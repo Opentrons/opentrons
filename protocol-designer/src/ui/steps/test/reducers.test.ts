@@ -7,7 +7,7 @@ import {
   TERMINAL_ITEM_SELECTION_TYPE,
   type SelectableItem,
 } from '../reducers.js'
-import type { SelectMultipleStepsAction } from '../actions/types'
+import { SelectMultipleStepsAction } from '../actions/types'
 
 jest.mock('../../../labware-defs/utils')
 
@@ -204,12 +204,12 @@ describe('selectedItem reducer', () => {
       type: 'SELECT_MULTIPLE_STEPS',
       payload: { stepIds, lastSelected },
     }
-    const multiTestCases: {|
+    const multiTestCases: {
       title: string,
       prev: SelectableItem | null,
       action: SelectMultipleStepsAction,
       expected: SelectableItem | null,
-    |} = [
+    } = [
       {
         title: 'should enter multi-select mode from null',
         prev: null,

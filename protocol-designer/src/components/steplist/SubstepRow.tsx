@@ -9,8 +9,8 @@ import { IngredPill } from './IngredPill'
 import { PDListItem } from '../lists'
 import { swatchColors } from '../swatchColors'
 import { formatVolume, formatPercentage } from './utils'
-import type { LocationLiquidState } from '@opentrons/step-generation'
-import type {
+import { LocationLiquidState } from '@opentrons/step-generation'
+import {
   SubstepIdentifier,
   SubstepWellData,
   WellIngredientVolumeData,
@@ -18,8 +18,8 @@ import type {
 } from '../../steplist/types'
 import styles from './StepItem.css'
 
-type SubstepRowProps = {|
-  volume?: ?number | ?string,
+type SubstepRowProps = {
+  volume: number | string | null | undefined ,
   source?: SubstepWellData,
   dest?: SubstepWellData,
   ingredNames: WellIngredientNames,
@@ -27,7 +27,7 @@ type SubstepRowProps = {|
   stepId: string,
   substepIndex: number,
   selectSubstep?: SubstepIdentifier => mixed,
-|}
+}
 
 type PillTooltipContentsProps = {
   ingreds: WellIngredientVolumeData | LocationLiquidState,

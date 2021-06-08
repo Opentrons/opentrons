@@ -5,14 +5,14 @@ import { i18n } from '../../localization'
 // TODO: Ian 2019-03-27 the use of Component Library `Alert` is being
 // stretched beyond its intentions here, we should reconcile PD + Run App uses of Alert later
 import styles from './alerts.css'
-import type { AlertType } from './types'
+import { AlertType } from './types'
 
-type PDAlertProps = {|
-  alertType: AlertType,
-  title: string,
-  description: React.Node,
-  onDismiss?: ?() => mixed,
-|}
+type PDAlertProps = {
+  alertType: AlertType
+  title: string
+  description: React.Node
+  onDismiss: (() => mixed) | null | undefined
+}
 
 export const PDAlert = (props: PDAlertProps): React.Node => {
   const { alertType, title, description, onDismiss } = props

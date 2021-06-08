@@ -5,13 +5,13 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import type { LabwareDefinition2, ModuleRealType } from '@opentrons/shared-data'
-import type { LabwareDefByDefURI } from '../labware-defs'
-import type { LabwareOnDeck } from '../step-forms'
+import { LabwareDefinition2, ModuleRealType } from '@opentrons/shared-data'
+import { LabwareDefByDefURI } from '../labware-defs'
+import { LabwareOnDeck } from '../step-forms'
 // NOTE: this does not distinguish btw versions. Standard labware only (assumes namespace is 'opentrons')
 const COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE: Record<
   ModuleRealType,
-  ReadonlyArray<string>
+  Readonly<string[]>
 > = {
   [TEMPERATURE_MODULE_TYPE]: [
     'eppendorf_6_wellplate_16.8ml_flat',

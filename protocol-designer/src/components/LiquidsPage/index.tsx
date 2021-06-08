@@ -8,18 +8,18 @@ import { LiquidsPageInfo } from './LiquidsPageInfo'
 import * as labwareIngredActions from '../../labware-ingred/actions'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 
-import type { LiquidGroup } from '../../labware-ingred/types'
-import type { BaseState, ThunkDispatch } from '../../types'
+import { LiquidGroup } from '../../labware-ingred/types'
+import { BaseState, ThunkDispatch } from '../../types'
 
 type Props = React.ElementProps<typeof LiquidEditForm>
 type WrapperProps = { showForm: boolean, formKey: string, formProps: Props }
 
-type SP = {|
-  ...$Exact<LiquidGroup>,
-  _liquidGroupId: ?string,
+type SP = {
+  ...LiquidGroup,
+  _liquidGroupId: string | null | undefined,
   showForm: boolean,
   canDelete: $ElementType<Props, 'canDelete'>,
-|}
+}
 
 function LiquidEditFormWrapper(props: WrapperProps) {
   const { showForm, formKey, formProps } = props
@@ -90,11 +90,11 @@ function mergeProps(
   }
 }
 
-export const LiquidsPage: React.AbstractComponent<{||}> = connect<
+export const LiquidsPage: React.AbstractComponent<{}> = connect<
   WrapperProps,
-  {||},
+  {},
   SP,
-  {||},
+  {},
   _,
   _
 >(

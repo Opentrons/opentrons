@@ -13,11 +13,11 @@ import {
   type StepType,
 } from '../../form-types'
 import { selectors as stepFormSelectors } from '../../step-forms'
-import type { BaseState } from '../../types'
+import { BaseState } from '../../types'
 import { ContextMenu } from './ContextMenu'
 import styles from './StepItem.css'
 
-type DragDropStepItemProps = {|
+type DragDropStepItemProps = {
   ...$Exact<React.ElementProps<typeof ConnectedStepItem>>,
   connectDragSource: mixed => React.Element<any>,
   connectDropTarget: mixed => React.Element<any>,
@@ -27,7 +27,7 @@ type DragDropStepItemProps = {|
   findStepIndex: StepIdType => number,
   onDrag: () => void,
   moveStep: (StepIdType, number) => void,
-|}
+}
 
 const DragSourceStepItem = (props: DragDropStepItemProps) =>
   props.connectDragSource(
@@ -78,13 +78,13 @@ const DragDropStepItem = DropTarget(
   collectStepTarget
 )(DraggableStepItem)
 
-type StepItemsProps = {|
-  orderedStepIds: Array<StepIdType>,
-  reorderSteps: (Array<StepIdType>) => mixed,
+type StepItemsProps = {
+  orderedStepIds: StepIdType[],
+  reorderSteps: (StepIdType[]) => mixed,
   isOver: boolean,
   connectDropTarget: mixed => React.Element<any>,
-|}
-type StepItemsState = {| stepIds: Array<StepIdType> |}
+}
+type StepItemsState = { stepIds: StepIdType[] }
 class StepItems extends React.Component<StepItemsProps, StepItemsState> {
   constructor(props) {
     super(props)
@@ -152,16 +152,16 @@ class StepItems extends React.Component<StepItemsProps, StepItemsState> {
 
 const NAV_OFFSET = 64
 
-type StepDragPreviewSP = {| stepType: ?StepType, stepName: ?string |}
+type StepDragPreviewSP = { stepType: StepType | null | undefined, stepName: string | null | undefined }
 
-type StepDragPreviewOP = {|
+type StepDragPreviewOP = {
   currentOffset?: { y: number, x: number },
   itemType: string,
   isDragging: boolean,
   item: { stepId: StepIdType },
-|}
+}
 
-type StepDragPreviewProps = {| ...StepDragPreviewOP, ...StepDragPreviewSP |}
+type StepDragPreviewProps = StepDragPreviewOP & StepDragPreviewSP
 
 const StepDragPreview = (props: StepDragPreviewProps) => {
   const { itemType, isDragging, currentOffset, stepType, stepName } = props
@@ -198,7 +198,7 @@ const mapSTPForPreview = (
   return { stepType, stepName }
 }
 
-export const StepDragPreviewLayer: React.AbstractComponent<{||}> = DragLayer(
+export const StepDragPreviewLayer: React.AbstractComponent<{}> = DragLayer(
   monitor => ({
     currentOffset: monitor.getSourceClientOffset(),
     isDragging: monitor.isDragging(),
@@ -220,5 +220,5 @@ const collectListTarget = (connect, monitor) => ({
 })
 
 export const DraggableStepItems: React.AbstractComponent<
-  $Diff<StepItemsProps, {| isOver: mixed, connectDropTarget: mixed |}>
+  $Diff<StepItemsProps, { isOver: mixed, connectDropTarget: mixed }>
 > = DropTarget(DND_TYPES.STEP_ITEM, listTarget, collectListTarget)(StepItems)

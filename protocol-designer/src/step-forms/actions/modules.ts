@@ -1,7 +1,7 @@
 import { $Diff } from 'utility-types'
 import { uuid } from '../../utils'
-import type { ModuleRealType } from '@opentrons/shared-data'
-import type { DeckSlot } from '../../types'
+import { ModuleRealType } from '@opentrons/shared-data'
+import { DeckSlot } from '../../types'
 export type CreateModuleAction = {
   type: 'CREATE_MODULE'
   payload: {

@@ -42,13 +42,13 @@ import { SlotWarning } from './SlotWarning'
 import { LabwareOnDeck } from './LabwareOnDeck'
 import { SlotControls, LabwareControls, DragPreview } from './LabwareOverlays'
 
-import type { TerminalItemId } from '../../steplist'
-import type {
+import { TerminalItemId } from '../../steplist'
+import {
   InitialDeckSetup,
   LabwareOnDeck as LabwareOnDeckType,
   ModuleOnDeck,
 } from '../../step-forms'
-import type { LabwareDefByDefURI } from '../../labware-defs'
+import { LabwareDefByDefURI } from '../../labware-defs'
 
 import styles from './DeckSetup.css'
 
@@ -62,19 +62,19 @@ export const DECK_LAYER_BLOCKLIST = [
   'screwHoles',
 ]
 
-type Props = {|
-  selectedTerminalItemId: ?TerminalItemId,
+type Props = {
+  selectedTerminalItemId: TerminalItemId | null | undefined,
   handleClickOutside?: () => mixed,
   drilledDown: boolean,
   initialDeckSetup: InitialDeckSetup,
-|}
+}
 
-type ContentsProps = {|
+type ContentsProps = {
   ...RobotWorkSpaceRenderProps,
-  selectedTerminalItemId: ?TerminalItemId,
+  selectedTerminalItemId: TerminalItemId | null | undefined,
   initialDeckSetup: InitialDeckSetup,
   showGen1MultichannelCollisionWarnings: boolean,
-|}
+}
 
 export const VIEWBOX_MIN_X = -64
 export const VIEWBOX_MIN_Y = -10
@@ -110,15 +110,15 @@ const getSlotDefForModuleSlot = (
 const getModuleSlotDefs = (
   initialDeckSetup: InitialDeckSetup,
   deckSlots: { [slotId: string]: DeckDefSlot }
-): Array<DeckDefSlot> => {
+): DeckDefSlot[] => {
   return values(initialDeckSetup.modules).map((moduleOnDeck: ModuleOnDeck) =>
     getSlotDefForModuleSlot(moduleOnDeck, deckSlots)
   )
 }
 
 export const getSwapBlocked = (args: {
-  hoveredLabware: ?LabwareOnDeckType,
-  draggedLabware: ?LabwareOnDeckType,
+  hoveredLabware: LabwareOnDeckType | null | undefined,
+  draggedLabware: LabwareOnDeckType | null | undefined,
   modulesById: $PropertyType<InitialDeckSetup, 'modules'>,
   customLabwareDefs: LabwareDefByDefURI,
 }): boolean => {
@@ -132,9 +132,9 @@ export const getSwapBlocked = (args: {
     return false
   }
 
-  const sourceModuleType: ?ModuleRealType =
+  const sourceModuleType: ModuleRealType | null | undefined =
     modulesById[draggedLabware.slot]?.type || null
-  const destModuleType: ?ModuleRealType =
+  const destModuleType: ModuleRealType | null | undefined =
     modulesById[hoveredLabware.slot]?.type || null
 
   const draggedLabwareIsCustom = getLabwareIsCustom(
@@ -203,15 +203,15 @@ export const DeckSetupContents = (props: ContentsProps): React.Node => {
   const slotsBlockedBySpanning = getSlotsBlockedBySpanning(
     props.initialDeckSetup
   )
-  const deckSlots: Array<DeckDefSlot> = values(deckSlotsById)
+  const deckSlots: DeckDefSlot[] = values(deckSlotsById)
   const moduleSlots = getModuleSlotDefs(initialDeckSetup, deckSlotsById)
   // NOTE: in these arrays of slots, order affects SVG render layering
   // labware can be in a module or on the deck
-  const labwareParentSlots: Array<DeckDefSlot> = [...deckSlots, ...moduleSlots]
+  const labwareParentSlots: DeckDefSlot[] = [...deckSlots, ...moduleSlots]
   // modules can be on the deck, including pseudo-slots (eg special 'spanning' slot for thermocycler position)
   const moduleParentSlots = [...deckSlots, ...values(PSEUDO_DECK_SLOTS)]
 
-  const allLabware: Array<LabwareOnDeckType> = Object.keys(
+  const allLabware: LabwareOnDeckType[] = Object.keys(
     initialDeckSetup.labware
   ).reduce((acc, labwareId) => {
     const labware = initialDeckSetup.labware[labwareId]
@@ -220,10 +220,10 @@ export const DeckSetupContents = (props: ContentsProps): React.Node => {
       : [...acc, labware]
   }, [])
 
-  const allModules: Array<ModuleOnDeck> = values(initialDeckSetup.modules)
+  const allModules: ModuleOnDeck[] = values(initialDeckSetup.modules)
 
   // NOTE: naively hard-coded to show warning north of slots 1 or 3 when occupied by any module
-  const multichannelWarningSlots: Array<DeckDefSlot> = showGen1MultichannelCollisionWarnings
+  const multichannelWarningSlots: DeckDefSlot[] = showGen1MultichannelCollisionWarnings
     ? compact([
         (allModules.some(
           moduleOnDeck =>

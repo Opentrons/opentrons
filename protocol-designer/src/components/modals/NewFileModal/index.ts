@@ -17,16 +17,13 @@ import * as labwareDefActions from '../../../labware-defs/actions'
 import * as labwareIngredActions from '../../../labware-ingred/actions'
 import { actions as stepFormActions } from '../../../step-forms'
 import { actions as steplistActions } from '../../../steplist'
-import type {
-  ModuleCreationArgs,
-  PipetteFieldsData,
-} from '../FilePipettesModal'
+import { ModuleCreationArgs, PipetteFieldsData } from '../FilePipettesModal'
 import { FilePipettesModal as FilePipettesModalComponent } from '../FilePipettesModal'
-import type { NormalizedPipette } from '@opentrons/step-generation'
-import type { BaseState, ThunkDispatch } from '../../../types'
-import type { NewProtocolFields } from '../../../load-file'
-import type { PipetteOnDeck } from '../../../step-forms'
-import type { LabwareDefByDefURI } from '../../../labware-defs/types'
+import { NormalizedPipette } from '@opentrons/step-generation'
+import { BaseState, ThunkDispatch } from '../../../types'
+import { NewProtocolFields } from '../../../load-file'
+import { PipetteOnDeck } from '../../../step-forms'
+import { LabwareDefByDefURI } from '../../../labware-defs/types'
 type Props = React.ElementProps<typeof FilePipettesModalComponent>
 type OP = {
   showProtocolFields: Props['showProtocolFields']
@@ -40,8 +37,8 @@ type SP = {
 type CreateNewProtocolArgs = {
   customLabware: LabwareDefByDefURI
   newProtocolFields: NewProtocolFields
-  pipettes: Array<PipetteFieldsData>
-  modules: Array<ModuleCreationArgs>
+  pipettes: PipetteFieldsData[]
+  modules: ModuleCreationArgs[]
 }
 type DP = {
   onCancel: () => unknown
@@ -118,7 +115,7 @@ function mapDispatchToProps(dispatch: ThunkDispatch<any>): DP {
         dispatch(stepFormActions.createModule(moduleArgs))
       )
       // auto-generate tipracks for pipettes
-      const newTiprackModels: Array<string> = uniq(
+      const newTiprackModels: string[] = uniq(
         pipettes.map(pipette => pipette.tiprackDefURI)
       )
       newTiprackModels.forEach(tiprackDefURI => {

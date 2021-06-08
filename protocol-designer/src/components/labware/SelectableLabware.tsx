@@ -12,12 +12,12 @@ import { SingleLabware } from './SingleLabware'
 import { SelectionRect } from '../SelectionRect'
 import { WellTooltip } from './WellTooltip'
 
-import type { Channels, WellMouseEvent, WellGroup } from '@opentrons/components'
-import type { ContentsByWell } from '../../labware-ingred/types'
-import type { WellIngredientNames } from '../../steplist/types'
-import type { GenericRect } from '../../collision-types'
+import { Channels, WellMouseEvent, WellGroup } from '@opentrons/components'
+import { ContentsByWell } from '../../labware-ingred/types'
+import { WellIngredientNames } from '../../steplist/types'
+import { GenericRect } from '../../collision-types'
 
-export type Props = {|
+export type Props = {
   labwareProps: $Diff<
     React.ElementProps<typeof SingleLabware>,
     { selectedWells: * }
@@ -27,10 +27,10 @@ export type Props = {|
   selectWells: WellGroup => mixed,
   deselectWells: WellGroup => mixed,
   updateHighlightedWells: WellGroup => mixed,
-  pipetteChannels?: ?Channels,
+  pipetteChannels: Channels | null | undefined,
   ingredNames: WellIngredientNames,
   wellContents: ContentsByWell,
-|}
+}
 
 export class SelectableLabware extends React.Component<Props> {
   _getWellsFromRect: (rect: GenericRect) => WellGroup = rect => {

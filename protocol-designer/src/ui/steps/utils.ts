@@ -1,6 +1,6 @@
 import { i18n } from '../../localization'
 import forEach from 'lodash/forEach'
-import type { StepFieldName } from '../../form-types'
+import { StepFieldName } from '../../form-types'
 export const MAIN_CONTENT_FORCED_SCROLL_CLASSNAME = 'main_content_forced_scroll'
 // scroll to top of all elements with the special class (probably the main page wrapper)
 //
@@ -18,7 +18,7 @@ export const resetScrollElements = () => {
   )
 }
 type DisabledFields = Record<string, string>
-const batchEditMoveLiquidPipetteDifferentDisabledFieldNames: Array<StepFieldName> = [
+const batchEditMoveLiquidPipetteDifferentDisabledFieldNames: StepFieldName[] = [
   // aspirate
   'aspirate_mix_checkbox',
   'aspirate_mix_volume',
@@ -33,11 +33,11 @@ const batchEditMoveLiquidPipetteDifferentDisabledFieldNames: Array<StepFieldName
   'dispense_airGap_volume',
   'dispense_flowRate',
 ]
-const batchEditMixPipetteDifferentDisabledFieldNames: Array<StepFieldName> = [
+const batchEditMixPipetteDifferentDisabledFieldNames: StepFieldName[] = [
   'aspirate_flowRate',
   'dispense_flowRate',
 ]
-const batchEditMoveLiquidAspirateLabwareDisabledFieldNames: Array<StepFieldName> = [
+const batchEditMoveLiquidAspirateLabwareDisabledFieldNames: StepFieldName[] = [
   'aspirate_mmFromBottom',
   'aspirate_delay_checkbox',
   'aspirate_delay_seconds',
@@ -45,7 +45,7 @@ const batchEditMoveLiquidAspirateLabwareDisabledFieldNames: Array<StepFieldName>
   'aspirate_touchTip_checkbox',
   'aspirate_touchTip_mmFromBottom',
 ]
-const batchEditMoveLiquidDispenseLabwareDisabledFieldNames: Array<StepFieldName> = [
+const batchEditMoveLiquidDispenseLabwareDisabledFieldNames: StepFieldName[] = [
   'dispense_mmFromBottom',
   'dispense_delay_checkbox',
   'dispense_delay_seconds',
@@ -53,7 +53,7 @@ const batchEditMoveLiquidDispenseLabwareDisabledFieldNames: Array<StepFieldName>
   'dispense_touchTip_checkbox',
   'dispense_touchTip_mmFromBottom',
 ]
-const batchEditMixLabwareDifferentDisabledFieldNames: Array<StepFieldName> = [
+const batchEditMixLabwareDifferentDisabledFieldNames: StepFieldName[] = [
   'mix_mmFromBottom',
   'aspirate_delay_checkbox',
   'aspirate_delay_seconds',
@@ -62,31 +62,31 @@ const batchEditMixLabwareDifferentDisabledFieldNames: Array<StepFieldName> = [
   'mix_touchTip_checkbox',
   'mix_touchTip_mmFromBottom',
 ]
-const batchEditMoveLiquidMultiAspiratePathDisabledFieldNames: Array<StepFieldName> = [
+const batchEditMoveLiquidMultiAspiratePathDisabledFieldNames: StepFieldName[] = [
   'aspirate_mix_checkbox',
   'aspirate_mix_volume',
   'aspirate_mix_times',
 ]
-const batchEditMoveLiquidMultiDispensePathDisabledFieldNames: Array<StepFieldName> = [
+const batchEditMoveLiquidMultiDispensePathDisabledFieldNames: StepFieldName[] = [
   'dispense_mix_checkbox',
   'dispense_mix_volume',
   'dispense_mix_times',
   'blowout_checkbox',
   'blowout_location',
 ]
-const batchEditMoveLiquidPipetteDifferentAndMultiAspiratePathDisabledFieldNames: Array<StepFieldName> = [
+const batchEditMoveLiquidPipetteDifferentAndMultiAspiratePathDisabledFieldNames: StepFieldName[] = [
   'aspirate_mix_checkbox',
   'aspirate_mix_volume',
   'aspirate_mix_times',
 ]
-const batchEditMoveLiquidPipetteDifferentAndMultiDispensePathDisabledFieldNames: Array<StepFieldName> = [
+const batchEditMoveLiquidPipetteDifferentAndMultiDispensePathDisabledFieldNames: StepFieldName[] = [
   'dispense_mix_checkbox',
   'dispense_mix_volume',
   'dispense_mix_times',
 ]
 
 const fieldsWithDisabledTooltipText = (
-  fieldNames: Array<StepFieldName>,
+  fieldNames: StepFieldName[],
   disabledReason: string
 ): DisabledFields =>
   fieldNames.reduce(

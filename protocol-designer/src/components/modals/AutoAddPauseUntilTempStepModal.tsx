@@ -5,11 +5,11 @@ import { i18n } from '../../localization'
 import modalStyles from './modal.css'
 import styles from './AutoAddPauseUntilTempStepModal.css'
 
-type Props = {|
-  displayTemperature: string,
-  handleCancelClick: () => mixed,
-  handleContinueClick: () => mixed,
-|}
+type Props = {
+  displayTemperature: string
+  handleCancelClick: () => mixed
+  handleContinueClick: () => mixed
+}
 
 export const AutoAddPauseUntilTempStepModal = (props: Props): React.Node => (
   <AlertModal

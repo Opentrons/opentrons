@@ -8,16 +8,16 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { SPAN7_8_10_11_SLOT, TC_SPAN_SLOTS } from '../../constants'
-import type { DeckSlotId, ModuleRealType } from '@opentrons/shared-data'
-import type {
+import { DeckSlotId, ModuleRealType } from '@opentrons/shared-data'
+import {
   NormalizedPipette,
   NormalizedPipetteById,
   PipetteEntity,
   PipetteEntities,
 } from '@opentrons/step-generation'
-import type { LabwareDefByDefURI } from '../../labware-defs'
-import type { DeckSlot } from '../../types'
-import type {
+import { LabwareDefByDefURI } from '../../labware-defs'
+import { DeckSlot } from '../../types'
+import {
   InitialDeckSetup,
   ModuleOnDeck,
   FormPipettesByMount,
@@ -26,10 +26,10 @@ import type {
 } from '../types'
 export { createPresavedStepForm } from './createPresavedStepForm'
 export function getIdsInRange<T extends string | number>(
-  orderedIds: Array<T>,
+  orderedIds: T[],
   startId: T,
   endId: T
-): Array<T> {
+): T[] {
   const startIdx = orderedIds.findIndex(id => id === startId)
   const endIdx = orderedIds.findIndex(id => id === endId)
   assert(
@@ -88,7 +88,7 @@ export function denormalizePipetteEntities(
 }
 export const getSlotsBlockedBySpanning = (
   initialDeckSetup: InitialDeckSetup
-): Array<DeckSlot> => {
+): DeckSlot[] => {
   // NOTE: Ian 2019-10-25 dumb heuristic since there's only one case this can happen now
   if (
     values(initialDeckSetup.modules).some(

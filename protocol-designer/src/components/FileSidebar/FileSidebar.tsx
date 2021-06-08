@@ -16,37 +16,37 @@ import { getUnusedEntities } from './utils'
 import modalStyles from '../modals/modal.css'
 import styles from './FileSidebar.css'
 
-import type { HintKey } from '../../tutorial'
-import type { PDProtocolFile } from '../../file-types'
-import type {
+import { HintKey } from '../../tutorial'
+import { PDProtocolFile } from '../../file-types'
+import {
   InitialDeckSetup,
   SavedStepFormState,
   ModuleOnDeck,
   PipetteOnDeck,
 } from '../../step-forms'
 
-type Props = {|
-  loadFile: (event: SyntheticInputEvent<HTMLInputElement>) => mixed,
-  createNewFile?: () => mixed,
-  canDownload: boolean,
-  onDownload: () => mixed,
-  fileData: ?PDProtocolFile,
-  pipettesOnDeck: $PropertyType<InitialDeckSetup, 'pipettes'>,
-  modulesOnDeck: $PropertyType<InitialDeckSetup, 'modules'>,
-  savedStepForms: SavedStepFormState,
-  schemaVersion: number,
-|}
+type Props = {
+  loadFile: (event: SyntheticInputEvent<HTMLInputElement>) => mixed
+  createNewFile?: () => mixed
+  canDownload: boolean
+  onDownload: () => mixed
+  fileData: PDProtocolFile | null | undefined
+  pipettesOnDeck: $PropertyType<InitialDeckSetup, 'pipettes'>
+  modulesOnDeck: $PropertyType<InitialDeckSetup, 'modules'>
+  savedStepForms: SavedStepFormState
+  schemaVersion: number
+}
 
-type WarningContent = {|
-  content: React.Node,
-  heading: string,
-|}
+type WarningContent = {
+  content: React.Node
+  heading: string
+}
 
-type MissingContent = {|
-  noCommands: boolean,
-  pipettesWithoutStep: Array<PipetteOnDeck>,
-  modulesWithoutStep: Array<ModuleOnDeck>,
-|}
+type MissingContent = {
+  noCommands: boolean
+  pipettesWithoutStep: PipetteOnDeck[]
+  modulesWithoutStep: ModuleOnDeck[]
+}
 
 function getWarningContent({
   noCommands,
@@ -198,10 +198,10 @@ export function FileSidebar(props: Props): React.Node {
       modulesWithoutStep,
     })
 
-  const getExportHintContent = (): {|
-    hintKey: HintKey,
-    content: React.Node,
-  |} => {
+  const getExportHintContent = (): {
+    hintKey: HintKey
+    content: React.Node
+  } => {
     return {
       hintKey:
         schemaVersion === 5

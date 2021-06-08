@@ -1,5 +1,5 @@
-import type { NormalizedPipetteById } from '@opentrons/step-generation'
-import type { StepIdType } from '../../form-types'
+import { NormalizedPipetteById } from '@opentrons/step-generation'
+import { StepIdType } from '../../form-types'
 export type CreatePipettesAction = {
   type: 'CREATE_PIPETTES'
   payload: NormalizedPipetteById
@@ -14,7 +14,7 @@ export const createPipettes = (
 }
 export type DeletePipettesAction = {
   type: 'DELETE_PIPETTES'
-  payload: Array<string> // pipette ids to delete, order doesn't matter
+  payload: string[] // pipette ids to delete, order doesn't matter
 }
 export const deletePipettes = (
   payload: DeletePipettesAction['payload']

@@ -13,7 +13,7 @@ import {
 import { substepTimeline } from './substepTimeline'
 import * as steplistUtils from './utils'
 import { THERMOCYCLER_PROFILE, THERMOCYCLER_STATE } from '../constants'
-import type {
+import {
   CurriedCommandCreator,
   InvariantContext,
   RobotState,
@@ -22,8 +22,8 @@ import type {
   MixArgs,
   TransferArgs,
 } from '@opentrons/step-generation'
-import type { StepIdType } from '../form-types'
-import type {
+import { StepIdType } from '../form-types'
+import {
   NamedIngred,
   StepArgsAndErrors,
   StepItemSourceDestRow,
@@ -32,7 +32,7 @@ import type {
   SubstepTimelineFrame,
   LabwareNamesByModuleId,
 } from './types'
-export type GetIngreds = (labware: string, well: string) => Array<NamedIngred>
+export type GetIngreds = (labware: string, well: string) => NamedIngred[]
 type TransferLikeArgs =
   | ConsolidateArgs
   | DistributeArgs
@@ -105,9 +105,9 @@ function getCommandCreatorForTransferlikeSubsteps(
 }
 
 export const mergeSubstepRowsSingleChannel = (args: {
-  substepRows: Array<SubstepTimelineFrame>
+  substepRows: SubstepTimelineFrame[]
   showDispenseVol: boolean
-}): Array<StepItemSourceDestRow> => {
+}): StepItemSourceDestRow[] => {
   const { substepRows, showDispenseVol } = args
   return steplistUtils.mergeWhen(
     substepRows,
@@ -151,11 +151,11 @@ export const mergeSubstepRowsSingleChannel = (args: {
   )
 }
 export const mergeSubstepRowsMultiChannel = (args: {
-  substepRows: Array<SubstepTimelineFrame>
+  substepRows: SubstepTimelineFrame[]
   channels: number
   isMixStep: boolean
   showDispenseVol: boolean
-}): Array<Array<StepItemSourceDestRow>> => {
+}): Array<StepItemSourceDestRow[]> => {
   const { substepRows, channels, isMixStep, showDispenseVol } = args
   return steplistUtils.mergeWhen(
     substepRows,
@@ -276,14 +276,14 @@ function transferLikeSubsteps(args: {
 
   // Multichannel substeps
   if (pipetteSpec.channels > 1) {
-    const substepRows: Array<SubstepTimelineFrame> = substepTimeline(
+    const substepRows: SubstepTimelineFrame[] = substepTimeline(
       substepCommandCreator,
       invariantContext,
       initialRobotState,
       pipetteSpec.channels
     )
     const mergedMultiRows: Array<
-      Array<StepItemSourceDestRow>
+      StepItemSourceDestRow[]
     > = mergeSubstepRowsMultiChannel({
       substepRows,
       isMixStep: stepArgs.commandCreatorFnName === 'mix',
@@ -305,12 +305,10 @@ function transferLikeSubsteps(args: {
       initialRobotState,
       1
     )
-    const mergedRows: Array<StepItemSourceDestRow> = mergeSubstepRowsSingleChannel(
-      {
-        substepRows,
-        showDispenseVol,
-      }
-    )
+    const mergedRows: StepItemSourceDestRow[] = mergeSubstepRowsSingleChannel({
+      substepRows,
+      showDispenseVol,
+    })
     return {
       substepType: 'sourceDest',
       multichannel: false,

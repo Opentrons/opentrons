@@ -1,4 +1,4 @@
-import type { ElementProps } from 'react'
+import { ElementProps } from 'react'
 import assert from 'assert'
 import isEqual from 'lodash/isEqual'
 import mapValues from 'lodash/mapValues'
@@ -20,22 +20,22 @@ import {
   getFormErrors,
   stepFormToArgs,
 } from '../../steplist/formLevel'
-import type { ProfileFormError } from '../../steplist/formLevel/profileErrors'
+import { ProfileFormError } from '../../steplist/formLevel/profileErrors'
 import { getProfileFormErrors } from '../../steplist/formLevel/profileErrors'
 import { hydrateField, getFieldErrors } from '../../steplist/fieldLevel'
 import { getProfileItemsHaveErrors } from '../utils/getProfileItemsHaveErrors'
 import * as featureFlagSelectors from '../../feature-flags/selectors'
 import { denormalizePipetteEntities } from '../utils'
-import type { LabwareDefByDefURI } from '../../labware-defs'
+import { LabwareDefByDefURI } from '../../labware-defs'
 import { selectors as labwareDefSelectors } from '../../labware-defs'
 import { i18n } from '../../localization'
 import { InstrumentGroup as InstrumentGroupProps } from '@opentrons/components'
-import type {
+import {
   DropdownOption,
   Mount,
   InstrumentInfoProps,
 } from '@opentrons/components'
-import type {
+import {
   InvariantContext,
   LabwareEntity,
   LabwareEntities,
@@ -43,14 +43,11 @@ import type {
   ModuleEntity,
   PipetteEntities,
 } from '@opentrons/step-generation'
-import type { FormWarning } from '../../steplist/formLevel'
-import type { BaseState, Selector, DeckSlot } from '../../types'
-import type { FormData, StepIdType } from '../../form-types'
-import type {
-  StepArgsAndErrorsById,
-  StepFormErrors,
-} from '../../steplist/types'
-import type {
+import { FormWarning } from '../../steplist/formLevel'
+import { BaseState, Selector, DeckSlot } from '../../types'
+import { FormData, StepIdType } from '../../form-types'
+import { StepArgsAndErrorsById, StepFormErrors } from '../../steplist/types'
+import {
   InitialDeckSetup,
   NormalizedLabwareById,
   NormalizedLabware,
@@ -63,7 +60,7 @@ import type {
   TemperatureModuleState,
   ThermocyclerModuleState,
 } from '../types'
-import type {
+import {
   PresavedStepFormState,
   RootState,
   SavedStepFormState,
@@ -250,12 +247,12 @@ export const _getInitialDeckSetupRootState: (
   _getModuleEntitiesRootState,
   _getInitialDeckSetup
 )
-export const getPermittedTipracks: Selector<Array<string>> = createSelector(
+export const getPermittedTipracks: Selector<string[]> = createSelector(
   getInitialDeckSetup,
   initialDeckSetup =>
     reduce(
       initialDeckSetup.pipettes,
-      (acc: Array<string>, pipette: PipetteOnDeck) => {
+      (acc: string[], pipette: PipetteOnDeck) => {
         return pipette.tiprackDefURI ? [...acc, pipette.tiprackDefURI] : acc
       },
       []
@@ -279,7 +276,7 @@ function _getPipettesSame(pipettesOnDeck: InitialDeckSetup['pipettes']) {
 // equipped pipettes per step id instead of always using initial deck setup
 // (for when we support multiple deck setup steps)
 export const getEquippedPipetteOptions: Selector<
-  Array<DropdownOption>
+  DropdownOption[]
 > = createSelector(getInitialDeckSetup, initialDeckSetup => {
   const pipettes = initialDeckSetup.pipettes
 
@@ -287,7 +284,7 @@ export const getEquippedPipetteOptions: Selector<
 
   return reduce(
     pipettes,
-    (acc: Array<DropdownOption>, pipette: PipetteOnDeck, id: string) => {
+    (acc: DropdownOption[], pipette: PipetteOnDeck, id: string) => {
       const mountLabel = i18n.t(`form.pipette_mount_label.${pipette.mount}`)
       const nextOption = {
         name: pipettesSame
@@ -376,7 +373,7 @@ export const getModulesForEditModulesCard: Selector<ModulesForEditModulesCard> =
 export const getUnsavedForm: Selector<
   FormData | null | undefined
 > = createSelector(rootSelector, state => state.unsavedForm)
-export const getOrderedStepIds: Selector<Array<StepIdType>> = createSelector(
+export const getOrderedStepIds: Selector<StepIdType[]> = createSelector(
   rootSelector,
   state => state.orderedStepIds
 )
@@ -384,7 +381,7 @@ export const getSavedStepForms: Selector<SavedStepFormState> = createSelector(
   rootSelector,
   state => state.savedStepForms
 )
-const getOrderedSavedForms: Selector<Array<FormData>> = createSelector(
+const getOrderedSavedForms: Selector<FormData[]> = createSelector(
   getOrderedStepIds,
   getSavedStepForms,
   (orderedStepIds, savedStepForms) => {
@@ -456,7 +453,7 @@ const _formLevelErrors = (hydratedForm: FormData): StepFormErrors => {
 // TODO type with hydrated form type
 const _dynamicFieldFormErrors = (
   hydratedForm: FormData
-): Array<ProfileFormError> => {
+): ProfileFormError[] => {
   return getProfileFormErrors(hydratedForm)
 }
 
@@ -533,7 +530,7 @@ export const getHydratedUnsavedForm: Selector<any> = createSelector(
   }
 )
 export const getDynamicFieldFormErrorsForUnsavedForm: Selector<
-  Array<ProfileFormError>
+  ProfileFormError[]
 > = createSelector(getHydratedUnsavedForm, hydratedForm => {
   if (!hydratedForm) return []
 
@@ -594,7 +591,7 @@ export const getUnsavedFormIsPristineSetTempForm: Selector<boolean> = createSele
   }
 )
 export const getFormLevelWarningsForUnsavedForm: Selector<
-  Array<FormWarning>
+  FormWarning[]
 > = createSelector(
   getUnsavedForm,
   getInvariantContext,
@@ -607,7 +604,7 @@ export const getFormLevelWarningsForUnsavedForm: Selector<
   }
 )
 export const getFormLevelWarningsPerStep: Selector<
-  Record<string, Array<FormWarning>>
+  Record<string, FormWarning[]>
 > = createSelector(
   getSavedStepForms,
   getInvariantContext,

@@ -3,16 +3,16 @@ import * as React from 'react'
 import { i18n } from '../../localization'
 import { RobotCoordsForeignDiv } from '@opentrons/components'
 import styles from './SlotWarning.css'
-import type { ModuleOrientation } from '../../types'
+import { ModuleOrientation } from '../../types'
 
-type Props = {|
-  x: number,
-  y: number,
-  xDimension: number,
-  yDimension: number,
-  orientation: ModuleOrientation,
-  warningType: 'gen1multichannel', // NOTE: Ian 2019-10-31 if we want more on-deck warnings, expand the type here
-|}
+type Props = {
+  x: number
+  y: number
+  xDimension: number
+  yDimension: number
+  orientation: ModuleOrientation
+  warningType: 'gen1multichannel' // NOTE: Ian 2019-10-31 if we want more on-deck warnings, expand the type here
+}
 
 const OVERHANG = 60
 

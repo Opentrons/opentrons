@@ -4,18 +4,18 @@ import {
   MAGNETIC_MODULE_TYPE,
   MAGNETIC_MODULE_V1,
 } from '@opentrons/shared-data'
-import type { ModuleEntities } from '../../step-forms'
+import { ModuleEntities } from '../../step-forms'
 
 describe('getRequiresAtLeastV4 selector', () => {
-  const testCases: Array<{|
-    testName: string,
+  const testCases: Array<{
+    testName: string
     robotStateTimeline: {
       // NOTE: this is a simplified version of Timeline type so we don't need a huge fixture
-      timeline: Array<{ commands: Array<{ command: string }> }>,
-    },
-    moduleEntities: ModuleEntities,
-    expected: boolean,
-  |}> = [
+      timeline: Array<{ commands: Array<{ command: string }> }>
+    }
+    moduleEntities: ModuleEntities
+    expected: boolean
+  }> = [
     {
       testName: 'should return true if there are modules',
       expected: true,

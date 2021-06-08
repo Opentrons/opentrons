@@ -1,10 +1,10 @@
 import takeWhile from 'lodash/takeWhile'
 import { commandCreatorFromStepArgs } from '../file-data/selectors/commands'
 import * as StepGeneration from '@opentrons/step-generation'
-import type { StepArgsAndErrorsById } from '../steplist/types'
+import { StepArgsAndErrorsById } from '../steplist/types'
 export type GenerateRobotStateTimelineArgs = {
   allStepArgsAndErrors: StepArgsAndErrorsById
-  orderedStepIds: Array<string>
+  orderedStepIds: string[]
   initialRobotState: StepGeneration.RobotState
   invariantContext: StepGeneration.InvariantContext
 }

@@ -4,22 +4,22 @@ import { connect } from 'react-redux'
 import cx from 'classnames'
 import { Icon, useOnClickOutside } from '@opentrons/components'
 import { renameLabware } from '../../../labware-ingred/actions'
-import type { BaseState, ThunkDispatch } from '../../../types'
+import { BaseState, ThunkDispatch } from '../../../types'
 import { i18n } from '../../../localization'
-import type { LabwareOnDeck } from '../../../step-forms'
+import { LabwareOnDeck } from '../../../step-forms'
 import styles from './LabwareOverlays.css'
 
-type OP = {|
-  labwareOnDeck: LabwareOnDeck,
-  editLiquids: () => mixed,
-|}
+type OP = {
+  labwareOnDeck: LabwareOnDeck
+  editLiquids: () => mixed
+}
 
-type DP = {|
+type DP = {
   // TODO Ian 2018-02-16 type these fns elsewhere and import the type
-  setLabwareName: (name: ?string) => mixed,
-|}
+  setLabwareName: (name: string | null | undefined) => mixed
+}
 
-type Props = { ...OP, ...DP }
+type Props = OP & DP
 
 const NameThisLabwareComponent = (props: Props) => {
   const [inputValue, setInputValue] = React.useState('')
@@ -70,7 +70,7 @@ const NameThisLabwareComponent = (props: Props) => {
 const mapDispatchToProps = (dispatch: ThunkDispatch<*>, ownProps: OP): DP => {
   const { id } = ownProps.labwareOnDeck
   return {
-    setLabwareName: (name: ?string) =>
+    setLabwareName: (name: string | null | undefined) =>
       dispatch(renameLabware({ labwareId: id, name })),
   }
 }

@@ -21,27 +21,27 @@ import { EditModules } from './EditModules'
 import styles from './FilePage.css'
 import modalStyles from '../components/modals/modal.css'
 import formStyles from '../components/forms/forms.css'
-import type { FormikProps } from 'formik/@flow-typed'
-import type { ModuleRealType } from '@opentrons/shared-data'
-import type { FileMetadataFields } from '../file-data'
-import type { ModulesForEditModulesCard } from '../step-forms'
+import { FormikProps } from 'formik/@flow-typed'
+import { ModuleRealType } from '@opentrons/shared-data'
+import { FileMetadataFields } from '../file-data'
+import { ModulesForEditModulesCard } from '../step-forms'
 
-export type Props = {|
+export type Props = {
   formValues: FileMetadataFields,
   instruments: React.ElementProps<typeof InstrumentGroup>,
   goToNextPage: () => mixed,
   saveFileMetadata: FileMetadataFields => mixed,
   swapPipettes: () => mixed,
   modules: ModulesForEditModulesCard,
-|}
+}
 
-type State = {|
+type State = {
   isEditPipetteModalOpen: boolean,
-  moduleToEdit: {|
+  moduleToEdit: {
     moduleType: ModuleRealType,
-    moduleId: ?string,
-  |} | null,
-|}
+    moduleId: string | null | undefined,
+  } | null,
+}
 
 // TODO(mc, 2020-02-28): explore l10n for these dates
 const DATE_ONLY_FORMAT = 'MMM dd, yyyy'

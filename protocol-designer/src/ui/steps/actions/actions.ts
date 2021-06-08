@@ -4,13 +4,13 @@ import { PRESAVED_STEP_ID } from '../../../steplist/types'
 import { selectors as stepFormSelectors } from '../../../step-forms'
 import { getMultiSelectLastSelected } from '../selectors'
 import { resetScrollElements } from '../utils'
-import type { Timeline } from '@opentrons/step-generation'
-import type { StepIdType, StepType } from '../../../form-types'
-import type { GetState, ThunkAction, ThunkDispatch } from '../../../types'
-import type { TerminalItemId, SubstepIdentifier } from '../../../steplist/types'
-import type { AnalyticsEvent } from '../../../analytics/mixpanel'
-import type { AnalyticsEventAction } from '../../../analytics/actions'
-import type {
+import { Timeline } from '@opentrons/step-generation'
+import { StepIdType, StepType } from '../../../form-types'
+import { GetState, ThunkAction, ThunkDispatch } from '../../../types'
+import { TerminalItemId, SubstepIdentifier } from '../../../steplist/types'
+import { AnalyticsEvent } from '../../../analytics/mixpanel'
+import { AnalyticsEventAction } from '../../../analytics/actions'
+import {
   AddStepAction,
   ExpandAddStepButtonAction,
   ToggleStepCollapsedAction,
@@ -56,13 +56,13 @@ export const toggleStepCollapsed = (
   payload: stepId,
 })
 export const expandMultipleSteps = (
-  stepIds: Array<StepIdType>
+  stepIds: StepIdType[]
 ): ExpandMultipleStepsAction => ({
   type: 'EXPAND_MULTIPLE_STEPS',
   payload: stepIds,
 })
 export const collapseMultipleSteps = (
-  stepIds: Array<StepIdType>
+  stepIds: StepIdType[]
 ): CollapseMultipleStepsAction => ({
   type: 'COLLAPSE_MULTIPLE_STEPS',
   payload: stepIds,
@@ -120,7 +120,7 @@ export const selectStep = (stepId: StepIdType): ThunkAction<any> => (
 }
 // NOTE(sa, 2020-12-11): this is a thunk so that we can populate the batch edit form with things later
 export const selectMultipleSteps = (
-  stepIds: Array<StepIdType>,
+  stepIds: StepIdType[],
   lastSelected: StepIdType
 ): ThunkAction<SelectMultipleStepsAction> => (
   dispatch: ThunkDispatch<any>,

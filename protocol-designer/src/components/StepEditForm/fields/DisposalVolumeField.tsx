@@ -16,17 +16,17 @@ import { selectors as uiLabwareSelectors } from '../../../ui/labware'
 import { getBlowoutLocationOptionsForForm } from '../utils'
 import { TextField } from './TextField'
 
-import type { FieldProps, FieldPropsByName } from '../types'
-import type { PathOption, StepType } from '../../../form-types'
-import type { BaseState } from '../../../types'
+import { FieldProps, FieldPropsByName } from '../types'
+import { PathOption, StepType } from '../../../form-types'
+import { BaseState } from '../../../types'
 
 import styles from '../StepEditForm.css'
 
-type DropdownFormFieldProps = {|
+type DropdownFormFieldProps = {
   ...FieldProps,
   className?: string,
   options: Options,
-|}
+}
 const DropdownFormField = (props: DropdownFormFieldProps) => {
   return (
     <DropdownField
@@ -40,11 +40,11 @@ const DropdownFormField = (props: DropdownFormFieldProps) => {
   )
 }
 
-type SP = {|
+type SP = {
   disposalDestinationOptions: Options,
-  maxDisposalVolume: ?number,
-|}
-type OP = {|
+  maxDisposalVolume: number | null | undefined,
+}
+type OP = {
   aspirate_airGap_checkbox?: boolean | null,
   aspirate_airGap_volume?: string | null,
   path: PathOption,
@@ -52,8 +52,8 @@ type OP = {|
   propsForFields: FieldPropsByName,
   stepType: StepType,
   volume: string | null,
-|}
-type Props = { ...SP, ...OP }
+}
+type Props = SP & OP
 
 const DisposalVolumeFieldComponent = (props: Props) => {
   const { propsForFields } = props

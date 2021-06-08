@@ -1,18 +1,14 @@
 import { THERMOCYCLER_STATE, THERMOCYCLER_PROFILE } from '../../../constants'
-import type {
+import {
   ThermocyclerProfileStepArgs,
   ThermocyclerStateStepArgs,
 } from '@opentrons/step-generation'
 import { PROFILE_STEP } from '../../../form-types'
-import type {
-  FormData,
-  ProfileItem,
-  ProfileStepItem,
-} from '../../../form-types'
+import { FormData, ProfileItem, ProfileStepItem } from '../../../form-types'
 type FlatProfileSteps = ThermocyclerProfileStepArgs['profileSteps']
 
 const _flattenProfileSteps = (args: {
-  orderedProfileItems: Array<string>
+  orderedProfileItems: string[]
   profileItemsById: Record<string, ProfileItem>
 }): FlatProfileSteps => {
   const { orderedProfileItems, profileItemsById } = args

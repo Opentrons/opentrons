@@ -7,8 +7,8 @@ import {
   getPipetteEntities,
   getSavedStepForms,
 } from '../../step-forms/selectors'
-import type { FileMetadataFields } from '../../file-data/types'
-import type { SaveStepFormsMultiAction } from '../../step-forms/actions'
+import { FileMetadataFields } from '../../file-data/types'
+import { SaveStepFormsMultiAction } from '../../step-forms/actions'
 
 jest.mock('../../file-data/selectors')
 jest.mock('../../step-forms/selectors')

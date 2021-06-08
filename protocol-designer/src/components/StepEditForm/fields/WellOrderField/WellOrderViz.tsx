@@ -5,14 +5,14 @@ import cx from 'classnames'
 import WELLS_IMAGE from '../../../../images/well_order_wells.svg'
 import PATH_IMAGE from '../../../../images/well_order_path.svg'
 
-import type { WellOrderOption } from '../../../../form-types'
+import { WellOrderOption } from '../../../../form-types'
 
 import styles from './WellOrderInput.css'
 
-type Props = {|
-  firstValue: WellOrderOption,
-  secondValue: WellOrderOption,
-|}
+type Props = {
+  firstValue: WellOrderOption
+  secondValue: WellOrderOption
+}
 
 export const WellOrderViz = (props: Props): React.Node => {
   const { firstValue, secondValue } = props

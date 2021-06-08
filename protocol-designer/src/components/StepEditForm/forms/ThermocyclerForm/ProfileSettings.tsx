@@ -7,9 +7,9 @@ import { TextField } from '../../fields'
 
 import styles from '../../StepEditForm.css'
 
-import type { FieldPropsByName } from '../../types'
+import { FieldPropsByName } from '../../types'
 
-type Props = {| propsForFields: FieldPropsByName |}
+type Props = { propsForFields: FieldPropsByName }
 
 export const ProfileSettings = (props: Props): React.Node => {
   const { propsForFields } = props

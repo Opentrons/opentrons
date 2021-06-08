@@ -11,7 +11,7 @@ import { maskField } from '../../../steplist/fieldLevel'
 import { TextField, RadioGroupField } from '../fields'
 import styles from '../StepEditForm.css'
 
-import type { StepFormProps } from '../types'
+import { StepFormProps } from '../types'
 
 export const MagnetForm = (props: StepFormProps): React.Node => {
   const moduleLabwareOptions = useSelector(
@@ -22,7 +22,7 @@ export const MagnetForm = (props: StepFormProps): React.Node => {
   const { magnetAction, moduleId } = props.formData
   const moduleModel = moduleId ? moduleEntities[moduleId]?.model : null
 
-  const moduleOption: ?string = moduleLabwareOptions[0]
+  const moduleOption: string | null | undefined = moduleLabwareOptions[0]
     ? moduleLabwareOptions[0].name
     : 'No magnetic module'
 

@@ -12,9 +12,9 @@ import {
 } from '@opentrons/shared-data'
 import * as labwareDefSelectors from './selectors'
 import { getAllWellSetsForLabware } from '../utils'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { ThunkAction } from '../types'
-import type { LabwareUploadMessage } from './types'
+import { LabwareDefinition2 } from '@opentrons/shared-data'
+import { ThunkAction } from '../types'
+import { LabwareUploadMessage } from './types'
 export type LabwareUploadMessageAction = {
   type: 'LABWARE_UPLOAD_MESSAGE'
   payload: LabwareUploadMessage
@@ -58,12 +58,12 @@ const ajv = new Ajv({
 const validate = ajv.compile(labwareSchema)
 
 const _labwareDefsMatchingLoadName = (
-  labwareDefs: Array<LabwareDefinition2>,
+  labwareDefs: LabwareDefinition2[],
   loadName: string
 ) => labwareDefs.filter(def => def.parameters.loadName === loadName)
 
 const _labwareDefsMatchingDisplayName = (
-  labwareDefs: Array<LabwareDefinition2>,
+  labwareDefs: LabwareDefinition2[],
   displayName: string
 ) =>
   labwareDefs.filter(
@@ -91,10 +91,10 @@ const _createCustomLabwareDef: (
 ) => (
   event: React.SyntheticEvent<HTMLInputElement>
 ) => ThunkAction<any> = onlyTiprack => event => (dispatch, getState) => {
-  const allLabwareDefs: Array<LabwareDefinition2> = values(
+  const allLabwareDefs: LabwareDefinition2[] = values(
     labwareDefSelectors.getLabwareDefsByURI(getState())
   )
-  const customLabwareDefs: Array<LabwareDefinition2> = values(
+  const customLabwareDefs: LabwareDefinition2[] = values(
     labwareDefSelectors.getCustomLabwareDefsByURI(getState())
   )
   const file = event.currentTarget.files[0]

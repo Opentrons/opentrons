@@ -16,20 +16,20 @@ import ZIG_ZAG_IMAGE from '../../../../images/zig_zag_icon.svg'
 import { WellOrderModal } from './WellOrderModal'
 import stepEditStyles from '../../StepEditForm.css'
 import styles from './WellOrderInput.css'
-import type { FieldProps } from '../../types'
-import type { WellOrderOption } from '../../../../form-types'
+import { FieldProps } from '../../types'
+import { WellOrderOption } from '../../../../form-types'
 
-type Props = {|
-  className?: ?string,
-  label?: string,
-  prefix: 'aspirate' | 'dispense' | 'mix',
-  firstValue: ?WellOrderOption,
-  secondValue: ?WellOrderOption,
-  firstName: string,
-  secondName: string,
-  updateFirstWellOrder: $PropertyType<FieldProps, 'updateValue'>,
-  updateSecondWellOrder: $PropertyType<FieldProps, 'updateValue'>,
-|}
+type Props = {
+  className: string | null | undefined
+  label?: string
+  prefix: 'aspirate' | 'dispense' | 'mix'
+  firstValue: WellOrderOption | null | undefined
+  secondValue: WellOrderOption | null | undefined
+  firstName: string
+  secondName: string
+  updateFirstWellOrder: $PropertyType<FieldProps, 'updateValue'>
+  updateSecondWellOrder: $PropertyType<FieldProps, 'updateValue'>
+}
 
 export const WellOrderField = (props: Props): React.Node => {
   const {

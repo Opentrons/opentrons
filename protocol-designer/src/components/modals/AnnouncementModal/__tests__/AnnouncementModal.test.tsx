@@ -6,7 +6,7 @@ import { Modal, OutlineButton } from '@opentrons/components'
 import * as persist from '../../../../persist'
 import { AnnouncementModal } from '../'
 import * as announcements from '../announcements'
-import type { Announcement } from '../announcements'
+import { Announcement } from '../announcements'
 
 jest.mock('../../../../persist.js')
 
@@ -16,7 +16,7 @@ describe('AnnouncementModal', () => {
     persist.getLocalStorageItem
 
   const announcementsMock: {
-    announcements: Array<Announcement>
+    announcements: Announcement[]
   } = announcements
 
   beforeEach(() => {

@@ -7,13 +7,13 @@ import {
   END_TERMINAL_ITEM_ID,
   PRESAVED_STEP_ID,
 } from '../../steplist/types'
-import type { HoverableItem } from '../../ui/steps/reducers'
+import { HoverableItem } from '../../ui/steps/reducers'
 import {
   SINGLE_STEP_SELECTION_TYPE,
   TERMINAL_ITEM_SELECTION_TYPE,
 } from '../../ui/steps/reducers'
-import type { CommandsAndRobotState } from '@opentrons/step-generation'
-import type { StepIdType } from '../../form-types'
+import { CommandsAndRobotState } from '@opentrons/step-generation'
+import { StepIdType } from '../../form-types'
 const initialRobotState: any = 'fake initial robot state'
 const initialFrame: any = {
   robotState: initialRobotState,
@@ -24,7 +24,7 @@ const lastValidFrame: any = {
   robotState: lastValidRobotState,
   commands: [],
 }
-const orderedStepIds: Array<StepIdType> = [
+const orderedStepIds: StepIdType[] = [
   'step1',
   'step2',
   'step3',

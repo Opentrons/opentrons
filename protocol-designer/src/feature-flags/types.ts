@@ -19,11 +19,8 @@ export const DEPRECATED_FLAGS = [
 // union of feature flag string constant IDs
 export type FlagTypes = 'PRERELEASE_MODE' | 'OT_PD_DISABLE_MODULE_RESTRICTIONS'
 // flags that are not in this list only show in prerelease mode
-export const userFacingFlags: Array<FlagTypes> = [
+export const userFacingFlags: FlagTypes[] = [
   'OT_PD_DISABLE_MODULE_RESTRICTIONS',
 ]
-export const allFlags: Array<FlagTypes> = [
-  ...userFacingFlags,
-  'PRERELEASE_MODE',
-]
+export const allFlags: FlagTypes[] = [...userFacingFlags, 'PRERELEASE_MODE']
 export type Flags = Partial<Record<FlagTypes, boolean | null | undefined>>

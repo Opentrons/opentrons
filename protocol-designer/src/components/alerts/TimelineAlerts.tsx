@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-import type { Dispatch } from 'redux'
+import { Dispatch } from 'redux'
 import { connect } from 'react-redux'
 import { i18n } from '../../localization'
 import { ErrorContents } from './ErrorContents'
@@ -9,15 +9,15 @@ import { actions as dismissActions } from '../../dismiss'
 import * as timelineWarningSelectors from '../../top-selectors/timelineWarnings'
 import { getSelectedStepId } from '../../ui/steps'
 import { selectors as fileDataSelectors } from '../../file-data'
-import { Alerts, type Props } from './Alerts'
-import type { CommandCreatorError } from '@opentrons/step-generation'
-import type { BaseState } from '../../types'
+import { Alerts, Props } from './Alerts'
+import { CommandCreatorError } from '@opentrons/step-generation'
+import { BaseState } from '../../types'
 
-type SP = {|
+type SP = {
   errors: $PropertyType<Props, 'errors'>,
   warnings: $PropertyType<Props, 'warnings'>,
-  _stepId: ?string,
-|}
+  _stepId: string | null | undefined,
+}
 
 /** Errors and Warnings from step-generation are written for developers
  * who are using step-generation as an API for writing Opentrons protocols.
@@ -30,7 +30,7 @@ type SP = {|
 
 function mapStateToProps(state: BaseState): SP {
   const timeline = fileDataSelectors.getRobotStateTimeline(state)
-  const errors = (timeline.errors || []: Array<CommandCreatorError>).map(
+  const errors = (timeline.errors || []: CommandCreatorError[]).map(
     error => ({
       title: i18n.t(`alert.timeline.error.${error.type}.title`, error.message),
       description: <ErrorContents level="timeline" errorType={error.type} />,
@@ -75,11 +75,11 @@ function mergeProps(
   }
 }
 
-export const TimelineAlerts: React.AbstractComponent<{||}> = connect<
+export const TimelineAlerts: React.AbstractComponent<{}> = connect<
   Props,
-  {||},
+  {},
   SP,
-  {||},
+  {},
   _,
   _
 >(

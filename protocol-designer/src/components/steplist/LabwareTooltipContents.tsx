@@ -2,9 +2,9 @@
 import * as React from 'react'
 import styles from './StepItem.css'
 
-type LabwareTooltipContentsProps = {|
-  labwareNickname: ?string,
-|}
+type LabwareTooltipContentsProps = {
+  labwareNickname: string | null | undefined
+}
 export const LabwareTooltipContents = (
   props: LabwareTooltipContentsProps
 ): React.Node => {

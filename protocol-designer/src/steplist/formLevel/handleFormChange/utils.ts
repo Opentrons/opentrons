@@ -3,16 +3,10 @@ import round from 'lodash/round'
 import uniq from 'lodash/uniq'
 import { getWellSetForMultichannel, canPipetteUseLabware } from '../../../utils'
 import { getPipetteCapacity } from '../../../pipettes/pipetteData'
-import type {
-  LabwareDefinition2,
-  PipetteChannels,
-} from '@opentrons/shared-data'
-import type {
-  LabwareEntities,
-  PipetteEntities,
-} from '@opentrons/step-generation'
-import type { FormPatch } from '../../actions/types'
-import type { FormData, PathOption, StepFieldName } from '../../../form-types'
+import { LabwareDefinition2, PipetteChannels } from '@opentrons/shared-data'
+import { LabwareEntities, PipetteEntities } from '@opentrons/step-generation'
+import { FormPatch } from '../../actions/types'
+import { FormData, PathOption, StepFieldName } from '../../../form-types'
 export function chainPatchUpdaters(
   initialPatch: FormPatch,
   fns: Array<(arg0: FormPatch) => FormPatch>
@@ -24,10 +18,10 @@ export function chainPatchUpdaters(
 // given an array of primary wells (for a multichannel), return all unique wells
 // included in that set. Used to convert multi to single.
 export function getAllWellsFromPrimaryWells(
-  primaryWells: Array<string>,
+  primaryWells: string[],
   labwareDef: LabwareDefinition2
-): Array<string> {
-  const allWells = primaryWells.reduce((acc: Array<string>, well: string) => {
+): string[] {
+  const allWells = primaryWells.reduce((acc: string[], well: string) => {
     const nextWellSet = getWellSetForMultichannel(labwareDef, well)
 
     // filter out any nulls (but you shouldn't get any)
@@ -144,7 +138,7 @@ type GetDefaultWellsArgs = {
   labwareEntities: LabwareEntities
   pipetteEntities: PipetteEntities
 }
-export function getDefaultWells(args: GetDefaultWellsArgs): Array<string> {
+export function getDefaultWells(args: GetDefaultWellsArgs): string[] {
   const { labwareId, pipetteId, labwareEntities, pipetteEntities } = args
   if (
     !labwareId ||

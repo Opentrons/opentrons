@@ -3,8 +3,8 @@ import { THERMOCYCLER_MODULE_TYPE } from '@opentrons/shared-data'
 import { timelineFrameBeforeActiveItem } from '../top-selectors/timelineFrames'
 import { getUnsavedForm, getOrderedStepIds } from '../step-forms/selectors'
 import isEmpty from 'lodash/isEmpty'
-import type { BaseState, Selector } from '../types'
-import type { HintKey } from '.'
+import { BaseState, Selector } from '../types'
+import { HintKey } from '.'
 
 const rootSelector = (state: BaseState) => state.tutorial
 
@@ -20,7 +20,7 @@ export const getHint: Selector<HintKey | null | undefined> = createSelector(
     return hints[0]
   }
 )
-export const getDismissedHints: Selector<Array<HintKey>> = createSelector(
+export const getDismissedHints: Selector<HintKey[]> = createSelector(
   rootSelector,
   tutorial => {
     const dismissedKeys = Object.keys(tutorial.dismissedHints)

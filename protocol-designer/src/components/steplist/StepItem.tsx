@@ -21,29 +21,29 @@ import { PauseStepItems } from './PauseStepItems'
 import { SourceDestSubstep } from './SourceDestSubstep'
 import styles from './StepItem.css'
 
-import type {
+import {
   FormData,
   StepType,
   ProfileCycleItem,
   ProfileStepItem,
 } from '../../form-types'
-import type {
+import {
   SubstepIdentifier,
   SubstepItemData,
   ThermocyclerProfileSubstepItem,
   WellIngredientNames,
 } from '../../steplist/types'
 
-export type StepItemProps = {|
-  description?: ?string,
-  rawForm: ?FormData,
+export type StepItemProps = {
+  description: string | null | undefined,
+  rawForm: FormData | null | undefined,
   stepNumber: number,
   stepType: StepType,
   title?: string,
 
   collapsed?: boolean,
-  error?: ?boolean,
-  warning?: ?boolean,
+  error: boolean | null | undefined,
+  warning: boolean | null | undefined,
   selected?: boolean,
   isLastSelected?: boolean,
   hovered?: boolean,
@@ -55,7 +55,7 @@ export type StepItemProps = {|
   toggleStepCollapsed: () => mixed,
   unhighlightStep: (event?: SyntheticEvent<>) => mixed,
   children?: React.Node,
-|}
+}
 
 export const StepItem = (props: StepItemProps): React.Node => {
   const {
@@ -110,17 +110,17 @@ export const StepItem = (props: StepItemProps): React.Node => {
   )
 }
 
-export type StepItemContentsProps = {|
-  rawForm: ?FormData,
+export type StepItemContentsProps = {
+  rawForm: FormData | null | undefined,
   stepType: StepType,
-  substeps: ?SubstepItemData,
+  substeps: SubstepItemData | null | undefined,
 
   ingredNames: WellIngredientNames,
   labwareNicknamesById: { [labwareId: string]: string },
 
   highlightSubstep: SubstepIdentifier => mixed,
-  hoveredSubstep: ?SubstepIdentifier,
-|}
+  hoveredSubstep: SubstepIdentifier | null | undefined,
+}
 
 const makeDurationText = (
   durationMinutes: string,
@@ -130,11 +130,11 @@ const makeDurationText = (
   return `${minutesText}${durationSeconds || 0}s`
 }
 
-type ProfileStepSubstepRowProps = {|
+type ProfileStepSubstepRowProps = {
   step: ProfileStepItem,
   stepNumber: number,
-  repetitionsDisplay: ?string,
-|}
+  repetitionsDisplay: string | null | undefined,
+}
 export const ProfileStepSubstepRow = (
   props: ProfileStepSubstepRowProps
 ): React.Node => {
@@ -176,7 +176,7 @@ export const ProfileStepSubstepRow = (
 }
 
 // this is a row under a cycle under a substep
-type ProfileCycleRowProps = {| step: ProfileStepItem, stepNumber: number |}
+type ProfileCycleRowProps = { step: ProfileStepItem, stepNumber: number }
 const ProfileCycleRow = (props: ProfileCycleRowProps): React.Node => {
   const { step, stepNumber } = props
   return (
@@ -192,10 +192,10 @@ const ProfileCycleRow = (props: ProfileCycleRowProps): React.Node => {
   )
 }
 
-type ProfileCycleSubstepGroupProps = {|
+type ProfileCycleSubstepGroupProps = {
   cycle: ProfileCycleItem,
   stepNumber: number,
-|}
+}
 export const ProfileCycleSubstepGroup = (
   props: ProfileCycleSubstepGroupProps
 ): React.Node => {
@@ -216,10 +216,10 @@ export const ProfileCycleSubstepGroup = (
   )
 }
 
-type CollapsibleSubstepProps = {|
+type CollapsibleSubstepProps = {
   children: React.Node,
   headerContent: React.Node,
-|}
+}
 const CollapsibleSubstep = (props: CollapsibleSubstepProps) => {
   const [contentCollapsed, setContentCollapsed] = React.useState<boolean>(true)
   return (

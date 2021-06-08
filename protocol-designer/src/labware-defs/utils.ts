@@ -1,7 +1,7 @@
 import groupBy from 'lodash/groupBy'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import { LabwareDefinition2 } from '@opentrons/shared-data'
 import { getLabwareDefURI, PD_DO_NOT_LIST } from '@opentrons/shared-data'
-import type { LabwareDefByDefURI } from './types'
+import { LabwareDefByDefURI } from './types'
 
 // TODO: Ian 2019-04-11 getAllDefinitions also exists (differently) in labware-library,
 // should reconcile differences & make a general util fn imported from shared-data
@@ -38,7 +38,7 @@ export function getOnlyLatestDefs(): LabwareDefByDefURI {
   if (!_latestDefs) {
     const allDefs = getAllDefinitions()
     const allURIs = Object.keys(allDefs)
-    const labwareDefGroups: Record<string, Array<LabwareDefinition2>> = groupBy(
+    const labwareDefGroups: Record<string, LabwareDefinition2[]> = groupBy(
       allURIs.map((uri: string) => allDefs[uri]),
       d => `${d.namespace}/${d.parameters.loadName}`
     )

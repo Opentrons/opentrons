@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
-import  { Dispatch } from 'redux'
-import { connect, MapStateToProps } from 'react-redux'
+import { Dispatch } from 'redux'
+import { connect } from 'react-redux'
 
 import { TitleBar, Icon,  IconName } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
@@ -23,10 +23,10 @@ import { closeIngredientSelector } from '../labware-ingred/actions'
 import { stepIconsByType } from '../form-types'
 import { selectors,  Page } from '../navigation'
 
-import  { TitleBarProps } from '@opentrons/components'
-import  { BaseState } from '../types'
+import { TitleBarProps } from '@opentrons/components'
+import { BaseState } from '../types'
 
-type Props = React.ComponentProps<typeof TitleBar>
+type Props = React.ElementProps<typeof TitleBar>
 
 type DP = { onBackClick: $PropertyType<Props, 'onBackClick'> }
 
@@ -38,8 +38,8 @@ type SP = {
 }
 
 type TitleWithIconProps = {
-  iconName?: IconName,
-  text?: string,
+  iconName: IconName | null | undefined,
+  text: string | null | undefined,
 }
 
 function TitleWithIcon(props: TitleWithIconProps) {
@@ -52,7 +52,7 @@ function TitleWithIcon(props: TitleWithIconProps) {
   )
 }
 
-type TitleWithBetaTagProps = { text?: string }
+type TitleWithBetaTagProps = { text: string | null | undefined }
 
 const TitleWithBetaTag = (props: TitleWithBetaTagProps) => (
   <div className={styles.title_wrapper}>
@@ -61,7 +61,7 @@ const TitleWithBetaTag = (props: TitleWithBetaTagProps) => (
   </div>
 )
 
-const mapStateToProps: MapStateToProps<SP, {}, BaseState> = state => {
+function mapStateToProps(state: BaseState): SP {
   const selectedLabwareId = labwareIngredSelectors.getSelectedLabwareId(state)
   const _page = selectors.getCurrentPage(state)
   const fileName = fileDataSelectors.protocolName(state)
@@ -207,8 +207,14 @@ const StickyTitleBar = (props: TitleBarProps) => (
   <TitleBar id="TitleBar_main" {...props} className={styles.sticky_bar} />
 )
 
-// ce: fix
-export const ConnectedTitleBar = connect(
+export const ConnectedTitleBar: React.AbstractComponent<{}> = connect<
+  Props,
+  {},
+  SP,
+  {},
+  _,
+  _
+>(
   mapStateToProps,
   null,
   mergeProps

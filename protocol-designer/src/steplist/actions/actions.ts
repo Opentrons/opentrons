@@ -1,9 +1,9 @@
 import { getOrderedStepIds } from '../../step-forms/selectors'
 import { getNextNonTerminalItemId } from '../utils'
-import type { ThunkAction } from '../../types'
-import type { StepIdType, FormData } from '../../form-types'
-import type { ChangeFormPayload } from './types'
-import type {
+import { ThunkAction } from '../../types'
+import { StepIdType, FormData } from '../../form-types'
+import { ChangeFormPayload } from './types'
+import {
   ClearSelectedItemAction,
   SelectMultipleStepsAction,
 } from '../../ui/steps'
@@ -43,10 +43,10 @@ export const deleteStep = (stepId: StepIdType): DeleteStepAction => ({
 })
 export type DeleteMultipleStepsAction = {
   type: 'DELETE_MULTIPLE_STEPS'
-  payload: Array<StepIdType>
+  payload: StepIdType[]
 }
 export const deleteMultipleSteps = (
-  stepIds: Array<StepIdType>
+  stepIds: StepIdType[]
 ): ThunkAction<
   | DeleteMultipleStepsAction
   | ClearSelectedItemAction
@@ -95,12 +95,10 @@ export const cancelStepForm = (): CancelStepFormAction => ({
 export type ReorderStepsAction = {
   type: 'REORDER_STEPS'
   payload: {
-    stepIds: Array<StepIdType>
+    stepIds: StepIdType[]
   }
 }
-export const reorderSteps = (
-  stepIds: Array<StepIdType>
-): ReorderStepsAction => ({
+export const reorderSteps = (stepIds: StepIdType[]): ReorderStepsAction => ({
   type: 'REORDER_STEPS',
   payload: {
     stepIds,

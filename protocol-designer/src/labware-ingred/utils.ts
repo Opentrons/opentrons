@@ -1,7 +1,7 @@
 import { sortedSlotnames } from '@opentrons/components'
 import { getSlotIsEmpty } from '../step-forms/utils'
-import type { InitialDeckSetup } from '../step-forms/types'
-import type { DeckSlot } from '../types'
+import { InitialDeckSetup } from '../step-forms/types'
+import { DeckSlot } from '../types'
 export function getNextAvailableDeckSlot(
   initialDeckSetup: InitialDeckSetup
 ): DeckSlot | null | undefined {
@@ -19,14 +19,14 @@ const getMatchOrNull = (
 const nameOnlyPattern = /^(.*)\(\d+\)$/
 const numOnlyPattern = /^.*\((\d+)\)$/
 export function getNextNickname(
-  allNicknames: Array<string>,
+  allNicknames: string[],
   _proposedNickname: string
 ): string {
   const proposedNickname = (
     getMatchOrNull(nameOnlyPattern, _proposedNickname) || _proposedNickname
   ).trim()
 
-  const matchingDisambigNums = allNicknames.reduce<Array<number>>(
+  const matchingDisambigNums = allNicknames.reduce<number[]>(
     (acc, nickname) => {
       const nameOnly = (
         getMatchOrNull(nameOnlyPattern, nickname) || nickname

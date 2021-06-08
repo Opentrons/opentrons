@@ -11,10 +11,10 @@ import { PDListItem } from '../lists'
 import styles from './StepItem.css'
 import { LabwareTooltipContents } from './LabwareTooltipContents'
 
-type AspirateDispenseHeaderProps = {|
-  sourceLabwareNickname: ?string,
-  destLabwareNickname: ?string,
-|}
+type AspirateDispenseHeaderProps = {
+  sourceLabwareNickname: string | null | undefined
+  destLabwareNickname: string | null | undefined
+}
 
 export function AspirateDispenseHeader(
   props: AspirateDispenseHeaderProps

@@ -13,7 +13,7 @@ import {
   PAUSE_UNTIL_TEMP,
   THERMOCYCLER_PROFILE,
 } from '../../constants'
-import type { StepFieldName } from '../../form-types'
+import { StepFieldName } from '../../form-types'
 
 /*******************
  ** Error Messages **
@@ -42,7 +42,7 @@ export type FormErrorKey =
 export type FormError = {
   title: string
   body?: React.ReactNode
-  dependentFields: Array<StepFieldName>
+  dependentFields: StepFieldName[]
 }
 const INCOMPATIBLE_ASPIRATE_LABWARE: FormError = {
   title: 'Selected aspirate labware is incompatible with selected pipette',
@@ -337,10 +337,10 @@ export const engageHeightRangeExceeded = (
  **     Helpers    **
  ********************/
 type ComposeErrors = (
-  ...errorCheckers: Array<FormErrorChecker>
-) => (arg0: unknown) => Array<FormError>
+  ...errorCheckers: FormErrorChecker[]
+) => (arg0: unknown) => FormError[]
 export const composeErrors: ComposeErrors = (
-  ...errorCheckers: Array<FormErrorChecker>
+  ...errorCheckers: FormErrorChecker[]
 ) => value =>
   errorCheckers.reduce((acc, errorChecker) => {
     const possibleError = errorChecker(value)

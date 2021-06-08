@@ -1,20 +1,20 @@
 // @flow
 import * as React from 'react'
-import { BaseState } from '../types'
-import { connect, MapDispatchToProps, MapStateToProps } from 'react-redux'
+import { ThunkDispatch, BaseState } from '../types'
+import { connect } from 'react-redux'
 
 import { KNOWLEDGEBASE_ROOT_URL } from '../components/KnowledgeBaseLink'
 import { NavTab, TabbedNavBar, OutsideLinkTab } from '@opentrons/components'
 import { i18n } from '../localization'
-import { Page, actions, selectors } from '../navigation'
+import {  Page, actions, selectors } from '../navigation'
 import { selectors as fileSelectors } from '../file-data'
 
 type SP = {
-  currentPage: Page
-  currentProtocolExists: boolean
+  currentPage: Page,
+  currentProtocolExists: boolean,
 }
 
-type DP = { handleClick: (e: Page) => void }
+type DP = { handleClick: Page => (e: SyntheticEvent<> | null | undefined) => void }
 
 type Props = SP & DP
 
@@ -73,14 +73,14 @@ function Nav(props: Props) {
   )
 }
 
-const mapStateToProps: MapStateToProps<SP, {}, BaseState> = state => {
+function mapStateToProps(state: BaseState): SP {
   return {
     currentPage: selectors.getCurrentPage(state),
     currentProtocolExists: fileSelectors.getCurrentProtocolExists(state),
   }
 }
 
-const mapDispatchToProps: MapDispatchToProps<DP, {}> = dispatch => {
+function mapDispatchToProps(dispatch: ThunkDispatch<*>): DP {
   return {
     handleClick: (pageName: Page) => () => {
       dispatch(actions.navigateToPage(pageName))
@@ -88,4 +88,14 @@ const mapDispatchToProps: MapDispatchToProps<DP, {}> = dispatch => {
   }
 }
 
-export const ConnectedNav = connect(mapStateToProps, mapDispatchToProps)(Nav)
+export const ConnectedNav: React.AbstractComponent<{}> = connect<
+  Props,
+  {},
+  SP,
+  DP,
+  _,
+  _
+>(
+  mapStateToProps,
+  mapDispatchToProps
+)(Nav)

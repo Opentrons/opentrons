@@ -2,8 +2,8 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 
-import type { BaseState } from '../../types'
-import { selectors, type Page } from '../../navigation'
+import { BaseState } from '../../types'
+import { selectors, Page } from '../../navigation'
 import { SettingsApp } from './SettingsApp'
 
 export { SettingsSidebar } from './SettingsSidebar'
@@ -19,14 +19,14 @@ const SettingsPageComponent = (props: Props) => {
   }
 }
 
-const STP = (state: BaseState): $Exact<Props> => ({
+const STP = (state: BaseState): Props => ({
   currentPage: selectors.getCurrentPage(state),
 })
 
-export const SettingsPage: React.AbstractComponent<{||}> = connect<
+export const SettingsPage: React.AbstractComponent<{}> = connect<
   Props,
-  {||},
-  $Exact<Props>,
+  {},
+  Props,
   _,
   _,
   _

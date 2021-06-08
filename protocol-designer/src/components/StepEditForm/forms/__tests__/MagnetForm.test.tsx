@@ -7,9 +7,9 @@ import { selectors as uiModuleSelectors } from '../../../../ui/modules'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
 import * as _fields from '../../fields'
 import { MagnetForm } from '../MagnetForm'
-import type { Options } from '@opentrons/components'
-import type { BaseState } from '../../../../types'
-import type { ModuleEntities } from '../../../../step-forms/types'
+import { Options } from '@opentrons/components'
+import { BaseState } from '../../../../types'
+import { ModuleEntities } from '../../../../step-forms/types'
 
 jest.mock('../../../../step-forms/selectors')
 jest.mock('../../../../ui/modules')

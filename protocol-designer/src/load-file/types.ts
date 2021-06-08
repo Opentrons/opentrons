@@ -1,11 +1,11 @@
-import type { PDProtocolFile } from '../file-types'
+import { PDProtocolFile } from '../file-types'
 export type FileUploadErrorType = 'INVALID_FILE_TYPE' | 'INVALID_JSON_FILE'
 export type FileUploadMessageKey = 'DID_MIGRATE'
 export type FileUploadMessage =
   | {
       isError: false
       messageKey: FileUploadMessageKey
-      migrationsRan: Array<string>
+      migrationsRan: string[]
     }
   | {
       isError: true
@@ -20,6 +20,6 @@ export type LoadFileAction = {
   payload: {
     file: PDProtocolFile
     didMigrate: boolean
-    migrationsRan: Array<string>
+    migrationsRan: string[]
   }
 }

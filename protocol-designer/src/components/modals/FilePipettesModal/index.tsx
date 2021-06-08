@@ -27,52 +27,52 @@ import { CrashInfoBox, isModuleWithCollisionIssue } from '../../modules'
 import styles from './FilePipettesModal.css'
 import formStyles from '../../forms/forms.css'
 import modalStyles from '../modal.css'
-import type { ModuleRealType } from '@opentrons/shared-data'
-import type { DeckSlot } from '../../../types'
-import type { NewProtocolFields } from '../../../load-file'
-import type {
+import { ModuleRealType } from '@opentrons/shared-data'
+import { DeckSlot } from '../../../types'
+import { NewProtocolFields } from '../../../load-file'
+import {
   PipetteOnDeck,
   FormPipette,
   FormPipettesByMount,
   FormModulesByType,
 } from '../../../step-forms'
-import type { FormikProps } from 'formik/@flow-typed'
+import { FormikProps } from 'formik/@flow-typed'
 
 export type PipetteFieldsData = $Diff<
   PipetteOnDeck,
-  {| id: mixed, spec: mixed, tiprackLabwareDef: mixed |}
+  { id: mixed, spec: mixed, tiprackLabwareDef: mixed }
 >
 
-export type ModuleCreationArgs = {|
+export type ModuleCreationArgs = {
   type: ModuleRealType,
   model: string,
   slot: DeckSlot,
-|}
+}
 
-type FormState = {|
+type FormState = {
   fields: NewProtocolFields,
   pipettesByMount: FormPipettesByMount,
   modulesByType: FormModulesByType,
-|}
+}
 
-type State = {|
+type State = {
   showEditPipetteConfirmation: boolean,
-|}
+}
 
-export type Props = {|
-  showProtocolFields?: ?boolean,
-  showModulesFields?: ?boolean,
+export type Props = {
+  showProtocolFields: boolean | null | undefined,
+  showModulesFields: boolean | null | undefined,
   hideModal?: boolean,
   onCancel: () => mixed,
   initialPipetteValues?: $PropertyType<FormState, 'pipettesByMount'>,
   initialModuleValues?: $PropertyType<FormState, 'modulesByType'>,
-  onSave: ({|
+  onSave: ({
     newProtocolFields: NewProtocolFields,
-    pipettes: Array<PipetteFieldsData>,
-    modules: Array<ModuleCreationArgs>,
-  |}) => mixed,
-  moduleRestrictionsDisabled: ?boolean,
-|}
+    pipettes: PipetteFieldsData[],
+    modules: ModuleCreationArgs[],
+  }) => mixed,
+  moduleRestrictionsDisabled: boolean | null | undefined,
+}
 
 const initialFormState: FormState = {
   fields: { name: '' },
@@ -182,7 +182,7 @@ export class FilePipettesModal extends React.Component<Props, State> {
     const newProtocolFields = values.fields
     const pipettes = reduce(
       values.pipettesByMount,
-      (acc, formPipette: FormPipette, mount): Array<PipetteFieldsData> => {
+      (acc, formPipette: FormPipette, mount): PipetteFieldsData[] => {
         assert(mount === 'left' || mount === 'right', `invalid mount: ${mount}`) // this is mostly for flow
         return formPipette &&
           formPipette.pipetteName &&
@@ -203,8 +203,8 @@ export class FilePipettesModal extends React.Component<Props, State> {
 
     // NOTE: this is extra-explicit for flow. Reduce fns won't cooperate
     // with enum-typed key like `{[ModuleRealType]: ___}`
-    const moduleTypes: Array<ModuleRealType> = Object.keys(values.modulesByType)
-    const modules: Array<ModuleCreationArgs> = moduleTypes.reduce(
+    const moduleTypes: ModuleRealType[] = Object.keys(values.modulesByType)
+    const modules: ModuleCreationArgs[] = moduleTypes.reduce(
       (acc, moduleType) => {
         const formModule = values.modulesByType[moduleType]
         return formModule?.onDeck

@@ -3,7 +3,7 @@ import * as React from 'react'
 import { getWellTotalVolume } from '@opentrons/shared-data'
 import { i18n } from '../../localization'
 import { KnowledgeBaseLink } from '../../components/KnowledgeBaseLink'
-import type { FormError } from './errors'
+import { FormError } from './errors'
 /*******************
  ** Warning Messages **
  ********************/
@@ -15,7 +15,7 @@ export type FormWarningType =
   | 'BELOW_MIN_AIR_GAP_VOLUME'
 
 export type FormWarning = {
-  ...$Exact<FormError>,
+  ...FormError,
   type: FormWarningType,
 }
 
@@ -78,7 +78,7 @@ type HydratedFormData = any
 
 export const belowPipetteMinimumVolume = (
   fields: HydratedFormData
-): ?FormWarning => {
+): FormWarning | null | undefined => {
   const { pipette, volume } = fields
   if (!(pipette && pipette.spec)) return null
   return volume < pipette.spec.minVolume
@@ -88,7 +88,7 @@ export const belowPipetteMinimumVolume = (
 
 export const maxDispenseWellVolume = (
   fields: HydratedFormData
-): ?FormWarning => {
+): FormWarning | null | undefined => {
   const { dispense_labware, dispense_wells, volume } = fields
   if (!dispense_labware || !dispense_wells) return null
   const hasExceeded = dispense_wells.some(well => {
@@ -98,7 +98,7 @@ export const maxDispenseWellVolume = (
   return hasExceeded ? overMaxWellVolumeWarning() : null
 }
 
-export const minDisposalVolume = (fields: HydratedFormData): ?FormWarning => {
+export const minDisposalVolume = (fields: HydratedFormData): FormWarning | null | undefined => {
   const {
     disposalVolume_checkbox,
     disposalVolume_volume,
@@ -150,10 +150,10 @@ export const minDispenseAirGapVolume: (
  ********************/
 
 type ComposeWarnings = (
-  ...warningCheckers: Array<WarningChecker>
-) => (formData: mixed) => Array<FormWarning>
+  ...warningCheckers: WarningChecker[]
+) => (formData: mixed) => FormWarning[]
 export const composeWarnings: ComposeWarnings = (
-  ...warningCheckers: Array<WarningChecker>
+  ...warningCheckers: WarningChecker[]
 ) => formData =>
   warningCheckers.reduce((acc, checker) => {
     const possibleWarning = checker(formData)

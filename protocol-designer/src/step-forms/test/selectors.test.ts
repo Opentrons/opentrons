@@ -9,7 +9,7 @@ jest.mock('../../steplist/fieldLevel')
 jest.mock('../utils/getProfileItemsHaveErrors')
 const mockGetFieldErrors: JestMockFn<
   [string, unknown],
-  Array<string>
+  string[]
 > = getFieldErrors
 const mockGetProfileItemsHaveErrors: JestMockFn<
   [any],

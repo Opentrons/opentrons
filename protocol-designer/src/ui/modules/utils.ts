@@ -1,12 +1,12 @@
 import values from 'lodash/values'
 import { i18n } from '../../localization'
-import type { ModuleRealType } from '@opentrons/shared-data'
+import { ModuleRealType } from '@opentrons/shared-data'
 import {
   MAGNETIC_MODULE_V1,
   getLabwareDefaultEngageHeight,
 } from '@opentrons/shared-data'
-import type { Options } from '@opentrons/components'
-import type {
+import { Options } from '@opentrons/components'
+import {
   ModuleOnDeck,
   LabwareOnDeck,
   InitialDeckSetup,

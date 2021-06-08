@@ -12,14 +12,14 @@ import * as wellContentsSelectors from '../../top-selectors/well-contents'
 import { getSelectedWells } from '../../well-selection/selectors'
 import { deselectAllWells } from '../../well-selection/actions'
 import { LiquidPlacementForm as LiquidPlacementFormComponent } from './LiquidPlacementForm'
-import type { Dispatch } from 'redux'
-import type { LiquidPlacementFormValues } from './LiquidPlacementForm'
-import type { BaseState } from '../../types'
+import { Dispatch } from 'redux'
+import { LiquidPlacementFormValues } from './LiquidPlacementForm'
+import { BaseState } from '../../types'
 type Props = React.ElementProps<typeof LiquidPlacementFormComponent>
 type SP = $Diff<
   Props & {
     _labwareId: string | null | undefined
-    _selectedWells: Array<string> | null | undefined
+    _selectedWells: string[] | null | undefined
     _selectionHasLiquids: boolean
   },
   {

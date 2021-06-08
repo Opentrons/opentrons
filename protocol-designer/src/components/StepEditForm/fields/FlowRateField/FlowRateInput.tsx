@@ -12,29 +12,29 @@ import { Portal } from '../../../portals/MainPageModalPortal'
 import modalStyles from '../../../modals/modal.css'
 import stepFormStyles from '../../StepEditForm.css'
 import styles from './FlowRateInput.css'
-import type { FieldProps } from '../../types'
+import { FieldProps } from '../../types'
 
 const DEFAULT_LABEL = i18n.t('form.step_edit_form.field.flow_rate.label')
 const DECIMALS_ALLOWED = 1
 
 /** When flow rate is falsey (including 0), it means 'use default' */
-export type FlowRateInputProps = {|
+export type FlowRateInputProps = {
   ...FieldProps,
-  defaultFlowRate: ?number,
+  defaultFlowRate: number | null | undefined,
   flowRateType: 'aspirate' | 'dispense',
-  label: ?string,
+  label: string | null | undefined,
   minFlowRate: number,
   maxFlowRate: number,
-  pipetteDisplayName: ?string,
+  pipetteDisplayName: string | null | undefined,
   className?: string,
-|}
+}
 
-type State = {|
+type State = {
   isPristine: boolean,
-  modalFlowRate: ?string,
+  modalFlowRate: string | null | undefined,
   modalUseDefault: boolean,
   showModal: boolean,
-|}
+}
 
 export const FlowRateInput = (props: FlowRateInputProps): React.Node => {
   const {

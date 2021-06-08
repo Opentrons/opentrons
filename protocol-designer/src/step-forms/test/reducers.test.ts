@@ -28,12 +28,12 @@ import {
 } from '../../constants'
 import { PROFILE_CYCLE, PROFILE_STEP } from '../../form-types'
 import { PRESAVED_STEP_ID } from '../../steplist/types'
-import type { CreatePresavedStepFormArgs } from '../utils/createPresavedStepForm'
+import { CreatePresavedStepFormArgs } from '../utils/createPresavedStepForm'
 import { createPresavedStepForm } from '../utils/createPresavedStepForm'
 import { createInitialProfileCycle } from '../utils/createInitialProfileItems'
 import { getLabwareIsCompatible } from '../../utils/labwareModuleCompatibility'
 import { uuid } from '../../utils'
-import type { DeckSlot } from '../../types'
+import { DeckSlot } from '../../types'
 jest.mock('../../labware-defs/utils')
 jest.mock('../selectors')
 jest.mock('../../steplist/formLevel/handleFormChange')

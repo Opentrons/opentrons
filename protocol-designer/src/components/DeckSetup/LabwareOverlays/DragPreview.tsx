@@ -3,19 +3,19 @@ import * as React from 'react'
 import { DragLayer } from 'react-dnd'
 import { LabwareOnDeck } from '../LabwareOnDeck'
 import { DND_TYPES } from '../../../constants'
-import type { LabwareOnDeck as LabwareOnDeckType } from '../../../step-forms'
-import type { RobotWorkSpaceRenderProps } from '@opentrons/components'
+import { LabwareOnDeck as LabwareOnDeckType } from '../../../step-forms'
+import { RobotWorkSpaceRenderProps } from '@opentrons/components'
 import styles from './DragPreview.css'
 
 type DragPreviewProps = {
-  isDragging: boolean,
-  currentOffset?: { x: number, y: number },
-  item: { labwareOnDeck: LabwareOnDeckType },
-  itemType: string,
+  isDragging: boolean
+  currentOffset?: { x: number; y: number }
+  item: { labwareOnDeck: LabwareOnDeckType }
+  itemType: string
   getRobotCoordsFromDOMCoords: $PropertyType<
     RobotWorkSpaceRenderProps,
     'getRobotCoordsFromDOMCoords'
-  >,
+  >
 }
 
 const LabwareDragPreview = (props: DragPreviewProps) => {
@@ -45,7 +45,7 @@ const LabwareDragPreview = (props: DragPreviewProps) => {
 export const DragPreview: React.AbstractComponent<
   $Diff<
     DragPreviewProps,
-    {| currentOffset: mixed, isDragging: mixed, itemType: mixed, item: mixed |}
+    { currentOffset: mixed; isDragging: mixed; itemType: mixed; item: mixed }
   >
 > = DragLayer(monitor => ({
   currentOffset: monitor.getSourceClientOffset(),

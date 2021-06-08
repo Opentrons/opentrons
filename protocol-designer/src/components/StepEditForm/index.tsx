@@ -17,27 +17,27 @@ import {
 import { makeSingleEditFieldProps } from './fields/makeSingleEditFieldProps'
 import { StepEditFormComponent } from './StepEditFormComponent'
 import { getDirtyFields } from './utils'
-import type { BaseState, ThunkDispatch } from '../../types'
-import type { FormData, StepFieldName } from '../../form-types'
+import { BaseState, ThunkDispatch } from '../../types'
+import { FormData, StepFieldName } from '../../form-types'
 
-type SP = {|
+type SP = {
   canSave: boolean,
-  formData: ?FormData,
+  formData: FormData | null | undefined,
   formHasChanges: boolean,
   isNewStep: boolean,
   isPristineSetTempForm: boolean,
-|}
-type DP = {|
+}
+type DP = {
   deleteStep: (stepId: string) => mixed,
   handleClose: () => mixed,
   saveSetTempFormWithAddedPauseUntilTemp: () => mixed,
   saveStepForm: () => mixed,
   handleChangeFormInput: (name: string, value: mixed) => void,
-|}
-type StepEditFormManagerProps = {|
+}
+type StepEditFormManagerProps = {
   ...SP,
   ...DP,
-|}
+}
 
 const StepEditFormManager = (props: StepEditFormManagerProps) => {
   const {
@@ -58,7 +58,7 @@ const StepEditFormManager = (props: StepEditFormManagerProps) => {
     setShowMoreOptionsModal,
   ] = React.useState<boolean>(false)
   const [focusedField, setFocusedField] = React.useState<string | null>(null)
-  const [dirtyFields, setDirtyFields] = React.useState<Array<StepFieldName>>(
+  const [dirtyFields, setDirtyFields] = React.useState<StepFieldName[]>(
     getDirtyFields(isNewStep, formData)
   )
 
@@ -213,9 +213,9 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<*>): DP => {
 // It doesn't matter if the children are using connect or useSelector,
 // only the parent matters.)
 // https://react-redux.js.org/api/hooks#stale-props-and-zombie-children
-export const StepEditForm: React.AbstractComponent<{||}> = connect<
+export const StepEditForm: React.AbstractComponent<{}> = connect<
   StepEditFormManagerProps,
-  {||},
+  {},
   _,
   _,
   _,

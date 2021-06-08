@@ -1,4 +1,4 @@
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import { LabwareDefinition2 } from '@opentrons/shared-data'
 export type LabwareDefByDefURI = Record<string, LabwareDefinition2>
 export type LabwareUploadMessageType =
   | 'INVALID_JSON_FILE'
@@ -8,8 +8,8 @@ export type LabwareUploadMessageType =
   | 'ASK_FOR_LABWARE_OVERWRITE'
   | 'USES_STANDARD_NAMESPACE'
 type NameConflictFields = {
-  defsMatchingLoadName: Array<LabwareDefinition2>
-  defsMatchingDisplayName: Array<LabwareDefinition2>
+  defsMatchingLoadName: LabwareDefinition2[]
+  defsMatchingDisplayName: LabwareDefinition2[]
   newDef: LabwareDefinition2
 }
 export type LabwareUploadMessage =

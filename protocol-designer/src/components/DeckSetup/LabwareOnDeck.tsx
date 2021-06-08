@@ -1,30 +1,30 @@
 // @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { LabwareRender, type WellGroup } from '@opentrons/components'
+import { LabwareRender, WellGroup } from '@opentrons/components'
 
 import * as wellContentsSelectors from '../../top-selectors/well-contents'
 import * as highlightSelectors from '../../top-selectors/substep-highlight'
 import * as tipContentsSelectors from '../../top-selectors/tip-contents'
-import { type LabwareOnDeck as LabwareOnDeckType } from '../../step-forms'
-import type { ContentsByWell } from '../../labware-ingred/types'
-import type { BaseState } from '../../types'
+import { LabwareOnDeck as LabwareOnDeckType } from '../../step-forms'
+import { ContentsByWell } from '../../labware-ingred/types'
+import { BaseState } from '../../types'
 import { wellFillFromWellContents } from '../labware/utils'
 
-type OP = {|
-  className?: string,
-  labwareOnDeck: LabwareOnDeckType,
-  x: number,
-  y: number,
-|}
+type OP = {
+  className?: string
+  labwareOnDeck: LabwareOnDeckType
+  x: number
+  y: number
+}
 
-type SP = {|
-  wellContents: ContentsByWell,
-  missingTips: ?WellGroup,
-  highlightedWells: ?WellGroup,
-|}
+type SP = {
+  wellContents: ContentsByWell
+  missingTips: WellGroup | null | undefined
+  highlightedWells: WellGroup | null | undefined
+}
 
-type Props = { ...OP, ...SP }
+type Props = OP & SP
 
 const LabwareOnDeckComponent = (props: Props) => (
   <g
@@ -68,7 +68,7 @@ export const LabwareOnDeck: React.AbstractComponent<OP> = connect<
   Props,
   OP,
   SP,
-  {||},
+  {},
   _,
   _
 >(mapStateToProps)(LabwareOnDeckComponent)

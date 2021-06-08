@@ -8,7 +8,7 @@ import { SubstepRow } from './SubstepRow'
 import styles from './StepItem.css'
 import { formatVolume } from './utils'
 
-import type {
+import {
   StepItemSourceDestRow,
   SubstepIdentifier,
   WellIngredientNames,
@@ -16,18 +16,18 @@ import type {
 
 const DEFAULT_COLLAPSED_STATE = true
 
-type MultiChannelSubstepProps = {|
-  rowGroup: Array<StepItemSourceDestRow>,
+type MultiChannelSubstepProps = {
+  rowGroup: StepItemSourceDestRow[],
   ingredNames: WellIngredientNames,
   highlighted?: boolean,
   stepId: string,
   substepIndex: number,
   selectSubstep: SubstepIdentifier => mixed,
-|}
+}
 
-type MultiChannelSubstepState = {|
+type MultiChannelSubstepState = {
   collapsed: boolean,
-|}
+}
 
 export class MultiChannelSubstep extends React.PureComponent<
   MultiChannelSubstepProps,

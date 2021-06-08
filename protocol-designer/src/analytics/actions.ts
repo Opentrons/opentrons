@@ -1,6 +1,6 @@
 import { initializeFullstory, shutdownFullstory } from './fullstory'
 import { setMixpanelTracking } from './mixpanel'
-import type { AnalyticsEvent } from './mixpanel'
+import { AnalyticsEvent } from './mixpanel'
 export type SetOptIn = {
   type: 'SET_OPT_IN'
   payload: boolean

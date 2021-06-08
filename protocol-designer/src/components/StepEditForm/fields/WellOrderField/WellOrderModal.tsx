@@ -11,7 +11,7 @@ import {
   DropdownField,
 } from '@opentrons/components'
 import modalStyles from '../../../modals/modal.css'
-import type { WellOrderOption } from '../../../../form-types'
+import { WellOrderOption } from '../../../../form-types'
 
 import { WellOrderViz } from './WellOrderViz'
 import styles from './WellOrderInput.css'
@@ -19,38 +19,38 @@ import stepEditStyles from '../../StepEditForm.css'
 
 const DEFAULT_FIRST: WellOrderOption = 't2b'
 const DEFAULT_SECOND: WellOrderOption = 'l2r'
-const VERTICAL_VALUES: Array<WellOrderOption> = ['t2b', 'b2t']
-const HORIZONTAL_VALUES: Array<WellOrderOption> = ['l2r', 'r2l']
-const WELL_ORDER_VALUES: Array<WellOrderOption> = [
+const VERTICAL_VALUES: WellOrderOption[] = ['t2b', 'b2t']
+const HORIZONTAL_VALUES: WellOrderOption[] = ['l2r', 'r2l']
+const WELL_ORDER_VALUES: WellOrderOption[] = [
   ...VERTICAL_VALUES,
   ...HORIZONTAL_VALUES,
 ]
-type Props = {|
+type Props = {
   isOpen: boolean,
   closeModal: () => mixed,
   prefix: 'aspirate' | 'dispense' | 'mix',
-  firstValue: ?WellOrderOption,
-  secondValue: ?WellOrderOption,
+  firstValue: WellOrderOption | null | undefined,
+  secondValue: WellOrderOption | null | undefined,
   firstName: string,
   secondName: string,
   updateValues: (
-    firstValue: ?WellOrderOption,
-    secondValue: ?WellOrderOption
+    firstValue: WellOrderOption | null | undefined,
+    secondValue: WellOrderOption | null | undefined
   ) => void,
-|}
+}
 
-type State = {|
+type State = {
   firstValue: WellOrderOption,
   secondValue: WellOrderOption,
-|}
+}
 
-export const ResetButton = (props: {| onClick: () => void |}): React.Node => (
+export const ResetButton = (props: { onClick: () => void }): React.Node => (
   <OutlineButton className={modalStyles.button_medium} onClick={props.onClick}>
     {i18n.t('button.reset')}
   </OutlineButton>
 )
 
-export const CancelButton = (props: {| onClick: () => void |}): React.Node => (
+export const CancelButton = (props: { onClick: () => void }): React.Node => (
   <PrimaryButton
     className={cx(modalStyles.button_medium, modalStyles.button_right_of_break)}
     onClick={props.onClick}
@@ -59,7 +59,7 @@ export const CancelButton = (props: {| onClick: () => void |}): React.Node => (
   </PrimaryButton>
 )
 
-export const DoneButton = (props: {| onClick: () => void |}): React.Node => (
+export const DoneButton = (props: { onClick: () => void }): React.Node => (
   <PrimaryButton className={modalStyles.button_medium} onClick={props.onClick}>
     {i18n.t('button.done')}
   </PrimaryButton>
@@ -78,10 +78,10 @@ export class WellOrderModal extends React.Component<Props, State> {
     }
   }
 
-  getInitialFirstValues: () => {|
+  getInitialFirstValues: () => {
     initialFirstValue: WellOrderOption,
     initialSecondValue: WellOrderOption,
-  |} = () => {
+  } = () => {
     const { firstValue, secondValue } = this.props
     if (firstValue == null || secondValue == null) {
       return {

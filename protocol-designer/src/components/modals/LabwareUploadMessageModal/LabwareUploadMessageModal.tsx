@@ -9,9 +9,9 @@ import {
 } from '@opentrons/components'
 import { i18n } from '../../../localization'
 import modalStyles from '../modal.css'
-import type { LabwareUploadMessage } from '../../../labware-defs'
+import { LabwareUploadMessage } from '../../../labware-defs'
 
-const MessageBody = (props: {| message: LabwareUploadMessage |}) => {
+const MessageBody = (props: { message: LabwareUploadMessage }) => {
   const { message } = props
 
   if (
@@ -89,17 +89,17 @@ const MessageBody = (props: {| message: LabwareUploadMessage |}) => {
   return null
 }
 
-type Props = {|
-  message: ?LabwareUploadMessage,
+type Props = {
+  message: LabwareUploadMessage | null | undefined,
   dismissModal: () => mixed,
   overwriteLabwareDef?: () => mixed,
-|}
+}
 
 export const LabwareUploadMessageModal = (props: Props): React.Node => {
   const { message, dismissModal, overwriteLabwareDef } = props
   if (!message) return null
 
-  let buttons: Array<ButtonProps> = [{ children: 'OK', onClick: dismissModal }]
+  let buttons: ButtonProps[] = [{ children: 'OK', onClick: dismissModal }]
   if (message.messageType === 'ASK_FOR_LABWARE_OVERWRITE') {
     buttons = [
       { children: 'CANCEL IMPORT', onClick: dismissModal },

@@ -18,37 +18,37 @@ import {
   moveDeckItem,
 } from '../../../labware-ingred/actions'
 import { selectors as labwareDefSelectors } from '../../../labware-defs'
-import { START_TERMINAL_ITEM_ID, type TerminalItemId } from '../../../steplist'
+import { START_TERMINAL_ITEM_ID,  TerminalItemId } from '../../../steplist'
 
-import type { DeckSlot, ThunkDispatch, BaseState } from '../../../types'
-import type { LabwareDefByDefURI } from '../../../labware-defs'
-import type { LabwareOnDeck } from '../../../step-forms'
-import type {
+import { DeckSlot, ThunkDispatch, BaseState } from '../../../types'
+import { LabwareDefByDefURI } from '../../../labware-defs'
+import { LabwareOnDeck } from '../../../step-forms'
+import {
   DeckSlot as DeckSlotDefinition,
   ModuleRealType,
 } from '@opentrons/shared-data'
 import styles from './LabwareOverlays.css'
 
-type DNDP = {|
+type DNDP = {
   isOver: boolean,
   connectDropTarget: React.Node => React.Node,
   draggedItem: ?{ labwareOnDeck: LabwareOnDeck },
   itemType: string,
-|}
-type OP = {|
-  slot: {| ...DeckSlotDefinition, id: DeckSlot |}, // NOTE: Ian 2019-10-22 make slot `id` more restrictive when used in PD
+}
+type OP = {
+  slot: { ...DeckSlotDefinition, id: DeckSlot }, // NOTE: Ian 2019-10-22 make slot `id` more restrictive when used in PD
   moduleType: ModuleRealType | null,
-  selectedTerminalItemId: ?TerminalItemId,
+  selectedTerminalItemId: TerminalItemId | null | undefined,
   handleDragHover?: () => mixed,
-|}
-type DP = {|
+}
+type DP = {
   addLabware: (e: SyntheticEvent<*>) => mixed,
   moveDeckItem: (DeckSlot, DeckSlot) => mixed,
-|}
-type SP = {|
+}
+type SP = {
   customLabwareDefs: LabwareDefByDefURI,
-|}
-type Props = {| ...OP, ...DP, ...DNDP, ...SP |}
+}
+type Props = OP & DP & DNDP & SP
 
 export const SlotControlsComponent = (props: Props): React.Node => {
   const {
@@ -169,7 +169,7 @@ const collectSlotTarget = (connect, monitor) => ({
 })
 
 export const SlotControls: React.AbstractComponent<OP> = connect<
-  {| ...OP, ...DP, ...SP |},
+  { ...OP, ...DP, ...SP },
   OP,
   _,
   DP,

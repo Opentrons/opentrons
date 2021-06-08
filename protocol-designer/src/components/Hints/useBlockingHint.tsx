@@ -9,14 +9,14 @@ import { ContinueModal, CheckboxField } from '@opentrons/components'
 import { Portal } from '../portals/MainPageModalPortal'
 import { i18n } from '../../localization'
 import styles from './hints.css'
-import type { HintKey } from '../../tutorial'
+import { HintKey } from '../../tutorial'
 
-export type HintProps = {|
-  hintKey: HintKey,
-  handleCancel: () => mixed,
-  handleContinue: () => mixed,
-  content: React.Node,
-|}
+export type HintProps = {
+  hintKey: HintKey
+  handleCancel: () => mixed
+  handleContinue: () => mixed
+  content: React.Node
+}
 
 // This component handles the checkbox and dispatching `removeHint` action on continue/cancel
 export const BlockingHint = (props: HintProps): React.Node => {
@@ -63,16 +63,16 @@ export const BlockingHint = (props: HintProps): React.Node => {
   )
 }
 
-export type HintArgs = {|
+export type HintArgs = {
   /** `enabled` should be a condition that the parent uses to toggle whether the hint should be active or not.
    * If the hint is enabled but has been dismissed, it will automatically call `handleContinue` when enabled.
    * useBlockingHint expects the parent to disable the hint on cancel/continue */
-  enabled: boolean,
-  hintKey: HintKey,
-  content: React.Node,
-  handleCancel: () => mixed,
-  handleContinue: () => mixed,
-|}
+  enabled: boolean
+  hintKey: HintKey
+  content: React.Node
+  handleCancel: () => mixed
+  handleContinue: () => mixed
+}
 
 export const useBlockingHint = (args: HintArgs): React.Node => {
   const { enabled, hintKey, handleCancel, handleContinue, content } = args

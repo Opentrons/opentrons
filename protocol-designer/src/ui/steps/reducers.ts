@@ -1,19 +1,19 @@
-import type { Reducer } from 'redux'
+import { Reducer } from 'redux'
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
 import omit from 'lodash/omit'
 import { getPDMetadata } from '../../file-types'
-import type { SubstepIdentifier, TerminalItemId } from '../../steplist/types'
+import { SubstepIdentifier, TerminalItemId } from '../../steplist/types'
 import { START_TERMINAL_ITEM_ID, PRESAVED_STEP_ID } from '../../steplist/types'
-import type { Action } from '../../types'
-import type { LoadFileAction } from '../../load-file'
-import type { StepIdType } from '../../form-types'
-import type { SaveStepFormAction } from '../steps/actions/thunks'
-import type {
+import { Action } from '../../types'
+import { LoadFileAction } from '../../load-file'
+import { StepIdType } from '../../form-types'
+import { SaveStepFormAction } from '../steps/actions/thunks'
+import {
   DeleteStepAction,
   DeleteMultipleStepsAction,
 } from '../../steplist/actions'
-import type {
+import {
   AddStepAction,
   HoverOnStepAction,
   HoverOnSubstepAction,
@@ -82,7 +82,7 @@ type SingleSelectedItem = {
 }
 type MultipleSelectedItem = {
   selectionType: typeof MULTI_STEP_SELECTION_TYPE
-  ids: Array<StepIdType>
+  ids: StepIdType[]
   lastSelected: StepIdType
 }
 type TerminalItem = {

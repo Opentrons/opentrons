@@ -9,20 +9,20 @@ import { moveDeckItem } from '../labware-ingred/actions/actions'
 import { useBlockingHint } from './Hints/useBlockingHint'
 import { MagneticModuleWarningModalContent } from './modals/EditModulesModal/MagneticModuleWarningModalContent'
 import { EditModulesModal } from './modals/EditModulesModal'
-import type { ModuleModel, ModuleRealType } from '@opentrons/shared-data'
+import { ModuleModel, ModuleRealType } from '@opentrons/shared-data'
 
-type EditModulesProps = {|
+type EditModulesProps = {
   moduleToEdit: {|
-    moduleId: ?string,
+    moduleId: string | null | undefined,
     moduleType: ModuleRealType,
-  |},
+  },
   onCloseClick: () => mixed,
 |}
 
-export type ModelModuleInfo = {|
+export type ModelModuleInfo = {
   model: ModuleModel,
   slot: string,
-|}
+}
 
 export const EditModules = (props: EditModulesProps): React.Node => {
   const { onCloseClick, moduleToEdit } = props

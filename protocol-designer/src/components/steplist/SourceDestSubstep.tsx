@@ -6,22 +6,22 @@ import { MultiChannelSubstep } from './MultiChannelSubstep'
 import { SubstepRow } from './SubstepRow'
 import styles from './StepItem.css'
 
-import type {
+import {
   SourceDestSubstepItem,
   SubstepIdentifier,
   WellIngredientNames,
 } from '../../steplist/types'
 
-export type StepSubItemProps = {|
+export type StepSubItemProps = {
   substeps: SourceDestSubstepItem,
-|}
+}
 
-type SourceDestSubstepProps = {|
+type SourceDestSubstepProps = {
   ...StepSubItemProps,
   ingredNames: WellIngredientNames,
   selectSubstep: SubstepIdentifier => mixed,
-  hoveredSubstep: ?SubstepIdentifier,
-|}
+  hoveredSubstep: SubstepIdentifier | null | undefined,
+}
 
 export function SourceDestSubstep(props: SourceDestSubstepProps): React.Node {
   const { substeps, selectSubstep, hoveredSubstep } = props

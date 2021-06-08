@@ -5,16 +5,16 @@ import mapValues from 'lodash/mapValues'
 import pickBy from 'lodash/pickBy'
 import { FIXED_TRASH_ID } from '../../constants'
 import { getPDMetadata } from '../../file-types'
-import type { Reducer } from 'redux'
-import type {
+import { Reducer } from 'redux'
+import {
   SingleLabwareLiquidState,
   LocationLiquidState,
   LabwareLiquidState,
 } from '@opentrons/step-generation'
-import type { Action, DeckSlot } from '../../types'
-import type { LiquidGroupsById, DisplayLabware } from '../types'
-import type { LoadFileAction } from '../../load-file'
-import type {
+import { Action, DeckSlot } from '../../types'
+import { LiquidGroupsById, DisplayLabware } from '../types'
+import { LoadFileAction } from '../../load-file'
+import {
   RemoveWellsContentsAction,
   CreateContainerAction,
   DeleteLiquidGroupAction,
@@ -157,7 +157,7 @@ export const containers: Reducer<ContainersState, any> = handleActions(
     ): ContainersState => {
       const { file } = action.payload
       const allFileLabware = file.labware
-      const sortedLabwareIds: Array<string> = Object.keys(allFileLabware).sort(
+      const sortedLabwareIds: string[] = Object.keys(allFileLabware).sort(
         (a, b) =>
           Number(allFileLabware[a].slot) - Number(allFileLabware[b].slot)
       )

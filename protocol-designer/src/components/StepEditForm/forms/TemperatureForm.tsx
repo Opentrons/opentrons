@@ -7,7 +7,7 @@ import { i18n } from '../../../localization'
 
 import { StepFormDropdown, RadioGroupField, TextField } from '../fields'
 import styles from '../StepEditForm.css'
-import type { StepFormProps } from '../types'
+import { StepFormProps } from '../types'
 
 export const TemperatureForm = (props: StepFormProps): React.Node => {
   const moduleLabwareOptions = useSelector(

@@ -26,15 +26,15 @@ import {
   CLOSE_UNSAVED_STEP_FORM,
 } from './modals/ConfirmDeleteModal'
 import { Portal } from './portals/MainPageModalPortal'
-import { stepIconsByType, type StepType } from '../form-types'
+import { stepIconsByType, StepType } from '../form-types'
 import styles from './listButtons.css'
 
-type StepButtonComponentProps = {|
+type StepButtonComponentProps = {
   children: React.Node,
   expanded: boolean,
   disabled: boolean,
   setExpanded: boolean => mixed,
-|}
+}
 
 // TODO: Ian 2019-01-17 move out to centralized step info file - see #2926
 const getSupportedSteps = () => [
@@ -78,11 +78,11 @@ export const StepCreationButtonComponent = (
   )
 }
 
-export type StepButtonItemProps = {|
+export type StepButtonItemProps = {
   onClick: () => mixed,
   disabled: boolean,
   stepType: StepType,
-|}
+}
 
 export function StepButtonItem(props: StepButtonItemProps): React.Node {
   const { onClick, disabled, stepType } = props

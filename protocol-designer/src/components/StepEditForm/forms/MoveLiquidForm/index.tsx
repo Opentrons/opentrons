@@ -10,7 +10,7 @@ import {
   PathField,
 } from '../../fields'
 import styles from '../../StepEditForm.css'
-import type { StepFormProps } from '../../types'
+import { StepFormProps } from '../../types'
 import { SourceDestFields } from './SourceDestFields'
 import { SourceDestHeaders } from './SourceDestHeaders'
 

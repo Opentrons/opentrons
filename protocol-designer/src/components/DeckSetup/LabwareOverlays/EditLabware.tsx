@@ -15,34 +15,34 @@ import {
   moveDeckItem,
 } from '../../../labware-ingred/actions'
 import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
-import type { BaseState, ThunkDispatch, DeckSlot } from '../../../types'
-import type { LabwareOnDeck } from '../../../step-forms'
+import { BaseState, ThunkDispatch, DeckSlot } from '../../../types'
+import { LabwareOnDeck } from '../../../step-forms'
 import styles from './LabwareOverlays.css'
 
-type OP = {|
+type OP = {
   labwareOnDeck: LabwareOnDeck,
   setHoveredLabware: (?LabwareOnDeck) => mixed,
   setDraggedLabware: (?LabwareOnDeck) => mixed,
   swapBlocked: boolean,
-|}
-type SP = {|
+}
+type SP = {
   isYetUnnamed: boolean,
-|}
-type DP = {|
+}
+type DP = {
   editLiquids: () => mixed,
   duplicateLabware: () => mixed,
   deleteLabware: () => mixed,
   moveDeckItem: (DeckSlot, DeckSlot) => mixed,
-|}
+}
 
-type DNDP = {|
-  draggedLabware: ?LabwareOnDeck,
+type DNDP = {
+  draggedLabware: LabwareOnDeck | null | undefined,
   isOver: boolean,
   connectDragSource: React.Node => React.Node,
   connectDropTarget: React.Node => React.Node,
-|}
+}
 
-type Props = {| ...OP, ...SP, ...DP, ...DNDP |}
+type Props = OP & SP & DP & DNDP
 
 const EditLabwareComponent = (props: Props) => {
   const {
@@ -206,7 +206,7 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<*>, ownProps: OP): DP => ({
 })
 
 export const EditLabware: React.AbstractComponent<OP> = connect<
-  {| ...OP, ...SP, ...DP |},
+  { ...OP, ...SP, ...DP },
   OP,
   SP,
   DP,

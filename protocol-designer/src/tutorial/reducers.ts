@@ -1,14 +1,14 @@
-import type { Reducer } from 'redux'
+import { Reducer } from 'redux'
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
 import pickBy from 'lodash/pickBy'
 import uniq from 'lodash/uniq'
-import type { Action } from '../types'
-import type { RehydratePersistedAction } from '../persist'
-import type { HintKey } from './index'
-import type { AddHintAction, RemoveHintAction } from './actions'
-import type { NavigateToPageAction } from '../navigation/actions'
-type HintReducerState = Array<HintKey>
+import { Action } from '../types'
+import { RehydratePersistedAction } from '../persist'
+import { HintKey } from './index'
+import { AddHintAction, RemoveHintAction } from './actions'
+import { NavigateToPageAction } from '../navigation/actions'
+type HintReducerState = HintKey[]
 const hints = handleActions(
   {
     ADD_HINT: (

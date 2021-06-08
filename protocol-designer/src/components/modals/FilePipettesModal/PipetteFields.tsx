@@ -19,9 +19,9 @@ import { PipetteDiagram } from './PipetteDiagram'
 import styles from './FilePipettesModal.css'
 import formStyles from '../../forms/forms.css'
 
-import type { FormPipettesByMount } from '../../../step-forms'
+import { FormPipettesByMount } from '../../../step-forms'
 
-export type Props = {|
+export type Props = {
   initialTabIndex?: number,
   values: FormPipettesByMount,
   // TODO 2020-3-20 use formik typing here after we update the def in flow-typed
@@ -51,10 +51,10 @@ export type Props = {|
   onSetFieldValue: (field: string, value: string | null) => void,
   onSetFieldTouched: (field: string, touched: boolean) => void,
   onBlur: (event: SyntheticFocusEvent<HTMLSelectElement>) => mixed,
-|}
+}
 
 // TODO(mc, 2019-10-14): delete this typedef when gen2 ff is removed
-type PipetteSelectProps = {| mount: Mount, tabIndex: number |}
+type PipetteSelectProps = { mount: Mount, tabIndex: number }
 
 export function PipetteFields(props: Props): React.Node {
   const {

@@ -12,30 +12,30 @@ import {
 } from '../../../../ui/steps'
 import styles from '../../StepEditForm.css'
 
-import type { Dispatch } from 'redux'
-import type { StepIdType } from '../../../../form-types'
-import type { BaseState } from '../../../../types'
-import type { FieldProps } from '../../types'
+import { Dispatch } from 'redux'
+import { StepIdType } from '../../../../form-types'
+import { BaseState } from '../../../../types'
+import { FieldProps } from '../../types'
 
-type SP = {|
-  stepId: ?StepIdType,
-  wellSelectionLabwareKey: ?string,
-|}
+type SP = {
+  stepId: StepIdType | null | undefined,
+  wellSelectionLabwareKey: string | null | undefined,
+}
 
-type DP = {|
+type DP = {
   onOpen: string => mixed,
   onClose: () => mixed,
-|}
+}
 
-type OP = {|
+type OP = {
   ...FieldProps,
   primaryWellCount?: number,
-  isMulti: ?boolean,
-  pipetteId: ?string,
-  labwareId: ?string,
-|}
+  isMulti: boolean | null | undefined,
+  pipetteId: string | null | undefined,
+  labwareId: string | null | undefined,
+}
 
-type Props = {| ...OP, ...SP, ...DP |}
+type Props = OP & SP & DP
 
 class WellSelectionInputComponent extends React.Component<Props> {
   handleOpen = () => {

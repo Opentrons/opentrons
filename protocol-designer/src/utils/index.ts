@@ -1,9 +1,9 @@
 import uuidv1 from 'uuid/v1'
-import type { WellSetHelpers } from '@opentrons/shared-data'
+import { WellSetHelpers } from '@opentrons/shared-data'
 import { makeWellSetHelpers } from '@opentrons/shared-data'
 import { i18n } from '../localization'
-import type { WellGroup } from '@opentrons/components'
-import type { BoundingRect, GenericRect } from '../collision-types'
+import { WellGroup } from '@opentrons/components'
+import { BoundingRect, GenericRect } from '../collision-types'
 export const registerSelectors: (arg0: any) => void =
   process.env.NODE_ENV === 'development'
     ? require('reselect-tools').registerSelectors
@@ -39,7 +39,7 @@ export const getCollidingWells = (
     height: Math.abs(y1 - y0),
   }
   // NOTE: querySelectorAll returns a NodeList, so you need to unpack it as an Array to do .filter
-  const selectableElems: Array<HTMLElement> = [
+  const selectableElems: HTMLElement[] = [
     ...document.querySelectorAll('.' + selectableClassname),
   ]
   const collidedElems = selectableElems.filter((selectableElem, i) =>
@@ -63,7 +63,7 @@ export const getCollidingWells = (
   return collidedWellData
 }
 // TODO IMMEDIATELY use where appropriate
-export const arrayToWellGroup = (w: Array<string>): WellGroup =>
+export const arrayToWellGroup = (w: string[]): WellGroup =>
   w.reduce((acc, wellName) => ({ ...acc, [wellName]: null }), {})
 // cross-PD memoization of well set utils
 const wellSetHelpers: WellSetHelpers = makeWellSetHelpers()

@@ -5,18 +5,15 @@ import {
   volumeInCapacityForMultiDispense,
   volumeInCapacityForMultiAspirate,
 } from '../../../../steplist/formLevel/handleFormChange/utils'
-import type {
-  ChangeTipOptions,
-  PipetteEntities,
-} from '@opentrons/step-generation'
-import type { PathOption } from '../../../../form-types'
+import { ChangeTipOptions, PipetteEntities } from '@opentrons/step-generation'
+import { PathOption } from '../../../../form-types'
 export type DisabledPathMap = Record<PathOption, string> | null
 export type ValuesForPath = {
   aspirate_airGap_checkbox: boolean | null | undefined
   aspirate_airGap_volume: string | null | undefined
-  aspirate_wells: Array<string> | null | undefined
+  aspirate_wells: string[] | null | undefined
   changeTip: ChangeTipOptions
-  dispense_wells: Array<string> | null | undefined
+  dispense_wells: string[] | null | undefined
   pipette: string | null | undefined
   volume: string | null | undefined
 }

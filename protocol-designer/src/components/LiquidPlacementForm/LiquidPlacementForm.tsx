@@ -16,22 +16,22 @@ import styles from './LiquidPlacementForm.css'
 import formStyles from '../forms/forms.css'
 import stepEditFormStyles from '../StepEditForm/StepEditForm.css'
 
-import type { Options } from '@opentrons/components'
-import type { FormikProps } from 'formik/@flow-typed'
+import { Options } from '@opentrons/components'
+import { FormikProps } from 'formik/@flow-typed'
 
-type ValidFormValues = {|
+type ValidFormValues = {
   selectedLiquidId: string,
   volume: string,
-|}
+}
 
-export type LiquidPlacementFormValues = {|
-  selectedLiquidId: ?string,
-  volume: ?string,
-|}
+export type LiquidPlacementFormValues = {
+  selectedLiquidId: string | null | undefined,
+  volume: string | null | undefined,
+}
 
-type Props = {|
-  commonSelectedLiquidId: ?string,
-  commonSelectedVolume: ?number,
+type Props = {
+  commonSelectedLiquidId: string | null | undefined,
+  commonSelectedVolume: number | null | undefined,
   liquidSelectionOptions: Options,
   selectedWellsMaxVolume: number,
   showForm: boolean,
@@ -39,7 +39,7 @@ type Props = {|
   cancelForm: () => mixed,
   clearWells: ?() => mixed,
   saveForm: LiquidPlacementFormValues => mixed,
-|}
+}
 
 export class LiquidPlacementForm extends React.Component<Props> {
   getInitialValues: () => ValidFormValues = () => {
@@ -51,10 +51,10 @@ export class LiquidPlacementForm extends React.Component<Props> {
   }
 
   getValidationSchema: () => Yup.Schema<
-    {|
+    {
       selectedLiquidId: string,
       volume: number,
-    |},
+    },
     any
   > = () => {
     const { selectedWellsMaxVolume } = this.props
@@ -92,7 +92,7 @@ export class LiquidPlacementForm extends React.Component<Props> {
   handleChangeVolume: (
     setFieldValue: (fieldName: string, value: mixed) => mixed
   ) => (e: SyntheticInputEvent<*>) => void = setFieldValue => e => {
-    const value: ?string = e.currentTarget.value
+    const value: string | null | undefined = e.currentTarget.value
     const masked = fieldProcessors.composeMaskers(
       fieldProcessors.maskToFloat,
       fieldProcessors.onlyPositiveNumbers,

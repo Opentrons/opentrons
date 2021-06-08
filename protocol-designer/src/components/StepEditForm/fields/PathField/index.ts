@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { Path } from './Path'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
 import { getDisabledPathMap } from './getDisabledPathMap'
-import type { BaseState } from '../../../../types'
+import { BaseState } from '../../../../types'
 type Props = React.ElementProps<typeof Path>
 type SP = {
   disabledPathMap: Props['disabledPathMap']

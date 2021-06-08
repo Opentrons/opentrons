@@ -4,28 +4,28 @@ import { connect } from 'react-redux'
 import { AlertModal, CheckboxField, OutlineButton } from '@opentrons/components'
 import { i18n } from '../../localization'
 import { actions as stepsActions } from '../../ui/steps'
-import type { TerminalItemId } from '../../steplist'
+import { TerminalItemId } from '../../steplist'
 import { actions, selectors } from '../../tutorial'
 import { Portal } from '../portals/MainPageModalPortal'
 import styles from './hints.css'
 import EXAMPLE_ADD_LIQUIDS_IMAGE from '../../images/example_add_liquids.png'
 import EXAMPLE_WATCH_LIQUIDS_MOVE_IMAGE from '../../images/example_watch_liquids_move.png'
 import EXAMPLE_BATCH_EDIT_IMAGE from '../../images/announcements/multi_select.gif'
-import type { HintKey } from '../../tutorial'
-import type { BaseState, ThunkDispatch } from '../../types'
+import { HintKey } from '../../tutorial'
+import { BaseState, ThunkDispatch } from '../../types'
 
-type SP = {| hintKey: ?HintKey |}
-type DP = {|
+type SP = { hintKey: HintKey | null | undefined }
+type DP = {
   removeHint: (HintKey, boolean) => mixed,
   selectTerminalItem: TerminalItemId => mixed,
-|}
-type Props = {| ...SP, ...DP |}
+}
+type Props = SP & DP
 
 type State = { rememberDismissal: boolean }
 
 // List of hints that should have /!\ gray AlertModal header
 // (versus calmer non-alert header)
-const HINT_IS_ALERT: Array<HintKey> = ['add_liquids_and_labware']
+const HINT_IS_ALERT: HintKey[] = ['add_liquids_and_labware']
 
 class HintsComponent extends React.Component<Props, State> {
   constructor(props: Props) {
@@ -196,9 +196,9 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<*>): DP => ({
     dispatch(stepsActions.selectTerminalItem(terminalId)),
 })
 
-export const Hints: React.AbstractComponent<{||}> = connect<
+export const Hints: React.AbstractComponent<{}> = connect<
   Props,
-  {||},
+  {},
   SP,
   DP,
   _,

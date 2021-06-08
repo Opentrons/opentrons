@@ -11,9 +11,9 @@ import {
   actions as labwareDefActions,
   selectors as labwareDefSelectors,
 } from '../../labware-defs'
-import type { ModuleOnDeck } from '../../step-forms'
+import { ModuleOnDeck } from '../../step-forms'
 import { selectors as stepFormSelectors } from '../../step-forms'
-import type { BaseState, ThunkDispatch } from '../../types'
+import { BaseState, ThunkDispatch } from '../../types'
 type Props = React.ElementProps<typeof LabwareSelectionModalComponent>
 type SP = {
   customLabwareDefs: Props['customLabwareDefs']
@@ -27,7 +27,7 @@ function mapStateToProps(state: BaseState): SP {
   const slot = labwareIngredSelectors.selectedAddLabwareSlot(state) || null
   // TODO: Ian 2019-10-29 needs revisit to support multiple manualIntervention steps
   const modulesById = stepFormSelectors.getInitialDeckSetup(state).modules
-  const initialModules: Array<ModuleOnDeck> = Object.keys(modulesById).map(
+  const initialModules: ModuleOnDeck[] = Object.keys(modulesById).map(
     moduleId => modulesById[moduleId]
   )
   const parentModule =

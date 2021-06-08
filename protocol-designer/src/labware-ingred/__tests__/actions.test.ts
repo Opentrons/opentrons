@@ -9,7 +9,7 @@ import { getLabwareNicknamesById } from '../../ui/labware/selectors'
 import { uuid } from '../../utils'
 import { renameLabware, createContainer } from '../actions'
 import { getNextAvailableDeckSlot, getNextNickname } from '../utils'
-import type { InitialDeckSetup } from '../../step-forms'
+import { InitialDeckSetup } from '../../step-forms'
 jest.mock('../../labware-defs/selectors')
 jest.mock('../../step-forms/selectors')
 jest.mock('../../ui/labware/selectors')
@@ -36,7 +36,7 @@ const mockGetNextAvailableDeckSlot: JestMockFn<
 > = getNextAvailableDeckSlot
 
 const mockGetNextNickname: JestMockFn<
-  [Array<string>, string],
+  [string[], string],
   string
 > = getNextNickname
 

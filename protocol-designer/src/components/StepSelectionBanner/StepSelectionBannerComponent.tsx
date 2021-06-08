@@ -26,9 +26,9 @@ import {
   TEXT_TRANSFORM_UPPERCASE,
 } from '@opentrons/components'
 import { i18n } from '../../localization'
-import type { CountPerStepType, StepType } from '../../form-types'
+import { CountPerStepType, StepType } from '../../form-types'
 
-type StepPillProps = {| stepType: StepType, count: number |}
+type StepPillProps = { stepType: StepType; count: number }
 
 const stepPillStyles = css`
   align-items: ${ALIGN_CENTER};
@@ -62,7 +62,7 @@ export const ExitBatchEditButton = (props: {
   handleExitBatchEdit: $PropertyType<
     StepSelectionBannerProps,
     'handleExitBatchEdit'
-  >,
+  >
 }): React.Node => (
   <Box flex="0 1 auto">
     <SecondaryBtn
@@ -75,10 +75,10 @@ export const ExitBatchEditButton = (props: {
   </Box>
 )
 
-export type StepSelectionBannerProps = {|
-  countPerStepType: CountPerStepType,
-  handleExitBatchEdit: () => mixed,
-|}
+export type StepSelectionBannerProps = {
+  countPerStepType: CountPerStepType
+  handleExitBatchEdit: () => mixed
+}
 
 export const StepSelectionBannerComponent = (
   props: StepSelectionBannerProps
@@ -89,7 +89,7 @@ export const StepSelectionBannerComponent = (
     0
   )
 
-  const stepTypes: Array<StepType> = Object.keys(countPerStepType).sort()
+  const stepTypes: StepType[] = Object.keys(countPerStepType).sort()
 
   return (
     <Box

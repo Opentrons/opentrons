@@ -6,11 +6,11 @@ import {
   getSelectedWells,
   getHighlightedWells,
 } from '../../well-selection/selectors'
-import type { WellGroup } from '@opentrons/components'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { SingleLabwareLiquidState } from '@opentrons/step-generation'
-import type { Selector } from '../../types'
-import type {
+import { WellGroup } from '@opentrons/components'
+import { LabwareDefinition2 } from '@opentrons/shared-data'
+import { SingleLabwareLiquidState } from '@opentrons/step-generation'
+import { Selector } from '../../types'
+import {
   ContentsByWell,
   WellContentsByLabware,
 } from '../../labware-ingred/types'
@@ -31,7 +31,7 @@ const _getWellContents = (
       well: LabwareDefinition2['wells'],
       wellName: string
     ): ContentsByWell => {
-      const groupIds: Array<string> =
+      const groupIds: string[] =
         __ingredientsForContainer && __ingredientsForContainer[wellName]
           ? Object.keys(__ingredientsForContainer[wellName])
           : []
@@ -63,8 +63,8 @@ export const getWellContentsAllLabware: Selector<WellContentsByLabware> = create
     selectedWells,
     highlightedWells
   ) => {
-    // TODO: Ian 2019-02-14 weird flow error without explicit Array<string> annotation
-    const allLabwareIds: Array<string> = Object.keys(labwareEntities)
+    // TODO: Ian 2019-02-14 weird flow error without explicit string[] annotation
+    const allLabwareIds: string[] = Object.keys(labwareEntities)
     return allLabwareIds.reduce(
       (
         acc: WellContentsByLabware,

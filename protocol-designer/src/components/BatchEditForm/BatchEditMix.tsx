@@ -23,19 +23,19 @@ import {
   getLabwareFieldForPositioningField,
 } from '../StepEditForm/utils'
 import { FormColumn } from './FormColumn'
-import type { FieldPropsByName } from '../StepEditForm/types'
-import type { WellOrderOption } from '../../form-types'
+import { FieldPropsByName } from '../StepEditForm/types'
+import { WellOrderOption } from '../../form-types'
 // TODO(IL, 2021-03-01): refactor these fragmented style rules (see #7402)
 import formStyles from '../forms/forms.css'
 import styles from '../StepEditForm/StepEditForm.css'
 import buttonStyles from '../StepEditForm/ButtonRow/styles.css'
 
-type BatchEditMixProps = {|
-  batchEditFormHasChanges: boolean,
-  propsForFields: FieldPropsByName,
-  handleCancel: () => mixed,
-  handleSave: () => mixed,
-|}
+type BatchEditMixProps = {
+  batchEditFormHasChanges: boolean
+  propsForFields: FieldPropsByName
+  handleCancel: () => mixed
+  handleSave: () => mixed
+}
 export const BatchEditMix = (props: BatchEditMixProps): React.Node => {
   const { propsForFields, handleCancel, handleSave } = props
   const [cancelButtonTargetProps, cancelButtonTooltipProps] = useHoverTooltip({
@@ -59,7 +59,9 @@ export const BatchEditMix = (props: BatchEditMixProps): React.Node => {
     return pipetteId ? String(pipetteId) : null
   }
 
-  const getWellOrderFieldValue = (name: string): ?WellOrderOption => {
+  const getWellOrderFieldValue = (
+    name: string
+  ): WellOrderOption | null | undefined => {
     const val = propsForFields[name]?.value
     if (val === 'l2r' || val === 'r2l' || val === 't2b' || val === 'b2t') {
       return val

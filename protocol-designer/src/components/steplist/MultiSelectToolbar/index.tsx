@@ -33,17 +33,17 @@ import {
   DELETE_MULTIPLE_STEP_FORMS,
 } from '../../modals/ConfirmDeleteModal'
 
-import type { IconName } from '@opentrons/components'
+import { IconName } from '@opentrons/components'
 
-type ClickableIconProps = {|
-  id?: string,
-  iconName: IconName,
-  tooltipText: string,
-  width?: string,
-  alignRight?: boolean,
-  isLast?: boolean,
-  onClick?: (event: SyntheticMouseEvent<>) => mixed,
-|}
+type ClickableIconProps = {
+  id?: string
+  iconName: IconName
+  tooltipText: string
+  width?: string
+  alignRight?: boolean
+  isLast?: boolean
+  onClick?: (event: SyntheticMouseEvent<>) => mixed
+}
 
 const iconBoxStyles = css`
   align-self: stretch;
@@ -77,14 +77,14 @@ export const ClickableIcon = (props: ClickableIconProps): React.Node => {
   )
 }
 
-type Props = {|
-  isMultiSelectMode: boolean,
-|}
+type Props = {
+  isMultiSelectMode: boolean
+}
 
-type AccordionProps = {|
-  expanded: boolean,
-  children: React.Node,
-|}
+type AccordionProps = {
+  expanded: boolean
+  children: React.Node
+}
 
 export const Accordion = (props: AccordionProps): React.Node => {
   return (

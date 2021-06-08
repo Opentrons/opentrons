@@ -10,23 +10,23 @@ import {
 
 import { i18n } from '../../localization'
 import { actions as steplistActions } from '../../steplist'
-import type { StepFieldName } from '../../steplist/fieldLevel'
-import type { FormData } from '../../form-types'
-import type { ThunkDispatch } from '../../types'
+import { StepFieldName } from '../../steplist/fieldLevel'
+import { FormData } from '../../form-types'
+import { ThunkDispatch } from '../../types'
 import modalStyles from './modal.css'
 import styles from './MoreOptionsModal.css'
 
-type OP = {|
-  close: (event: ?SyntheticEvent<>) => mixed,
+type OP = {
+  close: (event: SyntheticEvent<> | null | undefined) => mixed,
   formData: FormData,
-|}
+}
 
-type DP = {|
-  saveValuesToForm: ({ [StepFieldName]: ?mixed }) => mixed,
-|}
+type DP = {
+  saveValuesToForm: ({ [StepFieldName]: mixed | null | undefined }) => mixed,
+}
 
-type Props = {| ...OP, ...DP |}
-type State = { [StepFieldName]: ?mixed }
+type Props = OP & DP
+type State = { [StepFieldName]: mixed | null | undefined }
 
 class MoreOptionsModalComponent extends React.Component<Props, State> {
   constructor(props: Props) {
@@ -99,7 +99,7 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<*>): DP => ({
 export const MoreOptionsModal: React.AbstractComponent<OP> = connect<
   Props,
   OP,
-  {||},
+  {},
   DP,
   _,
   _

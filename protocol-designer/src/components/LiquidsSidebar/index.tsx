@@ -8,21 +8,21 @@ import { swatchColors } from '../swatchColors'
 import listButtonStyles from '../listButtons.css'
 
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
-import type { OrderedLiquids } from '../../labware-ingred/types'
+import { OrderedLiquids } from '../../labware-ingred/types'
 import * as labwareIngredActions from '../../labware-ingred/actions'
-import type { BaseState, ThunkDispatch } from '../../types'
+import { BaseState, ThunkDispatch } from '../../types'
 
-type SP = {|
-  liquids: OrderedLiquids,
-  selectedLiquid: ?string,
-|}
+type SP = {
+  liquids: OrderedLiquids
+  selectedLiquid: string | null | undefined
+}
 
-type DP = {|
-  createNewLiquid: () => mixed,
-  selectLiquid: (liquidId: string) => mixed,
-|}
+type DP = {
+  createNewLiquid: () => mixed
+  selectLiquid: (liquidId: string) => mixed
+}
 
-type Props = {| ...SP, ...DP |}
+type Props = SP & DP
 
 function LiquidsSidebarComponent(props: Props) {
   const { liquids, selectedLiquid, createNewLiquid, selectLiquid } = props
@@ -66,9 +66,9 @@ function mapDispatchToProps(dispatch: ThunkDispatch<*>): DP {
   }
 }
 
-export const LiquidsSidebar: React.AbstractComponent<{||}> = connect<
+export const LiquidsSidebar: React.AbstractComponent<{}> = connect<
   Props,
-  {||},
+  {},
   SP,
   DP,
   _,

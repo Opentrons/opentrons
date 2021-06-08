@@ -1,31 +1,31 @@
 // @flow
 import * as React from 'react'
-import { FlowRateInput, type FlowRateInputProps } from './FlowRateInput'
+import { FlowRateInput,  FlowRateInputProps } from './FlowRateInput'
 import { connect } from 'react-redux'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
-import type { FieldProps } from '../../types'
-import type { BaseState } from '../../../../types'
+import { FieldProps } from '../../types'
+import { BaseState } from '../../../../types'
 
-type OP = {|
+type OP = {
   ...FieldProps,
-  pipetteId: ?string,
+  pipetteId: string | null | undefined,
   className?: $PropertyType<FlowRateInputProps, 'className'>,
   flowRateType: $PropertyType<FlowRateInputProps, 'flowRateType'>,
   label?: $PropertyType<FlowRateInputProps, 'label'>,
-|}
+}
 
-type SP = {|
+type SP = {
   innerKey: string,
-  defaultFlowRate: ?number,
+  defaultFlowRate: number | null | undefined,
   minFlowRate: number,
   maxFlowRate: number,
   pipetteDisplayName: string,
-|}
+}
 
-type Props = {|
+type Props = {
   ...FlowRateInputProps,
   innerKey: string,
-|}
+}
 
 // Add a key to force re-constructing component when values change
 function FlowRateInputWithKey(props: Props) {
@@ -73,7 +73,7 @@ export const FlowRateField: React.AbstractComponent<OP> = connect<
   Props,
   OP,
   SP,
-  {||},
+  {},
   _,
   _
 >(

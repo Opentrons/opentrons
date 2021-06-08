@@ -25,29 +25,29 @@ import {
 } from '../../modals/ConfirmDeleteModal'
 import { getDynamicFieldFocusHandlerId } from '../utils'
 import styles from '../StepEditForm.css'
-import type {
+import {
   ProfileStepItem,
   ProfileItem,
   ProfileCycleItem,
 } from '../../../form-types'
-import type { FocusHandlers } from '../types'
+import { FocusHandlers } from '../types'
 
 export const showProfileFieldErrors = ({
   fieldId,
   focusedField,
   dirtyFields,
-}: {|
+}: {
   fieldId: string,
-  focusedField: ?string,
-  dirtyFields: Array<string>,
-|}): boolean =>
+  focusedField: string | null | undefined,
+  dirtyFields: string[],
+}): boolean =>
   !(fieldId === focusedField) && dirtyFields && dirtyFields.includes(fieldId)
 
-type ProfileCycleRowProps = {|
+type ProfileCycleRowProps = {
   cycleItem: ProfileCycleItem,
   focusHandlers: FocusHandlers,
   stepOffset: number,
-|}
+}
 export const ProfileCycleRow = (props: ProfileCycleRowProps): React.Node => {
   const { cycleItem, focusHandlers, stepOffset } = props
   const dispatch = useDispatch()
@@ -139,14 +139,14 @@ export const ProfileCycleRow = (props: ProfileCycleRowProps): React.Node => {
   )
 }
 
-export type ProfileItemRowsProps = {|
+export type ProfileItemRowsProps = {
   focusHandlers: FocusHandlers,
-  orderedProfileItems: Array<string>,
+  orderedProfileItems: string[],
   profileItemsById: {
     [string]: ProfileItem,
     ...
   },
-|}
+}
 
 export const ProfileItemRows = (props: ProfileItemRowsProps): React.Node => {
   const { orderedProfileItems, profileItemsById } = props
@@ -230,14 +230,14 @@ export const ProfileItemRows = (props: ProfileItemRowsProps): React.Node => {
   )
 }
 
-type ProfileFieldProps = {|
+type ProfileFieldProps = {
   name: string,
   focusHandlers: FocusHandlers,
   profileItem: ProfileItem,
   units?: React.Node,
   className?: string,
   updateValue: (name: string, value: mixed) => mixed,
-|}
+}
 const ProfileField = (props: ProfileFieldProps) => {
   const {
     focusHandlers,
@@ -289,12 +289,12 @@ const ProfileField = (props: ProfileFieldProps) => {
   )
 }
 
-type ProfileStepRowProps = {|
+type ProfileStepRowProps = {
   focusHandlers: FocusHandlers,
   profileStepItem: ProfileStepItem,
   stepNumber: number,
-  isCycle?: ?boolean,
-|}
+  isCycle: boolean | null | undefined,
+}
 
 const ProfileStepRow = (props: ProfileStepRowProps) => {
   const { focusHandlers, profileStepItem, isCycle } = props

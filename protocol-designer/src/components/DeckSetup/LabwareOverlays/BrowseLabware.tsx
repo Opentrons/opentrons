@@ -4,21 +4,21 @@ import cx from 'classnames'
 import { connect } from 'react-redux'
 import { Icon } from '@opentrons/components'
 import { i18n } from '../../../localization'
-import type { ThunkDispatch } from '../../../types'
-import type { LabwareOnDeck } from '../../../step-forms'
+import { ThunkDispatch } from '../../../types'
+import { LabwareOnDeck } from '../../../step-forms'
 import { drillDownOnLabware } from '../../../labware-ingred/actions'
 import { resetScrollElements } from '../../../ui/steps/utils'
 import styles from './LabwareOverlays.css'
 
-type OP = {|
-  labwareOnDeck: LabwareOnDeck,
-|}
+type OP = {
+  labwareOnDeck: LabwareOnDeck
+}
 
-type DP = {|
-  drillDown: () => mixed,
-|}
+type DP = {
+  drillDown: () => mixed
+}
 
-type Props = {| ...OP, ...DP |}
+type Props = OP & DP
 
 function BrowseLabwareOverlay(props: Props) {
   if (props.labwareOnDeck.def.parameters.isTiprack) return null

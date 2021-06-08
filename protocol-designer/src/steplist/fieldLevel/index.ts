@@ -8,7 +8,7 @@ import {
   temperatureRangeFieldValue,
   realNumber,
 } from './errors'
-import type { ValueMasker, ValueCaster } from './processing'
+import { ValueMasker, ValueCaster } from './processing'
 import {
   maskToInteger,
   maskToFloat,
@@ -27,12 +27,12 @@ import {
   MIN_TC_DURATION_SECONDS,
   MAX_TC_DURATION_SECONDS,
 } from '../../constants'
-import type {
+import {
   LabwareEntity,
   PipetteEntity,
   InvariantContext,
 } from '@opentrons/step-generation'
-import type { StepFieldName } from '../../form-types'
+import { StepFieldName } from '../../form-types'
 export type { StepFieldName }
 
 const getLabwareEntity = (
@@ -50,7 +50,7 @@ const getPipetteEntity = (
 }
 
 type StepFieldHelpers = {
-  getErrors?: (arg0: unknown) => Array<string>
+  getErrors?: (arg0: unknown) => string[]
   maskValue?: ValueMasker
   castValue?: ValueCaster
   hydrate?: (state: InvariantContext, id: string) => unknown
@@ -276,7 +276,7 @@ const profileFieldHelperMap: Record<string, StepFieldHelpers> = {
 export const getFieldErrors = (
   name: StepFieldName,
   value: unknown
-): Array<string> => {
+): string[] => {
   const fieldErrorGetter =
     stepFieldHelperMap[name] && stepFieldHelperMap[name].getErrors
   const errors = fieldErrorGetter ? fieldErrorGetter(value) : []
@@ -285,7 +285,7 @@ export const getFieldErrors = (
 export const getProfileFieldErrors = (
   name: string,
   value: unknown
-): Array<string> => {
+): string[] => {
   const fieldErrorGetter =
     profileFieldHelperMap[name] && profileFieldHelperMap[name].getErrors
   const errors = fieldErrorGetter ? fieldErrorGetter(value) : []

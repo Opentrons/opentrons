@@ -13,25 +13,25 @@ import { selectors } from '../../labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import * as labwareIngredsActions from '../../labware-ingred/actions'
 
-import type { BaseState, ThunkDispatch } from '../../types'
-import type { ContentsByWell } from '../../labware-ingred/types'
-import type { WellIngredientNames } from '../../steplist/types'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import { BaseState, ThunkDispatch } from '../../types'
+import { ContentsByWell } from '../../labware-ingred/types'
+import { WellIngredientNames } from '../../steplist/types'
+import { LabwareDefinition2 } from '@opentrons/shared-data'
 
 import modalStyles from '../modals/modal.css'
 import styles from './labware.css'
 
-type SP = {|
-  definition: ?LabwareDefinition2,
-  wellContents: ContentsByWell,
-  ingredNames: WellIngredientNames,
-|}
+type SP = {
+  definition: LabwareDefinition2 | null | undefined
+  wellContents: ContentsByWell
+  ingredNames: WellIngredientNames
+}
 
-type DP = {|
-  drillUp: () => mixed,
-|}
+type DP = {
+  drillUp: () => mixed
+}
 
-type Props = {| ...SP, ...DP |}
+type Props = SP & DP
 
 const BrowseLabwareModalComponent = (props: Props) => {
   const { drillUp, definition, ingredNames, wellContents } = props
@@ -86,9 +86,9 @@ function mapDispatchToProps(dispatch: ThunkDispatch<*>): DP {
   return { drillUp: () => dispatch(labwareIngredsActions.drillUpFromLabware()) }
 }
 
-export const BrowseLabwareModal: React.AbstractComponent<{||}> = connect<
+export const BrowseLabwareModal: React.AbstractComponent<{}> = connect<
   Props,
-  {||},
+  {},
   SP,
   DP,
   _,

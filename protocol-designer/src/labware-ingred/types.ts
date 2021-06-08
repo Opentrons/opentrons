@@ -1,4 +1,4 @@
-import type { LocationLiquidState } from '@opentrons/step-generation'
+import { LocationLiquidState } from '@opentrons/step-generation'
 // TODO Ian 2018-02-19 make these shared in component library, standardize with Run App
 //  ===== LABWARE ===========
 export type DisplayLabware = {
@@ -12,7 +12,7 @@ export type WellContents = {
   // non-ingredient well state, for SelectableLabware
   wellName: string
   // eg 'A1', 'A2' etc
-  groupIds: Array<string>
+  groupIds: string[]
   ingreds: LocationLiquidState
 }
 export type ContentsByWell = Record<string, WellContents> | null

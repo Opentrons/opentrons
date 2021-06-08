@@ -1,7 +1,7 @@
 import { defaultMemoize } from 'reselect'
 import { getDisabledFieldsMoveLiquidForm } from './getDisabledFieldsMoveLiquidForm'
 import { getDisabledFieldsMixForm } from './getDisabledFieldsMixForm'
-import type { FormData } from '../../../form-types'
+import { FormData } from '../../../form-types'
 
 function _getDisabledFields(rawForm: FormData): Set<string> {
   switch (rawForm.stepType) {

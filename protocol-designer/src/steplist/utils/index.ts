@@ -1,6 +1,6 @@
 import { mergeWhen } from './mergeWhen'
 import { getOrderedWells } from './orderWells'
-import type { StepIdType } from '../../form-types'
+import { StepIdType } from '../../form-types'
 export { mergeWhen, getOrderedWells }
 export type WellRatio = 'n:n' | '1:many' | 'many:1'
 export function getWellRatio(
@@ -31,8 +31,8 @@ export function getWellRatio(
   return null
 }
 export const getNextNonTerminalItemId = (
-  orderedStepIds: Array<StepIdType>,
-  stepsToDelete: Array<StepIdType>
+  orderedStepIds: StepIdType[],
+  stepsToDelete: StepIdType[]
 ): StepIdType | null => {
   let highestDeletedIndex = stepsToDelete.reduce((highestIndex, val) => {
     const currentStepIndex = orderedStepIds.indexOf(val)

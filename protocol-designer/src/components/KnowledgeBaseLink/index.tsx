@@ -20,11 +20,11 @@ export const links = {
 
 type Link = $Keys<typeof links>
 
-type Props = {|
-  to: Link,
-  children: React.Node,
-  className?: ?string,
-|}
+type Props = {
+  to: Link
+  children: React.Node
+  className: string | null | undefined
+}
 
 /** Link which opens a page on the knowledge base to a new tab/window */
 export function KnowledgeBaseLink(props: Props): React.Node {

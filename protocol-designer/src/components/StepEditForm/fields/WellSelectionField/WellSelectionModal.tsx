@@ -14,41 +14,41 @@ import { SelectableLabware, wellFillFromWellContents } from '../../../labware'
 import * as wellContentsSelectors from '../../../../top-selectors/well-contents'
 import { selectors } from '../../../../labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
-import type { WellGroup } from '@opentrons/components'
-import type {
+import { WellGroup } from '@opentrons/components'
+import {
   LabwareDefinition2,
   PipetteNameSpecs,
 } from '@opentrons/shared-data'
-import type { ContentsByWell } from '../../../../labware-ingred/types'
-import type { WellIngredientNames } from '../../../../steplist/types'
-import type { StepFieldName } from '../../../../form-types'
+import { ContentsByWell } from '../../../../labware-ingred/types'
+import { WellIngredientNames } from '../../../../steplist/types'
+import { StepFieldName } from '../../../../form-types'
 
 import styles from './WellSelectionModal.css'
 import modalStyles from '../../../modals/modal.css'
 
-type WellSelectionModalProps = {|
+type WellSelectionModalProps = {
   isOpen: boolean,
-  labwareId: ?string,
+  labwareId: string | null | undefined,
   name: StepFieldName,
-  onCloseClick: (e: ?SyntheticEvent<*>) => mixed,
-  pipetteId: ?string,
+  onCloseClick: (e: SyntheticEvent<*> | null | undefined) => mixed,
+  pipetteId: string | null | undefined,
   value: mixed,
   updateValue: (?mixed) => void,
-|}
+}
 
-type WellSelectionModalComponentProps = {|
+type WellSelectionModalComponentProps = {
   deselectWells: WellGroup => mixed,
   handleSave: () => mixed,
   highlightedWells: WellGroup,
   ingredNames: WellIngredientNames,
-  labwareDef: ?LabwareDefinition2,
-  onCloseClick: (e: ?SyntheticEvent<*>) => mixed,
-  pipetteSpec: ?PipetteNameSpecs,
+  labwareDef: LabwareDefinition2 | null | undefined,
+  onCloseClick: (e: SyntheticEvent<*> | null | undefined) => mixed,
+  pipetteSpec: PipetteNameSpecs | null | undefined,
   selectedPrimaryWells: WellGroup,
   selectWells: WellGroup => mixed,
   updateHighlightedWells: WellGroup => mixed,
   wellContents: ContentsByWell,
-|}
+}
 
 const WellSelectionModalComponent = (
   props: WellSelectionModalComponentProps

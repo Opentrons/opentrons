@@ -12,21 +12,21 @@ import {
   getDisabledChangeTipOptions,
   type DisabledChangeTipArgs,
 } from './getDisabledChangeTipOptions'
-import type { ChangeTipOptions } from '@opentrons/step-generation'
-import type { FieldProps } from '../../types'
+import { ChangeTipOptions } from '@opentrons/step-generation'
+import { FieldProps } from '../../types'
 import styles from '../../StepEditForm.css'
 
-const ALL_CHANGE_TIP_VALUES: Array<ChangeTipOptions> = [
+const ALL_CHANGE_TIP_VALUES: ChangeTipOptions[] = [
   'always',
   'once',
   'perSource',
   'perDest',
   'never',
 ]
-type Props = {|
+type Props = {
   ...FieldProps,
   ...DisabledChangeTipArgs,
-|}
+}
 
 export const ChangeTipField = (props: Props): React.Node => {
   const {

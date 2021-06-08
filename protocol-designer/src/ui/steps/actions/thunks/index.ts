@@ -18,9 +18,9 @@ import {
 } from '../../../../tutorial'
 import * as uiModuleSelectors from '../../../../ui/modules/selectors'
 import * as fileDataSelectors from '../../../../file-data/selectors'
-import type { StepType, StepIdType, FormData } from '../../../../form-types'
-import type { ThunkAction } from '../../../../types'
-import type {
+import { StepType, StepIdType, FormData } from '../../../../form-types'
+import { ThunkAction } from '../../../../types'
+import {
   DuplicateStepAction,
   DuplicateMultipleStepsAction,
   SelectMultipleStepsAction,
@@ -108,7 +108,7 @@ export const duplicateStep: (
   }
 }
 export const duplicateMultipleSteps: (
-  stepIds: Array<StepIdType>
+  stepIds: StepIdType[]
 ) => ThunkAction<
   DuplicateMultipleStepsAction | SelectMultipleStepsAction
 > = stepIds => (dispatch, getState) => {

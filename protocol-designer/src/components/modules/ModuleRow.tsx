@@ -19,15 +19,15 @@ import { ModuleDiagram } from './ModuleDiagram'
 import { isModuleWithCollisionIssue } from './utils'
 import styles from './styles.css'
 
-import type { ModuleRealType } from '@opentrons/shared-data'
-import type { ModuleOnDeck } from '../../step-forms'
+import { ModuleRealType } from '@opentrons/shared-data'
+import { ModuleOnDeck } from '../../step-forms'
 
-type Props = {|
-  moduleOnDeck?: ModuleOnDeck,
-  showCollisionWarnings?: boolean,
-  type: ModuleRealType,
-  openEditModuleModal: (moduleType: ModuleRealType, moduleId?: string) => mixed,
-|}
+type Props = {
+  moduleOnDeck?: ModuleOnDeck
+  showCollisionWarnings?: boolean
+  type: ModuleRealType
+  openEditModuleModal: (moduleType: ModuleRealType, moduleId?: string) => mixed
+}
 
 export function ModuleRow(props: Props): React.Node {
   const { moduleOnDeck, openEditModuleModal, showCollisionWarnings } = props
@@ -41,8 +41,8 @@ export function ModuleRow(props: Props): React.Node {
   of SlotMap. Kept it here (for now?) because it spells out the different cases.
   */
   let slotDisplayName = null
-  let occupiedSlotsForMap: Array<string> = []
-  let collisionSlots: Array<string> = []
+  let occupiedSlotsForMap: string[] = []
+  let collisionSlots: string[] = []
   const moduleHasCollisionIssue = model
     ? isModuleWithCollisionIssue(model)
     : false

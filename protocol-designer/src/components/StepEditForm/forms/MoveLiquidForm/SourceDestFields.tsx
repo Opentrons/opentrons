@@ -17,17 +17,17 @@ import {
   getLabwareFieldForPositioningField,
 } from '../../utils'
 
-import type { FormData } from '../../../../form-types'
-import type { StepFieldName } from '../../../../steplist/fieldLevel'
-import type { FieldPropsByName } from '../../types'
+import { FormData } from '../../../../form-types'
+import { StepFieldName } from '../../../../steplist/fieldLevel'
+import { FieldPropsByName } from '../../types'
 import styles from '../../StepEditForm.css'
 
-type Props = {|
-  className?: ?string,
-  prefix: 'aspirate' | 'dispense',
-  propsForFields: FieldPropsByName,
-  formData: FormData,
-|}
+type Props = {
+  className: string | null | undefined
+  prefix: 'aspirate' | 'dispense'
+  propsForFields: FieldPropsByName
+  formData: FormData
+}
 
 const makeAddFieldNamePrefix = (prefix: string) => (
   fieldName: string

@@ -27,7 +27,7 @@ import {
   ConfirmDeleteModal,
   CLOSE_STEP_FORM_WITH_CHANGES,
   CLOSE_UNSAVED_STEP_FORM,
-  DeleteModalType,
+  type DeleteModalType,
   CLOSE_BATCH_EDIT_FORM,
 } from '../components/modals/ConfirmDeleteModal'
 
@@ -35,9 +35,9 @@ import { SubstepIdentifier } from '../steplist/types'
 import { StepIdType } from '../form-types'
 
 type Props = {
-  stepId: StepIdType
-  stepNumber: number
-  onStepContextMenu?: () => mixed
+  stepId: StepIdType,
+  stepNumber: number,
+  onStepContextMenu?: () => mixed,
 }
 
 const nonePressed = (keysPressed: boolean[]): boolean =>
@@ -47,7 +47,7 @@ const getUserOS = () => new UAParser().getOS().name
 
 const getMouseClickKeyInfo = (
   event: SyntheticMouseEvent<>
-): { isShiftKeyPressed: boolean; isMetaKeyPressed: boolean } => {
+): { isShiftKeyPressed: boolean, isMetaKeyPressed: boolean } => {
   const isMac: boolean = getUserOS() === 'Mac OS'
   const isShiftKeyPressed: boolean = event.shiftKey
   const isMetaKeyPressed: boolean =
@@ -108,8 +108,10 @@ export const ConnectedStepItem = (props: Props): React.Node => {
   const highlightSubstep = (payload: SubstepIdentifier) =>
     dispatch(stepsActions.hoverOnSubstep(payload))
   const selectStep = () => dispatch(stepsActions.selectStep(stepId))
-  const selectMultipleSteps = (steps: StepIdType[], lastSelected: StepIdType) =>
-    dispatch(stepsActions.selectMultipleSteps(steps, lastSelected))
+  const selectMultipleSteps = (
+    steps: StepIdType[],
+    lastSelected: StepIdType
+  ) => dispatch(stepsActions.selectMultipleSteps(steps, lastSelected))
   const toggleStepCollapsed = () =>
     dispatch(stepsActions.toggleStepCollapsed(stepId))
   const highlightStep = () => dispatch(stepsActions.hoverOnStep(stepId))

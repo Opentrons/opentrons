@@ -1,17 +1,17 @@
 // @flow
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { DropdownField, type Options } from '@opentrons/components'
+import { DropdownField,  Options } from '@opentrons/components'
 import cx from 'classnames'
 import { selectors as uiLabwareSelectors } from '../../../ui/labware'
 import styles from '../StepEditForm.css'
-import type { FieldProps } from '../types'
+import { FieldProps } from '../types'
 
-type BlowoutLocationDropdownProps = {|
+type BlowoutLocationDropdownProps = {
   ...FieldProps,
   className?: string,
   options: Options,
-|}
+}
 
 export const BlowoutLocationField = (
   props: BlowoutLocationDropdownProps

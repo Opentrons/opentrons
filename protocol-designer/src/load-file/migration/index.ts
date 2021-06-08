@@ -1,7 +1,7 @@
 import flow from 'lodash/flow'
 import takeRightWhile from 'lodash/takeRightWhile'
 import semver from 'semver'
-import type { PDProtocolFile } from '../../file-types'
+import { PDProtocolFile } from '../../file-types'
 import { migrateFile as migrateFileOne } from './1_1_0'
 import { migrateFile as migrateFileThree } from './3_0_0'
 import { migrateFile as migrateFileFour } from './4_0_0'
@@ -26,7 +26,7 @@ const allMigrationsByVersion: MigrationsByVersion = {
 export const getMigrationVersionsToRunFromVersion = (
   migrationsByVersion: {},
   version: Version
-): Array<Version> => {
+): Version[] => {
   const allSortedVersions = Object.keys(migrationsByVersion).sort(
     semver.compare
   )
@@ -37,7 +37,7 @@ export const migration = (
 ): {
   file: PDProtocolFile
   didMigrate: boolean
-  migrationsRan: Array<string>
+  migrationsRan: string[]
 } => {
   const designerApplication =
     file.designerApplication || file['designer-application']

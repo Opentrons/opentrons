@@ -1,8 +1,8 @@
 import last from 'lodash/last'
-import type { StepIdType, FormData } from '../../../form-types'
+import { StepIdType, FormData } from '../../../form-types'
 export function getNextDefaultEngageHeight(
   savedForms: Record<StepIdType, FormData>,
-  orderedStepIds: Array<StepIdType>
+  orderedStepIds: StepIdType[]
 ): string | null | undefined {
   const prevMagnetSteps = orderedStepIds
     .map(stepId => savedForms[stepId])

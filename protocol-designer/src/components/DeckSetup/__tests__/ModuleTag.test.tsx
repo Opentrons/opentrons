@@ -19,9 +19,9 @@ import * as timelineFramesSelectors from '../../../top-selectors/timelineFrames'
 import { selectors as stepFormSelectors } from '../../../step-forms'
 import * as uiSelectors from '../../../ui/steps'
 
-import type { CommandsAndRobotState } from '@opentrons/step-generation'
-import type { BaseState } from '../../../types'
-import type { ModuleEntities, InitialDeckSetup } from '../../../step-forms'
+import { CommandsAndRobotState } from '@opentrons/step-generation'
+import { BaseState } from '../../../types'
+import { ModuleEntities, InitialDeckSetup } from '../../../step-forms'
 
 jest.mock('../../../ui/steps')
 jest.mock('../../../top-selectors/timelineFrames')
@@ -35,7 +35,7 @@ const timelineFrameBeforeActiveItemMock: JestMockFn<
 const getModuleEntitiesMock: JestMockFn<[BaseState], ModuleEntities> =
   stepFormSelectors.getModuleEntities
 
-const getHoveredStepLabwareMock: JestMockFn<[BaseState], Array<string>> =
+const getHoveredStepLabwareMock: JestMockFn<[BaseState], string[]> =
   uiSelectors.getHoveredStepLabware
 
 const getInitialDeckSetup: JestMockFn<[BaseState], InitialDeckSetup> =

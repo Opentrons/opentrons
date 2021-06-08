@@ -11,18 +11,18 @@ import {
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 import { i18n } from './localization'
-import type {
+import {
   LabwareDefinition2,
   DeckSlot as DeckDefSlot,
   ModuleRealType,
   ModuleModel,
 } from '@opentrons/shared-data'
-import type { DeckSlot, WellVolumes } from './types'
+import { DeckSlot, WellVolumes } from './types'
 export const getMaxVolumes = (def: LabwareDefinition2): WellVolumes =>
   mapValues(def.wells, well => well.totalLiquidVolume)
 
 /** All wells for labware, in arbitrary order. */
-export function getAllWellsForLabware(def: LabwareDefinition2): Array<string> {
+export function getAllWellsForLabware(def: LabwareDefinition2): string[] {
   return Object.keys(def.wells)
 }
 export const FIXED_TRASH_ID: 'trashId' = 'trashId'
@@ -34,7 +34,7 @@ export const STD_SLOT_DIVIDER_WIDTH = 4
 // These have no visual representation on the deck themselves,
 // but may contain certain specific items that span (eg thermocycler)
 export const SPAN7_8_10_11_SLOT: 'span7_8_10_11' = 'span7_8_10_11'
-export const TC_SPAN_SLOTS: Array<DeckSlot> = ['7', '8', '10', '11']
+export const TC_SPAN_SLOTS: DeckSlot[] = ['7', '8', '10', '11']
 export const PSEUDO_DECK_SLOTS: Record<DeckSlot, DeckDefSlot> = {
   [SPAN7_8_10_11_SLOT]: {
     displayName: 'Spanning slot',

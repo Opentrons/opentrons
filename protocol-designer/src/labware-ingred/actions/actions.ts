@@ -1,7 +1,7 @@
 import { createAction } from 'redux-actions'
 import { selectors } from '../selectors'
-import type { DeckSlot, ThunkAction } from '../../types'
-import type { IngredInputs } from '../types'
+import { DeckSlot, ThunkAction } from '../../types'
+import { IngredInputs } from '../types'
 // ===== Labware selector actions =====
 export type OpenAddLabwareModalAction = {
   type: 'OPEN_ADD_LABWARE_MODAL'
@@ -107,7 +107,7 @@ export type RemoveWellsContentsAction = {
   payload: {
     labwareId: string
     liquidGroupId?: string
-    wells: Array<string>
+    wells: string[]
   }
 }
 export const removeWellsContents: (
@@ -147,7 +147,7 @@ export const deleteLiquidGroup: (
 export type SetWellContentsPayload = {
   liquidGroupId: string
   labwareId: string
-  wells: Array<string>
+  wells: string[]
   // NOTE: order should not be meaningful
   volume: number
 }

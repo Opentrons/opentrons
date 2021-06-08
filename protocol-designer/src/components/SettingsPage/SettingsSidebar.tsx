@@ -3,15 +3,15 @@ import * as React from 'react'
 import { SidePanel } from '@opentrons/components'
 import { connect } from 'react-redux'
 
-import type { BaseState, ThunkDispatch } from '../../types'
-import { actions, selectors, type Page } from '../../navigation'
+import { BaseState, ThunkDispatch } from '../../types'
+import { actions, selectors,  Page } from '../../navigation'
 import { i18n } from '../../localization'
 import { PDTitledList } from '../lists'
 import styles from './SettingsPage.css'
 
-type SP = {| currentPage: Page |}
-type DP = {| makeNavigateToPage: Page => () => mixed |}
-type Props = { ...SP, ...DP }
+type SP = { currentPage: Page }
+type DP = { makeNavigateToPage: Page => () => mixed }
+type Props = SP & DP
 
 const SettingsSidebarComponent = (props: Props) => (
   <SidePanel title={i18n.t('nav.tab_name.settings')}>
@@ -38,9 +38,9 @@ const DTP = (dispatch: ThunkDispatch<*>): DP => ({
     dispatch(actions.navigateToPage(pageName)),
 })
 
-export const SettingsSidebar: React.AbstractComponent<{||}> = connect<
+export const SettingsSidebar: React.AbstractComponent<{}> = connect<
   Props,
-  {||},
+  {},
   SP,
   DP,
   _,

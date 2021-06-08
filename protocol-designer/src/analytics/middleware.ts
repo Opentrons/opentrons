@@ -9,13 +9,13 @@ import { getFileMetadata } from '../file-data/selectors'
 import { trackEvent } from './mixpanel'
 import { getHasOptedIn } from './selectors'
 import { flattenNestedProperties } from './utils/flattenNestedProperties'
-import type { Middleware } from 'redux'
-import type { BaseState } from '../types'
-import type { FormData, StepType } from '../form-types'
-import type { StepArgsAndErrors } from '../steplist'
-import type { SaveStepFormAction } from '../ui/steps/actions/thunks'
-import type { AnalyticsEventAction } from './actions'
-import type { AnalyticsEvent } from './mixpanel'
+import { Middleware } from 'redux'
+import { BaseState } from '../types'
+import { FormData, StepType } from '../form-types'
+import { StepArgsAndErrors } from '../steplist'
+import { SaveStepFormAction } from '../ui/steps/actions/thunks'
+import { AnalyticsEventAction } from './actions'
+import { AnalyticsEvent } from './mixpanel'
 
 // Converts Redux actions to analytics events (read: Mixpanel events).
 // Returns null if there is no analytics event associated with the action,
@@ -70,11 +70,11 @@ export const reduxActionToAnalyticsEvent = (
     const { editedFields, stepIds } = action.payload
     const additionalProperties = flattenNestedProperties(editedFields)
     const savedStepForms = getSavedStepForms(state)
-    const batchEditedStepForms: Array<FormData> = stepIds.map(
+    const batchEditedStepForms: FormData[] = stepIds.map(
       id => savedStepForms[id]
     )
     let stepType = null
-    const uniqueStepTypes: Array<StepType> = uniq(
+    const uniqueStepTypes: StepType[] = uniq(
       batchEditedStepForms.map(form => form.stepType)
     )
     if (uniqueStepTypes.length === 1) {

@@ -23,18 +23,18 @@ import { getLabwareOnModule } from '../../ui/modules/utils'
 import { makeTemperatureText } from '../../utils'
 import { getModuleVizDims } from './getModuleVizDims'
 import styles from './ModuleTag.css'
-import type { ModuleOrientation } from '../../types'
-import type {
+import { ModuleOrientation } from '../../types'
+import {
   ModuleTemporalProperties,
   TemperatureModuleState,
 } from '../../step-forms'
 
-type Props = {|
+type Props = {
   x: number,
   y: number,
   orientation: ModuleOrientation,
   id: string,
-|}
+}
 
 // eyeballed width/height to match designs
 const STANDARD_TAG_HEIGHT = 50
@@ -66,9 +66,9 @@ function getTempStatus(temperatureModuleState: TemperatureModuleState): string {
 
 export const ModuleStatus = ({
   moduleState,
-}: {|
+}: {
   moduleState: $PropertyType<ModuleTemporalProperties, 'moduleState'>,
-|}): React.Node => {
+}): React.Node => {
   switch (moduleState.type) {
     case MAGNETIC_MODULE_TYPE:
       return (
@@ -126,7 +126,7 @@ const ModuleTagComponent = (props: Props) => {
   ]
   const moduleState: ?$PropertyType<ModuleTemporalProperties, 'moduleState'> =
     timelineFrame?.robotState.modules[props.id]?.moduleState
-  const moduleType: ?ModuleRealType = moduleEntity?.type
+  const moduleType: ModuleRealType | null | undefined = moduleEntity?.type
 
   const hoveredLabwares = useSelector(uiSelectors.getHoveredStepLabware)
   const initialDeck = useSelector(stepFormSelectors.getInitialDeckSetup)
