@@ -39,7 +39,7 @@ type DP = {
   deselectWells: WellGroup => mixed,
 }
 
-type Props = { ...SP, ...DP }
+type Props = SP & DP
 
 type State = { highlightedWells: WellGroup }
 

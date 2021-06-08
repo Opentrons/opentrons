@@ -25,7 +25,7 @@ type DP = {
   saveValuesToForm: ({ [StepFieldName]: ?mixed }) => mixed,
 }
 
-type Props = { ...OP, ...DP }
+type Props = OP & DP
 type State = { [StepFieldName]: ?mixed }
 
 class MoreOptionsModalComponent extends React.Component<Props, State> {

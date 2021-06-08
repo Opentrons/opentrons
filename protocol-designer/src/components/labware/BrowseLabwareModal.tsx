@@ -22,16 +22,16 @@ import modalStyles from '../modals/modal.css'
 import styles from './labware.css'
 
 type SP = {
-  definition: ?LabwareDefinition2,
-  wellContents: ContentsByWell,
-  ingredNames: WellIngredientNames,
+  definition: ?LabwareDefinition2
+  wellContents: ContentsByWell
+  ingredNames: WellIngredientNames
 }
 
 type DP = {
-  drillUp: () => mixed,
+  drillUp: () => mixed
 }
 
-type Props = { ...SP, ...DP }
+type Props = SP & DP
 
 const BrowseLabwareModalComponent = (props: Props) => {
   const { drillUp, definition, ingredNames, wellContents } = props

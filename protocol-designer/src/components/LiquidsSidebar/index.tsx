@@ -13,16 +13,16 @@ import * as labwareIngredActions from '../../labware-ingred/actions'
 import { BaseState, ThunkDispatch } from '../../types'
 
 type SP = {
-  liquids: OrderedLiquids,
-  selectedLiquid: ?string,
+  liquids: OrderedLiquids
+  selectedLiquid: ?string
 }
 
 type DP = {
-  createNewLiquid: () => mixed,
-  selectLiquid: (liquidId: string) => mixed,
+  createNewLiquid: () => mixed
+  selectLiquid: (liquidId: string) => mixed
 }
 
-type Props = { ...SP, ...DP }
+type Props = SP & DP
 
 function LiquidsSidebarComponent(props: Props) {
   const { liquids, selectedLiquid, createNewLiquid, selectLiquid } = props

@@ -34,7 +34,7 @@ type SP = {
   wellDepthMm: number,
 }
 
-type Props = { ...OP, ...SP }
+type Props = OP & SP
 
 function TipPositionInput(props: Props) {
   const [isModalOpen, setModalOpen] = React.useState(false)
