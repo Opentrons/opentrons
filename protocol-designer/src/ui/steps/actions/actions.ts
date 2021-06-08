@@ -4,13 +4,13 @@ import { PRESAVED_STEP_ID } from '../../../steplist/types'
 import { selectors as stepFormSelectors } from '../../../step-forms'
 import { getMultiSelectLastSelected } from '../selectors'
 import { resetScrollElements } from '../utils'
-import type { Timeline } from '@opentrons/step-generation'
-import type { StepIdType, StepType } from '../../../form-types'
-import type { GetState, ThunkAction, ThunkDispatch } from '../../../types'
-import type { TerminalItemId, SubstepIdentifier } from '../../../steplist/types'
-import type { AnalyticsEvent } from '../../../analytics/mixpanel'
-import type { AnalyticsEventAction } from '../../../analytics/actions'
-import type {
+import { Timeline } from '@opentrons/step-generation'
+import { StepIdType, StepType } from '../../../form-types'
+import { GetState, ThunkAction, ThunkDispatch } from '../../../types'
+import { TerminalItemId, SubstepIdentifier } from '../../../steplist/types'
+import { AnalyticsEvent } from '../../../analytics/mixpanel'
+import { AnalyticsEventAction } from '../../../analytics/actions'
+import {
   AddStepAction,
   ExpandAddStepButtonAction,
   ToggleStepCollapsedAction,

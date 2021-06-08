@@ -6,7 +6,7 @@ import { MixForm } from '../MixForm'
 import { AspDispSection } from '../AspDispSection'
 import * as stepFormSelectors from '../../../../step-forms/selectors'
 import { WellOrderField } from '../../fields'
-import type { BaseState } from '../../../../types'
+import { BaseState } from '../../../../types'
 
 const { DelayFields } = jest.requireActual('../../fields')
 

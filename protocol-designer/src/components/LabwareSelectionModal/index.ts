@@ -11,9 +11,9 @@ import {
   actions as labwareDefActions,
   selectors as labwareDefSelectors,
 } from '../../labware-defs'
-import type { ModuleOnDeck } from '../../step-forms'
+import { ModuleOnDeck } from '../../step-forms'
 import { selectors as stepFormSelectors } from '../../step-forms'
-import type { BaseState, ThunkDispatch } from '../../types'
+import { BaseState, ThunkDispatch } from '../../types'
 type Props = React.ElementProps<typeof LabwareSelectionModalComponent>
 type SP = {
   customLabwareDefs: Props['customLabwareDefs']

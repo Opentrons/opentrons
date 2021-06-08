@@ -8,8 +8,8 @@ import { selectors as stepFormSelectors } from '../../../step-forms'
 import { selectors as uiLabwareSelectors } from '../../../ui/labware'
 import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
 import * as labwareIngredActions from '../../../labware-ingred/actions'
-import type { ElementProps } from 'react'
-import type { BaseState, ThunkDispatch } from '../../../types'
+import { ElementProps } from 'react'
+import { BaseState, ThunkDispatch } from '../../../types'
 type Props = ElementProps<typeof LabwareDetailsCardComponent>
 type SP = $Diff<
   Props,

@@ -9,8 +9,8 @@ import {
 } from '../../../constants'
 import { getOrderedWells } from '../../utils'
 import { getMoveLiquidDelayData } from './getDelayData'
-import type { HydratedMoveLiquidFormData } from '../../../form-types'
-import type {
+import { HydratedMoveLiquidFormData } from '../../../form-types'
+import {
   ConsolidateArgs,
   DistributeArgs,
   TransferArgs,

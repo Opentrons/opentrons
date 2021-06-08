@@ -12,10 +12,10 @@ import { SingleLabware } from './SingleLabware'
 import { SelectionRect } from '../SelectionRect'
 import { WellTooltip } from './WellTooltip'
 
-import type { Channels, WellMouseEvent, WellGroup } from '@opentrons/components'
-import type { ContentsByWell } from '../../labware-ingred/types'
-import type { WellIngredientNames } from '../../steplist/types'
-import type { GenericRect } from '../../collision-types'
+import { Channels, WellMouseEvent, WellGroup } from '@opentrons/components'
+import { ContentsByWell } from '../../labware-ingred/types'
+import { WellIngredientNames } from '../../steplist/types'
+import { GenericRect } from '../../collision-types'
 
 export type Props = {
   labwareProps: $Diff<

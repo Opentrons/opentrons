@@ -1,16 +1,16 @@
 import { createSelector } from 'reselect'
 import { getWellNamePerMultiTip } from '@opentrons/shared-data'
 import { getWellSetForMultichannel } from '../utils'
-import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV6'
+import { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV6'
 import mapValues from 'lodash/mapValues'
 import * as StepGeneration from '@opentrons/step-generation'
 import { selectors as stepFormSelectors } from '../step-forms'
 import { selectors as fileDataSelectors } from '../file-data'
 import { getHoveredStepId, getHoveredSubstep } from '../ui/steps'
-import type { WellGroup } from '@opentrons/components'
-import type { PipetteEntity, LabwareEntity } from '@opentrons/step-generation'
-import type { Selector } from '../types'
-import type { SubstepItemData } from '../steplist/types'
+import { WellGroup } from '@opentrons/components'
+import { PipetteEntity, LabwareEntity } from '@opentrons/step-generation'
+import { Selector } from '../types'
+import { SubstepItemData } from '../steplist/types'
 // TODO IMMEDIATELY use WellGroup here
 export type AllWellHighlights = Record<string, true> // NOTE: all keys are true. There's a TODO in HighlightableLabware.js about making this a Set of well strings
 

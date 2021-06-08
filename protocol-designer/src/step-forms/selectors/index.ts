@@ -1,4 +1,4 @@
-import type { ElementProps } from 'react'
+import { ElementProps } from 'react'
 import assert from 'assert'
 import isEqual from 'lodash/isEqual'
 import mapValues from 'lodash/mapValues'
@@ -20,22 +20,22 @@ import {
   getFormErrors,
   stepFormToArgs,
 } from '../../steplist/formLevel'
-import type { ProfileFormError } from '../../steplist/formLevel/profileErrors'
+import { ProfileFormError } from '../../steplist/formLevel/profileErrors'
 import { getProfileFormErrors } from '../../steplist/formLevel/profileErrors'
 import { hydrateField, getFieldErrors } from '../../steplist/fieldLevel'
 import { getProfileItemsHaveErrors } from '../utils/getProfileItemsHaveErrors'
 import * as featureFlagSelectors from '../../feature-flags/selectors'
 import { denormalizePipetteEntities } from '../utils'
-import type { LabwareDefByDefURI } from '../../labware-defs'
+import { LabwareDefByDefURI } from '../../labware-defs'
 import { selectors as labwareDefSelectors } from '../../labware-defs'
 import { i18n } from '../../localization'
 import { InstrumentGroup as InstrumentGroupProps } from '@opentrons/components'
-import type {
+import {
   DropdownOption,
   Mount,
   InstrumentInfoProps,
 } from '@opentrons/components'
-import type {
+import {
   InvariantContext,
   LabwareEntity,
   LabwareEntities,
@@ -43,14 +43,11 @@ import type {
   ModuleEntity,
   PipetteEntities,
 } from '@opentrons/step-generation'
-import type { FormWarning } from '../../steplist/formLevel'
-import type { BaseState, Selector, DeckSlot } from '../../types'
-import type { FormData, StepIdType } from '../../form-types'
-import type {
-  StepArgsAndErrorsById,
-  StepFormErrors,
-} from '../../steplist/types'
-import type {
+import { FormWarning } from '../../steplist/formLevel'
+import { BaseState, Selector, DeckSlot } from '../../types'
+import { FormData, StepIdType } from '../../form-types'
+import { StepArgsAndErrorsById, StepFormErrors } from '../../steplist/types'
+import {
   InitialDeckSetup,
   NormalizedLabwareById,
   NormalizedLabware,
@@ -63,7 +60,7 @@ import type {
   TemperatureModuleState,
   ThermocyclerModuleState,
 } from '../types'
-import type {
+import {
   PresavedStepFormState,
   RootState,
   SavedStepFormState,

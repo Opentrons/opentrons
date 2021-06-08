@@ -1,8 +1,8 @@
 import reduce from 'lodash/reduce'
 import { AIR } from '@opentrons/step-generation'
 import { swatchColors, MIXED_WELL_COLOR } from '../swatchColors'
-import type { WellFill } from '@opentrons/components'
-import type { ContentsByWell, WellContents } from '../../labware-ingred/types'
+import { WellFill } from '@opentrons/components'
+import { ContentsByWell, WellContents } from '../../labware-ingred/types'
 
 const ingredIdsToColor = (groupIds: string[]): string | null | undefined => {
   const filteredIngredIds = groupIds.filter(id => id !== AIR)

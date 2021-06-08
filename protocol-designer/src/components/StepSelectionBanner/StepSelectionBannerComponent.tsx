@@ -26,7 +26,7 @@ import {
   TEXT_TRANSFORM_UPPERCASE,
 } from '@opentrons/components'
 import { i18n } from '../../localization'
-import type { CountPerStepType, StepType } from '../../form-types'
+import { CountPerStepType, StepType } from '../../form-types'
 
 type StepPillProps = { stepType: StepType; count: number }
 

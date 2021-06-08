@@ -9,8 +9,8 @@ import {
   selectors as loadFileSelectors,
 } from '../../load-file'
 import { FileSidebar as FileSidebarComponent } from './FileSidebar'
-import type { BaseState, ThunkDispatch } from '../../types'
-import type { SavedStepFormState, InitialDeckSetup } from '../../step-forms'
+import { BaseState, ThunkDispatch } from '../../types'
+import { SavedStepFormState, InitialDeckSetup } from '../../step-forms'
 type Props = React.ElementProps<typeof FileSidebarComponent>
 type SP = {
   canDownload: boolean

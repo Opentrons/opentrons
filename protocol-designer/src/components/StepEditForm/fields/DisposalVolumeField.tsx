@@ -16,9 +16,9 @@ import { selectors as uiLabwareSelectors } from '../../../ui/labware'
 import { getBlowoutLocationOptionsForForm } from '../utils'
 import { TextField } from './TextField'
 
-import type { FieldProps, FieldPropsByName } from '../types'
-import type { PathOption, StepType } from '../../../form-types'
-import type { BaseState } from '../../../types'
+import { FieldProps, FieldPropsByName } from '../types'
+import { PathOption, StepType } from '../../../form-types'
+import { BaseState } from '../../../types'
 
 import styles from '../StepEditForm.css'
 

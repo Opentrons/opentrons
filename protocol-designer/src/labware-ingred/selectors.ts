@@ -3,9 +3,9 @@ import forEach from 'lodash/forEach'
 import mapValues from 'lodash/mapValues'
 import max from 'lodash/max'
 import reduce from 'lodash/reduce'
-import type { Options } from '@opentrons/components'
-import type { LabwareLiquidState } from '@opentrons/step-generation'
-import type {
+import { Options } from '@opentrons/components'
+import { LabwareLiquidState } from '@opentrons/step-generation'
+import {
   RootState,
   ContainersState,
   DrillDownLabwareId,
@@ -13,18 +13,13 @@ import type {
   SelectedContainerId,
   SelectedLiquidGroupState,
 } from './reducers'
-import type {
+import {
   AllIngredGroupFields,
   IngredInputs,
   LiquidGroup,
   OrderedLiquids,
 } from './types'
-import type {
-  BaseState,
-  MemoizedSelector,
-  Selector,
-  DeckSlot,
-} from './../types'
+import { BaseState, MemoizedSelector, Selector, DeckSlot } from './../types'
 // TODO: Ian 2019-02-15 no RootSlice, use BaseState
 type RootSlice = {
   labwareIngred: RootState

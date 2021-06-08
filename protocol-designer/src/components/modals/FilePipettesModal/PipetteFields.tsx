@@ -19,7 +19,7 @@ import { PipetteDiagram } from './PipetteDiagram'
 import styles from './FilePipettesModal.css'
 import formStyles from '../../forms/forms.css'
 
-import type { FormPipettesByMount } from '../../../step-forms'
+import { FormPipettesByMount } from '../../../step-forms'
 
 export type Props = {
   initialTabIndex?: number,

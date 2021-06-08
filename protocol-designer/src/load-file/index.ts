@@ -1,4 +1,4 @@
-import type { RootState } from './reducers'
+import { RootState } from './reducers'
 import { rootReducer } from './reducers'
 import * as actions from './actions'
 import * as selectors from './selectors'

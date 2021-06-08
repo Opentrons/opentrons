@@ -1,7 +1,7 @@
 import { createSelector } from 'reselect'
-import type { BaseState, Selector } from '../../types'
-import type { RootState } from '../reducers'
-import type { FileMetadataFields } from '../types'
+import { BaseState, Selector } from '../../types'
+import { RootState } from '../reducers'
+import { FileMetadataFields } from '../types'
 export const rootSelector = (state: BaseState): RootState => state.fileData
 export const getCurrentProtocolExists: Selector<boolean> = createSelector(
   rootSelector,

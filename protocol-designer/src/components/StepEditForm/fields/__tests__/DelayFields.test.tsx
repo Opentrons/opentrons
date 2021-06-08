@@ -6,9 +6,9 @@ import { mount } from 'enzyme'
 import ApplicationText from '../../../../localization/en/application'
 import * as stepFormSelectors from '../../../../step-forms/selectors'
 import { CheckboxRowField, TextField, TipPositionField } from '../../fields'
-import { DelayFields, type DelayFieldProps } from '../DelayFields'
-import type { BaseState } from '../../../../types'
-import type { FormData } from '../../../../form-types'
+import { DelayFields,  DelayFieldProps } from '../DelayFields'
+import { BaseState } from '../../../../types'
+import { FormData } from '../../../../form-types'
 
 jest.mock('../../../../step-forms/selectors')
 

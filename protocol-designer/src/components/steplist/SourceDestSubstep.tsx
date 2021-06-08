@@ -6,7 +6,7 @@ import { MultiChannelSubstep } from './MultiChannelSubstep'
 import { SubstepRow } from './SubstepRow'
 import styles from './StepItem.css'
 
-import type {
+import {
   SourceDestSubstepItem,
   SubstepIdentifier,
   WellIngredientNames,

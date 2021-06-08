@@ -15,9 +15,9 @@ import {
   getModuleHasLabware,
   getMagnetLabwareEngageHeight as getMagnetLabwareEngageHeightUtil,
 } from './utils'
-import type { Options } from '@opentrons/components'
-import type { Selector } from '../../types'
-import type { LabwareNamesByModuleId } from '../../steplist/types'
+import { Options } from '@opentrons/components'
+import { Selector } from '../../types'
+import { LabwareNamesByModuleId } from '../../steplist/types'
 export const getLabwareNamesByModuleId: Selector<LabwareNamesByModuleId> = createSelector(
   getInitialDeckSetup,
   getLabwareNicknamesById,

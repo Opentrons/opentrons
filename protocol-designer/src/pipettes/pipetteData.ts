@@ -1,7 +1,7 @@
 import assert from 'assert'
 import { getPipetteNameSpecs, getTiprackVolume } from '@opentrons/shared-data'
-import type { Options } from '@opentrons/components'
-import type { PipetteEntity } from '@opentrons/step-generation'
+import { Options } from '@opentrons/components'
+import { PipetteEntity } from '@opentrons/step-generation'
 const supportedPipetteNames = [
   'p10_single',
   'p10_multi',

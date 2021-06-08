@@ -1,4 +1,4 @@
-import type { StepFieldName } from '../fieldLevel'
+import { StepFieldName } from '../fieldLevel'
 export type FormPatch = Partial<
   Record<StepFieldName, unknown | null | undefined>
 >

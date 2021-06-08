@@ -5,9 +5,9 @@ import {
   actions as featureFlagActions,
   selectors as featureFlagSelectors,
 } from '../../../feature-flags'
-import type { Dispatch } from 'redux'
-import type { ElementProps } from 'react'
-import type { BaseState } from '../../../types'
+import { Dispatch } from 'redux'
+import { ElementProps } from 'react'
+import { BaseState } from '../../../types'
 type Props = ElementProps<typeof FeatureFlagCardComponent>
 type SP = {
   flags: Props['flags']

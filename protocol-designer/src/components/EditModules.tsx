@@ -9,7 +9,7 @@ import { moveDeckItem } from '../labware-ingred/actions/actions'
 import { useBlockingHint } from './Hints/useBlockingHint'
 import { MagneticModuleWarningModalContent } from './modals/EditModulesModal/MagneticModuleWarningModalContent'
 import { EditModulesModal } from './modals/EditModulesModal'
-import type { ModuleModel, ModuleRealType } from '@opentrons/shared-data'
+import { ModuleModel, ModuleRealType } from '@opentrons/shared-data'
 
 type EditModulesProps = {
   moduleToEdit: {|

@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import { InputField } from '@opentrons/components'
-import type { FieldProps } from '../types'
+import { FieldProps } from '../types'
 
 type TextFieldProps = {
   ...FieldProps,

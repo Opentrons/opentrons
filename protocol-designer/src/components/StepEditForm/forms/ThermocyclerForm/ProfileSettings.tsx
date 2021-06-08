@@ -7,7 +7,7 @@ import { TextField } from '../../fields'
 
 import styles from '../../StepEditForm.css'
 
-import type { FieldPropsByName } from '../../types'
+import { FieldPropsByName } from '../../types'
 
 type Props = { propsForFields: FieldPropsByName }
 

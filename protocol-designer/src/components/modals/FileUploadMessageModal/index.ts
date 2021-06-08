@@ -6,8 +6,8 @@ import {
   selectors as loadFileSelectors,
   actions as loadFileActions,
 } from '../../../load-file'
-import type { Dispatch } from 'redux'
-import type { BaseState } from '../../../types'
+import { Dispatch } from 'redux'
+import { BaseState } from '../../../types'
 type Props = React.ElementProps<typeof FileUploadMessageModalComponent>
 type SP = {
   message: Props['message']

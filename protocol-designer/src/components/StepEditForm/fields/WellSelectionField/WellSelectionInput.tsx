@@ -12,10 +12,10 @@ import {
 } from '../../../../ui/steps'
 import styles from '../../StepEditForm.css'
 
-import type { Dispatch } from 'redux'
-import type { StepIdType } from '../../../../form-types'
-import type { BaseState } from '../../../../types'
-import type { FieldProps } from '../../types'
+import { Dispatch } from 'redux'
+import { StepIdType } from '../../../../form-types'
+import { BaseState } from '../../../../types'
+import { FieldProps } from '../../types'
 
 type SP = {
   stepId: ?StepIdType,

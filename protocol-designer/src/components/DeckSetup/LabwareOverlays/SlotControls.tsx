@@ -18,12 +18,12 @@ import {
   moveDeckItem,
 } from '../../../labware-ingred/actions'
 import { selectors as labwareDefSelectors } from '../../../labware-defs'
-import { START_TERMINAL_ITEM_ID, type TerminalItemId } from '../../../steplist'
+import { START_TERMINAL_ITEM_ID,  TerminalItemId } from '../../../steplist'
 
-import type { DeckSlot, ThunkDispatch, BaseState } from '../../../types'
-import type { LabwareDefByDefURI } from '../../../labware-defs'
-import type { LabwareOnDeck } from '../../../step-forms'
-import type {
+import { DeckSlot, ThunkDispatch, BaseState } from '../../../types'
+import { LabwareDefByDefURI } from '../../../labware-defs'
+import { LabwareOnDeck } from '../../../step-forms'
+import {
   DeckSlot as DeckSlotDefinition,
   ModuleRealType,
 } from '@opentrons/shared-data'

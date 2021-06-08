@@ -42,9 +42,9 @@ import { SlotDropdown } from './SlotDropdown'
 import { ConnectedSlotMap } from './ConnectedSlotMap'
 import { useResetSlotOnModelChange } from './form-state'
 
-import type { ModuleRealType, ModuleModel } from '@opentrons/shared-data'
-import type { ModuleOnDeck } from '../../../step-forms/types'
-import type { ModelModuleInfo } from '../../EditModules'
+import { ModuleRealType, ModuleModel } from '@opentrons/shared-data'
+import { ModuleOnDeck } from '../../../step-forms/types'
+import { ModelModuleInfo } from '../../EditModules'
 
 type EditModulesModalProps = {
   moduleType: ModuleRealType,

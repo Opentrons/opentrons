@@ -27,16 +27,16 @@ import { CrashInfoBox, isModuleWithCollisionIssue } from '../../modules'
 import styles from './FilePipettesModal.css'
 import formStyles from '../../forms/forms.css'
 import modalStyles from '../modal.css'
-import type { ModuleRealType } from '@opentrons/shared-data'
-import type { DeckSlot } from '../../../types'
-import type { NewProtocolFields } from '../../../load-file'
-import type {
+import { ModuleRealType } from '@opentrons/shared-data'
+import { DeckSlot } from '../../../types'
+import { NewProtocolFields } from '../../../load-file'
+import {
   PipetteOnDeck,
   FormPipette,
   FormPipettesByMount,
   FormModulesByType,
 } from '../../../step-forms'
-import type { FormikProps } from 'formik/@flow-typed'
+import { FormikProps } from 'formik/@flow-typed'
 
 export type PipetteFieldsData = $Diff<
   PipetteOnDeck,

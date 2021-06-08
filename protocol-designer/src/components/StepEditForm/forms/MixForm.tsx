@@ -23,7 +23,7 @@ import {
 } from '../utils'
 import { AspDispSection } from './AspDispSection'
 
-import type { StepFormProps } from '../types'
+import { StepFormProps } from '../types'
 
 import styles from '../StepEditForm.css'
 

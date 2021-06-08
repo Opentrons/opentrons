@@ -19,8 +19,8 @@ import { ModuleDiagram } from './ModuleDiagram'
 import { isModuleWithCollisionIssue } from './utils'
 import styles from './styles.css'
 
-import type { ModuleRealType } from '@opentrons/shared-data'
-import type { ModuleOnDeck } from '../../step-forms'
+import { ModuleRealType } from '@opentrons/shared-data'
+import { ModuleOnDeck } from '../../step-forms'
 
 type Props = {
   moduleOnDeck?: ModuleOnDeck

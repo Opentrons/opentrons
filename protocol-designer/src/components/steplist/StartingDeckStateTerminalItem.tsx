@@ -4,7 +4,7 @@ import * as React from 'react'
 import { TerminalItem } from './TerminalItem'
 import { PDListItem } from '../lists'
 import { START_TERMINAL_TITLE } from '../../constants'
-import type { BaseState } from '../../types'
+import { BaseState } from '../../types'
 import { START_TERMINAL_ITEM_ID } from '../../steplist'
 import { selectors as stepFormSelectors } from '../../step-forms'
 

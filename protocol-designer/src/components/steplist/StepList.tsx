@@ -12,7 +12,7 @@ import { StepCreationButton } from '../StepCreationButton'
 import { DraggableStepItems } from './DraggableStepItems'
 import { MultiSelectToolbar } from './MultiSelectToolbar'
 
-import type { StepIdType } from '../../form-types'
+import { StepIdType } from '../../form-types'
 
 type Props = {
   isMultiSelectMode: ?boolean,
