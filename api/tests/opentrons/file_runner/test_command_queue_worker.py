@@ -1,8 +1,9 @@
 """Test."""
-from typing import List, Optional, Tuple
+from typing import List, Tuple
 
 import pytest
 from mock import AsyncMock, call  # type: ignore[attr-defined]
+
 from opentrons.file_runner.command_queue_worker import CommandQueueWorker
 from opentrons.protocol_engine import ProtocolEngine, WellLocation, StateStore
 from opentrons.protocol_engine.commands import PickUpTipRequest, \
@@ -10,18 +11,33 @@ from opentrons.protocol_engine.commands import PickUpTipRequest, \
 
 
 @pytest.fixture
-def commands() -> List[CommandRequestType]:
+def commands() -> List[Tuple[str, CommandRequestType]]:
     """Fixture."""
     return [
-        PickUpTipRequest(
-            pipetteId="123", labwareId="abc", wellName="def"),
-        AspirateRequest(
-            volume=321, wellLocation=WellLocation(),
-            pipetteId="123", labwareId="xyz", wellName="def"),
-        DispenseRequest(
-            volume=321, wellLocation=WellLocation(),
-            pipetteId="123", labwareId="xyz", wellName="def"),
-
+        (
+            "command-id-0",
+            PickUpTipRequest(pipetteId="123", labwareId="abc", wellName="def"),
+        ),
+        (
+            "command-id-1",
+            AspirateRequest(
+                volume=321,
+                wellLocation=WellLocation(),
+                pipetteId="123",
+                labwareId="xyz",
+                wellName="def",
+            ),
+        ),
+        (
+            "command-id-2",
+            DispenseRequest(
+                volume=321,
+                wellLocation=WellLocation(),
+                pipetteId="123",
+                labwareId="xyz",
+                wellName="def",
+            ),
+        ),
     ]
 
 
@@ -33,13 +49,12 @@ def store() -> AsyncMock:
 
 @pytest.fixture
 def store_with_commands(
-        store: AsyncMock, commands: List[CommandRequestType]
+        store: AsyncMock, commands: List[Tuple[str, CommandRequestType]]
 ) -> AsyncMock:
     """Create a state store fixture with pending commands."""
     # List of Tuples. Command id and command. With None terminator.
-    pending_commands: List[Optional[Tuple[str, CommandRequestType]]] =\
-        [(str(c), c) for c in commands]
-    pending_commands.append(None)
+    # type ignore is because mypy doesn't like concatenating lists of different types.
+    pending_commands = commands[:] + [None]  # type: ignore
     store.commands.get_next_request.side_effect = pending_commands
     return store
 
@@ -76,14 +91,14 @@ async def test_play(
         protocol_engine: AsyncMock,
         subject: CommandQueueWorker,
         store_with_commands: AsyncMock,
-        commands: List[CommandRequestType]
+        commands: List[Tuple[str, CommandRequestType]]
 ) -> None:
     """It should cycle through pending commands and execute them."""
     subject.play()
     await subject.wait_to_be_idle()
 
-    expected_call_args_list = [call(command_id=str(c), request=c) for c in commands]
-
+    expected_call_args_list = [call(request=r, command_id=i) for i, r in commands]
+    print("Actual calls:", protocol_engine.execute_command.call_args_list)
     assert protocol_engine.execute_command.call_args_list == expected_call_args_list
 
 
@@ -91,12 +106,12 @@ async def test_pause(
         protocol_engine: AsyncMock,
         subject: CommandQueueWorker,
         store_with_commands: AsyncMock,
-        commands: List[CommandRequestType]
+        commands: List[Tuple[str, CommandRequestType]]
 ) -> None:
     """It should cycle through pending commands and execute them."""
     async def mock_execute_command(command_id: str,
                                    request: CommandRequestType) -> None:
-        if command_id == str(commands[0]):
+        if command_id == str("command-id-0"):
             # Pause after first command
             subject.pause()
 
@@ -107,7 +122,7 @@ async def test_pause(
 
     # Only first command was executed.
     protocol_engine.execute_command.assert_called_once_with(
-        command_id=str(commands[0]), request=commands[0]
+        request=commands[0][1], command_id=commands[0][0]
     )
 
     # Reset execute command mock and resume
@@ -116,6 +131,6 @@ async def test_pause(
     subject.play()
     await subject.wait_to_be_idle()
 
-    expected_call_args_list = [call(command_id=str(c), request=c) for c in commands[1:]]
+    expected_call_args_list = [call(command_id=i, request=r) for i, r in commands[1:]]
 
     assert protocol_engine.execute_command.call_args_list == expected_call_args_list
