@@ -57,7 +57,7 @@ function MainPanelComponent(props: Props) {
   }
 }
 
-function mapStateToProps(state: BaseState): $Exact<Props> {
+function mapStateToProps(state: BaseState): Props {
   return {
     page: selectors.getCurrentPage(state),
     selectedTerminalItemId: getSelectedTerminalItemId(state),

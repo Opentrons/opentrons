@@ -26,7 +26,7 @@ type SP = {
   hasOptedIn: $PropertyType<Props, 'hasOptedIn'>,
 }
 
-type DP = $Rest<$Exact<Props>, SP>
+type DP = $Rest<Props, SP>
 
 type State = { gateStage: GateStage, errorMessage: ?string }
 

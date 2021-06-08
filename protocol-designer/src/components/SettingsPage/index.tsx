@@ -19,14 +19,14 @@ const SettingsPageComponent = (props: Props) => {
   }
 }
 
-const STP = (state: BaseState): $Exact<Props> => ({
+const STP = (state: BaseState): Props => ({
   currentPage: selectors.getCurrentPage(state),
 })
 
 export const SettingsPage: React.AbstractComponent<{}> = connect<
   Props,
   {},
-  $Exact<Props>,
+  Props,
   _,
   _,
   _
