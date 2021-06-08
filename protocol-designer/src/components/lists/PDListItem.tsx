@@ -4,11 +4,11 @@ import cx from 'classnames'
 import styles from './styles.css'
 
 type Props = {
-  className?: ?string
+  className: string | null | undefined
   /** show light gray border between list items */
-  border?: ?boolean
+  border: boolean | null | undefined
   /** hover style when hovered (for redux-linked hover state, do not use this) */
-  hoverable?: ?boolean
+  hoverable: boolean | null | undefined
 }
 
 /** Light wrapper around li for PD-specific styles */

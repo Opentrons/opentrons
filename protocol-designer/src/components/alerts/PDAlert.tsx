@@ -11,7 +11,7 @@ type PDAlertProps = {
   alertType: AlertType
   title: string
   description: React.Node
-  onDismiss?: ?(() => mixed)
+  onDismiss: (() => mixed) | null | undefined
 }
 
 export const PDAlert = (props: PDAlertProps): React.Node => {

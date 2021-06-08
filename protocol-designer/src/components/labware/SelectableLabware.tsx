@@ -27,7 +27,7 @@ export type Props = {
   selectWells: WellGroup => mixed,
   deselectWells: WellGroup => mixed,
   updateHighlightedWells: WellGroup => mixed,
-  pipetteChannels?: ?Channels,
+  pipetteChannels: Channels | null | undefined,
   ingredNames: WellIngredientNames,
   wellContents: ContentsByWell,
 }

@@ -38,8 +38,8 @@ type SP = {
 }
 
 type TitleWithIconProps = {
-  iconName?: ?IconName,
-  text?: ?string,
+  iconName: IconName | null | undefined,
+  text: string | null | undefined,
 }
 
 function TitleWithIcon(props: TitleWithIconProps) {
@@ -52,7 +52,7 @@ function TitleWithIcon(props: TitleWithIconProps) {
   )
 }
 
-type TitleWithBetaTagProps = { text?: ?string }
+type TitleWithBetaTagProps = { text: string | null | undefined }
 
 const TitleWithBetaTag = (props: TitleWithBetaTagProps) => (
   <div className={styles.title_wrapper}>

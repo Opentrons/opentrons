@@ -23,7 +23,7 @@ import type { FieldPropsByName } from '../../types'
 import styles from '../../StepEditForm.css'
 
 type Props = {
-  className?: ?string
+  className: string | null | undefined
   prefix: 'aspirate' | 'dispense'
   propsForFields: FieldPropsByName
   formData: FormData

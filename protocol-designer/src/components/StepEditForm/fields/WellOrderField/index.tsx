@@ -20,7 +20,7 @@ import type { FieldProps } from '../../types'
 import type { WellOrderOption } from '../../../../form-types'
 
 type Props = {
-  className?: ?string
+  className: string | null | undefined
   label?: string
   prefix: 'aspirate' | 'dispense' | 'mix'
   firstValue: ?WellOrderOption
