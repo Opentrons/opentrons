@@ -11,8 +11,8 @@ import type { AlertData, AlertType } from './types'
  */
 
 export type Props = {
-  errors: Array<AlertData>,
-  warnings: Array<AlertData>,
+  errors: AlertData[],
+  warnings: AlertData[],
   dismissWarning: string => mixed,
 }
 

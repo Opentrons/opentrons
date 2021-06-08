@@ -6,7 +6,7 @@ import { selectors as dismissSelectors } from '../../dismiss'
 import type { CommandCreatorWarning } from '@opentrons/step-generation'
 import type { Selector } from '../../types'
 export const getTimelineWarningsForSelectedStep: Selector<
-  Array<CommandCreatorWarning>
+  CommandCreatorWarning[]
 > = createSelector(
   dismissSelectors.getDismissedTimelineWarningTypes,
   fileDataSelectors.timelineWarningsPerStep,

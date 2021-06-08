@@ -1245,7 +1245,7 @@ export const pipetteInvariantProperties: Reducer<
   },
   initialPipetteState
 )
-export type OrderedStepIdsState = Array<StepIdType>
+export type OrderedStepIdsState = StepIdType[]
 const initialOrderedStepIdsState = []
 export const orderedStepIds: Reducer<OrderedStepIdsState, any> = handleActions(
   {

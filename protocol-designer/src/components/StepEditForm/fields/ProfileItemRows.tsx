@@ -39,7 +39,7 @@ export const showProfileFieldErrors = ({
 }: {
   fieldId: string,
   focusedField: ?string,
-  dirtyFields: Array<string>,
+  dirtyFields: string[],
 }): boolean =>
   !(fieldId === focusedField) && dirtyFields && dirtyFields.includes(fieldId)
 
@@ -141,7 +141,7 @@ export const ProfileCycleRow = (props: ProfileCycleRowProps): React.Node => {
 
 export type ProfileItemRowsProps = {
   focusHandlers: FocusHandlers,
-  orderedProfileItems: Array<string>,
+  orderedProfileItems: string[],
   profileItemsById: {
     [string]: ProfileItem,
     ...

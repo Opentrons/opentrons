@@ -69,16 +69,15 @@ export const getIsMultiSelectMode: Selector<boolean> = createSelector(
     return item.selectionType === MULTI_STEP_SELECTION_TYPE
   }
 )
-export const getMultiSelectItemIds: Selector<Array<StepIdType> | null> = createSelector(
-  getSelectedItem,
-  item => {
-    if (item && item.selectionType === MULTI_STEP_SELECTION_TYPE) {
-      return item.ids
-    }
-
-    return null
+export const getMultiSelectItemIds: Selector<
+  StepIdType[] | null
+> = createSelector(getSelectedItem, item => {
+  if (item && item.selectionType === MULTI_STEP_SELECTION_TYPE) {
+    return item.ids
   }
-)
+
+  return null
+})
 export const getMultiSelectLastSelected: Selector<StepIdType | null> = createSelector(
   getSelectedItem,
   item => {
@@ -100,7 +99,7 @@ export const getHoveredStepId: Selector<StepIdType | null> = createSelector(
 )
 
 /** Array of labware (labwareId's) involved in hovered Step, or [] */
-export const getHoveredStepLabware: Selector<Array<string>> = createSelector(
+export const getHoveredStepLabware: Selector<string[]> = createSelector(
   stepFormSelectors.getArgsAndErrorsByStepId,
   getHoveredStepId,
   stepFormSelectors.getInitialDeckSetup,
@@ -288,9 +287,7 @@ export const getMultiSelectDisabledFields: Selector<DisabledFields | null> = cre
   getMultiSelectItemIds,
   (savedStepForms, multiSelectItemIds) => {
     if (!multiSelectItemIds) return null
-    const forms: Array<FormData> = multiSelectItemIds.map(
-      id => savedStepForms[id]
-    )
+    const forms: FormData[] = multiSelectItemIds.map(id => savedStepForms[id])
 
     if (forms.every(form => form.stepType === 'moveLiquid')) {
       return getMoveLiquidMultiSelectDisabledFields(forms)
@@ -317,7 +314,7 @@ export const getCountPerStepType: Selector<CountPerStepType> = createSelector(
   }
 )
 export const getBatchEditSelectedStepTypes: Selector<
-  Array<StepType>
+  StepType[]
 > = createSelector(getCountPerStepType, countPerStepType => {
   return uniq(
     Object.keys(countPerStepType).filter(
@@ -326,7 +323,7 @@ export const getBatchEditSelectedStepTypes: Selector<
   ).sort()
 })
 
-function getMoveLiquidMultiSelectDisabledFields(forms: Array<FormData>) {
+function getMoveLiquidMultiSelectDisabledFields(forms: FormData[]) {
   const {
     pipettesDifferent,
     aspirateLabwareDifferent,
@@ -379,7 +376,7 @@ function getMoveLiquidMultiSelectDisabledFields(forms: Array<FormData>) {
   return disabledFields
 }
 
-function getMixMultiSelectDisabledFields(forms: Array<FormData>) {
+function getMixMultiSelectDisabledFields(forms: FormData[]) {
   const { pipettesDifferent, labwareDifferent } = forms.reduce(
     (acc, form) => ({
       lastPipette: form.pipette,

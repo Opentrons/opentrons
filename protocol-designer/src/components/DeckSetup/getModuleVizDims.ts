@@ -71,13 +71,7 @@ export const getModuleVizDims = (
     childYOffset: SLOT_Y - dims.childYOffset - dims.childYDimension,
   }
 }
-const LEFT_SIDE_SLOTS: Array<DeckSlot> = [
-  '1',
-  '4',
-  '7',
-  '10',
-  SPAN7_8_10_11_SLOT,
-]
+const LEFT_SIDE_SLOTS: DeckSlot[] = ['1', '4', '7', '10', SPAN7_8_10_11_SLOT]
 export const inferModuleOrientationFromSlot = (
   slot: DeckSlot
 ): ModuleOrientation => {

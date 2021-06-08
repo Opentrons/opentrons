@@ -14,7 +14,7 @@ export const createPipettes = (
 }
 export type DeletePipettesAction = {
   type: 'DELETE_PIPETTES'
-  payload: Array<string> // pipette ids to delete, order doesn't matter
+  payload: string[] // pipette ids to delete, order doesn't matter
 }
 export const deletePipettes = (
   payload: DeletePipettesAction['payload']

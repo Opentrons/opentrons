@@ -167,5 +167,5 @@ export const savedStepForms: SavedStepFormState = {
     preWetTip: false,
   },
 }
-export const orderedStepIds: Array<StepIdType> = ['moveLiquidStepId']
+export const orderedStepIds: StepIdType[] = ['moveLiquidStepId']
 export const moduleEntities: ModuleEntities = {}

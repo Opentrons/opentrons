@@ -38,7 +38,7 @@ export function getOnlyLatestDefs(): LabwareDefByDefURI {
   if (!_latestDefs) {
     const allDefs = getAllDefinitions()
     const allURIs = Object.keys(allDefs)
-    const labwareDefGroups: Record<string, Array<LabwareDefinition2>> = groupBy(
+    const labwareDefGroups: Record<string, LabwareDefinition2[]> = groupBy(
       allURIs.map((uri: string) => allDefs[uri]),
       d => `${d.namespace}/${d.parameters.loadName}`
     )

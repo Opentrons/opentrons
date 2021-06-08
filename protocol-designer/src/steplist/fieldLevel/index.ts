@@ -50,7 +50,7 @@ const getPipetteEntity = (
 }
 
 type StepFieldHelpers = {
-  getErrors?: (arg0: unknown) => Array<string>
+  getErrors?: (arg0: unknown) => string[]
   maskValue?: ValueMasker
   castValue?: ValueCaster
   hydrate?: (state: InvariantContext, id: string) => unknown
@@ -276,7 +276,7 @@ const profileFieldHelperMap: Record<string, StepFieldHelpers> = {
 export const getFieldErrors = (
   name: StepFieldName,
   value: unknown
-): Array<string> => {
+): string[] => {
   const fieldErrorGetter =
     stepFieldHelperMap[name] && stepFieldHelperMap[name].getErrors
   const errors = fieldErrorGetter ? fieldErrorGetter(value) : []
@@ -285,7 +285,7 @@ export const getFieldErrors = (
 export const getProfileFieldErrors = (
   name: string,
   value: unknown
-): Array<string> => {
+): string[] => {
   const fieldErrorGetter =
     profileFieldHelperMap[name] && profileFieldHelperMap[name].getErrors
   const errors = fieldErrorGetter ? fieldErrorGetter(value) : []

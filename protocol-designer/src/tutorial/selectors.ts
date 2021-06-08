@@ -20,7 +20,7 @@ export const getHint: Selector<HintKey | null | undefined> = createSelector(
     return hints[0]
   }
 )
-export const getDismissedHints: Selector<Array<HintKey>> = createSelector(
+export const getDismissedHints: Selector<HintKey[]> = createSelector(
   rootSelector,
   tutorial => {
     const dismissedKeys = Object.keys(tutorial.dismissedHints)

@@ -24,10 +24,10 @@ export function chainPatchUpdaters(
 // given an array of primary wells (for a multichannel), return all unique wells
 // included in that set. Used to convert multi to single.
 export function getAllWellsFromPrimaryWells(
-  primaryWells: Array<string>,
+  primaryWells: string[],
   labwareDef: LabwareDefinition2
-): Array<string> {
-  const allWells = primaryWells.reduce((acc: Array<string>, well: string) => {
+): string[] {
+  const allWells = primaryWells.reduce((acc: string[], well: string) => {
     const nextWellSet = getWellSetForMultichannel(labwareDef, well)
 
     // filter out any nulls (but you shouldn't get any)
@@ -144,7 +144,7 @@ type GetDefaultWellsArgs = {
   labwareEntities: LabwareEntities
   pipetteEntities: PipetteEntities
 }
-export function getDefaultWells(args: GetDefaultWellsArgs): Array<string> {
+export function getDefaultWells(args: GetDefaultWellsArgs): string[] {
   const { labwareId, pipetteId, labwareEntities, pipetteEntities } = args
   if (
     !labwareId ||

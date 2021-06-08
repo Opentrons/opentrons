@@ -26,7 +26,7 @@ const allMigrationsByVersion: MigrationsByVersion = {
 export const getMigrationVersionsToRunFromVersion = (
   migrationsByVersion: {},
   version: Version
-): Array<Version> => {
+): Version[] => {
   const allSortedVersions = Object.keys(migrationsByVersion).sort(
     semver.compare
   )
@@ -37,7 +37,7 @@ export const migration = (
 ): {
   file: PDProtocolFile
   didMigrate: boolean
-  migrationsRan: Array<string>
+  migrationsRan: string[]
 } => {
   const designerApplication =
     file.designerApplication || file['designer-application']

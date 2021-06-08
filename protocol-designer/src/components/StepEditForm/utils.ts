@@ -67,7 +67,7 @@ export function getBlowoutLocationOptionsForForm(args: {
 export const getDirtyFields = (
   isNewStep: boolean,
   formData: FormData | null | undefined
-): Array<string> => {
+): string[] => {
   let dirtyFields = []
 
   if (formData == null) {
@@ -96,7 +96,7 @@ export const getDirtyFields = (
 }
 export const getVisibleFormErrors = (args: {
   focusedField: string | null | undefined
-  dirtyFields: Array<string>
+  dirtyFields: string[]
   errors: StepFormErrors
 }): StepFormErrors => {
   const { focusedField, dirtyFields, errors } = args
@@ -111,9 +111,9 @@ export const getVisibleFormErrors = (args: {
 }
 export const getVisibleFormWarnings = (args: {
   focusedField: string | null | undefined
-  dirtyFields: Array<string>
-  errors: Array<FormWarning>
-}): Array<FormWarning> => {
+  dirtyFields: string[]
+  errors: FormWarning[]
+}): FormWarning[] => {
   const { focusedField, dirtyFields, errors } = args
   return errors.filter(error => {
     const dependentFieldsAreNotFocused = !error.dependentFields.includes(
@@ -137,10 +137,10 @@ export const getDynamicFieldFocusHandlerId = ({
 // for specific profile fields, the field's parent ProfileItem id needs to be included in the error)
 export const getVisibleProfileFormLevelErrors = (args: {
   focusedField: string | null | undefined
-  dirtyFields: Array<string>
-  errors: Array<ProfileFormError>
+  dirtyFields: string[]
+  errors: ProfileFormError[]
   profileItemsById: Record<string, ProfileItem>
-}): Array<ProfileFormError> => {
+}): ProfileFormError[] => {
   const { dirtyFields, focusedField, errors, profileItemsById } = args
   const profileItemIds = Object.keys(profileItemsById)
   return errors.filter(error => {

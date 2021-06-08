@@ -79,12 +79,12 @@ const DragDropStepItem = DropTarget(
 )(DraggableStepItem)
 
 type StepItemsProps = {
-  orderedStepIds: Array<StepIdType>,
-  reorderSteps: (Array<StepIdType>) => mixed,
+  orderedStepIds: StepIdType[],
+  reorderSteps: (StepIdType[]) => mixed,
   isOver: boolean,
   connectDropTarget: mixed => React.Element<any>,
 }
-type StepItemsState = { stepIds: Array<StepIdType> }
+type StepItemsState = { stepIds: StepIdType[] }
 class StepItems extends React.Component<StepItemsProps, StepItemsState> {
   constructor(props) {
     super(props)

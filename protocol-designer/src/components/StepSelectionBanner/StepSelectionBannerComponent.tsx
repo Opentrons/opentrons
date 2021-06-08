@@ -89,7 +89,7 @@ export const StepSelectionBannerComponent = (
     0
   )
 
-  const stepTypes: Array<StepType> = Object.keys(countPerStepType).sort()
+  const stepTypes: StepType[] = Object.keys(countPerStepType).sort()
 
   return (
     <Box

@@ -32,7 +32,7 @@ import {
 } from '../../../pipettes/pipetteData'
 
 // TODO: Ian 2019-02-21 import this from a more central place - see #2926
-const getDefaultFields = (...fields: Array<StepFieldName>): FormPatch =>
+const getDefaultFields = (...fields: StepFieldName[]): FormPatch =>
   pick(getDefaultsForStepType('moveLiquid'), fields)
 
 const wellRatioUpdatesMap = [

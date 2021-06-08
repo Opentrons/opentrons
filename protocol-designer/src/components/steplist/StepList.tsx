@@ -16,9 +16,9 @@ import type { StepIdType } from '../../form-types'
 
 type Props = {
   isMultiSelectMode: ?boolean,
-  orderedStepIds: Array<StepIdType>,
+  orderedStepIds: StepIdType[],
   reorderSelectedStep: (delta: number) => mixed,
-  reorderSteps: (Array<StepIdType>) => mixed,
+  reorderSteps: (StepIdType[]) => mixed,
 }
 
 export class StepList extends React.Component<Props> {

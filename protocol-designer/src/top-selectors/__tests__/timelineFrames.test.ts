@@ -24,7 +24,7 @@ const lastValidFrame: any = {
   robotState: lastValidRobotState,
   commands: [],
 }
-const orderedStepIds: Array<StepIdType> = [
+const orderedStepIds: StepIdType[] = [
   'step1',
   'step2',
   'step3',

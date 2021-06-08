@@ -5,7 +5,7 @@ import {
 } from '../generateSubstepItem'
 
 const ingred1Id = 'ingred1Id'
-const wellNamesForCol = (isMulti: boolean, colNum: string): Array<string> =>
+const wellNamesForCol = (isMulti: boolean, colNum: string): string[] =>
   isMulti ? 'ABCDEFGH'.split('').map(s => `${s}${colNum}`) : [`A${colNum}`]
 
 type Ingreds = { [ingredId: string]: number }
@@ -13,7 +13,7 @@ const repeatIngreds = (
   isMulti: boolean,
   colNum: string,
   _ingreds: ?Ingreds
-): Ingreds | Array<Ingreds> => {
+): Ingreds | Ingreds[] => {
   const ingreds = _ingreds || {}
   return isMulti
     ? wellNamesForCol(true, colNum).reduce(

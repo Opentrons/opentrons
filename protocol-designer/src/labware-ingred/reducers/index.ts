@@ -157,7 +157,7 @@ export const containers: Reducer<ContainersState, any> = handleActions(
     ): ContainersState => {
       const { file } = action.payload
       const allFileLabware = file.labware
-      const sortedLabwareIds: Array<string> = Object.keys(allFileLabware).sort(
+      const sortedLabwareIds: string[] = Object.keys(allFileLabware).sort(
         (a, b) =>
           Number(allFileLabware[a].slot) - Number(allFileLabware[b].slot)
       )

@@ -114,7 +114,7 @@ const getLabwareSelectionMode: MemoizedSelector<boolean> = createSelector(
     return rootState.modeLabwareSelection !== false
   }
 )
-const getLiquidGroupsOnDeck: MemoizedSelector<Array<string>> = createSelector(
+const getLiquidGroupsOnDeck: MemoizedSelector<string[]> = createSelector(
   getLiquidsByLabwareId,
   ingredLocationsByLabware => {
     const liquidGroups: Set<string> = new Set()

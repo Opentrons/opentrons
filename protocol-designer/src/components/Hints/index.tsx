@@ -25,7 +25,7 @@ type State = { rememberDismissal: boolean }
 
 // List of hints that should have /!\ gray AlertModal header
 // (versus calmer non-alert header)
-const HINT_IS_ALERT: Array<HintKey> = ['add_liquids_and_labware']
+const HINT_IS_ALERT: HintKey[] = ['add_liquids_and_labware']
 
 class HintsComponent extends React.Component<Props, State> {
   constructor(props: Props) {

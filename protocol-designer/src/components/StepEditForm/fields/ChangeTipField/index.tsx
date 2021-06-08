@@ -16,7 +16,7 @@ import type { ChangeTipOptions } from '@opentrons/step-generation'
 import type { FieldProps } from '../../types'
 import styles from '../../StepEditForm.css'
 
-const ALL_CHANGE_TIP_VALUES: Array<ChangeTipOptions> = [
+const ALL_CHANGE_TIP_VALUES: ChangeTipOptions[] = [
   'always',
   'once',
   'perSource',

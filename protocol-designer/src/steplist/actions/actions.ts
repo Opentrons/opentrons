@@ -43,10 +43,10 @@ export const deleteStep = (stepId: StepIdType): DeleteStepAction => ({
 })
 export type DeleteMultipleStepsAction = {
   type: 'DELETE_MULTIPLE_STEPS'
-  payload: Array<StepIdType>
+  payload: StepIdType[]
 }
 export const deleteMultipleSteps = (
-  stepIds: Array<StepIdType>
+  stepIds: StepIdType[]
 ): ThunkAction<
   | DeleteMultipleStepsAction
   | ClearSelectedItemAction
@@ -95,12 +95,10 @@ export const cancelStepForm = (): CancelStepFormAction => ({
 export type ReorderStepsAction = {
   type: 'REORDER_STEPS'
   payload: {
-    stepIds: Array<StepIdType>
+    stepIds: StepIdType[]
   }
 }
-export const reorderSteps = (
-  stepIds: Array<StepIdType>
-): ReorderStepsAction => ({
+export const reorderSteps = (stepIds: StepIdType[]): ReorderStepsAction => ({
   type: 'REORDER_STEPS',
   payload: {
     stepIds,

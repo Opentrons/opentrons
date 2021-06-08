@@ -28,7 +28,7 @@ type SP = {
 }
 type OP = {
   focusedField: StepFieldName | null | undefined
-  dirtyFields: Array<StepFieldName>
+  dirtyFields: StepFieldName[]
 }
 
 const mapStateToProps = (state: BaseState, ownProps: OP): SP => {

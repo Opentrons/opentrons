@@ -10,7 +10,7 @@ import type { StepIdType, FormData } from '../../../form-types'
  * the 'left' pipette (or 'right' if there is no 'left' ) */
 export function getNextDefaultPipetteId(
   savedForms: Record<StepIdType, FormData>,
-  orderedStepIds: Array<StepIdType>,
+  orderedStepIds: StepIdType[],
   equippedPipettesById: Record<string, PipetteOnDeck>
 ): string {
   const prevPipetteSteps = orderedStepIds

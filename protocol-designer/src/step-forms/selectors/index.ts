@@ -250,12 +250,12 @@ export const _getInitialDeckSetupRootState: (
   _getModuleEntitiesRootState,
   _getInitialDeckSetup
 )
-export const getPermittedTipracks: Selector<Array<string>> = createSelector(
+export const getPermittedTipracks: Selector<string[]> = createSelector(
   getInitialDeckSetup,
   initialDeckSetup =>
     reduce(
       initialDeckSetup.pipettes,
-      (acc: Array<string>, pipette: PipetteOnDeck) => {
+      (acc: string[], pipette: PipetteOnDeck) => {
         return pipette.tiprackDefURI ? [...acc, pipette.tiprackDefURI] : acc
       },
       []
@@ -279,7 +279,7 @@ function _getPipettesSame(pipettesOnDeck: InitialDeckSetup['pipettes']) {
 // equipped pipettes per step id instead of always using initial deck setup
 // (for when we support multiple deck setup steps)
 export const getEquippedPipetteOptions: Selector<
-  Array<DropdownOption>
+  DropdownOption[]
 > = createSelector(getInitialDeckSetup, initialDeckSetup => {
   const pipettes = initialDeckSetup.pipettes
 
@@ -287,7 +287,7 @@ export const getEquippedPipetteOptions: Selector<
 
   return reduce(
     pipettes,
-    (acc: Array<DropdownOption>, pipette: PipetteOnDeck, id: string) => {
+    (acc: DropdownOption[], pipette: PipetteOnDeck, id: string) => {
       const mountLabel = i18n.t(`form.pipette_mount_label.${pipette.mount}`)
       const nextOption = {
         name: pipettesSame
@@ -376,7 +376,7 @@ export const getModulesForEditModulesCard: Selector<ModulesForEditModulesCard> =
 export const getUnsavedForm: Selector<
   FormData | null | undefined
 > = createSelector(rootSelector, state => state.unsavedForm)
-export const getOrderedStepIds: Selector<Array<StepIdType>> = createSelector(
+export const getOrderedStepIds: Selector<StepIdType[]> = createSelector(
   rootSelector,
   state => state.orderedStepIds
 )
@@ -384,7 +384,7 @@ export const getSavedStepForms: Selector<SavedStepFormState> = createSelector(
   rootSelector,
   state => state.savedStepForms
 )
-const getOrderedSavedForms: Selector<Array<FormData>> = createSelector(
+const getOrderedSavedForms: Selector<FormData[]> = createSelector(
   getOrderedStepIds,
   getSavedStepForms,
   (orderedStepIds, savedStepForms) => {
@@ -456,7 +456,7 @@ const _formLevelErrors = (hydratedForm: FormData): StepFormErrors => {
 // TODO type with hydrated form type
 const _dynamicFieldFormErrors = (
   hydratedForm: FormData
-): Array<ProfileFormError> => {
+): ProfileFormError[] => {
   return getProfileFormErrors(hydratedForm)
 }
 
@@ -533,7 +533,7 @@ export const getHydratedUnsavedForm: Selector<any> = createSelector(
   }
 )
 export const getDynamicFieldFormErrorsForUnsavedForm: Selector<
-  Array<ProfileFormError>
+  ProfileFormError[]
 > = createSelector(getHydratedUnsavedForm, hydratedForm => {
   if (!hydratedForm) return []
 
@@ -594,7 +594,7 @@ export const getUnsavedFormIsPristineSetTempForm: Selector<boolean> = createSele
   }
 )
 export const getFormLevelWarningsForUnsavedForm: Selector<
-  Array<FormWarning>
+  FormWarning[]
 > = createSelector(
   getUnsavedForm,
   getInvariantContext,
@@ -607,7 +607,7 @@ export const getFormLevelWarningsForUnsavedForm: Selector<
   }
 )
 export const getFormLevelWarningsPerStep: Selector<
-  Record<string, Array<FormWarning>>
+  Record<string, FormWarning[]>
 > = createSelector(
   getSavedStepForms,
   getInvariantContext,

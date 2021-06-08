@@ -68,8 +68,8 @@ export type Props = {
   initialModuleValues?: $PropertyType<FormState, 'modulesByType'>,
   onSave: ({
     newProtocolFields: NewProtocolFields,
-    pipettes: Array<PipetteFieldsData>,
-    modules: Array<ModuleCreationArgs>,
+    pipettes: PipetteFieldsData[],
+    modules: ModuleCreationArgs[],
   }) => mixed,
   moduleRestrictionsDisabled: ?boolean,
 }
@@ -182,7 +182,7 @@ export class FilePipettesModal extends React.Component<Props, State> {
     const newProtocolFields = values.fields
     const pipettes = reduce(
       values.pipettesByMount,
-      (acc, formPipette: FormPipette, mount): Array<PipetteFieldsData> => {
+      (acc, formPipette: FormPipette, mount): PipetteFieldsData[] => {
         assert(mount === 'left' || mount === 'right', `invalid mount: ${mount}`) // this is mostly for flow
         return formPipette &&
           formPipette.pipetteName &&
@@ -203,8 +203,8 @@ export class FilePipettesModal extends React.Component<Props, State> {
 
     // NOTE: this is extra-explicit for flow. Reduce fns won't cooperate
     // with enum-typed key like `{[ModuleRealType]: ___}`
-    const moduleTypes: Array<ModuleRealType> = Object.keys(values.modulesByType)
-    const modules: Array<ModuleCreationArgs> = moduleTypes.reduce(
+    const moduleTypes: ModuleRealType[] = Object.keys(values.modulesByType)
+    const modules: ModuleCreationArgs[] = moduleTypes.reduce(
       (acc, moduleType) => {
         const formModule = values.modulesByType[moduleType]
         return formModule?.onDeck

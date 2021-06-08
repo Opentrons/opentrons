@@ -19,9 +19,9 @@ import stepEditStyles from '../../StepEditForm.css'
 
 const DEFAULT_FIRST: WellOrderOption = 't2b'
 const DEFAULT_SECOND: WellOrderOption = 'l2r'
-const VERTICAL_VALUES: Array<WellOrderOption> = ['t2b', 'b2t']
-const HORIZONTAL_VALUES: Array<WellOrderOption> = ['l2r', 'r2l']
-const WELL_ORDER_VALUES: Array<WellOrderOption> = [
+const VERTICAL_VALUES: WellOrderOption[] = ['t2b', 'b2t']
+const HORIZONTAL_VALUES: WellOrderOption[] = ['l2r', 'r2l']
+const WELL_ORDER_VALUES: WellOrderOption[] = [
   ...VERTICAL_VALUES,
   ...HORIZONTAL_VALUES,
 ]

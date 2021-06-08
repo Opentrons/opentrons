@@ -82,7 +82,7 @@ type SingleSelectedItem = {
 }
 type MultipleSelectedItem = {
   selectionType: typeof MULTI_STEP_SELECTION_TYPE
-  ids: Array<StepIdType>
+  ids: StepIdType[]
   lastSelected: StepIdType
 }
 type TerminalItem = {

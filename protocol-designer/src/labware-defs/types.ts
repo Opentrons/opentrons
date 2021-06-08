@@ -8,8 +8,8 @@ export type LabwareUploadMessageType =
   | 'ASK_FOR_LABWARE_OVERWRITE'
   | 'USES_STANDARD_NAMESPACE'
 type NameConflictFields = {
-  defsMatchingLoadName: Array<LabwareDefinition2>
-  defsMatchingDisplayName: Array<LabwareDefinition2>
+  defsMatchingLoadName: LabwareDefinition2[]
+  defsMatchingDisplayName: LabwareDefinition2[]
   newDef: LabwareDefinition2
 }
 export type LabwareUploadMessage =

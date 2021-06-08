@@ -15,7 +15,7 @@ import type { SingleLabwareLiquidState } from '@opentrons/step-generation'
 
 type RemoveWellsContents = (args: {
   liquidGroupId: string,
-  wells: Array<string>,
+  wells: string[],
 }) => mixed
 
 // Props used by both IngredientsList and LiquidGroupCard

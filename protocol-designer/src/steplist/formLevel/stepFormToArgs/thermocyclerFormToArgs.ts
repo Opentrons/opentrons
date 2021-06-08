@@ -12,7 +12,7 @@ import type {
 type FlatProfileSteps = ThermocyclerProfileStepArgs['profileSteps']
 
 const _flattenProfileSteps = (args: {
-  orderedProfileItems: Array<string>
+  orderedProfileItems: string[]
   profileItemsById: Record<string, ProfileItem>
 }): FlatProfileSteps => {
   const { orderedProfileItems, profileItemsById } = args

@@ -29,7 +29,7 @@ export type NamedIngred = {
   name: string;
 };
 export type SourceDestData = {
-  wells: Array<string>;
+  wells: string[];
   preIngreds: WellIngredientVolumeData;
   postIngreds: WellIngredientVolumeData;
 };
@@ -62,7 +62,7 @@ export type SourceDestSubstepItemSingleChannel = {
   multichannel: false;
   commandCreatorFnName: SourceDestCommandCreatorName;
   parentStepId: StepIdType;
-  rows: Array<StepItemSourceDestRow>;
+  rows: StepItemSourceDestRow[];
 };
 export type SourceDestSubstepItemMultiChannel = {
   substepType: "sourceDest";
@@ -71,7 +71,7 @@ export type SourceDestSubstepItemMultiChannel = {
   parentStepId: StepIdType;
   volume?: number | null | undefined;
   // uniform volume for all steps
-  multiRows: Array<Array<StepItemSourceDestRow>>; // Array of arrays.
+  multiRows: Array<StepItemSourceDestRow[]>; // Array of arrays.
   // NOTE: "Row" means a tabular row on the steplist, NOT a "row" of wells on the deck
 
 };
@@ -121,7 +121,7 @@ export type ThermocyclerStateSubstepItem = {
 };
 export type SubstepItemData = SourceDestSubstepItem | PauseSubstepItem | MagnetSubstepItem | TemperatureSubstepItem | AwaitTemperatureSubstepItem | ThermocyclerProfileSubstepItem | ThermocyclerStateSubstepItem;
 export type Substeps = Record<StepIdType, SubstepItemData | null | undefined>;
-export type StepFormErrors = Array<FormError>;
+export type StepFormErrors = FormError[];
 export type StepArgsAndErrors = {
   errors: boolean;
   stepArgs: CommandCreatorArgs | null; // TODO: incompleteData field when this is null?
