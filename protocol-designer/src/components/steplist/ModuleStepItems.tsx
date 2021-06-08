@@ -13,11 +13,11 @@ import { LabwareTooltipContents } from './LabwareTooltipContents'
 import styles from './StepItem.css'
 import type { ModuleRealType } from '@opentrons/shared-data'
 
-export type ModuleStepItemRowProps = {|
+export type ModuleStepItemRowProps = {
   label?: ?string,
   value?: ?string,
   targetProps?: UseHoverTooltipTargetProps,
-|}
+}
 
 export const ModuleStepItemRow = (
   props: ModuleStepItemRowProps
@@ -32,7 +32,7 @@ export const ModuleStepItemRow = (
   </PDListItem>
 )
 
-type Props = {|
+type Props = {
   action?: string,
   moduleType: ModuleRealType,
   actionText: string,
@@ -40,7 +40,7 @@ type Props = {|
   message?: ?string,
   children?: React.Node,
   hideHeader?: boolean,
-|}
+}
 
 export const ModuleStepItems = (props: Props): React.Node => {
   const [targetProps, tooltipProps] = useHoverTooltip({

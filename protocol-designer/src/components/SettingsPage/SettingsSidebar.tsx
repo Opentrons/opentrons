@@ -9,8 +9,8 @@ import { i18n } from '../../localization'
 import { PDTitledList } from '../lists'
 import styles from './SettingsPage.css'
 
-type SP = {| currentPage: Page |}
-type DP = {| makeNavigateToPage: Page => () => mixed |}
+type SP = { currentPage: Page }
+type DP = { makeNavigateToPage: Page => () => mixed }
 type Props = { ...SP, ...DP }
 
 const SettingsSidebarComponent = (props: Props) => (
@@ -38,9 +38,9 @@ const DTP = (dispatch: ThunkDispatch<*>): DP => ({
     dispatch(actions.navigateToPage(pageName)),
 })
 
-export const SettingsSidebar: React.AbstractComponent<{||}> = connect<
+export const SettingsSidebar: React.AbstractComponent<{}> = connect<
   Props,
-  {||},
+  {},
   SP,
   DP,
   _,

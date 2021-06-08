@@ -30,12 +30,12 @@ import formStyles from '../forms/forms.css'
 import styles from '../StepEditForm/StepEditForm.css'
 import buttonStyles from '../StepEditForm/ButtonRow/styles.css'
 
-type BatchEditMixProps = {|
-  batchEditFormHasChanges: boolean,
-  propsForFields: FieldPropsByName,
-  handleCancel: () => mixed,
-  handleSave: () => mixed,
-|}
+type BatchEditMixProps = {
+  batchEditFormHasChanges: boolean
+  propsForFields: FieldPropsByName
+  handleCancel: () => mixed
+  handleSave: () => mixed
+}
 export const BatchEditMix = (props: BatchEditMixProps): React.Node => {
   const { propsForFields, handleCancel, handleSave } = props
   const [cancelButtonTargetProps, cancelButtonTooltipProps] = useHoverTooltip({

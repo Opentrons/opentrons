@@ -29,12 +29,12 @@ import type {
   TemperatureModuleState,
 } from '../../step-forms'
 
-type Props = {|
+type Props = {
   x: number,
   y: number,
   orientation: ModuleOrientation,
   id: string,
-|}
+}
 
 // eyeballed width/height to match designs
 const STANDARD_TAG_HEIGHT = 50
@@ -66,9 +66,9 @@ function getTempStatus(temperatureModuleState: TemperatureModuleState): string {
 
 export const ModuleStatus = ({
   moduleState,
-}: {|
+}: {
   moduleState: $PropertyType<ModuleTemporalProperties, 'moduleState'>,
-|}): React.Node => {
+}): React.Node => {
   switch (moduleState.type) {
     case MAGNETIC_MODULE_TYPE:
       return (

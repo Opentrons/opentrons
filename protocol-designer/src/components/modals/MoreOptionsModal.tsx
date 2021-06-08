@@ -16,16 +16,16 @@ import type { ThunkDispatch } from '../../types'
 import modalStyles from './modal.css'
 import styles from './MoreOptionsModal.css'
 
-type OP = {|
+type OP = {
   close: (event: ?SyntheticEvent<>) => mixed,
   formData: FormData,
-|}
+}
 
-type DP = {|
+type DP = {
   saveValuesToForm: ({ [StepFieldName]: ?mixed }) => mixed,
-|}
+}
 
-type Props = {| ...OP, ...DP |}
+type Props = { ...OP, ...DP }
 type State = { [StepFieldName]: ?mixed }
 
 class MoreOptionsModalComponent extends React.Component<Props, State> {
@@ -99,7 +99,7 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<*>): DP => ({
 export const MoreOptionsModal: React.AbstractComponent<OP> = connect<
   Props,
   OP,
-  {||},
+  {},
   DP,
   _,
   _

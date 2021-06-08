@@ -25,28 +25,28 @@ import type {
   PipetteOnDeck,
 } from '../../step-forms'
 
-type Props = {|
-  loadFile: (event: SyntheticInputEvent<HTMLInputElement>) => mixed,
-  createNewFile?: () => mixed,
-  canDownload: boolean,
-  onDownload: () => mixed,
-  fileData: ?PDProtocolFile,
-  pipettesOnDeck: $PropertyType<InitialDeckSetup, 'pipettes'>,
-  modulesOnDeck: $PropertyType<InitialDeckSetup, 'modules'>,
-  savedStepForms: SavedStepFormState,
-  schemaVersion: number,
-|}
+type Props = {
+  loadFile: (event: SyntheticInputEvent<HTMLInputElement>) => mixed
+  createNewFile?: () => mixed
+  canDownload: boolean
+  onDownload: () => mixed
+  fileData: ?PDProtocolFile
+  pipettesOnDeck: $PropertyType<InitialDeckSetup, 'pipettes'>
+  modulesOnDeck: $PropertyType<InitialDeckSetup, 'modules'>
+  savedStepForms: SavedStepFormState
+  schemaVersion: number
+}
 
-type WarningContent = {|
-  content: React.Node,
-  heading: string,
-|}
+type WarningContent = {
+  content: React.Node
+  heading: string
+}
 
-type MissingContent = {|
-  noCommands: boolean,
-  pipettesWithoutStep: Array<PipetteOnDeck>,
-  modulesWithoutStep: Array<ModuleOnDeck>,
-|}
+type MissingContent = {
+  noCommands: boolean
+  pipettesWithoutStep: Array<PipetteOnDeck>
+  modulesWithoutStep: Array<ModuleOnDeck>
+}
 
 function getWarningContent({
   noCommands,
@@ -198,10 +198,10 @@ export function FileSidebar(props: Props): React.Node {
       modulesWithoutStep,
     })
 
-  const getExportHintContent = (): {|
-    hintKey: HintKey,
-    content: React.Node,
-  |} => {
+  const getExportHintContent = (): {
+    hintKey: HintKey
+    content: React.Node
+  } => {
     return {
       hintKey:
         schemaVersion === 5

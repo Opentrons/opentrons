@@ -23,9 +23,9 @@ const STP = (state: BaseState): $Exact<Props> => ({
   currentPage: selectors.getCurrentPage(state),
 })
 
-export const SettingsPage: React.AbstractComponent<{||}> = connect<
+export const SettingsPage: React.AbstractComponent<{}> = connect<
   Props,
-  {||},
+  {},
   $Exact<Props>,
   _,
   _,

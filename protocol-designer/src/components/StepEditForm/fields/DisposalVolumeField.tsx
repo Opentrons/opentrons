@@ -22,11 +22,11 @@ import type { BaseState } from '../../../types'
 
 import styles from '../StepEditForm.css'
 
-type DropdownFormFieldProps = {|
+type DropdownFormFieldProps = {
   ...FieldProps,
   className?: string,
   options: Options,
-|}
+}
 const DropdownFormField = (props: DropdownFormFieldProps) => {
   return (
     <DropdownField
@@ -40,11 +40,11 @@ const DropdownFormField = (props: DropdownFormFieldProps) => {
   )
 }
 
-type SP = {|
+type SP = {
   disposalDestinationOptions: Options,
   maxDisposalVolume: ?number,
-|}
-type OP = {|
+}
+type OP = {
   aspirate_airGap_checkbox?: boolean | null,
   aspirate_airGap_volume?: string | null,
   path: PathOption,
@@ -52,7 +52,7 @@ type OP = {|
   propsForFields: FieldPropsByName,
   stepType: StepType,
   volume: string | null,
-|}
+}
 type Props = { ...SP, ...OP }
 
 const DisposalVolumeFieldComponent = (props: Props) => {

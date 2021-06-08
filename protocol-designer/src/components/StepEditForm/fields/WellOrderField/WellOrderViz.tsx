@@ -9,10 +9,10 @@ import type { WellOrderOption } from '../../../../form-types'
 
 import styles from './WellOrderInput.css'
 
-type Props = {|
-  firstValue: WellOrderOption,
-  secondValue: WellOrderOption,
-|}
+type Props = {
+  firstValue: WellOrderOption
+  secondValue: WellOrderOption
+}
 
 export const WellOrderViz = (props: Props): React.Node => {
   const { firstValue, secondValue } = props

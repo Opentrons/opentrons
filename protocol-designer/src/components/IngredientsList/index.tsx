@@ -13,23 +13,23 @@ import styles from './IngredientsList.css'
 import type { LiquidGroupsById, LiquidGroup } from '../../labware-ingred/types'
 import type { SingleLabwareLiquidState } from '@opentrons/step-generation'
 
-type RemoveWellsContents = (args: {|
+type RemoveWellsContents = (args: {
   liquidGroupId: string,
   wells: Array<string>,
-|}) => mixed
+}) => mixed
 
 // Props used by both IngredientsList and LiquidGroupCard
-type CommonProps = {|
+type CommonProps = {
   removeWellsContents: RemoveWellsContents,
   selected?: boolean,
-|}
+}
 
-type LiquidGroupCardProps = {|
+type LiquidGroupCardProps = {
   groupId: string,
   ingredGroup: LiquidGroup,
   labwareWellContents: SingleLabwareLiquidState,
   ...CommonProps,
-|}
+}
 
 const LiquidGroupCard = (props: LiquidGroupCardProps): React.Node => {
   const {
@@ -100,7 +100,7 @@ const LiquidGroupCard = (props: LiquidGroupCardProps): React.Node => {
   )
 }
 
-type IndividProps = {|
+type IndividProps = {
   name: ?string,
   wellName: string,
   volume: number,
@@ -108,7 +108,7 @@ type IndividProps = {|
   canDelete: boolean,
   groupId: string,
   removeWellsContents: RemoveWellsContents,
-|}
+}
 
 function IngredIndividual(props: IndividProps) {
   const {

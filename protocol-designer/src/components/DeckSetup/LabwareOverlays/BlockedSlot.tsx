@@ -8,13 +8,13 @@ type BlockedSlotMessage =
   | 'MODULE_INCOMPATIBLE_SINGLE_LABWARE'
   | 'MODULE_INCOMPATIBLE_LABWARE_SWAP'
 
-type Props = {|
-  x: number,
-  y: number,
-  width: number,
-  height: number,
-  message: BlockedSlotMessage,
-|}
+type Props = {
+  x: number
+  y: number
+  width: number
+  height: number
+  message: BlockedSlotMessage
+}
 
 export const BlockedSlot = (props: Props): React.Node => {
   const { x, y, width, height, message } = props

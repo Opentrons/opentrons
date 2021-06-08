@@ -23,10 +23,10 @@ const ALL_CHANGE_TIP_VALUES: Array<ChangeTipOptions> = [
   'perDest',
   'never',
 ]
-type Props = {|
+type Props = {
   ...FieldProps,
   ...DisabledChangeTipArgs,
-|}
+}
 
 export const ChangeTipField = (props: Props): React.Node => {
   const {

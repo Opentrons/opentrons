@@ -28,14 +28,14 @@ import type { BaseState } from '../types'
 
 type Props = React.ElementProps<typeof TitleBar>
 
-type DP = {| onBackClick: $PropertyType<Props, 'onBackClick'> |}
+type DP = { onBackClick: $PropertyType<Props, 'onBackClick'> }
 
-type SP = {|
+type SP = {
   ...$Diff<$Exact<Props>, DP>,
   _page: Page,
   _liquidPlacementMode?: boolean,
   _wellSelectionMode?: boolean,
-|}
+}
 
 type TitleWithIconProps = {
   iconName?: ?IconName,
@@ -207,11 +207,11 @@ const StickyTitleBar = (props: TitleBarProps) => (
   <TitleBar id="TitleBar_main" {...props} className={styles.sticky_bar} />
 )
 
-export const ConnectedTitleBar: React.AbstractComponent<{||}> = connect<
+export const ConnectedTitleBar: React.AbstractComponent<{}> = connect<
   Props,
-  {||},
+  {},
   SP,
-  {||},
+  {},
   _,
   _
 >(

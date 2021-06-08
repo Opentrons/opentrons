@@ -33,7 +33,7 @@ type LiquidEditFormValues = {
 }
 
 export const liquidEditFormSchema: Yup.Schema<
-  {| name: string, description: string, serialize: boolean |},
+  { name: string, description: string, serialize: boolean },
   any
 > = Yup.object().shape({
   name: Yup.string().required(

@@ -8,11 +8,11 @@ import type { ThermocyclerStateStepArgs } from '../../../../step-generation/type
 const tcModuleId = 'tcModuleId'
 
 describe('thermocyclerFormToArgs', () => {
-  const testCases: Array<{|
-    formData: FormData,
-    expected: ThermocyclerStateStepArgs,
-    testName: string,
-  |}> = [
+  const testCases: Array<{
+    formData: FormData
+    expected: ThermocyclerStateStepArgs
+    testName: string
+  }> = [
     {
       testName: 'all active temps',
       formData: {

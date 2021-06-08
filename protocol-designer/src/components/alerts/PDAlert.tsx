@@ -7,12 +7,12 @@ import { i18n } from '../../localization'
 import styles from './alerts.css'
 import type { AlertType } from './types'
 
-type PDAlertProps = {|
-  alertType: AlertType,
-  title: string,
-  description: React.Node,
-  onDismiss?: ?() => mixed,
-|}
+type PDAlertProps = {
+  alertType: AlertType
+  title: string
+  description: React.Node
+  onDismiss?: ?(() => mixed)
+}
 
 export const PDAlert = (props: PDAlertProps): React.Node => {
   const { alertType, title, description, onDismiss } = props

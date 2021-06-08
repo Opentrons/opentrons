@@ -5,12 +5,12 @@ import { CheckboxRowField, TextField } from './'
 import type { FieldPropsByName } from '../types'
 import styles from '../StepEditForm.css'
 
-export const MixFields = (props: {|
-  propsForFields: FieldPropsByName,
-  checkboxFieldName: string,
-  volumeFieldName: string,
-  timesFieldName: string,
-|}): React.Node => {
+export const MixFields = (props: {
+  propsForFields: FieldPropsByName
+  checkboxFieldName: string
+  volumeFieldName: string
+  timesFieldName: string
+}): React.Node => {
   const {
     propsForFields,
     checkboxFieldName,

@@ -22,16 +22,16 @@ import styles from './SettingsPage.css'
 import type { BaseState, ThunkDispatch } from '../../types'
 
 type Props = {
-  canClearHintDismissals: boolean,
-  hasOptedIn: boolean | null,
-  restoreHints: () => mixed,
-  toggleOptedIn: () => mixed,
+  canClearHintDismissals: boolean
+  hasOptedIn: boolean | null
+  restoreHints: () => mixed
+  toggleOptedIn: () => mixed
 }
 
-type SP = {|
-  canClearHintDismissals: $PropertyType<Props, 'canClearHintDismissals'>,
-  hasOptedIn: $PropertyType<Props, 'hasOptedIn'>,
-|}
+type SP = {
+  canClearHintDismissals: $PropertyType<Props, 'canClearHintDismissals'>
+  hasOptedIn: $PropertyType<Props, 'hasOptedIn'>
+}
 
 function SettingsAppComponent(props: Props) {
   const {
@@ -130,11 +130,11 @@ function mergeProps(
   }
 }
 
-export const SettingsApp: React.AbstractComponent<{||}> = connect<
+export const SettingsApp: React.AbstractComponent<{}> = connect<
   Props,
-  {||},
+  {},
   SP,
-  {||},
+  {},
   BaseState,
   _
 >(

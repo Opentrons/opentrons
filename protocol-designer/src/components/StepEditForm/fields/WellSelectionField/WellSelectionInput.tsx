@@ -17,25 +17,25 @@ import type { StepIdType } from '../../../../form-types'
 import type { BaseState } from '../../../../types'
 import type { FieldProps } from '../../types'
 
-type SP = {|
+type SP = {
   stepId: ?StepIdType,
   wellSelectionLabwareKey: ?string,
-|}
+}
 
-type DP = {|
+type DP = {
   onOpen: string => mixed,
   onClose: () => mixed,
-|}
+}
 
-type OP = {|
+type OP = {
   ...FieldProps,
   primaryWellCount?: number,
   isMulti: ?boolean,
   pipetteId: ?string,
   labwareId: ?string,
-|}
+}
 
-type Props = {| ...OP, ...SP, ...DP |}
+type Props = { ...OP, ...SP, ...DP }
 
 class WellSelectionInputComponent extends React.Component<Props> {
   handleOpen = () => {

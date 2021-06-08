@@ -11,7 +11,7 @@ import { i18n } from '../../../localization'
 import modalStyles from '../modal.css'
 import type { LabwareUploadMessage } from '../../../labware-defs'
 
-const MessageBody = (props: {| message: LabwareUploadMessage |}) => {
+const MessageBody = (props: { message: LabwareUploadMessage }) => {
   const { message } = props
 
   if (
@@ -89,11 +89,11 @@ const MessageBody = (props: {| message: LabwareUploadMessage |}) => {
   return null
 }
 
-type Props = {|
+type Props = {
   message: ?LabwareUploadMessage,
   dismissModal: () => mixed,
   overwriteLabwareDef?: () => mixed,
-|}
+}
 
 export const LabwareUploadMessageModal = (props: Props): React.Node => {
   const { message, dismissModal, overwriteLabwareDef } = props

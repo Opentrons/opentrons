@@ -11,18 +11,18 @@ import type { ContentsByWell } from '../../labware-ingred/types'
 import type { BaseState } from '../../types'
 import { wellFillFromWellContents } from '../labware/utils'
 
-type OP = {|
+type OP = {
   className?: string,
   labwareOnDeck: LabwareOnDeckType,
   x: number,
   y: number,
-|}
+}
 
-type SP = {|
+type SP = {
   wellContents: ContentsByWell,
   missingTips: ?WellGroup,
   highlightedWells: ?WellGroup,
-|}
+}
 
 type Props = { ...OP, ...SP }
 
@@ -68,7 +68,7 @@ export const LabwareOnDeck: React.AbstractComponent<OP> = connect<
   Props,
   OP,
   SP,
-  {||},
+  {},
   _,
   _
 >(mapStateToProps)(LabwareOnDeckComponent)

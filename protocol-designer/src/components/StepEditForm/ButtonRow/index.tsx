@@ -7,13 +7,13 @@ import { i18n } from '../../../localization'
 import modalStyles from '../../modals/modal.css'
 import styles from './styles.css'
 
-type ButtonRowProps = {|
-  handleClickMoreOptions: () => mixed,
-  handleClose: () => mixed,
-  handleSave: () => mixed,
-  handleDelete: () => mixed,
-  canSave: boolean,
-|}
+type ButtonRowProps = {
+  handleClickMoreOptions: () => mixed
+  handleClose: () => mixed
+  handleSave: () => mixed
+  handleDelete: () => mixed
+  canSave: boolean
+}
 
 export const ButtonRow = (props: ButtonRowProps): React.Node => {
   const {

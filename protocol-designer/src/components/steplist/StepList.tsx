@@ -14,12 +14,12 @@ import { MultiSelectToolbar } from './MultiSelectToolbar'
 
 import type { StepIdType } from '../../form-types'
 
-type Props = {|
+type Props = {
   isMultiSelectMode: ?boolean,
   orderedStepIds: Array<StepIdType>,
   reorderSelectedStep: (delta: number) => mixed,
   reorderSteps: (Array<StepIdType>) => mixed,
-|}
+}
 
 export class StepList extends React.Component<Props> {
   handleKeyDown: (e: SyntheticKeyboardEvent<>) => void = e => {

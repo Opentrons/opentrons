@@ -4,9 +4,9 @@ import { useField } from 'formik'
 import { SlotMap } from '@opentrons/components'
 import styles from './EditModules.css'
 
-type ConnectedSlotMapProps = {|
-  fieldName: string,
-|}
+type ConnectedSlotMapProps = {
+  fieldName: string
+}
 
 export const ConnectedSlotMap = (props: ConnectedSlotMapProps): React.Node => {
   const { fieldName } = props

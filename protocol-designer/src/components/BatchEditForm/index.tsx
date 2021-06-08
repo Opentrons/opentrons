@@ -19,7 +19,7 @@ import { maskField } from '../../steplist/fieldLevel'
 import { BatchEditMoveLiquid } from './BatchEditMoveLiquid'
 import { BatchEditMix } from './BatchEditMix'
 
-export type BatchEditFormProps = {||}
+export type BatchEditFormProps = {}
 
 export const BatchEditForm = (props: BatchEditFormProps): React.Node => {
   const dispatch = useDispatch()

@@ -7,11 +7,11 @@ import { selectors as uiLabwareSelectors } from '../../../ui/labware'
 import styles from '../StepEditForm.css'
 import type { FieldProps } from '../types'
 
-type BlowoutLocationDropdownProps = {|
+type BlowoutLocationDropdownProps = {
   ...FieldProps,
   className?: string,
   options: Options,
-|}
+}
 
 export const BlowoutLocationField = (
   props: BlowoutLocationDropdownProps

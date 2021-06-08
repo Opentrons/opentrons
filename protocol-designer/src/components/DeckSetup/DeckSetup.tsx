@@ -62,19 +62,19 @@ export const DECK_LAYER_BLOCKLIST = [
   'screwHoles',
 ]
 
-type Props = {|
+type Props = {
   selectedTerminalItemId: ?TerminalItemId,
   handleClickOutside?: () => mixed,
   drilledDown: boolean,
   initialDeckSetup: InitialDeckSetup,
-|}
+}
 
-type ContentsProps = {|
+type ContentsProps = {
   ...RobotWorkSpaceRenderProps,
   selectedTerminalItemId: ?TerminalItemId,
   initialDeckSetup: InitialDeckSetup,
   showGen1MultichannelCollisionWarnings: boolean,
-|}
+}
 
 export const VIEWBOX_MIN_X = -64
 export const VIEWBOX_MIN_Y = -10

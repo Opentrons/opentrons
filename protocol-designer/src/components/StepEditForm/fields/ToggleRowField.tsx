@@ -8,12 +8,12 @@ import styles from '../StepEditForm.css'
 
 import type { FieldProps } from '../types'
 
-type ToggleRowProps = {|
+type ToggleRowProps = {
   ...FieldProps,
   offLabel?: string,
   onLabel?: string,
   className?: string,
-|}
+}
 export const ToggleRowField = (props: ToggleRowProps): React.Node => {
   const {
     updateValue,

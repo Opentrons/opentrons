@@ -20,24 +20,24 @@ import { getDirtyFields } from './utils'
 import type { BaseState, ThunkDispatch } from '../../types'
 import type { FormData, StepFieldName } from '../../form-types'
 
-type SP = {|
+type SP = {
   canSave: boolean,
   formData: ?FormData,
   formHasChanges: boolean,
   isNewStep: boolean,
   isPristineSetTempForm: boolean,
-|}
-type DP = {|
+}
+type DP = {
   deleteStep: (stepId: string) => mixed,
   handleClose: () => mixed,
   saveSetTempFormWithAddedPauseUntilTemp: () => mixed,
   saveStepForm: () => mixed,
   handleChangeFormInput: (name: string, value: mixed) => void,
-|}
-type StepEditFormManagerProps = {|
+}
+type StepEditFormManagerProps = {
   ...SP,
   ...DP,
-|}
+}
 
 const StepEditFormManager = (props: StepEditFormManagerProps) => {
   const {
@@ -213,9 +213,9 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<*>): DP => {
 // It doesn't matter if the children are using connect or useSelector,
 // only the parent matters.)
 // https://react-redux.js.org/api/hooks#stale-props-and-zombie-children
-export const StepEditForm: React.AbstractComponent<{||}> = connect<
+export const StepEditForm: React.AbstractComponent<{}> = connect<
   StepEditFormManagerProps,
-  {||},
+  {},
   _,
   _,
   _,

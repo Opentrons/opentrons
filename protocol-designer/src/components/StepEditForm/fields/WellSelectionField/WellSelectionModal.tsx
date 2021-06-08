@@ -26,7 +26,7 @@ import type { StepFieldName } from '../../../../form-types'
 import styles from './WellSelectionModal.css'
 import modalStyles from '../../../modals/modal.css'
 
-type WellSelectionModalProps = {|
+type WellSelectionModalProps = {
   isOpen: boolean,
   labwareId: ?string,
   name: StepFieldName,
@@ -34,9 +34,9 @@ type WellSelectionModalProps = {|
   pipetteId: ?string,
   value: mixed,
   updateValue: (?mixed) => void,
-|}
+}
 
-type WellSelectionModalComponentProps = {|
+type WellSelectionModalComponentProps = {
   deselectWells: WellGroup => mixed,
   handleSave: () => mixed,
   highlightedWells: WellGroup,
@@ -48,7 +48,7 @@ type WellSelectionModalComponentProps = {|
   selectWells: WellGroup => mixed,
   updateHighlightedWells: WellGroup => mixed,
   wellContents: ContentsByWell,
-|}
+}
 
 const WellSelectionModalComponent = (
   props: WellSelectionModalComponentProps
