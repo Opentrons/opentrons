@@ -4,10 +4,10 @@ import { selectors as labwareIngredSelectors } from '../../labware-ingred/select
 import * as labwareIngredActions from '../../labware-ingred/actions'
 import { getSelectedTerminalItemId } from '../../ui/steps'
 import { selectors as stepFormSelectors } from '../../step-forms'
-import type { InitialDeckSetup } from '../../step-forms'
+import { InitialDeckSetup } from '../../step-forms'
 import { DeckSetup as DeckSetupComponent } from './DeckSetup'
-import type { TerminalItemId } from '../../steplist'
-import type { BaseState, ThunkDispatch } from '../../types'
+import { TerminalItemId } from '../../steplist'
+import { BaseState, ThunkDispatch } from '../../types'
 type Props = React.ElementProps<typeof DeckSetupComponent>
 type SP = {
   selectedTerminalItemId: TerminalItemId | null | undefined

@@ -14,14 +14,14 @@ import { SelectableLabware, wellFillFromWellContents } from '../../../labware'
 import * as wellContentsSelectors from '../../../../top-selectors/well-contents'
 import { selectors } from '../../../../labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
-import type { WellGroup } from '@opentrons/components'
-import type {
+import { WellGroup } from '@opentrons/components'
+import {
   LabwareDefinition2,
   PipetteNameSpecs,
 } from '@opentrons/shared-data'
-import type { ContentsByWell } from '../../../../labware-ingred/types'
-import type { WellIngredientNames } from '../../../../steplist/types'
-import type { StepFieldName } from '../../../../form-types'
+import { ContentsByWell } from '../../../../labware-ingred/types'
+import { WellIngredientNames } from '../../../../steplist/types'
+import { StepFieldName } from '../../../../form-types'
 
 import styles from './WellSelectionModal.css'
 import modalStyles from '../../../modals/modal.css'

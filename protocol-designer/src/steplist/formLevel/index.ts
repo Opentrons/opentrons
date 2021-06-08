@@ -1,4 +1,4 @@
-import type { FormError } from './errors'
+import { FormError } from './errors'
 import {
   composeErrors,
   incompatibleAspirateLabware,
@@ -19,7 +19,7 @@ import {
   lidTemperatureHoldRequired,
   volumeTooHigh,
 } from './errors'
-import type { FormWarning, FormWarningType } from './warnings'
+import { FormWarning, FormWarningType } from './warnings'
 import {
   composeWarnings,
   belowPipetteMinimumVolume,
@@ -28,7 +28,7 @@ import {
   minAspirateAirGapVolume,
   minDispenseAirGapVolume,
 } from './warnings'
-import type { StepType } from '../../form-types'
+import { StepType } from '../../form-types'
 export { handleFormChange } from './handleFormChange'
 export { createBlankForm } from './createBlankForm'
 export { getDefaultsForStepType } from './getDefaultsForStepType'

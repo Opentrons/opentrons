@@ -11,7 +11,7 @@ import { actions as stepsActions, getIsMultiSelectMode } from '../../ui/steps'
 import { actions as steplistActions } from '../../steplist'
 import { Portal } from '../portals/TopPortal'
 import styles from './StepItem.css'
-import type { StepIdType } from '../../form-types'
+import { StepIdType } from '../../form-types'
 
 const MENU_OFFSET_PX = 5
 

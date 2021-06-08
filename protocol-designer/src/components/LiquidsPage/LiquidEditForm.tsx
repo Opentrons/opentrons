@@ -14,8 +14,8 @@ import {
 import styles from './LiquidEditForm.css'
 import formStyles from '../forms/forms.css'
 
-import type { FormikProps } from 'formik/@flow-typed'
-import type { LiquidGroup } from '../../labware-ingred/types'
+import { FormikProps } from 'formik/@flow-typed'
+import { LiquidGroup } from '../../labware-ingred/types'
 
 type Props = {
   ...$Exact<LiquidGroup>,

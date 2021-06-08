@@ -21,13 +21,13 @@ import { PauseStepItems } from './PauseStepItems'
 import { SourceDestSubstep } from './SourceDestSubstep'
 import styles from './StepItem.css'
 
-import type {
+import {
   FormData,
   StepType,
   ProfileCycleItem,
   ProfileStepItem,
 } from '../../form-types'
-import type {
+import {
   SubstepIdentifier,
   SubstepItemData,
   ThermocyclerProfileSubstepItem,

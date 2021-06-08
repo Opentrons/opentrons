@@ -3,11 +3,8 @@ import {
   PAUSE_UNTIL_TEMP,
   PAUSE_UNTIL_RESUME,
 } from '../../../constants'
-import type { FormData } from '../../../form-types'
-import type {
-  AwaitTemperatureArgs,
-  PauseArgs,
-} from '@opentrons/step-generation'
+import { FormData } from '../../../form-types'
+import { AwaitTemperatureArgs, PauseArgs } from '@opentrons/step-generation'
 export const pauseFormToArgs = (
   formData: FormData
 ): PauseArgs | AwaitTemperatureArgs | null => {

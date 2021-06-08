@@ -31,8 +31,8 @@ import {
   CLOSE_BATCH_EDIT_FORM,
 } from '../components/modals/ConfirmDeleteModal'
 
-import type { SubstepIdentifier } from '../steplist/types'
-import type { StepIdType } from '../form-types'
+import { SubstepIdentifier } from '../steplist/types'
+import { StepIdType } from '../form-types'
 
 type Props = {
   stepId: StepIdType,

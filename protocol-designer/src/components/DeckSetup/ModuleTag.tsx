@@ -23,8 +23,8 @@ import { getLabwareOnModule } from '../../ui/modules/utils'
 import { makeTemperatureText } from '../../utils'
 import { getModuleVizDims } from './getModuleVizDims'
 import styles from './ModuleTag.css'
-import type { ModuleOrientation } from '../../types'
-import type {
+import { ModuleOrientation } from '../../types'
+import {
   ModuleTemporalProperties,
   TemperatureModuleState,
 } from '../../step-forms'

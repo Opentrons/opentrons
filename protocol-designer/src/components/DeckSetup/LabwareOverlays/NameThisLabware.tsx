@@ -4,9 +4,9 @@ import { connect } from 'react-redux'
 import cx from 'classnames'
 import { Icon, useOnClickOutside } from '@opentrons/components'
 import { renameLabware } from '../../../labware-ingred/actions'
-import type { BaseState, ThunkDispatch } from '../../../types'
+import { BaseState, ThunkDispatch } from '../../../types'
 import { i18n } from '../../../localization'
-import type { LabwareOnDeck } from '../../../step-forms'
+import { LabwareOnDeck } from '../../../step-forms'
 import styles from './LabwareOverlays.css'
 
 type OP = {

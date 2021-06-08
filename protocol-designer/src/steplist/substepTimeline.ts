@@ -4,16 +4,16 @@ import {
   getWellsForTips,
   getNextRobotStateAndWarningsSingleCommand,
 } from '@opentrons/step-generation'
-import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV6'
-import type { Channels } from '@opentrons/components'
-import type {
+import { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV6'
+import { Channels } from '@opentrons/components'
+import {
   CommandCreatorError,
   CommandsAndWarnings,
   CurriedCommandCreator,
   InvariantContext,
   RobotState,
 } from '@opentrons/step-generation'
-import type { SubstepTimelineFrame, SourceDestData, TipLocation } from './types'
+import { SubstepTimelineFrame, SourceDestData, TipLocation } from './types'
 
 /** Return last picked up tip in the specified commands, if any */
 export function _getNewActiveTips(

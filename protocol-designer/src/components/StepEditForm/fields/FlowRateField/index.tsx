@@ -1,10 +1,10 @@
 // @flow
 import * as React from 'react'
-import { FlowRateInput, type FlowRateInputProps } from './FlowRateInput'
+import { FlowRateInput,  FlowRateInputProps } from './FlowRateInput'
 import { connect } from 'react-redux'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
-import type { FieldProps } from '../../types'
-import type { BaseState } from '../../../../types'
+import { FieldProps } from '../../types'
+import { BaseState } from '../../../../types'
 
 type OP = {
   ...FieldProps,

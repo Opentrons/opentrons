@@ -7,8 +7,8 @@ import { FormGroup } from '@opentrons/components'
 import { ToggleRowField, TextField } from '../../fields'
 import styles from '../../StepEditForm.css'
 
-import type { FieldPropsByName } from '../../types'
-import type { FormData } from '../../../../form-types'
+import { FieldPropsByName } from '../../types'
+import { FormData } from '../../../../form-types'
 
 type Props = {
   propsForFields: FieldPropsByName

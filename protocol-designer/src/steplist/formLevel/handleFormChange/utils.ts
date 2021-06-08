@@ -3,16 +3,10 @@ import round from 'lodash/round'
 import uniq from 'lodash/uniq'
 import { getWellSetForMultichannel, canPipetteUseLabware } from '../../../utils'
 import { getPipetteCapacity } from '../../../pipettes/pipetteData'
-import type {
-  LabwareDefinition2,
-  PipetteChannels,
-} from '@opentrons/shared-data'
-import type {
-  LabwareEntities,
-  PipetteEntities,
-} from '@opentrons/step-generation'
-import type { FormPatch } from '../../actions/types'
-import type { FormData, PathOption, StepFieldName } from '../../../form-types'
+import { LabwareDefinition2, PipetteChannels } from '@opentrons/shared-data'
+import { LabwareEntities, PipetteEntities } from '@opentrons/step-generation'
+import { FormPatch } from '../../actions/types'
+import { FormData, PathOption, StepFieldName } from '../../../form-types'
 export function chainPatchUpdaters(
   initialPatch: FormPatch,
   fns: Array<(arg0: FormPatch) => FormPatch>

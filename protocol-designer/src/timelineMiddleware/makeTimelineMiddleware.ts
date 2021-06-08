@@ -4,16 +4,16 @@ import {
   getInvariantContext,
 } from '../step-forms/selectors'
 import { getInitialRobotState } from '../file-data/selectors'
-import type { ComputeRobotStateTimelineSuccessAction } from '../file-data/actions'
+import { ComputeRobotStateTimelineSuccessAction } from '../file-data/actions'
 import {
   computeRobotStateTimelineRequest,
   computeRobotStateTimelineSuccess,
 } from '../file-data/actions'
 import { getLabwareNamesByModuleId } from '../ui/modules/selectors'
-import type { Middleware } from 'redux'
-import type { BaseState } from '../types'
-import type { GenerateRobotStateTimelineArgs } from './generateRobotStateTimeline'
-import type { SubstepsArgsNoTimeline, TimelineWorker } from './types'
+import { Middleware } from 'redux'
+import { BaseState } from '../types'
+import { GenerateRobotStateTimelineArgs } from './generateRobotStateTimeline'
+import { SubstepsArgsNoTimeline, TimelineWorker } from './types'
 
 const hasChanged = (
   nextValues: { [key in any]?: any },

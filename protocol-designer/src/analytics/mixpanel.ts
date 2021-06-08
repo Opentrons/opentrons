@@ -3,7 +3,7 @@
 import mixpanel from 'mixpanel-browser'
 import { getIsProduction } from '../networking/opentronsWebApi'
 import { getHasOptedIn } from './selectors'
-import type { BaseState } from '../types'
+import { BaseState } from '../types'
 
 // TODO(IL, 2020-09-09): AnalyticsEvent type copied from app/src/analytics/types.js, consider merging
 export type AnalyticsEvent =

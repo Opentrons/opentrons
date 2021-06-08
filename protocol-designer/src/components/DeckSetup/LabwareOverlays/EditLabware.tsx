@@ -15,8 +15,8 @@ import {
   moveDeckItem,
 } from '../../../labware-ingred/actions'
 import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
-import type { BaseState, ThunkDispatch, DeckSlot } from '../../../types'
-import type { LabwareOnDeck } from '../../../step-forms'
+import { BaseState, ThunkDispatch, DeckSlot } from '../../../types'
+import { LabwareOnDeck } from '../../../step-forms'
 import styles from './LabwareOverlays.css'
 
 type OP = {

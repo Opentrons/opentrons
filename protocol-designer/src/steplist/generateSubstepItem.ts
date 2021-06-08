@@ -13,7 +13,7 @@ import {
 import { substepTimeline } from './substepTimeline'
 import * as steplistUtils from './utils'
 import { THERMOCYCLER_PROFILE, THERMOCYCLER_STATE } from '../constants'
-import type {
+import {
   CurriedCommandCreator,
   InvariantContext,
   RobotState,
@@ -22,8 +22,8 @@ import type {
   MixArgs,
   TransferArgs,
 } from '@opentrons/step-generation'
-import type { StepIdType } from '../form-types'
-import type {
+import { StepIdType } from '../form-types'
+import {
   NamedIngred,
   StepArgsAndErrors,
   StepItemSourceDestRow,

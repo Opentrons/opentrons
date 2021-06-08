@@ -1,9 +1,9 @@
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
-import type { Reducer } from 'redux'
-import type { Action } from '../types'
-import type { SetOptIn } from './actions'
-import type { RehydratePersistedAction } from '../persist'
+import { Reducer } from 'redux'
+import { Action } from '../types'
+import { SetOptIn } from './actions'
+import { RehydratePersistedAction } from '../persist'
 type OptInState = boolean | null
 const optInInitialState = null
 // NOTE(mc, 2020-06-04): `handleActions` cannot be strictly typed

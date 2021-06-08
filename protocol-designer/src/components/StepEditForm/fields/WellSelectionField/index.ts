@@ -2,8 +2,8 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { WellSelectionInput } from './WellSelectionInput'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
-import type { BaseState, ThunkDispatch } from '../../../../types'
-import type { FieldProps } from '../../types'
+import { BaseState, ThunkDispatch } from '../../../../types'
+import { FieldProps } from '../../types'
 type Props = JSX.LibraryManagedAttributes<
   typeof WellSelectionInput,
   React.ComponentProps<typeof WellSelectionInput>

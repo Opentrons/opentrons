@@ -8,9 +8,9 @@ import { swatchColors } from '../swatchColors'
 import listButtonStyles from '../listButtons.css'
 
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
-import type { OrderedLiquids } from '../../labware-ingred/types'
+import { OrderedLiquids } from '../../labware-ingred/types'
 import * as labwareIngredActions from '../../labware-ingred/actions'
-import type { BaseState, ThunkDispatch } from '../../types'
+import { BaseState, ThunkDispatch } from '../../types'
 
 type SP = {
   liquids: OrderedLiquids,

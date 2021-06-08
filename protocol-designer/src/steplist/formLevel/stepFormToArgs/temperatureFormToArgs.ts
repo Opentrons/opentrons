@@ -1,9 +1,9 @@
 import assert from 'assert'
-import type {
+import {
   SetTemperatureArgs,
   DeactivateTemperatureArgs,
 } from '@opentrons/step-generation'
-import type { HydratedTemperatureFormData } from '../../../form-types'
+import { HydratedTemperatureFormData } from '../../../form-types'
 type TemperatureArgs = SetTemperatureArgs | DeactivateTemperatureArgs
 export const temperatureFormToArgs = (
   hydratedFormData: HydratedTemperatureFormData

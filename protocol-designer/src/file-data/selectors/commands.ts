@@ -7,10 +7,10 @@ import * as StepGeneration from '@opentrons/step-generation'
 import { getAllWellsForLabware } from '../../constants'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '../../step-forms'
-import type { Substeps } from '../../steplist/types'
-import type { BaseState, Selector } from '../../types'
-import type { StepIdType } from '../../form-types'
-import type {
+import { Substeps } from '../../steplist/types'
+import { BaseState, Selector } from '../../types'
+import { StepIdType } from '../../form-types'
+import {
   LabwareOnDeck,
   LabwareTemporalProperties,
   ModuleOnDeck,

@@ -8,7 +8,7 @@ import {
   temperatureRangeFieldValue,
   realNumber,
 } from './errors'
-import type { ValueMasker, ValueCaster } from './processing'
+import { ValueMasker, ValueCaster } from './processing'
 import {
   maskToInteger,
   maskToFloat,
@@ -27,12 +27,12 @@ import {
   MIN_TC_DURATION_SECONDS,
   MAX_TC_DURATION_SECONDS,
 } from '../../constants'
-import type {
+import {
   LabwareEntity,
   PipetteEntity,
   InvariantContext,
 } from '@opentrons/step-generation'
-import type { StepFieldName } from '../../form-types'
+import { StepFieldName } from '../../form-types'
 export type { StepFieldName }
 
 const getLabwareEntity = (

@@ -1,8 +1,8 @@
-import type { Mount } from "@opentrons/components";
-import type { ModuleRealType, ModuleModel } from "@opentrons/shared-data";
-import type { DeckSlot } from "../types";
-import typeof { MAGNETIC_MODULE_TYPE, TEMPERATURE_MODULE_TYPE, THERMOCYCLER_MODULE_TYPE } from "@opentrons/shared-data";
-import type { TemperatureStatus, ModuleEntity, PipetteEntity, LabwareEntity } from "@opentrons/step-generation";
+import { Mount } from "@opentrons/components";
+import { ModuleRealType, ModuleModel } from "@opentrons/shared-data";
+import { DeckSlot } from "../types";
+import of { MAGNETIC_MODULE_TYPE, TEMPERATURE_MODULE_TYPE, THERMOCYCLER_MODULE_TYPE } from "@opentrons/shared-data";
+import { TemperatureStatus, ModuleEntity, PipetteEntity, LabwareEntity } from "@opentrons/step-generation";
 export type FormPipette = {
   pipetteName: string | null | undefined;
   tiprackDefURI: string | null | undefined;

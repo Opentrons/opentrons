@@ -10,8 +10,8 @@ import { TitledListNotes } from '../TitledListNotes'
 import { swatchColors } from '../swatchColors'
 import { LabwareDetailsCard } from './LabwareDetailsCard'
 import styles from './IngredientsList.css'
-import type { LiquidGroupsById, LiquidGroup } from '../../labware-ingred/types'
-import type { SingleLabwareLiquidState } from '@opentrons/step-generation'
+import { LiquidGroupsById, LiquidGroup } from '../../labware-ingred/types'
+import { SingleLabwareLiquidState } from '@opentrons/step-generation'
 
 type RemoveWellsContents = (args: {
   liquidGroupId: string,

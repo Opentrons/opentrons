@@ -1,14 +1,14 @@
 import { connect } from 'react-redux'
 import * as React from 'react'
 import mapValues from 'lodash/mapValues'
-import type { BaseState, ThunkDispatch } from '../types'
+import { BaseState, ThunkDispatch } from '../types'
 import { FilePage } from '../components/FilePage'
 import { actions, selectors as fileSelectors } from '../file-data'
 import { selectors as stepFormSelectors } from '../step-forms'
 import { actions as steplistActions } from '../steplist'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../constants'
-import type { InitialDeckSetup } from '../step-forms'
-import type { FileMetadataFields } from '../file-data'
+import { InitialDeckSetup } from '../step-forms'
+import { FileMetadataFields } from '../file-data'
 import { actions as navActions } from '../navigation'
 type Props = React.ElementProps<typeof FilePage>
 type SP = {

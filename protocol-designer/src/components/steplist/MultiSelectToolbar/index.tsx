@@ -33,7 +33,7 @@ import {
   DELETE_MULTIPLE_STEP_FORMS,
 } from '../../modals/ConfirmDeleteModal'
 
-import type { IconName } from '@opentrons/components'
+import { IconName } from '@opentrons/components'
 
 type ClickableIconProps = {
   id?: string

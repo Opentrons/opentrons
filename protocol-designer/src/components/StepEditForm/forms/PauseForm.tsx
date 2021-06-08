@@ -21,7 +21,7 @@ import { TextField, RadioGroupField, StepFormDropdown } from '../fields'
 import { getSingleSelectDisabledTooltip } from '../utils'
 import styles from '../StepEditForm.css'
 
-import type { StepFormProps } from '../types'
+import { StepFormProps } from '../types'
 
 export const PauseForm = (props: StepFormProps): React.Node => {
   const moduleLabwareOptions = useSelector(

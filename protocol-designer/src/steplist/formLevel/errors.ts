@@ -13,7 +13,7 @@ import {
   PAUSE_UNTIL_TEMP,
   THERMOCYCLER_PROFILE,
 } from '../../constants'
-import type { StepFieldName } from '../../form-types'
+import { StepFieldName } from '../../form-types'
 
 /*******************
  ** Error Messages **

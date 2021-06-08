@@ -3,9 +3,9 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { LabwareNameOverlay } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
-import type { BaseState, ThunkDispatch } from '../../../types'
+import { BaseState, ThunkDispatch } from '../../../types'
 import { selectors as uiLabwareSelectors } from '../../../ui/labware'
-import type { LabwareOnDeck } from '../../../step-forms'
+import { LabwareOnDeck } from '../../../step-forms'
 type OP = {
   labwareOnDeck: LabwareOnDeck,
 }

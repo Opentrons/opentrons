@@ -12,7 +12,7 @@ import { Portal } from '../../../portals/MainPageModalPortal'
 import modalStyles from '../../../modals/modal.css'
 import stepFormStyles from '../../StepEditForm.css'
 import styles from './FlowRateInput.css'
-import type { FieldProps } from '../../types'
+import { FieldProps } from '../../types'
 
 const DEFAULT_LABEL = i18n.t('form.step_edit_form.field.flow_rate.label')
 const DECIMALS_ALLOWED = 1

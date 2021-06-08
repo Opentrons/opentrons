@@ -5,7 +5,7 @@ import cx from 'classnames'
 import { AlertModal, OutlineButton } from '@opentrons/components'
 import modalStyles from '../modal.css'
 import { getModalContents } from './modalContents'
-import type { FileUploadMessage } from '../../../load-file'
+import { FileUploadMessage } from '../../../load-file'
 
 type Props = {
   message: ?FileUploadMessage,

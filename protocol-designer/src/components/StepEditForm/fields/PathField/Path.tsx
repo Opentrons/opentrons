@@ -6,9 +6,9 @@ import { i18n } from '../../../../localization'
 import SINGLE_IMAGE from '../../../../images/path_single_transfers.svg'
 import MULTI_DISPENSE_IMAGE from '../../../../images/path_multi_dispense.svg'
 import MULTI_ASPIRATE_IMAGE from '../../../../images/path_multi_aspirate.svg'
-import type { PathOption } from '../../../../form-types'
-import type { FieldProps } from '../../types'
-import type { DisabledPathMap, ValuesForPath } from './getDisabledPathMap'
+import { PathOption } from '../../../../form-types'
+import { FieldProps } from '../../types'
+import { DisabledPathMap, ValuesForPath } from './getDisabledPathMap'
 import styles from '../../StepEditForm.css'
 
 const PATH_ANIMATION_IMAGES = {

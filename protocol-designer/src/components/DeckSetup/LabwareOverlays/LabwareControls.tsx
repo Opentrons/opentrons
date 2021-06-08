@@ -2,10 +2,10 @@
 import * as React from 'react'
 import cx from 'classnames'
 import { RobotCoordsForeignDiv } from '@opentrons/components'
-import type { DeckSlot } from '@opentrons/shared-data'
+import { DeckSlot } from '@opentrons/shared-data'
 
-import { START_TERMINAL_ITEM_ID, type TerminalItemId } from '../../../steplist'
-import type { LabwareOnDeck } from '../../../step-forms'
+import { START_TERMINAL_ITEM_ID,  TerminalItemId } from '../../../steplist'
+import { LabwareOnDeck } from '../../../step-forms'
 import { BlockedSlot } from './BlockedSlot'
 import { BrowseLabware } from './BrowseLabware'
 import { EditLabware } from './EditLabware'

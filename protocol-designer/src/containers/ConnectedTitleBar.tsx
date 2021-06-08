@@ -1,9 +1,9 @@
 // @flow
 import * as React from 'react'
-import type { Dispatch } from 'redux'
+import { Dispatch } from 'redux'
 import { connect } from 'react-redux'
 
-import { TitleBar, Icon, type IconName } from '@opentrons/components'
+import { TitleBar, Icon,  IconName } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 import styles from './TitleBar.css'
 import { i18n } from '../localization'
@@ -21,10 +21,10 @@ import { END_TERMINAL_ITEM_ID, START_TERMINAL_ITEM_ID } from '../steplist'
 import { selectors as fileDataSelectors } from '../file-data'
 import { closeIngredientSelector } from '../labware-ingred/actions'
 import { stepIconsByType } from '../form-types'
-import { selectors, type Page } from '../navigation'
+import { selectors,  Page } from '../navigation'
 
-import type { TitleBarProps } from '@opentrons/components'
-import type { BaseState } from '../types'
+import { TitleBarProps } from '@opentrons/components'
+import { BaseState } from '../types'
 
 type Props = React.ElementProps<typeof TitleBar>
 

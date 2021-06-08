@@ -3,8 +3,8 @@ import {
   PAUSE_UNTIL_TIME,
   PAUSE_UNTIL_TEMP,
 } from './constants'
-import type { IconName } from '@opentrons/components'
-import type {
+import { IconName } from '@opentrons/components'
+import {
   ChangeTipOptions,
   LabwareEntity,
   PipetteEntity,

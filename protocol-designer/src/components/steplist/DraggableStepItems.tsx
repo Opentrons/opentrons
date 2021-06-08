@@ -13,7 +13,7 @@ import {
   type StepType,
 } from '../../form-types'
 import { selectors as stepFormSelectors } from '../../step-forms'
-import type { BaseState } from '../../types'
+import { BaseState } from '../../types'
 import { ContextMenu } from './ContextMenu'
 import styles from './StepItem.css'
 

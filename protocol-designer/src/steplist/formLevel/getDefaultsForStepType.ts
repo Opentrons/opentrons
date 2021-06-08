@@ -6,7 +6,7 @@ import {
   DEFAULT_DELAY_SECONDS,
   FIXED_TRASH_ID,
 } from '../../constants'
-import type { StepType, StepFieldName } from '../../form-types'
+import { StepType, StepFieldName } from '../../form-types'
 export function getDefaultsForStepType(
   stepType: StepType
 ): Record<StepFieldName, any> {

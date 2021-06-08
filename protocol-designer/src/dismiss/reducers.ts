@@ -3,16 +3,16 @@ import { handleActions } from 'redux-actions'
 import omit from 'lodash/omit'
 import { getPDMetadata } from '../file-types'
 import { PRESAVED_STEP_ID } from '../steplist/types'
-import type { Reducer } from 'redux'
-import type { DismissFormWarning, DismissTimelineWarning } from './actions'
-import type { BaseState, Action } from '../types'
-import type { LoadFileAction } from '../load-file'
-import type {
+import { Reducer } from 'redux'
+import { DismissFormWarning, DismissTimelineWarning } from './actions'
+import { BaseState, Action } from '../types'
+import { LoadFileAction } from '../load-file'
+import {
   CancelStepFormAction,
   DeleteStepAction,
   DeleteMultipleStepsAction,
 } from '../steplist/actions'
-import type { StepIdType } from '../form-types'
+import { StepIdType } from '../form-types'
 export type WarningType = string
 export type DismissedWarningsAllSteps = Record<
   StepIdType,

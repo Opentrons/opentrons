@@ -2,7 +2,7 @@
 import * as React from 'react'
 import cx from 'classnames'
 import { i18n } from '../../localization'
-import { Icon, type IconName } from '@opentrons/components'
+import { Icon,  IconName } from '@opentrons/components'
 import { PDListItem } from '../lists'
 import styles from './styles.css'
 import {

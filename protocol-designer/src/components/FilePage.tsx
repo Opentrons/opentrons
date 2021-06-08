@@ -21,10 +21,10 @@ import { EditModules } from './EditModules'
 import styles from './FilePage.css'
 import modalStyles from '../components/modals/modal.css'
 import formStyles from '../components/forms/forms.css'
-import type { FormikProps } from 'formik/@flow-typed'
-import type { ModuleRealType } from '@opentrons/shared-data'
-import type { FileMetadataFields } from '../file-data'
-import type { ModulesForEditModulesCard } from '../step-forms'
+import { FormikProps } from 'formik/@flow-typed'
+import { ModuleRealType } from '@opentrons/shared-data'
+import { FileMetadataFields } from '../file-data'
+import { ModulesForEditModulesCard } from '../step-forms'
 
 export type Props = {
   formValues: FileMetadataFields,

@@ -16,8 +16,8 @@ import ZIG_ZAG_IMAGE from '../../../../images/zig_zag_icon.svg'
 import { WellOrderModal } from './WellOrderModal'
 import stepEditStyles from '../../StepEditForm.css'
 import styles from './WellOrderInput.css'
-import type { FieldProps } from '../../types'
-import type { WellOrderOption } from '../../../../form-types'
+import { FieldProps } from '../../types'
+import { WellOrderOption } from '../../../../form-types'
 
 type Props = {
   className?: ?string

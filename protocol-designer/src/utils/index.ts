@@ -1,9 +1,9 @@
 import uuidv1 from 'uuid/v1'
-import type { WellSetHelpers } from '@opentrons/shared-data'
+import { WellSetHelpers } from '@opentrons/shared-data'
 import { makeWellSetHelpers } from '@opentrons/shared-data'
 import { i18n } from '../localization'
-import type { WellGroup } from '@opentrons/components'
-import type { BoundingRect, GenericRect } from '../collision-types'
+import { WellGroup } from '@opentrons/components'
+import { BoundingRect, GenericRect } from '../collision-types'
 export const registerSelectors: (arg0: any) => void =
   process.env.NODE_ENV === 'development'
     ? require('reselect-tools').registerSelectors

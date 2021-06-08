@@ -5,15 +5,15 @@ import min from 'lodash/min'
 import pick from 'lodash/pick'
 import reduce from 'lodash/reduce'
 import omitBy from 'lodash/omitBy'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import { LabwareDefinition2 } from '@opentrons/shared-data'
 import * as StepGeneration from '@opentrons/step-generation'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { timelineFrameBeforeActiveItem } from '../timelineFrames'
 import { getSelectedWells } from '../../well-selection/selectors'
 import { getAllWellsForLabware, getMaxVolumes } from '../../constants'
-import type { Selector } from '../../types'
-import type {
+import { Selector } from '../../types'
+import {
   WellContents,
   WellContentsByLabware,
   ContentsByWell,

@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-import type { Dispatch } from 'redux'
+import { Dispatch } from 'redux'
 import { connect } from 'react-redux'
 import { i18n } from '../../localization'
 import { ErrorContents } from './ErrorContents'
@@ -9,9 +9,9 @@ import { actions as dismissActions } from '../../dismiss'
 import * as timelineWarningSelectors from '../../top-selectors/timelineWarnings'
 import { getSelectedStepId } from '../../ui/steps'
 import { selectors as fileDataSelectors } from '../../file-data'
-import { Alerts, type Props } from './Alerts'
-import type { CommandCreatorError } from '@opentrons/step-generation'
-import type { BaseState } from '../../types'
+import { Alerts, Props } from './Alerts'
+import { CommandCreatorError } from '@opentrons/step-generation'
+import { BaseState } from '../../types'
 
 type SP = {
   errors: $PropertyType<Props, 'errors'>,
