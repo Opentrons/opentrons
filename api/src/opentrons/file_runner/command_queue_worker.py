@@ -18,6 +18,9 @@ class CommandQueueWorker:
         self._task: Optional[Awaitable] = None
         self._terminate = False
 
+    # todo(mm, 2021-06-07): "play" and "stop" at this level do not necessarily mean
+    # as "play" and "stop" at higher-levels (FileRunner). Use more specific names, like
+    # "start_scheduling_executions" and "stop_scheduling_executions"?
     def play(self) -> None:
         """Start executing the `ProtocolEngine`'s queued commands.
 
