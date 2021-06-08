@@ -16,7 +16,7 @@ class CommandQueueWorker:
         """
         self._engine = protocol_engine
         self._task: Optional[Awaitable] = None
-        self._terminate = False
+        self._keep_running = False
 
     # todo(mm, 2021-06-07): "play" and "stop" at this level do not necessarily mean
     # as "play" and "stop" at higher-levels (FileRunner). Use more specific names, like
