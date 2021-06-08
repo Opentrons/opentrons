@@ -29,13 +29,6 @@ class CommandQueueWorker:
 
         See `wait_to_be_idle` for when execution may stop.
         """
-        # todo(mm, 2021-06-07): How should things work if you pause and resume multiple
-        # times while a single command is executing? To ensure clean sequencing,
-        # would each resume need to be preceded by a wait_to_be_idle() call? If so,
-        # the resume request could block for multiple seconds. If not, there might be
-        # a race condition where a resume is ignored depending on the timing of
-        # self._task getting set to None. Resolving this might require more detailed
-        # state handling than "has a task" vs. "doesn't have a task".
         if self._task is None:
             self._keep_running = True
             # We rely on asyncio.create_task() returning before the event loop actually
@@ -52,7 +45,14 @@ class CommandQueueWorker:
         if self._task is not None:
             self._keep_running = False
 
-    # To do: Investigate whether every coroutine needs to be awaited
+    # todo(mm, 2021-06-08): In addition to calling this when it's done with the object,
+    # should calling code also call this between adjacent pause() and resume()s? 
+    #
+    # If yes, the resume request could block for multiple seconds.
+    #
+    # If no, there might be race conditions where a resume is ignored depending on the
+    # timing of self._task getting set to None? Resolving this might require better
+    # internal state representation than "has a task" vs. "doesn't have a task".
     async def wait_to_be_idle(self) -> None:
         """Wait until this `CommandQueueWorker` is idle.
 
@@ -76,7 +76,7 @@ class CommandQueueWorker:
         If an exception happened while executing commands, it will be raised from this
         call.
 
-        When you're finished with a `CommandQueueWorker`, you must call this method on
+        When you're finished with a `CommandQueueWorker`, you should call this method on
         it. This gives it a chance to clean up its background task, and propagate any
         errors.
         """
