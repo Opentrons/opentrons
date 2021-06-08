@@ -4,7 +4,7 @@ import '@testing-library/jest-dom'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { render, screen } from '@testing-library/react'
 import { getDefaultFormState, LabwareFields } from '../../../fields'
-import { isEveryFieldHidden } from '../../../utils'
+import { isEveryFieldHidden, getLabwareName } from '../../../utils'
 import { Volume } from '../../sections/Volume'
 import { wrapInFormik } from '../../utils/wrapInFormik'
 
@@ -12,6 +12,9 @@ jest.mock('../../../utils')
 
 const isEveryFieldHiddenMock = isEveryFieldHidden as jest.MockedFunction<
   typeof isEveryFieldHidden
+>
+const getLabwareNameMock = getLabwareName as jest.MockedFunction<
+  typeof getLabwareName
 >
 
 let formikConfig: FormikConfig<LabwareFields>
@@ -30,16 +33,22 @@ describe('Volume', () => {
   })
 
   it('should render with the correct information', () => {
+    when(getLabwareNameMock)
+      .calledWith(formikConfig.initialValues, false)
+      .mockReturnValue('well')
     render(wrapInFormik(<Volume />, formikConfig))
     expect(screen.getByRole('heading')).toHaveTextContent(/Volume/i)
 
     screen.getByText('Total maximum volume of each well.')
 
-    screen.getByRole('textbox', { name: /max volume per well/i })
+    screen.getByRole('textbox', { name: /Volume/i })
   })
 
   it('should render tubes when tubeRack is selected', () => {
     formikConfig.initialValues.labwareType = 'tubeRack'
+    when(getLabwareNameMock)
+      .calledWith(formikConfig.initialValues, false)
+      .mockReturnValue('tube')
     render(wrapInFormik(<Volume />, formikConfig))
 
     screen.getByText('Total maximum volume of each tube.')
@@ -47,6 +56,9 @@ describe('Volume', () => {
 
   it('should render tubes when aluminumBlock is selected', () => {
     formikConfig.initialValues.labwareType = 'aluminumBlock'
+    when(getLabwareNameMock)
+      .calledWith(formikConfig.initialValues, false)
+      .mockReturnValue('tube')
     render(wrapInFormik(<Volume />, formikConfig))
 
     screen.getByText('Total maximum volume of each tube.')
@@ -54,9 +66,22 @@ describe('Volume', () => {
 
   it('should render wells when wellPlate is selected', () => {
     formikConfig.initialValues.labwareType = 'wellPlate'
+    when(getLabwareNameMock)
+      .calledWith(formikConfig.initialValues, false)
+      .mockReturnValue('well')
     render(wrapInFormik(<Volume />, formikConfig))
 
     screen.getByText('Total maximum volume of each well.')
+  })
+
+  it('should render tips when tipRack is selected', () => {
+    formikConfig.initialValues.labwareType = 'tipRack'
+    when(getLabwareNameMock)
+      .calledWith(formikConfig.initialValues, false)
+      .mockReturnValue('tip')
+    render(wrapInFormik(<Volume />, formikConfig))
+
+    screen.getByText('Total maximum volume of each tip.')
   })
 
   it('should render alert when error is present', () => {

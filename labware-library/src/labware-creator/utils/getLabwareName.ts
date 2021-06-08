@@ -8,10 +8,10 @@ export const getLabwareName = (
   switch (labwareType) {
     case 'tipRack':
       return `tip${plural ? 's' : ''}`
+    case 'aluminumBlock':
     case 'tubeRack':
       return `tube${plural ? 's' : ''}`
     case 'wellPlate':
-    case 'aluminumBlock':
     case 'reservoir':
     default:
       return `well${plural ? 's' : ''}`
