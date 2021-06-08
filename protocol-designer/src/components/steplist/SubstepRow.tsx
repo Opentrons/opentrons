@@ -19,7 +19,7 @@ import type {
 import styles from './StepItem.css'
 
 type SubstepRowProps = {
-  volume: number | null | undefined | ?string,
+  volume: number | string | null | undefined ,
   source?: SubstepWellData,
   dest?: SubstepWellData,
   ingredNames: WellIngredientNames,
