@@ -24,8 +24,9 @@ class CommandQueueWorker:
     def play(self) -> None:
         """Start executing the `ProtocolEngine`'s queued commands.
 
-        The commands are executed in order, one by one, in the background via asyncio
-        tasks.
+        This returns immediately.
+        
+        Commands are executed sequentially in the background via asyncio tasks.
 
         See `wait_to_be_idle` for when execution may stop.
         """
@@ -39,8 +40,9 @@ class CommandQueueWorker:
     def pause(self) -> None:
         """Stop executing any more queued commands.
 
-        If a command is currently in the middle of executing, it will continue until
-        it's done. Further commands will be left unexecuted in the queue.
+        This will return immediately, but if a command is currently in the middle of
+        executing, it will continue until it's done. Further commands will be left
+        unexecuted in the queue.
         """
         if self._task is not None:
             self._keep_running = False
@@ -65,13 +67,12 @@ class CommandQueueWorker:
         A `CommandQueueWorker` can reach an idle state when either of the following
         happen:
 
-          * The `ProtocolEngine` reports no more commands in the queue, stopping the
-            `CommandQueueWorker` automatically.
+          * The `ProtocolEngine` reports no more commands in the queue,
+            stopping the `CommandQueueWorker` automatically.
             (Execution will not automatically resume if more commands are then added.)
           * You manually pause the `CommandQueueWorker` with `pause`.
 
-        If a command is currently executing, this method will return after that command
-        finishes.
+        This method will return only after any ongoing command executions have finished.
 
         If an exception happened while executing commands, it will be raised from this
         call.
