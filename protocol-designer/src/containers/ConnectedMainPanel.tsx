@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-import { connect } from 'react-redux'
+import { connect, MapStateToProps } from 'react-redux'
 import { Splash } from '@opentrons/components'
 import { START_TERMINAL_ITEM_ID, TerminalItemId } from '../steplist'
 import { Portal as MainPageModalPortal } from '../components/portals/MainPageModalPortal'
@@ -57,7 +57,7 @@ function MainPanelComponent(props: Props) {
   }
 }
 
-function mapStateToProps(state: BaseState): Props {
+const mapStateToProps: MapStateToProps<Props, {}, BaseState> = state => {
   return {
     page: selectors.getCurrentPage(state),
     selectedTerminalItemId: getSelectedTerminalItemId(state),
@@ -66,11 +66,4 @@ function mapStateToProps(state: BaseState): Props {
   }
 }
 
-export const ConnectedMainPanel: React.AbstractComponent<{}> = connect<
-  Props,
-  {},
-  _,
-  _,
-  _,
-  _
->(mapStateToProps)(MainPanelComponent)
+export const ConnectedMainPanel = connect(mapStateToProps)(MainPanelComponent)

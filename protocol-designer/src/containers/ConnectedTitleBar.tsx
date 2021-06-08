@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import  { Dispatch } from 'redux'
-import { connect } from 'react-redux'
+import { connect, MapStateToProps } from 'react-redux'
 
 import { TitleBar, Icon,  IconName } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
@@ -61,7 +61,7 @@ const TitleWithBetaTag = (props: TitleWithBetaTagProps) => (
   </div>
 )
 
-function mapStateToProps(state: BaseState): SP {
+const mapStateToProps: MapStateToProps<SP, {}, BaseState> = state => {
   const selectedLabwareId = labwareIngredSelectors.getSelectedLabwareId(state)
   const _page = selectors.getCurrentPage(state)
   const fileName = fileDataSelectors.protocolName(state)
@@ -207,14 +207,8 @@ const StickyTitleBar = (props: TitleBarProps) => (
   <TitleBar id="TitleBar_main" {...props} className={styles.sticky_bar} />
 )
 
-export const ConnectedTitleBar: React.AbstractComponent<{}> = connect<
-  Props,
-  {},
-  SP,
-  {},
-  _,
-  _
->(
+// ce: fix
+export const ConnectedTitleBar = connect(
   mapStateToProps,
   null,
   mergeProps

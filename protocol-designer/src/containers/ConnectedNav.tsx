@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
-import { ThunkDispatch, BaseState } from '../types'
-import { connect } from 'react-redux'
+import { BaseState } from '../types'
+import { connect, MapDispatchToProps, MapStateToProps } from 'react-redux'
 
 import { KNOWLEDGEBASE_ROOT_URL } from '../components/KnowledgeBaseLink'
 import { NavTab, TabbedNavBar, OutsideLinkTab } from '@opentrons/components'
@@ -73,14 +73,14 @@ function Nav(props: Props) {
   )
 }
 
-function mapStateToProps(state: BaseState): SP {
+const mapStateToProps: MapStateToProps<SP, {}, BaseState> = state => {
   return {
     currentPage: selectors.getCurrentPage(state),
     currentProtocolExists: fileSelectors.getCurrentProtocolExists(state),
   }
 }
 
-function mapDispatchToProps(dispatch: ThunkDispatch<*>): DP {
+const mapDispatchToProps: MapDispatchToProps<DP, {}> = dispatch => {
   return {
     handleClick: (pageName: Page) => () => {
       dispatch(actions.navigateToPage(pageName))
@@ -88,14 +88,4 @@ function mapDispatchToProps(dispatch: ThunkDispatch<*>): DP {
   }
 }
 
-export const ConnectedNav: React.AbstractComponent<OP> = connect<
-  Props,
-  {},
-  SP,
-  DP,
-  _,
-  _
->(
-  mapStateToProps,
-  mapDispatchToProps
-)(Nav)
+export const ConnectedNav = connect(mapStateToProps, mapDispatchToProps)(Nav)

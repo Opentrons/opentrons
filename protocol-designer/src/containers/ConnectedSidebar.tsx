@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-import { connect } from 'react-redux'
+import { connect, MapStateToProps } from 'react-redux'
 import { selectors } from '../navigation'
 import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors'
 
@@ -38,7 +38,7 @@ function Sidebar(props: Props) {
   return null
 }
 
-function mapStateToProps(state: BaseState): Props {
+const mapStateToProps: MapStateToProps<Props, {}, BaseState> = state => {
   const page = selectors.getCurrentPage(state)
   const liquidPlacementMode =
     labwareIngredSelectors.getSelectedLabwareId(state) != null
@@ -49,11 +49,4 @@ function mapStateToProps(state: BaseState): Props {
   }
 }
 
-export const ConnectedSidebar: React.AbstractComponent<{}> = connect<
-  Props,
-  {},
-  _,
-  _,
-  _,
-  _
->(mapStateToProps)(Sidebar)
+export const ConnectedSidebar = connect(mapStateToProps)(Sidebar)

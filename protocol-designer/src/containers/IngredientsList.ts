@@ -1,6 +1,5 @@
-import { $Diff } from 'utility-types'
 import * as React from 'react'
-import { connect } from 'react-redux'
+import { connect, MapStateToProps } from 'react-redux'
 import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors'
 import * as wellSelectionSelectors from '../top-selectors/well-contents'
 import {
@@ -23,7 +22,7 @@ type SP = Omit<
   _labwareId: string | null | undefined
 }
 
-function mapStateToProps(state: BaseState): SP {
+const mapStateToProps: MapStateToProps<SP, {}, BaseState> = state => {
   const selectedLabwareId = labwareIngredSelectors.getSelectedLabwareId(state)
   const labwareWellContents =
     (selectedLabwareId &&
@@ -58,14 +57,8 @@ function mergeProps(
   }
 }
 
-export const IngredientsList: React.AbstractComponent<{}> = connect<
-  Props,
-  {},
-  SP,
-  {},
-  _,
-  _
->(
+// ce: fix
+export const IngredientsList = connect(
   mapStateToProps,
   null,
   mergeProps

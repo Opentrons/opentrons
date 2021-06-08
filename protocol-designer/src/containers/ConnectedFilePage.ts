@@ -1,4 +1,4 @@
-import { connect } from 'react-redux'
+import { connect, MapStateToProps } from 'react-redux'
 import * as React from 'react'
 import mapValues from 'lodash/mapValues'
 import { BaseState, ThunkDispatch } from '../types'
@@ -18,7 +18,7 @@ type SP = {
   modules: Props['modules']
 }
 
-const mapStateToProps = (state: BaseState): SP => {
+const mapStateToProps: MapStateToProps<SP, {}, BaseState> = state => {
   return {
     formValues: fileSelectors.getFileMetadata(state),
     instruments: stepFormSelectors.getPipettesForInstrumentGroup(state),
@@ -56,15 +56,5 @@ function mergeProps(
   }
 }
 
-export const ConnectedFilePage: React.AbstractComponent<{}> = connect<
-  Props,
-  {},
-  SP,
-  {},
-  _,
-  _
->(
-  mapStateToProps,
-  null,
-  mergeProps
-)(FilePage)
+// ce: fix
+export const ConnectedFilePage = connect(mapStateToProps, undefined, mergeProps)
