@@ -48,7 +48,7 @@ type DP = {
 type SP = {
   customLabwareDefs: LabwareDefByDefURI,
 }
-type Props = { ...OP, ...DP, ...DNDP, ...SP }
+type Props = OP & DP & DNDP & SP
 
 export const SlotControlsComponent = (props: Props): React.Node => {
   const {

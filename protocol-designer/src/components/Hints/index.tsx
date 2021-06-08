@@ -19,7 +19,7 @@ type DP = {
   removeHint: (HintKey, boolean) => mixed,
   selectTerminalItem: TerminalItemId => mixed,
 }
-type Props = { ...SP, ...DP }
+type Props = SP & DP
 
 type State = { rememberDismissal: boolean }
 

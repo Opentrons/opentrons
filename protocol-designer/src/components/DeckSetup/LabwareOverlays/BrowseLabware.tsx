@@ -11,14 +11,14 @@ import { resetScrollElements } from '../../../ui/steps/utils'
 import styles from './LabwareOverlays.css'
 
 type OP = {
-  labwareOnDeck: LabwareOnDeck,
+  labwareOnDeck: LabwareOnDeck
 }
 
 type DP = {
-  drillDown: () => mixed,
+  drillDown: () => mixed
 }
 
-type Props = { ...OP, ...DP }
+type Props = OP & DP
 
 function BrowseLabwareOverlay(props: Props) {
   if (props.labwareOnDeck.def.parameters.isTiprack) return null

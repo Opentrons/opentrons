@@ -10,16 +10,16 @@ import type { LabwareOnDeck } from '../../../step-forms'
 import styles from './LabwareOverlays.css'
 
 type OP = {
-  labwareOnDeck: LabwareOnDeck,
-  editLiquids: () => mixed,
+  labwareOnDeck: LabwareOnDeck
+  editLiquids: () => mixed
 }
 
 type DP = {
   // TODO Ian 2018-02-16 type these fns elsewhere and import the type
-  setLabwareName: (name: ?string) => mixed,
+  setLabwareName: (name: ?string) => mixed
 }
 
-type Props = { ...OP, ...DP }
+type Props = OP & DP
 
 const NameThisLabwareComponent = (props: Props) => {
   const [inputValue, setInputValue] = React.useState('')

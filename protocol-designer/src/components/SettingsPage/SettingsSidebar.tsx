@@ -11,7 +11,7 @@ import styles from './SettingsPage.css'
 
 type SP = { currentPage: Page }
 type DP = { makeNavigateToPage: Page => () => mixed }
-type Props = { ...SP, ...DP }
+type Props = SP & DP
 
 const SettingsSidebarComponent = (props: Props) => (
   <SidePanel title={i18n.t('nav.tab_name.settings')}>

@@ -10,7 +10,7 @@ import styles from './styles.css'
 
 type OP = { terminalId: TerminalItemId }
 type DP = { selectTerminalItem: TerminalItemId => mixed }
-type Props = { ...OP, ...DP }
+type Props = OP & DP
 
 class TerminalItemLinkComponent extends React.Component<Props> {
   handleClick = () => {

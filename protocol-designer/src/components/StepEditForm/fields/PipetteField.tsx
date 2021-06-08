@@ -14,7 +14,7 @@ type OP = {
 
 type SP = { pipetteOptions: Options }
 
-type Props = { ...OP, ...SP }
+type Props = OP & SP
 
 const PipetteFieldSTP = (state: BaseState, ownProps: OP): SP => ({
   pipetteOptions: stepFormSelectors.getEquippedPipetteOptions(state),

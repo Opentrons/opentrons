@@ -35,7 +35,7 @@ type OP = {
   labwareId: ?string,
 }
 
-type Props = { ...OP, ...SP, ...DP }
+type Props = OP & SP & DP
 
 class WellSelectionInputComponent extends React.Component<Props> {
   handleOpen = () => {

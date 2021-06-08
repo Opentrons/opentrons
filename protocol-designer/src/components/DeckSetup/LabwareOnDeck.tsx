@@ -24,7 +24,7 @@ type SP = {
   highlightedWells: ?WellGroup,
 }
 
-type Props = { ...OP, ...SP }
+type Props = OP & SP
 
 const LabwareOnDeckComponent = (props: Props) => (
   <g

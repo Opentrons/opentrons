@@ -53,7 +53,7 @@ type OP = {
   stepType: StepType,
   volume: string | null,
 }
-type Props = { ...SP, ...OP }
+type Props = SP & OP
 
 const DisposalVolumeFieldComponent = (props: Props) => {
   const { propsForFields } = props

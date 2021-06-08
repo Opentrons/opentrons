@@ -16,7 +16,7 @@ type SP = {
 
 type DP = { handleClick: Page => (e: ?SyntheticEvent<>) => void }
 
-type Props = { ...SP, ...DP }
+type Props = SP & DP
 
 function Nav(props: Props) {
   const noCurrentProtocol = !props.currentProtocolExists
