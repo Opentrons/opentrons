@@ -16,13 +16,13 @@ import { TimelineAlerts } from '../components/alerts/TimelineAlerts'
 
 import { getSelectedTerminalItemId } from '../ui/steps'
 import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors'
-import { selectors,  Page } from '../navigation'
+import { selectors, Page } from '../navigation'
 import { BaseState } from '../types'
 
 type Props = {
-  page: Page,
-  selectedTerminalItemId: ?TerminalItemId,
-  ingredSelectionMode: boolean,
+  page: Page
+  selectedTerminalItemId: TerminalItemId | null | undefined
+  ingredSelectionMode: boolean
 }
 
 function MainPanelComponent(props: Props) {

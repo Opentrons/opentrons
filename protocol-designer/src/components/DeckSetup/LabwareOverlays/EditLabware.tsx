@@ -36,7 +36,7 @@ type DP = {
 }
 
 type DNDP = {
-  draggedLabware: ?LabwareOnDeck,
+  draggedLabware: LabwareOnDeck | null | undefined,
   isOver: boolean,
   connectDragSource: React.Node => React.Node,
   connectDropTarget: React.Node => React.Node,

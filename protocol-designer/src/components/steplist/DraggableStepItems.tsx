@@ -152,7 +152,7 @@ class StepItems extends React.Component<StepItemsProps, StepItemsState> {
 
 const NAV_OFFSET = 64
 
-type StepDragPreviewSP = { stepType: ?StepType, stepName: ?string }
+type StepDragPreviewSP = { stepType: StepType | null | undefined, stepName: string | null | undefined }
 
 type StepDragPreviewOP = {
   currentOffset?: { y: number, x: number },

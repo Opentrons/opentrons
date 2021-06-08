@@ -23,7 +23,7 @@ type MakeAlert = (
 ) => React.Node
 
 const AlertsComponent = (props: Props) => {
-  const makeHandleCloseWarning = (dismissId: ?string) => () => {
+  const makeHandleCloseWarning = (dismissId: string | null | undefined) => () => {
     assert(dismissId, 'expected dismissId, Alert cannot dismiss warning')
     if (dismissId) {
       props.dismissWarning(dismissId)

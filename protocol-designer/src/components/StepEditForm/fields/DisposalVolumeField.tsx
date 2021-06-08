@@ -42,7 +42,7 @@ const DropdownFormField = (props: DropdownFormFieldProps) => {
 
 type SP = {
   disposalDestinationOptions: Options,
-  maxDisposalVolume: ?number,
+  maxDisposalVolume: number | null | undefined,
 }
 type OP = {
   aspirate_airGap_checkbox?: boolean | null,

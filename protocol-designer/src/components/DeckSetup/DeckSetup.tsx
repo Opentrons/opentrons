@@ -63,7 +63,7 @@ export const DECK_LAYER_BLOCKLIST = [
 ]
 
 type Props = {
-  selectedTerminalItemId: ?TerminalItemId,
+  selectedTerminalItemId: TerminalItemId | null | undefined,
   handleClickOutside?: () => mixed,
   drilledDown: boolean,
   initialDeckSetup: InitialDeckSetup,
@@ -71,7 +71,7 @@ type Props = {
 
 type ContentsProps = {
   ...RobotWorkSpaceRenderProps,
-  selectedTerminalItemId: ?TerminalItemId,
+  selectedTerminalItemId: TerminalItemId | null | undefined,
   initialDeckSetup: InitialDeckSetup,
   showGen1MultichannelCollisionWarnings: boolean,
 }
@@ -117,8 +117,8 @@ const getModuleSlotDefs = (
 }
 
 export const getSwapBlocked = (args: {
-  hoveredLabware: ?LabwareOnDeckType,
-  draggedLabware: ?LabwareOnDeckType,
+  hoveredLabware: LabwareOnDeckType | null | undefined,
+  draggedLabware: LabwareOnDeckType | null | undefined,
   modulesById: $PropertyType<InitialDeckSetup, 'modules'>,
   customLabwareDefs: LabwareDefByDefURI,
 }): boolean => {
@@ -132,9 +132,9 @@ export const getSwapBlocked = (args: {
     return false
   }
 
-  const sourceModuleType: ?ModuleRealType =
+  const sourceModuleType: ModuleRealType | null | undefined =
     modulesById[draggedLabware.slot]?.type || null
-  const destModuleType: ?ModuleRealType =
+  const destModuleType: ModuleRealType | null | undefined =
     modulesById[hoveredLabware.slot]?.type || null
 
   const draggedLabwareIsCustom = getLabwareIsCustom(

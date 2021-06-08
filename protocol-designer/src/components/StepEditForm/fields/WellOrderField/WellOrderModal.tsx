@@ -29,13 +29,13 @@ type Props = {
   isOpen: boolean,
   closeModal: () => mixed,
   prefix: 'aspirate' | 'dispense' | 'mix',
-  firstValue: ?WellOrderOption,
-  secondValue: ?WellOrderOption,
+  firstValue: WellOrderOption | null | undefined,
+  secondValue: WellOrderOption | null | undefined,
   firstName: string,
   secondName: string,
   updateValues: (
-    firstValue: ?WellOrderOption,
-    secondValue: ?WellOrderOption
+    firstValue: WellOrderOption | null | undefined,
+    secondValue: WellOrderOption | null | undefined
   ) => void,
 }
 

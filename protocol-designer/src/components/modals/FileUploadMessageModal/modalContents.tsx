@@ -16,7 +16,9 @@ const INVALID_FILE_TYPE: ModalContents = {
   ),
 }
 
-const invalidJsonModal = (errorMessage: ?string): ModalContents => ({
+const invalidJsonModal = (
+  errorMessage: string | null | undefined
+): ModalContents => ({
   title: 'Invalid JSON file',
   body: (
     <>

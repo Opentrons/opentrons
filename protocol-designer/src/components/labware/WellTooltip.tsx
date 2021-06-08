@@ -18,7 +18,7 @@ type WellTooltipParams = {
     wellIngreds: LocationLiquidState
   ) => (e: SyntheticMouseEvent<*>) => void,
   handleMouseLeaveWell: mixed => void,
-  tooltipWellName: ?string,
+  tooltipWellName: string | null | undefined,
 }
 
 type Props = {
@@ -27,11 +27,11 @@ type Props = {
 }
 
 type State = {
-  tooltipX: ?number,
-  tooltipY: ?number,
-  tooltipWellName: ?string,
-  tooltipWellIngreds: ?LocationLiquidState,
-  tooltipOffset: ?number,
+  tooltipX: number | null | undefined,
+  tooltipY: number | null | undefined,
+  tooltipWellName: string | null | undefined,
+  tooltipWellIngreds: LocationLiquidState | null | undefined,
+  tooltipOffset: number | null | undefined,
 }
 const initialState: State = {
   tooltipX: null,

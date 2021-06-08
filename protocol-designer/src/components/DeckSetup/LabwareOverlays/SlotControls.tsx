@@ -38,7 +38,7 @@ type DNDP = {
 type OP = {
   slot: { ...DeckSlotDefinition, id: DeckSlot }, // NOTE: Ian 2019-10-22 make slot `id` more restrictive when used in PD
   moduleType: ModuleRealType | null,
-  selectedTerminalItemId: ?TerminalItemId,
+  selectedTerminalItemId: TerminalItemId | null | undefined,
   handleDragHover?: () => mixed,
 }
 type DP = {

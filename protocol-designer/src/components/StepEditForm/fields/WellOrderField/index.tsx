@@ -23,8 +23,8 @@ type Props = {
   className: string | null | undefined
   label?: string
   prefix: 'aspirate' | 'dispense' | 'mix'
-  firstValue: ?WellOrderOption
-  secondValue: ?WellOrderOption
+  firstValue: WellOrderOption | null | undefined
+  secondValue: WellOrderOption | null | undefined
   firstName: string
   secondName: string
   updateFirstWellOrder: $PropertyType<FieldProps, 'updateValue'>

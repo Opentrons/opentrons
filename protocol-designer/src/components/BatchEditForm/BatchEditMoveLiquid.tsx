@@ -49,7 +49,7 @@ const SourceDestBatchEditMoveLiquidFields = (props: {
     return pipetteId ? String(pipetteId) : null
   }
 
-  const getWellOrderFieldValue = (name: string): ?WellOrderOption => {
+  const getWellOrderFieldValue = (name: string): WellOrderOption | null | undefined => {
     const val = propsForFields[name]?.value
     if (val === 'l2r' || val === 'r2l' || val === 't2b' || val === 'b2t') {
       return val

@@ -15,7 +15,7 @@ import styles from './LabwareOverlays.css'
 
 type LabwareControlsProps = {
   labwareOnDeck: LabwareOnDeck,
-  selectedTerminalItemId: ?TerminalItemId,
+  selectedTerminalItemId: TerminalItemId | null | undefined,
   slot: DeckSlot,
   setHoveredLabware: (?LabwareOnDeck) => mixed,
   setDraggedLabware: (?LabwareOnDeck) => mixed,

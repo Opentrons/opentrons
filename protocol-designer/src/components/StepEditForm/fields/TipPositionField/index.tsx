@@ -25,7 +25,7 @@ import { FieldProps } from '../../types'
 
 type OP = {
   ...FieldProps,
-  labwareId: ?string,
+  labwareId: string | null | undefined,
   className?: string,
 }
 

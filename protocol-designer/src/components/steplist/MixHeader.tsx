@@ -7,9 +7,9 @@ import styles from './StepItem.css'
 import { LabwareTooltipContents } from './LabwareTooltipContents'
 
 type Props = {
-  volume: ?string
-  times: ?string
-  labwareNickname: ?string
+  volume: string | null | undefined
+  times: string | null | undefined
+  labwareNickname: string | null | undefined
 }
 
 export function MixHeader(props: Props): React.Node {

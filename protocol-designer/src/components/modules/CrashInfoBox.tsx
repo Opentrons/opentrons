@@ -6,8 +6,8 @@ import styles from './styles.css'
 
 type Props = {
   showDiagram?: boolean
-  magnetOnDeck: ?boolean
-  temperatureOnDeck: ?boolean
+  magnetOnDeck: boolean | null | undefined
+  temperatureOnDeck: boolean | null | undefined
 }
 
 export function CrashInfoBox(props: Props): React.Node {

@@ -16,7 +16,7 @@ type WrapperProps = { showForm: boolean, formKey: string, formProps: Props }
 
 type SP = {
   ...LiquidGroup,
-  _liquidGroupId: ?string,
+  _liquidGroupId: string | null | undefined,
   showForm: boolean,
   canDelete: $ElementType<Props, 'canDelete'>,
 }
