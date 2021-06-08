@@ -7,14 +7,14 @@ import { BaseState, ThunkDispatch } from '../../../types'
 import { selectors as uiLabwareSelectors } from '../../../ui/labware'
 import { LabwareOnDeck } from '../../../step-forms'
 type OP = {
-  labwareOnDeck: LabwareOnDeck,
+  labwareOnDeck: LabwareOnDeck
 }
 
 type SP = {
-  nickname: ?string,
+  nickname: ?string
 }
 
-type Props = { ...OP, ...SP }
+type Props = OP & SP
 
 const NameOverlay = (props: Props) => {
   const { labwareOnDeck, nickname } = props

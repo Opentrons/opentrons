@@ -161,7 +161,7 @@ type StepDragPreviewOP = {
   item: { stepId: StepIdType },
 }
 
-type StepDragPreviewProps = { ...StepDragPreviewOP, ...StepDragPreviewSP }
+type StepDragPreviewProps = StepDragPreviewOP & StepDragPreviewSP
 
 const StepDragPreview = (props: StepDragPreviewProps) => {
   const { itemType, isDragging, currentOffset, stepType, stepName } = props

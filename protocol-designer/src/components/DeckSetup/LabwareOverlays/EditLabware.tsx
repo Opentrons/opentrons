@@ -42,7 +42,7 @@ type DNDP = {
   connectDropTarget: React.Node => React.Node,
 }
 
-type Props = { ...OP, ...SP, ...DP, ...DNDP }
+type Props = OP & SP & DP & DNDP
 
 const EditLabwareComponent = (props: Props) => {
   const {
