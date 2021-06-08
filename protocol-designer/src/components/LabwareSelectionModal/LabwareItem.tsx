@@ -13,8 +13,8 @@ import {
 } from '@opentrons/shared-data'
 
 type Props = {
-  disabled?: ?boolean,
-  icon?: ?IconName,
+  disabled: boolean | null | undefined,
+  icon: IconName | null | undefined,
   labwareDef: LabwareDefinition2,
   onMouseEnter: () => any,
   onMouseLeave: () => any,

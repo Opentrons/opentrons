@@ -60,8 +60,8 @@ type State = {
 }
 
 export type Props = {
-  showProtocolFields?: ?boolean,
-  showModulesFields?: ?boolean,
+  showProtocolFields: boolean | null | undefined,
+  showModulesFields: boolean | null | undefined,
   hideModal?: boolean,
   onCancel: () => mixed,
   initialPipetteValues?: $PropertyType<FormState, 'pipettesByMount'>,

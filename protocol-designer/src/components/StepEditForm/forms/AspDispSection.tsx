@@ -5,8 +5,8 @@ import { i18n } from '../../../localization'
 import styles from '../StepEditForm.css'
 
 type Props = {
-  className?: ?string
-  collapsed?: ?boolean
+  className: string | null | undefined
+  collapsed: boolean | null | undefined
   toggleCollapsed: () => void
   prefix: 'aspirate' | 'dispense'
   children?: React.Node

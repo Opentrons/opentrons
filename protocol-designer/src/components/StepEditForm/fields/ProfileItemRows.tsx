@@ -293,7 +293,7 @@ type ProfileStepRowProps = {
   focusHandlers: FocusHandlers,
   profileStepItem: ProfileStepItem,
   stepNumber: number,
-  isCycle?: ?boolean,
+  isCycle: boolean | null | undefined,
 }
 
 const ProfileStepRow = (props: ProfileStepRowProps) => {
