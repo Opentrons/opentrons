@@ -1,27 +1,27 @@
 // @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { LabwareRender,  WellGroup } from '@opentrons/components'
+import { LabwareRender, WellGroup } from '@opentrons/components'
 
 import * as wellContentsSelectors from '../../top-selectors/well-contents'
 import * as highlightSelectors from '../../top-selectors/substep-highlight'
 import * as tipContentsSelectors from '../../top-selectors/tip-contents'
-import {  LabwareOnDeck as LabwareOnDeckType } from '../../step-forms'
+import { LabwareOnDeck as LabwareOnDeckType } from '../../step-forms'
 import { ContentsByWell } from '../../labware-ingred/types'
 import { BaseState } from '../../types'
 import { wellFillFromWellContents } from '../labware/utils'
 
 type OP = {
-  className?: string,
-  labwareOnDeck: LabwareOnDeckType,
-  x: number,
-  y: number,
+  className?: string
+  labwareOnDeck: LabwareOnDeckType
+  x: number
+  y: number
 }
 
 type SP = {
-  wellContents: ContentsByWell,
-  missingTips: ?WellGroup,
-  highlightedWells: ?WellGroup,
+  wellContents: ContentsByWell
+  missingTips: WellGroup | null | undefined
+  highlightedWells: WellGroup | null | undefined
 }
 
 type Props = OP & SP

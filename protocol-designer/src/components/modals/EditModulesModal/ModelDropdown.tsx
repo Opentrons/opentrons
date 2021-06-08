@@ -4,13 +4,13 @@ import { useField } from 'formik'
 import { DropdownField } from '@opentrons/components'
 
 type ModelDropdownProps = {
-  fieldName: string,
-  tabIndex: number,
+  fieldName: string
+  tabIndex: number
   options: Array<{
-    name: string,
-    value: string,
-    disabled?: boolean,
-  }>,
+    name: string
+    value: string
+    disabled?: boolean
+  }>
 }
 export const ModelDropdown = (props: ModelDropdownProps): React.Node => {
   const { fieldName, options, tabIndex } = props

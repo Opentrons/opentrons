@@ -12,7 +12,7 @@ type Ingreds = { [ingredId: string]: number }
 const repeatIngreds = (
   isMulti: boolean,
   colNum: string,
-  _ingreds: ?Ingreds
+  _ingreds: Ingreds | null | undefined
 ): Ingreds | Ingreds[] => {
   const ingreds = _ingreds || {}
   return isMulti

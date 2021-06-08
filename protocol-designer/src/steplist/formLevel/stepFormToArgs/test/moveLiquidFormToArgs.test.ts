@@ -19,7 +19,7 @@ const ASPIRATE_WELL = 'A2' // default source is trough for these tests
 const DISPENSE_WELL = 'C3' // default dest in 96 flat for these tests
 
 describe('move liquid step form -> command creator args', () => {
-  let hydratedForm: ?HydratedMoveLiquidFormData = null
+  let hydratedForm: HydratedMoveLiquidFormData | null | undefined = null
   const sourceLabwareDef = fixture_12_trough
   const sourceLabwareType = getLabwareDefURI(sourceLabwareDef)
   const destLabwareDef = fixture_96_plate

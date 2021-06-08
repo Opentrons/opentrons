@@ -22,7 +22,7 @@ export const MagnetForm = (props: StepFormProps): React.Node => {
   const { magnetAction, moduleId } = props.formData
   const moduleModel = moduleId ? moduleEntities[moduleId]?.model : null
 
-  const moduleOption: ?string = moduleLabwareOptions[0]
+  const moduleOption: string | null | undefined = moduleLabwareOptions[0]
     ? moduleLabwareOptions[0].name
     : 'No magnetic module'
 

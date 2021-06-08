@@ -90,7 +90,7 @@ const MessageBody = (props: { message: LabwareUploadMessage }) => {
 }
 
 type Props = {
-  message: ?LabwareUploadMessage,
+  message: LabwareUploadMessage | null | undefined,
   dismissModal: () => mixed,
   overwriteLabwareDef?: () => mixed,
 }

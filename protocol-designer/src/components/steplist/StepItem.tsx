@@ -36,7 +36,7 @@ import {
 
 export type StepItemProps = {
   description: string | null | undefined,
-  rawForm: ?FormData,
+  rawForm: FormData | null | undefined,
   stepNumber: number,
   stepType: StepType,
   title?: string,
@@ -111,15 +111,15 @@ export const StepItem = (props: StepItemProps): React.Node => {
 }
 
 export type StepItemContentsProps = {
-  rawForm: ?FormData,
+  rawForm: FormData | null | undefined,
   stepType: StepType,
-  substeps: ?SubstepItemData,
+  substeps: SubstepItemData | null | undefined,
 
   ingredNames: WellIngredientNames,
   labwareNicknamesById: { [labwareId: string]: string },
 
   highlightSubstep: SubstepIdentifier => mixed,
-  hoveredSubstep: ?SubstepIdentifier,
+  hoveredSubstep: SubstepIdentifier | null | undefined,
 }
 
 const makeDurationText = (
@@ -133,7 +133,7 @@ const makeDurationText = (
 type ProfileStepSubstepRowProps = {
   step: ProfileStepItem,
   stepNumber: number,
-  repetitionsDisplay: ?string,
+  repetitionsDisplay: string | null | undefined,
 }
 export const ProfileStepSubstepRow = (
   props: ProfileStepSubstepRowProps

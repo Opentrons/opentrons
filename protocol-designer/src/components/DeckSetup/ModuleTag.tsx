@@ -126,7 +126,7 @@ const ModuleTagComponent = (props: Props) => {
   ]
   const moduleState: ?$PropertyType<ModuleTemporalProperties, 'moduleState'> =
     timelineFrame?.robotState.modules[props.id]?.moduleState
-  const moduleType: ?ModuleRealType = moduleEntity?.type
+  const moduleType: ModuleRealType | null | undefined = moduleEntity?.type
 
   const hoveredLabwares = useSelector(uiSelectors.getHoveredStepLabware)
   const initialDeck = useSelector(stepFormSelectors.getInitialDeckSetup)

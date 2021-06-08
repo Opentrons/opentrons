@@ -15,7 +15,7 @@ import { MultiSelectToolbar } from './MultiSelectToolbar'
 import { StepIdType } from '../../form-types'
 
 type Props = {
-  isMultiSelectMode: ?boolean,
+  isMultiSelectMode: boolean | null | undefined,
   orderedStepIds: StepIdType[],
   reorderSelectedStep: (delta: number) => mixed,
   reorderSteps: (StepIdType[]) => mixed,

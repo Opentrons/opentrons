@@ -8,7 +8,7 @@ import { getModalContents } from './modalContents'
 import { FileUploadMessage } from '../../../load-file'
 
 type Props = {
-  message: ?FileUploadMessage,
+  message: FileUploadMessage | null | undefined,
   cancelProtocolMigration: (SyntheticEvent<*>) => mixed,
   dismissModal: (SyntheticEvent<*>) => mixed,
 }

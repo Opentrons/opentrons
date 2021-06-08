@@ -37,11 +37,11 @@ type Props = {
   selectLabware: (containerType: string) => mixed,
   customLabwareDefs: LabwareDefByDefURI,
   /** the slot you're literally adding labware to (may be a module slot) */
-  slot: ?DeckSlot,
+  slot: DeckSlot | null | undefined,
   /** if adding to a module, the slot of the parent (for display) */
-  parentSlot: ?DeckSlot,
+  parentSlot: DeckSlot | null | undefined,
   /** if adding to a module, the module's type */
-  moduleType: ?ModuleRealType,
+  moduleType: ModuleRealType | null | undefined,
   /** tipracks that may be added to deck (depends on pipette<>tiprack assignment) */
   permittedTipracks: string[],
 }
@@ -76,7 +76,7 @@ const RECOMMENDED_LABWARE_BY_MODULE: { [ModuleRealType]: string[] } = {
 
 export const getLabwareIsRecommended = (
   def: LabwareDefinition2,
-  moduleType: ?ModuleRealType
+  moduleType: ModuleRealType | null | undefined
 ): boolean =>
   moduleType
     ? RECOMMENDED_LABWARE_BY_MODULE[moduleType].includes(

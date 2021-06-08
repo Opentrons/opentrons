@@ -30,7 +30,7 @@ type Props = {
   createNewFile?: () => mixed
   canDownload: boolean
   onDownload: () => mixed
-  fileData: ?PDProtocolFile
+  fileData: PDProtocolFile | null | undefined
   pipettesOnDeck: $PropertyType<InitialDeckSetup, 'pipettes'>
   modulesOnDeck: $PropertyType<InitialDeckSetup, 'modules'>
   savedStepForms: SavedStepFormState

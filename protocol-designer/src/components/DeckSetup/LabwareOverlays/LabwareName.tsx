@@ -11,7 +11,7 @@ type OP = {
 }
 
 type SP = {
-  nickname: ?string
+  nickname: string | null | undefined
 }
 
 type Props = OP & SP

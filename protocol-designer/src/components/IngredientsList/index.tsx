@@ -101,7 +101,7 @@ const LiquidGroupCard = (props: LiquidGroupCardProps): React.Node => {
 }
 
 type IndividProps = {
-  name: ?string,
+  name: string | null | undefined,
   wellName: string,
   volume: number,
   // concentration?: string,
@@ -148,7 +148,7 @@ type Props = {
   ...CommonProps,
   liquidGroupsById: LiquidGroupsById,
   labwareWellContents: SingleLabwareLiquidState,
-  selectedIngredientGroupId: ?string,
+  selectedIngredientGroupId: string | null | undefined,
 }
 
 export function IngredientsList(props: Props): React.Node {

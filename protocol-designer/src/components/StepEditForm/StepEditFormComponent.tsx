@@ -18,7 +18,9 @@ import styles from './StepEditForm.css'
 import { FormData, StepType } from '../../form-types'
 import { FieldPropsByName, FocusHandlers, StepFormProps } from './types'
 
-const STEP_FORM_MAP: { [StepType]: ?React.ComponentType<StepFormProps> } = {
+const STEP_FORM_MAP: {
+  [StepType]: React.ComponentType<StepFormProps> | null | undefined
+} = {
   mix: MixForm,
   pause: PauseForm,
   moveLiquid: MoveLiquidForm,

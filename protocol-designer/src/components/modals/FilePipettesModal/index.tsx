@@ -71,7 +71,7 @@ export type Props = {
     pipettes: PipetteFieldsData[],
     modules: ModuleCreationArgs[],
   }) => mixed,
-  moduleRestrictionsDisabled: ?boolean,
+  moduleRestrictionsDisabled: boolean | null | undefined,
 }
 
 const initialFormState: FormState = {

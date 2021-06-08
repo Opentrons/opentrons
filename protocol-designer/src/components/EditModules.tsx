@@ -13,7 +13,7 @@ import { ModuleModel, ModuleRealType } from '@opentrons/shared-data'
 
 type EditModulesProps = {
   moduleToEdit: {|
-    moduleId: ?string,
+    moduleId: string | null | undefined,
     moduleType: ModuleRealType,
   },
   onCloseClick: () => mixed,

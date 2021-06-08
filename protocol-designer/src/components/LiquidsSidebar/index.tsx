@@ -14,7 +14,7 @@ import { BaseState, ThunkDispatch } from '../../types'
 
 type SP = {
   liquids: OrderedLiquids
-  selectedLiquid: ?string
+  selectedLiquid: string | null | undefined
 }
 
 type DP = {

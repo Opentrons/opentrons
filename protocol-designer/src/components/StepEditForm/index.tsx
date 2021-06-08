@@ -22,7 +22,7 @@ import { FormData, StepFieldName } from '../../form-types'
 
 type SP = {
   canSave: boolean,
-  formData: ?FormData,
+  formData: FormData | null | undefined,
   formHasChanges: boolean,
   isNewStep: boolean,
   isPristineSetTempForm: boolean,

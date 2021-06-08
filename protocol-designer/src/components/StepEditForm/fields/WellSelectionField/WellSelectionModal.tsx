@@ -28,10 +28,10 @@ import modalStyles from '../../../modals/modal.css'
 
 type WellSelectionModalProps = {
   isOpen: boolean,
-  labwareId: ?string,
+  labwareId: string | null | undefined,
   name: StepFieldName,
-  onCloseClick: (e: ?SyntheticEvent<*>) => mixed,
-  pipetteId: ?string,
+  onCloseClick: (e: SyntheticEvent<*> | null | undefined) => mixed,
+  pipetteId: string | null | undefined,
   value: mixed,
   updateValue: (?mixed) => void,
 }
@@ -41,9 +41,9 @@ type WellSelectionModalComponentProps = {
   handleSave: () => mixed,
   highlightedWells: WellGroup,
   ingredNames: WellIngredientNames,
-  labwareDef: ?LabwareDefinition2,
-  onCloseClick: (e: ?SyntheticEvent<*>) => mixed,
-  pipetteSpec: ?PipetteNameSpecs,
+  labwareDef: LabwareDefinition2 | null | undefined,
+  onCloseClick: (e: SyntheticEvent<*> | null | undefined) => mixed,
+  pipetteSpec: PipetteNameSpecs | null | undefined,
   selectedPrimaryWells: WellGroup,
   selectWells: WellGroup => mixed,
   updateHighlightedWells: WellGroup => mixed,

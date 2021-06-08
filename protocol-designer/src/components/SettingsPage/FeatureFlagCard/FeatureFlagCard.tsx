@@ -85,7 +85,7 @@ export const FeatureFlagCard = (props: Props): React.Node => {
   let flagSwitchDirection: string = 'on'
 
   if (modalFlagName) {
-    const isFlagOn: ?boolean = props.flags[modalFlagName]
+    const isFlagOn: boolean | null | undefined = props.flags[modalFlagName]
     flagSwitchDirection = isFlagOn ? 'off' : 'on'
   }
   return (

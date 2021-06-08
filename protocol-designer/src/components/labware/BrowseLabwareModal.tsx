@@ -22,7 +22,7 @@ import modalStyles from '../modals/modal.css'
 import styles from './labware.css'
 
 type SP = {
-  definition: ?LabwareDefinition2
+  definition: LabwareDefinition2 | null | undefined
   wellContents: ContentsByWell
   ingredNames: WellIngredientNames
 }

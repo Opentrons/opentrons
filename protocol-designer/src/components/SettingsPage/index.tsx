@@ -3,7 +3,7 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 
 import { BaseState } from '../../types'
-import { selectors,  Page } from '../../navigation'
+import { selectors, Page } from '../../navigation'
 import { SettingsApp } from './SettingsApp'
 
 export { SettingsSidebar } from './SettingsSidebar'
