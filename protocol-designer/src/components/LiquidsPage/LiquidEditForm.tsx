@@ -18,7 +18,7 @@ import { FormikProps } from 'formik/@flow-typed'
 import { LiquidGroup } from '../../labware-ingred/types'
 
 type Props = {
-  ...$Exact<LiquidGroup>,
+  ...LiquidGroup,
   canDelete: boolean,
   deleteLiquidGroup: () => mixed,
   cancelForm: () => mixed,

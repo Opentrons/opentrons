@@ -15,7 +15,7 @@ export type FormWarningType =
   | 'BELOW_MIN_AIR_GAP_VOLUME'
 
 export type FormWarning = {
-  ...$Exact<FormError>,
+  ...FormError,
   type: FormWarningType,
 }
 
