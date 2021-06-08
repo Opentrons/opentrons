@@ -34,7 +34,7 @@ import type {
   WellIngredientNames,
 } from '../../steplist/types'
 
-export type StepItemProps = {|
+export type StepItemProps = {
   description?: ?string,
   rawForm: ?FormData,
   stepNumber: number,
@@ -55,7 +55,7 @@ export type StepItemProps = {|
   toggleStepCollapsed: () => mixed,
   unhighlightStep: (event?: SyntheticEvent<>) => mixed,
   children?: React.Node,
-|}
+}
 
 export const StepItem = (props: StepItemProps): React.Node => {
   const {
@@ -110,7 +110,7 @@ export const StepItem = (props: StepItemProps): React.Node => {
   )
 }
 
-export type StepItemContentsProps = {|
+export type StepItemContentsProps = {
   rawForm: ?FormData,
   stepType: StepType,
   substeps: ?SubstepItemData,
@@ -120,7 +120,7 @@ export type StepItemContentsProps = {|
 
   highlightSubstep: SubstepIdentifier => mixed,
   hoveredSubstep: ?SubstepIdentifier,
-|}
+}
 
 const makeDurationText = (
   durationMinutes: string,
@@ -130,11 +130,11 @@ const makeDurationText = (
   return `${minutesText}${durationSeconds || 0}s`
 }
 
-type ProfileStepSubstepRowProps = {|
+type ProfileStepSubstepRowProps = {
   step: ProfileStepItem,
   stepNumber: number,
   repetitionsDisplay: ?string,
-|}
+}
 export const ProfileStepSubstepRow = (
   props: ProfileStepSubstepRowProps
 ): React.Node => {
@@ -176,7 +176,7 @@ export const ProfileStepSubstepRow = (
 }
 
 // this is a row under a cycle under a substep
-type ProfileCycleRowProps = {| step: ProfileStepItem, stepNumber: number |}
+type ProfileCycleRowProps = { step: ProfileStepItem, stepNumber: number }
 const ProfileCycleRow = (props: ProfileCycleRowProps): React.Node => {
   const { step, stepNumber } = props
   return (
@@ -192,10 +192,10 @@ const ProfileCycleRow = (props: ProfileCycleRowProps): React.Node => {
   )
 }
 
-type ProfileCycleSubstepGroupProps = {|
+type ProfileCycleSubstepGroupProps = {
   cycle: ProfileCycleItem,
   stepNumber: number,
-|}
+}
 export const ProfileCycleSubstepGroup = (
   props: ProfileCycleSubstepGroupProps
 ): React.Node => {
@@ -216,10 +216,10 @@ export const ProfileCycleSubstepGroup = (
   )
 }
 
-type CollapsibleSubstepProps = {|
+type CollapsibleSubstepProps = {
   children: React.Node,
   headerContent: React.Node,
-|}
+}
 const CollapsibleSubstep = (props: CollapsibleSubstepProps) => {
   const [contentCollapsed, setContentCollapsed] = React.useState<boolean>(true)
   return (

@@ -66,9 +66,9 @@ function mapStateToProps(state: BaseState): $Exact<Props> {
   }
 }
 
-export const ConnectedMainPanel: React.AbstractComponent<{||}> = connect<
+export const ConnectedMainPanel: React.AbstractComponent<{}> = connect<
   Props,
-  {||},
+  {},
   _,
   _,
   _,

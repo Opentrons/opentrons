@@ -19,17 +19,17 @@ import styles from './WellOrderInput.css'
 import type { FieldProps } from '../../types'
 import type { WellOrderOption } from '../../../../form-types'
 
-type Props = {|
-  className?: ?string,
-  label?: string,
-  prefix: 'aspirate' | 'dispense' | 'mix',
-  firstValue: ?WellOrderOption,
-  secondValue: ?WellOrderOption,
-  firstName: string,
-  secondName: string,
-  updateFirstWellOrder: $PropertyType<FieldProps, 'updateValue'>,
-  updateSecondWellOrder: $PropertyType<FieldProps, 'updateValue'>,
-|}
+type Props = {
+  className?: ?string
+  label?: string
+  prefix: 'aspirate' | 'dispense' | 'mix'
+  firstValue: ?WellOrderOption
+  secondValue: ?WellOrderOption
+  firstName: string
+  secondName: string
+  updateFirstWellOrder: $PropertyType<FieldProps, 'updateValue'>
+  updateSecondWellOrder: $PropertyType<FieldProps, 'updateValue'>
+}
 
 export const WellOrderField = (props: Props): React.Node => {
   const {

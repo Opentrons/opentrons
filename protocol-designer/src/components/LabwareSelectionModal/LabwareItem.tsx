@@ -12,14 +12,14 @@ import {
   type LabwareDefinition2,
 } from '@opentrons/shared-data'
 
-type Props = {|
+type Props = {
   disabled?: ?boolean,
   icon?: ?IconName,
   labwareDef: LabwareDefinition2,
   onMouseEnter: () => any,
   onMouseLeave: () => any,
   selectLabware: (labwareLoadName: string) => mixed,
-|}
+}
 
 const LABWARE_LIBRARY_PAGE_PATH = 'https://labware.opentrons.com'
 

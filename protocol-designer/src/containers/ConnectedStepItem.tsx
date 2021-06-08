@@ -34,11 +34,11 @@ import {
 import type { SubstepIdentifier } from '../steplist/types'
 import type { StepIdType } from '../form-types'
 
-type Props = {|
+type Props = {
   stepId: StepIdType,
   stepNumber: number,
   onStepContextMenu?: () => mixed,
-|}
+}
 
 const nonePressed = (keysPressed: Array<boolean>): boolean =>
   keysPressed.every(keyPress => keyPress === false)
@@ -47,7 +47,7 @@ const getUserOS = () => new UAParser().getOS().name
 
 const getMouseClickKeyInfo = (
   event: SyntheticMouseEvent<>
-): {| isShiftKeyPressed: boolean, isMetaKeyPressed: boolean |} => {
+): { isShiftKeyPressed: boolean, isMetaKeyPressed: boolean } => {
   const isMac: boolean = getUserOS() === 'Mac OS'
   const isShiftKeyPressed: boolean = event.shiftKey
   const isMetaKeyPressed: boolean =

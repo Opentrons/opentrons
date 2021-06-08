@@ -31,7 +31,7 @@ import styles from './styles.css'
 import type { DeckSlot } from '../../types'
 import type { LabwareDefByDefURI } from '../../labware-defs'
 
-type Props = {|
+type Props = {
   onClose: (e?: any) => mixed,
   onUploadLabware: (event: SyntheticInputEvent<HTMLInputElement>) => mixed,
   selectLabware: (containerType: string) => mixed,
@@ -44,7 +44,7 @@ type Props = {|
   moduleType: ?ModuleRealType,
   /** tipracks that may be added to deck (depends on pipette<>tiprack assignment) */
   permittedTipracks: Array<string>,
-|}
+}
 
 const LABWARE_CREATOR_URL = 'https://labware.opentrons.com/create'
 const CUSTOM_CATEGORY = 'custom'

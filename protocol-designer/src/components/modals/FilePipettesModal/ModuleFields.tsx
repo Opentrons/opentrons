@@ -13,7 +13,7 @@ import styles from './FilePipettesModal.css'
 import type { ModuleRealType } from '@opentrons/shared-data'
 import type { FormModulesByType } from '../../../step-forms'
 
-type Props = {|
+type Props = {
   // TODO 2020-3-20 use formik typing here after we update the def in flow-typed
   errors:
     | null
@@ -28,7 +28,7 @@ type Props = {|
         thermocyclerModuleType?: {
           model: string,
         },
-      |},
+      },
   touched:
     | null
     | boolean

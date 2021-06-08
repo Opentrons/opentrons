@@ -13,10 +13,10 @@ import {
   type FlagTypes,
 } from '../../../feature-flags'
 
-type Props = {|
+type Props = {
   flags: Flags,
   setFeatureFlags: (flags: Flags) => mixed,
-|}
+}
 
 export const FeatureFlagCard = (props: Props): React.Node => {
   const [modalFlagName, setModalFlagName] = React.useState<FlagTypes | null>(

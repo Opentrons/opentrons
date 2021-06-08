@@ -6,26 +6,26 @@ import { selectors as stepFormSelectors } from '../../../../step-forms'
 import type { FieldProps } from '../../types'
 import type { BaseState } from '../../../../types'
 
-type OP = {|
+type OP = {
   ...FieldProps,
   pipetteId: ?string,
   className?: $PropertyType<FlowRateInputProps, 'className'>,
   flowRateType: $PropertyType<FlowRateInputProps, 'flowRateType'>,
   label?: $PropertyType<FlowRateInputProps, 'label'>,
-|}
+}
 
-type SP = {|
+type SP = {
   innerKey: string,
   defaultFlowRate: ?number,
   minFlowRate: number,
   maxFlowRate: number,
   pipetteDisplayName: string,
-|}
+}
 
-type Props = {|
+type Props = {
   ...FlowRateInputProps,
   innerKey: string,
-|}
+}
 
 // Add a key to force re-constructing component when values change
 function FlowRateInputWithKey(props: Props) {
@@ -73,7 +73,7 @@ export const FlowRateField: React.AbstractComponent<OP> = connect<
   Props,
   OP,
   SP,
-  {||},
+  {},
   _,
   _
 >(

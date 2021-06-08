@@ -29,26 +29,26 @@ import type {
 } from '@opentrons/shared-data'
 import styles from './LabwareOverlays.css'
 
-type DNDP = {|
+type DNDP = {
   isOver: boolean,
   connectDropTarget: React.Node => React.Node,
   draggedItem: ?{ labwareOnDeck: LabwareOnDeck },
   itemType: string,
-|}
-type OP = {|
-  slot: {| ...DeckSlotDefinition, id: DeckSlot |}, // NOTE: Ian 2019-10-22 make slot `id` more restrictive when used in PD
+}
+type OP = {
+  slot: {| ...DeckSlotDefinition, id: DeckSlot }, // NOTE: Ian 2019-10-22 make slot `id` more restrictive when used in PD
   moduleType: ModuleRealType | null,
   selectedTerminalItemId: ?TerminalItemId,
   handleDragHover?: () => mixed,
 |}
-type DP = {|
+type DP = {
   addLabware: (e: SyntheticEvent<*>) => mixed,
   moveDeckItem: (DeckSlot, DeckSlot) => mixed,
-|}
-type SP = {|
+}
+type SP = {
   customLabwareDefs: LabwareDefByDefURI,
-|}
-type Props = {| ...OP, ...DP, ...DNDP, ...SP |}
+}
+type Props = { ...OP, ...DP, ...DNDP, ...SP }
 
 export const SlotControlsComponent = (props: Props): React.Node => {
   const {
@@ -169,7 +169,7 @@ const collectSlotTarget = (connect, monitor) => ({
 })
 
 export const SlotControls: React.AbstractComponent<OP> = connect<
-  {| ...OP, ...DP, ...SP |},
+  { ...OP, ...DP, ...SP },
   OP,
   _,
   DP,

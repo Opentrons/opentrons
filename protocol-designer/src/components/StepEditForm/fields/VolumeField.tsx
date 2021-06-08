@@ -14,12 +14,12 @@ import type { StepType } from '../../../form-types'
 import type { FieldProps } from '../types'
 import styles from '../StepEditForm.css'
 
-type Props = {|
+type Props = {
   ...FieldProps,
   stepType: StepType,
   label: string,
   className: string,
-|}
+}
 export const VolumeField = (props: Props): React.Node => {
   const { stepType, label, className, ...propsForVolumeField } = props
   const [targetProps, tooltipProps] = useHoverTooltip({

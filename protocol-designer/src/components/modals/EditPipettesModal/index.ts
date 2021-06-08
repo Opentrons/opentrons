@@ -22,16 +22,16 @@ import type { StepIdType } from '../../../form-types'
 
 type Props = React.ElementProps<typeof FilePipettesModal>
 
-type SP = {|
-  initialPipetteValues: FormPipettesByMount,
-  _prevPipettes: { [pipetteId: string]: PipetteOnDeck },
-  _orderedStepIds: Array<StepIdType>,
-  moduleRestrictionsDisabled: ?boolean,
-|}
+type SP = {
+  initialPipetteValues: FormPipettesByMount
+  _prevPipettes: { [pipetteId: string]: PipetteOnDeck }
+  _orderedStepIds: Array<StepIdType>
+  moduleRestrictionsDisabled: ?boolean
+}
 
-type OP = {|
-  closeModal: () => mixed,
-|}
+type OP = {
+  closeModal: () => mixed
+}
 
 const mapSTP = (state: BaseState): SP => {
   const initialPipettes = stepFormSelectors.getPipettesForEditPipetteForm(state)
@@ -68,11 +68,11 @@ const makeUpdatePipettes = (
   const usedPrevPipettes: Array<string> = [] // IDs of pipettes in prevPipettes that were already put into nextPipettes
   const nextPipettes: {
     [pipetteId: string]: {
-      mount: string,
-      name: string,
-      tiprackDefURI: string,
-      id: string,
-    },
+      mount: string
+      name: string
+      tiprackDefURI: string
+      id: string
+    }
   } = {}
 
   // from array of pipettes from Edit Pipette form (with no IDs),
@@ -195,7 +195,7 @@ const makeUpdatePipettes = (
 
 const mergeProps = (
   stateProps: SP,
-  dispatchProps: {| dispatch: ThunkDispatch<*> |},
+  dispatchProps: { dispatch: ThunkDispatch<*> },
   ownProps: OP
 ): Props => {
   const { _prevPipettes, _orderedStepIds, ...passThruStateProps } = stateProps
@@ -221,7 +221,7 @@ export const EditPipettesModal: React.AbstractComponent<OP> = connect<
   Props,
   OP,
   SP,
-  {||},
+  {},
   _,
   _
 >(

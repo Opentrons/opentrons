@@ -9,15 +9,15 @@ import { i18n } from '../../../localization'
 import type { LabwareOnDeck } from '../../../step-forms'
 import styles from './LabwareOverlays.css'
 
-type OP = {|
+type OP = {
   labwareOnDeck: LabwareOnDeck,
   editLiquids: () => mixed,
-|}
+}
 
-type DP = {|
+type DP = {
   // TODO Ian 2018-02-16 type these fns elsewhere and import the type
   setLabwareName: (name: ?string) => mixed,
-|}
+}
 
 type Props = { ...OP, ...DP }
 

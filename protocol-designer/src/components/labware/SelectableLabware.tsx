@@ -17,7 +17,7 @@ import type { ContentsByWell } from '../../labware-ingred/types'
 import type { WellIngredientNames } from '../../steplist/types'
 import type { GenericRect } from '../../collision-types'
 
-export type Props = {|
+export type Props = {
   labwareProps: $Diff<
     React.ElementProps<typeof SingleLabware>,
     { selectedWells: * }
@@ -30,7 +30,7 @@ export type Props = {|
   pipetteChannels?: ?Channels,
   ingredNames: WellIngredientNames,
   wellContents: ContentsByWell,
-|}
+}
 
 export class SelectableLabware extends React.Component<Props> {
   _getWellsFromRect: (rect: GenericRect) => WellGroup = rect => {

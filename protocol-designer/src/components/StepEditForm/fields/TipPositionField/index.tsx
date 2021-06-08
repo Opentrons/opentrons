@@ -23,18 +23,18 @@ import { getDefaultMmFromBottom } from './utils'
 import type { BaseState } from '../../../../types'
 import type { FieldProps } from '../../types'
 
-type OP = {|
+type OP = {
   ...FieldProps,
   labwareId: ?string,
   className?: string,
-|}
+}
 
-type SP = {|
+type SP = {
   mmFromBottom: number | null,
   wellDepthMm: number,
-|}
+}
 
-type Props = {| ...OP, ...SP |}
+type Props = { ...OP, ...SP }
 
 function TipPositionInput(props: Props) {
   const [isModalOpen, setModalOpen] = React.useState(false)
@@ -105,13 +105,13 @@ function TipPositionInput(props: Props) {
   )
 }
 
-type WrapperProps = {|
+type WrapperProps = {
   isTouchTipField: boolean,
   isDelayPositionField: boolean,
   children: React.Node,
   disabled: boolean,
   targetProps: $ElementType<UseHoverTooltipResult, 0>,
-|}
+}
 
 const Wrapper = (props: WrapperProps) =>
   props.isTouchTipField || props.isDelayPositionField ? (

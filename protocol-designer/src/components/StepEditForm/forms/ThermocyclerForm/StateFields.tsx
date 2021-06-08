@@ -10,11 +10,11 @@ import styles from '../../StepEditForm.css'
 import type { FieldPropsByName } from '../../types'
 import type { FormData } from '../../../../form-types'
 
-type Props = {|
-  propsForFields: FieldPropsByName,
-  isEndingHold?: boolean,
-  formData: FormData,
-|}
+type Props = {
+  propsForFields: FieldPropsByName
+  isEndingHold?: boolean
+  formData: FormData
+}
 
 export const StateFields = (props: Props): React.Node => {
   const { isEndingHold, propsForFields, formData } = props

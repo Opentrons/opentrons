@@ -3,7 +3,7 @@ import * as React from 'react'
 import { useField } from 'formik'
 import { DropdownField } from '@opentrons/components'
 
-type ModelDropdownProps = {|
+type ModelDropdownProps = {
   fieldName: string,
   disabled: boolean,
   tabIndex: number,
@@ -11,7 +11,7 @@ type ModelDropdownProps = {|
     name: string,
     value: string,
     disabled?: boolean,
-  |}>,
+  }>,
 |}
 
 export const SlotDropdown = (props: ModelDropdownProps): React.Node => {

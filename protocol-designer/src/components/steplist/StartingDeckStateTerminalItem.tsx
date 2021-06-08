@@ -9,7 +9,7 @@ import { START_TERMINAL_ITEM_ID } from '../../steplist'
 import { selectors as stepFormSelectors } from '../../step-forms'
 
 type Props = {
-  showHint: boolean,
+  showHint: boolean
 }
 
 type SP = $Exact<Props>
@@ -36,9 +36,9 @@ function mapStateToProps(state: BaseState): SP {
   return { showHint: noLabware }
 }
 
-export const StartingDeckStateTerminalItem: React.AbstractComponent<{||}> = connect<
+export const StartingDeckStateTerminalItem: React.AbstractComponent<{}> = connect<
   Props,
-  {||},
+  {},
   SP,
   _,
   _,

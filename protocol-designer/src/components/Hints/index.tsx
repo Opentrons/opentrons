@@ -14,12 +14,12 @@ import EXAMPLE_BATCH_EDIT_IMAGE from '../../images/announcements/multi_select.gi
 import type { HintKey } from '../../tutorial'
 import type { BaseState, ThunkDispatch } from '../../types'
 
-type SP = {| hintKey: ?HintKey |}
-type DP = {|
+type SP = { hintKey: ?HintKey }
+type DP = {
   removeHint: (HintKey, boolean) => mixed,
   selectTerminalItem: TerminalItemId => mixed,
-|}
-type Props = {| ...SP, ...DP |}
+}
+type Props = { ...SP, ...DP }
 
 type State = { rememberDismissal: boolean }
 
@@ -196,9 +196,9 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<*>): DP => ({
     dispatch(stepsActions.selectTerminalItem(terminalId)),
 })
 
-export const Hints: React.AbstractComponent<{||}> = connect<
+export const Hints: React.AbstractComponent<{}> = connect<
   Props,
-  {||},
+  {},
   SP,
   DP,
   _,

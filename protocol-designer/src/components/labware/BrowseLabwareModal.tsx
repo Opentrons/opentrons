@@ -21,17 +21,17 @@ import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import modalStyles from '../modals/modal.css'
 import styles from './labware.css'
 
-type SP = {|
+type SP = {
   definition: ?LabwareDefinition2,
   wellContents: ContentsByWell,
   ingredNames: WellIngredientNames,
-|}
+}
 
-type DP = {|
+type DP = {
   drillUp: () => mixed,
-|}
+}
 
-type Props = {| ...SP, ...DP |}
+type Props = { ...SP, ...DP }
 
 const BrowseLabwareModalComponent = (props: Props) => {
   const { drillUp, definition, ingredNames, wellContents } = props
@@ -86,9 +86,9 @@ function mapDispatchToProps(dispatch: ThunkDispatch<*>): DP {
   return { drillUp: () => dispatch(labwareIngredsActions.drillUpFromLabware()) }
 }
 
-export const BrowseLabwareModal: React.AbstractComponent<{||}> = connect<
+export const BrowseLabwareModal: React.AbstractComponent<{}> = connect<
   Props,
-  {||},
+  {},
   SP,
   DP,
   _,

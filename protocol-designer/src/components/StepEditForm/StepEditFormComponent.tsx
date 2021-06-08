@@ -27,19 +27,19 @@ const STEP_FORM_MAP: { [StepType]: ?React.ComponentType<StepFormProps> } = {
   thermocycler: ThermocyclerForm,
 }
 
-type Props = {|
-  canSave: boolean,
-  dirtyFields: Array<string>,
-  focusHandlers: FocusHandlers,
-  focusedField: string | null,
-  formData: FormData,
-  propsForFields: FieldPropsByName,
-  handleClose: () => mixed,
-  handleDelete: () => mixed,
-  handleSave: () => mixed,
-  showMoreOptionsModal: boolean,
-  toggleMoreOptionsModal: () => mixed,
-|}
+type Props = {
+  canSave: boolean
+  dirtyFields: Array<string>
+  focusHandlers: FocusHandlers
+  focusedField: string | null
+  formData: FormData
+  propsForFields: FieldPropsByName
+  handleClose: () => mixed
+  handleDelete: () => mixed
+  handleSave: () => mixed
+  showMoreOptionsModal: boolean
+  toggleMoreOptionsModal: () => mixed
+}
 
 export const StepEditFormComponent = (props: Props): React.Node => {
   const {

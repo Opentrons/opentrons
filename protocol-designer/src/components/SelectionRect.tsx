@@ -4,18 +4,18 @@ import * as React from 'react'
 import styles from './SelectionRect.css'
 import type { DragRect, GenericRect } from '../collision-types'
 
-type Props = {|
-  onSelectionMove?: (e: MouseEvent, GenericRect) => mixed,
-  onSelectionDone?: (e: MouseEvent, GenericRect) => mixed,
-  svg?: boolean, // set true if this is an embedded SVG
-  children?: React.Node,
-  originXOffset?: number,
-  originYOffset?: number,
-|}
+type Props = {
+  onSelectionMove?: (e: MouseEvent, GenericRect) => mixed
+  onSelectionDone?: (e: MouseEvent, GenericRect) => mixed
+  svg?: boolean // set true if this is an embedded SVG
+  children?: React.Node
+  originXOffset?: number
+  originYOffset?: number
+}
 
-type State = {|
-  positions: DragRect | null,
-|}
+type State = {
+  positions: DragRect | null
+}
 
 export class SelectionRect extends React.Component<Props, State> {
   // TODO Ian 2018-02-22 No support in Flow for SVGElement yet: https://github.com/facebook/flow/issues/2332
@@ -43,12 +43,12 @@ export class SelectionRect extends React.Component<Props, State> {
       }
 
       const clientRect: {
-        width: number,
-        height: number,
-        left: number,
-        top: number,
+        width: number
+        height: number
+        left: number
+        top: number
       } = parentRef.getBoundingClientRect()
-      const viewBox: { width: number, height: number } = parentRef.closest(
+      const viewBox: { width: number; height: number } = parentRef.closest(
         'svg'
       ).viewBox.baseVal // WARNING: elem.closest() is experiemental
 

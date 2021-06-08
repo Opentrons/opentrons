@@ -40,26 +40,26 @@ import type { FormikProps } from 'formik/@flow-typed'
 
 export type PipetteFieldsData = $Diff<
   PipetteOnDeck,
-  {| id: mixed, spec: mixed, tiprackLabwareDef: mixed |}
+  { id: mixed, spec: mixed, tiprackLabwareDef: mixed }
 >
 
-export type ModuleCreationArgs = {|
+export type ModuleCreationArgs = {
   type: ModuleRealType,
   model: string,
   slot: DeckSlot,
-|}
+}
 
-type FormState = {|
+type FormState = {
   fields: NewProtocolFields,
   pipettesByMount: FormPipettesByMount,
   modulesByType: FormModulesByType,
-|}
+}
 
-type State = {|
+type State = {
   showEditPipetteConfirmation: boolean,
-|}
+}
 
-export type Props = {|
+export type Props = {
   showProtocolFields?: ?boolean,
   showModulesFields?: ?boolean,
   hideModal?: boolean,
@@ -70,7 +70,7 @@ export type Props = {|
     newProtocolFields: NewProtocolFields,
     pipettes: Array<PipetteFieldsData>,
     modules: Array<ModuleCreationArgs>,
-  |}) => mixed,
+  }) => mixed,
   moduleRestrictionsDisabled: ?boolean,
 |}
 

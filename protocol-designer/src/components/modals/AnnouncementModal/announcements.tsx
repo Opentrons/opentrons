@@ -5,12 +5,12 @@ import { css } from 'styled-components'
 import { Flex, JUSTIFY_SPACE_AROUND, SPACING_3 } from '@opentrons/components'
 import styles from './AnnouncementModal.css'
 
-export type Announcement = {|
-  announcementKey: string,
-  image: React.Node | null,
-  heading: string,
-  message: React.Node,
-|}
+export type Announcement = {
+  announcementKey: string
+  image: React.Node | null
+  heading: string
+  message: React.Node
+}
 
 const batchEditStyles = css`
   justify-content: ${JUSTIFY_SPACE_AROUND};

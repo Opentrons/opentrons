@@ -10,14 +10,14 @@ import type { FieldPropsByName } from '../../types'
 
 import styles from '../../StepEditForm.css'
 
-type Props = {|
-  className?: ?string,
-  collapsed?: ?boolean,
-  formData: FormData,
-  prefix: 'aspirate' | 'dispense',
-  propsForFields: FieldPropsByName,
-  toggleCollapsed: () => void,
-|}
+type Props = {
+  className?: ?string
+  collapsed?: ?boolean
+  formData: FormData
+  prefix: 'aspirate' | 'dispense'
+  propsForFields: FieldPropsByName
+  toggleCollapsed: () => void
+}
 
 const makeAddFieldNamePrefix = (prefix: string) => (
   fieldName: string

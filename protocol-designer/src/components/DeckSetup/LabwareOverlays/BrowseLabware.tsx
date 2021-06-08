@@ -10,15 +10,15 @@ import { drillDownOnLabware } from '../../../labware-ingred/actions'
 import { resetScrollElements } from '../../../ui/steps/utils'
 import styles from './LabwareOverlays.css'
 
-type OP = {|
+type OP = {
   labwareOnDeck: LabwareOnDeck,
-|}
+}
 
-type DP = {|
+type DP = {
   drillDown: () => mixed,
-|}
+}
 
-type Props = {| ...OP, ...DP |}
+type Props = { ...OP, ...DP }
 
 function BrowseLabwareOverlay(props: Props) {
   if (props.labwareOnDeck.def.parameters.isTiprack) return null

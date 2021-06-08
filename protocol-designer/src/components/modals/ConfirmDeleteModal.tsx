@@ -23,11 +23,11 @@ export type DeleteModalType =
   | typeof CLOSE_BATCH_EDIT_FORM
   | typeof DELETE_MULTIPLE_STEP_FORMS
 
-type Props = {|
-  modalType: DeleteModalType,
-  onCancelClick: (event: ?SyntheticMouseEvent<>) => mixed,
-  onContinueClick: (event: SyntheticMouseEvent<>) => mixed,
-|}
+type Props = {
+  modalType: DeleteModalType
+  onCancelClick: (event: ?SyntheticMouseEvent<>) => mixed
+  onContinueClick: (event: SyntheticMouseEvent<>) => mixed
+}
 
 export function ConfirmDeleteModal(props: Props): React.Node {
   const { modalType, onCancelClick, onContinueClick } = props

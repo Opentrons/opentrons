@@ -5,13 +5,13 @@ import styles from './ModuleViz.css'
 import type { ModuleOnDeck } from '../../step-forms'
 import type { ModuleOrientation } from '../../types'
 
-type Props = {|
-  x: number,
-  y: number,
-  orientation: ModuleOrientation,
-  module: ModuleOnDeck,
-  slotName: string,
-|}
+type Props = {
+  x: number
+  y: number
+  orientation: ModuleOrientation
+  module: ModuleOnDeck
+  slotName: string
+}
 
 export const ModuleViz = (props: Props): React.Node => {
   const moduleType = props.module.type

@@ -12,16 +12,16 @@ import type {
   WellIngredientNames,
 } from '../../steplist/types'
 
-export type StepSubItemProps = {|
+export type StepSubItemProps = {
   substeps: SourceDestSubstepItem,
-|}
+}
 
-type SourceDestSubstepProps = {|
+type SourceDestSubstepProps = {
   ...StepSubItemProps,
   ingredNames: WellIngredientNames,
   selectSubstep: SubstepIdentifier => mixed,
   hoveredSubstep: ?SubstepIdentifier,
-|}
+}
 
 export function SourceDestSubstep(props: SourceDestSubstepProps): React.Node {
   const { substeps, selectSubstep, hoveredSubstep } = props
