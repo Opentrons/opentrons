@@ -36,7 +36,7 @@ class CommandQueueWorker:
             self._task = asyncio.create_task(self._loop())
 
     def pause(self) -> None:
-        """Pause queued command execution."""
+        """Equivalent to `stop`."""
         self.stop()
 
     def stop(self) -> None:
