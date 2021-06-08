@@ -67,6 +67,20 @@ describe('WellShapeAndSides', () => {
     screen.getByText('Diameter helps the robot locate the sides of the wells.')
   })
 
+  it('should render diameter field when tipRack is selected (and hide the well shape radio group),(and should not render x/y fields)', () => {
+    formikConfig.initialValues.labwareType = 'tipRack'
+    render(wrapInFormik(<WellShapeAndSides />, formikConfig))
+
+    expect(screen.getByRole('heading')).toHaveTextContent(/Tip Diameter/i)
+
+    expect(screen.queryByRole('textbox', { name: /Well X/i })).toBeNull()
+    expect(screen.queryByRole('textbox', { name: /Well Y/i })).toBeNull()
+    expect(screen.queryByRole('radio', { name: /circular/i })).toBeNull()
+    expect(screen.queryByRole('radio', { name: /rectangular/i })).toBeNull()
+
+    screen.getByRole('textbox', { name: /Diameter/i })
+  })
+
   it('should render diameter field when circular is selected (and should not render x/y fields)', () => {
     formikConfig.initialValues.wellShape = 'circular'
     render(wrapInFormik(<WellShapeAndSides />, formikConfig))
