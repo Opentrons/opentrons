@@ -27,7 +27,7 @@ type Props = {
 
 type LiquidEditFormValues = {
   name: string,
-  description?: ?string,
+  description: string | null | undefined,
   serialize?: boolean,
   ...
 }

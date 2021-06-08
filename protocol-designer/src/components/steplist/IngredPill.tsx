@@ -12,7 +12,7 @@ import styles from './StepItem.css'
 type Props = {
   ingreds: WellIngredientVolumeData,
   ingredNames: WellIngredientNames,
-  targetProps?: ?$ElementType<UseHoverTooltipResult, 0>,
+  targetProps: $ElementType<UseHoverTooltipResult, 0>| null | undefined,
 }
 
 export function IngredPill(props: Props): React.Node {

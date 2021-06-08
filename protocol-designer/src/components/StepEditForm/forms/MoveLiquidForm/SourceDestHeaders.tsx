@@ -11,8 +11,8 @@ import type { FieldPropsByName } from '../../types'
 import styles from '../../StepEditForm.css'
 
 type Props = {
-  className?: ?string
-  collapsed?: ?boolean
+  className: string | null | undefined
+  collapsed: boolean | null | undefined
   formData: FormData
   prefix: 'aspirate' | 'dispense'
   propsForFields: FieldPropsByName

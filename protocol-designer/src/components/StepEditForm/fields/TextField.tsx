@@ -6,8 +6,8 @@ import type { FieldProps } from '../types'
 type TextFieldProps = {
   ...FieldProps,
   className?: string,
-  caption?: ?string,
-  units?: ?string,
+  caption: string | null | undefined,
+  units: string | null | undefined,
 }
 
 export const TextField = (props: TextFieldProps): React.Node => {
