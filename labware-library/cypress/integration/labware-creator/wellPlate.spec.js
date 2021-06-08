@@ -130,9 +130,9 @@ context('Well Plates', () => {
 
     it('tests volume', () => {
       cy.get("input[name='wellVolume']").focus().blur()
-      cy.contains('Max volume per well must be a number').should('exist')
+      cy.contains('Volume must be a number').should('exist')
       cy.get("input[name='wellVolume']").type('100').blur()
-      cy.contains('Max volume per well must be a number').should('not.exist')
+      cy.contains('Volume must be a number').should('not.exist')
     })
 
     describe('Well shape tests', () => {
