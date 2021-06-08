@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.4.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v4.3.1...v4.4.0-alpha.0) (2021-06-08)
+
+
+### Features
+
+* **labware-creator:** add "Tip Racks" to labwareType dropdown ([#7791](https://github.com/Opentrons/opentrons/issues/7791)) ([b53f6b5](https://github.com/Opentrons/opentrons/commit/b53f6b5)), closes [#7160](https://github.com/Opentrons/opentrons/issues/7160)
+* **labware-creator:** Add custom tiprack not recommended section ([#7822](https://github.com/Opentrons/opentrons/issues/7822)) ([f7e58f5](https://github.com/Opentrons/opentrons/commit/f7e58f5)), closes [#7712](https://github.com/Opentrons/opentrons/issues/7712)
+* **labware-creator:** add dynamic footprint copy for tip racks ([#7861](https://github.com/Opentrons/opentrons/issues/7861)) ([5bb265f](https://github.com/Opentrons/opentrons/commit/5bb265f)), closes [#7715](https://github.com/Opentrons/opentrons/issues/7715)
+* **labware-creator:** Add hand placed tip fit section and alerts ([#7832](https://github.com/Opentrons/opentrons/issues/7832)) ([46431d5](https://github.com/Opentrons/opentrons/commit/46431d5)), closes [#7713](https://github.com/Opentrons/opentrons/issues/7713)
+* **labware-creator:** Add new errors for too large/small footprint ([#7846](https://github.com/Opentrons/opentrons/issues/7846)) ([dd853de](https://github.com/Opentrons/opentrons/commit/dd853de)), closes [#7163](https://github.com/Opentrons/opentrons/issues/7163) [#7792](https://github.com/Opentrons/opentrons/issues/7792)
+* **labware-creator:** autofill homogenousWells for tipRacks ([#7806](https://github.com/Opentrons/opentrons/issues/7806)) ([1594984](https://github.com/Opentrons/opentrons/commit/1594984)), closes [#7712](https://github.com/Opentrons/opentrons/issues/7712)
+* **labware-creator:** new errors for wells outside of footprint ([#7784](https://github.com/Opentrons/opentrons/issues/7784)) ([9733697](https://github.com/Opentrons/opentrons/commit/9733697)), closes [#7165](https://github.com/Opentrons/opentrons/issues/7165)
+* **labware-creator:** Update well shape and size section when tipRack is selected ([#7864](https://github.com/Opentrons/opentrons/issues/7864)) ([897d84b](https://github.com/Opentrons/opentrons/commit/897d84b)), closes [#7723](https://github.com/Opentrons/opentrons/issues/7723)
+* **labware-library:** fix mixpanel id bug ([#7761](https://github.com/Opentrons/opentrons/issues/7761)) ([6a9d611](https://github.com/Opentrons/opentrons/commit/6a9d611)), closes [#7536](https://github.com/Opentrons/opentrons/issues/7536)
+* **labware-library:** use correct type import ([#7718](https://github.com/Opentrons/opentrons/issues/7718)) ([dc84710](https://github.com/Opentrons/opentrons/commit/dc84710))
+
+
+
+
+
 ## [4.3.1](https://github.com/Opentrons/opentrons/compare/v4.3.0...v4.3.1) (2021-05-10)
 
 **Note:** Version bump only for package @opentrons/labware-library

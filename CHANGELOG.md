@@ -3,6 +3,60 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.4.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v4.3.1...v4.4.0-alpha.0) (2021-06-08)
+
+
+### Bug Fixes
+
+* **api:** add pause manager to separate pause and delay ([#7773](https://github.com/Opentrons/opentrons/issues/7773)) ([af1a29a](https://github.com/Opentrons/opentrons/commit/af1a29a))
+* **api:** Correct some type annotations in `ProtocolContext` ([#7701](https://github.com/Opentrons/opentrons/issues/7701)) ([6f01726](https://github.com/Opentrons/opentrons/commit/6f01726))
+* **api:** do not cache removed modules in thread_manager ([#7690](https://github.com/Opentrons/opentrons/issues/7690)) ([ca47a9c](https://github.com/Opentrons/opentrons/commit/ca47a9c)), closes [#5359](https://github.com/Opentrons/opentrons/issues/5359)
+* **api:** eliminate implicit creations of ThreadManager objects to avoid thread leaks leading to unit tests hanging due to too many open file descriptors. ([#7641](https://github.com/Opentrons/opentrons/issues/7641)) ([d7e94ed](https://github.com/Opentrons/opentrons/commit/d7e94ed))
+* **api:** simulation allows aspirating and dispensing on a tip rack ([#7788](https://github.com/Opentrons/opentrons/issues/7788)) ([1d624d8](https://github.com/Opentrons/opentrons/commit/1d624d8))
+* **shared-data:** fix p1000_single_gen2 literal in type union ([#7675](https://github.com/Opentrons/opentrons/issues/7675)) ([72735c2](https://github.com/Opentrons/opentrons/commit/72735c2))
+
+
+### Features
+
+* **api:** allow labware calibration on non liquid handling events ([#7812](https://github.com/Opentrons/opentrons/issues/7812)) ([26567f4](https://github.com/Opentrons/opentrons/commit/26567f4))
+* **api:** CommandTranslator._aspirate implemented. ([#7722](https://github.com/Opentrons/opentrons/issues/7722)) ([24d6f15](https://github.com/Opentrons/opentrons/commit/24d6f15)), closes [#7434](https://github.com/Opentrons/opentrons/issues/7434)
+* **api:** CommandTranslator._dispense implemented. ([#7734](https://github.com/Opentrons/opentrons/issues/7734)) ([5c1b694](https://github.com/Opentrons/opentrons/commit/5c1b694)), closes [#7435](https://github.com/Opentrons/opentrons/issues/7435)
+* **api:** CommandTranslator._drop_tip implemented. ([#7743](https://github.com/Opentrons/opentrons/issues/7743)) ([08e9a1e](https://github.com/Opentrons/opentrons/commit/08e9a1e)), closes [#7433](https://github.com/Opentrons/opentrons/issues/7433)
+* **api:** expand emulators and integration tests. ([#7739](https://github.com/Opentrons/opentrons/issues/7739)) ([448325a](https://github.com/Opentrons/opentrons/commit/448325a))
+* **api:** implement CommandTranslator._pick_up ([#7744](https://github.com/Opentrons/opentrons/issues/7744)) ([d3552eb](https://github.com/Opentrons/opentrons/commit/d3552eb))
+* **api:** implement JsonFileRunner ([#7797](https://github.com/Opentrons/opentrons/issues/7797)) ([6209f71](https://github.com/Opentrons/opentrons/commit/6209f71))
+* **api:** JSON protocol labware loading support in Protocol Engine ([#7762](https://github.com/Opentrons/opentrons/issues/7762)) ([8bbb5ef](https://github.com/Opentrons/opentrons/commit/8bbb5ef)), closes [#7429](https://github.com/Opentrons/opentrons/issues/7429)
+* **api:** JSON protocol pipette loading support in Protocol Engine  ([#7766](https://github.com/Opentrons/opentrons/issues/7766)) ([7aa9034](https://github.com/Opentrons/opentrons/commit/7aa9034)), closes [#7430](https://github.com/Opentrons/opentrons/issues/7430)
+* **api,robot-server:** Add Dockerfile and docker-compose file ([#7836](https://github.com/Opentrons/opentrons/issues/7836)) ([f89a660](https://github.com/Opentrons/opentrons/commit/f89a660)), closes [#7674](https://github.com/Opentrons/opentrons/issues/7674)
+* **api,robot-server:** hardware emulation integration ([#7821](https://github.com/Opentrons/opentrons/issues/7821)) ([e21b870](https://github.com/Opentrons/opentrons/commit/e21b870))
+* **components, protocol-library:** pass thru semantic 'disabled' attr to InputField elem ([#7759](https://github.com/Opentrons/opentrons/issues/7759)) ([1ec53d1](https://github.com/Opentrons/opentrons/commit/1ec53d1))
+* **emulator:** allow overriding pipettes used by smoothie emulator ([#7868](https://github.com/Opentrons/opentrons/issues/7868)) ([de05ed1](https://github.com/Opentrons/opentrons/commit/de05ed1))
+* **labware-creator:** add "Tip Racks" to labwareType dropdown ([#7791](https://github.com/Opentrons/opentrons/issues/7791)) ([b53f6b5](https://github.com/Opentrons/opentrons/commit/b53f6b5)), closes [#7160](https://github.com/Opentrons/opentrons/issues/7160)
+* **labware-creator:** Add custom tiprack not recommended section ([#7822](https://github.com/Opentrons/opentrons/issues/7822)) ([f7e58f5](https://github.com/Opentrons/opentrons/commit/f7e58f5)), closes [#7712](https://github.com/Opentrons/opentrons/issues/7712)
+* **labware-creator:** add dynamic footprint copy for tip racks ([#7861](https://github.com/Opentrons/opentrons/issues/7861)) ([5bb265f](https://github.com/Opentrons/opentrons/commit/5bb265f)), closes [#7715](https://github.com/Opentrons/opentrons/issues/7715)
+* **labware-creator:** Add hand placed tip fit section and alerts ([#7832](https://github.com/Opentrons/opentrons/issues/7832)) ([46431d5](https://github.com/Opentrons/opentrons/commit/46431d5)), closes [#7713](https://github.com/Opentrons/opentrons/issues/7713)
+* **labware-creator:** Add new errors for too large/small footprint ([#7846](https://github.com/Opentrons/opentrons/issues/7846)) ([dd853de](https://github.com/Opentrons/opentrons/commit/dd853de)), closes [#7163](https://github.com/Opentrons/opentrons/issues/7163) [#7792](https://github.com/Opentrons/opentrons/issues/7792)
+* **labware-creator:** autofill homogenousWells for tipRacks ([#7806](https://github.com/Opentrons/opentrons/issues/7806)) ([1594984](https://github.com/Opentrons/opentrons/commit/1594984)), closes [#7712](https://github.com/Opentrons/opentrons/issues/7712)
+* **labware-creator:** new errors for wells outside of footprint ([#7784](https://github.com/Opentrons/opentrons/issues/7784)) ([9733697](https://github.com/Opentrons/opentrons/commit/9733697)), closes [#7165](https://github.com/Opentrons/opentrons/issues/7165)
+* **labware-creator:** Update well shape and size section when tipRack is selected ([#7864](https://github.com/Opentrons/opentrons/issues/7864)) ([897d84b](https://github.com/Opentrons/opentrons/commit/897d84b)), closes [#7723](https://github.com/Opentrons/opentrons/issues/7723)
+* **labware-library:** fix mixpanel id bug ([#7761](https://github.com/Opentrons/opentrons/issues/7761)) ([6a9d611](https://github.com/Opentrons/opentrons/commit/6a9d611)), closes [#7536](https://github.com/Opentrons/opentrons/issues/7536)
+* **labware-library:** use correct type import ([#7718](https://github.com/Opentrons/opentrons/issues/7718)) ([dc84710](https://github.com/Opentrons/opentrons/commit/dc84710))
+* **protocol-designer:** Add batch edit hint modal ([#7626](https://github.com/Opentrons/opentrons/issues/7626)) ([0ff9179](https://github.com/Opentrons/opentrons/commit/0ff9179)), closes [#7488](https://github.com/Opentrons/opentrons/issues/7488)
+* **protocol-designer:** add DOM identifiers for e2e tests ([#7667](https://github.com/Opentrons/opentrons/issues/7667)) ([d4e43e1](https://github.com/Opentrons/opentrons/commit/d4e43e1)), closes [#7607](https://github.com/Opentrons/opentrons/issues/7607)
+* **protocol-designer:** add form level volume error to mix form ([#7625](https://github.com/Opentrons/opentrons/issues/7625)) ([3393368](https://github.com/Opentrons/opentrons/commit/3393368))
+* **protocol-designer:** Add tooltip for indeterminate checkboxes ([#7614](https://github.com/Opentrons/opentrons/issues/7614)) ([b1f43fb](https://github.com/Opentrons/opentrons/commit/b1f43fb)), closes [#7491](https://github.com/Opentrons/opentrons/issues/7491)
+* **protocol-designer:** remove FF and bump version for batch edit mix ([#7679](https://github.com/Opentrons/opentrons/issues/7679)) ([1968164](https://github.com/Opentrons/opentrons/commit/1968164)), closes [#7560](https://github.com/Opentrons/opentrons/issues/7560)
+* **protocol-designer:** show default tooltips when no indeterminate available ([#7714](https://github.com/Opentrons/opentrons/issues/7714)) ([c623f0c](https://github.com/Opentrons/opentrons/commit/c623f0c)), closes [#7711](https://github.com/Opentrons/opentrons/issues/7711)
+* **protocol-engine:** add load_pipette method to engine-backed ProtocolContext ([#7676](https://github.com/Opentrons/opentrons/issues/7676)) ([7ca8f76](https://github.com/Opentrons/opentrons/commit/7ca8f76)), closes [#7437](https://github.com/Opentrons/opentrons/issues/7437)
+* **protocol-engine:** InstrumentContext implements dispense ([#7640](https://github.com/Opentrons/opentrons/issues/7640)) ([a4a2d11](https://github.com/Opentrons/opentrons/commit/a4a2d11))
+* **protocol-engine:** Support `InstrumentContext.aspirate()` ([#7630](https://github.com/Opentrons/opentrons/issues/7630)) ([6e259f2](https://github.com/Opentrons/opentrons/commit/6e259f2))
+* **robot-server:** Clarify "local connection only" error message ([#7686](https://github.com/Opentrons/opentrons/issues/7686)) ([5d04dc4](https://github.com/Opentrons/opentrons/commit/5d04dc4))
+* **robot-server:** http protocol upload supports custom labware. ([#7694](https://github.com/Opentrons/opentrons/issues/7694)) ([4ad824c](https://github.com/Opentrons/opentrons/commit/4ad824c)), closes [#7148](https://github.com/Opentrons/opentrons/issues/7148)
+
+
+
+
+
 ## [4.3.1](https://github.com/Opentrons/opentrons/compare/v4.3.0...v4.3.1) (2021-05-10)
 
 ### Bug Fixes
