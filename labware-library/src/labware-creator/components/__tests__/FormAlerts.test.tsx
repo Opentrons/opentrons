@@ -16,6 +16,7 @@ const getIsHiddenMock = getIsHidden as jest.MockedFunction<typeof getIsHidden>
 
 describe('FormAlerts', () => {
   afterEach(() => {
+    jest.restoreAllMocks()
     resetAllWhenMocks()
   })
   it('should render a warning when an input is not valid', () => {

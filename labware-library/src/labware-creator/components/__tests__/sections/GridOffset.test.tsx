@@ -1,7 +1,7 @@
 import React from 'react'
 import { FormikConfig } from 'formik'
 import isEqual from 'lodash/isEqual'
-import { when } from 'jest-when'
+import { when, resetAllWhenMocks } from 'jest-when'
 import { render, screen } from '@testing-library/react'
 import { nestedTextMatcher } from '../../__testUtils__/nestedTextMatcher'
 import { getDefaultFormState, LabwareFields } from '../../../fields'
@@ -57,6 +57,7 @@ describe('GridOffset', () => {
 
   afterEach(() => {
     jest.restoreAllMocks()
+    resetAllWhenMocks()
   })
 
   it('should render when fields are visible', () => {

@@ -1,7 +1,7 @@
 import React from 'react'
 import { FormikConfig } from 'formik'
 import isEqual from 'lodash/isEqual'
-import { when } from 'jest-when'
+import { when, resetAllWhenMocks } from 'jest-when'
 import { render, screen } from '@testing-library/react'
 import { getDefaultFormState, LabwareFields } from '../../../fields'
 import { isEveryFieldHidden } from '../../../utils'
@@ -75,6 +75,7 @@ describe('Height Section with Alerts', () => {
 
   afterEach(() => {
     jest.restoreAllMocks()
+    resetAllWhenMocks()
   })
 
   it('should render text fields and alerts when fields are visible', () => {
