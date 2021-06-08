@@ -31,7 +31,7 @@ type Props = React.ElementProps<typeof TitleBar>
 type DP = { onBackClick: $PropertyType<Props, 'onBackClick'> }
 
 type SP = {
-  ...$Diff<$Exact<Props>, DP>,
+  ...$Diff<Props, DP>,
   _page: Page,
   _liquidPlacementMode?: boolean,
   _wellSelectionMode?: boolean,

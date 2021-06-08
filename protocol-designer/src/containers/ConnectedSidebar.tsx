@@ -38,7 +38,7 @@ function Sidebar(props: Props) {
   return null
 }
 
-function mapStateToProps(state: BaseState): $Exact<Props> {
+function mapStateToProps(state: BaseState): Props {
   const page = selectors.getCurrentPage(state)
   const liquidPlacementMode =
     labwareIngredSelectors.getSelectedLabwareId(state) != null

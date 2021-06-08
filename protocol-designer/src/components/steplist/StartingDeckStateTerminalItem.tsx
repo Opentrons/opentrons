@@ -12,7 +12,7 @@ type Props = {
   showHint: boolean
 }
 
-type SP = $Exact<Props>
+type SP = Props
 
 function StartingDeckStateTerminalItemComponent(props: Props) {
   const { showHint } = props

@@ -15,7 +15,7 @@ type Props = React.ElementProps<typeof LiquidEditForm>
 type WrapperProps = { showForm: boolean, formKey: string, formProps: Props }
 
 type SP = {
-  ...$Exact<LiquidGroup>,
+  ...LiquidGroup,
   _liquidGroupId: ?string,
   showForm: boolean,
   canDelete: $ElementType<Props, 'canDelete'>,
