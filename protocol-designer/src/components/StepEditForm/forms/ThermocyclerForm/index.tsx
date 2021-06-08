@@ -11,7 +11,7 @@ import { ProfileItemRows, RadioGroupField } from '../../fields'
 import { StateFields } from './StateFields'
 import { ProfileSettings } from './ProfileSettings'
 import styles from '../../StepEditForm.css'
-import type { StepFormProps } from '../../types'
+import { StepFormProps } from '../../types'
 
 export const ThermocyclerForm = (props: StepFormProps): React.Node => {
   const { focusHandlers, propsForFields, formData } = props

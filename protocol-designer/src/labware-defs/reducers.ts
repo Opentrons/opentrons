@@ -6,15 +6,15 @@ import {
   getLabwareDefURI,
   getLabwareDefIsStandard,
 } from '@opentrons/shared-data'
-import type { Reducer } from 'redux'
-import type { Action } from '../types'
-import type { LabwareUploadMessage, LabwareDefByDefURI } from './types'
-import type {
+import { Reducer } from 'redux'
+import { Action } from '../types'
+import { LabwareUploadMessage, LabwareDefByDefURI } from './types'
+import {
   CreateCustomLabwareDef,
   LabwareUploadMessageAction,
   ReplaceCustomLabwareDef,
 } from './actions'
-import type { LoadFileAction } from '../load-file'
+import { LoadFileAction } from '../load-file'
 const customDefs = handleActions(
   {
     CREATE_CUSTOM_LABWARE_DEF: (

@@ -8,16 +8,16 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { SPAN7_8_10_11_SLOT, TC_SPAN_SLOTS } from '../../constants'
-import type { DeckSlotId, ModuleRealType } from '@opentrons/shared-data'
-import type {
+import { DeckSlotId, ModuleRealType } from '@opentrons/shared-data'
+import {
   NormalizedPipette,
   NormalizedPipetteById,
   PipetteEntity,
   PipetteEntities,
 } from '@opentrons/step-generation'
-import type { LabwareDefByDefURI } from '../../labware-defs'
-import type { DeckSlot } from '../../types'
-import type {
+import { LabwareDefByDefURI } from '../../labware-defs'
+import { DeckSlot } from '../../types'
+import {
   InitialDeckSetup,
   ModuleOnDeck,
   FormPipettesByMount,

@@ -16,8 +16,8 @@ import { CrashInfoBox } from './CrashInfoBox'
 import { ModuleRow } from './ModuleRow'
 import { isModuleWithCollisionIssue } from './utils'
 import styles from './styles.css'
-import type { ModuleRealType } from '@opentrons/shared-data'
-import type { ModulesForEditModulesCard } from '../../step-forms'
+import { ModuleRealType } from '@opentrons/shared-data'
+import { ModulesForEditModulesCard } from '../../step-forms'
 
 type Props = {
   modules: ModulesForEditModulesCard

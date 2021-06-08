@@ -16,7 +16,7 @@ import { CrashInfoBox } from '../../../modules'
 import { StepChangesConfirmModal } from '../../EditPipettesModal/StepChangesConfirmModal'
 import { PipetteFields } from '../PipetteFields'
 import { ModuleFields } from '../ModuleFields'
-import { FilePipettesModal, type Props } from '../'
+import { FilePipettesModal, Props } from '../'
 
 describe('FilePipettesModal', () => {
   const tiprackDefURI = 'tiprack_300'

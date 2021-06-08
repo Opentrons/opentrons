@@ -26,7 +26,7 @@ import {
   CLOSE_UNSAVED_STEP_FORM,
 } from './modals/ConfirmDeleteModal'
 import { Portal } from './portals/MainPageModalPortal'
-import { stepIconsByType, type StepType } from '../form-types'
+import { stepIconsByType, StepType } from '../form-types'
 import styles from './listButtons.css'
 
 type StepButtonComponentProps = {

@@ -3,7 +3,7 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import cx from 'classnames'
 import { AlertModal, Icon, OutlineButton } from '@opentrons/components'
-import { opentronsWebApi, type GateStage } from '../../../networking'
+import { opentronsWebApi,  GateStage } from '../../../networking'
 import { i18n } from '../../../localization'
 import { writeFakeIdentityCookie } from '../../../networking/opentronsWebApi'
 import CHECK_EMAIL_IMAGE from '../../../images/youve_got_mail.svg'
@@ -11,7 +11,7 @@ import {
   actions as analyticsActions,
   selectors as analyticsSelectors,
 } from '../../../analytics'
-import type { BaseState, ThunkDispatch } from '../../../types'
+import { BaseState, ThunkDispatch } from '../../../types'
 import settingsStyles from '../../SettingsPage/SettingsPage.css'
 import modalStyles from '../modal.css'
 import { SignUpForm } from './SignUpForm'

@@ -20,12 +20,9 @@ import {
   volumeInCapacityForMulti,
   DISPOSAL_VOL_DIGITS,
 } from './utils'
-import type {
-  LabwareEntities,
-  PipetteEntities,
-} from '@opentrons/step-generation'
-import type { FormData, StepFieldName } from '../../../form-types'
-import type { FormPatch } from '../../actions/types'
+import { LabwareEntities, PipetteEntities } from '@opentrons/step-generation'
+import { FormData, StepFieldName } from '../../../form-types'
+import { FormPatch } from '../../actions/types'
 import {
   getMinPipetteVolume,
   getPipetteCapacity,

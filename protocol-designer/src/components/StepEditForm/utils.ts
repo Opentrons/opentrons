@@ -8,11 +8,11 @@ import {
 import { i18n } from '../../localization'
 import { PROFILE_CYCLE } from '../../form-types'
 import { getDefaultsForStepType } from '../../steplist/formLevel/getDefaultsForStepType'
-import type { Options } from '@opentrons/components'
-import type { ProfileFormError } from '../../steplist/formLevel/profileErrors'
-import type { FormWarning } from '../../steplist/formLevel/warnings'
-import type { StepFormErrors } from '../../steplist/types'
-import type {
+import { Options } from '@opentrons/components'
+import { ProfileFormError } from '../../steplist/formLevel/profileErrors'
+import { FormWarning } from '../../steplist/formLevel/warnings'
+import { StepFormErrors } from '../../steplist/types'
+import {
   FormData,
   ProfileItem,
   StepFieldName,

@@ -14,7 +14,7 @@ import {
   MAGNETIC_MODULE_V1,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import type { RootState as LabwareDefsRootState } from '../../labware-defs'
+import { RootState as LabwareDefsRootState } from '../../labware-defs'
 import { rootReducer as labwareDefsRootReducer } from '../../labware-defs'
 import { uuid } from '../../utils'
 import {
@@ -46,17 +46,17 @@ import {
 import { getLabwareOnModule } from '../../ui/modules/utils'
 import { nestedCombineReducers } from './nestedCombineReducers'
 import { PROFILE_CYCLE, PROFILE_STEP } from '../../form-types'
-import type { Reducer } from 'redux'
-import type { NormalizedPipetteById } from '@opentrons/step-generation'
-import type { LoadFileAction } from '../../load-file'
-import type {
+import { Reducer } from 'redux'
+import { NormalizedPipetteById } from '@opentrons/step-generation'
+import { LoadFileAction } from '../../load-file'
+import {
   CreateContainerAction,
   DeleteContainerAction,
   DuplicateLabwareAction,
   SwapSlotContentsAction,
 } from '../../labware-ingred/actions'
-import type { ReplaceCustomLabwareDef } from '../../labware-defs/actions'
-import type {
+import { ReplaceCustomLabwareDef } from '../../labware-defs/actions'
+import {
   FormData,
   StepIdType,
   StepType,
@@ -64,12 +64,12 @@ import type {
   ProfileCycleItem,
   ProfileStepItem,
 } from '../../form-types'
-import type {
+import {
   FileLabware,
   FilePipette,
   FileModule,
 } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
-import type {
+import {
   CancelStepFormAction,
   ChangeFormInputAction,
   ChangeSavedStepFormAction,
@@ -85,7 +85,7 @@ import type {
   EditProfileStepAction,
   FormPatch,
 } from '../../steplist/actions'
-import type {
+import {
   AddStepAction,
   DuplicateStepAction,
   DuplicateMultipleStepsAction,
@@ -94,13 +94,13 @@ import type {
   SelectTerminalItemAction,
   SelectMultipleStepsAction,
 } from '../../ui/steps/actions/types'
-import type { SaveStepFormAction } from '../../ui/steps/actions/thunks'
-import type {
+import { SaveStepFormAction } from '../../ui/steps/actions/thunks'
+import {
   NormalizedLabware,
   NormalizedLabwareById,
   ModuleEntities,
 } from '../types'
-import type {
+import {
   CreateModuleAction,
   CreatePipettesAction,
   DeleteModuleAction,

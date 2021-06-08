@@ -19,7 +19,7 @@ import {
 import { OLDEST_MIGRATEABLE_VERSION } from '../../load-file/migration'
 import { FeatureFlagCard } from './FeatureFlagCard'
 import styles from './SettingsPage.css'
-import type { BaseState, ThunkDispatch } from '../../types'
+import { BaseState, ThunkDispatch } from '../../types'
 
 type Props = {
   canClearHintDismissals: boolean

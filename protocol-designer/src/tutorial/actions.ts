@@ -1,4 +1,4 @@
-import type { HintKey } from './index'
+import { HintKey } from './index'
 export type AddHintAction = {
   type: 'ADD_HINT'
   payload: {

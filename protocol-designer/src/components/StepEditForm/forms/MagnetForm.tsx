@@ -11,7 +11,7 @@ import { maskField } from '../../../steplist/fieldLevel'
 import { TextField, RadioGroupField } from '../fields'
 import styles from '../StepEditForm.css'
 
-import type { StepFormProps } from '../types'
+import { StepFormProps } from '../types'
 
 export const MagnetForm = (props: StepFormProps): React.Node => {
   const moduleLabwareOptions = useSelector(

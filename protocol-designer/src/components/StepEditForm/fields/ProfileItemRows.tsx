@@ -25,12 +25,12 @@ import {
 } from '../../modals/ConfirmDeleteModal'
 import { getDynamicFieldFocusHandlerId } from '../utils'
 import styles from '../StepEditForm.css'
-import type {
+import {
   ProfileStepItem,
   ProfileItem,
   ProfileCycleItem,
 } from '../../../form-types'
-import type { FocusHandlers } from '../types'
+import { FocusHandlers } from '../types'
 
 export const showProfileFieldErrors = ({
   fieldId,

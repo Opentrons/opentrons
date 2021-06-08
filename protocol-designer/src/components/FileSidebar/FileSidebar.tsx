@@ -16,9 +16,9 @@ import { getUnusedEntities } from './utils'
 import modalStyles from '../modals/modal.css'
 import styles from './FileSidebar.css'
 
-import type { HintKey } from '../../tutorial'
-import type { PDProtocolFile } from '../../file-types'
-import type {
+import { HintKey } from '../../tutorial'
+import { PDProtocolFile } from '../../file-types'
+import {
   InitialDeckSetup,
   SavedStepFormState,
   ModuleOnDeck,

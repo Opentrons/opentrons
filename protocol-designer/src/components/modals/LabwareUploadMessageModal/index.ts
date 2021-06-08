@@ -6,8 +6,8 @@ import {
   actions as labwareDefActions,
 } from '../../../labware-defs'
 import { LabwareUploadMessageModal as LabwareUploadMessageModalComponent } from './LabwareUploadMessageModal'
-import type { Dispatch } from 'redux'
-import type { BaseState } from '../../../types'
+import { Dispatch } from 'redux'
+import { BaseState } from '../../../types'
 type Props = React.ElementProps<typeof LabwareUploadMessageModalComponent>
 type SP = {
   message: Props['message']

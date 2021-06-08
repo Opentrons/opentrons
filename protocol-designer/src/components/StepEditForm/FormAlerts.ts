@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
-import type { Props } from '../alerts/Alerts'
+import { Props } from '../alerts/Alerts'
 import { Alerts } from '../alerts/Alerts'
 import {
   actions as dismissActions,
@@ -13,10 +13,10 @@ import {
   getVisibleFormWarnings,
   getVisibleProfileFormLevelErrors,
 } from './utils'
-import type { Dispatch } from 'redux'
-import type { StepIdType } from '../../form-types'
-import type { StepFieldName } from '../../steplist/fieldLevel'
-import type { BaseState } from '../../types'
+import { Dispatch } from 'redux'
+import { StepIdType } from '../../form-types'
+import { StepFieldName } from '../../steplist/fieldLevel'
+import { BaseState } from '../../types'
 
 /* TODO:  BC 2018-09-13 move to src/components/alerts and adapt and use src/components/alerts/Alerts
  * see #1814 for reference

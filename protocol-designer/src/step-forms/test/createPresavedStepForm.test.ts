@@ -13,7 +13,7 @@ import {
   DEFAULT_DELAY_SECONDS,
   DEFAULT_MM_FROM_BOTTOM_DISPENSE,
 } from '../../constants'
-import type { CreatePresavedStepFormArgs } from '../utils/createPresavedStepForm'
+import { CreatePresavedStepFormArgs } from '../utils/createPresavedStepForm'
 import { createPresavedStepForm } from '../utils/createPresavedStepForm'
 const stepId = 'stepId123'
 const EXAMPLE_ENGAGE_HEIGHT = '18'

@@ -16,8 +16,8 @@ import styles from './LiquidPlacementForm.css'
 import formStyles from '../forms/forms.css'
 import stepEditFormStyles from '../StepEditForm/StepEditForm.css'
 
-import type { Options } from '@opentrons/components'
-import type { FormikProps } from 'formik/@flow-typed'
+import { Options } from '@opentrons/components'
+import { FormikProps } from 'formik/@flow-typed'
 
 type ValidFormValues = {
   selectedLiquidId: string,

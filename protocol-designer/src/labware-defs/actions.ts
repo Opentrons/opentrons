@@ -12,9 +12,9 @@ import {
 } from '@opentrons/shared-data'
 import * as labwareDefSelectors from './selectors'
 import { getAllWellSetsForLabware } from '../utils'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { ThunkAction } from '../types'
-import type { LabwareUploadMessage } from './types'
+import { LabwareDefinition2 } from '@opentrons/shared-data'
+import { ThunkAction } from '../types'
+import { LabwareUploadMessage } from './types'
 export type LabwareUploadMessageAction = {
   type: 'LABWARE_UPLOAD_MESSAGE'
   payload: LabwareUploadMessage

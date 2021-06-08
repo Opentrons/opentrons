@@ -20,12 +20,12 @@ import { selectWells, deselectWells } from '../well-selection/actions'
 
 import styles from './LiquidPlacementModal.css'
 
-import type { Dispatch } from 'redux'
-import type { WellGroup } from '@opentrons/components'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { BaseState } from '../types'
-import type { ContentsByWell } from '../labware-ingred/types'
-import type { WellIngredientNames } from '../steplist'
+import { Dispatch } from 'redux'
+import { WellGroup } from '@opentrons/components'
+import { LabwareDefinition2 } from '@opentrons/shared-data'
+import { BaseState } from '../types'
+import { ContentsByWell } from '../labware-ingred/types'
+import { WellIngredientNames } from '../steplist'
 
 type SP = {
   selectedWells: WellGroup,

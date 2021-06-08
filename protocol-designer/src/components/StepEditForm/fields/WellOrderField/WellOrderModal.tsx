@@ -11,7 +11,7 @@ import {
   DropdownField,
 } from '@opentrons/components'
 import modalStyles from '../../../modals/modal.css'
-import type { WellOrderOption } from '../../../../form-types'
+import { WellOrderOption } from '../../../../form-types'
 
 import { WellOrderViz } from './WellOrderViz'
 import styles from './WellOrderInput.css'

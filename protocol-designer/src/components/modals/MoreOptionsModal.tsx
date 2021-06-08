@@ -10,9 +10,9 @@ import {
 
 import { i18n } from '../../localization'
 import { actions as steplistActions } from '../../steplist'
-import type { StepFieldName } from '../../steplist/fieldLevel'
-import type { FormData } from '../../form-types'
-import type { ThunkDispatch } from '../../types'
+import { StepFieldName } from '../../steplist/fieldLevel'
+import { FormData } from '../../form-types'
+import { ThunkDispatch } from '../../types'
 import modalStyles from './modal.css'
 import styles from './MoreOptionsModal.css'
 

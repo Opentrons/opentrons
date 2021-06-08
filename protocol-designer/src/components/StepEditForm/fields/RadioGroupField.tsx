@@ -1,8 +1,8 @@
 // @flow
 import * as React from 'react'
 import { RadioGroup } from '@opentrons/components'
-import type { StepFieldName } from '../../../steplist/fieldLevel'
-import type { FieldProps } from '../types'
+import { StepFieldName } from '../../../steplist/fieldLevel'
+import { FieldProps } from '../types'
 
 type RadioGroupFieldProps = {
   ...FieldProps,

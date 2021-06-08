@@ -15,8 +15,8 @@ import { getOnlyLatestDefs } from '../../../../labware-defs/utils'
 import { PipetteFields } from '../PipetteFields'
 import { PipetteDiagram } from '../PipetteDiagram'
 
-import type { LabwareDefByDefURI } from '../../../../labware-defs'
-import type { ThunkAction } from '../../../../types'
+import { LabwareDefByDefURI } from '../../../../labware-defs'
+import { ThunkAction } from '../../../../types'
 
 jest.mock('../../../../feature-flags/selectors')
 jest.mock('../../../../labware-defs/selectors')

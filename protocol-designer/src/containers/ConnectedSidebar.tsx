@@ -10,8 +10,8 @@ import { FileSidebar } from '../components/FileSidebar'
 import { LiquidsSidebar } from '../components/LiquidsSidebar'
 import { SettingsSidebar } from '../components/SettingsPage'
 
-import type { BaseState } from '../types'
-import type { Page } from '../navigation'
+import { BaseState } from '../types'
+import { Page } from '../navigation'
 
 type Props = {
   page: Page

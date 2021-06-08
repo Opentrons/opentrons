@@ -1,4 +1,4 @@
-import type { Reducer } from 'redux'
+import { Reducer } from 'redux'
 export type GetNextState = (arg0: {
   action: Record<string, any>
   state: Record<string, any>

@@ -42,13 +42,13 @@ import { SlotWarning } from './SlotWarning'
 import { LabwareOnDeck } from './LabwareOnDeck'
 import { SlotControls, LabwareControls, DragPreview } from './LabwareOverlays'
 
-import type { TerminalItemId } from '../../steplist'
-import type {
+import { TerminalItemId } from '../../steplist'
+import {
   InitialDeckSetup,
   LabwareOnDeck as LabwareOnDeckType,
   ModuleOnDeck,
 } from '../../step-forms'
-import type { LabwareDefByDefURI } from '../../labware-defs'
+import { LabwareDefByDefURI } from '../../labware-defs'
 
 import styles from './DeckSetup.css'
 

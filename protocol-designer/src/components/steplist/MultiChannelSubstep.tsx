@@ -8,7 +8,7 @@ import { SubstepRow } from './SubstepRow'
 import styles from './StepItem.css'
 import { formatVolume } from './utils'
 
-import type {
+import {
   StepItemSourceDestRow,
   SubstepIdentifier,
   WellIngredientNames,

@@ -20,8 +20,8 @@ import styles from './TipPositionInput.css'
 import { TipPositionModal } from './TipPositionModal'
 
 import { getDefaultMmFromBottom } from './utils'
-import type { BaseState } from '../../../../types'
-import type { FieldProps } from '../../types'
+import { BaseState } from '../../../../types'
+import { FieldProps } from '../../types'
 
 type OP = {
   ...FieldProps,

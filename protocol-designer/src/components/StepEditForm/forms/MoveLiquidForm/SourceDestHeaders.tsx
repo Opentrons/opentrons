@@ -4,9 +4,9 @@ import { FormGroup } from '@opentrons/components'
 import { i18n } from '../../../../localization'
 import { LabwareField, WellSelectionField } from '../../fields'
 import { AspDispSection } from '../AspDispSection'
-import type { StepFieldName } from '../../../../steplist/fieldLevel'
-import type { FormData } from '../../../../form-types'
-import type { FieldPropsByName } from '../../types'
+import { StepFieldName } from '../../../../steplist/fieldLevel'
+import { FormData } from '../../../../form-types'
+import { FieldPropsByName } from '../../types'
 
 import styles from '../../StepEditForm.css'
 

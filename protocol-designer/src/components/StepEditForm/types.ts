@@ -1,4 +1,4 @@
-import type { FormData, StepFieldName } from '../../form-types'
+import { FormData, StepFieldName } from '../../form-types'
 export type FocusHandlers = {
   focusedField: StepFieldName | null
   dirtyFields: StepFieldName[]

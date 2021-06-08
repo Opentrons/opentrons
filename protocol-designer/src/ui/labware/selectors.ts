@@ -11,9 +11,9 @@ import { i18n } from '../../localization'
 import * as stepFormSelectors from '../../step-forms/selectors'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import { getModuleUnderLabware } from '../modules/utils'
-import type { Options } from '@opentrons/components'
-import type { LabwareEntity } from '@opentrons/step-generation'
-import type { Selector } from '../../types'
+import { Options } from '@opentrons/components'
+import { LabwareEntity } from '@opentrons/step-generation'
+import { Selector } from '../../types'
 export const getLabwareNicknamesById: Selector<
   Record<string, string>
 > = createSelector(

@@ -1,4 +1,4 @@
-import type { StepIdType } from '../form-types'
+import { StepIdType } from '../form-types'
 export type DismissAction<ActionType> = {
   type: ActionType
   payload: {

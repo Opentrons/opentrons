@@ -18,7 +18,7 @@ import { TipPositionZAxisViz } from './TipPositionZAxisViz'
 
 import styles from './TipPositionInput.css'
 import * as utils from './utils'
-import { getIsTouchTipField, type StepFieldName } from '../../../../form-types'
+import { getIsTouchTipField,  StepFieldName } from '../../../../form-types'
 
 const SMALL_STEP_MM = 1
 const LARGE_STEP_MM = 10

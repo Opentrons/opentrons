@@ -17,8 +17,8 @@ import {
 import { makeSingleEditFieldProps } from './fields/makeSingleEditFieldProps'
 import { StepEditFormComponent } from './StepEditFormComponent'
 import { getDirtyFields } from './utils'
-import type { BaseState, ThunkDispatch } from '../../types'
-import type { FormData, StepFieldName } from '../../form-types'
+import { BaseState, ThunkDispatch } from '../../types'
+import { FormData, StepFieldName } from '../../form-types'
 
 type SP = {
   canSave: boolean,

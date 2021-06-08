@@ -5,7 +5,7 @@ import { THERMOCYCLER_MODULE_TYPE } from '@opentrons/shared-data'
 import { THERMOCYCLER_STATE } from '../../../constants'
 import { StepItemContents } from '../StepItem'
 import { ModuleStepItems } from '../ModuleStepItems'
-import type { StepItemContentsProps } from '../StepItem'
+import { StepItemContentsProps } from '../StepItem'
 
 describe('StepItemContents', () => {
   let props

@@ -17,9 +17,9 @@ import {
   getLabwareFieldForPositioningField,
 } from '../../utils'
 
-import type { FormData } from '../../../../form-types'
-import type { StepFieldName } from '../../../../steplist/fieldLevel'
-import type { FieldPropsByName } from '../../types'
+import { FormData } from '../../../../form-types'
+import { StepFieldName } from '../../../../steplist/fieldLevel'
+import { FieldPropsByName } from '../../types'
 import styles from '../../StepEditForm.css'
 
 type Props = {

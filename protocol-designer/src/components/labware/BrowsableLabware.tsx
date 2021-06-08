@@ -5,10 +5,10 @@ import reduce from 'lodash/reduce'
 
 import { SingleLabware } from './SingleLabware'
 import { wellFillFromWellContents } from './utils'
-import type { ContentsByWell } from '../../labware-ingred/types'
-import type { WellIngredientNames } from '../../steplist/types'
-import type { WellGroup } from '@opentrons/components'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import { ContentsByWell } from '../../labware-ingred/types'
+import { WellIngredientNames } from '../../steplist/types'
+import { WellGroup } from '@opentrons/components'
+import { LabwareDefinition2 } from '@opentrons/shared-data'
 
 import { WellTooltip } from './WellTooltip'
 

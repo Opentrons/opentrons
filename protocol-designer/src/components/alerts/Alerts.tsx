@@ -2,7 +2,7 @@
 import * as React from 'react'
 import assert from 'assert'
 import { PDAlert } from './PDAlert'
-import type { AlertData, AlertType } from './types'
+import { AlertData, AlertType } from './types'
 
 /* TODO:  BC 2018-09-13 this component is an abstraction that is meant to be shared for timeline
  * and form level alerts. Currently it is being used in TimelineAlerts, but it should be used in

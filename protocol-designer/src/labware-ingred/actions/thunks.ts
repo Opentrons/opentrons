@@ -5,12 +5,12 @@ import { selectors as labwareDefSelectors } from '../../labware-defs'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { selectors as uiLabwareSelectors } from '../../ui/labware'
 import { getNextAvailableDeckSlot, getNextNickname } from '../utils'
-import type {
+import {
   CreateContainerArgs,
   CreateContainerAction,
   DuplicateLabwareAction,
 } from './actions'
-import type { ThunkAction } from '../../types'
+import { ThunkAction } from '../../types'
 export type RenameLabwareAction = {
   type: 'RENAME_LABWARE'
   payload: {

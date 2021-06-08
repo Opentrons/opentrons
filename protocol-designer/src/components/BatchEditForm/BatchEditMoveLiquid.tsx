@@ -24,8 +24,8 @@ import {
   getLabwareFieldForPositioningField,
 } from '../StepEditForm/utils'
 import { FormColumn } from './FormColumn'
-import type { FieldPropsByName } from '../StepEditForm/types'
-import type { WellOrderOption } from '../../form-types'
+import { FieldPropsByName } from '../StepEditForm/types'
+import { WellOrderOption } from '../../form-types'
 // TODO(IL, 2021-03-01): refactor these fragmented style rules (see #7402)
 import formStyles from '../forms/forms.css'
 import styles from '../StepEditForm/StepEditForm.css'

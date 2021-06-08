@@ -15,10 +15,10 @@ import {
   selectors as stepFormSelectors,
 } from '../../../step-forms'
 import { FilePipettesModal } from '../FilePipettesModal'
-import type { NormalizedPipette } from '@opentrons/step-generation'
-import type { BaseState, ThunkDispatch } from '../../../types'
-import type { PipetteOnDeck, FormPipettesByMount } from '../../../step-forms'
-import type { StepIdType } from '../../../form-types'
+import { NormalizedPipette } from '@opentrons/step-generation'
+import { BaseState, ThunkDispatch } from '../../../types'
+import { PipetteOnDeck, FormPipettesByMount } from '../../../step-forms'
+import { StepIdType } from '../../../form-types'
 
 type Props = React.ElementProps<typeof FilePipettesModal>
 

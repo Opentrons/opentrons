@@ -9,7 +9,7 @@ import { ContinueModal, CheckboxField } from '@opentrons/components'
 import { Portal } from '../portals/MainPageModalPortal'
 import { i18n } from '../../localization'
 import styles from './hints.css'
-import type { HintKey } from '../../tutorial'
+import { HintKey } from '../../tutorial'
 
 export type HintProps = {
   hintKey: HintKey

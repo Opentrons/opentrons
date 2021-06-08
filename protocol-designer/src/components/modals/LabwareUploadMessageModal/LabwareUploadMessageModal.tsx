@@ -9,7 +9,7 @@ import {
 } from '@opentrons/components'
 import { i18n } from '../../../localization'
 import modalStyles from '../modal.css'
-import type { LabwareUploadMessage } from '../../../labware-defs'
+import { LabwareUploadMessage } from '../../../labware-defs'
 
 const MessageBody = (props: { message: LabwareUploadMessage }) => {
   const { message } = props

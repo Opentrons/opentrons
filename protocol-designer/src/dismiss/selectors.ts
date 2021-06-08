@@ -3,13 +3,9 @@ import mapValues from 'lodash/mapValues'
 import { selectors as stepFormSelectors } from '../step-forms'
 import { getSelectedStepId } from '../ui/steps/selectors'
 import { PRESAVED_STEP_ID } from '../steplist/types'
-import type { FormWarning } from '../steplist'
-import type { BaseState, Selector } from '../types'
-import type {
-  RootState,
-  DismissedWarningsAllSteps,
-  WarningType,
-} from './reducers'
+import { FormWarning } from '../steplist'
+import { BaseState, Selector } from '../types'
+import { RootState, DismissedWarningsAllSteps, WarningType } from './reducers'
 export const rootSelector = (state: BaseState): RootState => state.dismiss
 export const getAllDismissedWarnings: Selector<any> = createSelector(
   rootSelector,

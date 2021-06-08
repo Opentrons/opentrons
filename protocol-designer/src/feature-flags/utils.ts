@@ -1,4 +1,4 @@
-import type { Flags } from './types'
+import { Flags } from './types'
 import { allFlags } from './types'
 // Overwrite feature flags that come in via query params
 // Ex: https://designer.opentrons.com/?someFF=1&anotherFF=1

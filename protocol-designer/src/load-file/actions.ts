@@ -1,9 +1,9 @@
 import { migration } from './migration'
 import { selectors as fileDataSelectors } from '../file-data'
 import { saveFile } from './utils'
-import type { PDProtocolFile } from '../file-types'
-import type { GetState, ThunkAction, ThunkDispatch } from '../types'
-import type {
+import { PDProtocolFile } from '../file-types'
+import { GetState, ThunkAction, ThunkDispatch } from '../types'
+import {
   FileUploadErrorType,
   FileUploadMessage,
   LoadFileAction,
