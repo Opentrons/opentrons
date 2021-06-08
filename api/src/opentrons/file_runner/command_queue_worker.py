@@ -87,14 +87,31 @@ class CommandQueueWorker:
         if self._task:
             await self._task
 
-    async def _loop(self) -> None:
-        """Loop through pending commands and execute them."""
-        while self._terminate is False:
-            pending = self._engine.state_store.commands.get_next_request()
-            if pending is None:
-                break
-            cmd_id, request = pending
-            await self._engine.execute_command(
-                command_id=cmd_id,
-                request=request
+    def _start_scheduling_rest_if_still_running(self) -> None:
+        if self._keep_running:
+            next_request_result = self._engine.state_store.commands.get_next_request()
+            if next_request_result is None:  # Nothing left in the queue.
+                return
+            next_command_id, next_request = next_request_result
+
+            # We rely on asyncio.create_task() returning before the event loop actually
+            # switches to the new task -- otherwise, this task and the new task would
+            # race to set self._task.
+            #
+            # This mutually recursive pair of functions *looks* like it would have
+            # stack depth problems as the depth grows linearly with the number of
+            # commands; but I think it's actually fine, because this method never
+            # awaits the new task that it creates here, so it will return immediately.
+            self._task = asyncio.create_task(
+                self._execute_and_start_scheduling_rest(
+                    next_command_id, next_request
+                )
             )
+
+    async def _execute_and_start_scheduling_rest(
+        self,
+        command_id_to_execute: str,
+        request_to_execute: protocol_engine.commands.CommandRequestType
+    ) -> None:
+        await self._engine.execute_command(request_to_execute, command_id_to_execute)
+        self._start_scheduling_rest_if_still_running()
