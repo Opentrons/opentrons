@@ -123,9 +123,7 @@ export const toV3MigrationMessage: ModalContents = {
   ),
 }
 
-export function getMigrationMessage(
-  migrationsRan: Array<string>
-): ModalContents {
+export function getMigrationMessage(migrationsRan: string[]): ModalContents {
   if (migrationsRan.includes('3.0.0')) {
     return toV3MigrationMessage
   }

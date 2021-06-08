@@ -6,12 +6,12 @@ import {
 } from '@opentrons/shared-data'
 import type { ModuleRealType } from '@opentrons/shared-data'
 import type { DropdownOption } from '@opentrons/components'
-export const SUPPORTED_MODULE_TYPES: Array<ModuleRealType> = [
+export const SUPPORTED_MODULE_TYPES: ModuleRealType[] = [
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 ]
-type SupportedSlotMap = Record<ModuleRealType, Array<DropdownOption>>
+type SupportedSlotMap = Record<ModuleRealType, DropdownOption[]>
 export const SUPPORTED_MODULE_SLOTS: SupportedSlotMap = {
   [MAGNETIC_MODULE_TYPE]: [
     {
@@ -32,7 +32,7 @@ export const SUPPORTED_MODULE_SLOTS: SupportedSlotMap = {
     },
   ],
 }
-export const ALL_MODULE_SLOTS: Array<DropdownOption> = [
+export const ALL_MODULE_SLOTS: DropdownOption[] = [
   {
     name: 'Slot 1',
     value: '1',
@@ -64,7 +64,7 @@ export const ALL_MODULE_SLOTS: Array<DropdownOption> = [
 ]
 export function getAllModuleSlotsByType(
   moduleType: ModuleRealType
-): Array<DropdownOption> {
+): DropdownOption[] {
   const supportedSlotOption = SUPPORTED_MODULE_SLOTS[moduleType]
 
   if (moduleType === THERMOCYCLER_MODULE_TYPE) {

@@ -150,10 +150,10 @@ export const minDispenseAirGapVolume: (
  ********************/
 
 type ComposeWarnings = (
-  ...warningCheckers: Array<WarningChecker>
-) => (formData: mixed) => Array<FormWarning>
+  ...warningCheckers: WarningChecker[]
+) => (formData: mixed) => FormWarning[]
 export const composeWarnings: ComposeWarnings = (
-  ...warningCheckers: Array<WarningChecker>
+  ...warningCheckers: WarningChecker[]
 ) => formData =>
   warningCheckers.reduce((acc, checker) => {
     const possibleWarning = checker(formData)

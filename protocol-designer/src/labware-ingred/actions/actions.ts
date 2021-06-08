@@ -107,7 +107,7 @@ export type RemoveWellsContentsAction = {
   payload: {
     labwareId: string
     liquidGroupId?: string
-    wells: Array<string>
+    wells: string[]
   }
 }
 export const removeWellsContents: (
@@ -147,7 +147,7 @@ export const deleteLiquidGroup: (
 export type SetWellContentsPayload = {
   liquidGroupId: string
   labwareId: string
-  wells: Array<string>
+  wells: string[]
   // NOTE: order should not be meaningful
   volume: number
 }

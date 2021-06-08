@@ -4,9 +4,7 @@ import { swatchColors, MIXED_WELL_COLOR } from '../swatchColors'
 import type { WellFill } from '@opentrons/components'
 import type { ContentsByWell, WellContents } from '../../labware-ingred/types'
 
-const ingredIdsToColor = (
-  groupIds: Array<string>
-): string | null | undefined => {
+const ingredIdsToColor = (groupIds: string[]): string | null | undefined => {
   const filteredIngredIds = groupIds.filter(id => id !== AIR)
   if (filteredIngredIds.length === 0) return null
 

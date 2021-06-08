@@ -24,12 +24,12 @@ type EditedFields = Record<StepFieldName, unknown>
 export type SaveStepFormsMultiAction = {
   type: 'SAVE_STEP_FORMS_MULTI'
   payload: {
-    stepIds: Array<StepIdType>
+    stepIds: StepIdType[]
     editedFields: EditedFields
   }
 }
 export const saveStepFormsMulti: (
-  selectedStepIds: Array<StepIdType> | null
+  selectedStepIds: StepIdType[] | null
 ) => ThunkAction<SaveStepFormsMultiAction> = selectedStepIds => (
   dispatch,
   getState

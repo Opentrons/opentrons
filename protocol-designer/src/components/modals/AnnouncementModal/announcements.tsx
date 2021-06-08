@@ -21,7 +21,7 @@ const batchEditStyles = css`
   }
 `
 
-export const announcements: Array<Announcement> = [
+export const announcements: Announcement[] = [
   {
     announcementKey: 'modulesRequireRunAppUpdate',
     image: (

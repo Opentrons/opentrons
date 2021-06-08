@@ -36,7 +36,7 @@ const mockGetNextAvailableDeckSlot: JestMockFn<
 > = getNextAvailableDeckSlot
 
 const mockGetNextNickname: JestMockFn<
-  [Array<string>, string],
+  [string[], string],
   string
 > = getNextNickname
 

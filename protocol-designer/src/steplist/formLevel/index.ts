@@ -43,8 +43,8 @@ export { getNextDefaultEngageHeight } from './getNextDefaultEngageHeight'
 export { stepFormToArgs } from './stepFormToArgs'
 export type { FormError, FormWarning, FormWarningType }
 type FormHelpers = {
-  getErrors?: (arg0: unknown) => Array<FormError>
-  getWarnings?: (arg0: unknown) => Array<FormWarning>
+  getErrors?: (arg0: unknown) => FormError[]
+  getWarnings?: (arg0: unknown) => FormWarning[]
 }
 const stepFormHelperMap: Record<StepType, FormHelpers> = {
   mix: {
@@ -93,7 +93,7 @@ const stepFormHelperMap: Record<StepType, FormHelpers> = {
 export const getFormErrors = (
   stepType: StepType,
   formData: unknown
-): Array<FormError> => {
+): FormError[] => {
   const formErrorGetter =
     stepFormHelperMap[stepType] && stepFormHelperMap[stepType].getErrors
   const errors = formErrorGetter ? formErrorGetter(formData) : []
@@ -102,7 +102,7 @@ export const getFormErrors = (
 export const getFormWarnings = (
   stepType: StepType,
   formData: unknown
-): Array<FormWarning> => {
+): FormWarning[] => {
   const formWarningGetter =
     stepFormHelperMap[stepType] && stepFormHelperMap[stepType].getWarnings
   const warnings = formWarningGetter ? formWarningGetter(formData) : []

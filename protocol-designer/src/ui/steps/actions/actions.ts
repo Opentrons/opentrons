@@ -56,13 +56,13 @@ export const toggleStepCollapsed = (
   payload: stepId,
 })
 export const expandMultipleSteps = (
-  stepIds: Array<StepIdType>
+  stepIds: StepIdType[]
 ): ExpandMultipleStepsAction => ({
   type: 'EXPAND_MULTIPLE_STEPS',
   payload: stepIds,
 })
 export const collapseMultipleSteps = (
-  stepIds: Array<StepIdType>
+  stepIds: StepIdType[]
 ): CollapseMultipleStepsAction => ({
   type: 'COLLAPSE_MULTIPLE_STEPS',
   payload: stepIds,
@@ -120,7 +120,7 @@ export const selectStep = (stepId: StepIdType): ThunkAction<any> => (
 }
 // NOTE(sa, 2020-12-11): this is a thunk so that we can populate the batch edit form with things later
 export const selectMultipleSteps = (
-  stepIds: Array<StepIdType>,
+  stepIds: StepIdType[],
   lastSelected: StepIdType
 ): ThunkAction<SelectMultipleStepsAction> => (
   dispatch: ThunkDispatch<any>,

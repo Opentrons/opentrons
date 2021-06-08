@@ -99,7 +99,7 @@ export const LabwareUploadMessageModal = (props: Props): React.Node => {
   const { message, dismissModal, overwriteLabwareDef } = props
   if (!message) return null
 
-  let buttons: Array<ButtonProps> = [{ children: 'OK', onClick: dismissModal }]
+  let buttons: ButtonProps[] = [{ children: 'OK', onClick: dismissModal }]
   if (message.messageType === 'ASK_FOR_LABWARE_OVERWRITE') {
     buttons = [
       { children: 'CANCEL IMPORT', onClick: dismissModal },

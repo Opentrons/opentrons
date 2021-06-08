@@ -8,7 +8,7 @@ import type { RehydratePersistedAction } from '../persist'
 import type { HintKey } from './index'
 import type { AddHintAction, RemoveHintAction } from './actions'
 import type { NavigateToPageAction } from '../navigation/actions'
-type HintReducerState = Array<HintKey>
+type HintReducerState = HintKey[]
 const hints = handleActions(
   {
     ADD_HINT: (

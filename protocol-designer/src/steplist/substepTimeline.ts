@@ -17,7 +17,7 @@ import type { SubstepTimelineFrame, SourceDestData, TipLocation } from './types'
 
 /** Return last picked up tip in the specified commands, if any */
 export function _getNewActiveTips(
-  commands: Array<Command>
+  commands: Command[]
 ): TipLocation | null | undefined {
   const lastNewTipCommand: Command | null | undefined = last(
     commands.filter(c => c.command === 'pickUpTip')
@@ -57,15 +57,15 @@ const _createNextTimelineFrame = ({
 }
 
 type SubstepTimelineAcc = {
-  timeline: Array<SubstepTimelineFrame>
-  errors: Array<CommandCreatorError> | null | undefined
+  timeline: SubstepTimelineFrame[]
+  errors: CommandCreatorError[] | null | undefined
   prevRobotState: RobotState
 }
 export const substepTimelineSingleChannel = (
   commandCreator: CurriedCommandCreator,
   invariantContext: InvariantContext,
   initialRobotState: RobotState
-): Array<SubstepTimelineFrame> => {
+): SubstepTimelineFrame[] => {
   const nextFrame = commandCreator(invariantContext, initialRobotState)
   if (nextFrame.errors) return []
   const timeline = nextFrame.commands.reduce<SubstepTimelineAcc>(
@@ -117,7 +117,7 @@ export const substepTimelineMultiChannel = (
   invariantContext: InvariantContext,
   initialRobotState: RobotState,
   channels: Channels
-): Array<SubstepTimelineFrame> => {
+): SubstepTimelineFrame[] => {
   const nextFrame = commandCreator(invariantContext, initialRobotState)
   if (nextFrame.errors) return []
   const timeline = nextFrame.commands.reduce<SubstepTimelineAcc>(
@@ -181,7 +181,7 @@ export const substepTimeline = (
   invariantContext: InvariantContext,
   initialRobotState: RobotState,
   channels: Channels
-): Array<SubstepTimelineFrame> => {
+): SubstepTimelineFrame[] => {
   if (channels === 1) {
     return substepTimelineSingleChannel(
       commandCreator,

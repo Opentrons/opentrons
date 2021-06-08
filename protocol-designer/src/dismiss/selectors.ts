@@ -24,7 +24,7 @@ export const getDismissedTimelineWarningTypes: Selector<DismissedWarningsAllStep
   all => all.timeline
 )
 export const getDismissedFormWarningTypesForSelectedStep: Selector<
-  Array<WarningType>
+  WarningType[]
 > = createSelector(
   getDismissedFormWarningTypesPerStep,
   getSelectedStepId,
@@ -39,7 +39,7 @@ export const getDismissedFormWarningTypesForSelectedStep: Selector<
 
 /** Non-dismissed form-level warnings for selected step */
 export const getFormWarningsForSelectedStep: Selector<
-  Array<FormWarning>
+  FormWarning[]
 > = createSelector(
   stepFormSelectors.getFormLevelWarningsForUnsavedForm,
   getDismissedFormWarningTypesForSelectedStep,

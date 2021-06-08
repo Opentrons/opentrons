@@ -58,7 +58,7 @@ const StepEditFormManager = (props: StepEditFormManagerProps) => {
     setShowMoreOptionsModal,
   ] = React.useState<boolean>(false)
   const [focusedField, setFocusedField] = React.useState<string | null>(null)
-  const [dirtyFields, setDirtyFields] = React.useState<Array<StepFieldName>>(
+  const [dirtyFields, setDirtyFields] = React.useState<StepFieldName[]>(
     getDirtyFields(isNewStep, formData)
   )
 

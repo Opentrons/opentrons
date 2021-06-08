@@ -16,7 +16,7 @@ import type { StepIdType } from '../form-types'
 export type WarningType = string
 export type DismissedWarningsAllSteps = Record<
   StepIdType,
-  Array<WarningType> | null | undefined
+  WarningType[] | null | undefined
 >
 export type DismissedWarningState = {
   form: DismissedWarningsAllSteps

@@ -66,10 +66,10 @@ export const realNumber: ErrorChecker = (value: unknown) =>
  **     Helpers    **
  ********************/
 type ComposeErrors = (
-  ...errorCheckers: Array<ErrorChecker>
-) => (value: unknown) => Array<string>
+  ...errorCheckers: ErrorChecker[]
+) => (value: unknown) => string[]
 export const composeErrors: ComposeErrors = (
-  ...errorCheckers: Array<ErrorChecker>
+  ...errorCheckers: ErrorChecker[]
 ) => value =>
   errorCheckers.reduce((accumulatedErrors, errorChecker) => {
     const possibleError = errorChecker(value)

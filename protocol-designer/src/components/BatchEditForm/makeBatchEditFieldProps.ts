@@ -14,7 +14,7 @@ export const makeBatchEditFieldProps = (
   disabledFields: DisabledFields,
   handleChangeFormInput: (name: string, value: unknown) => void
 ): FieldPropsByName => {
-  const fieldNames: Array<StepFieldName> = Object.keys(fieldValues)
+  const fieldNames: StepFieldName[] = Object.keys(fieldValues)
   return fieldNames.reduce<FieldPropsByName>((acc, name) => {
     const defaultTooltip = getFieldDefaultTooltip(name)
     const isIndeterminate = fieldValues[name].isIndeterminate

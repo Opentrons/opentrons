@@ -43,13 +43,13 @@ type Props = {
   /** if adding to a module, the module's type */
   moduleType: ?ModuleRealType,
   /** tipracks that may be added to deck (depends on pipette<>tiprack assignment) */
-  permittedTipracks: Array<string>,
+  permittedTipracks: string[],
 }
 
 const LABWARE_CREATOR_URL = 'https://labware.opentrons.com/create'
 const CUSTOM_CATEGORY = 'custom'
 
-const orderedCategories: Array<string> = [
+const orderedCategories: string[] = [
   'tipRack',
   'tubeRack',
   'wellPlate',
@@ -58,7 +58,7 @@ const orderedCategories: Array<string> = [
   // 'trash', // NOTE: trash intentionally hidden
 ]
 
-const RECOMMENDED_LABWARE_BY_MODULE: { [ModuleRealType]: Array<string> } = {
+const RECOMMENDED_LABWARE_BY_MODULE: { [ModuleRealType]: string[] } = {
   [TEMPERATURE_MODULE_TYPE]: [
     'opentrons_24_aluminumblock_generic_2ml_screwcap',
     'opentrons_96_aluminumblock_biorad_wellplate_200ul',
@@ -163,7 +163,7 @@ export const LabwareSelectionModal = (props: Props): React.Node => {
     [filterRecommended, getLabwareCompatible, moduleType]
   )
 
-  const customLabwareURIs: Array<string> = React.useMemo(
+  const customLabwareURIs: string[] = React.useMemo(
     () => Object.keys(customLabwareDefs),
     [customLabwareDefs]
   )
@@ -172,7 +172,7 @@ export const LabwareSelectionModal = (props: Props): React.Node => {
     const defs = getOnlyLatestDefs()
     return reduce<
       LabwareDefByDefURI,
-      { [category: string]: Array<LabwareDefinition2> }
+      { [category: string]: LabwareDefinition2[] }
     >(
       defs,
       (acc, def: $Values<typeof defs>) => {

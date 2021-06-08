@@ -70,11 +70,11 @@ export const reduxActionToAnalyticsEvent = (
     const { editedFields, stepIds } = action.payload
     const additionalProperties = flattenNestedProperties(editedFields)
     const savedStepForms = getSavedStepForms(state)
-    const batchEditedStepForms: Array<FormData> = stepIds.map(
+    const batchEditedStepForms: FormData[] = stepIds.map(
       id => savedStepForms[id]
     )
     let stepType = null
-    const uniqueStepTypes: Array<StepType> = uniq(
+    const uniqueStepTypes: StepType[] = uniq(
       batchEditedStepForms.map(form => form.stepType)
     )
     if (uniqueStepTypes.length === 1) {

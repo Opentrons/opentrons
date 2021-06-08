@@ -44,8 +44,8 @@ type WarningContent = {
 
 type MissingContent = {
   noCommands: boolean
-  pipettesWithoutStep: Array<PipetteOnDeck>
-  modulesWithoutStep: Array<ModuleOnDeck>
+  pipettesWithoutStep: PipetteOnDeck[]
+  modulesWithoutStep: ModuleOnDeck[]
 }
 
 function getWarningContent({

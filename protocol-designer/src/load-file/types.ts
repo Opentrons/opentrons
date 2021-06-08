@@ -5,7 +5,7 @@ export type FileUploadMessage =
   | {
       isError: false
       messageKey: FileUploadMessageKey
-      migrationsRan: Array<string>
+      migrationsRan: string[]
     }
   | {
       isError: true
@@ -20,6 +20,6 @@ export type LoadFileAction = {
   payload: {
     file: PDProtocolFile
     didMigrate: boolean
-    migrationsRan: Array<string>
+    migrationsRan: string[]
   }
 }

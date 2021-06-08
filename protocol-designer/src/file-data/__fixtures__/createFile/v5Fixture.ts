@@ -269,5 +269,5 @@ export const savedStepForms: SavedStepFormState = {
     dispense_delay_mmFromBottom: '0.5', //
   },
 }
-export const orderedStepIds: Array<StepIdType> = ['moveLiquidStepId']
+export const orderedStepIds: StepIdType[] = ['moveLiquidStepId']
 export const moduleEntities: ModuleEntities = {}

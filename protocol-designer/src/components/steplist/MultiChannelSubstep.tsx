@@ -17,7 +17,7 @@ import type {
 const DEFAULT_COLLAPSED_STATE = true
 
 type MultiChannelSubstepProps = {
-  rowGroup: Array<StepItemSourceDestRow>,
+  rowGroup: StepItemSourceDestRow[],
   ingredNames: WellIngredientNames,
   highlighted?: boolean,
   stepId: string,

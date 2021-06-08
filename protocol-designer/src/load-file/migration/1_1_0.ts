@@ -15,8 +15,8 @@ import type { FormData } from '../../form-types'
 export type PDMetadata = {
   pipetteTiprackAssignments: Record<string, string>
   dismissedWarnings: {
-    form: Record<string, Array<string> | null | undefined>
-    timeline: Record<string, Array<string> | null | undefined>
+    form: Record<string, string[] | null | undefined>
+    timeline: Record<string, string[] | null | undefined>
   }
   ingredients: Record<
     string,
@@ -46,7 +46,7 @@ export type PDMetadata = {
       [key: string]: any
     }
   >
-  orderedStepIds: Array<string>
+  orderedStepIds: string[]
 }
 export type PDProtocolFile = ProtocolFile<PDMetadata>
 type LegacyPipetteEntities = Record<

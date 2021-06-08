@@ -12,7 +12,7 @@ import type {
 export type GenerateSubstepsArgs = {
   allStepArgsAndErrors: StepArgsAndErrorsById
   invariantContext: InvariantContext
-  orderedStepIds: Array<string>
+  orderedStepIds: string[]
   robotStateTimeline: Timeline
   initialRobotState: RobotState
   labwareNamesByModuleId: LabwareNamesByModuleId

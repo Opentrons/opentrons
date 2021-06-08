@@ -17,7 +17,7 @@ type Props = {
 
 export function IngredPill(props: Props): React.Node {
   const { ingredNames, targetProps } = props
-  const ingredIds: Array<string> = Object.keys(props.ingreds)
+  const ingredIds: string[] = Object.keys(props.ingreds)
 
   if (ingredIds.filter(id => id !== AIR).length === 0) {
     // Invisible Pill, but has correct height/margin/etc for spacing

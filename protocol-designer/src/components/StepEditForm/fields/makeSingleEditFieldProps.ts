@@ -12,13 +12,13 @@ import type { FieldProps, FieldPropsByName, FocusHandlers } from '../types'
 type ShowFieldErrorParams = {
   name: StepFieldName
   focusedField: StepFieldName | null
-  dirtyFields?: Array<StepFieldName>
+  dirtyFields?: StepFieldName[]
 }
 export const showFieldErrors = ({
   name,
   focusedField,
   dirtyFields,
-}: ShowFieldErrorParams): boolean | void | Array<StepFieldName> =>
+}: ShowFieldErrorParams): boolean | void | StepFieldName[] =>
   !(name === focusedField) && dirtyFields && dirtyFields.includes(name)
 export const makeSingleEditFieldProps = (
   focusHandlers: FocusHandlers,
@@ -26,7 +26,7 @@ export const makeSingleEditFieldProps = (
   handleChangeFormInput: (name: string, value: unknown) => void
 ): FieldPropsByName => {
   const { dirtyFields, blur, focusedField, focus } = focusHandlers
-  const fieldNames: Array<string> = Object.keys(
+  const fieldNames: string[] = Object.keys(
     getDefaultsForStepType(formData.stepType)
   )
   return fieldNames.reduce<FieldPropsByName>((acc, name) => {

@@ -19,14 +19,14 @@ const getMatchOrNull = (
 const nameOnlyPattern = /^(.*)\(\d+\)$/
 const numOnlyPattern = /^.*\((\d+)\)$/
 export function getNextNickname(
-  allNicknames: Array<string>,
+  allNicknames: string[],
   _proposedNickname: string
 ): string {
   const proposedNickname = (
     getMatchOrNull(nameOnlyPattern, _proposedNickname) || _proposedNickname
   ).trim()
 
-  const matchingDisambigNums = allNicknames.reduce<Array<number>>(
+  const matchingDisambigNums = allNicknames.reduce<number[]>(
     (acc, nickname) => {
       const nameOnly = (
         getMatchOrNull(nameOnlyPattern, nickname) || nickname

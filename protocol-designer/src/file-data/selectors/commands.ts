@@ -23,7 +23,7 @@ export const getLabwareLiquidState: Selector<StepGeneration.LabwareLiquidState> 
   labwareIngredSelectors.getLiquidsByLabwareId,
   stepFormSelectors.getLabwareEntities,
   (ingredLocations, labwareEntities) => {
-    const allLabwareIds: Array<string> = Object.keys(labwareEntities)
+    const allLabwareIds: string[] = Object.keys(labwareEntities)
     return allLabwareIds.reduce(
       (
         acc: StepGeneration.LabwareLiquidState,

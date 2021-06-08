@@ -108,7 +108,7 @@ export const duplicateStep: (
   }
 }
 export const duplicateMultipleSteps: (
-  stepIds: Array<StepIdType>
+  stepIds: StepIdType[]
 ) => ThunkAction<
   DuplicateMultipleStepsAction | SelectMultipleStepsAction
 > = stepIds => (dispatch, getState) => {

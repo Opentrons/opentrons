@@ -1,10 +1,10 @@
 /** Merge 2 adjacent elements of an array when predicate fn is true */
 export function mergeWhen<T>(
-  array: Array<T>,
+  array: T[],
   predicate: (current: T, next: T) => unknown,
   merge: (current: T, next: T) => any,
   alternative: (current: T) => any = c => c
-): Array<any> {
+): any[] {
   if (array.length === 0) {
     return array
   }

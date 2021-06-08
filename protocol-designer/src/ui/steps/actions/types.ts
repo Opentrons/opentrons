@@ -27,7 +27,7 @@ export type DuplicateStepAction = {
 export type DuplicateMultipleStepsAction = {
   type: 'DUPLICATE_MULTIPLE_STEPS'
   payload: {
-    steps: Array<DuplicateStepPayload>
+    steps: DuplicateStepPayload[]
     indexToInsert: number
   }
 }
@@ -41,11 +41,11 @@ export type ToggleStepCollapsedAction = {
 }
 export type ExpandMultipleStepsAction = {
   type: 'EXPAND_MULTIPLE_STEPS'
-  payload: Array<StepIdType>
+  payload: StepIdType[]
 }
 export type CollapseMultipleStepsAction = {
   type: 'COLLAPSE_MULTIPLE_STEPS'
-  payload: Array<StepIdType>
+  payload: StepIdType[]
 }
 export type HoverOnSubstepAction = {
   type: 'HOVER_ON_SUBSTEP'
@@ -85,7 +85,7 @@ export type SelectStepAction = {
 export type SelectMultipleStepsAction = {
   type: 'SELECT_MULTIPLE_STEPS'
   payload: {
-    stepIds: Array<StepIdType>
+    stepIds: StepIdType[]
     lastSelected: StepIdType
   }
 }

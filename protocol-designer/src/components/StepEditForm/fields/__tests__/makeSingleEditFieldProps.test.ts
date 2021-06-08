@@ -24,10 +24,7 @@ const getDefaultsForStepTypeMock: JestMockFn<
   [any],
   any
 > = getDefaultsForStepType
-const getFieldErrorsMock: JestMockFn<
-  [string, mixed],
-  Array<string>
-> = getFieldErrors
+const getFieldErrorsMock: JestMockFn<[string, mixed], string[]> = getFieldErrors
 
 beforeEach(() => {
   getFieldDefaultTooltipSpy.mockImplementation(name => `tooltip for ${name}`)

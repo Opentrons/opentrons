@@ -11,7 +11,7 @@ import type { LabwareOnDeck } from '../step-forms'
 // NOTE: this does not distinguish btw versions. Standard labware only (assumes namespace is 'opentrons')
 const COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE: Record<
   ModuleRealType,
-  ReadonlyArray<string>
+  Readonlystring[]
 > = {
   [TEMPERATURE_MODULE_TYPE]: [
     'eppendorf_6_wellplate_16.8ml_flat',

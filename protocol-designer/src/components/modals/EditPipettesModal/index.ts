@@ -25,7 +25,7 @@ type Props = React.ElementProps<typeof FilePipettesModal>
 type SP = {
   initialPipetteValues: FormPipettesByMount
   _prevPipettes: { [pipetteId: string]: PipetteOnDeck }
-  _orderedStepIds: Array<StepIdType>
+  _orderedStepIds: StepIdType[]
   moduleRestrictionsDisabled: ?boolean
 }
 
@@ -65,7 +65,7 @@ const makeUpdatePipettes = (
   closeModal
 ) => ({ pipettes: newPipetteArray }) => {
   const prevPipetteIds = Object.keys(prevPipettes)
-  const usedPrevPipettes: Array<string> = [] // IDs of pipettes in prevPipettes that were already put into nextPipettes
+  const usedPrevPipettes: string[] = [] // IDs of pipettes in prevPipettes that were already put into nextPipettes
   const nextPipettes: {
     [pipetteId: string]: {
       mount: string
@@ -122,7 +122,7 @@ const makeUpdatePipettes = (
     })
   )
 
-  const pipetteIdsToDelete: Array<string> = Object.keys(prevPipettes).filter(
+  const pipetteIdsToDelete: string[] = Object.keys(prevPipettes).filter(
     id => !(id in nextPipettes)
   )
 
@@ -143,7 +143,7 @@ const makeUpdatePipettes = (
     {}
   )
 
-  const pipettesWithNewTipracks: Array<string> = filter(
+  const pipettesWithNewTipracks: string[] = filter(
     nextPipettes,
     (nextPipette: $Values<typeof nextPipettes>) => {
       const newPipetteId = nextPipette.id
