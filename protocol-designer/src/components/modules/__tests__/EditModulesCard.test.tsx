@@ -24,12 +24,12 @@ import { FormPipettesByMount } from '../../../step-forms'
 jest.mock('../../../feature-flags')
 jest.mock('../../../step-forms/selectors')
 
-const getDisableModuleRestrictionsMock: JestMockFn<[BaseState], ?boolean> =
-  featureFlagSelectors.getDisableModuleRestrictions
-const getPipettesForEditPipetteFormMock: JestMockFn<
-  [BaseState],
-  FormPipettesByMount
-> = stepFormSelectors.getPipettesForEditPipetteForm
+const getDisableModuleRestrictionsMock = featureFlagSelectors.getDisableModuleRestrictions as jest.MockedFunction<
+  typeof featureFlagSelectors.getDisableModuleRestrictions
+>
+const getPipettesForEditPipetteFormMock = stepFormSelectors.getPipettesForEditPipetteForm as jest.MockedFunction<
+  typeof stepFormSelectors.getPipettesForEditPipetteForm
+>
 
 describe('EditModulesCard', () => {
   let store,

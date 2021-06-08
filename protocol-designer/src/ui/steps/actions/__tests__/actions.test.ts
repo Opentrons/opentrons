@@ -10,14 +10,15 @@ import { duplicateStep, duplicateMultipleSteps } from '../thunks'
 jest.mock('../../../../step-forms/selectors')
 jest.mock('../../selectors')
 const mockStore = configureMockStore([thunk])
-const mockGetSavedStepForms: JestMockFn<[Record<string, any>], any> =
-  stepFormSelectors.getSavedStepForms
-const mockGetOrderedStepIds: JestMockFn<[Record<string, any>], any> =
-  stepFormSelectors.getOrderedStepIds
-const mockGetMultiSelectLastSelected: JestMockFn<
-  [Record<string, any>],
-  any
-> = getMultiSelectLastSelected
+const mockGetSavedStepForms = stepFormSelectors.getSavedStepForms as jest.MockedFunction<
+  typeof stepFormSelectors.getSavedStepForms
+>
+const mockGetOrderedStepIds = stepFormSelectors.getOrderedStepIds as jest.MockedFunction<
+  typeof stepFormSelectors.getOrderedStepIds
+>
+const mockGetMultiSelectLastSelected = getMultiSelectLastSelected as jest.MockedFunction<
+  typeof getMultiSelectLastSelected
+>
 describe('steps actions', () => {
   describe('selectStep', () => {
     const stepId = 'stepId'

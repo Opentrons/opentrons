@@ -23,15 +23,13 @@ jest.mock('../../../../labware-defs/selectors')
 jest.mock('../../../../labware-defs/utils.js')
 jest.mock('../../../../labware-defs/actions')
 
-const getOnlyLatestDefsMock: JestMockFn<
-  [],
-  LabwareDefByDefURI
-> = getOnlyLatestDefs
+const getOnlyLatestDefsMock = getOnlyLatestDefs as jest.MockedFunction<
+  typeof getOnlyLatestDefs
+>
 
-const createCustomTiprackDefMock: JestMockFn<
-  [SyntheticInputEvent<HTMLInputElement>],
-  ThunkAction<*>
-> = labwareDefActions.createCustomTiprackDef
+const createCustomTiprackDefMock = labwareDefActions.createCustomTiprackDef as jest.MockedFunction<
+  typeof labwareDefActions.createCustomTiprackDef
+>
 
 describe('PipetteFields', () => {
   const leftPipetteKey = 'pipettesByMount.left'

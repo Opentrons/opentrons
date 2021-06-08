@@ -19,12 +19,15 @@ const getSingleSelectDisabledTooltipSpy = jest.spyOn(
   'getSingleSelectDisabledTooltip'
 )
 
-const getDisabledFieldsMock: JestMockFn<any, Set<string>> = getDisabledFields
-const getDefaultsForStepTypeMock: JestMockFn<
-  [any],
-  any
-> = getDefaultsForStepType
-const getFieldErrorsMock: JestMockFn<[string, mixed], string[]> = getFieldErrors
+const getDisabledFieldsMock = getDisabledFields as jest.MockedFunction<
+  typeof getDisabledFields
+>
+const getDefaultsForStepTypeMock = getDefaultsForStepType as jest.MockedFunction<
+  typeof getDefaultsForStepType
+>
+const getFieldErrorsMock = getFieldErrors as jest.MockedFunction<
+  typeof getFieldErrors
+>
 
 beforeEach(() => {
   getFieldDefaultTooltipSpy.mockImplementation(name => `tooltip for ${name}`)

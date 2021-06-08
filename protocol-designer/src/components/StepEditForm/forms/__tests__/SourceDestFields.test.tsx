@@ -10,8 +10,7 @@ import { BaseState } from '../../../../types'
 jest.mock('../../../../step-forms')
 jest.mock('../../utils')
 
-const getUnsavedFormMock: JestMockFn<[BaseState], any> =
-  stepFormSelectors.getUnsavedForm
+const getUnsavedFormMock = stepFormSelectors.getUnsavedForm as jest.MockedFunction<typeof stepFormSelectors.getUnsavedForm>
 
 jest.mock('../../fields/', () => {
   const actualFields = jest.requireActual('../../fields')

@@ -12,8 +12,9 @@ jest.mock('../../../../persist.js')
 
 describe('AnnouncementModal', () => {
   const announcementKey = 'newType'
-  const getLocalStorageItemMock: JestMockFn<[string], mixed> =
-    persist.getLocalStorageItem
+  const getLocalStorageItemMock = persist.getLocalStorageItem as jest.MockedFunction<
+    typeof persist.getLocalStorageItem
+  >
 
   const announcementsMock: {
     announcements: Announcement[]

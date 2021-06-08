@@ -14,8 +14,7 @@ import { useResetSlotOnModelChange } from '../form-state'
 jest.mock('formik')
 jest.mock('../../../modules/utils')
 
-const useFormikContext: JestMockFn<[], $Call<typeof Formik.useFormikContext>> =
-  Formik.useFormikContext
+const useFormikContext = Formik.useFormikContext as jest.MockedFunction<typeof Formik.useFormikContext>
 
 const isModuleWithCollisionIssueMock: jest.MockedFunction<any> = isModuleWithCollisionIssue
 

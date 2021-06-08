@@ -7,14 +7,12 @@ import { getFieldErrors } from '../../steplist/fieldLevel'
 import { getProfileItemsHaveErrors } from '../utils/getProfileItemsHaveErrors'
 jest.mock('../../steplist/fieldLevel')
 jest.mock('../utils/getProfileItemsHaveErrors')
-const mockGetFieldErrors: JestMockFn<
-  [string, unknown],
-  string[]
-> = getFieldErrors
-const mockGetProfileItemsHaveErrors: JestMockFn<
-  [any],
-  boolean
-> = getProfileItemsHaveErrors
+const mockGetFieldErrors = getFieldErrors as jest.MockedFunction<
+  typeof getFieldErrors
+>
+const mockGetProfileItemsHaveErrors = getProfileItemsHaveErrors as jest.MockedFunction<
+  typeof getProfileItemsHaveErrors
+>
 beforeEach(() => {
   jest.clearAllMocks()
 })

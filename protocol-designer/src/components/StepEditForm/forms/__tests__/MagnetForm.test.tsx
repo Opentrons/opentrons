@@ -18,11 +18,9 @@ jest.mock('../../fields')
 // TODO(IL, 2021-02-01): don't any-type, follow mocking pattern in MixForm.test.js ?
 const fields: any = _fields
 
-const getUnsavedFormMock: JestMockFn<[BaseState], any> =
-  stepFormSelectors.getUnsavedForm
+const getUnsavedFormMock = stepFormSelectors.getUnsavedForm as jest.MockedFunction<typeof stepFormSelectors.getUnsavedForm>
 
-const getModuleEntitiesMock: JestMockFn<[BaseState], ModuleEntities> =
-  stepFormSelectors.getModuleEntities
+const getModuleEntitiesMock = stepFormSelectors.getModuleEntities as jest.MockedFunction<typeof stepFormSelectors.getModuleEntities>
 
 describe('MagnetForm', () => {
   let store
@@ -74,10 +72,7 @@ describe('MagnetForm', () => {
       .mockImplementation(props => <div>{props.children}</div>)
     fields.TextField = jest.fn().mockImplementation(props => <div />)
     fields.RadioGroupField = jest.fn().mockImplementation(props => <div />)
-    ;(uiModuleSelectors.getMagneticLabwareOptions: JestMockFn<
-      [BaseState],
-      Options
-    >).mockReturnValue([
+    (uiModuleSelectors.getMagneticLabwareOptions as jest.MockedFunction<typeof uiModuleSelectors.getMagneticLabwareOptions>).mockReturnValue([
       { name: 'magnet module v1', value: 'magnetV1', disabled: false },
       { name: 'magnet module v2', value: 'magnetV2', disabled: false },
     ])
@@ -99,10 +94,8 @@ describe('MagnetForm', () => {
   })
 
   it('engage height caption is displayed with proper height to decimal scale', () => {
-    ;(uiModuleSelectors.getMagnetLabwareEngageHeight: JestMockFn<
-      [BaseState],
-      number | null
-    >).mockReturnValue(10.9444)
+    (uiModuleSelectors.getMagnetLabwareEngageHeight as jest.MockedFunction<typeof uiModuleSelectors.getMagnetLabwareEngageHeight>)
+        .mockReturnValue(10.9444)
 
     const wrapper = render(props)
 
@@ -112,10 +105,8 @@ describe('MagnetForm', () => {
   })
 
   it('engage height caption is null when no engage height', () => {
-    ;(uiModuleSelectors.getMagnetLabwareEngageHeight: JestMockFn<
-      [BaseState],
-      number | null
-    >).mockReturnValue(null)
+    (uiModuleSelectors.getMagnetLabwareEngageHeight as jest.MockedFunction<typeof uiModuleSelectors.getMagnetLabwareEngageHeight>)
+        .mockReturnValue(null)
 
     const wrapper = render(props)
 
