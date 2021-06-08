@@ -16,7 +16,7 @@ import { BaseState } from '../../types'
 type SP = {
   errors: $PropertyType<Props, 'errors'>,
   warnings: $PropertyType<Props, 'warnings'>,
-  _stepId: ?string,
+  _stepId: string | null | undefined,
 }
 
 /** Errors and Warnings from step-generation are written for developers

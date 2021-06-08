@@ -18,8 +18,8 @@ import { BaseState } from '../../../../types'
 import { FieldProps } from '../../types'
 
 type SP = {
-  stepId: ?StepIdType,
-  wellSelectionLabwareKey: ?string,
+  stepId: StepIdType | null | undefined,
+  wellSelectionLabwareKey: string | null | undefined,
 }
 
 type DP = {
@@ -30,9 +30,9 @@ type DP = {
 type OP = {
   ...FieldProps,
   primaryWellCount?: number,
-  isMulti: ?boolean,
-  pipetteId: ?string,
-  labwareId: ?string,
+  isMulti: boolean | null | undefined,
+  pipetteId: string | null | undefined,
+  labwareId: string | null | undefined,
 }
 
 type Props = OP & SP & DP

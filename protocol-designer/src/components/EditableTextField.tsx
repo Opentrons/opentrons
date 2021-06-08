@@ -6,13 +6,13 @@ import styles from './editableTextField.css'
 
 type Props = {
   className?: string
-  value: ?string
+  value: string | null | undefined
   saveEdit: (newValue: string) => mixed
 }
 
 type State = {
   editing: boolean
-  transientValue: ?string
+  transientValue: string | null | undefined
 }
 
 export class EditableTextField extends React.Component<Props, State> {

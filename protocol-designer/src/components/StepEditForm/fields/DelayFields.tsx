@@ -10,7 +10,7 @@ import { StepFieldName } from '../../../form-types'
 
 export type DelayFieldProps = {
   checkboxFieldName: StepFieldName // TODO(IL, 2021-03-03): strictly, could be DelayCheckboxFields!
-  labwareId: ?string
+  labwareId: string | null | undefined
   propsForFields: FieldPropsByName
   secondsFieldName: StepFieldName // TODO(IL, 2021-03-03): strictly, could be DelaySecondFields!
   tipPositionFieldName?: StepFieldName // TODO(IL, 2021-03-03): strictly, could be TipOffsetFields!

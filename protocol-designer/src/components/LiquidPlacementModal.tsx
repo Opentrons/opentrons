@@ -30,7 +30,7 @@ import { WellIngredientNames } from '../steplist'
 type SP = {
   selectedWells: WellGroup,
   wellContents: ContentsByWell,
-  labwareDef: ?LabwareDefinition2,
+  labwareDef: LabwareDefinition2 | null | undefined,
   liquidNamesById: WellIngredientNames,
 }
 

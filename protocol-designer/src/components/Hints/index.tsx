@@ -14,7 +14,7 @@ import EXAMPLE_BATCH_EDIT_IMAGE from '../../images/announcements/multi_select.gi
 import { HintKey } from '../../tutorial'
 import { BaseState, ThunkDispatch } from '../../types'
 
-type SP = { hintKey: ?HintKey }
+type SP = { hintKey: HintKey | null | undefined }
 type DP = {
   removeHint: (HintKey, boolean) => mixed,
   selectTerminalItem: TerminalItemId => mixed,

@@ -25,13 +25,13 @@ type ValidFormValues = {
 }
 
 export type LiquidPlacementFormValues = {
-  selectedLiquidId: ?string,
-  volume: ?string,
+  selectedLiquidId: string | null | undefined,
+  volume: string | null | undefined,
 }
 
 type Props = {
-  commonSelectedLiquidId: ?string,
-  commonSelectedVolume: ?number,
+  commonSelectedLiquidId: string | null | undefined,
+  commonSelectedVolume: number | null | undefined,
   liquidSelectionOptions: Options,
   selectedWellsMaxVolume: number,
   showForm: boolean,
@@ -92,7 +92,7 @@ export class LiquidPlacementForm extends React.Component<Props> {
   handleChangeVolume: (
     setFieldValue: (fieldName: string, value: mixed) => mixed
   ) => (e: SyntheticInputEvent<*>) => void = setFieldValue => e => {
-    const value: ?string = e.currentTarget.value
+    const value: string | null | undefined = e.currentTarget.value
     const masked = fieldProcessors.composeMaskers(
       fieldProcessors.maskToFloat,
       fieldProcessors.onlyPositiveNumbers,

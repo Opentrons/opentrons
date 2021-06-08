@@ -4,7 +4,7 @@ import * as React from 'react'
 import styles from './TitledListNotes.css'
 
 type Props = {
-  notes: ?string
+  notes: string | null | undefined
 }
 
 export function TitledListNotes(props: Props): React.Node {

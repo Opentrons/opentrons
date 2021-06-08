@@ -8,7 +8,7 @@ import { BaseState } from '../../../../types'
 
 type OP = {
   ...FieldProps,
-  pipetteId: ?string,
+  pipetteId: string | null | undefined,
   className?: $PropertyType<FlowRateInputProps, 'className'>,
   flowRateType: $PropertyType<FlowRateInputProps, 'flowRateType'>,
   label?: $PropertyType<FlowRateInputProps, 'label'>,
@@ -16,7 +16,7 @@ type OP = {
 
 type SP = {
   innerKey: string,
-  defaultFlowRate: ?number,
+  defaultFlowRate: number | null | undefined,
   minFlowRate: number,
   maxFlowRate: number,
   pipetteDisplayName: string,

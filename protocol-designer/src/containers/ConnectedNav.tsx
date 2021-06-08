@@ -14,7 +14,7 @@ type SP = {
   currentProtocolExists: boolean,
 }
 
-type DP = { handleClick: Page => (e: ?SyntheticEvent<>) => void }
+type DP = { handleClick: Page => (e: SyntheticEvent<> | null | undefined) => void }
 
 type Props = SP & DP
 

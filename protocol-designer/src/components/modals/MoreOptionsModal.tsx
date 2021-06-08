@@ -17,16 +17,16 @@ import modalStyles from './modal.css'
 import styles from './MoreOptionsModal.css'
 
 type OP = {
-  close: (event: ?SyntheticEvent<>) => mixed,
+  close: (event: SyntheticEvent<> | null | undefined) => mixed,
   formData: FormData,
 }
 
 type DP = {
-  saveValuesToForm: ({ [StepFieldName]: ?mixed }) => mixed,
+  saveValuesToForm: ({ [StepFieldName]: mixed | null | undefined }) => mixed,
 }
 
 type Props = OP & DP
-type State = { [StepFieldName]: ?mixed }
+type State = { [StepFieldName]: mixed | null | undefined }
 
 class MoreOptionsModalComponent extends React.Component<Props, State> {
   constructor(props: Props) {

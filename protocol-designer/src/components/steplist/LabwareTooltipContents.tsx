@@ -3,7 +3,7 @@ import * as React from 'react'
 import styles from './StepItem.css'
 
 type LabwareTooltipContentsProps = {
-  labwareNickname: ?string
+  labwareNickname: string | null | undefined
 }
 export const LabwareTooltipContents = (
   props: LabwareTooltipContentsProps

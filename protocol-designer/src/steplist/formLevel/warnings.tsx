@@ -78,7 +78,7 @@ type HydratedFormData = any
 
 export const belowPipetteMinimumVolume = (
   fields: HydratedFormData
-): ?FormWarning => {
+): FormWarning | null | undefined => {
   const { pipette, volume } = fields
   if (!(pipette && pipette.spec)) return null
   return volume < pipette.spec.minVolume
@@ -88,7 +88,7 @@ export const belowPipetteMinimumVolume = (
 
 export const maxDispenseWellVolume = (
   fields: HydratedFormData
-): ?FormWarning => {
+): FormWarning | null | undefined => {
   const { dispense_labware, dispense_wells, volume } = fields
   if (!dispense_labware || !dispense_wells) return null
   const hasExceeded = dispense_wells.some(well => {
@@ -98,7 +98,7 @@ export const maxDispenseWellVolume = (
   return hasExceeded ? overMaxWellVolumeWarning() : null
 }
 
-export const minDisposalVolume = (fields: HydratedFormData): ?FormWarning => {
+export const minDisposalVolume = (fields: HydratedFormData): FormWarning | null | undefined => {
   const {
     disposalVolume_checkbox,
     disposalVolume_volume,

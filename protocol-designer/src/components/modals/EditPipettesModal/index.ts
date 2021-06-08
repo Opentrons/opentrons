@@ -26,7 +26,7 @@ type SP = {
   initialPipetteValues: FormPipettesByMount
   _prevPipettes: { [pipetteId: string]: PipetteOnDeck }
   _orderedStepIds: StepIdType[]
-  moduleRestrictionsDisabled: ?boolean
+  moduleRestrictionsDisabled: boolean | null | undefined
 }
 
 type OP = {
@@ -84,7 +84,7 @@ const makeUpdatePipettes = (
         const alreadyUsed = usedPrevPipettes.some(usedId => usedId === id)
         return !alreadyUsed && prevPipette.name === newPipette.name
       })
-      const pipetteId: ?string = candidatePipetteIds[0]
+      const pipetteId: string | null | undefined = candidatePipetteIds[0]
       if (pipetteId) {
         // update used pipette list
         usedPrevPipettes.push(pipetteId)

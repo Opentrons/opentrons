@@ -38,7 +38,7 @@ export const showProfileFieldErrors = ({
   dirtyFields,
 }: {
   fieldId: string,
-  focusedField: ?string,
+  focusedField: string | null | undefined,
   dirtyFields: string[],
 }): boolean =>
   !(fieldId === focusedField) && dirtyFields && dirtyFields.includes(fieldId)

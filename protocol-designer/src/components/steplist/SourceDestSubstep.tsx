@@ -20,7 +20,7 @@ type SourceDestSubstepProps = {
   ...StepSubItemProps,
   ingredNames: WellIngredientNames,
   selectSubstep: SubstepIdentifier => mixed,
-  hoveredSubstep: ?SubstepIdentifier,
+  hoveredSubstep: SubstepIdentifier | null | undefined,
 }
 
 export function SourceDestSubstep(props: SourceDestSubstepProps): React.Node {

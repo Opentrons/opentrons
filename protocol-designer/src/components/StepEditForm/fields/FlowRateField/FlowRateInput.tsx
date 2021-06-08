@@ -20,18 +20,18 @@ const DECIMALS_ALLOWED = 1
 /** When flow rate is falsey (including 0), it means 'use default' */
 export type FlowRateInputProps = {
   ...FieldProps,
-  defaultFlowRate: ?number,
+  defaultFlowRate: number | null | undefined,
   flowRateType: 'aspirate' | 'dispense',
-  label: ?string,
+  label: string | null | undefined,
   minFlowRate: number,
   maxFlowRate: number,
-  pipetteDisplayName: ?string,
+  pipetteDisplayName: string | null | undefined,
   className?: string,
 }
 
 type State = {
   isPristine: boolean,
-  modalFlowRate: ?string,
+  modalFlowRate: string | null | undefined,
   modalUseDefault: boolean,
   showModal: boolean,
 }

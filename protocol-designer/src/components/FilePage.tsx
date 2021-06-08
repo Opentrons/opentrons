@@ -39,7 +39,7 @@ type State = {
   isEditPipetteModalOpen: boolean,
   moduleToEdit: {
     moduleType: ModuleRealType,
-    moduleId: ?string,
+    moduleId: string | null | undefined,
   } | null,
 }
 

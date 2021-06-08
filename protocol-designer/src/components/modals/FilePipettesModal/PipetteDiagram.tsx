@@ -7,8 +7,8 @@ import styles from './FilePipettesModal.css'
 import { InstrumentDiagram } from '@opentrons/components'
 
 type Props = {
-  leftPipette: ?string
-  rightPipette: ?string
+  leftPipette: string | null | undefined
+  rightPipette: string | null | undefined
 }
 export function PipetteDiagram(props: Props): React.Node {
   const { leftPipette, rightPipette } = props
