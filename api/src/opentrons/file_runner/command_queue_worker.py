@@ -2,13 +2,13 @@
 import asyncio
 from typing import Optional, Awaitable
 
-from opentrons.protocol_engine import ProtocolEngine
+from opentrons import protocol_engine
 
 
 class CommandQueueWorker:
     """Execute a `ProtocolEngine`'s queued commands in the background."""
 
-    def __init__(self, protocol_engine: ProtocolEngine) -> None:
+    def __init__(self, protocol_engine: protocol_engine.ProtocolEngine) -> None:
         """Construct a CommandQueueWorker.
 
         Args:
