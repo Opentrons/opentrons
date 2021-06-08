@@ -1,4 +1,5 @@
 import { LabwareFields } from '../fields'
+import { displayAsTube } from './displayAsTube'
 
 export const getLabwareName = (
   values: LabwareFields,
@@ -9,6 +10,9 @@ export const getLabwareName = (
     case 'tipRack':
       return `tip${plural ? 's' : ''}`
     case 'aluminumBlock':
+      return displayAsTube(values)
+        ? `tube${plural ? 's' : ''}`
+        : `well${plural ? 's' : ''}`
     case 'tubeRack':
       return `tube${plural ? 's' : ''}`
     case 'wellPlate':
