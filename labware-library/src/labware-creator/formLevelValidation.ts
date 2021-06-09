@@ -1,6 +1,7 @@
 import { FormikErrors } from 'formik'
 import { labwareFormSchemaBaseObject } from './labwareFormSchema'
 import type { LabwareFields } from './fields'
+import { getLabwareName } from './utils'
 
 export const FORM_LEVEL_ERRORS = 'FORM_LEVEL_ERRORS'
 export const WELLS_OUT_OF_BOUNDS_X = 'WELLS_OUT_OF_BOUNDS_X'
@@ -73,21 +74,6 @@ export const getWellGridBoundingBox = (
       bottomRightCornerX,
       bottomRightCornerY,
     }
-  }
-}
-
-const getLabwareName = (values: LabwareFields): string => {
-  const { labwareType } = values
-  switch (labwareType) {
-    case 'tipRack':
-      return 'tips'
-    case 'tubeRack':
-      return 'tubes'
-    case 'wellPlate':
-    case 'aluminumBlock':
-    case 'reservoir':
-    default:
-      return 'wells'
   }
 }
 
@@ -225,7 +211,7 @@ export const formLevelValidation = (
   const wellBoundsInsideFootprintY =
     topLeftCornerY > 0 && bottomRightCornerY < footprintYDimension
 
-  const labwareName = getLabwareName(values)
+  const labwareName = getLabwareName(values, true)
 
   if (!wellBoundsInsideFootprintX) {
     formLevelErrors[WELLS_OUT_OF_BOUNDS_X] =
