@@ -5,7 +5,7 @@ import {
   Tooltip,
   useHoverTooltip,
   TOOLTIP_FIXED,
-  type UseHoverTooltipTargetProps,
+  UseHoverTooltipTargetProps,
 } from '@opentrons/components'
 import { i18n } from '../../localization'
 import { PDListItem } from '../lists'
@@ -14,9 +14,9 @@ import styles from './StepItem.css'
 import { ModuleRealType } from '@opentrons/shared-data'
 
 export type ModuleStepItemRowProps = {
-  label: string | null | undefined,
-  value: string | null | undefined,
-  targetProps?: UseHoverTooltipTargetProps,
+  label: string | null | undefined
+  value: string | null | undefined
+  targetProps?: UseHoverTooltipTargetProps
 }
 
 export const ModuleStepItemRow = (
@@ -33,13 +33,13 @@ export const ModuleStepItemRow = (
 )
 
 type Props = {
-  action?: string,
-  moduleType: ModuleRealType,
-  actionText: string,
-  labwareNickname: string | null | undefined,
-  message: string | null | undefined,
-  children?: React.Node,
-  hideHeader?: boolean,
+  action?: string
+  moduleType: ModuleRealType
+  actionText: string
+  labwareNickname: string | null | undefined
+  message: string | null | undefined
+  children?: React.Node
+  hideHeader?: boolean
 }
 
 export const ModuleStepItems = (props: Props): React.Node => {

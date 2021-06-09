@@ -4,7 +4,7 @@ import {
   FormGroup,
   CheckboxField,
   DropdownField,
-  type Options,
+ Options,
 } from '@opentrons/components'
 import { connect } from 'react-redux'
 import cx from 'classnames'

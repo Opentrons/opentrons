@@ -9,7 +9,7 @@ import {
   moveLiquidFormToArgs,
   getAirGapData,
   getMixData,
-  type HydratedMoveLiquidFormData,
+  HydratedMoveLiquidFormData,
 } from '../moveLiquidFormToArgs'
 import { getOrderedWells } from '../../../utils'
 jest.mock('../../../utils')
