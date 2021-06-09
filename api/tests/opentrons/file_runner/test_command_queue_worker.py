@@ -78,7 +78,7 @@ async def test_play_no_pending(
         subject: CommandQueueWorker,
         store: AsyncMock
 ) -> None:
-    """It not execute any commands."""
+    """It should not execute any commands."""
     store.commands.get_next_request.return_value = None
 
     subject.play()
