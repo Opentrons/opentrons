@@ -17,7 +17,7 @@ type WellTooltipParams = {
     wellName: string,
     wellIngreds: LocationLiquidState
   ) => (e: SyntheticMouseEvent<*>) => void,
-  handleMouseLeaveWell: mixed => void,
+  handleMouseLeaveWell: (val: unknown) => void,
   tooltipWellName: string | null | undefined,
 }
 

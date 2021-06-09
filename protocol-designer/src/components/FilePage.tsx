@@ -27,20 +27,20 @@ import { FileMetadataFields } from '../file-data'
 import { ModulesForEditModulesCard } from '../step-forms'
 
 export type Props = {
-  formValues: FileMetadataFields,
-  instruments: React.ElementProps<typeof InstrumentGroup>,
-  goToNextPage: () => mixed,
-  saveFileMetadata: FileMetadataFields => mixed,
-  swapPipettes: () => mixed,
-  modules: ModulesForEditModulesCard,
+  formValues: FileMetadataFields
+  instruments: React.ElementProps<typeof InstrumentGroup>
+  goToNextPage: () => unknown
+  saveFileMetadata: (fileMetaDataFields: FileMetadataFields) => unknown
+  swapPipettes: () => unknown
+  modules: ModulesForEditModulesCard
 }
 
 type State = {
-  isEditPipetteModalOpen: boolean,
+  isEditPipetteModalOpen: boolean
   moduleToEdit: {
-    moduleType: ModuleRealType,
-    moduleId: string | null | undefined,
-  } | null,
+    moduleType: ModuleRealType
+    moduleId: string | null | undefined
+  } | null
 }
 
 // TODO(mc, 2020-02-28): explore l10n for these dates

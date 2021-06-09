@@ -17,8 +17,8 @@ type LabwareControlsProps = {
   labwareOnDeck: LabwareOnDeck,
   selectedTerminalItemId: TerminalItemId | null | undefined,
   slot: DeckSlot,
-  setHoveredLabware: (?LabwareOnDeck) => mixed,
-  setDraggedLabware: (?LabwareOnDeck) => mixed,
+  setHoveredLabware: (labware: LabwareOnDeck | null | undefined) => unknown,
+  setDraggedLabware: (labware: LabwareOnDeck | null | undefined) => unknown,
   swapBlocked: boolean,
 }
 
