@@ -109,8 +109,10 @@ async def test_pause(
         commands: List[Tuple[str, CommandRequestType]]
 ) -> None:
     """It should cycle through pending commands and execute them."""
-    async def mock_execute_command(command_id: str,
-                                   request: CommandRequestType) -> None:
+    async def mock_execute_command(
+        request: CommandRequestType,
+        command_id: str,
+    ) -> None:
         if command_id == str("command-id-0"):
             # Pause after first command
             subject.pause()
@@ -131,6 +133,6 @@ async def test_pause(
     subject.play()
     await subject.wait_to_be_idle()
 
-    expected_call_args_list = [call(command_id=i, request=r) for i, r in commands[1:]]
+    expected_call_args_list = [call(request=r, command_id=i) for i, r in commands[1:]]
 
     assert protocol_engine.execute_command.call_args_list == expected_call_args_list
