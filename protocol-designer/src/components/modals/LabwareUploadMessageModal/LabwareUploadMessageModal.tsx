@@ -2,11 +2,7 @@
 import assert from 'assert'
 import cx from 'classnames'
 import * as React from 'react'
-import {
-  AlertModal,
-  OutlineButton,
-  type ButtonProps,
-} from '@opentrons/components'
+import { AlertModal, OutlineButton, ButtonProps } from '@opentrons/components'
 import { i18n } from '../../../localization'
 import modalStyles from '../modal.css'
 import { LabwareUploadMessage } from '../../../labware-defs'
@@ -90,9 +86,9 @@ const MessageBody = (props: { message: LabwareUploadMessage }) => {
 }
 
 type Props = {
-  message: LabwareUploadMessage | null | undefined,
-  dismissModal: () => mixed,
-  overwriteLabwareDef?: () => mixed,
+  message: LabwareUploadMessage | null | undefined
+  dismissModal: () => mixed
+  overwriteLabwareDef?: () => mixed
 }
 
 export const LabwareUploadMessageModal = (props: Props): React.Node => {

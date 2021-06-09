@@ -11,8 +11,7 @@ import { MODELS_FOR_MODULE_TYPE } from '../../../../constants'
 
 jest.mock('formik')
 
-const useField: JestMockFn<[any], $Call<typeof Formik.useField, any>> =
-  Formik.useField
+const useField = Formik.useField as jest.MockedFunction<typeof Formik.useField>
 
 describe('Model Dropdown', () => {
   let mockStore

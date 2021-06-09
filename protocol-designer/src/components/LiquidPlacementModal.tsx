@@ -35,8 +35,8 @@ type SP = {
 }
 
 type DP = {
-  selectWells: WellGroup => mixed,
-  deselectWells: WellGroup => mixed,
+  selectWells: (wellGroup: WellGroup) => unknown,
+  deselectWells: (wellGroup: WellGroup) => unknown,
 }
 
 type Props = SP & DP

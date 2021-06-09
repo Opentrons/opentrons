@@ -17,12 +17,12 @@ type WellTooltipParams = {
     wellName: string,
     wellIngreds: LocationLiquidState
   ) => (e: SyntheticMouseEvent<*>) => void,
-  handleMouseLeaveWell: mixed => void,
+  handleMouseLeaveWell: (val: unknown) => void,
   tooltipWellName: string | null | undefined,
 }
 
 type Props = {
-  children: WellTooltipParams => React.Node,
+  children: (wellTooltipParams: WellTooltipParams) => React.Node,
   ingredNames: WellIngredientNames,
 }
 

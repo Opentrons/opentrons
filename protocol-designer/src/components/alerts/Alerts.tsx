@@ -11,19 +11,21 @@ import { AlertData, AlertType } from './types'
  */
 
 export type Props = {
-  errors: AlertData[],
-  warnings: AlertData[],
-  dismissWarning: string => mixed,
+  errors: AlertData[]
+  warnings: AlertData[]
+  dismissWarning: (val: string) => unknown
 }
 
 type MakeAlert = (
   alertType: AlertType,
   data: AlertData,
   key: number | string
-) => React.Node
+) => JSX.Element
 
 const AlertsComponent = (props: Props) => {
-  const makeHandleCloseWarning = (dismissId: string | null | undefined) => () => {
+  const makeHandleCloseWarning = (
+    dismissId: string | null | undefined
+  ) => () => {
     assert(dismissId, 'expected dismissId, Alert cannot dismiss warning')
     if (dismissId) {
       props.dismissWarning(dismissId)

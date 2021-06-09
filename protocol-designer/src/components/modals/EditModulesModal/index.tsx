@@ -49,14 +49,13 @@ import { ModelModuleInfo } from '../../EditModules'
 type EditModulesModalProps = {
   moduleType: ModuleRealType,
   moduleOnDeck: ModuleOnDeck | null,
-  onCloseClick: () => mixed,
-  editModuleModel: (model: ModuleModel) => mixed,
-  editModuleSlot: (slot: string) => mixed,
-  displayModuleWarning: (module: ModelModuleInfo) => mixed,
+  onCloseClick: () => unknown,
+  editModuleModel: (model: ModuleModel) => unknown,
+  editModuleSlot: (slot: string) => unknown,
+  displayModuleWarning: (module: ModelModuleInfo) => unknown,
 }
 
-type EditModulesModalComponentProps = {
-  ...EditModulesModalProps,
+type EditModulesModalComponentProps = EditModulesModalProps & {
   supportedModuleSlot: string,
 }
 

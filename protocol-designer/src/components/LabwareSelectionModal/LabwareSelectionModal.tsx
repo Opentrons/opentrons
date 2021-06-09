@@ -14,8 +14,8 @@ import {
   TEMPERATURE_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
-  type LabwareDefinition2,
-  type ModuleRealType,
+  LabwareDefinition2,
+  ModuleRealType,
 } from '@opentrons/shared-data'
 import { i18n } from '../../localization'
 import { SPAN7_8_10_11_SLOT } from '../../constants'
@@ -32,18 +32,18 @@ import { DeckSlot } from '../../types'
 import { LabwareDefByDefURI } from '../../labware-defs'
 
 type Props = {
-  onClose: (e?: any) => mixed,
-  onUploadLabware: (event: SyntheticInputEvent<HTMLInputElement>) => mixed,
-  selectLabware: (containerType: string) => mixed,
+  onClose: (e?: any) => unknown,
+  onUploadLabware: (event: SyntheticInputEvent<HTMLInputElement>) => unknown,
+  selectLabware: (containerType: string) => unknown,
   customLabwareDefs: LabwareDefByDefURI,
   /** the slot you're literally adding labware to (may be a module slot) */
-  slot: DeckSlot | null | undefined,
+  slot: DeckSlot | null | undefined
   /** if adding to a module, the slot of the parent (for display) */
-  parentSlot: DeckSlot | null | undefined,
+  parentSlot: DeckSlot | null | undefined
   /** if adding to a module, the module's type */
-  moduleType: ModuleRealType | null | undefined,
+  moduleType: ModuleRealType | null | undefined
   /** tipracks that may be added to deck (depends on pipette<>tiprack assignment) */
-  permittedTipracks: string[],
+  permittedTipracks: string[]
 }
 
 const LABWARE_CREATOR_URL = 'https://labware.opentrons.com/create'
@@ -99,10 +99,9 @@ export const LabwareSelectionModal = (props: Props): React.Node => {
   const [selectedCategory, setSelectedCategory] = React.useState<string | null>(
     null
   )
-  const [
-    previewedLabware,
-    setPreviewedLabware,
-  ] = React.useState<?LabwareDefinition2>(null)
+  const [previewedLabware, setPreviewedLabware] = React.useState<
+    ?LabwareDefinition2
+  >(null)
   const [filterRecommended, setFilterRecommended] = React.useState<boolean>(
     false
   )

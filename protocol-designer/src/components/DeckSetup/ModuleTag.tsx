@@ -7,7 +7,7 @@ import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
-  type ModuleRealType,
+  ModuleRealType,
 } from '@opentrons/shared-data'
 import {
   TEMPERATURE_AT_TARGET,
@@ -30,10 +30,10 @@ import {
 } from '../../step-forms'
 
 type Props = {
-  x: number,
-  y: number,
-  orientation: ModuleOrientation,
-  id: string,
+  x: number
+  y: number
+  orientation: ModuleOrientation
+  id: string
 }
 
 // eyeballed width/height to match designs
@@ -67,7 +67,7 @@ function getTempStatus(temperatureModuleState: TemperatureModuleState): string {
 export const ModuleStatus = ({
   moduleState,
 }: {
-  moduleState: $PropertyType<ModuleTemporalProperties, 'moduleState'>,
+  moduleState: $PropertyType<ModuleTemporalProperties, 'moduleState'>
 }): React.Node => {
   switch (moduleState.type) {
     case MAGNETIC_MODULE_TYPE:

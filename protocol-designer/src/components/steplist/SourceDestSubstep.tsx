@@ -16,10 +16,9 @@ export type StepSubItemProps = {
   substeps: SourceDestSubstepItem,
 }
 
-type SourceDestSubstepProps = {
-  ...StepSubItemProps,
+type SourceDestSubstepProps = StepSubItemProps & {
   ingredNames: WellIngredientNames,
-  selectSubstep: SubstepIdentifier => mixed,
+  selectSubstep: (substepIdentifier: SubstepIdentifier) => unknown,
   hoveredSubstep: SubstepIdentifier | null | undefined,
 }
 

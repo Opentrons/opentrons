@@ -8,11 +8,11 @@ import { BaseState } from '../types'
 // TODO(IL, 2020-09-09): AnalyticsEvent type copied from app/src/analytics/types.js, consider merging
 export type AnalyticsEvent =
   | {
-      name: string,
-      properties: { ... },
-      superProperties?: { ... },
+      name: string
+      properties: { [key: string]: unknown }
+      superProperties?: { [key: string]: unknown }
     }
-  | { superProperties: { ... } }
+  | { superProperties: { [key: string]: unknown } }
 
 // pulled in from environment at build time
 const MIXPANEL_ID = getIsProduction()

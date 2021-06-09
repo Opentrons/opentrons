@@ -8,8 +8,7 @@ import styles from '../StepEditForm.css'
 
 import { FieldProps } from '../types'
 
-type ToggleRowProps = {
-  ...FieldProps,
+type ToggleRowProps = FieldProps & {
   offLabel?: string,
   onLabel?: string,
   className?: string,
@@ -31,7 +30,7 @@ export const ToggleRowField = (props: ToggleRowProps): React.Node => {
       onLabel={onLabel}
       className={cx(styles.toggle_field, className)}
       value={Boolean(value)}
-      onChange={(e: SyntheticInputEvent<*>) => updateValue(!value)}
+      onChange={(e: SyntheticInputEvent<>) => updateValue(!value)}
       disabled={disabled}
     />
   )

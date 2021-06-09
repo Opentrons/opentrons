@@ -6,7 +6,7 @@ import {
   FormGroup,
   PipetteSelect,
   OutlineButton,
-  type Mount,
+  Mount,
 } from '@opentrons/components'
 import { getLabwareDefURI, getLabwareDisplayName } from '@opentrons/shared-data'
 import isEmpty from 'lodash/isEmpty'
@@ -22,39 +22,39 @@ import formStyles from '../../forms/forms.css'
 import { FormPipettesByMount } from '../../../step-forms'
 
 export type Props = {
-  initialTabIndex?: number,
-  values: FormPipettesByMount,
+  initialTabIndex?: number
+  values: FormPipettesByMount
   // TODO 2020-3-20 use formik typing here after we update the def in flow-typed
   errors:
     | null
     | string
     | {
         left?: {
-          tiprackDefURI: string,
-        },
+          tiprackDefURI: string
+        }
         right?: {
-          tiprackDefURI: string,
-        },
-      },
+          tiprackDefURI: string
+        }
+      }
   touched:
     | null
     | boolean
     | {
         left?: {
-          tiprackDefURI: boolean,
-        },
+          tiprackDefURI: boolean
+        }
         right?: {
-          tiprackDefURI: boolean,
-        },
-      },
-  onFieldChange: (event: SyntheticInputEvent<HTMLSelectElement>) => mixed,
-  onSetFieldValue: (field: string, value: string | null) => void,
-  onSetFieldTouched: (field: string, touched: boolean) => void,
-  onBlur: (event: SyntheticFocusEvent<HTMLSelectElement>) => mixed,
+          tiprackDefURI: boolean
+        }
+      }
+  onFieldChange: (event: SyntheticInputEvent<HTMLSelectElement>) => mixed
+  onSetFieldValue: (field: string, value: string | null) => void
+  onSetFieldTouched: (field: string, touched: boolean) => void
+  onBlur: (event: SyntheticFocusEvent<HTMLSelectElement>) => mixed
 }
 
 // TODO(mc, 2019-10-14): delete this typedef when gen2 ff is removed
-type PipetteSelectProps = { mount: Mount, tabIndex: number }
+type PipetteSelectProps = { mount: Mount; tabIndex: number }
 
 export function PipetteFields(props: Props): React.Node {
   const {

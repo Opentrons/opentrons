@@ -10,7 +10,7 @@ import {
 import { i18n } from '../../../../localization'
 import {
   getDisabledChangeTipOptions,
-  type DisabledChangeTipArgs,
+  DisabledChangeTipArgs,
 } from './getDisabledChangeTipOptions'
 import { ChangeTipOptions } from '@opentrons/step-generation'
 import { FieldProps } from '../../types'
@@ -23,10 +23,7 @@ const ALL_CHANGE_TIP_VALUES: ChangeTipOptions[] = [
   'perDest',
   'never',
 ]
-type Props = {
-  ...FieldProps,
-  ...DisabledChangeTipArgs,
-}
+type Props = FieldProps & DisabledChangeTipArgs
 
 export const ChangeTipField = (props: Props): React.Node => {
   const {
@@ -70,7 +67,7 @@ export const ChangeTipField = (props: Props): React.Node => {
 }
 
 type LabelProps = {
-  value: string,
+  value: string
 }
 
 const ChangeTipOptionLabel = (props: LabelProps) => {

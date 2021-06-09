@@ -13,7 +13,7 @@ const _setAnalyticsTags = () => {
   const { ot_email: email, ot_name: displayName } = cookies
   const commit_str = process.env.OT_PD_COMMIT_HASH
   const version_str = process.env.OT_PD_VERSION
-  const buildDate_date = new Date((process.env.OT_PD_BUILD_DATE: any))
+  const buildDate_date = new Date(process.env.OT_PD_BUILD_DATE as any)
 
   // NOTE: fullstory expects the keys 'displayName' and 'email' verbatim
   // though all other key names must be fit the schema described here

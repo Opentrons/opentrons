@@ -40,38 +40,38 @@ import { FormikProps } from 'formik/@flow-typed'
 
 export type PipetteFieldsData = $Diff<
   PipetteOnDeck,
-  { id: mixed, spec: mixed, tiprackLabwareDef: mixed }
+  { id: mixed; spec: mixed; tiprackLabwareDef: mixed }
 >
 
 export type ModuleCreationArgs = {
-  type: ModuleRealType,
-  model: string,
-  slot: DeckSlot,
+  type: ModuleRealType
+  model: string
+  slot: DeckSlot
 }
 
 type FormState = {
-  fields: NewProtocolFields,
-  pipettesByMount: FormPipettesByMount,
-  modulesByType: FormModulesByType,
+  fields: NewProtocolFields
+  pipettesByMount: FormPipettesByMount
+  modulesByType: FormModulesByType
 }
 
 type State = {
-  showEditPipetteConfirmation: boolean,
+  showEditPipetteConfirmation: boolean
 }
 
 export type Props = {
-  showProtocolFields: boolean | null | undefined,
-  showModulesFields: boolean | null | undefined,
-  hideModal?: boolean,
-  onCancel: () => mixed,
-  initialPipetteValues?: $PropertyType<FormState, 'pipettesByMount'>,
-  initialModuleValues?: $PropertyType<FormState, 'modulesByType'>,
-  onSave: ({
-    newProtocolFields: NewProtocolFields,
-    pipettes: PipetteFieldsData[],
-    modules: ModuleCreationArgs[],
-  }) => mixed,
-  moduleRestrictionsDisabled: boolean | null | undefined,
+  showProtocolFields: boolean | null | undefined
+  showModulesFields: boolean | null | undefined
+  hideModal?: boolean
+  onCancel: () => unknown
+  initialPipetteValues?: $PropertyType<FormState, 'pipettesByMount'>
+  initialModuleValues?: $PropertyType<FormState, 'modulesByType'>
+  onSave: (args: {
+    newProtocolFields: NewProtocolFields
+    pipettes: PipetteFieldsData[]
+    modules: ModuleCreationArgs[]
+  }) => unknown
+  moduleRestrictionsDisabled: boolean | null | undefined
 }
 
 const initialFormState: FormState = {

@@ -18,22 +18,21 @@ const DEFAULT_LABEL = i18n.t('form.step_edit_form.field.flow_rate.label')
 const DECIMALS_ALLOWED = 1
 
 /** When flow rate is falsey (including 0), it means 'use default' */
-export type FlowRateInputProps = {
-  ...FieldProps,
-  defaultFlowRate: number | null | undefined,
-  flowRateType: 'aspirate' | 'dispense',
-  label: string | null | undefined,
-  minFlowRate: number,
-  maxFlowRate: number,
-  pipetteDisplayName: string | null | undefined,
-  className?: string,
+export type FlowRateInputProps = FieldProps & {
+  defaultFlowRate: number | null | undefined
+  flowRateType: 'aspirate' | 'dispense'
+  label: string | null | undefined
+  minFlowRate: number
+  maxFlowRate: number
+  pipetteDisplayName: string | null | undefined
+  className?: string
 }
 
 type State = {
-  isPristine: boolean,
-  modalFlowRate: string | null | undefined,
-  modalUseDefault: boolean,
-  showModal: boolean,
+  isPristine: boolean
+  modalFlowRate: string | null | undefined
+  modalUseDefault: boolean
+  showModal: boolean
 }
 
 export const FlowRateInput = (props: FlowRateInputProps): React.Node => {

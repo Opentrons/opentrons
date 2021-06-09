@@ -12,8 +12,7 @@ const { DelayFields } = jest.requireActual('../../fields')
 
 jest.mock('../../../../step-forms/selectors')
 
-const getUnsavedFormMock: JestMockFn<[BaseState], any> =
-  stepFormSelectors.getUnsavedForm
+const getUnsavedFormMock = stepFormSelectors.getUnsavedForm as jest.MockedFunction<typeof stepFormSelectors.getUnsavedForm>
 
 jest.mock('../../fields/', () => {
   const actualFields = jest.requireActual('../../fields')
@@ -60,7 +59,7 @@ describe('MixForm', () => {
         stepType: 'mix',
         mix_wellOrder_first: 'r2l',
         mix_wellOrder_second: 'b2t',
-      }: any),
+      } as any),
       focusHandlers: {
         blur: jest.fn(),
         focus: jest.fn(),
@@ -69,30 +68,30 @@ describe('MixForm', () => {
       },
       propsForFields: {
         pipette: {
-          onFieldFocus: (jest.fn(): any),
-          onFieldBlur: (jest.fn(): any),
+          onFieldFocus: (jest.fn() as any),
+          onFieldBlur: (jest.fn() as any),
           errorToShow: null,
           disabled: false,
           name: 'pipette',
-          updateValue: (jest.fn(): any),
+          updateValue: (jest.fn() as any),
           value: null,
         },
         mix_wellOrder_first: {
-          onFieldFocus: (jest.fn(): any),
-          onFieldBlur: (jest.fn(): any),
+          onFieldFocus: (jest.fn() as any),
+          onFieldBlur: (jest.fn() as any),
           errorToShow: null,
           disabled: false,
           name: 'mix_wellOrder_first',
-          updateValue: (jest.fn(): any),
+          updateValue: (jest.fn() as any),
           value: null,
         },
         mix_wellOrder_second: {
-          onFieldFocus: (jest.fn(): any),
-          onFieldBlur: (jest.fn(): any),
+          onFieldFocus: (jest.fn() as any),
+          onFieldBlur: (jest.fn() as any),
           errorToShow: null,
           disabled: false,
           name: 'mix_wellOrder_second',
-          updateValue: (jest.fn(): any),
+          updateValue: (jest.fn() as any),
           value: null,
         },
       },

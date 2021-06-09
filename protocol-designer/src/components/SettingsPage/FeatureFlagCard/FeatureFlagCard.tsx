@@ -9,8 +9,8 @@ import styles from '../SettingsPage.css'
 import modalStyles from '../../modals/modal.css'
 import {
   userFacingFlags,
-  type Flags,
-  type FlagTypes,
+ Flags,
+ FlagTypes,
 } from '../../../feature-flags'
 
 type Props = {
@@ -101,7 +101,7 @@ export const FeatureFlagCard = (props: Props): React.Node => {
             onCancelClick={() => setModalFlagName(null)}
             onContinueClick={() => {
               props.setFeatureFlags({
-                [(modalFlagName: string)]: !props.flags[modalFlagName],
+                [(modalFlagName as string)]: !props.flags[modalFlagName],
               })
               setModalFlagName(null)
             }}

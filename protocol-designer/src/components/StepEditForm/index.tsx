@@ -34,10 +34,7 @@ type DP = {
   saveStepForm: () => mixed,
   handleChangeFormInput: (name: string, value: mixed) => void,
 }
-type StepEditFormManagerProps = {
-  ...SP,
-  ...DP,
-}
+type StepEditFormManagerProps = SP & DP
 
 const StepEditFormManager = (props: StepEditFormManagerProps) => {
   const {

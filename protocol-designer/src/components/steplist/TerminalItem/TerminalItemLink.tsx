@@ -9,7 +9,7 @@ import { i18n } from '../../../localization'
 import styles from './styles.css'
 
 type OP = { terminalId: TerminalItemId }
-type DP = { selectTerminalItem: TerminalItemId => mixed }
+type DP = { selectTerminalItem: (terminalItemId: TerminalItemId) => unknown }
 type Props = OP & DP
 
 class TerminalItemLinkComponent extends React.Component<Props> {

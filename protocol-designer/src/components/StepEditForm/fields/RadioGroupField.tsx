@@ -4,11 +4,10 @@ import { RadioGroup } from '@opentrons/components'
 import { StepFieldName } from '../../../steplist/fieldLevel'
 import { FieldProps } from '../types'
 
-type RadioGroupFieldProps = {
-  ...FieldProps,
-  name: StepFieldName,
-  options: $PropertyType<React.ElementProps<typeof RadioGroup>, 'options'>,
-  className?: string,
+type RadioGroupFieldProps = FieldProps & {
+  name: StepFieldName
+  options: $PropertyType<React.ElementProps<typeof RadioGroup>, 'options'>
+  className?: string
 }
 
 export const RadioGroupField = (props: RadioGroupFieldProps): React.Node => {

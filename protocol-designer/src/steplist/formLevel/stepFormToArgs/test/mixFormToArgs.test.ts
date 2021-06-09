@@ -7,7 +7,9 @@ import { DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP } from '../../../../constants'
 import { getOrderedWells } from '../../../utils'
 jest.mock('../../../utils')
 
-const getOrderedWellsMock: JestMockFn<any, string[]> = getOrderedWells
+const getOrderedWellsMock = getOrderedWells as jest.MockedFunction<
+  typeof getOrderedWells
+>
 
 let hydratedForm
 const labwareDef = fixture_96_plate

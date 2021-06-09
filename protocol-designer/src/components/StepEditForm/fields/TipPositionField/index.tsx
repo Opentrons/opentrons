@@ -6,7 +6,7 @@ import {
   InputField,
   Tooltip,
   useHoverTooltip,
-  type UseHoverTooltipResult,
+ UseHoverTooltipResult,
 } from '@opentrons/components'
 import { getWellsDepth } from '@opentrons/shared-data'
 import {
@@ -23,8 +23,7 @@ import { getDefaultMmFromBottom } from './utils'
 import { BaseState } from '../../../../types'
 import { FieldProps } from '../../types'
 
-type OP = {
-  ...FieldProps,
+type OP = FieldProps & {
   labwareId: string | null | undefined,
   className?: string,
 }

@@ -32,20 +32,19 @@ const ALL_PATH_OPTIONS = [
   },
 ]
 
-type PathFieldProps = {
-  ...FieldProps,
-  ...ValuesForPath,
-  disabledPathMap: DisabledPathMap,
-}
+type PathFieldProps = FieldProps &
+  ValuesForPath & {
+    disabledPathMap: DisabledPathMap
+  }
 
 type ButtonProps = {
-  children?: React.Node,
-  disabled: boolean,
-  id?: string,
-  selected: boolean,
-  subtitle: string,
-  onClick: (e: SyntheticMouseEvent<*>) => mixed,
-  path: PathOption,
+  children?: React.Node
+  disabled: boolean
+  id?: string
+  selected: boolean
+  subtitle: string
+  onClick: (e: SyntheticMouseEvent<*>) => unknown
+  path: PathOption
 }
 
 const PathButton = (buttonProps: ButtonProps) => {

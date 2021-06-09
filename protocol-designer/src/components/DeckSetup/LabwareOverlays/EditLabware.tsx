@@ -20,26 +20,26 @@ import { LabwareOnDeck } from '../../../step-forms'
 import styles from './LabwareOverlays.css'
 
 type OP = {
-  labwareOnDeck: LabwareOnDeck,
-  setHoveredLabware: (?LabwareOnDeck) => mixed,
-  setDraggedLabware: (?LabwareOnDeck) => mixed,
-  swapBlocked: boolean,
+  labwareOnDeck: LabwareOnDeck
+  setHoveredLabware: (val: ?LabwareOnDeck) => unknown
+  setDraggedLabware: (val: ?LabwareOnDeck) => unknown
+  swapBlocked: boolean
 }
 type SP = {
-  isYetUnnamed: boolean,
+  isYetUnnamed: boolean
 }
 type DP = {
-  editLiquids: () => mixed,
-  duplicateLabware: () => mixed,
-  deleteLabware: () => mixed,
-  moveDeckItem: (DeckSlot, DeckSlot) => mixed,
+  editLiquids: () => unknown
+  duplicateLabware: () => unknown
+  deleteLabware: () => unknown
+  moveDeckItem: (item1: DeckSlot, item2: DeckSlot) => unknown
 }
 
 type DNDP = {
-  draggedLabware: LabwareOnDeck | null | undefined,
-  isOver: boolean,
-  connectDragSource: React.Node => React.Node,
-  connectDropTarget: React.Node => React.Node,
+  draggedLabware: LabwareOnDeck | null | undefined
+  isOver: boolean
+  connectDragSource: (val: React.Node) => React.Node
+  connectDropTarget: (val: React.Node) => React.Node
 }
 
 type Props = OP & SP & DP & DNDP
@@ -149,7 +149,7 @@ const DragEditLabware = DragSource(
 )(EditLabwareComponent)
 
 const labwareDropTarget = {
-  canDrop: (props: { ...OP, ...SP, ...DP }, monitor) => {
+  canDrop: (props: OP & SP & DP, monitor) => {
     const draggedItem = monitor.getItem()
     const draggedLabware = draggedItem?.labwareOnDeck
     const isDifferentSlot =
@@ -206,12 +206,12 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<*>, ownProps: OP): DP => ({
 })
 
 export const EditLabware: React.AbstractComponent<OP> = connect<
-  { ...OP, ...SP, ...DP },
+  OP & SP & DP,
   OP,
   SP,
   DP,
   BaseState,
-  ThunkDispatch<*>
+  ThunkDispatch<>
 >(
   mapStateToProps,
   mapDispatchToProps
