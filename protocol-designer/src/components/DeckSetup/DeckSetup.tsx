@@ -10,14 +10,14 @@ import {
   FONT_SIZE_BODY_1,
   FONT_WEIGHT_BOLD,
   TEXT_TRANSFORM_UPPERCASE,
-  type RobotWorkSpaceRenderProps,
+  RobotWorkSpaceRenderProps,
 } from '@opentrons/components'
 import { MODULES_WITH_COLLISION_ISSUES } from '@opentrons/step-generation'
 import {
   getLabwareHasQuirk,
   GEN_ONE_MULTI_PIPETTES,
-  type DeckSlot as DeckDefSlot,
-  type ModuleRealType,
+  DeckSlot as DeckDefSlot,
+  ModuleRealType,
 } from '@opentrons/shared-data'
 // $FlowFixMe(mc, 2021-03.15): ignore until TS conversion
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
@@ -63,17 +63,16 @@ export const DECK_LAYER_BLOCKLIST = [
 ]
 
 type Props = {
-  selectedTerminalItemId: TerminalItemId | null | undefined,
-  handleClickOutside?: () => mixed,
-  drilledDown: boolean,
-  initialDeckSetup: InitialDeckSetup,
+  selectedTerminalItemId: TerminalItemId | null | undefined
+  handleClickOutside?: () => unknown
+  drilledDown: boolean
+  initialDeckSetup: InitialDeckSetup
 }
 
-type ContentsProps = {
-  ...RobotWorkSpaceRenderProps,
-  selectedTerminalItemId: TerminalItemId | null | undefined,
-  initialDeckSetup: InitialDeckSetup,
-  showGen1MultichannelCollisionWarnings: boolean,
+type ContentsProps = RobotWorkSpaceRenderProps & {
+  selectedTerminalItemId: TerminalItemId | null | undefined
+  initialDeckSetup: InitialDeckSetup
+  showGen1MultichannelCollisionWarnings: boolean
 }
 
 export const VIEWBOX_MIN_X = -64
@@ -117,10 +116,10 @@ const getModuleSlotDefs = (
 }
 
 export const getSwapBlocked = (args: {
-  hoveredLabware: LabwareOnDeckType | null | undefined,
-  draggedLabware: LabwareOnDeckType | null | undefined,
-  modulesById: $PropertyType<InitialDeckSetup, 'modules'>,
-  customLabwareDefs: LabwareDefByDefURI,
+  hoveredLabware: LabwareOnDeckType | null | undefined
+  draggedLabware: LabwareOnDeckType | null | undefined
+  modulesById: $PropertyType<InitialDeckSetup, 'modules'>
+  customLabwareDefs: LabwareDefByDefURI
 }): boolean => {
   const {
     hoveredLabware,
@@ -176,14 +175,12 @@ export const DeckSetupContents = (props: ContentsProps): React.Node => {
   // hovered over**. The intrinsic state of `react-dnd` is not designed to handle that.
   // So we need to use our own state here to determine
   // whether swapping will be blocked due to labware<>module compat:
-  const [
-    hoveredLabware,
-    setHoveredLabware,
-  ] = React.useState<?LabwareOnDeckType>(null)
-  const [
-    draggedLabware,
-    setDraggedLabware,
-  ] = React.useState<?LabwareOnDeckType>(null)
+  const [hoveredLabware, setHoveredLabware] = React.useState<
+    ?LabwareOnDeckType
+  >(null)
+  const [draggedLabware, setDraggedLabware] = React.useState<
+    ?LabwareOnDeckType
+  >(null)
 
   const customLabwareDefs = useSelector(
     labwareDefSelectors.getCustomLabwareDefsByURI

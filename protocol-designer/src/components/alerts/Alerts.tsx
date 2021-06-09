@@ -13,14 +13,14 @@ import { AlertData, AlertType } from './types'
 export type Props = {
   errors: AlertData[],
   warnings: AlertData[],
-  dismissWarning: string => mixed,
+  dismissWarning: (val: string) => unknown,
 }
 
 type MakeAlert = (
   alertType: AlertType,
   data: AlertData,
   key: number | string
-) => React.Node
+) => JSX.Element
 
 const AlertsComponent = (props: Props) => {
   const makeHandleCloseWarning = (dismissId: string | null | undefined) => () => {
