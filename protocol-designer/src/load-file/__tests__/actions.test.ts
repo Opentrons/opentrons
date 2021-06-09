@@ -5,8 +5,12 @@ import { saveFile as saveFileUtil } from '../utils'
 jest.mock('../../file-data/selectors/fileCreator')
 jest.mock('../../file-data/selectors/fileFields')
 jest.mock('../utils')
-const createFileSelectorMock: jest.MockedFunction<any> = createFile
-const getFileMetadataMock: jest.MockedFunction<any> = getFileMetadata
+const createFileSelectorMock = createFile as jest.MockedFunction<
+  typeof createFile
+>
+const getFileMetadataMock = getFileMetadata as jest.MockedFunction<
+  typeof getFileMetadata
+>
 const saveFileUtilMock = saveFileUtil as jest.MockedFunction<
   typeof saveFileUtil
 >

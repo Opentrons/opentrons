@@ -52,7 +52,7 @@ describe('reduxActionToAnalyticsEvent', () => {
   })
 
   it('should convert a SAVE_STEP_FORM action into a saveStep action with additional properties', () => {
-    getArgsAndErrorsByStepId.mockReturnValue({
+    getArgsAndErrorsByStepIdMock.mockReturnValue({
       stepId: {
         stepArgs: {
           id: 'stepId',
