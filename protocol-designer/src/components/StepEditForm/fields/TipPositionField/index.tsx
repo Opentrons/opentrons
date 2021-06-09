@@ -6,7 +6,7 @@ import {
   InputField,
   Tooltip,
   useHoverTooltip,
-  type UseHoverTooltipResult,
+ UseHoverTooltipResult,
 } from '@opentrons/components'
 import { getWellsDepth } from '@opentrons/shared-data'
 import {

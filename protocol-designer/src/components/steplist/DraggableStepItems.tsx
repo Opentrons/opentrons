@@ -9,8 +9,8 @@ import { ConnectedStepItem } from '../../containers/ConnectedStepItem'
 import { PDTitledList } from '../lists'
 import {
   stepIconsByType,
-  type StepIdType,
-  type StepType,
+ StepIdType,
+ StepType,
 } from '../../form-types'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { BaseState } from '../../types'

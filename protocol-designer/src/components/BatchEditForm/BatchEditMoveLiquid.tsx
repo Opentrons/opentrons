@@ -32,8 +32,8 @@ import styles from '../StepEditForm/StepEditForm.css'
 import buttonStyles from '../StepEditForm/ButtonRow/styles.css'
 
 const SourceDestBatchEditMoveLiquidFields = (props: {
-  prefix: 'aspirate' | 'dispense',
-  propsForFields: FieldPropsByName,
+  prefix: 'aspirate' | 'dispense'
+  propsForFields: FieldPropsByName
 }): React.Node => {
   const { prefix, propsForFields } = props
   const addFieldNamePrefix = name => `${prefix}_${name}`
@@ -49,7 +49,9 @@ const SourceDestBatchEditMoveLiquidFields = (props: {
     return pipetteId ? String(pipetteId) : null
   }
 
-  const getWellOrderFieldValue = (name: string): WellOrderOption | null | undefined => {
+  const getWellOrderFieldValue = (
+    name: string
+  ): WellOrderOption | null | undefined => {
     const val = propsForFields[name]?.value
     if (val === 'l2r' || val === 'r2l' || val === 't2b' || val === 'b2t') {
       return val
@@ -139,7 +141,7 @@ const SourceDestBatchEditMoveLiquidFields = (props: {
             {...propsForFields['blowout_location']}
             className={styles.full_width}
             options={getBlowoutLocationOptionsForForm({
-              path: (propsForFields['path'].value as any),
+              path: propsForFields['path'].value as any,
               stepType: 'moveLiquid',
             })}
           />
@@ -150,10 +152,10 @@ const SourceDestBatchEditMoveLiquidFields = (props: {
 }
 
 type BatchEditMoveLiquidProps = {
-  batchEditFormHasChanges: boolean,
-  propsForFields: FieldPropsByName,
-  handleCancel: () => mixed,
-  handleSave: () => mixed,
+  batchEditFormHasChanges: boolean
+  propsForFields: FieldPropsByName
+  handleCancel: () => mixed
+  handleSave: () => mixed
 }
 export const BatchEditMoveLiquid = (
   props: BatchEditMoveLiquidProps

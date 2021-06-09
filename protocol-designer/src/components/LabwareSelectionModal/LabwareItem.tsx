@@ -2,23 +2,23 @@
 import * as React from 'react'
 import cx from 'classnames'
 import { i18n } from '../../localization'
-import { Icon,  IconName } from '@opentrons/components'
+import { Icon, IconName } from '@opentrons/components'
 import { PDListItem } from '../lists'
 import styles from './styles.css'
 import {
   getLabwareDefURI,
   getLabwareDefIsStandard,
   getLabwareDisplayName,
-  type LabwareDefinition2,
+  LabwareDefinition2,
 } from '@opentrons/shared-data'
 
 type Props = {
-  disabled: boolean | null | undefined,
-  icon: IconName | null | undefined,
-  labwareDef: LabwareDefinition2,
-  onMouseEnter: () => any,
-  onMouseLeave: () => any,
-  selectLabware: (labwareLoadName: string) => mixed,
+  disabled: boolean | null | undefined
+  icon: IconName | null | undefined
+  labwareDef: LabwareDefinition2
+  onMouseEnter: () => any
+  onMouseLeave: () => any
+  selectLabware: (labwareLoadName: string) => mixed
 }
 
 const LABWARE_LIBRARY_PAGE_PATH = 'https://labware.opentrons.com'

@@ -4,7 +4,7 @@ import cx from 'classnames'
 import { RobotCoordsForeignDiv } from '@opentrons/components'
 import { DeckSlot } from '@opentrons/shared-data'
 
-import { START_TERMINAL_ITEM_ID,  TerminalItemId } from '../../../steplist'
+import { START_TERMINAL_ITEM_ID, TerminalItemId } from '../../../steplist'
 import { LabwareOnDeck } from '../../../step-forms'
 import { BlockedSlot } from './BlockedSlot'
 import { BrowseLabware } from './BrowseLabware'
@@ -14,12 +14,12 @@ import { LabwareHighlight } from './LabwareHighlight'
 import styles from './LabwareOverlays.css'
 
 type LabwareControlsProps = {
-  labwareOnDeck: LabwareOnDeck,
-  selectedTerminalItemId: TerminalItemId | null | undefined,
-  slot: DeckSlot,
-  setHoveredLabware: (labware: LabwareOnDeck | null | undefined) => unknown,
-  setDraggedLabware: (labware: LabwareOnDeck | null | undefined) => unknown,
-  swapBlocked: boolean,
+  labwareOnDeck: LabwareOnDeck
+  selectedTerminalItemId: TerminalItemId | null | undefined
+  slot: DeckSlot
+  setHoveredLabware: (labware: LabwareOnDeck | null | undefined) => unknown
+  setDraggedLabware: (labware: LabwareOnDeck | null | undefined) => unknown
+  swapBlocked: boolean
 }
 
 export const LabwareControls = (props: LabwareControlsProps): React.Node => {

@@ -5,7 +5,7 @@ import {
   SINGLE_STEP_SELECTION_TYPE,
   MULTI_STEP_SELECTION_TYPE,
   TERMINAL_ITEM_SELECTION_TYPE,
-  type SelectableItem,
+  SelectableItem,
 } from '../reducers.js'
 import { SelectMultipleStepsAction } from '../actions/types'
 
@@ -205,10 +205,10 @@ describe('selectedItem reducer', () => {
       payload: { stepIds, lastSelected },
     }
     const multiTestCases: {
-      title: string,
-      prev: SelectableItem | null,
-      action: SelectMultipleStepsAction,
-      expected: SelectableItem | null,
+      title: string
+      prev: SelectableItem | null
+      action: SelectMultipleStepsAction
+      expected: SelectableItem | null
     } = [
       {
         title: 'should enter multi-select mode from null',
