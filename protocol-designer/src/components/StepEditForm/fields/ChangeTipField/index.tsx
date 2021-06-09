@@ -10,7 +10,7 @@ import {
 import { i18n } from '../../../../localization'
 import {
   getDisabledChangeTipOptions,
-  type DisabledChangeTipArgs,
+ DisabledChangeTipArgs,
 } from './getDisabledChangeTipOptions'
 import { ChangeTipOptions } from '@opentrons/step-generation'
 import { FieldProps } from '../../types'

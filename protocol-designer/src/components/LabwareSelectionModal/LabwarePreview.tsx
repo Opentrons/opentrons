@@ -10,18 +10,18 @@ import {
 import {
   getLabwareDisplayName,
   getLabwareDefIsStandard,
-  type LabwareDefinition2,
+  LabwareDefinition2,
 } from '@opentrons/shared-data'
 import { i18n } from '../../localization'
 import styles from './styles.css'
 
 type Props = {
-  labwareDef: LabwareDefinition2 | null | undefined,
+  labwareDef: LabwareDefinition2 | null | undefined
   moduleCompatibility?:
     | 'recommended'
     | 'potentiallyCompatible'
     | 'notCompatible'
-    | null,
+    | null
 }
 
 export const LabwarePreview = (props: Props): React.Node => {
