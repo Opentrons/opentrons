@@ -9,8 +9,7 @@ import { SlotDropdown } from '../SlotDropdown'
 
 jest.mock('formik')
 
-const useField: JestMockFn<[any], $Call<typeof Formik.useField, any>> =
-  Formik.useField
+const useField = Formik.useField as jest.MockedFunction<typeof Formik.useField>
 
 describe('Slot Dropdown', () => {
   let mockStore

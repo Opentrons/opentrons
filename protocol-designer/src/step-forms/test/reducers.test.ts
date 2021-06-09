@@ -40,31 +40,25 @@ jest.mock('../../steplist/formLevel/handleFormChange')
 jest.mock('../utils/createPresavedStepForm')
 jest.mock('../../utils/labwareModuleCompatibility')
 jest.mock('../../utils')
-const mockUuid: JestMockFn<[], string> = uuid
-const mockCreatePresavedStepForm: JestMockFn<
-  [CreatePresavedStepFormArgs],
-  any
-> = createPresavedStepForm
-const handleFormChangeMock: JestMockFn<
-  [Record<string, any>, Record<string, any>, any, any],
-  Record<string, any>
-> = handleFormChange
-const getLabwareIsCompatibleMock: JestMockFn<
-  [any],
-  boolean
-> = getLabwareIsCompatible
-const mock_getPipetteEntitiesRootState: JestMockFn<
-  [any],
-  any
-> = _getPipetteEntitiesRootState
-const mock_getLabwareEntitiesRootState: JestMockFn<
-  [any],
-  any
-> = _getLabwareEntitiesRootState
-const mock_getInitialDeckSetupRootState: JestMockFn<
-  [any],
-  any
-> = _getInitialDeckSetupRootState
+const mockUuid = uuid as jest.MockedFunction<typeof uuid>
+const mockCreatePresavedStepForm = createPresavedStepForm as jest.MockedFunction<
+  typeof createPresavedStepForm
+>
+const handleFormChangeMock = handleFormChange as jest.MockedFunction<
+  typeof handleFormChange
+>
+const getLabwareIsCompatibleMock = getLabwareIsCompatible as jest.MockedFunction<
+  typeof getLabwareIsCompatible
+>
+const mock_getPipetteEntitiesRootState = _getPipetteEntitiesRootState as jest.MockedFunction<
+  typeof _getPipetteEntitiesRootState
+>
+const mock_getLabwareEntitiesRootState = _getLabwareEntitiesRootState as jest.MockedFunction<
+  typeof _getLabwareEntitiesRootState
+>
+const mock_getInitialDeckSetupRootState = _getInitialDeckSetupRootState as jest.MockedFunction<
+  typeof _getInitialDeckSetupRootState
+>
 afterEach(() => {
   jest.clearAllMocks()
 })

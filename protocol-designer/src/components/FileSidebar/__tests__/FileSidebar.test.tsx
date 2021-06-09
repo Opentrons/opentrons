@@ -14,7 +14,9 @@ import { HintArgs } from '../../Hints/useBlockingHint'
 
 jest.mock('../../Hints/useBlockingHint')
 
-const mockUseBlockingHint: JestMockFn<[HintArgs], ?React.Node> = useBlockingHint
+const mockUseBlockingHint = useBlockingHint as jest.MockedFunction<
+  typeof useBlockingHint
+>
 
 describe('FileSidebar', () => {
   const pipetteLeftId = 'pipetteLeftId'

@@ -18,7 +18,7 @@ export const showFieldErrors = ({
   name,
   focusedField,
   dirtyFields,
-}: ShowFieldErrorParams): boolean | void | StepFieldName[] =>
+}: ShowFieldErrorParams): boolean | undefined | StepFieldName[] =>
   !(name === focusedField) && dirtyFields && dirtyFields.includes(name)
 export const makeSingleEditFieldProps = (
   focusHandlers: FocusHandlers,

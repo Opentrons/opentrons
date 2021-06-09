@@ -19,27 +19,25 @@ import * as timelineFramesSelectors from '../../../top-selectors/timelineFrames'
 import { selectors as stepFormSelectors } from '../../../step-forms'
 import * as uiSelectors from '../../../ui/steps'
 
-import { CommandsAndRobotState } from '@opentrons/step-generation'
-import { BaseState } from '../../../types'
-import { ModuleEntities, InitialDeckSetup } from '../../../step-forms'
-
 jest.mock('../../../ui/steps')
 jest.mock('../../../top-selectors/timelineFrames')
 jest.mock('../../../step-forms')
 
-const timelineFrameBeforeActiveItemMock: JestMockFn<
-  [BaseState],
-  CommandsAndRobotState | null
-> = timelineFramesSelectors.timelineFrameBeforeActiveItem
+const timelineFrameBeforeActiveItemMock = timelineFramesSelectors.timelineFrameBeforeActiveItem as jest.MockedFunction<
+  typeof timelineFramesSelectors.timelineFrameBeforeActiveItem
+>
 
-const getModuleEntitiesMock: JestMockFn<[BaseState], ModuleEntities> =
-  stepFormSelectors.getModuleEntities
+const getModuleEntitiesMock = stepFormSelectors.getModuleEntities as jest.MockedFunction<
+  typeof stepFormSelectors.getModuleEntities
+>
 
-const getHoveredStepLabwareMock: JestMockFn<[BaseState], string[]> =
-  uiSelectors.getHoveredStepLabware
+const getHoveredStepLabwareMock = uiSelectors.getHoveredStepLabware as jest.MockedFunction<
+  typeof uiSelectors.getHoveredStepLabware
+>
 
-const getInitialDeckSetup: JestMockFn<[BaseState], InitialDeckSetup> =
-  stepFormSelectors.getInitialDeckSetup
+const getInitialDeckSetup = stepFormSelectors.getInitialDeckSetup as jest.MockedFunction<
+  typeof stepFormSelectors.getInitialDeckSetup
+>
 
 describe('ModuleTag', () => {
   describe('ModuleStatus', () => {
