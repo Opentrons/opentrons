@@ -14,9 +14,8 @@ export type FormWarningType =
   | 'BELOW_MIN_DISPOSAL_VOLUME'
   | 'BELOW_MIN_AIR_GAP_VOLUME'
 
-export type FormWarning = {
-  ...FormError,
-  type: FormWarningType,
+export type FormWarning = FormError & {
+  type: FormWarningType
 }
 
 const belowMinAirGapVolumeWarning = (min: number): FormWarning => ({
@@ -68,7 +67,7 @@ const belowMinDisposalVolumeWarning = (min: number): FormWarning => ({
   dependentFields: ['disposalVolume_volume', 'pipette'],
 })
 
-export type WarningChecker = mixed => ?FormWarning
+export type WarningChecker = (val: unknown) => ?FormWarning
 
 /*******************
  ** Warning Checkers **
@@ -98,7 +97,9 @@ export const maxDispenseWellVolume = (
   return hasExceeded ? overMaxWellVolumeWarning() : null
 }
 
-export const minDisposalVolume = (fields: HydratedFormData): FormWarning | null | undefined => {
+export const minDisposalVolume = (
+  fields: HydratedFormData
+): FormWarning | null | undefined => {
   const {
     disposalVolume_checkbox,
     disposalVolume_volume,
@@ -115,13 +116,10 @@ export const minDisposalVolume = (fields: HydratedFormData): FormWarning | null 
 }
 
 // both aspirate and dispense air gap volumes have the same minimums
-export const _minAirGapVolume: (
+export const _minAirGapVolume = (
   checkboxField: 'aspirate_airGap_checkbox' | 'dispense_airGap_checkbox',
   volumeField: 'aspirate_airGap_volume' | 'dispense_airGap_volume'
-) => HydratedFormData => ?FormWarning = (
-  checkboxField,
-  volumeField
-) => fields => {
+) => (fields: HydratedFormData): ?FormWarning => {
   const checkboxValue = fields[checkboxField]
   const volumeValue = fields[volumeField]
   const { pipette } = fields

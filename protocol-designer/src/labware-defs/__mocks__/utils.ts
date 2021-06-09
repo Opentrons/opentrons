@@ -1,6 +1,5 @@
 // replace webpack-specific require.context with Node-based glob in tests
 import assert from 'assert'
-import { LabwareDefinition2 } from '@opentrons/shared-data'
 import { getLabwareDefURI } from '@opentrons/shared-data'
 import { LabwareDefByDefURI } from '../types'
 import path from 'path'
@@ -18,10 +17,12 @@ assert(
   Object.keys(allLabware).length > 0,
   `no labware fixtures found, is the path correct? ${LABWARE_FIXTURE_PATTERN}`
 )
-export const getAllDefinitions = jest.fn( as jest.MockedFunction<typeof jest.fn(>
+export const getAllDefinitions = jest.fn(
   () => allLabware
 )
-export const _getSharedLabware = jest.fn(() => null) as jest.MockedFunction<typeof jest.fn(() => null)>
-export const getOnlyLatestDefs = jest.fn(() => { as jest.MockedFunction<typeof jest.fn(() => {>
+
+export const _getSharedLabware = jest.fn(() => null)
+
+export const getOnlyLatestDefs= jest.fn(() => {
   throw Error('getOnlyLatestDefs should not be used directly')
 })
