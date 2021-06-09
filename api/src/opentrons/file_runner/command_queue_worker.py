@@ -44,8 +44,7 @@ class CommandQueueWorker:
         executing, it will continue until it's done. Further commands will be left
         unexecuted in the queue.
         """
-        if self._task is not None:
-            self._keep_running = False
+        self._keep_running = False
 
     # todo(mm, 2021-06-08): In addition to calling this when it's done with the object,
     # should calling code also call this between adjacent pause() and resume()s?
