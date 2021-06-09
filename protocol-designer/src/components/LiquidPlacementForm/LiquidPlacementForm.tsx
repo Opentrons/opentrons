@@ -36,9 +36,9 @@ type Props = {
   selectedWellsMaxVolume: number,
   showForm: boolean,
 
-  cancelForm: () => mixed,
-  clearWells: ?() => mixed,
-  saveForm: LiquidPlacementFormValues => mixed,
+  cancelForm: () => unknown,
+  clearWells: () => unknown | null | undefined,
+  saveForm: (liquidPlacementFormValues: LiquidPlacementFormValues) => unknown,
 }
 
 export class LiquidPlacementForm extends React.Component<Props> {

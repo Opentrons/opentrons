@@ -10,7 +10,7 @@ import { PDTitledList } from '../lists'
 import styles from './SettingsPage.css'
 
 type SP = { currentPage: Page }
-type DP = { makeNavigateToPage: Page => () => mixed }
+type DP = { makeNavigateToPage: (page: Page) => () => unknown }
 type Props = SP & DP
 
 const SettingsSidebarComponent = (props: Props) => (

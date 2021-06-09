@@ -33,7 +33,7 @@ type StepButtonComponentProps = {
   children: React.Node,
   expanded: boolean,
   disabled: boolean,
-  setExpanded: boolean => mixed,
+  setExpanded: (expanded: boolean) => unknown,
 }
 
 // TODO: Ian 2019-01-17 move out to centralized step info file - see #2926

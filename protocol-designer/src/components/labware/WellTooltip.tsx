@@ -22,7 +22,7 @@ type WellTooltipParams = {
 }
 
 type Props = {
-  children: WellTooltipParams => React.Node,
+  children: (wellTooltipParams: WellTooltipParams) => React.Node,
   ingredNames: WellIngredientNames,
 }
 

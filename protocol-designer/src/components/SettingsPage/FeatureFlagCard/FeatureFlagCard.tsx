@@ -101,7 +101,7 @@ export const FeatureFlagCard = (props: Props): React.Node => {
             onCancelClick={() => setModalFlagName(null)}
             onContinueClick={() => {
               props.setFeatureFlags({
-                [(modalFlagName: string)]: !props.flags[modalFlagName],
+                [(modalFlagName as string)]: !props.flags[modalFlagName],
               })
               setModalFlagName(null)
             }}

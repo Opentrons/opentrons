@@ -13,12 +13,12 @@ import {
 } from '@opentrons/shared-data'
 
 type Props = {
-  disabled: boolean | null | undefined
-  icon: IconName | null | undefined
-  labwareDef: LabwareDefinition2
-  onMouseEnter: () => any
-  onMouseLeave: () => any
-  selectLabware: (labwareLoadName: string) => mixed
+  disabled: boolean | null | undefined,
+  icon: IconName | null | undefined,
+  labwareDef: LabwareDefinition2,
+  onMouseEnter: () => any,
+  onMouseLeave: () => any,
+  selectLabware: (labwareLoadName: string) => unknown,
 }
 
 const LABWARE_LIBRARY_PAGE_PATH = 'https://labware.opentrons.com'
