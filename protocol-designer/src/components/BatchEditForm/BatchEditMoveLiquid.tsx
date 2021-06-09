@@ -139,7 +139,7 @@ const SourceDestBatchEditMoveLiquidFields = (props: {
             {...propsForFields['blowout_location']}
             className={styles.full_width}
             options={getBlowoutLocationOptionsForForm({
-              path: (propsForFields['path'].value: any),
+              path: (propsForFields['path'].value as any),
               stepType: 'moveLiquid',
             })}
           />

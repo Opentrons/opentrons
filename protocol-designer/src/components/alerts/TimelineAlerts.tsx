@@ -30,7 +30,7 @@ type SP = {
 
 function mapStateToProps(state: BaseState): SP {
   const timeline = fileDataSelectors.getRobotStateTimeline(state)
-  const errors = (timeline.errors || []: CommandCreatorError[]).map(
+  const errors = (timeline.errors || [] as CommandCreatorError[]).map(
     error => ({
       title: i18n.t(`alert.timeline.error.${error.type}.title`, error.message),
       description: <ErrorContents level="timeline" errorType={error.type} />,

@@ -9,10 +9,10 @@ import { BaseState } from '../types'
 export type AnalyticsEvent =
   | {
       name: string,
-      properties: { ... },
-      superProperties?: { ... },
+      properties: {[key: string]: unknown},
+      superProperties?: {[key: string]: unknown},
     }
-  | { superProperties: { ... } }
+  | { superProperties: {[key: string]: unknown} }
 
 // pulled in from environment at build time
 const MIXPANEL_ID = getIsProduction()
