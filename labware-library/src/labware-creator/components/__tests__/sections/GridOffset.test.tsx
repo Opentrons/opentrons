@@ -91,6 +91,24 @@ describe('GridOffset', () => {
     )
   })
 
+  it('should update instructions when tipRack is selected', () => {
+    const { getByText } = render(
+      wrapInFormik(<GridOffset />, {
+        ...formikConfig,
+        initialValues: {
+          ...formikConfig.initialValues,
+          labwareType: 'tipRack',
+        },
+      })
+    )
+
+    getByText(
+      nestedTextMatcher(
+        "Find the measurement from the center of tip A1 to the edge of the labware's footprint."
+      )
+    )
+  })
+
   it('should NOT render when the labware type is aluminumBlock', () => {
     const { container } = render(
       wrapInFormik(<GridOffset />, {
