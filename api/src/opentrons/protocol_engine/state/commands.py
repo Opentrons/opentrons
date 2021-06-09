@@ -23,7 +23,11 @@ class CommandState:
         return [entry for entry in self._commands_by_id.items()]
 
     def get_next_request(self) -> Optional[Tuple[str, CommandRequestType]]:
-        """Get the next pending request or None if there are no pending request."""
+        """Get the next pending request.
+
+        If there are no more pending requests, or if the last command failed,
+        return None instead.
+        """
         raise NotImplementedError()
 
 
