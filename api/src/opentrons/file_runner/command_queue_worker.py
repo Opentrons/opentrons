@@ -25,7 +25,7 @@ class CommandQueueWorker:
         """Start executing the `ProtocolEngine`'s queued commands.
 
         This returns immediately.
-        
+
         Commands are executed sequentially in the background via asyncio tasks.
 
         See `wait_to_be_idle` for when execution may stop.
