@@ -1,4 +1,3 @@
-import { $Diff } from 'utility-types'
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { BaseState, ThunkDispatch } from '../types'
@@ -7,12 +6,12 @@ import { actions as steplistActions } from '../steplist'
 import { actions as stepsActions, getIsMultiSelectMode } from '../ui/steps'
 import { selectors as stepFormSelectors } from '../step-forms'
 import { StepList } from '../components/steplist'
-type Props = React.ElementProps<typeof StepList>
+type Props = React.ComponentProps<typeof StepList>
 type SP = {
   orderedStepIds: Props['orderedStepIds']
   isMultiSelectMode: boolean | null | undefined
 }
-type DP = $Diff<Props, SP>
+type DP = Omit<Props, keyof SP>
 
 function mapStateToProps(state: BaseState): SP {
   return {
@@ -32,14 +31,7 @@ function mapDispatchToProps(dispatch: ThunkDispatch<any>): DP {
   }
 }
 
-export const ConnectedStepList: React.AbstractComponent<{}> = connect<
-  Props,
-  {},
-  SP,
-  DP,
-  _,
-  _
->(
+export const ConnectedStepList = connect(
   mapStateToProps,
   mapDispatchToProps
 )(StepList)

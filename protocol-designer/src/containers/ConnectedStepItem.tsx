@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react'
+import { MouseEvent } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import uniq from 'lodash/uniq'
 import UAParser from 'ua-parser-js'
@@ -11,24 +12,24 @@ import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors
 import { selectors as dismissSelectors } from '../dismiss'
 import { selectors as stepFormSelectors } from '../step-forms'
 import {
+  actions as stepsActions,
   getCollapsedSteps,
-  getHoveredSubstep,
   getHoveredStepId,
-  getSelectedStepId,
+  getHoveredSubstep,
+  getIsMultiSelectMode,
   getMultiSelectItemIds,
   getMultiSelectLastSelected,
-  getIsMultiSelectMode,
-  actions as stepsActions,
+  getSelectedStepId,
 } from '../ui/steps'
 import { selectors as fileDataSelectors } from '../file-data'
 
 import { StepItem, StepItemContents } from '../components/steplist/StepItem'
 import {
-  ConfirmDeleteModal,
+  CLOSE_BATCH_EDIT_FORM,
   CLOSE_STEP_FORM_WITH_CHANGES,
   CLOSE_UNSAVED_STEP_FORM,
+  ConfirmDeleteModal,
   DeleteModalType,
-  CLOSE_BATCH_EDIT_FORM,
 } from '../components/modals/ConfirmDeleteModal'
 
 import { SubstepIdentifier } from '../steplist/types'
@@ -37,7 +38,7 @@ import { StepIdType } from '../form-types'
 type Props = {
   stepId: StepIdType
   stepNumber: number
-  onStepContextMenu?: () => mixed
+  onStepContextMenu?: () => void
 }
 
 const nonePressed = (keysPressed: boolean[]): boolean =>
@@ -46,7 +47,7 @@ const nonePressed = (keysPressed: boolean[]): boolean =>
 const getUserOS = () => new UAParser().getOS().name
 
 const getMouseClickKeyInfo = (
-  event: SyntheticMouseEvent<>
+  event: MouseEvent
 ): { isShiftKeyPressed: boolean; isMetaKeyPressed: boolean } => {
   const isMac: boolean = getUserOS() === 'Mac OS'
   const isShiftKeyPressed: boolean = event.shiftKey
@@ -55,7 +56,7 @@ const getMouseClickKeyInfo = (
   return { isShiftKeyPressed, isMetaKeyPressed }
 }
 
-export const ConnectedStepItem = (props: Props): React.Node => {
+export const ConnectedStepItem = (props: Props): JSX.Element => {
   const { stepId, stepNumber } = props
 
   const step = useSelector(stepFormSelectors.getSavedStepForms)[stepId]
@@ -115,7 +116,7 @@ export const ConnectedStepItem = (props: Props): React.Node => {
   const highlightStep = () => dispatch(stepsActions.hoverOnStep(stepId))
   const unhighlightStep = () => dispatch(stepsActions.hoverOnStep(null))
 
-  const handleStepItemSelection = (event: SyntheticMouseEvent<>): void => {
+  const handleStepItemSelection = (event: MouseEvent): void => {
     const { isShiftKeyPressed, isMetaKeyPressed } = getMouseClickKeyInfo(event)
     let stepsToSelect: StepIdType[] = []
 
@@ -172,7 +173,7 @@ export const ConnectedStepItem = (props: Props): React.Node => {
   )
   // (SA 2020/12/23): This will not be needed once we update to React 17
   // since event pooling will be eliminated
-  const confirmWithPersistedEvent = (event: SyntheticMouseEvent<>): void => {
+  const confirmWithPersistedEvent = (event: MouseEvent): void => {
     event.persist()
     confirm(event)
   }
@@ -262,12 +263,12 @@ export function getMetaSelectedSteps(
 }
 
 function getShiftSelectedSteps(
-  selectedStepId,
-  orderedStepIds,
-  stepId,
-  multiSelectItemIds,
-  lastMultiSelectedStepId
-) {
+  selectedStepId: StepIdType,
+  orderedStepIds: StepIdType[],
+  stepId: StepIdType,
+  multiSelectItemIds: StepIdType[],
+  lastMultiSelectedStepId: StepIdType
+): StepIdType[] {
   let stepsToSelect: StepIdType[]
   if (selectedStepId) {
     stepsToSelect = getOrderedStepsInRange(
@@ -290,7 +291,7 @@ function getShiftSelectedSteps(
       // if they're all selected, deselect them all
       if (multiSelectItemIds.length - potentialStepsToSelect.length > 0) {
         stepsToSelect = multiSelectItemIds.filter(
-          id => !potentialStepsToSelect.includes(id)
+          (id: StepIdType) => !potentialStepsToSelect.includes(id)
         )
       } else {
         // unless deselecting them all results in none being selected
@@ -309,7 +310,7 @@ function getOrderedStepsInRange(
   lastSelectedStepId: StepIdType,
   stepId: StepIdType,
   orderedStepIds: StepIdType[]
-) {
+): StepIdType[] {
   const prevIndex: number = orderedStepIds.indexOf(lastSelectedStepId)
   const currentIndex: number = orderedStepIds.indexOf(stepId)
 

@@ -18,7 +18,7 @@ type SP = {
   modules: Props['modules']
 }
 
-const mapStateToProps: MapStateToProps<SP, {}, BaseState> = state => {
+const mapStateToProps = (state: BaseState): SP => {
   return {
     formValues: fileSelectors.getFileMetadata(state),
     instruments: stepFormSelectors.getPipettesForInstrumentGroup(state),
@@ -57,4 +57,4 @@ function mergeProps(
 }
 
 // ce: fix
-export const ConnectedFilePage = connect(mapStateToProps, undefined, mergeProps)
+export const ConnectedFilePage = connect(mapStateToProps, null, mergeProps)

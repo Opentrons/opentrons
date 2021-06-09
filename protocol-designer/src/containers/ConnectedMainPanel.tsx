@@ -25,7 +25,7 @@ type Props = {
   ingredSelectionMode: boolean
 }
 
-function MainPanelComponent(props: Props) {
+function MainPanelComponent(props: Props): JSX.Element {
   const { page, selectedTerminalItemId, ingredSelectionMode } = props
   switch (page) {
     case 'file-splash':
@@ -66,11 +66,4 @@ function mapStateToProps(state: BaseState): Props {
   }
 }
 
-export const ConnectedMainPanel: React.AbstractComponent<{}> = connect<
-  Props,
-  {},
-  _,
-  _,
-  _,
-  _
->(mapStateToProps)(MainPanelComponent)
+export const ConnectedMainPanel = connect(mapStateToProps)(MainPanelComponent)

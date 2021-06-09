@@ -18,7 +18,7 @@ type Props = {
   liquidPlacementMode: boolean
 }
 
-function Sidebar(props: Props) {
+function Sidebar(props: Props): JSX.Element {
   switch (props.page) {
     case 'liquids':
       return <LiquidsSidebar />
@@ -49,11 +49,4 @@ function mapStateToProps(state: BaseState): Props {
   }
 }
 
-export const ConnectedSidebar: React.AbstractComponent<{}> = connect<
-  Props,
-  {},
-  _,
-  _,
-  _,
-  _
->(mapStateToProps)(Sidebar)
+export const ConnectedSidebar = connect(mapStateToProps)(Sidebar)
