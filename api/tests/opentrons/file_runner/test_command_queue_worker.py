@@ -102,7 +102,7 @@ async def test_play(
     assert protocol_engine.execute_command.call_args_list == expected_call_args_list
 
 
-async def test_stop(
+async def test_pause(
         protocol_engine: AsyncMock,
         subject: CommandQueueWorker,
         store_with_commands: AsyncMock,
