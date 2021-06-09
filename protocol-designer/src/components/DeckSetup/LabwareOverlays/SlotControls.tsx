@@ -18,7 +18,7 @@ import {
   moveDeckItem,
 } from '../../../labware-ingred/actions'
 import { selectors as labwareDefSelectors } from '../../../labware-defs'
-import { START_TERMINAL_ITEM_ID,  TerminalItemId } from '../../../steplist'
+import { START_TERMINAL_ITEM_ID, TerminalItemId } from '../../../steplist'
 
 import { DeckSlot, ThunkDispatch, BaseState } from '../../../types'
 import { LabwareDefByDefURI } from '../../../labware-defs'
@@ -30,23 +30,23 @@ import {
 import styles from './LabwareOverlays.css'
 
 type DNDP = {
-  isOver: boolean,
-  connectDropTarget: React.Node => React.Node,
-  draggedItem: ?{ labwareOnDeck: LabwareOnDeck },
-  itemType: string,
+  isOver: boolean
+  connectDropTarget: (val: React.Node) => React.Node
+  draggedItem: ?{ labwareOnDeck: LabwareOnDeck }
+  itemType: string
 }
 type OP = {
-  slot: { ...DeckSlotDefinition, id: DeckSlot }, // NOTE: Ian 2019-10-22 make slot `id` more restrictive when used in PD
-  moduleType: ModuleRealType | null,
-  selectedTerminalItemId: TerminalItemId | null | undefined,
-  handleDragHover?: () => mixed,
+  slot: DeckSlotDefinition & { id: DeckSlot } // NOTE: Ian 2019-10-22 make slot `id` more restrictive when used in PD
+  moduleType: ModuleRealType | null
+  selectedTerminalItemId: TerminalItemId | null | undefined
+  handleDragHover?: () => mixed
 }
 type DP = {
-  addLabware: (e: SyntheticEvent<*>) => mixed,
-  moveDeckItem: (DeckSlot, DeckSlot) => mixed,
+  addLabware: (e: SyntheticEvent<*>) => unknown
+  moveDeckItem: (item1: DeckSlot, item2: DeckSlot) => unknown
 }
 type SP = {
-  customLabwareDefs: LabwareDefByDefURI,
+  customLabwareDefs: LabwareDefByDefURI
 }
 type Props = OP & DP & DNDP & SP
 
@@ -169,7 +169,7 @@ const collectSlotTarget = (connect, monitor) => ({
 })
 
 export const SlotControls: React.AbstractComponent<OP> = connect<
-  { ...OP, ...DP, ...SP },
+  OP & DP & SP,
   OP,
   _,
   DP,

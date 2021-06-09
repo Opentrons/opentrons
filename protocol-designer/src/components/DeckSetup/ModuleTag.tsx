@@ -7,7 +7,7 @@ import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
-  type ModuleRealType,
+  ModuleRealType,
 } from '@opentrons/shared-data'
 import {
   TEMPERATURE_AT_TARGET,

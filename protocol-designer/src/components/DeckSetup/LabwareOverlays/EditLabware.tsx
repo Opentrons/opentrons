@@ -20,26 +20,26 @@ import { LabwareOnDeck } from '../../../step-forms'
 import styles from './LabwareOverlays.css'
 
 type OP = {
-  labwareOnDeck: LabwareOnDeck,
-  setHoveredLabware: (val: ?LabwareOnDeck) => unknown,
-  setDraggedLabware: (val: ?LabwareOnDeck) => unknown,
-  swapBlocked: boolean,
+  labwareOnDeck: LabwareOnDeck
+  setHoveredLabware: (val: ?LabwareOnDeck) => unknown
+  setDraggedLabware: (val: ?LabwareOnDeck) => unknown
+  swapBlocked: boolean
 }
 type SP = {
-  isYetUnnamed: boolean,
+  isYetUnnamed: boolean
 }
 type DP = {
-  editLiquids: () => unknown,
-  duplicateLabware: () => unknown,
-  deleteLabware: () => unknown,
-  moveDeckItem: (item1: DeckSlot, item2: DeckSlot) => unknown,
+  editLiquids: () => unknown
+  duplicateLabware: () => unknown
+  deleteLabware: () => unknown
+  moveDeckItem: (item1: DeckSlot, item2: DeckSlot) => unknown
 }
 
 type DNDP = {
-  draggedLabware: LabwareOnDeck | null | undefined,
-  isOver: boolean,
-  connectDragSource:(val: React.Node) => React.Node,
-  connectDropTarget: (val: React.Node) => React.Node,
+  draggedLabware: LabwareOnDeck | null | undefined
+  isOver: boolean
+  connectDragSource: (val: React.Node) => React.Node
+  connectDropTarget: (val: React.Node) => React.Node
 }
 
 type Props = OP & SP & DP & DNDP
@@ -206,7 +206,7 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<*>, ownProps: OP): DP => ({
 })
 
 export const EditLabware: React.AbstractComponent<OP> = connect<
-  { ...OP, ...SP, ...DP },
+  OP & SP & DP,
   OP,
   SP,
   DP,

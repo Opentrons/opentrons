@@ -12,16 +12,16 @@ import { EditModulesModal } from './modals/EditModulesModal'
 import { ModuleModel, ModuleRealType } from '@opentrons/shared-data'
 
 type EditModulesProps = {
-  moduleToEdit: {|
-    moduleId: string | null | undefined,
-    moduleType: ModuleRealType,
-  },
-  onCloseClick: () => mixed,
-|}
+  moduleToEdit: {
+    moduleId: string | null | undefined
+    moduleType: ModuleRealType
+  }
+  onCloseClick: () => unknown
+}
 
 export type ModelModuleInfo = {
-  model: ModuleModel,
-  slot: string,
+  model: ModuleModel
+  slot: string
 }
 
 export const EditModules = (props: EditModulesProps): React.Node => {

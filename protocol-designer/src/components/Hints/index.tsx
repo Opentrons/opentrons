@@ -16,8 +16,8 @@ import { BaseState, ThunkDispatch } from '../../types'
 
 type SP = { hintKey: HintKey | null | undefined }
 type DP = {
-  removeHint: (HintKey, boolean) => mixed,
-  selectTerminalItem: TerminalItemId => mixed,
+  removeHint: (key: HintKey, rememberDismissal: boolean) => unknown
+  selectTerminalItem: (item: TerminalItemId) => unknown
 }
 type Props = SP & DP
 
