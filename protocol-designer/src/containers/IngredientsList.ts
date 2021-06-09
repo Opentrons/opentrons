@@ -1,4 +1,3 @@
-import { $Diff } from 'utility-types'
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors'
@@ -7,18 +6,16 @@ import { removeWellsContents } from '../labware-ingred/actions'
 import { Dispatch } from 'redux'
 import { BaseState } from '../types'
 import { IngredientsList as IngredientsListComponent } from '../components/IngredientsList'
-type Props = React.ElementProps<typeof IngredientsListComponent>
-type SP = $Diff<
-  Props,
-  {
-    removeWellsContents: any
-  }
-> & {
+import { SelectedContainerId } from '../labware-ingred/reducers'
+type Props = React.ComponentProps<typeof IngredientsListComponent>
+type SP = Omit<Props, 'removeWellsContents'> & {
   _labwareId: string | null | undefined
 }
 
 function mapStateToProps(state: BaseState): SP {
-  const selectedLabwareId = labwareIngredSelectors.getSelectedLabwareId(state)
+  const selectedLabwareId: SelectedContainerId = labwareIngredSelectors.getSelectedLabwareId(
+    state
+  )
   const labwareWellContents =
     (selectedLabwareId &&
       labwareIngredSelectors.getLiquidsByLabwareId(state)[selectedLabwareId]) ||
@@ -52,14 +49,7 @@ function mergeProps(
   }
 }
 
-export const IngredientsList: React.AbstractComponent<{}> = connect<
-  Props,
-  {},
-  SP,
-  {},
-  _,
-  _
->(
+export const IngredientsList = connect(
   mapStateToProps,
   null,
   mergeProps

@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import { Dispatch } from 'redux'
-import { connect } from 'react-redux'
+import { connect, MapStateToProps } from 'react-redux'
 
 import { TitleBar, Icon, IconName } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
@@ -26,7 +26,7 @@ import { selectors, Page } from '../navigation'
 import { TitleBarProps } from '@opentrons/components'
 import { BaseState } from '../types'
 
-type Props = React.ElementProps<typeof TitleBar>
+type Props = React.ComponentProps<typeof TitleBar>
 
 type DP = { onBackClick: $PropertyType<Props, 'onBackClick'> }
 
@@ -41,7 +41,7 @@ type TitleWithIconProps = {
   text: string | null | undefined
 }
 
-function TitleWithIcon(props: TitleWithIconProps) {
+function TitleWithIcon(props: TitleWithIconProps): JSX.Element {
   const { iconName, text } = props
   return (
     <div>
@@ -202,18 +202,11 @@ function mergeProps(
   }
 }
 
-const StickyTitleBar = (props: TitleBarProps) => (
+const StickyTitleBar = (props: TitleBarProps): JSX.Element => (
   <TitleBar id="TitleBar_main" {...props} className={styles.sticky_bar} />
 )
 
-export const ConnectedTitleBar: React.AbstractComponent<{}> = connect<
-  Props,
-  {},
-  SP,
-  {},
-  _,
-  _
->(
+export const ConnectedTitleBar = connect(
   mapStateToProps,
   null,
   mergeProps

@@ -60,11 +60,10 @@ function getRootReducer() {
   }
 }
 
-export function configureStore(): Store<
-  BaseState,
-  Action,
-  ThunkDispatch<Action>
-> {
+// TODO(CE: 2021-07-08) cheating a little 'cause I need a store type
+export type StoreType = Store<BaseState, Action, ThunkDispatch<Action>>
+
+export function configureStore(): StoreType {
   const reducer = getRootReducer()
   const composeEnhancers: any =
     window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose

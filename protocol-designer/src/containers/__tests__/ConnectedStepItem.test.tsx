@@ -22,6 +22,7 @@ import * as dismissSelectors from '../../dismiss/selectors.js'
 import * as uiStepSelectors from '../../ui/steps/selectors.js'
 import * as fileDataSelectors from '../../file-data/selectors/index.js'
 import * as timelineWarningSelectors from '../../top-selectors/timelineWarnings'
+import { StoreType } from '../../configureStore'
 
 jest.mock('ua-parser-js')
 jest.mock('../../step-forms/selectors/index.js')
@@ -90,7 +91,7 @@ const mockClickEvent = {
 }
 
 describe('ConnectedStepItem', () => {
-  let store
+  let store: StoreType
   beforeEach(() => {
     store = mockStore()
 
@@ -147,7 +148,7 @@ describe('ConnectedStepItem', () => {
     resetAllWhenMocks()
   })
 
-  const render = props =>
+  const render = (props: SP) =>
     mount(
       <Provider store={store}>
         <ConnectedStepItem {...props} />
