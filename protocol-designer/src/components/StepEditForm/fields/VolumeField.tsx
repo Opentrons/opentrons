@@ -14,8 +14,7 @@ import { StepType } from '../../../form-types'
 import { FieldProps } from '../types'
 import styles from '../StepEditForm.css'
 
-type Props = {
-  ...FieldProps,
+type Props = FieldProps & {
   stepType: StepType,
   label: string,
   className: string,

@@ -22,7 +22,7 @@ type MultiChannelSubstepProps = {
   highlighted?: boolean,
   stepId: string,
   substepIndex: number,
-  selectSubstep: SubstepIdentifier => mixed,
+  selectSubstep: (substepIdentifier: SubstepIdentifier) => unknown,
 }
 
 type MultiChannelSubstepState = {

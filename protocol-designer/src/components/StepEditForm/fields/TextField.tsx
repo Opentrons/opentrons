@@ -3,11 +3,10 @@ import * as React from 'react'
 import { InputField } from '@opentrons/components'
 import { FieldProps } from '../types'
 
-type TextFieldProps = {
-  ...FieldProps,
-  className?: string,
-  caption: string | null | undefined,
-  units: string | null | undefined,
+type TextFieldProps = FieldProps & {
+  className?: string
+  caption: string | null | undefined
+  units: string | null | undefined
 }
 
 export const TextField = (props: TextFieldProps): React.Node => {

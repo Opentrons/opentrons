@@ -18,7 +18,7 @@ type Props = {
   isMultiSelectMode: boolean | null | undefined,
   orderedStepIds: StepIdType[],
   reorderSelectedStep: (delta: number) => mixed,
-  reorderSteps: (StepIdType[]) => mixed,
+  reorderSteps: (steps: StepIdType[]) => unknown,
 }
 
 export class StepList extends React.Component<Props> {

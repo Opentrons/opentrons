@@ -23,8 +23,7 @@ import { getDefaultMmFromBottom } from './utils'
 import { BaseState } from '../../../../types'
 import { FieldProps } from '../../types'
 
-type OP = {
-  ...FieldProps,
+type OP = FieldProps & {
   labwareId: string | null | undefined,
   className?: string,
 }

@@ -118,7 +118,7 @@ export type StepItemContentsProps = {
   ingredNames: WellIngredientNames,
   labwareNicknamesById: { [labwareId: string]: string },
 
-  highlightSubstep: SubstepIdentifier => mixed,
+  highlightSubstep: (substepIdentifier: SubstepIdentifier) => unknown,
   hoveredSubstep: SubstepIdentifier | null | undefined,
 }
 

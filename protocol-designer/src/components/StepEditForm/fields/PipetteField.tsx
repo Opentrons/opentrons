@@ -8,9 +8,7 @@ import { BaseState } from '../../../types'
 import styles from '../StepEditForm.css'
 import { FieldProps } from '../types'
 
-type OP = {
-  ...FieldProps,
-}
+type OP = FieldProps
 
 type SP = { pipetteOptions: Options }
 

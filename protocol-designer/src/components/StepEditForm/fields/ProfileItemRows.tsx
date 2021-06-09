@@ -37,16 +37,16 @@ export const showProfileFieldErrors = ({
   focusedField,
   dirtyFields,
 }: {
-  fieldId: string,
-  focusedField: string | null | undefined,
-  dirtyFields: string[],
+  fieldId: string
+  focusedField: string | null | undefined
+  dirtyFields: string[]
 }): boolean =>
   !(fieldId === focusedField) && dirtyFields && dirtyFields.includes(fieldId)
 
 type ProfileCycleRowProps = {
-  cycleItem: ProfileCycleItem,
-  focusHandlers: FocusHandlers,
-  stepOffset: number,
+  cycleItem: ProfileCycleItem
+  focusHandlers: FocusHandlers
+  stepOffset: number
 }
 export const ProfileCycleRow = (props: ProfileCycleRowProps): React.Node => {
   const { cycleItem, focusHandlers, stepOffset } = props
@@ -140,12 +140,11 @@ export const ProfileCycleRow = (props: ProfileCycleRowProps): React.Node => {
 }
 
 export type ProfileItemRowsProps = {
-  focusHandlers: FocusHandlers,
-  orderedProfileItems: string[],
+  focusHandlers: FocusHandlers
+  orderedProfileItems: string[]
   profileItemsById: {
-    [string]: ProfileItem,
-    ...
-  },
+    [key: string]: ProfileItem
+  }
 }
 
 export const ProfileItemRows = (props: ProfileItemRowsProps): React.Node => {
@@ -231,12 +230,12 @@ export const ProfileItemRows = (props: ProfileItemRowsProps): React.Node => {
 }
 
 type ProfileFieldProps = {
-  name: string,
-  focusHandlers: FocusHandlers,
-  profileItem: ProfileItem,
-  units?: React.Node,
-  className?: string,
-  updateValue: (name: string, value: mixed) => mixed,
+  name: string
+  focusHandlers: FocusHandlers
+  profileItem: ProfileItem
+  units?: React.Node
+  className?: string
+  updateValue: (name: string, value: mixed) => mixed
 }
 const ProfileField = (props: ProfileFieldProps) => {
   const {
@@ -290,10 +289,10 @@ const ProfileField = (props: ProfileFieldProps) => {
 }
 
 type ProfileStepRowProps = {
-  focusHandlers: FocusHandlers,
-  profileStepItem: ProfileStepItem,
-  stepNumber: number,
-  isCycle: boolean | null | undefined,
+  focusHandlers: FocusHandlers
+  profileStepItem: ProfileStepItem
+  stepNumber: number
+  isCycle: boolean | null | undefined
 }
 
 const ProfileStepRow = (props: ProfileStepRowProps) => {

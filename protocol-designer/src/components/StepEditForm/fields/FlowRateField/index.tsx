@@ -1,30 +1,28 @@
 // @flow
 import * as React from 'react'
-import { FlowRateInput,  FlowRateInputProps } from './FlowRateInput'
+import { FlowRateInput, FlowRateInputProps } from './FlowRateInput'
 import { connect } from 'react-redux'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
 import { FieldProps } from '../../types'
 import { BaseState } from '../../../../types'
 
-type OP = {
-  ...FieldProps,
-  pipetteId: string | null | undefined,
-  className?: $PropertyType<FlowRateInputProps, 'className'>,
-  flowRateType: $PropertyType<FlowRateInputProps, 'flowRateType'>,
-  label?: $PropertyType<FlowRateInputProps, 'label'>,
+type OP = FieldProps & {
+  pipetteId: string | null | undefined
+  className?: $PropertyType<FlowRateInputProps, 'className'>
+  flowRateType: $PropertyType<FlowRateInputProps, 'flowRateType'>
+  label?: $PropertyType<FlowRateInputProps, 'label'>
 }
 
 type SP = {
-  innerKey: string,
-  defaultFlowRate: number | null | undefined,
-  minFlowRate: number,
-  maxFlowRate: number,
-  pipetteDisplayName: string,
+  innerKey: string
+  defaultFlowRate: number | null | undefined
+  minFlowRate: number
+  maxFlowRate: number
+  pipetteDisplayName: string
 }
 
-type Props = {
-  ...FlowRateInputProps,
-  innerKey: string,
+type Props = FlowRateInputProps & {
+  innerKey: string
 }
 
 // Add a key to force re-constructing component when values change
