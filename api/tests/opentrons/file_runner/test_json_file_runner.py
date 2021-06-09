@@ -109,7 +109,7 @@ def test_json_runner_stop(
     """It should be able to stop the run."""
     subject.stop()
 
-    decoy.verify(command_queue_worker.stop())
+    decoy.verify(command_queue_worker.pause())
 
 
 def test_json_runner_load_commands_to_engine(
