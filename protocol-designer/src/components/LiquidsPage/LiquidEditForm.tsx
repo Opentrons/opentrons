@@ -17,23 +17,22 @@ import formStyles from '../forms/forms.css'
 import { FormikProps } from 'formik/@flow-typed'
 import { LiquidGroup } from '../../labware-ingred/types'
 
-type Props = {
-  ...LiquidGroup,
-  canDelete: boolean,
-  deleteLiquidGroup: () => mixed,
-  cancelForm: () => mixed,
-  saveForm: LiquidGroup => mixed,
+type Props = LiquidGroup & {
+  canDelete: boolean
+  deleteLiquidGroup: () => unknown
+  cancelForm: () => unknown
+  saveForm: (liquidGroup: LiquidGroup) => unknown
 }
 
 type LiquidEditFormValues = {
-  name: string,
-  description: string | null | undefined,
-  serialize?: boolean,
-  ...
+  name: string
+  description: string | null | undefined
+  serialize?: boolean
+  [key: string]: unknown
 }
 
 export const liquidEditFormSchema: Yup.Schema<
-  { name: string, description: string, serialize: boolean },
+  { name: string; description: string; serialize: boolean },
   any
 > = Yup.object().shape({
   name: Yup.string().required(

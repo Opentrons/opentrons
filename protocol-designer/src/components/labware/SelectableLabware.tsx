@@ -24,9 +24,9 @@ export type Props = {
   >,
   /** array of primary wells. Overrides labwareProps.selectedWells */
   selectedPrimaryWells: WellGroup,
-  selectWells: WellGroup => mixed,
-  deselectWells: WellGroup => mixed,
-  updateHighlightedWells: WellGroup => mixed,
+  selectWells: (wellGroup: WellGroup) => unknown,
+  deselectWells: (wellGroup: WellGroup) => unknown,
+  updateHighlightedWells: (wellGroup: WellGroup) => unknown,
   pipetteChannels: Channels | null | undefined,
   ingredNames: WellIngredientNames,
   wellContents: ContentsByWell,
