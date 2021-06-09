@@ -402,7 +402,7 @@ export const unsavedForm = (
       } else {
         // it's a step in a cycle. Get the cycle id, and the index of our edited step in that cycle's `steps` array
         let editedStepIndex = -1
-        const cycleId: string | void = Object.keys(
+        const cycleId: string | undefined = Object.keys(
           unsavedFormState.profileItemsById
         ).find((itemId: string): boolean => {
           const item: ProfileItem = unsavedFormState.profileItemsById[itemId]
@@ -1388,9 +1388,9 @@ export const rootReducer: Reducer<RootState, any> = nestedCombineReducers(
     ),
     labwareDefs: labwareDefsRootReducer(prevStateFallback.labwareDefs, action),
     // 'forms' reducers get full rootReducer state
-    // $FlowFixMe TODO(IL, 2020-06-08): savedStepForms should be typed as `Reducer` (which makes state: RootState | void)
+    // $FlowFixMe TODO(IL, 2020-06-08): savedStepForms should be typed as `Reducer` (which makes state: RootState | undefined)
     savedStepForms: savedStepForms(state, action),
-    // $FlowFixMe TODO(IL, 2020-06-08): unsavedForm should be typed as `Reducer` (which makes state: RootState | void)
+    // $FlowFixMe TODO(IL, 2020-06-08): unsavedForm should be typed as `Reducer` (which makes state: RootState | undefined)
     unsavedForm: unsavedForm(state, action),
     presavedStepForm: presavedStepForm(
       prevStateFallback.presavedStepForm,

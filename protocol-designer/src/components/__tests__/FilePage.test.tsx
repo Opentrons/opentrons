@@ -11,7 +11,7 @@ jest.mock('../../step-forms/utils')
 jest.mock('../../step-forms/selectors')
 jest.mock('../../feature-flags')
 
-const editModulesMock: JestMockFn<any, any> = EditModules
+const editModulesMock: jest.MockedFunction<any> = EditModules
 
 describe('File Page', () => {
   let props

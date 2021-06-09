@@ -16,29 +16,25 @@ jest.mock('../../ui/labware/selectors')
 jest.mock('../../utils')
 jest.mock('../utils')
 
-const mockGetLabwareDefsByURI: JestMockFn<any, any> = getLabwareDefsByURI
+const mockGetLabwareDefsByURI = getLabwareDefsByURI as jest.MockedFunction<
+  typeof getLabwareDefsByURI
+>
 
-const mockGetLabwareNicknamesById: JestMockFn<
-  any,
-  any
-> = getLabwareNicknamesById
+const mockGetLabwareNicknamesById = getLabwareNicknamesById as jest.MockedFunction<getLabwareNicknamesById>
 
-const mockUuid: JestMockFn<[], string> = uuid
+const mockUuid = uuid as jest.MockedFunction<typeof uuid>
 
-const mockGetInitialDeckSetup: JestMockFn<
-  any,
-  InitialDeckSetup
-> = getInitialDeckSetup
+const mockGetInitialDeckSetup = getInitialDeckSetup as jest.MockedFunction<
+  typeof getInitialDeckSetup
+>
 
-const mockGetNextAvailableDeckSlot: JestMockFn<
-  [InitialDeckSetup],
-  ?string
-> = getNextAvailableDeckSlot
+const mockGetNextAvailableDeckSlot = getNextAvailableDeckSlot as jest.MockedFunction<
+  typeof getNextAvailableDeckSlot
+>
 
-const mockGetNextNickname: JestMockFn<
-  [string[], string],
-  string
-> = getNextNickname
+const mockGetNextNickname = getNextNickname as jest.MockedFunction<
+  typeof getNextNickname
+>
 
 const middlewares = [thunk]
 const mockStore = configureMockStore(middlewares)

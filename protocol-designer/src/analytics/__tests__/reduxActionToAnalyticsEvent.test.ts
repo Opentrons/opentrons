@@ -13,13 +13,16 @@ import { SaveStepFormsMultiAction } from '../../step-forms/actions'
 jest.mock('../../file-data/selectors')
 jest.mock('../../step-forms/selectors')
 
-const getFileMetadataMock: JestMockFn<any, FileMetadataFields> = getFileMetadata
-const getArgsAndErrorsByStepIdMock: JestMockFn<
-  any,
-  any
-> = getArgsAndErrorsByStepId
-const getPipetteEntitiesMock: JestMockFn<any, any> = getPipetteEntities
-const getSavedStepFormsMock: JestMockFn<any, any> = getSavedStepForms
+const getFileMetadataMock = getFileMetadata as jest.MockedFunction<FileMetadataFields>
+const getArgsAndErrorsByStepIdMock = getArgsAndErrorsByStepId as jest.MockedFunction<
+  typeof getArgsAndErrorsByStepId
+>
+const getPipetteEntitiesMock = getPipetteEntities as jest.MockedFunction<
+  typeof getPipetteEntities
+>
+const getSavedStepFormsMock = getSavedStepForms as jest.MockedFunction<
+  typeof getSavedStepForms
+>
 let fooState: any
 beforeEach(() => {
   fooState = {}

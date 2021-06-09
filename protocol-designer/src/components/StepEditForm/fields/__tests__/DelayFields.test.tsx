@@ -12,11 +12,9 @@ import { FormData } from '../../../../form-types'
 
 jest.mock('../../../../step-forms/selectors')
 
-const getUnsavedFormMock: JestMockFn<[BaseState], ?FormData> =
-  stepFormSelectors.getUnsavedForm
+const getUnsavedFormMock = stepFormSelectors.getUnsavedForm as jest.MockedFunction<typeof stepFormSelectors.getUnsavedForm>
 
-const getLabwareEntitiesMock: JestMockFn<[BaseState], any> =
-  stepFormSelectors.getLabwareEntities
+const getLabwareEntitiesMock = stepFormSelectors.getLabwareEntities as jest.MockedFunction<typeof stepFormSelectors.getLabwareEntities>
 
 const mockStore = {
   dispatch: jest.fn(),

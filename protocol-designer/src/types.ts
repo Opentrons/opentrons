@@ -31,7 +31,7 @@ export type ThunkDispatch<A> = (action: A | ThunkAction<A>) => A
 export type ThunkAction<A> = (
   dispatch: ThunkDispatch<A>,
   getState: GetState
-) => A | void
+) => A | undefined
 // TODO(mc, 2018-04-18): make actual Action union type for PD
 export type Action = {
   type: string

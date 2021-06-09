@@ -20,7 +20,7 @@ const middlewares = [thunk]
 const mockStore = configureMockStore(middlewares)
 const getBatchEditFormHasUnsavedChangesMock =
   stepFormSelectors.getBatchEditFormHasUnsavedChanges
-const getCountPerStepTypeMock: JestMockFn<any, any> = getCountPerStepType
+const getCountPerStepTypeMock: jest.MockedFunction<any> = getCountPerStepType
 
 describe('StepSelectionBanner', () => {
   let store

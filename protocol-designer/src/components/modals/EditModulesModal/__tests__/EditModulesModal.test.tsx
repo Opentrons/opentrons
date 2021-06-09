@@ -46,27 +46,21 @@ jest.mock('../form-state')
 const MODEL_FIELD = 'selectedModel'
 const SLOT_FIELD = 'selectedSlot'
 
-const getInitialDeckSetupMock: JestMockFn<any, any> =
+const getInitialDeckSetupMock: jest.MockedFunction<any> =
   stepFormSelectors.getInitialDeckSetup
 
-const getLabwareIsCompatibleMock: JestMockFn<any, any> = getLabwareIsCompatible
+const getLabwareIsCompatibleMock: jest.MockedFunction<any> = getLabwareIsCompatible
 
-const getDisableModuleRestrictionsMock: JestMockFn<any, any> =
+const getDisableModuleRestrictionsMock: jest.MockedFunction<any> =
   featureSelectors.getDisableModuleRestrictions
 
-const isModuleWithCollisionIssueMock: JestMockFn<
-  any,
-  any
-> = isModuleWithCollisionIssue
+const isModuleWithCollisionIssueMock: jest.MockedFunction<any> = isModuleWithCollisionIssue
 
-const getSlotsBlockedBySpanningMock: JestMockFn<
-  any,
-  any
-> = getSlotsBlockedBySpanning
+const getSlotsBlockedBySpanningMock: jest.MockedFunction<any> = getSlotsBlockedBySpanning
 
-const getSlotIsEmptyMock: JestMockFn<any, any> = getSlotIsEmpty
+const getSlotIsEmptyMock: jest.MockedFunction<any> = getSlotIsEmpty
 
-const getLabwareOnSlotMock: JestMockFn<any, any> = getLabwareOnSlot
+const getLabwareOnSlotMock: jest.MockedFunction<any> = getLabwareOnSlot
 
 describe('Edit Modules Modal', () => {
   let mockStore

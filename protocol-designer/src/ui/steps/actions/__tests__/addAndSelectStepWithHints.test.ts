@@ -10,27 +10,28 @@ jest.mock('../../../../labware-ingred/selectors')
 jest.mock('../../../../file-data/selectors')
 const dispatch = jest.fn()
 const getState = jest.fn()
-const addHintMock: JestMockFn<[any, string], any> = addHint
-const mockGetDeckHasLiquid: JestMockFn<[Record<string, any>], any> =
-  labwareIngredSelectors.getDeckHasLiquid
-const mockGetMagnetModuleHasLabware: JestMockFn<[Record<string, any>], any> =
-  uiModuleSelectors.getMagnetModuleHasLabware
-const mockGetTemperatureModuleHasLabware: JestMockFn<
-  [Record<string, any>],
-  any
-> = uiModuleSelectors.getTemperatureModuleHasLabware
-const mockGetThermocyclerModuleHasLabware: JestMockFn<
-  [Record<string, any>],
-  any
-> = uiModuleSelectors.getThermocyclerModuleHasLabware
-const mockGetSingleTemperatureModuleId: JestMockFn<[Record<string, any>], any> =
-  uiModuleSelectors.getSingleTemperatureModuleId
-const mockGetSingleThermocyclerModuleId: JestMockFn<
-  [Record<string, any>],
-  any
-> = uiModuleSelectors.getSingleThermocyclerModuleId
-const mockGetRobotStateTimeline: JestMockFn<[Record<string, any>], any> =
-  fileDataSelectors.getRobotStateTimeline
+const addHintMock = addHint as jest.MockedFunction<typeof addHint>
+const mockGetDeckHasLiquid = labwareIngredSelectors.getDeckHasLiquid as jest.MockedFunction<
+  typeof labwareIngredSelectors.getDeckHasLiquid
+>
+const mockGetMagnetModuleHasLabware = uiModuleSelectors.getMagnetModuleHasLabware as jest.MockedFunction<
+  typeof uiModuleSelectors.getMagnetModuleHasLabware
+>
+const mockGetTemperatureModuleHasLabware = uiModuleSelectors.getTemperatureModuleHasLabware as jest.MockedFunction<
+  typeof uiModuleSelectors.getTemperatureModuleHasLabware
+>
+const mockGetThermocyclerModuleHasLabware = uiModuleSelectors.getThermocyclerModuleHasLabware as jest.MockedFunction<
+  typeof uiModuleSelectors.getThermocyclerModuleHasLabware
+>
+const mockGetSingleTemperatureModuleId = uiModuleSelectors.getSingleTemperatureModuleId as jest.MockedFunction<
+  typeof uiModuleSelectors.getSingleTemperatureModuleId
+>
+const mockGetSingleThermocyclerModuleId = uiModuleSelectors.getSingleThermocyclerModuleId as jest.MockedFunction<
+  typeof uiModuleSelectors.getSingleThermocyclerModuleId
+>
+const mockGetRobotStateTimeline = fileDataSelectors.getRobotStateTimeline as jest.MockedFunction<
+  typeof fileDataSelectors.getRobotStateTimeline
+>
 beforeEach(() => {
   jest.clearAllMocks()
   addHintMock.mockReturnValue('addHintReturnValue')

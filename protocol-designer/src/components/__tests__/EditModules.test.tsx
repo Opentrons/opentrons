@@ -14,13 +14,15 @@ jest.mock('../../step-forms/selectors')
 jest.mock('../../tutorial')
 jest.mock('../modals/EditModulesModal')
 
-const mockEditModulesModal: JestMockFn<any, any> = EditModulesModal
-
-const getInitialDeckSetupMock: JestMockFn<any, any> =
-  stepFormSelectors.getInitialDeckSetup
-
-const getDismissedHintsMock: JestMockFn<any, any> =
-  tutorialSelectors.getDismissedHints
+const mockEditModulesModal = EditModulesModal as jest.MockedFunction<
+  typeof EditModulesModal
+>
+const getInitialDeckSetupMock = stepFormSelectors.getInitialDeckSetup as jest.MockedFunction<
+  typeof stepFormSelectors.getInitialDeckSetup
+>
+const getDismissedHintsMock = tutorialSelectors.getDismissedHints as jest.MockedFunction<
+  typeof tutorialSelectors.getDismissedHints
+>
 
 describe('Edit Modules', () => {
   const TEST_ID = 'testId'
