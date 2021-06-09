@@ -17,14 +17,13 @@ import { BaseState } from '../../types'
 import { ContextMenu } from './ContextMenu'
 import styles from './StepItem.css'
 
-type DragDropStepItemProps = {
-  ...$Exact<React.ElementProps<typeof ConnectedStepItem>>,
-  connectDragSource: mixed => React.Element<any>,
-  connectDropTarget: mixed => React.Element<any>,
+type DragDropStepItemProps =React.ElementProps<typeof ConnectedStepItem> & {
+  connectDragSource: (val: unknown) => React.Element<any>,
+  connectDropTarget: (val: unknown) => React.Element<any>,
   stepId: StepIdType,
   stepNumber: number,
   isDragging: boolean,
-  findStepIndex: StepIdType => number,
+  findStepIndex: (stepIdType: StepIdType) => number,
   onDrag: () => void,
   moveStep: (StepIdType, number) => void,
 }
@@ -80,9 +79,9 @@ const DragDropStepItem = DropTarget(
 
 type StepItemsProps = {
   orderedStepIds: StepIdType[],
-  reorderSteps: (StepIdType[]) => mixed,
+  reorderSteps: (steps: StepIdType[]) => unknown,
   isOver: boolean,
-  connectDropTarget: mixed => React.Element<any>,
+  connectDropTarget: (val: unknown) => React.Element<any>,
 }
 type StepItemsState = { stepIds: StepIdType[] }
 class StepItems extends React.Component<StepItemsProps, StepItemsState> {

@@ -25,11 +25,11 @@ const LARGE_STEP_MM = 10
 const DECIMALS_ALLOWED = 1
 
 type Props = {
-  closeModal: () => mixed,
+  closeModal: () => unknown,
   isIndeterminate?: boolean,
   mmFromBottom: number | null,
   name: StepFieldName,
-  updateValue: (?number) => mixed,
+  updateValue: (val: number | null | undefined) => unknown,
   wellDepthMm: number,
 }
 

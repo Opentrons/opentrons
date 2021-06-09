@@ -42,7 +42,7 @@ describe('MagnetForm', () => {
         stepType: 'magnet',
         moduleId: 'magnetV1',
         magnetAction: 'engage',
-      }: any),
+      } as any),
       focusHandlers: {
         blur: jest.fn(),
         focus: jest.fn(),
@@ -51,12 +51,12 @@ describe('MagnetForm', () => {
       },
       propsForFields: {
         magnetAction: {
-          onFieldFocus: (jest.fn(): any),
-          onFieldBlur: (jest.fn(): any),
+          onFieldFocus: (jest.fn() as any),
+          onFieldBlur: (jest.fn() as any),
           errorToShow: null,
           disabled: false,
           name: 'magnetAction',
-          updateValue: (jest.fn(): any),
+          updateValue: (jest.fn() as any),
           value: null,
         },
       },

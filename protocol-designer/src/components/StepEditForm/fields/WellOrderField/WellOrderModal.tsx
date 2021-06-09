@@ -147,7 +147,7 @@ export class WellOrderModal extends React.Component<Props, State> {
     this.setState(nextState)
   }
 
-  isSecondOptionDisabled: WellOrderOption => boolean = (
+  isSecondOptionDisabled: (wellOrderOption: WellOrderOption) => boolean = (
     value: WellOrderOption
   ) => {
     if (VERTICAL_VALUES.includes(this.state.firstValue)) {

@@ -1,16 +1,15 @@
 // @flow
 import * as React from 'react'
-import { DropdownField,  Options } from '@opentrons/components'
+import { DropdownField, Options } from '@opentrons/components'
 import cx from 'classnames'
 import styles from '../StepEditForm.css'
 import { StepFieldName } from '../../../steplist/fieldLevel'
 import { FieldProps } from '../types'
 
-export type StepFormDropdownProps = {
-  ...FieldProps,
-  options: Options,
-  name: StepFieldName,
-  className?: string,
+export type StepFormDropdownProps = FieldProps & {
+  options: Options
+  name: StepFieldName
+  className?: string
 }
 
 export const StepFormDropdown = (props: StepFormDropdownProps): React.Node => {

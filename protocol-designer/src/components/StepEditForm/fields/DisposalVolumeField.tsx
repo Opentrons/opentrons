@@ -22,8 +22,7 @@ import { BaseState } from '../../../types'
 
 import styles from '../StepEditForm.css'
 
-type DropdownFormFieldProps = {
-  ...FieldProps,
+type DropdownFormFieldProps = FieldProps & {
   className?: string,
   options: Options,
 }

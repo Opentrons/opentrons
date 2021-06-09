@@ -16,10 +16,10 @@ import { StepIdType } from '../../form-types'
 const MENU_OFFSET_PX = 5
 
 type Props = {
-  children: ({
-    makeStepOnContextMenu: StepIdType => (
+  children: (args: {
+    makeStepOnContextMenu: (stepIdType: StepIdType) => (
       event: SyntheticMouseEvent<>
-    ) => mixed,
+    ) => unknown,
   }) => React.Node,
 }
 

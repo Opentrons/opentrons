@@ -26,7 +26,7 @@ type SubstepRowProps = {
   className?: string,
   stepId: string,
   substepIndex: number,
-  selectSubstep?: SubstepIdentifier => mixed,
+  selectSubstep?: (substepIdentifier: SubstepIdentifier) => unknown,
 }
 
 type PillTooltipContentsProps = {
