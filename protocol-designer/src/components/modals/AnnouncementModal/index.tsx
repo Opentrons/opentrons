@@ -13,7 +13,7 @@ import modalStyles from '../modal.css'
 import { announcements } from './announcements'
 import styles from './AnnouncementModal.css'
 
-export const AnnouncementModal = (): React.Node => {
+export const AnnouncementModal = (): JSX.Element => {
   const { announcementKey, message, heading, image } = announcements[
     announcements.length - 1
   ]

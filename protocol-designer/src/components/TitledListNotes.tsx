@@ -7,7 +7,7 @@ type Props = {
   notes: string | null | undefined
 }
 
-export function TitledListNotes(props: Props): React.Node {
+export function TitledListNotes(props: Props): JSX.Element | null {
   return props.notes ? (
     <div className={styles.notes}>
       <header>{i18n.t('card.notes')}</header>

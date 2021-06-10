@@ -24,7 +24,7 @@ type Props = {
   openEditModuleModal: (moduleType: ModuleRealType, moduleId?: string) => mixed
 }
 
-export function EditModulesCard(props: Props): React.Node {
+export function EditModulesCard(props: Props): JSX.Element {
   const { modules, openEditModuleModal } = props
 
   const pipettesByMount = useSelector(

@@ -38,8 +38,8 @@ type DP = {
 type DNDP = {
   draggedLabware: LabwareOnDeck | null | undefined
   isOver: boolean
-  connectDragSource: (val: React.Node) => React.Node
-  connectDropTarget: (val: React.Node) => React.Node
+  connectDragSource: (val: React.ReactNode) => React.ReactNode
+  connectDropTarget: (val: React.ReactNode) => React.ReactNode
 }
 
 type Props = OP & SP & DP & DNDP
@@ -69,7 +69,7 @@ const EditLabwareComponent = (props: Props) => {
   } else {
     const isBeingDragged = draggedLabware?.slot === labwareOnDeck.slot
 
-    let contents: React.Node = null
+    let contents: React.ReactNode | null = null
 
     if (swapBlocked) {
       contents = null

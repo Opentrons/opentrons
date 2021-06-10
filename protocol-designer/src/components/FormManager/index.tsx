@@ -7,7 +7,7 @@ import { BatchEditForm } from '../BatchEditForm'
 import { StepSelectionBanner } from '../StepSelectionBanner'
 import { getIsMultiSelectMode } from '../../ui/steps/selectors'
 
-export const FormManager = (): React.Node => {
+export const FormManager = (): JSX.Element => {
   const isMultiSelectMode = useSelector(getIsMultiSelectMode)
 
   if (isMultiSelectMode) {

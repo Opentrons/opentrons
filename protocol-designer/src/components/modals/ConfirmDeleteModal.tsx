@@ -29,7 +29,7 @@ type Props = {
   onContinueClick: (event: SyntheticMouseEvent<>) => mixed
 }
 
-export function ConfirmDeleteModal(props: Props): React.Node {
+export function ConfirmDeleteModal(props: Props): JSX.Element {
   const { modalType, onCancelClick, onContinueClick } = props
   const cancelCopy = i18n.t('button.cancel')
   const continueCopy = i18n.t(

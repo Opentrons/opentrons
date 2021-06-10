@@ -55,7 +55,7 @@ export class EditableTextField extends React.Component<Props, State> {
     this.setState({ transientValue: e.currentTarget.value })
   }
 
-  render(): React.Node {
+  render(): React.ReactNode {
     const { className, value } = this.props
     if (this.state.editing) {
       return (

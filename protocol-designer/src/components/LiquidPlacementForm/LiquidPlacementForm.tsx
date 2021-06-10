@@ -105,7 +105,7 @@ export class LiquidPlacementForm extends React.Component<Props> {
     this.props.saveForm(values)
   }
 
-  render(): React.Node {
+  render(): React.ReactNode | null {
     const { liquidSelectionOptions, showForm } = this.props
     if (!showForm) return null
     return (

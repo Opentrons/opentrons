@@ -38,7 +38,7 @@ type Props = {
 }
 
 type WarningContent = {
-  content: React.Node
+  content: React.ReactNode
   heading: string
 }
 
@@ -134,7 +134,7 @@ function getWarningContent({
   return null
 }
 
-export const v4WarningContent: React.Node = (
+export const v4WarningContent: JSX.Element = (
   <div>
     <p>
       {i18n.t(`alert.hint.export_v4_protocol_3_18.body1`)}{' '}
@@ -144,7 +144,7 @@ export const v4WarningContent: React.Node = (
   </div>
 )
 
-export const v5WarningContent: React.Node = (
+export const v5WarningContent: JSX.Element = (
   <div>
     <p>
       {i18n.t(`alert.hint.export_v5_protocol_3_20.body1`)}{' '}
@@ -154,7 +154,7 @@ export const v5WarningContent: React.Node = (
   </div>
 )
 
-export function FileSidebar(props: Props): React.Node {
+export function FileSidebar(props: Props): JSX.Element {
   const {
     canDownload,
     fileData,
@@ -200,7 +200,7 @@ export function FileSidebar(props: Props): React.Node {
 
   const getExportHintContent = (): {
     hintKey: HintKey
-    content: React.Node
+    content: React.ReactNode
   } => {
     return {
       hintKey:

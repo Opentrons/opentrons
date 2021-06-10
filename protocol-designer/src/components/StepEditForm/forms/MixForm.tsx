@@ -27,7 +27,7 @@ import { StepFormProps } from '../types'
 
 import styles from '../StepEditForm.css'
 
-export const MixForm = (props: StepFormProps): React.Node => {
+export const MixForm = (props: StepFormProps): JSX.Element => {
   const [collapsed, setCollapsed] = React.useState(true)
 
   const { propsForFields, formData } = props

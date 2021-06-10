@@ -9,10 +9,10 @@ type Props = {
   collapsed: boolean | null | undefined
   toggleCollapsed: () => void
   prefix: 'aspirate' | 'dispense'
-  children?: React.Node
+  children?: React.ReactNode
 }
 
-export const AspDispSection = (props: Props): React.Node => {
+export const AspDispSection = (props: Props): JSX.Element => {
   const { children, className, collapsed, toggleCollapsed, prefix } = props
   const [targetProps, tooltipProps] = useHoverTooltip()
   return (

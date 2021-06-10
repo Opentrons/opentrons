@@ -16,7 +16,7 @@ type Props = {
   formData: FormData
 }
 
-export const StateFields = (props: Props): React.Node => {
+export const StateFields = (props: Props): JSX.Element => {
   const { isEndingHold, propsForFields, formData } = props
 
   // Append 'Hold' to field names if component is used for an ending hold in a TC profile

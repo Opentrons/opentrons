@@ -35,7 +35,7 @@ type State = {
   showModal: boolean
 }
 
-export const FlowRateInput = (props: FlowRateInputProps): React.Node => {
+export const FlowRateInput = (props: FlowRateInputProps): JSX.Element => {
   const {
     className,
     defaultFlowRate,

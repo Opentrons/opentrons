@@ -84,7 +84,7 @@ export const getLabwareIsRecommended = (
       )
     : false
 
-export const LabwareSelectionModal = (props: Props): React.Node => {
+export const LabwareSelectionModal = (props: Props): JSX.Element => {
   const {
     customLabwareDefs,
     permittedTipracks,

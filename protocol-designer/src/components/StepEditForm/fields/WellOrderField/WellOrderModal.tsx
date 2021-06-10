@@ -44,13 +44,13 @@ type State = {
   secondValue: WellOrderOption,
 }
 
-export const ResetButton = (props: { onClick: () => void }): React.Node => (
+export const ResetButton = (props: { onClick: () => void }): JSX.Element => (
   <OutlineButton className={modalStyles.button_medium} onClick={props.onClick}>
     {i18n.t('button.reset')}
   </OutlineButton>
 )
 
-export const CancelButton = (props: { onClick: () => void }): React.Node => (
+export const CancelButton = (props: { onClick: () => void }): JSX.Element => (
   <PrimaryButton
     className={cx(modalStyles.button_medium, modalStyles.button_right_of_break)}
     onClick={props.onClick}
@@ -59,7 +59,7 @@ export const CancelButton = (props: { onClick: () => void }): React.Node => (
   </PrimaryButton>
 )
 
-export const DoneButton = (props: { onClick: () => void }): React.Node => (
+export const DoneButton = (props: { onClick: () => void }): JSX.Element => (
   <PrimaryButton className={modalStyles.button_medium} onClick={props.onClick}>
     {i18n.t('button.done')}
   </PrimaryButton>
@@ -159,7 +159,7 @@ export class WellOrderModal extends React.Component<Props, State> {
     }
   }
 
-  render(): React.Node {
+  render(): React.ReactNode | null {
     if (!this.props.isOpen) return null
 
     const { firstValue, secondValue } = this.state

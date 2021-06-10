@@ -15,11 +15,11 @@ export type HintProps = {
   hintKey: HintKey
   handleCancel: () => mixed
   handleContinue: () => mixed
-  content: React.Node
+  content: React.ReactNode
 }
 
 // This component handles the checkbox and dispatching `removeHint` action on continue/cancel
-export const BlockingHint = (props: HintProps): React.Node => {
+export const BlockingHint = (props: HintProps): JSX.Element => {
   const { hintKey, handleCancel, handleContinue } = props
   const dispatch = useDispatch()
 
@@ -69,12 +69,12 @@ export type HintArgs = {
    * useBlockingHint expects the parent to disable the hint on cancel/continue */
   enabled: boolean
   hintKey: HintKey
-  content: React.Node
+  content: React.ReactNode
   handleCancel: () => mixed
   handleContinue: () => mixed
 }
 
-export const useBlockingHint = (args: HintArgs): React.Node => {
+export const useBlockingHint = (args: HintArgs): JSX.Element => {
   const { enabled, hintKey, handleCancel, handleContinue, content } = args
   const isDismissed = useSelector(selectors.getDismissedHints).includes(hintKey)
 
