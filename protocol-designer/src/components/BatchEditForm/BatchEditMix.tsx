@@ -33,8 +33,8 @@ import buttonStyles from '../StepEditForm/ButtonRow/styles.css'
 type BatchEditMixProps = {
   batchEditFormHasChanges: boolean
   propsForFields: FieldPropsByName
-  handleCancel: () => mixed
-  handleSave: () => mixed
+  handleCancel: () => unknown
+  handleSave: () => unknown
 }
 export const BatchEditMix = (props: BatchEditMixProps): JSX.Element => {
   const { propsForFields, handleCancel, handleSave } = props

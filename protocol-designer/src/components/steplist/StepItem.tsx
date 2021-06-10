@@ -49,11 +49,11 @@ export type StepItemProps = {
   hovered?: boolean,
   isMultiSelectMode?: boolean,
 
-  highlightStep: () => mixed,
-  onStepContextMenu?: (event?: React.MouseEvent) => mixed,
-  handleClick?: (event: React.MouseEvent) => mixed,
-  toggleStepCollapsed: () => mixed,
-  unhighlightStep: (event?: React.MouseEvent) => mixed,
+  highlightStep: () => unknown,
+  onStepContextMenu?: (event?: React.MouseEvent) => unknown,
+  handleClick?: (event: React.MouseEvent) => unknown,
+  toggleStepCollapsed: () => unknown,
+  unhighlightStep: (event?: React.MouseEvent) => unknown,
   children?: React.ReactNode
 }
 

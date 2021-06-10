@@ -26,10 +26,10 @@ import {
 } from '../../step-forms'
 
 type Props = {
-  loadFile: (event: React.ChangeEvent<HTMLInputElement>) => mixed
-  createNewFile?: () => mixed
+  loadFile: (event: React.ChangeEvent<HTMLInputElement>) => unknown
+  createNewFile?: () => unknown
   canDownload: boolean
-  onDownload: () => mixed
+  onDownload: () => unknown
   fileData: PDProtocolFile | null | undefined
   pipettesOnDeck: $PropertyType<InitialDeckSetup, 'pipettes'>
   modulesOnDeck: $PropertyType<InitialDeckSetup, 'modules'>

@@ -79,7 +79,7 @@ export const StepCreationButtonComponent = (
 }
 
 export type StepButtonItemProps = {
-  onClick: () => mixed,
+  onClick: () => unknown,
   disabled: boolean,
   stepType: StepType,
 }

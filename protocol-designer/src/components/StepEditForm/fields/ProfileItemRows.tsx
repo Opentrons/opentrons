@@ -235,7 +235,7 @@ type ProfileFieldProps = {
   profileItem: ProfileItem
   units?: React.ReactNode
   className?: string
-  updateValue: (name: string, value: mixed) => mixed
+  updateValue: (name: string, value: unknown) => unknown
 }
 const ProfileField = (props: ProfileFieldProps) => {
   const {
@@ -299,7 +299,7 @@ const ProfileStepRow = (props: ProfileStepRowProps) => {
   const { focusHandlers, profileStepItem, isCycle } = props
   const dispatch = useDispatch()
 
-  const updateStepFieldValue = (name: string, value: mixed) => {
+  const updateStepFieldValue = (name: string, value: unknown) => {
     dispatch(
       steplistActions.editProfileStep({
         id: profileStepItem.id,

@@ -27,7 +27,7 @@ const WELL_ORDER_VALUES: WellOrderOption[] = [
 ]
 type Props = {
   isOpen: boolean,
-  closeModal: () => mixed,
+  closeModal: () => unknown,
   prefix: 'aspirate' | 'dispense' | 'mix',
   firstValue: WellOrderOption | null | undefined,
   secondValue: WellOrderOption | null | undefined,

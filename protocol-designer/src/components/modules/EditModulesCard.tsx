@@ -21,7 +21,7 @@ import { ModulesForEditModulesCard } from '../../step-forms'
 
 type Props = {
   modules: ModulesForEditModulesCard
-  openEditModuleModal: (moduleType: ModuleRealType, moduleId?: string) => mixed
+  openEditModuleModal: (moduleType: ModuleRealType, moduleId?: string) => unknown
 }
 
 export function EditModulesCard(props: Props): JSX.Element {

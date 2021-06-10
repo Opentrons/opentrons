@@ -23,7 +23,7 @@ export const StepFormDropdown = (props: StepFormDropdownProps): JSX.Element => {
     updateValue,
     errorToShow,
   } = props
-  // TODO: BC abstract e.currentTarget.value inside onChange with fn like onChangeValue of type (value: mixed) => {}
+  // TODO: BC abstract e.currentTarget.value inside onChange with fn like onChangeValue of type (value: unknown) => {}
   // blank out the dropdown if labware id does not exist
   const availableOptionIds = options.map(opt => opt.value)
   const fieldValue = availableOptionIds.includes(value) ? String(value) : null
