@@ -12,7 +12,7 @@ type Props = {
   targetProps: $ElementType<UseHoverTooltipResult, 0> | null | undefined
 }
 
-export function IngredPill(props: Props): React.Node {
+export function IngredPill(props: Props): JSX.Element {
   const { ingredNames, targetProps } = props
   const ingredIds: string[] = Object.keys(props.ingreds)
 

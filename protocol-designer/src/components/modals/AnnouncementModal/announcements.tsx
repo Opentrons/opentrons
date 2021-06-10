@@ -7,9 +7,9 @@ import styles from './AnnouncementModal.css'
 
 export type Announcement = {
   announcementKey: string
-  image: React.Node | null
+  image: React.ReactNode | null
   heading: string
-  message: React.Node
+  message: React.ReactNode
 }
 
 const batchEditStyles = css`

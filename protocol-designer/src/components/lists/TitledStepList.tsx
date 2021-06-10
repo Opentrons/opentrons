@@ -16,11 +16,11 @@ export type Props = {
   /** optional data test id for the container */
   'data-test'?: string
   /** children must all be `<li>` */
-  children?: React.Node
+  children?: React.ReactNode
   /** additional classnames */
   className?: string
   /** component with descriptive text about the list */
-  description?: React.Node
+  description?: React.ReactNode
   /** optional click action (on title div, not children) */
   onClick?: (event: React.MouseEvent) => mixed
   /** optional right click action (on wrapping div) */
@@ -43,7 +43,7 @@ export type Props = {
   isLastSelected?: boolean
 }
 
-export function TitledStepList(props: Props): React.Node {
+export function TitledStepList(props: Props): JSX.Element {
   const {
     iconName,
     'data-test': dataTest,

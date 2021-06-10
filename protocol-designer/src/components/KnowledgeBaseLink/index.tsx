@@ -22,12 +22,12 @@ type Link = $Keys<typeof links>
 
 type Props = {
   to: Link
-  children: React.Node
+  children: React.ReactNode
   className: string | null | undefined
 }
 
 /** Link which opens a page on the knowledge base to a new tab/window */
-export function KnowledgeBaseLink(props: Props): React.Node {
+export function KnowledgeBaseLink(props: Props): JSX.Element {
   return (
     <a
       target="_blank"

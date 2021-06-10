@@ -46,7 +46,7 @@ const stepPillStyles = css`
   }
 `
 
-const StepPill = (props: StepPillProps): React.Node => {
+const StepPill = (props: StepPillProps): JSX.Element => {
   const { count, stepType } = props
   const label = `${startCase(
     i18n.t(`application.stepType.${stepType}`)
@@ -63,7 +63,7 @@ export const ExitBatchEditButton = (props: {
     StepSelectionBannerProps,
     'handleExitBatchEdit'
   >
-}): React.Node => (
+}): JSX.Element => (
   <Box flex="0 1 auto">
     <SecondaryBtn
       color={C_WHITE}
@@ -82,7 +82,7 @@ export type StepSelectionBannerProps = {
 
 export const StepSelectionBannerComponent = (
   props: StepSelectionBannerProps
-): React.Node => {
+): JSX.Element => {
   const { countPerStepType, handleExitBatchEdit } = props
   const numSteps = Object.keys(countPerStepType).reduce<number>(
     (acc, stepType) => acc + countPerStepType[stepType],

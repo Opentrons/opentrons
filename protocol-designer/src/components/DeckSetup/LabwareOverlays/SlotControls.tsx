@@ -31,7 +31,7 @@ import styles from './LabwareOverlays.css'
 
 type DNDP = {
   isOver: boolean
-  connectDropTarget: (val: React.Node) => React.Node
+  connectDropTarget: (val: React.ReactNode) => React.ReactNode
   draggedItem: ?{ labwareOnDeck: LabwareOnDeck }
   itemType: string
 }
@@ -50,7 +50,7 @@ type SP = {
 }
 type Props = OP & DP & DNDP & SP
 
-export const SlotControlsComponent = (props: Props): React.Node => {
+export const SlotControlsComponent = (props: Props): JSX.Element => {
   const {
     slot,
     addLabware,

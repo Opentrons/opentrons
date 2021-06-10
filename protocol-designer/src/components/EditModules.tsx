@@ -24,7 +24,7 @@ export type ModelModuleInfo = {
   slot: string
 }
 
-export const EditModules = (props: EditModulesProps): React.Node => {
+export const EditModules = (props: EditModulesProps): JSX.Element => {
   const { onCloseClick, moduleToEdit } = props
   const { moduleId, moduleType } = moduleToEdit
   const _initialDeckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)

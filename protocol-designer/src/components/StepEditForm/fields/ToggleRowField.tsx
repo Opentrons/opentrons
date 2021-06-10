@@ -13,7 +13,7 @@ type ToggleRowProps = FieldProps & {
   onLabel?: string,
   className?: string,
 }
-export const ToggleRowField = (props: ToggleRowProps): React.Node => {
+export const ToggleRowField = (props: ToggleRowProps): JSX.Element => {
   const {
     updateValue,
     value,

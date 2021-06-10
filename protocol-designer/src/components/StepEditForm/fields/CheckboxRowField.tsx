@@ -11,13 +11,13 @@ import styles from '../StepEditForm.css'
 import { FieldProps } from '../types'
 
 type CheckboxRowProps = FieldProps & {
-  children?: React.Node,
+  children?: React.ReactNode,
   className?: string,
   label?: string,
-  tooltipContent?: React.Node,
+  tooltipContent?: React.ReactNode,
 }
 
-export const CheckboxRowField = (props: CheckboxRowProps): React.Node => {
+export const CheckboxRowField = (props: CheckboxRowProps): JSX.Element => {
   const {
     children,
     className,

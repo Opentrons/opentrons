@@ -23,12 +23,12 @@ import { TerminalItemId } from '../../../steplist'
 export { TerminalItemLink } from './TerminalItemLink'
 
 type Props = {
-  children?: React.Node
+  children?: React.ReactNode
   id: TerminalItemId
   title: string
 }
 
-export const TerminalItem = (props: Props): React.Node => {
+export const TerminalItem = (props: Props): JSX.Element => {
   const { id, title, children } = props
   // const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false)
 

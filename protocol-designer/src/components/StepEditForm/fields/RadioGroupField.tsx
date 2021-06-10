@@ -10,7 +10,7 @@ type RadioGroupFieldProps = FieldProps & {
   className?: string
 }
 
-export const RadioGroupField = (props: RadioGroupFieldProps): React.Node => {
+export const RadioGroupField = (props: RadioGroupFieldProps): JSX.Element => {
   const {
     className,
     disabled, // NOTE: not used

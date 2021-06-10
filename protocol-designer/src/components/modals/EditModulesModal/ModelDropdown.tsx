@@ -12,7 +12,7 @@ type ModelDropdownProps = {
     disabled?: boolean
   }>
 }
-export const ModelDropdown = (props: ModelDropdownProps): React.Node => {
+export const ModelDropdown = (props: ModelDropdownProps): JSX.Element => {
   const { fieldName, options, tabIndex } = props
   const [field, meta] = useField(fieldName)
   return (

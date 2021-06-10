@@ -109,7 +109,7 @@ const WellSelectionModalComponent = (
 
 export const WellSelectionModal = (
   props: WellSelectionModalProps
-): React.Node => {
+): React.ReactNode => {
   const { isOpen, labwareId, onCloseClick, pipetteId } = props
   const wellFieldData = props.value
 

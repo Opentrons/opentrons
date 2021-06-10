@@ -9,7 +9,7 @@ type TextFieldProps = FieldProps & {
   units: string | null | undefined
 }
 
-export const TextField = (props: TextFieldProps): React.Node => {
+export const TextField = (props: TextFieldProps): JSX.Element => {
   const {
     errorToShow,
     onFieldBlur,

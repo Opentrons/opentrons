@@ -12,7 +12,7 @@ type Props = {
   labwareNickname: string | null | undefined
 }
 
-export function MixHeader(props: Props): React.Node {
+export function MixHeader(props: Props): JSX.Element {
   const { volume, times, labwareNickname } = props
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: 'bottom-start',

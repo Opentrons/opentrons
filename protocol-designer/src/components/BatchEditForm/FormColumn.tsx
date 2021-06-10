@@ -5,10 +5,10 @@ import { Box } from '@opentrons/components'
 import styles from '../StepEditForm/StepEditForm.css'
 
 export type FormColumnProps = {
-  children?: React.Node
-  sectionHeader?: React.Node
+  children?: React.ReactNode
+  sectionHeader?: React.ReactNode
 }
-export const FormColumn = (props: FormColumnProps): React.Node => {
+export const FormColumn = (props: FormColumnProps): JSX.Element => {
   return (
     <Box className={styles.section_column}>
       <Box className={styles.section_header}>

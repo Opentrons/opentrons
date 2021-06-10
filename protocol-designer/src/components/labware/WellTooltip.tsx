@@ -22,8 +22,8 @@ type WellTooltipParams = {
 }
 
 type Props = {
-  children: (wellTooltipParams: WellTooltipParams) => React.Node
-  ingredNames: WellIngredientNames
+  children: (wellTooltipParams: WellTooltipParams) => React.ReactNode,
+  ingredNames: WellIngredientNames,
 }
 
 type State = {
@@ -68,7 +68,7 @@ export class WellTooltip extends React.Component<Props, State> {
     this.setState(initialState)
   }
 
-  render(): React.Node {
+  render(): React.ReactNode {
     const { tooltipX, tooltipY, tooltipOffset } = this.state
 
     return (

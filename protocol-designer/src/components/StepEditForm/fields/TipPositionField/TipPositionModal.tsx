@@ -88,7 +88,7 @@ const getErrors = (args: {
   return errors
 }
 
-export const TipPositionModal = (props: Props): React.Node => {
+export const TipPositionModal = (props: Props): JSX.Element => {
   const { isIndeterminate, name, wellDepthMm } = props
 
   const defaultMmFromBottom = utils.getDefaultMmFromBottom({

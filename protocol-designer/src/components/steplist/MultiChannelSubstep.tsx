@@ -39,7 +39,7 @@ export class MultiChannelSubstep extends React.PureComponent<
     this.setState({ collapsed: !this.state.collapsed })
   }
 
-  render(): React.Node {
+  render(): React.ReactNode {
     const {
       rowGroup,
       highlighted,

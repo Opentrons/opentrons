@@ -12,7 +12,7 @@ type Props = {
   renameLabware: (name: string) => mixed
 }
 
-export function LabwareDetailsCard(props: Props): React.Node {
+export function LabwareDetailsCard(props: Props): JSX.Element {
   return (
     <PDTitledList title="labware details" iconName="flask-outline">
       <PDListItem>

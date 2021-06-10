@@ -21,7 +21,7 @@ import { BatchEditMix } from './BatchEditMix'
 
 export type BatchEditFormProps = {}
 
-export const BatchEditForm = (props: BatchEditFormProps): React.Node => {
+export const BatchEditForm = (props: BatchEditFormProps): JSX.Element => {
   const dispatch = useDispatch()
   const fieldValues = useSelector(getMultiSelectFieldValues)
   const stepTypes = useSelector(getBatchEditSelectedStepTypes)

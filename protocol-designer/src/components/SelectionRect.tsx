@@ -8,7 +8,7 @@ type Props = {
   onSelectionMove?: (e: React.MouseEvent, GenericRect) => mixed
   onSelectionDone?: (e: React.MouseEvent, GenericRect) => mixed
   svg?: boolean // set true if this is an embedded SVG
-  children?: React.Node
+  children?: React.ReactNode
   originXOffset?: number
   originYOffset?: number
 }
@@ -27,7 +27,7 @@ export class SelectionRect extends React.Component<Props, State> {
     this.state = { positions: null }
   }
 
-  renderRect(args: DragRect): React.Node {
+  renderRect(args: DragRect): React.ReactNode {
     const { xStart, yStart, xDynamic, yDynamic } = args
     const left = Math.min(xStart, xDynamic)
     const top = Math.min(yStart, yDynamic)
@@ -136,7 +136,7 @@ export class SelectionRect extends React.Component<Props, State> {
       this.props.onSelectionDone(e, finalRect)
   }
 
-  render(): React.Node {
+  render(): React.ReactNode {
     const { svg, children } = this.props
 
     return svg ? (

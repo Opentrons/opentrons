@@ -30,7 +30,7 @@ type LiquidGroupCardProps = CommonProps & {
   labwareWellContents: SingleLabwareLiquidState
 }
 
-const LiquidGroupCard = (props: LiquidGroupCardProps): React.Node => {
+const LiquidGroupCard = (props: LiquidGroupCardProps): JSX.Element => {
   const {
     ingredGroup,
     removeWellsContents,
@@ -149,7 +149,7 @@ type Props = CommonProps & {
   selectedIngredientGroupId: string | null | undefined
 }
 
-export function IngredientsList(props: Props): React.Node {
+export function IngredientsList(props: Props): JSX.Element {
   const {
     labwareWellContents,
     liquidGroupsById,

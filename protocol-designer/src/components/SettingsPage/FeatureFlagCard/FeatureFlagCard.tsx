@@ -18,7 +18,7 @@ type Props = {
   setFeatureFlags: (flags: Flags) => mixed,
 }
 
-export const FeatureFlagCard = (props: Props): React.Node => {
+export const FeatureFlagCard = (props: Props): JSX.Element => {
   const [modalFlagName, setModalFlagName] = React.useState<FlagTypes | null>(
     null
   )
@@ -35,8 +35,8 @@ export const FeatureFlagCard = (props: Props): React.Node => {
     flagName => !userFacingFlags.includes(flagName)
   )
 
-  const getDescription = (flag: FlagTypes): React.Node => {
-    const RICH_DESCRIPTIONS: { [FlagTypes]: React.Node } = {
+  const getDescription = (flag: FlagTypes): JSX.Element => {
+    const RICH_DESCRIPTIONS: { [FlagTypes]: JSX.Element } = {
       OT_PD_DISABLE_MODULE_RESTRICTIONS: (
         <>
           <p>{i18n.t(`feature_flags.${flag}.description_1`)} </p>

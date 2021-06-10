@@ -52,7 +52,7 @@ type Props = {
   onBlur: (event: React.FocusEvent<HTMLSelectElement>) => mixed
 }
 
-export function ModuleFields(props: Props): React.Node {
+export function ModuleFields(props: Props): JSX.Element {
   const {
     onFieldChange,
     onSetFieldValue,

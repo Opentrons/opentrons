@@ -10,11 +10,11 @@ import { AlertType } from './types'
 type PDAlertProps = {
   alertType: AlertType
   title: string
-  description: React.Node
+  description: React.ReactNode
   onDismiss: (() => mixed) | null | undefined
 }
 
-export const PDAlert = (props: PDAlertProps): React.Node => {
+export const PDAlert = (props: PDAlertProps): JSX.Element => {
   const { alertType, title, description, onDismiss } = props
   return (
     <AlertItem

@@ -20,10 +20,10 @@ type Props = {
     makeStepOnContextMenu: (
       stepIdType: StepIdType
     ) => (event: React.MouseEvent) => unknown
-  }) => React.Node
+  }) => React.ReactNode
 }
 
-type Position = { left: number | null; top: number | null }
+type Position = { left: number | null, top: number | null }
 
 export const ContextMenu = (props: Props): React.Node => {
   const dispatch = useDispatch()
@@ -48,7 +48,7 @@ export const ContextMenu = (props: Props): React.Node => {
   })
 
   const makeHandleContextMenu = (stepId: StepIdType) => (
-    event: React.MouseEvent<any>
+    event: SyntheticMouseEvent<*>
   ) => {
     if (isMultiSelectMode) return
     event.preventDefault()
@@ -75,7 +75,7 @@ export const ContextMenu = (props: Props): React.Node => {
     setPosition({ left, top })
   }
 
-  const handleClick = (event: React.MouseEvent) => {
+  const handleClick = (event: SyntheticMouseEvent<*>) => {
     const wasOutside = !(
       event.target instanceof Node && menuRoot.current?.contains(event.target)
     )
