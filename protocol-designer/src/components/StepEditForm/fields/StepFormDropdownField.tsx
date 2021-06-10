@@ -37,7 +37,7 @@ export const StepFormDropdown = (props: StepFormDropdownProps): React.Node => {
       onBlur={onFieldBlur}
       onFocus={onFieldFocus}
       value={fieldValue}
-      onChange={(e: SyntheticEvent<HTMLSelectElement>) => {
+      onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
         updateValue(e.currentTarget.value)
       }}
     />

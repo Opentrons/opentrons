@@ -42,7 +42,7 @@ type OP = {
   handleDragHover?: () => mixed
 }
 type DP = {
-  addLabware: (e: SyntheticEvent<*>) => unknown
+  addLabware: (e: React.MouseEvent<any>) => unknown
   moveDeckItem: (item1: DeckSlot, item2: DeckSlot) => unknown
 }
 type SP = {

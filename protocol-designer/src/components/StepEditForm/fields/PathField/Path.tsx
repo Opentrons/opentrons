@@ -43,7 +43,7 @@ type ButtonProps = {
   id?: string
   selected: boolean
   subtitle: string
-  onClick: (e: SyntheticMouseEvent<*>) => unknown
+  onClick: (e: React.MouseEvent) => unknown
   path: PathOption
 }
 

@@ -17,13 +17,13 @@ const MENU_OFFSET_PX = 5
 
 type Props = {
   children: (args: {
-    makeStepOnContextMenu: (stepIdType: StepIdType) => (
-      event: SyntheticMouseEvent<>
-    ) => unknown,
-  }) => React.Node,
+    makeStepOnContextMenu: (
+      stepIdType: StepIdType
+    ) => (event: React.MouseEvent) => unknown
+  }) => React.Node
 }
 
-type Position = { left: number | null, top: number | null }
+type Position = { left: number | null; top: number | null }
 
 export const ContextMenu = (props: Props): React.Node => {
   const dispatch = useDispatch()
@@ -48,7 +48,7 @@ export const ContextMenu = (props: Props): React.Node => {
   })
 
   const makeHandleContextMenu = (stepId: StepIdType) => (
-    event: SyntheticMouseEvent<*>
+    event: React.MouseEvent<any>
   ) => {
     if (isMultiSelectMode) return
     event.preventDefault()
@@ -75,7 +75,7 @@ export const ContextMenu = (props: Props): React.Node => {
     setPosition({ left, top })
   }
 
-  const handleClick = (event: SyntheticMouseEvent<*>) => {
+  const handleClick = (event: React.MouseEvent) => {
     const wasOutside = !(
       event.target instanceof Node && menuRoot.current?.contains(event.target)
     )

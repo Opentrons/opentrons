@@ -22,15 +22,15 @@ export type Props = {
   /** component with descriptive text about the list */
   description?: React.Node
   /** optional click action (on title div, not children) */
-  onClick?: (event: SyntheticMouseEvent<>) => mixed
+  onClick?: (event: React.MouseEvent) => mixed
   /** optional right click action (on wrapping div) */
-  onContextMenu?: (event: SyntheticMouseEvent<>) => mixed
+  onContextMenu?: (event: React.MouseEvent) => mixed
   /** optional mouseEnter action */
-  onMouseEnter?: (event: SyntheticMouseEvent<>) => mixed
+  onMouseEnter?: (event: React.MouseEvent) => mixed
   /** optional mouseLeave action */
-  onMouseLeave?: (event: SyntheticMouseEvent<>) => mixed
+  onMouseLeave?: (event: React.MouseEvent) => mixed
   /** caret click action; if defined, list is expandable and carat is visible */
-  onCollapseToggle?: (event: SyntheticMouseEvent<>) => mixed
+  onCollapseToggle?: (event: React.MouseEvent) => mixed
   /** collapse the list if true (false by default) */
   collapsed?: boolean
   /** set to true when Step is selected (eg, user clicked it) */
@@ -61,7 +61,7 @@ export function TitledStepList(props: Props): React.Node {
 
   // clicking on the carat will not call props.onClick,
   // so prevent bubbling up if there is an onCollapseToggle fn
-  const handleCollapseToggle = (e: SyntheticMouseEvent<>) => {
+  const handleCollapseToggle = (e: React.MouseEvent) => {
     if (onCollapseToggle) {
       e.stopPropagation()
       onCollapseToggle(e)

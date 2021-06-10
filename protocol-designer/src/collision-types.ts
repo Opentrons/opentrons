@@ -21,4 +21,4 @@ export type BoundingRect = {
   height: number
 }
 
-export type RectEvent = (MouseEvent, GenericRect) => mixed
+export type RectEvent = (React.MouseEvent, GenericRect) => mixed

@@ -252,7 +252,7 @@ const ProfileField = (props: ProfileFieldProps) => {
     name,
   })
 
-  const onChange = (e: SyntheticEvent<*>) => {
+  const onChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.currentTarget.value
     const maskedValue = maskProfileField(name, value)
     updateValue(name, maskedValue)

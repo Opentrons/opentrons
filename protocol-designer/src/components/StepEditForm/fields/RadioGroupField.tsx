@@ -30,7 +30,7 @@ export const RadioGroupField = (props: RadioGroupFieldProps): React.Node => {
       className={className}
       value={value ? String(value) : ''}
       error={errorToShow}
-      onChange={(e: SyntheticEvent<*>) => {
+      onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
         updateValue(e.currentTarget.value)
         // NOTE(IL, 2020-01-29): to allow the intented pristinity UX, this component "blurs" onchange
         if (onFieldBlur) {

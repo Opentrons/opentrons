@@ -88,7 +88,7 @@ const DisposalVolumeFieldComponent = (props: Props) => {
             label="Disposal Volume"
             value={Boolean(value)}
             className={cx(styles.checkbox_field, styles.large_field)}
-            onChange={(e: SyntheticInputEvent<*>) => updateValue(!value)}
+            onChange={(e: React.ChangeEvent<any>) => updateValue(!value)}
           />
           {value ? volumeField : null}
         </div>

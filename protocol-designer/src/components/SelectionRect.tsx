@@ -5,8 +5,8 @@ import styles from './SelectionRect.css'
 import { DragRect, GenericRect } from '../collision-types'
 
 type Props = {
-  onSelectionMove?: (e: MouseEvent, GenericRect) => mixed
-  onSelectionDone?: (e: MouseEvent, GenericRect) => mixed
+  onSelectionMove?: (e: React.MouseEvent, GenericRect) => mixed
+  onSelectionDone?: (e: React.MouseEvent, GenericRect) => mixed
   svg?: boolean // set true if this is an embedded SVG
   children?: React.Node
   originXOffset?: number
@@ -91,7 +91,7 @@ export class SelectionRect extends React.Component<Props, State> {
     }
   }
 
-  handleMouseDown: (e: MouseEvent) => void = e => {
+  handleMouseDown: (e: React.MouseEvent) => void = e => {
     document.addEventListener('mousemove', this.handleDrag)
     document.addEventListener('mouseup', this.handleMouseUp)
     this.setState({
@@ -104,7 +104,7 @@ export class SelectionRect extends React.Component<Props, State> {
     })
   }
 
-  handleDrag: (e: MouseEvent) => void = e => {
+  handleDrag: (e: React.MouseEvent) => void = e => {
     if (this.state.positions) {
       const nextRect = {
         ...this.state.positions,
@@ -118,8 +118,8 @@ export class SelectionRect extends React.Component<Props, State> {
     }
   }
 
-  handleMouseUp: (e: MouseEvent) => void = e => {
-    if (!(e instanceof MouseEvent)) {
+  handleMouseUp: (e: React.MouseEvent) => void = e => {
+    if (!(e instanceof React.MouseEvent)) {
       return
     }
     document.removeEventListener('mousemove', this.handleDrag)

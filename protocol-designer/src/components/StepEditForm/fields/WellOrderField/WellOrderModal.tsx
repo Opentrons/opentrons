@@ -127,7 +127,7 @@ export class WellOrderModal extends React.Component<Props, State> {
   makeOnChange: (
     ordinality: 'first' | 'second'
   ) => (
-    event: SyntheticEvent<HTMLSelectElement>
+    event: React.ChangeEvent<HTMLSelectElement>
   ) => void = ordinality => event => {
     const { value } = event.currentTarget
     let nextState = { [`${ordinality}Value`]: value }
