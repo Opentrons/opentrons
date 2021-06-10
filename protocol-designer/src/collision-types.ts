@@ -1,4 +1,4 @@
-import {MouseEvent} from 'react'
+import { MouseEvent } from 'react'
 
 export type DragRect = {
   xStart: number
@@ -21,5 +21,5 @@ export type BoundingRect = {
   height: number
 }
 
-// TODO(CE): can we get rid of this?
+// TODO(CE): can we get rid of this? It does not seem to be used.
 export type RectEvent = (event: MouseEvent, rect: GenericRect) => mixed
