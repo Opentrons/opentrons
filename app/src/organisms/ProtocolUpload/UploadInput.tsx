@@ -101,7 +101,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element {
 
   return (
     <>
-      <Text css={FONT_HEADER_DARK} marginBottom={SPACING_3}>
+      <Text as="h1" css={FONT_HEADER_DARK} marginBottom={SPACING_3}>
         {t('open_a_protocol')}
       </Text>
       <PrimaryBtn onClick={handleClick} marginBottom={SPACING_4}>
@@ -128,7 +128,11 @@ export function UploadInput(props: UploadInputProps): JSX.Element {
           onChange={onChange}
         />
       </label>
-      <Text css={FONT_HEADER_DARK} marginBottom={SPACING_4}>
+      <Text
+        role="complementary"
+        css={FONT_HEADER_DARK}
+        marginBottom={SPACING_4}
+      >
         {t('no_protocol_yet')}
       </Text>
       <SecondaryBtn

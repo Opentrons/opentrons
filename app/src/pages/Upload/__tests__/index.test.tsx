@@ -5,7 +5,7 @@ import { mountWithProviders } from '@opentrons/components/__utils__'
 import { i18n } from '../../../i18n'
 
 import * as Fixtures from '../../../redux/discovery/__fixtures__'
-import * as Config from '../../../redux/config'
+import * as ConfigSelectors from '../../../redux/config/selectors'
 import * as RobotSelectors from '../../../redux/robot/selectors'
 import * as ProtocolSelectors from '../../../redux/protocol/selectors'
 import * as DiscoSelectors from '../../../redux/discovery/selectors'
@@ -21,8 +21,8 @@ jest.mock('../../../redux/protocol/selectors')
 jest.mock('../../../redux/discovery/selectors')
 jest.mock('../../../redux/custom-labware/selectors')
 
-const getFeatureFlags = Config.getFeatureFlags as jest.MockedFunction<
-  typeof Config.getFeatureFlags
+const getFeatureFlags = ConfigSelectors.getFeatureFlags as jest.MockedFunction<
+  typeof ConfigSelectors.getFeatureFlags
 >
 const getSessionLoadInProgress = RobotSelectors.getSessionLoadInProgress as jest.MockedFunction<
   typeof RobotSelectors.getSessionLoadInProgress

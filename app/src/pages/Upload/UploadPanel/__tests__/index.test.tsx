@@ -4,7 +4,7 @@ import { mountWithProviders } from '@opentrons/components/__utils__'
 
 import { i18n } from '../../../../i18n'
 
-import * as Config from '../../../../redux/config'
+import * as ConfigSelectors from '../../../../redux/config/selectors'
 import * as RobotSelectors from '../../../../redux/robot/selectors'
 import * as ProtocolSelectors from '../../../../redux/protocol/selectors'
 
@@ -12,12 +12,12 @@ import { UploadPanel } from '../'
 
 import type { State, Action } from '../../../../redux/types'
 
-jest.mock('../../../redux/config/selectors')
-jest.mock('../../../redux/robot/selectors')
-jest.mock('../../../redux/protocol/selectors')
+jest.mock('../../../../redux/config/selectors')
+jest.mock('../../../../redux/robot/selectors')
+jest.mock('../../../../redux/protocol/selectors')
 
-const getFeatureFlags = Config.getFeatureFlags as jest.MockedFunction<
-  typeof Config.getFeatureFlags
+const getFeatureFlags = ConfigSelectors.getFeatureFlags as jest.MockedFunction<
+  typeof ConfigSelectors.getFeatureFlags
 >
 const getProtocolFilename = ProtocolSelectors.getProtocolFilename as jest.MockedFunction<
   typeof ProtocolSelectors.getProtocolFilename

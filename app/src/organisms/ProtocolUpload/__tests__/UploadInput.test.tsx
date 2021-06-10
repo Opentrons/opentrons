@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { screen, fireEvent } from '@testing-library/react'
+import '@testing-library/jest-dom'
+import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components/__utils__'
 
 import { i18n } from '../../../i18n'
@@ -25,15 +26,23 @@ describe('UploadInput', () => {
     jest.resetAllMocks()
   })
 
-  it('renders correct text for empty state', () => {
-    render()
+  it('renders correct contents for empty state', () => {
+    const { getByRole } = render()
 
-    expect(screen.getByText('Open a protocol to get started')).toBeTruthy()
-    expect(screen.getByText('Choose File...')).toBeTruthy()
-    expect(screen.getByText('Drag and drop protocol file here')).toBeTruthy()
-    expect(screen.getByText("Don't have a protocol yet?")).toBeTruthy()
-    expect(screen.getByText('Browse Our Protocol Library')).toBeTruthy()
-    expect(screen.getByText('Launch Protocol Designer')).toBeTruthy()
+    expect(getByRole('heading')).toHaveTextContent(
+      /Open a protocol to get started/i
+    )
+    expect(getByRole('button', { name: 'Choose File...' })).toBeTruthy()
+    expect(
+      getByRole('button', { name: 'Drag and drop protocol file here' })
+    ).toBeTruthy()
+    expect(getByRole('complementary')).toHaveTextContent(
+      /Don't have a protocol yet\?/i
+    )
+    expect(
+      getByRole('link', { name: 'Browse Our Protocol Library' })
+    ).toBeTruthy()
+    expect(getByRole('link', { name: 'Launch Protocol Designer' })).toBeTruthy()
   })
 
   it('calls createSession on button click', () => {
