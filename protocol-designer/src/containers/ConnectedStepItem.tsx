@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react'
-import { MouseEvent } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import uniq from 'lodash/uniq'
 import UAParser from 'ua-parser-js'
@@ -47,7 +46,7 @@ const nonePressed = (keysPressed: boolean[]): boolean =>
 const getUserOS = () => new UAParser().getOS().name
 
 const getMouseClickKeyInfo = (
-  event: MouseEvent
+  event: React.MouseEvent
 ): { isShiftKeyPressed: boolean; isMetaKeyPressed: boolean } => {
   const isMac: boolean = getUserOS() === 'Mac OS'
   const isShiftKeyPressed: boolean = event.shiftKey
@@ -116,7 +115,7 @@ export const ConnectedStepItem = (props: Props): JSX.Element => {
   const highlightStep = () => dispatch(stepsActions.hoverOnStep(stepId))
   const unhighlightStep = () => dispatch(stepsActions.hoverOnStep(null))
 
-  const handleStepItemSelection = (event: MouseEvent): void => {
+  const handleStepItemSelection = (event: React.MouseEvent): void => {
     const { isShiftKeyPressed, isMetaKeyPressed } = getMouseClickKeyInfo(event)
     let stepsToSelect: StepIdType[] = []
 
@@ -173,7 +172,7 @@ export const ConnectedStepItem = (props: Props): JSX.Element => {
   )
   // (SA 2020/12/23): This will not be needed once we update to React 17
   // since event pooling will be eliminated
-  const confirmWithPersistedEvent = (event: MouseEvent): void => {
+  const confirmWithPersistedEvent = (event: React.MouseEvent): void => {
     event.persist()
     confirm(event)
   }

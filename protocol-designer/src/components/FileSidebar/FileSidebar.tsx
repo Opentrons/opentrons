@@ -26,7 +26,7 @@ import {
 } from '../../step-forms'
 
 type Props = {
-  loadFile: (event: SyntheticInputEvent<HTMLInputElement>) => mixed
+  loadFile: (event: React.ChangeEvent<HTMLInputElement>) => mixed
   createNewFile?: () => mixed
   canDownload: boolean
   onDownload: () => mixed

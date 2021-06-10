@@ -38,7 +38,7 @@ export const BlowoutLocationField = (
       onBlur={onFieldBlur}
       onFocus={onFieldFocus}
       value={value ? String(value) : null}
-      onChange={(e: SyntheticEvent<HTMLSelectElement>) => {
+      onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
         updateValue(e.currentTarget.value)
       }}
     />

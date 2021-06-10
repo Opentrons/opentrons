@@ -1,4 +1,4 @@
-// @flow
+import { MouseEvent } from 'react'
 
 export type DragRect = {
   xStart: number
@@ -21,4 +21,5 @@ export type BoundingRect = {
   height: number
 }
 
-export type RectEvent = (MouseEvent, GenericRect) => mixed
+// TODO(CE): can we get rid of this? It does not seem to be used.
+export type RectEvent = (event: MouseEvent, rect: GenericRect) => mixed

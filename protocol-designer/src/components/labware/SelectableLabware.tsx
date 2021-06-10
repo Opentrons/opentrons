@@ -21,15 +21,15 @@ export type Props = {
   labwareProps: $Diff<
     React.ElementProps<typeof SingleLabware>,
     { selectedWells: * }
-  >,
+  >
   /** array of primary wells. Overrides labwareProps.selectedWells */
-  selectedPrimaryWells: WellGroup,
-  selectWells: (wellGroup: WellGroup) => unknown,
-  deselectWells: (wellGroup: WellGroup) => unknown,
-  updateHighlightedWells: (wellGroup: WellGroup) => unknown,
-  pipetteChannels: Channels | null | undefined,
-  ingredNames: WellIngredientNames,
-  wellContents: ContentsByWell,
+  selectedPrimaryWells: WellGroup
+  selectWells: (wellGroup: WellGroup) => unknown
+  deselectWells: (wellGroup: WellGroup) => unknown
+  updateHighlightedWells: (wellGroup: WellGroup) => unknown
+  pipetteChannels: Channels | null | undefined
+  ingredNames: WellIngredientNames
+  wellContents: ContentsByWell
 }
 
 export class SelectableLabware extends React.Component<Props> {
@@ -62,7 +62,7 @@ export class SelectableLabware extends React.Component<Props> {
     return selectedWells
   }
 
-  handleSelectionMove: (e: MouseEvent, rect: GenericRect) => void = (
+  handleSelectionMove: (e: React.MouseEvent, rect: GenericRect) => void = (
     e,
     rect
   ) => {
@@ -89,7 +89,7 @@ export class SelectableLabware extends React.Component<Props> {
       }
     }
   }
-  handleSelectionDone: (e: MouseEvent, rect: GenericRect) => void = (
+  handleSelectionDone: (e: React.MouseEvent, rect: GenericRect) => void = (
     e,
     rect
   ) => {

@@ -42,7 +42,7 @@ type ClickableIconProps = {
   width?: string
   alignRight?: boolean
   isLast?: boolean
-  onClick?: (event: SyntheticMouseEvent<>) => mixed
+  onClick?: (event: React.MouseEvent) => mixed
 }
 
 const iconBoxStyles = css`

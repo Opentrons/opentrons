@@ -34,13 +34,13 @@ export class EditableTextField extends React.Component<Props, State> {
     })
   }
 
-  handleKeyUp: (e: SyntheticKeyboardEvent<>) => void = e => {
+  handleKeyUp: (e: React.KeyboardEvent) => void = e => {
     if (e.key === 'Escape') {
       this.handleCancel()
     }
   }
 
-  handleFormSubmit: (e: SyntheticEvent<>) => void = e => {
+  handleFormSubmit: (e: React.FormEvent) => void = e => {
     e.preventDefault() // avoid 'form is not connected' warning
     this.handleSubmit()
   }
@@ -51,7 +51,7 @@ export class EditableTextField extends React.Component<Props, State> {
     )
   }
 
-  updateValue: (e: SyntheticInputEvent<HTMLInputElement>) => void = e => {
+  updateValue: (e: React.ChangeEvent<HTMLInputElement>) => void = e => {
     this.setState({ transientValue: e.currentTarget.value })
   }
 

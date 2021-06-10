@@ -47,7 +47,7 @@ export const CheckboxRowField = (props: CheckboxRowProps): JSX.Element => {
           label={label}
           labelProps={targetProps}
           name={name}
-          onChange={(e: SyntheticInputEvent<*>) => updateValue(!value)}
+          onChange={(e: React.ChangeEvent<HTMLSelectElement>) => updateValue(!value)}
           value={Boolean(value)}
         />
         {value && !disabled && !isIndeterminate ? children : null}

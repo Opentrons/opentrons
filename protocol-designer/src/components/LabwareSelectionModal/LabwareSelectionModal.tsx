@@ -33,7 +33,7 @@ import { LabwareDefByDefURI } from '../../labware-defs'
 
 type Props = {
   onClose: (e?: any) => unknown,
-  onUploadLabware: (event: SyntheticInputEvent<HTMLInputElement>) => unknown,
+  onUploadLabware: (event: React.ChangeEvent<HTMLInputElement>) => unknown,
   selectLabware: (containerType: string) => unknown,
   customLabwareDefs: LabwareDefByDefURI,
   /** the slot you're literally adding labware to (may be a module slot) */

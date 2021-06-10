@@ -39,7 +39,7 @@ export const PipetteField: React.AbstractComponent<OP> = connect<
         value={value ? String(value) : null}
         onBlur={onFieldBlur}
         onFocus={onFieldFocus}
-        onChange={(e: SyntheticEvent<HTMLSelectElement>) => {
+        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
           updateValue(e.currentTarget.value)
         }}
       />

@@ -170,7 +170,7 @@ export const TipPositionModal = (props: Props): JSX.Element => {
   }
 
   const handleInputFieldChange = (
-    e: SyntheticEvent<HTMLInputElement>
+    e: React.ChangeEvent<HTMLInputElement>
   ): void => {
     handleChange(e.currentTarget.value)
   }

@@ -50,11 +50,11 @@ export type StepItemProps = {
   isMultiSelectMode?: boolean,
 
   highlightStep: () => mixed,
-  onStepContextMenu?: (event?: SyntheticEvent<>) => mixed,
-  handleClick?: (event: SyntheticMouseEvent<>) => mixed,
+  onStepContextMenu?: (event?: React.MouseEvent) => mixed,
+  handleClick?: (event: React.MouseEvent) => mixed,
   toggleStepCollapsed: () => mixed,
-  unhighlightStep: (event?: SyntheticEvent<>) => mixed,
-  children?: React.ReactNode,
+  unhighlightStep: (event?: React.MouseEvent) => mixed,
+  children?: React.ReactNode
 }
 
 export const StepItem = (props: StepItemProps): JSX.Element => {

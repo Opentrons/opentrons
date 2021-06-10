@@ -17,10 +17,10 @@ const MENU_OFFSET_PX = 5
 
 type Props = {
   children: (args: {
-    makeStepOnContextMenu: (stepIdType: StepIdType) => (
-      event: SyntheticMouseEvent<>
-    ) => unknown,
-  }) => React.ReactNode,
+    makeStepOnContextMenu: (
+      stepIdType: StepIdType
+    ) => (event: React.MouseEvent) => unknown
+  }) => React.ReactNode
 }
 
 type Position = { left: number | null, top: number | null }
