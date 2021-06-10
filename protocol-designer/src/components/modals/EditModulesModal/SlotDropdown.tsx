@@ -14,7 +14,7 @@ type ModelDropdownProps = {
   }>
 }
 
-export const SlotDropdown = (props: ModelDropdownProps): React.Node => {
+export const SlotDropdown = (props: ModelDropdownProps): JSX.Element => {
   const { fieldName, options, disabled, tabIndex } = props
   const [field, meta] = useField(props.fieldName)
   return (

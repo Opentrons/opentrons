@@ -48,7 +48,7 @@ type ProfileCycleRowProps = {
   focusHandlers: FocusHandlers
   stepOffset: number
 }
-export const ProfileCycleRow = (props: ProfileCycleRowProps): React.Node => {
+export const ProfileCycleRow = (props: ProfileCycleRowProps): JSX.Element => {
   const { cycleItem, focusHandlers, stepOffset } = props
   const dispatch = useDispatch()
 
@@ -147,7 +147,7 @@ export type ProfileItemRowsProps = {
   }
 }
 
-export const ProfileItemRows = (props: ProfileItemRowsProps): React.Node => {
+export const ProfileItemRows = (props: ProfileItemRowsProps): JSX.Element => {
   const { orderedProfileItems, profileItemsById } = props
 
   const dispatch = useDispatch()
@@ -233,7 +233,7 @@ type ProfileFieldProps = {
   name: string
   focusHandlers: FocusHandlers
   profileItem: ProfileItem
-  units?: React.Node
+  units?: React.ReactNode
   className?: string
   updateValue: (name: string, value: mixed) => mixed
 }

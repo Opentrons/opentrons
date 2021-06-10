@@ -22,7 +22,7 @@ type LabwareControlsProps = {
   swapBlocked: boolean
 }
 
-export const LabwareControls = (props: LabwareControlsProps): React.Node => {
+export const LabwareControls = (props: LabwareControlsProps): JSX.Element => {
   const {
     labwareOnDeck,
     slot,

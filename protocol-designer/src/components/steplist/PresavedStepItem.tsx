@@ -10,7 +10,7 @@ import {
   actions as stepsActions,
 } from '../../ui/steps'
 
-export const PresavedStepItem = (): React.Node => {
+export const PresavedStepItem = (): JSX.Element => {
   const presavedStepForm = useSelector(stepFormSelectors.getPresavedStepForm)
   const stepNumber = useSelector(stepFormSelectors.getOrderedStepIds).length + 1
   const hovered = useSelector(getHoveredTerminalItemId) === PRESAVED_STEP_ID

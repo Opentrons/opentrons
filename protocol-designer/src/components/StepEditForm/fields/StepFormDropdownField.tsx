@@ -12,7 +12,7 @@ export type StepFormDropdownProps = FieldProps & {
   className?: string
 }
 
-export const StepFormDropdown = (props: StepFormDropdownProps): React.Node => {
+export const StepFormDropdown = (props: StepFormDropdownProps): JSX.Element => {
   const {
     options,
     name,

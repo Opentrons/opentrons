@@ -160,7 +160,7 @@ export const getSwapBlocked = (args: {
 
 // TODO IL 2020-01-12: to support dynamic labware/module movement during a protocol,
 // don't use initialDeckSetup here. Use some version of timelineFrameForActiveItem
-export const DeckSetupContents = (props: ContentsProps): React.Node => {
+export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
   const {
     initialDeckSetup,
     deckSlotsById,
@@ -354,7 +354,7 @@ const getHasGen1MultiChannelPipette = (
   )
 }
 
-export const DeckSetup = (props: Props): React.Node => {
+export const DeckSetup = (props: Props): JSX.Element => {
   const _disableCollisionWarnings = useSelector(
     featureFlagSelectors.getDisableModuleRestrictions
   )
@@ -401,7 +401,7 @@ export const DeckSetup = (props: Props): React.Node => {
   )
 }
 
-export const NullDeckState = (): React.Node => {
+export const NullDeckState = (): JSX.Element => {
   const deckDef = React.useMemo(() => getDeckDefinitions()['ot2_standard'], [])
 
   return (

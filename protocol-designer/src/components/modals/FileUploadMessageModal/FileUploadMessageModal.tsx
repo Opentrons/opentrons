@@ -13,7 +13,7 @@ type Props = {
   dismissModal: (event: SyntheticEvent) => unknown,
 }
 
-export function FileUploadMessageModal(props: Props): React.Node {
+export function FileUploadMessageModal(props: Props): JSX.Element {
   const { message, cancelProtocolMigration, dismissModal } = props
 
   if (!message) return null

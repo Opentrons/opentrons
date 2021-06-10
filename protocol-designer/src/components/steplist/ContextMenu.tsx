@@ -20,12 +20,12 @@ type Props = {
     makeStepOnContextMenu: (stepIdType: StepIdType) => (
       event: SyntheticMouseEvent<>
     ) => unknown,
-  }) => React.Node,
+  }) => React.ReactNode,
 }
 
 type Position = { left: number | null, top: number | null }
 
-export const ContextMenu = (props: Props): React.Node => {
+export const ContextMenu = (props: Props): JSX.Element => {
   const dispatch = useDispatch()
   const deleteStep = (stepId: StepIdType) =>
     dispatch(steplistActions.deleteStep(stepId))

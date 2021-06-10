@@ -23,7 +23,7 @@ import styles from '../StepEditForm.css'
 
 import { StepFormProps } from '../types'
 
-export const PauseForm = (props: StepFormProps): React.Node => {
+export const PauseForm = (props: StepFormProps): JSX.Element => {
   const moduleLabwareOptions = useSelector(
     uiModuleSelectors.getTemperatureLabwareOptions
   )

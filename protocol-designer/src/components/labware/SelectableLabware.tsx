@@ -117,7 +117,7 @@ export class SelectableLabware extends React.Component<Props> {
     this.props.updateHighlightedWells({})
   }
 
-  render(): React.Node {
+  render(): React.ReactNode {
     const {
       labwareProps,
       ingredNames,

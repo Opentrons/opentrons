@@ -13,7 +13,7 @@ import { ProfileSettings } from './ProfileSettings'
 import styles from '../../StepEditForm.css'
 import { StepFormProps } from '../../types'
 
-export const ThermocyclerForm = (props: StepFormProps): React.Node => {
+export const ThermocyclerForm = (props: StepFormProps): JSX.Element => {
   const { focusHandlers, propsForFields, formData } = props
 
   return (

@@ -245,7 +245,7 @@ export class FilePipettesModal extends React.Component<Props, State> {
     }
   }
 
-  render(): React.Node {
+  render(): React.ReactNode {
     if (this.props.hideModal) return null
     const { showProtocolFields, moduleRestrictionsDisabled } = this.props
 

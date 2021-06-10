@@ -34,7 +34,7 @@ import buttonStyles from '../StepEditForm/ButtonRow/styles.css'
 const SourceDestBatchEditMoveLiquidFields = (props: {
   prefix: 'aspirate' | 'dispense'
   propsForFields: FieldPropsByName
-}): React.Node => {
+}): React.ReactNode => {
   const { prefix, propsForFields } = props
   const addFieldNamePrefix = name => `${prefix}_${name}`
 
@@ -159,7 +159,7 @@ type BatchEditMoveLiquidProps = {
 }
 export const BatchEditMoveLiquid = (
   props: BatchEditMoveLiquidProps
-): React.Node => {
+): React.ReactNode => {
   const { propsForFields, handleCancel, handleSave } = props
   const [cancelButtonTargetProps, cancelButtonTooltipProps] = useHoverTooltip({
     placement: TOOLTIP_TOP,

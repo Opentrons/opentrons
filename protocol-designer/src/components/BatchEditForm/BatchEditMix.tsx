@@ -36,7 +36,7 @@ type BatchEditMixProps = {
   handleCancel: () => mixed
   handleSave: () => mixed
 }
-export const BatchEditMix = (props: BatchEditMixProps): React.Node => {
+export const BatchEditMix = (props: BatchEditMixProps): JSX.Element => {
   const { propsForFields, handleCancel, handleSave } = props
   const [cancelButtonTargetProps, cancelButtonTooltipProps] = useHoverTooltip({
     placement: TOOLTIP_TOP,

@@ -54,10 +54,10 @@ export type StepItemProps = {
   handleClick?: (event: SyntheticMouseEvent<>) => mixed,
   toggleStepCollapsed: () => mixed,
   unhighlightStep: (event?: SyntheticEvent<>) => mixed,
-  children?: React.Node,
+  children?: React.ReactNode,
 }
 
-export const StepItem = (props: StepItemProps): React.Node => {
+export const StepItem = (props: StepItemProps): JSX.Element => {
   const {
     stepType,
     stepNumber,
@@ -137,7 +137,7 @@ type ProfileStepSubstepRowProps = {
 }
 export const ProfileStepSubstepRow = (
   props: ProfileStepSubstepRowProps
-): React.Node => {
+): React.ReactNode => {
   const { repetitionsDisplay, stepNumber } = props
   const { temperature, durationMinutes, durationSeconds } = props.step
   return (
@@ -177,7 +177,7 @@ export const ProfileStepSubstepRow = (
 
 // this is a row under a cycle under a substep
 type ProfileCycleRowProps = { step: ProfileStepItem, stepNumber: number }
-const ProfileCycleRow = (props: ProfileCycleRowProps): React.Node => {
+const ProfileCycleRow = (props: ProfileCycleRowProps): React.ReactNode => {
   const { step, stepNumber } = props
   return (
     <div className={styles.cycle_step_row}>
@@ -198,7 +198,7 @@ type ProfileCycleSubstepGroupProps = {
 }
 export const ProfileCycleSubstepGroup = (
   props: ProfileCycleSubstepGroupProps
-): React.Node => {
+): React.ReactNode => {
   const { steps, repetitions } = props.cycle
   return (
     <div className={styles.profile_substep_cycle}>
@@ -217,8 +217,8 @@ export const ProfileCycleSubstepGroup = (
 }
 
 type CollapsibleSubstepProps = {
-  children: React.Node,
-  headerContent: React.Node,
+  children: React.ReactNode,
+  headerContent: React.ReactNode,
 }
 const CollapsibleSubstep = (props: CollapsibleSubstepProps) => {
   const [contentCollapsed, setContentCollapsed] = React.useState<boolean>(true)
@@ -273,7 +273,7 @@ const renderSubstepInfo = (substeps: ThermocyclerProfileSubstepItem) => {
   return substepInfo
 }
 
-export const StepItemContents = (props: StepItemContentsProps): React.Node => {
+export const StepItemContents = (props: StepItemContentsProps): JSX.Element => {
   const {
     rawForm,
     stepType,

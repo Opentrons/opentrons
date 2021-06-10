@@ -39,7 +39,7 @@ const MODULE_IMG_BY_TYPE: ModuleImg = {
   },
 }
 
-export function ModuleDiagram(props: Props): React.Node {
+export function ModuleDiagram(props: Props): JSX.Element {
   const model = MODULE_IMG_BY_TYPE[props.type][props.model]
   return <img className={styles.module_diagram} src={model} alt={props.type} />
 }

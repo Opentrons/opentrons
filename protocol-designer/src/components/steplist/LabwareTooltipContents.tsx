@@ -7,7 +7,7 @@ type LabwareTooltipContentsProps = {
 }
 export const LabwareTooltipContents = (
   props: LabwareTooltipContentsProps
-): React.Node => {
+): React.ReactNode => {
   const { labwareNickname } = props
   return (
     <div className={styles.labware_tooltip_contents}>

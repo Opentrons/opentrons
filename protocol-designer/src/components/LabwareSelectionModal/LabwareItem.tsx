@@ -23,7 +23,7 @@ type Props = {
 
 const LABWARE_LIBRARY_PAGE_PATH = 'https://labware.opentrons.com'
 
-export function LabwareItem(props: Props): React.Node {
+export function LabwareItem(props: Props): JSX.Element {
   const {
     disabled,
     icon,

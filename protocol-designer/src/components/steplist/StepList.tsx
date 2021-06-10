@@ -47,7 +47,7 @@ export class StepList extends React.Component<Props> {
     global.removeEventListener('keydown', this.handleKeyDown, false)
   }
 
-  render(): React.Node {
+  render(): React.ReactNode {
     return (
       <React.Fragment>
         <SidePanel title="Protocol Timeline">

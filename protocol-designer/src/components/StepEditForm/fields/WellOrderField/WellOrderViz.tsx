@@ -14,7 +14,7 @@ type Props = {
   secondValue: WellOrderOption
 }
 
-export const WellOrderViz = (props: Props): React.Node => {
+export const WellOrderViz = (props: Props): JSX.Element => {
   const { firstValue, secondValue } = props
 
   return (

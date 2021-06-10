@@ -14,7 +14,7 @@ type BlowoutLocationDropdownProps = FieldProps & {
 
 export const BlowoutLocationField = (
   props: BlowoutLocationDropdownProps
-): React.Node => {
+): React.ReactNode => {
   const {
     className,
     disabled,

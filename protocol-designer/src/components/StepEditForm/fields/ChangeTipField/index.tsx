@@ -25,7 +25,7 @@ const ALL_CHANGE_TIP_VALUES: ChangeTipOptions[] = [
 ]
 type Props = FieldProps & DisabledChangeTipArgs
 
-export const ChangeTipField = (props: Props): React.Node => {
+export const ChangeTipField = (props: Props): JSX.Element => {
   const {
     aspirateWells,
     dispenseWells,

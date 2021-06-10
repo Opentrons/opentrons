@@ -23,7 +23,7 @@ const makeAddFieldNamePrefix = (prefix: string) => (
   fieldName: string
 ): StepFieldName => `${prefix}_${fieldName}`
 
-export const SourceDestHeaders = (props: Props): React.Node => {
+export const SourceDestHeaders = (props: Props): JSX.Element => {
   const {
     className,
     collapsed,
