@@ -1,4 +1,4 @@
-import { connect, MapStateToProps } from 'react-redux'
+import { connect } from 'react-redux'
 import * as React from 'react'
 import mapValues from 'lodash/mapValues'
 import { BaseState, ThunkDispatch } from '../types'
@@ -57,4 +57,8 @@ function mergeProps(
 }
 
 // ce: fix
-export const ConnectedFilePage = connect(mapStateToProps, null, mergeProps)
+export const ConnectedFilePage = connect(
+  mapStateToProps,
+  null,
+  mergeProps
+)(FilePage)

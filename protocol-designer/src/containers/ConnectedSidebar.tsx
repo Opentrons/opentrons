@@ -18,7 +18,7 @@ type Props = {
   liquidPlacementMode: boolean
 }
 
-function Sidebar(props: Props): JSX.Element {
+function Sidebar(props: Props): JSX.Element | null {
   switch (props.page) {
     case 'liquids':
       return <LiquidsSidebar />
