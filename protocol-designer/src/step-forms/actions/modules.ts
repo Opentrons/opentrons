@@ -1,8 +1,7 @@
-import { $Diff } from 'utility-types'
 import { uuid } from '../../utils'
 import { ModuleRealType } from '@opentrons/shared-data'
 import { DeckSlot } from '../../types'
-export type CreateModuleAction = {
+export interface CreateModuleAction {
   type: 'CREATE_MODULE'
   payload: {
     slot: DeckSlot
@@ -13,17 +12,12 @@ export type CreateModuleAction = {
   }
 }
 export const createModule = (
-  args: $Diff<
-    CreateModuleAction['payload'],
-    {
-      id: any
-    }
-  >
+  args: Omit<CreateModuleAction['payload'], 'id'>
 ): CreateModuleAction => ({
   type: 'CREATE_MODULE',
   payload: { ...args, id: `${uuid()}:${args.type}` },
 })
-export type EditModuleAction = {
+export interface EditModuleAction {
   type: 'EDIT_MODULE'
   payload: {
     id: string
@@ -36,7 +30,7 @@ export const editModule = (
   type: 'EDIT_MODULE',
   payload: args,
 })
-export type DeleteModuleAction = {
+export interface DeleteModuleAction {
   type: 'DELETE_MODULE'
   payload: {
     id: string

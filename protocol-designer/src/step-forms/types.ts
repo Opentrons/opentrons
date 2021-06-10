@@ -37,16 +37,16 @@ export type FormModulesByType = {
 export type ModuleEntities = Record<string, ModuleEntity>
 // NOTE: semi-redundant 'type' key in FooModuleState types is required for Flow to disambiguate 'moduleState'
 export type MagneticModuleState = {
-  type: MAGNETIC_MODULE_TYPE
+  type: typeof MAGNETIC_MODULE_TYPE
   engaged: boolean
 }
 export type TemperatureModuleState = {
-  type: TEMPERATURE_MODULE_TYPE
+  type: typeof TEMPERATURE_MODULE_TYPE
   status: TemperatureStatus
   targetTemperature: number | null
 }
 export type ThermocyclerModuleState = {
-  type: THERMOCYCLER_MODULE_TYPE
+  type: typeof THERMOCYCLER_MODULE_TYPE
   blockTargetTemp: number | null
   // null means block is deactivated
   lidTargetTemp: number | null

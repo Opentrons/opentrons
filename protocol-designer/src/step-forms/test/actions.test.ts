@@ -5,9 +5,11 @@ import { saveStepFormsMulti } from '../actions'
 import { getBatchEditFieldChanges } from '../selectors'
 jest.mock('../selectors')
 const mockStore = configureMockStore([thunk])
-const mockGetBatchEditFieldChanges = getBatchEditFieldChanges
+const mockGetBatchEditFieldChanges = getBatchEditFieldChanges as jest.MockedFunction<
+  typeof getBatchEditFieldChanges
+>
 describe('saveStepFormsMulti', () => {
-  let store
+  let store: any
   beforeEach(() => {
     store = mockStore()
     when(mockGetBatchEditFieldChanges)

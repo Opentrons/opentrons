@@ -1,17 +1,14 @@
-import { Reducer } from 'redux'
+import { Action, Reducer } from 'redux'
 export type GetNextState = (arg0: {
   action: Record<string, any>
   state: Record<string, any>
   prevStateFallback: Record<string, any>
 }) => Record<string, any>
-export type NestedCombineReducers<S, A> = (
-  getNextState: GetNextState
-) => Reducer<S, A>
 
 const getUndefinedStateErrorMessage = (
   key: string,
   action: Record<string, any>
-) => {
+): string => {
   const actionType = action && action.type
   const actionDescription =
     (actionType && `action "${String(actionType)}"`) || 'an action'
@@ -27,7 +24,9 @@ const FAKE_INIT_ACTION = '@@redux/INITnestedCombineReducers'
 
 const assertReducerShape = (getNextState: GetNextState): void => {
   const initialState = getNextState({
+    // @ts-expect-error(sa, 2021-6-10): adjust to adhere to GetNextState.action type
     action: FAKE_INIT_ACTION,
+    // @ts-expect-error(sa, 2021-6-10): adjust to adhere to GetNextState.state type
     state: undefined,
     prevStateFallback: {},
   })
@@ -44,9 +43,10 @@ const assertReducerShape = (getNextState: GetNextState): void => {
   })
 }
 
-export function nestedCombineReducers<S, A>(
-  getNextState: GetNextState
-): Reducer<S, A> {
+export function nestedCombineReducers<
+  S extends Record<string, any>,
+  A extends Action
+>(getNextState: GetNextState): Reducer<S, A> {
   assertReducerShape(getNextState)
   return (state, action) => {
     const prevStateFallback = state || {}

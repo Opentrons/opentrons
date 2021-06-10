@@ -1357,7 +1357,7 @@ export const presavedStepForm = (
       return state
   }
 }
-export type RootState = {
+export interface RootState {
   orderedStepIds: OrderedStepIdsState
   labwareDefs: LabwareDefsRootState
   labwareInvariantProperties: NormalizedLabwareById

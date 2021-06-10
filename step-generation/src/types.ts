@@ -8,6 +8,7 @@ import type {
   LabwareDefinition2,
   ModuleRealType,
   ModuleModel,
+  PipetteName,
   PipetteNameSpecs,
 } from '@opentrons/shared-data'
 import type {
@@ -87,7 +88,7 @@ export interface ModuleEntities {
 
 export interface NormalizedPipetteById {
   [pipetteId: string]: {
-    name: string
+    name: PipetteName
     id: string
     tiprackDefURI: string
   }

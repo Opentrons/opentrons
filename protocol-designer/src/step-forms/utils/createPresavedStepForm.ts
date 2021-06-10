@@ -165,6 +165,7 @@ const _patchThermocyclerFields = (args: {
   const lastRobotState: RobotState | null | undefined = last(
     robotStateTimeline.timeline
   )?.robotState
+  // @ts-expect-error(sa, 2021-05-26): module id might be null, need to type narrow
   const moduleState = lastRobotState?.modules[moduleId]?.moduleState
 
   if (moduleState && moduleState.type === THERMOCYCLER_MODULE_TYPE) {
