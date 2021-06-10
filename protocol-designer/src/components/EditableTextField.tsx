@@ -7,8 +7,7 @@ import styles from './editableTextField.css'
 type Props = {
   className?: string
   value: string | null | undefined
-  saveEdit: (newValue: string) => mixed
-}
+  saveEdit: (newValue: string) => unknown}
 
 type State = {
   editing: boolean

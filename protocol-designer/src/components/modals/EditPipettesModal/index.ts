@@ -30,8 +30,7 @@ type SP = {
 }
 
 type OP = {
-  closeModal: () => mixed
-}
+  closeModal: () => unknown}
 
 const mapSTP = (state: BaseState): SP => {
   const initialPipettes = stepFormSelectors.getPipettesForEditPipetteForm(state)

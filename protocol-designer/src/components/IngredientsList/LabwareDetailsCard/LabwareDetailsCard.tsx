@@ -9,8 +9,7 @@ import styles from './labwareDetailsCard.css'
 type Props = {
   labwareDefDisplayName: string
   nickname: string
-  renameLabware: (name: string) => mixed
-}
+  renameLabware: (name: string) => unknown}
 
 export function LabwareDetailsCard(props: Props): JSX.Element {
   return (

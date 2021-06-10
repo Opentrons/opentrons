@@ -42,8 +42,7 @@ type ClickableIconProps = {
   width?: string
   alignRight?: boolean
   isLast?: boolean
-  onClick?: (event: React.MouseEvent) => mixed
-}
+  onClick?: (event: React.MouseEvent) => unknown}
 
 const iconBoxStyles = css`
   align-self: stretch;

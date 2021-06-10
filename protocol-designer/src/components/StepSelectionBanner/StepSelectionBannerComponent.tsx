@@ -77,8 +77,7 @@ export const ExitBatchEditButton = (props: {
 
 export type StepSelectionBannerProps = {
   countPerStepType: CountPerStepType
-  handleExitBatchEdit: () => mixed
-}
+  handleExitBatchEdit: () => unknown}
 
 export const StepSelectionBannerComponent = (
   props: StepSelectionBannerProps

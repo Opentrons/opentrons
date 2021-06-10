@@ -28,11 +28,11 @@ type SP = {
   isPristineSetTempForm: boolean,
 }
 type DP = {
-  deleteStep: (stepId: string) => mixed,
-  handleClose: () => mixed,
-  saveSetTempFormWithAddedPauseUntilTemp: () => mixed,
-  saveStepForm: () => mixed,
-  handleChangeFormInput: (name: string, value: mixed) => void,
+  deleteStep: (stepId: string) => unknown,
+  handleClose: () => unknown,
+  saveSetTempFormWithAddedPauseUntilTemp: () => unknown,
+  saveStepForm: () => unknown,
+  handleChangeFormInput: (name: string, value: unknown) => void,
 }
 type StepEditFormManagerProps = SP & DP
 
@@ -189,7 +189,7 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<*>): DP => {
     dispatch(stepsActions.saveSetTempFormWithAddedPauseUntilTemp())
   const saveStepForm = () => dispatch(stepsActions.saveStepForm())
 
-  const handleChangeFormInput = (name: string, value: mixed) => {
+  const handleChangeFormInput = (name: string, value: unknown) => {
     const maskedValue = maskField(name, value)
     dispatch(actions.changeFormInput({ update: { [name]: maskedValue } }))
   }

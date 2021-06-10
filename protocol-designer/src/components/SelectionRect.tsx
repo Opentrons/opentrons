@@ -5,9 +5,7 @@ import styles from './SelectionRect.css'
 import { DragRect, GenericRect } from '../collision-types'
 
 type Props = {
-  onSelectionMove?: (e: React.MouseEvent, GenericRect) => mixed
-  onSelectionDone?: (e: React.MouseEvent, GenericRect) => mixed
-  svg?: boolean // set true if this is an embedded SVG
+  onSelectionMove?: (e: React.MouseEvent, GenericRect) => unknown  onSelectionDone?: (e: React.MouseEvent, GenericRect) => unknown  svg?: boolean // set true if this is an embedded SVG
   children?: React.ReactNode
   originXOffset?: number
   originYOffset?: number

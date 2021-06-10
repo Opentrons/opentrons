@@ -12,7 +12,7 @@ export type Props = {
   /** icon left of the step */
   iconName: IconName
   /** props passed down to icon (`className` and `name` are ignored) */
-  iconProps?: $Diff<React.ElementProps<typeof Icon>, { name: mixed }>
+  iconProps?: $Diff<React.ElementProps<typeof Icon>, { name: unknown}>
   /** optional data test id for the container */
   'data-test'?: string
   /** children must all be `<li>` */
@@ -22,16 +22,11 @@ export type Props = {
   /** component with descriptive text about the list */
   description?: React.ReactNode
   /** optional click action (on title div, not children) */
-  onClick?: (event: React.MouseEvent) => mixed
-  /** optional right click action (on wrapping div) */
-  onContextMenu?: (event: React.MouseEvent) => mixed
-  /** optional mouseEnter action */
-  onMouseEnter?: (event: React.MouseEvent) => mixed
-  /** optional mouseLeave action */
-  onMouseLeave?: (event: React.MouseEvent) => mixed
-  /** caret click action; if defined, list is expandable and carat is visible */
-  onCollapseToggle?: (event: React.MouseEvent) => mixed
-  /** collapse the list if true (false by default) */
+  onClick?: (event: React.MouseEvent) => unknown  /** optional right click action (on wrapping div) */
+  onContextMenu?: (event: React.MouseEvent) => unknown  /** optional mouseEnter action */
+  onMouseEnter?: (event: React.MouseEvent) => unknown  /** optional mouseLeave action */
+  onMouseLeave?: (event: React.MouseEvent) => unknown  /** caret click action; if defined, list is expandable and carat is visible */
+  onCollapseToggle?: (event: React.MouseEvent) => unknown  /** collapse the list if true (false by default) */
   collapsed?: boolean
   /** set to true when Step is selected (eg, user clicked it) */
   selected?: boolean

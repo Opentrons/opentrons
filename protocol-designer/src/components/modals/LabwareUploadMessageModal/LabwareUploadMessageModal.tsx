@@ -87,9 +87,7 @@ const MessageBody = (props: { message: LabwareUploadMessage }) => {
 
 type Props = {
   message: LabwareUploadMessage | null | undefined
-  dismissModal: () => mixed
-  overwriteLabwareDef?: () => mixed
-}
+  dismissModal: () => unknown  overwriteLabwareDef?: () => unknown}
 
 export const LabwareUploadMessageModal = (props: Props): JSX.Element => {
   const { message, dismissModal, overwriteLabwareDef } = props

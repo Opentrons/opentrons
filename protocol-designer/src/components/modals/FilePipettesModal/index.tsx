@@ -40,7 +40,7 @@ import { FormikProps } from 'formik/@flow-typed'
 
 export type PipetteFieldsData = $Diff<
   PipetteOnDeck,
-  { id: mixed; spec: mixed; tiprackLabwareDef: mixed }
+  { id: unknown; spec: unknown; tiprackLabwareDef: unknown}
 >
 
 export type ModuleCreationArgs = {

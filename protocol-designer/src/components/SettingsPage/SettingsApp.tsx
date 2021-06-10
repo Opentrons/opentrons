@@ -24,9 +24,7 @@ import { BaseState, ThunkDispatch } from '../../types'
 type Props = {
   canClearHintDismissals: boolean
   hasOptedIn: boolean | null
-  restoreHints: () => mixed
-  toggleOptedIn: () => mixed
-}
+  restoreHints: () => unknown  toggleOptedIn: () => unknown}
 
 type SP = {
   canClearHintDismissals: $PropertyType<Props, 'canClearHintDismissals'>

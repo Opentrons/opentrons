@@ -11,13 +11,11 @@ import styles from './LabwareOverlays.css'
 
 type OP = {
   labwareOnDeck: LabwareOnDeck
-  editLiquids: () => mixed
-}
+  editLiquids: () => unknown}
 
 type DP = {
   // TODO Ian 2018-02-16 type these fns elsewhere and import the type
-  setLabwareName: (name: string | null | undefined) => mixed
-}
+  setLabwareName: (name: string | null | undefined) => unknown}
 
 type Props = OP & DP
 

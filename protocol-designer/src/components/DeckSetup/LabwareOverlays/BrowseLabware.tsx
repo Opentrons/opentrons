@@ -15,8 +15,7 @@ type OP = {
 }
 
 type DP = {
-  drillDown: () => mixed
-}
+  drillDown: () => unknown}
 
 type Props = OP & DP
 

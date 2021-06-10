@@ -219,5 +219,5 @@ const collectListTarget = (connect, monitor) => ({
 })
 
 export const DraggableStepItems: React.AbstractComponent<
-  $Diff<StepItemsProps, { isOver: mixed, connectDropTarget: mixed }>
+  $Diff<StepItemsProps, { isOver: unknown, connectDropTarget: unknown}>
 > = DropTarget(DND_TYPES.STEP_ITEM, listTarget, collectListTarget)(StepItems)

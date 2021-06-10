@@ -13,9 +13,7 @@ import { HintKey } from '../../tutorial'
 
 export type HintProps = {
   hintKey: HintKey
-  handleCancel: () => mixed
-  handleContinue: () => mixed
-  content: React.ReactNode
+  handleCancel: () => unknown  handleContinue: () => unknown  content: React.ReactNode
 }
 
 // This component handles the checkbox and dispatching `removeHint` action on continue/cancel
@@ -70,9 +68,7 @@ export type HintArgs = {
   enabled: boolean
   hintKey: HintKey
   content: React.ReactNode
-  handleCancel: () => mixed
-  handleContinue: () => mixed
-}
+  handleCancel: () => unknown  handleContinue: () => unknown}
 
 export const useBlockingHint = (args: HintArgs): JSX.Element => {
   const { enabled, hintKey, handleCancel, handleContinue, content } = args

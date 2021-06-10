@@ -7,9 +7,7 @@ import styles from './AutoAddPauseUntilTempStepModal.css'
 
 type Props = {
   displayTemperature: string
-  handleCancelClick: () => mixed
-  handleContinueClick: () => mixed
-}
+  handleCancelClick: () => unknown  handleContinueClick: () => unknown}
 
 export const AutoAddPauseUntilTempStepModal = (props: Props): JSX.Element => (
   <AlertModal
