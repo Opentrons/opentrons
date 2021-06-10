@@ -11,6 +11,7 @@ import fieldStyles from './fieldStyles.css'
 
 interface Props {
   name: keyof LabwareFields
+  label?: string
   placeholder?: string
   caption?: InputFieldProps['caption']
   inputMasks?: Array<(prevValue: string, update: string) => string>
@@ -21,7 +22,7 @@ interface Props {
 // because sections are laid out to contain groups of autofilled fields.
 // This functionality in TextField may be removed if we clearly don't need it.
 export const TextField = (props: Props): JSX.Element => {
-  const { caption, name, placeholder, units } = props
+  const { label, caption, name, placeholder, units } = props
   const inputMasks = props.inputMasks || []
   // @ts-expect-error(IL, 2021-03-24): formik types need cleanup w LabwareFields
   const makeHandleChange = ({ field, form }) => (
@@ -35,13 +36,15 @@ export const TextField = (props: Props): JSX.Element => {
     )
     form.setFieldValue(props.name, nextValue)
   }
+  const fieldLabel = label !== undefined ? label : LABELS[name]
+
   return (
     <Field name={props.name}>
       {({ field, form }: FieldProps) =>
         getIsHidden(props.name, form.values) ? null : (
           <div className={fieldStyles.field_wrapper}>
             <label className={fieldStyles.field_label}>
-              {LABELS[name]}
+              {fieldLabel}
               <InputField
                 name={field.name}
                 value={field.value}

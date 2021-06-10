@@ -146,16 +146,29 @@ export const labwareFormSchemaBaseObject = Yup.object({
       wellBottomShapeOptions.map(o => o.value)
     ),
   }),
-  wellDepth: Yup.number()
-    .default(0)
-    .label(LABELS.wellDepth)
-    .typeError(MUST_BE_A_NUMBER)
-    .moreThan(0)
-    .max(
-      Yup.ref('labwareZDimension'),
-      'Well depth cannot exceed labware height'
-    )
-    .required(),
+  wellDepth: Yup.number().when('labwareType', {
+    is: 'tipRack',
+    then: Yup.number()
+      .default(0)
+      .label('Length')
+      .typeError(MUST_BE_A_NUMBER)
+      .moreThan(0)
+      .max(
+        Yup.ref('labwareZDimension'),
+        'Tip Length cannot exceed labware height'
+      )
+      .required(),
+    otherwise: Yup.number()
+      .default(0)
+      .label(LABELS.wellDepth)
+      .typeError(MUST_BE_A_NUMBER)
+      .moreThan(0)
+      .max(
+        Yup.ref('labwareZDimension'),
+        'Well depth cannot exceed labware height'
+      )
+      .required(),
+  }),
   wellShape: requiredString(LABELS.wellShape).oneOf(
     wellShapeOptions.map(o => o.value)
   ),
