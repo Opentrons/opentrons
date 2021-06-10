@@ -57,7 +57,7 @@ export type StepItemProps = {
   children?: React.ReactNode
 }
 
-export const StepItem = (props: StepItemProps): React.Node => {
+export const StepItem = (props: StepItemProps): JSX.Element => {
   const {
     stepType,
     stepNumber,
@@ -137,7 +137,7 @@ type ProfileStepSubstepRowProps = {
 }
 export const ProfileStepSubstepRow = (
   props: ProfileStepSubstepRowProps
-): React.Node => {
+): JSX.Element => {
   const { repetitionsDisplay, stepNumber } = props
   const { temperature, durationMinutes, durationSeconds } = props.step
   return (
@@ -198,7 +198,7 @@ type ProfileCycleSubstepGroupProps = {
 }
 export const ProfileCycleSubstepGroup = (
   props: ProfileCycleSubstepGroupProps
-): React.Node => {
+): JSX.Element => {
   const { steps, repetitions } = props.cycle
   return (
     <div className={styles.profile_substep_cycle}>
@@ -273,7 +273,7 @@ const renderSubstepInfo = (substeps: ThermocyclerProfileSubstepItem) => {
   return substepInfo
 }
 
-export const StepItemContents = (props: StepItemContentsProps): React.Node => {
+export const StepItemContents = (props: StepItemContentsProps): JSX.Element => {
   const {
     rawForm,
     stepType,
