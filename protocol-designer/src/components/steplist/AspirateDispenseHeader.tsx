@@ -18,7 +18,7 @@ type AspirateDispenseHeaderProps = {
 
 export function AspirateDispenseHeader(
   props: AspirateDispenseHeaderProps
-): React.ReactNode {
+): JSX.Element {
   const { sourceLabwareNickname, destLabwareNickname } = props
 
   const [sourceTargetProps, sourceTooltipProps] = useHoverTooltip({

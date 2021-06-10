@@ -159,7 +159,7 @@ export class WellOrderModal extends React.Component<Props, State> {
     }
   }
 
-  render(): React.ReactNode {
+  render(): React.ReactNode | null {
     if (!this.props.isOpen) return null
 
     const { firstValue, secondValue } = this.state

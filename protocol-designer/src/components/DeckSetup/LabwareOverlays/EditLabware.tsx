@@ -69,7 +69,7 @@ const EditLabwareComponent = (props: Props) => {
   } else {
     const isBeingDragged = draggedLabware?.slot === labwareOnDeck.slot
 
-    let contents: React.ReactNode = null
+    let contents: React.ReactNode | null = null
 
     if (swapBlocked) {
       contents = null

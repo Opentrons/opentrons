@@ -48,7 +48,7 @@ const getSupportedSteps = () => [
 
 export const StepCreationButtonComponent = (
   props: StepButtonComponentProps
-): React.ReactNode => {
+): JSX.Element => {
   const { children, expanded, setExpanded, disabled } = props
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: TOOLTIP_TOP,

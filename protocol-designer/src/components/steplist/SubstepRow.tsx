@@ -36,7 +36,7 @@ type PillTooltipContentsProps = {
 }
 export const PillTooltipContents = (
   props: PillTooltipContentsProps
-): React.ReactNode => {
+): JSX.Element => {
   const totalLiquidVolume = reduce(
     props.ingreds,
     (acc, ingred) => acc + ingred.volume,

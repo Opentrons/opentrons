@@ -30,7 +30,7 @@ type LiquidGroupCardProps = CommonProps & {
   labwareWellContents: SingleLabwareLiquidState
 }
 
-const LiquidGroupCard = (props: LiquidGroupCardProps): React.ReactNode => {
+const LiquidGroupCard = (props: LiquidGroupCardProps): JSX.Element => {
   const {
     ingredGroup,
     removeWellsContents,

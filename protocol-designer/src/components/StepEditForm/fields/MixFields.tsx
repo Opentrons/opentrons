@@ -10,7 +10,7 @@ export const MixFields = (props: {
   checkboxFieldName: string
   volumeFieldName: string
   timesFieldName: string
-}): React.ReactNode => {
+}): JSX.Element => {
   const {
     propsForFields,
     checkboxFieldName,

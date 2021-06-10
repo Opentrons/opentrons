@@ -21,7 +21,7 @@ export type ModuleStepItemRowProps = {
 
 export const ModuleStepItemRow = (
   props: ModuleStepItemRowProps
-): React.ReactNode => (
+): JSX.Element => (
   <PDListItem
     className={cx(styles.step_subitem_column_header, styles.substep_content)}
   >

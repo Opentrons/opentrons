@@ -137,7 +137,7 @@ type ProfileStepSubstepRowProps = {
 }
 export const ProfileStepSubstepRow = (
   props: ProfileStepSubstepRowProps
-): React.ReactNode => {
+): JSX.Element => {
   const { repetitionsDisplay, stepNumber } = props
   const { temperature, durationMinutes, durationSeconds } = props.step
   return (
@@ -177,7 +177,7 @@ export const ProfileStepSubstepRow = (
 
 // this is a row under a cycle under a substep
 type ProfileCycleRowProps = { step: ProfileStepItem, stepNumber: number }
-const ProfileCycleRow = (props: ProfileCycleRowProps): React.ReactNode => {
+const ProfileCycleRow = (props: ProfileCycleRowProps): JSX.Element => {
   const { step, stepNumber } = props
   return (
     <div className={styles.cycle_step_row}>
@@ -198,7 +198,7 @@ type ProfileCycleSubstepGroupProps = {
 }
 export const ProfileCycleSubstepGroup = (
   props: ProfileCycleSubstepGroupProps
-): React.ReactNode => {
+): JSX.Element => {
   const { steps, repetitions } = props.cycle
   return (
     <div className={styles.profile_substep_cycle}>
