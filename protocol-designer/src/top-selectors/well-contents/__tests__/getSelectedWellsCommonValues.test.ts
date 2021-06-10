@@ -82,7 +82,7 @@ describe('getSelectedWellsCommonValues', () => {
     expect(result.ingredientId).toBe(null)
   })
 
-  it('1 well unknown ingreds: return null', () => {
+  it('1 well mixed ingreds: return null', () => {
     const selectedWells = { A4: null }
 
     const result = getSelectedWellsCommonValues.resultFunc(
