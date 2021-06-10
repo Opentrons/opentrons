@@ -46,10 +46,10 @@ type Props = {
   values: FormModulesByType
   onFieldChange: (
     event: React.MouseEvent<HTMLSelectElement | HTMLInputElement>
-  ) => mixed
+  ) => unknown
   onSetFieldValue: (field: string, value: string | null) => void
   onSetFieldTouched: (field: string, touched: boolean) => void
-  onBlur: (event: React.FocusEvent<HTMLSelectElement>) => mixed
+  onBlur: (event: React.FocusEvent<HTMLSelectElement>) => unknown
 }
 
 export function ModuleFields(props: Props): JSX.Element {

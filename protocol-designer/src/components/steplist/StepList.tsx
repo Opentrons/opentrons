@@ -17,7 +17,7 @@ import { StepIdType } from '../../form-types'
 type Props = {
   isMultiSelectMode: boolean | null | undefined,
   orderedStepIds: StepIdType[],
-  reorderSelectedStep: (delta: number) => mixed,
+  reorderSelectedStep: (delta: number) => unknown,
   reorderSteps: (steps: StepIdType[]) => unknown,
 }
 

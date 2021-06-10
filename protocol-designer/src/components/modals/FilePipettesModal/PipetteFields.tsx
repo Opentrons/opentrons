@@ -47,10 +47,10 @@ export type Props = {
           tiprackDefURI: boolean
         }
       }
-  onFieldChange: (event: React.ChangeEvent<HTMLSelectElement>) => mixed
+  onFieldChange: (event: React.ChangeEvent<HTMLSelectElement>) => unknown
   onSetFieldValue: (field: string, value: string | null) => void
   onSetFieldTouched: (field: string, touched: boolean) => void
-  onBlur: (event: React.FocusEvent<HTMLSelectElement>) => mixed
+  onBlur: (event: React.FocusEvent<HTMLSelectElement>) => unknown
 }
 
 // TODO(mc, 2019-10-14): delete this typedef when gen2 ff is removed

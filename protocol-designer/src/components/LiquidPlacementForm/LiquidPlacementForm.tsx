@@ -90,7 +90,7 @@ export class LiquidPlacementForm extends React.Component<Props> {
   }
 
   handleChangeVolume: (
-    setFieldValue: (fieldName: string, value: mixed) => mixed
+    setFieldValue: (fieldName: string, value: unknown) => unknown
   ) => (e: React.ChangeEvent<any>) => void = setFieldValue => e => {
     const value: string | null | undefined = e.currentTarget.value
     const masked = fieldProcessors.composeMaskers(

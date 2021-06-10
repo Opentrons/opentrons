@@ -39,7 +39,7 @@ type OP = {
   slot: DeckSlotDefinition & { id: DeckSlot } // NOTE: Ian 2019-10-22 make slot `id` more restrictive when used in PD
   moduleType: ModuleRealType | null
   selectedTerminalItemId: TerminalItemId | null | undefined
-  handleDragHover?: () => mixed
+  handleDragHover?: () => unknown
 }
 type DP = {
   addLabware: (e: React.MouseEvent<any>) => unknown

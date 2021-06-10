@@ -15,7 +15,7 @@ import {
 
 type Props = {
   flags: Flags,
-  setFeatureFlags: (flags: Flags) => mixed,
+  setFeatureFlags: (flags: Flags) => unknown,
 }
 
 export const FeatureFlagCard = (props: Props): JSX.Element => {

@@ -18,8 +18,8 @@ type SP = {
 }
 
 type DP = {
-  createNewLiquid: () => mixed
-  selectLiquid: (liquidId: string) => mixed
+  createNewLiquid: () => unknown
+  selectLiquid: (liquidId: string) => unknown
 }
 
 type Props = SP & DP
