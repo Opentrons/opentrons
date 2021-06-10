@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react'
-import { React.MouseEvent } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import uniq from 'lodash/uniq'
 import UAParser from 'ua-parser-js'

@@ -3,7 +3,6 @@
 import * as React from 'react'
 import { ClickOutside, Icon, InputField } from '@opentrons/components'
 import styles from './editableTextField.css'
-import {ChangeEventHandler} from "react";
 
 type Props = {
   className?: string
