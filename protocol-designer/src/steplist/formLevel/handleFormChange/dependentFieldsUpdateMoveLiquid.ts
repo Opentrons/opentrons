@@ -181,7 +181,7 @@ const updatePatchOnLabwareChange = (
   if (!sourceLabwareChanged && !destLabwareChanged) return patch
   const { id, stepType, ...stepData } = rawForm
   const appliedPatch = { ...(stepData as FormPatch), ...patch, id, stepType }
-  // $FlowFixMe(mc, 2020-02-19): appliedPatch.pipette is type ?mixed. Address in #3161
+  // $FlowFixMe(mc, 2020-02-19): appliedPatch.pipette is type ?unknown. Address in #3161
   const pipetteId: string = appliedPatch.pipette
   const sourceLabwarePatch: FormPatch = sourceLabwareChanged
     ? {
@@ -190,7 +190,7 @@ const updatePatchOnLabwareChange = (
           'aspirate_touchTip_mmFromBottom'
         ),
         aspirate_wells: getDefaultWells({
-          // $FlowFixMe(mc, 2020-02-19): appliedPatch.aspirate_labware is type ?mixed. Address in #3161
+          // $FlowFixMe(mc, 2020-02-19): appliedPatch.aspirate_labware is type ?unknown. Address in #3161
           labwareId: appliedPatch.aspirate_labware,
           pipetteId,
           labwareEntities,
@@ -205,7 +205,7 @@ const updatePatchOnLabwareChange = (
           'dispense_touchTip_mmFromBottom'
         ),
         dispense_wells: getDefaultWells({
-          // $FlowFixMe(mc, 2020-02-19): appliedPatch.aspirate_labware is type ?mixed. Address in #3161
+          // $FlowFixMe(mc, 2020-02-19): appliedPatch.aspirate_labware is type ?unknown. Address in #3161
           labwareId: appliedPatch.dispense_labware,
           pipetteId,
           labwareEntities,
@@ -294,7 +294,7 @@ const clampDispenseAirGapVolume = (
 ): FormPatch => {
   const { id, stepType, ...stepData } = rawForm
   const appliedPatch = { ...(stepData as FormPatch), ...patch, id, stepType }
-  // $FlowFixMe(mc, 2020-02-19): appliedPatch.pipette is type ?mixed. Address in #3161
+  // $FlowFixMe(mc, 2020-02-19): appliedPatch.pipette is type ?unknown. Address in #3161
   const pipetteId: string = appliedPatch.pipette
   const disposalVolume = appliedPatch.disposalVolume_checkbox
     ? Number(appliedPatch.disposalVolume_volume) || 0
@@ -441,18 +441,18 @@ const updatePatchOnPipetteChannelChange = (
 
   if (patch.pipette === null || singleToMulti) {
     // reset all well selection
-    // $FlowFixMe(mc, 2020-02-21): appliedPatch.pipette is type ?mixed. Address in #3161
+    // $FlowFixMe(mc, 2020-02-21): appliedPatch.pipette is type ?unknown. Address in #3161
     const pipetteId: string = appliedPatch.pipette
     update = {
       aspirate_wells: getDefaultWells({
-        // $FlowFixMe(mc, 2020-02-21): appliedPatch.aspirate_labware is type ?mixed. Address in #3161
+        // $FlowFixMe(mc, 2020-02-21): appliedPatch.aspirate_labware is type ?unknown. Address in #3161
         labwareId: appliedPatch.aspirate_labware,
         pipetteId,
         labwareEntities,
         pipetteEntities,
       }),
       dispense_wells: getDefaultWells({
-        // $FlowFixMe(mc, 2020-02-21): appliedPatch.dispense_labware is type ?mixed. Address in #3161
+        // $FlowFixMe(mc, 2020-02-21): appliedPatch.dispense_labware is type ?unknown. Address in #3161
         labwareId: appliedPatch.dispense_labware,
         pipetteId,
         labwareEntities,
@@ -461,9 +461,9 @@ const updatePatchOnPipetteChannelChange = (
     }
   } else if (multiToSingle) {
     // multi-channel to single-channel: convert primary wells to all wells
-    // $FlowFixMe(mc, 2020-02-21): appliedPatch.aspirate_labware is type ?mixed. Address in #3161
+    // $FlowFixMe(mc, 2020-02-21): appliedPatch.aspirate_labware is type ?unknown. Address in #3161
     const sourceLabwareId: string = appliedPatch.aspirate_labware
-    // $FlowFixMe(mc, 2020-02-21): appliedPatch.dispense_labware is type ?mixed. Address in #3161
+    // $FlowFixMe(mc, 2020-02-21): appliedPatch.dispense_labware is type ?unknown. Address in #3161
     const destLabwareId: string = appliedPatch.dispense_labware
     const sourceLabware = sourceLabwareId && labwareEntities[sourceLabwareId]
     const sourceLabwareDef = sourceLabware && sourceLabware.def
@@ -471,12 +471,12 @@ const updatePatchOnPipetteChannelChange = (
     const destLabwareDef = destLabware && destLabware.def
     update = {
       aspirate_wells: getAllWellsFromPrimaryWells(
-        // $FlowFixMe(mc, 2020-02-21): appliedPatch.aspirate_wells is type ?mixed. Address in #3161
+        // $FlowFixMe(mc, 2020-02-21): appliedPatch.aspirate_wells is type ?unknown. Address in #3161
         appliedPatch.aspirate_wells, // $FlowFixMe(mc, 2020-04-29): sourceLabwareDef is not typed properly. Address in #3161
         sourceLabwareDef
       ),
       dispense_wells: getAllWellsFromPrimaryWells(
-        // $FlowFixMe(mc, 2020-02-21): appliedPatch.dispense_wells is type ?mixed. Address in #3161
+        // $FlowFixMe(mc, 2020-02-21): appliedPatch.dispense_wells is type ?unknown. Address in #3161
         appliedPatch.dispense_wells, // $FlowFixMe(mc, 2020-04-29): destLabwareDef is not typed properly. Address in #3161
         destLabwareDef
       ),

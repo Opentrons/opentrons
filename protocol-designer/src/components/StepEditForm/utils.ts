@@ -52,7 +52,7 @@ export function getBlowoutLocationOptionsForForm(args: {
 
       default: {
         // is moveLiquid but no path -- assume we're in batch edit mode
-        // with mixed/indeterminate path values
+        // with unknown/indeterminate path values
         return [
           { ...sourceOption, disabled: true },
           { ...destOption, disabled: true },

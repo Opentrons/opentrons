@@ -29,7 +29,7 @@ export const trimDecimals = (
  **********************/
 // NOTE: these are often preceded by a Value Caster when composed via composeMaskers
 // in practice they will always take parameters of one type (e.g. `(value: string)`)
-// For the sake of simplicity and flow happiness, they are equipped to deal with parameters of type `mixed`
+// For the sake of simplicity and flow happiness, they are equipped to deal with parameters of type `unknown`
 export const onlyPositiveNumbers: ValueMasker = (value: unknown) =>
   value !== null && !Number.isNaN(value) && Number(value) >= 0 ? value : ''
 export const defaultTo = (defaultValue: unknown): ValueMasker => (

@@ -26,7 +26,7 @@ type Props = {
   moduleOnDeck?: ModuleOnDeck
   showCollisionWarnings?: boolean
   type: ModuleRealType
-  openEditModuleModal: (moduleType: ModuleRealType, moduleId?: string) => mixed
+  openEditModuleModal: (moduleType: ModuleRealType, moduleId?: string) => unknown
 }
 
 export function ModuleRow(props: Props): JSX.Element {

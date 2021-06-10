@@ -36,11 +36,11 @@ type Props = {
   focusedField: string | null
   formData: FormData
   propsForFields: FieldPropsByName
-  handleClose: () => mixed
-  handleDelete: () => mixed
-  handleSave: () => mixed
+  handleClose: () => unknown
+  handleDelete: () => unknown
+  handleSave: () => unknown
   showMoreOptionsModal: boolean
-  toggleMoreOptionsModal: () => mixed
+  toggleMoreOptionsModal: () => unknown
 }
 
 export const StepEditFormComponent = (props: Props): JSX.Element => {

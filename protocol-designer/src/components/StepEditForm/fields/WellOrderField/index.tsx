@@ -123,7 +123,7 @@ export const WellOrderField = (props: Props): JSX.Element => {
                 secondValue
               )}`}
             >
-              {i18n.t('form.step_edit_form.field.well_order.mixed')}
+              {i18n.t('form.step_edit_form.field.well_order.unknown')}
             </Text>
           )}
         </FormGroup>

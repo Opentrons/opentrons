@@ -18,8 +18,8 @@ import { SignUpForm } from './SignUpForm'
 
 type Props = {
   hasOptedIn: boolean | null
-  optIn: () => mixed
-  optOut: () => mixed
+  optIn: () => unknown
+  optOut: () => unknown
 }
 
 type SP = {

@@ -22,4 +22,4 @@ export type BoundingRect = {
 }
 
 // TODO(CE): can we get rid of this? It does not seem to be used.
-export type RectEvent = (event: MouseEvent, rect: GenericRect) => mixed
+export type RectEvent = (event: MouseEvent, rect: GenericRect) => unknown
