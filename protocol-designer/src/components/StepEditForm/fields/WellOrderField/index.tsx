@@ -31,7 +31,7 @@ type Props = {
   updateSecondWellOrder: $PropertyType<FieldProps, 'updateValue'>
 }
 
-export const WellOrderField = (props: Props): React.Node => {
+export const WellOrderField = (props: Props): JSX.Element => {
   const {
     firstValue,
     secondValue,

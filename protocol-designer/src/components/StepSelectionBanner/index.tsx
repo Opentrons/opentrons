@@ -15,7 +15,7 @@ const MemoizedStepSelectionBannerComponent = React.memo(
   StepSelectionBannerComponent
 )
 
-export const StepSelectionBanner = (): React.Node => {
+export const StepSelectionBanner = (): JSX.Element => {
   const countPerStepType = useSelector(getCountPerStepType)
   const batchEditFormHasUnsavedChanges = useSelector(
     stepFormSelectors.getBatchEditFormHasUnsavedChanges

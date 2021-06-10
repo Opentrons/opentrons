@@ -13,7 +13,7 @@ import styles from '../StepEditForm.css'
 
 import { StepFormProps } from '../types'
 
-export const MagnetForm = (props: StepFormProps): React.Node => {
+export const MagnetForm = (props: StepFormProps): JSX.Element => {
   const moduleLabwareOptions = useSelector(
     uiModuleSelectors.getMagneticLabwareOptions
   )

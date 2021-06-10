@@ -22,7 +22,7 @@ type Props = {
 }
 
 export class StepList extends React.Component<Props> {
-  handleKeyDown: (e: SyntheticKeyboardEvent<>) => void = e => {
+  handleKeyDown: (e: React.KeyboardEvent) => void = e => {
     const { reorderSelectedStep } = this.props
     const key = e.key
     const altIsPressed = e.altKey
@@ -47,7 +47,7 @@ export class StepList extends React.Component<Props> {
     global.removeEventListener('keydown', this.handleKeyDown, false)
   }
 
-  render(): React.Node {
+  render(): React.ReactNode {
     return (
       <React.Fragment>
         <SidePanel title="Protocol Timeline">

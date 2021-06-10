@@ -23,7 +23,7 @@ import styles from '../StepEditForm.css'
 
 import { StepFormProps } from '../types'
 
-export const PauseForm = (props: StepFormProps): React.Node => {
+export const PauseForm = (props: StepFormProps): JSX.Element => {
   const moduleLabwareOptions = useSelector(
     uiModuleSelectors.getTemperatureLabwareOptions
   )
@@ -155,7 +155,7 @@ export const PauseForm = (props: StepFormProps): React.Node => {
               <textarea
                 className={styles.textarea_field}
                 value={propsForFields['pauseMessage'].value}
-                onChange={(e: SyntheticInputEvent<*>) =>
+                onChange={(e: React.ChangeEvent<any>) =>
                   propsForFields['pauseMessage'].updateValue(
                     e.currentTarget.value
                   )

@@ -64,7 +64,7 @@ export type EditModulesFormValues = {
   selectedSlot: string,
 }
 
-export const EditModulesModal = (props: EditModulesModalProps): React.Node => {
+export const EditModulesModal = (props: EditModulesModalProps): JSX.Element => {
   const {
     moduleType,
     displayModuleWarning,

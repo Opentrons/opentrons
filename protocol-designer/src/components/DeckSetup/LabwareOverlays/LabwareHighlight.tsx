@@ -14,7 +14,7 @@ type LabwareHighlightProps = {
   labwareOnDeck: LabwareOnDeck
 }
 
-export const LabwareHighlight = (props: LabwareHighlightProps): React.Node => {
+export const LabwareHighlight = (props: LabwareHighlightProps): JSX.Element => {
   const { labwareOnDeck } = props
   const highlighted = useSelector(getHoveredStepLabware).includes(
     labwareOnDeck.id

@@ -9,11 +9,11 @@ import { FileUploadMessage } from '../../../load-file'
 
 type Props = {
   message: FileUploadMessage | null | undefined,
-  cancelProtocolMigration: (event: SyntheticEvent) => unknown,
-  dismissModal: (event: SyntheticEvent) => unknown,
+  cancelProtocolMigration: (event: React.MouseEvent) => unknown,
+  dismissModal: (event: React.MouseEvent) => unknown,
 }
 
-export function FileUploadMessageModal(props: Props): React.Node {
+export function FileUploadMessageModal(props: Props): JSX.Element {
   const { message, cancelProtocolMigration, dismissModal } = props
 
   if (!message) return null

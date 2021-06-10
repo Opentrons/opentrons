@@ -16,7 +16,7 @@ export type DelayFieldProps = {
   tipPositionFieldName?: StepFieldName // TODO(IL, 2021-03-03): strictly, could be TipOffsetFields!
 }
 
-export const DelayFields = (props: DelayFieldProps): React.Node => {
+export const DelayFields = (props: DelayFieldProps): JSX.Element => {
   const {
     checkboxFieldName,
     secondsFieldName,

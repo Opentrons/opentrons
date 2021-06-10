@@ -9,7 +9,7 @@ import modalStyles from '../modal.css'
 
 type Props = { onCancel: () => void; onConfirm: () => void }
 
-export const StepChangesConfirmModal = (props: Props): React.Node => {
+export const StepChangesConfirmModal = (props: Props): JSX.Element => {
   const { onCancel, onConfirm } = props
 
   return (

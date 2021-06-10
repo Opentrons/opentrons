@@ -14,7 +14,7 @@ type BlowoutLocationDropdownProps = FieldProps & {
 
 export const BlowoutLocationField = (
   props: BlowoutLocationDropdownProps
-): React.Node => {
+): JSX.Element => {
   const {
     className,
     disabled,
@@ -38,7 +38,7 @@ export const BlowoutLocationField = (
       onBlur={onFieldBlur}
       onFocus={onFieldFocus}
       value={value ? String(value) : null}
-      onChange={(e: SyntheticEvent<HTMLSelectElement>) => {
+      onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
         updateValue(e.currentTarget.value)
       }}
     />

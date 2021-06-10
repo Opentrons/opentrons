@@ -13,7 +13,7 @@ type ToggleRowProps = FieldProps & {
   onLabel?: string,
   className?: string,
 }
-export const ToggleRowField = (props: ToggleRowProps): React.Node => {
+export const ToggleRowField = (props: ToggleRowProps): JSX.Element => {
   const {
     updateValue,
     value,
@@ -30,7 +30,7 @@ export const ToggleRowField = (props: ToggleRowProps): React.Node => {
       onLabel={onLabel}
       className={cx(styles.toggle_field, className)}
       value={Boolean(value)}
-      onChange={(e: SyntheticInputEvent<>) => updateValue(!value)}
+      onChange={() => updateValue(!value)}
       disabled={disabled}
     />
   )

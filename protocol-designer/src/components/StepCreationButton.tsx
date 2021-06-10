@@ -30,7 +30,7 @@ import { stepIconsByType, StepType } from '../form-types'
 import styles from './listButtons.css'
 
 type StepButtonComponentProps = {
-  children: React.Node,
+  children: React.ReactNode,
   expanded: boolean,
   disabled: boolean,
   setExpanded: (expanded: boolean) => unknown,
@@ -48,7 +48,7 @@ const getSupportedSteps = () => [
 
 export const StepCreationButtonComponent = (
   props: StepButtonComponentProps
-): React.Node => {
+): JSX.Element => {
   const { children, expanded, setExpanded, disabled } = props
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: TOOLTIP_TOP,
@@ -84,7 +84,7 @@ export type StepButtonItemProps = {
   stepType: StepType,
 }
 
-export function StepButtonItem(props: StepButtonItemProps): React.Node {
+export function StepButtonItem(props: StepButtonItemProps): JSX.Element {
   const { onClick, disabled, stepType } = props
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: TOOLTIP_RIGHT,
@@ -110,7 +110,7 @@ export function StepButtonItem(props: StepButtonItemProps): React.Node {
   )
 }
 
-export const StepCreationButton = (): React.Node => {
+export const StepCreationButton = (): JSX.Element => {
   const currentFormIsPresaved = useSelector(
     stepFormSelectors.getCurrentFormIsPresaved
   )

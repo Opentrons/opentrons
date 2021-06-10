@@ -19,7 +19,7 @@ type Props = FieldProps & {
   label: string,
   className: string,
 }
-export const VolumeField = (props: Props): React.Node => {
+export const VolumeField = (props: Props): JSX.Element => {
   const { stepType, label, className, ...propsForVolumeField } = props
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: TOOLTIP_TOP,

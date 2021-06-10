@@ -88,7 +88,7 @@ const getErrors = (args: {
   return errors
 }
 
-export const TipPositionModal = (props: Props): React.Node => {
+export const TipPositionModal = (props: Props): JSX.Element => {
   const { isIndeterminate, name, wellDepthMm } = props
 
   const defaultMmFromBottom = utils.getDefaultMmFromBottom({
@@ -170,7 +170,7 @@ export const TipPositionModal = (props: Props): React.Node => {
   }
 
   const handleInputFieldChange = (
-    e: SyntheticEvent<HTMLInputElement>
+    e: React.ChangeEvent<HTMLInputElement>
   ): void => {
     handleChange(e.currentTarget.value)
   }

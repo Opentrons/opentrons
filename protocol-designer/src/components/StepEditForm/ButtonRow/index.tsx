@@ -15,7 +15,7 @@ type ButtonRowProps = {
   canSave: boolean
 }
 
-export const ButtonRow = (props: ButtonRowProps): React.Node => {
+export const ButtonRow = (props: ButtonRowProps): JSX.Element => {
   const {
     handleDelete,
     handleClickMoreOptions,

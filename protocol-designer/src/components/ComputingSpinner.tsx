@@ -9,7 +9,7 @@ const waitCursorStyle = css`
   cursor: wait;
 `
 
-export const ComputingSpinner = (): React.Node => {
+export const ComputingSpinner = (): JSX.Element | boolean => {
   const showSpinner = useSelector(fileDataSelectors.getTimelineIsBeingComputed)
 
   return (

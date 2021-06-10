@@ -11,13 +11,13 @@ import styles from '../StepEditForm.css'
 import { FieldProps } from '../types'
 
 type CheckboxRowProps = FieldProps & {
-  children?: React.Node,
+  children?: React.ReactNode,
   className?: string,
   label?: string,
-  tooltipContent?: React.Node,
+  tooltipContent?: React.ReactNode,
 }
 
-export const CheckboxRowField = (props: CheckboxRowProps): React.Node => {
+export const CheckboxRowField = (props: CheckboxRowProps): JSX.Element => {
   const {
     children,
     className,
@@ -47,7 +47,7 @@ export const CheckboxRowField = (props: CheckboxRowProps): React.Node => {
           label={label}
           labelProps={targetProps}
           name={name}
-          onChange={(e: SyntheticInputEvent<*>) => updateValue(!value)}
+          onChange={(e: React.ChangeEvent<HTMLSelectElement>) => updateValue(!value)}
           value={Boolean(value)}
         />
         {value && !disabled && !isIndeterminate ? children : null}

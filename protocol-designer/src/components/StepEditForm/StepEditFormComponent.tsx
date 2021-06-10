@@ -43,7 +43,7 @@ type Props = {
   toggleMoreOptionsModal: () => mixed
 }
 
-export const StepEditFormComponent = (props: Props): React.Node => {
+export const StepEditFormComponent = (props: Props): JSX.Element => {
   const {
     formData,
     focusHandlers,

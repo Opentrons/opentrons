@@ -5,10 +5,10 @@ import styles from './SelectionRect.css'
 import { DragRect, GenericRect } from '../collision-types'
 
 type Props = {
-  onSelectionMove?: (e: MouseEvent, GenericRect) => mixed
-  onSelectionDone?: (e: MouseEvent, GenericRect) => mixed
+  onSelectionMove?: (e: React.MouseEvent, GenericRect) => mixed
+  onSelectionDone?: (e: React.MouseEvent, GenericRect) => mixed
   svg?: boolean // set true if this is an embedded SVG
-  children?: React.Node
+  children?: React.ReactNode
   originXOffset?: number
   originYOffset?: number
 }
@@ -27,7 +27,7 @@ export class SelectionRect extends React.Component<Props, State> {
     this.state = { positions: null }
   }
 
-  renderRect(args: DragRect): React.Node {
+  renderRect(args: DragRect): React.ReactNode {
     const { xStart, yStart, xDynamic, yDynamic } = args
     const left = Math.min(xStart, xDynamic)
     const top = Math.min(yStart, yDynamic)
@@ -91,7 +91,7 @@ export class SelectionRect extends React.Component<Props, State> {
     }
   }
 
-  handleMouseDown: (e: MouseEvent) => void = e => {
+  handleMouseDown: (e: React.MouseEvent) => void = e => {
     document.addEventListener('mousemove', this.handleDrag)
     document.addEventListener('mouseup', this.handleMouseUp)
     this.setState({
@@ -104,7 +104,7 @@ export class SelectionRect extends React.Component<Props, State> {
     })
   }
 
-  handleDrag: (e: MouseEvent) => void = e => {
+  handleDrag: (e: React.MouseEvent) => void = e => {
     if (this.state.positions) {
       const nextRect = {
         ...this.state.positions,
@@ -118,8 +118,8 @@ export class SelectionRect extends React.Component<Props, State> {
     }
   }
 
-  handleMouseUp: (e: MouseEvent) => void = e => {
-    if (!(e instanceof MouseEvent)) {
+  handleMouseUp: (e: React.MouseEvent) => void = e => {
+    if (!(e instanceof React.MouseEvent)) {
       return
     }
     document.removeEventListener('mousemove', this.handleDrag)
@@ -136,7 +136,7 @@ export class SelectionRect extends React.Component<Props, State> {
       this.props.onSelectionDone(e, finalRect)
   }
 
-  render(): React.Node {
+  render(): React.ReactNode {
     const { svg, children } = this.props
 
     return svg ? (

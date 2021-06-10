@@ -16,22 +16,22 @@ type WellTooltipParams = {
   makeHandleMouseEnterWell: (
     wellName: string,
     wellIngreds: LocationLiquidState
-  ) => (e: SyntheticMouseEvent<*>) => void,
-  handleMouseLeaveWell: (val: unknown) => void,
-  tooltipWellName: string | null | undefined,
+  ) => (e: React.MouseEvent<any>) => void
+  handleMouseLeaveWell: (val: unknown) => void
+  tooltipWellName: string | null | undefined
 }
 
 type Props = {
-  children: (wellTooltipParams: WellTooltipParams) => React.Node,
+  children: (wellTooltipParams: WellTooltipParams) => React.ReactNode,
   ingredNames: WellIngredientNames,
 }
 
 type State = {
-  tooltipX: number | null | undefined,
-  tooltipY: number | null | undefined,
-  tooltipWellName: string | null | undefined,
-  tooltipWellIngreds: LocationLiquidState | null | undefined,
-  tooltipOffset: number | null | undefined,
+  tooltipX: number | null | undefined
+  tooltipY: number | null | undefined
+  tooltipWellName: string | null | undefined
+  tooltipWellIngreds: LocationLiquidState | null | undefined
+  tooltipOffset: number | null | undefined
 }
 const initialState: State = {
   tooltipX: null,
@@ -47,7 +47,7 @@ export class WellTooltip extends React.Component<Props, State> {
   makeHandleMouseEnterWell: (
     wellName: string,
     wellIngreds: LocationLiquidState
-  ) => (e: SyntheticMouseEvent<>) => void = (wellName, wellIngreds) => e => {
+  ) => (e: React.MouseEvent) => void = (wellName, wellIngreds) => e => {
     const { target } = e
     if (target instanceof Element) {
       const wellBoundingRect = target.getBoundingClientRect()
@@ -68,7 +68,7 @@ export class WellTooltip extends React.Component<Props, State> {
     this.setState(initialState)
   }
 
-  render(): React.Node {
+  render(): React.ReactNode {
     const { tooltipX, tooltipY, tooltipOffset } = this.state
 
     return (

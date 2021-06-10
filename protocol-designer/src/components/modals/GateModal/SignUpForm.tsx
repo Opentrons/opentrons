@@ -26,7 +26,7 @@ export class SignUpForm extends React.Component<{}> {
       hideScrollbars: true,
     })
   }
-  render(): React.Node {
+  render(): React.ReactNode {
     return (
       <div ref={this.embedElement} className={styles.sign_up_form_wrapper} />
     )

@@ -68,7 +68,7 @@ export const ModuleStatus = ({
   moduleState,
 }: {
   moduleState: $PropertyType<ModuleTemporalProperties, 'moduleState'>
-}): React.Node => {
+}): JSX.Element | null => {
   switch (moduleState.type) {
     case MAGNETIC_MODULE_TYPE:
       return (

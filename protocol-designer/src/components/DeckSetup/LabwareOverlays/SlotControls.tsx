@@ -31,7 +31,7 @@ import styles from './LabwareOverlays.css'
 
 type DNDP = {
   isOver: boolean
-  connectDropTarget: (val: React.Node) => React.Node
+  connectDropTarget: (val: React.ReactNode) => React.ReactNode
   draggedItem: ?{ labwareOnDeck: LabwareOnDeck }
   itemType: string
 }
@@ -42,7 +42,7 @@ type OP = {
   handleDragHover?: () => mixed
 }
 type DP = {
-  addLabware: (e: SyntheticEvent<*>) => unknown
+  addLabware: (e: React.MouseEvent<any>) => unknown
   moveDeckItem: (item1: DeckSlot, item2: DeckSlot) => unknown
 }
 type SP = {
@@ -50,7 +50,7 @@ type SP = {
 }
 type Props = OP & DP & DNDP & SP
 
-export const SlotControlsComponent = (props: Props): React.Node => {
+export const SlotControlsComponent = (props: Props): JSX.Element => {
   const {
     slot,
     addLabware,

@@ -45,14 +45,14 @@ type Props = {
       }
   values: FormModulesByType
   onFieldChange: (
-    event: SyntheticInputEvent<HTMLSelectElement | HTMLInputElement>
+    event: React.MouseEvent<HTMLSelectElement | HTMLInputElement>
   ) => mixed
   onSetFieldValue: (field: string, value: string | null) => void
   onSetFieldTouched: (field: string, touched: boolean) => void
-  onBlur: (event: SyntheticFocusEvent<HTMLSelectElement>) => mixed
+  onBlur: (event: React.FocusEvent<HTMLSelectElement>) => mixed
 }
 
-export function ModuleFields(props: Props): React.Node {
+export function ModuleFields(props: Props): JSX.Element {
   const {
     onFieldChange,
     onSetFieldValue,
@@ -64,7 +64,7 @@ export function ModuleFields(props: Props): React.Node {
   } = props
   const modules = Object.keys(values)
   const handleOnDeckChange = (type: ModuleRealType) => (
-    e: SyntheticInputEvent<HTMLInputElement>
+    e: React.ChangeEvent<HTMLInputElement>
   ) => {
     const targetToClear = `modulesByType.${type}.model`
 

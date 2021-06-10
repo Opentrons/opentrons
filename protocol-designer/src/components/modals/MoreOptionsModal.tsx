@@ -17,7 +17,7 @@ import modalStyles from './modal.css'
 import styles from './MoreOptionsModal.css'
 
 type OP = {
-  close: (event: SyntheticEvent<> | null | undefined) => unknown,
+  close: (event: React.MouseEvent | null | undefined) => unknown,
   formData: FormData,
 }
 
@@ -36,7 +36,7 @@ class MoreOptionsModalComponent extends React.Component<Props, State> {
   }
 
   makeHandleChange = (fieldName: StepFieldName) => (
-    e: SyntheticInputEvent<*>
+    e: React.ChangeEvent<any>
   ) => {
     this.setState({ [fieldName]: e.currentTarget.value })
   }

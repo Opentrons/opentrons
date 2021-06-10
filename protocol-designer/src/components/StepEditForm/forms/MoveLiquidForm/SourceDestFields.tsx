@@ -33,7 +33,7 @@ const makeAddFieldNamePrefix = (prefix: string) => (
   fieldName: string
 ): StepFieldName => `${prefix}_${fieldName}`
 
-export const SourceDestFields = (props: Props): React.Node => {
+export const SourceDestFields = (props: Props): JSX.Element => {
   const { className, formData, prefix, propsForFields } = props
 
   const addFieldNamePrefix = makeAddFieldNamePrefix(prefix)

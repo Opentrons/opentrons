@@ -10,7 +10,7 @@ type Props = {
   temperatureOnDeck: boolean | null | undefined
 }
 
-export function CrashInfoBox(props: Props): React.Node {
+export function CrashInfoBox(props: Props): JSX.Element {
   const moduleMessage = getCrashableModulesCopy(props) || ''
   return (
     <div className={styles.crash_info_container}>

@@ -30,11 +30,11 @@ const NameThisLabwareComponent = (props: Props) => {
 
   const wrapperRef = useOnClickOutside({ onClickOutside: saveNickname })
 
-  const handleChange = (e: SyntheticInputEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value)
   }
 
-  const handleKeyUp = (e: SyntheticKeyboardEvent<*>) => {
+  const handleKeyUp = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       saveNickname()
     }

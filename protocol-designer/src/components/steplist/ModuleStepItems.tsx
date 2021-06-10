@@ -21,7 +21,7 @@ export type ModuleStepItemRowProps = {
 
 export const ModuleStepItemRow = (
   props: ModuleStepItemRowProps
-): React.Node => (
+): JSX.Element => (
   <PDListItem
     className={cx(styles.step_subitem_column_header, styles.substep_content)}
   >
@@ -38,11 +38,11 @@ type Props = {
   actionText: string
   labwareNickname: string | null | undefined
   message: string | null | undefined
-  children?: React.Node
+  children?: React.ReactNode
   hideHeader?: boolean
 }
 
-export const ModuleStepItems = (props: Props): React.Node => {
+export const ModuleStepItems = (props: Props): JSX.Element => {
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: 'bottom-start',
     strategy: TOOLTIP_FIXED,

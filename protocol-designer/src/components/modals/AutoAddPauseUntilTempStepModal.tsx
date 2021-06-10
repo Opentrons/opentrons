@@ -11,7 +11,7 @@ type Props = {
   handleContinueClick: () => mixed
 }
 
-export const AutoAddPauseUntilTempStepModal = (props: Props): React.Node => (
+export const AutoAddPauseUntilTempStepModal = (props: Props): JSX.Element => (
   <AlertModal
     alertOverlay
     className={modalStyles.modal}

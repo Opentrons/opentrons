@@ -38,12 +38,12 @@ type PathFieldProps = FieldProps &
   }
 
 type ButtonProps = {
-  children?: React.Node
+  children?: React.ReactNode
   disabled: boolean
   id?: string
   selected: boolean
   subtitle: string
-  onClick: (e: SyntheticMouseEvent<*>) => unknown
+  onClick: (e: React.MouseEvent) => unknown
   path: PathOption
 }
 
@@ -103,7 +103,7 @@ const getSubtitle = (
   return reasonForDisabled || ''
 }
 
-export const Path = (props: PathFieldProps): React.Node => {
+export const Path = (props: PathFieldProps): JSX.Element => {
   const { disabledPathMap, value, updateValue } = props
   return (
     <FormGroup label="Path">

@@ -42,7 +42,7 @@ type ClickableIconProps = {
   width?: string
   alignRight?: boolean
   isLast?: boolean
-  onClick?: (event: SyntheticMouseEvent<>) => mixed
+  onClick?: (event: React.MouseEvent) => mixed
 }
 
 const iconBoxStyles = css`
@@ -55,7 +55,7 @@ const iconBoxStyles = css`
   }
 `
 
-export const ClickableIcon = (props: ClickableIconProps): React.Node => {
+export const ClickableIcon = (props: ClickableIconProps): JSX.Element => {
   const { id, iconName, onClick, tooltipText, width } = props
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: 'top',
@@ -83,10 +83,10 @@ type Props = {
 
 type AccordionProps = {
   expanded: boolean
-  children: React.Node
+  children: React.ReactNode
 }
 
-export const Accordion = (props: AccordionProps): React.Node => {
+export const Accordion = (props: AccordionProps): JSX.Element => {
   return (
     <Box
       height={props.expanded ? SIZE_2 : 0}
@@ -103,7 +103,7 @@ export const Accordion = (props: AccordionProps): React.Node => {
   )
 }
 
-export const MultiSelectToolbar = (props: Props): React.Node => {
+export const MultiSelectToolbar = (props: Props): JSX.Element => {
   const dispatch = useDispatch()
   const [isExpandState, setIsExpandState] = React.useState<boolean>(true)
   const stepCount = useSelector(stepFormSelectors.getOrderedStepIds).length

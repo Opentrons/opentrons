@@ -10,7 +10,7 @@ import {
 } from '@opentrons/components'
 import { i18n } from '../../localization'
 
-export const NoBatchEditSharedSettings = (): React.Node => {
+export const NoBatchEditSharedSettings = (): JSX.Element => {
   return (
     <Flex
       justifyContent={JUSTIFY_CENTER}

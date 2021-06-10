@@ -27,7 +27,7 @@ type WellSelectionModalProps = {
   isOpen: boolean
   labwareId: string | null | undefined
   name: StepFieldName
-  onCloseClick: (e: SyntheticEvent<*> | null | undefined) => unknown
+  onCloseClick: (e: React.MouseEvent<any> | null | undefined) => unknown
   pipetteId: string | null | undefined
   value: unknown
   updateValue: (val: unknown | null | undefined) => void
@@ -39,7 +39,7 @@ type WellSelectionModalComponentProps = {
   highlightedWells: WellGroup
   ingredNames: WellIngredientNames
   labwareDef: LabwareDefinition2 | null | undefined
-  onCloseClick: (e: SyntheticEvent<*> | null | undefined) => unknown
+  onCloseClick: (e: React.MouseEvent<any> | null | undefined) => unknown
   pipetteSpec: PipetteNameSpecs | null | undefined
   selectedPrimaryWells: WellGroup
   selectWells: (wellGroup: WellGroup) => unknown
@@ -109,7 +109,7 @@ const WellSelectionModalComponent = (
 
 export const WellSelectionModal = (
   props: WellSelectionModalProps
-): React.Node => {
+): React.ReactNode => {
   const { isOpen, labwareId, onCloseClick, pipetteId } = props
   const wellFieldData = props.value
 
