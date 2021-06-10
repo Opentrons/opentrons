@@ -260,3 +260,7 @@
   margin-top: 0;
   padding: 1rem 4rem;
 }
+
+.capitalize {
+  text-transform: capitalize;
+}

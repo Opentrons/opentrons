@@ -3,14 +3,19 @@ import { FormikConfig } from 'formik'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { render, screen } from '@testing-library/react'
 import { getDefaultFormState, LabwareFields } from '../../../fields'
-import { isEveryFieldHidden } from '../../../utils'
+import { isEveryFieldHidden, getLabwareName } from '../../../utils'
 import { WellSpacing } from '../../sections/WellSpacing'
 import { wrapInFormik } from '../../utils/wrapInFormik'
+import { nestedTextMatcher } from '../../__testUtils__/nestedTextMatcher'
 
 jest.mock('../../../utils')
 
 const isEveryFieldHiddenMock = isEveryFieldHidden as jest.MockedFunction<
   typeof isEveryFieldHidden
+>
+
+const getLabwareNameMock = getLabwareName as jest.MockedFunction<
+  typeof getLabwareName
 >
 
 let formikConfig: FormikConfig<LabwareFields>
@@ -33,11 +38,19 @@ describe('WellSpacing', () => {
   })
 
   it('should render when fields are visible', () => {
+    formikConfig.initialValues.labwareType = 'wellPlate'
+    when(getLabwareNameMock)
+      .calledWith(formikConfig.initialValues, false)
+      .mockReturnValue('well')
+
     render(wrapInFormik(<WellSpacing />, formikConfig))
+
     screen.getByRole('heading', { name: /Well Spacing/i })
 
     screen.getByText(
-      'Well spacing measurements inform the robot how far away rows and columns are from each other.'
+      nestedTextMatcher(
+        'well spacing measurements inform the robot how far away rows and columns are from each other.'
+      )
     )
 
     screen.getByRole('textbox', { name: /X Spacing \(Xs\)/i })
@@ -56,6 +69,23 @@ describe('WellSpacing', () => {
     )
     expect(container.firstChild).toBe(null)
   })
+
+  it('should render tips instead of wells when tipRack is selected', () => {
+    formikConfig.initialValues.labwareType = 'tipRack'
+    when(getLabwareNameMock)
+      .calledWith(formikConfig.initialValues, false)
+      .mockReturnValue('tip')
+
+    render(wrapInFormik(<WellSpacing />, formikConfig))
+
+    screen.getByRole('heading', { name: /Tip Spacing/i })
+    screen.getByText(
+      nestedTextMatcher(
+        'tip spacing measurements inform the robot how far away rows and columns are from each other.'
+      )
+    )
+  })
+
   it('should NOT render when the labware type is tubeRack', () => {
     const { container } = render(
       wrapInFormik(<WellSpacing />, {
