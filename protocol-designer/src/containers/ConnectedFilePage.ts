@@ -10,6 +10,7 @@ import { INITIAL_DECK_SETUP_STEP_ID } from '../constants'
 import { InitialDeckSetup } from '../step-forms'
 import { FileMetadataFields } from '../file-data'
 import { actions as navActions } from '../navigation'
+
 type Props = React.ComponentProps<typeof FilePage>
 type SP = {
   instruments: Props['instruments']
