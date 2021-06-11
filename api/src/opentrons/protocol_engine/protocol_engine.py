@@ -11,6 +11,7 @@ from .resources import ResourceProviders
 from .state import StateStore, StateView
 from .commands import (
     CommandRequestType,
+    PendingCommandType,
     CompletedCommandType,
     FailedCommandType,
 )
@@ -26,6 +27,7 @@ class ProtocolEngine:
 
     state_store: StateStore
     _handlers: CommandHandlers
+    _resources: ResourceProviders
 
     @classmethod
     async def create(cls, hardware: HardwareAPI) -> ProtocolEngine:
@@ -38,8 +40,7 @@ class ProtocolEngine:
         fixed_labware = await resources.deck_data.get_deck_fixed_labware(deck_def)
 
         state_store = StateStore(
-            deck_definition=deck_def,
-            deck_fixed_labware=fixed_labware
+            deck_definition=deck_def, deck_fixed_labware=fixed_labware
         )
 
         handlers = CommandHandlers.create(
@@ -48,12 +49,13 @@ class ProtocolEngine:
             state=StateView.create_view(state_store),
         )
 
-        return cls(state_store=state_store, handlers=handlers)
+        return cls(state_store=state_store, handlers=handlers, resources=resources)
 
     def __init__(
         self,
         state_store: StateStore,
         handlers: CommandHandlers,
+        resources: ResourceProviders,
     ) -> None:
         """Initialize a ProtocolEngine instance.
 
@@ -62,6 +64,7 @@ class ProtocolEngine:
         """
         self.state_store = state_store
         self._handlers = handlers
+        self._resources = resources
 
     async def execute_command(
         self,
@@ -94,8 +97,13 @@ class ProtocolEngine:
 
         return done_cmd
 
-    def add_command(self, request: CommandRequestType) -> None:
+    def add_command(self, request: CommandRequestType) -> PendingCommandType:
         """Add a command to ProtocolEngine."""
-        # TODO(spp, 2020-05-13):
-        #   Generate a UUID to be used as command_id for each command added.
-        raise NotImplementedError
+        command_id = self._resources.id_generator.generate_id()
+        created_at = utc_now()
+        command_impl = request.get_implementation()
+        command = command_impl.create_command(created_at)
+
+        self.state_store.handle_command(command, command_id=command_id)
+
+        return command

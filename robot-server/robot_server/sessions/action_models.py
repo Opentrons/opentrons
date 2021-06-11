@@ -15,7 +15,7 @@ class SessionActionType(str, Enum):
 class SessionActionCreateData(BaseModel):
     """Request model for new control action creation."""
 
-    controlType: SessionActionType
+    actionType: SessionActionType
 
 
 class SessionAction(ResourceModel):
@@ -30,7 +30,7 @@ class SessionAction(ResourceModel):
 
     id: str = Field(..., description="A unique identifier to reference the command.")
     createdAt: datetime = Field(..., description="When the command was created.")
-    controlType: SessionActionType = Field(
+    actionType: SessionActionType = Field(
         ...,
         description="Specific type of action, which determines behavior.",
     )

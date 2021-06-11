@@ -13,6 +13,7 @@ class SessionType(str, Enum):
     """All available session types."""
 
     BASIC = "basic"
+    PROTOCOL = "protocol"
 
 
 class AbstractSessionCreateData(BaseModel):
@@ -39,7 +40,7 @@ class AbstractSession(ResourceModel):
         None,
         description="Configuration parameters for the session.",
     )
-    controlCommands: List[SessionAction] = Field(
+    actions: List[SessionAction] = Field(
         ...,
         description="Client-initiated commands for session control.",
     )
@@ -57,10 +58,35 @@ class BasicSession(AbstractSession):
     sessionType: Literal[SessionType.BASIC] = SessionType.BASIC
 
 
+class ProtocolSessionCreateParams(BaseModel):
+    """Creation parameters for a protocol session."""
+
+    protocolId: str = Field(
+        ...,
+        description="Unique identifier of the protocol this session will run.",
+    )
+
+
+class ProtocolSessionCreateData(AbstractSessionCreateData):
+    """Creation request data for a basic session."""
+
+    sessionType: Literal[SessionType.PROTOCOL] = SessionType.PROTOCOL
+    createParams: ProtocolSessionCreateParams
+
+
+class ProtocolSession(AbstractSession):
+    """A session to execute commands without a previously loaded protocol file."""
+
+    sessionType: Literal[SessionType.PROTOCOL] = SessionType.PROTOCOL
+    createParams: ProtocolSessionCreateParams
+
+
 SessionCreateData = Union[
     BasicSessionCreateData,
+    ProtocolSessionCreateData,
 ]
 
 Session = Union[
     BasicSession,
+    ProtocolSession,
 ]

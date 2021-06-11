@@ -9,12 +9,23 @@ from httpx import AsyncClient
 from typing import AsyncIterator
 
 from robot_server.errors import exception_handlers
+from robot_server.protocols import ProtocolStore, ProtocolResource, ProtocolFileType
 from robot_server.sessions.session_view import (
     SessionView,
     BasicSessionCreateData,
 )
-from robot_server.sessions.session_models import BasicSession
-from robot_server.sessions.engine_store import EngineStore, EngineConflictError
+from robot_server.sessions.session_models import (
+    BasicSession,
+    ProtocolSession,
+    ProtocolSessionCreateData,
+    ProtocolSessionCreateParams,
+)
+
+from robot_server.sessions.engine_store import (
+    EngineStore,
+    EngineConflictError,
+    EngineMissingError,
+)
 
 from robot_server.sessions.session_store import (
     SessionStore,
@@ -32,8 +43,10 @@ from robot_server.sessions.router import (
     sessions_router,
     SessionNotFound,
     SessionAlreadyActive,
+    SessionActionNotAllowed,
     get_session_store,
     get_engine_store,
+    get_protocol_store,
     get_unique_id,
     get_current_time,
 )
@@ -46,6 +59,7 @@ def app(
     session_store: SessionStore,
     session_view: SessionView,
     engine_store: EngineStore,
+    protocol_store: ProtocolStore,
     unique_id: str,
     current_time: datetime,
 ) -> FastAPI:
@@ -54,6 +68,7 @@ def app(
     app.dependency_overrides[SessionView] = lambda: session_view
     app.dependency_overrides[get_session_store] = lambda: session_store
     app.dependency_overrides[get_engine_store] = lambda: engine_store
+    app.dependency_overrides[get_protocol_store] = lambda: protocol_store
     app.dependency_overrides[get_unique_id] = lambda: unique_id
     app.dependency_overrides[get_current_time] = lambda: current_time
     app.include_router(sessions_router)
@@ -96,7 +111,7 @@ async def test_create_session(
     expected_response = BasicSession(
         id=unique_id,
         createdAt=current_time,
-        controlCommands=[],
+        actions=[],
     )
 
     decoy.when(
@@ -120,7 +135,74 @@ async def test_create_session(
 
     # TODO(mc, 2021-05-27): spec the initialize method to return actual data
     decoy.verify(
-        await engine_store.create(),
+        await engine_store.create(protocol=None),
+        session_store.upsert(session=session),
+    )
+
+
+async def test_create_protocol_session(
+    decoy: Decoy,
+    session_view: SessionView,
+    session_store: SessionStore,
+    protocol_store: ProtocolStore,
+    engine_store: EngineStore,
+    unique_id: str,
+    current_time: datetime,
+    async_client: AsyncClient,
+) -> None:
+    """It should be able to create a protocol session."""
+    session = SessionResource(
+        session_id=unique_id,
+        created_at=current_time,
+        create_data=ProtocolSessionCreateData(
+            createParams=ProtocolSessionCreateParams(protocolId="protocol-id")
+        ),
+        actions=[],
+    )
+    protocol = ProtocolResource(
+        protocol_id="protocol-id",
+        protocol_type=ProtocolFileType.JSON,
+        created_at=datetime.now(),
+        files=[],
+    )
+    expected_response = ProtocolSession(
+        id=unique_id,
+        createdAt=current_time,
+        createParams=ProtocolSessionCreateParams(protocolId="protocol-id"),
+        actions=[],
+    )
+
+    decoy.when(protocol_store.get(protocol_id="protocol-id")).then_return(protocol)
+
+    decoy.when(
+        session_view.as_resource(
+            create_data=ProtocolSessionCreateData(
+                createParams=ProtocolSessionCreateParams(protocolId="protocol-id")
+            ),
+            session_id=unique_id,
+            created_at=current_time,
+        )
+    ).then_return(session)
+
+    decoy.when(
+        session_view.as_response(session=session),
+    ).then_return(expected_response)
+
+    response = await async_client.post(
+        "/sessions",
+        json={
+            "data": {
+                "sessionType": "protocol",
+                "createParams": {"protocolId": "protocol-id"},
+            }
+        },
+    )
+
+    verify_response(response, expected_status=201, expected_data=expected_response)
+
+    # TODO(mc, 2021-05-27): spec the initialize method to return actual data
+    decoy.verify(
+        await engine_store.create(protocol=protocol),
         session_store.upsert(session=session),
     )
 
@@ -150,7 +232,9 @@ async def test_create_session_conflict(
         )
     ).then_return(session)
 
-    decoy.when(await engine_store.create()).then_raise(EngineConflictError("oh no"))
+    decoy.when(await engine_store.create(protocol=None)).then_raise(
+        EngineConflictError("oh no")
+    )
 
     response = await async_client.post("/sessions")
 
@@ -179,7 +263,7 @@ def test_get_session(
     expected_response = BasicSession(
         id="session-id",
         createdAt=created_at,
-        controlCommands=[],
+        actions=[],
     )
 
     decoy.when(session_store.get(session_id="session-id")).then_return(session)
@@ -250,12 +334,12 @@ def test_get_sessions_not_empty(
     response_1 = BasicSession(
         id="unique-id-1",
         createdAt=created_at_1,
-        controlCommands=[],
+        actions=[],
     )
     response_2 = BasicSession(
         id="unique-id-2",
         createdAt=created_at_2,
-        controlCommands=[],
+        actions=[],
     )
 
     decoy.when(session_store.get_all()).then_return([session_1, session_2])
@@ -312,11 +396,11 @@ def test_delete_session_with_bad_id(
     )
 
 
-@pytest.mark.xfail(raises=NotImplementedError)
 def test_create_session_action(
     decoy: Decoy,
     session_view: SessionView,
     session_store: SessionStore,
+    engine_store: EngineStore,
     unique_id: str,
     current_time: datetime,
     client: TestClient,
@@ -325,7 +409,7 @@ def test_create_session_action(
     session_created_at = datetime.now()
 
     actions = SessionAction(
-        controlType=SessionActionType.START,
+        actionType=SessionActionType.START,
         createdAt=current_time,
         id=unique_id,
     )
@@ -350,17 +434,18 @@ def test_create_session_action(
         session_view.with_action(
             session=prev_session,
             action_id=unique_id,
-            action_data=SessionActionCreateData(controlType=SessionActionType.START),
+            action_data=SessionActionCreateData(actionType=SessionActionType.START),
             created_at=current_time,
         ),
     ).then_return((actions, next_session))
 
     response = client.post(
         "/sessions/session-id/actions",
-        json={"data": {"controlType": "start"}},
+        json={"data": {"actionType": "start"}},
     )
 
     verify_response(response, expected_status=201, expected_data=actions)
+    decoy.verify(engine_store.runner.play())
 
 
 def test_create_session_action_with_missing_id(
@@ -377,11 +462,68 @@ def test_create_session_action_with_missing_id(
 
     response = client.post(
         "/sessions/session-id/actions",
-        json={"data": {"controlType": "start"}},
+        json={"data": {"actionType": "start"}},
     )
 
     verify_response(
         response,
         expected_status=404,
         expected_errors=SessionNotFound(detail=str(not_found_error)),
+    )
+
+
+def test_create_session_action_without_runner(
+    decoy: Decoy,
+    session_view: SessionView,
+    session_store: SessionStore,
+    engine_store: EngineStore,
+    unique_id: str,
+    current_time: datetime,
+    client: TestClient,
+) -> None:
+    """It should handle a start input."""
+    session_created_at = datetime.now()
+
+    actions = SessionAction(
+        actionType=SessionActionType.START,
+        createdAt=current_time,
+        id=unique_id,
+    )
+
+    prev_session = SessionResource(
+        session_id="unique-id",
+        create_data=BasicSessionCreateData(),
+        created_at=session_created_at,
+        actions=[],
+    )
+
+    next_session = SessionResource(
+        session_id="unique-id",
+        create_data=BasicSessionCreateData(),
+        created_at=session_created_at,
+        actions=[actions],
+    )
+
+    decoy.when(session_store.get(session_id="session-id")).then_return(prev_session)
+
+    decoy.when(
+        session_view.with_action(
+            session=prev_session,
+            action_id=unique_id,
+            action_data=SessionActionCreateData(actionType=SessionActionType.START),
+            created_at=current_time,
+        ),
+    ).then_return((actions, next_session))
+
+    decoy.when(engine_store.runner.play()).then_raise(EngineMissingError("oh no"))
+
+    response = client.post(
+        "/sessions/session-id/actions",
+        json={"data": {"actionType": "start"}},
+    )
+
+    verify_response(
+        response,
+        expected_status=400,
+        expected_errors=SessionActionNotAllowed(detail="oh no"),
     )

@@ -13,11 +13,12 @@ from robot_server.service.json_api import (
     MultiResponseModel,
 )
 
+from robot_server.protocols import ProtocolStore, get_protocol_store
 from .session_store import SessionStore, SessionNotFoundError
 from .session_view import SessionView
-from .session_models import Session, SessionCreateData
+from .session_models import Session, SessionCreateData, ProtocolSessionCreateData
 from .action_models import SessionAction, SessionActionCreateData
-from .engine_store import EngineStore, EngineConflictError
+from .engine_store import EngineStore, EngineConflictError, EngineMissingError
 from .dependencies import get_session_store, get_engine_store
 
 sessions_router = APIRouter()
@@ -38,6 +39,13 @@ class SessionAlreadyActive(ErrorDetails):
     title: str = "Session Already Active"
 
 
+class SessionActionNotAllowed(ErrorDetails):
+    """An error if one tries to issue an unsupported session action."""
+
+    id: Literal["SessionActionNotAllow"] = "SessionActionNotAllow"
+    title: str = "Session Action Not Allowed"
+
+
 @sessions_router.post(
     path="/sessions",
     summary="Create a session",
@@ -53,6 +61,7 @@ async def create_session(
     session_view: SessionView = Depends(SessionView),
     session_store: SessionStore = Depends(get_session_store),
     engine_store: EngineStore = Depends(get_engine_store),
+    protocol_store: ProtocolStore = Depends(get_protocol_store),
     session_id: str = Depends(get_unique_id),
     created_at: datetime = Depends(get_current_time),
 ) -> ResponseModel[Session]:
@@ -63,6 +72,7 @@ async def create_session(
         session_view: Session model construction interface.
         session_store: Session storage interface.
         engine_store: ProtocolEngine storage and control.
+        protocol_store: Protocol resource storage.
         session_id: Generated ID to assign to the session.
         created_at: Timestamp to attach to created session
     """
@@ -72,10 +82,14 @@ async def create_session(
         created_at=created_at,
         create_data=create_data,
     )
+    protocol = None
+
+    if isinstance(create_data, ProtocolSessionCreateData):
+        protocol = protocol_store.get(protocol_id=create_data.createParams.protocolId)
 
     try:
         # TODO(mc, 2021-05-28): return engine state to build response model
-        await engine_store.create()
+        await engine_store.create(protocol=protocol)
     except EngineConflictError as e:
         raise SessionAlreadyActive(detail=str(e)).as_error(status.HTTP_409_CONFLICT)
 
@@ -176,13 +190,17 @@ async def remove_session_by_id(
     ),
     status_code=status.HTTP_201_CREATED,
     response_model=ResponseModel[SessionAction],
-    responses={status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[SessionNotFound]}},
+    responses={
+        status.HTTP_400_BAD_REQUEST: {"model": ErrorResponse[SessionActionNotAllowed]},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[SessionNotFound]},
+    },
 )
 async def create_session_action(
     sessionId: str,
     request_body: RequestModel[SessionActionCreateData],
     session_view: SessionView = Depends(SessionView),
     session_store: SessionStore = Depends(get_session_store),
+    engine_store: EngineStore = Depends(get_engine_store),
     action_id: str = Depends(get_unique_id),
     created_at: datetime = Depends(get_current_time),
 ) -> ResponseModel[SessionAction]:
@@ -193,24 +211,30 @@ async def create_session_action(
         request_body: Input payload from the request body.
         session_view: Resource model builder.
         session_store: Session storage interface.
+        engine_store: Protocol engine and runner storage.
         action_id: Generated ID to assign to the control action.
         created_at: Timestamp to attach to the control action.
     """
     try:
         prev_session = session_store.get(session_id=sessionId)
 
-        actions, next_session = session_view.with_action(
+        action, next_session = session_view.with_action(
             session=prev_session,
             action_id=action_id,
             action_data=request_body.data,
             created_at=created_at,
         )
 
-        raise NotImplementedError("Action handling not yet implemented")
+        # TODO(mc, 2021-06-11): support actions other than `start`
+        engine_store.runner.play()
 
     except SessionNotFoundError as e:
         raise SessionNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
+    except EngineMissingError as e:
+        raise SessionActionNotAllowed(detail=str(e)).as_error(
+            status.HTTP_400_BAD_REQUEST
+        )
 
     session_store.upsert(session=next_session)
 
-    return ResponseModel(data=actions)
+    return ResponseModel(data=action)
