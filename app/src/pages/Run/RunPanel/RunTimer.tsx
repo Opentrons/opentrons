@@ -41,7 +41,7 @@ export function RunTimer(): JSX.Element {
   const renderPaused = (): JSX.Element => {
     const pausedTime = formatSeconds(pausedSeconds)
     return (
-      <div>
+      <div className={styles.panel}>
         <div className={styles.bold_heading}>
           <p>Paused For: </p>
           {pausedTime}

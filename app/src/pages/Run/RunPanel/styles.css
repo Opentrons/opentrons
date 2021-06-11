@@ -9,9 +9,12 @@
   margin: 0.5rem;
 }
 
+.panel {
+  margin-bottom: var(--run-panel-padding);
+}
+
 .subheading {
   padding: var(--run-panel-padding);
-  margin-bottom: 0.5rem;
   font-size: var(--fs-body-2);
   color: var(--c-med-gray);
   text-transform: uppercase;
