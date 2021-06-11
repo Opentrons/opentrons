@@ -6,8 +6,8 @@ import itertools
 from opentrons.types import DeckSlotName
 from opentrons.protocol_engine import StateStore
 from opentrons.protocol_engine.types import DeckSlotLocation
+from opentrons.protocol_engine.errors import ProtocolEngineError
 from opentrons.protocol_engine.commands import (
-    CommandRequestType,
     PendingCommand,
     RunningCommand,
     FailedCommand,
@@ -68,15 +68,15 @@ def test_command_state_preserves_handle_order(  # noqa:D103
     ]
     command_a, command_b, command_c = unique_commands
 
-    store.handle_command(command_a, "first-handled-id")
-    store.handle_command(command_b, "second-handled-id")
+    store.handle_command(command_a, "command-id-1")
+    store.handle_command(command_b, "command-id-2")
     assert store.commands.get_all_commands() == [
-        ("first-handled-id", command_a), ("second-handled-id", command_b)
+        ("command-id-1", command_a), ("command-id-2", command_b)
     ]
 
-    store.handle_command(command_c, "first-handled-id")
+    store.handle_command(command_c, "command-id-1")
     assert store.commands.get_all_commands() == [
-        ("first-handled-id", command_c), ("second-handled-id", command_b)
+        ("command-id-1", command_c), ("command-id-2", command_b)
     ]
 
 
@@ -105,13 +105,13 @@ def test_get_next_request_returns_first_pending(  # noqa: D103
         created_at=now,
         request=_make_request()
     )
-    # Testing the test: the next assert is only meaningful if these compare nonequal.
-    assert running_command != pending_command
 
-    store.handle_command(running_command, "id-1")
-    store.handle_command(pending_command, "id-2")
+    store.handle_command(running_command, "command-id-1")
+    store.handle_command(pending_command, "command-id-2")
     # Skips running_command even though it came first.
-    assert store.commands.get_next_request() == ("id-2", pending_command.request)
+    assert store.commands.get_next_request() == (
+        "command-id-2", pending_command.request
+    )
 
 
 def test_get_next_request_returns_none_when_no_pending(  # noqa: D103
@@ -125,11 +125,21 @@ def test_get_next_request_returns_none_when_no_pending(  # noqa: D103
             started_at=now,
             request=_make_request()
         ),
-        "command-id"
+        "running-command-id"
+    )
+    store.handle_command(
+        FailedCommand[LoadLabwareRequest](
+            created_at=now,
+            started_at=now,
+            failed_at=now,
+            error=ProtocolEngineError(),
+            request=_make_request()
+        ),
+        "failed-command-id"
     )
 
-    # todo(mm, 2021-06-11): We should throw a completed command and failed command
-    # in here too, but I'm skipping it because they're a pain to construct.
+    # todo(mm, 2021-06-11): We should throw a completed command in here too, but I'm
+    # skipping it because it's a pain to construct.
 
     assert store.commands.get_next_request() is None
 
@@ -137,5 +147,17 @@ def test_get_next_request_returns_none_when_no_pending(  # noqa: D103
 def test_get_next_request_returns_none_when_earlier_command_failed(  # noqa: D103
     store: StateStore, now: datetime
 ) -> None:
-    # Fix before merge.
-    raise NotImplementedError()
+    failed_command = FailedCommand[LoadLabwareRequest](
+        created_at=now,
+        started_at=now,
+        failed_at=now,
+        error=ProtocolEngineError(),
+        request=_make_request()
+    )
+    pending_command = PendingCommand[LoadLabwareRequest, LoadLabwareResult](
+        created_at=now,
+        request=_make_request()
+    )
+    store.handle_command(failed_command, "command-id-1")
+    store.handle_command(pending_command, "command-id-2")
+    assert store.commands.get_next_request() is None
