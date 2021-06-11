@@ -99,7 +99,7 @@
     color: var(--c-med-gray);
   };
 
-  --font-code: {
+  --font-code-dark: {
     font-family: var(--ff-code);
     font-size: var(--fs-body-1);
     font-weight: var(--fw-regular);

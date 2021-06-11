@@ -227,13 +227,6 @@ function millisToSeconds(ms: number): number {
   return Math.floor(Math.max(0, ms) / 1000)
 }
 
-/**
- * I know this is a little unorthodox but this selector is dependent on a point in time which
- * outside of testing will be `Date.now()`. Selectors don't take parameters because it adds
- * an axis to memoization that `createSelector` knows nothing about. And we don't want to keep
- * `runTime` (now) out of the state. I don't think performance is an issue here. So we are
- * breaking form. It is selector like but does take `now` argument.
- */
 export function getRunSeconds(state: State, now: number = Date.now()): number {
   const isRunning = getIsRunning(state)
   if (isRunning) {
