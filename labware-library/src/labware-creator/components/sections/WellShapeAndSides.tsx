@@ -102,10 +102,12 @@ export const WellShapeAndSides = (): JSX.Element | null => {
   const { values, errors, touched } = useFormikContext<LabwareFields>()
   const label =
     values.labwareType === 'tipRack' ? 'Tip Diameter' : 'Well Shape & Sides'
+  const id =
+    values.labwareType === 'tipRack' ? 'TipDiameter' : 'WellShapeAndSides'
 
   return (
     <div className={styles.new_definition_section}>
-      <SectionBody label={label} id="WellShapeAndSides">
+      <SectionBody label={label} id={id}>
         <>
           <FormAlerts touched={touched} errors={errors} fieldList={fieldList} />
           <Content values={values} />
