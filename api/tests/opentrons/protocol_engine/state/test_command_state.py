@@ -56,7 +56,9 @@ def test_state_store_handles_command(store: StateStore, now: datetime) -> None:
     assert store.commands.get_command_by_id("unique-id") == cmd
 
 
-def test_command_state_preserves_handle_order(store: StateStore, now: datetime) -> None:
+def test_command_state_preserves_handle_order(  # noqa:D103
+    store: StateStore, now: datetime
+) -> None:
     unique_commands = [
         PendingCommand[LoadLabwareRequest, LoadLabwareResult](
             created_at=now,
@@ -91,7 +93,7 @@ def test_command_state_preserves_handle_order(store: StateStore, now: datetime) 
 # * Mock out CommandState.get_all_commands() and avoid the need to initialize the
 #   queue of commands at all? That would mean CommandState is partially mocked out,
 #   which seems Bad.
-def test_get_next_request_returns_first_pending(
+def test_get_next_request_returns_first_pending(  # noqa: D103
     store: StateStore, now: datetime
 ) -> None:
     running_command = RunningCommand[LoadLabwareRequest, LoadLabwareResult](
@@ -109,10 +111,10 @@ def test_get_next_request_returns_first_pending(
     store.handle_command(running_command, "id-1")
     store.handle_command(pending_command, "id-2")
     # Skips running_command even though it came first.
-    assert store.commands.get_next_request() == pending_command
+    assert store.commands.get_next_request() == ("id-2", pending_command.request)
 
 
-def test_get_next_request_returns_none_when_no_pending(
+def test_get_next_request_returns_none_when_no_pending(  # noqa: D103
     store: StateStore, now: datetime
 ) -> None:
     assert store.commands.get_next_request() is None
@@ -132,7 +134,7 @@ def test_get_next_request_returns_none_when_no_pending(
     assert store.commands.get_next_request() is None
 
 
-def test_get_next_request_returns_none_when_any_failed(
+def test_get_next_request_returns_none_when_earlier_command_failed(  # noqa: D103
     store: StateStore, now: datetime
 ) -> None:
     # Fix before merge.
