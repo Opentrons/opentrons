@@ -139,9 +139,18 @@ export const labwareFormSchemaBaseObject = Yup.object({
   }),
 
   wellVolume: requiredPositiveNumber(LABELS.wellVolume),
-  wellBottomShape: requiredString(LABELS.wellBottomShape).oneOf(
-    wellBottomShapeOptions.map(o => o.value)
-  ),
+  // Yup.mixed().when('gridColumns', {
+  //   is: 1,
+  //   then: Yup.mixed().default(true),
+  //   otherwise: unsupportedLabwareIfFalse(LABELS.regularColumnSpacing),
+  // })
+  wellBottomShape: Yup.mixed().when('labwareType', {
+    is: 'tipRack',
+    then: requiredString(LABELS.wellBottomShape).oneOf(
+      wellBottomShapeOptions.map(o => o.value)
+    ),
+    otherwise: Yup.mixed().nullable(),
+  }),
   wellDepth: Yup.number()
     .default(0)
     .label(LABELS.wellDepth)

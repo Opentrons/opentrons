@@ -158,7 +158,7 @@ export interface ProcessedLabwareFields {
   regularColumnSpacing: BooleanString
 
   wellVolume: number
-  wellBottomShape: WellBottomShape
+  wellBottomShape: WellBottomShape | null
   wellDepth: number
   wellShape: WellShape
 
