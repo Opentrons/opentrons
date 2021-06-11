@@ -1,4 +1,4 @@
-"""Request and response models for controllings sessions with actions."""
+"""Request and response models for controlling sessions with actions."""
 from datetime import datetime
 from enum import Enum
 from pydantic import BaseModel, Field

@@ -3,9 +3,11 @@ from datetime import datetime, timezone
 from typing_extensions import Literal
 from uuid import uuid4
 
-from starlette import status
 from fastapi import Depends, HTTPException, Header
+from starlette import status
+from starlette.datastructures import State
 from starlette.requests import Request
+
 from opentrons.hardware_control import ThreadManager, ThreadedAsyncLock
 
 from robot_server import constants, util, errors
@@ -128,6 +130,15 @@ async def check_version_header(
     else:
         # Attach the api version to request's state dict
         request.state.api_version = min(requested_version, constants.API_VERSION)
+
+
+def get_app_state(request: Request) -> State:
+    """Get the Starlette application's state from the framework.
+
+    See https://www.starlette.io/applications/#storing-state-on-the-app-instance
+    for more details.
+    """
+    return request.app.state
 
 
 def get_unique_id() -> str:
