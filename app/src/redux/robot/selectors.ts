@@ -235,19 +235,21 @@ function millisToSeconds(ms: number): number {
  * breaking form. It is selector like but does take `now` argument.
  */
 export function getRunSeconds(state: State, now: number = Date.now()): number {
-  const startTimeMs = getStartTimeMs(state)
   const isRunning = getIsRunning(state)
   if (isRunning) {
-    // TODO: to the reviewers, at this point, I think logically `startTimeMs` should not be null.
-    //  Do we have any reason to defend against it being null? I am going to assume that we can
-    //  use the non null assertion operator. If feedback shoots me down then I will defend. But then what?
-    return millisToSeconds(now - startTimeMs!)
+    const startTimeMs = getStartTimeMs(state)
+    if (startTimeMs == null) {
+      return 0
+    }
+    return millisToSeconds(now - startTimeMs)
   }
   const isDone = getIsDone(state)
   if (isDone) {
     const statusInfo = getSessionStatusInfo(state)
-    // TODO: same 'to the reviewers' question as above but regarding `changedAt`
-    return millisToSeconds(statusInfo.changedAt!)
+    if (statusInfo.changedAt == null) {
+      return 0
+    }
+    return millisToSeconds(statusInfo.changedAt)
   }
   return 0
 }
@@ -263,8 +265,9 @@ export function getPausedSeconds(
   if (isPaused) {
     const startTimeMs = getStartTimeMs(state)
     const statusInfo = getSessionStatusInfo(state)
-    // TODO: same 'to the reviewers' question as above concerning use of non-null assertion operator
-    return millisToSeconds(now - startTimeMs! - statusInfo.changedAt!)
+    if (startTimeMs != null && statusInfo.changedAt != null) {
+      return millisToSeconds(now - startTimeMs - statusInfo.changedAt)
+    }
   }
   return 0
 }
