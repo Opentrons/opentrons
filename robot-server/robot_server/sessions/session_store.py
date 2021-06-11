@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import Dict, List
 
 from .session_models import SessionCreateData
-from .control_commands import SessionControlCommand
+from .action_models import SessionAction
 
 
 @dataclass(frozen=True)
@@ -18,7 +18,7 @@ class SessionResource:
     session_id: str
     create_data: SessionCreateData
     created_at: datetime
-    control_commands: List[SessionControlCommand]
+    actions: List[SessionAction]
 
 
 class SessionNotFoundError(ValueError):

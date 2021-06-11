@@ -16,7 +16,7 @@ from robot_server.service.json_api import (
 from .session_store import SessionStore, SessionNotFoundError
 from .session_builder import SessionBuilder
 from .session_models import Session, SessionCreateData
-from .control_commands import SessionControlCommand, SessionControlCommandCreateData
+from .action_models import SessionAction, SessionActionCreateData
 from .engine_store import EngineStore, EngineConflictError
 from .dependencies import get_session_store, get_engine_store
 
@@ -167,24 +167,23 @@ async def remove_session_by_id(
 
 
 @sessions_router.post(
-    path="/sessions/{sessionId}/controls",
-    summary="Create a session control command.",
+    path="/sessions/{sessionId}/actions",
+    summary="Issue a control action to the session",
     description=(
-        "Provide a control command to the session in order to change "
-        "execution of the run."
+        "Provide an action to the session in order to control execution of the run."
     ),
     status_code=status.HTTP_201_CREATED,
-    response_model=ResponseModel[SessionControlCommand],
+    response_model=ResponseModel[SessionAction],
     responses={status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[SessionNotFound]}},
 )
-async def create_session_control_command(
+async def create_session_action(
     sessionId: str,
-    request_body: RequestModel[SessionControlCommandCreateData],
+    request_body: RequestModel[SessionActionCreateData],
     session_builder: SessionBuilder = Depends(SessionBuilder),
     session_store: SessionStore = Depends(get_session_store),
-    control_command_id: str = Depends(get_unique_id),
+    actions_id: str = Depends(get_unique_id),
     created_at: datetime = Depends(get_current_time),
-) -> ResponseModel[SessionControlCommand]:
+) -> ResponseModel[SessionAction]:
     """Create a session control command.
 
     Arguments:
@@ -192,24 +191,24 @@ async def create_session_control_command(
         request_body: Input payload from the request body.
         session_builder: Resource model builder.
         session_store: Session storage interface.
-        control_command_id: Generated ID to assign to the control command.
+        actions_id: Generated ID to assign to the control command.
         created_at: Timestamp to attach to the control command.
     """
     try:
         prev_session = session_store.get(session_id=sessionId)
 
-        control_command, next_session = session_builder.create_control_command(
+        actions, next_session = session_builder.create_actions(
             session=prev_session,
-            control_command_id=control_command_id,
-            control_command_data=request_body.data,
+            actions_id=actions_id,
+            actions_data=request_body.data,
             created_at=created_at,
         )
 
-        raise NotImplementedError("Control command handling not yet implemented")
+        raise NotImplementedError("Action handling not yet implemented")
 
     except SessionNotFoundError as e:
         raise SessionNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
 
     session_store.add(session=next_session)
 
-    return ResponseModel(data=control_command)
+    return ResponseModel(data=actions)

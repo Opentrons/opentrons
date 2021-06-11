@@ -10,10 +10,10 @@ from robot_server.sessions.session_models import (
     BasicSessionCreateData,
 )
 
-from robot_server.sessions.control_commands import (
-    SessionControlCommand,
-    SessionControlCommandCreateData,
-    SessionControlType,
+from robot_server.sessions.action_models import (
+    SessionAction,
+    SessionActionCreateData,
+    SessionActionType,
 )
 
 
@@ -38,7 +38,7 @@ def test_create_session_resource_from_none(subject: SessionBuilder) -> None:
         session_id="session-id",
         create_data=BasicSessionCreateData(),
         created_at=created_at,
-        control_commands=[],
+        actions=[],
     )
 
 
@@ -57,7 +57,7 @@ def test_create_session_resource(subject: SessionBuilder) -> None:
         session_id="session-id",
         create_data=create_data,
         created_at=created_at,
-        control_commands=[],
+        actions=[],
     )
 
 
@@ -72,7 +72,7 @@ current_time = datetime.now()
                 session_id="session-id",
                 create_data=BasicSessionCreateData(),
                 created_at=current_time,
-                control_commands=[],
+                actions=[],
             ),
             BasicSession(
                 id="session-id",
@@ -91,7 +91,7 @@ def test_to_response(
     assert subject.to_response(session_resource) == expected_response
 
 
-def test_create_control_command(
+def test_create_actions(
     current_time: datetime,
     subject: SessionBuilder,
 ) -> None:
@@ -102,29 +102,29 @@ def test_create_control_command(
         session_id="session-id",
         create_data=BasicSessionCreateData(),
         created_at=session_created_at,
-        control_commands=[],
+        actions=[],
     )
 
-    command_data = SessionControlCommandCreateData(
-        controlType=SessionControlType.START,
+    command_data = SessionActionCreateData(
+        controlType=SessionActionType.START,
     )
 
-    control_command_result, session_result = subject.create_control_command(
+    actions_result, session_result = subject.create_actions(
         session=session,
-        control_command_id="control-command-id",
-        control_command_data=command_data,
+        actions_id="control-command-id",
+        actions_data=command_data,
         created_at=current_time,
     )
 
-    assert control_command_result == SessionControlCommand(
+    assert actions_result == SessionAction(
         id="control-command-id",
         createdAt=current_time,
-        controlType=SessionControlType.START,
+        controlType=SessionActionType.START,
     )
 
     assert session_result == SessionResource(
         session_id="session-id",
         create_data=BasicSessionCreateData(),
         created_at=session_created_at,
-        control_commands=[control_command_result],
+        actions=[actions_result],
     )

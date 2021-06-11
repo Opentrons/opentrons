@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import Optional, Tuple
 
 from .session_store import SessionResource
-from .control_commands import SessionControlCommand, SessionControlCommandCreateData
+from .action_models import SessionAction, SessionActionCreateData
 from .session_models import (
     Session,
     BasicSession,
@@ -36,41 +36,41 @@ class SessionBuilder:
             session_id=session_id,
             created_at=created_at,
             create_data=create_data or BasicSessionCreateData(),
-            control_commands=[],
+            actions=[],
         )
 
     @staticmethod
-    def create_control_command(
+    def create_actions(
         session: SessionResource,
-        control_command_id: str,
-        control_command_data: SessionControlCommandCreateData,
+        actions_id: str,
+        actions_data: SessionActionCreateData,
         created_at: datetime,
-    ) -> Tuple[SessionControlCommand, SessionResource]:
+    ) -> Tuple[SessionAction, SessionResource]:
         """Create a new session control command resource.
 
         Arguments:
             session: The session resource to add the command to.
-            control_command_id: Unique ID to assign to the command resource.
-            control_command_data: Data used to create the command resource.
+            actions_id: Unique ID to assign to the command resource.
+            actions_data: Data used to create the command resource.
             created_at: Resource creation timestamp.
 
         Returns:
-            A tuple of the created SessionControlCommand resource and the
+            A tuple of the created SessionAction resource and the
             updated SessionResource.
 
         """
-        control_command = SessionControlCommand(
-            id=control_command_id,
+        actions = SessionAction(
+            id=actions_id,
             createdAt=created_at,
-            controlType=control_command_data.controlType,
+            controlType=actions_data.controlType,
         )
 
         updated_session = replace(
             session,
-            control_commands=session.control_commands + [control_command],
+            actions=session.actions + [actions],
         )
 
-        return control_command, updated_session
+        return actions, updated_session
 
     @staticmethod
     def to_response(session: SessionResource) -> Session:
@@ -88,7 +88,7 @@ class SessionBuilder:
             return BasicSession.construct(
                 id=session.session_id,
                 createdAt=session.created_at,
-                controlCommands=session.control_commands,
+                controlCommands=session.actions,
             )
 
         raise ValueError(f"Invalid session store entry {session}")

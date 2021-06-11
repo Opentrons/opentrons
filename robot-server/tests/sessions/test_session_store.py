@@ -23,7 +23,7 @@ def test_add_session(subject: SessionStore) -> None:
         session_id="session-id",
         create_data=BasicSessionCreateData(),
         created_at=datetime.now(),
-        control_commands=[],
+        actions=[],
     )
 
     result = subject.add(session)
@@ -37,7 +37,7 @@ def test_get_session(subject: SessionStore) -> None:
         session_id="session-id",
         create_data=BasicSessionCreateData(),
         created_at=datetime.now(),
-        control_commands=[],
+        actions=[],
     )
 
     subject.add(session)
@@ -59,13 +59,13 @@ def test_get_all_sessions(subject: SessionStore) -> None:
         session_id="session-id-1",
         create_data=BasicSessionCreateData(),
         created_at=datetime.now(),
-        control_commands=[],
+        actions=[],
     )
     session_2 = SessionResource(
         session_id="session-id-2",
         create_data=BasicSessionCreateData(),
         created_at=datetime.now(),
-        control_commands=[],
+        actions=[],
     )
 
     subject.add(session_1)
@@ -82,7 +82,7 @@ def test_remove_session(subject: SessionStore) -> None:
         session_id="session-id",
         create_data=BasicSessionCreateData(),
         created_at=datetime.now(),
-        control_commands=[],
+        actions=[],
     )
 
     subject.add(session)

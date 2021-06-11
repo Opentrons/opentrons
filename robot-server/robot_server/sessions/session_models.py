@@ -6,7 +6,7 @@ from typing import List, Optional, Union
 from typing_extensions import Literal
 
 from robot_server.service.json_api import ResourceModel
-from .control_commands import SessionControlCommand
+from .action_models import SessionAction
 
 
 class SessionType(str, Enum):
@@ -39,7 +39,7 @@ class AbstractSession(ResourceModel):
         None,
         description="Configuration parameters for the session.",
     )
-    controlCommands: List[SessionControlCommand] = Field(
+    controlCommands: List[SessionAction] = Field(
         ...,
         description="Client-initiated commands for session control.",
     )

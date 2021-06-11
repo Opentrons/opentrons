@@ -22,10 +22,10 @@ from robot_server.sessions.session_store import (
     SessionResource,
 )
 
-from robot_server.sessions.control_commands import (
-    SessionControlCommand,
-    SessionControlType,
-    SessionControlCommandCreateData,
+from robot_server.sessions.action_models import (
+    SessionAction,
+    SessionActionType,
+    SessionActionCreateData,
 )
 
 from robot_server.sessions.router import (
@@ -91,7 +91,7 @@ async def test_create_session(
         session_id=unique_id,
         created_at=current_time,
         create_data=BasicSessionCreateData(),
-        control_commands=[],
+        actions=[],
     )
     expected_response = BasicSession(
         id=unique_id,
@@ -139,7 +139,7 @@ async def test_create_session_conflict(
         session_id=unique_id,
         create_data=BasicSessionCreateData(),
         created_at=current_time,
-        control_commands=[],
+        actions=[],
     )
 
     decoy.when(
@@ -174,7 +174,7 @@ def test_get_session(
         session_id="session-id",
         create_data=create_data,
         created_at=created_at,
-        control_commands=[],
+        actions=[],
     )
     expected_response = BasicSession(
         id="session-id",
@@ -238,13 +238,13 @@ def test_get_sessions_not_empty(
         session_id="unique-id-1",
         create_data=BasicSessionCreateData(),
         created_at=created_at_1,
-        control_commands=[],
+        actions=[],
     )
     session_2 = SessionResource(
         session_id="unique-id-2",
         create_data=BasicSessionCreateData(),
         created_at=created_at_2,
-        control_commands=[],
+        actions=[],
     )
 
     response_1 = BasicSession(
@@ -313,7 +313,7 @@ def test_delete_session_with_bad_id(
 
 
 @pytest.mark.xfail(raises=NotImplementedError)
-def test_create_session_control_command(
+def test_create_session_action(
     decoy: Decoy,
     session_builder: SessionBuilder,
     session_store: SessionStore,
@@ -324,8 +324,8 @@ def test_create_session_control_command(
     """It should handle a start input."""
     session_created_at = datetime.now()
 
-    control_command = SessionControlCommand(
-        controlType=SessionControlType.START,
+    actions = SessionAction(
+        controlType=SessionActionType.START,
         createdAt=current_time,
         id=unique_id,
     )
@@ -334,38 +334,36 @@ def test_create_session_control_command(
         session_id="unique-id",
         create_data=BasicSessionCreateData(),
         created_at=session_created_at,
-        control_commands=[],
+        actions=[],
     )
 
     next_session = SessionResource(
         session_id="unique-id",
         create_data=BasicSessionCreateData(),
         created_at=session_created_at,
-        control_commands=[control_command],
+        actions=[actions],
     )
 
     decoy.when(session_store.get(session_id="session-id")).then_return(prev_session)
 
     decoy.when(
-        session_builder.create_control_command(
+        session_builder.create_actions(
             session=prev_session,
-            control_command_id=unique_id,
-            control_command_data=SessionControlCommandCreateData(
-                controlType=SessionControlType.START
-            ),
+            actions_id=unique_id,
+            actions_data=SessionActionCreateData(controlType=SessionActionType.START),
             created_at=current_time,
         ),
-    ).then_return((control_command, next_session))
+    ).then_return((actions, next_session))
 
     response = client.post(
-        "/sessions/session-id/controls",
+        "/sessions/session-id/actions",
         json={"data": {"controlType": "start"}},
     )
 
-    verify_response(response, expected_status=201, expected_data=control_command)
+    verify_response(response, expected_status=201, expected_data=actions)
 
 
-def test_create_session_control_command_with_missing_id(
+def test_create_session_action_with_missing_id(
     decoy: Decoy,
     session_store: SessionStore,
     unique_id: str,
@@ -378,7 +376,7 @@ def test_create_session_control_command_with_missing_id(
     decoy.when(session_store.get(session_id="session-id")).then_raise(not_found_error)
 
     response = client.post(
-        "/sessions/session-id/controls",
+        "/sessions/session-id/actions",
         json={"data": {"controlType": "start"}},
     )
 
