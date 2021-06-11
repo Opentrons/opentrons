@@ -1,10 +1,8 @@
 // robot selectors
 import { head } from 'lodash'
-import padStart from 'lodash/padStart'
 import some from 'lodash/some'
 import uniqBy from 'lodash/uniqBy'
 import { createSelector } from 'reselect'
-import { format } from 'date-fns'
 
 import type { ModuleModel, PipetteModel } from '@opentrons/shared-data'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
@@ -12,7 +10,6 @@ import { getCustomLabwareDefinitions } from '../custom-labware/selectors'
 import { getLabwareDefBySlot } from '../protocol/selectors'
 import { getLatestLabwareDef } from '../../assets/labware/getLabware'
 import * as Constants from './constants'
-import { ERROR, FINISHED, PAUSED, RUNNING, STOPPED } from './constants'
 
 import type { State } from '../types'
 import type {

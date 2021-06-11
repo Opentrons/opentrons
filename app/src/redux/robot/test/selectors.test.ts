@@ -205,13 +205,13 @@ describe('robot selectors', () => {
 
   describe('getRunSeconds', function () {
     const now = Date.now()
-    const getRunSecondsTests: {
+    const getRunSecondsTests: Array<{
       changedAt?: number
       expected: number
       startTime?: number
       state: SessionStatus
       text: string
-    }[] = [
+    }> = [
       {
         expected: 0,
         state: '',

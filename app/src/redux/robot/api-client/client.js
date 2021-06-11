@@ -22,8 +22,6 @@ import { fileIsBundle, fileIsPython } from '../../protocol/protocol-data'
 import { getCustomLabwareDefinitions } from '../../custom-labware/selectors'
 import { normalizeModuleModel } from '@opentrons/shared-data'
 
-const RUN_TIME_TICK_INTERVAL_MS = 1000
-const NO_INTERVAL = -1
 const RE_TIPRACK = /tip ?rack/i
 
 const THIS_ROBOT_DOES_NOT_SUPPORT_BUNDLES =
@@ -39,9 +37,6 @@ export function client(dispatch) {
   let freshUpload = false
   let rpcClient
   let remote
-
-  // TODO(mc, 2017-09-22): build some sort of timer middleware instead?
-  let runTimerInterval = NO_INTERVAL
 
   // return an action handler
   return function receive(state = {}, action = {}) {

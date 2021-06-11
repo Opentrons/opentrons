@@ -156,7 +156,6 @@ function handleSessionUpdate(
 ): SessionState {
   const {
     payload: { state: sessionStateUpdate, startTime, lastCommand },
-    meta: { now },
   } = action
   let { protocolCommandsById } = state
 

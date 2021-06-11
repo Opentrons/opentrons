@@ -47,7 +47,7 @@ describe('RunTimer component', () => {
   it('displays the start time if not null', () => {
     const { startTime } = mockEnvironment()
     const { wrapper } = render()
-    const expected = format(startTime!, 'pp')
+    const expected = format(startTime as number, 'pp')
     expect(wrapper.html()).toContain(`Start Time: ${expected}`)
   })
 
