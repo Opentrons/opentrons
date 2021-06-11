@@ -1,0 +1,27 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`LabwareList component renders 1`] = `
+<Card
+  className="card"
+  title="Custom Labware Listing"
+>
+  <div
+    className="list_column_titles"
+  >
+    <p
+      className="item_category_column"
+    />
+    <p
+      className="item_name_column"
+    >
+      Name
+    </p>
+    <p
+      className="item_date_column"
+    >
+      Date Added
+    </p>
+  </div>
+  <ul />
+</Card>
+`;

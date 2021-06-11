@@ -1,0 +1,37 @@
+@import '@opentrons/components';
+
+.labeled_value {
+  margin-top: 0.25rem;
+  margin-bottom: 0;
+}
+
+.code {
+  @apply --font-code;
+}
+
+.details_list {
+  list-style: none;
+}
+
+.list_item {
+  display: flex;
+  align-items: baseline;
+  margin-top: 0.125rem;
+}
+
+.list_item_title {
+  font-weight: var(--fw-semibold);
+  margin-right: 0.25rem;
+  min-width: 5rem;
+}
+
+.button {
+  width: auto;
+  padding-left: 2rem;
+  padding-right: 2rem;
+}
+
+.error {
+  font-weight: var(--fw-semibold);
+  color: var(--c-error-dark);
+}
