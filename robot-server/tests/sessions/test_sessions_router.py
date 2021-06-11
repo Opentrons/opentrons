@@ -1,31 +1,39 @@
 """Tests for the /sessions router."""
 import pytest
+from asyncio import AbstractEventLoop
 from datetime import datetime
 from decoy import Decoy
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
+from httpx import AsyncClient
+from typing import AsyncIterator
 
 from robot_server.errors import exception_handlers
-from robot_server.sessions.router import sessions_router, SessionNotFound
-from robot_server.sessions.session_builder import SessionBuilder, CreateBasicSessionData
+from robot_server.sessions.session_view import (
+    SessionView,
+    BasicSessionCreateData,
+)
 from robot_server.sessions.session_models import BasicSession
-from robot_server.sessions.session_runner import SessionRunner
+from robot_server.sessions.engine_store import EngineStore, EngineConflictError
+
 from robot_server.sessions.session_store import (
     SessionStore,
     SessionNotFoundError,
-    SessionStoreEntry,
+    SessionResource,
 )
 
-from robot_server.sessions.session_inputs import (
-    SessionInput,
-    SessionInputType,
-    CreateSessionInputData,
+from robot_server.sessions.action_models import (
+    SessionAction,
+    SessionActionType,
+    SessionActionCreateData,
 )
 
-from robot_server.sessions.dependencies import (
-    get_session_builder,
+from robot_server.sessions.router import (
+    sessions_router,
+    SessionNotFound,
+    SessionAlreadyActive,
     get_session_store,
-    get_session_runner,
+    get_engine_store,
     get_unique_id,
     get_current_time,
 )
@@ -34,114 +42,154 @@ from ..helpers import verify_response
 
 
 @pytest.fixture
-def session_store(decoy: Decoy) -> SessionStore:
-    """Get a fake SessionStore interface."""
-    return decoy.create_decoy(spec=SessionStore)
-
-
-@pytest.fixture
-def session_builder(decoy: Decoy) -> SessionBuilder:
-    """Get a fake SessionBuilder interface."""
-    return decoy.create_decoy(spec=SessionBuilder)
-
-
-@pytest.fixture
-def session_runner(decoy: Decoy) -> SessionRunner:
-    """Get a fake SessionRunner interface."""
-    return decoy.create_decoy(spec=SessionRunner)
-
-
-@pytest.fixture
-def client(
+def app(
     session_store: SessionStore,
-    session_builder: SessionBuilder,
-    session_runner: SessionRunner,
+    session_view: SessionView,
+    engine_store: EngineStore,
     unique_id: str,
     current_time: datetime,
-) -> TestClient:
-    """Get an TestClient for /protocols routes with dependencies mocked out."""
+) -> FastAPI:
+    """Get a FastAPI app with /sessions routes and mocked-out dependencies."""
     app = FastAPI(exception_handlers=exception_handlers)
-    app.dependency_overrides[get_session_builder] = lambda: session_builder
+    app.dependency_overrides[SessionView] = lambda: session_view
     app.dependency_overrides[get_session_store] = lambda: session_store
-    app.dependency_overrides[get_session_runner] = lambda: session_runner
+    app.dependency_overrides[get_engine_store] = lambda: engine_store
     app.dependency_overrides[get_unique_id] = lambda: unique_id
     app.dependency_overrides[get_current_time] = lambda: current_time
     app.include_router(sessions_router)
 
+    return app
+
+
+@pytest.fixture
+def client(app: FastAPI) -> TestClient:
+    """Get an TestClient for /sessions route testing."""
     return TestClient(app)
 
 
-def test_create_session(
+@pytest.fixture
+async def async_client(
+    loop: AbstractEventLoop,
+    app: FastAPI,
+) -> AsyncIterator[AsyncClient]:
+    """Get an asynchronous client for /sessions route testing."""
+    async with AsyncClient(app=app, base_url="http://test") as client:
+        yield client
+
+
+async def test_create_session(
     decoy: Decoy,
-    session_builder: SessionBuilder,
+    session_view: SessionView,
     session_store: SessionStore,
+    engine_store: EngineStore,
     unique_id: str,
     current_time: datetime,
-    client: TestClient,
+    async_client: AsyncClient,
 ) -> None:
-    """It should be able to create a basic session from an empty POST request."""
-    session_data = CreateBasicSessionData()
-    session_entry = SessionStoreEntry(
+    """It should be able to create a basic session."""
+    session = SessionResource(
         session_id=unique_id,
-        session_data=session_data,
         created_at=current_time,
-        inputs=[],
+        create_data=BasicSessionCreateData(),
+        actions=[],
     )
-    expected_session = BasicSession(id=unique_id, createdAt=current_time, inputs=[])
+    expected_response = BasicSession(
+        id=unique_id,
+        createdAt=current_time,
+        controlCommands=[],
+    )
 
     decoy.when(
-        session_store.create(
-            session_data=session_data,
+        session_view.as_resource(
+            create_data=BasicSessionCreateData(),
             session_id=unique_id,
             created_at=current_time,
         )
-    ).then_return(session_entry)
+    ).then_return(session)
 
     decoy.when(
-        session_builder.build(
-            session_data=session_data,
+        session_view.as_response(session=session),
+    ).then_return(expected_response)
+
+    response = await async_client.post(
+        "/sessions",
+        json={"data": {"sessionType": "basic"}},
+    )
+
+    verify_response(response, expected_status=201, expected_data=expected_response)
+
+    # TODO(mc, 2021-05-27): spec the initialize method to return actual data
+    decoy.verify(
+        await engine_store.create(),
+        session_store.upsert(session=session),
+    )
+
+
+async def test_create_session_conflict(
+    decoy: Decoy,
+    session_view: SessionView,
+    session_store: SessionStore,
+    engine_store: EngineStore,
+    unique_id: str,
+    current_time: datetime,
+    async_client: AsyncClient,
+) -> None:
+    """It should respond with a conflict error if multiple engines are created."""
+    session = SessionResource(
+        session_id=unique_id,
+        create_data=BasicSessionCreateData(),
+        created_at=current_time,
+        actions=[],
+    )
+
+    decoy.when(
+        session_view.as_resource(
+            create_data=None,
             session_id=unique_id,
             created_at=current_time,
-            inputs=[],
         )
-    ).then_return(expected_session)
+    ).then_return(session)
 
-    response = client.post("/sessions", json={"data": {"sessionType": "basic"}})
+    decoy.when(await engine_store.create()).then_raise(EngineConflictError("oh no"))
 
-    verify_response(response, expected_status=201, expected_data=expected_session)
+    response = await async_client.post("/sessions")
+
+    verify_response(
+        response,
+        expected_status=409,
+        expected_errors=SessionAlreadyActive(detail="oh no"),
+    )
 
 
 def test_get_session(
     decoy: Decoy,
-    session_builder: SessionBuilder,
+    session_view: SessionView,
     session_store: SessionStore,
     client: TestClient,
 ) -> None:
     """It should be able to get a session by ID."""
     created_at = datetime.now()
-    session_data = CreateBasicSessionData()
-    session_entry = SessionStoreEntry(
+    create_data = BasicSessionCreateData()
+    session = SessionResource(
         session_id="session-id",
-        session_data=session_data,
+        create_data=create_data,
         created_at=created_at,
-        inputs=[],
+        actions=[],
     )
-    expected_session = BasicSession(id="session-id", createdAt=created_at, inputs=[])
+    expected_response = BasicSession(
+        id="session-id",
+        createdAt=created_at,
+        controlCommands=[],
+    )
 
-    decoy.when(session_store.get(session_id="session-id")).then_return(session_entry)
-
+    decoy.when(session_store.get(session_id="session-id")).then_return(session)
     decoy.when(
-        session_builder.build(
-            session_id="session-id",
-            session_data=session_data,
-            created_at=created_at,
-            inputs=[],
-        )
-    ).then_return(expected_session)
+        session_view.as_response(session=session),
+    ).then_return(expected_response)
 
     response = client.get("/sessions/session-id")
 
-    verify_response(response, expected_status=200, expected_data=expected_session)
+    verify_response(response, expected_status=200, expected_data=expected_response)
 
 
 def test_get_session_with_missing_id(
@@ -178,7 +226,7 @@ def test_get_sessions_empty(
 
 def test_get_sessions_not_empty(
     decoy: Decoy,
-    session_builder: SessionBuilder,
+    session_view: SessionView,
     session_store: SessionStore,
     client: TestClient,
 ) -> None:
@@ -186,50 +234,60 @@ def test_get_sessions_not_empty(
     created_at_1 = datetime.now()
     created_at_2 = datetime.now()
 
-    entry_1 = SessionStoreEntry(
-        session_id="unique-id-1", session_data=None, created_at=created_at_1, inputs=[]
+    session_1 = SessionResource(
+        session_id="unique-id-1",
+        create_data=BasicSessionCreateData(),
+        created_at=created_at_1,
+        actions=[],
     )
-    entry_2 = SessionStoreEntry(
-        session_id="unique-id-2", session_data=None, created_at=created_at_2, inputs=[]
+    session_2 = SessionResource(
+        session_id="unique-id-2",
+        create_data=BasicSessionCreateData(),
+        created_at=created_at_2,
+        actions=[],
     )
 
-    session_1 = BasicSession(id="unique-id-1", createdAt=created_at_1, inputs=[])
-    session_2 = BasicSession(id="unique-id-2", createdAt=created_at_2, inputs=[])
+    response_1 = BasicSession(
+        id="unique-id-1",
+        createdAt=created_at_1,
+        controlCommands=[],
+    )
+    response_2 = BasicSession(
+        id="unique-id-2",
+        createdAt=created_at_2,
+        controlCommands=[],
+    )
 
-    decoy.when(session_store.get_all()).then_return([entry_1, entry_2])
+    decoy.when(session_store.get_all()).then_return([session_1, session_2])
 
     decoy.when(
-        session_builder.build(
-            session_id="unique-id-1",
-            session_data=None,
-            created_at=created_at_1,
-            inputs=[],
-        )
-    ).then_return(session_1)
+        session_view.as_response(session=session_1),
+    ).then_return(response_1)
 
     decoy.when(
-        session_builder.build(
-            session_id="unique-id-2",
-            session_data=None,
-            created_at=created_at_2,
-            inputs=[],
-        )
-    ).then_return(session_2)
+        session_view.as_response(session=session_2),
+    ).then_return(response_2)
 
     response = client.get("/sessions")
 
-    verify_response(response, expected_status=200, expected_data=[session_1, session_2])
+    verify_response(
+        response, expected_status=200, expected_data=[response_1, response_2]
+    )
 
 
 def test_delete_session_by_id(
     decoy: Decoy,
     session_store: SessionStore,
+    engine_store: EngineStore,
     client: TestClient,
 ) -> None:
     """It should be able to remove a session by ID."""
     response = client.delete("/sessions/unique-id")
 
-    decoy.verify(session_store.remove(session_id="unique-id"))
+    decoy.verify(
+        engine_store.clear(),
+        session_store.remove(session_id="unique-id"),
+    )
 
     assert response.status_code == 200
     assert response.json()["data"] is None
@@ -254,41 +312,58 @@ def test_delete_session_with_bad_id(
     )
 
 
-def test_create_session_input(
+@pytest.mark.xfail(raises=NotImplementedError)
+def test_create_session_action(
     decoy: Decoy,
+    session_view: SessionView,
     session_store: SessionStore,
-    session_runner: SessionRunner,
     unique_id: str,
     current_time: datetime,
     client: TestClient,
 ) -> None:
     """It should handle a start input."""
-    expected_input = SessionInput(
-        inputType=SessionInputType.START,
+    session_created_at = datetime.now()
+
+    actions = SessionAction(
+        controlType=SessionActionType.START,
         createdAt=current_time,
         id=unique_id,
     )
 
-    decoy.when(
-        session_store.create_input(
-            session_id="session-id",
-            input_id=unique_id,
-            input_data=CreateSessionInputData(inputType=SessionInputType.START),
-            created_at=current_time,
-        ),
-    ).then_return(expected_input)
-
-    response = client.post(
-        "/sessions/session-id/inputs",
-        json={"data": {"inputType": "start"}},
+    prev_session = SessionResource(
+        session_id="unique-id",
+        create_data=BasicSessionCreateData(),
+        created_at=session_created_at,
+        actions=[],
     )
 
-    decoy.verify(session_runner.trigger_input_effects(input=expected_input))
+    next_session = SessionResource(
+        session_id="unique-id",
+        create_data=BasicSessionCreateData(),
+        created_at=session_created_at,
+        actions=[actions],
+    )
 
-    verify_response(response, expected_status=201, expected_data=expected_input)
+    decoy.when(session_store.get(session_id="session-id")).then_return(prev_session)
+
+    decoy.when(
+        session_view.with_action(
+            session=prev_session,
+            action_id=unique_id,
+            action_data=SessionActionCreateData(controlType=SessionActionType.START),
+            created_at=current_time,
+        ),
+    ).then_return((actions, next_session))
+
+    response = client.post(
+        "/sessions/session-id/actions",
+        json={"data": {"controlType": "start"}},
+    )
+
+    verify_response(response, expected_status=201, expected_data=actions)
 
 
-def test_create_session_input_with_missing_id(
+def test_create_session_action_with_missing_id(
     decoy: Decoy,
     session_store: SessionStore,
     unique_id: str,
@@ -298,18 +373,11 @@ def test_create_session_input_with_missing_id(
     """It should 404 if the session ID does not exist."""
     not_found_error = SessionNotFoundError(session_id="session-id")
 
-    decoy.when(
-        session_store.create_input(
-            session_id="session-id",
-            input_id=unique_id,
-            input_data=CreateSessionInputData(inputType=SessionInputType.START),
-            created_at=current_time,
-        ),
-    ).then_raise(not_found_error)
+    decoy.when(session_store.get(session_id="session-id")).then_raise(not_found_error)
 
     response = client.post(
-        "/sessions/session-id/inputs",
-        json={"data": {"inputType": "start"}},
+        "/sessions/session-id/actions",
+        json={"data": {"controlType": "start"}},
     )
 
     verify_response(
