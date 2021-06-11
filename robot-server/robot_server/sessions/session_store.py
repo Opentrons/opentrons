@@ -36,11 +36,12 @@ class SessionStore:
         """Initialize a SessionStore and its in-memory storage."""
         self._sessions_by_id: Dict[str, SessionResource] = {}
 
-    def add(self, session: SessionResource) -> SessionResource:
-        """Add a session resource to the store.
+    def upsert(self, session: SessionResource) -> SessionResource:
+        """Insert or update a session resource in the store.
 
         Arguments:
-            session: Session resource to store.
+            session: Session resource to store. Reads `session.id` to
+                determine identity in storage.
 
         Returns:
             The resource that was added to the store.

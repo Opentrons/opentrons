@@ -13,16 +13,20 @@ from .session_models import (
 )
 
 
-class SessionBuilder:
-    """Interface to construct session resource models from data."""
+class SessionView:
+    """Interface to build session model instances from data.
+
+    Resources consumed and returned by this class will be treated as
+    immutable.
+    """
 
     @staticmethod
-    def create(
+    def as_resource(
         session_id: str,
         created_at: datetime,
         create_data: Optional[SessionCreateData],
     ) -> SessionResource:
-        """Create a new session resource.
+        """Create a new session resource instance from its create data.
 
         Arguments:
             session_id: Unique identifier.
@@ -30,7 +34,8 @@ class SessionBuilder:
             create_data: Data used to create the session.
 
         Returns:
-            The created session entry in the store.
+            The session in its internal resource representation, for use in
+                the `SessionStore` and other classes.
         """
         return SessionResource(
             session_id=session_id,
@@ -40,29 +45,29 @@ class SessionBuilder:
         )
 
     @staticmethod
-    def create_actions(
+    def with_action(
         session: SessionResource,
-        actions_id: str,
-        actions_data: SessionActionCreateData,
+        action_id: str,
+        action_data: SessionActionCreateData,
         created_at: datetime,
     ) -> Tuple[SessionAction, SessionResource]:
-        """Create a new session control command resource.
+        """Create a new session control action resource instance.
 
         Arguments:
             session: The session resource to add the command to.
-            actions_id: Unique ID to assign to the command resource.
-            actions_data: Data used to create the command resource.
+            action_id: Unique ID to assign to the command resource.
+            action_data: Data used to create the command resource.
             created_at: Resource creation timestamp.
 
         Returns:
-            A tuple of the created SessionAction resource and the
-            updated SessionResource.
+            A tuple of the created SessionAction resource and an
+            updated copy of the passed in SessionResource.
 
         """
         actions = SessionAction(
-            id=actions_id,
+            id=action_id,
             createdAt=created_at,
-            controlType=actions_data.controlType,
+            controlType=action_data.controlType,
         )
 
         updated_session = replace(
@@ -73,14 +78,14 @@ class SessionBuilder:
         return actions, updated_session
 
     @staticmethod
-    def to_response(session: SessionResource) -> Session:
-        """Build a session resource model.
+    def as_response(session: SessionResource) -> Session:
+        """Transform a session resource into its public response model.
 
         Arguments:
-            entry: Stored session data from the SessionStore.
+            session: Internal resource representation of the session.
 
         Returns:
-            Session model representing the resource.
+            Session response model representing the same resource.
         """
         create_data = session.create_data
 

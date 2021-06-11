@@ -3,7 +3,7 @@ import pytest
 from datetime import datetime
 
 from robot_server.sessions.session_store import SessionResource
-from robot_server.sessions.session_builder import SessionBuilder
+from robot_server.sessions.session_view import SessionView
 from robot_server.sessions.session_models import (
     Session,
     BasicSession,
@@ -17,18 +17,13 @@ from robot_server.sessions.action_models import (
 )
 
 
-@pytest.fixture
-def subject() -> SessionBuilder:
-    """Get an instance of the SessionBuilder test subject."""
-    return SessionBuilder()
-
-
-def test_create_session_resource_from_none(subject: SessionBuilder) -> None:
+def test_create_session_resource_from_none() -> None:
     """It should create a basic session from create_data=None."""
     created_at = datetime.now()
     create_data = None
 
-    result = subject.create(
+    subject = SessionView()
+    result = subject.as_resource(
         session_id="session-id",
         create_data=create_data,
         created_at=created_at,
@@ -42,12 +37,13 @@ def test_create_session_resource_from_none(subject: SessionBuilder) -> None:
     )
 
 
-def test_create_session_resource(subject: SessionBuilder) -> None:
+def test_create_session_resource() -> None:
     """It should create a session with create_data specified."""
     created_at = datetime.now()
     create_data = BasicSessionCreateData()
 
-    result = subject.create(
+    subject = SessionView()
+    result = subject.as_resource(
         session_id="session-id",
         create_data=create_data,
         created_at=created_at,
@@ -85,17 +81,14 @@ current_time = datetime.now()
 def test_to_response(
     session_resource: SessionResource,
     expected_response: Session,
-    subject: SessionBuilder,
 ) -> None:
     """It should create a BasicSession if session_data is None."""
-    assert subject.to_response(session_resource) == expected_response
+    subject = SessionView()
+    assert subject.as_response(session_resource) == expected_response
 
 
-def test_create_actions(
-    current_time: datetime,
-    subject: SessionBuilder,
-) -> None:
-    """It should create a control command and add it to the session."""
+def test_create_action(current_time: datetime) -> None:
+    """It should create a control action and add it to the session."""
     session_created_at = datetime.now()
 
     session = SessionResource(
@@ -109,14 +102,15 @@ def test_create_actions(
         controlType=SessionActionType.START,
     )
 
-    actions_result, session_result = subject.create_actions(
+    subject = SessionView()
+    action_result, session_result = subject.with_action(
         session=session,
-        actions_id="control-command-id",
-        actions_data=command_data,
+        action_id="control-command-id",
+        action_data=command_data,
         created_at=current_time,
     )
 
-    assert actions_result == SessionAction(
+    assert action_result == SessionAction(
         id="control-command-id",
         createdAt=current_time,
         controlType=SessionActionType.START,
@@ -126,5 +120,5 @@ def test_create_actions(
         session_id="session-id",
         create_data=BasicSessionCreateData(),
         created_at=session_created_at,
-        actions=[actions_result],
+        actions=[action_result],
     )

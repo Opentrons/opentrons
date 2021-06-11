@@ -14,7 +14,7 @@ from robot_server.service.json_api import (
 )
 
 from .session_store import SessionStore, SessionNotFoundError
-from .session_builder import SessionBuilder
+from .session_view import SessionView
 from .session_models import Session, SessionCreateData
 from .action_models import SessionAction, SessionActionCreateData
 from .engine_store import EngineStore, EngineConflictError
@@ -44,10 +44,13 @@ class SessionAlreadyActive(ErrorDetails):
     description="Create a new session to track robot interaction.",
     status_code=status.HTTP_201_CREATED,
     response_model=ResponseModel[Session],
+    responses={
+        status.HTTP_409_CONFLICT: {"model": ErrorResponse[SessionAlreadyActive]}
+    },
 )
 async def create_session(
     request_body: Optional[RequestModel[SessionCreateData]] = None,
-    session_builder: SessionBuilder = Depends(SessionBuilder),
+    session_view: SessionView = Depends(SessionView),
     session_store: SessionStore = Depends(get_session_store),
     engine_store: EngineStore = Depends(get_engine_store),
     session_id: str = Depends(get_unique_id),
@@ -57,14 +60,14 @@ async def create_session(
 
     Arguments:
         request_body: Optional request body with session creation data.
-        session_builder: Session model construction interface.
+        session_view: Session model construction interface.
         session_store: Session storage interface.
         engine_store: ProtocolEngine storage and control.
         session_id: Generated ID to assign to the session.
         created_at: Timestamp to attach to created session
     """
     create_data = request_body.data if request_body is not None else None
-    session = session_builder.create(
+    session = session_view.as_resource(
         session_id=session_id,
         created_at=created_at,
         create_data=create_data,
@@ -76,8 +79,8 @@ async def create_session(
     except EngineConflictError as e:
         raise SessionAlreadyActive(detail=str(e)).as_error(status.HTTP_409_CONFLICT)
 
-    session_store.add(session=session)
-    data = session_builder.to_response(session=session)
+    session_store.upsert(session=session)
+    data = session_view.as_response(session=session)
 
     return ResponseModel(data=data)
 
@@ -90,18 +93,17 @@ async def create_session(
     response_model=MultiResponseModel[Session],
 )
 async def get_sessions(
-    session_builder: SessionBuilder = Depends(SessionBuilder),
+    session_view: SessionView = Depends(SessionView),
     session_store: SessionStore = Depends(get_session_store),
 ) -> MultiResponseModel[Session]:
     """Get all sessions.
 
     Args:
-        session_builder: Session model construction interface.
+        session_view: Session model construction interface.
         session_store: Session storage interface
     """
     data = [
-        session_builder.to_response(session=session)
-        for session in session_store.get_all()
+        session_view.as_response(session=session) for session in session_store.get_all()
     ]
 
     return MultiResponseModel(data=data)
@@ -117,14 +119,14 @@ async def get_sessions(
 )
 async def get_session(
     sessionId: str,
-    session_builder: SessionBuilder = Depends(SessionBuilder),
+    session_view: SessionView = Depends(SessionView),
     session_store: SessionStore = Depends(get_session_store),
 ) -> ResponseModel[Session]:
     """Get a session by its ID.
 
     Args:
         sessionId: Session ID pulled from URL
-        session_builder: Session model construction interface.
+        session_view: Session model construction interface.
         session_store: Session storage interface
     """
     try:
@@ -132,7 +134,7 @@ async def get_session(
     except SessionNotFoundError as e:
         raise SessionNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
 
-    data = session_builder.to_response(session=session)
+    data = session_view.as_response(session=session)
 
     return ResponseModel(data=data)
 
@@ -158,7 +160,7 @@ async def remove_session_by_id(
         engine_store: ProtocolEngine storage and control.
     """
     try:
-        engine_store.remove()
+        engine_store.clear()
         session_store.remove(session_id=sessionId)
     except SessionNotFoundError as e:
         raise SessionNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
@@ -179,28 +181,28 @@ async def remove_session_by_id(
 async def create_session_action(
     sessionId: str,
     request_body: RequestModel[SessionActionCreateData],
-    session_builder: SessionBuilder = Depends(SessionBuilder),
+    session_view: SessionView = Depends(SessionView),
     session_store: SessionStore = Depends(get_session_store),
-    actions_id: str = Depends(get_unique_id),
+    action_id: str = Depends(get_unique_id),
     created_at: datetime = Depends(get_current_time),
 ) -> ResponseModel[SessionAction]:
-    """Create a session control command.
+    """Create a session control action.
 
     Arguments:
         sessionId: Session ID pulled from the URL.
         request_body: Input payload from the request body.
-        session_builder: Resource model builder.
+        session_view: Resource model builder.
         session_store: Session storage interface.
-        actions_id: Generated ID to assign to the control command.
-        created_at: Timestamp to attach to the control command.
+        action_id: Generated ID to assign to the control action.
+        created_at: Timestamp to attach to the control action.
     """
     try:
         prev_session = session_store.get(session_id=sessionId)
 
-        actions, next_session = session_builder.create_actions(
+        actions, next_session = session_view.with_action(
             session=prev_session,
-            actions_id=actions_id,
-            actions_data=request_body.data,
+            action_id=action_id,
+            action_data=request_body.data,
             created_at=created_at,
         )
 
@@ -209,6 +211,6 @@ async def create_session_action(
     except SessionNotFoundError as e:
         raise SessionNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
 
-    session_store.add(session=next_session)
+    session_store.upsert(session=next_session)
 
     return ResponseModel(data=actions)

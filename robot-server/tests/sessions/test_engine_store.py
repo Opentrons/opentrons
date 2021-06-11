@@ -1,4 +1,4 @@
-"""Integration tests for the EngineStore interface."""
+"""Tests for the EngineStore interface."""
 import pytest
 from mock import MagicMock
 
@@ -13,6 +13,8 @@ from robot_server.sessions.engine_store import (
 @pytest.fixture
 def subject() -> EngineStore:
     """Get a EngineStore test subject."""
+    # TODO(mc, 2021-06-11): to make these test more effective and valuable, we
+    # should pass in some sort of actual, valid HardwareAPI instead of a mock
     return EngineStore(hardware_api=MagicMock())
 
 
@@ -20,6 +22,7 @@ async def test_create_engine(subject: EngineStore) -> None:
     """It should create an engine."""
     result = await subject.create()
 
+    assert result == subject.engine
     assert isinstance(result, ProtocolEngine)
     assert isinstance(subject.engine, ProtocolEngine)
 
@@ -38,10 +41,15 @@ def test_raise_if_engine_does_not_exist(subject: EngineStore) -> None:
         subject.engine
 
 
-async def test_remove_engine(subject: EngineStore) -> None:
-    """It should remove a stored engine entry."""
+async def test_clear_engine(subject: EngineStore) -> None:
+    """It should clear a stored engine entry."""
     await subject.create()
-    subject.remove()
+    subject.clear()
 
     with pytest.raises(EngineMissingError):
         subject.engine
+
+
+async def test_clear_engine_noop(subject: EngineStore) -> None:
+    """It should noop if clear called and no stored engine entry."""
+    subject.clear()

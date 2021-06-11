@@ -64,6 +64,6 @@ class EngineStore:
 
         return engine
 
-    def remove(self) -> None:
-        """Remove the persisted ProtocolEngine."""
+    def clear(self) -> None:
+        """Remove the persisted ProtocolEngine, if present, no-op otherwise."""
         self._engine = None

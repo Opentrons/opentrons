@@ -9,8 +9,8 @@ from httpx import AsyncClient
 from typing import AsyncIterator
 
 from robot_server.errors import exception_handlers
-from robot_server.sessions.session_builder import (
-    SessionBuilder,
+from robot_server.sessions.session_view import (
+    SessionView,
     BasicSessionCreateData,
 )
 from robot_server.sessions.session_models import BasicSession
@@ -44,14 +44,14 @@ from ..helpers import verify_response
 @pytest.fixture
 def app(
     session_store: SessionStore,
-    session_builder: SessionBuilder,
+    session_view: SessionView,
     engine_store: EngineStore,
     unique_id: str,
     current_time: datetime,
 ) -> FastAPI:
     """Get a FastAPI app with /sessions routes and mocked-out dependencies."""
     app = FastAPI(exception_handlers=exception_handlers)
-    app.dependency_overrides[SessionBuilder] = lambda: session_builder
+    app.dependency_overrides[SessionView] = lambda: session_view
     app.dependency_overrides[get_session_store] = lambda: session_store
     app.dependency_overrides[get_engine_store] = lambda: engine_store
     app.dependency_overrides[get_unique_id] = lambda: unique_id
@@ -79,7 +79,7 @@ async def async_client(
 
 async def test_create_session(
     decoy: Decoy,
-    session_builder: SessionBuilder,
+    session_view: SessionView,
     session_store: SessionStore,
     engine_store: EngineStore,
     unique_id: str,
@@ -100,7 +100,7 @@ async def test_create_session(
     )
 
     decoy.when(
-        session_builder.create(
+        session_view.as_resource(
             create_data=BasicSessionCreateData(),
             session_id=unique_id,
             created_at=current_time,
@@ -108,7 +108,7 @@ async def test_create_session(
     ).then_return(session)
 
     decoy.when(
-        session_builder.to_response(session=session),
+        session_view.as_response(session=session),
     ).then_return(expected_response)
 
     response = await async_client.post(
@@ -121,13 +121,13 @@ async def test_create_session(
     # TODO(mc, 2021-05-27): spec the initialize method to return actual data
     decoy.verify(
         await engine_store.create(),
-        session_store.add(session=session),
+        session_store.upsert(session=session),
     )
 
 
 async def test_create_session_conflict(
     decoy: Decoy,
-    session_builder: SessionBuilder,
+    session_view: SessionView,
     session_store: SessionStore,
     engine_store: EngineStore,
     unique_id: str,
@@ -143,7 +143,7 @@ async def test_create_session_conflict(
     )
 
     decoy.when(
-        session_builder.create(
+        session_view.as_resource(
             create_data=None,
             session_id=unique_id,
             created_at=current_time,
@@ -163,7 +163,7 @@ async def test_create_session_conflict(
 
 def test_get_session(
     decoy: Decoy,
-    session_builder: SessionBuilder,
+    session_view: SessionView,
     session_store: SessionStore,
     client: TestClient,
 ) -> None:
@@ -184,7 +184,7 @@ def test_get_session(
 
     decoy.when(session_store.get(session_id="session-id")).then_return(session)
     decoy.when(
-        session_builder.to_response(session=session),
+        session_view.as_response(session=session),
     ).then_return(expected_response)
 
     response = client.get("/sessions/session-id")
@@ -226,7 +226,7 @@ def test_get_sessions_empty(
 
 def test_get_sessions_not_empty(
     decoy: Decoy,
-    session_builder: SessionBuilder,
+    session_view: SessionView,
     session_store: SessionStore,
     client: TestClient,
 ) -> None:
@@ -261,11 +261,11 @@ def test_get_sessions_not_empty(
     decoy.when(session_store.get_all()).then_return([session_1, session_2])
 
     decoy.when(
-        session_builder.to_response(session=session_1),
+        session_view.as_response(session=session_1),
     ).then_return(response_1)
 
     decoy.when(
-        session_builder.to_response(session=session_2),
+        session_view.as_response(session=session_2),
     ).then_return(response_2)
 
     response = client.get("/sessions")
@@ -285,7 +285,7 @@ def test_delete_session_by_id(
     response = client.delete("/sessions/unique-id")
 
     decoy.verify(
-        engine_store.remove(),
+        engine_store.clear(),
         session_store.remove(session_id="unique-id"),
     )
 
@@ -315,7 +315,7 @@ def test_delete_session_with_bad_id(
 @pytest.mark.xfail(raises=NotImplementedError)
 def test_create_session_action(
     decoy: Decoy,
-    session_builder: SessionBuilder,
+    session_view: SessionView,
     session_store: SessionStore,
     unique_id: str,
     current_time: datetime,
@@ -347,10 +347,10 @@ def test_create_session_action(
     decoy.when(session_store.get(session_id="session-id")).then_return(prev_session)
 
     decoy.when(
-        session_builder.create_actions(
+        session_view.with_action(
             session=prev_session,
-            actions_id=unique_id,
-            actions_data=SessionActionCreateData(controlType=SessionActionType.START),
+            action_id=unique_id,
+            action_data=SessionActionCreateData(controlType=SessionActionType.START),
             created_at=current_time,
         ),
     ).then_return((actions, next_session))
