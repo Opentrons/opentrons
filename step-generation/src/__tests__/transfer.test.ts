@@ -8,6 +8,7 @@ import {
   dropTipHelper,
   getErrorResult,
   getFlowRateAndOffsetParamsTransferLike,
+  FlowRateAndOffsetParamsTransferlike,
   getRobotStateWithTipStandard,
   getSuccessResult,
   makeAirGapHelper,
@@ -37,8 +38,26 @@ const touchTipHelper = makeTouchTipHelper()
 
 let invariantContext: InvariantContext
 let robotStateWithTip: RobotState
-let mixinArgs: Partial<TransferArgs>
-
+let mixinArgs: Pick<
+  TransferArgs,
+  | 'commandCreatorFnName'
+  | 'name'
+  | 'description'
+  | 'pipette'
+  | 'sourceLabware'
+  | 'destLabware'
+  | 'preWetTip'
+  | 'touchTipAfterAspirate'
+  | 'mixBeforeAspirate'
+  | 'aspirateDelay'
+  | 'dispenseDelay'
+  | 'aspirateAirGapVolume'
+  | 'dispenseAirGapVolume'
+  | 'touchTipAfterDispense'
+  | 'mixInDestination'
+  | 'blowoutLocation'
+> &
+  FlowRateAndOffsetParamsTransferlike
 beforeEach(() => {
   mixinArgs = {
     ...getFlowRateAndOffsetParamsTransferLike(),
@@ -56,6 +75,7 @@ beforeEach(() => {
     aspirateDelay: null,
     dispenseDelay: null,
     aspirateAirGapVolume: null,
+    dispenseAirGapVolume: null,
     touchTipAfterDispense: false,
     mixInDestination: null,
     blowoutLocation: null,
@@ -66,7 +86,7 @@ beforeEach(() => {
 })
 
 describe('pick up tip if no tip on pipette', () => {
-  let noTipArgs: TransferArgs
+  let noTipArgs: Omit<TransferArgs, 'changeTip'>
 
   beforeEach(() => {
     noTipArgs = {
@@ -74,22 +94,24 @@ describe('pick up tip if no tip on pipette', () => {
       sourceWells: ['A1'],
       destWells: ['B2'],
       volume: 30,
-    } as TransferArgs
+    }
 
     // no tip on pipette
     robotStateWithTip.tipState.pipettes.p300SingleId = false
   })
 
-  const changeTipOptions = ['once', 'always']
+  const changeTipOptions = ['once', 'always'] as const
 
   changeTipOptions.forEach(changeTip => {
     it(`...${changeTip}`, () => {
-      noTipArgs = {
-        ...noTipArgs,
-        changeTip,
-      } as TransferArgs
-
-      const result = transfer(noTipArgs, invariantContext, robotStateWithTip)
+      const result = transfer(
+        {
+          ...noTipArgs,
+          changeTip,
+        },
+        invariantContext,
+        robotStateWithTip
+      )
       const res = getSuccessResult(result)
 
       expect(res.commands[0]).toEqual(pickUpTipHelper('A1'))
@@ -97,12 +119,14 @@ describe('pick up tip if no tip on pipette', () => {
   })
 
   it('...never (should not pick up tip, and fail)', () => {
-    noTipArgs = {
-      ...noTipArgs,
-      changeTip: 'never',
-    }
-
-    const result = transfer(noTipArgs, invariantContext, robotStateWithTip)
+    const result = transfer(
+      {
+        ...noTipArgs,
+        changeTip: 'never',
+      },
+      invariantContext,
+      robotStateWithTip
+    )
     const res = getErrorResult(result)
 
     expect(res.errors).toHaveLength(1)
@@ -113,7 +137,7 @@ describe('pick up tip if no tip on pipette', () => {
 })
 
 test('single transfer: 1 source & 1 dest', () => {
-  mixinArgs = {
+  const args: TransferArgs = {
     ...mixinArgs,
     sourceWells: ['A1'],
     destWells: ['B2'],
@@ -125,11 +149,7 @@ test('single transfer: 1 source & 1 dest', () => {
     '0': { volume: 200 },
   }
 
-  const result = transfer(
-    mixinArgs as TransferArgs,
-    invariantContext,
-    robotStateWithTip
-  )
+  const result = transfer(args, invariantContext, robotStateWithTip)
   const res = getSuccessResult(result)
   expect(res.commands).toEqual([
     aspirateHelper('A1', 30),
@@ -138,18 +158,14 @@ test('single transfer: 1 source & 1 dest', () => {
 })
 
 test('transfer with multiple sets of wells', () => {
-  mixinArgs = {
+  const args: TransferArgs = {
     ...mixinArgs,
     sourceWells: ['A1', 'A2'],
     destWells: ['B2', 'C2'],
     changeTip: 'never',
     volume: 30,
   }
-  const result = transfer(
-    mixinArgs as TransferArgs,
-    invariantContext,
-    robotStateWithTip
-  )
+  const result = transfer(args, invariantContext, robotStateWithTip)
   const res = getSuccessResult(result)
   expect(res.commands).toEqual([
     aspirateHelper('A1', 30),
@@ -163,7 +179,7 @@ test('transfer with multiple sets of wells', () => {
 })
 
 test('invalid pipette ID should throw error', () => {
-  mixinArgs = {
+  const args: TransferArgs = {
     ...mixinArgs,
     sourceWells: ['A1'],
     destWells: ['B1'],
@@ -172,11 +188,7 @@ test('invalid pipette ID should throw error', () => {
     pipette: 'no-such-pipette-id-here',
   }
 
-  const result = transfer(
-    mixinArgs as TransferArgs,
-    invariantContext,
-    robotStateWithTip
-  )
+  const result = transfer(args, invariantContext, robotStateWithTip)
   const res = getErrorResult(result)
 
   expect(res.errors).toHaveLength(1)
@@ -186,7 +198,7 @@ test('invalid pipette ID should throw error', () => {
 })
 
 test('invalid labware ID should throw error', () => {
-  mixinArgs = {
+  const args: TransferArgs = {
     ...mixinArgs,
     sourceLabware: 'no-such-labware-id-here',
     sourceWells: ['A1'],
@@ -195,11 +207,7 @@ test('invalid labware ID should throw error', () => {
     changeTip: 'always',
   }
 
-  const result = transfer(
-    mixinArgs as TransferArgs,
-    invariantContext,
-    robotStateWithTip
-  )
+  const result = transfer(args, invariantContext, robotStateWithTip)
   const res = getErrorResult(result)
 
   expect(res.errors).toHaveLength(1)
@@ -209,15 +217,15 @@ test('invalid labware ID should throw error', () => {
 })
 
 describe('single transfer exceeding pipette max', () => {
-  let transferArgs: TransferArgs
+  let noTipArgs: Omit<TransferArgs, 'changeTip'>
 
   beforeEach(() => {
-    transferArgs = {
+    noTipArgs = {
       ...mixinArgs,
       sourceWells: ['A1', 'B1'],
       destWells: ['A3', 'B3'],
       volume: 350,
-    } as TransferArgs
+    }
     // tip setup: tiprack's A1 has tip, pipette has no tip
     robotStateWithTip.tipState.tipracks.tiprack1Id.A1 = true
     robotStateWithTip.tipState.pipettes.p300SingleId = false
@@ -231,12 +239,12 @@ describe('single transfer exceeding pipette max', () => {
   })
 
   it('changeTip="once"', () => {
-    transferArgs = {
-      ...transferArgs,
+    const args: TransferArgs = {
+      ...noTipArgs,
       changeTip: 'once',
     }
 
-    const result = transfer(transferArgs, invariantContext, robotStateWithTip)
+    const result = transfer(args, invariantContext, robotStateWithTip)
     const res = getSuccessResult(result)
     expect(res.commands).toEqual([
       pickUpTipHelper('A1'),
@@ -252,12 +260,12 @@ describe('single transfer exceeding pipette max', () => {
   })
 
   it('changeTip="always"', () => {
-    transferArgs = {
-      ...transferArgs,
+    const args: TransferArgs = {
+      ...noTipArgs,
       changeTip: 'always',
     }
 
-    const result = transfer(transferArgs, invariantContext, robotStateWithTip)
+    const result = transfer(args, invariantContext, robotStateWithTip)
     const res = getSuccessResult(result)
     expect(res.commands).toEqual([
       pickUpTipHelper('A1'),
@@ -289,14 +297,14 @@ describe('single transfer exceeding pipette max', () => {
   })
 
   it('changeTip="perSource"', () => {
-    transferArgs = {
-      ...transferArgs,
+    const args: TransferArgs = {
+      ...noTipArgs,
       sourceWells: ['A1', 'A1', 'A2'],
       destWells: ['B1', 'B2', 'B2'],
       changeTip: 'perSource',
     }
 
-    const result = transfer(transferArgs, invariantContext, robotStateWithTip)
+    const result = transfer(args, invariantContext, robotStateWithTip)
     const res = getSuccessResult(result)
     expect(res.commands).toEqual([
       pickUpTipHelper('A1'),
@@ -328,14 +336,14 @@ describe('single transfer exceeding pipette max', () => {
 
   it('changeTip="perDest"', () => {
     // NOTE: same wells as perSource test
-    transferArgs = {
-      ...transferArgs,
+    const args: TransferArgs = {
+      ...noTipArgs,
       sourceWells: ['A1', 'A1', 'A2'],
       destWells: ['B1', 'B2', 'B2'],
       changeTip: 'perDest',
     }
 
-    const result = transfer(transferArgs, invariantContext, robotStateWithTip)
+    const result = transfer(args, invariantContext, robotStateWithTip)
     const res = getSuccessResult(result)
     expect(res.commands).toEqual([
       pickUpTipHelper('A1'),
@@ -367,14 +375,14 @@ describe('single transfer exceeding pipette max', () => {
   })
 
   it('changeTip="never"', () => {
-    transferArgs = {
-      ...transferArgs,
+    const args: TransferArgs = {
+      ...noTipArgs,
       changeTip: 'never',
     }
     // begin with tip on pipette
     robotStateWithTip.tipState.pipettes.p300SingleId = true
 
-    const result = transfer(transferArgs, invariantContext, robotStateWithTip)
+    const result = transfer(args, invariantContext, robotStateWithTip)
     const res = getSuccessResult(result)
     expect(res.commands).toEqual([
       // no pick up tip
@@ -393,8 +401,8 @@ describe('single transfer exceeding pipette max', () => {
   })
 
   it('split up volume without going below pipette min', () => {
-    transferArgs = {
-      ...transferArgs,
+    const args: TransferArgs = {
+      ...noTipArgs,
       volume: 629,
       changeTip: 'never', // don't test tip use here
     }
@@ -402,7 +410,7 @@ describe('single transfer exceeding pipette max', () => {
     // begin with tip on pipette
     robotStateWithTip.tipState.pipettes.p300SingleId = true
 
-    const result = transfer(transferArgs, invariantContext, robotStateWithTip)
+    const result = transfer(args, invariantContext, robotStateWithTip)
     const res = getSuccessResult(result)
     expect(res.commands).toEqual([
       aspirateHelper('A1', 300),
@@ -425,25 +433,25 @@ describe('single transfer exceeding pipette max', () => {
 })
 
 describe('advanced options', () => {
-  let advArgs: TransferArgs
+  let noVolumeArgs: Omit<TransferArgs, 'volume'>
 
   beforeEach(() => {
-    advArgs = {
+    noVolumeArgs = {
       ...mixinArgs,
       sourceWells: ['A1'],
       destWells: ['B1'],
       changeTip: 'never',
-    } as TransferArgs
+    }
   })
   describe('...aspirate options', () => {
     it('pre-wet tip should aspirate and dispense the transfer volume from source well of each subtransfer', () => {
-      advArgs = {
-        ...advArgs,
+      const args: TransferArgs = {
+        ...noVolumeArgs,
         volume: 350,
         preWetTip: true,
       }
 
-      const result = transfer(advArgs, invariantContext, robotStateWithTip)
+      const result = transfer(args, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
         // pre-wet aspirate/dispense
@@ -463,14 +471,14 @@ describe('advanced options', () => {
     })
 
     it('pre-wet tip should use the aspirate delay when specified', () => {
-      advArgs = {
-        ...advArgs,
+      const args: TransferArgs = {
+        ...noVolumeArgs,
         volume: 350,
         preWetTip: true,
         aspirateDelay: { mmFromBottom: 14, seconds: 12 },
       }
 
-      const result = transfer(advArgs, invariantContext, robotStateWithTip)
+      const result = transfer(args, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
         // pre-wet aspirate/dispense
@@ -493,14 +501,14 @@ describe('advanced options', () => {
     })
 
     it('pre-wet tip should use the dispense delay when specified', () => {
-      advArgs = {
-        ...advArgs,
+      const args: TransferArgs = {
+        ...noVolumeArgs,
         volume: 350,
         preWetTip: true,
         dispenseDelay: { mmFromBottom: 14, seconds: 12 },
       }
 
-      const result = transfer(advArgs, invariantContext, robotStateWithTip)
+      const result = transfer(args, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
         // pre-wet aspirate/dispense
@@ -523,13 +531,13 @@ describe('advanced options', () => {
     })
 
     it('should touchTip after aspirate on each source well, for every aspirate', () => {
-      advArgs = {
-        ...advArgs,
+      const args: TransferArgs = {
+        ...noVolumeArgs,
         volume: 350,
         touchTipAfterAspirate: true,
       }
 
-      const result = transfer(advArgs, invariantContext, robotStateWithTip)
+      const result = transfer(args, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
         aspirateHelper('A1', 300),
@@ -543,13 +551,13 @@ describe('advanced options', () => {
     })
 
     it('should touchTip after dispense on each dest well, for every dispense', () => {
-      advArgs = {
-        ...advArgs,
+      const args: TransferArgs = {
+        ...noVolumeArgs,
         volume: 350,
         touchTipAfterDispense: true,
       }
 
-      const result = transfer(advArgs, invariantContext, robotStateWithTip)
+      const result = transfer(args, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
         aspirateHelper('A1', 300),
@@ -563,8 +571,8 @@ describe('advanced options', () => {
     })
 
     it('should mix before aspirate', () => {
-      advArgs = {
-        ...advArgs,
+      const args: TransferArgs = {
+        ...noVolumeArgs,
         volume: 350,
         mixBeforeAspirate: {
           volume: 250,
@@ -588,7 +596,7 @@ describe('advanced options', () => {
         }),
       ]
 
-      const result = transfer(advArgs, invariantContext, robotStateWithTip)
+      const result = transfer(args, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
         ...mixCommands,
@@ -601,8 +609,8 @@ describe('advanced options', () => {
       ])
     })
     it('should delay after mix aspirate and regular aspirate', () => {
-      advArgs = {
-        ...advArgs,
+      const args: TransferArgs = {
+        ...noVolumeArgs,
         volume: 350,
         mixBeforeAspirate: {
           volume: 250,
@@ -629,7 +637,7 @@ describe('advanced options', () => {
         }),
       ]
 
-      const result = transfer(advArgs, invariantContext, robotStateWithTip)
+      const result = transfer(args, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
         ...mixCommandsWithDelays,
@@ -645,13 +653,13 @@ describe('advanced options', () => {
     })
 
     it('should delay after aspirate', () => {
-      advArgs = {
-        ...advArgs,
+      const args: TransferArgs = {
+        ...noVolumeArgs,
         volume: 350,
         aspirateDelay: { seconds: 12, mmFromBottom: 14 },
       }
 
-      const result = transfer(advArgs, invariantContext, robotStateWithTip)
+      const result = transfer(args, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
         aspirateHelper('A1', 300),
@@ -665,13 +673,13 @@ describe('advanced options', () => {
     })
 
     it('should air gap after aspirate', () => {
-      advArgs = {
-        ...advArgs,
+      const args: TransferArgs = {
+        ...noVolumeArgs,
         volume: 350,
         aspirateAirGapVolume: 5,
       }
 
-      const result = transfer(advArgs, invariantContext, robotStateWithTip)
+      const result = transfer(args, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
         aspirateHelper('A1', 295),
@@ -686,13 +694,13 @@ describe('advanced options', () => {
       ])
     })
     it('should air gap after aspirate and break into two chunks', () => {
-      advArgs = {
-        ...advArgs,
+      const args: TransferArgs = {
+        ...noVolumeArgs,
         volume: 300,
         aspirateAirGapVolume: 5,
       }
 
-      const result = transfer(advArgs, invariantContext, robotStateWithTip)
+      const result = transfer(args, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
         aspirateHelper('A1', 150),
@@ -707,14 +715,14 @@ describe('advanced options', () => {
       ])
     })
     it('should delay after air gap aspirate and regular aspirate', () => {
-      advArgs = {
-        ...advArgs,
+      const args: TransferArgs = {
+        ...noVolumeArgs,
         volume: 350,
         aspirateAirGapVolume: 5,
         aspirateDelay: { seconds: 12, mmFromBottom: 14 },
       }
 
-      const result = transfer(advArgs, invariantContext, robotStateWithTip)
+      const result = transfer(args, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
         aspirateHelper('A1', 295),
@@ -737,14 +745,14 @@ describe('advanced options', () => {
       ])
     })
     it('should delay after air gap dispense and regular dispense', () => {
-      advArgs = {
-        ...advArgs,
+      const args: TransferArgs = {
+        ...noVolumeArgs,
         volume: 350,
         aspirateAirGapVolume: 5,
         dispenseDelay: { seconds: 12, mmFromBottom: 14 },
       }
 
-      const result = transfer(advArgs, invariantContext, robotStateWithTip)
+      const result = transfer(args, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
         aspirateHelper('A1', 295),
@@ -769,8 +777,8 @@ describe('advanced options', () => {
 
   describe('...dispense options', () => {
     it('should mix after dispense', () => {
-      advArgs = {
-        ...advArgs,
+      const args: TransferArgs = {
+        ...noVolumeArgs,
         volume: 350,
         mixInDestination: {
           volume: 250,
@@ -794,7 +802,7 @@ describe('advanced options', () => {
         dispenseHelper('B1', 250),
       ]
 
-      const result = transfer(advArgs, invariantContext, robotStateWithTip)
+      const result = transfer(args, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
         aspirateHelper('A1', 300),
@@ -807,8 +815,8 @@ describe('advanced options', () => {
       ])
     })
     it('should delay after mix dispense and after dispense', () => {
-      advArgs = {
-        ...advArgs,
+      const args: TransferArgs = {
+        ...noVolumeArgs,
         volume: 350,
         mixInDestination: {
           volume: 250,
@@ -840,7 +848,7 @@ describe('advanced options', () => {
         delayCommand(12),
       ]
 
-      const result = transfer(advArgs, invariantContext, robotStateWithTip)
+      const result = transfer(args, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
         aspirateHelper('A1', 300),
@@ -858,13 +866,13 @@ describe('advanced options', () => {
     })
 
     it('should delay after dispense', () => {
-      advArgs = {
-        ...advArgs,
+      const args: TransferArgs = {
+        ...noVolumeArgs,
         volume: 350,
         dispenseDelay: { seconds: 12, mmFromBottom: 14 },
       }
 
-      const result = transfer(advArgs, invariantContext, robotStateWithTip)
+      const result = transfer(args, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
         aspirateHelper('A1', 300),
@@ -879,9 +887,9 @@ describe('advanced options', () => {
   })
 
   describe('all advanced settings enabled', () => {
-    let allArgs: TransferArgs
+    let noTipArgs: Omit<TransferArgs, 'changeTip'>
     beforeEach(() => {
-      allArgs = {
+      noTipArgs = {
         ...mixinArgs,
         sourceWells: ['A1'],
         destWells: ['B1'],
@@ -906,15 +914,15 @@ describe('advanced options', () => {
         blowoutFlowRateUlSec: 2.3,
         blowoutOffsetFromTopMm: 3.3,
         dispenseAirGapVolume: 3,
-      } as TransferArgs
+      }
     })
 
     it('should create commands in the expected order with expected params (blowout in trash)', () => {
-      const args = {
-        ...allArgs,
+      const args: TransferArgs = {
+        ...noTipArgs,
         changeTip: 'never',
         blowoutLocation: 'trashId',
-      } as TransferArgs
+      }
       const result = transfer(args, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
@@ -1382,11 +1390,11 @@ describe('advanced options', () => {
     })
 
     it('should create commands in the expected order with expected params (blowout in dest well, reuse tip)', () => {
-      const args = {
-        ...allArgs,
+      const args: TransferArgs = {
+        ...noTipArgs,
         changeTip: 'never',
         blowoutLocation: DEST_WELL_BLOWOUT_DESTINATION,
-      } as TransferArgs
+      }
 
       const result = transfer(args, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
@@ -1857,11 +1865,11 @@ describe('advanced options', () => {
     })
 
     it('should create commands in the expected order with expected params (blowout in dest well, change tip perSource)', () => {
-      const args = {
-        ...allArgs,
+      const args: TransferArgs = {
+        ...noTipArgs,
         changeTip: 'perSource',
         blowoutLocation: DEST_WELL_BLOWOUT_DESTINATION,
-      } as TransferArgs
+      }
 
       const result = transfer(args, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
@@ -2349,11 +2357,11 @@ describe('advanced options', () => {
     })
 
     it('should create commands in the expected order with expected params (blowout in source well, change tip each aspirate)', () => {
-      const args = {
-        ...allArgs,
+      const args: TransferArgs = {
+        ...noTipArgs,
         changeTip: 'always',
         blowoutLocation: SOURCE_WELL_BLOWOUT_DESTINATION,
-      } as TransferArgs
+      }
 
       const result = transfer(args, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
