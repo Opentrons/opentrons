@@ -4,7 +4,6 @@
   --c-font-light: white;
   --c-font-disabled: #9c9c9c;
   --fs-huge: 3rem;
-  --fs-big: 2.25rem;
   --fs-header: 1.125rem;
   --fs-default: 1rem;
   --fs-body-2: 0.875rem;
@@ -100,7 +99,7 @@
     color: var(--c-med-gray);
   };
 
-  --font-code-dark: {
+  --font-code: {
     font-family: var(--ff-code);
     font-size: var(--fs-body-1);
     font-weight: var(--fw-regular);

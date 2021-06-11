@@ -339,11 +339,11 @@ class API(HardwareAPILike):
         await self._wait_for_is_running()
         self.pause(PauseType.DELAY)
         try:
-            if not self.is_simulator:
-                async def sleep_for_seconds(seconds: float):
-                    await asyncio.sleep(seconds)
-                delay_task = self._loop.create_task(sleep_for_seconds(duration_s))
-                await self._execution_manager.register_cancellable_task(delay_task)
+            async def sleep_for_seconds(seconds: float):
+                await asyncio.sleep(seconds)
+
+            delay_task = self._loop.create_task(sleep_for_seconds(duration_s))
+            await self._execution_manager.register_cancellable_task(delay_task)
         finally:
             self.resume(PauseType.DELAY)
 
