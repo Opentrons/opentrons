@@ -9,7 +9,7 @@
   margin: 0.5rem;
 }
 
-.start_time {
+.subheading {
   padding: var(--run-panel-padding);
   margin-bottom: 0.5rem;
   font-size: var(--fs-body-2);
@@ -17,19 +17,7 @@
   text-transform: uppercase;
 }
 
-.run_time {
-  padding: var(--run-panel-padding);
-  font-weight: var(--fw-semibold);
-  font-size: var(--fs-big);
-  color: var(--c-med-gray);
-  text-transform: uppercase;
-
-  & > p {
-    font-size: var(--fs-body-2);
-  }
-}
-
-.pause_time {
+.bold_heading {
   padding: var(--run-panel-padding);
   font-weight: var(--fw-semibold);
   font-size: var(--fs-huge);
