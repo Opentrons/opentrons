@@ -49,19 +49,19 @@ context('Reservoirs', () => {
     it('tests footprint', () => {
       cy.get("input[name='footprintXDimension']").type('150').blur()
       cy.contains(
-        'Your labware is not compatible with the Labware Creator'
+        'Your labware is too large to fit in a single slot properly. Please fill out this form to request a custom labware definition.'
       ).should('exist')
       cy.get("input[name='footprintXDimension']").clear().type('127').blur()
       cy.contains(
-        'Your labware is not compatible with the Labware Creator'
+        'Your labware is too large to fit in a single slot properly. Please fill out this form to request a custom labware definition.'
       ).should('not.exist')
       cy.get("input[name='footprintYDimension']").type('150').blur()
       cy.contains(
-        'Your labware is not compatible with the Labware Creator'
+        'Your labware is too large to fit in a single slot properly. Please fill out this form to request a custom labware definition.'
       ).should('exist')
       cy.get("input[name='footprintYDimension']").clear().type('85').blur()
       cy.contains(
-        'Your labware is not compatible with the Labware Creator'
+        'Your labware is too large to fit in a single slot properly. Please fill out this form to request a custom labware definition.'
       ).should('not.exist')
     })
 
@@ -118,9 +118,9 @@ context('Reservoirs', () => {
 
     it('tests volume', () => {
       cy.get("input[name='wellVolume']").focus().blur()
-      cy.contains('Max volume per well must be a number').should('exist')
+      cy.contains('Volume must be a number').should('exist')
       cy.get("input[name='wellVolume']").type('250').blur()
-      cy.contains('Max volume per well must be a number').should('not.exist')
+      cy.contains('Volume must be a number').should('not.exist')
     })
 
     describe('Well shape tests', () => {

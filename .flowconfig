@@ -16,6 +16,7 @@
 .*/node_modules/.*
 <PROJECT_ROOT>/components/flow-types/.*
 <PROJECT_ROOT>/shared-data/flow-types/.*
+<PROJECT_ROOT>/step-generation/flow-types/.*
 
 [include]
 

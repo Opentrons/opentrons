@@ -1,75 +1,47 @@
 import React from 'react'
 import { FormikConfig } from 'formik'
-import isEqual from 'lodash/isEqual'
-import { when } from 'jest-when'
+import { when, resetAllWhenMocks } from 'jest-when'
 import { render, screen } from '@testing-library/react'
 import { getDefaultFormState, LabwareFields } from '../../../fields'
 import { isEveryFieldHidden } from '../../../utils'
 import { WellSpacing } from '../../sections/WellSpacing'
-import { FormAlerts } from '../../alerts/FormAlerts'
-import { TextField } from '../../TextField'
 import { wrapInFormik } from '../../utils/wrapInFormik'
 
 jest.mock('../../../utils')
-jest.mock('../../TextField')
-jest.mock('../../alerts/FormAlerts')
-
-const FormAlertsMock = FormAlerts as jest.MockedFunction<typeof FormAlerts>
-
-const textFieldMock = TextField as jest.MockedFunction<typeof TextField>
 
 const isEveryFieldHiddenMock = isEveryFieldHidden as jest.MockedFunction<
   typeof isEveryFieldHidden
 >
 
-const formikConfig: FormikConfig<LabwareFields> = {
-  initialValues: getDefaultFormState(),
-  onSubmit: jest.fn(),
-}
+let formikConfig: FormikConfig<LabwareFields>
 
 describe('WellSpacing', () => {
   beforeEach(() => {
-    textFieldMock.mockImplementation(args => {
-      if (args.name === 'gridSpacingX') {
-        return <div>gridSpacingX text field</div>
-      }
-      if (args.name === 'gridSpacingY') {
-        return <div>gridSpacingY text field</div>
-      } else {
-        return <div></div>
-      }
-    })
+    formikConfig = {
+      initialValues: getDefaultFormState(),
+      onSubmit: jest.fn(),
+    }
 
-    FormAlertsMock.mockImplementation(args => {
-      if (
-        isEqual(args, {
-          touched: {},
-          errors: {},
-          fieldList: ['gridSpacingX', 'gridSpacingY'],
-        })
-      ) {
-        return <div>mock alerts</div>
-      } else {
-        return <div></div>
-      }
-    })
+    when(isEveryFieldHiddenMock)
+      .calledWith(['gridSpacingX', 'gridSpacingY'], expect.any(Object))
+      .mockReturnValue(false)
   })
 
   afterEach(() => {
     jest.restoreAllMocks()
+    resetAllWhenMocks()
   })
 
   it('should render when fields are visible', () => {
     render(wrapInFormik(<WellSpacing />, formikConfig))
-    expect(screen.getByText('Well Spacing'))
-    expect(screen.getByText('mock alerts'))
-    expect(
-      screen.getByText(
-        'Well spacing measurements inform the robot how far away rows and columns are from each other.'
-      )
+    screen.getByRole('heading', { name: /Well Spacing/i })
+
+    screen.getByText(
+      'Well spacing measurements inform the robot how far away rows and columns are from each other.'
     )
-    expect(screen.getByText('gridSpacingX text field'))
-    expect(screen.getByText('gridSpacingX text field'))
+
+    screen.getByRole('textbox', { name: /X Spacing \(Xs\)/i })
+    screen.getByRole('textbox', { name: /Y Spacing \(Ys\)/i })
   })
 
   it('should NOT render when the labware type is aluminumBlock', () => {
@@ -101,8 +73,17 @@ describe('WellSpacing', () => {
     when(isEveryFieldHiddenMock)
       .calledWith(['gridSpacingX', 'gridSpacingY'], formikConfig.initialValues)
       .mockReturnValue(true)
-
     const { container } = render(wrapInFormik(<WellSpacing />, formikConfig))
     expect(container.firstChild).toBe(null)
+  })
+
+  it('should render alert when error is present', () => {
+    const FAKE_ERROR = 'ahh'
+    formikConfig.initialErrors = { gridSpacingX: FAKE_ERROR }
+    formikConfig.initialTouched = { gridSpacingX: true }
+    render(wrapInFormik(<WellSpacing />, formikConfig))
+
+    // TODO(IL, 2021-05-26): AlertItem should have role="alert", then we can `getByRole('alert', {name: FAKE_ERROR})`
+    screen.getByText(FAKE_ERROR)
   })
 })

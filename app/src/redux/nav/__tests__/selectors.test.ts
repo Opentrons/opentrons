@@ -1,5 +1,6 @@
 import noop from 'lodash/noop'
 
+import * as ConfigSelectors from '../../config/selectors'
 import * as CalibrationSelectors from '../../calibration/selectors'
 import * as DiscoverySelectors from '../../discovery/selectors'
 import * as PipetteSelectors from '../../pipettes/selectors'
@@ -23,6 +24,7 @@ interface SelectorSpec {
   expected: unknown
 }
 
+jest.mock('../../config/selectors')
 jest.mock('../../calibration/selectors')
 jest.mock('../../discovery/selectors')
 jest.mock('../../pipettes/selectors')
@@ -31,6 +33,9 @@ jest.mock('../../system-info/selectors')
 jest.mock('../../shell')
 jest.mock('../../robot/selectors')
 
+const mockGetFeatureFlags = ConfigSelectors.getFeatureFlags as jest.MockedFunction<
+  typeof ConfigSelectors.getFeatureFlags
+>
 const mockGetConnectedRobot = DiscoverySelectors.getConnectedRobot as jest.MockedFunction<
   typeof DiscoverySelectors.getConnectedRobot
 >
@@ -116,6 +121,11 @@ describe('nav selectors', () => {
   const mockRobot: Robot = { mockRobot: true, name: 'mock-robot' } as any
 
   beforeEach(() => {
+    mockGetFeatureFlags.mockReturnValue({
+      allPipetteConfig: false,
+      enableBundleUpload: false,
+      preProtocolFlowWithoutRPC: false,
+    })
     mockGetConnectedRobot.mockReturnValue(null)
     mockGetProtocolPipettesMatching.mockReturnValue(false)
     mockGetProtocolPipettesCalibrated.mockReturnValue(false)
@@ -415,6 +425,25 @@ describe('nav selectors', () => {
         EXPECTED_ROBOTS,
         { ...EXPECTED_UPLOAD, disabledReason: null },
         EXPECTED_CALIBRATE,
+        EXPECTED_RUN,
+        EXPECTED_MORE,
+      ],
+    },
+    {
+      name:
+        'getNavbarLocations with feature flag for HTTP based pre-protocol flow',
+      selector: Selectors.getNavbarLocations,
+      before: () => {
+        mockGetFeatureFlags.mockReturnValue({
+          allPipetteConfig: false,
+          enableBundleUpload: false,
+          preProtocolFlowWithoutRPC: true,
+        })
+        mockGetConnectedRobot.mockReturnValue(mockRobot)
+      },
+      expected: [
+        EXPECTED_ROBOTS,
+        { ...EXPECTED_UPLOAD, disabledReason: null },
         EXPECTED_RUN,
         EXPECTED_MORE,
       ],

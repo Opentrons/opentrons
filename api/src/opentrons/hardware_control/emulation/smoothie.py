@@ -14,6 +14,7 @@ from opentrons.drivers.smoothie_drivers.driver_3_0 import GCODE
 from opentrons.hardware_control.emulation.parser import Command, Parser
 
 from .abstract_emulator import AbstractEmulator
+from .settings import SmoothieSettings
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +24,7 @@ class SmoothieEmulator(AbstractEmulator):
 
     WRITE_INSTRUMENT_RE = re.compile(r"(?P<mount>[LR])\s*(?P<value>[a-f0-9]+)")
 
-    def __init__(self, parser: Parser) -> None:
+    def __init__(self, parser: Parser, settings: SmoothieSettings) -> None:
         """Constructor"""
         _, fw_version = _find_smoothie_file()
         self._version_string = \
@@ -41,12 +42,12 @@ class SmoothieEmulator(AbstractEmulator):
         }
         self._speed = 0.0
         self._pipette_model = {
-            "L": utils.string_to_hex("p20_multi_v2.0", 64),
-            "R": utils.string_to_hex("p20_single_v2.0", 64)
+            "L": utils.string_to_hex(settings.left.model, 64),
+            "R": utils.string_to_hex(settings.right.model, 64)
         }
         self._pipette_id = {
-            "L": utils.string_to_hex("P3HMV202020041605", 64),
-            "R": utils.string_to_hex("P20SV202020070101", 64),
+            "L": utils.string_to_hex(settings.left.id, 64),
+            "R": utils.string_to_hex(settings.right.id, 64),
         }
         self._parser = parser
 

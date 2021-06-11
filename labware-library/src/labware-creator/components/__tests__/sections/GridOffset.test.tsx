@@ -1,7 +1,7 @@
 import React from 'react'
 import { FormikConfig } from 'formik'
 import isEqual from 'lodash/isEqual'
-import { when } from 'jest-when'
+import { when, resetAllWhenMocks } from 'jest-when'
 import { render, screen } from '@testing-library/react'
 import { nestedTextMatcher } from '../../__testUtils__/nestedTextMatcher'
 import { getDefaultFormState, LabwareFields } from '../../../fields'
@@ -57,6 +57,7 @@ describe('GridOffset', () => {
 
   afterEach(() => {
     jest.restoreAllMocks()
+    resetAllWhenMocks()
   })
 
   it('should render when fields are visible', () => {
@@ -86,6 +87,24 @@ describe('GridOffset', () => {
     getByText(
       nestedTextMatcher(
         "Find the measurement from the center of the top left-most well to the edge of the labware's footprint."
+      )
+    )
+  })
+
+  it('should update instructions when tipRack is selected', () => {
+    const { getByText } = render(
+      wrapInFormik(<GridOffset />, {
+        ...formikConfig,
+        initialValues: {
+          ...formikConfig.initialValues,
+          labwareType: 'tipRack',
+        },
+      })
+    )
+
+    getByText(
+      nestedTextMatcher(
+        "Find the measurement from the center of tip A1 to the edge of the labware's footprint."
       )
     )
   })

@@ -1,6 +1,6 @@
 """Tests for the /sessions router."""
 import pytest
-from datetime import datetime, timezone
+from datetime import datetime
 from decoy import Decoy
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
@@ -34,12 +34,6 @@ from ..helpers import verify_response
 
 
 @pytest.fixture
-def decoy() -> Decoy:
-    """Get a Decoy state container."""
-    return Decoy()
-
-
-@pytest.fixture
 def session_store(decoy: Decoy) -> SessionStore:
     """Get a fake SessionStore interface."""
     return decoy.create_decoy(spec=SessionStore)
@@ -55,18 +49,6 @@ def session_builder(decoy: Decoy) -> SessionBuilder:
 def session_runner(decoy: Decoy) -> SessionRunner:
     """Get a fake SessionRunner interface."""
     return decoy.create_decoy(spec=SessionRunner)
-
-
-@pytest.fixture
-def unique_id() -> str:
-    """Get a fake unique identifier."""
-    return "unique-id"
-
-
-@pytest.fixture
-def current_time() -> datetime:
-    """Get a fake current time."""
-    return datetime(year=2021, month=1, day=1, tzinfo=timezone.utc)
 
 
 @pytest.fixture

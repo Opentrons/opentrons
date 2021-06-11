@@ -1,8 +1,8 @@
 import * as React from 'react'
-import styles from '../Section.css'
+import styles from './SectionBody.css'
 
 interface Props {
-  children: JSX.Element
+  children: React.ReactNode
   headingClassName?: string
   label: string
   id?: string

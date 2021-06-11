@@ -55,15 +55,7 @@ export const Height = (): JSX.Element | null => {
 
   return (
     <div className={styles.new_definition_section}>
-      <SectionBody
-        label={
-          // @ts-expect-error(IL, 2021-03-24): `includes` doesn't want to take null/undefined
-          ['aluminumBlock', 'tubeRack'].includes(values.labwareType)
-            ? 'Total Height'
-            : 'Height'
-        }
-        id="Height"
-      >
+      <SectionBody label="Total Height" id="Height">
         <>
           <FormAlerts touched={touched} errors={errors} fieldList={fieldList} />
           <HeightAlerts values={values} touched={touched} />

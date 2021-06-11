@@ -10,9 +10,10 @@ import pathlib
 import requests
 import pytest
 
-from mock import MagicMock
-from datetime import datetime
+from datetime import datetime, timezone
+from decoy import Decoy
 from fastapi import routing
+from mock import MagicMock
 from typing import Any, Dict
 
 from opentrons.protocols.context.protocol_api.labware import \
@@ -40,6 +41,30 @@ async def always_raise():
     raise RuntimeError
 
 app.include_router(test_router)
+
+
+@pytest.fixture
+def decoy() -> Decoy:
+    """Get a Decoy state container to clean up stubs after tests."""
+    return Decoy()
+
+
+@pytest.fixture
+def unique_id() -> str:
+    """Get a fake unique identifier.
+
+    Override robot_server.service.dependencies.get_unique_id
+    """
+    return "unique-id"
+
+
+@pytest.fixture
+def current_time() -> datetime:
+    """Get a fake current time.
+
+    Override robot_server.service.dependencies.get_current_time
+    """
+    return datetime(year=2021, month=1, day=1, tzinfo=timezone.utc)
 
 
 @pytest.fixture

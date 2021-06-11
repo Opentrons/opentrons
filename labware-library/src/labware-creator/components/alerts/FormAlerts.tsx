@@ -5,8 +5,11 @@ import { AlertItem } from '@opentrons/components'
 import {
   LabwareFields,
   IRREGULAR_LABWARE_ERROR,
+  LABWARE_TOO_SMALL_ERROR,
+  LABWARE_TOO_LARGE_ERROR,
   LOOSE_TIP_FIT_ERROR,
   LINK_CUSTOM_LABWARE_FORM,
+  LINK_REQUEST_ADAPTER_FORM,
 } from '../../fields'
 import { LinkOut } from '../LinkOut'
 
@@ -25,6 +28,32 @@ export const IrregularLabwareAlert = (): JSX.Element => (
         Your labware is not compatible with the Labware Creator. Please fill out{' '}
         <LinkOut href={LINK_CUSTOM_LABWARE_FORM}>this form</LinkOut> to request
         a custom labware definition.
+      </>
+    }
+  />
+)
+
+export const LabwareTooSmallAlert = (): JSX.Element => (
+  <AlertItem
+    type="error"
+    title={
+      <>
+        Your labware is too small to fit in a slot properly. Please fill out{' '}
+        <LinkOut href={LINK_REQUEST_ADAPTER_FORM}>this form</LinkOut> to request
+        an adapter.
+      </>
+    }
+  />
+)
+
+export const LabwareTooLargeAlert = (): JSX.Element => (
+  <AlertItem
+    type="error"
+    title={
+      <>
+        Your labware is too large to fit in a single slot properly. Please fill
+        out <LinkOut href={LINK_CUSTOM_LABWARE_FORM}>this form</LinkOut> to
+        request a custom labware definition.
       </>
     }
   />
@@ -59,7 +88,13 @@ export const FormAlerts = (props: Props): JSX.Element | null => {
         if (error === IRREGULAR_LABWARE_ERROR) {
           return <IrregularLabwareAlert key={error} />
         }
-        return <AlertItem key={error} type="warning" title={error} />
+        if (error === LABWARE_TOO_SMALL_ERROR) {
+          return <LabwareTooSmallAlert key={error} />
+        }
+        if (error === LABWARE_TOO_LARGE_ERROR) {
+          return <LabwareTooLargeAlert key={error} />
+        }
+        if (error) return <AlertItem key={error} type="warning" title={error} />
       })}
     </>
   )
