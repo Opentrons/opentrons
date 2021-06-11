@@ -64,7 +64,8 @@ async def test_create_engine_initializes_state_with_deck_geometry(
 
 
 async def test_execute_command_creates_command(
-    engine: ProtocolEngine, mock_state_store: MagicMock
+    engine: ProtocolEngine,
+    mock_state_store: MagicMock,
 ) -> None:
     """It should create a command in the state store when executing."""
     req = MoveToWellRequest(pipetteId="123", labwareId="abc", wellName="A1")
@@ -108,7 +109,8 @@ async def test_execute_command_adds_result_to_state(
 
     mock_req.get_implementation.return_value = mock_impl
     mock_impl.create_command.return_value = PendingCommand(
-        request=mock_req, created_at=now
+        request=mock_req,
+        created_at=now,
     )
     mock_impl.execute.return_value = result
 
@@ -141,7 +143,8 @@ async def test_execute_command_adds_error_to_state(
 
     mock_req.get_implementation.return_value = mock_impl
     mock_impl.create_command.return_value = PendingCommand(
-        request=mock_req, created_at=now
+        request=mock_req,
+        created_at=now,
     )
     mock_impl.execute.side_effect = error
 
