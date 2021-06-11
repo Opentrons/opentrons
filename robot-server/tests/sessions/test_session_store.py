@@ -26,6 +26,29 @@ def test_add_session() -> None:
     assert result == session
 
 
+def test_update_session() -> None:
+    """It should be able to update a session in the store."""
+    session = SessionResource(
+        session_id="identical-session-id",
+        create_data=BasicSessionCreateData(),
+        created_at=datetime(year=2021, month=1, day=1, hour=1, minute=1, second=1),
+        actions=[],
+    )
+    updated_session = SessionResource(
+        session_id="identical-session-id",
+        create_data=BasicSessionCreateData(),
+        created_at=datetime(year=2022, month=2, day=2, hour=2, minute=2, second=2),
+        actions=[],
+    )
+
+    subject = SessionStore()
+    subject.upsert(session)
+
+    result = subject.upsert(updated_session)
+
+    assert result == updated_session
+
+
 def test_get_session() -> None:
     """It can get a previously stored session entry."""
     session = SessionResource(

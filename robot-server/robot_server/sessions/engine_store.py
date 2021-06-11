@@ -55,6 +55,10 @@ class EngineStore:
         Raises:
             EngineConflictError: a ProtocolEngine is already present.
         """
+        # NOTE: this async. creation happens before the `self._engine`
+        # check intentially to avoid a race condition where `self._engine` is
+        # set after the check but before the engine has finished getting created,
+        # at the expense of having to potentially throw away an engine instance
         engine = await ProtocolEngine.create(hardware=self._hardware_api)
 
         if self._engine is not None:
