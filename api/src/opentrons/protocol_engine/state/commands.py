@@ -3,7 +3,7 @@ import typing
 from typing import List, Optional, Tuple
 import collections
 
-from ..commands import CommandType, CommandRequestType
+from ..commands import CommandType, CommandRequestType, PendingCommand, FailedCommand
 from .substore import Substore
 
 
@@ -21,8 +21,8 @@ class CommandState:
         return self._commands_by_id.get(uid)
 
     def get_all_commands(self) -> List[Tuple[str, CommandType]]:
-        """Get a list of all command entries in state.
-        
+        """Get a list of all commands in state, paired with their respective IDs.
+
         Entries are returned in the order of first-added command to last-added command.
         Replacing a command (to change its status, for example) keeps its place in the
         ordering.
@@ -30,12 +30,23 @@ class CommandState:
         return [entry for entry in self._commands_by_id.items()]
 
     def get_next_request(self) -> Optional[Tuple[str, CommandRequestType]]:
-        """Get the next pending request.
+        """Return the next request in line to be executed.
 
-        If there are no more pending requests, or if the last command failed,
-        return None instead.
+        Normally, this corresponds to the earliest-added command that's currently
+        pending.
+
+        But if any command added before that command is currently failed, None is
+        returned instead. This models the entire protocol stopping when any command
+        fails.
+
+        If there are no pending commands at all, returns None.
         """
-        raise NotImplementedError()
+        for command_id, command in self._commands_by_id.items():
+            if isinstance(command, FailedCommand):
+                return None
+            elif isinstance(command, PendingCommand):
+                return command_id, command.request
+        return None
 
 
 class CommandStore(Substore[CommandState]):
