@@ -150,7 +150,6 @@ export function client(dispatch) {
       rpcClient = null
     }
 
-    clearRunTimerInterval()
     remote = null
     dispatch(actions.disconnectResponse())
   }
@@ -392,7 +391,6 @@ export function client(dispatch) {
       .run()
       .then(() => dispatch(actions.runResponse()))
       .catch(error => dispatch(actions.runResponse(error)))
-      .then(() => clearRunTimerInterval())
   }
 
   function pause(state, action) {

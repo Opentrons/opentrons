@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useSelector, useStore } from 'react-redux'
+import { useSelector } from 'react-redux'
 import padStart from 'lodash/padStart'
 import { useInterval } from '@opentrons/components'
 import { State } from '../../../redux/types'
@@ -34,11 +34,12 @@ export function RunTimer(): JSX.Element {
    * Using a a timer to tick at a 1 second interval to update the run time and pause durations.
    */
   useInterval(() => setNow(Date.now()), 1000)
-  const pausedTime = formatSeconds(pausedSeconds)
   const runTime = formatSeconds(runSeconds)
   const startTime = startTimeMs != null ? format(startTimeMs, 'pp') : ''
+
   // TODO(CE) See styling suggestions: https://github.com/Opentrons/opentrons/pull/7885#discussion_r647334710
   const renderPaused = (): JSX.Element => {
+    const pausedTime = formatSeconds(pausedSeconds)
     return (
       <div>
         <div className={styles.bold_heading}>
