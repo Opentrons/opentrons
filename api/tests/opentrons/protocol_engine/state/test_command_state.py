@@ -14,6 +14,7 @@ from opentrons.protocol_engine.commands import (
     LoadLabwareRequest,
     LoadLabwareResult,
 )
+from opentrons.protocol_engine.state.commands import CommandState
 
 
 def _make_unique_requests(n: int) -> List[LoadLabwareRequest]:
@@ -80,22 +81,10 @@ def test_command_state_preserves_handle_order(  # noqa:D103
     ]
 
 
-# todo(mm, 2021-06-10): Not sure if this is the right way to initialize the queue
-# of commands for the purposes of this test.
-#
-# Options:
-#
-# * Manually initalize ._commands_by_id? ._commands_by_id is private (sort of), and
-#   touching private attributes in a test seems Bad.
-# * Add the commands through store.handle_command()? That would make this
-#   test partially redundant with test_state_store_handles_command(), which seems
-#   Bad.
-# * Mock out CommandState.get_all_commands() and avoid the need to initialize the
-#   queue of commands at all? That would mean CommandState is partially mocked out,
-#   which seems Bad.
 def test_get_next_request_returns_first_pending(  # noqa: D103
-    store: StateStore, now: datetime
+    now: datetime
 ) -> None:
+    subject = CommandState()
     running_command = RunningCommand[LoadLabwareRequest, LoadLabwareResult](
         created_at=now,
         started_at=now,
@@ -106,47 +95,46 @@ def test_get_next_request_returns_first_pending(  # noqa: D103
         request=_make_request()
     )
 
-    store.handle_command(running_command, "command-id-1")
-    store.handle_command(pending_command, "command-id-2")
-    # Skips running_command even though it came first.
-    assert store.commands.get_next_request() == (
+    # todo(mm, 2021-06-14): Add completed and failed, for thoroughness.
+    subject._commands_by_id["command-id-1"] = running_command
+    subject._commands_by_id["command-id-2"] = pending_command
+
+    # running_command should be skipped even though it came first.
+    assert subject.get_next_request() == (
         "command-id-2", pending_command.request
     )
 
 
 def test_get_next_request_returns_none_when_no_pending(  # noqa: D103
-    store: StateStore, now: datetime
+    now: datetime
 ) -> None:
-    assert store.commands.get_next_request() is None
-
-    store.handle_command(
-        RunningCommand[LoadLabwareRequest, LoadLabwareResult](
-            created_at=now,
-            started_at=now,
-            request=_make_request()
-        ),
-        "running-command-id"
+    subject = CommandState()
+    # todo(mm, 2021-06-11): We should throw a completed command in here too.
+    running_command = RunningCommand[LoadLabwareRequest, LoadLabwareResult](
+        created_at=now,
+        started_at=now,
+        request=_make_request()
     )
-    store.handle_command(
-        FailedCommand[LoadLabwareRequest](
-            created_at=now,
-            started_at=now,
-            failed_at=now,
-            error=ProtocolEngineError(),
-            request=_make_request()
-        ),
-        "failed-command-id"
+    failed_command = FailedCommand[LoadLabwareRequest](
+        created_at=now,
+        started_at=now,
+        failed_at=now,
+        error=ProtocolEngineError(),
+        request=_make_request()
     )
 
-    # todo(mm, 2021-06-11): We should throw a completed command in here too, but I'm
-    # skipping it because it's a pain to construct.
+    assert subject.get_next_request() is None
 
-    assert store.commands.get_next_request() is None
+    subject._commands_by_id["running-command-id"] = running_command
+    subject._commands_by_id["failed-command-id"] = failed_command
+
+    assert subject.get_next_request() is None
 
 
 def test_get_next_request_returns_none_when_earlier_command_failed(  # noqa: D103
-    store: StateStore, now: datetime
+    now: datetime
 ) -> None:
+    subject = CommandState()
     failed_command = FailedCommand[LoadLabwareRequest](
         created_at=now,
         started_at=now,
@@ -158,6 +146,7 @@ def test_get_next_request_returns_none_when_earlier_command_failed(  # noqa: D10
         created_at=now,
         request=_make_request()
     )
-    store.handle_command(failed_command, "command-id-1")
-    store.handle_command(pending_command, "command-id-2")
-    assert store.commands.get_next_request() is None
+    subject._commands_by_id["command-id-1"] = failed_command
+    subject._commands_by_id["command-id-2"] = pending_command
+
+    assert subject.get_next_request() is None
