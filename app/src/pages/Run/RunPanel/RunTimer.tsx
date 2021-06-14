@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import padStart from 'lodash/padStart'
 import { useInterval } from '@opentrons/components'
 import { State } from '../../../redux/types'
 import styles from './styles.css'
@@ -11,13 +10,7 @@ import {
   getStartTimeMs,
 } from '../../../redux/robot/selectors'
 import { format } from 'date-fns'
-
-function formatSeconds(runSeconds: number): string {
-  const hours = padStart(`${Math.floor(runSeconds / 3600)}`, 2, '0')
-  const minutes = padStart(`${Math.floor(runSeconds / 60) % 60}`, 2, '0')
-  const seconds = padStart(`${runSeconds % 60}`, 2, '0')
-  return `${hours}:${minutes}:${seconds}`
-}
+import { formatSeconds } from './utils'
 
 export function RunTimer(): JSX.Element {
   const [now, setNow] = React.useState(Date.now())
