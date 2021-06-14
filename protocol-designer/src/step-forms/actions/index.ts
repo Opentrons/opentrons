@@ -4,7 +4,7 @@ import { StepIdType, StepFieldName } from '../../form-types'
 import { BatchEditFormChangesState } from '../reducers'
 export * from './modules'
 export * from './pipettes'
-export type ChangeBatchEditFieldAction = {
+export interface ChangeBatchEditFieldAction {
   type: 'CHANGE_BATCH_EDIT_FIELD'
   payload: BatchEditFormChangesState
 }
@@ -14,14 +14,14 @@ export const changeBatchEditField = (
   type: 'CHANGE_BATCH_EDIT_FIELD',
   payload: args,
 })
-export type ResetBatchEditFieldChangesAction = {
+export interface ResetBatchEditFieldChangesAction {
   type: 'RESET_BATCH_EDIT_FIELD_CHANGES'
 }
 export const resetBatchEditFieldChanges = (): ResetBatchEditFieldChangesAction => ({
   type: 'RESET_BATCH_EDIT_FIELD_CHANGES',
 })
 type EditedFields = Record<StepFieldName, unknown>
-export type SaveStepFormsMultiAction = {
+export interface SaveStepFormsMultiAction {
   type: 'SAVE_STEP_FORMS_MULTI'
   payload: {
     stepIds: StepIdType[]
@@ -29,14 +29,14 @@ export type SaveStepFormsMultiAction = {
   }
 }
 export const saveStepFormsMulti: (
-  selectedStepIds: StepIdType[] | null
+  selectedStepIds?: StepIdType[]
 ) => ThunkAction<SaveStepFormsMultiAction> = selectedStepIds => (
   dispatch,
   getState
 ) => {
   const state = getState()
   const batchEditFieldChanges = getBatchEditFieldChanges(state)
-  const saveStepFormsMultiAction = {
+  const saveStepFormsMultiAction: SaveStepFormsMultiAction = {
     type: 'SAVE_STEP_FORMS_MULTI',
     payload: {
       editedFields: batchEditFieldChanges,

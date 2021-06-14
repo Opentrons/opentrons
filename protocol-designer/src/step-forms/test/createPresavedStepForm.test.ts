@@ -7,17 +7,19 @@ import {
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
-import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul'
+import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
 import { getStateAndContextTempTCModules } from '@opentrons/step-generation'
 import {
   DEFAULT_DELAY_SECONDS,
   DEFAULT_MM_FROM_BOTTOM_DISPENSE,
 } from '../../constants'
-import { CreatePresavedStepFormArgs } from '../utils/createPresavedStepForm'
-import { createPresavedStepForm } from '../utils/createPresavedStepForm'
+import {
+  createPresavedStepForm,
+  CreatePresavedStepFormArgs,
+} from '../utils/createPresavedStepForm'
 const stepId = 'stepId123'
 const EXAMPLE_ENGAGE_HEIGHT = '18'
-let defaultArgs
+let defaultArgs: any
 beforeEach(() => {
   const { robotState } = getStateAndContextTempTCModules({
     temperatureModuleId: 'someTemperatureModuleId',

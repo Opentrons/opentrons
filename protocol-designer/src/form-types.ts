@@ -131,7 +131,6 @@ export type PauseForm = AnnotationFields & {
 export type FormData = {
   stepType: StepType
   id: StepIdType // TODO: form value processing to ensure type
-
   [key: string]: any
 }
 export const PROFILE_CYCLE: 'profileCycle' = 'profileCycle'

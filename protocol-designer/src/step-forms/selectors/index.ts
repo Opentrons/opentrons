@@ -1,10 +1,9 @@
-import { ElementProps } from 'react'
 import assert from 'assert'
 import isEqual from 'lodash/isEqual'
 import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
 import isEmpty from 'lodash/isEmpty'
-import { createSelector } from 'reselect'
+import { createSelector, Selector } from 'reselect'
 import {
   getPipetteNameSpecs,
   getLabwareDisplayName,
@@ -12,6 +11,7 @@ import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  PipetteName,
 } from '@opentrons/shared-data'
 import { TEMPERATURE_DEACTIVATED } from '@opentrons/step-generation'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
@@ -20,8 +20,10 @@ import {
   getFormErrors,
   stepFormToArgs,
 } from '../../steplist/formLevel'
-import { ProfileFormError } from '../../steplist/formLevel/profileErrors'
-import { getProfileFormErrors } from '../../steplist/formLevel/profileErrors'
+import {
+  ProfileFormError,
+  getProfileFormErrors,
+} from '../../steplist/formLevel/profileErrors'
 import { hydrateField, getFieldErrors } from '../../steplist/fieldLevel'
 import { getProfileItemsHaveErrors } from '../utils/getProfileItemsHaveErrors'
 import * as featureFlagSelectors from '../../feature-flags/selectors'
@@ -29,13 +31,13 @@ import { denormalizePipetteEntities } from '../utils'
 import { LabwareDefByDefURI } from '../../labware-defs'
 import { selectors as labwareDefSelectors } from '../../labware-defs'
 import { i18n } from '../../localization'
-import { InstrumentGroup as InstrumentGroupProps } from '@opentrons/components'
-import {
+import { InstrumentGroup } from '@opentrons/components'
+import type {
   DropdownOption,
   Mount,
   InstrumentInfoProps,
 } from '@opentrons/components'
-import {
+import type {
   InvariantContext,
   LabwareEntity,
   LabwareEntities,
@@ -43,8 +45,8 @@ import {
   ModuleEntity,
   PipetteEntities,
 } from '@opentrons/step-generation'
-import { FormWarning } from '../../steplist/formLevel'
-import { BaseState, Selector, DeckSlot } from '../../types'
+import type { FormWarning } from '../../steplist/formLevel'
+import { BaseState, DeckSlot } from '../../types'
 import { FormData, StepIdType } from '../../form-types'
 import { StepArgsAndErrorsById, StepFormErrors } from '../../steplist/types'
 import {
@@ -71,7 +73,10 @@ const rootSelector = (state: BaseState): RootState => state.stepForms
 
 export const getPresavedStepForm = (state: BaseState): PresavedStepFormState =>
   rootSelector(state).presavedStepForm
-export const getCurrentFormIsPresaved: Selector<boolean> = createSelector(
+export const getCurrentFormIsPresaved: Selector<
+  BaseState,
+  boolean
+> = createSelector(
   getPresavedStepForm,
   presavedStepForm => presavedStepForm != null
 )
@@ -80,10 +85,10 @@ export const getCurrentFormIsPresaved: Selector<boolean> = createSelector(
 // the labware entity in its denormalized representation, in which case you ought
 // to use `getLabwareEntities` instead.
 // `_getNormalizedLabwareById` is intended for uses tied to the NormalizedLabware type
-const _getNormalizedLabwareById: Selector<NormalizedLabwareById> = createSelector(
-  rootSelector,
-  state => state.labwareInvariantProperties
-)
+const _getNormalizedLabwareById: Selector<
+  BaseState,
+  NormalizedLabwareById
+> = createSelector(rootSelector, state => state.labwareInvariantProperties)
 
 function _hydrateLabwareEntity(
   l: NormalizedLabware,
@@ -98,7 +103,10 @@ function _hydrateLabwareEntity(
   return { ...l, id: labwareId, def }
 }
 
-export const getLabwareEntities: Selector<LabwareEntities> = createSelector(
+export const getLabwareEntities: Selector<
+  BaseState,
+  LabwareEntities
+> = createSelector(
   _getNormalizedLabwareById,
   labwareDefSelectors.getLabwareDefsByURI,
   (normalizedLabwareById, labwareDefs) =>
@@ -119,33 +127,33 @@ export const _getLabwareEntitiesRootState: (
 )
 // Special version of `getModuleEntities` selector for use in step-forms reducers
 export const _getModuleEntitiesRootState: (
-  arg0: RootState
+  arg: RootState
 ) => ModuleEntities = rs => rs.moduleInvariantProperties
-export const getModuleEntities: Selector<ModuleEntities> = createSelector(
-  rootSelector,
-  _getModuleEntitiesRootState
-)
+export const getModuleEntities: Selector<
+  BaseState,
+  ModuleEntities
+> = createSelector(rootSelector, _getModuleEntitiesRootState)
 // Special version of `getPipetteEntities` selector for use in step-forms reducers
 export const _getPipetteEntitiesRootState: (
-  arg0: RootState
+  arg: RootState
 ) => PipetteEntities = createSelector(
   rs => rs.pipetteInvariantProperties,
   labwareDefSelectors._getLabwareDefsByIdRootState,
   denormalizePipetteEntities
 )
-export const getPipetteEntities: Selector<PipetteEntities> = createSelector(
-  rootSelector,
-  _getPipetteEntitiesRootState
-)
+export const getPipetteEntities: Selector<
+  BaseState,
+  PipetteEntities
+> = createSelector(rootSelector, _getPipetteEntitiesRootState)
 
 const _getInitialDeckSetupStepFormRootState: (
-  arg0: RootState
+  arg: RootState
 ) => FormData = rs => rs.savedStepForms[INITIAL_DECK_SETUP_STEP_ID]
 
-export const getInitialDeckSetupStepForm: Selector<FormData> = createSelector(
-  rootSelector,
-  _getInitialDeckSetupStepFormRootState
-)
+export const getInitialDeckSetupStepForm: Selector<
+  BaseState,
+  FormData
+> = createSelector(rootSelector, _getInitialDeckSetupStepFormRootState)
 const MAGNETIC_MODULE_INITIAL_STATE: MagneticModuleState = {
   type: MAGNETIC_MODULE_TYPE,
   engaged: false,
@@ -179,7 +187,7 @@ const _getInitialDeckSetup = (
   const pipetteLocations =
     (initialSetupStep && initialSetupStep.pipetteLocationUpdate) || {}
   return {
-    labware: mapValues(
+    labware: mapValues<{}, LabwareOnDeck>(
       labwareLocations,
       (slot: DeckSlot, labwareId: string): LabwareOnDeck => {
         return {
@@ -188,7 +196,7 @@ const _getInitialDeckSetup = (
         }
       }
     ),
-    modules: mapValues(
+    modules: mapValues<{}, ModuleOnDeck>(
       moduleLocations,
       (slot: DeckSlot, moduleId: string): ModuleOnDeck => {
         const moduleEntity = moduleEntities[moduleId]
@@ -220,7 +228,7 @@ const _getInitialDeckSetup = (
         }
       }
     ),
-    pipettes: mapValues(
+    pipettes: mapValues<{}, PipetteOnDeck>(
       pipetteLocations,
       (mount: Mount, pipetteId: string): PipetteOnDeck => {
         // $FlowFixMe(sa, 2021-05-10): PipetteEntities is inexact typed, so flow does not know that there will me a mount on pipetteEntities
@@ -230,7 +238,10 @@ const _getInitialDeckSetup = (
   }
 }
 
-export const getInitialDeckSetup: Selector<InitialDeckSetup> = createSelector(
+export const getInitialDeckSetup: Selector<
+  BaseState,
+  InitialDeckSetup
+> = createSelector(
   getInitialDeckSetupStepForm,
   getLabwareEntities,
   getPipetteEntities,
@@ -247,25 +258,28 @@ export const _getInitialDeckSetupRootState: (
   _getModuleEntitiesRootState,
   _getInitialDeckSetup
 )
-export const getPermittedTipracks: Selector<string[]> = createSelector(
-  getInitialDeckSetup,
-  initialDeckSetup =>
-    reduce(
-      initialDeckSetup.pipettes,
-      (acc: string[], pipette: PipetteOnDeck) => {
-        return pipette.tiprackDefURI ? [...acc, pipette.tiprackDefURI] : acc
-      },
-      []
-    )
+export const getPermittedTipracks: Selector<
+  BaseState,
+  string[]
+> = createSelector(getInitialDeckSetup, initialDeckSetup =>
+  reduce(
+    initialDeckSetup.pipettes,
+    (acc: string[], pipette: PipetteOnDeck) => {
+      return pipette.tiprackDefURI ? [...acc, pipette.tiprackDefURI] : acc
+    },
+    []
+  )
 )
 
-function _getPipetteDisplayName(name: string): string {
+function _getPipetteDisplayName(name: PipetteName): string {
   const pipetteSpecs = getPipetteNameSpecs(name)
   if (!pipetteSpecs) return 'Unknown Pipette'
   return pipetteSpecs.displayName
 }
 
-function _getPipettesSame(pipettesOnDeck: InitialDeckSetup['pipettes']) {
+function _getPipettesSame(
+  pipettesOnDeck: InitialDeckSetup['pipettes']
+): boolean {
   const pipettes = Object.keys(pipettesOnDeck).map(id => {
     return pipettesOnDeck[id]
   })
@@ -276,6 +290,7 @@ function _getPipettesSame(pipettesOnDeck: InitialDeckSetup['pipettes']) {
 // equipped pipettes per step id instead of always using initial deck setup
 // (for when we support multiple deck setup steps)
 export const getEquippedPipetteOptions: Selector<
+  BaseState,
   DropdownOption[]
 > = createSelector(getInitialDeckSetup, initialDeckSetup => {
   const pipettes = initialDeckSetup.pipettes
@@ -298,90 +313,94 @@ export const getEquippedPipetteOptions: Selector<
   )
 })
 // Formats pipette data specifically for file page InstrumentGroup component
-type PipettesForInstrumentGroup = ElementProps<InstrumentGroupProps>
-export const getPipettesForInstrumentGroup: Selector<PipettesForInstrumentGroup> = createSelector(
-  getInitialDeckSetup,
-  (
-    initialDeckSetup // $FlowFixMe(2021-03-16): fix with TS conversion
-  ) =>
-    reduce(
-      initialDeckSetup.pipettes,
-      (
-        acc: PipettesForInstrumentGroup,
-        pipetteOnDeck: PipetteOnDeck,
-        pipetteId
-      ) => {
-        const pipetteSpec = pipetteOnDeck.spec
-        const tiprackDef = pipetteOnDeck.tiprackLabwareDef
-        const pipetteForInstrumentGroup: InstrumentInfoProps = {
-          mount: pipetteOnDeck.mount,
-          pipetteSpecs: pipetteSpec,
-          description: _getPipetteDisplayName(pipetteOnDeck.name),
-          isDisabled: false,
-          tiprackModel: getLabwareDisplayName(tiprackDef),
-        }
-        acc[pipetteOnDeck.mount] = pipetteForInstrumentGroup
-        return acc
-      },
-      {}
-    )
-)
-export const getPipettesForEditPipetteForm: Selector<FormPipettesByMount> = createSelector(
-  getInitialDeckSetup,
-  initialDeckSetup =>
-    reduce<InitialDeckSetup['pipettes'], FormPipettesByMount>(
-      initialDeckSetup.pipettes,
-      (acc, pipetteOnDeck: PipetteOnDeck, id) => {
-        const pipetteSpec = pipetteOnDeck.spec
-        const tiprackDef = pipetteOnDeck.tiprackLabwareDef
-        if (!pipetteSpec || !tiprackDef) return acc
-        const pipetteForInstrumentGroup = {
-          pipetteName: pipetteOnDeck.name,
-          tiprackDefURI: getLabwareDefURI(tiprackDef),
-        }
-        acc[pipetteOnDeck.mount] = pipetteForInstrumentGroup
-        return acc
-      },
-      {
-        left: {
-          pipetteName: null,
-          tiprackDefURI: null,
-        },
-        right: {
-          pipetteName: null,
-          tiprackDefURI: null,
-        },
+type PipettesForInstrumentGroup = React.ComponentProps<typeof InstrumentGroup>
+export const getPipettesForInstrumentGroup: Selector<
+  BaseState,
+  PipettesForInstrumentGroup
+> = createSelector(getInitialDeckSetup, (
+  initialDeckSetup // $FlowFixMe(2021-03-16): fix with TS conversion
+) =>
+  reduce(
+    initialDeckSetup.pipettes,
+    (
+      acc: PipettesForInstrumentGroup,
+      pipetteOnDeck: PipetteOnDeck,
+      pipetteId
+    ) => {
+      const pipetteSpec = pipetteOnDeck.spec
+      const tiprackDef = pipetteOnDeck.tiprackLabwareDef
+      const pipetteForInstrumentGroup: InstrumentInfoProps = {
+        mount: pipetteOnDeck.mount,
+        pipetteSpecs: pipetteSpec,
+        description: _getPipetteDisplayName(pipetteOnDeck.name),
+        isDisabled: false,
+        tiprackModel: getLabwareDisplayName(tiprackDef),
       }
-    )
+      acc[pipetteOnDeck.mount] = pipetteForInstrumentGroup
+      return acc
+    },
+    {}
+  )
 )
-export const getModulesForEditModulesCard: Selector<ModulesForEditModulesCard> = createSelector(
-  getInitialDeckSetup,
-  initialDeckSetup =>
-    reduce<InitialDeckSetup['modules'], ModulesForEditModulesCard>(
-      initialDeckSetup.modules,
-      (acc, moduleOnDeck: ModuleOnDeck, id) => {
-        acc[moduleOnDeck.type] = moduleOnDeck
-        return acc
-      },
-      {
-        [MAGNETIC_MODULE_TYPE]: null,
-        [TEMPERATURE_MODULE_TYPE]: null,
-        [THERMOCYCLER_MODULE_TYPE]: null,
+export const getPipettesForEditPipetteForm: Selector<
+  BaseState,
+  FormPipettesByMount
+> = createSelector(getInitialDeckSetup, initialDeckSetup =>
+  reduce<InitialDeckSetup['pipettes'], FormPipettesByMount>(
+    initialDeckSetup.pipettes,
+    (acc, pipetteOnDeck: PipetteOnDeck, id) => {
+      const pipetteSpec = pipetteOnDeck.spec
+      const tiprackDef = pipetteOnDeck.tiprackLabwareDef
+      if (!pipetteSpec || !tiprackDef) return acc
+      const pipetteForInstrumentGroup = {
+        pipetteName: pipetteOnDeck.name,
+        tiprackDefURI: getLabwareDefURI(tiprackDef),
       }
-    )
+      acc[pipetteOnDeck.mount] = pipetteForInstrumentGroup
+      return acc
+    },
+    {
+      left: {
+        pipetteName: null,
+        tiprackDefURI: null,
+      },
+      right: {
+        pipetteName: null,
+        tiprackDefURI: null,
+      },
+    }
+  )
+)
+export const getModulesForEditModulesCard: Selector<
+  BaseState,
+  ModulesForEditModulesCard
+> = createSelector(getInitialDeckSetup, initialDeckSetup =>
+  reduce<InitialDeckSetup['modules'], ModulesForEditModulesCard>(
+    initialDeckSetup.modules,
+    (acc, moduleOnDeck: ModuleOnDeck, id) => {
+      acc[moduleOnDeck.type] = moduleOnDeck
+      return acc
+    },
+    {
+      [MAGNETIC_MODULE_TYPE]: null,
+      [TEMPERATURE_MODULE_TYPE]: null,
+      [THERMOCYCLER_MODULE_TYPE]: null,
+    }
+  )
 )
 export const getUnsavedForm: Selector<
+  BaseState,
   FormData | null | undefined
 > = createSelector(rootSelector, state => state.unsavedForm)
-export const getOrderedStepIds: Selector<StepIdType[]> = createSelector(
-  rootSelector,
-  state => state.orderedStepIds
-)
-export const getSavedStepForms: Selector<SavedStepFormState> = createSelector(
-  rootSelector,
-  state => state.savedStepForms
-)
-const getOrderedSavedForms: Selector<FormData[]> = createSelector(
+export const getOrderedStepIds: Selector<
+  BaseState,
+  StepIdType[]
+> = createSelector(rootSelector, state => state.orderedStepIds)
+export const getSavedStepForms: Selector<
+  BaseState,
+  SavedStepFormState
+> = createSelector(rootSelector, state => state.savedStepForms)
+const getOrderedSavedForms: Selector<BaseState, FormData[]> = createSelector(
   getOrderedStepIds,
   getSavedStepForms,
   (orderedStepIds, savedStepForms) => {
@@ -390,7 +409,10 @@ const getOrderedSavedForms: Selector<FormData[]> = createSelector(
       .filter(form => form && form.id != null) // NOTE: for old protocols where stepId could === 0, need to do != null here
   }
 )
-export const getCurrentFormHasUnsavedChanges: Selector<boolean> = createSelector(
+export const getCurrentFormHasUnsavedChanges: Selector<
+  BaseState,
+  boolean
+> = createSelector(
   getUnsavedForm,
   getSavedStepForms,
   (unsavedForm, savedStepForms) => {
@@ -405,14 +427,14 @@ export const getCurrentFormHasUnsavedChanges: Selector<boolean> = createSelector
     return !isEqual(unsavedForm, savedForm)
   }
 )
-export const getBatchEditFieldChanges: Selector<BatchEditFormChangesState> = createSelector(
-  rootSelector,
-  state => state.batchEditFormChanges
-)
-export const getBatchEditFormHasUnsavedChanges: Selector<boolean> = createSelector(
-  getBatchEditFieldChanges,
-  changes => !isEmpty(changes)
-)
+export const getBatchEditFieldChanges: Selector<
+  BaseState,
+  BatchEditFormChangesState
+> = createSelector(rootSelector, state => state.batchEditFormChanges)
+export const getBatchEditFormHasUnsavedChanges: Selector<
+  BaseState,
+  boolean
+> = createSelector(getBatchEditFieldChanges, changes => !isEmpty(changes))
 
 const getModuleEntity = (state: InvariantContext, id: string): ModuleEntity => {
   return state.moduleEntities[id]
@@ -420,9 +442,9 @@ const getModuleEntity = (state: InvariantContext, id: string): ModuleEntity => {
 
 // TODO: Ian 2019-01-25 type with hydrated form type, see #3161
 function _getHydratedForm(
-  rawForm: FormData | null | undefined,
+  rawForm: FormData,
   invariantContext: InvariantContext
-) {
+): FormData {
   const hydratedForm = mapValues(rawForm, (value, name) =>
     hydrateField(invariantContext, name, value)
   )
@@ -436,12 +458,13 @@ function _getHydratedForm(
   hydratedForm.meta = {}
 
   if (rawForm?.moduleId != null) {
+    // @ts-expect-error(sa, 2021-6-14): type this properly in #3161
     hydratedForm.meta.module = getModuleEntity(
       invariantContext,
       rawForm.moduleId
     )
   }
-
+  // @ts-expect-error(sa, 2021-6-14):type this properly in #3161
   return hydratedForm
 }
 
@@ -498,7 +521,10 @@ export const _hasFormLevelErrors = (hydratedForm: FormData): boolean => {
 export const _formHasErrors = (hydratedForm: FormData): boolean => {
   return _hasFieldLevelErrors(hydratedForm) || _hasFormLevelErrors(hydratedForm)
 }
-export const getInvariantContext: Selector<InvariantContext> = createSelector(
+export const getInvariantContext: Selector<
+  BaseState,
+  InvariantContext
+> = createSelector(
   getLabwareEntities,
   getModuleEntities,
   getPipetteEntities,
@@ -518,7 +544,7 @@ export const getInvariantContext: Selector<InvariantContext> = createSelector(
   })
 )
 // TODO(IL, 2020-03-24) type this as Selector<HydratedFormData>. See #3161
-export const getHydratedUnsavedForm: Selector<any> = createSelector(
+export const getHydratedUnsavedForm: Selector<BaseState, any> = createSelector(
   getUnsavedForm,
   getInvariantContext,
   (unsavedForm, invariantContext) => {
@@ -530,6 +556,7 @@ export const getHydratedUnsavedForm: Selector<any> = createSelector(
   }
 )
 export const getDynamicFieldFormErrorsForUnsavedForm: Selector<
+  BaseState,
   ProfileFormError[]
 > = createSelector(getHydratedUnsavedForm, hydratedForm => {
   if (!hydratedForm) return []
@@ -538,24 +565,27 @@ export const getDynamicFieldFormErrorsForUnsavedForm: Selector<
 
   return errors
 })
-export const getFormLevelErrorsForUnsavedForm: Selector<StepFormErrors> = createSelector(
-  getHydratedUnsavedForm,
-  hydratedForm => {
-    if (!hydratedForm) return []
+export const getFormLevelErrorsForUnsavedForm: Selector<
+  BaseState,
+  StepFormErrors
+> = createSelector(getHydratedUnsavedForm, hydratedForm => {
+  if (!hydratedForm) return []
 
-    const errors = _formLevelErrors(hydratedForm)
+  const errors = _formLevelErrors(hydratedForm)
 
-    return errors
-  }
-)
-export const getCurrentFormCanBeSaved: Selector<boolean> = createSelector(
-  getHydratedUnsavedForm,
-  hydratedForm => {
-    if (!hydratedForm) return false
-    return !_formHasErrors(hydratedForm)
-  }
-)
-export const getArgsAndErrorsByStepId: Selector<StepArgsAndErrorsById> = createSelector(
+  return errors
+})
+export const getCurrentFormCanBeSaved: Selector<
+  BaseState,
+  boolean
+> = createSelector(getHydratedUnsavedForm, hydratedForm => {
+  if (!hydratedForm) return false
+  return !_formHasErrors(hydratedForm)
+})
+export const getArgsAndErrorsByStepId: Selector<
+  BaseState,
+  StepArgsAndErrorsById
+> = createSelector(
   getOrderedSavedForms,
   getInvariantContext,
   (stepForms, contextualState) => {
@@ -580,7 +610,10 @@ export const getArgsAndErrorsByStepId: Selector<StepArgsAndErrorsById> = createS
     )
   }
 )
-export const getUnsavedFormIsPristineSetTempForm: Selector<boolean> = createSelector(
+export const getUnsavedFormIsPristineSetTempForm: Selector<
+  BaseState,
+  boolean
+> = createSelector(
   getUnsavedForm,
   getCurrentFormIsPresaved,
   (unsavedForm, isPresaved) => {
@@ -591,6 +624,7 @@ export const getUnsavedFormIsPristineSetTempForm: Selector<boolean> = createSele
   }
 )
 export const getFormLevelWarningsForUnsavedForm: Selector<
+  BaseState,
   FormWarning[]
 > = createSelector(
   getUnsavedForm,
@@ -604,6 +638,7 @@ export const getFormLevelWarningsForUnsavedForm: Selector<
   }
 )
 export const getFormLevelWarningsPerStep: Selector<
+  BaseState,
   Record<string, FormWarning[]>
 > = createSelector(
   getSavedStepForms,

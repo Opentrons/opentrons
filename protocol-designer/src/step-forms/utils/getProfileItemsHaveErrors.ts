@@ -1,9 +1,9 @@
 import { getProfileFieldErrors } from '../../steplist/fieldLevel'
-import { PROFILE_CYCLE } from '../../form-types'
-import { ProfileItem } from '../../form-types'
+import { ProfileItem, PROFILE_CYCLE } from '../../form-types'
 
 const _someFieldsHaveErrors = (item: ProfileItem): boolean => {
   for (const fieldName in item) {
+    // @ts-expect-error(sa, 2021-6-10): TS thinks fieldName is type string rather than keyof ProfileItem
     const value = item[fieldName]
     const fieldErrors = getProfileFieldErrors(fieldName, value)
 

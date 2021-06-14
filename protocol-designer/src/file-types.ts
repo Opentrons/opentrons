@@ -1,10 +1,10 @@
 import { RootState as IngredRoot } from './labware-ingred/reducers'
 import { RootState as StepformRoot } from './step-forms'
 import { RootState as DismissRoot } from './dismiss'
-import { ProtocolFile as ProtocolFileV3 } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
-import { ProtocolFile as ProtocolFileV4 } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
-import { ProtocolFile as ProtocolFileV5 } from '@opentrons/shared-data/protocol/flowTypes/schemaV5'
-export type PDMetadata = {
+import { ProtocolFile as ProtocolFileV3 } from '@opentrons/shared-data/protocol/types/schemaV3'
+import { ProtocolFile as ProtocolFileV4 } from '@opentrons/shared-data/protocol/types/schemaV4'
+import { ProtocolFile as ProtocolFileV5 } from '@opentrons/shared-data/protocol/types/schemaV5'
+export interface PDMetadata {
   // pipetteId to tiprackModel
   pipetteTiprackAssignments: Record<string, string>
   dismissedWarnings: DismissRoot['dismissedWarnings']

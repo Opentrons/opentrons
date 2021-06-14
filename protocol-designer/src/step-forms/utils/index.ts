@@ -8,7 +8,7 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { SPAN7_8_10_11_SLOT, TC_SPAN_SLOTS } from '../../constants'
-import { DeckSlotId, ModuleRealType } from '@opentrons/shared-data'
+import type { DeckSlotId, ModuleRealType } from '@opentrons/shared-data'
 import {
   NormalizedPipette,
   NormalizedPipetteById,
@@ -134,6 +134,7 @@ export const getLabwareOnSlot = (
   initialDeckSetup: InitialDeckSetup,
   slot: string
 ): LabwareOnDeckType => {
+  // @ts-expect-error(sa, 2021-6-10): find could return undefined, need to null check
   return find(initialDeckSetup.labware, labware => labware.slot === slot)
 }
 export const getIsCrashablePipetteSelected = (
@@ -142,6 +143,7 @@ export const getIsCrashablePipetteSelected = (
   const { left, right } = pipettesByMount
   return [left, right].some(
     (formPipette: FormPipette | null | undefined) =>
+      // @ts-expect-error(sa, 2021-6-10): argument in .includes must be a string, since GEN_ONE_MULTI_PIPETTES is a list of strings
       formPipette && GEN_ONE_MULTI_PIPETTES.includes(formPipette?.pipetteName)
   )
 }

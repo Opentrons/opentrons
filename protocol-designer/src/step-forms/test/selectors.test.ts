@@ -5,6 +5,7 @@ import {
 } from '../selectors'
 import { getFieldErrors } from '../../steplist/fieldLevel'
 import { getProfileItemsHaveErrors } from '../utils/getProfileItemsHaveErrors'
+import { FormData } from '../../form-types'
 jest.mock('../../steplist/fieldLevel')
 jest.mock('../utils/getProfileItemsHaveErrors')
 const mockGetFieldErrors = getFieldErrors as jest.MockedFunction<
@@ -18,7 +19,8 @@ beforeEach(() => {
 })
 describe('_hasFieldLevelErrors', () => {
   it('should return true if form is "thermocycler", has "profileItemsById" field, and _getProfileItemsHaveErrors returns true', () => {
-    const formData = {
+    // @ts-expect-error(sa, 2021-6-14): missing id
+    const formData: FormData = {
       stepType: 'thermocycler',
       profileItemsById: {
         foo: 'abc',
@@ -87,6 +89,7 @@ describe('getEquippedPipetteOptions', () => {
         value: '456',
       },
     ]
+    // @ts-expect-error(sa, 2021-6-14): resultFunc (from reselect) is weirdly not part of their Selector interface
     const result = getEquippedPipetteOptions.resultFunc(initialDeckState)
     expect(result).toEqual(expected)
   })
@@ -113,6 +116,7 @@ describe('getEquippedPipetteOptions', () => {
         value: '456',
       },
     ]
+    // @ts-expect-error(sa, 2021-6-14): resultFunc (from reselect) is weirdly not part of their Selector interface
     const result = getEquippedPipetteOptions.resultFunc(initialDeckState)
     expect(result).toEqual(expected)
   })
@@ -131,6 +135,7 @@ describe('getEquippedPipetteOptions', () => {
         value: '123',
       },
     ]
+    // @ts-expect-error(sa, 2021-6-14): resultFunc (from reselect) is weirdly not part of their Selector interface
     const result = getEquippedPipetteOptions.resultFunc(initialDeckState)
     expect(result).toEqual(expected)
   })
@@ -138,12 +143,14 @@ describe('getEquippedPipetteOptions', () => {
 describe('getBatchEditFormHasUnsavedChanges', () => {
   it('should return true if there are unsaved changes ', () => {
     expect(
+      // @ts-expect-error(sa, 2021-6-14): resultFunc (from reselect) is weirdly not part of their Selector interface
       getBatchEditFormHasUnsavedChanges.resultFunc({
         someField: 'someVal',
       })
     ).toBe(true)
   })
   it('should return false if there are no unsaved changes ', () => {
+    // @ts-expect-error(sa, 2021-6-14): resultFunc (from reselect) is weirdly not part of their Selector interface
     expect(getBatchEditFormHasUnsavedChanges.resultFunc({})).toBe(false)
   })
 })

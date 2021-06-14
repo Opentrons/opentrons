@@ -24,14 +24,14 @@ export type BaseState = {
   wellSelection: WellSelection
 }
 export type GetState = () => BaseState
-export type Selector<T> = (arg0: BaseState) => T
+export type Selector<T> = (arg: BaseState) => T
 export type MemoizedSelector<T> = OutputSelector<BaseState, void, T>
 // eslint-disable-next-line no-use-before-define
 export type ThunkDispatch<A> = (action: A | ThunkAction<A>) => A
-export type ThunkAction<A> = (
-  dispatch: ThunkDispatch<A>,
-  getState: GetState
-) => A | undefined
+
+export type ThunkAction<A> = 
+| ((dispatch: ThunkDispatch<A>, getState: GetState) => A)
+| ((dispatch: ThunkDispatch<A>, getState: GetState) => void)
 // TODO(mc, 2018-04-18): make actual Action union type for PD
 export type Action = {
   type: string

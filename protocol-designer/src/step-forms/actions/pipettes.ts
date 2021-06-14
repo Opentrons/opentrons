@@ -1,6 +1,6 @@
 import { NormalizedPipetteById } from '@opentrons/step-generation'
 import { StepIdType } from '../../form-types'
-export type CreatePipettesAction = {
+export interface CreatePipettesAction {
   type: 'CREATE_PIPETTES'
   payload: NormalizedPipetteById
 }
@@ -12,7 +12,7 @@ export const createPipettes = (
     payload,
   }
 }
-export type DeletePipettesAction = {
+export interface DeletePipettesAction {
   type: 'DELETE_PIPETTES'
   payload: string[] // pipette ids to delete, order doesn't matter
 }
@@ -22,7 +22,7 @@ export const deletePipettes = (
   type: 'DELETE_PIPETTES',
   payload,
 })
-export type SubstituteStepFormPipettesAction = {
+export interface SubstituteStepFormPipettesAction {
   type: 'SUBSTITUTE_STEP_FORM_PIPETTES'
   payload: {
     // step range to modify (inclusive)

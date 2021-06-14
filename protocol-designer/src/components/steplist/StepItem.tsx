@@ -35,11 +35,11 @@ import {
 } from '../../steplist/types'
 
 export type StepItemProps = {
-  description: string | null | undefined,
-  rawForm: FormData | null | undefined,
-  stepNumber: number,
-  stepType: StepType,
-  title?: string,
+  description: string | null | undefined
+  rawForm: FormData | null | undefined
+  stepNumber: number
+  stepType: StepType
+  title?: string
 
   collapsed?: boolean,
   error: boolean | null | undefined,
