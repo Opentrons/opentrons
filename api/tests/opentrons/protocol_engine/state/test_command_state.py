@@ -1,7 +1,11 @@
 """Tests for the command lifecycle state."""
+import pytest
+
 from datetime import datetime
 from typing import List
 import itertools
+
+from pydantic import BaseModel
 
 from opentrons.types import DeckSlotName
 from opentrons.protocol_engine import StateStore
@@ -10,6 +14,7 @@ from opentrons.protocol_engine.errors import ProtocolEngineError
 from opentrons.protocol_engine.commands import (
     PendingCommand,
     RunningCommand,
+    CompletedCommand,
     FailedCommand,
     LoadLabwareRequest,
     LoadLabwareResult,
@@ -39,22 +44,56 @@ def _make_request() -> LoadLabwareRequest:
     return _make_unique_requests(1)[0]
 
 
-def test_state_store_handles_command(store: StateStore, now: datetime) -> None:
-    """It should add a command to the store."""
-    cmd = PendingCommand[LoadLabwareRequest, LoadLabwareResult](
+@pytest.fixture
+def pending_command(now: datetime) -> PendingCommand:
+    """Fixture for an arbitrary `PendingCommand`."""
+    return PendingCommand[BaseModel, BaseModel](
         created_at=now,
-        request=LoadLabwareRequest(
-            loadName="load-name",
-            namespace="opentrons-test",
-            version=1,
-            location=DeckSlotLocation(slot=DeckSlotName.SLOT_2),
-            labwareId=None
-        )
+        request=BaseModel()
     )
 
-    store.handle_command(cmd, command_id="unique-id")
 
-    assert store.commands.get_command_by_id("unique-id") == cmd
+@pytest.fixture
+def running_command(now: datetime) -> RunningCommand:
+    """Fixture for an arbitrary `RunningCommand`."""
+    return RunningCommand[BaseModel, BaseModel](
+        created_at=now,
+        started_at=now,
+        request=BaseModel()
+    )
+
+
+@pytest.fixture
+def completed_command(now: datetime) -> CompletedCommand:
+    """Fixture for an arbitrary `CompletedCommand`."""
+    return CompletedCommand[BaseModel, BaseModel](
+        created_at=now,
+        started_at=now,
+        completed_at=now,
+        request=BaseModel(),
+        result=BaseModel()
+    )
+
+
+@pytest.fixture
+def failed_command(now: datetime) -> FailedCommand:
+    """Fixture for an arbitrary `FailedCommand`."""
+    return FailedCommand[BaseModel](
+        created_at=now,
+        started_at=now,
+        failed_at=now,
+        request=BaseModel(),
+        error=ProtocolEngineError()
+    )
+
+
+def test_state_store_handles_command(
+    store: StateStore,
+    pending_command: PendingCommand
+) -> None:
+    """It should add a command to the store that can be accessed later by ID."""
+    store.handle_command(pending_command, command_id="unique-id")
+    assert store.commands.get_command_by_id("unique-id") == pending_command
 
 
 def test_command_state_preserves_handle_order(  # noqa:D103
@@ -82,18 +121,10 @@ def test_command_state_preserves_handle_order(  # noqa:D103
 
 
 def test_get_next_request_returns_first_pending(  # noqa: D103
-    now: datetime
+    pending_command: PendingCommand,
+    running_command: RunningCommand
 ) -> None:
     subject = CommandState()
-    running_command = RunningCommand[LoadLabwareRequest, LoadLabwareResult](
-        created_at=now,
-        started_at=now,
-        request=_make_request()
-    )
-    pending_command = PendingCommand[LoadLabwareRequest, LoadLabwareResult](
-        created_at=now,
-        request=_make_request()
-    )
 
     # todo(mm, 2021-06-14): Add completed and failed, for thoroughness.
     subject._commands_by_id["command-id-1"] = running_command
@@ -106,25 +137,14 @@ def test_get_next_request_returns_first_pending(  # noqa: D103
 
 
 def test_get_next_request_returns_none_when_no_pending(  # noqa: D103
-    now: datetime
+    running_command: RunningCommand,
+    failed_command: FailedCommand
 ) -> None:
     subject = CommandState()
-    # todo(mm, 2021-06-11): We should throw a completed command in here too.
-    running_command = RunningCommand[LoadLabwareRequest, LoadLabwareResult](
-        created_at=now,
-        started_at=now,
-        request=_make_request()
-    )
-    failed_command = FailedCommand[LoadLabwareRequest](
-        created_at=now,
-        started_at=now,
-        failed_at=now,
-        error=ProtocolEngineError(),
-        request=_make_request()
-    )
 
     assert subject.get_next_request() is None
 
+    # todo(mm, 2021-06-11): We should throw a completed command in here too.
     subject._commands_by_id["running-command-id"] = running_command
     subject._commands_by_id["failed-command-id"] = failed_command
 
@@ -132,20 +152,11 @@ def test_get_next_request_returns_none_when_no_pending(  # noqa: D103
 
 
 def test_get_next_request_returns_none_when_earlier_command_failed(  # noqa: D103
-    now: datetime
+    pending_command: PendingCommand,
+    failed_command: FailedCommand
 ) -> None:
     subject = CommandState()
-    failed_command = FailedCommand[LoadLabwareRequest](
-        created_at=now,
-        started_at=now,
-        failed_at=now,
-        error=ProtocolEngineError(),
-        request=_make_request()
-    )
-    pending_command = PendingCommand[LoadLabwareRequest, LoadLabwareResult](
-        created_at=now,
-        request=_make_request()
-    )
+
     subject._commands_by_id["command-id-1"] = failed_command
     subject._commands_by_id["command-id-2"] = pending_command
 
