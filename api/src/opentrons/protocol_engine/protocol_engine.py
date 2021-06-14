@@ -99,6 +99,9 @@ class ProtocolEngine:
 
     def add_command(self, request: CommandRequestType) -> PendingCommandType:
         """Add a command to ProtocolEngine."""
+        # TODO(mc, 2021-06-14): ID generation and timestamp generation need to
+        # be redone / reconsidered. Too much about command execution has leaked
+        # into the root ProtocolEngine class, so we should delegate downwards.
         command_id = self._resources.id_generator.generate_id()
         created_at = utc_now()
         command_impl = request.get_implementation()

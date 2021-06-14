@@ -9,7 +9,13 @@ from httpx import AsyncClient
 from typing import AsyncIterator
 
 from robot_server.errors import exception_handlers
-from robot_server.protocols import ProtocolStore, ProtocolResource, ProtocolFileType
+from robot_server.protocols import (
+    ProtocolStore,
+    ProtocolResource,
+    ProtocolFileType,
+    ProtocolNotFoundError,
+    ProtocolNotFound,
+)
 from robot_server.sessions.session_view import (
     SessionView,
     BasicSessionCreateData,
@@ -204,6 +210,38 @@ async def test_create_protocol_session(
     decoy.verify(
         await engine_store.create(protocol=protocol),
         session_store.upsert(session=session),
+    )
+
+
+async def test_create_protocol_session_missing_protocol(
+    decoy: Decoy,
+    session_view: SessionView,
+    session_store: SessionStore,
+    protocol_store: ProtocolStore,
+    engine_store: EngineStore,
+    unique_id: str,
+    current_time: datetime,
+    async_client: AsyncClient,
+) -> None:
+    """It should 404 if a protocol for a session does not exist."""
+    error = ProtocolNotFoundError("protocol-id")
+
+    decoy.when(protocol_store.get(protocol_id="protocol-id")).then_raise(error)
+
+    response = await async_client.post(
+        "/sessions",
+        json={
+            "data": {
+                "sessionType": "protocol",
+                "createParams": {"protocolId": "protocol-id"},
+            }
+        },
+    )
+
+    verify_response(
+        response,
+        expected_status=404,
+        expected_errors=ProtocolNotFound(detail=str(error)),
     )
 
 

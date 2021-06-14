@@ -13,7 +13,13 @@ from robot_server.service.json_api import (
     MultiResponseModel,
 )
 
-from robot_server.protocols import ProtocolStore, get_protocol_store
+from robot_server.protocols import (
+    ProtocolStore,
+    ProtocolNotFound,
+    ProtocolNotFoundError,
+    get_protocol_store,
+)
+
 from .session_store import SessionStore, SessionNotFoundError
 from .session_view import SessionView
 from .session_models import Session, SessionCreateData, ProtocolSessionCreateData
@@ -53,7 +59,8 @@ class SessionActionNotAllowed(ErrorDetails):
     status_code=status.HTTP_201_CREATED,
     response_model=ResponseModel[Session],
     responses={
-        status.HTTP_409_CONFLICT: {"model": ErrorResponse[SessionAlreadyActive]}
+        status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[ProtocolNotFound]},
+        status.HTTP_409_CONFLICT: {"model": ErrorResponse[SessionAlreadyActive]},
     },
 )
 async def create_session(
@@ -84,12 +91,16 @@ async def create_session(
     )
     protocol = None
 
-    if isinstance(create_data, ProtocolSessionCreateData):
-        protocol = protocol_store.get(protocol_id=create_data.createParams.protocolId)
-
     try:
+        if isinstance(create_data, ProtocolSessionCreateData):
+            protocol = protocol_store.get(
+                protocol_id=create_data.createParams.protocolId
+            )
+
         # TODO(mc, 2021-05-28): return engine state to build response model
         await engine_store.create(protocol=protocol)
+    except ProtocolNotFoundError as e:
+        raise ProtocolNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
     except EngineConflictError as e:
         raise SessionAlreadyActive(detail=str(e)).as_error(status.HTTP_409_CONFLICT)
 
