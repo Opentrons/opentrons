@@ -7,9 +7,11 @@ from .session_store import SessionResource
 from .action_models import SessionAction, SessionActionCreateData
 from .session_models import (
     Session,
-    BasicSession,
     SessionCreateData,
+    BasicSession,
     BasicSessionCreateData,
+    ProtocolSession,
+    ProtocolSessionCreateData,
 )
 
 
@@ -67,7 +69,7 @@ class SessionView:
         actions = SessionAction(
             id=action_id,
             createdAt=created_at,
-            controlType=action_data.controlType,
+            actionType=action_data.actionType,
         )
 
         updated_session = replace(
@@ -93,7 +95,14 @@ class SessionView:
             return BasicSession.construct(
                 id=session.session_id,
                 createdAt=session.created_at,
-                controlCommands=session.actions,
+                actions=session.actions,
+            )
+        if isinstance(create_data, ProtocolSessionCreateData):
+            return ProtocolSession.construct(
+                id=session.session_id,
+                createdAt=session.created_at,
+                createParams=create_data.createParams,
+                actions=session.actions,
             )
 
-        raise ValueError(f"Invalid session store entry {session}")
+        raise ValueError(f"Invalid session resource {session}")

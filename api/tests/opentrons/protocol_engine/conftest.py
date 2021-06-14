@@ -152,17 +152,13 @@ def well_plate_def() -> LabwareDefinition:
 @pytest.fixture(scope="session")
 def reservoir_def() -> LabwareDefinition:
     """Get the definition of single-row reservoir."""
-    return LabwareDefinition.parse_obj(
-        load_definition("nest_12_reservoir_15ml", 1)
-    )
+    return LabwareDefinition.parse_obj(load_definition("nest_12_reservoir_15ml", 1))
 
 
 @pytest.fixture(scope="session")
 def tip_rack_def() -> LabwareDefinition:
     """Get the definition of Opentrons 300 uL tip rack."""
-    return LabwareDefinition.parse_obj(
-        load_definition("opentrons_96_tiprack_300ul", 1)
-    )
+    return LabwareDefinition.parse_obj(load_definition("opentrons_96_tiprack_300ul", 1))
 
 
 @pytest.fixture
@@ -177,10 +173,12 @@ def store(standard_deck_def: DeckDefinitionV2) -> StateStore:
 @pytest.fixture
 def engine(
     mock_state_store: MagicMock,
-    mock_handlers: AsyncMock
+    mock_handlers: AsyncMock,
+    mock_resources: AsyncMock,
 ) -> ProtocolEngine:
     """Get a ProtocolEngine with its dependencies mocked out."""
     return ProtocolEngine(
         state_store=mock_state_store,
         handlers=mock_handlers,
+        resources=mock_resources,
     )

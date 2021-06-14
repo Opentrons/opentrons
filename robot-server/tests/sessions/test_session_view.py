@@ -8,6 +8,9 @@ from robot_server.sessions.session_models import (
     Session,
     BasicSession,
     BasicSessionCreateData,
+    ProtocolSession,
+    ProtocolSessionCreateData,
+    ProtocolSessionCreateParams,
 )
 
 from robot_server.sessions.action_models import (
@@ -57,6 +60,28 @@ def test_create_session_resource() -> None:
     )
 
 
+def test_create_protocol_session_resource() -> None:
+    """It should create a protocol session resource view."""
+    created_at = datetime.now()
+    create_data = ProtocolSessionCreateData(
+        createParams=ProtocolSessionCreateParams(protocolId="protocol-id")
+    )
+
+    subject = SessionView()
+    result = subject.as_resource(
+        session_id="session-id",
+        create_data=create_data,
+        created_at=created_at,
+    )
+
+    assert result == SessionResource(
+        session_id="session-id",
+        create_data=create_data,
+        created_at=created_at,
+        actions=[],
+    )
+
+
 current_time = datetime.now()
 
 
@@ -73,7 +98,23 @@ current_time = datetime.now()
             BasicSession(
                 id="session-id",
                 createdAt=current_time,
-                controlCommands=[],
+                actions=[],
+            ),
+        ),
+        (
+            SessionResource(
+                session_id="session-id",
+                create_data=ProtocolSessionCreateData(
+                    createParams=ProtocolSessionCreateParams(protocolId="protocol-id")
+                ),
+                created_at=current_time,
+                actions=[],
+            ),
+            ProtocolSession(
+                id="session-id",
+                createdAt=current_time,
+                createParams=ProtocolSessionCreateParams(protocolId="protocol-id"),
+                actions=[],
             ),
         ),
     ),
@@ -99,7 +140,7 @@ def test_create_action(current_time: datetime) -> None:
     )
 
     command_data = SessionActionCreateData(
-        controlType=SessionActionType.START,
+        actionType=SessionActionType.START,
     )
 
     subject = SessionView()
@@ -113,7 +154,7 @@ def test_create_action(current_time: datetime) -> None:
     assert action_result == SessionAction(
         id="control-command-id",
         createdAt=current_time,
-        controlType=SessionActionType.START,
+        actionType=SessionActionType.START,
     )
 
     assert session_result == SessionResource(
