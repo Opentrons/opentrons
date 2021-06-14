@@ -63,10 +63,10 @@ import {
   SelectTerminalItemAction,
 } from '../../ui/steps'
 import {
-    ChangeBatchEditFieldAction,
-    SaveStepFormsMultiAction,
-    ResetBatchEditFieldChangesAction
-} from '../actions';
+  ChangeBatchEditFieldAction,
+  SaveStepFormsMultiAction,
+  ResetBatchEditFieldChangesAction,
+} from '../actions'
 import {
   AddProfileCycleAction,
   AddProfileStepAction,
@@ -933,6 +933,7 @@ describe('savedStepForms reducer: initial deck setup step', () => {
                 id: moduleId,
                 slot: destSlot,
                 type: TEMPERATURE_MODULE_TYPE,
+                // @ts-expect-error(sa, 2021-6-14): not a valid module model
                 model: 'someTempModel',
               },
             }
@@ -969,9 +970,14 @@ describe('savedStepForms reducer: initial deck setup step', () => {
           },
         }
       })
-      const magneticStepCases = [
+      const magneticStepCases: Array<{
+        testName: string
+        action: SavedStepFormsActions
+        expectedModuleId: string
+      }> = [
         {
           testName: 'create mag mod -> override mag step module id',
+          // @ts-expect-error(sa, 2021-6-14): not a valid module model
           action: {
             type: 'CREATE_MODULE',
             payload: {
@@ -985,6 +991,7 @@ describe('savedStepForms reducer: initial deck setup step', () => {
         },
         {
           testName: 'create temp mod -> DO NOT override mag step module id',
+          // @ts-expect-error(sa, 2021-6-14): not a valid module model
           action: {
             type: 'CREATE_MODULE',
             payload: {
@@ -998,6 +1005,7 @@ describe('savedStepForms reducer: initial deck setup step', () => {
         },
         {
           testName: 'create TC -> DO NOT override mag step module id',
+          // @ts-expect-error(sa, 2021-6-14): not a valid module model
           action: {
             type: 'CREATE_MODULE',
             payload: {
@@ -1010,9 +1018,14 @@ describe('savedStepForms reducer: initial deck setup step', () => {
           expectedModuleId: 'magdeckId',
         },
       ]
-      const TCStepCases = [
+      const TCStepCases: Array<{
+        testName: string
+        action: SavedStepFormsActions
+        expectedModuleId: string
+      }> = [
         {
           testName: 'create TC -> override TC step module id',
+          // @ts-expect-error(sa, 2021-6-14): not a valid module model
           action: {
             type: 'CREATE_MODULE',
             payload: {
@@ -1026,6 +1039,7 @@ describe('savedStepForms reducer: initial deck setup step', () => {
         },
         {
           testName: 'create temp mod -> DO NOT override TC step module id',
+          // @ts-expect-error(sa, 2021-6-14): not a valid module model
           action: {
             type: 'CREATE_MODULE',
             payload: {
@@ -1039,6 +1053,7 @@ describe('savedStepForms reducer: initial deck setup step', () => {
         },
         {
           testName: 'create magnetic mod -> DO NOT override TC step module id',
+          // @ts-expect-error(sa, 2021-6-14): not a valid module model
           action: {
             type: 'CREATE_MODULE',
             payload: {
@@ -1054,6 +1069,7 @@ describe('savedStepForms reducer: initial deck setup step', () => {
       magneticStepCases.forEach(({ testName, action, expectedModuleId }) => {
         it(testName, () => {
           const result = savedStepForms(prevRootStateWithMagAndTCSteps, action)
+          // @ts-expect-error(sa, 2021-6-14): null check
           if (action.payload.type)
             expect(result.mag_step_form_id.moduleId).toBe(expectedModuleId)
         })
@@ -1061,6 +1077,7 @@ describe('savedStepForms reducer: initial deck setup step', () => {
       TCStepCases.forEach(({ testName, action, expectedModuleId }) => {
         it(testName, () => {
           const result = savedStepForms(prevRootStateWithMagAndTCSteps, action)
+          // @ts-expect-error(sa, 2021-6-14): null check
           if (action.payload.type)
             expect(result.TC_step_form_id.moduleId).toBe(expectedModuleId)
         })
@@ -1068,7 +1085,12 @@ describe('savedStepForms reducer: initial deck setup step', () => {
     })
   })
   describe('delete module -> removes module from initial deck setup step', () => {
-    const testCases = [
+    const testCases: Array<{
+      testName: string
+      makeStateArgs: MakeDeckSetupStepArgs
+      expectedLabwareLocations?: Record<string, any>
+      expectedModuleLocations?: Record<string, any>
+    }> = [
       {
         testName: 'delete unoccupied module',
         makeStateArgs: {
@@ -1122,7 +1144,7 @@ describe('savedStepForms reducer: initial deck setup step', () => {
         expectedModuleLocations,
       }) => {
         it(testName, () => {
-          const action = {
+          const action: DeleteModuleAction = {
             type: 'DELETE_MODULE',
             payload: {
               id: moduleId,
@@ -1524,6 +1546,7 @@ describe('unsavedForm reducer', () => {
     }
     const result = unsavedForm(someState, {
       type: 'POPULATE_FORM',
+      // @ts-expect-error(sa, 2021-6-14): not a valid FormData payload
       payload,
     })
     expect(result).toEqual(payload)
@@ -1644,6 +1667,7 @@ describe('unsavedForm reducer', () => {
       // @ts-expect-error(sa, 2021-6-14): not a valid FormData Type
       'createPresavedStepFormMockResult'
     )
+    // @ts-expect-error(sa, 2021-6-14): not valid InitialDeckSetup state
     mock_getInitialDeckSetupRootState.mockReturnValue('initalDeckSetupValue')
     const stateMock: RootState = {
       // @ts-expect-error(sa, 2021-6-14): not valid savedStepForms state
