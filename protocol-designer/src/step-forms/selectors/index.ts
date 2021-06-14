@@ -1,4 +1,3 @@
-import { ElementProps } from 'react'
 import assert from 'assert'
 import isEqual from 'lodash/isEqual'
 import mapValues from 'lodash/mapValues'
@@ -12,6 +11,7 @@ import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  PipetteName,
 } from '@opentrons/shared-data'
 import { TEMPERATURE_DEACTIVATED } from '@opentrons/step-generation'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
@@ -20,8 +20,10 @@ import {
   getFormErrors,
   stepFormToArgs,
 } from '../../steplist/formLevel'
-import { ProfileFormError } from '../../steplist/formLevel/profileErrors'
-import { getProfileFormErrors } from '../../steplist/formLevel/profileErrors'
+import {
+  ProfileFormError,
+  getProfileFormErrors,
+} from '../../steplist/formLevel/profileErrors'
 import { hydrateField, getFieldErrors } from '../../steplist/fieldLevel'
 import { getProfileItemsHaveErrors } from '../utils/getProfileItemsHaveErrors'
 import * as featureFlagSelectors from '../../feature-flags/selectors'
@@ -29,13 +31,13 @@ import { denormalizePipetteEntities } from '../utils'
 import { LabwareDefByDefURI } from '../../labware-defs'
 import { selectors as labwareDefSelectors } from '../../labware-defs'
 import { i18n } from '../../localization'
-import { InstrumentGroup as InstrumentGroupProps } from '@opentrons/components'
-import {
+import { InstrumentGroup } from '@opentrons/components'
+import type {
   DropdownOption,
   Mount,
   InstrumentInfoProps,
 } from '@opentrons/components'
-import {
+import type {
   InvariantContext,
   LabwareEntity,
   LabwareEntities,
@@ -43,7 +45,7 @@ import {
   ModuleEntity,
   PipetteEntities,
 } from '@opentrons/step-generation'
-import { FormWarning } from '../../steplist/formLevel'
+import type { FormWarning } from '../../steplist/formLevel'
 import { BaseState, Selector, DeckSlot } from '../../types'
 import { FormData, StepIdType } from '../../form-types'
 import { StepArgsAndErrorsById, StepFormErrors } from '../../steplist/types'
@@ -119,7 +121,7 @@ export const _getLabwareEntitiesRootState: (
 )
 // Special version of `getModuleEntities` selector for use in step-forms reducers
 export const _getModuleEntitiesRootState: (
-  arg0: RootState
+  arg: RootState
 ) => ModuleEntities = rs => rs.moduleInvariantProperties
 export const getModuleEntities: Selector<ModuleEntities> = createSelector(
   rootSelector,
@@ -127,7 +129,7 @@ export const getModuleEntities: Selector<ModuleEntities> = createSelector(
 )
 // Special version of `getPipetteEntities` selector for use in step-forms reducers
 export const _getPipetteEntitiesRootState: (
-  arg0: RootState
+  arg: RootState
 ) => PipetteEntities = createSelector(
   rs => rs.pipetteInvariantProperties,
   labwareDefSelectors._getLabwareDefsByIdRootState,
@@ -139,7 +141,7 @@ export const getPipetteEntities: Selector<PipetteEntities> = createSelector(
 )
 
 const _getInitialDeckSetupStepFormRootState: (
-  arg0: RootState
+  arg: RootState
 ) => FormData = rs => rs.savedStepForms[INITIAL_DECK_SETUP_STEP_ID]
 
 export const getInitialDeckSetupStepForm: Selector<FormData> = createSelector(
@@ -179,7 +181,7 @@ const _getInitialDeckSetup = (
   const pipetteLocations =
     (initialSetupStep && initialSetupStep.pipetteLocationUpdate) || {}
   return {
-    labware: mapValues(
+    labware: mapValues<{}, LabwareOnDeck>(
       labwareLocations,
       (slot: DeckSlot, labwareId: string): LabwareOnDeck => {
         return {
@@ -188,7 +190,7 @@ const _getInitialDeckSetup = (
         }
       }
     ),
-    modules: mapValues(
+    modules: mapValues<{}, ModuleOnDeck>(
       moduleLocations,
       (slot: DeckSlot, moduleId: string): ModuleOnDeck => {
         const moduleEntity = moduleEntities[moduleId]
@@ -220,7 +222,7 @@ const _getInitialDeckSetup = (
         }
       }
     ),
-    pipettes: mapValues(
+    pipettes: mapValues<{}, PipetteOnDeck>(
       pipetteLocations,
       (mount: Mount, pipetteId: string): PipetteOnDeck => {
         // $FlowFixMe(sa, 2021-05-10): PipetteEntities is inexact typed, so flow does not know that there will me a mount on pipetteEntities
@@ -259,13 +261,15 @@ export const getPermittedTipracks: Selector<string[]> = createSelector(
     )
 )
 
-function _getPipetteDisplayName(name: string): string {
+function _getPipetteDisplayName(name: PipetteName): string {
   const pipetteSpecs = getPipetteNameSpecs(name)
   if (!pipetteSpecs) return 'Unknown Pipette'
   return pipetteSpecs.displayName
 }
 
-function _getPipettesSame(pipettesOnDeck: InitialDeckSetup['pipettes']) {
+function _getPipettesSame(
+  pipettesOnDeck: InitialDeckSetup['pipettes']
+): boolean {
   const pipettes = Object.keys(pipettesOnDeck).map(id => {
     return pipettesOnDeck[id]
   })
@@ -298,7 +302,7 @@ export const getEquippedPipetteOptions: Selector<
   )
 })
 // Formats pipette data specifically for file page InstrumentGroup component
-type PipettesForInstrumentGroup = ElementProps<InstrumentGroupProps>
+type PipettesForInstrumentGroup = React.ComponentProps<typeof InstrumentGroup>
 export const getPipettesForInstrumentGroup: Selector<PipettesForInstrumentGroup> = createSelector(
   getInitialDeckSetup,
   (
@@ -420,9 +424,9 @@ const getModuleEntity = (state: InvariantContext, id: string): ModuleEntity => {
 
 // TODO: Ian 2019-01-25 type with hydrated form type, see #3161
 function _getHydratedForm(
-  rawForm: FormData | null | undefined,
+  rawForm: FormData,
   invariantContext: InvariantContext
-) {
+): FormData {
   const hydratedForm = mapValues(rawForm, (value, name) =>
     hydrateField(invariantContext, name, value)
   )
@@ -436,12 +440,13 @@ function _getHydratedForm(
   hydratedForm.meta = {}
 
   if (rawForm?.moduleId != null) {
+    // @ts-expect-error(sa, 2021-6-14): type this properly in #3161
     hydratedForm.meta.module = getModuleEntity(
       invariantContext,
       rawForm.moduleId
     )
   }
-
+  // @ts-expect-error(sa, 2021-6-14):type this properly in #3161
   return hydratedForm
 }
 

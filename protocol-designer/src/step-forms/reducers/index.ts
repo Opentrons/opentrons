@@ -14,7 +14,7 @@ import {
   MAGNETIC_MODULE_V1,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { RootState as LabwareDefsRootState } from '../../labware-defs'
+import type { RootState as LabwareDefsRootState } from '../../labware-defs'
 import { rootReducer as labwareDefsRootReducer } from '../../labware-defs'
 import { uuid } from '../../utils'
 import {
@@ -56,7 +56,7 @@ import {
   SwapSlotContentsAction,
 } from '../../labware-ingred/actions'
 import { ReplaceCustomLabwareDef } from '../../labware-defs/actions'
-import {
+import type {
   FormData,
   StepIdType,
   StepType,
@@ -68,7 +68,7 @@ import {
   FileLabware,
   FilePipette,
   FileModule,
-} from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
+} from '@opentrons/shared-data/protocol/types/schemaV4'
 import {
   CancelStepFormAction,
   ChangeFormInputAction,
@@ -114,7 +114,7 @@ import {
 type FormState = FormData | null
 const unsavedFormInitialState = null
 // the `unsavedForm` state holds temporary form info that is saved or thrown away with "cancel".
-type UnsavedFormActions =
+export type UnsavedFormActions =
   | AddProfileCycleAction
   | AddStepAction
   | ChangeFormInputAction
@@ -183,7 +183,7 @@ export const unsavedForm = (
         _getPipetteEntitiesRootState(rootState),
         _getLabwareEntitiesRootState(rootState)
       )
-      // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
+      // @ts-expect-error (IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
       return { ...unsavedFormState, ...fieldUpdate }
     }
 
@@ -291,7 +291,7 @@ export const unsavedForm = (
       return {
         ...unsavedFormState,
         orderedProfileItems: unsavedFormState.orderedProfileItems.filter(
-          itemId => itemId !== id
+          (itemId: string) => itemId !== id
         ),
         profileItemsById: omit(unsavedFormState.profileItemsById, id),
       }
@@ -309,7 +309,7 @@ export const unsavedForm = (
 
       const omitTopLevelSteps = (
         profileItemsById: Record<string, ProfileItem>
-      ) =>
+      ): Record<string, ProfileItem> =>
         omitBy(
           profileItemsById,
           (item: ProfileItem, itemId: string): boolean => {
@@ -318,7 +318,9 @@ export const unsavedForm = (
         )
 
       // not top-level, must be nested inside a cycle
-      const omitCycleSteps = (profileItemsById: Record<string, ProfileItem>) =>
+      const omitCycleSteps = (
+        profileItemsById: Record<string, ProfileItem>
+      ): Record<string, ProfileItem> =>
         mapValues(
           profileItemsById,
           (item: ProfileItem): ProfileItem => {
@@ -342,7 +344,9 @@ export const unsavedForm = (
         ? omitTopLevelSteps(unsavedFormState.profileItemsById)
         : omitCycleSteps(unsavedFormState.profileItemsById)
       const filteredOrderedProfileItems = isTopLevelProfileStep
-        ? unsavedFormState.orderedProfileItems.filter(itemId => itemId !== id)
+        ? unsavedFormState.orderedProfileItems.filter(
+            (itemId: string) => itemId !== id
+          )
         : unsavedFormState.orderedProfileItems
       return {
         ...unsavedFormState,
@@ -458,7 +462,7 @@ export const initialDeckSetupStepForm: FormData = {
 export const initialSavedStepFormsState: SavedStepFormState = {
   [INITIAL_DECK_SETUP_STEP_ID]: initialDeckSetupStepForm,
 }
-type SavedStepFormsActions =
+export type SavedStepFormsActions =
   | SaveStepFormAction
   | SaveStepFormsMultiAction
   | DeleteStepAction
@@ -952,6 +956,8 @@ export const savedStepForms = (
     }
 
     case 'DUPLICATE_STEP': {
+      // @ts-expect-error(sa, 2021-6-10): if  stepId is null, we will end up in situation where the entry for duplicateStepId
+      // will be {[duplicateStepId]: {id: duplicateStepId}}, which will be missing the rest of the properties from FormData
       return {
         ...savedStepForms,
         [action.payload.duplicateStepId]: {
@@ -1093,6 +1099,8 @@ const initialLabwareState: NormalizedLabwareById = {
 export const labwareInvariantProperties: Reducer<
   NormalizedLabwareById,
   any
+  // @ts-expect-error(sa, 2021-6-10): cannot use string literals as action type
+  // TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
 > = handleActions(
   {
     CREATE_CONTAINER: (
@@ -1155,6 +1163,8 @@ export const labwareInvariantProperties: Reducer<
 export const moduleInvariantProperties: Reducer<
   ModuleEntities,
   any
+  // @ts-expect-error(sa, 2021-6-10): cannot use string literals as action type
+  // TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
 > = handleActions(
   {
     CREATE_MODULE: (
@@ -1187,7 +1197,9 @@ export const moduleInvariantProperties: Reducer<
       action: LoadFileAction
     ): ModuleEntities => {
       const { file } = action.payload
+      // @ts-expect-error(sa, 2021-6-10): falling back to {} will not create a valid `ModuleEntity`, as per TODO below it is theoritically unnecessary anyways
       return mapValues(
+        // @ts-expect-error(sa, 2021-6-10): type narrow modules, they do not exist on the v3 schema
         file.modules || {}, // TODO: Ian 2019-11-11 this fallback to empty object is for JSONv3 protocols. Once JSONv4 is released, this should be handled in migration in PD
         (fileModule: FileModule, id: string) => ({
           id,
@@ -1203,6 +1215,8 @@ const initialPipetteState = {}
 export const pipetteInvariantProperties: Reducer<
   NormalizedPipetteById,
   any
+  // @ts-expect-error(sa, 2021-6-10): cannot use string literals as action type
+  // TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
 > = handleActions(
   {
     LOAD_FILE: (
@@ -1246,7 +1260,9 @@ export const pipetteInvariantProperties: Reducer<
   initialPipetteState
 )
 export type OrderedStepIdsState = StepIdType[]
-const initialOrderedStepIdsState = []
+const initialOrderedStepIdsState: string[] = []
+// @ts-expect-error(sa, 2021-6-10): cannot use string literals as action type
+// TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
 export const orderedStepIds: Reducer<OrderedStepIdsState, any> = handleActions(
   {
     SAVE_STEP_FORM: (
@@ -1323,7 +1339,7 @@ export const orderedStepIds: Reducer<OrderedStepIdsState, any> = handleActions(
 export type PresavedStepFormState = {
   stepType: StepType
 } | null
-type PresavedStepFormAction =
+export type PresavedStepFormAction =
   | AddStepAction
   | CancelStepFormAction
   | DeleteStepAction

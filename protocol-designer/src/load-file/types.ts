@@ -12,10 +12,10 @@ export type FileUploadMessage =
       errorType: FileUploadErrorType
       errorMessage?: string
     }
-export type NewProtocolFields = {
+export interface NewProtocolFields {
   name: string | null | undefined
 }
-export type LoadFileAction = {
+export interface LoadFileAction {
   type: 'LOAD_FILE'
   payload: {
     file: PDProtocolFile

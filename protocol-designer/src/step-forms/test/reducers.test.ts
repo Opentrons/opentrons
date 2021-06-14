@@ -13,6 +13,11 @@ import {
   savedStepForms,
   unsavedForm,
   batchEditFormChanges,
+  SavedStepFormsActions,
+  UnsavedFormActions,
+  RootState,
+  PresavedStepFormState,
+  PresavedStepFormAction,
 } from '../reducers'
 import {
   _getPipetteEntitiesRootState,
@@ -26,14 +31,53 @@ import {
   SPAN7_8_10_11_SLOT,
   PAUSE_UNTIL_TEMP,
 } from '../../constants'
-import { PROFILE_CYCLE, PROFILE_STEP } from '../../form-types'
+import {
+  FormData,
+  PROFILE_CYCLE,
+  PROFILE_STEP,
+  StepType,
+} from '../../form-types'
 import { PRESAVED_STEP_ID } from '../../steplist/types'
-import { CreatePresavedStepFormArgs } from '../utils/createPresavedStepForm'
 import { createPresavedStepForm } from '../utils/createPresavedStepForm'
 import { createInitialProfileCycle } from '../utils/createInitialProfileItems'
 import { getLabwareIsCompatible } from '../../utils/labwareModuleCompatibility'
 import { uuid } from '../../utils'
 import { DeckSlot } from '../../types'
+import { DeleteContainerAction } from '../../labware-ingred/actions/actions'
+import {
+  DeletePipettesAction,
+  SubstituteStepFormPipettesAction,
+} from '../actions/pipettes'
+import {
+  CreateModuleAction,
+  DeleteModuleAction,
+  EditModuleAction,
+} from '../actions/modules'
+import { ModuleEntity } from '@opentrons/step-generation'
+import {
+  AddStepAction,
+  DuplicateMultipleStepsAction,
+  DuplicateStepAction,
+  SelectMultipleStepsAction,
+  SelectStepAction,
+  SelectTerminalItemAction,
+} from '../../ui/steps'
+import {
+    ChangeBatchEditFieldAction,
+    SaveStepFormsMultiAction,
+    ResetBatchEditFieldChangesAction
+} from '../actions';
+import {
+  AddProfileCycleAction,
+  AddProfileStepAction,
+  ChangeFormInputAction,
+  DeleteMultipleStepsAction,
+  DeleteProfileCycleAction,
+  DeleteProfileStepAction,
+  EditProfileCycleAction,
+  EditProfileStepAction,
+} from '../../steplist/actions'
+
 jest.mock('../../labware-defs/utils')
 jest.mock('../selectors')
 jest.mock('../../steplist/formLevel/handleFormChange')
@@ -293,7 +337,7 @@ describe('labwareInvariantProperties reducer', () => {
   })
 })
 describe('moduleInvariantProperties reducer', () => {
-  let prevState
+  let prevState: Record<string, ModuleEntity>
   const existingModuleId = 'existingModuleId'
   const newId = 'newModuleId'
   beforeEach(() => {
@@ -302,6 +346,7 @@ describe('moduleInvariantProperties reducer', () => {
         id: existingModuleId,
         slot: '1',
         type: MAGNETIC_MODULE_TYPE,
+        // @ts-expect-error(sa, 2021-6-14): not a valid magnetic module model
         model: 'someMagModel',
       },
     }
@@ -349,13 +394,13 @@ describe('moduleInvariantProperties reducer', () => {
     expect(result).toEqual({})
   })
 })
-type MakeDeckSetupStepArgs = {
+interface MakeDeckSetupStepArgs {
   labwareLocationUpdate?: Record<string, DeckSlot>
   pipetteLocationUpdate?: Record<string, DeckSlot>
   moduleLocationUpdate?: Record<string, DeckSlot>
 }
 
-const makeDeckSetupStep = (args: MakeDeckSetupStepArgs = {}) => ({
+const makeDeckSetupStep = (args: MakeDeckSetupStepArgs = {}): any => ({
   stepType: 'manualIntervention',
   id: '__INITIAL_DECK_SETUP_STEP__',
   labwareLocationUpdate: args.labwareLocationUpdate || {},
@@ -363,7 +408,7 @@ const makeDeckSetupStep = (args: MakeDeckSetupStepArgs = {}) => ({
   moduleLocationUpdate: args.moduleLocationUpdate || {},
 })
 
-const makePrevRootState = (args: MakeDeckSetupStepArgs): any => ({
+const makePrevRootState = (args?: MakeDeckSetupStepArgs): any => ({
   savedStepForms: {
     [INITIAL_DECK_SETUP_STEP_ID]: makeDeckSetupStep(args),
   },
@@ -378,7 +423,10 @@ describe('savedStepForms reducer: initial deck setup step', () => {
   const labwareOnModuleId = '_labwareOnModuleId'
   describe('create (or duplicate) new labware', () => {
     const newSlot = '8'
-    const testCases = [
+    const testCases: Array<{
+      testName: string
+      action: SavedStepFormsActions
+    }> = [
       {
         testName: 'duplicate labware',
         action: {
@@ -426,6 +474,8 @@ describe('savedStepForms reducer: initial deck setup step', () => {
       sourceSlot: DeckSlot
       destSlot: DeckSlot
       makeStateArgs: MakeDeckSetupStepArgs
+      deckSetup?: any
+      labwareIsCompatible?: boolean
       expectedLabwareLocations?: Record<string, any>
       expectedModuleLocations?: Record<string, any>
     }> = [
@@ -761,18 +811,20 @@ describe('savedStepForms reducer: initial deck setup step', () => {
       }) => {
         it(testName, () => {
           mock_getInitialDeckSetupRootState.mockReturnValue(deckSetup)
-          getLabwareIsCompatibleMock.mockReturnValue(labwareIsCompatible)
+          getLabwareIsCompatibleMock.mockReturnValue(
+            labwareIsCompatible as boolean
+          )
           const prevRootState = makePrevRootState(makeStateArgs)
           const action = moveDeckItem(sourceSlot, destSlot)
           const result = savedStepForms(prevRootState, action)
 
-          if (expectedLabwareLocations) {
+          if (expectedLabwareLocations != null) {
             expect(
               result[INITIAL_DECK_SETUP_STEP_ID].labwareLocationUpdate
             ).toEqual(expectedLabwareLocations)
           }
 
-          if (expectedModuleLocations) {
+          if (expectedModuleLocations != null) {
             expect(
               result[INITIAL_DECK_SETUP_STEP_ID].moduleLocationUpdate
             ).toEqual(expectedModuleLocations)
@@ -789,7 +841,7 @@ describe('savedStepForms reducer: initial deck setup step', () => {
         [labwareToDeleteId]: '2',
       },
     })
-    const action = {
+    const action: DeleteContainerAction = {
       type: 'DELETE_CONTAINER',
       payload: {
         labwareId: labwareToDeleteId,
@@ -822,7 +874,7 @@ describe('savedStepForms reducer: initial deck setup step', () => {
       },
     ]
     testCases.forEach(({ pipettesToDelete, expected }) => {
-      const action = {
+      const action: DeletePipettesAction = {
         type: 'DELETE_PIPETTES',
         payload: pipettesToDelete,
       }
@@ -875,7 +927,7 @@ describe('savedStepForms reducer: initial deck setup step', () => {
           expectedModuleLocations,
         }) => {
           it(testName, () => {
-            const action = {
+            const action: CreateModuleAction = {
               type: 'CREATE_MODULE',
               payload: {
                 id: moduleId,
@@ -897,7 +949,7 @@ describe('savedStepForms reducer: initial deck setup step', () => {
       )
     })
     describe('existing steps', () => {
-      let prevRootStateWithMagAndTCSteps
+      let prevRootStateWithMagAndTCSteps: any
       beforeEach(() => {
         prevRootStateWithMagAndTCSteps = {
           savedStepForms: {
@@ -1090,14 +1142,17 @@ describe('savedStepForms reducer: initial deck setup step', () => {
   })
   describe('delete module -> removes references to module from step forms', () => {
     const stepId = '_stepId'
-    const action = {
+    const action: DeleteModuleAction = {
       type: 'DELETE_MODULE',
       payload: {
         id: moduleId,
       },
     }
 
-    const getPrevRootStateWithStep = step => ({
+    const getPrevRootStateWithStep = (
+      step: FormData
+      // @ts-expect-error(sa, 2021-6-14): make this actually return RootState (add the rest of the state properties)
+    ): RootState => ({
       savedStepForms: {
         [INITIAL_DECK_SETUP_STEP_ID]: makeDeckSetupStep({
           moduleLocationUpdate: {
@@ -1109,7 +1164,7 @@ describe('savedStepForms reducer: initial deck setup step', () => {
       },
     })
 
-    const testCases = [
+    const testCases: Array<{ testName: string; step: FormData }> = [
       {
         testName: 'pause -> wait until temperature step',
         step: {
@@ -1159,7 +1214,12 @@ describe('savedStepForms reducer: initial deck setup step', () => {
     })
   })
   describe('deleting steps', () => {
-    let savedStepFormsState
+    let savedStepFormsState: {
+      [id: string]: {
+        stepType: StepType
+        id: string
+      }
+    }
     beforeEach(() => {
       savedStepFormsState = {
         [INITIAL_DECK_SETUP_STEP_ID]: makeDeckSetupStep({
@@ -1168,12 +1228,15 @@ describe('savedStepForms reducer: initial deck setup step', () => {
             [otherModuleId]: '2',
           },
         }),
+        // @ts-expect-error(sa, 2021-6-14): add stepTypes to these test fixtures
         id1: {
           id: 'id1',
         },
+        // @ts-expect-error(sa, 2021-6-14): add stepTypes to these test fixtures
         id2: {
           id: 'id2',
         },
+        // @ts-expect-error(sa, 2021-6-14): add stepTypes to these test fixtures
         id3: {
           id: 'id3',
         },
@@ -1188,6 +1251,7 @@ describe('savedStepForms reducer: initial deck setup step', () => {
       delete expectedState.id1
       expect(
         savedStepForms(
+          // @ts-expect-error(sa, 2021-6-14): add missing keys to savedStepFormsState
           {
             savedStepForms: savedStepFormsState,
           },
@@ -1205,6 +1269,7 @@ describe('savedStepForms reducer: initial deck setup step', () => {
       delete expectedState.id2
       expect(
         savedStepForms(
+          // @ts-expect-error(sa, 2021-6-14): add missing keys to savedStepFormsState
           {
             savedStepForms: savedStepFormsState,
           },
@@ -1214,7 +1279,12 @@ describe('savedStepForms reducer: initial deck setup step', () => {
     })
   })
   describe('duplicating steps', () => {
-    let savedStepFormsState
+    let savedStepFormsState: {
+      [id: string]: {
+        stepType: StepType
+        id: string
+      }
+    }
     beforeEach(() => {
       savedStepFormsState = {
         [INITIAL_DECK_SETUP_STEP_ID]: makeDeckSetupStep({
@@ -1223,19 +1293,22 @@ describe('savedStepForms reducer: initial deck setup step', () => {
             [otherModuleId]: '2',
           },
         }),
+        // @ts-expect-error(sa, 2021-6-14): add stepTypes to these test fixtures
         id1: {
           id: 'id1',
         },
+        // @ts-expect-error(sa, 2021-6-14): add stepTypes to these test fixtures
         id2: {
           id: 'id2',
         },
+        // @ts-expect-error(sa, 2021-6-14): add stepTypes to these test fixtures
         id3: {
           id: 'id3',
         },
       }
     })
     it('should duplicate one step', () => {
-      const action = {
+      const action: DuplicateStepAction = {
         type: 'DUPLICATE_STEP',
         payload: {
           stepId: 'id1',
@@ -1250,6 +1323,7 @@ describe('savedStepForms reducer: initial deck setup step', () => {
       }
       expect(
         savedStepForms(
+          // @ts-expect-error(sa, 2021-6-14): add missing keys to savedStepFormsState
           {
             savedStepForms: savedStepFormsState,
           },
@@ -1292,6 +1366,7 @@ describe('savedStepForms reducer: initial deck setup step', () => {
       }
       expect(
         savedStepForms(
+          // @ts-expect-error(sa, 2021-6-14): add missing keys to savedStepFormsState
           {
             savedStepForms: savedStepFormsState,
           },
@@ -1308,6 +1383,7 @@ describe('savedStepForms reducer: initial deck setup step', () => {
             id: 'magPlateId',
             slot: 'magModuleId',
             def: {
+              // @ts-expect-error(sa, 2021-6-14): add missing parameters to fixture
               parameters: {
                 magneticModuleEngageHeight: 12,
               },
@@ -1316,6 +1392,7 @@ describe('savedStepForms reducer: initial deck setup step', () => {
         },
         pipettes: {},
         modules: {
+          // @ts-expect-error(sa, 2021-6-14): add missing parameters to fixture
           magModuleId: {
             id: 'magModuleId',
             type: MAGNETIC_MODULE_TYPE,
@@ -1324,33 +1401,37 @@ describe('savedStepForms reducer: initial deck setup step', () => {
           },
         },
       })
-      const action = {
+      const action: EditModuleAction = {
         type: 'EDIT_MODULE',
         payload: {
           id: 'magModuleId',
           model: 'magneticModuleV2',
         },
       }
-      const prevRootState = {
+      const prevRootState: RootState = {
         savedStepForms: {
+          // @ts-expect-error(sa, 2021-6-14): add id to fixture
           magnetEngageStepId: {
             stepType: 'magnet',
             magnetAction: 'engage',
             moduleId: 'magModuleId',
             engageHeight: '24', // = 12 * 2 b/c we're going V1 -> V2
           },
+          // @ts-expect-error(sa, 2021-6-14): add id to fixture
           magnetDisengageStepId: {
             stepType: 'magnet',
             magnetAction: 'disengage',
             engageHeight: null,
             moduleId: 'magModuleId',
           },
+          // @ts-expect-error(sa, 2021-6-14): add id to fixture
           nonDefaultMagnetEngageStepId: {
             stepType: 'magnet',
             magnetAction: 'engage',
             moduleId: 'magModuleId',
             engageHeight: '8',
           },
+          // @ts-expect-error(sa, 2021-6-14): add id to fixture
           unrelatedMagnetEngageStepId: {
             stepType: 'magnet',
             magnetAction: 'engage',
@@ -1385,14 +1466,16 @@ describe('savedStepForms reducer: initial deck setup step', () => {
   })
   describe('saving multiple steps', () => {
     it('should apply the form patch to all of the step ids', () => {
-      const prevState = {
+      const prevState: RootState = {
         savedStepForms: {
+          // @ts-expect-error(sa, 2021-6-14): add id to fixture
           some_transfer_step_id: {
             stepType: 'moveLiquid',
             blowout_location: 'someLocation',
             dispense_mix_checkbox: true,
             dispense_mix_volume: '10',
           },
+          // @ts-expect-error(sa, 2021-6-14): add id to fixture
           another_transfer_step_id: {
             stepType: 'moveLiquid',
             blowout_location: 'anotherLocation',
@@ -1401,7 +1484,7 @@ describe('savedStepForms reducer: initial deck setup step', () => {
           },
         },
       }
-      const action = {
+      const action: SaveStepFormsMultiAction = {
         type: 'SAVE_STEP_FORMS_MULTI',
         payload: {
           editedFields: {
@@ -1451,7 +1534,7 @@ describe('unsavedForm reducer', () => {
         existingField: 123,
       },
     }
-    const action = {
+    const action: ChangeFormInputAction = {
       type: 'CHANGE_FORM_INPUT',
       payload: {
         update: {
@@ -1463,9 +1546,11 @@ describe('unsavedForm reducer', () => {
       someField: 42,
     })
     mock_getPipetteEntitiesRootState.mockReturnValue(
+      // @ts-expect-error(sa, 2021-6-14): not a valid PipetteEntities Type
       'pipetteEntitiesPlaceholder'
     )
     mock_getLabwareEntitiesRootState.mockReturnValue(
+      // @ts-expect-error(sa, 2021-6-14): not a valid LabwareEntities Type
       'labwareEntitiesPlaceholder'
     )
     const result = unsavedForm(rootState, action)
@@ -1485,7 +1570,7 @@ describe('unsavedForm reducer', () => {
     })
   })
   it("should switch out pipettes via handleFormChange in response to SUBSTITUTE_STEP_FORM_PIPETTES if the unsaved form's ID is in range", () => {
-    const action = {
+    const action: SubstituteStepFormPipettesAction = {
       type: 'SUBSTITUTE_STEP_FORM_PIPETTES',
       payload: {
         substitutionMap: {
@@ -1495,8 +1580,9 @@ describe('unsavedForm reducer', () => {
         endStepId: '5',
       },
     }
-    const rootState = {
+    const rootState: RootState = {
       orderedStepIds: ['1', '3', '4', '5', '6'],
+      // @ts-expect-error(sa, 2021-6-14): add stepType to fixture
       unsavedForm: {
         pipette: 'oldPipetteId',
         id: '4',
@@ -1507,9 +1593,11 @@ describe('unsavedForm reducer', () => {
       pipette: 'newPipetteId',
     })
     mock_getPipetteEntitiesRootState.mockReturnValue(
+      // @ts-expect-error(sa, 2021-6-14): not a valid PipetteEntities Type
       'pipetteEntitiesPlaceholder'
     )
     mock_getLabwareEntitiesRootState.mockReturnValue(
+      // @ts-expect-error(sa, 2021-6-14): not a valid LabwareEntities Type
       'labwareEntitiesPlaceholder'
     )
     const result = unsavedForm(rootState, action)
@@ -1531,7 +1619,7 @@ describe('unsavedForm reducer', () => {
       otherField: 'blah',
     })
   })
-  const actionTypes = [
+  const actionTypes: Array<UnsavedFormActions['type']> = [
     'CANCEL_STEP_FORM',
     'CREATE_MODULE',
     'DELETE_MODULE',
@@ -1544,6 +1632,7 @@ describe('unsavedForm reducer', () => {
   ]
   actionTypes.forEach(actionType => {
     it(`should clear the unsaved form when any ${actionType} action is dispatched`, () => {
+      // @ts-expect-error(sa, 2021-6-14): missing a payload
       const result = unsavedForm(someState, {
         type: actionType,
       })
@@ -1552,11 +1641,14 @@ describe('unsavedForm reducer', () => {
   })
   it('should return the result createPresavedStepForm util upon ADD_STEP action', () => {
     mockCreatePresavedStepForm.mockReturnValue(
+      // @ts-expect-error(sa, 2021-6-14): not a valid FormData Type
       'createPresavedStepFormMockResult'
     )
     mock_getInitialDeckSetupRootState.mockReturnValue('initalDeckSetupValue')
-    const stateMock = {
+    const stateMock: RootState = {
+      // @ts-expect-error(sa, 2021-6-14): not valid savedStepForms state
       savedStepForms: 'savedStepFormsValue',
+      // @ts-expect-error(sa, 2021-6-14): not valid orderedStepIds state
       orderedStepIds: 'orderedStepIdsValue',
     }
     const result = unsavedForm(stateMock, {
@@ -1566,6 +1658,7 @@ describe('unsavedForm reducer', () => {
         stepType: 'moveLiquid',
       },
       meta: {
+        // @ts-expect-error(sa, 2021-6-14): not valid Timeline state
         robotStateTimeline: 'robotStateTimelineValue',
       },
     })
@@ -1586,7 +1679,7 @@ describe('unsavedForm reducer', () => {
     ])
   })
   it('should add a profile cycle item upon ADD_PROFILE_CYCLE action', () => {
-    const action = {
+    const action: AddProfileCycleAction = {
       type: 'ADD_PROFILE_CYCLE',
       payload: null,
     }
@@ -1597,7 +1690,8 @@ describe('unsavedForm reducer', () => {
     // assumes it's first for cycle id, then next for profile step id
     mockUuid.mockReturnValueOnce(id)
     mockUuid.mockReturnValueOnce(profileStepId)
-    const state = {
+    const state: RootState = {
+      // @ts-expect-error(sa, 2021-6-14): add id to fixture
       unsavedForm: {
         stepType: 'thermocycler',
         orderedProfileItems: [],
@@ -1616,14 +1710,15 @@ describe('unsavedForm reducer', () => {
   it('should add a profile step item to the specified cycle upon ADD_PROFILE_STEP action with cycleId payload', () => {
     const cycleId = 'someCycleId'
     const stepId = 'newStepId'
-    const action = {
+    const action: AddProfileStepAction = {
       type: 'ADD_PROFILE_STEP',
       payload: {
         cycleId,
       },
     }
     mockUuid.mockReturnValue(stepId)
-    const state = {
+    const state: RootState = {
+      // @ts-expect-error(sa, 2021-6-14): add id to fixture
       unsavedForm: {
         stepType: 'thermocycler',
         orderedProfileItems: [cycleId],
@@ -1643,6 +1738,7 @@ describe('unsavedForm reducer', () => {
       orderedProfileItems: [cycleId],
       profileItemsById: {
         [cycleId]: {
+          // @ts-expect-error(sa, 2021-6-14): possibly null
           ...state.unsavedForm.profileItemsById[cycleId],
           steps: [
             {
@@ -1660,13 +1756,14 @@ describe('unsavedForm reducer', () => {
   })
   it('should remove a profile step item on DELETE_PROFILE_STEP', () => {
     const id = 'stepItemId'
-    const action = {
+    const action: DeleteProfileStepAction = {
       type: 'DELETE_PROFILE_STEP',
       payload: {
         id,
       },
     }
-    const state = {
+    const state: RootState = {
+      // @ts-expect-error(sa, 2021-6-14): add missing id to fixture
       unsavedForm: {
         stepType: 'thermocycler',
         orderedProfileItems: [id],
@@ -1692,13 +1789,14 @@ describe('unsavedForm reducer', () => {
   it('should remove a step item inside a cycle on DELETE_PROFILE_STEP', () => {
     const stepId = 'stepItemId'
     const cycleId = 'cycleId'
-    const action = {
+    const action: DeleteProfileStepAction = {
       type: 'DELETE_PROFILE_STEP',
       payload: {
         id: stepId,
       },
     }
-    const state = {
+    const state: RootState = {
+      // @ts-expect-error(sa, 2021-6-14): add id to fixture
       unsavedForm: {
         stepType: 'thermocycler',
         orderedProfileItems: [cycleId],
@@ -1737,13 +1835,14 @@ describe('unsavedForm reducer', () => {
   })
   it('should do nothing on DELETE_PROFILE_STEP when the id is a cycle', () => {
     const id = 'cycleItemId'
-    const action = {
+    const action: DeleteProfileStepAction = {
       type: 'DELETE_PROFILE_STEP',
       payload: {
         id,
       },
     }
-    const state = {
+    const state: RootState = {
+      // @ts-expect-error(sa, 2021-6-14): add id to fixture
       unsavedForm: {
         stepType: 'thermocycler',
         orderedProfileItems: [id],
@@ -1762,13 +1861,14 @@ describe('unsavedForm reducer', () => {
   })
   it('should delete cycle on DELETE_PROFILE_CYCLE', () => {
     const id = 'cycleItemId'
-    const action = {
+    const action: DeleteProfileCycleAction = {
       type: 'DELETE_PROFILE_CYCLE',
       payload: {
         id,
       },
     }
-    const state = {
+    const state: RootState = {
+      // @ts-expect-error(sa, 2021-6-14): add id to fixture
       unsavedForm: {
         stepType: 'thermocycler',
         orderedProfileItems: [id],
@@ -1791,7 +1891,7 @@ describe('unsavedForm reducer', () => {
   })
   it('should edit a profile step on the top level with EDIT_PROFILE_STEP', () => {
     const stepId = 'profileStepId'
-    const action = {
+    const action: EditProfileStepAction = {
       type: 'EDIT_PROFILE_STEP',
       payload: {
         id: stepId,
@@ -1800,7 +1900,8 @@ describe('unsavedForm reducer', () => {
         },
       },
     }
-    const state = {
+    const state: RootState = {
+      // @ts-expect-error(sa, 2021-6-14): add id to fixture
       unsavedForm: {
         stepType: 'thermocycler',
         orderedProfileItems: [stepId],
@@ -1835,7 +1936,7 @@ describe('unsavedForm reducer', () => {
   it('should edit a profile step that is inside a cycle with EDIT_PROFILE_STEP', () => {
     const cycleId = 'cycleId'
     const stepId = 'profileStepId'
-    const action = {
+    const action: EditProfileStepAction = {
       type: 'EDIT_PROFILE_STEP',
       payload: {
         id: stepId,
@@ -1844,7 +1945,8 @@ describe('unsavedForm reducer', () => {
         },
       },
     }
-    const state = {
+    const state: RootState = {
+      // @ts-expect-error(sa, 2021-6-14): add id to fixture
       unsavedForm: {
         stepType: 'thermocycler',
         orderedProfileItems: [cycleId],
@@ -1892,7 +1994,7 @@ describe('unsavedForm reducer', () => {
   })
   it('should edit a profile cycle on EDIT_PROFILE_CYCLE', () => {
     const cycleId = 'cycleId'
-    const action = {
+    const action: EditProfileCycleAction = {
       type: 'EDIT_PROFILE_CYCLE',
       payload: {
         id: cycleId,
@@ -1901,7 +2003,8 @@ describe('unsavedForm reducer', () => {
         },
       },
     }
-    const state = {
+    const state: RootState = {
+      // @ts-expect-error(sa, 2021-6-14): add id to fixture
       unsavedForm: {
         stepType: 'thermocycler',
         orderedProfileItems: [cycleId],
@@ -1936,6 +2039,7 @@ describe('presavedStepForm reducer', () => {
       type: 'ADD_STEP',
       payload: {
         id: 'someId',
+        // @ts-expect-error(sa, 2021-6-14): transfer is not a valid stepType, change to moveLiquid
         stepType: 'transfer',
       },
     }
@@ -1945,26 +2049,29 @@ describe('presavedStepForm reducer', () => {
     })
   })
   it('should not update when the PRESAVED_STEP_ID terminal item is selected', () => {
-    const prevState = {
+    const prevState: PresavedStepFormState = {
+      // @ts-expect-error(sa, 2021-6-14): transfer is not a valid stepType, change to moveLiquid
       stepType: 'transfer',
     }
-    const action = {
+    const action: SelectTerminalItemAction = {
       type: 'SELECT_TERMINAL_ITEM',
       payload: PRESAVED_STEP_ID,
     }
     expect(presavedStepForm(prevState, action)).toBe(prevState)
   })
   it('should clear when a different terminal item is selected', () => {
-    const prevState = {
+    const prevState: PresavedStepFormState = {
+      // @ts-expect-error(sa, 2021-6-14): transfer is not a valid stepType, change to moveLiquid
       stepType: 'transfer',
     }
-    const action = {
+    const action: SelectTerminalItemAction = {
       type: 'SELECT_TERMINAL_ITEM',
+      // @ts-expect-error(sa, 2021-6-14): transfer is not a valid TerminalItemId
       payload: 'otherId',
     }
     expect(presavedStepForm(prevState, action)).toEqual(null)
   })
-  const clearingActions = [
+  const clearingActions: Array<PresavedStepFormAction['type']> = [
     'CANCEL_STEP_FORM',
     'DELETE_STEP',
     'DELETE_MULTIPLE_STEPS',
@@ -1974,11 +2081,13 @@ describe('presavedStepForm reducer', () => {
   ]
   clearingActions.forEach(actionType => {
     it(`should clear upon ${actionType}`, () => {
-      const prevState = {
+      const prevState: PresavedStepFormState = {
         id: 'someId',
+        // @ts-expect-error(sa, 2021-6-14): transfer is not a valid stepType, change to moveLiquid
         stepType: 'transfer',
       }
       expect(
+        // @ts-expect-error(sa, 2021-6-14): missing payload
         presavedStepForm(prevState, {
           type: actionType,
         })
@@ -1989,7 +2098,7 @@ describe('presavedStepForm reducer', () => {
 describe('batchEditFormChanges reducer', () => {
   it('should add the new fields into empty state on CHANGE_BATCH_EDIT_FIELD', () => {
     const state = {}
-    const action = {
+    const action: ChangeBatchEditFieldAction = {
       type: 'CHANGE_BATCH_EDIT_FIELD',
       payload: {
         someFieldName: 'someFieldValue',
@@ -2003,7 +2112,7 @@ describe('batchEditFormChanges reducer', () => {
     const state = {
       someFieldName: 'someFieldValue',
     }
-    const action = {
+    const action: ChangeBatchEditFieldAction = {
       type: 'CHANGE_BATCH_EDIT_FIELD',
       payload: {
         anotherFieldName: 'anotherFieldValue',
@@ -2018,7 +2127,7 @@ describe('batchEditFormChanges reducer', () => {
     const state = {
       someFieldName: 'someFieldValue',
     }
-    const action = {
+    const action: ResetBatchEditFieldChangesAction = {
       type: 'RESET_BATCH_EDIT_FIELD_CHANGES',
     }
     expect(batchEditFormChanges(state, { ...action })).toEqual({})
@@ -2027,7 +2136,8 @@ describe('batchEditFormChanges reducer', () => {
     const state = {
       someFieldName: 'someFieldValue',
     }
-    const action = {
+    // @ts-expect-error(sa, 2021-6-14): missing payload
+    const action: SaveStepFormsMultiAction = {
       type: 'SAVE_STEP_FORMS_MULTI',
     }
     expect(batchEditFormChanges(state, { ...action })).toEqual({})
@@ -2036,7 +2146,8 @@ describe('batchEditFormChanges reducer', () => {
     const state = {
       someFieldName: 'someFieldValue',
     }
-    const action = {
+    // @ts-expect-error(sa, 2021-6-14): missing payload
+    const action: SelectStepAction = {
       type: 'SELECT_STEP',
     }
     expect(batchEditFormChanges(state, { ...action })).toEqual({})
@@ -2045,7 +2156,8 @@ describe('batchEditFormChanges reducer', () => {
     const state = {
       someFieldName: 'someFieldValue',
     }
-    const action = {
+    // @ts-expect-error(sa, 2021-6-14): missing payload
+    const action: SelectMultipleStepsAction = {
       type: 'SELECT_MULTIPLE_STEPS',
     }
     expect(batchEditFormChanges(state, { ...action })).toEqual({})
@@ -2054,7 +2166,8 @@ describe('batchEditFormChanges reducer', () => {
     const state = {
       someFieldName: 'someFieldValue',
     }
-    const action = {
+    // @ts-expect-error(sa, 2021-6-14): missing payload
+    const action: DuplicateMultipleStepsAction = {
       type: 'DUPLICATE_MULTIPLE_STEPS',
     }
     expect(batchEditFormChanges(state, { ...action })).toEqual({})
@@ -2063,7 +2176,8 @@ describe('batchEditFormChanges reducer', () => {
     const state = {
       someFieldName: 'someFieldValue',
     }
-    const action = {
+    // @ts-expect-error(sa, 2021-6-14): missing payload
+    const action: DeleteMultipleStepsAction = {
       type: 'DELETE_MULTIPLE_STEPS',
     }
     expect(batchEditFormChanges(state, { ...action })).toEqual({})

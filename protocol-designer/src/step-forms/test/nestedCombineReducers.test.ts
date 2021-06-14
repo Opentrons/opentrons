@@ -1,7 +1,11 @@
+import { Action } from 'redux'
 import { nestedCombineReducers } from '../reducers/nestedCombineReducers'
 
 // typical reducer, only gets its own substate
-const fruits = (state = [], action) => {
+const fruits = (
+  state = [],
+  action: Record<string, any>
+): Record<string, any> => {
   if (action.type === 'ADD_FRUIT') {
     return [...state, action.payload]
   }
@@ -10,7 +14,10 @@ const fruits = (state = [], action) => {
 }
 
 // "top-level" reducer, gets whole nestedCombineReducers state
-const warnings = (rootState, action) => {
+const warnings = (
+  rootState: Record<string, any>,
+  action: Record<string, any>
+): Record<string, any> => {
   const substate = rootState?.warnings || {}
 
   if (action.type === 'ADD_FRUIT' && action.payload === 'durian') {
@@ -39,10 +46,11 @@ describe('nestedCombineReducers', () => {
     })
   })
   it('should populate with initial undefined state (handled action)', () => {
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const result = combinedReducer(undefined, {
       type: 'ADD_FRUIT',
       payload: 'durian',
-    })
+    } as Action)
     expect(result).toEqual({
       fruits: ['durian'],
       warnings: {
@@ -55,10 +63,11 @@ describe('nestedCombineReducers', () => {
       fruits: ['banana'],
       warnings: {},
     }
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const result = combinedReducer(prevState, {
       type: 'ADD_FRUIT',
       payload: 'durian',
-    })
+    } as Action)
     expect(result).toEqual({
       fruits: ['banana', 'durian'],
       warnings: {
@@ -78,7 +87,10 @@ describe('nestedCombineReducers', () => {
   })
   it('should throw an error when any sub-reducer returns undefined', () => {
     // counts total fruits added, but we "accidentally" return undefined for any other actions
-    const badCountReducer = (state, action) => {
+    const badCountReducer = (
+      state: number | undefined,
+      action: Action<any>
+    ): number | undefined => {
       if (state === undefined) {
         // weird way to initialize, but otherwise this will fail b/c
         // the reducer initializes to undefined
@@ -114,10 +126,11 @@ describe('nestedCombineReducers', () => {
           warnings: {},
           badCountReducer: 0,
         },
+        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
         {
           type: 'UNHANDLED_ACTION',
           payload: 'foo',
-        }
+        } as Action
       )
     }).toThrowError(
       'Given action "UNHANDLED_ACTION", reducer "badCountReducer" returned undefined. To ignore an action, you must explicitly return the previous state. If you want this reducer to hold no value, you can return null instead of undefined.'
@@ -125,7 +138,7 @@ describe('nestedCombineReducers', () => {
   })
   it('should throw an error when any sub-reducer initializes to undefined', () => {
     // counts fruits added, but we "forgot" to give it an initial state
-    const badCountReducer = (state, action) => {
+    const badCountReducer = (state: number, action: Action<any>): number => {
       if (action.type === 'ADD_FRUIT') {
         return state + 1
       }

@@ -1,9 +1,9 @@
 import { Action, Reducer } from 'redux'
-export type GetNextState = (arg0: {
-  action: Record<string, any>
-  state: Record<string, any>
-  prevStateFallback: Record<string, any>
-}) => Record<string, any>
+export type GetNextState<S, A extends Action> = (args: {
+  action: A
+  state: S
+  prevStateFallback: S
+}) => S
 
 const getUndefinedStateErrorMessage = (
   key: string,
@@ -22,13 +22,16 @@ const getUndefinedStateErrorMessage = (
 // an arbitrary used to test for initialization
 const FAKE_INIT_ACTION = '@@redux/INITnestedCombineReducers'
 
-const assertReducerShape = (getNextState: GetNextState): void => {
+const assertReducerShape = <S extends Record<string, any>, A extends Action>(
+  getNextState: GetNextState<S, A>
+): void => {
   const initialState = getNextState({
-    // @ts-expect-error(sa, 2021-6-10): adjust to adhere to GetNextState.action type
+    // @ts-expect-error type FAKE_INIT_ACTION to be of type Action
     action: FAKE_INIT_ACTION,
-    // @ts-expect-error(sa, 2021-6-10): adjust to adhere to GetNextState.state type
+    // @ts-expect-error(sa, 2021-6-14): type 
     state: undefined,
-    prevStateFallback: {},
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    prevStateFallback: {} as S,
   })
   Object.keys(initialState).forEach(key => {
     if (initialState[key] === undefined) {
@@ -46,12 +49,14 @@ const assertReducerShape = (getNextState: GetNextState): void => {
 export function nestedCombineReducers<
   S extends Record<string, any>,
   A extends Action
->(getNextState: GetNextState): Reducer<S, A> {
+>(getNextState: GetNextState<S, A>): Reducer<S, A> {
   assertReducerShape(getNextState)
   return (state, action) => {
-    const prevStateFallback = state || {}
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    const prevStateFallback = state || ({} as S)
     const nextState = getNextState({
       action,
+      // @ts-expect-error(sa, 2021-6-14): getNextState cannot return undefined because our reducers do not expect state to be undefined
       state,
       prevStateFallback,
     })

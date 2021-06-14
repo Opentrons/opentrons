@@ -8,8 +8,8 @@ import type {
   LabwareDefinition2,
   ModuleRealType,
   ModuleModel,
-  PipetteName,
   PipetteNameSpecs,
+  PipetteName,
 } from '@opentrons/shared-data'
 import type {
   AtomicProfileStep,

@@ -3,7 +3,7 @@ import { selectors } from '../selectors'
 import { DeckSlot, ThunkAction } from '../../types'
 import { IngredInputs } from '../types'
 // ===== Labware selector actions =====
-export type OpenAddLabwareModalAction = {
+export interface OpenAddLabwareModalAction {
   type: 'OPEN_ADD_LABWARE_MODAL'
   payload: {
     slot: DeckSlot
@@ -12,7 +12,7 @@ export type OpenAddLabwareModalAction = {
 export const openAddLabwareModal: (payload: {
   slot: DeckSlot // $FlowFixMe(mc, 2020-06-04): creatActions doesn't return exact actions
 }) => OpenAddLabwareModalAction = createAction('OPEN_ADD_LABWARE_MODAL')
-export type CloseLabwareSelectorAction = {
+export interface CloseLabwareSelectorAction {
   type: 'CLOSE_LABWARE_SELECTOR'
 }
 // @ts-expect-error(mc, 2020-06-04): creatActions doesn't return exact actions
@@ -20,7 +20,7 @@ export const closeLabwareSelector: () => CloseLabwareSelectorAction = createActi
   'CLOSE_LABWARE_SELECTOR'
 )
 // ===== Open and close Ingredient Selector modal ====
-export type OpenIngredientSelectorAction = {
+export interface OpenIngredientSelectorAction {
   type: 'OPEN_INGREDIENT_SELECTOR'
   payload: string
 }
@@ -28,7 +28,7 @@ export const openIngredientSelector: (
   payload: // $FlowFixMe(mc, 2020-06-04): creatActions doesn't return exact actions
   string
 ) => OpenIngredientSelectorAction = createAction('OPEN_INGREDIENT_SELECTOR')
-export type CloseIngredientSelectorAction = {
+export interface CloseIngredientSelectorAction {
   type: 'CLOSE_INGREDIENT_SELECTOR'
 }
 // @ts-expect-error(mc, 2020-06-04): creatActions doesn't return exact actions
@@ -36,7 +36,7 @@ export const closeIngredientSelector: () => CloseIngredientSelectorAction = crea
   'CLOSE_INGREDIENT_SELECTOR'
 )
 // ===== Drill Down on Labware ====
-export type DrillDownOnLabwareAction = {
+export interface DrillDownOnLabwareAction {
   type: 'DRILL_DOWN_ON_LABWARE'
   payload: string
 }
@@ -44,7 +44,7 @@ export const drillDownOnLabware: (
   payload: // $FlowFixMe(mc, 2020-06-04): creatActions doesn't return exact actions
   string
 ) => DrillDownOnLabwareAction = createAction('DRILL_DOWN_ON_LABWARE')
-export type DrillUpFromLabwareAction = {
+export interface DrillUpFromLabwareAction {
   type: 'DRILL_UP_FROM_LABWARE'
 }
 // @ts-expect-error(mc, 2020-06-04): creatActions doesn't return exact actions
@@ -52,19 +52,19 @@ export const drillUpFromLabware: () => DrillUpFromLabwareAction = createAction(
   'DRILL_UP_FROM_LABWARE'
 )
 // ==== Create/delete/modify labware =====
-export type CreateContainerArgs = {
+export interface CreateContainerArgs {
   slot?: DeckSlot
   // NOTE: if slot is omitted, next available slot will be used.
   labwareDefURI: string
 }
-export type CreateContainerAction = {
+export interface CreateContainerAction {
   type: 'CREATE_CONTAINER'
   payload: CreateContainerArgs & {
     slot: DeckSlot
     id: string
   }
 }
-export type DeleteContainerAction = {
+export interface DeleteContainerAction {
   type: 'DELETE_CONTAINER'
   payload: {
     labwareId: string
@@ -74,7 +74,7 @@ export const deleteContainer: (payload: {
   labwareId: string // $FlowFixMe(mc, 2020-06-04): creatActions doesn't return exact actions
 }) => DeleteContainerAction = createAction('DELETE_CONTAINER')
 // ===========
-export type SwapSlotContentsAction = {
+export interface SwapSlotContentsAction {
   type: 'MOVE_DECK_ITEM'
   payload: {
     sourceSlot: DeckSlot
@@ -93,7 +93,7 @@ export const moveDeckItem = (
     destSlot,
   },
 })
-export type DuplicateLabwareAction = {
+export interface DuplicateLabwareAction {
   type: 'DUPLICATE_LABWARE'
   payload: {
     templateLabwareId: string
@@ -102,7 +102,7 @@ export type DuplicateLabwareAction = {
     slot: DeckSlot
   }
 }
-export type RemoveWellsContentsAction = {
+export interface RemoveWellsContentsAction {
   type: 'REMOVE_WELLS_CONTENTS'
   payload: {
     labwareId: string
@@ -116,7 +116,7 @@ export const removeWellsContents: (
   type: 'REMOVE_WELLS_CONTENTS',
   payload,
 })
-export type DeleteLiquidGroupAction = {
+export interface DeleteLiquidGroupAction {
   type: 'DELETE_LIQUID_GROUP'
   payload: string // liquid group id
 }
@@ -144,14 +144,14 @@ export const deleteLiquidGroup: (
   }
 }
 // NOTE: assumes you want to set a uniform volume of the same liquid in one labware
-export type SetWellContentsPayload = {
+export interface SetWellContentsPayload {
   liquidGroupId: string
   labwareId: string
   wells: string[]
   // NOTE: order should not be meaningful
   volume: number
 }
-export type SetWellContentsAction = {
+export interface SetWellContentsAction {
   type: 'SET_WELL_CONTENTS'
   payload: SetWellContentsPayload
 }
@@ -161,7 +161,7 @@ export const setWellContents = (
   type: 'SET_WELL_CONTENTS',
   payload,
 })
-export type SelectLiquidAction = {
+export interface SelectLiquidAction {
   type: 'SELECT_LIQUID_GROUP'
   payload: string
 }
@@ -171,7 +171,7 @@ export function selectLiquidGroup(liquidGroupId: string): SelectLiquidAction {
     payload: liquidGroupId,
   }
 }
-export type DeselectLiquidGroupAction = {
+export interface DeselectLiquidGroupAction {
   type: 'DESELECT_LIQUID_GROUP'
 }
 export function deselectLiquidGroup(): DeselectLiquidGroupAction {
@@ -179,7 +179,7 @@ export function deselectLiquidGroup(): DeselectLiquidGroupAction {
     type: 'DESELECT_LIQUID_GROUP',
   }
 }
-export type CreateNewLiquidGroupAction = {
+export interface CreateNewLiquidGroupAction {
   type: 'CREATE_NEW_LIQUID_GROUP_FORM'
 }
 export function createNewLiquidGroup(): CreateNewLiquidGroupAction {
@@ -187,7 +187,7 @@ export function createNewLiquidGroup(): CreateNewLiquidGroupAction {
     type: 'CREATE_NEW_LIQUID_GROUP_FORM',
   }
 }
-export type EditLiquidGroupAction = {
+export interface EditLiquidGroupAction {
   type: 'EDIT_LIQUID_GROUP'
   payload: IngredInputs & {
     liquidGroupId: string
