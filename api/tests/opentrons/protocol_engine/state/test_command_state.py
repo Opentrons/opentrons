@@ -40,10 +40,6 @@ def _make_unique_requests(n: int) -> List[LoadLabwareRequest]:
     return requests
 
 
-def _make_request() -> LoadLabwareRequest:
-    return _make_unique_requests(1)[0]
-
-
 @pytest.fixture
 def pending_command(now: datetime) -> PendingCommand:
     """Fixture for an arbitrary `PendingCommand`."""
