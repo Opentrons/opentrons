@@ -68,14 +68,14 @@ class ProtocolSessionCreateParams(BaseModel):
 
 
 class ProtocolSessionCreateData(AbstractSessionCreateData):
-    """Creation request data for a basic session."""
+    """Creation request data for a protocol session."""
 
     sessionType: Literal[SessionType.PROTOCOL] = SessionType.PROTOCOL
     createParams: ProtocolSessionCreateParams
 
 
 class ProtocolSession(AbstractSession):
-    """A session to execute commands without a previously loaded protocol file."""
+    """A session to execute commands with a previously loaded protocol file."""
 
     sessionType: Literal[SessionType.PROTOCOL] = SessionType.PROTOCOL
     createParams: ProtocolSessionCreateParams

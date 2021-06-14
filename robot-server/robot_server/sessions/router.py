@@ -42,7 +42,7 @@ class SessionAlreadyActive(ErrorDetails):
 class SessionActionNotAllowed(ErrorDetails):
     """An error if one tries to issue an unsupported session action."""
 
-    id: Literal["SessionActionNotAllow"] = "SessionActionNotAllow"
+    id: Literal["SessionActionNotAllowed"] = "SessionActionNotAllowed"
     title: str = "Session Action Not Allowed"
 
 
