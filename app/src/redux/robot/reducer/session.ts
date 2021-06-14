@@ -192,8 +192,7 @@ function handleSessionUpdate(
 function handleSessionInProgress(state: SessionState): SessionState {
   return {
     ...state,
-    // ce: seems like `startTime` can go?
-    startTime: null,
+π    startTime: null,
     sessionRequest: { inProgress: true, error: null },
   }
 }

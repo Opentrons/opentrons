@@ -1,6 +1,8 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useInterval } from '@opentrons/components'
+import { format } from 'date-fns'
+
 import { State } from '../../../redux/types'
 import styles from './styles.css'
 import {
@@ -9,7 +11,6 @@ import {
   getRunSeconds,
   getStartTimeMs,
 } from '../../../redux/robot/selectors'
-import { format } from 'date-fns'
 import { formatSeconds } from './utils'
 
 export function RunTimer(): JSX.Element {
@@ -24,9 +25,9 @@ export function RunTimer(): JSX.Element {
   const isPaused = useSelector(getIsPaused)
 
   /**
-   * Using a a timer to tick at a 1 second interval to update the run time and pause durations.
+   * Using a a timer to update the run time and pause durations.
    */
-  useInterval(() => setNow(Date.now()), 1000)
+  useInterval(() => setNow(Date.now()), 500)
   const runTime = formatSeconds(runSeconds)
   const startTime = startTimeMs != null ? format(startTimeMs, 'pp') : ''
 
