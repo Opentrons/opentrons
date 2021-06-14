@@ -3,7 +3,6 @@ import pytest
 
 from datetime import datetime
 from typing import List
-import itertools
 
 from pydantic import BaseModel
 
@@ -20,24 +19,6 @@ from opentrons.protocol_engine.commands import (
     LoadLabwareResult,
 )
 from opentrons.protocol_engine.state.commands import CommandState
-
-
-def _make_unique_requests(n: int) -> List[LoadLabwareRequest]:
-    """Return n dummy requests that are non-equal (!=) to each other."""
-    def request(i: int) -> LoadLabwareRequest:
-        return LoadLabwareRequest(
-            loadName=f"load-name-{i}",
-            namespace="opentrons-test",
-            version=1,
-            location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
-            labwareId=None
-        )
-    requests = [request(i) for i in range(n)]
-    for a, b in itertools.combinations(requests, 2):
-        # Testing the test. If these accidentally compare equal real assertions in this
-        # module (e.g. to compare iteration order) could trivially succeed.
-        assert a != b
-    return requests
 
 
 @pytest.fixture
@@ -93,17 +74,16 @@ def test_state_store_handles_command(
 
 
 def test_command_state_preserves_handle_order(
-    store: StateStore, now: datetime
+    store: StateStore,
+    pending_command: PendingCommand,
+    completed_command: CompletedCommand,
+    running_command: RunningCommand
 ) -> None:
-    unique_commands = [
-        PendingCommand[LoadLabwareRequest, LoadLabwareResult](
-            created_at=now,
-            request=r
-        )
-        for r in _make_unique_requests(3)
-    ]
-    command_a, command_b, command_c = unique_commands
     """It should return commands in the order they are first added."""
+    # Any arbitrary 3 commands that compare non-equal (!=) to each other.
+    command_a = pending_command
+    command_b = running_command
+    command_c = completed_command
 
     store.handle_command(command_a, "command-id-1")
     store.handle_command(command_b, "command-id-2")
