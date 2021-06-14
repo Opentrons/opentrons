@@ -1,4 +1,4 @@
-import { connect, MapStateToProps } from 'react-redux'
+import { connect } from 'react-redux'
 import * as React from 'react'
 import mapValues from 'lodash/mapValues'
 import { BaseState, ThunkDispatch } from '../types'
@@ -10,6 +10,7 @@ import { INITIAL_DECK_SETUP_STEP_ID } from '../constants'
 import { InitialDeckSetup } from '../step-forms'
 import { FileMetadataFields } from '../file-data'
 import { actions as navActions } from '../navigation'
+
 type Props = React.ComponentProps<typeof FilePage>
 type SP = {
   instruments: Props['instruments']
@@ -57,4 +58,8 @@ function mergeProps(
 }
 
 // ce: fix
-export const ConnectedFilePage = connect(mapStateToProps, null, mergeProps)
+export const ConnectedFilePage = connect(
+  mapStateToProps,
+  {},
+  mergeProps
+)(FilePage)

@@ -132,7 +132,7 @@ export type FormData = {
   stepType: StepType
   id: StepIdType // TODO: form value processing to ensure type
 
-  [key: StepFieldName]: any
+  [key: string]: any
 }
 export const PROFILE_CYCLE: 'profileCycle' = 'profileCycle'
 export const PROFILE_STEP: 'profileStep' = 'profileStep'

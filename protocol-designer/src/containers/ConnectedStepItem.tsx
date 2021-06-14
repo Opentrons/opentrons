@@ -22,7 +22,12 @@ import {
 } from '../ui/steps'
 import { selectors as fileDataSelectors } from '../file-data'
 
-import { StepItem, StepItemContents } from '../components/steplist/StepItem'
+import {
+  StepItem,
+  StepItemContents,
+  StepItemContentsProps,
+  StepItemProps,
+} from '../components/steplist/StepItem'
 import {
   CLOSE_BATCH_EDIT_FORM,
   CLOSE_STEP_FORM_WITH_CHANGES,
@@ -177,7 +182,7 @@ export const ConnectedStepItem = (props: Props): JSX.Element => {
     confirm(event)
   }
 
-  const stepItemProps = {
+  const stepItemProps: StepItemProps = {
     description: step.stepDetails,
     rawForm: step,
     stepNumber,
@@ -200,14 +205,12 @@ export const ConnectedStepItem = (props: Props): JSX.Element => {
     isMultiSelectMode,
   }
 
-  const stepItemContentsProps = {
+  const stepItemContentsProps: StepItemContentsProps = {
     rawForm: step,
     stepType: step.stepType,
     substeps,
-
     ingredNames,
     labwareNicknamesById,
-
     highlightSubstep,
     hoveredSubstep,
   }
@@ -242,7 +245,7 @@ export function getMetaSelectedSteps(
   stepId: StepIdType,
   selectedStepId: StepIdType | null
 ): StepIdType[] {
-  let stepsToSelect: StepIdType[] = []
+  let stepsToSelect: StepIdType[];
   if (multiSelectItemIds?.length) {
     // already have a selection, add/remove the meta-clicked item
     stepsToSelect = multiSelectItemIds.includes(stepId)
@@ -262,11 +265,11 @@ export function getMetaSelectedSteps(
 }
 
 function getShiftSelectedSteps(
-  selectedStepId: StepIdType,
+  selectedStepId: StepIdType | null,
   orderedStepIds: StepIdType[],
   stepId: StepIdType,
-  multiSelectItemIds: StepIdType[],
-  lastMultiSelectedStepId: StepIdType
+  multiSelectItemIds: StepIdType[] | null,
+  lastMultiSelectedStepId: StepIdType | null
 ): StepIdType[] {
   let stepsToSelect: StepIdType[]
   if (selectedStepId) {

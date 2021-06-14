@@ -15,7 +15,7 @@ type SP = Omit<Props, 'removeWellsContents'> & {
 function mapStateToProps(state: BaseState): SP {
   const selectedLabwareId: SelectedContainerId = labwareIngredSelectors.getSelectedLabwareId(
     state
-  )
+  ) as SelectedContainerId
   const labwareWellContents =
     (selectedLabwareId &&
       labwareIngredSelectors.getLiquidsByLabwareId(state)[selectedLabwareId]) ||

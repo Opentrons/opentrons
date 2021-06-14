@@ -1,8 +1,6 @@
-// @flow
 import * as React from 'react'
 import { Provider } from 'react-redux'
 import { act } from 'react-dom/test-utils'
-import UAParser from 'ua-parser-js'
 import { mount } from 'enzyme'
 import { when, resetAllWhenMocks } from 'jest-when'
 import configureMockStore from 'redux-mock-store'
@@ -24,7 +22,6 @@ import * as fileDataSelectors from '../../file-data/selectors/index.js'
 import * as timelineWarningSelectors from '../../top-selectors/timelineWarnings'
 import { StoreType } from '../../configureStore'
 
-jest.mock('ua-parser-js')
 jest.mock('../../step-forms/selectors/index.js')
 jest.mock('../../file-data/selectors/index.js')
 jest.mock('../../top-selectors/timelineWarnings')
@@ -83,19 +80,33 @@ const middlewares = [thunk]
 const mockStore = configureMockStore(middlewares)
 const mockId = 'SOMEID'
 
-const mockClickEvent = {
-  shiftKey: false,
-  metaKey: false,
-  ctrlKey: false,
-  persist: jest.fn(),
+function createMockClickEvent({
+  shiftKey = false,
+  metaKey = false,
+  ctrlKey = false,
+  persist = jest.fn(),
+}: {
+  shiftKey?: boolean
+  metaKey?: boolean
+  ctrlKey?: boolean
+  persist?: () => void
+} = {}): React.MouseEvent {
+  return {
+    shiftKey,
+    metaKey,
+    ctrlKey,
+    persist,
+  } as React.MouseEvent
 }
+
+const mockClickEvent = createMockClickEvent()
 
 describe('ConnectedStepItem', () => {
   let store: StoreType
   beforeEach(() => {
     store = mockStore()
 
-    UAParser.mockImplementation(() => {
+    jest.mock('ua-parser-js', () => {
       return {
         getOS: () => ({ name: 'Mac OS', version: 'mockVersion' }),
       }
@@ -103,6 +114,7 @@ describe('ConnectedStepItem', () => {
 
     when(getSavedStepFormsMock)
       .calledWith(expect.anything())
+      // @ts-ignore
       .mockReturnValue({ [mockId]: 'some form' })
 
     when(getCurrentFormIsPresavedMock)
@@ -117,11 +129,14 @@ describe('ConnectedStepItem', () => {
       .calledWith(expect.anything())
       .mockReturnValue(false)
 
-    when(getErrorStepId).calledWith(expect.anything()).mockReturnValue(false)
+    when(getErrorStepId)
+      .calledWith(expect.anything())
+      .mockReturnValue('errorId')
 
     when(getArgsAndErrorsByStepIdMock)
       .calledWith(expect.anything())
-      .mockReturnValue({ [mockId]: { errors: undefined } })
+      // @ts-ignore
+      .mockReturnValue({ [mockId]: { errors: true } })
 
     when(getHasTimelineWarningsPerStepMock)
       .calledWith(expect.anything())
@@ -148,7 +163,7 @@ describe('ConnectedStepItem', () => {
     resetAllWhenMocks()
   })
 
-  const render = (props: SP) =>
+  const render = (props: any) =>
     mount(
       <Provider store={store}>
         <ConnectedStepItem {...props} />
@@ -159,7 +174,7 @@ describe('ConnectedStepItem', () => {
     it('should select a single step when PD not in batch edit mode', () => {
       const props = { stepId: mockId, stepNumber: 1 }
       const wrapper = render(props)
-      wrapper.find(StepItem).prop('handleClick')(mockClickEvent)
+      wrapper.find(StepItem)!.prop('handleClick')!(mockClickEvent)
       const actions = store.getActions()
       const selectStepAction = { type: 'SELECT_STEP', payload: mockId }
       expect(actions[0]).toEqual(selectStepAction)
@@ -172,7 +187,7 @@ describe('ConnectedStepItem', () => {
       const props = { stepId: mockId, stepNumber: 1 }
       const wrapper = render(props)
       act(() => {
-        wrapper.find(StepItem).prop('handleClick')(mockClickEvent)
+        wrapper.find(StepItem)!.prop('handleClick')!(mockClickEvent)
       })
       wrapper.update()
       const confirmDeleteModal = wrapper.find(ConfirmDeleteModal)
@@ -191,7 +206,7 @@ describe('ConnectedStepItem', () => {
       const props = { stepId: mockId, stepNumber: 1 }
       const wrapper = render(props)
       act(() => {
-        wrapper.find(StepItem).prop('handleClick')(mockClickEvent)
+        wrapper.find(StepItem)!.prop('handleClick')!(mockClickEvent)
       })
       wrapper.update()
       const confirmDeleteModal = wrapper.find(ConfirmDeleteModal)
@@ -206,7 +221,7 @@ describe('ConnectedStepItem', () => {
       const props = { stepId: mockId, stepNumber: 1 }
       const wrapper = render(props)
       act(() => {
-        wrapper.find(StepItem).prop('handleClick')(mockClickEvent)
+        wrapper.find(StepItem)!.prop('handleClick')!(mockClickEvent)
       })
       wrapper.update()
       const confirmDeleteModal = wrapper.find(ConfirmDeleteModal)
@@ -227,7 +242,7 @@ describe('ConnectedStepItem', () => {
 
         const props = { stepId: mockId, stepNumber: 1 }
         const wrapper = render(props)
-        wrapper.find(StepItem).prop('handleClick')(mockClickEvent)
+        wrapper.find(StepItem)!.prop('handleClick')!(mockClickEvent)
         const actions = store.getActions()
         const selectStepAction = {
           type: 'SELECT_MULTIPLE_STEPS',
@@ -248,7 +263,7 @@ describe('ConnectedStepItem', () => {
 
         const props = { stepId: mockId, stepNumber: 1 }
         const wrapper = render(props)
-        wrapper.find(StepItem).prop('handleClick')(mockClickEvent)
+        wrapper.find(StepItem)!.prop('handleClick')!(mockClickEvent)
         const actions = store.getActions()
         const selectStepAction = {
           type: 'SELECT_MULTIPLE_STEPS',
@@ -274,7 +289,7 @@ describe('ConnectedStepItem', () => {
         }
         const wrapper = render(props)
         act(() => {
-          wrapper.find(StepItem).prop('handleClick')(clickEvent)
+          wrapper.find(StepItem)!.prop('handleClick')!(clickEvent)
         })
         wrapper.update()
         const confirmDeleteModal = wrapper.find(ConfirmDeleteModal)
@@ -296,7 +311,7 @@ describe('ConnectedStepItem', () => {
         }
         const wrapper = render(props)
         act(() => {
-          wrapper.find(StepItem).prop('handleClick')(clickEvent)
+          wrapper.find(StepItem)!.prop('handleClick')!(clickEvent)
         })
         wrapper.update()
         const confirmDeleteModal = wrapper.find(ConfirmDeleteModal)
@@ -311,12 +326,11 @@ describe('ConnectedStepItem', () => {
       {
         name: 'should select just one step (in batch edit mode)',
         props: { stepId: mockId, stepNumber: 1 },
-        mockClickEvent: {
+        mockClickEvent: createMockClickEvent({
           shiftKey: true,
           metaKey: false,
           ctrlKey: false,
-          persist: jest.fn(),
-        },
+        }),
         setupMocks: () => {
           when(getOrderedStepIdsMock)
             .calledWith(expect.anything())
@@ -339,12 +353,11 @@ describe('ConnectedStepItem', () => {
         name:
           'should select a range of steps when one step is already selected',
         props: { stepId: mockId, stepNumber: 1 },
-        mockClickEvent: {
+        mockClickEvent: createMockClickEvent({
           shiftKey: true,
           metaKey: false,
           ctrlKey: false,
-          persist: jest.fn(),
-        },
+        }),
         setupMocks: () => {
           when(getSelectedStepIdMock)
             .calledWith(expect.anything())
@@ -365,12 +378,11 @@ describe('ConnectedStepItem', () => {
         name:
           'should select just one step when the clicked step is already selected',
         props: { stepId: mockId, stepNumber: 1 },
-        mockClickEvent: {
+        mockClickEvent: createMockClickEvent({
           shiftKey: true,
           metaKey: false,
           ctrlKey: false,
-          persist: jest.fn(),
-        },
+        }),
         setupMocks: () => {
           when(getSelectedStepIdMock)
             .calledWith(expect.anything())
@@ -391,12 +403,11 @@ describe('ConnectedStepItem', () => {
         name:
           'should select a range when the selected step is earlier than the last selected step (single => multi)',
         props: { stepId: mockId, stepNumber: 1 },
-        mockClickEvent: {
+        mockClickEvent: createMockClickEvent({
           shiftKey: true,
           metaKey: false,
           ctrlKey: false,
-          persist: jest.fn(),
-        },
+        }),
         setupMocks: () => {
           when(getOrderedStepIdsMock)
             .calledWith(expect.anything())
@@ -417,12 +428,11 @@ describe('ConnectedStepItem', () => {
         name:
           'should select a range when the selected step is earlier than the last selected step (multi => multi)',
         props: { stepId: mockId, stepNumber: 1 },
-        mockClickEvent: {
+        mockClickEvent: createMockClickEvent({
           shiftKey: true,
           metaKey: false,
           ctrlKey: false,
-          persist: jest.fn(),
-        },
+        }),
         setupMocks: () => {
           when(getMultiSelectItemIdsMock)
             .calledWith(expect.anything())
@@ -445,12 +455,11 @@ describe('ConnectedStepItem', () => {
       {
         name: 'should select a range when some of them are already selected',
         props: { stepId: mockId, stepNumber: 1 },
-        mockClickEvent: {
+        mockClickEvent: createMockClickEvent({
           shiftKey: true,
           metaKey: false,
           ctrlKey: false,
-          persist: jest.fn(),
-        },
+        }),
         setupMocks: () => {
           when(getMultiSelectItemIdsMock)
             .calledWith(expect.anything())
@@ -473,12 +482,11 @@ describe('ConnectedStepItem', () => {
       {
         name: 'should deselect a range when all of them are already selected',
         props: { stepId: mockId, stepNumber: 1 },
-        mockClickEvent: {
+        mockClickEvent: createMockClickEvent({
           shiftKey: true,
           metaKey: false,
           ctrlKey: false,
-          persist: jest.fn(),
-        },
+        }),
         setupMocks: () => {
           when(getMultiSelectItemIdsMock)
             .calledWith(expect.anything())
@@ -512,12 +520,11 @@ describe('ConnectedStepItem', () => {
         name:
           'should deselect a range when all of them are already selected (but preserve the first item and not exit batch edit mode)',
         props: { stepId: mockId, stepNumber: 1 },
-        mockClickEvent: {
+        mockClickEvent: createMockClickEvent({
           shiftKey: true,
           metaKey: false,
           ctrlKey: false,
-          persist: jest.fn(),
-        },
+        }),
         setupMocks: () => {
           when(getMultiSelectItemIdsMock)
             .calledWith(expect.anything())
@@ -541,12 +548,11 @@ describe('ConnectedStepItem', () => {
         name:
           'should ignore modifier key when clicking step that is already lastSelected',
         props: { stepId: mockId, stepNumber: 1 },
-        mockClickEvent: {
+        mockClickEvent: createMockClickEvent({
           shiftKey: true,
           metaKey: false,
           ctrlKey: false,
-          persist: jest.fn(),
-        },
+        }),
         setupMocks: () => {
           when(getMultiSelectItemIdsMock)
             .calledWith(expect.anything())
@@ -575,7 +581,7 @@ describe('ConnectedStepItem', () => {
             setupMocks()
           }
           const wrapper = render(props)
-          wrapper.find(StepItem).prop('handleClick')(mockClickEvent)
+          wrapper.find(StepItem)!.prop('handleClick')!(mockClickEvent)
           const actions = store.getActions()
           expect(actions[0]).toEqual(expectedAction)
         })
@@ -595,7 +601,7 @@ describe('ConnectedStepItem', () => {
         }
         const wrapper = render(props)
         act(() => {
-          wrapper.find(StepItem).prop('handleClick')(clickEvent)
+          wrapper.find(StepItem)!.prop('handleClick')!(clickEvent)
         })
         wrapper.update()
         const confirmDeleteModal = wrapper.find(ConfirmDeleteModal)
@@ -617,7 +623,7 @@ describe('ConnectedStepItem', () => {
         }
         const wrapper = render(props)
         act(() => {
-          wrapper.find(StepItem).prop('handleClick')(clickEvent)
+          wrapper.find(StepItem)!.prop('handleClick')!(clickEvent)
         })
         wrapper.update()
         const confirmDeleteModal = wrapper.find(ConfirmDeleteModal)
@@ -639,14 +645,14 @@ describe('ConnectedStepItem', () => {
           metaKey: true,
         }
 
-        UAParser.mockImplementation(() => {
+        jest.mock('ua-parser-js', () => {
           return {
             getOS: () => ({ name: 'NOT Mac OS', version: 'mockVersion' }),
           }
         })
 
         const wrapper = render(props)
-        wrapper.find(StepItem).prop('handleClick')(clickEvent)
+        wrapper.find(StepItem)!.prop('handleClick')!(clickEvent)
         const actions = store.getActions()
         expect(actions[0]).toEqual({ payload: 'SOMEID', type: 'SELECT_STEP' })
       })
@@ -731,7 +737,7 @@ describe('ConnectedStepItem', () => {
         ({ name, props, clickEvent, setupMocks, expectedAction }) => {
           it(name, () => {
             setupMocks && setupMocks()
-            UAParser.mockImplementation(() => {
+            jest.mock('ua-parser-js', () => {
               return {
                 getOS: () => ({
                   name: 'Mac OS',
@@ -740,7 +746,7 @@ describe('ConnectedStepItem', () => {
               }
             })
             const wrapper = render(props)
-            wrapper.find(StepItem).prop('handleClick')(clickEvent)
+            wrapper.find(StepItem)!.prop('handleClick')!(clickEvent)
             const actions = store.getActions()
             expect(actions[0]).toEqual(expectedAction)
           })
@@ -760,14 +766,14 @@ describe('ConnectedStepItem', () => {
           ctrlKey: true,
         }
 
-        UAParser.mockImplementation(() => {
+        jest.mock('ua-parser-js', () => {
           return {
             getOS: () => ({ name: 'Mac OS', version: 'mockVersion' }),
           }
         })
 
         const wrapper = render(props)
-        wrapper.find(StepItem).prop('handleClick')(clickEvent)
+        wrapper.find(StepItem)!.prop('handleClick')!(clickEvent)
         const actions = store.getActions()
         expect(actions[0]).toEqual({ payload: 'SOMEID', type: 'SELECT_STEP' })
       })
@@ -831,7 +837,7 @@ describe('ConnectedStepItem', () => {
         ({ name, props, clickEvent, setupMocks, expectedAction }) => {
           it(name, () => {
             setupMocks && setupMocks()
-            UAParser.mockImplementation(() => {
+            jest.mock('ua-parser-js', () => {
               return {
                 getOS: () => ({
                   name: 'NOT Mac OS',
@@ -840,7 +846,7 @@ describe('ConnectedStepItem', () => {
               }
             })
             const wrapper = render(props)
-            wrapper.find(StepItem).prop('handleClick')(clickEvent)
+            wrapper.find(StepItem)!.prop('handleClick')!(clickEvent)
             const actions = store.getActions()
             expect(actions[0]).toEqual(expectedAction)
           })

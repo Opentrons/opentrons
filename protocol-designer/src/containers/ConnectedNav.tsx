@@ -8,7 +8,6 @@ import { NavTab, TabbedNavBar, OutsideLinkTab } from '@opentrons/components'
 import { i18n } from '../localization'
 import { Page, actions, selectors } from '../navigation'
 import { selectors as fileSelectors } from '../file-data'
-import { NavigateToPageAction } from '../navigation/actions'
 
 type SP = {
   currentPage: Page
@@ -35,9 +34,11 @@ function Nav(props: Props): JSX.Element {
               props.currentPage === 'file-splash' ||
               props.currentPage === 'file-detail'
             }
-            onClick={props.handleClick(
-              noCurrentProtocol ? 'file-splash' : 'file-detail'
-            )}
+            onClick={() =>
+              props.handleClick(
+                noCurrentProtocol ? 'file-splash' : 'file-detail'
+              )
+            }
           />
           <NavTab
             id="NavTab_liquids"
@@ -45,7 +46,7 @@ function Nav(props: Props): JSX.Element {
             title={i18n.t('nav.tab_name.liquids')}
             disabled={noCurrentProtocol}
             selected={props.currentPage === 'liquids'}
-            onClick={props.handleClick('liquids')}
+            onClick={() => props.handleClick('liquids')}
           />
           <NavTab
             id="NavTab_design"
@@ -53,7 +54,7 @@ function Nav(props: Props): JSX.Element {
             title={i18n.t('nav.tab_name.design')}
             disabled={noCurrentProtocol}
             selected={props.currentPage === 'steplist'}
-            onClick={props.handleClick('steplist')}
+            onClick={() => props.handleClick('steplist')}
           />
         </React.Fragment>
       }
@@ -68,7 +69,7 @@ function Nav(props: Props): JSX.Element {
             iconName="settings"
             title={i18n.t('nav.tab_name.settings')}
             selected={props.currentPage === 'settings-app'}
-            onClick={props.handleClick('settings-app')}
+            onClick={() => props.handleClick('settings-app')}
           />
         </React.Fragment>
       }
