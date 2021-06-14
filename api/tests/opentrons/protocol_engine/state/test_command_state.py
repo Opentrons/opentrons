@@ -122,30 +122,33 @@ def test_command_state_preserves_handle_order(  # noqa:D103
 
 def test_get_next_request_returns_first_pending(  # noqa: D103
     pending_command: PendingCommand,
-    running_command: RunningCommand
+    running_command: RunningCommand,
+    completed_command: CompletedCommand,
+    failed_command: FailedCommand,
 ) -> None:
     subject = CommandState()
 
-    # todo(mm, 2021-06-14): Add completed and failed, for thoroughness.
     subject._commands_by_id["command-id-1"] = running_command
-    subject._commands_by_id["command-id-2"] = pending_command
+    subject._commands_by_id["command-id-2"] = completed_command
+    subject._commands_by_id["command-id-3"] = pending_command
+    subject._commands_by_id["command-id-4"] = pending_command
 
-    # running_command should be skipped even though it came first.
     assert subject.get_next_request() == (
-        "command-id-2", pending_command.request
+        "command-id-3", pending_command.request
     )
 
 
 def test_get_next_request_returns_none_when_no_pending(  # noqa: D103
     running_command: RunningCommand,
+    completed_command: CompletedCommand,
     failed_command: FailedCommand
 ) -> None:
     subject = CommandState()
 
     assert subject.get_next_request() is None
 
-    # todo(mm, 2021-06-11): We should throw a completed command in here too.
     subject._commands_by_id["running-command-id"] = running_command
+    subject._commands_by_id["completed-command-id"] = completed_command
     subject._commands_by_id["failed-command-id"] = failed_command
 
     assert subject.get_next_request() is None
