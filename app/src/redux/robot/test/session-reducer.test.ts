@@ -77,7 +77,6 @@ describe('robot reducer - session', () => {
     expect(reducer(state, action).session).toEqual(expected)
   })
 
-  // ce: update the runTime tests
   it('handles protocol:UPLOAD action', () => {
     const initialState = reducer(undefined, {} as any).session
     const state: RobotState = {
@@ -85,7 +84,6 @@ describe('robot reducer - session', () => {
         capabilities: ['create'],
         sessionRequest: { inProgress: false, error: new Error('AH') },
         startTime: 40,
-        runTime: 42,
       },
     } as any
     const action: Action = {
@@ -106,7 +104,6 @@ describe('robot reducer - session', () => {
       session: {
         sessionRequest: { inProgress: false, error: null },
         startTime: 40,
-        runTime: 42,
       },
     } as any
     const action: Action = { type: 'robot:REFRESH_SESSION', meta: {} as any }
@@ -114,7 +111,6 @@ describe('robot reducer - session', () => {
     expect(reducer(state, action).session).toEqual({
       sessionRequest: { inProgress: true, error: null },
       startTime: null,
-      runTime: 0,
     })
   })
 
@@ -200,7 +196,6 @@ describe('robot reducer - session', () => {
   it('handles RUN action', () => {
     const state: RobotState = {
       session: {
-        runTime: now,
         runRequest: { inProgress: false, error: new Error('AH') },
       },
     } as any
@@ -208,7 +203,6 @@ describe('robot reducer - session', () => {
 
     expect(reducer(state, action).session).toEqual({
       runRequest: { inProgress: true, error: null },
-      runTime: 0,
     })
   })
 
