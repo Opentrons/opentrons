@@ -138,8 +138,10 @@ export function fieldsToLabware(
       // from the definition.
       group: {
         metadata: {
-          wellBottomShape: fields.wellBottomShape,
-          ...(groupMetadataDisplayCategory
+          ...(fields.wellBottomShape != null
+            ? { wellBottomShape: fields.wellBottomShape }
+            : {}),
+          ...(groupMetadataDisplayCategory != null
             ? { displayCategory: groupMetadataDisplayCategory }
             : null),
         },

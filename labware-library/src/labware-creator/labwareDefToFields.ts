@@ -49,7 +49,8 @@ export function labwareDefToFields(
     def.metadata.displayCategory === 'wellPlate' ||
     def.metadata.displayCategory === 'tubeRack' ||
     def.metadata.displayCategory === 'aluminumBlock' ||
-    def.metadata.displayCategory === 'reservoir'
+    def.metadata.displayCategory === 'reservoir' ||
+    def.metadata.displayCategory === 'tipRack'
   ) {
     labwareType = def.metadata.displayCategory
   }
@@ -100,7 +101,7 @@ export function labwareDefToFields(
     regularColumnSpacing: boolToBoolString(regularColumnSpacing),
 
     wellVolume: String(totalLiquidVolume),
-    wellBottomShape: metadata.wellBottomShape || null,
+    wellBottomShape: metadata.wellBottomShape ?? null,
     wellDepth: String(depth),
     wellShape: shape.shape,
 
@@ -114,7 +115,7 @@ export function labwareDefToFields(
       shape.shape === 'rectangular' ? String(shape.yDimension) : null,
 
     brand: def.brand.brand,
-    brandId: def.brand.brandId ? def.brand.brandId.join(',') : null, // comma-separated values
+    brandId: def.brand.brandId != null ? def.brand.brandId.join(',') : null, // comma-separated values
 
     // NOTE: intentionally null these fields, do not import them
     loadName: null,
