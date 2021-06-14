@@ -1,23 +1,18 @@
 """Tests for the command lifecycle state."""
-import pytest
 
 from datetime import datetime
-from typing import List
 
+import pytest
 from pydantic import BaseModel
 
-from opentrons.types import DeckSlotName
 from opentrons.protocol_engine import StateStore
-from opentrons.protocol_engine.types import DeckSlotLocation
-from opentrons.protocol_engine.errors import ProtocolEngineError
 from opentrons.protocol_engine.commands import (
     PendingCommand,
     RunningCommand,
     CompletedCommand,
     FailedCommand,
-    LoadLabwareRequest,
-    LoadLabwareResult,
 )
+from opentrons.protocol_engine.errors import ProtocolEngineError
 from opentrons.protocol_engine.state.commands import CommandState
 
 
