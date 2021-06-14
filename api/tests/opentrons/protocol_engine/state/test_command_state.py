@@ -96,7 +96,7 @@ def test_state_store_handles_command(
     assert store.commands.get_command_by_id("unique-id") == pending_command
 
 
-def test_command_state_preserves_handle_order(  # noqa:D103
+def test_command_state_preserves_handle_order(
     store: StateStore, now: datetime
 ) -> None:
     unique_commands = [
@@ -107,6 +107,7 @@ def test_command_state_preserves_handle_order(  # noqa:D103
         for r in _make_unique_requests(3)
     ]
     command_a, command_b, command_c = unique_commands
+    """It should return commands in the order they are first added."""
 
     store.handle_command(command_a, "command-id-1")
     store.handle_command(command_b, "command-id-2")
@@ -120,12 +121,13 @@ def test_command_state_preserves_handle_order(  # noqa:D103
     ]
 
 
-def test_get_next_request_returns_first_pending(  # noqa: D103
+def test_get_next_request_returns_first_pending(
     pending_command: PendingCommand,
     running_command: RunningCommand,
     completed_command: CompletedCommand,
     failed_command: FailedCommand,
 ) -> None:
+    """It should return the first command that's pending."""
     subject = CommandState()
 
     subject._commands_by_id["command-id-1"] = running_command
@@ -138,11 +140,12 @@ def test_get_next_request_returns_first_pending(  # noqa: D103
     )
 
 
-def test_get_next_request_returns_none_when_no_pending(  # noqa: D103
+def test_get_next_request_returns_none_when_no_pending(
     running_command: RunningCommand,
     completed_command: CompletedCommand,
     failed_command: FailedCommand
 ) -> None:
+    """It should return None if there are no pending commands to return."""
     subject = CommandState()
 
     assert subject.get_next_request() is None
@@ -154,10 +157,11 @@ def test_get_next_request_returns_none_when_no_pending(  # noqa: D103
     assert subject.get_next_request() is None
 
 
-def test_get_next_request_returns_none_when_earlier_command_failed(  # noqa: D103
+def test_get_next_request_returns_none_when_earlier_command_failed(
     pending_command: PendingCommand,
     failed_command: FailedCommand
 ) -> None:
+    """It should return None if any prior-added command is failed."""
     subject = CommandState()
 
     subject._commands_by_id["command-id-1"] = failed_command
