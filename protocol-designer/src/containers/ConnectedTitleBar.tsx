@@ -24,13 +24,13 @@ import { stepIconsByType } from '../form-types'
 import { selectors, Page } from '../navigation'
 
 import { TitleBarProps } from '@opentrons/components'
-import { BaseState } from '../types'
+import {BaseState} from '../types'
 
 type Props = React.ComponentProps<typeof TitleBar>
 
-type DP = { onBackClick: $PropertyType<Props, 'onBackClick'> }
+type DP = { onBackClick: Props['onBackClick'] }
 
-type SP = Omit<Props, DP> & {
+type SP = Omit<Props, keyof DP> & {
   _page: Page
   _liquidPlacementMode?: boolean
   _wellSelectionMode?: boolean
@@ -174,7 +174,7 @@ function mapStateToProps(state: BaseState): SP {
 
 function mergeProps(
   stateProps: SP,
-  dispatchProps: { dispatch: Dispatch<*> }
+  dispatchProps: { dispatch: Dispatch<Action> }
 ): Props {
   const {
     _page,

@@ -60,6 +60,6 @@ function mergeProps(
 // ce: fix
 export const ConnectedFilePage = connect(
   mapStateToProps,
-  null,
+  {},
   mergeProps
 )(FilePage)
