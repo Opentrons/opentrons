@@ -135,12 +135,16 @@ def test_get_next_request_returns_none_when_no_pending(
 
 def test_get_next_request_returns_none_when_earlier_command_failed(
     pending_command: PendingCommand,
+    running_command: RunningCommand,
+    completed_command: CompletedCommand,
     failed_command: FailedCommand
 ) -> None:
     """It should return None if any prior-added command is failed."""
     subject = CommandState()
 
-    subject._commands_by_id["command-id-1"] = failed_command
-    subject._commands_by_id["command-id-2"] = pending_command
+    subject._commands_by_id["command-id-1"] = completed_command
+    subject._commands_by_id["command-id-2"] = failed_command
+    subject._commands_by_id["command-id-3"] = running_command
+    subject._commands_by_id["command-id-4"] = pending_command
 
     assert subject.get_next_request() is None
