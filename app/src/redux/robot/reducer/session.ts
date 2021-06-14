@@ -192,7 +192,7 @@ function handleSessionUpdate(
 function handleSessionInProgress(state: SessionState): SessionState {
   return {
     ...state,
-π    startTime: null,
+    startTime: null,
     sessionRequest: { inProgress: true, error: null },
   }
 }
