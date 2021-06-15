@@ -1,4 +1,5 @@
 import { getNextDefaultMagnetAction } from '../'
+import { StepType } from '../../../../form-types'
 describe('getNextDefaultMagnetAction', () => {
   describe('no previous forms defaults to engage', () => {
     const testCases = [
@@ -10,7 +11,7 @@ describe('getNextDefaultMagnetAction', () => {
     testCases.forEach(({ testMsg, expected }) => {
       it(testMsg, () => {
         const savedForms = {}
-        const orderedStepIds = []
+        const orderedStepIds: string[] = []
         const result = getNextDefaultMagnetAction(savedForms, orderedStepIds)
         expect(result).toBe(expected)
       })
@@ -31,7 +32,13 @@ describe('getNextDefaultMagnetAction', () => {
     ]
     testCases.forEach(({ testMsg, orderedStepIds, expected }) => {
       it(testMsg, () => {
-        const savedForms = {
+        const savedForms: {
+          [id: string]: {
+            id: string
+            stepType: StepType
+            magnetAction: string
+          }
+        } = {
           e: {
             id: 'moduleId',
             stepType: 'magnet',
