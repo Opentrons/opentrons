@@ -1,9 +1,8 @@
 import * as React from 'react'
-import { format } from 'date-fns'
 import { when } from 'jest-when'
 
 import { RunTimer } from '../RunTimer'
-import { formatSeconds } from '../utils'
+import { formatSeconds, formatTime } from '../utils'
 import { mountWithStore } from '@opentrons/components/__utils__'
 import * as selectors from '../../../../redux/robot/selectors'
 import { State } from '../../../../redux/types'
@@ -26,6 +25,7 @@ const getStartTimeMsMock = selectors.getStartTimeMs as jest.MockedFunction<
 const formatSecondsMock = formatSeconds as jest.MockedFunction<
   typeof formatSeconds
 >
+const formatTimeMock = formatTime as jest.MockedFunction<typeof formatTime>
 
 describe('RunTimer component', () => {
   interface Environment {
@@ -44,35 +44,33 @@ describe('RunTimer component', () => {
     startTime = new Date('2020-01-01').getTime(),
   }: Partial<Environment> = {}): Environment {
     when(getIsPausedMock).calledWith(MOCKED_STATE).mockReturnValue(isPaused)
-    when(getPausedSecondsMock)
-      .calledWith(MOCKED_STATE)
-      .mockReturnValue(pausedSeconds)
-    when(getRunSecondsMock).calledWith(MOCKED_STATE).mockReturnValue(runSeconds)
     when(getStartTimeMsMock).calledWith(MOCKED_STATE).mockReturnValue(startTime)
+    getPausedSecondsMock.mockReturnValue(pausedSeconds)
+    getRunSecondsMock.mockReturnValue(runSeconds)
     return { isPaused, pausedSeconds, runSeconds, startTime }
   }
 
   const render = () =>
     mountWithStore(<RunTimer />, { initialState: MOCKED_STATE })
 
-  it('displays the start time if not null', () => {
-    const { startTime } = mockEnvironment()
-    const { wrapper } = render()
-    const expected = format(startTime as number, 'pp')
-    expect(wrapper.html()).toContain(`Start Time: ${expected}`)
+  afterEach(() => {
+    jest.resetAllMocks()
   })
 
-  it('renders start time as empty if null', () => {
-    mockEnvironment({ startTime: null })
+  it('properly render the start time', () => {
+    const { startTime } = mockEnvironment()
+    formatTimeMock.mockReturnValue('7:00 PM')
     const { wrapper } = render()
-    expect(wrapper.html()).toContain('Start Time: <')
+    expect(wrapper.html()).toContain(`Start Time: 7:00 PM`)
+    expect(formatTimeMock).toBeCalledWith(startTime)
   })
 
   it(`should headline the run time when not paused`, () => {
-    mockEnvironment({ isPaused: false, runSeconds: 10 })
+    const { runSeconds } = mockEnvironment({ isPaused: false, runSeconds: 10 })
     formatSecondsMock.mockReturnValue('00:00:10')
     const { wrapper } = render()
     expect(wrapper.html()).toContain('<p>Total Runtime: </p>00:00:10')
+    expect(formatSecondsMock).toBeCalledWith(runSeconds)
   })
 
   it(`should present a less distinguished run time when paused`, () => {

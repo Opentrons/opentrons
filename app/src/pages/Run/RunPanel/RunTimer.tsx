@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useInterval } from '@opentrons/components'
-import { format } from 'date-fns'
 
 import { State } from '../../../redux/types'
 import styles from './styles.css'
@@ -11,7 +10,7 @@ import {
   getRunSeconds,
   getStartTimeMs,
 } from '../../../redux/robot/selectors'
-import { formatSeconds } from './utils'
+import { formatSeconds, formatTime } from './utils'
 
 export function RunTimer(): JSX.Element {
   const [now, setNow] = React.useState(Date.now())
@@ -29,7 +28,7 @@ export function RunTimer(): JSX.Element {
    */
   useInterval(() => setNow(Date.now()), 500)
   const runTime = formatSeconds(runSeconds)
-  const startTime = startTimeMs != null ? format(startTimeMs, 'pp') : ''
+  const startTime = formatTime(startTimeMs)
 
   // TODO(CE) See styling suggestions: https://github.com/Opentrons/opentrons/pull/7885#discussion_r647334710
   const renderPaused = (): JSX.Element => {

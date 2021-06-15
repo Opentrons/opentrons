@@ -1,7 +1,8 @@
-import { formatSeconds } from '../utils'
+import { formatSeconds, formatTime } from '../utils'
+import { format } from 'date-fns'
 
 describe('utils', function () {
-  describe('format', function () {
+  describe('formatSeconds', function () {
     const tests: Array<{
       expected: string
       seconds: number
@@ -40,6 +41,21 @@ describe('utils', function () {
       it(`should format ${seconds} seconds as ${expected}`, function () {
         expect(formatSeconds(seconds)).toBe(expected)
       })
+    })
+  })
+
+  describe('formatTime', function () {
+    it(`should format undefined as empty string`, function () {
+      expect(formatTime(undefined)).toBe('')
+    })
+
+    it(`should format null as empty string`, function () {
+      expect(formatTime(null)).toBe('')
+    })
+
+    it(`should format as 'format' would otherwise`, function () {
+      const time = Date.now()
+      expect(formatTime(time)).toBe(format(time, 'pp'))
     })
   })
 })
