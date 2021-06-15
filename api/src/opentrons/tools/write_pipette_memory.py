@@ -1,3 +1,5 @@
+from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieDriver_3_0_0
+
 from . import args_handler
 
 BAD_BARCODE_MESSAGE = 'Unexpected Serial -> {}'
@@ -69,11 +71,13 @@ MODELS = {
 }
 
 
-def write_identifiers(mount, new_id, new_model, driver):
-    '''
+def write_identifiers(
+        mount: str, new_id: str, new_model: str, driver: SmoothieDriver_3_0_0
+) -> None:
+    """
     Send a bytearray to the specified mount, so that Smoothieware can
     save the bytes to the pipette's memory
-    '''
+    """
     driver.write_pipette_id(mount, new_id)
     read_id = driver.read_pipette_id(mount)
     _assert_the_same(new_id, read_id)
@@ -82,7 +86,7 @@ def write_identifiers(mount, new_id, new_model, driver):
     _assert_the_same(new_model, read_model)
 
 
-def check_previous_data(mount, driver):
+def check_previous_data(mount: str, driver: SmoothieDriver_3_0_0) -> None:
     old_id = driver.read_pipette_id(mount)
     old_model = driver.read_pipette_model(mount)
     if old_id and old_model:
@@ -98,11 +102,11 @@ def _assert_the_same(a, b):
         raise Exception(WRITE_FAIL_MESSAGE)
 
 
-def _user_submitted_barcode(max_length):
-    '''
+def _user_submitted_barcode(max_length: int) -> str:
+    """
     User can enter a serial number as a string of HEX values
     Length of byte array must equal `num`
-    '''
+    """
     barcode = input('BUTTON + SCAN: ').strip()
     if len(barcode) > max_length:
         raise Exception(BAD_BARCODE_MESSAGE.format(barcode))
@@ -113,7 +117,7 @@ def _user_submitted_barcode(max_length):
     return barcode
 
 
-def _parse_model_from_barcode(barcode):
+def _parse_model_from_barcode(barcode: str) -> str:
     for version in VERSIONS:
         for barcode_substring in MODELS[version].keys():
             if barcode.startswith(barcode_substring):
@@ -121,12 +125,12 @@ def _parse_model_from_barcode(barcode):
     raise Exception(BAD_BARCODE_MESSAGE.format(barcode))
 
 
-def _do_wpm(driver):
+def _do_wpm(mount: str, driver: SmoothieDriver_3_0_0) -> None:
     try:
         barcode = _user_submitted_barcode(32)
         model = _parse_model_from_barcode(barcode)
-        check_previous_data('right', driver)
-        write_identifiers('right', barcode, model, driver)
+        check_previous_data(mount, driver)
+        write_identifiers(mount, barcode, model, driver)
         print('PASS: Saved -> {0} (model {1})'.format(barcode, model))
     except KeyboardInterrupt:
         exit()
@@ -134,13 +138,18 @@ def _do_wpm(driver):
         print('FAIL: {}'.format(e))
 
 
-def main():
+def main() -> None:
     parser = args_handler.root_argparser(
         "Write model and serial to a pipette's eeprom")
+    parser.add_argument('-m', '--mount',
+                        help='mount to use',
+                        default='right',
+                        type=str,
+                        choices=['left', 'right'])
     args = parser.parse_args()
     _, driver = args_handler.build_driver(args.port)
     while True:
-        _do_wpm(driver)
+        _do_wpm(args.mount, driver)
 
 
 if __name__ == "__main__":
