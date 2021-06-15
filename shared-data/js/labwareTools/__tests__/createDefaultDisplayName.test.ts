@@ -55,6 +55,18 @@ describe('createDefaultDisplayName', () => {
       expected: 'Generic 6 Tube Rack 123 µL',
     },
     {
+      testName: 'handle tip rack',
+      args: {
+        displayCategory: 'tipRack',
+        displayVolumeUnits: 'µL',
+        gridRows: 8,
+        gridColumns: 12,
+        totalLiquidVolume: 250,
+        brandName: 'bestbrand',
+      },
+      expected: 'Bestbrand 96 Tip Rack 250 µL',
+    },
+    {
       testName: 'append loadNamePostfix',
       args: {
         displayCategory: 'wellPlate',
