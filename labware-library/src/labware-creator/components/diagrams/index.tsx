@@ -97,7 +97,7 @@ export const DepthImg = (props: DepthImgProps): JSX.Element | null => {
     src = require('../../images/tip_length.svg')
     alt = 'tip length'
   }
-  if (wellBottomShape) {
+  if (!!wellBottomShape) {
     if (labwareType === 'reservoir' || labwareType === 'tubeRack') {
       const imgMap = {
         v: require('../../images/depth_reservoir-and-tubes_v.svg'),
