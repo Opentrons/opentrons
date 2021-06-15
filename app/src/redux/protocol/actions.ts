@@ -2,13 +2,13 @@
 import {
   parseProtocolData,
   fileIsBinary,
-} from '@opentrons/shared-data/js/helpers/validateJsonProtocolFile'
+} from '@opentrons/shared-data/js/helpers'
 import { arrayBufferToBase64, filenameToType } from './utils'
 
 import type { ThunkAction } from '../types'
 import type { OpenProtocolAction, UploadProtocolAction } from './types'
 
-import type { ProtocolParseErrorHandler } from '@opentrons/shared-data/js/helpers/validateJsonProtocolFile'
+import type { ProtocolParseErrorHandler } from '@opentrons/shared-data/js/helpers'
 
 const VALIDATION_ERROR_T_MAP: { [errorKey: string]: string } = {
   INVALID_FILE_TYPE: 'invalid_file_type',
@@ -31,18 +31,24 @@ export function openProtocol(file: File): ThunkAction {
         errorKey,
         errorDetails
       ) => {
-        const message = errorDetails && 'rawError' in errorDetails ? errorDetails.rawError : null,
-        const schemaErrors = errorDetails && 'schemaErrors' in errorDetails ? errorDetails.schemaErrors : null,
-        dispatch({
-          type: 'protocol:INVALID_FILE',
-          payload: {
-            message,
-            schemaErrors,
-          },
-        })
-        if (errorKey === 'INVALID_FILE_TYPE') {
-        } else if (errorKey === 'INVALID_JSON_FILE') {
-        }
+        const message =
+          errorDetails && 'rawError' in errorDetails
+            ? errorDetails.rawError
+            : null
+        const schemaErrors =
+          errorDetails && 'schemaErrors' in errorDetails
+            ? errorDetails.schemaErrors
+            : null
+        // dispatch({
+        //   type: 'protocol:INVALID_FILE',
+        //   payload: {
+        //     message,
+        //     schemaErrors,
+        //   },
+        // })
+        // if (errorKey === 'INVALID_FILE_TYPE') {
+        // } else if (errorKey === 'INVALID_JSON_FILE') {
+        // }
       }
 
       const uploadAction: UploadProtocolAction = {

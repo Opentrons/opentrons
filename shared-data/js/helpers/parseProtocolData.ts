@@ -9,16 +9,16 @@ import protocolSchemaV5 from '../../protocol/schemas/5.json'
 import type { ErrorObject } from 'ajv'
 import type { JsonProtocolFile, ProtocolFileV1 } from '../../protocol'
 
-export type ErrorKey = 'INVALID_FILE_TYPE' | 'INVALID_JSON_FILE'
+export type ProtocolParseErrorKey = 'INVALID_FILE_TYPE' | 'INVALID_JSON_FILE'
 
-interface ProtocolErrorDetails {
+interface ProtocolParseErrorDetails {
   rawError?: string
   schemaErrors?: ErrorObject[] | null
 }
 
 export type ProtocolParseErrorHandler = (
-  errorKey: ErrorKey,
-  errorDetails?: ProtocolErrorDetails
+  errorKey: ProtocolParseErrorKey,
+  errorDetails?: ProtocolParseErrorDetails
 ) => unknown
 
 type ProtocolSchema =
@@ -51,9 +51,8 @@ export type ProtocolData =
 export function parseProtocolData(
   file: File,
   contents: string,
-  // optional Python protocol metadata
-  metadata?: PythonProtocolMetadata | null,
-  handleError?: ProtocolParseErrorHandler
+  handleError?: ProtocolParseErrorHandler,
+  metadata?: PythonProtocolMetadata | null // optional Python protocol metadata
 ): ProtocolData | null {
   if (fileExtensionIsJson(file.name)) {
     return validateJsonProtocolFileContents(contents, handleError)
@@ -93,6 +92,8 @@ export function validateJsonProtocolFileContents(
       ajv.addSchema(labwareV2Schema)
 
       const parsedProtocol = JSON.parse(fileContents) as any
+      console.log('contents: ', fileContents)
+      console.log('Parsed: ', parsedProtocol)
       let validateAgainstSchema
       if ('protocol-schema' in parsedProtocol) {
         // 'protocol-schema' key only present in V1

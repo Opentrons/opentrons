@@ -2,9 +2,20 @@ import {
   fileExtensionIsPython,
   fileExtensionIsJson,
   fileExtensionIsZip,
-} from '@opentrons/shared-data/js/helpers/validateJsonProtocolFile'
+  fileIsBinary,
+  parseProtocolData,
+} from '@opentrons/shared-data/js/helpers'
 import { TYPE_JSON, TYPE_PYTHON, TYPE_ZIP } from './constants'
+
 import type { ProtocolType } from './types'
+import type { ProtocolParseErrorHandler } from '@opentrons/shared-data/js/helpers'
+
+export function filenameToType(filename: string): ProtocolType | null {
+  if (fileExtensionIsJson(filename)) return TYPE_JSON
+  if (fileExtensionIsPython(filename)) return TYPE_PYTHON
+  if (fileExtensionIsZip(filename)) return TYPE_ZIP
+  return null
+}
 
 export const arrayBufferToBase64 = (buffer: ArrayBuffer): string => {
   let binary = ''
@@ -16,9 +27,27 @@ export const arrayBufferToBase64 = (buffer: ArrayBuffer): string => {
   return global.btoa(binary)
 }
 
-export function filenameToType(filename: string): ProtocolType | null {
-  if (fileExtensionIsJson(filename)) return TYPE_JSON
-  if (fileExtensionIsPython(filename)) return TYPE_PYTHON
-  if (fileExtensionIsZip(filename)) return TYPE_ZIP
-  return null
+export function ingestProtocolFile(
+  file: File,
+  handleSuccess: (data: ReturnType<typeof parseProtocolData>) => unknown,
+  handleError?: ProtocolParseErrorHandler
+): void {
+  const reader = new FileReader()
+
+  reader.onload = () => {
+    // when we use readAsText below, reader.result will be a string,
+    // with readAsArrayBuffer, it will be an ArrayBuffer
+    const _contents: any = reader.result
+    const contents = fileIsBinary(file)
+      ? arrayBufferToBase64(_contents)
+      : _contents
+
+    handleSuccess(parseProtocolData(file, contents, handleError))
+  }
+
+  if (fileIsBinary(file)) {
+    reader.readAsArrayBuffer(file)
+  } else {
+    reader.readAsText(file)
+  }
 }
