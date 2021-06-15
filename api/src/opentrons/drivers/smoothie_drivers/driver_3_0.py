@@ -1124,11 +1124,13 @@ class SmoothieDriver:
                 _command_builder().add_gcode(gcode=gcode).add_element(allowed_mount),
                 suppress_error_msg=True)
             if res:
-                res = parse_utils.parse_instrument_data(res)
-                assert allowed_mount in res
+                parsed_res = parse_utils.parse_instrument_data(res)
+                assert allowed_mount in parsed_res
                 # data is read/written as strings of HEX characters
                 # to avoid firmware weirdness in how it parses GCode arguments
-                return parse_utils.byte_array_to_ascii_string(res[allowed_mount])
+                return parse_utils.byte_array_to_ascii_string(
+                    parsed_res[allowed_mount]
+                )
         except (ParseError, AssertionError, SmoothieError):
             pass
         return None
