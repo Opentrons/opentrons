@@ -41,12 +41,13 @@ export interface OpenProtocolAction {
 export interface UploadProtocolAction {
   type: 'protocol:UPLOAD'
   payload: { contents: string; data: ProtocolData | null }
+  // TODO(bc, 2021-06-11): remove robot boolean key from meta, unused?
   meta: { robot: true }
 }
 
 export interface InvalidProtocolFileAction {
   type: 'protocol:INVALID_FILE'
-  payload: { file: ProtocolFile; message: string }
+  payload: { file?: ProtocolFile; message: string }
 }
 
 export type ProtocolAction =
@@ -60,4 +61,6 @@ export interface ProtocolState {
   readonly file: ProtocolFile | null
   readonly contents: string | null
   readonly data: ProtocolData | null
+  readonly parseError: string | null
+  readonly schemaError: string | null
 }

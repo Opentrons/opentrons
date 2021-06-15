@@ -4,7 +4,13 @@ import type { Reducer } from 'redux'
 import type { Action } from '../types'
 import type { ProtocolState } from './types'
 
-const INITIAL_STATE: ProtocolState = { file: null, contents: null, data: null }
+const INITIAL_STATE: ProtocolState = {
+  file: null,
+  contents: null,
+  data: null,
+  parseError: null,
+  schemaError: null,
+}
 
 export const protocolReducer: Reducer<ProtocolState, Action> = (
   state = INITIAL_STATE,
@@ -32,7 +38,7 @@ export const protocolReducer: Reducer<ProtocolState, Action> = (
           ? parseProtocolData(file, contents, metadata)
           : state.data
 
-      return { file, contents, data }
+      return { file, contents, data, parseError: null, schemaError: null }
     }
 
     case 'robot:DISCONNECT_RESPONSE':

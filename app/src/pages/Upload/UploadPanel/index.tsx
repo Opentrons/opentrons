@@ -2,7 +2,8 @@ import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { selectors as robotSelectors } from '../../../redux/robot'
-import { openProtocol, getProtocolFilename } from '../../../redux/protocol'
+import { getProtocolFilename } from '../../../redux/protocol'
+import { openProtocol } from '../../../redux/protocol/actions'
 
 import { SidePanel } from '@opentrons/components'
 import { Upload } from './Upload'
