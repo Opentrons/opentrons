@@ -12,7 +12,7 @@ export const Preview = (): JSX.Element => {
   const { values, errors } = useFormikContext<LabwareFields>()
 
   return (
-    <SectionBody label="Check your work">
+    <SectionBody label="Check your work" id="CheckYourWork">
       <FormLevelErrorAlerts errors={errors} />
       <div className={styles.preview_labware}>
         <ConditionalLabwareRender values={values} />
