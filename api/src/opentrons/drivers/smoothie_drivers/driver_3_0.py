@@ -386,20 +386,20 @@ class SmoothieDriver:
 
     @staticmethod
     def get_port() -> str:
-        """Get the port to connect to."""
+        """Determine the port to connect to."""
         # Check if smoothie emulator is to be used
         port = environ.get("OT_SMOOTHIE_EMULATOR_URI")
-        if not port:
-            smoothie_id = environ.get('OT_SMOOTHIE_ID', 'AMA')
-            # Let this raise an exception.
-            port = get_ports_by_name(device_name=smoothie_id)[0]
-
-        log.info(f"Connecting to smoothie at port {port}")
-        return port
+        if port:
+            return port
+        smoothie_id = environ.get('OT_SMOOTHIE_ID', 'AMA')
+        # Let this raise an exception.
+        return get_ports_by_name(device_name=smoothie_id)[0]
 
     async def _connect_to_port(self, port: str = None):
         try:
             port = self.get_port() if port is None else port
+
+            log.info(f"Connecting to smoothie at port {port}")
 
             self._connection = await SerialConnection.create(
                 port=port,
@@ -841,7 +841,7 @@ class SmoothieDriver:
             be infinite. This is almost certainly not what you want.
         """
         if self.simulating:
-            return
+            return ""
         try:
             return await self._send_command_unsynchronized(
                 command, ack_timeout, timeout
@@ -867,37 +867,27 @@ class SmoothieDriver:
     async def _send_command_unsynchronized(
             self, command: CommandBuilder,
             ack_timeout: float, execute_timeout: float) -> str:
-        """
-
-        Args:
-            command:
-            ack_timeout:
-            execute_timeout:
-
-        Returns:
-
-        """
+        assert self._connection, "There is no connection."
+        command_result = ""
         try:
             command_result = await self._connection.send_command(
                 command=command,
                 retries=DEFAULT_COMMAND_RETRIES
             )
-
             wait_command = CommandBuilder(
                 terminator=SMOOTHIE_COMMAND_TERMINATOR
             ).add_gcode(
                 gcode=GCODE.WAIT
             )
-
             await self._connection.send_command(
                 command=wait_command,
                 retries=0
             )
-            return command_result
         except AlarmResponse as e:
             self._handle_return(ret_code=e.response, is_alarm=True)
         except ErrorResponse as e:
             self._handle_return(ret_code=e.response, is_error=True)
+        return command_result
 
     def _handle_return(
             self, ret_code: str, is_alarm: bool = False, is_error: bool = False
