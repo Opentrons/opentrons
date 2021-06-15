@@ -253,7 +253,7 @@ async def test_attitude_deck_cal_applied(
     called_with = None
 
     async def mock_move(position, speed=None, home_flagged_axes=True,
-                  axis_max_speeds=None):
+                        axis_max_speeds=None):
         nonlocal called_with
         called_with = position
 

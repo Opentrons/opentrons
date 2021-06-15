@@ -46,7 +46,8 @@ def position(x, y, z, a, b, c):
 async def test_update_position(smoothie: driver_3_0.SmoothieDriver,
                                mock_connection: AsyncMock) -> None:
     """It should update the position."""
-    mock_connection.send_command.return_value = 'ok MCS: X:1.0000 Y:2.0000 Z:3.0000 A:4.5000 B:0.0000 C:0.0000'
+    mock_connection.send_command.return_value =\
+        'ok MCS: X:1.0000 Y:2.0000 Z:3.0000 A:4.5000 B:0.0000 C:0.0000'
 
     await smoothie.update_position()
     expected = {
@@ -121,13 +122,18 @@ async def test_functional(smoothie: driver_3_0.SmoothieDriver):
     assert smoothie.position == smoothie.homed_position
 
 
-async def test_read_pipette_v13(smoothie: driver_3_0.SmoothieDriver, mock_connection: AsyncMock):
-    mock_connection.send_command.return_value = 'L:' + utils.string_to_hex("p300_single_v13")
+async def test_read_pipette_v13(
+        smoothie: driver_3_0.SmoothieDriver, mock_connection: AsyncMock
+):
+    mock_connection.send_command.return_value =\
+        'L:' + utils.string_to_hex("p300_single_v13")
     res = await smoothie.read_pipette_model('left')
     assert res == 'p300_single_v1.3'
 
 
-async def test_switch_state(smoothie: driver_3_0.SmoothieDriver, mock_connection: AsyncMock):
+async def test_switch_state(
+        smoothie: driver_3_0.SmoothieDriver, mock_connection: AsyncMock
+):
     smoothie_switch_res = 'X_max:0 Y_max:0 Z_max:0 A_max:0 B_max:0 C_max:0' \
                           ' _pins ' \
                           '(XL)2.01:0 (YL)2.01:0 (ZL)2.01:0 ' \
@@ -167,7 +173,9 @@ async def test_switch_state(smoothie: driver_3_0.SmoothieDriver, mock_connection
     assert r == expected
 
 
-async def test_clear_limit_switch(smoothie: driver_3_0.SmoothieDriver, mock_connection: AsyncMock):
+async def test_clear_limit_switch(
+        smoothie: driver_3_0.SmoothieDriver, mock_connection: AsyncMock
+):
     """
     This functions as a contract test around recovery from a limit-switch hit.
     Note that this *does not* itself guarantee correct physical behavior--this
@@ -216,7 +224,9 @@ async def test_clear_limit_switch(smoothie: driver_3_0.SmoothieDriver, mock_conn
     ]
 
 
-async def test_unstick_axes(smoothie: driver_3_0.SmoothieDriver, mock_connection: AsyncMock):
+async def test_unstick_axes(
+        smoothie: driver_3_0.SmoothieDriver, mock_connection: AsyncMock
+):
     cmd_list = []
 
     def write_mock(command, retries):

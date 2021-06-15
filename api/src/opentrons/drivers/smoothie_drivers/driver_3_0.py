@@ -970,8 +970,7 @@ class SmoothieDriver:
             # home commands are acked after execution rather than queueing, so
             # we want a long ack timeout and a short execution timeout
             home_timeout = (HOMED_POSITION['X'] / XY_HOMING_SPEED) * 2
-            await self._send_command(command, ack_timeout=home_timeout,
-                               timeout=5)
+            await self._send_command(command, ack_timeout=home_timeout, timeout=5)
             await self.update_homed_flags(flags={'X': True})
         finally:
             await self.pop_axis_max_speed()
@@ -991,8 +990,7 @@ class SmoothieDriver:
         ).add_element("Y")
         fast_home_timeout = (HOMED_POSITION['Y'] / XY_HOMING_SPEED) * 2
         # home commands are executed before ack, set a long ack timeout
-        await self._send_command(command, ack_timeout=fast_home_timeout,
-                           timeout=5)
+        await self._send_command(command, ack_timeout=fast_home_timeout, timeout=5)
 
         # slow the maximum allowed speed on Y axis
         await self.set_axis_max_speed({'Y': Y_RETRACT_SPEED})
@@ -1168,8 +1166,9 @@ class SmoothieDriver:
     # ----------- END Private functions ----------- #
 
     # ----------- Public interface ---------------- #
-    async def move(
-            self, target: Dict[str, float], home_flagged_axes: bool = False,
+    async def move(  # noqa: C901
+            self,
+            target: Dict[str, float], home_flagged_axes: bool = False,
             speed: float = None
     ) -> None:
         """
@@ -1216,7 +1215,7 @@ class SmoothieDriver:
             return not (
                     (axis in DISABLE_AXES) or
                     isclose(coord, self.position[axis],
-                        rel_tol=1e-05, abs_tol=1e-08)
+                            rel_tol=1e-05, abs_tol=1e-08)
             )
 
         def only_moving(move_target: Dict[str, float]) -> Dict[str, float]:
@@ -1815,7 +1814,7 @@ class SmoothieDriver:
             await asyncio.sleep(0.25)
             self.run_flag.set()
 
-    async def update_firmware(self,
+    async def update_firmware(self,  # noqa: C901
                               filename: str,
                               loop: asyncio.AbstractEventLoop = None,
                               explicit_modeset: bool = True) -> str:
