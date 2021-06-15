@@ -1,4 +1,3 @@
-// @flow
 import configureMockStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
 import { when, resetAllWhenMocks } from 'jest-when'
@@ -7,12 +6,14 @@ import { getOrderedStepIds } from '../../step-forms/selectors'
 
 jest.mock('../../step-forms/selectors')
 
-const getOrderedStepIdsMock = getOrderedStepIds
+const getOrderedStepIdsMock = getOrderedStepIds as jest.MockedFunction<
+  typeof getOrderedStepIds
+>
 
 const mockStore = configureMockStore([thunk])
 describe('step list actions', () => {
   describe('deleteMultipleSteps', () => {
-    let store
+    let store: any
     beforeEach(() => {
       store = mockStore()
       when(getOrderedStepIdsMock)

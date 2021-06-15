@@ -1,5 +1,6 @@
 // @flow
 import { _castForm } from '../index.js'
+import { FormData } from '../../../../form-types'
 
 // NOTE(IL, 2020-09-24): I think the real solution to validating the
 // output of hydration/casting is static typing as per #3161
@@ -9,7 +10,7 @@ import { _castForm } from '../index.js'
 
 describe('form casting', () => {
   it('should cast moveLiquid form fields', () => {
-    const input = {
+    const input: FormData = {
       id: 'stepId',
       stepType: 'moveLiquid',
       stepName: 'transfer',
@@ -73,7 +74,7 @@ describe('form casting', () => {
   })
 
   it('should cast mix form fields', () => {
-    const input = {
+    const input: FormData = {
       id: 'stepId',
       stepType: 'mix',
       stepName: 'mix',
@@ -107,7 +108,7 @@ describe('form casting', () => {
   })
 
   it('should cast pause form fields', () => {
-    const input = {
+    const input: FormData = {
       id: 'stepId',
       stepType: 'pause',
       stepName: 'pause',
@@ -136,7 +137,7 @@ describe('form casting', () => {
   })
 
   it('should cast magnet form fields', () => {
-    const input = {
+    const input: FormData = {
       id: 'stepId',
       stepType: 'magnet',
       stepName: 'magnet',
@@ -157,7 +158,7 @@ describe('form casting', () => {
   })
 
   it('should cast temperature form fields', () => {
-    const input = {
+    const input: FormData = {
       id: 'stepId',
       stepType: 'temperature',
       stepName: 'temperature',
@@ -180,7 +181,7 @@ describe('form casting', () => {
   })
 
   it('should cast thermocycler form fields', () => {
-    const input = {
+    const input: FormData = {
       id: 'stepId',
       stepType: 'thermocycler',
       stepName: 'thermocycler',

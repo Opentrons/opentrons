@@ -7,6 +7,7 @@ import {
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 import { TEMPERATURE_DEACTIVATED } from '@opentrons/step-generation'
+import { ModuleOnDeck } from '../../../../step-forms'
 import { getNextDefaultThermocyclerModuleId } from '../getNextDefaultThermocyclerModuleId'
 
 const getThermocycler = () => ({
@@ -47,7 +48,11 @@ const getTemp = () => ({
 
 describe('getNextDefaultThermocyclerModuleId', () => {
   describe('NO previous forms', () => {
-    const testCases = [
+    const testCases: Array<{
+      testMsg: string
+      equippedModulesById: Record<string, ModuleOnDeck>
+      expected: string | null
+    }> = [
       {
         testMsg: 'temp and TC module present: use TC',
         equippedModulesById: {
@@ -79,7 +84,11 @@ describe('getNextDefaultThermocyclerModuleId', () => {
     })
   })
   describe('previous forms', () => {
-    const testCases = [
+    const testCases: Array<{
+      testMsg: string
+      equippedModulesById: Record<string, ModuleOnDeck>
+      expected: string | null
+    }> = [
       {
         testMsg: 'temp and tc present, last step was tc: use tc mod',
         equippedModulesById: {

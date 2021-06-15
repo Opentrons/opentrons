@@ -5,6 +5,7 @@ describe('getMoveLiquidDelayData', () => {
   it('should return null if checkbox field is false', () => {
     expect(
       getMoveLiquidDelayData(
+        // @ts-expect-error(sa, 2021-6-15): these are not valid properties on the fields key of HydratedMoveLiquidFormData
         { checkboxField: false, secondsField: 3, offsetField: 2 },
         'checkboxField',
         'secondsField',
@@ -28,6 +29,7 @@ describe('getMoveLiquidDelayData', () => {
       expect(
         getMoveLiquidDelayData(
           {
+            // @ts-expect-error(sa, 2021-6-15): these are not valid properties on the fields key of HydratedMoveLiquidFormData
             checkboxField: true,
             secondsField: secondsValue,
             offsetField: offsetValue,
@@ -43,6 +45,7 @@ describe('getMoveLiquidDelayData', () => {
   it('should return seconds & mmFromBottom if checkbox is checked', () => {
     expect(
       getMoveLiquidDelayData(
+        // @ts-expect-error(sa, 2021-6-15): these are not valid properties on the fields key of HydratedMoveLiquidFormData
         { checkboxField: true, secondsField: 30, offsetField: 2 },
         'checkboxField',
         'secondsField',
@@ -56,6 +59,7 @@ describe('getMixDelayData', () => {
   it('should return null if the checkbox field is false', () => {
     expect(
       getMixDelayData(
+        // @ts-expect-error(sa, 2021-6-15): these are not valid properties on the fields key of HydratedMoveLiquidFormData
         { checkboxField: false, secondsField: 3 },
         'checkboxField',
         'secondsField'
@@ -65,6 +69,7 @@ describe('getMixDelayData', () => {
   it('should return null if the seconds field is 0', () => {
     expect(
       getMixDelayData(
+        // @ts-expect-error(sa, 2021-6-15): these are not valid properties on the fields key of HydratedMoveLiquidFormData
         { checkboxField: true, secondsField: 0 },
         'checkboxField',
         'secondsField'
@@ -74,6 +79,7 @@ describe('getMixDelayData', () => {
   it('should return null if the seconds field is less than 0', () => {
     expect(
       getMixDelayData(
+        // @ts-expect-error(sa, 2021-6-15): these are not valid properties on the fields key of HydratedMoveLiquidFormData
         { checkboxField: true, secondsField: -1 },
         'checkboxField',
         'secondsField'
@@ -83,6 +89,7 @@ describe('getMixDelayData', () => {
   it('should return the seconds field if checckbox is checked and the seconds field is > 0', () => {
     expect(
       getMixDelayData(
+        // @ts-expect-error(sa, 2021-6-15): these are not valid properties on the fields key of HydratedMoveLiquidFormData
         { checkboxField: true, secondsField: 10 },
         'checkboxField',
         'secondsField'
