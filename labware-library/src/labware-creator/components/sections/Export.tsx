@@ -28,7 +28,7 @@ export const Export = (props: ExportProps): JSX.Element | null => {
   }
 
   return (
-    <SectionBody label="Labware Test Protocol">
+    <SectionBody label="Labware Test Protocol" id="Export">
       <FormAlerts touched={touched} errors={errors} fieldList={fieldList} />
 
       <div className={cx(styles.flex_row, styles.flex_row_start)}>
@@ -43,7 +43,7 @@ export const Export = (props: ExportProps): JSX.Element | null => {
           <Dropdown name="pipetteName" options={pipetteNameOptions} />
         </div>
       </div>
-      <div className={styles.export_section}>
+      <div className={styles.export_section} id="DefinitionTest">
         <div className={cx(styles.callout, styles.export_callout)}>
           <h4 className={styles.test_labware_heading}>
             Please test your definition file!
