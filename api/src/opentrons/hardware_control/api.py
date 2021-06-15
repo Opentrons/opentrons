@@ -575,7 +575,7 @@ class API(HardwareAPILike):
 
         asyncio.run_coroutine_threadsafe(_chained_calls(), self._loop)
 
-    def halt(self):
+    async def halt(self):
         """ Immediately stop motion.
 
         Calls to :py:meth:`stop` through the synch adapter while other calls
@@ -587,7 +587,7 @@ class API(HardwareAPILike):
         After this call, the smoothie will be in a bad state until a call to
         :py:meth:`stop`.
         """
-        self._backend.hard_halt()
+        await self._backend.hard_halt()
         asyncio.run_coroutine_threadsafe(self._execution_manager.cancel(),
                                          self._loop)
 
@@ -599,7 +599,7 @@ class API(HardwareAPILike):
         see :py:meth:`pause` for more detail), then home and reset the
         robot.
         """
-        self._backend.halt()
+        await self._backend.halt()
         self._log.info("Recovering from halt")
         await self.reset()
         await self.home()
@@ -1122,7 +1122,7 @@ class API(HardwareAPILike):
         return self.get_engaged_axes()
 
     async def disengage_axes(self, which: List[Axis]):
-        self._backend.disengage_axes([ax.name for ax in which])
+        await self._backend.disengage_axes([ax.name for ax in which])
 
     async def _fast_home(
             self, axes: Sequence[str],
