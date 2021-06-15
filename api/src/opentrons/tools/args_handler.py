@@ -1,5 +1,5 @@
 import argparse
-from typing import Tuple
+from typing import Tuple, cast
 
 from opentrons.hardware_control import API
 from opentrons.drivers.smoothie_drivers import SmoothieDriver
@@ -17,5 +17,5 @@ async def build_driver(
         port: str = None)\
         -> Tuple[API, SmoothieDriver]:
     hardware = await API.build_hardware_controller(port=port)
-    driver = hardware._backend._smoothie_driver
+    driver = cast(SmoothieDriver, hardware._backend._smoothie_driver)
     return hardware, driver

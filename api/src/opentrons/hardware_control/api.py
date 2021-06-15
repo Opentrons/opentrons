@@ -1124,11 +1124,11 @@ class API(HardwareAPILike):
     async def disengage_axes(self, which: List[Axis]):
         self._backend.disengage_axes([ax.name for ax in which])
 
-    def _fast_home(
+    async def _fast_home(
             self, axes: Sequence[str],
             margin: float) -> Dict[str, float]:
         converted_axes = ''.join(axes)
-        return self._backend.fast_home(converted_axes, margin)
+        return await self._backend.fast_home(converted_axes, margin)
 
     async def retract(
             self,
