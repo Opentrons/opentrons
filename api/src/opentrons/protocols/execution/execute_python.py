@@ -5,7 +5,7 @@ import traceback
 import sys
 from typing import Any, Dict
 
-from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieAlarm
+from opentrons.drivers.smoothie_drivers.errors import SmoothieAlarm
 from opentrons.protocol_api.contexts import ProtocolContext
 from opentrons.protocols.execution.errors import ExceptionInProtocolError
 from opentrons.protocols.types import PythonProtocol, MalformedProtocolError

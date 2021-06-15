@@ -3,16 +3,15 @@ from typing import Dict
 
 from opentrons.drivers import utils
 from opentrons.drivers.asyncio.communication import AlarmResponse
-from opentrons.drivers.asyncio.smoothie import constants, parse_utils
 from mock import AsyncMock
 import pytest
-from opentrons.drivers.asyncio.smoothie.connection import \
+from opentrons.drivers.smoothie_drivers.connection import \
     SmoothieConnection
-from opentrons.drivers.asyncio.smoothie.constants import HOMED_POSITION, \
+from opentrons.drivers.smoothie_drivers.constants import HOMED_POSITION, \
     Y_BOUND_OVERRIDE
 from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
 
-from opentrons.drivers.asyncio.smoothie import driver
+from opentrons.drivers.smoothie_drivers import driver_3_0, constants
 
 
 @pytest.fixture
@@ -28,11 +27,11 @@ def sim_gpio() -> SimulatingGPIOCharDev:
 
 
 @pytest.fixture
-def smoothie(mock_connection: AsyncMock, sim_gpio) -> driver.SmoothieDriver:
+def smoothie(mock_connection: AsyncMock, sim_gpio) -> driver_3_0.SmoothieDriver:
     """The smoothie driver under test."""
     from opentrons.config import robot_configs
 
-    d = driver.SmoothieDriver(
+    d = driver_3_0.SmoothieDriver(
         connection=mock_connection,
         config=robot_configs.load(),
         gpio_chardev=sim_gpio
@@ -44,7 +43,7 @@ def position(x, y, z, a, b, c):
     return {axis: value for axis, value in zip('XYZABC', [x, y, z, a, b, c])}
 
 
-async def test_update_position(smoothie: driver.SmoothieDriver,
+async def test_update_position(smoothie: driver_3_0.SmoothieDriver,
                                mock_connection: AsyncMock) -> None:
     """It should update the position."""
     mock_connection.send_command.return_value = 'ok MCS: X:1.0000 Y:2.0000 Z:3.0000 A:4.5000 B:0.0000 C:0.0000'
@@ -62,7 +61,7 @@ async def test_update_position(smoothie: driver.SmoothieDriver,
 
 
 async def test_update_position_retry(
-        smoothie: driver.SmoothieDriver, mock_connection: AsyncMock
+        smoothie: driver_3_0.SmoothieDriver, mock_connection: AsyncMock
 ) -> None:
     """It should retry after a parse error."""
     mock_connection.send_command.side_effect = [
@@ -102,7 +101,7 @@ def test_active_dwelling_current_push_pop(smoothie):
 
 
 @pytest.mark.skip()
-async def test_functional(smoothie: driver.SmoothieDriver):
+async def test_functional(smoothie: driver_3_0.SmoothieDriver):
     assert smoothie.position == position(0, 0, 0, 0, 0, 0)
 
     await smoothie.move({'X': 0, 'Y': 1, 'Z': 2, 'A': 3, 'B': 4, 'C': 5})
@@ -122,13 +121,13 @@ async def test_functional(smoothie: driver.SmoothieDriver):
     assert smoothie.position == smoothie.homed_position
 
 
-async def test_read_pipette_v13(smoothie: driver.SmoothieDriver, mock_connection: AsyncMock):
+async def test_read_pipette_v13(smoothie: driver_3_0.SmoothieDriver, mock_connection: AsyncMock):
     mock_connection.send_command.return_value = 'L:' + utils.string_to_hex("p300_single_v13")
     res = await smoothie.read_pipette_model('left')
     assert res == 'p300_single_v1.3'
 
 
-async def test_switch_state(smoothie: driver.SmoothieDriver, mock_connection: AsyncMock):
+async def test_switch_state(smoothie: driver_3_0.SmoothieDriver, mock_connection: AsyncMock):
     smoothie_switch_res = 'X_max:0 Y_max:0 Z_max:0 A_max:0 B_max:0 C_max:0' \
                           ' _pins ' \
                           '(XL)2.01:0 (YL)2.01:0 (ZL)2.01:0 ' \
@@ -168,7 +167,7 @@ async def test_switch_state(smoothie: driver.SmoothieDriver, mock_connection: As
     assert r == expected
 
 
-async def test_clear_limit_switch(smoothie: driver.SmoothieDriver, mock_connection: AsyncMock):
+async def test_clear_limit_switch(smoothie: driver_3_0.SmoothieDriver, mock_connection: AsyncMock):
     """
     This functions as a contract test around recovery from a limit-switch hit.
     Note that this *does not* itself guarantee correct physical behavior--this
@@ -192,7 +191,7 @@ async def test_clear_limit_switch(smoothie: driver.SmoothieDriver, mock_connecti
     mock_connection.send_command.side_effect = write_mock
 
     # This will cause a limit-switch error and not back off
-    with pytest.raises(driver.SmoothieError):
+    with pytest.raises(driver_3_0.SmoothieError):
         await smoothie.move({'C': 100})
 
     assert [c.strip() for c in cmd_list] == [
@@ -217,7 +216,7 @@ async def test_clear_limit_switch(smoothie: driver.SmoothieDriver, mock_connecti
     ]
 
 
-async def test_unstick_axes(smoothie: driver.SmoothieDriver, mock_connection: AsyncMock):
+async def test_unstick_axes(smoothie: driver_3_0.SmoothieDriver, mock_connection: AsyncMock):
     cmd_list = []
 
     def write_mock(command, retries):
@@ -257,7 +256,7 @@ async def test_unstick_axes(smoothie: driver.SmoothieDriver, mock_connection: As
     ]
 )
 async def test_home_flagged_axes(
-        smoothie: driver.SmoothieDriver, home_flags: Dict[str, bool],
+        smoothie: driver_3_0.SmoothieDriver, home_flags: Dict[str, bool],
         axis_string: str, expected: str
 ) -> None:
     """It should only home un-homed axes."""
@@ -279,7 +278,7 @@ async def test_home_flagged_axes(
     ]
 )
 async def test_home_flagged_axes_no_call(
-    smoothie: driver.SmoothieDriver, home_flags: Dict[str, bool], axis_string: str
+    smoothie: driver_3_0.SmoothieDriver, home_flags: Dict[str, bool], axis_string: str
 ) -> None:
     """It should not home homed axes."""
     smoothie.home = AsyncMock()
@@ -291,7 +290,7 @@ async def test_home_flagged_axes_no_call(
 
 
 async def test_update_homed_flags_retry(
-        smoothie: driver.SmoothieDriver, mock_connection: AsyncMock
+        smoothie: driver_3_0.SmoothieDriver, mock_connection: AsyncMock
 ) -> None:
     """It should retry."""
     mock_connection.is_open.return_value = True
@@ -318,7 +317,7 @@ async def test_update_homed_flags_retry(
 
 
 def test_axis_bounds(
-        smoothie: driver.SmoothieDriver
+        smoothie: driver_3_0.SmoothieDriver
 ) -> None:
     """It should override Y."""
     bounds = smoothie.axis_bounds

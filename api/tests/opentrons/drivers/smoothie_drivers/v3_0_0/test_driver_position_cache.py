@@ -1,7 +1,7 @@
 import pytest
-from opentrons.drivers.asyncio.smoothie import SmoothieDriver
+from opentrons.drivers.smoothie_drivers import SmoothieDriver
 
-from opentrons.drivers.smoothie_drivers.driver_3_0 import (
+from opentrons.drivers.smoothie_drivers.constants import (
     AXES, HOMED_POSITION as HP
 )
 
