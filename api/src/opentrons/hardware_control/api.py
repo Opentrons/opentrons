@@ -1103,8 +1103,8 @@ class API(HardwareAPILike):
                 await stack.enter_async_context(self._motion_lock)
             try:
                 await self._backend.move(smoothie_pos, speed=speed,
-                                   home_flagged_axes=home_flagged_axes,
-                                   axis_max_speeds=str_maxes)
+                                         home_flagged_axes=home_flagged_axes,
+                                         axis_max_speeds=str_maxes)
             except Exception:
                 self._log.exception('Move failed')
                 self._current_position.clear()

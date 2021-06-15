@@ -174,8 +174,8 @@ class Simulator:
         return self._position
 
     async def move(self, target_position: Dict[str, float],
-             home_flagged_axes: bool = True, speed: float = None,
-             axis_max_speeds: Dict[str, float] = None):
+                   home_flagged_axes: bool = True, speed: float = None,
+                   axis_max_speeds: Dict[str, float] = None):
         self._position.update(target_position)
         self._engaged_axes.update({ax: True
                                    for ax in target_position})

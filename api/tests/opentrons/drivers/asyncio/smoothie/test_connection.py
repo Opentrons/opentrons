@@ -1,9 +1,10 @@
-import opentrons.drivers.smoothie_drivers.constants
 import pytest
 from mock import AsyncMock
 from opentrons.drivers.asyncio.communication import AsyncSerial
 from opentrons.drivers.smoothie_drivers.connection import SmoothieConnection
 from opentrons.drivers.command_builder import CommandBuilder
+from opentrons.drivers.smoothie_drivers.constants import \
+    SMOOTHIE_COMMAND_TERMINATOR
 
 
 @pytest.fixture
@@ -25,7 +26,7 @@ def subject(mock_serial_connection: AsyncMock) -> SmoothieConnection:
 def command() -> CommandBuilder:
     """A command fixture"""
     return CommandBuilder(
-        terminator=opentrons.drivers.smoothie_drivers.constants.SMOOTHIE_COMMAND_TERMINATOR
+        terminator=SMOOTHIE_COMMAND_TERMINATOR
     ).add_gcode(
         "M123"
     ).add_int(

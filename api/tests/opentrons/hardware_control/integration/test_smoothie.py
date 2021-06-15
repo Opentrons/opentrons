@@ -274,7 +274,9 @@ async def test_pipette_configs(subject: SmoothieDriver, spy: MagicMock):
         'Z',
         {'home': 175, 'debounce': 12, 'max_travel': 13, 'retract': 14}
     )
-    expected_return = {'Z': {'home': 175, 'debounce': 12, 'max_travel': 13, 'retract': 14}}
+    expected_return = {
+        'Z': {'home': 175, 'debounce': 12, 'max_travel': 13, 'retract': 14}
+    }
     assert res == expected_return
 
     command_log = [x.kwargs['data'].strip() for x in spy.call_args_list]
@@ -378,7 +380,9 @@ async def test_update_pipette_config(subject: SmoothieDriver, spy: MagicMock):
     ]
 
 
-async def test_do_relative_splits_during_home_for(subject: SmoothieDriver, spy: MagicMock):
+async def test_do_relative_splits_during_home_for(
+        subject: SmoothieDriver, spy: MagicMock
+):
     """Test command structure when a split configuration is present."""
     subject.configure_splits_for(
         {
