@@ -122,8 +122,8 @@ class Controller:
         return self._smoothie_driver.position
 
     async def move(self, target_position: Dict[str, float],
-             home_flagged_axes: bool = True, speed: float = None,
-             axis_max_speeds: Dict[str, float] = None):
+                   home_flagged_axes: bool = True, speed: float = None,
+                   axis_max_speeds: Dict[str, float] = None):
         with ExitStack() as cmstack:
             if axis_max_speeds:
                 cmstack.enter_context(
@@ -313,7 +313,9 @@ class Controller:
             except RuntimeError:
                 pass
 
-    async def configure_mount(self, mount: Mount, config: InstrumentHardwareConfigs) -> None:
+    async def configure_mount(
+            self, mount: Mount, config: InstrumentHardwareConfigs
+    ) -> None:
         mount_axis = Axis.by_mount(mount)
         plunger_axis = Axis.of_plunger(mount)
 
