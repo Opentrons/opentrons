@@ -3,7 +3,7 @@ import asyncio
 from contextlib import contextmanager, ExitStack
 import logging
 from typing import (Any, Dict, List, Optional, Tuple,
-                    TYPE_CHECKING, Union, Sequence, cast)
+                    TYPE_CHECKING, Union, Sequence)
 from typing_extensions import Final
 try:
     import aionotify  # type: ignore
@@ -151,8 +151,9 @@ class Controller:
             mount: Mount,
             expected: Union[PipetteModel, PipetteName, None]
     ) -> AttachedInstrument:
-        model = await self._smoothie_driver.read_pipette_model(mount.name.lower())
-        found_model: Optional[PipetteModel] = cast(Optional[PipetteModel], model)
+        found_model: Optional[PipetteModel]\
+            = await self._smoothie_driver.read_pipette_model(  # type: ignore
+            mount.name.lower())
         if found_model and found_model not in pipette_config.config_models:
             # TODO: Consider how to handle this error - it bubbles up now
             # and will cause problems at higher levels
