@@ -47,7 +47,7 @@ class GeometryState:
         return self._get_highest_z_from_labware_data(labware_data)
 
     def get_all_labware_highest_z(self) -> float:
-        """Get the highest Z-point of a labware."""
+        """Get the highest Z-point across all labware."""
         return max(
             [
                 self._get_highest_z_from_labware_data(lw_data)
