@@ -1,4 +1,3 @@
-import { $Diff } from 'utility-types'
 import * as React from 'react'
 import { FileUploadMessageModal as FileUploadMessageModalComponent } from './FileUploadMessageModal'
 import { connect } from 'react-redux'
@@ -8,11 +7,11 @@ import {
 } from '../../../load-file'
 import { Dispatch } from 'redux'
 import { BaseState } from '../../../types'
-type Props = React.ElementProps<typeof FileUploadMessageModalComponent>
-type SP = {
+type Props = React.ComponentProps<typeof FileUploadMessageModalComponent>
+interface SP {
   message: Props['message']
 }
-type DP = $Diff<Props, SP>
+type DP = Omit<Props, keyof SP>
 
 function mapStateToProps(state: BaseState): SP {
   return {
@@ -27,14 +26,7 @@ function mapDispatchToProps(dispatch: Dispatch<any>): DP {
   }
 }
 
-export const FileUploadMessageModal: React.AbstractComponent<{}> = connect<
-  Props,
-  {},
-  SP,
-  DP,
-  _,
-  _
->(
+export const FileUploadMessageModal = connect(
   mapStateToProps,
   mapDispatchToProps
 )(FileUploadMessageModalComponent)

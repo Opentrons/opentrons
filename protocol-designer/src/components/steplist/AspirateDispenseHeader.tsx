@@ -12,8 +12,8 @@ import styles from './StepItem.css'
 import { LabwareTooltipContents } from './LabwareTooltipContents'
 
 interface AspirateDispenseHeaderProps {
-  sourceLabwareNickname: string | null | undefined
-  destLabwareNickname: string | null | undefined
+  sourceLabwareNickname?: string | null
+  destLabwareNickname?: string | null
 }
 
 export function AspirateDispenseHeader(

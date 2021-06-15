@@ -5,7 +5,7 @@ import { RobotCoordsForeignDiv } from '@opentrons/components'
 import styles from './SlotWarning.css'
 import { ModuleOrientation } from '../../types'
 
-type Props = {
+interface Props {
   x: number
   y: number
   xDimension: number

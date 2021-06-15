@@ -11,7 +11,7 @@ import { i18n } from '../../localization'
 import styles from './hints.css'
 import { HintKey } from '../../tutorial'
 
-export type HintProps = {
+export interface HintProps {
   hintKey: HintKey
   handleCancel: () => unknown
   handleContinue: () => unknown
@@ -63,7 +63,7 @@ export const BlockingHint = (props: HintProps): JSX.Element => {
   )
 }
 
-export type HintArgs = {
+export interface HintArgs {
   /** `enabled` should be a condition that the parent uses to toggle whether the hint should be active or not.
    * If the hint is enabled but has been dismissed, it will automatically call `handleContinue` when enabled.
    * useBlockingHint expects the parent to disable the hint on cancel/continue */

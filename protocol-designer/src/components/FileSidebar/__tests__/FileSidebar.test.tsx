@@ -10,7 +10,6 @@ import {
 import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
 import { FileSidebar, v4WarningContent, v5WarningContent } from '../FileSidebar'
 import { useBlockingHint } from '../../Hints/useBlockingHint'
-import { HintArgs } from '../../Hints/useBlockingHint'
 
 jest.mock('../../Hints/useBlockingHint')
 

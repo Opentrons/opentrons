@@ -10,7 +10,7 @@ import { AlertData, AlertType } from './types'
  * see #1814 for reference
  */
 
-export type Props = {
+export interface Props {
   errors: AlertData[]
   warnings: AlertData[]
   dismissWarning: (val: string) => unknown
@@ -23,9 +23,7 @@ type MakeAlert = (
 ) => JSX.Element
 
 const AlertsComponent = (props: Props) => {
-  const makeHandleCloseWarning = (
-    dismissId: string | null | undefined
-  ) => () => {
+  const makeHandleCloseWarning = (dismissId?: string | null) => () => {
     assert(dismissId, 'expected dismissId, Alert cannot dismiss warning')
     if (dismissId) {
       props.dismissWarning(dismissId)
@@ -52,6 +50,4 @@ const AlertsComponent = (props: Props) => {
   )
 }
 
-export const Alerts: React.AbstractComponent<Props> = React.memo(
-  AlertsComponent
-)
+export const Alerts = React.memo(AlertsComponent)

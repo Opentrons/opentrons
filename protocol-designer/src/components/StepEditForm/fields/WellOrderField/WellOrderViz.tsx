@@ -9,7 +9,7 @@ import { WellOrderOption } from '../../../../form-types'
 
 import styles from './WellOrderInput.css'
 
-type Props = {
+interface Props {
   firstValue: WellOrderOption
   secondValue: WellOrderOption
 }

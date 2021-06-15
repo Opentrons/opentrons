@@ -36,7 +36,7 @@ const SourceDestBatchEditMoveLiquidFields = (props: {
   propsForFields: FieldPropsByName
 }): JSX.Element => {
   const { prefix, propsForFields } = props
-  const addFieldNamePrefix = name => `${prefix}_${name}`
+  const addFieldNamePrefix = (name: string) => `${prefix}_${name}`
 
   const getLabwareIdForPositioningField = (name: string): string | null => {
     const labwareField = getLabwareFieldForPositioningField(name)
@@ -151,7 +151,7 @@ const SourceDestBatchEditMoveLiquidFields = (props: {
   )
 }
 
-type BatchEditMoveLiquidProps = {
+interface BatchEditMoveLiquidProps {
   batchEditFormHasChanges: boolean
   propsForFields: FieldPropsByName
   handleCancel: () => unknown

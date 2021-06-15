@@ -37,7 +37,7 @@ type PathFieldProps = FieldProps &
     disabledPathMap: DisabledPathMap
   }
 
-type ButtonProps = {
+interface ButtonProps {
   children?: React.ReactNode
   disabled: boolean
   id?: string

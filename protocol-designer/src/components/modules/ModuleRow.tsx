@@ -22,11 +22,14 @@ import styles from './styles.css'
 import { ModuleRealType } from '@opentrons/shared-data'
 import { ModuleOnDeck } from '../../step-forms'
 
-type Props = {
+interface Props {
   moduleOnDeck?: ModuleOnDeck
   showCollisionWarnings?: boolean
   type: ModuleRealType
-  openEditModuleModal: (moduleType: ModuleRealType, moduleId?: string) => unknown
+  openEditModuleModal: (
+    moduleType: ModuleRealType,
+    moduleId?: string
+  ) => unknown
 }
 
 export function ModuleRow(props: Props): JSX.Element {

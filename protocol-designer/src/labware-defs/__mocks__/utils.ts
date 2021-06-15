@@ -17,12 +17,10 @@ assert(
   Object.keys(allLabware).length > 0,
   `no labware fixtures found, is the path correct? ${LABWARE_FIXTURE_PATTERN}`
 )
-export const getAllDefinitions = jest.fn(
-  () => allLabware
-)
+export const getAllDefinitions = jest.fn(() => allLabware)
 
 export const _getSharedLabware = jest.fn(() => null)
 
-export const getOnlyLatestDefs= jest.fn(() => {
+export const getOnlyLatestDefs = jest.fn(() => {
   throw Error('getOnlyLatestDefs should not be used directly')
 })

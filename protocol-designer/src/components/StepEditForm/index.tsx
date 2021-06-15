@@ -18,21 +18,21 @@ import { makeSingleEditFieldProps } from './fields/makeSingleEditFieldProps'
 import { StepEditFormComponent } from './StepEditFormComponent'
 import { getDirtyFields } from './utils'
 import { BaseState, ThunkDispatch } from '../../types'
-import { FormData, StepFieldName } from '../../form-types'
+import { FormData, StepFieldName, StepIdType } from '../../form-types'
 
-type SP = {
-  canSave: boolean,
-  formData: FormData | null | undefined,
-  formHasChanges: boolean,
-  isNewStep: boolean,
-  isPristineSetTempForm: boolean,
+interface SP {
+  canSave: boolean
+  formData?: FormData | null
+  formHasChanges: boolean
+  isNewStep: boolean
+  isPristineSetTempForm: boolean
 }
-type DP = {
-  deleteStep: (stepId: string) => unknown,
-  handleClose: () => unknown,
-  saveSetTempFormWithAddedPauseUntilTemp: () => unknown,
-  saveStepForm: () => unknown,
-  handleChangeFormInput: (name: string, value: unknown) => void,
+interface DP {
+  deleteStep: (stepId: string) => unknown
+  handleClose: () => unknown
+  saveSetTempFormWithAddedPauseUntilTemp: () => unknown
+  saveStepForm: () => unknown
+  handleChangeFormInput: (name: string, value: unknown) => void
 }
 type StepEditFormManagerProps = SP & DP
 
@@ -182,8 +182,9 @@ const mapStateToProps = (state: BaseState): SP => {
   }
 }
 
-const mapDispatchToProps = (dispatch: ThunkDispatch<*>): DP => {
-  const deleteStep = stepId => dispatch(actions.deleteStep(stepId))
+const mapDispatchToProps = (dispatch: ThunkDispatch<any>): DP => {
+  const deleteStep = (stepId: StepIdType) =>
+    dispatch(actions.deleteStep(stepId))
   const handleClose = () => dispatch(actions.cancelStepForm())
   const saveSetTempFormWithAddedPauseUntilTemp = () =>
     dispatch(stepsActions.saveSetTempFormWithAddedPauseUntilTemp())
@@ -210,14 +211,7 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<*>): DP => {
 // It doesn't matter if the children are using connect or useSelector,
 // only the parent matters.)
 // https://react-redux.js.org/api/hooks#stale-props-and-zombie-children
-export const StepEditForm: React.AbstractComponent<{}> = connect<
-  StepEditFormManagerProps,
-  {},
-  _,
-  _,
-  _,
-  _
->(
+export const StepEditForm = connect(
   mapStateToProps,
   mapDispatchToProps
 )((props: StepEditFormManagerProps) => (

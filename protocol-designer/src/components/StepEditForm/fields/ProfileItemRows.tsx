@@ -38,12 +38,12 @@ export const showProfileFieldErrors = ({
   dirtyFields,
 }: {
   fieldId: string
-  focusedField: string | null | undefined
+  focusedField?: string | null
   dirtyFields: string[]
 }): boolean =>
   !(fieldId === focusedField) && dirtyFields && dirtyFields.includes(fieldId)
 
-type ProfileCycleRowProps = {
+interface ProfileCycleRowProps {
   cycleItem: ProfileCycleItem
   focusHandlers: FocusHandlers
   stepOffset: number
@@ -139,7 +139,7 @@ export const ProfileCycleRow = (props: ProfileCycleRowProps): JSX.Element => {
   )
 }
 
-export type ProfileItemRowsProps = {
+export interface ProfileItemRowsProps {
   focusHandlers: FocusHandlers
   orderedProfileItems: string[]
   profileItemsById: {
@@ -229,7 +229,7 @@ export const ProfileItemRows = (props: ProfileItemRowsProps): JSX.Element => {
   )
 }
 
-type ProfileFieldProps = {
+interface ProfileFieldProps {
   name: string
   focusHandlers: FocusHandlers
   profileItem: ProfileItem
@@ -288,11 +288,11 @@ const ProfileField = (props: ProfileFieldProps) => {
   )
 }
 
-type ProfileStepRowProps = {
+interface ProfileStepRowProps {
   focusHandlers: FocusHandlers
   profileStepItem: ProfileStepItem
   stepNumber: number
-  isCycle: boolean | null | undefined
+  isCycle?: boolean | null
 }
 
 const ProfileStepRow = (props: ProfileStepRowProps) => {

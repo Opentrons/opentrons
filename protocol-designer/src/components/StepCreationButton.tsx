@@ -29,11 +29,11 @@ import { Portal } from './portals/MainPageModalPortal'
 import { stepIconsByType, StepType } from '../form-types'
 import styles from './listButtons.css'
 
-type StepButtonComponentProps = {
-  children: React.ReactNode,
-  expanded: boolean,
-  disabled: boolean,
-  setExpanded: (expanded: boolean) => unknown,
+interface StepButtonComponentProps {
+  children: React.ReactNode
+  expanded: boolean
+  disabled: boolean
+  setExpanded: (expanded: boolean) => unknown
 }
 
 // TODO: Ian 2019-01-17 move out to centralized step info file - see #2926
@@ -78,10 +78,10 @@ export const StepCreationButtonComponent = (
   )
 }
 
-export type StepButtonItemProps = {
-  onClick: () => unknown,
-  disabled: boolean,
-  stepType: StepType,
+export interface StepButtonItemProps {
+  onClick: () => unknown
+  disabled: boolean
+  stepType: StepType
 }
 
 export function StepButtonItem(props: StepButtonItemProps): JSX.Element {

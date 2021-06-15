@@ -6,13 +6,12 @@ import {
   selectors as featureFlagSelectors,
 } from '../../../feature-flags'
 import { Dispatch } from 'redux'
-import { ElementProps } from 'react'
 import { BaseState } from '../../../types'
-type Props = ElementProps<typeof FeatureFlagCardComponent>
-type SP = {
+type Props = React.ComponentProps<typeof FeatureFlagCardComponent>
+interface SP {
   flags: Props['flags']
 }
-type DP = {
+interface DP {
   setFeatureFlags: Props['setFeatureFlags']
 }
 
@@ -24,14 +23,7 @@ const mapDispatchToProps = (dispatch: Dispatch<any>): DP => ({
   setFeatureFlags: flags => dispatch(featureFlagActions.setFeatureFlags(flags)),
 })
 
-export const FeatureFlagCard: React.AbstractComponent<{}> = connect<
-  Props,
-  {},
-  SP,
-  DP,
-  BaseState,
-  _
->(
+export const FeatureFlagCard = connect(
   mapStateToProps,
   mapDispatchToProps
 )(FeatureFlagCardComponent)

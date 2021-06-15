@@ -6,11 +6,13 @@ import { KnowledgeBaseLink } from '../KnowledgeBaseLink'
 import { AlertLevel } from './types'
 import { TerminalItemLink } from '../steplist/TerminalItem'
 
-type ErrorContentsProps = {
+interface ErrorContentsProps {
   errorType: string
   level: AlertLevel
 }
-export const ErrorContents = (props: ErrorContentsProps): JSX.Element => {
+export const ErrorContents = (
+  props: ErrorContentsProps
+): JSX.Element | null => {
   if (props.level === 'timeline') {
     const bodyText = i18n.t(`alert.timeline.error.${props.errorType}.body`, {
       defaultValue: '',

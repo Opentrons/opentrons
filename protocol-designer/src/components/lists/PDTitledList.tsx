@@ -4,7 +4,7 @@ import cx from 'classnames'
 import { TitledList } from '@opentrons/components'
 import styles from './styles.css'
 
-type Props = React.ElementProps<typeof TitledList>
+type Props = React.ComponentProps<typeof TitledList>
 
 /** Light wrapper around TitledList for PD-specific styles */
 export function PDTitledList(props: Props): JSX.Element {

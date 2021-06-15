@@ -29,7 +29,7 @@ const STEP_FORM_MAP: {
   thermocycler: ThermocyclerForm,
 }
 
-type Props = {
+interface Props {
   canSave: boolean
   dirtyFields: string[]
   focusHandlers: FocusHandlers

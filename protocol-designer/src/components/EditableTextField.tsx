@@ -4,15 +4,15 @@ import * as React from 'react'
 import { ClickOutside, Icon, InputField } from '@opentrons/components'
 import styles from './editableTextField.css'
 
-type Props = {
+interface Props {
   className?: string
-  value: string | null | undefined
+  value?: string | null
   saveEdit: (newValue: string) => unknown
 }
 
-type State = {
+interface State {
   editing: boolean
-  transientValue: string | null | undefined
+  transientValue?: string | null
 }
 
 export class EditableTextField extends React.Component<Props, State> {

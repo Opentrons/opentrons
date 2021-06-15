@@ -85,8 +85,8 @@ const MessageBody = (props: { message: LabwareUploadMessage }) => {
   return null
 }
 
-type Props = {
-  message: LabwareUploadMessage | null | undefined
+interface Props {
+  message?: LabwareUploadMessage | null
   dismissModal: () => unknown
   overwriteLabwareDef?: () => unknown
 }

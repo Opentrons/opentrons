@@ -7,15 +7,11 @@ import { resetScrollElements } from '../../../ui/steps/utils'
 import { Portal } from '../../portals/MainPageModalPortal'
 import styles from '../SettingsPage.css'
 import modalStyles from '../../modals/modal.css'
-import {
-  userFacingFlags,
- Flags,
- FlagTypes,
-} from '../../../feature-flags'
+import { userFacingFlags, Flags, FlagTypes } from '../../../feature-flags'
 
-type Props = {
-  flags: Flags,
-  setFeatureFlags: (flags: Flags) => unknown,
+interface Props {
+  flags: Flags
+  setFeatureFlags: (flags: Flags) => unknown
 }
 
 export const FeatureFlagCard = (props: Props): JSX.Element => {
@@ -101,7 +97,7 @@ export const FeatureFlagCard = (props: Props): JSX.Element => {
             onCancelClick={() => setModalFlagName(null)}
             onContinueClick={() => {
               props.setFeatureFlags({
-                [(modalFlagName as string)]: !props.flags[modalFlagName],
+                [modalFlagName as string]: !props.flags[modalFlagName],
               })
               setModalFlagName(null)
             }}

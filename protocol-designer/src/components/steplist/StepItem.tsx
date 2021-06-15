@@ -34,26 +34,26 @@ import {
   WellIngredientNames,
 } from '../../steplist/types'
 
-export type StepItemProps = {
-  description: string | null | undefined
-  rawForm: FormData | null | undefined
+export interface StepItemProps {
+  description?: string | null
+  rawForm?: FormData | null
   stepNumber: number
   stepType: StepType
   title?: string
 
-  collapsed?: boolean,
-  error: boolean | null | undefined,
-  warning: boolean | null | undefined,
-  selected?: boolean,
-  isLastSelected?: boolean,
-  hovered?: boolean,
-  isMultiSelectMode?: boolean,
+  collapsed?: boolean
+  error?: boolean | null
+  warning?: boolean | null
+  selected?: boolean
+  isLastSelected?: boolean
+  hovered?: boolean
+  isMultiSelectMode?: boolean
 
-  highlightStep: () => unknown,
-  onStepContextMenu?: (event?: React.MouseEvent) => unknown,
-  handleClick?: (event: React.MouseEvent) => unknown,
-  toggleStepCollapsed: () => unknown,
-  unhighlightStep: (event?: React.MouseEvent) => unknown,
+  highlightStep: () => unknown
+  onStepContextMenu?: (event?: React.MouseEvent) => unknown
+  handleClick?: (event: React.MouseEvent) => unknown
+  toggleStepCollapsed: () => unknown
+  unhighlightStep: (event?: React.MouseEvent) => unknown
   children?: React.ReactNode
 }
 

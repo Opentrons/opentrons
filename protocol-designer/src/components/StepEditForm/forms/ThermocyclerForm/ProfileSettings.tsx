@@ -9,7 +9,7 @@ import styles from '../../StepEditForm.css'
 
 import { FieldPropsByName } from '../../types'
 
-type Props = { propsForFields: FieldPropsByName }
+interface Props { propsForFields: FieldPropsByName }
 
 export const ProfileSettings = (props: Props): JSX.Element => {
   const { propsForFields } = props

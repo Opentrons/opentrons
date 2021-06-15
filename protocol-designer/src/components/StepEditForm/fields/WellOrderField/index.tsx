@@ -19,16 +19,16 @@ import styles from './WellOrderInput.css'
 import { FieldProps } from '../../types'
 import { WellOrderOption } from '../../../../form-types'
 
-type Props = {
-  className: string | null | undefined
+interface Props {
+  className?: string | null
   label?: string
   prefix: 'aspirate' | 'dispense' | 'mix'
-  firstValue: WellOrderOption | null | undefined
-  secondValue: WellOrderOption | null | undefined
+  firstValue?: WellOrderOption | null
+  secondValue?: WellOrderOption | null
   firstName: string
   secondName: string
-  updateFirstWellOrder: $PropertyType<FieldProps, 'updateValue'>
-  updateSecondWellOrder: $PropertyType<FieldProps, 'updateValue'>
+  updateFirstWellOrder: FieldProps['updateValue']
+  updateSecondWellOrder: FieldProps['updateValue']
 }
 
 export const WellOrderField = (props: Props): JSX.Element => {

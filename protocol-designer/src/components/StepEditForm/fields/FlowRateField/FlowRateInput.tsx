@@ -19,18 +19,18 @@ const DECIMALS_ALLOWED = 1
 
 /** When flow rate is falsey (including 0), it means 'use default' */
 export type FlowRateInputProps = FieldProps & {
-  defaultFlowRate: number | null | undefined
+  defaultFlowRate?: number | null
   flowRateType: 'aspirate' | 'dispense'
-  label: string | null | undefined
+  label?: string | null
   minFlowRate: number
   maxFlowRate: number
-  pipetteDisplayName: string | null | undefined
+  pipetteDisplayName?: string | null
   className?: string
 }
 
-type State = {
+interface State {
   isPristine: boolean
-  modalFlowRate: string | null | undefined
+  modalFlowRate?: string | null
   modalUseDefault: boolean
   showModal: boolean
 }
@@ -56,21 +56,21 @@ export const FlowRateInput = (props: FlowRateInputProps): JSX.Element => {
     showModal: false,
   }
 
-  const [isPristine, setIsPristine] = React.useState<
-    $PropertyType<State, 'isPristine'>
-  >(initialState.isPristine)
+  const [isPristine, setIsPristine] = React.useState<State['isPristine']>(
+    initialState.isPristine
+  )
 
   const [modalFlowRate, setModalFlowRate] = React.useState<
-    $PropertyType<State, 'modalFlowRate'>
+    State['modalFlowRate']
   >(initialState.modalFlowRate)
 
   const [modalUseDefault, setModalUseDefault] = React.useState<
-    $PropertyType<State, 'modalUseDefault'>
+    State['modalUseDefault']
   >(initialState.modalUseDefault)
 
-  const [showModal, setShowModal] = React.useState<
-    $PropertyType<State, 'showModal'>
-  >(initialState.showModal)
+  const [showModal, setShowModal] = React.useState<State['showModal']>(
+    initialState.showModal
+  )
 
   const resetModalState = (): void => {
     setShowModal(initialState.showModal)

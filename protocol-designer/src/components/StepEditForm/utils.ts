@@ -66,7 +66,7 @@ export function getBlowoutLocationOptionsForForm(args: {
 // TODO: type fieldNames, don't use `string`
 export const getDirtyFields = (
   isNewStep: boolean,
-  formData: FormData | null | undefined
+  formData?: FormData | null
 ): string[] => {
   let dirtyFields = []
 
@@ -95,7 +95,7 @@ export const getDirtyFields = (
   return without(dirtyFields, 'stepType', 'id')
 }
 export const getVisibleFormErrors = (args: {
-  focusedField: string | null | undefined
+  focusedField?: string | null
   dirtyFields: string[]
   errors: StepFormErrors
 }): StepFormErrors => {
@@ -110,7 +110,7 @@ export const getVisibleFormErrors = (args: {
   })
 }
 export const getVisibleFormWarnings = (args: {
-  focusedField: string | null | undefined
+  focusedField?: string | null
   dirtyFields: string[]
   errors: FormWarning[]
 }): FormWarning[] => {
@@ -136,7 +136,7 @@ export const getDynamicFieldFocusHandlerId = ({
 // (Errors don't currently specify the id, so if we later want to only mask form-level errors
 // for specific profile fields, the field's parent ProfileItem id needs to be included in the error)
 export const getVisibleProfileFormLevelErrors = (args: {
-  focusedField: string | null | undefined
+  focusedField?: string | null
   dirtyFields: string[]
   errors: ProfileFormError[]
   profileItemsById: Record<string, ProfileItem>

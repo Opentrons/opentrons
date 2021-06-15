@@ -17,21 +17,21 @@ import { StepIdType } from '../../../../form-types'
 import { BaseState } from '../../../../types'
 import { FieldProps } from '../../types'
 
-type SP = {
-  stepId: StepIdType | null | undefined
-  wellSelectionLabwareKey: string | null | undefined
+interface SP {
+  stepId?: StepIdType | null
+  wellSelectionLabwareKey?: string | null
 }
 
-type DP = {
+interface DP {
   onOpen: (val: string) => unknown
   onClose: () => unknown
 }
 
 type OP = FieldProps & {
   primaryWellCount?: number
-  isMulti: boolean | null | undefined
-  pipetteId: string | null | undefined
-  labwareId: string | null | undefined
+  isMulti?: boolean | null
+  pipetteId?: string | null
+  labwareId?: string | null
 }
 
 type Props = OP & SP & DP

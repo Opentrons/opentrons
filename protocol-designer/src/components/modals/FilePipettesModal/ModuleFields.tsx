@@ -13,7 +13,7 @@ import styles from './FilePipettesModal.css'
 import { ModuleRealType } from '@opentrons/shared-data'
 import { FormModulesByType } from '../../../step-forms'
 
-type Props = {
+interface Props {
   // TODO 2020-3-20 use formik typing here after we update the def in flow-typed
   errors:
     | null

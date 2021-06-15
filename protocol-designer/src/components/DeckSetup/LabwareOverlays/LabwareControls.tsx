@@ -13,9 +13,9 @@ import { LabwareName } from './LabwareName'
 import { LabwareHighlight } from './LabwareHighlight'
 import styles from './LabwareOverlays.css'
 
-type LabwareControlsProps = {
+interface LabwareControlsProps {
   labwareOnDeck: LabwareOnDeck
-  selectedTerminalItemId: TerminalItemId | null | undefined
+  selectedTerminalItemId?: TerminalItemId | null
   slot: DeckSlot
   setHoveredLabware: (labware: LabwareOnDeck | null | undefined) => unknown
   setDraggedLabware: (labware: LabwareOnDeck | null | undefined) => unknown

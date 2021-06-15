@@ -6,7 +6,7 @@ import { swatchColors, MIXED_WELL_COLOR } from '../swatchColors'
 import { WellIngredientVolumeData, WellIngredientNames } from '../../steplist'
 import styles from './StepItem.css'
 
-type Props = {
+interface Props {
   ingreds: WellIngredientVolumeData
   ingredNames: WellIngredientNames
   targetProps: $ElementType<UseHoverTooltipResult, 0> | null | undefined

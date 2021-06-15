@@ -8,9 +8,9 @@ import styles from '../StepEditForm.css'
 import { FieldPropsByName } from '../types'
 import { StepFieldName } from '../../../form-types'
 
-export type DelayFieldProps = {
+export interface DelayFieldProps {
   checkboxFieldName: StepFieldName // TODO(IL, 2021-03-03): strictly, could be DelayCheckboxFields!
-  labwareId: string | null | undefined
+  labwareId?: string | null
   propsForFields: FieldPropsByName
   secondsFieldName: StepFieldName // TODO(IL, 2021-03-03): strictly, could be DelaySecondFields!
   tipPositionFieldName?: StepFieldName // TODO(IL, 2021-03-03): strictly, could be TipOffsetFields!

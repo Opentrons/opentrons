@@ -38,40 +38,40 @@ import {
 } from '../../../step-forms'
 import { FormikProps } from 'formik/@flow-typed'
 
-export type PipetteFieldsData = $Diff<
+export type PipetteFieldsData = Omit<
   PipetteOnDeck,
-  { id: unknown; spec: unknown; tiprackLabwareDef: unknown }
+  'id' | 'spec' | 'tiprackLabwareDef'
 >
 
-export type ModuleCreationArgs = {
+export interface ModuleCreationArgs {
   type: ModuleRealType
   model: string
   slot: DeckSlot
 }
 
-type FormState = {
+interface FormState {
   fields: NewProtocolFields
   pipettesByMount: FormPipettesByMount
   modulesByType: FormModulesByType
 }
 
-type State = {
+interface State {
   showEditPipetteConfirmation: boolean
 }
 
-export type Props = {
-  showProtocolFields: boolean | null | undefined
-  showModulesFields: boolean | null | undefined
+export interface Props {
+  showProtocolFields?: boolean | null
+  showModulesFields?: boolean | null
   hideModal?: boolean
   onCancel: () => unknown
-  initialPipetteValues?: $PropertyType<FormState, 'pipettesByMount'>
-  initialModuleValues?: $PropertyType<FormState, 'modulesByType'>
+  initialPipetteValues?: FormState['pipettesByMount']
+  initialModuleValues?: FormState['modulesByType']
   onSave: (args: {
     newProtocolFields: NewProtocolFields
     pipettes: PipetteFieldsData[]
     modules: ModuleCreationArgs[]
   }) => unknown
-  moduleRestrictionsDisabled: boolean | null | undefined
+  moduleRestrictionsDisabled?: boolean | null
 }
 
 const initialFormState: FormState = {

@@ -14,11 +14,11 @@ import { MultiSelectToolbar } from './MultiSelectToolbar'
 
 import { StepIdType } from '../../form-types'
 
-type Props = {
-  isMultiSelectMode: boolean | null | undefined,
-  orderedStepIds: StepIdType[],
-  reorderSelectedStep: (delta: number) => unknown,
-  reorderSteps: (steps: StepIdType[]) => unknown,
+interface Props {
+  isMultiSelectMode?: boolean | null
+  orderedStepIds: StepIdType[]
+  reorderSelectedStep: (delta: number) => unknown
+  reorderSteps: (steps: StepIdType[]) => unknown
 }
 
 export class StepList extends React.Component<Props> {

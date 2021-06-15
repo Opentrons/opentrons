@@ -11,13 +11,13 @@ import { selectors as labwareIngredSelectors } from '../../labware-ingred/select
 import { LiquidGroup } from '../../labware-ingred/types'
 import { BaseState, ThunkDispatch } from '../../types'
 
-type Props = React.ElementProps<typeof LiquidEditForm>
-type WrapperProps = { showForm: boolean, formKey: string, formProps: Props }
+type Props = React.ComponentProps<typeof LiquidEditForm>
+interface WrapperProps { showForm: boolean; formKey: string; formProps: Props }
 
 type SP = LiquidGroup & {
-  _liquidGroupId: string | null | undefined,
-  showForm: boolean,
-  canDelete: $ElementType<Props, 'canDelete'>,
+  _liquidGroupId?: string | null
+  showForm: boolean
+  canDelete: $ElementType<Props, 'canDelete'>
 }
 
 function LiquidEditFormWrapper(props: WrapperProps) {
@@ -64,7 +64,7 @@ function mapStateToProps(state: BaseState): SP {
 
 function mergeProps(
   stateProps: SP,
-  dispatchProps: { dispatch: ThunkDispatch<*> }
+  dispatchProps: { dispatch: ThunkDispatch<any> }
 ): WrapperProps {
   const { dispatch } = dispatchProps
   const { showForm, _liquidGroupId, ...passThruFormProps } = stateProps
@@ -89,14 +89,7 @@ function mergeProps(
   }
 }
 
-export const LiquidsPage: React.AbstractComponent<{}> = connect<
-  WrapperProps,
-  {},
-  SP,
-  {},
-  _,
-  _
->(
+export const LiquidsPage = connect(
   mapStateToProps,
   null,
   mergeProps

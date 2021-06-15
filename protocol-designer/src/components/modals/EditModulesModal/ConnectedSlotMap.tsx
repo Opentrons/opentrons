@@ -4,7 +4,7 @@ import { useField } from 'formik'
 import { SlotMap } from '@opentrons/components'
 import styles from './EditModules.css'
 
-type ConnectedSlotMapProps = {
+interface ConnectedSlotMapProps {
   fieldName: string
 }
 

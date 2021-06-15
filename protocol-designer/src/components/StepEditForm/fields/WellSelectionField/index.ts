@@ -9,10 +9,10 @@ type Props = JSX.LibraryManagedAttributes<
   React.ComponentProps<typeof WellSelectionInput>
 >
 type OP = FieldProps & {
-  labwareId: string | null | undefined
-  pipetteId: string | null | undefined
+  labwareId?: string | null
+  pipetteId?: string | null
 }
-type SP = {
+interface SP {
   isMulti: Props['isMulti']
   primaryWellCount: Props['primaryWellCount']
 }

@@ -16,17 +16,17 @@ import {
 
 const DEFAULT_COLLAPSED_STATE = true
 
-type MultiChannelSubstepProps = {
-  rowGroup: StepItemSourceDestRow[],
-  ingredNames: WellIngredientNames,
-  highlighted?: boolean,
-  stepId: string,
-  substepIndex: number,
-  selectSubstep: (substepIdentifier: SubstepIdentifier) => unknown,
+interface MultiChannelSubstepProps {
+  rowGroup: StepItemSourceDestRow[]
+  ingredNames: WellIngredientNames
+  highlighted?: boolean
+  stepId: string
+  substepIndex: number
+  selectSubstep: (substepIdentifier: SubstepIdentifier) => unknown
 }
 
-type MultiChannelSubstepState = {
-  collapsed: boolean,
+interface MultiChannelSubstepState {
+  collapsed: boolean
 }
 
 export class MultiChannelSubstep extends React.PureComponent<

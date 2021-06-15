@@ -1,15 +1,14 @@
-import { $Diff } from 'utility-types'
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { Path } from './Path'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
 import { getDisabledPathMap } from './getDisabledPathMap'
 import { BaseState } from '../../../../types'
-type Props = React.ElementProps<typeof Path>
-type SP = {
+type Props = React.ComponentProps<typeof Path>
+interface SP {
   disabledPathMap: Props['disabledPathMap']
 }
-type OP = $Diff<Props, SP>
+type OP = Omit<Props, keyof SP>
 
 function mapSTP(state: BaseState, ownProps: OP): SP {
   const {

@@ -24,9 +24,9 @@ type Props = LiquidGroup & {
   saveForm: (liquidGroup: LiquidGroup) => unknown
 }
 
-type LiquidEditFormValues = {
+interface LiquidEditFormValues {
   name: string
-  description: string | null | undefined
+  description?: string | null
   serialize?: boolean
   [key: string]: unknown
 }

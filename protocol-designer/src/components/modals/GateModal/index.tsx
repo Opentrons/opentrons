@@ -16,19 +16,19 @@ import settingsStyles from '../../SettingsPage/SettingsPage.css'
 import modalStyles from '../modal.css'
 import { SignUpForm } from './SignUpForm'
 
-type Props = {
+interface Props {
   hasOptedIn: boolean | null
   optIn: () => unknown
   optOut: () => unknown
 }
 
-type SP = {
-  hasOptedIn: $PropertyType<Props, 'hasOptedIn'>
+interface SP {
+  hasOptedIn: Props['hasOptedIn']
 }
 
 type DP = $Rest<Props, SP>
 
-type State = { gateStage: GateStage; errorMessage: string | null | undefined }
+interface State { gateStage: GateStage; errorMessage: string | null | undefined }
 
 class GateModalComponent extends React.Component<Props, State> {
   constructor(props: Props) {
@@ -40,7 +40,7 @@ class GateModalComponent extends React.Component<Props, State> {
     this.refreshState()
   }
 
-  refreshState() {
+  refreshState(): Promise<void> {
     return opentronsWebApi
       .getGateStage(this.props.hasOptedIn)
       .then(({ gateStage, errorMessage }) => {
@@ -170,21 +170,14 @@ function mapStateToProps(state: BaseState): SP {
   return { hasOptedIn: analyticsSelectors.getHasOptedIn(state) }
 }
 
-function mapDispatchToProps(dispatch: ThunkDispatch<*>): DP {
+function mapDispatchToProps(dispatch: ThunkDispatch<any>): DP {
   return {
     optIn: () => dispatch(analyticsActions.optIn()),
     optOut: () => dispatch(analyticsActions.optOut()),
   }
 }
 
-export const GateModal: React.AbstractComponent<{}> = connect<
-  Props,
-  {},
-  SP,
-  DP,
-  _,
-  _
->(
+export const GateModal = connect(
   mapStateToProps,
   mapDispatchToProps
 )(GateModalComponent)

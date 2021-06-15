@@ -10,7 +10,7 @@ import { THERMOCYCLER_PROFILE } from '../../../constants'
 import styles from './LabwareOverlays.css'
 import { LabwareOnDeck } from '../../../step-forms'
 
-type LabwareHighlightProps = {
+interface LabwareHighlightProps {
   labwareOnDeck: LabwareOnDeck
 }
 

@@ -10,7 +10,7 @@ import styles from '../../StepEditForm.css'
 import { FieldPropsByName } from '../../types'
 import { FormData } from '../../../../form-types'
 
-type Props = {
+interface Props {
   propsForFields: FieldPropsByName
   isEndingHold?: boolean
   formData: FormData

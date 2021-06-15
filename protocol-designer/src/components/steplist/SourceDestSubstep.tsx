@@ -12,14 +12,14 @@ import {
   WellIngredientNames,
 } from '../../steplist/types'
 
-export type StepSubItemProps = {
-  substeps: SourceDestSubstepItem,
+export interface StepSubItemProps {
+  substeps: SourceDestSubstepItem
 }
 
 type SourceDestSubstepProps = StepSubItemProps & {
-  ingredNames: WellIngredientNames,
-  selectSubstep: (substepIdentifier: SubstepIdentifier) => unknown,
-  hoveredSubstep: SubstepIdentifier | null | undefined,
+  ingredNames: WellIngredientNames
+  selectSubstep: (substepIdentifier: SubstepIdentifier) => unknown
+  hoveredSubstep?: SubstepIdentifier | null
 }
 
 export function SourceDestSubstep(props: SourceDestSubstepProps): JSX.Element {

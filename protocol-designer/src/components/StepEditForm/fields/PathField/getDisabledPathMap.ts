@@ -8,14 +8,14 @@ import {
 import { ChangeTipOptions, PipetteEntities } from '@opentrons/step-generation'
 import { PathOption } from '../../../../form-types'
 export type DisabledPathMap = Record<PathOption, string> | null
-export type ValuesForPath = {
-  aspirate_airGap_checkbox: boolean | null | undefined
-  aspirate_airGap_volume: string | null | undefined
-  aspirate_wells: string[] | null | undefined
+export interface ValuesForPath {
+  aspirate_airGap_checkbox?: boolean | null
+  aspirate_airGap_volume?: string | null
+  aspirate_wells?: string[] | null
   changeTip: ChangeTipOptions
   dispense_wells: string[] | null | undefined
-  pipette: string | null | undefined
-  volume: string | null | undefined
+  pipette?: string | null
+  volume?: string | null
 }
 export function getDisabledPathMap(
   values: ValuesForPath,

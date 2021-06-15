@@ -6,9 +6,9 @@ import cx from 'classnames'
 import styles from './FilePipettesModal.css'
 import { InstrumentDiagram } from '@opentrons/components'
 
-type Props = {
-  leftPipette: string | null | undefined
-  rightPipette: string | null | undefined
+interface Props {
+  leftPipette?: string | null
+  rightPipette?: string | null
 }
 export function PipetteDiagram(props: Props): JSX.Element {
   const { leftPipette, rightPipette } = props

@@ -22,7 +22,7 @@ import { TerminalItemId } from '../../../steplist'
 
 export { TerminalItemLink } from './TerminalItemLink'
 
-type Props = {
+interface Props {
   children?: React.ReactNode
   id: TerminalItemId
   title: string

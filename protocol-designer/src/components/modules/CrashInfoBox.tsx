@@ -4,10 +4,10 @@ import { Icon } from '@opentrons/components'
 import { KnowledgeBaseLink } from '../KnowledgeBaseLink'
 import styles from './styles.css'
 
-type Props = {
+interface Props {
   showDiagram?: boolean
-  magnetOnDeck: boolean | null | undefined
-  temperatureOnDeck: boolean | null | undefined
+  magnetOnDeck?: boolean | null
+  temperatureOnDeck?: boolean | null
 }
 
 export function CrashInfoBox(props: Props): JSX.Element {

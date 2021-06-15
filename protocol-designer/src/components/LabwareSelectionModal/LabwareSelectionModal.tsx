@@ -31,17 +31,17 @@ import styles from './styles.css'
 import { DeckSlot } from '../../types'
 import { LabwareDefByDefURI } from '../../labware-defs'
 
-type Props = {
-  onClose: (e?: any) => unknown,
-  onUploadLabware: (event: React.ChangeEvent<HTMLInputElement>) => unknown,
-  selectLabware: (containerType: string) => unknown,
-  customLabwareDefs: LabwareDefByDefURI,
+interface Props {
+  onClose: (e?: any) => unknown
+  onUploadLabware: (event: React.ChangeEvent<HTMLInputElement>) => unknown
+  selectLabware: (containerType: string) => unknown
+  customLabwareDefs: LabwareDefByDefURI
   /** the slot you're literally adding labware to (may be a module slot) */
-  slot: DeckSlot | null | undefined
+  slot?: DeckSlot | null
   /** if adding to a module, the slot of the parent (for display) */
-  parentSlot: DeckSlot | null | undefined
+  parentSlot?: DeckSlot | null
   /** if adding to a module, the module's type */
-  moduleType: ModuleRealType | null | undefined
+  moduleType?: ModuleRealType | null
   /** tipracks that may be added to deck (depends on pipette<>tiprack assignment) */
   permittedTipracks: string[]
 }
@@ -76,7 +76,7 @@ const RECOMMENDED_LABWARE_BY_MODULE: { [ModuleRealType]: string[] } = {
 
 export const getLabwareIsRecommended = (
   def: LabwareDefinition2,
-  moduleType: ModuleRealType | null | undefined
+  moduleType?: ModuleRealType | null
 ): boolean =>
   moduleType
     ? RECOMMENDED_LABWARE_BY_MODULE[moduleType].includes(
@@ -99,9 +99,10 @@ export const LabwareSelectionModal = (props: Props): JSX.Element => {
   const [selectedCategory, setSelectedCategory] = React.useState<string | null>(
     null
   )
-  const [previewedLabware, setPreviewedLabware] = React.useState<
-    ?LabwareDefinition2
-  >(null)
+  const [
+    previewedLabware,
+    setPreviewedLabware,
+  ] = React.useState<LabwareDefinition2 | null>(null)
   const [filterRecommended, setFilterRecommended] = React.useState<boolean>(
     false
   )
@@ -247,10 +248,9 @@ export const LabwareSelectionModal = (props: Props): JSX.Element => {
     </div>
   ) : null
 
-  let moduleCompatibility: $PropertyType<
-    React.ElementProps<typeof LabwarePreview>,
-    'moduleCompatibility'
-  > = null
+  let moduleCompatibility: React.ComponentProps<
+    typeof LabwarePreview
+  >['moduleCompatibility'] = null
   if (previewedLabware && moduleType) {
     if (getLabwareIsRecommended(previewedLabware, moduleType)) {
       moduleCompatibility = 'recommended'

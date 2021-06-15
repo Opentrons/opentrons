@@ -20,16 +20,16 @@ import { BaseState, ThunkDispatch } from '../../../types'
 import { PipetteOnDeck, FormPipettesByMount } from '../../../step-forms'
 import { StepIdType } from '../../../form-types'
 
-type Props = React.ElementProps<typeof FilePipettesModal>
+type Props = React.ComponentProps<typeof FilePipettesModal>
 
-type SP = {
+interface SP {
   initialPipetteValues: FormPipettesByMount
   _prevPipettes: { [pipetteId: string]: PipetteOnDeck }
   _orderedStepIds: StepIdType[]
-  moduleRestrictionsDisabled: boolean | null | undefined
+  moduleRestrictionsDisabled?: boolean | null
 }
 
-type OP = {
+interface OP {
   closeModal: () => unknown
 }
 
@@ -128,7 +128,7 @@ const makeUpdatePipettes = (
 
   // SubstitutionMap represents a map of oldPipetteId => newPipetteId
   // When a pipette's tiprack changes, the ids will be the same
-  type SubstitutionMap = { [pipetteId: string]: string }
+  interface SubstitutionMap { [pipetteId: string]: string }
 
   const pipetteReplacementMap: SubstitutionMap = pipetteIdsToDelete.reduce(
     (acc: SubstitutionMap, deletedId: string): SubstitutionMap => {
@@ -195,7 +195,7 @@ const makeUpdatePipettes = (
 
 const mergeProps = (
   stateProps: SP,
-  dispatchProps: { dispatch: ThunkDispatch<*> },
+  dispatchProps: { dispatch: ThunkDispatch<any> },
   ownProps: OP
 ): Props => {
   const { _prevPipettes, _orderedStepIds, ...passThruStateProps } = stateProps

@@ -29,23 +29,23 @@ import {
 } from '@opentrons/shared-data'
 import styles from './LabwareOverlays.css'
 
-type DNDP = {
+interface DNDP {
   isOver: boolean
   connectDropTarget: (val: React.ReactNode) => React.ReactNode
-  draggedItem: ?{ labwareOnDeck: LabwareOnDeck }
+  draggedItem: { labwareOnDeck: LabwareOnDeck } | null
   itemType: string
 }
-type OP = {
+interface OP {
   slot: DeckSlotDefinition & { id: DeckSlot } // NOTE: Ian 2019-10-22 make slot `id` more restrictive when used in PD
   moduleType: ModuleRealType | null
-  selectedTerminalItemId: TerminalItemId | null | undefined
+  selectedTerminalItemId?: TerminalItemId | null
   handleDragHover?: () => unknown
 }
-type DP = {
+interface DP {
   addLabware: (e: React.MouseEvent<any>) => unknown
   moveDeckItem: (item1: DeckSlot, item2: DeckSlot) => unknown
 }
-type SP = {
+interface SP {
   customLabwareDefs: LabwareDefByDefURI
 }
 type Props = OP & DP & DNDP & SP
@@ -125,7 +125,10 @@ const mapStateToProps = (state: BaseState): SP => {
   }
 }
 
-const mapDispatchToProps = (dispatch: ThunkDispatch<*>, ownProps: OP): DP => ({
+const mapDispatchToProps = (
+  dispatch: ThunkDispatch<any>,
+  ownProps: OP
+): DP => ({
   addLabware: () => dispatch(openAddLabwareModal({ slot: ownProps.slot.id })),
   moveDeckItem: (sourceSlot, destSlot) =>
     dispatch(moveDeckItem(sourceSlot, destSlot)),
@@ -168,14 +171,7 @@ const collectSlotTarget = (connect, monitor) => ({
   itemType: monitor.getItemType(),
 })
 
-export const SlotControls: React.AbstractComponent<OP> = connect<
-  OP & DP & SP,
-  OP,
-  _,
-  DP,
-  _,
-  _
->(
+export const SlotControls = connect(
   mapStateToProps,
   mapDispatchToProps
 )(

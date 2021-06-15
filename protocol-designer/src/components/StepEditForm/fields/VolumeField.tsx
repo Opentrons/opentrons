@@ -15,9 +15,9 @@ import { FieldProps } from '../types'
 import styles from '../StepEditForm.css'
 
 type Props = FieldProps & {
-  stepType: StepType,
-  label: string,
-  className: string,
+  stepType: StepType
+  label: string
+  className: string
 }
 export const VolumeField = (props: Props): JSX.Element => {
   const { stepType, label, className, ...propsForVolumeField } = props

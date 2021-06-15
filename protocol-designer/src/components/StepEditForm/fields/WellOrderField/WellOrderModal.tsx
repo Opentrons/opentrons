@@ -25,23 +25,23 @@ const WELL_ORDER_VALUES: WellOrderOption[] = [
   ...VERTICAL_VALUES,
   ...HORIZONTAL_VALUES,
 ]
-type Props = {
-  isOpen: boolean,
-  closeModal: () => unknown,
-  prefix: 'aspirate' | 'dispense' | 'mix',
-  firstValue: WellOrderOption | null | undefined,
-  secondValue: WellOrderOption | null | undefined,
-  firstName: string,
-  secondName: string,
+interface Props {
+  isOpen: boolean
+  closeModal: () => unknown
+  prefix: 'aspirate' | 'dispense' | 'mix'
+  firstValue?: WellOrderOption | null
+  secondValue?: WellOrderOption | null
+  firstName: string
+  secondName: string
   updateValues: (
-    firstValue: WellOrderOption | null | undefined,
-    secondValue: WellOrderOption | null | undefined
-  ) => void,
+    firstValue?: WellOrderOption | null,
+    secondValue?: WellOrderOption | null
+  ) => void
 }
 
-type State = {
-  firstValue: WellOrderOption,
-  secondValue: WellOrderOption,
+interface State {
+  firstValue: WellOrderOption
+  secondValue: WellOrderOption
 }
 
 export const ResetButton = (props: { onClick: () => void }): JSX.Element => (
@@ -79,8 +79,8 @@ export class WellOrderModal extends React.Component<Props, State> {
   }
 
   getInitialFirstValues: () => {
-    initialFirstValue: WellOrderOption,
-    initialSecondValue: WellOrderOption,
+    initialFirstValue: WellOrderOption
+    initialSecondValue: WellOrderOption
   } = () => {
     const { firstValue, secondValue } = this.props
     if (firstValue == null || secondValue == null) {

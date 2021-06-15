@@ -14,12 +14,12 @@ import {
   ModuleModel,
 } from '@opentrons/shared-data'
 
-type Props = {
+interface Props {
   type: ModuleRealType
   model: ModuleModel
 }
 
-type ModuleImg = {
+interface ModuleImg {
   [ModuleRealType]: {
     [ModuleModel]: string
   }

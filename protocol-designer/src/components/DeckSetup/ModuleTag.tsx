@@ -29,7 +29,7 @@ import {
   TemperatureModuleState,
 } from '../../step-forms'
 
-type Props = {
+interface Props {
   x: number
   y: number
   orientation: ModuleOrientation
@@ -67,7 +67,7 @@ function getTempStatus(temperatureModuleState: TemperatureModuleState): string {
 export const ModuleStatus = ({
   moduleState,
 }: {
-  moduleState: $PropertyType<ModuleTemporalProperties, 'moduleState'>
+  moduleState: ModuleTemporalProperties['moduleState']
 }): JSX.Element | null => {
   switch (moduleState.type) {
     case MAGNETIC_MODULE_TYPE:
@@ -124,8 +124,10 @@ const ModuleTagComponent = (props: Props) => {
   const moduleEntity = useSelector(stepFormSelectors.getModuleEntities)[
     props.id
   ]
-  const moduleState: ?$PropertyType<ModuleTemporalProperties, 'moduleState'> =
-    timelineFrame?.robotState.modules[props.id]?.moduleState
+  const moduleState:
+    | ModuleTemporalProperties['moduleState']
+    | null
+    | undefined = timelineFrame?.robotState.modules[props.id]?.moduleState
   const moduleType: ModuleRealType | null | undefined = moduleEntity?.type
 
   const hoveredLabwares = useSelector(uiSelectors.getHoveredStepLabware)
@@ -188,6 +190,4 @@ const ModuleTagComponent = (props: Props) => {
   )
 }
 
-export const ModuleTag: React.AbstractComponent<Props> = React.memo(
-  ModuleTagComponent
-)
+export const ModuleTag = React.memo(ModuleTagComponent)

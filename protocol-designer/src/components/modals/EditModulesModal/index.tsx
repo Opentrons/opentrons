@@ -46,22 +46,22 @@ import { ModuleRealType, ModuleModel } from '@opentrons/shared-data'
 import { ModuleOnDeck } from '../../../step-forms/types'
 import { ModelModuleInfo } from '../../EditModules'
 
-type EditModulesModalProps = {
-  moduleType: ModuleRealType,
-  moduleOnDeck: ModuleOnDeck | null,
-  onCloseClick: () => unknown,
-  editModuleModel: (model: ModuleModel) => unknown,
-  editModuleSlot: (slot: string) => unknown,
-  displayModuleWarning: (module: ModelModuleInfo) => unknown,
+interface EditModulesModalProps {
+  moduleType: ModuleRealType
+  moduleOnDeck: ModuleOnDeck | null
+  onCloseClick: () => unknown
+  editModuleModel: (model: ModuleModel) => unknown
+  editModuleSlot: (slot: string) => unknown
+  displayModuleWarning: (module: ModelModuleInfo) => unknown
 }
 
 type EditModulesModalComponentProps = EditModulesModalProps & {
-  supportedModuleSlot: string,
+  supportedModuleSlot: string
 }
 
-export type EditModulesFormValues = {
-  selectedModel: ModuleModel | null,
-  selectedSlot: string,
+export interface EditModulesFormValues {
+  selectedModel: ModuleModel | null
+  selectedSlot: string
 }
 
 export const EditModulesModal = (props: EditModulesModalProps): JSX.Element => {

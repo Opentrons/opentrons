@@ -25,24 +25,24 @@ import {
   PipetteOnDeck,
 } from '../../step-forms'
 
-type Props = {
+interface Props {
   loadFile: (event: React.ChangeEvent<HTMLInputElement>) => unknown
   createNewFile?: () => unknown
   canDownload: boolean
   onDownload: () => unknown
-  fileData: PDProtocolFile | null | undefined
-  pipettesOnDeck: $PropertyType<InitialDeckSetup, 'pipettes'>
-  modulesOnDeck: $PropertyType<InitialDeckSetup, 'modules'>
+  fileData?: PDProtocolFile | null
+  pipettesOnDeck: InitialDeckSetup['pipettes']
+  modulesOnDeck: InitialDeckSetup['modules']
   savedStepForms: SavedStepFormState
   schemaVersion: number
 }
 
-type WarningContent = {
+interface WarningContent {
   content: React.ReactNode
   heading: string
 }
 
-type MissingContent = {
+interface MissingContent {
   noCommands: boolean
   pipettesWithoutStep: PipetteOnDeck[]
   modulesWithoutStep: ModuleOnDeck[]

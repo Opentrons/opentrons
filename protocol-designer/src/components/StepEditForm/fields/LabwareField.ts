@@ -11,7 +11,7 @@ type OP = FieldProps & {
   name: StepFieldName
   className?: string
 }
-type SP = {
+interface SP {
   options: Options
 }
 

@@ -24,7 +24,7 @@ import { stepIconsByType } from '../form-types'
 import { selectors, Page } from '../navigation'
 
 import { TitleBarProps } from '@opentrons/components'
-import {BaseState} from '../types'
+import { BaseState } from '../types'
 
 type Props = React.ComponentProps<typeof TitleBar>
 
