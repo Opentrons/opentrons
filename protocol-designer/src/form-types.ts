@@ -91,15 +91,15 @@ export const stepIconsByType: Record<StepType, IconName> = {
   thermocycler: 'ot-thermocycler',
 }
 // ===== Unprocessed form types =====
-export type AnnotationFields = {
+export interface AnnotationFields {
   stepName: string
   stepDetails: string
 }
-export type BlowoutFields = {
+export interface BlowoutFields {
   blowout_checkbox?: boolean
   blowout_location?: string
 }
-export type ChangeTipFields = {
+export interface ChangeTipFields {
   changeTip?: ChangeTipOptions
 }
 export type MixForm = AnnotationFields &
@@ -128,14 +128,14 @@ export type PauseForm = AnnotationFields & {
   pauseTemperature?: string
 }
 // TODO: separate field values from from metadata
-export type FormData = {
+export interface FormData {
   stepType: StepType
   id: StepIdType // TODO: form value processing to ensure type
   [key: string]: any
 }
 export const PROFILE_CYCLE: 'profileCycle' = 'profileCycle'
 export const PROFILE_STEP: 'profileStep' = 'profileStep'
-export type ProfileStepItem = {
+export interface ProfileStepItem {
   type: typeof PROFILE_STEP
   id: string
   title: string
@@ -143,7 +143,7 @@ export type ProfileStepItem = {
   durationMinutes: string
   durationSeconds: string
 }
-export type ProfileCycleItem = {
+export interface ProfileCycleItem {
   type: typeof PROFILE_CYCLE
   id: string
   steps: ProfileStepItem[]
@@ -159,7 +159,7 @@ export type BlankForm = AnnotationFields & {
 }
 // TODO: Ian 2019-01-15 these types are a placeholder. Should be used in form hydration.
 // TODO: this is the type we are aiming for
-export type HydratedMoveLiquidFormData = {
+export interface HydratedMoveLiquidFormData {
   id: string
   stepType: 'moveLiquid'
   stepName: string
@@ -210,7 +210,7 @@ export type HydratedMoveLiquidFormData = {
     blowout_location: string | null | undefined // labwareId or 'SOURCE_WELL' or 'DEST_WELL'
   }
 }
-export type HydratedMixFormDataLegacy = {
+export interface HydratedMixFormDataLegacy {
   id: string
   stepType: 'mix'
   stepName: string
@@ -230,6 +230,10 @@ export type HydratedMixFormDataLegacy = {
   dispense_flowRate: number | null | undefined
   blowout_checkbox: boolean
   blowout_location: string | null | undefined // labwareId or 'SOURCE_WELL' or 'DEST_WELL'
+  aspirate_delay_checkbox: boolean
+  aspirate_delay_seconds: number | null | undefined
+  dispense_delay_checkbox: boolean
+  dispense_delay_seconds: number | null | undefined
 }
 export type MagnetAction = 'engage' | 'disengage'
 export type HydratedMagnetFormData = AnnotationFields & {
@@ -240,7 +244,7 @@ export type HydratedMagnetFormData = AnnotationFields & {
   magnetAction: MagnetAction
   engageHeight: string | null
 }
-export type HydratedTemperatureFormData = {
+export interface HydratedTemperatureFormData {
   id: string
   stepType: 'temperature'
   stepDetails: string | null

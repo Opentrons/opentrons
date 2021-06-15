@@ -11,6 +11,7 @@ export const temperatureFormToArgs = (
   const { moduleId } = hydratedFormData
   // cast values
   const setTemperature = hydratedFormData.setTemperature === 'true'
+  // @ts-expect-error(sa, 2021-6-14): null check targetTemperature
   const targetTemperature = parseFloat(hydratedFormData.targetTemperature)
   assert(
     setTemperature ? !Number.isNaN(targetTemperature) : true,

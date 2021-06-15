@@ -60,12 +60,12 @@ export const mixFormToArgs = (
     ? DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP
     : 0
   // Delay settings
-  const aspirateDelaySeconds = getMixDelayData<HydratedMixFormDataLegacy>(
+  const aspirateDelaySeconds = getMixDelayData(
     hydratedFormData,
     'aspirate_delay_checkbox',
     'aspirate_delay_seconds'
   )
-  const dispenseDelaySeconds = getMixDelayData<HydratedMixFormDataLegacy>(
+  const dispenseDelaySeconds = getMixDelayData(
     hydratedFormData,
     'dispense_delay_checkbox',
     'dispense_delay_seconds'

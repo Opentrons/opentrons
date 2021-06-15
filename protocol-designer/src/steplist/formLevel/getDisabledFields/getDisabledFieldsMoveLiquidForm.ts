@@ -4,7 +4,7 @@ import { FormData } from '../../../form-types'
 export function getDisabledFieldsMoveLiquidForm(
   rawForm: FormData // TODO IMMEDIATELY use raw form type instead of FormData
 ): Set<string> {
-  const disabled = new Set()
+  const disabled: Set<string> = new Set()
   const prefixes = ['aspirate', 'dispense']
 
   if (rawForm.path === 'multiAspirate') {

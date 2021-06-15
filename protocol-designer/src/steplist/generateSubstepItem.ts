@@ -13,7 +13,7 @@ import {
 import { substepTimeline } from './substepTimeline'
 import * as steplistUtils from './utils'
 import { THERMOCYCLER_PROFILE, THERMOCYCLER_STATE } from '../constants'
-import {
+import type {
   CurriedCommandCreator,
   InvariantContext,
   RobotState,
@@ -98,6 +98,7 @@ function getCommandCreatorForTransferlikeSubsteps(
     return curryCommandCreator(mix, stepArgs)
   } else {
     console.warn(
+      // @ts-expect-error(sa, 2021-6-14): I don't think this case can ever happen, so stepArgs.commandCreatorFnName gets never typed
       `getStepArgsForSubsteps got unsupported stepType "${stepArgs.commandCreatorFnName}"`
     )
     return null
@@ -155,7 +156,7 @@ export const mergeSubstepRowsMultiChannel = (args: {
   channels: number
   isMixStep: boolean
   showDispenseVol: boolean
-}): Array<StepItemSourceDestRow[]> => {
+}): StepItemSourceDestRow[][] => {
   const { substepRows, channels, isMixStep, showDispenseVol } = args
   return steplistUtils.mergeWhen(
     substepRows,
@@ -282,9 +283,7 @@ function transferLikeSubsteps(args: {
       initialRobotState,
       pipetteSpec.channels
     )
-    const mergedMultiRows: Array<
-      StepItemSourceDestRow[]
-    > = mergeSubstepRowsMultiChannel({
+    const mergedMultiRows: StepItemSourceDestRow[][] = mergeSubstepRowsMultiChannel({
       substepRows,
       isMixStep: stepArgs.commandCreatorFnName === 'mix',
       channels: pipetteSpec.channels,
@@ -446,6 +445,7 @@ export function generateSubstepItem(
 
   console.warn(
     "generateSubsteps doesn't support commandCreatorFnName: ",
+    // @ts-expect-error(sa, 2021-6-14): I don't think this case can ever happen, so stepArgs.commandCreatorFnName gets never typed
     stepArgs.commandCreatorFnName,
     stepId
   )

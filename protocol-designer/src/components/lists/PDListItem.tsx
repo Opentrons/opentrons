@@ -3,12 +3,13 @@ import * as React from 'react'
 import cx from 'classnames'
 import styles from './styles.css'
 
-type Props = {
-  className: string | null | undefined
+interface Props {
+  className?: string | null
   /** show light gray border between list items */
-  border: boolean | null | undefined
+  border?: boolean | null
   /** hover style when hovered (for redux-linked hover state, do not use this) */
-  hoverable: boolean | null | undefined
+  hoverable?: boolean | null,
+  [key: string]: unknown
 }
 
 /** Light wrapper around li for PD-specific styles */

@@ -1,8 +1,7 @@
-// @flow
 import * as React from 'react'
 import styles from './StepItem.css'
 
-type LabwareTooltipContentsProps = {
+interface LabwareTooltipContentsProps {
   labwareNickname: string | null | undefined
 }
 export const LabwareTooltipContents = (

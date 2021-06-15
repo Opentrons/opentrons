@@ -10,7 +10,7 @@ import {
 import { getOrderedWells } from '../../utils'
 import { getMoveLiquidDelayData } from './getDelayData'
 import { HydratedMoveLiquidFormData } from '../../../form-types'
-import {
+import type {
   ConsolidateArgs,
   DistributeArgs,
   TransferArgs,
@@ -123,13 +123,13 @@ export const moveLiquidFormToArgs = (
     'dispense_mix_volume',
     'dispense_mix_times'
   )
-  const aspirateDelay = getMoveLiquidDelayData<MoveLiquidFields>(
+  const aspirateDelay = getMoveLiquidDelayData(
     fields,
     'aspirate_delay_checkbox',
     'aspirate_delay_seconds',
     'aspirate_delay_mmFromBottom'
   )
-  const dispenseDelay = getMoveLiquidDelayData<MoveLiquidFields>(
+  const dispenseDelay = getMoveLiquidDelayData(
     fields,
     'dispense_delay_checkbox',
     'dispense_delay_seconds',
