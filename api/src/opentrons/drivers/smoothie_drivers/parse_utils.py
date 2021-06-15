@@ -1,7 +1,7 @@
 import logging
 from typing import Dict
 
-from opentrons.drivers.asyncio.smoothie.constants import AXES, \
+from opentrons.drivers.smoothie_drivers.constants import AXES, \
     GCODE_ROUNDING_PRECISION
 from opentrons.drivers.utils import parse_key_values, parse_number, \
     parse_optional_number, ParseError

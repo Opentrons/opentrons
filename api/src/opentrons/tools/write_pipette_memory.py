@@ -1,4 +1,5 @@
-from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieDriver_3_0_0
+import asyncio
+from opentrons.drivers.smoothie_drivers import SmoothieDriver
 
 from . import args_handler
 
@@ -71,24 +72,24 @@ MODELS = {
 }
 
 
-def write_identifiers(
-        mount: str, new_id: str, new_model: str, driver: SmoothieDriver_3_0_0
+async def write_identifiers(
+        mount: str, new_id: str, new_model: str, driver: SmoothieDriver
 ) -> None:
     """
     Send a bytearray to the specified mount, so that Smoothieware can
     save the bytes to the pipette's memory
     """
-    driver.write_pipette_id(mount, new_id)
-    read_id = driver.read_pipette_id(mount)
+    await driver.write_pipette_id(mount, new_id)
+    read_id = await driver.read_pipette_id(mount)
     _assert_the_same(new_id, read_id)
-    driver.write_pipette_model(mount, new_model)
-    read_model = driver.read_pipette_model(mount)
+    await driver.write_pipette_model(mount, new_model)
+    read_model = await driver.read_pipette_model(mount)
     _assert_the_same(new_model, read_model)
 
 
-def check_previous_data(mount: str, driver: SmoothieDriver_3_0_0) -> None:
-    old_id = driver.read_pipette_id(mount)
-    old_model = driver.read_pipette_model(mount)
+async def check_previous_data(mount: str, driver: SmoothieDriver) -> None:
+    old_id = await driver.read_pipette_id(mount)
+    old_model = await driver.read_pipette_model(mount)
     if old_id and old_model:
         print(
             'Overwriting old data: id={0}, model={1}'.format(
@@ -125,12 +126,12 @@ def _parse_model_from_barcode(barcode: str) -> str:
     raise Exception(BAD_BARCODE_MESSAGE.format(barcode))
 
 
-def _do_wpm(mount: str, driver: SmoothieDriver_3_0_0) -> None:
+async def _do_wpm(mount: str, driver: SmoothieDriver) -> None:
     try:
         barcode = _user_submitted_barcode(32)
         model = _parse_model_from_barcode(barcode)
-        check_previous_data(mount, driver)
-        write_identifiers(mount, barcode, model, driver)
+        await check_previous_data(mount, driver)
+        await write_identifiers(mount, barcode, model, driver)
         print('PASS: Saved -> {0} (model {1})'.format(barcode, model))
     except KeyboardInterrupt:
         exit()
@@ -138,7 +139,7 @@ def _do_wpm(mount: str, driver: SmoothieDriver_3_0_0) -> None:
         print('FAIL: {}'.format(e))
 
 
-def main() -> None:
+async def main() -> None:
     parser = args_handler.root_argparser(
         "Write model and serial to a pipette's eeprom")
     parser.add_argument('-m', '--mount',
@@ -147,10 +148,10 @@ def main() -> None:
                         type=str,
                         choices=['left', 'right'])
     args = parser.parse_args()
-    _, driver = args_handler.build_driver(args.port)
+    _, driver = await args_handler.build_driver(args.port)
     while True:
-        _do_wpm(args.mount, driver)
+        await _do_wpm(args.mount, driver)
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())

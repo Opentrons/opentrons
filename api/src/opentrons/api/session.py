@@ -14,7 +14,7 @@ from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 from opentrons.api.util import (RobotBusy, robot_is_busy,
                                 requires_http_protocols_disabled)
-from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieAlarm
+from opentrons.drivers.smoothie_drivers.errors import SmoothieAlarm
 from opentrons.broker import Broker
 from opentrons.config import feature_flags as ff
 from opentrons.commands.util import from_list
