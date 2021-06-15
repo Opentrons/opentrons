@@ -40,7 +40,7 @@ def test_get_labware_data_bad_id() -> None:
 
 
 def test_get_labware_data_by_id() -> None:
-    """It should add the labware data to the state."""
+    """It should retrieve labware data from the state."""
     subject = get_labware_view(
         labware_by_id={
             "plate-id": LabwareData(
@@ -59,7 +59,7 @@ def test_get_labware_data_by_id() -> None:
 
 
 def test_get_labware_definition(well_plate_def: LabwareDefinition) -> None:
-    """It should add the labware data to the state."""
+    """It should get a labware's definition from the state."""
     subject = get_labware_view(
         labware_by_id={
             "plate-id": LabwareData(
@@ -333,7 +333,7 @@ def test_get_load_name(reservoir_def: LabwareDefinition) -> None:
 
 
 def test_get_dimensions(well_plate_def: LabwareDefinition) -> None:
-    """It should return the load name."""
+    """It should compute the dimensions of a labware."""
     subject = get_labware_view(
         labware_by_id={
             "plate-id": LabwareData(
@@ -355,7 +355,7 @@ def test_get_dimensions(well_plate_def: LabwareDefinition) -> None:
 
 
 def test_get_deck_definition(standard_deck_def: DeckDefinitionV2) -> None:
-    """It should add the labware data to the state."""
+    """It should get the deck definition from the state."""
     subject = get_labware_view(deck_definition=standard_deck_def)
 
     assert subject.get_deck_definition() == standard_deck_def
