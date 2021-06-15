@@ -100,11 +100,11 @@ async def test_cache_instruments_hc(monkeypatch, dummy_instruments,
                                     running_on_pi, cntrlr_mock_connect, loop):
     hw_api_cntrlr = await hc.API.build_hardware_controller(loop=loop)
 
-    def mock_driver_model(mount):
+    async def mock_driver_model(mount):
         attached_pipette = {'left': LEFT_PIPETTE_MODEL, 'right': None}
         return attached_pipette[mount]
 
-    def mock_driver_id(mount):
+    async def mock_driver_id(mount):
         attached_pipette = {'left': LEFT_PIPETTE_ID, 'right': None}
         return attached_pipette[mount]
 
