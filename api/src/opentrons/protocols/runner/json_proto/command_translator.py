@@ -1,11 +1,21 @@
 from typing import Dict, Iterable
 
-from opentrons.protocol_engine import WellLocation, WellOrigin
+from opentrons.protocol_engine import DeckSlotLocation, WellLocation, WellOrigin
 from opentrons.protocol_engine.commands import (
-    CommandRequestType, AspirateRequest, DispenseRequest,
-    PickUpTipRequest, DropTipRequest
+    CommandRequestType,
+    AddLabwareDefinitionRequest,
+    LoadLabwareRequest,
+    AspirateRequest,
+    DispenseRequest,
+    PickUpTipRequest,
+    DropTipRequest
 )
+
+# To do: Collapse imports
+# To do: Don't access as models.Model, use JsonProtocol
 from opentrons.protocols.models import json_protocol as models
+from opentrons.protocols.models import LabwareDefinition
+from opentrons.protocols.models import Labware
 
 
 class CommandTranslatorError(Exception):
@@ -22,10 +32,19 @@ class CommandTranslator:
         """Construct a command translator"""
         pass
 
-    def translate(self, command: models.AllCommands) -> ReturnType:
-        """
-        Translate a PD/JSON protocol to Protocol Engine commands.
+    # Fix before merge: figure out a way to write models.Model more clearly
+    def translate(self, protocol: models.Model) -> ReturnType:
+        result = []
+        for labware_uri, labware_definition in protocol.labwareDefinitions.items():
+            result += [self._translate_labware_definition(labware_definition)]
+        for pd_labware_id, labware in protocol.labware.items():
+            # To do: Rename pd_labware_id
+            result += [self._translate_labware(pd_labware_id, labware, protocol.labwareDefinitions)]
+        
+        return result
 
+    def _translate_command(self, command: models.AllCommands) -> ReturnType:
+        """
         Args:
             command: The PD/JSON command to translate
 
@@ -42,6 +61,25 @@ class CommandTranslator:
         except AttributeError:
             raise CommandTranslatorError(
                 f"Cannot find handler for '{command.command}'.")
+
+    def _translate_labware_definition(self, labware_definition: LabwareDefinition):
+        return AddLabwareDefinitionRequest(definition=labware_definition)
+    
+    def _translate_labware(
+        self,
+        labware_id_to_translate: str,
+        labware_to_translate: Labware,
+        labware_definitions: Dict[str, LabwareDefinition]
+    ):
+        definition = labware_definitions[labware_to_translate.definitionId]
+        load_name = definition.parameters.loadName
+        return LoadLabwareRequest(
+            location=DeckSlotLocation(slot=int(labware_to_translate.slot)),
+            loadName=load_name,
+            namespace=definition.namespace,
+            version=definition.version,
+            labwareId=labware_id_to_translate
+        )
 
     def _aspirate(
             self,
