@@ -30,7 +30,7 @@ simfile ?=
 
 # These variables can be overriden when make is invoked to customize the
 # behavior of pytest. For instance,
-# make test tests=tests/opentrons/tools/test_qc_scripts.py would run only the
+# make test tests=tests/opentrons/tools/test_pipette_memory.py would run only the
 # specified test
 tests ?= tests
 test_opts ?=  --cov=src/opentrons --cov-report term-missing:skip-covered --cov-report xml:coverage.xml

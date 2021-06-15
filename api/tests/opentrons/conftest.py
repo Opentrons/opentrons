@@ -306,7 +306,7 @@ def model(request, hardware, loop):
 
 @pytest.fixture
 def smoothie(monkeypatch):
-    from opentrons.drivers.asyncio.smoothie import SmoothieDriver
+    from opentrons.drivers.smoothie_drivers import SmoothieDriver
     from opentrons.config import robot_configs
 
     monkeypatch.setenv('ENABLE_VIRTUAL_SMOOTHIE', 'true')

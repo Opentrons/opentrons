@@ -10,7 +10,7 @@ try:
 except OSError:
     aionotify = None  # type: ignore
 
-from opentrons.drivers.asyncio.smoothie import SmoothieDriver
+from opentrons.drivers.smoothie_drivers import SmoothieDriver
 from opentrons.drivers.rpi_drivers import build_gpio_chardev, usb
 import opentrons.config
 from opentrons.config import pipette_config
