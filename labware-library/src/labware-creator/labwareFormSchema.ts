@@ -139,9 +139,13 @@ export const labwareFormSchemaBaseObject = Yup.object({
   }),
 
   wellVolume: requiredPositiveNumber(LABELS.wellVolume),
-  wellBottomShape: requiredString(LABELS.wellBottomShape).oneOf(
-    wellBottomShapeOptions.map(o => o.value)
-  ),
+  wellBottomShape: Yup.string().when('labwareType', {
+    is: 'tipRack',
+    then: Yup.string().nullable(),
+    otherwise: requiredString(LABELS.wellBottomShape).oneOf(
+      wellBottomShapeOptions.map(o => o.value)
+    ),
+  }),
   wellDepth: Yup.number()
     .default(0)
     .label(LABELS.wellDepth)
