@@ -80,7 +80,9 @@ export function labwareDefToFields(
     tubeRackInsertLoadName: null,
     aluminumBlockType: null,
     aluminumBlockChildType: null,
-    handPlacedTipFit: null,
+
+    // We assume all tipracks are snug upon import
+    handPlacedTipFit: labwareType === 'tipRack' ? 'snug' : null,
 
     labwareType,
     footprintXDimension: String(def.dimensions.xDimension),

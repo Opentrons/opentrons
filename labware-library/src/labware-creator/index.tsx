@@ -227,7 +227,8 @@ export const LabwareCreator = (): JSX.Element => {
           setLastUploaded(fields, parsedLabwareDef)
           if (
             fields.labwareType === 'wellPlate' ||
-            fields.labwareType === 'reservoir'
+            fields.labwareType === 'reservoir' ||
+            fields.labwareType === 'tipRack'
           ) {
             // no additional required labware type child fields, we can scroll right away
             scrollToForm()

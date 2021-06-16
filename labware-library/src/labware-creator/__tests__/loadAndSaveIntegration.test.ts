@@ -32,7 +32,7 @@ describe('load and immediately save integrity test', () => {
     },
     {
       inputDef: fixtureTiprack,
-      extraFields: { pipetteName, handPlacedTipFit: 'snug' },
+      extraFields: { pipetteName },
     },
   ]
   testCases.forEach(({ inputDef, extraFields }) => {
