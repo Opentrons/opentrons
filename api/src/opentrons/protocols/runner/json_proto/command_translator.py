@@ -2,30 +2,15 @@ from typing import Dict, Iterable, List
 
 import opentrons.types
 
-from opentrons import protocol_engine as pe
-
-# To do: Collapse imports
-from opentrons.protocol_engine.commands import (
-    CommandRequestType,
-    LoadPipetteRequest,
-    AddLabwareDefinitionRequest,
-    LoadLabwareRequest,
-    AspirateRequest,
-    DispenseRequest,
-    PickUpTipRequest,
-    DropTipRequest
-)
-
+from opentrons import protocol_engine
 from opentrons.protocols import models
-from opentrons.protocols.models import JsonProtocol
-from opentrons.protocols.models.labware_definition import LabwareDefinition
 
 
 class CommandTranslatorError(Exception):
     pass
 
 
-PECommands = Iterable[CommandRequestType]
+PECommands = Iterable[protocol_engine.commands.CommandRequestType]
 
 
 class CommandTranslator:
@@ -35,9 +20,9 @@ class CommandTranslator:
         """Construct a command translator"""
         pass
 
-    def translate(self, protocol: JsonProtocol) -> PECommands:
+    def translate(self, protocol: models.JsonProtocol) -> PECommands:
         """Return all Protocol Engine commands required to run the given protocol."""
-        result: List[CommandRequestType] = []
+        result: List[protocol_engine.commands.CommandRequestType] = []
 
         for pipette_id, pipette in protocol.pipettes.items():
             result += [self._translate_load_pipette(pipette_id, pipette)]
@@ -80,14 +65,14 @@ class CommandTranslator:
 
     def _translate_add_labware_definition(
             self,
-            labware_definition: LabwareDefinition) -> AddLabwareDefinitionRequest:
-        return AddLabwareDefinitionRequest(definition=labware_definition)
+            labware_definition: models.LabwareDefinition) -> protocol_engine.commands.AddLabwareDefinitionRequest:
+        return protocol_engine.commands.AddLabwareDefinitionRequest(definition=labware_definition)
 
     def _translate_load_labware(
             self,
             labware_id: str,
             labware: models.json_protocol.Labware,
-            labware_definitions: Dict[str, LabwareDefinition]) -> LoadLabwareRequest:
+            labware_definitions: Dict[str, models.LabwareDefinition]) -> protocol_engine.commands.LoadLabwareRequest:
         """
         Args:
             labware_id:
@@ -100,8 +85,8 @@ class CommandTranslator:
                 The JSON protocol's collection of labware definitions.
         """
         definition = labware_definitions[labware.definitionId]
-        return LoadLabwareRequest(
-            location=pe.DeckSlotLocation(
+        return protocol_engine.commands.LoadLabwareRequest(
+            location=protocol_engine.DeckSlotLocation(
                 slot=opentrons.types.DeckSlotName.from_primitive(labware.slot)
             ),
             loadName=definition.parameters.loadName,
@@ -113,9 +98,9 @@ class CommandTranslator:
     def _translate_load_pipette(
             self,
             pipette_id: str,
-            pipette: models.json_protocol.Pipettes) -> LoadPipetteRequest:
-        return LoadPipetteRequest(
-            pipetteName=pe.PipetteName(pipette.name),
+            pipette: models.json_protocol.Pipettes) -> protocol_engine.commands.LoadPipetteRequest:
+        return protocol_engine.commands.LoadPipetteRequest(
+            pipetteName=protocol_engine.PipetteName(pipette.name),
             # todo(mm, 2021-06-16): Should protocol_engine re-export MountType?
             mount=opentrons.types.MountType(pipette.mount),
             pipetteId=pipette_id
@@ -136,13 +121,13 @@ class CommandTranslator:
         # TODO (al, 2021-04-26): incoming pipette and labware ids are
         #  assigned by PD. Are they the same as Protocol Engine's?
         return [
-            AspirateRequest(
+            protocol_engine.commands.AspirateRequest(
                 pipetteId=command.params.pipette,
                 labwareId=command.params.labware,
                 wellName=command.params.well,
                 volume=command.params.volume,
-                wellLocation=pe.WellLocation(
-                    origin=pe.WellOrigin.BOTTOM,
+                wellLocation=protocol_engine.WellLocation(
+                    origin=protocol_engine.WellOrigin.BOTTOM,
                     offset=(0, 0, command.params.offsetFromBottomMm)
                 )
             )
@@ -160,13 +145,13 @@ class CommandTranslator:
         Returns: DispenseRequest
         """
         return [
-            DispenseRequest(
+            protocol_engine.commands.DispenseRequest(
                 pipetteId=command.params.pipette,
                 labwareId=command.params.labware,
                 wellName=command.params.well,
                 volume=command.params.volume,
-                wellLocation=pe.WellLocation(
-                    origin=pe.WellOrigin.BOTTOM,
+                wellLocation=protocol_engine.WellLocation(
+                    origin=protocol_engine.WellOrigin.BOTTOM,
                     offset=(0, 0, command.params.offsetFromBottomMm)
                 )
             )
@@ -199,7 +184,7 @@ class CommandTranslator:
         Returns: PickUpTipRequest
         """
         return [
-            PickUpTipRequest(
+            protocol_engine.commands.PickUpTipRequest(
                 pipetteId=command.params.pipette,
                 labwareId=command.params.labware,
                 wellName=command.params.well
@@ -219,7 +204,7 @@ class CommandTranslator:
 
         """
         return [
-            DropTipRequest(
+            protocol_engine.commands.DropTipRequest(
                 pipetteId=command.params.pipette,
                 labwareId=command.params.labware,
                 wellName=command.params.well
