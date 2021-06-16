@@ -3065,7 +3065,7 @@ Object {
           "format": "96Standard",
           "isMagneticModuleCompatible": false,
           "isTiprack": true,
-          "loadName": "fixturebrand_96_tiprack_300ul",
+          "loadName": "fixture_tiprack_300_ul",
           "tipLength": 59.3,
         },
         "schemaVersion": 2,
@@ -3938,7 +3938,7 @@ Object {
         },
       },
       "id": "tiprack1Id",
-      "labwareDefURI": "fixture/fixturebrand_96_tiprack_300ul/1",
+      "labwareDefURI": "fixture/fixture_tiprack_300_ul/1",
     },
     "tiprack2Id": Object {
       "def": Object {
@@ -4191,7 +4191,7 @@ Object {
           "format": "96Standard",
           "isMagneticModuleCompatible": false,
           "isTiprack": true,
-          "loadName": "fixturebrand_96_tiprack_300ul",
+          "loadName": "fixture_tiprack_300_ul",
           "tipLength": 59.3,
         },
         "schemaVersion": 2,
@@ -5064,7 +5064,7 @@ Object {
         },
       },
       "id": "tiprack2Id",
-      "labwareDefURI": "fixture/fixturebrand_96_tiprack_300ul/1",
+      "labwareDefURI": "fixture/fixture_tiprack_300_ul/1",
     },
     "tiprack3Id": Object {
       "def": Object {
@@ -5317,7 +5317,7 @@ Object {
           "format": "96Standard",
           "isMagneticModuleCompatible": false,
           "isTiprack": true,
-          "loadName": "fixturebrand_96_tiprack_300ul",
+          "loadName": "fixture_tiprack_300_ul",
           "tipLength": 59.3,
         },
         "schemaVersion": 2,
@@ -6190,7 +6190,7 @@ Object {
         },
       },
       "id": "tiprack3Id",
-      "labwareDefURI": "fixture/fixturebrand_96_tiprack_300ul/1",
+      "labwareDefURI": "fixture/fixture_tiprack_300_ul/1",
     },
     "trashId": Object {
       "def": Object {
@@ -8801,7 +8801,7 @@ Object {
         "maxVolume": 300,
         "minVolume": 30,
       },
-      "tiprackDefURI": "fixture/fixturebrand_96_tiprack_300ul/1",
+      "tiprackDefURI": "fixture/fixture_tiprack_300_ul/1",
       "tiprackLabwareDef": Object {
         "brand": Object {
           "brand": "Fixture Brand",
@@ -9052,7 +9052,7 @@ Object {
           "format": "96Standard",
           "isMagneticModuleCompatible": false,
           "isTiprack": true,
-          "loadName": "fixturebrand_96_tiprack_300ul",
+          "loadName": "fixture_tiprack_300_ul",
           "tipLength": 59.3,
         },
         "schemaVersion": 2,
@@ -9944,7 +9944,7 @@ Object {
         "maxVolume": 300,
         "minVolume": 30,
       },
-      "tiprackDefURI": "fixture/fixturebrand_96_tiprack_300ul/1",
+      "tiprackDefURI": "fixture/fixture_tiprack_300_ul/1",
       "tiprackLabwareDef": Object {
         "brand": Object {
           "brand": "Fixture Brand",
@@ -10195,7 +10195,7 @@ Object {
           "format": "96Standard",
           "isMagneticModuleCompatible": false,
           "isTiprack": true,
-          "loadName": "fixturebrand_96_tiprack_300ul",
+          "loadName": "fixture_tiprack_300_ul",
           "tipLength": 59.3,
         },
         "schemaVersion": 2,

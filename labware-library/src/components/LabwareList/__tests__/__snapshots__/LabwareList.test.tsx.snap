@@ -10860,7 +10860,7 @@ exports[`LabwareList component renders 1`] = `
           "format": "96Standard",
           "isMagneticModuleCompatible": false,
           "isTiprack": true,
-          "loadName": "fixturebrand_96_tiprack_300ul",
+          "loadName": "fixture_tiprack_300_ul",
           "tipLength": 59.3,
         },
         "schemaVersion": 2,
@@ -11733,7 +11733,7 @@ exports[`LabwareList component renders 1`] = `
         },
       }
     }
-    key="fixture/fixturebrand_96_tiprack_300ul/1"
+    key="fixture/fixture_tiprack_300_ul/1"
   />
   <CustomLabwareCard
     isResultsEmpty={false}

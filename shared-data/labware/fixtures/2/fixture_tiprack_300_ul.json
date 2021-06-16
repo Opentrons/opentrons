@@ -1001,7 +1001,7 @@
     "isTiprack": true,
     "tipLength": 59.3,
     "isMagneticModuleCompatible": false,
-    "loadName": "fixturebrand_96_tiprack_300ul"
+    "loadName": "fixture_tiprack_300_ul"
   },
   "namespace": "fixture",
   "version": 1,
