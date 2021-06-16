@@ -101,8 +101,8 @@ def test_active_dwelling_current_push_pop(smoothie):
     assert smoothie._dwelling_current_settings == old_dwelling_currents
 
 
-@pytest.mark.skip()
 async def test_functional(smoothie: driver_3_0.SmoothieDriver):
+    smoothie.simulating = True
     assert smoothie.position == position(0, 0, 0, 0, 0, 0)
 
     await smoothie.move({'X': 0, 'Y': 1, 'Z': 2, 'A': 3, 'B': 4, 'C': 5})
@@ -185,7 +185,7 @@ async def test_clear_limit_switch(
     """
     cmd_list = []
 
-    def write_mock(command, retries):
+    def write_mock(command, retries, timeout):
         cmd_list.append(command.build())
         if constants.GCODE.MOVE in command:
             raise AlarmResponse(port="", response="ALARM: Hard limit +C")
@@ -229,7 +229,7 @@ async def test_unstick_axes(
 ):
     cmd_list = []
 
-    def write_mock(command, retries):
+    def write_mock(command, retries, timeout):
         cmd_list.append(command.build())
         if constants.GCODE.LIMIT_SWITCH_STATUS in command:
             return 'X_max:0 Y_max:0 Z_max:0 A_max:0 B_max:0 C_max:0 Probe: 0 \r\n'

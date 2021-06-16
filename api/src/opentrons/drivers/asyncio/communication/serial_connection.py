@@ -19,7 +19,7 @@ class SerialConnection:
             cls,
             port: str,
             baud_rate: int,
-            timeout: int,
+            timeout: float,
             ack: str,
             name: Optional[str] = None,
             retry_wait_time_seconds: float = 0.1,
@@ -72,7 +72,8 @@ class SerialConnection:
         self._retry_wait_time_seconds = retry_wait_time_seconds
 
     async def send_command(
-            self, command: CommandBuilder, retries: int = 0
+            self, command: CommandBuilder, retries: int = 0,
+            timeout: Optional[float] = None
     ) -> str:
         """
         Send a command and return the response.
@@ -80,15 +81,17 @@ class SerialConnection:
         Args:
             command: A command builder.
             retries: number of times to retry in case of timeout
+            timeout: optional override of default timeout in seconds
 
         Returns: The command response
 
         Raises: SerialException
         """
-        return await self.send_data(data=command.build(), retries=retries)
+        return await self.send_data(data=command.build(), retries=retries,
+                                    timeout=timeout)
 
     async def send_data(
-            self, data: str, retries: int = 0
+            self, data: str, retries: int = 0, timeout: Optional[float] = None
     ) -> str:
         """
         Send data and return the response.
@@ -96,6 +99,7 @@ class SerialConnection:
         Args:
             data: The data to send.
             retries: number of times to retry in case of timeout
+            timeout: optional override of default timeout in seconds
 
         Returns: The command response
 
@@ -107,7 +111,7 @@ class SerialConnection:
             log.debug(f'{self.name}: Write -> {data_encode!r}')
             await self._serial.write(data=data_encode)
 
-            response = await self._serial.read_until(match=self._ack)
+            response = await self._serial.read_until(match=self._ack, timeout=timeout)
             log.debug(f'{self.name}: Read <- {response!r}')
 
             if self._ack in response:
