@@ -27,6 +27,8 @@ from opentrons.protocols.runner.json_proto.command_translator import (
 
 from opentrons.protocols.models import JsonProtocol
 
+import typing
+
 
 @pytest.fixture
 def json_protocol(json_protocol_dict: dict) -> JsonProtocol:
@@ -111,6 +113,29 @@ def subject() -> CommandTranslator:
     return CommandTranslator()
 
 
+def _assert_appear_in_order(
+    elements: typing.Iterable,
+    source: typing.Iterable
+) -> None:
+    """
+    Make sure all elements appear in source, in the given relative order.
+
+    Example:
+
+        _assert_appear_in_order(
+            elements=["a", "c"]
+            source=["a", "b", "c", "d"]
+        )  # Pass.
+
+        _assert_appear_in_order(
+            elements=["c", "a"]
+            source=["a", "b", "c", "d"]
+        )  # Fail.
+    """
+    element_indexes = [source.index(element) for element in elements]
+    assert sorted(element_indexes) == element_indexes
+    
+
 def test_translates_labware_commands(
     subject: CommandTranslator,
     json_protocol: JsonProtocol,
@@ -118,30 +143,38 @@ def test_translates_labware_commands(
     minimal_labware_def2: dict,
 ) -> None:
     result = subject.translate(json_protocol)
-
-    # To do: More correct ordering constraints
-    assert AddLabwareDefinitionRequest(
+    
+    expected_add_definition_request_1 = AddLabwareDefinitionRequest(
         definition=LabwareDefinition.parse_obj(minimal_labware_def)
-    ) in result
-    assert AddLabwareDefinitionRequest(
-        definition=LabwareDefinition.parse_obj(minimal_labware_def2)
-    ) in result
-
-    assert LoadLabwareRequest(
+    )
+    expected_load_request_1 = LoadLabwareRequest(
         location=protocol_engine.DeckSlotLocation(slot=1),
         loadName=minimal_labware_def["parameters"]["loadName"],
         namespace=minimal_labware_def["namespace"],
         version=minimal_labware_def["version"],
         labwareId="tiprack1Id"
-    ) in result
-
-    assert LoadLabwareRequest(
+    )
+    
+    expected_add_definition_request_2 = AddLabwareDefinitionRequest(
+        definition=LabwareDefinition.parse_obj(minimal_labware_def2)
+    )
+    expected_load_request_2 = LoadLabwareRequest(
         location=protocol_engine.DeckSlotLocation(slot=10),
         loadName=minimal_labware_def2["parameters"]["loadName"],
         namespace=minimal_labware_def2["namespace"],
         version=minimal_labware_def2["version"],
         labwareId="wellplate1Id"
-    ) in result
+    )
+
+    _assert_appear_in_order(
+        elements=[expected_add_definition_request_1, expected_load_request_1],
+        source=result
+    )
+
+    _assert_appear_in_order(
+        elements=[expected_add_definition_request_2, expected_load_request_2],
+        source=result
+    )
 
 
 def test_aspirate(
