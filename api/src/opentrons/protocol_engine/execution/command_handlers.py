@@ -21,14 +21,13 @@ class CommandHandlers:
     _movement: MovementHandler
     _pipetting: PipettingHandler
 
-    @classmethod
-    def create(
-        cls,
+    def __init__(
+        self,
         hardware: HardwareAPI,
         state: StateView,
         resources: ResourceProviders,
-    ) -> CommandHandlers:
-        """Create a CommandHandlers container and its child handlers."""
+    ) -> None:
+        """Initialize a CommandHandlers container and its child handlers."""
         equipment = EquipmentHandler(
             state=state,
             hardware=hardware,
@@ -46,19 +45,6 @@ class CommandHandlers:
             movement_handler=movement,
         )
 
-        return cls(
-            equipment=equipment,
-            movement=movement,
-            pipetting=pipetting,
-        )
-
-    def __init__(
-        self,
-        equipment: EquipmentHandler,
-        movement: MovementHandler,
-        pipetting: PipettingHandler,
-    ) -> None:
-        """Initialize a CommandHandlers container."""
         self._equipment = equipment
         self._movement = movement
         self._pipetting = pipetting

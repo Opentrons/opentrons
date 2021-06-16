@@ -1,5 +1,6 @@
 """Tests for the ProtocolEngine class."""
 from datetime import datetime, timezone
+from decoy import matchers
 from math import isclose
 from mock import AsyncMock, MagicMock  # type: ignore[attr-defined]
 from typing import cast
@@ -20,6 +21,7 @@ from opentrons.protocol_engine.commands import (
     CompletedCommand,
     FailedCommand,
 )
+from opentrons.protocol_engine.execution import CommandHandlers
 from opentrons.protocol_engine.state import LabwareData
 from opentrons.protocol_engine.commands.move_to_well import MoveToWellImplementation
 
@@ -82,8 +84,7 @@ async def test_execute_command_creates_command(
 
 
 async def test_execute_command_calls_implementation_executor(
-    engine: ProtocolEngine,
-    mock_handlers: AsyncMock,
+    engine: ProtocolEngine
 ) -> None:
     """It should create a command in the state store when executing."""
     mock_req = MagicMock(spec=MoveToWellRequest)
@@ -93,12 +94,11 @@ async def test_execute_command_calls_implementation_executor(
 
     await engine.execute_command(mock_req, command_id="unique-id")
 
-    mock_impl.execute.assert_called_with(mock_handlers)
+    mock_impl.execute.assert_called_with(matchers.IsA(CommandHandlers))
 
 
 async def test_execute_command_adds_result_to_state(
     engine: ProtocolEngine,
-    mock_handlers: AsyncMock,
     mock_state_store: MagicMock,
     now: datetime,
 ) -> None:
@@ -132,7 +132,6 @@ async def test_execute_command_adds_result_to_state(
 
 async def test_execute_command_adds_error_to_state(
     engine: ProtocolEngine,
-    mock_handlers: AsyncMock,
     mock_state_store: MagicMock,
     now: datetime,
 ) -> None:
@@ -166,7 +165,6 @@ async def test_execute_command_adds_error_to_state(
 
 async def test_execute_command_adds_unexpected_error_to_state(
     engine: ProtocolEngine,
-    mock_handlers: AsyncMock,
     mock_state_store: MagicMock,
     now: datetime,
 ) -> None:
@@ -195,7 +193,6 @@ async def test_execute_command_adds_unexpected_error_to_state(
 
 def test_add_command(
     engine: ProtocolEngine,
-    mock_handlers: AsyncMock,
     mock_state_store: MagicMock,
     mock_resources: AsyncMock,
     now: datetime,

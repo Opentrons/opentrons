@@ -25,8 +25,8 @@ class ProtocolEngine:
     of the commands themselves.
     """
 
+    _hardware: HardwareAPI
     _state_store: StateStore
-    _handlers: CommandHandlers
     _resources: ResourceProviders
 
     @classmethod
@@ -43,18 +43,12 @@ class ProtocolEngine:
             deck_definition=deck_def, deck_fixed_labware=fixed_labware
         )
 
-        handlers = CommandHandlers.create(
-            resources=resources,
-            hardware=hardware,
-            state=state_store.state_view,
-        )
-
-        return cls(state_store=state_store, handlers=handlers, resources=resources)
+        return cls(state_store=state_store, resources=resources, hardware=hardware)
 
     def __init__(
         self,
+        hardware: HardwareAPI,
         state_store: StateStore,
-        handlers: CommandHandlers,
         resources: ResourceProviders,
     ) -> None:
         """Initialize a ProtocolEngine instance.
@@ -62,8 +56,8 @@ class ProtocolEngine:
         This constructor does not inject provider implementations. Prefer the
         ProtocolEngine.create factory classmethod.
         """
+        self._hardware = hardware
         self._state_store = state_store
-        self._handlers = handlers
         self._resources = resources
 
     @property
@@ -89,9 +83,18 @@ class ProtocolEngine:
         # store the command prior to execution
         self._state_store.handle_command(cmd, command_id=command_id)
 
+        # TODO(mc, 2021-06-16): refactor command execution after command
+        # models have been simplified to delegate to CommandExecutor. This
+        # should involve ditching the relatively useless CommandHandler class
+        handlers = CommandHandlers(
+            hardware=self._hardware,
+            resources=self._resources,
+            state=self.state_view,
+        )
+
         # execute the command
         try:
-            result = await cmd_impl.execute(self._handlers)
+            result = await cmd_impl.execute(handlers)
             completed_at = utc_now()
             done_cmd = cmd.to_completed(result, completed_at)
 
