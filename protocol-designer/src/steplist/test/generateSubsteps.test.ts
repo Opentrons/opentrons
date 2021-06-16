@@ -1,7 +1,20 @@
 // @flow
 import { generateSubstepItem } from '../generateSubstepItem'
-import { makeInitialRobotState, makeContext } from '@opentrons/step-generation'
+import {
+  makeInitialRobotState,
+  makeContext,
+  InvariantContext,
+  RobotState,
+  EngageMagnetArgs,
+  DisengageMagnetArgs,
+} from '@opentrons/step-generation'
 import { THERMOCYCLER_STATE } from '../../constants'
+import { LabwareNamesByModuleId, StepArgsAndErrors } from '../types'
+import {
+  SetTemperatureArgs,
+  DeactivateTemperatureArgs,
+} from '../../../../step-generation/lib/types.d'
+import { ThermocyclerStateStepArgs } from '../../../../step-generation/src/types'
 
 describe('generateSubstepItem', () => {
   const stepId = 'step123'
@@ -10,7 +23,9 @@ describe('generateSubstepItem', () => {
   const sourcePlateId = 'sourcePlateId'
   const destPlateId = 'destPlateId'
 
-  let invariantContext, labwareNamesByModuleId, robotState
+  let invariantContext: InvariantContext,
+    labwareNamesByModuleId: LabwareNamesByModuleId,
+    robotState: RobotState | null
   beforeEach(() => {
     invariantContext = makeContext()
 
@@ -33,6 +48,7 @@ describe('generateSubstepItem', () => {
         sourcePlateId: { slot: '4' },
         destPlateId: { slot: '5' },
       },
+      // @ts-expect-error(sa, 2021-6-15): this looks to be copied, because tiprackSetting is nowhere to be found in makeInitialRobotState
       tiprackSetting: { tiprack1Id: false },
     })
   })
@@ -49,6 +65,7 @@ describe('generateSubstepItem', () => {
     }
 
     const result = generateSubstepItem(
+      // @ts-expect-error(sa, 2021-6-15): errors should be a boolean, not {}
       stepArgsAndErrors,
       invariantContext,
       robotState,
@@ -84,6 +101,7 @@ describe('generateSubstepItem', () => {
   ].forEach(({ testName, args }) => {
     it(testName, () => {
       const result = generateSubstepItem(
+        // @ts-expect-error(sa, 2021-6-15): errors should be a boolean, not {}
         args,
         invariantContext,
         robotState,
@@ -96,14 +114,17 @@ describe('generateSubstepItem', () => {
   })
 
   it('delay command returns pause substep data', () => {
-    const stepArgsAndErrors = {
+    const stepArgsAndErrors: StepArgsAndErrors = {
+      // @ts-expect-error(sa, 2021-6-15): errors should be boolean typed
       errors: {},
+      // @ts-expect-error(sa, 2021-6-15): stepArgs missing name and description
       stepArgs: {
         commandCreatorFnName: 'delay',
         message: 'test',
         wait: true,
       },
     }
+    // @ts-expect-error(sa, 2021-6-15): missing parameters to make valid robot state
     const robotState = makeInitialRobotState({ invariantContext })
 
     const result = generateSubstepItem(
@@ -121,7 +142,23 @@ describe('generateSubstepItem', () => {
   })
 
   describe('like substeps', () => {
-    let sharedArgs
+    let sharedArgs: {
+      pipette: string
+      sourceLabware: string
+      destLabware: string
+      name: string
+      volume: number
+      preWetTip: boolean
+      touchTipAfterAspirate: boolean
+      touchTipAfterAspirateOffsetMmFromBottom: number
+      changeTip: string
+      aspirateFlowRateUlSec: number
+      aspirateOffsetFromBottomMm: number
+      touchTipAfterDispense: boolean
+      touchTipAfterDispenseOffsetMmFromBottom: number
+      dispenseFlowRateUlSec: number
+      dispenseOffsetFromBottomMm: number
+    }
     beforeEach(() => {
       sharedArgs = {
         pipette: pipetteId,
@@ -312,8 +349,10 @@ describe('generateSubstepItem', () => {
       },
     ].forEach(({ testName, stepArgs, expected }) => {
       it(testName, () => {
-        const stepArgsAndErrors = {
+        const stepArgsAndErrors: StepArgsAndErrors = {
+          // @ts-expect-error(sa, 2021-6-15): errors should be boolean typed
           errors: {},
+          // @ts-expect-error(sa, 2021-6-15): stepArgs missing name and description
           stepArgs: { ...sharedArgs, ...stepArgs },
         }
 
@@ -331,7 +370,8 @@ describe('generateSubstepItem', () => {
   })
 
   it('mix command returns substep data', () => {
-    const stepArgsAndErrors = {
+    const stepArgsAndErrors: StepArgsAndErrors = {
+      // @ts-expect-error(sa, 2021-6-15): stepArgs missing description
       stepArgs: {
         name: 'testing',
         commandCreatorFnName: 'mix',
@@ -351,6 +391,7 @@ describe('generateSubstepItem', () => {
         aspirateFlowRateUlSec: 5,
         dispenseFlowRateUlSec: 5,
       },
+      // @ts-expect-error(sa, 2021-6-15): errors should be boolean typed
       errors: {},
     }
 
@@ -486,13 +527,16 @@ describe('generateSubstepItem', () => {
   })
 
   it('engageMagnet returns substep data with engage = true', () => {
-    const stepArgsAndErrors = {
+    const engageMagnetArgs: EngageMagnetArgs = {
+      module: 'magnet123',
+      commandCreatorFnName: 'engageMagnet',
+      // @ts-expect-error(sa, 2021-6-15): message should be string or undefined
+      message: null,
+    }
+    const stepArgsAndErrors: StepArgsAndErrors = {
+      // @ts-expect-error(sa, 2021-6-15): errors should be boolean typed
       errors: {},
-      stepArgs: {
-        module: 'magnet123',
-        commandCreatorFnName: 'engageMagnet',
-        message: null,
-      },
+      stepArgs: engageMagnetArgs,
     }
 
     const result = generateSubstepItem(
@@ -512,13 +556,16 @@ describe('generateSubstepItem', () => {
   })
 
   it('disengageMagnet returns substep data with engage = false', () => {
-    const stepArgsAndErrors = {
+    const disengageMagnetArgs: DisengageMagnetArgs = {
+      module: 'magnet123',
+      commandCreatorFnName: 'disengageMagnet',
+      // @ts-expect-error(sa, 2021-6-15): message cannot be null
+      message: null,
+    }
+    const stepArgsAndErrors: StepArgsAndErrors = {
+      // @ts-expect-error(sa, 2021-6-15): errors should be boolean typed
       errors: {},
-      stepArgs: {
-        module: 'magnet123',
-        commandCreatorFnName: 'disengageMagnet',
-        message: null,
-      },
+      stepArgs: disengageMagnetArgs,
     }
 
     const result = generateSubstepItem(
@@ -538,14 +585,17 @@ describe('generateSubstepItem', () => {
   })
 
   it('setTemperature returns substep data with temperature', () => {
-    const stepArgsAndErrors = {
+    const setTempArgs: SetTemperatureArgs = {
+      module: 'tempId',
+      commandCreatorFnName: 'setTemperature',
+      targetTemperature: 45,
+      // @ts-expect-error(sa, 2021-6-15): message cannot be null
+      message: null,
+    }
+    const stepArgsAndErrors: StepArgsAndErrors = {
+      // @ts-expect-error(sa, 2021-6-15): errors should be boolean typed
       errors: {},
-      stepArgs: {
-        module: 'tempId',
-        commandCreatorFnName: 'setTemperature',
-        targetTemperature: 45,
-        message: null,
-      },
+      stepArgs: setTempArgs,
     }
 
     const result = generateSubstepItem(
@@ -565,14 +615,17 @@ describe('generateSubstepItem', () => {
   })
 
   it('setTemperature returns temperature when 0', () => {
-    const stepArgsAndErrors = {
+    const setTempArgs: SetTemperatureArgs = {
+      module: 'tempId',
+      commandCreatorFnName: 'setTemperature',
+      targetTemperature: 0,
+      // @ts-expect-error(sa, 2021-6-15): message cannot be null
+      message: null,
+    }
+    const stepArgsAndErrors: StepArgsAndErrors = {
+      // @ts-expect-error(sa, 2021-6-15): errors should be boolean typed
       errors: {},
-      stepArgs: {
-        module: 'tempId',
-        commandCreatorFnName: 'setTemperature',
-        targetTemperature: 0,
-        message: null,
-      },
+      stepArgs: setTempArgs,
     }
 
     const result = generateSubstepItem(
@@ -592,15 +645,17 @@ describe('generateSubstepItem', () => {
   })
 
   it('deactivateTemperature returns substep data with null temp', () => {
-    const stepArgsAndErrors = {
-      errors: {},
-      stepArgs: {
-        module: 'tempId',
-        commandCreatorFnName: 'deactivateTemperature',
-        message: null,
-      },
+    const deactivateTempArgs: DeactivateTemperatureArgs = {
+      module: 'tempId',
+      commandCreatorFnName: 'deactivateTemperature',
+      // @ts-expect-error(sa, 2021-6-15): message cannot be null
+      message: null,
     }
-
+    const stepArgsAndErrors: StepArgsAndErrors = {
+      // @ts-expect-error(sa, 2021-6-15): errors should be boolean typed
+      errors: {},
+      stepArgs: deactivateTempArgs,
+    }
     const result = generateSubstepItem(
       stepArgsAndErrors,
       invariantContext,
@@ -618,16 +673,18 @@ describe('generateSubstepItem', () => {
   })
 
   it('thermocyclerState returns substep data', () => {
-    const stepArgsAndErrors = {
+    const ThermocyclerStateArgs: ThermocyclerStateStepArgs = {
+      module: 'thermocyclerModuleId',
+      commandCreatorFnName: THERMOCYCLER_STATE,
+      message: 'a message',
+      blockTargetTemp: 44,
+      lidTargetTemp: 66,
+      lidOpen: false,
+    }
+    const stepArgsAndErrors: StepArgsAndErrors = {
+      // @ts-expect-error(sa, 2021-6-15): errors should be boolean typed
       errors: {},
-      stepArgs: {
-        module: 'thermocyclerModuleId',
-        commandCreatorFnName: THERMOCYCLER_STATE,
-        message: 'a message',
-        blockTargetTemp: 44,
-        lidTargetTemp: 66,
-        lidOpen: false,
-      },
+      stepArgs: ThermocyclerStateArgs,
     }
     const result = generateSubstepItem(
       stepArgsAndErrors,
@@ -655,6 +712,7 @@ describe('generateSubstepItem', () => {
     }
 
     const result = generateSubstepItem(
+      // @ts-expect-error(sa, 2021-6-15): errors should be boolean typed
       stepArgsAndErrors,
       invariantContext,
       robotState,

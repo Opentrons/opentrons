@@ -2,11 +2,12 @@ import {
   minFieldValue,
   maxFieldValue,
   temperatureRangeFieldValue,
+  ErrorChecker,
 } from '../errors'
 describe('errors', () => {
   describe('minFieldValue', () => {
     const MIN = 4
-    let minChecker
+    let minChecker: ErrorChecker
     beforeEach(() => {
       minChecker = minFieldValue(MIN)
     })
@@ -25,7 +26,7 @@ describe('errors', () => {
   })
   describe('maxFieldValue', () => {
     const MAX = 95
-    let maxChecker
+    let maxChecker: ErrorChecker
     beforeEach(() => {
       maxChecker = maxFieldValue(MAX)
     })
@@ -45,7 +46,7 @@ describe('errors', () => {
   describe('temperatureRangeFieldValue', () => {
     const MIN = 4
     const MAX = 99
-    let rangeChecker
+    let rangeChecker: ErrorChecker
     beforeEach(() => {
       rangeChecker = temperatureRangeFieldValue(MIN, MAX)
     })

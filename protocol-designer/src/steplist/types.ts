@@ -34,7 +34,7 @@ export type WellIngredientVolumeData =
         }
       >
     >
-export type TipLocation = {
+export interface TipLocation {
   labware: string
   well: string
 }
@@ -42,16 +42,16 @@ export type SubstepIdentifier = {
   stepId: StepIdType
   substepIndex: number
 } | null
-export type NamedIngred = {
+export interface NamedIngred {
   id: string
   name: string
 }
-export type SourceDestData = {
+export interface SourceDestData {
   wells: string[]
   preIngreds: WellIngredientVolumeData
   postIngreds: WellIngredientVolumeData
 }
-export type SubstepTimelineFrame = {
+export interface SubstepTimelineFrame {
   substepIndex?: number
   activeTips: TipLocation | null | undefined
   source?: SourceDestData
@@ -59,12 +59,12 @@ export type SubstepTimelineFrame = {
   volume?: number | null | undefined
   channelId?: number
 }
-export type SubstepWellData = {
+export interface SubstepWellData {
   well: string
   preIngreds: WellIngredientVolumeData
   postIngreds: WellIngredientVolumeData
 }
-export type StepItemSourceDestRow = {
+export interface StepItemSourceDestRow {
   activeTips: TipLocation | null | undefined
   substepIndex?: number
   source?: SubstepWellData
@@ -79,51 +79,51 @@ type SourceDestCommandCreatorName =
   | 'distribute'
   | 'consolidate'
   | 'mix'
-export type SourceDestSubstepItemSingleChannel = {
+export interface SourceDestSubstepItemSingleChannel {
   substepType: 'sourceDest'
   multichannel: false
   commandCreatorFnName: SourceDestCommandCreatorName
   parentStepId: StepIdType
   rows: StepItemSourceDestRow[]
 }
-export type SourceDestSubstepItemMultiChannel = {
+export interface SourceDestSubstepItemMultiChannel {
   substepType: 'sourceDest'
   multichannel: true
   commandCreatorFnName: SourceDestCommandCreatorName
   parentStepId: StepIdType
   volume?: number | null | undefined
   // uniform volume for all steps
-  multiRows: Array<StepItemSourceDestRow[]> // Array of arrays.
+  multiRows: StepItemSourceDestRow[][] // Array of arrays.
   // NOTE: "Row" means a tabular row on the steplist, NOT a "row" of wells on the deck
 }
 export type SourceDestSubstepItem =
   | SourceDestSubstepItemSingleChannel
   | SourceDestSubstepItemMultiChannel
-export type MagnetSubstepItem = {
+export interface MagnetSubstepItem {
   substepType: 'magnet'
   engage: boolean
   labwareNickname: string | null | undefined
   message?: string
 }
-export type TemperatureSubstepItem = {
+export interface TemperatureSubstepItem {
   substepType: 'temperature'
   temperature: number | null
   labwareNickname: string | null | undefined
   message?: string
 }
-export type PauseSubstepItem = {
+export interface PauseSubstepItem {
   substepType: 'pause'
   pauseStepArgs: PauseArgs
 }
 // Pause substeps use same data as processed form
-export type AwaitTemperatureSubstepItem = {
+export interface AwaitTemperatureSubstepItem {
   substepType: 'awaitTemperature'
   temperature: number
   labwareNickname: string | null | undefined
   message?: string
 }
-export type ThermocyclerProfileSubstepItem = {
-  substepType: THERMOCYCLER_PROFILE
+export interface ThermocyclerProfileSubstepItem {
+  substepType: typeof THERMOCYCLER_PROFILE
   blockTargetTempHold: number | null
   labwareNickname: string | null | undefined
   lidOpenHold: boolean
@@ -134,8 +134,8 @@ export type ThermocyclerProfileSubstepItem = {
   profileTargetLidTemp: number | null
   profileVolume: number
 }
-export type ThermocyclerStateSubstepItem = {
-  substepType: THERMOCYCLER_STATE
+export interface ThermocyclerStateSubstepItem {
+  substepType: typeof THERMOCYCLER_STATE
   labwareNickname: string | null | undefined
   blockTargetTemp: number | null
   lidTargetTemp: number | null
@@ -152,7 +152,7 @@ export type SubstepItemData =
   | ThermocyclerStateSubstepItem
 export type Substeps = Record<StepIdType, SubstepItemData | null | undefined>
 export type StepFormErrors = FormError[]
-export type StepArgsAndErrors = {
+export interface StepArgsAndErrors {
   errors: boolean
   stepArgs: CommandCreatorArgs | null // TODO: incompleteData field when this is null?
 }

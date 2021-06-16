@@ -3,38 +3,47 @@ import {
   fixtureP10Single,
   fixtureP300Single,
 } from '@opentrons/shared-data/pipette/fixtures/name'
-import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
-import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
+import _fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
+import _fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
+import { LabwareDefinition2 } from '@opentrons/shared-data'
 import {
   SOURCE_WELL_BLOWOUT_DESTINATION,
   DEST_WELL_BLOWOUT_DESTINATION,
+  PipetteEntities,
+  LabwareEntities,
 } from '@opentrons/step-generation'
+import { FormData } from '../../../../form-types'
 import {
   dependentFieldsUpdateMoveLiquid,
   updatePatchBlowoutFields,
 } from '../dependentFieldsUpdateMoveLiquid'
 
-let pipetteEntities
-let labwareEntities
-let handleFormHelper
+const fixtureTiprack10ul = _fixture_tiprack_10_ul as LabwareDefinition2
+const fixtureTiprack300ul = _fixture_tiprack_300_ul as LabwareDefinition2
+
+let pipetteEntities: PipetteEntities
+let labwareEntities: LabwareEntities
+let handleFormHelper: any
 
 beforeEach(() => {
   pipetteEntities = {
     pipetteId: {
       name: 'p10_single',
       spec: fixtureP10Single,
+      // @ts-expect-error(sa, 2021-6-15): tiprackModel does not exist on PipetteEntity
       tiprackModel: 'tiprack-10ul',
-      tiprackLabwareDef: fixture_tiprack_10_ul,
+      tiprackLabwareDef: fixtureTiprack10ul,
     },
     otherPipetteId: {
       name: 'p300_single_gen2',
       spec: fixtureP300Single,
+      // @ts-expect-error(sa, 2021-6-15): tiprackModel does not exist on PipetteEntity
       tiprackModel: 'tiprack-300ul',
-      tiprackLabwareDef: fixture_tiprack_300_ul,
+      tiprackLabwareDef: fixtureTiprack300ul,
     },
   }
   labwareEntities = {}
-  handleFormHelper = (patch, baseForm) =>
+  handleFormHelper = (patch: Partial<Record<string, unknown>>, baseForm: FormData) =>
     dependentFieldsUpdateMoveLiquid(
       patch,
       baseForm,
@@ -200,7 +209,7 @@ describe('path should update...', () => {
 })
 
 describe('disposal volume should update...', () => {
-  let form
+  let form: { path: string; aspirate_wells: string[]; dispense_wells: string[]; volume: string; pipette: string; disposalVolume_checkbox: boolean; disposalVolume_volume: string }
   beforeEach(() => {
     form = {
       path: 'multiDispense',
@@ -365,6 +374,7 @@ describe('disposal volume should update...', () => {
     testCases.forEach(({ prevPath, nextPath, incompatible }) => {
       const patch = { path: nextPath }
       it(`when changing path ${prevPath} → ${nextPath}, arbitrary labware still allowed`, () => {
+        // @ts-expect-error(sa, 2021-6-15): missing id and stepType to be valid formData type
         const result = updatePatchBlowoutFields(patch, {
           path: prevPath,
           blowout_location: 'someKindaTrashLabwareIdHere',
@@ -373,6 +383,7 @@ describe('disposal volume should update...', () => {
       })
 
       it(`when changing path ${prevPath} → ${nextPath}, ${incompatible} reset to trashId`, () => {
+        // @ts-expect-error(sa, 2021-6-15): missing id and stepType to be valid formData type
         const result = updatePatchBlowoutFields(patch, {
           path: prevPath,
           blowout_location: incompatible,
@@ -385,7 +396,7 @@ describe('disposal volume should update...', () => {
 
 describe('aspirate > air gap volume', () => {
   describe('when the path is single', () => {
-    let form
+    let form: { path: string; aspirate_wells: string[]; dispense_wells: string[]; volume: string; pipette: string; disposalVolume_checkbox: boolean; disposalVolume_volume: string }
     beforeEach(() => {
       form = {
         path: 'single',
@@ -449,7 +460,7 @@ describe('aspirate > air gap volume', () => {
   })
 
   describe('when the path is multi aspirate', () => {
-    let form
+    let form: { path: string; aspirate_wells: string[]; dispense_wells: string[]; volume: string; pipette: string; disposalVolume_checkbox: boolean; disposalVolume_volume: string }
     beforeEach(() => {
       form = {
         path: 'multiAspirate',

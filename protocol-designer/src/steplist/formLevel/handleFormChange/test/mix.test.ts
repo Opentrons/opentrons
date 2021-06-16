@@ -1,15 +1,23 @@
-import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
-import fixture_trash from '@opentrons/shared-data/labware/fixtures/2/fixture_trash.json'
+import { LabwareDefinition2 } from '@opentrons/shared-data'
+import _fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
+import _fixture_trash from '@opentrons/shared-data/labware/fixtures/2/fixture_trash.json'
+import { LabwareEntities, PipetteEntities } from '@opentrons/step-generation'
 import { DEFAULT_MM_FROM_BOTTOM_DISPENSE } from '../../../../constants'
+import { FormData } from '../../../../form-types'
 import { dependentFieldsUpdateMix } from '../dependentFieldsUpdateMix'
-let pipetteEntities
-let labwareEntities
-let handleFormHelper
+
+const fixture96Plate = _fixture_96_plate as LabwareDefinition2
+const fixtureTrash = _fixture_trash as LabwareDefinition2
+
+let pipetteEntities: PipetteEntities
+let labwareEntities: LabwareEntities
+let handleFormHelper: any
 beforeEach(() => {
   pipetteEntities = {
     pipetteId: {
       name: 'p10_single',
       tiprackModel: 'tiprack-10ul',
+      // @ts-expect-error(sa, 2021-6-15): missing properties from PipetteNameSpecs
       spec: {
         channels: 1,
       },
@@ -17,6 +25,7 @@ beforeEach(() => {
     pipetteMultiId: {
       name: 'p10_multi',
       tiprackModel: 'tiprack-10ul',
+      // @ts-expect-error(sa, 2021-6-15): missing properties from PipetteNameSpecs
       spec: {
         channels: 8,
       },
@@ -24,16 +33,18 @@ beforeEach(() => {
   }
   labwareEntities = {
     trashId: {
+      // @ts-expect-error(sa, 2021-6-15): type does not exist on LabwareEntity
       type: 'trash-box',
-      def: fixture_trash,
+      def: fixtureTrash,
     },
     plateId: {
+      // @ts-expect-error(sa, 2021-6-15): type does not exist on LabwareEntity
       type: '96-flat',
-      def: fixture_96_plate,
+      def: fixture96Plate,
     },
   }
 
-  handleFormHelper = (patch, baseForm) =>
+  handleFormHelper = (patch: Partial<Record<string, unknown>>, baseForm: FormData) =>
     dependentFieldsUpdateMix(patch, baseForm, pipetteEntities, labwareEntities)
 })
 describe('no-op cases should pass through the patch unchanged', () => {
@@ -52,7 +63,7 @@ describe('no-op cases should pass through the patch unchanged', () => {
   })
 })
 describe('well selection should update', () => {
-  let form
+  let form: any
   beforeEach(() => {
     form = {
       labware: 'plateId',

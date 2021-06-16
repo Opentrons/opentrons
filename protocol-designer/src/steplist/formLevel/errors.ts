@@ -128,7 +128,7 @@ const LID_TEMPERATURE_HOLD_REQUIRED: FormError = {
   title: 'Temperature is required',
   dependentFields: ['lidIsActiveHold', 'lidTargetTempHold'],
 }
-export type FormErrorChecker = (arg0: unknown) => FormError | null | undefined
+export type FormErrorChecker = (arg: unknown) => FormError | null | undefined
 // TODO: test these
 
 /*******************
@@ -338,10 +338,12 @@ export const engageHeightRangeExceeded = (
  ********************/
 type ComposeErrors = (
   ...errorCheckers: FormErrorChecker[]
-) => (arg0: unknown) => FormError[]
+) => (arg: unknown) => FormError[]
+// @ts-expect-error(sa, 2021-6-14): cannot modify return type of reduce without giving an initial value
 export const composeErrors: ComposeErrors = (
   ...errorCheckers: FormErrorChecker[]
 ) => value =>
+  // @ts-expect-error(sa, 2021-6-14): cannot modify return type of reduce without giving an initial value
   errorCheckers.reduce((acc, errorChecker) => {
     const possibleError = errorChecker(value)
     return possibleError ? [...acc, possibleError] : acc

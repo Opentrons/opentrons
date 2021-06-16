@@ -27,7 +27,7 @@ const FIELD_ERRORS: Record<FieldError, string> = {
 /*******************
  ** Error Checkers **
  ********************/
-type ErrorChecker = (value: unknown) => string | null | undefined
+export type ErrorChecker = (value: unknown) => string | null | undefined
 export const requiredField: ErrorChecker = (value: unknown) =>
   !value ? FIELD_ERRORS.REQUIRED : null
 export const nonZero: ErrorChecker = (value: unknown) =>
@@ -68,9 +68,11 @@ export const realNumber: ErrorChecker = (value: unknown) =>
 type ComposeErrors = (
   ...errorCheckers: ErrorChecker[]
 ) => (value: unknown) => string[]
+// @ts-expect-error(sa, 2021-6-14): cannot modify return type of reduce without giving an initial value
 export const composeErrors: ComposeErrors = (
   ...errorCheckers: ErrorChecker[]
 ) => value =>
+  // @ts-expect-error(sa, 2021-6-14): cannot modify return type of reduce without giving an initial value
   errorCheckers.reduce((accumulatedErrors, errorChecker) => {
     const possibleError = errorChecker(value)
     return possibleError

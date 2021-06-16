@@ -11,7 +11,7 @@ import { PDListItem } from '../lists'
 import styles from './StepItem.css'
 import { LabwareTooltipContents } from './LabwareTooltipContents'
 
-type AspirateDispenseHeaderProps = {
+interface AspirateDispenseHeaderProps {
   sourceLabwareNickname: string | null | undefined
   destLabwareNickname: string | null | undefined
 }

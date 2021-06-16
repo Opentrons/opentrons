@@ -282,13 +282,13 @@ export interface AwaitTemperatureArgs {
 }
 
 export type EngageMagnetArgs = EngageMagnetParams & {
-  module: string | null
+  module: string
   commandCreatorFnName: 'engageMagnet'
   message?: string
 }
 
 export type DisengageMagnetArgs = ModuleOnlyParams & {
-  module: string | null
+  module: string
   commandCreatorFnName: 'disengageMagnet'
   message?: string
 }

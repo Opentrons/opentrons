@@ -4,19 +4,28 @@ import {
   volumeInCapacityForMultiDispense,
 } from '../utils'
 import { fixtureP300Single } from '@opentrons/shared-data/pipette/fixtures/name'
-import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
+import _fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
+import { LabwareDefinition2 } from '@opentrons/shared-data'
+import { PipetteEntities } from '@opentrons/step-generation'
+import { FormData } from '../../../../form-types'
+
+
+const fixtureTiprack300ul = _fixture_tiprack_300_ul as LabwareDefinition2
+
 describe('utils', () => {
   describe('volumeInCapacityForMulti', () => {
-    let sharedForm
-    let pipetteEntities
+    let sharedForm: FormData
+    let pipetteEntities: PipetteEntities
     beforeEach(() => {
+      // @ts-expect-error(sa, 2021-6-15): missing id, stepType for FormData
       sharedForm = {
         pipette: 'p300_single',
       }
       pipetteEntities = {
+        // @ts-expect-error(sa, 2021-6-15): missing name and id
         p300_single: {
           spec: fixtureP300Single,
-          tiprackLabwareDef: fixture_tiprack_300_ul,
+          tiprackLabwareDef: fixtureTiprack300ul,
         },
       }
     })

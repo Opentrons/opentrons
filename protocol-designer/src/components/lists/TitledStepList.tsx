@@ -2,17 +2,17 @@
 
 import * as React from 'react'
 import cx from 'classnames'
-import { Icon } from '@opentrons/components'
+import { Icon , IconName } from '@opentrons/components'
 import styles from './styles.css'
-import { IconName } from '@opentrons/components'
 
-export type Props = {
+
+export interface Props {
   /** text of title */
   title: string
   /** icon left of the step */
   iconName: IconName
   /** props passed down to icon (`className` and `name` are ignored) */
-  iconProps?: $Diff<React.ElementProps<typeof Icon>, { name: unknown }>
+  iconProps?: Omit<React.ComponentProps<typeof Icon>, 'name'>
   /** optional data test id for the container */
   'data-test'?: string
   /** children must all be `<li>` */
@@ -61,8 +61,8 @@ export function TitledStepList(props: Props): JSX.Element {
 
   // clicking on the carat will not call props.onClick,
   // so prevent bubbling up if there is an onCollapseToggle fn
-  const handleCollapseToggle = (e: React.MouseEvent) => {
-    if (onCollapseToggle) {
+  const handleCollapseToggle = (e: React.MouseEvent): void => {
+    if (onCollapseToggle != null) {
       e.stopPropagation()
       onCollapseToggle(e)
     }
@@ -76,7 +76,7 @@ export function TitledStepList(props: Props): JSX.Element {
     [styles.titled_list_selected]: props.selected,
     [styles.hover_border]: props.hovered,
   })
-
+ // @ts-expect-error(sa, 2021-6-14): cast props.onClick to a boolean
   const titleBarClass = cx(styles.step_title_bar, {
     [styles.clickable]: props.onClick,
     [styles.multiselect_title_bar]: props.isMultiSelectMode,
@@ -85,7 +85,7 @@ export function TitledStepList(props: Props): JSX.Element {
   const iconClass = cx(
     styles.title_bar_icon,
     styles.icon_left_of_title,
-    iconProps && iconProps.className
+    (iconProps != null) && iconProps.className
   )
 
   const multiSelectIconName = props.selected

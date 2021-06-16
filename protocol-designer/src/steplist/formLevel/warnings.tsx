@@ -58,6 +58,7 @@ const belowMinDisposalVolumeWarning = (min: number): FormWarning => ({
   body: (
     <React.Fragment>
       {i18n.t(`alert.form.warning.BELOW_MIN_DISPOSAL_VOLUME.body`)}
+      {/* @ts-expect-error(sa, 2021-6-14): provide className */}
       <KnowledgeBaseLink to="multiDispense">
         {i18n.t(`alert.form.warning.BELOW_MIN_DISPOSAL_VOLUME.link`)}
       </KnowledgeBaseLink>
@@ -67,7 +68,7 @@ const belowMinDisposalVolumeWarning = (min: number): FormWarning => ({
   dependentFields: ['disposalVolume_volume', 'pipette'],
 })
 
-export type WarningChecker = (val: unknown) => ?FormWarning
+export type WarningChecker = (val: unknown) => FormWarning | null | undefined
 
 /*******************
  ** Warning Checkers **
@@ -90,7 +91,7 @@ export const maxDispenseWellVolume = (
 ): FormWarning | null | undefined => {
   const { dispense_labware, dispense_wells, volume } = fields
   if (!dispense_labware || !dispense_wells) return null
-  const hasExceeded = dispense_wells.some(well => {
+  const hasExceeded = dispense_wells.some((well: string) => {
     const maximum = getWellTotalVolume(dispense_labware.def, well)
     return maximum && volume > maximum
   })
@@ -119,7 +120,7 @@ export const minDisposalVolume = (
 export const _minAirGapVolume = (
   checkboxField: 'aspirate_airGap_checkbox' | 'dispense_airGap_checkbox',
   volumeField: 'aspirate_airGap_volume' | 'dispense_airGap_volume'
-) => (fields: HydratedFormData): ?FormWarning => {
+) => (fields: HydratedFormData): FormWarning | null | undefined => {
   const checkboxValue = fields[checkboxField]
   const volumeValue = fields[volumeField]
   const { pipette } = fields
@@ -131,14 +132,14 @@ export const _minAirGapVolume = (
 
 export const minAspirateAirGapVolume: (
   fields: HydratedFormData
-) => ?FormWarning = _minAirGapVolume(
+) => FormWarning | null | undefined = _minAirGapVolume(
   'aspirate_airGap_checkbox',
   'aspirate_airGap_volume'
 )
 
 export const minDispenseAirGapVolume: (
   fields: HydratedFormData
-) => ?FormWarning = _minAirGapVolume(
+) => FormWarning | null | undefined = _minAirGapVolume(
   'dispense_airGap_checkbox',
   'dispense_airGap_volume'
 )
@@ -150,9 +151,11 @@ export const minDispenseAirGapVolume: (
 type ComposeWarnings = (
   ...warningCheckers: WarningChecker[]
 ) => (formData: unknown) => FormWarning[]
+// @ts-expect-error(sa, 2021-6-14): cannot modify return type of reduce without giving an initial value
 export const composeWarnings: ComposeWarnings = (
   ...warningCheckers: WarningChecker[]
 ) => formData =>
+  // @ts-expect-error(sa, 2021-6-14): cannot modify return type of reduce without giving an initial value
   warningCheckers.reduce((acc, checker) => {
     const possibleWarning = checker(formData)
     return possibleWarning ? [...acc, possibleWarning] : acc

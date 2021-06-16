@@ -20,7 +20,10 @@ import {
   volumeInCapacityForMulti,
   DISPOSAL_VOL_DIGITS,
 } from './utils'
-import { LabwareEntities, PipetteEntities } from '@opentrons/step-generation'
+import type {
+  LabwareEntities,
+  PipetteEntities,
+} from '@opentrons/step-generation'
 import { FormData, StepFieldName } from '../../../form-types'
 import { FormPatch } from '../../actions/types'
 import {
@@ -149,6 +152,7 @@ export function updatePatchPathField(
     appliedPatch.pipette in pipetteEntities
   ) {
     pipetteCapacityExceeded = !volumeInCapacityForMulti(
+      // @ts-expect-error(sa, 2021-6-14): appliedPatch is not of type FormData, address in #3161
       appliedPatch,
       pipetteEntities
     )
@@ -181,7 +185,7 @@ const updatePatchOnLabwareChange = (
   if (!sourceLabwareChanged && !destLabwareChanged) return patch
   const { id, stepType, ...stepData } = rawForm
   const appliedPatch = { ...(stepData as FormPatch), ...patch, id, stepType }
-  // $FlowFixMe(mc, 2020-02-19): appliedPatch.pipette is type ?unknown. Address in #3161
+  // @ts-expect-error(sa, 2021-6-14): appliedPatch.pipette is type ?unknown. Address in #3161
   const pipetteId: string = appliedPatch.pipette
   const sourceLabwarePatch: FormPatch = sourceLabwareChanged
     ? {
@@ -190,7 +194,7 @@ const updatePatchOnLabwareChange = (
           'aspirate_touchTip_mmFromBottom'
         ),
         aspirate_wells: getDefaultWells({
-          // $FlowFixMe(mc, 2020-02-19): appliedPatch.aspirate_labware is type ?unknown. Address in #3161
+          // @ts-expect-error(sa, 2021-6-14): appliedPatch.pipette is type ?unknown. Address in #3161
           labwareId: appliedPatch.aspirate_labware,
           pipetteId,
           labwareEntities,
@@ -205,7 +209,7 @@ const updatePatchOnLabwareChange = (
           'dispense_touchTip_mmFromBottom'
         ),
         dispense_wells: getDefaultWells({
-          // $FlowFixMe(mc, 2020-02-19): appliedPatch.aspirate_labware is type ?unknown. Address in #3161
+          // @ts-expect-error(sa, 2021-6-14): appliedPatch.pipette is type ?unknown. Address in #3161
           labwareId: appliedPatch.dispense_labware,
           pipetteId,
           labwareEntities,
@@ -220,7 +224,7 @@ const updatePatchOnPipetteChange = (
   patch: FormPatch,
   rawForm: FormData,
   pipetteEntities: PipetteEntities
-) => {
+): FormPatch => {
   // when pipette ID is changed (to another ID, or to null),
   // set any flow rates, mix volumes, or disposal volumes to null
   // and set air gap volume to default (= pipette minimum)
@@ -294,15 +298,20 @@ const clampDispenseAirGapVolume = (
 ): FormPatch => {
   const { id, stepType, ...stepData } = rawForm
   const appliedPatch = { ...(stepData as FormPatch), ...patch, id, stepType }
-  // $FlowFixMe(mc, 2020-02-19): appliedPatch.pipette is type ?unknown. Address in #3161
+  // @ts-expect-error(sa, 2021-6-14): appliedPatch.pipette does not exist. Address in #3161
   const pipetteId: string = appliedPatch.pipette
+  // @ts-expect-error(sa, 2021-6-14): appliedPatch.disposalVolume_checkbox does not exist. Address in #3161
   const disposalVolume = appliedPatch.disposalVolume_checkbox
+  // @ts-expect-error(sa, 2021-6-14): appliedPatch.disposalVolume_volume does not exist. Address in #3161
     ? Number(appliedPatch.disposalVolume_volume) || 0
     : 0
+    // @ts-expect-error(sa, 2021-6-14): appliedPatch.volume does not exist. Address in #3161
   const transferVolume = Number(appliedPatch.volume)
+  // @ts-expect-error(sa, 2021-6-14): appliedPatch.dispense_airGap_volume does not exist. Address in #3161
   const dispenseAirGapVolume = Number(appliedPatch.dispense_airGap_volume)
 
   if (
+    // @ts-expect-error(sa, 2021-6-14): appliedPatch.dispense_airGap_volume does not exist. Address in #3161
     appliedPatch.dispense_airGap_volume &&
     typeof pipetteId === 'string' &&
     pipetteId in pipetteEntities
@@ -312,6 +321,7 @@ const clampDispenseAirGapVolume = (
     const minAirGapVolume = 0 // NOTE: a form level warning will occur if the air gap volume is below the pipette min volume
 
     const maxAirGapVolume =
+    // @ts-expect-error(sa, 2021-6-14): appliedPatch.path does not exist. Address in #3161
       appliedPatch.path === 'multiDispense'
         ? capacity - disposalVolume - transferVolume
         : capacity
@@ -331,7 +341,7 @@ const updatePatchDisposalVolumeFields = (
   patch: FormPatch,
   rawForm: FormData,
   pipetteEntities: PipetteEntities
-) => {
+): FormPatch => {
   const { id, stepType, ...stepData } = rawForm
   const appliedPatch = { ...(stepData as FormPatch), ...patch, id, stepType }
   const pathChangedFromMultiDispense =
@@ -352,8 +362,10 @@ const updatePatchDisposalVolumeFields = (
 
   if (
     shouldReinitializeDisposalVolume &&
+    // @ts-expect-error(sa, 2021-6-14): appliedPatch.pipette does not exist. Address in #3161
     typeof appliedPatch.pipette === 'string'
   ) {
+    // @ts-expect-error(sa, 2021-6-14): appliedPatch.pipette does not exist. Address in #3161
     const pipetteEntity = pipetteEntities[appliedPatch.pipette]
     const pipetteSpec = getPipetteNameSpecs(pipetteEntity.name)
     const recommendedMinimumDisposalVol =
@@ -375,13 +387,15 @@ const clampDisposalVolume = (
   patch: FormPatch,
   rawForm: FormData,
   pipetteEntities: PipetteEntities
-) => {
+): FormPatch => {
   const { id, stepType, ...stepData } = rawForm
   const appliedPatch = { ...(stepData as FormPatch), ...patch, id, stepType }
+  // @ts-expect-error(sa, 2021-6-14): appliedPatch isn't well-typed, address in #3161
   const isDecimalString = appliedPatch.disposalVolume_volume === '.'
+  // @ts-expect-error(sa, 2021-6-14): appliedPatch isn't well-typed, address in #3161
   if (appliedPatch.path !== 'multiDispense' || isDecimalString) return patch
   const maxDisposalVolume = getMaxDisposalVolumeForMultidispense(
-    // $FlowFixMe(IL, 2021-03-22): appliedPath isn't well-typed, address in #3161
+    // @ts-expect-error(sa, 2021-6-14): appliedPatch isn't well-typed, address in #3161
     appliedPatch,
     pipetteEntities
   )
@@ -393,7 +407,7 @@ const clampDisposalVolume = (
     )
     return patch
   }
-
+  // @ts-expect-error(sa, 2021-6-14): appliedPatch.disposalVolume_volume does not exist. Address in #3161
   const candidateDispVolNum = Number(appliedPatch.disposalVolume_volume)
   const nextDisposalVolume = clamp(
     round(candidateDispVolNum, DISPOSAL_VOL_DIGITS),
@@ -414,6 +428,7 @@ const clampDisposalVolume = (
   return rawForm.path === 'multiDispense'
     ? {
         ...patch,
+        // @ts-expect-error(sa, 2021-6-14): appliedPatch.disposalVolume_checkbox does not exist. Address in #3161
         disposalVolume_volume: appliedPatch.disposalVolume_checkbox
           ? '0'
           : null,
@@ -426,7 +441,7 @@ const updatePatchOnPipetteChannelChange = (
   rawForm: FormData,
   labwareEntities: LabwareEntities,
   pipetteEntities: PipetteEntities
-) => {
+): FormPatch => {
   if (patch.pipette === undefined) return patch
   let update: FormPatch = {}
   const prevChannels = getChannels(rawForm.pipette, pipetteEntities)
@@ -441,18 +456,18 @@ const updatePatchOnPipetteChannelChange = (
 
   if (patch.pipette === null || singleToMulti) {
     // reset all well selection
-    // $FlowFixMe(mc, 2020-02-21): appliedPatch.pipette is type ?unknown. Address in #3161
+    // @ts-expect-error(sa, 2021-6-14): appliedPatch.pipette does not exist. Address in #3161
     const pipetteId: string = appliedPatch.pipette
     update = {
       aspirate_wells: getDefaultWells({
-        // $FlowFixMe(mc, 2020-02-21): appliedPatch.aspirate_labware is type ?unknown. Address in #3161
+        // @ts-expect-error(sa, 2021-6-14): appliedPatch.aspirate_labware does not exist. Address in #3161
         labwareId: appliedPatch.aspirate_labware,
         pipetteId,
         labwareEntities,
         pipetteEntities,
       }),
       dispense_wells: getDefaultWells({
-        // $FlowFixMe(mc, 2020-02-21): appliedPatch.dispense_labware is type ?unknown. Address in #3161
+        // @ts-expect-error(sa, 2021-6-14): appliedPatch.dispense_labware does not exist. Address in #3161
         labwareId: appliedPatch.dispense_labware,
         pipetteId,
         labwareEntities,
@@ -461,9 +476,9 @@ const updatePatchOnPipetteChannelChange = (
     }
   } else if (multiToSingle) {
     // multi-channel to single-channel: convert primary wells to all wells
-    // $FlowFixMe(mc, 2020-02-21): appliedPatch.aspirate_labware is type ?unknown. Address in #3161
+    // @ts-expect-error(sa, 2021-06-14): appliedPatch.aspirate_labware is type ?unknown. Address in #3161
     const sourceLabwareId: string = appliedPatch.aspirate_labware
-    // $FlowFixMe(mc, 2020-02-21): appliedPatch.dispense_labware is type ?unknown. Address in #3161
+    // @ts-expect-error(sa, 2021-06-14): appliedPatch.dispense_labware is type ?unknown. Address in #3161
     const destLabwareId: string = appliedPatch.dispense_labware
     const sourceLabware = sourceLabwareId && labwareEntities[sourceLabwareId]
     const sourceLabwareDef = sourceLabware && sourceLabware.def
@@ -471,13 +486,13 @@ const updatePatchOnPipetteChannelChange = (
     const destLabwareDef = destLabware && destLabware.def
     update = {
       aspirate_wells: getAllWellsFromPrimaryWells(
-        // $FlowFixMe(mc, 2020-02-21): appliedPatch.aspirate_wells is type ?unknown. Address in #3161
-        appliedPatch.aspirate_wells, // $FlowFixMe(mc, 2020-04-29): sourceLabwareDef is not typed properly. Address in #3161
+        // @ts-expect-error(sa, 2021-06-14): appliedPatch.aspirate_wells is type ?unknown. Address in #3161
+        appliedPatch.aspirate_wells, // @ts-expect-error(sa, 2021-06-14): sourceLabwareDef is not typed properly. Address in #3161
         sourceLabwareDef
       ),
       dispense_wells: getAllWellsFromPrimaryWells(
-        // $FlowFixMe(mc, 2020-02-21): appliedPatch.dispense_wells is type ?unknown. Address in #3161
-        appliedPatch.dispense_wells, // $FlowFixMe(mc, 2020-04-29): destLabwareDef is not typed properly. Address in #3161
+        // @ts-expect-error(sa, 2021-06-14): appliedPatch.dispense_wells is type ?unknown. Address in #3161
+        appliedPatch.dispense_wells, // @ts-expect-error(sa, 2021-06-14): destLabwareDef is not typed properly. Address in #3161
         destLabwareDef
       ),
     }
@@ -490,7 +505,6 @@ function updatePatchOnWellRatioChange(
   patch: FormPatch,
   rawForm: FormData
 ): FormPatch {
-  // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
   const appliedPatch = { ...rawForm, ...patch }
   const prevWellRatio = getWellRatio(
     rawForm.aspirate_wells,
@@ -557,6 +571,7 @@ export function updatePatchBlowoutFields(
   const appliedPatch = { ...(stepData as FormPatch), ...patch, id, stepType }
 
   if (fieldHasChanged(rawForm, patch, 'path')) {
+    // @ts-expect-error(sa, 2021-06-14): appliedPatch.blowout_location does not exist. Address in #3161
     const { path, blowout_location } = appliedPatch
     // reset blowout_location when path changes to avoid invalid location for path
     // or reset whenever checkbox is toggled

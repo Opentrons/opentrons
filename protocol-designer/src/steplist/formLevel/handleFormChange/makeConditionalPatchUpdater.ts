@@ -14,7 +14,11 @@ export type FieldUpdateMaps = Array<{
 // This style of updater is useful when the previous independent value matters
 type MakeConditionalPatchUpdater = (
   updateMaps: FieldUpdateMaps
-) => (prevValue: unknown, nextValue: unknown, dependentFields: {}) => {}
+) => (
+  prevValue: unknown,
+  nextValue: unknown,
+  dependentFields: { [value: string]: unknown }
+) => {}
 export const makeConditionalPatchUpdater: MakeConditionalPatchUpdater = updateMaps => (
   prevValue,
   nextValue,

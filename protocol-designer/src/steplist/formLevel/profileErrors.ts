@@ -1,13 +1,11 @@
 import uniqBy from 'lodash/uniqBy'
 import { THERMOCYCLER_PROFILE } from '../../constants'
-import { ProfileStepItem } from '../../form-types'
-import { PROFILE_STEP } from '../../form-types'
-import { Node } from 'react'
+import { PROFILE_STEP, ProfileStepItem } from '../../form-types'
 // TODO: real HydratedFormData type
 type HydratedFormData = any
-export type ProfileFormError = {
+export interface ProfileFormError {
   title: string
-  body?: Node
+  body?: React.ReactNode
   dependentProfileFields: string[]
 }
 type ProfileFormErrorKey = 'INVALID_PROFILE_DURATION'

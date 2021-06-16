@@ -1,4 +1,5 @@
 import { getNextDefaultEngageHeight } from '../'
+import { StepType } from '../../../../form-types'
 describe('getNextDefaultEngageHeight', () => {
   describe('no previous forms', () => {
     const testCases = [
@@ -10,7 +11,7 @@ describe('getNextDefaultEngageHeight', () => {
     testCases.forEach(({ testMsg, expected }) => {
       it(testMsg, () => {
         const savedForms = {}
-        const orderedStepIds = []
+        const orderedStepIds: string[] = []
         const result = getNextDefaultEngageHeight(savedForms, orderedStepIds)
         expect(result).toBe(expected)
       })
@@ -41,13 +42,13 @@ describe('getNextDefaultEngageHeight', () => {
         const savedForms = {
           e: {
             id: 'moduleId',
-            stepType: 'magnet',
+            stepType: 'magnet' as StepType,
             magnetAction: 'engage',
             engageHeight: 14,
           },
           d: {
             id: 'moduleId',
-            stepType: 'magnet',
+            stepType: 'magnet' as StepType,
             magnetAction: 'disengage',
           },
         }
