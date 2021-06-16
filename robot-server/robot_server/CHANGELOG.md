@@ -3,18 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [4.4.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v4.4.0-alpha.0...v4.4.0-alpha.1) (2021-06-10)
+# [4.4.0](https://github.com/Opentrons/opentrons/compare/v4.3.1...v4.4.0) (2021-06-16)
 
 
 ### Bug Fixes
 
 * **robot-server:** exempt /logs and RPC from version header requirement ([#7927](https://github.com/Opentrons/opentrons/issues/7927)) ([58eb503](https://github.com/Opentrons/opentrons/commit/58eb503))
-
-
-
-
-
-# [4.4.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v4.3.1...v4.4.0-alpha.0) (2021-06-08)
 
 
 ### Features

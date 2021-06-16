@@ -3,18 +3,7 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [4.4.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v4.4.0-alpha.0...v4.4.0-alpha.1) (2021-06-10)
-
-
-### Bug Fixes
-
-* **robot-server:** exempt /logs and RPC from version header requirement ([#7927](https://github.com/Opentrons/opentrons/issues/7927)) ([58eb503](https://github.com/Opentrons/opentrons/commit/58eb503))
-
-
-
-
-
-# [4.4.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v4.3.1...v4.4.0-alpha.0) (2021-06-08)
+# [4.4.0](https://github.com/Opentrons/opentrons/compare/v4.3.1...v4.4.0) (2021-06-16)
 
 
 ### Bug Fixes
@@ -24,6 +13,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 * **api:** do not cache removed modules in thread_manager ([#7690](https://github.com/Opentrons/opentrons/issues/7690)) ([ca47a9c](https://github.com/Opentrons/opentrons/commit/ca47a9c)), closes [#5359](https://github.com/Opentrons/opentrons/issues/5359)
 * **api:** eliminate implicit creations of ThreadManager objects to avoid thread leaks leading to unit tests hanging due to too many open file descriptors. ([#7641](https://github.com/Opentrons/opentrons/issues/7641)) ([d7e94ed](https://github.com/Opentrons/opentrons/commit/d7e94ed))
 * **api:** simulation allows aspirating and dispensing on a tip rack ([#7788](https://github.com/Opentrons/opentrons/issues/7788)) ([1d624d8](https://github.com/Opentrons/opentrons/commit/1d624d8))
+* **robot-server:** exempt /logs and RPC from version header requirement ([#7927](https://github.com/Opentrons/opentrons/issues/7927)) ([58eb503](https://github.com/Opentrons/opentrons/commit/58eb503))
 * **shared-data:** fix p1000_single_gen2 literal in type union ([#7675](https://github.com/Opentrons/opentrons/issues/7675)) ([72735c2](https://github.com/Opentrons/opentrons/commit/72735c2))
 
 
