@@ -50,5 +50,8 @@
     "ua-parser-js": "^0.7.23",
     "uuid": "3.3.2",
     "yup": "0.26.6"
+  },
+  "devDependencies": {
+    "@types/redux-actions": "^2.6.1"
   }
 }
