@@ -126,7 +126,7 @@ def test_get_hardware_pipette_raises_with_name_mismatch() -> None:
 
 
 def test_pipette_volume_raises_if_bad_id() -> None:
-    """get_aspirated_volume should return 0 for a new pipette."""
+    """get_aspirated_volume should raise if the given pipette doesn't exist"""
     subject = get_pipette_view()
 
     with pytest.raises(errors.PipetteDoesNotExistError):
