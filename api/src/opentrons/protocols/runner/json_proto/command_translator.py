@@ -1,4 +1,4 @@
-from typing import Dict, Iterable
+from typing import Dict, Iterable, List
 
 import opentrons.types
 
@@ -25,7 +25,7 @@ class CommandTranslatorError(Exception):
     pass
 
 
-ReturnType = Iterable[CommandRequestType]
+PECommands = Iterable[CommandRequestType]
 
 
 class CommandTranslator:
@@ -35,25 +35,31 @@ class CommandTranslator:
         """Construct a command translator"""
         pass
 
-    def translate(self, protocol: JsonProtocol) -> ReturnType:
-        result = []
+    def translate(self, protocol: JsonProtocol) -> PECommands:
+        """Return all Protocol Engine commands required to run the given protocol."""
+        result: List[CommandRequestType] = []
 
         for pipette_id, pipette in protocol.pipettes.items():
-            result += [self._translate_pipette(pipette, pipette_id)]
+            result += [self._translate_load_pipette(pipette_id, pipette)]
 
-        for labware_uri, labware_definition in protocol.labwareDefinitions.items():
-            result += [self._translate_labware_definition(labware_definition)]
-        for pd_labware_id, labware in protocol.labware.items():
-            # To do: Rename pd_labware_id
-            result += [self._translate_labware(
-                pd_labware_id, labware, protocol.labwareDefinitions
-            )]
+        for definition_id, definition in protocol.labwareDefinitions.items():
+            result += [self._translate_add_labware_definition(definition)]
+
+        for labware_id, labware in protocol.labware.items():
+            result += [
+                self._translate_load_labware(
+                    labware_id, labware, protocol.labwareDefinitions
+                )
+            ]
+
+        for command in protocol.commands:
+            result += self._translate_command(command)
 
         return result
 
     def _translate_command(
             self,
-            command: models.json_protocol.AllCommands) -> ReturnType:
+            command: models.json_protocol.AllCommands) -> PECommands:
         """
         Args:
             command: The PD/JSON command to translate
@@ -72,35 +78,42 @@ class CommandTranslator:
             raise CommandTranslatorError(
                 f"Cannot find handler for '{command.command}'.")
 
-    def _translate_labware_definition(self, labware_definition: LabwareDefinition):
+    def _translate_add_labware_definition(
+            self,
+            labware_definition: LabwareDefinition) -> AddLabwareDefinitionRequest:
         return AddLabwareDefinitionRequest(definition=labware_definition)
 
-    def _translate_labware(
+    def _translate_load_labware(
             self,
-            labware_id_to_translate: str,
-            labware_to_translate: models.json_protocol.Labware,
-            labware_definitions: Dict[str, LabwareDefinition]
-    ):  # To do: Type
-        definition = labware_definitions[labware_to_translate.definitionId]
-        load_name = definition.parameters.loadName
+            labware_id: str,
+            labware: models.json_protocol.Labware,
+            labware_definitions: Dict[str, LabwareDefinition]) -> LoadLabwareRequest:
+        """
+        Args:
+            labware_id:
+                The ID that the JSON protocol's commands will use to refer to this
+                labware placement.
+            labware:
+                The JSON protocol's details about this labware placement, including
+                which deck slot it should go in, and a pointer to a labware definition.
+            labware_definitions:
+                The JSON protocol's collection of labware definitions.
+        """
+        definition = labware_definitions[labware.definitionId]
         return LoadLabwareRequest(
             location=pe.DeckSlotLocation(
-                # To do: Is this right?
-                slot=opentrons.types.DeckSlotName.from_primitive(
-                    labware_to_translate.slot
-                )
+                slot=opentrons.types.DeckSlotName.from_primitive(labware.slot)
             ),
-            loadName=load_name,
+            loadName=definition.parameters.loadName,
             namespace=definition.namespace,
             version=definition.version,
-            labwareId=labware_id_to_translate
+            labwareId=labware_id
         )
 
-    def _translate_pipette(
-        self,
-        pipette: models.json_protocol.Pipettes,
-        pipette_id: str
-    ):  # To do: Type.
+    def _translate_load_pipette(
+            self,
+            pipette_id: str,
+            pipette: models.json_protocol.Pipettes) -> LoadPipetteRequest:
         return LoadPipetteRequest(
             pipetteName=pe.PipetteName(pipette.name),
             # todo(mm, 2021-06-16): Should protocol_engine re-export MountType?
@@ -110,7 +123,7 @@ class CommandTranslator:
 
     def _aspirate(
             self,
-            command: models.json_protocol.LiquidCommand) -> ReturnType:
+            command: models.json_protocol.LiquidCommand) -> PECommands:
         """
         Translate an aspirate JSON command to a protocol engine aspirate request.
 
@@ -137,7 +150,7 @@ class CommandTranslator:
 
     def _dispense(
             self,
-            command: models.json_protocol.LiquidCommand) -> ReturnType:
+            command: models.json_protocol.LiquidCommand) -> PECommands:
         """
         Translate a dispense JSON command to a protocol engine dispense request.
 
@@ -161,22 +174,22 @@ class CommandTranslator:
 
     def _air_gap(
             self,
-            command: models.json_protocol.LiquidCommand) -> ReturnType:
+            command: models.json_protocol.LiquidCommand) -> PECommands:
         raise NotImplementedError()
 
     def _blowout(
             self,
-            command: models.json_protocol.BlowoutCommand) -> ReturnType:
+            command: models.json_protocol.BlowoutCommand) -> PECommands:
         raise NotImplementedError()
 
     def _touch_tip(
             self,
-            command: models.json_protocol.TouchTipCommand) -> ReturnType:
+            command: models.json_protocol.TouchTipCommand) -> PECommands:
         raise NotImplementedError()
 
     def _pick_up(
             self,
-            command: models.json_protocol.PickUpDropTipCommand) -> ReturnType:
+            command: models.json_protocol.PickUpDropTipCommand) -> PECommands:
         """
         Translate a pick_up_tip JSON command to a protocol engine pick_up_tip request.
 
@@ -195,7 +208,7 @@ class CommandTranslator:
 
     def _drop_tip(
             self,
-            command: models.json_protocol.PickUpDropTipCommand) -> ReturnType:
+            command: models.json_protocol.PickUpDropTipCommand) -> PECommands:
         """
         Translate a drop tip JSON command to a protocol engine drop tip request.
 
@@ -215,102 +228,102 @@ class CommandTranslator:
 
     def _move_to_slot(
             self,
-            command: models.json_protocol.MoveToSlotCommand) -> ReturnType:
+            command: models.json_protocol.MoveToSlotCommand) -> PECommands:
         raise NotImplementedError()
 
     def _delay(
             self,
-            command: models.json_protocol.DelayCommand) -> ReturnType:
+            command: models.json_protocol.DelayCommand) -> PECommands:
         raise NotImplementedError()
 
     def _magnetic_module_engage(
             self,
-            command: models.json_protocol.MagneticModuleEngageCommand) -> ReturnType:
+            command: models.json_protocol.MagneticModuleEngageCommand) -> PECommands:
         raise NotImplementedError()
 
     def _magnetic_module_disengage(
             self,
-            command: models.json_protocol.MagneticModuleDisengageCommand) -> ReturnType:
+            command: models.json_protocol.MagneticModuleDisengageCommand) -> PECommands:
         raise NotImplementedError()
 
     def _temperature_module_set_target(
             self,
             command: models.json_protocol.TemperatureModuleSetTargetCommand
-            ) -> ReturnType:
+            ) -> PECommands:
         raise NotImplementedError()
 
     def _temperature_module_await_temperature(
             self,
             command: models.json_protocol.TemperatureModuleAwaitTemperatureCommand
-            ) -> ReturnType:
+            ) -> PECommands:
         raise NotImplementedError()
 
     def _temperature_module_deactivate(
             self,
             command: models.json_protocol.TemperatureModuleDeactivateCommand
-            ) -> ReturnType:
+            ) -> PECommands:
         raise NotImplementedError()
 
     def _thermocycler_set_target_block_temperature(
             self,
             command: models.json_protocol.ThermocyclerSetTargetBlockTemperatureCommand
-            ) -> ReturnType:
+            ) -> PECommands:
         raise NotImplementedError()
 
     def _thermocycler_set_target_lid_temperature(
             self,
             command: models.json_protocol.ThermocyclerSetTargetLidTemperatureCommand
-            ) -> ReturnType:
+            ) -> PECommands:
         raise NotImplementedError()
 
     def _thermocycler_await_block_temperature(
             self,
             command: models.json_protocol.ThermocyclerAwaitBlockTemperatureCommand
-            ) -> ReturnType:
+            ) -> PECommands:
         raise NotImplementedError()
 
     def _thermocycler_await_lid_temperature(
             self,
             command: models.json_protocol.ThermocyclerAwaitLidTemperatureCommand
-            ) -> ReturnType:
+            ) -> PECommands:
         raise NotImplementedError()
 
     def _thermocycler_deactivate_block(
             self,
             command: models.json_protocol.ThermocyclerDeactivateBlockCommand
-            ) -> ReturnType:
+            ) -> PECommands:
         raise NotImplementedError()
 
     def _thermocycler_deactivate_lid(
             self,
             command: models.json_protocol.ThermocyclerDeactivateLidCommand
-            ) -> ReturnType:
+            ) -> PECommands:
         raise NotImplementedError()
 
     def _thermocycler_open_lid(
             self,
-            command: models.json_protocol.ThermocyclerOpenLidCommand) -> ReturnType:
+            command: models.json_protocol.ThermocyclerOpenLidCommand) -> PECommands:
         raise NotImplementedError()
 
     def _thermocycler_close_lid(
             self,
-            command: models.json_protocol.ThermocyclerCloseLidCommand) -> ReturnType:
+            command: models.json_protocol.ThermocyclerCloseLidCommand) -> PECommands:
         raise NotImplementedError()
 
     def _thermocycler_run_profile(
             self,
-            command: models.json_protocol.ThermocyclerRunProfile) -> ReturnType:
+            command: models.json_protocol.ThermocyclerRunProfile) -> PECommands:
         raise NotImplementedError()
 
     def _thermocycler_await_profile_complete(
             self,
             command: models.json_protocol.ThermocyclerAwaitProfileCompleteCommand
-            ) -> ReturnType:
+            ) -> PECommands:
         raise NotImplementedError()
 
     def _move_to_well(
             self,
-            command: models.json_protocol.MoveToWellCommand) -> ReturnType:
+            command: models.json_protocol.MoveToWellCommand) -> PECommands:
         raise NotImplementedError()
 
     _COMMAND_TO_NAME: Dict[str, str] = {
