@@ -134,7 +134,7 @@ def _assert_appear_in_order(
     """
     element_indexes = [source.index(element) for element in elements]
     assert sorted(element_indexes) == element_indexes
-    
+
 
 def test_translates_labware_commands(
     subject: CommandTranslator,
@@ -143,7 +143,7 @@ def test_translates_labware_commands(
     minimal_labware_def2: dict,
 ) -> None:
     result = subject.translate(json_protocol)
-    
+
     expected_add_definition_request_1 = AddLabwareDefinitionRequest(
         definition=LabwareDefinition.parse_obj(minimal_labware_def)
     )
@@ -154,7 +154,7 @@ def test_translates_labware_commands(
         version=minimal_labware_def["version"],
         labwareId="tiprack1Id"
     )
-    
+
     expected_add_definition_request_2 = AddLabwareDefinitionRequest(
         definition=LabwareDefinition.parse_obj(minimal_labware_def2)
     )
