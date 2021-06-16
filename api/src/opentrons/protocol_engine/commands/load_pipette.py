@@ -16,7 +16,7 @@ class LoadPipetteRequest(BaseModel):
 
     pipetteName: PipetteName = Field(
         ...,
-        description="The name of the pipette to be required.",
+        description="The load name of the pipette to be required.",
     )
     mount: MountType = Field(
         ...,
