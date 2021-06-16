@@ -1,6 +1,4 @@
-import decoy
 import pytest
-
 
 from opentrons import protocol_engine
 
@@ -13,8 +11,6 @@ from opentrons.protocol_engine.commands import (
     PickUpTipRequest,
     DropTipRequest,
 )
-
-import opentrons.protocols.models
 
 # To do: Redundant imports
 from opentrons.protocols.models import json_protocol as models
