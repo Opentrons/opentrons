@@ -23,7 +23,10 @@ interface Props {
   }) => React.ReactNode
 }
 
-interface Position { left: number | null; top: number | null }
+interface Position {
+  left: number | null
+  top: number | null
+}
 
 export const ContextMenu = (props: Props): JSX.Element => {
   const dispatch = useDispatch()
@@ -43,8 +46,8 @@ export const ContextMenu = (props: Props): JSX.Element => {
   const isMultiSelectMode = useSelector(getIsMultiSelectMode)
 
   React.useEffect(() => {
-    global.addEventListener('click', handleClick)
-    return () => global.removeEventListener('click', handleClick)
+    window.addEventListener('click', handleClick)
+    return () => window.removeEventListener('click', handleClick)
   })
 
   const makeHandleContextMenu = (stepId: StepIdType) => (event: MouseEvent) => {
@@ -125,7 +128,10 @@ export const ContextMenu = (props: Props): JSX.Element => {
           <React.Fragment>
             <div
               ref={menuRoot}
-              style={{ left: position.left, top: position.top }}
+              style={{
+                left: position.left ?? undefined,
+                top: position.top ?? undefined,
+              }}
               className={styles.context_menu}
             >
               <div

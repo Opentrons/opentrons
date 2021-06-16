@@ -34,7 +34,7 @@ function mapStateToProps(state: BaseState): SP {
 function mergeProps(
   stateProps: SP,
   dispatchProps: {
-    dispatch: Dispatch<any>
+    dispatch: Dispatch<*>
   }
 ): Props {
   const { dispatch } = dispatchProps

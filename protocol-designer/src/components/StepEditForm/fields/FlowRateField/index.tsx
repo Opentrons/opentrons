@@ -67,14 +67,7 @@ const mergeProps = (stateProps: SP, dispatchProps, ownProps: OP): Props => {
   return { ...stateProps, ...passThruProps }
 }
 
-export const FlowRateField: React.AbstractComponent<OP> = connect<
-  Props,
-  OP,
-  SP,
-  {},
-  _,
-  _
->(
+export const FlowRateField = connect(
   mapStateToProps,
   null,
   mergeProps

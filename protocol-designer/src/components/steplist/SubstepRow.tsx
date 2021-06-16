@@ -164,6 +164,6 @@ function SubstepRowComponent(props: SubstepRowProps) {
   )
 }
 
-export const SubstepRow: React.AbstractComponent<SubstepRowProps> = React.memo(
+export const SubstepRow = React.memo(
   SubstepRowComponent
 )

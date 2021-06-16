@@ -104,14 +104,7 @@ const mergeProps = (
   }
 }
 
-export const FormAlerts: React.AbstractComponent<OP> = connect<
-  Props,
-  OP,
-  SP,
-  {},
-  _,
-  _
->(
+export const FormAlerts =connect(
   mapStateToProps,
   null,
   mergeProps

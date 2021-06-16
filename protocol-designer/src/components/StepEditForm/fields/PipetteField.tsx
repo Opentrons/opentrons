@@ -18,14 +18,7 @@ const PipetteFieldSTP = (state: BaseState, ownProps: OP): SP => ({
   pipetteOptions: stepFormSelectors.getEquippedPipetteOptions(state),
 })
 
-export const PipetteField: React.AbstractComponent<OP> = connect<
-  Props,
-  OP,
-  SP,
-  _,
-  _,
-  _
->(PipetteFieldSTP)((props: Props) => {
+export const PipetteField = connect(PipetteFieldSTP)((props: Props) => {
   const { onFieldBlur, onFieldFocus, updateValue, value } = props
 
   return (

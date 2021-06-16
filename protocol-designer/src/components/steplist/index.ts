@@ -1,3 +1,3 @@
-import { StepItem } from './StepItem'
-import { StepList } from './StepList'
-export { StepItem, StepList }
+import { StepItem, StepItemProps } from './StepItem'
+import { StepList, StepListProps } from './StepList'
+export { StepItem, StepListProps, StepList, StepItemProps }

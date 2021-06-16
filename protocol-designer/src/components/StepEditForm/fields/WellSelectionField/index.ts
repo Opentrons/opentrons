@@ -64,14 +64,7 @@ function mergeProps(
   }
 }
 
-export const WellSelectionField: React.AbstractComponent<OP> = connect<
-  Props,
-  OP,
-  SP,
-  {},
-  _,
-  _
->(
+export const WellSelectionField=connect(
   mapStateToProps,
   null,
   mergeProps

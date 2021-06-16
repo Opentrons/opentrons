@@ -22,7 +22,7 @@ type SourceDestSubstepProps = StepSubItemProps & {
   hoveredSubstep?: SubstepIdentifier | null
 }
 
-export function SourceDestSubstep(props: SourceDestSubstepProps): JSX.Element {
+export function SourceDestSubstep(props: SourceDestSubstepProps): JSX.Element | JSX.Element[] {
   const { substeps, selectSubstep, hoveredSubstep } = props
   if (substeps.multichannel) {
     // multi-channel row item (collapsible)
@@ -48,7 +48,7 @@ export function SourceDestSubstep(props: SourceDestSubstepProps): JSX.Element {
   }
 
   // single-channel row item
-  return substeps.rows.map<React.ReactNode>((row, substepIndex) => (
+  return substeps.rows.map<JSX.Element>((row, substepIndex) => (
     <SubstepRow
       key={substepIndex}
       className={cx(styles.step_subitem, {

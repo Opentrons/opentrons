@@ -22,13 +22,13 @@ import { TerminalItemId } from '../../../steplist'
 
 export { TerminalItemLink } from './TerminalItemLink'
 
-interface Props {
+export interface TerminalItemProps {
   children?: React.ReactNode
   id: TerminalItemId
   title: string
 }
 
-export const TerminalItem = (props: Props): JSX.Element => {
+export const TerminalItem = (props: TerminalItemProps): JSX.Element => {
   const { id, title, children } = props
   // const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false)
 

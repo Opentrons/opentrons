@@ -15,21 +15,26 @@ import {
   CLOSE_STEP_FORM_WITH_CHANGES,
 } from '../../../components/modals/ConfirmDeleteModal'
 import { PDTitledList } from '../../lists'
-import { TerminalItem } from '../TerminalItem'
+import { TerminalItem, TerminalItemProps } from '../TerminalItem'
 
 jest.mock('../../../step-forms/selectors/index.js')
 jest.mock('../../../ui/steps/selectors.js')
 
-const getCurrentFormIsPresavedMock = stepFormSelectors.getCurrentFormIsPresaved
-const getCurrentFormHasUnsavedChangesMock =
-  stepFormSelectors.getCurrentFormHasUnsavedChanges
-const getIsMultiSelectModeMock = uiStepSelectors.getIsMultiSelectMode
+const getCurrentFormIsPresavedMock = stepFormSelectors.getCurrentFormIsPresaved as jest.MockedFunction<
+  typeof stepFormSelectors.getCurrentFormIsPresaved
+>
+const getCurrentFormHasUnsavedChangesMock = stepFormSelectors.getCurrentFormHasUnsavedChanges as jest.MockedFunction<
+  typeof stepFormSelectors.getCurrentFormHasUnsavedChanges
+>
+const getIsMultiSelectModeMock = uiStepSelectors.getIsMultiSelectMode as jest.MockedFunction<
+  typeof uiStepSelectors.getIsMultiSelectMode
+>
 
 const mockStore = configureMockStore([thunk])
 
 describe('TerminalItem', () => {
-  let store
-  let props
+  let store: any
+  let props: TerminalItemProps
   beforeEach(() => {
     props = {
       id: '__initial_setup__',

@@ -217,14 +217,7 @@ const mergeProps = (
   }
 }
 
-export const EditPipettesModal: React.AbstractComponent<OP> = connect<
-  Props,
-  OP,
-  SP,
-  {},
-  _,
-  _
->(
+export const EditPipettesModal = connect(
   mapSTP,
   null,
   mergeProps

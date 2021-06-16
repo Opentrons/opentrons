@@ -146,11 +146,4 @@ const mapSTP = (state: BaseState, ownProps: OP): SP => {
   }
 }
 
-export const TipPositionField: React.AbstractComponent<OP> = connect<
-  Props,
-  OP,
-  SP,
-  _,
-  _,
-  _
->(mapSTP, () => ({}))(TipPositionInput)
+export const TipPositionField = connect(mapSTP, () => ({}))(TipPositionInput)

@@ -38,11 +38,4 @@ function mapSTP(state: BaseState, ownProps: OP): SP {
   }
 }
 
-export const PathField: React.AbstractComponent<OP> = connect<
-  Props,
-  OP,
-  SP,
-  _,
-  _,
-  _
->(mapSTP, () => ({}))(Path)
+export const PathField = connect(mapSTP, () => ({}))(Path)

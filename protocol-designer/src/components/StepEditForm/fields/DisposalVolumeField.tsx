@@ -145,11 +145,4 @@ const mapSTP = (state: BaseState, ownProps: OP): SP => {
   }
 }
 
-export const DisposalVolumeField: React.AbstractComponent<OP> = connect<
-  Props,
-  OP,
-  SP,
-  _,
-  _,
-  _
->(mapSTP)(DisposalVolumeFieldComponent)
+export const DisposalVolumeField = connect(mapSTP)(DisposalVolumeFieldComponent)

@@ -82,11 +82,11 @@ export const StepSelectionBannerComponent = (
 ): JSX.Element => {
   const { countPerStepType, handleExitBatchEdit } = props
   const numSteps = Object.keys(countPerStepType).reduce<number>(
-    (acc, stepType) => acc + countPerStepType[stepType],
+    (acc, stepType) => acc + countPerStepType[stepType as StepType],
     0
   )
 
-  const stepTypes: StepType[] = Object.keys(countPerStepType).sort()
+  const stepTypes: StepType[] = Object.keys(countPerStepType).sort() as StepType[]
 
   return (
     <Box

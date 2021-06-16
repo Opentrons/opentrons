@@ -44,14 +44,7 @@ interface DP {
   onCancel: () => unknown
   _createNewProtocol: (arg0: CreateNewProtocolArgs) => void
 }
-export const NewFileModal: React.AbstractComponent<OP> = connect<
-  Props,
-  OP,
-  SP,
-  DP,
-  _,
-  _
->(
+export const NewFileModal = connect(
   mapStateToProps,
   mapDispatchToProps,
   mergeProps

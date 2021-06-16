@@ -36,8 +36,8 @@ type Props = {
   action?: string
   moduleType: ModuleRealType
   actionText: string
-  labwareNickname: string | null | undefined
-  message: string | null | undefined
+  labwareNickname?: string | null
+  message?: string | null
   children?: React.ReactNode
   hideHeader?: boolean
 }
