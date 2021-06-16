@@ -3,6 +3,40 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.4.0](https://github.com/Opentrons/opentrons/compare/v4.3.1...v4.4.0) (2021-06-16)
+
+
+### Bug Fixes
+
+* **api:** add pause manager to separate pause and delay ([#7773](https://github.com/Opentrons/opentrons/issues/7773)) ([af1a29a](https://github.com/Opentrons/opentrons/commit/af1a29a))
+* **api:** Correct some type annotations in `ProtocolContext` ([#7701](https://github.com/Opentrons/opentrons/issues/7701)) ([6f01726](https://github.com/Opentrons/opentrons/commit/6f01726))
+* **api:** do not cache removed modules in thread_manager ([#7690](https://github.com/Opentrons/opentrons/issues/7690)) ([ca47a9c](https://github.com/Opentrons/opentrons/commit/ca47a9c)), closes [#5359](https://github.com/Opentrons/opentrons/issues/5359)
+* **api:** simulation allows aspirating and dispensing on a tip rack ([#7788](https://github.com/Opentrons/opentrons/issues/7788)) ([1d624d8](https://github.com/Opentrons/opentrons/commit/1d624d8))
+
+
+### Features
+
+* **api:** allow labware calibration on non liquid handling events ([#7812](https://github.com/Opentrons/opentrons/issues/7812)) ([26567f4](https://github.com/Opentrons/opentrons/commit/26567f4))
+* **api:** CommandTranslator._aspirate implemented. ([#7722](https://github.com/Opentrons/opentrons/issues/7722)) ([24d6f15](https://github.com/Opentrons/opentrons/commit/24d6f15)), closes [#7434](https://github.com/Opentrons/opentrons/issues/7434)
+* **api:** CommandTranslator._dispense implemented. ([#7734](https://github.com/Opentrons/opentrons/issues/7734)) ([5c1b694](https://github.com/Opentrons/opentrons/commit/5c1b694)), closes [#7435](https://github.com/Opentrons/opentrons/issues/7435)
+* **api:** CommandTranslator._drop_tip implemented. ([#7743](https://github.com/Opentrons/opentrons/issues/7743)) ([08e9a1e](https://github.com/Opentrons/opentrons/commit/08e9a1e)), closes [#7433](https://github.com/Opentrons/opentrons/issues/7433)
+* **api:** expand emulators and integration tests. ([#7739](https://github.com/Opentrons/opentrons/issues/7739)) ([448325a](https://github.com/Opentrons/opentrons/commit/448325a))
+* **api:** implement CommandTranslator._pick_up ([#7744](https://github.com/Opentrons/opentrons/issues/7744)) ([d3552eb](https://github.com/Opentrons/opentrons/commit/d3552eb))
+* **api:** implement JsonFileRunner ([#7797](https://github.com/Opentrons/opentrons/issues/7797)) ([6209f71](https://github.com/Opentrons/opentrons/commit/6209f71))
+* **api:** JSON protocol labware loading support in Protocol Engine ([#7762](https://github.com/Opentrons/opentrons/issues/7762)) ([8bbb5ef](https://github.com/Opentrons/opentrons/commit/8bbb5ef)), closes [#7429](https://github.com/Opentrons/opentrons/issues/7429)
+* **api:** JSON protocol pipette loading support in Protocol Engine  ([#7766](https://github.com/Opentrons/opentrons/issues/7766)) ([7aa9034](https://github.com/Opentrons/opentrons/commit/7aa9034)), closes [#7430](https://github.com/Opentrons/opentrons/issues/7430)
+* **api,robot-server:** Add Dockerfile and docker-compose file ([#7836](https://github.com/Opentrons/opentrons/issues/7836)) ([f89a660](https://github.com/Opentrons/opentrons/commit/f89a660)), closes [#7674](https://github.com/Opentrons/opentrons/issues/7674)
+* **api,robot-server:** hardware emulation integration ([#7821](https://github.com/Opentrons/opentrons/issues/7821)) ([e21b870](https://github.com/Opentrons/opentrons/commit/e21b870))
+* **emulator:** allow overriding pipettes used by smoothie emulator ([#7868](https://github.com/Opentrons/opentrons/issues/7868)) ([de05ed1](https://github.com/Opentrons/opentrons/commit/de05ed1))
+* **protocol-engine:** add load_pipette method to engine-backed ProtocolContext ([#7676](https://github.com/Opentrons/opentrons/issues/7676)) ([7ca8f76](https://github.com/Opentrons/opentrons/commit/7ca8f76)), closes [#7437](https://github.com/Opentrons/opentrons/issues/7437)
+* **protocol-engine:** InstrumentContext implements dispense ([#7640](https://github.com/Opentrons/opentrons/issues/7640)) ([a4a2d11](https://github.com/Opentrons/opentrons/commit/a4a2d11))
+* **protocol-engine:** Support `InstrumentContext.aspirate()` ([#7630](https://github.com/Opentrons/opentrons/issues/7630)) ([6e259f2](https://github.com/Opentrons/opentrons/commit/6e259f2))
+* **robot-server:** http protocol upload supports custom labware. ([#7694](https://github.com/Opentrons/opentrons/issues/7694)) ([4ad824c](https://github.com/Opentrons/opentrons/commit/4ad824c)), closes [#7148](https://github.com/Opentrons/opentrons/issues/7148)
+
+
+
+
+
 ## [4.3.1](https://github.com/Opentrons/opentrons/compare/v4.3.0...v4.3.1) (2021-05-10)
 
 ### Bug Fixes

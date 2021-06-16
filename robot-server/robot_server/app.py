@@ -2,14 +2,13 @@
 import logging
 
 from opentrons import __version__
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import Response
 from starlette.requests import Request
 from starlette.middleware.base import RequestResponseEndpoint
 
 from .service.dependencies import (
-    check_version_header,
     get_rpc_server,
     get_protocol_manager,
     get_hardware_wrapper,
@@ -53,10 +52,7 @@ app.add_middleware(
 )
 
 # main router
-app.include_router(
-    router=router,
-    dependencies=[Depends(check_version_header)],
-)
+app.include_router(router=router)
 
 
 @app.on_event("startup")

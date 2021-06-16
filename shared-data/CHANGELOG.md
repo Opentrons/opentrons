@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.4.0](https://github.com/Opentrons/opentrons/compare/v4.3.1...v4.4.0) (2021-06-16)
+
+
+### Bug Fixes
+
+* **shared-data:** fix p1000_single_gen2 literal in type union ([#7675](https://github.com/Opentrons/opentrons/issues/7675)) ([72735c2](https://github.com/Opentrons/opentrons/commit/72735c2))
+
+
+
+
+
 ## [4.3.1](https://github.com/Opentrons/opentrons/compare/v4.3.0...v4.3.1) (2021-05-10)
 
 **Note:** Version bump only for package @opentrons/shared-data
