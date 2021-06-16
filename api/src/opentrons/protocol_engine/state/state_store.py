@@ -9,7 +9,7 @@ from ..resources import DeckFixedLabware
 from .substore import CommandReactive
 from .commands import CommandStore, CommandState
 from .labware import LabwareStore, LabwareView
-from .pipettes import PipetteStore, PipetteState
+from .pipettes import PipetteStore, PipetteView
 from .geometry import GeometryStore, GeometryState
 from .motion import MotionStore, MotionState
 
@@ -60,7 +60,7 @@ class StateView:
         return self._labware_store.state
 
     @property
-    def pipettes(self) -> PipetteState:
+    def pipettes(self) -> PipetteView:
         """Get pipettes sub-state."""
         return self._pipette_store.state
 
@@ -116,7 +116,6 @@ class StateStore(StateView):
         self._lifecycle_substores: List[CommandReactive] = [
             labware_store,
             pipette_store,
-            motion_store,
         ]
 
     def handle_command(self, command: cmd.CommandType, command_id: str) -> None:
