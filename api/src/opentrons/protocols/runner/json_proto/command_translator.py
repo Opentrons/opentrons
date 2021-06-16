@@ -1,4 +1,4 @@
-from typing import Dict, Iterable, cast
+from typing import Dict, Iterable
 
 import opentrons.types
 
@@ -102,10 +102,9 @@ class CommandTranslator:
         pipette_id: str
     ):  # To do: Type.
         return LoadPipetteRequest(
-            # Rely on Pydantic to validate these casts at runtime.
-            pipetteName=cast(pe.PipetteName, pipette.name),
+            pipetteName=pe.PipetteName(pipette.name),
             # todo(mm, 2021-06-16): Should protocol_engine re-export MountType?
-            mount=cast(opentrons.types.MountType, pipette.mount),
+            mount=opentrons.types.MountType(pipette.mount),
             pipetteId=pipette_id
         )
 
