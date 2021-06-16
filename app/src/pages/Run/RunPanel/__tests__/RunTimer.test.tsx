@@ -43,10 +43,16 @@ describe('RunTimer component', () => {
     runSeconds = 0,
     startTime = new Date('2020-01-01').getTime(),
   }: Partial<Environment> = {}): Environment {
+    const now = (startTime as number) + 1000
+    Date.now = jest.fn(() => now)
     when(getIsPausedMock).calledWith(MOCKED_STATE).mockReturnValue(isPaused)
     when(getStartTimeMsMock).calledWith(MOCKED_STATE).mockReturnValue(startTime)
-    getPausedSecondsMock.mockReturnValue(pausedSeconds)
-    getRunSecondsMock.mockReturnValue(runSeconds)
+    when(getPausedSecondsMock)
+      .calledWith(MOCKED_STATE, now)
+      .mockReturnValue(pausedSeconds)
+    when(getRunSecondsMock)
+      .calledWith(MOCKED_STATE, now)
+      .mockReturnValue(runSeconds)
     return { isPaused, pausedSeconds, runSeconds, startTime }
   }
 
@@ -59,23 +65,21 @@ describe('RunTimer component', () => {
 
   it('properly render the start time', () => {
     const { startTime } = mockEnvironment()
-    formatTimeMock.mockReturnValue('7:00 PM')
+    when(formatTimeMock).calledWith(startTime).mockReturnValue('7:00 PM')
     const { wrapper } = render()
     expect(wrapper.html()).toContain(`Start Time: 7:00 PM`)
-    expect(formatTimeMock).toBeCalledWith(startTime)
   })
 
   it(`should headline the run time when not paused`, () => {
     const { runSeconds } = mockEnvironment({ isPaused: false, runSeconds: 10 })
-    formatSecondsMock.mockReturnValue('00:00:10')
+    when(formatSecondsMock).calledWith(runSeconds).mockReturnValue('00:00:10')
     const { wrapper } = render()
     expect(wrapper.html()).toContain('<p>Total Runtime: </p>00:00:10')
-    expect(formatSecondsMock).toBeCalledWith(runSeconds)
   })
 
   it(`should present a less distinguished run time when paused`, () => {
-    mockEnvironment({ isPaused: true, runSeconds: 10 })
-    formatSecondsMock.mockReturnValue('00:00:10')
+    const { runSeconds } = mockEnvironment({ isPaused: true, runSeconds: 10 })
+    when(formatSecondsMock).calledWith(runSeconds).mockReturnValue('00:00:10')
     const { wrapper } = render()
     expect(wrapper.html()).toContain('Total Runtime: 00:00:10')
   })
@@ -87,8 +91,13 @@ describe('RunTimer component', () => {
   })
 
   it('does render paused time if paused', () => {
-    mockEnvironment({ isPaused: true, pausedSeconds: 10 })
-    formatSecondsMock.mockReturnValue('00:00:10')
+    const { pausedSeconds } = mockEnvironment({
+      isPaused: true,
+      pausedSeconds: 10,
+    })
+    when(formatSecondsMock)
+      .calledWith(pausedSeconds)
+      .mockReturnValue('00:00:10')
     const { wrapper } = render()
     expect(wrapper.html()).toContain(`Paused For`)
     expect(wrapper.html()).toContain(`00:00:10`)
