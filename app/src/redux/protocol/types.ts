@@ -44,6 +44,10 @@ export interface UploadProtocolAction {
   // TODO(bc, 2021-06-11): remove robot boolean key from meta, unused?
   meta: { robot: true }
 }
+export interface LoadProtocolAction {
+  type: 'protocol:LOAD'
+  payload: { file: ProtocolFile; data: ProtocolData | null }
+}
 
 export interface InvalidProtocolFileAction {
   type: 'protocol:INVALID_FILE'
@@ -54,6 +58,7 @@ export type ProtocolAction =
   | OpenProtocolAction
   | UploadProtocolAction
   | InvalidProtocolFileAction
+  | LoadProtocolAction
 
 // state types
 

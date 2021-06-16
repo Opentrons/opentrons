@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { AlertItem } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import {
   Flex,
   Text,
@@ -12,11 +12,14 @@ import {
 } from '@opentrons/components'
 import { Page } from '../../atoms/Page'
 import { UploadInput } from './UploadInput'
-import { openProtocol } from '../../redux/protocol/actions'
+import { ProtocolSetup } from '../ProtocolSetup'
+import { getProtocolData, getProtocolFile } from '../../redux/protocol'
+import { loadProtocol } from '../../redux/protocol/actions'
+import { ingestProtocolFile } from '../../redux/protocol/utils'
 
 import { useLogger } from '../../logger'
 import type { ErrorObject } from 'ajv'
-import type { Dispatch } from '../../redux/types'
+import type { Dispatch, State} from '../../redux/types'
 
 const VALIDATION_ERROR_T_MAP: {[errorKey: string]: string}= {
   INVALID_FILE_TYPE: 'invalid_file_type',
@@ -29,12 +32,22 @@ export function ProtocolUpload(): JSX.Element {
   const logger = useLogger(__filename)
   const [uploadErrorKey, setUploadErrorKey] = React.useState<string | null>(null)
   const [uploadSchemaError, setUploadSchemaError] = React.useState<ErrorObject[] | null | undefined>(null)
+  const protocolFile = useSelector((state: State) => getProtocolFile(state))
 
   const clearError  = () => {
     setUploadErrorKey(null)
     setUploadSchemaError(null)
   }
 
+  const createSession = (file: File): void => {
+    clearError()
+    ingestProtocolFile(file, (data) => {
+      dispatch(loadProtocol(file, data))
+    }, (errorKey, errorDetails) => {
+      setUploadErrorKey(errorKey)
+      setUploadSchemaError(errorDetails?.schemaErrors)
+    })
+  }
   const titleBarProps = { title: t('upload_and_simulate') }
 
   return (
@@ -52,18 +65,10 @@ export function ProtocolUpload(): JSX.Element {
             </Text>)}
         </AlertItem>
       )}
-      <Flex
-        height="100%"
-        width="100%"
-        backgroundColor={C_NEAR_WHITE}
-        flexDirection={DIRECTION_COLUMN}
-        justifyContent={JUSTIFY_CENTER}
-        alignItems={ALIGN_CENTER}
-      >
-        <UploadInput
-          createSession={ (file: File): void => { dispatch(openProtocol(file)) }}
-          />
-      </Flex>
+      { protocolFile !== null
+        ? <ProtocolSetup />
+        : <UploadInput createSession={createSession} />
+      }
     </Page>
   )
 }

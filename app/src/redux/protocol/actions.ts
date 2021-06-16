@@ -6,7 +6,12 @@ import {
 import { arrayBufferToBase64, filenameToType } from './utils'
 
 import type { ThunkAction } from '../types'
-import type { OpenProtocolAction, UploadProtocolAction } from './types'
+import type {
+  OpenProtocolAction,
+  UploadProtocolAction,
+  LoadProtocolAction,
+  ProtocolData,
+} from './types'
 
 import type { ProtocolParseErrorHandler } from '@opentrons/shared-data/js/helpers'
 
@@ -80,5 +85,22 @@ export function openProtocol(file: File): ThunkAction {
       },
     }
     return dispatch(openAction)
+  }
+}
+
+export function loadProtocol(
+  file: File,
+  data: ProtocolData | null
+): LoadProtocolAction {
+  return {
+    type: 'protocol:LOAD',
+    payload: {
+      file: {
+        name: file.name,
+        type: filenameToType(file.name),
+        lastModified: file.lastModified,
+      },
+      data,
+    },
   }
 }

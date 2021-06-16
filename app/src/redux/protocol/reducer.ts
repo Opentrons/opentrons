@@ -23,6 +23,9 @@ export const protocolReducer: Reducer<ProtocolState, Action> = (
     case 'protocol:OPEN':
       return { ...INITIAL_STATE, ...action.payload }
 
+    case 'protocol:LOAD':
+      return { ...INITIAL_STATE, ...action.payload }
+
     case 'protocol:UPLOAD':
       return { ...state, ...action.payload }
 

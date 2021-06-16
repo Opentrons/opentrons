@@ -92,8 +92,6 @@ export function validateJsonProtocolFileContents(
       ajv.addSchema(labwareV2Schema)
 
       const parsedProtocol = JSON.parse(fileContents) as any
-      console.log('contents: ', fileContents)
-      console.log('Parsed: ', parsedProtocol)
       let validateAgainstSchema
       if ('protocol-schema' in parsedProtocol) {
         // 'protocol-schema' key only present in V1
