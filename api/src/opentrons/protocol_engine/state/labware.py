@@ -1,14 +1,13 @@
 """Basic labware data state and store."""
+from __future__ import annotations
 from dataclasses import dataclass
 from typing import Dict, List, Sequence, Tuple
 
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV2, SlotDefV2
 from opentrons_shared_data.pipette.dev_types import LabwareUri
-from typing_extensions import final
 
-from opentrons.protocols.models import (
-    LabwareDefinition,
-    WellDefinition,
-)
+from opentrons.types import DeckSlotName, Point
+from opentrons.protocols.models import LabwareDefinition, WellDefinition
 from opentrons.calibration_storage.helpers import uri_from_details
 
 from .. import errors
@@ -19,10 +18,9 @@ from ..commands import (
     AddLabwareDefinitionResult,
 )
 from ..types import LabwareLocation, Dimensions
-from .substore import Substore, CommandReactive
+from .substore import CommandReactive
 
 
-@final
 @dataclass(frozen=True)
 class LabwareData:
     """Labware data entry."""
@@ -32,54 +30,137 @@ class LabwareData:
     calibration: Tuple[float, float, float]
 
 
+@dataclass(frozen=True)
 class LabwareState:
-    """Basic labware data state and getter methods."""
+    """State of all loaded labware resources."""
 
-    _labware_by_id: Dict[str, LabwareData]
-    _labware_definitions_by_uri: Dict[str, LabwareDefinition]
+    labware_by_id: Dict[str, LabwareData]
+    labware_definitions_by_uri: Dict[str, LabwareDefinition]
+    deck_definition: DeckDefinitionV2
 
-    def __init__(self, deck_fixed_labware: Sequence[DeckFixedLabware]) -> None:
-        """Initialize a LabwareState instance."""
-        self._labware_definitions_by_uri = {
+
+class LabwareStore(CommandReactive):
+    """Labware state container."""
+
+    _state: LabwareState
+
+    def __init__(
+        self,
+        deck_definition: DeckDefinitionV2,
+        deck_fixed_labware: Sequence[DeckFixedLabware],
+    ) -> None:
+        """Initialize a labware store and its state."""
+        labware_definitions_by_uri: Dict[str, LabwareDefinition] = {
             uri_from_details(
                 load_name=fixed_labware.definition.parameters.loadName,
                 namespace=fixed_labware.definition.namespace,
-                version=fixed_labware.definition.version
-            ): fixed_labware.definition for fixed_labware in deck_fixed_labware
+                version=fixed_labware.definition.version,
+            ): fixed_labware.definition
+            for fixed_labware in deck_fixed_labware
         }
-        self._labware_by_id = {
+        labware_by_id = {
             fixed_labware.labware_id: LabwareData(
                 location=fixed_labware.location,
                 uri=uri_from_details(
                     load_name=fixed_labware.definition.parameters.loadName,
                     namespace=fixed_labware.definition.namespace,
-                    version=fixed_labware.definition.version
+                    version=fixed_labware.definition.version,
                 ),
                 calibration=(0, 0, 0),
             )
             for fixed_labware in deck_fixed_labware
         }
 
+        self._state = LabwareState(
+            labware_definitions_by_uri=labware_definitions_by_uri,
+            labware_by_id=labware_by_id,
+            deck_definition=deck_definition,
+        )
+
+    @property
+    def state(self) -> LabwareView:
+        """Get the store's underlying state object."""
+        # TODO(mc, 2021-06-03): LabwareView wrapper is temporary to allow
+        # for this store to be used while other stores are converted to the
+        # state/store/view triple
+        return LabwareView(state=self._state)
+
+    def handle_completed_command(self, command: CompletedCommandType) -> None:
+        """Modify state in reaction to a completed command."""
+        if isinstance(command.result, LoadLabwareResult):
+            uri = uri_from_details(
+                namespace=command.result.definition.namespace,
+                load_name=command.result.definition.parameters.loadName,
+                version=command.result.definition.version,
+            )
+            self._state.labware_definitions_by_uri[uri] = command.result.definition
+            self._state.labware_by_id[command.result.labwareId] = LabwareData(
+                location=command.request.location,
+                uri=uri,
+                calibration=command.result.calibration,
+            )
+        elif isinstance(command.result, AddLabwareDefinitionResult):
+            uri = uri_from_details(
+                namespace=command.result.namespace,
+                load_name=command.result.loadName,
+                version=command.result.version,
+            )
+            self._state.labware_definitions_by_uri[uri] = command.request.definition
+
+
+class LabwareView:
+    """Read-only labware state view."""
+
+    def __init__(self, state: LabwareState) -> None:
+        """Initialize the computed view of labware state.
+
+        Arguments:
+            state: Labware state dataclass used for all calculations.
+        """
+        self._state = state
+
     def get_labware_data_by_id(self, labware_id: str) -> LabwareData:
         """Get labware data by the labware's unique identifier."""
         try:
-            return self._labware_by_id[labware_id]
+            return self._state.labware_by_id[labware_id]
         except KeyError:
             raise errors.LabwareDoesNotExistError(f"Labware {labware_id} not found.")
 
     def get_labware_definition(self, labware_id: str) -> LabwareDefinition:
         """Get labware definition by the labware's unique identifier."""
-        return self.get_definition_by_uri(
-            self.get_labware_data_by_id(labware_id).uri
+        return self.get_definition_by_uri(self.get_labware_data_by_id(labware_id).uri)
+
+    def get_deck_definition(self) -> DeckDefinitionV2:
+        """Get the current deck definition."""
+        return self._state.deck_definition
+
+    def get_slot_definition(self, slot: DeckSlotName) -> SlotDefV2:
+        """Get the definition of a slot in the deck."""
+        deck_def = self.get_deck_definition()
+
+        for slot_def in deck_def["locations"]["orderedSlots"]:
+            if slot_def["id"] == str(slot):
+                return slot_def
+
+        raise errors.SlotDoesNotExistError(
+            f"Slot ID {slot} does not exist in deck {deck_def['otId']}"
         )
+
+    def get_slot_position(self, slot: DeckSlotName) -> Point:
+        """Get the position of a deck slot."""
+        slot_def = self.get_slot_definition(slot)
+        position = slot_def["position"]
+
+        return Point(x=position[0], y=position[1], z=position[2])
 
     def get_definition_by_uri(self, uri: LabwareUri) -> LabwareDefinition:
         """Get the labware definition matching loadName namespace and version."""
         try:
-            return self._labware_definitions_by_uri[uri]
+            return self._state.labware_definitions_by_uri[uri]
         except KeyError:
             raise errors.LabwareDefinitionDoesNotExistError(
-                f"Labware definition for matching {uri} not found.")
+                f"Labware definition for matching {uri} not found."
+            )
 
     def get_labware_location(self, labware_id: str) -> LabwareLocation:
         """Get labware location by the labware's unique identifier."""
@@ -87,7 +168,7 @@ class LabwareState:
 
     def get_all_labware(self) -> List[Tuple[str, LabwareData]]:
         """Get a list of all labware entries in state."""
-        return [entry for entry in self._labware_by_id.items()]
+        return [entry for entry in self._state.labware_by_id.items()]
 
     def get_labware_has_quirk(self, labware_id: str, quirk: str) -> bool:
         """Get if a labware has a certain quirk."""
@@ -146,37 +227,3 @@ class LabwareState:
             y=dims.yDimension,
             z=dims.zDimension,
         )
-
-
-class LabwareStore(Substore[LabwareState], CommandReactive):
-    """Labware state container."""
-
-    _state: LabwareState
-
-    def __init__(self, deck_fixed_labware: Sequence[DeckFixedLabware]) -> None:
-        """Initialize a labware store and its state."""
-        self._state = LabwareState(deck_fixed_labware=deck_fixed_labware)
-
-    def handle_completed_command(self, command: CompletedCommandType) -> None:
-        """Modify state in reaction to a completed command."""
-        if isinstance(command.result, LoadLabwareResult):
-            uri = uri_from_details(
-                namespace=command.result.definition.namespace,
-                load_name=command.result.definition.parameters.loadName,
-                version=command.result.definition.version
-            )
-            self._state._labware_definitions_by_uri[uri] = \
-                command.result.definition
-            self._state._labware_by_id[command.result.labwareId] = LabwareData(
-                location=command.request.location,
-                uri=uri,
-                calibration=command.result.calibration,
-            )
-        elif isinstance(command.result, AddLabwareDefinitionResult):
-            uri = uri_from_details(
-                namespace=command.result.namespace,
-                load_name=command.result.loadName,
-                version=command.result.version
-            )
-            self._state._labware_definitions_by_uri[uri] =\
-                command.request.definition

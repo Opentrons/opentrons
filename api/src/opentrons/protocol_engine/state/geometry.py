@@ -3,14 +3,14 @@ from dataclasses import dataclass
 from typing import Optional
 from typing_extensions import final
 
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV2, SlotDefV2
-from opentrons.types import Point, DeckSlotName
+
+from opentrons.types import Point
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocols.geometry.deck import FIXED_TRASH_ID
 
 from .. import errors
 from ..types import WellLocation, WellOrigin
-from .substore import Substore, CommandReactive
+from .substore import Substore
 from .labware import LabwareStore, LabwareData
 
 
@@ -29,76 +29,47 @@ class TipGeometry:
     volume: int
 
 
+# TODO(mc, 2021-06-03): continue evaluation of which selectors should go here
+# vs which selectors should be in LabwareView
 class GeometryState:
     """Geometry getters."""
 
-    _deck_definition: DeckDefinitionV2
     _labware_store: LabwareStore
 
-    def __init__(
-        self,
-        deck_definition: DeckDefinitionV2,
-        labware_store: LabwareStore
-    ) -> None:
+    def __init__(self, labware_store: LabwareStore) -> None:
         """Initialize a GeometryState instance."""
-        self._deck_definition = deck_definition
         self._labware_store = labware_store
-
-    def get_deck_definition(self) -> DeckDefinitionV2:
-        """Get the current deck definition."""
-        return self._deck_definition
-
-    def get_slot_definition(self, slot: DeckSlotName) -> SlotDefV2:
-        """Get the current deck definition."""
-        deck_def = self.get_deck_definition()
-
-        for slot_def in deck_def["locations"]["orderedSlots"]:
-            if slot_def["id"] == str(slot):
-                return slot_def
-
-        raise errors.SlotDoesNotExistError(
-            f"Slot ID {slot} does not exist in deck {deck_def['otId']}"
-        )
-
-    def get_slot_position(self, slot: DeckSlotName) -> Point:
-        """Get the position of a deck slot."""
-        slot_def = self.get_slot_definition(slot)
-        position = slot_def["position"]
-
-        return Point(x=position[0], y=position[1], z=position[2])
 
     def get_labware_highest_z(self, labware_id: str) -> float:
         """Get the highest Z-point of a labware."""
-        labware_data = self._labware_store.state.get_labware_data_by_id(
-            labware_id
-        )
+        labware_data = self._labware_store.state.get_labware_data_by_id(labware_id)
 
         return self._get_highest_z_from_labware_data(labware_data)
 
     def get_all_labware_highest_z(self) -> float:
-        """Get the highest Z-point of a labware."""
-        return max([
-            self._get_highest_z_from_labware_data(lw_data)
-            for uid, lw_data in self._labware_store.state.get_all_labware()
-        ])
+        """Get the highest Z-point across all labware."""
+        return max(
+            [
+                self._get_highest_z_from_labware_data(lw_data)
+                for uid, lw_data in self._labware_store.state.get_all_labware()
+            ]
+        )
 
-    def get_labware_parent_position(
-        self,
-        labware_id: str
-    ) -> Point:
+    def get_labware_parent_position(self, labware_id: str) -> Point:
         """Get the position of the labware's parent slot (deck or module)."""
         labware_data = self._labware_store.state.get_labware_data_by_id(labware_id)
-        slot_pos = self.get_slot_position(labware_data.location.slot)
+        slot_pos = self._labware_store.state.get_slot_position(
+            labware_data.location.slot
+        )
 
         return slot_pos
 
-    def get_labware_origin_position(
-        self,
-        labware_id: str
-    ) -> Point:
+    def get_labware_origin_position(self, labware_id: str) -> Point:
         """Get the position of the labware's origin, without calibration."""
         labware_data = self._labware_store.state.get_labware_data_by_id(labware_id)
-        slot_pos = self.get_slot_position(labware_data.location.slot)
+        slot_pos = self._labware_store.state.get_slot_position(
+            labware_data.location.slot
+        )
         origin_offset = self._labware_store.state.get_definition_by_uri(
             labware_data.uri
         ).cornerOffsetFromSlot
@@ -106,13 +77,10 @@ class GeometryState:
         return Point(
             x=slot_pos.x + origin_offset.x,
             y=slot_pos.y + origin_offset.y,
-            z=slot_pos.z + origin_offset.z
+            z=slot_pos.z + origin_offset.z,
         )
 
-    def get_labware_position(
-        self,
-        labware_id: str
-    ) -> Point:
+    def get_labware_position(self, labware_id: str) -> Point:
         """Get the calibrated origin of the labware."""
         labware_data = self._labware_store.state.get_labware_data_by_id(labware_id)
         origin_pos = self.get_labware_origin_position(labware_id=labware_id)
@@ -121,7 +89,7 @@ class GeometryState:
         return Point(
             x=origin_pos.x + cal_offset[0],
             y=origin_pos.y + cal_offset[1],
-            z=origin_pos.z + cal_offset[2]
+            z=origin_pos.z + cal_offset[2],
         )
 
     def get_well_position(
@@ -131,13 +99,8 @@ class GeometryState:
         well_location: Optional[WellLocation] = None,
     ) -> Point:
         """Get the absolute position of a well in a labware."""
-        labware_pos = self.get_labware_position(
-            labware_id
-        )
-        well_def = self._labware_store.state.get_well_definition(
-            labware_id,
-            well_name
-        )
+        labware_pos = self.get_labware_position(labware_id)
+        well_def = self._labware_store.state.get_well_definition(labware_id, well_name)
         well_depth = well_def.depth
 
         if well_location is not None:
@@ -159,7 +122,7 @@ class GeometryState:
         z_dim = self._labware_store.state.get_definition_by_uri(
             lw_data.uri
         ).dimensions.zDimension
-        slot_pos = self.get_slot_position(lw_data.location.slot)
+        slot_pos = self._labware_store.state.get_slot_position(lw_data.location.slot)
 
         return z_dim + slot_pos[2] + lw_data.calibration[2]
 
@@ -168,7 +131,7 @@ class GeometryState:
     def get_effective_tip_length(
         self,
         labware_id: str,
-        pipette_config: PipetteDict
+        pipette_config: PipetteDict,
     ) -> float:
         """Given a labware and a pipette's config, get the effective tip length.
 
@@ -188,7 +151,7 @@ class GeometryState:
         self,
         labware_id: str,
         well_name: str,
-        pipette_config: PipetteDict
+        pipette_config: PipetteDict,
     ) -> TipGeometry:
         """Given a labware, well, and hardware pipette config, get the tip geometry.
 
@@ -216,7 +179,7 @@ class GeometryState:
     def get_tip_drop_location(
         self,
         labware_id: str,
-        pipette_config: PipetteDict
+        pipette_config: PipetteDict,
     ) -> WellLocation:
         """Get tip drop location given labware and hardware pipette."""
         # return to top if labware is fixed trash
@@ -229,18 +192,11 @@ class GeometryState:
         return WellLocation(offset=(0, 0, -nominal_length * offset_factor))
 
 
-class GeometryStore(Substore[GeometryState], CommandReactive):
+class GeometryStore(Substore[GeometryState]):
     """Geometry state container."""
 
     _state: GeometryState
 
-    def __init__(
-        self,
-        deck_definition: DeckDefinitionV2,
-        labware_store: LabwareStore
-    ) -> None:
+    def __init__(self, labware_store: LabwareStore) -> None:
         """Initialize a geometry store and its state."""
-        self._state = GeometryState(
-            deck_definition=deck_definition,
-            labware_store=labware_store,
-        )
+        self._state = GeometryState(labware_store=labware_store)

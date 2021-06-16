@@ -8,7 +8,7 @@ from .. import commands as cmd
 from ..resources import DeckFixedLabware
 from .substore import CommandReactive
 from .commands import CommandStore, CommandState
-from .labware import LabwareStore, LabwareState
+from .labware import LabwareStore, LabwareView
 from .pipettes import PipetteStore, PipetteState
 from .geometry import GeometryStore, GeometryState
 from .motion import MotionStore, MotionState
@@ -55,7 +55,7 @@ class StateView:
         return self._command_store.state
 
     @property
-    def labware(self) -> LabwareState:
+    def labware(self) -> LabwareView:
         """Get labware sub-state."""
         return self._labware_store.state
 
@@ -91,11 +91,11 @@ class StateStore(StateView):
         """Initialize a StateStore."""
         command_store = CommandStore()
         labware_store = LabwareStore(
-            deck_fixed_labware=deck_fixed_labware
+            deck_fixed_labware=deck_fixed_labware,
+            deck_definition=deck_definition,
         )
         pipette_store = PipetteStore()
         geometry_store = GeometryStore(
-            deck_definition=deck_definition,
             labware_store=labware_store,
         )
         motion_store = MotionStore(
@@ -110,21 +110,16 @@ class StateStore(StateView):
             labware_store=labware_store,
             pipette_store=pipette_store,
             geometry_store=geometry_store,
-            motion_store=motion_store
+            motion_store=motion_store,
         )
 
         self._lifecycle_substores: List[CommandReactive] = [
             labware_store,
             pipette_store,
-            geometry_store,
             motion_store,
         ]
 
-    def handle_command(
-        self,
-        command: cmd.CommandType,
-        command_id: str
-    ) -> None:
+    def handle_command(self, command: cmd.CommandType, command_id: str) -> None:
         """Modify State in reaction to a Command."""
         self._command_store.handle_command(command, command_id)
 

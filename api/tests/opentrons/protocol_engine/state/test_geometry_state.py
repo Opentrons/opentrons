@@ -11,7 +11,7 @@ from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocols.geometry.deck import FIXED_TRASH_ID
 from opentrons.types import Point, DeckSlotName
 
-from opentrons.protocol_engine import StateStore, errors
+from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.types import DeckSlotLocation, WellLocation, WellOrigin
 from opentrons.protocol_engine.state import LabwareData
 from opentrons.protocol_engine.state.labware import LabwareStore
@@ -31,58 +31,9 @@ def labware_store(decoy: Decoy) -> LabwareStore:
 
 
 @pytest.fixture
-def geometry_store(
-    labware_store: LabwareStore,
-    standard_deck_def: DeckDefinitionV2,
-) -> GeometryStore:
+def geometry_store(labware_store: LabwareStore) -> GeometryStore:
     """Get a GeometryStore with its store dependencies mocked out."""
-    return GeometryStore(
-        labware_store=labware_store,
-        deck_definition=standard_deck_def,
-    )
-
-
-def test_get_deck_definition(
-    standard_deck_def: DeckDefinitionV2,
-    store: StateStore,
-) -> None:
-    """It should return the deck definition."""
-    deck = store.geometry.get_deck_definition()
-
-    assert deck == standard_deck_def
-
-
-def test_get_slot_definition(
-    standard_deck_def: DeckDefinitionV2,
-    store: StateStore,
-) -> None:
-    """It should return a deck slot's definition."""
-    slot = store.geometry.get_slot_definition(DeckSlotName.SLOT_6)
-
-    assert slot["id"] == "6"
-    assert slot == standard_deck_def["locations"]["orderedSlots"][5]
-
-
-def test_get_slot_definition_raises_with_bad_slot_name(
-    standard_deck_def: DeckDefinitionV2,
-    store: StateStore,
-) -> None:
-    """It should raise a SlotDoesNotExistError if a bad slot name is given."""
-    with pytest.raises(errors.SlotDoesNotExistError):
-        # note: normally the typechecker should catch this, but clients may
-        # not be using typechecking or our enums
-        store.geometry.get_slot_definition(42)  # type: ignore[arg-type]
-
-
-def test_get_slot_position(
-    standard_deck_def: DeckDefinitionV2,
-    store: StateStore,
-) -> None:
-    """It should get the absolute location of a deck slot's origin."""
-    point = store.geometry.get_slot_position(DeckSlotName.SLOT_3)
-    slot_pos = standard_deck_def["locations"]["orderedSlots"][2]["position"]
-
-    assert point == Point(x=slot_pos[0], y=slot_pos[1], z=slot_pos[2])
+    return GeometryStore(labware_store=labware_store)
 
 
 def test_get_labware_parent_position(
@@ -96,17 +47,18 @@ def test_get_labware_parent_position(
     labware_data = LabwareData(
         uri=uri_from_details(namespace="a", load_name="b", version=1),
         location=DeckSlotLocation(slot=DeckSlotName.SLOT_3),
-        calibration=(1, -2, 3)
+        calibration=(1, -2, 3),
     )
-    decoy.when(
-        labware_store.state.get_labware_data_by_id("labware-id")
-    ).then_return(labware_data)
-
-    expected_point = geometry_store.state.get_slot_position(DeckSlotName.SLOT_3)
+    decoy.when(labware_store.state.get_labware_data_by_id("labware-id")).then_return(
+        labware_data
+    )
+    decoy.when(labware_store.state.get_slot_position(DeckSlotName.SLOT_3)).then_return(
+        Point(1, 2, 3)
+    )
 
     result = geometry_store.state.get_labware_parent_position("labware-id")
 
-    assert result == expected_point
+    assert result == Point(1, 2, 3)
 
 
 def test_get_labware_origin_position(
@@ -120,23 +72,27 @@ def test_get_labware_origin_position(
     uri = uri_from_details(
         namespace=well_plate_def.namespace,
         load_name=well_plate_def.parameters.loadName,
-        version=well_plate_def.version
+        version=well_plate_def.version,
     )
     labware_data = LabwareData(
         uri=uri,
         location=DeckSlotLocation(slot=DeckSlotName.SLOT_3),
-        calibration=(1, -2, 3)
+        calibration=(1, -2, 3),
     )
 
-    decoy.when(
-        labware_store.state.get_labware_data_by_id("labware-id")
-    ).then_return(labware_data)
+    decoy.when(labware_store.state.get_labware_data_by_id("labware-id")).then_return(
+        labware_data
+    )
 
-    decoy.when(
-        labware_store.state.get_definition_by_uri(uri)
-    ).then_return(well_plate_def)
+    decoy.when(labware_store.state.get_definition_by_uri(uri)).then_return(
+        well_plate_def
+    )
 
-    expected_parent = geometry_store.state.get_slot_position(DeckSlotName.SLOT_3)
+    decoy.when(labware_store.state.get_slot_position(DeckSlotName.SLOT_3)).then_return(
+        Point(1, 2, 3)
+    )
+
+    expected_parent = Point(1, 2, 3)
     expected_offset = Point(
         x=well_plate_def.cornerOffsetFromSlot.x,
         y=well_plate_def.cornerOffsetFromSlot.y,
@@ -160,31 +116,31 @@ def test_get_labware_highest_z(
     uri = uri_from_details(
         namespace=well_plate_def.namespace,
         load_name=well_plate_def.parameters.loadName,
-        version=well_plate_def.version
+        version=well_plate_def.version,
     )
     labware_data = LabwareData(
         uri=uri,
         location=DeckSlotLocation(slot=DeckSlotName.SLOT_3),
-        calibration=(1, -2, 3)
+        calibration=(1, -2, 3),
     )
 
-    decoy.when(
-        labware_store.state.get_labware_data_by_id("labware-id")
-    ).then_return(labware_data)
+    decoy.when(labware_store.state.get_labware_data_by_id("labware-id")).then_return(
+        labware_data
+    )
 
-    decoy.when(
-        labware_store.state.get_definition_by_uri(uri)
-    ).then_return(well_plate_def)
+    decoy.when(labware_store.state.get_definition_by_uri(uri)).then_return(
+        well_plate_def
+    )
 
-    slot_pos = geometry_store.state.get_slot_position(DeckSlotName.SLOT_3)
+    slot_pos = Point(1, 2, 3)
+
+    decoy.when(labware_store.state.get_slot_position(DeckSlotName.SLOT_3)).then_return(
+        slot_pos
+    )
 
     highest_z = geometry_store.state.get_labware_highest_z("labware-id")
 
-    assert highest_z == (
-        well_plate_def.dimensions.zDimension +
-        slot_pos[2] +
-        3
-    )
+    assert highest_z == (well_plate_def.dimensions.zDimension + slot_pos[2] + 3)
 
 
 def test_get_all_labware_highest_z(
@@ -200,43 +156,51 @@ def test_get_all_labware_highest_z(
         uri=uri_from_details(
             namespace=well_plate_def.namespace,
             load_name=well_plate_def.parameters.loadName,
-            version=well_plate_def.version
+            version=well_plate_def.version,
         ),
         location=DeckSlotLocation(slot=DeckSlotName.SLOT_3),
-        calibration=(1, -2, 3)
+        calibration=(1, -2, 3),
     )
     reservoir_data = LabwareData(
         uri=uri_from_details(
             namespace=reservoir_def.namespace,
             load_name=reservoir_def.parameters.loadName,
-            version=reservoir_def.version
+            version=reservoir_def.version,
         ),
         location=DeckSlotLocation(slot=DeckSlotName.SLOT_4),
-        calibration=(1, -2, 3)
+        calibration=(1, -2, 3),
     )
 
-    decoy.when(
-        labware_store.state.get_labware_data_by_id("plate-id")
-    ).then_return(plate_data)
+    decoy.when(labware_store.state.get_labware_data_by_id("plate-id")).then_return(
+        plate_data
+    )
 
-    decoy.when(
-        labware_store.state.get_labware_data_by_id("reservoir-id")
-    ).then_return(reservoir_data)
+    decoy.when(labware_store.state.get_labware_data_by_id("reservoir-id")).then_return(
+        reservoir_data
+    )
 
-    decoy.when(
-        labware_store.state.get_definition_by_uri(plate_data.uri)
-    ).then_return(well_plate_def)
+    decoy.when(labware_store.state.get_definition_by_uri(plate_data.uri)).then_return(
+        well_plate_def
+    )
 
     decoy.when(
         labware_store.state.get_definition_by_uri(reservoir_data.uri)
     ).then_return(reservoir_def)
 
-    decoy.when(
-        labware_store.state.get_all_labware()
-    ).then_return([
-        ("plate-id", plate_data),
-        ("reservoir-id", reservoir_data),
-    ])
+    decoy.when(labware_store.state.get_all_labware()).then_return(
+        [
+            ("plate-id", plate_data),
+            ("reservoir-id", reservoir_data),
+        ]
+    )
+
+    decoy.when(labware_store.state.get_slot_position(DeckSlotName.SLOT_3)).then_return(
+        Point(1, 2, 3)
+    )
+
+    decoy.when(labware_store.state.get_slot_position(DeckSlotName.SLOT_4)).then_return(
+        Point(4, 5, 6)
+    )
 
     plate_z = geometry_store.state.get_labware_highest_z("plate-id")
     reservoir_z = geometry_store.state.get_labware_highest_z("reservoir-id")
@@ -257,20 +221,24 @@ def test_get_labware_position(
         uri=uri_from_details(
             namespace=well_plate_def.namespace,
             load_name=well_plate_def.parameters.loadName,
-            version=well_plate_def.version
+            version=well_plate_def.version,
         ),
         location=DeckSlotLocation(slot=DeckSlotName.SLOT_4),
-        calibration=(1, -2, 3)
+        calibration=(1, -2, 3),
     )
-    slot_pos = standard_deck_def["locations"]["orderedSlots"][3]["position"]
+    slot_pos = Point(4, 5, 6)
 
-    decoy.when(
-        labware_store.state.get_labware_data_by_id("abc")
-    ).then_return(labware_data)
+    decoy.when(labware_store.state.get_labware_data_by_id("abc")).then_return(
+        labware_data
+    )
 
-    decoy.when(
-        labware_store.state.get_definition_by_uri(labware_data.uri)
-    ).then_return(well_plate_def)
+    decoy.when(labware_store.state.get_definition_by_uri(labware_data.uri)).then_return(
+        well_plate_def
+    )
+
+    decoy.when(labware_store.state.get_slot_position(DeckSlotName.SLOT_4)).then_return(
+        slot_pos
+    )
 
     position = geometry_store.state.get_labware_position(labware_id="abc")
 
@@ -293,25 +261,29 @@ def test_get_well_position(
         uri=uri_from_details(
             namespace=well_plate_def.namespace,
             load_name=well_plate_def.parameters.loadName,
-            version=well_plate_def.version
+            version=well_plate_def.version,
         ),
         location=DeckSlotLocation(slot=DeckSlotName.SLOT_3),
-        calibration=(1, -2, 3)
+        calibration=(1, -2, 3),
     )
     well_def = well_plate_def.wells["B2"]
-    slot_pos = standard_deck_def["locations"]["orderedSlots"][2]["position"]
+    slot_pos = Point(4, 5, 6)
 
-    decoy.when(
-        labware_store.state.get_definition_by_uri(labware_data.uri)
-    ).then_return(well_plate_def)
+    decoy.when(labware_store.state.get_definition_by_uri(labware_data.uri)).then_return(
+        well_plate_def
+    )
 
-    decoy.when(
-        labware_store.state.get_labware_data_by_id("plate-id")
-    ).then_return(labware_data)
+    decoy.when(labware_store.state.get_labware_data_by_id("plate-id")).then_return(
+        labware_data
+    )
 
-    decoy.when(
-        labware_store.state.get_well_definition("plate-id", "B2")
-    ).then_return(well_def)
+    decoy.when(labware_store.state.get_well_definition("plate-id", "B2")).then_return(
+        well_def
+    )
+
+    decoy.when(labware_store.state.get_slot_position(DeckSlotName.SLOT_3)).then_return(
+        slot_pos
+    )
 
     point = geometry_store.state.get_well_position("plate-id", "B2")
 
@@ -334,30 +306,32 @@ def test_get_well_position_with_top_offset(
         uri=uri_from_details(
             namespace=well_plate_def.namespace,
             load_name=well_plate_def.parameters.loadName,
-            version=well_plate_def.version
+            version=well_plate_def.version,
         ),
         location=DeckSlotLocation(slot=DeckSlotName.SLOT_3),
-        calibration=(1, -2, 3)
+        calibration=(1, -2, 3),
     )
     well_def = well_plate_def.wells["B2"]
-    slot_pos = standard_deck_def["locations"]["orderedSlots"][2]["position"]
+    slot_pos = Point(4, 5, 6)
 
-    decoy.when(
-        labware_store.state.get_definition_by_uri(labware_data.uri)
-    ).then_return(well_plate_def)
+    decoy.when(labware_store.state.get_definition_by_uri(labware_data.uri)).then_return(
+        well_plate_def
+    )
 
-    decoy.when(
-        labware_store.state.get_labware_data_by_id("plate-id")
-    ).then_return(labware_data)
+    decoy.when(labware_store.state.get_labware_data_by_id("plate-id")).then_return(
+        labware_data
+    )
 
-    decoy.when(
-        labware_store.state.get_well_definition("plate-id", "B2")
-    ).then_return(well_def)
+    decoy.when(labware_store.state.get_well_definition("plate-id", "B2")).then_return(
+        well_def
+    )
+
+    decoy.when(labware_store.state.get_slot_position(DeckSlotName.SLOT_3)).then_return(
+        slot_pos
+    )
 
     point = geometry_store.state.get_well_position(
-        "plate-id",
-        "B2",
-        WellLocation(origin=WellOrigin.TOP, offset=(1, 2, 3))
+        "plate-id", "B2", WellLocation(origin=WellOrigin.TOP, offset=(1, 2, 3))
     )
 
     assert point == Point(
@@ -379,30 +353,32 @@ def test_get_well_position_with_bottom_offset(
         uri=uri_from_details(
             namespace=well_plate_def.namespace,
             load_name=well_plate_def.parameters.loadName,
-            version=well_plate_def.version
+            version=well_plate_def.version,
         ),
         location=DeckSlotLocation(slot=DeckSlotName.SLOT_3),
-        calibration=(1, -2, 3)
+        calibration=(1, -2, 3),
     )
     well_def = well_plate_def.wells["B2"]
-    slot_pos = standard_deck_def["locations"]["orderedSlots"][2]["position"]
+    slot_pos = Point(4, 5, 6)
 
-    decoy.when(
-        labware_store.state.get_definition_by_uri(labware_data.uri)
-    ).then_return(well_plate_def)
+    decoy.when(labware_store.state.get_definition_by_uri(labware_data.uri)).then_return(
+        well_plate_def
+    )
 
-    decoy.when(
-        labware_store.state.get_labware_data_by_id("plate-id")
-    ).then_return(labware_data)
+    decoy.when(labware_store.state.get_labware_data_by_id("plate-id")).then_return(
+        labware_data
+    )
 
-    decoy.when(
-        labware_store.state.get_well_definition("plate-id", "B2")
-    ).then_return(well_def)
+    decoy.when(labware_store.state.get_well_definition("plate-id", "B2")).then_return(
+        well_def
+    )
+
+    decoy.when(labware_store.state.get_slot_position(DeckSlotName.SLOT_3)).then_return(
+        slot_pos
+    )
 
     point = geometry_store.state.get_well_position(
-        "plate-id",
-        "B2",
-        WellLocation(origin=WellOrigin.BOTTOM, offset=(3, 2, 1))
+        "plate-id", "B2", WellLocation(origin=WellOrigin.BOTTOM, offset=(3, 2, 1))
     )
 
     assert point == Point(
@@ -415,38 +391,39 @@ def test_get_well_position_with_bottom_offset(
 def test_get_effective_tip_length(
     decoy: Decoy,
     labware_store: LabwareStore,
-    geometry_store: GeometryStore
+    geometry_store: GeometryStore,
 ) -> None:
     """It should get the effective tip length from a labware ID and pipette config."""
-    pipette_config: PipetteDict = cast(PipetteDict, {
-        "tip_overlap": {
-            "default": 10,
-            "opentrons/opentrons_96_tiprack_300ul/1": 20,
-        }
-    })
+    pipette_config: PipetteDict = cast(
+        PipetteDict,
+        {
+            "tip_overlap": {
+                "default": 10,
+                "opentrons/opentrons_96_tiprack_300ul/1": 20,
+            }
+        },
+    )
 
-    decoy.when(
-        labware_store.state.get_tip_length("tip-rack-id")
-    ).then_return(50)
+    decoy.when(labware_store.state.get_tip_length("tip-rack-id")).then_return(50)
 
-    decoy.when(
-        labware_store.state.get_definition_uri("tip-rack-id")
-    ).then_return("opentrons/opentrons_96_tiprack_300ul/1")
+    decoy.when(labware_store.state.get_definition_uri("tip-rack-id")).then_return(
+        "opentrons/opentrons_96_tiprack_300ul/1"
+    )
 
     length_eff = geometry_store.state.get_effective_tip_length(
         labware_id="tip-rack-id",
-        pipette_config=pipette_config
+        pipette_config=pipette_config,
     )
 
     assert length_eff == 30
 
-    decoy.when(
-        labware_store.state.get_definition_uri("tip-rack-id")
-    ).then_return("opentrons/something_else/1")
+    decoy.when(labware_store.state.get_definition_uri("tip-rack-id")).then_return(
+        "opentrons/something_else/1"
+    )
 
     default_length_eff = geometry_store.state.get_effective_tip_length(
         labware_id="tip-rack-id",
-        pipette_config=pipette_config
+        pipette_config=pipette_config,
     )
 
     assert default_length_eff == 40
@@ -456,19 +433,15 @@ def test_get_tip_geometry(
     decoy: Decoy,
     tip_rack_def: LabwareDefinition,
     labware_store: LabwareStore,
-    geometry_store: GeometryStore
+    geometry_store: GeometryStore,
 ) -> None:
     """It should get a "well's" tip geometry."""
     pipette_config: PipetteDict = cast(PipetteDict, {"tip_overlap": {"default": 10}})
     well_def = tip_rack_def.wells["B2"]
 
-    decoy.when(
-        labware_store.state.get_tip_length("tip-rack-id")
-    ).then_return(50)
+    decoy.when(labware_store.state.get_tip_length("tip-rack-id")).then_return(50)
 
-    decoy.when(
-        labware_store.state.get_definition_uri("tip-rack-id")
-    ).then_return("")
+    decoy.when(labware_store.state.get_definition_uri("tip-rack-id")).then_return("")
 
     decoy.when(
         labware_store.state.get_well_definition("tip-rack-id", "B2")
@@ -477,7 +450,7 @@ def test_get_tip_geometry(
     tip_geometry = geometry_store.state.get_tip_geometry(
         labware_id="tip-rack-id",
         well_name="B2",
-        pipette_config=pipette_config
+        pipette_config=pipette_config,
     )
 
     assert tip_geometry.effective_length == 40
@@ -489,27 +462,22 @@ def test_get_tip_geometry_raises(
     decoy: Decoy,
     tip_rack_def: LabwareDefinition,
     labware_store: LabwareStore,
-    geometry_store: GeometryStore
+    geometry_store: GeometryStore,
 ) -> None:
     """It should raise LabwareIsNotTipRackError if well is not circular."""
-    pipette_config: PipetteDict = cast(PipetteDict,
-                                       {"tip_overlap": {"default": 10}})
+    pipette_config: PipetteDict = cast(PipetteDict, {"tip_overlap": {"default": 10}})
     well_def = tip_rack_def.wells["B2"]
     well_def.shape = "rectangular"
 
     with pytest.raises(errors.LabwareIsNotTipRackError):
-        decoy.when(
-            labware_store.state.get_tip_length("tip-rack-id")
-        ).then_return(0)
+        decoy.when(labware_store.state.get_tip_length("tip-rack-id")).then_return(0)
 
         decoy.when(
             labware_store.state.get_well_definition("tip-rack-id", "B2")
         ).then_return(well_def)
 
         geometry_store.state.get_tip_geometry(
-            labware_id="tip-rack-id",
-            well_name="B2",
-            pipette_config=pipette_config
+            labware_id="tip-rack-id", well_name="B2", pipette_config=pipette_config
         )
 
 
@@ -522,13 +490,10 @@ def test_get_tip_drop_location(
     """It should get relative drop tip location for a pipette/labware combo."""
     pipette_config: PipetteDict = cast(PipetteDict, {"return_tip_height": 0.7})
 
-    decoy.when(
-        labware_store.state.get_tip_length("tip-rack-id")
-    ).then_return(50)
+    decoy.when(labware_store.state.get_tip_length("tip-rack-id")).then_return(50)
 
     location = geometry_store.state.get_tip_drop_location(
-        labware_id="tip-rack-id",
-        pipette_config=pipette_config
+        labware_id="tip-rack-id", pipette_config=pipette_config
     )
 
     assert location == WellLocation(
@@ -545,8 +510,7 @@ def test_get_tip_drop_location_with_trash(
     pipette_config: PipetteDict = cast(PipetteDict, {"return_tip_height": 0.7})
 
     location = geometry_store.state.get_tip_drop_location(
-        labware_id=FIXED_TRASH_ID,
-        pipette_config=pipette_config
+        labware_id=FIXED_TRASH_ID, pipette_config=pipette_config
     )
 
     assert location == WellLocation(origin=WellOrigin.TOP, offset=(0, 0, 0))

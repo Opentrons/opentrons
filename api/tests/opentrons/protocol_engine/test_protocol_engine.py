@@ -51,7 +51,7 @@ async def test_create_engine_initializes_state_with_deck_geometry(
     engine = await ProtocolEngine.create(hardware=mock_hardware)
     state = engine.state_store
 
-    assert state.geometry.get_deck_definition() == standard_deck_def
+    assert state.labware.get_deck_definition() == standard_deck_def
     assert state.labware.get_labware_data_by_id(FIXED_TRASH_ID) == LabwareData(
         location=DeckSlotLocation(slot=DeckSlotName.FIXED_TRASH),
         uri=uri_from_details(
