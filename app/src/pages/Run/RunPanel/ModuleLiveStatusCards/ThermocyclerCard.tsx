@@ -7,7 +7,6 @@ import type {
   ThermocyclerModule,
   ModuleCommand,
 } from '../../../../redux/modules/types'
-import { formatSeconds } from '../../../../redux/robot/selectors' // TODO: move helper from robot selector to helper file
 import {
   TemperatureControl,
   TemperatureData,
@@ -15,6 +14,7 @@ import {
 
 import { StatusCard } from './StatusCard'
 import styles from './styles.css'
+import { formatSeconds } from '../utils'
 
 const CYCLE_NUMBER = 'Cycle #'
 const HOLD_TIME_REMAINING = 'Hold time remaining:'

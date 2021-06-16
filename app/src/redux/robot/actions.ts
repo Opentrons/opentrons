@@ -249,10 +249,6 @@ export interface CancelResponseAction {
   payload?: Error
 }
 
-export interface TickRunTimeAction {
-  type: 'robot:TICK_RUN_TIME'
-}
-
 // TODO(mc, 2018-01-23): refactor to use type above
 //   DO NOT ADD NEW ACTIONS HERE
 export const actionTypes = {
@@ -277,8 +273,6 @@ export const actionTypes = {
   RESUME_RESPONSE: 'robot:RESUME_RESPONSE',
   CANCEL: 'robot:CANCEL',
   CANCEL_RESPONSE: 'robot:CANCEL_RESPONSE',
-
-  TICK_RUN_TIME: 'robot:TICK_RUN_TIME',
 } as const
 
 // TODO(mc, 2018-01-23): NEW ACTION TYPES GO HERE
@@ -317,7 +311,6 @@ export type Action =
   | ResumeResponseAction
   | CancelAction
   | CancelResponseAction
-  | TickRunTimeAction
 
 export const actions = {
   connect(name: string): ConnectAction {
@@ -682,10 +675,6 @@ export const actions = {
 
   refreshSession(): RefreshSessionAction {
     return { type: 'robot:REFRESH_SESSION', meta: { robotCommand: true } }
-  },
-
-  tickRunTime(): TickRunTimeAction {
-    return { type: actionTypes.TICK_RUN_TIME }
   },
 
   clearCalibrationRequest(): ClearCalibrationRequestAction {

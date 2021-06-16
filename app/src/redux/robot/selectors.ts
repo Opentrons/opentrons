@@ -1,11 +1,10 @@
 // robot selectors
 import { head } from 'lodash'
-import padStart from 'lodash/padStart'
 import some from 'lodash/some'
 import uniqBy from 'lodash/uniqBy'
 import { createSelector } from 'reselect'
-import { format } from 'date-fns'
 
+import type { ModuleModel, PipetteModel } from '@opentrons/shared-data'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import { getCustomLabwareDefinitions } from '../custom-labware/selectors'
 import { getLabwareDefBySlot } from '../protocol/selectors'
@@ -14,22 +13,22 @@ import * as Constants from './constants'
 
 import type { State } from '../types'
 import type {
-  Mount,
-  Slot,
-  Pipette,
-  StatePipette,
-  Labware,
-  StateLabware,
-  ConnectionStatus,
-  LabwareCalibrationStatus,
-  LabwareType,
-  SessionStatus,
-  SessionStatusInfo,
-  SessionModule,
-  TipracksByMountMap,
-  NextTiprackPipetteInfo,
   Command,
   CommandNode,
+  ConnectionStatus,
+  Labware,
+  LabwareCalibrationStatus,
+  LabwareType,
+  Mount,
+  NextTiprackPipetteInfo,
+  Pipette,
+  SessionModule,
+  SessionStatus,
+  SessionStatusInfo,
+  Slot,
+  StateLabware,
+  StatePipette,
+  TipracksByMountMap,
 } from './types'
 
 import type { ConnectionState } from './reducer/connection'
@@ -37,8 +36,7 @@ import type {
   CalibrationRequest,
   CalibrationState,
 } from './reducer/calibration'
-import type { SessionState, Request } from './reducer/session'
-import type { PipetteModel, ModuleModel } from '@opentrons/shared-data'
+import type { Request, SessionState } from './reducer/session'
 
 const calibration = (state: State): CalibrationState => state.robot.calibration
 const connection = (state: State): ConnectionState => state.robot.connection
@@ -212,48 +210,57 @@ export const getSessionError: (state: State) => string | null = createSelector(
   }
 )
 
-const getStartTimeMs = (state: State): number | null => {
-  const { startTime, remoteTimeCompensation } = session(state)
+export const getStartTimeMs = (state: State): number | null => {
+  const { startTime } = session(state)
 
-  if (startTime == null || remoteTimeCompensation === null) {
+  if (startTime == null) {
     return null
   }
 
-  return startTime + remoteTimeCompensation
+  return startTime
 }
 
-export const getStartTime: (state: State) => string | null = createSelector(
-  getStartTimeMs,
-  startTimeMs => {
-    return startTimeMs !== null ? format(startTimeMs, 'pp') : null
-  }
-)
-
-export const getRunSeconds: (state: State) => number = createSelector(
-  getStartTimeMs,
-  (state: State) => session(state).runTime,
-  (
-    startTime: number | null | undefined,
-    runTime: number | null | undefined
-  ): number => {
-    return runTime && startTime && runTime > startTime
-      ? Math.floor((runTime - startTime) / 1000)
-      : 0
-  }
-)
-
-export function formatSeconds(runSeconds: number): string {
-  const hours = padStart(`${Math.floor(runSeconds / 3600)}`, 2, '0')
-  const minutes = padStart(`${Math.floor(runSeconds / 60) % 60}`, 2, '0')
-  const seconds = padStart(`${runSeconds % 60}`, 2, '0')
-
-  return `${hours}:${minutes}:${seconds}`
+function millisToSeconds(ms: number): number {
+  return Math.floor(Math.max(0, ms) / 1000)
 }
 
-export const getRunTime: (state: State) => string = createSelector(
-  getRunSeconds,
-  formatSeconds
-)
+export function getRunSeconds(state: State, now: number = Date.now()): number {
+  const isRunning = getIsRunning(state)
+  if (isRunning) {
+    const startTimeMs = getStartTimeMs(state)
+    if (startTimeMs == null) {
+      return 0
+    }
+    return millisToSeconds(now - startTimeMs)
+  }
+  const isDone = getIsDone(state)
+  if (isDone) {
+    const statusInfo = getSessionStatusInfo(state)
+    if (statusInfo.changedAt == null) {
+      return 0
+    }
+    return millisToSeconds(statusInfo.changedAt)
+  }
+  return 0
+}
+
+/**
+ * Same considerations as commented above for `getRunSecondsAt`
+ */
+export function getPausedSeconds(
+  state: State,
+  now: number = Date.now()
+): number {
+  const isPaused = getIsPaused(state)
+  if (isPaused) {
+    const startTimeMs = getStartTimeMs(state)
+    const statusInfo = getSessionStatusInfo(state)
+    if (startTimeMs != null && statusInfo.changedAt != null) {
+      return millisToSeconds(now - startTimeMs - statusInfo.changedAt)
+    }
+  }
+  return 0
+}
 
 export function getCalibrationRequest(state: State): CalibrationRequest {
   return calibration(state).calibrationRequest

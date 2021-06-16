@@ -340,14 +340,6 @@ describe('api client', () => {
         .then(() => sendToClient({} as any, actions.refreshSession()))
         .then(() => expect(session.refresh).toHaveBeenCalled())
     })
-
-    it('start a timer when the run starts', () => {
-      session.run.mockResolvedValue()
-
-      return sendConnect()
-        .then(() => sendToClient({} as any, actions.run()))
-        .then(() => expect(global.setInterval).toHaveBeenCalled())
-    })
   })
 
   describe('session responses', () => {
