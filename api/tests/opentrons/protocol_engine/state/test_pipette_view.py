@@ -101,7 +101,7 @@ def test_get_hardware_pipette_raises_with_name_mismatch() -> None:
     """It maps a pipette ID to a config given the HC's attached pipettes.
 
     In this test, the hardware config specs "p300_single_gen2", but the
-    loaded pipette name in state is "p300_single".
+    loaded pipette name in state is "p300_single," which does not match.
     """
     pipette_config = cast(PipetteDict, {"name": "p300_single_gen2"})
     attached_pipettes: Dict[HwMount, Optional[PipetteDict]] = {
@@ -126,7 +126,7 @@ def test_get_hardware_pipette_raises_with_name_mismatch() -> None:
 
 
 def test_pipette_volume_raises_if_bad_id() -> None:
-    """get_aspirated_volume should raise if the given pipette doesn't exist"""
+    """get_aspirated_volume should raise if the given pipette doesn't exist."""
     subject = get_pipette_view()
 
     with pytest.raises(errors.PipetteDoesNotExistError):
@@ -184,7 +184,7 @@ def test_pipette_is_ready_to_aspirate_if_no_volume_and_hc_says_ready() -> None:
 
 
 def test_pipette_not_ready_to_aspirate() -> None:
-    """Pipettes should be ready to aspirate if HC says it is."""
+    """Pipette should not be ready to aspirate if HC says so and it has no volume."""
     pipette_config = cast(PipetteDict, {"ready_to_aspirate": False})
 
     subject = get_pipette_view(
