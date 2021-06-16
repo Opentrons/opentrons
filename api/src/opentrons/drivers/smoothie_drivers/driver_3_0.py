@@ -872,7 +872,8 @@ class SmoothieDriver:
         try:
             command_result = await self._connection.send_command(
                 command=command,
-                retries=DEFAULT_COMMAND_RETRIES
+                retries=DEFAULT_COMMAND_RETRIES,
+                timeout=ack_timeout
             )
             wait_command = CommandBuilder(
                 terminator=SMOOTHIE_COMMAND_TERMINATOR
@@ -881,7 +882,8 @@ class SmoothieDriver:
             )
             await self._connection.send_command(
                 command=wait_command,
-                retries=0
+                retries=0,
+                timeout=execute_timeout
             )
         except AlarmResponse as e:
             self._handle_return(ret_code=e.response, is_alarm=True)

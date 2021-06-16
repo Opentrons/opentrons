@@ -44,7 +44,9 @@ async def test_send_command(
     await subject.send_data(data="send data")
 
     mock_serial_port.write.assert_called_once_with(data=b"send data")
-    mock_serial_port.read_until.assert_called_once_with(match=ack.encode())
+    mock_serial_port.read_until.assert_called_once_with(
+        match=ack.encode(), timeout=None
+    )
 
 
 async def test_send_command_with_retry(
@@ -59,7 +61,8 @@ async def test_send_command_with_retry(
     mock_serial_port.write.assert_has_calls(
         calls=[call(data=b"send data"), call(data=b"send data")])
     mock_serial_port.read_until.assert_has_calls(
-        calls=[call(match=ack.encode()), call(match=ack.encode())])
+        calls=[call(match=ack.encode(), timeout=None),
+               call(match=ack.encode(), timeout=None)])
 
 
 async def test_send_command_with_retry_exhausted(
