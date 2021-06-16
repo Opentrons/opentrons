@@ -1,7 +1,7 @@
 import { initializeFullstory, shutdownFullstory } from './fullstory'
-import { setMixpanelTracking } from './mixpanel'
-import { AnalyticsEvent } from './mixpanel'
-export type SetOptIn = {
+import { setMixpanelTracking, AnalyticsEvent } from './mixpanel'
+
+export interface SetOptIn {
   type: 'SET_OPT_IN'
   payload: boolean
 }
@@ -24,7 +24,7 @@ const _setOptIn = (payload: SetOptIn['payload']): SetOptIn => {
 
 export const optIn = (): SetOptIn => _setOptIn(true)
 export const optOut = (): SetOptIn => _setOptIn(false)
-export type AnalyticsEventAction = {
+export interface AnalyticsEventAction {
   type: 'ANALYTICS_EVENT'
   payload: AnalyticsEvent
   meta?: unknown

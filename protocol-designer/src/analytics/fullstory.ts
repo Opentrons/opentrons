@@ -1,4 +1,4 @@
-// @flow
+// @ts-nocheck
 import cookie from 'cookie'
 
 export const shutdownFullstory = () => {
