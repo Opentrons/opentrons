@@ -87,7 +87,7 @@ def test_pipette_volume_adds_aspirate(subject: PipetteStore) -> None:
 
 
 def test_pipette_volume_subtracts_dispense(subject: PipetteStore) -> None:
-    """It should subtract volume from pipette after an aspirate."""
+    """It should subtract volume from pipette after a dispense."""
     load_command = create_load_pipette_command(
         pipette_id="pipette-id",
         pipette_name=PipetteName.P300_SINGLE,
