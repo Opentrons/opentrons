@@ -116,13 +116,13 @@ def subject() -> CommandTranslator:
 
 
 def test_translates_labware_commands(
-    subject: CommandTranslator, 
+    subject: CommandTranslator,
     json_protocol: JsonProtocol,
     minimal_labware_def: dict,  # To do: Uhhh something
     minimal_labware_def2: dict,
 ) -> None:
     result = subject.translate(json_protocol)
-    
+
     # To do: More correct ordering constraints
     assert AddLabwareDefinitionRequest(
         definition=LabwareDefinition.parse_obj(minimal_labware_def)
@@ -130,7 +130,7 @@ def test_translates_labware_commands(
     assert AddLabwareDefinitionRequest(
         definition=LabwareDefinition.parse_obj(minimal_labware_def2)
     ) in result
-    
+
     assert LoadLabwareRequest(
         location=protocol_engine.DeckSlotLocation(slot=1),
         loadName=minimal_labware_def["parameters"]["loadName"],
