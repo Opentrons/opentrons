@@ -1,4 +1,4 @@
-from typing import Dict, Iterable
+from typing import Dict, Iterable, cast
 
 import opentrons.types
 
@@ -7,6 +7,7 @@ from opentrons import protocol_engine as pe
 # To do: Collapse imports
 from opentrons.protocol_engine.commands import (
     CommandRequestType,
+    LoadPipetteRequest,
     AddLabwareDefinitionRequest,
     LoadLabwareRequest,
     AspirateRequest,
@@ -36,6 +37,10 @@ class CommandTranslator:
 
     def translate(self, protocol: JsonProtocol) -> ReturnType:
         result = []
+
+        for pipette_id, pipette in protocol.pipettes.items():
+            result += [self._translate_pipette(pipette, pipette_id)]
+
         for labware_uri, labware_definition in protocol.labwareDefinitions.items():
             result += [self._translate_labware_definition(labware_definition)]
         for pd_labware_id, labware in protocol.labware.items():
@@ -89,6 +94,19 @@ class CommandTranslator:
             namespace=definition.namespace,
             version=definition.version,
             labwareId=labware_id_to_translate
+        )
+
+    def _translate_pipette(
+        self,
+        pipette: models.json_protocol.Pipettes,
+        pipette_id: str
+    ):  # To do: Type.
+        return LoadPipetteRequest(
+            # Rely on Pydantic to validate these casts at runtime.
+            pipetteName=cast(pe.PipetteName, pipette.name),
+            # todo(mm, 2021-06-16): Should protocol_engine re-export MountType?
+            mount=cast(opentrons.types.MountType, pipette.mount),
+            pipetteId=pipette_id
         )
 
     def _aspirate(

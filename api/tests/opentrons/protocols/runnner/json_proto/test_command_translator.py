@@ -6,6 +6,7 @@ from opentrons.protocol_engine import WellLocation, WellOrigin
 from opentrons.protocol_engine.commands import (
     AddLabwareDefinitionRequest,
     LoadLabwareRequest,
+    LoadPipetteRequest,
     AspirateRequest,
     DispenseRequest,
     PickUpTipRequest,
@@ -136,7 +137,7 @@ def _assert_appear_in_order(
     assert sorted(element_indexes) == element_indexes
 
 
-def test_translates_labware_commands(
+def test_labware(
     subject: CommandTranslator,
     json_protocol: JsonProtocol,
     minimal_labware_def: dict,  # To do: Uhhh something
@@ -175,6 +176,21 @@ def test_translates_labware_commands(
         elements=[expected_add_definition_request_2, expected_load_request_2],
         source=result
     )
+
+
+def test_pipettes(
+    subject: CommandTranslator,
+    json_protocol: JsonProtocol,
+) -> None:
+    result = subject.translate(json_protocol)
+
+    expected_request = LoadPipetteRequest(
+        pipetteName="p300_single",
+        mount="left",
+        pipetteId="leftPipetteId"
+    )
+
+    assert expected_request in result
 
 
 def test_aspirate(
