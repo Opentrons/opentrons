@@ -562,7 +562,7 @@ def minimal_labware_def() -> dict:
 
 
 @pytest.fixture
-def minimal_labware_def2():
+def minimal_labware_def2() -> dict:
     return {
         "metadata": {
             "displayName": "other test labware",
