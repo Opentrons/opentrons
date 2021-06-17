@@ -3,8 +3,8 @@ import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  ModuleRealType,
 } from '@opentrons/shared-data'
-import { ModuleRealType } from '@opentrons/shared-data'
 import { DropdownOption } from '@opentrons/components'
 export const SUPPORTED_MODULE_TYPES: ModuleRealType[] = [
   MAGNETIC_MODULE_TYPE,

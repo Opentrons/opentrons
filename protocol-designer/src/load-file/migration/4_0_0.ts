@@ -19,6 +19,7 @@ export const migrateSavedStepForms = (
     if (stepForm.stepType === 'pause') {
       const prevPauseActionValue = stepForm.pauseForAmountOfTime
       const res = omit(stepForm, 'pauseForAmountOfTime')
+      // @ts-expect-error prevPauseActionValue has any type, and can't be used as index
       res.pauseAction = PAUSE_ACTION_MAP[prevPauseActionValue]
       return res
     }

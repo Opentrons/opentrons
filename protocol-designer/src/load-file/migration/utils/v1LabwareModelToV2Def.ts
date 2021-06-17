@@ -44,6 +44,7 @@ const v1ModelTov2LoadNameMap = {
     'opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical_acrylic',
 }
 export function v1LabwareModelToV2Def(model: string): LabwareDefinition2 {
+  // @ts-expect-error string cannot be used to index type
   const loadName: string | null | undefined = v1ModelTov2LoadNameMap[model]
 
   if (!loadName) {

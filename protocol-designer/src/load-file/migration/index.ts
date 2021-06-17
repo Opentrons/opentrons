@@ -15,7 +15,9 @@ type MigrationsByVersion = Record<
   (arg0: Record<string, any>) => Record<string, any>
 >
 const allMigrationsByVersion: MigrationsByVersion = {
+  // @ts-expect-error file types are incompatible
   '1.1.0': migrateFileOne,
+  // @ts-expect-error file types are incompatible
   '3.0.0': migrateFileThree,
   '4.0.0': migrateFileFour,
   '5.0.0': migrateFileFive,

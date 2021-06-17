@@ -12,11 +12,13 @@ import {
   replaceTCDStepsWithMoveLiquidStep,
 } from '../1_1_0'
 describe('renameOrderedSteps', () => {
+  // @ts-expect-error incorrect paramater type, should be PDProtocolFile type
   const migratedFile = renameOrderedSteps(oldProtocol)
   it('removes orderedSteps key', () => {
     expect(oldProtocol['designer-application'].data.orderedSteps).not.toEqual(
       undefined
     )
+    // @ts-expect-error orderedSteps doesn't exist on type PDMetaData
     expect(migratedFile['designer-application'].data.orderedSteps).toEqual(
       undefined
     )
@@ -24,6 +26,7 @@ describe('renameOrderedSteps', () => {
   it('adds orderedStepIds key and value', () => {
     const oldOrderedStepsIds =
       oldProtocol['designer-application'].data.orderedSteps
+    // @ts-expect-error orderedSteps doesn't exist on type
     expect(oldProtocol['designer-application'].data.orderedStepIds).toEqual(
       undefined
     )
@@ -56,9 +59,11 @@ describe('renameOrderedSteps', () => {
   })
 })
 describe('addInitialDeckSetupStep', () => {
+  // @ts-expect-error oldProtocol not of type PDProtocolFile
   const migratedFile = addInitialDeckSetupStep(oldProtocol)
   it('adds savedStepForm key', () => {
     expect(
+      // @ts-expect-error INITIAL_DECK_SETUP_STEP_ID does not exist on type
       oldProtocol['designer-application'].data.savedStepForms[
         INITIAL_DECK_SETUP_STEP_ID
       ]
@@ -190,12 +195,14 @@ describe('updateStepFormKeys', () => {
         },
       },
     }
+    // @ts-expect-error incorrect parameter type
     const migratedFile = updateStepFormKeys(stubbedTCDStepsFile)
     it('deprecates all indicated field names', () => {
       each(TCD_DEPRECATED_FIELD_NAMES, fieldName => {
         each(
           stubbedTCDStepsFile['designer-application'].data.savedStepForms,
           stepForm => {
+            // @ts-expect-error fieldname (any string) cannot be used to index type
             expect(stepForm[fieldName]).not.toEqual(undefined)
           }
         )
@@ -230,12 +237,14 @@ describe('updateStepFormKeys', () => {
         each(
           stubbedTCDStepsFile['designer-application'].data.savedStepForms,
           stepForm => {
+            // @ts-expect-error fieldname (any string) cannot be used to index type
             expect(stepForm[fieldName]).toEqual(undefined)
           }
         )
         each(
           migratedFile['designer-application'].data.savedStepForms,
           stepForm =>
+            // @ts-expect-error fieldname (any string) cannot be used to index type
             expect(stepForm[fieldName]).toEqual(addedFields[fieldName])
         )
       })
@@ -272,11 +281,13 @@ describe('updateStepFormKeys', () => {
         },
       },
     }
+    // @ts-expect-error incorrect parameter type
     const migratedFile = updateStepFormKeys(stubbedMixStepFile)
     it('deprecates all indicated field names', () => {
       each(MIX_DEPRECATED_FIELD_NAMES, fieldName => {
         each(
           stubbedMixStepFile['designer-application'].data.savedStepForms,
+          // @ts-expect-error fieldname (any string) cannot be used to index type
           stepForm => expect(stepForm[fieldName]).not.toEqual(undefined)
         )
         each(
@@ -304,12 +315,14 @@ describe('updateStepFormKeys', () => {
         each(
           stubbedMixStepFile['designer-application'].data.savedStepForms,
           stepForm => {
+            // @ts-expect-error fieldname (any string) cannot be used to index type
             expect(stepForm[fieldName]).toEqual(undefined)
           }
         )
         each(
           migratedFile['designer-application'].data.savedStepForms,
           stepForm => {
+            // @ts-expect-error fieldname (any string) cannot be used to index type
             expect(stepForm[fieldName]).toEqual(addedFields[fieldName])
           }
         )
@@ -319,6 +332,7 @@ describe('updateStepFormKeys', () => {
 })
 describe('replaceTCDStepsWithMoveLiquidStep', () => {
   const oldStepForms = oldProtocol['designer-application'].data.savedStepForms
+  // @ts-expect-error incorrect parameter type
   const migratedFile = replaceTCDStepsWithMoveLiquidStep(oldProtocol)
   each(oldStepForms, (stepForm, stepId) => {
     if (stepForm.stepType === 'transfer') {
