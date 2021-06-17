@@ -81,7 +81,7 @@ def mock_hardware() -> AsyncMock:
 def mock_handlers() -> AsyncMock:
     """Get an asynchronous mock in the shape of CommandHandlers."""
     # TODO(mc, 2021-01-04): Replace with mock_cmd_handlers
-    mock = MagicMock()
+    mock = AsyncMock()
     mock.equipment = AsyncMock(spec=EquipmentHandler)
     mock.movement = AsyncMock(spec=MovementHandler)
     mock.pipetting = AsyncMock(spec=PipettingHandler)
