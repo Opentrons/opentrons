@@ -45,7 +45,7 @@ export function getModuleLabwareOptions(
   const labware =
     moduleOnDeck && getLabwareOnModule(initialDeckSetup, moduleOnDeck.id)
   const prefix = i18n.t(`form.step_edit_form.field.moduleLabwarePrefix.${type}`)
-  let options = []
+  let options: Options = []
 
   if (moduleOnDeck) {
     if (labware) {

@@ -1,4 +1,6 @@
-import { createSelector } from 'reselect'
+/* eslint-disable @typescript-eslint/strict-boolean-expressions */
+/* eslint-disable @typescript-eslint/restrict-plus-operands */
+import { createSelector, Selector } from 'reselect'
 import forEach from 'lodash/forEach'
 import mapValues from 'lodash/mapValues'
 import max from 'lodash/max'
@@ -19,16 +21,16 @@ import {
   LiquidGroup,
   OrderedLiquids,
 } from './types'
-import { BaseState, MemoizedSelector, Selector, DeckSlot } from './../types'
+import { BaseState, MemoizedSelector, DeckSlot } from './../types'
 // TODO: Ian 2019-02-15 no RootSlice, use BaseState
-type RootSlice = {
+interface RootSlice {
   labwareIngred: RootState
 }
 
 const rootSelector = (state: RootSlice): RootState => state.labwareIngred
 
 // NOTE: not intended for UI use! Use getLabwareNicknamesById for the string.
-const getLabwareNameInfo: MemoizedSelector<ContainersState> = createSelector(
+const getLabwareNameInfo: Selector<RootSlice, ContainersState> = createSelector(
   rootSelector,
   s => s.containers
 )
@@ -39,17 +41,19 @@ const getLiquidGroupsById = (state: RootSlice): IngredientsState =>
 const getLiquidsByLabwareId = (state: RootSlice): LabwareLiquidState =>
   rootSelector(state).ingredLocations
 
-const getNextLiquidGroupId: MemoizedSelector<string> = createSelector(
+const getNextLiquidGroupId: Selector<RootSlice, string> = createSelector(
   getLiquidGroupsById,
   ingredGroups =>
+    // @ts-expect-error(sa, 2021-6-15): this could return undefined
     (max(Object.keys(ingredGroups).map(id => parseInt(id))) + 1 || 0).toString()
 )
-const getLiquidNamesById: MemoizedSelector<
+const getLiquidNamesById: Selector<
+  RootSlice,
   Record<string, string>
 > = createSelector(getLiquidGroupsById, ingredGroups =>
   mapValues(ingredGroups, (ingred: LiquidGroup) => ingred.name)
 )
-const getLiquidSelectionOptions: MemoizedSelector<Options> = createSelector(
+const getLiquidSelectionOptions: Selector<RootSlice, Options> = createSelector(
   getLiquidGroupsById,
   liquidGroupsById => {
     return Object.keys(liquidGroupsById).map(id => ({
@@ -70,46 +74,47 @@ const selectedAddLabwareSlot = (state: BaseState): DeckSlot | false =>
 const getSavedLabware = (state: BaseState): Record<string, boolean> =>
   rootSelector(state).savedLabware
 
-const getSelectedLabwareId: MemoizedSelector<SelectedContainerId> = createSelector(
-  rootSelector,
-  rootState => rootState.selectedContainerId
+const getSelectedLabwareId: Selector<
+  RootSlice,
+  SelectedContainerId
+> = createSelector(rootSelector, rootState => rootState.selectedContainerId)
+const getSelectedLiquidGroupState: Selector<
+  RootSlice,
+  SelectedLiquidGroupState
+> = createSelector(rootSelector, rootState => rootState.selectedLiquidGroup)
+const getDrillDownLabwareId: Selector<
+  RootSlice,
+  DrillDownLabwareId
+> = createSelector(rootSelector, rootState => rootState.drillDownLabwareId)
+const allIngredientGroupFields: Selector<
+  RootSlice,
+  AllIngredGroupFields
+> = createSelector(getLiquidGroupsById, ingreds =>
+  reduce<IngredientsState, AllIngredGroupFields>(
+    ingreds,
+    (acc, ingredGroup: IngredInputs, ingredGroupId): AllIngredGroupFields => ({
+      ...acc,
+      [ingredGroupId]: ingredGroup,
+    }),
+    {}
+  )
 )
-const getSelectedLiquidGroupState: MemoizedSelector<SelectedLiquidGroupState> = createSelector(
-  rootSelector,
-  rootState => rootState.selectedLiquidGroup
+const allIngredientNamesIds: Selector<
+  RootSlice,
+  OrderedLiquids
+> = createSelector(getLiquidGroupsById, ingreds =>
+  Object.keys(ingreds).map(ingredId => ({
+    ingredientId: ingredId,
+    name: ingreds[ingredId].name,
+  }))
 )
-const getDrillDownLabwareId: MemoizedSelector<DrillDownLabwareId> = createSelector(
-  rootSelector,
-  rootState => rootState.drillDownLabwareId
-)
-const allIngredientGroupFields: MemoizedSelector<AllIngredGroupFields> = createSelector(
-  getLiquidGroupsById,
-  ingreds =>
-    reduce<IngredientsState, AllIngredGroupFields>(
-      ingreds,
-      (
-        acc,
-        ingredGroup: IngredInputs,
-        ingredGroupId
-      ): AllIngredGroupFields => ({ ...acc, [ingredGroupId]: ingredGroup }),
-      {}
-    )
-)
-const allIngredientNamesIds: MemoizedSelector<OrderedLiquids> = createSelector(
-  getLiquidGroupsById,
-  ingreds =>
-    Object.keys(ingreds).map(ingredId => ({
-      ingredientId: ingredId,
-      name: ingreds[ingredId].name,
-    }))
-)
-const getLabwareSelectionMode: MemoizedSelector<boolean> = createSelector(
+const getLabwareSelectionMode: Selector<RootSlice, boolean> = createSelector(
   rootSelector,
   rootState => {
     return rootState.modeLabwareSelection !== false
   }
 )
-const getLiquidGroupsOnDeck: MemoizedSelector<string[]> = createSelector(
+const getLiquidGroupsOnDeck: Selector<RootSlice, string[]> = createSelector(
   getLiquidsByLabwareId,
   ingredLocationsByLabware => {
     const liquidGroups: Set<string> = new Set()
@@ -135,7 +140,7 @@ const getLiquidGroupsOnDeck: MemoizedSelector<string[]> = createSelector(
     return [...liquidGroups]
   }
 )
-const getDeckHasLiquid: Selector<boolean> = createSelector(
+const getDeckHasLiquid: Selector<RootSlice, boolean> = createSelector(
   getLiquidGroupsOnDeck,
   liquidGroups => liquidGroups.length > 0
 )

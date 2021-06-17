@@ -7,7 +7,7 @@ export const MAIN_CONTENT_FORCED_SCROLL_CLASSNAME = 'main_content_forced_scroll'
 // TODO (ka 2019-10-28): This is a workaround, see #4446
 // but it solves the modal positioning problem caused by main page wrapper
 // being positioned absolute until we can figure out something better
-export const resetScrollElements = () => {
+export const resetScrollElements = (): void => {
   forEach(
     global.document.getElementsByClassName(
       MAIN_CONTENT_FORCED_SCROLL_CLASSNAME
