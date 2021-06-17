@@ -23,8 +23,12 @@ const getModuleEntitiesMock = stepFormSelectors.getModuleEntities as jest.Mocked
   typeof stepFormSelectors.getModuleEntities
 >
 
+const getMagnetLabwareEngageHeightMock = uiModuleSelectors.getMagnetLabwareEngageHeight as jest.MockedFunction<
+  typeof uiModuleSelectors.getMagnetLabwareEngageHeight
+>
+
 describe('MagnetForm', () => {
-  let store
+  let store: any
   let props: React.ComponentProps<typeof MagnetForm>
   function render(_props: React.ComponentProps<typeof MagnetForm>) {
     // enzyme seems to have trouble shallow rendering with hooks and redux
@@ -71,10 +75,10 @@ describe('MagnetForm', () => {
     fields.ConditionalOnField = jest
       .fn()
       .mockImplementation(props => <div>{props.children}</div>)
-    fields.TextField = jest.fn().mockImplementation(props => <div />)
+    fields.TextField = jest.fn().mockImplementation(() => <div />)
     fields.RadioGroupField = jest
       .fn()
-      .mockImplementation(props => <div />)(
+      .mockImplementation(() => <div />)(
         uiModuleSelectors.getMagneticLabwareOptions as jest.MockedFunction<
           typeof uiModuleSelectors.getMagneticLabwareOptions
         >
@@ -101,9 +105,7 @@ describe('MagnetForm', () => {
   })
 
   it('engage height caption is displayed with proper height to decimal scale', () => {
-    ;(uiModuleSelectors.getMagnetLabwareEngageHeight as jest.MockedFunction<
-      typeof uiModuleSelectors.getMagnetLabwareEngageHeight
-    >).mockReturnValue(10.9444)
+    getMagnetLabwareEngageHeightMock.mockReturnValue(10.9444)
 
     const wrapper = render(props)
 
@@ -113,9 +115,7 @@ describe('MagnetForm', () => {
   })
 
   it('engage height caption is null when no engage height', () => {
-    ;(uiModuleSelectors.getMagnetLabwareEngageHeight as jest.MockedFunction<
-      typeof uiModuleSelectors.getMagnetLabwareEngageHeight
-    >).mockReturnValue(null)
+    getMagnetLabwareEngageHeightMock.mockReturnValue(null)
 
     const wrapper = render(props)
 
