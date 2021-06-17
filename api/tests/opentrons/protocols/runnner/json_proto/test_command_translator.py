@@ -114,7 +114,7 @@ def _assert_appear_in_order(elements: typing.Iterable, source: typing.Iterable) 
 def test_labware(
     subject: CommandTranslator,
     json_protocol: models.JsonProtocol,
-    minimal_labware_def: dict,  # To do: Uhhh something
+    minimal_labware_def: dict,
     minimal_labware_def2: dict,
 ) -> None:
     result = subject.translate(json_protocol)
