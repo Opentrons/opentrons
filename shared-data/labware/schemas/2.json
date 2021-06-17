@@ -219,7 +219,7 @@
             ]
           },
           "properties": {
-            "depth": { 
+            "depth": {
               "description": "The distance between the top and bottom of this well. If the labware is a tip rack, this will be ignored in favor of tipLength, but the values should match.",
               "$ref": "#/definitions/positiveNumber"
             },
