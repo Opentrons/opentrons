@@ -27,7 +27,7 @@ class PipetteLocationData:
 
 
 class MotionView:
-    """Compulete motion planning state and getter methods."""
+    """Complete motion planning state and getter methods."""
 
     _labware: LabwareView
     _pipette: PipetteView

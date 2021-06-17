@@ -25,7 +25,7 @@ def get_command_view(
 
 
 def test_get_command_bad_id() -> None:
-    """get_labware_data_by_id should raise if labware ID doesn't exist."""
+    """get_command_by_id should return None if command ID doesn't exist."""
     subject = get_command_view()
 
     result = subject.get_command_by_id("asdfghjkl")
