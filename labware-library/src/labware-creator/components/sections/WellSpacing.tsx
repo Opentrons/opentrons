@@ -23,7 +23,7 @@ const Instructions = (props: Props): JSX.Element => {
     <>
       <p>
         Spacing is between the <strong>center</strong> of{' '}
-        {getLabwareName(values, false)}.
+        {getLabwareName(values, true)}.
       </p>
       <p>
         <span className={styles.capitalize}>

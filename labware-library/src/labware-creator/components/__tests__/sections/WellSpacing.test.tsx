@@ -41,7 +41,10 @@ describe('WellSpacing', () => {
     formikConfig.initialValues.labwareType = 'wellPlate'
     when(getLabwareNameMock)
       .calledWith(formikConfig.initialValues, false)
-      .mockReturnValue('well')
+      .mockReturnValue('FAKE LABWARE NAME SINGULAR')
+    when(getLabwareNameMock)
+      .calledWith(formikConfig.initialValues, true)
+      .mockReturnValue('FAKE LABWARE NAME PLURAL')
 
     render(wrapInFormik(<WellSpacing />, formikConfig))
 
@@ -49,12 +52,26 @@ describe('WellSpacing', () => {
 
     screen.getByText(
       nestedTextMatcher(
-        'well spacing measurements inform the robot how far away rows and columns are from each other.'
+        'Spacing is between the center of FAKE LABWARE NAME PLURAL.'
+      )
+    )
+
+    screen.getByText(
+      nestedTextMatcher(
+        'FAKE LABWARE NAME SINGULAR spacing measurements inform the robot how far away rows and columns are from each other.'
       )
     )
 
     screen.getByRole('textbox', { name: /X Spacing \(Xs\)/i })
     screen.getByRole('textbox', { name: /Y Spacing \(Ys\)/i })
+  })
+
+  it('should render "Tip Spacing" instead of "Well Spacing" when tipRack is selected', () => {
+    formikConfig.initialValues.labwareType = 'tipRack'
+
+    render(wrapInFormik(<WellSpacing />, formikConfig))
+
+    screen.getByRole('heading', { name: /Tip Spacing/i })
   })
 
   it('should NOT render when the labware type is aluminumBlock', () => {
@@ -68,22 +85,6 @@ describe('WellSpacing', () => {
       })
     )
     expect(container.firstChild).toBe(null)
-  })
-
-  it('should render tips instead of wells when tipRack is selected', () => {
-    formikConfig.initialValues.labwareType = 'tipRack'
-    when(getLabwareNameMock)
-      .calledWith(formikConfig.initialValues, false)
-      .mockReturnValue('tip')
-
-    render(wrapInFormik(<WellSpacing />, formikConfig))
-
-    screen.getByRole('heading', { name: /Tip Spacing/i })
-    screen.getByText(
-      nestedTextMatcher(
-        'tip spacing measurements inform the robot how far away rows and columns are from each other.'
-      )
-    )
   })
 
   it('should NOT render when the labware type is tubeRack', () => {
