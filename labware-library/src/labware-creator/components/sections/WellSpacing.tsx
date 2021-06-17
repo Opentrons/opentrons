@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useFormikContext } from 'formik'
 import { makeMaskToDecimal } from '../../fieldMasks'
-import { isEveryFieldHidden } from '../../utils'
+import { isEveryFieldHidden, getLabwareName } from '../../utils'
 import { LabwareFields } from '../../fields'
 import { FormAlerts } from '../alerts/FormAlerts'
 import { TextField } from '../TextField'
@@ -16,16 +16,21 @@ interface Props {
   values: LabwareFields
 }
 
-// TODO (ka 2021-5-11): Broke this out here since we will need to have more conditions for tips
-const Instructions = (): JSX.Element => {
+const Instructions = (props: Props): JSX.Element => {
+  const { values } = props
+
   return (
     <>
       <p>
-        Spacing is between the <strong>center</strong> of wells.
+        Spacing is between the <strong>center</strong> of{' '}
+        {getLabwareName(values, true)}.
       </p>
       <p>
-        Well spacing measurements inform the robot how far away rows and columns
-        are from each other.
+        <span className={styles.capitalize}>
+          {getLabwareName(values, false)}
+        </span>{' '}
+        spacing measurements inform the robot how far away rows and columns are
+        from each other.
       </p>
     </>
   )
@@ -36,7 +41,7 @@ const Content = (props: Props): JSX.Element => {
   return (
     <div className={styles.flex_row}>
       <div className={styles.instructions_column}>
-        <Instructions />
+        <Instructions values={values} />
       </div>
       <div className={styles.diagram_column}>
         <XYSpacingImg
@@ -71,9 +76,12 @@ export const WellSpacing = (): JSX.Element | null => {
   ) {
     return null
   }
+  // TODO (ka 2021-6-10): This will need getLabwareName once we introduce custom tuberacks
+  const label =
+    values.labwareType === 'tipRack' ? 'Tip Spacing' : 'Well Spacing'
   return (
     <div className={styles.new_definition_section}>
-      <SectionBody label="Well Spacing" id="WellSpacing">
+      <SectionBody label={label} id="WellSpacing">
         <>
           <FormAlerts touched={touched} errors={errors} fieldList={fieldList} />
           <Content values={values} />

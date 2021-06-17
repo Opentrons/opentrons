@@ -3,14 +3,19 @@ import { FormikConfig } from 'formik'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { render, screen } from '@testing-library/react'
 import { getDefaultFormState, LabwareFields } from '../../../fields'
-import { isEveryFieldHidden } from '../../../utils'
+import { isEveryFieldHidden, getLabwareName } from '../../../utils'
 import { WellSpacing } from '../../sections/WellSpacing'
 import { wrapInFormik } from '../../utils/wrapInFormik'
+import { nestedTextMatcher } from '../../__testUtils__/nestedTextMatcher'
 
 jest.mock('../../../utils')
 
 const isEveryFieldHiddenMock = isEveryFieldHidden as jest.MockedFunction<
   typeof isEveryFieldHidden
+>
+
+const getLabwareNameMock = getLabwareName as jest.MockedFunction<
+  typeof getLabwareName
 >
 
 let formikConfig: FormikConfig<LabwareFields>
@@ -33,15 +38,40 @@ describe('WellSpacing', () => {
   })
 
   it('should render when fields are visible', () => {
+    formikConfig.initialValues.labwareType = 'wellPlate'
+    when(getLabwareNameMock)
+      .calledWith(formikConfig.initialValues, false)
+      .mockReturnValue('FAKE LABWARE NAME SINGULAR')
+    when(getLabwareNameMock)
+      .calledWith(formikConfig.initialValues, true)
+      .mockReturnValue('FAKE LABWARE NAME PLURAL')
+
     render(wrapInFormik(<WellSpacing />, formikConfig))
+
     screen.getByRole('heading', { name: /Well Spacing/i })
 
     screen.getByText(
-      'Well spacing measurements inform the robot how far away rows and columns are from each other.'
+      nestedTextMatcher(
+        'Spacing is between the center of FAKE LABWARE NAME PLURAL.'
+      )
+    )
+
+    screen.getByText(
+      nestedTextMatcher(
+        'FAKE LABWARE NAME SINGULAR spacing measurements inform the robot how far away rows and columns are from each other.'
+      )
     )
 
     screen.getByRole('textbox', { name: /X Spacing \(Xs\)/i })
     screen.getByRole('textbox', { name: /Y Spacing \(Ys\)/i })
+  })
+
+  it('should render "Tip Spacing" instead of "Well Spacing" when tipRack is selected', () => {
+    formikConfig.initialValues.labwareType = 'tipRack'
+
+    render(wrapInFormik(<WellSpacing />, formikConfig))
+
+    screen.getByRole('heading', { name: /Tip Spacing/i })
   })
 
   it('should NOT render when the labware type is aluminumBlock', () => {
@@ -56,6 +86,7 @@ describe('WellSpacing', () => {
     )
     expect(container.firstChild).toBe(null)
   })
+
   it('should NOT render when the labware type is tubeRack', () => {
     const { container } = render(
       wrapInFormik(<WellSpacing />, {
