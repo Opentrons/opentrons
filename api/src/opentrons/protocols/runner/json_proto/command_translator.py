@@ -1,4 +1,4 @@
-from typing import Dict, Iterable, List
+from typing import Dict, List
 
 import opentrons.types
 
@@ -10,7 +10,7 @@ class CommandTranslatorError(Exception):
     pass
 
 
-PECommands = Iterable[pe.commands.CommandRequestType]
+PECommands = List[pe.commands.CommandRequestType]
 
 
 class CommandTranslator:
