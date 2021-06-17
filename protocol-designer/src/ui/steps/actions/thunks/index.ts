@@ -25,7 +25,7 @@ import {
   DuplicateMultipleStepsAction,
   SelectMultipleStepsAction,
 } from '../types'
-export const addAndSelectStepWithHints: (arg0: {
+export const addAndSelectStepWithHints: (arg: {
   stepType: StepType
 }) => ThunkAction<any> = payload => (dispatch, getState) => {
   const robotStateTimeline = fileDataSelectors.getRobotStateTimeline(getState())
@@ -70,7 +70,7 @@ export const addAndSelectStepWithHints: (arg0: {
     dispatch(tutorialActions.addHint('module_without_labware'))
   }
 }
-export type ReorderSelectedStepAction = {
+export interface ReorderSelectedStepAction {
   type: 'REORDER_SELECTED_STEP'
   payload: {
     delta: number
@@ -114,6 +114,7 @@ export const duplicateMultipleSteps: (
 > = stepIds => (dispatch, getState) => {
   const orderedStepIds = getOrderedStepIds(getState())
   const lastSelectedItemId = getMultiSelectLastSelected(getState())
+  // @ts-expect-error(sa, 2021-6-15): lastSelectedItemId might be null, which you cannot pass to indexOf
   const indexOfLastSelected = orderedStepIds.indexOf(lastSelectedItemId)
   stepIds.sort((a, b) => orderedStepIds.indexOf(a) - orderedStepIds.indexOf(b))
   const duplicateIdsZipped = stepIds.map(stepId => ({
@@ -123,17 +124,18 @@ export const duplicateMultipleSteps: (
   const duplicateIds = duplicateIdsZipped.map(
     ({ duplicateStepId }) => duplicateStepId
   )
-  const duplicateMultipleStepsAction = {
+  const duplicateMultipleStepsAction: DuplicateMultipleStepsAction = {
     type: 'DUPLICATE_MULTIPLE_STEPS',
     payload: {
       steps: duplicateIdsZipped,
       indexToInsert: indexOfLastSelected + 1,
     },
   }
-  const selectMultipleStepsAction = {
+  const selectMultipleStepsAction: SelectMultipleStepsAction = {
     type: 'SELECT_MULTIPLE_STEPS',
     payload: {
       stepIds: duplicateIds,
+      // @ts-expect-error(sa, 2021-6-15): last might return undefined
       lastSelected: last(duplicateIds),
     },
   }
@@ -141,7 +143,7 @@ export const duplicateMultipleSteps: (
   dispatch(selectMultipleStepsAction)
 }
 export const SAVE_STEP_FORM: 'SAVE_STEP_FORM' = 'SAVE_STEP_FORM'
-export type SaveStepFormAction = {
+export interface SaveStepFormAction {
   type: typeof SAVE_STEP_FORM
   payload: FormData
 }

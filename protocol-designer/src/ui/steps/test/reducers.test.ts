@@ -204,12 +204,12 @@ describe('selectedItem reducer', () => {
       type: 'SELECT_MULTIPLE_STEPS',
       payload: { stepIds, lastSelected },
     }
-    const multiTestCases: {
+    const multiTestCases: Array<{
       title: string
       prev: SelectableItem | null
       action: SelectMultipleStepsAction
       expected: SelectableItem | null
-    } = [
+    }> = [
       {
         title: 'should enter multi-select mode from null',
         prev: null,
@@ -222,6 +222,7 @@ describe('selectedItem reducer', () => {
       },
       {
         title: 'should enter multi-select mode from multi-select',
+        // @ts-expect-error(sa, 2021-6-17): missing lastSelected is to be of type MultipleSelectedItem
         prev: {
           selectionType: MULTI_STEP_SELECTION_TYPE,
           ids: ['notTheseSteps', 'nope'],
@@ -251,6 +252,7 @@ describe('selectedItem reducer', () => {
           'should enter multi-select mode from single-selected terminal item',
         prev: {
           selectionType: TERMINAL_ITEM_SELECTION_TYPE,
+          // @ts-expect-error(sa, 2021-6-17): not a valid TerminalItemId
           id: 'someTerminalItem',
         },
         action,

@@ -3,21 +3,24 @@ import last from 'lodash/last'
 import uniq from 'lodash/uniq'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { getDefaultsForStepType } from '../../steplist/formLevel/getDefaultsForStepType'
-import { SubstepIdentifier, TerminalItemId } from '../../steplist/types'
-import { PRESAVED_STEP_ID } from '../../steplist/types'
+import {
+  SubstepIdentifier,
+  TerminalItemId,
+  PRESAVED_STEP_ID,
+} from '../../steplist/types'
+
 import { getLabwareOnModule } from '../modules/utils'
 import {
   SelectableItem,
   StepsState,
   CollapsedStepsState,
   HoverableItem,
-} from './reducers'
-import {
   initialSelectedItemState,
   SINGLE_STEP_SELECTION_TYPE,
   TERMINAL_ITEM_SELECTION_TYPE,
   MULTI_STEP_SELECTION_TYPE,
 } from './reducers'
+
 import {
   getAspirateLabwareDisabledFields,
   getDispenseLabwareDisabledFields,
@@ -42,6 +45,8 @@ export const rootSelector = (state: BaseState): StepsState => state.ui.steps
 // (or the initial selected item, if there are no more saved steps).
 // Ideally this would happen in the selectedItem reducer itself,
 // but it's not easy to feed orderedStepIds into that reducer.
+
+// @ts-expect-error(sa, 2021-6-15): lodash/last might return undefined, change line 55 to pull out the last element directly
 const getSelectedItem: Selector<SelectableItem> = createSelector(
   rootSelector,
   stepFormSelectors.getOrderedStepIds,
@@ -104,7 +109,7 @@ export const getHoveredStepLabware: Selector<string[]> = createSelector(
   getHoveredStepId,
   stepFormSelectors.getInitialDeckSetup,
   (allStepArgsAndErrors, hoveredStep, initialDeckState) => {
-    const blank = []
+    const blank: string[] = []
 
     if (!hoveredStep || !allStepArgsAndErrors[hoveredStep]) {
       return blank
@@ -131,9 +136,9 @@ export const getHoveredStepLabware: Selector<string[]> = createSelector(
       // only 1 labware
       return [stepArgs.labware]
     }
-
+    // @ts-expect-error(sa, 2021-6-15): type narrow stepArgs.module
     if (stepArgs.module) {
-      // $FlowFixMe(sa, 2021-05-10): ignore until TS conversion
+      // @ts-expect-error(sa, 2021-6-15): this expect error should not be necessary after type narrowing above
       const labware = getLabwareOnModule(initialDeckState, stepArgs.module)
       return labware ? [labware.id] : []
     }
@@ -177,12 +182,12 @@ export const getCollapsedSteps: Selector<CollapsedStepsState> = createSelector(
   rootSelector,
   (state: StepsState) => state.collapsedSteps
 )
-type StepTitleInfo = {
+interface StepTitleInfo {
   stepName: string
   stepType: StepType
 }
 
-const _stepToTitleInfo = (stepForm: FormData) => ({
+const _stepToTitleInfo = (stepForm: FormData): StepTitleInfo => ({
   stepName: stepForm.stepName,
   stepType: stepForm.stepType,
 })
@@ -270,6 +275,8 @@ export const getMultiSelectFieldValues: Selector<MultiselectFieldValues | null> 
     }
 
     const multiselectChanges = Object.keys(changes).reduce((acc, name) => {
+      // @ts-expect-error(sa, 2021-6-15): not sure how to type this cuz isIndeterminate is NOT optional on MultiselectFieldValues
+      // but the inital value of this reduce is {}
       acc[name] = {
         value: changes[name],
         isIndeterminate: false,
@@ -298,6 +305,7 @@ export const getMultiSelectDisabledFields: Selector<DisabledFields | null> = cre
     }
   }
 )
+
 export const getCountPerStepType: Selector<CountPerStepType> = createSelector(
   getMultiSelectItemIds,
   stepFormSelectors.getSavedStepForms,
@@ -306,6 +314,7 @@ export const getCountPerStepType: Selector<CountPerStepType> = createSelector(
     const steps = stepIds.map(id => allSteps[id])
     const countPerStepType = steps.reduce<CountPerStepType>((acc, step) => {
       const { stepType } = step
+      // @ts-expect-error(sa, 2021-6-15): cannot type narrow this way in TS
       const newCount = acc[stepType] ? acc[stepType] + 1 : 1
       acc[stepType] = newCount
       return acc
@@ -317,13 +326,16 @@ export const getBatchEditSelectedStepTypes: Selector<
   StepType[]
 > = createSelector(getCountPerStepType, countPerStepType => {
   return uniq(
-    Object.keys(countPerStepType).filter(
-      stepType => countPerStepType[stepType] > 0
+    (Object.keys(countPerStepType) as StepType[]).filter(
+      // @ts-expect-error(sa, 2021-6-15): TS thinks countPerStepType[stepType] might be undefined because CountPerStepType is a partial record
+      (stepType) => countPerStepType[stepType] > 0
     )
   ).sort()
 })
 
-function getMoveLiquidMultiSelectDisabledFields(forms: FormData[]) {
+function getMoveLiquidMultiSelectDisabledFields(
+  forms: FormData[]
+): DisabledFields {
   const {
     pipettesDifferent,
     aspirateLabwareDifferent,
@@ -376,7 +388,7 @@ function getMoveLiquidMultiSelectDisabledFields(forms: FormData[]) {
   return disabledFields
 }
 
-function getMixMultiSelectDisabledFields(forms: FormData[]) {
+function getMixMultiSelectDisabledFields(forms: FormData[]): DisabledFields {
   const { pipettesDifferent, labwareDifferent } = forms.reduce(
     (acc, form) => ({
       lastPipette: form.pipette,

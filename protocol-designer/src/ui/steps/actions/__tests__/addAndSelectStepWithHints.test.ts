@@ -4,6 +4,7 @@ import { addHint } from '../../../../tutorial/actions'
 import * as uiModuleSelectors from '../../../../ui/modules/selectors'
 import { selectors as labwareIngredSelectors } from '../../../../labware-ingred/selectors'
 import * as fileDataSelectors from '../../../../file-data/selectors'
+import { StepType } from '../../../../form-types'
 jest.mock('../../../../tutorial/actions')
 jest.mock('../../../../ui/modules/selectors')
 jest.mock('../../../../labware-ingred/selectors')
@@ -34,6 +35,7 @@ const mockGetRobotStateTimeline = fileDataSelectors.getRobotStateTimeline as jes
 >
 beforeEach(() => {
   jest.clearAllMocks()
+  // @ts-expect-error(sa, 2021-6-17): not a valid AddHintAction
   addHintMock.mockReturnValue('addHintReturnValue')
   mockGetDeckHasLiquid.mockReturnValue(true)
   mockGetMagnetModuleHasLabware.mockReturnValue(false)
@@ -41,11 +43,12 @@ beforeEach(() => {
   mockGetThermocyclerModuleHasLabware.mockReturnValue(false)
   mockGetSingleTemperatureModuleId.mockReturnValue(null)
   mockGetSingleThermocyclerModuleId.mockReturnValue(null)
+  // @ts-expect-error(sa, 2021-6-17): not a valid Timeline
   mockGetRobotStateTimeline.mockReturnValue('mockGetRobotStateTimelineValue')
 })
 describe('addAndSelectStepWithHints', () => {
   it('should dispatch addStep thunk, and no hints when no hints are applicable (eg pause step)', () => {
-    const stepType = 'pause'
+    const stepType: StepType = 'pause'
     const payload = {
       stepType,
     }
@@ -66,7 +69,7 @@ describe('addAndSelectStepWithHints', () => {
     ])
   })
   it('should dispatch addStep thunk, and also ADD_HINT "add_liquids_and_labware" if we\'re adding a step that uses liquid but have no liquids on the deck', () => {
-    const stepType = 'moveLiquid'
+    const stepType: StepType = 'moveLiquid'
     const payload = {
       stepType,
     }
@@ -94,7 +97,7 @@ describe('addAndSelectStepWithHints', () => {
     ;[
       {
         testName: 'magnet step, when magnetic module has no labware',
-        stepType: 'magnet',
+        stepType: 'magnet' as StepType,
         selectorValues: {
           getMagnetModuleHasLabware: false,
           getTemperatureModuleHasLabware: false,
@@ -105,7 +108,7 @@ describe('addAndSelectStepWithHints', () => {
       },
       {
         testName: 'temperature step, when temperature module has no labware',
-        stepType: 'temperature',
+        stepType: 'temperature' as StepType,
         selectorValues: {
           getMagnetModuleHasLabware: false,
           getTemperatureModuleHasLabware: false,
@@ -116,7 +119,7 @@ describe('addAndSelectStepWithHints', () => {
       },
       {
         testName: 'temperature step, when thermocycler has no labware',
-        stepType: 'temperature',
+        stepType: 'temperature' as StepType,
         selectorValues: {
           getMagnetModuleHasLabware: false,
           getTemperatureModuleHasLabware: false,
