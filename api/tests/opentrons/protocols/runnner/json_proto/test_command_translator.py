@@ -8,7 +8,11 @@ from opentrons.protocols import models
 from opentrons.protocols.runner.json_proto.command_translator import CommandTranslator
 
 
-# Fix before merge: This gross-ass copy-paste
+# todo(mm, 2021-06-17):
+#
+# This JSON protocol fixture is copy-pasted from an opentrons.file_runner fixture.
+# Either lift the fixture somewhere common to both of these modules, or move one of
+# the modules next to the other so they can benefit from the same fixtures.
 
 
 @pytest.fixture
@@ -89,7 +93,7 @@ def subject() -> CommandTranslator:
 
 def _assert_appear_in_order(elements: typing.Iterable, source: typing.Iterable) -> None:
     """
-    Make sure all elements appear in source, in the given relative order.
+    Assert all elements appear in source, in the given order relative to each other.
 
     Example:
 
