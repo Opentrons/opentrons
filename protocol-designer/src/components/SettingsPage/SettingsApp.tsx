@@ -21,16 +21,16 @@ import { FeatureFlagCard } from './FeatureFlagCard'
 import styles from './SettingsPage.css'
 import { BaseState, ThunkDispatch } from '../../types'
 
-type Props = {
+interface Props {
   canClearHintDismissals: boolean
   hasOptedIn: boolean | null
   restoreHints: () => unknown
   toggleOptedIn: () => unknown
 }
 
-type SP = {
-  canClearHintDismissals: $PropertyType<Props, 'canClearHintDismissals'>
-  hasOptedIn: $PropertyType<Props, 'hasOptedIn'>
+interface SP {
+  canClearHintDismissals: Props['canClearHintDismissals']
+  hasOptedIn: Props['hasOptedIn']
 }
 
 function SettingsAppComponent(props: Props) {
@@ -115,7 +115,7 @@ function mapStateToProps(state: BaseState): SP {
 
 function mergeProps(
   stateProps: SP,
-  dispatchProps: { dispatch: ThunkDispatch<*> }
+  dispatchProps: { dispatch: ThunkDispatch<any> }
 ): Props {
   const { dispatch } = dispatchProps
   const { hasOptedIn } = stateProps
@@ -130,14 +130,7 @@ function mergeProps(
   }
 }
 
-export const SettingsApp: React.AbstractComponent<{}> = connect<
-  Props,
-  {},
-  SP,
-  {},
-  BaseState,
-  _
->(
+export const SettingsApp = connect(
   mapStateToProps,
   null,
   mergeProps

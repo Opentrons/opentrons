@@ -9,7 +9,7 @@ import styles from './TipPositionInput.css'
 
 const WELL_HEIGHT_PIXELS = 48
 const PIXEL_DECIMALS = 2
-type Props = {
+interface Props {
   mmFromBottom: number
   wellDepthMm: number
 }

@@ -1,12 +1,12 @@
-import * as React from 'react'
 import { connect } from 'react-redux'
 import { BaseState, ThunkDispatch } from '../types'
 import { StepIdType } from '../form-types'
 import { actions as steplistActions } from '../steplist'
 import { actions as stepsActions, getIsMultiSelectMode } from '../ui/steps'
 import { selectors as stepFormSelectors } from '../step-forms'
-import { StepList } from '../components/steplist'
-type Props = React.ComponentProps<typeof StepList>
+import { StepList, StepListProps } from '../components/steplist'
+
+type Props = StepListProps
 type SP = {
   orderedStepIds: Props['orderedStepIds']
   isMultiSelectMode: boolean | null | undefined

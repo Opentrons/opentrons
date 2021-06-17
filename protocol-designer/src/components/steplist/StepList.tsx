@@ -14,15 +14,15 @@ import { MultiSelectToolbar } from './MultiSelectToolbar'
 
 import { StepIdType } from '../../form-types'
 
-type Props = {
-  isMultiSelectMode: boolean | null | undefined,
-  orderedStepIds: StepIdType[],
-  reorderSelectedStep: (delta: number) => unknown,
-  reorderSteps: (steps: StepIdType[]) => unknown,
+export interface StepListProps {
+  isMultiSelectMode?: boolean | null
+  orderedStepIds: StepIdType[]
+  reorderSelectedStep: (delta: number) => unknown
+  reorderSteps: (steps: StepIdType[]) => unknown
 }
 
-export class StepList extends React.Component<Props> {
-  handleKeyDown: (e: React.KeyboardEvent) => void = e => {
+export class StepList extends React.Component<StepListProps> {
+  handleKeyDown: (e: KeyboardEvent) => void = e => {
     const { reorderSelectedStep } = this.props
     const key = e.key
     const altIsPressed = e.altKey
@@ -40,11 +40,11 @@ export class StepList extends React.Component<Props> {
   }
 
   componentDidMount() {
-    global.addEventListener('keydown', this.handleKeyDown, false)
+    window.addEventListener('keydown', this.handleKeyDown, false)
   }
 
   componentWillUnmount() {
-    global.removeEventListener('keydown', this.handleKeyDown, false)
+    window.removeEventListener('keydown', this.handleKeyDown, false)
   }
 
   render(): React.ReactNode {

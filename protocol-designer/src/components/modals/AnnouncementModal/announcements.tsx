@@ -5,7 +5,7 @@ import { css } from 'styled-components'
 import { Flex, JUSTIFY_SPACE_AROUND, SPACING_3 } from '@opentrons/components'
 import styles from './AnnouncementModal.css'
 
-export type Announcement = {
+export interface Announcement {
   announcementKey: string
   image: React.ReactNode | null
   heading: string

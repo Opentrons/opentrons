@@ -21,7 +21,7 @@ import formStyles from '../../forms/forms.css'
 
 import { FormPipettesByMount } from '../../../step-forms'
 
-export type Props = {
+export interface Props {
   initialTabIndex?: number
   values: FormPipettesByMount
   // TODO 2020-3-20 use formik typing here after we update the def in flow-typed
@@ -54,7 +54,7 @@ export type Props = {
 }
 
 // TODO(mc, 2019-10-14): delete this typedef when gen2 ff is removed
-type PipetteSelectProps = { mount: Mount; tabIndex: number }
+interface PipetteSelectProps { mount: Mount; tabIndex: number }
 
 export function PipetteFields(props: Props): JSX.Element {
   const {

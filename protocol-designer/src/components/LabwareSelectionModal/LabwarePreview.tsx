@@ -15,8 +15,8 @@ import {
 import { i18n } from '../../localization'
 import styles from './styles.css'
 
-type Props = {
-  labwareDef: LabwareDefinition2 | null | undefined
+interface Props {
+  labwareDef?: LabwareDefinition2 | null
   moduleCompatibility?:
     | 'recommended'
     | 'potentiallyCompatible'

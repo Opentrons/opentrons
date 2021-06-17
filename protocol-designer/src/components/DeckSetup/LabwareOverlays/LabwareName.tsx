@@ -3,15 +3,15 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { LabwareNameOverlay } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
-import { BaseState, ThunkDispatch } from '../../../types'
+import { BaseState } from '../../../types'
 import { selectors as uiLabwareSelectors } from '../../../ui/labware'
 import { LabwareOnDeck } from '../../../step-forms'
-type OP = {
+interface OP {
   labwareOnDeck: LabwareOnDeck
 }
 
-type SP = {
-  nickname: string | null | undefined
+interface SP {
+  nickname?: string | null
 }
 
 type Props = OP & SP
@@ -30,11 +30,4 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
   }
 }
 
-export const LabwareName: React.AbstractComponent<OP> = connect<
-  Props,
-  OP,
-  SP,
-  _,
-  BaseState,
-  ThunkDispatch<*>
->(mapStateToProps)(NameOverlay)
+export const LabwareName = connect(mapStateToProps)(NameOverlay)

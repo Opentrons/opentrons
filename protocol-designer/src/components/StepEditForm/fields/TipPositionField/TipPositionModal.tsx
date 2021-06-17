@@ -18,19 +18,19 @@ import { TipPositionZAxisViz } from './TipPositionZAxisViz'
 
 import styles from './TipPositionInput.css'
 import * as utils from './utils'
-import { getIsTouchTipField,  StepFieldName } from '../../../../form-types'
+import { getIsTouchTipField, StepFieldName } from '../../../../form-types'
 
 const SMALL_STEP_MM = 1
 const LARGE_STEP_MM = 10
 const DECIMALS_ALLOWED = 1
 
-type Props = {
-  closeModal: () => unknown,
-  isIndeterminate?: boolean,
-  mmFromBottom: number | null,
-  name: StepFieldName,
-  updateValue: (val: number | null | undefined) => unknown,
-  wellDepthMm: number,
+interface Props {
+  closeModal: () => unknown
+  isIndeterminate?: boolean
+  mmFromBottom: number | null
+  name: StepFieldName
+  updateValue: (val: number | null | undefined) => unknown
+  wellDepthMm: number
 }
 
 const roundValue = (value: number | string | null): number => {
@@ -42,10 +42,10 @@ const OUT_OF_BOUNDS: 'OUT_OF_BOUNDS' = 'OUT_OF_BOUNDS'
 type Error = typeof TOO_MANY_DECIMALS | typeof OUT_OF_BOUNDS
 
 const getErrorText = (args: {
-  errors: Error[],
-  maxMmFromBottom: number,
-  minMmFromBottom: number,
-  isPristine: boolean,
+  errors: Error[]
+  maxMmFromBottom: number
+  minMmFromBottom: number
+  isPristine: boolean
 }): string | null => {
   const { errors, minMmFromBottom, maxMmFromBottom, isPristine } = args
 
@@ -62,13 +62,13 @@ const getErrorText = (args: {
 }
 
 const getErrors = (args: {
-  isDefault: boolean,
-  value: string | null,
-  maxMmFromBottom: number,
-  minMmFromBottom: number,
+  isDefault: boolean
+  value: string | null
+  maxMmFromBottom: number
+  minMmFromBottom: number
 }): Error[] => {
   const { isDefault, value, maxMmFromBottom, minMmFromBottom } = args
-  const errors = []
+  const errors: Error[] = []
   if (isDefault) return errors
 
   const v = Number(value)
@@ -106,8 +106,8 @@ export const TipPositionModal = (props: Props): JSX.Element => {
   const [isPristine, setPristine] = React.useState<boolean>(true)
 
   const getMinMaxMmFromBottom = (): {
-    maxMmFromBottom: number,
-    minMmFromBottom: number,
+    maxMmFromBottom: number
+    minMmFromBottom: number
   } => {
     if (getIsTouchTipField(name)) {
       return {

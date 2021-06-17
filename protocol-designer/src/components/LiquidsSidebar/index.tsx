@@ -12,12 +12,12 @@ import { OrderedLiquids } from '../../labware-ingred/types'
 import * as labwareIngredActions from '../../labware-ingred/actions'
 import { BaseState, ThunkDispatch } from '../../types'
 
-type SP = {
+interface SP {
   liquids: OrderedLiquids
-  selectedLiquid: string | null | undefined
+  selectedLiquid?: string | null
 }
 
-type DP = {
+interface DP {
   createNewLiquid: () => unknown
   selectLiquid: (liquidId: string) => unknown
 }
@@ -57,7 +57,7 @@ function mapStateToProps(state: BaseState): SP {
   }
 }
 
-function mapDispatchToProps(dispatch: ThunkDispatch<*>): DP {
+function mapDispatchToProps(dispatch: ThunkDispatch<any>): DP {
   return {
     selectLiquid: liquidGroupId =>
       dispatch(labwareIngredActions.selectLiquidGroup(liquidGroupId)),
@@ -66,14 +66,7 @@ function mapDispatchToProps(dispatch: ThunkDispatch<*>): DP {
   }
 }
 
-export const LiquidsSidebar: React.AbstractComponent<{}> = connect<
-  Props,
-  {},
-  SP,
-  DP,
-  _,
-  _
->(
+export const LiquidsSidebar = connect(
   mapStateToProps,
   mapDispatchToProps
 )(LiquidsSidebarComponent)

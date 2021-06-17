@@ -6,7 +6,7 @@ import { FieldProps } from '../types'
 
 type RadioGroupFieldProps = FieldProps & {
   name: StepFieldName
-  options: $PropertyType<React.ElementProps<typeof RadioGroup>, 'options'>
+  options: React.ComponentProps<typeof RadioGroup>['options']
   className?: string
 }
 

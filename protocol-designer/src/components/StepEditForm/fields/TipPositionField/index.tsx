@@ -6,7 +6,7 @@ import {
   InputField,
   Tooltip,
   useHoverTooltip,
- UseHoverTooltipResult,
+  UseHoverTooltipResult,
 } from '@opentrons/components'
 import { getWellsDepth } from '@opentrons/shared-data'
 import {
@@ -24,13 +24,13 @@ import { BaseState } from '../../../../types'
 import { FieldProps } from '../../types'
 
 type OP = FieldProps & {
-  labwareId: string | null | undefined,
-  className?: string,
+  labwareId?: string | null
+  className?: string
 }
 
-type SP = {
-  mmFromBottom: number | null,
-  wellDepthMm: number,
+interface SP {
+  mmFromBottom: number | null
+  wellDepthMm: number
 }
 
 type Props = OP & SP
@@ -104,12 +104,12 @@ function TipPositionInput(props: Props) {
   )
 }
 
-type WrapperProps = {
-  isTouchTipField: boolean,
-  isDelayPositionField: boolean,
-  children: React.ReactNode,
-  disabled: boolean,
-  targetProps: $ElementType<UseHoverTooltipResult, 0>,
+interface WrapperProps {
+  isTouchTipField: boolean
+  isDelayPositionField: boolean
+  children: React.ReactNode
+  disabled: boolean
+  targetProps: $ElementType<UseHoverTooltipResult, 0>
 }
 
 const Wrapper = (props: WrapperProps) =>
@@ -146,11 +146,4 @@ const mapSTP = (state: BaseState, ownProps: OP): SP => {
   }
 }
 
-export const TipPositionField: React.AbstractComponent<OP> = connect<
-  Props,
-  OP,
-  SP,
-  _,
-  _,
-  _
->(mapSTP, () => ({}))(TipPositionInput)
+export const TipPositionField = connect(mapSTP, () => ({}))(TipPositionInput)

@@ -23,7 +23,7 @@ export type DeleteModalType =
   | typeof CLOSE_BATCH_EDIT_FORM
   | typeof DELETE_MULTIPLE_STEP_FORMS
 
-type Props = {
+interface Props {
   modalType: DeleteModalType
   onCancelClick: (event: React.MouseEvent | null | undefined) => unknown
   onContinueClick: (event: React.MouseEvent) => unknown

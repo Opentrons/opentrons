@@ -4,7 +4,7 @@ import { Box } from '@opentrons/components'
 // TODO(IL, 2021-03-01): refactor these fragmented style rules (see #7402)
 import styles from '../StepEditForm/StepEditForm.css'
 
-export type FormColumnProps = {
+export interface FormColumnProps {
   children?: React.ReactNode
   sectionHeader?: React.ReactNode
 }

@@ -21,13 +21,13 @@ import { BaseState } from '../../types'
 /* TODO:  BC 2018-09-13 move to src/components/alerts and adapt and use src/components/alerts/Alerts
  * see #1814 for reference
  */
-type SP = {
+interface SP {
   errors: Props['errors']
   warnings: Props['warnings']
   stepId?: StepIdType | null | undefined
 }
-type OP = {
-  focusedField: StepFieldName | null | undefined
+interface OP {
+  focusedField?: StepFieldName | null
   dirtyFields: StepFieldName[]
 }
 
@@ -104,14 +104,7 @@ const mergeProps = (
   }
 }
 
-export const FormAlerts: React.AbstractComponent<OP> = connect<
-  Props,
-  OP,
-  SP,
-  {},
-  _,
-  _
->(
+export const FormAlerts =connect(
   mapStateToProps,
   null,
   mergeProps

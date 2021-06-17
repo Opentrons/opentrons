@@ -11,17 +11,17 @@ import { ContentsByWell } from '../../labware-ingred/types'
 import { BaseState } from '../../types'
 import { wellFillFromWellContents } from '../labware/utils'
 
-type OP = {
+interface OP {
   className?: string
   labwareOnDeck: LabwareOnDeckType
   x: number
   y: number
 }
 
-type SP = {
+interface SP {
   wellContents: ContentsByWell
-  missingTips: WellGroup | null | undefined
-  highlightedWells: WellGroup | null | undefined
+  missingTips?: WellGroup | null
+  highlightedWells?: WellGroup | null
 }
 
 type Props = OP & SP
@@ -64,11 +64,4 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
   }
 }
 
-export const LabwareOnDeck: React.AbstractComponent<OP> = connect<
-  Props,
-  OP,
-  SP,
-  {},
-  _,
-  _
->(mapStateToProps)(LabwareOnDeckComponent)
+export const LabwareOnDeck = connect(mapStateToProps)(LabwareOnDeckComponent)

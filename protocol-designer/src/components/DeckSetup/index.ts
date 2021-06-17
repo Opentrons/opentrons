@@ -8,13 +8,13 @@ import { InitialDeckSetup } from '../../step-forms'
 import { DeckSetup as DeckSetupComponent } from './DeckSetup'
 import { TerminalItemId } from '../../steplist'
 import { BaseState, ThunkDispatch } from '../../types'
-type Props = React.ElementProps<typeof DeckSetupComponent>
-type SP = {
-  selectedTerminalItemId: TerminalItemId | null | undefined
+type Props = React.ComponentProps<typeof DeckSetupComponent>
+interface SP {
+  selectedTerminalItemId?: TerminalItemId | null
   drilledDown: boolean
   initialDeckSetup: InitialDeckSetup
 }
-type DP = {
+interface DP {
   drillUpFromLabware: () => unknown
 }
 
@@ -37,14 +37,7 @@ const mergeProps = (stateProps: SP, dispatchProps: DP): Props => ({
   },
 })
 
-export const DeckSetup: React.AbstractComponent<{}> = connect<
-  Props,
-  {},
-  SP,
-  DP,
-  _,
-  _
->(
+export const DeckSetup = connect(
   mapStateToProps,
   mapDispatchToProps,
   mergeProps

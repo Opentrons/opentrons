@@ -12,8 +12,8 @@ import { LabwareDefinition2 } from '@opentrons/shared-data'
 
 import { WellTooltip } from './WellTooltip'
 
-type Props = {
-  definition: LabwareDefinition2 | null | undefined
+interface Props {
+  definition?: LabwareDefinition2 | null
   ingredNames: WellIngredientNames
   wellContents: ContentsByWell
 }

@@ -5,7 +5,6 @@ import { mount } from 'enzyme'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
 import { CheckboxRowField, DelayFields, WellOrderField } from '../../fields'
 import { SourceDestFields } from '../MoveLiquidForm/SourceDestFields'
-import { BaseState } from '../../../../types'
 
 jest.mock('../../../../step-forms')
 jest.mock('../../utils')

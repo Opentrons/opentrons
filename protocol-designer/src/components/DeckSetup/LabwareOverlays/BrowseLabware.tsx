@@ -10,11 +10,11 @@ import { drillDownOnLabware } from '../../../labware-ingred/actions'
 import { resetScrollElements } from '../../../ui/steps/utils'
 import styles from './LabwareOverlays.css'
 
-type OP = {
+interface OP {
   labwareOnDeck: LabwareOnDeck
 }
 
-type DP = {
+interface DP {
   drillDown: () => unknown
 }
 
@@ -32,21 +32,17 @@ function BrowseLabwareOverlay(props: Props) {
   )
 }
 
-const mapDispatchToProps = (dispatch: ThunkDispatch<*>, ownProps: OP): DP => ({
+const mapDispatchToProps = (
+  dispatch: ThunkDispatch<any>,
+  ownProps: OP
+): DP => ({
   drillDown: () => {
     resetScrollElements()
     dispatch(drillDownOnLabware(ownProps.labwareOnDeck.id))
   },
 })
 
-export const BrowseLabware: React.AbstractComponent<OP> = connect<
-  Props,
-  OP,
-  _,
-  DP,
-  _,
-  _
->(
+export const BrowseLabware = connect(
   null,
   mapDispatchToProps
 )(BrowseLabwareOverlay)

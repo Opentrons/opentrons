@@ -7,7 +7,7 @@ import { i18n } from '../../../localization'
 import modalStyles from '../../modals/modal.css'
 import styles from './styles.css'
 
-type ButtonRowProps = {
+interface ButtonRowProps {
   handleClickMoreOptions: () => unknown
   handleClose: () => unknown
   handleSave: () => unknown

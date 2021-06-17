@@ -8,6 +8,7 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+import { AtomicProfileStep } from '@opentrons/shared-data/protocol/types/schemaV4'
 import { THERMOCYCLER_PROFILE, THERMOCYCLER_STATE } from '../../constants'
 import { stepIconsByType, PROFILE_CYCLE } from '../../form-types'
 import { i18n } from '../../localization'
@@ -34,26 +35,26 @@ import {
   WellIngredientNames,
 } from '../../steplist/types'
 
-export type StepItemProps = {
-  description: string | null | undefined
-  rawForm: FormData | null | undefined
+export interface StepItemProps {
+  description?: string | null
+  rawForm?: FormData | null
   stepNumber: number
   stepType: StepType
   title?: string
 
-  collapsed?: boolean,
-  error: boolean | null | undefined,
-  warning: boolean | null | undefined,
-  selected?: boolean,
-  isLastSelected?: boolean,
-  hovered?: boolean,
-  isMultiSelectMode?: boolean,
+  collapsed?: boolean
+  error?: boolean | null
+  warning?: boolean | null
+  selected?: boolean
+  isLastSelected?: boolean
+  hovered?: boolean
+  isMultiSelectMode?: boolean
 
-  highlightStep: () => unknown,
-  onStepContextMenu?: (event?: React.MouseEvent) => unknown,
-  handleClick?: (event: React.MouseEvent) => unknown,
-  toggleStepCollapsed: () => unknown,
-  unhighlightStep: (event?: React.MouseEvent) => unknown,
+  highlightStep: () => unknown
+  onStepContextMenu?: (event?: React.MouseEvent) => unknown
+  handleClick?: (event: React.MouseEvent) => unknown
+  toggleStepCollapsed: () => unknown
+  unhighlightStep: (event?: React.MouseEvent) => unknown
   children?: React.ReactNode
 }
 
@@ -111,15 +112,15 @@ export const StepItem = (props: StepItemProps): JSX.Element => {
 }
 
 export type StepItemContentsProps = {
-  rawForm: FormData | null | undefined,
-  stepType: StepType,
-  substeps: SubstepItemData | null | undefined,
+  rawForm: FormData | null | undefined
+  stepType: StepType
+  substeps: SubstepItemData | null | undefined
 
-  ingredNames: WellIngredientNames,
-  labwareNicknamesById: { [labwareId: string]: string },
+  ingredNames: WellIngredientNames
+  labwareNicknamesById: { [labwareId: string]: string }
 
-  highlightSubstep: (substepIdentifier: SubstepIdentifier) => unknown,
-  hoveredSubstep: SubstepIdentifier | null | undefined,
+  highlightSubstep: (substepIdentifier: SubstepIdentifier) => unknown
+  hoveredSubstep: SubstepIdentifier | null | undefined
 }
 
 const makeDurationText = (
@@ -131,9 +132,9 @@ const makeDurationText = (
 }
 
 type ProfileStepSubstepRowProps = {
-  step: ProfileStepItem,
-  stepNumber: number,
-  repetitionsDisplay: string | null | undefined,
+  step: ProfileStepItem
+  stepNumber: number
+  repetitionsDisplay: string | null | undefined
 }
 export const ProfileStepSubstepRow = (
   props: ProfileStepSubstepRowProps
@@ -176,7 +177,7 @@ export const ProfileStepSubstepRow = (
 }
 
 // this is a row under a cycle under a substep
-type ProfileCycleRowProps = { step: ProfileStepItem, stepNumber: number }
+type ProfileCycleRowProps = { step: ProfileStepItem; stepNumber: number }
 const ProfileCycleRow = (props: ProfileCycleRowProps): JSX.Element => {
   const { step, stepNumber } = props
   return (
@@ -193,8 +194,8 @@ const ProfileCycleRow = (props: ProfileCycleRowProps): JSX.Element => {
 }
 
 type ProfileCycleSubstepGroupProps = {
-  cycle: ProfileCycleItem,
-  stepNumber: number,
+  cycle: ProfileCycleItem
+  stepNumber: number
 }
 export const ProfileCycleSubstepGroup = (
   props: ProfileCycleSubstepGroupProps
@@ -217,8 +218,8 @@ export const ProfileCycleSubstepGroup = (
 }
 
 type CollapsibleSubstepProps = {
-  children: React.ReactNode,
-  headerContent: React.ReactNode,
+  children: React.ReactNode
+  headerContent: React.ReactNode
 }
 const CollapsibleSubstep = (props: CollapsibleSubstepProps) => {
   const [contentCollapsed, setContentCollapsed] = React.useState<boolean>(true)
@@ -241,12 +242,12 @@ const CollapsibleSubstep = (props: CollapsibleSubstepProps) => {
 const renderSubstepInfo = (substeps: ThermocyclerProfileSubstepItem) => {
   let stepNumber = 1
   const substepInfo: Array<
-    | React.Element<typeof ProfileCycleSubstepGroup>
-    | React.Element<typeof ProfileStepSubstepRow>
+    | React.ReactElement<typeof ProfileCycleSubstepGroup>
+    | React.ReactElement<typeof ProfileStepSubstepRow>
   > = []
 
   substeps.meta &&
-    substeps.meta.rawProfileItems.forEach(item => {
+    substeps.meta.rawProfileItems.forEach((item: any) => {
       const prevStepNumber = stepNumber
       if (item.type === PROFILE_CYCLE) {
         stepNumber += item.steps.length
@@ -273,7 +274,9 @@ const renderSubstepInfo = (substeps: ThermocyclerProfileSubstepItem) => {
   return substepInfo
 }
 
-export const StepItemContents = (props: StepItemContentsProps): JSX.Element => {
+export const StepItemContents = (
+  props: StepItemContentsProps
+): JSX.Element | JSX.Element[] | null => {
   const {
     rawForm,
     stepType,
@@ -341,7 +344,9 @@ export const StepItemContents = (props: StepItemContentsProps): JSX.Element => {
               className={styles.collapsible_substep_header}
             >{`Profile steps (${Math.floor(
               sum(
-                substeps.profileSteps.map(atomicStep => atomicStep.holdTime)
+                substeps.profileSteps.map(
+                  (atomicStep: AtomicProfileStep) => atomicStep.holdTime
+                )
               ) / 60
             )}+ min)`}</span>
           }
@@ -418,7 +423,7 @@ export const StepItemContents = (props: StepItemContentsProps): JSX.Element => {
     )
   }
 
-  const result = []
+  const result: JSX.Element[] = []
 
   // headers
   if (stepType === 'moveLiquid') {

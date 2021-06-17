@@ -14,14 +14,14 @@ import EXAMPLE_BATCH_EDIT_IMAGE from '../../images/announcements/multi_select.gi
 import { HintKey } from '../../tutorial'
 import { BaseState, ThunkDispatch } from '../../types'
 
-type SP = { hintKey: HintKey | null | undefined }
-type DP = {
+interface SP { hintKey?: HintKey | null }
+interface DP {
   removeHint: (key: HintKey, rememberDismissal: boolean) => unknown
   selectTerminalItem: (item: TerminalItemId) => unknown
 }
 type Props = SP & DP
 
-type State = { rememberDismissal: boolean }
+interface State { rememberDismissal: boolean }
 
 // List of hints that should have /!\ gray AlertModal header
 // (versus calmer non-alert header)
@@ -189,21 +189,14 @@ class HintsComponent extends React.Component<Props, State> {
 const mapStateToProps = (state: BaseState): SP => ({
   hintKey: selectors.getHint(state),
 })
-const mapDispatchToProps = (dispatch: ThunkDispatch<*>): DP => ({
+const mapDispatchToProps = (dispatch: ThunkDispatch<any>): DP => ({
   removeHint: (hintKey, rememberDismissal) =>
     dispatch(actions.removeHint(hintKey, rememberDismissal)),
   selectTerminalItem: terminalId =>
     dispatch(stepsActions.selectTerminalItem(terminalId)),
 })
 
-export const Hints: React.AbstractComponent<{}> = connect<
-  Props,
-  {},
-  SP,
-  DP,
-  _,
-  _
->(
+export const Hints = connect(
   mapStateToProps,
   mapDispatchToProps
 )(HintsComponent)

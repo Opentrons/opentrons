@@ -1,4 +1,3 @@
-import { $Diff } from 'utility-types'
 import * as React from 'react'
 import { connect } from 'react-redux'
 import assert from 'assert'
@@ -8,15 +7,9 @@ import { selectors as stepFormSelectors } from '../../../step-forms'
 import { selectors as uiLabwareSelectors } from '../../../ui/labware'
 import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
 import * as labwareIngredActions from '../../../labware-ingred/actions'
-import { ElementProps } from 'react'
 import { BaseState, ThunkDispatch } from '../../../types'
-type Props = ElementProps<typeof LabwareDetailsCardComponent>
-type SP = $Diff<
-  Props,
-  {
-    renameLabware: any
-  }
-> & {
+type Props = React.ComponentProps<typeof LabwareDetailsCardComponent>
+type SP = Omit<Props, 'renameLabware'> & {
   _labwareId?: string
 }
 
@@ -75,14 +68,7 @@ function mergeProps(
   return { ...passThruProps, renameLabware }
 }
 
-export const LabwareDetailsCard: React.AbstractComponent<{}> = connect<
-  Props,
-  {},
-  SP,
-  {},
-  _,
-  _
->(
+export const LabwareDetailsCard = connect(
   mapStateToProps,
   null,
   mergeProps

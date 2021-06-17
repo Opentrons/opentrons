@@ -17,17 +17,17 @@ import { ContentsByWell } from '../../labware-ingred/types'
 import { WellIngredientNames } from '../../steplist/types'
 import { GenericRect } from '../../collision-types'
 
-export type Props = {
-  labwareProps: $Diff<
-    React.ElementProps<typeof SingleLabware>,
-    { selectedWells: * }
+export interface Props {
+  labwareProps: Omit<
+    React.ComponentProps<typeof SingleLabware>,
+    'selectedWells'
   >
   /** array of primary wells. Overrides labwareProps.selectedWells */
   selectedPrimaryWells: WellGroup
   selectWells: (wellGroup: WellGroup) => unknown
   deselectWells: (wellGroup: WellGroup) => unknown
   updateHighlightedWells: (wellGroup: WellGroup) => unknown
-  pipetteChannels: Channels | null | undefined
+  pipetteChannels?: Channels | null
   ingredNames: WellIngredientNames
   wellContents: ContentsByWell
 }

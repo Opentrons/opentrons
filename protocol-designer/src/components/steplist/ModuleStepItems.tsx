@@ -14,8 +14,8 @@ import styles from './StepItem.css'
 import { ModuleRealType } from '@opentrons/shared-data'
 
 export interface ModuleStepItemRowProps {
-  label: string | null | undefined
-  value: string | null | undefined
+  label?: string | null
+  value?: string | null
   targetProps?: UseHoverTooltipTargetProps
 }
 
@@ -32,12 +32,12 @@ export const ModuleStepItemRow = (
   </PDListItem>
 )
 
-interface Props {
+type Props = {
   action?: string
   moduleType: ModuleRealType
   actionText: string
-  labwareNickname: string | null | undefined
-  message: string | null | undefined
+  labwareNickname?: string | null
+  message?: string | null
   children?: React.ReactNode
   hideHeader?: boolean
 }

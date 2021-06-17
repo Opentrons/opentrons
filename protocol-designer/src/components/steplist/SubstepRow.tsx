@@ -18,21 +18,21 @@ import {
 } from '../../steplist/types'
 import styles from './StepItem.css'
 
-type SubstepRowProps = {
-  volume: number | string | null | undefined ,
-  source?: SubstepWellData,
-  dest?: SubstepWellData,
-  ingredNames: WellIngredientNames,
-  className?: string,
-  stepId: string,
-  substepIndex: number,
-  selectSubstep?: (substepIdentifier: SubstepIdentifier) => unknown,
+interface SubstepRowProps {
+  volume: number | string | null | undefined
+  source?: SubstepWellData
+  dest?: SubstepWellData
+  ingredNames: WellIngredientNames
+  className?: string
+  stepId: string
+  substepIndex: number
+  selectSubstep?: (substepIdentifier: SubstepIdentifier) => unknown
 }
 
-type PillTooltipContentsProps = {
-  ingreds: WellIngredientVolumeData | LocationLiquidState,
-  ingredNames: WellIngredientNames,
-  well: string,
+interface PillTooltipContentsProps {
+  ingreds: WellIngredientVolumeData | LocationLiquidState
+  ingredNames: WellIngredientNames
+  well: string
 }
 export const PillTooltipContents = (
   props: PillTooltipContentsProps
@@ -164,6 +164,6 @@ function SubstepRowComponent(props: SubstepRowProps) {
   )
 }
 
-export const SubstepRow: React.AbstractComponent<SubstepRowProps> = React.memo(
+export const SubstepRow = React.memo(
   SubstepRowComponent
 )

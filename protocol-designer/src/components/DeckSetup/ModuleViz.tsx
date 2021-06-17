@@ -5,7 +5,7 @@ import styles from './ModuleViz.css'
 import { ModuleOnDeck } from '../../step-forms'
 import { ModuleOrientation } from '../../types'
 
-type Props = {
+interface Props {
   x: number
   y: number
   orientation: ModuleOrientation

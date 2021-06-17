@@ -15,11 +15,11 @@ import {
   resetBatchEditFieldChanges,
   saveStepFormsMulti,
 } from '../../step-forms/actions'
-import { maskField } from '../../steplist/fieldLevel'
+import { maskField, StepFieldName } from '../../steplist/fieldLevel'
 import { BatchEditMoveLiquid } from './BatchEditMoveLiquid'
 import { BatchEditMix } from './BatchEditMix'
 
-export type BatchEditFormProps = {}
+export interface BatchEditFormProps {}
 
 export const BatchEditForm = (props: BatchEditFormProps): JSX.Element => {
   const dispatch = useDispatch()
@@ -29,7 +29,7 @@ export const BatchEditForm = (props: BatchEditFormProps): JSX.Element => {
   const selectedStepIds = useSelector(getMultiSelectItemIds)
   const batchEditFormHasChanges = useSelector(getBatchEditFormHasUnsavedChanges)
 
-  const handleChangeFormInput = (name, value) => {
+  const handleChangeFormInput = (name: StepFieldName, value: unknown) => {
     const maskedValue = maskField(name, value)
     dispatch(changeBatchEditField({ [name]: maskedValue }))
   }

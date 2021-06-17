@@ -4,7 +4,18 @@ import * as React from 'react'
 export const KNOWLEDGEBASE_ROOT_URL =
   'https://support.opentrons.com/en/collections/493886-protocol-designer'
 
-export const links = {
+interface Links {
+  airGap: string
+  multiDispense: string
+  protocolSteps: string
+  customLabware: string
+  recommendedLabware: string
+  pipetteGen1MultiModuleCollision: string
+  betaReleases: string
+  magneticModuleGenerations: string
+}
+
+export const links: Links = {
   airGap: `https://support.opentrons.com/en/articles/4398106-air-gap`,
   multiDispense: `https://support.opentrons.com/en/articles/4170341-paths`,
   protocolSteps: `https://support.opentrons.com/en/collections/493886-protocol-designer#building-a-protocol-steps`,
@@ -18,12 +29,10 @@ export const links = {
     'http://support.opentrons.com/en/articles/1820112-magnetic-module',
 }
 
-type Link = $Keys<typeof links>
-
-type Props = {
-  to: Link
+interface Props {
+  to: keyof Links
   children: React.ReactNode
-  className: string | null | undefined
+  className?: string
 }
 
 /** Link which opens a page on the knowledge base to a new tab/window */

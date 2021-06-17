@@ -62,15 +62,15 @@ export const DECK_LAYER_BLOCKLIST = [
   'screwHoles',
 ]
 
-type Props = {
-  selectedTerminalItemId: TerminalItemId | null | undefined
+interface Props {
+  selectedTerminalItemId?: TerminalItemId | null
   handleClickOutside?: () => unknown
   drilledDown: boolean
   initialDeckSetup: InitialDeckSetup
 }
 
 type ContentsProps = RobotWorkSpaceRenderProps & {
-  selectedTerminalItemId: TerminalItemId | null | undefined
+  selectedTerminalItemId?: TerminalItemId | null
   initialDeckSetup: InitialDeckSetup
   showGen1MultichannelCollisionWarnings: boolean
 }
@@ -116,9 +116,9 @@ const getModuleSlotDefs = (
 }
 
 export const getSwapBlocked = (args: {
-  hoveredLabware: LabwareOnDeckType | null | undefined
-  draggedLabware: LabwareOnDeckType | null | undefined
-  modulesById: $PropertyType<InitialDeckSetup, 'modules'>
+  hoveredLabware?: LabwareOnDeckType | null
+  draggedLabware?: LabwareOnDeckType | null
+  modulesById: InitialDeckSetup['modules']
   customLabwareDefs: LabwareDefByDefURI
 }): boolean => {
   const {
@@ -131,9 +131,9 @@ export const getSwapBlocked = (args: {
     return false
   }
 
-  const sourceModuleType: ModuleRealType | null | undefined =
+  const sourceModuleType: ModuleRealType | null =
     modulesById[draggedLabware.slot]?.type || null
-  const destModuleType: ModuleRealType | null | undefined =
+  const destModuleType: ModuleRealType | null =
     modulesById[hoveredLabware.slot]?.type || null
 
   const draggedLabwareIsCustom = getLabwareIsCustom(
@@ -175,12 +175,14 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
   // hovered over**. The intrinsic state of `react-dnd` is not designed to handle that.
   // So we need to use our own state here to determine
   // whether swapping will be blocked due to labware<>module compat:
-  const [hoveredLabware, setHoveredLabware] = React.useState<
-    ?LabwareOnDeckType
-  >(null)
-  const [draggedLabware, setDraggedLabware] = React.useState<
-    ?LabwareOnDeckType
-  >(null)
+  const [
+    hoveredLabware,
+    setHoveredLabware,
+  ] = React.useState<LabwareOnDeckType | null>(null)
+  const [
+    draggedLabware,
+    setDraggedLabware,
+  ] = React.useState<LabwareOnDeckType | null>(null)
 
   const customLabwareDefs = useSelector(
     labwareDefSelectors.getCustomLabwareDefsByURI
@@ -346,7 +348,7 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
 }
 
 const getHasGen1MultiChannelPipette = (
-  pipettes: $PropertyType<InitialDeckSetup, 'pipettes'>
+  pipettes: InitialDeckSetup['pipettes']
 ) => {
   const pipetteIds = Object.keys(pipettes)
   return pipetteIds.some(pipetteId =>

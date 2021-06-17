@@ -9,7 +9,7 @@ import {
 } from '../utils'
 import { StepFieldName, FormData } from '../../../form-types'
 import { FieldProps, FieldPropsByName, FocusHandlers } from '../types'
-type ShowFieldErrorParams = {
+interface ShowFieldErrorParams {
   name: StepFieldName
   focusedField: StepFieldName | null
   dirtyFields?: StepFieldName[]

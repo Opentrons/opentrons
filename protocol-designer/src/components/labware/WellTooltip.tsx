@@ -12,26 +12,26 @@ import { WellIngredientNames } from '../../steplist/types'
 const DEFAULT_TOOLTIP_OFFSET = 22
 const WELL_BORDER_WIDTH = 4
 
-type WellTooltipParams = {
+interface WellTooltipParams {
   makeHandleMouseEnterWell: (
     wellName: string,
     wellIngreds: LocationLiquidState
   ) => (e: React.MouseEvent<any>) => void
   handleMouseLeaveWell: (val: unknown) => void
-  tooltipWellName: string | null | undefined
+  tooltipWellName?: string | null
 }
 
-type Props = {
-  children: (wellTooltipParams: WellTooltipParams) => React.ReactNode,
-  ingredNames: WellIngredientNames,
+interface Props {
+  children: (wellTooltipParams: WellTooltipParams) => React.ReactNode
+  ingredNames: WellIngredientNames
 }
 
-type State = {
-  tooltipX: number | null | undefined
-  tooltipY: number | null | undefined
-  tooltipWellName: string | null | undefined
-  tooltipWellIngreds: LocationLiquidState | null | undefined
-  tooltipOffset: number | null | undefined
+interface State {
+  tooltipX?: number | null
+  tooltipY?: number | null
+  tooltipWellName?: string | null
+  tooltipWellIngreds?: LocationLiquidState | null
+  tooltipOffset?: number | null
 }
 const initialState: State = {
   tooltipX: null,

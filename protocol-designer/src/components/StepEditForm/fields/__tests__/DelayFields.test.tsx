@@ -6,15 +6,17 @@ import { mount } from 'enzyme'
 import ApplicationText from '../../../../localization/en/application'
 import * as stepFormSelectors from '../../../../step-forms/selectors'
 import { CheckboxRowField, TextField, TipPositionField } from '../../fields'
-import { DelayFields,  DelayFieldProps } from '../DelayFields'
-import { BaseState } from '../../../../types'
-import { FormData } from '../../../../form-types'
+import { DelayFields, DelayFieldProps } from '../DelayFields'
 
 jest.mock('../../../../step-forms/selectors')
 
-const getUnsavedFormMock = stepFormSelectors.getUnsavedForm as jest.MockedFunction<typeof stepFormSelectors.getUnsavedForm>
+const getUnsavedFormMock = stepFormSelectors.getUnsavedForm as jest.MockedFunction<
+  typeof stepFormSelectors.getUnsavedForm
+>
 
-const getLabwareEntitiesMock = stepFormSelectors.getLabwareEntities as jest.MockedFunction<typeof stepFormSelectors.getLabwareEntities>
+const getLabwareEntitiesMock = stepFormSelectors.getLabwareEntities as jest.MockedFunction<
+  typeof stepFormSelectors.getLabwareEntities
+>
 
 const mockStore = {
   dispatch: jest.fn(),
@@ -67,49 +69,49 @@ describe('DelayFields', () => {
         labwareId: 'labware123asp',
         propsForFields: {
           aspirate_delay_checkbox: {
-            onFieldFocus: (jest.fn() as any),
-            onFieldBlur: (jest.fn() as any),
+            onFieldFocus: jest.fn() as any,
+            onFieldBlur: jest.fn() as any,
             errorToShow: null,
             disabled: false,
             name: 'aspirate_delay_checkbox',
-            updateValue: (jest.fn() as any),
+            updateValue: jest.fn() as any,
             value: true,
             tooltipContent: 'tooltip for aspirate_delay_checkbox',
           },
           aspirate_delay_seconds: {
-            onFieldFocus: (jest.fn() as any),
-            onFieldBlur: (jest.fn() as any),
+            onFieldFocus: jest.fn() as any,
+            onFieldBlur: jest.fn() as any,
             errorToShow: null,
             disabled: false,
             name: 'aspirate_delay_seconds',
-            updateValue: (jest.fn() as any),
+            updateValue: jest.fn() as any,
             value: '1',
           },
           preWetTip: {
-            onFieldFocus: (jest.fn() as any),
-            onFieldBlur: (jest.fn() as any),
+            onFieldFocus: jest.fn() as any,
+            onFieldBlur: jest.fn() as any,
             errorToShow: null,
             disabled: false,
             name: 'preWetTip',
-            updateValue: (jest.fn() as any),
+            updateValue: jest.fn() as any,
             value: true,
           },
           aspirate_mmFromBottom: {
-            onFieldFocus: (jest.fn() as any),
-            onFieldBlur: (jest.fn() as any),
+            onFieldFocus: jest.fn() as any,
+            onFieldBlur: jest.fn() as any,
             errorToShow: null,
             disabled: false,
             name: 'aspirate_mmFromBottom',
-            updateValue: (jest.fn() as any),
+            updateValue: jest.fn() as any,
             value: true,
           },
           aspirate_delay_mmFromBottom: {
-            onFieldFocus: (jest.fn() as any),
-            onFieldBlur: (jest.fn() as any),
+            onFieldFocus: jest.fn() as any,
+            onFieldBlur: jest.fn() as any,
             errorToShow: null,
             disabled: false,
             name: 'aspirate_delay_mmFromBottom',
-            updateValue: (jest.fn() as any),
+            updateValue: jest.fn() as any,
             value: true,
           },
         },
@@ -167,49 +169,49 @@ describe('DelayFields', () => {
         labwareId: 'labware123disp',
         propsForFields: {
           dispense_delay_checkbox: {
-            onFieldFocus: (jest.fn() as any),
-            onFieldBlur: (jest.fn() as any),
+            onFieldFocus: jest.fn() as any,
+            onFieldBlur: jest.fn() as any,
             errorToShow: null,
             disabled: false,
             name: 'dispense_delay_checkbox',
-            updateValue: (jest.fn() as any),
+            updateValue: jest.fn() as any,
             value: true,
             tooltipContent: 'tooltip for dispense_delay_checkbox',
           },
           dispense_delay_seconds: {
-            onFieldFocus: (jest.fn() as any),
-            onFieldBlur: (jest.fn() as any),
+            onFieldFocus: jest.fn() as any,
+            onFieldBlur: jest.fn() as any,
             errorToShow: null,
             disabled: false,
             name: 'dispense_delay_seconds',
-            updateValue: (jest.fn() as any),
+            updateValue: jest.fn() as any,
             value: '1',
           },
           preWetTip: {
-            onFieldFocus: (jest.fn() as any),
-            onFieldBlur: (jest.fn() as any),
+            onFieldFocus: jest.fn() as any,
+            onFieldBlur: jest.fn() as any,
             errorToShow: null,
             disabled: false,
             name: 'preWetTip',
-            updateValue: (jest.fn() as any),
+            updateValue: jest.fn() as any,
             value: true,
           },
           dispense_mmFromBottom: {
-            onFieldFocus: (jest.fn() as any),
-            onFieldBlur: (jest.fn() as any),
+            onFieldFocus: jest.fn() as any,
+            onFieldBlur: jest.fn() as any,
             errorToShow: null,
             disabled: false,
             name: 'dispense_mmFromBottom',
-            updateValue: (jest.fn() as any),
+            updateValue: jest.fn() as any,
             value: true,
           },
           dispense_delay_mmFromBottom: {
-            onFieldFocus: (jest.fn() as any),
-            onFieldBlur: (jest.fn() as any),
+            onFieldFocus: jest.fn() as any,
+            onFieldBlur: jest.fn() as any,
             errorToShow: null,
             disabled: false,
             name: 'dispense_delay_mmFromBottom',
-            updateValue: (jest.fn() as any),
+            updateValue: jest.fn() as any,
             value: true,
           },
         },

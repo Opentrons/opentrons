@@ -8,8 +8,8 @@ import {
 import { LabwareUploadMessageModal as LabwareUploadMessageModalComponent } from './LabwareUploadMessageModal'
 import { Dispatch } from 'redux'
 import { BaseState } from '../../../types'
-type Props = React.ElementProps<typeof LabwareUploadMessageModalComponent>
-type SP = {
+type Props = React.ComponentProps<typeof LabwareUploadMessageModalComponent>
+interface SP {
   message: Props['message']
 }
 
@@ -52,14 +52,7 @@ function mergeProps(
   }
 }
 
-export const LabwareUploadMessageModal: React.AbstractComponent<{}> = connect<
-  Props,
-  {},
-  SP,
-  _,
-  _,
-  _
->(
+export const LabwareUploadMessageModal = connect(
   mapStateToProps,
   null,
   mergeProps

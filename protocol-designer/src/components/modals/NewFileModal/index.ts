@@ -24,34 +24,27 @@ import { BaseState, ThunkDispatch } from '../../../types'
 import { NewProtocolFields } from '../../../load-file'
 import { PipetteOnDeck } from '../../../step-forms'
 import { LabwareDefByDefURI } from '../../../labware-defs/types'
-type Props = React.ElementProps<typeof FilePipettesModalComponent>
-type OP = {
+type Props = React.ComponentProps<typeof FilePipettesModalComponent>
+interface OP {
   showProtocolFields: Props['showProtocolFields']
 }
-type SP = {
+interface SP {
   _customLabware: LabwareDefByDefURI
-  _hasUnsavedChanges: boolean | null | undefined
+  _hasUnsavedChanges?: boolean | null
   hideModal: Props['hideModal']
-  moduleRestrictionsDisabled: boolean | null | undefined
+  moduleRestrictionsDisabled?: boolean | null
 }
-type CreateNewProtocolArgs = {
+interface CreateNewProtocolArgs {
   customLabware: LabwareDefByDefURI
   newProtocolFields: NewProtocolFields
   pipettes: PipetteFieldsData[]
   modules: ModuleCreationArgs[]
 }
-type DP = {
+interface DP {
   onCancel: () => unknown
   _createNewProtocol: (arg0: CreateNewProtocolArgs) => void
 }
-export const NewFileModal: React.AbstractComponent<OP> = connect<
-  Props,
-  OP,
-  SP,
-  DP,
-  _,
-  _
->(
+export const NewFileModal = connect(
   mapStateToProps,
   mapDispatchToProps,
   mergeProps

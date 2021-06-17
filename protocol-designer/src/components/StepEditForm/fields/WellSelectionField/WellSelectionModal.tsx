@@ -23,24 +23,24 @@ import { StepFieldName } from '../../../../form-types'
 import styles from './WellSelectionModal.css'
 import modalStyles from '../../../modals/modal.css'
 
-type WellSelectionModalProps = {
+interface WellSelectionModalProps {
   isOpen: boolean
-  labwareId: string | null | undefined
+  labwareId?: string | null
   name: StepFieldName
   onCloseClick: (e: React.MouseEvent<any> | null | undefined) => unknown
-  pipetteId: string | null | undefined
+  pipetteId?: string | null
   value: unknown
   updateValue: (val: unknown | null | undefined) => void
 }
 
-type WellSelectionModalComponentProps = {
+interface WellSelectionModalComponentProps {
   deselectWells: (wellGroup: WellGroup) => unknown
   handleSave: () => unknown
   highlightedWells: WellGroup
   ingredNames: WellIngredientNames
-  labwareDef: LabwareDefinition2 | null | undefined
+  labwareDef?: LabwareDefinition2 | null
   onCloseClick: (e: React.MouseEvent<any> | null | undefined) => unknown
-  pipetteSpec: PipetteNameSpecs | null | undefined
+  pipetteSpec?: PipetteNameSpecs | null
   selectedPrimaryWells: WellGroup
   selectWells: (wellGroup: WellGroup) => unknown
   updateHighlightedWells: (wellGroup: WellGroup) => unknown

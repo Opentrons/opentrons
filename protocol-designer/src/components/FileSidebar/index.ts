@@ -11,25 +11,18 @@ import {
 import { FileSidebar as FileSidebarComponent } from './FileSidebar'
 import { BaseState, ThunkDispatch } from '../../types'
 import { SavedStepFormState, InitialDeckSetup } from '../../step-forms'
-type Props = React.ElementProps<typeof FileSidebarComponent>
-type SP = {
+type Props = React.ComponentProps<typeof FileSidebarComponent>
+interface SP {
   canDownload: boolean
   fileData: Props['fileData']
-  _canCreateNew: boolean | null | undefined
-  _hasUnsavedChanges: boolean | null | undefined
+  _canCreateNew?: boolean | null
+  _hasUnsavedChanges?: boolean | null
   pipettesOnDeck: InitialDeckSetup['pipettes']
   modulesOnDeck: InitialDeckSetup['modules']
   savedStepForms: SavedStepFormState
   schemaVersion: number
 }
-export const FileSidebar: React.AbstractComponent<{}> = connect<
-  Props,
-  {},
-  SP,
-  {},
-  _,
-  _
->(
+export const FileSidebar = connect(
   mapStateToProps,
   null,
   mergeProps

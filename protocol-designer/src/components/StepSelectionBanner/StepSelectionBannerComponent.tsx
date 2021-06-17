@@ -28,7 +28,7 @@ import {
 import { i18n } from '../../localization'
 import { CountPerStepType, StepType } from '../../form-types'
 
-type StepPillProps = { stepType: StepType; count: number }
+interface StepPillProps { stepType: StepType; count: number }
 
 const stepPillStyles = css`
   align-items: ${ALIGN_CENTER};
@@ -59,10 +59,7 @@ const StepPill = (props: StepPillProps): JSX.Element => {
 }
 
 export const ExitBatchEditButton = (props: {
-  handleExitBatchEdit: $PropertyType<
-    StepSelectionBannerProps,
-    'handleExitBatchEdit'
-  >
+  handleExitBatchEdit: StepSelectionBannerProps['handleExitBatchEdit']
 }): JSX.Element => (
   <Box flex="0 1 auto">
     <SecondaryBtn
@@ -75,7 +72,7 @@ export const ExitBatchEditButton = (props: {
   </Box>
 )
 
-export type StepSelectionBannerProps = {
+export interface StepSelectionBannerProps {
   countPerStepType: CountPerStepType
   handleExitBatchEdit: () => unknown
 }
@@ -85,11 +82,11 @@ export const StepSelectionBannerComponent = (
 ): JSX.Element => {
   const { countPerStepType, handleExitBatchEdit } = props
   const numSteps = Object.keys(countPerStepType).reduce<number>(
-    (acc, stepType) => acc + countPerStepType[stepType],
+    (acc, stepType) => acc + countPerStepType[stepType as StepType],
     0
   )
 
-  const stepTypes: StepType[] = Object.keys(countPerStepType).sort()
+  const stepTypes: StepType[] = Object.keys(countPerStepType).sort() as StepType[]
 
   return (
     <Box

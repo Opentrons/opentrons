@@ -245,7 +245,7 @@ export function getMetaSelectedSteps(
   stepId: StepIdType,
   selectedStepId: StepIdType | null
 ): StepIdType[] {
-  let stepsToSelect: StepIdType[];
+  let stepsToSelect: StepIdType[]
   if (multiSelectItemIds?.length) {
     // already have a selection, add/remove the meta-clicked item
     stepsToSelect = multiSelectItemIds.includes(stepId)

@@ -5,7 +5,7 @@ import { i18n } from '../../localization'
 import modalStyles from './modal.css'
 import styles from './AutoAddPauseUntilTempStepModal.css'
 
-type Props = {
+interface Props {
   displayTemperature: string
   handleCancelClick: () => unknown
   handleContinueClick: () => unknown

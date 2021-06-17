@@ -14,8 +14,8 @@ import {
 import { ModuleOnDeck } from '../../step-forms'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { BaseState, ThunkDispatch } from '../../types'
-type Props = React.ElementProps<typeof LabwareSelectionModalComponent>
-type SP = {
+type Props = React.ComponentProps<typeof LabwareSelectionModalComponent>
+interface SP {
   customLabwareDefs: Props['customLabwareDefs']
   slot: Props['slot']
   parentSlot: Props['parentSlot']
@@ -70,14 +70,7 @@ function mergeProps(
   }
 }
 
-export const LabwareSelectionModal: React.AbstractComponent<{}> = connect<
-  Props,
-  {},
-  SP,
-  {},
-  _,
-  _
->(
+export const LabwareSelectionModal = connect(
   mapStateToProps,
   null,
   mergeProps

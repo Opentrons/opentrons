@@ -4,17 +4,17 @@ import { connect } from 'react-redux'
 import cx from 'classnames'
 import { Icon, useOnClickOutside } from '@opentrons/components'
 import { renameLabware } from '../../../labware-ingred/actions'
-import { BaseState, ThunkDispatch } from '../../../types'
+import { ThunkDispatch } from '../../../types'
 import { i18n } from '../../../localization'
 import { LabwareOnDeck } from '../../../step-forms'
 import styles from './LabwareOverlays.css'
 
-type OP = {
+interface OP {
   labwareOnDeck: LabwareOnDeck
   editLiquids: () => unknown
 }
 
-type DP = {
+interface DP {
   // TODO Ian 2018-02-16 type these fns elsewhere and import the type
   setLabwareName: (name: string | null | undefined) => unknown
 }
@@ -67,7 +67,7 @@ const NameThisLabwareComponent = (props: Props) => {
   )
 }
 
-const mapDispatchToProps = (dispatch: ThunkDispatch<*>, ownProps: OP): DP => {
+const mapDispatchToProps = (dispatch: ThunkDispatch<any>, ownProps: OP): DP => {
   const { id } = ownProps.labwareOnDeck
   return {
     setLabwareName: (name: string | null | undefined) =>
@@ -75,14 +75,7 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<*>, ownProps: OP): DP => {
   }
 }
 
-export const NameThisLabware: React.AbstractComponent<OP> = connect<
-  Props,
-  OP,
-  _,
-  DP,
-  BaseState,
-  ThunkDispatch<*>
->(
+export const NameThisLabware = connect(
   null,
   mapDispatchToProps
 )(NameThisLabwareComponent)

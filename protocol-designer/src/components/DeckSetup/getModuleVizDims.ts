@@ -14,7 +14,7 @@ import {
 import { ModuleRealType } from '@opentrons/shared-data'
 import { DeckSlot, ModuleOrientation } from '../../types'
 // NOTE: all dims are in 'left' orientation. Rotate & transform to obtain 'right' orientation.
-export type ModuleVizDims = {
+export interface ModuleVizDims {
   xOffset: number
   yOffset: number
   xDimension: number

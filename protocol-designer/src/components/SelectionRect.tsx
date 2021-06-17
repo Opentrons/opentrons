@@ -4,7 +4,7 @@ import * as React from 'react'
 import styles from './SelectionRect.css'
 import { DragRect, GenericRect } from '../collision-types'
 
-type Props = {
+interface Props {
   onSelectionMove?: (e: React.MouseEvent, GenericRect) => unknown
   onSelectionDone?: (e: React.MouseEvent, GenericRect) => unknown
   svg?: boolean // set true if this is an embedded SVG
@@ -13,14 +13,14 @@ type Props = {
   originYOffset?: number
 }
 
-type State = {
+interface State {
   positions: DragRect | null
 }
 
 export class SelectionRect extends React.Component<Props, State> {
   // TODO Ian 2018-02-22 No support in Flow for SVGElement yet: https://github.com/facebook/flow/issues/2332
   // this `parentRef` should be HTMLElement | SVGElement
-  parentRef: any | null | undefined
+  parentRef?: any | null
 
   constructor(props: Props) {
     super(props)

@@ -16,17 +16,19 @@ import { ThunkDispatch } from '../../types'
 import modalStyles from './modal.css'
 import styles from './MoreOptionsModal.css'
 
-type OP = {
-  close: (event: React.MouseEvent | null | undefined) => unknown,
-  formData: FormData,
+interface OP {
+  close: (event: React.MouseEvent | null | undefined) => unknown
+  formData: FormData
 }
 
-type DP = {
-  saveValuesToForm: (args: { [StepFieldName]: unknown | null | undefined }) => unknown,
+interface DP {
+  saveValuesToForm: (args: {
+    [StepFieldName]: unknown | null | undefined
+  }) => unknown
 }
 
 type Props = OP & DP
-type State = { [StepFieldName]: unknown | null | undefined }
+interface State { [StepFieldName]: unknown | null | undefined }
 
 class MoreOptionsModalComponent extends React.Component<Props, State> {
   constructor(props: Props) {
@@ -91,19 +93,12 @@ class MoreOptionsModalComponent extends React.Component<Props, State> {
   }
 }
 
-const mapDispatchToProps = (dispatch: ThunkDispatch<*>): DP => ({
+const mapDispatchToProps = (dispatch: ThunkDispatch<any>): DP => ({
   saveValuesToForm: update =>
     dispatch(steplistActions.changeFormInput({ update })),
 })
 
-export const MoreOptionsModal: React.AbstractComponent<OP> = connect<
-  Props,
-  OP,
-  {},
-  DP,
-  _,
-  _
->(
+export const MoreOptionsModal= connect(
   null,
   mapDispatchToProps
 )(MoreOptionsModalComponent)

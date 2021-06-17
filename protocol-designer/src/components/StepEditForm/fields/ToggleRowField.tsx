@@ -9,9 +9,9 @@ import styles from '../StepEditForm.css'
 import { FieldProps } from '../types'
 
 type ToggleRowProps = FieldProps & {
-  offLabel?: string,
-  onLabel?: string,
-  className?: string,
+  offLabel?: string
+  onLabel?: string
+  className?: string
 }
 export const ToggleRowField = (props: ToggleRowProps): JSX.Element => {
   const {

@@ -1,9 +1,9 @@
 // @flow
-import { _allReducers } from '../reducers'
+import {_allReducers, DismissedWarningState} from '../reducers'
 import { PRESAVED_STEP_ID } from '../../steplist/types'
 const { dismissedWarnings } = _allReducers
 
-let initialState
+let initialState: DismissedWarningState
 
 beforeEach(() => {
   initialState = { form: {}, timeline: {} }

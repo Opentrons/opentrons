@@ -19,7 +19,7 @@ type RemoveWellsContents = (args: {
 }) => unknown
 
 // Props used by both IngredientsList and LiquidGroupCard
-type CommonProps = {
+interface CommonProps {
   removeWellsContents: RemoveWellsContents
   selected?: boolean
 }
@@ -99,8 +99,8 @@ const LiquidGroupCard = (props: LiquidGroupCardProps): JSX.Element => {
   )
 }
 
-type IndividProps = {
-  name: string | null | undefined
+interface IndividProps {
+  name?: string | null
   wellName: string
   volume: number
   // concentration?: string,
@@ -146,7 +146,7 @@ function IngredIndividual(props: IndividProps) {
 type Props = CommonProps & {
   liquidGroupsById: LiquidGroupsById
   labwareWellContents: SingleLabwareLiquidState
-  selectedIngredientGroupId: string | null | undefined
+  selectedIngredientGroupId?: string | null
 }
 
 export function IngredientsList(props: Props): JSX.Element {

@@ -22,8 +22,8 @@ import { StepFieldName } from '../../../../steplist/fieldLevel'
 import { FieldPropsByName } from '../../types'
 import styles from '../../StepEditForm.css'
 
-type Props = {
-  className: string | null | undefined
+interface Props {
+  className?: string | null
   prefix: 'aspirate' | 'dispense'
   propsForFields: FieldPropsByName
   formData: FormData

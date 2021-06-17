@@ -1,5 +1,5 @@
 import * as React from 'react'
-export type ModalContents = {
+export interface ModalContents {
   title: string
   body: React.ReactNode
   okButtonText?: string

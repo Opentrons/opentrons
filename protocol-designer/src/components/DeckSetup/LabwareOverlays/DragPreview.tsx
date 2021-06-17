@@ -7,15 +7,12 @@ import { LabwareOnDeck as LabwareOnDeckType } from '../../../step-forms'
 import { RobotWorkSpaceRenderProps } from '@opentrons/components'
 import styles from './DragPreview.css'
 
-type DragPreviewProps = {
+interface DragPreviewProps {
   isDragging: boolean
   currentOffset?: { x: number; y: number }
   item: { labwareOnDeck: LabwareOnDeckType }
   itemType: string
-  getRobotCoordsFromDOMCoords: $PropertyType<
-    RobotWorkSpaceRenderProps,
-    'getRobotCoordsFromDOMCoords'
-  >
+  getRobotCoordsFromDOMCoords: RobotWorkSpaceRenderProps['getRobotCoordsFromDOMCoords']
 }
 
 const LabwareDragPreview = (props: DragPreviewProps) => {
@@ -42,12 +39,9 @@ const LabwareDragPreview = (props: DragPreviewProps) => {
   )
 }
 
-export const DragPreview: React.AbstractComponent<
-  $Diff<
-    DragPreviewProps,
-    { currentOffset: unknown; isDragging: unknown; itemType: unknown; item: unknown }
-  >
-> = DragLayer(monitor => ({
+export const DragPreview = DragLayer<
+  Omit<DragPreviewProps, 'currentOffset' | 'isDragging' | 'itemType' | 'item'>
+>(monitor => ({
   currentOffset: monitor.getSourceClientOffset(),
   isDragging: monitor.isDragging(),
   itemType: monitor.getItemType(),

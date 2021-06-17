@@ -4,9 +4,9 @@ import { IconButton, Tooltip, useHoverTooltip } from '@opentrons/components'
 import { i18n } from '../../../localization'
 import styles from '../StepEditForm.css'
 
-type Props = {
-  className: string | null | undefined
-  collapsed: boolean | null | undefined
+interface Props {
+  className?: string | null
+  collapsed?: boolean | null
   toggleCollapsed: () => void
   prefix: 'aspirate' | 'dispense'
   children?: React.ReactNode

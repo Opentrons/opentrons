@@ -5,7 +5,7 @@ import { START_TERMINAL_ITEM_ID } from '../../steplist'
 import { AlertLevel } from './types'
 import { TerminalItemLink } from '../steplist/TerminalItem'
 
-type WarningContentsProps = {
+interface WarningContentsProps {
   warningType: string
   level: AlertLevel
 }

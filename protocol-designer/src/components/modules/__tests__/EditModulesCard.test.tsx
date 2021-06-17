@@ -18,9 +18,6 @@ import { EditModulesCard } from '../EditModulesCard'
 import { CrashInfoBox } from '../CrashInfoBox'
 import { ModuleRow } from '../ModuleRow'
 
-import { BaseState } from '../../../types'
-import { FormPipettesByMount } from '../../../step-forms'
-
 jest.mock('../../../feature-flags')
 jest.mock('../../../step-forms/selectors')
 

@@ -1,7 +1,7 @@
 import { getWellRatio } from '../../../../steplist/utils'
 import { PathOption, StepType } from '../../../../form-types'
 import { ChangeTipOptions } from '@opentrons/step-generation'
-export type DisabledChangeTipArgs = {
+export interface DisabledChangeTipArgs {
   aspirateWells?: string[]
   dispenseWells?: string[]
   stepType?: StepType

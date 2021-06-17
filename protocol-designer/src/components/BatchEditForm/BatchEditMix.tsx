@@ -30,7 +30,7 @@ import formStyles from '../forms/forms.css'
 import styles from '../StepEditForm/StepEditForm.css'
 import buttonStyles from '../StepEditForm/ButtonRow/styles.css'
 
-type BatchEditMixProps = {
+interface BatchEditMixProps {
   batchEditFormHasChanges: boolean
   propsForFields: FieldPropsByName
   handleCancel: () => unknown

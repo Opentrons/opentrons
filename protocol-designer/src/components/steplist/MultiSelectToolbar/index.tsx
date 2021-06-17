@@ -35,7 +35,7 @@ import {
 
 import { IconName } from '@opentrons/components'
 
-type ClickableIconProps = {
+interface ClickableIconProps {
   id?: string
   iconName: IconName
   tooltipText: string
@@ -77,11 +77,11 @@ export const ClickableIcon = (props: ClickableIconProps): JSX.Element => {
   )
 }
 
-type Props = {
+interface Props {
   isMultiSelectMode: boolean
 }
 
-type AccordionProps = {
+interface AccordionProps {
   expanded: boolean
   children: React.ReactNode
 }

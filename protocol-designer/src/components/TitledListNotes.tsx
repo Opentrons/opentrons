@@ -3,8 +3,8 @@ import { i18n } from '../localization'
 import * as React from 'react'
 import styles from './TitledListNotes.css'
 
-type Props = {
-  notes: string | null | undefined
+interface Props {
+  notes?: string | null
 }
 
 export function TitledListNotes(props: Props): JSX.Element | null {

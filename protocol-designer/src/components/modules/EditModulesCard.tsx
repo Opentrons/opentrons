@@ -19,9 +19,12 @@ import styles from './styles.css'
 import { ModuleRealType } from '@opentrons/shared-data'
 import { ModulesForEditModulesCard } from '../../step-forms'
 
-type Props = {
+interface Props {
   modules: ModulesForEditModulesCard
-  openEditModuleModal: (moduleType: ModuleRealType, moduleId?: string) => unknown
+  openEditModuleModal: (
+    moduleType: ModuleRealType,
+    moduleId?: string
+  ) => unknown
 }
 
 export function EditModulesCard(props: Props): JSX.Element {

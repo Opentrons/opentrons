@@ -8,7 +8,7 @@ import { BaseState } from '../../types'
 import { START_TERMINAL_ITEM_ID } from '../../steplist'
 import { selectors as stepFormSelectors } from '../../step-forms'
 
-type Props = {
+interface Props {
   showHint: boolean
 }
 
@@ -36,11 +36,6 @@ function mapStateToProps(state: BaseState): SP {
   return { showHint: noLabware }
 }
 
-export const StartingDeckStateTerminalItem: React.AbstractComponent<{}> = connect<
-  Props,
-  {},
-  SP,
-  _,
-  _,
-  _
->(mapStateToProps)(StartingDeckStateTerminalItemComponent)
+export const StartingDeckStateTerminalItem = connect(mapStateToProps)(
+  StartingDeckStateTerminalItemComponent
+)

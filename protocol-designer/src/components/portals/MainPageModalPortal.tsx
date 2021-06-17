@@ -12,7 +12,7 @@ export function getPortalElem(): HTMLElement | null {
   return document.getElementById(PORTAL_ROOT_ID)
 }
 
-type Props = { children: React.ReactNode }
+interface Props { children: React.ReactNode }
 
 /** The children of Portal are rendered into the
  * PortalRoot, if the PortalRoot exists in the DOM */

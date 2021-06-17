@@ -4,7 +4,7 @@ import {
   FormGroup,
   CheckboxField,
   DropdownField,
- Options,
+  Options,
 } from '@opentrons/components'
 import { connect } from 'react-redux'
 import cx from 'classnames'
@@ -23,8 +23,8 @@ import { BaseState } from '../../../types'
 import styles from '../StepEditForm.css'
 
 type DropdownFormFieldProps = FieldProps & {
-  className?: string,
-  options: Options,
+  className?: string
+  options: Options
 }
 const DropdownFormField = (props: DropdownFormFieldProps) => {
   return (
@@ -39,18 +39,18 @@ const DropdownFormField = (props: DropdownFormFieldProps) => {
   )
 }
 
-type SP = {
-  disposalDestinationOptions: Options,
-  maxDisposalVolume: number | null | undefined,
+interface SP {
+  disposalDestinationOptions: Options
+  maxDisposalVolume?: number | null
 }
-type OP = {
-  aspirate_airGap_checkbox?: boolean | null,
-  aspirate_airGap_volume?: string | null,
-  path: PathOption,
-  pipette: string | null,
-  propsForFields: FieldPropsByName,
-  stepType: StepType,
-  volume: string | null,
+interface OP {
+  aspirate_airGap_checkbox?: boolean | null
+  aspirate_airGap_volume?: string | null
+  path: PathOption
+  pipette: string | null
+  propsForFields: FieldPropsByName
+  stepType: StepType
+  volume: string | null
 }
 type Props = SP & OP
 
@@ -145,11 +145,4 @@ const mapSTP = (state: BaseState, ownProps: OP): SP => {
   }
 }
 
-export const DisposalVolumeField: React.AbstractComponent<OP> = connect<
-  Props,
-  OP,
-  SP,
-  _,
-  _,
-  _
->(mapSTP)(DisposalVolumeFieldComponent)
+export const DisposalVolumeField = connect(mapSTP)(DisposalVolumeFieldComponent)

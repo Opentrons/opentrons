@@ -19,24 +19,24 @@ import { BaseState, ThunkDispatch, DeckSlot } from '../../../types'
 import { LabwareOnDeck } from '../../../step-forms'
 import styles from './LabwareOverlays.css'
 
-type OP = {
+interface OP {
   labwareOnDeck: LabwareOnDeck
-  setHoveredLabware: (val: ?LabwareOnDeck) => unknown
-  setDraggedLabware: (val: ?LabwareOnDeck) => unknown
+  setHoveredLabware: (val?: LabwareOnDeck | null) => unknown
+  setDraggedLabware: (val?: LabwareOnDeck | null) => unknown
   swapBlocked: boolean
 }
-type SP = {
+interface SP {
   isYetUnnamed: boolean
 }
-type DP = {
+interface DP {
   editLiquids: () => unknown
   duplicateLabware: () => unknown
   deleteLabware: () => unknown
   moveDeckItem: (item1: DeckSlot, item2: DeckSlot) => unknown
 }
 
-type DNDP = {
-  draggedLabware: LabwareOnDeck | null | undefined
+interface DNDP {
+  draggedLabware?: LabwareOnDeck | null
   isOver: boolean
   connectDragSource: (val: React.ReactNode) => React.ReactNode
   connectDropTarget: (val: React.ReactNode) => React.ReactNode
@@ -190,7 +190,10 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
   }
 }
 
-const mapDispatchToProps = (dispatch: ThunkDispatch<*>, ownProps: OP): DP => ({
+const mapDispatchToProps = (
+  dispatch: ThunkDispatch<any>,
+  ownProps: OP
+): DP => ({
   editLiquids: () =>
     dispatch(openIngredientSelector(ownProps.labwareOnDeck.id)),
   duplicateLabware: () => dispatch(duplicateLabware(ownProps.labwareOnDeck.id)),
@@ -205,14 +208,7 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<*>, ownProps: OP): DP => ({
     dispatch(moveDeckItem(sourceSlot, destSlot)),
 })
 
-export const EditLabware: React.AbstractComponent<OP> = connect<
-  OP & SP & DP,
-  OP,
-  SP,
-  DP,
-  BaseState,
-  ThunkDispatch<>
->(
+export const EditLabware = connect(
   mapStateToProps,
   mapDispatchToProps
 )(DragDropEditLabware)

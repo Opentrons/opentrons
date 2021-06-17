@@ -1,4 +1,3 @@
-import { $Diff } from 'utility-types'
 import * as React from 'react'
 import { connect } from 'react-redux'
 import assert from 'assert'
@@ -15,18 +14,14 @@ import { LiquidPlacementForm as LiquidPlacementFormComponent } from './LiquidPla
 import { Dispatch } from 'redux'
 import { LiquidPlacementFormValues } from './LiquidPlacementForm'
 import { BaseState } from '../../types'
-type Props = React.ElementProps<typeof LiquidPlacementFormComponent>
-type SP = $Diff<
+type Props = React.ComponentProps<typeof LiquidPlacementFormComponent>
+type SP = Omit<
   Props & {
-    _labwareId: string | null | undefined
-    _selectedWells: string[] | null | undefined
+    _labwareId?: string | null
+    _selectedWells?: string[] | null
     _selectionHasLiquids: boolean
   },
-  {
-    cancelForm: Props['cancelForm']
-    clearWells: Props['clearWells']
-    saveForm: Props['saveForm']
-  }
+  'cancelForm' | 'clearWells' | 'saveForm'
 >
 
 function mapStateToProps(state: BaseState): SP {
@@ -135,14 +130,7 @@ function mergeProps(
   }
 }
 
-export const LiquidPlacementForm: React.AbstractComponent<{}> = connect<
-  Props,
-  {},
-  SP,
-  {},
-  _,
-  _
->(
+export const LiquidPlacementForm = connect(
   mapStateToProps,
   null,
   mergeProps

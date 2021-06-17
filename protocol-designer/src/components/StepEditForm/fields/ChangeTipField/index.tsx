@@ -66,7 +66,7 @@ export const ChangeTipField = (props: Props): JSX.Element => {
   )
 }
 
-type LabelProps = {
+interface LabelProps {
   value: string
 }
 

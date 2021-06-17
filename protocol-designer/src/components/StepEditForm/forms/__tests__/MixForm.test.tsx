@@ -6,13 +6,14 @@ import { MixForm } from '../MixForm'
 import { AspDispSection } from '../AspDispSection'
 import * as stepFormSelectors from '../../../../step-forms/selectors'
 import { WellOrderField } from '../../fields'
-import { BaseState } from '../../../../types'
 
 const { DelayFields } = jest.requireActual('../../fields')
 
 jest.mock('../../../../step-forms/selectors')
 
-const getUnsavedFormMock = stepFormSelectors.getUnsavedForm as jest.MockedFunction<typeof stepFormSelectors.getUnsavedForm>
+const getUnsavedFormMock = stepFormSelectors.getUnsavedForm as jest.MockedFunction<
+  typeof stepFormSelectors.getUnsavedForm
+>
 
 jest.mock('../../fields/', () => {
   const actualFields = jest.requireActual('../../fields')
@@ -37,7 +38,7 @@ const mockStore = {
 }
 
 describe('MixForm', () => {
-  let props: React.ElementProps<typeof MixForm>
+  let props: React.ComponentProps<typeof MixForm>
 
   const render = _props =>
     mount(<MixForm {..._props} />, {
@@ -55,11 +56,11 @@ describe('MixForm', () => {
     })
 
     props = {
-      formData: ({
+      formData: {
         stepType: 'mix',
         mix_wellOrder_first: 'r2l',
         mix_wellOrder_second: 'b2t',
-      } as any),
+      } as any,
       focusHandlers: {
         blur: jest.fn(),
         focus: jest.fn(),
@@ -68,30 +69,30 @@ describe('MixForm', () => {
       },
       propsForFields: {
         pipette: {
-          onFieldFocus: (jest.fn() as any),
-          onFieldBlur: (jest.fn() as any),
+          onFieldFocus: jest.fn() as any,
+          onFieldBlur: jest.fn() as any,
           errorToShow: null,
           disabled: false,
           name: 'pipette',
-          updateValue: (jest.fn() as any),
+          updateValue: jest.fn() as any,
           value: null,
         },
         mix_wellOrder_first: {
-          onFieldFocus: (jest.fn() as any),
-          onFieldBlur: (jest.fn() as any),
+          onFieldFocus: jest.fn() as any,
+          onFieldBlur: jest.fn() as any,
           errorToShow: null,
           disabled: false,
           name: 'mix_wellOrder_first',
-          updateValue: (jest.fn() as any),
+          updateValue: jest.fn() as any,
           value: null,
         },
         mix_wellOrder_second: {
-          onFieldFocus: (jest.fn() as any),
-          onFieldBlur: (jest.fn() as any),
+          onFieldFocus: jest.fn() as any,
+          onFieldBlur: jest.fn() as any,
           errorToShow: null,
           disabled: false,
           name: 'mix_wellOrder_second',
-          updateValue: (jest.fn() as any),
+          updateValue: jest.fn() as any,
           value: null,
         },
       },

@@ -12,17 +12,17 @@ import {
   WellIngredientNames,
 } from '../../steplist/types'
 
-export type StepSubItemProps = {
-  substeps: SourceDestSubstepItem,
+export interface StepSubItemProps {
+  substeps: SourceDestSubstepItem
 }
 
 type SourceDestSubstepProps = StepSubItemProps & {
-  ingredNames: WellIngredientNames,
-  selectSubstep: (substepIdentifier: SubstepIdentifier) => unknown,
-  hoveredSubstep: SubstepIdentifier | null | undefined,
+  ingredNames: WellIngredientNames
+  selectSubstep: (substepIdentifier: SubstepIdentifier) => unknown
+  hoveredSubstep?: SubstepIdentifier | null
 }
 
-export function SourceDestSubstep(props: SourceDestSubstepProps): JSX.Element {
+export function SourceDestSubstep(props: SourceDestSubstepProps): JSX.Element | JSX.Element[] {
   const { substeps, selectSubstep, hoveredSubstep } = props
   if (substeps.multichannel) {
     // multi-channel row item (collapsible)
@@ -48,7 +48,7 @@ export function SourceDestSubstep(props: SourceDestSubstepProps): JSX.Element {
   }
 
   // single-channel row item
-  return substeps.rows.map<React.ReactNode>((row, substepIndex) => (
+  return substeps.rows.map<JSX.Element>((row, substepIndex) => (
     <SubstepRow
       key={substepIndex}
       className={cx(styles.step_subitem, {

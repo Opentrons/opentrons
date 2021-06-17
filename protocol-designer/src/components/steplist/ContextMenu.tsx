@@ -15,7 +15,7 @@ import { StepIdType } from '../../form-types'
 
 const MENU_OFFSET_PX = 5
 
-type Props = {
+interface Props {
   children: (args: {
     makeStepOnContextMenu: (
       stepIdType: StepIdType
@@ -23,7 +23,10 @@ type Props = {
   }) => React.ReactNode
 }
 
-type Position = { left: number | null, top: number | null }
+interface Position {
+  left: number | null
+  top: number | null
+}
 
 export const ContextMenu = (props: Props): JSX.Element => {
   const dispatch = useDispatch()
@@ -38,18 +41,16 @@ export const ContextMenu = (props: Props): JSX.Element => {
     left: null,
     top: null,
   })
-  const menuRoot = React.useRef<?HTMLElement>(null)
+  const menuRoot = React.useRef<HTMLElement | null>(null)
 
   const isMultiSelectMode = useSelector(getIsMultiSelectMode)
 
   React.useEffect(() => {
-    global.addEventListener('click', handleClick)
-    return () => global.removeEventListener('click', handleClick)
+    window.addEventListener('click', handleClick)
+    return () => window.removeEventListener('click', handleClick)
   })
 
-  const makeHandleContextMenu = (stepId: StepIdType) => (
-    event: SyntheticMouseEvent<*>
-  ) => {
+  const makeHandleContextMenu = (stepId: StepIdType) => (event: MouseEvent) => {
     if (isMultiSelectMode) return
     event.preventDefault()
 
@@ -75,7 +76,7 @@ export const ContextMenu = (props: Props): JSX.Element => {
     setPosition({ left, top })
   }
 
-  const handleClick = (event: SyntheticMouseEvent<*>) => {
+  const handleClick = (event: MouseEvent) => {
     const wasOutside = !(
       event.target instanceof Node && menuRoot.current?.contains(event.target)
     )
@@ -127,7 +128,10 @@ export const ContextMenu = (props: Props): JSX.Element => {
           <React.Fragment>
             <div
               ref={menuRoot}
-              style={{ left: position.left, top: position.top }}
+              style={{
+                left: position.left ?? undefined,
+                top: position.top ?? undefined,
+              }}
               className={styles.context_menu}
             >
               <div

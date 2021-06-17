@@ -8,7 +8,7 @@ type BlockedSlotMessage =
   | 'MODULE_INCOMPATIBLE_SINGLE_LABWARE'
   | 'MODULE_INCOMPATIBLE_LABWARE_SWAP'
 
-type Props = {
+interface Props {
   x: number
   y: number
   width: number

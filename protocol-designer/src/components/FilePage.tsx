@@ -26,20 +26,20 @@ import { ModuleRealType } from '@opentrons/shared-data'
 import { FileMetadataFields } from '../file-data'
 import { ModulesForEditModulesCard } from '../step-forms'
 
-export type Props = {
+export interface Props {
   formValues: FileMetadataFields
-  instruments: React.ElementProps<typeof InstrumentGroup>
+  instruments: React.ComponentProps<typeof InstrumentGroup>
   goToNextPage: () => unknown
   saveFileMetadata: (fileMetaDataFields: FileMetadataFields) => unknown
   swapPipettes: () => unknown
   modules: ModulesForEditModulesCard
 }
 
-type State = {
+interface State {
   isEditPipetteModalOpen: boolean
   moduleToEdit: {
     moduleType: ModuleRealType
-    moduleId: string | null | undefined
+    moduleId?: string | null
   } | null
 }
 

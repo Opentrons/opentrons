@@ -6,10 +6,10 @@ import { PDListItem } from '../lists'
 import styles from './StepItem.css'
 import { LabwareTooltipContents } from './LabwareTooltipContents'
 
-type Props = {
-  volume: string | null | undefined
-  times: string | null | undefined
-  labwareNickname: string | null | undefined
+interface Props {
+  volume?: string | null
+  times?: string | null
+  labwareNickname?: string | null
 }
 
 export function MixHeader(props: Props): JSX.Element {
