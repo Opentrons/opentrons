@@ -1,7 +1,8 @@
 """Protocol engine commands sub-state."""
+from __future__ import annotations
 from collections import OrderedDict
 from dataclasses import dataclass, replace
-from typing import List, Optional, OrderedDict as OrderedDictType, Tuple
+from typing import List, Optional, Tuple
 
 from ..commands import CommandType, CommandRequestType, PendingCommand, FailedCommand
 from .substore import Substore
@@ -12,7 +13,7 @@ class CommandState:
     """State of all protocol engine command resources."""
 
     # TODO(mc, 2021-06-16): OrderedDict is mutable. Switch to Sequence + Mapping
-    commands_by_id: OrderedDictType[str, CommandType]
+    commands_by_id: OrderedDict[str, CommandType]
 
 
 class CommandStore(Substore[CommandState]):
@@ -41,6 +42,7 @@ class CommandView:
 
     def get_command_by_id(self, uid: str) -> Optional[CommandType]:
         """Get a command by its unique identifier."""
+        # TODO(mc, 2021-06-17): raise on missing ID, to line up with other state views
         return self._state.commands_by_id.get(uid)
 
     def get_all_commands(self) -> List[Tuple[str, CommandType]]:
