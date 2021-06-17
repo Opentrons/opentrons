@@ -14,8 +14,11 @@ export const timelineIsBeingComputed: Reducer<boolean, any> = handleActions(
   },
   false
 )
+// @ts-expect-error(sa, 2021-6-10): cannot use string literals as action type
+// TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
 export const computedRobotStateTimeline: Reducer<Timeline, any> = handleActions(
   {
+    // @ts-expect-error(sa, 2021-6-10): cannot use string literals as action type
     COMPUTE_ROBOT_STATE_TIMELINE_SUCCESS: (
       state,
       action: ComputeRobotStateTimelineSuccessAction
@@ -27,6 +30,8 @@ export const computedRobotStateTimeline: Reducer<Timeline, any> = handleActions(
 )
 export const computedSubsteps: Reducer<Substeps, any> = handleActions(
   {
+    // @ts-expect-error(sa, 2021-6-10): cannot use string literals as action type
+    // TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
     COMPUTE_ROBOT_STATE_TIMELINE_SUCCESS: (
       state,
       action: ComputeRobotStateTimelineSuccessAction
@@ -70,7 +75,8 @@ function newProtocolMetadata(
     lastModified: null,
   }
 }
-
+// @ts-expect-error(sa, 2021-6-10): cannot use string literals as action type
+// TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
 const fileMetadata = handleActions(
   {
     LOAD_FILE: updateMetadataFields,
@@ -86,7 +92,7 @@ const fileMetadata = handleActions(
   },
   defaultFields
 )
-export type RootState = {
+export interface RootState {
   computedRobotStateTimeline: Timeline
   computedSubsteps: Substeps
   currentProtocolExists: boolean

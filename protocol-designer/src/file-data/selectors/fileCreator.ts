@@ -6,7 +6,10 @@ import uniq from 'lodash/uniq'
 import { getFileMetadata } from './fileFields'
 import { getInitialRobotState, getRobotStateTimeline } from './commands'
 import { selectors as dismissSelectors } from '../../dismiss'
-import { selectors as labwareDefSelectors } from '../../labware-defs'
+import {
+  selectors as labwareDefSelectors,
+  LabwareDefByDefURI,
+} from '../../labware-defs'
 import { selectors as ingredSelectors } from '../../labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { selectors as uiLabwareSelectors } from '../../ui/labware'
@@ -27,9 +30,8 @@ import {
   FilePipette,
   FileLabware,
   FileModule,
-} from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
-import { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV6'
-import { LabwareDefByDefURI } from '../../labware-defs'
+} from '@opentrons/shared-data/protocol/types/schemaV4'
+import { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
 import { Selector } from '../../types'
 import { PDProtocolFile } from '../../file-types'
 // TODO: BC: 2018-02-21 uncomment this assert, causes test failures
