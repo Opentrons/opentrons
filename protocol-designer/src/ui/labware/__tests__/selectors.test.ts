@@ -13,39 +13,50 @@ import {
   getLabwareOptions,
   _sortLabwareDropdownOptions,
 } from '../selectors'
-import fixture_tiprack_1000_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_1000_ul.json'
-import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
-import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
-import fixture_trash from '@opentrons/shared-data/labware/fixtures/2/fixture_trash.json'
+import { LabwareEntities } from '../../../../../step-generation/src/types'
+import { LabwareDefinition2 } from '../../../../../shared-data/lib/js/types.d'
+import _fixture_tiprack_1000_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_1000_ul.json'
+import _fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
+import _fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
+import _fixture_trash from '@opentrons/shared-data/labware/fixtures/2/fixture_trash.json'
+
+const fixtureTiprack1000ul = _fixture_tiprack_1000_ul as LabwareDefinition2
+const fixtureTiprack10ul = _fixture_tiprack_10_ul as LabwareDefinition2
+const fixture96Plate = _fixture_96_plate as LabwareDefinition2
+const fixtureTrash = _fixture_trash as LabwareDefinition2
 
 describe('labware selectors', () => {
-  let names
-  let tipracks
-  let trash
-  let otherLabware
+  let names: Record<string, string>
+  let tipracks: LabwareEntities
+  let trash: LabwareEntities
+  let otherLabware: LabwareEntities
 
   beforeEach(() => {
     trash = {
+      // @ts-expect-error(sa, 2021-6-15): missing id and labwareDefURI
       trashId: {
-        def: { ...fixture_trash },
+        def: { ...fixtureTrash },
       },
     }
 
     tipracks = {
+      // @ts-expect-error(sa, 2021-6-15): missing labwareDefURI
       tiprack100Id: {
         id: 'tiprack100Id',
-        def: { ...fixture_tiprack_1000_ul },
+        def: { ...fixtureTiprack1000ul },
       },
+      // @ts-expect-error(sa, 2021-6-15): missing labwareDefURI
       tiprack10Id: {
         id: 'tiprack10Id',
-        def: { ...fixture_tiprack_10_ul },
+        def: { ...fixtureTiprack10ul },
       },
     }
 
     otherLabware = {
+      // @ts-expect-error(sa, 2021-6-15): missing labwareDefURI
       wellPlateId: {
         id: 'wellPlateId',
-        def: { ...fixture_96_plate },
+        def: { ...fixture96Plate },
       },
     }
 
@@ -63,7 +74,7 @@ describe('labware selectors', () => {
   describe('getDisposalLabwareOptions', () => {
     it('returns an empty list when labware is NOT provided', () => {
       expect(
-        // $FlowFixMe(IL, 2020-03-12): resultFunc
+        // @ts-expect-error(sa, 2021-6-15): resultFunc
         getDisposalLabwareOptions.resultFunc([], names)
       ).toEqual([])
     })
@@ -72,7 +83,7 @@ describe('labware selectors', () => {
         ...tipracks,
       }
       expect(
-        // $FlowFixMe(IL, 2020-03-12): resultFunc
+        // @ts-expect-error(sa, 2021-6-15): resultFunc
         getDisposalLabwareOptions.resultFunc(labwareEntities, names)
       ).toEqual([])
     })
@@ -83,14 +94,14 @@ describe('labware selectors', () => {
       }
 
       expect(
-        // $FlowFixMe(IL, 2020-03-12): resultFunc
+        // @ts-expect-error(sa, 2021-6-15): resultFunc
         getDisposalLabwareOptions.resultFunc(labwareEntities, names)
       ).toEqual([{ name: 'Trash', value: 'trashId' }])
     })
     it('filters out labware that is NOT trash when multiple trash bins present', () => {
       const trash2 = {
         trashId2: {
-          def: { ...fixture_trash },
+          def: { ...fixtureTrash },
         },
       }
       const labwareEntities = {
@@ -100,7 +111,7 @@ describe('labware selectors', () => {
       }
 
       expect(
-        // $FlowFixMe(IL, 2020-03-12): resultFunc
+        // @ts-expect-error(sa, 2021-6-15): resultFunc
         getDisposalLabwareOptions.resultFunc(labwareEntities, names)
       ).toEqual([
         { name: 'Trash', value: 'trashId' },
@@ -112,7 +123,7 @@ describe('labware selectors', () => {
   describe('getLabwareOptions', () => {
     it('should return an empty list when no labware is present', () => {
       expect(
-        // $FlowFixMe(IL, 2020-03-12): resultFunc
+        // @ts-expect-error(sa, 2021-6-15): resultFunc
         getDisposalLabwareOptions.resultFunc(
           {},
           {},
@@ -133,7 +144,7 @@ describe('labware selectors', () => {
         pipettes: {},
       }
       expect(
-        // $FlowFixMe(IL, 2020-03-12): resultFunc
+        // @ts-expect-error(sa, 2021-6-15): resultFunc
         getLabwareOptions.resultFunc(labwareEntities, names, initialDeckSetup)
       ).toEqual([
         { name: 'Source Plate', value: 'wellPlateId' },
@@ -187,7 +198,7 @@ describe('labware selectors', () => {
         },
       }
 
-      const nicknames: { [string]: string } = {
+      const nicknames: Record<string, string> = {
         ...names,
         wellPlateId: 'Well Plate',
         tempPlateId: 'Temp Plate',
@@ -195,7 +206,7 @@ describe('labware selectors', () => {
       }
 
       expect(
-        // $FlowFixMe(IL, 2020-03-12): resultFunc
+        // @ts-expect-error(sa, 2021-6-15): resultFunc
         getLabwareOptions.resultFunc(
           labwareEntities,
           nicknames,

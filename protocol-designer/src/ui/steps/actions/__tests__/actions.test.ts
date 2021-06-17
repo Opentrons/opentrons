@@ -26,6 +26,7 @@ describe('steps actions', () => {
       when(mockGetSavedStepForms)
         .calledWith(expect.anything())
         .mockReturnValue({
+          // @ts-expect-error(sa, 2021-6-15): missing properties from FormData
           stepId: {
             foo: 'getSavedStepFormsResult',
           },
@@ -36,7 +37,7 @@ describe('steps actions', () => {
     })
     // TODO(IL, 2020-04-17): also test scroll to top behavior
     it('should select the step and populate the form', () => {
-      const store = mockStore()
+      const store: any = mockStore()
       // $FlowFixMe(IL, 2020-04-17): redux-mock-store dispatch types not cooperating. Related TypeScript issue: https://github.com/reduxjs/redux-mock-store/issues/148
       store.dispatch(selectStep(stepId))
       expect(store.getActions()).toEqual([
@@ -54,7 +55,7 @@ describe('steps actions', () => {
     })
   })
   describe('selectAllSteps', () => {
-    let ids
+    let ids: string[]
     beforeEach(() => {
       ids = ['id_1', 'id_2']
       when(mockGetOrderedStepIds)
@@ -65,8 +66,7 @@ describe('steps actions', () => {
       resetAllWhenMocks()
     })
     it('should select all of the steps', () => {
-      const store = mockStore()
-      // $FlowFixMe(SA, 2021-01-21): redux-mock-store dispatch types not cooperating. Related TypeScript issue: https://github.com/reduxjs/redux-mock-store/issues/148
+      const store: any = mockStore()
       store.dispatch(selectAllSteps())
       expect(store.getActions()).toContainEqual({
         type: 'SELECT_MULTIPLE_STEPS',
@@ -77,8 +77,7 @@ describe('steps actions', () => {
       })
     })
     it('should register an analytics event', () => {
-      const store = mockStore()
-      // $FlowFixMe(SA, 2021-01-21): redux-mock-store dispatch types not cooperating. Related TypeScript issue: https://github.com/reduxjs/redux-mock-store/issues/148
+      const store: any = mockStore()
       store.dispatch(selectAllSteps())
       expect(store.getActions()).toContainEqual({
         type: 'ANALYTICS_EVENT',
@@ -100,8 +99,7 @@ describe('steps actions', () => {
       resetAllWhenMocks()
     })
     it('should deselect all of the steps', () => {
-      const store = mockStore()
-      // $FlowFixMe(SA, 2021-01-21): redux-mock-store dispatch types not cooperating. Related TypeScript issue: https://github.com/reduxjs/redux-mock-store/issues/148
+      const store: any = mockStore()
       store.dispatch(deselectAllSteps())
       expect(store.getActions()).toContainEqual({
         type: 'SELECT_STEP',
@@ -109,8 +107,7 @@ describe('steps actions', () => {
       })
     })
     it('should register a "deslectAllSteps" analytics event', () => {
-      const store = mockStore()
-      // $FlowFixMe(SA, 2021-01-21): redux-mock-store dispatch types not cooperating. Related TypeScript issue: https://github.com/reduxjs/redux-mock-store/issues/148
+      const store: any = mockStore()
       store.dispatch(deselectAllSteps())
       expect(store.getActions()).toContainEqual({
         type: 'ANALYTICS_EVENT',
@@ -121,8 +118,7 @@ describe('steps actions', () => {
       })
     })
     it('should register a "exitBatchEditMode" analytics event when given a meta flag', () => {
-      const store = mockStore()
-      // $FlowFixMe(SA, 2021-01-21): redux-mock-store dispatch types not cooperating. Related TypeScript issue: https://github.com/reduxjs/redux-mock-store/issues/148
+      const store: any = mockStore()
       store.dispatch(deselectAllSteps('EXIT_BATCH_EDIT_MODE_BUTTON_PRESS'))
       expect(store.getActions()).toContainEqual({
         type: 'ANALYTICS_EVENT',
@@ -139,8 +135,7 @@ describe('steps actions', () => {
       const consoleWarnSpy = jest
         .spyOn(global.console, 'warn')
         .mockImplementation(() => null)
-      const store = mockStore()
-      // $FlowFixMe(SA, 2021-01-21): redux-mock-store dispatch types not cooperating. Related TypeScript issue: https://github.com/reduxjs/redux-mock-store/issues/148
+      const store: any = mockStore()
       store.dispatch(deselectAllSteps())
       expect(consoleWarnSpy).toHaveBeenCalledWith(
         'something went wrong, cannot deselect all steps if not in multi select mode'
@@ -154,8 +149,7 @@ describe('steps actions', () => {
     })
     it('should duplicate a step with a new step id', () => {
       jest.spyOn(utils, 'uuid').mockReturnValue('duplicate_id')
-      const store = mockStore()
-      // $FlowFixMe(SA, 2021-02-01): redux-mock-store dispatch types not cooperating. Related TypeScript issue: https://github.com/reduxjs/redux-mock-store/issues/148
+      const store: any = mockStore()
       store.dispatch(duplicateStep('id_1'))
       expect(store.getActions()).toEqual([
         {
@@ -189,8 +183,7 @@ describe('steps actions', () => {
         .mockReturnValueOnce('dup_1')
         .mockReturnValueOnce('dup_2')
         .mockReturnValueOnce('dup_3')
-      const store = mockStore()
-      // $FlowFixMe(SA, 2021-02-01): redux-mock-store dispatch types not cooperating. Related TypeScript issue: https://github.com/reduxjs/redux-mock-store/issues/148
+      const store: any = mockStore()
       store.dispatch(duplicateMultipleSteps(['id_1', 'id_2', 'id_3']))
       const duplicateStepsAction = {
         type: 'DUPLICATE_MULTIPLE_STEPS',
@@ -230,8 +223,7 @@ describe('steps actions', () => {
         .mockReturnValueOnce('dup_1')
         .mockReturnValueOnce('dup_2')
         .mockReturnValueOnce('dup_3')
-      const store = mockStore()
-      // $FlowFixMe(SA, 2021-02-01): redux-mock-store dispatch types not cooperating. Related TypeScript issue: https://github.com/reduxjs/redux-mock-store/issues/148
+      const store: any = mockStore()
       store.dispatch(duplicateMultipleSteps(['id_3', 'id_1', 'id_2']))
       const duplicateStepsAction = {
         type: 'DUPLICATE_MULTIPLE_STEPS',
