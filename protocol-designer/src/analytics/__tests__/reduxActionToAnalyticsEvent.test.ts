@@ -1,4 +1,3 @@
-// @flow
 import { when, resetAllWhenMocks } from 'jest-when'
 import { reduxActionToAnalyticsEvent } from '../middleware'
 import { getFileMetadata } from '../../file-data/selectors'

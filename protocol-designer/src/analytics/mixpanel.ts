@@ -1,4 +1,3 @@
-// @flow
 // TODO(IL, 2020-09-09): reconcile with app/src/analytics/mixpanel.js, which this is derived from
 import mixpanel from 'mixpanel-browser'
 import { getIsProduction } from '../networking/opentronsWebApi'
