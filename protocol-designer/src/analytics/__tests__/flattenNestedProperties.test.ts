@@ -1,4 +1,3 @@
-// @flow
 import { flattenNestedProperties } from '../utils/flattenNestedProperties'
 
 describe('flattenNestedProperties', () => {

@@ -1,4 +1,3 @@
-// @flow
 // TODO(IL, 2020-09-09): reconcile with app/src/analytics/mixpanel.js, which this is derived from
 import mixpanel from 'mixpanel-browser'
 import { getIsProduction } from '../networking/opentronsWebApi'
@@ -24,7 +23,7 @@ const MIXPANEL_OPTS = {
   opt_out_tracking_by_default: true,
 }
 
-export function initializeMixpanel(state: BaseState) {
+export function initializeMixpanel(state: BaseState): void {
   const optedIn = getHasOptedIn(state) || false
   if (MIXPANEL_ID) {
     console.debug('Initializing Mixpanel', { optedIn })
@@ -38,19 +37,21 @@ export function initializeMixpanel(state: BaseState) {
 }
 
 // NOTE: Do not use directly. Used in analytics Redux middleware: trackEventMiddleware.
-export function trackEvent(event: AnalyticsEvent, optedIn: boolean) {
+export function trackEvent(event: AnalyticsEvent, optedIn: boolean): void {
   console.debug('Trackable event', { event, optedIn })
   if (MIXPANEL_ID && optedIn) {
     if (event.superProperties) {
       mixpanel.register(event.superProperties)
     }
+    // @ts-expect-error not a valid way to type narrow
     if (event.name) {
+      // @ts-expect-error not a valid way to type narrow
       mixpanel.track(event.name, event.properties)
     }
   }
 }
 
-export function setMixpanelTracking(optedIn: boolean) {
+export function setMixpanelTracking(optedIn: boolean): void {
   if (MIXPANEL_ID) {
     if (optedIn) {
       console.debug('User has opted into analytics; tracking with Mixpanel')

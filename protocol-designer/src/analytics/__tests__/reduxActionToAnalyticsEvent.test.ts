@@ -1,4 +1,3 @@
-// @flow
 import { when, resetAllWhenMocks } from 'jest-when'
 import { reduxActionToAnalyticsEvent } from '../middleware'
 import { getFileMetadata } from '../../file-data/selectors'
@@ -55,6 +54,7 @@ describe('reduxActionToAnalyticsEvent', () => {
     getArgsAndErrorsByStepIdMock.mockReturnValue({
       stepId: {
         stepArgs: {
+          // @ts-expect-error id is not on type CommandCreatorArgs
           id: 'stepId',
           pipette: 'pipetteId',
           otherField: 123,
@@ -63,6 +63,7 @@ describe('reduxActionToAnalyticsEvent', () => {
       },
     })
     getPipetteEntitiesMock.mockReturnValue({
+      // @ts-expect-error 'some_pipette_spec_name' isn't a valid pipette type
       pipetteId: { name: 'some_pipette_spec_name' },
     })
 
@@ -113,7 +114,9 @@ describe('reduxActionToAnalyticsEvent', () => {
       when(getSavedStepFormsMock)
         .calledWith(expect.anything())
         .mockReturnValue({
+          // @ts-expect-error missing fields from test object
           id_1: { stepType: 'moveLiquid' },
+          // @ts-expect-error missing fields from test object
           id_2: { stepType: 'moveLiquid' },
         })
 
@@ -141,7 +144,9 @@ describe('reduxActionToAnalyticsEvent', () => {
       when(getSavedStepFormsMock)
         .calledWith(expect.anything())
         .mockReturnValue({
+          // @ts-expect-error missing fields from test object
           id_1: { stepType: 'mix' },
+          // @ts-expect-error missing fields from test object
           id_2: { stepType: 'mix' },
         })
 
@@ -169,7 +174,9 @@ describe('reduxActionToAnalyticsEvent', () => {
       when(getSavedStepFormsMock)
         .calledWith(expect.anything())
         .mockReturnValue({
+          // @ts-expect-error missing fields from test object
           id_1: { stepType: 'mix' },
+          // @ts-expect-error missing fields from test object
           id_2: { stepType: 'moveLiquid' },
         })
 

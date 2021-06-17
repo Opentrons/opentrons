@@ -1,7 +1,7 @@
 import isPlainObject from 'lodash/isPlainObject'
 const SEPARATOR = '__'
 
-const _innerFnFlattenNested = (innerProperties: any, prefix: string) => {
+const _innerFnFlattenNested = (innerProperties: any, prefix: string): any => {
   return Object.keys(innerProperties).reduce((acc, key) => {
     // if the key's value is an object, recurse into it
     const nestedValue = innerProperties[key]
