@@ -119,8 +119,6 @@ class CommandTranslator:
         Returns: AspirateRequest
 
         """
-        # TODO (al, 2021-04-26): incoming pipette and labware ids are
-        #  assigned by PD. Are they the same as Protocol Engine's?
         return [
             pe.commands.AspirateRequest(
                 pipetteId=command.params.pipette,
