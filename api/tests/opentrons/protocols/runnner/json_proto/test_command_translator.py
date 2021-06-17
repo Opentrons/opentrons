@@ -87,10 +87,6 @@ def json_protocol_dict(
     }
 
 
-# Fix before merge: Fix subject._translate_command to use a fixture
-# and go through top-level translate(), or something like that
-
-
 @pytest.fixture
 def subject() -> CommandTranslator:
     return CommandTranslator()
@@ -173,6 +169,18 @@ def test_pipettes(
     )
 
     assert expected_request in result
+
+
+# todo(mm, 2021-06-17):
+#
+# These tests use the internal implementation detail _translate_command.
+#
+# Maybe _translate_command(), _translate_add_labware_definition(), and
+# _translate_load_labware() should be static methods in classes (or a single class)
+# separate from CommandTranslator. Then these methods could be public again.
+#
+# Otherwise, we should delete these tests in favor of treating CommandTranslator
+# as a black box.
 
 
 def test_aspirate(
