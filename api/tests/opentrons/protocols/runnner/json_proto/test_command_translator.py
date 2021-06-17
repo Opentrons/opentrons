@@ -8,11 +8,23 @@ from opentrons.protocols import models
 from opentrons.protocols.runner.json_proto.command_translator import CommandTranslator
 
 
-# todo(mm, 2021-06-17):
+# todo(mc & mm, 2021-06-17):
 #
-# This JSON protocol fixture is copy-pasted from an opentrons.file_runner fixture.
-# Either lift the fixture somewhere common to both of these modules, or move one of
-# the modules next to the other so they can benefit from the same fixtures.
+# There are two big problems with these tests:
+#
+# 1. I copy-pasted the big JSON protocol fixture from opentrons.file_runner tests.
+# 2. The command translation tests use the internal implementation detail
+#    _translate_command().
+#
+# We should fix both of these by:
+#
+# * Writing a helper function, possibly specific to this test file, to return a minimal
+#   JSON protocol with some given commands, given labware, etc., filling in boring
+#   stuff like metadata.
+# * Making every test here use that helper function with its own hard-coded choice of
+#   commands. (So we don't have to pull expected details out of a fixture to assert
+#   against.)
+# * Consistently testing CommandTranslator as a black box here.
 
 
 @pytest.fixture
@@ -163,18 +175,6 @@ def test_pipettes(
     )
 
     assert expected_request in result
-
-
-# todo(mm, 2021-06-17):
-#
-# These tests use the internal implementation detail _translate_command.
-#
-# Maybe _translate_command(), _translate_add_labware_definition(), and
-# _translate_load_labware() should be static methods in classes (or a single class)
-# separate from CommandTranslator. Then these methods could be public again.
-#
-# Otherwise, we should delete these tests in favor of treating CommandTranslator
-# as a black box.
 
 
 def test_aspirate(
