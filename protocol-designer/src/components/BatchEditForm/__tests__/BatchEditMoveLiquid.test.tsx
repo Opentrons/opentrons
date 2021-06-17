@@ -3,17 +3,17 @@ import React from 'react'
 import { shallow } from 'enzyme'
 import { PrimaryButton, OutlineButton, Tooltip } from '@opentrons/components'
 import { i18n } from '../../../localization'
-import { BatchEditMoveLiquid } from '../BatchEditMoveLiquid'
+import {BatchEditMoveLiquid, BatchEditMoveLiquidProps} from '../BatchEditMoveLiquid'
 
 const localizationSpy = jest.spyOn(i18n, 't')
 
 describe('BatchEditMoveLiquid', () => {
   const handleCancel = jest.fn()
   const handleSave = jest.fn()
-  let props
+  let props: BatchEditMoveLiquidProps
   beforeEach(() => {
     // just return the i18n text path itself, instead of the text context at that path
-    localizationSpy.mockImplementation(path => path)
+    localizationSpy.mockImplementation(path => path.toString())
 
     props = {
       batchEditFormHasChanges: true,
@@ -43,7 +43,7 @@ describe('BatchEditMoveLiquid', () => {
       expect(localizationSpy).toHaveBeenCalledWith(tooltipPath)
       expect(saveButtonTooltip.prop('children')).toBe(tooltipPath)
 
-      saveButton.invoke('onClick')()
+      saveButton.invoke('onClick')!({} as React.MouseEvent)
       expect(handleSave).toHaveBeenCalled()
     })
 
@@ -95,7 +95,7 @@ describe('BatchEditMoveLiquid', () => {
 
       expect(handleCancel).not.toHaveBeenCalled()
 
-      cancelButton.invoke('onClick')()
+      cancelButton.invoke('onClick')!({} as React.MouseEvent)
       expect(handleCancel).toHaveBeenCalled()
     })
   })

@@ -151,7 +151,7 @@ const SourceDestBatchEditMoveLiquidFields = (props: {
   )
 }
 
-interface BatchEditMoveLiquidProps {
+export interface BatchEditMoveLiquidProps {
   batchEditFormHasChanges: boolean
   propsForFields: FieldPropsByName
   handleCancel: () => unknown

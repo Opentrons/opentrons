@@ -13,7 +13,7 @@ import {
   TEMPERATURE_AT_TARGET,
   TEMPERATURE_DEACTIVATED,
 } from '@opentrons/step-generation'
-import { ModuleStatus, ModuleTag } from '../ModuleTag'
+import {ModuleStatus, ModuleTag, ModuleTagProps} from '../ModuleTag'
 
 import * as timelineFramesSelectors from '../../../top-selectors/timelineFrames'
 import { selectors as stepFormSelectors } from '../../../step-forms'
@@ -106,7 +106,8 @@ describe('ModuleTag', () => {
 
   describe('ModuleTagComponent', () => {
     const moduleId = 'abcdef'
-    let store, props
+    let store: any
+    let props: ModuleTagProps
     beforeEach(() => {
       props = {
         x: 1,
