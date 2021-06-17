@@ -18,7 +18,7 @@ from ..commands import (
     PickUpTipResult,
     DropTipResult,
 )
-from .substore import CommandReactive
+from .substore import Substore, CommandReactive
 
 
 @dataclass(frozen=True)
@@ -46,7 +46,7 @@ class PipetteState:
     current_location: Optional[DeckLocation]
 
 
-class PipetteStore(CommandReactive):
+class PipetteStore(Substore[PipetteState], CommandReactive):
     """Pipette state container."""
 
     _state: PipetteState
@@ -58,14 +58,6 @@ class PipetteStore(CommandReactive):
             aspirated_volume_by_id={},
             current_location=None,
         )
-
-    @property
-    def state(self) -> PipetteView:
-        """Get the store's underlying state object."""
-        # TODO(mc, 2021-06-03): PipetteView wrapper is temporary to allow
-        # for this store to be used while other stores are converted to the
-        # state/store/view triple
-        return PipetteView(state=self._state)
 
     def handle_completed_command(self, command: CompletedCommandType) -> None:
         """Modify state in reaction to a completed command."""

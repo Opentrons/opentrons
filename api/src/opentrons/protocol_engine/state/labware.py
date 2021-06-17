@@ -18,7 +18,7 @@ from ..commands import (
     AddLabwareDefinitionResult,
 )
 from ..types import LabwareLocation, Dimensions
-from .substore import CommandReactive
+from .substore import Substore, CommandReactive
 
 
 @dataclass(frozen=True)
@@ -39,7 +39,7 @@ class LabwareState:
     deck_definition: DeckDefinitionV2
 
 
-class LabwareStore(CommandReactive):
+class LabwareStore(Substore[LabwareState], CommandReactive):
     """Labware state container."""
 
     _state: LabwareState
@@ -76,14 +76,6 @@ class LabwareStore(CommandReactive):
             labware_by_id=labware_by_id,
             deck_definition=deck_definition,
         )
-
-    @property
-    def state(self) -> LabwareView:
-        """Get the store's underlying state object."""
-        # TODO(mc, 2021-06-03): LabwareView wrapper is temporary to allow
-        # for this store to be used while other stores are converted to the
-        # state/store/view triple
-        return LabwareView(state=self._state)
 
     def handle_completed_command(self, command: CompletedCommandType) -> None:
         """Modify state in reaction to a completed command."""

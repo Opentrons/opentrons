@@ -61,7 +61,7 @@ class ChildThreadTransport(AbstractSyncTransport):
     @property
     def state(self) -> StateView:
         """Get a view of the Protocol Engine's state."""
-        return self._engine.state_store
+        return self._engine.state_view
 
     def execute_command(
         self,

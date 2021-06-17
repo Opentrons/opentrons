@@ -1,22 +1,33 @@
 """Protocol engine state module."""
 
-from .state_store import CommandState, StateStore, StateView
-from .labware import LabwareState, LabwareData
-from .pipettes import PipetteState, PipetteData, HardwarePipette
-from .geometry import GeometryState, TipGeometry
-from .motion import MotionState, PipetteLocationData
+from .state import State, StateStore, StateView
+from .commands import CommandState, CommandView
+from .labware import LabwareState, LabwareView, LabwareData
+from .pipettes import PipetteState, PipetteView, PipetteData, HardwarePipette
+from .geometry import GeometryView, TipGeometry
+from .motion import MotionView, PipetteLocationData
 
 __all__ = [
+    # top level state value and interfaces
+    "State",
     "StateStore",
     "StateView",
+    # command state
     "CommandState",
+    "CommandView",
+    # labware state
     "LabwareState",
-    "PipetteState",
-    "GeometryState",
-    "MotionState",
+    "LabwareView",
     "LabwareData",
+    # pipette state
+    "PipetteState",
+    "PipetteView",
     "PipetteData",
     "HardwarePipette",
+    # computed geometry state
+    "GeometryView",
     "TipGeometry",
+    # computed motion state
+    "MotionView",
     "PipetteLocationData",
 ]

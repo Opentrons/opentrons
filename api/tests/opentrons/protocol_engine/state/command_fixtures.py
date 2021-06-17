@@ -1,25 +1,73 @@
 """Command factories to use in tests as data fixtures."""
-from datetime import datetime, timezone
-from typing import Optional, Tuple
+from datetime import datetime
+from pydantic import BaseModel
+from typing import Optional, Tuple, cast
 
 from opentrons.types import MountType
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.protocol_engine import commands as cmd
+from opentrons.protocol_engine.errors import ProtocolEngineError
 from opentrons.protocol_engine.types import PipetteName, WellLocation, LabwareLocation
-from opentrons.protocol_engine.commands.command import ReqT, ResT
+
+
+def create_pending_command(
+    request: Optional[BaseModel] = None,
+) -> cmd.PendingCommandType:
+    """Given a request, build a pending command model."""
+    return cast(
+        cmd.PendingCommandType,
+        cmd.PendingCommand(
+            created_at=datetime(year=2021, month=1, day=1),
+            request=request or BaseModel(),
+        ),
+    )
+
+
+def create_running_command(
+    request: Optional[BaseModel] = None,
+) -> cmd.RunningCommandType:
+    """Given a request, build a running command model."""
+    return cast(
+        cmd.RunningCommandType,
+        cmd.RunningCommand(
+            created_at=datetime(year=2021, month=1, day=1),
+            started_at=datetime(year=2022, month=2, day=2),
+            request=request or BaseModel(),
+        ),
+    )
+
+
+def create_failed_command(
+    request: Optional[BaseModel] = None,
+    error: Optional[ProtocolEngineError] = None,
+) -> cmd.FailedCommandType:
+    """Given a request and error, build a failed command model."""
+    return cast(
+        cmd.FailedCommandType,
+        cmd.FailedCommand(
+            created_at=datetime(year=2021, month=1, day=1),
+            started_at=datetime(year=2022, month=2, day=2),
+            failed_at=datetime(year=2023, month=3, day=3),
+            request=request or BaseModel(),
+            error=error or ProtocolEngineError(),
+        ),
+    )
 
 
 def create_completed_command(
-    request: ReqT,
-    result: ResT,
-) -> cmd.CompletedCommand[ReqT, ResT]:
-    """Given a request and result, build a command model."""
-    return cmd.CompletedCommand(
-        created_at=datetime.now(tz=timezone.utc),
-        started_at=datetime.now(tz=timezone.utc),
-        completed_at=datetime.now(tz=timezone.utc),
-        request=request,
-        result=result,
+    request: Optional[BaseModel] = None,
+    result: Optional[BaseModel] = None,
+) -> cmd.CompletedCommandType:
+    """Given a request and result, build a completed command model."""
+    return cast(
+        cmd.CompletedCommandType,
+        cmd.CompletedCommand(
+            created_at=datetime(year=2021, month=1, day=1),
+            started_at=datetime(year=2022, month=2, day=2),
+            completed_at=datetime(year=2023, month=3, day=3),
+            request=request or BaseModel(),
+            result=result or BaseModel(),
+        ),
     )
 
 
@@ -28,7 +76,7 @@ def create_load_labware_command(
     location: LabwareLocation,
     definition: LabwareDefinition,
     calibration: Tuple[float, float, float],
-) -> cmd.CompletedCommand[cmd.LoadLabwareRequest, cmd.LoadLabwareResult]:
+) -> cmd.CompletedCommandType:
     """Create a completed LoadLabware command."""
     request = cmd.LoadLabwareRequest(
         loadName=definition.parameters.loadName,
@@ -48,9 +96,7 @@ def create_load_labware_command(
 
 def create_add_definition_command(
     definition: LabwareDefinition,
-) -> cmd.CompletedCommand[
-    cmd.AddLabwareDefinitionRequest, cmd.AddLabwareDefinitionResult
-]:
+) -> cmd.CompletedCommandType:
     """Create a completed AddLabwareDefinition command."""
     request = cmd.AddLabwareDefinitionRequest(definition=definition)
     result = cmd.AddLabwareDefinitionResult(
@@ -66,7 +112,7 @@ def create_load_pipette_command(
     pipette_id: str,
     pipette_name: PipetteName,
     mount: MountType,
-) -> cmd.CompletedCommand[cmd.LoadPipetteRequest, cmd.LoadPipetteResult]:
+) -> cmd.CompletedCommandType:
     """Get a completed LoadPipette command."""
     request = cmd.LoadPipetteRequest(pipetteName=pipette_name, mount=mount)
     result = cmd.LoadPipetteResult(pipetteId=pipette_id)
@@ -80,7 +126,7 @@ def create_aspirate_command(
     labware_id: str = "labware-id",
     well_name: str = "A1",
     well_location: Optional[WellLocation] = None,
-) -> cmd.CompletedCommand[cmd.AspirateRequest, cmd.AspirateResult]:
+) -> cmd.CompletedCommandType:
     """Get a completed Aspirate command."""
     request = cmd.AspirateRequest(
         pipetteId=pipette_id,
@@ -100,7 +146,7 @@ def create_dispense_command(
     labware_id: str = "labware-id",
     well_name: str = "A1",
     well_location: Optional[WellLocation] = None,
-) -> cmd.CompletedCommand[cmd.DispenseRequest, cmd.DispenseResult]:
+) -> cmd.CompletedCommandType:
     """Get a completed Dispense command."""
     request = cmd.DispenseRequest(
         pipetteId=pipette_id,
@@ -118,7 +164,7 @@ def create_pick_up_tip_command(
     pipette_id: str,
     labware_id: str = "labware-id",
     well_name: str = "A1",
-) -> cmd.CompletedCommand[cmd.PickUpTipRequest, cmd.PickUpTipResult]:
+) -> cmd.CompletedCommandType:
     """Get a completed PickUpTip command."""
     request = cmd.PickUpTipRequest(
         pipetteId=pipette_id,
@@ -135,7 +181,7 @@ def create_drop_tip_command(
     pipette_id: str,
     labware_id: str = "labware-id",
     well_name: str = "A1",
-) -> cmd.CompletedCommand[cmd.DropTipRequest, cmd.DropTipResult]:
+) -> cmd.CompletedCommandType:
     """Get a completed DropTip command."""
     request = cmd.DropTipRequest(
         pipetteId=pipette_id,
@@ -152,7 +198,7 @@ def create_move_to_well_command(
     pipette_id: str,
     labware_id: str = "labware-id",
     well_name: str = "A1",
-) -> cmd.CompletedCommand[cmd.MoveToWellRequest, cmd.MoveToWellResult]:
+) -> cmd.CompletedCommandType:
     """Get a completed MoveToWell command."""
     request = cmd.MoveToWellRequest(
         pipetteId=pipette_id,

@@ -21,7 +21,7 @@ def get_labware_view(
     labware_definitions_by_uri: Optional[Dict[str, LabwareDefinition]] = None,
     deck_definition: Optional[DeckDefinitionV2] = None,
 ) -> LabwareView:
-    """Get a labware view test subject factory."""
+    """Get a labware view test subject."""
     state = LabwareState(
         labware_by_id=labware_by_id or {},
         labware_definitions_by_uri=labware_definitions_by_uri or {},
