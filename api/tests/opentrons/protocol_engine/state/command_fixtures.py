@@ -13,7 +13,7 @@ from opentrons.protocol_engine.types import PipetteName, WellLocation, LabwareLo
 def create_pending_command(
     request: Optional[BaseModel] = None,
 ) -> cmd.PendingCommandType:
-    """Given a request and result, build a pending command model."""
+    """Given a request, build a pending command model."""
     return cast(
         cmd.PendingCommandType,
         cmd.PendingCommand(
@@ -26,7 +26,7 @@ def create_pending_command(
 def create_running_command(
     request: Optional[BaseModel] = None,
 ) -> cmd.RunningCommandType:
-    """Given a request and result, build a running command model."""
+    """Given a request, build a running command model."""
     return cast(
         cmd.RunningCommandType,
         cmd.RunningCommand(
@@ -41,7 +41,7 @@ def create_failed_command(
     request: Optional[BaseModel] = None,
     error: Optional[ProtocolEngineError] = None,
 ) -> cmd.FailedCommandType:
-    """Given a request and result, build a failed command model."""
+    """Given a request and error, build a failed command model."""
     return cast(
         cmd.FailedCommandType,
         cmd.FailedCommand(
