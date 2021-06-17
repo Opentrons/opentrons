@@ -5,9 +5,7 @@ import pytest
 from opentrons import protocol_engine as pe
 from opentrons.protocols import models
 
-from opentrons.protocols.runner.json_proto.command_translator import (
-    CommandTranslator
-)
+from opentrons.protocols.runner.json_proto.command_translator import CommandTranslator
 
 
 # Fix before merge: This gross-ass copy-paste
@@ -20,10 +18,7 @@ def json_protocol(json_protocol_dict: dict) -> models.JsonProtocol:
 
 
 @pytest.fixture
-def json_protocol_dict(
-    minimal_labware_def: dict,
-    minimal_labware_def2: dict
-) -> dict:
+def json_protocol_dict(minimal_labware_def: dict, minimal_labware_def2: dict) -> dict:
     """Get a JSON protocol dictionary fixture."""
     return {
         "schemaVersion": 3,
@@ -92,10 +87,7 @@ def subject() -> CommandTranslator:
     return CommandTranslator()
 
 
-def _assert_appear_in_order(
-    elements: typing.Iterable,
-    source: typing.Iterable
-) -> None:
+def _assert_appear_in_order(elements: typing.Iterable, source: typing.Iterable) -> None:
     """
     Make sure all elements appear in source, in the given relative order.
 
@@ -131,7 +123,7 @@ def test_labware(
         loadName=minimal_labware_def["parameters"]["loadName"],
         namespace=minimal_labware_def["namespace"],
         version=minimal_labware_def["version"],
-        labwareId="tiprack1Id"
+        labwareId="tiprack1Id",
     )
 
     expected_add_definition_request_2 = pe.commands.AddLabwareDefinitionRequest(
@@ -142,17 +134,17 @@ def test_labware(
         loadName=minimal_labware_def2["parameters"]["loadName"],
         namespace=minimal_labware_def2["namespace"],
         version=minimal_labware_def2["version"],
-        labwareId="wellplate1Id"
+        labwareId="wellplate1Id",
     )
 
     _assert_appear_in_order(
         elements=[expected_add_definition_request_1, expected_load_request_1],
-        source=result
+        source=result,
     )
 
     _assert_appear_in_order(
         elements=[expected_add_definition_request_2, expected_load_request_2],
-        source=result
+        source=result,
     )
 
 
@@ -163,9 +155,7 @@ def test_pipettes(
     result = subject.translate(json_protocol)
 
     expected_request = pe.commands.LoadPipetteRequest(
-        pipetteName="p300_single",
-        mount="left",
-        pipetteId="leftPipetteId"
+        pipetteName="p300_single", mount="left", pipetteId="leftPipetteId"
     )
 
     assert expected_request in result
@@ -184,10 +174,10 @@ def test_pipettes(
 
 
 def test_aspirate(
-        subject: CommandTranslator, aspirate_command: models.json_protocol.LiquidCommand
+    subject: CommandTranslator, aspirate_command: models.json_protocol.LiquidCommand
 ) -> None:
     """It should translate a JSON aspirate command to a Protocol Engine
-     aspirate request."""
+    aspirate request."""
     request = subject._translate_command(aspirate_command)
 
     assert request == [
@@ -198,18 +188,17 @@ def test_aspirate(
             volume=aspirate_command.params.volume,
             wellLocation=pe.WellLocation(
                 origin=pe.WellOrigin.BOTTOM,
-                offset=(0, 0, aspirate_command.params.offsetFromBottomMm)
-            )
+                offset=(0, 0, aspirate_command.params.offsetFromBottomMm),
+            ),
         )
     ]
 
 
 def test_dispense(
-        subject: CommandTranslator,
-        dispense_command: models.json_protocol.LiquidCommand
+    subject: CommandTranslator, dispense_command: models.json_protocol.LiquidCommand
 ) -> None:
     """It should translate a JSON dispense command to a Protocol Engine
-     dispense request."""
+    dispense request."""
     request = subject._translate_command(dispense_command)
 
     assert request == [
@@ -220,30 +209,32 @@ def test_dispense(
             volume=dispense_command.params.volume,
             wellLocation=pe.WellLocation(
                 origin=pe.WellOrigin.BOTTOM,
-                offset=(0, 0, dispense_command.params.offsetFromBottomMm)
-            )
+                offset=(0, 0, dispense_command.params.offsetFromBottomMm),
+            ),
         )
     ]
 
 
 def test_drop_tip(
-        subject: CommandTranslator,
-        drop_tip_command: models.json_protocol.PickUpDropTipCommand
+    subject: CommandTranslator,
+    drop_tip_command: models.json_protocol.PickUpDropTipCommand,
 ) -> None:
     """It should translate a JSON drop tip command to a Protocol Engine
-     drop tip request."""
+    drop tip request."""
     request = subject._translate_command(drop_tip_command)
 
     assert request == [
         pe.commands.DropTipRequest(
             pipetteId=drop_tip_command.params.pipette,
             labwareId=drop_tip_command.params.labware,
-            wellName=drop_tip_command.params.well
+            wellName=drop_tip_command.params.well,
         )
     ]
 
 
-def test_pick_up_tip(subject, pick_up_command: models.json_protocol.PickUpDropTipCommand) -> None:
+def test_pick_up_tip(
+    subject, pick_up_command: models.json_protocol.PickUpDropTipCommand
+) -> None:
     """
     It should translate a JSON pick up tip command to a Protocol Engine
     PickUpTip request.
@@ -255,6 +246,5 @@ def test_pick_up_tip(subject, pick_up_command: models.json_protocol.PickUpDropTi
             pipetteId=pick_up_command.params.pipette,
             labwareId=pick_up_command.params.labware,
             wellName=pick_up_command.params.well,
-
         )
     ]
