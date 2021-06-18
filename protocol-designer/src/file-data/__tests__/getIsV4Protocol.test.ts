@@ -47,7 +47,7 @@ describe('getRequiresAtLeastV4 selector', () => {
   testCases.forEach(
     ({ testName, robotStateTimeline, moduleEntities, expected }) => {
       it(testName, () => {
-        // $FlowFixMe TODO(IL, 2020-02-25): Flow doesn't have type for resultFunc
+        // @ts-expect-error(sa, 2021-6-18): resultFunc not part of Selector type
         const result = getRequiresAtLeastV4.resultFunc(
           robotStateTimeline,
           moduleEntities

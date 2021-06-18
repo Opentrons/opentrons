@@ -94,7 +94,8 @@ export const getRobotStateTimelineWithoutAirGapDispenseCommand: Selector<Timelin
       ...frame,
       commands: frame.commands.map(command => {
         if (command.command === 'dispenseAirGap') {
-          return { ...command, command: 'dispense' }
+          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+          return { ...command, command: 'dispense' } as Command
         }
 
         return command

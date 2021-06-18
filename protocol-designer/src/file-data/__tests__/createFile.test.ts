@@ -12,6 +12,7 @@ import {
   fixtureP10Single,
   fixtureP300Single,
 } from '@opentrons/shared-data/pipette/fixtures/name'
+import { LabwareDefinition2 } from '@opentrons/shared-data';
 import {
   createFile,
   getRequiresAtLeastV5,
@@ -30,8 +31,10 @@ import {
 import * as engageMagnet from '../__fixtures__/createFile/engageMagnet'
 import * as noModules from '../__fixtures__/createFile/noModules'
 import * as v5Fixture from '../__fixtures__/createFile/v5Fixture'
+import { LabwareEntities, PipetteEntities } from '../../../../step-generation/src/types';
+import { LabwareDefByDefURI } from '../../labware-defs'
 
-const getAjvValidator = _protocolSchema => {
+const getAjvValidator = (_protocolSchema: Record<string, any>) => {
   const ajv = new Ajv({
     allErrors: true,
     jsonPointers: true,
@@ -42,7 +45,7 @@ const getAjvValidator = _protocolSchema => {
   return validateProtocol
 }
 
-const expectResultToMatchSchema = (result, _protocolSchema): void => {
+const expectResultToMatchSchema = (result: any, _protocolSchema:Record<string, any>): void => {
   const validate = getAjvValidator(_protocolSchema)
   const valid = validate(result)
   const validationErrors = validate.errors
@@ -57,7 +60,7 @@ const expectResultToMatchSchema = (result, _protocolSchema): void => {
 
 describe('createFile selector', () => {
   it('should return a schema-valid JSON V3 protocol, if the protocol has NO modules', () => {
-    // $FlowFixMe TODO(IL, 2020-02-25): Flow doesn't have type for resultFunc
+    // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
     const result = createFile.resultFunc(
       fileMetadata,
       noModules.initialRobotState,
@@ -82,7 +85,7 @@ describe('createFile selector', () => {
     expect(!isEmpty(result.pipettes)).toBe(true)
   })
   it('should return a schema-valid JSON V4 protocol, if the protocol does have modules', () => {
-    // $FlowFixMe TODO(IL, 2020-02-25): Flow doesn't have type for resultFunc
+    // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
     const result = createFile.resultFunc(
       fileMetadata,
       engageMagnet.initialRobotState,
@@ -108,7 +111,7 @@ describe('createFile selector', () => {
     expect(!isEmpty(result.pipettes)).toBe(true)
   })
   it('should return a schema-valid JSON V5 protocol, if getRequiresAtLeastV5 returns true', () => {
-    // $FlowFixMe TODO(IL, 2020-02-25): Flow doesn't have type for resultFunc
+    // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
     const result = createFile.resultFunc(
       fileMetadata,
       v5Fixture.initialRobotState,
@@ -154,7 +157,7 @@ describe('getRequiresAtLeastV5', () => {
         },
       ],
     }
-    // $FlowFixMe TODO(IL, 2020-02-25): Flow doesn't have type for resultFunc
+    // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
     expect(getRequiresAtLeastV5.resultFunc(airGapTimeline)).toBe(true)
   })
   it('should return true if protocol has moveToWell', () => {
@@ -179,16 +182,16 @@ describe('getRequiresAtLeastV5', () => {
         },
       ],
     }
-    // $FlowFixMe TODO(IL, 2020-02-25): Flow doesn't have type for resultFunc
+    // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
     expect(getRequiresAtLeastV5.resultFunc(moveToWellTimeline)).toBe(true)
   })
   it('should return false if protocol has no airGap and no moveToWell', () => {
-    // $FlowFixMe TODO(IL, 2020-02-25): Flow doesn't have type for resultFunc
+    // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
     expect(getRequiresAtLeastV5.resultFunc(noModules.robotStateTimeline)).toBe(
       false
     )
     expect(
-      // $FlowFixMe TODO(IL, 2020-02-25): Flow doesn't have type for resultFunc
+      // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
       getRequiresAtLeastV5.resultFunc(engageMagnet.robotStateTimeline)
     ).toBe(false)
   })
@@ -201,37 +204,39 @@ describe('getLabwareDefinitionsInUse util', () => {
     const nonTiprackLabwareNotOnDeckDef = fixture_96_plate
     // NOTE that assignedTiprackNotOnDeckDef and nonTiprackLabwareNotOnDeckDef are
     // missing from LabwareEntities bc they're not on the deck
-    const labwareEntities = {
+    const labwareEntities: LabwareEntities = {
       someLabwareId: {
         id: 'someLabwareId',
-        def: assignedTiprackOnDeckDef,
+        def: assignedTiprackOnDeckDef as LabwareDefinition2,
         labwareDefURI: 'assignedTiprackOnDeckURI',
       },
       otherLabwareId: {
         id: 'otherLabwareId',
-        def: nonTiprackLabwareOnDeckDef,
+        def: nonTiprackLabwareOnDeckDef as LabwareDefinition2,
         labwareDefURI: 'nonTiprackLabwareOnDeckURI',
       },
     }
-    const allLabwareDefsByURI = {
-      assignedTiprackOnDeckURI: assignedTiprackOnDeckDef,
-      assignedTiprackNotOnDeckURI: assignedTiprackNotOnDeckDef,
-      nonTiprackLabwareOnDeckURI: nonTiprackLabwareOnDeckDef,
-      nonTiprackLabwareNotOnDeckURI: nonTiprackLabwareNotOnDeckDef,
+    const allLabwareDefsByURI: LabwareDefByDefURI = {
+      assignedTiprackOnDeckURI: assignedTiprackOnDeckDef as LabwareDefinition2,
+      assignedTiprackNotOnDeckURI: assignedTiprackNotOnDeckDef as LabwareDefinition2,
+      nonTiprackLabwareOnDeckURI: nonTiprackLabwareOnDeckDef as LabwareDefinition2,
+      nonTiprackLabwareNotOnDeckURI: nonTiprackLabwareNotOnDeckDef as LabwareDefinition2,
     }
-    const pipetteEntities = {
+    const pipetteEntities: PipetteEntities = {
       somePipetteId: {
         id: 'somePipetteId',
+        // @ts-expect-error(sa, 2021-6-18): not a valid pipette name
         name: 'foo',
         spec: fixtureP10Single,
-        tiprackLabwareDef: assignedTiprackOnDeckDef,
+        tiprackLabwareDef: assignedTiprackOnDeckDef as LabwareDefinition2,
         tiprackDefURI: 'assignedTiprackOnDeckURI',
       },
       otherPipetteId: {
         id: 'otherPipetteId',
+        // @ts-expect-error(sa, 2021-6-18): not a valid pipette name
         name: 'foo',
         spec: fixtureP300Single,
-        tiprackLabwareDef: assignedTiprackNotOnDeckDef,
+        tiprackLabwareDef: assignedTiprackNotOnDeckDef as LabwareDefinition2,
         tiprackDefURI: 'assignedTiprackNotOnDeckURI',
       },
     }
