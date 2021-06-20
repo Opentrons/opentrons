@@ -1,12 +1,11 @@
 import omit from 'lodash/omit'
-import { combineReducers } from 'redux'
+import { Reducer, combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
 import pickBy from 'lodash/pickBy'
 import {
   getLabwareDefURI,
   getLabwareDefIsStandard,
 } from '@opentrons/shared-data'
-import { Reducer } from 'redux'
 import { Action } from '../types'
 import { LabwareUploadMessage, LabwareDefByDefURI } from './types'
 import {
@@ -15,7 +14,9 @@ import {
   ReplaceCustomLabwareDef,
 } from './actions'
 import { LoadFileAction } from '../load-file'
-const customDefs = handleActions(
+// @ts-expect-error(sa, 2021-6-20): cannot use string literals as action type
+// TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
+const customDefs: Reducer<LabwareDefByDefURI, Action> = handleActions(
   {
     CREATE_CUSTOM_LABWARE_DEF: (
       state: LabwareDefByDefURI,
@@ -46,6 +47,8 @@ const labwareUploadMessage = handleActions<
   any
 >(
   {
+    // @ts-expect-error(sa, 2021-6-20): cannot use string literals as action type
+    // TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
     LABWARE_UPLOAD_MESSAGE: (
       state,
       action: LabwareUploadMessageAction
@@ -56,7 +59,7 @@ const labwareUploadMessage = handleActions<
   },
   null
 )
-export type RootState = {
+export interface RootState {
   customDefs: LabwareDefByDefURI
   labwareUploadMessage: LabwareUploadMessage | null | undefined
 }
