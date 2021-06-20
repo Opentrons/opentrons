@@ -148,7 +148,7 @@ export const commandCreatorFromStepArgs = (
         args
       )
   }
-
+  // @ts-expect-error(sa, 2021-6-18): this is technically unreachable since we've covered all of the command creators in the switch
   console.warn(`unhandled commandCreatorFnName: ${args.commandCreatorFnName}`)
   return null
 }
@@ -161,7 +161,7 @@ export const getSubsteps: Selector<Substeps> = state =>
   state.fileData.computedSubsteps
 type WarningsPerStep = {
   [stepId in number | string]?:
-    | Array<StepGeneration.CommandCreatorWarning>
+    | StepGeneration.CommandCreatorWarning[]
     | null
     | undefined
 }

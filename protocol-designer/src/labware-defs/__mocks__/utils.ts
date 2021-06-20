@@ -11,7 +11,9 @@ const LABWARE_FIXTURE_PATTERN = path.join(
 const allLabware: LabwareDefByDefURI = glob
   .sync(LABWARE_FIXTURE_PATTERN)
   .map(require)
+  // @ts-expect-error(sa, 2021-6-20): not sure why TS thinks d is void
   .filter(d => d.metadata.displayCategory !== 'trash')
+  // @ts-expect-error(sa, 2021-6-20): not sure why TS thinks d is void
   .reduce((acc, d) => ({ ...acc, [getLabwareDefURI(d)]: d }), {})
 assert(
   Object.keys(allLabware).length > 0,

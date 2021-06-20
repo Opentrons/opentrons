@@ -26,6 +26,7 @@ describe('getRobotStateTimelineWithoutAirGapDispenseCommand', () => {
       ],
     }
     expect(
+      // @ts-expect-error(sa, 2021-6-18): resultFunc not part of Selector type
       getRobotStateTimelineWithoutAirGapDispenseCommand.resultFunc(
         robotStateTimeline
       )

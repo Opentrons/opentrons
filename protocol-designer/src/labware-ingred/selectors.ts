@@ -21,7 +21,7 @@ import {
   LiquidGroup,
   OrderedLiquids,
 } from './types'
-import { BaseState, MemoizedSelector, DeckSlot } from './../types'
+import { BaseState, DeckSlot } from './../types'
 // TODO: Ian 2019-02-15 no RootSlice, use BaseState
 interface RootSlice {
   labwareIngred: RootState
@@ -50,8 +50,13 @@ const getNextLiquidGroupId: Selector<RootSlice, string> = createSelector(
 const getLiquidNamesById: Selector<
   RootSlice,
   Record<string, string>
-> = createSelector(getLiquidGroupsById, ingredGroups =>
-  mapValues(ingredGroups, (ingred: LiquidGroup) => ingred.name)
+> = createSelector(
+  getLiquidGroupsById,
+  ingredGroups =>
+    mapValues(ingredGroups, (ingred: LiquidGroup) => ingred.name) as Record<
+      string,
+      string
+    >
 )
 const getLiquidSelectionOptions: Selector<RootSlice, Options> = createSelector(
   getLiquidGroupsById,
@@ -131,7 +136,7 @@ const getLiquidGroupsOnDeck: Selector<RootSlice, string[]> = createSelector(
               groupId: keyof typeof groupContents
             ) => {
               if (contents.volume > 0) {
-                liquidGroups.add(groupId)
+                liquidGroups.add(groupId as string)
               }
             }
           )

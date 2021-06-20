@@ -1,8 +1,9 @@
 // Named arguments to createFile selector. This data would be the result of several selectors.
 import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
-import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
-import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
-import fixture_trash from '@opentrons/shared-data/labware/fixtures/2/fixture_trash.json'
+import _fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
+import _fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
+import _fixture_trash from '@opentrons/shared-data/labware/fixtures/2/fixture_trash.json'
+import { LabwareDefinition2 } from '@opentrons/shared-data'
 import {
   LabwareLiquidState,
   LabwareEntities,
@@ -12,6 +13,10 @@ import { DismissedWarningState } from '../../../dismiss/reducers'
 import { IngredientsState } from '../../../labware-ingred/reducers'
 import { LabwareDefByDefURI } from '../../../labware-defs'
 import { FileMetadataFields } from '../../types'
+
+const fixture96Plate = _fixture_96_plate as LabwareDefinition2
+const fixtureTiprack10ul = _fixture_tiprack_10_ul as LabwareDefinition2
+const fixtureTrash = _fixture_trash as LabwareDefinition2
 export const fileMetadata: FileMetadataFields = {
   protocolName: 'Test Protocol',
   author: 'The Author',
@@ -28,17 +33,17 @@ export const labwareEntities: LabwareEntities = {
   trashId: {
     labwareDefURI: 'opentrons/opentrons_1_trash_1100ml_fixed/1',
     id: 'trashId',
-    def: fixture_trash,
+    def: fixtureTrash,
   },
   tiprackId: {
     labwareDefURI: 'opentrons/opentrons_96_tiprack_10ul/1',
     id: 'tiprackId',
-    def: fixture_tiprack_10_ul,
+    def: fixtureTiprack10ul,
   },
   plateId: {
     labwareDefURI: 'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1',
     id: 'plateId',
-    def: fixture_96_plate,
+    def: fixture96Plate,
   },
 }
 export const pipetteEntities: PipetteEntities = {
@@ -47,7 +52,7 @@ export const pipetteEntities: PipetteEntities = {
     name: 'p10_single',
     spec: fixtureP10Single,
     tiprackDefURI: 'opentrons/opentrons_96_tiprack_10ul/1',
-    tiprackLabwareDef: fixture_tiprack_10_ul,
+    tiprackLabwareDef: fixtureTiprack10ul,
   },
 }
 export const labwareNicknamesById: Record<string, string> = {
@@ -56,7 +61,7 @@ export const labwareNicknamesById: Record<string, string> = {
   plateId: 'NEST 96 Well Plate 100 µL PCR Full Skirt',
 }
 export const labwareDefsByURI: LabwareDefByDefURI = {
-  'opentrons/opentrons_96_tiprack_10ul/1': fixture_tiprack_10_ul,
-  'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1': fixture_96_plate,
-  'opentrons/opentrons_1_trash_1100ml_fixed/1': fixture_trash,
+  'opentrons/opentrons_96_tiprack_10ul/1': fixtureTiprack10ul,
+  'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1': fixture96Plate,
+  'opentrons/opentrons_1_trash_1100ml_fixed/1': fixtureTrash,
 }
