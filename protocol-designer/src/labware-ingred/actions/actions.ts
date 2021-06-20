@@ -9,8 +9,9 @@ export interface OpenAddLabwareModalAction {
     slot: DeckSlot
   }
 }
+// @ts-expect-error(sa, 2021-6-20): creatActions doesn't return exact actions
 export const openAddLabwareModal: (payload: {
-  slot: DeckSlot // $FlowFixMe(mc, 2020-06-04): creatActions doesn't return exact actions
+  slot: DeckSlot
 }) => OpenAddLabwareModalAction = createAction('OPEN_ADD_LABWARE_MODAL')
 export interface CloseLabwareSelectorAction {
   type: 'CLOSE_LABWARE_SELECTOR'
@@ -24,9 +25,9 @@ export interface OpenIngredientSelectorAction {
   type: 'OPEN_INGREDIENT_SELECTOR'
   payload: string
 }
+// @ts-expect-error(sa, 2021-6-20): creatActions doesn't return exact actions
 export const openIngredientSelector: (
-  payload: // $FlowFixMe(mc, 2020-06-04): creatActions doesn't return exact actions
-  string
+  payload: string
 ) => OpenIngredientSelectorAction = createAction('OPEN_INGREDIENT_SELECTOR')
 export interface CloseIngredientSelectorAction {
   type: 'CLOSE_INGREDIENT_SELECTOR'
@@ -40,9 +41,9 @@ export interface DrillDownOnLabwareAction {
   type: 'DRILL_DOWN_ON_LABWARE'
   payload: string
 }
+// @ts-expect-error(sa, 2021-6-20): creatActions doesn't return exact actions
 export const drillDownOnLabware: (
-  payload: // $FlowFixMe(mc, 2020-06-04): creatActions doesn't return exact actions
-  string
+  payload: string
 ) => DrillDownOnLabwareAction = createAction('DRILL_DOWN_ON_LABWARE')
 export interface DrillUpFromLabwareAction {
   type: 'DRILL_UP_FROM_LABWARE'
@@ -70,8 +71,9 @@ export interface DeleteContainerAction {
     labwareId: string
   }
 }
+// @ts-expect-error(sa, 2021-6-20): creatActions doesn't return exact actions
 export const deleteContainer: (payload: {
-  labwareId: string // $FlowFixMe(mc, 2020-06-04): creatActions doesn't return exact actions
+  labwareId: string
 }) => DeleteContainerAction = createAction('DELETE_CONTAINER')
 // ===========
 export interface SwapSlotContentsAction {

@@ -3,13 +3,14 @@ import configureMockStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
 import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
+import { LabwareDefinition2 } from '@opentrons/shared-data'
 import { getLabwareDefsByURI } from '../../labware-defs/selectors'
 import { getInitialDeckSetup } from '../../step-forms/selectors'
 import { getLabwareNicknamesById } from '../../ui/labware/selectors'
 import { uuid } from '../../utils'
 import { renameLabware, createContainer } from '../actions'
 import { getNextAvailableDeckSlot, getNextNickname } from '../utils'
-import { InitialDeckSetup } from '../../step-forms'
+
 jest.mock('../../labware-defs/selectors')
 jest.mock('../../step-forms/selectors')
 jest.mock('../../ui/labware/selectors')
@@ -20,7 +21,9 @@ const mockGetLabwareDefsByURI = getLabwareDefsByURI as jest.MockedFunction<
   typeof getLabwareDefsByURI
 >
 
-const mockGetLabwareNicknamesById = getLabwareNicknamesById as jest.MockedFunction<getLabwareNicknamesById>
+const mockGetLabwareNicknamesById = getLabwareNicknamesById as jest.MockedFunction<
+  typeof getLabwareNicknamesById
+>
 
 const mockUuid = uuid as jest.MockedFunction<typeof uuid>
 
@@ -45,7 +48,7 @@ afterEach(() => {
 
 describe('renameLabware thunk', () => {
   it('should dispatch RENAME_LABWARE with a nickname from getNextNickname if `name` arg is unspecified', () => {
-    const store = mockStore({})
+    const store: any = mockStore({})
 
     mockGetLabwareNicknamesById.mockImplementation(state => {
       expect(state).toBe(store.getState())
@@ -65,13 +68,12 @@ describe('renameLabware thunk', () => {
         payload: { labwareId: 'someLabwareId', name: 'Mock Next Nickname' },
       },
     ]
-    // $FlowFixMe(IL. 2020-11-13): flow hates thunks
     store.dispatch(renameLabware({ labwareId: 'someLabwareId' }))
     expect(store.getActions()).toEqual(expectedActions)
   })
 
   it('should dispatch RENAME_LABWARE with a nickname from getNextNickname, with the nickname specified in the `name` arg', () => {
-    const store = mockStore({})
+    const store: any = mockStore({})
 
     mockGetLabwareNicknamesById.mockImplementation(state => {
       expect(state).toBe(store.getState())
@@ -96,7 +98,6 @@ describe('renameLabware thunk', () => {
     ]
 
     store.dispatch(
-      // $FlowFixMe(IL. 2020-11-13): flow hates thunks
       renameLabware({ labwareId: 'someLabwareId', name: 'Specified Name' })
     )
     expect(store.getActions()).toEqual(expectedActions)
@@ -105,7 +106,7 @@ describe('renameLabware thunk', () => {
 
 describe('createContainer', () => {
   it('should dispatch CREATE_CONTAINER with the specified slot', () => {
-    const store = mockStore({})
+    const store: any = mockStore({})
 
     mockGetInitialDeckSetup.mockImplementation(state => {
       expect(state).toBe(store.getState())
@@ -114,7 +115,7 @@ describe('createContainer', () => {
 
     mockGetLabwareDefsByURI.mockImplementation(state => {
       expect(state).toBe(store.getState())
-      return { someLabwareDefURI: fixture_96_plate }
+      return { someLabwareDefURI: fixture_96_plate as LabwareDefinition2 }
     })
 
     mockUuid.mockImplementation(() => 'fakeUuid')
@@ -131,14 +132,13 @@ describe('createContainer', () => {
     ]
 
     store.dispatch(
-      // $FlowFixMe(IL. 2020-11-13): flow hates thunks
       createContainer({ labwareDefURI: 'someLabwareDefURI', slot: '4' })
     )
     expect(store.getActions()).toEqual(expectedActions)
   })
 
   it('should dispatch CREATE_CONTAINER with slot from getNextAvailableDeckSlot if no slot is specified', () => {
-    const store = mockStore({})
+    const store: any = mockStore({})
 
     const initialDeckSetup = { labware: {}, pipettes: {}, modules: {} }
     mockGetInitialDeckSetup.mockImplementation(state => {
@@ -148,7 +148,7 @@ describe('createContainer', () => {
 
     mockGetLabwareDefsByURI.mockImplementation(state => {
       expect(state).toBe(store.getState())
-      return { someLabwareDefURI: fixture_96_plate }
+      return { someLabwareDefURI: fixture_96_plate as LabwareDefinition2 }
     })
 
     mockUuid.mockImplementation(() => 'fakeUuid')
@@ -177,7 +177,7 @@ describe('createContainer', () => {
   })
 
   it('should do nothing if no slot is specified and getNextAvailableDeckSlot returns falsey', () => {
-    const store = mockStore({})
+    const store: any = mockStore({})
 
     const initialDeckSetup = { labware: {}, pipettes: {}, modules: {} }
     mockGetInitialDeckSetup.mockImplementation(state => {
@@ -187,7 +187,7 @@ describe('createContainer', () => {
 
     mockGetLabwareDefsByURI.mockImplementation(state => {
       expect(state).toBe(store.getState())
-      return { someLabwareDefURI: fixture_96_plate }
+      return { someLabwareDefURI: fixture_96_plate as LabwareDefinition2 }
     })
 
     mockGetNextAvailableDeckSlot.mockImplementation(_initialDeckSetup => {
@@ -196,7 +196,7 @@ describe('createContainer', () => {
       return null
     })
 
-    const expectedActions = []
+    const expectedActions: any[] = []
 
     store.dispatch(
       // $FlowFixMe(IL. 2020-11-13): flow hates thunks
@@ -209,7 +209,7 @@ describe('createContainer', () => {
     // NOTE: this is because we don't show the NameThisLabwareOverlay for tipracks,
     // so for the auto-incrementing My Tiprack (1), My Tiprack (2) mechanism to work
     // we must dispatch RENAME_LABWARE here instead of having that overlay dispatch it.
-    const store = mockStore({})
+    const store: any = mockStore({})
 
     mockGetLabwareNicknamesById.mockImplementation(state => {
       expect(state).toBe(store.getState())
@@ -236,7 +236,7 @@ describe('createContainer', () => {
 
     mockGetLabwareDefsByURI.mockImplementation(state => {
       expect(state).toBe(store.getState())
-      return { someLabwareDefURI: fixture_tiprack_10_ul }
+      return { someLabwareDefURI: fixture_tiprack_10_ul as LabwareDefinition2 }
     })
 
     mockUuid.mockImplementation(() => 'fakeUuid')
@@ -260,7 +260,6 @@ describe('createContainer', () => {
     ]
 
     store.dispatch(
-      // $FlowFixMe(IL. 2020-11-13): flow hates thunks
       createContainer({ labwareDefURI: 'someLabwareDefURI', slot: '4' })
     )
     expect(store.getActions()).toEqual(expectedActions)

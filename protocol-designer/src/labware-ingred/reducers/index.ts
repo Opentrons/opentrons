@@ -1,11 +1,10 @@
-import { combineReducers } from 'redux'
+import { Reducer, combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
 import omit from 'lodash/omit'
 import mapValues from 'lodash/mapValues'
 import pickBy from 'lodash/pickBy'
 import { FIXED_TRASH_ID } from '../../constants'
 import { getPDMetadata } from '../../file-types'
-import { Reducer } from 'redux'
 import {
   SingleLabwareLiquidState,
   LocationLiquidState,
@@ -33,9 +32,12 @@ import {
 // REDUCERS
 // modeLabwareSelection: boolean. If true, we're selecting labware to add to a slot
 // (this state just toggles a modal)
-// NOTE(mc, 2020-06-04): `handleActions` cannot be strictly typed
+
+// @ts-expect-error(sa, 2021-6-20): cannot use string literals as action type
+// TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
 const modeLabwareSelection: Reducer<DeckSlot | false, any> = handleActions(
   {
+    // @ts-expect-error(sa, 2021-6-20): cannot use string literals as action type
     OPEN_ADD_LABWARE_MODAL: (state, action: OpenAddLabwareModalAction) =>
       action.payload.slot,
     CLOSE_LABWARE_SELECTOR: () => false,
@@ -44,7 +46,8 @@ const modeLabwareSelection: Reducer<DeckSlot | false, any> = handleActions(
   false
 )
 export type SelectedContainerId = string | null | undefined
-// NOTE(mc, 2020-06-04): `handleActions` cannot be strictly typed
+// @ts-expect-error(sa, 2021-6-20): cannot use string literals as action type
+// TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
 const selectedContainerId: Reducer<SelectedContainerId, any> = handleActions(
   {
     OPEN_INGREDIENT_SELECTOR: (
@@ -59,7 +62,8 @@ const selectedContainerId: Reducer<SelectedContainerId, any> = handleActions(
   null
 )
 export type DrillDownLabwareId = string | null | undefined
-// NOTE(mc, 2020-06-04): `handleActions` cannot be strictly typed
+// @ts-expect-error(sa, 2021-6-20): cannot use string literals as action type
+// TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
 const drillDownLabwareId: Reducer<DrillDownLabwareId, any> = handleActions(
   {
     DRILL_DOWN_ON_LABWARE: (
@@ -74,7 +78,7 @@ const drillDownLabwareId: Reducer<DrillDownLabwareId, any> = handleActions(
   null
 )
 export type ContainersState = Record<string, DisplayLabware | null | undefined>
-export type SelectedLiquidGroupState = {
+export interface SelectedLiquidGroupState {
   liquidGroupId: string | null | undefined
   newLiquidGroup?: true
 }
@@ -85,6 +89,8 @@ const unselectedLiquidGroupState = {
 // null = nothing selected, newLiquidGroup: true means user is creating new liquid
 const selectedLiquidGroup = handleActions(
   {
+    // @ts-expect-error(sa, 2021-6-20): cannot use string literals as action type
+    // TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
     SELECT_LIQUID_GROUP: (
       state: SelectedLiquidGroupState,
       action: SelectLiquidAction
@@ -106,7 +112,8 @@ const initialLabwareState: ContainersState = {
     nickname: 'Trash',
   },
 }
-// NOTE(mc, 2020-06-04): `handleActions` cannot be strictly typed
+// @ts-expect-error(sa, 2021-6-20): cannot use string literals as action type
+// TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
 export const containers: Reducer<ContainersState, any> = handleActions(
   {
     CREATE_CONTAINER: (
@@ -127,6 +134,7 @@ export const containers: Reducer<ContainersState, any> = handleActions(
     ): ContainersState =>
       pickBy(
         state,
+        // @ts-expect-error(sa, 2021-6-20): pickBy might return null or undefined
         (value: DisplayLabware, key: string) => key !== action.payload.labwareId
       ),
     RENAME_LABWARE: (
@@ -187,7 +195,8 @@ export const containers: Reducer<ContainersState, any> = handleActions(
 type SavedLabwareState = Record<string, boolean>
 
 /** Keeps track of which labware have saved nicknames */
-// NOTE(mc, 2020-06-04): `handleActions` cannot be strictly typed
+// @ts-expect-error(sa, 2021-6-20): cannot use string literals as action type
+// TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
 export const savedLabware: Reducer<SavedLabwareState, any> = handleActions(
   {
     DELETE_CONTAINER: (
@@ -210,7 +219,8 @@ export const savedLabware: Reducer<SavedLabwareState, any> = handleActions(
   {}
 )
 export type IngredientsState = LiquidGroupsById
-// NOTE(mc, 2020-06-04): `handleActions` cannot be strictly typed
+// @ts-expect-error(sa, 2021-6-20): cannot use string literals as action type
+// TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
 export const ingredients: Reducer<IngredientsState, any> = handleActions(
   {
     EDIT_LIQUID_GROUP: (
@@ -238,6 +248,8 @@ export const ingredients: Reducer<IngredientsState, any> = handleActions(
   {}
 )
 type LocationsState = LabwareLiquidState
+// @ts-expect-error(sa, 2021-6-20): cannot use string literals as action type
+// TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
 export const ingredLocations: Reducer<LocationsState, any> = handleActions(
   {
     SET_WELL_CONTENTS: (
@@ -290,7 +302,7 @@ export const ingredLocations: Reducer<LocationsState, any> = handleActions(
   },
   {}
 )
-export type RootState = {
+export interface RootState {
   modeLabwareSelection: DeckSlot | false
   selectedContainerId: SelectedContainerId
   drillDownLabwareId: DrillDownLabwareId

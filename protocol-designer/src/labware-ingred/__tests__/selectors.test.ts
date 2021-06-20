@@ -13,6 +13,7 @@ const allIngredientsXXSingleIngred = {
 describe('allIngredientNamesIds selector', () => {
   it('selects names & ids from allIngredients selector result', () => {
     expect(
+      // @ts-expect-error(sa, 2021-6-20): resultFunc not part of Selector type
       selectors.allIngredientNamesIds.resultFunc(
         // flow def for resultFunc is wrong and/or resultFun isn't typeable
         allIngredientsXXSingleIngred as any
@@ -27,13 +28,13 @@ describe('allIngredientNamesIds selector', () => {
 })
 describe('allIngredientGroupFields', () => {
   it('no ingreds - return empty obj', () => {
-    // flow def for resultFunc is wrong and/or resultFun isn't typeable
+    // @ts-expect-error(sa, 2021-6-20): resultFunc not part of Selector type
     expect(selectors.allIngredientGroupFields.resultFunc({} as any)).toEqual({})
   })
   it('select fields from all ingred groups', () => {
     expect(
+      // @ts-expect-error(sa, 2021-6-20): resultFunc not part of Selector type
       selectors.allIngredientGroupFields.resultFunc(
-        // flow def for resultFunc is wrong and/or resultFun isn't typeable
         allIngredientsXXSingleIngred as any
       )
     ).toEqual({
