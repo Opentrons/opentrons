@@ -4,19 +4,24 @@ import { selectors as fileDataSelectors } from '../file-data'
 import { selectors as stepFormSelectors } from '../step-forms'
 import { getActiveItem } from '../ui/steps/selectors'
 import { START_TERMINAL_ITEM_ID, PRESAVED_STEP_ID } from '../steplist'
-import { CommandsAndRobotState } from '@opentrons/step-generation'
+import {
+  CommandsAndRobotState,
+  RobotState,
+  Timeline,
+} from '@opentrons/step-generation'
 import { Selector } from '../types'
 import {
+  HoverableItem,
   SINGLE_STEP_SELECTION_TYPE,
   TERMINAL_ITEM_SELECTION_TYPE,
 } from '../ui/steps/reducers'
 
 const _timelineFrameHelper = (beforeActiveItem: boolean) => (
-  activeItem,
-  initialRobotState,
-  robotStateTimeline,
-  lastValidRobotState,
-  orderedStepIds
+  activeItem: HoverableItem | null,
+  initialRobotState: RobotState,
+  robotStateTimeline: Timeline,
+  lastValidRobotState: RobotState,
+  orderedStepIds: string[]
 ): CommandsAndRobotState | null => {
   if (activeItem === null) return null
   // Add pseudo-frames for start and end terminal items

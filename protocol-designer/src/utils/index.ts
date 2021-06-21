@@ -1,11 +1,11 @@
 import uuidv1 from 'uuid/v1'
-import { WellSetHelpers } from '@opentrons/shared-data'
-import { makeWellSetHelpers } from '@opentrons/shared-data'
+import { WellSetHelpers, makeWellSetHelpers } from '@opentrons/shared-data'
 import { i18n } from '../localization'
 import { WellGroup } from '@opentrons/components'
 import { BoundingRect, GenericRect } from '../collision-types'
 export const registerSelectors: (arg0: any) => void =
   process.env.NODE_ENV === 'development'
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     ? require('reselect-tools').registerSelectors
     : (a: any) => {}
 export const uuid: () => string = uuidv1
@@ -39,6 +39,7 @@ export const getCollidingWells = (
     height: Math.abs(y1 - y0),
   }
   // NOTE: querySelectorAll returns a NodeList, so you need to unpack it as an Array to do .filter
+  // @ts-expect-error(sa, 2021-6-21): there is no option to query by class selector in HTMLElementTagNameMap (see type of querySelectorAll)
   const selectableElems: HTMLElement[] = [
     ...document.querySelectorAll('.' + selectableClassname),
   ]
@@ -53,6 +54,7 @@ export const getCollidingWells = (
       // TODO IMMEDIATELY no magic string 'wellname'
       if ('wellname' in elem.dataset) {
         const wellName = elem.dataset['wellname']
+        // @ts-expect-error(sa, 2021-6-21): wellName might be undefined
         return { ...acc, [wellName]: null }
       }
 

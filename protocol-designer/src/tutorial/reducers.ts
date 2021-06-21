@@ -9,6 +9,8 @@ import { HintKey } from './index'
 import { AddHintAction, RemoveHintAction } from './actions'
 import { NavigateToPageAction } from '../navigation/actions'
 type HintReducerState = HintKey[]
+// @ts-expect-error(sa, 2021-6-21): cannot use string literals as action type
+// TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
 const hints = handleActions(
   {
     ADD_HINT: (
@@ -33,6 +35,8 @@ type DismissedHintReducerState = Record<
   }
 >
 const dismissedHintsInitialState = {}
+// @ts-expect-error(sa, 2021-6-21): cannot use string literals as action type
+// TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
 const dismissedHints: Reducer<DismissedHintReducerState, any> = handleActions(
   {
     // NOTE: only "rememberDismissal" hints should have been persisted
@@ -64,7 +68,7 @@ const dismissedHints: Reducer<DismissedHintReducerState, any> = handleActions(
 )
 export const dismissedHintsPersist = (
   state: DismissedHintReducerState
-): DismissedHintReducerState => {
+): Partial<DismissedHintReducerState> => {
   // persist only 'rememberDismissal' hints
   return pickBy(
     state,
@@ -76,7 +80,7 @@ const _allReducers = {
   hints,
   dismissedHints,
 }
-export type RootState = {
+export interface RootState {
   hints: HintReducerState
   dismissedHints: DismissedHintReducerState
 }

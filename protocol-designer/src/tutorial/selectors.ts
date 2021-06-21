@@ -6,7 +6,7 @@ import isEmpty from 'lodash/isEmpty'
 import { BaseState, Selector } from '../types'
 import { HintKey } from '.'
 
-const rootSelector = (state: BaseState) => state.tutorial
+const rootSelector = (state: BaseState): BaseState['tutorial'] => state.tutorial
 
 export const getHint: Selector<HintKey | null | undefined> = createSelector(
   rootSelector,
@@ -23,7 +23,7 @@ export const getHint: Selector<HintKey | null | undefined> = createSelector(
 export const getDismissedHints: Selector<HintKey[]> = createSelector(
   rootSelector,
   tutorial => {
-    const dismissedKeys = Object.keys(tutorial.dismissedHints)
+    const dismissedKeys = Object.keys(tutorial.dismissedHints) as HintKey[]
     return dismissedKeys
   }
 )
