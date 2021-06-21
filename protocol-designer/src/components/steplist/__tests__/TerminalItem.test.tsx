@@ -58,7 +58,7 @@ describe('TerminalItem', () => {
     resetAllWhenMocks()
   })
 
-  const render = props =>
+  const render = (props: React.ComponentProps<typeof TerminalItem>) =>
     mount(
       <Provider store={store}>
         <TerminalItem {...props} />
@@ -72,6 +72,7 @@ describe('TerminalItem', () => {
         .mockReturnValue(true)
       const wrapper = render(props)
       act(() => {
+        // @ts-expect-error(sa, 2021-6-21): onClick handler might be undefined
         wrapper.find(PDTitledList).prop('onClick')()
       })
       wrapper.update()
@@ -86,6 +87,7 @@ describe('TerminalItem', () => {
         .mockReturnValue(true)
       const wrapper = render(props)
       act(() => {
+        // @ts-expect-error(sa, 2021-6-21): onClick handler might be undefined
         wrapper.find(PDTitledList).prop('onClick')()
       })
       wrapper.update()
@@ -102,6 +104,7 @@ describe('TerminalItem', () => {
         .mockReturnValue(true)
       const wrapper = render(props)
       act(() => {
+        // @ts-expect-error(sa, 2021-6-21): onClick handler might be undefined
         wrapper.find(PDTitledList).prop('onClick')()
       })
       wrapper.update()

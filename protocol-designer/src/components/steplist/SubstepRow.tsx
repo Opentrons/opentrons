@@ -39,6 +39,8 @@ export const PillTooltipContents = (
 ): JSX.Element => {
   const totalLiquidVolume = reduce(
     props.ingreds,
+    // @ts-expect-error(sa, 2021-6-20): TODO IMMEDIATELY, this could either be single channel OR multi channel volume data
+    // we have to differentiate, because the structure of the interface is different
     (acc, ingred) => acc + ingred.volume,
     0
   )
@@ -60,10 +62,12 @@ export const PillTooltipContents = (
               </td>
               {hasMultipleIngreds && (
                 <td className={styles.ingred_percentage}>
+                  {/* @ts-expect-error(sa, 2021-6-20): TODO IMMEDIATELY, this could either be single channel OR multi channel volume data */}
                   {formatPercentage(ingred.volume, totalLiquidVolume)}
                 </td>
               )}
               <td className={styles.ingred_partial_volume}>
+                {/* @ts-expect-error(sa, 2021-6-20): TODO IMMEDIATELY, this could either be single channel OR multi channel volume data */}
                 {formatVolume(ingred.volume, 2)}µl
               </td>
             </tr>
@@ -83,16 +87,18 @@ export const PillTooltipContents = (
   )
 }
 
-function SubstepRowComponent(props: SubstepRowProps) {
+function SubstepRowComponent(props: SubstepRowProps): JSX.Element {
   const compactedSourcePreIngreds = props.source
     ? omitBy(
         props.source.preIngreds,
+        // @ts-expect-error(sa, 2021-6-21): ingred.volume might be undefined
         ingred => typeof ingred.volume === 'number' && ingred.volume <= 0
       )
     : {}
   const compactedDestPreIngreds = props.dest
     ? omitBy(
         props.dest.preIngreds,
+        // @ts-expect-error(sa, 2021-6-21): ingred.volume might be undefined
         ingred => typeof ingred.volume === 'number' && ingred.volume <= 0
       )
     : {}
@@ -164,6 +170,4 @@ function SubstepRowComponent(props: SubstepRowProps) {
   )
 }
 
-export const SubstepRow = React.memo(
-  SubstepRowComponent
-)
+export const SubstepRow = React.memo(SubstepRowComponent)

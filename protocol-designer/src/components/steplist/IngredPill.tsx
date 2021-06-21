@@ -1,6 +1,5 @@
-// @flow
 import * as React from 'react'
-import { Pill, UseHoverTooltipResult } from '@opentrons/components'
+import { Pill, UseHoverTooltipTargetProps } from '@opentrons/components'
 import { AIR } from '@opentrons/step-generation'
 import { swatchColors, MIXED_WELL_COLOR } from '../swatchColors'
 import { WellIngredientVolumeData, WellIngredientNames } from '../../steplist'
@@ -9,7 +8,7 @@ import styles from './StepItem.css'
 interface Props {
   ingreds: WellIngredientVolumeData
   ingredNames: WellIngredientNames
-  targetProps: $ElementType<UseHoverTooltipResult, 0> | null | undefined
+  targetProps: UseHoverTooltipTargetProps | null | undefined
 }
 
 export function IngredPill(props: Props): JSX.Element {

@@ -30,9 +30,13 @@ interface Position {
 
 export const ContextMenu = (props: Props): JSX.Element => {
   const dispatch = useDispatch()
-  const deleteStep = (stepId: StepIdType) =>
+  const deleteStep = (
+    stepId: StepIdType
+  ): ReturnType<typeof steplistActions.deleteStep> =>
     dispatch(steplistActions.deleteStep(stepId))
-  const duplicateStep = (stepId: StepIdType) =>
+  const duplicateStep = (
+    stepId: StepIdType
+  ): ReturnType<typeof stepsActions.duplicateStep> =>
     dispatch(stepsActions.duplicateStep(stepId))
 
   const [visible, setVisible] = React.useState<boolean>(false)
@@ -41,7 +45,7 @@ export const ContextMenu = (props: Props): JSX.Element => {
     left: null,
     top: null,
   })
-  const menuRoot = React.useRef<HTMLElement | null>(null)
+  const menuRoot = React.useRef<HTMLDivElement | null>(null)
 
   const isMultiSelectMode = useSelector(getIsMultiSelectMode)
 
@@ -76,7 +80,7 @@ export const ContextMenu = (props: Props): JSX.Element => {
     setPosition({ left, top })
   }
 
-  const handleClick = (event: MouseEvent) => {
+  const handleClick = (event: MouseEvent): void => {
     const wasOutside = !(
       event.target instanceof Node && menuRoot.current?.contains(event.target)
     )
@@ -85,7 +89,7 @@ export const ContextMenu = (props: Props): JSX.Element => {
     setPosition({ left: null, top: null })
   }
 
-  const handleDuplicate = () => {
+  const handleDuplicate = (): void => {
     if (stepId != null) {
       duplicateStep(stepId)
       setVisible(false)
@@ -93,7 +97,7 @@ export const ContextMenu = (props: Props): JSX.Element => {
     }
   }
 
-  const handleDelete = () => {
+  const handleDelete = (): void => {
     if (stepId != null) {
       deleteStep(stepId)
     } else {
@@ -117,7 +121,7 @@ export const ContextMenu = (props: Props): JSX.Element => {
         <ConfirmDeleteModal
           modalType={DELETE_STEP_FORM}
           onCancelClick={cancelDelete}
-          // @ts-ignore-error (ce: 2021-06-21) - type incompatibility deep down in useConditionalConfirm
+          // @ts-expect-error (ce: 2021-06-21) - type incompatibility deep down in useConditionalConfirm
           onContinueClick={confirmDelete}
         />
       )}

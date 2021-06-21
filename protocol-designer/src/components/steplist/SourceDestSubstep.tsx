@@ -22,7 +22,7 @@ type SourceDestSubstepProps = StepSubItemProps & {
   hoveredSubstep?: SubstepIdentifier | null
 }
 
-export function SourceDestSubstep(props: SourceDestSubstepProps): JSX.Element | JSX.Element[] {
+export function SourceDestSubstep(props: SourceDestSubstepProps): JSX.Element {
   const { substeps, selectSubstep, hoveredSubstep } = props
   if (substeps.multichannel) {
     // multi-channel row item (collapsible)
@@ -48,6 +48,7 @@ export function SourceDestSubstep(props: SourceDestSubstepProps): JSX.Element | 
   }
 
   // single-channel row item
+  // @ts-expect-error(sa, 2021-6-21): TODO: make this return a fragment instead of a list of JSX elements
   return substeps.rows.map<JSX.Element>((row, substepIndex) => (
     <SubstepRow
       key={substepIndex}
