@@ -2,7 +2,7 @@ import takeWhile from 'lodash/takeWhile'
 import { commandCreatorFromStepArgs } from '../file-data/selectors/commands'
 import * as StepGeneration from '@opentrons/step-generation'
 import { StepArgsAndErrorsById } from '../steplist/types'
-export type GenerateRobotStateTimelineArgs = {
+export interface GenerateRobotStateTimelineArgs {
   allStepArgsAndErrors: StepArgsAndErrorsById
   orderedStepIds: string[]
   initialRobotState: StepGeneration.RobotState
@@ -27,17 +27,17 @@ export const generateRobotStateTimeline = (
     }
   )
   // TODO: Ian 2018-06-14 `takeWhile` isn't inferring the right type
-  // $FlowFixMe
-  const continuousStepArgs: Array<StepGeneration.CommandCreatorArgs> = takeWhile(
+  // @ts-expect-error
+  const continuousStepArgs: StepGeneration.CommandCreatorArgs[] = takeWhile(
     allStepArgs,
     stepArgs => stepArgs
   )
   const curriedCommandCreators = continuousStepArgs.reduce(
     (
-      acc: Array<StepGeneration.CurriedCommandCreator>,
+      acc: StepGeneration.CurriedCommandCreator[],
       args: StepGeneration.CommandCreatorArgs,
       stepIndex
-    ): Array<StepGeneration.CurriedCommandCreator> => {
+    ): StepGeneration.CurriedCommandCreator[] => {
       const curriedCommandCreator = commandCreatorFromStepArgs(args)
 
       if (curriedCommandCreator === null) {
@@ -55,9 +55,12 @@ export const generateRobotStateTimeline = (
       if (pipetteId) {
         const nextStepArgsForPipette = continuousStepArgs
           .slice(stepIndex + 1)
+          // @ts-expect-error(sa, 2021-6-20): not a valid type narrow, use in operator
           .find(stepArgs => stepArgs.pipette && stepArgs.pipette === pipetteId)
         const willReuseTip =
+        // @ts-expect-error(sa, 2021-6-20): not a valid type narrow, use in operator
           nextStepArgsForPipette?.changeTip &&
+          // @ts-expect-error(sa, 2021-6-20): not a valid type narrow, use in operator
           nextStepArgsForPipette.changeTip === 'never'
 
         if (!willReuseTip) {

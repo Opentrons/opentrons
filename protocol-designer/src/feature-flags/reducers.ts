@@ -1,10 +1,8 @@
 import omit from 'lodash/omit'
 import mapValues from 'lodash/mapValues'
-import { combineReducers } from 'redux'
+import { Reducer, combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
-import { Flags } from './types'
-import { userFacingFlags, DEPRECATED_FLAGS } from './types'
-import { Reducer } from 'redux'
+import { Flags, FlagTypes, userFacingFlags, DEPRECATED_FLAGS } from './types'
 import { RehydratePersistedAction } from '../persist'
 import { SetFeatureFlagAction } from './actions'
 import { Action } from '../types'
@@ -22,7 +20,8 @@ const initialFlags: Flags = {
   OT_PD_DISABLE_MODULE_RESTRICTIONS:
     process.env.OT_PD_DISABLE_MODULE_RESTRICTIONS === '1' || false,
 }
-// NOTE(mc, 2020-06-04): `handleActions` cannot be strictly typed
+// @ts-expect-error(sa, 2021-6-10): cannot use string literals as action type
+// TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
 const flags: Reducer<Flags, any> = handleActions(
   {
     SET_FEATURE_FLAGS: (state: Flags, action: SetFeatureFlagAction): Flags => {
@@ -30,7 +29,7 @@ const flags: Reducer<Flags, any> = handleActions(
 
       if (action.payload.PRERELEASE_MODE === false) {
         // turn off all non-user-facing flags when prerelease mode disabled
-        return mapValues(nextState, (value, flagName) =>
+        return mapValues(nextState, (value, flagName: FlagTypes) =>
           userFacingFlags.includes(flagName) ? value : false
         )
       }
@@ -52,7 +51,7 @@ const flags: Reducer<Flags, any> = handleActions(
 export const _allReducers = {
   flags,
 }
-export type RootState = {
+export interface RootState {
   flags: Flags
 }
 export const rootReducer: Reducer<RootState, Action> = combineReducers(

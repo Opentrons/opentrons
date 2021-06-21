@@ -1,4 +1,3 @@
-// TODO IMMEDIATELY: figure our better way to import fixtures from step generation
 import {
   getInitialRobotStateStandard,
   makeContext,
@@ -7,11 +6,12 @@ import {
   SOURCE_LABWARE,
   DEST_LABWARE,
 } from '@opentrons/step-generation'
+import { StepArgsAndErrorsById } from '../../steplist'
 import { generateRobotStateTimeline } from '../generateRobotStateTimeline'
 jest.mock('../../labware-defs/utils')
 describe('generateRobotStateTimeline', () => {
   it('performs eager tip dropping', () => {
-    const allStepArgsAndErrors = {
+    const allStepArgsAndErrors: StepArgsAndErrorsById = {
       a: {
         errors: false,
         stepArgs: {
@@ -108,7 +108,6 @@ describe('generateRobotStateTimeline', () => {
     const invariantContext = makeContext()
     const initialRobotState = getInitialRobotStateStandard(invariantContext)
     const result = generateRobotStateTimeline({
-      // $FlowFixMe(sa, 2021-05-10): ignore until TS conversion
       allStepArgsAndErrors,
       orderedStepIds,
       initialRobotState,

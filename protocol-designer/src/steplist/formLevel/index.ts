@@ -49,8 +49,7 @@ interface FormHelpers {
   getErrors?: (arg: unknown) => FormError[]
   getWarnings?: (arg: unknown) => FormWarning[]
 }
-type StepTypesWithErrorChecking = Exclude<StepType, 'manualIntervention'>
-const stepFormHelperMap: Record<StepTypesWithErrorChecking, FormHelpers> = {
+const stepFormHelperMap: Partial<Record<StepType, FormHelpers>> = {
   mix: {
     getErrors: composeErrors(incompatibleLabware, volumeTooHigh),
     getWarnings: composeWarnings(belowPipetteMinimumVolume),
@@ -95,19 +94,21 @@ const stepFormHelperMap: Record<StepTypesWithErrorChecking, FormHelpers> = {
   },
 }
 export const getFormErrors = (
-  stepType: StepTypesWithErrorChecking,
+  stepType: StepType,
   formData: unknown
 ): FormError[] => {
   const formErrorGetter =
+    // @ts-expect-error(sa, 2021-6-20): not a valid type narrow
     stepFormHelperMap[stepType] && stepFormHelperMap[stepType].getErrors
   const errors = formErrorGetter != null ? formErrorGetter(formData) : []
   return errors
 }
 export const getFormWarnings = (
-  stepType: StepTypesWithErrorChecking,
+  stepType: StepType,
   formData: unknown
 ): FormWarning[] => {
   const formWarningGetter =
+    // @ts-expect-error(sa, 2021-6-20): not a valid type narrow
     stepFormHelperMap[stepType] && stepFormHelperMap[stepType].getWarnings
   const warnings = formWarningGetter != null ? formWarningGetter(formData) : []
   return warnings

@@ -1,9 +1,8 @@
-import { combineReducers } from 'redux'
+import { Reducer, combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
 import omit from 'lodash/omit'
 import { getPDMetadata } from '../file-types'
 import { PRESAVED_STEP_ID } from '../steplist/types'
-import { Reducer } from 'redux'
 import { DismissFormWarning, DismissTimelineWarning } from './actions'
 import { BaseState, Action } from '../types'
 import { LoadFileAction } from '../load-file'
@@ -18,11 +17,12 @@ export type DismissedWarningsAllSteps = Record<
   StepIdType,
   WarningType[] | null | undefined
 >
-export type DismissedWarningState = {
+export interface DismissedWarningState {
   form: DismissedWarningsAllSteps
   timeline: DismissedWarningsAllSteps
 }
-// NOTE(mc, 2020-06-04): `handleActions` cannot be strictly typed
+// @ts-expect-error(sa, 2021-6-10): cannot use string literals as action type
+// TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
 const dismissedWarnings: Reducer<DismissedWarningState, any> = handleActions(
   {
     DISMISS_FORM_WARNING: (
@@ -95,7 +95,7 @@ const dismissedWarnings: Reducer<DismissedWarningState, any> = handleActions(
 export const _allReducers = {
   dismissedWarnings,
 }
-export type RootState = {
+export interface RootState {
   dismissedWarnings: DismissedWarningState
 }
 export const rootReducer: Reducer<RootState, Action> = combineReducers(

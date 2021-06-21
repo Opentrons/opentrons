@@ -3,6 +3,7 @@ describe('getFlagsFromQueryParams', () => {
   it('should enable the flag passed in via query params when it is set to 1', () => {
     // replace window location search
     const actualWindowLocation = window.location
+    // @ts-expect-error(sa, 2021-6-20): can't delete a non optional parameter
     delete window.location
     window.location = {
       ...actualWindowLocation,
@@ -18,6 +19,7 @@ describe('getFlagsFromQueryParams', () => {
   it('should disable the flag passed in via query params when it is NOT set to 1', () => {
     // replace window location search
     const actualWindowLocation = window.location
+    // @ts-expect-error(sa, 2021-6-20): can't delete a non optional parameter
     delete window.location
     window.location = {
       ...actualWindowLocation,

@@ -8,7 +8,7 @@ export type GateStage =
   | 'failedIdentityVerification'
   | 'promptOptForAnalytics'
   | 'openGate'
-type GateState = {
+interface GateState {
   gateStage: GateStage
   errorMessage: string | null | undefined
 }
@@ -27,7 +27,10 @@ const headers = {
   'Content-Type': 'application/json',
 }
 
-const writeIdentityCookie = (payload: { name: string; email: string }) => {
+const writeIdentityCookie = (payload: {
+  name: string
+  email: string
+}): void => {
   const domain =
     process.env.NODE_ENV === 'production' ? 'opentrons.com' : undefined
   global.document.cookie = cookie.serialize('ot_name', payload.name, {
@@ -48,9 +51,9 @@ export const writeFakeIdentityCookie = (): void =>
   })
 
 const getStageFromIdentityCookie = (
-  token: string | null | undefined,
+  token: string | string[] | null | undefined,
   hasOptedIntoAnalytics: boolean | null
-) => {
+): GateStage => {
   const cookies = cookie.parse(global.document.cookie)
   const { ot_email: email, ot_name: name } = cookies
   const hasIdentityCookie = Boolean(email && name)
@@ -68,8 +71,8 @@ export const getGateStage = (
 ): Promise<GateState> => {
   const parsedQueryStringParams = queryString.parse(global.location.search)
   const { token, name, email } = parsedQueryStringParams
-  let gateStage = 'loading'
-  let errorMessage = null
+  let gateStage: GateStage = 'loading'
+  let errorMessage: string | null = null
 
   if (token) {
     return fetch(`${OPENTRONS_API_BASE_URL}${VERIFY_EMAIL_PATH}`, {

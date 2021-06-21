@@ -2,7 +2,7 @@ import get from 'lodash/get'
 import assert from 'assert'
 import { Store } from 'redux'
 import { dismissedHintsPersist } from './tutorial/reducers'
-export type RehydratePersistedAction = {
+export interface RehydratePersistedAction {
   type: 'REHYDRATE_PERSISTED'
   payload: {
     'tutorial.dismissedHints'?: Record<string, any>
@@ -33,6 +33,7 @@ export const _rehydrateAll = (): RehydratePersistedAction['payload'] => {
     const persistedData = _rehydrate(path)
 
     if (typeof persistedData !== 'undefined') {
+      // @ts-expect-error(sa, 2021-6-20): this gets any typed bcuz {}, the initial value in reduce, has no keys
       acc[path] = persistedData
     }
 
@@ -58,7 +59,10 @@ const PERSISTED_PATHS = [
   'featureFlags.flags',
 ]
 
-function transformBeforePersist(path: string, reducerState: any) {
+function transformBeforePersist(
+  path: string,
+  reducerState: any
+): Record<string, any> {
   switch (path) {
     case 'tutorial.dismissedHints':
       return dismissedHintsPersist(reducerState)
@@ -68,7 +72,7 @@ function transformBeforePersist(path: string, reducerState: any) {
   }
 }
 
-export const setLocalStorageItem = (path: string, value: any) => {
+export const setLocalStorageItem = (path: string, value: any): void => {
   try {
     global.localStorage.setItem(
       _addStoragePrefix(path),
@@ -93,9 +97,10 @@ export const makePersistSubscriber = (
     const state = store.getState()
     PERSISTED_PATHS.forEach(path => {
       const nextReducerState = get(state, path)
-
+      // @ts-expect-error(sa, 2021-6-20): this gets any typed because {} has no keys
       if (prevReducerStates[path] !== nextReducerState) {
         setLocalStorageItem(path, nextReducerState)
+        // @ts-expect-error(sa, 2021-6-20): this gets any typed because {} has no keys
         prevReducerStates[path] = nextReducerState
       }
     })

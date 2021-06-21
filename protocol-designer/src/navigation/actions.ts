@@ -1,5 +1,5 @@
 import { Page } from './types'
-export type NavigateToPageAction = {
+export interface NavigateToPageAction {
   type: 'NAVIGATE_TO_PAGE'
   payload: Page
 }
@@ -7,7 +7,7 @@ export const navigateToPage = (payload: Page): NavigateToPageAction => ({
   type: 'NAVIGATE_TO_PAGE',
   payload,
 })
-export type ToggleNewProtocolModalAction = {
+export interface ToggleNewProtocolModalAction {
   type: 'TOGGLE_NEW_PROTOCOL_MODAL'
   payload: boolean
 }

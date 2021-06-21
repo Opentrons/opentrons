@@ -9,7 +9,7 @@ import {
   SelectWellsAction,
   DeselectWellsAction,
 } from './actions'
-type SelectedWellsState = {
+interface SelectedWellsState {
   highlighted: WellGroup
   selected: WellGroup
 }
@@ -29,7 +29,9 @@ const selectedWellsInitialState: SelectedWellsState = {
   highlighted: {},
   selected: {},
 }
-const selectedWells = handleActions(
+// @ts-expect-error(sa, 2021-6-21): cannot use string literals as action type
+// TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
+const selectedWells: Reducer<SelectedWellsState, Action> = handleActions(
   {
     HIGHLIGHT_WELLS: (
       state,
@@ -54,7 +56,7 @@ const selectedWells = handleActions(
   },
   selectedWellsInitialState
 )
-export type RootState = {
+export interface RootState {
   selectedWells: SelectedWellsState
 }
 export const rootReducer: Reducer<RootState, Action> = combineReducers({
