@@ -62,18 +62,27 @@ class LoadLabwareResult(BaseModel):
     )
 
 
-class LoadLabwareRequest(BaseCommandRequest[LoadLabwareData]):
+class LoadLabwareImplProvider:
+    """Implementation provider mixin."""
+
+    data: LoadLabwareData
+
+    def get_implementation(self) -> LoadLabwareImplementation:
+        """Get the execution implementation of a LoadLabware."""
+        return LoadLabwareImplementation(self.data)
+
+
+class LoadLabwareRequest(BaseCommandRequest[LoadLabwareData], LoadLabwareImplProvider):
     """Load labware command creation request."""
 
     commandType: LoadLabwareCommandType = "loadLabware"
     data: LoadLabwareData
 
-    def get_implementation(self) -> LoadLabwareImplementation:
-        """Get the execution implementation of the LoadLabwareRequest."""
-        return LoadLabwareImplementation(self.data)
 
-
-class LoadLabware(BaseCommand[LoadLabwareData, LoadLabwareResult]):
+class LoadLabware(
+    BaseCommand[LoadLabwareData, LoadLabwareResult],
+    LoadLabwareImplProvider,
+):
     """Load labware command resource model."""
 
     commandType: LoadLabwareCommandType = "loadLabware"

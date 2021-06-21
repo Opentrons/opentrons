@@ -29,18 +29,24 @@ class DropTipResult(BaseModel):
     pass
 
 
-class DropTipRequest(BaseCommandRequest[DropTipData]):
+class DropTipImplProvider:
+    """Implementation provider mixin."""
+
+    data: DropTipData
+
+    def get_implementation(self) -> DropTipImplementation:
+        """Get the execution implementation of a DropTip."""
+        return DropTipImplementation(self.data)
+
+
+class DropTipRequest(BaseCommandRequest[DropTipData], DropTipImplProvider):
     """Drop tip command creation request model."""
 
     commandType: DropTipCommandType = "dropTip"
     data: DropTipData
 
-    def get_implementation(self) -> DropTipImplementation:
-        """Get the execution implementation of the DropTipRequest."""
-        return DropTipImplementation(self.data)
 
-
-class DropTip(BaseCommand[DropTipData, DropTipResult]):
+class DropTip(BaseCommand[DropTipData, DropTipResult], DropTipImplProvider):
     """Drop tip command model."""
 
     commandType: DropTipCommandType = "dropTip"

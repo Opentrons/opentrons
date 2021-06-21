@@ -40,19 +40,29 @@ class AddLabwareDefinitionResult(BaseModel):
     )
 
 
-class AddLabwareDefinitionRequest(BaseCommandRequest[AddLabwareDefinitionData]):
+class AddLabwareDefinitionImplProvider:
+    """Implementation provider mixin."""
+
+    data: AddLabwareDefinitionData
+
+    def get_implementation(self) -> AddLabwareDefinitionImplementation:
+        """Get the execution implementation of an AddLabwareDefinition."""
+        return AddLabwareDefinitionImplementation(self.data)
+
+
+class AddLabwareDefinitionRequest(
+    BaseCommandRequest[AddLabwareDefinitionData],
+    AddLabwareDefinitionImplProvider,
+):
     """Add labware definition command creation request."""
 
     commandType: AddLabwareDefinitionCommandType = "addLabwareDefinition"
     data: AddLabwareDefinitionData
 
-    def get_implementation(self) -> AddLabwareDefinitionImplementation:
-        """Get the execution implementation of the AddLabwareDefinitionRequest."""
-        return AddLabwareDefinitionImplementation(self.data)
-
 
 class AddLabwareDefinition(
-    BaseCommand[AddLabwareDefinitionData, AddLabwareDefinitionResult]
+    BaseCommand[AddLabwareDefinitionData, AddLabwareDefinitionResult],
+    AddLabwareDefinitionImplProvider,
 ):
     """Add labware definition command resource."""
 

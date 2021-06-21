@@ -30,18 +30,24 @@ class MoveToWellResult(BaseModel):
     pass
 
 
-class MoveToWellRequest(BaseCommandRequest[MoveToWellData]):
+class MoveToWellImplProvider:
+    """Implementation provider mixin."""
+
+    data: MoveToWellData
+
+    def get_implementation(self) -> MoveToWellImplementation:
+        """Get the execution implementation of a MoveToWell."""
+        return MoveToWellImplementation(self.data)
+
+
+class MoveToWellRequest(BaseCommandRequest[MoveToWellData], MoveToWellImplProvider):
     """Move to well command creation request model."""
 
     commandType: MoveToWellCommandType = "moveToWell"
     data: MoveToWellData
 
-    def get_implementation(self) -> MoveToWellImplementation:
-        """Get the execution implementation of the MoveToWellRequest."""
-        return MoveToWellImplementation(self.data)
 
-
-class MoveToWell(BaseCommand[MoveToWellData, MoveToWellResult]):
+class MoveToWell(BaseCommand[MoveToWellData, MoveToWellResult], MoveToWellImplProvider):
     """Move to well command model."""
 
     commandType: MoveToWellCommandType = "moveToWell"

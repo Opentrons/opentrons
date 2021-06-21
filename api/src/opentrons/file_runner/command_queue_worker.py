@@ -1,14 +1,14 @@
 """CommandQueueWorker definition. Implements JSON protocol flow control."""
 import asyncio
-from typing import Awaitable, Optional, Tuple
+from typing import Awaitable, Optional
 
-from opentrons import protocol_engine
+from opentrons.protocol_engine import ProtocolEngine
 
 
 class CommandQueueWorker:
     """Execute a `ProtocolEngine`'s queued commands in the background."""
 
-    def __init__(self, protocol_engine: protocol_engine.ProtocolEngine) -> None:
+    def __init__(self, protocol_engine: ProtocolEngine) -> None:
         """Construct a CommandQueueWorker.
 
         Args:
@@ -86,13 +86,13 @@ class CommandQueueWorker:
 
     def _next_command(
         self,
-    ) -> Optional[Tuple[str, protocol_engine.commands.CommandRequestType]]:
+    ) -> Optional[str]:
         if self._keep_running:
             # Will be None if the engine has no commands left.
-            return self._engine.state_view.commands.get_next_request()
+            return self._engine.state_view.commands.get_next_command()
         else:
             return None
 
     async def _play_async(self) -> None:
-        for command_id, request in iter(self._next_command, None):
-            await self._engine.execute_command(request=request, command_id=command_id)
+        for command_id in iter(self._next_command, None):
+            await self._engine.execute_command_by_id(command_id=command_id)

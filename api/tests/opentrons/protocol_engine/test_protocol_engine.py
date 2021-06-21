@@ -77,8 +77,7 @@ async def test_execute_command_creates_command(
             startedAt=cast(datetime, CloseToNow()),
             status=commands.CommandStatus.RUNNING,
             data=data,
-        ),
-        command_id="unique-id",
+        )
     )
 
 
@@ -133,10 +132,7 @@ async def test_execute_command_adds_result_to_state(
         result=result,
     )
 
-    mock_state_store.handle_command.assert_called_with(
-        cmd,
-        command_id="unique-id",
-    )
+    mock_state_store.handle_command.assert_called_with(cmd)
 
 
 async def test_execute_command_adds_error_to_state(
@@ -175,10 +171,7 @@ async def test_execute_command_adds_error_to_state(
         error="oh no!",
     )
 
-    mock_state_store.handle_command.assert_called_with(
-        cmd,
-        command_id="unique-id",
-    )
+    mock_state_store.handle_command.assert_called_with(cmd)
 
 
 def test_add_command(
@@ -214,7 +207,4 @@ def test_add_command(
         data=data,
     )
 
-    mock_state_store.handle_command.assert_called_with(
-        result,
-        command_id="command-id",
-    )
+    mock_state_store.handle_command.assert_called_with(result)

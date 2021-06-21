@@ -5,6 +5,7 @@ from dataclasses import dataclass, replace
 from typing import List, Optional, Tuple
 
 from ..commands import Command, CommandStatus
+from ..errors import CommandDoesNotExistError
 from .substore import Substore, CommandReactive
 
 
@@ -40,10 +41,13 @@ class CommandView:
         """Initialize the view of command state with its underlying data."""
         self._state = state
 
-    def get_command_by_id(self, uid: str) -> Optional[Command]:
+    def get_command_by_id(self, command_id: str) -> Command:
         """Get a command by its unique identifier."""
         # TODO(mc, 2021-06-17): raise on missing ID, to line up with other state views
-        return self._state.commands_by_id.get(uid)
+        try:
+            return self._state.commands_by_id[command_id]
+        except KeyError:
+            raise CommandDoesNotExistError(f"Command {command_id} does not exist")
 
     def get_all_commands(self) -> List[Tuple[str, Command]]:
         """Get a list of all commands in state, paired with their respective IDs.
@@ -54,7 +58,7 @@ class CommandView:
         """
         return [entry for entry in self._state.commands_by_id.items()]
 
-    def get_next_request(self) -> Optional[Tuple[str, Command]]:
+    def get_next_command(self) -> Optional[str]:
         """Return the next request in line to be executed.
 
         Normally, this corresponds to the earliest-added command that's currently
@@ -70,5 +74,5 @@ class CommandView:
             if command.status == CommandStatus.FAILED:
                 return None
             elif command.status == CommandStatus.QUEUED:
-                return command_id, command
+                return command_id
         return None

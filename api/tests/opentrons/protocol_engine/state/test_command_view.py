@@ -1,8 +1,9 @@
 """Labware state store tests."""
+import pytest
 from collections import OrderedDict
 from typing import Sequence, Tuple
 
-from opentrons.protocol_engine import commands as cmd
+from opentrons.protocol_engine import commands as cmd, errors
 from opentrons.protocol_engine.state.commands import CommandState, CommandView
 
 
@@ -32,13 +33,12 @@ def test_get_command_by_id() -> None:
 
 
 def test_get_command_bad_id() -> None:
-    """It should return None if a requested command ID isn't in state."""
+    """It should raise if a requested command ID isn't in state."""
     command = create_completed_command(command_id="command-id")
     subject = get_command_view(commands_by_id=[("command-id", command)])
 
-    result = subject.get_command_by_id("asdfghjkl")
-
-    assert result is None
+    with pytest.raises(errors.CommandDoesNotExistError):
+        subject.get_command_by_id("asdfghjkl")
 
 
 def test_get_all_commands() -> None:
@@ -62,7 +62,7 @@ def test_get_all_commands() -> None:
     ]
 
 
-def test_get_next_request_returns_first_pending() -> None:
+def test_get_next_command_returns_first_pending() -> None:
     """It should return the first command that's pending."""
     pending_command = create_pending_command()
     running_command = create_running_command()
@@ -77,10 +77,10 @@ def test_get_next_request_returns_first_pending() -> None:
         ]
     )
 
-    assert subject.get_next_request() == ("command-id-3", pending_command)
+    assert subject.get_next_command() == "command-id-3"
 
 
-def test_get_next_request_returns_none_when_no_pending() -> None:
+def test_get_next_command_returns_none_when_no_pending() -> None:
     """It should return None if there are no pending commands to return."""
     running_command = create_running_command(command_id="command-id-1")
     completed_command = create_completed_command(command_id="command-id-2")
@@ -88,7 +88,7 @@ def test_get_next_request_returns_none_when_no_pending() -> None:
 
     subject = get_command_view()
 
-    assert subject.get_next_request() is None
+    assert subject.get_next_command() is None
 
     subject = get_command_view(
         commands_by_id=[
@@ -98,10 +98,10 @@ def test_get_next_request_returns_none_when_no_pending() -> None:
         ]
     )
 
-    assert subject.get_next_request() is None
+    assert subject.get_next_command() is None
 
 
-def test_get_next_request_returns_none_when_earlier_command_failed() -> None:
+def test_get_next_command_returns_none_when_earlier_command_failed() -> None:
     """It should return None if any prior-added command is failed."""
     running_command = create_running_command(command_id="command-id-1")
     completed_command = create_completed_command(command_id="command-id-2")
@@ -117,4 +117,4 @@ def test_get_next_request_returns_none_when_earlier_command_failed() -> None:
         ]
     )
 
-    assert subject.get_next_request() is None
+    assert subject.get_next_command() is None

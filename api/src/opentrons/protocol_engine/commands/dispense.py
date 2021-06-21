@@ -29,18 +29,24 @@ class DispenseResult(BaseLiquidHandlingResult):
     pass
 
 
-class DispenseRequest(BaseCommandRequest[DispenseData]):
+class DispenseImplProvider:
+    """Implementation provider mixin."""
+
+    data: DispenseData
+
+    def get_implementation(self) -> DispenseImplementation:
+        """Get the execution implementation of a Dispense."""
+        return DispenseImplementation(self.data)
+
+
+class DispenseRequest(BaseCommandRequest[DispenseData], DispenseImplProvider):
     """Create dispense command request model."""
 
     commandType: DispenseCommandType = "dispense"
     data: DispenseData
 
-    def get_implementation(self) -> DispenseImplementation:
-        """Get the execution implementation of the DispenseRequest."""
-        return DispenseImplementation(self.data)
 
-
-class Dispense(BaseCommand[DispenseData, DispenseResult]):
+class Dispense(BaseCommand[DispenseData, DispenseResult], DispenseImplProvider):
     """Dispense command model."""
 
     commandType: DispenseCommandType = "dispense"

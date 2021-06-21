@@ -29,18 +29,24 @@ class AspirateResult(BaseLiquidHandlingResult):
     pass
 
 
-class AspirateRequest(BaseCommandRequest[AspirateData]):
+class AspirateImplProvider:
+    """Implementation provider mixin."""
+
+    data: AspirateData
+
+    def get_implementation(self) -> AspirateImplementation:
+        """Get the execution implementation of an Aspirate."""
+        return AspirateImplementation(self.data)
+
+
+class AspirateRequest(BaseCommandRequest[AspirateData], AspirateImplProvider):
     """Create aspirate command request model."""
 
     commandType: AspirateCommandType = "aspirate"
     data: AspirateData
 
-    def get_implementation(self) -> AspirateImplementation:
-        """Get the execution implementation of the AspirateRequest."""
-        return AspirateImplementation(self.data)
 
-
-class Aspirate(BaseCommand[AspirateData, AspirateResult]):
+class Aspirate(BaseCommand[AspirateData, AspirateResult], AspirateImplProvider):
     """Aspirate command model."""
 
     commandType: AspirateCommandType = "aspirate"

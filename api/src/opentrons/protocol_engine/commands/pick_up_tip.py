@@ -30,18 +30,24 @@ class PickUpTipResult(BaseModel):
     pass
 
 
-class PickUpTipRequest(BaseCommandRequest[PickUpTipData]):
+class PickUpTipImplProvider:
+    """Implementation provider mixin."""
+
+    data: PickUpTipData
+
+    def get_implementation(self) -> PickUpTipImplementation:
+        """Get the execution implementation of a PickUpTip."""
+        return PickUpTipImplementation(self.data)
+
+
+class PickUpTipRequest(BaseCommandRequest[PickUpTipData], PickUpTipImplProvider):
     """Pick up tip command creation request model."""
 
     commandType: PickUpTipCommandType = "pickUpTip"
     data: PickUpTipData
 
-    def get_implementation(self) -> PickUpTipImplementation:
-        """Get the execution implementation of the PickUpTipRequest."""
-        return PickUpTipImplementation(self.data)
 
-
-class PickUpTip(BaseCommand[PickUpTipData, PickUpTipResult]):
+class PickUpTip(BaseCommand[PickUpTipData, PickUpTipResult], PickUpTipImplProvider):
     """Pick up tip command model."""
 
     commandType: PickUpTipCommandType = "pickUpTip"

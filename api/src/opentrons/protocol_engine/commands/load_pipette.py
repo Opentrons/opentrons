@@ -46,18 +46,27 @@ class LoadPipetteResult(BaseModel):
     )
 
 
-class LoadPipetteRequest(BaseCommandRequest[LoadPipetteData]):
+class LoadPipetteImplProvider:
+    """Implementation provider mixin."""
+
+    data: LoadPipetteData
+
+    def get_implementation(self) -> LoadPipetteImplementation:
+        """Get the execution implementation of a LoadPipette."""
+        return LoadPipetteImplementation(self.data)
+
+
+class LoadPipetteRequest(BaseCommandRequest[LoadPipetteData], LoadPipetteImplProvider):
     """Load pipette command creation request model."""
 
     commandType: LoadPipetteCommandType = "loadPipette"
     data: LoadPipetteData
 
-    def get_implementation(self) -> LoadPipetteImplementation:
-        """Get the execution implementation of the LoadPipetteRequest."""
-        return LoadPipetteImplementation(self.data)
 
-
-class LoadPipette(BaseCommand[LoadPipetteData, LoadPipetteResult]):
+class LoadPipette(
+    BaseCommand[LoadPipetteData, LoadPipetteResult],
+    LoadPipetteImplProvider,
+):
     """Load pipette command model."""
 
     commandType: LoadPipetteCommandType = "loadPipette"
