@@ -37,7 +37,7 @@ interface StepButtonComponentProps {
 }
 
 // TODO: Ian 2019-01-17 move out to centralized step info file - see #2926
-const getSupportedSteps = () => [
+const getSupportedSteps = (): Array<Exclude<StepType, 'manualIntervention'>> => [
   'moveLiquid',
   'mix',
   'pause',
@@ -119,7 +119,10 @@ export const StepCreationButton = (): JSX.Element => {
   )
   const isStepCreationDisabled = useSelector(getIsMultiSelectMode)
   const modules = useSelector(stepFormSelectors.getInitialDeckSetup).modules
-  const isStepTypeEnabled = {
+  const isStepTypeEnabled: Record<
+    Exclude<StepType, 'manualIntervention'>,
+    boolean
+  > = {
     moveLiquid: true,
     mix: true,
     pause: true,
@@ -135,7 +138,9 @@ export const StepCreationButton = (): JSX.Element => {
   ] = React.useState<StepType | null>(null)
   const dispatch = useDispatch()
 
-  const addStep = (stepType: StepType) =>
+  const addStep = (
+    stepType: StepType
+  ): ReturnType<typeof stepsActions.addAndSelectStepWithHints> =>
     dispatch(stepsActions.addAndSelectStepWithHints({ stepType }))
 
   const items = getSupportedSteps().map(stepType => (

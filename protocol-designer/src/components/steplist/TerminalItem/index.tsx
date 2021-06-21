@@ -7,6 +7,8 @@ import {
   getSelectedTerminalItemId,
   getIsMultiSelectMode,
   actions as stepsActions,
+  SelectTerminalItemAction,
+  HoverOnTerminalItemAction,
 } from '../../../ui/steps'
 import {
   getCurrentFormIsPresaved,
@@ -40,10 +42,13 @@ export const TerminalItem = (props: TerminalItemProps): JSX.Element => {
 
   const dispatch = useDispatch()
 
-  const selectItem = () => dispatch(stepsActions.selectTerminalItem(id))
+  const selectItem = (): SelectTerminalItemAction =>
+    dispatch(stepsActions.selectTerminalItem(id))
 
-  const onMouseEnter = () => dispatch(stepsActions.hoverOnTerminalItem(id))
-  const onMouseLeave = () => dispatch(stepsActions.hoverOnTerminalItem(null))
+  const onMouseEnter = (): HoverOnTerminalItemAction =>
+    dispatch(stepsActions.hoverOnTerminalItem(id))
+  const onMouseLeave = (): HoverOnTerminalItemAction =>
+    dispatch(stepsActions.hoverOnTerminalItem(null))
 
   const { confirm, showConfirmation, cancel } = useConditionalConfirm(
     selectItem,
@@ -61,10 +66,13 @@ export const TerminalItem = (props: TerminalItemProps): JSX.Element => {
               ? CLOSE_UNSAVED_STEP_FORM
               : CLOSE_STEP_FORM_WITH_CHANGES
           }
+          // @ts-expect-error(sa, 2021-6-21): since we aren't passing any parameters into selectItem, the generic type T in useConditionalConfirm
+          // gets never typed. this odd behavior, we should probably get rid of the generic type in useConditionalConfirm
           onContinueClick={confirm}
           onCancelClick={cancel}
         />
       )}
+      {/* @ts-expect-error(sa, 2021-6-21): same issue as above here */}
       <PDTitledList
         {...{
           id: `TerminalItem_${id}`,
