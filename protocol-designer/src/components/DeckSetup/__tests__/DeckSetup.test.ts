@@ -10,7 +10,7 @@ import {
 } from '@opentrons/shared-data'
 import { TEMPERATURE_AT_TARGET } from '@opentrons/step-generation'
 import * as labwareModuleCompatibility from '../../../utils/labwareModuleCompatibility'
-import { getSwapBlocked } from '../DeckSetup'
+import {getSwapBlocked, SwapBlockedArgs} from '../DeckSetup'
 
 describe('DeckSetup', () => {
   describe('getSwapBlocked', () => {
@@ -101,7 +101,7 @@ describe('DeckSetup', () => {
         },
       }
 
-      const isBlocked = getSwapBlocked(args)
+      const isBlocked = getSwapBlocked(args as SwapBlockedArgs)
 
       expect(isBlocked).toEqual(false)
     })

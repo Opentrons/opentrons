@@ -197,7 +197,7 @@ describe('ModuleTag', () => {
       const wrapper = render()
 
       expect(
-        wrapper.find('RobotCoordsForeignDiv').prop('innerDivProps').className
+        wrapper.find('RobotCoordsForeignDiv').prop<any>('innerDivProps').className
       ).toContain('highlighted_border_right_none')
     })
 
@@ -205,7 +205,7 @@ describe('ModuleTag', () => {
       const wrapper = render()
 
       expect(
-        wrapper.find('RobotCoordsForeignDiv').prop('innerDivProps').className
+        wrapper.find('RobotCoordsForeignDiv').prop<any>('innerDivProps').className
       ).not.toContain('highlighted_border_right_none')
     })
 
@@ -215,7 +215,7 @@ describe('ModuleTag', () => {
       const wrapper = render()
 
       expect(
-        wrapper.find('RobotCoordsForeignDiv').prop('innerDivProps').className
+        wrapper.find('RobotCoordsForeignDiv').prop<any>('innerDivProps').className
       ).not.toContain('highlighted_border_right_none')
     })
   })

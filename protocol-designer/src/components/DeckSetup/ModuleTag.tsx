@@ -113,6 +113,7 @@ export const ModuleStatus = ({
 
     default:
       console.warn(
+          // @ts-ignore-error (ce, 2021-07-21) doesn't think `type` exists on type never (clever TS)
         `ModuleStatus doesn't support module type ${moduleState.type}`
       )
       return null
