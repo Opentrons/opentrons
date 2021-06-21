@@ -4,6 +4,7 @@ This module has functions that you can import to load robot or
 labware calibration from its designated file location.
 """
 import itertools
+import logging
 import json
 import typing
 from typing_extensions import Literal
@@ -19,6 +20,7 @@ if typing.TYPE_CHECKING:
     from opentrons_shared_data.pipette.dev_types import LabwareUri
     from .dev_types import CalibrationIndexDict, CalibrationDict
 
+log = logging.getLogger(__name__)
 
 def _format_calibration_type(
         data: 'CalibrationDict') -> local_types.LabwareCalibrationTypes:
@@ -67,14 +69,22 @@ def get_all_calibrations() -> typing.List[local_types.CalibrationInformation]:
     for key, data in calibration_index.items():
         cal_path = offset_path / f'{key}.json'
         if cal_path.exists():
-            cal_blob = io.read_cal_file(str(cal_path))
+            try:
+                cal_blob = io.read_cal_file(str(cal_path))
+            except json.JSONDecodeError:
+                log.error(f"Corrupt calibration file (bad JSON): {str(cal_path)}")
+                continue
             calibration = _format_calibration_type(cal_blob)  # type: ignore
-            all_calibrations.append(
-                local_types.CalibrationInformation(
-                    calibration=calibration,
-                    parent=_format_parent(data),
-                    labware_id=key,
-                    uri=data['uri']))
+            try:
+                all_calibrations.append(
+                    local_types.CalibrationInformation(
+                        calibration=calibration,
+                        parent=_format_parent(data),
+                        labware_id=key,
+                        uri=data['uri']))
+            except (KeyError, ValueError):
+                log.exception("Corrupt calibration file (bad data)")
+                continue
     return all_calibrations
 
 
@@ -95,7 +105,7 @@ def _get_tip_length_data(
             source=_get_calibration_source(tip_length_info),
             status=_get_calibration_status(tip_length_info),
             uri=labware_uri)
-    except (FileNotFoundError, KeyError):
+    except (FileNotFoundError, KeyError, json.JSONDecodeError):
         raise local_types.TipLengthCalNotFound(
             f'Tip length of {labware_load_name} has not been '
             f'calibrated for this pipette: {pip_id} and cannot'
@@ -167,7 +177,11 @@ def get_all_tip_length_calibrations() \
     for pip in unique_pips:
         cal_path = tip_length_dir / f'{pip}.json'
         if cal_path.exists():
-            data = io.read_cal_file(str(cal_path))
+            try:
+                data = io.read_cal_file(str(cal_path))
+            except json.JSONDecodeError:
+                log.error(f"corrupt calibration file (bad json): {str(cal_path)}")
+                continue
             for tiprack, info in data.items():
                 all_calibrations.append(
                     local_types.TipLengthCalibration(
@@ -210,7 +224,11 @@ def get_robot_deck_attitude() \
     robot_dir = config.get_opentrons_path('robot_calibration_dir')
     gantry_path = robot_dir / 'deck_calibration.json'
     if gantry_path.exists():
-        data = io.read_cal_file(gantry_path)
+        try:
+            data = io.read_cal_file(gantry_path)
+        except json.JSONDecodeError:
+            log.error(f"corrupt calibration file (bad json): {str(gantry_path)}")
+            return None
         try:
             return local_types.DeckCalibration(
                 attitude=data['attitude'],
@@ -232,7 +250,11 @@ def get_pipette_offset(
     pip_dir = config.get_opentrons_path('pipette_calibration_dir')
     offset_path = pip_dir / mount.name.lower() / f'{pip_id}.json'
     if offset_path.exists():
-        data = io.read_cal_file(offset_path)
+        try:
+            data = io.read_cal_file(offset_path)
+        except json.JSONDecodeError:
+            log.error(f"corrupt calibration file (bad json): {str(offset_path)}")
+            return None
         assert 'offset' in data.keys(), 'Not valid pipette calibration data'
         return local_types.PipetteOffsetByPipetteMount(
             offset=data['offset'],
@@ -265,17 +287,25 @@ def get_all_pipette_offset_calibrations() \
         for pip in pips:
             cal_path = pip_dir / mount_key / f'{pip}.json'
             if cal_path.exists():
-                data = io.read_cal_file(str(cal_path))
-                all_calibrations.append(
-                    local_types.PipetteOffsetCalibration(
-                        pipette=pip,
-                        mount=mount_key,
-                        offset=data['offset'],
-                        tiprack=data['tiprack'],
-                        uri=data['uri'],
-                        last_modified=data['last_modified'],
-                        source=_get_calibration_source(data),
-                        status=_get_calibration_status(data)))
+                try:
+                    data = io.read_cal_file(str(cal_path))
+                except json.JSONDecodeError:
+                    log.error(f"corrupt calibration file (bad json): {str(cal_path)}")
+                    continue
+                try:
+                    all_calibrations.append(
+                        local_types.PipetteOffsetCalibration(
+                            pipette=pip,
+                            mount=mount_key,
+                            offset=data['offset'],
+                            tiprack=data['tiprack'],
+                            uri=data['uri'],
+                            last_modified=data['last_modified'],
+                            source=_get_calibration_source(data),
+                            status=_get_calibration_status(data)))
+                except (KeyError, ValueError):
+                    log.exception("corrupt calibration file (bad data)")
+                    continue
     return all_calibrations
 
 
