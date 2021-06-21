@@ -1,6 +1,5 @@
-import { combineReducers } from 'redux'
+import { Reducer, combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
-import { Reducer } from 'redux'
 import { Timeline } from '@opentrons/step-generation'
 import { Action } from '../../types'
 import { FileMetadataFields, SaveFileMetadataAction } from '../types'

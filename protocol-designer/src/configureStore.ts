@@ -1,17 +1,24 @@
-import { createStore, combineReducers, applyMiddleware, compose } from 'redux'
+/* eslint-disable @typescript-eslint/no-var-requires */
+import {
+  createStore,
+  combineReducers,
+  applyMiddleware,
+  compose,
+  Store,
+  Reducer,
+} from 'redux'
 import thunk from 'redux-thunk'
 import { trackEventMiddleware } from './analytics/middleware'
 import { makePersistSubscriber, rehydratePersistedAction } from './persist'
 import { fileUploadMessage } from './load-file/actions'
 import { makeTimelineMiddleware } from './timelineMiddleware/makeTimelineMiddleware'
-import { Store } from 'redux'
-import { BaseState, Action, ThunkDispatch } from './types'
+import { BaseState, Action } from './types'
 const timelineMiddleware = makeTimelineMiddleware()
 const ReselectTools =
   process.env.NODE_ENV === 'development' ? require('reselect-tools') : undefined
 
-function getRootReducer() {
-  const rootReducer: any = combineReducers({
+function getRootReducer(): Reducer<BaseState, Action> {
+  const rootReducer = combineReducers<BaseState>({
     analytics: require('./analytics').rootReducer,
     dismiss: require('./dismiss').rootReducer,
     featureFlags: require('./feature-flags').rootReducer,
@@ -61,13 +68,13 @@ function getRootReducer() {
 }
 
 // TODO(CE: 2021-07-08) cheating a little 'cause I need a store type
-export type StoreType = Store<BaseState, Action, ThunkDispatch<Action>>
+export type StoreType = Store<BaseState, Action>
 
 export function configureStore(): StoreType {
   const reducer = getRootReducer()
   const composeEnhancers: any =
     window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
-  const store = createStore<BaseState, Action, ThunkDispatch<any>>(
+  const store = createStore(
     reducer,
     /* preloadedState, */
     composeEnhancers(
@@ -89,7 +96,7 @@ export function configureStore(): StoreType {
     })
   }
 
-  function replaceReducers() {
+  function replaceReducers(): void {
     const nextRootReducer = getRootReducer()
     store.replaceReducer(nextRootReducer)
   }
@@ -117,6 +124,5 @@ export function configureStore(): StoreType {
     )
   }
 
-  // $FlowFixMe(mc, 2020-06-09): Flow doesn't like mixture of exact and inexact action types
   return store
 }

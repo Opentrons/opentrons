@@ -5,7 +5,6 @@ import {
   END_TERMINAL_ITEM_ID,
   PRESAVED_STEP_ID,
   START_TERMINAL_ITEM_ID,
-  StepArgsAndErrors,
 } from '../../../steplist/types'
 import {
   SINGLE_STEP_SELECTION_TYPE,

@@ -58,7 +58,6 @@ const belowMinDisposalVolumeWarning = (min: number): FormWarning => ({
   body: (
     <React.Fragment>
       {i18n.t(`alert.form.warning.BELOW_MIN_DISPOSAL_VOLUME.body`)}
-      {/* @ts-expect-error(sa, 2021-6-14): provide className */}
       <KnowledgeBaseLink to="multiDispense">
         {i18n.t(`alert.form.warning.BELOW_MIN_DISPOSAL_VOLUME.link`)}
       </KnowledgeBaseLink>

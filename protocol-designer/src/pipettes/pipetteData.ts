@@ -1,8 +1,13 @@
 import assert from 'assert'
-import { getPipetteNameSpecs, getTiprackVolume } from '@opentrons/shared-data'
+import { DropdownOption } from '../../../components/lib/forms/DropdownField.d'
+import {
+  getPipetteNameSpecs,
+  getTiprackVolume,
+  PipetteName,
+} from '@opentrons/shared-data'
 import { Options } from '@opentrons/components'
 import { PipetteEntity } from '@opentrons/step-generation'
-const supportedPipetteNames = [
+const supportedPipetteNames: PipetteName[] = [
   'p10_single',
   'p10_multi',
   'p50_single',
@@ -14,7 +19,7 @@ const supportedPipetteNames = [
 // TODO: should a version of pipetteOptions be moved to shared-data,
 // and used for both PD and Run App?
 export const pipetteOptions: Options = supportedPipetteNames
-  .map((name: string) => {
+  .map((name: PipetteName) => {
     const pipette = getPipetteNameSpecs(name)
     return pipette
       ? {
@@ -23,7 +28,10 @@ export const pipetteOptions: Options = supportedPipetteNames
         }
       : null
   })
-  .filter(Boolean)
+  .filter<DropdownOption>(
+    (option: DropdownOption | null): option is DropdownOption => Boolean(option)
+  )
+
 // NOTE: this is similar to getPipetteWithTipMaxVol, the fns could potentially
 // be merged once multiple tiprack types per pipette is supported
 export function getPipetteCapacity(pipetteEntity: PipetteEntity): number {

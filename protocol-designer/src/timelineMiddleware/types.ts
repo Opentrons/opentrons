@@ -1,15 +1,11 @@
-import { $Diff } from 'utility-types'
-import { $Diff } from 'utility-types'
 import { Timeline } from '@opentrons/step-generation'
 import { Substeps } from '../steplist/types'
 import { GenerateRobotStateTimelineArgs } from './generateRobotStateTimeline'
 import { GenerateSubstepsArgs } from './generateSubsteps'
 // worker itself will spread the robotStateTimeline in
-export type SubstepsArgsNoTimeline = $Diff<
+export type SubstepsArgsNoTimeline = Omit<
   GenerateSubstepsArgs,
-  {
-    robotStateTimeline: unknown
-  }
+  'robotStateTimeline'
 >
 // Two types of message. Substep generation requires a timeline.
 // - we don't have a timeline and need to generate timeline + substeps
@@ -25,21 +21,21 @@ export type WorkerCommandMessage =
       timeline: Timeline
       substepsArgs: SubstepsArgsNoTimeline
     }
-export type WorkerCommandEvent = {
+export interface WorkerCommandEvent {
   data: WorkerCommandMessage
 }
-export type WorkerResponse = {
+export interface WorkerResponse {
   standardTimeline: Timeline
   substeps: Substeps
 }
-export type WorkerResponseEvent = {
+export interface WorkerResponseEvent {
   data: WorkerResponse
 }
-export type TimelineWorker = {
+export interface TimelineWorker {
   onmessage: (arg0: WorkerResponseEvent) => void
   postMessage: (arg0: WorkerCommandMessage) => void
 }
-export type WorkerContext = {
+export interface WorkerContext {
   addEventListener: (
     arg0: 'message',
     arg1: (arg0: WorkerCommandEvent) => void
