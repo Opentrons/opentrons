@@ -29,7 +29,7 @@ import {
   TemperatureModuleState,
 } from '../../step-forms'
 
-interface Props {
+export interface ModuleTagProps {
   x: number
   y: number
   orientation: ModuleOrientation
@@ -119,7 +119,7 @@ export const ModuleStatus = ({
   }
 }
 
-const ModuleTagComponent = (props: Props) => {
+const ModuleTagComponent = (props: ModuleTagProps) => {
   const timelineFrame = useSelector(timelineFrameBeforeActiveItem)
   const moduleEntity = useSelector(stepFormSelectors.getModuleEntities)[
     props.id

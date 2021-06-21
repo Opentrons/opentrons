@@ -1,7 +1,16 @@
 // @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { DragSource, DropTarget, DragLayer } from 'react-dnd'
+import {
+  DragSource,
+  DropTarget,
+  DragLayer,
+  DragLayerMonitor,
+  DragSourceConnector,
+  DragSourceMonitor,
+  DropTargetConnector,
+  DropTargetMonitor,
+} from 'react-dnd'
 import isEqual from 'lodash/isEqual'
 
 import { DND_TYPES } from '../../constants'
@@ -14,14 +23,14 @@ import { ContextMenu } from './ContextMenu'
 import styles from './StepItem.css'
 
 type DragDropStepItemProps = React.ComponentProps<typeof ConnectedStepItem> & {
-  connectDragSource: (val: unknown) => React.Element<any>
-  connectDropTarget: (val: unknown) => React.Element<any>
+  connectDragSource: (val: unknown) => React.ReactElement<any>
+  connectDropTarget: (val: unknown) => React.ReactElement<any>
   stepId: StepIdType
   stepNumber: number
   isDragging: boolean
   findStepIndex: (stepIdType: StepIdType) => number
   onDrag: () => void
-  moveStep: (StepIdType, number) => void
+  moveStep: (stepId: StepIdType, value: number) => void
 }
 
 const DragSourceStepItem = (props: DragDropStepItemProps) =>
@@ -35,12 +44,12 @@ const DragSourceStepItem = (props: DragDropStepItemProps) =>
   )
 
 const stepItemSource = {
-  beginDrag: props => {
+  beginDrag: (props: DragDropStepItemProps) => {
     props.onDrag()
     return { stepId: props.stepId }
   },
 }
-const collectStepSource = (connect, monitor) => ({
+const collectStepSource = (connect: DragSourceConnector, monitor: DragSourceMonitor) => ({
   connectDragSource: connect.dragSource(),
   isDragging: monitor.isDragging(),
 })
@@ -54,7 +63,7 @@ const stepItemTarget = {
   canDrop: () => {
     return false
   },
-  hover: (props: DragDropStepItemProps, monitor) => {
+  hover: (props: DragDropStepItemProps, monitor: DragLayerMonitor) => {
     const { stepId: draggedId } = monitor.getItem()
     const { stepId: overId } = props
 
@@ -64,7 +73,7 @@ const stepItemTarget = {
     }
   },
 }
-const collectStepTarget = connect => ({
+const collectStepTarget = (connect: DropTargetConnector) => ({
   connectDropTarget: connect.dropTarget(),
 })
 const DragDropStepItem = DropTarget(
@@ -77,11 +86,11 @@ interface StepItemsProps {
   orderedStepIds: StepIdType[]
   reorderSteps: (steps: StepIdType[]) => unknown
   isOver: boolean
-  connectDropTarget: (val: unknown) => React.Element<any>
+  connectDropTarget: (val: unknown) => React.ReactElement<any>
 }
 interface StepItemsState { stepIds: StepIdType[] }
 class StepItems extends React.Component<StepItemsProps, StepItemsState> {
-  constructor(props) {
+  constructor(props: StepItemsProps) {
     super(props)
     this.state = { stepIds: this.props.orderedStepIds }
   }
@@ -116,7 +125,8 @@ class StepItems extends React.Component<StepItemsProps, StepItemsState> {
     this.setState({ stepIds: currentReinserted })
   }
 
-  findStepIndex = stepId => this.state.stepIds.findIndex(id => stepId === id)
+  findStepIndex = (stepId: StepIdType) =>
+    this.state.stepIds.findIndex(id => stepId === id)
 
   render() {
     const currentIds = this.props.isOver
@@ -160,8 +170,12 @@ interface StepDragPreviewOP {
 }
 
 type StepDragPreviewProps = StepDragPreviewOP & StepDragPreviewSP
+type DraggableStepItemProps = Omit<
+  StepItemsProps,
+  'isOver' | 'connectDropTarget'
+>
 
-const StepDragPreview = (props: StepDragPreviewProps) => {
+const StepDragPreview = (props: StepDragPreviewProps): JSX.Element | null => {
   const { itemType, isDragging, currentOffset, stepType, stepName } = props
   if (
     itemType !== DND_TYPES.STEP_ITEM ||
@@ -196,7 +210,7 @@ const mapSTPForPreview = (
   return { stepType, stepName }
 }
 
-export const StepDragPreviewLayer = DragLayer(monitor => ({
+export const StepDragPreviewLayer = DragLayer((monitor: DragLayerMonitor) => ({
   currentOffset: monitor.getSourceClientOffset(),
   isDragging: monitor.isDragging(),
   itemType: monitor.getItemType(),
@@ -204,17 +218,23 @@ export const StepDragPreviewLayer = DragLayer(monitor => ({
 }))(connect(mapSTPForPreview)(StepDragPreview))
 
 const listTarget = {
-  drop: (props, monitor, component) => {
+  drop: (
+    props: DraggableStepItemProps,
+    monitor: DragLayerMonitor,
+    component: StepItems
+  ) => {
     if (!isEqual(props.orderedStepIds, component.state.stepIds)) {
       component.submitReordering()
     }
   },
 }
-const collectListTarget = (connect, monitor) => ({
+const collectListTarget = (connect: DropTargetConnector, monitor: DropTargetMonitor) => ({
   isOver: monitor.isOver(),
   connectDropTarget: connect.dropTarget(),
 })
 
-export const DraggableStepItems: React.AbstractComponent<
-  Omit<StepItemsProps, 'isOver' | 'connectDropTarget'>
-> = DropTarget(DND_TYPES.STEP_ITEM, listTarget, collectListTarget)(StepItems)
+export const DraggableStepItems = DropTarget<DraggableStepItemProps>(
+  DND_TYPES.STEP_ITEM,
+  listTarget,
+  collectListTarget
+)(StepItems)

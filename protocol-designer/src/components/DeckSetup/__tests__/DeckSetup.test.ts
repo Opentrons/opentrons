@@ -49,7 +49,7 @@ describe('DeckSetup', () => {
       slot: '7',
     }
 
-    let getLabwareIsCompatibleSpy
+    let getLabwareIsCompatibleSpy: jest.SpiedFunction<typeof labwareModuleCompatibility.getLabwareIsCompatible>
     beforeEach(() => {
       getLabwareIsCompatibleSpy = jest.spyOn(
         labwareModuleCompatibility,

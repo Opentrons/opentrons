@@ -34,7 +34,7 @@ const getInitialDeckSetupMock = stepFormSelectors.getInitialDeckSetup
 const getIsMultiSelectModeMock = getIsMultiSelectMode
 
 describe('StepCreationButton', () => {
-  let store
+  let store: any
 
   beforeEach(() => {
     store = mockStore()

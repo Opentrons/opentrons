@@ -2,9 +2,12 @@
 import React from 'react'
 import { act } from 'react-dom/test-utils'
 import { mount } from 'enzyme'
-import { EditModules } from '../EditModules'
+import { EditModules, EditModulesProps } from '../EditModules'
 import { Provider } from 'react-redux'
-import { selectors as stepFormSelectors } from '../../step-forms'
+import {
+  InitialDeckSetup,
+  selectors as stepFormSelectors,
+} from '../../step-forms'
 import { selectors as tutorialSelectors } from '../../tutorial'
 import { BlockingHint } from '../Hints/useBlockingHint'
 import { EditModulesModal } from '../modals/EditModulesModal'
@@ -26,9 +29,9 @@ const getDismissedHintsMock = tutorialSelectors.getDismissedHints as jest.Mocked
 
 describe('Edit Modules', () => {
   const TEST_ID = 'testId'
-  let props
+  let props: EditModulesProps
   let moduleToEdit
-  let mockStore
+  let mockStore: any
   let onCloseClick
 
   beforeEach(() => {
@@ -44,9 +47,9 @@ describe('Edit Modules', () => {
       getState: () => ({}),
     }
     getDismissedHintsMock.mockReturnValue([])
-    getInitialDeckSetupMock.mockReturnValue({
+    getInitialDeckSetupMock.mockReturnValue(({
       modules: { [TEST_ID]: {} },
-    })
+    } as unknown) as InitialDeckSetup)
     mockEditModulesModal.mockReturnValue(<div>mock edit modules modal</div>)
   })
 
@@ -54,7 +57,7 @@ describe('Edit Modules', () => {
     jest.resetAllMocks()
   })
 
-  const render = props =>
+  const render = (props: EditModulesProps) =>
     mount(<EditModules {...props} />, {
       wrappingComponent: Provider,
       wrappingComponentProps: { store: mockStore },
@@ -71,6 +74,7 @@ describe('Edit Modules', () => {
 
     act(() => {
       editModulesModal.prop('displayModuleWarning')({
+        // @ts-expect-error (ce, 2021-06-21) invalid type
         model: 'some_model',
         slot: 'some_slot',
       })

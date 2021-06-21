@@ -11,7 +11,7 @@ import { MagneticModuleWarningModalContent } from './modals/EditModulesModal/Mag
 import { EditModulesModal } from './modals/EditModulesModal'
 import { ModuleModel, ModuleRealType } from '@opentrons/shared-data'
 
-interface EditModulesProps {
+export interface EditModulesProps {
   moduleToEdit: {
     moduleId?: string | null
     moduleType: ModuleRealType
