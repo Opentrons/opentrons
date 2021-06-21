@@ -10,6 +10,7 @@ import type {
   OpenProtocolAction,
   UploadProtocolAction,
   LoadProtocolAction,
+  CloseProtocolAction,
   ProtocolData,
 } from './types'
 
@@ -102,5 +103,11 @@ export function loadProtocol(
       },
       data,
     },
+  }
+}
+
+export function closeProtocol(): CloseProtocolAction {
+  return {
+    type: 'protocol:CLOSE',
   }
 }

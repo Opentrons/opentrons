@@ -13,8 +13,8 @@ import {
 import { Page } from '../../atoms/Page'
 import { UploadInput } from './UploadInput'
 import { ProtocolSetup } from '../ProtocolSetup'
-import { getProtocolData, getProtocolFile } from '../../redux/protocol'
-import { loadProtocol } from '../../redux/protocol/actions'
+import { getProtocolName, getProtocolFile } from '../../redux/protocol'
+import { loadProtocol, closeProtocol } from '../../redux/protocol/actions'
 import { ingestProtocolFile } from '../../redux/protocol/utils'
 
 import { useLogger } from '../../logger'
@@ -27,12 +27,13 @@ const VALIDATION_ERROR_T_MAP: {[errorKey: string]: string}= {
 }
 
 export function ProtocolUpload(): JSX.Element {
-  const { t } = useTranslation('protocol_info')
+  const { t } = useTranslation(['protocol_info', 'shared'])
   const dispatch = useDispatch<Dispatch>()
   const logger = useLogger(__filename)
   const [uploadErrorKey, setUploadErrorKey] = React.useState<string | null>(null)
   const [uploadSchemaError, setUploadSchemaError] = React.useState<ErrorObject[] | null | undefined>(null)
   const protocolFile = useSelector((state: State) => getProtocolFile(state))
+  const protocolName = useSelector((state: State) => getProtocolName(state))
 
   const clearError  = () => {
     setUploadErrorKey(null)
@@ -48,7 +49,19 @@ export function ProtocolUpload(): JSX.Element {
       setUploadSchemaError(errorDetails?.schemaErrors)
     })
   }
-  const titleBarProps = { title: t('upload_and_simulate') }
+
+  const handleCloseProtocol: React.MouseEventHandler = (_event) => {
+    dispatch(closeProtocol())
+  }
+
+  const titleBarProps = protocolFile !== null
+    ? {
+      title: t('protocol_title', {protocol_name: protocolName}),
+      back: { onClick: handleCloseProtocol, title: t('shared:close'), children: t('shared:close') },
+    }
+    : {
+      title: t('upload_and_simulate'),
+    }
 
   return (
     <Page titleBarProps={titleBarProps}>

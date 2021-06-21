@@ -49,6 +49,10 @@ export interface LoadProtocolAction {
   payload: { file: ProtocolFile; data: ProtocolData | null }
 }
 
+export interface CloseProtocolAction {
+  type: 'protocol:CLOSE'
+}
+
 export interface InvalidProtocolFileAction {
   type: 'protocol:INVALID_FILE'
   payload: { file?: ProtocolFile; message: string }
@@ -59,6 +63,7 @@ export type ProtocolAction =
   | UploadProtocolAction
   | InvalidProtocolFileAction
   | LoadProtocolAction
+  | CloseProtocolAction
 
 // state types
 

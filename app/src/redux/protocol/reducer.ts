@@ -44,6 +44,7 @@ export const protocolReducer: Reducer<ProtocolState, Action> = (
       return { file, contents, data, parseError: null, schemaError: null }
     }
 
+    case 'protocol:CLOSE':
     case 'robot:DISCONNECT_RESPONSE':
       return INITIAL_STATE
   }

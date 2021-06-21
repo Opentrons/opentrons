@@ -6,6 +6,7 @@ import {
   SPACING_3,
 } from '@opentrons/components'
 
+import { RunSetupCard } from './RunSetupCard'
 import { MetadataCard } from './MetadataCard'
 
 export function ProtocolSetup(): JSX.Element {
@@ -18,6 +19,7 @@ export function ProtocolSetup(): JSX.Element {
       padding={SPACING_3}
     >
       <MetadataCard />
+      <RunSetupCard />
     </Flex>
   )
 }
