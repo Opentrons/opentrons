@@ -13,7 +13,8 @@ describe('BatchEditMoveLiquid', () => {
   let props: BatchEditMoveLiquidProps
   beforeEach(() => {
     // just return the i18n text path itself, instead of the text context at that path
-    localizationSpy.mockImplementation(path => path.toString())
+    // @ts-expect-error (ce, 2021-06-21) return type issue
+    localizationSpy.mockImplementation(path => path)
 
     props = {
       batchEditFormHasChanges: true,
@@ -43,7 +44,8 @@ describe('BatchEditMoveLiquid', () => {
       expect(localizationSpy).toHaveBeenCalledWith(tooltipPath)
       expect(saveButtonTooltip.prop('children')).toBe(tooltipPath)
 
-      saveButton.invoke('onClick')!({} as React.MouseEvent)
+      // @ts-expect-error (ce, 2021-06-21) lacks constraining and param type is incorrect
+      saveButton.invoke('onClick')({})
       expect(handleSave).toHaveBeenCalled()
     })
 
@@ -95,7 +97,8 @@ describe('BatchEditMoveLiquid', () => {
 
       expect(handleCancel).not.toHaveBeenCalled()
 
-      cancelButton.invoke('onClick')!({} as React.MouseEvent)
+      // @ts-expect-error (ce, 2021-06-21) lacks constraining and param type is incorrect
+      cancelButton.invoke('onClick')({})
       expect(handleCancel).toHaveBeenCalled()
     })
   })

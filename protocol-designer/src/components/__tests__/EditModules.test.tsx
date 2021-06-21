@@ -71,7 +71,8 @@ describe('Edit Modules', () => {
 
     act(() => {
       editModulesModal.prop('displayModuleWarning')({
-        model: 'magneticModuleV1',
+        // @ts-expect-error (ce, 2021-06-21) invalid type
+        model: 'some_model',
         slot: 'some_slot',
       })
     })
