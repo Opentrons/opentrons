@@ -4,7 +4,10 @@ import { act } from 'react-dom/test-utils'
 import { mount } from 'enzyme'
 import { EditModules, EditModulesProps } from '../EditModules'
 import { Provider } from 'react-redux'
-import {InitialDeckSetup, ModuleOnDeck, selectors as stepFormSelectors} from '../../step-forms'
+import {
+  InitialDeckSetup,
+  selectors as stepFormSelectors,
+} from '../../step-forms'
 import { selectors as tutorialSelectors } from '../../tutorial'
 import { BlockingHint } from '../Hints/useBlockingHint'
 import { EditModulesModal } from '../modals/EditModulesModal'
