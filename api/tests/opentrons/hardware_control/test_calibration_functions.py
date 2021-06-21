@@ -74,7 +74,7 @@ def test_load_malformed_calibration(ot_config_tempdir):
 
 def test_load_json(ot_config_tempdir):
     path = config.get_opentrons_path('robot_calibration_dir')/'deck_calibration.json'
-    path.write('{')
+    path.write_text('{')
     obj = robot_calibration.load_attitude_matrix()
     assert obj is None
 
@@ -102,6 +102,6 @@ def test_load_bad_pipette_offset(ot_config_tempdir):
     path = config.get_opentrons_path('pipette_calibration_dir')/'left'
     path.mkdir(parents=True, exist_ok=True)
     calpath = path / 'fakePip.json'
-    calpath.write('{')
+    calpath.write_text('{')
     obj = robot_calibration.load_pipette_offset('fakePip', Mount.LEFT)
     assert obj is None
