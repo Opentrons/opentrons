@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import styles from './styles.css'
 import {
@@ -19,11 +18,12 @@ interface Props {
   model: ModuleModel
 }
 
-interface ModuleImg {
-  [ModuleRealType]: {
-    [ModuleModel]: string
+type ModuleImg = {
+  [type in ModuleRealType]: {
+    [model in ModuleModel]?: string
   }
 }
+
 
 const MODULE_IMG_BY_TYPE: ModuleImg = {
   [MAGNETIC_MODULE_TYPE]: {

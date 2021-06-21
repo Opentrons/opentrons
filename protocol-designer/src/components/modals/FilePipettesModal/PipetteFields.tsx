@@ -20,6 +20,7 @@ import styles from './FilePipettesModal.css'
 import formStyles from '../../forms/forms.css'
 
 import { FormPipettesByMount } from '../../../step-forms'
+import { DropdownOption } from '../../../../../components/src/forms/DropdownField'
 
 export interface Props {
   initialTabIndex?: number
@@ -54,7 +55,10 @@ export interface Props {
 }
 
 // TODO(mc, 2019-10-14): delete this typedef when gen2 ff is removed
-interface PipetteSelectProps { mount: Mount; tabIndex: number }
+interface PipetteSelectProps {
+  mount: Mount
+  tabIndex: number
+}
 
 export function PipetteFields(props: Props): JSX.Element {
   const {
@@ -71,9 +75,11 @@ export function PipetteFields(props: Props): JSX.Element {
 
   const allLabware = useSelector(getLabwareDefsByURI)
 
+  type Values<T> = T[keyof T]
+
   const tiprackOptions = reduce(
     allLabware,
-    (acc, def: $Values<typeof allLabware>) => {
+    (acc, def: Values<typeof allLabware>) => {
       if (def.metadata.displayCategory !== 'tipRack') return acc
       return [
         ...acc,
@@ -83,7 +89,7 @@ export function PipetteFields(props: Props): JSX.Element {
         },
       ]
     },
-    []
+    [] as DropdownOption[]
   )
 
   const initialTabIndex = props.initialTabIndex || 1

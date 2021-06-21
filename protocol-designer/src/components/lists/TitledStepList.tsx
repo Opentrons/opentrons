@@ -2,9 +2,8 @@
 
 import * as React from 'react'
 import cx from 'classnames'
-import { Icon , IconName } from '@opentrons/components'
+import { Icon, IconName } from '@opentrons/components'
 import styles from './styles.css'
-
 
 export interface Props {
   /** text of title */
@@ -77,6 +76,7 @@ export function TitledStepList(props: Props): JSX.Element {
     [styles.hover_border]: props.hovered,
   })
 
+  // @ts-expect-error(sa, 2021-6-21): cast props.onClick to a boolean
   const titleBarClass = cx(styles.step_title_bar, {
     [styles.clickable]: props.onClick,
     [styles.multiselect_title_bar]: props.isMultiSelectMode,

@@ -1,6 +1,6 @@
 import some from 'lodash/some'
 import reduce from 'lodash/reduce'
-import { SavedStepFormState } from '../../../step-forms'
+import type { SavedStepFormState } from '../../../step-forms'
 
 /** Pull out all entities never specified by step forms. Assumes that all forms share the entityKey */
 export function getUnusedEntities<T>(
@@ -8,15 +8,16 @@ export function getUnusedEntities<T>(
   stepForms: SavedStepFormState,
   entityKey: 'pipette' | 'moduleId'
 ): T[] {
-  return reduce(
+  const a = reduce(
     entities,
-    (acc, entity, entityId): T[] => {
+    (acc, entity: T, entityId): T[] => {
       const stepContainsEntity = some(
         stepForms,
         form => form[entityKey] === entityId
       )
       return stepContainsEntity ? acc : [...acc, entity]
     },
-    []
+    [] as T[]
   )
+  return a
 }

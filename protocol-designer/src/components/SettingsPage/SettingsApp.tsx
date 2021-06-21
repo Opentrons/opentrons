@@ -33,7 +33,7 @@ interface SP {
   hasOptedIn: Props['hasOptedIn']
 }
 
-function SettingsAppComponent(props: Props) {
+function SettingsAppComponent(props: Props): JSX.Element {
   const {
     canClearHintDismissals,
     hasOptedIn,
@@ -132,6 +132,7 @@ function mergeProps(
 
 export const SettingsApp = connect(
   mapStateToProps,
+  // @ts-expect-error(sa, 2021-6-21): TODO IMMEDIATELY: figure out why TS does not like this
   null,
   mergeProps
 )(SettingsAppComponent)

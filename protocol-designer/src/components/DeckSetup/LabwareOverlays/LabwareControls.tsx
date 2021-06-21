@@ -17,8 +17,8 @@ interface LabwareControlsProps {
   labwareOnDeck: LabwareOnDeck
   selectedTerminalItemId?: TerminalItemId | null
   slot: DeckSlot
-  setHoveredLabware: (labware: LabwareOnDeck | null | undefined) => unknown
-  setDraggedLabware: (labware: LabwareOnDeck | null | undefined) => unknown
+  setHoveredLabware: (labware: LabwareOnDeck | null) => unknown
+  setDraggedLabware: (labware: LabwareOnDeck | null) => unknown
   swapBlocked: boolean
 }
 
@@ -49,7 +49,9 @@ export const LabwareControls = (props: LabwareControlsProps): JSX.Element => {
         {canEdit ? (
           <EditLabware
             labwareOnDeck={labwareOnDeck}
+            // @ts-expect-error(sa, 2021-6-21): react dnd type mismatch
             setHoveredLabware={setHoveredLabware}
+            // @ts-expect-error(sa, 2021-6-21): react dnd type mismatch
             setDraggedLabware={setDraggedLabware}
             swapBlocked={swapBlocked}
           />

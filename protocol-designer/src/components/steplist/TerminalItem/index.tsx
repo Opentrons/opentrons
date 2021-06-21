@@ -66,8 +66,6 @@ export const TerminalItem = (props: TerminalItemProps): JSX.Element => {
               ? CLOSE_UNSAVED_STEP_FORM
               : CLOSE_STEP_FORM_WITH_CHANGES
           }
-          // @ts-expect-error(sa, 2021-6-21): since we aren't passing any parameters into selectItem, the generic type T in useConditionalConfirm
-          // gets never typed. this odd behavior, we should probably get rid of the generic type in useConditionalConfirm
           onContinueClick={confirm}
           onCancelClick={cancel}
         />

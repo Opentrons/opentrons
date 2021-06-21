@@ -21,7 +21,8 @@ export const FeatureFlagCard = (props: Props): JSX.Element => {
 
   const prereleaseModeEnabled = props.flags.PRERELEASE_MODE === true
 
-  const allFlags = sortBy(Object.keys(props.flags))
+  // @ts-expect-error(sa, 2021-6-21): Object.keys not smart enough to take keys from props.flags
+  const allFlags: FlagTypes[] = sortBy(Object.keys(props.flags))
 
   const userFacingFlagNames = allFlags.filter(flagName =>
     userFacingFlags.includes(flagName)
@@ -32,7 +33,7 @@ export const FeatureFlagCard = (props: Props): JSX.Element => {
   )
 
   const getDescription = (flag: FlagTypes): JSX.Element => {
-    const RICH_DESCRIPTIONS: { [FlagTypes]: JSX.Element } = {
+    const RICH_DESCRIPTIONS: Partial<Record<FlagTypes, JSX.Element>> = {
       OT_PD_DISABLE_MODULE_RESTRICTIONS: (
         <>
           <p>{i18n.t(`feature_flags.${flag}.description_1`)} </p>
@@ -47,7 +48,7 @@ export const FeatureFlagCard = (props: Props): JSX.Element => {
     )
   }
 
-  const toFlagRow = flagName => (
+  const toFlagRow = (flagName: FlagTypes): JSX.Element => (
     <div key={flagName}>
       <div className={styles.setting_row}>
         <p className={styles.toggle_label}>

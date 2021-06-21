@@ -19,7 +19,6 @@ import {
   DeckSlot as DeckDefSlot,
   ModuleRealType,
 } from '@opentrons/shared-data'
-// $FlowFixMe(mc, 2021-03.15): ignore until TS conversion
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 import { PSEUDO_DECK_SLOTS } from '../../constants'
 import { i18n } from '../../localization'
@@ -27,14 +26,23 @@ import {
   getLabwareIsCompatible,
   getLabwareIsCustom,
 } from '../../utils/labwareModuleCompatibility'
-import { selectors as labwareDefSelectors } from '../../labware-defs'
+import {
+  selectors as labwareDefSelectors,
+  LabwareDefByDefURI,
+} from '../../labware-defs'
 import {
   getModuleVizDims,
   inferModuleOrientationFromSlot,
 } from './getModuleVizDims'
 
 import { selectors as featureFlagSelectors } from '../../feature-flags'
-import { getSlotsBlockedBySpanning, getSlotIsEmpty } from '../../step-forms'
+import {
+  getSlotsBlockedBySpanning,
+  getSlotIsEmpty,
+  InitialDeckSetup,
+  LabwareOnDeck as LabwareOnDeckType,
+  ModuleOnDeck,
+} from '../../step-forms'
 import { BrowseLabwareModal } from '../labware'
 import { ModuleViz } from './ModuleViz'
 import { ModuleTag } from './ModuleTag'
@@ -43,12 +51,6 @@ import { LabwareOnDeck } from './LabwareOnDeck'
 import { SlotControls, LabwareControls, DragPreview } from './LabwareOverlays'
 
 import { TerminalItemId } from '../../steplist'
-import {
-  InitialDeckSetup,
-  LabwareOnDeck as LabwareOnDeckType,
-  ModuleOnDeck,
-} from '../../step-forms'
-import { LabwareDefByDefURI } from '../../labware-defs'
 
 import styles from './DeckSetup.css'
 
@@ -214,7 +216,7 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
 
   const allLabware: LabwareOnDeckType[] = Object.keys(
     initialDeckSetup.labware
-  ).reduce<string[]>((acc, labwareId) => {
+  ).reduce<LabwareOnDeckType[]>((acc, labwareId) => {
     const labware = initialDeckSetup.labware[labwareId]
     return getLabwareHasQuirk(labware.def, 'fixedTrash')
       ? acc
@@ -229,6 +231,7 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
         (allModules.some(
           moduleOnDeck =>
             moduleOnDeck.slot === '1' &&
+            // @ts-expect-error(sa, 2021-6-21): ModuleModel is a super type of the elements in MODULES_WITH_COLLISION_ISSUES
             MODULES_WITH_COLLISION_ISSUES.includes(moduleOnDeck.model)
         ) &&
           deckSlotsById?.['4']) ||
@@ -236,6 +239,7 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
         (allModules.some(
           moduleOnDeck =>
             moduleOnDeck.slot === '3' &&
+            // @ts-expect-error(sa, 2021-6-21): ModuleModel is a super type of the elements in MODULES_WITH_COLLISION_ISSUES
             MODULES_WITH_COLLISION_ISSUES.includes(moduleOnDeck.model)
         ) &&
           deckSlotsById?.['6']) ||
@@ -301,7 +305,7 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
         )
         .map(slot => {
           return (
-              // @ts-ignore-error (ce, 2021-06-21) needs some type love
+            // @ts-expect-error (ce, 2021-06-21) needs some type love
             <SlotControls
               key={slot.id}
               slot={slot}
@@ -371,7 +375,7 @@ export const DeckSetup = (props: DeckSetupProps): JSX.Element => {
     !_disableCollisionWarnings && _hasGen1MultichannelPipette
 
   const deckDef = React.useMemo(() => getDeckDefinitions()['ot2_standard'], [])
-  const wrapperRef = useOnClickOutside({
+  const wrapperRef: React.RefObject<HTMLDivElement> = useOnClickOutside({
     onClickOutside: props.handleClickOutside,
   })
 

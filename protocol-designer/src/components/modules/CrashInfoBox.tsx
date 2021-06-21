@@ -30,6 +30,7 @@ export function CrashInfoBox(props: Props): JSX.Element {
       {props.showDiagram && (
         <img
           className={styles.crash_info_diagram}
+          // @ts-expect-error(sa, 2021-6-21): src should be string | undefined, null is not cool with TS
           src={getCrashDiagramSrc(props)}
         />
       )}

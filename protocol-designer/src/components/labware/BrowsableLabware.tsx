@@ -18,7 +18,7 @@ interface Props {
   wellContents: ContentsByWell
 }
 
-export function BrowsableLabware(props: Props): JSX.Element {
+export function BrowsableLabware(props: Props): JSX.Element | null {
   const { definition, ingredNames, wellContents } = props
   if (!definition) {
     assert(definition, 'BrowseLabwareModal expected definition')

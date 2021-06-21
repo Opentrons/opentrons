@@ -44,9 +44,7 @@ interface Props {
         }
       }
   values: FormModulesByType
-  onFieldChange: (
-    event: React.MouseEvent<HTMLSelectElement | HTMLInputElement>
-  ) => unknown
+  onFieldChange: (event: React.ChangeEvent) => unknown
   onSetFieldValue: (field: string, value: string | null) => void
   onSetFieldTouched: (field: string, touched: boolean) => void
   onBlur: (event: React.FocusEvent<HTMLSelectElement>) => unknown
@@ -62,9 +60,10 @@ export function ModuleFields(props: Props): JSX.Element {
     errors,
     touched,
   } = props
-  const modules = Object.keys(values)
+  // @ts-expect-error(sa, 2021-6-21): Object.keys not smartt enough to take the keys of FormModulesByType
+  const modules: ModuleRealType[] = Object.keys(values)
   const handleOnDeckChange = (type: ModuleRealType) => (
-    e: React.ChangeEvent<HTMLInputElement>
+    e: React.ChangeEvent
   ) => {
     const targetToClear = `modulesByType.${type}.model`
 
@@ -110,10 +109,12 @@ export function ModuleFields(props: Props): JSX.Element {
                       touched &&
                       typeof touched !== 'boolean' &&
                       touched[moduleType] &&
+                      // @ts-expect-error(sa, 2021-6-21): not a valid way to type narrow
                       touched[moduleType].model &&
                       errors !== null &&
                       typeof errors !== 'string' &&
                       errors[moduleType]
+                      // @ts-expect-error(sa, 2021-6-21): not a valid way to type narrow
                         ? errors[moduleType].model
                         : null
                     }

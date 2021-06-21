@@ -209,7 +209,6 @@ export const MultiSelectToolbar = (props: Props): JSX.Element => {
       {showSelectConfirmation && (
         <ConfirmDeleteModal
           modalType={CLOSE_BATCH_EDIT_FORM}
-          // @ts-expect-error(sa, 2021-6-21): type issue with useConditionalConfirm
           onContinueClick={confirmSelect}
           onCancelClick={cancelSelect}
         />
@@ -217,8 +216,6 @@ export const MultiSelectToolbar = (props: Props): JSX.Element => {
       {showDuplicateConfirmation && (
         <ConfirmDeleteModal
           modalType={CLOSE_BATCH_EDIT_FORM}
-          // @ts-expect-error(sa, 2021-6-21): since we aren't passing any parameters into selectItem, the generic type T in useConditionalConfirm
-          // gets never typed. this odd behavior, we should probably get rid of the generic type in useConditionalConfirm
           onContinueClick={confirmDuplicate}
           onCancelClick={cancelDuplicate}
         />
@@ -226,7 +223,6 @@ export const MultiSelectToolbar = (props: Props): JSX.Element => {
       {showDeleteConfirmation && (
         <ConfirmDeleteModal
           modalType={DELETE_MULTIPLE_STEP_FORMS}
-          // @ts-expect-error(sa, 2021-6-21): see above
           onContinueClick={confirmDelete}
           onCancelClick={cancelDelete}
         />

@@ -25,7 +25,7 @@ export type DeleteModalType =
 
 interface Props {
   modalType: DeleteModalType
-  onCancelClick: ((event: React.MouseEvent) => unknown) | (() => unknown)
+  onCancelClick: () => unknown
   onContinueClick: ((event: React.MouseEvent) => unknown) | (() => unknown)
 }
 

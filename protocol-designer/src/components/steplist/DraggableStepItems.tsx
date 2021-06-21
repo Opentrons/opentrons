@@ -40,7 +40,6 @@ const DragSourceStepItem = (props: DragDropStepItemProps): any =>
   props.connectDragSource(
     props.connectDropTarget(
       <div style={{ opacity: props.isDragging ? 0.3 : 1 }}>
-        {/* $FlowFixMe: (mc, 2019-04-18): connected components have exact props, which makes flow complain here */}
         <ConnectedStepItem {...props} />
       </div>
     )
