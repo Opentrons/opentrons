@@ -1,12 +1,16 @@
-import typing
-
 import pytest
+from typing import Any, List
 
-from opentrons import protocol_engine as pe
+from opentrons.types import DeckSlotName, MountType
 from opentrons.protocols import models
-
 from opentrons.protocols.runner.json_proto.command_translator import CommandTranslator
-
+from opentrons.protocol_engine import (
+    commands as pe_commands,
+    DeckSlotLocation,
+    PipetteName,
+    WellLocation,
+    WellOrigin,
+)
 
 # todo(mc & mm, 2021-06-17):
 #
@@ -103,7 +107,7 @@ def subject() -> CommandTranslator:
     return CommandTranslator()
 
 
-def _assert_appear_in_order(elements: typing.Iterable, source: typing.Iterable) -> None:
+def _assert_appear_in_order(elements: List[Any], source: List[Any]) -> None:
     """
     Assert all elements appear in source, in the given order relative to each other.
 
@@ -131,26 +135,34 @@ def test_labware(
 ) -> None:
     result = subject.translate(json_protocol)
 
-    expected_add_definition_request_1 = pe.commands.AddLabwareDefinitionRequest(
-        definition=models.LabwareDefinition.parse_obj(minimal_labware_def)
+    expected_add_definition_request_1 = pe_commands.AddLabwareDefinitionRequest(
+        data=pe_commands.AddLabwareDefinitionData(
+            definition=models.LabwareDefinition.parse_obj(minimal_labware_def)
+        )
     )
-    expected_load_request_1 = pe.commands.LoadLabwareRequest(
-        location=pe.DeckSlotLocation(slot=1),
-        loadName=minimal_labware_def["parameters"]["loadName"],
-        namespace=minimal_labware_def["namespace"],
-        version=minimal_labware_def["version"],
-        labwareId="tiprack1Id",
+    expected_load_request_1 = pe_commands.LoadLabwareRequest(
+        data=pe_commands.LoadLabwareData(
+            location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
+            loadName=minimal_labware_def["parameters"]["loadName"],
+            namespace=minimal_labware_def["namespace"],
+            version=minimal_labware_def["version"],
+            labwareId="tiprack1Id",
+        )
     )
 
-    expected_add_definition_request_2 = pe.commands.AddLabwareDefinitionRequest(
-        definition=models.LabwareDefinition.parse_obj(minimal_labware_def2)
+    expected_add_definition_request_2 = pe_commands.AddLabwareDefinitionRequest(
+        data=pe_commands.AddLabwareDefinitionData(
+            definition=models.LabwareDefinition.parse_obj(minimal_labware_def2)
+        )
     )
-    expected_load_request_2 = pe.commands.LoadLabwareRequest(
-        location=pe.DeckSlotLocation(slot=10),
-        loadName=minimal_labware_def2["parameters"]["loadName"],
-        namespace=minimal_labware_def2["namespace"],
-        version=minimal_labware_def2["version"],
-        labwareId="wellplate1Id",
+    expected_load_request_2 = pe_commands.LoadLabwareRequest(
+        data=pe_commands.LoadLabwareData(
+            location=DeckSlotLocation(slot=DeckSlotName.SLOT_10),
+            loadName=minimal_labware_def2["parameters"]["loadName"],
+            namespace=minimal_labware_def2["namespace"],
+            version=minimal_labware_def2["version"],
+            labwareId="wellplate1Id",
+        )
     )
 
     _assert_appear_in_order(
@@ -170,8 +182,12 @@ def test_pipettes(
 ) -> None:
     result = subject.translate(json_protocol)
 
-    expected_request = pe.commands.LoadPipetteRequest(
-        pipetteName="p300_single", mount="left", pipetteId="leftPipetteId"
+    expected_request = pe_commands.LoadPipetteRequest(
+        data=pe_commands.LoadPipetteData(
+            pipetteName=PipetteName.P300_SINGLE,
+            mount=MountType.LEFT,
+            pipetteId="leftPipetteId",
+        )
     )
 
     assert expected_request in result
@@ -184,18 +200,18 @@ def test_aspirate(
     aspirate request."""
     request = subject._translate_command(aspirate_command)
 
-    assert request == [
-        pe.commands.AspirateRequest(
+    assert request == pe_commands.AspirateRequest(
+        data=pe_commands.AspirateData(
             pipetteId=aspirate_command.params.pipette,
             labwareId=aspirate_command.params.labware,
             wellName=aspirate_command.params.well,
             volume=aspirate_command.params.volume,
-            wellLocation=pe.WellLocation(
-                origin=pe.WellOrigin.BOTTOM,
+            wellLocation=WellLocation(
+                origin=WellOrigin.BOTTOM,
                 offset=(0, 0, aspirate_command.params.offsetFromBottomMm),
             ),
         )
-    ]
+    )
 
 
 def test_dispense(
@@ -205,18 +221,18 @@ def test_dispense(
     dispense request."""
     request = subject._translate_command(dispense_command)
 
-    assert request == [
-        pe.commands.DispenseRequest(
+    assert request == pe_commands.DispenseRequest(
+        data=pe_commands.DispenseData(
             pipetteId=dispense_command.params.pipette,
             labwareId=dispense_command.params.labware,
             wellName=dispense_command.params.well,
             volume=dispense_command.params.volume,
-            wellLocation=pe.WellLocation(
-                origin=pe.WellOrigin.BOTTOM,
+            wellLocation=WellLocation(
+                origin=WellOrigin.BOTTOM,
                 offset=(0, 0, dispense_command.params.offsetFromBottomMm),
             ),
         )
-    ]
+    )
 
 
 def test_drop_tip(
@@ -227,13 +243,13 @@ def test_drop_tip(
     drop tip request."""
     request = subject._translate_command(drop_tip_command)
 
-    assert request == [
-        pe.commands.DropTipRequest(
+    assert request == pe_commands.DropTipRequest(
+        data=pe_commands.DropTipData(
             pipetteId=drop_tip_command.params.pipette,
             labwareId=drop_tip_command.params.labware,
             wellName=drop_tip_command.params.well,
         )
-    ]
+    )
 
 
 def test_pick_up_tip(
@@ -245,10 +261,10 @@ def test_pick_up_tip(
     """
     request = subject._translate_command(pick_up_command)
 
-    assert request == [
-        pe.commands.PickUpTipRequest(
+    assert request == pe_commands.PickUpTipRequest(
+        data=pe_commands.PickUpTipData(
             pipetteId=pick_up_command.params.pipette,
             labwareId=pick_up_command.params.labware,
             wellName=pick_up_command.params.well,
         )
-    ]
+    )
