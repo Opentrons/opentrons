@@ -20,7 +20,6 @@ import * as dismissSelectors from '../../dismiss/selectors.js'
 import * as uiStepSelectors from '../../ui/steps/selectors.js'
 import * as fileDataSelectors from '../../file-data/selectors/index.js'
 import * as timelineWarningSelectors from '../../top-selectors/timelineWarnings'
-import { StoreType } from '../../configureStore'
 
 jest.mock('../../step-forms/selectors/index.js')
 jest.mock('../../file-data/selectors/index.js')
@@ -102,7 +101,7 @@ function createMockClickEvent({
 const mockClickEvent = createMockClickEvent()
 
 describe('ConnectedStepItem', () => {
-  let store: StoreType
+  let store: any
   beforeEach(() => {
     store = mockStore()
 
@@ -114,7 +113,7 @@ describe('ConnectedStepItem', () => {
 
     when(getSavedStepFormsMock)
       .calledWith(expect.anything())
-      // @ts-ignore
+      // @ts-expect-error(sa, 2021-6-21): 'some form' is not a valid FormData type
       .mockReturnValue({ [mockId]: 'some form' })
 
     when(getCurrentFormIsPresavedMock)
@@ -135,7 +134,7 @@ describe('ConnectedStepItem', () => {
 
     when(getArgsAndErrorsByStepIdMock)
       .calledWith(expect.anything())
-      // @ts-ignore
+      // @ts-expect-error(sa, 2021-6-21): missing properties
       .mockReturnValue({ [mockId]: { errors: true } })
 
     when(getHasTimelineWarningsPerStepMock)
@@ -174,7 +173,8 @@ describe('ConnectedStepItem', () => {
     it('should select a single step when PD not in batch edit mode', () => {
       const props = { stepId: mockId, stepNumber: 1 }
       const wrapper = render(props)
-      wrapper.find(StepItem)!.prop('handleClick')!(mockClickEvent)
+      // @ts-expect-error(sa, 2021-6-21): handleClick handler might not exist
+      wrapper.find(StepItem).prop('handleClick')(mockClickEvent)
       const actions = store.getActions()
       const selectStepAction = { type: 'SELECT_STEP', payload: mockId }
       expect(actions[0]).toEqual(selectStepAction)
@@ -187,7 +187,8 @@ describe('ConnectedStepItem', () => {
       const props = { stepId: mockId, stepNumber: 1 }
       const wrapper = render(props)
       act(() => {
-        wrapper.find(StepItem)!.prop('handleClick')!(mockClickEvent)
+        // @ts-expect-error(sa, 2021-6-21): handleClick handler might not exist
+        wrapper.find(StepItem).prop('handleClick')(mockClickEvent)
       })
       wrapper.update()
       const confirmDeleteModal = wrapper.find(ConfirmDeleteModal)
@@ -206,7 +207,8 @@ describe('ConnectedStepItem', () => {
       const props = { stepId: mockId, stepNumber: 1 }
       const wrapper = render(props)
       act(() => {
-        wrapper.find(StepItem)!.prop('handleClick')!(mockClickEvent)
+        // @ts-expect-error(sa, 2021-6-21): handleClick handler might not exist
+        wrapper.find(StepItem).prop('handleClick')(mockClickEvent)
       })
       wrapper.update()
       const confirmDeleteModal = wrapper.find(ConfirmDeleteModal)
@@ -221,7 +223,8 @@ describe('ConnectedStepItem', () => {
       const props = { stepId: mockId, stepNumber: 1 }
       const wrapper = render(props)
       act(() => {
-        wrapper.find(StepItem)!.prop('handleClick')!(mockClickEvent)
+        // @ts-expect-error(sa, 2021-6-21): handleClick handler might not exist
+        wrapper.find(StepItem).prop('handleClick')(mockClickEvent)
       })
       wrapper.update()
       const confirmDeleteModal = wrapper.find(ConfirmDeleteModal)
@@ -242,7 +245,8 @@ describe('ConnectedStepItem', () => {
 
         const props = { stepId: mockId, stepNumber: 1 }
         const wrapper = render(props)
-        wrapper.find(StepItem)!.prop('handleClick')!(mockClickEvent)
+        // @ts-expect-error(sa, 2021-6-21): handleClick handler might not exist
+        wrapper.find(StepItem).prop('handleClick')(mockClickEvent)
         const actions = store.getActions()
         const selectStepAction = {
           type: 'SELECT_MULTIPLE_STEPS',
@@ -263,7 +267,8 @@ describe('ConnectedStepItem', () => {
 
         const props = { stepId: mockId, stepNumber: 1 }
         const wrapper = render(props)
-        wrapper.find(StepItem)!.prop('handleClick')!(mockClickEvent)
+        // @ts-expect-error(sa, 2021-6-21): handleClick handler might not exist
+        wrapper.find(StepItem).prop('handleClick')(mockClickEvent)
         const actions = store.getActions()
         const selectStepAction = {
           type: 'SELECT_MULTIPLE_STEPS',
@@ -289,7 +294,8 @@ describe('ConnectedStepItem', () => {
         }
         const wrapper = render(props)
         act(() => {
-          wrapper.find(StepItem)!.prop('handleClick')!(clickEvent)
+          // @ts-expect-error(sa, 2021-6-21): handleClick handler might not exist
+          wrapper.find(StepItem).prop('handleClick')(clickEvent)
         })
         wrapper.update()
         const confirmDeleteModal = wrapper.find(ConfirmDeleteModal)
@@ -311,7 +317,8 @@ describe('ConnectedStepItem', () => {
         }
         const wrapper = render(props)
         act(() => {
-          wrapper.find(StepItem)!.prop('handleClick')!(clickEvent)
+          // @ts-expect-error(sa, 2021-6-21): handleClick handler might not exist
+          wrapper.find(StepItem).prop('handleClick')(clickEvent)
         })
         wrapper.update()
         const confirmDeleteModal = wrapper.find(ConfirmDeleteModal)
@@ -581,7 +588,8 @@ describe('ConnectedStepItem', () => {
             setupMocks()
           }
           const wrapper = render(props)
-          wrapper.find(StepItem)!.prop('handleClick')!(mockClickEvent)
+          // @ts-expect-error(sa, 2021-6-21): handleClick handler might not exist
+          wrapper.find(StepItem).prop('handleClick')(mockClickEvent)
           const actions = store.getActions()
           expect(actions[0]).toEqual(expectedAction)
         })
@@ -601,7 +609,8 @@ describe('ConnectedStepItem', () => {
         }
         const wrapper = render(props)
         act(() => {
-          wrapper.find(StepItem)!.prop('handleClick')!(clickEvent)
+          // @ts-expect-error(sa, 2021-6-21): handleClick handler might not exist
+          wrapper.find(StepItem).prop('handleClick')(clickEvent)
         })
         wrapper.update()
         const confirmDeleteModal = wrapper.find(ConfirmDeleteModal)
@@ -623,7 +632,8 @@ describe('ConnectedStepItem', () => {
         }
         const wrapper = render(props)
         act(() => {
-          wrapper.find(StepItem)!.prop('handleClick')!(clickEvent)
+          // @ts-expect-error(sa, 2021-6-21): handleClick handler might not exist
+          wrapper.find(StepItem).prop('handleClick')(clickEvent)
         })
         wrapper.update()
         const confirmDeleteModal = wrapper.find(ConfirmDeleteModal)
@@ -652,7 +662,8 @@ describe('ConnectedStepItem', () => {
         })
 
         const wrapper = render(props)
-        wrapper.find(StepItem)!.prop('handleClick')!(clickEvent)
+        // @ts-expect-error(sa, 2021-6-21): handleClick handler might not exist
+        wrapper.find(StepItem).prop('handleClick')(clickEvent)
         const actions = store.getActions()
         expect(actions[0]).toEqual({ payload: 'SOMEID', type: 'SELECT_STEP' })
       })
@@ -746,7 +757,8 @@ describe('ConnectedStepItem', () => {
               }
             })
             const wrapper = render(props)
-            wrapper.find(StepItem)!.prop('handleClick')!(clickEvent)
+            // @ts-expect-error(sa, 2021-6-21): handleClick handler might not exist
+            wrapper.find(StepItem).prop('handleClick')(clickEvent)
             const actions = store.getActions()
             expect(actions[0]).toEqual(expectedAction)
           })
@@ -773,7 +785,8 @@ describe('ConnectedStepItem', () => {
         })
 
         const wrapper = render(props)
-        wrapper.find(StepItem)!.prop('handleClick')!(clickEvent)
+        // @ts-expect-error(sa, 2021-6-21): handleClick handler might not exist
+        wrapper.find(StepItem).prop('handleClick')(clickEvent)
         const actions = store.getActions()
         expect(actions[0]).toEqual({ payload: 'SOMEID', type: 'SELECT_STEP' })
       })
@@ -846,7 +859,8 @@ describe('ConnectedStepItem', () => {
               }
             })
             const wrapper = render(props)
-            wrapper.find(StepItem)!.prop('handleClick')!(clickEvent)
+            // @ts-expect-error(sa, 2021-6-21): handleClick handler might not exist
+            wrapper.find(StepItem).prop('handleClick')(clickEvent)
             const actions = store.getActions()
             expect(actions[0]).toEqual(expectedAction)
           })
