@@ -20,7 +20,9 @@ if typing.TYPE_CHECKING:
     from opentrons_shared_data.pipette.dev_types import LabwareUri
     from .dev_types import CalibrationIndexDict, CalibrationDict
 
+
 log = logging.getLogger(__name__)
+
 
 def _format_calibration_type(
         data: 'CalibrationDict') -> local_types.LabwareCalibrationTypes:
