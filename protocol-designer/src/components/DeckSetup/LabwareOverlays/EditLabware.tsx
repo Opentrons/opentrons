@@ -4,18 +4,26 @@ import { connect } from 'react-redux'
 import cx from 'classnames'
 import { Icon } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
-import { DragSource, DropTarget } from 'react-dnd'
+import {
+  DragSource,
+  DragSourceConnector,
+  DragSourceMonitor,
+  DropTarget,
+  DropTargetConnector,
+  DropTargetMonitor,
+  DropTargetSpec,
+} from 'react-dnd'
 import { i18n } from '../../../localization'
 import { NameThisLabware } from './NameThisLabware'
 import { DND_TYPES } from '../../../constants'
 import {
-  openIngredientSelector,
   deleteContainer,
   duplicateLabware,
   moveDeckItem,
+  openIngredientSelector,
 } from '../../../labware-ingred/actions'
 import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
-import { BaseState, ThunkDispatch, DeckSlot } from '../../../types'
+import { BaseState, DeckSlot, ThunkDispatch } from '../../../types'
 import { LabwareOnDeck } from '../../../step-forms'
 import styles from './LabwareOverlays.css'
 
@@ -44,7 +52,7 @@ interface DNDP {
 
 type Props = OP & SP & DP & DNDP
 
-const EditLabwareComponent = (props: Props) => {
+const EditLabwareComponent = (props: Props): React.ReactNode => {
   const {
     labwareOnDeck,
     isYetUnnamed,
@@ -127,17 +135,17 @@ const EditLabwareComponent = (props: Props) => {
 }
 
 const labwareSource = {
-  beginDrag: (props, monitor, component) => {
+  beginDrag: (props: Props, monitor: DragSourceMonitor, component: any) => {
     const { labwareOnDeck } = props
     props.setDraggedLabware(labwareOnDeck)
     return { labwareOnDeck }
   },
-  endDrag: (props, monitor, component) => {
+  endDrag: (props: Props, monitor: DragSourceMonitor, component: any) => {
     props.setHoveredLabware(null)
     props.setDraggedLabware(null)
   },
 }
-const collectLabwareSource = (connect, monitor) => ({
+const collectLabwareSource = (connect: DragSourceConnector, monitor: DragSourceMonitor) => ({
   connectDragSource: connect.dragSource(),
   isDragging: monitor.isDragging(),
   draggedItem: monitor.getItem(),
@@ -149,19 +157,19 @@ const DragEditLabware = DragSource(
 )(EditLabwareComponent)
 
 const labwareDropTarget = {
-  canDrop: (props: OP & SP & DP, monitor) => {
+  canDrop: (props: Props, monitor: DropTargetMonitor) => {
     const draggedItem = monitor.getItem()
     const draggedLabware = draggedItem?.labwareOnDeck
     const isDifferentSlot =
       draggedLabware && draggedLabware.slot !== props.labwareOnDeck.slot
     return isDifferentSlot && !props.swapBlocked
   },
-  hover: (props, monitor, component) => {
+  hover: (props: Props, monitor: DropTargetSpec<Props>, component: any) => {
     if (monitor.canDrop) {
       props.setHoveredLabware(component.props.labwareOnDeck)
     }
   },
-  drop: (props, monitor) => {
+  drop: (props: Props, monitor: DropTargetMonitor) => {
     const draggedItem = monitor.getItem()
     if (draggedItem) {
       props.moveDeckItem(
@@ -171,7 +179,7 @@ const labwareDropTarget = {
     }
   },
 }
-const collectLabwareDropTarget = (connect, monitor) => ({
+const collectLabwareDropTarget = (connect: DropTargetConnector, monitor: DropTargetMonitor) => ({
   connectDropTarget: connect.dropTarget(),
   isOver: monitor.isOver(),
   draggedLabware: monitor.getItem()?.labwareOnDeck || null,

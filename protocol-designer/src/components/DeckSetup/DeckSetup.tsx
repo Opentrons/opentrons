@@ -62,7 +62,7 @@ export const DECK_LAYER_BLOCKLIST = [
   'screwHoles',
 ]
 
-interface Props {
+export interface DeckSetupProps {
   selectedTerminalItemId?: TerminalItemId | null
   handleClickOutside?: () => unknown
   drilledDown: boolean
@@ -115,12 +115,14 @@ const getModuleSlotDefs = (
   )
 }
 
-export const getSwapBlocked = (args: {
+export interface SwapBlockedArgs {
   hoveredLabware?: LabwareOnDeckType | null
   draggedLabware?: LabwareOnDeckType | null
   modulesById: InitialDeckSetup['modules']
   customLabwareDefs: LabwareDefByDefURI
-}): boolean => {
+}
+
+export const getSwapBlocked = (args: SwapBlockedArgs): boolean => {
   const {
     hoveredLabware,
     draggedLabware,
@@ -212,7 +214,7 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
 
   const allLabware: LabwareOnDeckType[] = Object.keys(
     initialDeckSetup.labware
-  ).reduce((acc, labwareId) => {
+  ).reduce<string[]>((acc, labwareId) => {
     const labware = initialDeckSetup.labware[labwareId]
     return getLabwareHasQuirk(labware.def, 'fixedTrash')
       ? acc
@@ -299,6 +301,7 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
         )
         .map(slot => {
           return (
+              // @ts-ignore-error (ce, 2021-06-21) needs some type love
             <SlotControls
               key={slot.id}
               slot={slot}
@@ -356,7 +359,7 @@ const getHasGen1MultiChannelPipette = (
   )
 }
 
-export const DeckSetup = (props: Props): JSX.Element => {
+export const DeckSetup = (props: DeckSetupProps): JSX.Element => {
   const _disableCollisionWarnings = useSelector(
     featureFlagSelectors.getDisableModuleRestrictions
   )
