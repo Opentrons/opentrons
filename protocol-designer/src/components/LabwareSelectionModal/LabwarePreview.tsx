@@ -24,7 +24,7 @@ interface Props {
     | null
 }
 
-export const LabwarePreview = (props: Props): JSX.Element => {
+export const LabwarePreview = (props: Props): JSX.Element | null => {
   const { labwareDef, moduleCompatibility } = props
   if (!labwareDef) return null
   const maxVolumes = reduce(

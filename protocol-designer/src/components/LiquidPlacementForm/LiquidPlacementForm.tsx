@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-import { Formik } from 'formik'
+import { Formik, FormikProps } from 'formik'
 import * as Yup from 'yup'
 // TODO: Ian 2018-10-19 move the processors out of steplist (chore)
 import * as fieldProcessors from '../../steplist/fieldLevel/processing'
@@ -10,14 +10,12 @@ import {
   FormGroup,
   OutlineButton,
   PrimaryButton,
+  Options,
 } from '@opentrons/components'
 import { i18n } from '../../localization'
 import styles from './LiquidPlacementForm.css'
 import formStyles from '../forms/forms.css'
 import stepEditFormStyles from '../StepEditForm/StepEditForm.css'
-
-import { Options } from '@opentrons/components'
-import { FormikProps } from 'formik/@flow-typed'
 
 interface ValidFormValues {
   selectedLiquidId: string
@@ -50,6 +48,7 @@ export class LiquidPlacementForm extends React.Component<Props> {
     }
   }
 
+  // @ts-expect-error(sa, 2021-6-22): Yup types not cooporating
   getValidationSchema: () => Yup.Schema<
     {
       selectedLiquidId: string

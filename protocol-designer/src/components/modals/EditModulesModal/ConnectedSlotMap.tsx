@@ -8,7 +8,7 @@ interface ConnectedSlotMapProps {
   fieldName: string
 }
 
-export const ConnectedSlotMap = (props: ConnectedSlotMapProps): JSX.Element => {
+export const ConnectedSlotMap = (props: ConnectedSlotMapProps): JSX.Element | null => {
   const { fieldName } = props
   const [field, meta] = useField(fieldName)
   return field.value ? (

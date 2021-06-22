@@ -12,15 +12,19 @@ import { LiquidGroup } from '../../labware-ingred/types'
 import { BaseState, ThunkDispatch } from '../../types'
 
 type Props = React.ComponentProps<typeof LiquidEditForm>
-interface WrapperProps { showForm: boolean; formKey: string; formProps: Props }
+interface WrapperProps {
+  showForm: boolean
+  formKey: string
+  formProps: Props
+}
 
 type SP = LiquidGroup & {
   _liquidGroupId?: string | null
   showForm: boolean
-  canDelete: $ElementType<Props, 'canDelete'>
+  canDelete: Props['canDelete']
 }
 
-function LiquidEditFormWrapper(props: WrapperProps) {
+function LiquidEditFormWrapper(props: WrapperProps): JSX.Element {
   const { showForm, formKey, formProps } = props
   return showForm ? (
     <LiquidEditForm {...formProps} key={formKey} />
@@ -56,8 +60,11 @@ function mapStateToProps(state: BaseState): SP {
     _liquidGroupId,
     canDelete: _liquidGroupId != null,
     showForm,
+    // @ts-expect-error(sa, 2021-6-22): name might not exist
     name: selectedIngredFields.name,
+    // @ts-expect-error(sa, 2021-6-22): description might not exist
     description: selectedIngredFields.description,
+    // @ts-expect-error(sa, 2021-6-22): serialize might not exist
     serialize: selectedIngredFields.serialize,
   }
 }
@@ -91,6 +98,7 @@ function mergeProps(
 
 export const LiquidsPage = connect(
   mapStateToProps,
+  // @ts-expect-error(sa, 2021-6-21): TODO IMMEDIATELY: figure out why TS does not like this
   null,
   mergeProps
 )(LiquidEditFormWrapper)

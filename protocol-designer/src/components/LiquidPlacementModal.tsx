@@ -122,7 +122,7 @@ const mapStateToProps = (state: BaseState): SP => {
   }
 }
 
-const mapDispatchToProps = (dispatch: Dispatch<*>): DP => ({
+const mapDispatchToProps = (dispatch: Dispatch<any, any>): DP => ({
   deselectWells: wells => dispatch(deselectWells(wells)),
   selectWells: wells => dispatch(selectWells(wells)),
 })

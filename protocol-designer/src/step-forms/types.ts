@@ -2,7 +2,6 @@ import { Mount } from '@opentrons/components'
 import {
   ModuleRealType,
   ModuleModel,
-  PipetteName,
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
@@ -16,7 +15,7 @@ import {
   LabwareEntity,
 } from '@opentrons/step-generation'
 export interface FormPipette {
-  pipetteName: PipetteName
+  pipetteName: string | null | undefined
   tiprackDefURI: string | null | undefined
 }
 export interface FormPipettesByMount {

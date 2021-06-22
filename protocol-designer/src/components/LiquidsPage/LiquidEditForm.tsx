@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-import { Formik } from 'formik'
+import { Formik, FormikProps } from 'formik'
 import * as Yup from 'yup'
 import { i18n } from '../../localization'
 import {
@@ -14,7 +14,6 @@ import {
 import styles from './LiquidEditForm.css'
 import formStyles from '../forms/forms.css'
 
-import { FormikProps } from 'formik/@flow-typed'
 import { LiquidGroup } from '../../labware-ingred/types'
 
 type Props = LiquidGroup & {
@@ -30,7 +29,7 @@ interface LiquidEditFormValues {
   serialize?: boolean
   [key: string]: unknown
 }
-
+// @ts-expect-error(sa, 2021-6-22): Yup schema types not cooporating
 export const liquidEditFormSchema: Yup.Schema<
   { name: string; description: string; serialize: boolean },
   any
