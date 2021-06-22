@@ -121,6 +121,7 @@ export const ContextMenu = (props: Props): JSX.Element => {
         <ConfirmDeleteModal
           modalType={DELETE_STEP_FORM}
           onCancelClick={cancelDelete}
+          // @ts-expect-error (ce: 2021-06-21) - type incompatibility deep down in useConditionalConfirm
           onContinueClick={confirmDelete}
         />
       )}

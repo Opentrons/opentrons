@@ -16,6 +16,7 @@ export const AspDispSection = (props: Props): JSX.Element => {
   const { children, className, collapsed, toggleCollapsed, prefix } = props
   const [targetProps, tooltipProps] = useHoverTooltip()
   return (
+    // @ts-expect-error (ce, 2021-06-21) TS2322: Type 'string | null | undefined' is not assignable to type 'string | undefined'.
     <div className={className}>
       <div className={styles.section_header}>
         <span className={styles.section_header_text}>{prefix}</span>

@@ -31,8 +31,8 @@ export function getDisabledPathMap(
   if (!pipette) return null
   const wellRatio = getWellRatio(aspirate_wells, dispense_wells)
   let disabledPathMap: {
-    multiAspirate: string
-    multiAspirate: string
+    multiAspirate?: string,
+    multiDispense?: string
   } = {}
 
   // changeTip is lowest priority disable reasoning
@@ -114,6 +114,6 @@ export function getDisabledPathMap(
       ),
     }
   }
-
+  // @ts-expect-error (ce, 2021-06-22) Property 'single' is missing in type '{ multiAspirate?: string | undefined; multiDispense?: string | undefined; }' but required in type 'Record<PathOption, string>'
   return disabledPathMap
 }

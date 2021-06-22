@@ -67,7 +67,6 @@ function getRootReducer(): Reducer<BaseState, Action> {
   }
 }
 
-// TODO(CE: 2021-07-08) cheating a little 'cause I need a store type
 export type StoreType = Store<BaseState, Action>
 
 export function configureStore(): StoreType {

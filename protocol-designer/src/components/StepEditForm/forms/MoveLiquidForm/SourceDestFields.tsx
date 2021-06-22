@@ -22,7 +22,7 @@ import { StepFieldName } from '../../../../steplist/fieldLevel'
 import { FieldPropsByName } from '../../types'
 import styles from '../../StepEditForm.css'
 
-interface Props {
+export interface SourceDestFieldsProps {
   className?: string | null
   prefix: 'aspirate' | 'dispense'
   propsForFields: FieldPropsByName
@@ -33,7 +33,7 @@ const makeAddFieldNamePrefix = (prefix: string) => (
   fieldName: string
 ): StepFieldName => `${prefix}_${fieldName}`
 
-export const SourceDestFields = (props: Props): JSX.Element => {
+export const SourceDestFields = (props: SourceDestFieldsProps): JSX.Element => {
   const { className, formData, prefix, propsForFields } = props
 
   const addFieldNamePrefix = makeAddFieldNamePrefix(prefix)
@@ -64,6 +64,7 @@ export const SourceDestFields = (props: Props): JSX.Element => {
   )
 
   return (
+    // @ts-expect-error (ce: 2021-06-21) does not support null
     <div className={className}>
       <div className={styles.form_row}>
         <FlowRateField

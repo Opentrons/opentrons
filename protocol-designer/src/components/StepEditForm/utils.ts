@@ -82,7 +82,7 @@ export const getDirtyFields = (
     // "Dirty" any fields that differ from default new form values
     const defaultFormData = getDefaultsForStepType(formData.stepType)
     dirtyFields = Object.keys(defaultFormData).reduce(
-      (acc, fieldName: StepFieldName) => {
+      (acc: string[], fieldName: StepFieldName) => {
         const currentValue = data[fieldName]
         const initialValue = defaultFormData[fieldName]
         return isEqual(currentValue, initialValue) ? acc : [...acc, fieldName]
@@ -102,6 +102,7 @@ export const getVisibleFormErrors = (args: {
   const { focusedField, dirtyFields, errors } = args
   return errors.filter(error => {
     const dependentFieldsAreNotFocused = !error.dependentFields.includes(
+      // @ts-expect-error (ce, 2021-06-21) not constrained
       focusedField
     )
     const dependentFieldsAreDirty =
@@ -117,6 +118,7 @@ export const getVisibleFormWarnings = (args: {
   const { focusedField, dirtyFields, errors } = args
   return errors.filter(error => {
     const dependentFieldsAreNotFocused = !error.dependentFields.includes(
+      // @ts-expect-error (ce, 2021-06-21) not constrained
       focusedField
     )
     const dependentFieldsAreDirty =
@@ -155,6 +157,7 @@ export const getVisibleProfileFormLevelErrors = (args: {
           })
         )
         const dependentFieldsAreNotFocused = !fieldsForStep.includes(
+          // @ts-expect-error (ce, 2021-06-21) not constrained
           focusedField
         )
         const dependentProfileFieldsAreDirty =

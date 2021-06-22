@@ -62,7 +62,7 @@ function mapStateToProps(state: BaseState, ownProps: OP): SP {
   }
 }
 
-const mergeProps = (stateProps: SP, dispatchProps, ownProps: OP): Props => {
+const mergeProps = (stateProps: SP, dispatchProps: undefined, ownProps: OP): Props => {
   const { pipetteId, ...passThruProps } = ownProps
   return { ...stateProps, ...passThruProps }
 }

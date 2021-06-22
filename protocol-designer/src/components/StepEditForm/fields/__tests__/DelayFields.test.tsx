@@ -1,5 +1,5 @@
-// @flow
-import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
+import _fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
+import { LabwareDefinition2 } from '@opentrons/shared-data'
 import React from 'react'
 import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
@@ -9,6 +9,8 @@ import { CheckboxRowField, TextField, TipPositionField } from '../../fields'
 import { DelayFields, DelayFieldProps } from '../DelayFields'
 
 jest.mock('../../../../step-forms/selectors')
+
+const fixture96Plate = _fixture_96_plate as LabwareDefinition2
 
 const getUnsavedFormMock = stepFormSelectors.getUnsavedForm as jest.MockedFunction<
   typeof stepFormSelectors.getUnsavedForm
@@ -33,18 +35,21 @@ beforeEach(() => {
   getLabwareEntitiesMock.mockReturnValue({
     labware123asp: {
       id: 'labware123asp',
-      labwareDefURI: fixture_96_plate.labwareDefURI,
-      def: fixture_96_plate,
+      // @ts-expect-error (ce, 2021-06-21) `labwareDefURI` doesn't exist in `LabwareDefinition2` nor `_fixture_96_plate`
+      labwareDefURI: fixture96Plate.labwareDefURI,
+      def: fixture96Plate,
     },
     labware123disp: {
       id: 'labware123disp',
-      labwareDefURI: fixture_96_plate.labwareDefURI,
-      def: fixture_96_plate,
+      // @ts-expect-error (ce, 2021-06-21) `labwareDefURI` doesn't exist in `LabwareDefinition2` nor `_fixture_96_plate`
+      labwareDefURI: fixture96Plate.labwareDefURI,
+      def: fixture96Plate,
     },
     labware123: {
       id: 'labware123',
-      labwareDefURI: fixture_96_plate.labwareDefURI,
-      def: fixture_96_plate,
+      // @ts-expect-error (ce, 2021-06-21) `labwareDefURI` doesn't exist in `LabwareDefinition2` nor `_fixture_96_plate`
+      labwareDefURI: fixture96Plate.labwareDefURI,
+      def: fixture96Plate,
     },
   })
 })
@@ -161,7 +166,7 @@ describe('DelayFields', () => {
   })
 
   describe('Dispense Delay', () => {
-    let props
+    let props: DelayFieldProps
     beforeEach(() => {
       props = {
         checkboxFieldName: 'dispense_delay_checkbox',

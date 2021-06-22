@@ -26,6 +26,7 @@ export const StepFormDropdown = (props: StepFormDropdownProps): JSX.Element => {
   // TODO: BC abstract e.currentTarget.value inside onChange with fn like onChangeValue of type (value: unknown) => {}
   // blank out the dropdown if labware id does not exist
   const availableOptionIds = options.map(opt => opt.value)
+  // @ts-expect-error (ce, 2021-06-21) unknown not assignable to string
   const fieldValue = availableOptionIds.includes(value) ? String(value) : null
 
   return (

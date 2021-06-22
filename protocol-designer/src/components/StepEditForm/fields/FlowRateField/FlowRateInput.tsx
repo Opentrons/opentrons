@@ -99,7 +99,7 @@ export const FlowRateInput = (props: FlowRateInputProps): JSX.Element => {
     setModalUseDefault(e.target.value !== 'custom')
   }
 
-  const handleChangeNumber = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleChangeNumber = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
     if (value === '' || value === '.' || !Number.isNaN(Number(value))) {
       setModalFlowRate(value)

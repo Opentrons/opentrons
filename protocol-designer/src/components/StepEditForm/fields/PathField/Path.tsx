@@ -17,7 +17,12 @@ const PATH_ANIMATION_IMAGES = {
   multiDispense: require('../../../../images/path_multiDispense.gif'),
 }
 
-const ALL_PATH_OPTIONS = [
+interface PathOptions {
+    name: PathOption,
+    image: string
+}
+
+const ALL_PATH_OPTIONS: PathOptions[] = [
   {
     name: 'single',
     image: SINGLE_IMAGE,
@@ -85,7 +90,7 @@ const PathButton = (buttonProps: ButtonProps) => {
           [styles.selected]: selected,
           [styles.disabled]: disabled,
         })}
-        onClick={disabled ? null : onClick}
+        onClick={disabled ? undefined : onClick}
         id={id}
         data-test={pathButtonData}
       >

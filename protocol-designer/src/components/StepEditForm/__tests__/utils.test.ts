@@ -3,13 +3,14 @@ import {
   SOURCE_WELL_BLOWOUT_DESTINATION,
   DEST_WELL_BLOWOUT_DESTINATION,
 } from '@opentrons/step-generation'
+import { DropdownOption } from '@opentrons/components'
 import { getBlowoutLocationOptionsForForm } from '../utils'
 
 describe('getBlowoutLocationOptionsForForm', () => {
-  let destOption
-  let sourceOption
-  let disabledSourceOption
-  let disabledDestOption
+  let destOption: DropdownOption
+  let sourceOption: DropdownOption
+  let disabledSourceOption: DropdownOption
+  let disabledDestOption: DropdownOption
   const sourceName = 'Source Well'
   const destName = 'Destination Well'
 
