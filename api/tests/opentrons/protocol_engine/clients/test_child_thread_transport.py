@@ -3,19 +3,13 @@
 import pytest
 from asyncio import AbstractEventLoop
 from datetime import datetime
-from decoy import Decoy, matchers
+from decoy import Decoy
 from functools import partial
 
 
 from opentrons.protocol_engine import ProtocolEngine, commands
 from opentrons.protocol_engine.errors import ProtocolEngineError
 from opentrons.protocol_engine.clients.transports import ChildThreadTransport
-
-
-@pytest.fixture
-def decoy() -> Decoy:
-    """Create a Decoy state container for this test suite."""
-    return Decoy()
 
 
 @pytest.fixture

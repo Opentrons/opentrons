@@ -1,3 +1,4 @@
+"""Fixtures for protocol engine command tests."""
 import pytest
 from decoy import Decoy
 

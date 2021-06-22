@@ -13,7 +13,6 @@ from opentrons.util.helpers import utc_now
 from opentrons.hardware_control.api import API as HardwareController
 
 from opentrons.protocol_engine import (
-    ProtocolEngine,
     StateStore,
     StateView,
     CommandHandlers,
@@ -168,18 +167,4 @@ def store(standard_deck_def: DeckDefinitionV2) -> StateStore:
     return StateStore(
         deck_definition=standard_deck_def,
         deck_fixed_labware=[],
-    )
-
-
-@pytest.fixture
-def engine(
-    mock_hardware: AsyncMock,
-    mock_state_store: MagicMock,
-    mock_resources: AsyncMock,
-) -> ProtocolEngine:
-    """Get a ProtocolEngine with its dependencies mocked out."""
-    return ProtocolEngine(
-        hardware=mock_hardware,
-        state_store=mock_state_store,
-        resources=mock_resources,
     )

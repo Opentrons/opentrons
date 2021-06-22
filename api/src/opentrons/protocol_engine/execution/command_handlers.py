@@ -34,10 +34,7 @@ class CommandHandlers:
             resources=resources,
         )
 
-        movement = MovementHandler(
-            state=state,
-            hardware=hardware
-        )
+        movement = MovementHandler(state=state, hardware=hardware)
 
         pipetting = PipettingHandler(
             state=state,
