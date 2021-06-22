@@ -1837,7 +1837,7 @@ class SmoothieDriver:
                 pass
             else:
                 raise
-        #
+
         if not await self.is_connected():
             log.info("Getting port to connect")
             await self._connect_to_port()

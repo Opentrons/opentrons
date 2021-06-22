@@ -63,7 +63,7 @@ class AsyncSerial:
         Args:
             match: a sequence of bytes to match
             timeout: optional timeout in seconds. this is a temporary override
-                of parameter supplied to create
+                of parameter supplied to `create`
 
         Returns:
             read data.
