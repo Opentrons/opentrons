@@ -17,8 +17,8 @@
   },
   "homepage": "https://github.com/Opentrons/opentrons#readme",
   "peerDependencies": {
-    "react": "16.8.6",
-    "react-router-dom": "5.1.1"
+    "react": "16.14.0",
+    "react-router-dom": "5.1.2"
   },
   "dependencies": {
     "@opentrons/shared-data": "4.4.0",

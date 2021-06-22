@@ -12,8 +12,6 @@ const { DEV_MODE, ENABLE_ANALYZER, DEFAULT_PORT } = require('./env')
 module.exports = {
   target: 'web',
 
-  entry: DEV_MODE ? ['react-hot-loader/patch'] : [],
-
   output: {
     filename: DEV_MODE ? 'bundle.js' : 'bundle.[contenthash].js',
   },
@@ -44,9 +42,6 @@ module.exports = {
   ].filter(Boolean),
 
   resolve: {
-    alias: {
-      'react-dom': '@hot-loader/react-dom',
-    },
     extensions: ['.wasm', '.mjs', '.js', '.ts', '.tsx', '.json'],
   },
 

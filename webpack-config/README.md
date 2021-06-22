@@ -44,7 +44,6 @@ module.exports = {
 Our base configuration is designed to be used with [webpack-merge][] and includes:
 
 - `target: 'web'`
-- `react-hot-loader/patch` in `entry` if `$NODE_ENV` is `development`
 - `mode` set to `development` or `production` depending on `$NODE_ENV`
 - `devtool` set to sane development and production values
 - All loader rules in `rules` enabled (see below)

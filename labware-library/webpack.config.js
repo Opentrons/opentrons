@@ -4,10 +4,10 @@ const webpack = require('webpack')
 const merge = require('webpack-merge')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const FaviconsWebpackPlugin = require('favicons-webpack-plugin')
-// const glob = require('glob')
 
-const { baseConfig } = require('@opentrons/webpack-config')
-// const {baseConfig, DEV_MODE} = require('@opentrons/webpack-config')
+const { baseConfig, DEV_MODE } = require('@opentrons/webpack-config')
+const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin')
+
 const pkg = require('./package.json')
 
 const JS_ENTRY = path.join(__dirname, 'src/index.tsx')
@@ -47,6 +47,8 @@ module.exports = merge(baseConfig, {
 
   plugins: [
     new webpack.EnvironmentPlugin(envVars),
+
+    ...(DEV_MODE ? [new ReactRefreshWebpackPlugin()] : []),
 
     new HtmlWebpackPlugin({
       template: HTML_ENTRY,

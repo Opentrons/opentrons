@@ -1,6 +1,5 @@
 // main application wrapper component
 import * as React from 'react'
-import { hot } from 'react-hot-loader/root'
 import cx from 'classnames'
 
 import { DefinitionRoute } from '../../definitions'
@@ -53,4 +52,4 @@ export function AppWithRoute(): JSX.Element {
   return <DefinitionRoute render={props => <AppComponent {...props} />} />
 }
 
-export const App = hot(AppWithRoute)
+export const App = AppWithRoute
