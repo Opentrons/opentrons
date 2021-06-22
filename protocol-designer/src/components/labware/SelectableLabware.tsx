@@ -62,7 +62,7 @@ export class SelectableLabware extends React.Component<Props> {
     return selectedWells
   }
 
-  handleSelectionMove: (e: React.MouseEvent, rect: GenericRect) => void = (
+  handleSelectionMove: (e: MouseEvent, rect: GenericRect) => void = (
     e,
     rect
   ) => {
@@ -89,7 +89,8 @@ export class SelectableLabware extends React.Component<Props> {
       }
     }
   }
-  handleSelectionDone: (e: React.MouseEvent, rect: GenericRect) => void = (
+
+  handleSelectionDone: (e: MouseEvent, rect: GenericRect) => void = (
     e,
     rect
   ) => {

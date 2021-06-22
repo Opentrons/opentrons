@@ -154,6 +154,7 @@ const DragEditLabware = DragSource(
   DND_TYPES.LABWARE,
   labwareSource,
   collectLabwareSource
+  // @ts-expect-error(sa, 2021-6-21): react node types mismatch with react dnd
 )(EditLabwareComponent)
 
 const labwareDropTarget = {

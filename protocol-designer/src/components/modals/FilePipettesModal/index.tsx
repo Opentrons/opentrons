@@ -49,7 +49,7 @@ export interface ModuleCreationArgs {
   slot: DeckSlot
 }
 
-interface FormState {
+export interface FormState {
   fields: NewProtocolFields
   pipettesByMount: FormPipettesByMount
   modulesByType: FormModulesByType

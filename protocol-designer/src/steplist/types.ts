@@ -19,19 +19,25 @@ export type WellIngredientNames = Record<string, string>
 // We tried to unify them with Maybes and Unions, but really they should be
 // treated as 2 distinct paths
 export type WellIngredientVolumeData =
-  | Record<
-      string,
-      {
-        volume: number
-      }
-    >
-  | Record<
-      string,
+  // single-channel format
+  | Partial<
       Record<
         string,
         {
           volume: number
         }
+      >
+    >
+  // multi-channel 'by well' format
+  | Partial<
+      Record<
+        string,
+        Record<
+          string,
+          {
+            volume: number
+          }
+        >
       >
     >
 export interface TipLocation {

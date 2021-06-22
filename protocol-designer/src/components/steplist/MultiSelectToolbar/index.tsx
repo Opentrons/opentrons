@@ -19,6 +19,7 @@ import {
   C_DARK_GRAY,
   BORDER_SOLID_MEDIUM,
   POSITION_STICKY,
+  IconName,
 } from '@opentrons/components'
 import { selectors as stepFormSelectors } from '../../../step-forms'
 import {
@@ -33,9 +34,7 @@ import {
   DELETE_MULTIPLE_STEP_FORMS,
 } from '../../modals/ConfirmDeleteModal'
 
-import { IconName } from '@opentrons/components'
-
-interface ClickableIconProps {
+export interface ClickableIconProps {
   id?: string
   iconName: IconName
   tooltipText: string
@@ -68,6 +67,7 @@ export const ClickableIcon = (props: ClickableIconProps): JSX.Element => {
   }
 
   return (
+    // @ts-expect-error(sa, 2021-6-21): not sure why this is not a valid css prop
     <Box id={id} {...boxStyles} {...targetProps} css={iconBoxStyles}>
       <Tooltip {...tooltipProps}>{tooltipText}</Tooltip>
       <Box onClick={onClick}>
@@ -118,7 +118,7 @@ export const MultiSelectToolbar = (props: Props): JSX.Element => {
     ? () => dispatch(stepActions.deselectAllSteps())
     : () => dispatch(stepActions.selectAllSteps())
 
-  const onDuplicateClickAction = () => {
+  const onDuplicateClickAction = (): void => {
     if (selectedStepIds) {
       dispatch(stepActions.duplicateMultipleSteps(selectedStepIds))
     } else {
@@ -128,7 +128,7 @@ export const MultiSelectToolbar = (props: Props): JSX.Element => {
     }
   }
 
-  const onDeleteClickAction = () => {
+  const onDeleteClickAction = (): void => {
     if (selectedStepIds) {
       dispatch(deleteMultipleSteps(selectedStepIds))
     } else {
@@ -159,27 +159,30 @@ export const MultiSelectToolbar = (props: Props): JSX.Element => {
     cancel: cancelDelete,
   } = useConditionalConfirm(onDeleteClickAction, true)
 
-  const selectProps = {
+  const selectProps: ClickableIconProps = {
     iconName: isAllStepsSelected ? 'checkbox-marked' : 'minus-box',
     tooltipText: isAllStepsSelected ? 'Deselect All' : 'Select All',
+    // @ts-expect-error(sa, 2021-6-21): type issue with useConditionalConfirm
     onClick: confirmSelect,
   }
 
-  const deleteProps = {
+  const deleteProps: ClickableIconProps = {
     iconName: 'delete',
     tooltipText: 'Delete',
     width: '1.5rem',
     alignRight: true,
+    // @ts-expect-error(sa, 2021-6-21): type issue with useConditionalConfirm
     onClick: confirmDelete,
   }
 
-  const copyProps = {
+  const copyProps: ClickableIconProps = {
     iconName: 'content-copy',
     tooltipText: 'Duplicate',
+    // @ts-expect-error(sa, 2021-6-21): type issue with useConditionalConfirm
     onClick: confirmDuplicate,
   }
 
-  const expandProps = {
+  const expandProps: ClickableIconProps = {
     iconName: isExpandState
       ? 'unfold-more-horizontal'
       : 'unfold-less-horizontal',

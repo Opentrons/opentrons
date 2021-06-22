@@ -27,8 +27,9 @@ const NameThisLabwareComponent = (props: Props) => {
   const saveNickname = () => {
     props.setLabwareName(inputValue || null)
   }
-
-  const wrapperRef = useOnClickOutside({ onClickOutside: saveNickname })
+  const wrapperRef: React.RefObject<HTMLDivElement> = useOnClickOutside({
+    onClickOutside: saveNickname,
+  })
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value)

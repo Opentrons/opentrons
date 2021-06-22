@@ -1,15 +1,16 @@
 // @flow
 
-import { getPipetteNameSpecs } from '@opentrons/shared-data'
+import { getPipetteNameSpecs, PipetteName } from '@opentrons/shared-data'
 import * as React from 'react'
 import cx from 'classnames'
 import styles from './FilePipettesModal.css'
 import { InstrumentDiagram } from '@opentrons/components'
 
 interface Props {
-  leftPipette?: string | null
-  rightPipette?: string | null
+  leftPipette?: PipetteName
+  rightPipette?: PipetteName
 }
+
 export function PipetteDiagram(props: Props): JSX.Element {
   const { leftPipette, rightPipette } = props
 
@@ -24,7 +25,7 @@ export function PipetteDiagram(props: Props): JSX.Element {
   )
 }
 
-function PipetteGroup(props: Props) {
+function PipetteGroup(props: Props): JSX.Element {
   const { leftPipette, rightPipette } = props
   const leftSpecs = leftPipette && getPipetteNameSpecs(leftPipette)
   const rightSpecs = rightPipette && getPipetteNameSpecs(rightPipette)

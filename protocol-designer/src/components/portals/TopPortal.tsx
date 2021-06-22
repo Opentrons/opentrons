@@ -16,7 +16,7 @@ interface Props { children: React.ReactNode }
 
 /** The children of Portal are rendered into the
  * PortalRoot, if the PortalRoot exists in the DOM */
-export function Portal(props: Props): JSX.Element {
+export function Portal(props: Props): JSX.Element | null {
   const modalRootElem = getPortalElem()
 
   if (!modalRootElem) {

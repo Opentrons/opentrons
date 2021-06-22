@@ -12,7 +12,7 @@ import { FileMetadataFields } from '../file-data'
 import { actions as navActions } from '../navigation'
 
 type Props = React.ComponentProps<typeof FilePage>
-type SP = {
+interface SP {
   instruments: Props['instruments']
   formValues: Props['formValues']
   _initialDeckSetup: InitialDeckSetup
@@ -57,9 +57,9 @@ function mergeProps(
   }
 }
 
-// ce: fix
 export const ConnectedFilePage = connect(
   mapStateToProps,
-  {},
+  // @ts-expect-error(sa, 2021-6-21): TODO IMMEDIATELY: figure out why TS does not like this
+  null,
   mergeProps
 )(FilePage)

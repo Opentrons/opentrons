@@ -80,6 +80,7 @@ export class WellTooltip extends React.Component<Props, State> {
                 <div
                   ref={ref}
                   className={styles.virtual_reference}
+                  // @ts-expect-error(sa, 2021-6-21): can't use null as top and left, default to undefined
                   style={{ top: tooltipY, left: tooltipX }}
                 />
               </Portal>
@@ -94,6 +95,7 @@ export class WellTooltip extends React.Component<Props, State> {
             <Popper
               modifiers={{
                 offset: {
+                  // @ts-expect-error(sa, 2021-6-21): tooltipOffset might be null or undefined
                   offset: `0, ${tooltipOffset + WELL_BORDER_WIDTH * 2}`,
                 },
               }}

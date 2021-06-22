@@ -3,12 +3,11 @@ import React from 'react'
 import { shallow } from 'enzyme'
 import { THERMOCYCLER_MODULE_TYPE } from '@opentrons/shared-data'
 import { THERMOCYCLER_STATE } from '../../../constants'
-import { StepItemContents } from '../StepItem'
+import { StepItemContents, StepItemContentsProps } from '../StepItem'
 import { ModuleStepItems } from '../ModuleStepItems'
-import { StepItemContentsProps } from '../StepItem'
 
 describe('StepItemContents', () => {
-  let props
+  let props: any
   beforeEach(() => {
     props = {
       hoveredSubstep: null,
@@ -18,7 +17,7 @@ describe('StepItemContents', () => {
   })
 
   describe('magnet step type', () => {
-    let magnetProps
+    let magnetProps: any
     beforeEach(() => {
       const stepType: 'magnet' = 'magnet'
       magnetProps = {
@@ -42,6 +41,7 @@ describe('StepItemContents', () => {
     })
 
     it('module rendered with engage when engage is true', () => {
+      // @ts-expect-error(sa, 2021-6-21): StepItemContents might return a list of JSX Elements
       const wrapper = shallow(<StepItemContents {...magnetProps} />)
       const component = wrapper.find(ModuleStepItems)
       expect(component).toHaveLength(1)
@@ -50,6 +50,7 @@ describe('StepItemContents', () => {
 
     it('module rendered with disengage when type is disengage', () => {
       magnetProps.substeps.engage = false
+      // @ts-expect-error(sa, 2021-6-21): StepItemContents might return a list of JSX Elements
       const wrapper = shallow(<StepItemContents {...magnetProps} />)
       const component = wrapper.find(ModuleStepItems)
       expect(component).toHaveLength(1)
@@ -84,6 +85,7 @@ describe('StepItemContents', () => {
         labwareNickname: 'temperature nickname',
         message: 'message',
       }
+      // @ts-expect-error(sa, 2021-6-21): StepItemContents might return a list of JSX Elements
       const wrapper = shallow(<StepItemContents {...temperatureProps} />)
       const component = wrapper.find(ModuleStepItems)
       expect(component).toHaveLength(1)
@@ -97,6 +99,7 @@ describe('StepItemContents', () => {
         labwareNickname: 'temperature nickname',
         message: 'message',
       }
+      // @ts-expect-error(sa, 2021-6-21): StepItemContents might return a list of JSX Elements
       const wrapper = shallow(<StepItemContents {...temperatureProps} />)
       const component = wrapper.find(ModuleStepItems)
       expect(component).toHaveLength(1)
@@ -110,6 +113,7 @@ describe('StepItemContents', () => {
         labwareNickname: 'temperature nickname',
         message: 'message',
       }
+      // @ts-expect-error(sa, 2021-6-21): StepItemContents might return a list of JSX Elements
       const wrapper = shallow(<StepItemContents {...temperatureProps} />)
       const component = wrapper.find(ModuleStepItems)
       expect(component.prop('labwareNickname')).toEqual('temperature nickname')
@@ -142,6 +146,7 @@ describe('StepItemContents', () => {
         labwareNickname: 'temperature nickname',
         message: 'message',
       }
+      // @ts-expect-error(sa, 2021-6-21): StepItemContents might return a list of JSX Elements
       const wrapper = shallow(<StepItemContents {...awaitTemperatureProps} />)
       const component = wrapper.find(ModuleStepItems)
       expect(component).toHaveLength(1)
@@ -180,6 +185,7 @@ describe('StepItemContents', () => {
         labwareNickname: 'tc nickname',
         message: 'message',
       }
+      // @ts-expect-error(sa, 2021-6-21): StepItemContents might return a list of JSX Elements
       const wrapper = shallow(<StepItemContents {...thermocyclerStateProps} />)
       const component = wrapper.find(ModuleStepItems)
       expect(component).toHaveLength(1)

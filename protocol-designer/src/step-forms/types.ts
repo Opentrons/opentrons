@@ -1,27 +1,30 @@
 import { Mount } from '@opentrons/components'
-import { ModuleRealType, ModuleModel } from '@opentrons/shared-data'
-import { DeckSlot } from '../types'
 import {
+  ModuleRealType,
+  ModuleModel,
+  PipetteName,
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+import { DeckSlot } from '../types'
+
 import {
   TemperatureStatus,
   ModuleEntity,
   PipetteEntity,
   LabwareEntity,
 } from '@opentrons/step-generation'
-export type FormPipette = {
-  pipetteName: string | null | undefined
+export interface FormPipette {
+  pipetteName: PipetteName
   tiprackDefURI: string | null | undefined
 }
-export type FormPipettesByMount = {
+export interface FormPipettesByMount {
   left: FormPipette
   right: FormPipette
 }
 // =========== MODULES ========
-export type FormModule = {
+export interface FormModule {
   onDeck: boolean
   model: ModuleModel | null
   slot: DeckSlot
@@ -29,23 +32,23 @@ export type FormModule = {
 // TODO: IL 2020-02-21 somehow use the `typeof X_MODULE_TYPE` imports here instead of writing out the strings.
 // It doesn't seem possible with Flow to use these types as keys in an exact object,
 // unless you write them out like this. See https://github.com/facebook/flow/issues/6492
-export type FormModulesByType = {
+export interface FormModulesByType {
   magneticModuleType: FormModule
   temperatureModuleType: FormModule
   thermocyclerModuleType: FormModule
 }
 export type ModuleEntities = Record<string, ModuleEntity>
 // NOTE: semi-redundant 'type' key in FooModuleState types is required for Flow to disambiguate 'moduleState'
-export type MagneticModuleState = {
+export interface MagneticModuleState {
   type: typeof MAGNETIC_MODULE_TYPE
   engaged: boolean
 }
-export type TemperatureModuleState = {
+export interface TemperatureModuleState {
   type: typeof TEMPERATURE_MODULE_TYPE
   status: TemperatureStatus
   targetTemperature: number | null
 }
-export type ThermocyclerModuleState = {
+export interface ThermocyclerModuleState {
   type: typeof THERMOCYCLER_MODULE_TYPE
   blockTargetTemp: number | null
   // null means block is deactivated
@@ -53,7 +56,7 @@ export type ThermocyclerModuleState = {
   // null means lid is deactivated
   lidOpen: boolean | null // if false, closed. If null, unknown
 }
-export type ModuleTemporalProperties = {
+export interface ModuleTemporalProperties {
   slot: DeckSlot
   moduleState:
     | MagneticModuleState
@@ -75,10 +78,10 @@ export type NormalizedLabwareById = Record<
 export type NormalizedLabware = NormalizedLabwareById[keyof NormalizedLabwareById]
 // =========== TEMPORAL ONLY =====
 // Temporal properties (eg location) that are time-variant
-export type LabwareTemporalProperties = {
+export interface LabwareTemporalProperties {
   slot: DeckSlot
 }
-export type PipetteTemporalProperties = {
+export interface PipetteTemporalProperties {
   mount: Mount
 }
 // =========== ON DECK ========
@@ -87,7 +90,7 @@ export type PipetteTemporalProperties = {
 export type LabwareOnDeck = LabwareEntity & LabwareTemporalProperties
 export type PipetteOnDeck = PipetteEntity & PipetteTemporalProperties
 // TODO: Ian 2019-11-08 make all values Maybe typed
-export type InitialDeckSetup = {
+export interface InitialDeckSetup {
   labware: Record<string, LabwareOnDeck>
   pipettes: Record<string, PipetteOnDeck>
   modules: Record<string, ModuleOnDeck>

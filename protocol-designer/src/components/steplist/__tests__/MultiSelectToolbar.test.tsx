@@ -34,8 +34,8 @@ const getBatchEditFormHasUnsavedChangesMock =
   stepFormSelectors.getBatchEditFormHasUnsavedChanges
 
 describe('MultiSelectToolbar', () => {
-  let store
-  let props
+  let store: any
+  let props: React.ComponentProps<typeof MultiSelectToolbar>
   beforeEach(() => {
     store = mockStore()
     props = {
@@ -113,6 +113,7 @@ describe('MultiSelectToolbar', () => {
     expect(selectIcon.prop('iconName')).toBe('checkbox-marked')
     expect(selectIcon.prop('tooltipText')).toBe('Deselect All')
     act(() => {
+      // @ts-expect-error(sa, 2021-6-21): onClick handler might not exist
       selectIcon.prop('onClick')()
     })
     expect(deselectAllStepsSpy).toHaveBeenCalled()
@@ -133,6 +134,7 @@ describe('MultiSelectToolbar', () => {
     expect(selectIcon.prop('iconName')).toBe('minus-box')
     expect(selectIcon.prop('tooltipText')).toBe('Select All')
     act(() => {
+      // @ts-expect-error(sa, 2021-6-21): onClick handler might not exist
       selectIcon.prop('onClick')()
     })
     expect(selectAllStepsSpy).toHaveBeenCalled()
@@ -154,6 +156,7 @@ describe('MultiSelectToolbar', () => {
       const wrapper = render()
       const expandIcon = wrapper.find(ClickableIcon).at(3)
       act(() => {
+        // @ts-expect-error(sa, 2021-6-21): onClick handler might not exist
         expandIcon.prop('onClick')()
       })
       expect(expandMultipleStepsSpy).toHaveBeenCalledWith(['id_1', 'id_2'])
@@ -168,6 +171,7 @@ describe('MultiSelectToolbar', () => {
       const collapseIcon = wrapper.find(ClickableIcon).at(3)
 
       act(() => {
+        // @ts-expect-error(sa, 2021-6-21): onClick handler might not exist
         collapseIcon.prop('onClick')()
       })
       expect(collapseMultipleStepsSpy).toHaveBeenCalledWith(['id_1', 'id_2'])
@@ -178,6 +182,7 @@ describe('MultiSelectToolbar', () => {
       expect(expandIcon.prop('iconName')).toBe('unfold-more-horizontal')
       expect(expandIcon.prop('tooltipText')).toBe('Expand')
       act(() => {
+        // @ts-expect-error(sa, 2021-6-21): onClick handler might not exist
         expandIcon.prop('onClick')()
       })
       wrapper.update()
@@ -205,6 +210,7 @@ describe('MultiSelectToolbar', () => {
       const deleteIcon = wrapper.find(ClickableIcon).at(1)
 
       act(() => {
+        // @ts-expect-error(sa, 2021-6-21): onClick handler might not exist
         deleteIcon.prop('onClick')()
       })
 
@@ -243,6 +249,7 @@ describe('MultiSelectToolbar', () => {
 
       const copyIcon = wrapper.find(ClickableIcon).at(2)
       act(() => {
+        // @ts-expect-error(sa, 2021-6-21): onClick handler might not exist
         copyIcon.prop('onClick')()
       })
 
@@ -271,6 +278,7 @@ describe('MultiSelectToolbar', () => {
       const copyIcon = wrapper.find(ClickableIcon).at(2)
 
       act(() => {
+        // @ts-expect-error(sa, 2021-6-21): onClick handler might not exist
         copyIcon.prop('onClick')()
       })
 

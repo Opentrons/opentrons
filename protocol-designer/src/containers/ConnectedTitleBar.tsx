@@ -1,9 +1,9 @@
 // @flow
 import * as React from 'react'
 import { Dispatch } from 'redux'
-import { connect, MapStateToProps } from 'react-redux'
+import { connect } from 'react-redux'
 
-import { TitleBar, Icon, IconName } from '@opentrons/components'
+import { TitleBar, Icon, IconName, TitleBarProps } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 import styles from './TitleBar.css'
 import { i18n } from '../localization'
@@ -23,12 +23,11 @@ import { closeIngredientSelector } from '../labware-ingred/actions'
 import { stepIconsByType } from '../form-types'
 import { selectors, Page } from '../navigation'
 
-import { TitleBarProps } from '@opentrons/components'
 import { BaseState } from '../types'
 
 type Props = React.ComponentProps<typeof TitleBar>
 
-type DP = { onBackClick: Props['onBackClick'] }
+interface DP { onBackClick: Props['onBackClick'] }
 
 type SP = Omit<Props, keyof DP> & {
   _page: Page
@@ -36,7 +35,7 @@ type SP = Omit<Props, keyof DP> & {
   _wellSelectionMode?: boolean
 }
 
-type TitleWithIconProps = {
+interface TitleWithIconProps {
   iconName: IconName | null | undefined
   text: string | null | undefined
 }
@@ -51,9 +50,9 @@ function TitleWithIcon(props: TitleWithIconProps): JSX.Element {
   )
 }
 
-type TitleWithBetaTagProps = { text: string | null | undefined }
+interface TitleWithBetaTagProps { text: string | null | undefined }
 
-const TitleWithBetaTag = (props: TitleWithBetaTagProps) => (
+const TitleWithBetaTag = (props: TitleWithBetaTagProps): JSX.Element => (
   <div className={styles.title_wrapper}>
     <div className={styles.icon_inline_text}>{props.text}</div>
     <div className={styles.beta_tag}>{i18n.t('application.beta')}</div>
@@ -174,7 +173,7 @@ function mapStateToProps(state: BaseState): SP {
 
 function mergeProps(
   stateProps: SP,
-  dispatchProps: { dispatch: Dispatch<Action> }
+  dispatchProps: { dispatch: Dispatch<any, any> }
 ): Props {
   const {
     _page,
@@ -208,6 +207,7 @@ const StickyTitleBar = (props: TitleBarProps): JSX.Element => (
 
 export const ConnectedTitleBar = connect(
   mapStateToProps,
+  // @ts-expect-error(sa, 2021-6-21): TODO IMMEDIATELY: figure out why TS does not like this
   null,
   mergeProps
 )(StickyTitleBar)

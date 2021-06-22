@@ -74,7 +74,7 @@ export interface HintArgs {
   handleContinue: () => unknown
 }
 
-export const useBlockingHint = (args: HintArgs): JSX.Element => {
+export const useBlockingHint = (args: HintArgs): JSX.Element | null => {
   const { enabled, hintKey, handleCancel, handleContinue, content } = args
   const isDismissed = useSelector(selectors.getDismissedHints).includes(hintKey)
 

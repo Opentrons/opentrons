@@ -17,10 +17,14 @@ import { StepChangesConfirmModal } from '../../EditPipettesModal/StepChangesConf
 import { PipetteFields } from '../PipetteFields'
 import { ModuleFields } from '../ModuleFields'
 import { FilePipettesModal, Props } from '../'
+import { FormPipettesByMount } from '../../../../step-forms'
+import { FormState } from '..'
 
 describe('FilePipettesModal', () => {
   const tiprackDefURI = 'tiprack_300'
-  let props: Props, initialPipetteValues, initialModuleValues
+  let props: Props,
+    initialPipetteValues: FormPipettesByMount,
+    initialModuleValues: FormState['modulesByType']
   beforeEach(() => {
     initialPipetteValues = {
       left: {
