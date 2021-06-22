@@ -41,15 +41,15 @@ export const makeSingleEditFieldProps = (
     const errorToShow =
       showErrors && errors.length > 0 ? errors.join(', ') : null
 
-    const updateValue = (value: unknown) => {
+    const updateValue = (value: unknown): void => {
       handleChangeFormInput(name, value)
     }
 
-    const onFieldBlur = () => {
+    const onFieldBlur = (): void => {
       blur(name)
     }
 
-    const onFieldFocus = () => {
+    const onFieldFocus = (): void => {
       focus(name)
     }
 

@@ -35,15 +35,15 @@ interface SP {
 
 type Props = OP & SP
 
-function TipPositionInput(props: Props) {
+function TipPositionInput(props: Props): JSX.Element {
   const [isModalOpen, setModalOpen] = React.useState(false)
 
-  const handleOpen = () => {
+  const handleOpen = (): void => {
     if (props.wellDepthMm) {
       setModalOpen(true)
     }
   }
-  const handleClose = () => {
+  const handleClose = (): void => {
     setModalOpen(false)
   }
 
@@ -59,7 +59,7 @@ function TipPositionInput(props: Props) {
 
   const isTouchTipField = getIsTouchTipField(name)
   const isDelayPositionField = getIsDelayPositionField(name)
-  let value = ''
+  let value: number | string = ''
   if (wellDepthMm !== null) {
     // show default value for field in parens if no mmFromBottom value is selected
     // @ts-expect-error (ce, 2021-06-22) value is implicitly of type string.
@@ -113,7 +113,7 @@ interface WrapperProps {
   targetProps: UseHoverTooltipTargetProps
 }
 
-const Wrapper = (props: WrapperProps) =>
+const Wrapper = (props: WrapperProps): JSX.Element =>
   props.isTouchTipField || props.isDelayPositionField ? (
     <div {...props.targetProps}>{props.children}</div>
   ) : (

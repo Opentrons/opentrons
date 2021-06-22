@@ -31,10 +31,10 @@ export interface Props {
     | string
     | {
         left?: {
-          tiprackDefURI: string
+          tiprackDefURI?: string
         }
         right?: {
-          tiprackDefURI: string
+          tiprackDefURI?: string
         }
       }
   touched:
@@ -42,10 +42,10 @@ export interface Props {
     | boolean
     | {
         left?: {
-          tiprackDefURI: boolean
+          tiprackDefURI?: boolean
         }
         right?: {
-          tiprackDefURI: boolean
+          tiprackDefURI?: boolean
         }
       }
   onFieldChange: (event: React.ChangeEvent<HTMLSelectElement>) => unknown
@@ -77,7 +77,7 @@ export function PipetteFields(props: Props): JSX.Element {
 
   type Values<T> = T[keyof T]
 
-  const tiprackOptions = reduce(
+  const tiprackOptions = reduce<typeof allLabware, DropdownOption[]>(
     allLabware,
     (acc, def: Values<typeof allLabware>) => {
       if (def.metadata.displayCategory !== 'tipRack') return acc
@@ -89,7 +89,7 @@ export function PipetteFields(props: Props): JSX.Element {
         },
       ]
     },
-    [] as DropdownOption[]
+    []
   )
 
   const initialTabIndex = props.initialTabIndex || 1

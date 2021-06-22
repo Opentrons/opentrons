@@ -102,7 +102,7 @@ export const getVisibleFormErrors = (args: {
   const { focusedField, dirtyFields, errors } = args
   return errors.filter(error => {
     const dependentFieldsAreNotFocused = !error.dependentFields.includes(
-      // @ts-expect-error (ce, 2021-06-21) not constrained
+      // @ts-expect-error(sa, 2021-6-22): focusedField might be undefined
       focusedField
     )
     const dependentFieldsAreDirty =
@@ -118,7 +118,7 @@ export const getVisibleFormWarnings = (args: {
   const { focusedField, dirtyFields, errors } = args
   return errors.filter(error => {
     const dependentFieldsAreNotFocused = !error.dependentFields.includes(
-      // @ts-expect-error (ce, 2021-06-21) not constrained
+      // @ts-expect-error(sa, 2021-6-22): focusedField might be undefined
       focusedField
     )
     const dependentFieldsAreDirty =
@@ -157,7 +157,7 @@ export const getVisibleProfileFormLevelErrors = (args: {
           })
         )
         const dependentFieldsAreNotFocused = !fieldsForStep.includes(
-          // @ts-expect-error (ce, 2021-06-21) not constrained
+          // @ts-expect-error(sa, 2021-6-22): focusedField might be undefined
           focusedField
         )
         const dependentProfileFieldsAreDirty =

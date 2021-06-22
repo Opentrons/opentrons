@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { LabwareSelectionModal as LabwareSelectionModalComponent } from './LabwareSelectionModal'
-// import { selectors as featureFlagSelectors } from '../../feature-flags'
 import {
   closeLabwareSelector,
   createContainer,
@@ -11,8 +10,7 @@ import {
   actions as labwareDefActions,
   selectors as labwareDefSelectors,
 } from '../../labware-defs'
-import { ModuleOnDeck } from '../../step-forms'
-import { selectors as stepFormSelectors } from '../../step-forms'
+import { selectors as stepFormSelectors, ModuleOnDeck } from '../../step-forms'
 import { BaseState, ThunkDispatch } from '../../types'
 type Props = React.ComponentProps<typeof LabwareSelectionModalComponent>
 interface SP {
@@ -72,6 +70,7 @@ function mergeProps(
 
 export const LabwareSelectionModal = connect(
   mapStateToProps,
+  // @ts-expect-error(sa, 2021-6-21): TODO IMMEDIATELY: figure out why TS does not like this
   null,
   mergeProps
 )(LabwareSelectionModalComponent)

@@ -22,8 +22,8 @@ import { StepFieldName } from '../../../../steplist/fieldLevel'
 import { FieldPropsByName } from '../../types'
 import styles from '../../StepEditForm.css'
 
-export interface SourceDestFieldsProps {
-  className?: string | null
+interface SourceDestFieldsProps {
+  className?: string
   prefix: 'aspirate' | 'dispense'
   propsForFields: FieldPropsByName
   formData: FormData
@@ -38,7 +38,7 @@ export const SourceDestFields = (props: SourceDestFieldsProps): JSX.Element => {
 
   const addFieldNamePrefix = makeAddFieldNamePrefix(prefix)
 
-  const getDelayFields = () => (
+  const getDelayFields = (): JSX.Element => (
     <DelayFields
       checkboxFieldName={addFieldNamePrefix('delay_checkbox')}
       secondsFieldName={addFieldNamePrefix('delay_seconds')}
@@ -54,7 +54,7 @@ export const SourceDestFields = (props: SourceDestFieldsProps): JSX.Element => {
     />
   )
 
-  const getMixFields = () => (
+  const getMixFields = (): JSX.Element => (
     <MixFields
       checkboxFieldName={addFieldNamePrefix('mix_checkbox')}
       volumeFieldName={addFieldNamePrefix('mix_volume')}
@@ -64,7 +64,6 @@ export const SourceDestFields = (props: SourceDestFieldsProps): JSX.Element => {
   )
 
   return (
-    // @ts-expect-error (ce: 2021-06-21) does not support null
     <div className={className}>
       <div className={styles.form_row}>
         <FlowRateField

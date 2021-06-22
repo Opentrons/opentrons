@@ -27,7 +27,7 @@ interface WellSelectionModalProps {
   isOpen: boolean
   labwareId?: string | null
   name: StepFieldName
-  onCloseClick: (e?: React.MouseEvent<any> | null) => unknown
+  onCloseClick: (e?: React.MouseEvent<any>) => unknown
   pipetteId?: string | null
   value: unknown
   updateValue: (val: unknown | null | undefined) => void
@@ -39,7 +39,7 @@ interface WellSelectionModalComponentProps {
   highlightedWells: WellGroup
   ingredNames: WellIngredientNames
   labwareDef?: LabwareDefinition2 | null
-  onCloseClick: (e: React.MouseEvent<any> | null | undefined) => unknown
+  onCloseClick: (e?: React.MouseEvent<any>) => unknown
   pipetteSpec?: PipetteNameSpecs | null
   selectedPrimaryWells: WellGroup
   selectWells: (wellGroup: WellGroup) => unknown
@@ -49,7 +49,7 @@ interface WellSelectionModalComponentProps {
 
 const WellSelectionModalComponent = (
   props: WellSelectionModalComponentProps
-) => {
+): JSX.Element=> {
   const {
     deselectWells,
     handleSave,
@@ -139,17 +139,17 @@ export const WellSelectionModal = (
   const [highlightedWells, setHighlightedWells] = React.useState<WellGroup>({})
 
   // actions
-  const selectWells = (wells: WellGroup) => {
+  const selectWells = (wells: WellGroup): void => {
     setSelectedPrimaryWells(prev => ({ ...prev, ...wells }))
     setHighlightedWells({})
   }
 
-  const deselectWells = (deselectedWells: WellGroup) => {
+  const deselectWells = (deselectedWells: WellGroup): void => {
     setSelectedPrimaryWells(prev => omit(prev, Object.keys(deselectedWells)))
     setHighlightedWells({})
   }
 
-  const handleSave = () => {
+  const handleSave = (): void => {
     const sortedWells = Object.keys(selectedPrimaryWells).sort(sortWells)
     props.updateValue(sortedWells)
     onCloseClick()

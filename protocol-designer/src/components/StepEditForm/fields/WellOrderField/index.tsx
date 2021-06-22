@@ -42,22 +42,19 @@ export const WellOrderField = (props: WellOrderFieldProps): JSX.Element => {
   } = props
   const [isModalOpen, setModalOpen] = React.useState(false)
 
-  const handleOpen = () => {
+  const handleOpen = (): void => {
     setModalOpen(true)
   }
-  const handleClose = () => {
+  const handleClose = (): void => {
     setModalOpen(false)
   }
 
-  const updateValues = (
-    firstValue?: WellOrderOption | null,
-    secondValue?: WellOrderOption | null
-  ): void => {
+  const updateValues = (firstValue: unknown, secondValue: unknown): void => {
     updateFirstWellOrder(firstValue)
     updateSecondWellOrder(secondValue)
   }
 
-  const getIconClassNames = () => {
+  const getIconClassNames = (): string[] => {
     const iconClassNames = []
     if (firstValue) {
       iconClassNames.push(styles[`${firstValue}_first`])
@@ -109,7 +106,7 @@ export const WellOrderField = (props: WellOrderFieldProps): JSX.Element => {
               src={ZIG_ZAG_IMAGE}
               className={cx(
                 styles.well_order_icon,
-                  // @ts-expect-error (ce, 2021-06-22)  Argument of type '{ [x: string]: string | null; }' is not assignable to parameter of type 'ClassValue'.
+                // @ts-expect-error(sa, 2021-6-22): I think props.label needs to be casted to a boolean first
                 { [styles.icon_with_label]: props.label },
                 getIconClassNames()
               )}
@@ -121,6 +118,7 @@ export const WellOrderField = (props: WellOrderFieldProps): JSX.Element => {
           ) : (
             <Text
               onClick={handleOpen}
+              // @ts-expect-error(sa, 2021-6-22): not sure why TS does not like this coming from styled components
               css={mixedWellOrderStyles}
               id={`WellOrderField_button_${props.prefix}`}
               data-test={`WellOrderField_button_${String(firstValue)}_${String(

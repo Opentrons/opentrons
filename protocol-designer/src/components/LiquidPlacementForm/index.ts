@@ -60,7 +60,7 @@ function mapStateToProps(state: BaseState): SP {
 function mergeProps(
   stateProps: SP,
   dispatchProps: {
-    dispatch: Dispatch<any>
+    dispatch: Dispatch<any, any>
   }
 ): Props {
   const {
@@ -91,6 +91,7 @@ function mergeProps(
   return {
     ...passThruProps,
     cancelForm: () => dispatch(deselectAllWells()),
+    // @ts-expect-error(sa, 2021-6-22): clearWells might be null
     clearWells,
     saveForm: (values: LiquidPlacementFormValues) => {
       const { selectedLiquidId } = values
@@ -132,6 +133,7 @@ function mergeProps(
 
 export const LiquidPlacementForm = connect(
   mapStateToProps,
+  // @ts-expect-error(sa, 2021-6-21): TODO IMMEDIATELY: figure out why TS does not like this
   null,
   mergeProps
 )(LiquidPlacementFormComponent)

@@ -5,23 +5,26 @@ import { AlertModal, CheckboxField, OutlineButton } from '@opentrons/components'
 import { i18n } from '../../localization'
 import { actions as stepsActions } from '../../ui/steps'
 import { TerminalItemId } from '../../steplist'
-import { actions, selectors } from '../../tutorial'
+import { actions, selectors, HintKey } from '../../tutorial'
 import { Portal } from '../portals/MainPageModalPortal'
 import styles from './hints.css'
 import EXAMPLE_ADD_LIQUIDS_IMAGE from '../../images/example_add_liquids.png'
 import EXAMPLE_WATCH_LIQUIDS_MOVE_IMAGE from '../../images/example_watch_liquids_move.png'
 import EXAMPLE_BATCH_EDIT_IMAGE from '../../images/announcements/multi_select.gif'
-import { HintKey } from '../../tutorial'
 import { BaseState, ThunkDispatch } from '../../types'
 
-interface SP { hintKey?: HintKey | null }
+interface SP {
+  hintKey?: HintKey | null
+}
 interface DP {
   removeHint: (key: HintKey, rememberDismissal: boolean) => unknown
   selectTerminalItem: (item: TerminalItemId) => unknown
 }
 type Props = SP & DP
 
-interface State { rememberDismissal: boolean }
+interface State {
+  rememberDismissal: boolean
+}
 
 // List of hints that should have /!\ gray AlertModal header
 // (versus calmer non-alert header)
@@ -33,7 +36,7 @@ class HintsComponent extends React.Component<Props, State> {
     this.state = { rememberDismissal: false }
   }
 
-  toggleRememberDismissal = () => {
+  toggleRememberDismissal = (): void => {
     this.setState({ rememberDismissal: !this.state.rememberDismissal })
   }
 

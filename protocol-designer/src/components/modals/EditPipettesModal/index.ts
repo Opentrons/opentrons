@@ -5,7 +5,7 @@ import isEmpty from 'lodash/isEmpty'
 import last from 'lodash/last'
 import filter from 'lodash/filter'
 import mapValues from 'lodash/mapValues'
-
+import { PipetteName } from '@opentrons/shared-data'
 import { uuid } from '../../../utils'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../../constants'
 import { actions as steplistActions } from '../../../steplist'
@@ -13,11 +13,12 @@ import { selectors as featureFlagSelectors } from '../../../feature-flags'
 import {
   actions as stepFormActions,
   selectors as stepFormSelectors,
+  PipetteOnDeck,
+  FormPipettesByMount,
 } from '../../../step-forms'
-import { FilePipettesModal } from '../FilePipettesModal'
+import { FilePipettesModal, PipetteFieldsData } from '../FilePipettesModal'
 import { NormalizedPipette } from '@opentrons/step-generation'
 import { BaseState, ThunkDispatch } from '../../../types'
-import { PipetteOnDeck, FormPipettesByMount } from '../../../step-forms'
 import { StepIdType } from '../../../form-types'
 
 type Props = React.ComponentProps<typeof FilePipettesModal>
@@ -59,17 +60,17 @@ const mapSTP = (state: BaseState): SP => {
 // in one click (create, change manualIntervention step, substitute pipettes
 // across all steps, delete pipettes), which is why it's so funky!
 const makeUpdatePipettes = (
-  prevPipettes,
-  orderedStepIds,
-  dispatch,
-  closeModal
-) => ({ pipettes: newPipetteArray }) => {
+  prevPipettes: SP['_prevPipettes'],
+  orderedStepIds: SP['_orderedStepIds'],
+  dispatch: ThunkDispatch<any>,
+  closeModal: OP['closeModal']
+) => ({ pipettes: newPipetteArray }: { pipettes: PipetteFieldsData[] }) => {
   const prevPipetteIds = Object.keys(prevPipettes)
   const usedPrevPipettes: string[] = [] // IDs of pipettes in prevPipettes that were already put into nextPipettes
   const nextPipettes: {
     [pipetteId: string]: {
       mount: string
-      name: string
+      name: PipetteName
       tiprackDefURI: string
       id: string
     }
@@ -100,7 +101,9 @@ const makeUpdatePipettes = (
     stepFormActions.createPipettes(
       mapValues(
         nextPipettes,
-        (p: $Values<typeof nextPipettes>): NormalizedPipette => ({
+        (
+          p: typeof nextPipettes[keyof typeof nextPipettes]
+        ): NormalizedPipette => ({
           id: p.id,
           name: p.name,
           tiprackDefURI: p.tiprackDefURI,
@@ -128,7 +131,9 @@ const makeUpdatePipettes = (
 
   // SubstitutionMap represents a map of oldPipetteId => newPipetteId
   // When a pipette's tiprack changes, the ids will be the same
-  interface SubstitutionMap { [pipetteId: string]: string }
+  interface SubstitutionMap {
+    [pipetteId: string]: string
+  }
 
   const pipetteReplacementMap: SubstitutionMap = pipetteIdsToDelete.reduce(
     (acc: SubstitutionMap, deletedId: string): SubstitutionMap => {
@@ -136,6 +141,7 @@ const makeUpdatePipettes = (
       const replacementId = Object.keys(nextPipettes).find(
         newId => nextPipettes[newId].mount === deletedPipette.mount
       )
+      // @ts-expect-error(sa, 2021-6-21): redlacementId will always be a string, so right side of the and will always be true
       return replacementId && replacementId !== -1
         ? { ...acc, [deletedId]: replacementId }
         : acc
@@ -145,7 +151,7 @@ const makeUpdatePipettes = (
 
   const pipettesWithNewTipracks: string[] = filter(
     nextPipettes,
-    (nextPipette: $Values<typeof nextPipettes>) => {
+    (nextPipette: typeof nextPipettes[keyof typeof nextPipettes]) => {
       const newPipetteId = nextPipette.id
       const tiprackChanged =
         newPipetteId in prevPipettes &&
@@ -180,6 +186,7 @@ const makeUpdatePipettes = (
       stepFormActions.substituteStepFormPipettes({
         substitutionMap,
         startStepId: orderedStepIds[0],
+        // @ts-expect-error(sa, 2021-6-22): last might return undefined
         endStepId: last(orderedStepIds),
       })
     )
@@ -219,6 +226,7 @@ const mergeProps = (
 
 export const EditPipettesModal = connect(
   mapSTP,
+  // @ts-expect-error(sa, 2021-6-22): TODO IMMEDIATELY: figure out why TS does not like this
   null,
   mergeProps
 )(FilePipettesModal)

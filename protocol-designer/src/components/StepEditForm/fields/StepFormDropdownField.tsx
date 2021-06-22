@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { DropdownField, Options } from '@opentrons/components'
 import cx from 'classnames'

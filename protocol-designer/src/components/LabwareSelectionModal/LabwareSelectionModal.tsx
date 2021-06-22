@@ -58,7 +58,7 @@ const orderedCategories: string[] = [
   // 'trash', // NOTE: trash intentionally hidden
 ]
 
-const RECOMMENDED_LABWARE_BY_MODULE: { [ModuleRealType]: string[] } = {
+const RECOMMENDED_LABWARE_BY_MODULE: { [K in ModuleRealType]: string[] } = {
   [TEMPERATURE_MODULE_TYPE]: [
     'opentrons_24_aluminumblock_generic_2ml_screwcap',
     'opentrons_96_aluminumblock_biorad_wellplate_200ul',
@@ -84,7 +84,7 @@ export const getLabwareIsRecommended = (
       )
     : false
 
-export const LabwareSelectionModal = (props: Props): JSX.Element => {
+export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
   const {
     customLabwareDefs,
     permittedTipracks,
@@ -99,10 +99,9 @@ export const LabwareSelectionModal = (props: Props): JSX.Element => {
   const [selectedCategory, setSelectedCategory] = React.useState<string | null>(
     null
   )
-  const [
-    previewedLabware,
-    setPreviewedLabware,
-  ] = React.useState<LabwareDefinition2 | null>(null)
+  const [previewedLabware, setPreviewedLabware] = React.useState<
+    LabwareDefinition2 | null | undefined
+  >(null)
   const [filterRecommended, setFilterRecommended] = React.useState<boolean>(
     false
   )
@@ -175,7 +174,7 @@ export const LabwareSelectionModal = (props: Props): JSX.Element => {
       { [category: string]: LabwareDefinition2[] }
     >(
       defs,
-      (acc, def: $Values<typeof defs>) => {
+      (acc, def: typeof defs[keyof typeof defs]) => {
         const category: string = def.metadata.displayCategory
         // filter out non-permitted tipracks
         if (
@@ -211,7 +210,7 @@ export const LabwareSelectionModal = (props: Props): JSX.Element => {
     [labwareByCategory, getLabwareDisabled]
   )
 
-  const wrapperRef = useOnClickOutside({
+  const wrapperRef: React.RefObject<HTMLDivElement> = useOnClickOutside({
     onClickOutside: () => {
       // don't close when clicking on the custom labware hint
       if (!enqueuedLabwareType) {
@@ -233,7 +232,9 @@ export const LabwareSelectionModal = (props: Props): JSX.Element => {
       <div className={styles.filters_section}>
         <CheckboxField
           className={styles.filter_checkbox}
-          onChange={e => setFilterRecommended(e.currentTarget.checked)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setFilterRecommended(e.currentTarget.checked)
+          }
           value={filterRecommended}
         />
         <Icon className={styles.icon} name="check-decagram" />
@@ -295,6 +296,7 @@ export const LabwareSelectionModal = (props: Props): JSX.Element => {
                   onMouseEnter={() =>
                     setPreviewedLabware(customLabwareDefs[labwareURI])
                   }
+                  // @ts-expect-error(sa, 2021-6-22): need to pass in a nullsy value
                   onMouseLeave={() => setPreviewedLabware()}
                 />
               ))}
@@ -328,6 +330,7 @@ export const LabwareSelectionModal = (props: Props): JSX.Element => {
                             labwareDef={labwareDef}
                             selectLabware={selectLabware}
                             onMouseEnter={() => setPreviewedLabware(labwareDef)}
+                            // @ts-expect-error(sa, 2021-6-22): setPreviewedLabware expects an argument (even if nullsy)
                             onMouseLeave={() => setPreviewedLabware()}
                           />
                         )

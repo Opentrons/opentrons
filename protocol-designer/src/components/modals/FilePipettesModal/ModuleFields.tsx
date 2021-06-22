@@ -20,13 +20,13 @@ interface Props {
     | string
     | {
         magneticModuleType?: {
-          model: string
+          model?: string
         }
         temperatureModuleType?: {
-          model: string
+          model?: string
         }
         thermocyclerModuleType?: {
-          model: string
+          model?: string
         }
       }
   touched:
@@ -34,13 +34,13 @@ interface Props {
     | boolean
     | {
         magneticModuleType?: {
-          model: boolean
+          model?: boolean
         }
         temperatureModuleType?: {
-          model: boolean
+          model?: boolean
         }
         thermocyclerModuleType?: {
-          model: boolean
+          model?: boolean
         }
       }
   values: FormModulesByType

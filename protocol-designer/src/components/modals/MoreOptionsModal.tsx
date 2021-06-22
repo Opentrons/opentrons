@@ -17,19 +17,24 @@ import modalStyles from './modal.css'
 import styles from './MoreOptionsModal.css'
 
 interface OP {
-  close: (event: React.MouseEvent | null | undefined) => unknown
+  close: (event?: React.MouseEvent) => unknown
   formData: FormData
 }
 
 interface DP {
-  saveValuesToForm: (args: {
-    [StepFieldName]: unknown | null | undefined
-  }) => unknown
+  saveValuesToForm: (
+    args: {
+      [K in StepFieldName]: unknown | null | undefined
+    }
+  ) => unknown
 }
 
 type Props = OP & DP
-interface State { [StepFieldName]: unknown | null | undefined }
-
+interface State {
+  stepDetails: any
+  stepName: unknown
+  [key: string]: unknown
+}
 class MoreOptionsModalComponent extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
@@ -43,12 +48,12 @@ class MoreOptionsModalComponent extends React.Component<Props, State> {
     this.setState({ [fieldName]: e.currentTarget.value })
   }
 
-  handleSave = () => {
+  handleSave = (): void => {
     this.props.saveValuesToForm(this.state)
     this.props.close()
   }
 
-  render() {
+  render(): JSX.Element {
     return (
       <Modal
         heading={i18n.t('modal.step_notes.title')}
@@ -98,7 +103,7 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<any>): DP => ({
     dispatch(steplistActions.changeFormInput({ update })),
 })
 
-export const MoreOptionsModal= connect(
+export const MoreOptionsModal = connect(
   null,
   mapDispatchToProps
 )(MoreOptionsModalComponent)

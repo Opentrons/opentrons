@@ -85,6 +85,7 @@ function mapDispatchToProps(dispatch: ThunkDispatch<any>): DP {
           mapValues(
             pipettesById,
             (p: PipetteOnDeck, id: string): NormalizedPipette => ({
+              // @ts-expect-error(sa, 2021-6-22): id will always get overwritten
               id,
               ...omit(p, 'mount'),
             })

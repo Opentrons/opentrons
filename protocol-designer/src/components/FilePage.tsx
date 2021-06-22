@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-import { Formik } from 'formik'
+import { Formik, FormikProps } from 'formik'
 import { format } from 'date-fns'
 
 import {
@@ -21,7 +21,6 @@ import { EditModules } from './EditModules'
 import styles from './FilePage.css'
 import modalStyles from '../components/modals/modal.css'
 import formStyles from '../components/forms/forms.css'
-import { FormikProps } from 'formik/@flow-typed'
 import { ModuleRealType } from '@opentrons/shared-data'
 import { FileMetadataFields } from '../file-data'
 import { ModulesForEditModulesCard } from '../step-forms'
@@ -30,7 +29,7 @@ export interface Props {
   formValues: FileMetadataFields
   instruments: React.ComponentProps<typeof InstrumentGroup>
   goToNextPage: () => unknown
-  saveFileMetadata: (fileMetaDataFields: FileMetadataFields) => unknown
+  saveFileMetadata: (fileMetaDataFields: FileMetadataFields) => void
   swapPipettes: () => unknown
   modules: ModulesForEditModulesCard
 }
