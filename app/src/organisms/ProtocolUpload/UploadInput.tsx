@@ -17,11 +17,10 @@ import {
   SIZE_3,
   Link,
   DIRECTION_COLUMN,
-  JUSTIFY_CENTER,
   ALIGN_CENTER,
   C_SELECTED_DARK,
   C_WHITE,
-  C_NEAR_WHITE,
+  JUSTIFY_CENTER,
 } from '@opentrons/components'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
@@ -103,14 +102,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element {
     : DROP_ZONE_STYLES
 
   return (
-    <Flex
-      height="100%"
-      width="100%"
-      backgroundColor={C_NEAR_WHITE}
-      flexDirection={DIRECTION_COLUMN}
-      justifyContent={JUSTIFY_CENTER}
-      alignItems={ALIGN_CENTER}
-    >
+    <Flex height="100%" flexDirection={DIRECTION_COLUMN} justifyContent={JUSTIFY_CENTER} alignItems={ALIGN_CENTER}>
       <Text as="h1" css={FONT_HEADER_DARK} marginBottom={SPACING_3}>
         {t('open_a_protocol')}
       </Text>

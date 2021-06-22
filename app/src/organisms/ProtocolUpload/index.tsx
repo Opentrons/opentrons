@@ -3,12 +3,9 @@ import { AlertItem } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import {
-  Flex,
   Text,
+  Box,
   C_NEAR_WHITE,
-  JUSTIFY_CENTER,
-  ALIGN_CENTER,
-  DIRECTION_COLUMN,
 } from '@opentrons/components'
 import { Page } from '../../atoms/Page'
 import { UploadInput } from './UploadInput'
@@ -78,10 +75,16 @@ export function ProtocolUpload(): JSX.Element {
             </Text>)}
         </AlertItem>
       )}
-      { protocolFile !== null
-        ? <ProtocolSetup />
-        : <UploadInput createSession={createSession} />
-      }
+      <Box
+        height="calc(100vh - 3rem)"
+        width="100%"
+        backgroundColor={C_NEAR_WHITE}
+      >
+        { protocolFile !== null
+          ? <ProtocolSetup />
+          : <UploadInput createSession={createSession} />
+        }
+      </Box>
     </Page>
   )
 }
