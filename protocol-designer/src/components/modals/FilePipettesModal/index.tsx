@@ -24,6 +24,7 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V1,
   ModuleRealType,
+  ModuleModel,
 } from '@opentrons/shared-data'
 import { i18n } from '../../../localization'
 import { SPAN7_8_10_11_SLOT } from '../../../constants'
@@ -44,7 +45,7 @@ export type PipetteFieldsData = Omit<
 
 export interface ModuleCreationArgs {
   type: ModuleRealType
-  model: string
+  model: ModuleModel
   slot: DeckSlot
 }
 
@@ -212,7 +213,7 @@ export class FilePipettesModal extends React.Component<Props, State> {
             ...acc,
             {
               type: moduleType,
-              model: formModule.model || '',
+              model: formModule.model || '' as ModuleModel, // TODO: we need to validate that module models are of type ModuleModel
               slot: formModule.slot,
             },
           ]
