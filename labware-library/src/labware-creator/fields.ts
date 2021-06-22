@@ -158,7 +158,7 @@ export interface ProcessedLabwareFields {
   regularColumnSpacing: BooleanString
 
   wellVolume: number
-  wellBottomShape: WellBottomShape
+  wellBottomShape: WellBottomShape | null
   wellDepth: number
   wellShape: WellShape
 
@@ -298,6 +298,7 @@ export const labwareTypeAutofills: Record<
   tipRack: {
     homogeneousWells: 'true' as const,
     wellShape: 'circular' as const,
+    wellBottomShape: null,
   },
   tubeRack: {},
   wellPlate: {},

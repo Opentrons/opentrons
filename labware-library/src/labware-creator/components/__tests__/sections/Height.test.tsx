@@ -7,6 +7,7 @@ import { getDefaultFormState, LabwareFields } from '../../../fields'
 import { isEveryFieldHidden } from '../../../utils'
 import { Height } from '../../sections/Height'
 import { wrapInFormik } from '../../utils/wrapInFormik'
+import { nestedTextMatcher } from '../../__testUtils__/nestedTextMatcher'
 
 jest.mock('../../../utils')
 
@@ -62,9 +63,11 @@ describe('Height Section', () => {
     render(wrapInFormik(<Height />, formikConfig))
     expect(
       screen.getByText(
-        'Include the adapter and tops of the pipette tips in the measurement.'
+        nestedTextMatcher(
+          'Include the adapter and tops of the pipette tips in the measurement.'
+        )
       )
-    )
+    ).toBeInTheDocument()
   })
 
   it('should render form alert when error is present', () => {
