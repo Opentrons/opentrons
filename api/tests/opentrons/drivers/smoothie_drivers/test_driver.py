@@ -22,7 +22,7 @@ async def mock_connection() -> AsyncMock:
 
 @pytest.fixture
 def sim_gpio() -> SimulatingGPIOCharDev:
-    """The mock GPI."""
+    """The mock GPIO."""
     return SimulatingGPIOCharDev("sim")
 
 
