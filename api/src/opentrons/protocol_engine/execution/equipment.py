@@ -9,7 +9,7 @@ from opentrons.hardware_control.api import API as HardwareAPI
 
 from ..errors import FailedToLoadPipetteError, LabwareDefinitionDoesNotExistError
 from ..resources import ResourceProviders
-from ..state import StateView
+from ..state import StateStore, StateView
 from ..types import LabwareLocation, PipetteName
 
 
@@ -33,19 +33,23 @@ class EquipmentHandler:
     """Implementation logic for labware, pipette, and module loading."""
 
     _hardware: HardwareAPI
-    _state: StateView
+    _state_store: StateStore
     _resources: ResourceProviders
 
     def __init__(
         self,
         hardware: HardwareAPI,
-        state: StateView,
+        state_store: StateStore,
         resources: ResourceProviders,
     ) -> None:
         """Initialize an EquipmentHandler instance."""
         self._hardware = hardware
-        self._state = state
+        self._state_store = state_store
         self._resources = resources
+
+    @property
+    def _state(self) -> StateView:
+        return self._state_store.state_view
 
     async def load_labware(
         self,
@@ -53,7 +57,7 @@ class EquipmentHandler:
         namespace: str,
         version: int,
         location: LabwareLocation,
-        labware_id: Optional[str]
+        labware_id: Optional[str],
     ) -> LoadedLabware:
         """Load labware by assigning an identifier and pulling required data.
 
@@ -68,8 +72,9 @@ class EquipmentHandler:
         Returns:
             A LoadedLabware object.
         """
-        labware_id = labware_id if labware_id else \
-            self._resources.id_generator.generate_id()
+        labware_id = (
+            labware_id if labware_id else self._resources.model_utils.generate_id()
+        )
 
         try:
             # Try to use existing definition in state.
@@ -133,7 +138,10 @@ class EquipmentHandler:
         except RuntimeError as e:
             raise FailedToLoadPipetteError(str(e)) from e
 
-        pipette_id = pipette_id if pipette_id is not None else \
-            self._resources.id_generator.generate_id()
+        pipette_id = (
+            pipette_id
+            if pipette_id is not None
+            else self._resources.model_utils.generate_id()
+        )
 
         return LoadedPipette(pipette_id=pipette_id)

@@ -1,7 +1,14 @@
 """Test aspirate commands."""
 from decoy import Decoy
 
-from opentrons.protocol_engine import CommandHandlers, WellLocation, WellOrigin
+from opentrons.protocol_engine import WellLocation, WellOrigin
+
+from opentrons.protocol_engine.execution import (
+    EquipmentHandler,
+    MovementHandler,
+    PipettingHandler,
+)
+
 from opentrons.protocol_engine.commands.aspirate import (
     AspirateData,
     AspirateResult,
@@ -11,9 +18,17 @@ from opentrons.protocol_engine.commands.aspirate import (
 
 async def test_aspirate_implementation(
     decoy: Decoy,
-    command_handlers: CommandHandlers,
+    equipment: EquipmentHandler,
+    movement: MovementHandler,
+    pipetting: PipettingHandler,
 ) -> None:
     """An Aspirate should have an execution implementation."""
+    subject = AspirateImplementation(
+        equipment=equipment,
+        movement=movement,
+        pipetting=pipetting,
+    )
+
     location = WellLocation(origin=WellOrigin.BOTTOM, offset=(0, 0, 1))
 
     data = AspirateData(
@@ -25,7 +40,7 @@ async def test_aspirate_implementation(
     )
 
     decoy.when(
-        await command_handlers.pipetting.aspirate(
+        await pipetting.aspirate(
             pipette_id="abc",
             labware_id="123",
             well_name="A3",
@@ -34,7 +49,6 @@ async def test_aspirate_implementation(
         )
     ).then_return(42)
 
-    subject = AspirateImplementation(data)
-    result = await subject.execute(command_handlers)
+    result = await subject.execute(data)
 
     assert result == AspirateResult(volume=42)

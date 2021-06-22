@@ -13,7 +13,8 @@ they are part of the public input / output of the engine, and need validation
 and/or schema generation.
 """
 
-from .command import CommandStatus, BaseCommand, BaseCommandRequest
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandRequest, CommandStatus
+from .command_mapper import CommandMapper
 from .command_unions import Command, CommandRequest, CommandResult
 
 
@@ -48,16 +49,17 @@ from .pick_up_tip import PickUpTip, PickUpTipRequest, PickUpTipData, PickUpTipRe
 
 
 __all__ = [
-    # command factory
-    "CommandBuilder",
+    # command model factory
+    "CommandMapper",
     # command type unions
     "Command",
     "CommandRequest",
     "CommandResult",
     # base interfaces
-    "CommandStatus",
+    "AbstractCommandImpl",
     "BaseCommand",
     "BaseCommandRequest",
+    "CommandStatus",
     # load labware command models
     "LoadLabware",
     "LoadLabwareRequest",

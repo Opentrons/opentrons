@@ -1,18 +1,11 @@
 """Aspirate command request, result, and implementation models."""
 from __future__ import annotations
-from datetime import datetime
-from typing import Optional
+from typing import Optional, Type
 from typing_extensions import Literal
 
 
 from .pipetting_common import BaseLiquidHandlingData, BaseLiquidHandlingResult
-from .command import (
-    AbstractCommandImpl,
-    BaseCommand,
-    BaseCommandRequest,
-    CommandHandlers,
-    CommandStatus,
-)
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandRequest
 
 AspirateCommandType = Literal["aspirate"]
 
@@ -29,61 +22,36 @@ class AspirateResult(BaseLiquidHandlingResult):
     pass
 
 
-class AspirateImplProvider:
-    """Implementation provider mixin."""
+class AspirateImplementation(AbstractCommandImpl[AspirateData, AspirateResult]):
+    """Aspirate command implementation."""
 
-    data: AspirateData
+    async def execute(self, data: AspirateData) -> AspirateResult:
+        """Move to and aspirate from the requested well."""
+        volume = await self._pipetting.aspirate(
+            pipette_id=data.pipetteId,
+            labware_id=data.labwareId,
+            well_name=data.wellName,
+            well_location=data.wellLocation,
+            volume=data.volume,
+        )
 
-    def get_implementation(self) -> AspirateImplementation:
-        """Get the execution implementation of an Aspirate."""
-        return AspirateImplementation(self.data)
+        return AspirateResult(volume=volume)
 
 
-class AspirateRequest(BaseCommandRequest[AspirateData], AspirateImplProvider):
-    """Create aspirate command request model."""
-
-    commandType: AspirateCommandType = "aspirate"
-    data: AspirateData
-
-
-class Aspirate(BaseCommand[AspirateData, AspirateResult], AspirateImplProvider):
+class Aspirate(BaseCommand[AspirateData, AspirateResult]):
     """Aspirate command model."""
 
     commandType: AspirateCommandType = "aspirate"
     data: AspirateData
     result: Optional[AspirateResult]
 
+    _ImplementationCls: Type[AspirateImplementation] = AspirateImplementation
 
-class AspirateImplementation(
-    AbstractCommandImpl[AspirateData, AspirateResult, Aspirate]
-):
-    """Aspirate command implementation."""
 
-    def create_command(
-        self,
-        command_id: str,
-        created_at: datetime,
-        status: CommandStatus = CommandStatus.QUEUED,
-    ) -> Aspirate:
-        """Create a new Aspirate command resource."""
-        return Aspirate(
-            id=command_id,
-            createdAt=created_at,
-            status=status,
-            data=self._data,
-        )
+class AspirateRequest(BaseCommandRequest[AspirateData]):
+    """Create aspirate command request model."""
 
-    async def execute(
-        self,
-        handlers: CommandHandlers,
-    ) -> AspirateResult:
-        """Move to and aspirate from the requested well."""
-        volume = await handlers.pipetting.aspirate(
-            pipette_id=self._data.pipetteId,
-            labware_id=self._data.labwareId,
-            well_name=self._data.wellName,
-            well_location=self._data.wellLocation,
-            volume=self._data.volume,
-        )
+    commandType: AspirateCommandType = "aspirate"
+    data: AspirateData
 
-        return AspirateResult(volume=volume)
+    _CommandCls: Type[Aspirate] = Aspirate

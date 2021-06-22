@@ -1,20 +1,13 @@
 """Load labware command request, result, and implementation models."""
 from __future__ import annotations
-from datetime import datetime
 from pydantic import BaseModel, Field
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Type
 from typing_extensions import Literal
 
 from opentrons.protocols.models import LabwareDefinition
 
 from opentrons.protocol_engine.types import LabwareLocation
-from .command import (
-    AbstractCommandImpl,
-    BaseCommand,
-    BaseCommandRequest,
-    CommandHandlers,
-    CommandStatus,
-)
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandRequest
 
 LoadLabwareCommandType = Literal["loadLabware"]
 
@@ -62,61 +55,19 @@ class LoadLabwareResult(BaseModel):
     )
 
 
-class LoadLabwareImplProvider:
-    """Implementation provider mixin."""
-
-    data: LoadLabwareData
-
-    def get_implementation(self) -> LoadLabwareImplementation:
-        """Get the execution implementation of a LoadLabware."""
-        return LoadLabwareImplementation(self.data)
-
-
-class LoadLabwareRequest(BaseCommandRequest[LoadLabwareData], LoadLabwareImplProvider):
-    """Load labware command creation request."""
-
-    commandType: LoadLabwareCommandType = "loadLabware"
-    data: LoadLabwareData
-
-
-class LoadLabware(
-    BaseCommand[LoadLabwareData, LoadLabwareResult],
-    LoadLabwareImplProvider,
-):
-    """Load labware command resource model."""
-
-    commandType: LoadLabwareCommandType = "loadLabware"
-    data: LoadLabwareData
-    result: Optional[LoadLabwareResult]
-
-
 class LoadLabwareImplementation(
-    AbstractCommandImpl[LoadLabwareData, LoadLabwareResult, LoadLabware]
+    AbstractCommandImpl[LoadLabwareData, LoadLabwareResult]
 ):
     """Load labware command implementation."""
 
-    def create_command(
-        self,
-        command_id: str,
-        created_at: datetime,
-        status: CommandStatus = CommandStatus.QUEUED,
-    ) -> LoadLabware:
-        """Create a new LoadLabware command resource."""
-        return LoadLabware(
-            id=command_id,
-            createdAt=created_at,
-            status=status,
-            data=self._data,
-        )
-
-    async def execute(self, handlers: CommandHandlers) -> LoadLabwareResult:
+    async def execute(self, data: LoadLabwareData) -> LoadLabwareResult:
         """Load definition and calibration data necessary for a labware."""
-        loaded_labware = await handlers.equipment.load_labware(
-            load_name=self._data.loadName,
-            namespace=self._data.namespace,
-            version=self._data.version,
-            location=self._data.location,
-            labware_id=self._data.labwareId,
+        loaded_labware = await self._equipment.load_labware(
+            load_name=data.loadName,
+            namespace=data.namespace,
+            version=data.version,
+            location=data.location,
+            labware_id=data.labwareId,
         )
 
         return LoadLabwareResult(
@@ -124,3 +75,22 @@ class LoadLabwareImplementation(
             definition=loaded_labware.definition,
             calibration=loaded_labware.calibration,
         )
+
+
+class LoadLabware(BaseCommand[LoadLabwareData, LoadLabwareResult]):
+    """Load labware command resource model."""
+
+    commandType: LoadLabwareCommandType = "loadLabware"
+    data: LoadLabwareData
+    result: Optional[LoadLabwareResult]
+
+    _ImplementationCls: Type[LoadLabwareImplementation] = LoadLabwareImplementation
+
+
+class LoadLabwareRequest(BaseCommandRequest[LoadLabwareData]):
+    """Load labware command creation request."""
+
+    commandType: LoadLabwareCommandType = "loadLabware"
+    data: LoadLabwareData
+
+    _CommandCls: Type[LoadLabware] = LoadLabware

@@ -1,7 +1,12 @@
 """Test pick up tip commands."""
 from decoy import Decoy
 
-from opentrons.protocol_engine import CommandHandlers
+from opentrons.protocol_engine.execution import (
+    EquipmentHandler,
+    MovementHandler,
+    PipettingHandler,
+)
+
 from opentrons.protocol_engine.commands.drop_tip import (
     DropTipData,
     DropTipResult,
@@ -10,21 +15,30 @@ from opentrons.protocol_engine.commands.drop_tip import (
 
 
 async def test_pick_up_tip_implementation(
-    decoy: Decoy, command_handlers: CommandHandlers
+    decoy: Decoy,
+    equipment: EquipmentHandler,
+    movement: MovementHandler,
+    pipetting: PipettingHandler,
 ) -> None:
     """A DropTipRequest should have an execution implementation."""
+    subject = DropTipImplementation(
+        equipment=equipment,
+        movement=movement,
+        pipetting=pipetting,
+    )
+
     data = DropTipData(
         pipetteId="abc",
         labwareId="123",
         wellName="A3",
     )
 
-    subject = DropTipImplementation(data)
-    result = await subject.execute(command_handlers)
+    result = await subject.execute(data)
 
     assert result == DropTipResult()
+
     decoy.verify(
-        await command_handlers.pipetting.drop_tip(
+        await pipetting.drop_tip(
             pipette_id="abc",
             labware_id="123",
             well_name="A3",

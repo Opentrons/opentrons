@@ -1,11 +1,8 @@
 """Command side-effect execution logic container."""
 from __future__ import annotations
 
-from opentrons.hardware_control.api import API as HardwareAPI
-
 from ..resources import ResourceProviders
-from ..state import StateStore
-from ..commands import Command, CommandRequest
+from ..commands import Command, CommandStatus, CommandMapper
 from .equipment import EquipmentHandler
 from .movement import MovementHandler
 from .pipetting import PipettingHandler
@@ -20,60 +17,46 @@ class CommandExecutor:
 
     def __init__(
         self,
-        hardware: HardwareAPI,
-        state_store: StateStore,
+        equipment: EquipmentHandler,
+        movement: MovementHandler,
+        pipetting: PipettingHandler,
+        command_mapper: CommandMapper,
         resources: ResourceProviders,
     ) -> None:
         """Initialize the CommandExecutor with access to its dependencies."""
-        self._hardware = hardware
-        self._state_store = state_store
+        self._equipment = equipment
+        self._movement = movement
+        self._pipetting = pipetting
+        self._command_mapper = command_mapper
         self._resources = resources
 
-    def create_command(self, request: CommandRequest) -> Command:
-        raise NotImplementedError("CommandExecutor not implemented")
-
-    def to_running(self, command: Command) -> Command:
-        raise NotImplementedError("CommandExecutor not implemented")
-
     async def execute(self, command: Command) -> Command:
-        raise NotImplementedError("CommandExecutor not implemented")
+        """Run a given command's execution procedure."""
+        command_impl = command._ImplementationCls(
+            equipment=self._equipment,
+            movement=self._movement,
+            pipetting=self._pipetting,
+        )
 
-    # async def execute(self, command: Command) -> CommandResult:
-    #     state = self._state_store.state_view
-    #     hardware = self._hardware
-    #     resources = self._resources
+        result = None
+        error = None
+        status = CommandStatus.EXECUTED
 
-    #     equipment = EquipmentHandler(
-    #         state=state,
-    #         hardware=hardware,
-    #         resources=resources,
-    #     )
+        try:
+            result = await command_impl.execute(command.data)  # type: ignore[arg-type]
+        except Exception as e:
+            # TODO(mc, 2021-06-22): differentiate between `ProtocolEngineError`s
+            # and unexpected errors when the Command model is ready to accept
+            # structured error details
+            error = str(e)
+            status = CommandStatus.FAILED
 
-    #     movement = MovementHandler(state=state, hardware=hardware)
+        completed_at = self._resources.model_utils.get_timestamp()
 
-    #     pipetting = PipettingHandler(
-    #         state=state,
-    #         hardware=hardware,
-    #         movement_handler=movement,
-    #     )
-
-    #     command_impl = command.get_impl(
-    #         equipment=equipment,
-    #         movement=movement,
-    #         pipetting=pipetting,
-    #     )
-
-    # @property
-    # def equipment(self) -> EquipmentHandler:
-    #     """Access equipment handling procedures."""
-    #     return self._equipment
-
-    # @property
-    # def movement(self) -> MovementHandler:
-    #     """Access movement handling procedures."""
-    #     return self._movement
-
-    # @property
-    # def pipetting(self) -> PipettingHandler:
-    #     """Access pipetting handling procedures."""
-    #     return self._pipetting
+        return self._command_mapper.update_command(
+            command=command,
+            result=result,
+            error=error,
+            status=status,
+            completedAt=completed_at,
+        )

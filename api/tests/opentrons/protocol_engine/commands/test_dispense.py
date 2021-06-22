@@ -1,7 +1,15 @@
 """Test dispense commands."""
 from decoy import Decoy
 
-from opentrons.protocol_engine import CommandHandlers, WellLocation, WellOrigin
+from opentrons.protocol_engine import WellLocation, WellOrigin
+
+from opentrons.protocol_engine.execution import (
+    EquipmentHandler,
+    MovementHandler,
+    PipettingHandler,
+)
+
+
 from opentrons.protocol_engine.commands.dispense import (
     DispenseData,
     DispenseResult,
@@ -11,9 +19,17 @@ from opentrons.protocol_engine.commands.dispense import (
 
 async def test_dispense_implementation(
     decoy: Decoy,
-    command_handlers: CommandHandlers,
+    equipment: EquipmentHandler,
+    movement: MovementHandler,
+    pipetting: PipettingHandler,
 ) -> None:
     """A PickUpTipRequest should have an execution implementation."""
+    subject = DispenseImplementation(
+        equipment=equipment,
+        movement=movement,
+        pipetting=pipetting,
+    )
+
     location = WellLocation(origin=WellOrigin.BOTTOM, offset=(0, 0, 1))
 
     data = DispenseData(
@@ -25,7 +41,7 @@ async def test_dispense_implementation(
     )
 
     decoy.when(
-        await command_handlers.pipetting.dispense(
+        await pipetting.dispense(
             pipette_id="abc",
             labware_id="123",
             well_name="A3",
@@ -34,7 +50,6 @@ async def test_dispense_implementation(
         )
     ).then_return(42)
 
-    subject = DispenseImplementation(data)
-    result = await subject.execute(command_handlers)
+    result = await subject.execute(data)
 
     assert result == DispenseResult(volume=42)

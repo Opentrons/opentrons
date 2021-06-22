@@ -1,7 +1,12 @@
 """Test move to well commands."""
 from decoy import Decoy
 
-from opentrons.protocol_engine.execution import CommandHandlers
+from opentrons.protocol_engine.execution import (
+    EquipmentHandler,
+    MovementHandler,
+    PipettingHandler,
+)
+
 from opentrons.protocol_engine.commands.move_to_well import (
     MoveToWellData,
     MoveToWellResult,
@@ -11,21 +16,28 @@ from opentrons.protocol_engine.commands.move_to_well import (
 
 async def test_move_to_well_implementation(
     decoy: Decoy,
-    command_handlers: CommandHandlers,
+    equipment: EquipmentHandler,
+    movement: MovementHandler,
+    pipetting: PipettingHandler,
 ) -> None:
     """A MoveToWellRequest should have an execution implementation."""
+    subject = MoveToWellImplementation(
+        equipment=equipment,
+        movement=movement,
+        pipetting=pipetting,
+    )
+
     data = MoveToWellData(
         pipetteId="abc",
         labwareId="123",
         wellName="A3",
     )
 
-    subject = MoveToWellImplementation(data)
-    result = await subject.execute(command_handlers)
+    result = await subject.execute(data)
 
     assert result == MoveToWellResult()
     decoy.verify(
-        await command_handlers.movement.move_to_well(
+        await movement.move_to_well(
             pipette_id="abc",
             labware_id="123",
             well_name="A3",

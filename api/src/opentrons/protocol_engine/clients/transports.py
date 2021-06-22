@@ -2,7 +2,8 @@
 from abc import ABC, abstractmethod
 from asyncio import AbstractEventLoop, run_coroutine_threadsafe
 
-from ..protocol_engine import ProtocolEngine, ProtocolEngineError
+from ..protocol_engine import ProtocolEngine
+from ..errors import ProtocolEngineError
 from ..state import StateView
 from ..commands import CommandRequest, CommandResult
 

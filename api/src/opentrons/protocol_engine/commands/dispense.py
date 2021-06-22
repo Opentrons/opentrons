@@ -1,17 +1,10 @@
 """Dispense command request, result, and implementation models."""
 from __future__ import annotations
-from datetime import datetime
-from typing import Optional
+from typing import Optional, Type
 from typing_extensions import Literal
 
 from .pipetting_common import BaseLiquidHandlingData, BaseLiquidHandlingResult
-from .command import (
-    AbstractCommandImpl,
-    BaseCommand,
-    BaseCommandRequest,
-    CommandHandlers,
-    CommandStatus,
-)
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandRequest
 
 
 DispenseCommandType = Literal["dispense"]
@@ -29,58 +22,36 @@ class DispenseResult(BaseLiquidHandlingResult):
     pass
 
 
-class DispenseImplProvider:
-    """Implementation provider mixin."""
+class DispenseImplementation(AbstractCommandImpl[DispenseData, DispenseResult]):
+    """Dispense command implementation."""
 
-    data: DispenseData
+    async def execute(self, data: DispenseData) -> DispenseResult:
+        """Move to and dispense to the requested well."""
+        volume = await self._pipetting.dispense(
+            pipette_id=data.pipetteId,
+            labware_id=data.labwareId,
+            well_name=data.wellName,
+            well_location=data.wellLocation,
+            volume=data.volume,
+        )
 
-    def get_implementation(self) -> DispenseImplementation:
-        """Get the execution implementation of a Dispense."""
-        return DispenseImplementation(self.data)
+        return DispenseResult(volume=volume)
 
 
-class DispenseRequest(BaseCommandRequest[DispenseData], DispenseImplProvider):
-    """Create dispense command request model."""
-
-    commandType: DispenseCommandType = "dispense"
-    data: DispenseData
-
-
-class Dispense(BaseCommand[DispenseData, DispenseResult], DispenseImplProvider):
+class Dispense(BaseCommand[DispenseData, DispenseResult]):
     """Dispense command model."""
 
     commandType: DispenseCommandType = "dispense"
     data: DispenseData
     result: Optional[DispenseResult]
 
+    _ImplementationCls: Type[DispenseImplementation] = DispenseImplementation
 
-class DispenseImplementation(
-    AbstractCommandImpl[DispenseData, DispenseResult, Dispense]
-):
-    """Dispense command implementation."""
 
-    def create_command(
-        self,
-        command_id: str,
-        created_at: datetime,
-        status: CommandStatus = CommandStatus.QUEUED,
-    ) -> Dispense:
-        """Create a new Dispense command resource."""
-        return Dispense(
-            id=command_id,
-            createdAt=created_at,
-            status=status,
-            data=self._data,
-        )
+class DispenseRequest(BaseCommandRequest[DispenseData]):
+    """Create dispense command request model."""
 
-    async def execute(self, handlers: CommandHandlers) -> DispenseResult:
-        """Move to and dispense to the requested well."""
-        volume = await handlers.pipetting.dispense(
-            pipette_id=self._data.pipetteId,
-            labware_id=self._data.labwareId,
-            well_name=self._data.wellName,
-            well_location=self._data.wellLocation,
-            volume=self._data.volume,
-        )
+    commandType: DispenseCommandType = "dispense"
+    data: DispenseData
 
-        return DispenseResult(volume=volume)
+    _CommandCls: Type[Dispense] = Dispense

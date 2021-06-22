@@ -2,7 +2,12 @@
 from decoy import Decoy
 
 from opentrons.protocols.models import LabwareDefinition
-from opentrons.protocol_engine.execution import CommandHandlers
+from opentrons.protocol_engine.execution import (
+    EquipmentHandler,
+    MovementHandler,
+    PipettingHandler,
+)
+
 from opentrons.protocol_engine.commands.add_labware_definition import (
     AddLabwareDefinitionData,
     AddLabwareDefinitionResult,
@@ -13,12 +18,19 @@ from opentrons.protocol_engine.commands.add_labware_definition import (
 async def test_add_labware_implementation(
     decoy: Decoy,
     well_plate_def: LabwareDefinition,
-    command_handlers: CommandHandlers,
+    equipment: EquipmentHandler,
+    movement: MovementHandler,
+    pipetting: PipettingHandler,
 ) -> None:
     """An AddLabwareRequest should have an execution implementation."""
+    subject = AddLabwareDefinitionImplementation(
+        equipment=equipment,
+        movement=movement,
+        pipetting=pipetting,
+    )
+
     data = AddLabwareDefinitionData(definition=well_plate_def)
-    subject = AddLabwareDefinitionImplementation(data)
-    result = await subject.execute(command_handlers)
+    result = await subject.execute(data)
 
     assert result == AddLabwareDefinitionResult(
         loadName=well_plate_def.parameters.loadName,

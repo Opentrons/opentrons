@@ -9,10 +9,7 @@ from typing import TYPE_CHECKING, Generic, Optional, TypeVar
 
 # convenience type alias to work around type-only circular dependency
 if TYPE_CHECKING:
-    from ..execution import CommandHandlers
-else:
-    CommandHandlers = None
-
+    from ..execution import EquipmentHandler, MovementHandler, PipettingHandler
 
 CommandDataT = TypeVar("CommandDataT", bound=BaseModel)
 
@@ -87,7 +84,7 @@ CommandT = TypeVar("CommandT", bound=BaseCommand)
 
 class AbstractCommandImpl(
     ABC,
-    Generic[CommandDataT, CommandResultT, CommandT],
+    Generic[CommandDataT, CommandResultT],
 ):
     """Abstract command creation and execution implementation.
 
@@ -98,24 +95,18 @@ class AbstractCommandImpl(
     - Execute the command, mapping data from execution into the result model
     """
 
-    _data: CommandDataT
-
-    # TODO(mc, 2021-06-21): `__init__` and `execute` args are pretty clearly
-    # swapped. `data` should be fed into execute, while `handlers` should be
-    # fed into `__init__`
-    def __init__(self, data: CommandDataT) -> None:
-        """Initialize a command implementation from a command request."""
-        self._data = data
-
-    # TODO(mc, 2021-06-21): this method is awkward and not well-suited for this
-    # interface. Find a less verbose way of creating a full command resource
-    # from the request instance
-    @abstractmethod
-    def create_command(self, command_id: str, created_at: datetime) -> CommandT:
-        """Create a new command resource from the implementation's request."""
-        ...
+    def __init__(
+        self,
+        equipment: EquipmentHandler,
+        movement: MovementHandler,
+        pipetting: PipettingHandler,
+    ) -> None:
+        """Initialize the command implementation with execution handlers."""
+        self._equipment = equipment
+        self._movement = movement
+        self._pipetting = pipetting
 
     @abstractmethod
-    async def execute(self, handlers: CommandHandlers) -> CommandResultT:
+    async def execute(self, data: CommandDataT) -> CommandResultT:
         """Execute the command, mapping data from execution into a response model."""
         ...

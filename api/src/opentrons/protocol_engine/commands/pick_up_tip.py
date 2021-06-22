@@ -1,18 +1,11 @@
 """Pick up tip command request, result, and implementation models."""
 from __future__ import annotations
-from datetime import datetime
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, Type
 from typing_extensions import Literal
 
 from .pipetting_common import BasePipettingData
-from .command import (
-    AbstractCommandImpl,
-    BaseCommand,
-    BaseCommandRequest,
-    CommandHandlers,
-    CommandStatus,
-)
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandRequest
 
 
 PickUpTipCommandType = Literal["pickUpTip"]
@@ -30,56 +23,34 @@ class PickUpTipResult(BaseModel):
     pass
 
 
-class PickUpTipImplProvider:
-    """Implementation provider mixin."""
+class PickUpTipImplementation(AbstractCommandImpl[PickUpTipData, PickUpTipResult]):
+    """Pick up tip command implementation."""
 
-    data: PickUpTipData
+    async def execute(self, data: PickUpTipData) -> PickUpTipResult:
+        """Move to and pick up a tip using the requested pipette."""
+        await self._pipetting.pick_up_tip(
+            pipette_id=data.pipetteId,
+            labware_id=data.labwareId,
+            well_name=data.wellName,
+        )
 
-    def get_implementation(self) -> PickUpTipImplementation:
-        """Get the execution implementation of a PickUpTip."""
-        return PickUpTipImplementation(self.data)
-
-
-class PickUpTipRequest(BaseCommandRequest[PickUpTipData], PickUpTipImplProvider):
-    """Pick up tip command creation request model."""
-
-    commandType: PickUpTipCommandType = "pickUpTip"
-    data: PickUpTipData
+        return PickUpTipResult()
 
 
-class PickUpTip(BaseCommand[PickUpTipData, PickUpTipResult], PickUpTipImplProvider):
+class PickUpTip(BaseCommand[PickUpTipData, PickUpTipResult]):
     """Pick up tip command model."""
 
     commandType: PickUpTipCommandType = "pickUpTip"
     data: PickUpTipData
     result: Optional[PickUpTipResult]
 
+    _ImplementationCls: Type[PickUpTipImplementation] = PickUpTipImplementation
 
-class PickUpTipImplementation(
-    AbstractCommandImpl[PickUpTipData, PickUpTipResult, PickUpTip]
-):
-    """Pick up tip command implementation."""
 
-    def create_command(
-        self,
-        command_id: str,
-        created_at: datetime,
-        status: CommandStatus = CommandStatus.QUEUED,
-    ) -> PickUpTip:
-        """Create a new PickUpTip command resource."""
-        return PickUpTip(
-            id=command_id,
-            createdAt=created_at,
-            status=status,
-            data=self._data,
-        )
+class PickUpTipRequest(BaseCommandRequest[PickUpTipData]):
+    """Pick up tip command creation request model."""
 
-    async def execute(self, handlers: CommandHandlers) -> PickUpTipResult:
-        """Move to and pick up a tip using the requested pipette."""
-        await handlers.pipetting.pick_up_tip(
-            pipette_id=self._data.pipetteId,
-            labware_id=self._data.labwareId,
-            well_name=self._data.wellName,
-        )
+    commandType: PickUpTipCommandType = "pickUpTip"
+    data: PickUpTipData
 
-        return PickUpTipResult()
+    _CommandCls: Type[PickUpTip] = PickUpTip

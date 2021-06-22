@@ -4,7 +4,13 @@ from decoy import Decoy
 from opentrons.types import DeckSlotName
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.protocol_engine.types import DeckSlotLocation
-from opentrons.protocol_engine.execution import CommandHandlers, LoadedLabware
+
+from opentrons.protocol_engine.execution import (
+    LoadedLabware,
+    EquipmentHandler,
+    MovementHandler,
+    PipettingHandler,
+)
 from opentrons.protocol_engine.commands.load_labware import (
     LoadLabwareData,
     LoadLabwareResult,
@@ -15,9 +21,17 @@ from opentrons.protocol_engine.commands.load_labware import (
 async def test_load_labware_implementation(
     decoy: Decoy,
     well_plate_def: LabwareDefinition,
-    command_handlers: CommandHandlers,
+    equipment: EquipmentHandler,
+    movement: MovementHandler,
+    pipetting: PipettingHandler,
 ) -> None:
     """A LoadLabware command should have an execution implementation."""
+    subject = LoadLabwareImplementation(
+        equipment=equipment,
+        movement=movement,
+        pipetting=pipetting,
+    )
+
     data = LoadLabwareData(
         location=DeckSlotLocation(slot=DeckSlotName.SLOT_3),
         loadName="some-load-name",
@@ -26,7 +40,7 @@ async def test_load_labware_implementation(
     )
 
     decoy.when(
-        await command_handlers.equipment.load_labware(
+        await equipment.load_labware(
             location=DeckSlotLocation(slot=DeckSlotName.SLOT_3),
             load_name="some-load-name",
             namespace="opentrons-test",
@@ -35,12 +49,13 @@ async def test_load_labware_implementation(
         )
     ).then_return(
         LoadedLabware(
-            labware_id="labware-id", definition=well_plate_def, calibration=(1, 2, 3)
+            labware_id="labware-id",
+            definition=well_plate_def,
+            calibration=(1, 2, 3),
         )
     )
 
-    subject = LoadLabwareImplementation(data)
-    result = await subject.execute(command_handlers)
+    result = await subject.execute(data)
 
     assert result == LoadLabwareResult(
         labwareId="labware-id",

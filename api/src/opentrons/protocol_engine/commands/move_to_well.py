@@ -1,18 +1,11 @@
 """Move to well command request, result, and implementation models."""
 from __future__ import annotations
-from datetime import datetime
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, Type
 from typing_extensions import Literal
 
 from .pipetting_common import BasePipettingData
-from .command import (
-    AbstractCommandImpl,
-    BaseCommand,
-    BaseCommandRequest,
-    CommandHandlers,
-    CommandStatus,
-)
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandRequest
 
 
 MoveToWellCommandType = Literal["moveToWell"]
@@ -30,56 +23,34 @@ class MoveToWellResult(BaseModel):
     pass
 
 
-class MoveToWellImplProvider:
-    """Implementation provider mixin."""
+class MoveToWellImplementation(AbstractCommandImpl[MoveToWellData, MoveToWellResult]):
+    """Move to well command implementation."""
 
-    data: MoveToWellData
+    async def execute(self, data: MoveToWellData) -> MoveToWellResult:
+        """Move the requested pipette to the requested well."""
+        await self._movement.move_to_well(
+            pipette_id=data.pipetteId,
+            labware_id=data.labwareId,
+            well_name=data.wellName,
+        )
 
-    def get_implementation(self) -> MoveToWellImplementation:
-        """Get the execution implementation of a MoveToWell."""
-        return MoveToWellImplementation(self.data)
-
-
-class MoveToWellRequest(BaseCommandRequest[MoveToWellData], MoveToWellImplProvider):
-    """Move to well command creation request model."""
-
-    commandType: MoveToWellCommandType = "moveToWell"
-    data: MoveToWellData
+        return MoveToWellResult()
 
 
-class MoveToWell(BaseCommand[MoveToWellData, MoveToWellResult], MoveToWellImplProvider):
+class MoveToWell(BaseCommand[MoveToWellData, MoveToWellResult]):
     """Move to well command model."""
 
     commandType: MoveToWellCommandType = "moveToWell"
     data: MoveToWellData
     result: Optional[MoveToWellResult]
 
+    _ImplementationCls: Type[MoveToWellImplementation] = MoveToWellImplementation
 
-class MoveToWellImplementation(
-    AbstractCommandImpl[MoveToWellData, MoveToWellResult, MoveToWell]
-):
-    """Move to well command implementation."""
 
-    def create_command(
-        self,
-        command_id: str,
-        created_at: datetime,
-        status: CommandStatus = CommandStatus.QUEUED,
-    ) -> MoveToWell:
-        """Create a new MoveToWell command resource."""
-        return MoveToWell(
-            id=command_id,
-            createdAt=created_at,
-            status=status,
-            data=self._data,
-        )
+class MoveToWellRequest(BaseCommandRequest[MoveToWellData]):
+    """Move to well command creation request model."""
 
-    async def execute(self, handlers: CommandHandlers) -> MoveToWellResult:
-        """Move the requested pipette to the requested well."""
-        await handlers.movement.move_to_well(
-            pipette_id=self._data.pipetteId,
-            labware_id=self._data.labwareId,
-            well_name=self._data.wellName,
-        )
+    commandType: MoveToWellCommandType = "moveToWell"
+    data: MoveToWellData
 
-        return MoveToWellResult()
+    _CommandCls: Type[MoveToWell] = MoveToWell
