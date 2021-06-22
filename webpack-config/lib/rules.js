@@ -44,7 +44,6 @@ module.exports = {
       options: {
         cacheDirectory: true,
         rootMode: 'upward',
-        plugins: [...(DEV_MODE ? ['react-refresh/babel'] : [])],
       },
     },
   },

@@ -3,6 +3,7 @@
 const path = require('path')
 const webpackMerge = require('webpack-merge')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin')
 const ScriptExtHtmlWebpackPlugin = require('script-ext-html-webpack-plugin')
 
 const { DEV_MODE, baseConfig } = require('@opentrons/webpack-config')
@@ -21,6 +22,7 @@ module.exports = webpackMerge(baseConfig, {
   },
 
   plugins: [
+    ...(DEV_MODE ? [new ReactRefreshWebpackPlugin()] : []),
     new HtmlWebpackPlugin({ title, description, author, template: HTML_ENTRY }),
     new ScriptExtHtmlWebpackPlugin({ defaultAttribute: 'defer' }),
   ],

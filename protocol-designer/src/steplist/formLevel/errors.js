@@ -16,6 +16,10 @@ import {
 } from '../../constants'
 import type { StepFieldName } from '../../form-types'
 
+// HACK(IL, 2021-07-22): can't find cleaner workaround while using webpack-react-refresh
+self.$RefreshReg$ = () => {}
+self.$RefreshSig$$ = () => () => {}
+
 /*******************
  ** Error Messages **
  ********************/

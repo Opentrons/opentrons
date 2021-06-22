@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { Switch, Route, Redirect } from 'react-router-dom'
-import { hot } from 'react-hot-loader/root'
 
 import {
   Flex,
@@ -76,4 +75,4 @@ export const AppComponent = (): JSX.Element => (
   </>
 )
 
-export const App = hot(AppComponent)
+export const App = AppComponent

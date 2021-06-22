@@ -263,12 +263,10 @@ export function FileSidebar(props: Props): React.Node {
           <OutlineButton onClick={createNewFile} className={styles.button}>
             Create New
           </OutlineButton>
-
           <OutlineButton Component="label" className={cx(styles.upload_button)}>
             Import
             <input type="file" onChange={loadFile} />
           </OutlineButton>
-
           <div className={styles.button}>
             <PrimaryButton
               onClick={() => {

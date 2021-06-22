@@ -5,6 +5,7 @@ const path = require('path')
 const webpack = require('webpack')
 const webpackMerge = require('webpack-merge')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin')
 const ScriptExtHtmlWebpackPlugin = require('script-ext-html-webpack-plugin')
 const WorkerPlugin = require('worker-plugin')
 
@@ -35,9 +36,11 @@ module.exports = webpackMerge(baseConfig, {
         .concat(['NODE_ENV'])
     ),
 
+    ...(DEV_MODE ? [new ReactRefreshWebpackPlugin()] : []),
+
     new WorkerPlugin({
       // disable warnings about HMR when we're in prod
-      globalObject: DEV_MODE ? 'self' : false,
+      // globalObject: DEV_MODE ? 'self' : false, // TODO IMMEDIATELY uncomment??
       // add required JS plugins to child compiler
       plugins: ['EnvironmentPlugin'],
     }),

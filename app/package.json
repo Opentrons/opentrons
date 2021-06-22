@@ -38,7 +38,6 @@
     "path-to-regexp": "3.0.0",
     "react": "16.14.0",
     "react-dom": "16.14.0",
-    "react-hot-loader": "4.12.19",
     "react-i18next": "^11.7.3",
     "react-redux": "7.2.1",
     "react-router-dom": "5.1.2",

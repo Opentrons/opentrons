@@ -1,7 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
-import { AppContainer } from 'react-hot-loader'
 
 import { configureStore } from './configureStore'
 import { App } from './components/App'
@@ -18,9 +17,7 @@ initializeMixpanel(store.getState())
 const render = Component => {
   ReactDOM.render(
     <Provider store={store}>
-      <AppContainer>
-        <Component />
-      </AppContainer>
+      <Component />
     </Provider>,
     document.getElementById('root')
   )
