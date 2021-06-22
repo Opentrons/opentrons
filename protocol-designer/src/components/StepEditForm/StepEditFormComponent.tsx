@@ -2,6 +2,7 @@
 import * as React from 'react'
 import cx from 'classnames'
 import get from 'lodash/get'
+import { StepFieldName } from '../../steplist/fieldLevel'
 import { MoreOptionsModal } from '../modals/MoreOptionsModal'
 import {
   MixForm,
@@ -35,7 +36,7 @@ interface Props {
   canSave: boolean
   dirtyFields: string[]
   focusHandlers: FocusHandlers
-  focusedField: string | null
+  focusedField: StepFieldName | null
   formData: FormData
   propsForFields: FieldPropsByName
   handleClose: () => unknown

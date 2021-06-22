@@ -26,7 +26,7 @@ type Props = FlowRateInputProps & {
 }
 
 // Add a key to force re-constructing component when values change
-function FlowRateInputWithKey(props: Props) {
+function FlowRateInputWithKey(props: Props): JSX.Element {
   const { innerKey, ...otherProps } = props
   return <FlowRateInput key={innerKey} {...otherProps} />
 }
@@ -62,7 +62,7 @@ function mapStateToProps(state: BaseState, ownProps: OP): SP {
   }
 }
 
-const mergeProps = (stateProps: SP, dispatchProps: undefined, ownProps: OP): Props => {
+const mergeProps = (stateProps: SP, _dispatchProps: null, ownProps: OP): Props => {
   const { pipetteId, ...passThruProps } = ownProps
   return { ...stateProps, ...passThruProps }
 }

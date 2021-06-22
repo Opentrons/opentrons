@@ -2,7 +2,7 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { WellSelectionInput } from './WellSelectionInput'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
-import { BaseState, ThunkDispatch } from '../../../../types'
+import { BaseState } from '../../../../types'
 import { FieldProps } from '../../types'
 
 type Props = JSX.LibraryManagedAttributes<
@@ -32,13 +32,7 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
   }
 }
 
-function mergeProps(
-  stateProps: SP,
-  dispatchProps: {
-    dispatch: ThunkDispatch<any>
-  },
-  ownProps: OP
-): Props {
+function mergeProps(stateProps: SP, _dispatchProps: null, ownProps: OP): Props {
   const {
     disabled,
     errorToShow,
@@ -65,7 +59,7 @@ function mergeProps(
   }
 }
 
-export const WellSelectionField=connect(
+export const WellSelectionField = connect(
   mapStateToProps,
   null,
   mergeProps

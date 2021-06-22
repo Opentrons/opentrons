@@ -7,7 +7,7 @@ import {
 } from '../../../../steplist/formLevel/handleFormChange/utils'
 import { ChangeTipOptions, PipetteEntities } from '@opentrons/step-generation'
 import { PathOption } from '../../../../form-types'
-export type DisabledPathMap = Record<PathOption, string> | null
+export type DisabledPathMap = Partial<Record<PathOption, string>> | null
 export interface ValuesForPath {
   aspirate_airGap_checkbox?: boolean | null
   aspirate_airGap_volume?: string | null
@@ -30,10 +30,7 @@ export function getDisabledPathMap(
   } = values
   if (!pipette) return null
   const wellRatio = getWellRatio(aspirate_wells, dispense_wells)
-  let disabledPathMap: {
-    multiAspirate?: string,
-    multiDispense?: string
-  } = {}
+  let disabledPathMap: Partial<Record<PathOption, string>> = {}
 
   // changeTip is lowest priority disable reasoning
   if (changeTip === 'perDest') {
@@ -114,6 +111,5 @@ export function getDisabledPathMap(
       ),
     }
   }
-  // @ts-expect-error (ce, 2021-06-22) Property 'single' is missing in type '{ multiAspirate?: string | undefined; multiDispense?: string | undefined; }' but required in type 'Record<PathOption, string>'
   return disabledPathMap
 }

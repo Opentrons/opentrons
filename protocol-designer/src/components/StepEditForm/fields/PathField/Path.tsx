@@ -17,12 +17,7 @@ const PATH_ANIMATION_IMAGES = {
   multiDispense: require('../../../../images/path_multiDispense.gif'),
 }
 
-interface PathOptions {
-    name: PathOption,
-    image: string
-}
-
-const ALL_PATH_OPTIONS: PathOptions[] = [
+const ALL_PATH_OPTIONS: Array<{ name: PathOption; image: string }> = [
   {
     name: 'single',
     image: SINGLE_IMAGE,
@@ -90,7 +85,8 @@ const PathButton = (buttonProps: ButtonProps) => {
           [styles.selected]: selected,
           [styles.disabled]: disabled,
         })}
-        onClick={disabled ? undefined : onClick}
+        // @ts-expect-error(sa, 2021-6-22): null is not a valid onClick handler
+        onClick={disabled ? null : onClick}
         id={id}
         data-test={pathButtonData}
       >

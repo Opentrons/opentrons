@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { Props } from '../alerts/Alerts'
-import { Alerts } from '../alerts/Alerts'
+import { Props, Alerts } from '../alerts/Alerts'
 import {
   actions as dismissActions,
   selectors as dismissSelectors,
@@ -28,7 +27,7 @@ interface SP {
   stepId?: StepIdType | null | undefined
 }
 interface OP {
-  focusedField?: StepFieldName | null
+  focusedField: StepFieldName | null
   dirtyFields: StepFieldName[]
 }
 
@@ -105,5 +104,9 @@ const mergeProps = (
   }
 }
 
-// @ts-expect-error (ce, 2021-06-22) figure out why `null` for assignable to mapDispatchToProps
-export const FormAlerts = connect(mapStateToProps, null, mergeProps)(Alerts)
+export const FormAlerts = connect(
+  mapStateToProps,
+  // @ts-expect-error(sa, 2021-6-21): TODO IMMEDIATELY: figure out why TS does not like this
+  null,
+  mergeProps
+)(Alerts)

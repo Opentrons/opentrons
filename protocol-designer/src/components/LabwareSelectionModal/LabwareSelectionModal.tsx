@@ -330,6 +330,7 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
                             labwareDef={labwareDef}
                             selectLabware={selectLabware}
                             onMouseEnter={() => setPreviewedLabware(labwareDef)}
+                            // @ts-expect-error(sa, 2021-6-22): setPreviewedLabware expects an argument (even if nullsy)
                             onMouseLeave={() => setPreviewedLabware()}
                           />
                         )

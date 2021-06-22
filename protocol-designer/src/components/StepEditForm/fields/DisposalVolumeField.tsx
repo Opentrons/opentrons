@@ -79,11 +79,8 @@ const DisposalVolumeFieldComponent = (props: Props) => {
     <FormGroup label={i18n.t('form.step_edit_form.multiDispenseOptionsLabel')}>
       <>
         <div
-          className={
-            cx(styles.checkbox_row,
-                // @ts-expect-error (ce, 2021-06-22)  Argument of type '{ [x: string]: string | null; }' is not assignable to parameter of type 'ClassValue'.
-                // ClassDictionary?)
-                {
+        // @ts-expect-error(sa, 2021-6-22): I think volumeBoundsCaption needs to be casted to a boolean to be fed into a class name
+          className={cx(styles.checkbox_row, {
             [styles.captioned_field]: volumeBoundsCaption,
           })}
         >

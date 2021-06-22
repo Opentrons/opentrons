@@ -154,9 +154,8 @@ export const PauseForm = (props: StepFormProps): JSX.Element => {
             >
               <textarea
                 className={styles.textarea_field}
-                // @ts-expect-error (ce, 2021-06-21) TS2322: Type 'unknown' is not assignable to type 'string | number | readonly string[] | undefined'.
-                value={propsForFields['pauseMessage'].value}
-                onChange={(e: React.ChangeEvent<any>) =>
+                value={propsForFields['pauseMessage'].value as string}
+                  onChange={(e: React.ChangeEvent<any>) =>
                   propsForFields['pauseMessage'].updateValue(
                     e.currentTarget.value
                   )

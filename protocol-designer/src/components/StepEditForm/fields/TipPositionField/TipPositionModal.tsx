@@ -255,7 +255,7 @@ export const TipPositionModal = (props: Props): JSX.Element => {
               <div>
                 <RadioGroup
                   value={isDefault ? 'default' : 'custom'}
-                  onChange={(e:React.ChangeEvent<HTMLInputElement>) => {
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                     setIsDefault(e.currentTarget.value === 'default')
                   }}
                   options={[
