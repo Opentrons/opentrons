@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import {
   FormGroup,
@@ -80,7 +79,11 @@ const DisposalVolumeFieldComponent = (props: Props) => {
     <FormGroup label={i18n.t('form.step_edit_form.multiDispenseOptionsLabel')}>
       <>
         <div
-          className={cx(styles.checkbox_row, {
+          className={
+            cx(styles.checkbox_row,
+                // @ts-expect-error (ce, 2021-06-22)  Argument of type '{ [x: string]: string | null; }' is not assignable to parameter of type 'ClassValue'.
+                // ClassDictionary?)
+                {
             [styles.captioned_field]: volumeBoundsCaption,
           })}
         >

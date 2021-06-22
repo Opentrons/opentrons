@@ -81,6 +81,7 @@ export const ProfileCycleRow = (props: ProfileCycleRowProps): JSX.Element => {
       {showConfirmDeleteCycle && (
         <ConfirmDeleteModal
           modalType={DELETE_PROFILE_CYCLE}
+          // @ts-expect-error (ce, 2021-06-22) Type '(...args: never[]) => unknown' is not assignable to type '(event: MouseEvent<Element, MouseEvent>) => unknown'.
           onContinueClick={confirmDeleteCycle}
           onCancelClick={cancelConfirmDeleteCycle}
         />
@@ -246,6 +247,7 @@ const ProfileField = (props: ProfileFieldProps) => {
     className,
     updateValue,
   } = props
+  // @ts-expect-error (ce, 2021-06-22) Element implicitly has an 'any' type because expression of type 'string' can't be used to index type 'ProfileItem'
   const value = profileItem[name]
   const fieldId = getDynamicFieldFocusHandlerId({
     id: profileItem.id,
@@ -278,6 +280,7 @@ const ProfileField = (props: ProfileFieldProps) => {
   }
   return (
     <div className={styles.step_input_wrapper}>
+      {/* @ts-expect-error (ce, 2021-06-22) some property incompatibilities*/}
       <InputField
         className={cx(styles.step_input, className)}
         error={errorToShow}
@@ -312,7 +315,7 @@ const ProfileStepRow = (props: ProfileStepRowProps) => {
     dispatch(steplistActions.deleteProfileStep({ id: profileStepItem.id }))
   }
   const names = ['title', 'temperature', 'durationMinutes', 'durationSeconds']
-  const units = {
+  const units: {[property: string]: any} = {
     title: null,
     temperature: i18n.t('application.units.degrees'),
     durationMinutes: i18n.t('application.units.minutes'),

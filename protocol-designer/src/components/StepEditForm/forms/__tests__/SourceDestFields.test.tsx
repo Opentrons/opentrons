@@ -4,7 +4,11 @@ import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
 import { CheckboxRowField, DelayFields, WellOrderField } from '../../fields'
-import { SourceDestFields } from '../MoveLiquidForm/SourceDestFields'
+import {
+  SourceDestFields,
+  SourceDestFieldsProps,
+} from '../MoveLiquidForm/SourceDestFields'
+import { FormData } from '../../../../form-types'
 
 jest.mock('../../../../step-forms')
 jest.mock('../../utils')
@@ -34,8 +38,8 @@ jest.mock('../../fields/', () => {
 })
 
 describe('SourceDestFields', () => {
-  let store
-  let props
+  let store: any
+  let props: SourceDestFieldsProps
   beforeEach(() => {
     props = {
       formData: {
@@ -181,10 +185,10 @@ describe('SourceDestFields', () => {
     }
     getUnsavedFormMock.mockReturnValue({
       stepType: 'moveLiquid',
-    })
+    } as FormData)
   })
 
-  const render = props =>
+  const render = (props: SourceDestFieldsProps) =>
     mount(
       <Provider store={store}>
         <SourceDestFields {...props} />

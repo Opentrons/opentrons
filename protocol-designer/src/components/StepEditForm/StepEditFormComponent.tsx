@@ -18,9 +18,11 @@ import styles from './StepEditForm.css'
 import { FormData, StepType } from '../../form-types'
 import { FieldPropsByName, FocusHandlers, StepFormProps } from './types'
 
-const STEP_FORM_MAP: {
-  [StepType]: React.ComponentType<StepFormProps> | null | undefined
-} = {
+type StepFormMap = {
+  [K in StepType]?: React.ComponentType<StepFormProps> | null
+}
+
+const STEP_FORM_MAP: StepFormMap = {
   mix: MixForm,
   pause: PauseForm,
   moveLiquid: MoveLiquidForm,
@@ -58,7 +60,7 @@ export const StepEditFormComponent = (props: Props): JSX.Element => {
     focusedField,
   } = props
 
-  const FormComponent: $Values<typeof STEP_FORM_MAP> = get(
+  const FormComponent: typeof STEP_FORM_MAP[keyof typeof STEP_FORM_MAP] = get(
     STEP_FORM_MAP,
     formData.stepType
   )
@@ -76,6 +78,7 @@ export const StepEditFormComponent = (props: Props): JSX.Element => {
       {showMoreOptionsModal && (
         <MoreOptionsModal formData={formData} close={toggleMoreOptionsModal} />
       )}
+      {/* @ts-expect-error(ce, 2021-06-22) getting into the weeds of `connect` and props and not sure what is going on */}
       <FormAlerts focusedField={focusedField} dirtyFields={dirtyFields} />
       <div className={cx(formStyles.form, styles[formData.stepType])}>
         <FormComponent {...{ formData, propsForFields, focusHandlers }} />

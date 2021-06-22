@@ -301,7 +301,7 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
         )
         .map(slot => {
           return (
-              // @ts-ignore-error (ce, 2021-06-21) needs some type love
+            // @ts-expect-error (ce, 2021-06-21) needs some type love
             <SlotControls
               key={slot.id}
               slot={slot}

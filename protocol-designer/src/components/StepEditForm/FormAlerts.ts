@@ -17,6 +17,7 @@ import { Dispatch } from 'redux'
 import { StepIdType } from '../../form-types'
 import { StepFieldName } from '../../steplist/fieldLevel'
 import { BaseState } from '../../types'
+import { ProfileFormError } from '../../steplist/formLevel/profileErrors'
 
 /* TODO:  BC 2018-09-13 move to src/components/alerts and adapt and use src/components/alerts/Alerts
  * see #1814 for reference
@@ -48,7 +49,7 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
   })
   // deal with special-case dynamic field form-level errors
   const { profileItemsById } = stepFormSelectors.getHydratedUnsavedForm(state)
-  let visibleDynamicFieldFormErrors = []
+  let visibleDynamicFieldFormErrors: ProfileFormError[] = []
 
   if (profileItemsById != null) {
     const dynamicFieldFormErrors = stepFormSelectors.getDynamicFieldFormErrorsForUnsavedForm(
@@ -85,7 +86,7 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
 const mergeProps = (
   stateProps: SP,
   dispatchProps: {
-    dispatch: Dispatch<any>
+    dispatch: Dispatch<any, any>
   }
 ): Props => {
   const { stepId } = stateProps
@@ -104,8 +105,5 @@ const mergeProps = (
   }
 }
 
-export const FormAlerts =connect(
-  mapStateToProps,
-  null,
-  mergeProps
-)(Alerts)
+// @ts-expect-error (ce, 2021-06-22) figure out why `null` for assignable to mapDispatchToProps
+export const FormAlerts = connect(mapStateToProps, null, mergeProps)(Alerts)

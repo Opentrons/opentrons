@@ -6,7 +6,7 @@ import {
   InputField,
   Tooltip,
   useHoverTooltip,
-  UseHoverTooltipResult,
+  UseHoverTooltipTargetProps,
 } from '@opentrons/components'
 import { getWellsDepth } from '@opentrons/shared-data'
 import {
@@ -62,6 +62,7 @@ function TipPositionInput(props: Props) {
   let value = ''
   if (wellDepthMm !== null) {
     // show default value for field in parens if no mmFromBottom value is selected
+    // @ts-expect-error (ce, 2021-06-22) value is implicitly of type string.
     value =
       mmFromBottom !== null
         ? mmFromBottom
@@ -109,7 +110,7 @@ interface WrapperProps {
   isDelayPositionField: boolean
   children: React.ReactNode
   disabled: boolean
-  targetProps: $ElementType<UseHoverTooltipResult, 0>
+  targetProps: UseHoverTooltipTargetProps
 }
 
 const Wrapper = (props: WrapperProps) =>

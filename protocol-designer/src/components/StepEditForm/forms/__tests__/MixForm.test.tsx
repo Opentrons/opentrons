@@ -1,10 +1,10 @@
-// @flow
 import * as React from 'react'
-import { mount } from 'enzyme'
+import { mount, ReactWrapper } from 'enzyme'
 import { Provider } from 'react-redux'
 import { MixForm } from '../MixForm'
 import { AspDispSection } from '../AspDispSection'
 import * as stepFormSelectors from '../../../../step-forms/selectors'
+import { FormData } from '../../../../form-types'
 import { WellOrderField } from '../../fields'
 
 const { DelayFields } = jest.requireActual('../../fields')
@@ -37,23 +37,25 @@ const mockStore = {
   getState: () => ({}),
 }
 
-describe('MixForm', () => {
-  let props: React.ComponentProps<typeof MixForm>
+type MixFormProps = React.ComponentProps<typeof MixForm>
 
-  const render = _props =>
+describe('MixForm', () => {
+  let props: MixFormProps
+
+  const render = (_props: MixFormProps) =>
     mount(<MixForm {..._props} />, {
       wrappingComponent: Provider,
       wrappingComponentProps: { store: mockStore },
     })
 
-  const showAdvancedSettings = wrapper => {
+  const showAdvancedSettings = (wrapper: ReactWrapper) => {
     wrapper.find(AspDispSection).first().invoke('toggleCollapsed')()
   }
 
   beforeEach(() => {
     getUnsavedFormMock.mockReturnValue({
       stepType: 'mix',
-    })
+    } as FormData)
 
     props = {
       formData: {

@@ -27,7 +27,7 @@ interface WellSelectionModalProps {
   isOpen: boolean
   labwareId?: string | null
   name: StepFieldName
-  onCloseClick: (e: React.MouseEvent<any> | null | undefined) => unknown
+  onCloseClick: (e?: React.MouseEvent<any> | null) => unknown
   pipetteId?: string | null
   value: unknown
   updateValue: (val: unknown | null | undefined) => void
@@ -109,7 +109,7 @@ const WellSelectionModalComponent = (
 
 export const WellSelectionModal = (
   props: WellSelectionModalProps
-): React.ReactNode => {
+): JSX.Element | null => {
   const { isOpen, labwareId, onCloseClick, pipetteId } = props
   const wellFieldData = props.value
 

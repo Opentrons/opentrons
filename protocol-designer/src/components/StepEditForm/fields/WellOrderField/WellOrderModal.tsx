@@ -25,7 +25,8 @@ const WELL_ORDER_VALUES: WellOrderOption[] = [
   ...VERTICAL_VALUES,
   ...HORIZONTAL_VALUES,
 ]
-interface Props {
+
+export interface WellOrderModalProps {
   isOpen: boolean
   closeModal: () => unknown
   prefix: 'aspirate' | 'dispense' | 'mix'
@@ -65,8 +66,8 @@ export const DoneButton = (props: { onClick: () => void }): JSX.Element => (
   </PrimaryButton>
 )
 
-export class WellOrderModal extends React.Component<Props, State> {
-  constructor(props: Props) {
+export class WellOrderModal extends React.Component<WellOrderModalProps, State> {
+  constructor(props: WellOrderModalProps) {
     super(props)
     const {
       initialFirstValue,
@@ -130,15 +131,16 @@ export class WellOrderModal extends React.Component<Props, State> {
     event: React.ChangeEvent<HTMLSelectElement>
   ) => void = ordinality => event => {
     const { value } = event.currentTarget
-    let nextState = { [`${ordinality}Value`]: value }
+    // @ts-expect-error (ce, 2021-06-22) missing one prop or the other
+    let nextState: State = { [`${ordinality}Value`]: value }
     if (ordinality === 'first') {
       if (
-        VERTICAL_VALUES.includes(value) &&
+        VERTICAL_VALUES.includes(value as WellOrderOption) &&
         VERTICAL_VALUES.includes(this.state.secondValue)
       ) {
         nextState = { ...nextState, secondValue: HORIZONTAL_VALUES[0] }
       } else if (
-        HORIZONTAL_VALUES.includes(value) &&
+        HORIZONTAL_VALUES.includes(value as WellOrderOption) &&
         HORIZONTAL_VALUES.includes(this.state.secondValue)
       ) {
         nextState = { ...nextState, secondValue: VERTICAL_VALUES[0] }

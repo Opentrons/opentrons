@@ -19,7 +19,7 @@ import styles from './WellOrderInput.css'
 import { FieldProps } from '../../types'
 import { WellOrderOption } from '../../../../form-types'
 
-interface Props {
+export interface WellOrderFieldProps {
   className?: string | null
   label?: string
   prefix: 'aspirate' | 'dispense' | 'mix'
@@ -31,7 +31,7 @@ interface Props {
   updateSecondWellOrder: FieldProps['updateValue']
 }
 
-export const WellOrderField = (props: Props): JSX.Element => {
+export const WellOrderField = (props: WellOrderFieldProps): JSX.Element => {
   const {
     firstValue,
     secondValue,
@@ -49,7 +49,10 @@ export const WellOrderField = (props: Props): JSX.Element => {
     setModalOpen(false)
   }
 
-  const updateValues = (firstValue, secondValue) => {
+  const updateValues = (
+    firstValue?: WellOrderOption | null,
+    secondValue?: WellOrderOption | null
+  ): void => {
     updateFirstWellOrder(firstValue)
     updateSecondWellOrder(secondValue)
   }
@@ -106,6 +109,7 @@ export const WellOrderField = (props: Props): JSX.Element => {
               src={ZIG_ZAG_IMAGE}
               className={cx(
                 styles.well_order_icon,
+                  // @ts-expect-error (ce, 2021-06-22)  Argument of type '{ [x: string]: string | null; }' is not assignable to parameter of type 'ClassValue'.
                 { [styles.icon_with_label]: props.label },
                 getIconClassNames()
               )}

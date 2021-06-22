@@ -4,6 +4,7 @@ import { WellSelectionInput } from './WellSelectionInput'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
 import { BaseState, ThunkDispatch } from '../../../../types'
 import { FieldProps } from '../../types'
+
 type Props = JSX.LibraryManagedAttributes<
   typeof WellSelectionInput,
   React.ComponentProps<typeof WellSelectionInput>
