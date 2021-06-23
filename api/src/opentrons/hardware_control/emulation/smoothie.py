@@ -31,7 +31,14 @@ class SmoothieEmulator(AbstractEmulator):
             f"Build version: {fw_version}, Build date: CURRENT, " \
             f"MCU: NONE, System Clock: NONE"
 
-        self._pos = {'A': 0.0, 'B': 0.0, 'C': 0.0, 'X': 0.0, 'Y': 0.0, 'Z': 0.0}
+        self._pos = {
+            'A': 0.0,
+            'B': 0.0,
+            'C': 0.0,
+            'X': 0.0,
+            'Y': 0.0,
+            'Z': 0.0
+        }
         self._home_status: Dict[str, bool] = {
             'X': False,
             'Y': False,
@@ -57,45 +64,90 @@ class SmoothieEmulator(AbstractEmulator):
         joined = ' '.join(r for r in results if r)
         return None if not joined else joined
 
+    def __get_homing_status(self) -> str:
+        """Get the current homing status of the emulated gantry"""
+        return " ".join(f"{k}:{int(v)}" for k, v in self._home_status.items())
+
+    def __get_current_position(self, command_g_code) -> str:
+        """Get the current position of the emulated gantry"""
+        pos_string = " ".join(f"{k}:{v}" for k, v in self._pos.items())
+        return f"{command_g_code}\r\n\r\nok MCS: {pos_string}"
+
+    def __get_version(self) -> str:
+        """Get the current firmware version"""
+        return self._version_string
+
+    def __get_pipette_id(self, command_params) -> Optional[str]:
+        """Get the current id of the specified pipette"""
+        pipette_postion = None
+
+        if "L" in command_params:
+            pipette_postion = f"L:{self._pipette_id['L']}"
+        elif "R" in command_params:
+            pipette_postion = f"R:{self._pipette_id['R']}"
+
+        return pipette_postion
+
+    def __get_pipette_model(self, command_params) -> Optional[str]:
+        """Get the current model of the specified pipette"""
+        pipette_model = None
+
+        if "L" in command_params:
+            pipette_model = f"L:{self._pipette_model['L']}"
+        elif "R" in command_params:
+            pipette_model = f"R:{self._pipette_model['R']}"
+
+        return pipette_model
+
+    def __set_pipette_id(self, command):
+        """Sets the id for the pipette"""
+        self._pipette_id.update(self._mount_strings(command))
+
+    def __set_pipette_model(self, command):
+        """Sets the model for the pipette"""
+        self._pipette_model.update(self._mount_strings(command))
+
+    def __move_gantry(self, command):
+        """Moves the gantry to the position provided in the command"""
+        for key, value in command.params.items():
+            assert isinstance(value, float), f"invalid value '{value}'"
+            if 'F' == key:
+                self._speed = value
+            else:
+                self._pos[key] = value
+
+    def __home_gantry(self, command):
+        """Returns gantry to home position"""
+        for axis in command.params.keys():
+            self._pos[axis] = HOMED_POSITION[axis]
+            self._home_status[axis] = True
+
     def _handle(self, command: Command) -> Optional[str]:  # noqa: C901
         """Handle a command."""
-        # TODO (al, 2021-04-28): break this up into multiple functions and
-        #  remove 'noqa(C901)'.
         logger.info(f"Got command {command}")
-        if GCODE.HOMING_STATUS == command.gcode:
-            vals = " ".join(f"{k}:{int(v)}" for k, v in self._home_status.items())
-            return vals
-        elif GCODE.CURRENT_POSITION == command.gcode:
-            vals = " ".join(f"{k}:{v}" for k, v in self._pos.items())
-            return f"{command.gcode}\r\n\r\nok MCS: {vals}"
-        elif GCODE.VERSION == command.gcode:
-            return self._version_string
-        elif GCODE.READ_INSTRUMENT_ID == command.gcode:
-            if "L" in command.params:
-                return f"L:{self._pipette_id['L']}"
-            elif "R" in command.params:
-                return f"R:{self._pipette_id['R']}"
-        elif GCODE.READ_INSTRUMENT_MODEL == command.gcode:
-            if "L" in command.params:
-                return f"L:{self._pipette_model['L']}"
-            elif "R" in command.params:
-                return f"R:{self._pipette_model['R']}"
-        elif GCODE.WRITE_INSTRUMENT_ID == command.gcode:
-            self._pipette_id.update(self._mount_strings(command))
-        elif GCODE.WRITE_INSTRUMENT_MODEL == command.gcode:
-            self._pipette_model.update(self._mount_strings(command))
-        elif GCODE.MOVE == command.gcode:
-            for key, value in command.params.items():
-                assert isinstance(value, float), f"invalid value '{value}'"
-                if 'F' == key:
-                    self._speed = value
-                else:
-                    self._pos[key] = value
-        elif GCODE.HOME == command.gcode:
-            for axis in command.params.keys():
-                self._pos[axis] = HOMED_POSITION[axis]
-                self._home_status[axis] = True
-        return None
+
+        command_return = None
+
+        if command.gcode == GCODE.HOMING_STATUS:
+            command_return = self.__get_homing_status()
+        elif command.gcode == GCODE.CURRENT_POSITION:
+            command_return = self.__get_current_position(command.gcode)
+        elif command.gcode == GCODE.VERSION:
+            command_return = self.__get_version()
+        elif command.gcode == GCODE.READ_INSTRUMENT_ID:
+            command_return = self.__get_pipette_id(command.params)
+        elif command.gcode == GCODE.READ_INSTRUMENT_MODEL:
+            command_return = self.__get_pipette_model(command.params)
+        elif command.gcode == GCODE.WRITE_INSTRUMENT_ID:
+            self.__set_pipette_id(command)
+        elif command.gcode == GCODE.WRITE_INSTRUMENT_MODEL:
+            self.__set_pipette_model(command)
+        elif command.gcode == GCODE.MOVE:
+            self.__move_gantry(command)
+        elif command.gcode == GCODE.HOME:
+            self.__home_gantry(command)
+
+        return command_return
 
     @staticmethod
     def _mount_strings(command: Command) -> Dict[str, str]:
