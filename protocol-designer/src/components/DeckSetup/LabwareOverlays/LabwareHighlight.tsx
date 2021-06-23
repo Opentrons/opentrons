@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import cx from 'classnames'
 import { useSelector } from 'react-redux'
@@ -14,7 +13,9 @@ interface LabwareHighlightProps {
   labwareOnDeck: LabwareOnDeck
 }
 
-export const LabwareHighlight = (props: LabwareHighlightProps): JSX.Element | null => {
+export const LabwareHighlight = (
+  props: LabwareHighlightProps
+): JSX.Element | null => {
   const { labwareOnDeck } = props
   const highlighted = useSelector(getHoveredStepLabware).includes(
     labwareOnDeck.id

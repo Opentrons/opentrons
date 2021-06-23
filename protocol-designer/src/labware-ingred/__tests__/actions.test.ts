@@ -1,4 +1,3 @@
-// @flow
 import configureMockStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
 import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'

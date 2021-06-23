@@ -1,4 +1,3 @@
-// @flow
 import { _castForm } from '../index.js'
 import { FormData } from '../../../../form-types'
 

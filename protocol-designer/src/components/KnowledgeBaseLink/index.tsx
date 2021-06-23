@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 
 export const KNOWLEDGEBASE_ROOT_URL =

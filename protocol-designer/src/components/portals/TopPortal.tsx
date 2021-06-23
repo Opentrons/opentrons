@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import ReactDom from 'react-dom'
 
@@ -12,7 +11,9 @@ export function getPortalElem(): HTMLElement | null {
   return document.getElementById(PORTAL_ROOT_ID)
 }
 
-interface Props { children: React.ReactNode }
+interface Props {
+  children: React.ReactNode
+}
 
 /** The children of Portal are rendered into the
  * PortalRoot, if the PortalRoot exists in the DOM */

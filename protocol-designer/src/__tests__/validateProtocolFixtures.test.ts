@@ -1,4 +1,3 @@
-// @flow
 import Ajv from 'ajv'
 import glob from 'glob'
 import last from 'lodash/last'
@@ -21,7 +20,11 @@ const getAjvValidator = (_protocolSchema: object) => {
   return validateProtocol
 }
 
-const expectResultToMatchSchema = (testName: string, result: any, _protocolSchema: object): void => {
+const expectResultToMatchSchema = (
+  testName: string,
+  result: any,
+  _protocolSchema: object
+): void => {
   const validate = getAjvValidator(_protocolSchema)
   const valid = validate(result)
   const validationErrors = validate.errors

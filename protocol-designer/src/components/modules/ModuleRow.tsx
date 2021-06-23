@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { useDispatch } from 'react-redux'
 import upperFirst from 'lodash/upperFirst'
@@ -10,7 +9,7 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 import { i18n } from '../../localization'
-import { actions as stepFormActions } from '../../step-forms'
+import { actions as stepFormActions, ModuleOnDeck } from '../../step-forms'
 import {
   SPAN7_8_10_11_SLOT,
   DEFAULT_MODEL_FOR_MODULE_TYPE,
@@ -20,7 +19,6 @@ import { isModuleWithCollisionIssue } from './utils'
 import styles from './styles.css'
 
 import { ModuleRealType } from '@opentrons/shared-data'
-import { ModuleOnDeck } from '../../step-forms'
 
 interface Props {
   moduleOnDeck?: ModuleOnDeck

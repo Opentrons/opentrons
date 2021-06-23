@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { shallow, mount } from 'enzyme'
 import { PrimaryButton, AlertModal, OutlineButton } from '@opentrons/components'

@@ -10,8 +10,8 @@ import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  ModuleRealType,
 } from '@opentrons/shared-data'
-import { ModuleRealType } from '@opentrons/shared-data'
 import { DeckSlot, ModuleOrientation } from '../../types'
 // NOTE: all dims are in 'left' orientation. Rotate & transform to obtain 'right' orientation.
 export interface ModuleVizDims {

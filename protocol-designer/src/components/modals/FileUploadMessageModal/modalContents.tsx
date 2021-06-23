@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import assert from 'assert'
 import semver from 'semver'

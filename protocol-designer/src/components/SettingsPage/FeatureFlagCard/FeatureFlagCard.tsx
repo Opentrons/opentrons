@@ -1,4 +1,3 @@
-// @flow
 import sortBy from 'lodash/sortBy'
 import * as React from 'react'
 import { ContinueModal, Card, ToggleButton } from '@opentrons/components'

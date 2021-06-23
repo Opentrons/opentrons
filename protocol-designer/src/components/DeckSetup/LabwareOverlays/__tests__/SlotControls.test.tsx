@@ -1,9 +1,11 @@
-// @flow
-
 import React from 'react'
 import { shallow } from 'enzyme'
 import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
-import { DeckSlot, LabwareDefinition2, MAGNETIC_MODULE_TYPE } from '@opentrons/shared-data'
+import {
+  DeckSlot,
+  LabwareDefinition2,
+  MAGNETIC_MODULE_TYPE,
+} from '@opentrons/shared-data'
 import { DND_TYPES } from '../../../../constants'
 import * as labwareModuleCompatibility from '../../../../utils/labwareModuleCompatibility'
 import { START_TERMINAL_ITEM_ID } from '../../../../steplist'
@@ -16,7 +18,7 @@ describe('SlotControlsComponent', () => {
     typeof labwareModuleCompatibility.getLabwareIsCompatible
   >
   beforeEach(() => {
-    const slot: DeckSlot= {
+    const slot: DeckSlot = {
       id: 'deckSlot1',
       position: [1, 2, 3],
       boundingBox: {

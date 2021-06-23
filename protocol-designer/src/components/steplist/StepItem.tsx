@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import cx from 'classnames'
 import sum from 'lodash/sum'
@@ -10,7 +9,14 @@ import {
 } from '@opentrons/shared-data'
 import { AtomicProfileStep } from '@opentrons/shared-data/protocol/types/schemaV4'
 import { THERMOCYCLER_PROFILE, THERMOCYCLER_STATE } from '../../constants'
-import { stepIconsByType, PROFILE_CYCLE } from '../../form-types'
+import {
+  stepIconsByType,
+  PROFILE_CYCLE,
+  FormData,
+  StepType,
+  ProfileCycleItem,
+  ProfileStepItem,
+} from '../../form-types'
 import { i18n } from '../../localization'
 import { makeLidLabelText, makeTemperatureText } from '../../utils'
 import { PDListItem, TitledStepList } from '../lists'
@@ -22,12 +28,6 @@ import { PauseStepItems } from './PauseStepItems'
 import { SourceDestSubstep } from './SourceDestSubstep'
 import styles from './StepItem.css'
 
-import {
-  FormData,
-  StepType,
-  ProfileCycleItem,
-  ProfileStepItem,
-} from '../../form-types'
 import {
   SubstepIdentifier,
   SubstepItemData,
@@ -111,7 +111,7 @@ export const StepItem = (props: StepItemProps): JSX.Element => {
   )
 }
 
-export type StepItemContentsProps = {
+export interface StepItemContentsProps {
   rawForm: FormData | null | undefined
   stepType: StepType
   substeps: SubstepItemData | null | undefined
@@ -131,7 +131,7 @@ const makeDurationText = (
   return `${minutesText}${durationSeconds || 0}s`
 }
 
-type ProfileStepSubstepRowProps = {
+interface ProfileStepSubstepRowProps {
   step: ProfileStepItem
   stepNumber: number
   repetitionsDisplay: string | null | undefined
@@ -177,7 +177,10 @@ export const ProfileStepSubstepRow = (
 }
 
 // this is a row under a cycle under a substep
-type ProfileCycleRowProps = { step: ProfileStepItem; stepNumber: number }
+interface ProfileCycleRowProps {
+  step: ProfileStepItem
+  stepNumber: number
+}
 const ProfileCycleRow = (props: ProfileCycleRowProps): JSX.Element => {
   const { step, stepNumber } = props
   return (
@@ -193,7 +196,7 @@ const ProfileCycleRow = (props: ProfileCycleRowProps): JSX.Element => {
   )
 }
 
-type ProfileCycleSubstepGroupProps = {
+interface ProfileCycleSubstepGroupProps {
   cycle: ProfileCycleItem
   stepNumber: number
 }
@@ -217,11 +220,11 @@ export const ProfileCycleSubstepGroup = (
   )
 }
 
-type CollapsibleSubstepProps = {
+interface CollapsibleSubstepProps {
   children: React.ReactNode
   headerContent: React.ReactNode
 }
-const CollapsibleSubstep = (props: CollapsibleSubstepProps) => {
+const CollapsibleSubstep = (props: CollapsibleSubstepProps): JSX.Element => {
   const [contentCollapsed, setContentCollapsed] = React.useState<boolean>(true)
   return (
     <>
@@ -239,7 +242,9 @@ const CollapsibleSubstep = (props: CollapsibleSubstepProps) => {
   )
 }
 
-const renderSubstepInfo = (substeps: ThermocyclerProfileSubstepItem) => {
+const renderSubstepInfo = (
+  substeps: ThermocyclerProfileSubstepItem
+): React.ReactNode => {
   let stepNumber = 1
   const substepInfo: Array<
     | React.ReactElement<typeof ProfileCycleSubstepGroup>

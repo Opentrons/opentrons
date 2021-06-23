@@ -1,4 +1,3 @@
-// @flow
 import React from 'react'
 import { mount, ReactWrapper } from 'enzyme'
 import { Provider } from 'react-redux'

@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import {
   FormGroup,
@@ -70,7 +69,7 @@ interface LabelProps {
   value: string
 }
 
-const ChangeTipOptionLabel = (props: LabelProps) => {
+const ChangeTipOptionLabel = (props: LabelProps): JSX.Element => {
   const { value } = props
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: 'bottom-start',

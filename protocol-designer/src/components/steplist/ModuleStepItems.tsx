@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import cx from 'classnames'
 import {
@@ -32,7 +31,7 @@ export const ModuleStepItemRow = (
   </PDListItem>
 )
 
-type Props = {
+interface Props {
   action?: string
   moduleType: ModuleRealType
   actionText: string

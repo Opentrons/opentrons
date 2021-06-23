@@ -1,5 +1,3 @@
-// @flow
-
 import React from 'react'
 import { Formik } from 'formik'
 import { shallow } from 'enzyme'

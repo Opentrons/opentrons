@@ -1,5 +1,3 @@
-// @flow
-
 import * as React from 'react'
 import cx from 'classnames'
 import { Modal, OutlineButton } from '@opentrons/components'
@@ -26,7 +24,7 @@ export const AnnouncementModal = (): JSX.Element => {
     setShowAnnouncementModal,
   ] = React.useState<boolean>(userHasNotSeenAnnouncement)
 
-  const handleClick = () => {
+  const handleClick = (): void => {
     setLocalStorageItem(localStorageAnnouncementKey, announcementKey)
     setShowAnnouncementModal(false)
   }

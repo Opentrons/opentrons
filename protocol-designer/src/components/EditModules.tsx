@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import {
@@ -36,7 +35,7 @@ export const EditModules = (props: EditModulesProps): JSX.Element => {
   ] = React.useState<null | ModelModuleInfo>(null)
   const dispatch = useDispatch()
 
-  const editModuleModel = (selectedModel: ModuleModel) => {
+  const editModuleModel = (selectedModel: ModuleModel): void => {
     if (moduleOnDeck?.id != null) {
       dispatch(
         stepFormActions.editModule({
@@ -50,7 +49,7 @@ export const EditModules = (props: EditModulesProps): JSX.Element => {
       )
     }
   }
-  const editModuleSlot = (selectedSlot: string) => {
+  const editModuleSlot = (selectedSlot: string): void => {
     if (selectedSlot && moduleOnDeck && moduleOnDeck.slot !== selectedSlot) {
       dispatch(moveDeckItem(moduleOnDeck.slot, selectedSlot))
     }

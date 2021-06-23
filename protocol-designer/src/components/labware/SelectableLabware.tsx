@@ -1,8 +1,12 @@
-// @flow
 import * as React from 'react'
 import reduce from 'lodash/reduce'
 
-import { SELECTABLE_WELL_CLASS } from '@opentrons/components'
+import {
+  SELECTABLE_WELL_CLASS,
+  Channels,
+  WellMouseEvent,
+  WellGroup,
+} from '@opentrons/components'
 import {
   arrayToWellGroup,
   getCollidingWells,
@@ -12,7 +16,6 @@ import { SingleLabware } from './SingleLabware'
 import { SelectionRect } from '../SelectionRect'
 import { WellTooltip } from './WellTooltip'
 
-import { Channels, WellMouseEvent, WellGroup } from '@opentrons/components'
 import { ContentsByWell } from '../../labware-ingred/types'
 import { WellIngredientNames } from '../../steplist/types'
 import { GenericRect } from '../../collision-types'

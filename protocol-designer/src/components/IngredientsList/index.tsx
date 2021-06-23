@@ -1,4 +1,3 @@
-// @flow
 // TODO: Ian 2018-10-09 figure out what belongs in LiquidsSidebar vs IngredientsList after #2427
 import * as React from 'react'
 
@@ -43,7 +42,7 @@ const LiquidGroupCard = (props: LiquidGroupCardProps): JSX.Element | null => {
 
   const [expanded, setExpanded] = React.useState(true)
 
-  const toggleAccordion = () => setExpanded(!expanded)
+  const toggleAccordion = (): void => setExpanded(!expanded)
 
   const wellsWithIngred = Object.keys(labwareWellContents)
     .sort(sortWells)
@@ -109,7 +108,7 @@ interface IndividProps {
   removeWellsContents: RemoveWellsContents
 }
 
-function IngredIndividual(props: IndividProps) {
+function IngredIndividual(props: IndividProps): JSX.Element {
   const {
     name,
     wellName,

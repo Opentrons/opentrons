@@ -1,4 +1,3 @@
-// @flow
 import { getRequiresAtLeastV4 } from '../selectors/fileCreator'
 import {
   MAGNETIC_MODULE_TYPE,

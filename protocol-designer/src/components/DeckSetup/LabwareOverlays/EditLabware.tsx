@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
 import cx from 'classnames'
@@ -145,7 +144,10 @@ const labwareSource = {
     props.setDraggedLabware(null)
   },
 }
-const collectLabwareSource = (connect: DragSourceConnector, monitor: DragSourceMonitor) => ({
+const collectLabwareSource = (
+  connect: DragSourceConnector,
+  monitor: DragSourceMonitor
+): React.ReactNode => ({
   connectDragSource: connect.dragSource(),
   isDragging: monitor.isDragging(),
   draggedItem: monitor.getItem(),
@@ -180,7 +182,10 @@ const labwareDropTarget = {
     }
   },
 }
-const collectLabwareDropTarget = (connect: DropTargetConnector, monitor: DropTargetMonitor) => ({
+const collectLabwareDropTarget = (
+  connect: DropTargetConnector,
+  monitor: DropTargetMonitor
+): React.ReactNode => ({
   connectDropTarget: connect.dropTarget(),
   isOver: monitor.isOver(),
   draggedLabware: monitor.getItem()?.labwareOnDeck || null,

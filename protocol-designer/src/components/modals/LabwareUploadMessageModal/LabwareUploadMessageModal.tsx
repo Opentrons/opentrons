@@ -1,4 +1,3 @@
-// @flow
 import assert from 'assert'
 import cx from 'classnames'
 import * as React from 'react'
@@ -7,7 +6,9 @@ import { i18n } from '../../../localization'
 import modalStyles from '../modal.css'
 import { LabwareUploadMessage } from '../../../labware-defs'
 
-const MessageBody = (props: { message: LabwareUploadMessage }) => {
+const MessageBody = (props: {
+  message: LabwareUploadMessage
+}): JSX.Element | null => {
   const { message } = props
 
   if (

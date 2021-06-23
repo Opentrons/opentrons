@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import assert from 'assert'
 import { PDAlert } from './PDAlert'
@@ -22,7 +21,7 @@ type MakeAlert = (
   key: number | string
 ) => JSX.Element
 
-const AlertsComponent = (props: Props) => {
+const AlertsComponent = (props: Props): JSX.Element => {
   const makeHandleCloseWarning = (dismissId?: string | null) => () => {
     assert(dismissId, 'expected dismissId, Alert cannot dismiss warning')
     if (dismissId) {

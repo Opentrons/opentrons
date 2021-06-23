@@ -1,4 +1,3 @@
-// @flow
 import { getMoveLiquidDelayData, getMixDelayData } from '../getDelayData'
 
 describe('getMoveLiquidDelayData', () => {

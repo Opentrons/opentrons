@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { DragLayer } from 'react-dnd'
 import { LabwareOnDeck } from '../LabwareOnDeck'
@@ -15,7 +14,7 @@ interface DragPreviewProps {
   getRobotCoordsFromDOMCoords: RobotWorkSpaceRenderProps['getRobotCoordsFromDOMCoords']
 }
 
-const LabwareDragPreview = (props: DragPreviewProps) => {
+const LabwareDragPreview = (props: DragPreviewProps): React.ReactNode => {
   const {
     item,
     itemType,

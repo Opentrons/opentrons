@@ -1,4 +1,3 @@
-// @flow
 import {
   LabwareDefinition2,
   MAGNETIC_MODULE_TYPE,
@@ -14,7 +13,7 @@ import {
   TEMPERATURE_AT_TARGET,
   TEMPERATURE_DEACTIVATED,
 } from '@opentrons/step-generation'
-import {ModuleStatus, ModuleTag, ModuleTagProps} from '../ModuleTag'
+import { ModuleStatus, ModuleTag, ModuleTagProps } from '../ModuleTag'
 
 import * as timelineFramesSelectors from '../../../top-selectors/timelineFrames'
 import { selectors as stepFormSelectors } from '../../../step-forms'
@@ -198,7 +197,8 @@ describe('ModuleTag', () => {
       const wrapper = render()
 
       expect(
-        wrapper.find('RobotCoordsForeignDiv').prop<any>('innerDivProps').className
+        wrapper.find('RobotCoordsForeignDiv').prop<any>('innerDivProps')
+          .className
       ).toContain('highlighted_border_right_none')
     })
 
@@ -206,7 +206,8 @@ describe('ModuleTag', () => {
       const wrapper = render()
 
       expect(
-        wrapper.find('RobotCoordsForeignDiv').prop<any>('innerDivProps').className
+        wrapper.find('RobotCoordsForeignDiv').prop<any>('innerDivProps')
+          .className
       ).not.toContain('highlighted_border_right_none')
     })
 
@@ -216,7 +217,8 @@ describe('ModuleTag', () => {
       const wrapper = render()
 
       expect(
-        wrapper.find('RobotCoordsForeignDiv').prop<any>('innerDivProps').className
+        wrapper.find('RobotCoordsForeignDiv').prop<any>('innerDivProps')
+          .className
       ).not.toContain('highlighted_border_right_none')
     })
   })

@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { useDispatch } from 'react-redux'
 import cx from 'classnames'
@@ -53,12 +52,12 @@ export const ProfileCycleRow = (props: ProfileCycleRowProps): JSX.Element => {
   const { cycleItem, focusHandlers, stepOffset } = props
   const dispatch = useDispatch()
 
-  const addStepToCycle = () => {
+  const addStepToCycle = (): void => {
     dispatch(steplistActions.addProfileStep({ cycleId: cycleItem.id }))
   }
 
   // TODO IMMEDIATELY make conditional
-  const deleteProfileCycle = () =>
+  const deleteProfileCycle = (): void =>
     dispatch(steplistActions.deleteProfileCycle({ id: cycleItem.id }))
 
   const [
@@ -152,8 +151,12 @@ export const ProfileItemRows = (props: ProfileItemRowsProps): JSX.Element => {
   const { orderedProfileItems, profileItemsById } = props
 
   const dispatch = useDispatch()
-  const addProfileCycle = () => dispatch(steplistActions.addProfileCycle(null))
-  const addProfileStep = () => dispatch(steplistActions.addProfileStep(null))
+  const addProfileCycle = (): void => {
+    dispatch(steplistActions.addProfileCycle(null))
+  }
+  const addProfileStep = (): void => {
+    dispatch(steplistActions.addProfileStep(null))
+  }
 
   const [addCycleTargetProps, addCycleTooltipProps] = useHoverTooltip({
     placement: TOOLTIP_TOP,

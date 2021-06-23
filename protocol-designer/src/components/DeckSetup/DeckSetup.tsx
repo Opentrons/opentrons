@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import compact from 'lodash/compact'
@@ -356,7 +355,7 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
 
 const getHasGen1MultiChannelPipette = (
   pipettes: InitialDeckSetup['pipettes']
-) => {
+): boolean => {
   const pipetteIds = Object.keys(pipettes)
   return pipetteIds.some(pipetteId =>
     GEN_ONE_MULTI_PIPETTES.includes(pipettes[pipetteId]?.name)

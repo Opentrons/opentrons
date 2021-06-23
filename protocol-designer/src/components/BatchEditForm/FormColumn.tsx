@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { Box } from '@opentrons/components'
 // TODO(IL, 2021-03-01): refactor these fragmented style rules (see #7402)

@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { FormGroup, DropdownField, Options } from '@opentrons/components'
@@ -10,7 +9,9 @@ import { FieldProps } from '../types'
 
 type OP = FieldProps
 
-interface SP { pipetteOptions: Options }
+interface SP {
+  pipetteOptions: Options
+}
 
 type Props = OP & SP
 
