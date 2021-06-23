@@ -1,11 +1,11 @@
 import React from 'react'
 import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
-import { ModuleRealType } from '@opentrons/shared-data';
+import { ModuleRealType } from '@opentrons/shared-data'
 import { FilePage, Props } from '../FilePage'
 import { EditModules } from '../EditModules'
 import { EditModulesCard } from '../modules'
-import {ModulesForEditModulesCard} from "../../step-forms";
+import { ModulesForEditModulesCard } from '../../step-forms'
 
 jest.mock('../EditModules')
 jest.mock('../../step-forms/utils')
@@ -46,7 +46,9 @@ describe('File Page', () => {
   })
   it('opens and closes Edit Modules when appropriate handlers are called', () => {
     const wrapper = render(props)
-    wrapper.find(EditModulesCard).invoke('openEditModuleModal')({} as ModuleRealType)
+    wrapper.find(EditModulesCard).invoke('openEditModuleModal')(
+      {} as ModuleRealType
+    )
     expect(wrapper.find(EditModules)).toHaveLength(1)
 
     wrapper.find(EditModules).invoke('onCloseClick')()

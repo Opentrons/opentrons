@@ -115,13 +115,19 @@ export const ConnectedStepItem = (props: Props): JSX.Element => {
 
   const highlightSubstep = (payload: SubstepIdentifier): HoverOnSubstepAction =>
     dispatch(stepsActions.hoverOnSubstep(payload))
-  const selectStep = (): ThunkAction<any> => dispatch(stepsActions.selectStep(stepId))
-  const selectMultipleSteps = (steps: StepIdType[], lastSelected: StepIdType): ThunkAction<SelectMultipleStepsAction> =>
+  const selectStep = (): ThunkAction<any> =>
+    dispatch(stepsActions.selectStep(stepId))
+  const selectMultipleSteps = (
+    steps: StepIdType[],
+    lastSelected: StepIdType
+  ): ThunkAction<SelectMultipleStepsAction> =>
     dispatch(stepsActions.selectMultipleSteps(steps, lastSelected))
   const toggleStepCollapsed = (): ToggleStepCollapsedAction =>
     dispatch(stepsActions.toggleStepCollapsed(stepId))
-  const highlightStep = (): HoverOnStepAction => dispatch(stepsActions.hoverOnStep(stepId))
-  const unhighlightStep = (): HoverOnStepAction => dispatch(stepsActions.hoverOnStep(null))
+  const highlightStep = (): HoverOnStepAction =>
+    dispatch(stepsActions.hoverOnStep(stepId))
+  const unhighlightStep = (): HoverOnStepAction =>
+    dispatch(stepsActions.hoverOnStep(null))
 
   const handleStepItemSelection = (event: React.MouseEvent): void => {
     const { isShiftKeyPressed, isMetaKeyPressed } = getMouseClickKeyInfo(event)

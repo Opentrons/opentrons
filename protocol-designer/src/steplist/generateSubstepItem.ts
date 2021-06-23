@@ -283,12 +283,14 @@ function transferLikeSubsteps(args: {
       initialRobotState,
       pipetteSpec.channels
     )
-    const mergedMultiRows: StepItemSourceDestRow[][] = mergeSubstepRowsMultiChannel({
-      substepRows,
-      isMixStep: stepArgs.commandCreatorFnName === 'mix',
-      channels: pipetteSpec.channels,
-      showDispenseVol,
-    })
+    const mergedMultiRows: StepItemSourceDestRow[][] = mergeSubstepRowsMultiChannel(
+      {
+        substepRows,
+        isMixStep: stepArgs.commandCreatorFnName === 'mix',
+        channels: pipetteSpec.channels,
+        showDispenseVol,
+      }
+    )
     return {
       substepType: 'sourceDest',
       multichannel: true,

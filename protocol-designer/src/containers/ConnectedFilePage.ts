@@ -3,7 +3,11 @@ import * as React from 'react'
 import mapValues from 'lodash/mapValues'
 import { BaseState, ThunkDispatch } from '../types'
 import { FilePage } from '../components/FilePage'
-import { actions, selectors as fileSelectors, FileMetadataFields } from '../file-data'
+import {
+  actions,
+  selectors as fileSelectors,
+  FileMetadataFields,
+} from '../file-data'
 import { selectors as stepFormSelectors, InitialDeckSetup } from '../step-forms'
 import { actions as steplistActions } from '../steplist'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../constants'

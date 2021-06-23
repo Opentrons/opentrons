@@ -36,7 +36,11 @@ beforeEach(() => {
   }
 })
 
-function hasAllWellKeys(result: { wellPlateId: {}; troughId: {}; FIXED_TRASH_ID: {} }) {
+function hasAllWellKeys(result: {
+  wellPlateId: {}
+  troughId: {}
+  FIXED_TRASH_ID: {}
+}) {
   // make sure each labware has keys for all wells added in
   expect(Object.keys(result.wellPlateId).length).toBe(96)
   expect(Object.keys(result.troughId).length).toBe(12)

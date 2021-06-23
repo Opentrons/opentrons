@@ -26,7 +26,11 @@ const _getWellContents = (
   const allWells = labwareDef.wells
   return reduce<LabwareDefinition2['wells'], ContentsByWell>(
     allWells,
-    (acc: ContentsByWell, well: LabwareWell, wellName: string): ContentsByWell => {
+    (
+      acc: ContentsByWell,
+      well: LabwareWell,
+      wellName: string
+    ): ContentsByWell => {
       const groupIds: string[] =
         __ingredientsForContainer && __ingredientsForContainer[wellName]
           ? Object.keys(__ingredientsForContainer[wellName])

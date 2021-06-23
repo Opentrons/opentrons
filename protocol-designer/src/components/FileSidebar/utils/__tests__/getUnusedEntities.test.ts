@@ -13,7 +13,6 @@ import { TEMPERATURE_DEACTIVATED } from '@opentrons/step-generation'
 import { SavedStepFormState } from '../../../../step-forms'
 import { getUnusedEntities } from '../getUnusedEntities'
 
-
 describe('getUnusedEntities', () => {
   it('pipette entities not used in steps are returned', () => {
     const stepForms: SavedStepFormState = {

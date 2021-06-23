@@ -41,7 +41,10 @@ const updatePatchOnThermocyclerFormType = (
   return patch
 }
 
-const updatePatchOnBlockChange = (patch: FormPatch, rawForm: FormData): FormPatch => {
+const updatePatchOnBlockChange = (
+  patch: FormPatch,
+  rawForm: FormData
+): FormPatch => {
   if (fieldHasChanged(rawForm, patch, 'blockIsActive')) {
     return { ...patch, ...getDefaultFields('blockTargetTemp') }
   } else if (fieldHasChanged(rawForm, patch, 'blockIsActiveHold')) {
@@ -51,7 +54,10 @@ const updatePatchOnBlockChange = (patch: FormPatch, rawForm: FormData): FormPatc
   return patch
 }
 
-const updatePatchOnLidChange = (patch: FormPatch, rawForm: FormData): FormPatch => {
+const updatePatchOnLidChange = (
+  patch: FormPatch,
+  rawForm: FormData
+): FormPatch => {
   if (fieldHasChanged(rawForm, patch, 'lidIsActive')) {
     return { ...patch, ...getDefaultFields('lidTargetTemp') }
   } else if (fieldHasChanged(rawForm, patch, 'lidIsActiveHold')) {

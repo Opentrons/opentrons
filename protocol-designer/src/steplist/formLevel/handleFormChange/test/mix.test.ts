@@ -44,7 +44,10 @@ beforeEach(() => {
     },
   }
 
-  handleFormHelper = (patch: Partial<Record<string, unknown>>, baseForm: FormData) =>
+  handleFormHelper = (
+    patch: Partial<Record<string, unknown>>,
+    baseForm: FormData
+  ) =>
     dependentFieldsUpdateMix(patch, baseForm, pipetteEntities, labwareEntities)
 })
 describe('no-op cases should pass through the patch unchanged', () => {

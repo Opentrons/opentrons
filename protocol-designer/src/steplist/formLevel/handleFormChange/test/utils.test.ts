@@ -9,7 +9,6 @@ import { LabwareDefinition2 } from '@opentrons/shared-data'
 import { PipetteEntities } from '@opentrons/step-generation'
 import { FormData } from '../../../../form-types'
 
-
 const fixtureTiprack300ul = _fixture_tiprack_300_ul as LabwareDefinition2
 
 describe('utils', () => {

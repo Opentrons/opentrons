@@ -12,7 +12,7 @@ import {
   fixtureP10Single,
   fixtureP300Single,
 } from '@opentrons/shared-data/pipette/fixtures/name'
-import { LabwareDefinition2 } from '@opentrons/shared-data';
+import { LabwareDefinition2 } from '@opentrons/shared-data'
 import {
   createFile,
   getRequiresAtLeastV5,
@@ -31,7 +31,10 @@ import {
 import * as engageMagnet from '../__fixtures__/createFile/engageMagnet'
 import * as noModules from '../__fixtures__/createFile/noModules'
 import * as v5Fixture from '../__fixtures__/createFile/v5Fixture'
-import { LabwareEntities, PipetteEntities } from '../../../../step-generation/src/types';
+import {
+  LabwareEntities,
+  PipetteEntities,
+} from '../../../../step-generation/src/types'
 import { LabwareDefByDefURI } from '../../labware-defs'
 
 const getAjvValidator = (_protocolSchema: Record<string, any>) => {
@@ -45,7 +48,10 @@ const getAjvValidator = (_protocolSchema: Record<string, any>) => {
   return validateProtocol
 }
 
-const expectResultToMatchSchema = (result: any, _protocolSchema:Record<string, any>): void => {
+const expectResultToMatchSchema = (
+  result: any,
+  _protocolSchema: Record<string, any>
+): void => {
   const validate = getAjvValidator(_protocolSchema)
   const valid = validate(result)
   const validationErrors = validate.errors

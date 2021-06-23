@@ -1,10 +1,7 @@
 import * as React from 'react'
 
 import { i18n } from '../../../../localization'
-import {
-  THERMOCYCLER_STATE,
-  THERMOCYCLER_PROFILE,
-} from '../../../../constants'
+import { THERMOCYCLER_STATE, THERMOCYCLER_PROFILE } from '../../../../constants'
 
 import { ProfileItemRows, RadioGroupField } from '../../fields'
 import { StateFields } from './StateFields'

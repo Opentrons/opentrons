@@ -11,7 +11,9 @@ import { SaveStepFormsMultiAction } from '../../step-forms/actions'
 jest.mock('../../file-data/selectors')
 jest.mock('../../step-forms/selectors')
 
-const getFileMetadataMock = getFileMetadata as jest.MockedFunction<typeof getFileMetadata>
+const getFileMetadataMock = getFileMetadata as jest.MockedFunction<
+  typeof getFileMetadata
+>
 const getArgsAndErrorsByStepIdMock = getArgsAndErrorsByStepId as jest.MockedFunction<
   typeof getArgsAndErrorsByStepId
 >
