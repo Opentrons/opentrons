@@ -18,11 +18,11 @@ const ingredIdsToColor = (groupIds: string[]): string | null | undefined => {
 export const wellFillFromWellContents = (
   wellContents: ContentsByWell
 ): WellFill =>
+// @ts-expect-error(sa, 2021-6-23): TODO IMMEDIATELY: sort out WellContents type
   reduce(
     wellContents,
-    (acc, wellContents: WellContents, wellName: string) => {
+    (acc: WellFill, wellContents: WellContents, wellName: string) => {
       const wellFill = ingredIdsToColor(wellContents.groupIds)
       return wellFill ? { ...acc, [wellName]: wellFill } : acc
     },
-    {}
   )

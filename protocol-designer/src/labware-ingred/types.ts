@@ -9,22 +9,28 @@ export type LabwareTypeById = Record<string, string | null | undefined>
 // ==== WELLS ==========
 // TODO: Ian 2019-06-08 remove this in favor of WellGroup
 export type Wells = Record<string, string>
-export type WellContents = {
-  // non-ingredient well state, for SelectableLabware
-  wellName: string
+export interface WellContents {
   // eg 'A1', 'A2' etc
+  wellName?: string
   groupIds: string[]
   ingreds: LocationLiquidState
+  highlighted?: boolean
+  selected?: boolean
+  maxVolume?: number
 }
-export type ContentsByWell = Record<string, WellContents> | null
-export type WellContentsByLabware = Record<string, ContentsByWell>
+export type ContentsByWell = {
+  [wellName: string]: WellContents
+} | null
+export interface WellContentsByLabware {
+  [labwareId: string]: ContentsByWell
+}
 // ==== INGREDIENTS ====
 export type OrderedLiquids = Array<{
   ingredientId: string
   name: string | null | undefined
 }>
 // TODO: Ian 2018-10-15 audit & rename these confusing types
-export type LiquidGroup = {
+export interface LiquidGroup {
   name: string | null | undefined
   description: string | null | undefined
   serialize: boolean

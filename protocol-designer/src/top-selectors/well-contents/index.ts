@@ -79,6 +79,7 @@ export const getAllWellContentsForActiveItem: Selector<WellContentsByLabware | n
     return wellContentsByLabwareId
   }
 )
+// @ts-expect-error(sa, 2021-6-22): min could return undefined
 export const getSelectedWellsMaxVolume: Selector<number> = createSelector(
   getSelectedWells,
   labwareIngredSelectors.getSelectedLabwareId,
@@ -96,10 +97,11 @@ export const getSelectedWellsMaxVolume: Selector<number> = createSelector(
       ? Object.values(pick(maxVolumesByWell, Object.keys(selectedWells))) // when no wells selected (eg editing ingred group), look at all volumes.
       : // TODO LATER: look at filled wells, not all wells.
         Object.values(maxVolumesByWell)
+    // @ts-expect-error(sa, 2021-6-22): n is already a number, parseInt is meant for strings
     return min(maxVolumesList.map(n => parseInt(n)))
   }
 )
-type CommonWellValues = {
+interface CommonWellValues {
   ingredientId: string | null | undefined
   volume: number | null | undefined
 }

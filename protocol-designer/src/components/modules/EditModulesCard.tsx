@@ -19,7 +19,7 @@ import styles from './styles.css'
 import { ModuleRealType } from '@opentrons/shared-data'
 import { ModulesForEditModulesCard } from '../../step-forms'
 
-interface Props {
+export interface Props {
   modules: ModulesForEditModulesCard
   openEditModuleModal: (
     moduleType: ModuleRealType,

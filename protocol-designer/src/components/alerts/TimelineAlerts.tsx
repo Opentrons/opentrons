@@ -31,7 +31,7 @@ interface SP {
 function mapStateToProps(state: BaseState): SP {
   const timeline = fileDataSelectors.getRobotStateTimeline(state)
   const errors = (timeline.errors || ([] as CommandCreatorError[])).map(
-      (error: CommandCreatorError) => ({
+    (error: CommandCreatorError) => ({
       title: i18n.t(`alert.timeline.error.${error.type}.title`, error.message),
       description: <ErrorContents level="timeline" errorType={error.type} />,
     })
@@ -56,7 +56,7 @@ function mapStateToProps(state: BaseState): SP {
 
 function mergeProps(
   stateProps: SP,
-  dispatchProps: { dispatch: Dispatch<*> }
+  dispatchProps: { dispatch: Dispatch<any, any> }
 ): Props {
   const { dispatch } = dispatchProps
   const stepId = stateProps._stepId
@@ -74,5 +74,5 @@ function mergeProps(
     },
   }
 }
-
+// @ts-expect-error(sa, 2021-6-21): TODO IMMEDIATELY: figure out why TS does not like this
 export const TimelineAlerts = connect(mapStateToProps, null, mergeProps)(Alerts)

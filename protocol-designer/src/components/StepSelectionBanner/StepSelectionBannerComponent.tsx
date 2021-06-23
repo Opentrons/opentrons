@@ -28,7 +28,10 @@ import {
 import { i18n } from '../../localization'
 import { CountPerStepType, StepType } from '../../form-types'
 
-interface StepPillProps { stepType: StepType; count: number }
+interface StepPillProps {
+  stepType: StepType
+  count: number
+}
 
 const stepPillStyles = css`
   align-items: ${ALIGN_CENTER};
@@ -52,6 +55,7 @@ const StepPill = (props: StepPillProps): JSX.Element => {
     i18n.t(`application.stepType.${stepType}`)
   )} (${count})`
   return (
+    // @ts-expect-error(sa, 2021-6-23): TS does not like these styles coming from styled components
     <Flex css={stepPillStyles} key={stepType}>
       <Text fontSize={FONT_SIZE_BODY_1}>{label}</Text>
     </Flex>
@@ -82,11 +86,14 @@ export const StepSelectionBannerComponent = (
 ): JSX.Element => {
   const { countPerStepType, handleExitBatchEdit } = props
   const numSteps = Object.keys(countPerStepType).reduce<number>(
+    // @ts-expect-error(sa, 2021-6-23): not sure how to tell TS that countPerStepType[stepType] actually exists
     (acc, stepType) => acc + countPerStepType[stepType as StepType],
     0
   )
 
-  const stepTypes: StepType[] = Object.keys(countPerStepType).sort() as StepType[]
+  const stepTypes: StepType[] = Object.keys(
+    countPerStepType
+  ).sort() as StepType[]
 
   return (
     <Box
@@ -119,6 +126,7 @@ export const StepSelectionBannerComponent = (
           >
             {stepTypes.map(stepType => (
               <StepPill
+                // @ts-expect-error(sa, 2021-6-23): not sure how to tell TS that countPerStepType[stepType] actually exists
                 count={countPerStepType[stepType]}
                 stepType={stepType}
                 key={stepType}

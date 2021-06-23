@@ -130,7 +130,6 @@ const StepEditFormManager = (props: StepEditFormManagerProps) => {
         <ConfirmDeleteModal
           modalType={DELETE_STEP_FORM}
           onCancelClick={cancelDelete}
-          // @ts-expect-error (ce, 2021-06-21) Type '(...args: never[]) => unknown' is not assignable to type '(event: MouseEvent<Element, MouseEvent>) => unknown'.
           onContinueClick={confirmDelete}
         />
       )}
@@ -140,7 +139,6 @@ const StepEditFormManager = (props: StepEditFormManagerProps) => {
             isNewStep ? CLOSE_UNSAVED_STEP_FORM : CLOSE_STEP_FORM_WITH_CHANGES
           }
           onCancelClick={cancelClose}
-          // @ts-expect-error (ce, 2021-06-21) Type '(...args: never[]) => unknown' is not assignable to type '(event: MouseEvent<Element, MouseEvent>) => unknown'.
           onContinueClick={confirmClose}
         />
       )}

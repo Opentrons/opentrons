@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import cx from 'classnames'
 import { DragDropContext } from 'react-dnd'
@@ -22,7 +21,7 @@ import styles from './ProtocolEditor.css'
 const showGateModal =
   process.env.NODE_ENV === 'production' || process.env.OT_PD_SHOW_GATE
 
-function ProtocolEditorComponent() {
+function ProtocolEditorComponent(): JSX.Element {
   return (
     <div>
       <ComputingSpinner />

@@ -1,4 +1,3 @@
-// @flow
 import {
   fixtureP10Single,
   fixtureP300Single,
@@ -11,11 +10,13 @@ import {
   TEMPERATURE_MODULE_V1,
 } from '@opentrons/shared-data'
 import { TEMPERATURE_DEACTIVATED } from '@opentrons/step-generation'
+import { SavedStepFormState } from '../../../../step-forms'
 import { getUnusedEntities } from '../getUnusedEntities'
+
 
 describe('getUnusedEntities', () => {
   it('pipette entities not used in steps are returned', () => {
-    const stepForms = {
+    const stepForms: SavedStepFormState = {
       step123: {
         pipette: 'pipette123',
         id: 'step123',
@@ -47,7 +48,7 @@ describe('getUnusedEntities', () => {
   })
 
   it('module entities not used in steps are returned', () => {
-    const stepForms = {
+    const stepForms: SavedStepFormState = {
       step123: {
         moduleId: 'magnet123',
         id: 'step123',

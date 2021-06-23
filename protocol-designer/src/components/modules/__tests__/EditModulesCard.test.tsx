@@ -1,5 +1,3 @@
-// @flow
-
 import React from 'react'
 import { mount } from 'enzyme'
 import { Provider } from 'react-redux'
@@ -12,7 +10,11 @@ import {
 } from '@opentrons/shared-data'
 import { TEMPERATURE_DEACTIVATED } from '@opentrons/step-generation'
 import { selectors as featureFlagSelectors } from '../../../feature-flags'
-import { selectors as stepFormSelectors } from '../../../step-forms'
+import {
+  ModuleOnDeck,
+  selectors as stepFormSelectors,
+} from '../../../step-forms'
+import { FormPipette } from '../../../step-forms/types'
 import { SUPPORTED_MODULE_TYPES } from '../../../modules'
 import { EditModulesCard } from '../EditModulesCard'
 import { CrashInfoBox } from '../CrashInfoBox'
@@ -29,12 +31,12 @@ const getPipettesForEditPipetteFormMock = stepFormSelectors.getPipettesForEditPi
 >
 
 describe('EditModulesCard', () => {
-  let store,
-    crashableMagneticModule,
-    nonCrashableMagneticModule,
-    crashablePipette,
-    noncrashablePipette,
-    props
+  let store: any
+  let crashableMagneticModule: ModuleOnDeck | undefined
+  let nonCrashableMagneticModule: ModuleOnDeck | undefined
+  let crashablePipette: FormPipette
+  let noncrashablePipette: FormPipette
+  let props: React.ComponentProps<typeof EditModulesCard>
   beforeEach(() => {
     crashableMagneticModule = {
       id: 'magnet123',
@@ -81,7 +83,7 @@ describe('EditModulesCard', () => {
     }
   })
 
-  function render(renderProps) {
+  function render(renderProps: React.ComponentProps<typeof EditModulesCard>) {
     return mount(
       <Provider store={store}>
         <EditModulesCard {...renderProps} />
