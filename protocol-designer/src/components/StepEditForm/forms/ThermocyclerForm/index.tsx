@@ -5,7 +5,7 @@ import { i18n } from '../../../../localization'
 import {
   THERMOCYCLER_STATE,
   THERMOCYCLER_PROFILE,
-} from '../../../../constants.js'
+} from '../../../../constants'
 
 import { ProfileItemRows, RadioGroupField } from '../../fields'
 import { StateFields } from './StateFields'
