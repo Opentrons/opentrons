@@ -11,13 +11,13 @@ import {
 import { CheckboxField } from '@opentrons/components'
 import { DEFAULT_MODEL_FOR_MODULE_TYPE } from '../../../../constants'
 import { ModuleDiagram } from '../../../modules'
-import { ModuleFields } from '../ModuleFields'
+import { ModuleFields, ModuleFieldsProps } from '../ModuleFields'
 
 describe('ModuleFields', () => {
   let magnetModuleOnDeck,
     temperatureModuleNotOnDeck,
-    thermocyclerModuleNotOnDeck,
-    props
+    thermocyclerModuleNotOnDeck
+  let props: ModuleFieldsProps
   beforeEach(() => {
     magnetModuleOnDeck = {
       onDeck: true,

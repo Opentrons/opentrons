@@ -1,6 +1,6 @@
 // @flow
 
-import React from 'react'
+import React, { ChangeEvent } from 'react'
 import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
 import {
@@ -12,8 +12,9 @@ import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fi
 import fixture_tiprack_1000_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_1000_ul.json'
 import { actions as labwareDefActions } from '../../../../labware-defs'
 import { getOnlyLatestDefs } from '../../../../labware-defs/utils'
-import { PipetteFields } from '../PipetteFields'
+import { PipetteFields, Props } from '../PipetteFields'
 import { PipetteDiagram } from '../PipetteDiagram'
+import { FormPipette } from '../../../../step-forms'
 
 jest.mock('../../../../feature-flags/selectors')
 jest.mock('../../../../labware-defs/selectors')
@@ -39,7 +40,10 @@ describe('PipetteFields', () => {
     tiprackDefURI: '',
   }
 
-  let props, leftPipette, rightPipette, store
+  let props: Props
+  let leftPipette: FormPipette
+  let rightPipette: FormPipette
+  let store: any
   beforeEach(() => {
     store = {
       dispatch: jest.fn(),
@@ -75,7 +79,7 @@ describe('PipetteFields', () => {
     })
   })
 
-  function render(props) {
+  function render(props: Props) {
     return mount(
       <Provider store={store}>
         <PipetteFields {...props} />
@@ -113,7 +117,7 @@ describe('PipetteFields', () => {
     leftPipette.prop('onPipetteChange')('p50')
 
     expect(props.onSetFieldTouched).toHaveBeenCalledWith(leftTiprackKey, false)
-    expect(props.onSetFieldValue.mock.calls).toEqual([
+    expect((props.onSetFieldValue as jest.Mock).mock.calls).toEqual([
       [leftPipetteName, 'p50'],
       [leftTiprackKey, null],
     ])
@@ -145,7 +149,7 @@ describe('PipetteFields', () => {
     const leftTiprackSelect = wrapper
       .find(DropdownField)
       .filter({ name: leftTiprackKey })
-    leftTiprackSelect.prop('onChange')(event)
+    leftTiprackSelect.prop('onChange')(event as ChangeEvent<HTMLSelectElement>)
 
     expect(props.onFieldChange).toHaveBeenCalledWith(event)
   })

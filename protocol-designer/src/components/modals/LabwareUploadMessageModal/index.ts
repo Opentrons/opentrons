@@ -5,10 +5,14 @@ import {
   selectors as labwareDefSelectors,
   actions as labwareDefActions,
 } from '../../../labware-defs'
-import { LabwareUploadMessageModal as LabwareUploadMessageModalComponent } from './LabwareUploadMessageModal'
+import {
+  LabwareUploadMessageModal as LabwareUploadMessageModalComponent,
+  LabwareUploadMessageModalProps,
+} from './LabwareUploadMessageModal'
 import { Dispatch } from 'redux'
 import { BaseState } from '../../../types'
-type Props = React.ComponentProps<typeof LabwareUploadMessageModalComponent>
+
+type Props = LabwareUploadMessageModalProps
 interface SP {
   message: Props['message']
 }
@@ -22,7 +26,7 @@ function mapStateToProps(state: BaseState): SP {
 function mergeProps(
   stateProps: SP,
   dispatchProps: {
-    dispatch: Dispatch<any>
+    dispatch: Dispatch<any, any>
   }
 ): Props {
   const { dispatch } = dispatchProps

@@ -78,7 +78,7 @@ const makeUpdatePipettes = (
 
   // from array of pipettes from Edit Pipette form (with no IDs),
   // assign IDs and populate nextPipettes
-  newPipetteArray.forEach(newPipette => {
+  newPipetteArray.forEach((newPipette: PipetteFieldsData) => {
     if (newPipette && newPipette.name && newPipette.tiprackDefURI) {
       const candidatePipetteIds = prevPipetteIds.filter(id => {
         const prevPipette = prevPipettes[id]
@@ -89,6 +89,7 @@ const makeUpdatePipettes = (
       if (pipetteId) {
         // update used pipette list
         usedPrevPipettes.push(pipetteId)
+        // @ts-expect-error (ce, 2021-06-23) TS is not picking up types from `...newPipette` (IDE is)
         nextPipettes[pipetteId] = { ...newPipette, id: pipetteId }
       } else {
         const newId = uuid()

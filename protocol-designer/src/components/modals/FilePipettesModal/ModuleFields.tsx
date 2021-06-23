@@ -13,7 +13,7 @@ import styles from './FilePipettesModal.css'
 import { ModuleRealType } from '@opentrons/shared-data'
 import { FormModulesByType } from '../../../step-forms'
 
-interface Props {
+export interface ModuleFieldsProps {
   // TODO 2020-3-20 use formik typing here after we update the def in flow-typed
   errors:
     | null
@@ -50,7 +50,7 @@ interface Props {
   onBlur: (event: React.FocusEvent<HTMLSelectElement>) => unknown
 }
 
-export function ModuleFields(props: Props): JSX.Element {
+export function ModuleFields(props: ModuleFieldsProps): JSX.Element {
   const {
     onFieldChange,
     onSetFieldValue,
@@ -114,8 +114,8 @@ export function ModuleFields(props: Props): JSX.Element {
                       errors !== null &&
                       typeof errors !== 'string' &&
                       errors[moduleType]
-                      // @ts-expect-error(sa, 2021-6-21): not a valid way to type narrow
-                        ? errors[moduleType].model
+                        ? // @ts-expect-error(sa, 2021-6-21): not a valid way to type narrow
+                          errors[moduleType].model
                         : null
                     }
                     tabIndex={i}

@@ -3,7 +3,9 @@ import { useFormikContext } from 'formik'
 import { usePrevious } from '@opentrons/components'
 import { isModuleWithCollisionIssue } from '../../modules/utils'
 import { EditModulesFormValues } from '.'
-export const useResetSlotOnModelChange = (supportedModuleSlot: string): void => {
+export const useResetSlotOnModelChange = (
+  supportedModuleSlot: string
+): void => {
   const { values, setValues } = useFormikContext<EditModulesFormValues>()
   const selectedModel = values.selectedModel
   const prevSelectedModel = usePrevious(selectedModel)

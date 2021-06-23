@@ -3,7 +3,7 @@ import * as React from 'react'
 import { useField } from 'formik'
 import { DropdownField } from '@opentrons/components'
 
-interface ModelDropdownProps {
+export interface ModelDropdownProps {
   fieldName: string
   tabIndex: number
   options: Array<{

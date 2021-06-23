@@ -14,6 +14,7 @@ const SIGNUP_TYPEFORM_URL = getIsProduction()
   : STAGING_TYPEFORM_URL
 
 export class SignUpForm extends React.Component<{}> {
+  // TODO (ce, 2021-06-23) have no idea what this should be
   embedElement: React.ElementRef<*>
 
   constructor(props: {}) {
