@@ -1,14 +1,15 @@
 // @ts-nocheck
 import cookie from 'cookie'
 
-export const shutdownFullstory = () => {
+export const shutdownFullstory = (): void => {
   if (window[window['_fs_namespace']]) {
     window[window['_fs_namespace']].shutdown()
   }
+  // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
   delete window[window['_fs_namespace']]
 }
 
-const _setAnalyticsTags = () => {
+const _setAnalyticsTags = (): void => {
   const cookies = cookie.parse(global.document.cookie)
   const { ot_email: email, ot_name: displayName } = cookies
   const commit_str = process.env.OT_PD_COMMIT_HASH
@@ -36,7 +37,7 @@ window['_fs_host'] = 'fullstory.com'
 window['_fs_org'] = process.env.OT_PD_FULLSTORY_ORG
 window['_fs_namespace'] = 'FS'
 
-export const initializeFullstory = () => {
+export const initializeFullstory = (): void => {
   ;(function (m, n, e, t, l, o, g: any, y: any) {
     if (e in m) {
       if (m.console && m.console.log) {

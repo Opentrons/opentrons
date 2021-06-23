@@ -7,7 +7,7 @@ import { selectors as stepFormSelectors } from '../step-forms'
 import { StepList, StepListProps } from '../components/steplist'
 
 type Props = StepListProps
-type SP = {
+interface SP {
   orderedStepIds: Props['orderedStepIds']
   isMultiSelectMode: boolean | null | undefined
 }

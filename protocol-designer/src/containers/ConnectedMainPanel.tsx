@@ -19,7 +19,7 @@ import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors
 import { selectors, Page } from '../navigation'
 import { BaseState } from '../types'
 
-type Props = {
+interface Props {
   page: Page
   selectedTerminalItemId: TerminalItemId | null | undefined
   ingredSelectionMode: boolean

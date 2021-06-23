@@ -6,13 +6,13 @@ export const saveFileMetadata = (
   type: 'SAVE_FILE_METADATA',
   payload,
 })
-export type ComputeRobotStateTimelineRequestAction = {
+export interface ComputeRobotStateTimelineRequestAction {
   type: 'COMPUTE_ROBOT_STATE_TIMELINE_REQUEST'
 }
 export const computeRobotStateTimelineRequest = (): ComputeRobotStateTimelineRequestAction => ({
   type: 'COMPUTE_ROBOT_STATE_TIMELINE_REQUEST',
 })
-export type ComputeRobotStateTimelineSuccessAction = {
+export interface ComputeRobotStateTimelineSuccessAction {
   type: 'COMPUTE_ROBOT_STATE_TIMELINE_SUCCESS'
   payload: WorkerResponse
 }

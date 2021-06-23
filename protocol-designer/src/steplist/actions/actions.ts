@@ -7,7 +7,7 @@ import {
   ClearSelectedItemAction,
   SelectMultipleStepsAction,
 } from '../../ui/steps'
-export type ChangeSavedStepFormAction = {
+export interface ChangeSavedStepFormAction {
   type: 'CHANGE_SAVED_STEP_FORM'
   payload: ChangeFormPayload
 }
@@ -17,7 +17,7 @@ export const changeSavedStepForm = (
   type: 'CHANGE_SAVED_STEP_FORM',
   payload,
 })
-export type ChangeFormInputAction = {
+export interface ChangeFormInputAction {
   type: 'CHANGE_FORM_INPUT'
   payload: ChangeFormPayload
 }
@@ -28,12 +28,12 @@ export const changeFormInput = (
   payload,
 })
 // Populate form with selected action (only used in thunks)
-export type PopulateFormAction = {
+export interface PopulateFormAction {
   type: 'POPULATE_FORM'
   payload: FormData
 }
 // Create new step
-export type DeleteStepAction = {
+export interface DeleteStepAction {
   type: 'DELETE_STEP'
   payload: StepIdType
 }
@@ -41,7 +41,7 @@ export const deleteStep = (stepId: StepIdType): DeleteStepAction => ({
   type: 'DELETE_STEP',
   payload: stepId,
 })
-export type DeleteMultipleStepsAction = {
+export interface DeleteMultipleStepsAction {
   type: 'DELETE_MULTIPLE_STEPS'
   payload: StepIdType[]
 }
@@ -84,7 +84,7 @@ export const deleteMultipleSteps = (
     }
   }
 }
-export type CancelStepFormAction = {
+export interface CancelStepFormAction {
   type: 'CANCEL_STEP_FORM'
   payload: null
 }
@@ -92,7 +92,7 @@ export const cancelStepForm = (): CancelStepFormAction => ({
   type: 'CANCEL_STEP_FORM',
   payload: null,
 })
-export type ReorderStepsAction = {
+export interface ReorderStepsAction {
   type: 'REORDER_STEPS'
   payload: {
     stepIds: StepIdType[]
@@ -104,7 +104,7 @@ export const reorderSteps = (stepIds: StepIdType[]): ReorderStepsAction => ({
     stepIds,
   },
 })
-export type AddProfileStepAction = {
+export interface AddProfileStepAction {
   type: 'ADD_PROFILE_STEP'
   payload: null | {
     cycleId: string
@@ -116,7 +116,7 @@ export const addProfileStep = (
   type: 'ADD_PROFILE_STEP',
   payload,
 })
-export type DeleteProfileCycleAction = {
+export interface DeleteProfileCycleAction {
   type: 'DELETE_PROFILE_CYCLE'
   payload: {
     id: string
@@ -128,7 +128,7 @@ export const deleteProfileCycle = (
   type: 'DELETE_PROFILE_CYCLE',
   payload,
 })
-export type DeleteProfileStepAction = {
+export interface DeleteProfileStepAction {
   type: 'DELETE_PROFILE_STEP'
   payload: {
     id: string
@@ -140,7 +140,7 @@ export const deleteProfileStep = (
   type: 'DELETE_PROFILE_STEP',
   payload,
 })
-export type EditProfileCycleAction = {
+export interface EditProfileCycleAction {
   type: 'EDIT_PROFILE_CYCLE'
   payload: {
     id: string
@@ -155,7 +155,7 @@ export const editProfileCycle = (
   type: 'EDIT_PROFILE_CYCLE',
   payload,
 })
-export type EditProfileStepAction = {
+export interface EditProfileStepAction {
   type: 'EDIT_PROFILE_STEP'
   payload: {
     id: string
@@ -173,7 +173,7 @@ export const editProfileStep = (
   type: 'EDIT_PROFILE_STEP',
   payload,
 })
-export type AddProfileCycleAction = {
+export interface AddProfileCycleAction {
   type: 'ADD_PROFILE_CYCLE'
   payload: null
 }

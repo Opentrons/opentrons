@@ -11,7 +11,7 @@ import {
   DuplicateLabwareAction,
 } from './actions'
 import { ThunkAction } from '../../types'
-export type RenameLabwareAction = {
+export interface RenameLabwareAction {
   type: 'RENAME_LABWARE'
   payload: {
     labwareId: string

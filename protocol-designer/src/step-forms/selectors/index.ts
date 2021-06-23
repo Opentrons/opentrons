@@ -28,8 +28,10 @@ import { hydrateField, getFieldErrors } from '../../steplist/fieldLevel'
 import { getProfileItemsHaveErrors } from '../utils/getProfileItemsHaveErrors'
 import * as featureFlagSelectors from '../../feature-flags/selectors'
 import { denormalizePipetteEntities } from '../utils'
-import { LabwareDefByDefURI } from '../../labware-defs'
-import { selectors as labwareDefSelectors } from '../../labware-defs'
+import {
+  selectors as labwareDefSelectors,
+  LabwareDefByDefURI,
+} from '../../labware-defs'
 import { i18n } from '../../localization'
 import { InstrumentGroup } from '@opentrons/components'
 import type {

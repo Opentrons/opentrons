@@ -1,20 +1,20 @@
 import { MouseEvent } from 'react'
 
-export type DragRect = {
+export interface DragRect {
   xStart: number
   yStart: number
   xDynamic: number
   yDynamic: number
 }
 
-export type GenericRect = {
+export interface GenericRect {
   x0: number
   x1: number
   y0: number
   y1: number
 }
 
-export type BoundingRect = {
+export interface BoundingRect {
   x: number
   y: number
   width: number

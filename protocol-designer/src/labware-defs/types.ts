@@ -7,7 +7,7 @@ export type LabwareUploadMessageType =
   | 'LABWARE_NAME_CONFLICT'
   | 'ASK_FOR_LABWARE_OVERWRITE'
   | 'USES_STANDARD_NAMESPACE'
-type NameConflictFields = {
+interface NameConflictFields {
   defsMatchingLoadName: LabwareDefinition2[]
   defsMatchingDisplayName: LabwareDefinition2[]
   newDef: LabwareDefinition2

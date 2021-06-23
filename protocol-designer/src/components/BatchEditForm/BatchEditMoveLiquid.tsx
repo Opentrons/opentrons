@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import {
   Box,
@@ -36,7 +35,7 @@ const SourceDestBatchEditMoveLiquidFields = (props: {
   propsForFields: FieldPropsByName
 }): JSX.Element => {
   const { prefix, propsForFields } = props
-  const addFieldNamePrefix = (name: string) => `${prefix}_${name}`
+  const addFieldNamePrefix = (name: string): string => `${prefix}_${name}`
 
   const getLabwareIdForPositioningField = (name: string): string | null => {
     const labwareField = getLabwareFieldForPositioningField(name)

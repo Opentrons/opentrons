@@ -1,9 +1,9 @@
 import values from 'lodash/values'
 import { i18n } from '../../localization'
-import { ModuleRealType } from '@opentrons/shared-data'
 import {
   MAGNETIC_MODULE_V1,
   getLabwareDefaultEngageHeight,
+  ModuleRealType,
 } from '@opentrons/shared-data'
 import { Options } from '@opentrons/components'
 import {

@@ -132,7 +132,7 @@ export function volumeInCapacityForMultiDispense(args: {
     volume * 2 + airGapVolume <= pipetteCapacity
   )
 }
-type GetDefaultWellsArgs = {
+interface GetDefaultWellsArgs {
   labwareId: string | null | undefined
   pipetteId: string | null | undefined
   labwareEntities: LabwareEntities

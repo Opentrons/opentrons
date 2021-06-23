@@ -1,6 +1,5 @@
 import { registerSelectors } from '../utils'
-import { rootReducer } from './reducers'
-import { RootState, SavedStepFormState } from './reducers'
+import { rootReducer, RootState, SavedStepFormState } from './reducers'
 import * as selectors from './selectors'
 import * as actions from './actions'
 export * from './utils'

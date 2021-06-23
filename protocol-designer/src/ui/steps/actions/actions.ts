@@ -1,15 +1,20 @@
 import last from 'lodash/last'
-import { analyticsEvent } from '../../../analytics/actions'
-import { PRESAVED_STEP_ID } from '../../../steplist/types'
+import {
+  analyticsEvent,
+  AnalyticsEventAction,
+} from '../../../analytics/actions'
+import {
+  PRESAVED_STEP_ID,
+  TerminalItemId,
+  SubstepIdentifier,
+} from '../../../steplist/types'
 import { selectors as stepFormSelectors } from '../../../step-forms'
 import { getMultiSelectLastSelected } from '../selectors'
 import { resetScrollElements } from '../utils'
 import { Timeline } from '@opentrons/step-generation'
 import { StepIdType, StepType } from '../../../form-types'
 import { GetState, ThunkAction, ThunkDispatch } from '../../../types'
-import { TerminalItemId, SubstepIdentifier } from '../../../steplist/types'
 import { AnalyticsEvent } from '../../../analytics/mixpanel'
-import { AnalyticsEventAction } from '../../../analytics/actions'
 import {
   AddStepAction,
   ExpandAddStepButtonAction,

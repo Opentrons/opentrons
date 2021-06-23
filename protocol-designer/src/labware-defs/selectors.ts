@@ -35,7 +35,7 @@ const _makeCustomLabwareDefsObj = (
   return { ...customDefsById }
 }
 
-const _makeAllLabwareDefsObj = (customDefs: LabwareDefByDefURI) => {
+const _makeAllLabwareDefsObj = (customDefs: LabwareDefByDefURI): Record<string, LabwareDefinition2> => {
   return { ...getAllDefinitions(), ..._makeCustomLabwareDefsObj(customDefs) }
 }
 

@@ -6,11 +6,8 @@ import uniqBy from 'lodash/uniqBy'
 import * as StepGeneration from '@opentrons/step-generation'
 import { getAllWellsForLabware } from '../../constants'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
-import { selectors as stepFormSelectors } from '../../step-forms'
-import { Substeps } from '../../steplist/types'
-import { BaseState, Selector } from '../../types'
-import { StepIdType } from '../../form-types'
 import {
+  selectors as stepFormSelectors,
   LabwareOnDeck,
   LabwareTemporalProperties,
   ModuleOnDeck,
@@ -18,6 +15,10 @@ import {
   PipetteOnDeck,
   PipetteTemporalProperties,
 } from '../../step-forms'
+import { Substeps } from '../../steplist/types'
+import { BaseState, Selector } from '../../types'
+import { StepIdType } from '../../form-types'
+
 // NOTE this just adds missing well keys to the labware-ingred 'deck setup' liquid state
 export const getLabwareLiquidState: Selector<StepGeneration.LabwareLiquidState> = createSelector(
   labwareIngredSelectors.getLiquidsByLabwareId,

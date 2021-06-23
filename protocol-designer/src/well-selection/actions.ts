@@ -1,7 +1,7 @@
 import { WellGroup } from '@opentrons/components'
 // ===== Preselect / select wells in plate
 // these actions all use PRIMARY WELLS (see reducers for definition)
-export type HighlightWellsAction = {
+export interface HighlightWellsAction {
   type: 'HIGHLIGHT_WELLS'
   payload: WellGroup
 }
@@ -11,7 +11,7 @@ export const highlightWells = (
   type: 'HIGHLIGHT_WELLS',
   payload,
 })
-export type SelectWellsAction = {
+export interface SelectWellsAction {
   type: 'SELECT_WELLS'
   payload: WellGroup
 }
@@ -21,7 +21,7 @@ export const selectWells = (
   type: 'SELECT_WELLS',
   payload,
 })
-export type DeselectWellsAction = {
+export interface DeselectWellsAction {
   type: 'DESELECT_WELLS'
   payload: WellGroup
 }
@@ -31,7 +31,7 @@ export const deselectWells = (
   type: 'DESELECT_WELLS',
   payload,
 })
-export type DeselectAllWellsAction = {
+export interface DeselectAllWellsAction {
   type: 'DESELECT_ALL_WELLS'
 }
 export const deselectAllWells = (): DeselectAllWellsAction => ({

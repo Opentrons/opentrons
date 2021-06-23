@@ -1,88 +1,88 @@
 import { Timeline } from '@opentrons/step-generation'
 import { StepIdType, StepType } from '../../../form-types'
 import { TerminalItemId, SubstepIdentifier } from '../../../steplist/types'
-type AddStepPayload = {
+interface AddStepPayload {
   id: string
   stepType: StepType
 }
-export type AddStepAction = {
+export interface AddStepAction {
   type: 'ADD_STEP'
   payload: AddStepPayload
   meta: {
     robotStateTimeline: Timeline
   }
 }
-export type ClearWellSelectionLabwareKeyAction = {
+export interface ClearWellSelectionLabwareKeyAction {
   type: 'CLEAR_WELL_SELECTION_LABWARE_KEY'
   payload: null
 }
-type DuplicateStepPayload = {
+interface DuplicateStepPayload {
   stepId: StepIdType
   duplicateStepId: StepIdType
 }
-export type DuplicateStepAction = {
+export interface DuplicateStepAction {
   type: 'DUPLICATE_STEP'
   payload: DuplicateStepPayload
 }
-export type DuplicateMultipleStepsAction = {
+export interface DuplicateMultipleStepsAction {
   type: 'DUPLICATE_MULTIPLE_STEPS'
   payload: {
     steps: DuplicateStepPayload[]
     indexToInsert: number
   }
 }
-export type ExpandAddStepButtonAction = {
+export interface ExpandAddStepButtonAction {
   type: 'EXPAND_ADD_STEP_BUTTON'
   payload: boolean
 }
-export type ToggleStepCollapsedAction = {
+export interface ToggleStepCollapsedAction {
   type: 'TOGGLE_STEP_COLLAPSED'
   payload: StepIdType
 }
-export type ExpandMultipleStepsAction = {
+export interface ExpandMultipleStepsAction {
   type: 'EXPAND_MULTIPLE_STEPS'
   payload: StepIdType[]
 }
-export type CollapseMultipleStepsAction = {
+export interface CollapseMultipleStepsAction {
   type: 'COLLAPSE_MULTIPLE_STEPS'
   payload: StepIdType[]
 }
-export type HoverOnSubstepAction = {
+export interface HoverOnSubstepAction {
   type: 'HOVER_ON_SUBSTEP'
   payload: SubstepIdentifier
 }
-export type ReorderSelectedStepAction = {
+export interface ReorderSelectedStepAction {
   type: 'REORDER_SELECTED_STEP'
   payload: {
     delta: number
     stepId: StepIdType
   }
 }
-export type ClearSelectedItemAction = {
+export interface ClearSelectedItemAction {
   type: 'CLEAR_SELECTED_ITEM'
 }
-export type SelectTerminalItemAction = {
+export interface SelectTerminalItemAction {
   type: 'SELECT_TERMINAL_ITEM'
   payload: TerminalItemId
 }
 // TODO: Ian 2018-07-31 types aren't being inferred by ActionType in hoveredItem reducer...
-export type HoverOnStepAction = {
+export interface HoverOnStepAction {
   type: 'HOVER_ON_STEP'
   payload: StepIdType | null | undefined
 }
-export type HoverOnTerminalItemAction = {
+export interface HoverOnTerminalItemAction {
   type: 'HOVER_ON_TERMINAL_ITEM'
   payload: TerminalItemId | null | undefined
 }
-export type SetWellSelectionLabwareKeyAction = {
+export interface SetWellSelectionLabwareKeyAction {
   type: 'SET_WELL_SELECTION_LABWARE_KEY'
   payload: string | null | undefined
 }
-export type SelectStepAction = {
+export interface SelectStepAction {
   type: 'SELECT_STEP'
   payload: StepIdType
 }
-export type SelectMultipleStepsAction = {
+export interface SelectMultipleStepsAction {
   type: 'SELECT_MULTIPLE_STEPS'
   payload: {
     stepIds: StepIdType[]

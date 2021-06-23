@@ -11,7 +11,7 @@ const getDefaultFields = (...fields: StepFieldName[]): FormPatch =>
 const updatePatchOnSetTemperatureChange = (
   patch: FormPatch,
   rawForm: FormData
-) => {
+): FormPatch => {
   if (fieldHasChanged(rawForm, patch, 'setTemperature')) {
     return { ...patch, ...getDefaultFields('targetTemperature') }
   }

@@ -9,7 +9,7 @@ import {
   StepArgsAndErrorsById,
   Substeps,
 } from '../steplist/types'
-export type GenerateSubstepsArgs = {
+export interface GenerateSubstepsArgs {
   allStepArgsAndErrors: StepArgsAndErrorsById
   invariantContext: InvariantContext
   orderedStepIds: string[]

@@ -1,4 +1,3 @@
-// @flow
 import { TEMPERATURE_MODULE_TYPE } from '@opentrons/shared-data'
 import { i18n } from '../../../localization'
 import {
@@ -25,7 +24,7 @@ import {
 import { getMockMoveLiquidStep, getMockMixStep } from '../__fixtures__'
 
 import * as utils from '../../modules/utils'
-import { StepType, FormData } from '../../../form-types'
+import { FormData } from '../../../form-types'
 
 function createArgsForStepId(
   stepId: string,

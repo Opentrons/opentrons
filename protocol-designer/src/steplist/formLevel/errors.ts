@@ -39,7 +39,7 @@ export type FormErrorKey =
   | 'PROFILE_LID_TEMPERATURE_REQUIRED'
   | 'BLOCK_TEMPERATURE_HOLD_REQUIRED'
   | 'LID_TEMPERATURE_HOLD_REQUIRED'
-export type FormError = {
+export interface FormError {
   title: string
   body?: React.ReactNode
   dependentFields: StepFieldName[]
@@ -70,7 +70,7 @@ const PAUSE_TEMP_PARAM_REQUIRED: FormError = {
   dependentFields: ['pauseAction', 'pauseTemperature'],
 }
 
-const VOLUME_TOO_HIGH = (pipetteCapacity: number) => ({
+const VOLUME_TOO_HIGH = (pipetteCapacity: number): FormError => ({
   title: `Volume is greater than maximum pipette/tip volume (${pipetteCapacity} ul)`,
   dependentFields: ['pipette', 'volume'],
 })

@@ -1,7 +1,7 @@
 import { i18n } from '../../localization'
 import { getDefaultsForStepType } from './getDefaultsForStepType'
 import { StepType, StepIdType, BlankForm, FormData } from '../../form-types'
-type NewFormArgs = {
+interface NewFormArgs {
   stepId: StepIdType
   stepType: StepType
 }

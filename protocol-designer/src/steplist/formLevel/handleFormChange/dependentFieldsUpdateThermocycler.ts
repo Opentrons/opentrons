@@ -11,7 +11,7 @@ const getDefaultFields = (...fields: StepFieldName[]): FormPatch =>
 const updatePatchOnThermocyclerFormType = (
   patch: FormPatch,
   rawForm: FormData
-) => {
+): FormPatch => {
   // Profile => State
   if (
     rawForm['thermocyclerFormType'] !== null &&
@@ -41,7 +41,7 @@ const updatePatchOnThermocyclerFormType = (
   return patch
 }
 
-const updatePatchOnBlockChange = (patch: FormPatch, rawForm: FormData) => {
+const updatePatchOnBlockChange = (patch: FormPatch, rawForm: FormData): FormPatch => {
   if (fieldHasChanged(rawForm, patch, 'blockIsActive')) {
     return { ...patch, ...getDefaultFields('blockTargetTemp') }
   } else if (fieldHasChanged(rawForm, patch, 'blockIsActiveHold')) {
@@ -51,7 +51,7 @@ const updatePatchOnBlockChange = (patch: FormPatch, rawForm: FormData) => {
   return patch
 }
 
-const updatePatchOnLidChange = (patch: FormPatch, rawForm: FormData) => {
+const updatePatchOnLidChange = (patch: FormPatch, rawForm: FormData): FormPatch => {
   if (fieldHasChanged(rawForm, patch, 'lidIsActive')) {
     return { ...patch, ...getDefaultFields('lidTargetTemp') }
   } else if (fieldHasChanged(rawForm, patch, 'lidIsActiveHold')) {

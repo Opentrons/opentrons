@@ -45,7 +45,7 @@ const updatePatchOnPipetteChannelChange = (
   rawForm: FormData,
   labwareEntities: LabwareEntities,
   pipetteEntities: PipetteEntities
-) => {
+): FormPatch => {
   if (patch.pipette === undefined) return patch
   let update = {}
   const prevChannels = getChannels(rawForm.pipette, pipetteEntities)
@@ -78,7 +78,6 @@ const updatePatchOnPipetteChannelChange = (
     }
   }
 
-  // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
   return { ...patch, ...update }
 }
 
@@ -86,7 +85,7 @@ const updatePatchOnPipetteChange = (
   patch: FormPatch,
   rawForm: FormData,
   pipetteEntities: PipetteEntities
-) => {
+): FormPatch => {
   // when pipette ID is changed (to another ID, or to null),
   // set any flow rates to null
   if (fieldHasChanged(rawForm, patch, 'pipette')) {

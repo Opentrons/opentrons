@@ -8,7 +8,6 @@ import {
   temperatureRangeFieldValue,
   realNumber,
 } from './errors'
-import { ValueMasker, ValueCaster } from './processing'
 import {
   maskToInteger,
   maskToFloat,
@@ -16,6 +15,8 @@ import {
   defaultTo,
   composeMaskers,
   trimDecimals,
+  ValueMasker,
+  ValueCaster,
 } from './processing'
 import {
   MIN_TEMP_MODULE_TEMP,
@@ -49,7 +50,7 @@ const getPipetteEntity = (
   return state.pipetteEntities[id] || null
 }
 
-type StepFieldHelpers = {
+interface StepFieldHelpers {
   getErrors?: (arg0: unknown) => string[]
   maskValue?: ValueMasker
   castValue?: ValueCaster

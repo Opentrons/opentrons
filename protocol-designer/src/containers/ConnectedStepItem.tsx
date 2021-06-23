@@ -19,6 +19,9 @@ import {
   getMultiSelectItemIds,
   getMultiSelectLastSelected,
   getSelectedStepId,
+  HoverOnStepAction,
+  HoverOnSubstepAction,
+  ToggleStepCollapsedAction,
 } from '../ui/steps'
 import { selectors as fileDataSelectors } from '../file-data'
 
@@ -38,8 +41,9 @@ import {
 
 import { SubstepIdentifier } from '../steplist/types'
 import { StepIdType } from '../form-types'
+import { ThunkAction } from '../types'
 
-type Props = {
+interface Props {
   stepId: StepIdType
   stepNumber: number
   onStepContextMenu?: () => void
@@ -48,7 +52,7 @@ type Props = {
 const nonePressed = (keysPressed: boolean[]): boolean =>
   keysPressed.every(keyPress => keyPress === false)
 
-const getUserOS = () => new UAParser().getOS().name
+const getUserOS = (): string | undefined => new UAParser().getOS().name
 
 const getMouseClickKeyInfo = (
   event: React.MouseEvent
@@ -110,15 +114,15 @@ export const ConnectedStepItem = (props: Props): JSX.Element => {
   // Actions
   const dispatch = useDispatch()
 
-  const highlightSubstep = (payload: SubstepIdentifier) =>
+  const highlightSubstep = (payload: SubstepIdentifier): HoverOnSubstepAction =>
     dispatch(stepsActions.hoverOnSubstep(payload))
-  const selectStep = () => dispatch(stepsActions.selectStep(stepId))
-  const selectMultipleSteps = (steps: StepIdType[], lastSelected: StepIdType) =>
+  const selectStep = (): ThunkAction<any> => dispatch(stepsActions.selectStep(stepId))
+  const selectMultipleSteps = (steps: StepIdType[], lastSelected: StepIdType): ThunkAction<SelectMultipleStepsAction> =>
     dispatch(stepsActions.selectMultipleSteps(steps, lastSelected))
-  const toggleStepCollapsed = () =>
+  const toggleStepCollapsed = (): ToggleStepCollapsedAction =>
     dispatch(stepsActions.toggleStepCollapsed(stepId))
-  const highlightStep = () => dispatch(stepsActions.hoverOnStep(stepId))
-  const unhighlightStep = () => dispatch(stepsActions.hoverOnStep(null))
+  const highlightStep = (): HoverOnStepAction => dispatch(stepsActions.hoverOnStep(stepId))
+  const unhighlightStep = (): HoverOnStepAction => dispatch(stepsActions.hoverOnStep(null))
 
   const handleStepItemSelection = (event: React.MouseEvent): void => {
     const { isShiftKeyPressed, isMetaKeyPressed } = getMouseClickKeyInfo(event)

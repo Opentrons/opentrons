@@ -1,4 +1,3 @@
-// @flow
 import {
   mergeSubstepRowsSingleChannel,
   mergeSubstepRowsMultiChannel,
@@ -8,7 +7,7 @@ const ingred1Id = 'ingred1Id'
 const wellNamesForCol = (isMulti: boolean, colNum: string): string[] =>
   isMulti ? 'ABCDEFGH'.split('').map(s => `${s}${colNum}`) : [`A${colNum}`]
 
-type Ingreds = { [ingredId: string]: number }
+interface Ingreds { [ingredId: string]: number }
 const repeatIngreds = (
   isMulti: boolean,
   colNum: string,

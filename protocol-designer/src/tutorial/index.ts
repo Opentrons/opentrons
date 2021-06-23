@@ -1,6 +1,5 @@
 import * as actions from './actions'
-import { RootState } from './reducers'
-import { rootReducer } from './reducers'
+import { rootReducer, RootState } from './reducers'
 import * as selectors from './selectors'
 type HintKey =  // normal hints
   | 'add_liquids_and_labware'

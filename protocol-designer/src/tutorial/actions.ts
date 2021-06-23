@@ -1,5 +1,5 @@
 import { HintKey } from './index'
-export type AddHintAction = {
+export interface AddHintAction {
   type: 'ADD_HINT'
   payload: {
     hintKey: HintKey
@@ -11,7 +11,7 @@ export const addHint = (hintKey: HintKey): AddHintAction => ({
     hintKey,
   },
 })
-export type RemoveHintAction = {
+export interface RemoveHintAction {
   type: 'REMOVE_HINT'
   payload: {
     hintKey: HintKey
@@ -29,7 +29,7 @@ export const removeHint = (
     rememberDismissal,
   },
 })
-export type ClearAllHintDismissalsAction = {
+export interface ClearAllHintDismissalsAction {
   type: 'CLEAR_ALL_HINT_DISMISSALS'
 }
 export const clearAllHintDismissals = (): ClearAllHintDismissalsAction => ({

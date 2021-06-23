@@ -4,8 +4,9 @@ import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  LabwareDefinition2,
+  ModuleRealType,
 } from '@opentrons/shared-data'
-import { LabwareDefinition2, ModuleRealType } from '@opentrons/shared-data'
 import { LabwareDefByDefURI } from '../labware-defs'
 import { LabwareOnDeck } from '../step-forms'
 // NOTE: this does not distinguish btw versions. Standard labware only (assumes namespace is 'opentrons')

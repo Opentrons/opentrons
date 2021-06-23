@@ -13,11 +13,11 @@ interface DP { selectTerminalItem: (terminalItemId: TerminalItemId) => unknown }
 type Props = OP & DP
 
 class TerminalItemLinkComponent extends React.Component<Props> {
-  handleClick = () => {
+  handleClick = (): void => {
     this.props.selectTerminalItem(this.props.terminalId)
   }
 
-  render() {
+  render(): JSX.Element {
     return (
       <a className={styles.nav_link} onClick={this.handleClick}>
         {i18n.t(`nav.terminal_item.${this.props.terminalId}`)}

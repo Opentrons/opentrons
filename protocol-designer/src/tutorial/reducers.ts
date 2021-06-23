@@ -1,5 +1,4 @@
-import { Reducer } from 'redux'
-import { combineReducers } from 'redux'
+import { combineReducers, Reducer } from 'redux'
 import { handleActions } from 'redux-actions'
 import pickBy from 'lodash/pickBy'
 import uniq from 'lodash/uniq'

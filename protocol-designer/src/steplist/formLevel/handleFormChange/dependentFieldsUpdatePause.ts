@@ -12,7 +12,7 @@ const getDefaultFields = (...fields: StepFieldName[]): FormPatch =>
 const updatePatchOnPauseTemperatureChange = (
   patch: FormPatch,
   rawForm: FormData
-) => {
+): FormPatch => {
   if (fieldHasChanged(rawForm, patch, 'pauseAction')) {
     return {
       ...patch,

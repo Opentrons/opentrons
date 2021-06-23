@@ -1,6 +1,9 @@
 import groupBy from 'lodash/groupBy'
-import { LabwareDefinition2 } from '@opentrons/shared-data'
-import { getLabwareDefURI, PD_DO_NOT_LIST } from '@opentrons/shared-data'
+import {
+  getLabwareDefURI,
+  PD_DO_NOT_LIST,
+  LabwareDefinition2,
+} from '@opentrons/shared-data'
 import { LabwareDefByDefURI } from './types'
 
 // TODO: Ian 2019-04-11 getAllDefinitions also exists (differently) in labware-library,

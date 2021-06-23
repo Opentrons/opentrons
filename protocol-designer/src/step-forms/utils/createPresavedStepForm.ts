@@ -27,7 +27,7 @@ import { FormData, StepType, StepIdType } from '../../form-types'
 import { InitialDeckSetup } from '../types'
 import { FormPatch } from '../../steplist/actions/types'
 import { SavedStepFormState, OrderedStepIdsState } from '../reducers'
-export type CreatePresavedStepFormArgs = {
+export interface CreatePresavedStepFormArgs {
   stepId: StepIdType
   stepType: StepType
   pipetteEntities: PipetteEntities

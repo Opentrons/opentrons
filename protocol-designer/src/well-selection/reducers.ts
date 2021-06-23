@@ -1,7 +1,6 @@
 import omit from 'lodash/omit'
-import { combineReducers } from 'redux'
+import { combineReducers, Reducer } from 'redux'
 import { handleActions } from 'redux-actions'
-import { Reducer } from 'redux'
 import { WellGroup } from '@opentrons/components'
 import { Action } from '../types'
 import {

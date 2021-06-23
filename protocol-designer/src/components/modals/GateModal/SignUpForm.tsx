@@ -1,5 +1,3 @@
-// @flow
-
 import * as React from 'react'
 import { makeWidget } from '@typeform/embed'
 import { getIsProduction } from '../../../networking/opentronsWebApi'
@@ -15,7 +13,7 @@ const SIGNUP_TYPEFORM_URL = getIsProduction()
 
 export class SignUpForm extends React.Component<{}> {
   // TODO (ce, 2021-06-23) have no idea what this should be
-  embedElement: React.ElementRef<*>
+  embedElement: React.ElementRef<any>
 
   constructor(props: {}) {
     super(props)

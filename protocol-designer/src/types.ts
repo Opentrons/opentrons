@@ -10,7 +10,7 @@ import { RootState as StepForms } from './step-forms'
 import { RootState as Tutorial } from './tutorial'
 import { RootState as UI } from './ui'
 import { RootState as WellSelection } from './well-selection/reducers'
-export type BaseState = {
+export interface BaseState {
   analytics: Analytics
   dismiss: Dismiss
   fileData: FileData
@@ -33,7 +33,7 @@ export type ThunkAction<A> =
 | ((dispatch: ThunkDispatch<A>, getState: GetState) => A)
 | ((dispatch: ThunkDispatch<A>, getState: GetState) => void)
 // TODO(mc, 2018-04-18): make actual Action union type for PD
-export type Action = {
+export interface Action {
   type: string
   payload?: unknown
   metadata?: unknown
@@ -41,11 +41,11 @@ export type Action = {
 export type WellVolumes = Record<string, number>
 // TODO LATER Ian 2018-02-19 type for containers.json
 // TODO(mc, 2020-06-04): this type is unused, can it be deleted?
-export type JsonWellData = {
+export interface JsonWellData {
   'total-liquid-volume': number // missing rest of fields, todo later
 }
 // TODO(mc, 2020-06-04): this type is unused, can it be deleted?
-export type VolumeJson = {
+export interface VolumeJson {
   locations: Record<string, JsonWellData>
 }
 // NOTE: string expected to be '1', '2', ... '12' for normal deck slots,

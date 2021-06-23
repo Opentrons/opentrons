@@ -37,7 +37,7 @@ export const createCustomLabwareDefAction = (
   type: 'CREATE_CUSTOM_LABWARE_DEF',
   payload,
 })
-export type ReplaceCustomLabwareDef = {
+export interface ReplaceCustomLabwareDef {
   type: 'REPLACE_CUSTOM_LABWARE_DEF'
   payload: {
     defURIToOverwrite: string

@@ -11,7 +11,7 @@ const getDefaultFields = (...fields: StepFieldName[]): FormPatch =>
 const updatePatchOnMagnetActionChange = (
   patch: FormPatch,
   rawForm: FormData
-) => {
+): FormPatch => {
   if (fieldHasChanged(rawForm, patch, 'magnetAction')) {
     return { ...patch, ...getDefaultFields('engageHeight') }
   }

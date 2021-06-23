@@ -7,10 +7,10 @@ import {
   END_TERMINAL_ITEM_ID,
   PRESAVED_STEP_ID,
 } from '../../steplist/types'
-import { HoverableItem } from '../../ui/steps/reducers'
 import {
   SINGLE_STEP_SELECTION_TYPE,
   TERMINAL_ITEM_SELECTION_TYPE,
+  HoverableItem,
 } from '../../ui/steps/reducers'
 import { CommandsAndRobotState } from '@opentrons/step-generation'
 import { StepIdType } from '../../form-types'

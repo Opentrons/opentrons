@@ -1,5 +1,9 @@
-import { PROFILE_CYCLE, PROFILE_STEP } from '../../form-types'
-import { ProfileStepItem, ProfileCycleItem } from '../../form-types'
+import {
+  PROFILE_CYCLE,
+  PROFILE_STEP,
+  ProfileStepItem,
+  ProfileCycleItem,
+} from '../../form-types'
 export const createInitialProfileStep = (id: string): ProfileStepItem => ({
   type: PROFILE_STEP,
   id,

@@ -256,7 +256,7 @@ const updatePatchOnPipetteChange = (
   return patch
 }
 
-const getClearedDisposalVolumeFields = () =>
+const getClearedDisposalVolumeFields = (): FormPatch =>
   getDefaultFields('disposalVolume_volume', 'disposalVolume_checkbox')
 
 const clampAspirateAirGapVolume = (
@@ -302,10 +302,10 @@ const clampDispenseAirGapVolume = (
   const pipetteId: string = appliedPatch.pipette
   // @ts-expect-error(sa, 2021-6-14): appliedPatch.disposalVolume_checkbox does not exist. Address in #3161
   const disposalVolume = appliedPatch.disposalVolume_checkbox
-  // @ts-expect-error(sa, 2021-6-14): appliedPatch.disposalVolume_volume does not exist. Address in #3161
-    ? Number(appliedPatch.disposalVolume_volume) || 0
+    ? // @ts-expect-error(sa, 2021-6-14): appliedPatch.disposalVolume_volume does not exist. Address in #3161
+      Number(appliedPatch.disposalVolume_volume) || 0
     : 0
-    // @ts-expect-error(sa, 2021-6-14): appliedPatch.volume does not exist. Address in #3161
+  // @ts-expect-error(sa, 2021-6-14): appliedPatch.volume does not exist. Address in #3161
   const transferVolume = Number(appliedPatch.volume)
   // @ts-expect-error(sa, 2021-6-14): appliedPatch.dispense_airGap_volume does not exist. Address in #3161
   const dispenseAirGapVolume = Number(appliedPatch.dispense_airGap_volume)
@@ -321,7 +321,7 @@ const clampDispenseAirGapVolume = (
     const minAirGapVolume = 0 // NOTE: a form level warning will occur if the air gap volume is below the pipette min volume
 
     const maxAirGapVolume =
-    // @ts-expect-error(sa, 2021-6-14): appliedPatch.path does not exist. Address in #3161
+      // @ts-expect-error(sa, 2021-6-14): appliedPatch.path does not exist. Address in #3161
       appliedPatch.path === 'multiDispense'
         ? capacity - disposalVolume - transferVolume
         : capacity

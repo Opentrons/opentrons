@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { selectors } from '../navigation'
+import { selectors, Page } from '../navigation'
 import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors'
 
 import { ConnectedStepList } from './ConnectedStepList'
@@ -11,9 +11,8 @@ import { LiquidsSidebar } from '../components/LiquidsSidebar'
 import { SettingsSidebar } from '../components/SettingsPage'
 
 import { BaseState } from '../types'
-import { Page } from '../navigation'
 
-type Props = {
+interface Props {
   page: Page
   liquidPlacementMode: boolean
 }

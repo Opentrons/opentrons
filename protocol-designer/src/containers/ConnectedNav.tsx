@@ -9,12 +9,12 @@ import { i18n } from '../localization'
 import { Page, actions, selectors } from '../navigation'
 import { selectors as fileSelectors } from '../file-data'
 
-type SP = {
+interface SP {
   currentPage: Page
   currentProtocolExists: boolean
 }
 
-type DP = {
+interface DP {
   handleClick: (page: Page) => void
 }
 

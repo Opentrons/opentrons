@@ -4,10 +4,10 @@ import {
   getInvariantContext,
 } from '../step-forms/selectors'
 import { getInitialRobotState } from '../file-data/selectors'
-import { ComputeRobotStateTimelineSuccessAction } from '../file-data/actions'
 import {
   computeRobotStateTimelineRequest,
   computeRobotStateTimelineSuccess,
+  ComputeRobotStateTimelineSuccessAction,
 } from '../file-data/actions'
 import { getLabwareNamesByModuleId } from '../ui/modules/selectors'
 import { Middleware } from 'redux'
