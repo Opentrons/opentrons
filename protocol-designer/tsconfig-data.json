@@ -4,7 +4,7 @@
     "compilerOptions": {
       "composite": true,
       "emitDeclarationOnly": false,
-      "rootDir": "src",
+      "rootDir": ".",
       "outDir": "lib"
     },
     "include": ["src/**/*.json", "fixtures/**/*.json"],
