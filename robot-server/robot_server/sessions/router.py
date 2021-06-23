@@ -4,8 +4,14 @@ from datetime import datetime
 from typing import Optional
 from typing_extensions import Literal
 
+from opentrons.hardware_control import ThreadManager
 from robot_server.errors import ErrorDetails, ErrorResponse
-from robot_server.service.dependencies import get_current_time, get_unique_id
+
+from robot_server.service.dependencies import (
+    get_current_time,
+    get_unique_id,
+    get_hardware,
+)
 from robot_server.service.json_api import (
     RequestModel,
     ResponseModel,
@@ -212,6 +218,7 @@ async def create_session_action(
     session_view: SessionView = Depends(SessionView),
     session_store: SessionStore = Depends(get_session_store),
     engine_store: EngineStore = Depends(get_engine_store),
+    hardware_api: ThreadManager = Depends(get_hardware),
     action_id: str = Depends(get_unique_id),
     created_at: datetime = Depends(get_current_time),
 ) -> ResponseModel[SessionAction]:
@@ -237,6 +244,7 @@ async def create_session_action(
         )
 
         # TODO(mc, 2021-06-11): support actions other than `start`
+        await hardware_api.home()
         engine_store.runner.play()
 
     except SessionNotFoundError as e:

@@ -5,7 +5,6 @@ from typing import Optional
 
 from opentrons.types import Point
 from opentrons.hardware_control.dev_types import PipetteDict
-from opentrons.protocols.geometry.deck import FIXED_TRASH_ID
 
 from .. import errors
 from ..types import WellLocation, WellOrigin
@@ -173,8 +172,13 @@ class GeometryView:
         pipette_config: PipetteDict,
     ) -> WellLocation:
         """Get tip drop location given labware and hardware pipette."""
-        # return to top if labware is fixed trash
-        if labware_id == FIXED_TRASH_ID:
+        # return to top if labware is fixed trash=
+        is_fixed_trash = self._labware.get_labware_has_quirk(
+            labware_id=labware_id,
+            quirk="fixedTrash",
+        )
+
+        if is_fixed_trash:
             return WellLocation()
 
         nominal_length = self._labware.get_tip_length(labware_id)

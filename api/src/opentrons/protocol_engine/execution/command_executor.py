@@ -1,11 +1,13 @@
 """Command side-effect execution logic container."""
-from __future__ import annotations
+from logging import getLogger
 
 from ..resources import ResourceProviders
 from ..commands import Command, CommandStatus, CommandMapper
 from .equipment import EquipmentHandler
 from .movement import MovementHandler
 from .pipetting import PipettingHandler
+
+log = getLogger(__name__)
 
 
 class CommandExecutor:
@@ -43,8 +45,13 @@ class CommandExecutor:
         status = CommandStatus.EXECUTED
 
         try:
+            log.debug(f"Executing {command.id}, {command.commandType}, {command.data}")
             result = await command_impl.execute(command.data)  # type: ignore[arg-type]
         except Exception as e:
+            log.warn(
+                f"Execution of {command.id} failed",
+                exc_info=e,
+            )
             # TODO(mc, 2021-06-22): differentiate between `ProtocolEngineError`s
             # and unexpected errors when the Command model is ready to accept
             # structured error details

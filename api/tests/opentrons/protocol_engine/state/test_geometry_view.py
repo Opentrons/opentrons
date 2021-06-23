@@ -7,7 +7,6 @@ from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV2
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.hardware_control.dev_types import PipetteDict
-from opentrons.protocols.geometry.deck import FIXED_TRASH_ID
 from opentrons.types import Point, DeckSlotName
 
 from opentrons.protocol_engine import errors
@@ -481,14 +480,20 @@ def test_get_tip_drop_location(
 
 
 def test_get_tip_drop_location_with_trash(
+    decoy: Decoy,
     labware_view: LabwareView,
     subject: GeometryView,
 ) -> None:
     """It should get relative drop tip location for a the fixed trash."""
     pipette_config: PipetteDict = cast(PipetteDict, {"return_tip_height": 0.7})
 
+    decoy.when(
+        labware_view.get_labware_has_quirk(labware_id="labware-id", quirk="fixedTrash")
+    ).then_return(True)
+
     location = subject.get_tip_drop_location(
-        labware_id=FIXED_TRASH_ID, pipette_config=pipette_config
+        labware_id="labware-id",
+        pipette_config=pipette_config,
     )
 
     assert location == WellLocation(origin=WellOrigin.TOP, offset=(0, 0, 0))
