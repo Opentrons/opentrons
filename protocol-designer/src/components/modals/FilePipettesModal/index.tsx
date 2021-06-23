@@ -109,7 +109,8 @@ const pipetteValidationShape = Yup.object().shape({
       otherwise: null,
     }),
 })
-const moduleValidationShape = Yup.object().shape({
+// any typing this because TS says there are too many possibilities of what this could be
+const moduleValidationShape: any = Yup.object().shape({
   onDeck: Yup.boolean().default(false),
   model: Yup.string()
     .nullable()
@@ -151,7 +152,7 @@ export class FilePipettesModal extends React.Component<Props, State> {
     }
   }
 
-  componentDidUpdate(prevProps: Props) {
+  componentDidUpdate(prevProps: Props): void {
     if (!prevProps.hideModal && this.props.hideModal)
       this.setState({ showEditPipetteConfirmation: false })
   }
