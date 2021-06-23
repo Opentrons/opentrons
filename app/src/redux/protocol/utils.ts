@@ -8,7 +8,10 @@ import {
 import { TYPE_JSON, TYPE_PYTHON, TYPE_ZIP } from './constants'
 
 import type { ProtocolType } from './types'
-import type { ProtocolParseErrorHandler } from '@opentrons/shared-data/js/helpers'
+import type {
+  ProtocolData,
+  ProtocolParseErrorHandler,
+} from '@opentrons/shared-data/js/helpers'
 
 export function filenameToType(filename: string): ProtocolType | null {
   if (fileExtensionIsJson(filename)) return TYPE_JSON
@@ -29,7 +32,7 @@ export const arrayBufferToBase64 = (buffer: ArrayBuffer): string => {
 
 export function ingestProtocolFile(
   file: File,
-  handleSuccess: (data: ReturnType<typeof parseProtocolData>) => unknown,
+  handleSuccess: (data: ProtocolData) => unknown,
   handleError?: ProtocolParseErrorHandler
 ): void {
   const reader = new FileReader()
@@ -42,7 +45,8 @@ export function ingestProtocolFile(
       ? arrayBufferToBase64(_contents)
       : _contents
 
-    handleSuccess(parseProtocolData(file, contents, handleError))
+    const protocolData = parseProtocolData(file, contents, handleError)
+    protocolData != null && handleSuccess(protocolData)
   }
 
   if (fileIsBinary(file)) {

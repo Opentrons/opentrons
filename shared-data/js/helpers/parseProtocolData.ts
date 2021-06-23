@@ -56,11 +56,14 @@ export function parseProtocolData(
 ): ProtocolData | null {
   if (fileExtensionIsJson(file.name)) {
     return validateJsonProtocolFileContents(contents, handleError)
-  } else if (metadata != null) {
+  } else if (fileExtensionIsPython(file.name)) {
     // grab Python protocol metadata, if any
-    return { metadata }
+    return metadata != null ? { metadata } : null
+  } else if (fileExtensionIsZip(file.name)) {
+    return null
   }
 
+  handleError && handleError('INVALID_FILE_TYPE')
   return null
 }
 
@@ -119,6 +122,26 @@ export function validateJsonProtocolFileContents(
   }
 }
 
-export function protocolHasModules(protocol: JsonProtocolFile) {
+export function protocolHasModules(protocol: JsonProtocolFile): boolean {
   return 'modules' in protocol && Object.entries(protocol.modules).length > 0
+}
+
+export function getProtocolDesignerApplicationName(
+  protocol: JsonProtocolFile
+): string | null {
+  if (
+    'designerApplication' in protocol &&
+    protocol.designerApplication != null
+  ) {
+    return 'name' in protocol.designerApplication &&
+      protocol.designerApplication.name != null
+      ? protocol.designerApplication.name
+      : null
+  } else if (
+    'designer-application' in protocol &&
+    protocol['designer-application']['application-name'] != null
+  ) {
+    return protocol['designer-application']['application-name']
+  }
+  return null
 }

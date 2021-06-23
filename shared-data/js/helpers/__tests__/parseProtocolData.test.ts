@@ -156,4 +156,10 @@ describe('parseProtocolData', () => {
     expect(parseProtocolData(jsonFile, contents, handleError)).toBe(null)
     expect(handleError).toHaveBeenCalled()
   })
+  it(`should call handleError if given invalid file extension`, () => {
+    const contents = JSON.stringify(fixtureV1JsonProtocol)
+    const jsonFile = new File([contents], 'invalid.foobar')
+    expect(parseProtocolData(jsonFile, contents, handleError)).toBe(null)
+    expect(handleError).toHaveBeenCalledWith('INVALID_FILE_TYPE')
+  })
 })
