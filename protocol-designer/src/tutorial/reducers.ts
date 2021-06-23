@@ -3,10 +3,10 @@ import { handleActions } from 'redux-actions'
 import pickBy from 'lodash/pickBy'
 import uniq from 'lodash/uniq'
 import { Action } from '../types'
-import { RehydratePersistedAction } from '../persist'
-import { HintKey } from './index'
 import { AddHintAction, RemoveHintAction } from './actions'
 import { NavigateToPageAction } from '../navigation/actions'
+import type { RehydratePersistedAction } from '../persist'
+import type { HintKey } from './index'
 type HintReducerState = HintKey[]
 // @ts-expect-error(sa, 2021-6-21): cannot use string literals as action type
 // TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
