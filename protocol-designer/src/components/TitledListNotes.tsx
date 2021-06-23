@@ -1,4 +1,3 @@
-// @flow
 import { i18n } from '../localization'
 import * as React from 'react'
 import styles from './TitledListNotes.css'

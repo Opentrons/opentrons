@@ -10,9 +10,11 @@ import { selectors as labwareIngredSelectors } from '../../labware-ingred/select
 import * as wellContentsSelectors from '../../top-selectors/well-contents'
 import { getSelectedWells } from '../../well-selection/selectors'
 import { deselectAllWells } from '../../well-selection/actions'
-import { LiquidPlacementForm as LiquidPlacementFormComponent } from './LiquidPlacementForm'
+import {
+  LiquidPlacementForm as LiquidPlacementFormComponent,
+  LiquidPlacementFormValues,
+} from './LiquidPlacementForm'
 import { Dispatch } from 'redux'
-import { LiquidPlacementFormValues } from './LiquidPlacementForm'
 import { BaseState } from '../../types'
 type Props = React.ComponentProps<typeof LiquidPlacementFormComponent>
 type SP = Omit<

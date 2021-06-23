@@ -1,15 +1,13 @@
-// @flow
 // BlockingHint is an "are you sure" modal that can be dismissed.
 // Instances of BlockingHint need to be individually placed by whatever component
 // is controlling the flow that this modal will block, via useBlockingHint.
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { actions, selectors } from '../../tutorial'
+import { actions, selectors, HintKey } from '../../tutorial'
 import { ContinueModal, CheckboxField } from '@opentrons/components'
 import { Portal } from '../portals/MainPageModalPortal'
 import { i18n } from '../../localization'
 import styles from './hints.css'
-import { HintKey } from '../../tutorial'
 
 export interface HintProps {
   hintKey: HintKey
@@ -31,12 +29,12 @@ export const BlockingHint = (props: HintProps): JSX.Element => {
     setRememberDismissal(prevDismissal => !prevDismissal)
   }, [])
 
-  const onCancelClick = () => {
+  const onCancelClick = (): void => {
     dispatch(actions.removeHint(hintKey, rememberDismissal))
     handleCancel()
   }
 
-  const onContinueClick = () => {
+  const onContinueClick = (): void => {
     dispatch(actions.removeHint(hintKey, rememberDismissal))
     handleContinue()
   }

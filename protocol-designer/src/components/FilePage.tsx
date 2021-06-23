@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { Formik, FormikProps } from 'formik'
 import { format } from 'date-fns'

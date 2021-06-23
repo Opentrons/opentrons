@@ -1,4 +1,3 @@
-// @flow
 import assert from 'assert'
 import reduce from 'lodash/reduce'
 import * as React from 'react'

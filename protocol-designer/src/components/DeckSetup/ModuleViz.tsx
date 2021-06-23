@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { getModuleVizDims } from './getModuleVizDims'
 import styles from './ModuleViz.css'

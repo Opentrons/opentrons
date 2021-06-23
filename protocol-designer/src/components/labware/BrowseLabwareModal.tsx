@@ -1,4 +1,3 @@
-// @flow
 import assert from 'assert'
 import { i18n } from '../../localization'
 import * as React from 'react'
@@ -33,7 +32,7 @@ interface DP {
 
 type Props = SP & DP
 
-const BrowseLabwareModalComponent = (props: Props) => {
+const BrowseLabwareModalComponent = (props: Props): JSX.Element | null => {
   const { drillUp, definition, ingredNames, wellContents } = props
   if (!definition) {
     assert(definition, 'BrowseLabwareModal expected definition')

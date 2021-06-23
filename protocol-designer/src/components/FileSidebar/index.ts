@@ -2,8 +2,10 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { i18n } from '../../localization'
 import { actions, selectors } from '../../navigation'
-import { selectors as fileDataSelectors } from '../../file-data'
-import { selectors as stepFormSelectors } from '../../step-forms'
+import {
+  selectors as fileDataSelectors,
+  selectors as stepFormSelectors,
+} from '../../file-data'
 import {
   actions as loadFileActions,
   selectors as loadFileSelectors,

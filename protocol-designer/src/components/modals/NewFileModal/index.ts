@@ -11,18 +11,20 @@ import { selectors, actions as navigationActions } from '../../../navigation'
 import {
   actions as fileActions,
   selectors as loadFileSelectors,
+  NewProtocolFields,
 } from '../../../load-file'
 import * as labwareDefSelectors from '../../../labware-defs/selectors'
 import * as labwareDefActions from '../../../labware-defs/actions'
 import * as labwareIngredActions from '../../../labware-ingred/actions'
-import { actions as stepFormActions } from '../../../step-forms'
+import { actions as stepFormActions, PipetteOnDeck } from '../../../step-forms'
 import { actions as steplistActions } from '../../../steplist'
-import { ModuleCreationArgs, PipetteFieldsData } from '../FilePipettesModal'
-import { FilePipettesModal as FilePipettesModalComponent } from '../FilePipettesModal'
+import {
+  ModuleCreationArgs,
+  PipetteFieldsData,
+  FilePipettesModal as FilePipettesModalComponent,
+} from '../FilePipettesModal'
 import { NormalizedPipette } from '@opentrons/step-generation'
 import { BaseState, ThunkDispatch } from '../../../types'
-import { NewProtocolFields } from '../../../load-file'
-import { PipetteOnDeck } from '../../../step-forms'
 import { LabwareDefByDefURI } from '../../../labware-defs/types'
 type Props = React.ComponentProps<typeof FilePipettesModalComponent>
 interface OP {

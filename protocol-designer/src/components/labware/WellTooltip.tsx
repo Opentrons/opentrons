@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 
 import { Popper, Reference, Manager } from 'react-popper'

@@ -1,4 +1,3 @@
-// @flow
 import {
   fixtureP10Single,
   fixtureP300Single,
@@ -43,7 +42,10 @@ beforeEach(() => {
     },
   }
   labwareEntities = {}
-  handleFormHelper = (patch: Partial<Record<string, unknown>>, baseForm: FormData) =>
+  handleFormHelper = (
+    patch: Partial<Record<string, unknown>>,
+    baseForm: FormData
+  ) =>
     dependentFieldsUpdateMoveLiquid(
       patch,
       baseForm,
@@ -209,7 +211,15 @@ describe('path should update...', () => {
 })
 
 describe('disposal volume should update...', () => {
-  let form: { path: string; aspirate_wells: string[]; dispense_wells: string[]; volume: string; pipette: string; disposalVolume_checkbox: boolean; disposalVolume_volume: string }
+  let form: {
+    path: string
+    aspirate_wells: string[]
+    dispense_wells: string[]
+    volume: string
+    pipette: string
+    disposalVolume_checkbox: boolean
+    disposalVolume_volume: string
+  }
   beforeEach(() => {
     form = {
       path: 'multiDispense',
@@ -396,7 +406,15 @@ describe('disposal volume should update...', () => {
 
 describe('aspirate > air gap volume', () => {
   describe('when the path is single', () => {
-    let form: { path: string; aspirate_wells: string[]; dispense_wells: string[]; volume: string; pipette: string; disposalVolume_checkbox: boolean; disposalVolume_volume: string }
+    let form: {
+      path: string
+      aspirate_wells: string[]
+      dispense_wells: string[]
+      volume: string
+      pipette: string
+      disposalVolume_checkbox: boolean
+      disposalVolume_volume: string
+    }
     beforeEach(() => {
       form = {
         path: 'single',
@@ -460,7 +478,15 @@ describe('aspirate > air gap volume', () => {
   })
 
   describe('when the path is multi aspirate', () => {
-    let form: { path: string; aspirate_wells: string[]; dispense_wells: string[]; volume: string; pipette: string; disposalVolume_checkbox: boolean; disposalVolume_volume: string }
+    let form: {
+      path: string
+      aspirate_wells: string[]
+      dispense_wells: string[]
+      volume: string
+      pipette: string
+      disposalVolume_checkbox: boolean
+      disposalVolume_volume: string
+    }
     beforeEach(() => {
       form = {
         path: 'multiAspirate',

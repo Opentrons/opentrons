@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import cx from 'classnames'
 import { FormGroup, Tooltip, useHoverTooltip } from '@opentrons/components'
@@ -47,7 +46,7 @@ interface ButtonProps {
   path: PathOption
 }
 
-const PathButton = (buttonProps: ButtonProps) => {
+const PathButton = (buttonProps: ButtonProps): JSX.Element => {
   const {
     children,
     disabled,

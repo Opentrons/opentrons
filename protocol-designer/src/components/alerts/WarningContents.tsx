@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { i18n } from '../../localization'
 import { START_TERMINAL_ITEM_ID } from '../../steplist'
@@ -9,7 +8,9 @@ interface WarningContentsProps {
   warningType: string
   level: AlertLevel
 }
-export const WarningContents = (props: WarningContentsProps): JSX.Element | null => {
+export const WarningContents = (
+  props: WarningContentsProps
+): JSX.Element | null => {
   if (props.level === 'timeline') {
     switch (props.warningType) {
       case 'ASPIRATE_FROM_PRISTINE_WELL':

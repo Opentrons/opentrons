@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { LabwareNameOverlay } from '@opentrons/components'
@@ -16,7 +15,7 @@ interface SP {
 
 type Props = OP & SP
 
-const NameOverlay = (props: Props) => {
+const NameOverlay = (props: Props): JSX.Element => {
   const { labwareOnDeck, nickname } = props
   const title = nickname || getLabwareDisplayName(labwareOnDeck.def)
   // TODO(mc, 2019-06-27): µL to uL replacement needed to handle CSS capitalization

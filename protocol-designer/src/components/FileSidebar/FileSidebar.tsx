@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import cx from 'classnames'
 import {
@@ -173,7 +172,7 @@ export function FileSidebar(props: Props): JSX.Element {
 
   const [showBlockingHint, setShowBlockingHint] = React.useState<boolean>(false)
 
-  const cancelModal = () => setShowExportWarningModal(false)
+  const cancelModal = (): void => setShowExportWarningModal(false)
 
   const noCommands = fileData ? fileData.commands.length === 0 : true
   const pipettesWithoutStep = getUnusedEntities(

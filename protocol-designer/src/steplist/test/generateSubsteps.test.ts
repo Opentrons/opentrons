@@ -1,4 +1,3 @@
-// @flow
 import { generateSubstepItem } from '../generateSubstepItem'
 import {
   makeInitialRobotState,

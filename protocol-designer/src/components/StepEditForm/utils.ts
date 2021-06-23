@@ -6,19 +6,19 @@ import {
   DEST_WELL_BLOWOUT_DESTINATION,
 } from '@opentrons/step-generation'
 import { i18n } from '../../localization'
-import { PROFILE_CYCLE } from '../../form-types'
-import { getDefaultsForStepType } from '../../steplist/formLevel/getDefaultsForStepType'
-import { Options } from '@opentrons/components'
-import { ProfileFormError } from '../../steplist/formLevel/profileErrors'
-import { FormWarning } from '../../steplist/formLevel/warnings'
-import { StepFormErrors } from '../../steplist/types'
 import {
+  PROFILE_CYCLE,
   FormData,
   ProfileItem,
   StepFieldName,
   StepType,
   PathOption,
 } from '../../form-types'
+import { getDefaultsForStepType } from '../../steplist/formLevel/getDefaultsForStepType'
+import { Options } from '@opentrons/components'
+import { ProfileFormError } from '../../steplist/formLevel/profileErrors'
+import { FormWarning } from '../../steplist/formLevel/warnings'
+import { StepFormErrors } from '../../steplist/types'
 export function getBlowoutLocationOptionsForForm(args: {
   stepType: StepType
   path?: PathOption | null | undefined

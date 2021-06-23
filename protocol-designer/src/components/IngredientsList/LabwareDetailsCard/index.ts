@@ -49,7 +49,7 @@ function mergeProps(
   const dispatch = dispatchProps.dispatch
   const { _labwareId, ...passThruProps } = stateProps
 
-  const renameLabware = (name: string) => {
+  const renameLabware = (name: string): void => {
     assert(
       _labwareId,
       'renameLabware in LabwareDetailsCard expected a labwareId'

@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import map from 'lodash/map'
 import noop from 'lodash/noop'

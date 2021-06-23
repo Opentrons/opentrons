@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import cx from 'classnames'
 import styles from './styles.css'
@@ -8,7 +7,7 @@ interface Props {
   /** show light gray border between list items */
   border?: boolean | null
   /** hover style when hovered (for redux-linked hover state, do not use this) */
-  hoverable?: boolean | null,
+  hoverable?: boolean | null
   [key: string]: unknown
 }
 

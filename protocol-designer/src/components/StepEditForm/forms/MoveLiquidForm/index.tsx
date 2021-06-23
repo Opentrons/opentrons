@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import cx from 'classnames'
 import { i18n } from '../../../../localization'
@@ -20,7 +19,7 @@ import { SourceDestHeaders } from './SourceDestHeaders'
 export const MoveLiquidForm = (props: StepFormProps): JSX.Element => {
   const [collapsed, _setCollapsed] = React.useState<boolean>(true)
 
-  const toggleCollapsed = () => _setCollapsed(!collapsed)
+  const toggleCollapsed = (): void => _setCollapsed(!collapsed)
 
   const { propsForFields, formData } = props
   const { stepType, path } = formData

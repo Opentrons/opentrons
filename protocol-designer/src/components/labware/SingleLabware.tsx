@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { LabwareRender, RobotWorkSpace } from '@opentrons/components'
 

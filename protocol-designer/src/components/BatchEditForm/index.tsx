@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { makeBatchEditFieldProps } from './makeBatchEditFieldProps'
@@ -19,9 +18,7 @@ import { maskField, StepFieldName } from '../../steplist/fieldLevel'
 import { BatchEditMoveLiquid } from './BatchEditMoveLiquid'
 import { BatchEditMix } from './BatchEditMix'
 
-export interface BatchEditFormProps {}
-
-export const BatchEditForm = (props: BatchEditFormProps): JSX.Element => {
+export const BatchEditForm = (): JSX.Element => {
   const dispatch = useDispatch()
   const fieldValues = useSelector(getMultiSelectFieldValues)
   const stepTypes = useSelector(getBatchEditSelectedStepTypes)
@@ -29,16 +26,18 @@ export const BatchEditForm = (props: BatchEditFormProps): JSX.Element => {
   const selectedStepIds = useSelector(getMultiSelectItemIds)
   const batchEditFormHasChanges = useSelector(getBatchEditFormHasUnsavedChanges)
 
-  const handleChangeFormInput = (name: StepFieldName, value: unknown) => {
+  const handleChangeFormInput = (name: StepFieldName, value: unknown): void => {
     const maskedValue = maskField(name, value)
     dispatch(changeBatchEditField({ [name]: maskedValue }))
   }
 
-  const handleSave = () => {
+  const handleSave = (): void => {
     dispatch(saveStepFormsMulti(selectedStepIds))
   }
 
-  const handleCancel = () => dispatch(resetBatchEditFieldChanges())
+  const handleCancel = (): void => {
+    dispatch(resetBatchEditFieldChanges())
+  }
 
   const stepType = stepTypes.length === 1 ? stepTypes[0] : null
 

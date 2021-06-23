@@ -1,4 +1,3 @@
-// @flow
 import {
   DEFAULT_CHANGE_TIP_OPTION,
   DEFAULT_DELAY_SECONDS,

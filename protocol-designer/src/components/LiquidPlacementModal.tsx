@@ -1,4 +1,3 @@
-// @flow
 import assert from 'assert'
 import * as React from 'react'
 import { connect } from 'react-redux'
@@ -41,7 +40,9 @@ interface DP {
 
 type Props = SP & DP
 
-interface State { highlightedWells: WellGroup }
+interface State {
+  highlightedWells: WellGroup
+}
 
 class LiquidPlacementModalComponent extends React.Component<Props, State> {
   state = { highlightedWells: {} }
@@ -50,11 +51,11 @@ class LiquidPlacementModalComponent extends React.Component<Props, State> {
     this.state = { highlightedWells: {} }
   }
 
-  updateHighlightedWells = (wells: WellGroup) => {
+  updateHighlightedWells = (wells: WellGroup): void => {
     this.setState({ highlightedWells: wells })
   }
 
-  render() {
+  render(): JSX.Element {
     const { labwareDef, selectedWells } = this.props
 
     return (

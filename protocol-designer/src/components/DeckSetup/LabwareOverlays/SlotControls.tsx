@@ -1,4 +1,3 @@
-// @flow
 import assert from 'assert'
 import * as React from 'react'
 import { Icon, RobotCoordsForeignDiv } from '@opentrons/components'
@@ -175,7 +174,7 @@ const slotTarget = {
 const collectSlotTarget = (
   connect: DropTargetConnector,
   monitor: DropTargetMonitor
-) => ({
+): React.ReactNode => ({
   connectDropTarget: connect.dropTarget(),
   isOver: monitor.isOver(),
   draggedItem: monitor.getItem(),

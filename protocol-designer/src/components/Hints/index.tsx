@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { AlertModal, CheckboxField, OutlineButton } from '@opentrons/components'
@@ -40,12 +39,12 @@ class HintsComponent extends React.Component<Props, State> {
     this.setState({ rememberDismissal: !this.state.rememberDismissal })
   }
 
-  makeHandleCloseClick = (hintKey: HintKey) => {
+  makeHandleCloseClick = (hintKey: HintKey): (() => void) => {
     const { rememberDismissal } = this.state
     return () => this.props.removeHint(hintKey, rememberDismissal)
   }
 
-  renderHintContents = (hintKey: HintKey) => {
+  renderHintContents = (hintKey: HintKey): React.ReactNode => {
     // Only hints that have no outside effects should go here.
     // For hints that have an effect, use BlockingHint.
     switch (hintKey) {
@@ -154,7 +153,7 @@ class HintsComponent extends React.Component<Props, State> {
     }
   }
 
-  render() {
+  render(): React.ReactNode {
     const { hintKey } = this.props
     if (!hintKey) return null
 

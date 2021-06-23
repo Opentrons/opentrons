@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
@@ -94,7 +93,7 @@ export function PipetteFields(props: Props): JSX.Element {
 
   const initialTabIndex = props.initialTabIndex || 1
 
-  const renderPipetteSelect = (props: PipetteSelectProps) => {
+  const renderPipetteSelect = (props: PipetteSelectProps): JSX.Element => {
     const { tabIndex, mount } = props
     const pipetteName = values[mount].pipetteName
 

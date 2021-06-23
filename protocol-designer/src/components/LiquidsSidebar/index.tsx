@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { i18n } from '../../localization'
@@ -24,7 +23,7 @@ interface DP {
 
 type Props = SP & DP
 
-function LiquidsSidebarComponent(props: Props) {
+function LiquidsSidebarComponent(props: Props): JSX.Element {
   const { liquids, selectedLiquid, createNewLiquid, selectLiquid } = props
   return (
     <SidePanel title="Liquids">

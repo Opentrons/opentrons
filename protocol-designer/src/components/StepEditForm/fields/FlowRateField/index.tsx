@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { FlowRateInput, FlowRateInputProps } from './FlowRateInput'
 import { connect } from 'react-redux'
@@ -62,7 +61,11 @@ function mapStateToProps(state: BaseState, ownProps: OP): SP {
   }
 }
 
-const mergeProps = (stateProps: SP, _dispatchProps: null, ownProps: OP): Props => {
+const mergeProps = (
+  stateProps: SP,
+  _dispatchProps: null,
+  ownProps: OP
+): Props => {
   const { pipetteId, ...passThruProps } = ownProps
   return { ...stateProps, ...passThruProps }
 }

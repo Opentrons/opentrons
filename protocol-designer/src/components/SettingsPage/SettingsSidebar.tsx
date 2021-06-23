@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { SidePanel } from '@opentrons/components'
 import { connect } from 'react-redux'
@@ -9,11 +8,15 @@ import { i18n } from '../../localization'
 import { PDTitledList } from '../lists'
 import styles from './SettingsPage.css'
 
-interface SP { currentPage: Page }
-interface DP { makeNavigateToPage: (page: Page) => () => unknown }
+interface SP {
+  currentPage: Page
+}
+interface DP {
+  makeNavigateToPage: (page: Page) => () => unknown
+}
 type Props = SP & DP
 
-const SettingsSidebarComponent = (props: Props) => (
+const SettingsSidebarComponent = (props: Props): JSX.Element => (
   <SidePanel title={i18n.t('nav.tab_name.settings')}>
     <PDTitledList
       className={styles.sidebar_item}

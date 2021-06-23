@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import cx from 'classnames'
 import { connect } from 'react-redux'
@@ -20,7 +19,7 @@ interface DP {
 
 type Props = OP & DP
 
-function BrowseLabwareOverlay(props: Props) {
+function BrowseLabwareOverlay(props: Props): React.ReactNode {
   if (props.labwareOnDeck.def.parameters.isTiprack) return null
   return (
     <div className={cx(styles.slot_overlay, styles.appear_on_mouseover)}>

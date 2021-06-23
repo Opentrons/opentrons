@@ -1,5 +1,3 @@
-// @flow
-
 import * as persist from '../persist'
 
 describe('persist', () => {

@@ -1,11 +1,19 @@
-// @flow
 import * as React from 'react'
 import cx from 'classnames'
 import { useSelector } from 'react-redux'
 import omit from 'lodash/omit'
 
-import { Modal, OutlineButton, LabeledValue } from '@opentrons/components'
-import { sortWells } from '@opentrons/shared-data'
+import {
+  Modal,
+  OutlineButton,
+  LabeledValue,
+  WellGroup,
+} from '@opentrons/components'
+import {
+  sortWells,
+  LabwareDefinition2,
+  PipetteNameSpecs,
+} from '@opentrons/shared-data'
 
 import { arrayToWellGroup } from '../../../../utils'
 import { WellSelectionInstructions } from '../../../WellSelectionInstructions'
@@ -14,8 +22,6 @@ import { SelectableLabware, wellFillFromWellContents } from '../../../labware'
 import * as wellContentsSelectors from '../../../../top-selectors/well-contents'
 import { selectors } from '../../../../labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
-import { WellGroup } from '@opentrons/components'
-import { LabwareDefinition2, PipetteNameSpecs } from '@opentrons/shared-data'
 import { ContentsByWell } from '../../../../labware-ingred/types'
 import { WellIngredientNames } from '../../../../steplist/types'
 import { StepFieldName } from '../../../../form-types'
@@ -49,7 +55,7 @@ interface WellSelectionModalComponentProps {
 
 const WellSelectionModalComponent = (
   props: WellSelectionModalComponentProps
-): JSX.Element=> {
+): JSX.Element => {
   const {
     deselectWells,
     handleSave,

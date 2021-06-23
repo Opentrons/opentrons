@@ -20,11 +20,12 @@ export class SignUpForm extends React.Component<{}> {
     this.embedElement = React.createRef()
   }
 
-  componentDidMount() {
+  componentDidMount(): void {
     makeWidget(this.embedElement.current, SIGNUP_TYPEFORM_URL, {
       hideScrollbars: true,
     })
   }
+
   render(): React.ReactNode {
     return (
       <div ref={this.embedElement} className={styles.sign_up_form_wrapper} />

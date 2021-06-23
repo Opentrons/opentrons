@@ -1,14 +1,15 @@
-// @flow
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { Card } from '@opentrons/components'
 import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
+  ModuleRealType,
 } from '@opentrons/shared-data'
 import {
   selectors as stepFormSelectors,
   getIsCrashablePipetteSelected,
+  ModulesForEditModulesCard,
 } from '../../step-forms'
 import { selectors as featureFlagSelectors } from '../../feature-flags'
 import { SUPPORTED_MODULE_TYPES } from '../../modules'
@@ -16,8 +17,6 @@ import { CrashInfoBox } from './CrashInfoBox'
 import { ModuleRow } from './ModuleRow'
 import { isModuleWithCollisionIssue } from './utils'
 import styles from './styles.css'
-import { ModuleRealType } from '@opentrons/shared-data'
-import { ModulesForEditModulesCard } from '../../step-forms'
 
 export interface Props {
   modules: ModulesForEditModulesCard

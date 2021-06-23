@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { FormGroup, InputField } from '@opentrons/components'
@@ -37,7 +36,7 @@ type OP = FieldProps & {
 type Props = OP & SP & DP
 
 class WellSelectionInputComponent extends React.Component<Props> {
-  handleOpen = () => {
+  handleOpen = (): void => {
     const { labwareId, pipetteId, onFieldFocus } = this.props
 
     if (onFieldFocus) {
@@ -48,7 +47,7 @@ class WellSelectionInputComponent extends React.Component<Props> {
     }
   }
 
-  handleClose = () => {
+  handleClose = (): void => {
     const { onFieldBlur, onClose } = this.props
     if (onFieldBlur) {
       onFieldBlur()
@@ -56,14 +55,14 @@ class WellSelectionInputComponent extends React.Component<Props> {
     onClose()
   }
 
-  getModalKey = () => {
+  getModalKey = (): React.Key => {
     const { name, pipetteId, labwareId, stepId } = this.props
     return `${String(stepId)}${name}${pipetteId || 'noPipette'}${
       labwareId || 'noLabware'
     }`
   }
 
-  render() {
+  render(): JSX.Element {
     const modalKey = this.getModalKey()
     const label = this.props.isMulti
       ? i18n.t('form.step_edit_form.wellSelectionLabel.columns')

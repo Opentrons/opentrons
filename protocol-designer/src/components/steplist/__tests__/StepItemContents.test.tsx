@@ -1,4 +1,3 @@
-// @flow
 import React from 'react'
 import { shallow } from 'enzyme'
 import { THERMOCYCLER_MODULE_TYPE } from '@opentrons/shared-data'

@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import cx from 'classnames'
 import { RobotCoordsForeignDiv } from '@opentrons/components'

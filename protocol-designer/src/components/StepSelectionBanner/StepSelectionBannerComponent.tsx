@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import startCase from 'lodash/startCase'
 import { css } from 'styled-components'

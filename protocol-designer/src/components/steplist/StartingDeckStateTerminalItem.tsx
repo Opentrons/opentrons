@@ -1,4 +1,3 @@
-// @flow
 import { connect } from 'react-redux'
 import * as React from 'react'
 import { TerminalItem } from './TerminalItem'
@@ -14,7 +13,7 @@ interface Props {
 
 type SP = Props
 
-function StartingDeckStateTerminalItemComponent(props: Props) {
+function StartingDeckStateTerminalItemComponent(props: Props): JSX.Element {
   const { showHint } = props
   const hintContents = (
     <PDListItem>

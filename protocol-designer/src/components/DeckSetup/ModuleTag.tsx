@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import cx from 'classnames'
@@ -16,7 +15,11 @@ import {
 } from '@opentrons/step-generation'
 import { i18n } from '../../localization'
 import { timelineFrameBeforeActiveItem } from '../../top-selectors/timelineFrames'
-import { selectors as stepFormSelectors } from '../../step-forms'
+import {
+  selectors as stepFormSelectors,
+  ModuleTemporalProperties,
+  TemperatureModuleState,
+} from '../../step-forms'
 import { STD_SLOT_X_DIM, STD_SLOT_Y_DIM } from '../../constants'
 import * as uiSelectors from '../../ui/steps'
 import { getLabwareOnModule } from '../../ui/modules/utils'
@@ -24,10 +27,6 @@ import { makeTemperatureText } from '../../utils'
 import { getModuleVizDims } from './getModuleVizDims'
 import styles from './ModuleTag.css'
 import { ModuleOrientation } from '../../types'
-import {
-  ModuleTemporalProperties,
-  TemperatureModuleState,
-} from '../../step-forms'
 
 export interface ModuleTagProps {
   x: number
@@ -120,7 +119,7 @@ export const ModuleStatus = ({
   }
 }
 
-const ModuleTagComponent = (props: ModuleTagProps) => {
+const ModuleTagComponent = (props: ModuleTagProps): React.ReactNode => {
   const timelineFrame = useSelector(timelineFrameBeforeActiveItem)
   const moduleEntity = useSelector(stepFormSelectors.getModuleEntities)[
     props.id

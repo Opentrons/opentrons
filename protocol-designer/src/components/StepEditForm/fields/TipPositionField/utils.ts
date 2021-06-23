@@ -4,8 +4,7 @@ import {
   DEFAULT_MM_FROM_BOTTOM_DISPENSE,
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
 } from '../../../../constants'
-import { StepFieldName } from '../../../../form-types'
-import { getIsTouchTipField } from '../../../../form-types'
+import { StepFieldName, getIsTouchTipField } from '../../../../form-types'
 // TODO: Ian + Brian 2019-02-13 this should switch on stepType, not use field
 // name to infer step type!
 //

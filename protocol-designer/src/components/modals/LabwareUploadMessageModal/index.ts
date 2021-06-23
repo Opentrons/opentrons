@@ -1,5 +1,4 @@
 import assert from 'assert'
-import * as React from 'react'
 import { connect } from 'react-redux'
 import {
   selectors as labwareDefSelectors,

@@ -1,5 +1,3 @@
-// @flow
-
 import * as React from 'react'
 import cx from 'classnames'
 import { Icon, IconName } from '@opentrons/components'
@@ -60,7 +58,7 @@ export function TitledStepList(props: Props): JSX.Element {
 
   // clicking on the carat will not call props.onClick,
   // so prevent bubbling up if there is an onCollapseToggle fn
-  const handleCollapseToggle = (e: React.MouseEvent) => {
+  const handleCollapseToggle = (e: React.MouseEvent): void => {
     if (onCollapseToggle) {
       e.stopPropagation()
       onCollapseToggle(e)

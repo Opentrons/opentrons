@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { ThunkDispatch, BaseState } from '../types'
 import { connect } from 'react-redux'

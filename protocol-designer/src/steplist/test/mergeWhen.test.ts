@@ -1,4 +1,3 @@
-// @flow
 import { mergeWhen } from '../utils'
 
 function concat(a: string, b: string): string {

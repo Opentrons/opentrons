@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { CheckboxField, DropdownField, FormGroup } from '@opentrons/components'
 import { i18n } from '../../../localization'

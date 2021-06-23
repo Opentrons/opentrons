@@ -1,4 +1,3 @@
-// @flow
 import { useConditionalConfirm } from '@opentrons/components'
 import * as React from 'react'
 import { connect } from 'react-redux'
@@ -36,7 +35,9 @@ interface DP {
 }
 type StepEditFormManagerProps = SP & DP
 
-const StepEditFormManager = (props: StepEditFormManagerProps) => {
+const StepEditFormManager = (
+  props: StepEditFormManagerProps
+): JSX.Element | null => {
   const {
     canSave,
     deleteStep,
@@ -59,14 +60,14 @@ const StepEditFormManager = (props: StepEditFormManagerProps) => {
     getDirtyFields(isNewStep, formData)
   )
 
-  const toggleMoreOptionsModal = () => {
+  const toggleMoreOptionsModal = (): void => {
     resetScrollElements()
     setShowMoreOptionsModal(!showMoreOptionsModal)
   }
 
   const focus = setFocusedField
 
-  const blur = (fieldName: StepFieldName) => {
+  const blur = (fieldName: StepFieldName): void => {
     if (fieldName === focusedField) {
       setFocusedField(null)
     }
@@ -76,7 +77,7 @@ const StepEditFormManager = (props: StepEditFormManagerProps) => {
   }
 
   const stepId = formData?.id
-  const handleDelete = () => {
+  const handleDelete = (): void => {
     if (stepId != null) {
       deleteStep(stepId)
     } else {
@@ -183,14 +184,14 @@ const mapStateToProps = (state: BaseState): SP => {
 }
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<any>): DP => {
-  const deleteStep = (stepId: StepIdType) =>
+  const deleteStep = (stepId: StepIdType): void =>
     dispatch(actions.deleteStep(stepId))
-  const handleClose = () => dispatch(actions.cancelStepForm())
-  const saveSetTempFormWithAddedPauseUntilTemp = () =>
+  const handleClose = (): void => dispatch(actions.cancelStepForm())
+  const saveSetTempFormWithAddedPauseUntilTemp = (): void =>
     dispatch(stepsActions.saveSetTempFormWithAddedPauseUntilTemp())
-  const saveStepForm = () => dispatch(stepsActions.saveStepForm())
+  const saveStepForm = (): void => dispatch(stepsActions.saveStepForm())
 
-  const handleChangeFormInput = (name: string, value: unknown) => {
+  const handleChangeFormInput = (name: string, value: unknown): void => {
     const maskedValue = maskField(name, value)
     dispatch(actions.changeFormInput({ update: { [name]: maskedValue } }))
   }

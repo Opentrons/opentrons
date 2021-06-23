@@ -1,4 +1,3 @@
-// @flow
 import { getLabwareDefURI, LabwareDefinition2 } from '@opentrons/shared-data'
 import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
 import _fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'

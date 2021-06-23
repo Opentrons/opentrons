@@ -1,4 +1,3 @@
-// @flow
 import { PRESAVED_STEP_ID } from '../../../steplist/types'
 import {
   _allReducers,

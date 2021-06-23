@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
 import cx from 'classnames'
@@ -21,26 +20,26 @@ interface DP {
 
 type Props = OP & DP
 
-const NameThisLabwareComponent = (props: Props) => {
+const NameThisLabwareComponent = (props: Props): JSX.Element => {
   const [inputValue, setInputValue] = React.useState('')
 
-  const saveNickname = () => {
+  const saveNickname = (): void => {
     props.setLabwareName(inputValue || null)
   }
   const wrapperRef: React.RefObject<HTMLDivElement> = useOnClickOutside({
     onClickOutside: saveNickname,
   })
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     setInputValue(e.target.value)
   }
 
-  const handleKeyUp = (e: React.KeyboardEvent) => {
+  const handleKeyUp = (e: React.KeyboardEvent): void => {
     if (e.key === 'Enter') {
       saveNickname()
     }
   }
-  const addLiquids = () => {
+  const addLiquids = (): void => {
     saveNickname()
     props.editLiquids()
   }

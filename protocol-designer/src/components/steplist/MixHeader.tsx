@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import cx from 'classnames'
 import { Tooltip, useHoverTooltip, TOOLTIP_FIXED } from '@opentrons/components'

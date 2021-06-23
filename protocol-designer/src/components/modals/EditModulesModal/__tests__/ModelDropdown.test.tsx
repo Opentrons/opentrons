@@ -1,5 +1,3 @@
-// @flow
-
 import React from 'react'
 import * as Formik from 'formik'
 import { Provider } from 'react-redux'
