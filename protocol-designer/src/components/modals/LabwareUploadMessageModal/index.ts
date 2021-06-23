@@ -7,7 +7,7 @@ import {
 } from '../../../labware-defs'
 import {
   LabwareUploadMessageModal as LabwareUploadMessageModalComponent,
-  LabwareUploadMessageModalProps
+  LabwareUploadMessageModalProps,
 } from './LabwareUploadMessageModal'
 import { Dispatch } from 'redux'
 import { BaseState } from '../../../types'

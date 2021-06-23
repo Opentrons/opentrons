@@ -93,7 +93,9 @@ export interface LabwareUploadMessageModalProps {
   overwriteLabwareDef?: () => unknown
 }
 
-export const LabwareUploadMessageModal = (props: LabwareUploadMessageModalProps): JSX.Element | null => {
+export const LabwareUploadMessageModal = (
+  props: LabwareUploadMessageModalProps
+): JSX.Element | null => {
   const { message, dismissModal, overwriteLabwareDef } = props
   if (!message) return null
 

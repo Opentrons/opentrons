@@ -1,6 +1,6 @@
 // @flow
 
-import React, {ChangeEvent} from 'react'
+import React, { ChangeEvent } from 'react'
 import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
 import {

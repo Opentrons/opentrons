@@ -13,7 +13,9 @@ export interface FileUploadMessageModalProps {
   dismissModal: (event: React.MouseEvent) => unknown
 }
 
-export function FileUploadMessageModal(props: FileUploadMessageModalProps): JSX.Element | null {
+export function FileUploadMessageModal(
+  props: FileUploadMessageModalProps
+): JSX.Element | null {
   const { message, cancelProtocolMigration, dismissModal } = props
 
   if (!message) return null

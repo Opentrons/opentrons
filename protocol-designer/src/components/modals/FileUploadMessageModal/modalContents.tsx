@@ -156,7 +156,7 @@ export function getModalContents(
         false,
         `invalid messageKey ${uploadResponse.messageKey} specified for modal`
       )
-        // @ts-expect-error (ce, 2021-06-23) not sure why compliler is not able to resolve type with `messageKey` at this point
+      // @ts-expect-error (ce, 2021-06-23) not sure why compliler is not able to resolve type with `messageKey` at this point
       return { title: '', body: uploadResponse.messageKey }
     }
   }

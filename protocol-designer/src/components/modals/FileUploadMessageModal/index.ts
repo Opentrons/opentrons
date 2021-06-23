@@ -1,7 +1,7 @@
 import * as React from 'react'
 import {
   FileUploadMessageModal as FileUploadMessageModalComponent,
-  FileUploadMessageModalProps
+  FileUploadMessageModalProps,
 } from './FileUploadMessageModal'
 import { connect } from 'react-redux'
 import {
@@ -10,7 +10,6 @@ import {
 } from '../../../load-file'
 import { Dispatch } from 'redux'
 import { BaseState } from '../../../types'
-
 
 type Props = FileUploadMessageModalProps
 interface SP {
