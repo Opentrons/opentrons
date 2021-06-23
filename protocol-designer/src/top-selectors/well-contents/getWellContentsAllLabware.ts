@@ -7,7 +7,7 @@ import {
   getHighlightedWells,
 } from '../../well-selection/selectors'
 import { WellGroup } from '@opentrons/components'
-import { LabwareDefinition2 } from '@opentrons/shared-data'
+import { LabwareDefinition2, LabwareWell } from '@opentrons/shared-data'
 import { SingleLabwareLiquidState } from '@opentrons/step-generation'
 import { Selector } from '../../types'
 import {
@@ -20,17 +20,13 @@ const _getWellContents = (
   __ingredientsForContainer: SingleLabwareLiquidState,
   selectedWells: WellGroup | null | undefined,
   highlightedWells: WellGroup | null | undefined
-): ContentsByWell | null => {
+): ContentsByWell => {
   // selectedWells and highlightedWells args may both be null,
   // they're only relevant to the selected container.
   const allWells = labwareDef.wells
-  return reduce(
+  return reduce<LabwareDefinition2['wells'], ContentsByWell>(
     allWells,
-    (
-      acc: ContentsByWell,
-      well: LabwareDefinition2['wells'],
-      wellName: string
-    ): ContentsByWell => {
+    (acc: ContentsByWell, well: LabwareWell, wellName: string): ContentsByWell => {
       const groupIds: string[] =
         __ingredientsForContainer && __ingredientsForContainer[wellName]
           ? Object.keys(__ingredientsForContainer[wellName])

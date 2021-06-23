@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { LabwareRender, WellGroup } from '@opentrons/components'
@@ -26,7 +25,7 @@ interface SP {
 
 type Props = OP & SP
 
-const LabwareOnDeckComponent = (props: Props) => (
+const LabwareOnDeckComponent = (props: Props): JSX.Element => (
   <g
     transform={`translate(${props.x}, ${props.y})`}
     className={props.className}

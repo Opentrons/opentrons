@@ -20,7 +20,7 @@ export const wellFillFromWellContents = (
 ): WellFill =>
   reduce(
     wellContents,
-    (acc, wellContents: WellContents, wellName: string) => {
+    (acc: WellFill, wellContents: WellContents, wellName: string) => {
       const wellFill = ingredIdsToColor(wellContents.groupIds)
       return wellFill ? { ...acc, [wellName]: wellFill } : acc
     },

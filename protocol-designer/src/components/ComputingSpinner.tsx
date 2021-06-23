@@ -9,9 +9,9 @@ const waitCursorStyle = css`
   cursor: wait;
 `
 
-export const ComputingSpinner = (): JSX.Element | boolean => {
+export const ComputingSpinner = (): JSX.Element => {
   const showSpinner = useSelector(fileDataSelectors.getTimelineIsBeingComputed)
-
+  // @ts-expect-error(sa, 2021-6-22): return null so it can be properly rendered
   return (
     showSpinner && (
       <Box

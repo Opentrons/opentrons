@@ -5,7 +5,7 @@ import { Icon } from '@opentrons/components'
 import { TitledStepList } from '../TitledStepList'
 
 describe('TitledStepLest', () => {
-  let props
+  let props: React.ComponentProps<typeof TitledStepList>
   beforeEach(() => {
     props = {
       title: 'transfer',

@@ -45,6 +45,7 @@ export const ErrorContents = (
           </>
         )
       default:
+        // @ts-expect-error(sa, 2021-6-23): wrap in a fragment
         return bodyText
     }
   } else if (props.level === 'form') {

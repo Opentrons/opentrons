@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
 import cx from 'classnames'
@@ -26,11 +25,14 @@ interface SP {
   hasOptedIn: Props['hasOptedIn']
 }
 
-type DP = Omit<Props, keyof SP>
+interface DP {
+  optIn: Props['optIn']
+  optOut: Props['optOut']
+}
 
 interface State {
   gateStage: GateStage
-  errorMessage: string | null | undefined
+  errorMessage?: string | null
 }
 
 class GateModalComponent extends React.Component<Props, State> {
@@ -39,7 +41,7 @@ class GateModalComponent extends React.Component<Props, State> {
     this.state = { gateStage: 'loading', errorMessage: '' }
   }
 
-  componentDidMount() {
+  componentDidMount(): void {
     this.refreshState()
   }
 
@@ -51,7 +53,7 @@ class GateModalComponent extends React.Component<Props, State> {
       })
   }
 
-  static getDerivedStateFromProps(nextProps: Props, prevState: State) {
+  static getDerivedStateFromProps(nextProps: Props, prevState: State): State {
     if (
       nextProps.hasOptedIn !== null &&
       prevState.gateStage === 'promptOptForAnalytics'
@@ -62,7 +64,7 @@ class GateModalComponent extends React.Component<Props, State> {
     }
   }
 
-  render() {
+  render(): JSX.Element | null {
     const { optIn, optOut } = this.props
 
     switch (this.state.gateStage) {

@@ -29,7 +29,7 @@ export interface SaveStepFormsMultiAction {
   }
 }
 export const saveStepFormsMulti: (
-  selectedStepIds: StepIdType[] | null
+  selectedStepIds?: StepIdType[] | null
 ) => ThunkAction<SaveStepFormsMultiAction> = selectedStepIds => (
   dispatch,
   getState

@@ -1,7 +1,7 @@
 import { createSelector } from 'reselect'
 import { getWellNamePerMultiTip } from '@opentrons/shared-data'
 import { getWellSetForMultichannel } from '../utils'
-import { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV6'
+import { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
 import mapValues from 'lodash/mapValues'
 import * as StepGeneration from '@opentrons/step-generation'
 import { selectors as stepFormSelectors } from '../step-forms'
@@ -11,8 +11,6 @@ import { WellGroup } from '@opentrons/components'
 import { PipetteEntity, LabwareEntity } from '@opentrons/step-generation'
 import { Selector } from '../types'
 import { SubstepItemData } from '../steplist/types'
-// TODO IMMEDIATELY use WellGroup here
-export type AllWellHighlights = Record<string, true> // NOTE: all keys are true. There's a TODO in HighlightableLabware.js about making this a Set of well strings
 
 function _wellsForPipette(
   pipetteEntity: PipetteEntity,
@@ -21,7 +19,7 @@ function _wellsForPipette(
 ): string[] {
   // `wells` is all the wells that pipette's channel 1 interacts with.
   if (pipetteEntity.spec.channels === 8) {
-    return wells.reduce((acc, well) => {
+    return wells.reduce((acc: string[], well: string) => {
       const setOfWellsForMulti = getWellNamePerMultiTip(labwareEntity.def, well)
       return setOfWellsForMulti ? [...acc, ...setOfWellsForMulti] : acc // setOfWellsForMulti is null
     }, [])
@@ -51,7 +49,7 @@ function _getSelectedWellsForStep(
     return []
   }
 
-  const getWells = (wells: string[]) =>
+  const getWells = (wells: string[]): string[] =>
     _wellsForPipette(pipetteEntity, labwareEntity, wells)
 
   const wells = []
@@ -133,16 +131,19 @@ function _getSelectedWellsForSubstep(
     // ignore substeps with no well fields
     // TODO: Ian 2019-01-29 be more explicit about commandCreatorFnName,
     // don't rely so heavily on the fact that their well fields are the same now
+    // @ts-expect-error(sa, 2021-6-22): type narrow
     if (!substeps || substeps.commandCreatorFnName === 'delay') return []
-
+    // @ts-expect-error(sa, 2021-6-22): type narrow
     if (substeps.rows && substeps.rows[substepIndex]) {
       // single-channel
+      // @ts-expect-error(sa, 2021-6-22): type narrow
       const wellData = substeps.rows[substepIndex][wellField]
       return wellData && wellData.well ? [wellData.well] : []
     }
-
+    // @ts-expect-error(sa, 2021-6-22): type narrow
     if (substeps.multiRows && substeps.multiRows[substepIndex]) {
       // multi-channel
+      // @ts-expect-error(sa, 2021-6-22): type narrow
       return substeps.multiRows[substepIndex].reduce((acc, multiRow) => {
         const wellData = multiRow[wellField]
         return wellData && wellData.well ? [...acc, wellData.well] : acc
@@ -164,18 +165,19 @@ function _getSelectedWellsForSubstep(
   }
 
   // source + dest steps
-  // $FlowFixMe: property `sourceLabware` is missing in `MixArgs`
+
+  // @ts-expect-error(sa, 2021-6-22): `sourceLabware` is missing in `MixArgs`
   if (stepArgs.sourceLabware && stepArgs.sourceLabware === labwareId) {
     wells.push(...getWells('source'))
   }
 
-  // $FlowFixMe: property `destLabware` is missing in `MixArgs`
+  // @ts-expect-error(sa, 2021-6-22): property `destLabware` is missing in `MixArgs`
   if (stepArgs.destLabware && stepArgs.destLabware === labwareId) {
     wells.push(...getWells('dest'))
   }
 
   if (substeps && substeps.substepType === 'sourceDest') {
-    let tipWellSet = []
+    let tipWellSet: string[] = []
 
     if (substeps.multichannel) {
       const { activeTips } = substeps.multiRows[substepIndex][0]
@@ -241,7 +243,7 @@ export const wellHighlightsByLabwareId: Selector<
       (
         labwareLiquids: StepGeneration.SingleLabwareLiquidState,
         labwareId: string
-      ): AllWellHighlights => {
+      ) => {
         let selectedWells: string[] = []
 
         if (hoveredSubstep != null) {
@@ -265,7 +267,7 @@ export const wellHighlightsByLabwareId: Selector<
 
         // return selected wells eg {A1: null, B4: null}
         return selectedWells.reduce(
-          (acc: AllWellHighlights, well) => ({ ...acc, [well]: null }),
+          (acc, well) => ({ ...acc, [well]: null }),
           {}
         )
       }

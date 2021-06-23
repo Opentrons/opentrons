@@ -1,6 +1,6 @@
 // @flow
 import React from 'react'
-import { mount } from 'enzyme'
+import { mount, ReactWrapper } from 'enzyme'
 import { Provider } from 'react-redux'
 import {
   MAGNETIC_MODULE_TYPE,
@@ -19,7 +19,8 @@ import { ModuleRow } from '../ModuleRow'
 import { ModuleDiagram } from '../ModuleDiagram'
 
 describe('ModuleRow', () => {
-  let store, magneticModule
+  let store: any
+  let magneticModule: React.ComponentProps<typeof ModuleRow>['moduleOnDeck']
   beforeEach(() => {
     magneticModule = {
       id: 'magnet123',
@@ -39,7 +40,9 @@ describe('ModuleRow', () => {
     }
   })
 
-  function render(renderProps) {
+  function render(
+    renderProps: React.ComponentProps<typeof ModuleRow>
+  ): ReactWrapper {
     return mount(
       <Provider store={store}>
         <ModuleRow {...renderProps} />
@@ -62,6 +65,7 @@ describe('ModuleRow', () => {
   })
 
   it('displays crash warning tooltip when module is crashable and in slot 3', () => {
+    // @ts-expect-error(sa, 2021-6-22): magneticModule might be undefined
     magneticModule.slot = '3'
     const props = {
       moduleOnDeck: magneticModule,
@@ -77,6 +81,7 @@ describe('ModuleRow', () => {
   })
 
   it('does not display crash warning tooltip when module is not crashable regardless of slot', () => {
+    // @ts-expect-error(sa, 2021-6-22): magneticModule might be undefined
     magneticModule.model = MAGNETIC_MODULE_V2
     const props = {
       moduleOnDeck: magneticModule,
@@ -119,6 +124,7 @@ describe('ModuleRow', () => {
   })
 
   it('displays the correct module diagram for the selected module model', () => {
+    // @ts-expect-error(sa, 2021-6-22): magneticModule might be undefined
     magneticModule.model = MAGNETIC_MODULE_V2
     const props = {
       moduleOnDeck: magneticModule,

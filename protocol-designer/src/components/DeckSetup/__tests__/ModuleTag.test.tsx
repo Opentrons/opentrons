@@ -1,5 +1,6 @@
 // @flow
 import {
+  LabwareDefinition2,
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   TEMPERATURE_MODULE_V1,
@@ -161,7 +162,7 @@ describe('ModuleTag', () => {
             id: 'labwareId',
             slot: '3',
             labwareDefURI: 'url',
-            def: fixture_tiprack_10_ul,
+            def: fixture_tiprack_10_ul as LabwareDefinition2,
           },
         },
         pipettes: {},
@@ -187,7 +188,7 @@ describe('ModuleTag', () => {
             id: 'labwareId',
             slot: moduleId,
             labwareDefURI: 'url',
-            def: fixture_tiprack_10_ul,
+            def: fixture_tiprack_10_ul as LabwareDefinition2,
           },
         },
         pipettes: {},

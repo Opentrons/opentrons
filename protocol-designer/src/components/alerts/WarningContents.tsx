@@ -9,7 +9,7 @@ interface WarningContentsProps {
   warningType: string
   level: AlertLevel
 }
-export const WarningContents = (props: WarningContentsProps): JSX.Element => {
+export const WarningContents = (props: WarningContentsProps): JSX.Element | null => {
   if (props.level === 'timeline') {
     switch (props.warningType) {
       case 'ASPIRATE_FROM_PRISTINE_WELL':

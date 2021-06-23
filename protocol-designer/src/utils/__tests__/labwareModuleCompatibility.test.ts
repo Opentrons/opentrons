@@ -1,3 +1,4 @@
+import { LabwareDefinition2 } from '@opentrons/shared-data'
 import fixture_96_plate_def from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 import { getLabwareIsCustom } from '../labwareModuleCompatibility'
 describe('labwareModuleCompatibility', () => {
@@ -6,11 +7,11 @@ describe('labwareModuleCompatibility', () => {
       labwareDefURI: 'fixture/fixture_96_plate',
       id: 'abcef123',
       slot: '3',
-      def: fixture_96_plate_def,
+      def: fixture_96_plate_def as LabwareDefinition2,
     }
     it('returns true when labware is inside custom labwares obj', () => {
       const customLabwares = {
-        'fixture/fixture_96_plate': fixture_96_plate_def,
+        'fixture/fixture_96_plate': fixture_96_plate_def as LabwareDefinition2,
       }
       const labwareIsCustom = getLabwareIsCustom(customLabwares, labwareOnDeck)
       expect(labwareIsCustom).toEqual(true)

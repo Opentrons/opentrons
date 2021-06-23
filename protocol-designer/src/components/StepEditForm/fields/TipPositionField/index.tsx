@@ -62,7 +62,6 @@ function TipPositionInput(props: Props): JSX.Element {
   let value: number | string = ''
   if (wellDepthMm !== null) {
     // show default value for field in parens if no mmFromBottom value is selected
-    // @ts-expect-error (ce, 2021-06-22) value is implicitly of type string.
     value =
       mmFromBottom !== null
         ? mmFromBottom

@@ -6,13 +6,12 @@ import {
   getPipetteEntities,
   getSavedStepForms,
 } from '../../step-forms/selectors'
-import { FileMetadataFields } from '../../file-data/types'
 import { SaveStepFormsMultiAction } from '../../step-forms/actions'
 
 jest.mock('../../file-data/selectors')
 jest.mock('../../step-forms/selectors')
 
-const getFileMetadataMock = getFileMetadata as jest.MockedFunction<FileMetadataFields>
+const getFileMetadataMock = getFileMetadata as jest.MockedFunction<typeof getFileMetadata>
 const getArgsAndErrorsByStepIdMock = getArgsAndErrorsByStepId as jest.MockedFunction<
   typeof getArgsAndErrorsByStepId
 >

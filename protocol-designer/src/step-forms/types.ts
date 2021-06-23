@@ -63,9 +63,8 @@ export interface ModuleTemporalProperties {
     | ThermocyclerModuleState
 }
 export type ModuleOnDeck = ModuleEntity & ModuleTemporalProperties
-export type ModulesForEditModulesCard = Record<
-  ModuleRealType,
-  ModuleOnDeck | null | undefined
+export type ModulesForEditModulesCard = Partial<
+  Record<ModuleRealType, ModuleOnDeck | null | undefined>
 >
 // =========== LABWARE ========
 export type NormalizedLabwareById = Record<
