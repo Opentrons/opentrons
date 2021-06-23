@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { Provider } from 'react-redux'
 import { act } from 'react-dom/test-utils'
+import UAParser from 'ua-parser-js'
 import { mount } from 'enzyme'
 import { when, resetAllWhenMocks } from 'jest-when'
 import configureMockStore from 'redux-mock-store'
@@ -15,19 +16,22 @@ import {
   CLOSE_BATCH_EDIT_FORM,
 } from '../../components/modals/ConfirmDeleteModal'
 
-import * as stepFormSelectors from '../../step-forms/selectors/index.js'
-import * as dismissSelectors from '../../dismiss/selectors.js'
-import * as uiStepSelectors from '../../ui/steps/selectors.js'
-import * as fileDataSelectors from '../../file-data/selectors/index.js'
+import * as stepFormSelectors from '../../step-forms/selectors/index'
+import * as dismissSelectors from '../../dismiss/selectors'
+import * as uiStepSelectors from '../../ui/steps/selectors'
+import * as fileDataSelectors from '../../file-data/selectors/index'
 import * as timelineWarningSelectors from '../../top-selectors/timelineWarnings'
 
-jest.mock('../../step-forms/selectors/index.js')
-jest.mock('../../file-data/selectors/index.js')
+jest.mock('ua-parser-js')
+jest.mock('../../step-forms/selectors/index')
+jest.mock('../../file-data/selectors/index')
 jest.mock('../../top-selectors/timelineWarnings')
-jest.mock('../../dismiss/selectors.js')
-jest.mock('../../ui/steps/selectors.js')
+jest.mock('../../dismiss/selectors')
+jest.mock('../../ui/steps/selectors')
 jest.mock('../../labware-ingred/selectors')
 jest.mock('../../feature-flags/selectors')
+
+const mockUAParser = UAParser as jest.MockedFunction<typeof UAParser>
 
 const getSavedStepFormsMock = stepFormSelectors.getSavedStepForms as jest.MockedFunction<
   typeof stepFormSelectors.getSavedStepForms
@@ -105,7 +109,7 @@ describe('ConnectedStepItem', () => {
   beforeEach(() => {
     store = mockStore()
 
-    jest.mock('ua-parser-js', () => {
+    UAParser.mockImplementation(() => {
       return {
         getOS: () => ({ name: 'Mac OS', version: 'mockVersion' }),
       }
@@ -655,7 +659,7 @@ describe('ConnectedStepItem', () => {
           metaKey: true,
         }
 
-        jest.mock('ua-parser-js', () => {
+        mockUAParser.mockImplementation(() => {
           return {
             getOS: () => ({ name: 'NOT Mac OS', version: 'mockVersion' }),
           }
@@ -748,7 +752,7 @@ describe('ConnectedStepItem', () => {
         ({ name, props, clickEvent, setupMocks, expectedAction }) => {
           it(name, () => {
             setupMocks && setupMocks()
-            jest.mock('ua-parser-js', () => {
+            mockUAParser.mockImplementation(() => {
               return {
                 getOS: () => ({
                   name: 'Mac OS',
@@ -778,7 +782,7 @@ describe('ConnectedStepItem', () => {
           ctrlKey: true,
         }
 
-        jest.mock('ua-parser-js', () => {
+        mockUAParser.mockImplementation(() => {
           return {
             getOS: () => ({ name: 'Mac OS', version: 'mockVersion' }),
           }
@@ -850,7 +854,7 @@ describe('ConnectedStepItem', () => {
         ({ name, props, clickEvent, setupMocks, expectedAction }) => {
           it(name, () => {
             setupMocks && setupMocks()
-            jest.mock('ua-parser-js', () => {
+            mockUAParser.mockImplementation(() => {
               return {
                 getOS: () => ({
                   name: 'NOT Mac OS',

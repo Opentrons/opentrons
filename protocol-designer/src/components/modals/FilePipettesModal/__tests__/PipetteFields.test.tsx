@@ -16,7 +16,7 @@ import { FormPipette } from '../../../../step-forms'
 
 jest.mock('../../../../feature-flags/selectors')
 jest.mock('../../../../labware-defs/selectors')
-jest.mock('../../../../labware-defs/utils.js')
+jest.mock('../../../../labware-defs/utils')
 jest.mock('../../../../labware-defs/actions')
 
 const getOnlyLatestDefsMock = getOnlyLatestDefs as jest.MockedFunction<

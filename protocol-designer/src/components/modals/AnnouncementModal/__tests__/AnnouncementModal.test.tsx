@@ -6,7 +6,7 @@ import { AnnouncementModal } from '../'
 import * as announcements from '../announcements'
 import { Announcement } from '../announcements'
 
-jest.mock('../../../../persist.js')
+jest.mock('../../../../persist')
 
 describe('AnnouncementModal', () => {
   const announcementKey = 'newType'

@@ -76,17 +76,13 @@ describe('MagnetForm', () => {
       .fn()
       .mockImplementation(props => <div>{props.children}</div>)
     fields.TextField = jest.fn().mockImplementation(() => <div />)
-    fields.RadioGroupField = jest
-      .fn()
-      .mockImplementation(() => <div />)(
-        uiModuleSelectors.getMagneticLabwareOptions as jest.MockedFunction<
-          typeof uiModuleSelectors.getMagneticLabwareOptions
-        >
-      )
-      .mockReturnValue([
-        { name: 'magnet module v1', value: 'magnetV1', disabled: false },
-        { name: 'magnet module v2', value: 'magnetV2', disabled: false },
-      ])
+    fields.RadioGroupField = jest.fn().mockImplementation(() => <div />)
+    ;(uiModuleSelectors.getMagneticLabwareOptions as jest.MockedFunction<
+      typeof uiModuleSelectors.getMagneticLabwareOptions
+    >).mockReturnValue([
+      { name: 'magnet module v1', value: 'magnetV1', disabled: false },
+      { name: 'magnet module v2', value: 'magnetV2', disabled: false },
+    ])
 
     getUnsavedFormMock.mockReturnValue({ stepType: 'magnet' } as FormData)
 

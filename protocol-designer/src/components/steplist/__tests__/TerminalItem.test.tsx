@@ -6,8 +6,8 @@ import { when, resetAllWhenMocks } from 'jest-when'
 import configureMockStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
 
-import * as stepFormSelectors from '../../../step-forms/selectors/index.js'
-import * as uiStepSelectors from '../../../ui/steps/selectors.js'
+import * as stepFormSelectors from '../../../step-forms/selectors'
+import * as uiStepSelectors from '../../../ui/steps/selectors'
 import {
   ConfirmDeleteModal,
   CLOSE_UNSAVED_STEP_FORM,
@@ -16,8 +16,8 @@ import {
 import { PDTitledList } from '../../lists'
 import { TerminalItem, TerminalItemProps } from '../TerminalItem'
 
-jest.mock('../../../step-forms/selectors/index.js')
-jest.mock('../../../ui/steps/selectors.js')
+jest.mock('../../../step-forms/selectors')
+jest.mock('../../../ui/steps/selectors')
 
 const getCurrentFormIsPresavedMock = stepFormSelectors.getCurrentFormIsPresaved as jest.MockedFunction<
   typeof stepFormSelectors.getCurrentFormIsPresaved

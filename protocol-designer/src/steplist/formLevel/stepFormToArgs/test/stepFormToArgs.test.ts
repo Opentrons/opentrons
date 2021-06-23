@@ -1,4 +1,4 @@
-import { _castForm } from '../index.js'
+import { _castForm } from '../index'
 import { FormData } from '../../../../form-types'
 
 // NOTE(IL, 2020-09-24): I think the real solution to validating the

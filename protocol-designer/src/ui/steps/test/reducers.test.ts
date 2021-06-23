@@ -5,7 +5,7 @@ import {
   MULTI_STEP_SELECTION_TYPE,
   TERMINAL_ITEM_SELECTION_TYPE,
   SelectableItem,
-} from '../reducers.js'
+} from '../reducers'
 import { SelectMultipleStepsAction } from '../actions/types'
 
 jest.mock('../../../labware-defs/utils')
