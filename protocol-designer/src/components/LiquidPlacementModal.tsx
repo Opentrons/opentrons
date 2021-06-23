@@ -41,7 +41,9 @@ interface DP {
 
 type Props = SP & DP
 
-interface State { highlightedWells: WellGroup }
+interface State {
+  highlightedWells: WellGroup
+}
 
 class LiquidPlacementModalComponent extends React.Component<Props, State> {
   state = { highlightedWells: {} }

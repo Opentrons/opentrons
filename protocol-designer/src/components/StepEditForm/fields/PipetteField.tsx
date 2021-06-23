@@ -10,7 +10,9 @@ import { FieldProps } from '../types'
 
 type OP = FieldProps
 
-interface SP { pipetteOptions: Options }
+interface SP {
+  pipetteOptions: Options
+}
 
 type Props = OP & SP
 

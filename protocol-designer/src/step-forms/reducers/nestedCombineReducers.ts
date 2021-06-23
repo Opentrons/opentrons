@@ -28,7 +28,7 @@ const assertReducerShape = <S extends Record<string, any>, A extends Action>(
   const initialState = getNextState({
     // @ts-expect-error type FAKE_INIT_ACTION to be of type Action
     action: FAKE_INIT_ACTION,
-    // @ts-expect-error(sa, 2021-6-14): type 
+    // @ts-expect-error(sa, 2021-6-14): type
     state: undefined,
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     prevStateFallback: {} as S,

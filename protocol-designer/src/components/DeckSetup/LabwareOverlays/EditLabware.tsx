@@ -145,7 +145,10 @@ const labwareSource = {
     props.setDraggedLabware(null)
   },
 }
-const collectLabwareSource = (connect: DragSourceConnector, monitor: DragSourceMonitor) => ({
+const collectLabwareSource = (
+  connect: DragSourceConnector,
+  monitor: DragSourceMonitor
+) => ({
   connectDragSource: connect.dragSource(),
   isDragging: monitor.isDragging(),
   draggedItem: monitor.getItem(),
@@ -180,7 +183,10 @@ const labwareDropTarget = {
     }
   },
 }
-const collectLabwareDropTarget = (connect: DropTargetConnector, monitor: DropTargetMonitor) => ({
+const collectLabwareDropTarget = (
+  connect: DropTargetConnector,
+  monitor: DropTargetMonitor
+) => ({
   connectDropTarget: connect.dropTarget(),
   isOver: monitor.isOver(),
   draggedLabware: monitor.getItem()?.labwareOnDeck || null,

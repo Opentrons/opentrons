@@ -8,7 +8,9 @@ import { SettingsApp } from './SettingsApp'
 
 export { SettingsSidebar } from './SettingsSidebar'
 
-interface Props { currentPage: Page }
+interface Props {
+  currentPage: Page
+}
 
 const SettingsPageComponent = (props: Props) => {
   switch (props.currentPage) {

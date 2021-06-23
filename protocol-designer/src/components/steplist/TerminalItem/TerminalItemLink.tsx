@@ -8,8 +8,12 @@ import { TerminalItemId } from '../../../steplist'
 import { i18n } from '../../../localization'
 import styles from './styles.css'
 
-interface OP { terminalId: TerminalItemId }
-interface DP { selectTerminalItem: (terminalItemId: TerminalItemId) => unknown }
+interface OP {
+  terminalId: TerminalItemId
+}
+interface DP {
+  selectTerminalItem: (terminalItemId: TerminalItemId) => unknown
+}
 type Props = OP & DP
 
 class TerminalItemLinkComponent extends React.Component<Props> {
@@ -31,7 +35,4 @@ const mapDTP = (dispatch: ThunkDispatch<any>): DP => ({
     dispatch(stepsActions.selectTerminalItem(terminalId)),
 })
 
-export const TerminalItemLink = connect(
-  null,
-  mapDTP
-)(TerminalItemLinkComponent)
+export const TerminalItemLink = connect(null, mapDTP)(TerminalItemLinkComponent)

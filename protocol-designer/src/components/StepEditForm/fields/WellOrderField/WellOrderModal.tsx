@@ -66,7 +66,10 @@ export const DoneButton = (props: { onClick: () => void }): JSX.Element => (
   </PrimaryButton>
 )
 
-export class WellOrderModal extends React.Component<WellOrderModalProps, State> {
+export class WellOrderModal extends React.Component<
+  WellOrderModalProps,
+  State
+> {
   constructor(props: WellOrderModalProps) {
     super(props)
     const {

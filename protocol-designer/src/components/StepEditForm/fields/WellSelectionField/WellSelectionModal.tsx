@@ -49,7 +49,7 @@ interface WellSelectionModalComponentProps {
 
 const WellSelectionModalComponent = (
   props: WellSelectionModalComponentProps
-): JSX.Element=> {
+): JSX.Element => {
   const {
     deselectWells,
     handleSave,

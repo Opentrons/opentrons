@@ -37,14 +37,9 @@ interface StepButtonComponentProps {
 }
 
 // TODO: Ian 2019-01-17 move out to centralized step info file - see #2926
-const getSupportedSteps = (): Array<Exclude<StepType, 'manualIntervention'>> => [
-  'moveLiquid',
-  'mix',
-  'pause',
-  'magnet',
-  'temperature',
-  'thermocycler',
-]
+const getSupportedSteps = (): Array<
+  Exclude<StepType, 'manualIntervention'>
+> => ['moveLiquid', 'mix', 'pause', 'magnet', 'temperature', 'thermocycler']
 
 export const StepCreationButtonComponent = (
   props: StepButtonComponentProps

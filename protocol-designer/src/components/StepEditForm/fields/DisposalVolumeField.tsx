@@ -79,7 +79,7 @@ const DisposalVolumeFieldComponent = (props: Props) => {
     <FormGroup label={i18n.t('form.step_edit_form.multiDispenseOptionsLabel')}>
       <>
         <div
-        // @ts-expect-error(sa, 2021-6-22): I think volumeBoundsCaption needs to be casted to a boolean to be fed into a class name
+          // @ts-expect-error(sa, 2021-6-22): I think volumeBoundsCaption needs to be casted to a boolean to be fed into a class name
           className={cx(styles.checkbox_row, {
             [styles.captioned_field]: volumeBoundsCaption,
           })}

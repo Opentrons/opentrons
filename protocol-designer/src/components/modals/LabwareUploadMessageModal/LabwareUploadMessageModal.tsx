@@ -24,6 +24,7 @@ const MessageBody = (props: { message: LabwareUploadMessage }) => {
             `modal.labware_upload_message.message.${message.messageType}`
           )}
         </p>
+        {/* @ts-expect-error (ce, 2021-06-23) errorText does not exist on all type posibilities at this point */}
         {message.errorText ? <p>{message.errorText}</p> : null}
       </>
     )
@@ -70,6 +71,7 @@ const MessageBody = (props: { message: LabwareUploadMessage }) => {
             {i18n.t('modal.labware_upload_message.name_conflict.overwrite')}
           </p>
         )}
+        {/* @ts-expect-error (ce, 2021-06-23) Property 'isOverwriteMismatched' does not exist on type '(NameConflictFields & { messageType: "LABWARE_NAME_CONFLICT"; }) | (NameConflictFields & { messageType: "ASK_FOR_LABWARE_OVERWRITE"; defURIToOverwrite: string; isOverwriteMismatched: boolean; })' */}
         {canOverwrite && message.isOverwriteMismatched && (
           <p>
             <strong>
@@ -85,13 +87,13 @@ const MessageBody = (props: { message: LabwareUploadMessage }) => {
   return null
 }
 
-interface Props {
+export interface LabwareUploadMessageModalProps {
   message?: LabwareUploadMessage | null
   dismissModal: () => unknown
   overwriteLabwareDef?: () => unknown
 }
 
-export const LabwareUploadMessageModal = (props: Props): JSX.Element => {
+export const LabwareUploadMessageModal = (props: LabwareUploadMessageModalProps): JSX.Element | null => {
   const { message, dismissModal, overwriteLabwareDef } = props
   if (!message) return null
 

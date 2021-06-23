@@ -27,7 +27,9 @@ import { BaseState } from '../types'
 
 type Props = React.ComponentProps<typeof TitleBar>
 
-interface DP { onBackClick: Props['onBackClick'] }
+interface DP {
+  onBackClick: Props['onBackClick']
+}
 
 type SP = Omit<Props, keyof DP> & {
   _page: Page
@@ -50,7 +52,9 @@ function TitleWithIcon(props: TitleWithIconProps): JSX.Element {
   )
 }
 
-interface TitleWithBetaTagProps { text: string | null | undefined }
+interface TitleWithBetaTagProps {
+  text: string | null | undefined
+}
 
 const TitleWithBetaTag = (props: TitleWithBetaTagProps): JSX.Element => (
   <div className={styles.title_wrapper}>

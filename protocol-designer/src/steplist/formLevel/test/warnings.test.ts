@@ -117,7 +117,12 @@ describe('Below pipette minimum volume', () => {
   })
 })
 describe('Below min disposal volume', () => {
-  let fieldsWithPipette: { pipette: { spec: { minVolume: number } }; disposalVolume_checkbox: boolean; disposalVolume_volume: number; path: string }
+  let fieldsWithPipette: {
+    pipette: { spec: { minVolume: number } }
+    disposalVolume_checkbox: boolean
+    disposalVolume_volume: number
+    path: string
+  }
   beforeEach(() => {
     fieldsWithPipette = {
       pipette: {

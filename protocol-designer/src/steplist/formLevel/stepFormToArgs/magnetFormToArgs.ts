@@ -9,7 +9,7 @@ export const magnetFormToArgs = (
   hydratedFormData: HydratedMagnetFormData
 ): MagnetArgs => {
   const { magnetAction, moduleId } = hydratedFormData
-  // @ts-expect-error(sa, 2021-6-14): null check engageHeight 
+  // @ts-expect-error(sa, 2021-6-14): null check engageHeight
   const engageHeight = parseFloat(hydratedFormData.engageHeight)
   assert(
     magnetAction === 'engage' ? !Number.isNaN(engageHeight) : true,

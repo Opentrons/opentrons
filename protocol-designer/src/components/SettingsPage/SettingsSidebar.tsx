@@ -9,8 +9,12 @@ import { i18n } from '../../localization'
 import { PDTitledList } from '../lists'
 import styles from './SettingsPage.css'
 
-interface SP { currentPage: Page }
-interface DP { makeNavigateToPage: (page: Page) => () => unknown }
+interface SP {
+  currentPage: Page
+}
+interface DP {
+  makeNavigateToPage: (page: Page) => () => unknown
+}
 type Props = SP & DP
 
 const SettingsSidebarComponent = (props: Props) => (

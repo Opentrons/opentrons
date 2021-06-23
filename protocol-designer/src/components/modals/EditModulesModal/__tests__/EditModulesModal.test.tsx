@@ -31,7 +31,7 @@ import { selectors as featureSelectors } from '../../../../feature-flags'
 import { getLabwareIsCompatible } from '../../../../utils/labwareModuleCompatibility'
 import { isModuleWithCollisionIssue } from '../../../modules/utils'
 import { PDAlert } from '../../../alerts/PDAlert'
-import { EditModulesModal } from '..'
+import { EditModulesModal, EditModulesModalProps } from '..'
 import { ModelDropdown } from '../ModelDropdown'
 import { SlotDropdown } from '../SlotDropdown'
 import { ConnectedSlotMap } from '../ConnectedSlotMap'
@@ -63,8 +63,8 @@ const getSlotIsEmptyMock: jest.MockedFunction<any> = getSlotIsEmpty
 const getLabwareOnSlotMock: jest.MockedFunction<any> = getLabwareOnSlot
 
 describe('Edit Modules Modal', () => {
-  let mockStore
-  let props
+  let mockStore: any
+  let props: EditModulesModalProps
   beforeEach(() => {
     getInitialDeckSetupMock.mockReturnValue(getMockDeckSetup())
     getSlotsBlockedBySpanningMock.mockReturnValue([])
@@ -87,7 +87,7 @@ describe('Edit Modules Modal', () => {
   afterEach(() => {
     jest.clearAllMocks()
   })
-  const render = props =>
+  const render = (props: EditModulesModalProps) =>
     mount(
       <Provider store={mockStore}>
         <EditModulesModal {...props} />
@@ -206,6 +206,7 @@ describe('Edit Modules Modal', () => {
   describe('Cancel Button', () => {
     it('calls onCloseClick when pressed', () => {
       const wrapper = render(props)
+      // @ts-expect-error (ce, 2021-06-22) possibly undefined and no argument
       wrapper.find(OutlineButton).at(0).prop('onClick')()
       expect(props.onCloseClick).toHaveBeenCalled()
     })
@@ -220,6 +221,7 @@ describe('Edit Modules Modal', () => {
         selectedModel: MAGNETIC_MODULE_V2,
       }
       act(() => {
+        // @ts-expect-error (ce, 2021-06-22) expects 2 args
         formik.invoke('onSubmit')(mockValues)
       })
       expect(props.displayModuleWarning).toHaveBeenCalledWith({
@@ -237,6 +239,7 @@ describe('Edit Modules Modal', () => {
         selectedModel: TEMPERATURE_MODULE_V2,
       }
       act(() => {
+        // @ts-expect-error (ce, 2021-06-22) expects 2 args
         formik.invoke('onSubmit')(mockValues)
       })
       expect(props.editModuleModel).toHaveBeenCalledWith(TEMPERATURE_MODULE_V2)
@@ -252,6 +255,7 @@ describe('Edit Modules Modal', () => {
         selectedModel: MAGNETIC_MODULE_V2,
       }
       act(() => {
+        // @ts-expect-error (ce, 2021-06-22) expects 2 args
         formik.invoke('onSubmit')(mockValues)
       })
 

@@ -3,7 +3,7 @@ import {
   PAUSE_UNTIL_RESUME,
   PAUSE_UNTIL_TIME,
 } from '../../../../constants'
-import { FormData } from '../../../../form-types';
+import { FormData } from '../../../../form-types'
 import { pauseFormToArgs } from '../pauseFormToArgs'
 
 describe('pauseFormToArgs', () => {

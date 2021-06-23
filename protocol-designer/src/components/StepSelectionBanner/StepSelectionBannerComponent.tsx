@@ -28,7 +28,10 @@ import {
 import { i18n } from '../../localization'
 import { CountPerStepType, StepType } from '../../form-types'
 
-interface StepPillProps { stepType: StepType; count: number }
+interface StepPillProps {
+  stepType: StepType
+  count: number
+}
 
 const stepPillStyles = css`
   align-items: ${ALIGN_CENTER};
@@ -86,7 +89,9 @@ export const StepSelectionBannerComponent = (
     0
   )
 
-  const stepTypes: StepType[] = Object.keys(countPerStepType).sort() as StepType[]
+  const stepTypes: StepType[] = Object.keys(
+    countPerStepType
+  ).sort() as StepType[]
 
   return (
     <Box

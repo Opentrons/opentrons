@@ -9,7 +9,7 @@ import {
   getLabwareDefURI,
   getIsTiprack,
   OPENTRONS_LABWARE_NAMESPACE,
-  LabwareDefinition2
+  LabwareDefinition2,
 } from '@opentrons/shared-data'
 import * as labwareDefSelectors from './selectors'
 import { getAllWellSetsForLabware } from '../utils'
@@ -60,7 +60,8 @@ const validate = ajv.compile(labwareSchema)
 const _labwareDefsMatchingLoadName = (
   labwareDefs: LabwareDefinition2[],
   loadName: string
-): LabwareDefinition2[] => labwareDefs.filter(def => def.parameters.loadName === loadName)
+): LabwareDefinition2[] =>
+  labwareDefs.filter(def => def.parameters.loadName === loadName)
 
 const _labwareDefsMatchingDisplayName = (
   labwareDefs: LabwareDefinition2[],

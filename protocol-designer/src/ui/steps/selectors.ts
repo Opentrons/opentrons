@@ -328,7 +328,7 @@ export const getBatchEditSelectedStepTypes: Selector<
   return uniq(
     (Object.keys(countPerStepType) as StepType[]).filter(
       // @ts-expect-error(sa, 2021-6-15): TS thinks countPerStepType[stepType] might be undefined because CountPerStepType is a partial record
-      (stepType) => countPerStepType[stepType] > 0
+      stepType => countPerStepType[stepType] > 0
     )
   ).sort()
 })

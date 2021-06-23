@@ -14,7 +14,9 @@ interface LabwareHighlightProps {
   labwareOnDeck: LabwareOnDeck
 }
 
-export const LabwareHighlight = (props: LabwareHighlightProps): JSX.Element | null => {
+export const LabwareHighlight = (
+  props: LabwareHighlightProps
+): JSX.Element | null => {
   const { labwareOnDeck } = props
   const highlighted = useSelector(getHoveredStepLabware).includes(
     labwareOnDeck.id

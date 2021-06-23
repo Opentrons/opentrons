@@ -7,13 +7,13 @@ import modalStyles from '../modal.css'
 import { getModalContents } from './modalContents'
 import { FileUploadMessage } from '../../../load-file'
 
-interface Props {
+export interface FileUploadMessageModalProps {
   message?: FileUploadMessage | null
   cancelProtocolMigration: (event: React.MouseEvent) => unknown
   dismissModal: (event: React.MouseEvent) => unknown
 }
 
-export function FileUploadMessageModal(props: Props): JSX.Element {
+export function FileUploadMessageModal(props: FileUploadMessageModalProps): JSX.Element | null {
   const { message, cancelProtocolMigration, dismissModal } = props
 
   if (!message) return null

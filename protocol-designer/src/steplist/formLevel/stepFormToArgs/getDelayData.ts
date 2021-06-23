@@ -1,10 +1,10 @@
 import { InnerDelayArgs } from '@opentrons/step-generation'
 import {
-    DelayCheckboxFields,
-    DelaySecondFields,
-    HydratedMoveLiquidFormData,
-    HydratedMixFormDataLegacy
-} from '../../../form-types';
+  DelayCheckboxFields,
+  DelaySecondFields,
+  HydratedMoveLiquidFormData,
+  HydratedMixFormDataLegacy,
+} from '../../../form-types'
 export function getMoveLiquidDelayData(
   hydratedFormData: HydratedMoveLiquidFormData['fields'],
   checkboxField: DelayCheckboxFields,

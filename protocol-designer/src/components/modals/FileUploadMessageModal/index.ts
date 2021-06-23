@@ -1,5 +1,8 @@
 import * as React from 'react'
-import { FileUploadMessageModal as FileUploadMessageModalComponent } from './FileUploadMessageModal'
+import {
+  FileUploadMessageModal as FileUploadMessageModalComponent,
+  FileUploadMessageModalProps
+} from './FileUploadMessageModal'
 import { connect } from 'react-redux'
 import {
   selectors as loadFileSelectors,
@@ -7,7 +10,9 @@ import {
 } from '../../../load-file'
 import { Dispatch } from 'redux'
 import { BaseState } from '../../../types'
-type Props = React.ComponentProps<typeof FileUploadMessageModalComponent>
+
+
+type Props = FileUploadMessageModalProps
 interface SP {
   message: Props['message']
 }
@@ -19,7 +24,7 @@ function mapStateToProps(state: BaseState): SP {
   }
 }
 
-function mapDispatchToProps(dispatch: Dispatch<any>): DP {
+function mapDispatchToProps(dispatch: Dispatch<any, any>): DP {
   return {
     cancelProtocolMigration: () => dispatch(loadFileActions.undoLoadFile()),
     dismissModal: () => dispatch(loadFileActions.dismissFileUploadMessage()),
