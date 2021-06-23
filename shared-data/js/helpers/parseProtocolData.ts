@@ -118,3 +118,7 @@ export function validateJsonProtocolFileContents(
     return null
   }
 }
+
+export function protocolHasModules(protocol: JsonProtocolFile) {
+  return 'modules' in protocol && Object.entries(protocol.modules).length > 0
+}

@@ -28,8 +28,6 @@
   "required_type_title": "Type",
   "required_quantity_title": "Quantity",
   "required_cal_data_title": "Calibration Data",
-  "setup_for_run": "Setup for Run",
-  "step": "STEP {{index}}",
   "simulation_in_progress": "Simulation in Progress",
   "update_robot_for_custom_labware": "You have custom labware definitions saved to your app, but this robot needs to be updated before you can use these definitions with Python protocols",
   "upload_and_simulate": "Upload and Simulate Protocol"

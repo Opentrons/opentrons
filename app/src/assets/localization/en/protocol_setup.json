@@ -1,0 +1,12 @@
+{
+  "labware_setup_step_description": "Position full tip racks and labware in the deck slots as shown in the deck map.",
+  "labware_setup_step_title": "Labware Setup",
+  "module_setup_step_description": "Plug in and power up the required module(s) via the OT-2 USB Port(s). Place the module(s) as shown in the deck map.",
+  "module_setup_step_title": "Module Setup",
+  "proceed_to_labware_setup_step": "Proceed to Labware Setup",
+  "proceed_to_module_setup_step": "Proceed to Module Setup",
+  "robot_calibration_step_description": "Review required pipettes and tip length calibrations for this protocol",
+  "robot_calibration_step_title": "Robot Calibration",
+  "setup_for_run": "Setup for Run",
+  "step": "STEP {{index}}"
+}

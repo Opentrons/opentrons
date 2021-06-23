@@ -28,9 +28,6 @@ export const getProtocolFile = (state: State): ProtocolFile | null =>
 export const getProtocolContents = (state: State): string | null =>
   state.protocol.contents
 
-// TODO(mc, 2020-08-05): this data needs to be runtime schema checked
-// to truly prevent invalid data bringing down the app. For now we're
-// relying on overuse of ?. accessors
 export const getProtocolData = (state: State): ProtocolData | null =>
   state.protocol.data
 
