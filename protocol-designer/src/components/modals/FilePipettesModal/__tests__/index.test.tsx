@@ -65,7 +65,7 @@ describe('FilePipettesModal', () => {
     }
   })
 
-  function renderFormComponent(props) {
+  function renderFormComponent(props: Props) {
     return shallow(<FilePipettesModal {...props} />)
       .find(Formik)
       .dive()

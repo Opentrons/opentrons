@@ -7,7 +7,10 @@ import { i18n } from '../../../localization'
 import styles from './StepChangesConfirmModal.css'
 import modalStyles from '../modal.css'
 
-interface Props { onCancel: () => void; onConfirm: () => void }
+interface Props {
+  onCancel: () => void
+  onConfirm: () => void
+}
 
 export const StepChangesConfirmModal = (props: Props): JSX.Element => {
   const { onCancel, onConfirm } = props

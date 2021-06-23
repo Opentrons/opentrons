@@ -213,7 +213,7 @@ export class FilePipettesModal extends React.Component<Props, State> {
             ...acc,
             {
               type: moduleType,
-              model: formModule.model || '' as ModuleModel, // TODO: we need to validate that module models are of type ModuleModel
+              model: formModule.model || ('' as ModuleModel), // TODO: we need to validate that module models are of type ModuleModel
               slot: formModule.slot,
             },
           ]

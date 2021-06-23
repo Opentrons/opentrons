@@ -2,9 +2,8 @@ import * as React from 'react'
 import cx from 'classnames'
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
 import { InstrumentDiagram } from '@opentrons/components'
-import { FormPipette } from '../../../step-forms/types';
+import { FormPipette } from '../../../step-forms/types'
 import styles from './FilePipettesModal.css'
-
 
 interface Props {
   leftPipette?: FormPipette['pipetteName']

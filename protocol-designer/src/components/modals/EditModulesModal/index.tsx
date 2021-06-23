@@ -47,7 +47,7 @@ import { useResetSlotOnModelChange } from './form-state'
 import { ModuleOnDeck } from '../../../step-forms/types'
 import { ModelModuleInfo } from '../../EditModules'
 
-interface EditModulesModalProps {
+export interface EditModulesModalProps {
   moduleType: ModuleRealType
   moduleOnDeck: ModuleOnDeck | null
   onCloseClick: () => unknown

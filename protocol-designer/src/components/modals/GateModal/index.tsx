@@ -26,9 +26,12 @@ interface SP {
   hasOptedIn: Props['hasOptedIn']
 }
 
-type DP = $Rest<Props, SP>
+type DP = Omit<Props, keyof SP>
 
-interface State { gateStage: GateStage; errorMessage: string | null | undefined }
+interface State {
+  gateStage: GateStage
+  errorMessage: string | null | undefined
+}
 
 class GateModalComponent extends React.Component<Props, State> {
   constructor(props: Props) {
