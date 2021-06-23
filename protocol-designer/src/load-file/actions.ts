@@ -9,7 +9,7 @@ import {
   LoadFileAction,
   NewProtocolFields,
 } from './types'
-export type FileUploadMessageAction = {
+export interface FileUploadMessageAction {
   type: 'FILE_UPLOAD_MESSAGE'
   payload: FileUploadMessage
 }
@@ -19,7 +19,7 @@ export const fileUploadMessage = (
   type: 'FILE_UPLOAD_MESSAGE',
   payload,
 })
-export type DismissFileUploadMessageAction = {
+export interface DismissFileUploadMessageAction {
   type: 'DISMISS_FILE_UPLOAD_MESSAGE'
 }
 export const dismissFileUploadMessage = (): DismissFileUploadMessageAction => ({
@@ -34,7 +34,10 @@ export const loadFileAction = (payload: PDProtocolFile): LoadFileAction => ({
 export const loadProtocolFile = (
   event: React.SyntheticEvent<HTMLInputElement>
 ): ThunkAction<any> => (dispatch: ThunkDispatch<any>, getState: GetState) => {
-  const fileError = (errorType: FileUploadErrorType, errorMessage?: string) =>
+  const fileError = (
+    errorType: FileUploadErrorType,
+    errorMessage?: string
+  ): void =>
     dispatch(
       fileUploadMessage({
         isError: true,
@@ -43,6 +46,7 @@ export const loadProtocolFile = (
       })
     )
 
+  // @ts-expect-error need null checking
   const file = event.currentTarget.files[0]
   const reader = new FileReader()
   // reset the state of the input to allow file re-uploads
@@ -58,6 +62,7 @@ export const loadProtocolFile = (
       try {
         parsedProtocol = JSON.parse((result as any) as string)
         // TODO LATER Ian 2018-05-18 validate file with JSON Schema here
+        // @ts-expect-error need null checking
         dispatch(loadFileAction(parsedProtocol))
       } catch (error) {
         console.error(error)
@@ -68,7 +73,7 @@ export const loadProtocolFile = (
     reader.readAsText(file)
   }
 }
-export type UndoLoadFile = {
+export interface UndoLoadFile {
   type: 'UNDO_LOAD_FILE'
 }
 // TODO: Ian 2019-06-25 consider making file loading non-committal
@@ -76,7 +81,7 @@ export type UndoLoadFile = {
 export const undoLoadFile = (): UndoLoadFile => ({
   type: 'UNDO_LOAD_FILE',
 })
-export type CreateNewProtocolAction = {
+export interface CreateNewProtocolAction {
   type: 'CREATE_NEW_PROTOCOL'
   payload: NewProtocolFields
 }
@@ -86,7 +91,7 @@ export const createNewProtocol = (
   type: 'CREATE_NEW_PROTOCOL',
   payload,
 })
-export type SaveProtocolFileAction = {
+export interface SaveProtocolFileAction {
   type: 'SAVE_PROTOCOL_FILE'
 }
 export const saveProtocolFile: () => ThunkAction<SaveProtocolFileAction> = () => (

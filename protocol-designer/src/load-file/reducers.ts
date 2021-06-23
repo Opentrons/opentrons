@@ -1,11 +1,13 @@
-import { Reducer } from 'redux'
-import { combineReducers } from 'redux'
+import { Reducer, combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
 import { Action } from '../types'
 import { FileUploadMessage, LoadFileAction } from './types'
 import { FileUploadMessageAction } from './actions'
 // Keep track of file upload errors / messages
 type FileUploadMessageState = FileUploadMessage | null | undefined
+
+// @ts-expect-error(sb, 2021-6-17): cannot use string literals as action type
+// TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
 const fileUploadMessage: Reducer<FileUploadMessageState, any> = handleActions(
   {
     FILE_UPLOAD_MESSAGE: (
@@ -75,7 +77,7 @@ export const _allReducers = {
   fileUploadMessage,
   unsavedChanges,
 }
-export type RootState = {
+export interface RootState {
   fileUploadMessage: FileUploadMessageState
   unsavedChanges: boolean
 }

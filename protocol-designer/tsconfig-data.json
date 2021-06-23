@@ -7,7 +7,7 @@
       "rootDir": "src",
       "outDir": "lib"
     },
-    "include": ["src/**/*.json"],
+    "include": ["src/**/*.json", "fixtures/**/*.json"],
     "exclude": ["**/*.ts", "**/*.tsx"]
   }
   

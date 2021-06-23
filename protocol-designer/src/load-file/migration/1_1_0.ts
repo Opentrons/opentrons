@@ -9,10 +9,10 @@ import {
   FileLabware,
   FilePipette,
   ProtocolFile,
-} from '@opentrons/shared-data/protocol/flowTypes/schemaV1'
+} from '@opentrons/shared-data/protocol/types/schemaV1'
 import { FormPatch } from '../../steplist/actions'
 import { FormData } from '../../form-types'
-export type PDMetadata = {
+export interface PDMetadata {
   pipetteTiprackAssignments: Record<string, string>
   dismissedWarnings: {
     form: Record<string, string[] | null | undefined>
@@ -73,7 +73,7 @@ function getPipetteCapacityLegacy(
       )}"`
     )
   }
-
+  // @ts-expect-error unable to cast type string from manipulation above to type PipetteName
   const specs = getPipetteNameSpecs(pipetteName)
   const tiprackDef = getLabwareV1Def(pipette.tiprackModel)
 
@@ -181,7 +181,9 @@ export function renameOrderedSteps(fileData: PDProtocolFile): PDProtocolFile {
       ...fileData['designer-application'],
       data: {
         ...data,
+        // @ts-expect-error orderedSteps doesn't exist on PDMetaData
         orderedStepIds: data.orderedStepIds || data.orderedSteps,
+        // @ts-expect-error orderedSteps doesn't exist on PDMetaData
         orderedSteps: undefined,
       },
     },
@@ -324,6 +326,7 @@ export function updateStepFormKeys(fileData: PDProtocolFile): PDProtocolFile {
       ...fileData['designer-application'],
       data: {
         ...fileData['designer-application'].data,
+        // @ts-expect-error migratedStepForms is missing object fields
         savedStepForms: migratedStepForms,
       },
     },
@@ -343,6 +346,7 @@ export function replaceTCDStepsWithMoveLiquidStep(
       distribute: 'multiDispense',
     }
     const proposedPatch = {
+      // @ts-expect-error stepType not always included in pathMap
       path: pathMap[stepType],
       stepType: 'moveLiquid',
       aspirate_wells_grouped: false,
@@ -362,6 +366,7 @@ export function replaceTCDStepsWithMoveLiquidStep(
     const resolvedPatch = _updatePatchPathField(
       proposedPatch,
       formData,
+      // @ts-expect-error property id missing from object
       pipetteEntities
     )
 

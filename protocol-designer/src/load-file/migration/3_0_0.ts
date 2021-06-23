@@ -8,7 +8,7 @@ import {
   ProtocolFile,
   FileLabware,
   FilePipette,
-} from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
+} from '@opentrons/shared-data/protocol/types/schemaV3'
 import { PDProtocolFile as PDProtocolFileV1, PDMetadata } from './1_1_0'
 // NOTE: PDMetadata type did not change btw 1.1.0 and 3.0.0
 export type PDProtocolFile = ProtocolFile<PDMetadata>
@@ -21,6 +21,7 @@ function migrateMetadata(
 ): PDProtocolFile['metadata'] {
   const metadataExtraKeys: typeof metadata = {
     ...metadata,
+    // @ts-expect-error protocolName is not in the same case as the type, which has protocol-name
     protocolName: metadata['protocol-name'],
     lastModified: metadata['last-modified'],
   }
@@ -35,6 +36,7 @@ function migratePipettes(pipettes: PDProtocolFileV1['pipettes']): FilePipettes {
       const oldPipette = pipettes[pipetteId]
       const nextPipette: FilePipette = {
         mount: oldPipette.mount,
+        // @ts-expect-error TS can't deduce that the string from this split method is within the type
         name: oldPipette.name || (oldPipette.model || '').split('_v')[0],
       }
       // NOTE: the hacky model to name ('p10_single_v1.3' -> 'p10_single') fallback
