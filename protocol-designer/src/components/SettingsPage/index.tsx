@@ -11,7 +11,7 @@ interface Props {
   currentPage: Page
 }
 
-const SettingsPageComponent = (props: Props) => {
+const SettingsPageComponent = (props: Props): JSX.Element => {
   switch (props.currentPage) {
     // TODO: Ian 2019-08-21 when we have other pages, put them here
     case 'settings-app':

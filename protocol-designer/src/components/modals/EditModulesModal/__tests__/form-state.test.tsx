@@ -57,9 +57,9 @@ describe('useResetSlotOnModelChange', () => {
 
   it('resets the slot field when model field changes and there is a collision issue', () => {
     isModuleWithCollisionIssueMock.mockReturnValue(true)
-    // @ts-ignore-error (ce, 2021-06-23)  Type '"some_model"' is not assignable to type '"magneticModuleV1" | "magneticModuleV2" | "temperatureModuleV1" | "temperatureModuleV2" | "thermocyclerModuleV1" | null'.
+    // @ts-expect-error (ce, 2021-06-23)  Type '"some_model"' is not assignable to type '"magneticModuleV1" | "magneticModuleV2" | "temperatureModuleV1" | "temperatureModuleV2" | "thermocyclerModuleV1" | null'.
     mockFormOnce({ selectedModel: 'some_model', selectedSlot: 'some_slot' })
-    // @ts-ignore-error (ce, 2021-06-23)  Type '"another_model"' is not assignable to type '"magneticModuleV1" | "magneticModuleV2" | "temperatureModuleV1" | "temperatureModuleV2" | "thermocyclerModuleV1" | null'.
+    // @ts-expect-error (ce, 2021-06-23)  Type '"another_model"' is not assignable to type '"magneticModuleV1" | "magneticModuleV2" | "temperatureModuleV1" | "temperatureModuleV2" | "thermocyclerModuleV1" | null'.
     mockFormOnce({ selectedModel: 'another_model', selectedSlot: 'some_slot' })
     const wrapper = render()
 
@@ -74,9 +74,9 @@ describe('useResetSlotOnModelChange', () => {
 
   it('does NOT reset the slot if the model has NOT changed', () => {
     isModuleWithCollisionIssueMock.mockReturnValue(true)
-    // @ts-ignore-error (ce, 2021-06-23)  Type '"some_model"' is not assignable to type '"magneticModuleV1" | "magneticModuleV2" | "temperatureModuleV1" | "temperatureModuleV2" | "thermocyclerModuleV1" | null'.
+    // @ts-expect-error (ce, 2021-06-23)  Type '"some_model"' is not assignable to type '"magneticModuleV1" | "magneticModuleV2" | "temperatureModuleV1" | "temperatureModuleV2" | "thermocyclerModuleV1" | null'.
     mockFormOnce({ selectedModel: 'some_model', selectedSlot: 'some_slot' })
-    // @ts-ignore-error (ce, 2021-06-23)  Type '"some_model"' is not assignable to type '"magneticModuleV1" | "magneticModuleV2" | "temperatureModuleV1" | "temperatureModuleV2" | "thermocyclerModuleV1" | null'.
+    // @ts-expect-error (ce, 2021-06-23)  Type '"some_model"' is not assignable to type '"magneticModuleV1" | "magneticModuleV2" | "temperatureModuleV1" | "temperatureModuleV2" | "thermocyclerModuleV1" | null'.
     mockFormOnce({ selectedModel: 'some_model', selectedSlot: 'some_slot' })
     const wrapper = render()
 
@@ -87,9 +87,9 @@ describe('useResetSlotOnModelChange', () => {
 
   it('does NOT reset the slot if there is NO collision issue', () => {
     isModuleWithCollisionIssueMock.mockReturnValue(false)
-    // @ts-ignore-error (ce, 2021-06-23)  Type '"some_model"' is not assignable to type '"magneticModuleV1" | "magneticModuleV2" | "temperatureModuleV1" | "temperatureModuleV2" | "thermocyclerModuleV1" | null'.
+    // @ts-expect-error (ce, 2021-06-23)  Type '"some_model"' is not assignable to type '"magneticModuleV1" | "magneticModuleV2" | "temperatureModuleV1" | "temperatureModuleV2" | "thermocyclerModuleV1" | null'.
     mockFormOnce({ selectedModel: 'some_model', selectedSlot: 'some_slot' })
-    // @ts-ignore-error (ce, 2021-06-23)  Type '"another_model"' is not assignable to type '"magneticModuleV1" | "magneticModuleV2" | "temperatureModuleV1" | "temperatureModuleV2" | "thermocyclerModuleV1" | null'.
+    // @ts-expect-error (ce, 2021-06-23)  Type '"another_model"' is not assignable to type '"magneticModuleV1" | "magneticModuleV2" | "temperatureModuleV1" | "temperatureModuleV2" | "thermocyclerModuleV1" | null'.
     mockFormOnce({ selectedModel: 'another_model', selectedSlot: 'some_slot' })
     const wrapper = render()
 
