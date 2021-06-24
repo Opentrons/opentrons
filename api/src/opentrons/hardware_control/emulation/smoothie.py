@@ -64,50 +64,50 @@ class SmoothieEmulator(AbstractEmulator):
         joined = ' '.join(r for r in results if r)
         return None if not joined else joined
 
-    def __get_homing_status(self) -> str:
+    def _get_homing_status(self, command: Command) -> str:
         """Get the current homing status of the emulated gantry"""
         return " ".join(f"{k}:{int(v)}" for k, v in self._home_status.items())
 
-    def __get_current_position(self, command_g_code) -> str:
+    def _get_current_position(self, command: Command) -> str:
         """Get the current position of the emulated gantry"""
         pos_string = " ".join(f"{k}:{v}" for k, v in self._pos.items())
-        return f"{command_g_code}\r\n\r\nok MCS: {pos_string}"
+        return f"{command.gcode}\r\n\r\nok MCS: {pos_string}"
 
-    def __get_version(self) -> str:
+    def _get_version(self, command: Command) -> str:
         """Get the current firmware version"""
         return self._version_string
 
-    def __get_pipette_id(self, command_params) -> Optional[str]:
+    def _get_pipette_id(self, command: Command) -> Optional[str]:
         """Get the current id of the specified pipette"""
         pipette_postion = None
 
-        if "L" in command_params:
+        if "L" in command.params:
             pipette_postion = f"L:{self._pipette_id['L']}"
-        elif "R" in command_params:
+        elif "R" in command.params:
             pipette_postion = f"R:{self._pipette_id['R']}"
 
         return pipette_postion
 
-    def __get_pipette_model(self, command_params) -> Optional[str]:
+    def _get_pipette_model(self, command: Command) -> Optional[str]:
         """Get the current model of the specified pipette"""
         pipette_model = None
 
-        if "L" in command_params:
+        if "L" in command.params:
             pipette_model = f"L:{self._pipette_model['L']}"
-        elif "R" in command_params:
+        elif "R" in command.params:
             pipette_model = f"R:{self._pipette_model['R']}"
 
         return pipette_model
 
-    def __set_pipette_id(self, command):
+    def _set_pipette_id(self, command: Command) -> None:
         """Sets the id for the pipette"""
         self._pipette_id.update(self._mount_strings(command))
 
-    def __set_pipette_model(self, command):
+    def _set_pipette_model(self, command: Command) -> None:
         """Sets the model for the pipette"""
         self._pipette_model.update(self._mount_strings(command))
 
-    def __move_gantry(self, command):
+    def _move_gantry(self, command: Command) -> None:
         """Moves the gantry to the position provided in the command"""
         for key, value in command.params.items():
             assert isinstance(value, float), f"invalid value '{value}'"
@@ -116,38 +116,29 @@ class SmoothieEmulator(AbstractEmulator):
             else:
                 self._pos[key] = value
 
-    def __home_gantry(self, command):
+    def _home_gantry(self, command: Command) -> None:
         """Returns gantry to home position"""
         for axis in command.params.keys():
             self._pos[axis] = HOMED_POSITION[axis]
             self._home_status[axis] = True
 
-    def _handle(self, command: Command) -> Optional[str]:  # noqa: C901
+    def _handle(self, command: Command) -> Optional[str]:
         """Handle a command."""
         logger.info(f"Got command {command}")
 
-        command_return = None
+        gcode_to_function_mapping = {
+            str(GCODE.HOMING_STATUS): self._get_homing_status,
+            str(GCODE.CURRENT_POSITION): self._get_current_position,
+            str(GCODE.VERSION): self._get_version,
+            str(GCODE.READ_INSTRUMENT_ID): self._get_pipette_id,
+            str(GCODE.READ_INSTRUMENT_MODEL): self._get_pipette_model,
+            str(GCODE.WRITE_INSTRUMENT_ID): self._set_pipette_id,
+            str(GCODE.WRITE_INSTRUMENT_MODEL): self._set_pipette_model,
+            str(GCODE.MOVE): self._move_gantry,
+            str(GCODE.HOME): self._home_gantry,
+        }
 
-        if command.gcode == GCODE.HOMING_STATUS:
-            command_return = self.__get_homing_status()
-        elif command.gcode == GCODE.CURRENT_POSITION:
-            command_return = self.__get_current_position(command.gcode)
-        elif command.gcode == GCODE.VERSION:
-            command_return = self.__get_version()
-        elif command.gcode == GCODE.READ_INSTRUMENT_ID:
-            command_return = self.__get_pipette_id(command.params)
-        elif command.gcode == GCODE.READ_INSTRUMENT_MODEL:
-            command_return = self.__get_pipette_model(command.params)
-        elif command.gcode == GCODE.WRITE_INSTRUMENT_ID:
-            self.__set_pipette_id(command)
-        elif command.gcode == GCODE.WRITE_INSTRUMENT_MODEL:
-            self.__set_pipette_model(command)
-        elif command.gcode == GCODE.MOVE:
-            self.__move_gantry(command)
-        elif command.gcode == GCODE.HOME:
-            self.__home_gantry(command)
-
-        return command_return
+        return gcode_to_function_mapping[command.gcode](command)
 
     @staticmethod
     def _mount_strings(command: Command) -> Dict[str, str]:
