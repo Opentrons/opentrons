@@ -34,10 +34,14 @@ OR
 1. From the top level folder type: `make -C labware-designer`
 2. Open `labware-designer/dist/index.html` in your browser
 
+## React-based GUI Usage
+
+- In the browser window, the default UI the Irregular form
+
+## Javascript Console Usage
+
 - In the browser window, open the console (in Chrome, right click in the middle of the page, select "Inspect" and then select the "Console" tab--other browsers vary but are similar).
 - In the console, you can use the global variable `sharedData` and use any public functions which are exported in that project.
-
-## Usage
 
 The generator has the following functions:
 

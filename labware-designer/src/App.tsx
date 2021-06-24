@@ -9,7 +9,6 @@ import { IrregularLabwareSandbox } from './organisms/IrregularLabwareSandbox'
 export function App() {
   return (
     <Flex
-      alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_SPACE_AROUND}
       height="100%"
       width="100%"
