@@ -15,37 +15,71 @@ and/or schema generation.
 
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandRequest, CommandStatus
 from .command_mapper import CommandMapper
-from .command_unions import Command, CommandRequest, CommandResult
-
+from .command_unions import Command, CommandRequest, CommandResult, CommandType
 
 from .add_labware_definition import (
     AddLabwareDefinition,
-    AddLabwareDefinitionRequest,
     AddLabwareDefinitionData,
+    AddLabwareDefinitionRequest,
     AddLabwareDefinitionResult,
+    AddLabwareDefinitionCommandType,
 )
-from .aspirate import Aspirate, AspirateRequest, AspirateData, AspirateResult
-from .dispense import Dispense, DispenseRequest, DispenseData, DispenseResult
-from .drop_tip import DropTip, DropTipRequest, DropTipData, DropTipResult
+
+from .aspirate import (
+    Aspirate,
+    AspirateData,
+    AspirateRequest,
+    AspirateResult,
+    AspirateCommandType,
+)
+
+from .dispense import (
+    Dispense,
+    DispenseData,
+    DispenseRequest,
+    DispenseResult,
+    DispenseCommandType,
+)
+
+from .drop_tip import (
+    DropTip,
+    DropTipData,
+    DropTipRequest,
+    DropTipResult,
+    DropTipCommandType,
+)
+
 from .load_labware import (
     LoadLabware,
-    LoadLabwareRequest,
     LoadLabwareData,
+    LoadLabwareRequest,
     LoadLabwareResult,
+    LoadLabwareCommandType,
 )
+
 from .load_pipette import (
     LoadPipette,
-    LoadPipetteRequest,
     LoadPipetteData,
+    LoadPipetteRequest,
     LoadPipetteResult,
+    LoadPipetteCommandType,
 )
+
 from .move_to_well import (
     MoveToWell,
-    MoveToWellRequest,
     MoveToWellData,
+    MoveToWellRequest,
     MoveToWellResult,
+    MoveToWellCommandType,
 )
-from .pick_up_tip import PickUpTip, PickUpTipRequest, PickUpTipData, PickUpTipResult
+
+from .pick_up_tip import (
+    PickUpTip,
+    PickUpTipData,
+    PickUpTipRequest,
+    PickUpTipResult,
+    PickUpTipCommandType,
+)
 
 
 __all__ = [
@@ -55,6 +89,7 @@ __all__ = [
     "Command",
     "CommandRequest",
     "CommandResult",
+    "CommandType",
     # base interfaces
     "AbstractCommandImpl",
     "BaseCommand",
@@ -65,39 +100,47 @@ __all__ = [
     "LoadLabwareRequest",
     "LoadLabwareData",
     "LoadLabwareResult",
+    "LoadLabwareCommandType",
     # add labware definition command models
     "AddLabwareDefinition",
     "AddLabwareDefinitionRequest",
     "AddLabwareDefinitionData",
     "AddLabwareDefinitionResult",
+    "AddLabwareDefinitionCommandType",
     # load pipette command models
     "LoadPipette",
     "LoadPipetteRequest",
     "LoadPipetteData",
     "LoadPipetteResult",
+    "LoadPipetteCommandType",
     # move to well command models
     "MoveToWell",
     "MoveToWellRequest",
     "MoveToWellData",
     "MoveToWellResult",
+    "MoveToWellCommandType",
     # pick up tip command models
     "PickUpTip",
     "PickUpTipRequest",
     "PickUpTipData",
     "PickUpTipResult",
+    "PickUpTipCommandType",
     # drop tip command models
     "DropTip",
     "DropTipRequest",
     "DropTipData",
     "DropTipResult",
+    "DropTipCommandType",
     # aspirate command models
     "Aspirate",
     "AspirateRequest",
     "AspirateData",
     "AspirateResult",
+    "AspirateCommandType",
     # dispense command models
     "Dispense",
     "DispenseRequest",
     "DispenseData",
     "DispenseResult",
+    "DispenseCommandType",
 ]

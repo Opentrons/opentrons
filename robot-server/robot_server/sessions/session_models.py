@@ -5,6 +5,7 @@ from pydantic import BaseModel, Field
 from typing import List, Optional, Union
 from typing_extensions import Literal
 
+from opentrons.protocol_engine import CommandStatus, CommandType
 from robot_server.service.json_api import ResourceModel
 from .action_models import SessionAction
 
@@ -29,6 +30,14 @@ class AbstractSessionCreateData(BaseModel):
     )
 
 
+class SessionCommandSummary(ResourceModel):
+    """A stripped down model of a full Command for usage in a Session response."""
+
+    id: str = Field(..., description="Unique command identifier.")
+    commandType: CommandType = Field(..., description="Specific type of command.")
+    status: CommandStatus = Field(..., description="Execution status of the command.")
+
+
 class AbstractSession(ResourceModel):
     """Base session resource model."""
 
@@ -42,7 +51,11 @@ class AbstractSession(ResourceModel):
     )
     actions: List[SessionAction] = Field(
         ...,
-        description="Client-initiated commands for session control.",
+        description="Client-initiated session control actions.",
+    )
+    commands: List[SessionCommandSummary] = Field(
+        ...,
+        description="Protocol commands queued, running, or executed for the session.",
     )
 
 

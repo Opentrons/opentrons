@@ -22,7 +22,7 @@ class ResourceModel(ResponseDataModel):
     id: str = Field(..., description="Unique identifier of the resource.")
 
 
-ResponseDataT = TypeVar("ResponseDataT", bound=ResponseDataModel)
+ResponseDataT = TypeVar("ResponseDataT", bound=BaseModel)
 
 
 DESCRIPTION_DATA = "the document’s primary data"

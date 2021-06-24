@@ -2,7 +2,7 @@
 from __future__ import annotations
 from collections import OrderedDict
 from dataclasses import dataclass, replace
-from typing import List, Optional, Tuple
+from typing import List, Optional
 
 from ..commands import Command, CommandStatus
 from ..errors import CommandDoesNotExistError
@@ -41,23 +41,23 @@ class CommandView:
         """Initialize the view of command state with its underlying data."""
         self._state = state
 
-    def get_command_by_id(self, command_id: str) -> Command:
+    def get(self, command_id: str) -> Command:
         """Get a command by its unique identifier."""
         try:
             return self._state.commands_by_id[command_id]
         except KeyError:
             raise CommandDoesNotExistError(f"Command {command_id} does not exist")
 
-    def get_all_commands(self) -> List[Tuple[str, Command]]:
+    def get_all(self) -> List[Command]:
         """Get a list of all commands in state, paired with their respective IDs.
 
         Entries are returned in the order of first-added command to last-added command.
         Replacing a command (to change its status, for example) keeps its place in the
         ordering.
         """
-        return [entry for entry in self._state.commands_by_id.items()]
+        return list(self._state.commands_by_id.values())
 
-    def get_next_command(self) -> Optional[str]:
+    def get_next_queued(self) -> Optional[str]:
         """Return the next request in line to be executed.
 
         Normally, this corresponds to the earliest-added command that's currently
