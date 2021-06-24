@@ -37,7 +37,8 @@ class PipettingHandler:
         """Pick up a tip at the specified "well"."""
         # get mount and config data from state and hardware controller
         hw_pipette = self._state.pipettes.get_hardware_pipette(
-            pipette_id=pipette_id, attached_pipettes=self._hardware.attached_instruments
+            pipette_id=pipette_id,
+            attached_pipettes=self._hardware.attached_instruments,
         )
 
         # use config data to get tip geometry (length, diameter, volume)
@@ -65,10 +66,12 @@ class PipettingHandler:
 
         # after a successful pickup, update the hardware controller state
         self._hardware.set_current_tiprack_diameter(
-            mount=hw_pipette.mount, tiprack_diameter=tip_geometry.diameter
+            mount=hw_pipette.mount,
+            tiprack_diameter=tip_geometry.diameter,
         )
         self._hardware.set_working_volume(
-            mount=hw_pipette.mount, tip_volume=tip_geometry.volume
+            mount=hw_pipette.mount,
+            tip_volume=tip_geometry.volume,
         )
 
     async def drop_tip(
@@ -80,7 +83,8 @@ class PipettingHandler:
         """Drop a tip at the specified "well"."""
         # get mount and config data from state and hardware controller
         hw_pipette = self._state.pipettes.get_hardware_pipette(
-            pipette_id=pipette_id, attached_pipettes=self._hardware.attached_instruments
+            pipette_id=pipette_id,
+            attached_pipettes=self._hardware.attached_instruments,
         )
 
         # get the tip drop location
@@ -115,7 +119,8 @@ class PipettingHandler:
         """Aspirate liquid from a well."""
         # get mount and config data from state and hardware controller
         hw_pipette = self._state.pipettes.get_hardware_pipette(
-            pipette_id=pipette_id, attached_pipettes=self._hardware.attached_instruments
+            pipette_id=pipette_id,
+            attached_pipettes=self._hardware.attached_instruments,
         )
 
         ready_to_aspirate = self._state.pipettes.get_is_ready_to_aspirate(
@@ -138,7 +143,9 @@ class PipettingHandler:
             # set our current deck location to the well now that we've made
             # an intermediate move for the "prepare for aspirate" step
             current_location = DeckLocation(
-                pipette_id=pipette_id, labware_id=labware_id, well_name=well_name
+                pipette_id=pipette_id,
+                labware_id=labware_id,
+                well_name=well_name,
             )
 
         await self._movement_handler.move_to_well(
@@ -163,7 +170,8 @@ class PipettingHandler:
     ) -> float:
         """Dispense liquid to a well."""
         hw_pipette = self._state.pipettes.get_hardware_pipette(
-            pipette_id=pipette_id, attached_pipettes=self._hardware.attached_instruments
+            pipette_id=pipette_id,
+            attached_pipettes=self._hardware.attached_instruments,
         )
 
         await self._movement_handler.move_to_well(

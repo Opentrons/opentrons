@@ -13,7 +13,7 @@ LoadLabwareCommandType = Literal["loadLabware"]
 
 
 class LoadLabwareData(BaseModel):
-    """A request to load a labware into a slot."""
+    """Data required to load a labware into a slot."""
 
     location: LabwareLocation = Field(
         ...,

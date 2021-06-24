@@ -11,7 +11,7 @@ AspirateCommandType = Literal["aspirate"]
 
 
 class AspirateData(BaseLiquidHandlingData):
-    """A request to move to a specific well and aspirate from it."""
+    """Data required to aspirate from a specific well."""
 
     pass
 

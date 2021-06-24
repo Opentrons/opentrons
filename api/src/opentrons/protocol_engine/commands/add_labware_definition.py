@@ -11,7 +11,7 @@ AddLabwareDefinitionCommandType = Literal["addLabwareDefinition"]
 
 
 class AddLabwareDefinitionData(BaseModel):
-    """Request to add a labware definition."""
+    """Data required to add a labware definition."""
 
     definition: LabwareDefinition = Field(..., description="The labware definition.")
 

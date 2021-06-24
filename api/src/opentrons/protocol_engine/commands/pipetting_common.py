@@ -5,7 +5,7 @@ from ..types import WellLocation
 
 
 class BasePipettingData(BaseModel):
-    """Base class for pipetting requests that interact with wells."""
+    """Base class for data payloads of commands that interact with wells."""
 
     pipetteId: str = Field(
         ...,
@@ -22,7 +22,7 @@ class BasePipettingData(BaseModel):
 
 
 class BaseLiquidHandlingData(BasePipettingData):
-    """Base class for liquid handling requests."""
+    """Base class for data payloads of commands that handle liquid."""
 
     volume: float = Field(
         ...,

@@ -11,7 +11,7 @@ DropTipCommandType = Literal["dropTip"]
 
 
 class DropTipData(BasePipettingData):
-    """A request to drop a tip in a specific well."""
+    """Data required to drop a tip in a specific well."""
 
     pass
 

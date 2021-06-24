@@ -11,7 +11,7 @@ DispenseCommandType = Literal["dispense"]
 
 
 class DispenseData(BaseLiquidHandlingData):
-    """A request to aspirate from a specific well."""
+    """Data required to dispense to a specific well."""
 
     pass
 
