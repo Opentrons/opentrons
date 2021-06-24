@@ -62,7 +62,7 @@ class BaseCommand(GenericModel, Generic[CommandDataT, CommandResultT]):
     data: CommandDataT = Field(..., description="Command execution data payload")
     result: Optional[CommandResultT] = Field(
         None,
-        description="Command execution result data, if completed",
+        description="Command execution result data, if succeeded",
     )
     # TODO(mc, 2021-06-08): model ProtocolEngine errors
     error: Optional[str] = Field(
