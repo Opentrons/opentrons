@@ -17,7 +17,10 @@ import {
   SPACING_1,
   C_LIGHT_GRAY,
 } from '@opentrons/components'
-import { createIrregularLabware, createRegularLabware } from '@opentrons/shared-data'
+import {
+  createIrregularLabware,
+  createRegularLabware,
+} from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 import { IRREGULAR_OPTIONS, REGULAR_OPTIONS } from './fixtures'
 
@@ -42,7 +45,10 @@ export function CreateLabwareSandbox(): JSX.Element {
   const [rawOptions, setRawOptions] = React.useState(
     JSON.stringify(IRREGULAR_OPTIONS, undefined, 2)
   )
-  const [labwareToRender, setLabwareToRender] = React.useState<LabwareDefinition2>(
+  const [
+    labwareToRender,
+    setLabwareToRender,
+  ] = React.useState<LabwareDefinition2>(
     createIrregularLabware(IRREGULAR_OPTIONS)
   )
 
@@ -55,20 +61,32 @@ export function CreateLabwareSandbox(): JSX.Element {
   }
 
   const regularityLabel = isLabwareRegular ? 'Regular' : 'Irregular'
-  const handleRegularityChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
+  const handleRegularityChange: React.ChangeEventHandler<HTMLInputElement> = e => {
     const willBeRegular = e.target.value === 'regular'
-    setRawOptions(JSON.stringify(willBeRegular ? REGULAR_OPTIONS : IRREGULAR_OPTIONS, undefined, 2))
-    setLabwareToRender(willBeRegular ? createRegularLabware(REGULAR_OPTIONS) : createIrregularLabware(IRREGULAR_OPTIONS))
+    setRawOptions(
+      JSON.stringify(
+        willBeRegular ? REGULAR_OPTIONS : IRREGULAR_OPTIONS,
+        undefined,
+        2
+      )
+    )
+    setLabwareToRender(
+      willBeRegular
+        ? createRegularLabware(REGULAR_OPTIONS)
+        : createIrregularLabware(IRREGULAR_OPTIONS)
+    )
     setIsLabwareRegular(willBeRegular)
   }
 
-  const handleOnDeckChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
+  const handleOnDeckChange: React.ChangeEventHandler<HTMLInputElement> = e => {
     setViewOnDeck(e.target.value === 'deck')
   }
 
   const handleInputOptionChange: React.ChangeEventHandler<HTMLTextAreaElement> = event => {
     setRawOptions(event.target.value)
-    const createLabware = isLabwareRegular ? createRegularLabware : createIrregularLabware
+    const createLabware = isLabwareRegular
+      ? createRegularLabware
+      : createIrregularLabware
     try {
       setLabwareToRender(createLabware(JSON.parse(event.target.value)))
     } catch (error) {
@@ -79,26 +97,52 @@ export function CreateLabwareSandbox(): JSX.Element {
   return (
     <Flex height="100%" width="100%" flexDirection={DIRECTION_COLUMN}>
       <Flex flex={2} alignItems={ALIGN_CENTER} backgroundColor={C_LIGHT_GRAY}>
-        <Text as="h1" margin={SPACING_3}>Create</Text>
+        <Text as="h1" margin={SPACING_3}>
+          Create
+        </Text>
         <RadioGroup
-            onChange={handleRegularityChange}
-            value={isLabwareRegular ? 'regular' : 'irregular'}
-            options={[
-              {name: 'Regular', value: 'regular'},
-              {name: 'Irregular', value: 'irregular'},
-            ]} />
-        <Text as="h1" margin={SPACING_3}>Labware</Text>
+          onChange={handleRegularityChange}
+          value={isLabwareRegular ? 'regular' : 'irregular'}
+          options={[
+            { name: 'Regular', value: 'regular' },
+            { name: 'Irregular', value: 'irregular' },
+          ]}
+        />
+        <Text as="h1" margin={SPACING_3}>
+          Labware
+        </Text>
       </Flex>
-      <Flex flex={8} justifyContent={JUSTIFY_SPACE_AROUND} marginTop={SPACING_2}>
-        <Flex flex={2} flexDirection={DIRECTION_COLUMN} alignItems={ALIGN_CENTER}>
+      <Flex
+        flex={8}
+        justifyContent={JUSTIFY_SPACE_AROUND}
+        marginTop={SPACING_2}
+      >
+        <Flex
+          flex={2}
+          flexDirection={DIRECTION_COLUMN}
+          alignItems={ALIGN_CENTER}
+        >
           <Flex alignItems={ALIGN_CENTER}>
-            <Text as="h2" margin={SPACING_2}>Input</Text>
-            <Text css={FONT_BODY_2_DARK} fontStyle={FONT_STYLE_ITALIC}>{` (${regularityLabel} Labware Options)`}</Text>
+            <Text as="h2" margin={SPACING_2}>
+              Input
+            </Text>
+            <Text
+              css={FONT_BODY_2_DARK}
+              fontStyle={FONT_STYLE_ITALIC}
+            >{` (${regularityLabel} Labware Options)`}</Text>
           </Flex>
-          <JsonTextArea title="input options" value={optionsTextAreaValue} onChange={handleInputOptionChange} />
+          <JsonTextArea
+            title="input options"
+            value={optionsTextAreaValue}
+            onChange={handleInputOptionChange}
+          />
         </Flex>
         <Flex flex={5} flexDirection={DIRECTION_COLUMN}>
-          <Flex marginX={SPACING_4} marginY={SPACING_1} alignItems={ALIGN_CENTER}>
+          <Flex
+            marginX={SPACING_4}
+            marginY={SPACING_1}
+            alignItems={ALIGN_CENTER}
+          >
             <Text as="h2" marginRight={SPACING_2}>
               {`Render ${regularityLabel} Labware`}
             </Text>
@@ -106,55 +150,71 @@ export function CreateLabwareSandbox(): JSX.Element {
               onChange={handleOnDeckChange}
               value={viewOnDeck ? 'deck' : 'standalone'}
               options={[
-                {name: 'On Deck', value: 'deck'},
-                {name: 'By Itself', value: 'standalone'},
-              ]} />
+                { name: 'On Deck', value: 'deck' },
+                { name: 'By Itself', value: 'standalone' },
+              ]}
+            />
 
-            {viewOnDeck
-              ?  (
-                <Flex alignItems={ALIGN_CENTER}>
-                  <Text as="h2" marginX={SPACING_3}> In Slot:</Text>
-                  <SlotSelect defaultValue={DEFAULT_LABWARE_SLOT} onChange={e => setLabwareSlot(e.target.value)}>
-                    {SLOT_OPTIONS.map(slot => (
-                      <option  key={slot} value={slot}>
-                        {slot}
-                      </option>
-                    ))}
-                  </SlotSelect>
-                </Flex>
-              ) : null
-            }
+            {viewOnDeck ? (
+              <Flex alignItems={ALIGN_CENTER}>
+                <Text as="h2" marginX={SPACING_3}>
+                  {' '}
+                  In Slot:
+                </Text>
+                <SlotSelect
+                  defaultValue={DEFAULT_LABWARE_SLOT}
+                  onChange={e => setLabwareSlot(e.target.value)}
+                >
+                  {SLOT_OPTIONS.map(slot => (
+                    <option key={slot} value={slot}>
+                      {slot}
+                    </option>
+                  ))}
+                </SlotSelect>
+              </Flex>
+            ) : null}
           </Flex>
           <Flex maxHeight="84vh">
-            {viewOnDeck
-              ? (
-                <RobotWorkSpace deckDef={standardDeckDef as any}>
-                  {({ deckSlotsById }) => {
-                    const lwSlot = deckSlotsById[labwareSlot]
-                    return (
-                      <g
-                        transform={`translate(${lwSlot.position[0]}, ${lwSlot.position[1]})`}
-                        data-testid="lw_on_deck"
-                      >
-                        <LabwareRender  definition={labwareToRender} />
-                      </g>
-                    )
-                  }}
-                </RobotWorkSpace>
-              ) : (
-                <svg data-testid="lw_by_itself" width="100%" viewBox={`0 0 ${labwareToRender.dimensions.xDimension} ${labwareToRender.dimensions.yDimension}`}>
-                  <LabwareRender  definition={labwareToRender} />
-                </svg>
-              )
-            }
+            {viewOnDeck ? (
+              <RobotWorkSpace deckDef={standardDeckDef as any}>
+                {({ deckSlotsById }) => {
+                  const lwSlot = deckSlotsById[labwareSlot]
+                  return (
+                    <g
+                      transform={`translate(${lwSlot.position[0]}, ${lwSlot.position[1]})`}
+                      data-testid="lw_on_deck"
+                    >
+                      <LabwareRender definition={labwareToRender} />
+                    </g>
+                  )
+                }}
+              </RobotWorkSpace>
+            ) : (
+              <svg
+                data-testid="lw_by_itself"
+                width="100%"
+                viewBox={`0 0 ${labwareToRender.dimensions.xDimension} ${labwareToRender.dimensions.yDimension}`}
+              >
+                <LabwareRender definition={labwareToRender} />
+              </svg>
+            )}
           </Flex>
         </Flex>
-        <Flex flex={2} flexDirection={DIRECTION_COLUMN} >
+        <Flex flex={2} flexDirection={DIRECTION_COLUMN}>
           <Flex alignItems={ALIGN_CENTER}>
-            <Text as="h2" margin={SPACING_2}>Output</Text>
-            <Text css={FONT_BODY_2_DARK} fontStyle={FONT_STYLE_ITALIC}>{` (${regularityLabel} Labware Definition)`}</Text>
+            <Text as="h2" margin={SPACING_2}>
+              Output
+            </Text>
+            <Text
+              css={FONT_BODY_2_DARK}
+              fontStyle={FONT_STYLE_ITALIC}
+            >{` (${regularityLabel} Labware Definition)`}</Text>
           </Flex>
-          <JsonTextArea title="output definition" value={JSON.stringify(labwareToRender, undefined, 2)} disabled />
+          <JsonTextArea
+            title="output definition"
+            value={JSON.stringify(labwareToRender, undefined, 2)}
+            disabled
+          />
         </Flex>
       </Flex>
     </Flex>

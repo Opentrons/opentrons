@@ -15,11 +15,21 @@ if (!$root) {
   throw new Error('fatal: #root not found')
 }
 
-ReactDOM.render(<AppContainer><App/></AppContainer>, $root)
+ReactDOM.render(
+  <AppContainer>
+    <App />
+  </AppContainer>,
+  $root
+)
 
 // Hot Module Replacement API
 if (module.hot) {
   module.hot.accept('./App', () => {
-    ReactDOM.render(<AppContainer><App/></AppContainer>, $root)
+    ReactDOM.render(
+      <AppContainer>
+        <App />
+      </AppContainer>,
+      $root
+    )
   })
 }
