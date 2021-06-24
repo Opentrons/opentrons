@@ -4,16 +4,15 @@ import {
   ALIGN_CENTER,
   JUSTIFY_SPACE_AROUND,
 } from '@opentrons/components'
-import { IrregularLabwareSandbox } from './organisms/IrregularLabwareSandbox'
+import { GlobalStyle } from './atoms/GlobalStyle'
+import { CreateLabwareSandbox } from './organisms/CreateLabwareSandbox'
+
 
 export function App() {
   return (
-    <Flex
-      justifyContent={JUSTIFY_SPACE_AROUND}
-      height="100%"
-      width="100%"
-    >
-      <IrregularLabwareSandbox />
-    </Flex>
+    <>
+      <CreateLabwareSandbox />
+      <GlobalStyle />
+    </>
   )
 }

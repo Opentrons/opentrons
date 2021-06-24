@@ -1,4 +1,9 @@
-export const IRREGULAR_OPTIONS = {
+import type {
+  RegularLabwareProps,
+  IrregularLabwareProps,
+} from '@opentrons/shared-data'
+
+export const IRREGULAR_OPTIONS: IrregularLabwareProps = {
   namespace: 'opentrons',
   metadata: {
     displayName: 'Opentrons 10 Tube Rack with Falcon 4x50 mL, 6x15 mL Conical',
@@ -85,7 +90,7 @@ export const IRREGULAR_OPTIONS = {
   },
 }
 
-export const REGULAR_OPTIONS = {
+export const REGULAR_OPTIONS: RegularLabwareProps = {
   namespace: 'opentrons',
   metadata: {
     displayName: 'Corning 96 Well Plate 360 µL Flat',
