@@ -12,6 +12,7 @@ import { flattenNestedProperties } from './utils/flattenNestedProperties'
 import type { Middleware } from 'redux'
 import type { BaseState } from '../types'
 import type { FormData, StepType } from '../form-types'
+import type { StepArgsAndErrors } from '../steplist'
 import type { SaveStepFormAction } from '../ui/steps/actions/thunks'
 import type { AnalyticsEventAction } from './actions'
 import type { AnalyticsEvent } from './mixpanel'
@@ -27,7 +28,9 @@ export const reduxActionToAnalyticsEvent = (
     // create the "saveStep" action, taking advantage of the formToArgs machinery
     // to get nice cleaned-up data instead of the raw form data.
     const a: SaveStepFormAction = action
-    const argsAndErrors = getArgsAndErrorsByStepId(state)[a.payload.id]
+    const argsAndErrors: StepArgsAndErrors = getArgsAndErrorsByStepId(state)[
+      a.payload.id
+    ]
     const { stepArgs } = argsAndErrors
 
     if (stepArgs !== null) {
@@ -50,6 +53,7 @@ export const reduxActionToAnalyticsEvent = (
 
       if (stepArgs.pipette) {
         additionalProperties.__pipetteName =
+          // $FlowFixMe(sa, 2021-05-10): stepArgs is unknown typed here for some reason
           pipetteEntities[stepArgs?.pipette].name
       }
 

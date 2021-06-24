@@ -8,9 +8,10 @@ from opentrons.util.helpers import utc_now
 from .errors import ProtocolEngineError, UnexpectedProtocolError
 from .execution import CommandHandlers
 from .resources import ResourceProviders
-from .state import StateStore, StateView
+from .state import State, StateStore, StateView
 from .commands import (
     CommandRequestType,
+    PendingCommandType,
     CompletedCommandType,
     FailedCommandType,
 )
@@ -24,8 +25,9 @@ class ProtocolEngine:
     of the commands themselves.
     """
 
-    state_store: StateStore
-    _handlers: CommandHandlers
+    _hardware: HardwareAPI
+    _state_store: StateStore
+    _resources: ResourceProviders
 
     @classmethod
     async def create(cls, hardware: HardwareAPI) -> ProtocolEngine:
@@ -38,30 +40,34 @@ class ProtocolEngine:
         fixed_labware = await resources.deck_data.get_deck_fixed_labware(deck_def)
 
         state_store = StateStore(
-            deck_definition=deck_def,
-            deck_fixed_labware=fixed_labware
+            deck_definition=deck_def, deck_fixed_labware=fixed_labware
         )
 
-        handlers = CommandHandlers.create(
-            resources=resources,
-            hardware=hardware,
-            state=StateView.create_view(state_store),
-        )
-
-        return cls(state_store=state_store, handlers=handlers)
+        return cls(state_store=state_store, resources=resources, hardware=hardware)
 
     def __init__(
         self,
+        hardware: HardwareAPI,
         state_store: StateStore,
-        handlers: CommandHandlers,
+        resources: ResourceProviders,
     ) -> None:
         """Initialize a ProtocolEngine instance.
 
         This constructor does not inject provider implementations. Prefer the
         ProtocolEngine.create factory classmethod.
         """
-        self.state_store = state_store
-        self._handlers = handlers
+        self._hardware = hardware
+        self._state_store = state_store
+        self._resources = resources
+
+    @property
+    def state_view(self) -> StateView:
+        """Get an interface to retrieve calculated state values."""
+        return self._state_store.state_view
+
+    def get_state(self) -> State:
+        """Get the engine's underlying state."""
+        return self._state_store.get_state()
 
     async def execute_command(
         self,
@@ -75,11 +81,20 @@ class ProtocolEngine:
         done_cmd: Union[CompletedCommandType, FailedCommandType]
 
         # store the command prior to execution
-        self.state_store.handle_command(cmd, command_id=command_id)
+        self._state_store.handle_command(cmd, command_id=command_id)
+
+        # TODO(mc, 2021-06-16): refactor command execution after command
+        # models have been simplified to delegate to CommandExecutor. This
+        # should involve ditching the relatively useless CommandHandler class
+        handlers = CommandHandlers(
+            hardware=self._hardware,
+            resources=self._resources,
+            state=self.state_view,
+        )
 
         # execute the command
         try:
-            result = await cmd_impl.execute(self._handlers)
+            result = await cmd_impl.execute(handlers)
             completed_at = utc_now()
             done_cmd = cmd.to_completed(result, completed_at)
 
@@ -90,12 +105,20 @@ class ProtocolEngine:
             done_cmd = cmd.to_failed(error, failed_at)
 
         # store the done command
-        self.state_store.handle_command(done_cmd, command_id=command_id)
+        self._state_store.handle_command(done_cmd, command_id=command_id)
 
         return done_cmd
 
-    def add_command(self, request: CommandRequestType) -> None:
+    def add_command(self, request: CommandRequestType) -> PendingCommandType:
         """Add a command to ProtocolEngine."""
-        # TODO(spp, 2020-05-13):
-        #   Generate a UUID to be used as command_id for each command added.
-        raise NotImplementedError
+        # TODO(mc, 2021-06-14): ID generation and timestamp generation need to
+        # be redone / reconsidered. Too much about command execution has leaked
+        # into the root ProtocolEngine class, so we should delegate downwards.
+        command_id = self._resources.id_generator.generate_id()
+        created_at = utc_now()
+        command_impl = request.get_implementation()
+        command = command_impl.create_command(created_at)
+
+        self._state_store.handle_command(command, command_id=command_id)
+
+        return command

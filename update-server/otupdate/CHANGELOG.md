@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.4.0](https://github.com/Opentrons/opentrons/compare/v4.3.1...v4.4.0) (2021-06-16)
+
+
+### Features
+
+* **robot-server:** Clarify "local connection only" error message ([#7686](https://github.com/Opentrons/opentrons/issues/7686)) ([5d04dc4](https://github.com/Opentrons/opentrons/commit/5d04dc4))
+
+
+
+
+
 ## [4.3.1](https://github.com/Opentrons/opentrons/compare/v4.3.0...v4.3.1) (2021-05-10)
 
 **Note:** Version bump only for package @opentrons/update-server

@@ -18,6 +18,8 @@
     "labware-library/src",
     "labware-library/typings",
     "shared-data/js",
-    "shared-data/protocol"
+    "shared-data/protocol",
+    "step-generation/src",
+    "step-generation/typings"
   ]
 }

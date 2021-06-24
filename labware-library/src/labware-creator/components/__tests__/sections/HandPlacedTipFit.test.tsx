@@ -88,7 +88,7 @@ describe('HandPlacedTipFit', () => {
     expect(screen.getByText('Hand-Placed Tip Fit')).toBeTruthy()
     expect(
       screen.getByText(
-        'Place the tip you wish to use on the pipette you wish to use it on. Give the tip a wiggle to check the fit.'
+        'Place the tip on the pipette you wish to use it on. Give the tip a wiggle to check the fit.'
       )
     ).toBeTruthy()
     expect(screen.getByText('mock alerts')).toBeTruthy()

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useFormikContext } from 'formik'
-import { isEveryFieldHidden } from '../../utils'
+import { isEveryFieldHidden, getLabwareName } from '../../utils'
 import { makeMaskToDecimal } from '../../fieldMasks'
 import { LabwareFields } from '../../fields'
 import { FormAlerts } from '../alerts/FormAlerts'
@@ -16,15 +16,11 @@ interface ContentProps {
 }
 const Content = (props: ContentProps): JSX.Element => {
   const { values } = props
-  const wellLabel =
-    values.labwareType != null &&
-    ['aluminumBlock', 'tubeRack'].includes(values.labwareType)
-      ? 'tube'
-      : 'well'
+  const labwareName = getLabwareName(values, false)
   return (
     <div className={styles.flex_row}>
       <div className={styles.volume_instructions_column}>
-        <p>Total maximum volume of each {wellLabel}.</p>
+        <p>Total maximum volume of each {labwareName}.</p>
       </div>
 
       <div className={styles.form_fields_column}>

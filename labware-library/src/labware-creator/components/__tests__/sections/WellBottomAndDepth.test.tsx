@@ -1,133 +1,102 @@
 import React from 'react'
-import { FormikConfig } from 'formik'
-import { when } from 'jest-when'
-import isEqual from 'lodash/isEqual'
 import { render, screen } from '@testing-library/react'
+import '@testing-library/jest-dom'
+import { FormikConfig } from 'formik'
+import { when, resetAllWhenMocks } from 'jest-when'
 import { getDefaultFormState, LabwareFields } from '../../../fields'
-import { wellBottomShapeOptionsWithIcons } from '../../optionsWithImages'
 import { displayAsTube } from '../../../utils'
 import { WellBottomAndDepth } from '../../sections/WellBottomAndDepth'
-import { FormAlerts } from '../../alerts/FormAlerts'
-import { TextField } from '../../TextField'
-import { RadioField } from '../../RadioField'
+
 import { wrapInFormik } from '../../utils/wrapInFormik'
 
 jest.mock('../../../utils/displayAsTube')
-jest.mock('../../TextField')
-jest.mock('../../RadioField')
-jest.mock('../../alerts/FormAlerts')
 
-const FormAlertsMock = FormAlerts as jest.MockedFunction<typeof FormAlerts>
-const textFieldMock = TextField as jest.MockedFunction<typeof TextField>
-const RadioFieldMock = RadioField as jest.MockedFunction<typeof RadioField>
 const displayAsTubeMock = displayAsTube as jest.MockedFunction<
   typeof displayAsTube
 >
 
-const formikConfig: FormikConfig<LabwareFields> = {
-  initialValues: getDefaultFormState(),
-  onSubmit: jest.fn(),
-}
+let formikConfig: FormikConfig<LabwareFields>
 
 describe('WellBottomAndDepth', () => {
   beforeEach(() => {
-    textFieldMock.mockImplementation(args => {
-      if (args.name === 'wellDepth') {
-        return <div>wellDepth text field</div>
-      } else {
-        return <div></div>
-      }
-    })
-
-    RadioFieldMock.mockImplementation(args => {
-      if (args.name === 'wellBottomShape') {
-        expect(args).toEqual({
-          name: 'wellBottomShape',
-          labelTextClassName: 'hidden',
-          options: wellBottomShapeOptionsWithIcons,
-        })
-        return <div>wellBottomShape radio group</div>
-      } else {
-        return <div></div>
-      }
-    })
-
-    FormAlertsMock.mockImplementation(args => {
-      if (
-        isEqual(args, {
-          touched: {},
-          errors: {},
-          fieldList: ['wellBottomShape', 'wellDepth'],
-        })
-      ) {
-        return <div>mock alerts</div>
-      } else {
-        return <div></div>
-      }
-    })
+    formikConfig = {
+      initialValues: getDefaultFormState(),
+      onSubmit: jest.fn(),
+    }
 
     when(displayAsTubeMock)
-      .calledWith(formikConfig.initialValues)
+      .calledWith(expect.any(Object))
       .mockReturnValue(false)
   })
 
   afterEach(() => {
     jest.restoreAllMocks()
+    resetAllWhenMocks()
   })
 
   it('should render with the correct information', () => {
     render(wrapInFormik(<WellBottomAndDepth />, formikConfig))
 
-    expect(screen.getByText('Well Bottom & Depth'))
-    expect(
-      screen.getByText(
-        'Depth informs the robot how far down it can go inside a well.'
-      )
+    expect(screen.getByRole('heading')).toHaveTextContent(
+      /Well Bottom & Depth/i
     )
-    expect(screen.getByText('mock alerts'))
-    expect(screen.getByText('wellBottomShape radio group'))
-    expect(screen.getByText('wellDepth text field'))
+
+    screen.getByText(
+      'Depth informs the robot how far down it can go inside a well.'
+    )
+    const radioElements = screen.getAllByRole('radio')
+    expect(radioElements).toHaveLength(3)
+    screen.getAllByRole('radio', { name: /flat/i })
+    screen.getAllByRole('radio', { name: /round/i })
+    screen.getAllByRole('radio', { name: /v-bottom/i })
+
+    screen.getByRole('textbox', { name: /depth/i })
   })
 
-  it('should render tubes when tubeRack is selected', () => {
-    formikConfig.initialValues.labwareType = 'tubeRack'
-    when(displayAsTubeMock)
-      .calledWith(formikConfig.initialValues)
-      .mockReturnValue(true)
+  it('should render tip length when tipRack is selected and hide the well bottom shape radioFields', () => {
+    formikConfig.initialValues.labwareType = 'tipRack'
     render(wrapInFormik(<WellBottomAndDepth />, formikConfig))
 
-    expect(
-      screen.getByText(
-        'Depth informs the robot how far down it can go inside a tube.'
-      )
-    )
+    expect(screen.getByRole('heading')).toHaveTextContent(/Tip Length/i)
+
+    screen.getByText('Reference the top of the tip to the bottom of the tip.')
+
+    expect(screen.queryByRole('radio', { name: /flat/i })).toBeNull()
+    expect(screen.queryByRole('radio', { name: /u/i })).toBeNull()
+    expect(screen.queryByRole('radio', { name: /v/i })).toBeNull()
   })
 
-  it('should render tubes when aluminumBlock is selected', () => {
-    formikConfig.initialValues.labwareType = 'aluminumBlock'
+  it('should render tubes when labware that should displayAsTube is selected', () => {
     when(displayAsTubeMock)
-      .calledWith(formikConfig.initialValues)
+      .expectCalledWith(formikConfig.initialValues)
       .mockReturnValue(true)
+
     render(wrapInFormik(<WellBottomAndDepth />, formikConfig))
 
-    expect(
-      screen.getByText(
-        'Depth informs the robot how far down it can go inside a tube.'
-      )
+    screen.getByText(
+      'Depth informs the robot how far down it can go inside a tube.'
     )
   })
 
-  it('should render wells when wellplate is selected', () => {
-    formikConfig.initialValues.labwareType = 'wellPlate'
+  it('should render wells when labware that should NOT displayAsTube is selected', () => {
     when(displayAsTubeMock)
-      .calledWith(formikConfig.initialValues)
+      .expectCalledWith(formikConfig.initialValues)
       .mockReturnValue(false)
+
     render(wrapInFormik(<WellBottomAndDepth />, formikConfig))
 
-    expect(
-      screen.getByText(
-        'Depth informs the robot how far down it can go inside a well.'
-      )
+    screen.getByText(
+      'Depth informs the robot how far down it can go inside a well.'
     )
+  })
+
+  it('should render alert when error is present', () => {
+    const FAKE_ERROR = 'ahh'
+    formikConfig.initialErrors = { wellDepth: FAKE_ERROR }
+    formikConfig.initialTouched = { wellDepth: true }
+    render(wrapInFormik(<WellBottomAndDepth />, formikConfig))
+
+    // TODO(IL, 2021-05-26): AlertItem should have role="alert", then we can `getByRole('alert', {name: FAKE_ERROR})`
+    screen.getByText(FAKE_ERROR)
   })
 })

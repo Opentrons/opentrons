@@ -1,152 +1,113 @@
 import React from 'react'
-import { FormikConfig } from 'formik'
-import { when } from 'jest-when'
-import isEqual from 'lodash/isEqual'
 import { render, screen } from '@testing-library/react'
+import '@testing-library/jest-dom'
+import { FormikConfig } from 'formik'
+import { when, resetAllWhenMocks } from 'jest-when'
 import { getDefaultFormState, LabwareFields } from '../../../fields'
-import { wellShapeOptionsWithIcons } from '../../optionsWithImages'
 import { displayAsTube } from '../../../utils'
 import { WellShapeAndSides } from '../../sections/WellShapeAndSides'
-import { FormAlerts } from '../../alerts/FormAlerts'
-import { TextField } from '../../TextField'
-import { RadioField } from '../../RadioField'
 import { wrapInFormik } from '../../utils/wrapInFormik'
 
 jest.mock('../../../utils/displayAsTube')
-jest.mock('../../TextField')
-jest.mock('../../RadioField')
-jest.mock('../../alerts/FormAlerts')
 
-const FormAlertsMock = FormAlerts as jest.MockedFunction<typeof FormAlerts>
-const textFieldMock = TextField as jest.MockedFunction<typeof TextField>
-const RadioFieldMock = RadioField as jest.MockedFunction<typeof RadioField>
 const displayAsTubeMock = displayAsTube as jest.MockedFunction<
   typeof displayAsTube
 >
 
-const formikConfig: FormikConfig<LabwareFields> = {
-  initialValues: getDefaultFormState(),
-  onSubmit: jest.fn(),
-}
+let formikConfig: FormikConfig<LabwareFields>
 
 describe('WellShapeAndSides', () => {
   beforeEach(() => {
-    textFieldMock.mockImplementation(args => {
-      if (args.name === 'wellXDimension') {
-        return <div>wellXDimension text field</div>
-      }
-      if (args.name === 'wellYDimension') {
-        return <div>wellYDimension text field</div>
-      }
-      if (args.name === 'wellDiameter') {
-        return <div>wellDiameter text field</div>
-      } else {
-        return <div></div>
-      }
-    })
-
-    RadioFieldMock.mockImplementation(args => {
-      if (args.name === 'wellShape') {
-        expect(args).toEqual({
-          name: 'wellShape',
-          labelTextClassName: 'hidden',
-          options: wellShapeOptionsWithIcons,
-        })
-        return <div>wellShape radio group</div>
-      } else {
-        return <div></div>
-      }
-    })
-
-    FormAlertsMock.mockImplementation(args => {
-      if (
-        isEqual(args, {
-          touched: {},
-          errors: {},
-          fieldList: [
-            'wellShape',
-            'wellDiameter',
-            'wellXDimension',
-            'wellYDimension',
-          ],
-        })
-      ) {
-        return <div>mock alerts</div>
-      } else {
-        return <div></div>
-      }
-    })
-
-    when(displayAsTubeMock)
-      .calledWith(formikConfig.initialValues)
-      .mockReturnValue(false)
+    formikConfig = {
+      initialValues: getDefaultFormState(),
+      onSubmit: jest.fn(),
+    }
   })
 
   afterEach(() => {
     jest.restoreAllMocks()
+    resetAllWhenMocks()
   })
 
   it('should render with the correct information', () => {
     render(wrapInFormik(<WellShapeAndSides />, formikConfig))
 
-    expect(screen.getByText('Well Shape & Sides'))
-    expect(
-      screen.getByText(
-        'Diameter helps the robot locate the sides of the wells.'
-      )
-    )
-    expect(screen.getByText('mock alerts'))
-    expect(screen.getByText('wellShape radio group'))
-    expect(screen.getByText('wellDiameter text field'))
+    expect(screen.getByRole('heading')).toHaveTextContent(/Well Shape & Sides/i)
+
+    screen.getByText('Diameter helps the robot locate the sides of the wells.')
+
+    const radioElements = screen.getAllByRole('radio')
+    expect(radioElements).toHaveLength(2)
+    screen.getAllByRole('radio', { name: /circular/i })
+    screen.getAllByRole('radio', { name: /rectangular/i })
+
+    // should show diameter by default when no shape is selected
+    screen.getByRole('textbox', { name: /diameter/i })
   })
 
-  it('should render tubes when tubeRack is selected', () => {
-    formikConfig.initialValues.labwareType = 'tubeRack'
+  it('should render tubes when labware that should displayAsTube is selected', () => {
     when(displayAsTubeMock)
-      .calledWith(formikConfig.initialValues)
+      .expectCalledWith(formikConfig.initialValues)
       .mockReturnValue(true)
+
     render(wrapInFormik(<WellShapeAndSides />, formikConfig))
 
-    expect(
-      screen.getByText(
-        'Diameter helps the robot locate the sides of the tubes. If there are multiple measurements for this dimension then use the smaller one.'
-      )
+    screen.getByText(
+      'Diameter helps the robot locate the sides of the tubes. If there are multiple measurements for this dimension then use the smaller one.'
     )
   })
 
-  it('should render tubes when aluminumBlock is selected', () => {
-    formikConfig.initialValues.labwareType = 'aluminumBlock'
+  it('should render wells when labware that should NOT displayAsTube is selected', () => {
     when(displayAsTubeMock)
-      .calledWith(formikConfig.initialValues)
-      .mockReturnValue(true)
-    render(wrapInFormik(<WellShapeAndSides />, formikConfig))
-
-    expect(
-      screen.getByText(
-        'Diameter helps the robot locate the sides of the tubes. If there are multiple measurements for this dimension then use the smaller one.'
-      )
-    )
-  })
-
-  it('should render wells when wellplate is selected', () => {
-    formikConfig.initialValues.labwareType = 'wellPlate'
-    when(displayAsTubeMock)
-      .calledWith(formikConfig.initialValues)
+      .expectCalledWith(formikConfig.initialValues)
       .mockReturnValue(false)
+
     render(wrapInFormik(<WellShapeAndSides />, formikConfig))
 
-    expect(
-      screen.getByText(
-        'Diameter helps the robot locate the sides of the wells.'
-      )
-    )
+    screen.getByText('Diameter helps the robot locate the sides of the wells.')
+  })
+
+  it('should render diameter field when tipRack is selected (and hide the well shape radio group),(and should not render x/y fields)', () => {
+    formikConfig.initialValues.labwareType = 'tipRack'
+    render(wrapInFormik(<WellShapeAndSides />, formikConfig))
+
+    expect(screen.getByRole('heading')).toHaveTextContent(/Tip Diameter/i)
+
+    expect(screen.queryByRole('textbox', { name: /Well X/i })).toBeNull()
+    expect(screen.queryByRole('textbox', { name: /Well Y/i })).toBeNull()
+    expect(screen.queryByRole('radio', { name: /circular/i })).toBeNull()
+    expect(screen.queryByRole('radio', { name: /rectangular/i })).toBeNull()
+
+    screen.getByRole('textbox', { name: /Diameter/i })
+  })
+
+  it('should render diameter field when circular is selected (and should not render x/y fields)', () => {
+    formikConfig.initialValues.wellShape = 'circular'
+    render(wrapInFormik(<WellShapeAndSides />, formikConfig))
+
+    expect(screen.queryByRole('textbox', { name: /Well X/i })).toBeNull()
+    expect(screen.queryByRole('textbox', { name: /Well Y/i })).toBeNull()
+
+    screen.getByRole('textbox', { name: /Diameter/i })
   })
 
   it('should render X and Y dimension fields when rectangular is selected', () => {
     formikConfig.initialValues.wellShape = 'rectangular'
     render(wrapInFormik(<WellShapeAndSides />, formikConfig))
 
-    expect(screen.getByText('wellXDimension text field'))
-    expect(screen.getByText('wellYDimension text field'))
+    screen.getByRole('textbox', { name: /Well X/i })
+    screen.getByRole('textbox', { name: /Well Y/i })
+
+    expect(screen.queryByRole('textbox', { name: /Diameter/i })).toBeNull()
+  })
+
+  it('should render alert when error is present', () => {
+    const FAKE_ERROR = 'ahh'
+    formikConfig.initialErrors = { wellShape: FAKE_ERROR }
+    formikConfig.initialTouched = { wellShape: true }
+    render(wrapInFormik(<WellShapeAndSides />, formikConfig))
+
+    // TODO(IL, 2021-05-26): AlertItem should have role="alert", then we can `getByRole('alert', {name: FAKE_ERROR})`
+    screen.getByText(FAKE_ERROR)
   })
 })

@@ -48,6 +48,7 @@ export const labwareEntities: LabwareEntities = {
   },
 }
 
+// $FlowFixMe(sa, 2021-05.10): flow thinks these object keys are not strings for some reason
 export const pipetteEntities: PipetteEntities = {
   pipetteId: {
     id: 'pipetteId',

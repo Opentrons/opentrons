@@ -20,8 +20,14 @@ export const IRREGULAR_LABWARE_ERROR = 'IRREGULAR_LABWARE_ERROR'
 
 export const LOOSE_TIP_FIT_ERROR = 'LOOSE_TIP_FIT_ERROR'
 
+export const LABWARE_TOO_SMALL_ERROR = 'LABWARE_TOO_SMALL_ERROR'
+export const LABWARE_TOO_LARGE_ERROR = 'LABWARE_TOO_LARGE_ERROR'
+
 export const LINK_CUSTOM_LABWARE_FORM =
   'https://opentrons-ux.typeform.com/to/xi8h0W'
+
+export const LINK_REQUEST_ADAPTER_FORM =
+  'https://docs.google.com/forms/d/e/1FAIpQLScvsHlXQrtIhIQYO0zr6mYwmzOCGpYPqepeDIorFIyj2jT-UQ/viewform'
 
 export type ImportErrorKey =
   | 'INVALID_FILE_TYPE'
@@ -85,7 +91,7 @@ export interface LabwareFields {
   aluminumBlockType: string | null | undefined // eg, '24well' or '96well'
   aluminumBlockChildType: string | null | undefined
 
-  handPlacedTipFit: string | null | undefined
+  handPlacedTipFit: 'snug' | 'loose' | null | undefined
   // tubeRackSides: string[], // eg, []
   footprintXDimension: string | null | undefined
   footprintYDimension: string | null | undefined
@@ -152,7 +158,7 @@ export interface ProcessedLabwareFields {
   regularColumnSpacing: BooleanString
 
   wellVolume: number
-  wellBottomShape: WellBottomShape
+  wellBottomShape: WellBottomShape | null
   wellDepth: number
   wellShape: WellShape
 
@@ -291,6 +297,8 @@ export const labwareTypeAutofills: Record<
 > = {
   tipRack: {
     homogeneousWells: 'true' as const,
+    wellShape: 'circular' as const,
+    wellBottomShape: null,
   },
   tubeRack: {},
   wellPlate: {},
@@ -387,7 +395,7 @@ export const LABELS: Record<keyof LabwareFields, string> = {
   gridColumns: 'Number of columns',
   regularRowSpacing: 'Are all of your rows evenly spaced?',
   regularColumnSpacing: 'Are all of your columns evenly spaced?',
-  wellVolume: 'Max volume per well',
+  wellVolume: 'Volume',
   wellShape: 'Well shape',
   wellDiameter: 'Diameter',
   wellXDimension: 'Well X',

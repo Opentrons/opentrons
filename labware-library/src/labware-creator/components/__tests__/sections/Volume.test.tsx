@@ -1,82 +1,97 @@
 import React from 'react'
 import { FormikConfig } from 'formik'
-import { when } from 'jest-when'
-import isEqual from 'lodash/isEqual'
+import '@testing-library/jest-dom'
+import { when, resetAllWhenMocks } from 'jest-when'
 import { render, screen } from '@testing-library/react'
 import { getDefaultFormState, LabwareFields } from '../../../fields'
-import { isEveryFieldHidden } from '../../../utils'
+import { isEveryFieldHidden, getLabwareName } from '../../../utils'
 import { Volume } from '../../sections/Volume'
-import { FormAlerts } from '../../alerts/FormAlerts'
-import { TextField } from '../../TextField'
 import { wrapInFormik } from '../../utils/wrapInFormik'
 
 jest.mock('../../../utils')
-jest.mock('../../TextField')
-jest.mock('../../alerts/FormAlerts')
 
-const FormAlertsMock = FormAlerts as jest.MockedFunction<typeof FormAlerts>
-const textFieldMock = TextField as jest.MockedFunction<typeof TextField>
 const isEveryFieldHiddenMock = isEveryFieldHidden as jest.MockedFunction<
   typeof isEveryFieldHidden
 >
+const getLabwareNameMock = getLabwareName as jest.MockedFunction<
+  typeof getLabwareName
+>
 
-const formikConfig: FormikConfig<LabwareFields> = {
-  initialValues: getDefaultFormState(),
-  onSubmit: jest.fn(),
-}
+let formikConfig: FormikConfig<LabwareFields>
 
 describe('Volume', () => {
   beforeEach(() => {
-    textFieldMock.mockImplementation(args => {
-      return <div>wellVolume text field</div>
-    })
-
-    FormAlertsMock.mockImplementation(args => {
-      if (
-        isEqual(args, {
-          touched: {},
-          errors: {},
-          fieldList: ['wellVolume'],
-        })
-      ) {
-        return <div>mock alerts</div>
-      } else {
-        return <div></div>
-      }
-    })
+    formikConfig = {
+      initialValues: getDefaultFormState(),
+      onSubmit: jest.fn(),
+    }
   })
 
   afterEach(() => {
     jest.restoreAllMocks()
+    resetAllWhenMocks()
   })
 
   it('should render with the correct information', () => {
+    when(getLabwareNameMock)
+      .calledWith(formikConfig.initialValues, false)
+      .mockReturnValue('well')
     render(wrapInFormik(<Volume />, formikConfig))
-    expect(screen.getByText('Volume'))
-    expect(screen.getByText('Total maximum volume of each well.'))
-    expect(screen.getByText('mock alerts'))
-    expect(screen.getByText('wellVolume text field'))
+    expect(screen.getByRole('heading')).toHaveTextContent(/Volume/i)
+
+    screen.getByText('Total maximum volume of each well.')
+
+    screen.getByRole('textbox', { name: /Volume/i })
   })
 
   it('should render tubes when tubeRack is selected', () => {
     formikConfig.initialValues.labwareType = 'tubeRack'
+    when(getLabwareNameMock)
+      .calledWith(formikConfig.initialValues, false)
+      .mockReturnValue('tube')
     render(wrapInFormik(<Volume />, formikConfig))
 
-    expect(screen.getByText('Total maximum volume of each tube.'))
+    screen.getByText('Total maximum volume of each tube.')
   })
 
   it('should render tubes when aluminumBlock is selected', () => {
     formikConfig.initialValues.labwareType = 'aluminumBlock'
+    when(getLabwareNameMock)
+      .calledWith(formikConfig.initialValues, false)
+      .mockReturnValue('tube')
     render(wrapInFormik(<Volume />, formikConfig))
 
-    expect(screen.getByText('Total maximum volume of each tube.'))
+    screen.getByText('Total maximum volume of each tube.')
   })
 
-  it('should render wells when wellplate is selected', () => {
+  it('should render wells when wellPlate is selected', () => {
     formikConfig.initialValues.labwareType = 'wellPlate'
+    when(getLabwareNameMock)
+      .calledWith(formikConfig.initialValues, false)
+      .mockReturnValue('well')
     render(wrapInFormik(<Volume />, formikConfig))
 
-    expect(screen.getByText('Total maximum volume of each well.'))
+    screen.getByText('Total maximum volume of each well.')
+  })
+
+  it('should render tips when tipRack is selected', () => {
+    formikConfig.initialValues.labwareType = 'tipRack'
+    when(getLabwareNameMock)
+      .calledWith(formikConfig.initialValues, false)
+      .mockReturnValue('tip')
+    render(wrapInFormik(<Volume />, formikConfig))
+
+    screen.getByText('Total maximum volume of each tip.')
+  })
+
+  it('should render alert when error is present', () => {
+    const FAKE_ERROR = 'ahh'
+    formikConfig.initialErrors = { wellVolume: FAKE_ERROR }
+    formikConfig.initialTouched = { wellVolume: true }
+    render(wrapInFormik(<Volume />, formikConfig))
+
+    // TODO(IL, 2021-05-26): AlertItem should have role="alert", then we can `getByRole('alert', {name: FAKE_ERROR})`
+    screen.getByText(FAKE_ERROR)
   })
 
   it('should not render when all fields are hidden', () => {

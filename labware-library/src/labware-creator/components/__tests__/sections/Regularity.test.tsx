@@ -1,5 +1,5 @@
 import React from 'react'
-import { when } from 'jest-when'
+import { when, resetAllWhenMocks } from 'jest-when'
 import { FormikConfig } from 'formik'
 import { render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
@@ -30,6 +30,7 @@ describe('Regularity', () => {
 
   afterEach(() => {
     jest.restoreAllMocks()
+    resetAllWhenMocks()
   })
 
   it('should render radio fields when fields are visible', () => {

@@ -81,11 +81,12 @@ def mock_hardware() -> AsyncMock:
 def mock_handlers() -> AsyncMock:
     """Get an asynchronous mock in the shape of CommandHandlers."""
     # TODO(mc, 2021-01-04): Replace with mock_cmd_handlers
-    return CommandHandlers(
-        equipment=AsyncMock(spec=EquipmentHandler),
-        movement=AsyncMock(spec=MovementHandler),
-        pipetting=AsyncMock(spec=PipettingHandler),
-    )
+    mock = AsyncMock()
+    mock.equipment = AsyncMock(spec=EquipmentHandler)
+    mock.movement = AsyncMock(spec=MovementHandler)
+    mock.pipetting = AsyncMock(spec=PipettingHandler)
+
+    return mock
 
 
 @pytest.fixture
@@ -152,17 +153,13 @@ def well_plate_def() -> LabwareDefinition:
 @pytest.fixture(scope="session")
 def reservoir_def() -> LabwareDefinition:
     """Get the definition of single-row reservoir."""
-    return LabwareDefinition.parse_obj(
-        load_definition("nest_12_reservoir_15ml", 1)
-    )
+    return LabwareDefinition.parse_obj(load_definition("nest_12_reservoir_15ml", 1))
 
 
 @pytest.fixture(scope="session")
 def tip_rack_def() -> LabwareDefinition:
     """Get the definition of Opentrons 300 uL tip rack."""
-    return LabwareDefinition.parse_obj(
-        load_definition("opentrons_96_tiprack_300ul", 1)
-    )
+    return LabwareDefinition.parse_obj(load_definition("opentrons_96_tiprack_300ul", 1))
 
 
 @pytest.fixture
@@ -176,11 +173,13 @@ def store(standard_deck_def: DeckDefinitionV2) -> StateStore:
 
 @pytest.fixture
 def engine(
+    mock_hardware: AsyncMock,
     mock_state_store: MagicMock,
-    mock_handlers: AsyncMock
+    mock_resources: AsyncMock,
 ) -> ProtocolEngine:
     """Get a ProtocolEngine with its dependencies mocked out."""
     return ProtocolEngine(
+        hardware=mock_hardware,
         state_store=mock_state_store,
-        handlers=mock_handlers,
+        resources=mock_resources,
     )

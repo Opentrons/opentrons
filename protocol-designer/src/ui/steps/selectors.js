@@ -145,6 +145,7 @@ export const getHoveredStepLabware: Selector<Array<string>> = createSelector(
     }
 
     if (stepArgs.module) {
+      // $FlowFixMe(sa, 2021-05-10): ignore until TS conversion
       const labware = getLabwareOnModule(initialDeckState, stepArgs.module)
       return labware ? [labware.id] : []
     }

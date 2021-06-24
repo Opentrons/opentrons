@@ -5,6 +5,7 @@ from typing import Optional
 from typing_extensions import Literal
 
 from robot_server.errors import ErrorDetails, ErrorResponse
+from robot_server.service.dependencies import get_current_time, get_unique_id
 from robot_server.service.json_api import (
     RequestModel,
     ResponseModel,
@@ -12,28 +13,43 @@ from robot_server.service.json_api import (
     MultiResponseModel,
 )
 
-from .session_store import SessionStore, SessionNotFoundError
-from .session_builder import SessionBuilder, CreateSessionData
-from .session_runner import SessionRunner
-from .session_models import Session
-from .session_inputs import SessionInput, CreateSessionInputData
-
-from .dependencies import (
-    get_session_builder,
-    get_session_store,
-    get_session_runner,
-    get_unique_id,
-    get_current_time,
+from robot_server.protocols import (
+    ProtocolStore,
+    ProtocolNotFound,
+    ProtocolNotFoundError,
+    get_protocol_store,
 )
+
+from .session_store import SessionStore, SessionNotFoundError
+from .session_view import SessionView
+from .session_models import Session, SessionCreateData, ProtocolSessionCreateData
+from .action_models import SessionAction, SessionActionCreateData
+from .engine_store import EngineStore, EngineConflictError, EngineMissingError
+from .dependencies import get_session_store, get_engine_store
 
 sessions_router = APIRouter()
 
 
 class SessionNotFound(ErrorDetails):
-    """An error response for when a given session is not found."""
+    """An error if a given session is not found."""
 
     id: Literal["SessionNotFound"] = "SessionNotFound"
     title: str = "Session Not Found"
+
+
+# TODO(mc, 2021-05-28): evaluate multi-session logic
+class SessionAlreadyActive(ErrorDetails):
+    """An error if one tries to create a new session while one is already active."""
+
+    id: Literal["SessionAlreadyActive"] = "SessionAlreadyActive"
+    title: str = "Session Already Active"
+
+
+class SessionActionNotAllowed(ErrorDetails):
+    """An error if one tries to issue an unsupported session action."""
+
+    id: Literal["SessionActionNotAllowed"] = "SessionActionNotAllowed"
+    title: str = "Session Action Not Allowed"
 
 
 @sessions_router.post(
@@ -42,11 +58,17 @@ class SessionNotFound(ErrorDetails):
     description="Create a new session to track robot interaction.",
     status_code=status.HTTP_201_CREATED,
     response_model=ResponseModel[Session],
+    responses={
+        status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[ProtocolNotFound]},
+        status.HTTP_409_CONFLICT: {"model": ErrorResponse[SessionAlreadyActive]},
+    },
 )
 async def create_session(
-    request_body: Optional[RequestModel[CreateSessionData]] = None,
-    session_builder: SessionBuilder = Depends(get_session_builder),
+    request_body: Optional[RequestModel[SessionCreateData]] = None,
+    session_view: SessionView = Depends(SessionView),
     session_store: SessionStore = Depends(get_session_store),
+    engine_store: EngineStore = Depends(get_engine_store),
+    protocol_store: ProtocolStore = Depends(get_protocol_store),
     session_id: str = Depends(get_unique_id),
     created_at: datetime = Depends(get_current_time),
 ) -> ResponseModel[Session]:
@@ -54,25 +76,36 @@ async def create_session(
 
     Arguments:
         request_body: Optional request body with session creation data.
-        session_builder: Session model construction interface.
+        session_view: Session model construction interface.
         session_store: Session storage interface.
+        engine_store: ProtocolEngine storage and control.
+        protocol_store: Protocol resource storage.
         session_id: Generated ID to assign to the session.
         created_at: Timestamp to attach to created session
     """
-    session_data = request_body.data if request_body is not None else None
-
-    entry = session_store.create(
+    create_data = request_body.data if request_body is not None else None
+    session = session_view.as_resource(
         session_id=session_id,
-        session_data=session_data,
         created_at=created_at,
+        create_data=create_data,
     )
+    protocol = None
 
-    data = session_builder.build(
-        session_id=entry.session_id,
-        session_data=entry.session_data,
-        created_at=entry.created_at,
-        inputs=entry.inputs,
-    )
+    try:
+        if isinstance(create_data, ProtocolSessionCreateData):
+            protocol = protocol_store.get(
+                protocol_id=create_data.createParams.protocolId
+            )
+
+        # TODO(mc, 2021-05-28): return engine state to build response model
+        await engine_store.create(protocol=protocol)
+    except ProtocolNotFoundError as e:
+        raise ProtocolNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
+    except EngineConflictError as e:
+        raise SessionAlreadyActive(detail=str(e)).as_error(status.HTTP_409_CONFLICT)
+
+    session_store.upsert(session=session)
+    data = session_view.as_response(session=session)
 
     return ResponseModel(data=data)
 
@@ -85,23 +118,17 @@ async def create_session(
     response_model=MultiResponseModel[Session],
 )
 async def get_sessions(
-    session_builder: SessionBuilder = Depends(get_session_builder),
+    session_view: SessionView = Depends(SessionView),
     session_store: SessionStore = Depends(get_session_store),
 ) -> MultiResponseModel[Session]:
     """Get all sessions.
 
     Args:
-        session_builder: Session model construction interface.
+        session_view: Session model construction interface.
         session_store: Session storage interface
     """
     data = [
-        session_builder.build(
-            session_id=entry.session_id,
-            session_data=entry.session_data,
-            created_at=entry.created_at,
-            inputs=entry.inputs,
-        )
-        for entry in session_store.get_all()
+        session_view.as_response(session=session) for session in session_store.get_all()
     ]
 
     return MultiResponseModel(data=data)
@@ -117,27 +144,22 @@ async def get_sessions(
 )
 async def get_session(
     sessionId: str,
-    session_builder: SessionBuilder = Depends(get_session_builder),
+    session_view: SessionView = Depends(SessionView),
     session_store: SessionStore = Depends(get_session_store),
 ) -> ResponseModel[Session]:
     """Get a session by its ID.
 
     Args:
         sessionId: Session ID pulled from URL
-        session_builder: Session model construction interface.
+        session_view: Session model construction interface.
         session_store: Session storage interface
     """
     try:
-        entry = session_store.get(session_id=sessionId)
+        session = session_store.get(session_id=sessionId)
     except SessionNotFoundError as e:
         raise SessionNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
 
-    data = session_builder.build(
-        session_id=entry.session_id,
-        session_data=entry.session_data,
-        created_at=entry.created_at,
-        inputs=entry.inputs,
-    )
+    data = session_view.as_response(session=session)
 
     return ResponseModel(data=data)
 
@@ -153,14 +175,17 @@ async def get_session(
 async def remove_session_by_id(
     sessionId: str,
     session_store: SessionStore = Depends(get_session_store),
+    engine_store: EngineStore = Depends(get_engine_store),
 ) -> EmptyResponseModel:
     """Delete a session by its ID.
 
     Arguments:
         sessionId: Session ID pulled from URL.
         session_store: Session storage interface.
+        engine_store: ProtocolEngine storage and control.
     """
     try:
+        engine_store.clear()
         session_store.remove(session_id=sessionId)
     except SessionNotFoundError as e:
         raise SessionNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
@@ -169,44 +194,58 @@ async def remove_session_by_id(
 
 
 @sessions_router.post(
-    path="/sessions/{sessionId}/inputs",
-    summary="Create a session control input.",
+    path="/sessions/{sessionId}/actions",
+    summary="Issue a control action to the session",
     description=(
-        "Provide input data to the session in order to control the "
-        "execution of the run."
+        "Provide an action to the session in order to control execution of the run."
     ),
     status_code=status.HTTP_201_CREATED,
-    response_model=ResponseModel[SessionInput],
-    responses={status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[SessionNotFound]}},
+    response_model=ResponseModel[SessionAction],
+    responses={
+        status.HTTP_400_BAD_REQUEST: {"model": ErrorResponse[SessionActionNotAllowed]},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[SessionNotFound]},
+    },
 )
-async def create_session_input(
+async def create_session_action(
     sessionId: str,
-    request_body: RequestModel[CreateSessionInputData],
+    request_body: RequestModel[SessionActionCreateData],
+    session_view: SessionView = Depends(SessionView),
     session_store: SessionStore = Depends(get_session_store),
-    session_runner: SessionRunner = Depends(get_session_runner),
-    input_id: str = Depends(get_unique_id),
+    engine_store: EngineStore = Depends(get_engine_store),
+    action_id: str = Depends(get_unique_id),
     created_at: datetime = Depends(get_current_time),
-) -> ResponseModel[SessionInput]:
-    """Create a session input.
+) -> ResponseModel[SessionAction]:
+    """Create a session control action.
 
     Arguments:
         sessionId: Session ID pulled from the URL.
         request_body: Input payload from the request body.
+        session_view: Resource model builder.
         session_store: Session storage interface.
-        session_runner: Session control interface.
-        input_id: Generated ID to assign to the input data.
-        created_at: Timestamp to attach to the input data.
+        engine_store: Protocol engine and runner storage.
+        action_id: Generated ID to assign to the control action.
+        created_at: Timestamp to attach to the control action.
     """
     try:
-        data = session_store.create_input(
-            session_id=sessionId,
-            input_data=request_body.data,
-            input_id=input_id,
+        prev_session = session_store.get(session_id=sessionId)
+
+        action, next_session = session_view.with_action(
+            session=prev_session,
+            action_id=action_id,
+            action_data=request_body.data,
             created_at=created_at,
         )
+
+        # TODO(mc, 2021-06-11): support actions other than `start`
+        engine_store.runner.play()
+
     except SessionNotFoundError as e:
         raise SessionNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
+    except EngineMissingError as e:
+        raise SessionActionNotAllowed(detail=str(e)).as_error(
+            status.HTTP_400_BAD_REQUEST
+        )
 
-    session_runner.trigger_input_effects(input=data)
+    session_store.upsert(session=next_session)
 
-    return ResponseModel(data=data)
+    return ResponseModel(data=action)

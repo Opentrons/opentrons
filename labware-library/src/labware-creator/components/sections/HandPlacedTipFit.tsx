@@ -14,8 +14,8 @@ const Content = (): JSX.Element => (
   <div className={styles.flex_row}>
     <div className={styles.tip_fit_column}>
       <p>
-        Place the tip you wish to use on the pipette you wish to use it on. Give
-        the tip a wiggle to check the fit.
+        Place the tip on the pipette you wish to use it on. Give the tip a
+        wiggle to check the fit.
       </p>
 
       <p>

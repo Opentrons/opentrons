@@ -6,6 +6,8 @@ import {
   wellBottomShapeOptions,
   wellShapeOptions,
   IRREGULAR_LABWARE_ERROR,
+  LABWARE_TOO_SMALL_ERROR,
+  LABWARE_TOO_LARGE_ERROR,
   LABELS,
   LOOSE_TIP_FIT_ERROR,
   MAX_X_DIMENSION,
@@ -91,16 +93,16 @@ export const labwareFormSchemaBaseObject = Yup.object({
     .default(0)
     .label(LABELS.footprintXDimension)
     .typeError(MUST_BE_A_NUMBER)
-    .min(MIN_X_DIMENSION, IRREGULAR_LABWARE_ERROR)
-    .max(MAX_X_DIMENSION, IRREGULAR_LABWARE_ERROR)
+    .min(MIN_X_DIMENSION, LABWARE_TOO_SMALL_ERROR)
+    .max(MAX_X_DIMENSION, LABWARE_TOO_LARGE_ERROR)
     .nullable()
     .required(),
   footprintYDimension: Yup.number()
     .default(0)
     .label(LABELS.footprintYDimension)
     .typeError(MUST_BE_A_NUMBER)
-    .min(MIN_Y_DIMENSION, IRREGULAR_LABWARE_ERROR)
-    .max(MAX_Y_DIMENSION, IRREGULAR_LABWARE_ERROR)
+    .min(MIN_Y_DIMENSION, LABWARE_TOO_SMALL_ERROR)
+    .max(MAX_Y_DIMENSION, LABWARE_TOO_LARGE_ERROR)
     .nullable()
     .required(),
   labwareZDimension: requiredPositiveNumber(LABELS.labwareZDimension).max(
@@ -137,19 +139,36 @@ export const labwareFormSchemaBaseObject = Yup.object({
   }),
 
   wellVolume: requiredPositiveNumber(LABELS.wellVolume),
-  wellBottomShape: requiredString(LABELS.wellBottomShape).oneOf(
-    wellBottomShapeOptions.map(o => o.value)
-  ),
-  wellDepth: Yup.number()
-    .default(0)
-    .label(LABELS.wellDepth)
-    .typeError(MUST_BE_A_NUMBER)
-    .moreThan(0)
-    .max(
-      Yup.ref('labwareZDimension'),
-      'Well depth cannot exceed labware height'
-    )
-    .required(),
+  wellBottomShape: Yup.string().when('labwareType', {
+    is: 'tipRack',
+    then: Yup.string().nullable(),
+    otherwise: requiredString(LABELS.wellBottomShape).oneOf(
+      wellBottomShapeOptions.map(o => o.value)
+    ),
+  }),
+  wellDepth: Yup.number().when('labwareType', {
+    is: 'tipRack',
+    then: Yup.number()
+      .default(0)
+      .label('Length')
+      .typeError(MUST_BE_A_NUMBER)
+      .moreThan(0)
+      .max(
+        Yup.ref('labwareZDimension'),
+        'Tip Length cannot exceed labware height'
+      )
+      .required(),
+    otherwise: Yup.number()
+      .default(0)
+      .label(LABELS.wellDepth)
+      .typeError(MUST_BE_A_NUMBER)
+      .moreThan(0)
+      .max(
+        Yup.ref('labwareZDimension'),
+        'Well depth cannot exceed labware height'
+      )
+      .required(),
+  }),
   wellShape: requiredString(LABELS.wellShape).oneOf(
     wellShapeOptions.map(o => o.value)
   ),

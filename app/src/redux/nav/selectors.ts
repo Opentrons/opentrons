@@ -15,6 +15,7 @@ import { getDeckCalibrationStatus, DECK_CAL_STATUS_OK } from '../calibration'
 
 import type { State } from '../types'
 import type { NavLocation } from './types'
+import { getFeatureFlags } from '../config'
 
 // TODO(mc, 2019-11-26): i18n
 const ROBOT = 'Robot'
@@ -220,11 +221,12 @@ export const getNavbarLocations: (
   getCalibrateLocation,
   getRunLocation,
   getMoreLocation,
-  (robots, upload, calibrate, run, more) => [
-    robots,
-    upload,
-    calibrate,
-    run,
-    more,
-  ]
+  getFeatureFlags,
+  (robots, upload, calibrate, run, more, ff) => {
+    if (Boolean(ff.preProtocolFlowWithoutRPC)) {
+      return [robots, upload, run, more]
+    } else {
+      return [robots, upload, calibrate, run, more]
+    }
+  }
 )

@@ -241,6 +241,7 @@
 
 .export_button {
   margin-top: 2rem;
+  width: 100%;
 }
 
 .export_callout {
@@ -258,4 +259,8 @@
 
   margin-top: 0;
   padding: 1rem 4rem;
+}
+
+.capitalize {
+  text-transform: capitalize;
 }

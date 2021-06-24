@@ -37,11 +37,9 @@ class JsonFileRunner(AbstractFileRunner):
     def load(self) -> None:
         """Translate JSON commands and send them to protocol engine."""
         protocol = self._file_reader.read(self._file)
-
-        for json_cmd in protocol.commands:
-            translated_items = self._command_translator.translate(json_cmd)
-            for cmd in translated_items:
-                self._protocol_engine.add_command(cmd)
+        translated_items = self._command_translator.translate(protocol)
+        for cmd in translated_items:
+            self._protocol_engine.add_command(cmd)
 
     def play(self) -> None:
         """Start (or un-pause) running the JSON protocol file."""
@@ -53,4 +51,4 @@ class JsonFileRunner(AbstractFileRunner):
 
     def stop(self) -> None:
         """Cancel the running JSON protocol file."""
-        self._command_queue_worker.stop()
+        self._command_queue_worker.pause()

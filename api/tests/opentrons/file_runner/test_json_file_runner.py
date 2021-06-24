@@ -109,7 +109,7 @@ def test_json_runner_stop(
     """It should be able to stop the run."""
     subject.stop()
 
-    decoy.verify(command_queue_worker.stop())
+    decoy.verify(command_queue_worker.pause())
 
 
 def test_json_runner_load_commands_to_engine(
@@ -135,14 +135,9 @@ def test_json_runner_load_commands_to_engine(
         labwareId="xyz",
         wellName="def",
     )
-    decoy.when(command_translator.translate(json_protocol.commands[0])).then_return(
-        [mock_cmd1]
-    )
-    decoy.when(command_translator.translate(json_protocol.commands[1])).then_return(
-        [mock_cmd2]
-    )
-    decoy.when(command_translator.translate(json_protocol.commands[2])).then_return(
-        [mock_cmd3]
+
+    decoy.when(command_translator.translate(json_protocol)).then_return(
+        [mock_cmd1, mock_cmd2, mock_cmd3]
     )
 
     subject.load()

@@ -20,6 +20,9 @@
       "path": "./labware-designer"
     },
     {
+      "path": "./step-generation"
+    },
+    {
       "path": "./shared-data"
     }
   ]

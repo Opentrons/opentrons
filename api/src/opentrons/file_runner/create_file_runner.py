@@ -31,7 +31,7 @@ def create_file_runner(
             protocol_engine=engine,
             file_reader=JsonFileReader(),
             command_translator=CommandTranslator(),
-            command_queue_worker=CommandQueueWorker(),
+            command_queue_worker=CommandQueueWorker(engine),
         )
 
     raise NotImplementedError("Other runner types not yet supported")

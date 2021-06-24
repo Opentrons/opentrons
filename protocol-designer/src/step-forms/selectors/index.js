@@ -233,6 +233,7 @@ const _getInitialDeckSetup = (
     pipettes: mapValues(
       pipetteLocations,
       (mount: Mount, pipetteId: string): PipetteOnDeck => {
+        // $FlowFixMe(sa, 2021-05-10): PipetteEntities is inexact typed, so flow does not know that there will me a mount on pipetteEntities
         return { mount, ...pipetteEntities[pipetteId] }
       }
     ),

@@ -6,16 +6,22 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
-# Opentrons App Changes in 4.3.1
+# Opentrons App Changes in 4.4.0
+
+This is a quiet release on the app front as we make some behind-the-scenes improvements to how the app is built, so we don't have any changes to report here. There are changes to the OT-2 software, though, so make sure you update your app so it can get your robot fully up to date!
+
+---
+
+## Opentrons App Changes in 4.3.1
 
 We've improved module functionality with Opentrons App 4.3.0. The app now supports protocols with two Temperature Modules or two Magnetic Modules for Python API Protocols. All connected modules display their USB port connection (including limited USB port information for hubs). We've also updated how modules are displayed on the Run tab.
 
-## New Features
+### New Features
 
 - Support for 2 Temperature Modules or 2 Magnetic Modules
 - The USB port to which each module is attached is now displayed in the protocol info screen
 
-## Bugfixes
+### Bug Fixes
 
 - Fix an issue where robots would sometimes not reappear after an update when connected via USB ([#7608](https://github.com/Opentrons/opentrons/issues/7608))
 
@@ -29,14 +35,14 @@ We've improved module functionality with Opentrons App 4.3.0. The app now suppor
 
 ---
 
-# Opentrons App Changes in 4.2.0
+## Opentrons App Changes in 4.2.0
 
-## Changes
+### Changes
 
 - Do not automatically resume when the user decides not to confirm cancelling a protocol
   - If you click the "cancel" button and then click "Go back", the protocol will be paused until you click resume.
 
-## Bugfixes
+### Bug Fixes
 
 - Fix several issues that prevented changing the settings of an attached pipette.
 - You will now be asked whether you have a calibration block in pre-protocol tip length calibration if you have not saved your answer.
@@ -46,6 +52,8 @@ We've improved module functionality with Opentrons App 4.3.0. The app now suppor
 ## Opentrons App Changes in 4.1.1
 
 There are no changes to the Opentrons App in 4.1.1; it is a bugfix release for an issue with installing Python packages on the OT-2.
+
+---
 
 ## Opentrons App Changes in 4.1.0
 
@@ -57,7 +65,7 @@ Opentrons App 4.1.0 brings some new features to robot calibration.
 - You can now jog in Z when calibrating to deck markings
 - Downloading robot logs will now download a third file which contains logs from the robot's web server
 
-### Bugfixes
+### Bug Fixes
 
 - Fixed an issue that prevented calibration of labware in slots 10 and 11 while using a single channel pipette ([#6886](https://github.com/opentrons/opentrons/issues/6886))
 - Protocol upload should be much faster

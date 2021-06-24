@@ -234,8 +234,8 @@ class InstrumentContext(CommandPublisher):
         aspirated into the pipette will be dispensed (this volume is accessible
         through :py:attr:`current_volume`).
 
-        :param volume: The volume of liquid to dispense, in microliters. If not
-                       specified, defaults to :py:attr:`current_volume`.
+        :param volume: The volume of liquid to dispense, in microliters. If 0
+                       or unspecified, defaults to :py:attr:`current_volume`.
         :type volume: int or float
 
         :param location: Where to dispense into. If `location` is a
