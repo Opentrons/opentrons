@@ -36,7 +36,11 @@ OR
 
 ## React-based GUI Usage
 
-- In the browser window, the default UI the Irregular form
+- In the browser window you should be presented with a sandbox-style live update form.
+- The radio buttons in the top left allow you to switch between the two internal functions `createRegularLabware` and `createIrregularLabware`.
+- The large text area labeled "Input Options" is a live-editable JSON representation of the `options` object to be passed to the selected creator function.
+- If the supplied `options` object is parseable and produces valid results, the output labware definition will be render, and the text area labeled "Output Definition" will update to contain the generated labware definition.
+- If the supplied `options` object is not parseable or otherwise throws an error, the render and output will not update and instead show the last valid state. Error details are logged to the Javascript Console.
 
 ## Javascript Console Usage
 

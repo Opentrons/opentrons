@@ -40,11 +40,10 @@ export function CreateLabwareSandbox(): JSX.Element {
   const [isLabwareRegular, setIsLabwareRegular] = React.useState(false)
   const [viewOnDeck, setViewOnDeck] = React.useState(true)
   const [rawOptions, setRawOptions] = React.useState(
-    JSON.stringify(isLabwareRegular ? REGULAR_OPTIONS : IRREGULAR_OPTIONS, undefined, 2)
+    JSON.stringify(IRREGULAR_OPTIONS, undefined, 2)
   )
-  const createLabware = isLabwareRegular ? createRegularLabware : createIrregularLabware
   const [labwareToRender, setLabwareToRender] = React.useState<LabwareDefinition2>(
-    createLabware(JSON.parse(rawOptions))
+    createIrregularLabware(IRREGULAR_OPTIONS)
   )
 
   let optionsTextAreaValue = rawOptions
@@ -67,6 +66,16 @@ export function CreateLabwareSandbox(): JSX.Element {
     setViewOnDeck(e.target.value === 'deck')
   }
 
+  const handleInputOptionChange: React.ChangeEventHandler<HTMLTextAreaElement> = event => {
+    setRawOptions(event.target.value)
+    const createLabware = isLabwareRegular ? createRegularLabware : createIrregularLabware
+    try {
+      setLabwareToRender(createLabware(JSON.parse(event.target.value)))
+    } catch (error) {
+      console.log('Failed to parse options as JSON', error)
+    }
+  }
+
   return (
     <Flex height="100%" width="100%" flexDirection={DIRECTION_COLUMN}>
       <Flex flex={2} alignItems={ALIGN_CENTER} backgroundColor={C_LIGHT_GRAY}>
@@ -86,18 +95,7 @@ export function CreateLabwareSandbox(): JSX.Element {
             <Text as="h2" margin={SPACING_2}>Input</Text>
             <Text css={FONT_BODY_2_DARK} fontStyle={FONT_STYLE_ITALIC}>{` (${regularityLabel} Labware Options)`}</Text>
           </Flex>
-          <JsonTextArea
-            title="input options"
-            value={optionsTextAreaValue}
-            onChange={event => {
-              setRawOptions(event.target.value)
-              try {
-                setLabwareToRender(createLabware(JSON.parse(event.target.value)))
-              } catch (error) {
-                console.log('Failed to parse options as JSON', error)
-              }
-            }}
-          />
+          <JsonTextArea title="input options" value={optionsTextAreaValue} onChange={handleInputOptionChange} />
         </Flex>
         <Flex flex={5} flexDirection={DIRECTION_COLUMN}>
           <Flex marginX={SPACING_4} marginY={SPACING_1} alignItems={ALIGN_CENTER}>
@@ -156,11 +154,7 @@ export function CreateLabwareSandbox(): JSX.Element {
             <Text as="h2" margin={SPACING_2}>Output</Text>
             <Text css={FONT_BODY_2_DARK} fontStyle={FONT_STYLE_ITALIC}>{` (${regularityLabel} Labware Definition)`}</Text>
           </Flex>
-          <JsonTextArea
-            title="output definition"
-            value={JSON.stringify(labwareToRender, undefined, 2)}
-            disabled
-          />
+          <JsonTextArea title="output definition" value={JSON.stringify(labwareToRender, undefined, 2)} disabled />
         </Flex>
       </Flex>
     </Flex>
