@@ -74,7 +74,8 @@ def get_all_calibrations() -> typing.List[local_types.CalibrationInformation]:
             try:
                 cal_blob = io.read_cal_file(str(cal_path))
             except json.JSONDecodeError:
-                log.error(f"Corrupt calibration file (bad JSON): {str(cal_path)}")
+                log.error(
+                    f"Skipping corrupt calibration file (bad JSON): {str(cal_path)}")
                 continue
             calibration = _format_calibration_type(cal_blob)  # type: ignore
             try:
@@ -85,7 +86,8 @@ def get_all_calibrations() -> typing.List[local_types.CalibrationInformation]:
                         labware_id=key,
                         uri=data['uri']))
             except (KeyError, ValueError):
-                log.exception("Corrupt calibration file (bad data)")
+                log.exception(
+                    f"Skipping corrupt calibration file (bad data) {str(cal_path)}")
                 continue
     return all_calibrations
 
@@ -182,7 +184,8 @@ def get_all_tip_length_calibrations() \
             try:
                 data = io.read_cal_file(str(cal_path))
             except json.JSONDecodeError:
-                log.error(f"corrupt calibration file (bad json): {str(cal_path)}")
+                log.error(
+                    f"Skipping corrupt calibration file (bad json): {str(cal_path)}")
                 continue
             for tiprack, info in data.items():
                 all_calibrations.append(
@@ -229,7 +232,8 @@ def get_robot_deck_attitude() \
         try:
             data = io.read_cal_file(gantry_path)
         except json.JSONDecodeError:
-            log.error(f"corrupt calibration file (bad json): {str(gantry_path)}")
+            log.error(
+                f"Skipping corrupt calibration file (bad json): {str(gantry_path)}")
             return None
         try:
             return local_types.DeckCalibration(
@@ -255,7 +259,8 @@ def get_pipette_offset(
         try:
             data = io.read_cal_file(offset_path)
         except json.JSONDecodeError:
-            log.error(f"corrupt calibration file (bad json): {str(offset_path)}")
+            log.error(
+                f"Skipping corrupt calibration file (bad json): {str(offset_path)}")
             return None
         assert 'offset' in data.keys(), 'Not valid pipette calibration data'
         return local_types.PipetteOffsetByPipetteMount(
@@ -292,7 +297,9 @@ def get_all_pipette_offset_calibrations() \
                 try:
                     data = io.read_cal_file(str(cal_path))
                 except json.JSONDecodeError:
-                    log.error(f"corrupt calibration file (bad json): {str(cal_path)}")
+                    log.error(
+                        "Skipping corrupt calibration file (bad json): "
+                        + f"{str(cal_path)}")
                     continue
                 try:
                     all_calibrations.append(
@@ -306,7 +313,9 @@ def get_all_pipette_offset_calibrations() \
                             source=_get_calibration_source(data),
                             status=_get_calibration_status(data)))
                 except (KeyError, ValueError):
-                    log.exception("corrupt calibration file (bad data)")
+                    log.exception(
+                        "Skipping corrupt calibration file (bad data): "
+                        + f"{str(cal_path)}")
                     continue
     return all_calibrations
 
