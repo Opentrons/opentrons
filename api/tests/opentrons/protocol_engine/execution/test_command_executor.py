@@ -128,7 +128,7 @@ async def test_execute(
             createdAt=datetime(year=2021, month=1, day=1),
             startedAt=datetime(year=2022, month=2, day=2),
             completedAt=datetime(year=2023, month=3, day=3),
-            status=CommandStatus.EXECUTED,
+            status=CommandStatus.SUCCEEDED,
             data=command_data,
             result=command_result,
         ),
@@ -153,7 +153,7 @@ async def test_execute(
     decoy.when(
         command_mapper.update_command(
             command=running_command,
-            status=CommandStatus.EXECUTED,
+            status=CommandStatus.SUCCEEDED,
             completedAt=datetime(year=2023, month=3, day=3),
             result=command_result,
             error=None,

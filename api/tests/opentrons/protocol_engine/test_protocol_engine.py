@@ -127,7 +127,7 @@ async def test_execute_command_by_id(
 
     executed_command = commands.LoadPipette(
         id="command-id",
-        status=CommandStatus.EXECUTED,
+        status=CommandStatus.SUCCEEDED,
         createdAt=datetime(year=2021, month=1, day=1),
         startedAt=started_at,
         completedAt=completed_at,
@@ -197,7 +197,7 @@ async def test_execute_command(
 
     executed_command = commands.LoadPipette(
         id="command-id",
-        status=commands.CommandStatus.EXECUTED,
+        status=commands.CommandStatus.SUCCEEDED,
         createdAt=created_at,
         startedAt=created_at,
         completedAt=completed_at,

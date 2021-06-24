@@ -42,7 +42,7 @@ class CommandExecutor:
 
         result = None
         error = None
-        status = CommandStatus.EXECUTED
+        status = CommandStatus.SUCCEEDED
 
         try:
             log.debug(f"Executing {command.id}, {command.commandType}, {command.data}")

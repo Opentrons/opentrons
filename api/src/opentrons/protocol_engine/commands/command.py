@@ -21,7 +21,7 @@ class CommandStatus(str, Enum):
 
     QUEUED = "queued"
     RUNNING = "running"
-    EXECUTED = "executed"
+    SUCCEEDED = "succeeded"
     FAILED = "failed"
 
 
@@ -77,9 +77,6 @@ class BaseCommand(GenericModel, Generic[CommandDataT, CommandResultT]):
         None,
         description="Command execution completed timestamp, if completed",
     )
-
-
-CommandT = TypeVar("CommandT", bound=BaseCommand)
 
 
 class AbstractCommandImpl(

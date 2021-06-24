@@ -16,8 +16,10 @@ class CommandMapper:
         created_at: datetime,
     ) -> Command:
         """Map a CommandRequest instance to a full command."""
-        # NOTE(mc, 2021-06-22): mypy has trouble with this automatic
-        # request > command routing, but behavior is covered by unit tests
+        # TODO(mc, 2021-06-22): mypy has trouble with this automatic
+        # request > command mapping, figure out how to type precisely
+        # (or wait for a future mypy version that can figure it out).
+        # For now, unit tests cover mapping every request type
         return request._CommandCls(
             id=command_id,
             createdAt=created_at,
@@ -27,5 +29,9 @@ class CommandMapper:
 
     @staticmethod
     def update_command(command: Command, **update: Any) -> Command:
-        """Map a Command to a new Command instance with a different status."""
+        """Map a Command to a new Command instance with updated field values.
+
+        This is a thin wrapper around `BaseModel.copy`, but it ensures that
+        all updates to commands happen immutably.
+        """
         return command.copy(update=update)

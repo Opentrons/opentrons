@@ -80,7 +80,6 @@ class ChildThreadTransport(AbstractSyncTransport):
             # rather than a string
             raise ProtocolEngineError(command.error)
 
-        if command.result is None:
-            raise ValueError(f"Missing result in {command}; this is a bug")
+        assert command.result is not None, f"Expected Command {command} to have result"
 
         return command.result

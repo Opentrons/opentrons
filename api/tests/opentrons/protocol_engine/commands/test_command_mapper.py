@@ -174,7 +174,7 @@ def test_update_command_timestamps() -> None:
 
     result = subject.update_command(
         command=command,
-        status=commands.CommandStatus.EXECUTED,
+        status=commands.CommandStatus.SUCCEEDED,
         startedAt=datetime(year=2021, month=1, day=1, hour=1, minute=1),
         completedAt=datetime(year=2021, month=2, day=2, hour=2, minute=2),
         result=command_result,
@@ -183,7 +183,7 @@ def test_update_command_timestamps() -> None:
     assert result == commands.MoveToWell(
         id=command_id,
         createdAt=created_at,
-        status=commands.CommandStatus.EXECUTED,
+        status=commands.CommandStatus.SUCCEEDED,
         data=data,
         result=command_result,
         startedAt=datetime(year=2021, month=1, day=1, hour=1, minute=1),

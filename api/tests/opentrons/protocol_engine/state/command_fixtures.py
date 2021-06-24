@@ -76,7 +76,7 @@ def create_completed_command(
             id=command_id,
             createdAt=datetime(year=2021, month=1, day=1),
             commandType=command_type,
-            status=cmd.CommandStatus.EXECUTED,
+            status=cmd.CommandStatus.SUCCEEDED,
             data=data or BaseModel(),
             result=result or BaseModel(),
         ),
@@ -106,7 +106,7 @@ def create_load_labware_command(
 
     return cmd.LoadLabware(
         id="command-id",
-        status=cmd.CommandStatus.EXECUTED,
+        status=cmd.CommandStatus.SUCCEEDED,
         createdAt=datetime.now(),
         data=data,
         result=result,
@@ -127,7 +127,7 @@ def create_add_definition_command(
 
     return cmd.AddLabwareDefinition(
         id="command-id",
-        status=cmd.CommandStatus.EXECUTED,
+        status=cmd.CommandStatus.SUCCEEDED,
         createdAt=datetime.now(),
         data=data,
         result=result,
@@ -145,7 +145,7 @@ def create_load_pipette_command(
 
     return cmd.LoadPipette(
         id="command-id",
-        status=cmd.CommandStatus.EXECUTED,
+        status=cmd.CommandStatus.SUCCEEDED,
         createdAt=datetime.now(),
         data=data,
         result=result,
@@ -171,7 +171,7 @@ def create_aspirate_command(
 
     return cmd.Aspirate(
         id="command-id",
-        status=cmd.CommandStatus.EXECUTED,
+        status=cmd.CommandStatus.SUCCEEDED,
         createdAt=datetime.now(),
         data=data,
         result=result,
@@ -197,7 +197,7 @@ def create_dispense_command(
 
     return cmd.Dispense(
         id="command-id",
-        status=cmd.CommandStatus.EXECUTED,
+        status=cmd.CommandStatus.SUCCEEDED,
         createdAt=datetime.now(),
         data=data,
         result=result,
@@ -220,7 +220,7 @@ def create_pick_up_tip_command(
 
     return cmd.PickUpTip(
         id="command-id",
-        status=cmd.CommandStatus.EXECUTED,
+        status=cmd.CommandStatus.SUCCEEDED,
         createdAt=datetime.now(),
         data=data,
         result=result,
@@ -243,7 +243,7 @@ def create_drop_tip_command(
 
     return cmd.DropTip(
         id="command-id",
-        status=cmd.CommandStatus.EXECUTED,
+        status=cmd.CommandStatus.SUCCEEDED,
         createdAt=datetime.now(),
         data=data,
         result=result,
@@ -266,7 +266,7 @@ def create_move_to_well_command(
 
     return cmd.MoveToWell(
         id="command-id",
-        status=cmd.CommandStatus.EXECUTED,
+        status=cmd.CommandStatus.SUCCEEDED,
         createdAt=datetime.now(),
         data=data,
         result=result,

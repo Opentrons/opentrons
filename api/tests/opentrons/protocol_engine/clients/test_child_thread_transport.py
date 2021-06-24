@@ -47,7 +47,7 @@ async def test_execute_command(
     ).then_return(
         commands.MoveToWell(
             id="cmd-id",
-            status=commands.CommandStatus.EXECUTED,
+            status=commands.CommandStatus.SUCCEEDED,
             data=cmd_data,
             result=cmd_result,
             createdAt=datetime.now(),
