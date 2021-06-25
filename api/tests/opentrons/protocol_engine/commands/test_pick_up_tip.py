@@ -20,7 +20,7 @@ async def test_pick_up_tip_implementation(
     movement: MovementHandler,
     pipetting: PipettingHandler,
 ) -> None:
-    """A PickUpTipRequest should have an execution implementation."""
+    """A PickUpTip command should have an execution implementation."""
     subject = PickUpTipImplementation(
         equipment=equipment,
         movement=movement,

@@ -20,7 +20,8 @@ from opentrons.protocol_engine.types import (
     [
         (
             commands.AddLabwareDefinitionData.construct(
-                definition=cast(LabwareDefinition, {"mockDefintion": True})
+                # TODO(mc, 2021-06-25): do not mock out LabwareDefinition
+                definition=cast(LabwareDefinition, {"mockDefinition": True})
             ),
             commands.AddLabwareDefinitionRequest,
             commands.AddLabwareDefinition,
@@ -154,7 +155,7 @@ def test_update_command_status() -> None:
 
 
 def test_update_command_timestamps() -> None:
-    """It should update a command status."""
+    """It should update a command fields like status and timestamps."""
     subject = commands.CommandMapper()
     command_id = "command-id"
     created_at = datetime(year=2021, month=1, day=1, hour=1, minute=1)

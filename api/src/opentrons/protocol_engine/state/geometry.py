@@ -172,7 +172,7 @@ class GeometryView:
         pipette_config: PipetteDict,
     ) -> WellLocation:
         """Get tip drop location given labware and hardware pipette."""
-        # return to top if labware is fixed trash=
+        # return to top if labware is fixed trash
         is_fixed_trash = self._labware.get_labware_has_quirk(
             labware_id=labware_id,
             quirk="fixedTrash",

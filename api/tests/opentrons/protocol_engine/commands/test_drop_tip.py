@@ -14,13 +14,13 @@ from opentrons.protocol_engine.commands.drop_tip import (
 )
 
 
-async def test_pick_up_tip_implementation(
+async def test_drop_tip_implementation(
     decoy: Decoy,
     equipment: EquipmentHandler,
     movement: MovementHandler,
     pipetting: PipettingHandler,
 ) -> None:
-    """A DropTipRequest should have an execution implementation."""
+    """A DropTip command should have an execution implementation."""
     subject = DropTipImplementation(
         equipment=equipment,
         movement=movement,

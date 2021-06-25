@@ -20,7 +20,7 @@ async def test_move_to_well_implementation(
     movement: MovementHandler,
     pipetting: PipettingHandler,
 ) -> None:
-    """A MoveToWellRequest should have an execution implementation."""
+    """A MoveToWell command should have an execution implementation."""
     subject = MoveToWellImplementation(
         equipment=equipment,
         movement=movement,

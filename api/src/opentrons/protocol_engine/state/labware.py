@@ -74,7 +74,7 @@ class LabwareStore(Substore[LabwareState], CommandReactive):
         )
 
     def handle_command(self, command: Command) -> None:
-        """Modify state in reaction to a completed command."""
+        """Modify state in reaction to a command."""
         if isinstance(command.result, LoadLabwareResult):
             uri = uri_from_details(
                 namespace=command.result.definition.namespace,

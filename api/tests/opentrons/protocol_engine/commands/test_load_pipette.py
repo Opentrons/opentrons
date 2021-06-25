@@ -23,7 +23,7 @@ async def test_load_pipette_implementation(
     movement: MovementHandler,
     pipetting: PipettingHandler,
 ) -> None:
-    """A LoadPipetteRequest should have an execution implementation."""
+    """A LoadPipette command should have an execution implementation."""
     subject = LoadPipetteImplementation(
         equipment=equipment,
         movement=movement,
