@@ -22,6 +22,8 @@ Start a terminal and change directory to the root of this repo.
 
 3. Start the Opentrons application. The docker container will appear as `dev`. Connect and run just as you would on a robot.
 
+If `dev` does not appear you should click `More` on the bottom left. Then select `Network & System`. Now click `Manage` and add `127.0.0.1` to the `Manually Add Robot Network Address` dialog.
+
 ## Configuration
 
 ### Pipettes
