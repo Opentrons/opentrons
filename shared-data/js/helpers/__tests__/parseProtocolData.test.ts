@@ -64,7 +64,7 @@ describe('validateJsonProtocolFileContents', () => {
   it('should call handleError with INVALID_JSON_FILE if json is not parseable', () => {
     const parseSpy = jest.spyOn(JSON, 'parse')
     parseSpy.mockImplementation(() => {
-      throw 'not parseable as JSON'
+      throw new Error('not parseable as JSON')
     })
     validateJsonProtocolFileContents('[]', handleError)
     expect(handleError).toBeCalledWith('INVALID_JSON_FILE', {

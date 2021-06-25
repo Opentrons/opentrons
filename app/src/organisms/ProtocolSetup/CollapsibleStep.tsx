@@ -31,7 +31,7 @@ export function CollapsibleStep({
   label,
   toggleExpanded,
   children,
-}: CollapsibleStepProps) {
+}: CollapsibleStepProps): JSX.Element {
   return (
     <Flex flexDirection={DIRECTION_COLUMN} paddingX={SPACING_3}>
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} onClick={toggleExpanded}>

@@ -1,8 +1,7 @@
 import * as React from 'react'
-import { AlertItem } from '@opentrons/components'
+import { AlertItem, Text, Box, C_NEAR_WHITE } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
-import { Text, Box, C_NEAR_WHITE } from '@opentrons/components'
 import { Page } from '../../atoms/Page'
 import { UploadInput } from './UploadInput'
 import { ProtocolSetup } from '../ProtocolSetup'
@@ -32,7 +31,7 @@ export function ProtocolUpload(): JSX.Element {
   const protocolFile = useSelector((state: State) => getProtocolFile(state))
   const protocolName = useSelector((state: State) => getProtocolName(state))
 
-  const clearError = () => {
+  const clearError = (): void => {
     setUploadErrorKey(null)
     setUploadSchemaError(null)
   }
@@ -45,6 +44,8 @@ export function ProtocolUpload(): JSX.Element {
         dispatch(loadProtocol(file, data))
       },
       (errorKey, errorDetails) => {
+        logger.warn(errorKey)
+        console.info(errorDetails)
         setUploadErrorKey(errorKey)
         setUploadSchemaError(errorDetails?.schemaErrors)
       }
@@ -79,8 +80,8 @@ export function ProtocolUpload(): JSX.Element {
         >
           {t(VALIDATION_ERROR_T_MAP[uploadErrorKey])}
           {uploadSchemaError != null &&
-            uploadSchemaError.map(errorObject => (
-              <Text>{JSON.stringify(errorObject)}</Text>
+            uploadSchemaError.map((errorObject, i) => (
+              <Text key={i}>{JSON.stringify(errorObject)}</Text>
             ))}
         </AlertItem>
       )}
