@@ -43,7 +43,6 @@ class CommandView:
 
     def get_command_by_id(self, command_id: str) -> Command:
         """Get a command by its unique identifier."""
-        # TODO(mc, 2021-06-17): raise on missing ID, to line up with other state views
         try:
             return self._state.commands_by_id[command_id]
         except KeyError:
