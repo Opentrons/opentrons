@@ -127,18 +127,18 @@ class SmoothieEmulator(AbstractEmulator):
         logger.info(f"Got command {command}")
 
         gcode_to_function_mapping = {
-            str(GCODE.HOMING_STATUS): self._get_homing_status,
-            str(GCODE.CURRENT_POSITION): self._get_current_position,
-            str(GCODE.VERSION): self._get_version,
-            str(GCODE.READ_INSTRUMENT_ID): self._get_pipette_id,
-            str(GCODE.READ_INSTRUMENT_MODEL): self._get_pipette_model,
-            str(GCODE.WRITE_INSTRUMENT_ID): self._set_pipette_id,
-            str(GCODE.WRITE_INSTRUMENT_MODEL): self._set_pipette_model,
-            str(GCODE.MOVE): self._move_gantry,
-            str(GCODE.HOME): self._home_gantry,
+            GCODE.HOMING_STATUS.value: self._get_homing_status,
+            GCODE.CURRENT_POSITION.value: self._get_current_position,
+            GCODE.VERSION.value: self._get_version,
+            GCODE.READ_INSTRUMENT_ID.value: self._get_pipette_id,
+            GCODE.READ_INSTRUMENT_MODEL.value: self._get_pipette_model,
+            GCODE.WRITE_INSTRUMENT_ID.value: self._set_pipette_id,
+            GCODE.WRITE_INSTRUMENT_MODEL.value: self._set_pipette_model,
+            GCODE.MOVE.value: self._move_gantry,
+            GCODE.HOME.value: self._home_gantry,
         }
-
-        return gcode_to_function_mapping[command.gcode](command)
+        func_to_run = gcode_to_function_mapping.get(command.gcode)
+        return None if func_to_run is None else func_to_run(command)
 
     @staticmethod
     def _mount_strings(command: Command) -> Dict[str, str]:
