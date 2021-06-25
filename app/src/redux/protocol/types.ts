@@ -55,7 +55,7 @@ export interface CloseProtocolAction {
 
 export interface InvalidProtocolFileAction {
   type: 'protocol:INVALID_FILE'
-  payload: { file?: ProtocolFile; message: string }
+  payload: { file: ProtocolFile; message: string }
 }
 
 export type ProtocolAction =
@@ -71,6 +71,4 @@ export interface ProtocolState {
   readonly file: ProtocolFile | null
   readonly contents: string | null
   readonly data: ProtocolData | null
-  readonly parseError: string | null
-  readonly schemaError: string | null
 }
