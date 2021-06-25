@@ -58,6 +58,18 @@ class SmoothieEmulator(AbstractEmulator):
         }
         self._parser = parser
 
+        self._gcode_to_function_mapping = {
+            GCODE.HOMING_STATUS.value: self._get_homing_status,
+            GCODE.CURRENT_POSITION.value: self._get_current_position,
+            GCODE.VERSION.value: self._get_version,
+            GCODE.READ_INSTRUMENT_ID.value: self._get_pipette_id,
+            GCODE.READ_INSTRUMENT_MODEL.value: self._get_pipette_model,
+            GCODE.WRITE_INSTRUMENT_ID.value: self._set_pipette_id,
+            GCODE.WRITE_INSTRUMENT_MODEL.value: self._set_pipette_model,
+            GCODE.MOVE.value: self._move_gantry,
+            GCODE.HOME.value: self._home_gantry,
+        }
+
     def handle(self, line: str) -> Optional[str]:
         """Handle a line"""
         results = (self._handle(c) for c in self._parser.parse(line))
@@ -125,19 +137,7 @@ class SmoothieEmulator(AbstractEmulator):
     def _handle(self, command: Command) -> Optional[str]:
         """Handle a command."""
         logger.info(f"Got command {command}")
-
-        gcode_to_function_mapping = {
-            GCODE.HOMING_STATUS.value: self._get_homing_status,
-            GCODE.CURRENT_POSITION.value: self._get_current_position,
-            GCODE.VERSION.value: self._get_version,
-            GCODE.READ_INSTRUMENT_ID.value: self._get_pipette_id,
-            GCODE.READ_INSTRUMENT_MODEL.value: self._get_pipette_model,
-            GCODE.WRITE_INSTRUMENT_ID.value: self._set_pipette_id,
-            GCODE.WRITE_INSTRUMENT_MODEL.value: self._set_pipette_model,
-            GCODE.MOVE.value: self._move_gantry,
-            GCODE.HOME.value: self._home_gantry,
-        }
-        func_to_run = gcode_to_function_mapping.get(command.gcode)
+        func_to_run = self._gcode_to_function_mapping.get(command.gcode)
         return None if func_to_run is None else func_to_run(command)
 
     @staticmethod
