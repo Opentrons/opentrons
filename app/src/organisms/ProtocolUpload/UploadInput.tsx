@@ -102,7 +102,12 @@ export function UploadInput(props: UploadInputProps): JSX.Element {
     : DROP_ZONE_STYLES
 
   return (
-    <Flex height="100%" flexDirection={DIRECTION_COLUMN} justifyContent={JUSTIFY_CENTER} alignItems={ALIGN_CENTER}>
+    <Flex
+      height="100%"
+      flexDirection={DIRECTION_COLUMN}
+      justifyContent={JUSTIFY_CENTER}
+      alignItems={ALIGN_CENTER}
+    >
       <Text as="h1" css={FONT_HEADER_DARK} marginBottom={SPACING_3}>
         {t('open_a_protocol')}
       </Text>

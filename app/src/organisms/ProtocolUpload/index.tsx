@@ -2,11 +2,7 @@ import * as React from 'react'
 import { AlertItem } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
-import {
-  Text,
-  Box,
-  C_NEAR_WHITE,
-} from '@opentrons/components'
+import { Text, Box, C_NEAR_WHITE } from '@opentrons/components'
 import { Page } from '../../atoms/Page'
 import { UploadInput } from './UploadInput'
 import { ProtocolSetup } from '../ProtocolSetup'
@@ -16,49 +12,62 @@ import { ingestProtocolFile } from '../../redux/protocol/utils'
 
 import { useLogger } from '../../logger'
 import type { ErrorObject } from 'ajv'
-import type { Dispatch, State} from '../../redux/types'
+import type { Dispatch, State } from '../../redux/types'
 
-const VALIDATION_ERROR_T_MAP: {[errorKey: string]: string}= {
+const VALIDATION_ERROR_T_MAP: { [errorKey: string]: string } = {
   INVALID_FILE_TYPE: 'invalid_file_type',
-  INVALID_JSON_FILE: 'invalid_json_file'
+  INVALID_JSON_FILE: 'invalid_json_file',
 }
 
 export function ProtocolUpload(): JSX.Element {
   const { t } = useTranslation(['protocol_info', 'shared'])
   const dispatch = useDispatch<Dispatch>()
   const logger = useLogger(__filename)
-  const [uploadErrorKey, setUploadErrorKey] = React.useState<string | null>(null)
-  const [uploadSchemaError, setUploadSchemaError] = React.useState<ErrorObject[] | null | undefined>(null)
+  const [uploadErrorKey, setUploadErrorKey] = React.useState<string | null>(
+    null
+  )
+  const [uploadSchemaError, setUploadSchemaError] = React.useState<
+    ErrorObject[] | null | undefined
+  >(null)
   const protocolFile = useSelector((state: State) => getProtocolFile(state))
   const protocolName = useSelector((state: State) => getProtocolName(state))
 
-  const clearError  = () => {
+  const clearError = () => {
     setUploadErrorKey(null)
     setUploadSchemaError(null)
   }
 
   const createSession = (file: File): void => {
     clearError()
-    ingestProtocolFile(file, (data) => {
-      dispatch(loadProtocol(file, data))
-    }, (errorKey, errorDetails) => {
-      setUploadErrorKey(errorKey)
-      setUploadSchemaError(errorDetails?.schemaErrors)
-    })
+    ingestProtocolFile(
+      file,
+      data => {
+        dispatch(loadProtocol(file, data))
+      },
+      (errorKey, errorDetails) => {
+        setUploadErrorKey(errorKey)
+        setUploadSchemaError(errorDetails?.schemaErrors)
+      }
+    )
   }
 
-  const handleCloseProtocol: React.MouseEventHandler = (_event) => {
+  const handleCloseProtocol: React.MouseEventHandler = _event => {
     dispatch(closeProtocol())
   }
 
-  const titleBarProps = protocolFile !== null
-    ? {
-      title: t('protocol_title', {protocol_name: protocolName}),
-      back: { onClick: handleCloseProtocol, title: t('shared:close'), children: t('shared:close') },
-    }
-    : {
-      title: t('upload_and_simulate'),
-    }
+  const titleBarProps =
+    protocolFile !== null
+      ? {
+          title: t('protocol_title', { protocol_name: protocolName }),
+          back: {
+            onClick: handleCloseProtocol,
+            title: t('shared:close'),
+            children: t('shared:close'),
+          },
+        }
+      : {
+          title: t('upload_and_simulate'),
+        }
 
   return (
     <Page titleBarProps={titleBarProps}>
@@ -69,10 +78,10 @@ export function ProtocolUpload(): JSX.Element {
           title={t('protocol_upload_failed')}
         >
           {t(VALIDATION_ERROR_T_MAP[uploadErrorKey])}
-          {uploadSchemaError != null && uploadSchemaError.map(errorObject =>
-            <Text>
-              {JSON.stringify(errorObject)}
-            </Text>)}
+          {uploadSchemaError != null &&
+            uploadSchemaError.map(errorObject => (
+              <Text>{JSON.stringify(errorObject)}</Text>
+            ))}
         </AlertItem>
       )}
       <Box
@@ -80,10 +89,11 @@ export function ProtocolUpload(): JSX.Element {
         width="100%"
         backgroundColor={C_NEAR_WHITE}
       >
-        { protocolFile !== null
-          ? <ProtocolSetup />
-          : <UploadInput createSession={createSession} />
-        }
+        {protocolFile !== null ? (
+          <ProtocolSetup />
+        ) : (
+          <UploadInput createSession={createSession} />
+        )}
       </Box>
     </Page>
   )
