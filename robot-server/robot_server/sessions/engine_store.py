@@ -3,7 +3,7 @@ from typing import Optional
 
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.file_runner import AbstractFileRunner, ProtocolFile, create_file_runner
-from opentrons.protocol_engine import ProtocolEngine
+from opentrons.protocol_engine import ProtocolEngine, create_protocol_engine
 from robot_server.protocols import ProtocolResource
 
 
@@ -74,7 +74,7 @@ class EngineStore:
         # check intentionally to avoid a race condition where `self._engine` is
         # set after the check but before the engine has finished getting created,
         # at the expense of having to potentially throw away an engine instance
-        engine = await ProtocolEngine.create(hardware=self._hardware_api)
+        engine = await create_protocol_engine(hardware=self._hardware_api)
         runner = None
 
         if self._engine is not None:

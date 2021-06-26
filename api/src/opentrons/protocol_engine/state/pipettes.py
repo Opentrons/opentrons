@@ -10,7 +10,7 @@ from .. import errors
 from ..types import PipetteName, DeckLocation
 
 from ..commands import (
-    CompletedCommandType,
+    Command,
     LoadPipetteResult,
     AspirateResult,
     DispenseResult,
@@ -59,7 +59,7 @@ class PipetteStore(Substore[PipetteState], CommandReactive):
             current_location=None,
         )
 
-    def handle_completed_command(self, command: CompletedCommandType) -> None:
+    def handle_command(self, command: Command) -> None:
         """Modify state in reaction to a completed command."""
         if isinstance(
             command.result,
@@ -74,9 +74,9 @@ class PipetteStore(Substore[PipetteState], CommandReactive):
             self._state = replace(
                 self._state,
                 current_location=DeckLocation(
-                    pipette_id=command.request.pipetteId,
-                    labware_id=command.request.labwareId,
-                    well_name=command.request.wellName,
+                    pipette_id=command.data.pipetteId,
+                    labware_id=command.data.labwareId,
+                    well_name=command.data.wellName,
                 ),
             )
 
@@ -86,8 +86,8 @@ class PipetteStore(Substore[PipetteState], CommandReactive):
             aspirated_volume_by_id = self._state.aspirated_volume_by_id.copy()
 
             pipettes_by_id[pipette_id] = PipetteData(
-                pipette_name=command.request.pipetteName,
-                mount=command.request.mount,
+                pipette_name=command.data.pipetteName,
+                mount=command.data.mount,
             )
             aspirated_volume_by_id[pipette_id] = 0
 
@@ -98,7 +98,7 @@ class PipetteStore(Substore[PipetteState], CommandReactive):
             )
 
         elif isinstance(command.result, AspirateResult):
-            pipette_id = command.request.pipetteId
+            pipette_id = command.data.pipetteId
             aspirated_volume_by_id = self._state.aspirated_volume_by_id.copy()
 
             previous_volume = self._state.aspirated_volume_by_id[pipette_id]
@@ -111,7 +111,7 @@ class PipetteStore(Substore[PipetteState], CommandReactive):
             )
 
         elif isinstance(command.result, DispenseResult):
-            pipette_id = command.request.pipetteId
+            pipette_id = command.data.pipetteId
             aspirated_volume_by_id = self._state.aspirated_volume_by_id.copy()
 
             previous_volume = self._state.aspirated_volume_by_id[pipette_id]

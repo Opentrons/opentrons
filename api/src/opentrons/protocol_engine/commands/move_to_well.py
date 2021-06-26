@@ -1,36 +1,56 @@
 """Move to well command request, result, and implementation models."""
 from __future__ import annotations
 from pydantic import BaseModel
+from typing import Optional, Type
+from typing_extensions import Literal
 
-from .command import CommandImplementation, CommandHandlers
-from .pipetting_common import BasePipettingRequest
-
-
-class MoveToWellRequest(BasePipettingRequest):
-    """A request to move a pipette to a specific well."""
-
-    def get_implementation(self) -> MoveToWellImplementation:
-        """Get the move to well request's command implementation."""
-        return MoveToWellImplementation(self)
+from .pipetting_common import BasePipettingData
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandRequest
 
 
-class MoveToWellResult(BaseModel):
-    """Result data from the execution of a MoveToWellRequest."""
+MoveToWellCommandType = Literal["moveToWell"]
+
+
+class MoveToWellData(BasePipettingData):
+    """Data required to move a pipette to a specific well."""
 
     pass
 
 
-class MoveToWellImplementation(
-    CommandImplementation[MoveToWellRequest, MoveToWellResult]
-):
+class MoveToWellResult(BaseModel):
+    """Result data from the execution of a MoveToWell command."""
+
+    pass
+
+
+class MoveToWellImplementation(AbstractCommandImpl[MoveToWellData, MoveToWellResult]):
     """Move to well command implementation."""
 
-    async def execute(self, handlers: CommandHandlers) -> MoveToWellResult:
+    async def execute(self, data: MoveToWellData) -> MoveToWellResult:
         """Move the requested pipette to the requested well."""
-        await handlers.movement.move_to_well(
-            pipette_id=self._request.pipetteId,
-            labware_id=self._request.labwareId,
-            well_name=self._request.wellName,
+        await self._movement.move_to_well(
+            pipette_id=data.pipetteId,
+            labware_id=data.labwareId,
+            well_name=data.wellName,
         )
 
         return MoveToWellResult()
+
+
+class MoveToWell(BaseCommand[MoveToWellData, MoveToWellResult]):
+    """Move to well command model."""
+
+    commandType: MoveToWellCommandType = "moveToWell"
+    data: MoveToWellData
+    result: Optional[MoveToWellResult]
+
+    _ImplementationCls: Type[MoveToWellImplementation] = MoveToWellImplementation
+
+
+class MoveToWellRequest(BaseCommandRequest[MoveToWellData]):
+    """Move to well command creation request model."""
+
+    commandType: MoveToWellCommandType = "moveToWell"
+    data: MoveToWellData
+
+    _CommandCls: Type[MoveToWell] = MoveToWell

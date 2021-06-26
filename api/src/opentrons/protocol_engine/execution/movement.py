@@ -3,23 +3,27 @@ from typing import Optional
 from opentrons.hardware_control.api import API as HardwareAPI
 
 from ..types import DeckLocation, WellLocation
-from ..state import StateView
+from ..state import StateStore, StateView
 
 
 class MovementHandler:
     """Implementation logic for gantry movement."""
 
-    _state: StateView
+    _state_store: StateStore
     _hardware: HardwareAPI
 
     def __init__(
         self,
-        state: StateView,
+        state_store: StateStore,
         hardware: HardwareAPI,
     ) -> None:
         """Initialize a MovementHandler instance."""
-        self._state = state
+        self._state_store = state_store
         self._hardware = hardware
+
+    @property
+    def _state(self) -> StateView:
+        return self._state_store.state_view
 
     async def move_to_well(
         self,
@@ -63,5 +67,5 @@ class MovementHandler:
             await self._hardware.move_to(
                 mount=hw_mount,
                 abs_position=wp.position,
-                critical_point=wp.critical_point
+                critical_point=wp.critical_point,
             )

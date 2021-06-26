@@ -1,7 +1,7 @@
 """Pipetting command handling."""
 from opentrons.hardware_control.api import API as HardwareAPI
 
-from ..state import StateView
+from ..state import StateStore, StateView
 from ..types import DeckLocation, WellLocation, WellOrigin
 from .movement import MovementHandler
 
@@ -9,20 +9,24 @@ from .movement import MovementHandler
 class PipettingHandler:
     """Implementation logic for liquid handling commands."""
 
-    _state: StateView
+    _state_store: StateStore
     _hardware: HardwareAPI
     _movement_handler: MovementHandler
 
     def __init__(
         self,
-        state: StateView,
+        state_store: StateStore,
         hardware: HardwareAPI,
         movement_handler: MovementHandler,
     ) -> None:
         """Initialize a PipettingHandler instance."""
-        self._state = state
+        self._state_store = state_store
         self._hardware = hardware
         self._movement_handler = movement_handler
+
+    @property
+    def _state(self) -> StateView:
+        return self._state_store.state_view
 
     async def pick_up_tip(
         self,
@@ -34,7 +38,7 @@ class PipettingHandler:
         # get mount and config data from state and hardware controller
         hw_pipette = self._state.pipettes.get_hardware_pipette(
             pipette_id=pipette_id,
-            attached_pipettes=self._hardware.attached_instruments
+            attached_pipettes=self._hardware.attached_instruments,
         )
 
         # use config data to get tip geometry (length, diameter, volume)
@@ -57,17 +61,17 @@ class PipettingHandler:
             tip_length=tip_geometry.effective_length,
             # TODO(mc, 2020-11-12): include these parameters in the request
             presses=None,
-            increment=None
+            increment=None,
         )
 
         # after a successful pickup, update the hardware controller state
         self._hardware.set_current_tiprack_diameter(
             mount=hw_pipette.mount,
-            tiprack_diameter=tip_geometry.diameter
+            tiprack_diameter=tip_geometry.diameter,
         )
         self._hardware.set_working_volume(
             mount=hw_pipette.mount,
-            tip_volume=tip_geometry.volume
+            tip_volume=tip_geometry.volume,
         )
 
     async def drop_tip(
@@ -80,7 +84,7 @@ class PipettingHandler:
         # get mount and config data from state and hardware controller
         hw_pipette = self._state.pipettes.get_hardware_pipette(
             pipette_id=pipette_id,
-            attached_pipettes=self._hardware.attached_instruments
+            attached_pipettes=self._hardware.attached_instruments,
         )
 
         # get the tip drop location
@@ -101,7 +105,7 @@ class PipettingHandler:
         await self._hardware.drop_tip(
             mount=hw_pipette.mount,
             # TODO(mc, 2020-11-12): include this parameter in the request
-            home_after=True
+            home_after=True,
         )
 
     async def aspirate(
@@ -116,7 +120,7 @@ class PipettingHandler:
         # get mount and config data from state and hardware controller
         hw_pipette = self._state.pipettes.get_hardware_pipette(
             pipette_id=pipette_id,
-            attached_pipettes=self._hardware.attached_instruments
+            attached_pipettes=self._hardware.attached_instruments,
         )
 
         ready_to_aspirate = self._state.pipettes.get_is_ready_to_aspirate(
@@ -141,7 +145,8 @@ class PipettingHandler:
             current_location = DeckLocation(
                 pipette_id=pipette_id,
                 labware_id=labware_id,
-                well_name=well_name)
+                well_name=well_name,
+            )
 
         await self._movement_handler.move_to_well(
             pipette_id=pipette_id,
@@ -166,7 +171,7 @@ class PipettingHandler:
         """Dispense liquid to a well."""
         hw_pipette = self._state.pipettes.get_hardware_pipette(
             pipette_id=pipette_id,
-            attached_pipettes=self._hardware.attached_instruments
+            attached_pipettes=self._hardware.attached_instruments,
         )
 
         await self._movement_handler.move_to_well(
