@@ -119,7 +119,7 @@ export const ModuleStatus = ({
   }
 }
 
-const ModuleTagComponent = (props: ModuleTagProps): React.ReactNode => {
+const ModuleTagComponent = (props: ModuleTagProps): JSX.Element | null => {
   const timelineFrame = useSelector(timelineFrameBeforeActiveItem)
   const moduleEntity = useSelector(stepFormSelectors.getModuleEntities)[
     props.id

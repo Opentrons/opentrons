@@ -221,6 +221,7 @@ describe('MultiSelectToolbar', () => {
       )
 
       act(() => {
+        // @ts-expect-error(sa, 2021-6-27): not sure wht TS not recognizing onContinueClick overload with no function parameter
         confirmDeleteModal.prop('onContinueClick')()
       })
       wrapper.update()
@@ -287,6 +288,7 @@ describe('MultiSelectToolbar', () => {
       expect(confirmDeleteModal.prop('modalType')).toBe(CLOSE_BATCH_EDIT_FORM)
 
       act(() => {
+        // @ts-expect-error(sa, 2021-6-27): not sure wht TS not recognizing onContinueClick overload with no function parameter
         confirmDeleteModal.prop('onContinueClick')()
       })
       wrapper.update()

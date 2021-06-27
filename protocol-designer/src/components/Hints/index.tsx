@@ -44,7 +44,7 @@ class HintsComponent extends React.Component<Props, State> {
     return () => this.props.removeHint(hintKey, rememberDismissal)
   }
 
-  renderHintContents = (hintKey: HintKey): React.ReactNode => {
+  renderHintContents = (hintKey: HintKey): JSX.Element | null => {
     // Only hints that have no outside effects should go here.
     // For hints that have an effect, use BlockingHint.
     switch (hintKey) {

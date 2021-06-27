@@ -14,7 +14,7 @@ interface DragPreviewProps {
   getRobotCoordsFromDOMCoords: RobotWorkSpaceRenderProps['getRobotCoordsFromDOMCoords']
 }
 
-const LabwareDragPreview = (props: DragPreviewProps): React.ReactNode => {
+const LabwareDragPreview = (props: DragPreviewProps): JSX.Element | null => {
   const {
     item,
     itemType,

@@ -55,7 +55,7 @@ class WellSelectionInputComponent extends React.Component<Props> {
     onClose()
   }
 
-  getModalKey = (): React.Key => {
+  getModalKey = (): string => {
     const { name, pipetteId, labwareId, stepId } = this.props
     return `${String(stepId)}${name}${pipetteId || 'noPipette'}${
       labwareId || 'noLabware'

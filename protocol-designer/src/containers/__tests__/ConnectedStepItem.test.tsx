@@ -108,8 +108,8 @@ describe('ConnectedStepItem', () => {
   let store: any
   beforeEach(() => {
     store = mockStore()
-
-    UAParser.mockImplementation(() => {
+    // @ts-expect-error(sa, 2021-6-27): missing parameters from UA Parser constructor return type
+    mockUAParser.mockImplementation(() => {
       return {
         getOS: () => ({ name: 'Mac OS', version: 'mockVersion' }),
       }
@@ -658,7 +658,7 @@ describe('ConnectedStepItem', () => {
           ...mockClickEvent,
           metaKey: true,
         }
-
+        // @ts-expect-error(sa, 2021-6-27): missing parameters from UA Parser constructor return type
         mockUAParser.mockImplementation(() => {
           return {
             getOS: () => ({ name: 'NOT Mac OS', version: 'mockVersion' }),
@@ -752,6 +752,7 @@ describe('ConnectedStepItem', () => {
         ({ name, props, clickEvent, setupMocks, expectedAction }) => {
           it(name, () => {
             setupMocks && setupMocks()
+            // @ts-expect-error(sa, 2021-6-27): missing parameters from UA Parser constructor return type
             mockUAParser.mockImplementation(() => {
               return {
                 getOS: () => ({
@@ -781,7 +782,7 @@ describe('ConnectedStepItem', () => {
           ...mockClickEvent,
           ctrlKey: true,
         }
-
+        // @ts-expect-error(sa, 2021-6-27): missing parameters from UA Parser constructor return type
         mockUAParser.mockImplementation(() => {
           return {
             getOS: () => ({ name: 'Mac OS', version: 'mockVersion' }),
@@ -854,6 +855,7 @@ describe('ConnectedStepItem', () => {
         ({ name, props, clickEvent, setupMocks, expectedAction }) => {
           it(name, () => {
             setupMocks && setupMocks()
+            // @ts-expect-error(sa, 2021-6-27): missing parameters from UA Parser constructor return type
             mockUAParser.mockImplementation(() => {
               return {
                 getOS: () => ({

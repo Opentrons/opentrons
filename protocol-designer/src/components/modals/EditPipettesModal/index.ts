@@ -88,7 +88,6 @@ const makeUpdatePipettes = (
       if (pipetteId) {
         // update used pipette list
         usedPrevPipettes.push(pipetteId)
-        // @ts-expect-error (ce, 2021-06-23) TS is not picking up types from `...newPipette` (IDE is)
         nextPipettes[pipetteId] = { ...newPipette, id: pipetteId }
       } else {
         const newId = uuid()

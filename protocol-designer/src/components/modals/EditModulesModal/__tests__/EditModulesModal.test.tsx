@@ -14,6 +14,7 @@ import {
   getMockDeckSetup,
   getMockMagneticModule,
   getMockTemperatureModule,
+  // @ts-expect-error(sa, 2021-6-27): TODO: add another ts config for /fixtures, or move them into src
 } from '../../../../../fixtures/state/deck'
 import {
   actions as stepFormActions,

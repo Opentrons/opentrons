@@ -16,7 +16,7 @@ export interface OverlayProps {
  */
 export function Overlay(props: OverlayProps): JSX.Element {
   const { alertOverlay, onClick } = props
-
+  // @ts-expect-error(sa, 2021-6-23): cast value to boolean
   const className = cx(styles.overlay, {
     [styles.clickable]: onClick,
     [styles.alert_modal_overlay]: alertOverlay,

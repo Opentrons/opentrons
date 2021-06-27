@@ -57,7 +57,7 @@ export const ProfileCycleRow = (props: ProfileCycleRowProps): JSX.Element => {
   }
 
   // TODO IMMEDIATELY make conditional
-  const deleteProfileCycle = (): void =>
+  const deleteProfileCycle = (): steplistActions.DeleteProfileCycleAction =>
     dispatch(steplistActions.deleteProfileCycle({ id: cycleItem.id }))
 
   const [

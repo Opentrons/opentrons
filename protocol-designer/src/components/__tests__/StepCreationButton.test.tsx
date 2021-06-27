@@ -141,6 +141,7 @@ describe('StepCreationButton', () => {
           labware: {},
           pipettes: {},
           modules: {
+            // @ts-expect-error(sa, 2021-6-27): not valid ModuleTemporalProperties type
             abcdef: {
               id: 'abcdef',
               model: TEMPERATURE_MODULE_V1,

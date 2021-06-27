@@ -21,6 +21,7 @@ import {
   HoverOnStepAction,
   HoverOnSubstepAction,
   ToggleStepCollapsedAction,
+  SelectMultipleStepsAction,
 } from '../ui/steps'
 import { selectors as fileDataSelectors } from '../file-data'
 

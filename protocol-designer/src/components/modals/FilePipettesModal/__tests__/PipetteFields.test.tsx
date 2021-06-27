@@ -13,6 +13,7 @@ import { getOnlyLatestDefs } from '../../../../labware-defs/utils'
 import { PipetteFields, Props } from '../PipetteFields'
 import { PipetteDiagram } from '../PipetteDiagram'
 import { FormPipette } from '../../../../step-forms'
+import { LabwareDefinition2 } from '../../../../../../shared-data/lib/js/types.d'
 
 jest.mock('../../../../feature-flags/selectors')
 jest.mock('../../../../labware-defs/selectors')
@@ -72,8 +73,8 @@ describe('PipetteFields', () => {
     }
 
     getOnlyLatestDefsMock.mockReturnValue({
-      tiprack_300: fixture_tiprack_300_ul,
-      tiprack_1000: fixture_tiprack_1000_ul,
+      tiprack_300: fixture_tiprack_300_ul as LabwareDefinition2,
+      tiprack_1000: fixture_tiprack_1000_ul as LabwareDefinition2,
     })
   })
 

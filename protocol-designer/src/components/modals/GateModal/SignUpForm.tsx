@@ -1,4 +1,5 @@
 import * as React from 'react'
+// @ts-expect-error(sa, 2021-6-27): can't get TS to recognize that @types/typeform__embed exists
 import { makeWidget } from '@typeform/embed'
 import { getIsProduction } from '../../../networking/opentronsWebApi'
 import styles from '../modal.css'
@@ -13,7 +14,7 @@ const SIGNUP_TYPEFORM_URL = getIsProduction()
 
 export class SignUpForm extends React.Component<{}> {
   // TODO (ce, 2021-06-23) have no idea what this should be
-  embedElement: React.ElementRef<any>
+  embedElement: React.RefObject<HTMLDivElement>
 
   constructor(props: {}) {
     super(props)

@@ -4,7 +4,7 @@ import { selectors as analyticsSelectors } from './analytics'
 import { initializeFullstory } from './analytics/fullstory'
 export const initialize = (store: Record<string, any>): void => {
   if (process.env.NODE_ENV === 'production') {
-    window.onbeforeunload = e => {
+    window.onbeforeunload = (_e: unknown) => {
       // NOTE: the custom text will be ignored in modern browsers
       return loadFileSelectors.getHasUnsavedChanges(store.getState())
         ? i18n.t('alert.window.confirm_leave')

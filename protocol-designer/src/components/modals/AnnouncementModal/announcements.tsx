@@ -91,6 +91,7 @@ export const announcements: Announcement[] = [
   {
     announcementKey: 'batchEditTransfer',
     image: (
+      // @ts-expect-error(sa, 2021-6-27): not sure why TS does not like these styled components styles
       <Flex css={batchEditStyles}>
         <img src={require('../../../images/announcements/multi_select.gif')} />
 

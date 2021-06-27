@@ -19,7 +19,7 @@ interface DP {
 
 type Props = OP & DP
 
-function BrowseLabwareOverlay(props: Props): React.ReactNode {
+function BrowseLabwareOverlay(props: Props): JSX.Element | null {
   if (props.labwareOnDeck.def.parameters.isTiprack) return null
   return (
     <div className={cx(styles.slot_overlay, styles.appear_on_mouseover)}>

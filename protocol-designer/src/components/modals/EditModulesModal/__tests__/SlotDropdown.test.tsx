@@ -53,7 +53,7 @@ describe('Slot Dropdown', () => {
     jest.resetAllMocks()
   })
 
-  const render = props =>
+  const render = (props: SlotDropdownProps) =>
     mount(
       <Provider store={mockStore}>
         <SlotDropdown {...props} />

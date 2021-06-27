@@ -57,6 +57,7 @@ function mergeProps(
 
 export const LabwareUploadMessageModal = connect(
   mapStateToProps,
+  // @ts-expect-error(sa, 2021-6-21): TODO IMMEDIATELY: figure out why TS does not like this
   null,
   mergeProps
 )(LabwareUploadMessageModalComponent)

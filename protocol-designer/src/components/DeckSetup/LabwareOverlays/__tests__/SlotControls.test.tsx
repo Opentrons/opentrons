@@ -34,7 +34,7 @@ describe('SlotControlsComponent', () => {
       labwareDefURI: 'fixture/fixture_96_plate',
       id: 'plate123',
       slot: '3',
-      def: fixture_96_plate,
+      def: fixture_96_plate as LabwareDefinition2,
     }
 
     props = {
