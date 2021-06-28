@@ -51,14 +51,6 @@ class CommandTranslator:
         self,
         command: models.json_protocol.AllCommands,
     ) -> pe_commands.CommandRequest:
-        """
-        Args:
-            command: The PD/JSON command to translate
-
-        Returns:
-            A collection of Protocol Engine command requests.
-
-        """
         try:
             h = CommandTranslator._COMMAND_TO_NAME[command.command]
             return getattr(self, h)(command)
@@ -123,15 +115,6 @@ class CommandTranslator:
         self,
         command: models.json_protocol.LiquidCommand,
     ) -> pe_commands.AspirateRequest:
-        """
-        Translate an aspirate JSON command to a protocol engine aspirate request.
-
-        Args:
-            command: JSON protocol aspirate command
-
-        Returns: AspirateRequest
-
-        """
         return pe_commands.AspirateRequest(
             data=pe_commands.AspirateData(
                 pipetteId=command.params.pipette,
@@ -149,14 +132,6 @@ class CommandTranslator:
         self,
         command: models.json_protocol.LiquidCommand,
     ) -> pe_commands.DispenseRequest:
-        """
-        Translate a dispense JSON command to a protocol engine dispense request.
-
-        Args:
-            command: JSON protocol dispense command
-
-        Returns: DispenseRequest
-        """
         return pe_commands.DispenseRequest(
             data=pe_commands.DispenseData(
                 pipetteId=command.params.pipette,
@@ -183,14 +158,6 @@ class CommandTranslator:
         self,
         command: models.json_protocol.PickUpDropTipCommand,
     ) -> pe_commands.PickUpTipRequest:
-        """
-        Translate a pick_up_tip JSON command to a protocol engine pick_up_tip request.
-
-        Args:
-            command: JSON protocol PickUpTip command
-
-        Returns: PickUpTipRequest
-        """
         return pe_commands.PickUpTipRequest(
             data=pe_commands.PickUpTipData(
                 pipetteId=command.params.pipette,
@@ -203,15 +170,6 @@ class CommandTranslator:
         self,
         command: models.json_protocol.PickUpDropTipCommand,
     ) -> pe_commands.DropTipRequest:
-        """
-        Translate a drop tip JSON command to a protocol engine drop tip request.
-
-        Args:
-            command: JSON protocol drop tip command
-
-        Returns: DropTipRequest
-
-        """
         return pe_commands.DropTipRequest(
             data=pe_commands.DropTipData(
                 pipetteId=command.params.pipette,
