@@ -1,5 +1,5 @@
 import pytest
-from typing import Any, Iterable, List
+from typing import Any, Dict, List
 
 from opentrons.types import DeckSlotName, MountType
 from opentrons.protocols import models
@@ -128,7 +128,8 @@ def _assert_appear_in_order(elements: List[Any], source: List[Any]) -> None:
 
 
 def _make_json_protocol(
-    commands: Iterable[models.json_protocol.AllCommands] = (),
+    commands: List[models.json_protocol.AllCommands] = [],
+    pipettes: Dict[str, models.json_protocol.Pipettes] = {},
 ) -> models.JsonProtocol:
     """Return a minimal JsonProtocol with the given elements, to use as test input."""
     return models.JsonProtocol.parse_obj(
@@ -138,10 +139,10 @@ def _make_json_protocol(
             "schemaVersion": 5,
             "metadata": {},
             "robot": {"model": "OT-2 Standard"},
-            "pipettes": {},
+            "pipettes": pipettes,
             "labware": {},
             "labwareDefinitions": {},
-            "commands": list(commands),
+            "commands": commands,
         }
     )
 
@@ -195,21 +196,32 @@ def test_labware(
     )
 
 
-def test_pipettes(
-    subject: CommandTranslator,
-    json_protocol: models.JsonProtocol,
-) -> None:
-    result = subject.translate(json_protocol)
+def test_pipettes(subject: CommandTranslator) -> None:
+    json_pipettes = {
+        "abc123": models.json_protocol.Pipettes(mount="left", name="p20_single_gen2"),
+        "def456": models.json_protocol.Pipettes(mount="right", name="p300_multi"),
+    }
 
-    expected_request = pe_commands.LoadPipetteRequest(
+    expected_request_1 = pe_commands.LoadPipetteRequest(
         data=pe_commands.LoadPipetteData(
-            pipetteName=PipetteName.P300_SINGLE,
+            pipetteId="abc123",
             mount=MountType.LEFT,
-            pipetteId="leftPipetteId",
+            pipetteName=PipetteName.P20_SINGLE_GEN2,
         )
     )
 
-    assert expected_request in result
+    expected_request_2 = pe_commands.LoadPipetteRequest(
+        data=pe_commands.LoadPipetteData(
+            pipetteId="def456",
+            mount=MountType.RIGHT,
+            pipetteName=PipetteName.P300_MULTI,
+        )
+    )
+
+    result = subject.translate(_make_json_protocol(pipettes=json_pipettes))
+
+    assert expected_request_1 in result
+    assert expected_request_2 in result
 
 
 # todo(mm, 2021-06-28): Instead of pulling details out of fixtures, should each of
