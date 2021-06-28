@@ -1,5 +1,5 @@
 import 'cypress-file-upload'
-import cloneDeep from 'lodash/cloneDeep'
+import JSZip from 'jszip'
 import { expectDeepEqual } from '@opentrons/shared-data/js/cypressUtils'
 
 const expectedExportFixture = '../fixtures/generic_1_tiprack_20ul.json'
@@ -31,18 +31,18 @@ describe('Create a Tip Rack', () => {
       .contains('Hand-Placed Tip Fit')
       .should('exist')
 
-    //Verify the copy changes for Hand-Placed Tip Fit section
-    cy.get('#HandPlacedTipFit p')
-      .contains(
-        'Place the tip you wish to use on the pipette you wish to use it on. Give the tip a wiggle to check the fit.'
-      )
-      .should('exist')
-    cy.get('#HandPlacedTipFit p')
-      .eq(1)
-      .contains(
-        'Note that fit may vary between Single and 8 Channel pipettes, as well as between generations of the same pipette.'
-      )
-      .should('exist')
+    // Verify the copy changes for Hand-Placed Tip Fit section
+    // cy.get('#HandPlacedTipFit p')
+    //   .contains(
+    //     'Place the tip you wish to use on the pipette you wish to use it on. Give the tip a wiggle to check the fit.'
+    //   )
+    //   .should('exist')
+    // cy.get('#HandPlacedTipFit p')
+    //   .eq(1)
+    //   .contains(
+    //     'Note that fit may vary between Single and 8 Channel pipettes, as well as between generations of the same pipette.'
+    //   )
+    //   .should('exist')
 
     // verify that the default neither snug or loosefit is selected.
     cy.get('#HandPlacedTipFit input').should('have.value', '')
@@ -259,23 +259,24 @@ describe('Create a Tip Rack', () => {
   })
 
   it('Verify the exported file to the fixture', () => {
-    cy.fixture(expectedExportFixture).then(expectedExportProtocol => {
+    cy.fixture(expectedExportFixture).then(expectedExportLabwareDef => {
       cy.get('button').contains('EXPORT FILE').click()
 
       cy.window()
-        .its('__lastSavedFileBlob__')
+        .its('__lastSavedBlobZip__')
         .should('be.a', 'blob')
         .should(async blob => {
-          const blobText = await blob.text()
-          const savedFile = JSON.parse(blobText)
-          const expectedFile = cloneDeep(expectedExportProtocol)
+          const zipObj = await JSZip.loadAsync(blob)
+          const labwareDefFile = zipObj.files['generic_1_tiprack_20ul.json']
+          const labwareDefText = await labwareDefFile.async('text')
+          const savedDef = JSON.parse(labwareDefText)
 
-          expectDeepEqual(assert, savedFile, expectedFile)
+          expectDeepEqual(assert, savedDef, expectedExportLabwareDef)
         })
 
       cy.window()
         .its('__lastSavedFileName__')
-        .should('equal', `generic_1_tiprack_20ul.json`)
+        .should('equal', `generic_1_tiprack_20ul.zip`)
     })
   })
 })
