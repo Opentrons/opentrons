@@ -19,22 +19,41 @@ interface Props {
   values: LabwareFields
 }
 
+const calculateViewBox = (args: {
+  bBox: DOMRect | undefined
+  xDim: number
+  yDim: number
+}): string => {
+  const { bBox, xDim, yDim } = args
+
+  // by-eye margin to make sure there is no visual clipping
+  const MARGIN = 5
+
+  // calculate viewBox such that SVG is zoomed and panned with the bBox fully in view,
+  // in a "zoom to fit" manner, plus some visual margin to prevent clipping
+  return `${(bBox?.x ?? 0) - MARGIN} ${(bBox?.y ?? 0) - MARGIN} ${
+    xDim + MARGIN * 2
+  } ${yDim + MARGIN * 2}`
+}
+
 export const ConditionalLabwareRender = (props: Props): JSX.Element => {
   const gRef = React.useRef<SVGGElement>(null)
-  const [bBox, updateBBox] = React.useState<DOMRect>()
+  const [bBox, updateBBox] = React.useState<DOMRect | undefined>(
+    gRef.current ? gRef.current.getBBox() : undefined
+  )
 
   // In order to implement "zoom to fit", we're calculating the desired viewBox based on getBBox of the child.
   // So we have to actually render the child to get its bounding box. After that, we re-calculate the viewBox.
   // Once the viewBox is re-calculated, we use setState to force a re-render.
+  const nextBBox = gRef.current?.getBBox()
   React.useLayoutEffect((): void => {
-    const nextBBox = gRef.current?.getBBox()
     if (
       nextBBox != null &&
       (nextBBox.width !== bBox?.width || nextBBox.height !== bBox?.height)
     ) {
       updateBBox(nextBBox)
     }
-  })
+  }, [bBox?.height, bBox?.width, nextBBox])
 
   const definition = React.useMemo(() => {
     const values = cloneDeep(props.values)
@@ -90,15 +109,8 @@ export const ConditionalLabwareRender = (props: Props): JSX.Element => {
       ? bBox?.height ?? definition.dimensions.yDimension
       : DEFAULT_Y_DIMENSION
 
-  // by-eye margin to make sure there is no visual clipping
-  const MARGIN = 5
-
   return (
-    <RobotWorkSpace
-      viewBox={`${(bBox?.x ?? 0) - MARGIN} ${(bBox?.y ?? 0) - MARGIN} ${
-        xDim + MARGIN * 2
-      } ${yDim + MARGIN * 2}`}
-    >
+    <RobotWorkSpace viewBox={calculateViewBox({ bBox, xDim, yDim })}>
       {() =>
         definition != null ? (
           <LabwareRender definition={definition} gRef={gRef} />
