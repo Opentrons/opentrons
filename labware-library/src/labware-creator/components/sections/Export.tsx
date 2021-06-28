@@ -12,8 +12,10 @@ import { LinkOut } from '../LinkOut'
 import { SectionBody } from './SectionBody'
 import styles from '../../styles.css'
 
-const PDF_URL =
+const LABWARE_PDF_URL =
   'https://opentrons-publications.s3.us-east-2.amazonaws.com/labwareDefinition_testGuide.pdf'
+const TIPRACK_PDF_URL =
+  'https://opentrons-publications.s3.us-east-2.amazonaws.com/labwareDefinition_tipRack_testGuide.pdf'
 
 interface ExportProps {
   onExportClick: (e: React.MouseEvent) => unknown
@@ -22,6 +24,13 @@ interface ExportProps {
 export const Export = (props: ExportProps): JSX.Element | null => {
   const fieldList: Array<keyof LabwareFields> = ['pipetteName']
   const { values, errors, touched } = useFormikContext<LabwareFields>()
+
+  const testGuideUrl =
+    values.labwareType === 'tipRack' ? TIPRACK_PDF_URL : LABWARE_PDF_URL
+  const testGuideLabel =
+    values.labwareType === 'tipRack'
+      ? 'tip rack test guide'
+      : 'labware test guide'
 
   if (isEveryFieldHidden(fieldList, values)) {
     return null
@@ -55,17 +64,20 @@ export const Export = (props: ExportProps): JSX.Element | null => {
             definitions that are precise and do not rely on excessive
             calibration prior to each run to achieve accuracy.
           </p>
-          <p>Use the test guide to troubleshoot your definition.</p>
+          <p>
+            Use the Tip Rack guide to troubleshoot Tip Rack definitions. Use the
+            Labware guide for all other labware types.
+          </p>
           <LinkOut
             onClick={() =>
               reportEvent({
                 name: 'labwareCreatorClickTestLabware',
               })
             }
-            href={PDF_URL}
+            href={testGuideUrl}
             className={styles.test_guide_button}
           >
-            view test guide
+            {testGuideLabel}
           </LinkOut>
         </div>
         <PrimaryBtn

@@ -62,6 +62,20 @@ describe('Export', () => {
     screen.getByText(FAKE_ERROR)
   })
 
+  it('should render the tip rack button when tip rack is selected', () => {
+    formikConfig.initialValues.labwareType = 'tipRack'
+    render(wrapInFormik(<Export onExportClick={onExportClick} />, formikConfig))
+
+    screen.getByRole('button', { name: /tip rack test guide/i })
+  })
+
+  it('should render the labware button when tip rack is not selected', () => {
+    formikConfig.initialValues.labwareType = 'wellPlate'
+    render(wrapInFormik(<Export onExportClick={onExportClick} />, formikConfig))
+
+    screen.getByRole('button', { name: /labware test guide/i })
+  })
+
   it('should not render when all of the fields are hidden', () => {
     when(isEveryFieldHiddenMock)
       .calledWith(['pipetteName'], formikConfig.initialValues)
