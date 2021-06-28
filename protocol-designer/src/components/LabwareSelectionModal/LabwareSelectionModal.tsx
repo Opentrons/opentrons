@@ -30,7 +30,7 @@ import styles from './styles.css'
 import { DeckSlot } from '../../types'
 import { LabwareDefByDefURI } from '../../labware-defs'
 
-interface Props {
+export interface Props {
   onClose: (e?: any) => unknown
   onUploadLabware: (event: React.ChangeEvent<HTMLInputElement>) => unknown
   selectLabware: (containerType: string) => unknown

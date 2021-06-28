@@ -1,6 +1,8 @@
-import * as React from 'react'
 import { connect } from 'react-redux'
-import { LabwareSelectionModal as LabwareSelectionModalComponent } from './LabwareSelectionModal'
+import {
+  LabwareSelectionModal as LabwareSelectionModalComponent,
+  Props as LabwareSelectionModalProps,
+} from './LabwareSelectionModal'
 import {
   closeLabwareSelector,
   createContainer,
@@ -12,13 +14,12 @@ import {
 } from '../../labware-defs'
 import { selectors as stepFormSelectors, ModuleOnDeck } from '../../step-forms'
 import { BaseState, ThunkDispatch } from '../../types'
-type Props = React.ComponentProps<typeof LabwareSelectionModalComponent>
 interface SP {
-  customLabwareDefs: Props['customLabwareDefs']
-  slot: Props['slot']
-  parentSlot: Props['parentSlot']
-  moduleType: Props['moduleType']
-  permittedTipracks: Props['permittedTipracks']
+  customLabwareDefs: LabwareSelectionModalProps['customLabwareDefs']
+  slot: LabwareSelectionModalProps['slot']
+  parentSlot: LabwareSelectionModalProps['parentSlot']
+  moduleType: LabwareSelectionModalProps['moduleType']
+  permittedTipracks: LabwareSelectionModalProps['permittedTipracks']
 }
 
 function mapStateToProps(state: BaseState): SP {
@@ -46,7 +47,7 @@ function mergeProps(
   dispatchProps: {
     dispatch: ThunkDispatch<any>
   }
-): Props {
+): LabwareSelectionModalProps {
   const dispatch = dispatchProps.dispatch
   return {
     ...stateProps,

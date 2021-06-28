@@ -20,6 +20,5 @@
     "rootDir": "src",
     "outDir": "lib"
   },
-  "include": ["typings", "src"],
-  "exclude": ["../node_modules"]
+  "include": ["typings", "src"]
 }

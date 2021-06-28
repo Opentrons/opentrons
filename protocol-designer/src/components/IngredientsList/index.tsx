@@ -18,7 +18,7 @@ type RemoveWellsContents = (args: {
 }) => unknown
 
 // Props used by both IngredientsList and LiquidGroupCard
-interface CommonProps {
+export interface CommonProps {
   removeWellsContents: RemoveWellsContents
   selected?: boolean
 }

@@ -5,7 +5,7 @@ import { PDTitledList, PDListItem } from '../../lists'
 import { EditableTextField } from '../../EditableTextField'
 import styles from './labwareDetailsCard.css'
 
-interface Props {
+export interface Props {
   labwareDefDisplayName: string
   nickname: string
   renameLabware: (name: string) => unknown

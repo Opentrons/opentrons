@@ -24,7 +24,7 @@ import {
   PipetteOnDeck,
 } from '../../step-forms'
 
-interface Props {
+export interface Props {
   loadFile: (event: React.ChangeEvent<HTMLInputElement>) => unknown
   createNewFile?: () => unknown
   canDownload: boolean

@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { connect } from 'react-redux'
 import { i18n } from '../../localization'
 import { actions, selectors } from '../../navigation'
@@ -8,11 +7,11 @@ import {
   actions as loadFileActions,
   selectors as loadFileSelectors,
 } from '../../load-file'
-import { FileSidebar as FileSidebarComponent } from './FileSidebar'
+import { FileSidebar as FileSidebarComponent, Props } from './FileSidebar'
 import type { BaseState, ThunkDispatch } from '../../types'
 import type { SavedStepFormState, InitialDeckSetup } from '../../step-forms'
 
-type Props = React.ComponentProps<typeof FileSidebarComponent>
+// type Props = React.ComponentProps<typeof FileSidebarComponent>
 interface SP {
   canDownload: boolean
   fileData: Props['fileData']
