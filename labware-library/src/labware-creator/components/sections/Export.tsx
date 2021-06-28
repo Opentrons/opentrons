@@ -25,9 +25,9 @@ export const Export = (props: ExportProps): JSX.Element | null => {
   const fieldList: Array<keyof LabwareFields> = ['pipetteName']
   const { values, errors, touched } = useFormikContext<LabwareFields>()
 
-  const exportUrl =
+  const testGuideUrl =
     values.labwareType === 'tipRack' ? TIPRACK_PDF_URL : LABWARE_PDF_URL
-  const exportLabel =
+  const testGuideLabel =
     values.labwareType === 'tipRack'
       ? 'tip rack test guide'
       : 'labware test guide'
@@ -74,10 +74,10 @@ export const Export = (props: ExportProps): JSX.Element | null => {
                 name: 'labwareCreatorClickTestLabware',
               })
             }
-            href={exportUrl}
+            href={testGuideUrl}
             className={styles.test_guide_button}
           >
-            {exportLabel}
+            {testGuideLabel}
           </LinkOut>
         </div>
         <PrimaryBtn
