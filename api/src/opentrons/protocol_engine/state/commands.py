@@ -4,8 +4,9 @@ from collections import OrderedDict
 from dataclasses import dataclass, replace
 from typing import List, Optional, Tuple
 
-from ..commands import CommandType, CommandRequestType, PendingCommand, FailedCommand
-from .substore import Substore
+from ..commands import Command, CommandStatus
+from ..errors import CommandDoesNotExistError
+from .substore import Substore, CommandReactive
 
 
 @dataclass(frozen=True)
@@ -13,10 +14,10 @@ class CommandState:
     """State of all protocol engine command resources."""
 
     # TODO(mc, 2021-06-16): OrderedDict is mutable. Switch to Sequence + Mapping
-    commands_by_id: OrderedDict[str, CommandType]
+    commands_by_id: OrderedDict[str, Command]
 
 
-class CommandStore(Substore[CommandState]):
+class CommandStore(Substore[CommandState], CommandReactive):
     """Command state container."""
 
     _state: CommandState
@@ -25,10 +26,10 @@ class CommandStore(Substore[CommandState]):
         """Initialize a CommandStore and its state."""
         self._state = CommandState(commands_by_id=OrderedDict())
 
-    def handle_command(self, command: CommandType, command_id: str) -> None:
+    def handle_command(self, command: Command) -> None:
         """Modify state in reaction to any command."""
         commands_by_id = self._state.commands_by_id.copy()
-        commands_by_id.update({command_id: command})
+        commands_by_id.update({command.id: command})
 
         self._state = replace(self._state, commands_by_id=commands_by_id)
 
@@ -40,12 +41,14 @@ class CommandView:
         """Initialize the view of command state with its underlying data."""
         self._state = state
 
-    def get_command_by_id(self, uid: str) -> Optional[CommandType]:
+    def get_command_by_id(self, command_id: str) -> Command:
         """Get a command by its unique identifier."""
-        # TODO(mc, 2021-06-17): raise on missing ID, to line up with other state views
-        return self._state.commands_by_id.get(uid)
+        try:
+            return self._state.commands_by_id[command_id]
+        except KeyError:
+            raise CommandDoesNotExistError(f"Command {command_id} does not exist")
 
-    def get_all_commands(self) -> List[Tuple[str, CommandType]]:
+    def get_all_commands(self) -> List[Tuple[str, Command]]:
         """Get a list of all commands in state, paired with their respective IDs.
 
         Entries are returned in the order of first-added command to last-added command.
@@ -54,7 +57,7 @@ class CommandView:
         """
         return [entry for entry in self._state.commands_by_id.items()]
 
-    def get_next_request(self) -> Optional[Tuple[str, CommandRequestType]]:
+    def get_next_command(self) -> Optional[str]:
         """Return the next request in line to be executed.
 
         Normally, this corresponds to the earliest-added command that's currently
@@ -67,8 +70,8 @@ class CommandView:
         If there are no pending commands at all, returns None.
         """
         for command_id, command in self._state.commands_by_id.items():
-            if isinstance(command, FailedCommand):
+            if command.status == CommandStatus.FAILED:
                 return None
-            elif isinstance(command, PendingCommand):
-                return command_id, command.request
+            elif command.status == CommandStatus.QUEUED:
+                return command_id
         return None

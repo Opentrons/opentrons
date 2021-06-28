@@ -45,7 +45,7 @@ def test_handles_load_pipette(subject: PipetteStore) -> None:
         mount=MountType.LEFT,
     )
 
-    subject.handle_completed_command(command)
+    subject.handle_command(command)
 
     result = subject.state
 
@@ -68,12 +68,12 @@ def test_pipette_volume_adds_aspirate(subject: PipetteStore) -> None:
         volume=42,
     )
 
-    subject.handle_completed_command(load_command)
-    subject.handle_completed_command(aspirate_command)
+    subject.handle_command(load_command)
+    subject.handle_command(aspirate_command)
 
     assert subject.state.aspirated_volume_by_id["pipette-id"] == 42
 
-    subject.handle_completed_command(aspirate_command)
+    subject.handle_command(aspirate_command)
 
     assert subject.state.aspirated_volume_by_id["pipette-id"] == 84
 
@@ -94,17 +94,17 @@ def test_pipette_volume_subtracts_dispense(subject: PipetteStore) -> None:
         volume=21,
     )
 
-    subject.handle_completed_command(load_command)
-    subject.handle_completed_command(aspirate_command)
-    subject.handle_completed_command(dispense_command)
+    subject.handle_command(load_command)
+    subject.handle_command(aspirate_command)
+    subject.handle_command(dispense_command)
 
     assert subject.state.aspirated_volume_by_id["pipette-id"] == 21
 
-    subject.handle_completed_command(dispense_command)
+    subject.handle_command(dispense_command)
 
     assert subject.state.aspirated_volume_by_id["pipette-id"] == 0
 
-    subject.handle_completed_command(dispense_command)
+    subject.handle_command(dispense_command)
 
     assert subject.state.aspirated_volume_by_id["pipette-id"] == 0
 
@@ -177,18 +177,18 @@ def test_pipette_volume_subtracts_dispense(subject: PipetteStore) -> None:
     ),
 )
 def test_movement_commands_update_current_location(
-    command: cmd.CompletedCommandType,
+    command: cmd.Command,
     expected_location: DeckLocation,
     subject: PipetteStore,
 ) -> None:
     """It should save the last used pipette, labware, and well for movement commands."""
     load_pipette_command = create_load_pipette_command(
-        pipette_id=command.request.pipetteId,  # type: ignore[arg-type, union-attr]
+        pipette_id=command.data.pipetteId,  # type: ignore[arg-type, union-attr]
         pipette_name=PipetteName.P300_SINGLE,
         mount=MountType.LEFT,
     )
 
-    subject.handle_completed_command(load_pipette_command)
-    subject.handle_completed_command(command)
+    subject.handle_command(load_pipette_command)
+    subject.handle_command(command)
 
     assert subject.state.current_location == expected_location

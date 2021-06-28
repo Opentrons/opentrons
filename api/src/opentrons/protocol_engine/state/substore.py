@@ -1,8 +1,8 @@
 """Base state store classes."""
-from abc import ABC
+from abc import ABC, abstractmethod
 from typing import Generic, TypeVar
 
-from ..commands import CompletedCommandType
+from ..commands import Command
 
 
 SubstateT = TypeVar("SubstateT")
@@ -22,6 +22,7 @@ class Substore(ABC, Generic[SubstateT]):
 class CommandReactive(ABC):
     """Abstract base class for an interface that reacts to commands."""
 
-    def handle_completed_command(self, command: CompletedCommandType) -> None:
-        """React to a CompletedCommand."""
-        pass
+    @abstractmethod
+    def handle_command(self, command: Command) -> None:
+        """React to a Command resource change."""
+        ...

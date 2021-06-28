@@ -5,6 +5,7 @@ from typing import Optional
 from typing_extensions import Literal
 
 from robot_server.errors import ErrorDetails, ErrorResponse
+
 from robot_server.service.dependencies import get_current_time, get_unique_id
 from robot_server.service.json_api import (
     RequestModel,
@@ -237,6 +238,8 @@ async def create_session_action(
         )
 
         # TODO(mc, 2021-06-11): support actions other than `start`
+        # TODO(mc, 2021-06-24): ensure the engine homes pipette plungers
+        # before starting the protocol run
         engine_store.runner.play()
 
     except SessionNotFoundError as e:

@@ -86,7 +86,7 @@ def test_handles_load_labware(
         calibration=(1, 2, 3),
     )
 
-    subject.handle_completed_command(command)
+    subject.handle_command(command)
 
     # TODO(mc, 2021-06-02): usage of ._state over .state is temporary
     # until store.state returns the state instead of a state view
@@ -109,7 +109,7 @@ def test_handles_add_labware_defintion(
         version=well_plate_def.version,
     )
 
-    subject.handle_completed_command(command)
+    subject.handle_command(command)
 
     # TODO(mc, 2021-06-02): usage of ._state over .state is temporary
     # until store.state returns the state instead of a state view

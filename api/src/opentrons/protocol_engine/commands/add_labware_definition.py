@@ -1,22 +1,19 @@
 """Add labware command."""
 from __future__ import annotations
-from opentrons.protocol_engine.commands.command import (
-    CommandImplementation, CommandHandlers
-)
 from pydantic import BaseModel, Field
+from typing import Optional, Type
+from typing_extensions import Literal
+
 from opentrons.protocols.models import LabwareDefinition
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandRequest
+
+AddLabwareDefinitionCommandType = Literal["addLabwareDefinition"]
 
 
-class AddLabwareDefinitionRequest(BaseModel):
-    """Request to add a labware definition."""
-    definition: LabwareDefinition = Field(
-        ...,
-        description="The labware definition."
-    )
+class AddLabwareDefinitionData(BaseModel):
+    """Data required to add a labware definition."""
 
-    def get_implementation(self) -> AddLabwareDefinitionImplementation:
-        """Get the execution implementation of the AddLabwareDefinitionRequest."""
-        return AddLabwareDefinitionImplementation(self)
+    definition: LabwareDefinition = Field(..., description="The labware definition.")
 
 
 class AddLabwareDefinitionResult(BaseModel):
@@ -37,18 +34,39 @@ class AddLabwareDefinitionResult(BaseModel):
 
 
 class AddLabwareDefinitionImplementation(
-    CommandImplementation[AddLabwareDefinitionRequest,
-                          AddLabwareDefinitionResult]
+    AbstractCommandImpl[AddLabwareDefinitionData, AddLabwareDefinitionResult]
 ):
     """Add labware command implementation."""
 
     async def execute(
-            self,
-            handlers: CommandHandlers
+        self, data: AddLabwareDefinitionData
     ) -> AddLabwareDefinitionResult:
         """Execute the add labware definition request."""
         return AddLabwareDefinitionResult(
-            loadName=self._request.definition.parameters.loadName,
-            namespace=self._request.definition.namespace,
-            version=self._request.definition.version
+            loadName=data.definition.parameters.loadName,
+            namespace=data.definition.namespace,
+            version=data.definition.version,
         )
+
+
+class AddLabwareDefinition(
+    BaseCommand[AddLabwareDefinitionData, AddLabwareDefinitionResult]
+):
+    """Add labware definition command resource."""
+
+    commandType: AddLabwareDefinitionCommandType = "addLabwareDefinition"
+    data: AddLabwareDefinitionData
+    result: Optional[AddLabwareDefinitionResult]
+
+    _ImplementationCls: Type[
+        AddLabwareDefinitionImplementation
+    ] = AddLabwareDefinitionImplementation
+
+
+class AddLabwareDefinitionRequest(BaseCommandRequest[AddLabwareDefinitionData]):
+    """Add labware definition command creation request."""
+
+    commandType: AddLabwareDefinitionCommandType = "addLabwareDefinition"
+    data: AddLabwareDefinitionData
+
+    _CommandCls: Type[AddLabwareDefinition] = AddLabwareDefinition

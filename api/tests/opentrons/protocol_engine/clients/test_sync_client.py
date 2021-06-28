@@ -49,11 +49,13 @@ def stubbed_load_labware_result(
 ) -> commands.LoadLabwareResult:
     """Set up the protocol engine with default stubbed response for load labware."""
     request = commands.LoadLabwareRequest(
-        location=DeckSlotLocation(slot=DeckSlotName.SLOT_5),
-        loadName="some_labware",
-        namespace="opentrons",
-        version=1,
-        labwareId=None,
+        data=commands.LoadLabwareData(
+            location=DeckSlotLocation(slot=DeckSlotName.SLOT_5),
+            loadName="some_labware",
+            namespace="opentrons",
+            version=1,
+            labwareId=None,
+        )
     )
 
     result = commands.LoadLabwareResult(
@@ -91,8 +93,10 @@ def test_load_pipette(
 ) -> None:
     """It should execute a load pipette command and return its result."""
     request = commands.LoadPipetteRequest(
-        pipetteName=PipetteName.P300_SINGLE,
-        mount=MountType.RIGHT,
+        data=commands.LoadPipetteData(
+            pipetteName=PipetteName.P300_SINGLE,
+            mount=MountType.RIGHT,
+        )
     )
 
     expected_result = commands.LoadPipetteResult(pipetteId="abc123")
@@ -115,7 +119,9 @@ def test_pick_up_tip(
     subject: SyncClient,
 ) -> None:
     """It should execute a pick up tip command."""
-    request = commands.PickUpTipRequest(pipetteId="123", labwareId="456", wellName="A2")
+    request = commands.PickUpTipRequest(
+        data=commands.PickUpTipData(pipetteId="123", labwareId="456", wellName="A2")
+    )
     response = commands.PickUpTipResult()
 
     decoy.when(
@@ -133,7 +139,9 @@ def test_drop_tip(
     subject: SyncClient,
 ) -> None:
     """It should execute a drop up tip command."""
-    request = commands.DropTipRequest(pipetteId="123", labwareId="456", wellName="A2")
+    request = commands.DropTipRequest(
+        data=commands.DropTipData(pipetteId="123", labwareId="456", wellName="A2")
+    )
     response = commands.DropTipResult()
 
     decoy.when(
@@ -152,11 +160,13 @@ def test_aspirate(
 ) -> None:
     """It should send an AspirateCommand through the transport."""
     request = commands.AspirateRequest(
-        pipetteId="123",
-        labwareId="456",
-        wellName="A2",
-        wellLocation=WellLocation(origin=WellOrigin.BOTTOM, offset=(0, 0, 1)),
-        volume=123.45,
+        data=commands.AspirateData(
+            pipetteId="123",
+            labwareId="456",
+            wellName="A2",
+            wellLocation=WellLocation(origin=WellOrigin.BOTTOM, offset=(0, 0, 1)),
+            volume=123.45,
+        )
     )
 
     result_from_transport = commands.AspirateResult(volume=67.89)
@@ -183,11 +193,13 @@ def test_dispense(
 ) -> None:
     """It should execute a dispense command."""
     request = commands.DispenseRequest(
-        pipetteId="123",
-        labwareId="456",
-        wellName="A2",
-        wellLocation=WellLocation(origin=WellOrigin.BOTTOM, offset=(0, 0, 1)),
-        volume=10,
+        data=commands.DispenseData(
+            pipetteId="123",
+            labwareId="456",
+            wellName="A2",
+            wellLocation=WellLocation(origin=WellOrigin.BOTTOM, offset=(0, 0, 1)),
+            volume=10,
+        )
     )
 
     response = commands.DispenseResult(volume=1)
