@@ -1,5 +1,5 @@
 import pytest
-from typing import Any, List
+from typing import Any, Iterable, List
 
 from opentrons.types import DeckSlotName, MountType
 from opentrons.protocols import models
@@ -127,6 +127,25 @@ def _assert_appear_in_order(elements: List[Any], source: List[Any]) -> None:
     assert sorted(element_indexes) == element_indexes
 
 
+def _make_json_protocol(
+    commands: Iterable[models.json_protocol.AllCommands] = (),
+) -> models.JsonProtocol:
+    """Return a minimal JsonProtocol with the given elements, to use as test input."""
+    return models.JsonProtocol.parse_obj(
+        {
+            # Arbitrary schemaVersion. Currently (2021-06-28), JsonProtocol.parse_obj()
+            # isn't smart enough to validate differently depending on this field.
+            "schemaVersion": 5,
+            "metadata": {},
+            "robot": {"model": "OT-2 Standard"},
+            "pipettes": {},
+            "labware": {},
+            "labwareDefinitions": {},
+            "commands": list(commands),
+        }
+    )
+
+
 def test_labware(
     subject: CommandTranslator,
     json_protocol: models.JsonProtocol,
@@ -193,6 +212,11 @@ def test_pipettes(
     assert expected_request in result
 
 
+# todo(mm, 2021-06-28): Instead of pulling details out of fixtures, should each of
+# these command translation tests create its own hard-coded command input, and hard-code
+# its own matching output to assert against?
+
+
 def test_aspirate(
     subject: CommandTranslator, aspirate_command: models.json_protocol.LiquidCommand
 ) -> None:
@@ -219,20 +243,22 @@ def test_dispense(
 ) -> None:
     """It should translate a JSON dispense command to a Protocol Engine
     dispense request."""
-    request = subject._translate_command(dispense_command)
+    result = subject.translate(_make_json_protocol(commands=[dispense_command]))
 
-    assert request == pe_commands.DispenseRequest(
-        data=pe_commands.DispenseData(
-            pipetteId=dispense_command.params.pipette,
-            labwareId=dispense_command.params.labware,
-            wellName=dispense_command.params.well,
-            volume=dispense_command.params.volume,
-            wellLocation=WellLocation(
-                origin=WellOrigin.BOTTOM,
-                offset=(0, 0, dispense_command.params.offsetFromBottomMm),
-            ),
+    assert result == [
+        pe_commands.DispenseRequest(
+            data=pe_commands.DispenseData(
+                pipetteId=dispense_command.params.pipette,
+                labwareId=dispense_command.params.labware,
+                wellName=dispense_command.params.well,
+                volume=dispense_command.params.volume,
+                wellLocation=WellLocation(
+                    origin=WellOrigin.BOTTOM,
+                    offset=(0, 0, dispense_command.params.offsetFromBottomMm),
+                ),
+            )
         )
-    )
+    ]
 
 
 def test_drop_tip(
@@ -241,15 +267,17 @@ def test_drop_tip(
 ) -> None:
     """It should translate a JSON drop tip command to a Protocol Engine
     drop tip request."""
-    request = subject._translate_command(drop_tip_command)
+    result = subject.translate(_make_json_protocol(commands=[drop_tip_command]))
 
-    assert request == pe_commands.DropTipRequest(
-        data=pe_commands.DropTipData(
-            pipetteId=drop_tip_command.params.pipette,
-            labwareId=drop_tip_command.params.labware,
-            wellName=drop_tip_command.params.well,
+    assert result == [
+        pe_commands.DropTipRequest(
+            data=pe_commands.DropTipData(
+                pipetteId=drop_tip_command.params.pipette,
+                labwareId=drop_tip_command.params.labware,
+                wellName=drop_tip_command.params.well,
+            )
         )
-    )
+    ]
 
 
 def test_pick_up_tip(
@@ -259,12 +287,14 @@ def test_pick_up_tip(
     It should translate a JSON pick up tip command to a Protocol Engine
     PickUpTip request.
     """
-    request = subject._translate_command(pick_up_command)
+    result = subject.translate(_make_json_protocol(commands=[pick_up_command]))
 
-    assert request == pe_commands.PickUpTipRequest(
-        data=pe_commands.PickUpTipData(
-            pipetteId=pick_up_command.params.pipette,
-            labwareId=pick_up_command.params.labware,
-            wellName=pick_up_command.params.well,
+    assert result == [
+        pe_commands.PickUpTipRequest(
+            data=pe_commands.PickUpTipData(
+                pipetteId=pick_up_command.params.pipette,
+                labwareId=pick_up_command.params.labware,
+                wellName=pick_up_command.params.well,
+            )
         )
-    )
+    ]
