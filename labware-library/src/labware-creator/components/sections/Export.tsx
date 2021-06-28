@@ -25,6 +25,13 @@ export const Export = (props: ExportProps): JSX.Element | null => {
   const fieldList: Array<keyof LabwareFields> = ['pipetteName']
   const { values, errors, touched } = useFormikContext<LabwareFields>()
 
+  const exportUrl =
+    values.labwareType === 'tipRack' ? TIPRACK_PDF_URL : LABWARE_PDF_URL
+  const exportLabel =
+    values.labwareType === 'tipRack'
+      ? 'tip rack test guide'
+      : 'labware test guide'
+
   if (isEveryFieldHidden(fieldList, values)) {
     return null
   }
@@ -61,30 +68,17 @@ export const Export = (props: ExportProps): JSX.Element | null => {
             Use the Tip Rack guide to troubleshoot Tip Rack definitions. Use the
             Labware guide for all other labware types.
           </p>
-          <div className={styles.test_guide_container}>
-            <LinkOut
-              onClick={() =>
-                reportEvent({
-                  name: 'labwareCreatorClickTestLabware',
-                })
-              }
-              href={LABWARE_PDF_URL}
-              className={styles.test_guide_button}
-            >
-              labware test guide
-            </LinkOut>
-            <LinkOut
-              onClick={() =>
-                reportEvent({
-                  name: 'labwareCreatorClickTestLabware',
-                })
-              }
-              href={TIPRACK_PDF_URL}
-              className={styles.test_guide_button}
-            >
-              tip rack test guide
-            </LinkOut>
-          </div>
+          <LinkOut
+            onClick={() =>
+              reportEvent({
+                name: 'labwareCreatorClickTestLabware',
+              })
+            }
+            href={exportUrl}
+            className={styles.test_guide_button}
+          >
+            {exportLabel}
+          </LinkOut>
         </div>
         <PrimaryBtn
           className={styles.export_button}
