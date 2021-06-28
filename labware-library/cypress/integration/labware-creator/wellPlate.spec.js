@@ -28,7 +28,7 @@ context('Well Plates', () => {
     })
 
     it('contains a button to the testing guide', () => {
-      cy.contains('view test guide')
+      cy.contains('labware test guide')
         .should('have.prop', 'href')
         .and('to.have.string', 'labwareDefinition_testGuide')
     })
