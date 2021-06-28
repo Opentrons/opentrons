@@ -1,6 +1,7 @@
 import * as React from 'react'
 import cx from 'classnames'
-import { DragDropContext } from 'react-dnd'
+// @ts-expect-error(sa, 2021-6-28): no types for DndContext
+import { DndContext } from 'react-dnd'
 import MouseBackEnd from 'react-dnd-mouse-backend'
 import { ComputingSpinner } from '../components/ComputingSpinner'
 import { ConnectedNav } from '../containers/ConnectedNav'
@@ -55,6 +56,4 @@ function ProtocolEditorComponent(): JSX.Element {
   )
 }
 
-export const ProtocolEditor = DragDropContext(MouseBackEnd)(
-  ProtocolEditorComponent
-)
+export const ProtocolEditor = DndContext(MouseBackEnd)(ProtocolEditorComponent)

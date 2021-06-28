@@ -55,7 +55,7 @@ function mapStateToProps(state: BaseState): SP {
 
 function mergeProps(
   stateProps: SP,
-  dispatchProps: { dispatch: Dispatch<any, any> }
+  dispatchProps: { dispatch: Dispatch }
 ): Props {
   const { dispatch } = dispatchProps
   const stepId = stateProps._stepId

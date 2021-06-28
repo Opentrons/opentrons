@@ -19,7 +19,7 @@ const mapStateToProps = (state: BaseState): SP => ({
   flags: featureFlagSelectors.getFeatureFlagData(state),
 })
 
-const mapDispatchToProps = (dispatch: Dispatch<any, any>): DP => ({
+const mapDispatchToProps = (dispatch: Dispatch): DP => ({
   setFeatureFlags: flags => dispatch(featureFlagActions.setFeatureFlags(flags)),
 })
 

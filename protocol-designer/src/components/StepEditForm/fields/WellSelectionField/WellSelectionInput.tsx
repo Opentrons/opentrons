@@ -105,7 +105,7 @@ const mapStateToProps = (state: BaseState): SP => ({
   stepId: getSelectedStepId(state),
   wellSelectionLabwareKey: getWellSelectionLabwareKey(state),
 })
-const mapDispatchToProps = (dispatch: Dispatch<any, any>): DP => ({
+const mapDispatchToProps = (dispatch: Dispatch): DP => ({
   onOpen: key => dispatch(stepsActions.setWellSelectionLabwareKey(key)),
   onClose: () => dispatch(stepsActions.clearWellSelectionLabwareKey()),
 })

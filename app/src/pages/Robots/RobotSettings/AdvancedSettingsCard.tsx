@@ -89,7 +89,6 @@ export function AdvancedSettingsCard(
       <Divider />
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} padding={SPACING_3}>
         <LabeledValue label={t('reset_label')} value={t('reset_description')} />
-        {/* @ts-expect-error TODO: Link does not have a disable prop, is this prop achieving anything useful */}
         <SecondaryBtn
           disabled={controlsDisabled}
           as={Link}
