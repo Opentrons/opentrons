@@ -254,6 +254,11 @@
   font-size: var(--fs-body-2);
 }
 
+.test_guide_container {
+  display: flex;
+  justify-content: space-evenly;
+}
+
 .test_guide_button {
   @apply --link-btn-blue;
 

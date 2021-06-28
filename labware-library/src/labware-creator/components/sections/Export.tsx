@@ -12,8 +12,10 @@ import { LinkOut } from '../LinkOut'
 import { SectionBody } from './SectionBody'
 import styles from '../../styles.css'
 
-const PDF_URL =
+const LABWARE_PDF_URL =
   'https://opentrons-publications.s3.us-east-2.amazonaws.com/labwareDefinition_testGuide.pdf'
+const TIPRACK_PDF_URL =
+  'https://zh-file.s3.amazonaws.com/38644841/f4df21db-26be-4a04-ae6a-58d32e70bddc?Expires=1624630757&AWSAccessKeyId=AKIAI5X57DET3FHKSALA&Signature=KQc%2F8fBo817c3uvlRcfovJxm7MQ%3D'
 
 interface ExportProps {
   onExportClick: (e: React.MouseEvent) => unknown
@@ -55,18 +57,34 @@ export const Export = (props: ExportProps): JSX.Element | null => {
             definitions that are precise and do not rely on excessive
             calibration prior to each run to achieve accuracy.
           </p>
-          <p>Use the test guide to troubleshoot your definition.</p>
-          <LinkOut
-            onClick={() =>
-              reportEvent({
-                name: 'labwareCreatorClickTestLabware',
-              })
-            }
-            href={PDF_URL}
-            className={styles.test_guide_button}
-          >
-            view test guide
-          </LinkOut>
+          <p>
+            Use the Tip Rack guide to troubleshoot Tip Rack definitions. Use the
+            Labware guide for all other labware types.
+          </p>
+          <div className={styles.test_guide_container}>
+            <LinkOut
+              onClick={() =>
+                reportEvent({
+                  name: 'labwareCreatorClickTestLabware',
+                })
+              }
+              href={LABWARE_PDF_URL}
+              className={styles.test_guide_button}
+            >
+              labware test guide
+            </LinkOut>
+            <LinkOut
+              onClick={() =>
+                reportEvent({
+                  name: 'labwareCreatorClickTestLabware',
+                })
+              }
+              href={TIPRACK_PDF_URL}
+              className={styles.test_guide_button}
+            >
+              tip rack test guide
+            </LinkOut>
+          </div>
         </div>
         <PrimaryBtn
           className={styles.export_button}
