@@ -15,7 +15,7 @@ import styles from '../../styles.css'
 const LABWARE_PDF_URL =
   'https://opentrons-publications.s3.us-east-2.amazonaws.com/labwareDefinition_testGuide.pdf'
 const TIPRACK_PDF_URL =
-  'https://zh-file.s3.amazonaws.com/38644841/f4df21db-26be-4a04-ae6a-58d32e70bddc?Expires=1624630757&AWSAccessKeyId=AKIAI5X57DET3FHKSALA&Signature=KQc%2F8fBo817c3uvlRcfovJxm7MQ%3D'
+  'https://opentrons-publications.s3.us-east-2.amazonaws.com/labwareDefinition_tipRack_testGuide.pdf'
 
 interface ExportProps {
   onExportClick: (e: React.MouseEvent) => unknown
