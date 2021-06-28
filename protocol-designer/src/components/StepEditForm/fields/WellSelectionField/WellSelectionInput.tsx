@@ -16,26 +16,26 @@ import { StepIdType } from '../../../../form-types'
 import { BaseState } from '../../../../types'
 import { FieldProps } from '../../types'
 
-interface SP {
+export interface SP {
   stepId?: StepIdType | null
   wellSelectionLabwareKey?: string | null
 }
 
-interface DP {
+export interface DP {
   onOpen: (val: string) => unknown
   onClose: () => unknown
 }
 
-type OP = FieldProps & {
+export type OP = FieldProps & {
   primaryWellCount?: number
   isMulti?: boolean | null
   pipetteId?: string | null
   labwareId?: string | null
 }
 
-type Props = OP & SP & DP
+export type Props = OP & SP & DP
 
-class WellSelectionInputComponent extends React.Component<Props> {
+export class WellSelectionInputComponent extends React.Component<Props> {
   handleOpen = (): void => {
     const { labwareId, pipetteId, onFieldFocus } = this.props
 
@@ -105,7 +105,7 @@ const mapStateToProps = (state: BaseState): SP => ({
   stepId: getSelectedStepId(state),
   wellSelectionLabwareKey: getWellSelectionLabwareKey(state),
 })
-const mapDispatchToProps = (dispatch: Dispatch<any, any>): DP => ({
+const mapDispatchToProps = (dispatch: Dispatch): DP => ({
   onOpen: key => dispatch(stepsActions.setWellSelectionLabwareKey(key)),
   onClose: () => dispatch(stepsActions.clearWellSelectionLabwareKey()),
 })

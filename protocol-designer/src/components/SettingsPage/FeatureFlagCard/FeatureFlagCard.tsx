@@ -8,7 +8,7 @@ import styles from '../SettingsPage.css'
 import modalStyles from '../../modals/modal.css'
 import { userFacingFlags, Flags, FlagTypes } from '../../../feature-flags'
 
-interface Props {
+export interface Props {
   flags: Flags
   setFeatureFlags: (flags: Flags) => unknown
 }

@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { connect } from 'react-redux'
 import assert from 'assert'
 import isEmpty from 'lodash/isEmpty'
@@ -12,13 +11,13 @@ import { getSelectedWells } from '../../well-selection/selectors'
 import { deselectAllWells } from '../../well-selection/actions'
 import {
   LiquidPlacementForm as LiquidPlacementFormComponent,
+  Props as LiquidPlacementFormProps,
   LiquidPlacementFormValues,
 } from './LiquidPlacementForm'
 import { Dispatch } from 'redux'
 import { BaseState } from '../../types'
-type Props = React.ComponentProps<typeof LiquidPlacementFormComponent>
 type SP = Omit<
-  Props & {
+  LiquidPlacementFormProps & {
     _labwareId?: string | null
     _selectedWells?: string[] | null
     _selectionHasLiquids: boolean
@@ -62,9 +61,9 @@ function mapStateToProps(state: BaseState): SP {
 function mergeProps(
   stateProps: SP,
   dispatchProps: {
-    dispatch: Dispatch<any, any>
+    dispatch: Dispatch
   }
-): Props {
+): LiquidPlacementFormProps {
   const {
     _labwareId,
     _selectedWells,
@@ -93,7 +92,6 @@ function mergeProps(
   return {
     ...passThruProps,
     cancelForm: () => dispatch(deselectAllWells()),
-    // @ts-expect-error(sa, 2021-6-22): clearWells might be null
     clearWells,
     saveForm: (values: LiquidPlacementFormValues) => {
       const { selectedLiquidId } = values

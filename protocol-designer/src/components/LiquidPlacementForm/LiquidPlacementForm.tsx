@@ -26,7 +26,7 @@ export interface LiquidPlacementFormValues {
   volume?: string | null
 }
 
-interface Props {
+export interface Props {
   commonSelectedLiquidId?: string | null
   commonSelectedVolume?: number | null
   liquidSelectionOptions: Options
@@ -34,7 +34,7 @@ interface Props {
   showForm: boolean
 
   cancelForm: () => unknown
-  clearWells?: () => unknown | null
+  clearWells: (() => unknown | null) | null
   saveForm: (liquidPlacementFormValues: LiquidPlacementFormValues) => unknown
 }
 

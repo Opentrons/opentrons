@@ -1,15 +1,16 @@
-import * as React from 'react'
 import { connect } from 'react-redux'
 import assert from 'assert'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
-import { LabwareDetailsCard as LabwareDetailsCardComponent } from './LabwareDetailsCard'
+import {
+  LabwareDetailsCard as LabwareDetailsCardComponent,
+  Props as LabwareDetailsCardProps,
+} from './LabwareDetailsCard'
 import { selectors as stepFormSelectors } from '../../../step-forms'
 import { selectors as uiLabwareSelectors } from '../../../ui/labware'
 import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
 import * as labwareIngredActions from '../../../labware-ingred/actions'
 import { BaseState, ThunkDispatch } from '../../../types'
-type Props = React.ComponentProps<typeof LabwareDetailsCardComponent>
-type SP = Omit<Props, 'renameLabware'> & {
+type SP = Omit<LabwareDetailsCardProps, 'renameLabware'> & {
   _labwareId?: string
 }
 
@@ -45,7 +46,7 @@ function mergeProps(
   dispatchProps: {
     dispatch: ThunkDispatch<any>
   }
-): Props {
+): LabwareDetailsCardProps {
   const dispatch = dispatchProps.dispatch
   const { _labwareId, ...passThruProps } = stateProps
 

@@ -84,7 +84,7 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
 const mergeProps = (
   stateProps: SP,
   dispatchProps: {
-    dispatch: Dispatch<any, any>
+    dispatch: Dispatch
   }
 ): Props => {
   const { stepId } = stateProps

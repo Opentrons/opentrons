@@ -1,13 +1,19 @@
-import * as React from 'react'
 import { connect } from 'react-redux'
-import { WellSelectionInput } from './WellSelectionInput'
+import {
+  WellSelectionInput,
+  Props as WellSelectionInputProps,
+  DP,
+} from './WellSelectionInput'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
 import { BaseState } from '../../../../types'
 import { FieldProps } from '../../types'
 
-type Props = JSX.LibraryManagedAttributes<
-  typeof WellSelectionInput,
-  React.ComponentProps<typeof WellSelectionInput>
+type Props = Omit<
+  JSX.LibraryManagedAttributes<
+    typeof WellSelectionInput,
+    WellSelectionInputProps
+  >,
+  keyof DP
 >
 type OP = FieldProps & {
   labwareId?: string | null

@@ -1,9 +1,9 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
+import { Dispatch } from 'redux'
 import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors'
 import * as wellSelectionSelectors from '../top-selectors/well-contents'
 import { removeWellsContents } from '../labware-ingred/actions'
-import { Dispatch } from 'redux'
 import { BaseState } from '../types'
 import { IngredientsList as IngredientsListComponent } from '../components/IngredientsList'
 import { SelectedContainerId } from '../labware-ingred/reducers'
@@ -34,7 +34,7 @@ function mapStateToProps(state: BaseState): SP {
 function mergeProps(
   stateProps: SP,
   dispatchProps: {
-    dispatch: Dispatch<any, any>
+    dispatch: Dispatch<any>
   }
 ): Props {
   const { dispatch } = dispatchProps
