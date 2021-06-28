@@ -8,7 +8,7 @@ import {
   LabwareFields,
   yesNoOptions,
 } from '../../../fields'
-import { isEveryFieldHidden } from '../../../utils'
+import { isEveryFieldHidden, getLabwareName } from '../../../utils'
 import { Grid } from '../../sections/Grid'
 import { FormAlerts } from '../../alerts/FormAlerts'
 import { TextField } from '../../TextField'
@@ -28,6 +28,10 @@ const radioFieldMock = RadioField as jest.MockedFunction<typeof RadioField>
 
 const isEveryFieldHiddenMock = isEveryFieldHidden as jest.MockedFunction<
   typeof isEveryFieldHidden
+>
+
+const getLabwareNameMock = getLabwareName as jest.MockedFunction<
+  typeof getLabwareName
 >
 
 const formikConfig: FormikConfig<LabwareFields> = {
@@ -94,12 +98,18 @@ describe('Grid', () => {
     resetAllWhenMocks()
   })
   it('should render when fields are visible', () => {
+    when(getLabwareNameMock)
+      .calledWith(formikConfig.initialValues, true)
+      .mockReturnValue('FAKE LABWARE NAME PLURAL')
+    when(getLabwareNameMock)
+
     render(wrapInFormik(<Grid />, formikConfig))
     expect(screen.getByText('Grid'))
     expect(screen.getByText('mock alerts'))
     expect(
       screen.getByText(
-        'The grid of wells on your labware is arranged via rows and columns. Rows run horizontally across your labware (left to right). Columns run top to bottom.'
+        'The grid of FAKE LABWARE NAME PLURAL on your labware is arranged via rows and columns. ' +
+          'Rows run horizontally across your labware (left to right). Columns run top to bottom.'
       )
     )
     expect(screen.getByText('gridRows text field'))
