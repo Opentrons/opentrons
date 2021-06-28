@@ -20,16 +20,6 @@ type StepKey =
   | typeof MODULE_SETUP_KEY
   | typeof LABWARE_SETUP_KEY
 
-const StepComponentMap: Record<StepKey, JSX.Element> = {
-  [ROBOT_CALIBRATION_STEP_KEY]: (
-    <Text marginTop={SPACING_3}>TODO: robot calibration step contents</Text>
-  ),
-  [MODULE_SETUP_KEY]: (
-    <Text marginTop={SPACING_3}>TODO: module setup step contents</Text>
-  ),
-  [LABWARE_SETUP_KEY]: <Text marginTop={SPACING_3}>TODO: labware setup</Text>,
-}
-
 export function RunSetupCard(): JSX.Element | null {
   const { t } = useTranslation('protocol_setup')
   const [expandedStepKey, setExpandedStepKey] = React.useState<StepKey | null>(
@@ -52,6 +42,16 @@ export function RunSetupCard(): JSX.Element | null {
     ]
   } else {
     stepsKeysInOrder = [...stepsKeysInOrder, LABWARE_SETUP_KEY]
+  }
+
+  const StepComponentMap: Record<StepKey, JSX.Element> = {
+    [ROBOT_CALIBRATION_STEP_KEY]: (
+      <Text marginTop={SPACING_3}>TODO: robot calibration step contents</Text>
+    ),
+    [MODULE_SETUP_KEY]: (
+      <Text marginTop={SPACING_3}>TODO: module setup step contents</Text>
+    ),
+    [LABWARE_SETUP_KEY]: <Text marginTop={SPACING_3}>TODO: labware setup</Text>,
   }
 
   return (
