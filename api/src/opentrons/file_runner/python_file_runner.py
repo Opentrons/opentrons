@@ -3,7 +3,7 @@ from .abstract_file_runner import AbstractFileRunner
 from .protocol_file import ProtocolFile
 from .python_file_reader import PythonFileReader
 from .python_executor import PythonExecutor
-from .context_creator import ProtocolContextCreator
+from .context_creator import ContextCreator
 
 
 class PythonFileRunner(AbstractFileRunner):
@@ -13,7 +13,7 @@ class PythonFileRunner(AbstractFileRunner):
         self,
         file: ProtocolFile,
         file_reader: PythonFileReader,
-        context_creator: ProtocolContextCreator,
+        context_creator: ContextCreator,
         executor: PythonExecutor,
     ) -> None:
         self._file = file

@@ -7,7 +7,7 @@ from opentrons.protocol_api_experimental import ProtocolContext
 from opentrons.file_runner import PythonFileRunner, ProtocolFile, ProtocolFileType
 from opentrons.file_runner.python_file_reader import PythonFileReader, PythonProtocol
 from opentrons.file_runner.python_executor import PythonExecutor
-from opentrons.file_runner.context_creator import ProtocolContextCreator
+from opentrons.file_runner.context_creator import ContextCreator
 
 
 @pytest.fixture
@@ -32,8 +32,8 @@ def file_reader(decoy: Decoy) -> PythonFileReader:
 
 
 @pytest.fixture
-def context_creator(decoy: Decoy) -> ProtocolContextCreator:
-    return decoy.create_decoy(spec=ProtocolContextCreator)
+def context_creator(decoy: Decoy) -> ContextCreator:
+    return decoy.create_decoy(spec=ContextCreator)
 
 
 @pytest.fixture
@@ -45,7 +45,7 @@ def executor(decoy: Decoy) -> PythonExecutor:
 def subject(
     protocol_file: ProtocolFile,
     file_reader: PythonFileReader,
-    context_creator: ProtocolContextCreator,
+    context_creator: ContextCreator,
     executor: PythonExecutor,
 ) -> PythonFileRunner:
     """Get a PythonFileRunner test subject with its dependencies mocked out."""
@@ -62,7 +62,7 @@ def test_python_runner_load(
     protocol_file: ProtocolFile,
     file_reader: PythonFileReader,
     python_protocol: PythonProtocol,
-    context_creator: ProtocolContextCreator,
+    context_creator: ContextCreator,
     protocol_context: ProtocolContext,
     executor: PythonExecutor,
     subject: PythonFileRunner,
