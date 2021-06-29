@@ -286,7 +286,7 @@ def model(request, hardware, loop):
 @pytest.fixture
 def smoothie(monkeypatch):
     from opentrons.drivers.smoothie_drivers.driver_3_0 import \
-        SmoothieDriver_3_0_0 as SmoothieDriver
+         SmoothieDriver_3_0_0 as SmoothieDriver
     from opentrons.config import robot_configs
 
     monkeypatch.setenv('ENABLE_VIRTUAL_SMOOTHIE', 'true')
@@ -306,7 +306,7 @@ def hardware_controller_lockfile():
     old_lockfile = config.CONFIG['hardware_controller_lockfile']
     with tempfile.TemporaryDirectory() as td:
         config.CONFIG['hardware_controller_lockfile']\
-            = pathlib.Path(td) / 'hardware.lock'
+            = pathlib.Path(td)/'hardware.lock'
         yield td
         config.CONFIG['hardware_controller_lockfile'] = old_lockfile
 
@@ -339,8 +339,8 @@ async def hardware_api(loop, is_robot):
 @pytest.fixture
 def get_labware_fixture():
     def _get_labware_fixture(fixture_name):
-        with open((pathlib.Path(__file__).parent / '..' / '..' / '..' / 'shared-data' /
-                   'labware' / 'fixtures' / '2' / f'{fixture_name}.json'), 'rb'
+        with open((pathlib.Path(__file__).parent/'..'/'..'/'..'/'shared-data' /
+                   'labware' / 'fixtures'/'2'/f'{fixture_name}.json'), 'rb'
                   ) as f:
             return json.loads(f.read().decode('utf-8'))
 
@@ -351,8 +351,8 @@ def get_labware_fixture():
 def get_json_protocol_fixture():
     def _get_json_protocol_fixture(fixture_version, fixture_name, decode=True):
         with open(pathlib.Path(__file__).parent /
-                  '..' / '..' / '..' / 'shared-data' / 'protocol' / 'fixtures' /
-                  fixture_version / f'{fixture_name}.json', 'rb') as f:
+                  '..'/'..'/'..'/'shared-data'/'protocol'/'fixtures' /
+                  fixture_version/f'{fixture_name}.json', 'rb') as f:
             contents = f.read().decode('utf-8')
             if decode:
                 return json.loads(contents)
@@ -508,22 +508,22 @@ def minimal_labware_def() -> dict:
         "ordering": [["A1"], ["A2"]],
         "wells": {
             "A1": {
-                "depth": 40,
-                "totalLiquidVolume": 100,
-                "diameter": 30,
-                "x": 0,
-                "y": 0,
-                "z": 0,
-                "shape": "circular"
+              "depth": 40,
+              "totalLiquidVolume": 100,
+              "diameter": 30,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "shape": "circular"
             },
             "A2": {
-                "depth": 40,
-                "totalLiquidVolume": 100,
-                "diameter": 30,
-                "x": 10,
-                "y": 0,
-                "z": 0,
-                "shape": "circular"
+              "depth": 40,
+              "totalLiquidVolume": 100,
+              "diameter": 30,
+              "x": 10,
+              "y": 0,
+              "z": 0,
+              "shape": "circular"
             }
         },
         "dimensions": {
@@ -550,9 +550,9 @@ def minimal_labware_def2() -> dict:
             "displayVolumeUnits": "mL",
         },
         "cornerOffsetFromSlot": {
-            "x": 10,
-            "y": 10,
-            "z": 5
+                "x": 10,
+                "y": 10,
+                "z": 5
         },
         "parameters": {
             "isTiprack": False,
@@ -563,58 +563,58 @@ def minimal_labware_def2() -> dict:
         "ordering": [["A1", "B1", "C1"], ["A2", "B2", "C2"]],
         "wells": {
             "A1": {
-                "depth": 40,
-                "totalLiquidVolume": 100,
-                "diameter": 30,
-                "x": 0,
-                "y": 18,
-                "z": 0,
-                "shape": "circular"
+              "depth": 40,
+              "totalLiquidVolume": 100,
+              "diameter": 30,
+              "x": 0,
+              "y": 18,
+              "z": 0,
+              "shape": "circular"
             },
             "B1": {
-                "depth": 40,
-                "totalLiquidVolume": 100,
-                "diameter": 30,
-                "x": 0,
-                "y": 9,
-                "z": 0,
-                "shape": "circular"
+              "depth": 40,
+              "totalLiquidVolume": 100,
+              "diameter": 30,
+              "x": 0,
+              "y": 9,
+              "z": 0,
+              "shape": "circular"
             },
             "C1": {
-                "depth": 40,
-                "totalLiquidVolume": 100,
-                "diameter": 30,
-                "x": 0,
-                "y": 0,
-                "z": 0,
-                "shape": "circular"
+              "depth": 40,
+              "totalLiquidVolume": 100,
+              "diameter": 30,
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "shape": "circular"
             },
             "A2": {
-                "depth": 40,
-                "totalLiquidVolume": 100,
-                "diameter": 30,
-                "x": 9,
-                "y": 18,
-                "z": 0,
-                "shape": "circular"
+              "depth": 40,
+              "totalLiquidVolume": 100,
+              "diameter": 30,
+              "x": 9,
+              "y": 18,
+              "z": 0,
+              "shape": "circular"
             },
             "B2": {
-                "depth": 40,
-                "totalLiquidVolume": 100,
-                "diameter": 30,
-                "x": 9,
-                "y": 9,
-                "z": 0,
-                "shape": "circular"
+              "depth": 40,
+              "totalLiquidVolume": 100,
+              "diameter": 30,
+              "x": 9,
+              "y": 9,
+              "z": 0,
+              "shape": "circular"
             },
             "C2": {
-                "depth": 40,
-                "totalLiquidVolume": 100,
-                "diameter": 30,
-                "x": 9,
-                "y": 0,
-                "z": 0,
-                "shape": "circular"
+              "depth": 40,
+              "totalLiquidVolume": 100,
+              "diameter": 30,
+              "x": 9,
+              "y": 0,
+              "z": 0,
+              "shape": "circular"
             }
         },
         "groups": [],
@@ -635,8 +635,8 @@ def minimal_labware_def2() -> dict:
 @pytest.fixture
 def min_lw_impl(minimal_labware_def) -> LabwareImplementation:
     return LabwareImplementation(
-        definition=minimal_labware_def,
-        parent=Location(Point(0, 0, 0), 'deck')
+            definition=minimal_labware_def,
+            parent=Location(Point(0, 0, 0), 'deck')
     )
 
 
