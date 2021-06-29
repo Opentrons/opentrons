@@ -372,7 +372,7 @@ def test_get_sessions_not_empty(
     engine_store: EngineStore,
     client: TestClient,
 ) -> None:
-    """It should a collection response when a session exists."""
+    """It should return a collection response when a session exists."""
     # TODO(mc, 2021-06-23): add actual multi-session support
     created_at_1 = datetime.now()
 
