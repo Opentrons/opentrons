@@ -149,18 +149,20 @@ settings = [
                     "current motion."
     ),
     SettingDefinition(
-        _id='disableFastProtocolUpload',
-        title='Disable Fast Protocol Upload',
+        _id="disableFastProtocolUpload",
+        title="Use older protocol analysis method",
         description=(
-            "By default, the OT-2 will perform a fast protocol analysis when you "
-            "upload a protocol file. This setting will disable fast analysis in "
-            "favor of slower, legacy simulation logic."
+            "Use an older, slower method of analyzing uploaded protocols. "
+            "This changes how the OT-2 validates your protocol during the upload "
+            "step, but does not affect how your protocol actually runs. "
+            "Opentrons Support might ask you to change this setting if you encounter "
+            "problems with the newer, faster protocol analysis method."
         ),
         restart_required=False,
     ),
     SettingDefinition(
         _id='enableHttpProtocolSessions',
-        title='Enable Experimental HTTP Protocol Sessions',
+        title='Enable experimental HTTP protocol sessions',
         description='Do not activate this unless you are a developer. '
                     'Activating this will disable protocol running from the '
                     'Opentrons application.',
@@ -168,7 +170,7 @@ settings = [
     ),
     SettingDefinition(
         _id="enableProtocolEngine",
-        title="Enable Experimental Protocol Engine",
+        title="Enable experimental protocol engine",
         description=(
             "Do not enable. This is an Opentrons-internal setting to test "
             "new protocol execution logic. This feature is not yet complete; "
