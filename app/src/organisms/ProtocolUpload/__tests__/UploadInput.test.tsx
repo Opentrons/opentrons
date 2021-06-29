@@ -15,10 +15,9 @@ describe('UploadInput', () => {
   beforeEach(() => {
     handleUpload = jest.fn()
     render = () => {
-      return renderWithProviders(
-        <UploadInput onUpload={handleUpload} />,
-        { i18nInstance: i18n }
-      )
+      return renderWithProviders(<UploadInput onUpload={handleUpload} />, {
+        i18nInstance: i18n,
+      })
     }
   })
 
@@ -56,7 +55,7 @@ describe('UploadInput', () => {
   it('calls create session on choose file', () => {
     const { getByTestId } = render()
     const input = getByTestId('file_input')
-    fireEvent.change(input, {target: {files: ['dummyFile']}})
+    fireEvent.change(input, { target: { files: ['dummyFile'] } })
     expect(handleUpload).toHaveBeenCalledWith('dummyFile')
   })
 })

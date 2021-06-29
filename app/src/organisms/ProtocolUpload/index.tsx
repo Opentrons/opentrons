@@ -22,9 +22,9 @@ export function ProtocolUpload(): JSX.Element {
   const { t } = useTranslation(['protocol_info', 'shared'])
   const dispatch = useDispatch<Dispatch>()
   const logger = useLogger(__filename)
-  const [uploadError, setUploadError] = React.useState<[string, ErrorObject[] | null | undefined] | null>(
-    null
-  )
+  const [uploadError, setUploadError] = React.useState<
+    [string, ErrorObject[] | null | undefined] | null
+  >(null)
   const protocolFile = useSelector((state: State) => getProtocolFile(state))
   const protocolName = useSelector((state: State) => getProtocolName(state))
 
