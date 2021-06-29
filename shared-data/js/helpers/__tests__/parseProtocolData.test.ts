@@ -68,7 +68,7 @@ describe('validateJsonProtocolFileContents', () => {
     })
     validateJsonProtocolFileContents('[]', handleError)
     expect(handleError).toBeCalledWith('INVALID_JSON_FILE', {
-      rawError: 'not parseable as JSON',
+      rawError: expect.any(Error),
     })
     parseSpy.mockRestore()
   })
