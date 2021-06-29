@@ -283,8 +283,8 @@ async def create_session_action(
     description=(
         "Get a list of all commands in the session and their statuses. "
         "This endpoint returns command summaries. Use "
-        "`GET /sessions/{sessionId}/commands/{commandId}` to all information "
-        "available for a given command."
+        "`GET /sessions/{sessionId}/commands/{commandId}` to get all "
+        "information available for a given command."
     ),
     status_code=status.HTTP_200_OK,
     response_model=MultiResponseModel[SessionCommandSummary],
