@@ -154,11 +154,6 @@ def test_pipettes(subject: CommandTranslator) -> None:
     assert expected_request_2 in result
 
 
-# todo(mm, 2021-06-28): Instead of pulling details out of fixtures, should each of
-# these command translation tests create its own hard-coded command input, and hard-code
-# its own matching output to assert against?
-
-
 def test_aspirate(
     subject: CommandTranslator, aspirate_command: models.json_protocol.LiquidCommand
 ) -> None:
