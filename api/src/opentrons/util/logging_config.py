@@ -17,6 +17,9 @@ def _balena_config(level_value: int) -> Dict[str, Any]:
                 'format':
                 '%(asctime)s %(name)s %(levelname)s [Line %(lineno)s] %(message)s'
             },
+            'emulator': {
+                'format': '%(created)f | %(module)s | %(message)s'
+            }
         },
         'handlers': {
             'debug': {
@@ -39,6 +42,13 @@ def _balena_config(level_value: int) -> Dict[str, Any]:
                 'maxBytes': 1000000,
                 'level': logging.DEBUG,
                 'backupCount': 5
+            },
+            'emulation': {
+                'class': 'logging.FileHandler',
+                'level': logging.DEBUG,
+                'filename': '/tmp/emulation.log',
+                'formatter': 'emulator',
+                'mode': 'w+',
             }
         },
         'loggers': {
@@ -52,6 +62,11 @@ def _balena_config(level_value: int) -> Dict[str, Any]:
             },
             'opentrons.drivers.serial_communication': {
                 'handlers': ['serial'],
+                'level': logging.DEBUG,
+                'propagate': False
+            },
+            'emulation': {
+                'handlers': ['emulation'],
                 'level': logging.DEBUG,
                 'propagate': False
             },
