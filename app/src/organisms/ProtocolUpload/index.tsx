@@ -22,18 +22,14 @@ export function ProtocolUpload(): JSX.Element {
   const { t } = useTranslation(['protocol_info', 'shared'])
   const dispatch = useDispatch<Dispatch>()
   const logger = useLogger(__filename)
-  const [uploadErrorKey, setUploadErrorKey] = React.useState<string | null>(
+  const [uploadError, setUploadError] = React.useState<[string, ErrorObject[] | null | undefined] | null>(
     null
   )
-  const [uploadSchemaError, setUploadSchemaError] = React.useState<
-    ErrorObject[] | null | undefined
-  >(null)
   const protocolFile = useSelector((state: State) => getProtocolFile(state))
   const protocolName = useSelector((state: State) => getProtocolName(state))
 
   const clearError = (): void => {
-    setUploadErrorKey(null)
-    setUploadSchemaError(null)
+    setUploadError(null)
   }
 
   const createSession = (file: File): void => {
@@ -46,8 +42,7 @@ export function ProtocolUpload(): JSX.Element {
       (errorKey, errorDetails) => {
         logger.warn(errorKey)
         console.info(errorDetails)
-        setUploadErrorKey(errorKey)
-        setUploadSchemaError(errorDetails?.schemaErrors)
+        setUploadError([errorKey, errorDetails?.schemaErrors])
       }
     )
   }
@@ -72,15 +67,15 @@ export function ProtocolUpload(): JSX.Element {
 
   return (
     <Page titleBarProps={titleBarProps}>
-      {uploadErrorKey != null && (
+      {uploadError != null && (
         <AlertItem
           type="warning"
           onCloseClick={clearError}
           title={t('protocol_upload_failed')}
         >
-          {t(VALIDATION_ERROR_T_MAP[uploadErrorKey])}
-          {uploadSchemaError != null &&
-            uploadSchemaError.map((errorObject, i) => (
+          {t(VALIDATION_ERROR_T_MAP[uploadError[0]])}
+          {uploadError[1] != null &&
+            uploadError[1].map((errorObject, i) => (
               <Text key={i}>{JSON.stringify(errorObject)}</Text>
             ))}
         </AlertItem>
