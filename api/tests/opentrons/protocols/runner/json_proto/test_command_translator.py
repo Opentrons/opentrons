@@ -65,40 +65,54 @@ def _make_json_protocol(
 
 def test_labware(
     subject: CommandTranslator,
-    json_protocol: models.JsonProtocol,
     minimal_labware_def: dict,
     minimal_labware_def2: dict,
 ) -> None:
-    result = subject.translate(json_protocol)
+    definition_1 = models.LabwareDefinition.parse_obj(minimal_labware_def)
+    definition_2 = models.LabwareDefinition.parse_obj(minimal_labware_def2)
+
+    definition_map = {
+        "definition-id-abc123": definition_1,
+        "definition-id-def456": definition_2,
+    }
+
+    labware_map = {
+        "labware-id-abc123": models.json_protocol.Labware(
+            slot="1", definitionId="definition-id-abc123"
+        ),
+        "labware-id-def456": models.json_protocol.Labware(
+            slot="2", definitionId="definition-id-def456"
+        ),
+    }
 
     expected_add_definition_request_1 = pe_commands.AddLabwareDefinitionRequest(
-        data=pe_commands.AddLabwareDefinitionData(
-            definition=models.LabwareDefinition.parse_obj(minimal_labware_def)
-        )
+        data=pe_commands.AddLabwareDefinitionData(definition=definition_1)
     )
     expected_load_request_1 = pe_commands.LoadLabwareRequest(
         data=pe_commands.LoadLabwareData(
             location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
-            loadName=minimal_labware_def["parameters"]["loadName"],
-            namespace=minimal_labware_def["namespace"],
-            version=minimal_labware_def["version"],
-            labwareId="tiprack1Id",
+            loadName=definition_1.parameters.loadName,
+            namespace=definition_1.namespace,
+            version=definition_1.version,
+            labwareId="labware-id-abc123",
         )
     )
 
     expected_add_definition_request_2 = pe_commands.AddLabwareDefinitionRequest(
-        data=pe_commands.AddLabwareDefinitionData(
-            definition=models.LabwareDefinition.parse_obj(minimal_labware_def2)
-        )
+        data=pe_commands.AddLabwareDefinitionData(definition=definition_2)
     )
     expected_load_request_2 = pe_commands.LoadLabwareRequest(
         data=pe_commands.LoadLabwareData(
-            location=DeckSlotLocation(slot=DeckSlotName.SLOT_10),
-            loadName=minimal_labware_def2["parameters"]["loadName"],
-            namespace=minimal_labware_def2["namespace"],
-            version=minimal_labware_def2["version"],
-            labwareId="wellplate1Id",
+            location=DeckSlotLocation(slot=DeckSlotName.SLOT_2),
+            loadName=definition_2.parameters.loadName,
+            namespace=definition_2.namespace,
+            version=definition_2.version,
+            labwareId="labware-id-def456",
         )
+    )
+
+    result = subject.translate(
+        _make_json_protocol(labware_definitions=definition_map, labware=labware_map)
     )
 
     _assert_appear_in_order(
