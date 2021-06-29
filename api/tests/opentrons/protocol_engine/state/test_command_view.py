@@ -24,12 +24,12 @@ def get_command_view(
     return CommandView(state=state)
 
 
-def test_get_command_by_id() -> None:
+def test_get_by_id() -> None:
     """It should get a command by ID from state."""
     command = create_completed_command(command_id="command-id")
     subject = get_command_view(commands_by_id=[("command-id", command)])
 
-    assert subject.get_command_by_id("command-id") == command
+    assert subject.get("command-id") == command
 
 
 def test_get_command_bad_id() -> None:
@@ -38,10 +38,10 @@ def test_get_command_bad_id() -> None:
     subject = get_command_view(commands_by_id=[("command-id", command)])
 
     with pytest.raises(errors.CommandDoesNotExistError):
-        subject.get_command_by_id("asdfghjkl")
+        subject.get("asdfghjkl")
 
 
-def test_get_all_commands() -> None:
+def test_get_all() -> None:
     """It should get all the commands from the state."""
     command_1 = create_completed_command(command_id="command-id-1")
     command_2 = create_running_command(command_id="command-id-2")
@@ -55,14 +55,10 @@ def test_get_all_commands() -> None:
         ]
     )
 
-    assert subject.get_all_commands() == [
-        ("command-id-1", command_1),
-        ("command-id-2", command_2),
-        ("command-id-3", command_3),
-    ]
+    assert subject.get_all() == [command_1, command_2, command_3]
 
 
-def test_get_next_command_returns_first_pending() -> None:
+def test_get_next_queued_returns_first_pending() -> None:
     """It should return the first command that's pending."""
     pending_command = create_pending_command()
     running_command = create_running_command()
@@ -77,10 +73,10 @@ def test_get_next_command_returns_first_pending() -> None:
         ]
     )
 
-    assert subject.get_next_command() == "command-id-3"
+    assert subject.get_next_queued() == "command-id-3"
 
 
-def test_get_next_command_returns_none_when_no_pending() -> None:
+def test_get_next_queued_returns_none_when_no_pending() -> None:
     """It should return None if there are no pending commands to return."""
     running_command = create_running_command(command_id="command-id-1")
     completed_command = create_completed_command(command_id="command-id-2")
@@ -88,7 +84,7 @@ def test_get_next_command_returns_none_when_no_pending() -> None:
 
     subject = get_command_view()
 
-    assert subject.get_next_command() is None
+    assert subject.get_next_queued() is None
 
     subject = get_command_view(
         commands_by_id=[
@@ -98,10 +94,10 @@ def test_get_next_command_returns_none_when_no_pending() -> None:
         ]
     )
 
-    assert subject.get_next_command() is None
+    assert subject.get_next_queued() is None
 
 
-def test_get_next_command_returns_none_when_earlier_command_failed() -> None:
+def test_get_next_queued_returns_none_when_earlier_command_failed() -> None:
     """It should return None if any prior-added command is failed."""
     running_command = create_running_command(command_id="command-id-1")
     completed_command = create_completed_command(command_id="command-id-2")
@@ -117,4 +113,4 @@ def test_get_next_command_returns_none_when_earlier_command_failed() -> None:
         ]
     )
 
-    assert subject.get_next_command() is None
+    assert subject.get_next_queued() is None

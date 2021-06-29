@@ -134,9 +134,9 @@ async def test_execute_command_by_id(
         data=data,
     )
 
-    decoy.when(
-        state_store.state_view.commands.get_command_by_id("command-id")
-    ).then_return(queued_command)
+    decoy.when(state_store.state_view.commands.get("command-id")).then_return(
+        queued_command
+    )
 
     decoy.when(resources.model_utils.get_timestamp()).then_return(started_at)
 

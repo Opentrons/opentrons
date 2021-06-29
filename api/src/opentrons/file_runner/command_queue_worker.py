@@ -89,7 +89,7 @@ class CommandQueueWorker:
     ) -> Optional[str]:
         if self._keep_running:
             # Will be None if the engine has no commands left.
-            return self._engine.state_view.commands.get_next_command()
+            return self._engine.state_view.commands.get_next_queued()
         else:
             return None
 

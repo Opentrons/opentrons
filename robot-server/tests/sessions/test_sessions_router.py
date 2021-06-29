@@ -8,6 +8,12 @@ from fastapi.testclient import TestClient
 from httpx import AsyncClient
 from typing import AsyncIterator
 
+from opentrons.protocol_engine import (
+    CommandStatus,
+    commands as pe_commands,
+    errors as pe_errors,
+)
+
 from robot_server.errors import exception_handlers
 from robot_server.protocols import (
     ProtocolStore,
@@ -25,6 +31,7 @@ from robot_server.sessions.session_models import (
     ProtocolSession,
     ProtocolSessionCreateData,
     ProtocolSessionCreateParams,
+    SessionCommandSummary,
 )
 
 from robot_server.sessions.engine_store import (
@@ -50,6 +57,7 @@ from robot_server.sessions.router import (
     SessionNotFound,
     SessionAlreadyActive,
     SessionActionNotAllowed,
+    CommandNotFound,
     get_session_store,
     get_engine_store,
     get_protocol_store,
@@ -118,7 +126,10 @@ async def test_create_session(
         id=unique_id,
         createdAt=current_time,
         actions=[],
+        commands=[],
     )
+
+    decoy.when(engine_store.engine.state_view.commands.get_all()).then_return([])
 
     decoy.when(
         session_view.as_resource(
@@ -129,7 +140,7 @@ async def test_create_session(
     ).then_return(session)
 
     decoy.when(
-        session_view.as_response(session=session),
+        session_view.as_response(session=session, commands=[]),
     ).then_return(expected_response)
 
     response = await async_client.post(
@@ -176,6 +187,7 @@ async def test_create_protocol_session(
         createdAt=current_time,
         createParams=ProtocolSessionCreateParams(protocolId="protocol-id"),
         actions=[],
+        commands=[],
     )
 
     decoy.when(protocol_store.get(protocol_id="protocol-id")).then_return(protocol)
@@ -190,8 +202,10 @@ async def test_create_protocol_session(
         )
     ).then_return(session)
 
+    decoy.when(engine_store.engine.state_view.commands.get_all()).then_return([])
+
     decoy.when(
-        session_view.as_response(session=session),
+        session_view.as_response(session=session, commands=[]),
     ).then_return(expected_response)
 
     response = await async_client.post(
@@ -287,6 +301,7 @@ def test_get_session(
     decoy: Decoy,
     session_view: SessionView,
     session_store: SessionStore,
+    engine_store: EngineStore,
     client: TestClient,
 ) -> None:
     """It should be able to get a session by ID."""
@@ -302,11 +317,15 @@ def test_get_session(
         id="session-id",
         createdAt=created_at,
         actions=[],
+        commands=[],
     )
 
     decoy.when(session_store.get(session_id="session-id")).then_return(session)
+
+    decoy.when(engine_store.engine.state_view.commands.get_all()).then_return([])
+
     decoy.when(
-        session_view.as_response(session=session),
+        session_view.as_response(session=session, commands=[]),
     ).then_return(expected_response)
 
     response = client.get("/sessions/session-id")
@@ -338,7 +357,7 @@ def test_get_sessions_empty(
     session_store: SessionStore,
     client: TestClient,
 ) -> None:
-    """It should return an empty collection response with no sessions exist."""
+    """It should return an empty collection response when no sessions exist."""
     decoy.when(session_store.get_all()).then_return([])
 
     response = client.get("/sessions")
@@ -350,11 +369,12 @@ def test_get_sessions_not_empty(
     decoy: Decoy,
     session_view: SessionView,
     session_store: SessionStore,
+    engine_store: EngineStore,
     client: TestClient,
 ) -> None:
-    """It should return an empty collection response with no sessions exist."""
+    """It should return a collection response when a session exists."""
+    # TODO(mc, 2021-06-23): add actual multi-session support
     created_at_1 = datetime.now()
-    created_at_2 = datetime.now()
 
     session_1 = SessionResource(
         session_id="unique-id-1",
@@ -362,39 +382,25 @@ def test_get_sessions_not_empty(
         created_at=created_at_1,
         actions=[],
     )
-    session_2 = SessionResource(
-        session_id="unique-id-2",
-        create_data=BasicSessionCreateData(),
-        created_at=created_at_2,
-        actions=[],
-    )
 
     response_1 = BasicSession(
         id="unique-id-1",
         createdAt=created_at_1,
         actions=[],
-    )
-    response_2 = BasicSession(
-        id="unique-id-2",
-        createdAt=created_at_2,
-        actions=[],
+        commands=[],
     )
 
-    decoy.when(session_store.get_all()).then_return([session_1, session_2])
+    decoy.when(session_store.get_all()).then_return([session_1])
+
+    decoy.when(engine_store.engine.state_view.commands.get_all()).then_return([])
 
     decoy.when(
-        session_view.as_response(session=session_1),
+        session_view.as_response(session=session_1, commands=[]),
     ).then_return(response_1)
-
-    decoy.when(
-        session_view.as_response(session=session_2),
-    ).then_return(response_2)
 
     response = client.get("/sessions")
 
-    verify_response(
-        response, expected_status=200, expected_data=[response_1, response_2]
-    )
+    verify_response(response, expected_status=200, expected_data=[response_1])
 
 
 def test_delete_session_by_id(
@@ -564,4 +570,185 @@ def test_create_session_action_without_runner(
         response,
         expected_status=400,
         expected_errors=SessionActionNotAllowed(detail="oh no"),
+    )
+
+
+def test_get_session_commands(
+    decoy: Decoy,
+    session_view: SessionView,
+    session_store: SessionStore,
+    engine_store: EngineStore,
+    client: TestClient,
+) -> None:
+    """It should return a list of all commands in a session."""
+    session = SessionResource(
+        session_id="session-id",
+        create_data=BasicSessionCreateData(),
+        created_at=datetime(year=2021, month=1, day=1),
+        actions=[],
+    )
+
+    command = pe_commands.MoveToWell(
+        id="command-id",
+        status=CommandStatus.RUNNING,
+        createdAt=datetime(year=2022, month=2, day=2),
+        data=pe_commands.MoveToWellData(pipetteId="a", labwareId="b", wellName="c"),
+    )
+
+    command_summary = SessionCommandSummary(
+        id="command-id",
+        commandType="moveToWell",
+        status=CommandStatus.RUNNING,
+    )
+
+    session_response = BasicSession(
+        id="session-id",
+        createdAt=datetime(year=2021, month=1, day=1),
+        actions=[],
+        commands=[command_summary],
+    )
+
+    decoy.when(session_store.get(session_id="session-id")).then_return(session)
+
+    decoy.when(engine_store.engine.state_view.commands.get_all()).then_return([command])
+
+    decoy.when(
+        session_view.as_response(session=session, commands=[command]),
+    ).then_return(session_response)
+
+    response = client.get("/sessions/session-id/commands")
+
+    verify_response(response, expected_status=200, expected_data=[command_summary])
+
+
+def test_get_session_commands_missing_session(
+    decoy: Decoy,
+    session_view: SessionView,
+    session_store: SessionStore,
+    engine_store: EngineStore,
+    client: TestClient,
+) -> None:
+    """It should 404 if you attempt to get the commands for a non-existent session."""
+    key_error = SessionNotFoundError(session_id="session-id")
+
+    decoy.when(session_store.get(session_id="session-id")).then_raise(key_error)
+
+    response = client.get("/sessions/session-id/commands")
+
+    verify_response(
+        response,
+        expected_status=404,
+        expected_errors=SessionNotFound(detail=str(key_error)),
+    )
+
+
+def test_get_session_command_by_id(
+    decoy: Decoy,
+    session_view: SessionView,
+    session_store: SessionStore,
+    engine_store: EngineStore,
+    client: TestClient,
+) -> None:
+    """It should return full details about a command by ID."""
+    session = SessionResource(
+        session_id="session-id",
+        create_data=BasicSessionCreateData(),
+        created_at=datetime(year=2021, month=1, day=1),
+        actions=[],
+    )
+
+    session_response = BasicSession(
+        id="session-id",
+        createdAt=datetime(year=2021, month=1, day=1),
+        actions=[],
+        commands=[],
+    )
+
+    command = pe_commands.MoveToWell(
+        id="command-id",
+        status=CommandStatus.RUNNING,
+        createdAt=datetime(year=2022, month=2, day=2),
+        data=pe_commands.MoveToWellData(pipetteId="a", labwareId="b", wellName="c"),
+    )
+
+    decoy.when(session_store.get(session_id="session-id")).then_return(session)
+
+    decoy.when(engine_store.engine.state_view.commands.get_all()).then_return([command])
+
+    decoy.when(
+        session_view.as_response(session=session, commands=[command]),
+    ).then_return(session_response)
+
+    decoy.when(engine_store.engine.state_view.commands.get("command-id")).then_return(
+        command
+    )
+
+    response = client.get("/sessions/session-id/commands/command-id")
+
+    verify_response(response, expected_status=200, expected_data=command)
+
+
+def test_get_session_command_missing_session(
+    decoy: Decoy,
+    session_view: SessionView,
+    session_store: SessionStore,
+    engine_store: EngineStore,
+    client: TestClient,
+) -> None:
+    """It should 404 if you attempt to get a command for a non-existent session."""
+    key_error = SessionNotFoundError(session_id="session-id")
+
+    decoy.when(session_store.get(session_id="session-id")).then_raise(key_error)
+
+    response = client.get("/sessions/session-id/commands/command-id")
+
+    verify_response(
+        response,
+        expected_status=404,
+        expected_errors=SessionNotFound(detail=str(key_error)),
+    )
+
+
+def test_get_session_command_missing_command(
+    decoy: Decoy,
+    session_view: SessionView,
+    session_store: SessionStore,
+    engine_store: EngineStore,
+    client: TestClient,
+) -> None:
+    """It should 404 if you attempt to get a non-existent command."""
+    session = SessionResource(
+        session_id="session-id",
+        create_data=BasicSessionCreateData(),
+        created_at=datetime(year=2021, month=1, day=1),
+        actions=[],
+    )
+
+    session_response = BasicSession(
+        id="session-id",
+        createdAt=datetime(year=2021, month=1, day=1),
+        actions=[],
+        commands=[],
+    )
+
+    key_error = pe_errors.CommandDoesNotExistError("oh no")
+
+    decoy.when(session_store.get(session_id="session-id")).then_return(session)
+
+    decoy.when(engine_store.engine.state_view.commands.get_all()).then_return([])
+
+    decoy.when(
+        session_view.as_response(session=session, commands=[]),
+    ).then_return(session_response)
+
+    decoy.when(engine_store.engine.state_view.commands.get("command-id")).then_raise(
+        key_error
+    )
+
+    response = client.get("/sessions/session-id/commands/command-id")
+
+    verify_response(
+        response,
+        expected_status=404,
+        expected_errors=CommandNotFound(detail=str(key_error)),
     )

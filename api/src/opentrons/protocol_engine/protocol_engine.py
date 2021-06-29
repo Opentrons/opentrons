@@ -56,7 +56,7 @@ class ProtocolEngine:
 
     async def execute_command_by_id(self, command_id: str) -> Command:
         """Execute a protocol engine command by its identifier."""
-        queued_command = self.state_view.commands.get_command_by_id(command_id)
+        queued_command = self.state_view.commands.get(command_id)
 
         running_command = self._command_mapper.update_command(
             command=queued_command,

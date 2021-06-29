@@ -2,6 +2,13 @@
 import pytest
 from datetime import datetime
 
+from opentrons.types import MountType
+from opentrons.protocol_engine import (
+    CommandStatus,
+    PipetteName,
+    commands as pe_commands,
+)
+
 from robot_server.sessions.session_store import SessionResource
 from robot_server.sessions.session_view import SessionView
 from robot_server.sessions.session_models import (
@@ -11,6 +18,7 @@ from robot_server.sessions.session_models import (
     ProtocolSession,
     ProtocolSessionCreateData,
     ProtocolSessionCreateParams,
+    SessionCommandSummary,
 )
 
 from robot_server.sessions.action_models import (
@@ -99,6 +107,7 @@ current_time = datetime.now()
                 id="session-id",
                 createdAt=current_time,
                 actions=[],
+                commands=[],
             ),
         ),
         (
@@ -115,6 +124,7 @@ current_time = datetime.now()
                 createdAt=current_time,
                 createParams=ProtocolSessionCreateParams(protocolId="protocol-id"),
                 actions=[],
+                commands=[],
             ),
         ),
     ),
@@ -125,7 +135,58 @@ def test_to_response(
 ) -> None:
     """It should create a BasicSession if session_data is None."""
     subject = SessionView()
-    assert subject.as_response(session_resource) == expected_response
+    result = subject.as_response(session=session_resource, commands=[])
+    assert result == expected_response
+
+
+def test_to_response_maps_commands() -> None:
+    """It should map ProtocolEngine commands to SessionCommandSummary models."""
+    session_resource = SessionResource(
+        session_id="session-id",
+        create_data=BasicSessionCreateData(),
+        created_at=datetime(year=2021, month=1, day=1),
+        actions=[],
+    )
+
+    command_1 = pe_commands.LoadPipette(
+        id="command-1",
+        status=CommandStatus.RUNNING,
+        createdAt=datetime(year=2022, month=2, day=2),
+        data=pe_commands.LoadPipetteData(
+            mount=MountType.LEFT,
+            pipetteName=PipetteName.P300_SINGLE,
+        ),
+    )
+
+    command_2 = pe_commands.MoveToWell(
+        id="command-2",
+        status=CommandStatus.QUEUED,
+        createdAt=datetime(year=2023, month=3, day=3),
+        data=pe_commands.MoveToWellData(pipetteId="a", labwareId="b", wellName="c"),
+    )
+
+    subject = SessionView()
+    result = subject.as_response(
+        session=session_resource, commands=[command_1, command_2]
+    )
+
+    assert result == BasicSession(
+        id="session-id",
+        createdAt=datetime(year=2021, month=1, day=1),
+        actions=[],
+        commands=[
+            SessionCommandSummary(
+                id="command-1",
+                commandType="loadPipette",
+                status=CommandStatus.RUNNING,
+            ),
+            SessionCommandSummary(
+                id="command-2",
+                commandType="moveToWell",
+                status=CommandStatus.QUEUED,
+            ),
+        ],
+    )
 
 
 def test_create_action(current_time: datetime) -> None:
