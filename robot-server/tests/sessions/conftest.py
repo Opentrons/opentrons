@@ -124,7 +124,7 @@ def python_protocol_file(tmp_path: Path) -> Path:
             """
             # my protocol
             metadata = {
-                "apiVersion": "3.0"
+                "apiVersion": "3.0",
             }
             def run(ctx):
                 pass
