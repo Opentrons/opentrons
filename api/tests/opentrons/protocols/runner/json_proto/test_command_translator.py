@@ -34,27 +34,32 @@ def _assert_appear_in_order(elements: List[Any], source: List[Any]) -> None:
             source=["a", "b", "c", "d"]
         )  # Fail.
     """
+    for element in elements:
+        # .index() will check this, but asserting separately lets PyTest show better
+        # error details.
+        assert element in source
     element_indexes = [source.index(element) for element in elements]
     assert sorted(element_indexes) == element_indexes
 
 
 def _make_json_protocol(
-    commands: List[models.json_protocol.AllCommands] = [],
+    *,
     pipettes: Dict[str, models.json_protocol.Pipettes] = {},
+    labware_definitions: Dict[str, models.LabwareDefinition] = {},
+    labware: Dict[str, models.json_protocol.Labware] = {},
+    commands: List[models.json_protocol.AllCommands] = [],
 ) -> models.JsonProtocol:
     """Return a minimal JsonProtocol with the given elements, to use as test input."""
-    return models.JsonProtocol.parse_obj(
-        {
-            # Arbitrary schemaVersion. Currently (2021-06-28), JsonProtocol.parse_obj()
-            # isn't smart enough to validate differently depending on this field.
-            "schemaVersion": 5,
-            "metadata": {},
-            "robot": {"model": "OT-2 Standard"},
-            "pipettes": pipettes,
-            "labware": {},
-            "labwareDefinitions": {},
-            "commands": commands,
-        }
+    return models.JsonProtocol(
+        # schemaVersion is arbitrary. Currently (2021-06-28), JsonProtocol.parse_obj()
+        # isn't smart enough to validate differently depending on this field.
+        schemaVersion=5,
+        metadata=models.json_protocol.Metadata(),
+        robot=models.json_protocol.Robot(model="OT-2 Standard"),
+        pipettes=pipettes,
+        labwareDefinitions=labware_definitions,
+        labware=labware,
+        commands=commands,
     )
 
 
