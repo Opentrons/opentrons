@@ -49,7 +49,7 @@ class CommandView:
             raise CommandDoesNotExistError(f"Command {command_id} does not exist")
 
     def get_all(self) -> List[Command]:
-        """Get a list of all commands in state, paired with their respective IDs.
+        """Get a list of all commands in state.
 
         Entries are returned in the order of first-added command to last-added command.
         Replacing a command (to change its status, for example) keeps its place in the
