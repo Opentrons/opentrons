@@ -127,11 +127,6 @@ settings = [
                     ' robots that do not have crosses etched on the deck'
     ),
     SettingDefinition(
-        _id='useProtocolApi2',
-        title='Use Protocol API version 2',
-        description='Deprecated feature flag'
-    ),
-    SettingDefinition(
         _id='disableHomeOnBoot',
         old_id='disable-home-on-boot',
         title='Disable home on boot',
@@ -154,11 +149,14 @@ settings = [
                     "current motion."
     ),
     SettingDefinition(
-        _id='enableTipLengthCalibration',
-        title='Enable Under-Development Calibration Flows',
-        description='Do not activate this unless you are a developer. '
-                    'Enables the in-progress robot calibration flows '
-                    'for tip length, deck, and instrument calibration.'
+        _id='disableFastProtocolUpload',
+        title='Disable Fast Protocol Upload',
+        description=(
+            "By default, the OT-2 will perform a fast protocol analysis when you "
+            "upload a protocol file. This setting will disable fast analysis in "
+            "favor of slower, legacy simulation logic."
+        ),
+        restart_required=False,
     ),
     SettingDefinition(
         _id='enableHttpProtocolSessions',
@@ -169,16 +167,6 @@ settings = [
         restart_required=True,
     ),
     SettingDefinition(
-        _id='enableFastProtocolUpload',
-        title='Enable Experimental Fast Protocol Upload',
-        description='Enabling this flag will skip simulation for a faster '
-                    'upload. The protocol will be analyzed for syntax errors, '
-                    'run steps, and equipment requirements. This feature '
-                    'should only be used if a protocol has been simulated '
-                    'before.',
-        restart_required=False,
-    ),
-    SettingDefinition(
         _id="enableProtocolEngine",
         title="Enable Experimental Protocol Engine",
         description=(
@@ -186,8 +174,8 @@ settings = [
             "new protocol execution logic. This feature is not yet complete; "
             "your protocols will break if you enable this setting."
         ),
-        restart_required=False,
-    )
+        restart_required=True,
+    ),
 ]
 
 if ARCHITECTURE == SystemArchitecture.BUILDROOT:
@@ -384,18 +372,35 @@ def _migrate7to8(previous: SettingsMap) -> SettingsMap:
 
 
 def _migrate8to9(previous: SettingsMap) -> SettingsMap:
-    """
-    Migration to version 8 of the feature flags file. Adds the
-    enableFastProtocolUpload config element.
+    """Migrate to version 9 of the feature flags file.
+
+    - Adds the enableProtocolEngine config element.
     """
     newmap = {k: v for k, v in previous.items()}
     newmap["enableProtocolEngine"] = None
     return newmap
 
 
+def _migrate9to10(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 10 of the feature flags file.
+
+    - Removes deprecated useProtocolApi2 option
+    - Removes deprecated enableApi1BackCompat option
+    - Removed deprecated useV1HttpApi option
+    - Removes deprecated enableTipLengthCalibration option
+    - Removes deprecated enableFastProtocolUpload option
+    - Adds disableFastProtocolUpload option
+    """
+    removals = ['useProtocolApi2', 'enableApi1BackCompat', 'useV1HttpApi',
+                'enableTipLengthCalibration', 'enableFastProtocolUpload']
+    newmap = {k: v for k, v in previous.items() if k not in removals}
+    newmap["disableFastProtocolUpload"] = None
+    return newmap
+
+
 _MIGRATIONS = [_migrate0to1, _migrate1to2, _migrate2to3, _migrate3to4,
                _migrate4to5, _migrate5to6, _migrate6to7, _migrate7to8,
-               _migrate8to9]
+               _migrate8to9, _migrate9to10]
 """
 List of all migrations to apply, indexed by (version - 1). See _migrate below
 for how the migration functions are applied. Each migration function should
@@ -426,9 +431,11 @@ def _migrate(data: Mapping[str, Any]) -> SettingsData:
 
 
 def _ensure(data: Mapping[str, Any]) -> SettingsMap:
-    """
+    """Ensure config data is valid, regardless of version.
+
     Even after migration, we may have an invalid file. For instance,
-    we may have _downgraded_. Make sure all required keys are present.
+    the user may have _downgraded_. Make sure all required keys are present,
+    regardless of config version.
     """
     newdata = {k: v for k, v in data.items()}
     for s in settings:

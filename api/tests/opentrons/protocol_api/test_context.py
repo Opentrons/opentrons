@@ -944,7 +944,7 @@ def test_tip_length_for(ctx, monkeypatch):
             ['opentrons/geb_96_tiprack_10ul/1'])
 
 
-def test_tip_length_for_caldata(ctx, monkeypatch, use_new_calibration):
+def test_tip_length_for_caldata(ctx, monkeypatch):
     instr = ctx.load_instrument('p20_single_gen2', 'left')
     tiprack = ctx.load_labware('geb_96_tiprack_10ul', '1')
     mock_tip_length = mock.Mock()

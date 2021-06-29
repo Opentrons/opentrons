@@ -33,7 +33,7 @@ async def test_home_specific_sim(hardware_api, monkeypatch, is_robot):
                                               Axis.C: 19}
 
 
-async def test_retract(hardware_api, toggle_new_calibration):
+async def test_retract(hardware_api):
     await hardware_api.home()
     await hardware_api.move_to(types.Mount.RIGHT, types.Point(0, 10, 20))
     await hardware_api.retract(types.Mount.RIGHT, 10)
@@ -45,7 +45,7 @@ async def test_retract(hardware_api, toggle_new_calibration):
                                               Axis.C: 19}
 
 
-async def test_move(hardware_api, is_robot, toggle_new_calibration):
+async def test_move(hardware_api, is_robot):
     abs_position = types.Point(30, 20, 10)
     mount = types.Mount.RIGHT
     target_position1 = {Axis.X: 30,
@@ -98,7 +98,7 @@ async def test_move_extras_passed_through(hardware_api, monkeypatch):
 
 
 async def test_mount_offset_applied(
-        hardware_api, is_robot, toggle_new_calibration):
+        hardware_api, is_robot):
     await hardware_api.home()
     abs_position = types.Point(30, 20, 10)
     mount = types.Mount.LEFT
@@ -179,7 +179,7 @@ async def test_critical_point_applied(hardware_api, monkeypatch, is_robot):
 
 
 async def test_new_critical_point_applied(
-        hardware_api, monkeypatch, is_robot, use_new_calibration):
+        hardware_api, monkeypatch, is_robot):
     await hardware_api.home()
     hardware_api._backend._attached_instruments\
         = {types.Mount.LEFT: {'model': None, 'id': None},
@@ -245,7 +245,7 @@ async def test_new_critical_point_applied(
 
 
 async def test_attitude_deck_cal_applied(
-        monkeypatch, loop, use_new_calibration):
+        monkeypatch, loop):
     new_gantry_cal = [
         [1.0047, -0.0046, 0.0],
         [0.0011, 1.0038, 0.0],
@@ -278,7 +278,7 @@ async def test_attitude_deck_cal_applied(
 
 
 async def test_other_mount_retracted(
-        hardware_api, is_robot, toggle_new_calibration):
+        hardware_api, is_robot):
     await hardware_api.home()
     await hardware_api.move_to(types.Mount.RIGHT, types.Point(0, 0, 0))
     assert await hardware_api.gantry_position(types.Mount.RIGHT)\
@@ -289,7 +289,7 @@ async def test_other_mount_retracted(
 
 
 async def test_shake_during_pick_up(
-        hardware_api, monkeypatch, toggle_new_calibration):
+        hardware_api, monkeypatch):
     await hardware_api.home()
     hardware_api._backend._attached_instruments\
         = {types.Mount.LEFT: {'model': None, 'id': None},
@@ -326,7 +326,7 @@ async def test_shake_during_pick_up(
 
 
 async def test_shake_during_drop(
-        hardware_api, monkeypatch, toggle_new_calibration):
+        hardware_api, monkeypatch):
     await hardware_api.home()
     hardware_api._backend._attached_instruments\
         = {types.Mount.LEFT: {'model': None, 'id': None},
@@ -351,7 +351,7 @@ async def test_shake_during_drop(
     # Test drop tip shake with 25% of tiprack well diameter
     # between upper (2.25 mm) and lower limit (1.0 mm)
     shake_tips_drop.reset_mock()
-    await shake_tips_drop(types.Mount.RIGHT, 2.0*4)
+    await shake_tips_drop(types.Mount.RIGHT, 2.0 * 4)
     move_rel_calls = [
         mock.call(types.Mount.RIGHT, types.Point(-2, 0, 0), speed=50),
         mock.call(types.Mount.RIGHT, types.Point(4, 0, 0), speed=50),
@@ -362,7 +362,7 @@ async def test_shake_during_drop(
     # Test drop tip shake with 25% of tiprack well diameter
     # over upper (2.25 mm) limit
     shake_tips_drop.reset_mock()
-    await shake_tips_drop(types.Mount.RIGHT, 2.3*4)
+    await shake_tips_drop(types.Mount.RIGHT, 2.3 * 4)
     move_rel_calls = [
         mock.call(types.Mount.RIGHT, types.Point(-2.25, 0, 0), speed=50),
         mock.call(types.Mount.RIGHT, types.Point(4.5, 0, 0), speed=50),
@@ -373,7 +373,7 @@ async def test_shake_during_drop(
     # Test drop tip shake with 25% of tiprack well diameter
     # below lower (1.0 mm) limit
     shake_tips_drop.reset_mock()
-    await shake_tips_drop(types.Mount.RIGHT, 0.9*4)
+    await shake_tips_drop(types.Mount.RIGHT, 0.9 * 4)
     move_rel_calls = [
         mock.call(types.Mount.RIGHT, types.Point(-1, 0, 0), speed=50),
         mock.call(types.Mount.RIGHT, types.Point(2, 0, 0), speed=50),
@@ -383,7 +383,7 @@ async def test_shake_during_drop(
 
 
 async def test_move_rel_bounds(
-        hardware_api, toggle_new_calibration):
+        hardware_api):
     with pytest.raises(OutOfBoundsMove):
         await hardware_api.move_rel(
             types.Mount.RIGHT, types.Point(0, 0, 2000),
