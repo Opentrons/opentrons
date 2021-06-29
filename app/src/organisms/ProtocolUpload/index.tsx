@@ -32,7 +32,7 @@ export function ProtocolUpload(): JSX.Element {
     setUploadError(null)
   }
 
-  const createSession = (file: File): void => {
+  const handleUpload = (file: File): void => {
     clearError()
     ingestProtocolFile(
       file,
@@ -88,7 +88,7 @@ export function ProtocolUpload(): JSX.Element {
         {protocolFile !== null ? (
           <ProtocolSetup />
         ) : (
-          <UploadInput createSession={createSession} />
+          <UploadInput onUpload={handleUpload} />
         )}
       </Box>
     </Page>

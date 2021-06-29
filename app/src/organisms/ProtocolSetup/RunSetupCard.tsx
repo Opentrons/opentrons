@@ -28,7 +28,7 @@ export function RunSetupCard(): JSX.Element | null {
   const protocolData = useSelector((state: State) => getProtocolData(state))
 
   if (
-    protocolData === null ||
+    protocolData == null ||
     ('metadata' in protocolData && Object.keys(protocolData).length === 1)
   )
     return null
