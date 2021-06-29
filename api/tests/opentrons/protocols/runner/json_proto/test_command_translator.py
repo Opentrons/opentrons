@@ -125,6 +125,8 @@ def test_labware(
         source=result,
     )
 
+    assert len(result) == 4
+
 
 def test_pipettes(subject: CommandTranslator) -> None:
     json_pipettes = {
@@ -150,8 +152,10 @@ def test_pipettes(subject: CommandTranslator) -> None:
 
     result = subject.translate(_make_json_protocol(pipettes=json_pipettes))
 
+    # set() would be a nicer way to write this, but our Pydantic models aren't hashable.
     assert expected_request_1 in result
     assert expected_request_2 in result
+    assert len(result) == 2
 
 
 def test_aspirate(
