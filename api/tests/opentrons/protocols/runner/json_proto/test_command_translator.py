@@ -159,20 +159,22 @@ def test_aspirate(
 ) -> None:
     """It should translate a JSON aspirate command to a Protocol Engine
     aspirate request."""
-    request = subject._translate_command(aspirate_command)
+    result = subject.translate(_make_json_protocol(commands=[aspirate_command]))
 
-    assert request == pe_commands.AspirateRequest(
-        data=pe_commands.AspirateData(
-            pipetteId=aspirate_command.params.pipette,
-            labwareId=aspirate_command.params.labware,
-            wellName=aspirate_command.params.well,
-            volume=aspirate_command.params.volume,
-            wellLocation=WellLocation(
-                origin=WellOrigin.BOTTOM,
-                offset=(0, 0, aspirate_command.params.offsetFromBottomMm),
-            ),
+    assert result == [
+        pe_commands.AspirateRequest(
+            data=pe_commands.AspirateData(
+                pipetteId=aspirate_command.params.pipette,
+                labwareId=aspirate_command.params.labware,
+                wellName=aspirate_command.params.well,
+                volume=aspirate_command.params.volume,
+                wellLocation=WellLocation(
+                    origin=WellOrigin.BOTTOM,
+                    offset=(0, 0, aspirate_command.params.offsetFromBottomMm),
+                ),
+            )
         )
-    )
+    ]
 
 
 def test_dispense(
