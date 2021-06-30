@@ -31,6 +31,7 @@
   max-width: 50rem;
   margin: 1rem auto;
   padding: 1rem;
+  padding-bottom: 10rem;
 
   & p {
     margin: 1rem 0;
