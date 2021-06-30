@@ -1,5 +1,6 @@
 import React from 'react'
 import { FormikConfig } from 'formik'
+import { when, resetAllWhenMocks } from 'jest-when'
 import { render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import {
@@ -7,13 +8,20 @@ import {
   LabwareFields,
   LabwareType,
 } from '../../../fields'
+import { getLabwareName } from '../../../utils'
 import { Preview } from '../../sections/Preview'
 import { wrapInFormik } from '../../utils/wrapInFormik'
 import { FORM_LEVEL_ERRORS } from '../../../formLevelValidation'
 
+jest.mock('../../../utils')
+
 // NOTE(IL, 2021-05-18): eventual dependency on definitions.tsx which uses require.context
 // would break this test (though it's not directly used)
 jest.mock('../../../../definitions')
+
+const getLabwareNameMock = getLabwareName as jest.MockedFunction<
+  typeof getLabwareName
+>
 
 let formikConfig: FormikConfig<LabwareFields>
 
@@ -23,46 +31,25 @@ describe('Preview', () => {
       initialValues: getDefaultFormState(),
       onSubmit: jest.fn(),
     }
+
+    when(getLabwareNameMock)
+      .calledWith(formikConfig.initialValues, true)
+      .mockReturnValue('FAKE LABWARE NAME PLURAL')
   })
 
   afterEach(() => {
     jest.restoreAllMocks()
+    resetAllWhenMocks()
   })
 
-  it('should render the preview section telling user to check their tips when labware is a tiprack', () => {
+  it('should render the preview section telling user to check their tubes/tips/wells/etc', () => {
     formikConfig.initialValues.labwareType = 'tipRack'
     render(wrapInFormik(<Preview />, formikConfig))
     expect(screen.getByRole('heading')).toHaveTextContent(/check your work/i)
     screen.getByText(
-      'Check that the size, spacing, and shape of your tips looks correct.'
+      'Check that the size, spacing, and shape of your FAKE LABWARE NAME PLURAL looks correct.'
     )
     screen.getByText('Add missing info to see labware preview')
-  })
-  it('should render the preview section telling user to check their tubes when labware is a tube rack', () => {
-    formikConfig.initialValues.labwareType = 'tubeRack'
-    render(wrapInFormik(<Preview />, formikConfig))
-    expect(screen.getByRole('heading')).toHaveTextContent(/check your work/i)
-    screen.getByText(
-      'Check that the size, spacing, and shape of your tubes looks correct.'
-    )
-    screen.getByText('Add missing info to see labware preview')
-  })
-
-  const wellLabwareTypes: LabwareType[] = [
-    'aluminumBlock',
-    'reservoir',
-    'wellPlate',
-  ]
-  wellLabwareTypes.forEach(labwareType => {
-    it(`should render the preview section telling user to check their wells when the labware type is ${labwareType}`, () => {
-      formikConfig.initialValues.labwareType = labwareType
-      render(wrapInFormik(<Preview />, formikConfig))
-      expect(screen.getByRole('heading')).toHaveTextContent(/check your work/i)
-      screen.getByText(
-        'Check that the size, spacing, and shape of your wells looks correct.'
-      )
-      screen.getByText('Add missing info to see labware preview')
-    })
   })
 })
 
