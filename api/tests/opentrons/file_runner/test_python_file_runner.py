@@ -18,26 +18,31 @@ def protocol_file(decoy: Decoy) -> ProtocolFile:
 
 @pytest.fixture
 def python_protocol(decoy: Decoy) -> PythonProtocol:
+    """Get a mock PythonProtocol object."""
     return decoy.create_decoy(spec=PythonProtocol)
 
 
 @pytest.fixture
 def protocol_context(decoy: Decoy) -> ProtocolContext:
+    """Get a mock ProtocolContext API interface."""
     return decoy.create_decoy(spec=ProtocolContext)
 
 
 @pytest.fixture
 def file_reader(decoy: Decoy) -> PythonFileReader:
+    """Get a mock FileReader."""
     return decoy.create_decoy(spec=PythonFileReader)
 
 
 @pytest.fixture
 def context_creator(decoy: Decoy) -> ContextCreator:
+    """Get a mock ContextCreator."""
     return decoy.create_decoy(spec=ContextCreator)
 
 
 @pytest.fixture
 def executor(decoy: Decoy) -> PythonExecutor:
+    """Get a mock PythonExecutor."""
     return decoy.create_decoy(spec=PythonExecutor)
 
 
@@ -68,10 +73,10 @@ def test_python_runner_load(
     subject: PythonFileRunner,
 ) -> None:
     """It should be able to load the module and prepare a ProtocolContext."""
-    decoy.when(file_reader.read(file=protocol_file)).then_return(python_protocol)
-    decoy.when(context_creator.create(protocol=python_protocol)).then_return(
-        protocol_context
+    decoy.when(file_reader.read(protocol_file=protocol_file)).then_return(
+        python_protocol
     )
+    decoy.when(context_creator.create()).then_return(protocol_context)
 
     subject.load()
 

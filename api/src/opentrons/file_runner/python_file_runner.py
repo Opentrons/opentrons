@@ -16,6 +16,7 @@ class PythonFileRunner(AbstractFileRunner):
         context_creator: ContextCreator,
         executor: PythonExecutor,
     ) -> None:
+        """Initialize the runner with its protocol file and dependencies."""
         self._file = file
         self._file_reader = file_reader
         self._context_creator = context_creator
@@ -23,8 +24,8 @@ class PythonFileRunner(AbstractFileRunner):
 
     def load(self) -> None:
         """Prepare to run the Python protocol file."""
-        protocol = self._file_reader.read(file=self._file)
-        context = self._context_creator.create(protocol=protocol)
+        protocol = self._file_reader.read(protocol_file=self._file)
+        context = self._context_creator.create()
         self._executor.load(protocol=protocol, context=context)
 
     def play(self) -> None:

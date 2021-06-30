@@ -7,9 +7,14 @@ from .python_file_reader import PythonProtocol
 class PythonExecutor:
     """Execute a given PythonProtocol's run method with a ProtocolContext."""
 
-    def execute(
+    def load(
         self,
-        python_protocol: PythonProtocol,
-        protocol_context: ProtocolContext,
+        protocol: PythonProtocol,
+        context: ProtocolContext,
     ) -> None:
-        raise NotImplementedError()
+        """Load the executor with the Protocol and ProtocolContext."""
+        raise NotImplementedError("PythonExecutor not yet implemented")
+
+    def execute(self) -> None:
+        """Execute the previously loaded Protocol."""
+        raise NotImplementedError("PythonExecutor not yet implemented")
