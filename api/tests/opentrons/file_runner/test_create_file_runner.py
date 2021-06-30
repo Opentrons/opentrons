@@ -41,7 +41,7 @@ def test_create_python_runner(
     protocol_engine: ProtocolEngine,
     python_protocol_file: Path,
 ) -> None:
-    """It should be able to create a JSON file runner."""
+    """It should be able to create a Python file runner."""
     protocol_file = ProtocolFile(
         file_type=ProtocolFileType.PYTHON,
         file_path=python_protocol_file,
