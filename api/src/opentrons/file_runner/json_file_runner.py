@@ -41,8 +41,14 @@ class JsonFileRunner(AbstractFileRunner):
         for cmd in translated_items:
             self._protocol_engine.add_command(cmd)
 
+    async def run(self) -> None:
+        """Run the protocol to completion."""
+        # TODO(mc, 2021-06-30): do not merge
+        self.play()
+        await self._command_queue_worker.wait_to_be_idle()
+
     def play(self) -> None:
-        """Start (or un-pause) running the JSON protocol file."""
+        """Resume running the JSON protocol file."""
         self._command_queue_worker.play()
 
     def pause(self) -> None:

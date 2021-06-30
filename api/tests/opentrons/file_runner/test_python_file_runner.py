@@ -5,7 +5,7 @@ from decoy import Decoy
 
 from opentrons.protocol_api_experimental import ProtocolContext
 from opentrons.file_runner import PythonFileRunner, ProtocolFile, ProtocolFileType
-from opentrons.file_runner.python_file_reader import PythonFileReader, PythonProtocol
+from opentrons.file_runner.python_reader import PythonFileReader, PythonProtocol
 from opentrons.file_runner.python_executor import PythonExecutor
 from opentrons.file_runner.context_creator import ContextCreator
 
@@ -83,14 +83,14 @@ def test_python_runner_load(
     decoy.verify(executor.load(protocol=python_protocol, context=protocol_context))
 
 
-def test_python_runner_play(
+async def test_python_runner_play(
     decoy: Decoy,
     executor: PythonExecutor,
     subject: PythonFileRunner,
 ) -> None:
     """It should be able to start the run."""
-    subject.play()
-    decoy.verify(executor.execute())
+    await subject.run()
+    decoy.verify(await executor.execute())
 
 
 @pytest.mark.xfail(raises=NotImplementedError, strict=True)

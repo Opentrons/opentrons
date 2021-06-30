@@ -1,5 +1,5 @@
 """Router for /sessions endpoints."""
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, BackgroundTasks, Depends, status
 from datetime import datetime
 from typing import Optional, Union
 from typing_extensions import Literal
@@ -232,6 +232,7 @@ async def remove_session_by_id(
 )
 async def create_session_action(
     sessionId: str,
+    background_tasks: BackgroundTasks,
     request_body: RequestModel[SessionActionCreateData],
     session_view: SessionView = Depends(SessionView),
     session_store: SessionStore = Depends(get_session_store),
@@ -243,6 +244,7 @@ async def create_session_action(
 
     Arguments:
         sessionId: Session ID pulled from the URL.
+        background_tasks: FastAPI background task manager.
         request_body: Input payload from the request body.
         session_view: Resource model builder.
         session_store: Session storage interface.
@@ -263,7 +265,9 @@ async def create_session_action(
         # TODO(mc, 2021-06-11): support actions other than `start`
         # TODO(mc, 2021-06-24): ensure the engine homes pipette plungers
         # before starting the protocol run
-        engine_store.runner.play()
+        # TODO(mc, 2021-06-30): capture errors (e.g. uncaught Python raise)
+        # and place them in the session response
+        background_tasks.add_task(engine_store.runner.run)
 
     except SessionNotFoundError as e:
         raise SessionNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)

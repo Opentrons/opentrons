@@ -4,7 +4,7 @@ from inspect import Signature, Parameter, signature
 
 from opentrons.protocol_api_experimental import ProtocolContext
 from opentrons.file_runner import ProtocolFile, ProtocolFileType
-from opentrons.file_runner.python_file_reader import PythonFileReader
+from opentrons.file_runner.python_reader import PythonFileReader
 
 
 def test_read_gets_run_method(python_protocol_file: Path) -> None:

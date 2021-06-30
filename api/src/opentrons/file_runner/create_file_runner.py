@@ -13,7 +13,7 @@ from .json_file_reader import JsonFileReader
 from .command_queue_worker import CommandQueueWorker
 
 from .python_file_runner import PythonFileRunner
-from .python_file_reader import PythonFileReader
+from .python_reader import PythonFileReader
 from .context_creator import ContextCreator
 from .python_executor import PythonExecutor
 
@@ -42,14 +42,12 @@ def create_file_runner(
                 command_queue_worker=CommandQueueWorker(engine),
             )
         elif protocol_file.file_type == ProtocolFileType.PYTHON:
+            loop = asyncio.get_running_loop()
             return PythonFileRunner(
                 file=protocol_file,
                 file_reader=PythonFileReader(),
-                context_creator=ContextCreator(
-                    engine=engine,
-                    loop=asyncio.get_running_loop(),
-                ),
-                executor=PythonExecutor(),
+                context_creator=ContextCreator(engine=engine, loop=loop),
+                executor=PythonExecutor(loop=loop),
             )
 
     raise NotImplementedError("Other runner types not yet supported")
