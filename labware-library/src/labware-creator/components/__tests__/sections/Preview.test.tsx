@@ -3,11 +3,7 @@ import { FormikConfig } from 'formik'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
-import {
-  getDefaultFormState,
-  LabwareFields,
-  LabwareType,
-} from '../../../fields'
+import { getDefaultFormState, LabwareFields } from '../../../fields'
 import { getLabwareName } from '../../../utils'
 import { Preview } from '../../sections/Preview'
 import { wrapInFormik } from '../../utils/wrapInFormik'
