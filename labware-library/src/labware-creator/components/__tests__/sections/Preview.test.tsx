@@ -47,7 +47,7 @@ describe('Preview', () => {
     )
     screen.getByText('Add missing info to see labware preview')
   })
-  
+
   const wellLabwareTypes: LabwareType[] = [
     'aluminumBlock',
     'reservoir',
