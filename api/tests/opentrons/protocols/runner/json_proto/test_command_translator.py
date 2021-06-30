@@ -68,6 +68,11 @@ def test_labware(
     minimal_labware_def: dict,
     minimal_labware_def2: dict,
 ) -> None:
+    """It should emit AddLabwareDefinitionRequests and LoadLabwareRequests.
+
+    A LoadLabwareRequest should always come after the AddLabwareDefinitionRequest
+    that it depends on.
+    """
     definition_1 = models.LabwareDefinition.parse_obj(minimal_labware_def)
     definition_2 = models.LabwareDefinition.parse_obj(minimal_labware_def2)
 
