@@ -163,86 +163,116 @@ def test_pipettes(subject: CommandTranslator) -> None:
     assert len(result) == 2
 
 
-def test_aspirate(
-    subject: CommandTranslator, aspirate_command: models.json_protocol.LiquidCommand
-) -> None:
+def test_aspirate(subject: CommandTranslator) -> None:
     """It should translate a JSON aspirate command to a Protocol Engine
     aspirate request."""
-    result = subject.translate(_make_json_protocol(commands=[aspirate_command]))
+
+    json_aspirate_command = models.json_protocol.LiquidCommand(
+        command="aspirate",
+        params=models.json_protocol.Params(
+            pipette="pipette-id-abc123",
+            labware="labware-id-def456",
+            volume=1.23,
+            flowRate=4.56,
+            well="A1",
+            offsetFromBottomMm=7.89,
+        ),
+    )
+
+    result = subject.translate(_make_json_protocol(commands=[json_aspirate_command]))
 
     assert result == [
         pe_commands.AspirateRequest(
             data=pe_commands.AspirateData(
-                pipetteId=aspirate_command.params.pipette,
-                labwareId=aspirate_command.params.labware,
-                wellName=aspirate_command.params.well,
-                volume=aspirate_command.params.volume,
+                pipetteId="pipette-id-abc123",
+                labwareId="labware-id-def456",
+                volume=1.23,
+                wellName="A1",
                 wellLocation=WellLocation(
                     origin=WellOrigin.BOTTOM,
-                    offset=(0, 0, aspirate_command.params.offsetFromBottomMm),
+                    offset=(0, 0, 7.89),
                 ),
             )
         )
     ]
 
 
-def test_dispense(
-    subject: CommandTranslator, dispense_command: models.json_protocol.LiquidCommand
-) -> None:
+def test_dispense(subject: CommandTranslator) -> None:
     """It should translate a JSON dispense command to a Protocol Engine
     dispense request."""
-    result = subject.translate(_make_json_protocol(commands=[dispense_command]))
+    json_dispense_command = models.json_protocol.LiquidCommand(
+        command="dispense",
+        params=models.json_protocol.Params(
+            pipette="pipette-id-abc123",
+            labware="labware-id-def456",
+            volume=1.23,
+            flowRate=4.56,
+            well="A1",
+            offsetFromBottomMm=7.89,
+        ),
+    )
+
+    result = subject.translate(_make_json_protocol(commands=[json_dispense_command]))
 
     assert result == [
         pe_commands.DispenseRequest(
             data=pe_commands.DispenseData(
-                pipetteId=dispense_command.params.pipette,
-                labwareId=dispense_command.params.labware,
-                wellName=dispense_command.params.well,
-                volume=dispense_command.params.volume,
+                pipetteId="pipette-id-abc123",
+                labwareId="labware-id-def456",
+                volume=1.23,
+                wellName="A1",
                 wellLocation=WellLocation(
                     origin=WellOrigin.BOTTOM,
-                    offset=(0, 0, dispense_command.params.offsetFromBottomMm),
+                    offset=(0, 0, 7.89),
                 ),
             )
         )
     ]
 
 
-def test_drop_tip(
-    subject: CommandTranslator,
-    drop_tip_command: models.json_protocol.PickUpDropTipCommand,
-) -> None:
+def test_drop_tip(subject: CommandTranslator) -> None:
     """It should translate a JSON drop tip command to a Protocol Engine
     drop tip request."""
-    result = subject.translate(_make_json_protocol(commands=[drop_tip_command]))
+    json_drop_tip_command = models.json_protocol.PickUpDropTipCommand(
+        command="dropTip",
+        params=models.json_protocol.PipetteAccessParams(
+            pipette="pipette-id-abc123", labware="labware-id-def456", well="A1"
+        ),
+    )
+
+    result = subject.translate(_make_json_protocol(commands=[json_drop_tip_command]))
 
     assert result == [
         pe_commands.DropTipRequest(
             data=pe_commands.DropTipData(
-                pipetteId=drop_tip_command.params.pipette,
-                labwareId=drop_tip_command.params.labware,
-                wellName=drop_tip_command.params.well,
+                pipetteId="pipette-id-abc123",
+                labwareId="labware-id-def456",
+                wellName="A1",
             )
         )
     ]
 
 
-def test_pick_up_tip(
-    subject, pick_up_command: models.json_protocol.PickUpDropTipCommand
-) -> None:
+def test_pick_up_tip(subject) -> None:
     """
     It should translate a JSON pick up tip command to a Protocol Engine
     PickUpTip request.
     """
-    result = subject.translate(_make_json_protocol(commands=[pick_up_command]))
+    json_pick_up_tip_command = models.json_protocol.PickUpDropTipCommand(
+        command="pickUpTip",
+        params=models.json_protocol.PipetteAccessParams(
+            pipette="pipette-id-abc123", labware="labware-id-def456", well="A1"
+        ),
+    )
+
+    result = subject.translate(_make_json_protocol(commands=[json_pick_up_tip_command]))
 
     assert result == [
         pe_commands.PickUpTipRequest(
             data=pe_commands.PickUpTipData(
-                pipetteId=pick_up_command.params.pipette,
-                labwareId=pick_up_command.params.labware,
-                wellName=pick_up_command.params.well,
+                pipetteId="pipette-id-abc123",
+                labwareId="labware-id-def456",
+                wellName="A1",
             )
         )
     ]
