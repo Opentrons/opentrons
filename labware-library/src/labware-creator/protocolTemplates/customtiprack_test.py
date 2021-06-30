@@ -7,8 +7,8 @@ TEST_TIPRACK_SLOT = '5'
 RATE = 0.25  # % of default speeds
 SLOWER_RATE = 0.1
 
-PIPETTE_MOUNT = 'right'
-PIPETTE_NAME = 'p20_single_gen2'
+PIPETTE_MOUNT = 'left'
+PIPETTE_NAME = 'p20_multi_gen2'
 
 
 TIPRACK_DEF_JSON = """{
@@ -1163,7 +1163,9 @@ def run(protocol: protocol_api.ProtocolContext):
             instr.default_speed = speed_max
 
     set_speeds(RATE)
-
+    firstwell = tiprack.well('A1')
+    pipette.move_to(firstwell.top())
+    protocol.pause("If the pipette is accurate click 'resume'")
     pipette.pick_up_tip()
     protocol.pause("If the pipette went into the center of the tip, click 'resume'")
     pipette.return_tip()
@@ -1174,10 +1176,14 @@ def run(protocol: protocol_api.ProtocolContext):
     last_col = (num_cols * num_rows) - num_rows
     if (PIPETTE_NAME == 'p20_multi_gen2' or PIPETTE_NAME == 'p300_multi_gen2'):
         well = tiprack.well(last_col)
+        pipette.move_to(well.top())
+        protocol.pause("If the pipette is accurate click 'resume'")
         pipette.pick_up_tip(well)
     else:
         last_well = (num_cols) * (num_rows)
         well = tiprack.well(last_well-1)
+        pipette.move_to(well.top())
+        protocol.pause("If the pipette is accurate click 'resume'")
         pipette.pick_up_tip(well)
         
     protocol.pause("If the pipette went to the center of the tip, hit 'resume'")
