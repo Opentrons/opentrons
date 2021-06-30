@@ -1,8 +1,9 @@
 """Session response model factory."""
 from dataclasses import replace
 from datetime import datetime
-from typing import Optional, Tuple
+from typing import List, Optional, Tuple
 
+from opentrons.protocol_engine import Command as ProtocolEngineCommand
 from .session_store import SessionResource
 from .action_models import SessionAction, SessionActionCreateData
 from .session_models import (
@@ -12,6 +13,7 @@ from .session_models import (
     BasicSessionCreateData,
     ProtocolSession,
     ProtocolSessionCreateData,
+    SessionCommandSummary,
 )
 
 
@@ -80,7 +82,10 @@ class SessionView:
         return actions, updated_session
 
     @staticmethod
-    def as_response(session: SessionResource) -> Session:
+    def as_response(
+        session: SessionResource,
+        commands: List[ProtocolEngineCommand],
+    ) -> Session:
         """Transform a session resource into its public response model.
 
         Arguments:
@@ -90,12 +95,17 @@ class SessionView:
             Session response model representing the same resource.
         """
         create_data = session.create_data
+        command_summaries = [
+            SessionCommandSummary(id=c.id, commandType=c.commandType, status=c.status)
+            for c in commands
+        ]
 
         if isinstance(create_data, BasicSessionCreateData):
             return BasicSession.construct(
                 id=session.session_id,
                 createdAt=session.created_at,
                 actions=session.actions,
+                commands=command_summaries,
             )
         if isinstance(create_data, ProtocolSessionCreateData):
             return ProtocolSession.construct(
@@ -103,6 +113,7 @@ class SessionView:
                 createdAt=session.created_at,
                 createParams=create_data.createParams,
                 actions=session.actions,
+                commands=command_summaries,
             )
 
         raise ValueError(f"Invalid session resource {session}")

@@ -5,14 +5,42 @@ from .add_labware_definition import (
     AddLabwareDefinition,
     AddLabwareDefinitionRequest,
     AddLabwareDefinitionResult,
+    AddLabwareDefinitionCommandType,
 )
-from .aspirate import Aspirate, AspirateRequest, AspirateResult
-from .dispense import Dispense, DispenseRequest, DispenseResult
-from .drop_tip import DropTip, DropTipRequest, DropTipResult
-from .load_labware import LoadLabware, LoadLabwareRequest, LoadLabwareResult
-from .load_pipette import LoadPipette, LoadPipetteRequest, LoadPipetteResult
-from .move_to_well import MoveToWell, MoveToWellRequest, MoveToWellResult
-from .pick_up_tip import PickUpTip, PickUpTipRequest, PickUpTipResult
+
+from .aspirate import Aspirate, AspirateRequest, AspirateResult, AspirateCommandType
+
+from .dispense import Dispense, DispenseRequest, DispenseResult, DispenseCommandType
+
+from .drop_tip import DropTip, DropTipRequest, DropTipResult, DropTipCommandType
+
+from .load_labware import (
+    LoadLabware,
+    LoadLabwareRequest,
+    LoadLabwareResult,
+    LoadLabwareCommandType,
+)
+
+from .load_pipette import (
+    LoadPipette,
+    LoadPipetteRequest,
+    LoadPipetteResult,
+    LoadPipetteCommandType,
+)
+
+from .move_to_well import (
+    MoveToWell,
+    MoveToWellRequest,
+    MoveToWellResult,
+    MoveToWellCommandType,
+)
+
+from .pick_up_tip import (
+    PickUpTip,
+    PickUpTipRequest,
+    PickUpTipResult,
+    PickUpTipCommandType,
+)
 
 Command = Union[
     AddLabwareDefinition,
@@ -23,6 +51,17 @@ Command = Union[
     LoadPipette,
     MoveToWell,
     PickUpTip,
+]
+
+CommandType = Union[
+    AddLabwareDefinitionCommandType,
+    AspirateCommandType,
+    DispenseCommandType,
+    DropTipCommandType,
+    LoadLabwareCommandType,
+    LoadPipetteCommandType,
+    MoveToWellCommandType,
+    PickUpTipCommandType,
 ]
 
 CommandRequest = Union[

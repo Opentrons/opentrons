@@ -30,7 +30,7 @@ def state_view_with_commands(
 ) -> MagicMock:
     """Create a state view fixture with pending commands."""
     pending_commands = commands + [None]
-    state_view.commands.get_next_command.side_effect = pending_commands
+    state_view.commands.get_next_queued.side_effect = pending_commands
     return state_view
 
 
@@ -54,7 +54,7 @@ async def test_play_no_pending(
     state_view: MagicMock,
 ) -> None:
     """It should not execute any commands."""
-    state_view.commands.get_next_command.return_value = None
+    state_view.commands.get_next_queued.return_value = None
 
     subject.play()
     await subject.wait_to_be_idle()
