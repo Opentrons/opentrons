@@ -32,17 +32,17 @@ describe('Create a Tip Rack', () => {
       .should('exist')
 
     // Verify the copy changes for Hand-Placed Tip Fit section
-    // cy.get('#HandPlacedTipFit p')
-    //   .contains(
-    //     'Place the tip you wish to use on the pipette you wish to use it on. Give the tip a wiggle to check the fit.'
-    //   )
-    //   .should('exist')
-    // cy.get('#HandPlacedTipFit p')
-    //   .eq(1)
-    //   .contains(
-    //     'Note that fit may vary between Single and 8 Channel pipettes, as well as between generations of the same pipette.'
-    //   )
-    //   .should('exist')
+    cy.get('#HandPlacedTipFit p')
+      .contains(
+        'Place the tip on the pipette you wish to use it on. Give the tip a wiggle to check the fit.'
+      )
+      .should('exist')
+    cy.get('#HandPlacedTipFit p')
+      .eq(1)
+      .contains(
+        'Note that fit may vary between Single and 8 Channel pipettes, as well as between generations of the same pipette.'
+      )
+      .should('exist')
 
     // verify that the default neither snug or loosefit is selected.
     cy.get('#HandPlacedTipFit input').should('have.value', '')
@@ -69,11 +69,11 @@ describe('Create a Tip Rack', () => {
       .type('Snug', { force: true })
       .type('{enter}')
 
-    // cy.get('#HandPlacedTipFit span')
-    //   .contains(
-    //     'If your tip seems to fit when placed by hand it may work on the OT-2.  Proceed through the form to generate a definition. Once you have a definition you can check performance on the robot. '
-    //   )
-    //   .should('exist')
+    cy.get('#HandPlacedTipFit span')
+      .contains(
+        'If your tip seems to fit when placed by hand it may work on the OT-2. Proceed through the form to generate a definition. Once you have a definition you can check performance on the robot.'
+      )
+      .should('exist')
   })
 
   it('Verify Total Footprint section', () => {
@@ -171,7 +171,7 @@ describe('Create a Tip Rack', () => {
     cy.get('#Grid h2').contains('Grid').should('exist')
     cy.get('#Grid p')
       .contains(
-        'The grid of wells on your labware is arranged via rows and columns. Rows run horizontally across your labware (left to right). Columns run top to bottom.'
+        'The grid of tips on your labware is arranged via rows and columns. Rows run horizontally across your labware (left to right). Columns run top to bottom.'
       )
       .should('exist')
     cy.get('img[alt="grid rows and columns"]').should('exist')
@@ -200,15 +200,15 @@ describe('Create a Tip Rack', () => {
 
   it('Verify the Tip Spacing section', () => {
     cy.get('#WellSpacing h2').contains('Tip Spacing').should('exist')
-    // cy.get('#WellSpacing p')
-    //   .contains('Spacing is between the center of tips.')
-    //   .should('exist')
-    // cy.get('#WellSpacing p')
-    //   .eq(1)
-    //   .contains(
-    //     'Tip spacing measurements inform the robot how far away rows and columns are from each other.'
-    //   )
-    //   .should('exist')
+    cy.get('#WellSpacing p')
+      .contains('Spacing is between the center of tips.')
+      .should('exist')
+    cy.get('#WellSpacing p')
+      .eq(1)
+      .contains(
+        'spacing measurements inform the robot how far away rows and columns are from each other.'
+      )
+      .should('exist')
     cy.get('img[alt="circular well spacing"]').should('exist')
     cy.get('input[name="gridSpacingX"]').clear().type('15')
     cy.get('input[name="gridSpacingY"]').clear().type('15')
@@ -256,6 +256,12 @@ describe('Create a Tip Rack', () => {
       .invoke('attr', 'value', 'p20_single_gen2')
       .should('have.attr', 'value', 'p20_single_gen2')
     cy.get('*[class^="Dropdown__option"]').contains('P20 Single GEN2').click()
+    cy.get('#DefinitionTest a').contains('tip rack test guide').click()
+    cy.get('#DefinitionTest a').should(
+      'have.attr',
+      'href',
+      'https://opentrons-publications.s3.us-east-2.amazonaws.com/labwareDefinition_tipRack_testGuide.pdf'
+    )
   })
 
   it('Verify the exported file to the fixture', () => {
@@ -278,5 +284,19 @@ describe('Create a Tip Rack', () => {
         .its('__lastSavedFileName__')
         .should('equal', `generic_1_tiprack_20ul.zip`)
     })
+  })
+  it('verify the too big, too small error', () => {
+    cy.get('input[name="gridOffsetY"]').clear().type('24')
+    cy.get('#CheckYourWork span')
+      .contains(
+        'Grid of tips is larger than labware footprint in the Y dimension. Please double check well size, Y Spacing, and Y Offset.'
+      )
+      .should('exist')
+    cy.get('input[name="gridOffsetX"]').clear().type('240')
+    cy.get('#CheckYourWork span')
+      .contains(
+        'Grid of tips is larger than labware footprint in the X dimension. Please double check well size, X Spacing, and X Offset.'
+      )
+      .should('exist')
   })
 })
