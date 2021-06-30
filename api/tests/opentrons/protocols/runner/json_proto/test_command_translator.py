@@ -90,6 +90,12 @@ def test_labware(
         ),
     }
 
+    # todo(mm, 2021-06-30): This test pulls internal details out of fixtures, like
+    # definition_1.parameters.loadName. This makes it hard to read and follow. Instead,
+    # it should created its own labware definitions with hard-coded values like
+    # "my-load-name", and then assert that the hard-coded string "my-load-name" is
+    # what's used in the output Protocol Engine command.
+
     expected_add_definition_request_1 = pe_commands.AddLabwareDefinitionRequest(
         data=pe_commands.AddLabwareDefinitionData(definition=definition_1)
     )
