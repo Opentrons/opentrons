@@ -178,7 +178,7 @@ def test_get_protocol_not_found(
     )
 
 
-async def test_create_protocol(
+async def test_create_json_protocol(
     decoy: Decoy,
     protocol_store: ProtocolStore,
     response_builder: ResponseBuilder,
@@ -186,7 +186,7 @@ async def test_create_protocol(
     current_time: datetime,
     async_client: AsyncClient,
 ) -> None:
-    """It should store a single protocol file."""
+    """It should store a single JSON protocol file."""
     entry = ProtocolResource(
         protocol_id=unique_id,
         protocol_type=ProtocolFileType.JSON,
@@ -224,7 +224,6 @@ async def test_create_protocol(
     )
 
 
-@pytest.mark.xfail(raises=NotImplementedError)
 async def test_create_python_protocol(
     decoy: Decoy,
     protocol_store: ProtocolStore,
@@ -233,12 +232,44 @@ async def test_create_python_protocol(
     current_time: datetime,
     async_client: AsyncClient,
 ) -> None:
-    """It should store a Python protocol file."""
-    files = [
-        ("files", ("foo.py", bytes("# my protocol", "utf-8"), "text/x-python")),
-    ]
+    """It should store a single Python protocol file."""
+    entry = ProtocolResource(
+        protocol_id=unique_id,
+        protocol_type=ProtocolFileType.PYTHON,
+        created_at=current_time,
+        files=[],
+    )
+    protocol = Protocol(
+        id=unique_id,
+        createdAt=current_time,
+        protocolType=ProtocolFileType.PYTHON,
+    )
 
-    await async_client.post("/protocols", files=files)
+    decoy.when(
+        await protocol_store.create(
+            protocol_id=unique_id,
+            created_at=current_time,
+            files=[
+                matchers.IsA(
+                    UploadFile,
+                    {"filename": "foo.py", "content_type": "text/x-python"},
+                )
+            ],
+        )
+    ).then_return(entry)
+
+    decoy.when(response_builder.build(entry)).then_return(protocol)
+
+    files = [
+        ("files", ("foo.py", bytes("# my protocol\n", "utf-8"), "text/x-python")),
+    ]
+    response = await async_client.post("/protocols", files=files)
+
+    verify_response(
+        response,
+        expected_status=201,
+        expected_data=protocol,
+    )
 
 
 @pytest.mark.xfail(raises=NotImplementedError)

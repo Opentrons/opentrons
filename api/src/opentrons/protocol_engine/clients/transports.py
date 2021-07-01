@@ -3,8 +3,9 @@ from abc import ABC, abstractmethod
 from asyncio import AbstractEventLoop, run_coroutine_threadsafe
 
 from ..protocol_engine import ProtocolEngine
+from ..errors import ProtocolEngineError
 from ..state import StateView
-from ..commands import CommandRequestType, CommandResultType, FailedCommand
+from ..commands import CommandRequest, CommandResult
 
 
 class AbstractSyncTransport(ABC):
@@ -19,9 +20,9 @@ class AbstractSyncTransport(ABC):
     @abstractmethod
     def execute_command(
         self,
-        request: CommandRequestType,
+        request: CommandRequest,
         command_id: str,
-    ) -> CommandResultType:
+    ) -> CommandResult:
         """Execute a ProtocolEngine command, blocking until the command completes.
 
         Args:
@@ -65,16 +66,20 @@ class ChildThreadTransport(AbstractSyncTransport):
 
     def execute_command(
         self,
-        request: CommandRequestType,
+        request: CommandRequest,
         command_id: str,
-    ) -> CommandResultType:
+    ) -> CommandResult:
         """Execute a command synchronously on the main thread."""
-        command_state = run_coroutine_threadsafe(
+        command = run_coroutine_threadsafe(
             self._engine.execute_command(request=request, command_id=command_id),
             loop=self._loop,
         ).result()
 
-        if isinstance(command_state, FailedCommand):
-            raise command_state.error
+        if command.error is not None:
+            # TODO(mc, 2021-06-21): refactor when command.error is error details
+            # rather than a string
+            raise ProtocolEngineError(command.error)
 
-        return command_state.result
+        assert command.result is not None, f"Expected Command {command} to have result"
+
+        return command.result

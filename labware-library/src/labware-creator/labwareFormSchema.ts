@@ -27,12 +27,22 @@ const requiredString = (label: string): Yup.StringSchema =>
   Yup.string().label(label).typeError(REQUIRED_FIELD).required()
 const MUST_BE_A_NUMBER = '${label} must be a number' // eslint-disable-line no-template-curly-in-string
 
+// put this in a transform to make Yup to show "this field is required"
+// instead of "must be a number". See https://github.com/jquense/yup/issues/971
+const nanToUndefined = (value: number): number | undefined =>
+  isNaN(value) ? undefined : value
+
 const requiredPositiveNumber = (label: string): Yup.NumberSchema =>
-  Yup.number().label(label).typeError(MUST_BE_A_NUMBER).moreThan(0).required()
+  Yup.number()
+    .label(label)
+    .transform(nanToUndefined)
+    .typeError(MUST_BE_A_NUMBER)
+    .moreThan(0)
+    .required()
 
 const requiredPositiveInteger = (label: string): Yup.NumberSchema =>
   Yup.number()
-    .default(0)
+    .transform(nanToUndefined)
     .label(label)
     .typeError(MUST_BE_A_NUMBER)
     .moreThan(0)
@@ -90,7 +100,7 @@ export const labwareFormSchemaBaseObject = Yup.object({
 
   // tubeRackSides: Array<string>
   footprintXDimension: Yup.number()
-    .default(0)
+    .transform(nanToUndefined)
     .label(LABELS.footprintXDimension)
     .typeError(MUST_BE_A_NUMBER)
     .min(MIN_X_DIMENSION, LABWARE_TOO_SMALL_ERROR)
@@ -98,7 +108,7 @@ export const labwareFormSchemaBaseObject = Yup.object({
     .nullable()
     .required(),
   footprintYDimension: Yup.number()
-    .default(0)
+    .transform(nanToUndefined)
     .label(LABELS.footprintYDimension)
     .typeError(MUST_BE_A_NUMBER)
     .min(MIN_Y_DIMENSION, LABWARE_TOO_SMALL_ERROR)
@@ -146,16 +156,29 @@ export const labwareFormSchemaBaseObject = Yup.object({
       wellBottomShapeOptions.map(o => o.value)
     ),
   }),
-  wellDepth: Yup.number()
-    .default(0)
-    .label(LABELS.wellDepth)
-    .typeError(MUST_BE_A_NUMBER)
-    .moreThan(0)
-    .max(
-      Yup.ref('labwareZDimension'),
-      'Well depth cannot exceed labware height'
-    )
-    .required(),
+  wellDepth: Yup.number().when('labwareType', {
+    is: 'tipRack',
+    then: Yup.number()
+      .transform(nanToUndefined)
+      .label('Length')
+      .typeError(MUST_BE_A_NUMBER)
+      .moreThan(0)
+      .max(
+        Yup.ref('labwareZDimension'),
+        'Tip Length cannot exceed labware height'
+      )
+      .required(),
+    otherwise: Yup.number()
+      .transform(nanToUndefined)
+      .label(LABELS.wellDepth)
+      .typeError(MUST_BE_A_NUMBER)
+      .moreThan(0)
+      .max(
+        Yup.ref('labwareZDimension'),
+        'Well depth cannot exceed labware height'
+      )
+      .required(),
+  }),
   wellShape: requiredString(LABELS.wellShape).oneOf(
     wellShapeOptions.map(o => o.value)
   ),

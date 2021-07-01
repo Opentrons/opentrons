@@ -8,11 +8,7 @@ from opentrons.file_runner.json_file_reader import JsonFileReader
 from opentrons.file_runner.command_queue_worker import CommandQueueWorker
 
 from opentrons.protocol_engine import ProtocolEngine, WellLocation
-from opentrons.protocol_engine.commands import (
-    PickUpTipRequest,
-    AspirateRequest,
-    DispenseRequest,
-)
+from opentrons.protocol_engine import commands as pe_commands
 from opentrons.protocols.models import JsonProtocol
 from opentrons.protocols.runner.json_proto.command_translator import CommandTranslator
 
@@ -120,20 +116,30 @@ def test_json_runner_load_commands_to_engine(
     protocol_engine: ProtocolEngine,
 ) -> None:
     """It should send translated commands to protocol engine."""
-    mock_cmd1 = PickUpTipRequest(pipetteId="123", labwareId="abc", wellName="def")
-    mock_cmd2 = AspirateRequest(
-        volume=321,
-        wellLocation=WellLocation(),
-        pipetteId="123",
-        labwareId="xyz",
-        wellName="def",
+    mock_cmd1 = pe_commands.PickUpTipRequest(
+        data=pe_commands.PickUpTipData(
+            pipetteId="123",
+            labwareId="abc",
+            wellName="def",
+        )
     )
-    mock_cmd3 = DispenseRequest(
-        volume=321,
-        wellLocation=WellLocation(),
-        pipetteId="123",
-        labwareId="xyz",
-        wellName="def",
+    mock_cmd2 = pe_commands.AspirateRequest(
+        data=pe_commands.AspirateData(
+            volume=321,
+            wellLocation=WellLocation(),
+            pipetteId="123",
+            labwareId="xyz",
+            wellName="def",
+        )
+    )
+    mock_cmd3 = pe_commands.DispenseRequest(
+        data=pe_commands.DispenseData(
+            volume=321,
+            wellLocation=WellLocation(),
+            pipetteId="123",
+            labwareId="xyz",
+            wellName="def",
+        )
     )
 
     decoy.when(command_translator.translate(json_protocol)).then_return(

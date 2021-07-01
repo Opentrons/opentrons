@@ -46,6 +46,7 @@ class StateStore:
         )
 
         self._lifecycle_substores: List[CommandReactive] = [
+            self._command_store,
             self._pipette_store,
             self._labware_store,
         ]
@@ -61,13 +62,10 @@ class StateStore:
         """Get an immutable copy of the current engine state."""
         return self._state
 
-    def handle_command(self, command: cmd.CommandType, command_id: str) -> None:
+    def handle_command(self, command: cmd.Command) -> None:
         """Modify State in reaction to a Command."""
-        self._command_store.handle_command(command, command_id)
-
-        if isinstance(command, cmd.CompletedCommand):
-            for substore in self._lifecycle_substores:
-                substore.handle_completed_command(command)
+        for substore in self._lifecycle_substores:
+            substore.handle_command(command)
 
         self._update_state()
 

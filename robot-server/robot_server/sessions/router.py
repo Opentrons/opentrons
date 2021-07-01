@@ -1,10 +1,13 @@
 """Router for /sessions endpoints."""
 from fastapi import APIRouter, Depends, status
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Union
 from typing_extensions import Literal
 
+from opentrons.protocol_engine import commands as pe_commands, errors as pe_errors
+
 from robot_server.errors import ErrorDetails, ErrorResponse
+
 from robot_server.service.dependencies import get_current_time, get_unique_id
 from robot_server.service.json_api import (
     RequestModel,
@@ -22,8 +25,9 @@ from robot_server.protocols import (
 
 from .session_store import SessionStore, SessionNotFoundError
 from .session_view import SessionView
-from .session_models import Session, SessionCreateData, ProtocolSessionCreateData
+from .session_models import Session, SessionCommandSummary, ProtocolSessionCreateData
 from .action_models import SessionAction, SessionActionCreateData
+from .schema_models import CreateSessionRequest, SessionResponse, SessionCommandResponse
 from .engine_store import EngineStore, EngineConflictError, EngineMissingError
 from .dependencies import get_session_store, get_engine_store
 
@@ -35,6 +39,13 @@ class SessionNotFound(ErrorDetails):
 
     id: Literal["SessionNotFound"] = "SessionNotFound"
     title: str = "Session Not Found"
+
+
+class CommandNotFound(ErrorDetails):
+    """An error if a given session command is not found."""
+
+    id: Literal["CommandNotFound"] = "CommandNotFound"
+    title: str = "Session Command Not Found"
 
 
 # TODO(mc, 2021-05-28): evaluate multi-session logic
@@ -57,14 +68,16 @@ class SessionActionNotAllowed(ErrorDetails):
     summary="Create a session",
     description="Create a new session to track robot interaction.",
     status_code=status.HTTP_201_CREATED,
-    response_model=ResponseModel[Session],
+    # TODO(mc, 2021-06-23): mypy >= 0.780 broke Unions as `response_model`
+    # see https://github.com/tiangolo/fastapi/issues/2279
+    response_model=SessionResponse,  # type: ignore[arg-type]
     responses={
         status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[ProtocolNotFound]},
         status.HTTP_409_CONFLICT: {"model": ErrorResponse[SessionAlreadyActive]},
     },
 )
 async def create_session(
-    request_body: Optional[RequestModel[SessionCreateData]] = None,
+    request_body: Optional[CreateSessionRequest] = None,
     session_view: SessionView = Depends(SessionView),
     session_store: SessionStore = Depends(get_session_store),
     engine_store: EngineStore = Depends(get_engine_store),
@@ -105,7 +118,8 @@ async def create_session(
         raise SessionAlreadyActive(detail=str(e)).as_error(status.HTTP_409_CONFLICT)
 
     session_store.upsert(session=session)
-    data = session_view.as_response(session=session)
+    commands = engine_store.engine.state_view.commands.get_all()
+    data = session_view.as_response(session=session, commands=commands)
 
     return ResponseModel(data=data)
 
@@ -120,16 +134,21 @@ async def create_session(
 async def get_sessions(
     session_view: SessionView = Depends(SessionView),
     session_store: SessionStore = Depends(get_session_store),
+    engine_store: EngineStore = Depends(get_engine_store),
 ) -> MultiResponseModel[Session]:
     """Get all sessions.
 
     Args:
         session_view: Session model construction interface.
-        session_store: Session storage interface
+        session_store: Session storage interface.
+        engine_store: ProtocolEngine storage and control.
     """
-    data = [
-        session_view.as_response(session=session) for session in session_store.get_all()
-    ]
+    data = []
+
+    for session in session_store.get_all():
+        # TODO(mc, 2021-06-23): add multi-engine support
+        commands = engine_store.engine.state_view.commands.get_all()
+        data.append(session_view.as_response(session=session, commands=commands))
 
     return MultiResponseModel(data=data)
 
@@ -139,27 +158,32 @@ async def get_sessions(
     summary="Get a session",
     description="Get a specific session by its unique identifier.",
     status_code=status.HTTP_200_OK,
-    response_model=ResponseModel[Session],
+    # TODO(mc, 2021-06-23): mypy >= 0.780 broke Unions as `response_model`
+    # see https://github.com/tiangolo/fastapi/issues/2279
+    response_model=SessionResponse,  # type: ignore[arg-type]
     responses={status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[SessionNotFound]}},
 )
 async def get_session(
     sessionId: str,
     session_view: SessionView = Depends(SessionView),
     session_store: SessionStore = Depends(get_session_store),
+    engine_store: EngineStore = Depends(get_engine_store),
 ) -> ResponseModel[Session]:
     """Get a session by its ID.
 
     Args:
-        sessionId: Session ID pulled from URL
+        sessionId: Session ID pulled from URL.
         session_view: Session model construction interface.
-        session_store: Session storage interface
+        session_store: Session storage interface.
+        engine_store: ProtocolEngine storage and control.
     """
     try:
         session = session_store.get(session_id=sessionId)
     except SessionNotFoundError as e:
         raise SessionNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
 
-    data = session_view.as_response(session=session)
+    commands = engine_store.engine.state_view.commands.get_all()
+    data = session_view.as_response(session=session, commands=commands)
 
     return ResponseModel(data=data)
 
@@ -237,6 +261,8 @@ async def create_session_action(
         )
 
         # TODO(mc, 2021-06-11): support actions other than `start`
+        # TODO(mc, 2021-06-24): ensure the engine homes pipette plungers
+        # before starting the protocol run
         engine_store.runner.play()
 
     except SessionNotFoundError as e:
@@ -249,3 +275,72 @@ async def create_session_action(
     session_store.upsert(session=next_session)
 
     return ResponseModel(data=action)
+
+
+@sessions_router.get(
+    path="/sessions/{sessionId}/commands",
+    summary="Get a list of all protocol commands in the session",
+    description=(
+        "Get a list of all commands in the session and their statuses. "
+        "This endpoint returns command summaries. Use "
+        "`GET /sessions/{sessionId}/commands/{commandId}` to get all "
+        "information available for a given command."
+    ),
+    status_code=status.HTTP_200_OK,
+    response_model=MultiResponseModel[SessionCommandSummary],
+    responses={
+        status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[SessionNotFound]},
+    },
+)
+async def get_session_commands(
+    session: ResponseModel[Session] = Depends(get_session),
+) -> MultiResponseModel[SessionCommandSummary]:
+    """Get a summary of all commands in a session.
+
+    Arguments:
+        session: Session response model, provided by the route handler for
+            `GET /session/{sessionId}`
+    """
+    return MultiResponseModel(data=session.data.commands)
+
+
+@sessions_router.get(
+    path="/sessions/{sessionId}/commands/{commandId}",
+    summary="Get full details about a specific command in the session",
+    description=(
+        "Get a command along with any associated payload, result, and "
+        "execution information."
+    ),
+    status_code=status.HTTP_200_OK,
+    # TODO(mc, 2021-06-23): mypy >= 0.780 broke Unions as `response_model`
+    # see https://github.com/tiangolo/fastapi/issues/2279
+    response_model=SessionCommandResponse,  # type: ignore[arg-type]
+    responses={
+        status.HTTP_404_NOT_FOUND: {
+            "model": Union[
+                ErrorResponse[SessionNotFound],
+                ErrorResponse[CommandNotFound],
+            ]
+        },
+    },
+)
+async def get_session_command(
+    commandId: str,
+    engine_store: EngineStore = Depends(get_engine_store),
+    session: ResponseModel[Session] = Depends(get_session),
+) -> ResponseModel[pe_commands.Command]:
+    """Get a specific command from a session.
+
+    Arguments:
+        commandId: Command identifier, pulled from route parameter.
+        engine_store: Protocol engine and runner storage.
+        session: Session response model, provided by the route handler for
+            `GET /session/{sessionId}`. Present to ensure 404 if session
+            not found.
+    """
+    try:
+        command = engine_store.engine.state_view.commands.get(commandId)
+    except pe_errors.CommandDoesNotExistError as e:
+        raise CommandNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
+
+    return ResponseModel(data=command)

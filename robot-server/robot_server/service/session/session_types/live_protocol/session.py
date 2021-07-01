@@ -1,7 +1,7 @@
 from typing import cast
 
 from opentrons import API
-from opentrons.protocol_engine import ProtocolEngine
+from opentrons.protocol_engine import ProtocolEngine, create_protocol_engine
 
 from robot_server.service.session.models import session as models
 from robot_server.service.session.command_execution import CommandQueue, \
@@ -33,7 +33,7 @@ class LiveProtocolSession(BaseSession):
         return LiveProtocolSession(
             configuration=configuration,
             instance_meta=instance_meta,
-            protocol_engine=await ProtocolEngine.create(
+            protocol_engine=await create_protocol_engine(
                 # Cast the ThreadManager to the wrapped API object.
                 cast(API, configuration.hardware)
             )

@@ -208,7 +208,7 @@ class AttachedModulesControl:
             if name not in modules.MODULE_HW_BY_NAME:
                 log.warning(f"Unexpected module connected: {name} on {port}")
                 return None
-            return modules.ModuleAtPort(port=f'dev/{port}', name=name)
+            return modules.ModuleAtPort(port=f'/dev/{port}', name=name)
         return None
 
     async def handle_module_appearance(self, event: AionotifyEvent):

@@ -53,6 +53,19 @@ describe('WellBottomAndDepth', () => {
     screen.getByRole('textbox', { name: /depth/i })
   })
 
+  it('should render tip length when tipRack is selected and hide the well bottom shape radioFields', () => {
+    formikConfig.initialValues.labwareType = 'tipRack'
+    render(wrapInFormik(<WellBottomAndDepth />, formikConfig))
+
+    expect(screen.getByRole('heading')).toHaveTextContent(/Tip Length/i)
+
+    screen.getByText('Reference the top of the tip to the bottom of the tip.')
+
+    expect(screen.queryByRole('radio', { name: /flat/i })).toBeNull()
+    expect(screen.queryByRole('radio', { name: /u/i })).toBeNull()
+    expect(screen.queryByRole('radio', { name: /v/i })).toBeNull()
+  })
+
   it('should render tubes when labware that should displayAsTube is selected', () => {
     when(displayAsTubeMock)
       .expectCalledWith(formikConfig.initialValues)
