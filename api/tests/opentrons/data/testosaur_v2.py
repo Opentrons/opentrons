@@ -1,7 +1,7 @@
 from opentrons import types
 
 metadata = {
-    "protocolName": "Testosaur",
+    "protocolName": "Testosaur Version 2",
     "author": "Opentrons <engineering@opentrons.com>",
     "description": 'A variant on "Dinosaur" for testing',
     "source": "Opentrons Repository",
@@ -10,14 +10,11 @@ metadata = {
 
 
 def run(ctx):
-    tip_rack = ctx.load_labware("opentrons_96_tiprack_300ul", 8)
-    source = ctx.load_labware("nest_12_reservoir_15ml", 1)
-    dest = ctx.load_labware("corning_96_wellplate_360ul_flat", 2)
-
-    pipette = ctx.load_instrument("p300_single_gen2", types.Mount.RIGHT, [])
-
-    for i in range(4):
-        pipette.pick_up_tip(tip_rack.well(i))
-        pipette.aspirate(50, source.wells_by_name()["A1"])
-        pipette.dispense(50, dest.well(i))
-        pipette.drop_tip(tip_rack.well(i))
+    ctx.home()
+    tr = ctx.load_labware("opentrons_96_tiprack_300ul", 1)
+    right = ctx.load_instrument("p300_single", types.Mount.RIGHT, [tr])
+    lw = ctx.load_labware("corning_96_wellplate_360ul_flat", 2)
+    right.pick_up_tip()
+    right.aspirate(10, lw.wells()[0].bottom())
+    right.dispense(10, lw.wells()[1].bottom())
+    right.drop_tip(tr.wells()[-1].top())
