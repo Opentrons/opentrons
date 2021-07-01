@@ -16,15 +16,18 @@ export const CustomTiprackWarning = (): JSX.Element | null => {
           id="CustomTiprackWarning"
         >
           <div className={styles.flex_row}>
-            <p className={styles.instructions_text}>
-              Opentrons tip racks are recommended for use with the OT-2 because
-              they are specifically designed and verified for automation.
-            </p>
-            <p className={styles.instructions_text}>
-              Third party tips can fit, but not necessarily with a tight seal.
-              You risk tips falling off mid-run as well as pipetting inaccuracy.
-              They may also be more likely to bend or break.
-            </p>
+            <div className={styles.instructions_text}>
+              <p>
+                Opentrons tip racks are recommended for use with the OT-2
+                because they are specifically designed and verified for
+                automation.
+              </p>
+              <p>
+                Third party tips can fit, but not necessarily with a tight seal.
+                You risk tips falling off mid-run as well as pipetting
+                inaccuracy. They may also be more likely to bend or break.
+              </p>
+            </div>
           </div>
         </SectionBody>
       </div>
