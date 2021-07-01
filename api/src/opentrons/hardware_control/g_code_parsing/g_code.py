@@ -101,8 +101,8 @@ class GCode:
             # have 2 enum entries with the same value the second value will
             # act as an alias to the first.
             # Since the value for SET_SPEED and MOVE are both G0 and MOVE is defined
-            # first, calling SMOOTHIE_GCODE.SET_SPEED.name returns MOVE. Super annoying but
-            # it's how it works.
+            # first, calling SMOOTHIE_GCODE.SET_SPEED.name returns MOVE.
+            # Super annoying but it's how it works.
             # Super annoying, so I am just going to hard code the value for now.
 
             # For corroborating documentation see:
@@ -115,9 +115,10 @@ class GCode:
 
             return g_code_function
 
-        g_code_function = self.DEVICE_GCODE_LOOKUP[self.device_name].get(self.g_code)
-
-        if g_code_function is None:
+        device = self.DEVICE_GCODE_LOOKUP[self.device_name]
+        try:
+            g_code_function = device[self.g_code]
+        except KeyError:
             raise UnparsableGCodeError(f'{self.g_code} {self.g_code_body}')
 
         return g_code_function

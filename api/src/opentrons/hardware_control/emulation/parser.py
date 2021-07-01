@@ -1,6 +1,6 @@
 import re
 from dataclasses import dataclass
-from typing import Dict, Generator, Optional, Tuple
+from typing import Dict, Generator, Optional, Tuple, List
 
 
 @dataclass
@@ -55,7 +55,7 @@ class Parser:
             raise ValueError(f"Invalid content: {line}")
 
     @staticmethod
-    def _generate_arg_dict(body: str) -> Dict[str, float]:
+    def _generate_arg_dict(body: str) -> Dict[str, Optional[float]]:
         pars = (i.groupdict() for i in Parser.ALPHA_PREFIXED_NUMBER_RE.finditer(body))
         return {
             p['prefix']: float(p['number']) if p['number'] else None for p in pars
@@ -82,7 +82,10 @@ class Parser:
         for gcode in self._parse(line):
             yield self._create_command(gcode[0], gcode[1])
 
-    def parse_to_string_list(self, line: str) -> Generator[str, None, None]:
+    def parse_to_string_list(
+            self,
+            line: str
+    ) -> List[Tuple[str, str, Dict[str, Optional[float]]]]:
         """
         Parse out line of G-Code into a list of G-Codes
 
@@ -91,4 +94,7 @@ class Parser:
 
         Returns: String with explanation
         """
-        return [(g_code[0], g_code[1], self._generate_arg_dict(g_code[1])) for g_code in self._parse(line)]
+        return [
+            (g_code[0], g_code[1], self._generate_arg_dict(g_code[1]))
+            for g_code in self._parse(line)
+        ]

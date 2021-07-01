@@ -2,6 +2,7 @@ from __future__ import annotations
 import re
 from opentrons.hardware_control.emulation.parser import Parser
 from .g_code import GCode
+from typing import List
 
 
 class GCodeProgram:
@@ -41,7 +42,7 @@ class GCodeProgram:
                     )
         return cls(write_matches)
 
-    def __init__(self, g_codes: GCode):
+    def __init__(self, g_codes: List[GCode]):
         self._g_codes = g_codes
 
     @property

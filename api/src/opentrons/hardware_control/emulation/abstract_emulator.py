@@ -3,6 +3,7 @@ from typing import Optional
 
 from opentrons.hardware_control.emulation.parser import Command
 
+
 class AbstractEmulator(ABC):
     """Interface of gcode line processing hardware emulator."""
 
@@ -24,4 +25,3 @@ class AbstractEmulator(ABC):
     @staticmethod
     def log_g_code(command: Command) -> None:
         ...
-
