@@ -17,7 +17,7 @@ export type InputFieldProps = {|
   /**
    * change handler
    */
-  onChange?: (event: React.SyntheticEvent<HTMLInputElement>) => mixed,
+  onChange?: React.ChangeEventHandler<HTMLInputElement>,
 
   /**
    * classes to apply to outer element

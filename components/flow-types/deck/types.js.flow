@@ -7,7 +7,9 @@
 
 import type { DeckSlot } from "@opentrons/shared-data";
 export type RobotWorkSpaceRenderProps = {|
-  deckSlotsById: { [key: string]: DeckSlot },
+  deckSlotsById: {
+    [slotId: string]: DeckSlot,
+  },
   getRobotCoordsFromDOMCoords: (
     domX: number,
     domY: number
