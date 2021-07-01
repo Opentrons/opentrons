@@ -23,8 +23,19 @@ class Labware:  # noqa: D101
             engine_client: A client to access protocol state.
             labware_id: The labware's identifier in commands and protocol state.
         """
+        definition = engine_client.state.labware.get_labware_definition(labware_id)
+
         self._engine_client = engine_client
         self._labware_id = labware_id
+        self._wells_by_name: Dict[str, Well] = {
+            well_name: Well(
+                well_name=well_name,
+                engine_client=engine_client,
+                labware=self,
+            )
+            for row in definition.ordering
+            for well_name in row
+        }
 
     # TODO(mc, 2021-04-22): remove this property; it's redundant and
     # unlikely to be used by PAPI users
@@ -108,7 +119,7 @@ class Labware:  # noqa: D101
     # operational logic, and its presence in this interface is no longer
     # necessary with Protocol Engine controlling execution. Can we get rid of it?
     @property
-    def magdeck_engage_height(self) -> Optional[float]:    # noqa: D102
+    def magdeck_engage_height(self) -> Optional[float]:  # noqa: D102
         definition = self._engine_client.state.labware.get_labware_definition(
             labware_id=self._labware_id
         )
@@ -168,13 +179,13 @@ class Labware:  # noqa: D101
         return definition.parameters.tipLength
 
     def well(self, idx: int) -> Well:  # noqa: D102
-        raise NotImplementedError()
+        return self.wells()[idx]
 
     def wells(self) -> List[Well]:  # noqa: D102
-        raise NotImplementedError()
+        return list(self._wells_by_name.values())
 
     def wells_by_name(self) -> Dict[str, Well]:  # noqa: D102
-        raise NotImplementedError()
+        return self._wells_by_name
 
     def rows(self) -> List[List[Well]]:  # noqa: D102
         raise NotImplementedError()
