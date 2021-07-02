@@ -1,6 +1,16 @@
 from .errors import UnparsableGCodeError
 from opentrons.drivers.smoothie_drivers.driver_3_0 import GCODE as SMOOTHIE_GCODE
 from opentrons.hardware_control.g_code_parsing.utils import reverse_enum
+from .g_code_functionality_defs.home_g_code_functionality_def import \
+    HomeGCodeFunctionalityDef
+from .g_code_functionality_defs.move_g_code_functionality_def import \
+    MoveGCodeFunctionalityDef
+from .g_code_functionality_defs.set_current_g_code_functionality_def import \
+    SetCurrentGCodeFunctionalityDef
+from .g_code_functionality_defs.set_speed_g_code_functionality_def import \
+    SetSpeedGCodeFunctionalityDef
+from .g_code_functionality_defs.wait_g_code_functionality_def import \
+    WaitGCodeFunctionalityDef
 
 
 class GCode:
@@ -8,6 +18,17 @@ class GCode:
     Middleware class to provide functionality to define G-Codes as well as
     convert them to human-readable JSON form
     """
+
+    G_CODE_EXPLANATION_MAPPING = {
+        # Weird Enum thing stopping me from using values from
+        # enum for MOVE and SET_SPEED see g_code.py get_gcode_function for explanation
+        'MOVE': MoveGCodeFunctionalityDef,
+        'SET_SPEED': SetSpeedGCodeFunctionalityDef,
+        SMOOTHIE_GCODE.WAIT.name: WaitGCodeFunctionalityDef,
+        SMOOTHIE_GCODE.HOME.name: HomeGCodeFunctionalityDef,
+        SMOOTHIE_GCODE.SET_CURRENT.name: SetCurrentGCodeFunctionalityDef
+    }
+
     # Smoothie G-Code Parsing Characters
     SET_SPEED_CHARACTER = 'F'
     MOVE_CHARACTERS = ['X', 'Y', 'Z', 'A', 'B', 'C']
@@ -122,3 +143,11 @@ class GCode:
             raise UnparsableGCodeError(f'{self.g_code} {self.g_code_body}')
 
         return g_code_function
+
+    def get_explanation_dict(self):
+        explanation_class = self.G_CODE_EXPLANATION_MAPPING[self.get_gcode_function()]
+        return explanation_class.generate_explanation_dict(
+            self.g_code,
+            self.get_gcode_function(),
+            self.g_code_args
+        )

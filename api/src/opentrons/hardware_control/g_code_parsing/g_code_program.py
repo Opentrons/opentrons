@@ -1,5 +1,8 @@
 from __future__ import annotations
+
+import json
 import re
+import os
 from opentrons.hardware_control.emulation.parser import Parser
 from .g_code import GCode
 from typing import List
@@ -42,10 +45,24 @@ class GCodeProgram:
                     )
         return cls(write_matches)
 
-    def __init__(self, g_codes: List[GCode]):
+    def __init__(self, g_codes: List[GCode]) -> None:
         self._g_codes = g_codes
 
     @property
-    def g_codes(self):
+    def g_codes(self) -> List[GCode]:
         """List of GCode objects"""
         return self._g_codes
+
+    def get_json(self) -> str:
+        return json.dumps(
+            [
+                code.get_explanation_dict()
+                for code in self._g_codes
+            ],
+            indent=4
+        )
+
+    def save_json_to_file(self, file_name: str) -> None:
+        file_path = os.path.join(os.getcwd(), file_name)
+        with open(file_path, 'w+') as file:
+            file.write(self.get_json())
