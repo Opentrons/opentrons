@@ -21,9 +21,18 @@ describe('Create a Tip Rack', () => {
   })
 
   it('Custom Tip Racks Are Not Recommended', () => {
-    cy.contains(
-      'Opentrons tip racks are recommended for use with the OT-2. You are welcome to try to use third party tip racks but accuracy is not guaranteed.'
-    ).should('exist')
+    cy.get('#CustomTiprackWarning p')
+      .first()
+      .contains(
+        'Opentrons tip racks are recommended for use with the OT-2 because they are specifically designed and verified for automation.'
+      )
+      .should('exist')
+    cy.get('#CustomTiprackWarning p')
+      .eq(1)
+      .contains(
+        'Third party tips can fit, but not necessarily with a tight seal. You risk tips falling off mid-run as well as pipetting inaccuracy. They may also be more likely to bend or break.'
+      )
+      .should('exist')
   })
 
   it('Verify Hand-Placed Tip Fit section', () => {
