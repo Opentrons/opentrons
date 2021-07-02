@@ -45,7 +45,10 @@ ot_sources := $(ot_py_sources)
 clean_cmd = $(SHX) rm -rf build dist .coverage coverage.xml '*.egg-info' '**/__pycache__' '**/*.pyc' 'robot_server/**/.mypy_cache'
 
 # Uvicorn command to run the robot server in dev mode.
-run_dev ?= uvicorn "robot_server:app" --host localhost --port 31950 --ws wsproto --reload
+#
+# "--lifespan on" ensures errors in startup and shutdown handlers won't be hidden.
+# See github.com/encode/starlette/issues/1138.
+run_dev ?= uvicorn "robot_server:app" --host localhost --port 31950 --ws wsproto --lifespan on --reload
 
 .PHONY: all
 all: clean wheel
