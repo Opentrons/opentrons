@@ -1,6 +1,6 @@
 import re
 from dataclasses import dataclass
-from typing import Dict, Generator, Optional
+from typing import Dict, Generator, Optional, Tuple, List
 
 
 @dataclass
@@ -20,7 +20,7 @@ class Parser:
     ALPHA_PREFIXED_NUMBER_RE = re.compile(r"(?P<prefix>[A-Z])(?P<number>-?\d*\.?\d*)")
     """All parameters are a capital letter followed by a decimal value."""
 
-    def parse(self, line: str) -> Generator[Command, None, None]:
+    def _parse(self, line: str) -> Generator[Tuple, None, None]:
         """
         Parse a line to extract commands.
 
@@ -34,7 +34,7 @@ class Parser:
         previous = None
         for i in self.GCODE_RE.finditer(line):
             if previous:
-                yield self._create_command(
+                yield (
                     line[previous.start(): previous.end()],
                     line[previous.end(): i.start()]
                 )
@@ -46,7 +46,7 @@ class Parser:
             previous = i
         if previous:
             # Create command from final GCODE and remainder of the line.
-            yield self._create_command(
+            yield (
                 line[previous.start(): previous.end()],
                 line[previous.end():]
             )
@@ -55,7 +55,13 @@ class Parser:
             raise ValueError(f"Invalid content: {line}")
 
     @staticmethod
-    def _create_command(gcode: str, body: str) -> Command:
+    def _generate_arg_dict(body: str) -> Dict[str, Optional[float]]:
+        pars = (i.groupdict() for i in Parser.ALPHA_PREFIXED_NUMBER_RE.finditer(body))
+        return {
+            p['prefix']: float(p['number']) if p['number'] else None for p in pars
+        }
+
+    def _create_command(self, gcode: str, body: str) -> Command:
         """
         Create a Command.
 
@@ -65,11 +71,30 @@ class Parser:
 
         Returns: a Command object
         """
-        pars = (i.groupdict() for i in Parser.ALPHA_PREFIXED_NUMBER_RE.finditer(body))
+
         return Command(
             gcode=gcode,
             body=body.strip(),
-            params={
-                p['prefix']: float(p['number']) if p['number'] else None for p in pars
-            }
+            params=self._generate_arg_dict(body)
         )
+
+    def parse(self, line: str) -> Generator[Command, None, None]:
+        for gcode in self._parse(line):
+            yield self._create_command(gcode[0], gcode[1])
+
+    def parse_to_string_list(
+            self,
+            line: str
+    ) -> List[Tuple[str, str, Dict[str, Optional[float]]]]:
+        """
+        Parse out line of G-Code into a list of G-Codes
+
+        Args:
+            line: The unparsed G-Code string
+
+        Returns: String with explanation
+        """
+        return [
+            (g_code[0], g_code[1], self._generate_arg_dict(g_code[1]))
+            for g_code in self._parse(line)
+        ]
