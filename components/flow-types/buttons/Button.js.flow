@@ -22,7 +22,7 @@ export type ButtonProps = {|
   /**
    * click handler
    */
-  onClick?: (event: React.MouseEvent<>) => mixed,
+  onClick?: React.MouseEventHandler<>,
 
   /**
    * name attribute

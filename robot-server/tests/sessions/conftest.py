@@ -1,6 +1,7 @@
 """Common test fixtures for sessions route tests."""
 import pytest
 import json
+import textwrap
 from pathlib import Path
 from decoy import Decoy
 
@@ -34,6 +35,8 @@ def engine_store(decoy: Decoy) -> EngineStore:
     return decoy.create_decoy(spec=EngineStore)
 
 
+# TODO(mc, 2021-06-28): these fixtures are duplicated with fixtures in
+# tests/opentrons/file_runner/conftest.py
 @pytest.fixture
 def json_protocol_file(
     tmp_path: Path,
@@ -104,6 +107,28 @@ def json_protocol_file(
                     },
                 ],
             }
+        ),
+        encoding="utf-8",
+    )
+
+    return file_path
+
+
+@pytest.fixture
+def python_protocol_file(tmp_path: Path) -> Path:
+    """Get an on-disk, minimal Python protocol fixture."""
+    file_path = tmp_path / "protocol-name.py"
+
+    file_path.write_text(
+        textwrap.dedent(
+            """
+            # my protocol
+            metadata = {
+                "apiVersion": "3.0"
+            }
+            def run(ctx):
+                pass
+            """
         ),
         encoding="utf-8",
     )

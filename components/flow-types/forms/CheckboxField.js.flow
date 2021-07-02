@@ -6,6 +6,10 @@
  */
 
 import * as React from "react";
+
+/**
+ * Checkbox Field Properties.
+ */
 export type CheckboxFieldProps = {|
   /**
    * change handler
@@ -62,4 +66,8 @@ export type CheckboxFieldProps = {|
    */
   isIndeterminate?: boolean,
 |};
+
+/**
+ * Checkbox Form Field
+ */
 declare export function CheckboxField(props: CheckboxFieldProps): React$Node;

@@ -31,12 +31,26 @@ def json_upload_file(tmp_path: Path) -> Iterator[UploadFile]:
 
 
 @pytest.fixture
+def python_upload_file(tmp_path: Path) -> Iterator[UploadFile]:
+    """Get an UploadFile with contents."""
+    file_path = tmp_path / "protocol.py"
+    file_path.write_text("# my protocol\n", encoding="utf-8")
+
+    with file_path.open() as python_file:
+        yield UploadFile(
+            filename="protocol.py",
+            file=python_file,
+            content_type="text/x-python",
+        )
+
+
+@pytest.fixture
 def subject(tmp_path: Path) -> ProtocolStore:
     """Get a ProtocolStore test subject."""
     return ProtocolStore(directory=tmp_path)
 
 
-async def test_create_protocol(
+async def test_create_json_protocol(
     tmp_path: Path,
     json_upload_file: UploadFile,
     subject: ProtocolStore,
@@ -59,6 +73,32 @@ async def test_create_protocol(
 
     file_path = result.files[0]
     assert file_path.read_text("utf-8") == "{}\n"
+    assert str(file_path).startswith(str(tmp_path))
+
+
+async def test_create_python_protocol(
+    tmp_path: Path,
+    python_upload_file: UploadFile,
+    subject: ProtocolStore,
+) -> None:
+    """It should save a single protocol to disk."""
+    created_at = datetime.now()
+
+    result = await subject.create(
+        protocol_id="protocol-id",
+        created_at=created_at,
+        files=[python_upload_file],
+    )
+
+    assert result == ProtocolResource(
+        protocol_id="protocol-id",
+        protocol_type=ProtocolFileType.PYTHON,
+        created_at=created_at,
+        files=[matchers.Anything()],
+    )
+
+    file_path = result.files[0]
+    assert file_path.read_text("utf-8") == "# my protocol\n"
     assert str(file_path).startswith(str(tmp_path))
 
 

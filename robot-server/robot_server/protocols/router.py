@@ -66,8 +66,6 @@ async def create_protocol(
     """
     if len(files) > 1:
         raise NotImplementedError("Multi-file protocols not yet supported.")
-    elif files[0].filename.endswith(".py"):
-        raise NotImplementedError("Python protocols not yet supported")
 
     try:
         protocol_entry = await protocol_store.create(
