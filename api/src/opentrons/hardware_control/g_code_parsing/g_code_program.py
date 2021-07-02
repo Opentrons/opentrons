@@ -24,9 +24,9 @@ class GCodeProgram:
         with open(log_file_path, 'r') as file:
             write_matches = []
             for line in file.readlines():
-                match = cls.WRITE_REGEX.search(line)
-                if match is not None:
-                    date, device, g_code = match.groups()
+                split_line = line.split('|')
+                if len(split_line) == 3:
+                    date, device, g_code = split_line
 
                     write_matches.extend(
                         [
