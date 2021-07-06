@@ -1,45 +1,8 @@
-"""Common test fixtures for sessions route tests."""
+"""Common test fixtures for sessions module tests."""
 import pytest
 import json
 import textwrap
 from pathlib import Path
-from decoy import Decoy
-
-from robot_server.service.task_runner import TaskRunner
-from robot_server.protocols import ProtocolStore
-from robot_server.sessions.session_view import SessionView
-from robot_server.sessions.session_store import SessionStore
-from robot_server.sessions.engine_store import EngineStore
-
-
-@pytest.fixture
-def task_runner(decoy: Decoy) -> TaskRunner:
-    """Get a mock background TaskRunner."""
-    return decoy.create_decoy(spec=TaskRunner)
-
-
-@pytest.fixture
-def protocol_store(decoy: Decoy) -> ProtocolStore:
-    """Get a mock ProtocolStore interface."""
-    return decoy.create_decoy(spec=ProtocolStore)
-
-
-@pytest.fixture
-def session_store(decoy: Decoy) -> SessionStore:
-    """Get a mock SessionStore interface."""
-    return decoy.create_decoy(spec=SessionStore)
-
-
-@pytest.fixture
-def session_view(decoy: Decoy) -> SessionView:
-    """Get a mock SessionView interface."""
-    return decoy.create_decoy(spec=SessionView)
-
-
-@pytest.fixture
-def engine_store(decoy: Decoy) -> EngineStore:
-    """Get a mock EngineStore interface."""
-    return decoy.create_decoy(spec=EngineStore)
 
 
 # TODO(mc, 2021-06-28): these fixtures are duplicated with fixtures in
