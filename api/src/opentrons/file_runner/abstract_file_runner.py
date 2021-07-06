@@ -12,7 +12,7 @@ class AbstractFileRunner(ABC):
 
     @abstractmethod
     async def run(self) -> None:
-        """Start running the protocol file."""
+        """Run the protocol file to completion."""
         ...
 
     @abstractmethod

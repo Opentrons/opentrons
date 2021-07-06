@@ -33,7 +33,7 @@ class PythonFileRunner(AbstractFileRunner):
         await self._executor.execute()
 
     def play(self) -> None:
-        """Resumt running the Python protocol file."""
+        """Resume running the Python protocol file after a pause."""
         raise NotImplementedError()
 
     def pause(self) -> None:

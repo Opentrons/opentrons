@@ -18,6 +18,7 @@ def run(ctx):
 
     for i in range(4):
         pipette.pick_up_tip(tip_rack.well(i))
+        pipette.pick_up_tip(tip_rack.well(i))
         pipette.aspirate(50, source.wells_by_name()["A1"])
         pipette.dispense(50, dest.well(i))
         pipette.drop_tip(tip_rack.well(i))

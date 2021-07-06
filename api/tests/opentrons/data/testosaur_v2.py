@@ -1,7 +1,7 @@
 from opentrons import types
 
 metadata = {
-    "protocolName": "Testosaur Version 2",
+    "protocolName": "Testosaur",
     "author": "Opentrons <engineering@opentrons.com>",
     "description": 'A variant on "Dinosaur" for testing',
     "source": "Opentrons Repository",

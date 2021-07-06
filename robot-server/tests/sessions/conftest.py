@@ -5,10 +5,17 @@ import textwrap
 from pathlib import Path
 from decoy import Decoy
 
+from robot_server.service.task_runner import TaskRunner
 from robot_server.protocols import ProtocolStore
 from robot_server.sessions.session_view import SessionView
 from robot_server.sessions.session_store import SessionStore
 from robot_server.sessions.engine_store import EngineStore
+
+
+@pytest.fixture
+def task_runner(decoy: Decoy) -> TaskRunner:
+    """Get a mock background TaskRunner."""
+    return decoy.create_decoy(spec=TaskRunner)
 
 
 @pytest.fixture
