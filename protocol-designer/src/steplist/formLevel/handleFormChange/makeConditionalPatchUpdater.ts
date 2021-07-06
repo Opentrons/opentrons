@@ -1,11 +1,12 @@
-// @flow
-
 export type FieldUpdateMaps = Array<{
-  prevValue: mixed,
-  nextValue: mixed,
-  dependentFields: Array<{ name: string, prevValue: mixed, nextValue: mixed }>,
+  prevValue: unknown
+  nextValue: unknown
+  dependentFields: Array<{
+    name: string
+    prevValue: unknown
+    nextValue: unknown
+  }>
 }>
-
 // the "value" in the outer prevValue/nextValue can be a field value,
 // or derived from the form (example in Move Liquid form: "well ratio" is
 // derived from aspirate_wells + dispense_wells).
@@ -13,7 +14,11 @@ export type FieldUpdateMaps = Array<{
 // This style of updater is useful when the previous independent value matters
 type MakeConditionalPatchUpdater = (
   updateMaps: FieldUpdateMaps
-) => (prevValue: mixed, nextValue: mixed, dependentFields: { ... }) => { ... }
+) => (
+  prevValue: unknown,
+  nextValue: unknown,
+  dependentFields: { [value: string]: unknown }
+) => {}
 export const makeConditionalPatchUpdater: MakeConditionalPatchUpdater = updateMaps => (
   prevValue,
   nextValue,
@@ -23,6 +28,7 @@ export const makeConditionalPatchUpdater: MakeConditionalPatchUpdater = updateMa
   const updateMap = updateMaps.find(
     u => u.prevValue === prevValue && u.nextValue === nextValue
   )
+
   if (!updateMap) {
     console.warn(
       `expected prevValue "${String(prevValue)}" and nextValue "${String(
@@ -31,6 +37,7 @@ export const makeConditionalPatchUpdater: MakeConditionalPatchUpdater = updateMa
     )
     return {}
   }
+
   const fieldUpdates = updateMap.dependentFields
   return fieldUpdates.reduce((patchAcc, { name, prevValue, nextValue }) => {
     return dependentFields[name] !== undefined &&

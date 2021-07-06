@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import cx from 'classnames'
 import { FormGroup, Tooltip, useHoverTooltip } from '@opentrons/components'
@@ -6,9 +5,9 @@ import { i18n } from '../../../../localization'
 import SINGLE_IMAGE from '../../../../images/path_single_transfers.svg'
 import MULTI_DISPENSE_IMAGE from '../../../../images/path_multi_dispense.svg'
 import MULTI_ASPIRATE_IMAGE from '../../../../images/path_multi_aspirate.svg'
-import type { PathOption } from '../../../../form-types'
-import type { FieldProps } from '../../types'
-import type { DisabledPathMap, ValuesForPath } from './getDisabledPathMap'
+import { PathOption } from '../../../../form-types'
+import { FieldProps } from '../../types'
+import { DisabledPathMap, ValuesForPath } from './getDisabledPathMap'
 import styles from '../../StepEditForm.css'
 
 const PATH_ANIMATION_IMAGES = {
@@ -17,7 +16,7 @@ const PATH_ANIMATION_IMAGES = {
   multiDispense: require('../../../../images/path_multiDispense.gif'),
 }
 
-const ALL_PATH_OPTIONS = [
+const ALL_PATH_OPTIONS: Array<{ name: PathOption; image: string }> = [
   {
     name: 'single',
     image: SINGLE_IMAGE,
@@ -32,23 +31,22 @@ const ALL_PATH_OPTIONS = [
   },
 ]
 
-type PathFieldProps = {|
-  ...FieldProps,
-  ...ValuesForPath,
-  disabledPathMap: DisabledPathMap,
-|}
+type PathFieldProps = FieldProps &
+  ValuesForPath & {
+    disabledPathMap: DisabledPathMap
+  }
 
-type ButtonProps = {
-  children?: React.Node,
-  disabled: boolean,
-  id?: string,
-  selected: boolean,
-  subtitle: string,
-  onClick: (e: SyntheticMouseEvent<*>) => mixed,
-  path: PathOption,
+interface ButtonProps {
+  children?: React.ReactNode
+  disabled: boolean
+  id?: string
+  selected: boolean
+  subtitle: string
+  onClick: (e: React.MouseEvent) => unknown
+  path: PathOption
 }
 
-const PathButton = (buttonProps: ButtonProps) => {
+const PathButton = (buttonProps: ButtonProps): JSX.Element => {
   const {
     children,
     disabled,
@@ -86,6 +84,7 @@ const PathButton = (buttonProps: ButtonProps) => {
           [styles.selected]: selected,
           [styles.disabled]: disabled,
         })}
+        // @ts-expect-error(sa, 2021-6-22): null is not a valid onClick handler
         onClick={disabled ? null : onClick}
         id={id}
         data-test={pathButtonData}
@@ -104,7 +103,7 @@ const getSubtitle = (
   return reasonForDisabled || ''
 }
 
-export const Path = (props: PathFieldProps): React.Node => {
+export const Path = (props: PathFieldProps): JSX.Element => {
   const { disabledPathMap, value, updateValue } = props
   return (
     <FormGroup label="Path">

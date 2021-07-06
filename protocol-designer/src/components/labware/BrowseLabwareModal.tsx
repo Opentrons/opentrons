@@ -1,4 +1,3 @@
-// @flow
 import assert from 'assert'
 import { i18n } from '../../localization'
 import * as React from 'react'
@@ -13,27 +12,27 @@ import { selectors } from '../../labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import * as labwareIngredsActions from '../../labware-ingred/actions'
 
-import type { BaseState, ThunkDispatch } from '../../types'
-import type { ContentsByWell } from '../../labware-ingred/types'
-import type { WellIngredientNames } from '../../steplist/types'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import { BaseState, ThunkDispatch } from '../../types'
+import { ContentsByWell } from '../../labware-ingred/types'
+import { WellIngredientNames } from '../../steplist/types'
+import { LabwareDefinition2 } from '@opentrons/shared-data'
 
 import modalStyles from '../modals/modal.css'
 import styles from './labware.css'
 
-type SP = {|
-  definition: ?LabwareDefinition2,
-  wellContents: ContentsByWell,
-  ingredNames: WellIngredientNames,
-|}
+interface SP {
+  definition?: LabwareDefinition2 | null
+  wellContents: ContentsByWell
+  ingredNames: WellIngredientNames
+}
 
-type DP = {|
-  drillUp: () => mixed,
-|}
+interface DP {
+  drillUp: () => unknown
+}
 
-type Props = {| ...SP, ...DP |}
+type Props = SP & DP
 
-const BrowseLabwareModalComponent = (props: Props) => {
+const BrowseLabwareModalComponent = (props: Props): JSX.Element | null => {
   const { drillUp, definition, ingredNames, wellContents } = props
   if (!definition) {
     assert(definition, 'BrowseLabwareModal expected definition')
@@ -82,18 +81,11 @@ function mapStateToProps(state: BaseState): SP {
   }
 }
 
-function mapDispatchToProps(dispatch: ThunkDispatch<*>): DP {
+function mapDispatchToProps(dispatch: ThunkDispatch<any>): DP {
   return { drillUp: () => dispatch(labwareIngredsActions.drillUpFromLabware()) }
 }
 
-export const BrowseLabwareModal: React.AbstractComponent<{||}> = connect<
-  Props,
-  {||},
-  SP,
-  DP,
-  _,
-  _
->(
+export const BrowseLabwareModal = connect(
   mapStateToProps,
   mapDispatchToProps
 )(BrowseLabwareModalComponent)

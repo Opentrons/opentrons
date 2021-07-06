@@ -1,4 +1,3 @@
-// @flow
 import { useConditionalConfirm } from '@opentrons/components'
 import * as React from 'react'
 import { connect } from 'react-redux'
@@ -17,29 +16,28 @@ import {
 import { makeSingleEditFieldProps } from './fields/makeSingleEditFieldProps'
 import { StepEditFormComponent } from './StepEditFormComponent'
 import { getDirtyFields } from './utils'
-import type { BaseState, ThunkDispatch } from '../../types'
-import type { FormData, StepFieldName } from '../../form-types'
+import { BaseState, ThunkDispatch } from '../../types'
+import { FormData, StepFieldName, StepIdType } from '../../form-types'
 
-type SP = {|
-  canSave: boolean,
-  formData: ?FormData,
-  formHasChanges: boolean,
-  isNewStep: boolean,
-  isPristineSetTempForm: boolean,
-|}
-type DP = {|
-  deleteStep: (stepId: string) => mixed,
-  handleClose: () => mixed,
-  saveSetTempFormWithAddedPauseUntilTemp: () => mixed,
-  saveStepForm: () => mixed,
-  handleChangeFormInput: (name: string, value: mixed) => void,
-|}
-type StepEditFormManagerProps = {|
-  ...SP,
-  ...DP,
-|}
+interface SP {
+  canSave: boolean
+  formData?: FormData | null
+  formHasChanges: boolean
+  isNewStep: boolean
+  isPristineSetTempForm: boolean
+}
+interface DP {
+  deleteStep: (stepId: string) => unknown
+  handleClose: () => unknown
+  saveSetTempFormWithAddedPauseUntilTemp: () => unknown
+  saveStepForm: () => unknown
+  handleChangeFormInput: (name: string, value: unknown) => void
+}
+type StepEditFormManagerProps = SP & DP
 
-const StepEditFormManager = (props: StepEditFormManagerProps) => {
+const StepEditFormManager = (
+  props: StepEditFormManagerProps
+): JSX.Element | null => {
   const {
     canSave,
     deleteStep,
@@ -58,18 +56,18 @@ const StepEditFormManager = (props: StepEditFormManagerProps) => {
     setShowMoreOptionsModal,
   ] = React.useState<boolean>(false)
   const [focusedField, setFocusedField] = React.useState<string | null>(null)
-  const [dirtyFields, setDirtyFields] = React.useState<Array<StepFieldName>>(
+  const [dirtyFields, setDirtyFields] = React.useState<StepFieldName[]>(
     getDirtyFields(isNewStep, formData)
   )
 
-  const toggleMoreOptionsModal = () => {
+  const toggleMoreOptionsModal = (): void => {
     resetScrollElements()
     setShowMoreOptionsModal(!showMoreOptionsModal)
   }
 
   const focus = setFocusedField
 
-  const blur = (fieldName: StepFieldName) => {
+  const blur = (fieldName: StepFieldName): void => {
     if (fieldName === focusedField) {
       setFocusedField(null)
     }
@@ -79,7 +77,7 @@ const StepEditFormManager = (props: StepEditFormManagerProps) => {
   }
 
   const stepId = formData?.id
-  const handleDelete = () => {
+  const handleDelete = (): void => {
     if (stepId != null) {
       deleteStep(stepId)
     } else {
@@ -185,14 +183,15 @@ const mapStateToProps = (state: BaseState): SP => {
   }
 }
 
-const mapDispatchToProps = (dispatch: ThunkDispatch<*>): DP => {
-  const deleteStep = stepId => dispatch(actions.deleteStep(stepId))
-  const handleClose = () => dispatch(actions.cancelStepForm())
-  const saveSetTempFormWithAddedPauseUntilTemp = () =>
+const mapDispatchToProps = (dispatch: ThunkDispatch<any>): DP => {
+  const deleteStep = (stepId: StepIdType): void =>
+    dispatch(actions.deleteStep(stepId))
+  const handleClose = (): void => dispatch(actions.cancelStepForm())
+  const saveSetTempFormWithAddedPauseUntilTemp = (): void =>
     dispatch(stepsActions.saveSetTempFormWithAddedPauseUntilTemp())
-  const saveStepForm = () => dispatch(stepsActions.saveStepForm())
+  const saveStepForm = (): void => dispatch(stepsActions.saveStepForm())
 
-  const handleChangeFormInput = (name: string, value: mixed) => {
+  const handleChangeFormInput = (name: string, value: unknown): void => {
     const maskedValue = maskField(name, value)
     dispatch(actions.changeFormInput({ update: { [name]: maskedValue } }))
   }
@@ -213,14 +212,7 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<*>): DP => {
 // It doesn't matter if the children are using connect or useSelector,
 // only the parent matters.)
 // https://react-redux.js.org/api/hooks#stale-props-and-zombie-children
-export const StepEditForm: React.AbstractComponent<{||}> = connect<
-  StepEditFormManagerProps,
-  {||},
-  _,
-  _,
-  _,
-  _
->(
+export const StepEditForm = connect(
   mapStateToProps,
   mapDispatchToProps
 )((props: StepEditFormManagerProps) => (

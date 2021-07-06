@@ -1,9 +1,8 @@
-// @flow
 import * as React from 'react'
 import { Icon } from '@opentrons/components'
 import styles from './LiquidsPageInfo.css'
 
-export function LiquidsPageInfo(): React.Node {
+export function LiquidsPageInfo(): JSX.Element {
   return (
     <div className={styles.info_wrapper}>
       <h2 className={styles.header}>Define your liquids</h2>

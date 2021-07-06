@@ -1,14 +1,14 @@
-// @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { Path } from './Path'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
 import { getDisabledPathMap } from './getDisabledPathMap'
-import type { BaseState } from '../../../../types'
-
-type Props = React.ElementProps<typeof Path>
-type SP = {| disabledPathMap: $PropertyType<Props, 'disabledPathMap'> |}
-type OP = $Diff<$Exact<Props>, SP>
+import { BaseState } from '../../../../types'
+type Props = React.ComponentProps<typeof Path>
+interface SP {
+  disabledPathMap: Props['disabledPathMap']
+}
+type OP = Omit<Props, keyof SP>
 
 function mapSTP(state: BaseState, ownProps: OP): SP {
   const {
@@ -38,11 +38,4 @@ function mapSTP(state: BaseState, ownProps: OP): SP {
   }
 }
 
-export const PathField: React.AbstractComponent<OP> = connect<
-  Props,
-  OP,
-  SP,
-  _,
-  _,
-  _
->(mapSTP, () => ({}))(Path)
+export const PathField = connect(mapSTP, () => ({}))(Path)

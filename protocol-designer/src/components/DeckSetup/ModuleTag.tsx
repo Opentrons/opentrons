@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import cx from 'classnames'
@@ -7,7 +6,7 @@ import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
-  type ModuleRealType,
+  ModuleRealType,
 } from '@opentrons/shared-data'
 import {
   TEMPERATURE_AT_TARGET,
@@ -16,25 +15,25 @@ import {
 } from '@opentrons/step-generation'
 import { i18n } from '../../localization'
 import { timelineFrameBeforeActiveItem } from '../../top-selectors/timelineFrames'
-import { selectors as stepFormSelectors } from '../../step-forms'
+import {
+  selectors as stepFormSelectors,
+  ModuleTemporalProperties,
+  TemperatureModuleState,
+} from '../../step-forms'
 import { STD_SLOT_X_DIM, STD_SLOT_Y_DIM } from '../../constants'
 import * as uiSelectors from '../../ui/steps'
 import { getLabwareOnModule } from '../../ui/modules/utils'
 import { makeTemperatureText } from '../../utils'
 import { getModuleVizDims } from './getModuleVizDims'
 import styles from './ModuleTag.css'
-import type { ModuleOrientation } from '../../types'
-import type {
-  ModuleTemporalProperties,
-  TemperatureModuleState,
-} from '../../step-forms'
+import { ModuleOrientation } from '../../types'
 
-type Props = {|
-  x: number,
-  y: number,
-  orientation: ModuleOrientation,
-  id: string,
-|}
+export interface ModuleTagProps {
+  x: number
+  y: number
+  orientation: ModuleOrientation
+  id: string
+}
 
 // eyeballed width/height to match designs
 const STANDARD_TAG_HEIGHT = 50
@@ -66,9 +65,9 @@ function getTempStatus(temperatureModuleState: TemperatureModuleState): string {
 
 export const ModuleStatus = ({
   moduleState,
-}: {|
-  moduleState: $PropertyType<ModuleTemporalProperties, 'moduleState'>,
-|}): React.Node => {
+}: {
+  moduleState: ModuleTemporalProperties['moduleState']
+}): JSX.Element | null => {
   switch (moduleState.type) {
     case MAGNETIC_MODULE_TYPE:
       return (
@@ -113,20 +112,23 @@ export const ModuleStatus = ({
 
     default:
       console.warn(
+        // @ts-expect-error (ce, 2021-07-21) doesn't think `type` exists on type never (clever TS)
         `ModuleStatus doesn't support module type ${moduleState.type}`
       )
       return null
   }
 }
 
-const ModuleTagComponent = (props: Props) => {
+const ModuleTagComponent = (props: ModuleTagProps): JSX.Element | null => {
   const timelineFrame = useSelector(timelineFrameBeforeActiveItem)
   const moduleEntity = useSelector(stepFormSelectors.getModuleEntities)[
     props.id
   ]
-  const moduleState: ?$PropertyType<ModuleTemporalProperties, 'moduleState'> =
-    timelineFrame?.robotState.modules[props.id]?.moduleState
-  const moduleType: ?ModuleRealType = moduleEntity?.type
+  const moduleState:
+    | ModuleTemporalProperties['moduleState']
+    | null
+    | undefined = timelineFrame?.robotState.modules[props.id]?.moduleState
+  const moduleType: ModuleRealType | null | undefined = moduleEntity?.type
 
   const hoveredLabwares = useSelector(uiSelectors.getHoveredStepLabware)
   const initialDeck = useSelector(stepFormSelectors.getInitialDeckSetup)
@@ -188,6 +190,4 @@ const ModuleTagComponent = (props: Props) => {
   )
 }
 
-export const ModuleTag: React.AbstractComponent<Props> = React.memo(
-  ModuleTagComponent
-)
+export const ModuleTag = React.memo(ModuleTagComponent)

@@ -1,4 +1,3 @@
-// @flow
 import {
   requiredField,
   minimumWellCount,
@@ -16,8 +15,8 @@ import {
   defaultTo,
   composeMaskers,
   trimDecimals,
-  type ValueMasker,
-  type ValueCaster,
+  ValueMasker,
+  ValueCaster,
 } from './processing'
 import {
   MIN_TEMP_MODULE_TEMP,
@@ -29,13 +28,12 @@ import {
   MIN_TC_DURATION_SECONDS,
   MAX_TC_DURATION_SECONDS,
 } from '../../constants'
-import type {
+import {
   LabwareEntity,
   PipetteEntity,
   InvariantContext,
 } from '@opentrons/step-generation'
-import type { StepFieldName } from '../../form-types'
-
+import { StepFieldName } from '../../form-types'
 export type { StepFieldName }
 
 const getLabwareEntity = (
@@ -52,14 +50,13 @@ const getPipetteEntity = (
   return state.pipetteEntities[id] || null
 }
 
-type StepFieldHelpers = {|
-  getErrors?: mixed => Array<string>,
-  maskValue?: ValueMasker,
-  castValue?: ValueCaster,
-  hydrate?: (state: InvariantContext, id: string) => mixed,
-|}
-
-const stepFieldHelperMap: { [StepFieldName]: StepFieldHelpers } = {
+interface StepFieldHelpers {
+  getErrors?: (arg0: unknown) => string[]
+  maskValue?: ValueMasker
+  castValue?: ValueCaster
+  hydrate?: (state: InvariantContext, id: string) => unknown
+}
+const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
   aspirate_airGap_volume: {
     maskValue: composeMaskers(
       maskToFloat,
@@ -180,13 +177,17 @@ const stepFieldHelperMap: { [StepFieldName]: StepFieldHelpers } = {
     getErrors: composeErrors(requiredField, minimumWellCount(1)),
     maskValue: defaultTo([]),
   },
-  magnetAction: { getErrors: composeErrors(requiredField) },
+  magnetAction: {
+    getErrors: composeErrors(requiredField),
+  },
   engageHeight: {
     getErrors: composeErrors(realNumber),
     maskValue: composeMaskers(maskToFloat, trimDecimals(1)),
     castValue: Number,
   },
-  setTemperature: { getErrors: composeErrors(requiredField) },
+  setTemperature: {
+    getErrors: composeErrors(requiredField),
+  },
   targetTemperature: {
     getErrors: composeErrors(
       minFieldValue(MIN_TEMP_MODULE_TEMP),
@@ -195,7 +196,9 @@ const stepFieldHelperMap: { [StepFieldName]: StepFieldHelpers } = {
     maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
     castValue: Number,
   },
-  pauseAction: { getErrors: composeErrors(requiredField) },
+  pauseAction: {
+    getErrors: composeErrors(requiredField),
+  },
   pauseTemperature: {
     getErrors: composeErrors(
       minFieldValue(MIN_TEMP_MODULE_TEMP),
@@ -237,10 +240,11 @@ const stepFieldHelperMap: { [StepFieldName]: StepFieldHelpers } = {
     maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
     castValue: Number,
   },
-  mix_mmFromBottom: { castValue: Number },
+  mix_mmFromBottom: {
+    castValue: Number,
+  },
 }
-
-const profileFieldHelperMap: { [string]: StepFieldHelpers } = {
+const profileFieldHelperMap: Record<string, StepFieldHelpers> = {
   // profile step fields
   temperature: {
     getErrors: composeErrors(
@@ -270,50 +274,44 @@ const profileFieldHelperMap: { [string]: StepFieldHelpers } = {
     castValue: Number,
   },
 }
-
 export const getFieldErrors = (
   name: StepFieldName,
-  value: mixed
-): Array<string> => {
+  value: unknown
+): string[] => {
   const fieldErrorGetter =
     stepFieldHelperMap[name] && stepFieldHelperMap[name].getErrors
   const errors = fieldErrorGetter ? fieldErrorGetter(value) : []
   return errors
 }
-
 export const getProfileFieldErrors = (
   name: string,
-  value: mixed
-): Array<string> => {
+  value: unknown
+): string[] => {
   const fieldErrorGetter =
     profileFieldHelperMap[name] && profileFieldHelperMap[name].getErrors
   const errors = fieldErrorGetter ? fieldErrorGetter(value) : []
   return errors
 }
-
-export const castField = (name: StepFieldName, value: mixed): mixed => {
+export const castField = (name: StepFieldName, value: unknown): unknown => {
   const fieldCaster =
     stepFieldHelperMap[name] && stepFieldHelperMap[name].castValue
   return fieldCaster ? fieldCaster(value) : value
 }
-
-export const maskField = (name: StepFieldName, value: mixed): mixed => {
+export const maskField = (name: StepFieldName, value: unknown): unknown => {
   const fieldMasker =
     stepFieldHelperMap[name] && stepFieldHelperMap[name].maskValue
   return fieldMasker ? fieldMasker(value) : value
 }
-
-export const maskProfileField = (name: string, value: mixed): mixed => {
+export const maskProfileField = (name: string, value: unknown): unknown => {
   const fieldMasker =
     profileFieldHelperMap[name] && profileFieldHelperMap[name].maskValue
   return fieldMasker ? fieldMasker(value) : value
 }
-
 export const hydrateField = (
   state: InvariantContext,
   name: StepFieldName,
   value: string
-): mixed => {
+): unknown => {
   const hydrator = stepFieldHelperMap[name] && stepFieldHelperMap[name].hydrate
   return hydrator ? hydrator(state, value) : value
 }

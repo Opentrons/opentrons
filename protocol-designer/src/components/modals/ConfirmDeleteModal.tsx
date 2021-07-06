@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { AlertModal } from '@opentrons/components'
 import { i18n } from '../../localization'
@@ -23,13 +22,14 @@ export type DeleteModalType =
   | typeof CLOSE_BATCH_EDIT_FORM
   | typeof DELETE_MULTIPLE_STEP_FORMS
 
-type Props = {|
-  modalType: DeleteModalType,
-  onCancelClick: (event: ?SyntheticMouseEvent<>) => mixed,
-  onContinueClick: (event: SyntheticMouseEvent<>) => mixed,
-|}
+interface Props {
+  modalType: DeleteModalType
+  onCancelClick: () => unknown
+  // TODO(sa, 2021-7-2): iron out this type, I think the weirdness comes from the return type of onConditionalConfirm
+  onContinueClick: ((event: React.MouseEvent) => unknown) | (() => unknown)
+}
 
-export function ConfirmDeleteModal(props: Props): React.Node {
+export function ConfirmDeleteModal(props: Props): JSX.Element {
   const { modalType, onCancelClick, onContinueClick } = props
   const cancelCopy = i18n.t('button.cancel')
   const continueCopy = i18n.t(

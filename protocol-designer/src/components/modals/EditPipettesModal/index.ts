@@ -1,11 +1,10 @@
-// @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
 import isEmpty from 'lodash/isEmpty'
 import last from 'lodash/last'
 import filter from 'lodash/filter'
 import mapValues from 'lodash/mapValues'
-
+import { PipetteName } from '@opentrons/shared-data'
 import { uuid } from '../../../utils'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../../constants'
 import { actions as steplistActions } from '../../../steplist'
@@ -13,25 +12,26 @@ import { selectors as featureFlagSelectors } from '../../../feature-flags'
 import {
   actions as stepFormActions,
   selectors as stepFormSelectors,
+  PipetteOnDeck,
+  FormPipettesByMount,
 } from '../../../step-forms'
-import { FilePipettesModal } from '../FilePipettesModal'
-import type { NormalizedPipette } from '@opentrons/step-generation'
-import type { BaseState, ThunkDispatch } from '../../../types'
-import type { PipetteOnDeck, FormPipettesByMount } from '../../../step-forms'
-import type { StepIdType } from '../../../form-types'
+import { FilePipettesModal, PipetteFieldsData } from '../FilePipettesModal'
+import { NormalizedPipette } from '@opentrons/step-generation'
+import { BaseState, ThunkDispatch } from '../../../types'
+import { StepIdType } from '../../../form-types'
 
-type Props = React.ElementProps<typeof FilePipettesModal>
+type Props = React.ComponentProps<typeof FilePipettesModal>
 
-type SP = {|
-  initialPipetteValues: FormPipettesByMount,
-  _prevPipettes: { [pipetteId: string]: PipetteOnDeck },
-  _orderedStepIds: Array<StepIdType>,
-  moduleRestrictionsDisabled: ?boolean,
-|}
+interface SP {
+  initialPipetteValues: FormPipettesByMount
+  _prevPipettes: { [pipetteId: string]: PipetteOnDeck }
+  _orderedStepIds: StepIdType[]
+  moduleRestrictionsDisabled?: boolean | null
+}
 
-type OP = {|
-  closeModal: () => mixed,
-|}
+interface OP {
+  closeModal: () => unknown
+}
 
 const mapSTP = (state: BaseState): SP => {
   const initialPipettes = stepFormSelectors.getPipettesForEditPipetteForm(state)
@@ -59,32 +59,32 @@ const mapSTP = (state: BaseState): SP => {
 // in one click (create, change manualIntervention step, substitute pipettes
 // across all steps, delete pipettes), which is why it's so funky!
 const makeUpdatePipettes = (
-  prevPipettes,
-  orderedStepIds,
-  dispatch,
-  closeModal
-) => ({ pipettes: newPipetteArray }) => {
+  prevPipettes: SP['_prevPipettes'],
+  orderedStepIds: SP['_orderedStepIds'],
+  dispatch: ThunkDispatch<any>,
+  closeModal: OP['closeModal']
+) => ({ pipettes: newPipetteArray }: { pipettes: PipetteFieldsData[] }) => {
   const prevPipetteIds = Object.keys(prevPipettes)
-  const usedPrevPipettes: Array<string> = [] // IDs of pipettes in prevPipettes that were already put into nextPipettes
+  const usedPrevPipettes: string[] = [] // IDs of pipettes in prevPipettes that were already put into nextPipettes
   const nextPipettes: {
     [pipetteId: string]: {
-      mount: string,
-      name: string,
-      tiprackDefURI: string,
-      id: string,
-    },
+      mount: string
+      name: PipetteName
+      tiprackDefURI: string
+      id: string
+    }
   } = {}
 
   // from array of pipettes from Edit Pipette form (with no IDs),
   // assign IDs and populate nextPipettes
-  newPipetteArray.forEach(newPipette => {
+  newPipetteArray.forEach((newPipette: PipetteFieldsData) => {
     if (newPipette && newPipette.name && newPipette.tiprackDefURI) {
       const candidatePipetteIds = prevPipetteIds.filter(id => {
         const prevPipette = prevPipettes[id]
         const alreadyUsed = usedPrevPipettes.some(usedId => usedId === id)
         return !alreadyUsed && prevPipette.name === newPipette.name
       })
-      const pipetteId: ?string = candidatePipetteIds[0]
+      const pipetteId: string | null | undefined = candidatePipetteIds[0]
       if (pipetteId) {
         // update used pipette list
         usedPrevPipettes.push(pipetteId)
@@ -100,7 +100,9 @@ const makeUpdatePipettes = (
     stepFormActions.createPipettes(
       mapValues(
         nextPipettes,
-        (p: $Values<typeof nextPipettes>): NormalizedPipette => ({
+        (
+          p: typeof nextPipettes[keyof typeof nextPipettes]
+        ): NormalizedPipette => ({
           id: p.id,
           name: p.name,
           tiprackDefURI: p.tiprackDefURI,
@@ -122,13 +124,15 @@ const makeUpdatePipettes = (
     })
   )
 
-  const pipetteIdsToDelete: Array<string> = Object.keys(prevPipettes).filter(
+  const pipetteIdsToDelete: string[] = Object.keys(prevPipettes).filter(
     id => !(id in nextPipettes)
   )
 
   // SubstitutionMap represents a map of oldPipetteId => newPipetteId
   // When a pipette's tiprack changes, the ids will be the same
-  type SubstitutionMap = { [pipetteId: string]: string }
+  interface SubstitutionMap {
+    [pipetteId: string]: string
+  }
 
   const pipetteReplacementMap: SubstitutionMap = pipetteIdsToDelete.reduce(
     (acc: SubstitutionMap, deletedId: string): SubstitutionMap => {
@@ -136,6 +140,7 @@ const makeUpdatePipettes = (
       const replacementId = Object.keys(nextPipettes).find(
         newId => nextPipettes[newId].mount === deletedPipette.mount
       )
+      // @ts-expect-error(sa, 2021-6-21): redlacementId will always be a string, so right side of the and will always be true
       return replacementId && replacementId !== -1
         ? { ...acc, [deletedId]: replacementId }
         : acc
@@ -143,9 +148,9 @@ const makeUpdatePipettes = (
     {}
   )
 
-  const pipettesWithNewTipracks: Array<string> = filter(
+  const pipettesWithNewTipracks: string[] = filter(
     nextPipettes,
-    (nextPipette: $Values<typeof nextPipettes>) => {
+    (nextPipette: typeof nextPipettes[keyof typeof nextPipettes]) => {
       const newPipetteId = nextPipette.id
       const tiprackChanged =
         newPipetteId in prevPipettes &&
@@ -180,6 +185,7 @@ const makeUpdatePipettes = (
       stepFormActions.substituteStepFormPipettes({
         substitutionMap,
         startStepId: orderedStepIds[0],
+        // @ts-expect-error(sa, 2021-6-22): last might return undefined
         endStepId: last(orderedStepIds),
       })
     )
@@ -195,7 +201,7 @@ const makeUpdatePipettes = (
 
 const mergeProps = (
   stateProps: SP,
-  dispatchProps: {| dispatch: ThunkDispatch<*> |},
+  dispatchProps: { dispatch: ThunkDispatch<any> },
   ownProps: OP
 ): Props => {
   const { _prevPipettes, _orderedStepIds, ...passThruStateProps } = stateProps
@@ -217,15 +223,9 @@ const mergeProps = (
   }
 }
 
-export const EditPipettesModal: React.AbstractComponent<OP> = connect<
-  Props,
-  OP,
-  SP,
-  {||},
-  _,
-  _
->(
+export const EditPipettesModal = connect(
   mapSTP,
+  // @ts-expect-error(sa, 2021-6-22): TODO: refactor to use hooks api
   null,
   mergeProps
 )(FilePipettesModal)

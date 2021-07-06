@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { Provider } from 'react-redux'
 import { act } from 'react-dom/test-utils'
@@ -7,29 +6,34 @@ import { when, resetAllWhenMocks } from 'jest-when'
 import configureMockStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
 
-import * as stepFormSelectors from '../../../step-forms/selectors/index.js'
-import * as uiStepSelectors from '../../../ui/steps/selectors.js'
+import * as stepFormSelectors from '../../../step-forms/selectors'
+import * as uiStepSelectors from '../../../ui/steps/selectors'
 import {
   ConfirmDeleteModal,
   CLOSE_UNSAVED_STEP_FORM,
   CLOSE_STEP_FORM_WITH_CHANGES,
 } from '../../../components/modals/ConfirmDeleteModal'
 import { PDTitledList } from '../../lists'
-import { TerminalItem } from '../TerminalItem'
+import { TerminalItem, TerminalItemProps } from '../TerminalItem'
 
-jest.mock('../../../step-forms/selectors/index.js')
-jest.mock('../../../ui/steps/selectors.js')
+jest.mock('../../../step-forms/selectors')
+jest.mock('../../../ui/steps/selectors')
 
-const getCurrentFormIsPresavedMock = stepFormSelectors.getCurrentFormIsPresaved
-const getCurrentFormHasUnsavedChangesMock =
-  stepFormSelectors.getCurrentFormHasUnsavedChanges
-const getIsMultiSelectModeMock = uiStepSelectors.getIsMultiSelectMode
+const getCurrentFormIsPresavedMock = stepFormSelectors.getCurrentFormIsPresaved as jest.MockedFunction<
+  typeof stepFormSelectors.getCurrentFormIsPresaved
+>
+const getCurrentFormHasUnsavedChangesMock = stepFormSelectors.getCurrentFormHasUnsavedChanges as jest.MockedFunction<
+  typeof stepFormSelectors.getCurrentFormHasUnsavedChanges
+>
+const getIsMultiSelectModeMock = uiStepSelectors.getIsMultiSelectMode as jest.MockedFunction<
+  typeof uiStepSelectors.getIsMultiSelectMode
+>
 
 const mockStore = configureMockStore([thunk])
 
 describe('TerminalItem', () => {
-  let store
-  let props
+  let store: any
+  let props: TerminalItemProps
   beforeEach(() => {
     props = {
       id: '__initial_setup__',
@@ -53,7 +57,7 @@ describe('TerminalItem', () => {
     resetAllWhenMocks()
   })
 
-  const render = props =>
+  const render = (props: React.ComponentProps<typeof TerminalItem>) =>
     mount(
       <Provider store={store}>
         <TerminalItem {...props} />
@@ -67,7 +71,7 @@ describe('TerminalItem', () => {
         .mockReturnValue(true)
       const wrapper = render(props)
       act(() => {
-        wrapper.find(PDTitledList).prop('onClick')()
+        wrapper.find(PDTitledList).prop('onClick')?.({} as React.MouseEvent)
       })
       wrapper.update()
       const confirmDeleteModal = wrapper.find(ConfirmDeleteModal)
@@ -81,7 +85,7 @@ describe('TerminalItem', () => {
         .mockReturnValue(true)
       const wrapper = render(props)
       act(() => {
-        wrapper.find(PDTitledList).prop('onClick')()
+        wrapper.find(PDTitledList).prop('onClick')?.({} as React.MouseEvent)
       })
       wrapper.update()
       const confirmDeleteModal = wrapper.find(ConfirmDeleteModal)
@@ -97,7 +101,7 @@ describe('TerminalItem', () => {
         .mockReturnValue(true)
       const wrapper = render(props)
       act(() => {
-        wrapper.find(PDTitledList).prop('onClick')()
+        wrapper.find(PDTitledList).prop('onClick')?.({} as React.MouseEvent)
       })
       wrapper.update()
       const confirmDeleteModal = wrapper.find(ConfirmDeleteModal)

@@ -1,15 +1,11 @@
-// @flow
 import omit from 'lodash/omit'
 import mapValues from 'lodash/mapValues'
-import { combineReducers } from 'redux'
+import { Reducer, combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
-import { userFacingFlags, DEPRECATED_FLAGS, type Flags } from './types'
-
-import type { Reducer } from 'redux'
-import type { RehydratePersistedAction } from '../persist'
-import type { SetFeatureFlagAction } from './actions'
-import type { Action } from '../types'
-
+import { Flags, FlagTypes, userFacingFlags, DEPRECATED_FLAGS } from './types'
+import { RehydratePersistedAction } from '../persist'
+import { SetFeatureFlagAction } from './actions'
+import { Action } from '../types'
 // NOTE: these values will always be overridden by persisted values,
 // whenever the browser has seen the feature flag before and persisted it.
 // Only "never before seen" flags will take on the default values from `initialFlags`.
@@ -24,18 +20,20 @@ const initialFlags: Flags = {
   OT_PD_DISABLE_MODULE_RESTRICTIONS:
     process.env.OT_PD_DISABLE_MODULE_RESTRICTIONS === '1' || false,
 }
-
-// NOTE(mc, 2020-06-04): `handleActions` cannot be strictly typed
+// @ts-expect-error(sa, 2021-6-10): cannot use string literals as action type
+// TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
 const flags: Reducer<Flags, any> = handleActions(
   {
     SET_FEATURE_FLAGS: (state: Flags, action: SetFeatureFlagAction): Flags => {
       const nextState = { ...state, ...action.payload }
+
       if (action.payload.PRERELEASE_MODE === false) {
         // turn off all non-user-facing flags when prerelease mode disabled
-        return mapValues(nextState, (value, flagName) =>
+        return mapValues(nextState, (value, flagName: FlagTypes) =>
           userFacingFlags.includes(flagName) ? value : false
         )
       }
+
       return nextState
     },
     // Feature flags that are new (not yet in browser storage) should take on default values.
@@ -50,15 +48,12 @@ const flags: Reducer<Flags, any> = handleActions(
   },
   initialFlags
 )
-
 export const _allReducers = {
   flags,
 }
-
-export type RootState = {|
-  flags: Flags,
-|}
-
+export interface RootState {
+  flags: Flags
+}
 export const rootReducer: Reducer<RootState, Action> = combineReducers(
   _allReducers
 )

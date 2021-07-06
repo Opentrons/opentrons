@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
 import {
@@ -10,24 +9,31 @@ import {
 
 import { i18n } from '../../localization'
 import { actions as steplistActions } from '../../steplist'
-import type { StepFieldName } from '../../steplist/fieldLevel'
-import type { FormData } from '../../form-types'
-import type { ThunkDispatch } from '../../types'
+import { StepFieldName } from '../../steplist/fieldLevel'
+import { FormData } from '../../form-types'
+import { ThunkDispatch } from '../../types'
 import modalStyles from './modal.css'
 import styles from './MoreOptionsModal.css'
 
-type OP = {|
-  close: (event: ?SyntheticEvent<>) => mixed,
-  formData: FormData,
-|}
+interface OP {
+  close: (event?: React.MouseEvent) => unknown
+  formData: FormData
+}
 
-type DP = {|
-  saveValuesToForm: ({ [StepFieldName]: ?mixed }) => mixed,
-|}
+interface DP {
+  saveValuesToForm: (
+    args: {
+      [K in StepFieldName]: unknown | null | undefined
+    }
+  ) => unknown
+}
 
-type Props = {| ...OP, ...DP |}
-type State = { [StepFieldName]: ?mixed }
-
+type Props = OP & DP
+interface State {
+  stepDetails: any
+  stepName: unknown
+  [key: string]: unknown
+}
 class MoreOptionsModalComponent extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
@@ -36,17 +42,17 @@ class MoreOptionsModalComponent extends React.Component<Props, State> {
   }
 
   makeHandleChange = (fieldName: StepFieldName) => (
-    e: SyntheticInputEvent<*>
+    e: React.ChangeEvent<any>
   ) => {
     this.setState({ [fieldName]: e.currentTarget.value })
   }
 
-  handleSave = () => {
+  handleSave = (): void => {
     this.props.saveValuesToForm(this.state)
     this.props.close()
   }
 
-  render() {
+  render(): JSX.Element {
     return (
       <Modal
         heading={i18n.t('modal.step_notes.title')}
@@ -91,19 +97,12 @@ class MoreOptionsModalComponent extends React.Component<Props, State> {
   }
 }
 
-const mapDispatchToProps = (dispatch: ThunkDispatch<*>): DP => ({
+const mapDispatchToProps = (dispatch: ThunkDispatch<any>): DP => ({
   saveValuesToForm: update =>
     dispatch(steplistActions.changeFormInput({ update })),
 })
 
-export const MoreOptionsModal: React.AbstractComponent<OP> = connect<
-  Props,
-  OP,
-  {||},
-  DP,
-  _,
-  _
->(
+export const MoreOptionsModal = connect(
   null,
   mapDispatchToProps
 )(MoreOptionsModalComponent)

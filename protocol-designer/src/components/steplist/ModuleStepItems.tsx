@@ -1,27 +1,26 @@
-// @flow
 import * as React from 'react'
 import cx from 'classnames'
 import {
   Tooltip,
   useHoverTooltip,
   TOOLTIP_FIXED,
-  type UseHoverTooltipTargetProps,
+  UseHoverTooltipTargetProps,
 } from '@opentrons/components'
 import { i18n } from '../../localization'
 import { PDListItem } from '../lists'
 import { LabwareTooltipContents } from './LabwareTooltipContents'
 import styles from './StepItem.css'
-import type { ModuleRealType } from '@opentrons/shared-data'
+import { ModuleRealType } from '@opentrons/shared-data'
 
-export type ModuleStepItemRowProps = {|
-  label?: ?string,
-  value?: ?string,
-  targetProps?: UseHoverTooltipTargetProps,
-|}
+export interface ModuleStepItemRowProps {
+  label?: string | null
+  value?: string | null
+  targetProps?: UseHoverTooltipTargetProps
+}
 
 export const ModuleStepItemRow = (
   props: ModuleStepItemRowProps
-): React.Node => (
+): JSX.Element => (
   <PDListItem
     className={cx(styles.step_subitem_column_header, styles.substep_content)}
   >
@@ -32,17 +31,17 @@ export const ModuleStepItemRow = (
   </PDListItem>
 )
 
-type Props = {|
-  action?: string,
-  moduleType: ModuleRealType,
-  actionText: string,
-  labwareNickname: ?string,
-  message?: ?string,
-  children?: React.Node,
-  hideHeader?: boolean,
-|}
+interface Props {
+  action?: string
+  moduleType: ModuleRealType
+  actionText: string
+  labwareNickname?: string | null
+  message?: string | null
+  children?: React.ReactNode
+  hideHeader?: boolean
+}
 
-export const ModuleStepItems = (props: Props): React.Node => {
+export const ModuleStepItems = (props: Props): JSX.Element => {
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: 'bottom-start',
     strategy: TOOLTIP_FIXED,

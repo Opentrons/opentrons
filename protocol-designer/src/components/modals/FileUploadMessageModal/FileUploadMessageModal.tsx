@@ -1,19 +1,20 @@
-// @flow
 import { i18n } from '../../../localization'
 import * as React from 'react'
 import cx from 'classnames'
 import { AlertModal, OutlineButton } from '@opentrons/components'
 import modalStyles from '../modal.css'
 import { getModalContents } from './modalContents'
-import type { FileUploadMessage } from '../../../load-file'
+import { FileUploadMessage } from '../../../load-file'
 
-type Props = {
-  message: ?FileUploadMessage,
-  cancelProtocolMigration: (SyntheticEvent<*>) => mixed,
-  dismissModal: (SyntheticEvent<*>) => mixed,
+export interface FileUploadMessageModalProps {
+  message?: FileUploadMessage | null
+  cancelProtocolMigration: (event: React.MouseEvent) => unknown
+  dismissModal: (event: React.MouseEvent) => unknown
 }
 
-export function FileUploadMessageModal(props: Props): React.Node {
+export function FileUploadMessageModal(
+  props: FileUploadMessageModalProps
+): JSX.Element | null {
   const { message, cancelProtocolMigration, dismissModal } = props
 
   if (!message) return null

@@ -1,15 +1,11 @@
-// @flow
-import { combineReducers } from 'redux'
+import { Reducer, combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
-
-import type { Reducer } from 'redux'
-import type { Timeline } from '@opentrons/step-generation'
-import type { Action } from '../../types'
-import type { FileMetadataFields, SaveFileMetadataAction } from '../types'
-import type { LoadFileAction, NewProtocolFields } from '../../load-file'
-import type { ComputeRobotStateTimelineSuccessAction } from '../actions'
-import type { Substeps } from '../../steplist/types'
-
+import { Timeline } from '@opentrons/step-generation'
+import { Action } from '../../types'
+import { FileMetadataFields, SaveFileMetadataAction } from '../types'
+import { LoadFileAction, NewProtocolFields } from '../../load-file'
+import { ComputeRobotStateTimelineSuccessAction } from '../actions'
+import { Substeps } from '../../steplist/types'
 export const timelineIsBeingComputed: Reducer<boolean, any> = handleActions(
   {
     COMPUTE_ROBOT_STATE_TIMELINE_REQUEST: () => true,
@@ -17,19 +13,24 @@ export const timelineIsBeingComputed: Reducer<boolean, any> = handleActions(
   },
   false
 )
-
+// @ts-expect-error(sa, 2021-6-10): cannot use string literals as action type
+// TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
 export const computedRobotStateTimeline: Reducer<Timeline, any> = handleActions(
   {
+    // @ts-expect-error(sa, 2021-6-10): cannot use string literals as action type
     COMPUTE_ROBOT_STATE_TIMELINE_SUCCESS: (
       state,
       action: ComputeRobotStateTimelineSuccessAction
     ) => action.payload.standardTimeline,
   },
-  { timeline: [] }
+  {
+    timeline: [],
+  }
 )
-
 export const computedSubsteps: Reducer<Substeps, any> = handleActions(
   {
+    // @ts-expect-error(sa, 2021-6-10): cannot use string literals as action type
+    // TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
     COMPUTE_ROBOT_STATE_TIMELINE_SUCCESS: (
       state,
       action: ComputeRobotStateTimelineSuccessAction
@@ -37,7 +38,6 @@ export const computedSubsteps: Reducer<Substeps, any> = handleActions(
   },
   {}
 )
-
 const defaultFields = {
   protocolName: '',
   author: '',
@@ -63,7 +63,9 @@ const currentProtocolExists = handleActions(
 
 function newProtocolMetadata(
   state: FileMetadataFields,
-  action: { payload: NewProtocolFields }
+  action: {
+    payload: NewProtocolFields
+  }
 ): FileMetadataFields {
   return {
     ...defaultFields,
@@ -72,7 +74,8 @@ function newProtocolMetadata(
     lastModified: null,
   }
 }
-
+// @ts-expect-error(sa, 2021-6-10): cannot use string literals as action type
+// TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
 const fileMetadata = handleActions(
   {
     LOAD_FILE: updateMetadataFields,
@@ -80,10 +83,7 @@ const fileMetadata = handleActions(
     SAVE_FILE_METADATA: (
       state: FileMetadataFields,
       action: SaveFileMetadataAction
-    ): FileMetadataFields => ({
-      ...state,
-      ...action.payload,
-    }),
+    ): FileMetadataFields => ({ ...state, ...action.payload }),
     SAVE_PROTOCOL_FILE: (state: FileMetadataFields): FileMetadataFields => {
       // NOTE: 'last-modified' is updated "on-demand", in response to user clicking "save/export"
       return { ...state, lastModified: Date.now() }
@@ -91,15 +91,13 @@ const fileMetadata = handleActions(
   },
   defaultFields
 )
-
-export type RootState = {|
-  computedRobotStateTimeline: Timeline,
-  computedSubsteps: Substeps,
-  currentProtocolExists: boolean,
-  fileMetadata: FileMetadataFields,
-  timelineIsBeingComputed: boolean,
-|}
-
+export interface RootState {
+  computedRobotStateTimeline: Timeline
+  computedSubsteps: Substeps
+  currentProtocolExists: boolean
+  fileMetadata: FileMetadataFields
+  timelineIsBeingComputed: boolean
+}
 const _allReducers = {
   computedRobotStateTimeline,
   computedSubsteps,
@@ -107,7 +105,6 @@ const _allReducers = {
   fileMetadata,
   timelineIsBeingComputed,
 }
-
 export const rootReducer: Reducer<RootState, Action> = combineReducers(
   _allReducers
 )

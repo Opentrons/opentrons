@@ -11,7 +11,7 @@ import fieldStyles from './fieldStyles.css'
 interface Props {
   name: keyof LabwareFields
   options: RadioGroupProps['options']
-  labelTextClassName?: string | null | undefined
+  labelTextClassName?: string | null
 }
 
 export const RadioField = (props: Props): JSX.Element => (

@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import cx from 'classnames'
 import round from 'lodash/round'
@@ -18,20 +17,20 @@ import { TipPositionZAxisViz } from './TipPositionZAxisViz'
 
 import styles from './TipPositionInput.css'
 import * as utils from './utils'
-import { getIsTouchTipField, type StepFieldName } from '../../../../form-types'
+import { getIsTouchTipField, StepFieldName } from '../../../../form-types'
 
 const SMALL_STEP_MM = 1
 const LARGE_STEP_MM = 10
 const DECIMALS_ALLOWED = 1
 
-type Props = {|
-  closeModal: () => mixed,
-  isIndeterminate?: boolean,
-  mmFromBottom: number | null,
-  name: StepFieldName,
-  updateValue: (?number) => mixed,
-  wellDepthMm: number,
-|}
+interface Props {
+  closeModal: () => unknown
+  isIndeterminate?: boolean
+  mmFromBottom: number | null
+  name: StepFieldName
+  updateValue: (val: number | null | undefined) => unknown
+  wellDepthMm: number
+}
 
 const roundValue = (value: number | string | null): number => {
   return round(Number(value), DECIMALS_ALLOWED)
@@ -41,12 +40,12 @@ const TOO_MANY_DECIMALS: 'TOO_MANY_DECIMALS' = 'TOO_MANY_DECIMALS'
 const OUT_OF_BOUNDS: 'OUT_OF_BOUNDS' = 'OUT_OF_BOUNDS'
 type Error = typeof TOO_MANY_DECIMALS | typeof OUT_OF_BOUNDS
 
-const getErrorText = (args: {|
-  errors: Array<Error>,
-  maxMmFromBottom: number,
-  minMmFromBottom: number,
-  isPristine: boolean,
-|}): string | null => {
+const getErrorText = (args: {
+  errors: Error[]
+  maxMmFromBottom: number
+  minMmFromBottom: number
+  isPristine: boolean
+}): string | null => {
   const { errors, minMmFromBottom, maxMmFromBottom, isPristine } = args
 
   if (errors.includes(TOO_MANY_DECIMALS)) {
@@ -61,14 +60,14 @@ const getErrorText = (args: {|
   }
 }
 
-const getErrors = (args: {|
-  isDefault: boolean,
-  value: string | null,
-  maxMmFromBottom: number,
-  minMmFromBottom: number,
-|}): Array<Error> => {
+const getErrors = (args: {
+  isDefault: boolean
+  value: string | null
+  maxMmFromBottom: number
+  minMmFromBottom: number
+}): Error[] => {
   const { isDefault, value, maxMmFromBottom, minMmFromBottom } = args
-  const errors = []
+  const errors: Error[] = []
   if (isDefault) return errors
 
   const v = Number(value)
@@ -88,7 +87,7 @@ const getErrors = (args: {|
   return errors
 }
 
-export const TipPositionModal = (props: Props): React.Node => {
+export const TipPositionModal = (props: Props): JSX.Element => {
   const { isIndeterminate, name, wellDepthMm } = props
 
   const defaultMmFromBottom = utils.getDefaultMmFromBottom({
@@ -105,10 +104,10 @@ export const TipPositionModal = (props: Props): React.Node => {
   // in this modal, pristinity hides the OUT_OF_BOUNDS error only.
   const [isPristine, setPristine] = React.useState<boolean>(true)
 
-  const getMinMaxMmFromBottom = (): {|
-    maxMmFromBottom: number,
-    minMmFromBottom: number,
-  |} => {
+  const getMinMaxMmFromBottom = (): {
+    maxMmFromBottom: number
+    minMmFromBottom: number
+  } => {
     if (getIsTouchTipField(name)) {
       return {
         maxMmFromBottom: roundValue(wellDepthMm),
@@ -170,7 +169,7 @@ export const TipPositionModal = (props: Props): React.Node => {
   }
 
   const handleInputFieldChange = (
-    e: SyntheticEvent<HTMLInputElement>
+    e: React.ChangeEvent<HTMLInputElement>
   ): void => {
     handleChange(e.currentTarget.value)
   }
@@ -255,7 +254,7 @@ export const TipPositionModal = (props: Props): React.Node => {
               <div>
                 <RadioGroup
                   value={isDefault ? 'default' : 'custom'}
-                  onChange={e => {
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                     setIsDefault(e.currentTarget.value === 'default')
                   }}
                   options={[

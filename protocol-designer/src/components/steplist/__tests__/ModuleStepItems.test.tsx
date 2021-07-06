@@ -1,10 +1,9 @@
-// @flow
 import { MAGNETIC_MODULE_TYPE } from '@opentrons/shared-data'
 import React from 'react'
 import { render, shallow, mount } from 'enzyme'
 import { ModuleStepItems } from '../ModuleStepItems'
 
-let props
+let props: any
 beforeEach(() => {
   props = {
     action: 'action',

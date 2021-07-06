@@ -1,4 +1,3 @@
-// @flow
 import sortBy from 'lodash/sortBy'
 import * as React from 'react'
 import { ContinueModal, Card, ToggleButton } from '@opentrons/components'
@@ -7,25 +6,22 @@ import { resetScrollElements } from '../../../ui/steps/utils'
 import { Portal } from '../../portals/MainPageModalPortal'
 import styles from '../SettingsPage.css'
 import modalStyles from '../../modals/modal.css'
-import {
-  userFacingFlags,
-  type Flags,
-  type FlagTypes,
-} from '../../../feature-flags'
+import { userFacingFlags, Flags, FlagTypes } from '../../../feature-flags'
 
-type Props = {|
-  flags: Flags,
-  setFeatureFlags: (flags: Flags) => mixed,
-|}
+export interface Props {
+  flags: Flags
+  setFeatureFlags: (flags: Flags) => unknown
+}
 
-export const FeatureFlagCard = (props: Props): React.Node => {
+export const FeatureFlagCard = (props: Props): JSX.Element => {
   const [modalFlagName, setModalFlagName] = React.useState<FlagTypes | null>(
     null
   )
 
   const prereleaseModeEnabled = props.flags.PRERELEASE_MODE === true
 
-  const allFlags = sortBy(Object.keys(props.flags))
+  // @ts-expect-error(sa, 2021-6-21): Object.keys not smart enough to take keys from props.flags
+  const allFlags: FlagTypes[] = sortBy(Object.keys(props.flags))
 
   const userFacingFlagNames = allFlags.filter(flagName =>
     userFacingFlags.includes(flagName)
@@ -35,8 +31,8 @@ export const FeatureFlagCard = (props: Props): React.Node => {
     flagName => !userFacingFlags.includes(flagName)
   )
 
-  const getDescription = (flag: FlagTypes): React.Node => {
-    const RICH_DESCRIPTIONS: { [FlagTypes]: React.Node } = {
+  const getDescription = (flag: FlagTypes): JSX.Element => {
+    const RICH_DESCRIPTIONS: Partial<Record<FlagTypes, JSX.Element>> = {
       OT_PD_DISABLE_MODULE_RESTRICTIONS: (
         <>
           <p>{i18n.t(`feature_flags.${flag}.description_1`)} </p>
@@ -51,7 +47,7 @@ export const FeatureFlagCard = (props: Props): React.Node => {
     )
   }
 
-  const toFlagRow = flagName => (
+  const toFlagRow = (flagName: FlagTypes): JSX.Element => (
     <div key={flagName}>
       <div className={styles.setting_row}>
         <p className={styles.toggle_label}>
@@ -85,7 +81,7 @@ export const FeatureFlagCard = (props: Props): React.Node => {
   let flagSwitchDirection: string = 'on'
 
   if (modalFlagName) {
-    const isFlagOn: ?boolean = props.flags[modalFlagName]
+    const isFlagOn: boolean | null | undefined = props.flags[modalFlagName]
     flagSwitchDirection = isFlagOn ? 'off' : 'on'
   }
   return (
@@ -101,7 +97,7 @@ export const FeatureFlagCard = (props: Props): React.Node => {
             onCancelClick={() => setModalFlagName(null)}
             onContinueClick={() => {
               props.setFeatureFlags({
-                [(modalFlagName: string)]: !props.flags[modalFlagName],
+                [modalFlagName as string]: !props.flags[modalFlagName],
               })
               setModalFlagName(null)
             }}

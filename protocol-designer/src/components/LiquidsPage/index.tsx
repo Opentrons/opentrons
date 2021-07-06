@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
 import assert from 'assert'
@@ -8,20 +7,23 @@ import { LiquidsPageInfo } from './LiquidsPageInfo'
 import * as labwareIngredActions from '../../labware-ingred/actions'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 
-import type { LiquidGroup } from '../../labware-ingred/types'
-import type { BaseState, ThunkDispatch } from '../../types'
+import { LiquidGroup } from '../../labware-ingred/types'
+import { BaseState, ThunkDispatch } from '../../types'
 
-type Props = React.ElementProps<typeof LiquidEditForm>
-type WrapperProps = { showForm: boolean, formKey: string, formProps: Props }
+type Props = React.ComponentProps<typeof LiquidEditForm>
+interface WrapperProps {
+  showForm: boolean
+  formKey: string
+  formProps: Props
+}
 
-type SP = {|
-  ...$Exact<LiquidGroup>,
-  _liquidGroupId: ?string,
-  showForm: boolean,
-  canDelete: $ElementType<Props, 'canDelete'>,
-|}
+type SP = LiquidGroup & {
+  _liquidGroupId?: string | null
+  showForm: boolean
+  canDelete: Props['canDelete']
+}
 
-function LiquidEditFormWrapper(props: WrapperProps) {
+function LiquidEditFormWrapper(props: WrapperProps): JSX.Element {
   const { showForm, formKey, formProps } = props
   return showForm ? (
     <LiquidEditForm {...formProps} key={formKey} />
@@ -57,15 +59,18 @@ function mapStateToProps(state: BaseState): SP {
     _liquidGroupId,
     canDelete: _liquidGroupId != null,
     showForm,
+    // @ts-expect-error(sa, 2021-6-22): name might not exist
     name: selectedIngredFields.name,
+    // @ts-expect-error(sa, 2021-6-22): description might not exist
     description: selectedIngredFields.description,
+    // @ts-expect-error(sa, 2021-6-22): serialize might not exist
     serialize: selectedIngredFields.serialize,
   }
 }
 
 function mergeProps(
   stateProps: SP,
-  dispatchProps: { dispatch: ThunkDispatch<*> }
+  dispatchProps: { dispatch: ThunkDispatch<any> }
 ): WrapperProps {
   const { dispatch } = dispatchProps
   const { showForm, _liquidGroupId, ...passThruFormProps } = stateProps
@@ -90,15 +95,9 @@ function mergeProps(
   }
 }
 
-export const LiquidsPage: React.AbstractComponent<{||}> = connect<
-  WrapperProps,
-  {||},
-  SP,
-  {||},
-  _,
-  _
->(
+export const LiquidsPage = connect(
   mapStateToProps,
+  // @ts-expect-error(sa, 2021-6-21): TODO: refactor to use hooks api
   null,
   mergeProps
 )(LiquidEditFormWrapper)

@@ -1,4 +1,3 @@
-// @flow
 import assert from 'assert'
 import reduce from 'lodash/reduce'
 import values from 'lodash/values'
@@ -10,29 +9,27 @@ import {
 } from '@opentrons/shared-data'
 import { SPAN7_8_10_11_SLOT, TC_SPAN_SLOTS } from '../../constants'
 import type { DeckSlotId, ModuleRealType } from '@opentrons/shared-data'
-import type {
+import {
   NormalizedPipette,
   NormalizedPipetteById,
   PipetteEntity,
   PipetteEntities,
 } from '@opentrons/step-generation'
-import type { LabwareDefByDefURI } from '../../labware-defs'
-import type { DeckSlot } from '../../types'
-import type {
+import { LabwareDefByDefURI } from '../../labware-defs'
+import { DeckSlot } from '../../types'
+import {
   InitialDeckSetup,
   ModuleOnDeck,
   FormPipettesByMount,
   FormPipette,
   LabwareOnDeck as LabwareOnDeckType,
 } from '../types'
-
 export { createPresavedStepForm } from './createPresavedStepForm'
-
-export function getIdsInRange<T: string | number>(
-  orderedIds: Array<T>,
+export function getIdsInRange<T extends string | number>(
+  orderedIds: T[],
   startId: T,
   endId: T
-): Array<T> {
+): T[] {
   const startIdx = orderedIds.findIndex(id => id === startId)
   const endIdx = orderedIds.findIndex(id => id === endId)
   assert(
@@ -49,12 +46,11 @@ export function getIdsInRange<T: string | number>(
   )
   return orderedIds.slice(startIdx, endIdx + 1)
 }
-
 // NOTE: deck items include labware and modules
 export function getDeckItemIdInSlot(
-  itemIdToSlot: { [itemId: string]: DeckSlotId },
+  itemIdToSlot: Record<string, DeckSlotId>,
   slot: DeckSlotId
-): ?string {
+): string | null | undefined {
   const idsForSourceSlot = Object.entries(itemIdToSlot)
     .filter(([id, labwareSlot]) => labwareSlot === slot)
     .map(([id, labwareSlot]) => id)
@@ -64,7 +60,6 @@ export function getDeckItemIdInSlot(
   )
   return idsForSourceSlot[0]
 }
-
 export function denormalizePipetteEntities(
   pipetteInvariantProperties: NormalizedPipetteById,
   labwareDefs: LabwareDefByDefURI
@@ -74,6 +69,7 @@ export function denormalizePipetteEntities(
     (acc: PipetteEntities, pipette: NormalizedPipette): PipetteEntities => {
       const pipetteId = pipette.id
       const spec = getPipetteNameSpecs(pipette.name)
+
       if (!spec) {
         throw new Error(
           `no pipette spec for pipette id "${pipetteId}", name "${pipette.name}"`
@@ -90,10 +86,9 @@ export function denormalizePipetteEntities(
     {}
   )
 }
-
 export const getSlotsBlockedBySpanning = (
   initialDeckSetup: InitialDeckSetup
-): Array<DeckSlot> => {
+): DeckSlot[] => {
   // NOTE: Ian 2019-10-25 dumb heuristic since there's only one case this can happen now
   if (
     values(initialDeckSetup.modules).some(
@@ -104,9 +99,9 @@ export const getSlotsBlockedBySpanning = (
   ) {
     return ['7', '8', '10', '11']
   }
+
   return []
 }
-
 export const getSlotIsEmpty = (
   initialDeckSetup: InitialDeckSetup,
   slot: string
@@ -135,35 +130,33 @@ export const getSlotIsEmpty = (
     ].length === 0
   )
 }
-
 export const getLabwareOnSlot = (
   initialDeckSetup: InitialDeckSetup,
   slot: string
 ): LabwareOnDeckType => {
+  // @ts-expect-error(sa, 2021-6-10): find could return undefined, need to null check
   return find(initialDeckSetup.labware, labware => labware.slot === slot)
 }
-
 export const getIsCrashablePipetteSelected = (
   pipettesByMount: FormPipettesByMount
 ): boolean => {
   const { left, right } = pipettesByMount
   return [left, right].some(
-    (formPipette: ?FormPipette) =>
+    (formPipette: FormPipette | null | undefined) =>
+      // @ts-expect-error(sa, 2021-6-10): argument in .includes must be a string, since GEN_ONE_MULTI_PIPETTES is a list of strings
       formPipette && GEN_ONE_MULTI_PIPETTES.includes(formPipette?.pipetteName)
   )
 }
-
 export const getHasGen1MultiChannelPipette = (
-  pipettes: $PropertyType<InitialDeckSetup, 'pipettes'>
+  pipettes: InitialDeckSetup['pipettes']
 ): boolean => {
   const pipetteIds = Object.keys(pipettes)
   return pipetteIds.some(pipetteId =>
     GEN_ONE_MULTI_PIPETTES.includes(pipettes[pipetteId]?.name)
   )
 }
-
 export const getIsModuleOnDeck = (
-  modules: $PropertyType<InitialDeckSetup, 'modules'>,
+  modules: InitialDeckSetup['modules'],
   moduleType: ModuleRealType
 ): boolean => {
   const moduleIds = Object.keys(modules)

@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
 import mapValues from 'lodash/mapValues'
@@ -12,56 +11,42 @@ import { selectors, actions as navigationActions } from '../../../navigation'
 import {
   actions as fileActions,
   selectors as loadFileSelectors,
+  NewProtocolFields,
 } from '../../../load-file'
 import * as labwareDefSelectors from '../../../labware-defs/selectors'
 import * as labwareDefActions from '../../../labware-defs/actions'
-
 import * as labwareIngredActions from '../../../labware-ingred/actions'
-import { actions as stepFormActions } from '../../../step-forms'
+import { actions as stepFormActions, PipetteOnDeck } from '../../../step-forms'
 import { actions as steplistActions } from '../../../steplist'
 import {
+  ModuleCreationArgs,
+  PipetteFieldsData,
   FilePipettesModal as FilePipettesModalComponent,
-  type ModuleCreationArgs,
-  type PipetteFieldsData,
 } from '../FilePipettesModal'
-import type { NormalizedPipette } from '@opentrons/step-generation'
-import type { BaseState, ThunkDispatch } from '../../../types'
-import type { NewProtocolFields } from '../../../load-file'
-import type { PipetteOnDeck } from '../../../step-forms'
-import type { LabwareDefByDefURI } from '../../../labware-defs/types'
-
-type Props = React.ElementProps<typeof FilePipettesModalComponent>
-
-type OP = {|
-  showProtocolFields: $PropertyType<Props, 'showProtocolFields'>,
-|}
-
-type SP = {|
-  _customLabware: LabwareDefByDefURI,
-  _hasUnsavedChanges: ?boolean,
-  hideModal: $PropertyType<Props, 'hideModal'>,
-  moduleRestrictionsDisabled: ?boolean,
-|}
-
-type CreateNewProtocolArgs = {|
-  customLabware: LabwareDefByDefURI,
-  newProtocolFields: NewProtocolFields,
-  pipettes: Array<PipetteFieldsData>,
-  modules: Array<ModuleCreationArgs>,
-|}
-type DP = {|
-  onCancel: () => mixed,
-  _createNewProtocol: CreateNewProtocolArgs => void,
-|}
-
-export const NewFileModal: React.AbstractComponent<OP> = connect<
-  Props,
-  OP,
-  SP,
-  DP,
-  _,
-  _
->(
+import { NormalizedPipette } from '@opentrons/step-generation'
+import { BaseState, ThunkDispatch } from '../../../types'
+import { LabwareDefByDefURI } from '../../../labware-defs/types'
+type Props = React.ComponentProps<typeof FilePipettesModalComponent>
+interface OP {
+  showProtocolFields: Props['showProtocolFields']
+}
+interface SP {
+  _customLabware: LabwareDefByDefURI
+  _hasUnsavedChanges?: boolean | null
+  hideModal: Props['hideModal']
+  moduleRestrictionsDisabled?: boolean | null
+}
+interface CreateNewProtocolArgs {
+  customLabware: LabwareDefByDefURI
+  newProtocolFields: NewProtocolFields
+  pipettes: PipetteFieldsData[]
+  modules: ModuleCreationArgs[]
+}
+interface DP {
+  onCancel: () => unknown
+  _createNewProtocol: (arg0: CreateNewProtocolArgs) => void
+}
+export const NewFileModal = connect(
   mapStateToProps,
   mapDispatchToProps,
   mergeProps
@@ -78,37 +63,37 @@ function mapStateToProps(state: BaseState): SP {
   }
 }
 
-function mapDispatchToProps(dispatch: ThunkDispatch<*>): DP {
+function mapDispatchToProps(dispatch: ThunkDispatch<any>): DP {
   return {
     onCancel: () => dispatch(navigationActions.toggleNewProtocolModal(false)),
     _createNewProtocol: (args: CreateNewProtocolArgs) => {
       const { modules, newProtocolFields, pipettes, customLabware } = args
       dispatch(fileActions.createNewProtocol(newProtocolFields))
-
-      const pipettesById: {
-        [pipetteId: string]: PipetteOnDeck,
-      } = pipettes.reduce((acc, pipette) => ({ ...acc, [uuid()]: pipette }), {})
-
+      const pipettesById: Record<string, PipetteOnDeck> = pipettes.reduce(
+        (acc, pipette) => ({ ...acc, [uuid()]: pipette }),
+        {}
+      )
       // create custom labware
       mapValues(customLabware, labwareDef =>
         dispatch(
-          labwareDefActions.createCustomLabwareDefAction({ def: labwareDef })
+          labwareDefActions.createCustomLabwareDefAction({
+            def: labwareDef,
+          })
         )
       )
-
       // create new pipette entities
       dispatch(
         stepFormActions.createPipettes(
           mapValues(
             pipettesById,
             (p: PipetteOnDeck, id: string): NormalizedPipette => ({
+              // @ts-expect-error(sa, 2021-6-22): id will always get overwritten
               id,
               ...omit(p, 'mount'),
             })
           )
         )
       )
-
       // update pipette locations in initial deck setup step
       dispatch(
         steplistActions.changeSavedStepForm({
@@ -116,25 +101,24 @@ function mapDispatchToProps(dispatch: ThunkDispatch<*>): DP {
           update: {
             pipetteLocationUpdate: mapValues(
               pipettesById,
-              (p: $Values<typeof pipettesById>) => p.mount
+              (p: typeof pipettesById[keyof typeof pipettesById]) => p.mount
             ),
           },
         })
       )
-
       // create modules
       modules.forEach(moduleArgs =>
         dispatch(stepFormActions.createModule(moduleArgs))
       )
-
       // auto-generate tipracks for pipettes
-      const newTiprackModels: Array<string> = uniq(
+      const newTiprackModels: string[] = uniq(
         pipettes.map(pipette => pipette.tiprackDefURI)
       )
-
       newTiprackModels.forEach(tiprackDefURI => {
         dispatch(
-          labwareIngredActions.createContainer({ labwareDefURI: tiprackDefURI })
+          labwareIngredActions.createContainer({
+            labwareDefURI: tiprackDefURI,
+          })
         )
       })
     },

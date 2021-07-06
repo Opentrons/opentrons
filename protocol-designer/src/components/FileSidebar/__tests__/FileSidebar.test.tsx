@@ -1,8 +1,11 @@
-// @flow
 import * as React from 'react'
 import { shallow, mount } from 'enzyme'
 import { PrimaryButton, AlertModal, OutlineButton } from '@opentrons/components'
-import { MAGNETIC_MODULE_TYPE } from '@opentrons/shared-data'
+import { Command } from '@opentrons/shared-data/protocol/types/schemaV5'
+import {
+  LabwareDefinition2,
+  MAGNETIC_MODULE_TYPE,
+} from '@opentrons/shared-data'
 import {
   fixtureP10Single,
   fixtureP300Single,
@@ -10,16 +13,21 @@ import {
 import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
 import { FileSidebar, v4WarningContent, v5WarningContent } from '../FileSidebar'
 import { useBlockingHint } from '../../Hints/useBlockingHint'
-import type { HintArgs } from '../../Hints/useBlockingHint'
 
 jest.mock('../../Hints/useBlockingHint')
 
-const mockUseBlockingHint: JestMockFn<[HintArgs], ?React.Node> = useBlockingHint
+const mockUseBlockingHint = useBlockingHint as jest.MockedFunction<
+  typeof useBlockingHint
+>
 
 describe('FileSidebar', () => {
   const pipetteLeftId = 'pipetteLeftId'
   const pipetteRightId = 'pipetteRightId'
-  let props, commands, modulesOnDeck, pipettesOnDeck, savedStepForms
+  let props: React.ComponentProps<typeof FileSidebar>
+  let commands: Command[]
+  let modulesOnDeck: React.ComponentProps<typeof FileSidebar>['modulesOnDeck']
+  let pipettesOnDeck: React.ComponentProps<typeof FileSidebar>['pipettesOnDeck']
+  let savedStepForms: React.ComponentProps<typeof FileSidebar>['savedStepForms']
   beforeEach(() => {
     props = {
       loadFile: jest.fn(),
@@ -50,18 +58,18 @@ describe('FileSidebar', () => {
 
     pipettesOnDeck = {
       pipetteLeftId: {
-        name: 'string',
+        name: 'string' as any,
         id: pipetteLeftId,
         tiprackDefURI: 'test',
-        tiprackLabwareDef: fixture_tiprack_10_ul,
+        tiprackLabwareDef: fixture_tiprack_10_ul as LabwareDefinition2,
         spec: fixtureP10Single,
         mount: 'left',
       },
       pipetteRightId: {
-        name: 'string',
+        name: 'string' as any,
         id: pipetteRightId,
         tiprackDefURI: 'test',
-        tiprackLabwareDef: fixture_tiprack_10_ul,
+        tiprackLabwareDef: fixture_tiprack_10_ul as LabwareDefinition2,
         spec: fixtureP300Single,
         mount: 'right',
       },
@@ -70,14 +78,14 @@ describe('FileSidebar', () => {
     modulesOnDeck = {
       magnet123: {
         type: MAGNETIC_MODULE_TYPE,
-      },
+      } as any,
     }
 
     savedStepForms = {
       step123: {
         id: 'step123',
         pipette: pipetteLeftId,
-      },
+      } as any,
     }
   })
   afterEach(() => {
@@ -112,6 +120,7 @@ describe('FileSidebar', () => {
   })
 
   it('export button exports protocol when no errors', () => {
+    // @ts-expect-error(sa, 2021-6-22): props.fileData might be null
     props.fileData.commands = commands
     const wrapper = shallow(<FileSidebar {...props} />)
     const downloadButton = wrapper.find(PrimaryButton).at(0)
@@ -135,6 +144,7 @@ describe('FileSidebar', () => {
   })
 
   it('warning modal is shown when export is clicked with unused pipette', () => {
+    // @ts-expect-error(sa, 2021-6-22): props.fileData might be null
     props.fileData.commands = commands
     props.pipettesOnDeck = pipettesOnDeck
     props.savedStepForms = savedStepForms
@@ -162,6 +172,7 @@ describe('FileSidebar', () => {
   it('warning modal is shown when export is clicked with unused module', () => {
     props.modulesOnDeck = modulesOnDeck
     props.savedStepForms = savedStepForms
+    // @ts-expect-error(sa, 2021-6-22): props.fileData might be null
     props.fileData.commands = commands
 
     const wrapper = shallow(<FileSidebar {...props} />)
@@ -182,6 +193,7 @@ describe('FileSidebar', () => {
     props.modulesOnDeck = modulesOnDeck
     props.pipettesOnDeck = pipettesOnDeck
     props.savedStepForms = savedStepForms
+    // @ts-expect-error(sa, 2021-6-22): props.fileData might be null
     props.fileData.commands = commands
 
     const wrapper = shallow(<FileSidebar {...props} />)
@@ -206,13 +218,15 @@ describe('FileSidebar', () => {
   })
 
   it('blocking hint is shown when protocol is v4', () => {
+    // @ts-expect-error(sa, 2021-6-22): props.fileData might be null
     props.fileData.commands = commands
     props.pipettesOnDeck = {
       pipetteLeftId: {
+        // @ts-expect-error(sa, 2021-6-22): not a valid pipette name
         name: 'string',
         id: pipetteLeftId,
         tiprackDefURI: 'test',
-        tiprackLabwareDef: fixture_tiprack_10_ul,
+        tiprackLabwareDef: fixture_tiprack_10_ul as LabwareDefinition2,
         spec: fixtureP10Single,
         mount: 'left',
       },
@@ -251,6 +265,7 @@ describe('FileSidebar', () => {
   })
 
   it('blocking hint is shown when protocol is v5', () => {
+    // @ts-expect-error(sa, 2021-6-22): props.fileData might be null
     props.fileData.commands = commands
     props.savedStepForms = savedStepForms
 

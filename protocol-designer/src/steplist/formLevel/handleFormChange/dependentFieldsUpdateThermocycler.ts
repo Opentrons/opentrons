@@ -1,18 +1,17 @@
-// @flow
 import pick from 'lodash/pick'
 import { chainPatchUpdaters, fieldHasChanged } from './utils'
 import { getDefaultsForStepType } from '../getDefaultsForStepType'
-import type { FormData, StepFieldName } from '../../../form-types'
-import type { FormPatch } from '../../actions/types'
+import { FormData, StepFieldName } from '../../../form-types'
+import { FormPatch } from '../../actions/types'
 
 // TODO: Ian 2019-02-21 import this from a more central place - see #2926
-const getDefaultFields = (...fields: Array<StepFieldName>): FormPatch =>
+const getDefaultFields = (...fields: StepFieldName[]): FormPatch =>
   pick(getDefaultsForStepType('thermocycler'), fields)
 
 const updatePatchOnThermocyclerFormType = (
   patch: FormPatch,
   rawForm: FormData
-) => {
+): FormPatch => {
   // Profile => State
   if (
     rawForm['thermocyclerFormType'] !== null &&
@@ -38,36 +37,33 @@ const updatePatchOnThermocyclerFormType = (
       ),
     }
   }
+
   return patch
 }
 
-const updatePatchOnBlockChange = (patch: FormPatch, rawForm: FormData) => {
+const updatePatchOnBlockChange = (
+  patch: FormPatch,
+  rawForm: FormData
+): FormPatch => {
   if (fieldHasChanged(rawForm, patch, 'blockIsActive')) {
-    return {
-      ...patch,
-      ...getDefaultFields('blockTargetTemp'),
-    }
+    return { ...patch, ...getDefaultFields('blockTargetTemp') }
   } else if (fieldHasChanged(rawForm, patch, 'blockIsActiveHold')) {
-    return {
-      ...patch,
-      ...getDefaultFields('blockTargetTempHold'),
-    }
+    return { ...patch, ...getDefaultFields('blockTargetTempHold') }
   }
+
   return patch
 }
 
-const updatePatchOnLidChange = (patch: FormPatch, rawForm: FormData) => {
+const updatePatchOnLidChange = (
+  patch: FormPatch,
+  rawForm: FormData
+): FormPatch => {
   if (fieldHasChanged(rawForm, patch, 'lidIsActive')) {
-    return {
-      ...patch,
-      ...getDefaultFields('lidTargetTemp'),
-    }
+    return { ...patch, ...getDefaultFields('lidTargetTemp') }
   } else if (fieldHasChanged(rawForm, patch, 'lidIsActiveHold')) {
-    return {
-      ...patch,
-      ...getDefaultFields('lidTargetTempHold'),
-    }
+    return { ...patch, ...getDefaultFields('lidTargetTempHold') }
   }
+
   return patch
 }
 

@@ -1,17 +1,17 @@
-// @flow
 import React from 'react'
 import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
 import { CheckboxRowField, DelayFields, WellOrderField } from '../../fields'
 import { SourceDestFields } from '../MoveLiquidForm/SourceDestFields'
-import type { BaseState } from '../../../../types'
+import { FormData } from '../../../../form-types'
 
 jest.mock('../../../../step-forms')
 jest.mock('../../utils')
 
-const getUnsavedFormMock: JestMockFn<[BaseState], any> =
-  stepFormSelectors.getUnsavedForm
+const getUnsavedFormMock = stepFormSelectors.getUnsavedForm as jest.MockedFunction<
+  typeof stepFormSelectors.getUnsavedForm
+>
 
 jest.mock('../../fields/', () => {
   const actualFields = jest.requireActual('../../fields')
@@ -34,141 +34,141 @@ jest.mock('../../fields/', () => {
 })
 
 describe('SourceDestFields', () => {
-  let store
-  let props
+  let store: any
+  let props: React.ComponentProps<typeof SourceDestFields>
   beforeEach(() => {
     props = {
-      formData: ({
+      formData: {
         aspirate_wellOrder_first: 'r2l',
         aspirate_wellOrder_second: 'b2t',
         dispense_wellOrder_first: 'l2r',
         dispense_wellOrder_second: 't2b',
-      }: any),
+      } as any,
       propsForFields: {
         aspirate_delay_checkbox: {
-          onFieldFocus: (jest.fn(): any),
-          onFieldBlur: (jest.fn(): any),
+          onFieldFocus: jest.fn() as any,
+          onFieldBlur: jest.fn() as any,
           errorToShow: null,
           disabled: false,
           name: 'aspirate_delay_checkbox',
-          updateValue: (jest.fn(): any),
+          updateValue: jest.fn() as any,
           value: true,
         },
         aspirate_mix_checkbox: {
-          onFieldFocus: (jest.fn(): any),
-          onFieldBlur: (jest.fn(): any),
+          onFieldFocus: jest.fn() as any,
+          onFieldBlur: jest.fn() as any,
           errorToShow: null,
           disabled: false,
           name: 'aspirate_mix_checkbox',
-          updateValue: (jest.fn(): any),
+          updateValue: jest.fn() as any,
           value: true,
         },
         aspirate_touchTip_checkbox: {
-          onFieldFocus: (jest.fn(): any),
-          onFieldBlur: (jest.fn(): any),
+          onFieldFocus: jest.fn() as any,
+          onFieldBlur: jest.fn() as any,
           errorToShow: null,
           disabled: false,
           name: 'aspirate_touchTip_checkbox',
-          updateValue: (jest.fn(): any),
+          updateValue: jest.fn() as any,
           value: true,
         },
         aspirate_airGap_checkbox: {
-          onFieldFocus: (jest.fn(): any),
-          onFieldBlur: (jest.fn(): any),
+          onFieldFocus: jest.fn() as any,
+          onFieldBlur: jest.fn() as any,
           errorToShow: null,
           disabled: false,
           name: 'aspirate_airGap_checkbox',
-          updateValue: (jest.fn(): any),
+          updateValue: jest.fn() as any,
           value: true,
         },
         aspirate_wellOrder_first: {
-          onFieldFocus: (jest.fn(): any),
-          onFieldBlur: (jest.fn(): any),
+          onFieldFocus: jest.fn() as any,
+          onFieldBlur: jest.fn() as any,
           errorToShow: null,
           disabled: false,
           name: 'aspirate_wellOrder_first',
-          updateValue: (jest.fn(): any),
+          updateValue: jest.fn() as any,
           value: true,
         },
         aspirate_wellOrder_second: {
-          onFieldFocus: (jest.fn(): any),
-          onFieldBlur: (jest.fn(): any),
+          onFieldFocus: jest.fn() as any,
+          onFieldBlur: jest.fn() as any,
           errorToShow: null,
           disabled: false,
           name: 'aspirate_wellOrder_second',
-          updateValue: (jest.fn(): any),
+          updateValue: jest.fn() as any,
           value: true,
         },
         dispense_airGap_checkbox: {
-          onFieldFocus: (jest.fn(): any),
-          onFieldBlur: (jest.fn(): any),
+          onFieldFocus: jest.fn() as any,
+          onFieldBlur: jest.fn() as any,
           errorToShow: null,
           disabled: false,
           name: 'dispense_airGap_checkbox',
-          updateValue: (jest.fn(): any),
+          updateValue: jest.fn() as any,
           value: true,
         },
         dispense_delay_checkbox: {
-          onFieldFocus: (jest.fn(): any),
-          onFieldBlur: (jest.fn(): any),
+          onFieldFocus: jest.fn() as any,
+          onFieldBlur: jest.fn() as any,
           errorToShow: null,
           disabled: false,
           name: 'dispense_delay_checkbox',
-          updateValue: (jest.fn(): any),
+          updateValue: jest.fn() as any,
           value: true,
         },
         dispense_mix_checkbox: {
-          onFieldFocus: (jest.fn(): any),
-          onFieldBlur: (jest.fn(): any),
+          onFieldFocus: jest.fn() as any,
+          onFieldBlur: jest.fn() as any,
           errorToShow: null,
           disabled: false,
           name: 'dispense_mix_checkbox',
-          updateValue: (jest.fn(): any),
+          updateValue: jest.fn() as any,
           value: true,
         },
         dispense_touchTip_checkbox: {
-          onFieldFocus: (jest.fn(): any),
-          onFieldBlur: (jest.fn(): any),
+          onFieldFocus: jest.fn() as any,
+          onFieldBlur: jest.fn() as any,
           errorToShow: null,
           disabled: false,
           name: 'dispense_touchTip_checkbox',
-          updateValue: (jest.fn(): any),
+          updateValue: jest.fn() as any,
           value: true,
         },
         dispense_wellOrder_first: {
-          onFieldFocus: (jest.fn(): any),
-          onFieldBlur: (jest.fn(): any),
+          onFieldFocus: jest.fn() as any,
+          onFieldBlur: jest.fn() as any,
           errorToShow: null,
           disabled: false,
           name: 'dispense_wellOrder_first',
-          updateValue: (jest.fn(): any),
+          updateValue: jest.fn() as any,
           value: true,
         },
         dispense_wellOrder_second: {
-          onFieldFocus: (jest.fn(): any),
-          onFieldBlur: (jest.fn(): any),
+          onFieldFocus: jest.fn() as any,
+          onFieldBlur: jest.fn() as any,
           errorToShow: null,
           disabled: false,
           name: 'dispense_wellOrder_second',
-          updateValue: (jest.fn(): any),
+          updateValue: jest.fn() as any,
           value: true,
         },
         blowout_checkbox: {
-          onFieldFocus: (jest.fn(): any),
-          onFieldBlur: (jest.fn(): any),
+          onFieldFocus: jest.fn() as any,
+          onFieldBlur: jest.fn() as any,
           errorToShow: null,
           disabled: false,
           name: 'blowout_checkbox',
-          updateValue: (jest.fn(): any),
+          updateValue: jest.fn() as any,
           value: true,
         },
         preWetTip: {
-          onFieldFocus: (jest.fn(): any),
-          onFieldBlur: (jest.fn(): any),
+          onFieldFocus: jest.fn() as any,
+          onFieldBlur: jest.fn() as any,
           errorToShow: null,
           disabled: false,
           name: 'preWetTip',
-          updateValue: (jest.fn(): any),
+          updateValue: jest.fn() as any,
           value: true,
         },
       },
@@ -181,10 +181,10 @@ describe('SourceDestFields', () => {
     }
     getUnsavedFormMock.mockReturnValue({
       stepType: 'moveLiquid',
-    })
+    } as FormData)
   })
 
-  const render = props =>
+  const render = (props: React.ComponentProps<typeof SourceDestFields>) =>
     mount(
       <Provider store={store}>
         <SourceDestFields {...props} />

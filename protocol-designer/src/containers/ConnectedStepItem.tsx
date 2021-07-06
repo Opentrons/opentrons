@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import uniq from 'lodash/uniq'
@@ -11,43 +10,53 @@ import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors
 import { selectors as dismissSelectors } from '../dismiss'
 import { selectors as stepFormSelectors } from '../step-forms'
 import {
+  actions as stepsActions,
   getCollapsedSteps,
-  getHoveredSubstep,
   getHoveredStepId,
-  getSelectedStepId,
+  getHoveredSubstep,
+  getIsMultiSelectMode,
   getMultiSelectItemIds,
   getMultiSelectLastSelected,
-  getIsMultiSelectMode,
-  actions as stepsActions,
+  getSelectedStepId,
+  HoverOnStepAction,
+  HoverOnSubstepAction,
+  ToggleStepCollapsedAction,
+  SelectMultipleStepsAction,
 } from '../ui/steps'
 import { selectors as fileDataSelectors } from '../file-data'
 
-import { StepItem, StepItemContents } from '../components/steplist/StepItem'
 import {
-  ConfirmDeleteModal,
+  StepItem,
+  StepItemContents,
+  StepItemContentsProps,
+  StepItemProps,
+} from '../components/steplist/StepItem'
+import {
+  CLOSE_BATCH_EDIT_FORM,
   CLOSE_STEP_FORM_WITH_CHANGES,
   CLOSE_UNSAVED_STEP_FORM,
-  type DeleteModalType,
-  CLOSE_BATCH_EDIT_FORM,
+  ConfirmDeleteModal,
+  DeleteModalType,
 } from '../components/modals/ConfirmDeleteModal'
 
-import type { SubstepIdentifier } from '../steplist/types'
-import type { StepIdType } from '../form-types'
+import { SubstepIdentifier } from '../steplist/types'
+import { StepIdType } from '../form-types'
+import { ThunkAction } from '../types'
 
-type Props = {|
-  stepId: StepIdType,
-  stepNumber: number,
-  onStepContextMenu?: () => mixed,
-|}
+interface Props {
+  stepId: StepIdType
+  stepNumber: number
+  onStepContextMenu?: () => void
+}
 
-const nonePressed = (keysPressed: Array<boolean>): boolean =>
+const nonePressed = (keysPressed: boolean[]): boolean =>
   keysPressed.every(keyPress => keyPress === false)
 
-const getUserOS = () => new UAParser().getOS().name
+const getUserOS = (): string | undefined => new UAParser().getOS().name
 
 const getMouseClickKeyInfo = (
-  event: SyntheticMouseEvent<>
-): {| isShiftKeyPressed: boolean, isMetaKeyPressed: boolean |} => {
+  event: React.MouseEvent
+): { isShiftKeyPressed: boolean; isMetaKeyPressed: boolean } => {
   const isMac: boolean = getUserOS() === 'Mac OS'
   const isShiftKeyPressed: boolean = event.shiftKey
   const isMetaKeyPressed: boolean =
@@ -55,7 +64,7 @@ const getMouseClickKeyInfo = (
   return { isShiftKeyPressed, isMetaKeyPressed }
 }
 
-export const ConnectedStepItem = (props: Props): React.Node => {
+export const ConnectedStepItem = (props: Props): JSX.Element => {
   const { stepId, stepNumber } = props
 
   const step = useSelector(stepFormSelectors.getSavedStepForms)[stepId]
@@ -105,21 +114,25 @@ export const ConnectedStepItem = (props: Props): React.Node => {
   // Actions
   const dispatch = useDispatch()
 
-  const highlightSubstep = (payload: SubstepIdentifier) =>
+  const highlightSubstep = (payload: SubstepIdentifier): HoverOnSubstepAction =>
     dispatch(stepsActions.hoverOnSubstep(payload))
-  const selectStep = () => dispatch(stepsActions.selectStep(stepId))
+  const selectStep = (): ThunkAction<any> =>
+    dispatch(stepsActions.selectStep(stepId))
   const selectMultipleSteps = (
-    steps: Array<StepIdType>,
+    steps: StepIdType[],
     lastSelected: StepIdType
-  ) => dispatch(stepsActions.selectMultipleSteps(steps, lastSelected))
-  const toggleStepCollapsed = () =>
+  ): ThunkAction<SelectMultipleStepsAction> =>
+    dispatch(stepsActions.selectMultipleSteps(steps, lastSelected))
+  const toggleStepCollapsed = (): ToggleStepCollapsedAction =>
     dispatch(stepsActions.toggleStepCollapsed(stepId))
-  const highlightStep = () => dispatch(stepsActions.hoverOnStep(stepId))
-  const unhighlightStep = () => dispatch(stepsActions.hoverOnStep(null))
+  const highlightStep = (): HoverOnStepAction =>
+    dispatch(stepsActions.hoverOnStep(stepId))
+  const unhighlightStep = (): HoverOnStepAction =>
+    dispatch(stepsActions.hoverOnStep(null))
 
-  const handleStepItemSelection = (event: SyntheticMouseEvent<>): void => {
+  const handleStepItemSelection = (event: React.MouseEvent): void => {
     const { isShiftKeyPressed, isMetaKeyPressed } = getMouseClickKeyInfo(event)
-    let stepsToSelect: Array<StepIdType> = []
+    let stepsToSelect: StepIdType[] = []
 
     // if user clicked on the last multi-selected step, shift/meta keys don't matter
     const toggledLastSelected = stepId === lastMultiSelectedStepId
@@ -174,12 +187,12 @@ export const ConnectedStepItem = (props: Props): React.Node => {
   )
   // (SA 2020/12/23): This will not be needed once we update to React 17
   // since event pooling will be eliminated
-  const confirmWithPersistedEvent = (event: SyntheticMouseEvent<>): void => {
+  const confirmWithPersistedEvent = (event: React.MouseEvent): void => {
     event.persist()
     confirm(event)
   }
 
-  const stepItemProps = {
+  const stepItemProps: StepItemProps = {
     description: step.stepDetails,
     rawForm: step,
     stepNumber,
@@ -202,14 +215,12 @@ export const ConnectedStepItem = (props: Props): React.Node => {
     isMultiSelectMode,
   }
 
-  const stepItemContentsProps = {
+  const stepItemContentsProps: StepItemContentsProps = {
     rawForm: step,
     stepType: step.stepType,
     substeps,
-
     ingredNames,
     labwareNicknamesById,
-
     highlightSubstep,
     hoveredSubstep,
   }
@@ -234,17 +245,18 @@ export const ConnectedStepItem = (props: Props): React.Node => {
         />
       )}
       <StepItem {...stepItemProps} onStepContextMenu={props.onStepContextMenu}>
+        {/* @ts-expect-error(sa, 2021-6-21): StepItemContents might return a list of JSX elements */}
         <StepItemContents {...stepItemContentsProps} />
       </StepItem>
     </>
   )
 }
 export function getMetaSelectedSteps(
-  multiSelectItemIds: Array<StepIdType> | null,
+  multiSelectItemIds: StepIdType[] | null,
   stepId: StepIdType,
   selectedStepId: StepIdType | null
-): Array<StepIdType> {
-  let stepsToSelect: Array<StepIdType> = []
+): StepIdType[] {
+  let stepsToSelect: StepIdType[]
   if (multiSelectItemIds?.length) {
     // already have a selection, add/remove the meta-clicked item
     stepsToSelect = multiSelectItemIds.includes(stepId)
@@ -264,13 +276,13 @@ export function getMetaSelectedSteps(
 }
 
 function getShiftSelectedSteps(
-  selectedStepId,
-  orderedStepIds,
-  stepId,
-  multiSelectItemIds,
-  lastMultiSelectedStepId
-) {
-  let stepsToSelect: Array<StepIdType>
+  selectedStepId: StepIdType | null,
+  orderedStepIds: StepIdType[],
+  stepId: StepIdType,
+  multiSelectItemIds: StepIdType[] | null,
+  lastMultiSelectedStepId: StepIdType | null
+): StepIdType[] {
+  let stepsToSelect: StepIdType[]
   if (selectedStepId) {
     stepsToSelect = getOrderedStepsInRange(
       selectedStepId,
@@ -292,7 +304,7 @@ function getShiftSelectedSteps(
       // if they're all selected, deselect them all
       if (multiSelectItemIds.length - potentialStepsToSelect.length > 0) {
         stepsToSelect = multiSelectItemIds.filter(
-          id => !potentialStepsToSelect.includes(id)
+          (id: StepIdType) => !potentialStepsToSelect.includes(id)
         )
       } else {
         // unless deselecting them all results in none being selected
@@ -310,8 +322,8 @@ function getShiftSelectedSteps(
 function getOrderedStepsInRange(
   lastSelectedStepId: StepIdType,
   stepId: StepIdType,
-  orderedStepIds: Array<StepIdType>
-) {
+  orderedStepIds: StepIdType[]
+): StepIdType[] {
   const prevIndex: number = orderedStepIds.indexOf(lastSelectedStepId)
   const currentIndex: number = orderedStepIds.indexOf(stepId)
 

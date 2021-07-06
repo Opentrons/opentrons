@@ -1,6 +1,5 @@
-// @flow
 import * as React from 'react'
-import type { Dispatch } from 'redux'
+import { Dispatch } from 'redux'
 import { connect } from 'react-redux'
 import { i18n } from '../../localization'
 import { ErrorContents } from './ErrorContents'
@@ -9,15 +8,15 @@ import { actions as dismissActions } from '../../dismiss'
 import * as timelineWarningSelectors from '../../top-selectors/timelineWarnings'
 import { getSelectedStepId } from '../../ui/steps'
 import { selectors as fileDataSelectors } from '../../file-data'
-import { Alerts, type Props } from './Alerts'
-import type { CommandCreatorError } from '@opentrons/step-generation'
-import type { BaseState } from '../../types'
+import { Alerts, Props } from './Alerts'
+import { CommandCreatorError } from '@opentrons/step-generation'
+import { BaseState } from '../../types'
 
-type SP = {|
-  errors: $PropertyType<Props, 'errors'>,
-  warnings: $PropertyType<Props, 'warnings'>,
-  _stepId: ?string,
-|}
+interface SP {
+  errors: Props['errors']
+  warnings: Props['warnings']
+  _stepId?: string | null
+}
 
 /** Errors and Warnings from step-generation are written for developers
  * who are using step-generation as an API for writing Opentrons protocols.
@@ -30,8 +29,8 @@ type SP = {|
 
 function mapStateToProps(state: BaseState): SP {
   const timeline = fileDataSelectors.getRobotStateTimeline(state)
-  const errors = (timeline.errors || []: Array<CommandCreatorError>).map(
-    error => ({
+  const errors = (timeline.errors || ([] as CommandCreatorError[])).map(
+    (error: CommandCreatorError) => ({
       title: i18n.t(`alert.timeline.error.${error.type}.title`, error.message),
       description: <ErrorContents level="timeline" errorType={error.type} />,
     })
@@ -56,7 +55,7 @@ function mapStateToProps(state: BaseState): SP {
 
 function mergeProps(
   stateProps: SP,
-  dispatchProps: { dispatch: Dispatch<*> }
+  dispatchProps: { dispatch: Dispatch }
 ): Props {
   const { dispatch } = dispatchProps
   const stepId = stateProps._stepId
@@ -74,16 +73,5 @@ function mergeProps(
     },
   }
 }
-
-export const TimelineAlerts: React.AbstractComponent<{||}> = connect<
-  Props,
-  {||},
-  SP,
-  {||},
-  _,
-  _
->(
-  mapStateToProps,
-  null,
-  mergeProps
-)(Alerts)
+// @ts-expect-error(sa, 2021-6-21): TODO: refactor to use hooks api
+export const TimelineAlerts = connect(mapStateToProps, null, mergeProps)(Alerts)

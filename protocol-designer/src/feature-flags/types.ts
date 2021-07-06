@@ -1,5 +1,3 @@
-// @flow
-
 // When flag types are removed from this list, the browser will hold on to that value indefinitely.
 // To avoid being surprised when/if we deprecate and then re-introduce a flag with the same type string,
 // items should never be removed from this list.
@@ -18,20 +16,11 @@ export const DEPRECATED_FLAGS = [
   'BATCH_EDIT_ENABLED',
   'OT_PD_ENABLE_BATCH_EDIT_MIX',
 ]
-
 // union of feature flag string constant IDs
 export type FlagTypes = 'PRERELEASE_MODE' | 'OT_PD_DISABLE_MODULE_RESTRICTIONS'
-
 // flags that are not in this list only show in prerelease mode
-export const userFacingFlags: Array<FlagTypes> = [
+export const userFacingFlags: FlagTypes[] = [
   'OT_PD_DISABLE_MODULE_RESTRICTIONS',
 ]
-
-export const allFlags: Array<FlagTypes> = [
-  ...userFacingFlags,
-  'PRERELEASE_MODE',
-]
-
-export type Flags = $Shape<{|
-  [flag: FlagTypes]: ?boolean,
-|}>
+export const allFlags: FlagTypes[] = [...userFacingFlags, 'PRERELEASE_MODE']
+export type Flags = Partial<Record<FlagTypes, boolean | null | undefined>>

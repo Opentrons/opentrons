@@ -1,5 +1,3 @@
-// @flow
-
 export { MoveLiquidForm } from './MoveLiquidForm'
 export { MixForm } from './MixForm'
 export { PauseForm } from './PauseForm'

@@ -1,4 +1,3 @@
-// @flow
 import { addStep } from '../actions'
 import { PRESAVED_STEP_ID } from '../../../../steplist/types'
 

@@ -1,4 +1,3 @@
-// @flow
 // NOTE: Ian 2019-10-24 these are by-eye numbers that intentionally
 // ignore the real-life data to emphasize overhangs etc
 import {
@@ -11,23 +10,21 @@ import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  ModuleRealType,
 } from '@opentrons/shared-data'
-import type { ModuleRealType } from '@opentrons/shared-data'
-import type { DeckSlot, ModuleOrientation } from '../../types'
-
+import { DeckSlot, ModuleOrientation } from '../../types'
 // NOTE: all dims are in 'left' orientation. Rotate & transform to obtain 'right' orientation.
-export type ModuleVizDims = {|
-  xOffset: number,
-  yOffset: number,
-  xDimension: number,
-  yDimension: number,
-  childXOffset: number,
-  childYOffset: number,
-  childXDimension: number,
-  childYDimension: number,
-|}
-
-const MODULE_VIZ_DIMS: { [ModuleRealType]: ModuleVizDims } = {
+export interface ModuleVizDims {
+  xOffset: number
+  yOffset: number
+  xDimension: number
+  yDimension: number
+  childXOffset: number
+  childYOffset: number
+  childXDimension: number
+  childYDimension: number
+}
+const MODULE_VIZ_DIMS: Record<ModuleRealType, ModuleVizDims> = {
   [MAGNETIC_MODULE_TYPE]: {
     xOffset: -1 * (SLOT_X * 0.2 + DIVIDER),
     yOffset: -1 * DIVIDER,
@@ -59,7 +56,6 @@ const MODULE_VIZ_DIMS: { [ModuleRealType]: ModuleVizDims } = {
     childYDimension: SLOT_Y,
   },
 }
-
 export const getModuleVizDims = (
   orientation: ModuleOrientation,
   moduleType: ModuleRealType
@@ -75,15 +71,7 @@ export const getModuleVizDims = (
     childYOffset: SLOT_Y - dims.childYOffset - dims.childYDimension,
   }
 }
-
-const LEFT_SIDE_SLOTS: Array<DeckSlot> = [
-  '1',
-  '4',
-  '7',
-  '10',
-  SPAN7_8_10_11_SLOT,
-]
-
+const LEFT_SIDE_SLOTS: DeckSlot[] = ['1', '4', '7', '10', SPAN7_8_10_11_SLOT]
 export const inferModuleOrientationFromSlot = (
   slot: DeckSlot
 ): ModuleOrientation => {
@@ -93,5 +81,6 @@ export const inferModuleOrientationFromSlot = (
   if (!LEFT_SIDE_SLOTS.includes(slot)) {
     return 'right'
   }
+
   return 'left'
 }

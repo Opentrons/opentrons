@@ -1,10 +1,8 @@
-// @flow
-
 import * as persist from '../persist'
 
 describe('persist', () => {
-  let getItemSpy
-  let setItemSpy
+  let getItemSpy: jest.SpyInstance<any, unknown[]>
+  let setItemSpy: jest.SpyInstance<any, unknown[]>
 
   beforeEach(() => {
     const LocalStorageProto = Object.getPrototypeOf(global.localStorage)

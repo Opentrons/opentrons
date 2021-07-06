@@ -1,25 +1,23 @@
-// @flow
 import assert from 'assert'
-import type {
+import {
   SetTemperatureArgs,
   DeactivateTemperatureArgs,
 } from '@opentrons/step-generation'
-import type { HydratedTemperatureFormData } from '../../../form-types'
-
+import { HydratedTemperatureFormData } from '../../../form-types'
 type TemperatureArgs = SetTemperatureArgs | DeactivateTemperatureArgs
-
 export const temperatureFormToArgs = (
   hydratedFormData: HydratedTemperatureFormData
 ): TemperatureArgs => {
   const { moduleId } = hydratedFormData
   // cast values
   const setTemperature = hydratedFormData.setTemperature === 'true'
+  // @ts-expect-error(sa, 2021-6-14): null check targetTemperature
   const targetTemperature = parseFloat(hydratedFormData.targetTemperature)
-
   assert(
     setTemperature ? !Number.isNaN(targetTemperature) : true,
     'temperatureFormToArgs expected (hydrated) targetTemperature to be a number when setTemperature is "true"'
   )
+
   if (setTemperature && !Number.isNaN(targetTemperature)) {
     return {
       commandCreatorFnName: 'setTemperature',

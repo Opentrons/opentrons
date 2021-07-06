@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { i18n } from '../../localization'
@@ -8,23 +7,23 @@ import { swatchColors } from '../swatchColors'
 import listButtonStyles from '../listButtons.css'
 
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
-import type { OrderedLiquids } from '../../labware-ingred/types'
+import { OrderedLiquids } from '../../labware-ingred/types'
 import * as labwareIngredActions from '../../labware-ingred/actions'
-import type { BaseState, ThunkDispatch } from '../../types'
+import { BaseState, ThunkDispatch } from '../../types'
 
-type SP = {|
-  liquids: OrderedLiquids,
-  selectedLiquid: ?string,
-|}
+interface SP {
+  liquids: OrderedLiquids
+  selectedLiquid?: string | null
+}
 
-type DP = {|
-  createNewLiquid: () => mixed,
-  selectLiquid: (liquidId: string) => mixed,
-|}
+interface DP {
+  createNewLiquid: () => unknown
+  selectLiquid: (liquidId: string) => unknown
+}
 
-type Props = {| ...SP, ...DP |}
+type Props = SP & DP
 
-function LiquidsSidebarComponent(props: Props) {
+function LiquidsSidebarComponent(props: Props): JSX.Element {
   const { liquids, selectedLiquid, createNewLiquid, selectLiquid } = props
   return (
     <SidePanel title="Liquids">
@@ -57,7 +56,7 @@ function mapStateToProps(state: BaseState): SP {
   }
 }
 
-function mapDispatchToProps(dispatch: ThunkDispatch<*>): DP {
+function mapDispatchToProps(dispatch: ThunkDispatch<any>): DP {
   return {
     selectLiquid: liquidGroupId =>
       dispatch(labwareIngredActions.selectLiquidGroup(liquidGroupId)),
@@ -66,14 +65,7 @@ function mapDispatchToProps(dispatch: ThunkDispatch<*>): DP {
   }
 }
 
-export const LiquidsSidebar: React.AbstractComponent<{||}> = connect<
-  Props,
-  {||},
-  SP,
-  DP,
-  _,
-  _
->(
+export const LiquidsSidebar = connect(
   mapStateToProps,
   mapDispatchToProps
 )(LiquidsSidebarComponent)

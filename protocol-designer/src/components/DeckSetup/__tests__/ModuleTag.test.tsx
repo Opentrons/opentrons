@@ -1,5 +1,5 @@
-// @flow
 import {
+  LabwareDefinition2,
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   TEMPERATURE_MODULE_V1,
@@ -13,33 +13,31 @@ import {
   TEMPERATURE_AT_TARGET,
   TEMPERATURE_DEACTIVATED,
 } from '@opentrons/step-generation'
-import { ModuleStatus, ModuleTag } from '../ModuleTag'
+import { ModuleStatus, ModuleTag, ModuleTagProps } from '../ModuleTag'
 
 import * as timelineFramesSelectors from '../../../top-selectors/timelineFrames'
 import { selectors as stepFormSelectors } from '../../../step-forms'
 import * as uiSelectors from '../../../ui/steps'
 
-import type { CommandsAndRobotState } from '@opentrons/step-generation'
-import type { BaseState } from '../../../types'
-import type { ModuleEntities, InitialDeckSetup } from '../../../step-forms'
-
 jest.mock('../../../ui/steps')
 jest.mock('../../../top-selectors/timelineFrames')
 jest.mock('../../../step-forms')
 
-const timelineFrameBeforeActiveItemMock: JestMockFn<
-  [BaseState],
-  CommandsAndRobotState | null
-> = timelineFramesSelectors.timelineFrameBeforeActiveItem
+const timelineFrameBeforeActiveItemMock = timelineFramesSelectors.timelineFrameBeforeActiveItem as jest.MockedFunction<
+  typeof timelineFramesSelectors.timelineFrameBeforeActiveItem
+>
 
-const getModuleEntitiesMock: JestMockFn<[BaseState], ModuleEntities> =
-  stepFormSelectors.getModuleEntities
+const getModuleEntitiesMock = stepFormSelectors.getModuleEntities as jest.MockedFunction<
+  typeof stepFormSelectors.getModuleEntities
+>
 
-const getHoveredStepLabwareMock: JestMockFn<[BaseState], Array<string>> =
-  uiSelectors.getHoveredStepLabware
+const getHoveredStepLabwareMock = uiSelectors.getHoveredStepLabware as jest.MockedFunction<
+  typeof uiSelectors.getHoveredStepLabware
+>
 
-const getInitialDeckSetup: JestMockFn<[BaseState], InitialDeckSetup> =
-  stepFormSelectors.getInitialDeckSetup
+const getInitialDeckSetup = stepFormSelectors.getInitialDeckSetup as jest.MockedFunction<
+  typeof stepFormSelectors.getInitialDeckSetup
+>
 
 describe('ModuleTag', () => {
   describe('ModuleStatus', () => {
@@ -108,7 +106,8 @@ describe('ModuleTag', () => {
 
   describe('ModuleTagComponent', () => {
     const moduleId = 'abcdef'
-    let store, props
+    let store: any
+    let props: ModuleTagProps
     beforeEach(() => {
       props = {
         x: 1,
@@ -162,7 +161,7 @@ describe('ModuleTag', () => {
             id: 'labwareId',
             slot: '3',
             labwareDefURI: 'url',
-            def: fixture_tiprack_10_ul,
+            def: fixture_tiprack_10_ul as LabwareDefinition2,
           },
         },
         pipettes: {},
@@ -188,7 +187,7 @@ describe('ModuleTag', () => {
             id: 'labwareId',
             slot: moduleId,
             labwareDefURI: 'url',
-            def: fixture_tiprack_10_ul,
+            def: fixture_tiprack_10_ul as LabwareDefinition2,
           },
         },
         pipettes: {},
@@ -198,7 +197,8 @@ describe('ModuleTag', () => {
       const wrapper = render()
 
       expect(
-        wrapper.find('RobotCoordsForeignDiv').prop('innerDivProps').className
+        wrapper.find('RobotCoordsForeignDiv').prop<any>('innerDivProps')
+          .className
       ).toContain('highlighted_border_right_none')
     })
 
@@ -206,7 +206,8 @@ describe('ModuleTag', () => {
       const wrapper = render()
 
       expect(
-        wrapper.find('RobotCoordsForeignDiv').prop('innerDivProps').className
+        wrapper.find('RobotCoordsForeignDiv').prop<any>('innerDivProps')
+          .className
       ).not.toContain('highlighted_border_right_none')
     })
 
@@ -216,7 +217,8 @@ describe('ModuleTag', () => {
       const wrapper = render()
 
       expect(
-        wrapper.find('RobotCoordsForeignDiv').prop('innerDivProps').className
+        wrapper.find('RobotCoordsForeignDiv').prop<any>('innerDivProps')
+          .className
       ).not.toContain('highlighted_border_right_none')
     })
   })

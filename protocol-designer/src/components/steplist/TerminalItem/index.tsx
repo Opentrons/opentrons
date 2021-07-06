@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useConditionalConfirm } from '@opentrons/components'
@@ -7,6 +6,8 @@ import {
   getSelectedTerminalItemId,
   getIsMultiSelectMode,
   actions as stepsActions,
+  SelectTerminalItemAction,
+  HoverOnTerminalItemAction,
 } from '../../../ui/steps'
 import {
   getCurrentFormIsPresaved,
@@ -18,19 +19,18 @@ import {
   CLOSE_UNSAVED_STEP_FORM,
 } from '../../modals/ConfirmDeleteModal'
 import { PDTitledList } from '../../lists'
-import type { TerminalItemId } from '../../../steplist'
+import { TerminalItemId } from '../../../steplist'
 
 export { TerminalItemLink } from './TerminalItemLink'
 
-type Props = {|
-  children?: React.Node,
-  id: TerminalItemId,
-  title: string,
-|}
+export interface TerminalItemProps {
+  children?: React.ReactNode
+  id: TerminalItemId
+  title: string
+}
 
-export const TerminalItem = (props: Props): React.Node => {
+export const TerminalItem = (props: TerminalItemProps): JSX.Element => {
   const { id, title, children } = props
-  // const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false)
 
   const hovered = useSelector(getHoveredTerminalItemId) === id
   const selected = useSelector(getSelectedTerminalItemId) === id
@@ -40,10 +40,13 @@ export const TerminalItem = (props: Props): React.Node => {
 
   const dispatch = useDispatch()
 
-  const selectItem = () => dispatch(stepsActions.selectTerminalItem(id))
+  const selectItem = (): SelectTerminalItemAction =>
+    dispatch(stepsActions.selectTerminalItem(id))
 
-  const onMouseEnter = () => dispatch(stepsActions.hoverOnTerminalItem(id))
-  const onMouseLeave = () => dispatch(stepsActions.hoverOnTerminalItem(null))
+  const onMouseEnter = (): HoverOnTerminalItemAction =>
+    dispatch(stepsActions.hoverOnTerminalItem(id))
+  const onMouseLeave = (): HoverOnTerminalItemAction =>
+    dispatch(stepsActions.hoverOnTerminalItem(null))
 
   const { confirm, showConfirmation, cancel } = useConditionalConfirm(
     selectItem,
@@ -65,6 +68,7 @@ export const TerminalItem = (props: Props): React.Node => {
           onCancelClick={cancel}
         />
       )}
+      {/* @ts-expect-error(sa, 2021-6-21): type mismatch with useConditionalConfirm. see https://github.com/Opentrons/opentrons/issues/8054 */}
       <PDTitledList
         {...{
           id: `TerminalItem_${id}`,

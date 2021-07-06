@@ -1,4 +1,3 @@
-// @flow
 // TODO: Ian 2018-10-09 figure out what belongs in LiquidsSidebar vs IngredientsList after #2427
 import * as React from 'react'
 
@@ -10,28 +9,27 @@ import { TitledListNotes } from '../TitledListNotes'
 import { swatchColors } from '../swatchColors'
 import { LabwareDetailsCard } from './LabwareDetailsCard'
 import styles from './IngredientsList.css'
-import type { LiquidGroupsById, LiquidGroup } from '../../labware-ingred/types'
-import type { SingleLabwareLiquidState } from '@opentrons/step-generation'
+import { LiquidGroupsById, LiquidGroup } from '../../labware-ingred/types'
+import { SingleLabwareLiquidState } from '@opentrons/step-generation'
 
-type RemoveWellsContents = (args: {|
-  liquidGroupId: string,
-  wells: Array<string>,
-|}) => mixed
+type RemoveWellsContents = (args: {
+  liquidGroupId: string
+  wells: string[]
+}) => unknown
 
 // Props used by both IngredientsList and LiquidGroupCard
-type CommonProps = {|
-  removeWellsContents: RemoveWellsContents,
-  selected?: boolean,
-|}
+export interface CommonProps {
+  removeWellsContents: RemoveWellsContents
+  selected?: boolean
+}
 
-type LiquidGroupCardProps = {|
-  groupId: string,
-  ingredGroup: LiquidGroup,
-  labwareWellContents: SingleLabwareLiquidState,
-  ...CommonProps,
-|}
+type LiquidGroupCardProps = CommonProps & {
+  groupId: string
+  ingredGroup: LiquidGroup
+  labwareWellContents: SingleLabwareLiquidState
+}
 
-const LiquidGroupCard = (props: LiquidGroupCardProps): React.Node => {
+const LiquidGroupCard = (props: LiquidGroupCardProps): JSX.Element | null => {
   const {
     ingredGroup,
     removeWellsContents,
@@ -44,7 +42,7 @@ const LiquidGroupCard = (props: LiquidGroupCardProps): React.Node => {
 
   const [expanded, setExpanded] = React.useState(true)
 
-  const toggleAccordion = () => setExpanded(!expanded)
+  const toggleAccordion = (): void => setExpanded(!expanded)
 
   const wellsWithIngred = Object.keys(labwareWellContents)
     .sort(sortWells)
@@ -100,17 +98,17 @@ const LiquidGroupCard = (props: LiquidGroupCardProps): React.Node => {
   )
 }
 
-type IndividProps = {|
-  name: ?string,
-  wellName: string,
-  volume: number,
+interface IndividProps {
+  name?: string | null
+  wellName: string
+  volume: number
   // concentration?: string,
-  canDelete: boolean,
-  groupId: string,
-  removeWellsContents: RemoveWellsContents,
-|}
+  canDelete: boolean
+  groupId: string
+  removeWellsContents: RemoveWellsContents
+}
 
-function IngredIndividual(props: IndividProps) {
+function IngredIndividual(props: IndividProps): JSX.Element {
   const {
     name,
     wellName,
@@ -144,14 +142,13 @@ function IngredIndividual(props: IndividProps) {
   )
 }
 
-type Props = {
-  ...CommonProps,
-  liquidGroupsById: LiquidGroupsById,
-  labwareWellContents: SingleLabwareLiquidState,
-  selectedIngredientGroupId: ?string,
+type Props = CommonProps & {
+  liquidGroupsById: LiquidGroupsById
+  labwareWellContents: SingleLabwareLiquidState
+  selectedIngredientGroupId?: string | null
 }
 
-export function IngredientsList(props: Props): React.Node {
+export function IngredientsList(props: Props): JSX.Element {
   const {
     labwareWellContents,
     liquidGroupsById,

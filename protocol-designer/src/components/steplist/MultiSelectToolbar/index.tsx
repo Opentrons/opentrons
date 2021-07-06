@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { css } from 'styled-components'
@@ -19,6 +18,7 @@ import {
   C_DARK_GRAY,
   BORDER_SOLID_MEDIUM,
   POSITION_STICKY,
+  IconName,
 } from '@opentrons/components'
 import { selectors as stepFormSelectors } from '../../../step-forms'
 import {
@@ -33,17 +33,15 @@ import {
   DELETE_MULTIPLE_STEP_FORMS,
 } from '../../modals/ConfirmDeleteModal'
 
-import type { IconName } from '@opentrons/components'
-
-type ClickableIconProps = {|
-  id?: string,
-  iconName: IconName,
-  tooltipText: string,
-  width?: string,
-  alignRight?: boolean,
-  isLast?: boolean,
-  onClick?: (event: SyntheticMouseEvent<>) => mixed,
-|}
+export interface ClickableIconProps {
+  id?: string
+  iconName: IconName
+  tooltipText: string
+  width?: string
+  alignRight?: boolean
+  isLast?: boolean
+  onClick?: (event: React.MouseEvent) => unknown
+}
 
 const iconBoxStyles = css`
   align-self: stretch;
@@ -55,7 +53,7 @@ const iconBoxStyles = css`
   }
 `
 
-export const ClickableIcon = (props: ClickableIconProps): React.Node => {
+export const ClickableIcon = (props: ClickableIconProps): JSX.Element => {
   const { id, iconName, onClick, tooltipText, width } = props
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: 'top',
@@ -77,16 +75,16 @@ export const ClickableIcon = (props: ClickableIconProps): React.Node => {
   )
 }
 
-type Props = {|
-  isMultiSelectMode: boolean,
-|}
+interface Props {
+  isMultiSelectMode: boolean
+}
 
-type AccordionProps = {|
-  expanded: boolean,
-  children: React.Node,
-|}
+interface AccordionProps {
+  expanded: boolean
+  children: React.ReactNode
+}
 
-export const Accordion = (props: AccordionProps): React.Node => {
+export const Accordion = (props: AccordionProps): JSX.Element => {
   return (
     <Box
       height={props.expanded ? SIZE_2 : 0}
@@ -103,7 +101,7 @@ export const Accordion = (props: AccordionProps): React.Node => {
   )
 }
 
-export const MultiSelectToolbar = (props: Props): React.Node => {
+export const MultiSelectToolbar = (props: Props): JSX.Element => {
   const dispatch = useDispatch()
   const [isExpandState, setIsExpandState] = React.useState<boolean>(true)
   const stepCount = useSelector(stepFormSelectors.getOrderedStepIds).length
@@ -118,7 +116,7 @@ export const MultiSelectToolbar = (props: Props): React.Node => {
     ? () => dispatch(stepActions.deselectAllSteps())
     : () => dispatch(stepActions.selectAllSteps())
 
-  const onDuplicateClickAction = () => {
+  const onDuplicateClickAction = (): void => {
     if (selectedStepIds) {
       dispatch(stepActions.duplicateMultipleSteps(selectedStepIds))
     } else {
@@ -128,7 +126,7 @@ export const MultiSelectToolbar = (props: Props): React.Node => {
     }
   }
 
-  const onDeleteClickAction = () => {
+  const onDeleteClickAction = (): void => {
     if (selectedStepIds) {
       dispatch(deleteMultipleSteps(selectedStepIds))
     } else {
@@ -159,27 +157,30 @@ export const MultiSelectToolbar = (props: Props): React.Node => {
     cancel: cancelDelete,
   } = useConditionalConfirm(onDeleteClickAction, true)
 
-  const selectProps = {
+  const selectProps: ClickableIconProps = {
     iconName: isAllStepsSelected ? 'checkbox-marked' : 'minus-box',
     tooltipText: isAllStepsSelected ? 'Deselect All' : 'Select All',
+    // @ts-expect-error(sa, 2021-6-21): type issue with useConditionalConfirm
     onClick: confirmSelect,
   }
 
-  const deleteProps = {
+  const deleteProps: ClickableIconProps = {
     iconName: 'delete',
     tooltipText: 'Delete',
     width: '1.5rem',
     alignRight: true,
+    // @ts-expect-error(sa, 2021-6-21): type issue with useConditionalConfirm
     onClick: confirmDelete,
   }
 
-  const copyProps = {
+  const copyProps: ClickableIconProps = {
     iconName: 'content-copy',
     tooltipText: 'Duplicate',
+    // @ts-expect-error(sa, 2021-6-21): type issue with useConditionalConfirm
     onClick: confirmDuplicate,
   }
 
-  const expandProps = {
+  const expandProps: ClickableIconProps = {
     iconName: isExpandState
       ? 'unfold-more-horizontal'
       : 'unfold-less-horizontal',

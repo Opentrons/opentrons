@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import cx from 'classnames'
 import { FormGroup } from '@opentrons/components'
@@ -23,11 +22,11 @@ import {
 } from '../utils'
 import { AspDispSection } from './AspDispSection'
 
-import type { StepFormProps } from '../types'
+import { StepFormProps } from '../types'
 
 import styles from '../StepEditForm.css'
 
-export const MixForm = (props: StepFormProps): React.Node => {
+export const MixForm = (props: StepFormProps): JSX.Element => {
   const [collapsed, setCollapsed] = React.useState(true)
 
   const { propsForFields, formData } = props

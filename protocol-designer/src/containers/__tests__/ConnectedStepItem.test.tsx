@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { Provider } from 'react-redux'
 import { act } from 'react-dom/test-utils'
@@ -17,59 +16,100 @@ import {
   CLOSE_BATCH_EDIT_FORM,
 } from '../../components/modals/ConfirmDeleteModal'
 
-import * as stepFormSelectors from '../../step-forms/selectors/index.js'
-import * as dismissSelectors from '../../dismiss/selectors.js'
-import * as uiStepSelectors from '../../ui/steps/selectors.js'
-import * as fileDataSelectors from '../../file-data/selectors/index.js'
+import * as stepFormSelectors from '../../step-forms/selectors/index'
+import * as dismissSelectors from '../../dismiss/selectors'
+import * as uiStepSelectors from '../../ui/steps/selectors'
+import * as fileDataSelectors from '../../file-data/selectors/index'
 import * as timelineWarningSelectors from '../../top-selectors/timelineWarnings'
 
 jest.mock('ua-parser-js')
-jest.mock('../../step-forms/selectors/index.js')
-jest.mock('../../file-data/selectors/index.js')
+jest.mock('../../step-forms/selectors/index')
+jest.mock('../../file-data/selectors/index')
 jest.mock('../../top-selectors/timelineWarnings')
-jest.mock('../../dismiss/selectors.js')
-jest.mock('../../ui/steps/selectors.js')
+jest.mock('../../dismiss/selectors')
+jest.mock('../../ui/steps/selectors')
 jest.mock('../../labware-ingred/selectors')
 jest.mock('../../feature-flags/selectors')
 
-const getSavedStepFormsMock = stepFormSelectors.getSavedStepForms
-const getOrderedStepIdsMock = stepFormSelectors.getOrderedStepIds
-const getArgsAndErrorsByStepIdMock = stepFormSelectors.getArgsAndErrorsByStepId
-const getCurrentFormIsPresavedMock = stepFormSelectors.getCurrentFormIsPresaved
-const getCurrentFormHasUnsavedChangesMock =
-  stepFormSelectors.getCurrentFormHasUnsavedChanges
-const getBatchEditFormHasUnsavedChangesMock =
-  stepFormSelectors.getBatchEditFormHasUnsavedChanges
-const getHasTimelineWarningsPerStepMock =
-  timelineWarningSelectors.getHasTimelineWarningsPerStep
-const getHasFormLevelWarningsPerStepMock =
-  dismissSelectors.getHasFormLevelWarningsPerStep
-const getCollapsedStepsMock = uiStepSelectors.getCollapsedSteps
-const getSelectedStepIdMock = uiStepSelectors.getSelectedStepId
-const getMultiSelectLastSelectedMock =
-  uiStepSelectors.getMultiSelectLastSelected
-const getMultiSelectItemIdsMock = uiStepSelectors.getMultiSelectItemIds
-const getSubstepsMock = fileDataSelectors.getSubsteps
-const getErrorStepId = fileDataSelectors.getErrorStepId
-const getIsMultiSelectModeMock = uiStepSelectors.getIsMultiSelectMode
+const mockUAParser = UAParser as jest.MockedFunction<typeof UAParser>
+
+const getSavedStepFormsMock = stepFormSelectors.getSavedStepForms as jest.MockedFunction<
+  typeof stepFormSelectors.getSavedStepForms
+>
+const getOrderedStepIdsMock = stepFormSelectors.getOrderedStepIds as jest.MockedFunction<
+  typeof stepFormSelectors.getOrderedStepIds
+>
+const getArgsAndErrorsByStepIdMock = stepFormSelectors.getArgsAndErrorsByStepId as jest.MockedFunction<
+  typeof stepFormSelectors.getArgsAndErrorsByStepId
+>
+const getCurrentFormIsPresavedMock = stepFormSelectors.getCurrentFormIsPresaved as jest.MockedFunction<
+  typeof stepFormSelectors.getCurrentFormIsPresaved
+>
+const getCurrentFormHasUnsavedChangesMock = stepFormSelectors.getCurrentFormHasUnsavedChanges as jest.MockedFunction<
+  typeof stepFormSelectors.getCurrentFormHasUnsavedChanges
+>
+const getBatchEditFormHasUnsavedChangesMock = stepFormSelectors.getBatchEditFormHasUnsavedChanges as jest.MockedFunction<
+  typeof stepFormSelectors.getBatchEditFormHasUnsavedChanges
+>
+const getHasTimelineWarningsPerStepMock = timelineWarningSelectors.getHasTimelineWarningsPerStep as jest.MockedFunction<
+  typeof timelineWarningSelectors.getHasTimelineWarningsPerStep
+>
+const getHasFormLevelWarningsPerStepMock = dismissSelectors.getHasFormLevelWarningsPerStep as jest.MockedFunction<
+  typeof dismissSelectors.getHasFormLevelWarningsPerStep
+>
+const getCollapsedStepsMock = uiStepSelectors.getCollapsedSteps as jest.MockedFunction<
+  typeof uiStepSelectors.getCollapsedSteps
+>
+const getSelectedStepIdMock = uiStepSelectors.getSelectedStepId as jest.MockedFunction<
+  typeof uiStepSelectors.getSelectedStepId
+>
+const getMultiSelectLastSelectedMock = uiStepSelectors.getMultiSelectLastSelected as jest.MockedFunction<
+  typeof uiStepSelectors.getMultiSelectLastSelected
+>
+const getMultiSelectItemIdsMock = uiStepSelectors.getMultiSelectItemIds as jest.MockedFunction<
+  typeof uiStepSelectors.getMultiSelectItemIds
+>
+const getSubstepsMock = fileDataSelectors.getSubsteps as jest.MockedFunction<
+  typeof fileDataSelectors.getSubsteps
+>
+const getErrorStepId = fileDataSelectors.getErrorStepId as jest.MockedFunction<
+  typeof fileDataSelectors.getErrorStepId
+>
+const getIsMultiSelectModeMock = uiStepSelectors.getIsMultiSelectMode as jest.MockedFunction<
+  typeof uiStepSelectors.getIsMultiSelectMode
+>
 
 const middlewares = [thunk]
 const mockStore = configureMockStore(middlewares)
 const mockId = 'SOMEID'
 
-const mockClickEvent = {
-  shiftKey: false,
-  metaKey: false,
-  ctrlKey: false,
-  persist: jest.fn(),
+function createMockClickEvent({
+  shiftKey = false,
+  metaKey = false,
+  ctrlKey = false,
+  persist = jest.fn(),
+}: {
+  shiftKey?: boolean
+  metaKey?: boolean
+  ctrlKey?: boolean
+  persist?: () => void
+} = {}): React.MouseEvent {
+  return {
+    shiftKey,
+    metaKey,
+    ctrlKey,
+    persist,
+  } as React.MouseEvent
 }
 
+const mockClickEvent = createMockClickEvent()
+
 describe('ConnectedStepItem', () => {
-  let store
+  let store: any
   beforeEach(() => {
     store = mockStore()
-
-    UAParser.mockImplementation(() => {
+    // @ts-expect-error(sa, 2021-6-27): missing parameters from UA Parser constructor return type
+    mockUAParser.mockImplementation(() => {
       return {
         getOS: () => ({ name: 'Mac OS', version: 'mockVersion' }),
       }
@@ -77,6 +117,7 @@ describe('ConnectedStepItem', () => {
 
     when(getSavedStepFormsMock)
       .calledWith(expect.anything())
+      // @ts-expect-error(sa, 2021-6-21): 'some form' is not a valid FormData type
       .mockReturnValue({ [mockId]: 'some form' })
 
     when(getCurrentFormIsPresavedMock)
@@ -91,11 +132,14 @@ describe('ConnectedStepItem', () => {
       .calledWith(expect.anything())
       .mockReturnValue(false)
 
-    when(getErrorStepId).calledWith(expect.anything()).mockReturnValue(false)
+    when(getErrorStepId)
+      .calledWith(expect.anything())
+      .mockReturnValue('errorId')
 
     when(getArgsAndErrorsByStepIdMock)
       .calledWith(expect.anything())
-      .mockReturnValue({ [mockId]: { errors: undefined } })
+      // @ts-expect-error(sa, 2021-6-21): missing properties
+      .mockReturnValue({ [mockId]: { errors: true } })
 
     when(getHasTimelineWarningsPerStepMock)
       .calledWith(expect.anything())
@@ -122,7 +166,7 @@ describe('ConnectedStepItem', () => {
     resetAllWhenMocks()
   })
 
-  const render = props =>
+  const render = (props: any) =>
     mount(
       <Provider store={store}>
         <ConnectedStepItem {...props} />
@@ -133,6 +177,7 @@ describe('ConnectedStepItem', () => {
     it('should select a single step when PD not in batch edit mode', () => {
       const props = { stepId: mockId, stepNumber: 1 }
       const wrapper = render(props)
+      // @ts-expect-error(sa, 2021-6-21): handleClick handler might not exist
       wrapper.find(StepItem).prop('handleClick')(mockClickEvent)
       const actions = store.getActions()
       const selectStepAction = { type: 'SELECT_STEP', payload: mockId }
@@ -146,6 +191,7 @@ describe('ConnectedStepItem', () => {
       const props = { stepId: mockId, stepNumber: 1 }
       const wrapper = render(props)
       act(() => {
+        // @ts-expect-error(sa, 2021-6-21): handleClick handler might not exist
         wrapper.find(StepItem).prop('handleClick')(mockClickEvent)
       })
       wrapper.update()
@@ -165,6 +211,7 @@ describe('ConnectedStepItem', () => {
       const props = { stepId: mockId, stepNumber: 1 }
       const wrapper = render(props)
       act(() => {
+        // @ts-expect-error(sa, 2021-6-21): handleClick handler might not exist
         wrapper.find(StepItem).prop('handleClick')(mockClickEvent)
       })
       wrapper.update()
@@ -180,6 +227,7 @@ describe('ConnectedStepItem', () => {
       const props = { stepId: mockId, stepNumber: 1 }
       const wrapper = render(props)
       act(() => {
+        // @ts-expect-error(sa, 2021-6-21): handleClick handler might not exist
         wrapper.find(StepItem).prop('handleClick')(mockClickEvent)
       })
       wrapper.update()
@@ -201,6 +249,7 @@ describe('ConnectedStepItem', () => {
 
         const props = { stepId: mockId, stepNumber: 1 }
         const wrapper = render(props)
+        // @ts-expect-error(sa, 2021-6-21): handleClick handler might not exist
         wrapper.find(StepItem).prop('handleClick')(mockClickEvent)
         const actions = store.getActions()
         const selectStepAction = {
@@ -222,6 +271,7 @@ describe('ConnectedStepItem', () => {
 
         const props = { stepId: mockId, stepNumber: 1 }
         const wrapper = render(props)
+        // @ts-expect-error(sa, 2021-6-21): handleClick handler might not exist
         wrapper.find(StepItem).prop('handleClick')(mockClickEvent)
         const actions = store.getActions()
         const selectStepAction = {
@@ -248,6 +298,7 @@ describe('ConnectedStepItem', () => {
         }
         const wrapper = render(props)
         act(() => {
+          // @ts-expect-error(sa, 2021-6-21): handleClick handler might not exist
           wrapper.find(StepItem).prop('handleClick')(clickEvent)
         })
         wrapper.update()
@@ -270,6 +321,7 @@ describe('ConnectedStepItem', () => {
         }
         const wrapper = render(props)
         act(() => {
+          // @ts-expect-error(sa, 2021-6-21): handleClick handler might not exist
           wrapper.find(StepItem).prop('handleClick')(clickEvent)
         })
         wrapper.update()
@@ -285,12 +337,11 @@ describe('ConnectedStepItem', () => {
       {
         name: 'should select just one step (in batch edit mode)',
         props: { stepId: mockId, stepNumber: 1 },
-        mockClickEvent: {
+        mockClickEvent: createMockClickEvent({
           shiftKey: true,
           metaKey: false,
           ctrlKey: false,
-          persist: jest.fn(),
-        },
+        }),
         setupMocks: () => {
           when(getOrderedStepIdsMock)
             .calledWith(expect.anything())
@@ -313,12 +364,11 @@ describe('ConnectedStepItem', () => {
         name:
           'should select a range of steps when one step is already selected',
         props: { stepId: mockId, stepNumber: 1 },
-        mockClickEvent: {
+        mockClickEvent: createMockClickEvent({
           shiftKey: true,
           metaKey: false,
           ctrlKey: false,
-          persist: jest.fn(),
-        },
+        }),
         setupMocks: () => {
           when(getSelectedStepIdMock)
             .calledWith(expect.anything())
@@ -339,12 +389,11 @@ describe('ConnectedStepItem', () => {
         name:
           'should select just one step when the clicked step is already selected',
         props: { stepId: mockId, stepNumber: 1 },
-        mockClickEvent: {
+        mockClickEvent: createMockClickEvent({
           shiftKey: true,
           metaKey: false,
           ctrlKey: false,
-          persist: jest.fn(),
-        },
+        }),
         setupMocks: () => {
           when(getSelectedStepIdMock)
             .calledWith(expect.anything())
@@ -365,12 +414,11 @@ describe('ConnectedStepItem', () => {
         name:
           'should select a range when the selected step is earlier than the last selected step (single => multi)',
         props: { stepId: mockId, stepNumber: 1 },
-        mockClickEvent: {
+        mockClickEvent: createMockClickEvent({
           shiftKey: true,
           metaKey: false,
           ctrlKey: false,
-          persist: jest.fn(),
-        },
+        }),
         setupMocks: () => {
           when(getOrderedStepIdsMock)
             .calledWith(expect.anything())
@@ -391,12 +439,11 @@ describe('ConnectedStepItem', () => {
         name:
           'should select a range when the selected step is earlier than the last selected step (multi => multi)',
         props: { stepId: mockId, stepNumber: 1 },
-        mockClickEvent: {
+        mockClickEvent: createMockClickEvent({
           shiftKey: true,
           metaKey: false,
           ctrlKey: false,
-          persist: jest.fn(),
-        },
+        }),
         setupMocks: () => {
           when(getMultiSelectItemIdsMock)
             .calledWith(expect.anything())
@@ -419,12 +466,11 @@ describe('ConnectedStepItem', () => {
       {
         name: 'should select a range when some of them are already selected',
         props: { stepId: mockId, stepNumber: 1 },
-        mockClickEvent: {
+        mockClickEvent: createMockClickEvent({
           shiftKey: true,
           metaKey: false,
           ctrlKey: false,
-          persist: jest.fn(),
-        },
+        }),
         setupMocks: () => {
           when(getMultiSelectItemIdsMock)
             .calledWith(expect.anything())
@@ -447,12 +493,11 @@ describe('ConnectedStepItem', () => {
       {
         name: 'should deselect a range when all of them are already selected',
         props: { stepId: mockId, stepNumber: 1 },
-        mockClickEvent: {
+        mockClickEvent: createMockClickEvent({
           shiftKey: true,
           metaKey: false,
           ctrlKey: false,
-          persist: jest.fn(),
-        },
+        }),
         setupMocks: () => {
           when(getMultiSelectItemIdsMock)
             .calledWith(expect.anything())
@@ -486,12 +531,11 @@ describe('ConnectedStepItem', () => {
         name:
           'should deselect a range when all of them are already selected (but preserve the first item and not exit batch edit mode)',
         props: { stepId: mockId, stepNumber: 1 },
-        mockClickEvent: {
+        mockClickEvent: createMockClickEvent({
           shiftKey: true,
           metaKey: false,
           ctrlKey: false,
-          persist: jest.fn(),
-        },
+        }),
         setupMocks: () => {
           when(getMultiSelectItemIdsMock)
             .calledWith(expect.anything())
@@ -515,12 +559,11 @@ describe('ConnectedStepItem', () => {
         name:
           'should ignore modifier key when clicking step that is already lastSelected',
         props: { stepId: mockId, stepNumber: 1 },
-        mockClickEvent: {
+        mockClickEvent: createMockClickEvent({
           shiftKey: true,
           metaKey: false,
           ctrlKey: false,
-          persist: jest.fn(),
-        },
+        }),
         setupMocks: () => {
           when(getMultiSelectItemIdsMock)
             .calledWith(expect.anything())
@@ -549,6 +592,7 @@ describe('ConnectedStepItem', () => {
             setupMocks()
           }
           const wrapper = render(props)
+          // @ts-expect-error(sa, 2021-6-21): handleClick handler might not exist
           wrapper.find(StepItem).prop('handleClick')(mockClickEvent)
           const actions = store.getActions()
           expect(actions[0]).toEqual(expectedAction)
@@ -569,6 +613,7 @@ describe('ConnectedStepItem', () => {
         }
         const wrapper = render(props)
         act(() => {
+          // @ts-expect-error(sa, 2021-6-21): handleClick handler might not exist
           wrapper.find(StepItem).prop('handleClick')(clickEvent)
         })
         wrapper.update()
@@ -591,6 +636,7 @@ describe('ConnectedStepItem', () => {
         }
         const wrapper = render(props)
         act(() => {
+          // @ts-expect-error(sa, 2021-6-21): handleClick handler might not exist
           wrapper.find(StepItem).prop('handleClick')(clickEvent)
         })
         wrapper.update()
@@ -612,14 +658,15 @@ describe('ConnectedStepItem', () => {
           ...mockClickEvent,
           metaKey: true,
         }
-
-        UAParser.mockImplementation(() => {
+        // @ts-expect-error(sa, 2021-6-27): missing parameters from UA Parser constructor return type
+        mockUAParser.mockImplementation(() => {
           return {
             getOS: () => ({ name: 'NOT Mac OS', version: 'mockVersion' }),
           }
         })
 
         const wrapper = render(props)
+        // @ts-expect-error(sa, 2021-6-21): handleClick handler might not exist
         wrapper.find(StepItem).prop('handleClick')(clickEvent)
         const actions = store.getActions()
         expect(actions[0]).toEqual({ payload: 'SOMEID', type: 'SELECT_STEP' })
@@ -705,7 +752,8 @@ describe('ConnectedStepItem', () => {
         ({ name, props, clickEvent, setupMocks, expectedAction }) => {
           it(name, () => {
             setupMocks && setupMocks()
-            UAParser.mockImplementation(() => {
+            // @ts-expect-error(sa, 2021-6-27): missing parameters from UA Parser constructor return type
+            mockUAParser.mockImplementation(() => {
               return {
                 getOS: () => ({
                   name: 'Mac OS',
@@ -714,6 +762,7 @@ describe('ConnectedStepItem', () => {
               }
             })
             const wrapper = render(props)
+            // @ts-expect-error(sa, 2021-6-21): handleClick handler might not exist
             wrapper.find(StepItem).prop('handleClick')(clickEvent)
             const actions = store.getActions()
             expect(actions[0]).toEqual(expectedAction)
@@ -733,14 +782,15 @@ describe('ConnectedStepItem', () => {
           ...mockClickEvent,
           ctrlKey: true,
         }
-
-        UAParser.mockImplementation(() => {
+        // @ts-expect-error(sa, 2021-6-27): missing parameters from UA Parser constructor return type
+        mockUAParser.mockImplementation(() => {
           return {
             getOS: () => ({ name: 'Mac OS', version: 'mockVersion' }),
           }
         })
 
         const wrapper = render(props)
+        // @ts-expect-error(sa, 2021-6-21): handleClick handler might not exist
         wrapper.find(StepItem).prop('handleClick')(clickEvent)
         const actions = store.getActions()
         expect(actions[0]).toEqual({ payload: 'SOMEID', type: 'SELECT_STEP' })
@@ -805,7 +855,8 @@ describe('ConnectedStepItem', () => {
         ({ name, props, clickEvent, setupMocks, expectedAction }) => {
           it(name, () => {
             setupMocks && setupMocks()
-            UAParser.mockImplementation(() => {
+            // @ts-expect-error(sa, 2021-6-27): missing parameters from UA Parser constructor return type
+            mockUAParser.mockImplementation(() => {
               return {
                 getOS: () => ({
                   name: 'NOT Mac OS',
@@ -814,6 +865,7 @@ describe('ConnectedStepItem', () => {
               }
             })
             const wrapper = render(props)
+            // @ts-expect-error(sa, 2021-6-21): handleClick handler might not exist
             wrapper.find(StepItem).prop('handleClick')(clickEvent)
             const actions = store.getActions()
             expect(actions[0]).toEqual(expectedAction)

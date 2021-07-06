@@ -1,33 +1,25 @@
-// @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { FormGroup, DropdownField, type Options } from '@opentrons/components'
+import { FormGroup, DropdownField, Options } from '@opentrons/components'
 import { i18n } from '../../../localization'
 import { selectors as stepFormSelectors } from '../../../step-forms'
-import type { BaseState } from '../../../types'
+import { BaseState } from '../../../types'
 import styles from '../StepEditForm.css'
-import type { FieldProps } from '../types'
+import { FieldProps } from '../types'
 
-type OP = {|
-  ...FieldProps,
-|}
+type OP = FieldProps
 
-type SP = {| pipetteOptions: Options |}
+interface SP {
+  pipetteOptions: Options
+}
 
-type Props = { ...OP, ...SP }
+type Props = OP & SP
 
 const PipetteFieldSTP = (state: BaseState, ownProps: OP): SP => ({
   pipetteOptions: stepFormSelectors.getEquippedPipetteOptions(state),
 })
 
-export const PipetteField: React.AbstractComponent<OP> = connect<
-  Props,
-  OP,
-  SP,
-  _,
-  _,
-  _
->(PipetteFieldSTP)((props: Props) => {
+export const PipetteField = connect(PipetteFieldSTP)((props: Props) => {
   const { onFieldBlur, onFieldFocus, updateValue, value } = props
 
   return (
@@ -41,7 +33,7 @@ export const PipetteField: React.AbstractComponent<OP> = connect<
         value={value ? String(value) : null}
         onBlur={onFieldBlur}
         onFocus={onFieldFocus}
-        onChange={(e: SyntheticEvent<HTMLSelectElement>) => {
+        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
           updateValue(e.currentTarget.value)
         }}
       />

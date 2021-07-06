@@ -1,23 +1,25 @@
-// @flow
-
 import * as React from 'react'
 import { connect } from 'react-redux'
-import type { ThunkDispatch } from '../../../types'
+import { ThunkDispatch } from '../../../types'
 import { actions as stepsActions } from '../../../ui/steps'
-import { type TerminalItemId } from '../../../steplist'
+import { TerminalItemId } from '../../../steplist'
 import { i18n } from '../../../localization'
 import styles from './styles.css'
 
-type OP = {| terminalId: TerminalItemId |}
-type DP = {| selectTerminalItem: TerminalItemId => mixed |}
-type Props = {| ...OP, ...DP |}
+interface OP {
+  terminalId: TerminalItemId
+}
+interface DP {
+  selectTerminalItem: (terminalItemId: TerminalItemId) => unknown
+}
+type Props = OP & DP
 
 class TerminalItemLinkComponent extends React.Component<Props> {
-  handleClick = () => {
+  handleClick = (): void => {
     this.props.selectTerminalItem(this.props.terminalId)
   }
 
-  render() {
+  render(): JSX.Element {
     return (
       <a className={styles.nav_link} onClick={this.handleClick}>
         {i18n.t(`nav.terminal_item.${this.props.terminalId}`)}
@@ -26,19 +28,9 @@ class TerminalItemLinkComponent extends React.Component<Props> {
   }
 }
 
-const mapDTP = (dispatch: ThunkDispatch<*>): DP => ({
+const mapDTP = (dispatch: ThunkDispatch<any>): DP => ({
   selectTerminalItem: terminalId =>
     dispatch(stepsActions.selectTerminalItem(terminalId)),
 })
 
-export const TerminalItemLink: React.AbstractComponent<OP> = connect<
-  Props,
-  OP,
-  {||},
-  DP,
-  _,
-  _
->(
-  null,
-  mapDTP
-)(TerminalItemLinkComponent)
+export const TerminalItemLink = connect(null, mapDTP)(TerminalItemLinkComponent)

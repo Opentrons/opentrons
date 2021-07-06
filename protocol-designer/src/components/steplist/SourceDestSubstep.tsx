@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import cx from 'classnames'
 
@@ -6,24 +5,23 @@ import { MultiChannelSubstep } from './MultiChannelSubstep'
 import { SubstepRow } from './SubstepRow'
 import styles from './StepItem.css'
 
-import type {
+import {
   SourceDestSubstepItem,
   SubstepIdentifier,
   WellIngredientNames,
 } from '../../steplist/types'
 
-export type StepSubItemProps = {|
-  substeps: SourceDestSubstepItem,
-|}
+export interface StepSubItemProps {
+  substeps: SourceDestSubstepItem
+}
 
-type SourceDestSubstepProps = {|
-  ...StepSubItemProps,
-  ingredNames: WellIngredientNames,
-  selectSubstep: SubstepIdentifier => mixed,
-  hoveredSubstep: ?SubstepIdentifier,
-|}
+type SourceDestSubstepProps = StepSubItemProps & {
+  ingredNames: WellIngredientNames
+  selectSubstep: (substepIdentifier: SubstepIdentifier) => unknown
+  hoveredSubstep?: SubstepIdentifier | null
+}
 
-export function SourceDestSubstep(props: SourceDestSubstepProps): React.Node {
+export function SourceDestSubstep(props: SourceDestSubstepProps): JSX.Element {
   const { substeps, selectSubstep, hoveredSubstep } = props
   if (substeps.multichannel) {
     // multi-channel row item (collapsible)
@@ -49,7 +47,8 @@ export function SourceDestSubstep(props: SourceDestSubstepProps): React.Node {
   }
 
   // single-channel row item
-  return substeps.rows.map<React.Node>((row, substepIndex) => (
+  // @ts-expect-error(sa, 2021-6-21): TODO: make this return a fragment instead of a list of JSX elements
+  return substeps.rows.map<JSX.Element>((row, substepIndex) => (
     <SubstepRow
       key={substepIndex}
       className={cx(styles.step_subitem, {

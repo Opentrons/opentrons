@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import cx from 'classnames'
 import { Tooltip, useHoverTooltip, TOOLTIP_FIXED } from '@opentrons/components'
@@ -6,13 +5,13 @@ import { PDListItem } from '../lists'
 import styles from './StepItem.css'
 import { LabwareTooltipContents } from './LabwareTooltipContents'
 
-type Props = {|
-  volume: ?string,
-  times: ?string,
-  labwareNickname: ?string,
-|}
+interface Props {
+  volume?: string | null
+  times?: string | null
+  labwareNickname?: string | null
+}
 
-export function MixHeader(props: Props): React.Node {
+export function MixHeader(props: Props): JSX.Element {
   const { volume, times, labwareNickname } = props
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: 'bottom-start',

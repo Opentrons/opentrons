@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 
 import { FormGroup } from '@opentrons/components'
@@ -7,11 +6,13 @@ import { TextField } from '../../fields'
 
 import styles from '../../StepEditForm.css'
 
-import type { FieldPropsByName } from '../../types'
+import { FieldPropsByName } from '../../types'
 
-type Props = {| propsForFields: FieldPropsByName |}
+interface Props {
+  propsForFields: FieldPropsByName
+}
 
-export const ProfileSettings = (props: Props): React.Node => {
+export const ProfileSettings = (props: Props): JSX.Element => {
   const { propsForFields } = props
 
   return (

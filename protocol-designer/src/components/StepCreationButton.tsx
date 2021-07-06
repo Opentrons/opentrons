@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import cx from 'classnames'
@@ -26,29 +25,24 @@ import {
   CLOSE_UNSAVED_STEP_FORM,
 } from './modals/ConfirmDeleteModal'
 import { Portal } from './portals/MainPageModalPortal'
-import { stepIconsByType, type StepType } from '../form-types'
+import { stepIconsByType, StepType } from '../form-types'
 import styles from './listButtons.css'
 
-type StepButtonComponentProps = {|
-  children: React.Node,
-  expanded: boolean,
-  disabled: boolean,
-  setExpanded: boolean => mixed,
-|}
+interface StepButtonComponentProps {
+  children: React.ReactNode
+  expanded: boolean
+  disabled: boolean
+  setExpanded: (expanded: boolean) => unknown
+}
 
 // TODO: Ian 2019-01-17 move out to centralized step info file - see #2926
-const getSupportedSteps = () => [
-  'moveLiquid',
-  'mix',
-  'pause',
-  'magnet',
-  'temperature',
-  'thermocycler',
-]
+const getSupportedSteps = (): Array<
+  Exclude<StepType, 'manualIntervention'>
+> => ['moveLiquid', 'mix', 'pause', 'magnet', 'temperature', 'thermocycler']
 
 export const StepCreationButtonComponent = (
   props: StepButtonComponentProps
-): React.Node => {
+): JSX.Element => {
   const { children, expanded, setExpanded, disabled } = props
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: TOOLTIP_TOP,
@@ -78,13 +72,13 @@ export const StepCreationButtonComponent = (
   )
 }
 
-export type StepButtonItemProps = {|
-  onClick: () => mixed,
-  disabled: boolean,
-  stepType: StepType,
-|}
+export interface StepButtonItemProps {
+  onClick: () => unknown
+  disabled: boolean
+  stepType: StepType
+}
 
-export function StepButtonItem(props: StepButtonItemProps): React.Node {
+export function StepButtonItem(props: StepButtonItemProps): JSX.Element {
   const { onClick, disabled, stepType } = props
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: TOOLTIP_RIGHT,
@@ -110,7 +104,7 @@ export function StepButtonItem(props: StepButtonItemProps): React.Node {
   )
 }
 
-export const StepCreationButton = (): React.Node => {
+export const StepCreationButton = (): JSX.Element => {
   const currentFormIsPresaved = useSelector(
     stepFormSelectors.getCurrentFormIsPresaved
   )
@@ -119,7 +113,10 @@ export const StepCreationButton = (): React.Node => {
   )
   const isStepCreationDisabled = useSelector(getIsMultiSelectMode)
   const modules = useSelector(stepFormSelectors.getInitialDeckSetup).modules
-  const isStepTypeEnabled = {
+  const isStepTypeEnabled: Record<
+    Exclude<StepType, 'manualIntervention'>,
+    boolean
+  > = {
     moveLiquid: true,
     mix: true,
     pause: true,
@@ -135,7 +132,9 @@ export const StepCreationButton = (): React.Node => {
   ] = React.useState<StepType | null>(null)
   const dispatch = useDispatch()
 
-  const addStep = (stepType: StepType) =>
+  const addStep = (
+    stepType: StepType
+  ): ReturnType<typeof stepsActions.addAndSelectStepWithHints> =>
     dispatch(stepsActions.addAndSelectStepWithHints({ stepType }))
 
   const items = getSupportedSteps().map(stepType => (

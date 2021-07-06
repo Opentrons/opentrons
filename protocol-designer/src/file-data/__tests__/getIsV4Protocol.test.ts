@@ -1,21 +1,20 @@
-// @flow
 import { getRequiresAtLeastV4 } from '../selectors/fileCreator'
 import {
   MAGNETIC_MODULE_TYPE,
   MAGNETIC_MODULE_V1,
 } from '@opentrons/shared-data'
-import type { ModuleEntities } from '../../step-forms'
+import { ModuleEntities } from '../../step-forms'
 
 describe('getRequiresAtLeastV4 selector', () => {
-  const testCases: Array<{|
-    testName: string,
+  const testCases: Array<{
+    testName: string
     robotStateTimeline: {
       // NOTE: this is a simplified version of Timeline type so we don't need a huge fixture
-      timeline: Array<{ commands: Array<{ command: string }> }>,
-    },
-    moduleEntities: ModuleEntities,
-    expected: boolean,
-  |}> = [
+      timeline: Array<{ commands: Array<{ command: string }> }>
+    }
+    moduleEntities: ModuleEntities
+    expected: boolean
+  }> = [
     {
       testName: 'should return true if there are modules',
       expected: true,
@@ -47,7 +46,7 @@ describe('getRequiresAtLeastV4 selector', () => {
   testCases.forEach(
     ({ testName, robotStateTimeline, moduleEntities, expected }) => {
       it(testName, () => {
-        // $FlowFixMe TODO(IL, 2020-02-25): Flow doesn't have type for resultFunc
+        // @ts-expect-error(sa, 2021-6-18): resultFunc not part of Selector type
         const result = getRequiresAtLeastV4.resultFunc(
           robotStateTimeline,
           moduleEntities

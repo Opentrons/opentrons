@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
 import {
@@ -6,7 +5,7 @@ import {
   InputField,
   Tooltip,
   useHoverTooltip,
-  type UseHoverTooltipResult,
+  UseHoverTooltipTargetProps,
 } from '@opentrons/components'
 import { getWellsDepth } from '@opentrons/shared-data'
 import {
@@ -20,31 +19,30 @@ import styles from './TipPositionInput.css'
 import { TipPositionModal } from './TipPositionModal'
 
 import { getDefaultMmFromBottom } from './utils'
-import type { BaseState } from '../../../../types'
-import type { FieldProps } from '../../types'
+import { BaseState } from '../../../../types'
+import { FieldProps } from '../../types'
 
-type OP = {|
-  ...FieldProps,
-  labwareId: ?string,
-  className?: string,
-|}
+interface OP extends FieldProps {
+  labwareId?: string | null
+  className?: string
+}
 
-type SP = {|
-  mmFromBottom: number | null,
-  wellDepthMm: number,
-|}
+interface SP {
+  mmFromBottom: number | null
+  wellDepthMm: number
+}
 
-type Props = {| ...OP, ...SP |}
+type Props = OP & SP
 
-function TipPositionInput(props: Props) {
+function TipPositionInput(props: Props): JSX.Element {
   const [isModalOpen, setModalOpen] = React.useState(false)
 
-  const handleOpen = () => {
+  const handleOpen = (): void => {
     if (props.wellDepthMm) {
       setModalOpen(true)
     }
   }
-  const handleClose = () => {
+  const handleClose = (): void => {
     setModalOpen(false)
   }
 
@@ -60,7 +58,7 @@ function TipPositionInput(props: Props) {
 
   const isTouchTipField = getIsTouchTipField(name)
   const isDelayPositionField = getIsDelayPositionField(name)
-  let value = ''
+  let value: number | string = ''
   if (wellDepthMm !== null) {
     // show default value for field in parens if no mmFromBottom value is selected
     value =
@@ -105,15 +103,15 @@ function TipPositionInput(props: Props) {
   )
 }
 
-type WrapperProps = {|
-  isTouchTipField: boolean,
-  isDelayPositionField: boolean,
-  children: React.Node,
-  disabled: boolean,
-  targetProps: $ElementType<UseHoverTooltipResult, 0>,
-|}
+interface WrapperProps {
+  isTouchTipField: boolean
+  isDelayPositionField: boolean
+  children: React.ReactNode
+  disabled: boolean
+  targetProps: UseHoverTooltipTargetProps
+}
 
-const Wrapper = (props: WrapperProps) =>
+const Wrapper = (props: WrapperProps): JSX.Element =>
   props.isTouchTipField || props.isDelayPositionField ? (
     <div {...props.targetProps}>{props.children}</div>
   ) : (
@@ -147,11 +145,4 @@ const mapSTP = (state: BaseState, ownProps: OP): SP => {
   }
 }
 
-export const TipPositionField: React.AbstractComponent<OP> = connect<
-  Props,
-  OP,
-  SP,
-  _,
-  _,
-  _
->(mapSTP, () => ({}))(TipPositionInput)
+export const TipPositionField = connect(mapSTP, () => ({}))(TipPositionInput)

@@ -1,16 +1,17 @@
-// @flow
 import { sortedSlotnames } from '@opentrons/components'
 import { getSlotIsEmpty } from '../step-forms/utils'
-import type { InitialDeckSetup } from '../step-forms/types'
-import type { DeckSlot } from '../types'
-
+import { InitialDeckSetup } from '../step-forms/types'
+import { DeckSlot } from '../types'
 export function getNextAvailableDeckSlot(
   initialDeckSetup: InitialDeckSetup
-): ?DeckSlot {
+): DeckSlot | null | undefined {
   return sortedSlotnames.find(slot => getSlotIsEmpty(initialDeckSetup, slot))
 }
 
-const getMatchOrNull = (pattern: RegExp, s: string): ?string => {
+const getMatchOrNull = (
+  pattern: RegExp,
+  s: string
+): string | null | undefined => {
   const matchResult = pattern.exec(s)
   return matchResult ? matchResult[1] : null
 }
@@ -18,18 +19,18 @@ const getMatchOrNull = (pattern: RegExp, s: string): ?string => {
 const nameOnlyPattern = /^(.*)\(\d+\)$/
 const numOnlyPattern = /^.*\((\d+)\)$/
 export function getNextNickname(
-  allNicknames: Array<string>,
+  allNicknames: string[],
   _proposedNickname: string
 ): string {
   const proposedNickname = (
     getMatchOrNull(nameOnlyPattern, _proposedNickname) || _proposedNickname
   ).trim()
-  const matchingDisambigNums = allNicknames.reduce<Array<number>>(
+
+  const matchingDisambigNums = allNicknames.reduce<number[]>(
     (acc, nickname) => {
       const nameOnly = (
         getMatchOrNull(nameOnlyPattern, nickname) || nickname
       ).trim()
-
       const numOnlyMatch = getMatchOrNull(numOnlyPattern, nickname)
       const num = numOnlyMatch ? Number(numOnlyMatch) : 0
 
@@ -37,11 +38,11 @@ export function getNextNickname(
       if (nameOnly === proposedNickname) {
         return [...acc, num]
       }
+
       return acc
     },
     []
   )
-
   const topMatchNum = Math.max(...matchingDisambigNums)
   return Number.isFinite(topMatchNum)
     ? `${proposedNickname.trim()} (${topMatchNum + 1})`

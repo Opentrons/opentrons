@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { css } from 'styled-components'
 import {
@@ -16,22 +15,22 @@ import ZIG_ZAG_IMAGE from '../../../../images/zig_zag_icon.svg'
 import { WellOrderModal } from './WellOrderModal'
 import stepEditStyles from '../../StepEditForm.css'
 import styles from './WellOrderInput.css'
-import type { FieldProps } from '../../types'
-import type { WellOrderOption } from '../../../../form-types'
+import { FieldProps } from '../../types'
+import { WellOrderOption } from '../../../../form-types'
 
-type Props = {|
-  className?: ?string,
-  label?: string,
-  prefix: 'aspirate' | 'dispense' | 'mix',
-  firstValue: ?WellOrderOption,
-  secondValue: ?WellOrderOption,
-  firstName: string,
-  secondName: string,
-  updateFirstWellOrder: $PropertyType<FieldProps, 'updateValue'>,
-  updateSecondWellOrder: $PropertyType<FieldProps, 'updateValue'>,
-|}
+export interface WellOrderFieldProps {
+  className?: string | null
+  label?: string
+  prefix: 'aspirate' | 'dispense' | 'mix'
+  firstValue?: WellOrderOption | null
+  secondValue?: WellOrderOption | null
+  firstName: string
+  secondName: string
+  updateFirstWellOrder: FieldProps['updateValue']
+  updateSecondWellOrder: FieldProps['updateValue']
+}
 
-export const WellOrderField = (props: Props): React.Node => {
+export const WellOrderField = (props: WellOrderFieldProps): JSX.Element => {
   const {
     firstValue,
     secondValue,
@@ -42,19 +41,19 @@ export const WellOrderField = (props: Props): React.Node => {
   } = props
   const [isModalOpen, setModalOpen] = React.useState(false)
 
-  const handleOpen = () => {
+  const handleOpen = (): void => {
     setModalOpen(true)
   }
-  const handleClose = () => {
+  const handleClose = (): void => {
     setModalOpen(false)
   }
 
-  const updateValues = (firstValue, secondValue) => {
+  const updateValues = (firstValue: unknown, secondValue: unknown): void => {
     updateFirstWellOrder(firstValue)
     updateSecondWellOrder(secondValue)
   }
 
-  const getIconClassNames = () => {
+  const getIconClassNames = (): string[] => {
     const iconClassNames = []
     if (firstValue) {
       iconClassNames.push(styles[`${firstValue}_first`])
@@ -106,6 +105,7 @@ export const WellOrderField = (props: Props): React.Node => {
               src={ZIG_ZAG_IMAGE}
               className={cx(
                 styles.well_order_icon,
+                // @ts-expect-error(sa, 2021-6-22): I think props.label needs to be casted to a boolean first
                 { [styles.icon_with_label]: props.label },
                 getIconClassNames()
               )}

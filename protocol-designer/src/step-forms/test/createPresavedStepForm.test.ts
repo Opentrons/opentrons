@@ -1,4 +1,3 @@
-// @flow
 import {
   MAGNETIC_MODULE_TYPE,
   MAGNETIC_MODULE_V2,
@@ -8,7 +7,7 @@ import {
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
-import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul'
+import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
 import { getStateAndContextTempTCModules } from '@opentrons/step-generation'
 import {
   DEFAULT_DELAY_SECONDS,
@@ -16,12 +15,11 @@ import {
 } from '../../constants'
 import {
   createPresavedStepForm,
-  type CreatePresavedStepFormArgs,
+  CreatePresavedStepFormArgs,
 } from '../utils/createPresavedStepForm'
-
 const stepId = 'stepId123'
 const EXAMPLE_ENGAGE_HEIGHT = '18'
-let defaultArgs
+let defaultArgs: any
 beforeEach(() => {
   const { robotState } = getStateAndContextTempTCModules({
     temperatureModuleId: 'someTemperatureModuleId',
@@ -35,7 +33,11 @@ beforeEach(() => {
   }
   const labwareOnMagModule = {
     id: 'labwareOnMagModule',
-    def: { parameters: { magneticModuleEngageHeight: EXAMPLE_ENGAGE_HEIGHT } },
+    def: {
+      parameters: {
+        magneticModuleEngageHeight: EXAMPLE_ENGAGE_HEIGHT,
+      },
+    },
   }
   defaultArgs = {
     stepId,
@@ -76,7 +78,9 @@ beforeEach(() => {
           slot: '3',
         },
       },
-      pipettes: { leftPipetteId: { ...leftPipette, mount: 'left' } },
+      pipettes: {
+        leftPipetteId: { ...leftPipette, mount: 'left' },
+      },
     },
     robotStateTimeline: {
       timeline: [
@@ -88,11 +92,9 @@ beforeEach(() => {
     },
   }
 })
-
 afterEach(() => {
   jest.resetAllMocks()
 })
-
 describe('createPresavedStepForm', () => {
   ;[true, false].forEach(hasTempModule => {
     it(`should populate initial values for a new pause step (with ${
@@ -103,12 +105,8 @@ describe('createPresavedStepForm', () => {
         stepType: 'pause',
         initialDeckSetup: hasTempModule
           ? defaultArgs.initialDeckSetup
-          : {
-              ...defaultArgs.initialDeckSetup,
-              modules: {},
-            },
+          : { ...defaultArgs.initialDeckSetup, modules: {} },
       }
-
       expect(createPresavedStepForm(args)).toEqual({
         id: stepId,
         stepType: 'pause',
@@ -124,13 +122,8 @@ describe('createPresavedStepForm', () => {
       })
     })
   })
-
   it(`should call handleFormChange with a default pipette for "moveLiquid" step`, () => {
-    const args = {
-      ...defaultArgs,
-      stepType: 'moveLiquid',
-    }
-
+    const args = { ...defaultArgs, stepType: 'moveLiquid' }
     expect(createPresavedStepForm(args)).toEqual({
       id: stepId,
       pipette: 'leftPipetteId',
@@ -181,14 +174,9 @@ describe('createPresavedStepForm', () => {
       volume: null,
     })
   })
-
   describe('mix step', () => {
     it('should call handleFormChange with a default pipette for mix step', () => {
-      const args = {
-        ...defaultArgs,
-        stepType: 'mix',
-      }
-
+      const args = { ...defaultArgs, stepType: 'mix' }
       expect(createPresavedStepForm(args)).toEqual({
         id: stepId,
         pipette: 'leftPipetteId',
@@ -217,13 +205,8 @@ describe('createPresavedStepForm', () => {
       })
     })
   })
-
   it('should set a default magnetic module for magnet step, and set engage height and magnetAction=engage, when it is the first magnet step in the timeline', () => {
-    const args = {
-      ...defaultArgs,
-      stepType: 'magnet',
-    }
-
+    const args = { ...defaultArgs, stepType: 'magnet' }
     expect(createPresavedStepForm(args)).toEqual({
       id: stepId,
       stepType: 'magnet',
@@ -235,7 +218,6 @@ describe('createPresavedStepForm', () => {
       stepDetails: '',
     })
   })
-
   it('should set a default magnetic module for magnet step, and set magnetAction=disengage, when the previous magnet step is an engage', () => {
     const args = {
       ...defaultArgs,
@@ -253,7 +235,6 @@ describe('createPresavedStepForm', () => {
       orderedStepIds: ['prevStepId'],
       stepType: 'magnet',
     }
-
     expect(createPresavedStepForm(args)).toEqual({
       id: stepId,
       stepType: 'magnet',
@@ -264,7 +245,6 @@ describe('createPresavedStepForm', () => {
       stepDetails: '',
     })
   })
-
   it('should set a default magnetic module for magnet step, and set magnetAction=engage, when the previous magnet step is a disengage', () => {
     const args = {
       ...defaultArgs,
@@ -282,7 +262,6 @@ describe('createPresavedStepForm', () => {
       orderedStepIds: ['prevStepId'],
       stepType: 'magnet',
     }
-
     expect(createPresavedStepForm(args)).toEqual({
       id: stepId,
       stepType: 'magnet',
@@ -293,13 +272,8 @@ describe('createPresavedStepForm', () => {
       stepDetails: '',
     })
   })
-
   it('should set a default temperature module when a Temperature step is added', () => {
-    const args = {
-      ...defaultArgs,
-      stepType: 'temperature',
-    }
-
+    const args = { ...defaultArgs, stepType: 'temperature' }
     expect(createPresavedStepForm(args)).toEqual({
       id: stepId,
       stepType: 'temperature',
@@ -321,7 +295,10 @@ describe('createPresavedStepForm', () => {
       it(testName, () => {
         // mutate robot state in defaultArgs
         if (timelineHasErrors) {
-          defaultArgs.robotStateTimeline = { errors: ['OH NO!'], timeline: [] }
+          defaultArgs.robotStateTimeline = {
+            errors: ['OH NO!'],
+            timeline: [],
+          }
         } else {
           const thermocyclerModuleState =
             defaultArgs.robotStateTimeline.timeline[0].robotState.modules[
@@ -335,10 +312,7 @@ describe('createPresavedStepForm', () => {
           }
         }
 
-        const args = {
-          ...defaultArgs,
-          stepType: 'thermocycler',
-        }
+        const args = { ...defaultArgs, stepType: 'thermocycler' }
 
         if (isFirstThermocyclerStep) {
           args.savedStepForms = {
@@ -364,7 +338,6 @@ describe('createPresavedStepForm', () => {
               lidOpenHold: null,
             },
           }
-
           args.orderedStepIds = ['prevStepId']
         }
 

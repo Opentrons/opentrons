@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useConditionalConfirm } from '@opentrons/components'
@@ -11,25 +10,32 @@ import { actions as stepsActions, getIsMultiSelectMode } from '../../ui/steps'
 import { actions as steplistActions } from '../../steplist'
 import { Portal } from '../portals/TopPortal'
 import styles from './StepItem.css'
-import type { StepIdType } from '../../form-types'
+import { StepIdType } from '../../form-types'
 
 const MENU_OFFSET_PX = 5
 
-type Props = {|
-  children: ({
-    makeStepOnContextMenu: StepIdType => (
-      event: SyntheticMouseEvent<>
-    ) => mixed,
-  }) => React.Node,
-|}
+interface Props {
+  children: (args: {
+    makeStepOnContextMenu: (
+      stepIdType: StepIdType
+    ) => (event: MouseEvent) => unknown
+  }) => React.ReactNode
+}
 
-type Position = {| left: number | null, top: number | null |}
+interface Position {
+  left: number | null
+  top: number | null
+}
 
-export const ContextMenu = (props: Props): React.Node => {
+export const ContextMenu = (props: Props): JSX.Element => {
   const dispatch = useDispatch()
-  const deleteStep = (stepId: StepIdType) =>
+  const deleteStep = (
+    stepId: StepIdType
+  ): ReturnType<typeof steplistActions.deleteStep> =>
     dispatch(steplistActions.deleteStep(stepId))
-  const duplicateStep = (stepId: StepIdType) =>
+  const duplicateStep = (
+    stepId: StepIdType
+  ): ReturnType<typeof stepsActions.duplicateStep> =>
     dispatch(stepsActions.duplicateStep(stepId))
 
   const [visible, setVisible] = React.useState<boolean>(false)
@@ -38,7 +44,7 @@ export const ContextMenu = (props: Props): React.Node => {
     left: null,
     top: null,
   })
-  const menuRoot = React.useRef<?HTMLElement>(null)
+  const menuRoot = React.useRef<HTMLDivElement | null>(null)
 
   const isMultiSelectMode = useSelector(getIsMultiSelectMode)
 
@@ -47,9 +53,7 @@ export const ContextMenu = (props: Props): React.Node => {
     return () => global.removeEventListener('click', handleClick)
   })
 
-  const makeHandleContextMenu = (stepId: StepIdType) => (
-    event: SyntheticMouseEvent<*>
-  ) => {
+  const makeHandleContextMenu = (stepId: StepIdType) => (event: MouseEvent) => {
     if (isMultiSelectMode) return
     event.preventDefault()
 
@@ -75,7 +79,7 @@ export const ContextMenu = (props: Props): React.Node => {
     setPosition({ left, top })
   }
 
-  const handleClick = (event: SyntheticMouseEvent<*>) => {
+  const handleClick = (event: MouseEvent): void => {
     const wasOutside = !(
       event.target instanceof Node && menuRoot.current?.contains(event.target)
     )
@@ -84,7 +88,7 @@ export const ContextMenu = (props: Props): React.Node => {
     setPosition({ left: null, top: null })
   }
 
-  const handleDuplicate = () => {
+  const handleDuplicate = (): void => {
     if (stepId != null) {
       duplicateStep(stepId)
       setVisible(false)
@@ -92,7 +96,7 @@ export const ContextMenu = (props: Props): React.Node => {
     }
   }
 
-  const handleDelete = () => {
+  const handleDelete = (): void => {
     if (stepId != null) {
       deleteStep(stepId)
     } else {
@@ -127,6 +131,7 @@ export const ContextMenu = (props: Props): React.Node => {
           <React.Fragment>
             <div
               ref={menuRoot}
+              // @ts-expect-error(sa, 2021-7-5): position cannot be null, cast to undefined
               style={{ left: position.left, top: position.top }}
               className={styles.context_menu}
             >

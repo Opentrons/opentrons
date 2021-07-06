@@ -1,4 +1,3 @@
-// @flow
 import assert from 'assert'
 import { getIsTiprack } from '@opentrons/shared-data'
 import { uuid } from '../../utils'
@@ -6,24 +5,21 @@ import { selectors as labwareDefSelectors } from '../../labware-defs'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { selectors as uiLabwareSelectors } from '../../ui/labware'
 import { getNextAvailableDeckSlot, getNextNickname } from '../utils'
-
-import type {
+import {
   CreateContainerArgs,
   CreateContainerAction,
   DuplicateLabwareAction,
 } from './actions'
-import type { ThunkAction } from '../../types'
-
-export type RenameLabwareAction = {
-  type: 'RENAME_LABWARE',
+import { ThunkAction } from '../../types'
+export interface RenameLabwareAction {
+  type: 'RENAME_LABWARE'
   payload: {
-    labwareId: string,
-    name?: ?string,
-  },
+    labwareId: string
+    name?: string | null
+  }
 }
-
 export const renameLabware: (
-  args: $PropertyType<RenameLabwareAction, 'payload'>
+  args: RenameLabwareAction['payload']
 ) => ThunkAction<CreateContainerAction | RenameLabwareAction> = args => (
   dispatch,
   getState
@@ -40,7 +36,6 @@ export const renameLabware: (
       .map((id: string) => allNicknamesById[id]),
     args.name || defaultNickname
   )
-
   return dispatch({
     type: 'RENAME_LABWARE',
     payload: {
@@ -49,7 +44,6 @@ export const renameLabware: (
     },
   })
 }
-
 export const createContainer: (
   args: CreateContainerArgs
 ) => ThunkAction<CreateContainerAction | RenameLabwareAction> = args => (
@@ -63,28 +57,26 @@ export const createContainer: (
     args.labwareDefURI
   ]
   const isTiprack = getIsTiprack(labwareDef)
+
   if (slot) {
     const id = `${uuid()}:${args.labwareDefURI}`
     dispatch({
       type: 'CREATE_CONTAINER',
-      payload: {
-        ...args,
-        id,
-        slot,
-      },
+      payload: { ...args, id, slot },
     })
 
     if (isTiprack) {
       // Tipracks cannot be named, but should auto-increment.
       // We can't rely on reducers to do that themselves bc they don't have access
       // to both the nickname state and the isTiprack condition
-      renameLabware({ labwareId: id })(dispatch, getState)
+      renameLabware({
+        labwareId: id,
+      })(dispatch, getState)
     }
   } else {
     console.warn('no slots available, cannot create labware')
   }
 }
-
 export const duplicateLabware: (
   templateLabwareId: string
 ) => ThunkAction<DuplicateLabwareAction> = templateLabwareId => (
@@ -99,13 +91,10 @@ export const duplicateLabware: (
     templateLabwareDefURI,
     `no labwareDefURI for labware ${templateLabwareId}, cannot run duplicateLabware thunk`
   )
-
   const initialDeckSetup = stepFormSelectors.getInitialDeckSetup(state)
   const duplicateSlot = getNextAvailableDeckSlot(initialDeckSetup)
-
   if (!duplicateSlot)
     console.warn('no slots available, cannot duplicate labware')
-
   const allNicknamesById = uiLabwareSelectors.getLabwareNicknamesById(state)
   const templateNickname = allNicknamesById[templateLabwareId]
   const duplicateLabwareNickname = getNextNickname(

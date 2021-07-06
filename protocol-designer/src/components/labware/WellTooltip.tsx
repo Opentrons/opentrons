@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 
 import { Popper, Reference, Manager } from 'react-popper'
@@ -6,32 +5,32 @@ import cx from 'classnames'
 import { Portal } from '../portals/TopPortal'
 import { PillTooltipContents } from '../steplist/SubstepRow'
 import styles from './labware.css'
-import type { LocationLiquidState } from '@opentrons/step-generation'
-import type { WellIngredientNames } from '../../steplist/types'
+import { LocationLiquidState } from '@opentrons/step-generation'
+import { WellIngredientNames } from '../../steplist/types'
 
 const DEFAULT_TOOLTIP_OFFSET = 22
 const WELL_BORDER_WIDTH = 4
 
-type WellTooltipParams = {
+interface WellTooltipParams {
   makeHandleMouseEnterWell: (
     wellName: string,
     wellIngreds: LocationLiquidState
-  ) => (e: SyntheticMouseEvent<*>) => void,
-  handleMouseLeaveWell: mixed => void,
-  tooltipWellName: ?string,
+  ) => (e: React.MouseEvent<any>) => void
+  handleMouseLeaveWell: (val: unknown) => void
+  tooltipWellName?: string | null
 }
 
-type Props = {
-  children: WellTooltipParams => React.Node,
-  ingredNames: WellIngredientNames,
+interface Props {
+  children: (wellTooltipParams: WellTooltipParams) => React.ReactNode
+  ingredNames: WellIngredientNames
 }
 
-type State = {
-  tooltipX: ?number,
-  tooltipY: ?number,
-  tooltipWellName: ?string,
-  tooltipWellIngreds: ?LocationLiquidState,
-  tooltipOffset: ?number,
+interface State {
+  tooltipX?: number | null
+  tooltipY?: number | null
+  tooltipWellName?: string | null
+  tooltipWellIngreds?: LocationLiquidState | null
+  tooltipOffset?: number | null
 }
 const initialState: State = {
   tooltipX: null,
@@ -47,7 +46,7 @@ export class WellTooltip extends React.Component<Props, State> {
   makeHandleMouseEnterWell: (
     wellName: string,
     wellIngreds: LocationLiquidState
-  ) => (e: SyntheticMouseEvent<>) => void = (wellName, wellIngreds) => e => {
+  ) => (e: React.MouseEvent) => void = (wellName, wellIngreds) => e => {
     const { target } = e
     if (target instanceof Element) {
       const wellBoundingRect = target.getBoundingClientRect()
@@ -68,7 +67,7 @@ export class WellTooltip extends React.Component<Props, State> {
     this.setState(initialState)
   }
 
-  render(): React.Node {
+  render(): React.ReactNode {
     const { tooltipX, tooltipY, tooltipOffset } = this.state
 
     return (
@@ -80,6 +79,7 @@ export class WellTooltip extends React.Component<Props, State> {
                 <div
                   ref={ref}
                   className={styles.virtual_reference}
+                  // @ts-expect-error(sa, 2021-6-21): can't use null as top and left, default to undefined
                   style={{ top: tooltipY, left: tooltipX }}
                 />
               </Portal>
@@ -94,6 +94,7 @@ export class WellTooltip extends React.Component<Props, State> {
             <Popper
               modifiers={{
                 offset: {
+                  // @ts-expect-error(sa, 2021-6-21): tooltipOffset might be null or undefined
                   offset: `0, ${tooltipOffset + WELL_BORDER_WIDTH * 2}`,
                 },
               }}

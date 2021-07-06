@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import compact from 'lodash/compact'
@@ -10,16 +9,15 @@ import {
   FONT_SIZE_BODY_1,
   FONT_WEIGHT_BOLD,
   TEXT_TRANSFORM_UPPERCASE,
-  type RobotWorkSpaceRenderProps,
+  RobotWorkSpaceRenderProps,
 } from '@opentrons/components'
 import { MODULES_WITH_COLLISION_ISSUES } from '@opentrons/step-generation'
 import {
   getLabwareHasQuirk,
   GEN_ONE_MULTI_PIPETTES,
-  type DeckSlot as DeckDefSlot,
-  type ModuleRealType,
+  DeckSlot as DeckDefSlot,
+  ModuleRealType,
 } from '@opentrons/shared-data'
-// $FlowFixMe(mc, 2021-03.15): ignore until TS conversion
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 import { PSEUDO_DECK_SLOTS } from '../../constants'
 import { i18n } from '../../localization'
@@ -27,14 +25,23 @@ import {
   getLabwareIsCompatible,
   getLabwareIsCustom,
 } from '../../utils/labwareModuleCompatibility'
-import { selectors as labwareDefSelectors } from '../../labware-defs'
+import {
+  selectors as labwareDefSelectors,
+  LabwareDefByDefURI,
+} from '../../labware-defs'
 import {
   getModuleVizDims,
   inferModuleOrientationFromSlot,
 } from './getModuleVizDims'
 
 import { selectors as featureFlagSelectors } from '../../feature-flags'
-import { getSlotsBlockedBySpanning, getSlotIsEmpty } from '../../step-forms'
+import {
+  getSlotsBlockedBySpanning,
+  getSlotIsEmpty,
+  InitialDeckSetup,
+  LabwareOnDeck as LabwareOnDeckType,
+  ModuleOnDeck,
+} from '../../step-forms'
 import { BrowseLabwareModal } from '../labware'
 import { ModuleViz } from './ModuleViz'
 import { ModuleTag } from './ModuleTag'
@@ -42,13 +49,7 @@ import { SlotWarning } from './SlotWarning'
 import { LabwareOnDeck } from './LabwareOnDeck'
 import { SlotControls, LabwareControls, DragPreview } from './LabwareOverlays'
 
-import type { TerminalItemId } from '../../steplist'
-import type {
-  InitialDeckSetup,
-  LabwareOnDeck as LabwareOnDeckType,
-  ModuleOnDeck,
-} from '../../step-forms'
-import type { LabwareDefByDefURI } from '../../labware-defs'
+import { TerminalItemId } from '../../steplist'
 
 import styles from './DeckSetup.css'
 
@@ -62,19 +63,18 @@ export const DECK_LAYER_BLOCKLIST = [
   'screwHoles',
 ]
 
-type Props = {|
-  selectedTerminalItemId: ?TerminalItemId,
-  handleClickOutside?: () => mixed,
-  drilledDown: boolean,
-  initialDeckSetup: InitialDeckSetup,
-|}
+export interface DeckSetupProps {
+  selectedTerminalItemId?: TerminalItemId | null
+  handleClickOutside?: () => unknown
+  drilledDown: boolean
+  initialDeckSetup: InitialDeckSetup
+}
 
-type ContentsProps = {|
-  ...RobotWorkSpaceRenderProps,
-  selectedTerminalItemId: ?TerminalItemId,
-  initialDeckSetup: InitialDeckSetup,
-  showGen1MultichannelCollisionWarnings: boolean,
-|}
+type ContentsProps = RobotWorkSpaceRenderProps & {
+  selectedTerminalItemId?: TerminalItemId | null
+  initialDeckSetup: InitialDeckSetup
+  showGen1MultichannelCollisionWarnings: boolean
+}
 
 export const VIEWBOX_MIN_X = -64
 export const VIEWBOX_MIN_Y = -10
@@ -110,18 +110,20 @@ const getSlotDefForModuleSlot = (
 const getModuleSlotDefs = (
   initialDeckSetup: InitialDeckSetup,
   deckSlots: { [slotId: string]: DeckDefSlot }
-): Array<DeckDefSlot> => {
+): DeckDefSlot[] => {
   return values(initialDeckSetup.modules).map((moduleOnDeck: ModuleOnDeck) =>
     getSlotDefForModuleSlot(moduleOnDeck, deckSlots)
   )
 }
 
-export const getSwapBlocked = (args: {
-  hoveredLabware: ?LabwareOnDeckType,
-  draggedLabware: ?LabwareOnDeckType,
-  modulesById: $PropertyType<InitialDeckSetup, 'modules'>,
-  customLabwareDefs: LabwareDefByDefURI,
-}): boolean => {
+export interface SwapBlockedArgs {
+  hoveredLabware?: LabwareOnDeckType | null
+  draggedLabware?: LabwareOnDeckType | null
+  modulesById: InitialDeckSetup['modules']
+  customLabwareDefs: LabwareDefByDefURI
+}
+
+export const getSwapBlocked = (args: SwapBlockedArgs): boolean => {
   const {
     hoveredLabware,
     draggedLabware,
@@ -132,9 +134,9 @@ export const getSwapBlocked = (args: {
     return false
   }
 
-  const sourceModuleType: ?ModuleRealType =
+  const sourceModuleType: ModuleRealType | null =
     modulesById[draggedLabware.slot]?.type || null
-  const destModuleType: ?ModuleRealType =
+  const destModuleType: ModuleRealType | null =
     modulesById[hoveredLabware.slot]?.type || null
 
   const draggedLabwareIsCustom = getLabwareIsCustom(
@@ -161,7 +163,7 @@ export const getSwapBlocked = (args: {
 
 // TODO IL 2020-01-12: to support dynamic labware/module movement during a protocol,
 // don't use initialDeckSetup here. Use some version of timelineFrameForActiveItem
-export const DeckSetupContents = (props: ContentsProps): React.Node => {
+export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
   const {
     initialDeckSetup,
     deckSlotsById,
@@ -176,14 +178,12 @@ export const DeckSetupContents = (props: ContentsProps): React.Node => {
   // hovered over**. The intrinsic state of `react-dnd` is not designed to handle that.
   // So we need to use our own state here to determine
   // whether swapping will be blocked due to labware<>module compat:
-  const [
-    hoveredLabware,
-    setHoveredLabware,
-  ] = React.useState<?LabwareOnDeckType>(null)
-  const [
-    draggedLabware,
-    setDraggedLabware,
-  ] = React.useState<?LabwareOnDeckType>(null)
+  const [hoveredLabware, setHoveredLabware] = React.useState<
+    LabwareOnDeckType | null | undefined
+  >(null)
+  const [draggedLabware, setDraggedLabware] = React.useState<
+    LabwareOnDeckType | null | undefined
+  >(null)
 
   const customLabwareDefs = useSelector(
     labwareDefSelectors.getCustomLabwareDefsByURI
@@ -203,31 +203,32 @@ export const DeckSetupContents = (props: ContentsProps): React.Node => {
   const slotsBlockedBySpanning = getSlotsBlockedBySpanning(
     props.initialDeckSetup
   )
-  const deckSlots: Array<DeckDefSlot> = values(deckSlotsById)
+  const deckSlots: DeckDefSlot[] = values(deckSlotsById)
   const moduleSlots = getModuleSlotDefs(initialDeckSetup, deckSlotsById)
   // NOTE: in these arrays of slots, order affects SVG render layering
   // labware can be in a module or on the deck
-  const labwareParentSlots: Array<DeckDefSlot> = [...deckSlots, ...moduleSlots]
+  const labwareParentSlots: DeckDefSlot[] = [...deckSlots, ...moduleSlots]
   // modules can be on the deck, including pseudo-slots (eg special 'spanning' slot for thermocycler position)
   const moduleParentSlots = [...deckSlots, ...values(PSEUDO_DECK_SLOTS)]
 
-  const allLabware: Array<LabwareOnDeckType> = Object.keys(
+  const allLabware: LabwareOnDeckType[] = Object.keys(
     initialDeckSetup.labware
-  ).reduce((acc, labwareId) => {
+  ).reduce<LabwareOnDeckType[]>((acc, labwareId) => {
     const labware = initialDeckSetup.labware[labwareId]
     return getLabwareHasQuirk(labware.def, 'fixedTrash')
       ? acc
       : [...acc, labware]
   }, [])
 
-  const allModules: Array<ModuleOnDeck> = values(initialDeckSetup.modules)
+  const allModules: ModuleOnDeck[] = values(initialDeckSetup.modules)
 
   // NOTE: naively hard-coded to show warning north of slots 1 or 3 when occupied by any module
-  const multichannelWarningSlots: Array<DeckDefSlot> = showGen1MultichannelCollisionWarnings
+  const multichannelWarningSlots: DeckDefSlot[] = showGen1MultichannelCollisionWarnings
     ? compact([
         (allModules.some(
           moduleOnDeck =>
             moduleOnDeck.slot === '1' &&
+            // @ts-expect-error(sa, 2021-6-21): ModuleModel is a super type of the elements in MODULES_WITH_COLLISION_ISSUES
             MODULES_WITH_COLLISION_ISSUES.includes(moduleOnDeck.model)
         ) &&
           deckSlotsById?.['4']) ||
@@ -235,6 +236,7 @@ export const DeckSetupContents = (props: ContentsProps): React.Node => {
         (allModules.some(
           moduleOnDeck =>
             moduleOnDeck.slot === '3' &&
+            // @ts-expect-error(sa, 2021-6-21): ModuleModel is a super type of the elements in MODULES_WITH_COLLISION_ISSUES
             MODULES_WITH_COLLISION_ISSUES.includes(moduleOnDeck.model)
         ) &&
           deckSlotsById?.['6']) ||
@@ -300,6 +302,7 @@ export const DeckSetupContents = (props: ContentsProps): React.Node => {
         )
         .map(slot => {
           return (
+            // @ts-expect-error (ce, 2021-06-21) once we upgrade to the react-dnd hooks api, and use react-redux hooks, typing this will be easier
             <SlotControls
               key={slot.id}
               slot={slot}
@@ -349,15 +352,15 @@ export const DeckSetupContents = (props: ContentsProps): React.Node => {
 }
 
 const getHasGen1MultiChannelPipette = (
-  pipettes: $PropertyType<InitialDeckSetup, 'pipettes'>
-) => {
+  pipettes: InitialDeckSetup['pipettes']
+): boolean => {
   const pipetteIds = Object.keys(pipettes)
   return pipetteIds.some(pipetteId =>
     GEN_ONE_MULTI_PIPETTES.includes(pipettes[pipetteId]?.name)
   )
 }
 
-export const DeckSetup = (props: Props): React.Node => {
+export const DeckSetup = (props: DeckSetupProps): JSX.Element => {
   const _disableCollisionWarnings = useSelector(
     featureFlagSelectors.getDisableModuleRestrictions
   )
@@ -369,7 +372,7 @@ export const DeckSetup = (props: Props): React.Node => {
     !_disableCollisionWarnings && _hasGen1MultichannelPipette
 
   const deckDef = React.useMemo(() => getDeckDefinitions()['ot2_standard'], [])
-  const wrapperRef = useOnClickOutside({
+  const wrapperRef: React.RefObject<HTMLDivElement> = useOnClickOutside({
     onClickOutside: props.handleClickOutside,
   })
 
@@ -404,7 +407,7 @@ export const DeckSetup = (props: Props): React.Node => {
   )
 }
 
-export const NullDeckState = (): React.Node => {
+export const NullDeckState = (): JSX.Element => {
   const deckDef = React.useMemo(() => getDeckDefinitions()['ot2_standard'], [])
 
   return (

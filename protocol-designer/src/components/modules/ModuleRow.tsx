@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { useDispatch } from 'react-redux'
 import upperFirst from 'lodash/upperFirst'
@@ -10,7 +9,7 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 import { i18n } from '../../localization'
-import { actions as stepFormActions } from '../../step-forms'
+import { actions as stepFormActions, ModuleOnDeck } from '../../step-forms'
 import {
   SPAN7_8_10_11_SLOT,
   DEFAULT_MODEL_FOR_MODULE_TYPE,
@@ -19,17 +18,19 @@ import { ModuleDiagram } from './ModuleDiagram'
 import { isModuleWithCollisionIssue } from './utils'
 import styles from './styles.css'
 
-import type { ModuleRealType } from '@opentrons/shared-data'
-import type { ModuleOnDeck } from '../../step-forms'
+import { ModuleRealType } from '@opentrons/shared-data'
 
-type Props = {|
-  moduleOnDeck?: ModuleOnDeck,
-  showCollisionWarnings?: boolean,
-  type: ModuleRealType,
-  openEditModuleModal: (moduleType: ModuleRealType, moduleId?: string) => mixed,
-|}
+interface Props {
+  moduleOnDeck?: ModuleOnDeck
+  showCollisionWarnings?: boolean
+  type: ModuleRealType
+  openEditModuleModal: (
+    moduleType: ModuleRealType,
+    moduleId?: string
+  ) => unknown
+}
 
-export function ModuleRow(props: Props): React.Node {
+export function ModuleRow(props: Props): JSX.Element {
   const { moduleOnDeck, openEditModuleModal, showCollisionWarnings } = props
   const type: ModuleRealType = moduleOnDeck?.type || props.type
 
@@ -41,8 +42,8 @@ export function ModuleRow(props: Props): React.Node {
   of SlotMap. Kept it here (for now?) because it spells out the different cases.
   */
   let slotDisplayName = null
-  let occupiedSlotsForMap: Array<string> = []
-  let collisionSlots: Array<string> = []
+  let occupiedSlotsForMap: string[] = []
+  let collisionSlots: string[] = []
   const moduleHasCollisionIssue = model
     ? isModuleWithCollisionIssue(model)
     : false

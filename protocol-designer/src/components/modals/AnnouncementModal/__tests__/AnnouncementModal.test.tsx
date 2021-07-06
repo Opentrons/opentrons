@@ -1,22 +1,21 @@
-// @flow
-
 import React from 'react'
 import { shallow } from 'enzyme'
 import { Modal, OutlineButton } from '@opentrons/components'
 import * as persist from '../../../../persist'
 import { AnnouncementModal } from '../'
 import * as announcements from '../announcements'
-import type { Announcement } from '../announcements'
+import { Announcement } from '../announcements'
 
-jest.mock('../../../../persist.js')
+jest.mock('../../../../persist')
 
 describe('AnnouncementModal', () => {
   const announcementKey = 'newType'
-  const getLocalStorageItemMock: JestMockFn<[string], mixed> =
-    persist.getLocalStorageItem
+  const getLocalStorageItemMock = persist.getLocalStorageItem as jest.MockedFunction<
+    typeof persist.getLocalStorageItem
+  >
 
   const announcementsMock: {
-    announcements: Array<Announcement>,
+    announcements: Announcement[]
   } = announcements
 
   beforeEach(() => {

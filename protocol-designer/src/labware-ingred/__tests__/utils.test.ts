@@ -1,5 +1,4 @@
 import { getNextNickname } from '../utils'
-
 describe('getNextNickname', () => {
   const testCases = [
     {
@@ -57,7 +56,6 @@ describe('getNextNickname', () => {
       expected: 'cool (1)',
     },
   ]
-
   testCases.forEach(({ desc, allNicknames, proposed, expected }) => {
     it(desc, () => {
       const result = getNextNickname(allNicknames, proposed)

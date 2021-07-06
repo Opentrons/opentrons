@@ -1,26 +1,26 @@
-// @flow
 import { createSelector } from 'reselect'
 import last from 'lodash/last'
 import uniq from 'lodash/uniq'
-
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { getDefaultsForStepType } from '../../steplist/formLevel/getDefaultsForStepType'
 import {
+  SubstepIdentifier,
+  TerminalItemId,
   PRESAVED_STEP_ID,
-  type SubstepIdentifier,
-  type TerminalItemId,
 } from '../../steplist/types'
+
 import { getLabwareOnModule } from '../modules/utils'
 import {
+  SelectableItem,
+  StepsState,
+  CollapsedStepsState,
+  HoverableItem,
   initialSelectedItemState,
-  type SelectableItem,
-  type StepsState,
-  type CollapsedStepsState,
-  type HoverableItem,
   SINGLE_STEP_SELECTION_TYPE,
   TERMINAL_ITEM_SELECTION_TYPE,
   MULTI_STEP_SELECTION_TYPE,
 } from './reducers'
+
 import {
   getAspirateLabwareDisabledFields,
   getDispenseLabwareDisabledFields,
@@ -31,23 +31,22 @@ import {
   getPipetteDifferentDisabledFields,
   getLabwareDisabledFields,
 } from './utils'
-import type {
+import {
   CountPerStepType,
   FormData,
   StepFieldName,
   StepIdType,
   StepType,
 } from '../../form-types'
-import type { BaseState, Selector } from '../../types'
-
+import { BaseState, Selector } from '../../types'
 export const rootSelector = (state: BaseState): StepsState => state.ui.steps
-
 // ======= Selectors ===============================================
-
 // NOTE: when the selected step is deleted, we need to fall back to the last step
 // (or the initial selected item, if there are no more saved steps).
 // Ideally this would happen in the selectedItem reducer itself,
 // but it's not easy to feed orderedStepIds into that reducer.
+
+// @ts-expect-error(sa, 2021-6-15): lodash/last might return undefined, change line 55 to pull out the last element directly
 const getSelectedItem: Selector<SelectableItem> = createSelector(
   rootSelector,
   stepFormSelectors.getOrderedStepIds,
@@ -61,49 +60,43 @@ const getSelectedItem: Selector<SelectableItem> = createSelector(
     return initialSelectedItemState
   }
 )
-
 export const getSelectedStepId: Selector<StepIdType | null> = createSelector(
   getSelectedItem,
   item => (item.selectionType === SINGLE_STEP_SELECTION_TYPE ? item.id : null)
 )
-
 export const getSelectedTerminalItemId: Selector<TerminalItemId | null> = createSelector(
   getSelectedItem,
   item => (item.selectionType === TERMINAL_ITEM_SELECTION_TYPE ? item.id : null)
 )
-
 export const getIsMultiSelectMode: Selector<boolean> = createSelector(
   getSelectedItem,
   item => {
     return item.selectionType === MULTI_STEP_SELECTION_TYPE
   }
 )
-
-export const getMultiSelectItemIds: Selector<Array<StepIdType> | null> = createSelector(
-  getSelectedItem,
-  item => {
-    if (item && item.selectionType === MULTI_STEP_SELECTION_TYPE) {
-      return item.ids
-    }
-    return null
+export const getMultiSelectItemIds: Selector<
+  StepIdType[] | null
+> = createSelector(getSelectedItem, item => {
+  if (item && item.selectionType === MULTI_STEP_SELECTION_TYPE) {
+    return item.ids
   }
-)
 
+  return null
+})
 export const getMultiSelectLastSelected: Selector<StepIdType | null> = createSelector(
   getSelectedItem,
   item => {
     if (item.selectionType === MULTI_STEP_SELECTION_TYPE) {
       return item.lastSelected
     }
+
     return null
   }
 )
-
 export const getHoveredItem: Selector<HoverableItem | null> = createSelector(
   rootSelector,
   (state: StepsState) => state.hoveredItem
 )
-
 export const getHoveredStepId: Selector<StepIdType | null> = createSelector(
   getHoveredItem,
   item =>
@@ -111,12 +104,13 @@ export const getHoveredStepId: Selector<StepIdType | null> = createSelector(
 )
 
 /** Array of labware (labwareId's) involved in hovered Step, or [] */
-export const getHoveredStepLabware: Selector<Array<string>> = createSelector(
+export const getHoveredStepLabware: Selector<string[]> = createSelector(
   stepFormSelectors.getArgsAndErrorsByStepId,
   getHoveredStepId,
   stepFormSelectors.getInitialDeckSetup,
   (allStepArgsAndErrors, hoveredStep, initialDeckState) => {
-    const blank = []
+    const blank: string[] = []
+
     if (!hoveredStep || !allStepArgsAndErrors[hoveredStep]) {
       return blank
     }
@@ -135,7 +129,6 @@ export const getHoveredStepLabware: Selector<Array<string>> = createSelector(
       // source and dest labware
       const src = stepArgs.sourceLabware
       const dest = stepArgs.destLabware
-
       return [src, dest]
     }
 
@@ -143,9 +136,9 @@ export const getHoveredStepLabware: Selector<Array<string>> = createSelector(
       // only 1 labware
       return [stepArgs.labware]
     }
-
+    // @ts-expect-error(sa, 2021-6-15): type narrow stepArgs.module
     if (stepArgs.module) {
-      // $FlowFixMe(sa, 2021-05-10): ignore until TS conversion
+      // @ts-expect-error(sa, 2021-6-15): this expect error should not be necessary after type narrowing above
       const labware = getLabwareOnModule(initialDeckState, stepArgs.module)
       return labware ? [labware.id] : []
     }
@@ -161,18 +154,15 @@ export const getHoveredStepLabware: Selector<Array<string>> = createSelector(
     return blank
   }
 )
-
 export const getHoveredTerminalItemId: Selector<TerminalItemId | null> = createSelector(
   getHoveredItem,
   item =>
     item && item.selectionType === TERMINAL_ITEM_SELECTION_TYPE ? item.id : null
 )
-
 export const getHoveredSubstep: Selector<SubstepIdentifier> = createSelector(
   rootSelector,
   (state: StepsState) => state.hoveredSubstep
 )
-
 // Hovered or selected item. Hovered has priority. Used to tell deck what to display
 export const getActiveItem: Selector<HoverableItem | null> = createSelector(
   getSelectedItem,
@@ -187,18 +177,17 @@ export const getActiveItem: Selector<HoverableItem | null> = createSelector(
     }
   }
 )
-
 // TODO: BC 2018-12-17 refactor as react state
 export const getCollapsedSteps: Selector<CollapsedStepsState> = createSelector(
   rootSelector,
   (state: StepsState) => state.collapsedSteps
 )
+interface StepTitleInfo {
+  stepName: string
+  stepType: StepType
+}
 
-type StepTitleInfo = {|
-  stepName: string,
-  stepType: StepType,
-|}
-const _stepToTitleInfo = (stepForm: FormData) => ({
+const _stepToTitleInfo = (stepForm: FormData): StepTitleInfo => ({
   stepName: stepForm.stepName,
   stepType: stepForm.stepType,
 })
@@ -220,21 +209,19 @@ export const getSelectedStepTitleInfo: Selector<StepTitleInfo | null> = createSe
     return _stepToTitleInfo(savedStepForms[selectedStepId])
   }
 )
-
 export const getWellSelectionLabwareKey: Selector<
   string | null
 > = createSelector(
   rootSelector,
   (state: StepsState) => state.wellSelectionLabwareKey
 )
-export type MultiselectFieldValues = {
-  [fieldName: StepFieldName]: {|
-    value?: any,
-    isIndeterminate: boolean,
-  |},
-  ...
-}
-
+export type MultiselectFieldValues = Record<
+  StepFieldName,
+  {
+    value?: any
+    isIndeterminate: boolean
+  }
+>
 export const _getSavedMultiSelectFieldValues: Selector<MultiselectFieldValues | null> = createSelector(
   stepFormSelectors.getSavedStepForms,
   getMultiSelectItemIds,
@@ -242,16 +229,18 @@ export const _getSavedMultiSelectFieldValues: Selector<MultiselectFieldValues | 
     if (!multiSelectItemIds) return null
     const forms = multiSelectItemIds.map(id => savedStepForms[id])
     const stepTypes = uniq(forms.map(form => form.stepType))
+
     if (stepTypes.length !== 1) {
       return null
     }
+
     const stepType: StepType = stepTypes[0]
+
     if (stepType !== 'moveLiquid' && stepType !== 'mix') {
       return null
     }
 
     const allFieldNames = Object.keys(getDefaultsForStepType(stepType))
-
     return allFieldNames.reduce(
       (acc: MultiselectFieldValues, fieldName: StepFieldName) => {
         const firstFieldValue = forms[0][fieldName]
@@ -276,7 +265,6 @@ export const _getSavedMultiSelectFieldValues: Selector<MultiselectFieldValues | 
     )
   }
 )
-
 export const getMultiSelectFieldValues: Selector<MultiselectFieldValues | null> = createSelector(
   _getSavedMultiSelectFieldValues,
   stepFormSelectors.getBatchEditFieldChanges,
@@ -286,7 +274,9 @@ export const getMultiSelectFieldValues: Selector<MultiselectFieldValues | null> 
       return null
     }
 
-    const multiselectChanges = Object.keys(changes).reduce((acc, name) => {
+    const multiselectChanges = Object.keys(
+      changes
+    ).reduce<MultiselectFieldValues>((acc, name) => {
       acc[name] = {
         value: changes[name],
         isIndeterminate: false,
@@ -296,20 +286,16 @@ export const getMultiSelectFieldValues: Selector<MultiselectFieldValues | null> 
     return { ...savedValues, ...multiselectChanges }
   }
 )
-
 // NOTE: the value is the tooltip text explaining why the field is disabled
 type TooltipText = string
-export type DisabledFields = {
-  [fieldName: string]: TooltipText,
-}
+export type DisabledFields = Record<string, TooltipText>
 export const getMultiSelectDisabledFields: Selector<DisabledFields | null> = createSelector(
   stepFormSelectors.getSavedStepForms,
   getMultiSelectItemIds,
   (savedStepForms, multiSelectItemIds) => {
     if (!multiSelectItemIds) return null
-    const forms: Array<FormData> = multiSelectItemIds.map(
-      id => savedStepForms[id]
-    )
+    const forms: FormData[] = multiSelectItemIds.map(id => savedStepForms[id])
+
     if (forms.every(form => form.stepType === 'moveLiquid')) {
       return getMoveLiquidMultiSelectDisabledFields(forms)
     } else if (forms.every(form => form.stepType === 'mix')) {
@@ -325,31 +311,31 @@ export const getCountPerStepType: Selector<CountPerStepType> = createSelector(
   stepFormSelectors.getSavedStepForms,
   (stepIds, allSteps) => {
     if (stepIds === null) return {}
-
     const steps = stepIds.map(id => allSteps[id])
-
     const countPerStepType = steps.reduce<CountPerStepType>((acc, step) => {
       const { stepType } = step
+      // @ts-expect-error(sa, 2021-6-15): cannot type narrow this way in TS
       const newCount = acc[stepType] ? acc[stepType] + 1 : 1
       acc[stepType] = newCount
       return acc
     }, {})
-
     return countPerStepType
   }
 )
-
 export const getBatchEditSelectedStepTypes: Selector<
-  Array<StepType>
+  StepType[]
 > = createSelector(getCountPerStepType, countPerStepType => {
   return uniq(
-    Object.keys(countPerStepType).filter(
+    (Object.keys(countPerStepType) as StepType[]).filter(
+      // @ts-expect-error(sa, 2021-6-15): TS thinks countPerStepType[stepType] might be undefined because CountPerStepType is a partial record
       stepType => countPerStepType[stepType] > 0
     )
   ).sort()
 })
 
-function getMoveLiquidMultiSelectDisabledFields(forms: Array<FormData>) {
+function getMoveLiquidMultiSelectDisabledFields(
+  forms: FormData[]
+): DisabledFields {
   const {
     pipettesDifferent,
     aspirateLabwareDifferent,
@@ -385,13 +371,10 @@ function getMoveLiquidMultiSelectDisabledFields(forms: Array<FormData>) {
       includesMultiDispense: false,
     }
   )
-
   const disabledFields: DisabledFields = {
     ...(pipettesDifferent && getPipetteDifferentDisabledFields('moveLiquid')),
     ...(aspirateLabwareDifferent && getAspirateLabwareDisabledFields()),
-    ...(dispenseLabwareDifferent &&
-      // $FlowIssue(sa, 2021-01-13): https://github.com/facebook/flow/issues/8186
-      getDispenseLabwareDisabledFields()),
+    ...(dispenseLabwareDifferent && getDispenseLabwareDisabledFields()),
     ...(includesMultiAspirate && getMultiAspiratePathDisabledFields()),
     ...(includesMultiDispense && getMultiDispensePathDisabledFields()),
     ...(includesMultiAspirate &&
@@ -401,11 +384,10 @@ function getMoveLiquidMultiSelectDisabledFields(forms: Array<FormData>) {
       pipettesDifferent &&
       getPipetteDifferentAndMultiDispensePathFields()),
   }
-
   return disabledFields
 }
 
-function getMixMultiSelectDisabledFields(forms: Array<FormData>) {
+function getMixMultiSelectDisabledFields(forms: FormData[]): DisabledFields {
   const { pipettesDifferent, labwareDifferent } = forms.reduce(
     (acc, form) => ({
       lastPipette: form.pipette,
@@ -423,10 +405,8 @@ function getMixMultiSelectDisabledFields(forms: Array<FormData>) {
     }
   )
   const disabledFields: DisabledFields = {
-    // $FlowIssue(sa, 2021-04-01): https://github.com/facebook/flow/issues/8186
     ...(pipettesDifferent && getPipetteDifferentDisabledFields('mix')),
     ...(labwareDifferent && getLabwareDisabledFields()),
   }
-
   return disabledFields
 }

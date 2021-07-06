@@ -1,31 +1,33 @@
-// @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { AlertModal, CheckboxField, OutlineButton } from '@opentrons/components'
 import { i18n } from '../../localization'
 import { actions as stepsActions } from '../../ui/steps'
-import type { TerminalItemId } from '../../steplist'
-import { actions, selectors } from '../../tutorial'
+import { TerminalItemId } from '../../steplist'
+import { actions, selectors, HintKey } from '../../tutorial'
 import { Portal } from '../portals/MainPageModalPortal'
 import styles from './hints.css'
 import EXAMPLE_ADD_LIQUIDS_IMAGE from '../../images/example_add_liquids.png'
 import EXAMPLE_WATCH_LIQUIDS_MOVE_IMAGE from '../../images/example_watch_liquids_move.png'
 import EXAMPLE_BATCH_EDIT_IMAGE from '../../images/announcements/multi_select.gif'
-import type { HintKey } from '../../tutorial'
-import type { BaseState, ThunkDispatch } from '../../types'
+import { BaseState, ThunkDispatch } from '../../types'
 
-type SP = {| hintKey: ?HintKey |}
-type DP = {|
-  removeHint: (HintKey, boolean) => mixed,
-  selectTerminalItem: TerminalItemId => mixed,
-|}
-type Props = {| ...SP, ...DP |}
+interface SP {
+  hintKey?: HintKey | null
+}
+interface DP {
+  removeHint: (key: HintKey, rememberDismissal: boolean) => unknown
+  selectTerminalItem: (item: TerminalItemId) => unknown
+}
+type Props = SP & DP
 
-type State = { rememberDismissal: boolean }
+interface State {
+  rememberDismissal: boolean
+}
 
 // List of hints that should have /!\ gray AlertModal header
 // (versus calmer non-alert header)
-const HINT_IS_ALERT: Array<HintKey> = ['add_liquids_and_labware']
+const HINT_IS_ALERT: HintKey[] = ['add_liquids_and_labware']
 
 class HintsComponent extends React.Component<Props, State> {
   constructor(props: Props) {
@@ -33,16 +35,16 @@ class HintsComponent extends React.Component<Props, State> {
     this.state = { rememberDismissal: false }
   }
 
-  toggleRememberDismissal = () => {
+  toggleRememberDismissal = (): void => {
     this.setState({ rememberDismissal: !this.state.rememberDismissal })
   }
 
-  makeHandleCloseClick = (hintKey: HintKey) => {
+  makeHandleCloseClick = (hintKey: HintKey): (() => void) => {
     const { rememberDismissal } = this.state
     return () => this.props.removeHint(hintKey, rememberDismissal)
   }
 
-  renderHintContents = (hintKey: HintKey) => {
+  renderHintContents = (hintKey: HintKey): JSX.Element | null => {
     // Only hints that have no outside effects should go here.
     // For hints that have an effect, use BlockingHint.
     switch (hintKey) {
@@ -151,7 +153,7 @@ class HintsComponent extends React.Component<Props, State> {
     }
   }
 
-  render() {
+  render(): React.ReactNode {
     const { hintKey } = this.props
     if (!hintKey) return null
 
@@ -189,21 +191,14 @@ class HintsComponent extends React.Component<Props, State> {
 const mapStateToProps = (state: BaseState): SP => ({
   hintKey: selectors.getHint(state),
 })
-const mapDispatchToProps = (dispatch: ThunkDispatch<*>): DP => ({
+const mapDispatchToProps = (dispatch: ThunkDispatch<any>): DP => ({
   removeHint: (hintKey, rememberDismissal) =>
     dispatch(actions.removeHint(hintKey, rememberDismissal)),
   selectTerminalItem: terminalId =>
     dispatch(stepsActions.selectTerminalItem(terminalId)),
 })
 
-export const Hints: React.AbstractComponent<{||}> = connect<
-  Props,
-  {||},
-  SP,
-  DP,
-  _,
-  _
->(
+export const Hints = connect(
   mapStateToProps,
   mapDispatchToProps
 )(HintsComponent)

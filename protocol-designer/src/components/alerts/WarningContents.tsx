@@ -1,15 +1,16 @@
-// @flow
 import * as React from 'react'
 import { i18n } from '../../localization'
 import { START_TERMINAL_ITEM_ID } from '../../steplist'
-import type { AlertLevel } from './types'
+import { AlertLevel } from './types'
 import { TerminalItemLink } from '../steplist/TerminalItem'
 
-type WarningContentsProps = {
-  warningType: string,
-  level: AlertLevel,
+interface WarningContentsProps {
+  warningType: string
+  level: AlertLevel
 }
-export const WarningContents = (props: WarningContentsProps): React.Node => {
+export const WarningContents = (
+  props: WarningContentsProps
+): JSX.Element | null => {
   if (props.level === 'timeline') {
     switch (props.warningType) {
       case 'ASPIRATE_FROM_PRISTINE_WELL':

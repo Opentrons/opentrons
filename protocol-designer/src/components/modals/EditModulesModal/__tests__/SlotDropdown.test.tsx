@@ -1,27 +1,28 @@
-// @flow
-
 import React from 'react'
 import * as Formik from 'formik'
 import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
 import { DropdownField } from '@opentrons/components'
-import { SlotDropdown } from '../SlotDropdown'
+import { SlotDropdown, SlotDropdownProps } from '../SlotDropdown'
 
 jest.mock('formik')
 
-const useField: JestMockFn<[any], $Call<typeof Formik.useField, any>> =
-  Formik.useField
+const useField = Formik.useField as jest.MockedFunction<typeof Formik.useField>
 
 describe('Slot Dropdown', () => {
-  let mockStore
-  let props
+  let mockStore: any
+  let props: SlotDropdownProps
 
   const onChange = jest.fn()
   const onBlur = jest.fn()
   const setValue = jest.fn()
   const setTouched = jest.fn()
 
-  const mockFieldOnce = (value, error, touched) => {
+  const mockFieldOnce = (
+    value: string | null | undefined,
+    error: string | null | undefined,
+    touched: boolean
+  ) => {
     const fieldProps: any = { value, onChange, onBlur }
     const fieldMeta: any = { error, touched }
     const fieldHelpers: any = { setValue, setTouched }
@@ -52,7 +53,7 @@ describe('Slot Dropdown', () => {
     jest.resetAllMocks()
   })
 
-  const render = props =>
+  const render = (props: SlotDropdownProps) =>
     mount(
       <Provider store={mockStore}>
         <SlotDropdown {...props} />

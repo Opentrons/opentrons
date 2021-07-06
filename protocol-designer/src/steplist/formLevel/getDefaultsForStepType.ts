@@ -1,4 +1,3 @@
-// @flow
 import {
   DEFAULT_CHANGE_TIP_OPTION,
   DEFAULT_MM_FROM_BOTTOM_DISPENSE,
@@ -7,11 +6,10 @@ import {
   DEFAULT_DELAY_SECONDS,
   FIXED_TRASH_ID,
 } from '../../constants'
-import type { StepType, StepFieldName } from '../../form-types'
-
+import { StepType, StepFieldName } from '../../form-types'
 export function getDefaultsForStepType(
   stepType: StepType
-): { [StepFieldName]: any } {
+): Record<StepFieldName, any> {
   switch (stepType) {
     case 'mix':
       return {
@@ -38,6 +36,7 @@ export function getDefaultsForStepType(
         mix_touchTip_checkbox: false,
         mix_touchTip_mmFromBottom: null,
       }
+
     case 'moveLiquid':
       return {
         pipette: null,
@@ -45,7 +44,6 @@ export function getDefaultsForStepType(
         changeTip: DEFAULT_CHANGE_TIP_OPTION,
         path: 'single',
         aspirate_wells_grouped: false,
-
         aspirate_flowRate: null,
         aspirate_labware: null,
         aspirate_wells: [],
@@ -57,7 +55,6 @@ export function getDefaultsForStepType(
         aspirate_mmFromBottom: null,
         aspirate_touchTip_checkbox: false,
         aspirate_touchTip_mmFromBottom: null,
-
         dispense_flowRate: null,
         dispense_labware: null,
         dispense_wells: [],
@@ -69,14 +66,11 @@ export function getDefaultsForStepType(
         dispense_mmFromBottom: null,
         dispense_touchTip_checkbox: false,
         dispense_touchTip_mmFromBottom: null,
-
         disposalVolume_checkbox: false,
         disposalVolume_volume: null,
-
         blowout_checkbox: false,
         blowout_location: FIXED_TRASH_ID,
         preWetTip: false,
-
         aspirate_airGap_checkbox: false,
         aspirate_airGap_volume: null,
         aspirate_delay_checkbox: false,
@@ -88,6 +82,7 @@ export function getDefaultsForStepType(
         dispense_delay_seconds: `${DEFAULT_DELAY_SECONDS}`,
         dispense_delay_mmFromBottom: null,
       }
+
     case 'pause':
       return {
         pauseAction: null,
@@ -98,24 +93,28 @@ export function getDefaultsForStepType(
         moduleId: null,
         pauseTemperature: null,
       }
+
     case 'manualIntervention':
       return {
         labwareLocationUpdate: {},
         pipetteLocationUpdate: {},
         moduleLocationUpdate: {},
       }
+
     case 'magnet':
       return {
         moduleId: null,
         magnetAction: null,
         engageHeight: null,
       }
+
     case 'temperature':
       return {
         moduleId: null,
         setTemperature: null,
         targetTemperature: null,
       }
+
     case 'thermocycler':
       return {
         thermocyclerFormType: null,
@@ -135,6 +134,7 @@ export function getDefaultsForStepType(
         lidTargetTempHold: null,
         lidOpenHold: null,
       }
+
     default:
       return {}
   }

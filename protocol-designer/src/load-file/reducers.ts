@@ -1,12 +1,13 @@
-// @flow
-import { combineReducers, type Reducer } from 'redux'
+import { Reducer, combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
-import type { Action } from '../types'
-import type { FileUploadMessage, LoadFileAction } from './types'
-import type { FileUploadMessageAction } from './actions'
-
+import { Action } from '../types'
+import { FileUploadMessage, LoadFileAction } from './types'
+import { FileUploadMessageAction } from './actions'
 // Keep track of file upload errors / messages
-type FileUploadMessageState = ?FileUploadMessage
+type FileUploadMessageState = FileUploadMessage | null | undefined
+
+// @ts-expect-error(sb, 2021-6-17): cannot use string literals as action type
+// TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
 const fileUploadMessage: Reducer<FileUploadMessageState, any> = handleActions(
   {
     FILE_UPLOAD_MESSAGE: (
@@ -30,14 +31,19 @@ const fileUploadMessage: Reducer<FileUploadMessageState, any> = handleActions(
 // "changes to the protocol", those action types need to be updated here.
 const unsavedChanges = (
   state: boolean = false,
-  action: { type: string, payload: any }
+  action: {
+    type: string
+    payload: any
+  }
 ): boolean => {
   switch (action.type) {
     case 'LOAD_FILE': {
       return action.payload.didMigrate // no unsaved changes unless migration happened
     }
+
     case 'SAVE_PROTOCOL_FILE':
       return false
+
     case 'CREATE_NEW_PROTOCOL':
     case 'DISMISS_FORM_WARNING':
     case 'DISMISS_TIMELINE_WARNING':
@@ -61,6 +67,7 @@ const unsavedChanges = (
     case 'DELETE_MODULE':
     case 'EDIT_MODULE':
       return true
+
     default:
       return state
   }
@@ -70,12 +77,10 @@ export const _allReducers = {
   fileUploadMessage,
   unsavedChanges,
 }
-
-export type RootState = {|
-  fileUploadMessage: FileUploadMessageState,
-  unsavedChanges: boolean,
-|}
-
+export interface RootState {
+  fileUploadMessage: FileUploadMessageState
+  unsavedChanges: boolean
+}
 export const rootReducer: Reducer<RootState, Action> = combineReducers(
   _allReducers
 )

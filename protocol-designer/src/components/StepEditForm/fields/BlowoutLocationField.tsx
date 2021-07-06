@@ -1,21 +1,19 @@
-// @flow
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { DropdownField, type Options } from '@opentrons/components'
+import { DropdownField, Options } from '@opentrons/components'
 import cx from 'classnames'
 import { selectors as uiLabwareSelectors } from '../../../ui/labware'
 import styles from '../StepEditForm.css'
-import type { FieldProps } from '../types'
+import { FieldProps } from '../types'
 
-type BlowoutLocationDropdownProps = {|
-  ...FieldProps,
-  className?: string,
-  options: Options,
-|}
+type BlowoutLocationDropdownProps = FieldProps & {
+  className?: string
+  options: Options
+}
 
 export const BlowoutLocationField = (
   props: BlowoutLocationDropdownProps
-): React.Node => {
+): JSX.Element => {
   const {
     className,
     disabled,
@@ -39,7 +37,7 @@ export const BlowoutLocationField = (
       onBlur={onFieldBlur}
       onFocus={onFieldFocus}
       value={value ? String(value) : null}
-      onChange={(e: SyntheticEvent<HTMLSelectElement>) => {
+      onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
         updateValue(e.currentTarget.value)
       }}
     />

@@ -1,22 +1,18 @@
-// @flow
-import * as React from 'react'
 import { connect } from 'react-redux'
 import assert from 'assert'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
-import { LabwareDetailsCard as LabwareDetailsCardComponent } from './LabwareDetailsCard'
+import {
+  LabwareDetailsCard as LabwareDetailsCardComponent,
+  Props as LabwareDetailsCardProps,
+} from './LabwareDetailsCard'
 import { selectors as stepFormSelectors } from '../../../step-forms'
 import { selectors as uiLabwareSelectors } from '../../../ui/labware'
 import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
 import * as labwareIngredActions from '../../../labware-ingred/actions'
-import type { ElementProps } from 'react'
-import type { BaseState, ThunkDispatch } from '../../../types'
-
-type Props = ElementProps<typeof LabwareDetailsCardComponent>
-
-type SP = {|
-  ...$Diff<$Exact<Props>, {| renameLabware: * |}>,
-  _labwareId?: string,
-|}
+import { BaseState, ThunkDispatch } from '../../../types'
+type SP = Omit<LabwareDetailsCardProps, 'renameLabware'> & {
+  _labwareId?: string
+}
 
 function mapStateToProps(state: BaseState): SP {
   const labwareNicknamesById = uiLabwareSelectors.getLabwareNicknamesById(state)
@@ -26,11 +22,11 @@ function mapStateToProps(state: BaseState): SP {
     getLabwareDisplayName(
       stepFormSelectors.getLabwareEntities(state)[labwareId].def
     )
-
   assert(
     labwareId,
     'Expected labware id to exist in connected labware details card'
   )
+
   if (!labwareId || !labwareDefDisplayName) {
     return {
       labwareDefDisplayName: '?',
@@ -47,38 +43,35 @@ function mapStateToProps(state: BaseState): SP {
 
 function mergeProps(
   stateProps: SP,
-  dispatchProps: { dispatch: ThunkDispatch<*> }
-): Props {
+  dispatchProps: {
+    dispatch: ThunkDispatch<any>
+  }
+): LabwareDetailsCardProps {
   const dispatch = dispatchProps.dispatch
   const { _labwareId, ...passThruProps } = stateProps
 
-  const renameLabware = (name: string) => {
+  const renameLabware = (name: string): void => {
     assert(
       _labwareId,
       'renameLabware in LabwareDetailsCard expected a labwareId'
     )
+
     if (_labwareId) {
       dispatch(
-        labwareIngredActions.renameLabware({ labwareId: _labwareId, name })
+        labwareIngredActions.renameLabware({
+          labwareId: _labwareId,
+          name,
+        })
       )
     }
   }
 
-  return {
-    ...passThruProps,
-    renameLabware,
-  }
+  return { ...passThruProps, renameLabware }
 }
 
-export const LabwareDetailsCard: React.AbstractComponent<{||}> = connect<
-  Props,
-  {||},
-  SP,
-  {||},
-  _,
-  _
->(
+export const LabwareDetailsCard = connect(
   mapStateToProps,
+  // @ts-expect-error(sa, 2021-6-21): TODO: refactor to use hooks api
   null,
   mergeProps
 )(LabwareDetailsCardComponent)

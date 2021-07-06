@@ -1,20 +1,20 @@
-// @flow
 import assert from 'assert'
-import * as React from 'react'
 import { connect } from 'react-redux'
 import {
   selectors as labwareDefSelectors,
   actions as labwareDefActions,
 } from '../../../labware-defs'
-import { LabwareUploadMessageModal as LabwareUploadMessageModalComponent } from './LabwareUploadMessageModal'
-import type { Dispatch } from 'redux'
-import type { BaseState } from '../../../types'
+import {
+  LabwareUploadMessageModal as LabwareUploadMessageModalComponent,
+  LabwareUploadMessageModalProps,
+} from './LabwareUploadMessageModal'
+import { Dispatch } from 'redux'
+import { BaseState } from '../../../types'
 
-type Props = React.ElementProps<typeof LabwareUploadMessageModalComponent>
-
-type SP = {|
-  message: $PropertyType<Props, 'message'>,
-|}
+type Props = LabwareUploadMessageModalProps
+interface SP {
+  message: Props['message']
+}
 
 function mapStateToProps(state: BaseState): SP {
   return {
@@ -24,7 +24,9 @@ function mapStateToProps(state: BaseState): SP {
 
 function mergeProps(
   stateProps: SP,
-  dispatchProps: { dispatch: Dispatch<any> }
+  dispatchProps: {
+    dispatch: Dispatch
+  }
 ): Props {
   const { dispatch } = dispatchProps
   const { message } = stateProps
@@ -53,15 +55,9 @@ function mergeProps(
   }
 }
 
-export const LabwareUploadMessageModal: React.AbstractComponent<{||}> = connect<
-  Props,
-  {||},
-  SP,
-  _,
-  _,
-  _
->(
+export const LabwareUploadMessageModal = connect(
   mapStateToProps,
+  // @ts-expect-error(sa, 2021-6-21): TODO: refactor to use hooks api
   null,
   mergeProps
 )(LabwareUploadMessageModalComponent)

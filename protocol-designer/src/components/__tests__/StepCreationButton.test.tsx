@@ -1,4 +1,3 @@
-// @flow
 import React from 'react'
 import { Provider } from 'react-redux'
 import { act } from 'react-dom/test-utils'
@@ -34,7 +33,7 @@ const getInitialDeckSetupMock = stepFormSelectors.getInitialDeckSetup
 const getIsMultiSelectModeMock = getIsMultiSelectMode
 
 describe('StepCreationButton', () => {
-  let store
+  let store: any
 
   beforeEach(() => {
     store = mockStore()
@@ -147,7 +146,7 @@ describe('StepCreationButton', () => {
               model: TEMPERATURE_MODULE_V1,
               type: TEMPERATURE_MODULE_TYPE,
               slot: '3',
-            },
+            } as any,
           },
         })
       const wrapper = render()

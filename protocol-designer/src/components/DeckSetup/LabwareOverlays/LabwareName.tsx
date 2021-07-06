@@ -1,22 +1,21 @@
-// @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { LabwareNameOverlay } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
-import type { BaseState, ThunkDispatch } from '../../../types'
+import { BaseState } from '../../../types'
 import { selectors as uiLabwareSelectors } from '../../../ui/labware'
-import type { LabwareOnDeck } from '../../../step-forms'
-type OP = {|
-  labwareOnDeck: LabwareOnDeck,
-|}
+import { LabwareOnDeck } from '../../../step-forms'
+interface OP {
+  labwareOnDeck: LabwareOnDeck
+}
 
-type SP = {|
-  nickname: ?string,
-|}
+interface SP {
+  nickname?: string | null
+}
 
-type Props = { ...OP, ...SP }
+type Props = OP & SP
 
-const NameOverlay = (props: Props) => {
+const NameOverlay = (props: Props): JSX.Element => {
   const { labwareOnDeck, nickname } = props
   const title = nickname || getLabwareDisplayName(labwareOnDeck.def)
   // TODO(mc, 2019-06-27): µL to uL replacement needed to handle CSS capitalization
@@ -30,11 +29,4 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
   }
 }
 
-export const LabwareName: React.AbstractComponent<OP> = connect<
-  Props,
-  OP,
-  SP,
-  _,
-  BaseState,
-  ThunkDispatch<*>
->(mapStateToProps)(NameOverlay)
+export const LabwareName = connect(mapStateToProps)(NameOverlay)

@@ -1,14 +1,15 @@
-// @flow
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { Card } from '@opentrons/components'
 import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
+  ModuleRealType,
 } from '@opentrons/shared-data'
 import {
   selectors as stepFormSelectors,
   getIsCrashablePipetteSelected,
+  ModulesForEditModulesCard,
 } from '../../step-forms'
 import { selectors as featureFlagSelectors } from '../../feature-flags'
 import { SUPPORTED_MODULE_TYPES } from '../../modules'
@@ -16,15 +17,16 @@ import { CrashInfoBox } from './CrashInfoBox'
 import { ModuleRow } from './ModuleRow'
 import { isModuleWithCollisionIssue } from './utils'
 import styles from './styles.css'
-import type { ModuleRealType } from '@opentrons/shared-data'
-import type { ModulesForEditModulesCard } from '../../step-forms'
 
-type Props = {
-  modules: ModulesForEditModulesCard,
-  openEditModuleModal: (moduleType: ModuleRealType, moduleId?: string) => mixed,
+export interface Props {
+  modules: ModulesForEditModulesCard
+  openEditModuleModal: (
+    moduleType: ModuleRealType,
+    moduleId?: string
+  ) => unknown
 }
 
-export function EditModulesCard(props: Props): React.Node {
+export function EditModulesCard(props: Props): JSX.Element {
   const { modules, openEditModuleModal } = props
 
   const pipettesByMount = useSelector(

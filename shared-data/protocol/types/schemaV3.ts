@@ -1,3 +1,4 @@
+import { PipetteName } from '../../js'
 import type {
   DeckSlotId,
   LabwareDefinition2,
@@ -5,7 +6,7 @@ import type {
 } from '../../js/types'
 
 // NOTE: this is an enum type in the spec, but it's inconvenient to flow-type them.
-type PipetteName = string
+// type PipetteName = string
 
 export interface FilePipette {
   mount: Mount

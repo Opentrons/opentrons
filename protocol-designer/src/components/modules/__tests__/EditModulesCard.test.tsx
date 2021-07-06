@@ -1,5 +1,3 @@
-// @flow
-
 import React from 'react'
 import { mount } from 'enzyme'
 import { Provider } from 'react-redux'
@@ -12,32 +10,33 @@ import {
 } from '@opentrons/shared-data'
 import { TEMPERATURE_DEACTIVATED } from '@opentrons/step-generation'
 import { selectors as featureFlagSelectors } from '../../../feature-flags'
-import { selectors as stepFormSelectors } from '../../../step-forms'
+import {
+  ModuleOnDeck,
+  selectors as stepFormSelectors,
+} from '../../../step-forms'
+import { FormPipette } from '../../../step-forms/types'
 import { SUPPORTED_MODULE_TYPES } from '../../../modules'
 import { EditModulesCard } from '../EditModulesCard'
 import { CrashInfoBox } from '../CrashInfoBox'
 import { ModuleRow } from '../ModuleRow'
 
-import type { BaseState } from '../../../types'
-import type { FormPipettesByMount } from '../../../step-forms'
-
 jest.mock('../../../feature-flags')
 jest.mock('../../../step-forms/selectors')
 
-const getDisableModuleRestrictionsMock: JestMockFn<[BaseState], ?boolean> =
-  featureFlagSelectors.getDisableModuleRestrictions
-const getPipettesForEditPipetteFormMock: JestMockFn<
-  [BaseState],
-  FormPipettesByMount
-> = stepFormSelectors.getPipettesForEditPipetteForm
+const getDisableModuleRestrictionsMock = featureFlagSelectors.getDisableModuleRestrictions as jest.MockedFunction<
+  typeof featureFlagSelectors.getDisableModuleRestrictions
+>
+const getPipettesForEditPipetteFormMock = stepFormSelectors.getPipettesForEditPipetteForm as jest.MockedFunction<
+  typeof stepFormSelectors.getPipettesForEditPipetteForm
+>
 
 describe('EditModulesCard', () => {
-  let store,
-    crashableMagneticModule,
-    nonCrashableMagneticModule,
-    crashablePipette,
-    noncrashablePipette,
-    props
+  let store: any
+  let crashableMagneticModule: ModuleOnDeck | undefined
+  let nonCrashableMagneticModule: ModuleOnDeck | undefined
+  let crashablePipette: FormPipette
+  let noncrashablePipette: FormPipette
+  let props: React.ComponentProps<typeof EditModulesCard>
   beforeEach(() => {
     crashableMagneticModule = {
       id: 'magnet123',
@@ -84,7 +83,7 @@ describe('EditModulesCard', () => {
     }
   })
 
-  function render(renderProps) {
+  function render(renderProps: React.ComponentProps<typeof EditModulesCard>) {
     return mount(
       <Provider store={store}>
         <EditModulesCard {...renderProps} />

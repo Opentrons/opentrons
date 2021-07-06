@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import {
@@ -8,7 +7,7 @@ import {
 import { DeckSetup } from './DeckSetup'
 import { NullDeckState } from './DeckSetup/DeckSetup'
 
-export const DeckSetupManager = (): React.Node => {
+export const DeckSetupManager = (): JSX.Element => {
   const batchEditSelectedStepTypes = useSelector(getBatchEditSelectedStepTypes)
   const hoveredItem = useSelector(getHoveredItem)
 

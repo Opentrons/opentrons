@@ -1,4 +1,3 @@
-// @flow
 import { createSelector } from 'reselect'
 import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
@@ -10,32 +9,28 @@ import {
 import { FIXED_TRASH_ID } from '../../constants'
 import { i18n } from '../../localization'
 import * as stepFormSelectors from '../../step-forms/selectors'
-
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import { getModuleUnderLabware } from '../modules/utils'
-import type { Options } from '@opentrons/components'
-import type { LabwareEntity } from '@opentrons/step-generation'
-import type { Selector } from '../../types'
-
-export const getLabwareNicknamesById: Selector<{
-  [labwareId: string]: string,
-}> = createSelector(
+import { Options } from '@opentrons/components'
+import { LabwareEntity } from '@opentrons/step-generation'
+import { Selector } from '../../types'
+export const getLabwareNicknamesById: Selector<
+  Record<string, string>
+> = createSelector(
   stepFormSelectors.getLabwareEntities,
   labwareIngredSelectors.getLabwareNameInfo,
-  (labwareEntities, displayLabware): { [labwareId: string]: string } =>
+  (labwareEntities, displayLabware): Record<string, string> =>
     mapValues(
       labwareEntities,
       (labwareEntity: LabwareEntity, id: string): string =>
         displayLabware[id]?.nickname || getLabwareDisplayName(labwareEntity.def)
     )
 )
-
 export const _sortLabwareDropdownOptions = (options: Options): Options =>
   options.sort((a, b) => {
     // special case for fixed trash (always at the bottom of the list)
     if (a.value === FIXED_TRASH_ID) return 1
     if (b.value === FIXED_TRASH_ID) return -1
-
     // sort by name everything else by name
     return a.name.localeCompare(b.name)
   })

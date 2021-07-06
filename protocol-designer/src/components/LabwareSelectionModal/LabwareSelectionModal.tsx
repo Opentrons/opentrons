@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import startCase from 'lodash/startCase'
 import reduce from 'lodash/reduce'
@@ -14,8 +13,8 @@ import {
   TEMPERATURE_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
-  type LabwareDefinition2,
-  type ModuleRealType,
+  LabwareDefinition2,
+  ModuleRealType,
 } from '@opentrons/shared-data'
 import { i18n } from '../../localization'
 import { SPAN7_8_10_11_SLOT } from '../../constants'
@@ -28,28 +27,28 @@ import { KnowledgeBaseLink } from '../KnowledgeBaseLink'
 import { LabwareItem } from './LabwareItem'
 import { LabwarePreview } from './LabwarePreview'
 import styles from './styles.css'
-import type { DeckSlot } from '../../types'
-import type { LabwareDefByDefURI } from '../../labware-defs'
+import { DeckSlot } from '../../types'
+import { LabwareDefByDefURI } from '../../labware-defs'
 
-type Props = {|
-  onClose: (e?: any) => mixed,
-  onUploadLabware: (event: SyntheticInputEvent<HTMLInputElement>) => mixed,
-  selectLabware: (containerType: string) => mixed,
-  customLabwareDefs: LabwareDefByDefURI,
+export interface Props {
+  onClose: (e?: any) => unknown
+  onUploadLabware: (event: React.ChangeEvent<HTMLInputElement>) => unknown
+  selectLabware: (containerType: string) => unknown
+  customLabwareDefs: LabwareDefByDefURI
   /** the slot you're literally adding labware to (may be a module slot) */
-  slot: ?DeckSlot,
+  slot?: DeckSlot | null
   /** if adding to a module, the slot of the parent (for display) */
-  parentSlot: ?DeckSlot,
+  parentSlot?: DeckSlot | null
   /** if adding to a module, the module's type */
-  moduleType: ?ModuleRealType,
+  moduleType?: ModuleRealType | null
   /** tipracks that may be added to deck (depends on pipette<>tiprack assignment) */
-  permittedTipracks: Array<string>,
-|}
+  permittedTipracks: string[]
+}
 
 const LABWARE_CREATOR_URL = 'https://labware.opentrons.com/create'
 const CUSTOM_CATEGORY = 'custom'
 
-const orderedCategories: Array<string> = [
+const orderedCategories: string[] = [
   'tipRack',
   'tubeRack',
   'wellPlate',
@@ -58,7 +57,7 @@ const orderedCategories: Array<string> = [
   // 'trash', // NOTE: trash intentionally hidden
 ]
 
-const RECOMMENDED_LABWARE_BY_MODULE: { [ModuleRealType]: Array<string> } = {
+const RECOMMENDED_LABWARE_BY_MODULE: { [K in ModuleRealType]: string[] } = {
   [TEMPERATURE_MODULE_TYPE]: [
     'opentrons_24_aluminumblock_generic_2ml_screwcap',
     'opentrons_96_aluminumblock_biorad_wellplate_200ul',
@@ -76,7 +75,7 @@ const RECOMMENDED_LABWARE_BY_MODULE: { [ModuleRealType]: Array<string> } = {
 
 export const getLabwareIsRecommended = (
   def: LabwareDefinition2,
-  moduleType: ?ModuleRealType
+  moduleType?: ModuleRealType | null
 ): boolean =>
   moduleType
     ? RECOMMENDED_LABWARE_BY_MODULE[moduleType].includes(
@@ -84,7 +83,7 @@ export const getLabwareIsRecommended = (
       )
     : false
 
-export const LabwareSelectionModal = (props: Props): React.Node => {
+export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
   const {
     customLabwareDefs,
     permittedTipracks,
@@ -99,10 +98,9 @@ export const LabwareSelectionModal = (props: Props): React.Node => {
   const [selectedCategory, setSelectedCategory] = React.useState<string | null>(
     null
   )
-  const [
-    previewedLabware,
-    setPreviewedLabware,
-  ] = React.useState<?LabwareDefinition2>(null)
+  const [previewedLabware, setPreviewedLabware] = React.useState<
+    LabwareDefinition2 | null | undefined
+  >(null)
   const [filterRecommended, setFilterRecommended] = React.useState<boolean>(
     false
   )
@@ -163,7 +161,7 @@ export const LabwareSelectionModal = (props: Props): React.Node => {
     [filterRecommended, getLabwareCompatible, moduleType]
   )
 
-  const customLabwareURIs: Array<string> = React.useMemo(
+  const customLabwareURIs: string[] = React.useMemo(
     () => Object.keys(customLabwareDefs),
     [customLabwareDefs]
   )
@@ -172,10 +170,10 @@ export const LabwareSelectionModal = (props: Props): React.Node => {
     const defs = getOnlyLatestDefs()
     return reduce<
       LabwareDefByDefURI,
-      { [category: string]: Array<LabwareDefinition2> }
+      { [category: string]: LabwareDefinition2[] }
     >(
       defs,
-      (acc, def: $Values<typeof defs>) => {
+      (acc, def: typeof defs[keyof typeof defs]) => {
         const category: string = def.metadata.displayCategory
         // filter out non-permitted tipracks
         if (
@@ -211,7 +209,7 @@ export const LabwareSelectionModal = (props: Props): React.Node => {
     [labwareByCategory, getLabwareDisabled]
   )
 
-  const wrapperRef = useOnClickOutside({
+  const wrapperRef: React.RefObject<HTMLDivElement> = useOnClickOutside({
     onClickOutside: () => {
       // don't close when clicking on the custom labware hint
       if (!enqueuedLabwareType) {
@@ -233,7 +231,9 @@ export const LabwareSelectionModal = (props: Props): React.Node => {
       <div className={styles.filters_section}>
         <CheckboxField
           className={styles.filter_checkbox}
-          onChange={e => setFilterRecommended(e.currentTarget.checked)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setFilterRecommended(e.currentTarget.checked)
+          }
           value={filterRecommended}
         />
         <Icon className={styles.icon} name="check-decagram" />
@@ -248,10 +248,9 @@ export const LabwareSelectionModal = (props: Props): React.Node => {
     </div>
   ) : null
 
-  let moduleCompatibility: $PropertyType<
-    React.ElementProps<typeof LabwarePreview>,
-    'moduleCompatibility'
-  > = null
+  let moduleCompatibility: React.ComponentProps<
+    typeof LabwarePreview
+  >['moduleCompatibility'] = null
   if (previewedLabware && moduleType) {
     if (getLabwareIsRecommended(previewedLabware, moduleType)) {
       moduleCompatibility = 'recommended'
@@ -296,6 +295,7 @@ export const LabwareSelectionModal = (props: Props): React.Node => {
                   onMouseEnter={() =>
                     setPreviewedLabware(customLabwareDefs[labwareURI])
                   }
+                  // @ts-expect-error(sa, 2021-6-22): need to pass in a nullsy value
                   onMouseLeave={() => setPreviewedLabware()}
                 />
               ))}
@@ -329,6 +329,7 @@ export const LabwareSelectionModal = (props: Props): React.Node => {
                             labwareDef={labwareDef}
                             selectLabware={selectLabware}
                             onMouseEnter={() => setPreviewedLabware(labwareDef)}
+                            // @ts-expect-error(sa, 2021-6-22): setPreviewedLabware expects an argument (even if nullsy)
                             onMouseLeave={() => setPreviewedLabware()}
                           />
                         )

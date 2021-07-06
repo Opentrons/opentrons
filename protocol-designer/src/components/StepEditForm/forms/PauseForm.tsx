@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import cx from 'classnames'
 import { useSelector } from 'react-redux'
@@ -21,9 +20,9 @@ import { TextField, RadioGroupField, StepFormDropdown } from '../fields'
 import { getSingleSelectDisabledTooltip } from '../utils'
 import styles from '../StepEditForm.css'
 
-import type { StepFormProps } from '../types'
+import { StepFormProps } from '../types'
 
-export const PauseForm = (props: StepFormProps): React.Node => {
+export const PauseForm = (props: StepFormProps): JSX.Element => {
   const moduleLabwareOptions = useSelector(
     uiModuleSelectors.getTemperatureLabwareOptions
   )
@@ -154,8 +153,8 @@ export const PauseForm = (props: StepFormProps): React.Node => {
             >
               <textarea
                 className={styles.textarea_field}
-                value={propsForFields['pauseMessage'].value}
-                onChange={(e: SyntheticInputEvent<*>) =>
+                value={propsForFields['pauseMessage'].value as string}
+                onChange={(e: React.ChangeEvent<any>) =>
                   propsForFields['pauseMessage'].updateValue(
                     e.currentTarget.value
                   )

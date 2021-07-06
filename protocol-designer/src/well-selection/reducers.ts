@@ -1,19 +1,16 @@
-// @flow
 import omit from 'lodash/omit'
-import { combineReducers } from 'redux'
+import { combineReducers, Reducer } from 'redux'
 import { handleActions } from 'redux-actions'
-
-import type { Reducer } from 'redux'
-import type { WellGroup } from '@opentrons/components'
-import type { Action } from '../types'
-import type {
+import { WellGroup } from '@opentrons/components'
+import { Action } from '../types'
+import {
   HighlightWellsAction,
   SelectWellsAction,
   DeselectWellsAction,
 } from './actions'
-type SelectedWellsState = {
-  highlighted: WellGroup,
-  selected: WellGroup,
+interface SelectedWellsState {
+  highlighted: WellGroup
+  selected: WellGroup
 }
 
 function deleteWells(
@@ -31,18 +28,18 @@ const selectedWellsInitialState: SelectedWellsState = {
   highlighted: {},
   selected: {},
 }
-const selectedWells = handleActions(
+// @ts-expect-error(sa, 2021-6-21): cannot use string literals as action type
+// TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
+const selectedWells: Reducer<SelectedWellsState, Action> = handleActions(
   {
     HIGHLIGHT_WELLS: (
       state,
       action: HighlightWellsAction
     ): SelectedWellsState => ({ ...state, highlighted: action.payload }),
-
     SELECT_WELLS: (state, action: SelectWellsAction): SelectedWellsState => ({
       highlighted: {},
       selected: { ...state.selected, ...action.payload },
     }),
-
     DESELECT_WELLS: (
       state,
       action: DeselectWellsAction
@@ -58,11 +55,9 @@ const selectedWells = handleActions(
   },
   selectedWellsInitialState
 )
-
-export type RootState = {|
-  selectedWells: SelectedWellsState,
-|}
-
+export interface RootState {
+  selectedWells: SelectedWellsState
+}
 export const rootReducer: Reducer<RootState, Action> = combineReducers({
   selectedWells,
 })

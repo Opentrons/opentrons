@@ -1,4 +1,3 @@
-// @flow
 import { when, resetAllWhenMocks } from 'jest-when'
 import { reduxActionToAnalyticsEvent } from '../middleware'
 import { getFileMetadata } from '../../file-data/selectors'
@@ -7,19 +6,23 @@ import {
   getPipetteEntities,
   getSavedStepForms,
 } from '../../step-forms/selectors'
-import type { FileMetadataFields } from '../../file-data/types'
-import type { SaveStepFormsMultiAction } from '../../step-forms/actions'
+import { SaveStepFormsMultiAction } from '../../step-forms/actions'
 
 jest.mock('../../file-data/selectors')
 jest.mock('../../step-forms/selectors')
 
-const getFileMetadataMock: JestMockFn<any, FileMetadataFields> = getFileMetadata
-const getArgsAndErrorsByStepIdMock: JestMockFn<
-  any,
-  any
-> = getArgsAndErrorsByStepId
-const getPipetteEntitiesMock: JestMockFn<any, any> = getPipetteEntities
-const getSavedStepFormsMock: JestMockFn<any, any> = getSavedStepForms
+const getFileMetadataMock = getFileMetadata as jest.MockedFunction<
+  typeof getFileMetadata
+>
+const getArgsAndErrorsByStepIdMock = getArgsAndErrorsByStepId as jest.MockedFunction<
+  typeof getArgsAndErrorsByStepId
+>
+const getPipetteEntitiesMock = getPipetteEntities as jest.MockedFunction<
+  typeof getPipetteEntities
+>
+const getSavedStepFormsMock = getSavedStepForms as jest.MockedFunction<
+  typeof getSavedStepForms
+>
 let fooState: any
 beforeEach(() => {
   fooState = {}
@@ -52,6 +55,7 @@ describe('reduxActionToAnalyticsEvent', () => {
     getArgsAndErrorsByStepIdMock.mockReturnValue({
       stepId: {
         stepArgs: {
+          // @ts-expect-error id is not on type CommandCreatorArgs
           id: 'stepId',
           pipette: 'pipetteId',
           otherField: 123,
@@ -60,6 +64,7 @@ describe('reduxActionToAnalyticsEvent', () => {
       },
     })
     getPipetteEntitiesMock.mockReturnValue({
+      // @ts-expect-error 'some_pipette_spec_name' isn't a valid pipette type
       pipetteId: { name: 'some_pipette_spec_name' },
     })
 
@@ -110,7 +115,9 @@ describe('reduxActionToAnalyticsEvent', () => {
       when(getSavedStepFormsMock)
         .calledWith(expect.anything())
         .mockReturnValue({
+          // @ts-expect-error missing fields from test object
           id_1: { stepType: 'moveLiquid' },
+          // @ts-expect-error missing fields from test object
           id_2: { stepType: 'moveLiquid' },
         })
 
@@ -138,7 +145,9 @@ describe('reduxActionToAnalyticsEvent', () => {
       when(getSavedStepFormsMock)
         .calledWith(expect.anything())
         .mockReturnValue({
+          // @ts-expect-error missing fields from test object
           id_1: { stepType: 'mix' },
+          // @ts-expect-error missing fields from test object
           id_2: { stepType: 'mix' },
         })
 
@@ -166,7 +175,9 @@ describe('reduxActionToAnalyticsEvent', () => {
       when(getSavedStepFormsMock)
         .calledWith(expect.anything())
         .mockReturnValue({
+          // @ts-expect-error missing fields from test object
           id_1: { stepType: 'mix' },
+          // @ts-expect-error missing fields from test object
           id_2: { stepType: 'moveLiquid' },
         })
 

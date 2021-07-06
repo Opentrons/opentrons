@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { selectors as uiModuleSelectors } from '../../../ui/modules'
@@ -7,9 +6,9 @@ import { i18n } from '../../../localization'
 
 import { StepFormDropdown, RadioGroupField, TextField } from '../fields'
 import styles from '../StepEditForm.css'
-import type { StepFormProps } from '../types'
+import { StepFormProps } from '../types'
 
-export const TemperatureForm = (props: StepFormProps): React.Node => {
+export const TemperatureForm = (props: StepFormProps): JSX.Element => {
   const moduleLabwareOptions = useSelector(
     uiModuleSelectors.getTemperatureLabwareOptions
   )

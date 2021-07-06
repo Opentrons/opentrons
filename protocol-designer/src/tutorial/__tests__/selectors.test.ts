@@ -1,12 +1,9 @@
-// @flow
 import { THERMOCYCLER_MODULE_TYPE } from '@opentrons/shared-data'
 import { shouldShowCoolingHint as _shouldShowCoolingHint } from '../selectors'
-import type { ThermocyclerModuleState } from '../../step-forms/types'
+import { ThermocyclerModuleState } from '../../step-forms/types'
 // TODO(IL, 2020-05-19): Flow doesn't have type for resultFunc
 const shouldShowCoolingHint: any = _shouldShowCoolingHint
-
 const tcModuleId = 'tcModuleId'
-
 describe('shouldShowCoolingHint', () => {
   const testCases = [
     {
@@ -46,7 +43,6 @@ describe('shouldShowCoolingHint', () => {
       expected: false,
     },
   ]
-
   testCases.forEach(
     ({ testName, prevLidTemp, nextLidTemp, formStepType, expected }) => {
       it(testName, () => {
@@ -57,7 +53,13 @@ describe('shouldShowCoolingHint', () => {
           blockTargetTemp: null,
         }
         const prevTimelineFrame = {
-          robotState: { modules: { [tcModuleId]: { moduleState } } },
+          robotState: {
+            modules: {
+              [tcModuleId]: {
+                moduleState,
+              },
+            },
+          },
         }
         const unsavedForm = {
           stepType: 'thermocycler',

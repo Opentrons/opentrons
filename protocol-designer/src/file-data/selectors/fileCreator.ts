@@ -1,4 +1,3 @@
-// @flow
 import { createSelector } from 'reselect'
 import flatMap from 'lodash/flatMap'
 import isEmpty from 'lodash/isEmpty'
@@ -7,7 +6,10 @@ import uniq from 'lodash/uniq'
 import { getFileMetadata } from './fileFields'
 import { getInitialRobotState, getRobotStateTimeline } from './commands'
 import { selectors as dismissSelectors } from '../../dismiss'
-import { selectors as labwareDefSelectors } from '../../labware-defs'
+import {
+  selectors as labwareDefSelectors,
+  LabwareDefByDefURI,
+} from '../../labware-defs'
 import { selectors as ingredSelectors } from '../../labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { selectors as uiLabwareSelectors } from '../../ui/labware'
@@ -17,34 +19,30 @@ import {
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
   DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
 } from '../../constants'
-import type {
+import {
   ModuleEntity,
   PipetteEntity,
   LabwareEntities,
   PipetteEntities,
   Timeline,
 } from '@opentrons/step-generation'
-import type {
+import {
   FilePipette,
   FileLabware,
   FileModule,
-} from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
-import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV6'
-import type { LabwareDefByDefURI } from '../../labware-defs'
-import type { Selector } from '../../types'
-import type { PDProtocolFile } from '../../file-types'
-
+} from '@opentrons/shared-data/protocol/types/schemaV4'
+import { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
+import { Selector } from '../../types'
+import { PDProtocolFile } from '../../file-types'
 // TODO: BC: 2018-02-21 uncomment this assert, causes test failures
 // assert(!isEmpty(process.env.OT_PD_VERSION), 'Could not find application version!')
 if (isEmpty(process.env.OT_PD_VERSION))
   console.warn('Could not find application version!')
 const applicationVersion: string = process.env.OT_PD_VERSION || ''
-
 // Internal release date: this should never be read programatically,
 // it just helps us humans quickly identify what build a user was using
 // when we look at saved protocols (without requiring us to trace thru git logs)
 const _internalAppBuildDate = process.env.OT_PD_BUILD_DATE
-
 // A labware definition is considered "in use" and should be included in
 // the protocol file if it either...
 // 1. is present on the deck in initial deck setup
@@ -54,18 +52,16 @@ export const getLabwareDefinitionsInUse = (
   pipettes: PipetteEntities,
   allLabwareDefsByURI: LabwareDefByDefURI
 ): LabwareDefByDefURI => {
-  const labwareDefURIsOnDeck: Array<string> = Object.keys(labware).map(
+  const labwareDefURIsOnDeck: string[] = Object.keys(labware).map(
     (labwareId: string) => labware[labwareId].labwareDefURI
   )
-  const tiprackDefURIsInUse: Array<string> = Object.keys(pipettes)
+  const tiprackDefURIsInUse: string[] = Object.keys(pipettes)
     .map(id => pipettes[id])
     .map((pipetteEntity: PipetteEntity) => pipetteEntity.tiprackDefURI)
-
   const labwareDefURIsInUse = uniq([
     ...tiprackDefURIsInUse,
     ...labwareDefURIsOnDeck,
   ])
-
   return labwareDefURIsInUse.reduce<LabwareDefByDefURI>(
     (acc, labwareDefURI: string) => ({
       ...acc,
@@ -98,8 +94,10 @@ export const getRobotStateTimelineWithoutAirGapDispenseCommand: Selector<Timelin
       ...frame,
       commands: frame.commands.map(command => {
         if (command.command === 'dispenseAirGap') {
-          return { ...command, command: 'dispense' }
+          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+          return { ...command, command: 'dispense' } as Command
         }
+
         return command
       }),
     }))
@@ -131,6 +129,7 @@ export const getRequiresAtLeastV4: Selector<boolean> = createSelector(
 // for users in terms of managing robot stack upgrades, so we will force v5
 const _requiresV5 = (command: Command): boolean =>
   command.command === 'moveToWell' || command.command === 'airGap'
+
 export const getRequiresAtLeastV5: Selector<boolean> = createSelector(
   getRobotStateTimelineWithoutAirGapDispenseCommand,
   robotStateTimeline => {
@@ -152,8 +151,7 @@ export const getExportedFileSchemaVersion: Selector<number> = createSelector(
     }
   }
 )
-
-// $FlowFixMe(IL, 2020-03-02): presence of non-v3 commands should make 'isV4Protocol' true
+// @ts-expect-error(IL, 2020-03-02): presence of non-v3 commands should make 'isV4Protocol' true
 export const createFile: Selector<PDProtocolFile> = createSelector(
   getFileMetadata,
   getInitialRobotState,
@@ -190,22 +188,20 @@ export const createFile: Selector<PDProtocolFile> = createSelector(
     const { author, description, created } = fileMetadata
     const name = fileMetadata.protocolName || 'untitled'
     const lastModified = fileMetadata.lastModified
-
     const pipettes = mapValues(
       initialRobotState.pipettes,
       (
-        pipette: $Values<typeof initialRobotState.pipettes>,
+        pipette: typeof initialRobotState.pipettes[keyof typeof initialRobotState.pipettes],
         pipetteId: string
       ): FilePipette => ({
         mount: pipette.mount,
         name: pipetteEntities[pipetteId].name,
       })
     )
-
-    const labware: { [labwareId: string]: FileLabware } = mapValues(
+    const labware: Record<string, FileLabware> = mapValues(
       initialRobotState.labware,
       (
-        l: $Values<typeof initialRobotState.labware>,
+        l: typeof initialRobotState.labware[keyof typeof initialRobotState.labware],
         labwareId: string
       ): FileLabware => ({
         slot: l.slot,
@@ -213,33 +209,28 @@ export const createFile: Selector<PDProtocolFile> = createSelector(
         definitionId: labwareEntities[labwareId].labwareDefURI,
       })
     )
-
-    const modules: { [moduleId: string]: FileModule } = mapValues(
+    const modules: Record<string, FileModule> = mapValues(
       moduleEntities,
       (moduleEntity: ModuleEntity, moduleId: string): FileModule => ({
         slot: initialRobotState.modules[moduleId].slot,
         model: moduleEntity.model,
       })
     )
-
     // TODO: Ian 2018-07-10 allow user to save steps in JSON file, even if those
     // step never have saved forms.
     // (We could just export the `steps` reducer, but we've sunset it)
     const savedOrderedStepIds = orderedStepIds.filter(
       stepId => savedStepForms[stepId]
     )
-
     const labwareDefinitions = getLabwareDefinitionsInUse(
       labwareEntities,
       pipetteEntities,
       labwareDefsByURI
     )
-
-    const commands: Array<Command> = flatMap(
+    const commands: Command[] = flatMap(
       robotStateTimeline.timeline,
       timelineFrame => timelineFrame.commands
     )
-
     const protocolFile = {
       metadata: {
         protocolName: name,
@@ -247,13 +238,11 @@ export const createFile: Selector<PDProtocolFile> = createSelector(
         description,
         created,
         lastModified,
-
         // TODO LATER
         category: null,
         subcategory: null,
         tags: [],
       },
-
       designerApplication: {
         name: 'opentrons/protocol-designer',
         version: applicationVersion,
@@ -270,7 +259,9 @@ export const createFile: Selector<PDProtocolFile> = createSelector(
           },
           pipetteTiprackAssignments: mapValues(
             pipetteEntities,
-            (p: $Values<typeof pipetteEntities>): ?string => p.tiprackDefURI
+            (
+              p: typeof pipetteEntities[keyof typeof pipetteEntities]
+            ): string | null | undefined => p.tiprackDefURI
           ),
           dismissedWarnings,
           ingredients,
@@ -279,11 +270,9 @@ export const createFile: Selector<PDProtocolFile> = createSelector(
           orderedStepIds: savedOrderedStepIds,
         },
       },
-
       robot: {
         model: 'OT-2 Standard',
       },
-
       pipettes,
       labware,
       labwareDefinitions,
@@ -306,11 +295,7 @@ export const createFile: Selector<PDProtocolFile> = createSelector(
         commands,
       }
     } else {
-      return {
-        ...protocolFile,
-        schemaVersion: 3,
-        commands,
-      }
+      return { ...protocolFile, schemaVersion: 3, commands }
     }
   }
 )

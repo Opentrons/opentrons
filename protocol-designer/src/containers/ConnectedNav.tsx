@@ -1,24 +1,25 @@
-// @flow
 import * as React from 'react'
-import type { ThunkDispatch, BaseState } from '../types'
+import { ThunkDispatch, BaseState } from '../types'
 import { connect } from 'react-redux'
 
 import { KNOWLEDGEBASE_ROOT_URL } from '../components/KnowledgeBaseLink'
 import { NavTab, TabbedNavBar, OutsideLinkTab } from '@opentrons/components'
 import { i18n } from '../localization'
-import { type Page, actions, selectors } from '../navigation'
+import { Page, actions, selectors } from '../navigation'
 import { selectors as fileSelectors } from '../file-data'
 
-type SP = {|
-  currentPage: Page,
-  currentProtocolExists: boolean,
-|}
+interface SP {
+  currentPage: Page
+  currentProtocolExists: boolean
+}
 
-type DP = {| handleClick: Page => (e: ?SyntheticEvent<>) => void |}
+interface DP {
+  handleClick: (page: Page) => React.MouseEventHandler
+}
 
-type Props = {| ...SP, ...DP |}
+type Props = SP & DP
 
-function Nav(props: Props) {
+function Nav(props: Props): JSX.Element {
   const noCurrentProtocol = !props.currentProtocolExists
   return (
     <TabbedNavBar
@@ -80,7 +81,7 @@ function mapStateToProps(state: BaseState): SP {
   }
 }
 
-function mapDispatchToProps(dispatch: ThunkDispatch<*>): DP {
+function mapDispatchToProps(dispatch: ThunkDispatch<any>): DP {
   return {
     handleClick: (pageName: Page) => () => {
       dispatch(actions.navigateToPage(pageName))
@@ -88,14 +89,4 @@ function mapDispatchToProps(dispatch: ThunkDispatch<*>): DP {
   }
 }
 
-export const ConnectedNav: React.AbstractComponent<{||}> = connect<
-  Props,
-  {||},
-  SP,
-  DP,
-  _,
-  _
->(
-  mapStateToProps,
-  mapDispatchToProps
-)(Nav)
+export const ConnectedNav = connect(mapStateToProps, mapDispatchToProps)(Nav)

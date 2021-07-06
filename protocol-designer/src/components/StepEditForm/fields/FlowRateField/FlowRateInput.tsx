@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import round from 'lodash/round'
 import {
@@ -12,31 +11,30 @@ import { Portal } from '../../../portals/MainPageModalPortal'
 import modalStyles from '../../../modals/modal.css'
 import stepFormStyles from '../../StepEditForm.css'
 import styles from './FlowRateInput.css'
-import type { FieldProps } from '../../types'
+import { FieldProps } from '../../types'
 
 const DEFAULT_LABEL = i18n.t('form.step_edit_form.field.flow_rate.label')
 const DECIMALS_ALLOWED = 1
 
 /** When flow rate is falsey (including 0), it means 'use default' */
-export type FlowRateInputProps = {|
-  ...FieldProps,
-  defaultFlowRate: ?number,
-  flowRateType: 'aspirate' | 'dispense',
-  label: ?string,
-  minFlowRate: number,
-  maxFlowRate: number,
-  pipetteDisplayName: ?string,
-  className?: string,
-|}
+export interface FlowRateInputProps extends FieldProps {
+  defaultFlowRate?: number | null
+  flowRateType: 'aspirate' | 'dispense'
+  label?: string | null
+  minFlowRate: number
+  maxFlowRate: number
+  pipetteDisplayName?: string | null
+  className?: string
+}
 
-type State = {|
-  isPristine: boolean,
-  modalFlowRate: ?string,
-  modalUseDefault: boolean,
-  showModal: boolean,
-|}
+interface State {
+  isPristine: boolean
+  modalFlowRate?: string | null
+  modalUseDefault: boolean
+  showModal: boolean
+}
 
-export const FlowRateInput = (props: FlowRateInputProps): React.Node => {
+export const FlowRateInput = (props: FlowRateInputProps): JSX.Element => {
   const {
     className,
     defaultFlowRate,
@@ -57,21 +55,21 @@ export const FlowRateInput = (props: FlowRateInputProps): React.Node => {
     showModal: false,
   }
 
-  const [isPristine, setIsPristine] = React.useState<
-    $PropertyType<State, 'isPristine'>
-  >(initialState.isPristine)
+  const [isPristine, setIsPristine] = React.useState<State['isPristine']>(
+    initialState.isPristine
+  )
 
   const [modalFlowRate, setModalFlowRate] = React.useState<
-    $PropertyType<State, 'modalFlowRate'>
+    State['modalFlowRate']
   >(initialState.modalFlowRate)
 
   const [modalUseDefault, setModalUseDefault] = React.useState<
-    $PropertyType<State, 'modalUseDefault'>
+    State['modalUseDefault']
   >(initialState.modalUseDefault)
 
-  const [showModal, setShowModal] = React.useState<
-    $PropertyType<State, 'showModal'>
-  >(initialState.showModal)
+  const [showModal, setShowModal] = React.useState<State['showModal']>(
+    initialState.showModal
+  )
 
   const resetModalState = (): void => {
     setShowModal(initialState.showModal)
@@ -96,11 +94,11 @@ export const FlowRateInput = (props: FlowRateInputProps): React.Node => {
     }
   }
 
-  const handleChangeRadio = (e: SyntheticInputEvent<>): void => {
+  const handleChangeRadio = (e: React.ChangeEvent<HTMLSelectElement>): void => {
     setModalUseDefault(e.target.value !== 'custom')
   }
 
-  const handleChangeNumber = (e: SyntheticInputEvent<>) => {
+  const handleChangeNumber = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const value = e.target.value
     if (value === '' || value === '.' || !Number.isNaN(Number(value))) {
       setModalFlowRate(value)

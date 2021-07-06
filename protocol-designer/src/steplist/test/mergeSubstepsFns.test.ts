@@ -1,19 +1,20 @@
-// @flow
 import {
   mergeSubstepRowsSingleChannel,
   mergeSubstepRowsMultiChannel,
 } from '../generateSubstepItem'
 
 const ingred1Id = 'ingred1Id'
-const wellNamesForCol = (isMulti: boolean, colNum: string): Array<string> =>
+const wellNamesForCol = (isMulti: boolean, colNum: string): string[] =>
   isMulti ? 'ABCDEFGH'.split('').map(s => `${s}${colNum}`) : [`A${colNum}`]
 
-type Ingreds = { [ingredId: string]: number }
+interface Ingreds {
+  [ingredId: string]: number
+}
 const repeatIngreds = (
   isMulti: boolean,
   colNum: string,
-  _ingreds: ?Ingreds
-): Ingreds | Array<Ingreds> => {
+  _ingreds: Ingreds | null | undefined
+): Ingreds | Ingreds[] => {
   const ingreds = _ingreds || {}
   return isMulti
     ? wellNamesForCol(true, colNum).reduce(
@@ -23,7 +24,9 @@ const repeatIngreds = (
     : ingreds
 }
 
-const getFixtures = ({ isMulti }: {| isMulti: boolean |}) => {
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+const getFixtures = ({ isMulti }: { isMulti: boolean }) => {
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   const makeIngreds = (volume: number | null, colNum: string) =>
     repeatIngreds(isMulti, colNum, volume ? { [ingred1Id]: volume } : null)
   // NOTE: these cases do not cover dynamic behavior of `activeTips` key
@@ -127,7 +130,12 @@ describe('mergeSubstepRowsSingleChannel', () => {
     distributeRowsFixture,
   } = getFixtures({ isMulti: false })
 
-  const testCases = [
+  const testCases: Array<{
+    testName: string
+    showDispenseVol: boolean
+    substepRows: any
+    expected: any
+  }> = [
     {
       testName: 'mock transfer / mix',
       showDispenseVol: false,
@@ -232,7 +240,12 @@ describe('mergeSubstepRowsMultiChannel', () => {
     consolidateRowsFixture,
     distributeRowsFixture,
   } = getFixtures({ isMulti: true })
-  const testCases = [
+  const testCases: Array<{
+    testName: string
+    showDispenseVol: boolean
+    isMixStep: boolean
+    substepRows: any
+  }> = [
     {
       testName: 'mock transfer',
       showDispenseVol: false,

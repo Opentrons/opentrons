@@ -1,4 +1,3 @@
-// @flow
 import {
   DEFAULT_CHANGE_TIP_OPTION,
   DEFAULT_DELAY_SECONDS,
@@ -154,6 +153,7 @@ describe('getDefaultsForStepType', () => {
       })
     })
     it('should default to an empty object', () => {
+      // @ts-expect-error(sa, 2021-6-15): this case can never actually happen beacuse '' is not a StepType
       expect(getDefaultsForStepType('')).toEqual({})
     })
   })

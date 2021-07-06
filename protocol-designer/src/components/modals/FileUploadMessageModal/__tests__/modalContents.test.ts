@@ -1,6 +1,4 @@
-// @flow
 import { getMigrationMessage } from '../modalContents'
-
 describe('modalContents', () => {
   describe('getMigrationMessage', () => {
     it('should return the v3 migration message when migrating to v3', () => {
@@ -11,7 +9,6 @@ describe('modalContents', () => {
         ['3.0.0', '4.0.0', '5.0.0', '5.1.0'],
         ['3.0.0', '4.0.0', '5.0.0', '5.1.0, 5.2.0'],
       ]
-
       migrationsList.forEach(migrations => {
         expect(JSON.stringify(getMigrationMessage(migrations))).toEqual(
           expect.stringContaining(
@@ -26,7 +23,6 @@ describe('modalContents', () => {
         ['5.0.0', '5.1.0'],
         ['5.0.0', '5.1.0', '5.2.0'],
       ]
-
       migrationsList.forEach(migrations => {
         expect(JSON.stringify(getMigrationMessage(migrations))).toEqual(
           expect.stringContaining(
@@ -42,7 +38,6 @@ describe('modalContents', () => {
         ['4.0.0', '5.0.0', '5.1.0'],
         ['4.0.0', '5.0.0', '5.1.0, 5.2.0'],
       ]
-
       migrationsList.forEach(migrations => {
         expect(JSON.stringify(getMigrationMessage(migrations))).toEqual(
           expect.stringContaining(

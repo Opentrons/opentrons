@@ -1,11 +1,19 @@
-// @flow
 import * as React from 'react'
 import cx from 'classnames'
 import { useSelector } from 'react-redux'
 import omit from 'lodash/omit'
 
-import { Modal, OutlineButton, LabeledValue } from '@opentrons/components'
-import { sortWells } from '@opentrons/shared-data'
+import {
+  Modal,
+  OutlineButton,
+  LabeledValue,
+  WellGroup,
+} from '@opentrons/components'
+import {
+  sortWells,
+  LabwareDefinition2,
+  PipetteNameSpecs,
+} from '@opentrons/shared-data'
 
 import { arrayToWellGroup } from '../../../../utils'
 import { WellSelectionInstructions } from '../../../WellSelectionInstructions'
@@ -14,45 +22,40 @@ import { SelectableLabware, wellFillFromWellContents } from '../../../labware'
 import * as wellContentsSelectors from '../../../../top-selectors/well-contents'
 import { selectors } from '../../../../labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
-import type { WellGroup } from '@opentrons/components'
-import type {
-  LabwareDefinition2,
-  PipetteNameSpecs,
-} from '@opentrons/shared-data'
-import type { ContentsByWell } from '../../../../labware-ingred/types'
-import type { WellIngredientNames } from '../../../../steplist/types'
-import type { StepFieldName } from '../../../../form-types'
+import { ContentsByWell } from '../../../../labware-ingred/types'
+import { WellIngredientNames } from '../../../../steplist/types'
+import { StepFieldName } from '../../../../form-types'
 
 import styles from './WellSelectionModal.css'
 import modalStyles from '../../../modals/modal.css'
 
-type WellSelectionModalProps = {|
-  isOpen: boolean,
-  labwareId: ?string,
-  name: StepFieldName,
-  onCloseClick: (e: ?SyntheticEvent<*>) => mixed,
-  pipetteId: ?string,
-  value: mixed,
-  updateValue: (?mixed) => void,
-|}
+interface WellSelectionModalProps {
+  isOpen: boolean
+  labwareId?: string | null
+  name: StepFieldName
+  onCloseClick: (e?: React.MouseEvent<HTMLDivElement>) => unknown
+  pipetteId?: string | null
+  value: unknown
+  updateValue: (val: unknown | null | undefined) => void
+}
 
-type WellSelectionModalComponentProps = {|
-  deselectWells: WellGroup => mixed,
-  handleSave: () => mixed,
-  highlightedWells: WellGroup,
-  ingredNames: WellIngredientNames,
-  labwareDef: ?LabwareDefinition2,
-  onCloseClick: (e: ?SyntheticEvent<*>) => mixed,
-  pipetteSpec: ?PipetteNameSpecs,
-  selectedPrimaryWells: WellGroup,
-  selectWells: WellGroup => mixed,
-  updateHighlightedWells: WellGroup => mixed,
-  wellContents: ContentsByWell,
-|}
+interface WellSelectionModalComponentProps {
+  deselectWells: (wellGroup: WellGroup) => unknown
+  handleSave: () => unknown
+  highlightedWells: WellGroup
+  ingredNames: WellIngredientNames
+  labwareDef?: LabwareDefinition2 | null
+  onCloseClick: (e?: React.MouseEvent<any>) => unknown
+  pipetteSpec?: PipetteNameSpecs | null
+  selectedPrimaryWells: WellGroup
+  selectWells: (wellGroup: WellGroup) => unknown
+  updateHighlightedWells: (wellGroup: WellGroup) => unknown
+  wellContents: ContentsByWell
+}
 
 const WellSelectionModalComponent = (
   props: WellSelectionModalComponentProps
-) => {
+): JSX.Element => {
   const {
     deselectWells,
     handleSave,
@@ -112,7 +115,7 @@ const WellSelectionModalComponent = (
 
 export const WellSelectionModal = (
   props: WellSelectionModalProps
-): React.Node => {
+): JSX.Element | null => {
   const { isOpen, labwareId, onCloseClick, pipetteId } = props
   const wellFieldData = props.value
 
@@ -142,17 +145,17 @@ export const WellSelectionModal = (
   const [highlightedWells, setHighlightedWells] = React.useState<WellGroup>({})
 
   // actions
-  const selectWells = (wells: WellGroup) => {
+  const selectWells = (wells: WellGroup): void => {
     setSelectedPrimaryWells(prev => ({ ...prev, ...wells }))
     setHighlightedWells({})
   }
 
-  const deselectWells = (deselectedWells: WellGroup) => {
+  const deselectWells = (deselectedWells: WellGroup): void => {
     setSelectedPrimaryWells(prev => omit(prev, Object.keys(deselectedWells)))
     setHighlightedWells({})
   }
 
-  const handleSave = () => {
+  const handleSave = (): void => {
     const sortedWells = Object.keys(selectedPrimaryWells).sort(sortWells)
     props.updateValue(sortedWells)
     onCloseClick()

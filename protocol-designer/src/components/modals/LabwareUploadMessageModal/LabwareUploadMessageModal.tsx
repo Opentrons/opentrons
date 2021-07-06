@@ -1,17 +1,14 @@
-// @flow
 import assert from 'assert'
 import cx from 'classnames'
 import * as React from 'react'
-import {
-  AlertModal,
-  OutlineButton,
-  type ButtonProps,
-} from '@opentrons/components'
+import { AlertModal, OutlineButton, ButtonProps } from '@opentrons/components'
 import { i18n } from '../../../localization'
 import modalStyles from '../modal.css'
-import type { LabwareUploadMessage } from '../../../labware-defs'
+import { LabwareUploadMessage } from '../../../labware-defs'
 
-const MessageBody = (props: {| message: LabwareUploadMessage |}) => {
+const MessageBody = (props: {
+  message: LabwareUploadMessage
+}): JSX.Element | null => {
   const { message } = props
 
   if (
@@ -28,6 +25,7 @@ const MessageBody = (props: {| message: LabwareUploadMessage |}) => {
             `modal.labware_upload_message.message.${message.messageType}`
           )}
         </p>
+        {/* @ts-expect-error (ce, 2021-06-23) errorText does not exist on all type posibilities at this point */}
         {message.errorText ? <p>{message.errorText}</p> : null}
       </>
     )
@@ -74,6 +72,7 @@ const MessageBody = (props: {| message: LabwareUploadMessage |}) => {
             {i18n.t('modal.labware_upload_message.name_conflict.overwrite')}
           </p>
         )}
+        {/* @ts-expect-error (ce, 2021-06-23) Property 'isOverwriteMismatched' does not exist on type '(NameConflictFields & { messageType: "LABWARE_NAME_CONFLICT"; }) | (NameConflictFields & { messageType: "ASK_FOR_LABWARE_OVERWRITE"; defURIToOverwrite: string; isOverwriteMismatched: boolean; })' */}
         {canOverwrite && message.isOverwriteMismatched && (
           <p>
             <strong>
@@ -89,17 +88,19 @@ const MessageBody = (props: {| message: LabwareUploadMessage |}) => {
   return null
 }
 
-type Props = {|
-  message: ?LabwareUploadMessage,
-  dismissModal: () => mixed,
-  overwriteLabwareDef?: () => mixed,
-|}
+export interface LabwareUploadMessageModalProps {
+  message?: LabwareUploadMessage | null
+  dismissModal: () => unknown
+  overwriteLabwareDef?: () => unknown
+}
 
-export const LabwareUploadMessageModal = (props: Props): React.Node => {
+export const LabwareUploadMessageModal = (
+  props: LabwareUploadMessageModalProps
+): JSX.Element | null => {
   const { message, dismissModal, overwriteLabwareDef } = props
   if (!message) return null
 
-  let buttons: Array<ButtonProps> = [{ children: 'OK', onClick: dismissModal }]
+  let buttons: ButtonProps[] = [{ children: 'OK', onClick: dismissModal }]
   if (message.messageType === 'ASK_FOR_LABWARE_OVERWRITE') {
     buttons = [
       { children: 'CANCEL IMPORT', onClick: dismissModal },

@@ -1,6 +1,5 @@
-// @flow
 import { THERMOCYCLER_STATE, THERMOCYCLER_PROFILE } from '../../../constants'
-import type {
+import {
   ThermocyclerProfileStepArgs,
   ThermocyclerStateStepArgs,
 } from '@opentrons/step-generation'
@@ -10,15 +9,12 @@ import type {
   ProfileItem,
   ProfileStepItem,
 } from '../../../form-types'
+type FlatProfileSteps = ThermocyclerProfileStepArgs['profileSteps']
 
-type FlatProfileSteps = $PropertyType<
-  ThermocyclerProfileStepArgs,
-  'profileSteps'
->
-const _flattenProfileSteps = (args: {|
-  orderedProfileItems: Array<string>,
-  profileItemsById: { [string]: ProfileItem, ... },
-|}): FlatProfileSteps => {
+const _flattenProfileSteps = (args: {
+  orderedProfileItems: string[]
+  profileItemsById: Record<string, ProfileItem>
+}): FlatProfileSteps => {
   const { orderedProfileItems, profileItemsById } = args
   const steps: FlatProfileSteps = []
 
@@ -33,10 +29,12 @@ const _flattenProfileSteps = (args: {|
 
   for (const itemId of orderedProfileItems) {
     const item = profileItemsById[itemId]
+
     if (item.type === PROFILE_STEP) {
       addStep(item)
     } else {
       const repetitions = Number(item.repetitions)
+
       for (let i = 0; i < repetitions; i++) {
         for (const step of item.steps) {
           addStep(step)
@@ -44,6 +42,7 @@ const _flattenProfileSteps = (args: {|
       }
     }
   }
+
   return steps
 }
 
@@ -51,6 +50,7 @@ export const thermocyclerFormToArgs = (
   formData: FormData
 ): ThermocyclerProfileStepArgs | ThermocyclerStateStepArgs | null => {
   const { thermocyclerFormType } = formData
+
   switch (thermocyclerFormType) {
     case THERMOCYCLER_STATE: {
       return {
@@ -67,6 +67,7 @@ export const thermocyclerFormToArgs = (
         lidOpen: formData.lidOpen,
       }
     }
+
     case THERMOCYCLER_PROFILE: {
       const profileSteps = _flattenProfileSteps({
         orderedProfileItems: formData.orderedProfileItems,
@@ -76,7 +77,6 @@ export const thermocyclerFormToArgs = (
       return {
         module: formData.moduleId,
         commandCreatorFnName: THERMOCYCLER_PROFILE,
-
         blockTargetTempHold:
           formData.blockIsActiveHold && formData.blockTargetTempHold !== null
             ? Number(formData.blockTargetTempHold)
@@ -88,7 +88,7 @@ export const thermocyclerFormToArgs = (
             : null,
         meta: {
           rawProfileItems: formData.orderedProfileItems.map(
-            itemId => formData.profileItemsById[itemId]
+            (itemId: string | number) => formData.profileItemsById[itemId]
           ),
         },
         profileSteps,
@@ -97,6 +97,7 @@ export const thermocyclerFormToArgs = (
       }
     }
   }
+
   // this should not happen, for Flow only
   return null
 }

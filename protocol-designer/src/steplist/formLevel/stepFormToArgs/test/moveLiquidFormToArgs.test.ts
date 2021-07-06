@@ -1,6 +1,5 @@
-// @flow
 import assert from 'assert'
-import { getLabwareDefURI } from '@opentrons/shared-data'
+import { getLabwareDefURI, LabwareDefinition2 } from '@opentrons/shared-data'
 import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
 import fixture_12_trough from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough.json'
 import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
@@ -9,26 +8,29 @@ import {
   moveLiquidFormToArgs,
   getAirGapData,
   getMixData,
-  type HydratedMoveLiquidFormData,
 } from '../moveLiquidFormToArgs'
 import { getOrderedWells } from '../../../utils'
+import { HydratedMoveLiquidFormData, PathOption } from '../../../../form-types'
+
 jest.mock('../../../utils')
 jest.mock('assert')
 
 const ASPIRATE_WELL = 'A2' // default source is trough for these tests
 const DISPENSE_WELL = 'C3' // default dest in 96 flat for these tests
 
+const mockGetOrderedWells = getOrderedWells as jest.MockedFunction<
+  typeof getOrderedWells
+>
+
 describe('move liquid step form -> command creator args', () => {
-  let hydratedForm: ?HydratedMoveLiquidFormData = null
-  const sourceLabwareDef = fixture_12_trough
+  let hydratedForm: HydratedMoveLiquidFormData
+  const sourceLabwareDef = fixture_12_trough as LabwareDefinition2
   const sourceLabwareType = getLabwareDefURI(sourceLabwareDef)
-  const destLabwareDef = fixture_96_plate
+  const destLabwareDef = fixture_96_plate as LabwareDefinition2
   const destLabwareType = getLabwareDefURI(destLabwareDef)
   beforeEach(() => {
-    // $FlowFixMe: mock methods
-    getOrderedWells.mockClear()
-    // $FlowFixMe: mock methods
-    getOrderedWells.mockImplementation(wells => wells)
+    mockGetOrderedWells.mockClear()
+    mockGetOrderedWells.mockImplementation(wells => wells)
 
     // the "base case" is a 1 to 1 transfer, single path
     hydratedForm = {
@@ -37,6 +39,7 @@ describe('move liquid step form -> command creator args', () => {
       description: null,
 
       fields: {
+        // @ts-expect-error(sa, 2021-6-15): not a valid PipetteEntity
         pipette: {
           id: 'pipetteId',
           spec: fixtureP10Single,
@@ -46,6 +49,7 @@ describe('move liquid step form -> command creator args', () => {
         changeTip: 'always',
         aspirate_labware: {
           id: 'sourceLabwareId',
+          // @ts-expect-error(sa, 2021-6-15): type does not exist on LabwareEntity
           type: sourceLabwareType,
           def: sourceLabwareDef,
         },
@@ -65,6 +69,7 @@ describe('move liquid step form -> command creator args', () => {
 
         dispense_labware: {
           id: 'destLabwareId',
+          // @ts-expect-error(sa, 2021-6-15): type does not exist on LabwareEntity
           type: destLabwareType,
           def: destLabwareDef,
         },
@@ -100,14 +105,14 @@ describe('move liquid step form -> command creator args', () => {
   it('moveLiquidFormToArgs calls getOrderedWells correctly', () => {
     moveLiquidFormToArgs(hydratedForm)
 
-    expect(getOrderedWells).toHaveBeenCalledTimes(2)
-    expect(getOrderedWells).toHaveBeenCalledWith(
+    expect(mockGetOrderedWells).toHaveBeenCalledTimes(2)
+    expect(mockGetOrderedWells).toHaveBeenCalledWith(
       [ASPIRATE_WELL],
       sourceLabwareDef,
       'l2r',
       't2b'
     )
-    expect(getOrderedWells).toHaveBeenCalledWith(
+    expect(mockGetOrderedWells).toHaveBeenCalledWith(
       [DISPENSE_WELL],
       destLabwareDef,
       'r2l',
@@ -129,6 +134,7 @@ describe('move liquid step form -> command creator args', () => {
     })
 
     // no form-specific fields should be passed along
+    // @ts-expect-error(sa, 2021-6-15): result might be null, need to null check
     Object.keys(result).forEach(field => {
       expect(field).toEqual(expect.not.stringMatching(/.*wellOrder.*/i))
       expect(field).toEqual(expect.not.stringMatching(/.*checkbox.*/i))
@@ -254,7 +260,7 @@ describe('move liquid step form -> command creator args', () => {
   describe('distribute: disposal volume / blowout behaviors', () => {
     const blowoutLabwareId = 'blowoutLabwareId'
     const disposalVolumeFields = {
-      path: 'multiDispense', // 'multiDispense' required to use `distribute` command creator
+      path: 'multiDispense' as PathOption, // 'multiDispense' required to use `distribute` command creator
       blowout_location: blowoutLabwareId, // disposal volume uses `blowout_location` for the blowout
       disposalVolume_volume: 123,
       // NOTE: when spreading these in to hydratedForm fixture,
@@ -431,6 +437,7 @@ describe('getAirGapData', () => {
   it('should return null when the checkbox field is false', () => {
     expect(
       getAirGapData(
+        // @ts-expect-error(sa, 2021-6-15): missing properties on hydrated form data
         { aspirate_airGap_checkbox: false, aspirate_airGap_volume: 20 },
         'aspirate_airGap_checkbox',
         'aspirate_airGap_volume'
@@ -440,6 +447,7 @@ describe('getAirGapData', () => {
   it('should return the air gap volume when the air gap checkbox is true', () => {
     expect(
       getAirGapData(
+        // @ts-expect-error(sa, 2021-6-15): missing properties on hydrated form data
         { aspirate_airGap_checkbox: true, aspirate_airGap_volume: 20 },
         'aspirate_airGap_checkbox',
         'aspirate_airGap_volume'

@@ -1,5 +1,3 @@
-// @flow
-
 import React from 'react'
 import { Formik } from 'formik'
 import { shallow } from 'enzyme'
@@ -16,11 +14,15 @@ import { CrashInfoBox } from '../../../modules'
 import { StepChangesConfirmModal } from '../../EditPipettesModal/StepChangesConfirmModal'
 import { PipetteFields } from '../PipetteFields'
 import { ModuleFields } from '../ModuleFields'
-import { FilePipettesModal, type Props } from '../'
+import { FilePipettesModal, Props } from '../'
+import { FormPipettesByMount } from '../../../../step-forms'
+import { FormState } from '..'
 
 describe('FilePipettesModal', () => {
   const tiprackDefURI = 'tiprack_300'
-  let props: Props, initialPipetteValues, initialModuleValues
+  let props: Props,
+    initialPipetteValues: FormPipettesByMount,
+    initialModuleValues: FormState['modulesByType']
   beforeEach(() => {
     initialPipetteValues = {
       left: {
@@ -61,7 +63,7 @@ describe('FilePipettesModal', () => {
     }
   })
 
-  function renderFormComponent(props) {
+  function renderFormComponent(props: Props) {
     return shallow(<FilePipettesModal {...props} />)
       .find(Formik)
       .dive()

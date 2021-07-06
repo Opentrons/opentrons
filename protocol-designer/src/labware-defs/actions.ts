@@ -1,4 +1,3 @@
-// @flow
 import assert from 'assert'
 import Ajv from 'ajv'
 import isEqual from 'lodash/isEqual'
@@ -10,67 +9,64 @@ import {
   getLabwareDefURI,
   getIsTiprack,
   OPENTRONS_LABWARE_NAMESPACE,
+  LabwareDefinition2,
 } from '@opentrons/shared-data'
 import * as labwareDefSelectors from './selectors'
 import { getAllWellSetsForLabware } from '../utils'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { ThunkAction } from '../types'
-import type { LabwareUploadMessage } from './types'
-
-export type LabwareUploadMessageAction = {|
-  type: 'LABWARE_UPLOAD_MESSAGE',
-  payload: LabwareUploadMessage,
-|}
-
+import { ThunkAction } from '../types'
+import { LabwareUploadMessage } from './types'
+export interface LabwareUploadMessageAction {
+  type: 'LABWARE_UPLOAD_MESSAGE'
+  payload: LabwareUploadMessage
+}
 export const labwareUploadMessage = (
   payload: LabwareUploadMessage
 ): LabwareUploadMessageAction => ({
   type: 'LABWARE_UPLOAD_MESSAGE',
   payload,
 })
-
-export type CreateCustomLabwareDef = {|
-  type: 'CREATE_CUSTOM_LABWARE_DEF',
-  payload: {|
-    def: LabwareDefinition2,
-  |},
-|}
-
+export interface CreateCustomLabwareDef {
+  type: 'CREATE_CUSTOM_LABWARE_DEF'
+  payload: {
+    def: LabwareDefinition2
+  }
+}
 export const createCustomLabwareDefAction = (
-  payload: $PropertyType<CreateCustomLabwareDef, 'payload'>
+  payload: CreateCustomLabwareDef['payload']
 ): CreateCustomLabwareDef => ({
   type: 'CREATE_CUSTOM_LABWARE_DEF',
   payload,
 })
-
-export type ReplaceCustomLabwareDef = {|
-  type: 'REPLACE_CUSTOM_LABWARE_DEF',
-  payload: {|
-    defURIToOverwrite: string,
-    newDef: LabwareDefinition2,
-    isOverwriteMismatched: boolean,
-  |},
-|}
-
+export interface ReplaceCustomLabwareDef {
+  type: 'REPLACE_CUSTOM_LABWARE_DEF'
+  payload: {
+    defURIToOverwrite: string
+    newDef: LabwareDefinition2
+    isOverwriteMismatched: boolean
+  }
+}
 export const replaceCustomLabwareDef = (
-  payload: $PropertyType<ReplaceCustomLabwareDef, 'payload'>
+  payload: ReplaceCustomLabwareDef['payload']
 ): ReplaceCustomLabwareDef => ({
   type: 'REPLACE_CUSTOM_LABWARE_DEF',
   payload,
 })
-
-const ajv = new Ajv({ allErrors: true, jsonPointers: true })
+const ajv = new Ajv({
+  allErrors: true,
+  jsonPointers: true,
+})
 const validate = ajv.compile(labwareSchema)
 
 const _labwareDefsMatchingLoadName = (
-  labwareDefs: Array<LabwareDefinition2>,
+  labwareDefs: LabwareDefinition2[],
   loadName: string
-) => labwareDefs.filter(def => def.parameters.loadName === loadName)
+): LabwareDefinition2[] =>
+  labwareDefs.filter(def => def.parameters.loadName === loadName)
 
 const _labwareDefsMatchingDisplayName = (
-  labwareDefs: Array<LabwareDefinition2>,
+  labwareDefs: LabwareDefinition2[],
   displayName: string
-) =>
+): LabwareDefinition2[] =>
   labwareDefs.filter(
     def =>
       def.metadata.displayName.trim().toLowerCase() ===
@@ -94,18 +90,17 @@ const getIsOverwriteMismatched = (
 const _createCustomLabwareDef: (
   onlyTiprack: boolean
 ) => (
-  event: SyntheticInputEvent<HTMLInputElement>
+  event: React.SyntheticEvent<HTMLInputElement>
 ) => ThunkAction<any> = onlyTiprack => event => (dispatch, getState) => {
-  const allLabwareDefs: Array<LabwareDefinition2> = values(
+  const allLabwareDefs: LabwareDefinition2[] = values(
     labwareDefSelectors.getLabwareDefsByURI(getState())
   )
-  const customLabwareDefs: Array<LabwareDefinition2> = values(
+  const customLabwareDefs: LabwareDefinition2[] = values(
     labwareDefSelectors.getCustomLabwareDefsByURI(getState())
   )
-
+  // @ts-expect-error(sa, 2021-6-20): null check
   const file = event.currentTarget.files[0]
   const reader = new FileReader()
-
   // reset the state of the input to allow file re-uploads
   event.currentTarget.value = ''
 
@@ -118,14 +113,13 @@ const _createCustomLabwareDef: (
   }
 
   reader.onload = readEvent => {
-    const result = ((readEvent.currentTarget: any): FileReader).result
-    let parsedLabwareDef: ?LabwareDefinition2
+    const result = ((readEvent.currentTarget as any) as FileReader).result
+    let parsedLabwareDef: LabwareDefinition2 | null | undefined
 
     try {
-      parsedLabwareDef = JSON.parse(((result: any): string))
+      parsedLabwareDef = JSON.parse((result as any) as string)
     } catch (error) {
       console.error(error)
-
       return dispatch(
         labwareUploadMessage({
           messageType: 'INVALID_JSON_FILE',
@@ -134,7 +128,7 @@ const _createCustomLabwareDef: (
       )
     }
 
-    const valid: boolean =
+    const valid: boolean | PromiseLike<any> =
       parsedLabwareDef === null ? false : validate(parsedLabwareDef)
     const hasWellA1 = flatten(parsedLabwareDef?.ordering || []).includes('A1')
     const loadName = parsedLabwareDef?.parameters?.loadName || ''
@@ -143,12 +137,14 @@ const _createCustomLabwareDef: (
     if (!hasWellA1) {
       console.warn('uploaded labware conforms to schema, but has no well A1!')
     }
+
     if (!valid || !hasWellA1) {
       return dispatch(
         labwareUploadMessage({
           messageType: 'INVALID_JSON_FILE',
         })
       )
+      // @ts-expect-error(sa, 2021-6-20): parsedLabwareDef might be nullsy
     } else if (onlyTiprack && !getIsTiprack(parsedLabwareDef)) {
       return dispatch(
         labwareUploadMessage({
@@ -173,10 +169,12 @@ const _createCustomLabwareDef: (
       customLabwareDefs,
       loadName
     )
+
     const defsMatchingCustomDisplayName = _labwareDefsMatchingDisplayName(
       customLabwareDefs,
       displayName
     )
+
     if (
       defsMatchingCustomLoadName.length > 0 ||
       defsMatchingCustomDisplayName.length > 0
@@ -194,9 +192,11 @@ const _createCustomLabwareDef: (
           messageType: 'ASK_FOR_LABWARE_OVERWRITE',
           defsMatchingLoadName: defsMatchingCustomLoadName,
           defsMatchingDisplayName: defsMatchingCustomDisplayName,
+          // @ts-expect-error(sa, 2021-6-20): parsedLabwareDef might be nullsy
           newDef: parsedLabwareDef,
           defURIToOverwrite: getLabwareDefURI(matchingDefs[0]),
           isOverwriteMismatched: getIsOverwriteMismatched(
+            // @ts-expect-error(sa, 2021-6-20): parsedLabwareDef might be nullsy
             parsedLabwareDef,
             matchingDefs[0]
           ),
@@ -208,10 +208,12 @@ const _createCustomLabwareDef: (
       allLabwareDefs,
       loadName
     )
+
     const allDefsMatchingDisplayName = _labwareDefsMatchingDisplayName(
       allLabwareDefs,
       displayName
     )
+
     if (
       allDefsMatchingLoadName.length > 0 ||
       allDefsMatchingDisplayName.length > 0
@@ -221,6 +223,7 @@ const _createCustomLabwareDef: (
           messageType: 'LABWARE_NAME_CONFLICT',
           defsMatchingLoadName: allDefsMatchingLoadName,
           defsMatchingDisplayName: allDefsMatchingDisplayName,
+          // @ts-expect-error(sa, 2021-6-20): parsedLabwareDef might be nullsy
           newDef: parsedLabwareDef,
         })
       )
@@ -228,25 +231,24 @@ const _createCustomLabwareDef: (
 
     return dispatch(
       createCustomLabwareDefAction({
+        // @ts-expect-error(sa, 2021-6-20): parsedLabwareDef might be nullsy
         def: parsedLabwareDef,
       })
     )
   }
+
   reader.readAsText(file)
 }
 
 export const createCustomLabwareDef: (
-  event: SyntheticInputEvent<HTMLInputElement>
+  event: React.SyntheticEvent<HTMLInputElement>
 ) => ThunkAction<any> = _createCustomLabwareDef(false)
-
 export const createCustomTiprackDef: (
-  event: SyntheticInputEvent<HTMLInputElement>
+  event: React.SyntheticEvent<HTMLInputElement>
 ) => ThunkAction<any> = _createCustomLabwareDef(true)
-
-type DismissLabwareUploadMessage = {|
-  type: 'DISMISS_LABWARE_UPLOAD_MESSAGE',
-|}
-
+interface DismissLabwareUploadMessage {
+  type: 'DISMISS_LABWARE_UPLOAD_MESSAGE'
+}
 export const dismissLabwareUploadMessage = (): DismissLabwareUploadMessage => ({
   type: 'DISMISS_LABWARE_UPLOAD_MESSAGE',
 })
