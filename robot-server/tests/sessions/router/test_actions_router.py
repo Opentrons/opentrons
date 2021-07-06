@@ -46,7 +46,7 @@ def test_create_session_action(
     current_time: datetime,
     client: TestClient,
 ) -> None:
-    """It should handle a start input."""
+    """It should handle a start action."""
     session_created_at = datetime.now()
 
     actions = SessionAction(
@@ -123,7 +123,7 @@ def test_create_session_action_without_runner(
     current_time: datetime,
     client: TestClient,
 ) -> None:
-    """It should handle a start input."""
+    """It should 400 if the runner is not able to handle the action."""
     session_created_at = datetime.now()
 
     actions = SessionAction(
