@@ -178,14 +178,12 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
   // hovered over**. The intrinsic state of `react-dnd` is not designed to handle that.
   // So we need to use our own state here to determine
   // whether swapping will be blocked due to labware<>module compat:
-  const [
-    hoveredLabware,
-    setHoveredLabware,
-  ] = React.useState<LabwareOnDeckType | null>(null)
-  const [
-    draggedLabware,
-    setDraggedLabware,
-  ] = React.useState<LabwareOnDeckType | null>(null)
+  const [hoveredLabware, setHoveredLabware] = React.useState<
+    LabwareOnDeckType | null | undefined
+  >(null)
+  const [draggedLabware, setDraggedLabware] = React.useState<
+    LabwareOnDeckType | null | undefined
+  >(null)
 
   const customLabwareDefs = useSelector(
     labwareDefSelectors.getCustomLabwareDefsByURI
@@ -304,7 +302,7 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
         )
         .map(slot => {
           return (
-            // @ts-expect-error (ce, 2021-06-21) needs some type love
+            // @ts-expect-error (ce, 2021-06-21) once we upgrade to the react-dnd hooks api, and use react-redux hooks, typing this will be easier
             <SlotControls
               key={slot.id}
               slot={slot}

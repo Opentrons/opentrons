@@ -28,9 +28,6 @@ export interface FormModule {
   model: ModuleModel | null
   slot: DeckSlot
 }
-// TODO: IL 2020-02-21 somehow use the `typeof X_MODULE_TYPE` imports here instead of writing out the strings.
-// It doesn't seem possible with Flow to use these types as keys in an exact object,
-// unless you write them out like this. See https://github.com/facebook/flow/issues/6492
 export interface FormModulesByType {
   magneticModuleType: FormModule
   temperatureModuleType: FormModule
@@ -89,7 +86,13 @@ export type LabwareOnDeck = LabwareEntity & LabwareTemporalProperties
 export type PipetteOnDeck = PipetteEntity & PipetteTemporalProperties
 // TODO: Ian 2019-11-08 make all values Maybe typed
 export interface InitialDeckSetup {
-  labware: Record<string, LabwareOnDeck>
-  pipettes: Record<string, PipetteOnDeck>
-  modules: Record<string, ModuleOnDeck>
+  labware: {
+    [labwareId: string]: LabwareOnDeck
+  }
+  pipettes: {
+    [pipetteId: string]: PipetteOnDeck
+  }
+  modules: {
+    [moduleId: string]: ModuleOnDeck
+  }
 }

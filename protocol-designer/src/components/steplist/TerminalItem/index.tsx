@@ -31,7 +31,6 @@ export interface TerminalItemProps {
 
 export const TerminalItem = (props: TerminalItemProps): JSX.Element => {
   const { id, title, children } = props
-  // const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false)
 
   const hovered = useSelector(getHoveredTerminalItemId) === id
   const selected = useSelector(getSelectedTerminalItemId) === id
@@ -69,7 +68,7 @@ export const TerminalItem = (props: TerminalItemProps): JSX.Element => {
           onCancelClick={cancel}
         />
       )}
-      {/* @ts-expect-error(sa, 2021-6-21): same issue as above here */}
+      {/* @ts-expect-error(sa, 2021-6-21): type mismatch with useConditionalConfirm. see https://github.com/Opentrons/opentrons/issues/8054 */}
       <PDTitledList
         {...{
           id: `TerminalItem_${id}`,

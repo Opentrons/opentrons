@@ -26,8 +26,7 @@ export const generateRobotStateTimeline = (
       )
     }
   )
-  // TODO: Ian 2018-06-14 `takeWhile` isn't inferring the right type
-  // @ts-expect-error
+  // @ts-expect-error(sa, 2021-7-6): stepArgs might be null (see code above). this was incorrectly typed from before the TS migration and requires source code changes
   const continuousStepArgs: StepGeneration.CommandCreatorArgs[] = takeWhile(
     allStepArgs,
     stepArgs => stepArgs

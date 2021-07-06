@@ -1655,10 +1655,9 @@ describe('unsavedForm reducer', () => {
   ]
   actionTypes.forEach(actionType => {
     it(`should clear the unsaved form when any ${actionType} action is dispatched`, () => {
-      // @ts-expect-error(sa, 2021-6-14): missing a payload
       const result = unsavedForm(someState, {
         type: actionType,
-      })
+      } as any)
       expect(result).toEqual(null)
     })
   })

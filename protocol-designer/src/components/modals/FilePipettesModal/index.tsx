@@ -337,7 +337,9 @@ export class FilePipettesModal extends React.Component<Props, State> {
                           onFieldChange={handleChange}
                           onSetFieldValue={setFieldValue}
                           onBlur={handleBlur}
+                          // @ts-expect-error(sa, 2021-7-2): we need to explicitly check that the module tiprackDefURI inside of pipettesByMount exists, because it could be undefined
                           errors={errors.pipettesByMount ?? null}
+                          // @ts-expect-error(sa, 2021-7-2): we need to explicitly check that the module tiprackDefURI inside of pipettesByMount exists, because it could be undefined
                           touched={touched.pipettesByMount ?? null}
                           onSetFieldTouched={setFieldTouched}
                         />
@@ -350,11 +352,13 @@ export class FilePipettesModal extends React.Component<Props, State> {
                               )}
                             </h2>
                             <ModuleFields
+                              // @ts-expect-error(sa, 2021-7-2): we need to explicitly check that the module model inside of modulesByType exists, because it could be undefined
                               errors={errors.modulesByType ?? null}
                               values={values.modulesByType}
                               onFieldChange={handleChange}
                               onSetFieldValue={setFieldValue}
                               onBlur={handleBlur}
+                              // @ts-expect-error(sa, 2021-7-2): we need to explicitly check that the module model inside of modulesByType exists, because it could be undefined
                               touched={touched.modulesByType ?? null}
                               onSetFieldTouched={setFieldTouched}
                             />

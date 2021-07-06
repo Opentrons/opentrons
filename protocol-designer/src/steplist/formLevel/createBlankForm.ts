@@ -14,6 +14,5 @@ export function createBlankForm(args: NewFormArgs): FormData {
     stepName: i18n.t(`application.stepType.${stepType}`),
     stepDetails: '',
   }
-  // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
   return { ...baseForm, ...getDefaultsForStepType(stepType) }
 }

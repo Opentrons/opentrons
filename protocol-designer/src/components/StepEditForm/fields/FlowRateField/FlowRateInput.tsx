@@ -17,7 +17,7 @@ const DEFAULT_LABEL = i18n.t('form.step_edit_form.field.flow_rate.label')
 const DECIMALS_ALLOWED = 1
 
 /** When flow rate is falsey (including 0), it means 'use default' */
-export type FlowRateInputProps = FieldProps & {
+export interface FlowRateInputProps extends FieldProps {
   defaultFlowRate?: number | null
   flowRateType: 'aspirate' | 'dispense'
   label?: string | null

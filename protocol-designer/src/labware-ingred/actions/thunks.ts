@@ -15,7 +15,7 @@ export interface RenameLabwareAction {
   type: 'RENAME_LABWARE'
   payload: {
     labwareId: string
-    name?: string | null | undefined
+    name?: string | null
   }
 }
 export const renameLabware: (

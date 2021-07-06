@@ -30,10 +30,10 @@ export interface Props {
     | string
     | {
         left?: {
-          tiprackDefURI?: string
+          tiprackDefURI: string
         }
         right?: {
-          tiprackDefURI?: string
+          tiprackDefURI: string
         }
       }
   touched:
@@ -41,10 +41,10 @@ export interface Props {
     | boolean
     | {
         left?: {
-          tiprackDefURI?: boolean
+          tiprackDefURI: boolean
         }
         right?: {
-          tiprackDefURI?: boolean
+          tiprackDefURI: boolean
         }
       }
   onFieldChange: (event: React.ChangeEvent<HTMLSelectElement>) => unknown

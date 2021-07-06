@@ -27,33 +27,33 @@ const FIELD_ERRORS: Record<FieldError, string> = {
 /*******************
  ** Error Checkers **
  ********************/
-export type ErrorChecker = (value: unknown) => string | null | undefined
+export type ErrorChecker = (value: unknown) => string | null
 export const requiredField: ErrorChecker = (value: unknown) =>
   !value ? FIELD_ERRORS.REQUIRED : null
 export const nonZero: ErrorChecker = (value: unknown) =>
   value && Number(value) === 0 ? FIELD_ERRORS.NON_ZERO : null
 export const minimumWellCount = (minimum: number): ErrorChecker => (
   wells: unknown
-): string | null | undefined =>
+): string | null =>
   isArray(wells) && wells.length < minimum
     ? `${minimum} ${FIELD_ERRORS.UNDER_WELL_MINIMUM}`
     : null
 export const minFieldValue = (minimum: number): ErrorChecker => (
   value: unknown
-): string | null | undefined =>
+): string | null =>
   value === null || Number(value) >= minimum
     ? null
     : `${FIELD_ERRORS.UNDER_RANGE_MINIMUM} ${minimum}`
 export const maxFieldValue = (maximum: number): ErrorChecker => (
   value: unknown
-): string | null | undefined =>
+): string | null =>
   value === null || Number(value) <= maximum
     ? null
     : `${FIELD_ERRORS.OVER_RANGE_MAXIMUM} ${maximum}`
 export const temperatureRangeFieldValue = (
   minimum: number,
   maximum: number
-): ErrorChecker => (value: unknown): string | null | undefined =>
+): ErrorChecker => (value: unknown): string | null =>
   value === null || (Number(value) <= maximum && Number(value) >= minimum)
     ? null
     : `${FIELD_ERRORS.OUTSIDE_OF_RANGE} ${minimum} and ${maximum} ${i18n.t(
@@ -68,12 +68,11 @@ export const realNumber: ErrorChecker = (value: unknown) =>
 type ComposeErrors = (
   ...errorCheckers: ErrorChecker[]
 ) => (value: unknown) => string[]
-// @ts-expect-error(sa, 2021-6-14): cannot modify return type of reduce without giving an initial value
+
 export const composeErrors: ComposeErrors = (
   ...errorCheckers: ErrorChecker[]
 ) => value =>
-  // @ts-expect-error(sa, 2021-6-14): cannot modify return type of reduce without giving an initial value
-  errorCheckers.reduce((accumulatedErrors, errorChecker) => {
+  errorCheckers.reduce<string[]>((accumulatedErrors, errorChecker) => {
     const possibleError = errorChecker(value)
     return possibleError
       ? [...accumulatedErrors, possibleError]

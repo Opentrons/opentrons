@@ -76,7 +76,7 @@ export class FilePage extends React.Component<Props, State> {
     })
   }
 
-  render(): React.ReactNode {
+  render(): JSX.Element {
     const {
       formValues,
       instruments,

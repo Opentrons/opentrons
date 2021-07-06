@@ -5,7 +5,7 @@ import { selectors as stepFormSelectors } from '../../../../step-forms'
 import { FieldProps } from '../../types'
 import { BaseState } from '../../../../types'
 
-type OP = FieldProps & {
+interface OP extends FieldProps {
   pipetteId?: string | null
   className?: FlowRateInputProps['className']
   flowRateType: FlowRateInputProps['flowRateType']
@@ -20,7 +20,7 @@ interface SP {
   pipetteDisplayName: string
 }
 
-type Props = FlowRateInputProps & {
+interface Props extends FlowRateInputProps {
   innerKey: string
 }
 

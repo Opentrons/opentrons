@@ -13,13 +13,13 @@ import {
   OutlineButton,
 } from '@opentrons/components'
 import { DEFAULT_MODEL_FOR_MODULE_TYPE } from '../../../constants'
-import { actions as stepFormActions } from '../../../step-forms'
+import { actions as stepFormActions, ModuleOnDeck } from '../../../step-forms'
 import { ModuleRow } from '../ModuleRow'
 import { ModuleDiagram } from '../ModuleDiagram'
 
 describe('ModuleRow', () => {
   let store: any
-  let magneticModule: React.ComponentProps<typeof ModuleRow>['moduleOnDeck']
+  let magneticModule: ModuleOnDeck
   beforeEach(() => {
     magneticModule = {
       id: 'magnet123',
@@ -64,7 +64,6 @@ describe('ModuleRow', () => {
   })
 
   it('displays crash warning tooltip when module is crashable and in slot 3', () => {
-    // @ts-expect-error(sa, 2021-6-22): magneticModule might be undefined
     magneticModule.slot = '3'
     const props = {
       moduleOnDeck: magneticModule,
@@ -80,7 +79,6 @@ describe('ModuleRow', () => {
   })
 
   it('does not display crash warning tooltip when module is not crashable regardless of slot', () => {
-    // @ts-expect-error(sa, 2021-6-22): magneticModule might be undefined
     magneticModule.model = MAGNETIC_MODULE_V2
     const props = {
       moduleOnDeck: magneticModule,
@@ -123,7 +121,6 @@ describe('ModuleRow', () => {
   })
 
   it('displays the correct module diagram for the selected module model', () => {
-    // @ts-expect-error(sa, 2021-6-22): magneticModule might be undefined
     magneticModule.model = MAGNETIC_MODULE_V2
     const props = {
       moduleOnDeck: magneticModule,

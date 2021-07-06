@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/strict-boolean-expressions */
-/* eslint-disable @typescript-eslint/restrict-plus-operands */
 import { createSelector, Selector } from 'reselect'
 import forEach from 'lodash/forEach'
 import mapValues from 'lodash/mapValues'

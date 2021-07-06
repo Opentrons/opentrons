@@ -35,19 +35,19 @@ beforeEach(() => {
   getLabwareEntitiesMock.mockReturnValue({
     labware123asp: {
       id: 'labware123asp',
-      // @ts-expect-error (ce, 2021-06-21) `labwareDefURI` doesn't exist in `LabwareDefinition2` nor `_fixture_96_plate`
+      // @ts-expect-error (ce, 2021-06-21) need to stub labwareDefURI. see createFile.test.ts for an example
       labwareDefURI: fixture96Plate.labwareDefURI,
       def: fixture96Plate,
     },
     labware123disp: {
       id: 'labware123disp',
-      // @ts-expect-error (ce, 2021-06-21) `labwareDefURI` doesn't exist in `LabwareDefinition2` nor `_fixture_96_plate`
+      // @ts-expect-error (ce, 2021-06-21) need to stub labwareDefURI. see createFile.test.ts for an example
       labwareDefURI: fixture96Plate.labwareDefURI,
       def: fixture96Plate,
     },
     labware123: {
       id: 'labware123',
-      // @ts-expect-error (ce, 2021-06-21) `labwareDefURI` doesn't exist in `LabwareDefinition2` nor `_fixture_96_plate`
+      // @ts-expect-error (ce, 2021-06-21) need to stub labwareDefURI. see createFile.test.ts for an example
       labwareDefURI: fixture96Plate.labwareDefURI,
       def: fixture96Plate,
     },

@@ -11,7 +11,6 @@ import { FileSidebar as FileSidebarComponent, Props } from './FileSidebar'
 import type { BaseState, ThunkDispatch } from '../../types'
 import type { SavedStepFormState, InitialDeckSetup } from '../../step-forms'
 
-// type Props = React.ComponentProps<typeof FileSidebarComponent>
 interface SP {
   canDownload: boolean
   fileData: Props['fileData']

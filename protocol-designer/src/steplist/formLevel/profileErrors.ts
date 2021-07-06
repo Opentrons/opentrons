@@ -12,7 +12,6 @@ type ProfileFormErrorKey = 'INVALID_PROFILE_DURATION'
 const PROFILE_FORM_ERRORS: Record<ProfileFormErrorKey, ProfileFormError> = {
   INVALID_PROFILE_DURATION: {
     title: 'Invalid profile duration',
-    // TODO IMMEDIATELY: what is the actual copy?
     dependentProfileFields: ['durationMinutes', 'durationSeconds'],
   },
 }

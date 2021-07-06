@@ -243,10 +243,6 @@ export const createPresavedStepForm = ({
         return acc
       }
 
-      // TODO(IL, 2020-04-30): Flow cannot be sure that spreading FormPatch type will not overwrite
-      // values for the explicitly-typed keys in FormData (`stepType: StepType` for example)
-      // with `[key]: unknown`.
-      // $FlowFixMe - Fix in #3161.
       return { ...acc, ...updates }
     },
     { ...formData }

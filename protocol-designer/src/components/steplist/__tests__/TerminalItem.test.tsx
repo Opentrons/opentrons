@@ -71,8 +71,7 @@ describe('TerminalItem', () => {
         .mockReturnValue(true)
       const wrapper = render(props)
       act(() => {
-        // @ts-expect-error(sa, 2021-6-21): onClick handler might be undefined
-        wrapper.find(PDTitledList).prop('onClick')()
+        wrapper.find(PDTitledList).prop('onClick')?.({} as React.MouseEvent)
       })
       wrapper.update()
       const confirmDeleteModal = wrapper.find(ConfirmDeleteModal)
@@ -86,8 +85,7 @@ describe('TerminalItem', () => {
         .mockReturnValue(true)
       const wrapper = render(props)
       act(() => {
-        // @ts-expect-error(sa, 2021-6-21): onClick handler might be undefined
-        wrapper.find(PDTitledList).prop('onClick')()
+        wrapper.find(PDTitledList).prop('onClick')?.({} as React.MouseEvent)
       })
       wrapper.update()
       const confirmDeleteModal = wrapper.find(ConfirmDeleteModal)
@@ -103,8 +101,7 @@ describe('TerminalItem', () => {
         .mockReturnValue(true)
       const wrapper = render(props)
       act(() => {
-        // @ts-expect-error(sa, 2021-6-21): onClick handler might be undefined
-        wrapper.find(PDTitledList).prop('onClick')()
+        wrapper.find(PDTitledList).prop('onClick')?.({} as React.MouseEvent)
       })
       wrapper.update()
       const confirmDeleteModal = wrapper.find(ConfirmDeleteModal)

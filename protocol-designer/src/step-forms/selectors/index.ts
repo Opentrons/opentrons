@@ -233,7 +233,6 @@ const _getInitialDeckSetup = (
     pipettes: mapValues<{}, PipetteOnDeck>(
       pipetteLocations,
       (mount: Mount, pipetteId: string): PipetteOnDeck => {
-        // $FlowFixMe(sa, 2021-05-10): PipetteEntities is inexact typed, so flow does not know that there will me a mount on pipetteEntities
         return { mount, ...pipetteEntities[pipetteId] }
       }
     ),
@@ -319,9 +318,7 @@ type PipettesForInstrumentGroup = React.ComponentProps<typeof InstrumentGroup>
 export const getPipettesForInstrumentGroup: Selector<
   BaseState,
   PipettesForInstrumentGroup
-> = createSelector(getInitialDeckSetup, (
-  initialDeckSetup // $FlowFixMe(2021-03-16): fix with TS conversion
-) =>
+> = createSelector(getInitialDeckSetup, initialDeckSetup =>
   reduce(
     initialDeckSetup.pipettes,
     (

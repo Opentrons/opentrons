@@ -13,7 +13,7 @@ export interface FieldProps {
   name: string
   onFieldBlur: () => unknown
   onFieldFocus: () => unknown
-  tooltipContent?: string | null | undefined
+  tooltipContent?: string | null
   updateValue: (arg0: unknown) => void
   value: unknown
 }

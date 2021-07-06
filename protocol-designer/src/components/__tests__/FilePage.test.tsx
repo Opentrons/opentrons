@@ -19,8 +19,7 @@ describe('File Page', () => {
   let mockStore: any
   beforeEach(() => {
     props = {
-      // @ts-expect-error(sa, 2021-6-27): not valid FileMetadataFields state
-      formValues: { metadata: {} },
+      formValues: { metadata: {} } as any,
       instruments: {},
       goToNextPage: () => null,
       saveFileMetadata: () => null,

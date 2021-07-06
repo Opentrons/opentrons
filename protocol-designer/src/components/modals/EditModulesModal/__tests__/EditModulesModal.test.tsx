@@ -206,8 +206,9 @@ describe('Edit Modules Modal', () => {
   describe('Cancel Button', () => {
     it('calls onCloseClick when pressed', () => {
       const wrapper = render(props)
-      // @ts-expect-error (ce, 2021-06-22) possibly undefined and no argument
-      wrapper.find(OutlineButton).at(0).prop('onClick')()
+      wrapper.find(OutlineButton).at(0).prop('onClick')?.(
+        {} as React.MouseEvent
+      )
       expect(props.onCloseClick).toHaveBeenCalled()
     })
   })

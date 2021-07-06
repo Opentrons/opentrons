@@ -49,8 +49,8 @@ export const ContextMenu = (props: Props): JSX.Element => {
   const isMultiSelectMode = useSelector(getIsMultiSelectMode)
 
   React.useEffect(() => {
-    window.addEventListener('click', handleClick)
-    return () => window.removeEventListener('click', handleClick)
+    global.addEventListener('click', handleClick)
+    return () => global.removeEventListener('click', handleClick)
   })
 
   const makeHandleContextMenu = (stepId: StepIdType) => (event: MouseEvent) => {
@@ -131,10 +131,8 @@ export const ContextMenu = (props: Props): JSX.Element => {
           <React.Fragment>
             <div
               ref={menuRoot}
-              style={{
-                left: position.left ?? undefined,
-                top: position.top ?? undefined,
-              }}
+              // @ts-expect-error(sa, 2021-7-5): position cannot be null, cast to undefined
+              style={{ left: position.left, top: position.top }}
               className={styles.context_menu}
             >
               <div

@@ -54,7 +54,6 @@ const StepPill = (props: StepPillProps): JSX.Element => {
     i18n.t(`application.stepType.${stepType}`)
   )} (${count})`
   return (
-    // @ts-expect-error(sa, 2021-6-23): TS does not like these styles coming from styled components
     <Flex css={stepPillStyles} key={stepType}>
       <Text fontSize={FONT_SIZE_BODY_1}>{label}</Text>
     </Flex>
@@ -85,7 +84,7 @@ export const StepSelectionBannerComponent = (
 ): JSX.Element => {
   const { countPerStepType, handleExitBatchEdit } = props
   const numSteps = Object.keys(countPerStepType).reduce<number>(
-    // @ts-expect-error(sa, 2021-6-23): not sure how to tell TS that countPerStepType[stepType] actually exists
+    // @ts-expect-error(sa, 2021-6-23): refactor to use Object.entries to preserve type safety
     (acc, stepType) => acc + countPerStepType[stepType as StepType],
     0
   )
@@ -125,7 +124,7 @@ export const StepSelectionBannerComponent = (
           >
             {stepTypes.map(stepType => (
               <StepPill
-                // @ts-expect-error(sa, 2021-6-23): not sure how to tell TS that countPerStepType[stepType] actually exists
+                // @ts-expect-error(sa, 2021-6-23): refactor to use Object.entries to preserve type safety
                 count={countPerStepType[stepType]}
                 stepType={stepType}
                 key={stepType}

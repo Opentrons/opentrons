@@ -33,7 +33,7 @@ interface WellSelectionModalProps {
   isOpen: boolean
   labwareId?: string | null
   name: StepFieldName
-  onCloseClick: (e?: React.MouseEvent<any>) => unknown
+  onCloseClick: (e?: React.MouseEvent<HTMLDivElement>) => unknown
   pipetteId?: string | null
   value: unknown
   updateValue: (val: unknown | null | undefined) => void

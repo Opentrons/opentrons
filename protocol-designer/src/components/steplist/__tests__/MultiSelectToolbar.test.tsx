@@ -112,8 +112,7 @@ describe('MultiSelectToolbar', () => {
     expect(selectIcon.prop('iconName')).toBe('checkbox-marked')
     expect(selectIcon.prop('tooltipText')).toBe('Deselect All')
     act(() => {
-      // @ts-expect-error(sa, 2021-6-21): onClick handler might not exist
-      selectIcon.prop('onClick')()
+      selectIcon.prop('onClick')?.({} as React.MouseEvent)
     })
     expect(deselectAllStepsSpy).toHaveBeenCalled()
   })
@@ -133,8 +132,7 @@ describe('MultiSelectToolbar', () => {
     expect(selectIcon.prop('iconName')).toBe('minus-box')
     expect(selectIcon.prop('tooltipText')).toBe('Select All')
     act(() => {
-      // @ts-expect-error(sa, 2021-6-21): onClick handler might not exist
-      selectIcon.prop('onClick')()
+      selectIcon.prop('onClick')?.({} as React.MouseEvent)
     })
     expect(selectAllStepsSpy).toHaveBeenCalled()
   })
@@ -155,8 +153,7 @@ describe('MultiSelectToolbar', () => {
       const wrapper = render()
       const expandIcon = wrapper.find(ClickableIcon).at(3)
       act(() => {
-        // @ts-expect-error(sa, 2021-6-21): onClick handler might not exist
-        expandIcon.prop('onClick')()
+        expandIcon.prop('onClick')?.({} as React.MouseEvent)
       })
       expect(expandMultipleStepsSpy).toHaveBeenCalledWith(['id_1', 'id_2'])
 
@@ -170,8 +167,7 @@ describe('MultiSelectToolbar', () => {
       const collapseIcon = wrapper.find(ClickableIcon).at(3)
 
       act(() => {
-        // @ts-expect-error(sa, 2021-6-21): onClick handler might not exist
-        collapseIcon.prop('onClick')()
+        collapseIcon.prop('onClick')?.({} as React.MouseEvent)
       })
       expect(collapseMultipleStepsSpy).toHaveBeenCalledWith(['id_1', 'id_2'])
     })
@@ -181,8 +177,7 @@ describe('MultiSelectToolbar', () => {
       expect(expandIcon.prop('iconName')).toBe('unfold-more-horizontal')
       expect(expandIcon.prop('tooltipText')).toBe('Expand')
       act(() => {
-        // @ts-expect-error(sa, 2021-6-21): onClick handler might not exist
-        expandIcon.prop('onClick')()
+        expandIcon.prop('onClick')?.({} as React.MouseEvent)
       })
       wrapper.update()
       const expandIconUpdated = wrapper.find(ClickableIcon).at(3)
@@ -209,8 +204,7 @@ describe('MultiSelectToolbar', () => {
       const deleteIcon = wrapper.find(ClickableIcon).at(1)
 
       act(() => {
-        // @ts-expect-error(sa, 2021-6-21): onClick handler might not exist
-        deleteIcon.prop('onClick')()
+        deleteIcon.prop('onClick')?.({} as React.MouseEvent)
       })
 
       wrapper.update()
@@ -221,7 +215,7 @@ describe('MultiSelectToolbar', () => {
       )
 
       act(() => {
-        // @ts-expect-error(sa, 2021-6-27): not sure wht TS not recognizing onContinueClick overload with no function parameter
+        // @ts-expect-error(sa, 2021-6-27): not sure why TS not recognizing onContinueClick overload with no event parameter
         confirmDeleteModal.prop('onContinueClick')()
       })
       wrapper.update()
@@ -249,8 +243,7 @@ describe('MultiSelectToolbar', () => {
 
       const copyIcon = wrapper.find(ClickableIcon).at(2)
       act(() => {
-        // @ts-expect-error(sa, 2021-6-21): onClick handler might not exist
-        copyIcon.prop('onClick')()
+        copyIcon.prop('onClick')?.({} as React.MouseEvent)
       })
 
       expect(duplicateMultipleStepsSpy).toHaveBeenCalledWith(['id_1'])
@@ -278,8 +271,7 @@ describe('MultiSelectToolbar', () => {
       const copyIcon = wrapper.find(ClickableIcon).at(2)
 
       act(() => {
-        // @ts-expect-error(sa, 2021-6-21): onClick handler might not exist
-        copyIcon.prop('onClick')()
+        copyIcon.prop('onClick')?.({} as React.MouseEvent)
       })
 
       wrapper.update()
@@ -288,7 +280,7 @@ describe('MultiSelectToolbar', () => {
       expect(confirmDeleteModal.prop('modalType')).toBe(CLOSE_BATCH_EDIT_FORM)
 
       act(() => {
-        // @ts-expect-error(sa, 2021-6-27): not sure wht TS not recognizing onContinueClick overload with no function parameter
+        // @ts-expect-error(sa, 2021-6-27): not sure why TS not recognizing onContinueClick overload with no event parameter
         confirmDeleteModal.prop('onContinueClick')()
       })
       wrapper.update()

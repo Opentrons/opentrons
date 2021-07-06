@@ -17,9 +17,7 @@ interface State {
 }
 
 export class SelectionRect extends React.Component<Props, State> {
-  // TODO Ian 2018-02-22 No support in Flow for SVGElement yet: https://github.com/facebook/flow/issues/2332
-  // this `parentRef` should be HTMLElement | SVGElement
-  parentRef?: any | null
+  parentRef?: HTMLElement | SVGElement | null
 
   constructor(props: Props) {
     super(props)
@@ -47,6 +45,7 @@ export class SelectionRect extends React.Component<Props, State> {
         left: number
         top: number
       } = parentRef.getBoundingClientRect()
+      // @ts-expect-error(sa, 2021-7-1): parentRef.closest might return null
       const viewBox: { width: number; height: number } = parentRef.closest(
         'svg'
       ).viewBox.baseVal // WARNING: elem.closest() is experiemental

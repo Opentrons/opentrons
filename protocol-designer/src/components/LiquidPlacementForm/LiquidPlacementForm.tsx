@@ -47,12 +47,12 @@ export class LiquidPlacementForm extends React.Component<Props> {
     }
   }
 
-  // @ts-expect-error(sa, 2021-6-22): Yup types not cooporating
   getValidationSchema: () => Yup.Schema<
-    {
-      selectedLiquidId: string
-      volume: number
-    },
+    | {
+        selectedLiquidId: string
+        volume: number
+      }
+    | undefined,
     any
   > = () => {
     const { selectedWellsMaxVolume } = this.props

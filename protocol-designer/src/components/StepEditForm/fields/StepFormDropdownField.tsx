@@ -5,7 +5,7 @@ import styles from '../StepEditForm.css'
 import { StepFieldName } from '../../../steplist/fieldLevel'
 import { FieldProps } from '../types'
 
-export type StepFormDropdownProps = FieldProps & {
+export interface StepFormDropdownProps extends FieldProps {
   options: Options
   name: StepFieldName
   className?: string

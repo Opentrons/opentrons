@@ -28,9 +28,8 @@ interface LiquidEditFormValues {
   serialize?: boolean
   [key: string]: unknown
 }
-// @ts-expect-error(sa, 2021-6-22): Yup schema types not cooporating
 export const liquidEditFormSchema: Yup.Schema<
-  { name: string; description: string; serialize: boolean },
+  { name: string; description: string; serialize: boolean } | undefined,
   any
 > = Yup.object().shape({
   name: Yup.string().required(

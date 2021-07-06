@@ -19,13 +19,13 @@ export interface ModuleFieldsProps {
     | string
     | {
         magneticModuleType?: {
-          model?: string
+          model: string
         }
         temperatureModuleType?: {
-          model?: string
+          model: string
         }
         thermocyclerModuleType?: {
-          model?: string
+          model: string
         }
       }
   touched:
@@ -33,13 +33,13 @@ export interface ModuleFieldsProps {
     | boolean
     | {
         magneticModuleType?: {
-          model?: boolean
+          model: boolean
         }
         temperatureModuleType?: {
-          model?: boolean
+          model: boolean
         }
         thermocyclerModuleType?: {
-          model?: boolean
+          model: boolean
         }
       }
   values: FormModulesByType
@@ -59,7 +59,7 @@ export function ModuleFields(props: ModuleFieldsProps): JSX.Element {
     errors,
     touched,
   } = props
-  // @ts-expect-error(sa, 2021-6-21): Object.keys not smartt enough to take the keys of FormModulesByType
+  // @ts-expect-error(sa, 2021-6-21): Object.keys not smart enough to take the keys of FormModulesByType
   const modules: ModuleRealType[] = Object.keys(values)
   const handleOnDeckChange = (type: ModuleRealType) => (
     e: React.ChangeEvent

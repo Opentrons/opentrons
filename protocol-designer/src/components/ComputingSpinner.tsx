@@ -14,7 +14,6 @@ export const ComputingSpinner = (): JSX.Element => {
   return (
     showSpinner && (
       <Box
-        // @ts-expect-error(sa, 2021-6-21): TS does not recognize these styles
         css={waitCursorStyle}
         opacity={0}
         zIndex={999}

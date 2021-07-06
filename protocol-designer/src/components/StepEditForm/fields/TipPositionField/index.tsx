@@ -22,7 +22,7 @@ import { getDefaultMmFromBottom } from './utils'
 import { BaseState } from '../../../../types'
 import { FieldProps } from '../../types'
 
-type OP = FieldProps & {
+interface OP extends FieldProps {
   labwareId?: string | null
   className?: string
 }

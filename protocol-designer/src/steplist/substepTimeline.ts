@@ -44,7 +44,7 @@ const _createNextTimelineFrame = (args: {
   wellInfo: SourceDestData
 }> => {
   // TODO(IL, 2020-02-24): is there a cleaner way to create newTimelineFrame
-  // and keep Flow happy about computed properties?
+  // and keep TS happy about computed properties?
   const _newTimelineFrameKeys = {
     volume: args.volume,
     activeTips: _getNewActiveTips(args.nextFrame.commands.slice(0, args.index)),

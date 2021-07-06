@@ -45,13 +45,13 @@ interface DP {
 interface DNDP {
   draggedLabware?: LabwareOnDeck | null
   isOver: boolean
-  connectDragSource: (val: React.ReactNode) => React.ReactNode
-  connectDropTarget: (val: React.ReactNode) => React.ReactNode
+  connectDragSource: (val: JSX.Element) => JSX.Element
+  connectDropTarget: (val: JSX.Element) => JSX.Element
 }
 
 type Props = OP & SP & DP & DNDP
 
-const EditLabwareComponent = (props: Props): React.ReactNode => {
+const EditLabwareComponent = (props: Props): JSX.Element => {
   const {
     labwareOnDeck,
     isYetUnnamed,
@@ -156,7 +156,6 @@ const DragEditLabware = DragSource(
   DND_TYPES.LABWARE,
   labwareSource,
   collectLabwareSource
-  // @ts-expect-error(sa, 2021-6-21): react node types mismatch with react dnd
 )(EditLabwareComponent)
 
 const labwareDropTarget = {

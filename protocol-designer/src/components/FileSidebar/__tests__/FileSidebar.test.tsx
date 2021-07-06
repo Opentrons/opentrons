@@ -58,8 +58,7 @@ describe('FileSidebar', () => {
 
     pipettesOnDeck = {
       pipetteLeftId: {
-        // @ts-expect-error(sa, 2021-6-22): not a valid pipette name
-        name: 'string',
+        name: 'string' as any,
         id: pipetteLeftId,
         tiprackDefURI: 'test',
         tiprackLabwareDef: fixture_tiprack_10_ul as LabwareDefinition2,
@@ -67,8 +66,7 @@ describe('FileSidebar', () => {
         mount: 'left',
       },
       pipetteRightId: {
-        // @ts-expect-error(sa, 2021-6-22): not a valid pipette name
-        name: 'string',
+        name: 'string' as any,
         id: pipetteRightId,
         tiprackDefURI: 'test',
         tiprackLabwareDef: fixture_tiprack_10_ul as LabwareDefinition2,
@@ -78,18 +76,16 @@ describe('FileSidebar', () => {
     }
 
     modulesOnDeck = {
-      // @ts-expect-error(sa, 2021-6-22): missing id and model
       magnet123: {
         type: MAGNETIC_MODULE_TYPE,
-      },
+      } as any,
     }
 
     savedStepForms = {
-      // @ts-expect-error(sa, 2021-6-22): stepType missing
       step123: {
         id: 'step123',
         pipette: pipetteLeftId,
-      },
+      } as any,
     }
   })
   afterEach(() => {

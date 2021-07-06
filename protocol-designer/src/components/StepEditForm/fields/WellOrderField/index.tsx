@@ -117,7 +117,6 @@ export const WellOrderField = (props: WellOrderFieldProps): JSX.Element => {
           ) : (
             <Text
               onClick={handleOpen}
-              // @ts-expect-error(sa, 2021-6-22): not sure why TS does not like this coming from styled components
               css={mixedWellOrderStyles}
               id={`WellOrderField_button_${props.prefix}`}
               data-test={`WellOrderField_button_${String(firstValue)}_${String(

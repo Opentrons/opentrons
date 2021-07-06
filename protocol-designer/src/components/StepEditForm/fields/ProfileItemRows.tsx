@@ -311,14 +311,13 @@ const ProfileStepRow = (props: ProfileStepRowProps): JSX.Element => {
   const deleteProfileStep = (): void => {
     dispatch(steplistActions.deleteProfileStep({ id: profileStepItem.id }))
   }
-  type Names = 'title' | 'temperature' | 'durationMinutes' | 'durationSeconds'
-  const names: Names[] = [
+  const names = [
     'title',
     'temperature',
     'durationMinutes',
     'durationSeconds',
-  ]
-  const units: Record<Names, string | null> = {
+  ] as const
+  const units: Record<typeof names[number], string | null> = {
     title: null,
     temperature: i18n.t('application.units.degrees'),
     durationMinutes: i18n.t('application.units.minutes'),

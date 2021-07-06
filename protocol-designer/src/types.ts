@@ -39,15 +39,6 @@ export interface Action {
   metadata?: unknown
 }
 export type WellVolumes = Record<string, number>
-// TODO LATER Ian 2018-02-19 type for containers.json
-// TODO(mc, 2020-06-04): this type is unused, can it be deleted?
-export interface JsonWellData {
-  'total-liquid-volume': number // missing rest of fields, todo later
-}
-// TODO(mc, 2020-06-04): this type is unused, can it be deleted?
-export interface VolumeJson {
-  locations: Record<string, JsonWellData>
-}
 // NOTE: string expected to be '1', '2', ... '12' for normal deck slots,
 // or special PD-specific 'span7_8_10_11' slot (for thermocycler)
 // or a module ID.

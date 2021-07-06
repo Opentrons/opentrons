@@ -11,27 +11,24 @@ describe('getNextDefaultPipetteId', () => {
       {
         testMsg: 'both pipettes present: use left pipette',
         equippedPipettesById: {
-          // @ts-expect-error(sa, 2021-6-14): missing properties for type PipetteOnDeck
           leftId: {
             id: 'leftId',
             mount: 'left',
-          },
-          // @ts-expect-error(sa, 2021-6-14): missing properties for type PipetteOnDeck
+          } as any,
           rightId: {
             id: 'rightId',
             mount: 'right',
-          },
+          } as any,
         },
         expected: 'leftId',
       },
       {
         testMsg: 'right only: use right',
         equippedPipettesById: {
-          // @ts-expect-error(sa, 2021-6-14): missing properties for type PipetteOnDeck
           rightId: {
             id: 'rightId',
             mount: 'right',
-          },
+          } as any,
         },
         expected: 'rightId',
       },
@@ -80,16 +77,13 @@ describe('getNextDefaultPipetteId', () => {
     testCases.forEach(({ testMsg, orderedStepIds, expected }) => {
       it(testMsg, () => {
         const savedForms: Record<StepIdType, FormData> = {
-          // @ts-expect-error(sa, 2021-6-14): missing stepType and id to be of type FormData
           a: {
             pipette: 'pipetteId_A',
-          },
-          // @ts-expect-error(sa, 2021-6-14): missing stepType and id to be of type FormData
+          } as any,
           b: {
             pipette: 'pipetteId_B',
-          },
-          // @ts-expect-error(sa, 2021-6-14): missing stepType and id to be of type FormData
-          x: {}, // no 'pipette' key, eg a Pause step
+          } as any,
+          x: {} as any, // no 'pipette' key, eg a Pause step
         }
         const equippedPipettesById: Record<string, PipetteOnDeck> = {
           // @ts-expect-error(sa, 2021-6-14): missing properties for type PipetteOnDeck

@@ -217,7 +217,7 @@ export const unsavedForm = (
         unsavedFormState.id &&
         stepIdsToUpdate.includes(unsavedFormState.id)
       ) {
-        // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
+        // TODO(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
         return {
           ...unsavedFormState,
           ...handleFormChange(
@@ -562,7 +562,6 @@ export const savedStepForms = (
       return stepIds.reduce(
         (acc, stepId) => ({
           ...acc,
-          // $FlowFixMe(sa, 2021-02-16): spreading editedFields can overwrite properties with explicit keys in a way that Flow cannot track
           [stepId]: { ...savedStepForms[stepId], ...editedFields },
         }),
         { ...savedStepForms }
@@ -792,7 +791,7 @@ export const savedStepForms = (
           savedForm,
           (acc, value, fieldName) => {
             if (value === labwareIdToDelete) {
-              // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
+              // TODO(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
               return {
                 ...acc,
                 ...handleFormChange(
@@ -810,7 +809,7 @@ export const savedStepForms = (
           },
           savedForm
         )
-        // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
+        // TODO(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
         return { ...savedForm, ...deleteLabwareUpdate }
       })
     }
@@ -830,7 +829,7 @@ export const savedStepForms = (
               ),
             }
           } else if (deletedPipetteIds.includes(form.pipette)) {
-            // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
+            // TODO(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
             return {
               ...form,
               ...handleFormChange(
@@ -909,11 +908,11 @@ export const savedStepForms = (
         )
         return {
           ...acc,
-          // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
+          // TODO(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
           [stepId]: { ...prevStepForm, ...updatedFields },
         }
       }, {})
-      // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
+      // TODO(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
       return { ...savedStepForms, ...savedStepsUpdate }
     }
 
@@ -942,7 +941,7 @@ export const savedStepForms = (
       // (eg `wells` arrays should be reset, not appended to)
       return {
         ...savedStepForms,
-        // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
+        // TODO(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
         [stepId]: {
           ...previousForm,
           ...handleFormChange(
@@ -1045,7 +1044,7 @@ export const savedStepForms = (
           )
           return {
             ...acc,
-            // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
+            // TODO(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
             [stepId]: { ...prevStepForm, ...updatedFields },
           }
         },

@@ -25,6 +25,7 @@ export type DeleteModalType =
 interface Props {
   modalType: DeleteModalType
   onCancelClick: () => unknown
+  // TODO(sa, 2021-7-2): iron out this type, I think the weirdness comes from the return type of onConditionalConfirm
   onContinueClick: ((event: React.MouseEvent) => unknown) | (() => unknown)
 }
 

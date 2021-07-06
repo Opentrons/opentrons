@@ -26,10 +26,9 @@ describe('steps actions', () => {
       when(mockGetSavedStepForms)
         .calledWith(expect.anything())
         .mockReturnValue({
-          // @ts-expect-error(sa, 2021-6-15): missing properties from FormData
           stepId: {
             foo: 'getSavedStepFormsResult',
-          },
+          } as any,
         })
     })
     afterEach(() => {
@@ -38,7 +37,6 @@ describe('steps actions', () => {
     // TODO(IL, 2020-04-17): also test scroll to top behavior
     it('should select the step and populate the form', () => {
       const store: any = mockStore()
-      // $FlowFixMe(IL, 2020-04-17): redux-mock-store dispatch types not cooperating. Related TypeScript issue: https://github.com/reduxjs/redux-mock-store/issues/148
       store.dispatch(selectStep(stepId))
       expect(store.getActions()).toEqual([
         {

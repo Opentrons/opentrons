@@ -3,7 +3,7 @@ import { RadioGroup } from '@opentrons/components'
 import { StepFieldName } from '../../../steplist/fieldLevel'
 import { FieldProps } from '../types'
 
-type RadioGroupFieldProps = FieldProps & {
+interface RadioGroupFieldProps extends FieldProps {
   name: StepFieldName
   options: React.ComponentProps<typeof RadioGroup>['options']
   className?: string

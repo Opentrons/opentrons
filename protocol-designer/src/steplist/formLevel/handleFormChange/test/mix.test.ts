@@ -17,7 +17,6 @@ beforeEach(() => {
     pipetteId: {
       name: 'p10_single',
       tiprackModel: 'tiprack-10ul',
-      // @ts-expect-error(sa, 2021-6-15): missing properties from PipetteNameSpecs
       spec: {
         channels: 1,
       },
@@ -25,24 +24,21 @@ beforeEach(() => {
     pipetteMultiId: {
       name: 'p10_multi',
       tiprackModel: 'tiprack-10ul',
-      // @ts-expect-error(sa, 2021-6-15): missing properties from PipetteNameSpecs
       spec: {
         channels: 8,
       },
     },
-  }
+  } as any
   labwareEntities = {
     trashId: {
-      // @ts-expect-error(sa, 2021-6-15): type does not exist on LabwareEntity
       type: 'trash-box',
       def: fixtureTrash,
     },
     plateId: {
-      // @ts-expect-error(sa, 2021-6-15): type does not exist on LabwareEntity
       type: '96-flat',
       def: fixture96Plate,
     },
-  }
+  } as any
 
   handleFormHelper = (
     patch: Partial<Record<string, unknown>>,

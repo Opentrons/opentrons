@@ -3,18 +3,7 @@ import * as React from 'react'
 export const KNOWLEDGEBASE_ROOT_URL =
   'https://support.opentrons.com/en/collections/493886-protocol-designer'
 
-interface Links {
-  airGap: string
-  multiDispense: string
-  protocolSteps: string
-  customLabware: string
-  recommendedLabware: string
-  pipetteGen1MultiModuleCollision: string
-  betaReleases: string
-  magneticModuleGenerations: string
-}
-
-export const links: Links = {
+export const links = {
   airGap: `https://support.opentrons.com/en/articles/4398106-air-gap`,
   multiDispense: `https://support.opentrons.com/en/articles/4170341-paths`,
   protocolSteps: `https://support.opentrons.com/en/collections/493886-protocol-designer#building-a-protocol-steps`,
@@ -26,10 +15,10 @@ export const links: Links = {
   betaReleases: `https://support.opentrons.com/en/articles/3854833-opentrons-beta-software-releases`,
   magneticModuleGenerations:
     'http://support.opentrons.com/en/articles/1820112-magnetic-module',
-}
+} as const
 
 interface Props {
-  to: keyof Links
+  to: keyof typeof links
   children: React.ReactNode
   className?: string
 }

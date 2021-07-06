@@ -64,7 +64,7 @@ export const getMissingTipsByLabwareId: Selector<Record<
 
     const missingTips =
       robotState &&
-      robotState.tipState && // $FlowFixMe(bc, 2019-05-31): flow choking on mapValues
+      robotState.tipState &&
       mapValues(robotState.tipState.tipracks, tipMap =>
         reduce(
           tipMap,

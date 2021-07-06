@@ -1,7 +1,7 @@
 import round from 'lodash/round'
 const VOLUME_SIG_DIGITS_DEFAULT = 2
 export function formatVolume(
-  inputVolume: (string | null | undefined) | (number | null | undefined),
+  inputVolume?: string | number | null,
   sigDigits: number = VOLUME_SIG_DIGITS_DEFAULT
 ): string {
   if (typeof inputVolume === 'number') {

@@ -244,7 +244,7 @@ const CollapsibleSubstep = (props: CollapsibleSubstepProps): JSX.Element => {
 
 const renderSubstepInfo = (
   substeps: ThermocyclerProfileSubstepItem
-): React.ReactNode => {
+): JSX.Element | JSX.Element[] | null => {
   let stepNumber = 1
   const substepInfo: Array<
     | React.ReactElement<typeof ProfileCycleSubstepGroup>

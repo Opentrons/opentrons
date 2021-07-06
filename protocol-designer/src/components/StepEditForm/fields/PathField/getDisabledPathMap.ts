@@ -13,7 +13,7 @@ export interface ValuesForPath {
   aspirate_airGap_volume?: string | null
   aspirate_wells?: string[] | null
   changeTip: ChangeTipOptions
-  dispense_wells: string[] | null | undefined
+  dispense_wells?: string[] | null
   pipette?: string | null
   volume?: string | null
 }

@@ -22,11 +22,10 @@ describe('saveProtocolFile thunk', () => {
     const fakeState = {}
     const mockFileData = {}
     let actionWasDispatched = false
-    // @ts-expect-error incorrect return type for function
     createFileSelectorMock.mockImplementation(state => {
       expect(state).toBe(fakeState)
       expect(actionWasDispatched).toBe(true)
-      return mockFileData
+      return mockFileData as any
     })
     getFileMetadataMock.mockImplementation(state => {
       expect(state).toBe(fakeState)

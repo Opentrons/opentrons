@@ -63,7 +63,6 @@ export const getWellContentsAllLabware: Selector<WellContentsByLabware> = create
     selectedWells,
     highlightedWells
   ) => {
-    // TODO: Ian 2019-02-14 weird flow error without explicit string[] annotation
     const allLabwareIds: string[] = Object.keys(labwareEntities)
     return allLabwareIds.reduce(
       (

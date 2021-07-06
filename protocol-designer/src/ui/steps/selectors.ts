@@ -274,9 +274,9 @@ export const getMultiSelectFieldValues: Selector<MultiselectFieldValues | null> 
       return null
     }
 
-    const multiselectChanges = Object.keys(changes).reduce((acc, name) => {
-      // @ts-expect-error(sa, 2021-6-15): not sure how to type this cuz isIndeterminate is NOT optional on MultiselectFieldValues
-      // but the inital value of this reduce is {}
+    const multiselectChanges = Object.keys(
+      changes
+    ).reduce<MultiselectFieldValues>((acc, name) => {
       acc[name] = {
         value: changes[name],
         isIndeterminate: false,
@@ -374,8 +374,7 @@ function getMoveLiquidMultiSelectDisabledFields(
   const disabledFields: DisabledFields = {
     ...(pipettesDifferent && getPipetteDifferentDisabledFields('moveLiquid')),
     ...(aspirateLabwareDifferent && getAspirateLabwareDisabledFields()),
-    ...(dispenseLabwareDifferent && // $FlowIssue(sa, 2021-01-13): https://github.com/facebook/flow/issues/8186
-      getDispenseLabwareDisabledFields()),
+    ...(dispenseLabwareDifferent && getDispenseLabwareDisabledFields()),
     ...(includesMultiAspirate && getMultiAspiratePathDisabledFields()),
     ...(includesMultiDispense && getMultiDispensePathDisabledFields()),
     ...(includesMultiAspirate &&
@@ -406,7 +405,6 @@ function getMixMultiSelectDisabledFields(forms: FormData[]): DisabledFields {
     }
   )
   const disabledFields: DisabledFields = {
-    // $FlowIssue(sa, 2021-04-01): https://github.com/facebook/flow/issues/8186
     ...(pipettesDifferent && getPipetteDifferentDisabledFields('mix')),
     ...(labwareDifferent && getLabwareDisabledFields()),
   }

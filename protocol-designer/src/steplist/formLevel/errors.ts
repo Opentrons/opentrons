@@ -128,7 +128,7 @@ const LID_TEMPERATURE_HOLD_REQUIRED: FormError = {
   title: 'Temperature is required',
   dependentFields: ['lidIsActiveHold', 'lidTargetTempHold'],
 }
-export type FormErrorChecker = (arg: unknown) => FormError | null | undefined
+export type FormErrorChecker = (arg: unknown) => FormError | null
 // TODO: test these
 
 /*******************
@@ -138,7 +138,7 @@ export type FormErrorChecker = (arg: unknown) => FormError | null | undefined
 type HydratedFormData = any
 export const incompatibleLabware = (
   fields: HydratedFormData
-): FormError | null | undefined => {
+): FormError | null => {
   const { labware, pipette } = fields
   if (!labware || !pipette) return null
   return !canPipetteUseLabware(pipette.spec, labware.def)
@@ -147,7 +147,7 @@ export const incompatibleLabware = (
 }
 export const incompatibleDispenseLabware = (
   fields: HydratedFormData
-): FormError | null | undefined => {
+): FormError | null => {
   const { dispense_labware, pipette } = fields
   if (!dispense_labware || !pipette) return null
   return !canPipetteUseLabware(pipette.spec, dispense_labware.def)
@@ -156,7 +156,7 @@ export const incompatibleDispenseLabware = (
 }
 export const incompatibleAspirateLabware = (
   fields: HydratedFormData
-): FormError | null | undefined => {
+): FormError | null => {
   const { aspirate_labware, pipette } = fields
   if (!aspirate_labware || !pipette) return null
   return !canPipetteUseLabware(pipette.spec, aspirate_labware.def)
@@ -165,7 +165,7 @@ export const incompatibleAspirateLabware = (
 }
 export const pauseForTimeOrUntilTold = (
   fields: HydratedFormData
-): FormError | null | undefined => {
+): FormError | null => {
   const {
     pauseAction,
     pauseHour,
@@ -339,12 +339,10 @@ export const engageHeightRangeExceeded = (
 type ComposeErrors = (
   ...errorCheckers: FormErrorChecker[]
 ) => (arg: unknown) => FormError[]
-// @ts-expect-error(sa, 2021-6-14): cannot modify return type of reduce without giving an initial value
 export const composeErrors: ComposeErrors = (
   ...errorCheckers: FormErrorChecker[]
 ) => value =>
-  // @ts-expect-error(sa, 2021-6-14): cannot modify return type of reduce without giving an initial value
-  errorCheckers.reduce((acc, errorChecker) => {
+  errorCheckers.reduce<FormError[]>((acc, errorChecker) => {
     const possibleError = errorChecker(value)
     return possibleError ? [...acc, possibleError] : acc
   }, [])

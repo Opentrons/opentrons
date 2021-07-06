@@ -161,10 +161,7 @@ export const getRobotStateTimeline: Selector<StepGeneration.Timeline> = state =>
 export const getSubsteps: Selector<Substeps> = state =>
   state.fileData.computedSubsteps
 type WarningsPerStep = {
-  [stepId in number | string]?:
-    | StepGeneration.CommandCreatorWarning[]
-    | null
-    | undefined
+  [stepId in number | string]?: StepGeneration.CommandCreatorWarning[] | null
 }
 export const timelineWarningsPerStep: Selector<WarningsPerStep> = createSelector(
   stepFormSelectors.getOrderedStepIds,

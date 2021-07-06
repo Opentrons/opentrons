@@ -16,17 +16,15 @@ describe('utils', () => {
     let sharedForm: FormData
     let pipetteEntities: PipetteEntities
     beforeEach(() => {
-      // @ts-expect-error(sa, 2021-6-15): missing id, stepType for FormData
       sharedForm = {
         pipette: 'p300_single',
-      }
+      } as any
       pipetteEntities = {
-        // @ts-expect-error(sa, 2021-6-15): missing name and id
         p300_single: {
           spec: fixtureP300Single,
           tiprackLabwareDef: fixtureTiprack300ul,
         },
-      }
+      } as any
     })
     describe('multi dispense path', () => {
       const testCases = [

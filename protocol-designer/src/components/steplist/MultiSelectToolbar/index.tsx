@@ -66,7 +66,6 @@ export const ClickableIcon = (props: ClickableIconProps): JSX.Element => {
   }
 
   return (
-    // @ts-expect-error(sa, 2021-6-21): not sure why this is not a valid css prop
     <Box id={id} {...boxStyles} {...targetProps} css={iconBoxStyles}>
       <Tooltip {...tooltipProps}>{tooltipText}</Tooltip>
       <Box onClick={onClick}>

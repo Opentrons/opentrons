@@ -4,8 +4,8 @@ import { i18n } from '../../../localization'
 import styles from '../StepEditForm.css'
 
 interface Props {
-  className?: string
-  collapsed?: boolean
+  className?: string | null
+  collapsed?: boolean | null
   toggleCollapsed: () => void
   prefix: 'aspirate' | 'dispense'
   children?: React.ReactNode
@@ -15,6 +15,7 @@ export const AspDispSection = (props: Props): JSX.Element => {
   const { children, className, collapsed, toggleCollapsed, prefix } = props
   const [targetProps, tooltipProps] = useHoverTooltip()
   return (
+    // @ts-expect-error(sa, 2021-7-2): className might be null
     <div className={className}>
       <div className={styles.section_header}>
         <span className={styles.section_header_text}>{prefix}</span>

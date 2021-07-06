@@ -13,7 +13,7 @@ import { getLabwareNamesByModuleId } from '../ui/modules/selectors'
 import { Middleware } from 'redux'
 import { BaseState } from '../types'
 import { GenerateRobotStateTimelineArgs } from './generateRobotStateTimeline'
-import { SubstepsArgsNoTimeline, TimelineWorker } from './types'
+import { SubstepsArgsNoTimeline } from './types'
 
 const hasChanged = (
   nextValues: { [key in any]?: any },
@@ -41,8 +41,7 @@ const getSubstepsArgs = (state: BaseState): SubstepsArgsNoTimeline => ({
 
 // TODO(IL, 2020-06-15): once we create an Action union for PD, use that instead of `any` for Middleware<S, A>
 export const makeTimelineMiddleware: () => Middleware<BaseState, any> = () => {
-  // TODO(IL, 2021-04-08): in TS conversion, this 'any' should be avoidable
-  const worker: TimelineWorker = new Worker('./worker', {
+  const worker: Worker = new Worker('./worker', {
     type: 'module',
   }) as any
   let prevTimelineArgs: GenerateRobotStateTimelineArgs | null = null // caches results of dependent selectors, eg {[selectorIndex]: lastCachedSelectorValue}

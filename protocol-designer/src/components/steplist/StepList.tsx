@@ -39,11 +39,11 @@ export class StepList extends React.Component<StepListProps> {
   }
 
   componentDidMount(): void {
-    window.addEventListener('keydown', this.handleKeyDown, false)
+    global.addEventListener('keydown', this.handleKeyDown, false)
   }
 
   componentWillUnmount(): void {
-    window.removeEventListener('keydown', this.handleKeyDown, false)
+    global.removeEventListener('keydown', this.handleKeyDown, false)
   }
 
   render(): React.ReactNode {

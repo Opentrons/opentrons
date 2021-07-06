@@ -26,18 +26,13 @@ export interface PDMetadata {
       serialize: boolean
     }
   >
-  ingredLocations: Record<
-    string,
-    Record<
-      string,
-      Record<
-        string,
-        {
-          volume: number
-        }
-      >
-    >
-  >
+  ingredLocations: {
+    [labwareId: string]: {
+      [wellId: string]: {
+        [liquidId: string]: { volume: number }
+      }
+    }
+  }
   savedStepForms: Record<
     string,
     {

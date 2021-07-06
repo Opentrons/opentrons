@@ -31,10 +31,6 @@ export interface WorkerResponse {
 export interface WorkerResponseEvent {
   data: WorkerResponse
 }
-export interface TimelineWorker {
-  onmessage: (arg0: WorkerResponseEvent) => void
-  postMessage: (arg0: WorkerCommandMessage) => void
-}
 export interface WorkerContext {
   addEventListener: (
     arg0: 'message',

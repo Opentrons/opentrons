@@ -1,5 +1,3 @@
-import { MouseEvent } from 'react'
-
 export interface DragRect {
   xStart: number
   yStart: number
@@ -20,6 +18,3 @@ export interface BoundingRect {
   width: number
   height: number
 }
-
-// TODO(CE): can we get rid of this? It does not seem to be used.
-export type RectEvent = (event: MouseEvent, rect: GenericRect) => unknown

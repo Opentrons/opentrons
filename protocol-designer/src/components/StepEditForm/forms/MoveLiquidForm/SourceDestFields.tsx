@@ -22,7 +22,7 @@ import { FieldPropsByName } from '../../types'
 import styles from '../../StepEditForm.css'
 
 interface SourceDestFieldsProps {
-  className?: string
+  className?: string | null
   prefix: 'aspirate' | 'dispense'
   propsForFields: FieldPropsByName
   formData: FormData
@@ -63,6 +63,7 @@ export const SourceDestFields = (props: SourceDestFieldsProps): JSX.Element => {
   )
 
   return (
+    // @ts-expect-error(sa, 2021-7-2): className might be null
     <div className={className}>
       <div className={styles.form_row}>
         <FlowRateField

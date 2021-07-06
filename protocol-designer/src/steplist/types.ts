@@ -19,27 +19,15 @@ export type WellIngredientNames = Record<string, string>
 // We tried to unify them with Maybes and Unions, but really they should be
 // treated as 2 distinct paths
 export type WellIngredientVolumeData =
-  // single-channel format
-  | Partial<
-      Record<
-        string,
-        {
-          volume: number
-        }
-      >
-    >
-  // multi-channel 'by well' format
-  | Partial<
-      Record<
-        string,
-        Record<
-          string,
-          {
-            volume: number
-          }
-        >
-      >
-    >
+  | {
+      // single-channel format
+      [ingredId: string]: { volume: number } | undefined
+    }
+  | {
+      // multi-channel 'by well' format
+      [well: string]: { [ingredId: string]: { volume: number } } | undefined
+    }
+
 export interface TipLocation {
   labware: string
   well: string
@@ -62,7 +50,7 @@ export interface SubstepTimelineFrame {
   activeTips: TipLocation | null | undefined
   source?: SourceDestData
   dest?: SourceDestData
-  volume?: number | null | undefined
+  volume?: number | null
   channelId?: number
 }
 export interface SubstepWellData {
@@ -75,7 +63,7 @@ export interface StepItemSourceDestRow {
   substepIndex?: number
   source?: SubstepWellData
   dest?: SubstepWellData
-  volume?: number | null | undefined
+  volume?: number | null
   channelId?: number
 }
 // NOTE: delay is NOT a source-dest-style command creator, this type exists
@@ -97,7 +85,7 @@ export interface SourceDestSubstepItemMultiChannel {
   multichannel: true
   commandCreatorFnName: SourceDestCommandCreatorName
   parentStepId: StepIdType
-  volume?: number | null | undefined
+  volume?: number | null
   // uniform volume for all steps
   multiRows: StepItemSourceDestRow[][] // Array of arrays.
   // NOTE: "Row" means a tabular row on the steplist, NOT a "row" of wells on the deck
@@ -119,9 +107,8 @@ export interface TemperatureSubstepItem {
 }
 export interface PauseSubstepItem {
   substepType: 'pause'
-  pauseStepArgs: PauseArgs
+  pauseStepArgs: PauseArgs // Pause substeps use same data as processed form
 }
-// Pause substeps use same data as processed form
 export interface AwaitTemperatureSubstepItem {
   substepType: 'awaitTemperature'
   temperature: number
