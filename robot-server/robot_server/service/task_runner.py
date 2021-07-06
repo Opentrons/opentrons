@@ -41,7 +41,7 @@ class TaskRunner:
                 the background. Use functools.partial to add arguments,
                 if required.
         """
-        func_name = func.__name__
+        func_name = func.__qualname__
 
         async def _run_async_task() -> None:
             try:
