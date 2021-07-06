@@ -1,5 +1,4 @@
 from __future__ import annotations
-import re
 from opentrons.hardware_control.emulation.parser import Parser
 from .g_code import GCode
 from typing import List
