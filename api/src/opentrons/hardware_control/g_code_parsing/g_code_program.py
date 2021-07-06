@@ -10,7 +10,6 @@ class GCodeProgram:
     Class for parsing various G-Code files and programs into a
     list of GCode objects
     """
-    WRITE_REGEX = re.compile(r"(.*?) \| (.*?) \|(.*?)$")
 
     @classmethod
     def from_log_file(cls, log_file_path: str) -> GCodeProgram:
@@ -33,11 +32,11 @@ class GCodeProgram:
                             GCode(
                                 float(date),
                                 device.strip(),
-                                g_code.strip(),
-                                g_code_args
+                                g_code.gcode,
+                                g_code.params
                             )
-                            for g_code, _, g_code_args
-                            in Parser().parse_to_string_list(g_code)
+                            for g_code
+                            in Parser().parse(g_code)
                         ]
                     )
         return cls(write_matches)
