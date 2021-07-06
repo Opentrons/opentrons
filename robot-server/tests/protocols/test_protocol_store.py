@@ -23,11 +23,7 @@ def json_upload_file(tmp_path: Path) -> Iterator[UploadFile]:
     file_path.write_text("{}\n", encoding="utf-8")
 
     with file_path.open() as json_file:
-        yield UploadFile(
-            filename="protocol.json",
-            file=json_file,
-            content_type="application/json",
-        )
+        yield UploadFile(filename="protocol.json", file=json_file)
 
 
 @pytest.fixture
@@ -37,11 +33,7 @@ def python_upload_file(tmp_path: Path) -> Iterator[UploadFile]:
     file_path.write_text("# my protocol\n", encoding="utf-8")
 
     with file_path.open() as python_file:
-        yield UploadFile(
-            filename="protocol.py",
-            file=python_file,
-            content_type="text/x-python",
-        )
+        yield UploadFile(filename="protocol.py", file=python_file)
 
 
 @pytest.fixture

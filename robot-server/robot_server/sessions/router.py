@@ -7,8 +7,8 @@ from typing_extensions import Literal
 from opentrons.protocol_engine import commands as pe_commands, errors as pe_errors
 
 from robot_server.errors import ErrorDetails, ErrorResponse
-
 from robot_server.service.dependencies import get_current_time, get_unique_id
+from robot_server.service.task_runner import TaskRunner
 from robot_server.service.json_api import (
     RequestModel,
     ResponseModel,
@@ -238,6 +238,7 @@ async def create_session_action(
     engine_store: EngineStore = Depends(get_engine_store),
     action_id: str = Depends(get_unique_id),
     created_at: datetime = Depends(get_current_time),
+    task_runner: TaskRunner = Depends(TaskRunner),
 ) -> ResponseModel[SessionAction]:
     """Create a session control action.
 
@@ -249,6 +250,7 @@ async def create_session_action(
         engine_store: Protocol engine and runner storage.
         action_id: Generated ID to assign to the control action.
         created_at: Timestamp to attach to the control action.
+        task_runner: Background task runner.
     """
     try:
         prev_session = session_store.get(session_id=sessionId)
@@ -263,7 +265,9 @@ async def create_session_action(
         # TODO(mc, 2021-06-11): support actions other than `start`
         # TODO(mc, 2021-06-24): ensure the engine homes pipette plungers
         # before starting the protocol run
-        engine_store.runner.play()
+        # TODO(mc, 2021-06-30): capture errors (e.g. uncaught Python raise)
+        # and place them in the session response
+        task_runner.run(engine_store.runner.run)
 
     except SessionNotFoundError as e:
         raise SessionNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)

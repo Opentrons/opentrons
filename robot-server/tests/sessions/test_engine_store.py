@@ -59,7 +59,6 @@ async def test_create_engine_for_json_protocol(
     assert isinstance(subject.runner, JsonFileRunner)
 
 
-@pytest.mark.xfail(raises=NotImplementedError, strict=True)
 async def test_create_engine_for_python_protocol(
     subject: EngineStore,
     python_protocol_file: Path,
