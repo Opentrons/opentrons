@@ -157,5 +157,10 @@
     "webpack-node-externals": "^1.7.2",
     "worker-plugin": "^5.0.0",
     "ws": "7.1.2"
+  },
+  "resolutions": {
+    "sharp": "0.28.3",
+    "node-abi": "2.30.0"
   }
+
 }
