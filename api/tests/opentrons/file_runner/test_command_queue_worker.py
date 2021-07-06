@@ -34,7 +34,7 @@ def subject(
     return CommandQueueWorker(loop=loop, engine=engine)
 
 
-async def test_start(
+async def test_play(
     decoy: Decoy,
     engine: ProtocolEngine,
     subject: CommandQueueWorker,
@@ -46,7 +46,7 @@ async def test_start(
         None,
     )
 
-    subject.start()
+    subject.play()
     await subject.wait_for_done()
 
     decoy.verify(
@@ -55,7 +55,7 @@ async def test_start(
     )
 
 
-async def test_stop(
+async def test_pause(
     decoy: Decoy,
     engine: ProtocolEngine,
     subject: CommandQueueWorker,
@@ -68,8 +68,8 @@ async def test_stop(
     )
 
     wait_for_done = asyncio.create_task(subject.wait_for_done())
-    subject.start()
-    subject.stop()
+    subject.play()
+    subject.pause()
 
     # flush mock executions
     await asyncio.sleep(0)
@@ -84,7 +84,7 @@ async def test_stop(
     )
     assert wait_for_done.done() is False
 
-    subject.start()
+    subject.play()
     await asyncio.wait_for(subject.wait_for_done(), timeout=0.001)
 
     decoy.verify(
@@ -93,7 +93,7 @@ async def test_stop(
     )
 
 
-async def test_start_no_commands(
+async def test_play_no_commands(
     decoy: Decoy,
     engine: ProtocolEngine,
     subject: CommandQueueWorker,
@@ -101,7 +101,7 @@ async def test_start_no_commands(
     """It should signal the ProtocolEngine to execute commands."""
     decoy.when(engine.state_view.commands.get_next_queued()).then_return(None)
 
-    subject.start()
+    subject.play()
     await asyncio.wait_for(subject.wait_for_done(), timeout=0.001)
 
     decoy.verify(

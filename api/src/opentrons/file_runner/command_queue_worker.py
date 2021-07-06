@@ -21,7 +21,7 @@ class CommandQueueWorker:
         self._running = False
         self._current_task: Optional[asyncio.Task] = None
 
-    def start(self) -> None:
+    def play(self) -> None:
         """Start executing the `ProtocolEngine`'s queued commands.
 
         This method returns immediately. Commands will be executed sequentially
@@ -32,8 +32,8 @@ class CommandQueueWorker:
         self._running = True
         self._schedule_next_command()
 
-    def stop(self) -> None:
-        """Stop executing any more queued commands.
+    def pause(self) -> None:
+        """Pause execution of queued commands.
 
         This will return immediately, but if a command is currently in the middle of
         executing, it will continue until it's done. Further commands will be left

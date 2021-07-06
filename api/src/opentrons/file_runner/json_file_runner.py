@@ -48,11 +48,11 @@ class JsonFileRunner(AbstractFileRunner):
 
     def play(self) -> None:
         """Resume running the JSON protocol file."""
-        self._command_queue_worker.start()
+        self._command_queue_worker.play()
 
     def pause(self) -> None:
         """Pause the running JSON protocol file's execution."""
-        self._command_queue_worker.stop()
+        self._command_queue_worker.pause()
 
     def stop(self) -> None:
         """Cancel the running JSON protocol file."""
