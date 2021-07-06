@@ -83,7 +83,7 @@ def test_json_runner_play(
     """It should be able to start the run."""
     subject.play()
 
-    decoy.verify(command_queue_worker.play())
+    decoy.verify(command_queue_worker.start())
 
 
 def test_json_runner_pause(
@@ -94,9 +94,10 @@ def test_json_runner_pause(
     """It should be able to pause the run."""
     subject.pause()
 
-    decoy.verify(command_queue_worker.pause())
+    decoy.verify(command_queue_worker.stop())
 
 
+@pytest.mark.xfail(raises=NotImplementedError, strict=True)
 def test_json_runner_stop(
     decoy: Decoy,
     subject: JsonFileRunner,
@@ -105,7 +106,7 @@ def test_json_runner_stop(
     """It should be able to stop the run."""
     subject.stop()
 
-    decoy.verify(command_queue_worker.pause())
+    decoy.verify(command_queue_worker.stop())
 
 
 def test_json_runner_load_commands_to_engine(

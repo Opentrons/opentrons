@@ -1,6 +1,7 @@
-"""CommandQueueWorker definition. Implements JSON protocol flow control."""
+"""Execution of queued commands in a ProtocolEngine's state."""
+# TODO(mc, 2021-07-06): move to ProtocolEngine core
 import asyncio
-from typing import Awaitable, Optional
+from typing import Optional
 
 from opentrons.protocol_engine import ProtocolEngine
 
@@ -8,91 +9,74 @@ from opentrons.protocol_engine import ProtocolEngine
 class CommandQueueWorker:
     """Execute a `ProtocolEngine`'s queued commands in the background."""
 
-    def __init__(self, protocol_engine: ProtocolEngine) -> None:
+    def __init__(self, loop: asyncio.AbstractEventLoop, engine: ProtocolEngine) -> None:
         """Construct a CommandQueueWorker.
 
         Args:
-            protocol_engine: ProtocolEngine
+            loop: The EventLoop in which commands will be executed.
+            engine: The ProtocolEngine instance to run commands on.
         """
-        self._engine = protocol_engine
-        self._task: Optional[Awaitable] = None
-        self._keep_running = False
+        self._engine = engine
+        self._done: asyncio.Future = loop.create_future()
+        self._running = False
+        self._current_task: Optional[asyncio.Task] = None
 
-    # todo(mm, 2021-06-07): "play" and "pause" at this level do not necessarily mean
-    # as "play" and "pause" at higher-levels (FileRunner). Use more specific names, like
-    # "start_scheduling_executions" and "pause_scheduling_executions"?
-    def play(self) -> None:
+    def start(self) -> None:
         """Start executing the `ProtocolEngine`'s queued commands.
 
-        This returns immediately.
+        This method returns immediately. Commands will be executed sequentially
+        in the background via event loop tasks.
 
-        Commands are executed sequentially in the background via asyncio tasks.
-
-        See `wait_to_be_idle` for when execution may stop.
+        See `wait_for_done` for when execution may stop.
         """
-        if self._task is None:
-            self._keep_running = True
-            # We rely on asyncio.create_task() returning before the event loop actually
-            # switches to the new task -- otherwise, concurrent calls to this function
-            # could race to check and set self._task.
-            self._task = asyncio.create_task(self._play_async())
+        self._running = True
+        self._schedule_next_command()
 
-    def pause(self) -> None:
+    def stop(self) -> None:
         """Stop executing any more queued commands.
 
         This will return immediately, but if a command is currently in the middle of
         executing, it will continue until it's done. Further commands will be left
         unexecuted in the queue.
         """
-        self._keep_running = False
+        self._running = False
 
-    # todo(mm, 2021-06-08): In addition to calling this when it's done with the object,
-    # should calling code also call this between adjacent pause() and resume()s?
-    #
-    # If yes, the resume request could block for multiple seconds.
-    #
-    # If no, there might be race conditions where a resume is ignored depending on the
-    # timing of self._task getting set to None? Resolving this might require better
-    # internal state representation than "has a task" vs. "doesn't have a task".
-    async def wait_to_be_idle(self) -> None:
-        """Wait until this `CommandQueueWorker` is idle.
+    async def wait_for_done(self) -> None:
+        """Wait until all queued commands have finished executing.
 
         This means:
 
         * No command is currently executing on the `ProtocolEngine`.
-        * No commands are scheduled for execution in the future, and none will be
-          scheduled without further action from you.
+        * No commands are scheduled for execution in the future.
 
-        A `CommandQueueWorker` can reach an idle state when either of the following
-        happen:
-
-          * The `ProtocolEngine` reports no more commands in the queue,
-            stopping the `CommandQueueWorker` automatically.
-            (Execution will not automatically resume if more commands are then added.)
-          * You manually pause the `CommandQueueWorker` with `pause`.
-
-        This method will return only after any ongoing command executions have finished.
-
-        If an exception happened while executing commands, it will be raised from this
-        call.
-
-        When you're finished with a `CommandQueueWorker`, you should call this method on
-        it. This gives it a chance to clean up its background task, and propagate any
-        errors.
+        If an unexpected exception is raised while executing commands,
+        it will be raised from this call. When you're finished with a
+        `CommandQueueWorker`, you should call this method to clean up and
+        propogate errors.
         """
-        if self._task is not None:
-            await self._task
-            self._task = None
+        await self._done
 
-    def _next_command(
-        self,
-    ) -> Optional[str]:
-        if self._keep_running:
-            # Will be None if the engine has no commands left.
-            return self._engine.state_view.commands.get_next_queued()
+    def _schedule_next_command(self, command_id: Optional[str] = None) -> None:
+        if self._current_task is None and self._running is True:
+            command_id = (
+                command_id or self._engine.state_view.commands.get_next_queued()
+            )
+
+            if command_id is not None:
+                exec_coro = self._engine.execute_command_by_id(command_id=command_id)
+                self._current_task = asyncio.create_task(exec_coro)
+                self._current_task.add_done_callback(self._handle_command_done)
+            else:
+                self._handle_command_done()
+
+    def _handle_command_done(self, task: Optional[asyncio.Task] = None) -> None:
+        self._current_task = None
+        next_command_id = self._engine.state_view.commands.get_next_queued()
+        exc = task.exception() if task is not None else None
+
+        if exc is not None:
+            self._done.set_exception(exc)
+        elif next_command_id is None:
+            self._done.set_result(None)
         else:
-            return None
-
-    async def _play_async(self) -> None:
-        for command_id in iter(self._next_command, None):
-            await self._engine.execute_command_by_id(command_id=command_id)
+            self._schedule_next_command(next_command_id)

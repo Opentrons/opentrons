@@ -43,19 +43,17 @@ class JsonFileRunner(AbstractFileRunner):
 
     async def run(self) -> None:
         """Run the protocol to completion."""
-        # TODO(mc, 2021-06-30): this will not work with pause/resume. Rework
-        # so that queue worker has `wait_for_done` method, instead.
         self.play()
-        await self._command_queue_worker.wait_to_be_idle()
+        await self._command_queue_worker.wait_for_done()
 
     def play(self) -> None:
         """Resume running the JSON protocol file."""
-        self._command_queue_worker.play()
+        self._command_queue_worker.start()
 
     def pause(self) -> None:
         """Pause the running JSON protocol file's execution."""
-        self._command_queue_worker.pause()
+        self._command_queue_worker.stop()
 
     def stop(self) -> None:
         """Cancel the running JSON protocol file."""
-        self._command_queue_worker.pause()
+        raise NotImplementedError("Protocol cancellation not yet implemented")

@@ -10,7 +10,7 @@ from robot_server.service.json_api import RequestModel, ResponseModel
 
 from ..session_store import SessionStore, SessionNotFoundError
 from ..session_view import SessionView
-from ..action_models import SessionAction, SessionActionCreateData
+from ..action_models import SessionAction, SessionActionType, SessionActionCreateData
 from ..engine_store import EngineStore, EngineMissingError
 from ..dependencies import get_session_store, get_engine_store
 from .base_router import SessionNotFound
@@ -70,12 +70,18 @@ async def create_session_action(
             created_at=created_at,
         )
 
-        # TODO(mc, 2021-06-11): support actions other than `start`
-        # TODO(mc, 2021-06-24): ensure the engine homes pipette plungers
-        # before starting the protocol run
-        # TODO(mc, 2021-06-30): capture errors (e.g. uncaught Python raise)
-        # and place them in the session response
-        task_runner.run(engine_store.runner.run)
+        # TODO(mc, 2021-07-06): add a dependency to verify that a given
+        # action is allowed
+        if action.actionType == SessionActionType.START:
+            # TODO(mc, 2021-06-24): ensure the engine homes pipette plungers
+            # before starting the protocol run
+            # TODO(mc, 2021-06-30): capture errors (e.g. uncaught Python raise)
+            # and place them in the session response
+            task_runner.run(engine_store.runner.run)
+        elif action.actionType == SessionActionType.RESUME:
+            task_runner.run(engine_store.runner.play)
+        elif action.actionType == SessionActionType.PAUSE:
+            task_runner.run(engine_store.runner.pause)
 
     except SessionNotFoundError as e:
         raise SessionNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)

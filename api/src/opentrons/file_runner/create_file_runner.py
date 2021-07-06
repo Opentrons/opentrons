@@ -32,6 +32,8 @@ def create_file_runner(
     Returns:
         A runner appropriate for the requested protocol type.
     """
+    loop = asyncio.get_running_loop()
+
     if protocol_file is not None:
         if protocol_file.file_type == ProtocolFileType.JSON:
             return JsonFileRunner(
@@ -39,10 +41,9 @@ def create_file_runner(
                 protocol_engine=engine,
                 file_reader=JsonFileReader(),
                 command_translator=CommandTranslator(),
-                command_queue_worker=CommandQueueWorker(engine),
+                command_queue_worker=CommandQueueWorker(engine=engine, loop=loop),
             )
         elif protocol_file.file_type == ProtocolFileType.PYTHON:
-            loop = asyncio.get_running_loop()
             return PythonFileRunner(
                 file=protocol_file,
                 file_reader=PythonFileReader(),

@@ -174,3 +174,109 @@ def test_create_session_action_without_runner(
         expected_status=400,
         expected_errors=SessionActionNotAllowed(detail="oh no"),
     )
+
+
+def test_create_pause_action(
+    decoy: Decoy,
+    task_runner: TaskRunner,
+    session_view: SessionView,
+    session_store: SessionStore,
+    engine_store: EngineStore,
+    unique_id: str,
+    current_time: datetime,
+    client: TestClient,
+) -> None:
+    """It should handle a pause action."""
+    session_created_at = datetime.now()
+
+    actions = SessionAction(
+        actionType=SessionActionType.PAUSE,
+        createdAt=current_time,
+        id=unique_id,
+    )
+
+    prev_session = SessionResource(
+        session_id="unique-id",
+        create_data=BasicSessionCreateData(),
+        created_at=session_created_at,
+        actions=[],
+    )
+
+    next_session = SessionResource(
+        session_id="unique-id",
+        create_data=BasicSessionCreateData(),
+        created_at=session_created_at,
+        actions=[actions],
+    )
+
+    decoy.when(session_store.get(session_id="session-id")).then_return(prev_session)
+
+    decoy.when(
+        session_view.with_action(
+            session=prev_session,
+            action_id=unique_id,
+            action_data=SessionActionCreateData(actionType=SessionActionType.PAUSE),
+            created_at=current_time,
+        ),
+    ).then_return((actions, next_session))
+
+    response = client.post(
+        "/sessions/session-id/actions",
+        json={"data": {"actionType": "pause"}},
+    )
+
+    verify_response(response, expected_status=201, expected_data=actions)
+    decoy.verify(task_runner.run(engine_store.runner.pause))
+
+
+def test_create_resume_action(
+    decoy: Decoy,
+    task_runner: TaskRunner,
+    session_view: SessionView,
+    session_store: SessionStore,
+    engine_store: EngineStore,
+    unique_id: str,
+    current_time: datetime,
+    client: TestClient,
+) -> None:
+    """It should handle a resume action."""
+    session_created_at = datetime.now()
+
+    actions = SessionAction(
+        actionType=SessionActionType.RESUME,
+        createdAt=current_time,
+        id=unique_id,
+    )
+
+    prev_session = SessionResource(
+        session_id="unique-id",
+        create_data=BasicSessionCreateData(),
+        created_at=session_created_at,
+        actions=[],
+    )
+
+    next_session = SessionResource(
+        session_id="unique-id",
+        create_data=BasicSessionCreateData(),
+        created_at=session_created_at,
+        actions=[actions],
+    )
+
+    decoy.when(session_store.get(session_id="session-id")).then_return(prev_session)
+
+    decoy.when(
+        session_view.with_action(
+            session=prev_session,
+            action_id=unique_id,
+            action_data=SessionActionCreateData(actionType=SessionActionType.RESUME),
+            created_at=current_time,
+        ),
+    ).then_return((actions, next_session))
+
+    response = client.post(
+        "/sessions/session-id/actions",
+        json={"data": {"actionType": "resume"}},
+    )
+
+    verify_response(response, expected_status=201, expected_data=actions)
+    decoy.verify(task_runner.run(engine_store.runner.play))
