@@ -1,6 +1,6 @@
 """Background task management.
 
-This mosule is mostly a thin wrapper around fastapi.BackgroundTasks
+This module is mostly a thin wrapper around fastapi.BackgroundTasks
 that adds logging. It should be tested primarly through integration
 and end-to-end tests.
 """
@@ -37,7 +37,7 @@ class TaskRunner:
         that may occur.
 
         Arguments:
-            func: A argumentless, None-returing function to run the in
+            func: An argumentless, None-returing function to run in
                 the background. Use functools.partial to add arguments,
                 if required.
         """

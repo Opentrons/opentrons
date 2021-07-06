@@ -32,7 +32,7 @@ def python_protocol_file(tmp_path: Path) -> ProtocolFile:
             """
             # my protocol
             metadata = {
-                "apiVersion": "3.0",
+                "apiLevel": "3.0",
             }
             def run(ctx):
                 ctx.load_labware(
