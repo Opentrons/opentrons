@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import round from 'lodash/round'
 
@@ -9,12 +8,12 @@ import styles from './TipPositionInput.css'
 
 const WELL_HEIGHT_PIXELS = 48
 const PIXEL_DECIMALS = 2
-type Props = {
-  mmFromBottom: number,
-  wellDepthMm: number,
+interface Props {
+  mmFromBottom: number
+  wellDepthMm: number
 }
 
-export const TipPositionZAxisViz = (props: Props): React.Node => {
+export const TipPositionZAxisViz = (props: Props): JSX.Element => {
   const fractionOfWellHeight = props.mmFromBottom / props.wellDepthMm
   const pixelsFromBottom =
     Number(fractionOfWellHeight) * WELL_HEIGHT_PIXELS - WELL_HEIGHT_PIXELS

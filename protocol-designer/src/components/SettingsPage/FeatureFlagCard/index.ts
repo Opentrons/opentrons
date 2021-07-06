@@ -1,37 +1,30 @@
-// @flow
-import * as React from 'react'
 import { connect } from 'react-redux'
-import { FeatureFlagCard as FeatureFlagCardComponent } from './FeatureFlagCard'
+import {
+  FeatureFlagCard as FeatureFlagCardComponent,
+  Props as FeatureFlagCardProps,
+} from './FeatureFlagCard'
 import {
   actions as featureFlagActions,
   selectors as featureFlagSelectors,
 } from '../../../feature-flags'
-
-import type { Dispatch } from 'redux'
-import type { ElementProps } from 'react'
-import type { BaseState } from '../../../types'
-
-type Props = ElementProps<typeof FeatureFlagCardComponent>
-
-type SP = {| flags: $PropertyType<Props, 'flags'> |}
-type DP = {| setFeatureFlags: $PropertyType<Props, 'setFeatureFlags'> |}
+import { Dispatch } from 'redux'
+import { BaseState } from '../../../types'
+interface SP {
+  flags: FeatureFlagCardProps['flags']
+}
+interface DP {
+  setFeatureFlags: FeatureFlagCardProps['setFeatureFlags']
+}
 
 const mapStateToProps = (state: BaseState): SP => ({
   flags: featureFlagSelectors.getFeatureFlagData(state),
 })
 
-const mapDispatchToProps = (dispatch: Dispatch<*>): DP => ({
+const mapDispatchToProps = (dispatch: Dispatch): DP => ({
   setFeatureFlags: flags => dispatch(featureFlagActions.setFeatureFlags(flags)),
 })
 
-export const FeatureFlagCard: React.AbstractComponent<{||}> = connect<
-  Props,
-  {||},
-  SP,
-  DP,
-  BaseState,
-  _
->(
+export const FeatureFlagCard = connect(
   mapStateToProps,
   mapDispatchToProps
 )(FeatureFlagCardComponent)

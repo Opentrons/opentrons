@@ -1,20 +1,19 @@
-// @flow
 import { connect } from 'react-redux'
 import * as React from 'react'
 import { TerminalItem } from './TerminalItem'
 import { PDListItem } from '../lists'
 import { START_TERMINAL_TITLE } from '../../constants'
-import type { BaseState } from '../../types'
+import { BaseState } from '../../types'
 import { START_TERMINAL_ITEM_ID } from '../../steplist'
 import { selectors as stepFormSelectors } from '../../step-forms'
 
-type Props = {
-  showHint: boolean,
+interface Props {
+  showHint: boolean
 }
 
-type SP = $Exact<Props>
+type SP = Props
 
-function StartingDeckStateTerminalItemComponent(props: Props) {
+function StartingDeckStateTerminalItemComponent(props: Props): JSX.Element {
   const { showHint } = props
   const hintContents = (
     <PDListItem>
@@ -36,11 +35,6 @@ function mapStateToProps(state: BaseState): SP {
   return { showHint: noLabware }
 }
 
-export const StartingDeckStateTerminalItem: React.AbstractComponent<{||}> = connect<
-  Props,
-  {||},
-  SP,
-  _,
-  _,
-  _
->(mapStateToProps)(StartingDeckStateTerminalItemComponent)
+export const StartingDeckStateTerminalItem = connect(mapStateToProps)(
+  StartingDeckStateTerminalItemComponent
+)

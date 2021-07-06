@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
@@ -6,7 +5,7 @@ import {
   FormGroup,
   PipetteSelect,
   OutlineButton,
-  type Mount,
+  Mount,
 } from '@opentrons/components'
 import { getLabwareDefURI, getLabwareDisplayName } from '@opentrons/shared-data'
 import isEmpty from 'lodash/isEmpty'
@@ -19,44 +18,48 @@ import { PipetteDiagram } from './PipetteDiagram'
 import styles from './FilePipettesModal.css'
 import formStyles from '../../forms/forms.css'
 
-import type { FormPipettesByMount } from '../../../step-forms'
+import { FormPipettesByMount } from '../../../step-forms'
+import { DropdownOption } from '../../../../../components/src/forms/DropdownField'
 
-export type Props = {|
-  initialTabIndex?: number,
-  values: FormPipettesByMount,
+export interface Props {
+  initialTabIndex?: number
+  values: FormPipettesByMount
   // TODO 2020-3-20 use formik typing here after we update the def in flow-typed
   errors:
     | null
     | string
     | {
         left?: {
-          tiprackDefURI: string,
-        },
+          tiprackDefURI: string
+        }
         right?: {
-          tiprackDefURI: string,
-        },
-      },
+          tiprackDefURI: string
+        }
+      }
   touched:
     | null
     | boolean
     | {
         left?: {
-          tiprackDefURI: boolean,
-        },
+          tiprackDefURI: boolean
+        }
         right?: {
-          tiprackDefURI: boolean,
-        },
-      },
-  onFieldChange: (event: SyntheticInputEvent<HTMLSelectElement>) => mixed,
-  onSetFieldValue: (field: string, value: string | null) => void,
-  onSetFieldTouched: (field: string, touched: boolean) => void,
-  onBlur: (event: SyntheticFocusEvent<HTMLSelectElement>) => mixed,
-|}
+          tiprackDefURI: boolean
+        }
+      }
+  onFieldChange: (event: React.ChangeEvent<HTMLSelectElement>) => unknown
+  onSetFieldValue: (field: string, value: string | null) => void
+  onSetFieldTouched: (field: string, touched: boolean) => void
+  onBlur: (event: React.FocusEvent<HTMLSelectElement>) => unknown
+}
 
 // TODO(mc, 2019-10-14): delete this typedef when gen2 ff is removed
-type PipetteSelectProps = {| mount: Mount, tabIndex: number |}
+interface PipetteSelectProps {
+  mount: Mount
+  tabIndex: number
+}
 
-export function PipetteFields(props: Props): React.Node {
+export function PipetteFields(props: Props): JSX.Element {
   const {
     values,
     onFieldChange,
@@ -71,9 +74,11 @@ export function PipetteFields(props: Props): React.Node {
 
   const allLabware = useSelector(getLabwareDefsByURI)
 
-  const tiprackOptions = reduce(
+  type Values<T> = T[keyof T]
+
+  const tiprackOptions = reduce<typeof allLabware, DropdownOption[]>(
     allLabware,
-    (acc, def: $Values<typeof allLabware>) => {
+    (acc, def: Values<typeof allLabware>) => {
       if (def.metadata.displayCategory !== 'tipRack') return acc
       return [
         ...acc,
@@ -88,7 +93,7 @@ export function PipetteFields(props: Props): React.Node {
 
   const initialTabIndex = props.initialTabIndex || 1
 
-  const renderPipetteSelect = (props: PipetteSelectProps) => {
+  const renderPipetteSelect = (props: PipetteSelectProps): JSX.Element => {
     const { tabIndex, mount } = props
     const pipetteName = values[mount].pipetteName
 

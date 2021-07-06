@@ -1,20 +1,24 @@
-// @flow
-import { createStore, combineReducers, applyMiddleware, compose } from 'redux'
+/* eslint-disable @typescript-eslint/no-var-requires */
+import {
+  createStore,
+  combineReducers,
+  applyMiddleware,
+  compose,
+  Store,
+  Reducer,
+} from 'redux'
 import thunk from 'redux-thunk'
 import { trackEventMiddleware } from './analytics/middleware'
 import { makePersistSubscriber, rehydratePersistedAction } from './persist'
 import { fileUploadMessage } from './load-file/actions'
 import { makeTimelineMiddleware } from './timelineMiddleware/makeTimelineMiddleware'
-import type { Store } from 'redux'
-import type { BaseState, Action, ThunkDispatch } from './types'
-
+import { BaseState, Action } from './types'
 const timelineMiddleware = makeTimelineMiddleware()
-
 const ReselectTools =
   process.env.NODE_ENV === 'development' ? require('reselect-tools') : undefined
 
-function getRootReducer() {
-  const rootReducer: any = combineReducers({
+function getRootReducer(): Reducer<BaseState, Action> {
+  const rootReducer = combineReducers<BaseState>({
     analytics: require('./analytics').rootReducer,
     dismiss: require('./dismiss').rootReducer,
     featureFlags: require('./feature-flags').rootReducer,
@@ -27,7 +31,6 @@ function getRootReducer() {
     ui: require('./ui').rootReducer,
     wellSelection: require('./well-selection/reducers').rootReducer,
   })
-
   // TODO: Ian 2019-06-25 consider making file loading non-committal
   // so UNDO_LOAD_FILE doesnt' just reset Redux state
   return (state: any, action) => {
@@ -55,34 +58,30 @@ function getRootReducer() {
           )
         }
       }
+
       return rootReducer(resetState, action)
     }
+
     // pass-thru
     return rootReducer(state, action)
   }
 }
 
-export function configureStore(): Store<
-  BaseState,
-  Action,
-  ThunkDispatch<Action>
-> {
-  const reducer = getRootReducer()
+export type StoreType = Store<BaseState, Action>
 
+export function configureStore(): StoreType {
+  const reducer = getRootReducer()
   const composeEnhancers: any =
     window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
-
-  const store = createStore<BaseState, Action, ThunkDispatch<*>>(
+  const store = createStore(
     reducer,
     /* preloadedState, */
     composeEnhancers(
       applyMiddleware(trackEventMiddleware, timelineMiddleware, thunk)
     )
   )
-
   // give reselect tools access to state if in dev env
   if (ReselectTools) ReselectTools.getStateWith(() => store.getState())
-
   // initial rehydration, and persistence subscriber
   store.dispatch(rehydratePersistedAction())
   store.subscribe(makePersistSubscriber(store))
@@ -90,14 +89,17 @@ export function configureStore(): Store<
   global.enablePrereleaseMode = () => {
     store.dispatch({
       type: 'SET_FEATURE_FLAGS',
-      payload: { PRERELEASE_MODE: true },
+      payload: {
+        PRERELEASE_MODE: true,
+      },
     })
   }
 
-  function replaceReducers() {
+  function replaceReducers(): void {
     const nextRootReducer = getRootReducer()
     store.replaceReducer(nextRootReducer)
   }
+
   // $FlowFixMe no module.hot
   if (module.hot) {
     // Enable Webpack hot module replacement for reducers
@@ -121,6 +123,5 @@ export function configureStore(): Store<
     )
   }
 
-  // $FlowFixMe(mc, 2020-06-09): Flow doesn't like mixture of exact and inexact action types
   return store
 }

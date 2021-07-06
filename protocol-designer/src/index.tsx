@@ -15,7 +15,7 @@ initialize(store)
 // initialize analytics
 initializeMixpanel(store.getState())
 
-const render = Component => {
+const render = (Component: any): void => {
   ReactDOM.render(
     <Provider store={store}>
       <AppContainer>

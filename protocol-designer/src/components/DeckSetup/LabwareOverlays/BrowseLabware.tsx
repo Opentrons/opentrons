@@ -1,26 +1,25 @@
-// @flow
 import * as React from 'react'
 import cx from 'classnames'
 import { connect } from 'react-redux'
 import { Icon } from '@opentrons/components'
 import { i18n } from '../../../localization'
-import type { ThunkDispatch } from '../../../types'
-import type { LabwareOnDeck } from '../../../step-forms'
+import { ThunkDispatch } from '../../../types'
+import { LabwareOnDeck } from '../../../step-forms'
 import { drillDownOnLabware } from '../../../labware-ingred/actions'
 import { resetScrollElements } from '../../../ui/steps/utils'
 import styles from './LabwareOverlays.css'
 
-type OP = {|
-  labwareOnDeck: LabwareOnDeck,
-|}
+interface OP {
+  labwareOnDeck: LabwareOnDeck
+}
 
-type DP = {|
-  drillDown: () => mixed,
-|}
+interface DP {
+  drillDown: () => unknown
+}
 
-type Props = {| ...OP, ...DP |}
+type Props = OP & DP
 
-function BrowseLabwareOverlay(props: Props) {
+function BrowseLabwareOverlay(props: Props): JSX.Element | null {
   if (props.labwareOnDeck.def.parameters.isTiprack) return null
   return (
     <div className={cx(styles.slot_overlay, styles.appear_on_mouseover)}>
@@ -32,21 +31,17 @@ function BrowseLabwareOverlay(props: Props) {
   )
 }
 
-const mapDispatchToProps = (dispatch: ThunkDispatch<*>, ownProps: OP): DP => ({
+const mapDispatchToProps = (
+  dispatch: ThunkDispatch<any>,
+  ownProps: OP
+): DP => ({
   drillDown: () => {
     resetScrollElements()
     dispatch(drillDownOnLabware(ownProps.labwareOnDeck.id))
   },
 })
 
-export const BrowseLabware: React.AbstractComponent<OP> = connect<
-  Props,
-  OP,
-  _,
-  DP,
-  _,
-  _
->(
+export const BrowseLabware = connect(
   null,
   mapDispatchToProps
 )(BrowseLabwareOverlay)

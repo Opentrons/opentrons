@@ -1,4 +1,3 @@
-// @flow
 import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
@@ -8,6 +7,7 @@ import {
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 import { TEMPERATURE_DEACTIVATED } from '@opentrons/step-generation'
+import { ModuleOnDeck } from '../../../../step-forms'
 import { getNextDefaultThermocyclerModuleId } from '../getNextDefaultThermocyclerModuleId'
 
 const getThermocycler = () => ({
@@ -28,7 +28,10 @@ const getMag = () => ({
   type: MAGNETIC_MODULE_TYPE,
   model: MAGNETIC_MODULE_V1,
   slot: '_span781011',
-  moduleState: { type: MAGNETIC_MODULE_TYPE, engaged: false },
+  moduleState: {
+    type: MAGNETIC_MODULE_TYPE,
+    engaged: false,
+  },
 })
 
 const getTemp = () => ({
@@ -45,7 +48,11 @@ const getTemp = () => ({
 
 describe('getNextDefaultThermocyclerModuleId', () => {
   describe('NO previous forms', () => {
-    const testCases = [
+    const testCases: Array<{
+      testMsg: string
+      equippedModulesById: Record<string, ModuleOnDeck>
+      expected: string | null
+    }> = [
       {
         testMsg: 'temp and TC module present: use TC',
         equippedModulesById: {
@@ -61,7 +68,6 @@ describe('getNextDefaultThermocyclerModuleId', () => {
         },
         expected: 'tcId',
       },
-
       {
         testMsg: 'only mag module present: return null',
         equippedModulesById: {
@@ -70,18 +76,19 @@ describe('getNextDefaultThermocyclerModuleId', () => {
         expected: null,
       },
     ]
-
     testCases.forEach(({ testMsg, equippedModulesById, expected }) => {
       it(testMsg, () => {
         const result = getNextDefaultThermocyclerModuleId(equippedModulesById)
-
         expect(result).toBe(expected)
       })
     })
   })
-
   describe('previous forms', () => {
-    const testCases = [
+    const testCases: Array<{
+      testMsg: string
+      equippedModulesById: Record<string, ModuleOnDeck>
+      expected: string | null
+    }> = [
       {
         testMsg: 'temp and tc present, last step was tc: use tc mod',
         equippedModulesById: {
@@ -98,7 +105,10 @@ describe('getNextDefaultThermocyclerModuleId', () => {
             type: MAGNETIC_MODULE_TYPE,
             model: MAGNETIC_MODULE_V1,
             slot: '_span781011',
-            moduleState: { type: MAGNETIC_MODULE_TYPE, engaged: false },
+            moduleState: {
+              type: MAGNETIC_MODULE_TYPE,
+              engaged: false,
+            },
           },
           tempId: {
             id: 'tempId',
@@ -115,7 +125,6 @@ describe('getNextDefaultThermocyclerModuleId', () => {
         expected: null,
       },
     ]
-
     testCases.forEach(({ testMsg, equippedModulesById, expected }) => {
       it(testMsg, () => {
         const result = getNextDefaultThermocyclerModuleId(equippedModulesById)

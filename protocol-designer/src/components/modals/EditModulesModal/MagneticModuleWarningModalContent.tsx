@@ -1,9 +1,8 @@
-// @flow
 import * as React from 'react'
 import styles from './MagneticModuleWarningModalContent.css'
 import { KnowledgeBaseLink } from '../../KnowledgeBaseLink'
 
-export const MagneticModuleWarningModalContent = (): React.Node => (
+export const MagneticModuleWarningModalContent = (): JSX.Element => (
   <div className={styles.content}>
     <p>
       Switching between GEN1 and GEN2 Magnetic Modules{' '}

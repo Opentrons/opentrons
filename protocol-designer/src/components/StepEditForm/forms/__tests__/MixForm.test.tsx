@@ -1,19 +1,19 @@
-// @flow
 import * as React from 'react'
-import { mount } from 'enzyme'
+import { mount, ReactWrapper } from 'enzyme'
 import { Provider } from 'react-redux'
 import { MixForm } from '../MixForm'
 import { AspDispSection } from '../AspDispSection'
 import * as stepFormSelectors from '../../../../step-forms/selectors'
+import { FormData } from '../../../../form-types'
 import { WellOrderField } from '../../fields'
-import type { BaseState } from '../../../../types'
 
 const { DelayFields } = jest.requireActual('../../fields')
 
 jest.mock('../../../../step-forms/selectors')
 
-const getUnsavedFormMock: JestMockFn<[BaseState], any> =
-  stepFormSelectors.getUnsavedForm
+const getUnsavedFormMock = stepFormSelectors.getUnsavedForm as jest.MockedFunction<
+  typeof stepFormSelectors.getUnsavedForm
+>
 
 jest.mock('../../fields/', () => {
   const actualFields = jest.requireActual('../../fields')
@@ -37,30 +37,32 @@ const mockStore = {
   getState: () => ({}),
 }
 
-describe('MixForm', () => {
-  let props: React.ElementProps<typeof MixForm>
+type MixFormProps = React.ComponentProps<typeof MixForm>
 
-  const render = _props =>
+describe('MixForm', () => {
+  let props: MixFormProps
+
+  const render = (_props: MixFormProps) =>
     mount(<MixForm {..._props} />, {
       wrappingComponent: Provider,
       wrappingComponentProps: { store: mockStore },
     })
 
-  const showAdvancedSettings = wrapper => {
+  const showAdvancedSettings = (wrapper: ReactWrapper) => {
     wrapper.find(AspDispSection).first().invoke('toggleCollapsed')()
   }
 
   beforeEach(() => {
     getUnsavedFormMock.mockReturnValue({
       stepType: 'mix',
-    })
+    } as FormData)
 
     props = {
-      formData: ({
+      formData: {
         stepType: 'mix',
         mix_wellOrder_first: 'r2l',
         mix_wellOrder_second: 'b2t',
-      }: any),
+      } as any,
       focusHandlers: {
         blur: jest.fn(),
         focus: jest.fn(),
@@ -69,30 +71,30 @@ describe('MixForm', () => {
       },
       propsForFields: {
         pipette: {
-          onFieldFocus: (jest.fn(): any),
-          onFieldBlur: (jest.fn(): any),
+          onFieldFocus: jest.fn() as any,
+          onFieldBlur: jest.fn() as any,
           errorToShow: null,
           disabled: false,
           name: 'pipette',
-          updateValue: (jest.fn(): any),
+          updateValue: jest.fn() as any,
           value: null,
         },
         mix_wellOrder_first: {
-          onFieldFocus: (jest.fn(): any),
-          onFieldBlur: (jest.fn(): any),
+          onFieldFocus: jest.fn() as any,
+          onFieldBlur: jest.fn() as any,
           errorToShow: null,
           disabled: false,
           name: 'mix_wellOrder_first',
-          updateValue: (jest.fn(): any),
+          updateValue: jest.fn() as any,
           value: null,
         },
         mix_wellOrder_second: {
-          onFieldFocus: (jest.fn(): any),
-          onFieldBlur: (jest.fn(): any),
+          onFieldFocus: jest.fn() as any,
+          onFieldBlur: jest.fn() as any,
           errorToShow: null,
           disabled: false,
           name: 'mix_wellOrder_second',
-          updateValue: (jest.fn(): any),
+          updateValue: jest.fn() as any,
           value: null,
         },
       },

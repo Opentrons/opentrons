@@ -1,16 +1,15 @@
-// @flow
 import * as React from 'react'
 import { Icon } from '@opentrons/components'
 import { KnowledgeBaseLink } from '../KnowledgeBaseLink'
 import styles from './styles.css'
 
-type Props = {|
-  showDiagram?: boolean,
-  magnetOnDeck: ?boolean,
-  temperatureOnDeck: ?boolean,
-|}
+interface Props {
+  showDiagram?: boolean
+  magnetOnDeck?: boolean | null
+  temperatureOnDeck?: boolean | null
+}
 
-export function CrashInfoBox(props: Props): React.Node {
+export function CrashInfoBox(props: Props): JSX.Element {
   const moduleMessage = getCrashableModulesCopy(props) || ''
   return (
     <div className={styles.crash_info_container}>
@@ -30,6 +29,7 @@ export function CrashInfoBox(props: Props): React.Node {
       {props.showDiagram && (
         <img
           className={styles.crash_info_diagram}
+          // @ts-expect-error(sa, 2021-6-21): src should be string | undefined, null is not cool with TS
           src={getCrashDiagramSrc(props)}
         />
       )}

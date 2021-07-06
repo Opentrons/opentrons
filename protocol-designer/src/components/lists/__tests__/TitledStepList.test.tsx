@@ -1,11 +1,10 @@
-// @flow
 import React from 'react'
 import { shallow } from 'enzyme'
 import { Icon } from '@opentrons/components'
 import { TitledStepList } from '../TitledStepList'
 
 describe('TitledStepLest', () => {
-  let props
+  let props: React.ComponentProps<typeof TitledStepList>
   beforeEach(() => {
     props = {
       title: 'transfer',

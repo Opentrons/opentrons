@@ -1,7 +1,7 @@
-// @flow
 import * as React from 'react'
 import cx from 'classnames'
 import get from 'lodash/get'
+import { StepFieldName } from '../../steplist/fieldLevel'
 import { MoreOptionsModal } from '../modals/MoreOptionsModal'
 import {
   MixForm,
@@ -15,10 +15,14 @@ import { FormAlerts } from './FormAlerts'
 import { ButtonRow } from './ButtonRow'
 import formStyles from '../forms/forms.css'
 import styles from './StepEditForm.css'
-import type { FormData, StepType } from '../../form-types'
-import type { FieldPropsByName, FocusHandlers, StepFormProps } from './types'
+import { FormData, StepType } from '../../form-types'
+import { FieldPropsByName, FocusHandlers, StepFormProps } from './types'
 
-const STEP_FORM_MAP: { [StepType]: ?React.ComponentType<StepFormProps> } = {
+type StepFormMap = {
+  [K in StepType]?: React.ComponentType<StepFormProps> | null
+}
+
+const STEP_FORM_MAP: StepFormMap = {
   mix: MixForm,
   pause: PauseForm,
   moveLiquid: MoveLiquidForm,
@@ -27,21 +31,21 @@ const STEP_FORM_MAP: { [StepType]: ?React.ComponentType<StepFormProps> } = {
   thermocycler: ThermocyclerForm,
 }
 
-type Props = {|
-  canSave: boolean,
-  dirtyFields: Array<string>,
-  focusHandlers: FocusHandlers,
-  focusedField: string | null,
-  formData: FormData,
-  propsForFields: FieldPropsByName,
-  handleClose: () => mixed,
-  handleDelete: () => mixed,
-  handleSave: () => mixed,
-  showMoreOptionsModal: boolean,
-  toggleMoreOptionsModal: () => mixed,
-|}
+interface Props {
+  canSave: boolean
+  dirtyFields: string[]
+  focusHandlers: FocusHandlers
+  focusedField: StepFieldName | null
+  formData: FormData
+  propsForFields: FieldPropsByName
+  handleClose: () => unknown
+  handleDelete: () => unknown
+  handleSave: () => unknown
+  showMoreOptionsModal: boolean
+  toggleMoreOptionsModal: () => unknown
+}
 
-export const StepEditFormComponent = (props: Props): React.Node => {
+export const StepEditFormComponent = (props: Props): JSX.Element => {
   const {
     formData,
     focusHandlers,
@@ -56,7 +60,7 @@ export const StepEditFormComponent = (props: Props): React.Node => {
     focusedField,
   } = props
 
-  const FormComponent: $Values<typeof STEP_FORM_MAP> = get(
+  const FormComponent: typeof STEP_FORM_MAP[keyof typeof STEP_FORM_MAP] = get(
     STEP_FORM_MAP,
     formData.stepType
   )
@@ -74,6 +78,7 @@ export const StepEditFormComponent = (props: Props): React.Node => {
       {showMoreOptionsModal && (
         <MoreOptionsModal formData={formData} close={toggleMoreOptionsModal} />
       )}
+      {/* @ts-expect-error(ce, 2021-06-22) getting into the weeds of `connect` and props and not sure what is going on */}
       <FormAlerts focusedField={focusedField} dirtyFields={dirtyFields} />
       <div className={cx(formStyles.form, styles[formData.stepType])}>
         <FormComponent {...{ formData, propsForFields, focusHandlers }} />

@@ -1,18 +1,19 @@
-// @flow
 import React from 'react'
 import { mount } from 'enzyme'
 import { act } from 'react-dom/test-utils'
-import { WellOrderField } from '../WellOrderField'
+import { WellOrderField, WellOrderFieldProps } from '../WellOrderField'
 import {
   WellOrderModal,
   CancelButton,
   ResetButton,
+  WellOrderModalProps,
 } from '../WellOrderField/WellOrderModal'
 
 describe('WellOrderField', () => {
-  const render = _props => mount(<WellOrderField {..._props} />)
+  const render = (_props: WellOrderFieldProps) =>
+    mount(<WellOrderField {..._props} />)
 
-  let props
+  let props: WellOrderFieldProps
   beforeEach(() => {
     props = {
       prefix: 'aspirate',
@@ -36,7 +37,7 @@ describe('WellOrderField', () => {
       expect(props.updateSecondWellOrder).toHaveBeenCalledWith('t2b')
     })
     it('should NOT update on cancel', () => {
-      const wellOrderModalProps = {
+      const wellOrderModalProps: WellOrderModalProps = {
         prefix: 'aspirate',
         closeModal: jest.fn(),
         isOpen: true,
@@ -55,7 +56,7 @@ describe('WellOrderField', () => {
       expect(wellOrderModalProps.updateValues).not.toHaveBeenCalled()
     })
     it('should update to default values on reset', () => {
-      const wellOrderModalProps = {
+      const wellOrderModalProps: WellOrderModalProps = {
         prefix: 'aspirate',
         closeModal: jest.fn(),
         isOpen: true,

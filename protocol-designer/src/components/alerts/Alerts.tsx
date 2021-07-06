@@ -1,8 +1,7 @@
-// @flow
 import * as React from 'react'
 import assert from 'assert'
 import { PDAlert } from './PDAlert'
-import type { AlertData, AlertType } from './types'
+import { AlertData, AlertType } from './types'
 
 /* TODO:  BC 2018-09-13 this component is an abstraction that is meant to be shared for timeline
  * and form level alerts. Currently it is being used in TimelineAlerts, but it should be used in
@@ -10,20 +9,20 @@ import type { AlertData, AlertType } from './types'
  * see #1814 for reference
  */
 
-export type Props = {
-  errors: Array<AlertData>,
-  warnings: Array<AlertData>,
-  dismissWarning: string => mixed,
+export interface Props {
+  errors: AlertData[]
+  warnings: AlertData[]
+  dismissWarning: (val: string) => unknown
 }
 
 type MakeAlert = (
   alertType: AlertType,
   data: AlertData,
   key: number | string
-) => React.Node
+) => JSX.Element
 
-const AlertsComponent = (props: Props) => {
-  const makeHandleCloseWarning = (dismissId: ?string) => () => {
+const AlertsComponent = (props: Props): JSX.Element => {
+  const makeHandleCloseWarning = (dismissId?: string | null) => () => {
     assert(dismissId, 'expected dismissId, Alert cannot dismiss warning')
     if (dismissId) {
       props.dismissWarning(dismissId)
@@ -50,6 +49,4 @@ const AlertsComponent = (props: Props) => {
   )
 }
 
-export const Alerts: React.AbstractComponent<Props> = React.memo(
-  AlertsComponent
-)
+export const Alerts = React.memo(AlertsComponent)

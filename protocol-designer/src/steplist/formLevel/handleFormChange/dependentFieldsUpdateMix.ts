@@ -1,4 +1,3 @@
-// @flow
 import pick from 'lodash/pick'
 import {
   chainPatchUpdaters,
@@ -8,15 +7,12 @@ import {
   getAllWellsFromPrimaryWells,
 } from './utils'
 import { getDefaultsForStepType } from '../getDefaultsForStepType'
-import type {
-  LabwareEntities,
-  PipetteEntities,
-} from '@opentrons/step-generation'
-import type { FormData, StepFieldName } from '../../../form-types'
-import type { FormPatch } from '../../actions/types'
+import { LabwareEntities, PipetteEntities } from '@opentrons/step-generation'
+import { FormData, StepFieldName } from '../../../form-types'
+import { FormPatch } from '../../actions/types'
 
 // TODO: Ian 2019-02-21 import this from a more central place - see #2926
-const getDefaultFields = (...fields: Array<StepFieldName>): FormPatch =>
+const getDefaultFields = (...fields: StepFieldName[]): FormPatch =>
   pick(getDefaultsForStepType('mix'), fields)
 
 const updatePatchOnLabwareChange = (
@@ -26,13 +22,10 @@ const updatePatchOnLabwareChange = (
   pipetteEntities: PipetteEntities
 ): FormPatch => {
   const labwareChanged = fieldHasChanged(rawForm, patch, 'labware')
-
   if (!labwareChanged) return patch
-
   // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
   const appliedPatch = { ...rawForm, ...patch }
   const pipetteId = appliedPatch.pipette
-
   return {
     ...patch,
     ...getDefaultFields('mix_mmFromBottom', 'mix_touchTip_mmFromBottom'),
@@ -52,16 +45,14 @@ const updatePatchOnPipetteChannelChange = (
   rawForm: FormData,
   labwareEntities: LabwareEntities,
   pipetteEntities: PipetteEntities
-) => {
+): FormPatch => {
   if (patch.pipette === undefined) return patch
   let update = {}
-
   const prevChannels = getChannels(rawForm.pipette, pipetteEntities)
   const nextChannels =
     typeof patch.pipette === 'string'
       ? getChannels(patch.pipette, pipetteEntities)
       : null
-
   // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
   const appliedPatch = { ...rawForm, ...patch }
   const singleToMulti = prevChannels === 1 && nextChannels === 8
@@ -82,12 +73,11 @@ const updatePatchOnPipetteChannelChange = (
     // multi-channel to single-channel: convert primary wells to all wells
     const labwareId = appliedPatch.labware
     const labwareDef = labwareEntities[labwareId].def
-
     update = {
       wells: getAllWellsFromPrimaryWells(appliedPatch.wells, labwareDef),
     }
   }
-  // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
+
   return { ...patch, ...update }
 }
 
@@ -95,7 +85,7 @@ const updatePatchOnPipetteChange = (
   patch: FormPatch,
   rawForm: FormData,
   pipetteEntities: PipetteEntities
-) => {
+): FormPatch => {
   // when pipette ID is changed (to another ID, or to null),
   // set any flow rates to null
   if (fieldHasChanged(rawForm, patch, 'pipette')) {

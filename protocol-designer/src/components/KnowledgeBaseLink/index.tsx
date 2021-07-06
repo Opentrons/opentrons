@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 
 export const KNOWLEDGEBASE_ROOT_URL =
@@ -16,18 +15,16 @@ export const links = {
   betaReleases: `https://support.opentrons.com/en/articles/3854833-opentrons-beta-software-releases`,
   magneticModuleGenerations:
     'http://support.opentrons.com/en/articles/1820112-magnetic-module',
+} as const
+
+interface Props {
+  to: keyof typeof links
+  children: React.ReactNode
+  className?: string
 }
 
-type Link = $Keys<typeof links>
-
-type Props = {|
-  to: Link,
-  children: React.Node,
-  className?: ?string,
-|}
-
 /** Link which opens a page on the knowledge base to a new tab/window */
-export function KnowledgeBaseLink(props: Props): React.Node {
+export function KnowledgeBaseLink(props: Props): JSX.Element {
   return (
     <a
       target="_blank"

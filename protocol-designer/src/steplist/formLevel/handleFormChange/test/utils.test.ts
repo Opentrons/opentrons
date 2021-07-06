@@ -1,26 +1,30 @@
-// @flow
 import {
   volumeInCapacityForMulti,
   volumeInCapacityForMultiAspirate,
   volumeInCapacityForMultiDispense,
 } from '../utils'
 import { fixtureP300Single } from '@opentrons/shared-data/pipette/fixtures/name'
-import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
+import _fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
+import { LabwareDefinition2 } from '@opentrons/shared-data'
+import { PipetteEntities } from '@opentrons/step-generation'
+import { FormData } from '../../../../form-types'
+
+const fixtureTiprack300ul = _fixture_tiprack_300_ul as LabwareDefinition2
 
 describe('utils', () => {
   describe('volumeInCapacityForMulti', () => {
-    let sharedForm
-    let pipetteEntities
+    let sharedForm: FormData
+    let pipetteEntities: PipetteEntities
     beforeEach(() => {
       sharedForm = {
         pipette: 'p300_single',
-      }
+      } as any
       pipetteEntities = {
         p300_single: {
           spec: fixtureP300Single,
-          tiprackLabwareDef: fixture_tiprack_300_ul,
+          tiprackLabwareDef: fixtureTiprack300ul,
         },
-      }
+      } as any
     })
     describe('multi dispense path', () => {
       const testCases = [

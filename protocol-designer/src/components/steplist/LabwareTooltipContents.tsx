@@ -1,13 +1,12 @@
-// @flow
 import * as React from 'react'
 import styles from './StepItem.css'
 
-type LabwareTooltipContentsProps = {|
-  labwareNickname: ?string,
-|}
+interface LabwareTooltipContentsProps {
+  labwareNickname?: string | null
+}
 export const LabwareTooltipContents = (
   props: LabwareTooltipContentsProps
-): React.Node => {
+): JSX.Element => {
   const { labwareNickname } = props
   return (
     <div className={styles.labware_tooltip_contents}>

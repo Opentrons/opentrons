@@ -1,28 +1,27 @@
-// @flow
 import * as React from 'react'
 import styles from './styles.css'
 import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
-  type ModuleRealType,
+  ModuleRealType,
   MAGNETIC_MODULE_V1,
   MAGNETIC_MODULE_V2,
   TEMPERATURE_MODULE_V1,
   TEMPERATURE_MODULE_V2,
   THERMOCYCLER_MODULE_V1,
-  type ModuleModel,
+  ModuleModel,
 } from '@opentrons/shared-data'
 
-type Props = {
-  type: ModuleRealType,
-  model: ModuleModel,
+interface Props {
+  type: ModuleRealType
+  model: ModuleModel
 }
 
 type ModuleImg = {
-  [ModuleRealType]: {
-    [ModuleModel]: string,
-  },
+  [type in ModuleRealType]: {
+    [model in ModuleModel]?: string
+  }
 }
 
 const MODULE_IMG_BY_TYPE: ModuleImg = {
@@ -39,7 +38,7 @@ const MODULE_IMG_BY_TYPE: ModuleImg = {
   },
 }
 
-export function ModuleDiagram(props: Props): React.Node {
+export function ModuleDiagram(props: Props): JSX.Element {
   const model = MODULE_IMG_BY_TYPE[props.type][props.model]
   return <img className={styles.module_diagram} src={model} alt={props.type} />
 }

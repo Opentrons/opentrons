@@ -1,49 +1,46 @@
-// @flow
-
 import * as React from 'react'
 import cx from 'classnames'
-import { Icon } from '@opentrons/components'
+import { Icon, IconName } from '@opentrons/components'
 import styles from './styles.css'
-import type { IconName } from '@opentrons/components'
 
-export type Props = {|
+export interface Props {
   /** text of title */
-  title: string,
+  title: string
   /** icon left of the step */
-  iconName: IconName,
+  iconName: IconName
   /** props passed down to icon (`className` and `name` are ignored) */
-  iconProps?: $Diff<React.ElementProps<typeof Icon>, { name: mixed }>,
+  iconProps?: Omit<React.ComponentProps<typeof Icon>, 'name'>
   /** optional data test id for the container */
-  'data-test'?: string,
+  'data-test'?: string
   /** children must all be `<li>` */
-  children?: React.Node,
+  children?: React.ReactNode
   /** additional classnames */
-  className?: string,
+  className?: string
   /** component with descriptive text about the list */
-  description?: React.Node,
+  description?: React.ReactNode
   /** optional click action (on title div, not children) */
-  onClick?: (event: SyntheticMouseEvent<>) => mixed,
+  onClick?: (event: React.MouseEvent) => unknown
   /** optional right click action (on wrapping div) */
-  onContextMenu?: (event: SyntheticMouseEvent<>) => mixed,
+  onContextMenu?: (event: React.MouseEvent) => unknown
   /** optional mouseEnter action */
-  onMouseEnter?: (event: SyntheticMouseEvent<>) => mixed,
+  onMouseEnter?: (event: React.MouseEvent) => unknown
   /** optional mouseLeave action */
-  onMouseLeave?: (event: SyntheticMouseEvent<>) => mixed,
+  onMouseLeave?: (event: React.MouseEvent) => unknown
   /** caret click action; if defined, list is expandable and carat is visible */
-  onCollapseToggle?: (event: SyntheticMouseEvent<>) => mixed,
+  onCollapseToggle?: (event: React.MouseEvent) => unknown
   /** collapse the list if true (false by default) */
-  collapsed?: boolean,
+  collapsed?: boolean
   /** set to true when Step is selected (eg, user clicked it) */
-  selected?: boolean,
+  selected?: boolean
   /** set to true when Step is hovered (but not when its contents are hovered) */
-  hovered?: boolean,
+  hovered?: boolean
   /** show checkbox icons if true */
-  isMultiSelectMode?: boolean,
+  isMultiSelectMode?: boolean
   /** set to true when Step is the last selected in multi select mode */
-  isLastSelected?: boolean,
-|}
+  isLastSelected?: boolean
+}
 
-export function TitledStepList(props: Props): React.Node {
+export function TitledStepList(props: Props): JSX.Element {
   const {
     iconName,
     'data-test': dataTest,
@@ -61,7 +58,7 @@ export function TitledStepList(props: Props): React.Node {
 
   // clicking on the carat will not call props.onClick,
   // so prevent bubbling up if there is an onCollapseToggle fn
-  const handleCollapseToggle = (e: SyntheticMouseEvent<>) => {
+  const handleCollapseToggle = (e: React.MouseEvent): void => {
     if (onCollapseToggle) {
       e.stopPropagation()
       onCollapseToggle(e)
@@ -77,6 +74,7 @@ export function TitledStepList(props: Props): React.Node {
     [styles.hover_border]: props.hovered,
   })
 
+  // @ts-expect-error(sa, 2021-6-21): cast props.onClick to a boolean
   const titleBarClass = cx(styles.step_title_bar, {
     [styles.clickable]: props.onClick,
     [styles.multiselect_title_bar]: props.isMultiSelectMode,

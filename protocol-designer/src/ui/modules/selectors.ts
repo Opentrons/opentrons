@@ -1,4 +1,3 @@
-// @flow
 import { createSelector } from 'reselect'
 import {
   getLabwareDisplayName,
@@ -16,10 +15,9 @@ import {
   getModuleHasLabware,
   getMagnetLabwareEngageHeight as getMagnetLabwareEngageHeightUtil,
 } from './utils'
-import type { Options } from '@opentrons/components'
-import type { Selector } from '../../types'
-import type { LabwareNamesByModuleId } from '../../steplist/types'
-
+import { Options } from '@opentrons/components'
+import { Selector } from '../../types'
+import { LabwareNamesByModuleId } from '../../steplist/types'
 export const getLabwareNamesByModuleId: Selector<LabwareNamesByModuleId> = createSelector(
   getInitialDeckSetup,
   getLabwareNicknamesById,
@@ -58,7 +56,6 @@ export const getTemperatureLabwareOptions: Selector<Options> = createSelector(
       nicknamesById,
       TEMPERATURE_MODULE_TYPE
     )
-
     return temperatureModuleOptions
   }
 )
@@ -114,7 +111,6 @@ export const getThermocyclerModuleHasLabware: Selector<boolean> = createSelector
     return getModuleHasLabware(initialDeckSetup, THERMOCYCLER_MODULE_TYPE)
   }
 )
-
 export const getMagnetLabwareEngageHeight: Selector<
   number | null
 > = createSelector(
@@ -132,7 +128,6 @@ export const getTempModuleIsOnDeck: Selector<boolean> = createSelector(
       initialDeckSetup,
       TEMPERATURE_MODULE_TYPE
     )
-
     return Boolean(tempOnDeck)
   }
 )

@@ -1,13 +1,12 @@
-// @flow
 import * as React from 'react'
-import type { PauseArgs } from '@opentrons/step-generation'
+import { PauseArgs } from '@opentrons/step-generation'
 import { i18n } from '../../localization'
 import styles from './StepItem.css'
-type Props = {
-  pauseArgs: PauseArgs,
+interface Props {
+  pauseArgs: PauseArgs
 }
 
-export function PauseStepItems(props: Props): React.Node {
+export function PauseStepItems(props: Props): JSX.Element | null {
   const { pauseArgs } = props
   if (!pauseArgs.meta) {
     // No message or time, show nothing

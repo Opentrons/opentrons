@@ -1,19 +1,24 @@
-// @flow
-
 import React from 'react'
 import { shallow } from 'enzyme'
 import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
-import { MAGNETIC_MODULE_TYPE } from '@opentrons/shared-data'
+import {
+  DeckSlot,
+  LabwareDefinition2,
+  MAGNETIC_MODULE_TYPE,
+} from '@opentrons/shared-data'
 import { DND_TYPES } from '../../../../constants'
 import * as labwareModuleCompatibility from '../../../../utils/labwareModuleCompatibility'
 import { START_TERMINAL_ITEM_ID } from '../../../../steplist'
-import { SlotControlsComponent } from '../SlotControls'
+import { SlotControlsComponent, SlotControlsProps } from '../SlotControls'
 import { BlockedSlot } from '../BlockedSlot'
 
 describe('SlotControlsComponent', () => {
-  let props, getLabwareIsCompatibleSpy
+  let props: SlotControlsProps
+  let getLabwareIsCompatibleSpy: jest.SpiedFunction<
+    typeof labwareModuleCompatibility.getLabwareIsCompatible
+  >
   beforeEach(() => {
-    const slot = {
+    const slot: DeckSlot = {
       id: 'deckSlot1',
       position: [1, 2, 3],
       boundingBox: {
@@ -29,7 +34,7 @@ describe('SlotControlsComponent', () => {
       labwareDefURI: 'fixture/fixture_96_plate',
       id: 'plate123',
       slot: '3',
-      def: fixture_96_plate,
+      def: fixture_96_plate as LabwareDefinition2,
     }
 
     props = {
@@ -86,7 +91,7 @@ describe('SlotControlsComponent', () => {
 
   it('displays place here when dragged labware is custom and hovered over another labware on module slot', () => {
     props.customLabwareDefs = {
-      'fixture/fixture_96_plate': fixture_96_plate,
+      'fixture/fixture_96_plate': fixture_96_plate as LabwareDefinition2,
     }
 
     const wrapper = shallow(<SlotControlsComponent {...props} />)

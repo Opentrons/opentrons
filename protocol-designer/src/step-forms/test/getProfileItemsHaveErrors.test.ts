@@ -1,13 +1,9 @@
-// @flow
 import { getProfileFieldErrors } from '../../steplist/fieldLevel'
 import { getProfileItemsHaveErrors } from '../utils/getProfileItemsHaveErrors'
 jest.mock('../../steplist/fieldLevel')
-
-const mockGetProfileFieldErrors: JestMockFn<
-  [string, string],
-  Array<string>
-> = getProfileFieldErrors
-
+const mockGetProfileFieldErrors = getProfileFieldErrors as jest.MockedFunction<
+  typeof getProfileFieldErrors
+>
 describe('getProfileItemsHaveErrors', () => {
   const testCases = [
     {
@@ -21,18 +17,20 @@ describe('getProfileItemsHaveErrors', () => {
       expected: false,
     },
   ]
-
   testCases.forEach(
     ({ testName, mockGetProfileFieldErrorsReturn, expected }) => {
       it(testName, () => {
-        const profileItems: { [id: string]: any } = {
-          itemA: { field1: '1', field2: '2', field3: '3' },
+        const profileItems: Record<string, any> = {
+          itemA: {
+            field1: '1',
+            field2: '2',
+            field3: '3',
+          },
         }
         mockGetProfileFieldErrors.mockImplementation((name, value) => {
           expect(profileItems['itemA']).toHaveProperty(name, value)
           return mockGetProfileFieldErrorsReturn
         })
-
         const result = getProfileItemsHaveErrors(profileItems)
         expect(result).toBe(expected)
       })

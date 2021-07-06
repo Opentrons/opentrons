@@ -1,4 +1,3 @@
-// @flow
 import cx from 'classnames'
 import * as React from 'react'
 import { useSelector } from 'react-redux'
@@ -11,9 +10,9 @@ import { maskField } from '../../../steplist/fieldLevel'
 import { TextField, RadioGroupField } from '../fields'
 import styles from '../StepEditForm.css'
 
-import type { StepFormProps } from '../types'
+import { StepFormProps } from '../types'
 
-export const MagnetForm = (props: StepFormProps): React.Node => {
+export const MagnetForm = (props: StepFormProps): JSX.Element => {
   const moduleLabwareOptions = useSelector(
     uiModuleSelectors.getMagneticLabwareOptions
   )
@@ -22,7 +21,7 @@ export const MagnetForm = (props: StepFormProps): React.Node => {
   const { magnetAction, moduleId } = props.formData
   const moduleModel = moduleId ? moduleEntities[moduleId]?.model : null
 
-  const moduleOption: ?string = moduleLabwareOptions[0]
+  const moduleOption: string | null | undefined = moduleLabwareOptions[0]
     ? moduleLabwareOptions[0].name
     : 'No magnetic module'
 

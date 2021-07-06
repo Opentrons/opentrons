@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { i18n } from '../../localization'
@@ -19,21 +18,21 @@ import {
 import { OLDEST_MIGRATEABLE_VERSION } from '../../load-file/migration'
 import { FeatureFlagCard } from './FeatureFlagCard'
 import styles from './SettingsPage.css'
-import type { BaseState, ThunkDispatch } from '../../types'
+import { BaseState, ThunkDispatch } from '../../types'
 
-type Props = {
-  canClearHintDismissals: boolean,
-  hasOptedIn: boolean | null,
-  restoreHints: () => mixed,
-  toggleOptedIn: () => mixed,
+interface Props {
+  canClearHintDismissals: boolean
+  hasOptedIn: boolean | null
+  restoreHints: () => unknown
+  toggleOptedIn: () => unknown
 }
 
-type SP = {|
-  canClearHintDismissals: $PropertyType<Props, 'canClearHintDismissals'>,
-  hasOptedIn: $PropertyType<Props, 'hasOptedIn'>,
-|}
+interface SP {
+  canClearHintDismissals: Props['canClearHintDismissals']
+  hasOptedIn: Props['hasOptedIn']
+}
 
-function SettingsAppComponent(props: Props) {
+function SettingsAppComponent(props: Props): JSX.Element {
   const {
     canClearHintDismissals,
     hasOptedIn,
@@ -115,7 +114,7 @@ function mapStateToProps(state: BaseState): SP {
 
 function mergeProps(
   stateProps: SP,
-  dispatchProps: { dispatch: ThunkDispatch<*> }
+  dispatchProps: { dispatch: ThunkDispatch<any> }
 ): Props {
   const { dispatch } = dispatchProps
   const { hasOptedIn } = stateProps
@@ -130,15 +129,9 @@ function mergeProps(
   }
 }
 
-export const SettingsApp: React.AbstractComponent<{||}> = connect<
-  Props,
-  {||},
-  SP,
-  {||},
-  BaseState,
-  _
->(
+export const SettingsApp = connect(
   mapStateToProps,
+  // @ts-expect-error(sa, 2021-6-21): TODO: refactor to use hooks api
   null,
   mergeProps
 )(SettingsAppComponent)

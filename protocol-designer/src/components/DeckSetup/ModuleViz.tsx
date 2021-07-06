@@ -1,19 +1,18 @@
-// @flow
 import * as React from 'react'
 import { getModuleVizDims } from './getModuleVizDims'
 import styles from './ModuleViz.css'
-import type { ModuleOnDeck } from '../../step-forms'
-import type { ModuleOrientation } from '../../types'
+import { ModuleOnDeck } from '../../step-forms'
+import { ModuleOrientation } from '../../types'
 
-type Props = {|
-  x: number,
-  y: number,
-  orientation: ModuleOrientation,
-  module: ModuleOnDeck,
-  slotName: string,
-|}
+interface Props {
+  x: number
+  y: number
+  orientation: ModuleOrientation
+  module: ModuleOnDeck
+  slotName: string
+}
 
-export const ModuleViz = (props: Props): React.Node => {
+export const ModuleViz = (props: Props): JSX.Element => {
   const moduleType = props.module.type
   const {
     xOffset,

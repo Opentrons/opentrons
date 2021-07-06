@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import cx from 'classnames'
 
@@ -8,7 +7,7 @@ import { SubstepRow } from './SubstepRow'
 import styles from './StepItem.css'
 import { formatVolume } from './utils'
 
-import type {
+import {
   StepItemSourceDestRow,
   SubstepIdentifier,
   WellIngredientNames,
@@ -16,18 +15,18 @@ import type {
 
 const DEFAULT_COLLAPSED_STATE = true
 
-type MultiChannelSubstepProps = {|
-  rowGroup: Array<StepItemSourceDestRow>,
-  ingredNames: WellIngredientNames,
-  highlighted?: boolean,
-  stepId: string,
-  substepIndex: number,
-  selectSubstep: SubstepIdentifier => mixed,
-|}
+interface MultiChannelSubstepProps {
+  rowGroup: StepItemSourceDestRow[]
+  ingredNames: WellIngredientNames
+  highlighted?: boolean
+  stepId: string
+  substepIndex: number
+  selectSubstep: (substepIdentifier: SubstepIdentifier) => unknown
+}
 
-type MultiChannelSubstepState = {|
-  collapsed: boolean,
-|}
+interface MultiChannelSubstepState {
+  collapsed: boolean
+}
 
 export class MultiChannelSubstep extends React.PureComponent<
   MultiChannelSubstepProps,
@@ -39,7 +38,7 @@ export class MultiChannelSubstep extends React.PureComponent<
     this.setState({ collapsed: !this.state.collapsed })
   }
 
-  render(): React.Node {
+  render(): React.ReactNode {
     const {
       rowGroup,
       highlighted,

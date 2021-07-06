@@ -1,5 +1,5 @@
-// @flow
 import {
+  FormError,
   composeErrors,
   incompatibleAspirateLabware,
   incompatibleDispenseLabware,
@@ -9,7 +9,6 @@ import {
   magnetActionRequired,
   engageHeightRequired,
   engageHeightRangeExceeded,
-  type FormError,
   moduleIdRequired,
   targetTemperatureRequired,
   blockTemperatureRequired,
@@ -20,18 +19,19 @@ import {
   lidTemperatureHoldRequired,
   volumeTooHigh,
 } from './errors'
+
 import {
+  FormWarning,
+  FormWarningType,
   composeWarnings,
   belowPipetteMinimumVolume,
   maxDispenseWellVolume,
   minDisposalVolume,
-  type FormWarning,
-  type FormWarningType,
   minAspirateAirGapVolume,
   minDispenseAirGapVolume,
 } from './warnings'
-import type { StepType } from '../../form-types'
 
+import { StepType } from '../../form-types'
 export { handleFormChange } from './handleFormChange'
 export { createBlankForm } from './createBlankForm'
 export { getDefaultsForStepType } from './getDefaultsForStepType'
@@ -45,13 +45,11 @@ export { getNextDefaultMagnetAction } from './getNextDefaultMagnetAction'
 export { getNextDefaultEngageHeight } from './getNextDefaultEngageHeight'
 export { stepFormToArgs } from './stepFormToArgs'
 export type { FormError, FormWarning, FormWarningType }
-
-type FormHelpers = {|
-  getErrors?: mixed => Array<FormError>,
-  getWarnings?: mixed => Array<FormWarning>,
-|}
-
-const stepFormHelperMap: { [StepType]: FormHelpers } = {
+interface FormHelpers {
+  getErrors?: (arg: unknown) => FormError[]
+  getWarnings?: (arg: unknown) => FormWarning[]
+}
+const stepFormHelperMap: Partial<Record<StepType, FormHelpers>> = {
   mix: {
     getErrors: composeErrors(incompatibleLabware, volumeTooHigh),
     getWarnings: composeWarnings(belowPipetteMinimumVolume),
@@ -95,23 +93,23 @@ const stepFormHelperMap: { [StepType]: FormHelpers } = {
     ),
   },
 }
-
 export const getFormErrors = (
   stepType: StepType,
-  formData: mixed
-): Array<FormError> => {
+  formData: unknown
+): FormError[] => {
   const formErrorGetter =
+    // @ts-expect-error(sa, 2021-6-20): not a valid type narrow
     stepFormHelperMap[stepType] && stepFormHelperMap[stepType].getErrors
-  const errors = formErrorGetter ? formErrorGetter(formData) : []
+  const errors = formErrorGetter != null ? formErrorGetter(formData) : []
   return errors
 }
-
 export const getFormWarnings = (
   stepType: StepType,
-  formData: mixed
-): Array<FormWarning> => {
+  formData: unknown
+): FormWarning[] => {
   const formWarningGetter =
+    // @ts-expect-error(sa, 2021-6-20): not a valid type narrow
     stepFormHelperMap[stepType] && stepFormHelperMap[stepType].getWarnings
-  const warnings = formWarningGetter ? formWarningGetter(formData) : []
+  const warnings = formWarningGetter != null ? formWarningGetter(formData) : []
   return warnings
 }

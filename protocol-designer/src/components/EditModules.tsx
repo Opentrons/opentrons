@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import {
@@ -9,22 +8,22 @@ import { moveDeckItem } from '../labware-ingred/actions/actions'
 import { useBlockingHint } from './Hints/useBlockingHint'
 import { MagneticModuleWarningModalContent } from './modals/EditModulesModal/MagneticModuleWarningModalContent'
 import { EditModulesModal } from './modals/EditModulesModal'
-import type { ModuleModel, ModuleRealType } from '@opentrons/shared-data'
+import { ModuleModel, ModuleRealType } from '@opentrons/shared-data'
 
-type EditModulesProps = {|
-  moduleToEdit: {|
-    moduleId: ?string,
-    moduleType: ModuleRealType,
-  |},
-  onCloseClick: () => mixed,
-|}
+export interface EditModulesProps {
+  moduleToEdit: {
+    moduleId?: string | null
+    moduleType: ModuleRealType
+  }
+  onCloseClick: () => unknown
+}
 
-export type ModelModuleInfo = {|
-  model: ModuleModel,
-  slot: string,
-|}
+export interface ModelModuleInfo {
+  model: ModuleModel
+  slot: string
+}
 
-export const EditModules = (props: EditModulesProps): React.Node => {
+export const EditModules = (props: EditModulesProps): JSX.Element => {
   const { onCloseClick, moduleToEdit } = props
   const { moduleId, moduleType } = moduleToEdit
   const _initialDeckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
@@ -36,7 +35,7 @@ export const EditModules = (props: EditModulesProps): React.Node => {
   ] = React.useState<null | ModelModuleInfo>(null)
   const dispatch = useDispatch()
 
-  const editModuleModel = (selectedModel: ModuleModel) => {
+  const editModuleModel = (selectedModel: ModuleModel): void => {
     if (moduleOnDeck?.id != null) {
       dispatch(
         stepFormActions.editModule({
@@ -50,7 +49,7 @@ export const EditModules = (props: EditModulesProps): React.Node => {
       )
     }
   }
-  const editModuleSlot = (selectedSlot: string) => {
+  const editModuleSlot = (selectedSlot: string): void => {
     if (selectedSlot && moduleOnDeck && moduleOnDeck.slot !== selectedSlot) {
       dispatch(moveDeckItem(moduleOnDeck.slot, selectedSlot))
     }

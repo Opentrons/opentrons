@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import cx from 'classnames'
 import {
@@ -11,14 +10,14 @@ import { PDListItem } from '../lists'
 import styles from './StepItem.css'
 import { LabwareTooltipContents } from './LabwareTooltipContents'
 
-type AspirateDispenseHeaderProps = {|
-  sourceLabwareNickname: ?string,
-  destLabwareNickname: ?string,
-|}
+interface AspirateDispenseHeaderProps {
+  sourceLabwareNickname?: string | null
+  destLabwareNickname?: string | null
+}
 
 export function AspirateDispenseHeader(
   props: AspirateDispenseHeaderProps
-): React.Node {
+): JSX.Element {
   const { sourceLabwareNickname, destLabwareNickname } = props
 
   const [sourceTargetProps, sourceTooltipProps] = useHoverTooltip({

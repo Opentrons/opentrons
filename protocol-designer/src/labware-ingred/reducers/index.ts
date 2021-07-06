@@ -1,23 +1,19 @@
-// @flow
-import { combineReducers } from 'redux'
+import { Reducer, combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
 import omit from 'lodash/omit'
 import mapValues from 'lodash/mapValues'
 import pickBy from 'lodash/pickBy'
-
 import { FIXED_TRASH_ID } from '../../constants'
 import { getPDMetadata } from '../../file-types'
-
-import type { Reducer } from 'redux'
-import type {
+import {
   SingleLabwareLiquidState,
   LocationLiquidState,
   LabwareLiquidState,
 } from '@opentrons/step-generation'
-import type { Action, DeckSlot } from '../../types'
-import type { LiquidGroupsById, DisplayLabware } from '../types'
-import type { LoadFileAction } from '../../load-file'
-import type {
+import { Action, DeckSlot } from '../../types'
+import { LiquidGroupsById, DisplayLabware } from '../types'
+import { LoadFileAction } from '../../load-file'
+import {
   RemoveWellsContentsAction,
   CreateContainerAction,
   DeleteLiquidGroupAction,
@@ -33,14 +29,15 @@ import type {
   DrillDownOnLabwareAction,
   DrillUpFromLabwareAction,
 } from '../actions'
-
 // REDUCERS
-
 // modeLabwareSelection: boolean. If true, we're selecting labware to add to a slot
 // (this state just toggles a modal)
-// NOTE(mc, 2020-06-04): `handleActions` cannot be strictly typed
+
+// @ts-expect-error(sa, 2021-6-20): cannot use string literals as action type
+// TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
 const modeLabwareSelection: Reducer<DeckSlot | false, any> = handleActions(
   {
+    // @ts-expect-error(sa, 2021-6-20): cannot use string literals as action type
     OPEN_ADD_LABWARE_MODAL: (state, action: OpenAddLabwareModalAction) =>
       action.payload.slot,
     CLOSE_LABWARE_SELECTOR: () => false,
@@ -48,9 +45,9 @@ const modeLabwareSelection: Reducer<DeckSlot | false, any> = handleActions(
   },
   false
 )
-
-export type SelectedContainerId = ?string
-// NOTE(mc, 2020-06-04): `handleActions` cannot be strictly typed
+export type SelectedContainerId = string | null | undefined
+// @ts-expect-error(sa, 2021-6-20): cannot use string literals as action type
+// TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
 const selectedContainerId: Reducer<SelectedContainerId, any> = handleActions(
   {
     OPEN_INGREDIENT_SELECTOR: (
@@ -64,10 +61,9 @@ const selectedContainerId: Reducer<SelectedContainerId, any> = handleActions(
   },
   null
 )
-
-export type DrillDownLabwareId = ?string
-
-// NOTE(mc, 2020-06-04): `handleActions` cannot be strictly typed
+export type DrillDownLabwareId = string | null | undefined
+// @ts-expect-error(sa, 2021-6-20): cannot use string literals as action type
+// TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
 const drillDownLabwareId: Reducer<DrillDownLabwareId, any> = handleActions(
   {
     DRILL_DOWN_ON_LABWARE: (
@@ -81,24 +77,26 @@ const drillDownLabwareId: Reducer<DrillDownLabwareId, any> = handleActions(
   },
   null
 )
-
-export type ContainersState = {
-  [id: string]: ?DisplayLabware,
+export type ContainersState = Record<string, DisplayLabware | null | undefined>
+export interface SelectedLiquidGroupState {
+  liquidGroupId: string | null | undefined
+  newLiquidGroup?: true
 }
-
-export type SelectedLiquidGroupState = {
-  liquidGroupId: ?string,
-  newLiquidGroup?: true,
+const unselectedLiquidGroupState = {
+  liquidGroupId: null,
 }
-const unselectedLiquidGroupState = { liquidGroupId: null }
 // This is only a concern of the liquid page.
 // null = nothing selected, newLiquidGroup: true means user is creating new liquid
 const selectedLiquidGroup = handleActions(
   {
+    // @ts-expect-error(sa, 2021-6-20): cannot use string literals as action type
+    // TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
     SELECT_LIQUID_GROUP: (
       state: SelectedLiquidGroupState,
       action: SelectLiquidAction
-    ): SelectedLiquidGroupState => ({ liquidGroupId: action.payload }),
+    ): SelectedLiquidGroupState => ({
+      liquidGroupId: action.payload,
+    }),
     DELETE_LIQUID_GROUP: () => unselectedLiquidGroupState,
     DESELECT_LIQUID_GROUP: () => unselectedLiquidGroupState,
     CREATE_NEW_LIQUID_GROUP_FORM: (): SelectedLiquidGroupState => ({
@@ -109,14 +107,13 @@ const selectedLiquidGroup = handleActions(
   },
   unselectedLiquidGroupState
 )
-
 const initialLabwareState: ContainersState = {
   [FIXED_TRASH_ID]: {
     nickname: 'Trash',
   },
 }
-
-// NOTE(mc, 2020-06-04): `handleActions` cannot be strictly typed
+// @ts-expect-error(sa, 2021-6-20): cannot use string literals as action type
+// TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
 export const containers: Reducer<ContainersState, any> = handleActions(
   {
     CREATE_CONTAINER: (
@@ -137,6 +134,7 @@ export const containers: Reducer<ContainersState, any> = handleActions(
     ): ContainersState =>
       pickBy(
         state,
+        // @ts-expect-error(sa, 2021-6-20): pickBy might return null or undefined
         (value: DisplayLabware, key: string) => key !== action.payload.labwareId
       ),
     RENAME_LABWARE: (
@@ -146,13 +144,7 @@ export const containers: Reducer<ContainersState, any> = handleActions(
       const { labwareId, name } = action.payload
       // ignore renaming to whitespace
       return name && name.trim()
-        ? {
-            ...state,
-            [labwareId]: {
-              ...state[labwareId],
-              nickname: name,
-            },
-          }
+        ? { ...state, [labwareId]: { ...state[labwareId], nickname: name } }
         : state
     },
     DUPLICATE_LABWARE: (
@@ -173,11 +165,10 @@ export const containers: Reducer<ContainersState, any> = handleActions(
     ): ContainersState => {
       const { file } = action.payload
       const allFileLabware = file.labware
-      const sortedLabwareIds: Array<string> = Object.keys(allFileLabware).sort(
+      const sortedLabwareIds: string[] = Object.keys(allFileLabware).sort(
         (a, b) =>
           Number(allFileLabware[a].slot) - Number(allFileLabware[b].slot)
       )
-
       return sortedLabwareIds.reduce(
         (acc: ContainersState, id): ContainersState => {
           const fileLabware = allFileLabware[id]
@@ -201,33 +192,25 @@ export const containers: Reducer<ContainersState, any> = handleActions(
   },
   initialLabwareState
 )
+type SavedLabwareState = Record<string, boolean>
 
-type SavedLabwareState = { [labwareId: string]: boolean, ... }
 /** Keeps track of which labware have saved nicknames */
-// NOTE(mc, 2020-06-04): `handleActions` cannot be strictly typed
+// @ts-expect-error(sa, 2021-6-20): cannot use string literals as action type
+// TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
 export const savedLabware: Reducer<SavedLabwareState, any> = handleActions(
   {
     DELETE_CONTAINER: (
       state: SavedLabwareState,
       action: DeleteContainerAction
-    ) => ({
-      ...state,
-      [action.payload.labwareId]: false,
-    }),
+    ) => ({ ...state, [action.payload.labwareId]: false }),
     RENAME_LABWARE: (
       state: SavedLabwareState,
       action: RenameLabwareAction
-    ) => ({
-      ...state,
-      [action.payload.labwareId]: true,
-    }),
+    ) => ({ ...state, [action.payload.labwareId]: true }),
     DUPLICATE_LABWARE: (
       state: SavedLabwareState,
       action: DuplicateLabwareAction
-    ) => ({
-      ...state,
-      [action.payload.duplicateLabwareId]: true,
-    }),
+    ) => ({ ...state, [action.payload.duplicateLabwareId]: true }),
     LOAD_FILE: (
       state: SavedLabwareState,
       action: LoadFileAction
@@ -235,10 +218,9 @@ export const savedLabware: Reducer<SavedLabwareState, any> = handleActions(
   },
   {}
 )
-
 export type IngredientsState = LiquidGroupsById
-
-// NOTE(mc, 2020-06-04): `handleActions` cannot be strictly typed
+// @ts-expect-error(sa, 2021-6-20): cannot use string literals as action type
+// TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
 export const ingredients: Reducer<IngredientsState, any> = handleActions(
   {
     EDIT_LIQUID_GROUP: (
@@ -265,9 +247,9 @@ export const ingredients: Reducer<IngredientsState, any> = handleActions(
   },
   {}
 )
-
 type LocationsState = LabwareLiquidState
-
+// @ts-expect-error(sa, 2021-6-20): cannot use string literals as action type
+// TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
 export const ingredLocations: Reducer<LocationsState, any> = handleActions(
   {
     SET_WELL_CONTENTS: (
@@ -276,47 +258,29 @@ export const ingredLocations: Reducer<LocationsState, any> = handleActions(
     ): LocationsState => {
       const { liquidGroupId, labwareId, wells, volume } = action.payload
       const newWellContents: LocationLiquidState = {
-        [liquidGroupId]: { volume },
-      }
-      const updatedWells = wells.reduce<SingleLabwareLiquidState>(
-        (acc, wellName) => ({
-          ...acc,
-          [wellName]: newWellContents,
-        }),
-        {}
-      )
-
-      return {
-        ...state,
-        [labwareId]: {
-          ...state[labwareId],
-          ...updatedWells,
+        [liquidGroupId]: {
+          volume,
         },
       }
+      const updatedWells = wells.reduce<SingleLabwareLiquidState>(
+        (acc, wellName) => ({ ...acc, [wellName]: newWellContents }),
+        {}
+      )
+      return { ...state, [labwareId]: { ...state[labwareId], ...updatedWells } }
     },
     DUPLICATE_LABWARE: (
       state: LocationsState,
       action: DuplicateLabwareAction
     ): LocationsState => {
       const { templateLabwareId, duplicateLabwareId } = action.payload
-      return {
-        ...state,
-        [duplicateLabwareId]: {
-          ...state[templateLabwareId],
-        },
-      }
+      return { ...state, [duplicateLabwareId]: { ...state[templateLabwareId] } }
     },
     REMOVE_WELLS_CONTENTS: (
       state: LocationsState,
       action: RemoveWellsContentsAction
     ): LocationsState => {
       const { wells, labwareId } = action.payload
-      return {
-        ...state,
-        [labwareId]: {
-          ...omit(state[labwareId], wells),
-        },
-      }
+      return { ...state, [labwareId]: { ...omit(state[labwareId], wells) } }
     },
     DELETE_LIQUID_GROUP: (
       state: LocationsState,
@@ -338,18 +302,16 @@ export const ingredLocations: Reducer<LocationsState, any> = handleActions(
   },
   {}
 )
-
-export type RootState = {|
-  modeLabwareSelection: DeckSlot | false,
-  selectedContainerId: SelectedContainerId,
-  drillDownLabwareId: DrillDownLabwareId,
-  containers: ContainersState,
-  savedLabware: SavedLabwareState,
-  selectedLiquidGroup: SelectedLiquidGroupState,
-  ingredients: IngredientsState,
-  ingredLocations: LocationsState,
-|}
-
+export interface RootState {
+  modeLabwareSelection: DeckSlot | false
+  selectedContainerId: SelectedContainerId
+  drillDownLabwareId: DrillDownLabwareId
+  containers: ContainersState
+  savedLabware: SavedLabwareState
+  selectedLiquidGroup: SelectedLiquidGroupState
+  ingredients: IngredientsState
+  ingredLocations: LocationsState
+}
 // TODO Ian 2018-01-15 factor into separate files
 export const rootReducer: Reducer<RootState, Action> = combineReducers({
   modeLabwareSelection,

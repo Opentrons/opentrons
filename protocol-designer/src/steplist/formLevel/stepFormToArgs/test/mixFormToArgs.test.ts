@@ -1,16 +1,18 @@
-// @flow
-import { getLabwareDefURI } from '@opentrons/shared-data'
+import { getLabwareDefURI, LabwareDefinition2 } from '@opentrons/shared-data'
 import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
-import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
+import _fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 import { mixFormToArgs } from '../mixFormToArgs'
 import { DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP } from '../../../../constants'
 import { getOrderedWells } from '../../../utils'
+import { HydratedMixFormDataLegacy } from '../../../../form-types'
 jest.mock('../../../utils')
 
-const getOrderedWellsMock: JestMockFn<any, Array<string>> = getOrderedWells
+const getOrderedWellsMock = getOrderedWells as jest.MockedFunction<
+  typeof getOrderedWells
+>
 
-let hydratedForm
-const labwareDef = fixture_96_plate
+let hydratedForm: HydratedMixFormDataLegacy
+const labwareDef = _fixture_96_plate as LabwareDefinition2
 const labwareType = getLabwareDefURI(labwareDef)
 
 beforeEach(() => {
@@ -24,6 +26,7 @@ beforeEach(() => {
     changeTip: 'always',
     labware: {
       id: 'labwareId',
+      // @ts-expect-error(sa, 2021-6-15): type does not exist on LabwareEntity
       type: labwareType,
       def: labwareDef,
     },
@@ -32,12 +35,15 @@ beforeEach(() => {
     blowout_checkbox: false,
     blowout_location: null,
     mix_mmFromBottom: 0.5,
+    // @ts-expect-error(sa, 2021-6-15): not a valid PipetteEntity
     pipette: {
       id: 'pipetteId',
       spec: fixtureP10Single,
     },
+    // @ts-expect-error(sa, 2021-6-15): volume should be a number
     volume: '12',
     wells: ['A1', 'A2'],
+    // @ts-expect-error(sa, 2021-6-15): times should be a number
     times: '2',
     dispense_flowRate: 4,
     mix_touchTip_checkbox: false,

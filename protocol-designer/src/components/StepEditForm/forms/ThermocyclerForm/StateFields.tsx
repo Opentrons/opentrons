@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import cx from 'classnames'
 
@@ -7,16 +6,16 @@ import { FormGroup } from '@opentrons/components'
 import { ToggleRowField, TextField } from '../../fields'
 import styles from '../../StepEditForm.css'
 
-import type { FieldPropsByName } from '../../types'
-import type { FormData } from '../../../../form-types'
+import { FieldPropsByName } from '../../types'
+import { FormData } from '../../../../form-types'
 
-type Props = {|
-  propsForFields: FieldPropsByName,
-  isEndingHold?: boolean,
-  formData: FormData,
-|}
+interface Props {
+  propsForFields: FieldPropsByName
+  isEndingHold?: boolean
+  formData: FormData
+}
 
-export const StateFields = (props: Props): React.Node => {
+export const StateFields = (props: Props): JSX.Element => {
   const { isEndingHold, propsForFields, formData } = props
 
   // Append 'Hold' to field names if component is used for an ending hold in a TC profile

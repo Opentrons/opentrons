@@ -1,6 +1,5 @@
-// @flow
 import React from 'react'
-import { mount } from 'enzyme'
+import { mount, ReactWrapper } from 'enzyme'
 import { Provider } from 'react-redux'
 import {
   MAGNETIC_MODULE_TYPE,
@@ -14,12 +13,13 @@ import {
   OutlineButton,
 } from '@opentrons/components'
 import { DEFAULT_MODEL_FOR_MODULE_TYPE } from '../../../constants'
-import { actions as stepFormActions } from '../../../step-forms'
+import { actions as stepFormActions, ModuleOnDeck } from '../../../step-forms'
 import { ModuleRow } from '../ModuleRow'
 import { ModuleDiagram } from '../ModuleDiagram'
 
 describe('ModuleRow', () => {
-  let store, magneticModule
+  let store: any
+  let magneticModule: ModuleOnDeck
   beforeEach(() => {
     magneticModule = {
       id: 'magnet123',
@@ -39,7 +39,9 @@ describe('ModuleRow', () => {
     }
   })
 
-  function render(renderProps) {
+  function render(
+    renderProps: React.ComponentProps<typeof ModuleRow>
+  ): ReactWrapper {
     return mount(
       <Provider store={store}>
         <ModuleRow {...renderProps} />

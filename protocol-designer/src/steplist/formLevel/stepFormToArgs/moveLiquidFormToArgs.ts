@@ -1,4 +1,3 @@
-// @flow
 import assert from 'assert'
 import { getWellsDepth } from '@opentrons/shared-data'
 import { DEST_WELL_BLOWOUT_DESTINATION } from '@opentrons/step-generation'
@@ -10,17 +9,14 @@ import {
 } from '../../../constants'
 import { getOrderedWells } from '../../utils'
 import { getMoveLiquidDelayData } from './getDelayData'
-
-import type { HydratedMoveLiquidFormData } from '../../../form-types'
+import { HydratedMoveLiquidFormData } from '../../../form-types'
 import type {
   ConsolidateArgs,
   DistributeArgs,
   TransferArgs,
   InnerMixArgs,
 } from '@opentrons/step-generation'
-
-type MoveLiquidFields = $PropertyType<HydratedMoveLiquidFormData, 'fields'>
-
+type MoveLiquidFields = HydratedMoveLiquidFormData['fields']
 // NOTE(sa, 2020-08-11): leaving this as fn so it can be expanded later for dispense air gap
 export function getAirGapData(
   hydratedFormData: MoveLiquidFields,
@@ -33,15 +29,15 @@ export function getAirGapData(
   if (checkbox && typeof volume === 'number' && volume > 0) {
     return volume
   }
+
   return null
 }
-
 export function getMixData(
-  hydratedFormData: *,
-  checkboxField: *,
-  volumeField: *,
-  timesField: *
-): ?InnerMixArgs {
+  hydratedFormData: any,
+  checkboxField: any,
+  volumeField: any,
+  timesField: any
+): InnerMixArgs | null | undefined {
   const checkbox = hydratedFormData[checkboxField]
   const volume = hydratedFormData[volumeField]
   const times = hydratedFormData[timesField]
@@ -53,13 +49,15 @@ export function getMixData(
     typeof times === 'number' &&
     times > 0
   ) {
-    return { volume, times }
+    return {
+      volume,
+      times,
+    }
   }
+
   return null
 }
-
 type MoveLiquidStepArgs = ConsolidateArgs | DistributeArgs | TransferArgs | null
-
 export const moveLiquidFormToArgs = (
   hydratedFormData: HydratedMoveLiquidFormData
 ): MoveLiquidStepArgs => {
@@ -67,10 +65,8 @@ export const moveLiquidFormToArgs = (
     hydratedFormData.stepType === 'moveLiquid',
     `moveLiquidFormToArgs called with stepType ${hydratedFormData.stepType}, expected "moveLiquid"`
   )
-
   const fields = hydratedFormData.fields
   const pipetteSpec = fields.pipette.spec
-
   const pipetteId = fields.pipette.id
   const {
     volume,
@@ -80,14 +76,12 @@ export const moveLiquidFormToArgs = (
     dispense_wells: destWellsUnordered,
     path,
   } = fields
-
   let sourceWells = getOrderedWells(
     fields.aspirate_wells,
     sourceLabware.def,
     fields.aspirate_wellOrder_first,
     fields.aspirate_wellOrder_second
   )
-
   let destWells = getOrderedWells(
     fields.dispense_wells,
     destLabware.def,
@@ -107,71 +101,58 @@ export const moveLiquidFormToArgs = (
   const disposalVolume = fields.disposalVolume_checkbox
     ? fields.disposalVolume_volume
     : null
-
   const touchTipAfterAspirate = Boolean(fields.aspirate_touchTip_checkbox)
-
   const touchTipAfterAspirateOffsetMmFromBottom =
     fields.aspirate_touchTip_mmFromBottom ||
     getWellsDepth(fields.aspirate_labware.def, sourceWells) +
       DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP
-
   const touchTipAfterDispense = Boolean(fields.dispense_touchTip_checkbox)
   const touchTipAfterDispenseOffsetMmFromBottom =
     fields.dispense_touchTip_mmFromBottom ||
     getWellsDepth(fields.dispense_labware.def, destWells) +
       DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP
-
   const mixBeforeAspirate = getMixData(
     fields,
     'aspirate_mix_checkbox',
     'aspirate_mix_volume',
     'aspirate_mix_times'
   )
-
   const mixInDestination = getMixData(
     fields,
     'dispense_mix_checkbox',
     'dispense_mix_volume',
     'dispense_mix_times'
   )
-  const aspirateDelay = getMoveLiquidDelayData<MoveLiquidFields>(
+  const aspirateDelay = getMoveLiquidDelayData(
     fields,
     'aspirate_delay_checkbox',
     'aspirate_delay_seconds',
     'aspirate_delay_mmFromBottom'
   )
-
-  const dispenseDelay = getMoveLiquidDelayData<MoveLiquidFields>(
+  const dispenseDelay = getMoveLiquidDelayData(
     fields,
     'dispense_delay_checkbox',
     'dispense_delay_seconds',
     'dispense_delay_mmFromBottom'
   )
-
   const blowoutLocation =
     (fields.blowout_checkbox && fields.blowout_location) || null
-
   const blowoutOffsetFromTopMm = DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP
-
   const aspirateAirGapVolume = getAirGapData(
     fields,
     'aspirate_airGap_checkbox',
     'aspirate_airGap_volume'
   )
-
   const dispenseAirGapVolume = getAirGapData(
     fields,
     'dispense_airGap_checkbox',
     'dispense_airGap_volume'
   )
-
   const commonFields = {
     pipette: pipetteId,
     volume,
-
     sourceLabware: sourceLabware.id,
     destLabware: destLabware.id,
-
     aspirateFlowRateUlSec:
       fields.aspirate_flowRate || pipetteSpec.defaultAspirateFlowRate.value,
     dispenseFlowRateUlSec:
@@ -183,7 +164,6 @@ export const moveLiquidFormToArgs = (
     blowoutFlowRateUlSec:
       fields.dispense_flowRate || pipetteSpec.defaultDispenseFlowRate.value,
     blowoutOffsetFromTopMm,
-
     changeTip: fields.changeTip,
     preWetTip: Boolean(fields.preWetTip),
     aspirateDelay,
@@ -194,11 +174,9 @@ export const moveLiquidFormToArgs = (
     touchTipAfterAspirateOffsetMmFromBottom,
     touchTipAfterDispense,
     touchTipAfterDispenseOffsetMmFromBottom,
-
     description: hydratedFormData.description,
     name: hydratedFormData.stepName,
   }
-
   assert(
     sourceWellsUnordered.length > 0,
     'expected sourceWells to have length > 0'
@@ -231,6 +209,7 @@ export const moveLiquidFormToArgs = (
       }
       return transferStepArguments
     }
+
     case 'multiAspirate': {
       const consolidateStepArguments: ConsolidateArgs = {
         ...commonFields,
@@ -243,6 +222,7 @@ export const moveLiquidFormToArgs = (
       }
       return consolidateStepArguments
     }
+
     case 'multiDispense': {
       const distributeStepArguments: DistributeArgs = {
         ...commonFields,
@@ -256,6 +236,7 @@ export const moveLiquidFormToArgs = (
       }
       return distributeStepArguments
     }
+
     default: {
       assert(
         false,

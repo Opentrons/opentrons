@@ -1,4 +1,3 @@
-// @flow
 import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
@@ -8,6 +7,8 @@ import {
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 import { TEMPERATURE_DEACTIVATED } from '@opentrons/step-generation'
+import { FormData, StepIdType } from '../../../../form-types'
+import { ModuleOnDeck } from '../../../../step-forms'
 import { getNextDefaultTemperatureModuleId } from '../getNextDefaultTemperatureModuleId'
 
 const getThermocycler = () => ({
@@ -28,7 +29,10 @@ const getMag = () => ({
   type: MAGNETIC_MODULE_TYPE,
   model: MAGNETIC_MODULE_V1,
   slot: '_span781011',
-  moduleState: { type: MAGNETIC_MODULE_TYPE, engaged: false },
+  moduleState: {
+    type: MAGNETIC_MODULE_TYPE,
+    engaged: false,
+  },
 })
 
 const getTemp = () => ({
@@ -45,7 +49,11 @@ const getTemp = () => ({
 
 describe('getNextDefaultTemperatureModuleId', () => {
   describe('NO previous forms', () => {
-    const testCases = [
+    const testCases: Array<{
+      testMsg: string
+      equippedModulesById: Record<string, ModuleOnDeck>
+      expected: string | null
+    }> = [
       {
         testMsg: 'temp and TC module present: use temp',
         equippedModulesById: {
@@ -62,25 +70,27 @@ describe('getNextDefaultTemperatureModuleId', () => {
         expected: null,
       },
     ]
-
     testCases.forEach(({ testMsg, equippedModulesById, expected }) => {
       it(testMsg, () => {
         const savedForms = {}
-        const orderedStepIds = []
-
+        const orderedStepIds: string[] = []
         const result = getNextDefaultTemperatureModuleId(
           savedForms,
           orderedStepIds,
           equippedModulesById
         )
-
         expect(result).toBe(expected)
       })
     })
   })
-
   describe('previous forms', () => {
-    const testCases = [
+    const testCases: Array<{
+      testMsg: string
+      equippedModulesById: Record<string, ModuleOnDeck>
+      savedForms: Record<StepIdType, FormData>
+      orderedStepIds: string[]
+      expected: string
+    }> = [
       {
         testMsg: 'temp and tc present, last step was tc: use temp mod',
         equippedModulesById: {
@@ -111,24 +121,23 @@ describe('getNextDefaultTemperatureModuleId', () => {
           tempId: getTemp(),
         },
         savedForms: {
-          tempStepId: ({
+          tempStepId: {
             id: 'tempStepId',
             stepType: 'temperature',
             stepName: 'temperature',
             moduleId: 'tempId',
-          }: any),
-          magStepId: ({
+          },
+          magStepId: {
             id: 'magStepId',
             stepType: 'magnet',
             stepName: 'magnet',
             moduleId: 'magdeckId',
-          }: any),
+          },
         },
         orderedStepIds: ['tempStepId', 'magStepId'],
         expected: 'tempId',
       },
     ]
-
     testCases.forEach(
       ({
         testMsg,
@@ -143,7 +152,6 @@ describe('getNextDefaultTemperatureModuleId', () => {
             orderedStepIds,
             equippedModulesById
           )
-
           expect(result).toBe(expected)
         })
       }

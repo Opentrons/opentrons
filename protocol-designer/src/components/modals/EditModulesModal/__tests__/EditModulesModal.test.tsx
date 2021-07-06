@@ -1,4 +1,3 @@
-// @flow
 import React from 'react'
 import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
@@ -15,6 +14,7 @@ import {
   getMockDeckSetup,
   getMockMagneticModule,
   getMockTemperatureModule,
+  // @ts-expect-error(sa, 2021-6-27): TODO: add another ts config for /fixtures, or move them into src
 } from '../../../../../fixtures/state/deck'
 import {
   actions as stepFormActions,
@@ -31,7 +31,7 @@ import { selectors as featureSelectors } from '../../../../feature-flags'
 import { getLabwareIsCompatible } from '../../../../utils/labwareModuleCompatibility'
 import { isModuleWithCollisionIssue } from '../../../modules/utils'
 import { PDAlert } from '../../../alerts/PDAlert'
-import { EditModulesModal } from '..'
+import { EditModulesModal, EditModulesModalProps } from '..'
 import { ModelDropdown } from '../ModelDropdown'
 import { SlotDropdown } from '../SlotDropdown'
 import { ConnectedSlotMap } from '../ConnectedSlotMap'
@@ -46,31 +46,25 @@ jest.mock('../form-state')
 const MODEL_FIELD = 'selectedModel'
 const SLOT_FIELD = 'selectedSlot'
 
-const getInitialDeckSetupMock: JestMockFn<any, any> =
+const getInitialDeckSetupMock: jest.MockedFunction<any> =
   stepFormSelectors.getInitialDeckSetup
 
-const getLabwareIsCompatibleMock: JestMockFn<any, any> = getLabwareIsCompatible
+const getLabwareIsCompatibleMock: jest.MockedFunction<any> = getLabwareIsCompatible
 
-const getDisableModuleRestrictionsMock: JestMockFn<any, any> =
+const getDisableModuleRestrictionsMock: jest.MockedFunction<any> =
   featureSelectors.getDisableModuleRestrictions
 
-const isModuleWithCollisionIssueMock: JestMockFn<
-  any,
-  any
-> = isModuleWithCollisionIssue
+const isModuleWithCollisionIssueMock: jest.MockedFunction<any> = isModuleWithCollisionIssue
 
-const getSlotsBlockedBySpanningMock: JestMockFn<
-  any,
-  any
-> = getSlotsBlockedBySpanning
+const getSlotsBlockedBySpanningMock: jest.MockedFunction<any> = getSlotsBlockedBySpanning
 
-const getSlotIsEmptyMock: JestMockFn<any, any> = getSlotIsEmpty
+const getSlotIsEmptyMock: jest.MockedFunction<any> = getSlotIsEmpty
 
-const getLabwareOnSlotMock: JestMockFn<any, any> = getLabwareOnSlot
+const getLabwareOnSlotMock: jest.MockedFunction<any> = getLabwareOnSlot
 
 describe('Edit Modules Modal', () => {
-  let mockStore
-  let props
+  let mockStore: any
+  let props: EditModulesModalProps
   beforeEach(() => {
     getInitialDeckSetupMock.mockReturnValue(getMockDeckSetup())
     getSlotsBlockedBySpanningMock.mockReturnValue([])
@@ -93,7 +87,7 @@ describe('Edit Modules Modal', () => {
   afterEach(() => {
     jest.clearAllMocks()
   })
-  const render = props =>
+  const render = (props: EditModulesModalProps) =>
     mount(
       <Provider store={mockStore}>
         <EditModulesModal {...props} />
@@ -212,7 +206,9 @@ describe('Edit Modules Modal', () => {
   describe('Cancel Button', () => {
     it('calls onCloseClick when pressed', () => {
       const wrapper = render(props)
-      wrapper.find(OutlineButton).at(0).prop('onClick')()
+      wrapper.find(OutlineButton).at(0).prop('onClick')?.(
+        {} as React.MouseEvent
+      )
       expect(props.onCloseClick).toHaveBeenCalled()
     })
   })
@@ -226,6 +222,7 @@ describe('Edit Modules Modal', () => {
         selectedModel: MAGNETIC_MODULE_V2,
       }
       act(() => {
+        // @ts-expect-error (ce, 2021-06-22) expects 2 args
         formik.invoke('onSubmit')(mockValues)
       })
       expect(props.displayModuleWarning).toHaveBeenCalledWith({
@@ -243,6 +240,7 @@ describe('Edit Modules Modal', () => {
         selectedModel: TEMPERATURE_MODULE_V2,
       }
       act(() => {
+        // @ts-expect-error (ce, 2021-06-22) expects 2 args
         formik.invoke('onSubmit')(mockValues)
       })
       expect(props.editModuleModel).toHaveBeenCalledWith(TEMPERATURE_MODULE_V2)
@@ -258,6 +256,7 @@ describe('Edit Modules Modal', () => {
         selectedModel: MAGNETIC_MODULE_V2,
       }
       act(() => {
+        // @ts-expect-error (ce, 2021-06-22) expects 2 args
         formik.invoke('onSubmit')(mockValues)
       })
 

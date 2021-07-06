@@ -1,29 +1,28 @@
-// @flow
 import * as React from 'react'
 import { FormGroup } from '@opentrons/components'
 import { i18n } from '../../../../localization'
 import { LabwareField, WellSelectionField } from '../../fields'
 import { AspDispSection } from '../AspDispSection'
-import type { StepFieldName } from '../../../../steplist/fieldLevel'
-import type { FormData } from '../../../../form-types'
-import type { FieldPropsByName } from '../../types'
+import { StepFieldName } from '../../../../steplist/fieldLevel'
+import { FormData } from '../../../../form-types'
+import { FieldPropsByName } from '../../types'
 
 import styles from '../../StepEditForm.css'
 
-type Props = {|
-  className?: ?string,
-  collapsed?: ?boolean,
-  formData: FormData,
-  prefix: 'aspirate' | 'dispense',
-  propsForFields: FieldPropsByName,
-  toggleCollapsed: () => void,
-|}
+interface Props {
+  className?: string | null
+  collapsed?: boolean | null
+  formData: FormData
+  prefix: 'aspirate' | 'dispense'
+  propsForFields: FieldPropsByName
+  toggleCollapsed: () => void
+}
 
 const makeAddFieldNamePrefix = (prefix: string) => (
   fieldName: string
 ): StepFieldName => `${prefix}_${fieldName}`
 
-export const SourceDestHeaders = (props: Props): React.Node => {
+export const SourceDestHeaders = (props: Props): JSX.Element => {
   const {
     className,
     collapsed,

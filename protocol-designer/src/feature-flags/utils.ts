@@ -1,6 +1,4 @@
-// @flow
-import { allFlags, type Flags } from './types'
-
+import { allFlags, Flags, FlagTypes } from './types'
 // Overwrite feature flags that come in via query params
 // Ex: https://designer.opentrons.com/?someFF=1&anotherFF=1
 export const getFlagsFromQueryParams = (): Flags => {
@@ -8,12 +6,10 @@ export const getFlagsFromQueryParams = (): Flags => {
   let flagsToEnable: Flags = {}
 
   for (const [flagName, flagValue] of urlSearchParams.entries()) {
-    if (allFlags.includes(flagName)) {
-      flagsToEnable = {
-        ...flagsToEnable,
-        [flagName]: flagValue === '1',
-      }
+    if (allFlags.includes(flagName as FlagTypes)) {
+      flagsToEnable = { ...flagsToEnable, [flagName]: flagValue === '1' }
     }
   }
+
   return flagsToEnable
 }

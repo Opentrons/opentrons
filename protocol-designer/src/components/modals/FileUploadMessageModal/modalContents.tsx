@@ -1,10 +1,9 @@
-// @flow
 import * as React from 'react'
 import assert from 'assert'
 import semver from 'semver'
 import styles from './modalContents.css'
-import type { ModalContents } from './types'
-import type { FileUploadMessage } from '../../../load-file'
+import { ModalContents } from './types'
+import { FileUploadMessage } from '../../../load-file'
 
 const INVALID_FILE_TYPE: ModalContents = {
   title: 'Incorrect file type',
@@ -16,7 +15,7 @@ const INVALID_FILE_TYPE: ModalContents = {
   ),
 }
 
-const invalidJsonModal = (errorMessage: ?string): ModalContents => ({
+const invalidJsonModal = (errorMessage?: string | null): ModalContents => ({
   title: 'Invalid JSON file',
   body: (
     <>
@@ -123,9 +122,7 @@ export const toV3MigrationMessage: ModalContents = {
   ),
 }
 
-export function getMigrationMessage(
-  migrationsRan: Array<string>
-): ModalContents {
+export function getMigrationMessage(migrationsRan: string[]): ModalContents {
   if (migrationsRan.includes('3.0.0')) {
     return toV3MigrationMessage
   }
@@ -158,6 +155,7 @@ export function getModalContents(
         false,
         `invalid messageKey ${uploadResponse.messageKey} specified for modal`
       )
+      // @ts-expect-error (ce, 2021-06-23) the case below will never happened, as we've already narrowed all posibilities
       return { title: '', body: uploadResponse.messageKey }
     }
   }

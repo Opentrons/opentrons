@@ -16,6 +16,7 @@ describe('DELETE_CONTAINER action', () => {
   it('no-op with nonexistent labwareId', () => {
     expect(
       containers(
+        // @ts-expect-error(sa, 2021-6-20): not a valid ContainersState
         {
           1: 'blah',
           999: 'blaaah',
@@ -34,6 +35,7 @@ describe('DELETE_CONTAINER action', () => {
   it('delete given labwareId', () => {
     expect(
       containers(
+        // @ts-expect-error(sa, 2021-6-20): not a valid ContainersState
         {
           1: 'blah',
           123: 'delete this',

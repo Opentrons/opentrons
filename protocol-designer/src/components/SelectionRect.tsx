@@ -1,33 +1,30 @@
-// @flow
 import * as React from 'react'
 
 import styles from './SelectionRect.css'
-import type { DragRect, GenericRect } from '../collision-types'
+import { DragRect, GenericRect } from '../collision-types'
 
-type Props = {|
-  onSelectionMove?: (e: MouseEvent, GenericRect) => mixed,
-  onSelectionDone?: (e: MouseEvent, GenericRect) => mixed,
-  svg?: boolean, // set true if this is an embedded SVG
-  children?: React.Node,
-  originXOffset?: number,
-  originYOffset?: number,
-|}
+interface Props {
+  onSelectionMove?: (e: MouseEvent, arg: GenericRect) => unknown
+  onSelectionDone?: (e: MouseEvent, arg: GenericRect) => unknown
+  svg?: boolean // set true if this is an embedded SVG
+  children?: React.ReactNode
+  originXOffset?: number
+  originYOffset?: number
+}
 
-type State = {|
-  positions: DragRect | null,
-|}
+interface State {
+  positions: DragRect | null
+}
 
 export class SelectionRect extends React.Component<Props, State> {
-  // TODO Ian 2018-02-22 No support in Flow for SVGElement yet: https://github.com/facebook/flow/issues/2332
-  // this `parentRef` should be HTMLElement | SVGElement
-  parentRef: ?any
+  parentRef?: HTMLElement | SVGElement | null
 
   constructor(props: Props) {
     super(props)
     this.state = { positions: null }
   }
 
-  renderRect(args: DragRect): React.Node {
+  renderRect(args: DragRect): React.ReactNode {
     const { xStart, yStart, xDynamic, yDynamic } = args
     const left = Math.min(xStart, xDynamic)
     const top = Math.min(yStart, yDynamic)
@@ -43,12 +40,13 @@ export class SelectionRect extends React.Component<Props, State> {
       }
 
       const clientRect: {
-        width: number,
-        height: number,
-        left: number,
-        top: number,
+        width: number
+        height: number
+        left: number
+        top: number
       } = parentRef.getBoundingClientRect()
-      const viewBox: { width: number, height: number } = parentRef.closest(
+      // @ts-expect-error(sa, 2021-7-1): parentRef.closest might return null
+      const viewBox: { width: number; height: number } = parentRef.closest(
         'svg'
       ).viewBox.baseVal // WARNING: elem.closest() is experiemental
 
@@ -91,7 +89,7 @@ export class SelectionRect extends React.Component<Props, State> {
     }
   }
 
-  handleMouseDown: (e: MouseEvent) => void = e => {
+  handleMouseDown: React.MouseEventHandler = e => {
     document.addEventListener('mousemove', this.handleDrag)
     document.addEventListener('mouseup', this.handleMouseUp)
     this.setState({
@@ -136,7 +134,7 @@ export class SelectionRect extends React.Component<Props, State> {
       this.props.onSelectionDone(e, finalRect)
   }
 
-  render(): React.Node {
+  render(): React.ReactNode {
     const { svg, children } = this.props
 
     return svg ? (

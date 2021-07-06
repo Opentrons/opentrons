@@ -1,4 +1,3 @@
-// @flow
 import React from 'react'
 import { Provider } from 'react-redux'
 import thunk from 'redux-thunk'
@@ -34,8 +33,8 @@ const getBatchEditFormHasUnsavedChangesMock =
   stepFormSelectors.getBatchEditFormHasUnsavedChanges
 
 describe('MultiSelectToolbar', () => {
-  let store
-  let props
+  let store: any
+  let props: React.ComponentProps<typeof MultiSelectToolbar>
   beforeEach(() => {
     store = mockStore()
     props = {
@@ -113,7 +112,7 @@ describe('MultiSelectToolbar', () => {
     expect(selectIcon.prop('iconName')).toBe('checkbox-marked')
     expect(selectIcon.prop('tooltipText')).toBe('Deselect All')
     act(() => {
-      selectIcon.prop('onClick')()
+      selectIcon.prop('onClick')?.({} as React.MouseEvent)
     })
     expect(deselectAllStepsSpy).toHaveBeenCalled()
   })
@@ -133,7 +132,7 @@ describe('MultiSelectToolbar', () => {
     expect(selectIcon.prop('iconName')).toBe('minus-box')
     expect(selectIcon.prop('tooltipText')).toBe('Select All')
     act(() => {
-      selectIcon.prop('onClick')()
+      selectIcon.prop('onClick')?.({} as React.MouseEvent)
     })
     expect(selectAllStepsSpy).toHaveBeenCalled()
   })
@@ -154,7 +153,7 @@ describe('MultiSelectToolbar', () => {
       const wrapper = render()
       const expandIcon = wrapper.find(ClickableIcon).at(3)
       act(() => {
-        expandIcon.prop('onClick')()
+        expandIcon.prop('onClick')?.({} as React.MouseEvent)
       })
       expect(expandMultipleStepsSpy).toHaveBeenCalledWith(['id_1', 'id_2'])
 
@@ -168,7 +167,7 @@ describe('MultiSelectToolbar', () => {
       const collapseIcon = wrapper.find(ClickableIcon).at(3)
 
       act(() => {
-        collapseIcon.prop('onClick')()
+        collapseIcon.prop('onClick')?.({} as React.MouseEvent)
       })
       expect(collapseMultipleStepsSpy).toHaveBeenCalledWith(['id_1', 'id_2'])
     })
@@ -178,7 +177,7 @@ describe('MultiSelectToolbar', () => {
       expect(expandIcon.prop('iconName')).toBe('unfold-more-horizontal')
       expect(expandIcon.prop('tooltipText')).toBe('Expand')
       act(() => {
-        expandIcon.prop('onClick')()
+        expandIcon.prop('onClick')?.({} as React.MouseEvent)
       })
       wrapper.update()
       const expandIconUpdated = wrapper.find(ClickableIcon).at(3)
@@ -205,7 +204,7 @@ describe('MultiSelectToolbar', () => {
       const deleteIcon = wrapper.find(ClickableIcon).at(1)
 
       act(() => {
-        deleteIcon.prop('onClick')()
+        deleteIcon.prop('onClick')?.({} as React.MouseEvent)
       })
 
       wrapper.update()
@@ -216,6 +215,7 @@ describe('MultiSelectToolbar', () => {
       )
 
       act(() => {
+        // @ts-expect-error(sa, 2021-6-27): not sure why TS not recognizing onContinueClick overload with no event parameter
         confirmDeleteModal.prop('onContinueClick')()
       })
       wrapper.update()
@@ -243,7 +243,7 @@ describe('MultiSelectToolbar', () => {
 
       const copyIcon = wrapper.find(ClickableIcon).at(2)
       act(() => {
-        copyIcon.prop('onClick')()
+        copyIcon.prop('onClick')?.({} as React.MouseEvent)
       })
 
       expect(duplicateMultipleStepsSpy).toHaveBeenCalledWith(['id_1'])
@@ -271,7 +271,7 @@ describe('MultiSelectToolbar', () => {
       const copyIcon = wrapper.find(ClickableIcon).at(2)
 
       act(() => {
-        copyIcon.prop('onClick')()
+        copyIcon.prop('onClick')?.({} as React.MouseEvent)
       })
 
       wrapper.update()
@@ -280,6 +280,7 @@ describe('MultiSelectToolbar', () => {
       expect(confirmDeleteModal.prop('modalType')).toBe(CLOSE_BATCH_EDIT_FORM)
 
       act(() => {
+        // @ts-expect-error(sa, 2021-6-27): not sure why TS not recognizing onContinueClick overload with no event parameter
         confirmDeleteModal.prop('onContinueClick')()
       })
       wrapper.update()

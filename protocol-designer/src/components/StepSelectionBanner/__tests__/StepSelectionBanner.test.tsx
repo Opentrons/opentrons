@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { mount } from 'enzyme'
 import configureMockStore from 'redux-mock-store'
@@ -18,12 +17,13 @@ jest.mock('../../../ui/steps/selectors')
 
 const middlewares = [thunk]
 const mockStore = configureMockStore(middlewares)
-const getBatchEditFormHasUnsavedChangesMock =
-  stepFormSelectors.getBatchEditFormHasUnsavedChanges
-const getCountPerStepTypeMock: JestMockFn<any, any> = getCountPerStepType
+const getBatchEditFormHasUnsavedChangesMock = stepFormSelectors.getBatchEditFormHasUnsavedChanges as jest.MockedFunction<
+  typeof stepFormSelectors.getBatchEditFormHasUnsavedChanges
+>
+const getCountPerStepTypeMock: jest.MockedFunction<any> = getCountPerStepType
 
 describe('StepSelectionBanner', () => {
-  let store
+  let store: any
   beforeEach(() => {
     store = mockStore()
   })
@@ -32,7 +32,7 @@ describe('StepSelectionBanner', () => {
     jest.restoreAllMocks()
   })
 
-  const render = store =>
+  const render = (store: any) =>
     mount(<StepSelectionBanner />, {
       wrappingComponent: Provider,
       wrappingComponentProps: {

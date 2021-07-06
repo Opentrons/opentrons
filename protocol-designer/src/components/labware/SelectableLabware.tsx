@@ -1,8 +1,12 @@
-// @flow
 import * as React from 'react'
 import reduce from 'lodash/reduce'
 
-import { SELECTABLE_WELL_CLASS } from '@opentrons/components'
+import {
+  SELECTABLE_WELL_CLASS,
+  Channels,
+  WellMouseEvent,
+  WellGroup,
+} from '@opentrons/components'
 import {
   arrayToWellGroup,
   getCollidingWells,
@@ -12,25 +16,24 @@ import { SingleLabware } from './SingleLabware'
 import { SelectionRect } from '../SelectionRect'
 import { WellTooltip } from './WellTooltip'
 
-import type { Channels, WellMouseEvent, WellGroup } from '@opentrons/components'
-import type { ContentsByWell } from '../../labware-ingred/types'
-import type { WellIngredientNames } from '../../steplist/types'
-import type { GenericRect } from '../../collision-types'
+import { ContentsByWell } from '../../labware-ingred/types'
+import { WellIngredientNames } from '../../steplist/types'
+import { GenericRect } from '../../collision-types'
 
-export type Props = {|
-  labwareProps: $Diff<
-    React.ElementProps<typeof SingleLabware>,
-    { selectedWells: * }
-  >,
+export interface Props {
+  labwareProps: Omit<
+    React.ComponentProps<typeof SingleLabware>,
+    'selectedWells'
+  >
   /** array of primary wells. Overrides labwareProps.selectedWells */
-  selectedPrimaryWells: WellGroup,
-  selectWells: WellGroup => mixed,
-  deselectWells: WellGroup => mixed,
-  updateHighlightedWells: WellGroup => mixed,
-  pipetteChannels?: ?Channels,
-  ingredNames: WellIngredientNames,
-  wellContents: ContentsByWell,
-|}
+  selectedPrimaryWells: WellGroup
+  selectWells: (wellGroup: WellGroup) => unknown
+  deselectWells: (wellGroup: WellGroup) => unknown
+  updateHighlightedWells: (wellGroup: WellGroup) => unknown
+  pipetteChannels?: Channels | null
+  ingredNames: WellIngredientNames
+  wellContents: ContentsByWell
+}
 
 export class SelectableLabware extends React.Component<Props> {
   _getWellsFromRect: (rect: GenericRect) => WellGroup = rect => {
@@ -89,6 +92,7 @@ export class SelectableLabware extends React.Component<Props> {
       }
     }
   }
+
   handleSelectionDone: (e: MouseEvent, rect: GenericRect) => void = (
     e,
     rect
@@ -117,7 +121,7 @@ export class SelectableLabware extends React.Component<Props> {
     this.props.updateHighlightedWells({})
   }
 
-  render(): React.Node {
+  render(): React.ReactNode {
     const {
       labwareProps,
       ingredNames,

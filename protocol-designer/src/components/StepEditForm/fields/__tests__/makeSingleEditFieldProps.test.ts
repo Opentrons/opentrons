@@ -1,4 +1,3 @@
-// @flow
 import { makeSingleEditFieldProps } from '../makeSingleEditFieldProps'
 import {
   getDisabledFields,
@@ -6,6 +5,7 @@ import {
 } from '../../../../steplist/formLevel'
 import { getFieldErrors } from '../../../../steplist/fieldLevel'
 import * as stepEditFormUtils from '../../utils'
+import { FormData } from '../../../../form-types'
 jest.mock('../../../../steplist/formLevel')
 jest.mock('../../../../steplist/fieldLevel')
 
@@ -19,15 +19,15 @@ const getSingleSelectDisabledTooltipSpy = jest.spyOn(
   'getSingleSelectDisabledTooltip'
 )
 
-const getDisabledFieldsMock: JestMockFn<any, Set<string>> = getDisabledFields
-const getDefaultsForStepTypeMock: JestMockFn<
-  [any],
-  any
-> = getDefaultsForStepType
-const getFieldErrorsMock: JestMockFn<
-  [string, mixed],
-  Array<string>
-> = getFieldErrors
+const getDisabledFieldsMock = getDisabledFields as jest.MockedFunction<
+  typeof getDisabledFields
+>
+const getDefaultsForStepTypeMock = getDefaultsForStepType as jest.MockedFunction<
+  typeof getDefaultsForStepType
+>
+const getFieldErrorsMock = getFieldErrors as jest.MockedFunction<
+  typeof getFieldErrors
+>
 
 beforeEach(() => {
   getFieldDefaultTooltipSpy.mockImplementation(name => `tooltip for ${name}`)
@@ -58,12 +58,14 @@ describe('makeSingleEditFieldProps', () => {
       focused_error_field: '',
     }
 
-    getDisabledFieldsMock.mockImplementation(form => {
-      expect(form).toBe(formData)
-      const disabled = new Set()
-      disabled.add('disabled_field')
-      return disabled
-    })
+    getDisabledFieldsMock.mockImplementation(
+      (form: FormData): Set<string> => {
+        expect(form).toBe(formData)
+        const disabled = new Set<string>()
+        disabled.add('disabled_field')
+        return disabled
+      }
+    )
 
     getDefaultsForStepTypeMock.mockImplementation(stepType => {
       expect(stepType).toEqual('fakeStepType')

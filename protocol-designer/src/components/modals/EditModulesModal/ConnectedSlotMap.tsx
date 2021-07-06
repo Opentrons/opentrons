@@ -1,14 +1,15 @@
-// @flow
 import * as React from 'react'
 import { useField } from 'formik'
 import { SlotMap } from '@opentrons/components'
 import styles from './EditModules.css'
 
-type ConnectedSlotMapProps = {|
-  fieldName: string,
-|}
+interface ConnectedSlotMapProps {
+  fieldName: string
+}
 
-export const ConnectedSlotMap = (props: ConnectedSlotMapProps): React.Node => {
+export const ConnectedSlotMap = (
+  props: ConnectedSlotMapProps
+): JSX.Element | null => {
   const { fieldName } = props
   const [field, meta] = useField(fieldName)
   return field.value ? (

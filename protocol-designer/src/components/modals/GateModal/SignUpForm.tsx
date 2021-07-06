@@ -1,6 +1,5 @@
-// @flow
-
 import * as React from 'react'
+// @ts-expect-error(sa, 2021-6-27): can't get TS to recognize that @types/typeform__embed exists
 import { makeWidget } from '@typeform/embed'
 import { getIsProduction } from '../../../networking/opentronsWebApi'
 import styles from '../modal.css'
@@ -14,19 +13,20 @@ const SIGNUP_TYPEFORM_URL = getIsProduction()
   : STAGING_TYPEFORM_URL
 
 export class SignUpForm extends React.Component<{}> {
-  embedElement: React.ElementRef<*>
+  embedElement: React.RefObject<HTMLDivElement>
 
   constructor(props: {}) {
     super(props)
     this.embedElement = React.createRef()
   }
 
-  componentDidMount() {
+  componentDidMount(): void {
     makeWidget(this.embedElement.current, SIGNUP_TYPEFORM_URL, {
       hideScrollbars: true,
     })
   }
-  render(): React.Node {
+
+  render(): React.ReactNode {
     return (
       <div ref={this.embedElement} className={styles.sign_up_form_wrapper} />
     )

@@ -1,10 +1,12 @@
-// @flow
 import React from 'react'
 import { act } from 'react-dom/test-utils'
 import { mount } from 'enzyme'
-import { EditModules } from '../EditModules'
+import { EditModules, EditModulesProps } from '../EditModules'
 import { Provider } from 'react-redux'
-import { selectors as stepFormSelectors } from '../../step-forms'
+import {
+  InitialDeckSetup,
+  selectors as stepFormSelectors,
+} from '../../step-forms'
 import { selectors as tutorialSelectors } from '../../tutorial'
 import { BlockingHint } from '../Hints/useBlockingHint'
 import { EditModulesModal } from '../modals/EditModulesModal'
@@ -14,19 +16,21 @@ jest.mock('../../step-forms/selectors')
 jest.mock('../../tutorial')
 jest.mock('../modals/EditModulesModal')
 
-const mockEditModulesModal: JestMockFn<any, any> = EditModulesModal
-
-const getInitialDeckSetupMock: JestMockFn<any, any> =
-  stepFormSelectors.getInitialDeckSetup
-
-const getDismissedHintsMock: JestMockFn<any, any> =
-  tutorialSelectors.getDismissedHints
+const mockEditModulesModal = EditModulesModal as jest.MockedFunction<
+  typeof EditModulesModal
+>
+const getInitialDeckSetupMock = stepFormSelectors.getInitialDeckSetup as jest.MockedFunction<
+  typeof stepFormSelectors.getInitialDeckSetup
+>
+const getDismissedHintsMock = tutorialSelectors.getDismissedHints as jest.MockedFunction<
+  typeof tutorialSelectors.getDismissedHints
+>
 
 describe('Edit Modules', () => {
   const TEST_ID = 'testId'
-  let props
+  let props: EditModulesProps
   let moduleToEdit
-  let mockStore
+  let mockStore: any
   let onCloseClick
 
   beforeEach(() => {
@@ -42,9 +46,9 @@ describe('Edit Modules', () => {
       getState: () => ({}),
     }
     getDismissedHintsMock.mockReturnValue([])
-    getInitialDeckSetupMock.mockReturnValue({
+    getInitialDeckSetupMock.mockReturnValue(({
       modules: { [TEST_ID]: {} },
-    })
+    } as unknown) as InitialDeckSetup)
     mockEditModulesModal.mockReturnValue(<div>mock edit modules modal</div>)
   })
 
@@ -52,7 +56,7 @@ describe('Edit Modules', () => {
     jest.resetAllMocks()
   })
 
-  const render = props =>
+  const render = (props: EditModulesProps) =>
     mount(<EditModules {...props} />, {
       wrappingComponent: Provider,
       wrappingComponentProps: { store: mockStore },
@@ -69,7 +73,7 @@ describe('Edit Modules', () => {
 
     act(() => {
       editModulesModal.prop('displayModuleWarning')({
-        model: 'some_model',
+        model: 'some_model' as any,
         slot: 'some_slot',
       })
     })

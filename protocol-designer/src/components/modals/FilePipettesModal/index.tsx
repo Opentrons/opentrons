@@ -1,11 +1,16 @@
-// @flow
 import assert from 'assert'
 import reduce from 'lodash/reduce'
 import * as React from 'react'
 import cx from 'classnames'
-import { Formik } from 'formik'
+import { Formik, FormikProps } from 'formik'
 import * as Yup from 'yup'
-import { getIsCrashablePipetteSelected } from '../../../step-forms'
+import {
+  getIsCrashablePipetteSelected,
+  PipetteOnDeck,
+  FormPipette,
+  FormPipettesByMount,
+  FormModulesByType,
+} from '../../../step-forms'
 import {
   Modal,
   FormGroup,
@@ -17,6 +22,8 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V1,
+  ModuleRealType,
+  ModuleModel,
 } from '@opentrons/shared-data'
 import { i18n } from '../../../localization'
 import { SPAN7_8_10_11_SLOT } from '../../../constants'
@@ -27,52 +34,44 @@ import { CrashInfoBox, isModuleWithCollisionIssue } from '../../modules'
 import styles from './FilePipettesModal.css'
 import formStyles from '../../forms/forms.css'
 import modalStyles from '../modal.css'
-import type { ModuleRealType } from '@opentrons/shared-data'
-import type { DeckSlot } from '../../../types'
-import type { NewProtocolFields } from '../../../load-file'
-import type {
-  PipetteOnDeck,
-  FormPipette,
-  FormPipettesByMount,
-  FormModulesByType,
-} from '../../../step-forms'
-import type { FormikProps } from 'formik/@flow-typed'
+import { DeckSlot } from '../../../types'
+import { NewProtocolFields } from '../../../load-file'
 
-export type PipetteFieldsData = $Diff<
+export type PipetteFieldsData = Omit<
   PipetteOnDeck,
-  {| id: mixed, spec: mixed, tiprackLabwareDef: mixed |}
+  'id' | 'spec' | 'tiprackLabwareDef'
 >
 
-export type ModuleCreationArgs = {|
-  type: ModuleRealType,
-  model: string,
-  slot: DeckSlot,
-|}
+export interface ModuleCreationArgs {
+  type: ModuleRealType
+  model: ModuleModel
+  slot: DeckSlot
+}
 
-type FormState = {|
-  fields: NewProtocolFields,
-  pipettesByMount: FormPipettesByMount,
-  modulesByType: FormModulesByType,
-|}
+export interface FormState {
+  fields: NewProtocolFields
+  pipettesByMount: FormPipettesByMount
+  modulesByType: FormModulesByType
+}
 
-type State = {|
-  showEditPipetteConfirmation: boolean,
-|}
+interface State {
+  showEditPipetteConfirmation: boolean
+}
 
-export type Props = {|
-  showProtocolFields?: ?boolean,
-  showModulesFields?: ?boolean,
-  hideModal?: boolean,
-  onCancel: () => mixed,
-  initialPipetteValues?: $PropertyType<FormState, 'pipettesByMount'>,
-  initialModuleValues?: $PropertyType<FormState, 'modulesByType'>,
-  onSave: ({|
-    newProtocolFields: NewProtocolFields,
-    pipettes: Array<PipetteFieldsData>,
-    modules: Array<ModuleCreationArgs>,
-  |}) => mixed,
-  moduleRestrictionsDisabled: ?boolean,
-|}
+export interface Props {
+  showProtocolFields?: boolean | null
+  showModulesFields?: boolean | null
+  hideModal?: boolean
+  onCancel: () => unknown
+  initialPipetteValues?: FormState['pipettesByMount']
+  initialModuleValues?: FormState['modulesByType']
+  onSave: (args: {
+    newProtocolFields: NewProtocolFields
+    pipettes: PipetteFieldsData[]
+    modules: ModuleCreationArgs[]
+  }) => unknown
+  moduleRestrictionsDisabled?: boolean | null
+}
 
 const initialFormState: FormState = {
   fields: { name: '' },
@@ -103,18 +102,17 @@ const pipetteValidationShape = Yup.object().shape({
   pipetteName: Yup.string().nullable(),
   tiprackDefURI: Yup.string()
     .nullable()
-    // $FlowFixMe(mc, 2020-06-02): is `otherwise: null` valid?
     .when('pipetteName', {
       is: (val: string | null): boolean => Boolean(val),
       then: Yup.string().required('Required'),
       otherwise: null,
     }),
 })
-const moduleValidationShape = Yup.object().shape({
+// any typing this because TS says there are too many possibilities of what this could be
+const moduleValidationShape: any = Yup.object().shape({
   onDeck: Yup.boolean().default(false),
   model: Yup.string()
     .nullable()
-    // $FlowFixMe(mc, 2020-06-02): is `otherwise: null` valid?
     .when('onDeck', {
       is: true,
       then: Yup.string().required('Required'),
@@ -133,7 +131,7 @@ const validationSchema = Yup.object().shape({
       right: pipetteValidationShape,
     })
     .test('pipette-is-required', 'a pipette is required', value =>
-      // $FlowFixMe(mc, 2020-06-02): Flow isn't extracting `value` type properly
+      // @ts-expect-error(sa, 2021-6-21): TS not extracting type of value properly
       Object.keys(value).some((val: string) => value[val].pipetteName)
     ),
   modulesByType: Yup.object().shape({
@@ -153,7 +151,7 @@ export class FilePipettesModal extends React.Component<Props, State> {
     }
   }
 
-  componentDidUpdate(prevProps: Props) {
+  componentDidUpdate(prevProps: Props): void {
     if (!prevProps.hideModal && this.props.hideModal)
       this.setState({ showEditPipetteConfirmation: false })
   }
@@ -180,10 +178,11 @@ export class FilePipettesModal extends React.Component<Props, State> {
     }
 
     const newProtocolFields = values.fields
-    const pipettes = reduce(
+    const pipettes = reduce<FormPipettesByMount, PipetteFieldsData[]>(
       values.pipettesByMount,
-      (acc, formPipette: FormPipette, mount): Array<PipetteFieldsData> => {
+      (acc, formPipette: FormPipette, mount): PipetteFieldsData[] => {
         assert(mount === 'left' || mount === 'right', `invalid mount: ${mount}`) // this is mostly for flow
+        // @ts-expect-error(sa, 2021-6-21): TODO validate that pipette names coming from the modal are actually valid pipette names on PipetteName type
         return formPipette &&
           formPipette.pipetteName &&
           formPipette.tiprackDefURI &&
@@ -203,23 +202,23 @@ export class FilePipettesModal extends React.Component<Props, State> {
 
     // NOTE: this is extra-explicit for flow. Reduce fns won't cooperate
     // with enum-typed key like `{[ModuleRealType]: ___}`
-    const moduleTypes: Array<ModuleRealType> = Object.keys(values.modulesByType)
-    const modules: Array<ModuleCreationArgs> = moduleTypes.reduce(
-      (acc, moduleType) => {
-        const formModule = values.modulesByType[moduleType]
-        return formModule?.onDeck
-          ? [
-              ...acc,
-              {
-                type: moduleType,
-                model: formModule.model || '',
-                slot: formModule.slot,
-              },
-            ]
-          : acc
-      },
-      []
-    )
+    // @ts-expect-error(sa, 2021-6-21): TS not smart enough to take real type from Object.keys
+    const moduleTypes: ModuleRealType[] = Object.keys(values.modulesByType)
+    const modules: ModuleCreationArgs[] = moduleTypes.reduce<
+      ModuleCreationArgs[]
+    >((acc, moduleType) => {
+      const formModule = values.modulesByType[moduleType]
+      return formModule?.onDeck
+        ? [
+            ...acc,
+            {
+              type: moduleType,
+              model: formModule.model || ('' as ModuleModel), // TODO: we need to validate that module models are of type ModuleModel
+              slot: formModule.slot,
+            },
+          ]
+        : acc
+    }, [])
     this.props.onSave({ modules, newProtocolFields, pipettes })
   }
 
@@ -245,7 +244,7 @@ export class FilePipettesModal extends React.Component<Props, State> {
     }
   }
 
-  render(): React.Node {
+  render(): React.ReactNode | null {
     if (this.props.hideModal) return null
     const { showProtocolFields, moduleRestrictionsDisabled } = this.props
 
@@ -338,7 +337,9 @@ export class FilePipettesModal extends React.Component<Props, State> {
                           onFieldChange={handleChange}
                           onSetFieldValue={setFieldValue}
                           onBlur={handleBlur}
+                          // @ts-expect-error(sa, 2021-7-2): we need to explicitly check that the module tiprackDefURI inside of pipettesByMount exists, because it could be undefined
                           errors={errors.pipettesByMount ?? null}
+                          // @ts-expect-error(sa, 2021-7-2): we need to explicitly check that the module tiprackDefURI inside of pipettesByMount exists, because it could be undefined
                           touched={touched.pipettesByMount ?? null}
                           onSetFieldTouched={setFieldTouched}
                         />
@@ -351,11 +352,13 @@ export class FilePipettesModal extends React.Component<Props, State> {
                               )}
                             </h2>
                             <ModuleFields
+                              // @ts-expect-error(sa, 2021-7-2): we need to explicitly check that the module model inside of modulesByType exists, because it could be undefined
                               errors={errors.modulesByType ?? null}
                               values={values.modulesByType}
                               onFieldChange={handleChange}
                               onSetFieldValue={setFieldValue}
                               onBlur={handleBlur}
+                              // @ts-expect-error(sa, 2021-7-2): we need to explicitly check that the module model inside of modulesByType exists, because it could be undefined
                               touched={touched.modulesByType ?? null}
                               onSetFieldTouched={setFieldTouched}
                             />
@@ -380,6 +383,7 @@ export class FilePipettesModal extends React.Component<Props, State> {
                           </OutlineButton>
                           <OutlineButton
                             disabled={!pipetteSelectionIsValid}
+                            // @ts-expect-error(sa, 2021-6-21): Formik handleSubmit type not cooporating with OutlineButton onClick type
                             onClick={handleSubmit}
                             tabIndex={6}
                             className={styles.button}

@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import {
   FormGroup,
@@ -10,17 +9,16 @@ import {
 import { i18n } from '../../../localization'
 import { getFieldDefaultTooltip } from '../utils'
 import { TextField } from './TextField'
-import type { StepType } from '../../../form-types'
-import type { FieldProps } from '../types'
+import { StepType } from '../../../form-types'
+import { FieldProps } from '../types'
 import styles from '../StepEditForm.css'
 
-type Props = {|
-  ...FieldProps,
-  stepType: StepType,
-  label: string,
-  className: string,
-|}
-export const VolumeField = (props: Props): React.Node => {
+type Props = FieldProps & {
+  stepType: StepType
+  label: string
+  className: string
+}
+export const VolumeField = (props: Props): JSX.Element => {
   const { stepType, label, className, ...propsForVolumeField } = props
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: TOOLTIP_TOP,

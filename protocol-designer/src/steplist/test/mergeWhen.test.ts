@@ -1,4 +1,3 @@
-// @flow
 import { mergeWhen } from '../utils'
 
 function concat(a: string, b: string): string {
@@ -43,6 +42,7 @@ describe('mergeWhen', () => {
   it('predicate true on index=0 only', () => {
     const result = mergeWhen(
       ['1', '2', '3'],
+      // @ts-expect-error(sa, 2021-6-15): this condition will always be false since we are comparing a number to a string
       (current, next) => current === 1,
       concat
     )

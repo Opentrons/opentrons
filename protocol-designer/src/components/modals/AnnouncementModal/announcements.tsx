@@ -1,16 +1,14 @@
-// @flow
-
 import * as React from 'react'
 import { css } from 'styled-components'
 import { Flex, JUSTIFY_SPACE_AROUND, SPACING_3 } from '@opentrons/components'
 import styles from './AnnouncementModal.css'
 
-export type Announcement = {|
-  announcementKey: string,
-  image: React.Node | null,
-  heading: string,
-  message: React.Node,
-|}
+export interface Announcement {
+  announcementKey: string
+  image: React.ReactNode | null
+  heading: string
+  message: React.ReactNode
+}
 
 const batchEditStyles = css`
   justify-content: ${JUSTIFY_SPACE_AROUND};
@@ -21,7 +19,7 @@ const batchEditStyles = css`
   }
 `
 
-export const announcements: Array<Announcement> = [
+export const announcements: Announcement[] = [
   {
     announcementKey: 'modulesRequireRunAppUpdate',
     image: (

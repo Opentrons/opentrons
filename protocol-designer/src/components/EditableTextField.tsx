@@ -1,18 +1,17 @@
-// @flow
 // TODO: Ian 2018-10-30 if we like this, add it to components library
 import * as React from 'react'
 import { ClickOutside, Icon, InputField } from '@opentrons/components'
 import styles from './editableTextField.css'
 
-type Props = {
-  className?: string,
-  value: ?string,
-  saveEdit: (newValue: string) => mixed,
+interface Props {
+  className?: string
+  value?: string | null
+  saveEdit: (newValue: string) => unknown
 }
 
-type State = {
-  editing: boolean,
-  transientValue: ?string,
+interface State {
+  editing: boolean
+  transientValue?: string | null
 }
 
 export class EditableTextField extends React.Component<Props, State> {
@@ -34,13 +33,13 @@ export class EditableTextField extends React.Component<Props, State> {
     })
   }
 
-  handleKeyUp: (e: SyntheticKeyboardEvent<>) => void = e => {
+  handleKeyUp: (e: React.KeyboardEvent) => void = e => {
     if (e.key === 'Escape') {
       this.handleCancel()
     }
   }
 
-  handleFormSubmit: (e: SyntheticEvent<>) => void = e => {
+  handleFormSubmit: (e: React.FormEvent) => void = e => {
     e.preventDefault() // avoid 'form is not connected' warning
     this.handleSubmit()
   }
@@ -51,11 +50,11 @@ export class EditableTextField extends React.Component<Props, State> {
     )
   }
 
-  updateValue: (e: SyntheticInputEvent<HTMLInputElement>) => void = e => {
+  updateValue: (e: React.ChangeEvent<HTMLInputElement>) => void = e => {
     this.setState({ transientValue: e.currentTarget.value })
   }
 
-  render(): React.Node {
+  render(): React.ReactNode {
     const { className, value } = this.props
     if (this.state.editing) {
       return (

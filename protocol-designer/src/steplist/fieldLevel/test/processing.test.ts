@@ -1,5 +1,4 @@
 import { maskToFloat, trimDecimals } from '../processing'
-
 describe('Value Casters', () => {
   describe('maskToFloat', () => {
     it('returns string representation of integer when the input is an integer', () => {
@@ -19,7 +18,6 @@ describe('Value Casters', () => {
       expect(maskToFloat('-9211.0987')).toBe('-9211.0987')
     })
   })
-
   describe('trimDecimals', () => {
     it('removes one decimal', () => {
       const trimByOne = trimDecimals(1)

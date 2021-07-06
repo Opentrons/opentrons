@@ -1,7 +1,5 @@
-// @flow
 import { _allReducers } from '../reducers'
 const { unsavedChanges } = _allReducers
-
 describe('unsavedChanges', () => {
   it('should return true when an action changes the protocol', () => {
     const actionTypes = [
@@ -31,7 +29,10 @@ describe('unsavedChanges', () => {
     expect.assertions(actionTypes.length)
     actionTypes.forEach(actionType => {
       expect(
-        unsavedChanges(false, { type: actionType, payload: 'does not matter' })
+        unsavedChanges(false, {
+          type: actionType,
+          payload: 'does not matter',
+        })
       ).toBe(true)
     })
   })
@@ -48,7 +49,9 @@ describe('unsavedChanges', () => {
       expect(
         unsavedChanges(true, {
           type: 'LOAD_FILE',
-          payload: { didMigrate: false },
+          payload: {
+            didMigrate: false,
+          },
         })
       ).toBe(false)
     })
@@ -56,7 +59,9 @@ describe('unsavedChanges', () => {
       expect(
         unsavedChanges(false, {
           type: 'LOAD_FILE',
-          payload: { didMigrate: true },
+          payload: {
+            didMigrate: true,
+          },
         })
       ).toBe(true)
     })

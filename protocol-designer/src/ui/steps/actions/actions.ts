@@ -1,17 +1,21 @@
-// @flow
 import last from 'lodash/last'
-import { analyticsEvent } from '../../../analytics/actions'
-import { PRESAVED_STEP_ID } from '../../../steplist/types'
+import {
+  analyticsEvent,
+  AnalyticsEventAction,
+} from '../../../analytics/actions'
+import {
+  PRESAVED_STEP_ID,
+  TerminalItemId,
+  SubstepIdentifier,
+} from '../../../steplist/types'
 import { selectors as stepFormSelectors } from '../../../step-forms'
 import { getMultiSelectLastSelected } from '../selectors'
 import { resetScrollElements } from '../utils'
-import type { Timeline } from '@opentrons/step-generation'
-import type { StepIdType, StepType } from '../../../form-types'
-import type { GetState, ThunkAction, ThunkDispatch } from '../../../types'
-import type { TerminalItemId, SubstepIdentifier } from '../../../steplist/types'
-import type { AnalyticsEvent } from '../../../analytics/mixpanel'
-import type { AnalyticsEventAction } from '../../../analytics/actions'
-import type {
+import { Timeline } from '@opentrons/step-generation'
+import { StepIdType, StepType } from '../../../form-types'
+import { GetState, ThunkAction, ThunkDispatch } from '../../../types'
+import { AnalyticsEvent } from '../../../analytics/mixpanel'
+import {
   AddStepAction,
   ExpandAddStepButtonAction,
   ToggleStepCollapsedAction,
@@ -26,13 +30,12 @@ import type {
   SelectStepAction,
   SelectMultipleStepsAction,
 } from './types'
-
 // adds an incremental integer ID for Step reducers.
 // NOTE: if this is an "add step" directly performed by the user,
 // addAndSelectStepWithHints is probably what you want
 export const addStep = (args: {
-  stepType: StepType,
-  robotStateTimeline: Timeline,
+  stepType: StepType
+  robotStateTimeline: Timeline
 }): AddStepAction => {
   return {
     type: 'ADD_STEP',
@@ -45,75 +48,66 @@ export const addStep = (args: {
     },
   }
 }
-
 export const expandAddStepButton = (
   payload: boolean
 ): ExpandAddStepButtonAction => ({
   type: 'EXPAND_ADD_STEP_BUTTON',
   payload,
 })
-
 export const toggleStepCollapsed = (
   stepId: StepIdType
 ): ToggleStepCollapsedAction => ({
   type: 'TOGGLE_STEP_COLLAPSED',
   payload: stepId,
 })
-
 export const expandMultipleSteps = (
-  stepIds: Array<StepIdType>
+  stepIds: StepIdType[]
 ): ExpandMultipleStepsAction => ({
   type: 'EXPAND_MULTIPLE_STEPS',
   payload: stepIds,
 })
-
 export const collapseMultipleSteps = (
-  stepIds: Array<StepIdType>
+  stepIds: StepIdType[]
 ): CollapseMultipleStepsAction => ({
   type: 'COLLAPSE_MULTIPLE_STEPS',
   payload: stepIds,
 })
-
 export const hoverOnSubstep = (
   payload: SubstepIdentifier
 ): HoverOnSubstepAction => ({
   type: 'HOVER_ON_SUBSTEP',
   payload: payload,
 })
-
 export const selectTerminalItem = (
   terminalId: TerminalItemId
 ): SelectTerminalItemAction => ({
   type: 'SELECT_TERMINAL_ITEM',
   payload: terminalId,
 })
-
-export const hoverOnStep = (stepId: ?StepIdType): HoverOnStepAction => ({
+export const hoverOnStep = (
+  stepId: StepIdType | null | undefined
+): HoverOnStepAction => ({
   type: 'HOVER_ON_STEP',
   payload: stepId,
 })
-
 export const hoverOnTerminalItem = (
-  terminalId: ?TerminalItemId
+  terminalId: TerminalItemId | null | undefined
 ): HoverOnTerminalItemAction => ({
   type: 'HOVER_ON_TERMINAL_ITEM',
   payload: terminalId,
 })
-
 export const setWellSelectionLabwareKey = (
-  labwareName: ?string
+  labwareName: string | null | undefined
 ): SetWellSelectionLabwareKeyAction => ({
   type: 'SET_WELL_SELECTION_LABWARE_KEY',
   payload: labwareName,
 })
-
 export const clearWellSelectionLabwareKey = (): ClearWellSelectionLabwareKeyAction => ({
   type: 'CLEAR_WELL_SELECTION_LABWARE_KEY',
   payload: null,
 })
-
-export const selectStep = (stepId: StepIdType): ThunkAction<*> => (
-  dispatch: ThunkDispatch<*>,
+export const selectStep = (stepId: StepIdType): ThunkAction<any> => (
+  dispatch: ThunkDispatch<any>,
   getState: GetState
 ) => {
   const selectStepAction: SelectStepAction = {
@@ -121,33 +115,31 @@ export const selectStep = (stepId: StepIdType): ThunkAction<*> => (
     payload: stepId,
   }
   dispatch(selectStepAction)
-
   const state = getState()
   const formData = { ...stepFormSelectors.getSavedStepForms(state)[stepId] }
-
   dispatch({
     type: 'POPULATE_FORM',
     payload: formData,
   })
-
   resetScrollElements()
 }
-
 // NOTE(sa, 2020-12-11): this is a thunk so that we can populate the batch edit form with things later
 export const selectMultipleSteps = (
-  stepIds: Array<StepIdType>,
+  stepIds: StepIdType[],
   lastSelected: StepIdType
 ): ThunkAction<SelectMultipleStepsAction> => (
-  dispatch: ThunkDispatch<*>,
+  dispatch: ThunkDispatch<any>,
   getState: GetState
 ) => {
   const selectStepAction: SelectMultipleStepsAction = {
     type: 'SELECT_MULTIPLE_STEPS',
-    payload: { stepIds, lastSelected },
+    payload: {
+      stepIds,
+      lastSelected,
+    },
   }
   dispatch(selectStepAction)
 }
-
 export const selectAllSteps = (): ThunkAction<
   SelectMultipleStepsAction | AnalyticsEventAction
 > => (
@@ -155,10 +147,13 @@ export const selectAllSteps = (): ThunkAction<
   getState: GetState
 ) => {
   const allStepIds = stepFormSelectors.getOrderedStepIds(getState())
-
   const selectStepAction: SelectMultipleStepsAction = {
     type: 'SELECT_MULTIPLE_STEPS',
-    payload: { stepIds: allStepIds, lastSelected: last(allStepIds) },
+    payload: {
+      stepIds: allStepIds,
+      // @ts-expect-error(sa, 2021-6-15): find could return undefined, need to null check PipetteNameSpecs
+      lastSelected: last(allStepIds),
+    },
   }
   dispatch(selectStepAction)
   // dispatch an analytics event to indicate all steps have been selected
@@ -167,13 +162,10 @@ export const selectAllSteps = (): ThunkAction<
     name: 'selectAllSteps',
     properties: {},
   }
-
   dispatch(analyticsEvent(selectAllStepsEvent))
 }
-
 export const EXIT_BATCH_EDIT_MODE_BUTTON_PRESS: 'EXIT_BATCH_EDIT_MODE_BUTTON_PRESS' =
   'EXIT_BATCH_EDIT_MODE_BUTTON_PRESS'
-
 export const deselectAllSteps = (
   meta?: typeof EXIT_BATCH_EDIT_MODE_BUTTON_PRESS
 ): ThunkAction<SelectStepAction | AnalyticsEventAction> => (
@@ -181,6 +173,7 @@ export const deselectAllSteps = (
   getState: GetState
 ) => {
   const lastSelectedStepId = getMultiSelectLastSelected(getState())
+
   if (lastSelectedStepId) {
     const selectStepAction: SelectStepAction = {
       type: 'SELECT_STEP',
@@ -192,6 +185,7 @@ export const deselectAllSteps = (
       'something went wrong, cannot deselect all steps if not in multi select mode'
     )
   }
+
   // dispatch an analytics event to indicate all steps have been deselected
   // because there is no 'DESELECT_ALL_STEPS'/'EXIT_BATCH_EDIT_MODE' action that middleware can catch
   if (meta === EXIT_BATCH_EDIT_MODE_BUTTON_PRESS) {
@@ -201,14 +195,12 @@ export const deselectAllSteps = (
       name: 'exitBatchEditMode',
       properties: {},
     }
-
     dispatch(analyticsEvent(exitBatchEditModeEvent))
   } else {
     const deselectAllStepsEvent: AnalyticsEvent = {
       name: 'deselectAllSteps',
       properties: {},
     }
-
     dispatch(analyticsEvent(deselectAllStepsEvent))
   }
 }

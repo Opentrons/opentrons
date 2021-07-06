@@ -1,4 +1,3 @@
-// @flow
 import assert from 'assert'
 import bench from 'nanobench'
 import {

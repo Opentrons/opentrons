@@ -1,7 +1,5 @@
-// @flow
-import * as React from 'react'
 import { connect } from 'react-redux'
-import { Alerts, type Props } from '../alerts/Alerts'
+import { Props, Alerts } from '../alerts/Alerts'
 import {
   actions as dismissActions,
   selectors as dismissSelectors,
@@ -13,25 +11,24 @@ import {
   getVisibleFormWarnings,
   getVisibleProfileFormLevelErrors,
 } from './utils'
-import type { Dispatch } from 'redux'
-import type { StepIdType } from '../../form-types'
-import type { StepFieldName } from '../../steplist/fieldLevel'
-import type { BaseState } from '../../types'
+import { Dispatch } from 'redux'
+import { StepIdType } from '../../form-types'
+import { StepFieldName } from '../../steplist/fieldLevel'
+import { BaseState } from '../../types'
+import { ProfileFormError } from '../../steplist/formLevel/profileErrors'
 
 /* TODO:  BC 2018-09-13 move to src/components/alerts and adapt and use src/components/alerts/Alerts
  * see #1814 for reference
  */
-
-type SP = {|
-  errors: $PropertyType<Props, 'errors'>,
-  warnings: $PropertyType<Props, 'warnings'>,
-  stepId?: ?StepIdType,
-|}
-
-type OP = {|
-  focusedField: ?StepFieldName,
-  dirtyFields: Array<StepFieldName>,
-|}
+interface SP {
+  errors: Props['errors']
+  warnings: Props['warnings']
+  stepId?: StepIdType | null | undefined
+}
+interface OP {
+  focusedField: StepFieldName | null
+  dirtyFields: StepFieldName[]
+}
 
 const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
   const { focusedField, dirtyFields } = ownProps
@@ -40,7 +37,6 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
     dirtyFields,
     errors: dismissSelectors.getFormWarningsForSelectedStep(state),
   })
-
   const formLevelErrors = stepFormSelectors.getFormLevelErrorsForUnsavedForm(
     state
   )
@@ -49,10 +45,10 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
     dirtyFields,
     errors: formLevelErrors,
   })
-
   // deal with special-case dynamic field form-level errors
   const { profileItemsById } = stepFormSelectors.getHydratedUnsavedForm(state)
-  let visibleDynamicFieldFormErrors = []
+  let visibleDynamicFieldFormErrors: ProfileFormError[] = []
+
   if (profileItemsById != null) {
     const dynamicFieldFormErrors = stepFormSelectors.getDynamicFieldFormErrorsForUnsavedForm(
       state
@@ -87,7 +83,9 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
 
 const mergeProps = (
   stateProps: SP,
-  dispatchProps: { dispatch: Dispatch<*> }
+  dispatchProps: {
+    dispatch: Dispatch
+  }
 ): Props => {
   const { stepId } = stateProps
   const { dispatch } = dispatchProps
@@ -95,20 +93,19 @@ const mergeProps = (
     ...stateProps,
     dismissWarning: (dismissId: string) => {
       if (stepId)
-        dispatch(dismissActions.dismissFormWarning({ type: dismissId, stepId }))
+        dispatch(
+          dismissActions.dismissFormWarning({
+            type: dismissId,
+            stepId,
+          })
+        )
     },
   }
 }
 
-export const FormAlerts: React.AbstractComponent<OP> = connect<
-  Props,
-  OP,
-  SP,
-  {||},
-  _,
-  _
->(
+export const FormAlerts = connect(
   mapStateToProps,
+  // @ts-expect-error(sa, 2021-6-21): TODO: refactor to use hooks api
   null,
   mergeProps
 )(Alerts)

@@ -1,18 +1,20 @@
-import fixture_24_tuberack from '@opentrons/shared-data/labware/fixtures/2/fixture_24_tuberack'
-import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate'
-import fixture_trash from '@opentrons/shared-data/labware/fixtures/2/fixture_trash'
+import fixture_24_tuberack from '@opentrons/shared-data/labware/fixtures/2/fixture_24_tuberack.json'
+import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
+import fixture_trash from '@opentrons/shared-data/labware/fixtures/2/fixture_trash.json'
 
 import { getWellContentsAllLabware } from '../getWellContentsAllLabware'
+import { LabwareEntities, LabwareLiquidState } from '@opentrons/step-generation'
+import { LabwareDefinition2 } from '@opentrons/shared-data'
 
 jest.mock('../../../labware-defs/utils')
 
 describe('getWellContentsAllLabware', () => {
   const container1MaxVolume = fixture_96_plate.wells.A1.totalLiquidVolume
   let baseIngredFields
-  let labwareEntities
-  let ingredsByLabwareXXSingleIngred
-  let defaultWellContents
-  let singleIngredResult
+  let labwareEntities: LabwareEntities
+  let ingredsByLabwareXXSingleIngred: LabwareLiquidState
+  let defaultWellContents: { highlighted: boolean; selected: boolean }
+  let singleIngredResult: Record<string, any>
 
   beforeEach(() => {
     baseIngredFields = {
@@ -23,10 +25,14 @@ describe('getWellContentsAllLabware', () => {
     }
 
     labwareEntities = {
-      FIXED_TRASH_ID: { def: fixture_trash },
-      container1Id: { def: fixture_96_plate },
-      container2Id: { def: fixture_96_plate },
-      container3Id: { def: fixture_24_tuberack },
+      // @ts-expect-error(sa, 2021-6-22): missing id and labwareDefURI
+      FIXED_TRASH_ID: { def: fixture_trash as LabwareDefinition2 },
+      // @ts-expect-error(sa, 2021-6-22): missing id and labwareDefURI
+      container1Id: { def: fixture_96_plate as LabwareDefinition2 },
+      // @ts-expect-error(sa, 2021-6-22): missing id and labwareDefURI
+      container2Id: { def: fixture_96_plate as LabwareDefinition2 },
+      // @ts-expect-error(sa, 2021-6-22): missing id and labwareDefURI
+      container3Id: { def: fixture_24_tuberack as LabwareDefinition2 },
     }
 
     ingredsByLabwareXXSingleIngred = {
@@ -34,6 +40,7 @@ describe('getWellContentsAllLabware', () => {
         0: {
           ...baseIngredFields,
           wells: {
+            // @ts-expect-error(sa, 2021-6-22): structure of ingredsByLabwareXXSingleIngred does not match LabwareLiquidState
             A1: { volume: 100 },
             B1: { volume: 150 },
           },
@@ -48,7 +55,7 @@ describe('getWellContentsAllLabware', () => {
       highlighted: false,
       selected: false,
     }
-
+    // @ts-expect-error(sa, 2021-6-22): resultFunc not part of Selector type
     singleIngredResult = getWellContentsAllLabware.resultFunc(
       labwareEntities,
       ingredsByLabwareXXSingleIngred,
@@ -99,6 +106,7 @@ describe('getWellContentsAllLabware', () => {
   })
 
   it('no selected wells when labwareId is not selected', () => {
+    // @ts-expect-error(sa, 2021-6-22): resultFunc not part of Selector type
     const result = getWellContentsAllLabware.resultFunc(
       labwareEntities,
       ingredsByLabwareXXSingleIngred,

@@ -1,19 +1,17 @@
-// @flow
 import * as React from 'react'
-import { DropdownField, type Options } from '@opentrons/components'
+import { DropdownField, Options } from '@opentrons/components'
 import cx from 'classnames'
 import styles from '../StepEditForm.css'
-import type { StepFieldName } from '../../../steplist/fieldLevel'
-import type { FieldProps } from '../types'
+import { StepFieldName } from '../../../steplist/fieldLevel'
+import { FieldProps } from '../types'
 
-export type StepFormDropdownProps = {
-  ...FieldProps,
-  options: Options,
-  name: StepFieldName,
-  className?: string,
+export interface StepFormDropdownProps extends FieldProps {
+  options: Options
+  name: StepFieldName
+  className?: string
 }
 
-export const StepFormDropdown = (props: StepFormDropdownProps): React.Node => {
+export const StepFormDropdown = (props: StepFormDropdownProps): JSX.Element => {
   const {
     options,
     name,
@@ -24,9 +22,10 @@ export const StepFormDropdown = (props: StepFormDropdownProps): React.Node => {
     updateValue,
     errorToShow,
   } = props
-  // TODO: BC abstract e.currentTarget.value inside onChange with fn like onChangeValue of type (value: mixed) => {}
+  // TODO: BC abstract e.currentTarget.value inside onChange with fn like onChangeValue of type (value: unknown) => {}
   // blank out the dropdown if labware id does not exist
   const availableOptionIds = options.map(opt => opt.value)
+  // @ts-expect-error (ce, 2021-06-21) unknown not assignable to string
   const fieldValue = availableOptionIds.includes(value) ? String(value) : null
 
   return (
@@ -38,7 +37,7 @@ export const StepFormDropdown = (props: StepFormDropdownProps): React.Node => {
       onBlur={onFieldBlur}
       onFocus={onFieldFocus}
       value={fieldValue}
-      onChange={(e: SyntheticEvent<HTMLSelectElement>) => {
+      onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
         updateValue(e.currentTarget.value)
       }}
     />

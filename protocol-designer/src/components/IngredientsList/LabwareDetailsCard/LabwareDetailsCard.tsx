@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import cx from 'classnames'
 import { i18n } from '../../../localization'
@@ -6,13 +5,13 @@ import { PDTitledList, PDListItem } from '../../lists'
 import { EditableTextField } from '../../EditableTextField'
 import styles from './labwareDetailsCard.css'
 
-type Props = {
-  labwareDefDisplayName: string,
-  nickname: string,
-  renameLabware: (name: string) => mixed,
+export interface Props {
+  labwareDefDisplayName: string
+  nickname: string
+  renameLabware: (name: string) => unknown
 }
 
-export function LabwareDetailsCard(props: Props): React.Node {
+export function LabwareDetailsCard(props: Props): JSX.Element {
   return (
     <PDTitledList title="labware details" iconName="flask-outline">
       <PDListItem>

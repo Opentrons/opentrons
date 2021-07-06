@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import {
   FormGroup,
@@ -10,25 +9,22 @@ import {
 import { i18n } from '../../../../localization'
 import {
   getDisabledChangeTipOptions,
-  type DisabledChangeTipArgs,
+  DisabledChangeTipArgs,
 } from './getDisabledChangeTipOptions'
-import type { ChangeTipOptions } from '@opentrons/step-generation'
-import type { FieldProps } from '../../types'
+import { ChangeTipOptions } from '@opentrons/step-generation'
+import { FieldProps } from '../../types'
 import styles from '../../StepEditForm.css'
 
-const ALL_CHANGE_TIP_VALUES: Array<ChangeTipOptions> = [
+const ALL_CHANGE_TIP_VALUES: ChangeTipOptions[] = [
   'always',
   'once',
   'perSource',
   'perDest',
   'never',
 ]
-type Props = {|
-  ...FieldProps,
-  ...DisabledChangeTipArgs,
-|}
+type Props = FieldProps & DisabledChangeTipArgs
 
-export const ChangeTipField = (props: Props): React.Node => {
+export const ChangeTipField = (props: Props): JSX.Element => {
   const {
     aspirateWells,
     dispenseWells,
@@ -69,11 +65,11 @@ export const ChangeTipField = (props: Props): React.Node => {
   )
 }
 
-type LabelProps = {
-  value: string,
+interface LabelProps {
+  value: string
 }
 
-const ChangeTipOptionLabel = (props: LabelProps) => {
+const ChangeTipOptionLabel = (props: LabelProps): JSX.Element => {
   const { value } = props
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: 'bottom-start',

@@ -1,15 +1,13 @@
-// @flow
 import takeWhile from 'lodash/takeWhile'
 import { commandCreatorFromStepArgs } from '../file-data/selectors/commands'
 import * as StepGeneration from '@opentrons/step-generation'
-import type { StepArgsAndErrorsById } from '../steplist/types'
-
-export type GenerateRobotStateTimelineArgs = {|
-  allStepArgsAndErrors: StepArgsAndErrorsById,
-  orderedStepIds: Array<string>,
-  initialRobotState: StepGeneration.RobotState,
-  invariantContext: StepGeneration.InvariantContext,
-|}
+import { StepArgsAndErrorsById } from '../steplist/types'
+export interface GenerateRobotStateTimelineArgs {
+  allStepArgsAndErrors: StepArgsAndErrorsById
+  orderedStepIds: string[]
+  initialRobotState: StepGeneration.RobotState
+  invariantContext: StepGeneration.InvariantContext
+}
 export const generateRobotStateTimeline = (
   args: GenerateRobotStateTimelineArgs
 ): StepGeneration.Timeline => {
@@ -19,7 +17,6 @@ export const generateRobotStateTimeline = (
     initialRobotState,
     invariantContext,
   } = args
-
   const allStepArgs: Array<StepGeneration.CommandCreatorArgs | null> = orderedStepIds.map(
     stepId => {
       return (
@@ -29,20 +26,17 @@ export const generateRobotStateTimeline = (
       )
     }
   )
-
-  // TODO: Ian 2018-06-14 `takeWhile` isn't inferring the right type
-  // $FlowFixMe
-  const continuousStepArgs: Array<StepGeneration.CommandCreatorArgs> = takeWhile(
+  // @ts-expect-error(sa, 2021-7-6): stepArgs might be null (see code above). this was incorrectly typed from before the TS migration and requires source code changes
+  const continuousStepArgs: StepGeneration.CommandCreatorArgs[] = takeWhile(
     allStepArgs,
     stepArgs => stepArgs
   )
-
   const curriedCommandCreators = continuousStepArgs.reduce(
     (
-      acc: Array<StepGeneration.CurriedCommandCreator>,
+      acc: StepGeneration.CurriedCommandCreator[],
       args: StepGeneration.CommandCreatorArgs,
       stepIndex
-    ): Array<StepGeneration.CurriedCommandCreator> => {
+    ): StepGeneration.CurriedCommandCreator[] => {
       const curriedCommandCreator = commandCreatorFromStepArgs(args)
 
       if (curriedCommandCreator === null) {
@@ -56,14 +50,18 @@ export const generateRobotStateTimeline = (
       // we know the current tip(s) aren't going to be reused, so we can drop them
       // immediately after the current step is done.
       const pipetteId = StepGeneration.getPipetteIdFromCCArgs(args)
+
       if (pipetteId) {
         const nextStepArgsForPipette = continuousStepArgs
           .slice(stepIndex + 1)
+          // @ts-expect-error(sa, 2021-6-20): not a valid type narrow, use in operator
           .find(stepArgs => stepArgs.pipette && stepArgs.pipette === pipetteId)
-
         const willReuseTip =
+          // @ts-expect-error(sa, 2021-6-20): not a valid type narrow, use in operator
           nextStepArgsForPipette?.changeTip &&
+          // @ts-expect-error(sa, 2021-6-20): not a valid type narrow, use in operator
           nextStepArgsForPipette.changeTip === 'never'
+
         if (!willReuseTip) {
           return [
             ...acc,
@@ -81,16 +79,15 @@ export const generateRobotStateTimeline = (
           ]
         }
       }
+
       return [...acc, curriedCommandCreator]
     },
     []
   )
-
   const timeline = StepGeneration.commandCreatorsTimeline(
     curriedCommandCreators,
     invariantContext,
     initialRobotState
   )
-
   return timeline
 }

@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import cx from 'classnames'
 import {
@@ -16,37 +15,37 @@ import { getUnusedEntities } from './utils'
 import modalStyles from '../modals/modal.css'
 import styles from './FileSidebar.css'
 
-import type { HintKey } from '../../tutorial'
-import type { PDProtocolFile } from '../../file-types'
-import type {
+import { HintKey } from '../../tutorial'
+import { PDProtocolFile } from '../../file-types'
+import {
   InitialDeckSetup,
   SavedStepFormState,
   ModuleOnDeck,
   PipetteOnDeck,
 } from '../../step-forms'
 
-type Props = {|
-  loadFile: (event: SyntheticInputEvent<HTMLInputElement>) => mixed,
-  createNewFile?: () => mixed,
-  canDownload: boolean,
-  onDownload: () => mixed,
-  fileData: ?PDProtocolFile,
-  pipettesOnDeck: $PropertyType<InitialDeckSetup, 'pipettes'>,
-  modulesOnDeck: $PropertyType<InitialDeckSetup, 'modules'>,
-  savedStepForms: SavedStepFormState,
-  schemaVersion: number,
-|}
+export interface Props {
+  loadFile: (event: React.ChangeEvent<HTMLInputElement>) => unknown
+  createNewFile?: () => unknown
+  canDownload: boolean
+  onDownload: () => unknown
+  fileData?: PDProtocolFile | null
+  pipettesOnDeck: InitialDeckSetup['pipettes']
+  modulesOnDeck: InitialDeckSetup['modules']
+  savedStepForms: SavedStepFormState
+  schemaVersion: number
+}
 
-type WarningContent = {|
-  content: React.Node,
-  heading: string,
-|}
+interface WarningContent {
+  content: React.ReactNode
+  heading: string
+}
 
-type MissingContent = {|
-  noCommands: boolean,
-  pipettesWithoutStep: Array<PipetteOnDeck>,
-  modulesWithoutStep: Array<ModuleOnDeck>,
-|}
+interface MissingContent {
+  noCommands: boolean
+  pipettesWithoutStep: PipetteOnDeck[]
+  modulesWithoutStep: ModuleOnDeck[]
+}
 
 function getWarningContent({
   noCommands,
@@ -134,7 +133,7 @@ function getWarningContent({
   return null
 }
 
-export const v4WarningContent: React.Node = (
+export const v4WarningContent: JSX.Element = (
   <div>
     <p>
       {i18n.t(`alert.hint.export_v4_protocol_3_18.body1`)}{' '}
@@ -144,7 +143,7 @@ export const v4WarningContent: React.Node = (
   </div>
 )
 
-export const v5WarningContent: React.Node = (
+export const v5WarningContent: JSX.Element = (
   <div>
     <p>
       {i18n.t(`alert.hint.export_v5_protocol_3_20.body1`)}{' '}
@@ -154,7 +153,7 @@ export const v5WarningContent: React.Node = (
   </div>
 )
 
-export function FileSidebar(props: Props): React.Node {
+export function FileSidebar(props: Props): JSX.Element {
   const {
     canDownload,
     fileData,
@@ -173,7 +172,7 @@ export function FileSidebar(props: Props): React.Node {
 
   const [showBlockingHint, setShowBlockingHint] = React.useState<boolean>(false)
 
-  const cancelModal = () => setShowExportWarningModal(false)
+  const cancelModal = (): void => setShowExportWarningModal(false)
 
   const noCommands = fileData ? fileData.commands.length === 0 : true
   const pipettesWithoutStep = getUnusedEntities(
@@ -198,10 +197,10 @@ export function FileSidebar(props: Props): React.Node {
       modulesWithoutStep,
     })
 
-  const getExportHintContent = (): {|
-    hintKey: HintKey,
-    content: React.Node,
-  |} => {
+  const getExportHintContent = (): {
+    hintKey: HintKey
+    content: React.ReactNode
+  } => {
     return {
       hintKey:
         schemaVersion === 5

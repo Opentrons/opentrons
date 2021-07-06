@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { useDispatch } from 'react-redux'
 import cx from 'classnames'
@@ -14,7 +13,12 @@ import {
 } from '@opentrons/components'
 import { i18n } from '../../../localization'
 import * as steplistActions from '../../../steplist/actions'
-import { PROFILE_CYCLE } from '../../../form-types'
+import {
+  PROFILE_CYCLE,
+  ProfileStepItem,
+  ProfileItem,
+  ProfileCycleItem,
+} from '../../../form-types'
 import {
   getProfileFieldErrors,
   maskProfileField,
@@ -25,39 +29,35 @@ import {
 } from '../../modals/ConfirmDeleteModal'
 import { getDynamicFieldFocusHandlerId } from '../utils'
 import styles from '../StepEditForm.css'
-import type {
-  ProfileStepItem,
-  ProfileItem,
-  ProfileCycleItem,
-} from '../../../form-types'
-import type { FocusHandlers } from '../types'
+
+import { FocusHandlers } from '../types'
 
 export const showProfileFieldErrors = ({
   fieldId,
   focusedField,
   dirtyFields,
-}: {|
-  fieldId: string,
-  focusedField: ?string,
-  dirtyFields: Array<string>,
-|}): boolean =>
+}: {
+  fieldId: string
+  focusedField?: string | null
+  dirtyFields: string[]
+}): boolean =>
   !(fieldId === focusedField) && dirtyFields && dirtyFields.includes(fieldId)
 
-type ProfileCycleRowProps = {|
-  cycleItem: ProfileCycleItem,
-  focusHandlers: FocusHandlers,
-  stepOffset: number,
-|}
-export const ProfileCycleRow = (props: ProfileCycleRowProps): React.Node => {
+interface ProfileCycleRowProps {
+  cycleItem: ProfileCycleItem
+  focusHandlers: FocusHandlers
+  stepOffset: number
+}
+export const ProfileCycleRow = (props: ProfileCycleRowProps): JSX.Element => {
   const { cycleItem, focusHandlers, stepOffset } = props
   const dispatch = useDispatch()
 
-  const addStepToCycle = () => {
+  const addStepToCycle = (): void => {
     dispatch(steplistActions.addProfileStep({ cycleId: cycleItem.id }))
   }
 
   // TODO IMMEDIATELY make conditional
-  const deleteProfileCycle = () =>
+  const deleteProfileCycle = (): steplistActions.DeleteProfileCycleAction =>
     dispatch(steplistActions.deleteProfileCycle({ id: cycleItem.id }))
 
   const [
@@ -139,21 +139,24 @@ export const ProfileCycleRow = (props: ProfileCycleRowProps): React.Node => {
   )
 }
 
-export type ProfileItemRowsProps = {|
-  focusHandlers: FocusHandlers,
-  orderedProfileItems: Array<string>,
+export interface ProfileItemRowsProps {
+  focusHandlers: FocusHandlers
+  orderedProfileItems: string[]
   profileItemsById: {
-    [string]: ProfileItem,
-    ...
-  },
-|}
+    [key: string]: ProfileItem
+  }
+}
 
-export const ProfileItemRows = (props: ProfileItemRowsProps): React.Node => {
+export const ProfileItemRows = (props: ProfileItemRowsProps): JSX.Element => {
   const { orderedProfileItems, profileItemsById } = props
 
   const dispatch = useDispatch()
-  const addProfileCycle = () => dispatch(steplistActions.addProfileCycle(null))
-  const addProfileStep = () => dispatch(steplistActions.addProfileStep(null))
+  const addProfileCycle = (): void => {
+    dispatch(steplistActions.addProfileCycle(null))
+  }
+  const addProfileStep = (): void => {
+    dispatch(steplistActions.addProfileStep(null))
+  }
 
   const [addCycleTargetProps, addCycleTooltipProps] = useHoverTooltip({
     placement: TOOLTIP_TOP,
@@ -230,15 +233,15 @@ export const ProfileItemRows = (props: ProfileItemRowsProps): React.Node => {
   )
 }
 
-type ProfileFieldProps = {|
-  name: string,
-  focusHandlers: FocusHandlers,
-  profileItem: ProfileItem,
-  units?: React.Node,
-  className?: string,
-  updateValue: (name: string, value: mixed) => mixed,
-|}
-const ProfileField = (props: ProfileFieldProps) => {
+interface ProfileFieldProps {
+  name: string
+  focusHandlers: FocusHandlers
+  profileItem: ProfileItem
+  units?: React.ReactNode
+  className?: string
+  updateValue: (name: string, value: unknown) => unknown
+}
+const ProfileField = (props: ProfileFieldProps): JSX.Element => {
   const {
     focusHandlers,
     name,
@@ -247,13 +250,13 @@ const ProfileField = (props: ProfileFieldProps) => {
     className,
     updateValue,
   } = props
-  const value = profileItem[name]
+  const value = profileItem[name as keyof ProfileItem] // this is not very safe but I don't know how else to tell TS that name should be keyof ProfileItem without being a discriminated union
   const fieldId = getDynamicFieldFocusHandlerId({
     id: profileItem.id,
     name,
   })
 
-  const onChange = (e: SyntheticEvent<*>) => {
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const value = e.currentTarget.value
     const maskedValue = maskProfileField(name, value)
     updateValue(name, maskedValue)
@@ -267,14 +270,10 @@ const ProfileField = (props: ProfileFieldProps) => {
   const errors = getProfileFieldErrors(name, value)
   const errorToShow = showErrors && errors.length > 0 ? errors.join(', ') : null
 
-  // TODO: tooltips for profile fields
-  // const tooltipComponent =
-  //   props.tooltipComponent || getTooltipForField(stepType, name, disabled)
-
-  const onBlur = () => {
+  const onBlur = (): void => {
     focusHandlers.blur(fieldId)
   }
-  const onFocus = () => {
+  const onFocus = (): void => {
     focusHandlers.focus(fieldId)
   }
   return (
@@ -289,18 +288,18 @@ const ProfileField = (props: ProfileFieldProps) => {
   )
 }
 
-type ProfileStepRowProps = {|
-  focusHandlers: FocusHandlers,
-  profileStepItem: ProfileStepItem,
-  stepNumber: number,
-  isCycle?: ?boolean,
-|}
+interface ProfileStepRowProps {
+  focusHandlers: FocusHandlers
+  profileStepItem: ProfileStepItem
+  stepNumber: number
+  isCycle?: boolean | null
+}
 
-const ProfileStepRow = (props: ProfileStepRowProps) => {
+const ProfileStepRow = (props: ProfileStepRowProps): JSX.Element => {
   const { focusHandlers, profileStepItem, isCycle } = props
   const dispatch = useDispatch()
 
-  const updateStepFieldValue = (name: string, value: mixed) => {
+  const updateStepFieldValue = (name: string, value: unknown): void => {
     dispatch(
       steplistActions.editProfileStep({
         id: profileStepItem.id,
@@ -309,11 +308,16 @@ const ProfileStepRow = (props: ProfileStepRowProps) => {
     )
   }
 
-  const deleteProfileStep = () => {
+  const deleteProfileStep = (): void => {
     dispatch(steplistActions.deleteProfileStep({ id: profileStepItem.id }))
   }
-  const names = ['title', 'temperature', 'durationMinutes', 'durationSeconds']
-  const units = {
+  const names = [
+    'title',
+    'temperature',
+    'durationMinutes',
+    'durationSeconds',
+  ] as const
+  const units: Record<typeof names[number], string | null> = {
     title: null,
     temperature: i18n.t('application.units.degrees'),
     durationMinutes: i18n.t('application.units.minutes'),

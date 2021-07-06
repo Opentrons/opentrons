@@ -1,9 +1,8 @@
-// @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
 import cx from 'classnames'
 import { AlertModal, Icon, OutlineButton } from '@opentrons/components'
-import { opentronsWebApi, type GateStage } from '../../../networking'
+import { opentronsWebApi, GateStage } from '../../../networking'
 import { i18n } from '../../../localization'
 import { writeFakeIdentityCookie } from '../../../networking/opentronsWebApi'
 import CHECK_EMAIL_IMAGE from '../../../images/youve_got_mail.svg'
@@ -11,24 +10,30 @@ import {
   actions as analyticsActions,
   selectors as analyticsSelectors,
 } from '../../../analytics'
-import type { BaseState, ThunkDispatch } from '../../../types'
+import { BaseState, ThunkDispatch } from '../../../types'
 import settingsStyles from '../../SettingsPage/SettingsPage.css'
 import modalStyles from '../modal.css'
 import { SignUpForm } from './SignUpForm'
 
-type Props = {
-  hasOptedIn: boolean | null,
-  optIn: () => mixed,
-  optOut: () => mixed,
+interface Props {
+  hasOptedIn: boolean | null
+  optIn: () => unknown
+  optOut: () => unknown
 }
 
-type SP = {|
-  hasOptedIn: $PropertyType<Props, 'hasOptedIn'>,
-|}
+interface SP {
+  hasOptedIn: Props['hasOptedIn']
+}
 
-type DP = $Rest<$Exact<Props>, SP>
+interface DP {
+  optIn: Props['optIn']
+  optOut: Props['optOut']
+}
 
-type State = { gateStage: GateStage, errorMessage: ?string }
+interface State {
+  gateStage: GateStage
+  errorMessage?: string | null
+}
 
 class GateModalComponent extends React.Component<Props, State> {
   constructor(props: Props) {
@@ -36,11 +41,11 @@ class GateModalComponent extends React.Component<Props, State> {
     this.state = { gateStage: 'loading', errorMessage: '' }
   }
 
-  componentDidMount() {
+  componentDidMount(): void {
     this.refreshState()
   }
 
-  refreshState() {
+  refreshState(): Promise<void> {
     return opentronsWebApi
       .getGateStage(this.props.hasOptedIn)
       .then(({ gateStage, errorMessage }) => {
@@ -48,7 +53,7 @@ class GateModalComponent extends React.Component<Props, State> {
       })
   }
 
-  static getDerivedStateFromProps(nextProps: Props, prevState: State) {
+  static getDerivedStateFromProps(nextProps: Props, prevState: State): State {
     if (
       nextProps.hasOptedIn !== null &&
       prevState.gateStage === 'promptOptForAnalytics'
@@ -59,7 +64,7 @@ class GateModalComponent extends React.Component<Props, State> {
     }
   }
 
-  render() {
+  render(): JSX.Element | null {
     const { optIn, optOut } = this.props
 
     switch (this.state.gateStage) {
@@ -170,21 +175,14 @@ function mapStateToProps(state: BaseState): SP {
   return { hasOptedIn: analyticsSelectors.getHasOptedIn(state) }
 }
 
-function mapDispatchToProps(dispatch: ThunkDispatch<*>): DP {
+function mapDispatchToProps(dispatch: ThunkDispatch<any>): DP {
   return {
     optIn: () => dispatch(analyticsActions.optIn()),
     optOut: () => dispatch(analyticsActions.optOut()),
   }
 }
 
-export const GateModal: React.AbstractComponent<{||}> = connect<
-  Props,
-  {||},
-  SP,
-  DP,
-  _,
-  _
->(
+export const GateModal = connect(
   mapStateToProps,
   mapDispatchToProps
 )(GateModalComponent)

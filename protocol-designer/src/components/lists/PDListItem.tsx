@@ -1,18 +1,18 @@
-// @flow
 import * as React from 'react'
 import cx from 'classnames'
 import styles from './styles.css'
 
-type Props = {
-  className?: ?string,
+interface Props {
+  className?: string | null
   /** show light gray border between list items */
-  border?: ?boolean,
+  border?: boolean | null
   /** hover style when hovered (for redux-linked hover state, do not use this) */
-  hoverable?: ?boolean,
+  hoverable?: boolean | null
+  [key: string]: unknown
 }
 
 /** Light wrapper around li for PD-specific styles */
-export function PDListItem(props: Props): React.Node {
+export function PDListItem(props: Props): JSX.Element {
   const { className, border, hoverable, ...passThruProps } = props
   const _className = cx(
     {

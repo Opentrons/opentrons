@@ -1,11 +1,10 @@
-// @flow
 import * as React from 'react'
 import cx from 'classnames'
 import { RobotCoordsForeignDiv } from '@opentrons/components'
-import type { DeckSlot } from '@opentrons/shared-data'
+import { DeckSlot } from '@opentrons/shared-data'
 
-import { START_TERMINAL_ITEM_ID, type TerminalItemId } from '../../../steplist'
-import type { LabwareOnDeck } from '../../../step-forms'
+import { START_TERMINAL_ITEM_ID, TerminalItemId } from '../../../steplist'
+import { LabwareOnDeck } from '../../../step-forms'
 import { BlockedSlot } from './BlockedSlot'
 import { BrowseLabware } from './BrowseLabware'
 import { EditLabware } from './EditLabware'
@@ -13,16 +12,16 @@ import { LabwareName } from './LabwareName'
 import { LabwareHighlight } from './LabwareHighlight'
 import styles from './LabwareOverlays.css'
 
-type LabwareControlsProps = {|
-  labwareOnDeck: LabwareOnDeck,
-  selectedTerminalItemId: ?TerminalItemId,
-  slot: DeckSlot,
-  setHoveredLabware: (?LabwareOnDeck) => mixed,
-  setDraggedLabware: (?LabwareOnDeck) => mixed,
-  swapBlocked: boolean,
-|}
+interface LabwareControlsProps {
+  labwareOnDeck: LabwareOnDeck
+  selectedTerminalItemId?: TerminalItemId | null
+  slot: DeckSlot
+  setHoveredLabware: (labware?: LabwareOnDeck | null) => unknown
+  setDraggedLabware: (labware?: LabwareOnDeck | null) => unknown
+  swapBlocked: boolean
+}
 
-export const LabwareControls = (props: LabwareControlsProps): React.Node => {
+export const LabwareControls = (props: LabwareControlsProps): JSX.Element => {
   const {
     labwareOnDeck,
     slot,
@@ -47,6 +46,7 @@ export const LabwareControls = (props: LabwareControlsProps): React.Node => {
       >
         <LabwareHighlight labwareOnDeck={labwareOnDeck} />
         {canEdit ? (
+          // @ts-expect-error(sa, 2021-6-21): react dnd type mismatch
           <EditLabware
             labwareOnDeck={labwareOnDeck}
             setHoveredLabware={setHoveredLabware}

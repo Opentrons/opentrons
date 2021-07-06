@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { SidePanel } from '@opentrons/components'
 
@@ -12,17 +11,17 @@ import { StepCreationButton } from '../StepCreationButton'
 import { DraggableStepItems } from './DraggableStepItems'
 import { MultiSelectToolbar } from './MultiSelectToolbar'
 
-import type { StepIdType } from '../../form-types'
+import { StepIdType } from '../../form-types'
 
-type Props = {|
-  isMultiSelectMode: ?boolean,
-  orderedStepIds: Array<StepIdType>,
-  reorderSelectedStep: (delta: number) => mixed,
-  reorderSteps: (Array<StepIdType>) => mixed,
-|}
+export interface StepListProps {
+  isMultiSelectMode?: boolean | null
+  orderedStepIds: StepIdType[]
+  reorderSelectedStep: (delta: number) => unknown
+  reorderSteps: (steps: StepIdType[]) => unknown
+}
 
-export class StepList extends React.Component<Props> {
-  handleKeyDown: (e: SyntheticKeyboardEvent<>) => void = e => {
+export class StepList extends React.Component<StepListProps> {
+  handleKeyDown: (e: KeyboardEvent) => void = e => {
     const { reorderSelectedStep } = this.props
     const key = e.key
     const altIsPressed = e.altKey
@@ -39,15 +38,15 @@ export class StepList extends React.Component<Props> {
     }
   }
 
-  componentDidMount() {
+  componentDidMount(): void {
     global.addEventListener('keydown', this.handleKeyDown, false)
   }
 
-  componentWillUnmount() {
+  componentWillUnmount(): void {
     global.removeEventListener('keydown', this.handleKeyDown, false)
   }
 
-  render(): React.Node {
+  render(): React.ReactNode {
     return (
       <React.Fragment>
         <SidePanel title="Protocol Timeline">

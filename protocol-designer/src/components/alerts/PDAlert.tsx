@@ -1,20 +1,19 @@
-// @flow
 import * as React from 'react'
 import { AlertItem, OutlineButton } from '@opentrons/components'
 import { i18n } from '../../localization'
 // TODO: Ian 2019-03-27 the use of Component Library `Alert` is being
 // stretched beyond its intentions here, we should reconcile PD + Run App uses of Alert later
 import styles from './alerts.css'
-import type { AlertType } from './types'
+import { AlertData, AlertType } from './types'
 
-type PDAlertProps = {|
-  alertType: AlertType,
-  title: string,
-  description: React.Node,
-  onDismiss?: ?() => mixed,
-|}
+interface PDAlertProps {
+  alertType: AlertType
+  title: string
+  description: AlertData['description']
+  onDismiss?: (() => unknown) | null
+}
 
-export const PDAlert = (props: PDAlertProps): React.Node => {
+export const PDAlert = (props: PDAlertProps): JSX.Element => {
   const { alertType, title, description, onDismiss } = props
   return (
     <AlertItem

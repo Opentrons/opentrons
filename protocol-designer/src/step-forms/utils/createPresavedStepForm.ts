@@ -1,4 +1,3 @@
-// @flow
 import last from 'lodash/last'
 import {
   MAGNETIC_MODULE_TYPE,
@@ -18,37 +17,35 @@ import {
   getMagnetLabwareEngageHeight,
 } from '../../ui/modules/utils'
 import { maskField } from '../../steplist/fieldLevel'
-import type {
+import {
   PipetteEntities,
   LabwareEntities,
   RobotState,
   Timeline,
 } from '@opentrons/step-generation'
-import type { FormData, StepType, StepIdType } from '../../form-types'
-import type { InitialDeckSetup } from '../types'
-import type { FormPatch } from '../../steplist/actions/types'
-import type { SavedStepFormState, OrderedStepIdsState } from '../reducers'
+import { FormData, StepType, StepIdType } from '../../form-types'
+import { InitialDeckSetup } from '../types'
+import { FormPatch } from '../../steplist/actions/types'
+import { SavedStepFormState, OrderedStepIdsState } from '../reducers'
+export interface CreatePresavedStepFormArgs {
+  stepId: StepIdType
+  stepType: StepType
+  pipetteEntities: PipetteEntities
+  labwareEntities: LabwareEntities
+  savedStepForms: SavedStepFormState
+  orderedStepIds: OrderedStepIdsState
+  initialDeckSetup: InitialDeckSetup
+  robotStateTimeline: Timeline
+}
+type FormUpdater = (arg0: FormData) => FormPatch | null
 
-export type CreatePresavedStepFormArgs = {|
-  stepId: StepIdType,
-  stepType: StepType,
-  pipetteEntities: PipetteEntities,
-  labwareEntities: LabwareEntities,
-  savedStepForms: SavedStepFormState,
-  orderedStepIds: OrderedStepIdsState,
-  initialDeckSetup: InitialDeckSetup,
-  robotStateTimeline: Timeline,
-|}
-
-type FormUpdater = FormData => FormPatch | null
-
-const _patchDefaultPipette = (args: {|
-  initialDeckSetup: InitialDeckSetup,
-  labwareEntities: LabwareEntities,
-  orderedStepIds: OrderedStepIdsState,
-  pipetteEntities: PipetteEntities,
-  savedStepForms: SavedStepFormState,
-|}): FormUpdater => formData => {
+const _patchDefaultPipette = (args: {
+  initialDeckSetup: InitialDeckSetup
+  labwareEntities: LabwareEntities
+  orderedStepIds: OrderedStepIdsState
+  pipetteEntities: PipetteEntities
+  savedStepForms: SavedStepFormState
+}): FormUpdater => formData => {
   const {
     initialDeckSetup,
     labwareEntities,
@@ -56,60 +53,58 @@ const _patchDefaultPipette = (args: {|
     pipetteEntities,
     savedStepForms,
   } = args
-
   const defaultPipetteId = getNextDefaultPipetteId(
     savedStepForms,
     orderedStepIds,
     initialDeckSetup.pipettes
   )
-
   // If there is a `pipette` field in the form,
   // then set `pipette` field of new steps to the next default pipette id.
   //
   // In order to trigger dependent field changes (eg default disposal volume),
   // update the form thru handleFormChange.
   const formHasPipetteField = formData && 'pipette' in formData
+
   if (formHasPipetteField && defaultPipetteId !== '') {
     const updatedFields = handleFormChange(
-      { pipette: defaultPipetteId },
+      {
+        pipette: defaultPipetteId,
+      },
       formData,
       pipetteEntities,
       labwareEntities
     )
-
     return updatedFields
   }
+
   return null
 }
 
-const _patchDefaultMagnetFields = (args: {|
-  initialDeckSetup: InitialDeckSetup,
-  orderedStepIds: OrderedStepIdsState,
-  savedStepForms: SavedStepFormState,
-  stepType: StepType,
-|}): FormUpdater => () => {
+const _patchDefaultMagnetFields = (args: {
+  initialDeckSetup: InitialDeckSetup
+  orderedStepIds: OrderedStepIdsState
+  savedStepForms: SavedStepFormState
+  stepType: StepType
+}): FormUpdater => () => {
   const { initialDeckSetup, orderedStepIds, savedStepForms, stepType } = args
+
   if (stepType !== 'magnet') {
     return null
   }
 
   const moduleId =
     getModuleOnDeckByType(initialDeckSetup, MAGNETIC_MODULE_TYPE)?.id || null
-
   const magnetAction = getNextDefaultMagnetAction(
     savedStepForms,
     orderedStepIds
   )
-
   const defaultEngageHeight = getMagnetLabwareEngageHeight(
     initialDeckSetup,
     moduleId
   )
-
   const stringDefaultEngageHeight = defaultEngageHeight
     ? maskField('engageHeight', defaultEngageHeight)
     : null
-
   const prevEngageHeight = getNextDefaultEngageHeight(
     savedStepForms,
     orderedStepIds
@@ -121,19 +116,23 @@ const _patchDefaultMagnetFields = (args: {|
   //
   // Bypass dependent field changes, do not use handleFormChange
   const engageHeight = prevEngageHeight || stringDefaultEngageHeight
-  return { moduleId, magnetAction, engageHeight }
+  return {
+    moduleId,
+    magnetAction,
+    engageHeight,
+  }
 }
 
-const _patchTemperatureModuleId = (args: {|
-  initialDeckSetup: InitialDeckSetup,
-  orderedStepIds: OrderedStepIdsState,
-  savedStepForms: SavedStepFormState,
-  stepType: StepType,
-|}): FormUpdater => () => {
+const _patchTemperatureModuleId = (args: {
+  initialDeckSetup: InitialDeckSetup
+  orderedStepIds: OrderedStepIdsState
+  savedStepForms: SavedStepFormState
+  stepType: StepType
+}): FormUpdater => () => {
   const { initialDeckSetup, orderedStepIds, savedStepForms, stepType } = args
-
   const hasTemperatureModuleId =
     stepType === 'pause' || stepType === 'temperature'
+
   // Auto-populate moduleId field of 'pause' and 'temperature' steps.
   //
   // Bypass dependent field changes, do not use handleFormChange
@@ -143,16 +142,19 @@ const _patchTemperatureModuleId = (args: {|
       orderedStepIds,
       initialDeckSetup.modules
     )
-    return { moduleId }
+    return {
+      moduleId,
+    }
   }
+
   return null
 }
 
-const _patchThermocyclerFields = (args: {|
-  initialDeckSetup: InitialDeckSetup,
-  stepType: StepType,
-  robotStateTimeline: Timeline,
-|}): FormUpdater => () => {
+const _patchThermocyclerFields = (args: {
+  initialDeckSetup: InitialDeckSetup
+  stepType: StepType
+  robotStateTimeline: Timeline
+}): FormUpdater => () => {
   const { initialDeckSetup, stepType, robotStateTimeline } = args
 
   if (stepType !== 'thermocycler') {
@@ -160,9 +162,10 @@ const _patchThermocyclerFields = (args: {|
   }
 
   const moduleId = getNextDefaultThermocyclerModuleId(initialDeckSetup.modules)
-
-  const lastRobotState: ?RobotState = last(robotStateTimeline.timeline)
-    ?.robotState
+  const lastRobotState: RobotState | null | undefined = last(
+    robotStateTimeline.timeline
+  )?.robotState
+  // @ts-expect-error(sa, 2021-05-26): module id might be null, need to type narrow
   const moduleState = lastRobotState?.modules[moduleId]?.moduleState
 
   if (moduleState && moduleState.type === THERMOCYCLER_MODULE_TYPE) {
@@ -175,8 +178,11 @@ const _patchThermocyclerFields = (args: {|
       lidOpen: moduleState.lidOpen,
     }
   }
+
   // if there's no last robot state (eg upstream errors), still should return moduleId
-  return { moduleId }
+  return {
+    moduleId,
+  }
 }
 
 export const createPresavedStepForm = ({
@@ -232,13 +238,11 @@ export const createPresavedStepForm = ({
   ].reduce<FormData>(
     (acc, updater: FormUpdater) => {
       const updates = updater(acc)
+
       if (updates === null) {
         return acc
       }
-      // TODO(IL, 2020-04-30): Flow cannot be sure that spreading FormPatch type will not overwrite
-      // values for the explicitly-typed keys in FormData (`stepType: StepType` for example)
-      // with `[key]: mixed`.
-      // $FlowFixMe - Fix in #3161.
+
       return { ...acc, ...updates }
     },
     { ...formData }

@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import cx from 'classnames'
 import { OutlineButton, PrimaryButton } from '@opentrons/components'
@@ -7,15 +6,15 @@ import { i18n } from '../../../localization'
 import modalStyles from '../../modals/modal.css'
 import styles from './styles.css'
 
-type ButtonRowProps = {|
-  handleClickMoreOptions: () => mixed,
-  handleClose: () => mixed,
-  handleSave: () => mixed,
-  handleDelete: () => mixed,
-  canSave: boolean,
-|}
+interface ButtonRowProps {
+  handleClickMoreOptions: () => unknown
+  handleClose: () => unknown
+  handleSave: () => unknown
+  handleDelete: () => unknown
+  canSave: boolean
+}
 
-export const ButtonRow = (props: ButtonRowProps): React.Node => {
+export const ButtonRow = (props: ButtonRowProps): JSX.Element => {
   const {
     handleDelete,
     handleClickMoreOptions,

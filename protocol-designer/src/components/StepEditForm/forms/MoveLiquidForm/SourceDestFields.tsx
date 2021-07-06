@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { i18n } from '../../../../localization'
 
@@ -17,28 +16,28 @@ import {
   getLabwareFieldForPositioningField,
 } from '../../utils'
 
-import type { FormData } from '../../../../form-types'
-import type { StepFieldName } from '../../../../steplist/fieldLevel'
-import type { FieldPropsByName } from '../../types'
+import { FormData } from '../../../../form-types'
+import { StepFieldName } from '../../../../steplist/fieldLevel'
+import { FieldPropsByName } from '../../types'
 import styles from '../../StepEditForm.css'
 
-type Props = {|
-  className?: ?string,
-  prefix: 'aspirate' | 'dispense',
-  propsForFields: FieldPropsByName,
-  formData: FormData,
-|}
+interface SourceDestFieldsProps {
+  className?: string | null
+  prefix: 'aspirate' | 'dispense'
+  propsForFields: FieldPropsByName
+  formData: FormData
+}
 
 const makeAddFieldNamePrefix = (prefix: string) => (
   fieldName: string
 ): StepFieldName => `${prefix}_${fieldName}`
 
-export const SourceDestFields = (props: Props): React.Node => {
+export const SourceDestFields = (props: SourceDestFieldsProps): JSX.Element => {
   const { className, formData, prefix, propsForFields } = props
 
   const addFieldNamePrefix = makeAddFieldNamePrefix(prefix)
 
-  const getDelayFields = () => (
+  const getDelayFields = (): JSX.Element => (
     <DelayFields
       checkboxFieldName={addFieldNamePrefix('delay_checkbox')}
       secondsFieldName={addFieldNamePrefix('delay_seconds')}
@@ -54,7 +53,7 @@ export const SourceDestFields = (props: Props): React.Node => {
     />
   )
 
-  const getMixFields = () => (
+  const getMixFields = (): JSX.Element => (
     <MixFields
       checkboxFieldName={addFieldNamePrefix('mix_checkbox')}
       volumeFieldName={addFieldNamePrefix('mix_volume')}
@@ -64,6 +63,7 @@ export const SourceDestFields = (props: Props): React.Node => {
   )
 
   return (
+    // @ts-expect-error(sa, 2021-7-2): className might be null
     <div className={className}>
       <div className={styles.form_row}>
         <FlowRateField

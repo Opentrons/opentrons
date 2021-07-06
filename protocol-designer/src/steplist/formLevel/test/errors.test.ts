@@ -1,9 +1,8 @@
-// @flow
 import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
 import { volumeTooHigh } from '../errors'
 
 describe('volumeTooHigh', () => {
-  let fieldsWithPipette
+  let fieldsWithPipette: any // this is any typed because HydratedFormData in formLevel/errors is any typed :(
   beforeEach(() => {
     fieldsWithPipette = {
       pipette: {
@@ -33,9 +32,11 @@ describe('volumeTooHigh', () => {
       ...fieldsWithPipette,
       volume: 11,
     }
+    // @ts-expect-error(sa, 2021-6-15): volumeTooHigh might return null, need to null check before property access
     expect(volumeTooHigh(fields).title).toBe(
       `Volume is greater than maximum pipette/tip volume (${fields.pipette.spec.maxVolume} ul)`
     )
+    // @ts-expect-error(sa, 2021-6-15): volumeTooHigh might return null, need to null check before property access
     expect(volumeTooHigh(fields).dependentFields).toEqual(['pipette', 'volume'])
   })
 })

@@ -1,6 +1,5 @@
-// @flow
 import * as React from 'react'
-import { Formik } from 'formik'
+import { Formik, FormikProps } from 'formik'
 import { format } from 'date-fns'
 
 import {
@@ -21,27 +20,26 @@ import { EditModules } from './EditModules'
 import styles from './FilePage.css'
 import modalStyles from '../components/modals/modal.css'
 import formStyles from '../components/forms/forms.css'
-import type { FormikProps } from 'formik/@flow-typed'
-import type { ModuleRealType } from '@opentrons/shared-data'
-import type { FileMetadataFields } from '../file-data'
-import type { ModulesForEditModulesCard } from '../step-forms'
+import { ModuleRealType } from '@opentrons/shared-data'
+import { FileMetadataFields } from '../file-data'
+import { ModulesForEditModulesCard } from '../step-forms'
 
-export type Props = {|
-  formValues: FileMetadataFields,
-  instruments: React.ElementProps<typeof InstrumentGroup>,
-  goToNextPage: () => mixed,
-  saveFileMetadata: FileMetadataFields => mixed,
-  swapPipettes: () => mixed,
-  modules: ModulesForEditModulesCard,
-|}
+export interface Props {
+  formValues: FileMetadataFields
+  instruments: React.ComponentProps<typeof InstrumentGroup>
+  goToNextPage: () => unknown
+  saveFileMetadata: (fileMetaDataFields: FileMetadataFields) => void
+  swapPipettes: () => unknown
+  modules: ModulesForEditModulesCard
+}
 
-type State = {|
-  isEditPipetteModalOpen: boolean,
-  moduleToEdit: {|
-    moduleType: ModuleRealType,
-    moduleId: ?string,
-  |} | null,
-|}
+interface State {
+  isEditPipetteModalOpen: boolean
+  moduleToEdit: {
+    moduleType: ModuleRealType
+    moduleId?: string | null
+  } | null
+}
 
 // TODO(mc, 2020-02-28): explore l10n for these dates
 const DATE_ONLY_FORMAT = 'MMM dd, yyyy'
@@ -78,7 +76,7 @@ export class FilePage extends React.Component<Props, State> {
     })
   }
 
-  render(): React.Node {
+  render(): JSX.Element {
     const {
       formValues,
       instruments,

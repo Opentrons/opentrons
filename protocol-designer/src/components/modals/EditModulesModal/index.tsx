@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Form, Formik, useFormikContext } from 'formik'
@@ -15,6 +14,8 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
   THERMOCYCLER_MODULE_V1,
+  ModuleRealType,
+  ModuleModel,
 } from '@opentrons/shared-data'
 import { i18n } from '../../../localization'
 import {
@@ -42,30 +43,28 @@ import { SlotDropdown } from './SlotDropdown'
 import { ConnectedSlotMap } from './ConnectedSlotMap'
 import { useResetSlotOnModelChange } from './form-state'
 
-import type { ModuleRealType, ModuleModel } from '@opentrons/shared-data'
-import type { ModuleOnDeck } from '../../../step-forms/types'
-import type { ModelModuleInfo } from '../../EditModules'
+import { ModuleOnDeck } from '../../../step-forms/types'
+import { ModelModuleInfo } from '../../EditModules'
 
-type EditModulesModalProps = {|
-  moduleType: ModuleRealType,
-  moduleOnDeck: ModuleOnDeck | null,
-  onCloseClick: () => mixed,
-  editModuleModel: (model: ModuleModel) => mixed,
-  editModuleSlot: (slot: string) => mixed,
-  displayModuleWarning: (module: ModelModuleInfo) => mixed,
-|}
+export interface EditModulesModalProps {
+  moduleType: ModuleRealType
+  moduleOnDeck: ModuleOnDeck | null
+  onCloseClick: () => unknown
+  editModuleModel: (model: ModuleModel) => unknown
+  editModuleSlot: (slot: string) => unknown
+  displayModuleWarning: (module: ModelModuleInfo) => unknown
+}
 
-type EditModulesModalComponentProps = {|
-  ...EditModulesModalProps,
-  supportedModuleSlot: string,
-|}
+type EditModulesModalComponentProps = EditModulesModalProps & {
+  supportedModuleSlot: string
+}
 
-export type EditModulesFormValues = {|
-  selectedModel: ModuleModel | null,
-  selectedSlot: string,
-|}
+export interface EditModulesFormValues {
+  selectedModel: ModuleModel | null
+  selectedSlot: string
+}
 
-export const EditModulesModal = (props: EditModulesModalProps): React.Node => {
+export const EditModulesModal = (props: EditModulesModalProps): JSX.Element => {
   const {
     moduleType,
     displayModuleWarning,
@@ -78,7 +77,7 @@ export const EditModulesModal = (props: EditModulesModalProps): React.Node => {
   const initialDeckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
   const dispatch = useDispatch()
 
-  const hasSlotIssue = (selectedSlot): boolean => {
+  const hasSlotIssue = (selectedSlot: string): boolean => {
     const previousModuleSlot = moduleOnDeck?.slot
     const hasModuleMoved = previousModuleSlot !== selectedSlot
     const isSlotBlocked = getSlotsBlockedBySpanning(initialDeckSetup).includes(
@@ -111,8 +110,8 @@ export const EditModulesModal = (props: EditModulesModalProps): React.Node => {
   const validator = ({
     selectedModel,
     selectedSlot,
-  }: EditModulesFormValues) => {
-    const errors = {}
+  }: EditModulesFormValues): Record<string, any> => {
+    const errors: Record<string, any> = {}
     if (!selectedModel) {
       errors.selectedModel = i18n.t('alert.field.required')
     }
@@ -186,9 +185,11 @@ export const EditModulesModal = (props: EditModulesModalProps): React.Node => {
   )
 }
 
-const EditModulesModalComponent = (props: EditModulesModalComponentProps) => {
+const EditModulesModalComponent = (
+  props: EditModulesModalComponentProps
+): JSX.Element => {
   const { moduleType, onCloseClick, supportedModuleSlot } = props
-  const { values, errors, isValid } = useFormikContext()
+  const { values, errors, isValid } = useFormikContext<EditModulesFormValues>()
   const { selectedModel } = values
 
   const disabledModuleRestriction = useSelector(

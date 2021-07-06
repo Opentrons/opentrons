@@ -1,10 +1,7 @@
-// @flow
 import * as actions from './actions'
-import { rootReducer, type RootState } from './reducers'
+import { rootReducer, RootState } from './reducers'
 import * as selectors from './selectors'
-
-type HintKey =
-  // normal hints
+type HintKey =  // normal hints
   | 'add_liquids_and_labware'
   | 'deck_setup_explanation'
   | 'module_without_labware'
@@ -15,10 +12,7 @@ type HintKey =
   | 'export_v4_protocol_3_18'
   | 'export_v5_protocol_3_20'
   | 'change_magnet_module_model'
-
 // DEPRECATED HINTS (keep a record to avoid name collisions with old persisted dismissal states)
 // 'export_v4_protocol'
-
 export { actions, rootReducer, selectors }
-
 export type { RootState, HintKey }

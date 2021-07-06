@@ -1,18 +1,17 @@
-// @flow
-import type { FormData } from '../../../form-types'
-
+import { FormData } from '../../../form-types'
 // NOTE: expects that '_checkbox' fields are implemented so that
 // when checkbox is disabled, its dependent fields are hidden
 export function getDisabledFieldsMoveLiquidForm(
   rawForm: FormData // TODO IMMEDIATELY use raw form type instead of FormData
 ): Set<string> {
-  const disabled = new Set()
+  const disabled: Set<string> = new Set()
   const prefixes = ['aspirate', 'dispense']
 
   if (rawForm.path === 'multiAspirate') {
     disabled.add('aspirate_mix_checkbox')
   } else if (rawForm.path === 'multiDispense') {
     disabled.add('dispense_mix_checkbox')
+
     if (rawForm.disposalVolume_checkbox) {
       disabled.add('blowout_checkbox')
     }

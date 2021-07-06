@@ -1,14 +1,12 @@
-// @flow
 import { createSelector } from 'reselect'
 import { selectors as fileDataSelectors } from '../../file-data'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { getSelectedStepId } from '../../ui/steps'
 import { selectors as dismissSelectors } from '../../dismiss'
-import type { CommandCreatorWarning } from '@opentrons/step-generation'
-import type { Selector } from '../../types'
-
+import { CommandCreatorWarning } from '@opentrons/step-generation'
+import { Selector } from '../../types'
 export const getTimelineWarningsForSelectedStep: Selector<
-  Array<CommandCreatorWarning>
+  CommandCreatorWarning[]
 > = createSelector(
   dismissSelectors.getDismissedTimelineWarningTypes,
   fileDataSelectors.timelineWarningsPerStep,
@@ -20,8 +18,7 @@ export const getTimelineWarningsForSelectedStep: Selector<
     )
   }
 )
-
-type HasWarningsPerStep = { [stepId: string]: boolean }
+type HasWarningsPerStep = Record<string, boolean>
 export const getHasTimelineWarningsPerStep: Selector<HasWarningsPerStep> = createSelector(
   dismissSelectors.getDismissedTimelineWarningTypes,
   fileDataSelectors.timelineWarningsPerStep,
@@ -34,16 +31,11 @@ export const getHasTimelineWarningsPerStep: Selector<HasWarningsPerStep> = creat
       const dismissedWarningTypesForStep = new Set(
         dismissedWarningTypes[stepId] || []
       )
-
       const hasUndismissedWarnings =
         warningTypesForStep.filter(
           warningType => !dismissedWarningTypesForStep.has(warningType)
         ).length > 0
-
-      return {
-        ...stepAcc,
-        [stepId]: hasUndismissedWarnings,
-      }
+      return { ...stepAcc, [stepId]: hasUndismissedWarnings }
     }, {})
   }
 )

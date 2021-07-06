@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import map from 'lodash/map'
 import noop from 'lodash/noop'
@@ -9,8 +8,8 @@ import { IngredPill } from './IngredPill'
 import { PDListItem } from '../lists'
 import { swatchColors } from '../swatchColors'
 import { formatVolume, formatPercentage } from './utils'
-import type { LocationLiquidState } from '@opentrons/step-generation'
-import type {
+import { LocationLiquidState } from '@opentrons/step-generation'
+import {
   SubstepIdentifier,
   SubstepWellData,
   WellIngredientVolumeData,
@@ -18,27 +17,29 @@ import type {
 } from '../../steplist/types'
 import styles from './StepItem.css'
 
-type SubstepRowProps = {|
-  volume?: ?number | ?string,
-  source?: SubstepWellData,
-  dest?: SubstepWellData,
-  ingredNames: WellIngredientNames,
-  className?: string,
-  stepId: string,
-  substepIndex: number,
-  selectSubstep?: SubstepIdentifier => mixed,
-|}
+interface SubstepRowProps {
+  volume: number | string | null | undefined
+  source?: SubstepWellData
+  dest?: SubstepWellData
+  ingredNames: WellIngredientNames
+  className?: string
+  stepId: string
+  substepIndex: number
+  selectSubstep?: (substepIdentifier: SubstepIdentifier) => unknown
+}
 
-type PillTooltipContentsProps = {
-  ingreds: WellIngredientVolumeData | LocationLiquidState,
-  ingredNames: WellIngredientNames,
-  well: string,
+interface PillTooltipContentsProps {
+  ingreds: WellIngredientVolumeData | LocationLiquidState
+  ingredNames: WellIngredientNames
+  well: string
 }
 export const PillTooltipContents = (
   props: PillTooltipContentsProps
-): React.Node => {
+): JSX.Element => {
   const totalLiquidVolume = reduce(
     props.ingreds,
+    // @ts-expect-error(sa, 2021-6-20): TODO IMMEDIATELY, this could either be single channel OR multi channel volume data
+    // we have to differentiate, because the structure of the interface is different
     (acc, ingred) => acc + ingred.volume,
     0
   )
@@ -60,10 +61,12 @@ export const PillTooltipContents = (
               </td>
               {hasMultipleIngreds && (
                 <td className={styles.ingred_percentage}>
+                  {/* @ts-expect-error(sa, 2021-6-20): TODO IMMEDIATELY, this could either be single channel OR multi channel volume data */}
                   {formatPercentage(ingred.volume, totalLiquidVolume)}
                 </td>
               )}
               <td className={styles.ingred_partial_volume}>
+                {/* @ts-expect-error(sa, 2021-6-20): TODO IMMEDIATELY, this could either be single channel OR multi channel volume data */}
                 {formatVolume(ingred.volume, 2)}µl
               </td>
             </tr>
@@ -83,16 +86,18 @@ export const PillTooltipContents = (
   )
 }
 
-function SubstepRowComponent(props: SubstepRowProps) {
+function SubstepRowComponent(props: SubstepRowProps): JSX.Element {
   const compactedSourcePreIngreds = props.source
     ? omitBy(
         props.source.preIngreds,
+        // @ts-expect-error(sa, 2021-6-21): ingred.volume might be undefined
         ingred => typeof ingred.volume === 'number' && ingred.volume <= 0
       )
     : {}
   const compactedDestPreIngreds = props.dest
     ? omitBy(
         props.dest.preIngreds,
+        // @ts-expect-error(sa, 2021-6-21): ingred.volume might be undefined
         ingred => typeof ingred.volume === 'number' && ingred.volume <= 0
       )
     : {}
@@ -164,6 +169,4 @@ function SubstepRowComponent(props: SubstepRowProps) {
   )
 }
 
-export const SubstepRow: React.AbstractComponent<SubstepRowProps> = React.memo(
-  SubstepRowComponent
-)
+export const SubstepRow = React.memo(SubstepRowComponent)

@@ -1,4 +1,3 @@
-// @flow
 import Ajv from 'ajv'
 import glob from 'glob'
 import last from 'lodash/last'
@@ -10,7 +9,7 @@ import protocolV5Schema from '@opentrons/shared-data/protocol/schemas/5.json'
 import labwareV2Schema from '@opentrons/shared-data/labware/schemas/2.json'
 
 // TODO: copied from createFile.test.js
-const getAjvValidator = _protocolSchema => {
+const getAjvValidator = (_protocolSchema: object) => {
   const ajv = new Ajv({
     allErrors: true,
     jsonPointers: true,
@@ -21,7 +20,11 @@ const getAjvValidator = _protocolSchema => {
   return validateProtocol
 }
 
-const expectResultToMatchSchema = (testName, result, _protocolSchema): void => {
+const expectResultToMatchSchema = (
+  testName: string,
+  result: any,
+  _protocolSchema: object
+): void => {
   const validate = getAjvValidator(_protocolSchema)
   const valid = validate(result)
   const validationErrors = validate.errors

@@ -1,4 +1,3 @@
-// @flow
 import fixture_24_tuberack from '@opentrons/shared-data/labware/fixtures/2/fixture_24_tuberack.json'
 import {
   _minAirGapVolume,
@@ -7,14 +6,16 @@ import {
   maxDispenseWellVolume,
 } from '../warnings'
 
+type CheckboxFields = 'aspirate_airGap_checkbox' | 'dispense_airGap_checkbox'
+type VolumeFields = 'aspirate_airGap_volume' | 'dispense_airGap_volume'
 describe('Min air gap volume', () => {
   const aspDisp = ['aspirate', 'dispense']
   aspDisp.forEach(aspOrDisp => {
-    const checkboxField = `${aspDisp}_airGap_checkbox`
-    const volumeField = `${aspDisp}_airGap_volume`
+    const checkboxField = `${aspDisp}_airGap_checkbox` as CheckboxFields
+    const volumeField = `${aspDisp}_airGap_volume` as VolumeFields
 
     describe(`${aspOrDisp} -> air gap`, () => {
-      let pipette
+      let pipette: { spec: { minVolume: number } }
       beforeEach(() => {
         pipette = {
           spec: {
@@ -64,6 +65,7 @@ describe('Min air gap volume', () => {
           [volumeField]: '0',
           ...{ pipette },
         }
+        // @ts-expect-error(sa, 2021-6-15): minAirGapVolume might return null, need to null check before property access
         expect(minAirGapVolume(fields).type).toBe('BELOW_MIN_AIR_GAP_VOLUME')
       })
       it('should return a warning when the transfer volume is less than the pipette min volume', () => {
@@ -72,13 +74,14 @@ describe('Min air gap volume', () => {
           [volumeField]: '0',
           ...{ pipette },
         }
+        // @ts-expect-error(sa, 2021-6-15): minAirGapVolume might return null, need to null check before property access
         expect(minAirGapVolume(fields).type).toBe('BELOW_MIN_AIR_GAP_VOLUME')
       })
     })
   })
 })
 describe('Below pipette minimum volume', () => {
-  let fieldsWithPipette
+  let fieldsWithPipette: { pipette: { spec: { minVolume: number } } }
   beforeEach(() => {
     fieldsWithPipette = {
       pipette: {
@@ -107,13 +110,19 @@ describe('Below pipette minimum volume', () => {
       ...fieldsWithPipette,
       volume: 99,
     }
+    // @ts-expect-error(sa, 2021-6-15): belowPipetteMinimumVolume might return null, need to null check before property access
     expect(belowPipetteMinimumVolume(fields).type).toBe(
       'BELOW_PIPETTE_MINIMUM_VOLUME'
     )
   })
 })
 describe('Below min disposal volume', () => {
-  let fieldsWithPipette
+  let fieldsWithPipette: {
+    pipette: { spec: { minVolume: number } }
+    disposalVolume_checkbox: boolean
+    disposalVolume_volume: number
+    path: string
+  }
   beforeEach(() => {
     fieldsWithPipette = {
       pipette: {
@@ -167,6 +176,7 @@ describe('Below min disposal volume', () => {
       ...fieldsWithPipette,
       disposalVolume_volume: 99,
     }
+    // @ts-expect-error(sa, 2021-6-15): minDisposalVolume might return null, need to null check before property access
     expect(minDisposalVolume(fields).type).toBe('BELOW_MIN_DISPOSAL_VOLUME')
   })
   it('should return a warning when the path is multi dispense and the checkbox is unchecked', () => {
@@ -174,6 +184,7 @@ describe('Below min disposal volume', () => {
       ...fieldsWithPipette,
       disposalVolume_checkbox: false,
     }
+    // @ts-expect-error(sa, 2021-6-15): minDisposalVolume might return null, need to null check before property access
     expect(minDisposalVolume(fields).type).toBe('BELOW_MIN_DISPOSAL_VOLUME')
   })
   it('should return a warning when the path is multi dispense and there is no disposal volume', () => {
@@ -181,11 +192,12 @@ describe('Below min disposal volume', () => {
       ...fieldsWithPipette,
       disposalVolume_volume: undefined,
     }
+    // @ts-expect-error(sa, 2021-6-15): minDisposalVolume might return null, need to null check before property access
     expect(minDisposalVolume(fields).type).toBe('BELOW_MIN_DISPOSAL_VOLUME')
   })
 })
 describe('Max dispense well volume', () => {
-  let fieldsWithDispenseLabware
+  let fieldsWithDispenseLabware: any
   beforeEach(() => {
     fieldsWithDispenseLabware = {
       dispense_labware: { def: { ...fixture_24_tuberack } },
@@ -228,6 +240,7 @@ describe('Max dispense well volume', () => {
       // well total liquid volume is 2000 (see fixture)
       volume: 2001,
     }
+    // @ts-expect-error(sa, 2021-6-15): maxDispenseWellVolume might return null, need to null check before property access
     expect(maxDispenseWellVolume(fields).type).toBe('OVER_MAX_WELL_VOLUME')
   })
 })

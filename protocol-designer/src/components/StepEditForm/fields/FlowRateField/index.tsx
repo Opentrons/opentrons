@@ -1,34 +1,31 @@
-// @flow
 import * as React from 'react'
-import { FlowRateInput, type FlowRateInputProps } from './FlowRateInput'
+import { FlowRateInput, FlowRateInputProps } from './FlowRateInput'
 import { connect } from 'react-redux'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
-import type { FieldProps } from '../../types'
-import type { BaseState } from '../../../../types'
+import { FieldProps } from '../../types'
+import { BaseState } from '../../../../types'
 
-type OP = {|
-  ...FieldProps,
-  pipetteId: ?string,
-  className?: $PropertyType<FlowRateInputProps, 'className'>,
-  flowRateType: $PropertyType<FlowRateInputProps, 'flowRateType'>,
-  label?: $PropertyType<FlowRateInputProps, 'label'>,
-|}
+interface OP extends FieldProps {
+  pipetteId?: string | null
+  className?: FlowRateInputProps['className']
+  flowRateType: FlowRateInputProps['flowRateType']
+  label?: FlowRateInputProps['label']
+}
 
-type SP = {|
-  innerKey: string,
-  defaultFlowRate: ?number,
-  minFlowRate: number,
-  maxFlowRate: number,
-  pipetteDisplayName: string,
-|}
+interface SP {
+  innerKey: string
+  defaultFlowRate?: number | null
+  minFlowRate: number
+  maxFlowRate: number
+  pipetteDisplayName: string
+}
 
-type Props = {|
-  ...FlowRateInputProps,
-  innerKey: string,
-|}
+interface Props extends FlowRateInputProps {
+  innerKey: string
+}
 
 // Add a key to force re-constructing component when values change
-function FlowRateInputWithKey(props: Props) {
+function FlowRateInputWithKey(props: Props): JSX.Element {
   const { innerKey, ...otherProps } = props
   return <FlowRateInput key={innerKey} {...otherProps} />
 }
@@ -64,19 +61,16 @@ function mapStateToProps(state: BaseState, ownProps: OP): SP {
   }
 }
 
-const mergeProps = (stateProps: SP, dispatchProps, ownProps: OP): Props => {
+const mergeProps = (
+  stateProps: SP,
+  _dispatchProps: null,
+  ownProps: OP
+): Props => {
   const { pipetteId, ...passThruProps } = ownProps
   return { ...stateProps, ...passThruProps }
 }
 
-export const FlowRateField: React.AbstractComponent<OP> = connect<
-  Props,
-  OP,
-  SP,
-  {||},
-  _,
-  _
->(
+export const FlowRateField = connect(
   mapStateToProps,
   null,
   mergeProps

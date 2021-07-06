@@ -1,4 +1,3 @@
-// @flow
 import assert from 'assert'
 import * as React from 'react'
 import { connect } from 'react-redux'
@@ -20,28 +19,30 @@ import { selectWells, deselectWells } from '../well-selection/actions'
 
 import styles from './LiquidPlacementModal.css'
 
-import type { Dispatch } from 'redux'
-import type { WellGroup } from '@opentrons/components'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { BaseState } from '../types'
-import type { ContentsByWell } from '../labware-ingred/types'
-import type { WellIngredientNames } from '../steplist'
+import { Dispatch } from 'redux'
+import { WellGroup } from '@opentrons/components'
+import { LabwareDefinition2 } from '@opentrons/shared-data'
+import { BaseState } from '../types'
+import { ContentsByWell } from '../labware-ingred/types'
+import { WellIngredientNames } from '../steplist'
 
-type SP = {|
-  selectedWells: WellGroup,
-  wellContents: ContentsByWell,
-  labwareDef: ?LabwareDefinition2,
-  liquidNamesById: WellIngredientNames,
-|}
+interface SP {
+  selectedWells: WellGroup
+  wellContents: ContentsByWell
+  labwareDef?: LabwareDefinition2 | null
+  liquidNamesById: WellIngredientNames
+}
 
-type DP = {|
-  selectWells: WellGroup => mixed,
-  deselectWells: WellGroup => mixed,
-|}
+interface DP {
+  selectWells: (wellGroup: WellGroup) => unknown
+  deselectWells: (wellGroup: WellGroup) => unknown
+}
 
-type Props = { ...SP, ...DP }
+type Props = SP & DP
 
-type State = { highlightedWells: WellGroup }
+interface State {
+  highlightedWells: WellGroup
+}
 
 class LiquidPlacementModalComponent extends React.Component<Props, State> {
   state = { highlightedWells: {} }
@@ -50,11 +51,11 @@ class LiquidPlacementModalComponent extends React.Component<Props, State> {
     this.state = { highlightedWells: {} }
   }
 
-  updateHighlightedWells = (wells: WellGroup) => {
+  updateHighlightedWells = (wells: WellGroup): void => {
     this.setState({ highlightedWells: wells })
   }
 
-  render() {
+  render(): JSX.Element {
     const { labwareDef, selectedWells } = this.props
 
     return (
@@ -122,19 +123,12 @@ const mapStateToProps = (state: BaseState): SP => {
   }
 }
 
-const mapDispatchToProps = (dispatch: Dispatch<*>): DP => ({
+const mapDispatchToProps = (dispatch: Dispatch): DP => ({
   deselectWells: wells => dispatch(deselectWells(wells)),
   selectWells: wells => dispatch(selectWells(wells)),
 })
 
-export const LiquidPlacementModal: React.AbstractComponent<{||}> = connect<
-  Props,
-  {||},
-  _,
-  _,
-  _,
-  _
->(
+export const LiquidPlacementModal = connect(
   mapStateToProps,
   mapDispatchToProps
 )(LiquidPlacementModalComponent)

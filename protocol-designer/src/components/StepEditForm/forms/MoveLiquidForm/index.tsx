@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import cx from 'classnames'
 import { i18n } from '../../../../localization'
@@ -10,17 +9,17 @@ import {
   PathField,
 } from '../../fields'
 import styles from '../../StepEditForm.css'
-import type { StepFormProps } from '../../types'
+import { StepFormProps } from '../../types'
 import { SourceDestFields } from './SourceDestFields'
 import { SourceDestHeaders } from './SourceDestHeaders'
 
 // TODO: BC 2019-01-25 instead of passing path from here, put it in connect fields where needed
 // or question if it even needs path
 
-export const MoveLiquidForm = (props: StepFormProps): React.Node => {
+export const MoveLiquidForm = (props: StepFormProps): JSX.Element => {
   const [collapsed, _setCollapsed] = React.useState<boolean>(true)
 
-  const toggleCollapsed = () => _setCollapsed(!collapsed)
+  const toggleCollapsed = (): void => _setCollapsed(!collapsed)
 
   const { propsForFields, formData } = props
   const { stepType, path } = formData

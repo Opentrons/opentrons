@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import cx from 'classnames'
 import { useSelector } from 'react-redux'
@@ -8,13 +7,15 @@ import { getSavedStepForms } from '../../../step-forms/selectors'
 import { THERMOCYCLER_PROFILE } from '../../../constants'
 
 import styles from './LabwareOverlays.css'
-import type { LabwareOnDeck } from '../../../step-forms'
+import { LabwareOnDeck } from '../../../step-forms'
 
-type LabwareHighlightProps = {|
-  labwareOnDeck: LabwareOnDeck,
-|}
+interface LabwareHighlightProps {
+  labwareOnDeck: LabwareOnDeck
+}
 
-export const LabwareHighlight = (props: LabwareHighlightProps): React.Node => {
+export const LabwareHighlight = (
+  props: LabwareHighlightProps
+): JSX.Element | null => {
   const { labwareOnDeck } = props
   const highlighted = useSelector(getHoveredStepLabware).includes(
     labwareOnDeck.id

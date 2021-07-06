@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { CheckboxField, DropdownField, FormGroup } from '@opentrons/components'
 import { i18n } from '../../../localization'
@@ -10,49 +9,47 @@ import { ModuleDiagram } from '../../modules'
 
 import styles from './FilePipettesModal.css'
 
-import type { ModuleRealType } from '@opentrons/shared-data'
-import type { FormModulesByType } from '../../../step-forms'
+import { ModuleRealType } from '@opentrons/shared-data'
+import { FormModulesByType } from '../../../step-forms'
 
-type Props = {|
+export interface ModuleFieldsProps {
   // TODO 2020-3-20 use formik typing here after we update the def in flow-typed
   errors:
     | null
     | string
-    | {|
+    | {
         magneticModuleType?: {
-          model: string,
-        },
+          model: string
+        }
         temperatureModuleType?: {
-          model: string,
-        },
+          model: string
+        }
         thermocyclerModuleType?: {
-          model: string,
-        },
-      |},
+          model: string
+        }
+      }
   touched:
     | null
     | boolean
     | {
         magneticModuleType?: {
-          model: boolean,
-        },
+          model: boolean
+        }
         temperatureModuleType?: {
-          model: boolean,
-        },
+          model: boolean
+        }
         thermocyclerModuleType?: {
-          model: boolean,
-        },
-      },
-  values: FormModulesByType,
-  onFieldChange: (
-    event: SyntheticInputEvent<HTMLSelectElement | HTMLInputElement>
-  ) => mixed,
-  onSetFieldValue: (field: string, value: string | null) => void,
-  onSetFieldTouched: (field: string, touched: boolean) => void,
-  onBlur: (event: SyntheticFocusEvent<HTMLSelectElement>) => mixed,
-|}
+          model: boolean
+        }
+      }
+  values: FormModulesByType
+  onFieldChange: (event: React.ChangeEvent) => unknown
+  onSetFieldValue: (field: string, value: string | null) => void
+  onSetFieldTouched: (field: string, touched: boolean) => void
+  onBlur: (event: React.FocusEvent<HTMLSelectElement>) => unknown
+}
 
-export function ModuleFields(props: Props): React.Node {
+export function ModuleFields(props: ModuleFieldsProps): JSX.Element {
   const {
     onFieldChange,
     onSetFieldValue,
@@ -62,9 +59,10 @@ export function ModuleFields(props: Props): React.Node {
     errors,
     touched,
   } = props
-  const modules = Object.keys(values)
+  // @ts-expect-error(sa, 2021-6-21): Object.keys not smart enough to take the keys of FormModulesByType
+  const modules: ModuleRealType[] = Object.keys(values)
   const handleOnDeckChange = (type: ModuleRealType) => (
-    e: SyntheticInputEvent<HTMLInputElement>
+    e: React.ChangeEvent
   ) => {
     const targetToClear = `modulesByType.${type}.model`
 
@@ -110,11 +108,13 @@ export function ModuleFields(props: Props): React.Node {
                       touched &&
                       typeof touched !== 'boolean' &&
                       touched[moduleType] &&
+                      // @ts-expect-error(sa, 2021-6-21): not a valid way to type narrow
                       touched[moduleType].model &&
                       errors !== null &&
                       typeof errors !== 'string' &&
                       errors[moduleType]
-                        ? errors[moduleType].model
+                        ? // @ts-expect-error(sa, 2021-6-21): not a valid way to type narrow
+                          errors[moduleType].model
                         : null
                     }
                     tabIndex={i}

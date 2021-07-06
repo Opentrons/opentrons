@@ -1,6 +1,4 @@
-// @flow
 import { getIdsInRange } from '../utils'
-
 describe('getIdsInRange', () => {
   it('gets id in array of length 1', () => {
     expect(getIdsInRange(['X'], 'X', 'X')).toEqual(['X'])

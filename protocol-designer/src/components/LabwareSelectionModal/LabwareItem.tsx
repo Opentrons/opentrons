@@ -1,29 +1,28 @@
-// @flow
 import * as React from 'react'
 import cx from 'classnames'
 import { i18n } from '../../localization'
-import { Icon, type IconName } from '@opentrons/components'
+import { Icon, IconName } from '@opentrons/components'
 import { PDListItem } from '../lists'
 import styles from './styles.css'
 import {
   getLabwareDefURI,
   getLabwareDefIsStandard,
   getLabwareDisplayName,
-  type LabwareDefinition2,
+  LabwareDefinition2,
 } from '@opentrons/shared-data'
 
-type Props = {|
-  disabled?: ?boolean,
-  icon?: ?IconName,
-  labwareDef: LabwareDefinition2,
-  onMouseEnter: () => any,
-  onMouseLeave: () => any,
-  selectLabware: (labwareLoadName: string) => mixed,
-|}
+interface Props {
+  disabled?: boolean | null
+  icon?: IconName | null
+  labwareDef: LabwareDefinition2
+  onMouseEnter: () => any
+  onMouseLeave: () => any
+  selectLabware: (labwareLoadName: string) => unknown
+}
 
 const LABWARE_LIBRARY_PAGE_PATH = 'https://labware.opentrons.com'
 
-export function LabwareItem(props: Props): React.Node {
+export function LabwareItem(props: Props): JSX.Element {
   const {
     disabled,
     icon,

@@ -1,32 +1,35 @@
-// @flow
-import * as React from 'react'
 import { connect } from 'react-redux'
-import { WellSelectionInput } from './WellSelectionInput'
+import {
+  WellSelectionInput,
+  Props as WellSelectionInputProps,
+  DP,
+} from './WellSelectionInput'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
-import type { BaseState, ThunkDispatch } from '../../../../types'
-import type { FieldProps } from '../../types'
+import { BaseState } from '../../../../types'
+import { FieldProps } from '../../types'
 
-type Props = React.ElementConfig<typeof WellSelectionInput>
-
-type OP = {|
-  ...FieldProps,
-  labwareId: ?string,
-  pipetteId: ?string,
-|}
-
-type SP = {|
-  isMulti: $PropertyType<Props, 'isMulti'>,
-  primaryWellCount: $PropertyType<Props, 'primaryWellCount'>,
-|}
+type Props = Omit<
+  JSX.LibraryManagedAttributes<
+    typeof WellSelectionInput,
+    WellSelectionInputProps
+  >,
+  keyof DP
+>
+type OP = FieldProps & {
+  labwareId?: string | null
+  pipetteId?: string | null
+}
+interface SP {
+  isMulti: Props['isMulti']
+  primaryWellCount: Props['primaryWellCount']
+}
 
 const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
   const { pipetteId } = ownProps
   const selectedWells = ownProps.value
-
   const pipette =
     pipetteId && stepFormSelectors.getPipetteEntities(state)[pipetteId]
   const isMulti = pipette ? pipette.spec.channels > 1 : false
-
   return {
     primaryWellCount: Array.isArray(selectedWells)
       ? selectedWells.length
@@ -35,11 +38,7 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
   }
 }
 
-function mergeProps(
-  stateProps: SP,
-  dispatchProps: { dispatch: ThunkDispatch<*> },
-  ownProps: OP
-): Props {
+function mergeProps(stateProps: SP, _dispatchProps: null, ownProps: OP): Props {
   const {
     disabled,
     errorToShow,
@@ -51,7 +50,6 @@ function mergeProps(
     updateValue,
     value,
   } = ownProps
-
   return {
     disabled,
     errorToShow,
@@ -67,14 +65,7 @@ function mergeProps(
   }
 }
 
-export const WellSelectionField: React.AbstractComponent<OP> = connect<
-  Props,
-  OP,
-  SP,
-  {||},
-  _,
-  _
->(
+export const WellSelectionField = connect(
   mapStateToProps,
   null,
   mergeProps

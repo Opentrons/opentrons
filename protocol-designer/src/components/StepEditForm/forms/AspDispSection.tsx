@@ -1,21 +1,21 @@
-// @flow
 import * as React from 'react'
 import { IconButton, Tooltip, useHoverTooltip } from '@opentrons/components'
 import { i18n } from '../../../localization'
 import styles from '../StepEditForm.css'
 
-type Props = {
-  className?: ?string,
-  collapsed?: ?boolean,
-  toggleCollapsed: () => void,
-  prefix: 'aspirate' | 'dispense',
-  children?: React.Node,
+interface Props {
+  className?: string | null
+  collapsed?: boolean | null
+  toggleCollapsed: () => void
+  prefix: 'aspirate' | 'dispense'
+  children?: React.ReactNode
 }
 
-export const AspDispSection = (props: Props): React.Node => {
+export const AspDispSection = (props: Props): JSX.Element => {
   const { children, className, collapsed, toggleCollapsed, prefix } = props
   const [targetProps, tooltipProps] = useHoverTooltip()
   return (
+    // @ts-expect-error(sa, 2021-7-2): className might be null
     <div className={className}>
       <div className={styles.section_header}>
         <span className={styles.section_header_text}>{prefix}</span>

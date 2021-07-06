@@ -1,23 +1,19 @@
-// @flow
 import * as React from 'react'
-import { Pill, type UseHoverTooltipResult } from '@opentrons/components'
+import { Pill, UseHoverTooltipTargetProps } from '@opentrons/components'
 import { AIR } from '@opentrons/step-generation'
 import { swatchColors, MIXED_WELL_COLOR } from '../swatchColors'
-import type {
-  WellIngredientVolumeData,
-  WellIngredientNames,
-} from '../../steplist'
+import { WellIngredientVolumeData, WellIngredientNames } from '../../steplist'
 import styles from './StepItem.css'
 
-type Props = {
-  ingreds: WellIngredientVolumeData,
-  ingredNames: WellIngredientNames,
-  targetProps?: ?$ElementType<UseHoverTooltipResult, 0>,
+interface Props {
+  ingreds: WellIngredientVolumeData
+  ingredNames: WellIngredientNames
+  targetProps: UseHoverTooltipTargetProps | null | undefined
 }
 
-export function IngredPill(props: Props): React.Node {
+export function IngredPill(props: Props): JSX.Element {
   const { ingredNames, targetProps } = props
-  const ingredIds: Array<string> = Object.keys(props.ingreds)
+  const ingredIds: string[] = Object.keys(props.ingreds)
 
   if (ingredIds.filter(id => id !== AIR).length === 0) {
     // Invisible Pill, but has correct height/margin/etc for spacing

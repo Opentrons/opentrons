@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
@@ -9,9 +8,9 @@ const waitCursorStyle = css`
   cursor: wait;
 `
 
-export const ComputingSpinner = (): React.Node => {
+export const ComputingSpinner = (): JSX.Element => {
   const showSpinner = useSelector(fileDataSelectors.getTimelineIsBeingComputed)
-
+  // @ts-expect-error(sa, 2021-6-22): return null so it can be properly rendered
   return (
     showSpinner && (
       <Box

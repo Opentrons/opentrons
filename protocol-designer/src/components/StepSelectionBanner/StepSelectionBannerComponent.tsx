@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import startCase from 'lodash/startCase'
 import { css } from 'styled-components'
@@ -26,9 +25,12 @@ import {
   TEXT_TRANSFORM_UPPERCASE,
 } from '@opentrons/components'
 import { i18n } from '../../localization'
-import type { CountPerStepType, StepType } from '../../form-types'
+import { CountPerStepType, StepType } from '../../form-types'
 
-type StepPillProps = {| stepType: StepType, count: number |}
+interface StepPillProps {
+  stepType: StepType
+  count: number
+}
 
 const stepPillStyles = css`
   align-items: ${ALIGN_CENTER};
@@ -46,7 +48,7 @@ const stepPillStyles = css`
   }
 `
 
-const StepPill = (props: StepPillProps): React.Node => {
+const StepPill = (props: StepPillProps): JSX.Element => {
   const { count, stepType } = props
   const label = `${startCase(
     i18n.t(`application.stepType.${stepType}`)
@@ -59,11 +61,8 @@ const StepPill = (props: StepPillProps): React.Node => {
 }
 
 export const ExitBatchEditButton = (props: {
-  handleExitBatchEdit: $PropertyType<
-    StepSelectionBannerProps,
-    'handleExitBatchEdit'
-  >,
-}): React.Node => (
+  handleExitBatchEdit: StepSelectionBannerProps['handleExitBatchEdit']
+}): JSX.Element => (
   <Box flex="0 1 auto">
     <SecondaryBtn
       color={C_WHITE}
@@ -75,21 +74,24 @@ export const ExitBatchEditButton = (props: {
   </Box>
 )
 
-export type StepSelectionBannerProps = {|
-  countPerStepType: CountPerStepType,
-  handleExitBatchEdit: () => mixed,
-|}
+export interface StepSelectionBannerProps {
+  countPerStepType: CountPerStepType
+  handleExitBatchEdit: () => unknown
+}
 
 export const StepSelectionBannerComponent = (
   props: StepSelectionBannerProps
-): React.Node => {
+): JSX.Element => {
   const { countPerStepType, handleExitBatchEdit } = props
   const numSteps = Object.keys(countPerStepType).reduce<number>(
-    (acc, stepType) => acc + countPerStepType[stepType],
+    // @ts-expect-error(sa, 2021-6-23): refactor to use Object.entries to preserve type safety
+    (acc, stepType) => acc + countPerStepType[stepType as StepType],
     0
   )
 
-  const stepTypes: Array<StepType> = Object.keys(countPerStepType).sort()
+  const stepTypes: StepType[] = Object.keys(
+    countPerStepType
+  ).sort() as StepType[]
 
   return (
     <Box
@@ -122,6 +124,7 @@ export const StepSelectionBannerComponent = (
           >
             {stepTypes.map(stepType => (
               <StepPill
+                // @ts-expect-error(sa, 2021-6-23): refactor to use Object.entries to preserve type safety
                 count={countPerStepType[stepType]}
                 stepType={stepType}
                 key={stepType}

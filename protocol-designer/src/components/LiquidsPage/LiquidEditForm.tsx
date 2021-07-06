@@ -1,6 +1,5 @@
-// @flow
 import * as React from 'react'
-import { Formik } from 'formik'
+import { Formik, FormikProps } from 'formik'
 import * as Yup from 'yup'
 import { i18n } from '../../localization'
 import {
@@ -14,26 +13,23 @@ import {
 import styles from './LiquidEditForm.css'
 import formStyles from '../forms/forms.css'
 
-import type { FormikProps } from 'formik/@flow-typed'
-import type { LiquidGroup } from '../../labware-ingred/types'
+import { LiquidGroup } from '../../labware-ingred/types'
 
-type Props = {
-  ...$Exact<LiquidGroup>,
-  canDelete: boolean,
-  deleteLiquidGroup: () => mixed,
-  cancelForm: () => mixed,
-  saveForm: LiquidGroup => mixed,
+type Props = LiquidGroup & {
+  canDelete: boolean
+  deleteLiquidGroup: () => unknown
+  cancelForm: () => unknown
+  saveForm: (liquidGroup: LiquidGroup) => unknown
 }
 
-type LiquidEditFormValues = {
-  name: string,
-  description?: ?string,
-  serialize?: boolean,
-  ...
+interface LiquidEditFormValues {
+  name: string
+  description?: string | null
+  serialize?: boolean
+  [key: string]: unknown
 }
-
 export const liquidEditFormSchema: Yup.Schema<
-  {| name: string, description: string, serialize: boolean |},
+  { name: string; description: string; serialize: boolean } | undefined,
   any
 > = Yup.object().shape({
   name: Yup.string().required(
@@ -45,7 +41,7 @@ export const liquidEditFormSchema: Yup.Schema<
   serialize: Yup.boolean(),
 })
 
-export function LiquidEditForm(props: Props): React.Node {
+export function LiquidEditForm(props: Props): JSX.Element {
   const { deleteLiquidGroup, cancelForm, canDelete, saveForm } = props
 
   const initialValues: LiquidEditFormValues = {

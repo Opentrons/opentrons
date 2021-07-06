@@ -1,17 +1,14 @@
-// @flow
 import groupBy from 'lodash/groupBy'
 import {
   getLabwareDefURI,
   PD_DO_NOT_LIST,
-  type LabwareDefinition2,
+  LabwareDefinition2,
 } from '@opentrons/shared-data'
-import type { LabwareDefByDefURI } from './types'
+import { LabwareDefByDefURI } from './types'
 
 // TODO: Ian 2019-04-11 getAllDefinitions also exists (differently) in labware-library,
 // should reconcile differences & make a general util fn imported from shared-data
-
 // require all definitions in the labware/definitions/2 directory
-// $FlowFixMe: require.context is webpack-specific method
 const definitionsContext = require.context(
   '@opentrons/shared-data/labware/definitions/2',
   true, // traverse subdirectories
@@ -19,7 +16,7 @@ const definitionsContext = require.context(
   'sync' // load every definition into one synchronous chunk
 )
 
-let _definitions = null
+let _definitions: LabwareDefByDefURI | null = null
 export function getAllDefinitions(): LabwareDefByDefURI {
   // NOTE: unlike labware-library, no filtering out trashes here (we need 'em)
   // also, more convenient & performant to make a map {labwareDefURI: def} not an array
@@ -35,18 +32,15 @@ export function getAllDefinitions(): LabwareDefByDefURI {
 
   return _definitions
 }
-
 // filter out all but the latest version of each labware
 // NOTE: this is similar to labware-library's getOnlyLatestDefs, but this one
 // has the {labwareDefURI: def} shape, instead of an array of labware defs
-let _latestDefs = null
+let _latestDefs: LabwareDefByDefURI | null = null
 export function getOnlyLatestDefs(): LabwareDefByDefURI {
   if (!_latestDefs) {
     const allDefs = getAllDefinitions()
     const allURIs = Object.keys(allDefs)
-    const labwareDefGroups: {
-      [groupKey: string]: Array<LabwareDefinition2>,
-    } = groupBy(
+    const labwareDefGroups: Record<string, LabwareDefinition2[]> = groupBy(
       allURIs.map((uri: string) => allDefs[uri]),
       d => `${d.namespace}/${d.parameters.loadName}`
     )
@@ -65,11 +59,13 @@ export function getOnlyLatestDefs(): LabwareDefByDefURI {
       {}
     )
   }
+
   return _latestDefs
 }
-
 // NOTE: this is different than labware library,
 // in PD we wanna get always by labware URI (namespace/loadName/version) never by loadName
-export function _getSharedLabware(labwareDefURI: string): ?LabwareDefinition2 {
+export function _getSharedLabware(
+  labwareDefURI: string
+): LabwareDefinition2 | null | undefined {
   return getAllDefinitions()[labwareDefURI] || null
 }

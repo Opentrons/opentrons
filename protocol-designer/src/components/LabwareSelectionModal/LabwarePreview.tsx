@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import reduce from 'lodash/reduce'
 import {
@@ -10,21 +9,21 @@ import {
 import {
   getLabwareDisplayName,
   getLabwareDefIsStandard,
-  type LabwareDefinition2,
+  LabwareDefinition2,
 } from '@opentrons/shared-data'
 import { i18n } from '../../localization'
 import styles from './styles.css'
 
-type Props = {
-  labwareDef: ?LabwareDefinition2,
+interface Props {
+  labwareDef?: LabwareDefinition2 | null
   moduleCompatibility?:
     | 'recommended'
     | 'potentiallyCompatible'
     | 'notCompatible'
-    | null,
+    | null
 }
 
-export const LabwarePreview = (props: Props): React.Node => {
+export const LabwarePreview = (props: Props): JSX.Element | null => {
   const { labwareDef, moduleCompatibility } = props
   if (!labwareDef) return null
   const maxVolumes = reduce(

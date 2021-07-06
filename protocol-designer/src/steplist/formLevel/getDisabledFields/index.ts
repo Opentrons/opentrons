@@ -1,19 +1,22 @@
-// @flow
 import { defaultMemoize } from 'reselect'
 import { getDisabledFieldsMoveLiquidForm } from './getDisabledFieldsMoveLiquidForm'
 import { getDisabledFieldsMixForm } from './getDisabledFieldsMixForm'
-import type { FormData } from '../../../form-types'
+import { FormData } from '../../../form-types'
 
 function _getDisabledFields(rawForm: FormData): Set<string> {
   switch (rawForm.stepType) {
     case 'moveLiquid':
       return getDisabledFieldsMoveLiquidForm(rawForm)
+
     case 'mix':
       return getDisabledFieldsMixForm(rawForm)
+
     case 'pause':
     case 'magnet':
     case 'thermocycler':
-      return new Set() // nothing to disabled
+      return new Set()
+
+    // nothing to disabled
     default: {
       console.warn(
         `disabled fields for step type ${rawForm.stepType} not yet implemented!`

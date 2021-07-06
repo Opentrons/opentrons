@@ -1,10 +1,9 @@
-// @flow
 import * as React from 'react'
 import {
   FormGroup,
   CheckboxField,
   DropdownField,
-  type Options,
+  Options,
 } from '@opentrons/components'
 import { connect } from 'react-redux'
 import cx from 'classnames'
@@ -16,18 +15,17 @@ import { selectors as uiLabwareSelectors } from '../../../ui/labware'
 import { getBlowoutLocationOptionsForForm } from '../utils'
 import { TextField } from './TextField'
 
-import type { FieldProps, FieldPropsByName } from '../types'
-import type { PathOption, StepType } from '../../../form-types'
-import type { BaseState } from '../../../types'
+import { FieldProps, FieldPropsByName } from '../types'
+import { PathOption, StepType } from '../../../form-types'
+import { BaseState } from '../../../types'
 
 import styles from '../StepEditForm.css'
 
-type DropdownFormFieldProps = {|
-  ...FieldProps,
-  className?: string,
-  options: Options,
-|}
-const DropdownFormField = (props: DropdownFormFieldProps) => {
+interface DropdownFormFieldProps extends FieldProps {
+  className?: string
+  options: Options
+}
+const DropdownFormField = (props: DropdownFormFieldProps): JSX.Element => {
   return (
     <DropdownField
       options={props.options}
@@ -40,22 +38,22 @@ const DropdownFormField = (props: DropdownFormFieldProps) => {
   )
 }
 
-type SP = {|
-  disposalDestinationOptions: Options,
-  maxDisposalVolume: ?number,
-|}
-type OP = {|
-  aspirate_airGap_checkbox?: boolean | null,
-  aspirate_airGap_volume?: string | null,
-  path: PathOption,
-  pipette: string | null,
-  propsForFields: FieldPropsByName,
-  stepType: StepType,
-  volume: string | null,
-|}
-type Props = { ...SP, ...OP }
+interface SP {
+  disposalDestinationOptions: Options
+  maxDisposalVolume?: number | null
+}
+interface OP {
+  aspirate_airGap_checkbox?: boolean | null
+  aspirate_airGap_volume?: string | null
+  path: PathOption
+  pipette: string | null
+  propsForFields: FieldPropsByName
+  stepType: StepType
+  volume: string | null
+}
+type Props = SP & OP
 
-const DisposalVolumeFieldComponent = (props: Props) => {
+const DisposalVolumeFieldComponent = (props: Props): JSX.Element => {
   const { propsForFields } = props
 
   const { maxDisposalVolume } = props
@@ -81,6 +79,7 @@ const DisposalVolumeFieldComponent = (props: Props) => {
     <FormGroup label={i18n.t('form.step_edit_form.multiDispenseOptionsLabel')}>
       <>
         <div
+          // @ts-expect-error(sa, 2021-6-22): I think volumeBoundsCaption needs to be casted to a boolean to be fed into a class name
           className={cx(styles.checkbox_row, {
             [styles.captioned_field]: volumeBoundsCaption,
           })}
@@ -89,7 +88,7 @@ const DisposalVolumeFieldComponent = (props: Props) => {
             label="Disposal Volume"
             value={Boolean(value)}
             className={cx(styles.checkbox_field, styles.large_field)}
-            onChange={(e: SyntheticInputEvent<*>) => updateValue(!value)}
+            onChange={(e: React.ChangeEvent<any>) => updateValue(!value)}
           />
           {value ? volumeField : null}
         </div>
@@ -146,11 +145,4 @@ const mapSTP = (state: BaseState, ownProps: OP): SP => {
   }
 }
 
-export const DisposalVolumeField: React.AbstractComponent<OP> = connect<
-  Props,
-  OP,
-  SP,
-  _,
-  _,
-  _
->(mapSTP)(DisposalVolumeFieldComponent)
+export const DisposalVolumeField = connect(mapSTP)(DisposalVolumeFieldComponent)

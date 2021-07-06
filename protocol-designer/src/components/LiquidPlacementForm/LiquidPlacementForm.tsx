@@ -1,6 +1,5 @@
-// @flow
 import * as React from 'react'
-import { Formik } from 'formik'
+import { Formik, FormikProps } from 'formik'
 import * as Yup from 'yup'
 // TODO: Ian 2018-10-19 move the processors out of steplist (chore)
 import * as fieldProcessors from '../../steplist/fieldLevel/processing'
@@ -10,36 +9,34 @@ import {
   FormGroup,
   OutlineButton,
   PrimaryButton,
+  Options,
 } from '@opentrons/components'
 import { i18n } from '../../localization'
 import styles from './LiquidPlacementForm.css'
 import formStyles from '../forms/forms.css'
 import stepEditFormStyles from '../StepEditForm/StepEditForm.css'
 
-import type { Options } from '@opentrons/components'
-import type { FormikProps } from 'formik/@flow-typed'
+interface ValidFormValues {
+  selectedLiquidId: string
+  volume: string
+}
 
-type ValidFormValues = {|
-  selectedLiquidId: string,
-  volume: string,
-|}
+export interface LiquidPlacementFormValues {
+  selectedLiquidId?: string | null
+  volume?: string | null
+}
 
-export type LiquidPlacementFormValues = {|
-  selectedLiquidId: ?string,
-  volume: ?string,
-|}
+export interface Props {
+  commonSelectedLiquidId?: string | null
+  commonSelectedVolume?: number | null
+  liquidSelectionOptions: Options
+  selectedWellsMaxVolume: number
+  showForm: boolean
 
-type Props = {|
-  commonSelectedLiquidId: ?string,
-  commonSelectedVolume: ?number,
-  liquidSelectionOptions: Options,
-  selectedWellsMaxVolume: number,
-  showForm: boolean,
-
-  cancelForm: () => mixed,
-  clearWells: ?() => mixed,
-  saveForm: LiquidPlacementFormValues => mixed,
-|}
+  cancelForm: () => unknown
+  clearWells: (() => unknown | null) | null
+  saveForm: (liquidPlacementFormValues: LiquidPlacementFormValues) => unknown
+}
 
 export class LiquidPlacementForm extends React.Component<Props> {
   getInitialValues: () => ValidFormValues = () => {
@@ -51,10 +48,11 @@ export class LiquidPlacementForm extends React.Component<Props> {
   }
 
   getValidationSchema: () => Yup.Schema<
-    {|
-      selectedLiquidId: string,
-      volume: number,
-    |},
+    | {
+        selectedLiquidId: string
+        volume: number
+      }
+    | undefined,
     any
   > = () => {
     const { selectedWellsMaxVolume } = this.props
@@ -90,9 +88,9 @@ export class LiquidPlacementForm extends React.Component<Props> {
   }
 
   handleChangeVolume: (
-    setFieldValue: (fieldName: string, value: mixed) => mixed
-  ) => (e: SyntheticInputEvent<*>) => void = setFieldValue => e => {
-    const value: ?string = e.currentTarget.value
+    setFieldValue: (fieldName: string, value: unknown) => unknown
+  ) => (e: React.ChangeEvent<any>) => void = setFieldValue => e => {
+    const value: string | null | undefined = e.currentTarget.value
     const masked = fieldProcessors.composeMaskers(
       fieldProcessors.maskToFloat,
       fieldProcessors.onlyPositiveNumbers,
@@ -105,7 +103,7 @@ export class LiquidPlacementForm extends React.Component<Props> {
     this.props.saveForm(values)
   }
 
-  render(): React.Node {
+  render(): React.ReactNode | null {
     const { liquidSelectionOptions, showForm } = this.props
     if (!showForm) return null
     return (

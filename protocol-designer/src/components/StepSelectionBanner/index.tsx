@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useConditionalConfirm } from '@opentrons/components'
@@ -15,7 +14,7 @@ const MemoizedStepSelectionBannerComponent = React.memo(
   StepSelectionBannerComponent
 )
 
-export const StepSelectionBanner = (): React.Node => {
+export const StepSelectionBanner = (): JSX.Element => {
   const countPerStepType = useSelector(getCountPerStepType)
   const batchEditFormHasUnsavedChanges = useSelector(
     stepFormSelectors.getBatchEditFormHasUnsavedChanges

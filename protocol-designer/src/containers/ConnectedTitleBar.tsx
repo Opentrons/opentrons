@@ -1,9 +1,8 @@
-// @flow
 import * as React from 'react'
-import type { Dispatch } from 'redux'
+import { Dispatch } from 'redux'
 import { connect } from 'react-redux'
 
-import { TitleBar, Icon, type IconName } from '@opentrons/components'
+import { TitleBar, Icon, IconName, TitleBarProps } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 import styles from './TitleBar.css'
 import { i18n } from '../localization'
@@ -21,28 +20,28 @@ import { END_TERMINAL_ITEM_ID, START_TERMINAL_ITEM_ID } from '../steplist'
 import { selectors as fileDataSelectors } from '../file-data'
 import { closeIngredientSelector } from '../labware-ingred/actions'
 import { stepIconsByType } from '../form-types'
-import { selectors, type Page } from '../navigation'
+import { selectors, Page } from '../navigation'
 
-import type { TitleBarProps } from '@opentrons/components'
-import type { BaseState } from '../types'
+import { BaseState } from '../types'
 
-type Props = React.ElementProps<typeof TitleBar>
+type Props = React.ComponentProps<typeof TitleBar>
 
-type DP = {| onBackClick: $PropertyType<Props, 'onBackClick'> |}
-
-type SP = {|
-  ...$Diff<$Exact<Props>, DP>,
-  _page: Page,
-  _liquidPlacementMode?: boolean,
-  _wellSelectionMode?: boolean,
-|}
-
-type TitleWithIconProps = {
-  iconName?: ?IconName,
-  text?: ?string,
+interface DP {
+  onBackClick: Props['onBackClick']
 }
 
-function TitleWithIcon(props: TitleWithIconProps) {
+type SP = Omit<Props, keyof DP> & {
+  _page: Page
+  _liquidPlacementMode?: boolean
+  _wellSelectionMode?: boolean
+}
+
+interface TitleWithIconProps {
+  iconName: IconName | null | undefined
+  text: string | null | undefined
+}
+
+function TitleWithIcon(props: TitleWithIconProps): JSX.Element {
   const { iconName, text } = props
   return (
     <div>
@@ -52,9 +51,11 @@ function TitleWithIcon(props: TitleWithIconProps) {
   )
 }
 
-type TitleWithBetaTagProps = { text?: ?string }
+interface TitleWithBetaTagProps {
+  text: string | null | undefined
+}
 
-const TitleWithBetaTag = (props: TitleWithBetaTagProps) => (
+const TitleWithBetaTag = (props: TitleWithBetaTagProps): JSX.Element => (
   <div className={styles.title_wrapper}>
     <div className={styles.icon_inline_text}>{props.text}</div>
     <div className={styles.beta_tag}>{i18n.t('application.beta')}</div>
@@ -175,7 +176,7 @@ function mapStateToProps(state: BaseState): SP {
 
 function mergeProps(
   stateProps: SP,
-  dispatchProps: { dispatch: Dispatch<*> }
+  dispatchProps: { dispatch: Dispatch }
 ): Props {
   const {
     _page,
@@ -203,19 +204,13 @@ function mergeProps(
   }
 }
 
-const StickyTitleBar = (props: TitleBarProps) => (
+const StickyTitleBar = (props: TitleBarProps): JSX.Element => (
   <TitleBar id="TitleBar_main" {...props} className={styles.sticky_bar} />
 )
 
-export const ConnectedTitleBar: React.AbstractComponent<{||}> = connect<
-  Props,
-  {||},
-  SP,
-  {||},
-  _,
-  _
->(
+export const ConnectedTitleBar = connect(
   mapStateToProps,
+  // @ts-expect-error(sa, 2021-6-21): TODO: refactor to use hooks api
   null,
   mergeProps
 )(StickyTitleBar)
