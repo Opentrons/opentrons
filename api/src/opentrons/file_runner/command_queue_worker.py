@@ -17,7 +17,7 @@ class CommandQueueWorker:
             engine: The ProtocolEngine instance to run commands on.
         """
         self._engine = engine
-        self._done: asyncio.Future = loop.create_future()
+        self._done_signal: asyncio.Future = loop.create_future()
         self._running = False
         self._current_task: Optional[asyncio.Task] = None
 
@@ -54,7 +54,7 @@ class CommandQueueWorker:
         `CommandQueueWorker`, you should call this method to clean up and
         propogate errors.
         """
-        await self._done
+        await self._done_signal
 
     def _schedule_next_command(self, command_id: Optional[str] = None) -> None:
         if self._current_task is None and self._running is True:
@@ -75,8 +75,8 @@ class CommandQueueWorker:
         exc = task.exception() if task is not None else None
 
         if exc is not None:
-            self._done.set_exception(exc)
-        elif next_command_id is None:
-            self._done.set_result(None)
-        else:
+            self._done_signal.set_exception(exc)
+        elif next_command_id is None and not self._done_signal.done():
+            self._done_signal.set_result(None)
+        elif next_command_id is not None:
             self._schedule_next_command(next_command_id)
