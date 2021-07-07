@@ -125,8 +125,7 @@ class Location:
 
             >>> loc = Location(Point(1, 1, 1), None)
             >>> new_loc = loc.move(Point(1, 1, 1))
-            >>> assert loc_2.point == Point(2, 2, 2)  # True
-            >>> assert loc.point == Point(1, 1, 1)  # True
+            >>> assert new_loc.point == Point(2, 2, 2)  # True
 
         """
         return Location(point=self.point + point,
