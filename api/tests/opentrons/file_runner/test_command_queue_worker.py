@@ -85,6 +85,9 @@ async def test_pause(
     assert wait_for_done.done() is False
 
     subject.play()
+
+    # TODO(mc, 2021-07-07): this timeout may be a source of flakiness, and its
+    # necessity in this test is code smell
     await asyncio.wait_for(subject.wait_for_done(), timeout=0.1)
 
     decoy.verify(
@@ -102,6 +105,9 @@ async def test_play_no_commands(
     decoy.when(engine.state_view.commands.get_next_queued()).then_return(None)
 
     subject.play()
+
+    # TODO(mc, 2021-07-07): this timeout may be a source of flakiness, and its
+    # necessity in this test is code smell
     await asyncio.wait_for(subject.wait_for_done(), timeout=0.1)
 
     decoy.verify(
