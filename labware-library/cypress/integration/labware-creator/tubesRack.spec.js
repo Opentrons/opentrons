@@ -15,12 +15,12 @@ context('Tubes and Rack', () => {
         .first()
         .trigger('mousedown')
       cy.get('*[class^="Dropdown__option_label"]')
-        .contains('Tubes + Opentrons Tube Rack')
+        .contains('Tubes + Tube Rack')
         .click()
 
       // TODO(IL, 2021-05-15): give Dropdown component semantic selectors for E2E
       cy.get('label')
-        .contains('Which tube rack insert?')
+        .contains('Which tube rack?')
         .children()
         .first()
         .trigger('mousedown')
@@ -190,12 +190,12 @@ context('Tubes and Rack', () => {
         .first()
         .trigger('mousedown')
       cy.get('*[class^="Dropdown__option_label"]')
-        .contains('Tubes + Opentrons Tube Rack')
+        .contains('Tubes + Tube Rack')
         .click()
 
       // TODO(IL, 2021-05-15): give Dropdown component semantic selectors for E2E
       cy.get('label')
-        .contains('Which tube rack insert?')
+        .contains('Which tube rack?')
         .children()
         .first()
         .trigger('mousedown')
@@ -367,18 +367,16 @@ context('Tubes and Rack', () => {
         .first()
         .trigger('mousedown')
       cy.get('*[class^="Dropdown__option_label"]')
-        .contains('Tubes + Opentrons Tube Rack')
+        .contains('Tubes + Tube Rack')
         .click()
 
       // TODO(IL, 2021-05-15): give Dropdown component semantic selectors for E2E
       cy.get('label')
-        .contains('Which tube rack insert?')
+        .contains('Which tube rack?')
         .children()
         .first()
         .trigger('mousedown')
-      cy.get('*[class^="Dropdown__option_label"]')
-        .contains('24 tubes (snap cap)')
-        .click()
+      cy.get('*[class^="Dropdown__option_label"]').contains('24 tubes').click()
 
       cy.contains('start creating labware').click({ force: true })
     })

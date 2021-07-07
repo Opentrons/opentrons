@@ -9,6 +9,7 @@ import type {
   ModuleRealType,
   ModuleModel,
   PipetteNameSpecs,
+  PipetteName,
 } from '@opentrons/shared-data'
 import type {
   AtomicProfileStep,
@@ -87,7 +88,7 @@ export interface ModuleEntities {
 
 export interface NormalizedPipetteById {
   [pipetteId: string]: {
-    name: string
+    name: PipetteName
     id: string
     tiprackDefURI: string
   }
@@ -281,13 +282,13 @@ export interface AwaitTemperatureArgs {
 }
 
 export type EngageMagnetArgs = EngageMagnetParams & {
-  module: string | null
+  module: string
   commandCreatorFnName: 'engageMagnet'
   message?: string
 }
 
 export type DisengageMagnetArgs = ModuleOnlyParams & {
-  module: string | null
+  module: string
   commandCreatorFnName: 'disengageMagnet'
   message?: string
 }

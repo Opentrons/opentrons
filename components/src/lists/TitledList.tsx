@@ -87,7 +87,7 @@ export function TitledList(props: TitledListProps): JSX.Element {
     [styles.titled_list_selected]: !disabled && props.selected,
     [styles.hover_border]: !disabled && props.hovered,
   })
-
+  // @ts-expect-error(sa, 2021-6-23): cast value to boolean
   const titleBarClass = cx(styles.title_bar, {
     [styles.clickable]: props.onClick,
   })

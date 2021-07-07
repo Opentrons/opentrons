@@ -1,0 +1,40 @@
+import * as React from 'react'
+import cx from 'classnames'
+import { i18n } from '../../../localization'
+import { PDTitledList, PDListItem } from '../../lists'
+import { EditableTextField } from '../../EditableTextField'
+import styles from './labwareDetailsCard.css'
+
+export interface Props {
+  labwareDefDisplayName: string
+  nickname: string
+  renameLabware: (name: string) => unknown
+}
+
+export function LabwareDetailsCard(props: Props): JSX.Element {
+  return (
+    <PDTitledList title="labware details" iconName="flask-outline">
+      <PDListItem>
+        <div className={styles.row}>
+          <span className={cx(styles.label, styles.column_1_3)}>
+            {i18n.t('form.generic.labware_type')}
+          </span>
+          <span className={styles.column_2_3}>
+            {props.labwareDefDisplayName}
+          </span>
+        </div>
+      </PDListItem>
+      <PDListItem border>
+        <div className={styles.row}>
+          <span className={cx(styles.label, styles.column_1_3)}>
+            {i18n.t('form.generic.nickname')}
+          </span>
+          <EditableTextField
+            value={props.nickname}
+            saveEdit={props.renameLabware}
+          />
+        </div>
+      </PDListItem>
+    </PDTitledList>
+  )
+}

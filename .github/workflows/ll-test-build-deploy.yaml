@@ -23,6 +23,7 @@ on:
       - '*'
     tags:
       - 'labware-library*'
+  workflow_dispatch:
 
 defaults:
   run:

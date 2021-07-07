@@ -37,7 +37,7 @@ def test_create_json_runner(
     assert isinstance(result, JsonFileRunner)
 
 
-def test_create_python_runner(
+async def test_create_python_runner(
     protocol_engine: ProtocolEngine,
     python_protocol_file: Path,
 ) -> None:

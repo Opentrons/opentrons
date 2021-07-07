@@ -56,7 +56,7 @@ export type LabwareType =
 export const labwareTypeOptions: Options = [
   { name: 'Well Plate', value: 'wellPlate' },
   { name: 'Reservoir', value: 'reservoir' },
-  { name: 'Tubes + Opentrons Tube Rack', value: 'tubeRack' },
+  { name: 'Tubes + Tube Rack', value: 'tubeRack' },
   { name: 'Tubes / Plates + Opentrons Aluminum Block', value: 'aluminumBlock' },
   { name: 'Tip Rack', value: 'tipRack' },
 ]
@@ -182,25 +182,30 @@ export interface ProcessedLabwareFields {
 
 export const tubeRackInsertOptions: Options = [
   {
-    name: '6 tubes',
+    name: 'Opentrons 6 tubes',
     value: '6tubes',
     imgSrc: require('./images/6x50mL_insert_large.png'),
   },
   {
-    name: '15 tubes',
+    name: 'Opentrons 15 tubes',
     value: '15tubes',
     imgSrc: require('./images/15x15mL_insert_large.png'),
   },
   {
-    name: '24 tubes (snap cap)',
+    name: 'Opentrons 24 tubes',
     value: '24tubesSnapCap',
     imgSrc: require('./images/24x1_5mL_insert_large.png'),
   },
   {
-    name: '10 tubes (2 size)',
+    name: 'Opentrons 10 tubes',
     value: '10tubes',
     imgSrc: require('./images/6x15mL_and_4x50mL_insert_large.png'),
     disabled: true, // 6 + 4 tube rack not yet supported
+  },
+  {
+    name: 'Non-Opentrons tube rack',
+    value: 'customTubeRack',
+    imgSrc: require('./images/blank_insert_large.png'),
   },
 ]
 
@@ -244,6 +249,7 @@ export const tubeRackAutofills: {
     gridOffsetX: '13.88',
     gridOffsetY: '17.74',
   },
+  customTubeRack: {}, // not an insert, no autofills
 }
 
 // NOTE: these images are from labware-library, not labware creator's local images dir
@@ -383,7 +389,7 @@ export const getDefaultFormState = (): LabwareFields => ({
 
 export const LABELS: Record<keyof LabwareFields, string> = {
   labwareType: 'What type of labware are you creating?',
-  tubeRackInsertLoadName: 'Which tube rack insert?',
+  tubeRackInsertLoadName: 'Which tube rack?',
   aluminumBlockType: 'Which aluminum block?',
   aluminumBlockChildType: 'What labware is on top of your aluminum block?',
   handPlacedTipFit: 'Fit',
