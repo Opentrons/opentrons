@@ -3,7 +3,7 @@ import { Field } from 'formik'
 import { InputField } from '@opentrons/components'
 import { reportFieldEdit } from '../analyticsUtils'
 import { getIsHidden } from '../formSelectors'
-import { LABELS } from '../fields'
+import { getLabel } from '../fields'
 import type { InputFieldProps } from '@opentrons/components'
 import type { LabwareFields } from '../fields'
 import type { FieldProps } from 'formik'
@@ -22,7 +22,7 @@ interface Props {
 // because sections are laid out to contain groups of autofilled fields.
 // This functionality in TextField may be removed if we clearly don't need it.
 export const TextField = (props: Props): JSX.Element => {
-  const { label, caption, name, placeholder, units } = props
+  const { label, caption, placeholder, units } = props
   const inputMasks = props.inputMasks || []
   // @ts-expect-error(IL, 2021-03-24): formik types need cleanup w LabwareFields
   const makeHandleChange = ({ field, form }) => (
@@ -36,7 +36,6 @@ export const TextField = (props: Props): JSX.Element => {
     )
     form.setFieldValue(props.name, nextValue)
   }
-  const fieldLabel = label !== undefined ? label : LABELS[name]
 
   return (
     <Field name={props.name}>
@@ -44,7 +43,7 @@ export const TextField = (props: Props): JSX.Element => {
         getIsHidden(props.name, form.values) ? null : (
           <div className={fieldStyles.field_wrapper}>
             <label className={fieldStyles.field_label}>
-              {fieldLabel}
+              {label !== undefined ? label : getLabel(props.name, form.values)}
               <InputField
                 name={field.name}
                 value={field.value}

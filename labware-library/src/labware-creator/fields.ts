@@ -1,4 +1,5 @@
 import type { WellBottomShape } from '@opentrons/shared-data'
+import { getLabwareName } from './utils'
 
 export const MAX_X_DIMENSION = 129
 export const MIN_X_DIMENSION = 127
@@ -411,4 +412,17 @@ export const LABELS: Record<keyof LabwareFields, string> = {
   displayName: 'Display Name',
   loadName: 'API Load Name',
   pipetteName: 'Test Pipette',
+}
+
+export const getLabel = (
+  name: keyof LabwareFields,
+  values: LabwareFields
+): string => {
+  if (name === 'homogeneousWells') {
+    return `Are all your ${getLabwareName(
+      values,
+      true
+    )} the same shape and size?`
+  }
+  return LABELS[name]
 }

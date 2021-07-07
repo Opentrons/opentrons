@@ -2,13 +2,13 @@ import * as React from 'react'
 import { SelectField } from '@opentrons/components'
 import { Field } from 'formik'
 import { reportFieldEdit } from '../analyticsUtils'
-import { LABELS } from '../fields'
+import { getLabel, LabwareFields } from '../fields'
 import type { Option, Options } from '../fields'
 import fieldStyles from './fieldStyles.css'
 import styles from './Dropdown.css'
 
 export interface DropdownProps {
-  name: keyof typeof LABELS
+  name: keyof LabwareFields
   options: Options
   caption?: string
   /** optionally override the default onValueChange */
@@ -17,7 +17,9 @@ export interface DropdownProps {
 
 export const OptionLabel = (props: Option): JSX.Element => (
   <div className={styles.option_row}>
-    {props.imgSrc && <img className={styles.option_image} src={props.imgSrc} />}
+    {props.imgSrc != null && (
+      <img className={styles.option_image} src={props.imgSrc} />
+    )}
     <div className={styles.option_label}>{props.name}</div>
   </div>
 )
@@ -35,28 +37,30 @@ export const Dropdown = (props: DropdownProps): JSX.Element => {
   return (
     <div className={fieldStyles.field_wrapper}>
       <label className={fieldStyles.field_label}>
-        {LABELS[props.name]}
         <Field name={props.name}>
           {/* @ts-expect-error(IL, 2021-03-24): formik types need cleanup w LabwareFields */}
           {({ field, form }) => (
-            <SelectField
-              name={field.name}
-              caption={props.caption}
-              value={field.value}
-              options={options}
-              onLoseFocus={name => {
-                reportFieldEdit({ value: field.value, name })
-                form.setFieldTouched(name)
-              }}
-              onValueChange={
-                props.onValueChange ||
-                ((name, value) => form.setFieldValue(name, value))
-              }
-              formatOptionLabel={({ value, label }) => {
-                const option = props.options.find(opt => opt.value === value)
-                return option ? <OptionLabel {...option} /> : null
-              }}
-            />
+            <>
+              {getLabel(field.name, form.values)}
+              <SelectField
+                name={field.name}
+                caption={props.caption}
+                value={field.value}
+                options={options}
+                onLoseFocus={name => {
+                  reportFieldEdit({ value: field.value, name })
+                  form.setFieldTouched(name)
+                }}
+                onValueChange={
+                  props.onValueChange ||
+                  ((name, value) => form.setFieldValue(name, value))
+                }
+                formatOptionLabel={({ value, label }) => {
+                  const option = props.options.find(opt => opt.value === value)
+                  return option ? <OptionLabel {...option} /> : null
+                }}
+              />
+            </>
           )}
         </Field>
       </label>
