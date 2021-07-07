@@ -1,7 +1,7 @@
 import * as React from 'react'
+import capitalize from 'lodash/capitalize'
 import { useFormikContext } from 'formik'
 import { makeMaskToDecimal } from '../../fieldMasks'
-import { displayAsTube } from '../../utils'
 import { LabwareFields } from '../../fields'
 import { FormAlerts } from '../alerts/FormAlerts'
 import { TextField } from '../TextField'
@@ -11,6 +11,7 @@ import { SectionBody } from './SectionBody'
 import { wellBottomShapeOptionsWithIcons } from '../optionsWithImages'
 
 import styles from '../../styles.css'
+import { getLabwareName } from '../../utils'
 
 const maskTo2Decimal = makeMaskToDecimal(2)
 
@@ -24,18 +25,18 @@ const Instructions = (props: Props): JSX.Element => {
   if (values.labwareType === 'tipRack') {
     return <p>Reference the top of the tip to the bottom of the tip.</p>
   }
+
+  const labwareName = getLabwareName(values, false)
   return (
     <>
       <p>
-        Reference the measurement from the top of the{' '}
-        {displayAsTube(values) ? 'tube' : 'well'} (include any lip but exclude
-        any cap) to the bottom of the <strong>inside</strong> of the{' '}
-        {displayAsTube(values) ? 'tube' : 'well'}.
+        Reference the measurement from the top of the {labwareName} (include any
+        lip but exclude any cap) to the bottom of the <strong>inside</strong> of
+        the {labwareName}.
       </p>
 
       <p>
-        Depth informs the robot how far down it can go inside a{' '}
-        {displayAsTube(values) ? 'tube' : 'well'}.
+        Depth informs the robot how far down it can go inside a {labwareName}.
       </p>
     </>
   )
@@ -75,7 +76,9 @@ export const WellBottomAndDepth = (): JSX.Element | null => {
   const fieldList: Array<keyof LabwareFields> = ['wellBottomShape', 'wellDepth']
   const { values, errors, touched } = useFormikContext<LabwareFields>()
   const label =
-    values.labwareType === 'tipRack' ? 'Tip Length' : 'Well Bottom & Depth'
+    values.labwareType === 'tipRack'
+      ? 'Tip Length'
+      : `${capitalize(getLabwareName(values, false))} Bottom & Depth`
   return (
     <div className={styles.new_definition_section}>
       <SectionBody label={label} id="WellBottomAndDepth">
