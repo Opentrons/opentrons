@@ -1,4 +1,4 @@
-"""Router for /sessions endpoints."""
+"""Router for /sessions commands endpoints."""
 from fastapi import APIRouter, Depends, status
 from typing import Union
 from typing_extensions import Literal
