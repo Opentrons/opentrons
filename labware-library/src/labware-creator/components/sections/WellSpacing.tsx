@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useFormikContext } from 'formik'
+import capitalize from 'lodash/capitalize'
 import { makeMaskToDecimal } from '../../fieldMasks'
 import { isEveryFieldHidden, getLabwareName } from '../../utils'
 import { LabwareFields } from '../../fields'
@@ -71,14 +72,12 @@ export const WellSpacing = (): JSX.Element | null => {
   const { values, errors, touched } = useFormikContext<LabwareFields>()
   if (
     isEveryFieldHidden(fieldList, values) ||
-    (values.labwareType != null &&
-      ['aluminumBlock', 'tubeRack'].includes(values.labwareType))
+    values.labwareType === 'aluminumBlock'
   ) {
     return null
   }
-  // TODO (ka 2021-6-10): This will need getLabwareName once we introduce custom tuberacks
-  const label =
-    values.labwareType === 'tipRack' ? 'Tip Spacing' : 'Well Spacing'
+
+  const label = `${capitalize(getLabwareName(values, false))} Spacing`
   return (
     <div className={styles.new_definition_section}>
       <SectionBody label={label} id="WellSpacing">
