@@ -17,7 +17,6 @@ from .abstract_emulator import AbstractEmulator
 from .settings import SmoothieSettings
 
 logger = logging.getLogger(__name__)
-g_code_logger = logging.getLogger('emulation')
 
 
 class SmoothieEmulator(AbstractEmulator):
@@ -138,7 +137,6 @@ class SmoothieEmulator(AbstractEmulator):
     def _handle(self, command: Command) -> Optional[str]:
         """Handle a command."""
         logger.info(f"Got command {command}")
-        self._write_g_code(command)
         func_to_run = self._gcode_to_function_mapping.get(command.gcode)
         return None if func_to_run is None else func_to_run(command)
 
@@ -162,6 +160,3 @@ class SmoothieEmulator(AbstractEmulator):
         result = {p['mount']: p['value'] for p in pars}
         assert result, f"missing mount values '{command.body}'"
         return result
-
-    def _write_g_code(self, command: Command):
-        g_code_logger.debug(f'{command.gcode} {command.body}')
