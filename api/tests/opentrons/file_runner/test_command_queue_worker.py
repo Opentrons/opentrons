@@ -85,7 +85,7 @@ async def test_pause(
     assert wait_for_done.done() is False
 
     subject.play()
-    await asyncio.wait_for(subject.wait_for_done(), timeout=0.001)
+    await asyncio.wait_for(subject.wait_for_done(), timeout=0.01)
 
     decoy.verify(
         await engine.execute_command_by_id(command_id="command-id-2"),
@@ -102,7 +102,7 @@ async def test_play_no_commands(
     decoy.when(engine.state_view.commands.get_next_queued()).then_return(None)
 
     subject.play()
-    await asyncio.wait_for(subject.wait_for_done(), timeout=0.001)
+    await asyncio.wait_for(subject.wait_for_done(), timeout=0.01)
 
     decoy.verify(
         await engine.execute_command_by_id(command_id=matchers.Anything()),
