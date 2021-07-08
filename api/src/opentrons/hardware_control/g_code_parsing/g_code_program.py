@@ -72,15 +72,9 @@ class GCodeProgram:
         g_codes = []
         for watcher_data in watcher.get_command_list():
             device = cls.get_device(watcher_data.serial_connection)
-            g_codes.extend([
-                GCode(
-                    watcher_data.date,
-                    device,
-                    g_code.gcode,
-                    g_code.params
-                )
-                for g_code in Parser().parse(watcher_data.raw_g_code)
-            ])
+            g_codes.extend(
+                GCode.from_raw_code(watcher_data.raw_g_code, watcher_data.date, device)
+            )
         return cls(g_codes)
 
     def __init__(self, g_codes: List[GCode]):

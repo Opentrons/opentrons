@@ -1,16 +1,23 @@
+from __future__ import annotations
 from .errors import UnparsableGCodeError
 from opentrons.drivers.smoothie_drivers.driver_3_0 import GCODE as SMOOTHIE_GCODE
 from opentrons.hardware_control.g_code_parsing.utils import reverse_enum
-from .g_code_functionality_defs.home_g_code_functionality_def import \
-    HomeGCodeFunctionalityDef
-from .g_code_functionality_defs.move_g_code_functionality_def import \
-    MoveGCodeFunctionalityDef
-from .g_code_functionality_defs.set_current_g_code_functionality_def import \
-    SetCurrentGCodeFunctionalityDef
-from .g_code_functionality_defs.set_speed_g_code_functionality_def import \
-    SetSpeedGCodeFunctionalityDef
-from .g_code_functionality_defs.wait_g_code_functionality_def import \
-    WaitGCodeFunctionalityDef
+from opentrons.hardware_control.emulation.parser import Parser
+from opentrons.hardware_control.g_code_parsing.g_code_functionality_defs.\
+    g_code_functionality_def_base import Explanation
+from .g_code_functionality_defs import (
+    CurrentPositionCodeFunctionalityDef,
+    DwellGCodeFunctionalityDef,
+    HomeGCodeFunctionalityDef,
+    LimitSwitchStatusGCodeFunctionalityDef,
+    MoveGCodeFunctionalityDef,
+    SetCurrentGCodeFunctionalityDef,
+    SetSpeedGCodeFunctionalityDef,
+    WaitGCodeFunctionalityDef,
+    ProbeGCodeFunctionalityDef,
+    AbsoluteCoordinateModeGCodeFunctionalityDef,
+    RelativeCoordinateModeGCodeFunctionalityDef
+)
 
 
 class GCode:
@@ -26,7 +33,16 @@ class GCode:
         'SET_SPEED': SetSpeedGCodeFunctionalityDef,
         SMOOTHIE_GCODE.WAIT.name: WaitGCodeFunctionalityDef,
         SMOOTHIE_GCODE.HOME.name: HomeGCodeFunctionalityDef,
-        SMOOTHIE_GCODE.SET_CURRENT.name: SetCurrentGCodeFunctionalityDef
+        SMOOTHIE_GCODE.SET_CURRENT.name: SetCurrentGCodeFunctionalityDef,
+        SMOOTHIE_GCODE.DWELL.name: DwellGCodeFunctionalityDef,
+        SMOOTHIE_GCODE.CURRENT_POSITION.name: CurrentPositionCodeFunctionalityDef,
+        SMOOTHIE_GCODE.LIMIT_SWITCH_STATUS.name: LimitSwitchStatusGCodeFunctionalityDef,
+        SMOOTHIE_GCODE.PROBE.name: ProbeGCodeFunctionalityDef,
+        SMOOTHIE_GCODE.ABSOLUTE_COORDS.name: \
+        AbsoluteCoordinateModeGCodeFunctionalityDef,
+        SMOOTHIE_GCODE.RELATIVE_COORDS.name: \
+        RelativeCoordinateModeGCodeFunctionalityDef
+
     }
 
     # Smoothie G-Code Parsing Characters
@@ -41,6 +57,19 @@ class GCode:
     DEVICE_GCODE_LOOKUP = {
         SMOOTHIE_IDENT: SMOOTHIE_GCODE_LOOKUP
     }
+
+    @classmethod
+    def from_raw_code(cls, raw_code: str, date: float, device: str) -> GCode:
+        return [
+            cls(
+                date,
+                device,
+                g_code.gcode,
+                g_code.params
+            )
+            for g_code
+            in Parser().parse(raw_code)
+        ]
 
     def __init__(
             self,
@@ -144,9 +173,9 @@ class GCode:
 
         return g_code_function
 
-    def get_explanation_dict(self):
+    def get_explanation(self) -> Explanation:
         explanation_class = self.G_CODE_EXPLANATION_MAPPING[self.get_gcode_function()]
-        return explanation_class.generate_explanation_dict(
+        return explanation_class.generate_explanation(
             self.g_code,
             self.get_gcode_function(),
             self.g_code_args
