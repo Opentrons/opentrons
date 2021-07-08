@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useFormikContext } from 'formik'
 import { makeMaskToDecimal } from '../../fieldMasks'
-import { isEveryFieldHidden, displayAsTube } from '../../utils'
+import { isEveryFieldHidden, getLabwareName } from '../../utils'
 import { LabwareFields } from '../../fields'
 import { FormAlerts } from '../alerts/FormAlerts'
 import { TextField } from '../TextField'
@@ -18,16 +18,12 @@ interface Props {
 
 const Instructions = (props: Props): JSX.Element => {
   const { values } = props
-  let labwareTypeLocation = 'well A1'
-  // NOTE (ka 2021-6-8): this case is not needed till custom tuberacks but adding logic/text in here
-  // This section is hidden with opentrons tubracks/alumn blocks at the moment since we know the grid offset already
-  if (displayAsTube(values)) {
-    labwareTypeLocation = 'tube A1'
-  } else if (values.labwareType === 'reservoir') {
+  let labwareTypeLocation = `${getLabwareName(values, false)} A1`
+
+  if (values.labwareType === 'reservoir') {
     labwareTypeLocation = 'the top left-most well'
-  } else if (values.labwareType === 'tipRack') {
-    labwareTypeLocation = 'tip A1'
   }
+
   return (
     <>
       <p>
@@ -37,9 +33,7 @@ const Instructions = (props: Props): JSX.Element => {
       </p>
       <p>
         Corner offset informs the robot how far the grid of{' '}
-        {/* TODO (ka 2021-6-8): Use Sarah's incoming helper function once custom tuberacks is implemented */}
-        {values.labwareType === 'tipRack' ? 'tips' : 'wells'} is from the slot
-        {"'"}s top left corner.
+        {getLabwareName(values, true)} is from the slot{"'"}s top left corner.
       </p>
       <div className={styles.help_text}>
         <XYOffsetHelperTextImg labwareType={values.labwareType} />
@@ -82,8 +76,7 @@ export const GridOffset = (): JSX.Element | null => {
   const { values, errors, touched } = useFormikContext<LabwareFields>()
   if (
     isEveryFieldHidden(fieldList, values) ||
-    (values.labwareType != null &&
-      ['aluminumBlock', 'tubeRack'].includes(values.labwareType))
+    (values.labwareType != null && values.labwareType === 'aluminumBlock')
   ) {
     return null
   }
