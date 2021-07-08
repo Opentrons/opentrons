@@ -133,8 +133,7 @@ export const WellSelectionModal = (
   const pipette = pipetteId != null ? pipetteEntities[pipetteId] : null
 
   const initialSelectedPrimaryWells = Array.isArray(wellFieldData)
-    ? // $FlowFixMe(IL, 2021-03-22): FormData values are poorly typed, address in #3161
-      arrayToWellGroup(wellFieldData)
+    ? arrayToWellGroup(wellFieldData)
     : {}
 
   // component state

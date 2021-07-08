@@ -1403,9 +1403,7 @@ export const rootReducer: Reducer<RootState, any> = nestedCombineReducers(
     ),
     labwareDefs: labwareDefsRootReducer(prevStateFallback.labwareDefs, action),
     // 'forms' reducers get full rootReducer state
-    // $FlowFixMe TODO(IL, 2020-06-08): savedStepForms should be typed as `Reducer` (which makes state: RootState | undefined)
     savedStepForms: savedStepForms(state, action),
-    // $FlowFixMe TODO(IL, 2020-06-08): unsavedForm should be typed as `Reducer` (which makes state: RootState | undefined)
     unsavedForm: unsavedForm(state, action),
     presavedStepForm: presavedStepForm(
       prevStateFallback.presavedStepForm,

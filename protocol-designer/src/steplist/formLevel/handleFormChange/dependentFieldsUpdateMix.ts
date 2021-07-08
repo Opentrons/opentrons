@@ -23,7 +23,6 @@ const updatePatchOnLabwareChange = (
 ): FormPatch => {
   const labwareChanged = fieldHasChanged(rawForm, patch, 'labware')
   if (!labwareChanged) return patch
-  // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
   const appliedPatch = { ...rawForm, ...patch }
   const pipetteId = appliedPatch.pipette
   return {
@@ -53,7 +52,6 @@ const updatePatchOnPipetteChannelChange = (
     typeof patch.pipette === 'string'
       ? getChannels(patch.pipette, pipetteEntities)
       : null
-  // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
   const appliedPatch = { ...rawForm, ...patch }
   const singleToMulti = prevChannels === 1 && nextChannels === 8
   const multiToSingle = prevChannels === 8 && nextChannels === 1
