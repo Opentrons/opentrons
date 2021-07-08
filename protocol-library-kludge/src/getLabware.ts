@@ -1,4 +1,3 @@
-// @flow
 // HACK: IL 2019-11-25 this file is copied from Run App
 import groupBy from 'lodash/groupBy'
 import type {
@@ -7,15 +6,14 @@ import type {
 } from '@opentrons/shared-data'
 
 // require all definitions in the labware/definitions/1 directory
-// require.context is webpack-specific method
-const labwareSchemaV1DefsContext = (require: any).context(
+const labwareSchemaV1DefsContext = require.context(
   '@opentrons/shared-data/labware/definitions/1',
   true, // traverse subdirectories
   /\.json$/, // import filter
   'sync' // load every definition into one synchronous chunk
 )
-let labwareSchemaV1Defs: $ReadOnlyArray<LabwareDefinition1> | null = null
-function getLegacyLabwareDefs(): $ReadOnlyArray<LabwareDefinition1> {
+let labwareSchemaV1Defs: Readonly<LabwareDefinition1[]> | null = null
+function getLegacyLabwareDefs(): Readonly<LabwareDefinition1[]> {
   if (!labwareSchemaV1Defs) {
     labwareSchemaV1Defs = labwareSchemaV1DefsContext
       .keys()
@@ -26,23 +24,22 @@ function getLegacyLabwareDefs(): $ReadOnlyArray<LabwareDefinition1> {
 }
 
 export function getLegacyLabwareDef(
-  loadName: ?string
+  loadName: string | null | undefined
 ): LabwareDefinition1 | null {
   const def = getLegacyLabwareDefs().find(d => d.metadata.name === loadName)
   return def || null
 }
 
 // require all definitions in the labware/definitions/2 directory
-// require.context is webpack-specific method
-const labwareSchemaV2DefsContext = (require: any).context(
+const labwareSchemaV2DefsContext = require.context(
   '@opentrons/shared-data/labware/definitions/2',
   true, // traverse subdirectories
   /\.json$/, // import filter
   'sync' // load every definition into one synchronous chunk
 )
 
-let labwareSchemaV2Defs: $ReadOnlyArray<LabwareDefinition2> | null = null
-function getLatestLabwareDefs(): $ReadOnlyArray<LabwareDefinition2> {
+let labwareSchemaV2Defs: Readonly<LabwareDefinition2[]> | null = null
+function getLatestLabwareDefs(): Readonly<LabwareDefinition2[]> {
   // NOTE: unlike labware-library, no filtering out "do not list labware"
   // also, more convenient & performant to make a map {loadName: def} not an array
   if (!labwareSchemaV2Defs) {
@@ -51,7 +48,7 @@ function getLatestLabwareDefs(): $ReadOnlyArray<LabwareDefinition2> {
       .map(name => labwareSchemaV2DefsContext(name))
     // group by namespace + loadName
     const labwareDefGroups: {
-      [groupKey: string]: Array<LabwareDefinition2>,
+      [groupKey: string]: LabwareDefinition2[]
     } = groupBy(allDefs, d => `${d.namespace}/${d.parameters.loadName}`)
 
     labwareSchemaV2Defs = Object.keys(labwareDefGroups).map(
@@ -69,7 +66,7 @@ function getLatestLabwareDefs(): $ReadOnlyArray<LabwareDefinition2> {
 }
 
 export function getLatestLabwareDef(
-  loadName: ?string
+  loadName: string | null | undefined
 ): LabwareDefinition2 | null {
   const def = getLatestLabwareDefs().find(
     d => d.parameters.loadName === loadName

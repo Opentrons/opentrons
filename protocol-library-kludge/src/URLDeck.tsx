@@ -1,4 +1,3 @@
-// @flow
 import * as React from 'react'
 import styles from './URLDeck.css'
 
@@ -16,16 +15,16 @@ import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefini
 import type { ModuleModel, DeckSlotId } from '@opentrons/shared-data'
 
 // URI-encoded JSON expected as URL param "data" (eg `?data=...`)
-type UrlData = {
-  labware: {
-    [DeckSlotId]: {
-      labwareType: string,
-      name: ?string,
-    },
-  },
-  modules: {
-    [DeckSlotId]: ModuleModel,
-  },
+
+interface UrlData {
+  labware: Record<
+    DeckSlotId,
+    {
+      labwareType: string
+      name: string | null | undefined
+    }
+  >
+  modules: Record<DeckSlotId, ModuleModel>
 }
 
 const DECK_DEF = getDeckDefinitions()['ot2_standard']
@@ -40,7 +39,7 @@ const DECK_LAYER_BLOCKLIST = [
   'screwHoles',
 ]
 
-function getDataFromUrl(): ?UrlData {
+function getDataFromUrl(): UrlData | null {
   try {
     const urlData = new URLSearchParams(window.location.search).get('data')
 
@@ -56,15 +55,16 @@ function getDataFromUrl(): ?UrlData {
   }
 }
 
-export class URLDeck extends React.Component<{||}> {
-  urlData: ?UrlData
+export class URLDeck extends React.Component<{}> {
+  urlData: UrlData | null
 
   constructor() {
+    // @ts-expect-error(sa, 2021-7-8): call super with props
     super()
     this.urlData = getDataFromUrl()
   }
 
-  render(): React.Node {
+  render(): JSX.Element {
     const labwareBySlot = this.urlData?.labware
     const modulesBySlot = this.urlData?.modules
 
@@ -75,8 +75,8 @@ export class URLDeck extends React.Component<{||}> {
         viewBox={`-35 -35 ${488} ${390}`} // TODO: put these in variables
         className={styles.url_deck}
       >
-        {({ deckSlotsById }): Array<React.Node> =>
-          Object.keys(deckSlotsById).map((slotId): React.Node => {
+        {({ deckSlotsById }): Array<JSX.Element | null> =>
+          Object.keys(deckSlotsById).map((slotId): JSX.Element | null => {
             const slot = deckSlotsById[slotId]
             if (!slot.matingSurfaceUnitVector) return null // if slot has no mating surface, don't render anything in it
             const moduleModel = modulesBySlot && modulesBySlot[slotId]
@@ -113,8 +113,8 @@ export class URLDeck extends React.Component<{||}> {
                     {labwareDefV2 ? (
                       <LabwareRender definition={labwareDefV2} />
                     ) : (
-                      /* $FlowFixMe(mc, 2021-03-18): LegacyLabwareRender does not take x and y props */
                       <LegacyLabwareRender
+                        /* @ts-expect-error(mc, 2021-03-18): LegacyLabwareRender does not take x and y props */
                         x={0}
                         y={0}
                         definition={labwareDefV1}
