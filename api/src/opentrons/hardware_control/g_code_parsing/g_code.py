@@ -16,7 +16,11 @@ from .g_code_functionality_defs import (
     WaitGCodeFunctionalityDef,
     ProbeGCodeFunctionalityDef,
     AbsoluteCoordinateModeGCodeFunctionalityDef,
-    RelativeCoordinateModeGCodeFunctionalityDef
+    RelativeCoordinateModeGCodeFunctionalityDef,
+    ResetFromErrorGCodeFunctionalityDef,
+    PushSpeedGCodeFunctionalityDef,
+    PopSpeedGCodeFunctionalityDef,
+    StepsPerMMGCodeFunctionalityDef,
 )
 
 
@@ -41,7 +45,11 @@ class GCode:
         SMOOTHIE_GCODE.ABSOLUTE_COORDS.name: \
         AbsoluteCoordinateModeGCodeFunctionalityDef,
         SMOOTHIE_GCODE.RELATIVE_COORDS.name: \
-        RelativeCoordinateModeGCodeFunctionalityDef
+        RelativeCoordinateModeGCodeFunctionalityDef,
+        SMOOTHIE_GCODE.RESET_FROM_ERROR.name: ResetFromErrorGCodeFunctionalityDef,
+        SMOOTHIE_GCODE.PUSH_SPEED.name: PushSpeedGCodeFunctionalityDef,
+        SMOOTHIE_GCODE.POP_SPEED.name: PopSpeedGCodeFunctionalityDef,
+        SMOOTHIE_GCODE.STEPS_PER_MM.name: StepsPerMMGCodeFunctionalityDef,
 
     }
 
