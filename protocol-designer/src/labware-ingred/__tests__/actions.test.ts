@@ -168,10 +168,7 @@ describe('createContainer', () => {
       },
     ]
 
-    store.dispatch(
-      // $FlowFixMe(IL. 2020-11-13): flow hates thunks
-      createContainer({ labwareDefURI: 'someLabwareDefURI' })
-    )
+    store.dispatch(createContainer({ labwareDefURI: 'someLabwareDefURI' }))
     expect(store.getActions()).toEqual(expectedActions)
   })
 
@@ -197,10 +194,7 @@ describe('createContainer', () => {
 
     const expectedActions: any[] = []
 
-    store.dispatch(
-      // $FlowFixMe(IL. 2020-11-13): flow hates thunks
-      createContainer({ labwareDefURI: 'someLabwareDefURI' })
-    )
+    store.dispatch(createContainer({ labwareDefURI: 'someLabwareDefURI' }))
     expect(store.getActions()).toEqual(expectedActions)
   })
 
