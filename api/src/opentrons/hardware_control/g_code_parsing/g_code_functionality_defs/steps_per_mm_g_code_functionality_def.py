@@ -1,6 +1,5 @@
 from typing import Dict
 from string import Template
-from enum import Enum
 from .g_code_functionality_def_base import GCodeFunctionalityDefBase
 
 

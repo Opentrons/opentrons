@@ -406,7 +406,7 @@ def explanations() -> List[Explanation]:
                                 ' mm:'
                                 '\n\tX-Axis 200.0 steps per mm'
                                 '\n\tY-Axis 1000.0 steps per mm'
-                                '\n\tZ-Axis 100.0 steps per mm'                                
+                                '\n\tZ-Axis 100.0 steps per mm'
                                 '\n\tA-Axis 10.0 steps per mm'
                                 '\n\tB-Axis 10.0 steps per mm'
                                 '\n\tC-Axis 10.0 steps per mm'

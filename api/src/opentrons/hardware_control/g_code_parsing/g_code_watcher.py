@@ -11,6 +11,7 @@ class WatcherData:
     raw_g_code: str
     serial_connection: Serial
     date: float
+    response: str
 
 
 class GCodeWatcher:
@@ -39,7 +40,8 @@ class GCodeWatcher:
             WatcherData(
                 raw_g_code=args[0],
                 serial_connection=args[2],
-                date=time()
+                date=time(),
+                response=self._mock.return_value
             )
         )
         return DEFAULT

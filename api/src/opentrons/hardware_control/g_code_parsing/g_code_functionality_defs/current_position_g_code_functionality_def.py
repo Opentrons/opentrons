@@ -6,4 +6,4 @@ class CurrentPositionCodeFunctionalityDef(GCodeFunctionalityDefBase):
 
     @classmethod
     def _generate_command_explanation(cls, g_code_args: Dict[str, str]) -> str:
-        return f'CURRENT POSITION:\n\tGetting current position for all axes'
+        return 'CURRENT POSITION:\n\tGetting current position for all axes'
