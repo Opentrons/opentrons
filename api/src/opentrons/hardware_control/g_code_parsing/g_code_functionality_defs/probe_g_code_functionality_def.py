@@ -2,7 +2,7 @@ from typing import Dict
 from .g_code_functionality_def_base import GCodeFunctionalityDefBase
 
 
-class HomeGCodeFunctionalityDef(GCodeFunctionalityDefBase):
+class ProbeGCodeFunctionalityDef(GCodeFunctionalityDefBase):
     EXPECTED_ARGS = ['X', 'Y', 'Z', 'A', 'B', 'C']
 
     @classmethod
@@ -15,5 +15,5 @@ class HomeGCodeFunctionalityDef(GCodeFunctionalityDefBase):
             if key in passed_args
         ]
 
-        axis_to_home = ', '.join(current_keys)
-        return f'HOME:\n\tHoming the following axes: {axis_to_home}'
+        axis_to_probe = ', '.join(current_keys)
+        return f'PROBE:\n\tProbing the following axes: {axis_to_probe}'
