@@ -1,4 +1,7 @@
 from __future__ import annotations
+
+from typing import List
+
 from .errors import UnparsableGCodeError
 from opentrons.drivers.smoothie_drivers.driver_3_0 import GCODE as SMOOTHIE_GCODE
 from opentrons.hardware_control.g_code_parsing.utils import reverse_enum
@@ -67,7 +70,7 @@ class GCode:
     }
 
     @classmethod
-    def from_raw_code(cls, raw_code: str, date: float, device: str) -> GCode:
+    def from_raw_code(cls, raw_code: str, date: float, device: str) -> List[GCode]:
         return [
             cls(
                 date,
