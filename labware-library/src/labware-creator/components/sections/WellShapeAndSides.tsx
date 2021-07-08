@@ -1,7 +1,8 @@
 import * as React from 'react'
 import { useFormikContext } from 'formik'
+import capitalize from 'lodash/capitalize'
 import { makeMaskToDecimal } from '../../fieldMasks'
-import { displayAsTube } from '../../utils'
+import { displayAsTube, getLabwareName } from '../../utils'
 import { LabwareFields } from '../../fields'
 import { FormAlerts } from '../alerts/FormAlerts'
 import { wellShapeOptionsWithIcons } from '../optionsWithImages'
@@ -44,7 +45,10 @@ const Instructions = (props: Props): JSX.Element => {
           <p>
             Reference the <strong>inside</strong> of the well. Ignore any lip.
           </p>
-          <p>Diameter helps the robot locate the sides of the wells.</p>
+          <p>
+            Diameter helps the robot locate the sides of the{' '}
+            {getLabwareName(props.values, true)}.
+          </p>
         </>
       )}
     </>
@@ -101,7 +105,9 @@ export const WellShapeAndSides = (): JSX.Element | null => {
   ]
   const { values, errors, touched } = useFormikContext<LabwareFields>()
   const label =
-    values.labwareType === 'tipRack' ? 'Tip Diameter' : 'Well Shape & Sides'
+    values.labwareType === 'tipRack'
+      ? 'Tip Diameter'
+      : `${capitalize(getLabwareName(values, false))} Shape & Sides`
   const id =
     values.labwareType === 'tipRack' ? 'TipDiameter' : 'WellShapeAndSides'
 

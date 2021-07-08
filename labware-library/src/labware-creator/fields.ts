@@ -1,3 +1,4 @@
+import capitalize from 'lodash/capitalize'
 import type { WellBottomShape } from '@opentrons/shared-data'
 import { getLabwareName } from './utils'
 
@@ -429,6 +430,9 @@ export const getLabel = (
       values,
       true
     )} the same shape and size?`
+  }
+  if (name === 'wellShape') {
+    return `${capitalize(getLabwareName(values, false))} shape`
   }
   return LABELS[name]
 }

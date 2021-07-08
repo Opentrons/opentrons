@@ -4,14 +4,18 @@ import '@testing-library/jest-dom'
 import { FormikConfig } from 'formik'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { getDefaultFormState, LabwareFields } from '../../../fields'
-import { displayAsTube } from '../../../utils'
+import { displayAsTube, getLabwareName } from '../../../utils'
 import { WellShapeAndSides } from '../../sections/WellShapeAndSides'
 import { wrapInFormik } from '../../utils/wrapInFormik'
 
-jest.mock('../../../utils/displayAsTube')
+jest.mock('../../../utils')
 
 const displayAsTubeMock = displayAsTube as jest.MockedFunction<
   typeof displayAsTube
+>
+
+const getLabwareNameMock = getLabwareName as jest.MockedFunction<
+  typeof getLabwareName
 >
 
 let formikConfig: FormikConfig<LabwareFields>
@@ -30,11 +34,25 @@ describe('WellShapeAndSides', () => {
   })
 
   it('should render with the correct information', () => {
+    when(getLabwareNameMock)
+      .calledWith(formikConfig.initialValues, false)
+      .mockReturnValue('FAKE LABWARE NAME SINGULAR')
+    when(getLabwareNameMock)
+      .calledWith(formikConfig.initialValues, true)
+      .mockReturnValue('FAKE LABWARE NAME PLURAL')
+    when(displayAsTubeMock)
+      .expectCalledWith(formikConfig.initialValues)
+      .mockReturnValue(false)
+
     render(wrapInFormik(<WellShapeAndSides />, formikConfig))
 
-    expect(screen.getByRole('heading')).toHaveTextContent(/Well Shape & Sides/i)
+    expect(screen.getByRole('heading')).toHaveTextContent(
+      /FAKE LABWARE NAME SINGULAR Shape & Sides/i
+    )
 
-    screen.getByText('Diameter helps the robot locate the sides of the wells.')
+    screen.getByText(
+      'Diameter helps the robot locate the sides of the FAKE LABWARE NAME PLURAL.'
+    )
 
     const radioElements = screen.getAllByRole('radio')
     expect(radioElements).toHaveLength(2)
@@ -55,16 +73,6 @@ describe('WellShapeAndSides', () => {
     screen.getByText(
       'Diameter helps the robot locate the sides of the tubes. If there are multiple measurements for this dimension then use the smaller one.'
     )
-  })
-
-  it('should render wells when labware that should NOT displayAsTube is selected', () => {
-    when(displayAsTubeMock)
-      .expectCalledWith(formikConfig.initialValues)
-      .mockReturnValue(false)
-
-    render(wrapInFormik(<WellShapeAndSides />, formikConfig))
-
-    screen.getByText('Diameter helps the robot locate the sides of the wells.')
   })
 
   it('should render diameter field when tipRack is selected (and hide the well shape radio group),(and should not render x/y fields)', () => {
