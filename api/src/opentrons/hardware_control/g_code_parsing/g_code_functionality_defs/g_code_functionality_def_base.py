@@ -1,29 +1,34 @@
 from abc import ABC
-from typing import Dict, Union
+from typing import Dict, Union, Any
+from dataclasses import dataclass
 
-
-class GCodeFunctionalityDefBase(ABC):
-
+@dataclass
+class Explanation:
     CODE_KEY = 'Code'
     COMMAND_NAME_KEY = 'Command Name'
     PROVIDED_ARGS_KEY = 'Provided Arguments'
     COMMAND_EXPLANATION_KEY = 'Command Explanation'
 
+    code: str
+    command_name: str
+    provided_args: Dict[str, Any]
+    command_explanation: str
+
+
+class GCodeFunctionalityDefBase(ABC):
     @classmethod
-    def generate_explanation_dict(
+    def generate_explanation(
         cls,
         code,
         command_name,
         provided_args
-    ) -> Dict[str, Union[str, Dict]]:
-        g_code_explanation_dict = {
-            cls.CODE_KEY: code,
-            cls.COMMAND_NAME_KEY: command_name,
-            cls.PROVIDED_ARGS_KEY: provided_args,
-            cls.COMMAND_EXPLANATION_KEY: cls._generate_command_explanation(
-                provided_args)
-        }
-        return g_code_explanation_dict
+    ) -> Explanation:
+        return Explanation(
+            code,
+            command_name,
+            provided_args,
+            cls._generate_command_explanation(provided_args)
+        )
 
     @classmethod
     def _generate_command_explanation(

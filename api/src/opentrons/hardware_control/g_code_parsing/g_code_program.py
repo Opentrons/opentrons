@@ -1,11 +1,9 @@
 from __future__ import annotations
-
-import json
-import re
 import os
+import json
 from opentrons.hardware_control.emulation.app import \
     TEMPDECK_PORT, THERMOCYCLER_PORT, SMOOTHIE_PORT, MAGDECK_PORT
-from opentrons.hardware_control.emulation.parser import Parser
+
 from .g_code import GCode
 from typing import List
 
@@ -58,7 +56,7 @@ class GCodeProgram:
     def get_json(self) -> str:
         return json.dumps(
             [
-                code.get_explanation_dict()
+                code.get_explanation()
                 for code in self._g_codes
             ],
             indent=4
