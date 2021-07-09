@@ -194,7 +194,7 @@ export function CreateLabwareSandbox(): JSX.Element {
                 data-testid="lw_by_itself"
                 width="100%"
                 viewBox={`0 0 ${labwareToRender.dimensions.xDimension} ${labwareToRender.dimensions.yDimension}`}
-                style={{transform: 'scale(1, -1)'}}
+                style={{ transform: 'scale(1, -1)' }}
               >
                 <LabwareRender definition={labwareToRender} showLabels />
               </svg>
