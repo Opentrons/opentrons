@@ -26,17 +26,14 @@ export function Card(props: CardProps): JSX.Element {
   const { title, children, className, disabled, ...styleProps } = props
 
   return (
-    // @ts-expect-error TODO: allow Section to receive disabled prop
-    <Section disabled={disabled} className={className} {...styleProps}>
+    <Section disabled={Boolean(disabled)} className={className} {...styleProps}>
       {title && <Title className={className}>{title}</Title>}
       {children}
     </Section>
   )
 }
 
-const Section: PrimitiveComponent<'section'> = styled.section.withConfig({
-  shouldForwardProp: isntStyleProp,
-})`
+const Section = styled.section<{ disabled: boolean }>`
   font-size: ${styles.FONT_SIZE_BODY_2};
   position: relative;
   overflow: visible;

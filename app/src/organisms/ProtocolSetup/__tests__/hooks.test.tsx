@@ -11,10 +11,18 @@ import type { State } from '../../../redux/types'
 
 jest.mock('../../../redux/protocol/selectors')
 
-const getProtocolAuthor = protocolSelectors.getProtocolAuthor as jest.MockedFunction<typeof protocolSelectors.getProtocolAuthor>
-const getProtocolLastUpdated = protocolSelectors.getProtocolLastUpdated as jest.MockedFunction<typeof protocolSelectors.getProtocolLastUpdated>
-const getProtocolMethod = protocolSelectors.getProtocolMethod as jest.MockedFunction<typeof protocolSelectors.getProtocolMethod>
-const getProtocolDescription = protocolSelectors.getProtocolDescription as jest.MockedFunction<typeof protocolSelectors.getProtocolDescription>
+const getProtocolAuthor = protocolSelectors.getProtocolAuthor as jest.MockedFunction<
+  typeof protocolSelectors.getProtocolAuthor
+>
+const getProtocolLastUpdated = protocolSelectors.getProtocolLastUpdated as jest.MockedFunction<
+  typeof protocolSelectors.getProtocolLastUpdated
+>
+const getProtocolMethod = protocolSelectors.getProtocolMethod as jest.MockedFunction<
+  typeof protocolSelectors.getProtocolMethod
+>
+const getProtocolDescription = protocolSelectors.getProtocolDescription as jest.MockedFunction<
+  typeof protocolSelectors.getProtocolDescription
+>
 
 describe('useProtocolMetadata', () => {
   const store: Store<State> = createStore(jest.fn(), {})
