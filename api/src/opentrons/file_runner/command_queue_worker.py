@@ -21,10 +21,11 @@ class CommandQueueWorker:
         self._done_signal: asyncio.Future = asyncio.get_running_loop().create_future()
 
     def play(self) -> None:
-        """Start executing the `ProtocolEngine`'s queued commands.
+        """Start or resume executing the `ProtocolEngine`'s queued commands.
 
         This method returns immediately. Commands will be executed sequentially
-        in the background via event loop tasks.
+        in the background via event loop tasks. If commands are already
+        executing, this method will no-op.
 
         See `wait_for_done` for when execution may stop.
         """
