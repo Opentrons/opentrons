@@ -13,7 +13,9 @@ const useProtocolMetadata = hooks.useProtocolMetadata as jest.MockedFunction<
 >
 
 describe('MetadataCard', () => {
-  let render: () => ReturnType<typeof renderWithProviders>
+  const render = () => {
+    return renderWithProviders(<MetadataCard />, { i18nInstance: i18n })
+  }
 
   beforeEach(() => {
     useProtocolMetadata.mockReturnValue({
@@ -22,9 +24,6 @@ describe('MetadataCard', () => {
       method: 'custom protocol creator application',
       description: 'this describes the protocol',
     })
-    render = () => {
-      return renderWithProviders(<MetadataCard />, { i18nInstance: i18n })
-    }
   })
 
   afterEach(() => {
