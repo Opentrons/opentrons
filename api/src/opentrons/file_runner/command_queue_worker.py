@@ -47,7 +47,7 @@ class CommandQueueWorker:
         This means:
 
         * No command is currently executing on the `ProtocolEngine`.
-        * No commands are scheduled for execution in the future.
+        * No commands are left in the `ProtocolEngine`'s queue.
 
         If an unexpected exception is raised while executing commands,
         it will be raised from this call. When you're finished with a
