@@ -2,10 +2,10 @@
 
 import * as React from 'react'
 import styled, { css } from 'styled-components'
-import { styleProps } from '../primitives'
+import { isntStyleProp, styleProps } from '../primitives'
 import * as styles from '../styles'
 
-import type { StyleProps } from '../primitives'
+import type { StyleProps, PrimitiveComponent } from '../primitives'
 export interface CardProps extends StyleProps {
   /** Title for card, all cards should receive a title. */
   title?: React.ReactNode
@@ -26,14 +26,17 @@ export function Card(props: CardProps): JSX.Element {
   const { title, children, className, disabled, ...styleProps } = props
 
   return (
-    <Section disabled={Boolean(disabled)} className={className} {...styleProps}>
+    // @ts-expect-error TODO: allow Section to receive disabled prop
+    <Section disabled={disabled} className={className} {...styleProps}>
       {title && <Title className={className}>{title}</Title>}
       {children}
     </Section>
   )
 }
 
-const Section = styled.section<{ disabled: boolean }>`
+const Section: PrimitiveComponent<'section'> = styled.section.withConfig({
+  shouldForwardProp: isntStyleProp,
+})`
   font-size: ${styles.FONT_SIZE_BODY_2};
   position: relative;
   overflow: visible;
