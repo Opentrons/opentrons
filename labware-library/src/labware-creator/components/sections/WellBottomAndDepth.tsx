@@ -21,6 +21,9 @@ interface Props {
 // TODO (ka 2021-5-7): Broke this out here since we will need to have more conditions for tips
 const Instructions = (props: Props): JSX.Element => {
   const { values } = props
+  if (values.labwareType === 'tipRack') {
+    return <p>Reference the top of the tip to the bottom of the tip.</p>
+  }
   return (
     <>
       <p>
@@ -57,7 +60,12 @@ const Content = (props: Props): JSX.Element => {
           labelTextClassName={styles.hidden}
           options={wellBottomShapeOptionsWithIcons}
         />
-        <TextField name="wellDepth" inputMasks={[maskTo2Decimal]} units="mm" />
+        <TextField
+          label={values.labwareType === 'tipRack' ? 'Length' : undefined}
+          name="wellDepth"
+          inputMasks={[maskTo2Decimal]}
+          units="mm"
+        />
       </div>
     </div>
   )
@@ -66,10 +74,11 @@ const Content = (props: Props): JSX.Element => {
 export const WellBottomAndDepth = (): JSX.Element | null => {
   const fieldList: Array<keyof LabwareFields> = ['wellBottomShape', 'wellDepth']
   const { values, errors, touched } = useFormikContext<LabwareFields>()
-
+  const label =
+    values.labwareType === 'tipRack' ? 'Tip Length' : 'Well Bottom & Depth'
   return (
     <div className={styles.new_definition_section}>
-      <SectionBody label="Well Bottom & Depth" id="WellBottomAndDepth">
+      <SectionBody label={label} id="WellBottomAndDepth">
         <>
           <FormAlerts touched={touched} errors={errors} fieldList={fieldList} />
           <Content values={values} />

@@ -91,6 +91,8 @@ export function fieldsToLabware(
       labwareType: fields.labwareType,
     })
 
+    const isTiprack = fields.labwareType === 'tipRack'
+
     const def = createRegularLabware({
       strict: false,
       metadata: {
@@ -102,8 +104,9 @@ export function fieldsToLabware(
       parameters: {
         format,
         quirks,
-        isTiprack: fields.labwareType === 'tipRack',
-        //   tipLength?: number,
+        isTiprack,
+        // NOTE: `wellDepth` field is used to represent tip length for tip racks
+        ...(isTiprack ? { tipLength: fields.wellDepth } : {}),
         // Currently, assume labware is not magnetic module compatible. We don't have the information here.
         isMagneticModuleCompatible: false,
         //   magneticModuleEngageHeight?: number,
@@ -138,10 +141,12 @@ export function fieldsToLabware(
       // from the definition.
       group: {
         metadata: {
-          wellBottomShape: fields.wellBottomShape,
-          ...(groupMetadataDisplayCategory
-            ? { displayCategory: groupMetadataDisplayCategory }
-            : null),
+          ...(fields.wellBottomShape === null
+            ? null
+            : { wellBottomShape: fields.wellBottomShape }),
+          ...(groupMetadataDisplayCategory === null
+            ? null
+            : { displayCategory: groupMetadataDisplayCategory }),
         },
       },
     })

@@ -153,27 +153,7 @@ async def enable_door_safety_switch():
     await config.advanced_settings.set_adv_setting(
         'enableDoorSafetySwitch', False)
 
-
-@pytest.fixture
-async def use_new_calibration(monkeypatch):
-    await config.advanced_settings.set_adv_setting(
-        'enableTipLengthCalibration', True)
-    yield
-    await config.advanced_settings.set_adv_setting(
-        'enableTipLengthCalibration', False)
 # -----end feature flag fixtures-----------
-
-
-@pytest.fixture(params=[False, True])
-async def toggle_new_calibration(request):
-    if request.param:
-        await config.advanced_settings.set_adv_setting(
-            'enableTipLengthCalibration', True)
-        yield
-        await config.advanced_settings.set_adv_setting(
-            'enableTipLengthCalibration', False)
-    else:
-        yield
 
 
 @pytest.fixture(params=["testosaur_v2.py"])

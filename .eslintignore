@@ -1,6 +1,7 @@
 api/**
 update-server/**
 robot-server/**
+notify-server/**
 shared-data/python/**
 **/node_modules/**
 **/coverage/**
@@ -32,4 +33,6 @@ lerna.json
 storybook-static
 
 # mypy
+# todo(mm, 2021-07-01): Is this necessary, given that we already ignore whole
+# Python project directories?
 **/.mypy_cache/**

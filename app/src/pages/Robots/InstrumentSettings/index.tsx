@@ -45,6 +45,7 @@ export function InstrumentSettings(
           render={routeProps => (
             <ChangePipette
               robotName={robotName}
+              // @ts-expect-error not a valid Mount type
               mount={routeProps.match.params.mount}
               closeModal={routeProps.history.goBack}
             />
@@ -55,6 +56,7 @@ export function InstrumentSettings(
           render={routeProps => (
             <ConfigurePipette
               robotName={robotName}
+              // @ts-expect-error not a valid Mount type
               mount={routeProps.match.params.mount}
               closeModal={routeProps.history.goBack}
             />

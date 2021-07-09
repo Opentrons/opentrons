@@ -1,11 +1,14 @@
 """Tests for the EngineStore interface."""
+# TODO(mc, 2021-06-28): these factory smoke tests are becoming duplicated
+# with test logic in `api`. Try to rework the EngineStore / tests into more
+# of a collaborator
 import pytest
 from datetime import datetime
 from mock import MagicMock
 from pathlib import Path
 
 from opentrons.protocol_engine import ProtocolEngine
-from opentrons.file_runner import JsonFileRunner
+from opentrons.file_runner import JsonFileRunner, PythonFileRunner
 from robot_server.protocols import ProtocolResource, ProtocolFileType
 from robot_server.sessions.engine_store import (
     EngineStore,
@@ -35,7 +38,7 @@ async def test_create_engine_for_json_protocol(
     subject: EngineStore,
     json_protocol_file: Path,
 ) -> None:
-    """It should create a protocol runner.
+    """It should create a JSON protocol runner.
 
     This test is functioning as an integration / smoke test. Ensuring that
     the protocol was loaded correctly is / should be covered in unit tests
@@ -54,6 +57,31 @@ async def test_create_engine_for_json_protocol(
     assert isinstance(result, ProtocolEngine)
     assert isinstance(subject.engine, ProtocolEngine)
     assert isinstance(subject.runner, JsonFileRunner)
+
+
+async def test_create_engine_for_python_protocol(
+    subject: EngineStore,
+    python_protocol_file: Path,
+) -> None:
+    """It should create a Python protocol runner.
+
+    This test is functioning as an integration / smoke test. Ensuring that
+    the protocol was loaded correctly is / should be covered in unit tests
+    elsewhere.
+    """
+    protocol = ProtocolResource(
+        protocol_id="protocol-id",
+        protocol_type=ProtocolFileType.PYTHON,
+        created_at=datetime.now(),
+        files=[python_protocol_file],
+    )
+
+    result = await subject.create(protocol=protocol)
+
+    assert result == subject.engine
+    assert isinstance(result, ProtocolEngine)
+    assert isinstance(subject.engine, ProtocolEngine)
+    assert isinstance(subject.runner, PythonFileRunner)
 
 
 async def test_raise_if_engine_already_exists(subject: EngineStore) -> None:

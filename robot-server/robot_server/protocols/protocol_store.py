@@ -120,14 +120,15 @@ class ProtocolStore:
     def _get_protocol_dir(self, protocol_id: str) -> Path:
         return self._directory / protocol_id
 
-    # TODO(mc, 2021-06-01): add python support, add multi-file support, and
-    # honestly, probably ditch all of this logic in favor of whatever
-    # `ProtocolAnalyzer` situation we come up with
+    # TODO(mc, 2021-06-01): add multi-file support and ditch all of this
+    # logic in favor of whatever protocol analyzer we come up with
     @staticmethod
     def _get_protocol_type(files: List[Path]) -> ProtocolFileType:
         file_path = files[0]
 
         if file_path.suffix == ".json":
             return ProtocolFileType.JSON
+        elif file_path.suffix == ".py":
+            return ProtocolFileType.PYTHON
         else:
-            raise NotImplementedError()
+            raise NotImplementedError("Protocol type not yet supported")

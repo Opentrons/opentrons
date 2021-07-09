@@ -25,6 +25,7 @@ on:
       - '*'
     tags:
       - 'protocol-designer*'
+  workflow_dispatch:
 
 defaults:
   run:

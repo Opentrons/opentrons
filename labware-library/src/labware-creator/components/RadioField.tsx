@@ -3,7 +3,7 @@ import { Field } from 'formik'
 import { RadioGroup } from '@opentrons/components'
 import { reportFieldEdit } from '../analyticsUtils'
 import { getIsHidden } from '../formSelectors'
-import { LABELS } from '../fields'
+import { getLabel } from '../fields'
 import type { LabwareFields } from '../fields'
 import type { RadioGroupProps } from '@opentrons/components'
 import fieldStyles from './fieldStyles.css'
@@ -11,7 +11,7 @@ import fieldStyles from './fieldStyles.css'
 interface Props {
   name: keyof LabwareFields
   options: RadioGroupProps['options']
-  labelTextClassName?: string | null | undefined
+  labelTextClassName?: string | null
 }
 
 export const RadioField = (props: Props): JSX.Element => (
@@ -20,7 +20,9 @@ export const RadioField = (props: Props): JSX.Element => (
     {({ form, field }) =>
       getIsHidden(props.name, form.values) ? null : (
         <div className={fieldStyles.field_wrapper}>
-          <div className={fieldStyles.field_label}>{LABELS[props.name]}</div>
+          <div className={fieldStyles.field_label}>
+            {getLabel(props.name, form.values)}
+          </div>
           <RadioGroup
             name={field.name}
             value={field.value}

@@ -14,7 +14,6 @@
   "description": "Step generation",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
-  "flow:main": "flow-types/index.js.flow",
   "bugs": {
     "url": "https://github.com/Opentrons/opentrons/issues"
   },

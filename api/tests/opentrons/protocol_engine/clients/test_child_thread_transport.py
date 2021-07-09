@@ -3,19 +3,13 @@
 import pytest
 from asyncio import AbstractEventLoop
 from datetime import datetime
-from decoy import Decoy, matchers
+from decoy import Decoy
 from functools import partial
 
 
 from opentrons.protocol_engine import ProtocolEngine, commands
 from opentrons.protocol_engine.errors import ProtocolEngineError
 from opentrons.protocol_engine.clients.transports import ChildThreadTransport
-
-
-@pytest.fixture
-def decoy() -> Decoy:
-    """Create a Decoy state container for this test suite."""
-    return Decoy()
 
 
 @pytest.fixture
@@ -40,22 +34,23 @@ async def test_execute_command(
     subject: ChildThreadTransport,
 ) -> None:
     """It should execute a command synchronously in a child thread."""
-    cmd_request = commands.MoveToWellRequest(
+    cmd_data = commands.MoveToWellData(
         pipetteId="pipette-id",
         labwareId="labware-id",
-        wellName="A1"
+        wellName="A1",
     )
     cmd_result = commands.MoveToWellResult()
+    cmd_request = commands.MoveToWellRequest(data=cmd_data)
 
     decoy.when(
         await engine.execute_command(request=cmd_request, command_id="cmd-id")
     ).then_return(
-        commands.CompletedCommand(
-            request=cmd_request,
+        commands.MoveToWell(
+            id="cmd-id",
+            status=commands.CommandStatus.SUCCEEDED,
+            data=cmd_data,
             result=cmd_result,
-            created_at=matchers.IsA(datetime),
-            started_at=matchers.IsA(datetime),
-            completed_at=matchers.IsA(datetime),
+            createdAt=datetime.now(),
         )
     )
 
@@ -72,21 +67,22 @@ async def test_execute_command_failure(
     subject: ChildThreadTransport,
 ) -> None:
     """It should execute a load labware command."""
-    cmd_request = commands.MoveToWellRequest(
+    cmd_data = commands.MoveToWellData(
         pipetteId="pipette-id",
         labwareId="labware-id",
-        wellName="A1"
+        wellName="A1",
     )
+    cmd_request = commands.MoveToWellRequest(data=cmd_data)
 
     decoy.when(
         await engine.execute_command(request=cmd_request, command_id="cmd-id")
     ).then_return(
-        commands.FailedCommand(
-            error=ProtocolEngineError("oh no"),
-            request=cmd_request,
-            created_at=matchers.IsA(datetime),
-            started_at=matchers.IsA(datetime),
-            failed_at=matchers.IsA(datetime),
+        commands.MoveToWell(
+            id="cmd-id",
+            data=cmd_data,
+            status=commands.CommandStatus.FAILED,
+            error="oh no",
+            createdAt=datetime.now(),
         )
     )
 

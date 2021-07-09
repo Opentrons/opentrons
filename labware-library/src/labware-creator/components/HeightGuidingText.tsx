@@ -43,7 +43,8 @@ export const HeightGuidingText = (props: {
     return (
       <>
         <p>
-          Include the adapter and tops of the pipette tips in the measurement.
+          Include the <strong>adapter and tops of the pipette tips</strong> in
+          the measurement.
         </p>
         {footer}
       </>

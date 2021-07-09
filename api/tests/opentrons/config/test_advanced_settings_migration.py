@@ -7,7 +7,7 @@ from opentrons.config.advanced_settings import _migrate, _ensure
 
 @pytest.fixture
 def migrated_file_version() -> int:
-    return 9
+    return 10
 
 
 @pytest.fixture
@@ -19,14 +19,10 @@ def default_file_settings() -> Dict[str, Optional[bool]]:
         'disableHomeOnBoot': None,
         'useOldAspirationFunctions': None,
         'disableLogAggregation': None,
-        'enableApi1BackCompat': None,
-        'useProtocolApi2': None,
-        'useV1HttpApi': None,
         'enableDoorSafetySwitch': None,
-        'enableTipLengthCalibration': None,
         'enableHttpProtocolSessions': None,
-        'enableFastProtocolUpload': None,
         'enableProtocolEngine': None,
+        'disableFastProtocolUpload': None,
     }
 
 
@@ -61,7 +57,7 @@ def v1_config():
 
 @pytest.fixture
 def v2_config(v1_config):
-    r = v1_config
+    r = v1_config.copy()
     r.update({
         '_version': 2,
         'disableLogAggregation': True,
@@ -71,7 +67,7 @@ def v2_config(v1_config):
 
 @pytest.fixture
 def v3_config(v2_config):
-    r = v2_config
+    r = v2_config.copy()
     r.update({
         '_version': 3,
         'enableApi1BackCompat': False
@@ -81,7 +77,7 @@ def v3_config(v2_config):
 
 @pytest.fixture
 def v4_config(v3_config):
-    r = v3_config
+    r = v3_config.copy()
     r.update({
         '_version': 4,
         'useV1HttpApi': False
@@ -91,7 +87,7 @@ def v4_config(v3_config):
 
 @pytest.fixture
 def v5_config(v4_config):
-    r = v4_config
+    r = v4_config.copy()
     r.update({
         '_version': 5,
         'enableDoorSafetySwitch': True,
@@ -101,7 +97,7 @@ def v5_config(v4_config):
 
 @pytest.fixture
 def v6_config(v5_config):
-    r = v5_config
+    r = v5_config.copy()
     r.update({
         '_version': 6,
         'enableTipLengthCalibration': True,
@@ -111,7 +107,7 @@ def v6_config(v5_config):
 
 @pytest.fixture
 def v7_config(v6_config):
-    r = v6_config
+    r = v6_config.copy()
     r.update({
         '_version': 7,
         'enableHttpProtocolSessions': True,
@@ -121,7 +117,7 @@ def v7_config(v6_config):
 
 @pytest.fixture
 def v8_config(v7_config):
-    r = v7_config
+    r = v7_config.copy()
     r.update({
         '_version': 8,
         'enableFastProtocolUpload': True,
@@ -131,10 +127,25 @@ def v8_config(v7_config):
 
 @pytest.fixture
 def v9_config(v8_config):
-    r = v8_config
+    r = v8_config.copy()
     r.update({
         '_version': 9,
         'enableProtocolEngine': True,
+    })
+    return r
+
+
+@pytest.fixture
+def v10_config(v9_config):
+    r = v9_config.copy()
+    r.pop("useProtocolApi2")
+    r.pop("enableApi1BackCompat")
+    r.pop("useV1HttpApi")
+    r.pop("enableTipLengthCalibration")
+    r.pop("enableFastProtocolUpload")
+    r.update({
+        '_version': 10,
+        'disableFastProtocolUpload': True,
     })
     return r
 
@@ -153,6 +164,7 @@ def v9_config(v8_config):
         lazy_fixture("v7_config"),
         lazy_fixture("v8_config"),
         lazy_fixture("v9_config"),
+        lazy_fixture("v10_config"),
     ]
 )
 def old_settings(request):
@@ -163,9 +175,11 @@ def test_migrations(
         old_settings, migrated_file_version, default_file_settings):
     settings, version = _migrate(old_settings)
 
-    expected = default_file_settings
+    expected = default_file_settings.copy()
     expected.update({
-        k: v for k, v in old_settings.items() if k != '_version'
+        k: v
+        for k, v in old_settings.items()
+        if k != '_version' and k in default_file_settings
     })
 
     assert version == migrated_file_version
@@ -181,7 +195,7 @@ def test_migrates_versionless_old_config(
         'disable-home-on-boot': False,
     })
 
-    expected = default_file_settings
+    expected = default_file_settings.copy()
     expected.update({
         'shortFixedTrash': None,
         'calibrateToBottom': None,
@@ -203,7 +217,7 @@ def test_ignores_invalid_keys(migrated_file_version, default_file_settings):
     assert settings == default_file_settings
 
 
-def test_ensures_config(default_file_settings):
+def test_ensures_config():
     assert _ensure({
         '_version': 3,
         'shortFixedTrash': False,
@@ -216,10 +230,8 @@ def test_ensures_config(default_file_settings):
         'disableHomeOnBoot': None,
         'useOldAspirationFunctions': None,
         'disableLogAggregation': True,
-        'useProtocolApi2': None,
         'enableDoorSafetySwitch': None,
-        'enableTipLengthCalibration': None,
         'enableHttpProtocolSessions': None,
-        'enableFastProtocolUpload': None,
         'enableProtocolEngine': None,
+        'disableFastProtocolUpload': None,
     }

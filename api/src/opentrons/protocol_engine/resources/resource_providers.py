@@ -1,7 +1,7 @@
 """Resource providers."""
 from __future__ import annotations
 
-from .id_generator import IdGenerator
+from .model_utils import ModelUtils
 from .deck_data_provider import DeckDataProvider
 from .labware_data_provider import LabwareDataProvider
 
@@ -13,38 +13,20 @@ class ResourceProviders:
     data for engine setup and command execution.
     """
 
-    _id_generator: IdGenerator
+    _model_utils: ModelUtils
     _labware_data: LabwareDataProvider
     _deck_data: DeckDataProvider
 
-    @classmethod
-    def create(cls) -> ResourceProviders:
-        """Create a ResourceProviders container and its children."""
-        id_generator = IdGenerator()
-        labware_data = LabwareDataProvider()
-        deck_data = DeckDataProvider(labware_data=labware_data)
-
-        return cls(
-            id_generator=id_generator,
-            labware_data=labware_data,
-            deck_data=deck_data,
-        )
-
-    def __init__(
-        self,
-        id_generator: IdGenerator,
-        labware_data: LabwareDataProvider,
-        deck_data: DeckDataProvider,
-    ) -> None:
+    def __init__(self) -> None:
         """Initialize a ResourceProviders container."""
-        self._id_generator = id_generator
-        self._labware_data = labware_data
-        self._deck_data = deck_data
+        self._model_utils = ModelUtils()
+        self._labware_data = LabwareDataProvider()
+        self._deck_data = DeckDataProvider(labware_data=self._labware_data)
 
     @property
-    def id_generator(self) -> IdGenerator:
-        """Get the unique ID generator resource."""
-        return self._id_generator
+    def model_utils(self) -> ModelUtils:
+        """Get an interface to ID and timestamp generation utilities."""
+        return self._model_utils
 
     @property
     def labware_data(self) -> LabwareDataProvider:

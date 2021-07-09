@@ -15,12 +15,12 @@ context('Tubes and Rack', () => {
         .first()
         .trigger('mousedown')
       cy.get('*[class^="Dropdown__option_label"]')
-        .contains('Tubes + Opentrons Tube Rack')
+        .contains('Tubes + Tube Rack')
         .click()
 
       // TODO(IL, 2021-05-15): give Dropdown component semantic selectors for E2E
       cy.get('label')
-        .contains('Which tube rack insert?')
+        .contains('Which tube rack?')
         .children()
         .first()
         .trigger('mousedown')
@@ -30,7 +30,7 @@ context('Tubes and Rack', () => {
     })
 
     it('contains a button to the testing guide', () => {
-      cy.contains('view test guide')
+      cy.contains('labware test guide')
         .should('have.prop', 'href')
         .and('to.have.string', 'labwareDefinition_testGuide')
     })
@@ -70,9 +70,9 @@ context('Tubes and Rack', () => {
 
     it('tests volume', () => {
       cy.get("input[name='wellVolume']").focus().blur()
-      cy.contains('Volume must be a number').should('exist')
+      cy.contains('Volume is a required field').should('exist')
       cy.get("input[name='wellVolume']").type('10').blur()
-      cy.contains('Volume must be a number').should('not.exist')
+      cy.contains('Volume is a required field').should('not.exist')
     })
 
     describe('Well shape tests', () => {
@@ -84,9 +84,9 @@ context('Tubes and Rack', () => {
         cy.get("input[name='wellXDimension']").should('not.exist')
         cy.get("input[name='wellYDimension']").should('not.exist')
         cy.get("input[name='wellDiameter']").focus().blur()
-        cy.contains('Diameter must be a number').should('exist')
+        cy.contains('Diameter is a required field').should('exist')
         cy.get("input[name='wellDiameter']").type('10').blur()
-        cy.contains('Diameter must be a number').should('not.exist')
+        cy.contains('Diameter is a required field').should('not.exist')
       })
 
       it('tests rectangular wells', () => {
@@ -97,13 +97,13 @@ context('Tubes and Rack', () => {
         cy.get("input[name='wellXDimension']").should('exist')
         cy.get("input[name='wellYDimension']").should('exist')
         cy.get("input[name='wellXDimension']").focus().blur()
-        cy.contains('Well X must be a number').should('exist')
+        cy.contains('Well X is a required field').should('exist')
         cy.get("input[name='wellXDimension']").type('10').blur()
-        cy.contains('Well X must be a number').should('not.exist')
+        cy.contains('Well X is a required field').should('not.exist')
         cy.get("input[name='wellYDimension']").focus().blur()
-        cy.contains('Well Y must be a number').should('exist')
+        cy.contains('Well Y is a required field').should('exist')
         cy.get("input[name='wellYDimension']").type('10').blur()
-        cy.contains('Well Y must be a number').should('not.exist')
+        cy.contains('Well Y is a required field').should('not.exist')
       })
 
       it('tests well bottom shape and depth', () => {
@@ -126,9 +126,9 @@ context('Tubes and Rack', () => {
         cy.get("img[src*='_round.']").should('not.exist')
         cy.get("img[src*='_v.']").should('exist')
         cy.get("input[name='wellDepth']").focus().blur()
-        cy.contains('Depth must be a number').should('exist')
+        cy.contains('Depth is a required field').should('exist')
         cy.get("input[name='wellDepth']").type('10').blur()
-        cy.contains('Depth must be a number').should('not.exist')
+        cy.contains('Depth is a required field').should('not.exist')
       })
 
       it('does has a preview image', () => {
@@ -190,12 +190,12 @@ context('Tubes and Rack', () => {
         .first()
         .trigger('mousedown')
       cy.get('*[class^="Dropdown__option_label"]')
-        .contains('Tubes + Opentrons Tube Rack')
+        .contains('Tubes + Tube Rack')
         .click()
 
       // TODO(IL, 2021-05-15): give Dropdown component semantic selectors for E2E
       cy.get('label')
-        .contains('Which tube rack insert?')
+        .contains('Which tube rack?')
         .children()
         .first()
         .trigger('mousedown')
@@ -205,7 +205,7 @@ context('Tubes and Rack', () => {
     })
 
     it('contains a button to the testing guide', () => {
-      cy.contains('view test guide')
+      cy.contains('labware test guide')
         .should('have.prop', 'href')
         .and('to.have.string', 'labwareDefinition_testGuide')
     })
@@ -245,9 +245,9 @@ context('Tubes and Rack', () => {
 
     it('tests volume', () => {
       cy.get("input[name='wellVolume']").focus().blur()
-      cy.contains('Volume must be a number').should('exist')
+      cy.contains('Volume is a required field').should('exist')
       cy.get("input[name='wellVolume']").type('10').blur()
-      cy.contains('Volume must be a number').should('not.exist')
+      cy.contains('Volume is a required field').should('not.exist')
     })
 
     describe('Well shape tests', () => {
@@ -259,9 +259,9 @@ context('Tubes and Rack', () => {
         cy.get("input[name='wellXDimension']").should('not.exist')
         cy.get("input[name='wellYDimension']").should('not.exist')
         cy.get("input[name='wellDiameter']").focus().blur()
-        cy.contains('Diameter must be a number').should('exist')
+        cy.contains('Diameter is a required field').should('exist')
         cy.get("input[name='wellDiameter']").type('10').blur()
-        cy.contains('Diameter must be a number').should('not.exist')
+        cy.contains('Diameter is a required field').should('not.exist')
       })
 
       it('tests rectangular wells', () => {
@@ -272,13 +272,13 @@ context('Tubes and Rack', () => {
         cy.get("input[name='wellXDimension']").should('exist')
         cy.get("input[name='wellYDimension']").should('exist')
         cy.get("input[name='wellXDimension']").focus().blur()
-        cy.contains('Well X must be a number').should('exist')
+        cy.contains('Well X is a required field').should('exist')
         cy.get("input[name='wellXDimension']").type('10').blur()
-        cy.contains('Well X must be a number').should('not.exist')
+        cy.contains('Well X is a required field').should('not.exist')
         cy.get("input[name='wellYDimension']").focus().blur()
-        cy.contains('Well Y must be a number').should('exist')
+        cy.contains('Well Y is a required field').should('exist')
         cy.get("input[name='wellYDimension']").type('10').blur()
-        cy.contains('Well Y must be a number').should('not.exist')
+        cy.contains('Well Y is a required field').should('not.exist')
       })
 
       it('tests well bottom shape and depth', () => {
@@ -301,9 +301,9 @@ context('Tubes and Rack', () => {
         cy.get("img[src*='_round.']").should('not.exist')
         cy.get("img[src*='_v.']").should('exist')
         cy.get("input[name='wellDepth']").focus().blur()
-        cy.contains('Depth must be a number').should('exist')
+        cy.contains('Depth is a required field').should('exist')
         cy.get("input[name='wellDepth']").type('10').blur()
-        cy.contains('Depth must be a number').should('not.exist')
+        cy.contains('Depth is a required field').should('not.exist')
       })
 
       it('does has a preview image', () => {
@@ -367,24 +367,22 @@ context('Tubes and Rack', () => {
         .first()
         .trigger('mousedown')
       cy.get('*[class^="Dropdown__option_label"]')
-        .contains('Tubes + Opentrons Tube Rack')
+        .contains('Tubes + Tube Rack')
         .click()
 
       // TODO(IL, 2021-05-15): give Dropdown component semantic selectors for E2E
       cy.get('label')
-        .contains('Which tube rack insert?')
+        .contains('Which tube rack?')
         .children()
         .first()
         .trigger('mousedown')
-      cy.get('*[class^="Dropdown__option_label"]')
-        .contains('24 tubes (snap cap)')
-        .click()
+      cy.get('*[class^="Dropdown__option_label"]').contains('24 tubes').click()
 
       cy.contains('start creating labware').click({ force: true })
     })
 
     it('contains a button to the testing guide', () => {
-      cy.contains('view test guide')
+      cy.contains('labware test guide')
         .should('have.prop', 'href')
         .and('to.have.string', 'labwareDefinition_testGuide')
     })
@@ -424,9 +422,9 @@ context('Tubes and Rack', () => {
 
     it('tests volume', () => {
       cy.get("input[name='wellVolume']").focus().blur()
-      cy.contains('Volume must be a number').should('exist')
+      cy.contains('Volume is a required field').should('exist')
       cy.get("input[name='wellVolume']").type('10').blur()
-      cy.contains('Volume must be a number').should('not.exist')
+      cy.contains('Volume is a required field').should('not.exist')
     })
 
     describe('Well shape tests', () => {
@@ -438,9 +436,9 @@ context('Tubes and Rack', () => {
         cy.get("input[name='wellXDimension']").should('not.exist')
         cy.get("input[name='wellYDimension']").should('not.exist')
         cy.get("input[name='wellDiameter']").focus().blur()
-        cy.contains('Diameter must be a number').should('exist')
+        cy.contains('Diameter is a required field').should('exist')
         cy.get("input[name='wellDiameter']").type('10').blur()
-        cy.contains('Diameter must be a number').should('not.exist')
+        cy.contains('Diameter is a required field').should('not.exist')
       })
 
       it('tests rectangular wells', () => {
@@ -451,13 +449,13 @@ context('Tubes and Rack', () => {
         cy.get("input[name='wellXDimension']").should('exist')
         cy.get("input[name='wellYDimension']").should('exist')
         cy.get("input[name='wellXDimension']").focus().blur()
-        cy.contains('Well X must be a number').should('exist')
+        cy.contains('Well X is a required field').should('exist')
         cy.get("input[name='wellXDimension']").type('10').blur()
-        cy.contains('Well X must be a number').should('not.exist')
+        cy.contains('Well X is a required field').should('not.exist')
         cy.get("input[name='wellYDimension']").focus().blur()
-        cy.contains('Well Y must be a number').should('exist')
+        cy.contains('Well Y is a required field').should('exist')
         cy.get("input[name='wellYDimension']").type('10').blur()
-        cy.contains('Well Y must be a number').should('not.exist')
+        cy.contains('Well Y is a required field').should('not.exist')
       })
 
       it('tests well bottom shape and depth', () => {
@@ -480,9 +478,9 @@ context('Tubes and Rack', () => {
         cy.get("img[src*='_round.']").should('not.exist')
         cy.get("img[src*='_v.']").should('exist')
         cy.get("input[name='wellDepth']").focus().blur()
-        cy.contains('Depth must be a number').should('exist')
+        cy.contains('Depth is a required field').should('exist')
         cy.get("input[name='wellDepth']").type('10').blur()
-        cy.contains('Depth must be a number').should('not.exist')
+        cy.contains('Depth is a required field').should('not.exist')
       })
 
       it('does has a preview image', () => {

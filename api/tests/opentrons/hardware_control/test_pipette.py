@@ -29,7 +29,7 @@ def test_tip_tracking():
 
 
 @pytest.mark.parametrize('model', pipette_config.config_models)
-def test_critical_points_nozzle_offset(model, use_new_calibration):
+def test_critical_points_nozzle_offset(model):
     loaded = pipette_config.load(model)
     pip = pipette.Pipette(loaded,
                           PIP_CAL,
@@ -54,7 +54,7 @@ def test_critical_points_nozzle_offset(model, use_new_calibration):
 
 
 @pytest.mark.parametrize('model', pipette_config.config_models)
-def test_critical_points_pipette_offset(model, use_new_calibration):
+def test_critical_points_pipette_offset(model):
     loaded = pipette_config.load(model)
     # set pipette offset calibration
     pip_cal = cal_types.PipetteOffsetByPipetteMount(

@@ -23,7 +23,8 @@ import {
   formLevelValidation,
   LabwareCreatorErrors,
 } from './formLevelValidation'
-import { labwareTestProtocol } from './labwareTestProtocol'
+import { labwareTestProtocol } from './testProtocols/labwareTestProtocol'
+import { tipRackTestProtocol } from './testProtocols/tipRackTestProtocol'
 import { fieldsToLabware } from './fieldsToLabware'
 import { LabwareCreator as LabwareCreatorComponent } from './components/LabwareCreator'
 import { Dropdown } from './components/Dropdown'
@@ -227,7 +228,8 @@ export const LabwareCreator = (): JSX.Element => {
           setLastUploaded(fields, parsedLabwareDef)
           if (
             fields.labwareType === 'wellPlate' ||
-            fields.labwareType === 'reservoir'
+            fields.labwareType === 'reservoir' ||
+            fields.labwareType === 'tipRack'
           ) {
             // no additional required labware type child fields, we can scroll right away
             scrollToForm()
@@ -288,12 +290,15 @@ export const LabwareCreator = (): JSX.Element => {
           const { displayName } = def.metadata
           const { loadName } = def.parameters
 
+          const testProtocol =
+            values.labwareType === 'tipRack'
+              ? tipRackTestProtocol({ pipetteName, definition: def })
+              : labwareTestProtocol({ pipetteName, definition: def })
+
           const zip = new JSZip()
           zip.file(`${loadName}.json`, JSON.stringify(def, null, 4))
-          zip.file(
-            `test_${loadName}.py`,
-            labwareTestProtocol({ pipetteName, definition: def })
-          )
+
+          zip.file(`test_${loadName}.py`, testProtocol)
 
           // TODO(IL, 2021-03-31): add `catch`
           // eslint-disable-next-line @typescript-eslint/no-floating-promises
