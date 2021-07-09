@@ -6,67 +6,85 @@ from typing import List, Dict
 
 
 def gcodes() -> List[GCode]:
+
     raw_codes = [
+        # FORMAT
+        # [GCODE, RESPONSE]
+
+
         # Home
-        'G28.2 ABCXYZ',  # Test 0
-        'G28.2 X',  # Test 1
-        'G28.2 Y',  # Test 2
-        'G28.2 Z',  # Test 3
-        'G28.2 A',  # Test 4
-        'G28.2 B',  # Test 5
-        'G28.2 C',  # Test 6
+        ['G28.2 ABCXYZ', 'ok\r\nok\r\n'],  # Test 0
+        ['G28.2 X', 'ok\r\nok\r\n'],  # Test 1
+        ['G28.2 Y', 'ok\r\nok\r\n'],  # Test 2
+        ['G28.2 Z', 'ok\r\nok\r\n'],  # Test 3
+        ['G28.2 A', 'ok\r\nok\r\n'],  # Test 4
+        ['G28.2 B', 'ok\r\nok\r\n'],  # Test 5
+        ['G28.2 C', 'ok\r\nok\r\n'],  # Test 6
 
         # Move
-        'G0 X113.38 Y11.24',  # Test 7
-        'G0 A132.6',  # Test 8
-        'G0 C-8.5',  # Test 9
+        ['G0 X113.38 Y11.24', 'ok\r\nok\r\n'],  # Test 7
+        ['G0 A132.6', 'ok\r\nok\r\n'],  # Test 8
+        ['G0 C-8.5', 'ok\r\nok\r\n'],  # Test 9
 
         # Set Speed
-        'G0 F5.0004',  # Test 10
+        ['G0 F5.0004', 'ok\r\nok\r\n'],  # Test 10
 
         # Wait
-        'M400',  # Test 11
+        ['M400', 'ok\r\nok\r\n'],  # Test 11
 
         # Set Current
-        'M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1',  # Test 12
+        ['M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1', ''],  # Test 12
 
         # Dwell
-        'G4 P555',  # Test 13
+        ['G4 P555', 'ok\r\nok\r\n'],  # Test 13
 
         # Get Current Position
-        'M114.2',  # Test 14
+        [  # Test 14
+            'M114.2',
+            'M114.2\r\n\r\nok MCS: A:218.0 B:0.0 C:0.0 X:418.0 Y:-3.0 Z:218.0'
+        ],
 
         # Get Limit Switch Status
-        'M119',  # Test 15
+        ['M119', 'Lid:closed'],  # Test 15
 
         # Probe
-        'G38.2 A',  # Test 16
-        'G38.2 ABC',  # Test 17
+        [  # Test 16
+            'G38.2 F420Y-40.0',
+            'G38.2 F420Y-40.0\r\n\r\n[PRB:296.825,292.663,218.000:1]\nok\r\nok\r\n'
+        ],
 
         # Absolute Mode
-        'G90',  # Test 18
+        ['G90', ''],  # Test 17
 
         # Relative Mode
-        'G91',  # Test 19
+        ['G91', ''],  # Test 18
 
         # Reset from Error
-        'M999',  # Test 20
+        ['M999', 'ok\r\nok\r\n'],  # Test 19
 
         # Push Speed
-        'M120',  # Test 21
+        # TODO: Get Example
+        ['M120', ''],  # Test 20
 
         # Pop Speed
-        'M121',  # Test 22
+        # TODO: Get Example
+        ['M121', ''],  # Test 21
 
         # Steps per mm
-        'M92 X200 Y1000 Z100 A10 B10 C10',  # Test 23
-        'M92 X100',  # Test 24
-        'M92 A400',  # Test 25
+        [  # Test 22
+            'M92 X80.0 Y80.0 Z400 A400',
+            'X:80.000000 Y:80.000000 Z:400.000000 A:400.000000 B:768.000000 '
+            'C:768.000000 \r\nok\r\nok\r\n'
+        ],
+        [  # Test 23
+            'M92 B768',
+            'X:80.000000 Y:80.000000 Z:400.000000 A:400.000000 B:768.000000 '
+            'C:768.000000'
+        ],
     ]
-
     g_code_list = [
-        GCode.from_raw_code(code, 555.1, 'smoothie')
-        for code in raw_codes
+        GCode.from_raw_code(code, 'smoothie', response)
+        for code, response in raw_codes
     ]
 
     for g_code in g_code_list:
@@ -97,15 +115,13 @@ def expected_function_name_values() -> List[str]:
         'CURRENT_POSITION',  # Test 14
         'LIMIT_SWITCH_STATUS',  # Test 15
         'PROBE',  # Test 16
-        'PROBE',  # Test 17
-        'ABSOLUTE_COORDS',  # Test 18
-        'RELATIVE_COORDS',  # Test 19
-        'RESET_FROM_ERROR',  # Test 20
-        'PUSH_SPEED',  # Test 21
-        'POP_SPEED',  # Test 22
+        'ABSOLUTE_COORDS',  # Test 17
+        'RELATIVE_COORDS',  # Test 18
+        'RESET_FROM_ERROR',  # Test 19
+        'PUSH_SPEED',  # Test 20
+        'POP_SPEED',  # Test 21
+        'STEPS_PER_MM',  # Test 22
         'STEPS_PER_MM',  # Test 23
-        'STEPS_PER_MM',  # Test 24
-        'STEPS_PER_MM',  # Test 25
     ]
 
 
@@ -161,10 +177,10 @@ def expected_arg_values() -> List[Dict[str, int]]:
         {},
 
         # Test 16
-        {'A': None},
+        {'F': 420, 'Y': -40.0},
 
         # Test 17
-        {'A': None, 'B': None, 'C': None},
+        {},
 
         # Test 18
         {},
@@ -179,16 +195,10 @@ def expected_arg_values() -> List[Dict[str, int]]:
         {},
 
         # Test 22
-        {},
+        {'X': 80.0, 'Y': 80.0, 'Z': 400, 'A': 400},
 
         # Test 23
-        {'X': 200, 'Y': 1000, 'Z': 100, 'A': 10, 'B': 10, 'C': 10},
-
-        # Test 24
-        {'X': 100},
-
-        # Test 25
-        {'A': 400},
+        {'B': 768.0},
     ]
 
 
@@ -197,54 +207,38 @@ def explanations() -> List[Explanation]:
         Explanation(  # Test 0
             code='G28.2',
             command_name='HOME',
-            provided_args={
-                'A': None,
-                'B': None,
-                'C': None,
-                'X': None,
-                'Y': None,
-                'Z': None,
-            },
+            provided_args={'A': None, 'B': None, 'C': None, 'X': None, 'Y': None,
+                           'Z': None},
             command_explanation='HOME:\n\tHoming the following axes: X, Y, Z, A, B, C'
         ),
         Explanation(  # Test 1
             code='G28.2',
             command_name='HOME',
-            provided_args={
-                'X': None,
-            },
+            provided_args={'X': None},
             command_explanation='HOME:\n\tHoming the following axes: X'
         ),
         Explanation(  # Test 2
             code='G28.2',
             command_name='HOME',
-            provided_args={
-                'Y': None,
-            },
+            provided_args={'Y': None},
             command_explanation='HOME:\n\tHoming the following axes: Y'
         ),
         Explanation(  # Test 3
             code='G28.2',
             command_name='HOME',
-            provided_args={
-                'Z': None,
-            },
+            provided_args={'Z': None},
             command_explanation='HOME:\n\tHoming the following axes: Z'
         ),
         Explanation(  # Test 4
             code='G28.2',
             command_name='HOME',
-            provided_args={
-                'A': None,
-            },
+            provided_args={'A': None},
             command_explanation='HOME:\n\tHoming the following axes: A'
         ),
         Explanation(  # Test 5
             code='G28.2',
             command_name='HOME',
-            provided_args={
-                'B': None,
-            },
+            provided_args={'B': None},
             command_explanation='HOME:\n\tHoming the following axes: B'
         ),
         Explanation(  # Test 6
@@ -258,10 +252,7 @@ def explanations() -> List[Explanation]:
         Explanation(  # Test 7
             code='G0',
             command_name='MOVE',
-            provided_args={
-                'X': 113.38,
-                'Y': 11.24,
-            },
+            provided_args={'X': 113.38, 'Y': 11.24},
             command_explanation='MOVE:\n\t'
                                 'The gantry to 113.38 on the X-Axis\n\t'
                                 'The gantry to 11.24 on the Y-Axis'
@@ -269,27 +260,21 @@ def explanations() -> List[Explanation]:
         Explanation(  # Test 8
             code='G0',
             command_name='MOVE',
-            provided_args={
-                'A': 132.6,
-            },
+            provided_args={'A': 132.6},
             command_explanation='MOVE:\n\t'
                                 'The right pipette arm height to 132.6'
         ),
         Explanation(  # Test 9
             code='G0',
             command_name='MOVE',
-            provided_args={
-                'C': -8.5,
-            },
+            provided_args={'C': -8.5},
             command_explanation='MOVE:\n\t'
                                 'The right pipette suction to -8.5'
         ),
         Explanation(  # Test 10
             code='G0',
             command_name='SET_SPEED',
-            provided_args={
-                'F': 5.0004
-            },
+            provided_args={'F': 5.0004},
             command_explanation='SETTING SPEED:\n\tSetting speed to 5.0004'
         ),
         Explanation(  # Test 11
@@ -301,14 +286,7 @@ def explanations() -> List[Explanation]:
         Explanation(  # Test 12
             code='M907',
             command_name='SET_CURRENT',
-            provided_args={
-                'X': 0.3,
-                'Y': 0.3,
-                'Z': 0.1,
-                'A': 0.1,
-                'B': 0.3,
-                'C': 0.05,
-            },
+            provided_args={'X': 0.3, 'Y': 0.3, 'Z': 0.1, 'A': 0.1, 'B': 0.3, 'C': 0.05},
             command_explanation='SETTING CURRENT:\n\t'
                                 'The current (in amps) for the X-Axis Motor to 0.3\n\t'
                                 'The current (in amps) for the Y-Axis Motor to 0.3\n\t'
@@ -320,9 +298,7 @@ def explanations() -> List[Explanation]:
         Explanation(  # Test 13
             code='G4',
             command_name='DWELL',
-            provided_args={
-                'P': 555.0
-            },
+            provided_args={'P': 555.0},
             command_explanation='DWELLING:\n\t'
                                 'Pausing movement for 555.0ms'
         ),
@@ -343,96 +319,63 @@ def explanations() -> List[Explanation]:
         Explanation(  # Test 16
             code='G38.2',
             command_name='PROBE',
-            provided_args={
-                'A': None,
-            },
-            command_explanation='PROBE:\n\tProbing the following axes: A'
+            provided_args={'F': 420, 'Y': -40.0},
+            command_explanation='PROBE:\n\tProbing the following axes: Y; '
+                                'at a speed of 420.0'
         ),
         Explanation(  # Test 17
-            code='G38.2',
-            command_name='PROBE',
-            provided_args={
-                'A': None,
-                'B': None,
-                'C': None,
-            },
-            command_explanation='PROBE:\n\tProbing the following axes: A, B, C'
-        ),
-        Explanation(  # Test 18
             code='G90',
             command_name='ABSOLUTE_COORDS',
             provided_args={},
             command_explanation='ABSOLUTE COORDINATE MODE: \n\t'
                                 'Switching to Absolute Coordinate Mode'
         ),
-        Explanation(  # Test 19
+        Explanation(  # Test 18
             code='G91',
             command_name='RELATIVE_COORDS',
             provided_args={},
             command_explanation='RELATIVE COORDINATE MODE: \n\t'
                                 'Switching to Relative Coordinate Mode'
         ),
-        Explanation(  # Test 20
+        Explanation(  # Test 19
             code='M999',
             command_name='RESET_FROM_ERROR',
             provided_args={},
             command_explanation='RESET FROM ERROR: \n\tResetting OT-2 from error state'
         ),
-        Explanation(  # Test 21
+        Explanation(  # Test 20
             code='M120',
             command_name='PUSH_SPEED',
             provided_args={},
             command_explanation='PUSH SPEED: \n\tSaving current speed so temporary'
                                 ' speed can be set'
         ),
-        Explanation(  # Test 22
+        Explanation(  # Test 21
             code='M121',
             command_name='POP_SPEED',
             provided_args={},
             command_explanation='POP SPEED: \n\tLoading previously saved speed'
         ),
+        Explanation(  # Test 22
+            code='M92',
+            command_name='STEPS_PER_MM',
+            provided_args={'X': 80.0, 'Y': 80.0, 'Z': 400.0, 'A': 400.0},
+            command_explanation='STEPS PER MM:\n\tSetting the following axes steps per'
+                                ' mm:'
+                                '\n\tX-Axis 80.0 steps per mm'
+                                '\n\tY-Axis 80.0 steps per mm'
+                                '\n\tZ-Axis 400.0 steps per mm'
+                                '\n\tA-Axis 400.0 steps per mm'
+        ),
         Explanation(  # Test 23
             code='M92',
             command_name='STEPS_PER_MM',
-            provided_args={
-                'X': 200.0,
-                'Y': 1000.0,
-                'Z': 100.0,
-                'A': 10.0,
-                'B': 10.0,
-                'C': 10.0,
-            },
+            provided_args={'B': 768.0},
             command_explanation='STEPS PER MM:\n\tSetting the following axes steps per'
                                 ' mm:'
-                                '\n\tX-Axis 200.0 steps per mm'
-                                '\n\tY-Axis 1000.0 steps per mm'
-                                '\n\tZ-Axis 100.0 steps per mm'
-                                '\n\tA-Axis 10.0 steps per mm'
-                                '\n\tB-Axis 10.0 steps per mm'
-                                '\n\tC-Axis 10.0 steps per mm'
+                                '\n\tB-Axis 768.0 steps per mm'
         ),
-        Explanation(  # Test 24
-            code='M92',
-            command_name='STEPS_PER_MM',
-            provided_args={
-                'X': 100.0
-            },
-            command_explanation='STEPS PER MM:\n\tSetting the following axes steps per'
-                                ' mm:'
-                                '\n\tX-Axis 100.0 steps per mm'
-        ),
-        Explanation(  # Test 25
-            code='M92',
-            command_name='STEPS_PER_MM',
-            provided_args={
-                'A': 400.0
-            },
-            command_explanation='STEPS PER MM:\n\tSetting the following axes steps per'
-                                ' mm:'
-                                '\n\tA-Axis 400.0 steps per mm'
-        ),
-
-    ]
+]
 
 
 @pytest.mark.parametrize(
