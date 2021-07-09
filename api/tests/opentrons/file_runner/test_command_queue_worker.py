@@ -101,7 +101,7 @@ async def test_play_no_commands(
     engine: ProtocolEngine,
     subject: CommandQueueWorker,
 ) -> None:
-    """It should signal the ProtocolEngine to execute commands."""
+    """It should immediately signal done if no queued commands."""
     decoy.when(engine.state_view.commands.get_next_queued()).then_return(None)
 
     subject.play()
