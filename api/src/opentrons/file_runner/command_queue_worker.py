@@ -13,7 +13,6 @@ class CommandQueueWorker:
         """Construct a CommandQueueWorker.
 
         Args:
-            loop: The EventLoop in which commands will be executed.
             engine: The ProtocolEngine instance to run commands on.
         """
         self._engine = engine
