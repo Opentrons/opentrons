@@ -30,17 +30,30 @@ from robot_server.sessions.router.actions_router import (
 )
 
 
+prev_session = SessionResource(
+    session_id="session-id",
+    create_data=BasicSessionCreateData(),
+    created_at=datetime(year=2021, month=1, day=1),
+    actions=[],
+)
+
+
 @pytest.fixture(autouse=True)
 def setup_app(app: FastAPI) -> None:
-    """Setup the FastAPI app with actions routes."""
+    """Configure the FastAPI app with actions routes."""
     app.include_router(actions_router)
+
+
+@pytest.fixture(autouse=True)
+def setup_session_store(decoy: Decoy, session_store: SessionStore) -> None:
+    """Configure the mock SessionStore to return a SessionResource."""
+    decoy.when(session_store.get(session_id="session-id")).then_return(prev_session)
 
 
 def test_create_session_action(
     decoy: Decoy,
     task_runner: TaskRunner,
     session_view: SessionView,
-    session_store: SessionStore,
     engine_store: EngineStore,
     unique_id: str,
     current_time: datetime,
@@ -55,21 +68,12 @@ def test_create_session_action(
         id=unique_id,
     )
 
-    prev_session = SessionResource(
-        session_id="unique-id",
-        create_data=BasicSessionCreateData(),
-        created_at=session_created_at,
-        actions=[],
-    )
-
     next_session = SessionResource(
-        session_id="unique-id",
+        session_id="session-id",
         create_data=BasicSessionCreateData(),
         created_at=session_created_at,
         actions=[actions],
     )
-
-    decoy.when(session_store.get(session_id="session-id")).then_return(prev_session)
 
     decoy.when(
         session_view.with_action(
@@ -117,7 +121,6 @@ def test_create_session_action_with_missing_id(
 def test_create_session_action_without_runner(
     decoy: Decoy,
     session_view: SessionView,
-    session_store: SessionStore,
     engine_store: EngineStore,
     unique_id: str,
     current_time: datetime,
@@ -132,21 +135,12 @@ def test_create_session_action_without_runner(
         id=unique_id,
     )
 
-    prev_session = SessionResource(
-        session_id="unique-id",
-        create_data=BasicSessionCreateData(),
-        created_at=session_created_at,
-        actions=[],
-    )
-
     next_session = SessionResource(
         session_id="unique-id",
         create_data=BasicSessionCreateData(),
         created_at=session_created_at,
         actions=[actions],
     )
-
-    decoy.when(session_store.get(session_id="session-id")).then_return(prev_session)
 
     decoy.when(
         session_view.with_action(
@@ -178,9 +172,7 @@ def test_create_session_action_without_runner(
 
 def test_create_pause_action(
     decoy: Decoy,
-    task_runner: TaskRunner,
     session_view: SessionView,
-    session_store: SessionStore,
     engine_store: EngineStore,
     unique_id: str,
     current_time: datetime,
@@ -195,21 +187,12 @@ def test_create_pause_action(
         id=unique_id,
     )
 
-    prev_session = SessionResource(
-        session_id="unique-id",
-        create_data=BasicSessionCreateData(),
-        created_at=session_created_at,
-        actions=[],
-    )
-
     next_session = SessionResource(
         session_id="unique-id",
         create_data=BasicSessionCreateData(),
         created_at=session_created_at,
         actions=[actions],
     )
-
-    decoy.when(session_store.get(session_id="session-id")).then_return(prev_session)
 
     decoy.when(
         session_view.with_action(
@@ -226,14 +209,12 @@ def test_create_pause_action(
     )
 
     verify_response(response, expected_status=201, expected_data=actions)
-    decoy.verify(task_runner.run(engine_store.runner.pause))
+    decoy.verify(engine_store.runner.pause())
 
 
 def test_create_resume_action(
     decoy: Decoy,
-    task_runner: TaskRunner,
     session_view: SessionView,
-    session_store: SessionStore,
     engine_store: EngineStore,
     unique_id: str,
     current_time: datetime,
@@ -248,21 +229,12 @@ def test_create_resume_action(
         id=unique_id,
     )
 
-    prev_session = SessionResource(
-        session_id="unique-id",
-        create_data=BasicSessionCreateData(),
-        created_at=session_created_at,
-        actions=[],
-    )
-
     next_session = SessionResource(
         session_id="unique-id",
         create_data=BasicSessionCreateData(),
         created_at=session_created_at,
         actions=[actions],
     )
-
-    decoy.when(session_store.get(session_id="session-id")).then_return(prev_session)
 
     decoy.when(
         session_view.with_action(
@@ -279,4 +251,4 @@ def test_create_resume_action(
     )
 
     verify_response(response, expected_status=201, expected_data=actions)
-    decoy.verify(task_runner.run(engine_store.runner.play))
+    decoy.verify(engine_store.runner.play())

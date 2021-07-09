@@ -17,9 +17,9 @@ class CommandQueueWorker:
             engine: The ProtocolEngine instance to run commands on.
         """
         self._engine = engine
-        self._done_signal: asyncio.Future = loop.create_future()
-        self._running = False
+        self._keep_running = False
         self._current_task: Optional[asyncio.Task] = None
+        self._done_signal: asyncio.Future = loop.create_future()
 
     def play(self) -> None:
         """Start executing the `ProtocolEngine`'s queued commands.
@@ -29,8 +29,9 @@ class CommandQueueWorker:
 
         See `wait_for_done` for when execution may stop.
         """
-        self._running = True
-        self._schedule_next_command()
+        self._keep_running = True
+        if self._current_task is None:
+            self._schedule_next_command()
 
     def pause(self) -> None:
         """Pause execution of queued commands.
@@ -39,7 +40,7 @@ class CommandQueueWorker:
         executing, it will continue until it's done. Further commands will be left
         unexecuted in the queue.
         """
-        self._running = False
+        self._keep_running = False
 
     async def wait_for_done(self) -> None:
         """Wait until all queued commands have finished executing.
@@ -52,31 +53,24 @@ class CommandQueueWorker:
         If an unexpected exception is raised while executing commands,
         it will be raised from this call. When you're finished with a
         `CommandQueueWorker`, you should call this method to clean up and
-        propogate errors.
+        propagate errors.
         """
         await self._done_signal
 
-    def _schedule_next_command(self, command_id: Optional[str] = None) -> None:
-        if self._current_task is None and self._running is True:
-            command_id = (
-                command_id or self._engine.state_view.commands.get_next_queued()
-            )
-
-            if command_id is not None:
-                exec_coro = self._engine.execute_command_by_id(command_id=command_id)
-                self._current_task = asyncio.create_task(exec_coro)
-                self._current_task.add_done_callback(self._handle_command_done)
-            else:
-                self._handle_command_done()
-
-    def _handle_command_done(self, task: Optional[asyncio.Task] = None) -> None:
-        self._current_task = None
+    def _schedule_next_command(self, prev_task: Optional[asyncio.Task] = None) -> None:
         next_command_id = self._engine.state_view.commands.get_next_queued()
-        exc = task.exception() if task is not None else None
+        exc = prev_task.exception() if prev_task is not None else None
+
+        self._current_task = None
 
         if exc is not None:
             self._done_signal.set_exception(exc)
         elif next_command_id is None and not self._done_signal.done():
             self._done_signal.set_result(None)
-        elif next_command_id is not None:
-            self._schedule_next_command(next_command_id)
+        elif next_command_id is not None and self._keep_running is True:
+            self._run_command(next_command_id)
+
+    def _run_command(self, command_id: str) -> None:
+        exec_coro = self._engine.execute_command_by_id(command_id=command_id)
+        self._current_task = asyncio.create_task(exec_coro)
+        self._current_task.add_done_callback(self._schedule_next_command)

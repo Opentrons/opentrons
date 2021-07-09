@@ -34,6 +34,11 @@ def subject(
     return CommandQueueWorker(loop=loop, engine=engine)
 
 
+async def flush_event_loop() -> None:
+    """Flush out the event loop by using short sleep."""
+    await asyncio.sleep(0.1)
+
+
 async def test_play(
     decoy: Decoy,
     engine: ProtocolEngine,
@@ -46,13 +51,39 @@ async def test_play(
         None,
     )
 
+    result = asyncio.create_task(subject.wait_for_done())
     subject.play()
-    await subject.wait_for_done()
+    await flush_event_loop()
 
     decoy.verify(
         await engine.execute_command_by_id(command_id="command-id-1"),
         await engine.execute_command_by_id(command_id="command-id-2"),
     )
+    assert result.done() is True
+
+
+async def test_play_noop(
+    decoy: Decoy,
+    engine: ProtocolEngine,
+    subject: CommandQueueWorker,
+) -> None:
+    """It should no-op if play is called multiple times."""
+    decoy.when(engine.state_view.commands.get_next_queued()).then_return(
+        "command-id-1",
+        None,
+    )
+
+    result = asyncio.create_task(subject.wait_for_done())
+    subject.play()
+    subject.play()
+    subject.play()
+    await flush_event_loop()
+
+    decoy.verify(
+        await engine.execute_command_by_id(command_id=matchers.Anything()),
+        times=1,
+    )
+    assert result.done() is True
 
 
 async def test_pause(
@@ -64,15 +95,14 @@ async def test_pause(
     decoy.when(engine.state_view.commands.get_next_queued()).then_return(
         "command-id-1",
         "command-id-2",
+        "command-id-2",
         None,
     )
 
-    wait_for_done = asyncio.create_task(subject.wait_for_done())
+    result = asyncio.create_task(subject.wait_for_done())
     subject.play()
     subject.pause()
-
-    # flush mock executions
-    await asyncio.sleep(0)
+    await flush_event_loop()
 
     decoy.verify(
         await engine.execute_command_by_id(command_id="command-id-1"),
@@ -82,18 +112,16 @@ async def test_pause(
         await engine.execute_command_by_id(command_id="command-id-2"),
         times=0,
     )
-    assert wait_for_done.done() is False
+    assert result.done() is False
 
     subject.play()
-
-    # TODO(mc, 2021-07-07): this timeout may be a source of flakiness, and its
-    # necessity in this test is code smell
-    await asyncio.wait_for(subject.wait_for_done(), timeout=0.1)
+    await flush_event_loop()
 
     decoy.verify(
         await engine.execute_command_by_id(command_id="command-id-2"),
         times=1,
     )
+    assert result.done() is True
 
 
 async def test_play_no_commands(
@@ -104,13 +132,40 @@ async def test_play_no_commands(
     """It should immediately signal done if no queued commands."""
     decoy.when(engine.state_view.commands.get_next_queued()).then_return(None)
 
+    result = asyncio.create_task(subject.wait_for_done())
     subject.play()
-
-    # TODO(mc, 2021-07-07): this timeout may be a source of flakiness, and its
-    # necessity in this test is code smell
-    await asyncio.wait_for(subject.wait_for_done(), timeout=0.1)
+    await flush_event_loop()
 
     decoy.verify(
         await engine.execute_command_by_id(command_id=matchers.Anything()),
         times=0,
     )
+    assert result.done() is True
+
+
+async def test_play_resets_done_signal(
+    decoy: Decoy,
+    engine: ProtocolEngine,
+    subject: CommandQueueWorker,
+) -> None:
+    """It should immediately signal done if no queued commands."""
+    decoy.when(engine.state_view.commands.get_next_queued()).then_return(
+        "command-id",
+        None,
+    )
+
+    result = asyncio.create_task(subject.wait_for_done())
+    subject.play()
+    assert result.done() is False
+    await flush_event_loop()
+    assert result.done() is True
+
+    decoy.when(engine.state_view.commands.get_next_queued()).then_return(
+        "command-id",
+        None,
+    )
+    result = asyncio.create_task(subject.wait_for_done())
+    subject.play()
+    assert result.done() is False
+    await flush_event_loop()
+    assert result.done() is True
