@@ -79,6 +79,39 @@ jobs:
         run: |
           yarn jest --coverage=true --ci=true --testPathIgnorePatterns 'labware-.*' 'protocol-.*' 'app-shell' 'discovery-client'
 
+    e2e-test:
+    name: 'app e2e tests'
+    timeout-minutes: 30
+    strategy:
+      matrix:
+        os: ['ubuntu-18.04', 'macos-latest']
+    runs-on: '${{ matrix.os }}'
+    steps:
+      - uses: 'actions/checkout@v2'
+      - uses: 'actions/setup-node@v1'
+        with:
+          node-version: '12'
+        name: 'cache yarn cache'
+        uses: actions/cache@v2
+        with:
+          path: |
+            ${{ github.workspace }}/.yarn-cache
+            ${{ github.workspace }}/.npm-cache/_prebuild
+          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
+      - name: 'setup-js'
+        run: |
+          npm config set cache ${{ github.workspace }}/.npm-cache
+          yarn config set cache-folder ${{ github.workspace }}/.yarn-cache
+          make setup-js
+      - name: 'docker-emulator'
+        run: make docker-emulator
+      - name: 'external-browser-app'
+        run: make external-browser-app
+      - name: 'test-e2e'
+        run: make test-e2e
+
   build-app-test-backend:
     # since js tests for "backend" projects (app-shell, discovery-client) need
     # to run cross-platform just like builds, might as well do them in the same job

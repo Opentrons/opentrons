@@ -6,12 +6,9 @@
   "types": "lib/index.d.ts",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Opentrons/opentrons.git"
+    "url": "git+https://github.com/Opentrons/opentrons.git"
   },
-  "author": {
-    "name": "Opentrons Labworks",
-    "email": "engineering@opentrons.com"
-  },
+  "author": "Opentrons Labworks <engineering@opentrons.com>",
   "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/Opentrons/opentrons/issues"
@@ -25,6 +22,8 @@
     "classnames": "2.2.5",
     "connected-react-router": "6.8.0",
     "core-js": "3.2.1",
+    "cypress-file-upload": "^5.0.8",
+    "cypress-wait-until": "^1.7.1",
     "date-fns": "2.10.0",
     "events": "3.0.0",
     "file-saver": "2.0.1",
@@ -52,5 +51,14 @@
     "semver": "5.5.0",
     "styled-components": "5.1.1",
     "typeface-open-sans": "0.0.75"
+  },
+  "main": "webpack.config.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "cypress": "^7.6.0",
+    "cypress-file-upload": "^5.0.8",
+    "cypress-wait-until": "^1.7.1"
   }
 }

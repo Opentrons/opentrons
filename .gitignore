@@ -126,3 +126,8 @@ api/pyproject.toml
 
 # Static storybook build artifacts
 storybook-static/
+
+# Cypress screenshots and videos
+app/cypress/screenshots
+app/cypress/videos
+app/cypress/downloads

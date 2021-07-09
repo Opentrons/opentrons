@@ -43,6 +43,7 @@ dev: export NODE_ENV := development
 dev: export PORT := $(PORT)
 dev:
 	concurrently --no-color --kill-others --names "server,shell" \
+
 		"$(MAKE) dev-server" \
 		"$(MAKE) dev-shell"
 
@@ -55,3 +56,17 @@ dev-shell:
 	wait-on http-get://localhost:$(PORT)
 	$(MAKE) -C $(shell_dir) dev
 
+# end-to-end tests
+#####################################################################
+
+.PHONY: docker-emulator
+docker-emulator:
+	docker-compose up --build
+
+.PHONY: external-browser-app
+external-browser-app:
+	make -C app dev OT_APP_UI__EXTERNAL_BROWSER=1
+
+.PHONY: test-e2e
+test-e2e:
+	wait-on http://localhost:8090/ && cypress run --browser electron --record false

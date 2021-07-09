@@ -85,6 +85,21 @@ Test tasks can also be run with the following arguments:
 | watch | false   | Run tests in watch mode | `$ make test-unit watch=true`       |
 | cover | !watch  | Calculate code coverage | `$ make test watch=true cover=true` |
 
+For end-to-end tests using Cypress, ensure that the Docker emulator is running and calibrated before attempting to execute the following.
+See DOCKER.md in root directory for instructions on running the Docker emulator.
+
+Incorporating this into the test automation is currently in progress.
+
+```shell
+# To launch the app in an external browser mode.
+make -C app dev OT_APP_UI__EXTERNAL_BROWSER=1
+# Run Cypress end-to-end tests in terminal without any GUI.
+make test-e2e
+# Open the Cypress test runner GUI to visually see the test suites run.
+# Won't automatically start running tests. You will need to click on the test suites to run them.
+make cypress-visual
+```
+
 ## building
 
 If you'd like to build the Electron desktop app, see the [app shell's build instructions][app-shell-readme-build].
