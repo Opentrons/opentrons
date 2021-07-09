@@ -162,7 +162,7 @@ export function CreateLabwareSandbox(): JSX.Element {
                   In Slot:
                 </Text>
                 <SlotSelect
-                  defaultValue={DEFAULT_LABWARE_SLOT}
+                  defaultValue={labwareSlot}
                   onChange={e => setLabwareSlot(e.target.value)}
                 >
                   {SLOT_OPTIONS.map(slot => (
@@ -184,7 +184,7 @@ export function CreateLabwareSandbox(): JSX.Element {
                       transform={`translate(${lwSlot.position[0]}, ${lwSlot.position[1]})`}
                       data-testid="lw_on_deck"
                     >
-                      <LabwareRender definition={labwareToRender} />
+                      <LabwareRender definition={labwareToRender} showLabels />
                     </g>
                   )
                 }}
@@ -194,8 +194,9 @@ export function CreateLabwareSandbox(): JSX.Element {
                 data-testid="lw_by_itself"
                 width="100%"
                 viewBox={`0 0 ${labwareToRender.dimensions.xDimension} ${labwareToRender.dimensions.yDimension}`}
+                style={{transform: 'scale(1, -1)'}}
               >
-                <LabwareRender definition={labwareToRender} />
+                <LabwareRender definition={labwareToRender} showLabels />
               </svg>
             )}
           </Flex>
