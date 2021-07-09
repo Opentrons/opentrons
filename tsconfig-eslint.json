@@ -13,6 +13,8 @@
     "components/typings",
     "discovery-client/src",
     "discovery-client/typings",
+    "labware-designer/src",
+    "labware-designer/typings",
     "labware-library/src",
     "labware-library/typings",
     "shared-data/js",
