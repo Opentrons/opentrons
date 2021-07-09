@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import { selectors as robotSelectors } from '../../../redux/robot'
 import { getProtocolFilename } from '../../../redux/protocol'
-import { openProtocol } from '../../../redux/protocol/actions'
+import { openProtocol } from '../../../redux/protocol'
 
 import { SidePanel } from '@opentrons/components'
 import { Upload } from './Upload'
