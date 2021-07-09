@@ -20,8 +20,8 @@ export const IntroCopy = (): JSX.Element => (
     </LinkOut>
     <p>
       This tool will allow you to create definitions for well plates,
-      reservoirs, tubes in Opentrons tube racks, and plates/tubes in Opentrons
-      aluminum blocks that do not already exist on the{' '}
+      reservoirs, tubes in tube racks, and plates/tubes in Opentrons aluminum
+      blocks that do not already exist on the{' '}
       <Link to={LINK_LABWARE_LIBRARY} className={styles.link}>
         Labware Library
       </Link>

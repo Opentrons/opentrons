@@ -21,6 +21,12 @@
     },
     {
       "path": "./shared-data"
+    },
+    {
+      "path": "./protocol-designer"
+    },
+    {
+      "path": "./protocol-library-kludge"
     }
   ]
 }

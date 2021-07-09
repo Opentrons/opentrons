@@ -125,7 +125,11 @@ class Location:
 
             >>> loc = Location(Point(1, 1, 1), None)
             >>> new_loc = loc.move(Point(1, 1, 1))
-            >>> assert loc_2.point == Point(2, 2, 2)  # True
+            >>>
+            >>> # The new point is the old one plus the given offset.
+            >>> assert new_loc.point == Point(2, 2, 2)  # True
+            >>>
+            >>> # The old point hasn't changed.
             >>> assert loc.point == Point(1, 1, 1)  # True
 
         """

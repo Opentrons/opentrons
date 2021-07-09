@@ -17,7 +17,12 @@
     "labware-library/typings",
     "shared-data/js",
     "shared-data/protocol",
+    "shared-data/pipette",
     "step-generation/src",
-    "step-generation/typings"
+    "step-generation/typings",
+    "protocol-designer/src",
+    "protocol-designer/typings",
+    "protocol-library-kludge/src",
+    "protocol-library-kludge/typings"
   ]
 }

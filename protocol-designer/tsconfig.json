@@ -1,0 +1,24 @@
+{
+  "extends": "../tsconfig-base.json",
+  "references": [
+    {
+      "path": "./tsconfig-data.json"
+    },
+    {
+      "path": "../components"
+    },
+    {
+      "path": "../shared-data"
+    },
+    {
+      "path": "../step-generation"
+    }
+  ],
+  "compilerOptions": {
+    "composite": true,
+    "noErrorTruncation": true,
+    "rootDir": "src",
+    "outDir": "lib"
+  },
+  "include": ["typings", "src"]
+}

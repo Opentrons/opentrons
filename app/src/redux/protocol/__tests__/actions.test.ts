@@ -23,6 +23,7 @@ describe('protocol actions', () => {
     mockReader = { readAsText: jest.fn(), readAsArrayBuffer: jest.fn() }
 
     store = mockStore({})
+    // @ts-expect-error(sa, 2021-6-28): not a valid FileReader interface
     global.FileReader = jest.fn(() => mockReader)
     getFeatureFlags.mockReturnValue({
       enableBundleUpload: false,

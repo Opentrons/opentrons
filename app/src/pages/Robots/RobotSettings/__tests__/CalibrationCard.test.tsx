@@ -128,6 +128,7 @@ describe('CalibrationCard', () => {
 
   const realBlob = global.Blob
   beforeAll(() => {
+    // @ts-expect-error(sa, 2021-6-28): not a valid blob interface
     global.Blob = function (content: any, options: any) {
       return { content, options }
     }
