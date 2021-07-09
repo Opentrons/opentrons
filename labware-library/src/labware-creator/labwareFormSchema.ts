@@ -218,6 +218,22 @@ export const labwareFormSchemaBaseObject = Yup.object({
           .filter(Boolean)
     ),
 
+  groupBrand: requiredString(LABELS.groupBrand),
+  // TODO(mc, 2020-06-02): should this be Yup.array() instead of mixed?
+  groupBrandId: Yup.mixed()
+    .nullable()
+    .transform(
+      (
+        currentValue: string | null | undefined,
+        originalValue: string | null | undefined
+      ): ProcessedLabwareFields['groupBrandId'] =>
+        (currentValue || '')
+          .trim()
+          .split(',')
+          .map(s => s.trim())
+          .filter(Boolean)
+    ),
+
   loadName: Yup.string()
     .nullable()
     .label(LABELS.loadName)

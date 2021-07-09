@@ -8,16 +8,43 @@ import { SectionBody } from './SectionBody'
 
 import styles from '../../styles.css'
 
-const Content = (): JSX.Element => (
-  <div className={styles.flex_row}>
-    <div className={styles.brand_column}>
-      <TextField name="brand" />
-    </div>
-    <div className={styles.brand_id_column}>
-      <TextField name="brandId" caption="Separate multiple by comma" />
-    </div>
-  </div>
-)
+interface Props {
+  values: LabwareFields
+}
+const Content = (props: Props): JSX.Element => {
+//  if (props.values.labwareType === 'tipRack') {
+  const labwareType = props.values.labwareType
+  const isOpentronsTubeRack = labwareType === 'tubeRack' && props.values.tubeRackInsertLoadName !== 'customTubeRack'
+  const showBrand = !isOpentronsTubeRack
+  const showGroupBrand = labwareType === 'tubeRack'
+    return (
+      <>
+
+      {
+          showBrand &&
+          <div className={styles.flex_row}>
+            <div className={styles.brand_column}>
+              <TextField name="brand" />
+            </div>
+            <div className={styles.brand_id_column}>
+              <TextField name="brandId" caption="Separate multiple by comma" />
+            </div>
+          </div>
+          }
+        {
+        showGroupBrand &&
+        <div className={styles.flex_row}>
+          <div className={styles.brand_column}>
+            <TextField name="groupBrand" />
+          </div>
+          <div className={styles.brand_id_column}>
+            <TextField name="groupBrandId" caption="Separate multiple by comma" />
+          </div>
+        </div>
+        }
+      </>
+    )
+}
 
 export const Description = (): JSX.Element | null => {
   const fieldList: Array<keyof LabwareFields> = ['brand', 'brandId']
@@ -30,7 +57,7 @@ export const Description = (): JSX.Element | null => {
   return (
     <SectionBody label="Description" id="Description">
       <FormAlerts touched={touched} errors={errors} fieldList={fieldList} />
-      <Content />
+      <Content values={values}/>
     </SectionBody>
   )
 }

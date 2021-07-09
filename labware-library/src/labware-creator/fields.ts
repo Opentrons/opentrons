@@ -123,6 +123,8 @@ export interface LabwareFields {
 
   brand: string | null | undefined
   brandId: string | null | undefined // comma-separated values
+  groupBrand: string | null | undefined
+  groupBrandId: string | null | undefined
 
   loadName: string | null | undefined
   displayName: string | null | undefined
@@ -141,6 +143,7 @@ export interface ProcessedLabwareFields {
   aluminumBlockType: string
   aluminumBlockChildType: string | null
   handPlacedTipFit: string | null
+
 
   // tubeRackSides: string[], // eg, []
   footprintXDimension: number
@@ -172,6 +175,8 @@ export interface ProcessedLabwareFields {
 
   brand: string
   brandId: string[]
+  groupBrand: string
+  groupBrandId: string[]
 
   // if loadName or displayName are left blank, Yup schema generates them
   loadName: string
@@ -380,6 +385,8 @@ export const getDefaultFormState = (): LabwareFields => ({
 
   brand: null,
   brandId: null,
+  groupBrand: null,
+  groupBrandId: null,
 
   loadName: null,
   displayName: null,
@@ -415,6 +422,8 @@ export const LABELS: Record<keyof LabwareFields, string> = {
   gridOffsetY: 'Y Offset (Yo)',
   brand: 'Brand',
   brandId: 'Manufacturer/Catalog #',
+  groupBrand: 'Tube Brand',
+  groupBrandId: 'Manufacturer/Catalog #',
   displayName: 'Display Name',
   loadName: 'API Load Name',
   pipetteName: 'Test Pipette',
@@ -428,7 +437,9 @@ export const getLabel = (
     return `Are all your ${getLabwareName(
       values,
       true
-    )} the same shape and size?`
+    )} the same shape and size?`}
+  else if (name === 'brand' && values.labwareType==='tubeRack'){
+    return 'Rack Brand'
   }
   return LABELS[name]
 }
