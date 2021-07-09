@@ -9,7 +9,7 @@ from opentrons.protocol_engine import ProtocolEngine
 class CommandQueueWorker:
     """Execute a `ProtocolEngine`'s queued commands in the background."""
 
-    def __init__(self, loop: asyncio.AbstractEventLoop, engine: ProtocolEngine) -> None:
+    def __init__(self, engine: ProtocolEngine) -> None:
         """Construct a CommandQueueWorker.
 
         Args:
@@ -19,7 +19,7 @@ class CommandQueueWorker:
         self._engine = engine
         self._keep_running = False
         self._current_task: Optional[asyncio.Task] = None
-        self._done_signal: asyncio.Future = loop.create_future()
+        self._done_signal: asyncio.Future = asyncio.get_running_loop().create_future()
 
     def play(self) -> None:
         """Start executing the `ProtocolEngine`'s queued commands.

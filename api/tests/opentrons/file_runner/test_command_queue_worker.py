@@ -26,12 +26,9 @@ def engine(decoy: Decoy) -> ProtocolEngine:
 
 
 @pytest.fixture
-def subject(
-    loop: asyncio.AbstractEventLoop,
-    engine: ProtocolEngine,
-) -> CommandQueueWorker:
+async def subject(engine: ProtocolEngine) -> CommandQueueWorker:
     """Get a CommandQueueWorker test subject with mocked out dependencies."""
-    return CommandQueueWorker(loop=loop, engine=engine)
+    return CommandQueueWorker(engine=engine)
 
 
 async def flush_event_loop() -> None:
@@ -140,32 +137,4 @@ async def test_play_no_commands(
         await engine.execute_command_by_id(command_id=matchers.Anything()),
         times=0,
     )
-    assert result.done() is True
-
-
-async def test_play_resets_done_signal(
-    decoy: Decoy,
-    engine: ProtocolEngine,
-    subject: CommandQueueWorker,
-) -> None:
-    """It should immediately signal done if no queued commands."""
-    decoy.when(engine.state_view.commands.get_next_queued()).then_return(
-        "command-id",
-        None,
-    )
-
-    result = asyncio.create_task(subject.wait_for_done())
-    subject.play()
-    assert result.done() is False
-    await flush_event_loop()
-    assert result.done() is True
-
-    decoy.when(engine.state_view.commands.get_next_queued()).then_return(
-        "command-id",
-        None,
-    )
-    result = asyncio.create_task(subject.wait_for_done())
-    subject.play()
-    assert result.done() is False
-    await flush_event_loop()
     assert result.done() is True
