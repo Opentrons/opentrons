@@ -123,7 +123,6 @@ export function validateJsonProtocolFileContents(
 }
 
 export function protocolHasModules(protocol: JsonProtocolFile): boolean {
-  // @ts-expect-error TODO: modules only exists on schema >v5 protocols, but narrowing doesn't work here for some reason
   return 'modules' in protocol && Object.entries(protocol.modules).length > 0
 }
 
