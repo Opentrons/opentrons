@@ -58,16 +58,17 @@ class CommandQueueWorker:
 
     def _schedule_next_command(self, prev_task: Optional[asyncio.Task] = None) -> None:
         next_command_id = self._engine.state_view.commands.get_next_queued()
-        exc = prev_task.exception() if prev_task is not None else None
+        prev_exc = prev_task.exception() if prev_task is not None else None
 
         self._current_task = None
 
-        if exc is not None:
-            self._done_signal.set_exception(exc)
-        elif next_command_id is None and not self._done_signal.done():
-            self._done_signal.set_result(None)
-        elif next_command_id is not None and self._keep_running is True:
-            self._run_command(next_command_id)
+        if not self._done_signal.done():
+            if prev_exc:
+                self._done_signal.set_exception(prev_exc)
+            elif next_command_id is None:
+                self._done_signal.set_result(None)
+            elif self._keep_running is True:
+                self._run_command(next_command_id)
 
     def _run_command(self, command_id: str) -> None:
         exec_coro = self._engine.execute_command_by_id(command_id=command_id)
