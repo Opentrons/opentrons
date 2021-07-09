@@ -48,8 +48,7 @@ export const Grid = (): JSX.Element | null => {
   const { values, errors, touched } = useFormikContext<LabwareFields>()
   if (
     isEveryFieldHidden(fieldList, values) ||
-    (values.labwareType != null &&
-      ['aluminumBlock', 'tubeRack'].includes(values.labwareType))
+    (values.labwareType != null && values.labwareType === 'aluminumBlock')
   ) {
     return null
   }
