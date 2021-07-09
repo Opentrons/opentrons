@@ -41,7 +41,11 @@ class GCodeProgram:
         for watcher_data in watcher.get_command_list():
             device = cls.get_device(watcher_data.serial_connection)
             g_codes.extend(
-                GCode.from_raw_code(watcher_data.raw_g_code, watcher_data.date, device)
+                GCode.from_raw_code(
+                    watcher_data.raw_g_code,
+                    device,
+                    watcher_data.response
+                )
             )
         return cls(g_codes)
 

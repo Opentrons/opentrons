@@ -70,13 +70,18 @@ class GCode:
     }
 
     @classmethod
-    def from_raw_code(cls, raw_code: str, date: float, device: str) -> List[GCode]:
+    def from_raw_code(
+        cls,
+        raw_code: str,
+        device: str,
+        response: str
+    ) -> List[GCode]:
         return [
             cls(
-                date,
                 device,
                 g_code.gcode,
-                g_code.params
+                g_code.params,
+                response
             )
             for g_code
             in Parser().parse(raw_code)
@@ -84,20 +89,15 @@ class GCode:
 
     def __init__(
             self,
-            from_epoch: float,
             device_name: str,
             g_code: str,
-            g_code_args: dict
+            g_code_args: dict,
+            response
     ) -> None:
-        self._from_epoch = from_epoch
         self._device_name = device_name
         self._g_code = g_code
         self._g_code_args = g_code_args
-
-    @property
-    def from_epoch(self) -> float:
-        """Time from epoch that G-Code was logged at"""
-        return self._from_epoch
+        self._response = response
 
     @property
     def device_name(self) -> str:
@@ -191,3 +191,7 @@ class GCode:
             self.get_gcode_function(),
             self.g_code_args
         )
+
+    @property
+    def response(self):
+        return self._response
