@@ -1,20 +1,20 @@
 // E2E Test Suite 03 for Opentrons App - Validate More Page
 import 'cypress-wait-until';
 
-//Ensures that the site is opened in the browser before each test case
+// Ensures that the site is opened in the browser before each test case
 describe('Test Suite 03 - Validate App tab on More Page', () => {
 
     before(() => {
         cy.visit('http://localhost:8090')
 
-        //Clear the version update modal
-        //cy.get('.dIbOfO').find('.bbkbLa').click()
+        // Clear the version update modal
+        // cy.get('.dIbOfO').find('.bbkbLa').click()
 
         //Navigate to More page
         cy.get('.cOCwJn > .iqXzje').click({force:true})
     })
 
-    //Confirm text on page is correct
+    // Confirm text on page is correct
     it('Confirm text on page is correct', () => {
         cy.get('.structure__title__3nJ-D').should('have.text', 'App')
         cy.get(':nth-child(2) > .Card__Section-r4iqug-0 > .Card__Title-r4iqug-1').should('have.text', 'App Software Settings')
@@ -48,13 +48,13 @@ describe('Test Suite 03 - Validate App tab on More Page', () => {
         cy.get(':nth-child(3) > .styles__labeled_control__WeQhH > .buttons__button_flat__1YVfe > .Svg-sc-1lpozsw-0').should('exist')
     })
 
-    //Confirm the View Available Update button works correct
+    // Confirm the View Available Update button works correct
     it('Confirm View Available Update button works', () => {
         cy.get('.structure__labeled_value_value__rgaIu').then(($versionObj) => {
             const version = $versionObj.text()
-            if (version != '4.4.0') {
+            if (version !== '4.4.0') {
                 cy.get('.kWaShj > .Btn-o3dtr1-0').click({force:true}).then(() => {
-                    //Confirm contents on version update modal
+                    // Confirm contents on version update modal
                     cy.get('.fQyeVu > .Text-sc-1wb1h0f-0').should('have.text', 'App Version 4.4.0 Available')
                     cy.get('.styles__release_notes__33nZE > h1').should('have.text', 'Opentrons App Changes in 4.4.0')
                     cy.get('.bbkbLa').click()
@@ -63,7 +63,7 @@ describe('Test Suite 03 - Validate App tab on More Page', () => {
         })
     })
 
-    //Confirm able to change the Update Channel dropdown menu
+    // Confirm able to change the Update Channel dropdown menu
     it('Confirm able to change Update Channel dropdown', () => {
         cy.get('.forms__dropdown__3-opf').select('Beta')
         cy.get('.forms__dropdown__3-opf').select('Alpha')
