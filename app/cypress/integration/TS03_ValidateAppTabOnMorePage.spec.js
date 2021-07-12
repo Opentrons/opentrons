@@ -10,7 +10,7 @@ describe('Test Suite 03 - Validate App tab on More Page', () => {
         // Clear the version update modal
         // cy.get('.dIbOfO').find('.bbkbLa').click()
 
-        //Navigate to More page
+        // Navigate to More page
         cy.get('.cOCwJn > .iqXzje').click({force:true})
     })
 
