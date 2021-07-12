@@ -130,18 +130,6 @@ describe('Grid', () => {
     )
     expect(container.firstChild).toBe(null)
   })
-  it('should NOT render when the labware type is tubeRack', () => {
-    const { container } = render(
-      wrapInFormik(<Grid />, {
-        ...formikConfig,
-        initialValues: {
-          ...formikConfig.initialValues,
-          labwareType: 'tubeRack',
-        },
-      })
-    )
-    expect(container.firstChild).toBe(null)
-  })
 
   it('should not render when all fields are hidden', () => {
     when(isEveryFieldHiddenMock)

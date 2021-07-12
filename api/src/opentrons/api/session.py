@@ -399,7 +399,7 @@ class Session(RobotBusy):
             # Use feature flag to determine ProtocolContext implementation
             # class: real or simulating.
             impl_class = ProtocolContextImplementation \
-                if not ff.enable_fast_protocol_upload() \
+                if ff.disable_fast_protocol_upload() \
                 else ProtocolContextSimulation
 
             ctx_impl = impl_class.build_using(

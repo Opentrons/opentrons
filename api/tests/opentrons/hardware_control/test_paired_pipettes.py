@@ -43,7 +43,7 @@ async def test_move_z_axis(hardware_api, monkeypatch):
     assert mock_be_move.call_args_list[0][0][0] == expected
 
 
-async def test_move_gantry(hardware_api, is_robot, toggle_new_calibration):
+async def test_move_gantry(hardware_api, is_robot):
     abs_position = types.Point(30, 20, 10)
     mount = PipettePair.PRIMARY_RIGHT
     target_position1 = {Axis.X: 30,
@@ -89,7 +89,7 @@ async def test_move_currents(smoothie, monkeypatch, loop):
 
 
 async def test_pick_up_tip(
-        dummy_instruments, loop, is_robot, toggle_new_calibration):
+        dummy_instruments, loop, is_robot):
     hw_api = await hc.API.build_hardware_simulator(
         attached_instruments=dummy_instruments, loop=loop)
     mount = PipettePair.PRIMARY_RIGHT
@@ -118,7 +118,7 @@ async def test_pick_up_tip(
 
 
 async def test_drop_tip(
-        dummy_instruments, loop, is_robot, toggle_new_calibration):
+        dummy_instruments, loop, is_robot):
     hw_api = await hc.API.build_hardware_simulator(
         attached_instruments=dummy_instruments, loop=loop)
     mount = PipettePair.PRIMARY_RIGHT
@@ -138,7 +138,7 @@ async def test_drop_tip(
 
 
 async def test_prep_aspirate(
-        dummy_instruments, loop, toggle_new_calibration):
+        dummy_instruments, loop):
     hw_api = await hc.API.build_hardware_simulator(
         attached_instruments=dummy_instruments, loop=loop)
     await hw_api.home()

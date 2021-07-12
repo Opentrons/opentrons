@@ -16,7 +16,7 @@ async def magdeck(loop: asyncio.BaseEventLoop, emulation_app) -> MagDeck:
         loop=loop
     )
     yield module
-    module.cleanup()
+    await module.cleanup()
 
 
 def test_device_info(magdeck: MagDeck):

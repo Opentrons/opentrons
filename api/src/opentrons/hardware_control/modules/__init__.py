@@ -5,8 +5,7 @@ from .thermocycler import Thermocycler
 from .update import update_firmware
 from .utils import MODULE_HW_BY_NAME, build
 from .types import (ThermocyclerStep, InterruptCallback, UploadFunction,
-                    BundledFirmware, UpdateError, UnsupportedModuleError,
-                    AbsentModuleError, ModuleAtPort)
+                    BundledFirmware, UpdateError, ModuleAtPort)
 
 __all__ = [
     'MODULE_HW_BY_NAME', 'build', 'update_firmware',

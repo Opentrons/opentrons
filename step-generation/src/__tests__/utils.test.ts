@@ -843,7 +843,6 @@ describe('orderWells', () => {
     orderTuples.forEach(tuple => {
       it(`first ${tuple[0]} then ${tuple[1]}`, () => {
         expect(orderWells(irregularOrdering, ...tuple)).toEqual(
-          // $FlowFixMe adding additional keys to answer map would add more confusion
           irregularAnswerMap[tuple[0]][tuple[1]]
         )
       })

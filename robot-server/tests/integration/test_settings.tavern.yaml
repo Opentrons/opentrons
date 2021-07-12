@@ -30,12 +30,6 @@ stages:
             description: !re_search 'Perform deck calibration to dots'
             restart_required: false
             value: !anything
-          - id: useProtocolApi2
-            old_id: Null
-            title: Use Protocol API version 2
-            description: Deprecated feature flag
-            restart_required: false
-            value: !anything
           - id: disableHomeOnBoot
             old_id: disable-home-on-boot
             title: Disable home on boot
@@ -54,29 +48,23 @@ stages:
             description: !re_search 'Automatically pause protocols when robot door opens'
             restart_required: false
             value: !anything
-          - id: enableTipLengthCalibration
+          - id: disableFastProtocolUpload
             old_id: Null
-            title: Enable Under-Development Calibration Flows
-            description: !re_search 'Enables the in-progress robot calibration flows'
+            title: Use older protocol analysis method
+            description: !re_search 'Use an older, slower method of analyzing uploaded protocols'
             restart_required: false
             value: !anything
           - id: enableHttpProtocolSessions
             old_id: Null
-            title: Enable Experimental HTTP Protocol Sessions
+            title: Enable experimental HTTP protocol sessions
             description: !re_search 'Activating this will disable protocol running from the Opentrons application'
             restart_required: true
             value: !anything
-          - id: enableFastProtocolUpload
-            old_id: Null
-            title: Enable Experimental Fast Protocol Upload
-            description: !re_search 'Enabling this flag will skip simulation for a faster'
-            restart_required: false
-            value: !anything
           - id: enableProtocolEngine
             old_id: Null
-            title: Enable Experimental Protocol Engine
+            title: Enable experimental protocol engine
             description: !re_search 'Opentrons-internal setting to test new protocol execution logic'
-            restart_required: false
+            restart_required: true
             value: !anything
         links: !anydict
 
@@ -92,12 +80,12 @@ marks:
         - shortFixedTrash
         - calibrateToBottom
         - deckCalibrationDots
-        - useProtocolApi2
         - disableHomeOnBoot
         - useOldAspirationFunctions
         - enableDoorSafetySwitch
-        - enableTipLengthCalibration
+        - disableFastProtocolUpload
         - enableHttpProtocolSessions
+        - enableProtocolEngine
   - parametrize:
       key: value
       vals:
@@ -131,11 +119,10 @@ marks:
         - shortFixedTrash
         - calibrateToBottom
         - deckCalibrationDots
-        - useProtocolApi2
         - disableHomeOnBoot
         - useOldAspirationFunctions
         - enableDoorSafetySwitch
-        - enableTipLengthCalibration
+        - disableFastProtocolUpload
         - enableHttpProtocolSessions
 stages:
   - name: Set each setting to acceptable values

@@ -4,7 +4,7 @@ import { FormikConfig } from 'formik'
 import { render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import { getDefaultFormState, LabwareFields } from '../../../fields'
-import { isEveryFieldHidden } from '../../../utils'
+import { isEveryFieldHidden, getLabwareName } from '../../../utils'
 import { Regularity } from '../../sections/Regularity'
 import { wrapInFormik } from '../../utils/wrapInFormik'
 
@@ -12,6 +12,10 @@ jest.mock('../../../utils')
 
 const isEveryFieldHiddenMock = isEveryFieldHidden as jest.MockedFunction<
   typeof isEveryFieldHidden
+>
+
+const getLabwareNameMock = getLabwareName as jest.MockedFunction<
+  typeof getLabwareName
 >
 
 let formikConfig: FormikConfig<LabwareFields>
@@ -34,10 +38,16 @@ describe('Regularity', () => {
   })
 
   it('should render radio fields when fields are visible', () => {
+    when(getLabwareNameMock)
+      .calledWith(formikConfig.initialValues, true)
+      .mockReturnValue('FAKE LABWARE NAME PLURAL')
+
     render(wrapInFormik(<Regularity />, formikConfig))
     expect(screen.getByRole('heading')).toHaveTextContent(/regularity/i)
     // TODO(IL, 2021-05-26): this should be a semantic label, but is just a div
-    screen.getByText('Are all your wells the same shape and size?')
+    screen.getByText(
+      'Are all your FAKE LABWARE NAME PLURAL the same shape and size?'
+    )
 
     const radioElements = screen.getAllByRole('radio')
     expect(radioElements).toHaveLength(2)

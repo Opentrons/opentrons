@@ -210,7 +210,6 @@ lint-css:
 
 .PHONY: check-js
 check-js: build-ts
-	yarn flow $(if $(CI),check,status)
 
 .PHONY: build-ts
 build-ts:

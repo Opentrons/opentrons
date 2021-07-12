@@ -100,10 +100,8 @@ export function configureStore(): StoreType {
     store.replaceReducer(nextRootReducer)
   }
 
-  // $FlowFixMe no module.hot
   if (module.hot) {
     // Enable Webpack hot module replacement for reducers
-    // $FlowFixMe no module.hot
     module.hot.accept(
       [
         './analytics/reducers',

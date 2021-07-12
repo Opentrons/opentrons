@@ -52,10 +52,6 @@ def tempdeck():
 
     yield t
 
-    # Have to stop the poller
-    t._poller.stop()
-    t._poller.join()
-
 
 @pytest.fixture
 def thermocycler():
@@ -305,8 +301,9 @@ def test_execute_module_command_bad_command(api_client, hardware, magdeck):
 def test_execute_module_command_bad_args(api_client, hardware, thermocycler):
     hardware.attached_modules = [thermocycler]
 
-    thermocycler.wait_for_temp = MagicMock(side_effect=TypeError(
-                                                       "found a 'str'"))
+    thermocycler.set_temperature = MagicMock(
+        side_effect=TypeError("found a 'str'")
+    )
 
     resp = api_client.post('modules/dummySerialTC',
                            json={'command_type': 'set_temperature',
@@ -319,6 +316,8 @@ def test_execute_module_command_bad_args(api_client, hardware, thermocycler):
 
 def test_execute_module_command_valid_args(api_client, hardware, thermocycler):
     hardware.attached_modules = [thermocycler]
+
+    thermocycler.set_temperature = MagicMock(return_value=None)
 
     resp = api_client.post('modules/dummySerialTC',
                            json={'command_type': 'set_temperature',

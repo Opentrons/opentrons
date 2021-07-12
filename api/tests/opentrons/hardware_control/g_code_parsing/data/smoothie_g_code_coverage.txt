@@ -1,0 +1,24 @@
+# Home
+1625066248.782470 | smoothie | G28.2 ABCXYZ
+1625066248.786640 | smoothie | G28.2 X
+1625066248.789110 | smoothie | G28.2 Y
+1625066248.794110 | smoothie | G28.2 Z
+1625066248.795227 | smoothie | G28.2 A
+1625066248.795527 | smoothie | G28.2 B
+1625066248.802971 | smoothie | G28.2 C
+
+# Move
+1625066248.881811 | smoothie | G0 X113.38 Y11.24
+1625066248.879905 | smoothie | G0 A132.6
+1625066248.875387 | smoothie | G0 C-8.5
+
+# Set Speed
+1625066248.874877 | smoothie | G0 F601
+
+# Wait
+1625066248.793615 | smoothie | M400
+
+# Set Current
+1625066248.804175 | smoothie | M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1
+
+# TODO: Define coverage for the rest of the G-Codes in Smoothie

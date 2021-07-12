@@ -113,7 +113,6 @@ function _updatePatchPathField(
   rawForm: FormData,
   pipetteEntities: LegacyPipetteEntities
 ): FormPatch {
-  // $FlowFixMe(IL, 2020-02-24): address in #3161, patch may overwrite explicit keys in rawForm
   const appliedPatch = { ...rawForm, ...patch }
   const { path, changeTip } = appliedPatch
 
