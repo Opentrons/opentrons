@@ -13,36 +13,38 @@ interface Props {
 }
 const Content = (props: Props): JSX.Element => {
   const labwareType = props.values.labwareType
-  const isOpentronsTubeRack = labwareType === 'tubeRack' && props.values.tubeRackInsertLoadName !== 'customTubeRack'
+  const isOpentronsTubeRack =
+    labwareType === 'tubeRack' &&
+    props.values.tubeRackInsertLoadName !== 'customTubeRack'
   const showBrand = !isOpentronsTubeRack
   const showGroupBrand = labwareType === 'tubeRack'
-    return (
-      <>
-
-      {
-          showBrand &&
-          <div className={styles.flex_row}>
-            <div className={styles.brand_column}>
-              <TextField name="brand" />
-            </div>
-            <div className={styles.brand_id_column}>
-              <TextField name="brandId" caption="Separate multiple by comma" />
-            </div>
+  return (
+    <>
+      {showBrand && (
+        <div className={styles.flex_row}>
+          <div className={styles.brand_column}>
+            <TextField name="brand" />
           </div>
-          }
-        {
-        showGroupBrand &&
+          <div className={styles.brand_id_column}>
+            <TextField name="brandId" caption="Separate multiple by comma" />
+          </div>
+        </div>
+      )}
+      {showGroupBrand && (
         <div className={styles.flex_row}>
           <div className={styles.brand_column}>
             <TextField name="groupBrand" />
           </div>
           <div className={styles.brand_id_column}>
-            <TextField name="groupBrandId" caption="Separate multiple by comma" />
+            <TextField
+              name="groupBrandId"
+              caption="Separate multiple by comma"
+            />
           </div>
         </div>
-        }
-      </>
-    )
+      )}
+    </>
+  )
 }
 
 export const Description = (): JSX.Element | null => {
@@ -56,7 +58,7 @@ export const Description = (): JSX.Element | null => {
   return (
     <SectionBody label="Description" id="Description">
       <FormAlerts touched={touched} errors={errors} fieldList={fieldList} />
-      <Content values={values}/>
+      <Content values={values} />
     </SectionBody>
   )
 }

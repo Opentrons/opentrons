@@ -144,7 +144,6 @@ export interface ProcessedLabwareFields {
   aluminumBlockChildType: string | null
   handPlacedTipFit: string | null
 
-
   // tubeRackSides: string[], // eg, []
   footprintXDimension: number
   footprintYDimension: number
@@ -437,8 +436,8 @@ export const getLabel = (
     return `Are all your ${getLabwareName(
       values,
       true
-    )} the same shape and size?`}
-  else if (name === 'brand' && values.labwareType==='tubeRack'){
+    )} the same shape and size?`
+  } else if (name === 'brand' && values.labwareType === 'tubeRack') {
     return 'Rack Brand'
   }
   return LABELS[name]

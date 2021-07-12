@@ -24,7 +24,10 @@ describe('Description', () => {
     }
 
     when(isEveryFieldHiddenMock)
-      .calledWith(['brand', 'brandId', 'groupBrand', 'groupBrandId'], formikConfig.initialValues)
+      .calledWith(
+        ['brand', 'brandId', 'groupBrand', 'groupBrandId'],
+        formikConfig.initialValues
+      )
       .mockReturnValue(false)
   })
 
@@ -43,8 +46,8 @@ describe('Description', () => {
   })
 
   it('should show tube brand when an Opentrons Tube rack is selected', () => {
-    formikConfig.initialValues.labwareType='tubeRack'
-    formikConfig.initialValues.tubeRackInsertLoadName='6tubes'
+    formikConfig.initialValues.labwareType = 'tubeRack'
+    formikConfig.initialValues.tubeRackInsertLoadName = '6tubes'
     render(wrapInFormik(<Description />, formikConfig))
     expect(screen.getByRole('heading')).toHaveTextContent(/description/i)
 
@@ -54,13 +57,15 @@ describe('Description', () => {
   })
 
   it('should show tube brand and rack brand when Custom Tube rack is selected', () => {
-    formikConfig.initialValues.labwareType='tubeRack'
-    formikConfig.initialValues.tubeRackInsertLoadName='customTubeRack'
+    formikConfig.initialValues.labwareType = 'tubeRack'
+    formikConfig.initialValues.tubeRackInsertLoadName = 'customTubeRack'
     render(wrapInFormik(<Description />, formikConfig))
     expect(screen.getByRole('heading')).toHaveTextContent(/description/i)
 
     screen.getByRole('textbox', { name: /^tube brand$/i })
-    expect(screen.getAllByRole('textbox', { name: /manufacturer\/catalog #/i })).toHaveLength(2)
+    expect(
+      screen.getAllByRole('textbox', { name: /manufacturer\/catalog #/i })
+    ).toHaveLength(2)
     screen.getByRole('textbox', { name: /^rack brand$/i })
   })
 
