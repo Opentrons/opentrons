@@ -47,7 +47,7 @@ clean_cmd = $(SHX) rm -rf build dist .coverage coverage.xml '*.egg-info' '**/__p
 # Uvicorn command to run the robot server in dev mode.
 #
 # "--lifespan on" ensures errors in startup and shutdown handlers won't be hidden.
-# See github.com/encode/starlette/issues/1138.
+# See github.com/encode/starlette/issues/1138, fixed in Starlette v0.16.0?
 #
 # todo(mm, 2021-07-08): Figure out how to run the server with Python development
 # mode enabled, to expose more errors and warnings.
