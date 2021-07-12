@@ -12,7 +12,6 @@ interface Props {
   values: LabwareFields
 }
 const Content = (props: Props): JSX.Element => {
-//  if (props.values.labwareType === 'tipRack') {
   const labwareType = props.values.labwareType
   const isOpentronsTubeRack = labwareType === 'tubeRack' && props.values.tubeRackInsertLoadName !== 'customTubeRack'
   const showBrand = !isOpentronsTubeRack

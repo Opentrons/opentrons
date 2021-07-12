@@ -124,7 +124,7 @@ export interface LabwareFields {
   brand: string | null | undefined
   brandId: string | null | undefined // comma-separated values
   groupBrand: string | null | undefined
-  groupBrandId: string | null | undefined
+  groupBrandId: string | null | undefined // comma-separated values
 
   loadName: string | null | undefined
   displayName: string | null | undefined
