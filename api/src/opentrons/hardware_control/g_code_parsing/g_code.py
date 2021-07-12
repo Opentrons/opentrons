@@ -8,22 +8,22 @@ from opentrons.hardware_control.g_code_parsing.utils import reverse_enum
 from opentrons.hardware_control.emulation.parser import Parser
 from opentrons.hardware_control.g_code_parsing.g_code_functionality_defs.\
     g_code_functionality_def_base import Explanation
-from .g_code_functionality_defs import (
-    CurrentPositionCodeFunctionalityDef,
-    DwellGCodeFunctionalityDef,
-    HomeGCodeFunctionalityDef,
-    LimitSwitchStatusGCodeFunctionalityDef,
-    MoveGCodeFunctionalityDef,
-    SetCurrentGCodeFunctionalityDef,
-    SetSpeedGCodeFunctionalityDef,
-    WaitGCodeFunctionalityDef,
-    ProbeGCodeFunctionalityDef,
-    AbsoluteCoordinateModeGCodeFunctionalityDef,
-    RelativeCoordinateModeGCodeFunctionalityDef,
-    ResetFromErrorGCodeFunctionalityDef,
-    PushSpeedGCodeFunctionalityDef,
-    PopSpeedGCodeFunctionalityDef,
-    StepsPerMMGCodeFunctionalityDef,
+from .g_code_functionality_defs.smoothie import (
+    CurrentPositionCodeFunctionalityDef, DwellGCodeFunctionalityDef,
+    HomeGCodeFunctionalityDef, LimitSwitchStatusGCodeFunctionalityDef,
+    MoveGCodeFunctionalityDef, SetCurrentGCodeFunctionalityDef,
+    SetSpeedGCodeFunctionalityDef, WaitGCodeFunctionalityDef,
+    ProbeGCodeFunctionalityDef, AbsoluteCoordinateModeGCodeFunctionalityDef,
+    RelativeCoordinateModeGCodeFunctionalityDef, ResetFromErrorGCodeFunctionalityDef,
+    PushSpeedGCodeFunctionalityDef, PopSpeedGCodeFunctionalityDef,
+    StepsPerMMGCodeFunctionalityDef, SetMaxSpeedGCodeFunctionalityDef,
+    AccelerationGCodeFunctionalityDef, DisengageMotorGCodeFunctionalityDef,
+    HomingStatusGCodeFunctionalityDef, MicrosteppingCEnableGCodeFunctionalityDef,
+    MicrosteppingCDisableGCodeFunctionalityDef,
+    MicrosteppingBEnableGCodeFunctionalityDef,
+    MicrosteppingBDisableGCodeFunctionalityDef, SetPipetteRetractGCodeFunctionalityDef,
+    SetPipetteDebounceGCodeFunctionalityDef, SetPipetteHomeGCodeFunctionalityDef,
+    SetPipetteMaxTravelGCodeFunctionalityDef,
 )
 
 
@@ -45,15 +45,31 @@ class GCode:
         SMOOTHIE_GCODE.CURRENT_POSITION.name: CurrentPositionCodeFunctionalityDef,
         SMOOTHIE_GCODE.LIMIT_SWITCH_STATUS.name: LimitSwitchStatusGCodeFunctionalityDef,
         SMOOTHIE_GCODE.PROBE.name: ProbeGCodeFunctionalityDef,
-        SMOOTHIE_GCODE.ABSOLUTE_COORDS.name: \
-        AbsoluteCoordinateModeGCodeFunctionalityDef,
-        SMOOTHIE_GCODE.RELATIVE_COORDS.name: \
-        RelativeCoordinateModeGCodeFunctionalityDef,
+        SMOOTHIE_GCODE.ABSOLUTE_COORDS.name:
+            AbsoluteCoordinateModeGCodeFunctionalityDef,
+        SMOOTHIE_GCODE.RELATIVE_COORDS.name:
+            RelativeCoordinateModeGCodeFunctionalityDef,
         SMOOTHIE_GCODE.RESET_FROM_ERROR.name: ResetFromErrorGCodeFunctionalityDef,
         SMOOTHIE_GCODE.PUSH_SPEED.name: PushSpeedGCodeFunctionalityDef,
         SMOOTHIE_GCODE.POP_SPEED.name: PopSpeedGCodeFunctionalityDef,
         SMOOTHIE_GCODE.STEPS_PER_MM.name: StepsPerMMGCodeFunctionalityDef,
-
+        SMOOTHIE_GCODE.SET_MAX_SPEED.name: SetMaxSpeedGCodeFunctionalityDef,
+        SMOOTHIE_GCODE.ACCELERATION.name: AccelerationGCodeFunctionalityDef,
+        SMOOTHIE_GCODE.DISENGAGE_MOTOR.name: DisengageMotorGCodeFunctionalityDef,
+        SMOOTHIE_GCODE.HOMING_STATUS.name: HomingStatusGCodeFunctionalityDef,
+        SMOOTHIE_GCODE.MICROSTEPPING_B_DISABLE.name:
+            MicrosteppingBDisableGCodeFunctionalityDef,
+        SMOOTHIE_GCODE.MICROSTEPPING_B_ENABLE.name:
+            MicrosteppingBEnableGCodeFunctionalityDef,
+        SMOOTHIE_GCODE.MICROSTEPPING_C_DISABLE.name:
+            MicrosteppingCDisableGCodeFunctionalityDef,
+        SMOOTHIE_GCODE.MICROSTEPPING_C_ENABLE.name:
+            MicrosteppingCEnableGCodeFunctionalityDef,
+        SMOOTHIE_GCODE.PIPETTE_HOME.name: SetPipetteHomeGCodeFunctionalityDef,
+        SMOOTHIE_GCODE.PIPETTE_RETRACT.name: SetPipetteRetractGCodeFunctionalityDef,
+        SMOOTHIE_GCODE.PIPETTE_DEBOUNCE.name: SetPipetteDebounceGCodeFunctionalityDef,
+        SMOOTHIE_GCODE.PIPETTE_MAX_TRAVEL.name:
+            SetPipetteMaxTravelGCodeFunctionalityDef,
     }
 
     # Smoothie G-Code Parsing Characters
@@ -70,19 +86,9 @@ class GCode:
     }
 
     @classmethod
-    def from_raw_code(
-        cls,
-        raw_code: str,
-        device: str,
-        response: str
-    ) -> List[GCode]:
+    def from_raw_code(cls, raw_code: str, device: str, response: str) -> List[GCode]:
         return [
-            cls(
-                device,
-                g_code.gcode,
-                g_code.params,
-                response
-            )
+            cls(device, g_code.gcode, g_code.params, response)
             for g_code
             in Parser().parse(raw_code)
         ]
