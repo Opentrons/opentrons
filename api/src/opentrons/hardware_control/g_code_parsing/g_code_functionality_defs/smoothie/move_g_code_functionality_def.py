@@ -1,7 +1,8 @@
 from typing import Dict
 from string import Template
 from enum import Enum
-from .g_code_functionality_def_base import GCodeFunctionalityDefBase
+from opentrons.hardware_control.g_code_parsing.g_code_functionality_defs.\
+    g_code_functionality_def_base import GCodeFunctionalityDefBase
 
 
 class MoveGCodeFunctionalityDef(GCodeFunctionalityDefBase):
