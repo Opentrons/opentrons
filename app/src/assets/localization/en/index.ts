@@ -1,6 +1,7 @@
 import shared from './shared.json'
 import protocol_calibration from './protocol_calibration.json'
 import protocol_info from './protocol_info.json'
+import protocol_setup from './protocol_setup.json'
 import robot_advanced_settings from './robot_advanced_settings.json'
 import robot_calibration from './robot_calibration.json'
 import robot_connection from './robot_connection.json'
@@ -12,6 +13,7 @@ export const en = {
   shared,
   protocol_calibration,
   protocol_info,
+  protocol_setup,
   robot_advanced_settings,
   robot_calibration,
   robot_connection,

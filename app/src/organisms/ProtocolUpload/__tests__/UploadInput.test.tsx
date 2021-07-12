@@ -8,17 +8,16 @@ import { UploadInput } from '../UploadInput'
 
 describe('UploadInput', () => {
   let render: () => ReturnType<typeof renderWithProviders>
-  let createSession: jest.MockedFunction<
-    React.ComponentProps<typeof UploadInput>['createSession']
+  let handleUpload: jest.MockedFunction<
+    React.ComponentProps<typeof UploadInput>['onUpload']
   >
 
   beforeEach(() => {
-    createSession = jest.fn()
+    handleUpload = jest.fn()
     render = () => {
-      return renderWithProviders(
-        <UploadInput createSession={createSession} />,
-        { i18nInstance: i18n }
-      )
+      return renderWithProviders(<UploadInput onUpload={handleUpload} />, {
+        i18nInstance: i18n,
+      })
     }
   })
 
@@ -45,12 +44,18 @@ describe('UploadInput', () => {
     expect(getByRole('link', { name: 'Launch Protocol Designer' })).toBeTruthy()
   })
 
-  it('calls createSession on button click', () => {
+  it('opens file select on button click', () => {
     const { getByRole, getByTestId } = render()
     const button = getByRole('button', { name: 'Choose File...' })
     const input = getByTestId('file_input')
     input.click = jest.fn()
     fireEvent.click(button)
     expect(input.click).toHaveBeenCalled()
+  })
+  it('calls create session on choose file', () => {
+    const { getByTestId } = render()
+    const input = getByTestId('file_input')
+    fireEvent.change(input, { target: { files: ['dummyFile'] } })
+    expect(handleUpload).toHaveBeenCalledWith('dummyFile')
   })
 })

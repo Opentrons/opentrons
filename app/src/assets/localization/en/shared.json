@@ -1,6 +1,7 @@
 {
   "browse": "browse",
   "cancel": "cancel",
+  "close": "close",
   "continue": "continue",
   "disabled_cannot_connect": "Cannot connect to robot",
   "disabled_connect_to_robot": "Connect to robot to control",

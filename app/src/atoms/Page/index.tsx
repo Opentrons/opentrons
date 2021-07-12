@@ -16,7 +16,7 @@ export function Page(props: PageProps): JSX.Element {
   return (
     <main className={styles.page}>
       {titleBarProps && (
-        <TitleBar {...titleBarProps} className={styles.fixed_title_bar} />
+        <TitleBar {...titleBarProps} className={styles.sticky_title_bar} />
       )}
       {children}
     </main>

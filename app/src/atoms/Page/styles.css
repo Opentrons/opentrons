@@ -1,14 +1,13 @@
 .page {
-  position: relative;
   width: 100%;
-  height: 100%;
-  padding-top: 3rem;
+  height: 100vh;
   overflow-y: auto;
 }
 
-.fixed_title_bar {
-  position: fixed;
+.sticky_title_bar {
+  position: sticky;
   top: 0;
+  min-height: 3rem;
   width: 100%;
   z-index: 1;
 }

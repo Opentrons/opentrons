@@ -8,6 +8,7 @@ export { getWellNamePerMultiTip } from './getWellNamePerMultiTip'
 export { getWellTotalVolume } from './getWellTotalVolume'
 export { wellIsRect } from './wellIsRect'
 
+export * from './parseProtocolData'
 export * from './volume'
 export * from './wellSets'
 

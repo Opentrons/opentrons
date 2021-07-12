@@ -17,6 +17,9 @@ export const protocolReducer: Reducer<ProtocolState, Action> = (
     case 'protocol:OPEN':
       return { ...INITIAL_STATE, ...action.payload }
 
+    case 'protocol:LOAD':
+      return { ...INITIAL_STATE, ...action.payload }
+
     case 'protocol:UPLOAD':
       return { ...state, ...action.payload }
 
@@ -35,6 +38,7 @@ export const protocolReducer: Reducer<ProtocolState, Action> = (
       return { file, contents, data }
     }
 
+    case 'protocol:CLOSE':
     case 'robot:DISCONNECT_RESPONSE':
       return INITIAL_STATE
   }
