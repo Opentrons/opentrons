@@ -31,7 +31,6 @@ async def test_with_thermocycler(loop):
                                            'temperature': 3,
                                            'hold_time_seconds': 1,
                                            'hold_time_minutes': 2,
-                                           'ramp_rate': 4,
                                            'volume': 5
                                        })
         ]})
@@ -42,15 +41,15 @@ async def test_with_thermocycler(loop):
         'data': {'currentCycleIndex': None,
                  'currentStepIndex': None,
                  'currentTemp': 3,
-                 'holdTime': 0,
+                 'holdTime': 121,
                  'lid': 'open',
                  'lidTarget': None,
-                 'lidTemp': None,
-                 'rampRate': 4,
+                 'lidTemp': 23,
+                 'rampRate': None,
                  'targetTemp': 3,
                  'totalCycleCount': None,
                  'totalStepCount': None},
-        'status': 'holding at target'
+        'status': 'heating'
         }
 
 
