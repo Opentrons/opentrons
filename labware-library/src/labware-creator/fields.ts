@@ -124,6 +124,8 @@ export interface LabwareFields {
 
   brand: string | null | undefined
   brandId: string | null | undefined // comma-separated values
+  groupBrand: string | null | undefined
+  groupBrandId: string | null | undefined // comma-separated values
 
   loadName: string | null | undefined
   displayName: string | null | undefined
@@ -173,6 +175,8 @@ export interface ProcessedLabwareFields {
 
   brand: string
   brandId: string[]
+  groupBrand: string
+  groupBrandId: string[]
 
   // if loadName or displayName are left blank, Yup schema generates them
   loadName: string
@@ -210,6 +214,8 @@ export const tubeRackInsertOptions: Options = [
     imgSrc: require('./images/blank_insert_large.png'),
   },
 ]
+
+export const DEFAULT_TUBE_BRAND = 'Opentrons'
 
 // fields that get auto-filled when tubeRackInsertLoadName is selected
 // NOTE: these are duplicate data derived from tube rack defs, but
@@ -381,6 +387,8 @@ export const getDefaultFormState = (): LabwareFields => ({
 
   brand: null,
   brandId: null,
+  groupBrand: null,
+  groupBrandId: null,
 
   loadName: null,
   displayName: null,
@@ -416,6 +424,8 @@ export const LABELS: Record<keyof LabwareFields, string> = {
   gridOffsetY: 'Y Offset (Yo)',
   brand: 'Brand',
   brandId: 'Manufacturer/Catalog #',
+  groupBrand: 'Tube Brand',
+  groupBrandId: 'Manufacturer/Catalog #',
   displayName: 'Display Name',
   loadName: 'API Load Name',
   pipetteName: 'Test Pipette',
@@ -430,6 +440,8 @@ export const getLabel = (
       values,
       true
     )} the same shape and size?`
+  } else if (name === 'brand' && values.labwareType === 'tubeRack') {
+    return 'Rack Brand'
   }
   if (name === 'wellShape') {
     return `${capitalize(getLabwareName(values, false))} shape`

@@ -5,6 +5,7 @@ import {
   labwareTypeOptions,
   wellBottomShapeOptions,
   wellShapeOptions,
+  DEFAULT_TUBE_BRAND,
   IRREGULAR_LABWARE_ERROR,
   LABWARE_TOO_SMALL_ERROR,
   LABWARE_TOO_LARGE_ERROR,
@@ -15,6 +16,7 @@ import {
   MAX_Z_DIMENSION,
   MIN_X_DIMENSION,
   MIN_Y_DIMENSION,
+  LabwareFields,
 } from './fields'
 import type { ProcessedLabwareFields } from './fields'
 
@@ -61,6 +63,18 @@ const nameExistsError = (nameName: string): string =>
   `This ${nameName} already exists in the Opentrons default labware library. Please edit the ${nameName} to make it unique.`
 
 // NOTE: all IRREGULAR_LABWARE_ERROR messages will be converted to a special 'error' Alert
+
+const matchCustomTubeRack = (
+  labwareType: LabwareFields['labwareType'],
+  tubeRackInsertLoadName: LabwareFields['tubeRackInsertLoadName']
+): boolean =>
+  labwareType === 'tubeRack' && tubeRackInsertLoadName === 'customTubeRack'
+
+const matchNonCustomTubeRack = (
+  labwareType: LabwareFields['labwareType'],
+  tubeRackInsertLoadName: LabwareFields['tubeRackInsertLoadName']
+): boolean =>
+  labwareType === 'tubeRack' && tubeRackInsertLoadName !== 'customTubeRack'
 
 export const labwareFormSchemaBaseObject = Yup.object({
   labwareType: requiredString(LABELS.labwareType).oneOf(
@@ -201,8 +215,13 @@ export const labwareFormSchemaBaseObject = Yup.object({
     then: requiredPositiveNumber(LABELS.wellYDimension),
     otherwise: Yup.mixed().nullable(),
   }),
-
-  brand: requiredString(LABELS.brand),
+  // non-custom tuberacks (aka Opentrons tube racks) default to "Opentrons" brand,
+  // and user cannot see or override brand (aka "rack brand")
+  brand: Yup.mixed().when(['labwareType', 'tubeRackInsertLoadName'], {
+    is: matchNonCustomTubeRack,
+    then: Yup.mixed().nullable(), // defaulted to DEFAULT_TUBE_BRAND in form-level transform below
+    otherwise: requiredString(LABELS.brand),
+  }),
   // TODO(mc, 2020-06-02): should this be Yup.array() instead of mixed?
   brandId: Yup.mixed()
     .nullable()
@@ -211,6 +230,26 @@ export const labwareFormSchemaBaseObject = Yup.object({
         currentValue: string | null | undefined,
         originalValue: string | null | undefined
       ): ProcessedLabwareFields['brandId'] =>
+        (currentValue || '')
+          .trim()
+          .split(',')
+          .map(s => s.trim())
+          .filter(Boolean)
+    ),
+  // group brand (aka "tube brand") is only required for custom tube racks
+  groupBrand: Yup.mixed().when(['labwareType', 'tubeRackInsertLoadName'], {
+    is: matchCustomTubeRack,
+    then: requiredString(LABELS.groupBrand),
+    otherwise: Yup.mixed().nullable(),
+  }),
+  // TODO(mc, 2020-06-02): should this be Yup.array() instead of mixed?
+  groupBrandId: Yup.mixed()
+    .nullable()
+    .transform(
+      (
+        currentValue: string | null | undefined,
+        originalValue: string | null | undefined
+      ): ProcessedLabwareFields['groupBrandId'] =>
         (currentValue || '')
           .trim()
           .split(',')
@@ -251,14 +290,26 @@ export const labwareFormSchemaBaseObject = Yup.object({
 export const labwareFormSchema: Yup.Schema<ProcessedLabwareFields> = labwareFormSchemaBaseObject.transform(
   (currentValue, originalValue) => {
     // "form-level" transforms
-    // NOTE: the currentValue does NOT have transforms applied :(
+    // NOTE: the currentValue does NOT have field-level transforms applied :(
     // TODO: these results are not validated, ideally I could do these transforms in the fields
+
+    // Yup runs transforms before defaults. In order for brand defaulting to work for displayName/loadName
+    // creation, we can't do .default() to the brand field, but need to default it here.
+    const brand = matchNonCustomTubeRack(
+      currentValue.labwareType,
+      currentValue.tubeRackInsertLoadName
+    )
+      ? DEFAULT_TUBE_BRAND
+      : currentValue.brand
+
+    const nextValues = { ...currentValue, brand }
+
     const displayName =
       currentValue.displayName == null || currentValue.displayName.trim() === ''
-        ? getDefaultDisplayName(currentValue)
+        ? getDefaultDisplayName(nextValues)
         : currentValue.displayName
 
-    const loadName = currentValue.loadName || getDefaultLoadName(currentValue)
+    const loadName = currentValue.loadName || getDefaultLoadName(nextValues)
 
     return {
       ...currentValue,

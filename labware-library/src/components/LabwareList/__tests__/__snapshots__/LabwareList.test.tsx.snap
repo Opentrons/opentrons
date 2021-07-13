@@ -469,6 +469,16 @@ exports[`LabwareList component renders 1`] = `
         },
         "groups": Array [
           Object {
+            "brand": Object {
+              "brand": "tube brand here",
+              "brandId": Array [
+                "tube123",
+                "other123",
+              ],
+              "links": Array [
+                "http://www.example.com/tube123",
+              ],
+            },
             "metadata": Object {},
             "wells": Array [
               "A1",

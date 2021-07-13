@@ -8,6 +8,7 @@ import {
   DISPLAY_VOLUME_UNITS,
   tubeRackAutofills,
   labwareTypeAutofills,
+  DEFAULT_TUBE_BRAND,
 } from './fields'
 import type { LabwareFields } from './fields'
 // TODO(Ian, 2019-07-24): consolidate `tubeRackAutofills/aluminumBlockAutofills`-getting logic btw here and makeAutofillOnChange
@@ -80,12 +81,21 @@ const _valuesToCreateNameArgs = (values: LabwareFields): any => {
   const gridColumns = Number(values.gridColumns) || 1
   const brand = (values.brand || '').trim()
 
+  let brandDefault: string | undefined
+  // Opentrons tube racks need to default their brand
+  if (
+    values.labwareType === 'tubeRack' &&
+    values.tubeRackInsertLoadName !== 'customTubeRack'
+  ) {
+    brandDefault = DEFAULT_TUBE_BRAND
+  }
+
   return {
     gridColumns,
     gridRows,
     displayCategory: values.labwareType || '',
     displayVolumeUnits: DISPLAY_VOLUME_UNITS,
-    brandName: brand === '' ? undefined : brand,
+    brandName: brand === '' ? brandDefault : brand,
     totalLiquidVolume: Number(values.wellVolume) || 0,
   }
 }
