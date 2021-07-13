@@ -2,10 +2,6 @@ import pytest
 from opentrons.hardware_control.g_code_parsing.g_code_functionality_defs.\
     g_code_functionality_def_base import Explanation
 from opentrons.hardware_control.g_code_parsing.g_code import GCode
-from opentrons.hardware_control.g_code_parsing.g_code_program.g_code_program import \
-    GCodeProgram
-from opentrons.hardware_control.g_code_parsing.g_code_program.supported_text_modes \
-    import SupportedTextModes
 from typing import List, Dict
 
 
