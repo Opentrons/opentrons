@@ -43,7 +43,6 @@ dev: export NODE_ENV := development
 dev: export PORT := $(PORT)
 dev:
 	concurrently --no-color --kill-others --names "server,shell" \
-
 		"$(MAKE) dev-server" \
 		"$(MAKE) dev-shell"
 
@@ -61,12 +60,22 @@ dev-shell:
 
 .PHONY: docker-emulator
 docker-emulator:
+	docker-compose down
 	docker-compose up --build
 
 .PHONY: external-browser-app
 external-browser-app:
-	make -C app dev OT_APP_UI__EXTERNAL_BROWSER=1
+	$(MAKE) dev OT_APP_UI__EXTERNAL_BROWSER=1
+
+.PHONY: test-cypress
+test-cypress:
+	wait-on http://localhost:$(PORT) && \
+	wait-on http-get://localhost:31950/openapi.json && \
+	cypress run --browser electron --record false
 
 .PHONY: test-e2e
 test-e2e:
-	wait-on http://localhost:8090/ && cypress run --browser electron --record false
+	concurrently --kill-others --names "emulator,app,tests" \
+		"$(MAKE) docker-emulator" \
+		"$(MAKE) external-browser-app" \
+		"$(MAKE) test-cypress"
