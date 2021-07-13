@@ -98,7 +98,7 @@ class GCode:
             device_name: str,
             g_code: str,
             g_code_args: dict,
-            response
+            response: str
     ) -> None:
         self._device_name = device_name
         self._g_code = g_code
@@ -191,12 +191,24 @@ class GCode:
         return g_code_function
 
     def get_explanation(self) -> Explanation:
-        explanation_class = self.G_CODE_EXPLANATION_MAPPING[self.get_gcode_function()]
-        return explanation_class.generate_explanation(
-            self.g_code,
-            self.get_gcode_function(),
-            self.g_code_args
-        )
+        g_code_function = self.get_gcode_function()
+        try:
+            explanation_class = self.G_CODE_EXPLANATION_MAPPING[g_code_function]
+        except KeyError:
+            return Explanation(
+                self.g_code,
+                self.get_gcode_function(),
+                self.g_code_args,
+                f'No explanation defined for {self.get_gcode_function()}'
+            )
+        except Exception:
+            raise
+        else:
+            return explanation_class.generate_explanation(
+                self.g_code,
+                self.get_gcode_function(),
+                self.g_code_args
+            )
 
     @property
     def response(self):
