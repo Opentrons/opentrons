@@ -1,5 +1,8 @@
 import { getUniqueWellProperties } from '../labwareInference'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type {
+  LabwareDefinition2,
+  LabwareWellGroup,
+} from '@opentrons/shared-data'
 import type { LabwareFields, BooleanString } from './fields'
 
 // NOTE: this is just String() with some typing for flow
@@ -75,6 +78,9 @@ export function labwareDefToFields(
     return null
   }
 
+  const firstGroup: LabwareWellGroup | undefined = def.groups[0]
+  const firstGroupBrand = firstGroup?.brand ?? null
+
   return {
     // NOTE: Ian 2019-08-26 these LC-specific fields cannot easily/reliably be inferred
     tubeRackInsertLoadName: null,
@@ -118,6 +124,8 @@ export function labwareDefToFields(
 
     brand: def.brand.brand,
     brandId: def.brand.brandId != null ? def.brand.brandId.join(',') : null, // comma-separated values
+    groupBrand: firstGroupBrand?.brand ?? undefined,
+    groupBrandId: firstGroupBrand?.brandId?.join(',') ?? undefined,
 
     // NOTE: intentionally null these fields, do not import them
     loadName: null,
