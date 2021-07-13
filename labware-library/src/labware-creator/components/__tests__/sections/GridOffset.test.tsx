@@ -5,7 +5,7 @@ import { when, resetAllWhenMocks } from 'jest-when'
 import { render, screen } from '@testing-library/react'
 import { nestedTextMatcher } from '../../__testUtils__/nestedTextMatcher'
 import { getDefaultFormState, LabwareFields } from '../../../fields'
-import { isEveryFieldHidden } from '../../../utils'
+import { isEveryFieldHidden, getLabwareName } from '../../../utils'
 import { GridOffset } from '../../sections/GridOffset'
 import { FormAlerts } from '../../alerts/FormAlerts'
 import { TextField } from '../../TextField'
@@ -20,6 +20,10 @@ const textFieldMock = TextField as jest.MockedFunction<typeof TextField>
 
 const isEveryFieldHiddenMock = isEveryFieldHidden as jest.MockedFunction<
   typeof isEveryFieldHidden
+>
+
+const getLabwareNameMock = getLabwareName as jest.MockedFunction<
+  typeof getLabwareName
 >
 
 const formikConfig: FormikConfig<LabwareFields> = {
@@ -61,19 +65,33 @@ describe('GridOffset', () => {
   })
 
   it('should render when fields are visible', () => {
+    when(getLabwareNameMock)
+      .calledWith(formikConfig.initialValues, false)
+      .mockReturnValue('FAKE LABWARE NAME SINGULAR')
+    when(getLabwareNameMock)
+      .calledWith(formikConfig.initialValues, true)
+      .mockReturnValue('FAKE LABWARE NAME PLURAL')
+
     render(wrapInFormik(<GridOffset />, formikConfig))
     expect(screen.getByText('Grid Offset'))
     expect(screen.getByText('mock alerts'))
     expect(
       screen.getByText(
-        "Corner offset informs the robot how far the grid of wells is from the slot's top left corner."
+        "Corner offset informs the robot how far the grid of FAKE LABWARE NAME PLURAL is from the slot's top left corner."
       )
     )
+
+    screen.getByText(
+      nestedTextMatcher(
+        "Find the measurement from the center of FAKE LABWARE NAME SINGULAR A1 to the edge of the labware's footprint."
+      )
+    )
+
     expect(screen.getByText('gridOffsetX text field'))
     expect(screen.getByText('gridOffsetY text field'))
   })
 
-  it('should update instructions when reservoir is selected', () => {
+  it('should show reservoir-specific instructions when reservoir is selected', () => {
     const { getByText } = render(
       wrapInFormik(<GridOffset />, {
         ...formikConfig,
@@ -91,24 +109,6 @@ describe('GridOffset', () => {
     )
   })
 
-  it('should update instructions when tipRack is selected', () => {
-    const { getByText } = render(
-      wrapInFormik(<GridOffset />, {
-        ...formikConfig,
-        initialValues: {
-          ...formikConfig.initialValues,
-          labwareType: 'tipRack',
-        },
-      })
-    )
-
-    getByText(
-      nestedTextMatcher(
-        "Find the measurement from the center of tip A1 to the edge of the labware's footprint."
-      )
-    )
-  })
-
   it('should NOT render when the labware type is aluminumBlock', () => {
     const { container } = render(
       wrapInFormik(<GridOffset />, {
@@ -116,19 +116,6 @@ describe('GridOffset', () => {
         initialValues: {
           ...formikConfig.initialValues,
           labwareType: 'aluminumBlock',
-        },
-      })
-    )
-    expect(container.firstChild).toBe(null)
-  })
-
-  it('should NOT render when the labware type is tubeRack', () => {
-    const { container } = render(
-      wrapInFormik(<GridOffset />, {
-        ...formikConfig,
-        initialValues: {
-          ...formikConfig.initialValues,
-          labwareType: 'tubeRack',
         },
       })
     )
