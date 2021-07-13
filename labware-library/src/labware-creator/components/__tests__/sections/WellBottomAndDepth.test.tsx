@@ -3,7 +3,11 @@ import { render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import { FormikConfig } from 'formik'
 import { when, resetAllWhenMocks } from 'jest-when'
-import { getDefaultFormState, LabwareFields } from '../../../fields'
+import {
+  getDefaultFormState,
+  LabwareFields,
+  LabwareType,
+} from '../../../fields'
 import { getLabwareName } from '../../../utils'
 import { WellBottomAndDepth } from '../../sections/WellBottomAndDepth'
 
@@ -30,30 +34,39 @@ describe('WellBottomAndDepth', () => {
     resetAllWhenMocks()
   })
 
-  it('should render with the correct information', () => {
-    when(getLabwareNameMock)
-      .calledWith(formikConfig.initialValues, false)
-      .mockReturnValue('FAKE LABWARE NAME SINGULAR')
-    when(getLabwareNameMock)
-      .calledWith(formikConfig.initialValues, true)
-      .mockReturnValue('FAKE LABWARE NAME PLURAL')
+  const labwareTypes: LabwareType[] = [
+    'tubeRack',
+    'wellPlate',
+    'reservoir',
+    'aluminumBlock',
+  ]
+  labwareTypes.forEach(labwareType => {
+    it(`should render with the correct information ${labwareType}`, () => {
+      formikConfig.initialValues.labwareType = labwareType
+      when(getLabwareNameMock)
+        .calledWith(formikConfig.initialValues, false)
+        .mockReturnValue('FAKE LABWARE NAME SINGULAR')
+      when(getLabwareNameMock)
+        .calledWith(formikConfig.initialValues, true)
+        .mockReturnValue('FAKE LABWARE NAME PLURAL')
 
-    render(wrapInFormik(<WellBottomAndDepth />, formikConfig))
+      render(wrapInFormik(<WellBottomAndDepth />, formikConfig))
 
-    expect(screen.getByRole('heading')).toHaveTextContent(
-      /FAKE LABWARE NAME SINGULAR Bottom & Depth/i
-    )
+      expect(screen.getByRole('heading')).toHaveTextContent(
+        /FAKE LABWARE NAME SINGULAR Bottom & Depth/i
+      )
 
-    screen.getByText(
-      'Depth informs the robot how far down it can go inside a FAKE LABWARE NAME SINGULAR.'
-    )
-    const radioElements = screen.getAllByRole('radio')
-    expect(radioElements).toHaveLength(3)
-    screen.getAllByRole('radio', { name: /flat/i })
-    screen.getAllByRole('radio', { name: /round/i })
-    screen.getAllByRole('radio', { name: /v-bottom/i })
+      screen.getByText(
+        'Depth informs the robot how far down it can go inside a FAKE LABWARE NAME SINGULAR.'
+      )
+      const radioElements = screen.getAllByRole('radio')
+      expect(radioElements).toHaveLength(3)
+      screen.getAllByRole('radio', { name: /flat/i })
+      screen.getAllByRole('radio', { name: /round/i })
+      screen.getAllByRole('radio', { name: /v-bottom/i })
 
-    screen.getByRole('textbox', { name: /depth/i })
+      screen.getByRole('textbox', { name: /depth/i })
+    })
   })
 
   it('should render tip length when tipRack is selected and hide the well bottom shape radioFields', () => {
