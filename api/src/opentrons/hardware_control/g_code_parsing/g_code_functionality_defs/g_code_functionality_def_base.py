@@ -18,6 +18,14 @@ class Explanation:
     provided_args: Dict[str, Any]
     command_explanation: str
 
+    def to_dict(self) -> Any:
+        return {
+            self.CODE_KEY: self.code,
+            self.COMMAND_NAME_KEY: self.command_name,
+            self.PROVIDED_ARGS_KEY: self.provided_args,
+            self.COMMAND_EXPLANATION_KEY: self.command_explanation
+        }
+
 
 class GCodeFunctionalityDefBase(ABC):
     """
