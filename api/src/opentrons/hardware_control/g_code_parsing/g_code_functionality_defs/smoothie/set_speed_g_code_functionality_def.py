@@ -10,4 +10,4 @@ class SetSpeedGCodeFunctionalityDef(GCodeFunctionalityDefBase):
     @classmethod
     def _generate_command_explanation(cls, g_code_args: Dict[str, str]) -> str:
         speed = g_code_args[cls.SPEED_ARG_KEY]
-        return f'SETTING SPEED:\n\tSetting speed to {speed}'
+        return f'Setting speed to {speed}'

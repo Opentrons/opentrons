@@ -4,7 +4,6 @@ from opentrons.hardware_control.g_code_parsing.g_code_functionality_defs.\
 
 
 class AbsoluteCoordinateModeGCodeFunctionalityDef(GCodeFunctionalityDefBase):
-
     @classmethod
     def _generate_command_explanation(cls, g_code_args: Dict[str, str]) -> str:
-        return 'ABSOLUTE COORDINATE MODE: \n\tSwitching to Absolute Coordinate Mode'
+        return 'Switching to Absolute Coordinate Mode'

@@ -20,6 +20,5 @@ class SetPipetteHomeGCodeFunctionalityDef(GCodeFunctionalityDefBase):
                     cls.VAL_DEFINED_MESSAGE.substitute(name=arg, height=g_code_arg_val)
                 )
 
-        return 'PIPETTE HOME:\n\t'\
-               'Setting the pipette home height for the following axes:\n\t'\
+        return 'Setting the pipette home height for the following axes:\n\t'\
                + '\n\t'.join(message_list)

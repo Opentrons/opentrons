@@ -8,7 +8,7 @@ class SetPipetteDebounceGCodeFunctionalityDef(GCodeFunctionalityDefBase):
 
     EXPECTED_ARGS = ['B', 'C', 'Z', 'A']
 
-    VAL_DEFINED_MESSAGE = Template('$name-Axis: $height')
+    VAL_DEFINED_MESSAGE = Template('$name-Axis: $time')
 
     @classmethod
     def _generate_command_explanation(cls, g_code_args: Dict[str, str]) -> str:
@@ -17,9 +17,8 @@ class SetPipetteDebounceGCodeFunctionalityDef(GCodeFunctionalityDefBase):
             g_code_arg_val = g_code_args.get(arg)
             if g_code_arg_val is not None:
                 message_list.append(
-                    cls.VAL_DEFINED_MESSAGE.substitute(name=arg, height=g_code_arg_val)
+                    cls.VAL_DEFINED_MESSAGE.substitute(name=arg, time=g_code_arg_val)
                 )
 
-        return 'PIPETTE HOME:\n\t'\
-               'Setting the pipette endstop debounce time for the following axes:\n\t'\
+        return 'Setting the pipette endstop debounce time for the following axes:\n\t'\
                + '\n\t'.join(message_list)

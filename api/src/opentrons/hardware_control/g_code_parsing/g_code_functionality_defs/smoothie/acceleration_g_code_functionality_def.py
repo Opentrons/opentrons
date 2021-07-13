@@ -9,13 +9,13 @@ class AccelerationGCodeFunctionalityDef(GCodeFunctionalityDefBase):
     EXPECTED_ARGS = ['S', 'X', 'Y', 'Z', 'A', 'B', 'C']
 
     class ValDefinedMessage(str, Enum):
-        S = 'Default -> $ident'
-        Y = 'Y-Axis -> $ident'
-        X = 'X-Axis -> $ident'
-        Z = 'Left Pipette Arm -> $ident'
-        B = 'Left Pipette Suction -> $ident'
-        A = 'Right Pipette Arm ->- $ident'
-        C = 'Right Pipette Suction -> $ident'
+        S = 'Default: $ident'
+        Y = 'Y-Axis: $ident'
+        X = 'X-Axis: $ident'
+        Z = 'Left Pipette Arm: $ident'
+        B = 'Left Pipette Suction: $ident'
+        A = 'Right Pipette Arm: $ident'
+        C = 'Right Pipette Suction: $ident'
 
     @classmethod
     def _generate_command_explanation(cls, g_code_args: Dict[str, str]) -> str:
@@ -27,4 +27,5 @@ class AccelerationGCodeFunctionalityDef(GCodeFunctionalityDefBase):
                 message = pos_message_template.substitute(ident=g_code_arg_val)
                 message_list.append(message)
 
-        return 'ACCELERATION:\n\tSetting acceleration:' + '\n\t'.join(message_list)
+        return 'Setting acceleration for the following axes:\n\t'\
+               + '\n\t'.join(message_list)

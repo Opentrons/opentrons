@@ -6,7 +6,7 @@ from opentrons.hardware_control.g_code_parsing.g_code_functionality_defs.\
 
 class SetPipetteMaxTravelGCodeFunctionalityDef(GCodeFunctionalityDefBase):
 
-    EXPECTED_ARGS = ['B', 'C']
+    EXPECTED_ARGS = ['A', 'Z', 'B', 'C']
 
     VAL_DEFINED_MESSAGE = Template('$name-Axis: $height')
 
@@ -20,6 +20,5 @@ class SetPipetteMaxTravelGCodeFunctionalityDef(GCodeFunctionalityDefBase):
                     cls.VAL_DEFINED_MESSAGE.substitute(name=arg, height=g_code_arg_val)
                 )
 
-        return 'PIPETTE HOME:\n\t'\
-               'Setting the pipette max travel height for the following axes:\n\t'\
+        return 'Setting the pipette max travel height for the following axes:\n\t'\
                + '\n\t'.join(message_list)

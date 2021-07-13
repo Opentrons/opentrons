@@ -17,4 +17,4 @@ class HomeGCodeFunctionalityDef(GCodeFunctionalityDefBase):
         ]
 
         axis_to_home = ', '.join(current_keys)
-        return f'HOME:\n\tHoming the following axes: {axis_to_home}'
+        return f'Homing the following axes: {axis_to_home}'

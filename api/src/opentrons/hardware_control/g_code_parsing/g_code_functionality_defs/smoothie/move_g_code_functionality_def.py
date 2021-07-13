@@ -27,4 +27,4 @@ class MoveGCodeFunctionalityDef(GCodeFunctionalityDefBase):
                 message = pos_message_template.substitute(ident=g_code_arg_val)
                 message_list.append(message)
 
-        return 'MOVE:\n\t' + '\n\t'.join(message_list)
+        return 'Moving the robot as follows:\n\t' + '\n\t'.join(message_list)

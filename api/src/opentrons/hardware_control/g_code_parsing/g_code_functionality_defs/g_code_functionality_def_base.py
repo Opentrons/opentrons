@@ -5,6 +5,9 @@ from dataclasses import dataclass
 
 @dataclass
 class Explanation:
+    """
+    Dataclass containing information about the ran G-Code.
+    """
     CODE_KEY = 'Code'
     COMMAND_NAME_KEY = 'Command Name'
     PROVIDED_ARGS_KEY = 'Provided Arguments'
@@ -17,6 +20,11 @@ class Explanation:
 
 
 class GCodeFunctionalityDefBase(ABC):
+    """
+    ABC for classes that provide the string building for the textual descriptions of
+    each G-Code. It is required that each child class implements
+    _generate_command_explanations
+    """
     @classmethod
     def generate_explanation(
         cls,

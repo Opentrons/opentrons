@@ -17,10 +17,12 @@ class SetPipetteRetractGCodeFunctionalityDef(GCodeFunctionalityDefBase):
             g_code_arg_val = g_code_args.get(arg)
             if g_code_arg_val is not None:
                 message_list.append(
-                    cls.VAL_DEFINED_MESSAGE.substitute(name=arg, height=g_code_arg_val)
+                    cls.VAL_DEFINED_MESSAGE.substitute(
+                        name=arg,
+                        distance=g_code_arg_val
+                    )
                 )
 
-        return 'PIPETTE HOME:\n\t'\
-               'Setting the pipette endstop retract distance ' \
+        return 'Setting the pipette endstop retract distance ' \
                'for the following axes:\n\t'\
                + '\n\t'.join(message_list)

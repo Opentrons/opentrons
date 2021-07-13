@@ -7,4 +7,4 @@ class ResetFromErrorGCodeFunctionalityDef(GCodeFunctionalityDefBase):
 
     @classmethod
     def _generate_command_explanation(cls, g_code_args: Dict[str, str]) -> str:
-        return 'RESET FROM ERROR: \n\tResetting OT-2 from error state'
+        return 'Resetting OT-2 from error state'

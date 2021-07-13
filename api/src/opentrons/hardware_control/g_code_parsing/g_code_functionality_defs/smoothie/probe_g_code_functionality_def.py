@@ -22,13 +22,13 @@ class ProbeGCodeFunctionalityDef(GCodeFunctionalityDefBase):
         if cls.SPEED_ARG_KEY in current_keys:
             speed = g_code_args[cls.SPEED_ARG_KEY]
             current_keys.remove(cls.SPEED_ARG_KEY)
-
+        probing_to_values = ','.join([str(g_code_args[key]) for key in current_keys])
         axis_to_probe = ', '.join(current_keys)
 
         if speed is None:
-            message = f'PROBE:\n\tProbing the following axes: {axis_to_probe}'
+            message = f'Probing {probing_to_values} on the {axis_to_probe} axis'
         else:
-            message = f'PROBE:\n\tProbing the following axes: {axis_to_probe}; ' \
+            message = f'Probing {probing_to_values} on the {axis_to_probe} axis, ' \
                       f'at a speed of {speed}'
 
         return message

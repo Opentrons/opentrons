@@ -20,5 +20,5 @@ class SetMaxSpeedGCodeFunctionalityDef(GCodeFunctionalityDefBase):
                     cls.VAL_DEFINED_MESSAGE.substitute(name=arg, speed=g_code_arg_val)
                 )
 
-        return 'SET MAX SPEED:\n\tSetting the max speed for the following axes:\n\t'\
+        return 'Setting the max speed for the following axes:\n\t'\
                + '\n\t'.join(message_list)

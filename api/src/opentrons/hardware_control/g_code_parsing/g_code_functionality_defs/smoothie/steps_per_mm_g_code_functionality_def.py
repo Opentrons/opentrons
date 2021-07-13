@@ -8,7 +8,7 @@ class StepsPerMMGCodeFunctionalityDef(GCodeFunctionalityDefBase):
 
     EXPECTED_ARGS = ['X', 'Y', 'Z', 'A', 'B', 'C']
 
-    VAL_DEFINED_MESSAGE = Template('$name-Axis $steps steps per mm')
+    VAL_DEFINED_MESSAGE = Template('$name-Axis: $steps steps per mm')
 
     @classmethod
     def _generate_command_explanation(cls, g_code_args: Dict[str, str]) -> str:
@@ -20,5 +20,5 @@ class StepsPerMMGCodeFunctionalityDef(GCodeFunctionalityDefBase):
                     cls.VAL_DEFINED_MESSAGE.substitute(name=arg, steps=g_code_arg_val)
                 )
 
-        return 'STEPS PER MM:\n\tSetting the following axes steps per mm:\n\t'\
+        return 'Setting the following axes steps per mm:\n\t' \
                + '\n\t'.join(message_list)

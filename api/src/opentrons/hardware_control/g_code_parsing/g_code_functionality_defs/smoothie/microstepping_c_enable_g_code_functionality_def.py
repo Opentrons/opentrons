@@ -7,4 +7,4 @@ class MicrosteppingCEnableGCodeFunctionalityDef(GCodeFunctionalityDefBase):
 
     @classmethod
     def _generate_command_explanation(cls, g_code_args: Dict[str, str]) -> str:
-        return 'MICROSTEPPING C ENABLE \n\tEnabling microstepping on C-Axis'
+        return 'Enabling microstepping on C-Axis'

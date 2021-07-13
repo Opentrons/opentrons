@@ -10,12 +10,12 @@ class SetCurrentGCodeFunctionalityDef(GCodeFunctionalityDefBase):
     EXPECTED_ARGS = ['X', 'Y', 'Z', 'A', 'B', 'C']
 
     class ValDefinedMessage(str, Enum):
-        Y = 'The current (in amps) for the Y-Axis Motor to $current'
-        X = 'The current (in amps) for the X-Axis Motor to $current'
-        Z = 'The current (in amps) for the Z-Axis Motor to $current'
-        B = 'The current (in amps) for the B-Axis Motor to $current'
-        A = 'The current (in amps) for the A-Axis Motor to $current'
-        C = 'The current (in amps) for the C-Axis Motor to $current'
+        Y = 'Y-Axis Motor: $current'
+        X = 'X-Axis Motor: $current'
+        Z = 'Z-Axis Motor: $current'
+        B = 'B-Axis Motor: $current'
+        A = 'A-Axis Motor: $current'
+        C = 'C-Axis Motor: $current'
 
     @classmethod
     def _generate_command_explanation(
@@ -30,4 +30,4 @@ class SetCurrentGCodeFunctionalityDef(GCodeFunctionalityDefBase):
                 message = message_template.substitute(current=g_code_arg_val)
                 message_list.append(message)
 
-        return 'SETTING CURRENT:\n\t' + '\n\t'.join(message_list)
+        return 'Setting the current (in amps) to:\n\t' + '\n\t'.join(message_list)

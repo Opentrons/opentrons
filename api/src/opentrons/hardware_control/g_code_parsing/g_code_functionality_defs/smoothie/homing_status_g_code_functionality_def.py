@@ -7,4 +7,4 @@ class HomingStatusGCodeFunctionalityDef(GCodeFunctionalityDefBase):
 
     @classmethod
     def _generate_command_explanation(cls, g_code_args: Dict[str, str]) -> str:
-        return 'HOMING STATUS \n\tGetting homing status for all axes'
+        return 'Getting homing status for all axes'

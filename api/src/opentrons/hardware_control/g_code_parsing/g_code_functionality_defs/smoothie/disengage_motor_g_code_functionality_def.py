@@ -1,5 +1,4 @@
 from typing import Dict
-from string import Template
 from opentrons.hardware_control.g_code_parsing.g_code_functionality_defs.\
     g_code_functionality_def_base import GCodeFunctionalityDefBase
 
@@ -18,5 +17,4 @@ class DisengageMotorGCodeFunctionalityDef(GCodeFunctionalityDefBase):
         ]
 
         axis_to_home = ', '.join(current_keys)
-        return f'DISENGAGE MOTOR:\n\tDisengaging motor for the following axes:' \
-               f'\n\t{axis_to_home}'
+        return f'Disengaging motor for the following axes: {axis_to_home}'

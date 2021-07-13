@@ -7,4 +7,4 @@ class RelativeCoordinateModeGCodeFunctionalityDef(GCodeFunctionalityDefBase):
 
     @classmethod
     def _generate_command_explanation(cls, g_code_args: Dict[str, str]) -> str:
-        return 'RELATIVE COORDINATE MODE: \n\tSwitching to Relative Coordinate Mode'
+        return 'Switching to Relative Coordinate Mode'
