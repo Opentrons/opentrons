@@ -79,7 +79,7 @@ export function labwareDefToFields(
   }
 
   const firstGroup: LabwareWellGroup | undefined = def.groups[0]
-  const firstGroupBrand = firstGroup?.brand ?? null
+  const firstGroupBrand = firstGroup?.brand
 
   return {
     // NOTE: Ian 2019-08-26 these LC-specific fields cannot easily/reliably be inferred
@@ -124,7 +124,7 @@ export function labwareDefToFields(
 
     brand: def.brand.brand,
     brandId: def.brand.brandId != null ? def.brand.brandId.join(',') : null, // comma-separated values
-    groupBrand: firstGroupBrand?.brand ?? undefined,
+    groupBrand: firstGroupBrand?.brand,
     groupBrandId: firstGroupBrand?.brandId?.join(',') ?? undefined,
 
     // NOTE: intentionally null these fields, do not import them

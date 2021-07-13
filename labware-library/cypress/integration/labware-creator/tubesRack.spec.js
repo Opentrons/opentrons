@@ -145,15 +145,14 @@ context('Tubes and Rack', () => {
         ).should('exist')
         cy.contains('close').click({ force: true })
 
-        // Brand info
-        cy.contains('Brand is required').should('exist')
-        cy.get("input[name='brand']").type('TestPro')
+        // Brand field should not be shown for Opentrons tube rack (aka non-custom)
         cy.contains('Brand is required').should('not.exist')
-        cy.get("input[name='brandId']").type('001')
 
         // File info
-        cy.get("input[placeholder='TestPro 6 Tube Rack 10 µL']").should('exist')
-        cy.get("input[placeholder='testpro_6_tuberack_10ul']").should('exist')
+        cy.get("input[placeholder='Opentrons 6 Tube Rack 10 µL']").should(
+          'exist'
+        )
+        cy.get("input[placeholder='opentrons_6_tuberack_10ul']").should('exist')
 
         // Test pipette
         cy.contains('Test Pipette is required').should('exist')
@@ -320,17 +319,16 @@ context('Tubes and Rack', () => {
         ).should('exist')
         cy.contains('close').click({ force: true })
 
-        // Brand info
-        cy.contains('Brand is required').should('exist')
-        cy.get("input[name='brand']").type('TestPro')
+        // Brand field should not be shown for Opentrons tube rack (aka non-custom)
         cy.contains('Brand is required').should('not.exist')
-        cy.get("input[name='brandId']").type('001')
 
         // File info
-        cy.get("input[placeholder='TestPro 15 Tube Rack 10 µL']").should(
+        cy.get("input[placeholder='Opentrons 15 Tube Rack 10 µL']").should(
           'exist'
         )
-        cy.get("input[placeholder='testpro_15_tuberack_10ul']").should('exist')
+        cy.get("input[placeholder='opentrons_15_tuberack_10ul']").should(
+          'exist'
+        )
 
         // Test pipette
         cy.contains('Test Pipette is required').should('exist')
@@ -497,17 +495,16 @@ context('Tubes and Rack', () => {
         ).should('exist')
         cy.contains('close').click({ force: true })
 
-        // Brand info
-        cy.contains('Brand is required').should('exist')
-        cy.get("input[name='brand']").type('TestPro')
+        // Brand field should not be shown for Opentrons tube rack (aka non-custom)
         cy.contains('Brand is required').should('not.exist')
-        cy.get("input[name='brandId']").type('001')
 
         // File info
-        cy.get("input[placeholder='TestPro 24 Tube Rack 10 µL']").should(
+        cy.get("input[placeholder='Opentrons 24 Tube Rack 10 µL']").should(
           'exist'
         )
-        cy.get("input[placeholder='testpro_24_tuberack_10ul']").should('exist')
+        cy.get("input[placeholder='opentrons_24_tuberack_10ul']").should(
+          'exist'
+        )
 
         // Test pipette
         cy.contains('Test Pipette is required').should('exist')

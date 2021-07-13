@@ -214,6 +214,8 @@ export const tubeRackInsertOptions: Options = [
   },
 ]
 
+export const DEFAULT_TUBE_BRAND = 'Opentrons'
+
 // fields that get auto-filled when tubeRackInsertLoadName is selected
 // NOTE: these are duplicate data derived from tube rack defs, but
 // are intentionally duplicated to be the source of truth about the

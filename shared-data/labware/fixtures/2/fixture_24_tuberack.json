@@ -277,6 +277,11 @@
         "C6",
         "D6"
       ],
+      "brand": {
+        "brand": "tube brand here",
+        "brandId": ["tube123", "other123"],
+        "links": ["http://www.example.com/tube123"]
+      },
       "metadata": {}
     }
   ],
