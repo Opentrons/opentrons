@@ -1,9 +1,7 @@
-from unittest.mock import MagicMock, DEFAULT
 from typing import List
 from serial import Serial  # type: ignore
 from opentrons.drivers import serial_communication
 from dataclasses import dataclass
-from time import time
 
 
 @dataclass
