@@ -32,6 +32,9 @@ class CommandExecutor:
         self._command_mapper = command_mapper
         self._resources = resources
 
+    async def execute_by_id(self, command_id: str) -> None:
+        raise NotImplementedError("execute_by_id not yet implemented")
+
     async def execute(self, command: Command) -> Command:
         """Run a given command's execution procedure."""
         command_impl = command._ImplementationCls(

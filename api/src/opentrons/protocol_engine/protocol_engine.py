@@ -57,6 +57,8 @@ class ProtocolEngine:
         self._state_store.handle_command(command)
         return command
 
+    # TODO(mc, 2021-07-14): pretty sure this method becomes obsolete with
+    # the addition of the QueueWorker. Remove if able.
     async def execute_command_by_id(self, command_id: str) -> Command:
         """Execute a protocol engine command by its identifier."""
         queued_command = self.state_view.commands.get(command_id)
@@ -97,6 +99,7 @@ class ProtocolEngine:
             startedAt=self._resources.model_utils.get_timestamp(),
             status=CommandStatus.RUNNING,
         )
+
         self._state_store.handle_command(running_command)
 
         completed_command = await self._command_executor.execute(running_command)

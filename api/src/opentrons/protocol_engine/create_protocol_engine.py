@@ -51,7 +51,10 @@ async def create_protocol_engine(hardware: HardwareAPI) -> ProtocolEngine:
         command_mapper=command_mapper,
     )
 
-    queue_worker = QueueWorker()
+    queue_worker = QueueWorker(
+        command_executor=command_executor,
+        state_store=state_store,
+    )
 
     return ProtocolEngine(
         state_store=state_store,
