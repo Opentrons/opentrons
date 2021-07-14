@@ -7,10 +7,14 @@ describe('Test Suite 01 - Validate Robot Page', () => {
     cy.visit('http://localhost:8090')
   })
 
-  // Confirm that initial page has loaded properly and all inital content is present
+  // Confirm that initial page has loaded properly and all initial content is present
   it('Successfully loads page', () => {
-    cy.get('.dZMtmt > .Svg-sc-1lpozsw-0 > path').should('exist')
-    cy.get('.SidePanel__title__3j665').should('exist')
+    //ROBOT button
+    cy.get('a[href="#/robots"]').should('exist').contains('Robot')
+    //Robots header
+    cy.get('h2').should(elem => {
+      expect(elem.text()).to.equal('Robots')
+    })
     cy.get('.dZMtmt > .Text-sc-1wb1h0f-0').should('exist')
     cy.get('.cOCwJn > .Svg-sc-1lpozsw-0 > path').should('exist')
     cy.get('.cOCwJn > .Text-sc-1wb1h0f-0').should('exist')

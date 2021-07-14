@@ -79,3 +79,7 @@ test-e2e:
 		"$(MAKE) docker-emulator" \
 		"$(MAKE) external-browser-app" \
 		"$(MAKE) test-cypress"
+
+.PHONY: cypress-visual
+cypress-visual:
+	cypress open
