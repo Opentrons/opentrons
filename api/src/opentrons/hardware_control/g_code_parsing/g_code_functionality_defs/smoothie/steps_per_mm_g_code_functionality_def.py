@@ -1,0 +1,24 @@
+from typing import Dict
+from string import Template
+from opentrons.hardware_control.g_code_parsing.g_code_functionality_defs.\
+    g_code_functionality_def_base import GCodeFunctionalityDefBase
+
+
+class StepsPerMMGCodeFunctionalityDef(GCodeFunctionalityDefBase):
+
+    EXPECTED_ARGS = ['X', 'Y', 'Z', 'A', 'B', 'C']
+
+    VAL_DEFINED_MESSAGE = Template('$name-Axis: $steps steps per mm')
+
+    @classmethod
+    def _generate_command_explanation(cls, g_code_args: Dict[str, str]) -> str:
+        message_list = []
+        for arg in cls.EXPECTED_ARGS:
+            g_code_arg_val = g_code_args.get(arg)
+            if g_code_arg_val is not None:
+                message_list.append(
+                    cls.VAL_DEFINED_MESSAGE.substitute(name=arg, steps=g_code_arg_val)
+                )
+
+        return 'Setting the following axes steps per mm:\n\t' \
+               + '\n\t'.join(message_list)

@@ -23,6 +23,7 @@ class SmoothieEmulator(AbstractEmulator):
     """Smoothie emulator"""
 
     WRITE_INSTRUMENT_RE = re.compile(r"(?P<mount>[LR])\s*(?P<value>[a-f0-9]+)")
+    INSTRUMENT_AND_MODEL_STRING_LENGTH = 64
 
     def __init__(self, parser: Parser, settings: SmoothieSettings) -> None:
         """Constructor"""
@@ -48,13 +49,23 @@ class SmoothieEmulator(AbstractEmulator):
             'C': False,
         }
         self._speed = 0.0
+
         self._pipette_model = {
-            "L": utils.string_to_hex(settings.left.model, 64),
-            "R": utils.string_to_hex(settings.right.model, 64)
+            "L": utils.string_to_hex(
+                settings.left.model, self.INSTRUMENT_AND_MODEL_STRING_LENGTH
+            ),
+            "R": utils.string_to_hex(
+                settings.right.model, self.INSTRUMENT_AND_MODEL_STRING_LENGTH
+            ),
         }
+
         self._pipette_id = {
-            "L": utils.string_to_hex(settings.left.id, 64),
-            "R": utils.string_to_hex(settings.right.id, 64),
+            "L": utils.string_to_hex(
+                settings.left.id, self.INSTRUMENT_AND_MODEL_STRING_LENGTH
+            ),
+            "R": utils.string_to_hex(
+                settings.right.id, self.INSTRUMENT_AND_MODEL_STRING_LENGTH
+            ),
         }
         self._parser = parser
 
@@ -140,8 +151,8 @@ class SmoothieEmulator(AbstractEmulator):
         func_to_run = self._gcode_to_function_mapping.get(command.gcode)
         return None if func_to_run is None else func_to_run(command)
 
-    @staticmethod
-    def _mount_strings(command: Command) -> Dict[str, str]:
+    @classmethod
+    def _mount_strings(cls, command: Command) -> Dict[str, str]:
         """
         Parse the body of the command for the mount strings.
 
@@ -157,6 +168,12 @@ class SmoothieEmulator(AbstractEmulator):
         """
         pars = (i.groupdict() for i in
                 SmoothieEmulator.WRITE_INSTRUMENT_RE.finditer(command.body))
-        result = {p['mount']: p['value'] for p in pars}
+        result = {
+            p['mount']: p['value'] + '0' * (
+                cls.INSTRUMENT_AND_MODEL_STRING_LENGTH - len(p['value'])
+            )
+            for p in pars
+        }
+
         assert result, f"missing mount values '{command.body}'"
         return result
