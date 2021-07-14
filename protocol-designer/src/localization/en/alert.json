@@ -13,7 +13,7 @@
         "title": "Dispense volume will overflow a destination well"
       },
       "BELOW_PIPETTE_MINIMUM_VOLUME": {
-        "title": "Transfer volume is below pipette minimum ({{min}} uL)",
+        "title": "Mix volume is below pipette minimum ({{min}} uL)",
         "body": "Pipettes cannot accurately handle volumes below their minimum. "
       },
       "BELOW_MIN_AIR_GAP_VOLUME": {
