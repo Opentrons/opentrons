@@ -24,15 +24,9 @@ UUID_MATCHER = matchers.StringMatching(
 
 
 @pytest.fixture
-def decoy() -> Decoy:
-    """Create a Decoy state container for this test suite."""
-    return Decoy()
-
-
-@pytest.fixture
 def transport(decoy: Decoy) -> AbstractSyncTransport:
     """Get a stubbed out AbstractSyncTransport."""
-    return decoy.create_decoy(spec=AbstractSyncTransport)
+    return decoy.mock(cls=AbstractSyncTransport)
 
 
 @pytest.fixture

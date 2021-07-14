@@ -15,25 +15,25 @@ from opentrons.protocol_engine.state import StateStore
 @pytest.fixture
 def state_store(decoy: Decoy) -> StateStore:
     """Get a mock StateStore."""
-    return decoy.create_decoy(spec=StateStore)
+    return decoy.mock(cls=StateStore)
 
 
 @pytest.fixture
 def command_executor(decoy: Decoy) -> CommandExecutor:
     """Get a mock CommandExecutor."""
-    return decoy.create_decoy(spec=CommandExecutor)
+    return decoy.mock(cls=CommandExecutor)
 
 
 @pytest.fixture
 def command_mapper(decoy: Decoy) -> CommandMapper:
     """Get a mock CommandMapper."""
-    return decoy.create_decoy(spec=CommandMapper)
+    return decoy.mock(cls=CommandMapper)
 
 
 @pytest.fixture
 def resources(decoy: Decoy) -> ResourceProviders:
     """Get mock ResourceProviders."""
-    return decoy.create_decoy(spec=ResourceProviders)
+    return decoy.mock(cls=ResourceProviders)
 
 
 @pytest.fixture

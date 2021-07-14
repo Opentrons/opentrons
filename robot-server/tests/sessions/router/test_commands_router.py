@@ -1,6 +1,5 @@
 """Tests for the /sessions/.../commands routes."""
 import pytest
-import inspect
 
 from datetime import datetime
 from decoy import Decoy, matchers
@@ -30,14 +29,7 @@ from robot_server.sessions.router.commands_router import (
 @pytest.fixture
 def get_session(decoy: Decoy) -> Callable[..., Awaitable[ResponseModel]]:
     """Get a mock version of the get_session route handler."""
-    get_session: Callable[..., Awaitable[ResponseModel]] = decoy.create_decoy_func(
-        spec=real_get_session,
-    )
-    # TODO(mc, 2021-07-06): add signature support in decoy
-    get_session.__signature__ = inspect.signature(  # type: ignore[attr-defined]
-        real_get_session
-    )
-    return get_session
+    return decoy.mock(func=real_get_session)
 
 
 @pytest.fixture(autouse=True)
