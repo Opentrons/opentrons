@@ -208,11 +208,13 @@ async def test_execute_command(
     command_executor: CommandExecutor,
     command_mapper: CommandMapper,
     resources: ResourceProviders,
+    queue_worker: QueueWorker,
     subject: ProtocolEngine,
 ) -> None:
     """It should add and execute a command from a request."""
     created_at = datetime(year=2021, month=1, day=1)
-    completed_at = datetime(year=2022, month=3, day=3)
+    started_at = datetime(year=2022, month=2, day=2)
+    completed_at = datetime(year=2023, month=3, day=3)
 
     data = commands.LoadPipetteData(
         mount=MountType.LEFT,
@@ -232,7 +234,7 @@ async def test_execute_command(
         id="command-id",
         status=commands.CommandStatus.RUNNING,
         createdAt=created_at,
-        startedAt=created_at,
+        startedAt=started_at,
         data=data,
     )
 
@@ -245,7 +247,9 @@ async def test_execute_command(
         data=data,
     )
 
-    decoy.when(resources.model_utils.get_timestamp()).then_return(created_at)
+    decoy.when(resources.model_utils.get_timestamp()).then_return(
+        created_at, started_at
+    )
 
     decoy.when(
         command_mapper.map_request_to_command(
@@ -258,7 +262,7 @@ async def test_execute_command(
     decoy.when(
         command_mapper.update_command(
             command=queued_command,
-            startedAt=created_at,
+            startedAt=started_at,
             status=CommandStatus.RUNNING,
         )
     ).then_return(running_command)
@@ -271,6 +275,7 @@ async def test_execute_command(
 
     assert result == executed_command
     decoy.verify(
+        await queue_worker.wait_for_idle(),
         state_store.handle_command(running_command),
         state_store.handle_command(executed_command),
     )

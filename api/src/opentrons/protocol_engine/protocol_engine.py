@@ -78,7 +78,11 @@ class ProtocolEngine:
         request: CommandRequest,
         command_id: str,
     ) -> Command:
-        """Execute a command request, waiting for it to complete."""
+        """Execute a command request, waiting for it to complete.
+
+        If there are commands currently in the queue, this method will wait
+        for the engine to become idle before starting execution.
+        """
         created_at = self._resources.model_utils.get_timestamp()
 
         queued_command = self._command_mapper.map_request_to_command(
@@ -87,9 +91,16 @@ class ProtocolEngine:
             created_at=created_at,
         )
 
+        # TODO(mc, 2021-07-14): do we want to figure out a way to get this command
+        # into state as a queued command? I don't think we need it for now, but it
+        # may become useful if we expose a "create and execute" HTTP endpoint
+        await self.wait_for_idle()
+
+        started_at = self._resources.model_utils.get_timestamp()
+
         running_command = self._command_mapper.update_command(
             command=queued_command,
-            startedAt=created_at,
+            startedAt=started_at,
             status=CommandStatus.RUNNING,
         )
 
