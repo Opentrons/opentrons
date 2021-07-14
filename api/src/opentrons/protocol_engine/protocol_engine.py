@@ -99,6 +99,8 @@ class ProtocolEngine:
 
         return completed_command
 
+    # TODO(mc, 2021-07-14): should we just expose a `worker` property instead
+    # of mirroring methods like this? I kind of think we should
     def start(self) -> None:
         """Executing commands in the queue until the queue is exhausted."""
         self._queue_worker.start()
@@ -106,3 +108,18 @@ class ProtocolEngine:
     def stop(self) -> None:
         """Stop or pause executing commands in the queue."""
         self._queue_worker.stop()
+
+    async def wait_for_idle(self) -> None:
+        """Wait for the ProtocolEngine to become idle.
+
+        The ProtocolEngine is considered "idle" when:
+
+        - There is no command currently executing
+        - There are no commands queued according to
+          `state_view.commands.get_next_queued()`
+
+        This method should not raise, but if any unexepected exceptions
+        happen during command execution that are not properly caught by
+        the CommandExecutor, this is where they will be raised.
+        """
+        await self._queue_worker.wait_for_idle()

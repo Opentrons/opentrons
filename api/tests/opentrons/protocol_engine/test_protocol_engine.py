@@ -122,6 +122,17 @@ def test_stop(
     decoy.verify(queue_worker.stop())
 
 
+async def test_wait_for_idle(
+    decoy: Decoy,
+    queue_worker: QueueWorker,
+    subject: ProtocolEngine,
+) -> None:
+    """It should be able to wait until the engine is idle."""
+    await subject.wait_for_idle()
+
+    decoy.verify(await queue_worker.wait_for_idle())
+
+
 async def test_execute_command_by_id(
     decoy: Decoy,
     state_store: StateStore,
