@@ -10,6 +10,8 @@ class SessionActionType(str, Enum):
     """Types of session control actions."""
 
     START = "start"
+    PAUSE = "pause"
+    RESUME = "resume"
 
 
 class SessionActionCreateData(BaseModel):

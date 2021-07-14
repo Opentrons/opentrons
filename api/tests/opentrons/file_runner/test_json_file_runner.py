@@ -75,12 +75,26 @@ def subject(
     )
 
 
+async def test_json_runner_run(
+    decoy: Decoy,
+    subject: JsonFileRunner,
+    command_queue_worker: CommandQueueWorker,
+) -> None:
+    """It should be able to run the protocol until done."""
+    await subject.run()
+
+    decoy.verify(
+        command_queue_worker.play(),
+        await command_queue_worker.wait_for_done(),
+    )
+
+
 def test_json_runner_play(
     decoy: Decoy,
     subject: JsonFileRunner,
     command_queue_worker: CommandQueueWorker,
 ) -> None:
-    """It should be able to start the run."""
+    """It should be able to resume the run."""
     subject.play()
 
     decoy.verify(command_queue_worker.play())
@@ -97,6 +111,7 @@ def test_json_runner_pause(
     decoy.verify(command_queue_worker.pause())
 
 
+@pytest.mark.xfail(raises=NotImplementedError, strict=True)
 def test_json_runner_stop(
     decoy: Decoy,
     subject: JsonFileRunner,
@@ -104,8 +119,6 @@ def test_json_runner_stop(
 ) -> None:
     """It should be able to stop the run."""
     subject.stop()
-
-    decoy.verify(command_queue_worker.pause())
 
 
 def test_json_runner_load_commands_to_engine(
