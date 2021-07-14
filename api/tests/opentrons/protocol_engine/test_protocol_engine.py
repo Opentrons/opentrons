@@ -7,7 +7,7 @@ from opentrons.types import MountType
 from opentrons.protocol_engine import ProtocolEngine, commands
 from opentrons.protocol_engine.commands import CommandMapper, CommandStatus
 from opentrons.protocol_engine.types import PipetteName
-from opentrons.protocol_engine.execution import CommandExecutor
+from opentrons.protocol_engine.execution import CommandExecutor, QueueWorker
 from opentrons.protocol_engine.resources import ResourceProviders
 from opentrons.protocol_engine.state import StateStore
 
@@ -22,6 +22,12 @@ def state_store(decoy: Decoy) -> StateStore:
 def command_executor(decoy: Decoy) -> CommandExecutor:
     """Get a mock CommandExecutor."""
     return decoy.mock(cls=CommandExecutor)
+
+
+@pytest.fixture
+def queue_worker(decoy: Decoy) -> QueueWorker:
+    """Get a mock CommandExecutor."""
+    return decoy.mock(cls=QueueWorker)
 
 
 @pytest.fixture
@@ -42,11 +48,13 @@ def subject(
     command_executor: CommandExecutor,
     command_mapper: CommandMapper,
     resources: ResourceProviders,
+    queue_worker: QueueWorker,
 ) -> ProtocolEngine:
     """Get a ProtocolEngine test subject with its dependencies stubbed out."""
     return ProtocolEngine(
         state_store=state_store,
         command_executor=command_executor,
+        queue_worker=queue_worker,
         command_mapper=command_mapper,
         resources=resources,
     )
@@ -90,6 +98,28 @@ def test_add_command(
 
     assert result == queued_command
     decoy.verify(state_store.handle_command(queued_command))
+
+
+def test_start(
+    decoy: Decoy,
+    queue_worker: QueueWorker,
+    subject: ProtocolEngine,
+) -> None:
+    """It should be able to start executing queued commands."""
+    subject.start()
+
+    decoy.verify(queue_worker.start())
+
+
+def test_stop(
+    decoy: Decoy,
+    queue_worker: QueueWorker,
+    subject: ProtocolEngine,
+) -> None:
+    """It should be able to stop executing queued commands."""
+    subject.stop()
+
+    decoy.verify(queue_worker.stop())
 
 
 async def test_execute_command_by_id(

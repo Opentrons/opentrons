@@ -2,7 +2,7 @@
 from .resources import ResourceProviders
 from .state import State, StateStore, StateView
 from .commands import Command, CommandRequest, CommandStatus, CommandMapper
-from .execution import CommandExecutor
+from .execution import CommandExecutor, QueueWorker
 
 
 class ProtocolEngine:
@@ -17,6 +17,7 @@ class ProtocolEngine:
     _command_executor: CommandExecutor
     _command_mapper: CommandMapper
     _resources: ResourceProviders
+    _queue_worker: QueueWorker
 
     def __init__(
         self,
@@ -24,6 +25,7 @@ class ProtocolEngine:
         command_executor: CommandExecutor,
         command_mapper: CommandMapper,
         resources: ResourceProviders,
+        queue_worker: QueueWorker,
     ) -> None:
         """Initialize a ProtocolEngine instance.
 
@@ -34,6 +36,7 @@ class ProtocolEngine:
         self._command_executor = command_executor
         self._command_mapper = command_mapper
         self._resources = resources
+        self._queue_worker = queue_worker
 
     @property
     def state_view(self) -> StateView:
@@ -71,7 +74,9 @@ class ProtocolEngine:
         return completed_command
 
     async def execute_command(
-        self, request: CommandRequest, command_id: str
+        self,
+        request: CommandRequest,
+        command_id: str,
     ) -> Command:
         """Execute a command request, waiting for it to complete."""
         created_at = self._resources.model_utils.get_timestamp()
@@ -93,3 +98,11 @@ class ProtocolEngine:
         self._state_store.handle_command(completed_command)
 
         return completed_command
+
+    def start(self) -> None:
+        """Executing commands in the queue until the queue is exhausted."""
+        self._queue_worker.start()
+
+    def stop(self) -> None:
+        """Stop or pause executing commands in the queue."""
+        self._queue_worker.stop()
