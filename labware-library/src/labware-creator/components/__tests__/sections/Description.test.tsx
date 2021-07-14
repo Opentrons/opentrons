@@ -4,11 +4,11 @@ import { FormikConfig } from 'formik'
 import { render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import { getDefaultFormState, LabwareFields } from '../../../fields'
-import { isEveryFieldHidden } from '../../../utils'
+import { isEveryFieldHidden } from '../../../utils/isEveryFieldHidden'
 import { Description } from '../../sections/Description'
 import { wrapInFormik } from '../../utils/wrapInFormik'
 
-jest.mock('../../../utils')
+jest.mock('../../../utils/isEveryFieldHidden')
 
 const isEveryFieldHiddenMock = isEveryFieldHidden as jest.MockedFunction<
   typeof isEveryFieldHidden

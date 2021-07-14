@@ -475,11 +475,11 @@ exports[`LabwareList component renders 1`] = `
                 "tube123",
                 "other123",
               ],
-              "links": Array [
-                "http://www.example.com/tube123",
-              ],
             },
-            "metadata": Object {},
+            "metadata": Object {
+              "displayCategory": "tubeRack",
+              "wellBottomShape": "v",
+            },
             "wells": Array [
               "A1",
               "B1",

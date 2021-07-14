@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useFormikContext } from 'formik'
 import { LabwareFields } from '../../fields'
-import { isEveryFieldHidden } from '../../utils'
+import { getIsOpentronsTubeRack, isEveryFieldHidden } from '../../utils'
 import { FormAlerts } from '../alerts/FormAlerts'
 import { TextField } from '../TextField'
 import { SectionBody } from './SectionBody'
@@ -13,9 +13,7 @@ interface Props {
 }
 const Content = (props: Props): JSX.Element => {
   const labwareType = props.values.labwareType
-  const isOpentronsTubeRack =
-    labwareType === 'tubeRack' &&
-    props.values.tubeRackInsertLoadName !== 'customTubeRack'
+  const isOpentronsTubeRack = getIsOpentronsTubeRack(props.values)
   const showBrand = !isOpentronsTubeRack
   const showGroupBrand = labwareType === 'tubeRack'
   return (

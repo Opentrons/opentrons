@@ -11,6 +11,7 @@ import {
   DEFAULT_TUBE_BRAND,
 } from './fields'
 import type { LabwareFields } from './fields'
+import { getIsOpentronsTubeRack } from './utils'
 // TODO(Ian, 2019-07-24): consolidate `tubeRackAutofills/aluminumBlockAutofills`-getting logic btw here and makeAutofillOnChange
 export const _getIsAutofilled = (
   name: keyof LabwareFields,
@@ -83,10 +84,7 @@ const _valuesToCreateNameArgs = (values: LabwareFields): any => {
 
   let brandDefault: string | undefined
   // Opentrons tube racks need to default their brand
-  if (
-    values.labwareType === 'tubeRack' &&
-    values.tubeRackInsertLoadName !== 'customTubeRack'
-  ) {
+  if (getIsOpentronsTubeRack(values)) {
     brandDefault = DEFAULT_TUBE_BRAND
   }
 
