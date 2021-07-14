@@ -5,7 +5,11 @@ from decoy import Decoy
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.protocol_engine import DeckSlotLocation
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
-from opentrons.protocol_api_experimental import DeckSlotName, Labware, Point, errors
+from opentrons.protocol_api_experimental import (DeckSlotName,
+                                                 Labware,
+                                                 Point,
+                                                 Well,
+                                                 errors)
 from opentrons_shared_data.labware import dev_types
 
 
@@ -201,3 +205,74 @@ def test_labware_no_tip_length(
 
     with pytest.raises(errors.LabwareIsNotTipRackError):
         subject.tip_length
+
+
+def test_labware_has_wells_by_name(
+        decoy: Decoy,
+        engine_client: ProtocolEngineClient,
+        labware_definition: LabwareDefinition,
+        subject: Labware,
+) -> None:
+    """It should return Dict of Well objects by name and cache it."""
+    decoy.when(
+        engine_client.state.labware.get_labware_definition(labware_id="labware-id")
+    ).then_return(labware_definition)
+
+    call1_value = subject.wells_by_name()
+    # Something like this shouldn't technically assert True but this is because
+    # __eq__ is only checking for labware_id and both the objects' labware_ids are
+    # "labware_id"
+    assert call1_value == {'A1': Well(well_name='A1',
+                                      engine_client=engine_client,
+                                      labware=subject),
+                           'A2': Well(well_name='A2',
+                                      engine_client=engine_client,
+                                      labware=subject)
+                           }
+
+    call2_value = subject.wells_by_name()
+    assert call1_value is call2_value
+
+
+def test_labware_has_wells_list(
+        decoy: Decoy,
+        engine_client: ProtocolEngineClient,
+        labware_definition: LabwareDefinition,
+        subject: Labware,
+) -> None:
+    """It should return List of Well objects."""
+    decoy.when(
+        engine_client.state.labware.get_labware_definition(labware_id="labware-id")
+    ).then_return(labware_definition)
+
+    assert len(subject.wells()) == 2
+    assert subject.wells()[0].well_name == "A1"
+
+    # This passes when tested individually but fails if the whole file is tested
+    assert subject.wells()[0] == Well(well_name='A1',
+                                      engine_client=engine_client,
+                                      labware=subject)
+
+
+# def test_labware_rows(
+#         decoy: Decoy,
+#         engine_client: ProtocolEngineClient,
+#         labware_definition: LabwareDefinition,
+#         subject: Labware,
+# ) -> None:
+#     """It should return the labware's wells as rows."""
+#     decoy.when(
+#         engine_client.state.labware.get_labware_definition(labware_id="labware-id")
+#     ).then_return(labware_definition)
+#
+#     assert subject.rows() == [[Well(well_name='A1',
+#                                     engine_client=engine_client,
+#                                     labware=subject)],
+#                               [Well(well_name='A2',
+#                                     engine_client=engine_client,
+#                                     labware=subject)]]
+
+
+# def test_labware_columns(
+#
+# )

@@ -101,10 +101,15 @@ class Well:  # noqa: D101
         raise NotImplementedError()
 
     def __repr__(self) -> str:  # noqa: D105
-        raise NotImplementedError()
+        # TODO: (spp, 2021.07.14): Should this be a combination of display name & <obj>?
+        return self._well_name
 
     def __eq__(self, other: object) -> bool:  # noqa: D105
-        raise NotImplementedError()
+        """Compare for object equality.
+
+        Checks that other object is a `Well` and belongs to the same labware.
+        """
+        return isinstance(other, Well) and self.parent is other.parent
 
     def __hash__(self) -> int:  # noqa: D105
         raise NotImplementedError()

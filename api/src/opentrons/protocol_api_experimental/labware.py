@@ -1,5 +1,7 @@
 # noqa: D100
 from __future__ import annotations
+
+from functools import lru_cache
 from typing import Any, List, Dict, Optional, Union, cast
 
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
@@ -168,13 +170,27 @@ class Labware:  # noqa: D101
         return definition.parameters.tipLength
 
     def well(self, idx: int) -> Well:  # noqa: D102
-        raise NotImplementedError()
+        # TODO: figure out if we want to keep this as it is marked as deprecated in v2
+        return self.wells()[idx]
 
     def wells(self) -> List[Well]:  # noqa: D102
-        raise NotImplementedError()
+        return list(self.wells_by_name().values())
 
+    @lru_cache(maxsize=1)
     def wells_by_name(self) -> Dict[str, Well]:  # noqa: D102
-        raise NotImplementedError()
+        definition = self._engine_client.state.labware.get_labware_definition(
+            labware_id=self._labware_id)
+
+        wells_by_name: Dict[str, Well] = {
+            well_name: Well(
+                well_name=well_name,
+                engine_client=self._engine_client,
+                labware=self,
+            )
+            for col in definition.ordering
+            for well_name in col
+        }
+        return wells_by_name
 
     def rows(self) -> List[List[Well]]:  # noqa: D102
         raise NotImplementedError()
@@ -186,10 +202,14 @@ class Labware:  # noqa: D101
         raise NotImplementedError()
 
     def columns_by_name(self) -> Dict[str, List[Well]]:  # noqa: D102
+        definition = self._engine_client.state.labware.get_labware_definition(
+            labware_id=self._labware_id)
+
         raise NotImplementedError()
 
     def __repr__(self) -> str:  # noqa: D105
-        raise NotImplementedError()
+        # TODO: (spp, 2021.07.14): Should this be a combination of display name & <obj>?
+        return self.name
 
     def __eq__(self, other: object) -> bool:
         """Compare for object equality.
