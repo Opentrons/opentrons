@@ -275,6 +275,7 @@ async def test_execute_command(
 
     assert result == executed_command
     decoy.verify(
+        state_store.handle_command(queued_command),
         await queue_worker.wait_for_idle(),
         state_store.handle_command(running_command),
         state_store.handle_command(executed_command),

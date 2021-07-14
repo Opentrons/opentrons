@@ -83,28 +83,22 @@ class ProtocolEngine:
         If there are commands currently in the queue, this method will wait
         for the engine to become idle before starting execution.
         """
-        created_at = self._resources.model_utils.get_timestamp()
-
         queued_command = self._command_mapper.map_request_to_command(
             request=request,
             command_id=command_id,
-            created_at=created_at,
+            created_at=self._resources.model_utils.get_timestamp(),
         )
+        self._state_store.handle_command(queued_command)
 
-        # TODO(mc, 2021-07-14): do we want to figure out a way to get this command
-        # into state as a queued command? I don't think we need it for now, but it
-        # may become useful if we expose a "create and execute" HTTP endpoint
         await self.wait_for_idle()
-
-        started_at = self._resources.model_utils.get_timestamp()
 
         running_command = self._command_mapper.update_command(
             command=queued_command,
-            startedAt=started_at,
+            startedAt=self._resources.model_utils.get_timestamp(),
             status=CommandStatus.RUNNING,
         )
-
         self._state_store.handle_command(running_command)
+
         completed_command = await self._command_executor.execute(running_command)
         self._state_store.handle_command(completed_command)
 
@@ -126,8 +120,7 @@ class ProtocolEngine:
         The ProtocolEngine is considered "idle" when:
 
         - There is no command currently executing
-        - There are no commands queued according to
-          `state_view.commands.get_next_queued()`
+        - The worker is _not_ currently stopped
 
         This method should not raise, but if any unexepected exceptions
         happen during command execution that are not properly caught by
