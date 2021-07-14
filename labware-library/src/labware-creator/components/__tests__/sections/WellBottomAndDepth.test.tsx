@@ -13,7 +13,7 @@ import { WellBottomAndDepth } from '../../sections/WellBottomAndDepth'
 
 import { wrapInFormik } from '../../utils/wrapInFormik'
 
-jest.mock('../../../utils')
+jest.mock('../../../utils/getLabwareName')
 
 const getLabwareNameMock = getLabwareName as jest.MockedFunction<
   typeof getLabwareName

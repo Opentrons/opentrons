@@ -9,7 +9,7 @@ import { Preview } from '../../sections/Preview'
 import { wrapInFormik } from '../../utils/wrapInFormik'
 import { FORM_LEVEL_ERRORS } from '../../../formLevelValidation'
 
-jest.mock('../../../utils')
+jest.mock('../../../utils/getLabwareName')
 
 // NOTE(IL, 2021-05-18): eventual dependency on definitions.tsx which uses require.context
 // would break this test (though it's not directly used)

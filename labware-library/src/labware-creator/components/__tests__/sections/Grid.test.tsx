@@ -15,7 +15,8 @@ import { TextField } from '../../TextField'
 import { RadioField } from '../../RadioField'
 import { wrapInFormik } from '../../utils/wrapInFormik'
 
-jest.mock('../../../utils')
+jest.mock('../../../utils/isEveryFieldHidden')
+jest.mock('../../../utils/getLabwareName')
 jest.mock('../../TextField')
 jest.mock('../../RadioField')
 jest.mock('../../alerts/FormAlerts')

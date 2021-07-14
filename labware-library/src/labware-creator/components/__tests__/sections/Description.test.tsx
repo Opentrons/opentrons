@@ -8,7 +8,7 @@ import { isEveryFieldHidden } from '../../../utils'
 import { Description } from '../../sections/Description'
 import { wrapInFormik } from '../../utils/wrapInFormik'
 
-jest.mock('../../../utils')
+jest.mock('../../../utils/isEveryFieldHidden')
 
 const isEveryFieldHiddenMock = isEveryFieldHidden as jest.MockedFunction<
   typeof isEveryFieldHidden

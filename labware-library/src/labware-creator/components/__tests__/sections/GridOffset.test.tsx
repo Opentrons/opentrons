@@ -10,7 +10,9 @@ import { GridOffset } from '../../sections/GridOffset'
 import { FormAlerts } from '../../alerts/FormAlerts'
 import { TextField } from '../../TextField'
 import { wrapInFormik } from '../../utils/wrapInFormik'
-jest.mock('../../../utils')
+
+jest.mock('../../../utils/isEveryFieldHidden')
+jest.mock('../../../utils/getLabwareName')
 jest.mock('../../TextField')
 jest.mock('../../alerts/FormAlerts')
 

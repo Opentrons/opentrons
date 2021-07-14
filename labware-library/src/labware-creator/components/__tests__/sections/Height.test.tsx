@@ -9,7 +9,7 @@ import { Height } from '../../sections/Height'
 import { wrapInFormik } from '../../utils/wrapInFormik'
 import { nestedTextMatcher } from '../../__testUtils__/nestedTextMatcher'
 
-jest.mock('../../../utils')
+jest.mock('../../../utils/isEveryFieldHidden')
 
 const isEveryFieldHiddenMock = isEveryFieldHidden as jest.MockedFunction<
   typeof isEveryFieldHidden

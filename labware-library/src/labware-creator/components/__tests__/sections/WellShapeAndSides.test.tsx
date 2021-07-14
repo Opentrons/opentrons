@@ -8,7 +8,8 @@ import { displayAsTube, getLabwareName } from '../../../utils'
 import { WellShapeAndSides } from '../../sections/WellShapeAndSides'
 import { wrapInFormik } from '../../utils/wrapInFormik'
 
-jest.mock('../../../utils')
+jest.mock('../../../utils/displayAsTube')
+jest.mock('../../../utils/getLabwareName')
 
 const displayAsTubeMock = displayAsTube as jest.MockedFunction<
   typeof displayAsTube
