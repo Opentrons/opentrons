@@ -220,10 +220,10 @@ def expected_function_name_values() -> List[str]:
         'POP_SPEED',  # Test 21
         'STEPS_PER_MM',  # Test 22
         'STEPS_PER_MM',  # Test 23
-        # 'READ_INSTRUMENT_ID',  # Test 24
-        # 'WRITE_INSTRUMENT_ID',  # Test 25
-        # 'READ_INSTRUMENT_MODEL',  # Test 26
-        # 'WRITE_INSTRUMENT_MODEL',  # Test 27
+        'READ_INSTRUMENT_ID',  # Test 24
+        'WRITE_INSTRUMENT_ID',  # Test 25
+        'READ_INSTRUMENT_MODEL',  # Test 26
+        'WRITE_INSTRUMENT_MODEL',  # Test 27
         'SET_MAX_SPEED',  # Test 28
         'DISENGAGE_MOTOR',  # Test 29
         'HOMING_STATUS',  # Test 30
@@ -316,17 +316,17 @@ def expected_arg_values() -> List[Dict[str, int]]:
         {'B': 768.0},
 
         # # TODO: Need to figure out to do with 24, 25, 26, and 27
-        # # Test 24
-        # {'L': 'FAIL'},
-        #
-        # # Test 25
-        # {'L': 'FAIL'},
-        #
-        # # Test 26
-        # {'L': 'FAIL'},
-        #
-        # # Test 27
-        # {'L': 'FAIL'},
+        # Test 24
+        {'L': None},
+
+        # Test 25
+        {'L': '5032305356323032303230303730313031000000000000000000000000000000'},
+
+        # Test 26
+        {'L': None},
+
+        # Test 27
+        {'L': '7032305f6d756c74695f76322e30000000000000000000000000000000000000'},
 
         # Test 28
         {'A': 125.0, 'B': 40.0, 'C': 40.0, 'X': 600.0, 'Y': 400.0, 'Z': 125.0},
