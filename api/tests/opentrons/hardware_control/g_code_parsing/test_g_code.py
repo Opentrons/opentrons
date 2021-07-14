@@ -2,6 +2,7 @@ import pytest
 from opentrons.hardware_control.g_code_parsing.g_code_functionality_defs.\
     g_code_functionality_def_base import Explanation
 from opentrons.hardware_control.g_code_parsing.g_code import GCode
+from opentrons.hardware_control.g_code_parsing.errors import UnparsableGCodeError
 from typing import List, Dict
 
 
@@ -787,3 +788,27 @@ def test_explanation(
 def test_bad_read_write_g_codes(bad_raw_code):
     with pytest.raises(UnparsableGCodeError):
         GCode.from_raw_code(bad_raw_code, 'smoothie', '')
+
+
+@pytest.mark.parametrize(
+    'raw_code',
+    [
+        'M204 S10000 A1500 B200 C200 X3000 Y2000 Z1500',
+        'M370 L5032305356323032303230303730313031000000000000000000000000000000',
+        'M400',
+    ]
+)
+def test_get_g_code_line(raw_code):
+    GCode.from_raw_code(raw_code, 'smoothie', '')[0].g_code_line == raw_code
+
+
+@pytest.mark.parametrize(
+    'raw_code',
+    [
+        'M3000 S10000 A1500 B200 C200 X3000 Y2000 Z1500',
+        'G5678',
+    ]
+)
+def test_unparsable_g_code_error(raw_code):
+    with pytest.raises(UnparsableGCodeError):
+        GCode.from_raw_code(raw_code, 'smoothie', '')[0].get_gcode_function()
