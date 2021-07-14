@@ -12,18 +12,21 @@ class Explanation:
     COMMAND_NAME_KEY = 'Command Name'
     PROVIDED_ARGS_KEY = 'Provided Arguments'
     COMMAND_EXPLANATION_KEY = 'Command Explanation'
+    RESPONSE_KEY = 'Response'
 
     code: str
     command_name: str
     provided_args: Dict[str, Any]
     command_explanation: str
+    response: str
 
     def to_dict(self) -> Any:
         return {
             self.CODE_KEY: self.code,
             self.COMMAND_NAME_KEY: self.command_name,
             self.PROVIDED_ARGS_KEY: self.provided_args,
-            self.COMMAND_EXPLANATION_KEY: self.command_explanation
+            self.COMMAND_EXPLANATION_KEY: self.command_explanation,
+            self.RESPONSE_KEY: self.response
         }
 
 
@@ -38,13 +41,15 @@ class GCodeFunctionalityDefBase(ABC):
         cls,
         code,
         command_name,
-        provided_args
+        provided_args,
+        response
     ) -> Explanation:
         return Explanation(
             code,
             command_name,
             provided_args,
-            cls._generate_command_explanation(provided_args)
+            cls._generate_command_explanation(provided_args),
+            response
         )
 
     @classmethod

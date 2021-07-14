@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from typing import List
 
 from .errors import UnparsableGCodeError
@@ -108,7 +109,14 @@ class GCode:
         self._device_name = device_name
         self._g_code = g_code
         self._g_code_args = g_code_args
-        self._response = response
+        self._response = self._cleanup_response(response)
+
+    @staticmethod
+    def _cleanup_response(response):
+        pre_space_cleanup = response.replace('ok', ' ')\
+            .replace('\r', ' ')\
+            .replace('\n', ' ')
+        return re.sub(' +', ' ', pre_space_cleanup).strip()
 
     @property
     def device_name(self) -> str:
@@ -151,7 +159,7 @@ class GCode:
         The entire string representation of the G-Code Command.
         For instance, "G0 X100 Y200"
         """
-        return f'{self.g_code} {self.g_code_body}'
+        return f'{self.g_code} {self.g_code_body}'.strip()
 
     def get_gcode_function(self) -> str:
         """
@@ -212,7 +220,8 @@ class GCode:
             return explanation_class.generate_explanation(
                 self.g_code,
                 self.get_gcode_function(),
-                self.g_code_args
+                self.g_code_args,
+                self.response
             )
 
     @property
