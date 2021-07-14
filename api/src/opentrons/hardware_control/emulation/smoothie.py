@@ -166,8 +166,8 @@ class SmoothieEmulator(AbstractEmulator):
         Returns:
             A dict of L and/or R to the string value following it.
         """
-        pars = [i.groupdict() for i in
-                SmoothieEmulator.WRITE_INSTRUMENT_RE.finditer(command.body)]
+        pars = (i.groupdict() for i in
+                SmoothieEmulator.WRITE_INSTRUMENT_RE.finditer(command.body))
         result = {
             p['mount']: p['value'] + '0' * (
                 cls.INSTRUMENT_AND_MODEL_STRING_LENGTH - len(p['value'])
