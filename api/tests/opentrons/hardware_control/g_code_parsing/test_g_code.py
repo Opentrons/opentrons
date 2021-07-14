@@ -81,32 +81,30 @@ def gcodes() -> List[GCode]:
             'C:768.000000'
         ],
 
-        # # Read Instrument ID
-        # [  # Test 24
-        #     'M369 L',
-        #     'M369 L\r\n\r\nL: 5032305356323032303230303730313031
-        #     0000000000000000000000'
-        #     '00000000 \r\nok\r\nok\r\n'
-        # ],
-        #
-        # # Write Instrument ID
-        # [  # Test 25
-        #     'M370 L5032305356323032303230303730313031000000000000000000000000000000',
-        #     ''
-        # ],
-        # # Read Instrument Model
-        # [  # Test 26
-        #     'M371 L',
-        #     'M371 L\r\n\r\nL: 7032305f6d756c74695f76322e3
-        #     000000000000000000000000000000'
-        #     '0000000 \r\nok\r\nok\r\n'
-        # ],
-        #
-        # # Write Instrument Model
-        # [  # Test 27
-        #     'M372 L7032305f6d756c74695f76322e30000000000000000000000000000000000000',
-        #     ''
-        # ],
+        # Read Instrument ID
+        [  # Test 24
+            'M369 L',
+            'M369 L\r\n\r\nL: 5032305356323032303230303730313031'
+            '000000000000000000000000000000 \r\nok\r\nok\r\n'
+        ],
+
+        # Write Instrument ID
+        [  # Test 25
+            'M370 L5032305356323032303230303730313031000000000000000000000000000000',
+            ''
+        ],
+        # Read Instrument Model
+        [  # Test 26
+            'M371 L',
+            'M371 L\r\n\r\nL: 7032305f6d756c74695f76322e3'
+            '0000000000000000000000000000000000000 \r\nok\r\nok\r\n'
+        ],
+
+        # Write Instrument Model
+        [  # Test 27
+            'M372 L7032305f6d756c74695f76322e30000000000000000000000000000000000000',
+            ''
+        ],
 
         # Set Max Speed
         [  # Test 28
@@ -551,9 +549,37 @@ def explanations() -> List[Explanation]:
                                 '\n\tB-Axis: 768.0 steps per mm'
         ),
         # Test 24
+        Explanation(
+            code='M369',
+            command_name='READ_INSTRUMENT_ID',
+            provided_args={'L': None},
+            command_explanation='Reading instrument ID for Left pipette'
+        ),
         # Test 25
+        Explanation(
+            code='M370',
+            command_name='WRITE_INSTRUMENT_ID',
+            provided_args={'L': '5032305356323032303230303730313031'
+                                '000000000000000000000000000000'},
+            command_explanation='Writing instrument ID 50323053563230323032303037303130'
+                                '31000000000000000000000000000000 for Left pipette'
+        ),
         # Test 26
+        Explanation(
+            code='M371',
+            command_name='READ_INSTRUMENT_MODEL',
+            provided_args={'L': None},
+            command_explanation='Reading instrument model for Left pipette'
+        ),
         # Test 27
+        Explanation(
+            code='M372',
+            command_name='WRITE_INSTRUMENT_MODEL',
+            provided_args={'L': '7032305f6d756c74695f76322e'
+                                '30000000000000000000000000000000000000'},
+            command_explanation='Writing instrument model 7032305f6d756c74695f76322e3'
+                                '0000000000000000000000000000000000000 for Left pipette'
+        ),
         Explanation(  # Test 28
             code='M203.1',
             command_name='SET_MAX_SPEED',
@@ -705,3 +731,15 @@ def test_explanation(
     expected_value: dict
 ) -> None:
     assert parsed_value.get_explanation() == expected_value
+
+
+@pytest.mark.parametrize(
+    'bad_raw_code',
+    [
+        'M370 T5032305356323032303230303730313031000000000000000000000000000000',
+        'M372 Q7032305f6d756c74695f76322e30000000000000000000000000000000000000',
+    ]
+)
+def test_bad_read_write_g_codes(bad_raw_code):
+    with pytest.raises(UnparsableGCodeError):
+        GCode.from_raw_code(bad_raw_code, 'smoothie', '')

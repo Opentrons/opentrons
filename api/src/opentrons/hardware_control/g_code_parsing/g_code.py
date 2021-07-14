@@ -87,11 +87,16 @@ class GCode:
 
     @classmethod
     def from_raw_code(cls, raw_code: str, device: str, response: str) -> List[GCode]:
-        return [
-            cls(device, g_code.gcode, g_code.params, response)
-            for g_code
-            in Parser().parse(raw_code)
-        ]
+        g_code_list = []
+        for g_code in Parser().parse(raw_code):
+            if g_code.gcode not in cls.SPECIAL_HANDLING_REQUIRED_G_CODES:
+                g_code_list.append(cls(device, g_code.gcode, g_code.params, response))
+            else:
+                left_or_right = g_code.body.strip()[0]
+                if left_or_right not in ['R', 'L']:
+                    raise UnparsableGCodeError(raw_code)
+
+                params = {left_or_right: g_code.body.strip()[1:]}
 
     def __init__(
             self,
