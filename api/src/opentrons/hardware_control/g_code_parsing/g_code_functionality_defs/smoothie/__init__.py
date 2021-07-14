@@ -52,6 +52,14 @@ from .steps_per_mm_g_code_functionality_def import \
     StepsPerMMGCodeFunctionalityDef
 from .wait_g_code_functionality_def import \
     WaitGCodeFunctionalityDef
+from .read_instrument_id_g_code_functionality_def import \
+    ReadInstrumentIDGCodeFunctionalityDef
+from .read_instrument_model_g_code_functionality_def import \
+    ReadInstrumentModelGCodeFunctionalityDef
+from .write_instrument_id_g_code_functionality_def import \
+    WriteInstrumentIDGCodeFunctionalityDef
+from .write_instrument_model_g_code_functionality_def import \
+    WriteInstrumentModelGCodeFunctionalityDef
 
 __all__ = [
     'CurrentPositionCodeFunctionalityDef',
@@ -80,5 +88,9 @@ __all__ = [
     'SetPipetteRetractGCodeFunctionalityDef',
     'SetPipetteDebounceGCodeFunctionalityDef',
     'SetPipetteHomeGCodeFunctionalityDef',
-    'SetPipetteMaxTravelGCodeFunctionalityDef'
+    'SetPipetteMaxTravelGCodeFunctionalityDef',
+    'ReadInstrumentIDGCodeFunctionalityDef',
+    'ReadInstrumentModelGCodeFunctionalityDef',
+    'WriteInstrumentIDGCodeFunctionalityDef',
+    'WriteInstrumentModelGCodeFunctionalityDef',
 ]

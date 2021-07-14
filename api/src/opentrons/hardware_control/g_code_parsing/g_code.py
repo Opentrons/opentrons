@@ -24,7 +24,9 @@ from .g_code_functionality_defs.smoothie import (
     MicrosteppingBEnableGCodeFunctionalityDef,
     MicrosteppingBDisableGCodeFunctionalityDef, SetPipetteRetractGCodeFunctionalityDef,
     SetPipetteDebounceGCodeFunctionalityDef, SetPipetteHomeGCodeFunctionalityDef,
-    SetPipetteMaxTravelGCodeFunctionalityDef,
+    SetPipetteMaxTravelGCodeFunctionalityDef, ReadInstrumentModelGCodeFunctionalityDef,
+    ReadInstrumentIDGCodeFunctionalityDef, WriteInstrumentModelGCodeFunctionalityDef,
+    WriteInstrumentIDGCodeFunctionalityDef
 )
 
 
@@ -71,6 +73,12 @@ class GCode:
         SMOOTHIE_GCODE.PIPETTE_DEBOUNCE.name: SetPipetteDebounceGCodeFunctionalityDef,
         SMOOTHIE_GCODE.PIPETTE_MAX_TRAVEL.name:
             SetPipetteMaxTravelGCodeFunctionalityDef,
+        SMOOTHIE_GCODE.READ_INSTRUMENT_MODEL.name:
+            ReadInstrumentModelGCodeFunctionalityDef,
+        SMOOTHIE_GCODE.READ_INSTRUMENT_ID.name: ReadInstrumentIDGCodeFunctionalityDef,
+        SMOOTHIE_GCODE.WRITE_INSTRUMENT_ID.name: WriteInstrumentIDGCodeFunctionalityDef,
+        SMOOTHIE_GCODE.WRITE_INSTRUMENT_MODEL.name:
+            WriteInstrumentModelGCodeFunctionalityDef,
     }
 
     # Smoothie G-Code Parsing Characters
@@ -86,6 +94,11 @@ class GCode:
         SMOOTHIE_IDENT: SMOOTHIE_GCODE_LOOKUP
     }
 
+    SPECIAL_HANDLING_REQUIRED_G_CODES = [
+        SMOOTHIE_GCODE.WRITE_INSTRUMENT_ID,
+        SMOOTHIE_GCODE.WRITE_INSTRUMENT_MODEL,
+    ]
+
     @classmethod
     def from_raw_code(cls, raw_code: str, device: str, response: str) -> List[GCode]:
         g_code_list = []
@@ -96,8 +109,11 @@ class GCode:
                 left_or_right = g_code.body.strip()[0]
                 if left_or_right not in ['R', 'L']:
                     raise UnparsableGCodeError(raw_code)
-
                 params = {left_or_right: g_code.body.strip()[1:]}
+
+                g_code_list.append(cls(device, g_code.gcode, params, response))
+
+        return g_code_list
 
     def __init__(
             self,
@@ -212,7 +228,8 @@ class GCode:
                 self.g_code,
                 self.get_gcode_function(),
                 self.g_code_args,
-                f'No explanation defined for {self.get_gcode_function()}'
+                f'No explanation defined for {self.get_gcode_function()}',
+                self.response
             )
         except Exception:
             raise
