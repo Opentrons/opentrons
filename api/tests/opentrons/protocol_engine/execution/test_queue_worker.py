@@ -142,3 +142,27 @@ async def test_restart_clears_idle_flag(
         await command_executor.execute_by_id("command-id-3"),
         await command_executor.execute_by_id("command-id-4"),
     )
+
+
+async def test_play_noop(
+    decoy: Decoy,
+    state_store: StateStore,
+    command_executor: CommandExecutor,
+    subject: QueueWorker,
+) -> None:
+    """It should no-op if play is called multiple times."""
+    decoy.when(state_store.state_view.commands.get_next_queued()).then_return(
+        "command-id-1"
+    )
+
+    subject.start()
+    subject.start()
+    subject.start()
+    decoy.when(state_store.state_view.commands.get_next_queued()).then_return(None)
+
+    await subject.wait_for_idle()
+
+    decoy.verify(
+        await command_executor.execute_by_id("command-id-1"),
+        times=1,
+    )

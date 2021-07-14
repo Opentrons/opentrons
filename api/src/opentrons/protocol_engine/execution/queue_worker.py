@@ -33,11 +33,13 @@ class QueueWorker:
 
     def start(self) -> None:
         """Start executing commands in the queue."""
-        if self._idle_signal.done():
-            self._idle_signal = asyncio.get_running_loop().create_future()
-
         self._is_running = True
-        self._schedule_next_command()
+
+        if self._current_task is None:
+            if self._idle_signal.done():
+                self._idle_signal = asyncio.get_running_loop().create_future()
+
+            self._schedule_next_command()
 
     def stop(self) -> None:
         """Stop executing commands in the queue."""
