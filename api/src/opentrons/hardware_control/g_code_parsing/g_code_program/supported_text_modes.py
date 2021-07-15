@@ -26,7 +26,7 @@ class TextMode:
         return self._builder
 
 
-def default_builder(code):
+def default_builder(code: GCode):
     """
     Function to build verbose string in form of:
 
@@ -49,10 +49,11 @@ def default_builder(code):
     :return: Textual description
     """
     return f'Code: {code.g_code} {code.g_code_body} \n' \
-           f'Explanation: {code.get_explanation().command_explanation}\n'
+           f'Explanation: {code.get_explanation().command_explanation}\n' \
+           f'Response: {code.response}'
 
 
-def explanation_only(code):
+def explanation_only(code: GCode):
     """
     Function to build string that contains only the explanation. In the form of:
 
@@ -75,7 +76,7 @@ def explanation_only(code):
     return code.get_explanation().command_explanation
 
 
-def concise(code):
+def concise(code: GCode):
     """
     Function to build concise string. Removes all newlines and tabs In the form of:
 
@@ -89,7 +90,8 @@ def concise(code):
     :return: Textual description
     """
     return f'{code.g_code} {code.g_code_body} -> ' \
-           f'{code.get_explanation().command_explanation}'\
+           f'{code.get_explanation().command_explanation} -> ' \
+           f'{code.response}'\
         .replace('\n', ' ')\
         .replace('\t', '')
 

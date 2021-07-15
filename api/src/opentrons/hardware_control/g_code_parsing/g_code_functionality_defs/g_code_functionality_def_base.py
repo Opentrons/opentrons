@@ -49,7 +49,7 @@ class GCodeFunctionalityDefBase(ABC):
             command_name,
             provided_args,
             cls._generate_command_explanation(provided_args),
-            response
+            cls._generate_response_explanation(response)
         )
 
     @classmethod
@@ -57,4 +57,13 @@ class GCodeFunctionalityDefBase(ABC):
             cls,
             g_code_args: Dict[str, str]
     ) -> str:
+        ...
+
+    @classmethod
+    def _generate_response_explanation(cls, response: str) -> str:
+        """
+        Method for parsing response into human readable format
+        All child classes should either parse response into human readable text or
+        return an empty string
+        """
         ...

@@ -18,3 +18,7 @@ class HomeGCodeFunctionalityDef(GCodeFunctionalityDefBase):
 
         axis_to_home = ', '.join(current_keys)
         return f'Homing the following axes: {axis_to_home}'
+
+    @classmethod
+    def _generate_response_explanation(cls, response: str) -> str:
+        return ''
