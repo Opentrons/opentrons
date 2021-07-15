@@ -688,6 +688,89 @@
                 }
               }
             }
+          },
+          {
+            "description": "Update Robot State Command. Directly manipulate the robot's stateful representation of temporally dynamic protocol properties. These updated properties may include labware/module location, tip count within tip racks, and liquid volumes in wells.",
+            "type": "object",
+            "required": ["command", "params"],
+            "additionalProperties": false,
+            "properties": {
+              "command": { "enum": ["updateRobotState"] },
+              "params": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "labware": {
+                    "description": "labware by id with desired state update",
+                    "type": "object",
+                    "additionalProperties": false,
+                    "patternProperties": {
+                      ".+": {
+                        "description": "the per labware state to update to",
+                        "type": "object",
+                        "required": ["slot"],
+                        "additionalProperties": false,
+                        "properties": {
+                          "slot": { "$ref": "#/definitions/slot" }
+                        }
+                      }
+                    }
+                  },
+                  "modules": {
+                    "description": "module by id with desired state update",
+                    "type": "object",
+                    "additionalProperties": false,
+                    "patternProperties": {
+                      ".+": {
+                        "description": "the per module state to update to",
+                        "type": "object",
+                        "required": ["slot"],
+                        "additionalProperties": false,
+                        "properties": {
+                          "slot": { "$ref": "#/definitions/slot" }
+                        }
+                      }
+                    }
+                  },
+                  "tipState": {
+                    "description": "tip state",
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "tipracks": {
+                        "description": "representation of tips within tip racks on the deck as tip state per tip rack identifier",
+                        "type": "object",
+                        "additionalProperties": false,
+                        "patternProperties": {
+                          ".+": {
+                            "description": "desired tip state update as tip presence boolean keyed by well identifier",
+                            "type": "object",
+                            "additionalProperties": false,
+                            "patternProperties": {
+                              ".+": {
+                                "description": "whether or not a tip should be present in this well of the tip rack",
+                                "type": "boolean"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "pipettes": {
+                        "description": "representation of tips on the nozzle of connected pipettes as tip state per pipette id",
+                        "type": "object",
+                        "additionalProperties": false,
+                        "patternProperties": {
+                          ".+": {
+                            "description": "whether or not tips should be present on this pipette",
+                            "type": "boolean"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
           }
         ]
       }
