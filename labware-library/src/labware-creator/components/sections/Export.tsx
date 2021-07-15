@@ -5,7 +5,7 @@ import { PrimaryBtn } from '@opentrons/components'
 import { reportEvent } from '../../../analytics'
 import { LabwareFields } from '../../fields'
 import { isEveryFieldHidden } from '../../utils'
-import { pipetteNameOptions } from '../../testProtocols/constants'
+import { getPipetteNameOptions } from '../../testProtocols/constants'
 import { FormAlerts } from '../alerts/FormAlerts'
 import { Dropdown } from '../Dropdown'
 import { LinkOut } from '../LinkOut'
@@ -36,6 +36,11 @@ export const Export = (props: ExportProps): JSX.Element | null => {
     return null
   }
 
+  // TODO IMMEDIATELY. If no definition, you can't pick a pipette
+  const disablePipetteField = false
+  // TODO IMMEDIATELY. Allow only if definition supports 8-channel. Make & use a new util.
+  const allowMultiChannel = false
+
   return (
     <SectionBody label="Labware Test Protocol" id="Export">
       <FormAlerts touched={touched} errors={errors} fieldList={fieldList} />
@@ -49,7 +54,16 @@ export const Export = (props: ExportProps): JSX.Element | null => {
           </p>
         </div>
         <div className={styles.pipette_field_wrapper}>
-          <Dropdown name="pipetteName" options={pipetteNameOptions} />
+          <Dropdown
+            disabled={disablePipetteField}
+            tooltip={
+              disablePipetteField ? (
+                <div>Add missing measurements to select a test pipette</div>
+              ) : undefined
+            }
+            name="pipetteName"
+            options={getPipetteNameOptions(allowMultiChannel)}
+          />
         </div>
       </div>
       <div className={styles.export_section} id="DefinitionTest">

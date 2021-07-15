@@ -1,5 +1,11 @@
+import cx from 'classnames'
 import * as React from 'react'
-import { SelectField } from '@opentrons/components'
+import {
+  SelectField,
+  Tooltip,
+  useHover,
+  useHoverTooltip,
+} from '@opentrons/components'
 import { Field } from 'formik'
 import { reportFieldEdit } from '../analyticsUtils'
 import { getLabel, LabwareFields } from '../fields'
@@ -9,6 +15,8 @@ import styles from './Dropdown.css'
 
 export interface DropdownProps {
   name: keyof LabwareFields
+  disabled?: boolean
+  tooltip?: JSX.Element
   options: Options
   caption?: string
   /** optionally override the default onValueChange */
@@ -34,36 +42,52 @@ export const Dropdown = (props: DropdownProps): JSX.Element => {
     [props.options]
   )
 
+  const [targetProps, tooltipProps] = useHoverTooltip()
+
   return (
-    <div className={fieldStyles.field_wrapper}>
-      <label className={fieldStyles.field_label}>
-        <Field name={props.name}>
-          {/* @ts-expect-error(IL, 2021-03-24): formik types need cleanup w LabwareFields */}
-          {({ field, form }) => (
-            <>
-              {getLabel(field.name, form.values)}
-              <SelectField
-                name={field.name}
-                caption={props.caption}
-                value={field.value}
-                options={options}
-                onLoseFocus={name => {
-                  reportFieldEdit({ value: field.value, name })
-                  form.setFieldTouched(name)
-                }}
-                onValueChange={
-                  props.onValueChange ||
-                  ((name, value) => form.setFieldValue(name, value))
-                }
-                formatOptionLabel={({ value, label }) => {
-                  const option = props.options.find(opt => opt.value === value)
-                  return option ? <OptionLabel {...option} /> : null
-                }}
-              />
-            </>
-          )}
-        </Field>
-      </label>
-    </div>
+    <>
+      {props.tooltip != null && (
+        <Tooltip {...tooltipProps}>{props.tooltip}</Tooltip>
+      )}
+
+      <div {...targetProps} className={fieldStyles.field_wrapper}>
+        <label
+          className={cx(fieldStyles.field_label, {
+            [fieldStyles.disabled]: props.disabled,
+          })}
+        >
+          <Field name={props.name}>
+            {/* @ts-expect-error(IL, 2021-03-24): formik types need cleanup w LabwareFields */}
+            {({ field, form }) => (
+              <div style={{ width: '18rem' }}>
+                {/* TODO IMMEDIATELY ^^^ don't inline style; allow instance to be styled via style props */}
+                {getLabel(field.name, form.values)}
+                <SelectField
+                  disabled={props.disabled}
+                  name={field.name}
+                  caption={props.caption}
+                  value={field.value}
+                  options={options}
+                  onLoseFocus={name => {
+                    reportFieldEdit({ value: field.value, name })
+                    form.setFieldTouched(name)
+                  }}
+                  onValueChange={
+                    props.onValueChange ||
+                    ((name, value) => form.setFieldValue(name, value))
+                  }
+                  formatOptionLabel={({ value, label }) => {
+                    const option = props.options.find(
+                      opt => opt.value === value
+                    )
+                    return option ? <OptionLabel {...option} /> : null
+                  }}
+                />
+              </div>
+            )}
+          </Field>
+        </label>
+      </div>
+    </>
   )
 }

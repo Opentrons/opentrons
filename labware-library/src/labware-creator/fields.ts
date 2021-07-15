@@ -42,7 +42,7 @@ export interface ImportError {
 }
 
 export interface Option {
-  name: string
+  name: JSX.Element | string
   value: string
   disabled?: boolean
   imgSrc?: string
