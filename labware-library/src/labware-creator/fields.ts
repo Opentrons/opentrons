@@ -1,5 +1,8 @@
 import capitalize from 'lodash/capitalize'
-import type { WellBottomShape } from '@opentrons/shared-data'
+import type {
+  LabwareDefinition2,
+  WellBottomShape,
+} from '@opentrons/shared-data'
 import { getLabwareName } from './utils'
 
 export const MAX_X_DIMENSION = 129
@@ -447,4 +450,11 @@ export const getLabel = (
     return `${capitalize(getLabwareName(values, false))} shape`
   }
   return LABELS[name]
+}
+
+// type of Formik status. We can't type status in useFormikContext so
+// this interface needs to be used explicitly each time :(
+export interface FormStatus {
+  defaultedDef: LabwareDefinition2 | null
+  prevValues: LabwareFields | null
 }

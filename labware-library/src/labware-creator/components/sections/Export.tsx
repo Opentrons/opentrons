@@ -3,7 +3,7 @@ import * as React from 'react'
 import { useFormikContext } from 'formik'
 import { PrimaryBtn } from '@opentrons/components'
 import { reportEvent } from '../../../analytics'
-import { LabwareFields } from '../../fields'
+import { FormStatus, LabwareFields } from '../../fields'
 import { isEveryFieldHidden } from '../../utils'
 import { getPipetteNameOptions } from '../../testProtocols/constants'
 import { FormAlerts } from '../alerts/FormAlerts'
@@ -23,7 +23,10 @@ interface ExportProps {
 
 export const Export = (props: ExportProps): JSX.Element | null => {
   const fieldList: Array<keyof LabwareFields> = ['pipetteName']
-  const { values, errors, touched } = useFormikContext<LabwareFields>()
+  const _context = useFormikContext<LabwareFields>()
+  const { values, errors, touched } = _context
+  const status: FormStatus = _context.status
+  const { defaultedDef } = status
 
   const testGuideUrl =
     values.labwareType === 'tipRack' ? TIPRACK_PDF_URL : LABWARE_PDF_URL
@@ -36,10 +39,11 @@ export const Export = (props: ExportProps): JSX.Element | null => {
     return null
   }
 
-  // TODO IMMEDIATELY. If no definition, you can't pick a pipette
-  const disablePipetteField = false
+  const disablePipetteField = defaultedDef === null
   // TODO IMMEDIATELY. Allow only if definition supports 8-channel. Make & use a new util.
   const allowMultiChannel = false
+
+  console.log('from inside export', status.defaultedDef)
 
   return (
     <SectionBody label="Labware Test Protocol" id="Export">

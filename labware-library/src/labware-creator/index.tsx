@@ -12,6 +12,7 @@ import {
   aluminumBlockAutofills,
   aluminumBlockChildTypeOptions,
   aluminumBlockTypeOptions,
+  FormStatus,
   getDefaultFormState,
   tubeRackAutofills,
   tubeRackInsertOptions,
@@ -58,9 +59,15 @@ import type {
   LabwareFields,
   ProcessedLabwareFields,
 } from './fields'
+import { getDefaultedDef } from './getDefaultedDef'
 
 const ajv = new Ajv()
 const validateLabwareSchema = ajv.compile(labwareSchema)
+
+const getInitialStatus = (): FormStatus => ({
+  defaultedDef: null,
+  prevValues: null,
+})
 
 export const LabwareCreator = (): JSX.Element => {
   const [
@@ -281,6 +288,7 @@ export const LabwareCreator = (): JSX.Element => {
         enableReinitialize
         validationSchema={labwareFormSchema}
         validate={formLevelValidation}
+        initialStatus={getInitialStatus}
         onSubmit={(values: LabwareFields) => {
           const castValues: ProcessedLabwareFields = labwareFormSchema.cast(
             values
@@ -329,7 +337,16 @@ export const LabwareCreator = (): JSX.Element => {
             isValid,
             handleSubmit,
           } = bag
+          const status: FormStatus = bag.status
+          const setStatus: (status: FormStatus) => void = bag.setStatus
           const errors: LabwareCreatorErrors = bag.errors
+
+          if (status.prevValues !== values) {
+            setStatus({
+              defaultedDef: getDefaultedDef(values),
+              prevValues: values,
+            })
+          }
 
           const onExportClick = (): void => {
             if (!isValid && !showExportErrorModal) {
