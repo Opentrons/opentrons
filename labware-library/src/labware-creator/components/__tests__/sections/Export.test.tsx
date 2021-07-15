@@ -3,7 +3,11 @@ import { when } from 'jest-when'
 import { FormikConfig } from 'formik'
 import { render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
-import { getDefaultFormState, LabwareFields } from '../../../fields'
+import {
+  getDefaultFormState,
+  getInitialStatus,
+  LabwareFields,
+} from '../../../fields'
 import { isEveryFieldHidden } from '../../../utils'
 import { Export } from '../../sections/Export'
 import { wrapInFormik } from '../../utils/wrapInFormik'
@@ -20,6 +24,7 @@ let onExportClick: (e: any) => unknown
 describe('Export', () => {
   beforeEach(() => {
     formikConfig = {
+      initialStatus: getInitialStatus(),
       initialValues: getDefaultFormState(),
       onSubmit: jest.fn(),
     }

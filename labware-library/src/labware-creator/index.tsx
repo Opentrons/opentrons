@@ -14,6 +14,7 @@ import {
   aluminumBlockTypeOptions,
   FormStatus,
   getDefaultFormState,
+  getInitialStatus,
   tubeRackAutofills,
   tubeRackInsertOptions,
 } from './fields'
@@ -63,11 +64,6 @@ import { getDefaultedDef } from './getDefaultedDef'
 
 const ajv = new Ajv()
 const validateLabwareSchema = ajv.compile(labwareSchema)
-
-const getInitialStatus = (): FormStatus => ({
-  defaultedDef: null,
-  prevValues: null,
-})
 
 export const LabwareCreator = (): JSX.Element => {
   const [

@@ -3,7 +3,11 @@ import { FormikConfig } from 'formik'
 import '@testing-library/jest-dom'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { render, screen } from '@testing-library/react'
-import { getDefaultFormState, LabwareFields } from '../../../fields'
+import {
+  getDefaultFormState,
+  getInitialStatus,
+  LabwareFields,
+} from '../../../fields'
 import { isEveryFieldHidden, getLabwareName } from '../../../utils'
 import { Volume } from '../../sections/Volume'
 import { wrapInFormik } from '../../utils/wrapInFormik'
@@ -23,6 +27,7 @@ describe('Volume', () => {
   beforeEach(() => {
     formikConfig = {
       initialValues: getDefaultFormState(),
+      initialStatus: getInitialStatus(),
       onSubmit: jest.fn(),
     }
   })

@@ -3,7 +3,11 @@ import { render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import { FormikConfig } from 'formik'
 import { when, resetAllWhenMocks } from 'jest-when'
-import { getDefaultFormState, LabwareFields } from '../../../fields'
+import {
+  getDefaultFormState,
+  getInitialStatus,
+  LabwareFields,
+} from '../../../fields'
 import { displayAsTube, getLabwareName } from '../../../utils'
 import { WellShapeAndSides } from '../../sections/WellShapeAndSides'
 import { wrapInFormik } from '../../utils/wrapInFormik'
@@ -24,6 +28,7 @@ describe('WellShapeAndSides', () => {
   beforeEach(() => {
     formikConfig = {
       initialValues: getDefaultFormState(),
+      initialStatus: getInitialStatus(),
       onSubmit: jest.fn(),
     }
   })

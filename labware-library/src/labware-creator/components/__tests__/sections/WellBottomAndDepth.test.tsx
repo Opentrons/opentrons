@@ -5,6 +5,7 @@ import { FormikConfig } from 'formik'
 import { when, resetAllWhenMocks } from 'jest-when'
 import {
   getDefaultFormState,
+  getInitialStatus,
   LabwareFields,
   LabwareType,
 } from '../../../fields'
@@ -25,6 +26,7 @@ describe('WellBottomAndDepth', () => {
   beforeEach(() => {
     formikConfig = {
       initialValues: getDefaultFormState(),
+      initialStatus: getInitialStatus(),
       onSubmit: jest.fn(),
     }
   })

@@ -353,6 +353,11 @@ export const getImplicitAutofillValues = (
   return result
 }
 
+export const getInitialStatus = (): FormStatus => ({
+  defaultedDef: null,
+  prevValues: null,
+})
+
 export const getDefaultFormState = (): LabwareFields => ({
   labwareType: null,
   tubeRackInsertLoadName: null,
