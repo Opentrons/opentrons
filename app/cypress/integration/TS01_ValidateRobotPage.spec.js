@@ -21,8 +21,12 @@ describe('Test Suite 01 - Validate Robot Page', () => {
     // Robots header
     cy.get('h2:contains("Robots")').should('exist')
     // Inactive menu items exist
-    cy.get('[aria-describedby="Tooltip__2"]').should('exist').contains('Protocol')
-    cy.get('[aria-describedby="Tooltip__3"]').should('exist').contains('Calibrate')
+    cy.get('[aria-describedby="Tooltip__2"]')
+      .should('exist')
+      .contains('Protocol')
+    cy.get('[aria-describedby="Tooltip__3"]')
+      .should('exist')
+      .contains('Calibrate')
     cy.get('[aria-describedby="Tooltip__4"]').should('exist').contains('Run')
   })
 

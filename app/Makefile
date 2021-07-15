@@ -90,3 +90,9 @@ visual:
 		"$(MAKE) docker-emulator" \
 		"$(MAKE) external-browser-app" \
 		"$(MAKE) cypress-visual"
+
+.PHONY: go
+go:
+	concurrently --kill-others --names "emulator,app,tests" \
+		"$(MAKE) docker-emulator" \
+		"$(MAKE) external-browser-app"
