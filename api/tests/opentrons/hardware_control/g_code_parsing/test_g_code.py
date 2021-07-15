@@ -6,8 +6,7 @@ from opentrons.hardware_control.g_code_parsing.errors import UnparsableGCodeErro
 from typing import List, Dict
 
 
-def gcodes() -> List[GCode]:
-
+def g_codes() -> List[GCode]:
     raw_codes = [
         # FORMAT
         # [GCODE, RESPONSE]
@@ -498,7 +497,13 @@ def explanations() -> List[Explanation]:
         Explanation(  # Test 14
             code='M114.2',
             command_name='CURRENT_POSITION',
-            response='M114.2 MCS: A:218.0 B:0.0 C:0.0 X:418.0 Y:-3.0 Z:218.0',
+            response='The current position of the robot is:'
+                     '\n\tA Axis: 218.0'
+                     '\n\tB Axis: 0.0'
+                     '\n\tC Axis: 0.0'
+                     '\n\tX Axis: 418.0'
+                     '\n\tY Axis: -3.0'
+                     '\n\tZ Axis: 218.0',
             provided_args={},
             command_explanation='Getting current position for all axes'
         ),
@@ -512,7 +517,10 @@ def explanations() -> List[Explanation]:
         Explanation(  # Test 16
             code='G38.2',
             command_name='PROBE',
-            response='G38.2 F420Y-40.0 [PRB:296.825,292.663,218.000:1]',
+            response='Probed to :'
+                     '\n\tX Axis: 296.825'
+                     '\n\tY Axis: 292.663'
+                     '\n\tZ Axis: 218.000',
             provided_args={'F': 420, 'Y': -40.0},
             command_explanation='Probing -40.0 on the Y axis, at a speed of 420.0'
         ),
@@ -555,8 +563,13 @@ def explanations() -> List[Explanation]:
         Explanation(  # Test 22
             code='M92',
             command_name='STEPS_PER_MM',
-            response='X:80.000000 Y:80.000000 Z:400.000000 A:400.000000 B:955.000000 '
-                     'C:768.000000',
+            response='Current set steps per mm:'
+                     '\n\tX Axis: 80.000000'
+                     '\n\tY Axis: 80.000000'
+                     '\n\tZ Axis: 400.000000'
+                     '\n\tA Axis: 400.000000'
+                     '\n\tB Axis: 955.000000'
+                     '\n\tC Axis: 768.000000',
             provided_args={'X': 80.0, 'Y': 80.0, 'Z': 400.0, 'A': 400.0},
             command_explanation='Setting the following axes steps per'
                                 ' mm:'
@@ -568,8 +581,13 @@ def explanations() -> List[Explanation]:
         Explanation(  # Test 23
             code='M92',
             command_name='STEPS_PER_MM',
-            response='X:80.000000 Y:80.000000 Z:400.000000 A:400.000000 B:768.000000 '
-                     'C:768.000000',
+            response='Current set steps per mm:'
+                     '\n\tX Axis: 80.000000'
+                     '\n\tY Axis: 80.000000'
+                     '\n\tZ Axis: 400.000000'
+                     '\n\tA Axis: 400.000000'
+                     '\n\tB Axis: 768.000000'
+                     '\n\tC Axis: 768.000000',
             provided_args={'B': 768.0},
             command_explanation='Setting the following axes steps per'
                                 ' mm:'
@@ -579,8 +597,7 @@ def explanations() -> List[Explanation]:
         Explanation(
             code='M369',
             command_name='READ_INSTRUMENT_ID',
-            response='M369 L L: 5032305356323032303230303730313031'
-                     '000000000000000000000000000000',
+            response='Read Instrument ID: P20SV202020070101',
             provided_args={'L': None},
             command_explanation='Reading instrument ID for Left pipette'
         ),
@@ -598,8 +615,7 @@ def explanations() -> List[Explanation]:
         Explanation(
             code='M371',
             command_name='READ_INSTRUMENT_MODEL',
-            response='M371 L L: 7032305f6d756c74695f76322e3'
-                     '0000000000000000000000000000000000000',
+            response='Read Instrument Model: p20_multi_v2.0',
             provided_args={'L': None},
             command_explanation='Reading instrument model for Left pipette'
         ),
@@ -643,7 +659,13 @@ def explanations() -> List[Explanation]:
         Explanation(  # Test 30
             code='G28.6',
             command_name='HOMING_STATUS',
-            response='G28.6 X:0 Y:0 Z:0 A:0 B:0 C:0',
+            response='The homing status of the robot is:'
+                     '\n\tA Axis: 0'
+                     '\n\tB Axis: 0'
+                     '\n\tC Axis: 0'
+                     '\n\tX Axis: 0'
+                     '\n\tY Axis: 0'
+                     '\n\tZ Axis: 0',
             provided_args={},
             command_explanation='Getting homing status for all axes'
 
@@ -747,7 +769,7 @@ def explanations() -> List[Explanation]:
 
 @pytest.mark.parametrize(
     'parsed_value,expected_value',
-    list(zip(gcodes(), expected_function_name_values()))
+    list(zip(g_codes(), expected_function_name_values()))
 )
 def test_smoothie_g_code_function_lookup(
     parsed_value: GCode,
@@ -758,7 +780,7 @@ def test_smoothie_g_code_function_lookup(
 
 @pytest.mark.parametrize(
     'parsed_value,expected_value',
-    list(zip(gcodes(), expected_arg_values()))
+    list(zip(g_codes(), expected_arg_values()))
 )
 def test_g_code_args(
     parsed_value: GCode,
@@ -769,7 +791,7 @@ def test_g_code_args(
 
 @pytest.mark.parametrize(
     'parsed_value,expected_value',
-    list(zip(gcodes(), explanations()))
+    list(zip(g_codes(), explanations()))
 )
 def test_explanation(
     parsed_value: GCode,
