@@ -5,7 +5,7 @@ from opentrons.hardware_control.g_code_parsing.g_code_functionality_defs.\
 
 
 class SetPipetteRetractGCodeFunctionalityDef(GCodeFunctionalityDefBase):
-
+    # Using this list to output string in specific order
     EXPECTED_ARGS = ['B', 'C', 'Z', 'A']
 
     VAL_DEFINED_MESSAGE = Template('$name-Axis: $distance')

@@ -9,25 +9,7 @@ from opentrons.hardware_control.g_code_parsing.utils import reverse_enum
 from opentrons.hardware_control.emulation.parser import Parser
 from opentrons.hardware_control.g_code_parsing.g_code_functionality_defs.\
     g_code_functionality_def_base import Explanation
-from .g_code_functionality_defs.smoothie import (
-    CurrentPositionCodeFunctionalityDef, DwellGCodeFunctionalityDef,
-    HomeGCodeFunctionalityDef, LimitSwitchStatusGCodeFunctionalityDef,
-    MoveGCodeFunctionalityDef, SetCurrentGCodeFunctionalityDef,
-    SetSpeedGCodeFunctionalityDef, WaitGCodeFunctionalityDef,
-    ProbeGCodeFunctionalityDef, AbsoluteCoordinateModeGCodeFunctionalityDef,
-    RelativeCoordinateModeGCodeFunctionalityDef, ResetFromErrorGCodeFunctionalityDef,
-    PushSpeedGCodeFunctionalityDef, PopSpeedGCodeFunctionalityDef,
-    StepsPerMMGCodeFunctionalityDef, SetMaxSpeedGCodeFunctionalityDef,
-    AccelerationGCodeFunctionalityDef, DisengageMotorGCodeFunctionalityDef,
-    HomingStatusGCodeFunctionalityDef, MicrosteppingCEnableGCodeFunctionalityDef,
-    MicrosteppingCDisableGCodeFunctionalityDef,
-    MicrosteppingBEnableGCodeFunctionalityDef,
-    MicrosteppingBDisableGCodeFunctionalityDef, SetPipetteRetractGCodeFunctionalityDef,
-    SetPipetteDebounceGCodeFunctionalityDef, SetPipetteHomeGCodeFunctionalityDef,
-    SetPipetteMaxTravelGCodeFunctionalityDef, ReadInstrumentModelGCodeFunctionalityDef,
-    ReadInstrumentIDGCodeFunctionalityDef, WriteInstrumentModelGCodeFunctionalityDef,
-    WriteInstrumentIDGCodeFunctionalityDef
-)
+from .g_code_functionality_defs import smoothie
 
 
 class GCode:
@@ -39,46 +21,68 @@ class GCode:
     G_CODE_EXPLANATION_MAPPING = {
         # Weird Enum thing stopping me from using values from
         # enum for MOVE and SET_SPEED see g_code.py get_gcode_function for explanation
-        'MOVE': MoveGCodeFunctionalityDef,
-        'SET_SPEED': SetSpeedGCodeFunctionalityDef,
-        SMOOTHIE_GCODE.WAIT.name: WaitGCodeFunctionalityDef,
-        SMOOTHIE_GCODE.HOME.name: HomeGCodeFunctionalityDef,
-        SMOOTHIE_GCODE.SET_CURRENT.name: SetCurrentGCodeFunctionalityDef,
-        SMOOTHIE_GCODE.DWELL.name: DwellGCodeFunctionalityDef,
-        SMOOTHIE_GCODE.CURRENT_POSITION.name: CurrentPositionCodeFunctionalityDef,
-        SMOOTHIE_GCODE.LIMIT_SWITCH_STATUS.name: LimitSwitchStatusGCodeFunctionalityDef,
-        SMOOTHIE_GCODE.PROBE.name: ProbeGCodeFunctionalityDef,
+        'MOVE':
+            smoothie.MoveGCodeFunctionalityDef,
+        'SET_SPEED':
+            smoothie.SetSpeedGCodeFunctionalityDef,
+        SMOOTHIE_GCODE.WAIT.name:
+            smoothie.WaitGCodeFunctionalityDef,
+        SMOOTHIE_GCODE.HOME.name:
+            smoothie.HomeGCodeFunctionalityDef,
+        SMOOTHIE_GCODE.SET_CURRENT.name:
+            smoothie.SetCurrentGCodeFunctionalityDef,
+        SMOOTHIE_GCODE.DWELL.name:
+            smoothie.DwellGCodeFunctionalityDef,
+        SMOOTHIE_GCODE.CURRENT_POSITION.name:
+            smoothie.CurrentPositionCodeFunctionalityDef,
+        SMOOTHIE_GCODE.LIMIT_SWITCH_STATUS.name:
+            smoothie.LimitSwitchStatusGCodeFunctionalityDef,
+        SMOOTHIE_GCODE.PROBE.name:
+            smoothie.ProbeGCodeFunctionalityDef,
         SMOOTHIE_GCODE.ABSOLUTE_COORDS.name:
-            AbsoluteCoordinateModeGCodeFunctionalityDef,
+            smoothie.AbsoluteCoordinateModeGCodeFunctionalityDef,
         SMOOTHIE_GCODE.RELATIVE_COORDS.name:
-            RelativeCoordinateModeGCodeFunctionalityDef,
-        SMOOTHIE_GCODE.RESET_FROM_ERROR.name: ResetFromErrorGCodeFunctionalityDef,
-        SMOOTHIE_GCODE.PUSH_SPEED.name: PushSpeedGCodeFunctionalityDef,
-        SMOOTHIE_GCODE.POP_SPEED.name: PopSpeedGCodeFunctionalityDef,
-        SMOOTHIE_GCODE.STEPS_PER_MM.name: StepsPerMMGCodeFunctionalityDef,
-        SMOOTHIE_GCODE.SET_MAX_SPEED.name: SetMaxSpeedGCodeFunctionalityDef,
-        SMOOTHIE_GCODE.ACCELERATION.name: AccelerationGCodeFunctionalityDef,
-        SMOOTHIE_GCODE.DISENGAGE_MOTOR.name: DisengageMotorGCodeFunctionalityDef,
-        SMOOTHIE_GCODE.HOMING_STATUS.name: HomingStatusGCodeFunctionalityDef,
+            smoothie.RelativeCoordinateModeGCodeFunctionalityDef,
+        SMOOTHIE_GCODE.RESET_FROM_ERROR.name:
+            smoothie.ResetFromErrorGCodeFunctionalityDef,
+        SMOOTHIE_GCODE.PUSH_SPEED.name:
+            smoothie.PushSpeedGCodeFunctionalityDef,
+        SMOOTHIE_GCODE.POP_SPEED.name:
+            smoothie.PopSpeedGCodeFunctionalityDef,
+        SMOOTHIE_GCODE.STEPS_PER_MM.name:
+            smoothie.StepsPerMMGCodeFunctionalityDef,
+        SMOOTHIE_GCODE.SET_MAX_SPEED.name:
+            smoothie.SetMaxSpeedGCodeFunctionalityDef,
+        SMOOTHIE_GCODE.ACCELERATION.name:
+            smoothie.AccelerationGCodeFunctionalityDef,
+        SMOOTHIE_GCODE.DISENGAGE_MOTOR.name:
+            smoothie.DisengageMotorGCodeFunctionalityDef,
+        SMOOTHIE_GCODE.HOMING_STATUS.name:
+            smoothie.HomingStatusGCodeFunctionalityDef,
         SMOOTHIE_GCODE.MICROSTEPPING_B_DISABLE.name:
-            MicrosteppingBDisableGCodeFunctionalityDef,
+            smoothie.MicrosteppingBDisableGCodeFunctionalityDef,
         SMOOTHIE_GCODE.MICROSTEPPING_B_ENABLE.name:
-            MicrosteppingBEnableGCodeFunctionalityDef,
+            smoothie.MicrosteppingBEnableGCodeFunctionalityDef,
         SMOOTHIE_GCODE.MICROSTEPPING_C_DISABLE.name:
-            MicrosteppingCDisableGCodeFunctionalityDef,
+            smoothie.MicrosteppingCDisableGCodeFunctionalityDef,
         SMOOTHIE_GCODE.MICROSTEPPING_C_ENABLE.name:
-            MicrosteppingCEnableGCodeFunctionalityDef,
-        SMOOTHIE_GCODE.PIPETTE_HOME.name: SetPipetteHomeGCodeFunctionalityDef,
-        SMOOTHIE_GCODE.PIPETTE_RETRACT.name: SetPipetteRetractGCodeFunctionalityDef,
-        SMOOTHIE_GCODE.PIPETTE_DEBOUNCE.name: SetPipetteDebounceGCodeFunctionalityDef,
+            smoothie.MicrosteppingCEnableGCodeFunctionalityDef,
+        SMOOTHIE_GCODE.PIPETTE_HOME.name:
+            smoothie.SetPipetteHomeGCodeFunctionalityDef,
+        SMOOTHIE_GCODE.PIPETTE_RETRACT.name:
+            smoothie.SetPipetteRetractGCodeFunctionalityDef,
+        SMOOTHIE_GCODE.PIPETTE_DEBOUNCE.name:
+            smoothie.SetPipetteDebounceGCodeFunctionalityDef,
         SMOOTHIE_GCODE.PIPETTE_MAX_TRAVEL.name:
-            SetPipetteMaxTravelGCodeFunctionalityDef,
+            smoothie.SetPipetteMaxTravelGCodeFunctionalityDef,
         SMOOTHIE_GCODE.READ_INSTRUMENT_MODEL.name:
-            ReadInstrumentModelGCodeFunctionalityDef,
-        SMOOTHIE_GCODE.READ_INSTRUMENT_ID.name: ReadInstrumentIDGCodeFunctionalityDef,
-        SMOOTHIE_GCODE.WRITE_INSTRUMENT_ID.name: WriteInstrumentIDGCodeFunctionalityDef,
+            smoothie.ReadInstrumentModelGCodeFunctionalityDef,
+        SMOOTHIE_GCODE.READ_INSTRUMENT_ID.name:
+            smoothie.ReadInstrumentIDGCodeFunctionalityDef,
+        SMOOTHIE_GCODE.WRITE_INSTRUMENT_ID.name:
+            smoothie.WriteInstrumentIDGCodeFunctionalityDef,
         SMOOTHIE_GCODE.WRITE_INSTRUMENT_MODEL.name:
-            WriteInstrumentModelGCodeFunctionalityDef,
+            smoothie.WriteInstrumentModelGCodeFunctionalityDef,
     }
 
     # Smoothie G-Code Parsing Characters
@@ -106,6 +110,18 @@ class GCode:
             if g_code.gcode not in cls.SPECIAL_HANDLING_REQUIRED_G_CODES:
                 g_code_list.append(cls(device, g_code.gcode, g_code.params, response))
             else:
+                # This case is the exception compared to all of the others for the
+                # smoothie G-Codes. We have 4 G-Codes that have to do with loading
+                # and reading instrument (pipette) IDs and models, listed as follows:
+                # M369: Read Instrument ID
+                # M370: Write Instrument ID
+                # M371: Read Instrument Model
+                # M372: Write Instrument Model
+                # The "Write" codes do not parse in the same fashion as all of the other
+                # codes. Instead of being floats, their parameters are actually hex
+                # strings. Because of this we have to parse them differently.
+                # From the body of the G-Code, we pull the L or R for left or right
+                # pipette. Everything else in the string is the hex code
                 left_or_right = g_code.body.strip()[0]
                 if left_or_right not in ['R', 'L']:
                     raise UnparsableGCodeError(raw_code)

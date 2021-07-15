@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import Dict, Any
+from typing import Dict, Any, Union
 from dataclasses import dataclass
 
 
@@ -20,7 +20,7 @@ class Explanation:
     command_explanation: str
     response: str
 
-    def to_dict(self) -> Any:
+    def to_dict(self) -> Dict[str, Union[str, Dict[str, Union[float, str]]]]:
         return {
             self.CODE_KEY: self.code,
             self.COMMAND_NAME_KEY: self.command_name,
