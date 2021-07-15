@@ -83,3 +83,10 @@ test-e2e:
 .PHONY: cypress-visual
 cypress-visual:
 	cypress open
+
+.PHONY: visual
+visual:
+	concurrently --kill-others --names "emulator,app,tests" \
+		"$(MAKE) docker-emulator" \
+		"$(MAKE) external-browser-app" \
+		"$(MAKE) cypress-visual"

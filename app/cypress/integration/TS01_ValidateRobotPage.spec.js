@@ -9,33 +9,21 @@ describe('Test Suite 01 - Validate Robot Page', () => {
 
   // Confirm that initial page has loaded properly and all initial content is present
   it('Successfully loads page', () => {
-    //ROBOT button
+    // https://docs.cypress.io/guides/core-concepts/conditional-testing#Definition
+    // need a deterministic check to know if this modal will appear
+    // cy.dismissUpdateNotice()
+    // Dismiss the update notice
+    cy.get('button:contains("Not Now")').click()
+    // ROBOT menu button
     cy.get('a[href="#/robots"]').should('exist').contains('Robot')
-    //Robots header
-    cy.get('h2').should(elem => {
-      expect(elem.text()).to.equal('Robots')
-    })
-    cy.get('.dZMtmt > .Text-sc-1wb1h0f-0').should('exist')
-    cy.get('.cOCwJn > .Svg-sc-1lpozsw-0 > path').should('exist')
-    cy.get('.cOCwJn > .Text-sc-1wb1h0f-0').should('exist')
-    cy.get('[aria-describedby="Tooltip__2"] > .Svg-sc-1lpozsw-0 > path').should(
-      'exist'
-    )
-    cy.get('[aria-describedby="Tooltip__2"] > .Text-sc-1wb1h0f-0').should(
-      'exist'
-    )
-    cy.get('[aria-describedby="Tooltip__3"] > .Svg-sc-1lpozsw-0 > path').should(
-      'exist'
-    )
-    cy.get('[aria-describedby="Tooltip__3"] > .Text-sc-1wb1h0f-0').should(
-      'exist'
-    )
-    cy.get('[aria-describedby="Tooltip__4"] > .Svg-sc-1lpozsw-0 > path').should(
-      'exist'
-    )
-    cy.get('[aria-describedby="Tooltip__4"] > .Text-sc-1wb1h0f-0').should(
-      'exist'
-    )
+    // More menu button
+    cy.get('a[href="#/more"]').should('exist').contains('More')
+    // Robots header
+    cy.get('h2:contains("Robots")').should('exist')
+    // Inactive menu items exist
+    cy.get('[aria-describedby="Tooltip__2"]').should('exist').contains('Protocol')
+    cy.get('[aria-describedby="Tooltip__3"]').should('exist').contains('Calibrate')
+    cy.get('[aria-describedby="Tooltip__4"]').should('exist').contains('Run')
   })
 
   // Checking to make sure that the application sees the robot

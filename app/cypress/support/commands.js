@@ -23,3 +23,8 @@
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
+
+Cypress.Commands.add('dismissUpdateNotice', () => {
+  // deterministic check that modal is present
+  cy.get('button:contains("Not Now")').click()
+})
