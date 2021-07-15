@@ -8,7 +8,3 @@ class MicrosteppingBDisableGCodeFunctionalityDef(GCodeFunctionalityDefBase):
     @classmethod
     def _generate_command_explanation(cls, g_code_args: Dict[str, str]) -> str:
         return 'Disabling microstepping on B-Axis'
-
-    @classmethod
-    def _generate_response_explanation(cls, response: str) -> str:
-        return ''

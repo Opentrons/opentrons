@@ -29,7 +29,3 @@ class MoveGCodeFunctionalityDef(GCodeFunctionalityDefBase):
                 message_list.append(message)
 
         return 'Moving the robot as follows:\n\t' + '\n\t'.join(message_list)
-
-    @classmethod
-    def _generate_response_explanation(cls, response: str) -> str:
-        return ''

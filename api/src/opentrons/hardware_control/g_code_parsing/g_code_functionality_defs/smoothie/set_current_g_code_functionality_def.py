@@ -31,7 +31,3 @@ class SetCurrentGCodeFunctionalityDef(GCodeFunctionalityDefBase):
                 message_list.append(message)
 
         return 'Setting the current (in amps) to:\n\t' + '\n\t'.join(message_list)
-
-    @classmethod
-    def _generate_response_explanation(cls, response: str) -> str:
-        return ''

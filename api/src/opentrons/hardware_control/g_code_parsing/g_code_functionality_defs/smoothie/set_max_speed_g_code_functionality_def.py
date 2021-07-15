@@ -22,7 +22,3 @@ class SetMaxSpeedGCodeFunctionalityDef(GCodeFunctionalityDefBase):
 
         return 'Setting the max speed for the following axes:\n\t'\
                + '\n\t'.join(message_list)
-
-    @classmethod
-    def _generate_response_explanation(cls, response: str) -> str:
-        return ''

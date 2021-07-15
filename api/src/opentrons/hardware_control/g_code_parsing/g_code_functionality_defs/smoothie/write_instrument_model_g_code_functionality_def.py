@@ -16,7 +16,3 @@ class WriteInstrumentModelGCodeFunctionalityDef(GCodeFunctionalityDefBase):
 
         return f'Writing instrument model {g_code_args[l_or_r]} for ' \
                f'{left_or_right} pipette'
-
-    @classmethod
-    def _generate_response_explanation(cls, response: str) -> str:
-        return ''

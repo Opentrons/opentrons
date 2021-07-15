@@ -8,7 +8,3 @@ class WaitGCodeFunctionalityDef(GCodeFunctionalityDefBase):
     @classmethod
     def _generate_command_explanation(cls, g_code_args: Dict[str, str]) -> str:
         return 'Waiting for motors to stop moving'
-
-    @classmethod
-    def _generate_response_explanation(cls, response: str) -> str:
-        return ''

@@ -66,4 +66,4 @@ class GCodeFunctionalityDefBase(ABC):
         All child classes should either parse response into human readable text or
         return an empty string
         """
-        ...
+        return ''

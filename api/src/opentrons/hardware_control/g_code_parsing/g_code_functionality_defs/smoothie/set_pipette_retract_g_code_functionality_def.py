@@ -26,7 +26,3 @@ class SetPipetteRetractGCodeFunctionalityDef(GCodeFunctionalityDefBase):
         return 'Setting the pipette endstop retract distance ' \
                'for the following axes:\n\t'\
                + '\n\t'.join(message_list)
-
-    @classmethod
-    def _generate_response_explanation(cls, response: str) -> str:
-        return ''

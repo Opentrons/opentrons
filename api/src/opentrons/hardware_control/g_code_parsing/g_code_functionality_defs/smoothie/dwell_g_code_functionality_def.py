@@ -11,7 +11,3 @@ class DwellGCodeFunctionalityDef(GCodeFunctionalityDefBase):
     def _generate_command_explanation(cls, g_code_args: Dict[str, str]) -> str:
         duration = g_code_args[cls.DWELL_ARG_KEY]
         return f'Pausing movement for {duration}ms'
-
-    @classmethod
-    def _generate_response_explanation(cls, response: str) -> str:
-        return ''
