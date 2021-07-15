@@ -6,6 +6,7 @@ from opentrons.hardware_control.g_code_parsing.g_code_functionality_defs.\
 
 
 class AccelerationGCodeFunctionalityDef(GCodeFunctionalityDefBase):
+    # Using this list to output string in specific order
     EXPECTED_ARGS = ['S', 'X', 'Y', 'Z', 'A', 'B', 'C']
 
     class ValDefinedMessage(str, Enum):

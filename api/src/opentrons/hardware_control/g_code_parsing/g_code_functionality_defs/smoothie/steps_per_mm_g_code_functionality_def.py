@@ -5,7 +5,7 @@ from opentrons.hardware_control.g_code_parsing.g_code_functionality_defs.\
 
 
 class StepsPerMMGCodeFunctionalityDef(GCodeFunctionalityDefBase):
-
+    # Using this list to output string in specific order
     EXPECTED_ARGS = ['X', 'Y', 'Z', 'A', 'B', 'C']
 
     VAL_DEFINED_MESSAGE = Template('$name-Axis: $steps steps per mm')

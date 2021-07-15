@@ -151,8 +151,8 @@ class SmoothieEmulator(AbstractEmulator):
         func_to_run = self._gcode_to_function_mapping.get(command.gcode)
         return None if func_to_run is None else func_to_run(command)
 
-    @classmethod
-    def _mount_strings(cls, command: Command) -> Dict[str, str]:
+    @staticmethod
+    def _mount_strings(command: Command) -> Dict[str, str]:
         """
         Parse the body of the command for the mount strings.
 
@@ -170,7 +170,7 @@ class SmoothieEmulator(AbstractEmulator):
                 SmoothieEmulator.WRITE_INSTRUMENT_RE.finditer(command.body))
         result = {
             p['mount']: p['value'] + '0' * (
-                cls.INSTRUMENT_AND_MODEL_STRING_LENGTH - len(p['value'])
+                SmoothieEmulator.INSTRUMENT_AND_MODEL_STRING_LENGTH - len(p['value'])
             )
             for p in pars
         }

@@ -5,7 +5,7 @@ from opentrons.hardware_control.g_code_parsing.g_code_functionality_defs.\
 
 
 class SetPipetteHomeGCodeFunctionalityDef(GCodeFunctionalityDefBase):
-
+    # Using this list to output string in specific order
     EXPECTED_ARGS = ['Z', 'A']
 
     VAL_DEFINED_MESSAGE = Template('$name-Axis: $height')
