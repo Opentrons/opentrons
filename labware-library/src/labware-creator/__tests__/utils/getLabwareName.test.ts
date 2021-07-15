@@ -1,7 +1,7 @@
 import { getLabwareName } from '../../utils'
 
 describe('getLabwareName', () => {
-  const testCases: Array<{ values: any; plural: boolean; expected: String }> = [
+  const testCases: Array<{ values: any; plural: boolean; expected: string }> = [
     { values: { labwareType: 'tipRack' }, plural: false, expected: 'tip' },
     { values: { labwareType: 'tipRack' }, plural: true, expected: 'tips' },
     {

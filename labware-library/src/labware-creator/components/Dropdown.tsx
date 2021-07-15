@@ -1,15 +1,10 @@
 import cx from 'classnames'
 import * as React from 'react'
-import {
-  SelectField,
-  Tooltip,
-  useHover,
-  useHoverTooltip,
-} from '@opentrons/components'
+import { SelectField, Tooltip, useHoverTooltip } from '@opentrons/components'
 import { Field } from 'formik'
 import { reportFieldEdit } from '../analyticsUtils'
 import { getLabel, LabwareFields } from '../fields'
-import type { Option, Options } from '../fields'
+import type { RichOption, RichOptions } from '../fields'
 import fieldStyles from './fieldStyles.css'
 import styles from './Dropdown.css'
 
@@ -17,13 +12,13 @@ export interface DropdownProps {
   name: keyof LabwareFields
   disabled?: boolean
   tooltip?: JSX.Element
-  options: Options
+  options: RichOptions
   caption?: string
   /** optionally override the default onValueChange */
   onValueChange?: React.ComponentProps<typeof SelectField>['onValueChange']
 }
 
-export const OptionLabel = (props: Option): JSX.Element => (
+export const OptionLabel = (props: RichOption): JSX.Element => (
   <div className={styles.option_row}>
     {props.imgSrc != null && (
       <img className={styles.option_image} src={props.imgSrc} />

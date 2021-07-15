@@ -45,12 +45,22 @@ export interface ImportError {
 }
 
 export interface Option {
-  name: JSX.Element | string
+  name: string
   value: string
   disabled?: boolean
   imgSrc?: string
 }
 export type Options = Option[]
+
+// NOTE: annoyingly, some components support "rich" `name` values (eg Dropdown)
+// that can be a JSX.Element, and others like RadioField only support string values for `name` :(
+export interface RichOption {
+  name: string | JSX.Element
+  value: string
+  disabled?: boolean
+  imgSrc?: string
+}
+export type RichOptions = RichOption[]
 
 export type LabwareType =
   | 'wellPlate'

@@ -8,15 +8,14 @@ import {
 import { memoize } from 'lodash'
 import upperFirst from 'lodash/upperFirst'
 import * as React from 'react'
-import type { Options } from '../fields'
+import { RichOptions } from '../fields'
 
-// TODO IMMEDIATELY: factor out? or just rename this file? Prob doesn't belong in testProtocols
-interface PipetteOptionProps {
+export interface PipetteOptionRowProps {
   disabled?: boolean
   isMultiChannel: boolean
   loadName: string
 }
-export const PipetteOption = (props: PipetteOptionProps): JSX.Element => {
+export const PipetteOptionRow = (props: PipetteOptionRowProps): JSX.Element => {
   const pName = upperFirst(props.loadName.split('_')[0]) // Eg, "P300"
   const gen = props.loadName.endsWith('_gen2') ? 'GEN2' : 'GEN1'
 
@@ -108,7 +107,7 @@ export const pipettes: Record<string, Pipette> = {
   },
 }
 
-const _getPipetteNameOptions = (allowMultiChannel: boolean): Options =>
+const _getPipetteNameOptions = (allowMultiChannel: boolean): RichOptions =>
   Object.keys(pipettes).map(loadName => {
     const pipette = pipettes[loadName]
 
@@ -116,7 +115,7 @@ const _getPipetteNameOptions = (allowMultiChannel: boolean): Options =>
 
     return {
       name: (
-        <PipetteOption
+        <PipetteOptionRow
           disabled={disabled}
           isMultiChannel={pipette.isMultiChannel}
           loadName={loadName}

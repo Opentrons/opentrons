@@ -5,12 +5,13 @@ import { PrimaryBtn } from '@opentrons/components'
 import { reportEvent } from '../../../analytics'
 import { FormStatus, LabwareFields } from '../../fields'
 import { isEveryFieldHidden } from '../../utils'
-import { getPipetteNameOptions } from '../../testProtocols/constants'
+import { getPipetteNameOptions } from '../getPipetteOptions'
 import { FormAlerts } from '../alerts/FormAlerts'
 import { Dropdown } from '../Dropdown'
 import { LinkOut } from '../LinkOut'
 import { SectionBody } from './SectionBody'
 import styles from '../../styles.css'
+import { determineMultiChannelSupport } from '../../utils/determineMultiChannelSupport'
 
 const LABWARE_PDF_URL =
   'https://opentrons-publications.s3.us-east-2.amazonaws.com/labwareDefinition_testGuide.pdf'
@@ -39,11 +40,10 @@ export const Export = (props: ExportProps): JSX.Element | null => {
     return null
   }
 
-  const disablePipetteField = defaultedDef === null
-  // TODO IMMEDIATELY. Allow only if definition supports 8-channel. Make & use a new util.
-  const allowMultiChannel = false
-
-  console.log('from inside export', status.defaultedDef)
+  const {
+    disablePipetteField,
+    allowMultiChannel,
+  } = determineMultiChannelSupport(defaultedDef)
 
   return (
     <SectionBody label="Labware Test Protocol" id="Export">
