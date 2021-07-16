@@ -3,6 +3,7 @@ import * as React from 'react'
 import {
   Box,
   SelectField,
+  SelectOption,
   StyleProps,
   Tooltip,
   useHoverTooltip,
@@ -46,6 +47,12 @@ export const Dropdown = (props: DropdownProps): JSX.Element => {
 
   const [targetProps, tooltipProps] = useHoverTooltip()
 
+  // change disabled -> isDisabled :(
+  const selectFieldOptions: SelectOption[] = options.map(opt => ({
+    value: opt.value,
+    isDisabled: opt.disabled,
+  }))
+
   return (
     <>
       {tooltip != null && <Tooltip {...tooltipProps}>{tooltip}</Tooltip>}
@@ -66,7 +73,7 @@ export const Dropdown = (props: DropdownProps): JSX.Element => {
                   name={field.name}
                   caption={caption}
                   value={field.value}
-                  options={options}
+                  options={selectFieldOptions}
                   onLoseFocus={name => {
                     reportFieldEdit({ value: field.value, name })
                     form.setFieldTouched(name)

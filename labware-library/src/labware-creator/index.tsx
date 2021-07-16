@@ -61,6 +61,7 @@ import type {
   ProcessedLabwareFields,
 } from './fields'
 import { getDefaultedDef } from './getDefaultedDef'
+import { getIsXYGeometryChanged } from './utils/getIsXYGeometryChanged'
 
 const ajv = new Ajv()
 const validateLabwareSchema = ajv.compile(labwareSchema)
@@ -337,7 +338,18 @@ export const LabwareCreator = (): JSX.Element => {
           const setStatus: (status: FormStatus) => void = bag.setStatus
           const errors: LabwareCreatorErrors = bag.errors
 
-          if (status.prevValues !== values) {
+          if (
+            (status.prevValues !== values && status.prevValues == null) ||
+            getIsXYGeometryChanged(status.prevValues, values)
+          ) {
+            // since geometry has changed, clear the pipette field (to avoid multi-channel selection
+            // for labware not that is not multi-channel compatible)
+            setValues({
+              ...values,
+              pipetteName: getDefaultFormState().pipetteName,
+            })
+
+            // update defaultedDef with new values
             setStatus({
               defaultedDef: getDefaultedDef(values),
               prevValues: values,

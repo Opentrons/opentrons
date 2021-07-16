@@ -113,6 +113,8 @@ const _getPipetteNameOptions = (allowMultiChannel: boolean): RichOptions =>
 
     const disabled = pipette.isMultiChannel ? !allowMultiChannel : false
 
+    console.log('_getPipetteNameOptions', { allowMultiChannel })
+
     return {
       name: (
         <PipetteOptionRow
