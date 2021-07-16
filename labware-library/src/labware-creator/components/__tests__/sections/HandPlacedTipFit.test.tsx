@@ -4,6 +4,7 @@ import isEqual from 'lodash/isEqual'
 import { render, screen } from '@testing-library/react'
 import {
   getDefaultFormState,
+  getInitialStatus,
   LabwareFields,
   snugLooseOptions,
 } from '../../../fields'
@@ -30,6 +31,7 @@ describe('HandPlacedTipFit', () => {
   beforeEach(() => {
     formikConfig = {
       initialValues: getDefaultFormState(),
+      initialStatus: getInitialStatus(),
       onSubmit: jest.fn(),
     }
 

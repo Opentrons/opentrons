@@ -1,7 +1,11 @@
 import React from 'react'
 import { FormikConfig } from 'formik'
 import { render, screen } from '@testing-library/react'
-import { getDefaultFormState, LabwareFields } from '../../../fields'
+import {
+  getDefaultFormState,
+  getInitialStatus,
+  LabwareFields,
+} from '../../../fields'
 
 import { CustomTiprackWarning } from '../../sections/CustomTiprackWarning'
 
@@ -13,6 +17,7 @@ describe('CustomTiprackWarning', () => {
   beforeEach(() => {
     formikConfig = {
       initialValues: getDefaultFormState(),
+      initialStatus: getInitialStatus(),
       onSubmit: jest.fn(),
     }
   })

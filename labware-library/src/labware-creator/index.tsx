@@ -12,7 +12,9 @@ import {
   aluminumBlockAutofills,
   aluminumBlockChildTypeOptions,
   aluminumBlockTypeOptions,
+  FormStatus,
   getDefaultFormState,
+  getInitialStatus,
   tubeRackAutofills,
   tubeRackInsertOptions,
 } from './fields'
@@ -58,6 +60,8 @@ import type {
   LabwareFields,
   ProcessedLabwareFields,
 } from './fields'
+import { getDefaultedDef } from './getDefaultedDef'
+import { getIsXYGeometryChanged } from './utils/getIsXYGeometryChanged'
 
 const ajv = new Ajv()
 const validateLabwareSchema = ajv.compile(labwareSchema)
@@ -281,6 +285,7 @@ export const LabwareCreator = (): JSX.Element => {
         enableReinitialize
         validationSchema={labwareFormSchema}
         validate={formLevelValidation}
+        initialStatus={getInitialStatus}
         onSubmit={(values: LabwareFields) => {
           const castValues: ProcessedLabwareFields = labwareFormSchema.cast(
             values
@@ -329,7 +334,27 @@ export const LabwareCreator = (): JSX.Element => {
             isValid,
             handleSubmit,
           } = bag
+          const status: FormStatus = bag.status
+          const setStatus: (status: FormStatus) => void = bag.setStatus
           const errors: LabwareCreatorErrors = bag.errors
+
+          if (
+            (status.prevValues !== values && status.prevValues == null) ||
+            getIsXYGeometryChanged(status.prevValues, values)
+          ) {
+            // since geometry has changed, clear the pipette field (to avoid multi-channel selection
+            // for labware not that is not multi-channel compatible)
+            setValues({
+              ...values,
+              pipetteName: getDefaultFormState().pipetteName,
+            })
+
+            // update defaultedDef with new values
+            setStatus({
+              defaultedDef: getDefaultedDef(values),
+              prevValues: values,
+            })
+          }
 
           const onExportClick = (): void => {
             if (!isValid && !showExportErrorModal) {
