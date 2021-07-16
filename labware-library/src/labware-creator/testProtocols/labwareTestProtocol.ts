@@ -67,8 +67,6 @@ def run(protocol: protocol_api.ProtocolContext):
     set_speeds(RATE)
 
     pipette.home()
-
-#    protocol.pause(f"Place your labware in Slot {TEST_LABWARE_SLOT}")
     if(PIPETTE_NAME == 'p20_single_gen2' or PIPETTE_NAME == 'p300_single_gen2' or PIPETTE_NAME == 'p1000_single_gen2' or PIPETTE_NAME == 'p50_single' or PIPETTE_NAME == 'p10_single' or PIPETTE_NAME == 'p300_single' or PIPETTE_NAME == 'p1000_single'):
         if(total > 1):
             #testing with single channel
