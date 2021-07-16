@@ -76,7 +76,9 @@ function _getNextRobotStateAndWarningsSingleCommand(
     case 'delay':
     case 'airGap':
     case 'dispenseAirGap':
+    case 'moveToSlot':
     case 'moveToWell':
+    case 'updateRobotState':
       // these commands don't have any effects on the state
       break
 

@@ -1339,12 +1339,12 @@
         "labware": {
           "tiprackId": {"slot": "5"},
           "sourcePlateId": {"slot": "6"},
-          "destPlateId": {"slot": "magneticModuleId"},
+          "destPlateId": {"slot": "magneticModuleId"}
         },
         "modules": {"temperatureModuleId": {"slot": null} },
         "tipState": {
-          "tipracks": {"goof": {"A1": true, "A2": false}},
-          "pipettes": {"pip": true}
+          "tipracks": {"tiprackId": {"A1": true, "A2": false}},
+          "pipettes": {"pipetteId": true}
         }
       }
     }
