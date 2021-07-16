@@ -711,7 +711,7 @@
                         "required": ["slot"],
                         "additionalProperties": false,
                         "properties": {
-                          "slot": { "$ref": "#/definitions/slot" }
+                          "slot": { "anyOf": [{ "$ref": "#/definitions/slot" }, { "type": "null" }] }
                         }
                       }
                     }
@@ -727,7 +727,7 @@
                         "required": ["slot"],
                         "additionalProperties": false,
                         "properties": {
-                          "slot": { "$ref": "#/definitions/slot" }
+                          "slot": { "anyOf": [{ "$ref": "#/definitions/slot" }, { "type": "null" }] }
                         }
                       }
                     }
