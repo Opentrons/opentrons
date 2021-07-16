@@ -178,6 +178,19 @@ def g_codes() -> List[GCode]:
             ''
         ],
 
+        # Read Instrument ID no space
+        [  # Test 40
+            'M369 L',
+            'M369 L\r\n\r\nL:5032305356323032303230303730313031'
+            '000000000000000000000000000000 \r\nok\r\nok\r\n'
+        ],
+
+        # Read Instrument Model no space
+        [  # Test 41
+            'M371 L',
+            'M371 L\r\n\r\nL:7032305f6d756c74695f76322e3'
+            '0000000000000000000000000000000000000 \r\nok\r\nok\r\n'
+        ],
     ]
     g_code_list = [
         GCode.from_raw_code(code, 'smoothie', response)
@@ -235,6 +248,8 @@ def expected_function_name_values() -> List[str]:
         'MICROSTEPPING_B_DISABLE',  # Test 37
         'MICROSTEPPING_C_ENABLE',  # Test 38
         'MICROSTEPPING_C_DISABLE',  # Test 39
+        'READ_INSTRUMENT_ID',  # Test 40
+        'READ_INSTRUMENT_MODEL',  # Test 41
 
     ]
 
@@ -378,6 +393,12 @@ def expected_arg_values() -> List[Dict[str, int]]:
 
         # Test 39
         {},
+
+        # Test 40
+        {'L': None},
+
+        # Test 41
+        {'L': None},
     ]
 
 
@@ -763,7 +784,23 @@ def explanations() -> List[Explanation]:
             response='',
             provided_args={},
             command_explanation='Disabling microstepping on C-Axis'
-        )
+        ),
+        # Test 40
+        Explanation(
+            code='M369',
+            command_name='READ_INSTRUMENT_ID',
+            response='Read Instrument ID: P20SV202020070101',
+            provided_args={'L': None},
+            command_explanation='Reading instrument ID for Left pipette'
+        ),
+        # Test 41
+        Explanation(
+            code='M371',
+            command_name='READ_INSTRUMENT_MODEL',
+            response='Read Instrument Model: p20_multi_v2.0',
+            provided_args={'L': None},
+            command_explanation='Reading instrument model for Left pipette'
+        ),
     ]
 
 
