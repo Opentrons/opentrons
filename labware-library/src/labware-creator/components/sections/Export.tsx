@@ -67,6 +67,7 @@ export const Export = (props: ExportProps): JSX.Element | null => {
             }
             name="pipetteName"
             options={getPipetteNameOptions(allowMultiChannel)}
+            width="18rem"
           />
         </div>
       </div>

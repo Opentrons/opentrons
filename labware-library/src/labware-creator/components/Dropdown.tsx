@@ -1,6 +1,12 @@
 import cx from 'classnames'
 import * as React from 'react'
-import { SelectField, Tooltip, useHoverTooltip } from '@opentrons/components'
+import {
+  Box,
+  SelectField,
+  StyleProps,
+  Tooltip,
+  useHoverTooltip,
+} from '@opentrons/components'
 import { Field } from 'formik'
 import { reportFieldEdit } from '../analyticsUtils'
 import { getLabel, LabwareFields } from '../fields'
@@ -8,7 +14,7 @@ import type { RichOption, RichOptions } from '../fields'
 import fieldStyles from './fieldStyles.css'
 import styles from './Dropdown.css'
 
-export interface DropdownProps {
+export interface DropdownProps extends StyleProps {
   name: keyof LabwareFields
   disabled?: boolean
   tooltip?: JSX.Element
@@ -28,39 +34,37 @@ export const OptionLabel = (props: RichOption): JSX.Element => (
 )
 
 export const Dropdown = (props: DropdownProps): JSX.Element => {
-  const options = React.useMemo(
-    () =>
-      props.options.map(o => ({
-        value: o.value,
-        isDisabled: o.disabled || false,
-      })),
-    [props.options]
-  )
+  const {
+    name,
+    disabled,
+    tooltip,
+    options,
+    caption,
+    onValueChange,
+    ...styleProps
+  } = props
 
   const [targetProps, tooltipProps] = useHoverTooltip()
 
   return (
     <>
-      {props.tooltip != null && (
-        <Tooltip {...tooltipProps}>{props.tooltip}</Tooltip>
-      )}
+      {tooltip != null && <Tooltip {...tooltipProps}>{tooltip}</Tooltip>}
 
       <div {...targetProps} className={fieldStyles.field_wrapper}>
         <label
           className={cx(fieldStyles.field_label, {
-            [fieldStyles.disabled]: props.disabled,
+            [fieldStyles.disabled]: disabled,
           })}
         >
-          <Field name={props.name}>
+          <Field name={name}>
             {/* @ts-expect-error(IL, 2021-03-24): formik types need cleanup w LabwareFields */}
             {({ field, form }) => (
-              <div style={{ width: '18rem' }}>
-                {/* TODO IMMEDIATELY ^^^ don't inline style; allow instance to be styled via style props */}
+              <Box {...styleProps}>
                 {getLabel(field.name, form.values)}
                 <SelectField
-                  disabled={props.disabled}
+                  disabled={disabled}
                   name={field.name}
-                  caption={props.caption}
+                  caption={caption}
                   value={field.value}
                   options={options}
                   onLoseFocus={name => {
@@ -68,17 +72,17 @@ export const Dropdown = (props: DropdownProps): JSX.Element => {
                     form.setFieldTouched(name)
                   }}
                   onValueChange={
-                    props.onValueChange ||
+                    onValueChange ??
                     ((name, value) => form.setFieldValue(name, value))
                   }
                   formatOptionLabel={({ value, label }) => {
-                    const option = props.options.find(
-                      opt => opt.value === value
-                    )
-                    return option ? <OptionLabel {...option} /> : null
+                    const option = options.find(opt => opt.value === value)
+                    return option !== undefined ? (
+                      <OptionLabel {...option} />
+                    ) : null
                   }}
                 />
-              </div>
+              </Box>
             )}
           </Field>
         </label>
