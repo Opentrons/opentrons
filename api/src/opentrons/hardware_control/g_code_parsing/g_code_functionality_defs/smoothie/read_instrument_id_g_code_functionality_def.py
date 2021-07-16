@@ -17,6 +17,6 @@ class ReadInstrumentIDGCodeFunctionalityDef(GCodeFunctionalityDefBase):
 
     @classmethod
     def _generate_response_explanation(cls, response: str) -> str:
-        hex_string = response.split(' ')[-1]
+        hex_string = response.split(':')[-1].strip()
         instrument_id = _byte_array_to_ascii_string(bytearray.fromhex(hex_string))
         return f'Read Instrument ID: {instrument_id}'
