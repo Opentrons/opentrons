@@ -53,7 +53,7 @@ def default_builder(code: GCode):
            f'Response: {code.response}'
 
 
-def explanation_only(code: GCode):
+def explanation_only_builder(code: GCode):
     """
     Function to build string that contains only the explanation. In the form of:
 
@@ -76,7 +76,7 @@ def explanation_only(code: GCode):
     return code.get_explanation().command_explanation
 
 
-def concise(code: GCode):
+def concise_builder(code: GCode):
     """
     Function to build concise string. Removes all newlines and tabs In the form of:
 
@@ -110,15 +110,27 @@ class SupportedTextModes(Enum):
     Concise: Same as Default but with all newlines and tabs removed to fit everything on
         a single line
     """
-    DEFAULT = TextMode(
-        'Default',
-        default_builder
-    )
-    EXPLANATION_ONLY = TextMode(
-        'Explanation Only',
-        explanation_only
-    )
-    CONCISE = TextMode(
-        'Concise',
-        concise
-    )
+    DEFAULT = 'Default'
+    EXPLANATION_ONLY = 'Explanation Only'
+    CONCISE = 'Concise'
+
+    @classmethod
+    def get_text_mode(cls, key: str):
+        # Defining this inside of the function so that it does not show up
+        # when using the __members__ attribute
+        _internal_mapping = {
+            cls.DEFAULT.value: TextMode(cls.DEFAULT.value, default_builder),
+            cls.EXPLANATION_ONLY.value: TextMode(
+                cls.EXPLANATION_ONLY.value, explanation_only_builder
+            ),
+            cls.CONCISE.value: TextMode(cls.CONCISE.value, concise_builder)
+        }
+        members = [member.value for member in list(cls.__members__.values())]
+        if key not in members:
+            raise ValueError(f'Mode named "{key}" not found. Valid modes are: {members}')
+
+        return _internal_mapping[key]
+
+    @classmethod
+    def get_text_mode_by_enum_value(cls, enum_value):
+        return cls.get_text_mode(enum_value.value)
