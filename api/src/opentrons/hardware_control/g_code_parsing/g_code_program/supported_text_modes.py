@@ -1,6 +1,11 @@
+import re
+
 from opentrons.hardware_control.g_code_parsing.g_code import GCode
+from opentrons.hardware_control.g_code_parsing.errors import InvalidTextModeError
 from typing import Callable
 from enum import Enum
+
+MULTIPLE_SPACE_REGEX = re.compile(' +')
 
 
 # Can't use a dataclass because mypy doesn't like a dataclass
@@ -35,45 +40,28 @@ def default_builder(code: GCode):
 
     Example:
 
-    Code: M203.1 A125.0 B40.0 C40.0 X600.0 Y400.0 Z125.0
+    Code: M92 X80.0 Y80.0 Z400 A400
     Explanation: Setting the max speed for the following axes:
-        X-Axis: 600.0
-        Y-Axis: 400.0
-        Z-Axis: 125.0
-        A-Axis: 125.0
-        B-Axis: 40.0
-        C-Axis: 40.0
+        X-Axis: 80.0 steps per mm
+        Y-Axis: 80.0 steps per mm
+        Z-Axis: 400.0 steps per mm
+        A-Axis: 400.0 steps per mm
+    Response: Current set steps per mm:
+        X Axis: 80.000000
+        Y Axis: 80.000000
+        Z Axis: 400.000000
+        A Axis: 400.000000
+        B Axis: 955.000000
+        C Axis: 768.000000
 
 
     :param code: G-Code object to parse into a string
     :return: Textual description
     """
-    return f'Code: {code.g_code} {code.g_code_body} \n' \
+    message = f'Code: {code.g_code} {code.g_code_body}\n' \
            f'Explanation: {code.get_explanation().command_explanation}\n' \
-           f'Response: {code.response}'
-
-
-def explanation_only_builder(code: GCode):
-    """
-    Function to build string that contains only the explanation. In the form of:
-
-    <Textual Description>
-
-    Example:
-
-    Setting the max speed for the following axes:
-        X-Axis: 600.0
-        Y-Axis: 400.0
-        Z-Axis: 125.0
-        A-Axis: 125.0
-        B-Axis: 40.0
-        C-Axis: 40.0
-
-
-    :param code: G-Code object to parse into a string
-    :return: Textual description
-    """
-    return code.get_explanation().command_explanation
+           f'Response: {code.get_explanation().response}'
+    return MULTIPLE_SPACE_REGEX.sub(' ', message).strip()
 
 
 def concise_builder(code: GCode):
@@ -89,11 +77,12 @@ def concise_builder(code: GCode):
     :param code: G-Code object to parse into a string
     :return: Textual description
     """
-    return f'{code.g_code} {code.g_code_body} -> ' \
+    message = f'{code.g_code} {code.g_code_body} -> ' \
            f'{code.get_explanation().command_explanation} -> ' \
-           f'{code.response}'\
+           f'{code.get_explanation().response}'\
         .replace('\n', ' ')\
         .replace('\t', '')
+    return MULTIPLE_SPACE_REGEX.sub(' ', message).strip()
 
 
 class SupportedTextModes(Enum):
@@ -120,14 +109,11 @@ class SupportedTextModes(Enum):
         # when using the __members__ attribute
         _internal_mapping = {
             cls.DEFAULT.value: TextMode(cls.DEFAULT.value, default_builder),
-            cls.EXPLANATION_ONLY.value: TextMode(
-                cls.EXPLANATION_ONLY.value, explanation_only_builder
-            ),
             cls.CONCISE.value: TextMode(cls.CONCISE.value, concise_builder)
         }
         members = [member.value for member in list(cls.__members__.values())]
         if key not in members:
-            raise ValueError(f'Mode named "{key}" not found. Valid modes are: {members}')
+            raise InvalidTextModeError(key, members)
 
         return _internal_mapping[key]
 
