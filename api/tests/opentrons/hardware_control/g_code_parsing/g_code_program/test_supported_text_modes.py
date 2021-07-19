@@ -8,6 +8,7 @@ from opentrons.hardware_control.g_code_parsing.g_code_program.supported_text_mod
     default_builder,\
     concise_builder
 
+
 @pytest.fixture
 def concise_mode() -> TextMode:
     return SupportedTextModes.get_text_mode('Concise')

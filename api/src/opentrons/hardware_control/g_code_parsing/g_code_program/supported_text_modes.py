@@ -59,8 +59,8 @@ def default_builder(code: GCode):
     :return: Textual description
     """
     message = f'Code: {code.g_code} {code.g_code_body}\n' \
-           f'Explanation: {code.get_explanation().command_explanation}\n' \
-           f'Response: {code.get_explanation().response}'
+              f'Explanation: {code.get_explanation().command_explanation}\n' \
+              f'Response: {code.get_explanation().response}'
     return MULTIPLE_SPACE_REGEX.sub(' ', message).strip()
 
 
@@ -78,8 +78,8 @@ def concise_builder(code: GCode):
     :return: Textual description
     """
     message = f'{code.g_code} {code.g_code_body} -> ' \
-           f'{code.get_explanation().command_explanation} -> ' \
-           f'{code.get_explanation().response}'\
+              f'{code.get_explanation().command_explanation} -> ' \
+              f'{code.get_explanation().response}'\
         .replace('\n', ' ')\
         .replace('\t', '')
     return MULTIPLE_SPACE_REGEX.sub(' ', message).strip()

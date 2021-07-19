@@ -12,8 +12,11 @@ class UnparsableGCodeError(ValueError):
 class InvalidTextModeError(ValueError):
     """Error raised if passed text mode is not a valid mode"""
     def __init__(self, invalid_mode: str, valid_modes: List[str]) -> None:
-        valid_modes = ', '.join(valid_modes)
+        joined_valid_modes = ', '.join(valid_modes)
+
         super().__init__(
-            f'Mode named "{invalid_mode}" not found. Valid modes are: {valid_modes}')
+            f'Mode named "{invalid_mode}" not found. '
+            f'Valid modes are: {joined_valid_modes}'
+        )
         self.invalid_mode = invalid_mode
-        self.valid_modes = valid_modes
+        self.joined_valid_modes = joined_valid_modes
