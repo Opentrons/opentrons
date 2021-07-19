@@ -62,7 +62,7 @@ Object {
   "regularColumnSpacing": "true",
   "regularRowSpacing": "true",
   "tubeRackInsertLoadName": null,
-  "wellBottomShape": null,
+  "wellBottomShape": "v",
   "wellDepth": "42",
   "wellDiameter": "8.5",
   "wellShape": "circular",

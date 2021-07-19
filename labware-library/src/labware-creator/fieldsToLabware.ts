@@ -1,5 +1,6 @@
 import {
   createRegularLabware,
+  LabwareWellGroup,
   //   createIrregularLabware,
 } from '@opentrons/shared-data'
 import { DISPLAY_VOLUME_UNITS } from './fields'
@@ -10,6 +11,7 @@ import type {
   LabwareWellProperties,
 } from '@opentrons/shared-data'
 import type { ProcessedLabwareFields } from './fields'
+import { getIsCustomTubeRack } from './utils'
 
 // TODO Ian 2019-07-29: move this constant to shared-data?
 // This is the distance from channel 1 to channel 8 of any 8-channel, not tied to name/model
@@ -86,6 +88,15 @@ export function fieldsToLabware(
       //   links: []
     }
 
+    let groupBrand: LabwareWellGroup['brand'] | null = null
+
+    if (getIsCustomTubeRack(fields)) {
+      groupBrand = {
+        brand: fields.groupBrand,
+        brandId: fields.groupBrandId,
+      }
+    }
+
     const groupMetadataDisplayCategory = _getGroupMetadataDisplayCategory({
       aluminumBlockChildType: fields.aluminumBlockChildType,
       labwareType: fields.labwareType,
@@ -140,6 +151,7 @@ export function fieldsToLabware(
       // Since LC doesn't allow the user to specify any of these 3 fields for wells themselves, we'll omit them
       // from the definition.
       group: {
+        ...(groupBrand === null ? {} : { brand: groupBrand }),
         metadata: {
           ...(fields.wellBottomShape === null
             ? null

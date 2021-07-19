@@ -64,13 +64,15 @@ const nameExistsError = (nameName: string): string =>
 
 // NOTE: all IRREGULAR_LABWARE_ERROR messages will be converted to a special 'error' Alert
 
+// NOTE: same as getIsCustomTubeRack util, but different args type
 const matchCustomTubeRack = (
   labwareType: LabwareFields['labwareType'],
   tubeRackInsertLoadName: LabwareFields['tubeRackInsertLoadName']
 ): boolean =>
   labwareType === 'tubeRack' && tubeRackInsertLoadName === 'customTubeRack'
 
-const matchNonCustomTubeRack = (
+// NOTE: same as getIsOpentronsTubeRack util, but different args type
+const matchOpentronsTubeRack = (
   labwareType: LabwareFields['labwareType'],
   tubeRackInsertLoadName: LabwareFields['tubeRackInsertLoadName']
 ): boolean =>
@@ -218,7 +220,7 @@ export const labwareFormSchemaBaseObject = Yup.object({
   // non-custom tuberacks (aka Opentrons tube racks) default to "Opentrons" brand,
   // and user cannot see or override brand (aka "rack brand")
   brand: Yup.mixed().when(['labwareType', 'tubeRackInsertLoadName'], {
-    is: matchNonCustomTubeRack,
+    is: matchOpentronsTubeRack,
     then: Yup.mixed().nullable(), // defaulted to DEFAULT_TUBE_BRAND in form-level transform below
     otherwise: requiredString(LABELS.brand),
   }),
@@ -295,7 +297,7 @@ export const labwareFormSchema: Yup.Schema<ProcessedLabwareFields> = labwareForm
 
     // Yup runs transforms before defaults. In order for brand defaulting to work for displayName/loadName
     // creation, we can't do .default() to the brand field, but need to default it here.
-    const brand = matchNonCustomTubeRack(
+    const brand = matchOpentronsTubeRack(
       currentValue.labwareType,
       currentValue.tubeRackInsertLoadName
     )

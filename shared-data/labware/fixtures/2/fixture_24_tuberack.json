@@ -279,10 +279,12 @@
       ],
       "brand": {
         "brand": "tube brand here",
-        "brandId": ["tube123", "other123"],
-        "links": ["http://www.example.com/tube123"]
+        "brandId": ["tube123", "other123"]
       },
-      "metadata": {}
+      "metadata": {
+        "displayCategory": "tubeRack",
+        "wellBottomShape": "v"
+      }
     }
   ],
   "cornerOffsetFromSlot": {
