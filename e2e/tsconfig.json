@@ -19,5 +19,5 @@
     "rootDir": "src",
     "outDir": "lib"
   },
-  "include": [".", "src"]
+  "include": ["playwright.config.ts", "src/**/*.ts"]
 }
