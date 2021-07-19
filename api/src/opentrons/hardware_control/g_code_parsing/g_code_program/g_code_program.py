@@ -3,7 +3,7 @@ import os
 import json
 from opentrons.hardware_control.emulation.app import \
     TEMPDECK_PORT, THERMOCYCLER_PORT, SMOOTHIE_PORT, MAGDECK_PORT
-from typing import List
+from typing import List, Union
 from opentrons.hardware_control.g_code_parsing.g_code_watcher import GCodeWatcher
 from opentrons.hardware_control.g_code_parsing.g_code import GCode
 from .supported_text_modes import SupportedTextModes
@@ -82,22 +82,20 @@ class GCodeProgram:
             indent=4
         )
 
-    def get_text_explanation(self, mode=SupportedTextModes.DEFAULT) -> str:
+    def get_text_explanation(self, mode: Union[SupportedTextModes, str]) -> str:
         """
         Returns a textual explanation of all the G-Codes in the GCodeProgram
         :param mode: Mode to output text in. See SupportedTextModes for more info
         :return: Textual description of all GCodes
         """
-        if mode not in SupportedTextModes.__members__:
-            supported_modes = ', '.join(SupportedTextModes.__members__.keys())
-            raise ValueError(f'Text Mode "{mode}" is not supported. Supported modes'
-                             f'are: {supported_modes}')
 
-        selected_mode = SupportedTextModes[mode].value
-
+        if isinstance(mode, SupportedTextModes):
+            text_mode = SupportedTextModes.get_text_mode_by_enum_value(mode)
+        else:
+            text_mode = SupportedTextModes.get_text_mode(mode)
         return '\n'.join(
             [
-                selected_mode.builder(code)
+                text_mode.builder(code)
                 for code in self._g_codes
             ]
         )
