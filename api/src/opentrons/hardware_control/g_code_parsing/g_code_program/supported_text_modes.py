@@ -100,7 +100,6 @@ class SupportedTextModes(Enum):
         a single line
     """
     DEFAULT = 'Default'
-    EXPLANATION_ONLY = 'Explanation Only'
     CONCISE = 'Concise'
 
     @classmethod
