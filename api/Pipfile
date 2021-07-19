@@ -43,3 +43,4 @@ pyserial = "==3.5"
 systemd-python = {version="==234", sys_platform="== 'linux'"}
 typing-extensions = "==3.7.4.3"
 pydantic = "==1.4"
+diff-match-patch = "*"
