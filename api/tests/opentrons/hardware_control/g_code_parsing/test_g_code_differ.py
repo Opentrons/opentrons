@@ -111,6 +111,7 @@ def second_g_code_program() -> GCodeProgram:
 
     return GCodeProgram([code[0] for code in g_code_list])
 
+
 def test_naive_insertion():
     diff = GCodeDiffer(HELLO, HELLO_WORLD).get_diff()
     hello = diff[0]
@@ -257,12 +258,11 @@ def test_g_code_program_diff(first_g_code_program, second_g_code_program):
            'X Axis: 418.0 Y Axis: -3.0 Z Axis: 218.0'
 
 
-
 def test_html_diff(
         first_g_code_explanation,
         second_g_code_explanation
 ):
-    EXPECTED_HTML = '<span>G28.2 A B C X Y Z -&gt; Homing the following axes: ' \
+    expected_html = '<span>G28.2 A B C X Y Z -&gt; Homing the following axes: ' \
                     'X, Y, Z, A, B, C -&gt;&para;<br></span><del style="background:' \
                     '#ffe6e6;">G38.2 F420.0 Y-40.0 -&gt; Probing -40.0 on the Y ' \
                     'axis, at a speed of 420.0 -&gt; Probed to : X Axis: 296.825 Y ' \
@@ -272,5 +272,4 @@ def test_html_diff(
                     'Z-Axis: 125.0 A-Axis: 125.0 B-Axis: 40.0 C-Axis: 40.0 -&gt;</span>'
     diff = GCodeDiffer(first_g_code_explanation, second_g_code_explanation)
     html = diff.get_html_diff()
-    assert html == EXPECTED_HTML
-
+    assert html == expected_html

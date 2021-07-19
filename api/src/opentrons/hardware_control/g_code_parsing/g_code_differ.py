@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 from typing import Tuple
-from diff_match_patch import diff_match_patch as dmp
+from diff_match_patch import diff_match_patch as dmp  # type: ignore
 from opentrons.hardware_control.g_code_parsing.g_code_program.g_code_program import \
     GCodeProgram
-from opentrons.hardware_control.g_code_parsing.g_code_program.supported_text_modes import \
-    SupportedTextModes
+from opentrons.hardware_control.g_code_parsing.g_code_program.supported_text_modes \
+    import SupportedTextModes
 
 
 class GCodeDiffer:
