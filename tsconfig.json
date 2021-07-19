@@ -21,6 +21,9 @@
     },
     {
       "path": "./shared-data"
+    },
+    {
+      "path": "./e2e"
     }
   ]
 }

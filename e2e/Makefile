@@ -8,29 +8,28 @@ SHELL := bash
 PATH := $(shell cd .. && yarn bin):$(PATH)
 PATH := $(shell yarn bin):$(PATH)
 
-# dev server port
-PORT ?= 8090
-
-electron := electron ../app/. \
-	--devtools \
-	--log.level.console="debug" \
-	--disable_ui.webPreferences.webSecurity \
-	--ui.url.protocol="http:" \
-	--ui.url.path="localhost:$(PORT)" \
-	--discovery.candidates=localhost
 
 # development
 #####################################################################
 
-.PHONY: dev
-dev: export NODE_ENV := development
-dev:
-	webpack
-	$(electron)
+.PHONY: test
+test: export NODE_ENV := development
+test: export PWDEBUG := console
+test: export DEBUG := pw:api
+test:
+	playwright test --workers 1
 
-.PHONY: tes
-tes: export NODE_ENV := development
-tes: export PWDEBUG := console
-tes: export DEBUG := pw:api
-tes:
-	playwright test
+.PHONY: docker-emulator
+docker-emulator:
+	cd .. && docker-compose down
+	cd .. && docker-compose up --build
+
+.PHONY: dev-server
+dev-server:
+	cd ../app && webpack-dev-server --hot
+
+.PHONY: up
+up:
+	concurrently --kill-others --names "emulator,app" \
+		"$(MAKE) docker-emulator" \
+		"$(MAKE) dev-server" \

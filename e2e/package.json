@@ -1,13 +1,20 @@
 {
-  "name": "electron-e2e",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo 'NOT DEFINED'"
+  "name": "@opentrons/e2e",
+  "version": "4.4.0",
+  "description": "Opentrons desktop application UI",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Opentrons/opentrons.git"
   },
-  "author": "",
-  "license": "ISC",
+  "author": {
+    "name": "Opentrons Labworks",
+    "email": "engineering@opentrons.com"
+  },
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/Opentrons/opentrons/issues"
+  },
+  "homepage": "https://github.com/Opentrons/opentrons",
   "workspaces": {
     "nohoist": [
       "**"
@@ -15,7 +22,6 @@
   },
   "dependencies": {
     "@playwright/test": "^1.12.3",
-    "playwright": "^1.12.3",
-    "typescript": "^4.3.5"
+    "playwright": "^1.12.3"
   }
 }

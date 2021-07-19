@@ -1,1 +1,7 @@
-https://www.carlrippon.com/getting-started-with-playwright/
+# End to End Tests
+
+> from the e2e folder
+
+- yarn install
+- make up
+- make test
