@@ -149,9 +149,9 @@ context('Tubes and Rack', () => {
         cy.contains('Brand is required').should('not.exist')
 
         // File info
-        cy.get("input[placeholder='Opentrons 6 Tube Rack 10 µL']").should(
-          'exist'
-        )
+        cy.get(
+          "input[placeholder='Opentrons 6 Tube Rack with Generic 0.01 mL']"
+        ).should('exist')
         cy.get("input[placeholder='opentrons_6_tuberack_10ul']").should('exist')
 
         // Test pipette
@@ -323,9 +323,9 @@ context('Tubes and Rack', () => {
         cy.contains('Brand is required').should('not.exist')
 
         // File info
-        cy.get("input[placeholder='Opentrons 15 Tube Rack 10 µL']").should(
-          'exist'
-        )
+        cy.get(
+          "input[placeholder='Opentrons 15 Tube Rack with Generic 0.01 mL']"
+        ).should('exist')
         cy.get("input[placeholder='opentrons_15_tuberack_10ul']").should(
           'exist'
         )
@@ -499,9 +499,9 @@ context('Tubes and Rack', () => {
         cy.contains('Brand is required').should('not.exist')
 
         // File info
-        cy.get("input[placeholder='Opentrons 24 Tube Rack 10 µL']").should(
-          'exist'
-        )
+        cy.get(
+          "input[placeholder='Opentrons 24 Tube Rack with Generic 0.01 mL']"
+        ).should('exist')
         cy.get("input[placeholder='opentrons_24_tuberack_10ul']").should(
           'exist'
         )

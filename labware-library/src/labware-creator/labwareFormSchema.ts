@@ -5,7 +5,7 @@ import {
   labwareTypeOptions,
   wellBottomShapeOptions,
   wellShapeOptions,
-  DEFAULT_TUBE_BRAND,
+  DEFAULT_RACK_BRAND,
   IRREGULAR_LABWARE_ERROR,
   LABWARE_TOO_SMALL_ERROR,
   LABWARE_TOO_LARGE_ERROR,
@@ -221,7 +221,7 @@ export const labwareFormSchemaBaseObject = Yup.object({
   // and user cannot see or override brand (aka "rack brand")
   brand: Yup.mixed().when(['labwareType', 'tubeRackInsertLoadName'], {
     is: matchOpentronsTubeRack,
-    then: Yup.mixed().nullable(), // defaulted to DEFAULT_TUBE_BRAND in form-level transform below
+    then: Yup.mixed().nullable(), // defaulted to DEFAULT_RACK_BRAND in form-level transform below
     otherwise: requiredString(LABELS.brand),
   }),
   // TODO(mc, 2020-06-02): should this be Yup.array() instead of mixed?
@@ -301,7 +301,7 @@ export const labwareFormSchema: Yup.Schema<ProcessedLabwareFields> = labwareForm
       currentValue.labwareType,
       currentValue.tubeRackInsertLoadName
     )
-      ? DEFAULT_TUBE_BRAND
+      ? DEFAULT_RACK_BRAND
       : currentValue.brand
 
     const nextValues = { ...currentValue, brand }
