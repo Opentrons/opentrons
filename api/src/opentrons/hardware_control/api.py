@@ -587,6 +587,7 @@ class API(HardwareAPILike):
         After this call, the smoothie will be in a bad state until a call to
         :py:meth:`stop`.
         """
+        self._log.info("api.py: ====Got a hard halt====")
         self._backend.hard_halt()
         asyncio.run_coroutine_threadsafe(self._execution_manager.cancel(),
                                          self._loop)
@@ -600,11 +601,13 @@ class API(HardwareAPILike):
         robot.
         """
         self._backend.halt()
+        self._log.info("api.py: ====Stopped====")
         self._log.info("Recovering from halt")
         await self.reset()
 
         if home_after:
             await self.home()
+        self._log.info("api.py: ====Homed====")
 
     async def _wait_for_is_running(self):
         if not self.is_simulator:

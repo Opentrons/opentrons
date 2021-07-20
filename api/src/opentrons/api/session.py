@@ -457,13 +457,26 @@ class Session(RobotBusy):
         self.set_state('loaded')
 
     def stop(self) -> None:
+        log.info("session.py: ==== stop() called ====")
         self._hw_iface().halt()
         with self._motion_lock.lock():
             try:
+                log.info("session.py: stop(): "
+                         "====== Disposing off any tips left on the pipettes..")
+                for instr in self._instruments:
+                    log.info(f"@@@@ Instrument: {instr.name}")
+                    current_loc = instr._ctx.location_cache
+                    log.info(f"=== Location cache is: {current_loc}")
+                    if instr.has_tip:
+                        log.info("=== Pipette has a tip! ===")
+                        # instr.drop_tip()
+                    else:
+                        log.info("____ Pipette has NO tip. Safe to home____")
                 self._hw_iface().stop()
             except asyncio.CancelledError:
                 pass
         self.set_state('stopped')
+        log.info("session.py: ==== Exiting stop() ====")
 
     def pause(self,
               reason: str = None,
@@ -541,6 +554,7 @@ class Session(RobotBusy):
             )
             ctx.connect(self._hardware)
             ctx.home()
+
             run_protocol(self._protocol, context=ctx)
 
             # If the last command in a protocol was a pause, the protocol
@@ -556,10 +570,12 @@ class Session(RobotBusy):
             while self.state == 'paused':
                 sleep(0.1)
             self.set_state('finished')
+            log.info("session.py: ===== Done with run_protocol(). Homing now. =====")
             self._hw_iface().home()
         except (SmoothieAlarm, asyncio.CancelledError,
-                ExecutionCancelledError):
+                ExecutionCancelledError) as e:
             log.info("Protocol cancelled")
+            log.info(f"^^^^^ Exception raised: {e}")
         except Exception as e:
             log.exception("Exception during run:")
             self.error_append(e)
