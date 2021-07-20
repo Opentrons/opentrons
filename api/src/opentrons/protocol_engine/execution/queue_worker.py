@@ -99,21 +99,25 @@ class QueueWorker:
         self._current_task = None
 
         prev_exc = prev_task.exception() if prev_task is not None else None
-        next_command_id = (
-            self._state_store.state_view.commands.get_next_queued()
-            if self._behavior == QueueBehavior.RUN or prev_task is None
-            else None
-        )
+        next_command_id = self._get_next_command_id(prev_task)
 
         if not self._idle_signal.done():
             if prev_exc:
                 self._behavior = QueueBehavior.RUN
                 self._idle_signal.set_exception(prev_exc)
-            elif next_command_id is None or not self._ok_to_run.is_set():
+            elif next_command_id is None:
                 self._behavior = QueueBehavior.RUN
                 self._idle_signal.set_result(None)
-            elif next_command_id:
+            else:
                 self._run_command(next_command_id)
+
+    def _get_next_command_id(self, prev_task: Optional[asyncio.Task]) -> Optional[str]:
+        if self._ok_to_run.is_set() and (
+            self._behavior == QueueBehavior.RUN or prev_task is None
+        ):
+            return self._state_store.state_view.commands.get_next_queued()
+
+        return None
 
     def _run_command(self, command_id: str) -> None:
         exec_coro = self._command_executor.execute(command_id=command_id)

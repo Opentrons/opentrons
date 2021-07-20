@@ -84,16 +84,13 @@ async def test_stop(
         lambda command_id: subject.stop()
     )
 
-    idle_task = asyncio.create_task(subject.wait_for_idle())
-
     subject.start()
-    await _flush_tasks()
+    await subject.wait_for_idle()
 
     decoy.verify(await command_executor.execute(command_id="command-id-2"), times=0)
-    assert idle_task.done() is False
 
     subject.start()
-    await idle_task
+    await subject.wait_for_idle()
 
     decoy.verify(await command_executor.execute(command_id="command-id-2"), times=1)
 
