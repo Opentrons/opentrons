@@ -3,11 +3,18 @@ import pytest
 from pathlib import Path
 from decoy import Decoy
 
+from opentrons.protocol_engine import ProtocolEngine
 from opentrons.protocol_api_experimental import ProtocolContext
 from opentrons.file_runner import PythonFileRunner, ProtocolFile, ProtocolFileType
 from opentrons.file_runner.python_reader import PythonFileReader, PythonProtocol
 from opentrons.file_runner.python_executor import PythonExecutor
 from opentrons.file_runner.context_creator import ContextCreator
+
+
+@pytest.fixture
+def protocol_engine(decoy: Decoy) -> ProtocolEngine:
+    """Get a mock ProtocolEngine."""
+    return decoy.mock(cls=ProtocolEngine)
 
 
 @pytest.fixture
@@ -48,6 +55,7 @@ def executor(decoy: Decoy) -> PythonExecutor:
 
 @pytest.fixture
 def subject(
+    protocol_engine: ProtocolEngine,
     protocol_file: ProtocolFile,
     file_reader: PythonFileReader,
     context_creator: ContextCreator,
@@ -57,6 +65,7 @@ def subject(
     return PythonFileRunner(
         file=protocol_file,
         file_reader=file_reader,
+        protocol_engine=protocol_engine,
         context_creator=context_creator,
         executor=executor,
     )
@@ -83,20 +92,34 @@ def test_python_runner_load(
     decoy.verify(executor.load(protocol=python_protocol, context=protocol_context))
 
 
-async def test_python_runner_play(
+async def test_python_runner_run(
     decoy: Decoy,
     executor: PythonExecutor,
     subject: PythonFileRunner,
 ) -> None:
-    """It should be able to start the run."""
+    """It should be able to run the protocol to completion."""
     await subject.run()
     decoy.verify(await executor.execute())
 
 
-@pytest.mark.xfail(raises=NotImplementedError, strict=True)
-def test_python_runner_pause(subject: PythonFileRunner) -> None:
+def test_python_runner_pause(
+    decoy: Decoy,
+    protocol_engine: ProtocolEngine,
+    subject: PythonFileRunner,
+) -> None:
     """It should be able to pause the run."""
     subject.pause()
+    decoy.verify(protocol_engine.stop())
+
+
+def test_python_runner_play(
+    decoy: Decoy,
+    protocol_engine: ProtocolEngine,
+    subject: PythonFileRunner,
+) -> None:
+    """It should be able to resume the run."""
+    subject.play()
+    decoy.verify(protocol_engine.start())
 
 
 @pytest.mark.xfail(raises=NotImplementedError, strict=True)

@@ -5,7 +5,7 @@ from decoy import Decoy
 
 from opentrons.types import MountType
 from opentrons.protocol_engine import ProtocolEngine, commands
-from opentrons.protocol_engine.commands import CommandMapper, CommandStatus
+from opentrons.protocol_engine.commands import CommandMapper
 from opentrons.protocol_engine.types import PipetteName
 from opentrons.protocol_engine.execution import CommandExecutor, QueueWorker
 from opentrons.protocol_engine.resources import ResourceProviders
@@ -133,75 +133,6 @@ async def test_wait_for_idle(
     decoy.verify(await queue_worker.wait_for_idle())
 
 
-async def test_execute_command_by_id(
-    decoy: Decoy,
-    state_store: StateStore,
-    command_executor: CommandExecutor,
-    command_mapper: CommandMapper,
-    resources: ResourceProviders,
-    subject: ProtocolEngine,
-) -> None:
-    """It should execute an existing command in the state."""
-    created_at = datetime(year=2021, month=1, day=1)
-    started_at = datetime(year=2022, month=2, day=2)
-    completed_at = datetime(year=2022, month=3, day=3)
-
-    data = commands.LoadPipetteData(
-        mount=MountType.LEFT,
-        pipetteName=PipetteName.P300_SINGLE,
-    )
-
-    queued_command = commands.LoadPipette(
-        id="command-id",
-        status=CommandStatus.QUEUED,
-        createdAt=created_at,
-        data=data,
-    )
-
-    running_command = commands.LoadPipette(
-        id="command-id",
-        status=CommandStatus.RUNNING,
-        createdAt=created_at,
-        startedAt=started_at,
-        data=data,
-    )
-
-    executed_command = commands.LoadPipette(
-        id="command-id",
-        status=CommandStatus.SUCCEEDED,
-        createdAt=datetime(year=2021, month=1, day=1),
-        startedAt=started_at,
-        completedAt=completed_at,
-        data=data,
-    )
-
-    decoy.when(state_store.state_view.commands.get("command-id")).then_return(
-        queued_command
-    )
-
-    decoy.when(resources.model_utils.get_timestamp()).then_return(started_at)
-
-    decoy.when(
-        command_mapper.update_command(
-            command=queued_command,
-            status=CommandStatus.RUNNING,
-            startedAt=started_at,
-        )
-    ).then_return(running_command)
-
-    decoy.when(await command_executor.execute(running_command)).then_return(
-        executed_command
-    )
-
-    result = await subject.execute_command_by_id("command-id")
-
-    assert result == executed_command
-    decoy.verify(
-        state_store.handle_command(running_command),
-        state_store.handle_command(executed_command),
-    )
-
-
 async def test_execute_command(
     decoy: Decoy,
     state_store: StateStore,
@@ -213,7 +144,6 @@ async def test_execute_command(
 ) -> None:
     """It should add and execute a command from a request."""
     created_at = datetime(year=2021, month=1, day=1)
-    started_at = datetime(year=2022, month=2, day=2)
     completed_at = datetime(year=2023, month=3, day=3)
 
     data = commands.LoadPipetteData(
@@ -230,14 +160,6 @@ async def test_execute_command(
         data=data,
     )
 
-    running_command = commands.LoadPipette(
-        id="command-id",
-        status=commands.CommandStatus.RUNNING,
-        createdAt=created_at,
-        startedAt=started_at,
-        data=data,
-    )
-
     executed_command = commands.LoadPipette(
         id="command-id",
         status=commands.CommandStatus.SUCCEEDED,
@@ -247,36 +169,25 @@ async def test_execute_command(
         data=data,
     )
 
-    decoy.when(resources.model_utils.get_timestamp()).then_return(
-        created_at, started_at
-    )
+    decoy.when(resources.model_utils.generate_id()).then_return("command-id")
+    decoy.when(resources.model_utils.get_timestamp()).then_return(created_at)
 
     decoy.when(
         command_mapper.map_request_to_command(
-            request=request,
-            created_at=created_at,
             command_id="command-id",
+            created_at=created_at,
+            request=request,
         )
     ).then_return(queued_command)
 
     decoy.when(
-        command_mapper.update_command(
-            command=queued_command,
-            startedAt=started_at,
-            status=CommandStatus.RUNNING,
-        )
-    ).then_return(running_command)
+        state_store.state_view.commands.get(command_id="command-id")
+    ).then_return(executed_command)
 
-    decoy.when(await command_executor.execute(running_command)).then_return(
-        executed_command
-    )
-
-    result = await subject.execute_command(request, "command-id")
+    result = await subject.execute_command(request)
 
     assert result == executed_command
     decoy.verify(
         state_store.handle_command(queued_command),
-        await queue_worker.wait_for_idle(),
-        state_store.handle_command(running_command),
-        state_store.handle_command(executed_command),
+        await queue_worker.step(),
     )

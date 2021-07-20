@@ -44,6 +44,7 @@ async def create_protocol_engine(hardware: HardwareAPI) -> ProtocolEngine:
     )
 
     command_executor = CommandExecutor(
+        state_store=state_store,
         equipment=equipment_handler,
         movement=movement_handler,
         pipetting=pipetting_handler,

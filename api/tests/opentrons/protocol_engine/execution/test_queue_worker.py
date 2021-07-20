@@ -58,19 +58,14 @@ async def test_pulls_jobs_off_queue(
     )
 
     subject.start()
-    assert subject.is_running is True
-
     await subject.wait_for_idle()
 
-    assert subject.is_running is False
     decoy.verify(
-        await command_executor.execute_by_id("command-id-1"),
-        await command_executor.execute_by_id("command-id-2"),
+        await command_executor.execute(command_id="command-id-1"),
+        await command_executor.execute(command_id="command-id-2"),
     )
 
 
-# TODO(mc, 2021-07-14): https://github.com/mcous/decoy/issues/41
-@pytest.mark.filterwarnings("ignore::decoy.warnings.MiscalledStubWarning")
 async def test_stop(
     decoy: Decoy,
     state_store: StateStore,
@@ -85,8 +80,8 @@ async def test_stop(
         None,
     )
 
-    decoy.when(await command_executor.execute_by_id("command-id-1")).then_do(
-        lambda _: subject.stop()
+    decoy.when(await command_executor.execute(command_id="command-id-1")).then_do(
+        lambda command_id: subject.stop()
     )
 
     idle_task = asyncio.create_task(subject.wait_for_idle())
@@ -94,14 +89,13 @@ async def test_stop(
     subject.start()
     await _flush_tasks()
 
-    decoy.verify(await command_executor.execute_by_id("command-id-2"), times=0)
+    decoy.verify(await command_executor.execute(command_id="command-id-2"), times=0)
     assert idle_task.done() is False
-    assert subject.is_running is False
 
     subject.start()
     await idle_task
 
-    decoy.verify(await command_executor.execute_by_id("command-id-2"), times=1)
+    decoy.verify(await command_executor.execute(command_id="command-id-2"), times=1)
 
 
 async def test_restart_clears_idle_flag(
@@ -121,26 +115,20 @@ async def test_restart_clears_idle_flag(
     )
 
     subject.start()
-
-    assert subject.is_running is True
     await subject.wait_for_idle()
-    assert subject.is_running is False
 
     decoy.verify(
-        await command_executor.execute_by_id("command-id-1"),
-        await command_executor.execute_by_id("command-id-2"),
+        await command_executor.execute(command_id="command-id-1"),
+        await command_executor.execute(command_id="command-id-2"),
     )
-    decoy.verify(await command_executor.execute_by_id("command-id-3"), times=0)
+    decoy.verify(await command_executor.execute(command_id="command-id-3"), times=0)
 
     subject.start()
-
-    assert subject.is_running is True
     await subject.wait_for_idle()
-    assert subject.is_running is False
 
     decoy.verify(
-        await command_executor.execute_by_id("command-id-3"),
-        await command_executor.execute_by_id("command-id-4"),
+        await command_executor.execute(command_id="command-id-3"),
+        await command_executor.execute(command_id="command-id-4"),
     )
 
 
@@ -163,6 +151,109 @@ async def test_play_noop(
     await subject.wait_for_idle()
 
     decoy.verify(
-        await command_executor.execute_by_id("command-id-1"),
+        await command_executor.execute(command_id="command-id-1"),
         times=1,
+    )
+
+
+async def test_step(
+    decoy: Decoy,
+    state_store: StateStore,
+    command_executor: CommandExecutor,
+    subject: QueueWorker,
+) -> None:
+    """It should be able to execute the next queued command."""
+    decoy.when(state_store.state_view.commands.get_next_queued()).then_return(
+        "command-id-1",
+        "command-id-2",
+        None,
+    )
+
+    await subject.step()
+
+    decoy.verify(
+        await command_executor.execute(command_id="command-id-1"),
+        times=1,
+    )
+    decoy.verify(
+        await command_executor.execute(command_id="command-id-2"),
+        times=0,
+    )
+
+    await subject.step()
+
+    decoy.verify(
+        await command_executor.execute(command_id="command-id-1"),
+        times=1,
+    )
+    decoy.verify(
+        await command_executor.execute(command_id="command-id-2"),
+        times=1,
+    )
+
+
+async def test_step_command_in_progress(
+    decoy: Decoy,
+    state_store: StateStore,
+    command_executor: CommandExecutor,
+    subject: QueueWorker,
+) -> None:
+    """It should be wait for current task to finish before stepping."""
+    decoy.when(state_store.state_view.commands.get_next_queued()).then_return(
+        "command-id-1",
+        "command-id-2",
+        "command-id-3",
+        None,
+    )
+
+    subject.start()
+    await subject.step()
+
+    decoy.verify(
+        await command_executor.execute(command_id="command-id-1"),
+        times=1,
+    )
+    decoy.verify(
+        await command_executor.execute(command_id="command-id-2"),
+        times=1,
+    )
+    decoy.verify(
+        await command_executor.execute(command_id="command-id-3"),
+        times=0,
+    )
+
+
+async def test_step_not_running(
+    decoy: Decoy,
+    state_store: StateStore,
+    command_executor: CommandExecutor,
+    subject: QueueWorker,
+) -> None:
+    """It should be wait to be running before stepping."""
+    decoy.when(state_store.state_view.commands.get_next_queued()).then_return(
+        "command-id-1",
+        "command-id-2",
+        None,
+    )
+
+    subject.stop()
+    result = asyncio.create_task(subject.step())
+    await _flush_tasks()
+
+    decoy.verify(
+        await command_executor.execute(command_id="command-id-1"),
+        times=0,
+    )
+
+    subject.start()
+    await result
+    await subject.wait_for_idle()
+
+    decoy.verify(
+        await command_executor.execute(command_id="command-id-1"),
+        times=1,
+    )
+    decoy.verify(
+        await command_executor.execute(command_id="command-id-2"),
+        times=0,
     )

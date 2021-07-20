@@ -18,11 +18,7 @@ class AbstractSyncTransport(ABC):
         ...
 
     @abstractmethod
-    def execute_command(
-        self,
-        request: CommandRequest,
-        command_id: str,
-    ) -> CommandResult:
+    def execute_command(self, request: CommandRequest) -> CommandResult:
         """Execute a ProtocolEngine command, blocking until the command completes.
 
         Args:
@@ -64,14 +60,10 @@ class ChildThreadTransport(AbstractSyncTransport):
         """Get a view of the Protocol Engine's state."""
         return self._engine.state_view
 
-    def execute_command(
-        self,
-        request: CommandRequest,
-        command_id: str,
-    ) -> CommandResult:
+    def execute_command(self, request: CommandRequest) -> CommandResult:
         """Execute a command synchronously on the main thread."""
         command = run_coroutine_threadsafe(
-            self._engine.execute_command(request=request, command_id=command_id),
+            self._engine.execute_command(request=request),
             loop=self._loop,
         ).result()
 

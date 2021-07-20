@@ -50,7 +50,7 @@ def setup_session_store(decoy: Decoy, session_store: SessionStore) -> None:
     decoy.when(session_store.get(session_id="session-id")).then_return(prev_session)
 
 
-def test_create_session_action(
+def test_create_start_action(
     decoy: Decoy,
     task_runner: TaskRunner,
     session_view: SessionView,
@@ -214,6 +214,7 @@ def test_create_pause_action(
 
 def test_create_resume_action(
     decoy: Decoy,
+    task_runner: TaskRunner,
     session_view: SessionView,
     engine_store: EngineStore,
     unique_id: str,
@@ -251,4 +252,7 @@ def test_create_resume_action(
     )
 
     verify_response(response, expected_status=201, expected_data=actions)
-    decoy.verify(engine_store.runner.play())
+    decoy.verify(
+        engine_store.runner.play(),
+        task_runner.run(engine_store.engine.wait_for_idle)
+    )
