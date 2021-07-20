@@ -27,31 +27,31 @@ from opentrons.protocol_engine.execution import (
 @pytest.fixture
 def equipment(decoy: Decoy) -> EquipmentHandler:
     """Get a mocked out EquipmentHandler."""
-    return decoy.create_decoy(spec=EquipmentHandler)
+    return decoy.mock(cls=EquipmentHandler)
 
 
 @pytest.fixture
 def movement(decoy: Decoy) -> MovementHandler:
     """Get a mocked out MovementHandler."""
-    return decoy.create_decoy(spec=MovementHandler)
+    return decoy.mock(cls=MovementHandler)
 
 
 @pytest.fixture
 def pipetting(decoy: Decoy) -> PipettingHandler:
     """Get a mocked out PipettingHandler."""
-    return decoy.create_decoy(spec=PipettingHandler)
+    return decoy.mock(cls=PipettingHandler)
 
 
 @pytest.fixture
 def resources(decoy: Decoy) -> ResourceProviders:
     """Get a mocked out ResourceProviders."""
-    return decoy.create_decoy(spec=ResourceProviders)
+    return decoy.mock(cls=ResourceProviders)
 
 
 @pytest.fixture
 def command_mapper(decoy: Decoy) -> CommandMapper:
     """Get a mocked out CommandMapper."""
-    return decoy.create_decoy(spec=CommandMapper)
+    return decoy.mock(cls=CommandMapper)
 
 
 @pytest.fixture
@@ -95,8 +95,8 @@ async def test_execute(
     subject: CommandExecutor,
 ) -> None:
     """It should be able execute a command."""
-    TestCommandImplCls = decoy.create_decoy_func(spec=_TestCommandImpl)
-    command_impl = decoy.create_decoy(spec=_TestCommandImpl)
+    TestCommandImplCls = decoy.mock(func=_TestCommandImpl)
+    command_impl = decoy.mock(cls=_TestCommandImpl)
 
     class _TestCommand(BaseCommand[_TestCommandData, _TestCommandResult]):
         commandType: str = "testCommand"
@@ -175,8 +175,8 @@ async def test_execute_raises_protocol_engine_error(
     subject: CommandExecutor,
 ) -> None:
     """It should be able execute a command."""
-    TestCommandImplCls = decoy.create_decoy_func(spec=_TestCommandImpl)
-    command_impl = decoy.create_decoy(spec=_TestCommandImpl)
+    TestCommandImplCls = decoy.mock(func=_TestCommandImpl)
+    command_impl = decoy.mock(cls=_TestCommandImpl)
 
     class _TestCommand(BaseCommand[_TestCommandData, _TestCommandResult]):
         commandType: str = "testCommand"

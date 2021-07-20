@@ -25,15 +25,9 @@ from opentrons.protocol_api_experimental import (
 
 
 @pytest.fixture
-def decoy() -> Decoy:
-    """Get a Decoy test-double container fixture."""
-    return Decoy()
-
-
-@pytest.fixture
 def engine_client(decoy: Decoy) -> SyncClient:
     """Get a fake ProtocolEngine client."""
-    return decoy.create_decoy(spec=SyncClient)
+    return decoy.mock(cls=SyncClient)
 
 
 @pytest.fixture

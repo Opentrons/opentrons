@@ -23,7 +23,6 @@ from functools import partial
 import zipfile
 
 import pytest
-from decoy import Decoy
 
 from opentrons.api.routers import MainRouter
 from opentrons.api import models
@@ -50,12 +49,6 @@ def asyncio_loop_exception_handler(loop):
     loop.set_exception_handler(exception_handler)
     yield
     loop.set_exception_handler(None)
-
-
-@pytest.fixture
-def decoy() -> Decoy:
-    """Get a Decoy state container to clean up stubs after tests."""
-    return Decoy()
 
 
 def state(topic, state):

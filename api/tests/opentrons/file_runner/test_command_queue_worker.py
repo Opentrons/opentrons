@@ -22,7 +22,7 @@ from opentrons.file_runner.command_queue_worker import CommandQueueWorker
 @pytest.fixture
 def engine(decoy: Decoy) -> ProtocolEngine:
     """Get a mock ProtocolEngine."""
-    return decoy.create_decoy(spec=ProtocolEngine)
+    return decoy.mock(cls=ProtocolEngine)
 
 
 @pytest.fixture

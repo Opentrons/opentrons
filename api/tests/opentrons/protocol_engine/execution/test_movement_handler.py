@@ -15,13 +15,13 @@ from opentrons.protocol_engine.execution.movement import MovementHandler
 @pytest.fixture
 def hardware_api(decoy: Decoy) -> HardwareAPI:
     """Get a mock in the shape of a HardwareAPI."""
-    return decoy.create_decoy(spec=HardwareAPI)
+    return decoy.mock(cls=HardwareAPI)
 
 
 @pytest.fixture
 def state_store(decoy: Decoy) -> StateStore:
     """Get a mock in the shape of a StateStore."""
-    return decoy.create_decoy(spec=StateStore)
+    return decoy.mock(cls=StateStore)
 
 
 @pytest.fixture
