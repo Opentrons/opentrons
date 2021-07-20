@@ -1,4 +1,15 @@
 """Command queue execution worker module."""
+# TODO(mc, 2021-07-20): the command executor itself will need to be able to signal
+# the queue to start/stop during protocol pause/resume commands. Factor flow control
+# signaling out of the queue worker and into a common dependency.
+#
+# A good candidate for this might be the command state, which could lean more heavily on
+# the "return None if execution should pause" logic, because the handling of a protocol
+# pause command could set a pause flagged in command state.
+#
+# It also might make sense to move the concept of non-command actions into the
+# ProtocolEngine core, as well, to use those same state mechanisms and move statefulness
+# out of this QueueWorker.
 import asyncio
 from enum import Enum
 from typing import Optional

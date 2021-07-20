@@ -1,5 +1,4 @@
 """ProtocolEngine class definition."""
-from typing import Optional
 from .resources import ResourceProviders
 from .state import State, StateStore, StateView
 from .commands import Command, CommandRequest, CommandMapper
@@ -58,24 +57,11 @@ class ProtocolEngine:
         self._state_store.handle_command(command)
         return command
 
-    async def execute_command(
-        self,
-        request: CommandRequest,
-        command_id: Optional[str] = None,
-    ) -> Command:
+    async def execute_command(self, request: CommandRequest) -> Command:
         """Execute a command request, waiting for it to complete."""
-        command_id = self._resources.model_utils.generate_id()
-        created_at = self._resources.model_utils.get_timestamp()
-        queued_command = self._command_mapper.map_request_to_command(
-            request=request,
-            command_id=command_id,
-            created_at=created_at,
-        )
-
-        self._state_store.handle_command(queued_command)
+        command = self.add_command(request)
         await self._queue_worker.step()
-
-        return self._state_store.state_view.commands.get(command_id=command_id)
+        return self._state_store.state_view.commands.get(command_id=command.id)
 
     def start(self) -> None:
         """Start or resume executing commands in the queue."""

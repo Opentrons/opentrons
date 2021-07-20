@@ -9,18 +9,13 @@ the subject's methods in a synchronous context in a child thread to ensure:
     loop, without blocking.
 """
 import pytest
-from decoy import Decoy, matchers
+from decoy import Decoy
 
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import DeckSlotName, MountType
 from opentrons.protocol_engine import DeckSlotLocation, PipetteName, commands
 from opentrons.protocol_engine.clients import SyncClient, AbstractSyncTransport
 from opentrons.protocol_engine.types import WellOrigin, WellLocation
-
-
-UUID_MATCHER = matchers.StringMatching(
-    r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
-)
 
 
 @pytest.fixture
@@ -58,9 +53,7 @@ def stubbed_load_labware_result(
         calibration=(1, 2, 3),
     )
 
-    decoy.when(
-        transport.execute_command(request=request, command_id=UUID_MATCHER)
-    ).then_return(result)
+    decoy.when(transport.execute_command(request=request)).then_return(result)
 
     return result
 
@@ -95,9 +88,7 @@ def test_load_pipette(
 
     expected_result = commands.LoadPipetteResult(pipetteId="abc123")
 
-    decoy.when(
-        transport.execute_command(request=request, command_id=UUID_MATCHER)
-    ).then_return(expected_result)
+    decoy.when(transport.execute_command(request=request)).then_return(expected_result)
 
     result = subject.load_pipette(
         pipette_name=PipetteName.P300_SINGLE,
@@ -118,9 +109,7 @@ def test_pick_up_tip(
     )
     response = commands.PickUpTipResult()
 
-    decoy.when(
-        transport.execute_command(request=request, command_id=UUID_MATCHER)
-    ).then_return(response)
+    decoy.when(transport.execute_command(request=request)).then_return(response)
 
     result = subject.pick_up_tip(pipette_id="123", labware_id="456", well_name="A2")
 
@@ -138,9 +127,7 @@ def test_drop_tip(
     )
     response = commands.DropTipResult()
 
-    decoy.when(
-        transport.execute_command(request=request, command_id=UUID_MATCHER)
-    ).then_return(response)
+    decoy.when(transport.execute_command(request=request)).then_return(response)
 
     result = subject.drop_tip(pipette_id="123", labware_id="456", well_name="A2")
 
@@ -165,9 +152,9 @@ def test_aspirate(
 
     result_from_transport = commands.AspirateResult(volume=67.89)
 
-    decoy.when(
-        transport.execute_command(request=request, command_id=UUID_MATCHER)
-    ).then_return(result_from_transport)
+    decoy.when(transport.execute_command(request=request)).then_return(
+        result_from_transport
+    )
 
     result = subject.aspirate(
         pipette_id="123",
@@ -198,9 +185,7 @@ def test_dispense(
 
     response = commands.DispenseResult(volume=1)
 
-    decoy.when(
-        transport.execute_command(request=request, command_id=UUID_MATCHER)
-    ).then_return(response)
+    decoy.when(transport.execute_command(request=request)).then_return(response)
 
     result = subject.dispense(
         pipette_id="123",
