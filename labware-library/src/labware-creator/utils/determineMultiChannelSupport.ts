@@ -17,7 +17,7 @@ export const determineMultiChannelSupport = (
   // all 8 channels fit into the first column correctly
   const multiChannelTipsFirstColumn =
     def !== null ? getWellNamePerMultiTip(def, 'A1') : null
-  console.log({ multiChannelTipsFirstColumn })
+
   const allowMultiChannel =
     multiChannelTipsFirstColumn !== null &&
     multiChannelTipsFirstColumn.length === 8
