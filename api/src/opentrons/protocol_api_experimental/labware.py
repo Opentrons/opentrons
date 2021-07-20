@@ -1,9 +1,12 @@
 # noqa: D100
 from __future__ import annotations
 
+import re
 from functools import lru_cache
 from typing import Any, List, Dict, Optional, Union, cast
+from collections import defaultdict
 
+from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from .errors import LabwareIsNotTipRackError
 from .types import DeckSlotName, LabwareParameters, Point
@@ -27,6 +30,19 @@ class Labware:  # noqa: D101
         """
         self._engine_client = engine_client
         self._labware_id = labware_id
+
+        self._definition = self._engine_client.state.labware.get_labware_definition(
+            self._labware_id)
+
+        self._wells_by_name: Dict[str, Well] = {
+            well_name: Well(
+                well_name=well_name,
+                engine_client=self._engine_client,
+                labware=self,
+            )
+            for col in self._definition.ordering
+            for well_name in col
+        }
 
     # TODO(mc, 2021-04-22): remove this property; it's redundant and
     # unlikely to be used by PAPI users
@@ -94,10 +110,7 @@ class Labware:  # noqa: D101
     # definition and call it a day?
     @property
     def parameters(self) -> LabwareParameters:  # noqa: D102
-        definition = self._engine_client.state.labware.get_labware_definition(
-            labware_id=self._labware_id
-        )
-        return cast(LabwareParameters, definition.parameters.dict())
+        return cast(LabwareParameters, self._definition.parameters.dict())
 
     # TODO(mc, 2021-05-03): this is an internal list of Opentrons-specific
     # data; does it really need to be a public property? Can we expose the
@@ -111,10 +124,7 @@ class Labware:  # noqa: D101
     # necessary with Protocol Engine controlling execution. Can we get rid of it?
     @property
     def magdeck_engage_height(self) -> Optional[float]:    # noqa: D102
-        definition = self._engine_client.state.labware.get_labware_definition(
-            labware_id=self._labware_id
-        )
-        return definition.parameters.magneticModuleEngageHeight
+        return self._definition.parameters.magneticModuleEngageHeight
 
     @property
     def calibrated_offset(self) -> Point:
@@ -142,10 +152,7 @@ class Labware:  # noqa: D101
     @property
     def is_tiprack(self) -> bool:
         """Whether this labware is a tiprack."""
-        definition = self._engine_client.state.labware.get_labware_definition(
-            labware_id=self._labware_id
-        )
-        return definition.parameters.isTiprack
+        return self._definition.parameters.isTiprack
 
     # TODO(mc, 2021-05-03): encode this in a specific `TipRack` interface that
     # extends from Labware
@@ -162,12 +169,9 @@ class Labware:  # noqa: D101
             LabwareIsNotTipRackError: will raise if this property is accessed
                 on a labware instance that is not a tip rack.
         """
-        definition = self._engine_client.state.labware.get_labware_definition(
-            labware_id=self._labware_id
-        )
-        if definition.parameters.tipLength is None:
+        if self._definition.parameters.tipLength is None:
             raise LabwareIsNotTipRackError(f"{self.load_name} is not a tip rack.")
-        return definition.parameters.tipLength
+        return self._definition.parameters.tipLength
 
     def well(self, idx: int) -> Well:  # noqa: D102
         # TODO: figure out if we want to keep this as it is marked as deprecated in v2
@@ -176,40 +180,38 @@ class Labware:  # noqa: D101
     def wells(self) -> List[Well]:  # noqa: D102
         return list(self.wells_by_name().values())
 
-    @lru_cache(maxsize=1)
     def wells_by_name(self) -> Dict[str, Well]:  # noqa: D102
-        definition = self._engine_client.state.labware.get_labware_definition(
-            labware_id=self._labware_id)
-
-        wells_by_name: Dict[str, Well] = {
-            well_name: Well(
-                well_name=well_name,
-                engine_client=self._engine_client,
-                labware=self,
-            )
-            for col in definition.ordering
-            for well_name in col
-        }
-        return wells_by_name
+        return self._wells_by_name
 
     def rows(self) -> List[List[Well]]:  # noqa: D102
-        raise NotImplementedError()
+        rows = list()
+        for row in self.rows_by_name().keys():
+            rows.append(self.rows_by_name()[row])
+        return rows
 
     def rows_by_name(self) -> Dict[str, List[Well]]:  # noqa: D102
-        raise NotImplementedError()
+        pattern = re.compile(WELL_NAME_PATTERN, re.X)
+        rows_by_name = defaultdict(list)
+        for key in self._wells_by_name.keys():
+            rows_by_name[pattern.match(key).group(1)].append(self._wells_by_name[key])
+        return rows_by_name
 
     def columns(self) -> List[List[Well]]:  # noqa: D102
-        raise NotImplementedError()
+        cols = list()
+        for col in self.columns_by_name().keys():
+            cols.append(self.columns_by_name()[col])
+        return cols
 
     def columns_by_name(self) -> Dict[str, List[Well]]:  # noqa: D102
-        definition = self._engine_client.state.labware.get_labware_definition(
-            labware_id=self._labware_id)
-
-        raise NotImplementedError()
+        pattern = re.compile(WELL_NAME_PATTERN, re.X)
+        cols_by_name = defaultdict(list)
+        for key in self._wells_by_name.keys():
+            cols_by_name[pattern.match(key).group(2)].append(self._wells_by_name[key])
+        return cols_by_name
 
     def __repr__(self) -> str:  # noqa: D105
         # TODO: (spp, 2021.07.14): Should this be a combination of display name & <obj>?
-        return self.name
+        return f"{self.load_name}<id:{self.labware_id}>"
 
     def __eq__(self, other: object) -> bool:
         """Compare for object equality.
