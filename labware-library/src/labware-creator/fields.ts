@@ -354,10 +354,10 @@ export const getImplicitAutofillValues = (
   preAutofilledValues: Partial<LabwareFields>
 ): Partial<LabwareFields> => {
   const result: Partial<LabwareFields> = {}
-  if ('gridRows' in preAutofilledValues) {
+  if (Number(preAutofilledValues.gridRows) > 0) {
     result.regularRowSpacing = 'true'
   }
-  if ('gridColumns' in preAutofilledValues) {
+  if (Number(preAutofilledValues.gridColumns) > 0) {
     result.regularColumnSpacing = 'true'
   }
   return result
