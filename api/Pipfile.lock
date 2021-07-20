@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "7290d9516778cc532375a96226f4d5212024488ac274e6262fa8c6f6e2f231f0"
+            "sha256": "a00b9ace936b97e7f3e2ddf7d111d2550c0ad38750c225b26d9019d64e7c30cf"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -26,9 +26,9 @@
         },
         "apply-defaults": {
             "hashes": [
-                "sha256:1ce26326a61d8773d38a9726a345c6525a91a6120d7333af79ad792dacb6246c"
+                "sha256:3773de3491b94c0fe44310f1a85888389cdc71e1544b343bce0d2bd6991acea5"
             ],
-            "version": "==0.1.4"
+            "version": "==0.1.6"
         },
         "attrs": {
             "hashes": [
@@ -273,11 +273,11 @@
         },
         "bleach": {
             "hashes": [
-                "sha256:6123ddc1052673e52bab52cdc955bcb57a015264a1c57d37bea2f6b817af0125",
-                "sha256:98b3170739e5e83dd9dc19633f074727ad848cbedb6026708c8ac2d3b697a433"
+                "sha256:306483a5a9795474160ad57fce3ddd1b50551e981eed8e15a582d34cef28aafa",
+                "sha256:ae976d7174bba988c0b632def82fdc94235756edfb14e6558a9c5be555c9fb78"
             ],
             "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'",
-            "version": "==3.3.0"
+            "version": "==3.3.1"
         },
         "c445fee": {
             "editable": true,
@@ -300,11 +300,11 @@
         },
         "charset-normalizer": {
             "hashes": [
-                "sha256:ad0da505736fc7e716a8da15bf19a985db21ac6415c26b34d2fafd3beb3d927e",
-                "sha256:b68b38179052975093d71c1b5361bf64afd80484697c1f27056e50593e695ceb"
+                "sha256:88fce3fa5b1a84fdcb3f603d889f723d1dd89b26059d0123ca435570e848d5e1",
+                "sha256:c46c3ace2d744cfbdebceaa3c19ae691f53ae621b39fd7570f59d14fb7f2fd12"
             ],
             "markers": "python_version >= '3'",
-            "version": "==2.0.1"
+            "version": "==2.0.3"
         },
         "clint": {
             "hashes": [
@@ -360,11 +360,11 @@
         },
         "decoy": {
             "hashes": [
-                "sha256:524789c7fb3c39905d2c24b33412dbf9a9c0e1d3a4b4aa79e40cf2cdcc6e2c65",
-                "sha256:f0c39d2b9fbfb44b46fd1dffd8b8275b7b9b2e9f280b7925a77ef9a66734ac4c"
+                "sha256:b8ae8b707169824af59b04215615a4b0fa0bff4dccc6dde053c2b18824a6271e",
+                "sha256:c605822c4d867acb5d950ce98b51727705ff55ecc7bad544f2b4face3ee69ae0"
             ],
             "index": "pypi",
-            "version": "==1.6.1"
+            "version": "==1.6.2"
         },
         "dill": {
             "hashes": [
