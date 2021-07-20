@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "873da1d1c36b6624c91df3ddd5d23feba3756fe6565b7b937c41f9260690f73c"
+            "sha256": "c144019e96c5ae96889ad59f16807b4e1c4cedf89acfc081d13096aa2072f4a9"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -37,14 +37,6 @@
             ],
             "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'",
             "version": "==21.2.0"
-        },
-        "diff-match-patch": {
-            "hashes": [
-                "sha256:8bf9d9c4e059d917b5c6312bac0c137971a32815ddbda9c682b949f2986b4d34",
-                "sha256:da6f5a01aa586df23dfc89f3827e1cafbb5420be9d87769eeb079ddfd9477a18"
-            ],
-            "index": "pypi",
-            "version": "==20200713"
         },
         "funcsigs": {
             "hashes": [
