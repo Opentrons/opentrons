@@ -1,7 +1,9 @@
 """Protocol engine state management."""
 from __future__ import annotations
+
+import asyncio
 from dataclasses import dataclass
-from typing import List, Sequence
+from typing import Any, Callable, List, Set, Sequence
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV2
 
@@ -24,7 +26,47 @@ class State:
     pipettes: PipetteState
 
 
-class StateStore:
+class StateView:
+    """A read-only view of computed state."""
+
+    _state: State
+    _commands: CommandView
+    _labware: LabwareView
+    _pipettes: PipetteView
+    _geometry: GeometryView
+    _motion: MotionView
+
+    @property
+    def commands(self) -> CommandView:
+        """Get state view selectors for commands state."""
+        return self._commands
+
+    @property
+    def labware(self) -> LabwareView:
+        """Get state view selectors for labware state."""
+        return self._labware
+
+    @property
+    def pipettes(self) -> PipetteView:
+        """Get state view selectors for pipette state."""
+        return self._pipettes
+
+    @property
+    def geometry(self) -> GeometryView:
+        """Get state view selectors for derived geometry state."""
+        return self._geometry
+
+    @property
+    def motion(self) -> MotionView:
+        """Get state view selectors for derived motion state."""
+        return self._motion
+
+    def get_state(self) -> State:
+        """Get an immutable copy of the current engine state."""
+        return self._state
+
+
+class StateStore(StateView):
     """ProtocolEngine state store.
 
     A StateStore manages several substores, which will modify themselves in
@@ -51,12 +93,8 @@ class StateStore:
             self._labware_store,
         ]
 
-        self._update_state()
-
-    @property
-    def state_view(self) -> StateView:
-        """Get a read-only view of state-derived data."""
-        return self._state_view
+        self._wait_checkers: Set[Callable[[], None]] = set()
+        self._initialize_state()
 
     def get_state(self) -> State:
         """Get an immutable copy of the current engine state."""
@@ -67,59 +105,66 @@ class StateStore:
         for substore in self._lifecycle_substores:
             substore.handle_command(command)
 
-        self._update_state()
+        self._update_state_views()
 
-    def _update_state(self) -> None:
-        """Set state data and view interface to latest underlying values."""
-        self._state = State(
+    async def wait_for(
+        self,
+        condition: Callable[..., Any],
+        *args: Any,
+        **kwargs: Any,
+    ) -> None:
+        """Wait for a condition to become true, checking whenever state changes."""
+        result = asyncio.get_running_loop().create_future()
+
+        def _check() -> None:
+            try:
+                is_done = condition(*args, **kwargs)
+                if is_done:
+                    self._wait_checkers.remove(_check)
+                    result.set_result(None)
+            except Exception as e:
+                self._wait_checkers.remove(_check)
+                result.set_exception(e)
+
+        self._wait_checkers.add(_check)
+        _check()
+        await result
+
+    def _initialize_state(self) -> None:
+        """Initialize state data and view."""
+        state = State(
             commands=self._command_store.state,
             labware=self._labware_store.state,
             pipettes=self._pipette_store.state,
         )
-        self._state_view = StateView(state=self._state)
 
-
-class StateView:
-    """An interface that returns calculated and derived values from the state."""
-
-    def __init__(self, state: State) -> None:
-        """Initialize a StateView and its underlying subviews."""
         # Base states
+        self._state = state
         self._commands = CommandView(state.commands)
         self._labware = LabwareView(state.labware)
         self._pipettes = PipetteView(state.pipettes)
 
         # Derived states
-        self._geometry = GeometryView(
-            labware_view=self._labware,
-        )
+        self._geometry = GeometryView(labware_view=self._labware)
         self._motion = MotionView(
             labware_view=self._labware,
             pipette_view=self._pipettes,
             geometry_view=self._geometry,
         )
 
-    @property
-    def commands(self) -> CommandView:
-        """Get state view selectors for commands state."""
-        return self._commands
+    def _update_state_views(self) -> None:
+        """Update state view interfaces to use latest underlying values."""
+        state = State(
+            commands=self._command_store.state,
+            labware=self._labware_store.state,
+            pipettes=self._pipette_store.state,
+        )
 
-    @property
-    def labware(self) -> LabwareView:
-        """Get state view selectors for labware state."""
-        return self._labware
+        self._state = state
+        self._commands._state = state.commands
+        self._labware._state = state.labware
+        self._pipettes._state = state.pipettes
 
-    @property
-    def pipettes(self) -> PipetteView:
-        """Get state view selectors for pipette state."""
-        return self._pipettes
-
-    @property
-    def geometry(self) -> GeometryView:
-        """Get state view selectors for derived geometry state."""
-        return self._geometry
-
-    @property
-    def motion(self) -> MotionView:
-        """Get state view selectors for derived motion state."""
-        return self._motion
+        # check for any wait conditions
+        for check_done in list(self._wait_checkers):
+            check_done()

@@ -41,7 +41,7 @@ class ProtocolEngine:
     @property
     def state_view(self) -> StateView:
         """Get an interface to retrieve calculated state values."""
-        return self._state_store.state_view
+        return self._state_store
 
     def get_state(self) -> State:
         """Get the engine's underlying state."""
@@ -58,10 +58,22 @@ class ProtocolEngine:
         return command
 
     async def execute_command(self, request: CommandRequest) -> Command:
-        """Execute a command request, waiting for it to complete."""
+        """Execute a command request, waiting for it to complete.
+
+        The engine must be started with `start` before commands will
+        start executing.
+        """
         command = self.add_command(request)
-        await self._queue_worker.step()
-        return self._state_store.state_view.commands.get(command_id=command.id)
+        command_id = command.id
+
+        await self._queue_worker.wait_for_running()
+        self._queue_worker.start()
+        await self._state_store.wait_for(
+            condition=self._state_store.commands.is_complete,
+            command_id=command_id,
+        )
+
+        return self._state_store.commands.get(command_id=command_id)
 
     def start(self) -> None:
         """Start or resume executing commands in the queue."""
@@ -71,14 +83,14 @@ class ProtocolEngine:
         """Stop or pause executing commands in the queue."""
         self._queue_worker.stop()
 
-    async def wait_for_idle(self) -> None:
+    async def wait_for_done(self) -> None:
         """Wait for the ProtocolEngine to become idle.
 
-        The ProtocolEngine is considered "idle" when there is no command
-        currently executing.
+        The ProtocolEngine is considered "done" when there is no command
+        currently executing nor any commands left in the queue.
 
         This method should not raise, but if any unexepected exceptions
         happen during command execution that are not properly caught by
         the CommandExecutor, this is where they will be raised.
         """
-        await self._queue_worker.wait_for_idle()
+        await self._queue_worker.wait_for_done()

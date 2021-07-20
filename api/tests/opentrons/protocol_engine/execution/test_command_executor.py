@@ -153,9 +153,9 @@ async def test_execute(
         ),
     )
 
-    decoy.when(
-        state_store.state_view.commands.get(command_id="command-id")
-    ).then_return(queued_command)
+    decoy.when(state_store.commands.get(command_id="command-id")).then_return(
+        queued_command
+    )
 
     decoy.when(
         queued_command._ImplementationCls(
@@ -260,9 +260,9 @@ async def test_execute_raises_protocol_engine_error(
         ),
     )
 
-    decoy.when(
-        state_store.state_view.commands.get(command_id="command-id")
-    ).then_return(queued_command)
+    decoy.when(state_store.commands.get(command_id="command-id")).then_return(
+        queued_command
+    )
 
     decoy.when(
         queued_command._ImplementationCls(

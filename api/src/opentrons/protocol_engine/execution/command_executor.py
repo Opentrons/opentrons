@@ -37,7 +37,7 @@ class CommandExecutor:
 
     async def execute(self, command_id: str) -> None:
         """Run a given command's execution procedure."""
-        command = self._state_store.state_view.commands.get(command_id=command_id)
+        command = self._state_store.commands.get(command_id=command_id)
         command_impl = command._ImplementationCls(
             equipment=self._equipment,
             movement=self._movement,

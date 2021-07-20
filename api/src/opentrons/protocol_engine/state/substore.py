@@ -8,7 +8,7 @@ from ..commands import Command
 SubstateT = TypeVar("SubstateT")
 
 
-class Substore(ABC, Generic[SubstateT]):
+class HasState(ABC, Generic[SubstateT]):
     """Abstract base class for a sub-store."""
 
     _state: SubstateT

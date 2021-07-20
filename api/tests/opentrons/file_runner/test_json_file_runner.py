@@ -70,7 +70,7 @@ async def test_json_runner_run(
 
     decoy.verify(
         protocol_engine.start(),
-        await protocol_engine.wait_for_idle(),
+        await protocol_engine.wait_for_done(),
     )
 
 

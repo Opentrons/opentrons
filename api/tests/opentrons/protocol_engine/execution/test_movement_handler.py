@@ -40,7 +40,7 @@ async def test_move_to_well(
     well_location = WellLocation(origin=WellOrigin.BOTTOM, offset=(0, 0, 1))
 
     decoy.when(
-        state_store.state_view.motion.get_pipette_location(
+        state_store.motion.get_pipette_location(
             pipette_id="pipette-id",
             current_location=None,
         )
@@ -63,7 +63,7 @@ async def test_move_to_well(
     )
 
     decoy.when(
-        state_store.state_view.motion.get_movement_waypoints(
+        state_store.motion.get_movement_waypoints(
             origin=Point(1, 1, 1),
             origin_cp=CriticalPoint.FRONT_NOZZLE,
             max_travel_z=42.0,
@@ -110,7 +110,7 @@ async def test_move_to_well_from_starting_location(
     )
 
     decoy.when(
-        state_store.state_view.motion.get_pipette_location(
+        state_store.motion.get_pipette_location(
             pipette_id="pipette-id",
             current_location=current_location,
         )
@@ -133,7 +133,7 @@ async def test_move_to_well_from_starting_location(
     )
 
     decoy.when(
-        state_store.state_view.motion.get_movement_waypoints(
+        state_store.motion.get_movement_waypoints(
             current_location=current_location,
             origin=Point(1, 2, 5),
             origin_cp=CriticalPoint.XY_CENTER,

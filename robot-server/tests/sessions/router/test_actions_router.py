@@ -252,7 +252,4 @@ def test_create_resume_action(
     )
 
     verify_response(response, expected_status=201, expected_data=actions)
-    decoy.verify(
-        engine_store.runner.play(),
-        task_runner.run(engine_store.engine.wait_for_idle)
-    )
+    decoy.verify(engine_store.runner.play())

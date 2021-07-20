@@ -80,7 +80,6 @@ async def create_session_action(
             task_runner.run(engine_store.runner.run)
         elif action.actionType == SessionActionType.RESUME:
             engine_store.runner.play()
-            task_runner.run(engine_store.engine.wait_for_idle)
         elif action.actionType == SessionActionType.PAUSE:
             engine_store.runner.pause()
 

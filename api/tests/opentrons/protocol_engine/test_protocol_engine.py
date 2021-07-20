@@ -122,15 +122,15 @@ def test_stop(
     decoy.verify(queue_worker.stop())
 
 
-async def test_wait_for_idle(
+async def test_wait_for_done(
     decoy: Decoy,
     queue_worker: QueueWorker,
     subject: ProtocolEngine,
 ) -> None:
-    """It should be able to wait until the engine is idle."""
-    await subject.wait_for_idle()
+    """It should be able to wait until the engine is done executing."""
+    await subject.wait_for_done()
 
-    decoy.verify(await queue_worker.wait_for_idle())
+    decoy.verify(await queue_worker.wait_for_done())
 
 
 async def test_execute_command(
@@ -180,14 +180,20 @@ async def test_execute_command(
         )
     ).then_return(queued_command)
 
-    decoy.when(
-        state_store.state_view.commands.get(command_id="command-id")
-    ).then_return(executed_command)
+    decoy.when(state_store.commands.get(command_id="command-id")).then_return(
+        executed_command
+    )
 
     result = await subject.execute_command(request)
 
     assert result == executed_command
+
     decoy.verify(
         state_store.handle_command(queued_command),
-        await queue_worker.step(),
+        await queue_worker.wait_for_running(),
+        queue_worker.start(),
+        await state_store.wait_for(
+            condition=state_store.commands.is_complete,
+            command_id="command-id",
+        ),
     )

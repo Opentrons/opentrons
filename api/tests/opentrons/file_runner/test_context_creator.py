@@ -16,7 +16,9 @@ from opentrons.protocol_engine import (
 @pytest.fixture
 async def protocol_engine(hardware: HardwareAPI) -> ProtocolEngine:
     """Get a ProtocolEngine wired to a simulating HardwareAPI."""
-    return await create_protocol_engine(hardware=hardware)
+    engine = await create_protocol_engine(hardware=hardware)
+    engine.start()
+    return engine
 
 
 def test_creates_protocol_context(

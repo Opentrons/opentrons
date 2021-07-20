@@ -18,7 +18,7 @@ from ..commands import (
     PickUpTipResult,
     DropTipResult,
 )
-from .substore import Substore, CommandReactive
+from .substore import HasState, CommandReactive
 
 
 @dataclass(frozen=True)
@@ -46,7 +46,7 @@ class PipetteState:
     current_location: Optional[DeckLocation]
 
 
-class PipetteStore(Substore[PipetteState], CommandReactive):
+class PipetteStore(HasState[PipetteState], CommandReactive):
     """Pipette state container."""
 
     _state: PipetteState
@@ -124,8 +124,10 @@ class PipetteStore(Substore[PipetteState], CommandReactive):
             )
 
 
-class PipetteView:
+class PipetteView(HasState[PipetteState]):
     """Read-only view of computed pipettes state."""
+
+    _state: PipetteState
 
     def __init__(self, state: PipetteState) -> None:
         """Initialize the view with its backing state value."""

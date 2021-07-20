@@ -94,12 +94,17 @@ def test_python_runner_load(
 
 async def test_python_runner_run(
     decoy: Decoy,
+    protocol_engine: ProtocolEngine,
     executor: PythonExecutor,
     subject: PythonFileRunner,
 ) -> None:
     """It should be able to run the protocol to completion."""
     await subject.run()
-    decoy.verify(await executor.execute())
+    decoy.verify(
+        protocol_engine.start(),
+        await executor.execute(),
+        await protocol_engine.wait_for_done(),
+    )
 
 
 def test_python_runner_pause(

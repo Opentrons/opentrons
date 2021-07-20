@@ -37,7 +37,7 @@ def mock_state_store() -> MagicMock:
 def mock_state_view(mock_state_store: MagicMock) -> MagicMock:
     """Get the StateView of the mock StateStore."""
     # TODO(mc, 2021-06-22): replace with Decoy mock
-    return mock_state_store.state_view
+    return mock_state_store
 
 
 @pytest.fixture

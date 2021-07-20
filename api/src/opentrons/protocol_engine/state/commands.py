@@ -6,7 +6,7 @@ from typing import List, Optional
 
 from ..commands import Command, CommandStatus
 from ..errors import CommandDoesNotExistError
-from .substore import Substore, CommandReactive
+from .substore import HasState, CommandReactive
 
 
 @dataclass(frozen=True)
@@ -17,7 +17,7 @@ class CommandState:
     commands_by_id: OrderedDict[str, Command]
 
 
-class CommandStore(Substore[CommandState], CommandReactive):
+class CommandStore(HasState[CommandState], CommandReactive):
     """Command state container."""
 
     _state: CommandState
@@ -34,8 +34,10 @@ class CommandStore(Substore[CommandState], CommandReactive):
         self._state = replace(self._state, commands_by_id=commands_by_id)
 
 
-class CommandView:
+class CommandView(HasState[CommandState]):
     """Read-only command state view."""
+
+    _state: CommandState
 
     def __init__(self, state: CommandState) -> None:
         """Initialize the view of command state with its underlying data."""
@@ -75,3 +77,17 @@ class CommandView:
             elif command.status == CommandStatus.QUEUED:
                 return command_id
         return None
+
+    def is_complete(self, command_id: str) -> bool:
+        """Get whether a given command is completed.
+
+        Raises:
+            CommandWillNotRunError: If a command prior to the requested command
+                fails, the requested command will never run and this error will
+                be raised instead.
+        """
+        command = self.get(command_id)
+        return (
+            command.status == CommandStatus.SUCCEEDED
+            or command.status == CommandStatus.FAILED
+        )

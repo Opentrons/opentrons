@@ -14,7 +14,7 @@ from .. import errors
 from ..resources import DeckFixedLabware
 from ..commands import Command, LoadLabwareResult, AddLabwareDefinitionResult
 from ..types import LabwareLocation, Dimensions
-from .substore import Substore, CommandReactive
+from .substore import HasState, CommandReactive
 
 
 @dataclass(frozen=True)
@@ -35,7 +35,7 @@ class LabwareState:
     deck_definition: DeckDefinitionV2
 
 
-class LabwareStore(Substore[LabwareState], CommandReactive):
+class LabwareStore(HasState[LabwareState], CommandReactive):
     """Labware state container."""
 
     _state: LabwareState
@@ -96,8 +96,10 @@ class LabwareStore(Substore[LabwareState], CommandReactive):
             self._state.labware_definitions_by_uri[uri] = command.data.definition
 
 
-class LabwareView:
+class LabwareView(HasState[LabwareState]):
     """Read-only labware state view."""
+
+    _state: LabwareState
 
     def __init__(self, state: LabwareState) -> None:
         """Initialize the computed view of labware state.

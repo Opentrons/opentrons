@@ -49,7 +49,7 @@ class EquipmentHandler:
 
     @property
     def _state(self) -> StateView:
-        return self._state_store.state_view
+        return self._state_store
 
     async def load_labware(
         self,

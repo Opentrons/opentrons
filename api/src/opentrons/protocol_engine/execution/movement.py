@@ -23,7 +23,7 @@ class MovementHandler:
 
     @property
     def _state(self) -> StateView:
-        return self._state_store.state_view
+        return self._state_store
 
     async def move_to_well(
         self,
