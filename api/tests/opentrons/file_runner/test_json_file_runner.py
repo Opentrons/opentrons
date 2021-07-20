@@ -14,27 +14,21 @@ from opentrons.protocols.runner.json_proto.command_translator import CommandTran
 
 
 @pytest.fixture
-def decoy() -> Decoy:
-    """Create a Decoy state container for this test suite."""
-    return Decoy()
-
-
-@pytest.fixture
 def protocol_engine(decoy: Decoy) -> ProtocolEngine:
     """Create a protocol engine fixture."""
-    return decoy.create_decoy(spec=ProtocolEngine)
+    return decoy.mock(cls=ProtocolEngine)
 
 
 @pytest.fixture
 def command_translator(decoy: Decoy) -> CommandTranslator:
     """Create a stubbed command translator fixture."""
-    return decoy.create_decoy(spec=CommandTranslator)
+    return decoy.mock(cls=CommandTranslator)
 
 
 @pytest.fixture
 def command_queue_worker(decoy: Decoy) -> CommandQueueWorker:
     """Create a stubbed command queue worker fixture."""
-    return decoy.create_decoy(spec=CommandQueueWorker)
+    return decoy.mock(cls=CommandQueueWorker)
 
 
 @pytest.fixture
@@ -44,7 +38,7 @@ def file_reader(
     json_protocol: JsonProtocol,
 ) -> JsonFileReader:
     """Create a stubbed JsonFileReader interface."""
-    reader = decoy.create_decoy(spec=JsonFileReader)
+    reader = decoy.mock(cls=JsonFileReader)
 
     decoy.when(reader.read(protocol_file)).then_return(json_protocol)
 

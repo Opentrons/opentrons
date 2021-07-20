@@ -21,31 +21,31 @@ from robot_server.sessions.dependencies import get_session_store, get_engine_sto
 @pytest.fixture
 def task_runner(decoy: Decoy) -> TaskRunner:
     """Get a mock background TaskRunner."""
-    return decoy.create_decoy(spec=TaskRunner)
+    return decoy.mock(cls=TaskRunner)
 
 
 @pytest.fixture
 def protocol_store(decoy: Decoy) -> ProtocolStore:
     """Get a mock ProtocolStore interface."""
-    return decoy.create_decoy(spec=ProtocolStore)
+    return decoy.mock(cls=ProtocolStore)
 
 
 @pytest.fixture
 def session_store(decoy: Decoy) -> SessionStore:
     """Get a mock SessionStore interface."""
-    return decoy.create_decoy(spec=SessionStore)
+    return decoy.mock(cls=SessionStore)
 
 
 @pytest.fixture
 def session_view(decoy: Decoy) -> SessionView:
     """Get a mock SessionView interface."""
-    return decoy.create_decoy(spec=SessionView)
+    return decoy.mock(cls=SessionView)
 
 
 @pytest.fixture
 def engine_store(decoy: Decoy) -> EngineStore:
     """Get a mock EngineStore interface."""
-    return decoy.create_decoy(spec=EngineStore)
+    return decoy.mock(cls=EngineStore)
 
 
 @pytest.fixture

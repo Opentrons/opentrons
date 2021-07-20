@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "c144019e96c5ae96889ad59f16807b4e1c4cedf89acfc081d13096aa2072f4a9"
+            "sha256": "a00b9ace936b97e7f3e2ddf7d111d2550c0ad38750c225b26d9019d64e7c30cf"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -26,9 +26,9 @@
         },
         "apply-defaults": {
             "hashes": [
-                "sha256:1ce26326a61d8773d38a9726a345c6525a91a6120d7333af79ad792dacb6246c"
+                "sha256:3773de3491b94c0fe44310f1a85888389cdc71e1544b343bce0d2bd6991acea5"
             ],
-            "version": "==0.1.4"
+            "version": "==0.1.6"
         },
         "attrs": {
             "hashes": [
@@ -273,11 +273,11 @@
         },
         "bleach": {
             "hashes": [
-                "sha256:6123ddc1052673e52bab52cdc955bcb57a015264a1c57d37bea2f6b817af0125",
-                "sha256:98b3170739e5e83dd9dc19633f074727ad848cbedb6026708c8ac2d3b697a433"
+                "sha256:306483a5a9795474160ad57fce3ddd1b50551e981eed8e15a582d34cef28aafa",
+                "sha256:ae976d7174bba988c0b632def82fdc94235756edfb14e6558a9c5be555c9fb78"
             ],
             "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'",
-            "version": "==3.3.0"
+            "version": "==3.3.1"
         },
         "c445fee": {
             "editable": true,
@@ -297,6 +297,14 @@
             ],
             "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'",
             "version": "==4.0.0"
+        },
+        "charset-normalizer": {
+            "hashes": [
+                "sha256:88fce3fa5b1a84fdcb3f603d889f723d1dd89b26059d0123ca435570e848d5e1",
+                "sha256:c46c3ace2d744cfbdebceaa3c19ae691f53ae621b39fd7570f59d14fb7f2fd12"
+            ],
+            "markers": "python_version >= '3'",
+            "version": "==2.0.3"
         },
         "clint": {
             "hashes": [
@@ -352,11 +360,11 @@
         },
         "decoy": {
             "hashes": [
-                "sha256:949e769cca522aefd6ed2759b5b174fff26341c01e8cd660bc6b9c55e7188b9a",
-                "sha256:c4ef05af5a5cc0193f27159d8eb8678a8b20f58e3de0683042a3aadc1e0c627f"
+                "sha256:b8ae8b707169824af59b04215615a4b0fa0bff4dccc6dde053c2b18824a6271e",
+                "sha256:c605822c4d867acb5d950ce98b51727705ff55ecc7bad544f2b4face3ee69ae0"
             ],
             "index": "pypi",
-            "version": "==1.5.0"
+            "version": "==1.6.2"
         },
         "dill": {
             "hashes": [
@@ -418,11 +426,11 @@
         },
         "idna": {
             "hashes": [
-                "sha256:b307872f855b18632ce0c21c5e45be78c0ea7ae4c15c828c20788b26921eb3f6",
-                "sha256:b97d804b1e9b523befed77c48dacec60e6dcb0b5391d57af6a65a312a90648c0"
+                "sha256:14475042e284991034cb48e06f6851428fb14c4dc953acd9be9a5e95c7b6dd7a",
+                "sha256:467fbad99067910785144ce333826c71fb0e63a425657295239737f7ecd125f3"
             ],
-            "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'",
-            "version": "==2.10"
+            "markers": "python_version >= '3'",
+            "version": "==3.2"
         },
         "imagesize": {
             "hashes": [
@@ -835,11 +843,11 @@
         },
         "requests": {
             "hashes": [
-                "sha256:27973dd4a904a4f13b263a19c866c13b92a39ed1c964655f025f3f8d3d75b804",
-                "sha256:c210084e36a42ae6b9219e00e48287def368a26d03a048ddad7bfee44f75871e"
+                "sha256:6c1246513ecd5ecd4528a0906f910e8f0f9c6b8ec72030dc9fd154dc1a6efd24",
+                "sha256:b8aa58f8cf793ffd8782d3d8cb19e66ef36f7aba4353eec859e74678b01b07a7"
             ],
-            "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'",
-            "version": "==2.25.1"
+            "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4, 3.5'",
+            "version": "==2.26.0"
         },
         "requests-toolbelt": {
             "hashes": [

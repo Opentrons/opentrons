@@ -9,10 +9,10 @@ from robot_server.protocols.response_builder import ResponseBuilder
 @pytest.fixture
 def protocol_store(decoy: Decoy) -> ProtocolStore:
     """Get a fake ProtocolStore interface."""
-    return decoy.create_decoy(spec=ProtocolStore)
+    return decoy.mock(cls=ProtocolStore)
 
 
 @pytest.fixture
 def response_builder(decoy: Decoy) -> ResponseBuilder:
     """Get a fake ResponseBuilder interface."""
-    return decoy.create_decoy(spec=ResponseBuilder)
+    return decoy.mock(cls=ResponseBuilder)
