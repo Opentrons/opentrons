@@ -193,6 +193,11 @@ class GCode:
         """
         return f'{self.g_code} {self.g_code_body}'.strip()
 
+    @property
+    def response(self):
+        """Unparsed G-Code Response"""
+        return self._response
+
     def get_gcode_function(self) -> str:
         """
         Returns the function that the G-Code performs.
@@ -257,6 +262,3 @@ class GCode:
                 self.response
             )
 
-    @property
-    def response(self):
-        return self._response
