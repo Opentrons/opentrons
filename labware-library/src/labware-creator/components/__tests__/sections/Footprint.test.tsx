@@ -1,7 +1,7 @@
 import React from 'react'
 import '@testing-library/jest-dom'
 import { FormikConfig } from 'formik'
-import { when } from 'jest-when'
+import { when, resetAllWhenMocks } from 'jest-when'
 import { render, screen } from '@testing-library/react'
 import { getDefaultFormState, LabwareFields } from '../../../fields'
 import { Footprint } from '../../sections/Footprint'
@@ -32,6 +32,7 @@ describe('Footprint', () => {
 
   afterEach(() => {
     jest.restoreAllMocks()
+    resetAllWhenMocks()
   })
   it('should render alerts and text fields when fields are visible', () => {
     render(wrapInFormik(<Footprint />, formikConfig))

@@ -1,7 +1,8 @@
 import * as React from 'react'
 import { useFormikContext } from 'formik'
+import capitalize from 'lodash/capitalize'
 import { makeMaskToDecimal } from '../../fieldMasks'
-import { displayAsTube } from '../../utils'
+import { displayAsTube, getLabwareName } from '../../utils'
 import { LabwareFields } from '../../fields'
 import { FormAlerts } from '../alerts/FormAlerts'
 import { wellShapeOptionsWithIcons } from '../optionsWithImages'
@@ -18,8 +19,14 @@ interface Props {
   values: LabwareFields
 }
 
-// TODO (ka 2021-5-7): Broke this out here since we will need to have more conditions for tips
 const Instructions = (props: Props): JSX.Element => {
+  if (props.values.labwareType === 'tipRack') {
+    return (
+      <p>
+        Reference the <strong>inside</strong> of the tip.
+      </p>
+    )
+  }
   return (
     <>
       {displayAsTube(props.values) ? (
@@ -38,7 +45,10 @@ const Instructions = (props: Props): JSX.Element => {
           <p>
             Reference the <strong>inside</strong> of the well. Ignore any lip.
           </p>
-          <p>Diameter helps the robot locate the sides of the wells.</p>
+          <p>
+            Diameter helps the robot locate the sides of the{' '}
+            {getLabwareName(props.values, true)}.
+          </p>
         </>
       )}
     </>
@@ -94,10 +104,16 @@ export const WellShapeAndSides = (): JSX.Element | null => {
     'wellYDimension',
   ]
   const { values, errors, touched } = useFormikContext<LabwareFields>()
+  const label =
+    values.labwareType === 'tipRack'
+      ? 'Tip Diameter'
+      : `${capitalize(getLabwareName(values, false))} Shape & Sides`
+  const id =
+    values.labwareType === 'tipRack' ? 'TipDiameter' : 'WellShapeAndSides'
 
   return (
     <div className={styles.new_definition_section}>
-      <SectionBody label="Well Shape & Sides" id="WellShapeAndSides">
+      <SectionBody label={label} id={id}>
         <>
           <FormAlerts touched={touched} errors={errors} fieldList={fieldList} />
           <Content values={values} />

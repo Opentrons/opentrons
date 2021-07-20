@@ -3,6 +3,7 @@ import type { DevInternalFlag } from './types'
 export const DEV_INTERNAL_FLAGS: DevInternalFlag[] = [
   'allPipetteConfig',
   'enableBundleUpload',
+  'preProtocolFlowWithoutRPC',
 ]
 
 // action type constants

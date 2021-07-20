@@ -1,77 +1,64 @@
 """Test load labware commands."""
-from mock import AsyncMock  # type: ignore[attr-defined]
+from decoy import Decoy
 
-from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import DeckSlotName
+from opentrons.protocols.models import LabwareDefinition
 from opentrons.protocol_engine.types import DeckSlotLocation
 
-from opentrons.protocol_engine.execution import LoadedLabware
-from opentrons.protocol_engine.commands import (
-    LoadLabwareRequest,
+from opentrons.protocol_engine.execution import (
+    LoadedLabware,
+    EquipmentHandler,
+    MovementHandler,
+    PipettingHandler,
+)
+from opentrons.protocol_engine.commands.load_labware import (
+    LoadLabwareData,
     LoadLabwareResult,
+    LoadLabwareImplementation,
 )
 
 
-def test_load_labware_request() -> None:
-    """It should have a LoadLabwareRequest model."""
-    request = LoadLabwareRequest(
-        location=DeckSlotLocation(slot=DeckSlotName.SLOT_3),
-        loadName="some-load-name",
-        namespace="opentrons-test",
-        version=1,
-        labwareId="some id"
-    )
-
-    assert request.location == DeckSlotLocation(slot=DeckSlotName.SLOT_3)
-    assert request.loadName == "some-load-name"
-    assert request.namespace == "opentrons-test"
-    assert request.version == 1
-    assert request.labwareId == "some id"
-
-
-def test_load_labware_result(well_plate_def: LabwareDefinition) -> None:
-    """It should have a LoadLabwareResult model."""
-    result = LoadLabwareResult(
-        labwareId="labware-id",
-        definition=well_plate_def,
-        calibration=(1, 2, 3),
-    )
-
-    assert result.labwareId == "labware-id"
-    assert result.definition == well_plate_def
-    assert result.calibration == (1, 2, 3)
-
-
 async def test_load_labware_implementation(
+    decoy: Decoy,
     well_plate_def: LabwareDefinition,
-    mock_handlers: AsyncMock,
+    equipment: EquipmentHandler,
+    movement: MovementHandler,
+    pipetting: PipettingHandler,
 ) -> None:
-    """A LoadLabwareRequest should have an execution implementation."""
-    mock_handlers.equipment.load_labware.return_value = LoadedLabware(
-        labware_id="labware-id",
-        definition=well_plate_def,
-        calibration=(1, 2, 3)
+    """A LoadLabware command should have an execution implementation."""
+    subject = LoadLabwareImplementation(
+        equipment=equipment,
+        movement=movement,
+        pipetting=pipetting,
     )
 
-    request = LoadLabwareRequest(
+    data = LoadLabwareData(
         location=DeckSlotLocation(slot=DeckSlotName.SLOT_3),
         loadName="some-load-name",
         namespace="opentrons-test",
         version=1,
     )
 
-    impl = request.get_implementation()
-    result = await impl.execute(mock_handlers)
+    decoy.when(
+        await equipment.load_labware(
+            location=DeckSlotLocation(slot=DeckSlotName.SLOT_3),
+            load_name="some-load-name",
+            namespace="opentrons-test",
+            version=1,
+            labware_id=None,
+        )
+    ).then_return(
+        LoadedLabware(
+            labware_id="labware-id",
+            definition=well_plate_def,
+            calibration=(1, 2, 3),
+        )
+    )
+
+    result = await subject.execute(data)
 
     assert result == LoadLabwareResult(
         labwareId="labware-id",
         definition=well_plate_def,
         calibration=(1, 2, 3),
-    )
-    mock_handlers.equipment.load_labware.assert_called_with(
-        location=DeckSlotLocation(slot=DeckSlotName.SLOT_3),
-        load_name="some-load-name",
-        namespace="opentrons-test",
-        version=1,
-        labware_id=None
     )

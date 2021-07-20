@@ -1,11 +1,11 @@
 import * as React from 'react'
 import { useFormikContext } from 'formik'
 import { makeMaskToDecimal } from '../../fieldMasks'
-import { isEveryFieldHidden } from '../../utils'
+import { isEveryFieldHidden, getLabwareName } from '../../utils'
 import { LabwareFields } from '../../fields'
 import { FormAlerts } from '../alerts/FormAlerts'
 import { TextField } from '../TextField'
-import { XYOffsetImg } from '../diagrams'
+import { XYOffsetImg, XYOffsetHelperTextImg } from '../diagrams'
 import { SectionBody } from './SectionBody'
 
 import styles from '../../styles.css'
@@ -16,26 +16,27 @@ interface Props {
   values: LabwareFields
 }
 
-// TODO (ka 2021-5-11): Broke this out here since we will need to have more conditions for tips
 const Instructions = (props: Props): JSX.Element => {
   const { values } = props
+  let labwareTypeLocation = `${getLabwareName(values, false)} A1`
+
+  if (values.labwareType === 'reservoir') {
+    labwareTypeLocation = 'the top left-most well'
+  }
+
   return (
     <>
       <p>
         Find the measurement from the center of{' '}
-        <strong>
-          {values.labwareType === 'reservoir'
-            ? 'the top left-most well'
-            : 'well A1'}
-        </strong>{' '}
-        to the edge of the labware{"'"}s footprint.
+        <strong>{labwareTypeLocation}</strong> to the edge of the labware{"'"}s
+        footprint.
       </p>
       <p>
-        Corner offset informs the robot how far the grid of wells is from the
-        slot{"'"}s top left corner.
+        Corner offset informs the robot how far the grid of{' '}
+        {getLabwareName(values, true)} is from the slot{"'"}s top left corner.
       </p>
       <div className={styles.help_text}>
-        <img src={require('../../images/offset_helpText.svg')} />
+        <XYOffsetHelperTextImg labwareType={values.labwareType} />
       </div>
     </>
   )
@@ -75,8 +76,7 @@ export const GridOffset = (): JSX.Element | null => {
   const { values, errors, touched } = useFormikContext<LabwareFields>()
   if (
     isEveryFieldHidden(fieldList, values) ||
-    (values.labwareType != null &&
-      ['aluminumBlock', 'tubeRack'].includes(values.labwareType))
+    (values.labwareType != null && values.labwareType === 'aluminumBlock')
   ) {
     return null
   }

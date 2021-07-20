@@ -5,14 +5,37 @@ from pydantic import BaseModel, Field
 from typing import List, Optional, Union
 from typing_extensions import Literal
 
+from opentrons.protocol_engine import CommandStatus, CommandType
 from robot_server.service.json_api import ResourceModel
-from .session_inputs import SessionInput
+from .action_models import SessionAction
 
 
 class SessionType(str, Enum):
     """All available session types."""
 
     BASIC = "basic"
+    PROTOCOL = "protocol"
+
+
+class AbstractSessionCreateData(BaseModel):
+    """Request data sent when creating a session."""
+
+    sessionType: SessionType = Field(
+        ...,
+        description="The session type to create.",
+    )
+    createParams: Optional[BaseModel] = Field(
+        None,
+        description="Parameters to set session behaviors at creation time.",
+    )
+
+
+class SessionCommandSummary(ResourceModel):
+    """A stripped down model of a full Command for usage in a Session response."""
+
+    id: str = Field(..., description="Unique command identifier.")
+    commandType: CommandType = Field(..., description="Specific type of command.")
+    status: CommandStatus = Field(..., description="Execution status of the command.")
 
 
 class AbstractSession(ResourceModel):
@@ -26,10 +49,20 @@ class AbstractSession(ResourceModel):
         None,
         description="Configuration parameters for the session.",
     )
-    inputs: List[SessionInput] = Field(
+    actions: List[SessionAction] = Field(
         ...,
-        description="Client-initiated events for session control input.",
+        description="Client-initiated session control actions.",
     )
+    commands: List[SessionCommandSummary] = Field(
+        ...,
+        description="Protocol commands queued, running, or executed for the session.",
+    )
+
+
+class BasicSessionCreateData(AbstractSessionCreateData):
+    """Creation request data for a basic session."""
+
+    sessionType: Literal[SessionType.BASIC] = SessionType.BASIC
 
 
 class BasicSession(AbstractSession):
@@ -38,4 +71,35 @@ class BasicSession(AbstractSession):
     sessionType: Literal[SessionType.BASIC] = SessionType.BASIC
 
 
-Session = Union[BasicSession]
+class ProtocolSessionCreateParams(BaseModel):
+    """Creation parameters for a protocol session."""
+
+    protocolId: str = Field(
+        ...,
+        description="Unique identifier of the protocol this session will run.",
+    )
+
+
+class ProtocolSessionCreateData(AbstractSessionCreateData):
+    """Creation request data for a protocol session."""
+
+    sessionType: Literal[SessionType.PROTOCOL] = SessionType.PROTOCOL
+    createParams: ProtocolSessionCreateParams
+
+
+class ProtocolSession(AbstractSession):
+    """A session to execute commands with a previously loaded protocol file."""
+
+    sessionType: Literal[SessionType.PROTOCOL] = SessionType.PROTOCOL
+    createParams: ProtocolSessionCreateParams
+
+
+SessionCreateData = Union[
+    BasicSessionCreateData,
+    ProtocolSessionCreateData,
+]
+
+Session = Union[
+    BasicSession,
+    ProtocolSession,
+]

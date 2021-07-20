@@ -210,7 +210,6 @@ lint-css:
 
 .PHONY: check-js
 check-js: build-ts
-	yarn flow $(if $(CI),check,status)
 
 .PHONY: build-ts
 build-ts:
@@ -223,8 +222,8 @@ clean-ts:
 # TODO: Ian 2019-12-17 gradually add components and shared-data
 .PHONY: circular-dependencies-js
 circular-dependencies-js:
-	madge $(and $(CI),--no-spinner --no-color) --circular protocol-designer/src/index.js
-	madge $(and $(CI),--no-spinner --no-color) --circular step-generation/src/index.js
+	madge $(and $(CI),--no-spinner --no-color) --circular protocol-designer/src/index.tsx
+	madge $(and $(CI),--no-spinner --no-color) --circular step-generation/src/index.ts
 	madge $(and $(CI),--no-spinner --no-color) --circular labware-library/src/index.tsx
 	madge $(and $(CI),--no-spinner --no-color) --circular app/src/index.tsx
 

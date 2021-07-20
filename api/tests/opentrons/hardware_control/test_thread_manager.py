@@ -1,3 +1,5 @@
+import asyncio
+
 import pytest
 import weakref
 from opentrons.hardware_control.modules import ModuleAtPort
@@ -47,10 +49,18 @@ async def test_module_cache_remove_entry():
     mods_before = thread_manager.attached_modules
     assert len(mods_before) == 2
 
-    await thread_manager._backend.module_controls.register_modules(
-        removed_mods_at_ports=[
-            ModuleAtPort(port='/dev/ot_module_sim_tempdeck0',
-                         name='tempdeck')
-        ])
+    loop: asyncio.AbstractEventLoop = thread_manager._loop
+
+    # The coroutine must be called using the threadmanager's loop.
+    future = asyncio.run_coroutine_threadsafe(
+        thread_manager._backend.module_controls.register_modules(
+            removed_mods_at_ports=[
+                ModuleAtPort(port='/dev/ot_module_sim_tempdeck0',
+                             name='tempdeck')
+            ]
+        ),
+        loop
+    )
+    future.result()
     mods_after = thread_manager.attached_modules
     assert len(mods_after) == 1

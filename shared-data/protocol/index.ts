@@ -1,4 +1,3 @@
-// TODO(mc, 2021-04-27): delete flowTypes directory
 import type { ProtocolFile as _ProtocolFileV1 } from './types/schemaV1'
 import type { ProtocolFile as _ProtocolFileV3 } from './types/schemaV3'
 import type { ProtocolFile as _ProtocolFileV4 } from './types/schemaV4'

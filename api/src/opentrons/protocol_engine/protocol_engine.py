@@ -1,19 +1,8 @@
 """ProtocolEngine class definition."""
-from __future__ import annotations
-from typing import Union
-
-from opentrons.hardware_control.api import API as HardwareAPI
-from opentrons.util.helpers import utc_now
-
-from .errors import ProtocolEngineError, UnexpectedProtocolError
-from .execution import CommandHandlers
 from .resources import ResourceProviders
-from .state import StateStore, StateView
-from .commands import (
-    CommandRequestType,
-    CompletedCommandType,
-    FailedCommandType,
-)
+from .state import State, StateStore, StateView
+from .commands import Command, CommandRequest, CommandStatus, CommandMapper
+from .execution import CommandExecutor
 
 
 class ProtocolEngine:
@@ -24,78 +13,83 @@ class ProtocolEngine:
     of the commands themselves.
     """
 
-    state_store: StateStore
-    _handlers: CommandHandlers
-
-    @classmethod
-    async def create(cls, hardware: HardwareAPI) -> ProtocolEngine:
-        """Create a ProtocolEngine instance."""
-        resources = ResourceProviders.create()
-
-        # TODO(mc, 2020-11-18): check short trash FF
-        # TODO(mc, 2020-11-18): consider moving into a StateStore.create factory
-        deck_def = await resources.deck_data.get_deck_definition()
-        fixed_labware = await resources.deck_data.get_deck_fixed_labware(deck_def)
-
-        state_store = StateStore(
-            deck_definition=deck_def,
-            deck_fixed_labware=fixed_labware
-        )
-
-        handlers = CommandHandlers.create(
-            resources=resources,
-            hardware=hardware,
-            state=StateView.create_view(state_store),
-        )
-
-        return cls(state_store=state_store, handlers=handlers)
+    _state_store: StateStore
+    _command_executor: CommandExecutor
+    _command_mapper: CommandMapper
+    _resources: ResourceProviders
 
     def __init__(
         self,
         state_store: StateStore,
-        handlers: CommandHandlers,
+        command_executor: CommandExecutor,
+        command_mapper: CommandMapper,
+        resources: ResourceProviders,
     ) -> None:
         """Initialize a ProtocolEngine instance.
 
         This constructor does not inject provider implementations. Prefer the
         ProtocolEngine.create factory classmethod.
         """
-        self.state_store = state_store
-        self._handlers = handlers
+        self._state_store = state_store
+        self._command_executor = command_executor
+        self._command_mapper = command_mapper
+        self._resources = resources
+
+    @property
+    def state_view(self) -> StateView:
+        """Get an interface to retrieve calculated state values."""
+        return self._state_store.state_view
+
+    def get_state(self) -> State:
+        """Get the engine's underlying state."""
+        return self._state_store.get_state()
+
+    def add_command(self, request: CommandRequest) -> Command:
+        """Add a command to ProtocolEngine."""
+        command = self._command_mapper.map_request_to_command(
+            request=request,
+            command_id=self._resources.model_utils.generate_id(),
+            created_at=self._resources.model_utils.get_timestamp(),
+        )
+        self._state_store.handle_command(command)
+        return command
+
+    async def execute_command_by_id(self, command_id: str) -> Command:
+        """Execute a protocol engine command by its identifier."""
+        queued_command = self.state_view.commands.get(command_id)
+
+        running_command = self._command_mapper.update_command(
+            command=queued_command,
+            startedAt=self._resources.model_utils.get_timestamp(),
+            status=CommandStatus.RUNNING,
+        )
+
+        self._state_store.handle_command(running_command)
+        completed_command = await self._command_executor.execute(running_command)
+        self._state_store.handle_command(completed_command)
+
+        return completed_command
 
     async def execute_command(
-        self,
-        request: CommandRequestType,
-        command_id: str,
-    ) -> Union[CompletedCommandType, FailedCommandType]:
+        self, request: CommandRequest, command_id: str
+    ) -> Command:
         """Execute a command request, waiting for it to complete."""
-        cmd_impl = request.get_implementation()
-        created_at = utc_now()
-        cmd = cmd_impl.create_command(created_at).to_running(created_at)
-        done_cmd: Union[CompletedCommandType, FailedCommandType]
+        created_at = self._resources.model_utils.get_timestamp()
 
-        # store the command prior to execution
-        self.state_store.handle_command(cmd, command_id=command_id)
+        queued_command = self._command_mapper.map_request_to_command(
+            request=request,
+            command_id=command_id,
+            created_at=created_at,
+        )
 
-        # execute the command
-        try:
-            result = await cmd_impl.execute(self._handlers)
-            completed_at = utc_now()
-            done_cmd = cmd.to_completed(result, completed_at)
+        running_command = self._command_mapper.update_command(
+            command=queued_command,
+            startedAt=created_at,
+            status=CommandStatus.RUNNING,
+        )
 
-        except Exception as error:
-            failed_at = utc_now()
-            if not isinstance(error, ProtocolEngineError):
-                error = UnexpectedProtocolError(error)
-            done_cmd = cmd.to_failed(error, failed_at)
+        self._state_store.handle_command(running_command)
+        completed_command = await self._command_executor.execute(running_command)
+        self._state_store.handle_command(completed_command)
 
-        # store the done command
-        self.state_store.handle_command(done_cmd, command_id=command_id)
-
-        return done_cmd
-
-    def add_command(self, request: CommandRequestType) -> None:
-        """Add a command to ProtocolEngine."""
-        # TODO(spp, 2020-05-13):
-        #   Generate a UUID to be used as command_id for each command added.
-        raise NotImplementedError
+        return completed_command

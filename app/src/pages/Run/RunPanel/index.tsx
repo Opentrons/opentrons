@@ -18,11 +18,9 @@ import type { State } from '../../../redux/types'
 interface SP {
   isRunning: boolean
   isPaused: boolean
-  startTime: string | null
   isReadyToRun: boolean
   isBlocked: boolean
   modulesReady: boolean
-  runTime: string
   disabled: boolean
 }
 
@@ -38,11 +36,9 @@ type Props = SP & DP
 const mapStateToProps = (state: State): SP => ({
   isRunning: robotSelectors.getIsRunning(state),
   isPaused: robotSelectors.getIsPaused(state),
-  startTime: robotSelectors.getStartTime(state),
   isReadyToRun: robotSelectors.getIsReadyToRun(state),
   isBlocked: robotSelectors.getIsBlocked(state),
   modulesReady: getMissingModules(state).length === 0,
-  runTime: robotSelectors.getRunTime(state),
   disabled:
     !robotSelectors.getSessionIsLoaded(state) ||
     robotSelectors.getCancelInProgress(state) ||
@@ -60,7 +56,7 @@ function RunPanelComponent(props: Props): JSX.Element {
   return (
     <SidePanel title="Execute Run">
       <SidePanelGroup>
-        <RunTimer startTime={props.startTime} runTime={props.runTime} />
+        <RunTimer />
         <RunControls
           disabled={props.disabled}
           modulesReady={props.modulesReady}

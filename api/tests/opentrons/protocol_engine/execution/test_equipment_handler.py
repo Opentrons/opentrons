@@ -2,20 +2,61 @@
 import pytest
 from mock import AsyncMock, MagicMock  # type: ignore[attr-defined]
 from opentrons.calibration_storage.helpers import uri_from_details
-from opentrons.protocol_engine.errors import LabwareDefinitionDoesNotExistError
 
-from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import Mount as HwMount, MountType, DeckSlotName
+from opentrons.hardware_control import API as HardwareAPI
+from opentrons.protocols.models import LabwareDefinition
 
-from opentrons.protocol_engine import errors, ResourceProviders
+from opentrons.protocol_engine import errors
+from opentrons.protocol_engine.errors import LabwareDefinitionDoesNotExistError
 from opentrons.protocol_engine.types import DeckSlotLocation, PipetteName
-from opentrons.protocol_engine.state import PipetteData
+from opentrons.protocol_engine.state import StateStore, PipetteData
+
+from opentrons.protocol_engine.resources import (
+    ResourceProviders,
+    ModelUtils,
+    LabwareDataProvider,
+    DeckDataProvider,
+)
 
 from opentrons.protocol_engine.execution.equipment import (
     EquipmentHandler,
     LoadedLabware,
     LoadedPipette,
 )
+
+
+@pytest.fixture
+def mock_state_store() -> MagicMock:
+    """Get a mock StateStore."""
+    # TODO(mc, 2021-06-22): replace with Decoy mock
+    return MagicMock(spec=StateStore)
+
+
+@pytest.fixture
+def mock_state_view(mock_state_store: MagicMock) -> MagicMock:
+    """Get the StateView of the mock StateStore."""
+    # TODO(mc, 2021-06-22): replace with Decoy mock
+    return mock_state_store.state_view
+
+
+@pytest.fixture
+def mock_hardware() -> AsyncMock:
+    """Get an asynchronous mock in the shape of a HardwareAPI."""
+    # TODO(mc, 2021-06-22): Replace with Decoy mock
+    return AsyncMock(spec=HardwareAPI)
+
+
+@pytest.fixture
+def mock_resources() -> AsyncMock:
+    """Get an asynchronous mock in the shape of ResourceProviders."""
+    # TODO(mc, 2021-06-22): Replace with Decoy mock
+    mock = AsyncMock()
+    mock.model_utils = MagicMock(spec=ModelUtils)
+    mock.labware_data = AsyncMock(spec=LabwareDataProvider)
+    mock.deck_data = AsyncMock(spec=DeckDataProvider)
+
+    return mock
 
 
 @pytest.fixture
@@ -28,7 +69,7 @@ def mock_resources_with_data(
         minimal_labware_def
     )
     mock_resources.labware_data.get_labware_calibration.return_value = (1, 2, 3)
-    mock_resources.id_generator.generate_id.return_value = "unique-id"
+    mock_resources.model_utils.generate_id.return_value = "unique-id"
 
     return mock_resources
 
@@ -36,13 +77,13 @@ def mock_resources_with_data(
 @pytest.fixture
 def handler(
     mock_hardware: AsyncMock,
-    mock_state_view: MagicMock,
+    mock_state_store: MagicMock,
     mock_resources_with_data: AsyncMock,
 ) -> EquipmentHandler:
     """Get an EquipmentHandler with its dependencies mocked out."""
     return EquipmentHandler(
         hardware=mock_hardware,
-        state=mock_state_view,
+        state_store=mock_state_store,
         resources=mock_resources_with_data,
     )
 
@@ -57,7 +98,7 @@ async def test_load_labware_assigns_id(
         load_name="load-name",
         namespace="opentrons-test",
         version=1,
-        labware_id=None
+        labware_id=None,
     )
 
     assert type(res) == LoadedLabware
@@ -74,12 +115,12 @@ async def test_load_labware_uses_provided_id(
         load_name="load-name",
         namespace="opentrons-test",
         version=1,
-        labware_id="my labware id"
+        labware_id="my labware id",
     )
 
     assert type(res) == LoadedLabware
     assert res.labware_id == "my labware id"
-    mock_resources_with_data.id_generator.generate_id.assert_not_called()
+    mock_resources_with_data.model_utils.generate_id.assert_not_called()
 
 
 async def test_load_labware_gets_labware_def(
@@ -89,8 +130,9 @@ async def test_load_labware_gets_labware_def(
     mock_state_view: MagicMock,
 ) -> None:
     """Loading labware should load the labware's defintion."""
-    mock_state_view.labware.get_definition_by_uri.side_effect =\
+    mock_state_view.labware.get_definition_by_uri.side_effect = (
         LabwareDefinitionDoesNotExistError
+    )
 
     res = await handler.load_labware(
         location=DeckSlotLocation(slot=DeckSlotName.SLOT_3),
@@ -180,12 +222,12 @@ async def test_load_pipette_uses_provided_id(
     res = await handler.load_pipette(
         pipette_name=PipetteName.P300_SINGLE,
         mount=MountType.LEFT,
-        pipette_id="my pipette id"
+        pipette_id="my pipette id",
     )
 
     assert type(res) == LoadedPipette
     assert res.pipette_id == "my pipette id"
-    mock_resources_with_data.id_generator.generate_id.assert_not_called()
+    mock_resources_with_data.model_utils.generate_id.assert_not_called()
 
 
 async def test_load_pipette_checks_checks_existence(

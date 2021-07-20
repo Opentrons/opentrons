@@ -1,14 +1,12 @@
-// @flow
 import assert from 'assert'
 import bench from 'nanobench'
 import {
   commandCreatorsTimeline,
   curryCommandCreator,
   mix,
+  getStateAndContextTempTCModules,
 } from '@opentrons/step-generation'
 // TODO IMMEDIATELY: figure out a better way to import fixtures from step generation
-import { getStateAndContextTempTCModules } from '@opentrons/step-generation/src/__fixtures__'
-
 const times = 200
 
 bench(`commandCreatorsTimeline: mix ${times} times`, b => {

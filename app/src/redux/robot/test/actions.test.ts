@@ -417,10 +417,4 @@ describe('robot actions', () => {
       meta: { robotCommand: true },
     })
   })
-
-  it('tick run time action', () => {
-    const expected = { type: actionTypes.TICK_RUN_TIME }
-
-    expect(actions.tickRunTime()).toEqual(expected)
-  })
 })

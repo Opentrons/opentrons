@@ -14,7 +14,6 @@ from typing import Any, Dict, Optional, Union, Tuple, TYPE_CHECKING
 
 import jsonschema  # type: ignore
 
-from opentrons.config import feature_flags as ff
 from opentrons_shared_data import load_shared_data, protocol
 from .api_support.types import APIVersion
 from .types import (Protocol, PythonProtocol, JsonProtocol,
@@ -128,12 +127,6 @@ def _parse_python(
 
 def _parse_bundle(bundle: ZipFile, filename: str = None) -> PythonProtocol:
     """ Parse a bundled Python protocol """
-    if not ff.use_protocol_api_v2():
-        raise RuntimeError(
-            'Uploading a bundled protocol requires the robot to be set to '
-            'Protocol API V2. Enable the \'Use Protocol API version 2\' '
-            'toggle in the robot\'s Advanced Settings and restart the robot')
-
     contents = extract_bundle(bundle)
 
     result = _parse_python(

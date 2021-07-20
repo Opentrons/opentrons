@@ -1,14 +1,14 @@
 import React from 'react'
 import { FormikConfig } from 'formik'
 import isEqual from 'lodash/isEqual'
-import { when } from 'jest-when'
+import { when, resetAllWhenMocks } from 'jest-when'
 import { render, screen } from '@testing-library/react'
 import {
   getDefaultFormState,
   LabwareFields,
   yesNoOptions,
 } from '../../../fields'
-import { isEveryFieldHidden } from '../../../utils'
+import { isEveryFieldHidden, getLabwareName } from '../../../utils'
 import { Grid } from '../../sections/Grid'
 import { FormAlerts } from '../../alerts/FormAlerts'
 import { TextField } from '../../TextField'
@@ -28,6 +28,10 @@ const radioFieldMock = RadioField as jest.MockedFunction<typeof RadioField>
 
 const isEveryFieldHiddenMock = isEveryFieldHidden as jest.MockedFunction<
   typeof isEveryFieldHidden
+>
+
+const getLabwareNameMock = getLabwareName as jest.MockedFunction<
+  typeof getLabwareName
 >
 
 const formikConfig: FormikConfig<LabwareFields> = {
@@ -91,14 +95,21 @@ describe('Grid', () => {
 
   afterEach(() => {
     jest.restoreAllMocks()
+    resetAllWhenMocks()
   })
   it('should render when fields are visible', () => {
+    when(getLabwareNameMock)
+      .calledWith(formikConfig.initialValues, true)
+      .mockReturnValue('FAKE LABWARE NAME PLURAL')
+    when(getLabwareNameMock)
+
     render(wrapInFormik(<Grid />, formikConfig))
     expect(screen.getByText('Grid'))
     expect(screen.getByText('mock alerts'))
     expect(
       screen.getByText(
-        'The grid of wells on your labware is arranged via rows and columns. Rows run horizontally across your labware (left to right). Columns run top to bottom.'
+        'The grid of FAKE LABWARE NAME PLURAL on your labware is arranged via rows and columns. ' +
+          'Rows run horizontally across your labware (left to right). Columns run top to bottom.'
       )
     )
     expect(screen.getByText('gridRows text field'))
@@ -114,18 +125,6 @@ describe('Grid', () => {
         initialValues: {
           ...formikConfig.initialValues,
           labwareType: 'aluminumBlock',
-        },
-      })
-    )
-    expect(container.firstChild).toBe(null)
-  })
-  it('should NOT render when the labware type is tubeRack', () => {
-    const { container } = render(
-      wrapInFormik(<Grid />, {
-        ...formikConfig,
-        initialValues: {
-          ...formikConfig.initialValues,
-          labwareType: 'tubeRack',
         },
       })
     )

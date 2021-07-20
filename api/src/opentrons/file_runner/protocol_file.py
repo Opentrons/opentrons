@@ -3,8 +3,10 @@
 # existing logic and models from:
 #   - api/src/opentrons/protocols/types.py
 #   - robot-server/robot_server/service/protocol/models.py
+from __future__ import annotations
 from dataclasses import dataclass
 from enum import Enum
+from pathlib import Path
 
 
 class ProtocolFileType(str, Enum):
@@ -27,4 +29,5 @@ class ProtocolFile:
         file_type: Whether the file is a JSON protocol or Python protocol
     """
 
+    file_path: Path
     file_type: ProtocolFileType

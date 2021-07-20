@@ -9,7 +9,7 @@ module.exports = {
 
   extends: ['standard-with-typescript', 'plugin:react/recommended', 'prettier'],
 
-  plugins: ['flowtype', 'react', 'react-hooks', 'json', 'jest'],
+  plugins: ['react', 'react-hooks', 'json', 'jest'],
 
   rules: {
     camelcase: 'off',
@@ -45,10 +45,6 @@ module.exports = {
   settings: {
     react: {
       version: '16.8',
-      flowVersion: '0.125.1',
-    },
-    flowtype: {
-      onlyFilesWithFlowAnnotation: true,
     },
   },
 
@@ -56,7 +52,7 @@ module.exports = {
     {
       files: ['**/*.js'],
       parser: '@babel/eslint-parser',
-      extends: ['plugin:flowtype/recommended', 'prettier'],
+      extends: ['prettier'],
     },
     {
       // TODO(mc, 2021-03-18): remove to default these rules back to errors

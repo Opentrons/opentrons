@@ -134,9 +134,11 @@ export type Command =
     }
 
 // NOTE: must be kept in sync with '../schemas/4.json'
-export type ProtocolFile<
-  DesignerApplicationData
-> = V3ProtocolFile<DesignerApplicationData> & {
+export interface ProtocolFile<DesignerApplicationData>
+  extends Omit<
+    V3ProtocolFile<DesignerApplicationData>,
+    'schemaVersion' | 'commands'
+  > {
   $otSharedSchema: '#/protocol/schemas/4'
   schemaVersion: 4
   modules: Record<string, FileModule>

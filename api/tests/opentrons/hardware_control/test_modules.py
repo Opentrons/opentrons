@@ -219,7 +219,7 @@ async def test_get_bundled_fw(monkeypatch, tmpdir):
         (None, 'magneticModuleV1')
     ])
 def test_magnetic_module_revision_parsing(revision, model):
-    assert magdeck._model_from_revision(revision) == model
+    assert magdeck.MagDeck._model_from_revision(revision) == model
 
 
 @pytest.mark.parametrize(
@@ -235,4 +235,4 @@ def test_magnetic_module_revision_parsing(revision, model):
         (None, 'temperatureModuleV1')
     ])
 def test_temperature_module_revision_parsing(revision, model):
-    assert tempdeck._model_from_revision(revision) == model
+    assert tempdeck.TempDeck._model_from_revision(revision) == model

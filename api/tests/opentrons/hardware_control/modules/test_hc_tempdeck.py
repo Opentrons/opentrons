@@ -1,7 +1,5 @@
 import pytest
-import asyncio
 from opentrons.hardware_control import modules, ExecutionManager
-from opentrons.hardware_control.modules import tempdeck
 
 
 from opentrons.drivers.rpi_drivers.types import USBPort
@@ -26,13 +24,15 @@ async def test_sim_initialization(loop, usb_port):
 
 
 async def test_sim_state(loop, usb_port):
-    temp = await modules.build(port='/dev/ot_module_sim_tempdeck0',
-                               usb_port=usb_port,
-                               which='tempdeck',
-                               simulating=True,
-                               interrupt_callback=lambda x: None,
-                               loop=loop,
-                               execution_manager=ExecutionManager(loop=loop))
+    temp = await modules.TempDeck.build(
+        port='/dev/ot_module_sim_tempdeck0',
+        usb_port=usb_port,
+        simulating=True,
+        interrupt_callback=lambda x: None,
+        loop=loop,
+        execution_manager=ExecutionManager(loop=loop)
+    )
+    await temp.wait_next_poll()
     assert temp.temperature == 0
     assert temp.target is None
     assert temp.status == 'idle'
@@ -47,46 +47,36 @@ async def test_sim_state(loop, usb_port):
 
 
 async def test_sim_update(loop, usb_port):
-    temp = await modules.build(port='/dev/ot_module_sim_tempdeck0',
-                               usb_port=usb_port,
-                               which='tempdeck',
-                               simulating=True,
-                               interrupt_callback=lambda x: None,
-                               loop=loop,
-                               execution_manager=ExecutionManager(loop=loop))
-    await asyncio.wait_for(temp.set_temperature(10), 0.2)
+    temp = await modules.TempDeck.build(
+        port='/dev/ot_module_sim_tempdeck0',
+        usb_port=usb_port,
+        simulating=True,
+        interrupt_callback=lambda x: None,
+        loop=loop,
+        execution_manager=ExecutionManager(loop=loop),
+        polling_frequency=0
+    )
+    await temp.set_temperature(10)
     assert temp.temperature == 10
     assert temp.target == 10
     assert temp.status == 'holding at target'
     await temp.deactivate()
-    assert temp.temperature == 0
+    await temp.wait_next_poll()
+    assert temp.temperature == 23
     assert temp.target is None
     assert temp.status == 'idle'
 
 
-async def test_poller(monkeypatch, loop, usb_port):
-    temp = modules.tempdeck.TempDeck(
-            port='/dev/ot_module_sim_tempdeck0',
-            usb_port=usb_port,
-            execution_manager=ExecutionManager(loop=loop),
-            simulating=True,
-            loop=loop)
-    hit = False
-
-    def update_called():
-        nonlocal hit
-        hit = True
-
-    monkeypatch.setattr(temp._driver, 'update_temperature', update_called)
-    await temp._connect()
-    assert temp._poller.is_alive()
-    await asyncio.sleep(tempdeck.TEMP_POLL_INTERVAL_SECS * 1.1)
-    assert hit
-
-
 async def test_revision_model_parsing(loop, usb_port):
-    mag = await modules.build('', 'tempdeck', True, usb_port, lambda x: None, loop=loop,
-                              execution_manager=ExecutionManager(loop=loop))
+    mag = await modules.TempDeck.build(
+        port='',
+        simulating=True,
+        usb_port=usb_port,
+        interrupt_callback=lambda x: None,
+        loop=loop,
+        execution_manager=ExecutionManager(loop=loop),
+        polling_frequency=0
+    )
     mag._device_info['model'] = 'temp_deck_v20'
     assert mag.model() == 'temperatureModuleV2'
     mag._device_info['model'] = 'temp_deck_v4.0'

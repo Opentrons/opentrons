@@ -1,3 +1,4 @@
+import round from 'lodash/round'
 import {
   createRegularLoadName,
   createDefaultDisplayName,
@@ -8,8 +9,11 @@ import {
   DISPLAY_VOLUME_UNITS,
   tubeRackAutofills,
   labwareTypeAutofills,
+  DEFAULT_RACK_BRAND,
 } from './fields'
 import type { LabwareFields } from './fields'
+import { getIsOpentronsTubeRack } from './utils/getIsOpentronsTubeRack'
+import { getIsCustomTubeRack } from './utils/getIsCustomTubeRack'
 // TODO(Ian, 2019-07-24): consolidate `tubeRackAutofills/aluminumBlockAutofills`-getting logic btw here and makeAutofillOnChange
 export const _getIsAutofilled = (
   name: keyof LabwareFields,
@@ -80,18 +84,43 @@ const _valuesToCreateNameArgs = (values: LabwareFields): any => {
   const gridColumns = Number(values.gridColumns) || 1
   const brand = (values.brand || '').trim()
 
+  let brandDefault: string | undefined
+
   return {
     gridColumns,
     gridRows,
     displayCategory: values.labwareType || '',
     displayVolumeUnits: DISPLAY_VOLUME_UNITS,
-    brandName: brand === '' ? undefined : brand,
+    brandName: brand === '' ? brandDefault : brand,
     totalLiquidVolume: Number(values.wellVolume) || 0,
   }
 }
+const _getTubeRackDisplayName = (values: LabwareFields): string => {
+  const rows = Number(values.gridRows) || 1
+  const columns = Number(values.gridColumns) || 1
+  const volume = Number(values.wellVolume) || 0
+  const wellCount = rows * columns
 
-export const getDefaultLoadName = (values: LabwareFields): string =>
-  createRegularLoadName(_valuesToCreateNameArgs(values))
+  return `${values.brand || 'Generic'} ${wellCount} Tube Rack with ${
+    values.groupBrand || 'Generic'
+  } ${round(volume / 1000, 2)} mL`
+}
+export const getDefaultLoadName = (values: LabwareFields): string => {
+  let args
+  if (getIsOpentronsTubeRack(values)) {
+    args = _valuesToCreateNameArgs({ ...values, brand: DEFAULT_RACK_BRAND })
+  } else {
+    args = _valuesToCreateNameArgs(values)
+  }
+  return createRegularLoadName(args)
+}
 
-export const getDefaultDisplayName = (values: LabwareFields): string =>
-  createDefaultDisplayName(_valuesToCreateNameArgs(values))
+export const getDefaultDisplayName = (values: LabwareFields): string => {
+  if (getIsOpentronsTubeRack(values)) {
+    return _getTubeRackDisplayName({ ...values, brand: DEFAULT_RACK_BRAND })
+  } else if (getIsCustomTubeRack(values)) {
+    return _getTubeRackDisplayName(values)
+  }
+
+  return createDefaultDisplayName(_valuesToCreateNameArgs(values))
+}

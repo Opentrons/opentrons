@@ -27,7 +27,7 @@ context('File Import', () => {
   })
 
   it('contains a button to the testing guide', () => {
-    cy.contains('view test guide')
+    cy.contains('labware test guide')
       .should('have.prop', 'href')
       .and('to.have.string', 'labwareDefinition_testGuide')
   })
@@ -111,7 +111,7 @@ context('File Import', () => {
       .first()
       .trigger('mousedown')
     cy.get('*[class^="Dropdown__option_label"]')
-      .contains('P10 Single GEN1')
+      .contains(/P10.*Single-Channel.*GEN1/)
       .click()
 
     // All fields present

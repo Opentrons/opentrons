@@ -62,7 +62,7 @@ class _Internal:
 
     async def __aenter__(self):
         pref = f"[ThreadedAsyncLock tid {threading.get_ident()} "\
-            f"task {asyncio.Task.current_task()}] "
+            f"task {asyncio.current_task()}] "
         log.debug(pref + 'will acquire')
         then = time.perf_counter()
         while not self._thread_lock.acquire(blocking=False):
@@ -75,7 +75,7 @@ class _Internal:
 
     async def __aexit__(self, exc_type, exc, tb):
         log.debug(f"[ThreadedAsyncLock tid {threading.get_ident()} "
-                  f"task {asyncio.Task.current_task()}] will release")
+                  f"task {asyncio.current_task()}] will release")
         self._thread_lock.release()
 
     def __enter__(self):

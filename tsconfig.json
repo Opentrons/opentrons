@@ -17,7 +17,19 @@
       "path": "./labware-library"
     },
     {
+      "path": "./labware-designer"
+    },
+    {
+      "path": "./step-generation"
+    },
+    {
       "path": "./shared-data"
+    },
+    {
+      "path": "./protocol-designer"
+    },
+    {
+      "path": "./protocol-library-kludge"
     }
   ]
 }

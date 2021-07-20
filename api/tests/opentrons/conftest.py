@@ -146,27 +146,7 @@ async def enable_door_safety_switch():
     await config.advanced_settings.set_adv_setting(
         'enableDoorSafetySwitch', False)
 
-
-@pytest.fixture
-async def use_new_calibration(monkeypatch):
-    await config.advanced_settings.set_adv_setting(
-        'enableTipLengthCalibration', True)
-    yield
-    await config.advanced_settings.set_adv_setting(
-        'enableTipLengthCalibration', False)
 # -----end feature flag fixtures-----------
-
-
-@pytest.fixture(params=[False, True])
-async def toggle_new_calibration(request):
-    if request.param:
-        await config.advanced_settings.set_adv_setting(
-            'enableTipLengthCalibration', True)
-        yield
-        await config.advanced_settings.set_adv_setting(
-            'enableTipLengthCalibration', False)
-    else:
-        yield
 
 
 @pytest.fixture(params=["testosaur_v2.py"])
@@ -499,7 +479,7 @@ def get_bundle_fixture():
 
 
 @pytest.fixture
-def minimal_labware_def():
+def minimal_labware_def() -> dict:
     return {
         "metadata": {
             "displayName": "minimal labware",
@@ -555,10 +535,12 @@ def minimal_labware_def():
 
 
 @pytest.fixture
-def minimal_labware_def2():
+def minimal_labware_def2() -> dict:
     return {
         "metadata": {
-            "displayName": "other test labware"
+            "displayName": "other test labware",
+            "displayCategory": "other",
+            "displayVolumeUnits": "mL",
         },
         "cornerOffsetFromSlot": {
                 "x": 10,
@@ -567,7 +549,9 @@ def minimal_labware_def2():
         },
         "parameters": {
             "isTiprack": False,
-            "loadName": "minimal_labware_def"
+            "loadName": "minimal_labware_def",
+            "isMagneticModuleCompatible": True,
+            "format": "irregular"
         },
         "ordering": [["A1", "B1", "C1"], ["A2", "B2", "C2"]],
         "wells": {
@@ -626,11 +610,18 @@ def minimal_labware_def2():
               "shape": "circular"
             }
         },
+        "groups": [],
         "dimensions": {
             "xDimension": 1.0,
             "yDimension": 2.0,
             "zDimension": 3.0
-        }
+        },
+        "schemaVersion": 2,
+        "version": 1,
+        "namespace": "dummy_namespace",
+        "brand": {
+            "brand": "opentrons"
+        },
     }
 
 

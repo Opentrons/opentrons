@@ -18,9 +18,11 @@ export function getActiveInterfaces(): NetworkInterface[] {
   const ifaces = os.networkInterfaces()
 
   return Object.keys(ifaces).flatMap<NetworkInterface>((name: string) => {
-    return ifaces[name]
-      .filter(iface => !iface.internal)
-      .map((iface): NetworkInterface => ({ ...iface, name }))
+    const addresses = ifaces[name] ?? []
+
+    return addresses
+      .filter(address => !address.internal)
+      .map((address): NetworkInterface => ({ ...address, name }))
   })
 }
 

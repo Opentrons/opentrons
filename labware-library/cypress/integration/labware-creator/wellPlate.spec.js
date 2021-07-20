@@ -28,7 +28,7 @@ context('Well Plates', () => {
     })
 
     it('contains a button to the testing guide', () => {
-      cy.contains('view test guide')
+      cy.contains('labware test guide')
         .should('have.prop', 'href')
         .and('to.have.string', 'labwareDefinition_testGuide')
     })
@@ -55,19 +55,19 @@ context('Well Plates', () => {
     it('tests footprint', () => {
       cy.get("input[name='footprintXDimension']").type('150').blur()
       cy.contains(
-        'Your labware is not compatible with the Labware Creator'
+        'Your labware is too large to fit in a single slot properly. Please fill out this form to request a custom labware definition.'
       ).should('exist')
       cy.get("input[name='footprintXDimension']").clear().type('127').blur()
       cy.contains(
-        'Your labware is not compatible with the Labware Creator'
+        'Your labware is too large to fit in a single slot properly. Please fill out this form to request a custom labware definition.'
       ).should('not.exist')
       cy.get("input[name='footprintYDimension']").type('150').blur()
       cy.contains(
-        'Your labware is not compatible with the Labware Creator'
+        'Your labware is too large to fit in a single slot properly. Please fill out this form to request a custom labware definition.'
       ).should('exist')
       cy.get("input[name='footprintYDimension']").clear().type('85').blur()
       cy.contains(
-        'Your labware is not compatible with the Labware Creator'
+        'Your labware is too large to fit in a single slot properly. Please fill out this form to request a custom labware definition.'
       ).should('not.exist')
     })
 
@@ -88,9 +88,9 @@ context('Well Plates', () => {
     describe('Grid tests', () => {
       it('tests number of rows', () => {
         cy.get("input[name='gridRows']").focus().blur()
-        cy.contains('Number of rows must be a number').should('exist')
+        cy.contains('Number of rows is a required field').should('exist')
         cy.get("input[name='gridRows']").type('8').blur()
-        cy.contains('Number of rows must be a number').should('not.exist')
+        cy.contains('Number of rows is a required field').should('not.exist')
       })
 
       it('tests are all of your rows evenly spaced', () => {
@@ -107,9 +107,9 @@ context('Well Plates', () => {
 
       it('tests number of columns', () => {
         cy.get("input[name='gridColumns']").focus().blur()
-        cy.contains('Number of columns must be a number').should('exist')
+        cy.contains('Number of columns is a required field').should('exist')
         cy.get("input[name='gridColumns']").type('10').blur()
-        cy.contains('Number of columns must be a number').should('not.exist')
+        cy.contains('Number of columns is a required field').should('not.exist')
       })
 
       it('tests are all of your columns evenly spaced', () => {
@@ -130,9 +130,9 @@ context('Well Plates', () => {
 
     it('tests volume', () => {
       cy.get("input[name='wellVolume']").focus().blur()
-      cy.contains('Max volume per well must be a number').should('exist')
+      cy.contains('Volume is a required field').should('exist')
       cy.get("input[name='wellVolume']").type('100').blur()
-      cy.contains('Max volume per well must be a number').should('not.exist')
+      cy.contains('Volume is a required field').should('not.exist')
     })
 
     describe('Well shape tests', () => {
@@ -144,9 +144,9 @@ context('Well Plates', () => {
         cy.get("input[name='wellXDimension']").should('not.exist')
         cy.get("input[name='wellYDimension']").should('not.exist')
         cy.get("input[name='wellDiameter']").focus().blur()
-        cy.contains('Diameter must be a number').should('exist')
+        cy.contains('Diameter is a required field').should('exist')
         cy.get("input[name='wellDiameter']").type('10').blur()
-        cy.contains('Diameter must be a number').should('not.exist')
+        cy.contains('Diameter is a required field').should('not.exist')
       })
 
       it('tests rectangular wells', () => {
@@ -157,13 +157,13 @@ context('Well Plates', () => {
         cy.get("input[name='wellXDimension']").should('exist')
         cy.get("input[name='wellYDimension']").should('exist')
         cy.get("input[name='wellXDimension']").focus().blur()
-        cy.contains('Well X must be a number').should('exist')
+        cy.contains('Well X is a required field').should('exist')
         cy.get("input[name='wellXDimension']").type('8').blur()
-        cy.contains('Well X must be a number').should('not.exist')
+        cy.contains('Well X is a required field').should('not.exist')
         cy.get("input[name='wellYDimension']").focus().blur()
-        cy.contains('Well Y must be a number').should('exist')
+        cy.contains('Well Y is a required field').should('exist')
         cy.get("input[name='wellYDimension']").type('8').blur()
-        cy.contains('Well Y must be a number').should('not.exist')
+        cy.contains('Well Y is a required field').should('not.exist')
       })
 
       it('tests well bottom shape and depth', () => {
@@ -186,31 +186,31 @@ context('Well Plates', () => {
         cy.get("img[src*='_round.']").should('not.exist')
         cy.get("img[src*='_v.']").should('exist')
         cy.get("input[name='wellDepth']").focus().blur()
-        cy.contains('Depth must be a number').should('exist')
+        cy.contains('Depth is a required field').should('exist')
         cy.get("input[name='wellDepth']").type('10').blur()
-        cy.contains('Depth must be a number').should('not.exist')
+        cy.contains('Depth is a required field').should('not.exist')
       })
 
       it('tests well spacing', () => {
         cy.get("input[name='gridSpacingX']").focus().blur()
-        cy.contains('X Spacing (Xs) must be a number').should('exist')
+        cy.contains('X Spacing (Xs) is a required field').should('exist')
         cy.get("input[name='gridSpacingX']").type('12').blur()
-        cy.contains('X Spacing (Xs) must be a number').should('not.exist')
+        cy.contains('X Spacing (Xs) is a required field').should('not.exist')
         cy.get("input[name='gridSpacingY']").focus().blur()
-        cy.contains('Y Spacing (Ys) must be a number').should('exist')
+        cy.contains('Y Spacing (Ys) is a required field').should('exist')
         cy.get("input[name='gridSpacingY']").type('10').blur()
-        cy.contains('Y Spacing (Ys) must be a number').should('not.exist')
+        cy.contains('Y Spacing (Ys) is a required field').should('not.exist')
       })
 
       it('tests grid offset', () => {
         cy.get("input[name='gridOffsetX']").focus().blur()
-        cy.contains('X Offset (Xo) must be a number').should('exist')
+        cy.contains('X Offset (Xo) is a required field').should('exist')
         cy.get("input[name='gridOffsetX']").type('10').blur()
-        cy.contains('X Offset (Xo) must be a number').should('not.exist')
+        cy.contains('X Offset (Xo) is a required field').should('not.exist')
         cy.get("input[name='gridOffsetY']").focus().blur()
-        cy.contains('Y Offset (Yo) must be a number').should('exist')
+        cy.contains('Y Offset (Yo) is a required field').should('exist')
         cy.get("input[name='gridOffsetY']").type('8').blur()
-        cy.contains('Y Offset (Yo) must be a number').should('not.exist')
+        cy.contains('Y Offset (Yo) is a required field').should('not.exist')
       })
 
       it('should have a preview image and no footprint errors', () => {
@@ -253,7 +253,7 @@ context('Well Plates', () => {
           .first()
           .trigger('mousedown')
         cy.get('*[class^="Dropdown__option_label"]')
-          .contains('P10 Single GEN1')
+          .contains(/P10.*Single-Channel.*GEN1/)
           .click()
         cy.contains('Test Pipette is required').should('not.exist')
 

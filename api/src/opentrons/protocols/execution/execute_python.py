@@ -69,4 +69,4 @@ def run_python(
         except KeyError:
             # No pretty names, just raise it
             raise e
-        raise ExceptionInProtocolError(e, tb, str(e), frame.lineno)
+        raise ExceptionInProtocolError(e, tb, str(e), frame.lineno) from e

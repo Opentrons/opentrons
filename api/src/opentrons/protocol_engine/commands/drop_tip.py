@@ -1,17 +1,19 @@
 """Drop tip command request, result, and implementation models."""
 from __future__ import annotations
 from pydantic import BaseModel
+from typing import Optional, Type
+from typing_extensions import Literal
 
-from .command import CommandImplementation, CommandHandlers
-from .pipetting_common import BasePipettingRequest
+from .pipetting_common import BasePipettingData
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandRequest
+
+DropTipCommandType = Literal["dropTip"]
 
 
-class DropTipRequest(BasePipettingRequest):
-    """A request to drop a tip in a specific well."""
+class DropTipData(BasePipettingData):
+    """Data required to drop a tip in a specific well."""
 
-    def get_implementation(self) -> DropTipImplementation:
-        """Get the drop tip request's command implementation."""
-        return DropTipImplementation(self)
+    pass
 
 
 class DropTipResult(BaseModel):
@@ -20,17 +22,34 @@ class DropTipResult(BaseModel):
     pass
 
 
-class DropTipImplementation(
-    CommandImplementation[DropTipRequest, DropTipResult]
-):
+class DropTipImplementation(AbstractCommandImpl[DropTipData, DropTipResult]):
     """Drop tip command implementation."""
 
-    async def execute(self, handlers: CommandHandlers) -> DropTipResult:
+    async def execute(self, data: DropTipData) -> DropTipResult:
         """Move to and drop a tip using the requested pipette."""
-        await handlers.pipetting.drop_tip(
-            pipette_id=self._request.pipetteId,
-            labware_id=self._request.labwareId,
-            well_name=self._request.wellName,
+        await self._pipetting.drop_tip(
+            pipette_id=data.pipetteId,
+            labware_id=data.labwareId,
+            well_name=data.wellName,
         )
 
         return DropTipResult()
+
+
+class DropTip(BaseCommand[DropTipData, DropTipResult]):
+    """Drop tip command model."""
+
+    commandType: DropTipCommandType = "dropTip"
+    data: DropTipData
+    result: Optional[DropTipResult]
+
+    _ImplementationCls: Type[DropTipImplementation] = DropTipImplementation
+
+
+class DropTipRequest(BaseCommandRequest[DropTipData]):
+    """Drop tip command creation request model."""
+
+    commandType: DropTipCommandType = "dropTip"
+    data: DropTipData
+
+    _CommandCls: Type[DropTip] = DropTip

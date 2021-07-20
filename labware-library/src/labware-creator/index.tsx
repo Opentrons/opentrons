@@ -1,21 +1,20 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
 import assert from 'assert'
 import Ajv from 'ajv'
-import cx from 'classnames'
 import * as React from 'react'
 import { Formik } from 'formik'
 import { saveAs } from 'file-saver'
 import JSZip from 'jszip'
 import { reportEvent } from '../analytics'
 import { reportErrors } from './analyticsUtils'
-import { AlertModal, PrimaryButton } from '@opentrons/components'
+import { AlertModal } from '@opentrons/components'
 import labwareSchema from '@opentrons/shared-data/labware/schemas/2.json'
-import { maskLoadName } from './fieldMasks'
 import {
   aluminumBlockAutofills,
   aluminumBlockChildTypeOptions,
   aluminumBlockTypeOptions,
+  FormStatus,
   getDefaultFormState,
+  getInitialStatus,
   tubeRackAutofills,
   tubeRackInsertOptions,
 } from './fields'
@@ -26,34 +25,32 @@ import {
   formLevelValidation,
   LabwareCreatorErrors,
 } from './formLevelValidation'
-import { getDefaultDisplayName, getDefaultLoadName } from './formSelectors'
-import { labwareTestProtocol, pipetteNameOptions } from './labwareTestProtocol'
+import { labwareTestProtocol } from './testProtocols/labwareTestProtocol'
+import { tipRackTestProtocol } from './testProtocols/tipRackTestProtocol'
 import { fieldsToLabware } from './fieldsToLabware'
 import { LabwareCreator as LabwareCreatorComponent } from './components/LabwareCreator'
-import { ConditionalLabwareRender } from './components/ConditionalLabwareRender'
 import { Dropdown } from './components/Dropdown'
-import { FormLevelErrorAlerts } from './components/FormLevelErrorAlerts'
 import { IntroCopy } from './components/IntroCopy'
-import { LinkOut } from './components/LinkOut'
-
-import { Section } from './components/Section'
-import { TextField } from './components/TextField'
 
 import { ImportErrorModal } from './components/ImportErrorModal'
 import { CreateNewDefinition } from './components/sections/CreateNewDefinition'
 import { UploadExisting } from './components/sections/UploadExisting'
 
 import { CustomTiprackWarning } from './components/sections/CustomTiprackWarning'
-import { HandPlacedTipFit } from './components/sections/HandPlacedTipFit'
-import { Regularity } from './components/sections/Regularity'
+import { Description } from './components/sections/Description'
+import { Export } from './components/sections/Export'
+import { File } from './components/sections/File'
 import { Footprint } from './components/sections/Footprint'
-import { Height } from './components/sections/Height'
 import { Grid } from './components/sections/Grid'
-import { Volume } from './components/sections/Volume'
-import { WellShapeAndSides } from './components/sections/WellShapeAndSides'
-import { WellBottomAndDepth } from './components/sections/WellBottomAndDepth'
-import { WellSpacing } from './components/sections/WellSpacing'
 import { GridOffset } from './components/sections/GridOffset'
+import { HandPlacedTipFit } from './components/sections/HandPlacedTipFit'
+import { Height } from './components/sections/Height'
+import { Preview } from './components/sections/Preview'
+import { Regularity } from './components/sections/Regularity'
+import { Volume } from './components/sections/Volume'
+import { WellBottomAndDepth } from './components/sections/WellBottomAndDepth'
+import { WellShapeAndSides } from './components/sections/WellShapeAndSides'
+import { WellSpacing } from './components/sections/WellSpacing'
 
 import styles from './styles.css'
 
@@ -63,12 +60,11 @@ import type {
   LabwareFields,
   ProcessedLabwareFields,
 } from './fields'
+import { getDefaultedDef } from './getDefaultedDef'
+import { getIsXYGeometryChanged } from './utils/getIsXYGeometryChanged'
 
 const ajv = new Ajv()
 const validateLabwareSchema = ajv.compile(labwareSchema)
-
-const PDF_URL =
-  'https://opentrons-publications.s3.us-east-2.amazonaws.com/labwareDefinition_testGuide.pdf'
 
 export const LabwareCreator = (): JSX.Element => {
   const [
@@ -236,7 +232,8 @@ export const LabwareCreator = (): JSX.Element => {
           setLastUploaded(fields, parsedLabwareDef)
           if (
             fields.labwareType === 'wellPlate' ||
-            fields.labwareType === 'reservoir'
+            fields.labwareType === 'reservoir' ||
+            fields.labwareType === 'tipRack'
           ) {
             // no additional required labware type child fields, we can scroll right away
             scrollToForm()
@@ -288,6 +285,7 @@ export const LabwareCreator = (): JSX.Element => {
         enableReinitialize
         validationSchema={labwareFormSchema}
         validate={formLevelValidation}
+        initialStatus={getInitialStatus}
         onSubmit={(values: LabwareFields) => {
           const castValues: ProcessedLabwareFields = labwareFormSchema.cast(
             values
@@ -297,12 +295,15 @@ export const LabwareCreator = (): JSX.Element => {
           const { displayName } = def.metadata
           const { loadName } = def.parameters
 
+          const testProtocol =
+            values.labwareType === 'tipRack'
+              ? tipRackTestProtocol({ pipetteName, definition: def })
+              : labwareTestProtocol({ pipetteName, definition: def })
+
           const zip = new JSZip()
           zip.file(`${loadName}.json`, JSON.stringify(def, null, 4))
-          zip.file(
-            `test_${loadName}.py`,
-            labwareTestProtocol({ pipetteName, definition: def })
-          )
+
+          zip.file(`test_${loadName}.py`, testProtocol)
 
           // TODO(IL, 2021-03-31): add `catch`
           // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -326,14 +327,41 @@ export const LabwareCreator = (): JSX.Element => {
       >
         {bag => {
           const {
-            handleSubmit,
             values,
-            isValid,
             touched,
             setTouched,
             setValues,
+            isValid,
+            handleSubmit,
           } = bag
+          const status: FormStatus = bag.status
+          const setStatus: (status: FormStatus) => void = bag.setStatus
           const errors: LabwareCreatorErrors = bag.errors
+
+          if (
+            (status.prevValues !== values && status.prevValues == null) ||
+            getIsXYGeometryChanged(status.prevValues, values)
+          ) {
+            // since geometry has changed, clear the pipette field (to avoid multi-channel selection
+            // for labware not that is not multi-channel compatible)
+            setValues({
+              ...values,
+              pipetteName: getDefaultFormState().pipetteName,
+            })
+
+            // update defaultedDef with new values
+            setStatus({
+              defaultedDef: getDefaultedDef(values),
+              prevValues: values,
+            })
+          }
+
+          const onExportClick = (): void => {
+            if (!isValid && !showExportErrorModal) {
+              setShowExportErrorModal(true, values)
+            }
+            handleSubmit()
+          }
 
           // @ts-expect-error(IL, 2021-03-24): values/errors/touched not typed for reportErrors to be happy
           reportErrors({ values, errors, touched })
@@ -414,125 +442,21 @@ export const LabwareCreator = (): JSX.Element => {
               <div ref={scrollRef} />
               {showCreatorForm && (
                 <>
-                  {/* PAGE 1 - Labware */}
                   <CustomTiprackWarning />
                   <HandPlacedTipFit />
                   <Regularity />
                   <Footprint />
                   <Height />
                   <Grid />
-                  {/* PAGE 2 */}
                   <Volume />
                   <WellShapeAndSides />
                   <WellBottomAndDepth />
                   <WellSpacing />
                   <GridOffset />
-                  <Section label="Check your work">
-                    <FormLevelErrorAlerts errors={errors} />
-                    <div className={styles.preview_labware}>
-                      <ConditionalLabwareRender values={values} />
-                      <p className={styles.preview_instructions}>
-                        Check that the size, spacing, and shape of your wells
-                        looks correct.
-                      </p>
-                    </div>
-                  </Section>
-
-                  {/* PAGE 3 */}
-                  <Section label="Description" fieldList={['brand', 'brandId']}>
-                    <div className={styles.flex_row}>
-                      <div className={styles.brand_column}>
-                        <TextField name="brand" />
-                      </div>
-                      <div className={styles.brand_id_column}>
-                        <TextField
-                          name="brandId"
-                          caption="Separate multiple by comma"
-                        />
-                      </div>
-                    </div>
-                  </Section>
-                  {/* PAGE 4 */}
-
-                  <Section label="File" fieldList={['loadName', 'displayName']}>
-                    <div className={styles.flex_row}>
-                      <div className={styles.export_form_fields}>
-                        <TextField
-                          name="displayName"
-                          placeholder={getDefaultDisplayName(values)}
-                        />
-                        <TextField
-                          name="loadName"
-                          placeholder={getDefaultLoadName(values)}
-                          caption="Only lower case letters, numbers, periods, and underscores may be used"
-                          inputMasks={[maskLoadName]}
-                        />
-                      </div>
-                    </div>
-                  </Section>
-                  <Section
-                    label="Labware Test Protocol"
-                    fieldList={['pipetteName']}
-                  >
-                    <div className={cx(styles.flex_row, styles.flex_row_start)}>
-                      <div className={styles.instructions_column}>
-                        <p>
-                          Your file will be exported with a protocol that will
-                          help you test and troubleshoot your labware definition
-                          on the robot. The protocol requires a Single Channel
-                          pipette on the right mount of your robot.
-                        </p>
-                      </div>
-                      <div className={styles.pipette_field_wrapper}>
-                        <Dropdown
-                          name="pipetteName"
-                          options={pipetteNameOptions}
-                        />
-                      </div>
-                    </div>
-                    <div className={styles.export_section}>
-                      <div
-                        className={cx(styles.callout, styles.export_callout)}
-                      >
-                        <h4 className={styles.test_labware_heading}>
-                          Please test your definition file!
-                        </h4>
-
-                        <p>
-                          Use the labware test protocol contained in the
-                          downloaded file to check the accuracy of your
-                          definition. It’s important to create definitions that
-                          are precise and do not rely on excessive calibration
-                          prior to each run to achieve accuracy.
-                        </p>
-                        <p>
-                          Use the test guide to troubleshoot your definition.
-                        </p>
-                        <LinkOut
-                          onClick={() =>
-                            reportEvent({
-                              name: 'labwareCreatorClickTestLabware',
-                            })
-                          }
-                          href={PDF_URL}
-                          className={styles.test_guide_button}
-                        >
-                          view test guide
-                        </LinkOut>
-                      </div>
-                      <PrimaryButton
-                        className={styles.export_button}
-                        onClick={() => {
-                          if (!isValid && !showExportErrorModal) {
-                            setShowExportErrorModal(true, values)
-                          }
-                          handleSubmit()
-                        }}
-                      >
-                        EXPORT FILE
-                      </PrimaryButton>
-                    </div>
-                  </Section>
+                  <Preview />
+                  <Description />
+                  <File />
+                  <Export onExportClick={onExportClick} />
                 </>
               )}
             </div>

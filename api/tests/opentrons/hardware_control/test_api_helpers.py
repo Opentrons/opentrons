@@ -4,7 +4,7 @@ from opentrons.hardware_control.util import DeckTransformState
 from opentrons.hardware_control.robot_calibration import RobotCalibration
 
 
-async def test_validating_attitude(hardware, use_new_calibration):
+async def test_validating_attitude(hardware):
 
     inrange_matrix = [[1, 0, 1], [0, 1, 2], [0, 0, 1]]
     deck_cal = DeckCalibration(

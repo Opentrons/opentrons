@@ -14,6 +14,7 @@ export const LinkOut = (props: Props): JSX.Element => (
     href={props.href}
     target="_blank"
     rel="noopener noreferrer"
+    role="button"
   >
     {props.children}
   </a>
