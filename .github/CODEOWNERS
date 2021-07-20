@@ -5,7 +5,7 @@
 # notify those language communities
 *.js @Opentrons/js
 *.py @Opentrons/py
-/flow-typed @Opentrons/js
+*.d.ts @Opentrons/js
 /webpack-config @Opentrons/js
 
 # subprojects - those with clear team ownership should have appropriate notifications

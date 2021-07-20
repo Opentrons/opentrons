@@ -38,12 +38,7 @@ module.exports = {
     '!**/test/**',
     '!**/scripts/**',
   ],
-  testPathIgnorePatterns: [
-    'cypress/',
-    '/node_modules/',
-    '.*.d.ts',
-    '.*.flow.js',
-  ],
+  testPathIgnorePatterns: ['cypress/', '/node_modules/', '.*.d.ts'],
   coverageReporters: ['lcov', 'text-summary'],
   snapshotSerializers: ['enzyme-to-json/serializer'],
   watchPathIgnorePatterns: ['/node_modules/'],

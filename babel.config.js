@@ -37,14 +37,13 @@ module.exports = {
     ],
   ],
   presets: [
-    '@babel/preset-flow',
     '@babel/preset-react',
     ['@babel/preset-env', { modules: false, useBuiltIns: false }],
   ],
   overrides: [
     {
       test: ['**/*.ts', '**/*.tsx'],
-      presets: [['@babel/preset-flow', false], '@babel/preset-typescript'],
+      presets: ['@babel/preset-typescript'],
     },
     {
       test: 'app-shell/**/*',
