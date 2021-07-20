@@ -75,7 +75,7 @@ def _write_to_device_and_return(cmd, ack, device_connection, tag=None):
                 device_connection.timeout))
     clean_response = _parse_serial_response(response, encoded_ack)
     if clean_response:
-        return clean_response.decode()
+        return clean_response.decode(errors = 'ignore')
     return ''
 
 
