@@ -33,7 +33,7 @@ async def _flush_tasks() -> None:
 
 
 async def test_wait_for_idle_with_start(subject: QueueWorker) -> None:
-    """It should become idle when started."""
+    """It should become idle when started without commands in the queue."""
     idle_task = asyncio.create_task(subject.wait_for_idle())
     await _flush_tasks()
 
