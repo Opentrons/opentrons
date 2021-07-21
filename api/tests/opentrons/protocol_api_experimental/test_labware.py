@@ -200,9 +200,13 @@ def test_labware_has_wells_by_name(
         subject: Labware,
 ) -> None:
     """It should return Dict of Well objects by name and cache it."""
-    call1_value = subject.wells_by_name()
-    assert list(call1_value.keys()) == ['A1', 'A2']
-    assert isinstance(call1_value['A1'], Well)
+    assert subject.wells_by_name() == {'A1': Well(well_name='A1',
+                                                  engine_client=engine_client,
+                                                  labware=subject),
+                                       'A2': Well(well_name='A2',
+                                                  engine_client=engine_client,
+                                                  labware=subject)
+                                       }
 
 
 def test_labware_has_wells_list(
@@ -212,9 +216,13 @@ def test_labware_has_wells_list(
         subject: Labware,
 ) -> None:
     """It should return List of Well objects."""
-    assert len(subject.wells()) == 2
-    assert subject.wells()[0].well_name == "A1"
-    assert isinstance(subject.wells()[0], Well)
+    assert subject.wells() == [Well(well_name='A1',
+                                    engine_client=engine_client,
+                                    labware=subject),
+                               Well(well_name='A2',
+                                    engine_client=engine_client,
+                                    labware=subject)
+                               ]
 
 
 def test_labware_rows(
@@ -223,9 +231,12 @@ def test_labware_rows(
         subject: Labware,
 ) -> None:
     """It should return the labware's wells as rows."""
-    assert len(subject.rows()) == 1
-    assert len(subject.rows()[0]) == 2
-    assert subject.rows()[0][0].well_name == 'A1'
+    assert subject.rows() == [[Well(well_name='A1',
+                                    engine_client=engine_client,
+                                    labware=subject),
+                               Well(well_name='A2',
+                                    engine_client=engine_client,
+                                    labware=subject)]]
 
 
 def test_labware_rows_by_name(
@@ -234,9 +245,12 @@ def test_labware_rows_by_name(
         subject: Labware,
 ) -> None:
     """It should return the labware's wells as rows."""
-    assert list(subject.rows_by_name().keys()) == ["A"]
-    assert len(subject.rows_by_name()["A"]) == 2
-    assert subject.rows_by_name()["A"][0].well_name == 'A1'
+    assert subject.rows_by_name() == {"A": [Well(well_name='A1',
+                                                 engine_client=engine_client,
+                                                 labware=subject),
+                                            Well(well_name='A2',
+                                                 engine_client=engine_client,
+                                                 labware=subject)]}
 
 
 def test_labware_columns_by_name(
@@ -245,10 +259,12 @@ def test_labware_columns_by_name(
         subject: Labware,
 ) -> None:
     """It should return the labware's wells as columns."""
-    assert list(subject.columns_by_name().keys()) == ["1", "2"]
-    assert len(subject.columns_by_name()["1"]) == \
-           len(subject.columns_by_name()["2"]) == 1
-    assert subject.columns_by_name()["1"][0].well_name == 'A1'
+    assert subject.columns_by_name() == {"1": [Well(well_name='A1',
+                                                    engine_client=engine_client,
+                                                    labware=subject)],
+                                         "2": [Well(well_name='A2',
+                                                    engine_client=engine_client,
+                                                    labware=subject)]}
 
 
 def test_labware_columns(
@@ -257,6 +273,9 @@ def test_labware_columns(
         subject: Labware,
 ) -> None:
     """It should return the labware's wells as columns."""
-    assert len(subject.columns()) == 2
-    assert len(subject.columns()[0]) == 1
-    assert subject.columns()[0][0].well_name == 'A1'
+    assert subject.columns() == [[Well(well_name='A1',
+                                       engine_client=engine_client,
+                                       labware=subject)],
+                                 [Well(well_name='A2',
+                                       engine_client=engine_client,
+                                       labware=subject)]]
