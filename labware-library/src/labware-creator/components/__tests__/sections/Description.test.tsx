@@ -86,7 +86,10 @@ describe('Description', () => {
 
   it('should not render when all of the fields are hidden', () => {
     when(isEveryFieldHiddenMock)
-      .calledWith(['brand', 'brandId'], formikConfig.initialValues)
+      .calledWith(
+        ['brand', 'brandId', 'groupBrand', 'groupBrandId'],
+        formikConfig.initialValues
+      )
       .mockReturnValue(true)
 
     const { container } = render(wrapInFormik(<Description />, formikConfig))
