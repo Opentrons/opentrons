@@ -1,7 +1,8 @@
 import * as React from 'react'
 import { useFormikContext } from 'formik'
 import { LabwareFields } from '../../fields'
-import { getIsOpentronsTubeRack, isEveryFieldHidden } from '../../utils'
+import { isEveryFieldHidden } from '../../utils'
+import { getIsOpentronsTubeRack } from '../../utils/getIsOpentronsTubeRack'
 import { FormAlerts } from '../alerts/FormAlerts'
 import { TextField } from '../TextField'
 import { SectionBody } from './SectionBody'
@@ -46,7 +47,12 @@ const Content = (props: Props): JSX.Element => {
 }
 
 export const Description = (): JSX.Element | null => {
-  const fieldList: Array<keyof LabwareFields> = ['brand', 'brandId']
+  const fieldList: Array<keyof LabwareFields> = [
+    'brand',
+    'brandId',
+    'groupBrand',
+    'groupBrandId',
+  ]
   const { values, errors, touched } = useFormikContext<LabwareFields>()
 
   if (isEveryFieldHidden(fieldList, values)) {
