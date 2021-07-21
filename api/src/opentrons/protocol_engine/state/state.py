@@ -3,7 +3,8 @@ from __future__ import annotations
 
 import asyncio
 from dataclasses import dataclass
-from typing import Any, Callable, List, Set, Sequence
+from functools import partial
+from typing import Any, Callable, List, Sequence
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV2
 
@@ -93,7 +94,7 @@ class StateStore(StateView):
             self._labware_store,
         ]
 
-        self._wait_checkers: Set[Callable[[], None]] = set()
+        self._state_update_event = asyncio.Event()
         self._initialize_state()
 
     def get_state(self) -> State:
@@ -114,29 +115,27 @@ class StateStore(StateView):
         **kwargs: Any,
     ) -> None:
         """Wait for a condition to become true, checking whenever state changes."""
-        result = asyncio.get_running_loop().create_future()
+        predicate = partial(condition, *args, **kwargs)
+        is_done = predicate()
 
-        def _check() -> None:
-            try:
-                is_done = condition(*args, **kwargs)
-                if is_done:
-                    self._wait_checkers.remove(_check)
-                    result.set_result(None)
-            except Exception as e:
-                self._wait_checkers.remove(_check)
-                result.set_exception(e)
+        while not is_done:
+            self._state_update_event.clear()
+            await self._state_update_event.wait()
+            is_done = predicate()
 
-        self._wait_checkers.add(_check)
-        _check()
-        await result
+        return is_done
 
-    def _initialize_state(self) -> None:
-        """Initialize state data and view."""
-        state = State(
+    def _get_next_state(self) -> State:
+        """Get a new instance of the state value object."""
+        return State(
             commands=self._command_store.state,
             labware=self._labware_store.state,
             pipettes=self._pipette_store.state,
         )
+
+    def _initialize_state(self) -> None:
+        """Initialize state data and view."""
+        state = self._get_next_state()
 
         # Base states
         self._state = state
@@ -154,17 +153,12 @@ class StateStore(StateView):
 
     def _update_state_views(self) -> None:
         """Update state view interfaces to use latest underlying values."""
-        state = State(
-            commands=self._command_store.state,
-            labware=self._labware_store.state,
-            pipettes=self._pipette_store.state,
-        )
+        state = state = self._get_next_state()
 
         self._state = state
         self._commands._state = state.commands
         self._labware._state = state.labware
         self._pipettes._state = state.pipettes
 
-        # check for any wait conditions
-        for check_done in list(self._wait_checkers):
-            check_done()
+        # notify that state has been updated for watchers
+        self._state_update_event.set()

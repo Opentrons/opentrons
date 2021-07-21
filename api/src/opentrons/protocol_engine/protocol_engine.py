@@ -68,7 +68,7 @@ class ProtocolEngine:
         command = self.add_command(request)
 
         await self._state_store.wait_for(
-            condition=self._state_store.commands.is_complete,
+            condition=self._state_store.commands.get_is_complete,
             command_id=command.id,
         )
 
@@ -92,5 +92,5 @@ class ProtocolEngine:
         happen during command execution that are not properly caught by
         the CommandExecutor, this is where they will be raised.
         """
-        await self._state_store.wait_for(self._state_store.commands.is_complete)
+        await self._state_store.wait_for(self._state_store.commands.get_is_complete)
         await self._queue_worker.wait_for_idle()

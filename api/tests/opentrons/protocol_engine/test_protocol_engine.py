@@ -133,7 +133,7 @@ async def test_wait_for_done(
     await subject.wait_for_done()
 
     decoy.verify(
-        await state_store.wait_for(state_store.commands.is_complete),
+        await state_store.wait_for(state_store.commands.get_is_complete),
         await queue_worker.wait_for_idle(),
     )
 
@@ -197,7 +197,7 @@ async def test_execute_command(
         state_store.handle_command(queued_command),
         queue_worker.refresh(),
         await state_store.wait_for(
-            condition=state_store.commands.is_complete,
+            condition=state_store.commands.get_is_complete,
             command_id="command-id",
         ),
     )

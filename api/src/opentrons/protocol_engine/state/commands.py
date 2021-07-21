@@ -92,8 +92,8 @@ class CommandView(HasState[CommandState]):
 
         return [c.id for c in commands if c.status == CommandStatus.QUEUED]
 
-    def is_complete(self, command_id: Optional[str] = None) -> bool:
-        """Get whether a given command is completed.
+    def get_is_complete(self, command_id: Optional[str] = None) -> bool:
+        """Get whether a given command is (or all commands are) completed.
 
         Arguments:
             command_id: Command to check. If omitted or `None`, will return True

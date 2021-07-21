@@ -62,11 +62,15 @@ class QueueWorker:
 
         This method should be called when you are done executing commands.
         """
-        if self._worker_task:
+        worker_task = self._worker_task
+
+        if worker_task:
             await self._command_queue.join()
-            self._worker_task.cancel()
-            await asyncio.gather(self._worker_task, return_exceptions=True)
+            worker_task.cancel()
+
+            self._command_queue = asyncio.Queue()
             self._worker_task = None
+            await asyncio.gather(worker_task, return_exceptions=True)
 
     def _queue_next_command(self) -> None:
         if self._keep_running:

@@ -130,9 +130,9 @@ def test_get_is_complete() -> None:
         ]
     )
 
-    assert subject.is_complete("command-id-1") is True
-    assert subject.is_complete("command-id-2") is False
-    assert subject.is_complete("command-id-3") is False
+    assert subject.get_is_complete("command-id-1") is True
+    assert subject.get_is_complete("command-id-2") is False
+    assert subject.get_is_complete("command-id-3") is False
 
 
 def test_get_is_complete_with_failed_command() -> None:
@@ -147,5 +147,40 @@ def test_get_is_complete_with_failed_command() -> None:
         ]
     )
 
-    assert subject.is_complete("command-id-1") is True
-    assert subject.is_complete("command-id-2") is True
+    assert subject.get_is_complete("command-id-1") is True
+    assert subject.get_is_complete("command-id-2") is True
+
+
+def test_getis_complete_with_all_commands() -> None:
+    """It should return true if a given command will never be executed."""
+    completed_command = create_completed_command(command_id="command-id-1")
+    running_command = create_running_command(command_id="command-id-2")
+    pending_command = create_pending_command(command_id="command-id-3")
+    failed_command = create_failed_command(command_id="command-id-4")
+
+    subject = get_command_view(
+        commands_by_id=[
+            ("command-id-4", failed_command),
+            ("command-id-2", pending_command),
+        ]
+    )
+
+    assert subject.get_is_complete() is True
+
+    subject = get_command_view(
+        commands_by_id=[
+            ("command-id-1", completed_command),
+            ("command-id-2", running_command),
+        ]
+    )
+
+    assert subject.get_is_complete() is False
+
+    subject = get_command_view(
+        commands_by_id=[
+            ("command-id-1", completed_command),
+            ("command-id-2", completed_command),
+        ]
+    )
+
+    assert subject.get_is_complete() is True
