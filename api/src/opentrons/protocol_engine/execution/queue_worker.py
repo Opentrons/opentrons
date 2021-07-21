@@ -11,20 +11,18 @@
 # ProtocolEngine core, as well, to use those same state mechanisms and move statefulness
 # out of this QueueWorker.
 import asyncio
+from logging import getLogger
 from typing import Optional
 
 from ..state import StateStore
 from .command_executor import CommandExecutor
 
 
+log = getLogger(__name__)
+
+
 class QueueWorker:
     """Handle and track execution of commands queued in ProtocolEngine state."""
-
-    _state_store: StateStore
-    _command_executor: CommandExecutor
-    _current_task: Optional[asyncio.Task]
-    _ok_to_run: asyncio.Event
-    _done_signal: asyncio.Future
 
     def __init__(
         self,
@@ -32,59 +30,64 @@ class QueueWorker:
         command_executor: CommandExecutor,
     ) -> None:
         """Initialize the queue worker's dependencies and state."""
-        self._state_store = state_store
-        self._command_executor = command_executor
-        self._current_task = None
-        self._ok_to_run = asyncio.Event()
-        self._done_signal = asyncio.get_running_loop().create_future()
+        self._state_store: StateStore = state_store
+        self._command_executor: CommandExecutor = command_executor
+        self._command_queue: "asyncio.Queue[str]" = asyncio.Queue()
+        self._worker_task: Optional[asyncio.Task] = None
+        self._keep_running: bool = False
 
     def start(self) -> None:
         """Start executing commands in the queue."""
-        self._ok_to_run.set()
-
-        if self._current_task is None:
-            if self._done_signal.done():
-                self._done_signal = asyncio.get_running_loop().create_future()
-
-            self._schedule_next_command()
+        self._keep_running = True
+        self.refresh()
 
     def stop(self) -> None:
         """Stop executing commands in the queue."""
-        self._ok_to_run.clear()
+        self._keep_running = False
 
-    async def wait_for_running(self) -> None:
-        """Wait for the queue worker to be ready to execute new commands."""
-        await self._ok_to_run.wait()
+    def refresh(self) -> None:
+        """Refresh the worker's jobs.
 
-    async def wait_for_done(self) -> None:
-        """Wait for the queue worker to be done.
-
-        The worker is "done" when there is no command currently executing and
-        no future commands will be executed.
-
-        This method should not raise, but if any unexepected exceptions
-        happen during command execution that are not properly caught by
-        the CommandExecutor, they will be raised here.
+        You should call this method when commands are added to the queue
+        so the worker can restart if the queue was previously empty.
         """
-        await self._done_signal
+        if self._worker_task is None:
+            self._worker_task = asyncio.create_task(self._run_commands())
 
-    def _schedule_next_command(self, prev_task: Optional[asyncio.Task] = None) -> None:
-        prev_exc = prev_task.exception() if prev_task is not None else None
+        if self._command_queue.empty():
+            self._queue_next_command()
 
-        self._current_task = None
+    async def wait_for_idle(self) -> None:
+        """Wait for the queue worker finish all tasks and clean up.
 
-        if not self._done_signal.done():
-            if prev_exc:
-                self._done_signal.set_exception(prev_exc)
-            elif self._ok_to_run.is_set():
-                next_command_id = self._state_store.commands.get_next_queued()
+        This method should be called when you are done executing commands.
+        """
+        if self._worker_task:
+            await self._command_queue.join()
+            self._worker_task.cancel()
+            await asyncio.gather(self._worker_task, return_exceptions=True)
+            self._worker_task = None
 
-                if next_command_id:
-                    self._run_command(next_command_id)
-                else:
-                    self._done_signal.set_result(None)
+    def _queue_next_command(self) -> None:
+        if self._keep_running:
+            next_command_id = self._state_store.commands.get_next_queued()
 
-    def _run_command(self, command_id: str) -> None:
-        exec_coro = self._command_executor.execute(command_id=command_id)
-        self._current_task = asyncio.create_task(exec_coro)
-        self._current_task.add_done_callback(self._schedule_next_command)
+            if next_command_id:
+                self._command_queue.put_nowait(next_command_id)
+
+    async def _run_commands(self) -> None:
+        while True:
+            command_id = None
+
+            try:
+                command_id = await self._command_queue.get()
+                await self._command_executor.execute(command_id=command_id)
+                self._queue_next_command()
+            except asyncio.CancelledError:
+                return
+            except Exception as e:
+                log.error("Unexpected exception while running command", exc_info=e)
+                return
+            finally:
+                if command_id is not None:
+                    self._command_queue.task_done()

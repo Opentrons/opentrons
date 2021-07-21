@@ -65,6 +65,7 @@ def test_add_command(
     state_store: StateStore,
     command_mapper: CommandMapper,
     resources: ResourceProviders,
+    queue_worker: QueueWorker,
     subject: ProtocolEngine,
 ) -> None:
     """It should add a command to the state from a request."""
@@ -97,7 +98,7 @@ def test_add_command(
     result = subject.add_command(request)
 
     assert result == queued_command
-    decoy.verify(state_store.handle_command(queued_command))
+    decoy.verify(state_store.handle_command(queued_command), queue_worker.refresh())
 
 
 def test_start(
@@ -124,13 +125,17 @@ def test_stop(
 
 async def test_wait_for_done(
     decoy: Decoy,
+    state_store: StateStore,
     queue_worker: QueueWorker,
     subject: ProtocolEngine,
 ) -> None:
     """It should be able to wait until the engine is done executing."""
     await subject.wait_for_done()
 
-    decoy.verify(await queue_worker.wait_for_done())
+    decoy.verify(
+        await state_store.wait_for(state_store.commands.is_complete),
+        await queue_worker.wait_for_idle(),
+    )
 
 
 async def test_execute_command(
@@ -190,8 +195,7 @@ async def test_execute_command(
 
     decoy.verify(
         state_store.handle_command(queued_command),
-        await queue_worker.wait_for_running(),
-        queue_worker.start(),
+        queue_worker.refresh(),
         await state_store.wait_for(
             condition=state_store.commands.is_complete,
             command_id="command-id",

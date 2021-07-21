@@ -55,6 +55,8 @@ class ProtocolEngine:
             created_at=self._resources.model_utils.get_timestamp(),
         )
         self._state_store.handle_command(command)
+        self._queue_worker.refresh()
+
         return command
 
     async def execute_command(self, request: CommandRequest) -> Command:
@@ -64,16 +66,13 @@ class ProtocolEngine:
         start executing.
         """
         command = self.add_command(request)
-        command_id = command.id
 
-        await self._queue_worker.wait_for_running()
-        self._queue_worker.start()
         await self._state_store.wait_for(
             condition=self._state_store.commands.is_complete,
-            command_id=command_id,
+            command_id=command.id,
         )
 
-        return self._state_store.commands.get(command_id=command_id)
+        return self._state_store.commands.get(command_id=command.id)
 
     def start(self) -> None:
         """Start or resume executing commands in the queue."""
@@ -93,4 +92,5 @@ class ProtocolEngine:
         happen during command execution that are not properly caught by
         the CommandExecutor, this is where they will be raised.
         """
-        await self._queue_worker.wait_for_done()
+        await self._state_store.wait_for(self._state_store.commands.is_complete)
+        await self._queue_worker.wait_for_idle()

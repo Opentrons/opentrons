@@ -114,3 +114,38 @@ def test_get_next_queued_returns_none_when_earlier_command_failed() -> None:
     )
 
     assert subject.get_next_queued() is None
+
+
+def test_get_is_complete() -> None:
+    """It should be able to tell if a command is complete."""
+    completed_command = create_completed_command(command_id="command-id-1")
+    running_command = create_running_command(command_id="command-id-2")
+    pending_command = create_pending_command(command_id="command-id-3")
+
+    subject = get_command_view(
+        commands_by_id=[
+            ("command-id-1", completed_command),
+            ("command-id-2", running_command),
+            ("command-id-3", pending_command),
+        ]
+    )
+
+    assert subject.is_complete("command-id-1") is True
+    assert subject.is_complete("command-id-2") is False
+    assert subject.is_complete("command-id-3") is False
+
+
+def test_get_is_complete_with_failed_command() -> None:
+    """It should return true if a given command will never be executed."""
+    failed_command = create_failed_command(command_id="command-id-1")
+    pending_command = create_pending_command(command_id="command-id-2")
+
+    subject = get_command_view(
+        commands_by_id=[
+            ("command-id-1", failed_command),
+            ("command-id-2", pending_command),
+        ]
+    )
+
+    assert subject.is_complete("command-id-1") is True
+    assert subject.is_complete("command-id-2") is True

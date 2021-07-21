@@ -2,6 +2,7 @@
 import asyncio
 import pytest
 from decoy import Decoy
+from typing import AsyncIterable
 
 from opentrons.protocol_engine.state import StateStore
 from opentrons.protocol_engine.execution import CommandExecutor, QueueWorker
@@ -23,31 +24,15 @@ def command_executor(decoy: Decoy) -> CommandExecutor:
 async def subject(
     state_store: StateStore,
     command_executor: CommandExecutor,
-) -> QueueWorker:
+) -> AsyncIterable[QueueWorker]:
     """Get a QueueWorker instance."""
-    return QueueWorker(state_store=state_store, command_executor=command_executor)
+    subject = QueueWorker(state_store=state_store, command_executor=command_executor)
+    yield subject
+    await subject.wait_for_idle()
 
 
 async def _flush_tasks() -> None:
     await asyncio.sleep(0)
-
-
-async def test_wait_for_done_with_start(
-    decoy: Decoy,
-    state_store: StateStore,
-    subject: QueueWorker,
-) -> None:
-    """It should become done when started without commands in the queue."""
-    decoy.when(state_store.commands.get_next_queued()).then_return(None)
-
-    idle_task = asyncio.create_task(subject.wait_for_done())
-    await _flush_tasks()
-
-    assert idle_task.done() is False
-    subject.start()
-
-    await _flush_tasks()
-    assert idle_task.done() is True
 
 
 async def test_pulls_jobs_off_queue(
@@ -64,7 +49,7 @@ async def test_pulls_jobs_off_queue(
     )
 
     subject.start()
-    await subject.wait_for_done()
+    await subject.wait_for_idle()
 
     decoy.verify(
         await command_executor.execute(command_id="command-id-1"),
@@ -96,12 +81,12 @@ async def test_stop(
     decoy.verify(await command_executor.execute(command_id="command-id-2"), times=0)
 
     subject.start()
-    await subject.wait_for_done()
+    await subject.wait_for_idle()
 
     decoy.verify(await command_executor.execute(command_id="command-id-2"), times=1)
 
 
-async def test_restart_clears_idle_flag(
+async def test_restart(
     decoy: Decoy,
     state_store: StateStore,
     command_executor: CommandExecutor,
@@ -118,7 +103,7 @@ async def test_restart_clears_idle_flag(
     )
 
     subject.start()
-    await subject.wait_for_done()
+    await subject.wait_for_idle()
 
     decoy.verify(
         await command_executor.execute(command_id="command-id-1"),
@@ -127,9 +112,47 @@ async def test_restart_clears_idle_flag(
     decoy.verify(await command_executor.execute(command_id="command-id-3"), times=0)
 
     subject.start()
-    await subject.wait_for_done()
+    await subject.wait_for_idle()
 
     decoy.verify(
+        await command_executor.execute(command_id="command-id-1"),
+        await command_executor.execute(command_id="command-id-2"),
+        await command_executor.execute(command_id="command-id-3"),
+        await command_executor.execute(command_id="command-id-4"),
+    )
+
+
+async def test_refresh(
+    decoy: Decoy,
+    state_store: StateStore,
+    command_executor: CommandExecutor,
+    subject: QueueWorker,
+) -> None:
+    """It should be able to refresh the queue without restarting."""
+    decoy.when(state_store.commands.get_next_queued()).then_return(
+        "command-id-1",
+        "command-id-2",
+        None,
+        "command-id-3",
+        "command-id-4",
+        None,
+    )
+
+    subject.start()
+    await subject.wait_for_idle()
+
+    decoy.verify(
+        await command_executor.execute(command_id="command-id-1"),
+        await command_executor.execute(command_id="command-id-2"),
+    )
+    decoy.verify(await command_executor.execute(command_id="command-id-3"), times=0)
+
+    subject.refresh()
+    await subject.wait_for_idle()
+
+    decoy.verify(
+        await command_executor.execute(command_id="command-id-1"),
+        await command_executor.execute(command_id="command-id-2"),
         await command_executor.execute(command_id="command-id-3"),
         await command_executor.execute(command_id="command-id-4"),
     )
@@ -149,20 +172,9 @@ async def test_play_noop(
     subject.start()
     decoy.when(state_store.commands.get_next_queued()).then_return(None)
 
-    await subject.wait_for_done()
+    await subject.wait_for_idle()
 
     decoy.verify(
         await command_executor.execute(command_id="command-id-1"),
         times=1,
     )
-
-
-async def test_wait_for_running(decoy: Decoy, subject: QueueWorker) -> None:
-    """It should be able to signal when ready to run."""
-    result = asyncio.create_task(subject.wait_for_running())
-    await _flush_tasks()
-
-    assert result.done() is False
-
-    subject.start()
-    await result
