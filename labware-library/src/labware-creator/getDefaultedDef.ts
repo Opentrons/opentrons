@@ -28,6 +28,7 @@ export const DEFAULTED_DEF_PATCH: Readonly<Partial<LabwareFields>> = {
   displayName: 'Some Labware',
   loadName: 'some_labware',
   brand: 'somebrand',
+  groupBrand: 'somebrand',
   // A few other fields don't even go into the definition (eg "is row spacing uniform" etc).
   homogeneousWells: 'true',
   regularRowSpacing: 'true',
@@ -55,7 +56,9 @@ export const getDefaultedDef = (
     // TODO(IL, 2021-06-01): if we stick with this instead of single value casting, sniff this error to make sure it's
     // really a Yup validation error (see how Formik does it in `Formik.tsx`).
     // See #7824 and see pattern in formLevelValidation fn
-  } catch (error) {}
+  } catch (error) {
+    console.log('getDefaultedDef casting error', error)
+  }
 
   if (castValues === null) {
     return null
