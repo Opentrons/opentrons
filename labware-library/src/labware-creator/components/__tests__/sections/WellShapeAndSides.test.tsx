@@ -80,7 +80,7 @@ describe('WellShapeAndSides', () => {
     )
   })
 
-  it('should render diameter field when tipRack is selected (and hide the well shape radio group),(and should not render x/y fields)', () => {
+  it('should render diameter field when tipRack is selected (and hide the well shape radio group ,and should not render x/y fields)', () => {
     formikConfig.initialValues.labwareType = 'tipRack'
     render(wrapInFormik(<WellShapeAndSides />, formikConfig))
 

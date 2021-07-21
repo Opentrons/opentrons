@@ -5,7 +5,6 @@ import {
 } from '@opentrons/shared-data'
 import {
   aluminumBlockAutofills,
-  getImplicitAutofillValues,
   DISPLAY_VOLUME_UNITS,
   tubeRackAutofills,
   labwareTypeAutofills,
@@ -17,12 +16,9 @@ import { getIsCustomTubeRack } from './utils/getIsCustomTubeRack'
 // TODO(Ian, 2019-07-24): consolidate `tubeRackAutofills/aluminumBlockAutofills`-getting logic btw here and makeAutofillOnChange
 export const _getIsAutofilled = (
   name: keyof LabwareFields,
-  values: LabwareFields
+  values: Partial<LabwareFields>
 ): boolean => {
   const { labwareType, aluminumBlockType, tubeRackInsertLoadName } = values
-  const isAutofilledByDefault = Object.keys(
-    getImplicitAutofillValues(values)
-  ).includes(name)
 
   if (
     labwareType != null &&
@@ -35,19 +31,15 @@ export const _getIsAutofilled = (
 
   if (labwareType === 'aluminumBlock' && aluminumBlockType != null) {
     return (
-      isAutofilledByDefault ||
       // @ts-expect-error(IL, 2021-03-18): aluminumBlockType not strictly typed enough
       Object.keys(aluminumBlockAutofills[aluminumBlockType] || {}).includes(
         name
       )
     )
   } else if (labwareType === 'tubeRack' && tubeRackInsertLoadName != null) {
-    return (
-      isAutofilledByDefault ||
-      Object.keys(tubeRackAutofills[tubeRackInsertLoadName] || {}).includes(
-        name
-      )
-    )
+    return Object.keys(
+      tubeRackAutofills[tubeRackInsertLoadName] || {}
+    ).includes(name)
   }
   return false
 }
@@ -76,7 +68,9 @@ export const _getIsDefaulted = (
 export const getIsHidden = (
   name: keyof LabwareFields,
   values: LabwareFields
-): boolean => _getIsAutofilled(name, values) || _getIsDefaulted(name, values)
+): boolean =>
+  (values.labwareType != null && _getIsAutofilled(name, values)) ||
+  _getIsDefaulted(name, values)
 
 // TODO(IL, 2021-03-18): _valuesToCreateNameArgs should return RegularNameProps from shared-data/js/labwareTools/index.js
 const _valuesToCreateNameArgs = (values: LabwareFields): any => {

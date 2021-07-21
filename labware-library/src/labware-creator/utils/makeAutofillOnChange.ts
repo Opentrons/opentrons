@@ -1,5 +1,5 @@
 import mapValues from 'lodash/mapValues'
-import { getImplicitAutofillValues, LabwareFields } from '../fields'
+import { LabwareFields } from '../fields'
 import type { FormikTouched } from 'formik'
 
 interface MakeAutofillOnChangeArgs {
@@ -26,10 +26,9 @@ export const makeAutofillOnChange = ({
     return
   }
   const _autofillValues = autofills[value]
-  if (_autofillValues) {
+  if (_autofillValues !== undefined) {
     const autofillValues = {
       ..._autofillValues,
-      ...getImplicitAutofillValues(_autofillValues),
     }
 
     const namesToTrue = mapValues(autofillValues, () => true)

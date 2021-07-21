@@ -247,6 +247,8 @@ export const tubeRackAutofills: {
     gridSpacingY: '35.0',
     gridOffsetX: '35.50',
     gridOffsetY: '25.24',
+    regularRowSpacing: 'true',
+    regularColumnSpacing: 'true',
   },
   '24tubesSnapCap': {
     // NOTE: based on opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap
@@ -258,6 +260,8 @@ export const tubeRackAutofills: {
     gridSpacingY: '19.28',
     gridOffsetX: '18.21',
     gridOffsetY: '10.07',
+    regularRowSpacing: 'true',
+    regularColumnSpacing: 'true',
   },
   '15tubes': {
     // NOTE: based on opentrons_15_tuberack_falcon_15ml_conical
@@ -269,6 +273,8 @@ export const tubeRackAutofills: {
     gridSpacingY: '25.00',
     gridOffsetX: '13.88',
     gridOffsetY: '17.74',
+    regularRowSpacing: 'true',
+    regularColumnSpacing: 'true',
   },
   customTubeRack: {}, // not an insert, no autofills
 }
@@ -304,6 +310,8 @@ export const aluminumBlockAutofills = {
     gridSpacingY: '17.25',
     gridOffsetX: '20.75',
     gridOffsetY: '16.87',
+    regularRowSpacing: 'true',
+    regularColumnSpacing: 'true',
   },
   '96well': {
     // NOTE: based on opentrons_96_aluminumblock_generic_pcr_strip_200ul
@@ -315,8 +323,10 @@ export const aluminumBlockAutofills = {
     gridSpacingY: '9.00',
     gridOffsetX: '14.38',
     gridOffsetY: '11.25',
+    regularRowSpacing: 'true',
+    regularColumnSpacing: 'true',
   },
-}
+} as const
 
 export const labwareTypeAutofills: Record<
   LabwareType,
@@ -347,21 +357,6 @@ export const aluminumBlockChildTypeOptions: Options = [
     value: 'pcrPlate',
   },
 ]
-
-// For DRYness, these values aren't explicitly included in the autofill objects (eg tubeRackAutofills),
-// but should be included in the autofill spread
-export const getImplicitAutofillValues = (
-  preAutofilledValues: Partial<LabwareFields>
-): Partial<LabwareFields> => {
-  const result: Partial<LabwareFields> = {}
-  if ('gridRows' in preAutofilledValues) {
-    result.regularRowSpacing = 'true'
-  }
-  if ('gridColumns' in preAutofilledValues) {
-    result.regularColumnSpacing = 'true'
-  }
-  return result
-}
 
 export const getInitialStatus = (): FormStatus => ({
   defaultedDef: null,
