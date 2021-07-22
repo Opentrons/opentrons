@@ -16,18 +16,24 @@ import {
   MAX_Z_DIMENSION,
   MIN_X_DIMENSION,
   MIN_Y_DIMENSION,
+  REQUIRED_FIELD_ERROR,
+  MUST_BE_A_NUMBER_ERROR,
   LabwareFields,
 } from './fields'
 import type { ProcessedLabwareFields } from './fields'
 
+// global overrides for Yup's default error messages.
+Yup.setLocale({
+  mixed: {
+    required: REQUIRED_FIELD_ERROR,
+  },
+})
+
 const ALL_DISPLAY_NAMES = new Set(
   getAllDisplayNames().map(n => n.toLowerCase().trim())
 )
-
-const REQUIRED_FIELD = '${label} is required' // eslint-disable-line no-template-curly-in-string
 const requiredString = (label: string): Yup.StringSchema =>
-  Yup.string().label(label).typeError(REQUIRED_FIELD).required()
-const MUST_BE_A_NUMBER = '${label} must be a number' // eslint-disable-line no-template-curly-in-string
+  Yup.string().label(label).typeError(REQUIRED_FIELD_ERROR).required()
 
 // put this in a transform to make Yup to show "this field is required"
 // instead of "must be a number". See https://github.com/jquense/yup/issues/971
@@ -38,7 +44,7 @@ const requiredPositiveNumber = (label: string): Yup.NumberSchema =>
   Yup.number()
     .label(label)
     .transform(nanToUndefined)
-    .typeError(MUST_BE_A_NUMBER)
+    .typeError(MUST_BE_A_NUMBER_ERROR)
     .moreThan(0)
     .required()
 
@@ -46,7 +52,7 @@ const requiredPositiveInteger = (label: string): Yup.NumberSchema =>
   Yup.number()
     .transform(nanToUndefined)
     .label(label)
-    .typeError(MUST_BE_A_NUMBER)
+    .typeError(MUST_BE_A_NUMBER_ERROR)
     .moreThan(0)
     .integer()
     .required()
@@ -55,7 +61,7 @@ const unsupportedLabwareIfFalse = (label: string): Yup.BooleanSchema =>
   Yup.boolean()
     .default(false)
     .label(label)
-    .typeError(REQUIRED_FIELD)
+    .typeError(REQUIRED_FIELD_ERROR)
     .oneOf([true], IRREGULAR_LABWARE_ERROR)
     .required()
 
@@ -118,7 +124,7 @@ export const labwareFormSchemaBaseObject = Yup.object({
   footprintXDimension: Yup.number()
     .transform(nanToUndefined)
     .label(LABELS.footprintXDimension)
-    .typeError(MUST_BE_A_NUMBER)
+    .typeError(MUST_BE_A_NUMBER_ERROR)
     .min(MIN_X_DIMENSION, LABWARE_TOO_SMALL_ERROR)
     .max(MAX_X_DIMENSION, LABWARE_TOO_LARGE_ERROR)
     .nullable()
@@ -126,7 +132,7 @@ export const labwareFormSchemaBaseObject = Yup.object({
   footprintYDimension: Yup.number()
     .transform(nanToUndefined)
     .label(LABELS.footprintYDimension)
-    .typeError(MUST_BE_A_NUMBER)
+    .typeError(MUST_BE_A_NUMBER_ERROR)
     .min(MIN_Y_DIMENSION, LABWARE_TOO_SMALL_ERROR)
     .max(MAX_Y_DIMENSION, LABWARE_TOO_LARGE_ERROR)
     .nullable()
@@ -177,7 +183,7 @@ export const labwareFormSchemaBaseObject = Yup.object({
     then: Yup.number()
       .transform(nanToUndefined)
       .label('Length')
-      .typeError(MUST_BE_A_NUMBER)
+      .typeError(MUST_BE_A_NUMBER_ERROR)
       .moreThan(0)
       .max(
         Yup.ref('labwareZDimension'),
@@ -187,7 +193,7 @@ export const labwareFormSchemaBaseObject = Yup.object({
     otherwise: Yup.number()
       .transform(nanToUndefined)
       .label(LABELS.wellDepth)
-      .typeError(MUST_BE_A_NUMBER)
+      .typeError(MUST_BE_A_NUMBER_ERROR)
       .moreThan(0)
       .max(
         Yup.ref('labwareZDimension'),

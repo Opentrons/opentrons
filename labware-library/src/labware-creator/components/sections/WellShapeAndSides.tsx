@@ -115,7 +115,12 @@ export const WellShapeAndSides = (): JSX.Element | null => {
     <div className={styles.new_definition_section}>
       <SectionBody label={label} id={id}>
         <>
-          <FormAlerts touched={touched} errors={errors} fieldList={fieldList} />
+          <FormAlerts
+            values={values}
+            touched={touched}
+            errors={errors}
+            fieldList={fieldList}
+          />
           <Content values={values} />
         </>
       </SectionBody>

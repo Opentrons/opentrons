@@ -3,7 +3,7 @@ import type {
   LabwareDefinition2,
   WellBottomShape,
 } from '@opentrons/shared-data'
-import { getLabwareName } from './utils'
+import { displayAsTube, getLabwareName } from './utils'
 
 export const MAX_X_DIMENSION = 129
 export const MIN_X_DIMENSION = 127
@@ -22,6 +22,9 @@ export const DISPLAY_VOLUME_UNITS = 'µL'
 
 // magic string for all validation errors that direct user away to the labware request form
 export const IRREGULAR_LABWARE_ERROR = 'IRREGULAR_LABWARE_ERROR'
+
+export const REQUIRED_FIELD_ERROR = 'REQUIRED_FIELD_ERROR'
+export const MUST_BE_A_NUMBER_ERROR = 'MUST_BE_A_NUMBER_ERROR'
 
 export const LOOSE_TIP_FIT_ERROR = 'LOOSE_TIP_FIT_ERROR'
 
@@ -458,6 +461,12 @@ export const getLabel = (
   }
   if (name === 'wellShape') {
     return `${capitalize(getLabwareName(values, false))} shape`
+  }
+  if (name === 'wellXDimension' && displayAsTube(values)) {
+    return 'Tube X'
+  }
+  if (name === 'wellYDimension' && displayAsTube(values)) {
+    return 'Tube Y'
   }
   return LABELS[name]
 }

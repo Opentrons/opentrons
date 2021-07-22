@@ -37,7 +37,12 @@ export const File = (): JSX.Element | null => {
 
   return (
     <SectionBody label="File" id="File">
-      <FormAlerts touched={touched} errors={errors} fieldList={fieldList} />
+      <FormAlerts
+        values={values}
+        touched={touched}
+        errors={errors}
+        fieldList={fieldList}
+      />
       <Content values={values} />
     </SectionBody>
   )
