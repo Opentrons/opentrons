@@ -239,6 +239,9 @@ async def ctx(loop, hardware) -> ProtocolContext:
     )
 
 
+def data_dir() -> str:
+    return os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
+
 def build_v2_model(h, lw_name, loop):
     ctx = ProtocolContext(
         implementation=ProtocolContextImplementation(hardware=h),
