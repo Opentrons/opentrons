@@ -5,7 +5,7 @@ import asyncio
 from typing import Generator
 from collections import namedtuple
 
-from opentrons.hardware_control.emulation.settings import SmoothieSettings
+from opentrons.hardware_control.emulation.settings import Settings
 from opentrons.protocols.parse import parse
 from opentrons.protocols.execution import execute
 from contextlib import contextmanager
@@ -43,7 +43,7 @@ class ProtocolRunner:
     """
     URI_TEMPLATE = "socket://127.0.0.1:%s"
 
-    def __init__(self, smoothie_config: SmoothieSettings) -> None:
+    def __init__(self, smoothie_config: Settings) -> None:
         self._config = smoothie_config
         self._set_env_vars()
 
