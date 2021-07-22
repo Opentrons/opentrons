@@ -85,6 +85,23 @@ def concise_builder(code: GCode):
     return MULTIPLE_SPACE_REGEX.sub(' ', message).strip()
 
 
+def g_code_only_builder(code: GCode):
+    """
+    Function to build string that contains only the raw G-Code input and output
+
+    <Raw G-Code> -> <Raw G-Code Output>
+
+    Example:
+
+    G28.2 X -> Homing the following axes: X
+
+    :param code: G-Code object to parse into a string
+    :return: Textual description
+    """
+    message = f'{code.g_code_line} -> {code.response}'
+    return MULTIPLE_SPACE_REGEX.sub(' ', message).strip()
+
+
 class SupportedTextModes(Enum):
     """
     Class representing the different text modes that G-Codes can be parsed into
@@ -101,6 +118,11 @@ class SupportedTextModes(Enum):
     """
     DEFAULT = 'Default'
     CONCISE = 'Concise'
+    G_CODE = 'G-Code'
+
+    @classmethod
+    def get_valid_modes(cls):
+        return [cls.CONCISE.value, cls.DEFAULT.value, cls.G_CODE.value]
 
     @classmethod
     def get_text_mode(cls, key: str):
@@ -108,7 +130,8 @@ class SupportedTextModes(Enum):
         # when using the __members__ attribute
         _internal_mapping = {
             cls.DEFAULT.value: TextMode(cls.DEFAULT.value, default_builder),
-            cls.CONCISE.value: TextMode(cls.CONCISE.value, concise_builder)
+            cls.CONCISE.value: TextMode(cls.CONCISE.value, concise_builder),
+            cls.G_CODE.value: TextMode(cls.G_CODE.value, g_code_only_builder)
         }
         members = [member.value for member in list(cls.__members__.values())]
         if key not in members:

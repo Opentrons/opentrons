@@ -26,7 +26,17 @@ class SmoothieEmulator(AbstractEmulator):
     INSTRUMENT_AND_MODEL_STRING_LENGTH = 64
 
     def __init__(self, parser: Parser, settings: SmoothieSettings) -> None:
-        """Constructor"""
+        self._parser = parser
+        self._settings = settings
+        self.reset()
+
+    def handle(self, line: str) -> Optional[str]:
+        """Handle a line"""
+        results = (self._handle(c) for c in self._parser.parse(line))
+        joined = ' '.join(r for r in results if r)
+        return None if not joined else joined
+
+    def reset(self):
         _, fw_version = _find_smoothie_file()
         self._version_string = \
             f"Build version: {fw_version}, Build date: CURRENT, " \
@@ -52,22 +62,21 @@ class SmoothieEmulator(AbstractEmulator):
 
         self._pipette_model = {
             "L": utils.string_to_hex(
-                settings.left.model, self.INSTRUMENT_AND_MODEL_STRING_LENGTH
+                self._settings.left.model, self.INSTRUMENT_AND_MODEL_STRING_LENGTH
             ),
             "R": utils.string_to_hex(
-                settings.right.model, self.INSTRUMENT_AND_MODEL_STRING_LENGTH
+                self._settings.right.model, self.INSTRUMENT_AND_MODEL_STRING_LENGTH
             ),
         }
 
         self._pipette_id = {
             "L": utils.string_to_hex(
-                settings.left.id, self.INSTRUMENT_AND_MODEL_STRING_LENGTH
+                self._settings.left.id, self.INSTRUMENT_AND_MODEL_STRING_LENGTH
             ),
             "R": utils.string_to_hex(
-                settings.right.id, self.INSTRUMENT_AND_MODEL_STRING_LENGTH
+                self._settings.right.id, self.INSTRUMENT_AND_MODEL_STRING_LENGTH
             ),
         }
-        self._parser = parser
 
         self._gcode_to_function_mapping = {
             GCODE.HOMING_STATUS.value: self._get_homing_status,
@@ -81,11 +90,8 @@ class SmoothieEmulator(AbstractEmulator):
             GCODE.HOME.value: self._home_gantry,
         }
 
-    def handle(self, line: str) -> Optional[str]:
-        """Handle a line"""
-        results = (self._handle(c) for c in self._parser.parse(line))
-        joined = ' '.join(r for r in results if r)
-        return None if not joined else joined
+    def get_current_position(self):
+        return self._pos
 
     def _get_homing_status(self, command: Command) -> str:
         """Get the current homing status of the emulated gantry"""
