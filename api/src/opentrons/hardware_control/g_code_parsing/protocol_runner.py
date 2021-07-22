@@ -2,12 +2,11 @@ import os
 import sys
 import threading
 import asyncio
-import json
-from typing import Dict
+from typing import Generator
 from collections import namedtuple
+
 from opentrons.hardware_control.emulation.settings import SmoothieSettings
 from opentrons.protocols.parse import parse
-from opentrons.hardware_control import Controller
 from opentrons.protocols.execution import execute
 from contextlib import contextmanager
 from opentrons.protocol_api import ProtocolContext
@@ -68,7 +67,8 @@ class ProtocolRunner:
         os.environ['OT_TEMPERATURE_EMULATOR_URI'] = \
             ProtocolRunner.URI_TEMPLATE % TEMPDECK_PORT
 
-    def _start_emulation_app(self, server_manager: ServerManager) -> None:
+    @staticmethod
+    def _start_emulation_app(server_manager: ServerManager) -> None:
         """Start emulated OT-2"""
         def runit():
             asyncio.run(server_manager.run())
@@ -77,7 +77,7 @@ class ProtocolRunner:
         t.start()
 
     @staticmethod
-    def _emulate_hardware() -> Controller:
+    def _emulate_hardware() -> ThreadManager:
         """Created emulated smoothie"""
         conf = build_config({})
         emulator = ThreadManager(
@@ -96,7 +96,7 @@ class ProtocolRunner:
         return Protocol(text=text, filename=file_path, filelike=file)
 
     @contextmanager
-    def run_protocol(self, file_name: str) -> GCodeProgram:
+    def run_protocol(self, file_name: str) -> Generator:
         """
         Runs passed protocol file and collects all G-Code I/O from it.
         Will cleanup emulation after execution
