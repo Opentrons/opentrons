@@ -261,4 +261,3 @@ class GCode:
                 self.g_code_args,
                 self.response
             )
-

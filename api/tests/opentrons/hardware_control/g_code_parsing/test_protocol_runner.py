@@ -31,6 +31,3 @@ async def test_watcher_command_list_is_cleared(protocol_runner: ProtocolRunner):
         run_2_desc = run_2.get_text_explanation(SupportedTextModes.G_CODE)
 
     assert run_1_desc == run_2_desc
-
-
-

@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from opentrons.hardware_control.emulation.app import \
     TEMPDECK_PORT, THERMOCYCLER_PORT, SMOOTHIE_PORT, MAGDECK_PORT
 
+
 @dataclass
 class WatcherData:
     raw_g_code: str

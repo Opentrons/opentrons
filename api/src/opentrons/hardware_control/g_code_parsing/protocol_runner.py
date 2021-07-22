@@ -116,5 +116,3 @@ class ProtocolRunner:
         execute.run_protocol(parsed_protocol, context=context)
         yield GCodeProgram.from_g_code_watcher(watcher)
         server_manager.stop()
-
-
