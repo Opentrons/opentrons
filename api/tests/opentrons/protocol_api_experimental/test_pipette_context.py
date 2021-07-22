@@ -32,9 +32,11 @@ def labware_id() -> str:
 
 
 @pytest.fixture
-def labware(engine_client: EngineClient, labware_id: str) -> Labware:
+def labware(decoy: Decoy, engine_client: EngineClient, labware_id: str) -> Labware:
     """Labware fixture."""
-    return Labware(engine_client=engine_client, labware_id=labware_id)
+    lw = decoy.create_decoy(spec=Labware)
+    lw.labware_id = labware_id  # type: ignore
+    return lw
 
 
 @pytest.fixture

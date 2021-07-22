@@ -41,17 +41,20 @@ class Labware:  # noqa: D101
         self._definition = self._engine_client.state.labware.get_labware_definition(
             labware_id=self._labware_id)
 
-        self._wells_by_name: Dict[str, Well] = {
-            well_name: Well(
-                well_name=well_name,
-                engine_client=self._engine_client,
-                labware=self,
-            )
-            for col in self._definition.ordering
-            for well_name in col
-        }
-
-        self._well_grid = self._get_well_grid()
+        if self._definition:
+            self._wells_by_name: Dict[str, Well] = {
+                well_name: Well(
+                    well_name=well_name,
+                    engine_client=self._engine_client,
+                    labware=self,
+                )
+                for col in self._definition.ordering
+                for well_name in col
+            }
+            self._well_grid = self._get_well_grid()
+        else:
+            raise Exception("Labware definition not found. Definition required for "
+                            "labware initialization.")
 
     # TODO(mc, 2021-04-22): remove this property; it's redundant and
     # unlikely to be used by PAPI users
