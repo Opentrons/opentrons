@@ -45,7 +45,21 @@ ot_sources := $(ot_py_sources)
 clean_cmd = $(SHX) rm -rf build dist .coverage coverage.xml '*.egg-info' '**/__pycache__' '**/*.pyc' 'robot_server/**/.mypy_cache'
 
 # Uvicorn command to run the robot server in dev mode.
-run_dev ?= uvicorn "robot_server:app" --host localhost --port 31950 --ws wsproto --reload
+#
+# "--lifespan on" ensures errors in startup and shutdown handlers won't be hidden.
+# See github.com/encode/starlette/issues/1138, fixed in Starlette v0.16.0?
+#
+# todo(mm, 2021-07-08): Figure out how to run the server with Python development
+# mode enabled, to expose more errors and warnings.
+#   * Using a Makefile target-specific variable to set PYTHONDEVMODE=1
+#     doesn't work because it applies the variable to the whole `pipenv run`
+#     command, and we only want our inner server process running under dev mode,
+#     not the outer pipenv process.
+#   * Adding PYTHONDEVMODE=1 to the .env file specified by
+#     OT_ROBOT_SERVER_DOT_ENV_PATH doesn't work because that's read too late.
+#   * Doing `pipenv run env PYTHONDEVMODE=1 uvicorn ...` works, except it's
+#     probably POSIX-only.
+run_dev ?= uvicorn "robot_server:app" --host localhost --port 31950 --ws wsproto --lifespan on --reload
 
 .PHONY: all
 all: clean wheel
