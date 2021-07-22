@@ -8,6 +8,7 @@ import { TextField } from '../TextField'
 import { SectionBody } from './SectionBody'
 
 import styles from '../../styles.css'
+import { Flex } from '@opentrons/components'
 
 interface Props {
   values: LabwareFields
@@ -20,17 +21,17 @@ const Content = (props: Props): JSX.Element => {
   return (
     <>
       {showBrand && (
-        <div className={styles.flex_row}>
+        <Flex>
           <div className={styles.brand_column}>
             <TextField name="brand" />
           </div>
           <div className={styles.brand_id_column}>
             <TextField name="brandId" caption="Separate multiple by comma" />
           </div>
-        </div>
+        </Flex>
       )}
       {showGroupBrand && (
-        <div className={styles.flex_row}>
+        <Flex>
           <div className={styles.brand_column}>
             <TextField name="groupBrand" />
           </div>
@@ -40,7 +41,7 @@ const Content = (props: Props): JSX.Element => {
               caption="Separate multiple by comma"
             />
           </div>
-        </div>
+        </Flex>
       )}
     </>
   )
