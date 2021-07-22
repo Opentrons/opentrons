@@ -4,11 +4,16 @@ from tests.opentrons.conftest import data_dir
 from opentrons.hardware_control.g_code_parsing.protocol_runner import ProtocolRunner
 from opentrons.hardware_control.g_code_parsing.g_code_program.supported_text_modes \
     import SupportedTextModes
+from opentrons.hardware_control.emulation.settings import \
+    Settings, SmoothieSettings, PipetteSettings
 
-CONFIG = {
-    'right': {'model': 'p20_single_v2.0'},
-    'left': {'model': 'p20_single_v2.0'}
-}
+CONFIG = Settings(
+    host='0.0.0.0',
+    smoothie=SmoothieSettings(
+        left=PipetteSettings(model='p20_single_v2.0', id='P20SV202020070101'),
+        right=PipetteSettings(model='p20_single_v2.0', id='P20SV202020070101')
+    )
+)
 
 PROTOCOL_PATH = os.path.join(
     data_dir(), 'g_code_validation_protocols', 'smoothie_protocol.py'

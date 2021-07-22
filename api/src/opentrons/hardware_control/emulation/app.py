@@ -21,8 +21,7 @@ class ServerManager:
     """
     Class to start and stop emulated smoothie and modules.
     """
-    def __init__(self) -> None:
-        settings = Settings()
+    def __init__(self, settings=Settings()) -> None:
         host = settings.host
         self._mag_emulator = MagDeckEmulator(parser=Parser())
         self._temp_emulator = TempDeckEmulator(parser=Parser())

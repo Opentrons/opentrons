@@ -5,6 +5,7 @@ import asyncio
 import json
 from typing import Dict
 from collections import namedtuple
+from opentrons.hardware_control.emulation.settings import SmoothieSettings
 from opentrons.protocols.parse import parse
 from opentrons.hardware_control import Controller
 from opentrons.protocols.execution import execute
@@ -43,9 +44,9 @@ class ProtocolRunner:
     """
     URI_TEMPLATE = "socket://127.0.0.1:%s"
 
-    def __init__(self, smoothie_config: Dict) -> None:
+    def __init__(self, smoothie_config: SmoothieSettings) -> None:
         self._config = smoothie_config
-        self._set_env_vars(self._config)
+        self._set_env_vars()
 
     @staticmethod
     def _get_loop() -> asyncio.AbstractEventLoop:
@@ -58,7 +59,7 @@ class ProtocolRunner:
         return asyncio.get_event_loop()
 
     @staticmethod
-    def _set_env_vars(config: Dict) -> None:
+    def _set_env_vars() -> None:
         """Set URLs of where to find modules and config for smoothie"""
         os.environ['OT_MAGNETIC_EMULATOR_URI'] = \
             ProtocolRunner.URI_TEMPLATE % MAGDECK_PORT
@@ -66,7 +67,6 @@ class ProtocolRunner:
             ProtocolRunner.URI_TEMPLATE % THERMOCYCLER_PORT
         os.environ['OT_TEMPERATURE_EMULATOR_URI'] = \
             ProtocolRunner.URI_TEMPLATE % TEMPDECK_PORT
-        os.environ['OT_EMULATOR_smoothie'] = json.dumps(config)
 
     def _start_emulation_app(self, server_manager: ServerManager) -> None:
         """Start emulated OT-2"""
@@ -103,7 +103,7 @@ class ProtocolRunner:
         :param file_name: Path to file
         :return: GCodeProgram with all the parsed data
         """
-        server_manager = ServerManager()
+        server_manager = ServerManager(self._config)
         self._start_emulation_app(server_manager)
         emulated_hardware = self._emulate_hardware()
         protocol = self._get_protocol(file_name)
