@@ -21,8 +21,7 @@ class MagDeckEmulator(AbstractEmulator):
     """Magdeck emulator"""
 
     def __init__(self, parser: Parser) -> None:
-        self.height: float = 0
-        self.position: float = 0
+        self.reset()
         self._parser = parser
 
     def handle(self, line: str) -> Optional[str]:
@@ -30,6 +29,10 @@ class MagDeckEmulator(AbstractEmulator):
         results = (self._handle(c) for c in self._parser.parse(line))
         joined = ' '.join(r for r in results if r)
         return None if not joined else joined
+
+    def reset(self):
+        self.height: float = 0
+        self.position: float = 0
 
     def _handle(self, command: Command) -> Optional[str]:
         """Handle a command."""
