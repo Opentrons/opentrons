@@ -1,9 +1,7 @@
 from __future__ import annotations
 import os
 import json
-from opentrons.hardware_control.emulation.app import \
-    TEMPDECK_PORT, THERMOCYCLER_PORT, SMOOTHIE_PORT, MAGDECK_PORT
-from typing import List
+from typing import List, Union
 from opentrons.hardware_control.g_code_parsing.g_code_watcher import GCodeWatcher
 from opentrons.hardware_control.g_code_parsing.g_code import GCode
 from .supported_text_modes import SupportedTextModes
@@ -14,14 +12,6 @@ class GCodeProgram:
     Class for parsing various G-Code files and programs into a
     list of GCode objects
     """
-
-    DEVICE_LOOKUP_BY_PORT = {
-        SMOOTHIE_PORT: 'smoothie',
-        TEMPDECK_PORT: 'tempdeck',
-        THERMOCYCLER_PORT: 'thermocycler',
-        MAGDECK_PORT: 'magdeck',
-    }
-
     @classmethod
     def from_g_code_watcher(cls, watcher: GCodeWatcher) -> GCodeProgram:
         """
@@ -32,11 +22,10 @@ class GCodeProgram:
         """
         g_codes = []
         for watcher_data in watcher.get_command_list():
-            device = cls._parse_device(watcher_data.serial_connection)
             g_codes.extend(
                 GCode.from_raw_code(
                     watcher_data.raw_g_code,
-                    device,
+                    watcher_data.device,
                     watcher_data.response
                 )
             )
@@ -44,16 +33,6 @@ class GCodeProgram:
 
     def __init__(self, g_codes: List[GCode]):
         self._g_codes = g_codes
-
-    @classmethod
-    def _parse_device(cls, serial_connection):
-        """
-        Based on port specified in connection URL, parse out what the name
-        of the device is
-        """
-        serial_port = serial_connection.port
-        device_port = serial_port[serial_port.rfind(':') + 1:]
-        return cls.DEVICE_LOOKUP_BY_PORT[int(device_port)]
 
     def add_g_code(self, g_code: GCode) -> None:
         """Add singular G-Code to the end of the program"""
@@ -82,22 +61,20 @@ class GCodeProgram:
             indent=4
         )
 
-    def get_text_explanation(self, mode=SupportedTextModes.DEFAULT) -> str:
+    def get_text_explanation(self, mode: Union[SupportedTextModes, str]) -> str:
         """
         Returns a textual explanation of all the G-Codes in the GCodeProgram
         :param mode: Mode to output text in. See SupportedTextModes for more info
         :return: Textual description of all GCodes
         """
-        if mode not in SupportedTextModes.__members__:
-            supported_modes = ', '.join(SupportedTextModes.__members__.keys())
-            raise ValueError(f'Text Mode "{mode}" is not supported. Supported modes'
-                             f'are: {supported_modes}')
 
-        selected_mode = SupportedTextModes[mode].value
-
+        if isinstance(mode, SupportedTextModes):
+            text_mode = SupportedTextModes.get_text_mode_by_enum_value(mode)
+        else:
+            text_mode = SupportedTextModes.get_text_mode(mode)
         return '\n'.join(
             [
-                selected_mode.builder(code)
+                text_mode.builder(code)
                 for code in self._g_codes
             ]
         )

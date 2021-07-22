@@ -25,6 +25,16 @@ class ThermocyclerEmulator(AbstractEmulator):
     """Thermocycler emulator"""
 
     def __init__(self, parser: Parser) -> None:
+        self.reset()
+        self._parser = parser
+
+    def handle(self, line: str) -> Optional[str]:
+        """Handle a line"""
+        results = (self._handle(c) for c in self._parser.parse(line))
+        joined = ' '.join(r for r in results if r)
+        return None if not joined else joined
+
+    def reset(self):
         self._lid_temperate = Temperature(
             per_tick=2, current=util.TEMPERATURE_ROOM
         )
@@ -34,13 +44,6 @@ class ThermocyclerEmulator(AbstractEmulator):
         self.lid_status = ThermocyclerLidStatus.OPEN
         self.plate_volume = util.OptionalValue[float]()
         self.plate_ramp_rate = util.OptionalValue[float]()
-        self._parser = parser
-
-    def handle(self, line: str) -> Optional[str]:
-        """Handle a line"""
-        results = (self._handle(c) for c in self._parser.parse(line))
-        joined = ' '.join(r for r in results if r)
-        return None if not joined else joined
 
     def _handle(self, command: Command) -> Optional[str]:  # noqa: C901
         """

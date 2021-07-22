@@ -2,12 +2,14 @@ from typing import List
 from serial import Serial  # type: ignore
 from opentrons.drivers import serial_communication
 from dataclasses import dataclass
+from opentrons.hardware_control.emulation.app import \
+    TEMPDECK_PORT, THERMOCYCLER_PORT, SMOOTHIE_PORT, MAGDECK_PORT
 
 
 @dataclass
 class WatcherData:
     raw_g_code: str
-    serial_connection: Serial
+    device: str
     response: str
 
 
@@ -16,11 +18,29 @@ class GCodeWatcher:
     Watches commands sent to serial_communication.write_and_return
     extracts the parameters passed and stores them
     """
+
+    DEVICE_LOOKUP_BY_PORT = {
+        SMOOTHIE_PORT: 'smoothie',
+        TEMPDECK_PORT: 'tempdeck',
+        THERMOCYCLER_PORT: 'thermocycler',
+        MAGDECK_PORT: 'magdeck',
+    }
+
     def __init__(self) -> None:
         self._command_list: List[WatcherData] = []
 
         self._old_write_return = serial_communication.write_and_return
         serial_communication.write_and_return = self._pull_info
+
+    @classmethod
+    def _parse_device(cls, serial_connection: Serial):
+        """
+        Based on port specified in connection URL, parse out what the name
+        of the device is
+        """
+        serial_port = serial_connection.port
+        device_port = serial_port[serial_port.rfind(':') + 1:]
+        return cls.DEVICE_LOOKUP_BY_PORT[int(device_port)]
 
     def _pull_info(self, *args, **kwargs):
         """
@@ -36,7 +56,7 @@ class GCodeWatcher:
         self._command_list.append(
             WatcherData(
                 raw_g_code=args[0],
-                serial_connection=args[2],
+                device=self._parse_device(args[2]),
                 response=response
             )
         )

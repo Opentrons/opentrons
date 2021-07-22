@@ -1,6 +1,11 @@
+import re
+
 from opentrons.hardware_control.g_code_parsing.g_code import GCode
+from opentrons.hardware_control.g_code_parsing.errors import InvalidTextModeError
 from typing import Callable
 from enum import Enum
+
+MULTIPLE_SPACE_REGEX = re.compile(' +')
 
 
 # Can't use a dataclass because mypy doesn't like a dataclass
@@ -35,48 +40,31 @@ def default_builder(code: GCode):
 
     Example:
 
-    Code: M203.1 A125.0 B40.0 C40.0 X600.0 Y400.0 Z125.0
+    Code: M92 X80.0 Y80.0 Z400 A400
     Explanation: Setting the max speed for the following axes:
-        X-Axis: 600.0
-        Y-Axis: 400.0
-        Z-Axis: 125.0
-        A-Axis: 125.0
-        B-Axis: 40.0
-        C-Axis: 40.0
+        X-Axis: 80.0 steps per mm
+        Y-Axis: 80.0 steps per mm
+        Z-Axis: 400.0 steps per mm
+        A-Axis: 400.0 steps per mm
+    Response: Current set steps per mm:
+        X Axis: 80.000000
+        Y Axis: 80.000000
+        Z Axis: 400.000000
+        A Axis: 400.000000
+        B Axis: 955.000000
+        C Axis: 768.000000
 
 
     :param code: G-Code object to parse into a string
     :return: Textual description
     """
-    return f'Code: {code.g_code} {code.g_code_body} \n' \
-           f'Explanation: {code.get_explanation().command_explanation}\n' \
-           f'Response: {code.response}'
+    message = f'Code: {code.g_code} {code.g_code_body}\n' \
+              f'Explanation: {code.get_explanation().command_explanation}\n' \
+              f'Response: {code.get_explanation().response}'
+    return MULTIPLE_SPACE_REGEX.sub(' ', message).strip()
 
 
-def explanation_only(code: GCode):
-    """
-    Function to build string that contains only the explanation. In the form of:
-
-    <Textual Description>
-
-    Example:
-
-    Setting the max speed for the following axes:
-        X-Axis: 600.0
-        Y-Axis: 400.0
-        Z-Axis: 125.0
-        A-Axis: 125.0
-        B-Axis: 40.0
-        C-Axis: 40.0
-
-
-    :param code: G-Code object to parse into a string
-    :return: Textual description
-    """
-    return code.get_explanation().command_explanation
-
-
-def concise(code: GCode):
+def concise_builder(code: GCode):
     """
     Function to build concise string. Removes all newlines and tabs In the form of:
 
@@ -89,11 +77,29 @@ def concise(code: GCode):
     :param code: G-Code object to parse into a string
     :return: Textual description
     """
-    return f'{code.g_code} {code.g_code_body} -> ' \
-           f'{code.get_explanation().command_explanation} -> ' \
-           f'{code.response}'\
+    message = f'{code.g_code} {code.g_code_body} -> ' \
+              f'{code.get_explanation().command_explanation} -> ' \
+              f'{code.get_explanation().response}'\
         .replace('\n', ' ')\
         .replace('\t', '')
+    return MULTIPLE_SPACE_REGEX.sub(' ', message).strip()
+
+
+def g_code_only_builder(code: GCode):
+    """
+    Function to build string that contains only the raw G-Code input and output
+
+    <Raw G-Code> -> <Raw G-Code Output>
+
+    Example:
+
+    G28.2 X -> Homing the following axes: X
+
+    :param code: G-Code object to parse into a string
+    :return: Textual description
+    """
+    message = f'{code.g_code_line} -> {code.response}'
+    return MULTIPLE_SPACE_REGEX.sub(' ', message).strip()
 
 
 class SupportedTextModes(Enum):
@@ -110,15 +116,29 @@ class SupportedTextModes(Enum):
     Concise: Same as Default but with all newlines and tabs removed to fit everything on
         a single line
     """
-    DEFAULT = TextMode(
-        'Default',
-        default_builder
-    )
-    EXPLANATION_ONLY = TextMode(
-        'Explanation Only',
-        explanation_only
-    )
-    CONCISE = TextMode(
-        'Concise',
-        concise
-    )
+    DEFAULT = 'Default'
+    CONCISE = 'Concise'
+    G_CODE = 'G-Code'
+
+    @classmethod
+    def get_valid_modes(cls):
+        return [cls.CONCISE.value, cls.DEFAULT.value, cls.G_CODE.value]
+
+    @classmethod
+    def get_text_mode(cls, key: str):
+        # Defining this inside of the function so that it does not show up
+        # when using the __members__ attribute
+        _internal_mapping = {
+            cls.DEFAULT.value: TextMode(cls.DEFAULT.value, default_builder),
+            cls.CONCISE.value: TextMode(cls.CONCISE.value, concise_builder),
+            cls.G_CODE.value: TextMode(cls.G_CODE.value, g_code_only_builder)
+        }
+        members = [member.value for member in list(cls.__members__.values())]
+        if key not in members:
+            raise InvalidTextModeError(key, members)
+
+        return _internal_mapping[key]
+
+    @classmethod
+    def get_text_mode_by_enum_value(cls, enum_value):
+        return cls.get_text_mode(enum_value.value)

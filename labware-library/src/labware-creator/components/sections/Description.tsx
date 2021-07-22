@@ -1,12 +1,14 @@
 import * as React from 'react'
 import { useFormikContext } from 'formik'
 import { LabwareFields } from '../../fields'
-import { getIsOpentronsTubeRack, isEveryFieldHidden } from '../../utils'
+import { isEveryFieldHidden } from '../../utils'
+import { getIsOpentronsTubeRack } from '../../utils/getIsOpentronsTubeRack'
 import { FormAlerts } from '../alerts/FormAlerts'
 import { TextField } from '../TextField'
 import { SectionBody } from './SectionBody'
 
 import styles from '../../styles.css'
+import { Flex } from '@opentrons/components'
 
 interface Props {
   values: LabwareFields
@@ -19,17 +21,17 @@ const Content = (props: Props): JSX.Element => {
   return (
     <>
       {showBrand && (
-        <div className={styles.flex_row}>
+        <Flex>
           <div className={styles.brand_column}>
             <TextField name="brand" />
           </div>
           <div className={styles.brand_id_column}>
             <TextField name="brandId" caption="Separate multiple by comma" />
           </div>
-        </div>
+        </Flex>
       )}
       {showGroupBrand && (
-        <div className={styles.flex_row}>
+        <Flex>
           <div className={styles.brand_column}>
             <TextField name="groupBrand" />
           </div>
@@ -39,14 +41,19 @@ const Content = (props: Props): JSX.Element => {
               caption="Separate multiple by comma"
             />
           </div>
-        </div>
+        </Flex>
       )}
     </>
   )
 }
 
 export const Description = (): JSX.Element | null => {
-  const fieldList: Array<keyof LabwareFields> = ['brand', 'brandId']
+  const fieldList: Array<keyof LabwareFields> = [
+    'brand',
+    'brandId',
+    'groupBrand',
+    'groupBrandId',
+  ]
   const { values, errors, touched } = useFormikContext<LabwareFields>()
 
   if (isEveryFieldHidden(fieldList, values)) {
