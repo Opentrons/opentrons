@@ -47,7 +47,12 @@ export const Export = (props: ExportProps): JSX.Element | null => {
 
   return (
     <SectionBody label="Labware Test Protocol" id="Export">
-      <FormAlerts touched={touched} errors={errors} fieldList={fieldList} />
+      <FormAlerts
+        values={values}
+        touched={touched}
+        errors={errors}
+        fieldList={fieldList}
+      />
 
       <div className={cx(styles.flex_row, styles.flex_row_start)}>
         <div className={styles.instructions_column}>

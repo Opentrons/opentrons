@@ -47,6 +47,7 @@ describe('GridOffset', () => {
     FormAlertsMock.mockImplementation(args => {
       if (
         isEqual(args, {
+          values: formikConfig.initialValues,
           touched: {},
           errors: {},
           fieldList: ['gridOffsetX', 'gridOffsetY'],

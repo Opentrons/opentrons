@@ -82,7 +82,12 @@ export const CreateNewDefinition = (props: Props): JSX.Element | null => {
         })}
       >
         <>
-          <FormAlerts touched={touched} errors={errors} fieldList={fieldList} />
+          <FormAlerts
+            values={values}
+            touched={touched}
+            errors={errors}
+            fieldList={fieldList}
+          />
           {content}
         </>
       </SectionBody>

@@ -1,8 +1,9 @@
 import * as React from 'react'
-import compact from 'lodash/compact'
-import uniq from 'lodash/uniq'
+import toPairs from 'lodash/toPairs'
+import pick from 'lodash/pick'
 import { AlertItem } from '@opentrons/components'
 import {
+  getLabel,
   LabwareFields,
   IRREGULAR_LABWARE_ERROR,
   LABWARE_TOO_SMALL_ERROR,
@@ -10,11 +11,14 @@ import {
   LOOSE_TIP_FIT_ERROR,
   LINK_CUSTOM_LABWARE_FORM,
   LINK_REQUEST_ADAPTER_FORM,
+  MUST_BE_A_NUMBER_ERROR,
+  REQUIRED_FIELD_ERROR,
 } from '../../fields'
 import { LinkOut } from '../LinkOut'
 
 import type { FormikTouched, FormikErrors } from 'formik'
 export interface Props {
+  values: LabwareFields
   fieldList: Array<keyof LabwareFields>
   touched: FormikTouched<LabwareFields>
   errors: FormikErrors<LabwareFields>
@@ -72,16 +76,16 @@ export const LooseTipFitAlert = (): JSX.Element => (
 )
 
 export const FormAlerts = (props: Props): JSX.Element | null => {
-  const { fieldList, touched, errors } = props
+  const { fieldList, touched, errors, values } = props
 
   const dirtyFieldNames = fieldList.filter(name => touched[name])
-  const allErrors: string[] = uniq(
-    compact(dirtyFieldNames.map(name => errors[name]))
-  )
+  const allErrors = toPairs(pick(errors, dirtyFieldNames)) as Array<
+    [keyof LabwareFields, string]
+  >
 
   return (
     <>
-      {allErrors.map(error => {
+      {allErrors.map(([name, error]) => {
         if (error === LOOSE_TIP_FIT_ERROR) {
           return <LooseTipFitAlert key={error} />
         }
@@ -94,7 +98,22 @@ export const FormAlerts = (props: Props): JSX.Element | null => {
         if (error === LABWARE_TOO_LARGE_ERROR) {
           return <LabwareTooLargeAlert key={error} />
         }
+
+        // sometimes fields have dynamic labels, and the "__ is a required field" error
+        // should use the dynamic label from getLabel.
+        if (error === MUST_BE_A_NUMBER_ERROR) {
+          const message = `${getLabel(name, values)} must be a number`
+          return <AlertItem key={message} type="warning" title={message} />
+        }
+        if (error === REQUIRED_FIELD_ERROR) {
+          const message = `${getLabel(name, values)} is a required field`
+          return <AlertItem key={message} type="warning" title={message} />
+        }
+
+        // TODO(IL, 2021-07-22): is there actually any cases
+        // where the error could be falsey here?
         if (error) return <AlertItem key={error} type="warning" title={error} />
+        return null
       })}
     </>
   )

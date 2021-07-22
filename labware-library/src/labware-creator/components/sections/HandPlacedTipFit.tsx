@@ -39,6 +39,7 @@ export const HandPlacedTipFit = (): JSX.Element | null => {
         <SectionBody label="Hand-Placed Tip Fit" id="HandPlacedTipFit">
           <>
             <FormAlerts
+              values={values}
               touched={touched}
               errors={errors}
               fieldList={fieldList}

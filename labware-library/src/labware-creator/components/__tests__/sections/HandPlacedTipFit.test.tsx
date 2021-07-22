@@ -48,6 +48,7 @@ describe('HandPlacedTipFit', () => {
     FormAlertsMock.mockImplementation(args => {
       if (
         isEqual(args, {
+          values: formikConfig.initialValues,
           touched: {},
           errors: {},
           fieldList: ['handPlacedTipFit'],

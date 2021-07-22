@@ -59,7 +59,9 @@ describe('Create a Tip Rack', () => {
     // verify that fit is required
     cy.get('#HandPlacedTipFit input').first().click()
     cy.get('#HandPlacedTipFit p').first().click()
-    cy.get('#HandPlacedTipFit span').contains('Fit is required').should('exist')
+    cy.get('#HandPlacedTipFit span')
+      .contains('Fit is a required field')
+      .should('exist')
 
     // verify that loose option is selected
     cy.get('#HandPlacedTipFit input')
