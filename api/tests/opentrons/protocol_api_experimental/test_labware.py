@@ -64,9 +64,11 @@ def subject(decoy: Decoy,
     return Labware(engine_client=engine_client, labware_id="labware-id")
 
 
-def test_has_labware_definition(subject: Labware) -> None:
-    """Test that labware object caches labware_definition."""
-    assert subject._definition is not None
+def test_raises_error_without_labware_definition(
+        engine_client: ProtocolEngineClient) -> None:
+    """Test that an exception is raised when no labware_definition found."""
+    with pytest.raises(Exception, match="Labware definition not found"):
+        Labware(engine_client=engine_client, labware_id="123")
 
 
 def test_labware_id_property(subject: Labware) -> None:
