@@ -14,7 +14,8 @@ from .. import errors
 from ..resources import DeckFixedLabware
 from ..commands import Command, LoadLabwareResult, AddLabwareDefinitionResult
 from ..types import LabwareLocation, Dimensions
-from .substore import HasState, CommandReactive
+from .actions import Action, UpdateCommandAction
+from .substore import HasState, HandlesActions
 
 
 @dataclass(frozen=True)
@@ -35,7 +36,7 @@ class LabwareState:
     deck_definition: DeckDefinitionV2
 
 
-class LabwareStore(HasState[LabwareState], CommandReactive):
+class LabwareStore(HasState[LabwareState], HandlesActions):
     """Labware state container."""
 
     _state: LabwareState
@@ -73,7 +74,12 @@ class LabwareStore(HasState[LabwareState], CommandReactive):
             deck_definition=deck_definition,
         )
 
-    def handle_command(self, command: Command) -> None:
+    def handle_action(self, action: Action) -> None:
+        """Modify state in reaction to an action."""
+        if isinstance(action, UpdateCommandAction):
+            self._handle_command(action.command)
+
+    def _handle_command(self, command: Command) -> None:
         """Modify state in reaction to a command."""
         if isinstance(command.result, LoadLabwareResult):
             uri = uri_from_details(

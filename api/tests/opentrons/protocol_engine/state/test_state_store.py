@@ -4,9 +4,7 @@ import pytest
 from decoy import Decoy
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV2
-from opentrons.protocol_engine.state import StateStore, State
-
-from .command_fixtures import create_pending_command
+from opentrons.protocol_engine.state import StateStore, State, PlayAction, PauseAction
 
 
 @pytest.fixture
@@ -28,7 +26,7 @@ def test_has_state(subject: StateStore) -> None:
 def test_state_is_immutable(subject: StateStore) -> None:
     """It should treat the state as immutable."""
     result_1 = subject.get_state()
-    subject.handle_command(create_pending_command())
+    subject.handle_action(PlayAction())
     result_2 = subject.get_state()
 
     assert result_1 is not result_2
@@ -47,11 +45,11 @@ async def test_wait_for_state(decoy: Decoy, subject: StateStore) -> None:
     result = asyncio.create_task(subject.wait_for(check_condition, "foo", bar="baz"))
     await asyncio.sleep(0)
 
-    subject.handle_command(create_pending_command())
+    subject.handle_action(PauseAction())
     await asyncio.sleep(0)
     assert result.done() is False
 
-    subject.handle_command(create_pending_command())
+    subject.handle_action(PlayAction())
     await asyncio.sleep(0)
     assert result.done() is True
 

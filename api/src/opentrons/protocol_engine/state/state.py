@@ -4,18 +4,21 @@ from __future__ import annotations
 import asyncio
 from dataclasses import dataclass
 from functools import partial
-from typing import Any, Callable, List, Sequence
+from typing import Any, Callable, List, Optional, Sequence, TypeVar
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV2
 
-from .. import commands as cmd
 from ..resources import DeckFixedLabware
-from .substore import CommandReactive
+from .actions import Action
+from .substore import HandlesActions
 from .commands import CommandState, CommandStore, CommandView
 from .labware import LabwareState, LabwareStore, LabwareView
 from .pipettes import PipetteState, PipetteStore, PipetteView
 from .geometry import GeometryView
 from .motion import MotionView
+
+
+ReturnT = TypeVar("ReturnT")
 
 
 @dataclass(frozen=True)
@@ -88,7 +91,7 @@ class StateStore(StateView):
             deck_definition=deck_definition,
         )
 
-        self._lifecycle_substores: List[CommandReactive] = [
+        self._lifecycle_substores: List[HandlesActions] = [
             self._command_store,
             self._pipette_store,
             self._labware_store,
@@ -101,19 +104,19 @@ class StateStore(StateView):
         """Get an immutable copy of the current engine state."""
         return self._state
 
-    def handle_command(self, command: cmd.Command) -> None:
-        """Modify State in reaction to a Command."""
+    def handle_action(self, action: Action) -> None:
+        """Modify State in reaction to an action."""
         for substore in self._lifecycle_substores:
-            substore.handle_command(command)
+            substore.handle_action(action)
 
         self._update_state_views()
 
     async def wait_for(
         self,
-        condition: Callable[..., Any],
+        condition: Callable[..., Optional[ReturnT]],
         *args: Any,
         **kwargs: Any,
-    ) -> None:
+    ) -> ReturnT:
         """Wait for a condition to become true, checking whenever state changes."""
         predicate = partial(condition, *args, **kwargs)
         is_done = predicate()

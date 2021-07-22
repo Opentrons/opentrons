@@ -7,7 +7,7 @@ from typing import Optional, Type, cast
 
 from opentrons.protocol_engine.errors import ProtocolEngineError
 from opentrons.protocol_engine.resources import ResourceProviders
-from opentrons.protocol_engine.state import StateStore
+from opentrons.protocol_engine.state import StateStore, UpdateCommandAction
 from opentrons.protocol_engine.commands import (
     AbstractCommandImpl,
     BaseCommand,
@@ -195,8 +195,8 @@ async def test_execute(
     await subject.execute("command-id")
 
     decoy.verify(
-        state_store.handle_command(running_command),
-        state_store.handle_command(completed_command),
+        state_store.handle_action(UpdateCommandAction(command=running_command)),
+        state_store.handle_action(UpdateCommandAction(command=completed_command)),
     )
 
 
@@ -302,6 +302,6 @@ async def test_execute_raises_protocol_engine_error(
     await subject.execute("command-id")
 
     decoy.verify(
-        state_store.handle_command(running_command),
-        state_store.handle_command(failed_command),
+        state_store.handle_action(UpdateCommandAction(command=running_command)),
+        state_store.handle_action(UpdateCommandAction(command=failed_command)),
     )

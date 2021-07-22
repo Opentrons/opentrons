@@ -1,7 +1,7 @@
 """Command side-effect execution logic container."""
 from logging import getLogger
 
-from ..state import StateStore
+from ..state import StateStore, UpdateCommandAction
 from ..resources import ResourceProviders
 from ..commands import CommandStatus, CommandMapper
 from .equipment import EquipmentHandler
@@ -55,7 +55,7 @@ class CommandExecutor:
             startedAt=started_at,
         )
 
-        self._state_store.handle_command(running_command)
+        self._state_store.handle_action(UpdateCommandAction(command=running_command))
 
         try:
             log.debug(f"Executing {command.id}, {command.commandType}, {command.data}")
@@ -80,4 +80,4 @@ class CommandExecutor:
             completedAt=completed_at,
         )
 
-        self._state_store.handle_command(completed_command)
+        self._state_store.handle_action(UpdateCommandAction(command=completed_command))

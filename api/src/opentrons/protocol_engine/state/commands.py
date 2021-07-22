@@ -6,32 +6,42 @@ from typing import List, Optional
 
 from ..commands import Command, CommandStatus
 from ..errors import CommandDoesNotExistError
-from .substore import HasState, CommandReactive
+from .substore import HasState, HandlesActions
+from .actions import Action, UpdateCommandAction, PlayAction, PauseAction
 
 
 @dataclass(frozen=True)
 class CommandState:
     """State of all protocol engine command resources."""
 
+    is_running: bool
     # TODO(mc, 2021-06-16): OrderedDict is mutable. Switch to Sequence + Mapping
     commands_by_id: OrderedDict[str, Command]
 
 
-class CommandStore(HasState[CommandState], CommandReactive):
+class CommandStore(HasState[CommandState], HandlesActions):
     """Command state container."""
 
     _state: CommandState
 
     def __init__(self) -> None:
         """Initialize a CommandStore and its state."""
-        self._state = CommandState(commands_by_id=OrderedDict())
+        self._state = CommandState(is_running=False, commands_by_id=OrderedDict())
 
-    def handle_command(self, command: Command) -> None:
-        """Modify state in reaction to any command."""
-        commands_by_id = self._state.commands_by_id.copy()
-        commands_by_id.update({command.id: command})
+    def handle_action(self, action: Action) -> None:
+        """Modify state in reaction to an action."""
+        if isinstance(action, UpdateCommandAction):
+            command = action.command
+            commands_by_id = self._state.commands_by_id.copy()
+            commands_by_id.update({command.id: command})
 
-        self._state = replace(self._state, commands_by_id=commands_by_id)
+            self._state = replace(self._state, commands_by_id=commands_by_id)
+
+        elif isinstance(action, PlayAction):
+            self._state = replace(self._state, is_running=True)
+
+        elif isinstance(action, PauseAction):
+            self._state = replace(self._state, is_running=False)
 
 
 class CommandView(HasState[CommandState]):
@@ -71,11 +81,15 @@ class CommandView(HasState[CommandState]):
 
         If there are no pending commands at all, returns None.
         """
+        if self._state.is_running is False:
+            return None
+
         for command_id, command in self._state.commands_by_id.items():
             if command.status == CommandStatus.FAILED:
                 return None
             elif command.status == CommandStatus.QUEUED:
                 return command_id
+
         return None
 
     def get_all_queued(self) -> List[str]:

@@ -2,8 +2,7 @@
 from abc import ABC, abstractmethod
 from typing import Generic, TypeVar
 
-from ..commands import Command
-
+from .actions import Action
 
 SubstateT = TypeVar("SubstateT")
 
@@ -19,10 +18,10 @@ class HasState(ABC, Generic[SubstateT]):
         return self._state
 
 
-class CommandReactive(ABC):
-    """Abstract base class for an interface that reacts to commands."""
+class HandlesActions(ABC):
+    """Abstract base class for an interface that reacts to actions."""
 
     @abstractmethod
-    def handle_command(self, command: Command) -> None:
-        """React to a Command resource change."""
+    def handle_action(self, action: Action) -> None:
+        """React to a state-change action."""
         ...

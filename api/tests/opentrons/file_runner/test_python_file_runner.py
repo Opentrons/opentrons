@@ -101,7 +101,7 @@ async def test_python_runner_run(
     """It should be able to run the protocol to completion."""
     await subject.run()
     decoy.verify(
-        protocol_engine.start(),
+        protocol_engine.play(),
         await executor.execute(),
         await protocol_engine.wait_for_done(),
     )
@@ -114,7 +114,7 @@ def test_python_runner_pause(
 ) -> None:
     """It should be able to pause the run."""
     subject.pause()
-    decoy.verify(protocol_engine.stop())
+    decoy.verify(protocol_engine.pause())
 
 
 def test_python_runner_play(
@@ -124,7 +124,7 @@ def test_python_runner_play(
 ) -> None:
     """It should be able to resume the run."""
     subject.play()
-    decoy.verify(protocol_engine.start())
+    decoy.verify(protocol_engine.play())
 
 
 @pytest.mark.xfail(raises=NotImplementedError, strict=True)

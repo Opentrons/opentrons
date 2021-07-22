@@ -9,7 +9,13 @@ from opentrons.protocol_engine.commands import CommandMapper
 from opentrons.protocol_engine.types import PipetteName
 from opentrons.protocol_engine.execution import CommandExecutor, QueueWorker
 from opentrons.protocol_engine.resources import ResourceProviders
-from opentrons.protocol_engine.state import StateStore
+
+from opentrons.protocol_engine.state import (
+    StateStore,
+    PlayAction,
+    PauseAction,
+    UpdateCommandAction,
+)
 
 
 @pytest.fixture
@@ -98,43 +104,8 @@ def test_add_command(
     result = subject.add_command(request)
 
     assert result == queued_command
-    decoy.verify(state_store.handle_command(queued_command), queue_worker.refresh())
-
-
-def test_start(
-    decoy: Decoy,
-    queue_worker: QueueWorker,
-    subject: ProtocolEngine,
-) -> None:
-    """It should be able to start executing queued commands."""
-    subject.start()
-
-    decoy.verify(queue_worker.start())
-
-
-def test_stop(
-    decoy: Decoy,
-    queue_worker: QueueWorker,
-    subject: ProtocolEngine,
-) -> None:
-    """It should be able to stop executing queued commands."""
-    subject.stop()
-
-    decoy.verify(queue_worker.stop())
-
-
-async def test_wait_for_done(
-    decoy: Decoy,
-    state_store: StateStore,
-    queue_worker: QueueWorker,
-    subject: ProtocolEngine,
-) -> None:
-    """It should be able to wait until the engine is done executing."""
-    await subject.wait_for_done()
-
     decoy.verify(
-        await state_store.wait_for(state_store.commands.get_is_complete),
-        await queue_worker.wait_for_idle(),
+        state_store.handle_action(UpdateCommandAction(command=queued_command)),
     )
 
 
@@ -194,10 +165,48 @@ async def test_execute_command(
     assert result == executed_command
 
     decoy.verify(
-        state_store.handle_command(queued_command),
-        queue_worker.refresh(),
+        state_store.handle_action(PlayAction()),
+        queue_worker.start(),
+        state_store.handle_action(UpdateCommandAction(command=queued_command)),
         await state_store.wait_for(
             condition=state_store.commands.get_is_complete,
             command_id="command-id",
         ),
+    )
+
+
+def test_play(
+    decoy: Decoy,
+    state_store: StateStore,
+    subject: ProtocolEngine,
+) -> None:
+    """It should be able to start executing queued commands."""
+    subject.play()
+
+    decoy.verify(state_store.handle_action(PlayAction()))
+
+
+def test_pause(
+    decoy: Decoy,
+    state_store: StateStore,
+    subject: ProtocolEngine,
+) -> None:
+    """It should be able to stop executing queued commands."""
+    subject.pause()
+
+    decoy.verify(state_store.handle_action(PauseAction()))
+
+
+async def test_wait_for_done(
+    decoy: Decoy,
+    state_store: StateStore,
+    queue_worker: QueueWorker,
+    subject: ProtocolEngine,
+) -> None:
+    """It should be able to wait until the engine is done executing."""
+    await subject.wait_for_done()
+
+    decoy.verify(
+        await state_store.wait_for(state_store.commands.get_is_complete),
+        await queue_worker.stop(),
     )

@@ -18,7 +18,8 @@ from ..commands import (
     PickUpTipResult,
     DropTipResult,
 )
-from .substore import HasState, CommandReactive
+from .actions import Action, UpdateCommandAction
+from .substore import HasState, HandlesActions
 
 
 @dataclass(frozen=True)
@@ -46,7 +47,7 @@ class PipetteState:
     current_location: Optional[DeckLocation]
 
 
-class PipetteStore(HasState[PipetteState], CommandReactive):
+class PipetteStore(HasState[PipetteState], HandlesActions):
     """Pipette state container."""
 
     _state: PipetteState
@@ -59,8 +60,12 @@ class PipetteStore(HasState[PipetteState], CommandReactive):
             current_location=None,
         )
 
-    def handle_command(self, command: Command) -> None:
-        """Modify state in reaction to a completed command."""
+    def handle_action(self, action: Action) -> None:
+        """Modify state in reaction to an action."""
+        if isinstance(action, UpdateCommandAction):
+            self._handle_command(action.command)
+
+    def _handle_command(self, command: Command) -> None:
         if isinstance(
             command.result,
             (

@@ -69,7 +69,7 @@ async def test_json_runner_run(
     await subject.run()
 
     decoy.verify(
-        protocol_engine.start(),
+        protocol_engine.play(),
         await protocol_engine.wait_for_done(),
     )
 
@@ -82,7 +82,7 @@ def test_json_runner_play(
     """It should be able to resume the run."""
     subject.play()
 
-    decoy.verify(protocol_engine.start())
+    decoy.verify(protocol_engine.play())
 
 
 def test_json_runner_pause(
@@ -93,7 +93,7 @@ def test_json_runner_pause(
     """It should be able to pause the run."""
     subject.pause()
 
-    decoy.verify(protocol_engine.stop())
+    decoy.verify(protocol_engine.pause())
 
 
 @pytest.mark.xfail(raises=NotImplementedError, strict=True)

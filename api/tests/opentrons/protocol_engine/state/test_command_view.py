@@ -16,10 +16,13 @@ from .command_fixtures import (
 
 
 def get_command_view(
-    commands_by_id: Sequence[Tuple[str, cmd.Command]] = ()
+    is_running: bool = False, commands_by_id: Sequence[Tuple[str, cmd.Command]] = ()
 ) -> CommandView:
     """Get a command view test subject."""
-    state = CommandState(commands_by_id=OrderedDict(commands_by_id))
+    state = CommandState(
+        is_running=is_running,
+        commands_by_id=OrderedDict(commands_by_id),
+    )
 
     return CommandView(state=state)
 
@@ -65,12 +68,13 @@ def test_get_next_queued_returns_first_pending() -> None:
     completed_command = create_completed_command()
 
     subject = get_command_view(
+        is_running=True,
         commands_by_id=[
             ("command-id-1", running_command),
             ("command-id-2", completed_command),
             ("command-id-3", pending_command),
             ("command-id-4", pending_command),
-        ]
+        ],
     )
 
     assert subject.get_next_queued() == "command-id-3"
@@ -87,11 +91,12 @@ def test_get_next_queued_returns_none_when_no_pending() -> None:
     assert subject.get_next_queued() is None
 
     subject = get_command_view(
+        is_running=True,
         commands_by_id=[
             ("command-id-1", running_command),
             ("command-id-2", completed_command),
             ("command-id-3", failed_command),
-        ]
+        ],
     )
 
     assert subject.get_next_queued() is None
@@ -105,12 +110,27 @@ def test_get_next_queued_returns_none_when_earlier_command_failed() -> None:
     pending_command = create_pending_command(command_id="command-id-4")
 
     subject = get_command_view(
+        is_running=True,
         commands_by_id=[
             ("command-id-1", running_command),
             ("command-id-2", completed_command),
             ("command-id-3", failed_command),
             ("command-id-4", pending_command),
-        ]
+        ],
+    )
+
+    assert subject.get_next_queued() is None
+
+
+def test_get_next_queued_returns_none_if_stopped() -> None:
+    """It should return None if the engine is not running."""
+    pending_command = create_pending_command(command_id="command-id-1")
+
+    subject = get_command_view(
+        is_running=False,
+        commands_by_id=[
+            ("command-id-1", pending_command),
+        ],
     )
 
     assert subject.get_next_queued() is None

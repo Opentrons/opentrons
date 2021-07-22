@@ -1,11 +1,17 @@
 """Tests for the command QueueWorker in opentrons.protocol_engine."""
 import asyncio
 import pytest
-from decoy import Decoy
-from typing import AsyncIterable
+from decoy import Decoy, matchers
+from typing import Any, AsyncIterable
 
 from opentrons.protocol_engine.state import StateStore
 from opentrons.protocol_engine.execution import CommandExecutor, QueueWorker
+
+
+class BreakLoopError(Exception):
+    """An exception to break out of the worker's wait-for-new-command loop."""
+
+    pass
 
 
 @pytest.fixture
@@ -28,28 +34,55 @@ async def subject(
     """Get a QueueWorker instance."""
     subject = QueueWorker(state_store=state_store, command_executor=command_executor)
     yield subject
-    await subject.wait_for_idle()
+
+    try:
+        await subject.stop()
+    except BreakLoopError:
+        pass
+
+
+@pytest.fixture(autouse=True)
+async def queue_commands(decoy: Decoy, state_store: StateStore) -> None:
+    """Load the command queue with 2 queued commands, then a break.
+
+    Since `state_store.wait_for` will not return a `None` command ID,
+    we raise to make sure the tests stop no matter what.
+    """
+    call_count = 0
+
+    def _get_next_queued_command(condition: Any) -> str:
+        nonlocal call_count
+        call_count = call_count + 1
+
+        if call_count < 3:
+            return f"command-id-{call_count}"
+        else:
+            raise BreakLoopError()
+
+    decoy.when(
+        await state_store.wait_for(condition=state_store.commands.get_next_queued)
+    ).then_do(_get_next_queued_command)
 
 
 async def _flush_tasks() -> None:
     await asyncio.sleep(0)
 
 
-async def test_pulls_jobs_off_queue(
+async def test_start_processes_commands(
     decoy: Decoy,
     state_store: StateStore,
     command_executor: CommandExecutor,
     subject: QueueWorker,
 ) -> None:
     """It should pull commands off the queue and execute them."""
-    decoy.when(state_store.commands.get_next_queued()).then_return(
-        "command-id-1",
-        "command-id-2",
-        None,
+    subject.start()
+
+    decoy.verify(
+        await command_executor.execute(command_id=matchers.Anything()),
+        times=0,
     )
 
-    subject.start()
-    await subject.wait_for_idle()
+    await _flush_tasks()
 
     decoy.verify(
         await command_executor.execute(command_id="command-id-1"),
@@ -63,118 +96,123 @@ async def test_stop(
     command_executor: CommandExecutor,
     subject: QueueWorker,
 ) -> None:
-    """It should stop pulling jobs off the queue."""
-    decoy.when(state_store.commands.get_next_queued()).then_return(
-        "command-id-1",
-        "command-id-2",
-        "command-id-3",
-        None,
+    """It should stop pulling jobs once it is stopped."""
+    subject.start()
+    await subject.stop()
+
+    decoy.verify(
+        await command_executor.execute(command_id=matchers.Anything()),
+        times=0,
     )
 
-    decoy.when(await command_executor.execute(command_id="command-id-1")).then_do(
-        lambda command_id: subject.stop()
+
+async def test_unhandled_exception_breaks_loop(
+    decoy: Decoy,
+    state_store: StateStore,
+    command_executor: CommandExecutor,
+    subject: QueueWorker,
+) -> None:
+    """It should raise any unhandled exceptions in `stop`."""
+    decoy.when(await command_executor.execute(command_id="command-id-1")).then_raise(
+        RuntimeError("oh no")
     )
 
     subject.start()
     await _flush_tasks()
 
-    decoy.verify(await command_executor.execute(command_id="command-id-2"), times=0)
-
-    subject.start()
-    await subject.wait_for_idle()
-
-    decoy.verify(await command_executor.execute(command_id="command-id-2"), times=1)
+    with pytest.raises(RuntimeError, match="oh no"):
+        await subject.stop()
 
 
-async def test_restart(
-    decoy: Decoy,
-    state_store: StateStore,
-    command_executor: CommandExecutor,
-    subject: QueueWorker,
-) -> None:
-    """It should be able to restart after the queue is exhausted."""
-    decoy.when(state_store.commands.get_next_queued()).then_return(
-        "command-id-1",
-        "command-id-2",
-        None,
-        "command-id-3",
-        "command-id-4",
-        None,
-    )
+# async def test_restart(
+#     decoy: Decoy,
+#     state_store: StateStore,
+#     command_executor: CommandExecutor,
+#     subject: QueueWorker,
+# ) -> None:
+#     """It should be able to restart after the queue is exhausted."""
+#     decoy.when(state_store.commands.get_next_queued()).then_return(
+#         "command-id-1",
+#         "command-id-2",
+#         None,
+#         "command-id-3",
+#         "command-id-4",
+#         None,
+#     )
 
-    subject.start()
-    await subject.wait_for_idle()
+#     subject.start()
+#     await subject.wait_for_idle()
 
-    decoy.verify(
-        await command_executor.execute(command_id="command-id-1"),
-        await command_executor.execute(command_id="command-id-2"),
-    )
-    decoy.verify(await command_executor.execute(command_id="command-id-3"), times=0)
+#     decoy.verify(
+#         await command_executor.execute(command_id="command-id-1"),
+#         await command_executor.execute(command_id="command-id-2"),
+#     )
+#     decoy.verify(await command_executor.execute(command_id="command-id-3"), times=0)
 
-    subject.start()
-    await subject.wait_for_idle()
+#     subject.start()
+#     await subject.wait_for_idle()
 
-    decoy.verify(
-        await command_executor.execute(command_id="command-id-1"),
-        await command_executor.execute(command_id="command-id-2"),
-        await command_executor.execute(command_id="command-id-3"),
-        await command_executor.execute(command_id="command-id-4"),
-    )
-
-
-async def test_refresh(
-    decoy: Decoy,
-    state_store: StateStore,
-    command_executor: CommandExecutor,
-    subject: QueueWorker,
-) -> None:
-    """It should be able to refresh the queue without restarting."""
-    decoy.when(state_store.commands.get_next_queued()).then_return(
-        "command-id-1",
-        "command-id-2",
-        None,
-        "command-id-3",
-        "command-id-4",
-        None,
-    )
-
-    subject.start()
-    await subject.wait_for_idle()
-
-    decoy.verify(
-        await command_executor.execute(command_id="command-id-1"),
-        await command_executor.execute(command_id="command-id-2"),
-    )
-    decoy.verify(await command_executor.execute(command_id="command-id-3"), times=0)
-
-    subject.refresh()
-    await subject.wait_for_idle()
-
-    decoy.verify(
-        await command_executor.execute(command_id="command-id-1"),
-        await command_executor.execute(command_id="command-id-2"),
-        await command_executor.execute(command_id="command-id-3"),
-        await command_executor.execute(command_id="command-id-4"),
-    )
+#     decoy.verify(
+#         await command_executor.execute(command_id="command-id-1"),
+#         await command_executor.execute(command_id="command-id-2"),
+#         await command_executor.execute(command_id="command-id-3"),
+#         await command_executor.execute(command_id="command-id-4"),
+#     )
 
 
-async def test_play_noop(
-    decoy: Decoy,
-    state_store: StateStore,
-    command_executor: CommandExecutor,
-    subject: QueueWorker,
-) -> None:
-    """It should no-op if play is called multiple times."""
-    decoy.when(state_store.commands.get_next_queued()).then_return("command-id-1")
+# async def test_refresh(
+#     decoy: Decoy,
+#     state_store: StateStore,
+#     command_executor: CommandExecutor,
+#     subject: QueueWorker,
+# ) -> None:
+#     """It should be able to refresh the queue without restarting."""
+#     decoy.when(state_store.commands.get_next_queued()).then_return(
+#         "command-id-1",
+#         "command-id-2",
+#         None,
+#         "command-id-3",
+#         "command-id-4",
+#         None,
+#     )
 
-    subject.start()
-    subject.start()
-    subject.start()
-    decoy.when(state_store.commands.get_next_queued()).then_return(None)
+#     subject.start()
+#     await subject.wait_for_idle()
 
-    await subject.wait_for_idle()
+#     decoy.verify(
+#         await command_executor.execute(command_id="command-id-1"),
+#         await command_executor.execute(command_id="command-id-2"),
+#     )
+#     decoy.verify(await command_executor.execute(command_id="command-id-3"), times=0)
 
-    decoy.verify(
-        await command_executor.execute(command_id="command-id-1"),
-        times=1,
-    )
+#     subject.refresh()
+#     await subject.wait_for_idle()
+
+#     decoy.verify(
+#         await command_executor.execute(command_id="command-id-1"),
+#         await command_executor.execute(command_id="command-id-2"),
+#         await command_executor.execute(command_id="command-id-3"),
+#         await command_executor.execute(command_id="command-id-4"),
+#     )
+
+
+# async def test_play_noop(
+#     decoy: Decoy,
+#     state_store: StateStore,
+#     command_executor: CommandExecutor,
+#     subject: QueueWorker,
+# ) -> None:
+#     """It should no-op if play is called multiple times."""
+#     decoy.when(state_store.commands.get_next_queued()).then_return("command-id-1")
+
+#     subject.start()
+#     subject.start()
+#     subject.start()
+#     decoy.when(state_store.commands.get_next_queued()).then_return(None)
+
+#     await subject.wait_for_idle()
+
+#     decoy.verify(
+#         await command_executor.execute(command_id="command-id-1"),
+#         times=1,
+#     )

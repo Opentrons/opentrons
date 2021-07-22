@@ -1,8 +1,16 @@
 """ProtocolEngine class definition."""
 from .resources import ResourceProviders
-from .state import State, StateStore, StateView
 from .commands import Command, CommandRequest, CommandMapper
 from .execution import CommandExecutor, QueueWorker
+
+from .state import (
+    State,
+    StateStore,
+    StateView,
+    PlayAction,
+    PauseAction,
+    UpdateCommandAction,
+)
 
 
 class ProtocolEngine:
@@ -54,17 +62,17 @@ class ProtocolEngine:
             command_id=self._resources.model_utils.generate_id(),
             created_at=self._resources.model_utils.get_timestamp(),
         )
-        self._state_store.handle_command(command)
-        self._queue_worker.refresh()
+        self._state_store.handle_action(UpdateCommandAction(command=command))
 
         return command
 
     async def execute_command(self, request: CommandRequest) -> Command:
         """Execute a command request, waiting for it to complete.
 
-        The engine must be started with `start` before commands will
-        start executing.
+        This method will start the engine if it has not been started. The
+        engine will remain running after this method is done.
         """
+        self.play()
         command = self.add_command(request)
 
         await self._state_store.wait_for(
@@ -74,13 +82,14 @@ class ProtocolEngine:
 
         return self._state_store.commands.get(command_id=command.id)
 
-    def start(self) -> None:
+    def play(self) -> None:
         """Start or resume executing commands in the queue."""
+        self._state_store.handle_action(PlayAction())
         self._queue_worker.start()
 
-    def stop(self) -> None:
-        """Stop or pause executing commands in the queue."""
-        self._queue_worker.stop()
+    def pause(self) -> None:
+        """Pause executing commands in the queue."""
+        self._state_store.handle_action(PauseAction())
 
     async def wait_for_done(self) -> None:
         """Wait for the ProtocolEngine to become idle.
@@ -93,4 +102,4 @@ class ProtocolEngine:
         the CommandExecutor, this is where they will be raised.
         """
         await self._state_store.wait_for(self._state_store.commands.get_is_complete)
-        await self._queue_worker.wait_for_idle()
+        await self._queue_worker.stop()

@@ -34,17 +34,17 @@ class PythonFileRunner(AbstractFileRunner):
 
     async def run(self) -> None:
         """Run the protocol to completion."""
-        self._protocol_engine.start()
+        self._protocol_engine.play()
         await self._executor.execute()
         await self._protocol_engine.wait_for_done()
 
     def play(self) -> None:
         """Resume running the Python protocol file after a pause."""
-        self._protocol_engine.start()
+        self._protocol_engine.play()
 
     def pause(self) -> None:
         """Pause the running Python protocol file's execution."""
-        self._protocol_engine.stop()
+        self._protocol_engine.pause()
 
     def stop(self) -> None:
         """Cancel the running Python protocol file."""
