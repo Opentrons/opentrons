@@ -1,7 +1,8 @@
 """Tests for the Protocol API v3 labware interface."""
 import pytest
 from decoy import Decoy
-from mock import MagicMock, patch
+from pytest_lazyfixture import lazy_fixture     # type: ignore
+
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.protocol_engine import DeckSlotLocation
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
@@ -34,17 +35,37 @@ def min_labware_definition(
 
 
 @pytest.fixture
+def min_labware_definition2(
+        minimal_labware_def: dev_types.LabwareDefinition
+) -> LabwareDefinition:
+    """Create another labware definition fixture."""
+    minimal_labware_def['parameters'].update({'magneticModuleEngageHeight': 101.0,
+                                              'tipLength': 42.0})
+    return LabwareDefinition.parse_obj(minimal_labware_def)
+
+
+@pytest.fixture
+def labware_definition(
+        min_labware_definition: LabwareDefinition
+) -> LabwareDefinition:
+    """Labware definition fixture to use in subject, and to use for parametrization."""
+    return min_labware_definition
+
+
+@pytest.fixture
 def subject(decoy: Decoy,
             engine_client: ProtocolEngineClient,
-            min_labware_definition: LabwareDefinition,
-) -> Labware:
+            labware_definition: LabwareDefinition,
+            ) -> Labware:
     """Get a Labware test subject with its dependencies mocked out."""
-    engine_client.state.labware.get_labware_definition = MagicMock(
-        return_value=min_labware_definition)
+    decoy.when(
+        engine_client.state.labware.get_labware_definition(labware_id="labware-id")
+    ).then_return(labware_definition)
     return Labware(engine_client=engine_client, labware_id="labware-id")
 
 
-def test_has_labware_definition(subject: Labware):
+def test_has_labware_definition(subject: Labware) -> None:
+    """Test that labware object caches labware_definition."""
     assert subject._definition is not None
 
 
@@ -53,14 +74,15 @@ def test_labware_id_property(subject: Labware) -> None:
     assert subject.labware_id == "labware-id"
 
 
-def test_labware_equality(engine_client: ProtocolEngineClient,
-                          min_labware_definition: LabwareDefinition) -> None:
+def test_labware_equality(decoy: Decoy,
+                          engine_client: ProtocolEngineClient,
+                          labware_definition: LabwareDefinition) -> None:
     """Two labware with the same ID should be considered equal."""
-    engine_client.state.labware.get_labware_definition = MagicMock(
-        return_value=min_labware_definition)
+    decoy.when(
+        engine_client.state.labware.get_labware_definition(labware_id="123")
+    ).then_return(labware_definition)
     labware_1 = Labware(engine_client=engine_client, labware_id="123")
     labware_2 = Labware(engine_client=engine_client, labware_id="123")
-
     assert labware_1 == labware_2
 
 
@@ -149,15 +171,16 @@ def test_labware_magdeck_engage_height_not_compatible(
     assert subject.magdeck_engage_height is None
 
 
+@pytest.mark.parametrize("labware_definition",
+                         [lazy_fixture("min_labware_definition2")])
 def test_labware_magdeck_engage_height(
     decoy: Decoy,
     engine_client: ProtocolEngineClient,
-    min_labware_definition: LabwareDefinition,
+    labware_definition: LabwareDefinition,
     subject: Labware,
 ) -> None:
     """It should return magdeck engage height from definition."""
-    subject._definition.parameters = MagicMock(magneticModuleEngageHeight=42.0)
-    assert subject.magdeck_engage_height == 42.0
+    assert subject.magdeck_engage_height == 101.0
 
 
 def test_labware_is_not_tiprack(
@@ -170,6 +193,8 @@ def test_labware_is_not_tiprack(
     assert subject.is_tiprack is False
 
 
+@pytest.mark.parametrize("labware_definition",
+                         [lazy_fixture("min_labware_definition2")])
 def test_labware_tip_length(
     decoy: Decoy,
     engine_client: ProtocolEngineClient,
@@ -177,8 +202,6 @@ def test_labware_tip_length(
     subject: Labware,
 ) -> None:
     """It should return tip length if present in the definition."""
-    subject._definition.parameters = MagicMock(tipLength=42.0)
-
     assert subject.tip_length == 42.0
 
 
@@ -199,14 +222,13 @@ def test_labware_has_wells_by_name(
         min_labware_definition: LabwareDefinition,
         subject: Labware,
 ) -> None:
-    """It should return Dict of Well objects by name and cache it."""
+    """It should return Dict of Well objects by name."""
     assert subject.wells_by_name() == {'A1': Well(well_name='A1',
                                                   engine_client=engine_client,
                                                   labware=subject),
                                        'A2': Well(well_name='A2',
                                                   engine_client=engine_client,
-                                                  labware=subject)
-                                       }
+                                                  labware=subject)}
 
 
 def test_labware_has_wells_list(
@@ -230,7 +252,7 @@ def test_labware_rows(
         engine_client: ProtocolEngineClient,
         subject: Labware,
 ) -> None:
-    """It should return the labware's wells as rows."""
+    """It should return the labware's wells as list of rows."""
     assert subject.rows() == [[Well(well_name='A1',
                                     engine_client=engine_client,
                                     labware=subject),
@@ -244,7 +266,7 @@ def test_labware_rows_by_name(
         engine_client: ProtocolEngineClient,
         subject: Labware,
 ) -> None:
-    """It should return the labware's wells as rows."""
+    """It should return the labware's wells as dictionary of rows."""
     assert subject.rows_by_name() == {"A": [Well(well_name='A1',
                                                  engine_client=engine_client,
                                                  labware=subject),
@@ -253,29 +275,29 @@ def test_labware_rows_by_name(
                                                  labware=subject)]}
 
 
-def test_labware_columns_by_name(
-        decoy: Decoy,
-        engine_client: ProtocolEngineClient,
-        subject: Labware,
-) -> None:
-    """It should return the labware's wells as columns."""
-    assert subject.columns_by_name() == {"1": [Well(well_name='A1',
-                                                    engine_client=engine_client,
-                                                    labware=subject)],
-                                         "2": [Well(well_name='A2',
-                                                    engine_client=engine_client,
-                                                    labware=subject)]}
-
-
 def test_labware_columns(
         decoy: Decoy,
         engine_client: ProtocolEngineClient,
         subject: Labware,
 ) -> None:
-    """It should return the labware's wells as columns."""
+    """It should return the labware's wells as list of columns."""
     assert subject.columns() == [[Well(well_name='A1',
                                        engine_client=engine_client,
                                        labware=subject)],
                                  [Well(well_name='A2',
                                        engine_client=engine_client,
                                        labware=subject)]]
+
+
+def test_labware_columns_by_name(
+        decoy: Decoy,
+        engine_client: ProtocolEngineClient,
+        subject: Labware,
+) -> None:
+    """It should return the labware's wells as dictionary of columns."""
+    assert subject.columns_by_name() == {"1": [Well(well_name='A1',
+                                                    engine_client=engine_client,
+                                                    labware=subject)],
+                                         "2": [Well(well_name='A2',
+                                                    engine_client=engine_client,
+                                                    labware=subject)]}

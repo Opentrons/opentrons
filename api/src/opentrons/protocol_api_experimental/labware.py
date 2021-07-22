@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import re
-from functools import lru_cache
+from dataclasses import dataclass
 from typing import Any, List, Dict, Optional, Union, cast
 from collections import defaultdict
 
@@ -11,6 +11,13 @@ from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from .errors import LabwareIsNotTipRackError
 from .types import DeckSlotName, LabwareParameters, Point
 from .well import Well
+
+
+@dataclass
+class Grid:
+    """Class for a labware's wells as a grid of rows & columns."""
+    rows: Dict[str, List[Well]]
+    columns: Dict[str, List[Well]]
 
 
 class Labware:  # noqa: D101
@@ -32,7 +39,7 @@ class Labware:  # noqa: D101
         self._labware_id = labware_id
 
         self._definition = self._engine_client.state.labware.get_labware_definition(
-            self._labware_id)
+            labware_id=self._labware_id)
 
         self._wells_by_name: Dict[str, Well] = {
             well_name: Well(
@@ -43,6 +50,8 @@ class Labware:  # noqa: D101
             for col in self._definition.ordering
             for well_name in col
         }
+
+        self._well_grid = self._get_well_grid()
 
     # TODO(mc, 2021-04-22): remove this property; it's redundant and
     # unlikely to be used by PAPI users
@@ -190,11 +199,7 @@ class Labware:  # noqa: D101
         return rows
 
     def rows_by_name(self) -> Dict[str, List[Well]]:  # noqa: D102
-        pattern = re.compile(WELL_NAME_PATTERN, re.X)
-        rows_by_name = defaultdict(list)
-        for key in self._wells_by_name.keys():
-            rows_by_name[pattern.match(key).group(1)].append(self._wells_by_name[key])
-        return rows_by_name
+        return self._well_grid.rows
 
     def columns(self) -> List[List[Well]]:  # noqa: D102
         cols = list()
@@ -203,11 +208,20 @@ class Labware:  # noqa: D101
         return cols
 
     def columns_by_name(self) -> Dict[str, List[Well]]:  # noqa: D102
+        return self._well_grid.columns
+
+    def _get_well_grid(self) -> Grid:
+        """Arrange wells in rows and columns."""
         pattern = re.compile(WELL_NAME_PATTERN, re.X)
-        cols_by_name = defaultdict(list)
-        for key in self._wells_by_name.keys():
-            cols_by_name[pattern.match(key).group(2)].append(self._wells_by_name[key])
-        return cols_by_name
+        wells_by_rows = defaultdict(list)
+        wells_by_cols = defaultdict(list)
+        assert self._wells_by_name, "Need _wells_by_name created before computing grid"
+        for well_name in self._wells_by_name.keys():
+            match = pattern.match(well_name)
+            assert match, f"Well name did not match pattern {pattern}"
+            wells_by_rows[match.group(1)].append(self._wells_by_name[well_name])
+            wells_by_cols[match.group(2)].append(self._wells_by_name[well_name])
+        return Grid(columns=dict(wells_by_cols), rows=dict(wells_by_rows))
 
     def __repr__(self) -> str:  # noqa: D105
         # TODO: (spp, 2021.07.14): Should this be a combination of display name & <obj>?
