@@ -52,38 +52,6 @@ class ServerManager:
             handler=ConnectionHandler(self._smoothie_emulator),
         )
 
-    @property
-    def smoothie_emulator(self) -> SmoothieEmulator:
-        return self._smoothie_emulator
-
-    @property
-    def temp_deck_emulator(self) -> TempDeckEmulator:
-        return self._temp_emulator
-
-    @property
-    def mag_deck_emulator(self) -> MagDeckEmulator:
-        return self._mag_emulator
-
-    @property
-    def thermocycler_emulator(self) -> ThermocyclerEmulator:
-        return self._therm_emulator
-
-    @property
-    def smoothie_server(self) -> SmoothieEmulator:
-        return self._smoothie_server
-
-    @property
-    def temp_deck_server(self) -> TempDeckEmulator:
-        return self._temp_server
-
-    @property
-    def mag_deck_server(self) -> MagDeckEmulator:
-        return self._mag_server
-
-    @property
-    def thermocycler_server(self) -> ThermocyclerEmulator:
-        return self._therm_server
-
     async def run(self):
         await asyncio.gather(
             self._mag_server,
