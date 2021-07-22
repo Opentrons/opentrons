@@ -2,6 +2,7 @@
 import asyncio
 import pytest
 from decoy import Decoy
+from typing import Callable
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV2
 from opentrons.protocol_engine.state import StateStore, State, PlayAction, PauseAction
@@ -34,7 +35,7 @@ def test_state_is_immutable(subject: StateStore) -> None:
 
 async def test_wait_for_state(decoy: Decoy, subject: StateStore) -> None:
     """It should return an awaitable that signals state changes."""
-    check_condition = decoy.mock()
+    check_condition: Callable[..., bool] = decoy.mock()
 
     decoy.when(check_condition("foo", bar="baz")).then_return(
         False,
