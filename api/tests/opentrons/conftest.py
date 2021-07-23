@@ -9,7 +9,7 @@ from opentrons.protocols.context.protocol_api.protocol_context import \
 
 try:
     import aionotify
-except OSError:
+except (OSError, ModuleNotFoundError):
     aionotify = None  # type: ignore
 import asyncio
 import os
