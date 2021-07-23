@@ -108,7 +108,7 @@ class Labware:  # noqa: D101
     # operational logic, and its presence in this interface is no longer
     # necessary with Protocol Engine controlling execution. Can we get rid of it?
     @property
-    def magdeck_engage_height(self) -> Optional[float]:  # noqa: D102
+    def magdeck_engage_height(self) -> Optional[float]:    # noqa: D102
         definition = self._engine_client.state.labware.get_labware_definition(
             labware_id=self._labware_id
         )
