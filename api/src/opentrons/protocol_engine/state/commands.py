@@ -92,29 +92,19 @@ class CommandView(HasState[CommandState]):
 
         return None
 
-    def get_all_queued(self) -> List[str]:
-        """Return the next requests in line to be executed.
-
-        This will return all commands with a status of CommandStatus.QUEUED.
-        However, if any command is marked CommandStatus.FAILED, an empty list
-        will be return instead.
-        """
-        commands = self._state.commands_by_id.values()
-
-        if any(c for c in commands if c.status == CommandStatus.FAILED):
-            return []
-
-        return [c.id for c in commands if c.status == CommandStatus.QUEUED]
-
     def get_is_complete(self, command_id: Optional[str] = None) -> bool:
         """Get whether a given command is (or all commands are) completed.
 
-        Arguments:
-            command_id: Command to check. If omitted or `None`, will return True
-                only if _all_ commands have completed.
+        A command is "completed" if one of the following is true:
 
-        Will also return true if the command in question (or an ealier command in
-        the queue) fails.
+        - Its status is CommandStatus.SUCCEEDED
+        - Its status is CommandStatus.FAILED
+        - A command earlier in the queue has a status of CommandStatus.FAILED
+             - In this case, the command in question will never run
+
+        Arguments:
+            command_id: Command to check. If omitted or `None`, will onle
+                return True if _all_ commands have completed.
         """
         for search_id, search_command in self._state.commands_by_id.items():
             search_status = search_command.status
