@@ -63,7 +63,7 @@ Simulators
 ***************
 Simulation mode will run the robot-server with simple software simulations of the Smoothie and magnetic, temperature, and thermocycler modules. This mode is ideal for rapid testing as the GCODE communication layer is bypassed.
 
-- `make -C robot-server dev`
+- ``make -C robot-server dev``
 
 ***************
 Emulators
@@ -72,7 +72,7 @@ Using the emulation mode will have the robot server send GCODE commands to a run
 
 This requires two steps. Enter these commands from the opentrons directory:
 
-- `make -C api emulator`
-- `make -C robot-server dev-with-emulator`
+- ``make -C api emulator``
+- ``make -C robot-server dev-with-emulator``
 
-By default a `p20_multi_v2.0` is on the left mount and `p20_single_v2.0` is on the right. These can be changed by modifying the `OT_EMULATOR_smoothie` environment variable which contains a stringified JSON object with a `model` and `id` field for the `left` and `right`. All fields are optional. For example to use a `p300_multi` on the right use  `export OT_EMULATOR_smoothie='{"right": {"model": "p300_multi"}}' && make -C api emulator`
+By default a ``p20_multi_v2.0`` is on the left mount and ``p20_single_v2.0`` is on the right. These can be changed by modifying the ``OT_EMULATOR_smoothie`` environment variable which contains a stringified JSON object with a ``model`` and ``id`` field for the ``left`` and ``right``. All fields are optional. For example to use a ``p300_multi`` on the right use  ``export OT_EMULATOR_smoothie='{"right": {"model": "p300_multi"}}' && make -C api emulator``
