@@ -165,8 +165,6 @@ async def test_execute_command(
     assert result == executed_command
 
     decoy.verify(
-        state_store.handle_action(PlayAction()),
-        queue_worker.start(),
         state_store.handle_action(UpdateCommandAction(command=queued_command)),
         await state_store.wait_for(
             condition=state_store.commands.get_is_complete,

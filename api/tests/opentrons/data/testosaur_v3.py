@@ -17,7 +17,7 @@ def run(ctx):
     pipette = ctx.load_instrument("p300_single_gen2", types.Mount.RIGHT, [])
 
     for i in range(4):
-        pipette.pick_up_tip(tip_rack.well(i))
+        pipette.pick_up_tip(tip_rack.wells()[i])
         pipette.aspirate(50, source.wells_by_name()["A1"])
-        pipette.dispense(50, dest.well(i))
-        pipette.drop_tip(tip_rack.well(i))
+        pipette.dispense(50, dest.wells()[i])
+        pipette.drop_tip(tip_rack.wells()[i])

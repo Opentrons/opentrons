@@ -72,10 +72,10 @@ class ProtocolEngine:
         return command
 
     async def execute_command(self, request: CommandRequest) -> Command:
-        """Add a command to the queue and execute it, waiting for it to complete.
+        """Add a command to the queue and wait for it to complete.
 
-        This method will start the engine if it has not been started. The
-        engine will remain running after this method is done.
+        The engine must be started by calling `play` before the command will
+        execute. You only need to call `play` once.
 
         Arguments:
             request: The command type and payload data used to construct
@@ -84,7 +84,6 @@ class ProtocolEngine:
         Returns:
             The completed command, whether or not it succeeded or failed.
         """
-        self.play()
         command = self.add_command(request)
 
         await self._state_store.wait_for(

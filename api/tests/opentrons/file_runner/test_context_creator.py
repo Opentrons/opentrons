@@ -18,6 +18,7 @@ from opentrons.protocol_engine import (
 async def protocol_engine(hardware: HardwareAPI) -> AsyncIterable[ProtocolEngine]:
     """Get a ProtocolEngine wired to a simulating HardwareAPI."""
     engine = await create_protocol_engine(hardware=hardware)
+    engine.play()
     yield engine
     await engine.wait_for_done()
 
