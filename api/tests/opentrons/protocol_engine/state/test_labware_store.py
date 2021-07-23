@@ -41,7 +41,7 @@ def test_initial_state(
     fixed_trash_def: LabwareDefinition,
     subject: LabwareStore,
 ) -> None:
-    """It should create the labware substore with preloaded fixed labware."""
+    """It should create the labware.abstract_store with preloaded fixed labware."""
     expected_trash_uri = uri_from_details(
         namespace=fixed_trash_def.namespace,
         version=fixed_trash_def.version,

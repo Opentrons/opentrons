@@ -1,25 +1,25 @@
-"""Base state store classes."""
+"""Abstract state store interfaces."""
 from abc import ABC, abstractmethod
 from typing import Generic, TypeVar
 
 from .actions import Action
 
-SubstateT = TypeVar("SubstateT")
+StateT = TypeVar("StateT")
 
 
-class HasState(ABC, Generic[SubstateT]):
-    """Abstract base class for a sub-store."""
+class HasState(ABC, Generic[StateT]):
+    """Abstract interface for an object that has a state data member."""
 
-    _state: SubstateT
+    _state: StateT
 
     @property
-    def state(self) -> SubstateT:
+    def state(self) -> StateT:
         """State getter."""
         return self._state
 
 
 class HandlesActions(ABC):
-    """Abstract base class for an interface that reacts to actions."""
+    """Abstract interface for an object that reacts to actions."""
 
     @abstractmethod
     def handle_action(self, action: Action) -> None:

@@ -10,7 +10,7 @@ from opentrons_shared_data.deck.dev_types import DeckDefinitionV2
 
 from ..resources import DeckFixedLabware
 from .actions import Action
-from .substore import HasState, HandlesActions
+from .abstract_store import HasState, HandlesActions
 from .commands import CommandState, CommandStore, CommandView
 from .labware import LabwareState, LabwareStore, LabwareView
 from .pipettes import PipetteState, PipetteStore, PipetteView
@@ -94,7 +94,7 @@ class StateStore(StateView, HandlesActions):
             deck_definition=deck_definition,
         )
 
-        self._lifecycle_substores: List[HandlesActions] = [
+        self._substores: List[HandlesActions] = [
             self._command_store,
             self._pipette_store,
             self._labware_store,
@@ -110,7 +110,7 @@ class StateStore(StateView, HandlesActions):
             action: An action object representing a state change. Will be
                 passed to all substores so they can react accordingly.
         """
-        for substore in self._lifecycle_substores:
+        for substore in self._substores:
             substore.handle_action(action)
 
         self._update_state_views()

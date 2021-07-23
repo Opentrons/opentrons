@@ -19,7 +19,7 @@ from ..commands import (
     DropTipResult,
 )
 from .actions import Action, UpdateCommandAction
-from .substore import HasState, HandlesActions
+from .abstract_store import HasState, HandlesActions
 
 
 @dataclass(frozen=True)

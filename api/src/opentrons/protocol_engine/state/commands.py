@@ -6,7 +6,7 @@ from typing import List, Optional
 
 from ..commands import Command, CommandStatus
 from ..errors import CommandDoesNotExistError
-from .substore import HasState, HandlesActions
+from .abstract_store import HasState, HandlesActions
 from .actions import Action, UpdateCommandAction, PlayAction, PauseAction
 
 

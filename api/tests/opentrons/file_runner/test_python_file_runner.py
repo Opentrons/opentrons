@@ -101,7 +101,6 @@ async def test_python_runner_run(
     """It should be able to run the protocol to completion."""
     await subject.run()
     decoy.verify(
-        protocol_engine.play(),
         await executor.execute(),
         await protocol_engine.wait_for_done(),
     )
