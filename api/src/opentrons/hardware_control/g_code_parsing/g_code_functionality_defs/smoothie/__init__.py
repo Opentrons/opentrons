@@ -3,7 +3,7 @@ from .absolute_coordinate_mode_g_code_functionality_def import \
 from .acceleration_g_code_functionality_def import \
     AccelerationGCodeFunctionalityDef
 from .current_position_g_code_functionality_def import \
-    CurrentPositionCodeFunctionalityDef
+    CurrentPositionGCodeFunctionalityDef
 from .disengage_motor_g_code_functionality_def import \
     DisengageMotorGCodeFunctionalityDef
 from .dwell_g_code_functionality_def import \
@@ -62,7 +62,7 @@ from .write_instrument_model_g_code_functionality_def import \
     WriteInstrumentModelGCodeFunctionalityDef
 
 __all__ = [
-    'CurrentPositionCodeFunctionalityDef',
+    'CurrentPositionGCodeFunctionalityDef',
     'DwellGCodeFunctionalityDef',
     'HomeGCodeFunctionalityDef',
     'LimitSwitchStatusGCodeFunctionalityDef',

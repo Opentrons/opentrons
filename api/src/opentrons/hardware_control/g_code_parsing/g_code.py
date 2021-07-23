@@ -4,12 +4,13 @@ import re
 from typing import List
 
 from .errors import UnparsableGCodeError
-from opentrons.drivers.smoothie_drivers.driver_3_0 import GCODE as SMOOTHIE_GCODE
+from opentrons.drivers.smoothie_drivers.driver_3_0 import GCODE as SMOOTHIE_G_CODE
+from opentrons.drivers.mag_deck.driver import GCODE as MAGDECK_G_CODE
 from opentrons.hardware_control.g_code_parsing.utils import reverse_enum
 from opentrons.hardware_control.emulation.parser import Parser
 from opentrons.hardware_control.g_code_parsing.g_code_functionality_defs.\
     g_code_functionality_def_base import Explanation
-from .g_code_functionality_defs import smoothie
+from .g_code_functionality_defs import smoothie, magdeck
 
 
 class GCode:
@@ -18,71 +19,86 @@ class GCode:
     convert them to human-readable JSON form
     """
 
-    G_CODE_EXPLANATION_MAPPING = {
+    SMOOTHIE_G_CODE_EXPLANATION_MAPPING = {
         # Weird Enum thing stopping me from using values from
         # enum for MOVE and SET_SPEED see g_code.py get_gcode_function for explanation
         'MOVE':
             smoothie.MoveGCodeFunctionalityDef,
         'SET_SPEED':
             smoothie.SetSpeedGCodeFunctionalityDef,
-        SMOOTHIE_GCODE.WAIT.name:
+        SMOOTHIE_G_CODE.WAIT.name:
             smoothie.WaitGCodeFunctionalityDef,
-        SMOOTHIE_GCODE.HOME.name:
+        SMOOTHIE_G_CODE.HOME.name:
             smoothie.HomeGCodeFunctionalityDef,
-        SMOOTHIE_GCODE.SET_CURRENT.name:
+        SMOOTHIE_G_CODE.SET_CURRENT.name:
             smoothie.SetCurrentGCodeFunctionalityDef,
-        SMOOTHIE_GCODE.DWELL.name:
+        SMOOTHIE_G_CODE.DWELL.name:
             smoothie.DwellGCodeFunctionalityDef,
-        SMOOTHIE_GCODE.CURRENT_POSITION.name:
-            smoothie.CurrentPositionCodeFunctionalityDef,
-        SMOOTHIE_GCODE.LIMIT_SWITCH_STATUS.name:
+        SMOOTHIE_G_CODE.CURRENT_POSITION.name:
+            smoothie.CurrentPositionGCodeFunctionalityDef,
+        SMOOTHIE_G_CODE.LIMIT_SWITCH_STATUS.name:
             smoothie.LimitSwitchStatusGCodeFunctionalityDef,
-        SMOOTHIE_GCODE.PROBE.name:
+        SMOOTHIE_G_CODE.PROBE.name:
             smoothie.ProbeGCodeFunctionalityDef,
-        SMOOTHIE_GCODE.ABSOLUTE_COORDS.name:
+        SMOOTHIE_G_CODE.ABSOLUTE_COORDS.name:
             smoothie.AbsoluteCoordinateModeGCodeFunctionalityDef,
-        SMOOTHIE_GCODE.RELATIVE_COORDS.name:
+        SMOOTHIE_G_CODE.RELATIVE_COORDS.name:
             smoothie.RelativeCoordinateModeGCodeFunctionalityDef,
-        SMOOTHIE_GCODE.RESET_FROM_ERROR.name:
+        SMOOTHIE_G_CODE.RESET_FROM_ERROR.name:
             smoothie.ResetFromErrorGCodeFunctionalityDef,
-        SMOOTHIE_GCODE.PUSH_SPEED.name:
+        SMOOTHIE_G_CODE.PUSH_SPEED.name:
             smoothie.PushSpeedGCodeFunctionalityDef,
-        SMOOTHIE_GCODE.POP_SPEED.name:
+        SMOOTHIE_G_CODE.POP_SPEED.name:
             smoothie.PopSpeedGCodeFunctionalityDef,
-        SMOOTHIE_GCODE.STEPS_PER_MM.name:
+        SMOOTHIE_G_CODE.STEPS_PER_MM.name:
             smoothie.StepsPerMMGCodeFunctionalityDef,
-        SMOOTHIE_GCODE.SET_MAX_SPEED.name:
+        SMOOTHIE_G_CODE.SET_MAX_SPEED.name:
             smoothie.SetMaxSpeedGCodeFunctionalityDef,
-        SMOOTHIE_GCODE.ACCELERATION.name:
+        SMOOTHIE_G_CODE.ACCELERATION.name:
             smoothie.AccelerationGCodeFunctionalityDef,
-        SMOOTHIE_GCODE.DISENGAGE_MOTOR.name:
+        SMOOTHIE_G_CODE.DISENGAGE_MOTOR.name:
             smoothie.DisengageMotorGCodeFunctionalityDef,
-        SMOOTHIE_GCODE.HOMING_STATUS.name:
+        SMOOTHIE_G_CODE.HOMING_STATUS.name:
             smoothie.HomingStatusGCodeFunctionalityDef,
-        SMOOTHIE_GCODE.MICROSTEPPING_B_DISABLE.name:
+        SMOOTHIE_G_CODE.MICROSTEPPING_B_DISABLE.name:
             smoothie.MicrosteppingBDisableGCodeFunctionalityDef,
-        SMOOTHIE_GCODE.MICROSTEPPING_B_ENABLE.name:
+        SMOOTHIE_G_CODE.MICROSTEPPING_B_ENABLE.name:
             smoothie.MicrosteppingBEnableGCodeFunctionalityDef,
-        SMOOTHIE_GCODE.MICROSTEPPING_C_DISABLE.name:
+        SMOOTHIE_G_CODE.MICROSTEPPING_C_DISABLE.name:
             smoothie.MicrosteppingCDisableGCodeFunctionalityDef,
-        SMOOTHIE_GCODE.MICROSTEPPING_C_ENABLE.name:
+        SMOOTHIE_G_CODE.MICROSTEPPING_C_ENABLE.name:
             smoothie.MicrosteppingCEnableGCodeFunctionalityDef,
-        SMOOTHIE_GCODE.PIPETTE_HOME.name:
+        SMOOTHIE_G_CODE.PIPETTE_HOME.name:
             smoothie.SetPipetteHomeGCodeFunctionalityDef,
-        SMOOTHIE_GCODE.PIPETTE_RETRACT.name:
+        SMOOTHIE_G_CODE.PIPETTE_RETRACT.name:
             smoothie.SetPipetteRetractGCodeFunctionalityDef,
-        SMOOTHIE_GCODE.PIPETTE_DEBOUNCE.name:
+        SMOOTHIE_G_CODE.PIPETTE_DEBOUNCE.name:
             smoothie.SetPipetteDebounceGCodeFunctionalityDef,
-        SMOOTHIE_GCODE.PIPETTE_MAX_TRAVEL.name:
+        SMOOTHIE_G_CODE.PIPETTE_MAX_TRAVEL.name:
             smoothie.SetPipetteMaxTravelGCodeFunctionalityDef,
-        SMOOTHIE_GCODE.READ_INSTRUMENT_MODEL.name:
+        SMOOTHIE_G_CODE.READ_INSTRUMENT_MODEL.name:
             smoothie.ReadInstrumentModelGCodeFunctionalityDef,
-        SMOOTHIE_GCODE.READ_INSTRUMENT_ID.name:
+        SMOOTHIE_G_CODE.READ_INSTRUMENT_ID.name:
             smoothie.ReadInstrumentIDGCodeFunctionalityDef,
-        SMOOTHIE_GCODE.WRITE_INSTRUMENT_ID.name:
+        SMOOTHIE_G_CODE.WRITE_INSTRUMENT_ID.name:
             smoothie.WriteInstrumentIDGCodeFunctionalityDef,
-        SMOOTHIE_GCODE.WRITE_INSTRUMENT_MODEL.name:
+        SMOOTHIE_G_CODE.WRITE_INSTRUMENT_MODEL.name:
             smoothie.WriteInstrumentModelGCodeFunctionalityDef,
+    }
+
+    MAGDECK_G_CODE_EXPLANATION_MAPPING = {
+        MAGDECK_G_CODE.HOME.name:
+            magdeck.HomeGCodeFunctionalityDef,
+        MAGDECK_G_CODE.MOVE.name:
+            magdeck.MoveGCodeFunctionalityDef,
+        MAGDECK_G_CODE.GET_CURRENT_POSITION.name:
+            magdeck.CurrentPositionGCodeFunctionalityDef,
+        MAGDECK_G_CODE.PROBE_PLATE.name:
+            magdeck.ProbeGCodeFunctionalityDef,
+        MAGDECK_G_CODE.GET_PLATE_HEIGHT.name:
+            magdeck.GetPlateHeightGCodeFunctionalityDef,
+        MAGDECK_G_CODE.DEVICE_INFO.name:
+            magdeck.DeviceInfoGCodeFunctionalityDef
     }
 
     # Smoothie G-Code Parsing Characters
@@ -92,16 +108,25 @@ class GCode:
     MOVE_NAME = 'MOVE'
 
     SMOOTHIE_IDENT = 'smoothie'
-    SMOOTHIE_GCODE_LOOKUP = reverse_enum(SMOOTHIE_GCODE)
+    SMOOTHIE_G_CODE_LOOKUP = reverse_enum(SMOOTHIE_G_CODE)
+
+    MAGDECK_IDENT = 'magdeck'
+    MAGDECK_G_CODE_LOOKUP = reverse_enum(MAGDECK_G_CODE)
 
     DEVICE_GCODE_LOOKUP = {
-        SMOOTHIE_IDENT: SMOOTHIE_GCODE_LOOKUP
+        SMOOTHIE_IDENT: SMOOTHIE_G_CODE_LOOKUP,
+        MAGDECK_IDENT: MAGDECK_G_CODE_LOOKUP,
     }
 
     SPECIAL_HANDLING_REQUIRED_G_CODES = [
-        SMOOTHIE_GCODE.WRITE_INSTRUMENT_ID,
-        SMOOTHIE_GCODE.WRITE_INSTRUMENT_MODEL,
+        SMOOTHIE_G_CODE.WRITE_INSTRUMENT_ID,
+        SMOOTHIE_G_CODE.WRITE_INSTRUMENT_MODEL,
     ]
+
+    EXPLANATION_LOOKUP = {
+        SMOOTHIE_IDENT: SMOOTHIE_G_CODE_EXPLANATION_MAPPING,
+        MAGDECK_IDENT: MAGDECK_G_CODE_EXPLANATION_MAPPING,
+    }
 
     @classmethod
     def from_raw_code(cls, raw_code: str, device: str, response: str) -> List[GCode]:
@@ -214,11 +239,11 @@ class GCode:
             ])
 
             # For the following if/else I was going to grab the enum names
-            # from SMOOTHIE_GCODE but due to the way that enums work, if I
+            # from SMOOTHIE_G_CODE but due to the way that enums work, if I
             # have 2 enum entries with the same value the second value will
             # act as an alias to the first.
             # Since the value for SET_SPEED and MOVE are both G0 and MOVE is defined
-            # first, calling SMOOTHIE_GCODE.SET_SPEED.name returns MOVE.
+            # first, calling SMOOTHIE_G_CODE.SET_SPEED.name returns MOVE.
             # Super annoying but it's how it works.
             # Super annoying, so I am just going to hard code the value for now.
 
@@ -243,7 +268,9 @@ class GCode:
     def get_explanation(self) -> Explanation:
         g_code_function = self.get_gcode_function()
         try:
-            explanation_class = self.G_CODE_EXPLANATION_MAPPING[g_code_function]
+            explanation_class = \
+                self.EXPLANATION_LOOKUP[self.device_name][g_code_function]
+
         except KeyError:
             return Explanation(
                 self.g_code,

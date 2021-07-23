@@ -6,7 +6,7 @@ from opentrons.hardware_control.g_code_parsing.errors import UnparsableGCodeErro
 from typing import List, Dict
 
 
-def g_codes() -> List[GCode]:
+def smoothie_g_codes() -> List[GCode]:
     raw_codes = [
         # FORMAT
         # [GCODE, RESPONSE]
@@ -199,15 +199,61 @@ def g_codes() -> List[GCode]:
 
     for g_code in g_code_list:
         if len(g_code) > 1:
-            g_codes = ', '.join([code.g_code for code in g_code])
+            smoothie_g_codes = ', '.join([code.g_code for code in g_code])
             raise Exception('Hey, you forgot to put a comma between the G-Codes for '
-                            f'{g_codes}')
+                            f'{smoothie_g_codes}')
 
     return [code[0] for code in g_code_list]
 
 
+def magdeck_g_codes() -> List[GCode]:
+    raw_codes = [
+        # Test 42
+        ['G28.2', 'ok\r\nok\r\n'],
+
+        # Test 43
+        ['G0 Z10.12', 'ok\r\nok\r\n'],
+
+        # Test 44
+        ['M114.2', 'Z:12.34\r\nok\r\nok\r\n'],
+
+        # Test 45
+        ['G38.2', 'ok\r\nok\r\n'],
+
+        # Test 46
+        ['M836', 'height:12.34\r\nok\r\nok\r\n'],
+
+        # Test 47
+        [
+            'M115', 'serial:MDV0118052801 model:mag_deck_v1 '
+            'version:edge-11aa22b\r\nok\r\nok\r\n'
+         ]
+    ]
+    g_code_list = [
+        GCode.from_raw_code(code, 'magdeck', response)
+        for code, response in raw_codes
+    ]
+
+    for g_code in g_code_list:
+        if len(g_code) > 1:
+            magdeck_g_codes = ', '.join([code.g_code for code in g_code])
+            raise Exception('Hey, you forgot to put a comma between the G-Codes for '
+                            f'{magdeck_g_codes}')
+
+    return [code[0] for code in g_code_list]
+
+
+def all_g_codes() -> List[GCode]:
+    g_codes = []
+    g_codes.extend(smoothie_g_codes())
+    g_codes.extend(magdeck_g_codes())
+
+    return g_codes
+
+
 def expected_function_name_values() -> List[str]:
     return [
+        #  Smoothie
         'HOME',  # Test 0
         'HOME',  # Test 1
         'HOME',  # Test 2
@@ -250,13 +296,19 @@ def expected_function_name_values() -> List[str]:
         'MICROSTEPPING_C_DISABLE',  # Test 39
         'READ_INSTRUMENT_ID',  # Test 40
         'READ_INSTRUMENT_MODEL',  # Test 41
-
+        #  Magdeck
+        'HOME',  # Test 42
+        'MOVE',  # Test 43
+        'GET_CURRENT_POSITION',  # Test 44
+        'PROBE_PLATE',  # Test 45
+        'GET_PLATE_HEIGHT',  # Test 46
+        'DEVICE_INFO',  # Test 47
     ]
 
 
 def expected_arg_values() -> List[Dict[str, int]]:
     return [
-
+        #  Smoothie
         # Test 0
         {'A': None, 'B': None, 'C': None, 'X': None, 'Y': None, 'Z': None},
 
@@ -399,11 +451,26 @@ def expected_arg_values() -> List[Dict[str, int]]:
 
         # Test 41
         {'L': None},
+
+        # Magdeck
+        # Test 42
+        {},
+        # Test 43
+        {'Z': 10.12},
+        # Test 44
+        {},
+        # Test 45
+        {},
+        # Test 46
+        {},
+        # Test 47
+        {},
     ]
 
 
 def explanations() -> List[Explanation]:
     return [
+        #  Smoothie
         Explanation(  # Test 0
             code='G28.2',
             command_name='HOME',
@@ -801,12 +868,65 @@ def explanations() -> List[Explanation]:
             provided_args={'L': None},
             command_explanation='Reading instrument model for Left pipette'
         ),
+
+        #  Magdeck
+        # Test 42
+        Explanation(
+            code='G28.2',
+            command_name='HOME',
+            response='',
+            provided_args={},
+            command_explanation='Homing the magdeck'
+        ),
+        # Test 43
+        Explanation(
+            code='G0',
+            command_name='MOVE',
+            response='',
+            provided_args={'Z': 10.12},
+            command_explanation='Setting magnet height to 10.12mm'
+        ),
+        # Test 44
+        Explanation(
+            code='M114.2',
+            command_name='GET_CURRENT_POSITION',
+            response='Current height of magnets are 12.34mm',
+            provided_args={},
+            command_explanation='Reading current position of magnets'
+        ),
+        # Test 45
+        Explanation(
+            code='G38.2',
+            command_name='PROBE_PLATE',
+            response='',
+            provided_args={},
+            command_explanation='Magdeck probing attached labware to get height in mm'
+        ),
+        # Test 46
+        Explanation(
+            code='M836',
+            command_name='GET_PLATE_HEIGHT',
+            response='Magdeck calculated labware height at 12.34mm',
+            provided_args={},
+            command_explanation='Calculating magdeck labware height'
+        ),
+        # Test 47
+        Explanation(
+            code='M115',
+            command_name='DEVICE_INFO',
+            response='Magdeck info:'
+                     '\n\tSerial Number: MDV0118052801'
+                     '\n\tModel: mag_deck_v1'
+                     '\n\tFirmware Version: edge-11aa22b',
+            provided_args={},
+            command_explanation='Getting magdeck device info'
+        ),
     ]
 
 
 @pytest.mark.parametrize(
     'parsed_value,expected_value',
-    list(zip(g_codes(), expected_function_name_values()))
+    list(zip(all_g_codes(), expected_function_name_values()))
 )
 def test_smoothie_g_code_function_lookup(
     parsed_value: GCode,
@@ -817,7 +937,7 @@ def test_smoothie_g_code_function_lookup(
 
 @pytest.mark.parametrize(
     'parsed_value,expected_value',
-    list(zip(g_codes(), expected_arg_values()))
+    list(zip(all_g_codes(), expected_arg_values()))
 )
 def test_g_code_args(
     parsed_value: GCode,
@@ -828,7 +948,7 @@ def test_g_code_args(
 
 @pytest.mark.parametrize(
     'parsed_value,expected_value',
-    list(zip(g_codes(), explanations()))
+    list(zip(all_g_codes(), explanations()))
 )
 def test_explanation(
     parsed_value: GCode,
@@ -852,13 +972,13 @@ def test_bad_read_write_g_codes(bad_raw_code):
 @pytest.mark.parametrize(
     'raw_code',
     [
-        'M204 S10000 A1500 B200 C200 X3000 Y2000 Z1500',
+        'M204 S10000.0 A1500.0 B200.0 C200.0 X3000.0 Y2000.0 Z1500.0',
         'M370 L5032305356323032303230303730313031000000000000000000000000000000',
         'M400',
     ]
 )
 def test_get_g_code_line(raw_code):
-    GCode.from_raw_code(raw_code, 'smoothie', '')[0].g_code_line == raw_code
+    assert GCode.from_raw_code(raw_code, 'smoothie', '')[0].g_code_line == raw_code
 
 
 @pytest.mark.parametrize(
