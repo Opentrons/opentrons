@@ -36,11 +36,11 @@ class LabwareDataProvider:
         # TODO(mc, 2020-10-18): Fetching labware calibration data is a little
         #  convoluted and could use some clean up
         as_type_dict = cast(dev_types.LabwareDefinition, definition.dict())
-        labware_path = f'{hash_labware_def(as_type_dict)}.json'
+        labware_path = f"{hash_labware_def(as_type_dict)}.json"
         cal_point = get_labware_calibration(
             labware_path,
             as_type_dict,
             # TODO(mc, 2020-10-18): Support labware on modules
-            parent='',
+            parent="",
         )
         return (cal_point.x, cal_point.y, cal_point.z)

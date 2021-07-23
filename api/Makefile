@@ -60,8 +60,16 @@ ot_tests_to_typecheck := \
 	tests/opentrons/protocols/runner
 
 # files and modules to format
-# TODO(mc, 2021-07-23): expand this to all files, replace this variable with `.`
-ot_files_to_format :=
+# TODO(mc, 2021-07-23): expand this to all files until we can format `.`
+ot_files_to_format := \
+	src/opentrons/file_runner \
+	src/opentrons/motion_planning \
+	src/opentrons/protocol_api_experimental \
+	src/opentrons/protocol_engine \
+	tests/opentrons/file_runner \
+	tests/opentrons/motion_planning  \
+	tests/opentrons/protocol_api_experimental \
+	tests/opentrons/protocol_engine
 
 # Defined separately than the clean target so the wheel file doesn’t have to
 # depend on a PHONY target
