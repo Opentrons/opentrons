@@ -3,13 +3,6 @@
 include ../scripts/push.mk
 include ../scripts/python.mk
 
-# using bash instead of /bin/bash in SHELL prevents macOS optimizing away our PATH update
-SHELL := bash
-
-# add yarn CLI dev deps to PATH (for cross platform POSIX commands via shx)
-# and also make an explicit version for shx for use in the shell function,
-# where PATH won’t be propagated
-PATH := $(shell cd .. && yarn bin):$(PATH)
 SHX := npx shx
 
 # Path of source package
@@ -39,6 +32,10 @@ ssh_opts ?= $(default_ssh_opts)
 # For the python sources
 ot_py_sources := $(filter %.py,$(shell $(SHX) find $(SRC_PATH)))
 ot_sources := $(ot_py_sources)
+
+# files and modules to format
+# TODO(mc, 2021-07-23): expand this to all files, replace this variable with `.`
+ot_files_to_format :=
 
 # Defined separately than the clean target so the wheel file doesn’t have to
 # depend on a PHONY target
@@ -90,9 +87,13 @@ test:
 	$(pytest) $(tests) $(test_opts)
 
 .PHONY: lint
-lint: $(ot_py_sources)
+lint:
 	$(python) -m mypy $(SRC_PATH) $(tests)
 	$(python) -m flake8 $(SRC_PATH) $(tests) setup.py
+
+.PHONY: format
+format:
+	$(python) -m black $(ot_files_to_format)
 
 .PHONY: dev
 dev: export OT_ROBOT_SERVER_DOT_ENV_PATH ?= dev.env
