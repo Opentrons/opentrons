@@ -101,6 +101,7 @@ test:
 .PHONY: lint
 lint:
 	$(python) -m mypy $(SRC_PATH) $(tests)
+	$(python) -m black --check $(ot_files_to_format)
 	$(python) -m flake8 $(SRC_PATH) $(tests) setup.py
 
 .PHONY: format

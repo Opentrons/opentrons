@@ -108,6 +108,7 @@ test:
 .PHONY: lint
 lint:
 	$(python) -m mypy src/opentrons $(ot_tests_to_typecheck)
+	$(python) -m black --check $(ot_files_to_format)
 	$(python) -m flake8 setup.py src/opentrons tests
 
 .PHONY: format
