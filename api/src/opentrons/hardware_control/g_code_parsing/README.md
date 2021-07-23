@@ -31,8 +31,8 @@ PROTOCOL_PATH = os.path.join('my', 'absolute', 'path', 'to', 'my', 'protocol.py'
 OUTPUT_PATH = os.path.join('where', 'I', 'want', 'to', 'store', 'my', 'output.txt')
 
 settings = Settings()  # Using default settings defined in class
-g_code_program = ProtocolRunner(settings).run_protocol(PROTOCOL_PATH)
-g_code_program.save_text_explanation_to_file(OUTPUT_PATH, SupportedTextModes.CONCISE)
+with ProtocolRunner(settings).run_protocol(PROTOCOL_PATH) as program:
+    program.save_text_explanation_to_file(OUTPUT_PATH, SupportedTextModes.CONCISE)
 ```
 
 ### G-Code Differ
