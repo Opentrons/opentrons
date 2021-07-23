@@ -2,10 +2,6 @@ import asyncio
 from pathlib import Path
 from unittest import mock
 import pytest
-try:
-    import aionotify
-except (OSError, ModuleNotFoundError):
-    aionotify = None  # type: ignore
 from opentrons.hardware_control import ExecutionManager
 from opentrons.hardware_control.modules import ModuleAtPort
 from opentrons.hardware_control.modules.types import (
