@@ -34,8 +34,20 @@ ot_py_sources := $(filter %.py,$(shell $(SHX) find $(SRC_PATH)))
 ot_sources := $(ot_py_sources)
 
 # files and modules to format
-# TODO(mc, 2021-07-23): expand this to all files, replace this variable with `.`
-ot_files_to_format :=
+# TODO(mc, 2021-07-23): expand this to all files until we can format `.`
+ot_files_to_format := \
+	robot_server/errors \
+	robot_server/health \
+	robot_server/protocols \
+	robot_server/sessions \
+	robot_server/app.py \
+	robot_server/util.py \
+	tests/errors \
+	tests/health \
+	tests/protocols \
+	tests/sessions \
+	tests/test_app.py \
+	tests/test_util.py
 
 # Defined separately than the clean target so the wheel file doesn’t have to
 # depend on a PHONY target
