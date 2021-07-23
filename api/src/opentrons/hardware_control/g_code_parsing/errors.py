@@ -20,3 +20,15 @@ class InvalidTextModeError(ValueError):
         )
         self.invalid_mode = invalid_mode
         self.joined_valid_modes = joined_valid_modes
+
+
+class UnparsableCLICommandError(ValueError):
+    def __init__(self, invalid_command, valid_commands: List[str]) -> None:
+        joined_commands = ', '.join(valid_commands)
+
+        super().__init__(
+            f'Command named "{invalid_command}" not valid. '
+            f'Valid commands are: {joined_commands}'
+        )
+        self.invalid_command = invalid_command
+        self.joined_commands = joined_commands
