@@ -72,14 +72,10 @@ class CommandView(HasState[CommandState]):
     def get_next_queued(self) -> Optional[str]:
         """Return the next request in line to be executed.
 
-        Normally, this corresponds to the earliest-added command that's currently
-        pending.
-
-        But if any command added before that command is currently failed, None is
-        returned instead. This models the entire protocol stopping when any command
-        fails.
-
-        If there are no pending commands at all, returns None.
+        Returns:
+            Normally, the ID of the earliest queued command. However, will return
+                None if any command has failed (since a command failure is fatal
+                to a protocol run) or if the engine is currently paused.
         """
         if self._state.is_running is False:
             return None
@@ -103,7 +99,7 @@ class CommandView(HasState[CommandState]):
              - In this case, the command in question will never run
 
         Arguments:
-            command_id: Command to check. If omitted or `None`, will onle
+            command_id: Command to check. If omitted or `None`, will only
                 return True if _all_ commands have completed.
         """
         for search_id, search_command in self._state.commands_by_id.items():

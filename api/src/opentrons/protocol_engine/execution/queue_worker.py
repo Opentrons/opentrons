@@ -18,7 +18,13 @@ class QueueWorker:
         state_store: StateStore,
         command_executor: CommandExecutor,
     ) -> None:
-        """Initialize the queue worker's dependencies and state."""
+        """Initialize the queue worker's dependencies and state.
+
+        Arguments:
+            state_store: The source of truth for protocol state, including
+                all queued commands.
+            command_executor: Interface used to execute and update commands.
+        """
         self._state_store: StateStore = state_store
         self._command_executor: CommandExecutor = command_executor
         self._worker_task: Optional[asyncio.Task] = None

@@ -36,7 +36,12 @@ class CommandExecutor:
         self._resources = resources
 
     async def execute(self, command_id: str) -> None:
-        """Run a given command's execution procedure."""
+        """Run a given command's execution procedure.
+
+        Arguments:
+            command_id: The identifier of the command to execute. The
+                command itself will be looked up from state.
+        """
         command = self._state_store.commands.get(command_id=command_id)
         command_impl = command._ImplementationCls(
             equipment=self._equipment,

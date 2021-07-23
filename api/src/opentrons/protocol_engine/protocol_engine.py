@@ -2,15 +2,7 @@
 from .resources import ResourceProviders
 from .commands import Command, CommandRequest, CommandMapper
 from .execution import CommandExecutor, QueueWorker
-
-from .state import (
-    State,
-    StateStore,
-    StateView,
-    PlayAction,
-    PauseAction,
-    UpdateCommandAction,
-)
+from .state import StateStore, StateView, PlayAction, PauseAction, UpdateCommandAction
 
 
 class ProtocolEngine:
@@ -51,12 +43,25 @@ class ProtocolEngine:
         """Get an interface to retrieve calculated state values."""
         return self._state_store
 
-    def get_state(self) -> State:
-        """Get the engine's underlying state."""
-        return self._state_store.get_state()
+    def play(self) -> None:
+        """Start or resume executing commands in the queue."""
+        self._state_store.handle_action(PlayAction())
+        self._queue_worker.start()
+
+    def pause(self) -> None:
+        """Pause executing commands in the queue."""
+        self._state_store.handle_action(PauseAction())
 
     def add_command(self, request: CommandRequest) -> Command:
-        """Add a command to ProtocolEngine."""
+        """Add a command to ProtocolEngine queue.
+
+        Arguments:
+            request: The command type and payload data used to construct
+                the command in state.
+
+        Returns:
+            The full, newly queued command.
+        """
         command = self._command_mapper.map_request_to_command(
             request=request,
             command_id=self._resources.model_utils.generate_id(),
@@ -67,10 +72,17 @@ class ProtocolEngine:
         return command
 
     async def execute_command(self, request: CommandRequest) -> Command:
-        """Execute a command request, waiting for it to complete.
+        """Add a command to the queue and execute it, waiting for it to complete.
 
         This method will start the engine if it has not been started. The
         engine will remain running after this method is done.
+
+        Arguments:
+            request: The command type and payload data used to construct
+                the command in state.
+
+        Returns:
+            The completed command, whether or not it succeeded or failed.
         """
         self.play()
         command = self.add_command(request)
@@ -81,15 +93,6 @@ class ProtocolEngine:
         )
 
         return self._state_store.commands.get(command_id=command.id)
-
-    def play(self) -> None:
-        """Start or resume executing commands in the queue."""
-        self._state_store.handle_action(PlayAction())
-        self._queue_worker.start()
-
-    def pause(self) -> None:
-        """Pause executing commands in the queue."""
-        self._state_store.handle_action(PauseAction())
 
     async def wait_for_done(self) -> None:
         """Wait for the ProtocolEngine to become idle.

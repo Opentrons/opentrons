@@ -19,16 +19,16 @@ def subject(standard_deck_def: DeckDefinitionV2) -> StateStore:
 
 def test_has_state(subject: StateStore) -> None:
     """It should have an initial state."""
-    result = subject.get_state()
+    result = subject.state
 
     assert isinstance(result, State)
 
 
 def test_state_is_immutable(subject: StateStore) -> None:
     """It should treat the state as immutable."""
-    result_1 = subject.get_state()
+    result_1 = subject.state
     subject.handle_action(PlayAction())
-    result_2 = subject.get_state()
+    result_2 = subject.state
 
     assert result_1 is not result_2
 
