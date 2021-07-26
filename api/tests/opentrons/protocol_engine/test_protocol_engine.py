@@ -14,6 +14,7 @@ from opentrons.protocol_engine.state import (
     StateStore,
     PlayAction,
     PauseAction,
+    StopAction,
     UpdateCommandAction,
 )
 
@@ -180,7 +181,7 @@ def test_pause(
     state_store: StateStore,
     subject: ProtocolEngine,
 ) -> None:
-    """It should be able to stop executing queued commands."""
+    """It should be able to pause executing queued commands."""
     subject.pause()
 
     decoy.verify(state_store.handle_action(PauseAction()))
@@ -198,4 +199,5 @@ async def test_wait_for_done(
     decoy.verify(
         await state_store.wait_for(state_store.commands.get_is_complete),
         await queue_worker.stop(),
+        state_store.handle_action(StopAction()),
     )

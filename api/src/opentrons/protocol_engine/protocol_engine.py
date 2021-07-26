@@ -2,7 +2,15 @@
 from .resources import ResourceProviders
 from .commands import Command, CommandRequest, CommandMapper
 from .execution import QueueWorker
-from .state import StateStore, StateView, PlayAction, PauseAction, UpdateCommandAction
+
+from .state import (
+    StateStore,
+    StateView,
+    PlayAction,
+    PauseAction,
+    StopAction,
+    UpdateCommandAction,
+)
 
 
 class ProtocolEngine:
@@ -49,6 +57,13 @@ class ProtocolEngine:
         """Pause executing commands in the queue."""
         self._state_store.handle_action(PauseAction())
 
+    def stop(self) -> None:
+        """Stop executing commands in the queue.
+
+        A stopped engine cannot be restarted, and is used to mark a given
+        procedure as "done."
+        """
+
     def add_command(self, request: CommandRequest) -> Command:
         """Add a command to the `ProtocolEngine`'s queue.
 
@@ -94,7 +109,9 @@ class ProtocolEngine:
         """Wait for the ProtocolEngine to become idle.
 
         The ProtocolEngine is considered "done" when there is no command
-        currently executing nor any commands left in the queue.
+        currently executing nor any commands left in the queue. After
+        this method resolves, the ProtocolEngine will no longer process commands,
+        nor will it be allowed to restart.
 
         This method should not raise, but if any unexepected exceptions
         happen during command execution that are not properly caught by
@@ -102,3 +119,4 @@ class ProtocolEngine:
         """
         await self._state_store.wait_for(self._state_store.commands.get_is_complete)
         await self._queue_worker.stop()
+        self._state_store.handle_action(StopAction())

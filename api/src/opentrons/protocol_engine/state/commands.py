@@ -5,9 +5,10 @@ from dataclasses import dataclass, replace
 from typing import List, Optional
 
 from ..commands import Command, CommandStatus
-from ..errors import CommandDoesNotExistError
+from ..errors import CommandDoesNotExistError, ProtocolEngineStoppedError
+from ..types import EngineStatus
 from .abstract_store import HasState, HandlesActions
-from .actions import Action, UpdateCommandAction, PlayAction, PauseAction
+from .actions import Action, UpdateCommandAction, PlayAction, PauseAction, StopAction
 
 
 @dataclass(frozen=True)
@@ -15,6 +16,7 @@ class CommandState:
     """State of all protocol engine command resources."""
 
     is_running: bool
+    is_stopped: bool
     # TODO(mc, 2021-06-16): OrderedDict is mutable. Switch to Sequence + Mapping
     commands_by_id: OrderedDict[str, Command]
 
@@ -26,7 +28,11 @@ class CommandStore(HasState[CommandState], HandlesActions):
 
     def __init__(self) -> None:
         """Initialize a CommandStore and its state."""
-        self._state = CommandState(is_running=False, commands_by_id=OrderedDict())
+        self._state = CommandState(
+            is_running=False,
+            is_stopped=False,
+            commands_by_id=OrderedDict(),
+        )
 
     def handle_action(self, action: Action) -> None:
         """Modify state in reaction to an action."""
@@ -38,10 +44,16 @@ class CommandStore(HasState[CommandState], HandlesActions):
             self._state = replace(self._state, commands_by_id=commands_by_id)
 
         elif isinstance(action, PlayAction):
+            if self._state.is_stopped:
+                raise ProtocolEngineStoppedError("Cannot start a stopped protocol.")
+
             self._state = replace(self._state, is_running=True)
 
         elif isinstance(action, PauseAction):
             self._state = replace(self._state, is_running=False)
+
+        elif isinstance(action, StopAction):
+            self._state = replace(self._state, is_running=False, is_stopped=True)
 
 
 class CommandView(HasState[CommandState]):
@@ -112,3 +124,25 @@ class CommandView(HasState[CommandState]):
                 return False
 
         return True if command_id is None else False
+
+    def get_status(self) -> EngineStatus:
+        """Get the current execution status of the engine."""
+        if any(
+            command.status == CommandStatus.FAILED
+            for command in self._state.commands_by_id.values()
+        ):
+            return EngineStatus.FAILED
+
+        if self._state.is_stopped:
+            return EngineStatus.SUCCEEDED
+
+        if self._state.is_running:
+            return EngineStatus.RUNNING
+
+        if all(
+            command.status == CommandStatus.QUEUED
+            for command in self._state.commands_by_id.values()
+        ):
+            return EngineStatus.READY_TO_START
+
+        return EngineStatus.PAUSED

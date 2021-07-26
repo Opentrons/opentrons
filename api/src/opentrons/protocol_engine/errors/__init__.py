@@ -88,3 +88,9 @@ class FailedToPlanMoveError(ProtocolEngineError):
     """An error raised when a requested movement could not be planned."""
 
     pass
+
+
+class ProtocolEngineStoppedError(ProtocolEngineError):
+    """An error raised when attempting to start an engine that has been stopped."""
+
+    pass

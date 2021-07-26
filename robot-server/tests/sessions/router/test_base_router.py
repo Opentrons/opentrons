@@ -7,7 +7,6 @@ from fastapi.testclient import TestClient
 from httpx import AsyncClient
 
 from tests.helpers import verify_response
-
 from robot_server.protocols import (
     ProtocolStore,
     ProtocolResource,
@@ -19,6 +18,7 @@ from robot_server.protocols import (
 from robot_server.sessions.session_view import SessionView, BasicSessionCreateData
 
 from robot_server.sessions.session_models import (
+    SessionStatus,
     BasicSession,
     ProtocolSession,
     ProtocolSessionCreateData,
@@ -65,11 +65,16 @@ async def test_create_session(
     expected_response = BasicSession(
         id=unique_id,
         createdAt=current_time,
+        status=SessionStatus.READY_TO_START,
         actions=[],
         commands=[],
     )
 
     decoy.when(engine_store.engine.state_view.commands.get_all()).then_return([])
+
+    decoy.when(engine_store.engine.state_view.commands.get_status()).then_return(
+        SessionStatus.READY_TO_START
+    )
 
     decoy.when(
         session_view.as_resource(
@@ -80,7 +85,11 @@ async def test_create_session(
     ).then_return(session)
 
     decoy.when(
-        session_view.as_response(session=session, commands=[]),
+        session_view.as_response(
+            session=session,
+            commands=[],
+            engine_status=SessionStatus.READY_TO_START,
+        ),
     ).then_return(expected_response)
 
     response = await async_client.post(
@@ -125,6 +134,7 @@ async def test_create_protocol_session(
     expected_response = ProtocolSession(
         id=unique_id,
         createdAt=current_time,
+        status=SessionStatus.READY_TO_START,
         createParams=ProtocolSessionCreateParams(protocolId="protocol-id"),
         actions=[],
         commands=[],
@@ -143,9 +153,16 @@ async def test_create_protocol_session(
     ).then_return(session)
 
     decoy.when(engine_store.engine.state_view.commands.get_all()).then_return([])
+    decoy.when(engine_store.engine.state_view.commands.get_status()).then_return(
+        SessionStatus.READY_TO_START
+    )
 
     decoy.when(
-        session_view.as_response(session=session, commands=[]),
+        session_view.as_response(
+            session=session,
+            commands=[],
+            engine_status=SessionStatus.READY_TO_START,
+        ),
     ).then_return(expected_response)
 
     response = await async_client.post(
@@ -256,6 +273,7 @@ def test_get_session(
     expected_response = BasicSession(
         id="session-id",
         createdAt=created_at,
+        status=SessionStatus.READY_TO_START,
         actions=[],
         commands=[],
     )
@@ -263,9 +281,16 @@ def test_get_session(
     decoy.when(session_store.get(session_id="session-id")).then_return(session)
 
     decoy.when(engine_store.engine.state_view.commands.get_all()).then_return([])
+    decoy.when(engine_store.engine.state_view.commands.get_status()).then_return(
+        SessionStatus.READY_TO_START
+    )
 
     decoy.when(
-        session_view.as_response(session=session, commands=[]),
+        session_view.as_response(
+            session=session,
+            commands=[],
+            engine_status=SessionStatus.READY_TO_START,
+        ),
     ).then_return(expected_response)
 
     response = client.get("/sessions/session-id")
@@ -326,6 +351,7 @@ def test_get_sessions_not_empty(
     response_1 = BasicSession(
         id="unique-id-1",
         createdAt=created_at_1,
+        status=SessionStatus.SUCCEEDED,
         actions=[],
         commands=[],
     )
@@ -333,9 +359,16 @@ def test_get_sessions_not_empty(
     decoy.when(session_store.get_all()).then_return([session_1])
 
     decoy.when(engine_store.engine.state_view.commands.get_all()).then_return([])
+    decoy.when(engine_store.engine.state_view.commands.get_status()).then_return(
+        SessionStatus.SUCCEEDED
+    )
 
     decoy.when(
-        session_view.as_response(session=session_1, commands=[]),
+        session_view.as_response(
+            session=session_1,
+            commands=[],
+            engine_status=SessionStatus.SUCCEEDED,
+        ),
     ).then_return(response_1)
 
     response = client.get("/sessions")
