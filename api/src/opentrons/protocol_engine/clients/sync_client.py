@@ -137,4 +137,6 @@ class SyncClient:
 
     def pause(self, message: Optional[str]) -> commands.PauseResult:
         """Execute a ``PauseRequest``, returning the result."""
-        raise NotImplementedError("sync_client.pause not yet implemented")
+        request = commands.PauseRequest(data=commands.PauseData(message=message))
+        result = self._transport.execute_command(request=request)
+        return cast(commands.PauseResult, result)

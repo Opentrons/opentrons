@@ -1,6 +1,6 @@
 """Pause protocol command request, result, and implementation models."""
 from __future__ import annotations
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional, Type
 from typing_extensions import Literal
 
@@ -13,7 +13,10 @@ PauseCommandType = Literal["pause"]
 class PauseData(BaseModel):
     """Data required to pause the protocol."""
 
-    pass
+    message: Optional[str] = Field(
+        None,
+        description="A user-facing message associated with the pause",
+    )
 
 
 class PauseResult(BaseModel):
