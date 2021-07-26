@@ -56,8 +56,7 @@ ot_tests_to_typecheck := \
 	tests/opentrons/protocol_api_experimental \
 	tests/opentrons/protocol_engine \
 	tests/opentrons/motion_planning \
-	tests/opentrons/file_runner \
-	tests/opentrons/protocols/runner
+	tests/opentrons/file_runner
 
 # files and modules to format
 # TODO(mc, 2021-07-23): expand this to all files until we can format `.`

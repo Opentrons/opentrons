@@ -1,3 +1,4 @@
+"""Translation of JSON protocol atomic commands into ProtocolEngine commands."""
 from typing import Dict, List
 
 from opentrons.types import DeckSlotName, MountType
@@ -12,15 +13,13 @@ from opentrons.protocol_engine import (
 
 
 class CommandTranslatorError(Exception):
+    """An error raised to indicate an internal programmer error."""
+
     pass
 
 
 class CommandTranslator:
     """Class that translates commands from PD/JSON to ProtocolEngine."""
-
-    def __init__(self) -> None:
-        """Construct a command translator"""
-        pass
 
     def translate(
         self,
@@ -74,16 +73,14 @@ class CommandTranslator:
         labware: models.json_protocol.Labware,
         labware_definitions: Dict[str, models.LabwareDefinition],
     ) -> pe_commands.LoadLabwareRequest:
-        """
+        """Translate a JSON labware data into a LoadLabware command.
+
         Args:
-            labware_id:
-                The ID that the JSON protocol's commands will use to refer to this
-                labware placement.
-            labware:
-                The JSON protocol's details about this labware placement, including
+            labware_id: The ID that the JSON protocol's commands will use to refer to
+                this labware placement.
+            labware: The JSON protocol's details about this labware placement, including
                 which deck slot it should go in, and a pointer to a labware definition.
-            labware_definitions:
-                The JSON protocol's collection of labware definitions.
+            labware_definitions: The JSON protocol's collection of labware definitions.
         """
         definition = labware_definitions[labware.definitionId]
         return pe_commands.LoadLabwareRequest(
