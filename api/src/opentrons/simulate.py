@@ -246,15 +246,15 @@ def bundle_from_sim(
     )
 
 
-def simulate(
-    protocol_file: TextIO,
-    file_name: str = None,
-    custom_labware_paths: List[str] = None,
-    custom_data_paths: List[str] = None,
-    propagate_logs: bool = False,
-    hardware_simulator_file_path: str = None,
-    log_level: str = "warning",
-) -> Tuple[List[Mapping[str, Any]], Optional[BundleContents]]:
+def simulate(protocol_file: TextIO,
+             file_name: str = None,
+             custom_labware_paths: List[str] = None,
+             custom_data_paths: List[str] = None,
+             propagate_logs: bool = False,
+             hardware_simulator_file_path: str = None,
+             estimate_duration: bool = False,
+             log_level: str = 'warning') -> Tuple[List[Mapping[str, Any]],
+                                                  Optional[BundleContents]]:
     """
     Simulate the protocol itself.
 
@@ -302,6 +302,8 @@ def simulate(
                               :py:attr:`.ProtocolContext.bundled_data`.
     :param hardware_simulator_file_path: A path to a JSON file defining a
                                          hardware simulator.
+    :param estimate_duration: Whether this function should estimate how long
+                              the protocol will take to run.
     :param propagate_logs: Whether this function should allow logs from the
                            Opentrons stack to propagate up to the root handler.
                            This can be useful if you're integrating this
@@ -507,13 +509,18 @@ def get_arguments(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
         parser = _get_bundle_args(parser)
 
     parser.add_argument(
-        "protocol",
-        metavar="PROTOCOL",
-        type=argparse.FileType("rb"),
-        help="The protocol file to simulate. If you pass '-', you can pipe "
-        "the protocol via stdin; this could be useful if you want to use this "
-        "utility as part of an automated workflow.",
+        '-e', '--estimate-duration', action="store_true",
+        # TODO (AL, 2021-07-26): Better wording.
+        help='Estimate how long the protocol will take to complete.'
+             'This is a beta feature.'
     )
+
+    parser.add_argument(
+        'protocol', metavar='PROTOCOL',
+        type=argparse.FileType('rb'),
+        help='The protocol file to simulate. If you pass \'-\', you can pipe '
+        'the protocol via stdin; this could be useful if you want to use this '
+        'utility as part of an automated workflow.')
     parser.add_argument(
         "-v",
         "--version",
@@ -567,11 +574,13 @@ def main() -> int:
     runlog, maybe_bundle = simulate(
         args.protocol,
         args.protocol.name,
-        getattr(args, "custom_labware_path", []),
-        getattr(args, "custom_data_path", []) + getattr(args, "custom_data_file", []),
-        hardware_simulator_file_path=getattr(args, "custom_hardware_simulator_file"),
-        log_level=args.log_level,
-    )
+        getattr(args, 'custom_labware_path', []),
+        getattr(args, 'custom_data_path', [])
+        + getattr(args, 'custom_data_file', []),
+        estimate_duration=args.estimate_duration,
+        hardware_simulator_file_path=getattr(args,
+                                             'custom_hardware_simulator_file'),
+        log_level=args.log_level)
 
     if maybe_bundle:
         bundle_name = getattr(args, "bundle", None)
