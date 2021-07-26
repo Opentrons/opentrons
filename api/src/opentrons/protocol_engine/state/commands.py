@@ -88,6 +88,10 @@ class CommandView(HasState[CommandState]):
 
         return None
 
+    def get_is_running(self) -> bool:
+        """Get whether the engine is running and queued commands should be executed."""
+        raise NotImplementedError("get_is_running not yet implemented")
+
     def get_is_complete(self, command_id: Optional[str] = None) -> bool:
         """Get whether a given command is (or all commands are) completed.
 

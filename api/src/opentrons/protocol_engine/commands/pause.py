@@ -30,7 +30,8 @@ class PauseImplementation(AbstractCommandImpl[PauseData, PauseResult]):
 
     async def execute(self, data: PauseData) -> PauseResult:
         """Dispatch a PauseAction to the store to pause the protocol."""
-        raise NotImplementedError("pause command not yet implemented")
+        await self._run_control.pause()
+        return PauseResult()
 
 
 class Pause(BaseCommand[PauseData, PauseResult]):
