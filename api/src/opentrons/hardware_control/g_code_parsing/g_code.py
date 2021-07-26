@@ -6,11 +6,12 @@ from typing import List
 from .errors import UnparsableGCodeError
 from opentrons.drivers.smoothie_drivers.driver_3_0 import GCODE as SMOOTHIE_G_CODE
 from opentrons.drivers.mag_deck.driver import GCODE as MAGDECK_G_CODE
+from opentrons.drivers.temp_deck.driver import GCODE as TEMPDECK_G_CODE
 from opentrons.hardware_control.g_code_parsing.utils import reverse_enum
 from opentrons.hardware_control.emulation.parser import Parser
 from opentrons.hardware_control.g_code_parsing.g_code_functionality_defs.\
     g_code_functionality_def_base import Explanation
-from .g_code_functionality_defs import smoothie, magdeck
+from .g_code_functionality_defs import smoothie, magdeck, tempdeck
 
 
 class GCode:
@@ -101,6 +102,17 @@ class GCode:
             magdeck.DeviceInfoGCodeFunctionalityDef
     }
 
+    TEMPDECK_G_CODE_EXPLANATION_MAPPING = {
+        TEMPDECK_G_CODE.DISENGAGE.name:
+            tempdeck.DisengageGCodeFunctionalityDef,
+        TEMPDECK_G_CODE.SET_TEMP.name:
+            tempdeck.SetTempGCodeFunctionalityDef,
+        TEMPDECK_G_CODE.GET_TEMP.name:
+            tempdeck.GetTempGCodeFunctionalityDef,
+        TEMPDECK_G_CODE.DEVICE_INFO.name:
+            tempdeck.DeviceInfoGCodeFunctionalityDef
+    }
+
     # Smoothie G-Code Parsing Characters
     SET_SPEED_CHARACTER = 'F'
     MOVE_CHARACTERS = ['X', 'Y', 'Z', 'A', 'B', 'C']
@@ -113,9 +125,13 @@ class GCode:
     MAGDECK_IDENT = 'magdeck'
     MAGDECK_G_CODE_LOOKUP = reverse_enum(MAGDECK_G_CODE)
 
+    TEMPDECK_IDENT = 'tempdeck'
+    TEMPDECK_G_CODE_LOOKUP = reverse_enum(TEMPDECK_G_CODE)
+
     DEVICE_GCODE_LOOKUP = {
         SMOOTHIE_IDENT: SMOOTHIE_G_CODE_LOOKUP,
         MAGDECK_IDENT: MAGDECK_G_CODE_LOOKUP,
+        TEMPDECK_IDENT: TEMPDECK_G_CODE_LOOKUP,
     }
 
     SPECIAL_HANDLING_REQUIRED_G_CODES = [
@@ -126,6 +142,7 @@ class GCode:
     EXPLANATION_LOOKUP = {
         SMOOTHIE_IDENT: SMOOTHIE_G_CODE_EXPLANATION_MAPPING,
         MAGDECK_IDENT: MAGDECK_G_CODE_EXPLANATION_MAPPING,
+        TEMPDECK_IDENT: TEMPDECK_G_CODE_EXPLANATION_MAPPING
     }
 
     @classmethod
