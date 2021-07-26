@@ -114,7 +114,7 @@ class GCodeCLI:
     @classmethod
     def to_command(
             cls, processed_args
-    ) -> Union[RunCommand, DiffCommand]:
+    ) -> CLICommand:
         """
         Parse passed arguments to a cli command class
         :param processed_args: Arguments that have been ran through both the
@@ -169,7 +169,7 @@ class GCodeCLI:
         :return: Parser object
         """
         parser = argparse.ArgumentParser(
-            description='CLI for interfacing G-Code Parser with S3'
+            description='CLI for G-Code Parser'
         )
         subparsers = parser.add_subparsers(
             title='Supported commands',
