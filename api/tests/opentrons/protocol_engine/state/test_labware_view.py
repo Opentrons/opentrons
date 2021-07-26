@@ -391,3 +391,5 @@ def test_get_slot_position(standard_deck_def: DeckDefinitionV2) -> None:
     result = subject.get_slot_position(DeckSlotName.SLOT_3)
 
     assert result == Point(x=slot_pos[0], y=slot_pos[1], z=slot_pos[2])
+
+# TODO: Test get_wells and get_well_grid
