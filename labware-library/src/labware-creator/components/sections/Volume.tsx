@@ -42,7 +42,12 @@ export const Volume = (): JSX.Element | null => {
     <div className={styles.new_definition_section}>
       <SectionBody label="Volume" id="Volume">
         <>
-          <FormAlerts touched={touched} errors={errors} fieldList={fieldList} />
+          <FormAlerts
+            values={values}
+            touched={touched}
+            errors={errors}
+            fieldList={fieldList}
+          />
           <Content values={values} />
         </>
       </SectionBody>

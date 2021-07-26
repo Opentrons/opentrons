@@ -20,7 +20,12 @@ export const Regularity = (): JSX.Element | null => {
   return (
     <SectionBody label="Regularity" id="Regularity">
       <>
-        <FormAlerts touched={touched} errors={errors} fieldList={fieldList} />
+        <FormAlerts
+          values={values}
+          touched={touched}
+          errors={errors}
+          fieldList={fieldList}
+        />
         <div className={styles.flex_row}>
           <div className={styles.homogenous_wells_section}>
             <RadioField name="homogeneousWells" options={yesNoOptions} />

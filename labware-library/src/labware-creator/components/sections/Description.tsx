@@ -62,7 +62,12 @@ export const Description = (): JSX.Element | null => {
 
   return (
     <SectionBody label="Description" id="Description">
-      <FormAlerts touched={touched} errors={errors} fieldList={fieldList} />
+      <FormAlerts
+        values={values}
+        touched={touched}
+        errors={errors}
+        fieldList={fieldList}
+      />
       <Content values={values} />
     </SectionBody>
   )

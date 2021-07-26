@@ -3,13 +3,6 @@
 include ../scripts/push.mk
 include ../scripts/python.mk
 
-# using bash instead of /bin/bash in SHELL prevents macOS optimizing away our PATH update
-SHELL := bash
-
-# add yarn CLI dev deps to PATH (for cross platform POSIX commands via shx)
-# and also make an explicit version for shx for use in the shell function,
-# where PATH won’t be propagated
-PATH := $(shell cd .. && yarn bin):$(PATH)
 SHX := npx shx
 
 # Path of source package
@@ -40,12 +33,42 @@ ssh_opts ?= $(default_ssh_opts)
 ot_py_sources := $(filter %.py,$(shell $(SHX) find $(SRC_PATH)))
 ot_sources := $(ot_py_sources)
 
+# files and modules to format
+# TODO(mc, 2021-07-23): expand this to all files until we can format `.`
+ot_files_to_format := \
+	robot_server/errors \
+	robot_server/health \
+	robot_server/protocols \
+	robot_server/sessions \
+	robot_server/app.py \
+	robot_server/util.py \
+	tests/errors \
+	tests/health \
+	tests/protocols \
+	tests/sessions \
+	tests/test_app.py \
+	tests/test_util.py
+
 # Defined separately than the clean target so the wheel file doesn’t have to
 # depend on a PHONY target
 clean_cmd = $(SHX) rm -rf build dist .coverage coverage.xml '*.egg-info' '**/__pycache__' '**/*.pyc' 'robot_server/**/.mypy_cache'
 
 # Uvicorn command to run the robot server in dev mode.
-run_dev ?= uvicorn "robot_server:app" --host localhost --port 31950 --ws wsproto --reload
+#
+# "--lifespan on" ensures errors in startup and shutdown handlers won't be hidden.
+# See github.com/encode/starlette/issues/1138, fixed in Starlette v0.16.0?
+#
+# todo(mm, 2021-07-08): Figure out how to run the server with Python development
+# mode enabled, to expose more errors and warnings.
+#   * Using a Makefile target-specific variable to set PYTHONDEVMODE=1
+#     doesn't work because it applies the variable to the whole `pipenv run`
+#     command, and we only want our inner server process running under dev mode,
+#     not the outer pipenv process.
+#   * Adding PYTHONDEVMODE=1 to the .env file specified by
+#     OT_ROBOT_SERVER_DOT_ENV_PATH doesn't work because that's read too late.
+#   * Doing `pipenv run env PYTHONDEVMODE=1 uvicorn ...` works, except it's
+#     probably POSIX-only.
+run_dev ?= uvicorn "robot_server:app" --host localhost --port 31950 --ws wsproto --lifespan on --reload
 
 .PHONY: all
 all: clean wheel
@@ -76,9 +99,14 @@ test:
 	$(pytest) $(tests) $(test_opts)
 
 .PHONY: lint
-lint: $(ot_py_sources)
+lint:
 	$(python) -m mypy $(SRC_PATH) $(tests)
+	$(python) -m black --check $(ot_files_to_format)
 	$(python) -m flake8 $(SRC_PATH) $(tests) setup.py
+
+.PHONY: format
+format:
+	$(python) -m black $(ot_files_to_format)
 
 .PHONY: dev
 dev: export OT_ROBOT_SERVER_DOT_ENV_PATH ?= dev.env

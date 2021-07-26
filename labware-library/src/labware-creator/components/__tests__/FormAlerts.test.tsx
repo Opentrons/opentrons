@@ -29,6 +29,7 @@ describe('FormAlerts', () => {
       .mockReturnValue(false)
 
     const props: FormAlertProps = {
+      values: { labwareType: 'wellPlate', tubeRackInsertLoadName: null } as any,
       fieldList: ['labwareType', 'tubeRackInsertLoadName'],
       touched: { labwareType: true, tubeRackInsertLoadName: true },
       errors: {
@@ -40,7 +41,7 @@ describe('FormAlerts', () => {
     const warning = container.querySelector('[class="alert warning"]')
     expect(warning?.textContent).toBe('some warning')
   })
-  it('should render an incompatable labware error when the labware is not compatible with labware creator', () => {
+  it('should render an incompatible labware error when the labware is not compatible with labware creator', () => {
     when(getIsHiddenMock)
       .calledWith('labwareType', {} as any)
       .mockReturnValue(false)
@@ -50,6 +51,7 @@ describe('FormAlerts', () => {
       .mockReturnValue(false)
 
     const props: FormAlertProps = {
+      values: { labwareType: 'wellPlate', tubeRackInsertLoadName: null } as any,
       fieldList: ['labwareType', 'tubeRackInsertLoadName'],
       touched: { labwareType: true, tubeRackInsertLoadName: true },
       errors: {
@@ -73,6 +75,7 @@ describe('FormAlerts', () => {
       .mockReturnValue(false)
 
     const props: FormAlertProps = {
+      values: { labwareType: 'wellPlate', tubeRackInsertLoadName: null } as any,
       fieldList: ['labwareType', 'tubeRackInsertLoadName'],
       touched: { labwareType: true, tubeRackInsertLoadName: true },
       errors: {
@@ -96,6 +99,7 @@ describe('FormAlerts', () => {
       .mockReturnValue(false)
 
     const props: FormAlertProps = {
+      values: { labwareType: 'wellPlate', tubeRackInsertLoadName: null } as any,
       fieldList: ['labwareType', 'tubeRackInsertLoadName'],
       touched: { labwareType: true, tubeRackInsertLoadName: true },
       errors: {
@@ -119,6 +123,7 @@ describe('FormAlerts', () => {
       .mockReturnValue(false)
 
     const props: FormAlertProps = {
+      values: { labwareType: 'wellPlate', tubeRackInsertLoadName: null } as any,
       fieldList: ['labwareType', 'tubeRackInsertLoadName'],
       touched: { labwareType: true, tubeRackInsertLoadName: true },
       errors: {
