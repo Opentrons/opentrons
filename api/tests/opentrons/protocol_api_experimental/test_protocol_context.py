@@ -187,3 +187,16 @@ def test_load_labware_default_namespace_and_version(
 def test_load_labware_with_label(subject: ProtocolContext) -> None:
     """TODO: it should do something with the `label` parameter to load_labware."""
     subject.load_labware(load_name="some_labware", location=5, label="some_label")
+
+
+def test_pause(
+    decoy: Decoy,
+    engine_client: SyncClient,
+    subject: ProtocolContext,
+) -> None:
+    """It should be able to issue a Pause command through the client."""
+    subject.pause()
+    decoy.verify(engine_client.pause(message=None), times=1)
+
+    subject.pause(msg="hello world")
+    decoy.verify(engine_client.pause(message="hello world"), times=1)
