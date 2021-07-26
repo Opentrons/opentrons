@@ -160,7 +160,7 @@ async def test_execute_command(
         executed_command
     )
 
-    result = await subject.execute_command(request)
+    result = await subject.add_and_execute_command(request)
 
     assert result == executed_command
 

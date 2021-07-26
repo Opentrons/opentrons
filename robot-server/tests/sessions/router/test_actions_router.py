@@ -214,7 +214,6 @@ def test_create_pause_action(
 
 def test_create_resume_action(
     decoy: Decoy,
-    task_runner: TaskRunner,
     session_view: SessionView,
     engine_store: EngineStore,
     unique_id: str,

@@ -63,7 +63,7 @@ class ChildThreadTransport(AbstractSyncTransport):
     def execute_command(self, request: CommandRequest) -> CommandResult:
         """Execute a command synchronously on the main thread."""
         command = run_coroutine_threadsafe(
-            self._engine.execute_command(request=request),
+            self._engine.add_and_execute_command(request=request),
             loop=self._loop,
         ).result()
 
