@@ -6,7 +6,23 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
-# Opentrons App Changes in 4.4.0
+# Opentrons App Changes in 4.5.0
+
+This release of the app is focussed on quality of life improvements as we continue large behind-the-scenes improvements.
+
+## New Features
+
+- Protocol uploads have been made substantially faster! (See OT-2 release notes for more details.)
+
+## Bug Fixes
+
+- Fixed issues with the run timer reading `00:00` in the middle of a paused protocol ([#7740][])
+
+[#7740]: https://github.com/Opentrons/opentrons/issues/7740
+
+---
+
+## Opentrons App Changes in 4.4.0
 
 This is a quiet release on the app front as we make some behind-the-scenes improvements to how the app is built, so we don't have any changes to report here. There are changes to the OT-2 software, though, so make sure you update your app so it can get your robot fully up to date!
 
