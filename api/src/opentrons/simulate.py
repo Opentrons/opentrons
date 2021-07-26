@@ -327,40 +327,29 @@ def simulate(protocol_file: TextIO,
                            extra_data=extra_data)
     bundle_contents:  Optional[BundleContents] = None
 
-    if getattr(protocol, 'api_level', APIVersion(2, 0)) < APIVersion(2, 0):
-        def _simulate_v1():
-            opentrons.robot.disconnect()
-            opentrons.robot.reset()
-            scraper = CommandScraper(stack_logger, log_level,
-                                     opentrons.robot.broker)
-            exec(protocol.contents, {})  # type: ignore
-            return scraper
-
-        scraper = _simulate_v1()
-    else:
-        # we want a None literal rather than empty dict so get_protocol_api
-        # will look for custom labware if this is a robot
-        gpa_extras = getattr(protocol, 'extra_labware', None) or None
-        context = get_protocol_api(
-            getattr(protocol, 'api_level', MAX_SUPPORTED_VERSION),
-            bundled_labware=getattr(protocol, 'bundled_labware', None),
-            bundled_data=getattr(protocol, 'bundled_data', None),
-            hardware_simulator=hardware_simulator,
-            extra_labware=gpa_extras)
-        broker = context.broker
-        scraper = CommandScraper(stack_logger,
-                                 log_level,
-                                 broker)
-        try:
-            execute.run_protocol(protocol, context)
-            if isinstance(protocol, PythonProtocol)\
-               and protocol.api_level >= APIVersion(2, 0)\
-               and protocol.bundled_labware is None\
-               and allow_bundle():
-                bundle_contents = bundle_from_sim(
-                    protocol, context)
-        finally:
-            context.cleanup()
+    # we want a None literal rather than empty dict so get_protocol_api
+    # will look for custom labware if this is a robot
+    gpa_extras = getattr(protocol, 'extra_labware', None) or None
+    context = get_protocol_api(
+        getattr(protocol, 'api_level', MAX_SUPPORTED_VERSION),
+        bundled_labware=getattr(protocol, 'bundled_labware', None),
+        bundled_data=getattr(protocol, 'bundled_data', None),
+        hardware_simulator=hardware_simulator,
+        extra_labware=gpa_extras)
+    broker = context.broker
+    scraper = CommandScraper(stack_logger,
+                             log_level,
+                             broker)
+    try:
+        execute.run_protocol(protocol, context)
+        if isinstance(protocol, PythonProtocol)\
+           and protocol.api_level >= APIVersion(2, 0)\
+           and protocol.bundled_labware is None\
+           and allow_bundle():
+            bundle_contents = bundle_from_sim(
+                protocol, context)
+    finally:
+        context.cleanup()
 
     return scraper.commands, bundle_contents
 
