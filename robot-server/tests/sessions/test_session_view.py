@@ -4,6 +4,7 @@ from datetime import datetime
 
 from opentrons.types import MountType
 from opentrons.protocol_engine import (
+    EngineStatus,
     CommandStatus,
     PipetteName,
     commands as pe_commands,
@@ -13,6 +14,7 @@ from robot_server.sessions.session_store import SessionResource
 from robot_server.sessions.session_view import SessionView
 from robot_server.sessions.session_models import (
     Session,
+    SessionStatus,
     BasicSession,
     BasicSessionCreateData,
     ProtocolSession,
@@ -106,6 +108,7 @@ current_time = datetime.now()
             BasicSession(
                 id="session-id",
                 createdAt=current_time,
+                status=SessionStatus.READY_TO_START,
                 actions=[],
                 commands=[],
             ),
@@ -122,6 +125,7 @@ current_time = datetime.now()
             ProtocolSession(
                 id="session-id",
                 createdAt=current_time,
+                status=SessionStatus.READY_TO_START,
                 createParams=ProtocolSessionCreateParams(protocolId="protocol-id"),
                 actions=[],
                 commands=[],
@@ -133,9 +137,13 @@ def test_to_response(
     session_resource: SessionResource,
     expected_response: Session,
 ) -> None:
-    """It should create a BasicSession if session_data is None."""
+    """It should create the correct type of session."""
     subject = SessionView()
-    result = subject.as_response(session=session_resource, commands=[])
+    result = subject.as_response(
+        session=session_resource,
+        commands=[],
+        engine_status=EngineStatus.READY_TO_START,
+    )
     assert result == expected_response
 
 
@@ -167,12 +175,15 @@ def test_to_response_maps_commands() -> None:
 
     subject = SessionView()
     result = subject.as_response(
-        session=session_resource, commands=[command_1, command_2]
+        session=session_resource,
+        commands=[command_1, command_2],
+        engine_status=EngineStatus.RUNNING,
     )
 
     assert result == BasicSession(
         id="session-id",
         createdAt=datetime(year=2021, month=1, day=1),
+        status=SessionStatus.RUNNING,
         actions=[],
         commands=[
             SessionCommandSummary(

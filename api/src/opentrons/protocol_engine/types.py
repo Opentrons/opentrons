@@ -8,6 +8,16 @@ from typing_extensions import final
 from opentrons.types import DeckSlotName
 
 
+class EngineStatus(str, Enum):
+    """Current execution status of a ProtocolEngine."""
+
+    READY_TO_START = "ready-to-start"
+    PAUSED = "paused"
+    RUNNING = "running"
+    FAILED = "failed"
+    SUCCEEDED = "succeeded"
+
+
 class DeckSlotLocation(BaseModel):
     """Location for labware placed in a single slot."""
 
