@@ -1,6 +1,6 @@
 """Run control command side-effect logic."""
 
-from ..state import StateStore
+from ..state import StateStore, PauseAction
 
 
 class RunControlHandler:
@@ -14,4 +14,7 @@ class RunControlHandler:
 
     async def pause(self) -> None:
         """Issue a PauseAction to the store, pausing the run."""
-        raise NotImplementedError("RunControlHandler not yet implemented.")
+        self._state_store.handle_action(PauseAction())
+        await self._state_store.wait_for(
+            condition=self._state_store.commands.get_is_running
+        )
