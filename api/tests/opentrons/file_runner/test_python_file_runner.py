@@ -103,7 +103,7 @@ async def test_python_runner_run(
     decoy.verify(
         protocol_engine.play(),
         await executor.execute(),
-        await protocol_engine.wait_for_done(),
+        await protocol_engine.stop(),
     )
 
 

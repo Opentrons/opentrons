@@ -1,12 +1,15 @@
 """Tests for the command lifecycle state."""
+import pytest
 from collections import OrderedDict
 
+from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.state.commands import CommandState, CommandStore
 
 from opentrons.protocol_engine.state.actions import (
     UpdateCommandAction,
     PlayAction,
     PauseAction,
+    StopAction,
 )
 
 from .command_fixtures import (
@@ -25,6 +28,7 @@ def test_command_store_handles_command() -> None:
 
     assert subject.state == CommandState(
         is_running=False,
+        stop_requested=False,
         commands_by_id=OrderedDict({"command-id": command}),
     )
 
@@ -42,6 +46,7 @@ def test_command_store_preserves_handle_order() -> None:
 
     assert subject.state == CommandState(
         is_running=False,
+        stop_requested=False,
         commands_by_id=OrderedDict(
             [
                 ("command-id-1", command_a),
@@ -53,6 +58,7 @@ def test_command_store_preserves_handle_order() -> None:
     subject.handle_action(UpdateCommandAction(command=command_c))
     assert subject.state == CommandState(
         is_running=False,
+        stop_requested=False,
         commands_by_id=OrderedDict(
             [
                 ("command-id-1", command_c),
@@ -62,17 +68,48 @@ def test_command_store_preserves_handle_order() -> None:
     )
 
 
-def test_command_store_handle_start_action() -> None:
-    """It should set the running flag on start."""
+def test_command_store_handles_play_action() -> None:
+    """It should set the running flag on play."""
     subject = CommandStore()
     subject.handle_action(PlayAction())
 
-    assert subject.state == CommandState(is_running=True, commands_by_id=OrderedDict())
+    assert subject.state == CommandState(
+        is_running=True,
+        stop_requested=False,
+        commands_by_id=OrderedDict(),
+    )
 
 
-def test_command_store_handle_stop_action() -> None:
-    """It should clear the running flag on stop/pause."""
+def test_command_store_handles_pause_action() -> None:
+    """It should clear the running flag on pause."""
     subject = CommandStore()
     subject.handle_action(PauseAction())
 
-    assert subject.state == CommandState(is_running=False, commands_by_id=OrderedDict())
+    assert subject.state == CommandState(
+        is_running=False,
+        stop_requested=False,
+        commands_by_id=OrderedDict(),
+    )
+
+
+def test_command_store_handles_stop_action() -> None:
+    """It should clear the running flag and set the done flag on stop."""
+    subject = CommandStore()
+
+    subject.handle_action(PlayAction())
+    subject.handle_action(StopAction())
+
+    assert subject.state == CommandState(
+        is_running=False,
+        stop_requested=True,
+        commands_by_id=OrderedDict(),
+    )
+
+
+def test_command_store_cannot_restart_after_Stop() -> None:
+    """It should reject a play action after a stop action."""
+    subject = CommandStore()
+    subject.handle_action(StopAction())
+
+    with pytest.raises(errors.ProtocolEngineStoppedError):
+        subject.handle_action(PlayAction())

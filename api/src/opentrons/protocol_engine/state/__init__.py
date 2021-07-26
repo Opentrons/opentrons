@@ -6,7 +6,7 @@ from .labware import LabwareState, LabwareView, LabwareData
 from .pipettes import PipetteState, PipetteView, PipetteData, HardwarePipette
 from .geometry import GeometryView, TipGeometry
 from .motion import MotionView, PipetteLocationData
-from .actions import Action, PlayAction, PauseAction, UpdateCommandAction
+from .actions import Action, PlayAction, PauseAction, StopAction, UpdateCommandAction
 
 __all__ = [
     # top level state value and interfaces
@@ -35,5 +35,6 @@ __all__ = [
     "Action",
     "PlayAction",
     "PauseAction",
+    "StopAction",
     "UpdateCommandAction",
 ]

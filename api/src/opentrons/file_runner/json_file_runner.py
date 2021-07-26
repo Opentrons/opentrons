@@ -41,7 +41,7 @@ class JsonFileRunner(AbstractFileRunner):
     async def run(self) -> None:
         """Run the protocol to completion."""
         self._protocol_engine.play()
-        await self._protocol_engine.wait_for_done()
+        await self._protocol_engine.stop(wait_until_complete=True)
 
     def play(self) -> None:
         """Resume running the JSON protocol file."""

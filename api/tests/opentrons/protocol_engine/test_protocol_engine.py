@@ -4,6 +4,7 @@ from datetime import datetime
 from decoy import Decoy
 
 from opentrons.types import MountType
+from opentrons.hardware_control import API as HardwareAPI
 from opentrons.protocol_engine import ProtocolEngine, commands
 from opentrons.protocol_engine.commands import CommandMapper
 from opentrons.protocol_engine.types import PipetteName
@@ -14,6 +15,7 @@ from opentrons.protocol_engine.state import (
     StateStore,
     PlayAction,
     PauseAction,
+    StopAction,
     UpdateCommandAction,
 )
 
@@ -43,11 +45,18 @@ def resources(decoy: Decoy) -> ResourceProviders:
 
 
 @pytest.fixture
+def hardware_api(decoy: Decoy) -> HardwareAPI:
+    """Get a mock HardwareAPI."""
+    return decoy.mock(cls=HardwareAPI)
+
+
+@pytest.fixture
 def subject(
     state_store: StateStore,
     command_mapper: CommandMapper,
     resources: ResourceProviders,
     queue_worker: QueueWorker,
+    hardware_api: HardwareAPI,
 ) -> ProtocolEngine:
     """Get a ProtocolEngine test subject with its dependencies stubbed out."""
     return ProtocolEngine(
@@ -55,6 +64,7 @@ def subject(
         queue_worker=queue_worker,
         command_mapper=command_mapper,
         resources=resources,
+        hardware_api=hardware_api,
     )
 
 
@@ -180,22 +190,55 @@ def test_pause(
     state_store: StateStore,
     subject: ProtocolEngine,
 ) -> None:
-    """It should be able to stop executing queued commands."""
+    """It should be able to pause executing queued commands."""
     subject.pause()
 
     decoy.verify(state_store.handle_action(PauseAction()))
 
 
-async def test_wait_for_done(
+async def test_stop(
     decoy: Decoy,
     state_store: StateStore,
     queue_worker: QueueWorker,
     subject: ProtocolEngine,
 ) -> None:
-    """It should be able to wait until the engine is done executing."""
-    await subject.wait_for_done()
+    """It should be able to stop the engine."""
+    await subject.stop()
 
     decoy.verify(
-        await state_store.wait_for(state_store.commands.get_is_complete),
-        await queue_worker.stop(),
+        state_store.handle_action(StopAction()),
+        await queue_worker.join(),
+    )
+
+
+async def test_stop_after_wait(
+    decoy: Decoy,
+    state_store: StateStore,
+    queue_worker: QueueWorker,
+    subject: ProtocolEngine,
+) -> None:
+    """It should be able to stop the engine after waiting for commands to complete."""
+    await subject.stop(wait_until_complete=True)
+
+    decoy.verify(
+        await state_store.wait_for(condition=state_store.commands.get_all_complete),
+        state_store.handle_action(StopAction()),
+        await queue_worker.join(),
+    )
+
+
+async def test_halt(
+    decoy: Decoy,
+    state_store: StateStore,
+    queue_worker: QueueWorker,
+    hardware_api: HardwareAPI,
+    subject: ProtocolEngine,
+) -> None:
+    """It should be able to halt the engine."""
+    subject.halt()
+
+    decoy.verify(
+        state_store.handle_action(StopAction()),
+        queue_worker.cancel(),
+        hardware_api.halt(),
     )

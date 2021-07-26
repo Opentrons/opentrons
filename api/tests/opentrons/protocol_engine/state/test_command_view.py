@@ -16,11 +16,14 @@ from .command_fixtures import (
 
 
 def get_command_view(
-    is_running: bool = False, commands_by_id: Sequence[Tuple[str, cmd.Command]] = ()
+    is_running: bool = False,
+    stop_requested: bool = False,
+    commands_by_id: Sequence[Tuple[str, cmd.Command]] = (),
 ) -> CommandView:
     """Get a command view test subject."""
     state = CommandState(
         is_running=is_running,
+        stop_requested=stop_requested,
         commands_by_id=OrderedDict(commands_by_id),
     )
 
@@ -84,9 +87,8 @@ def test_get_next_queued_returns_none_when_no_pending() -> None:
     """It should return None if there are no pending commands to return."""
     running_command = create_running_command(command_id="command-id-1")
     completed_command = create_completed_command(command_id="command-id-2")
-    failed_command = create_failed_command(command_id="command-id-3")
 
-    subject = get_command_view()
+    subject = get_command_view(is_running=True)
 
     assert subject.get_next_queued() is None
 
@@ -95,15 +97,14 @@ def test_get_next_queued_returns_none_when_no_pending() -> None:
         commands_by_id=[
             ("command-id-1", running_command),
             ("command-id-2", completed_command),
-            ("command-id-3", failed_command),
         ],
     )
 
     assert subject.get_next_queued() is None
 
 
-def test_get_next_queued_returns_none_when_earlier_command_failed() -> None:
-    """It should return None if any prior-added command is failed."""
+def test_get_next_queued_raises_when_earlier_command_failed() -> None:
+    """It should raise if any prior-added command is failed."""
     running_command = create_running_command(command_id="command-id-1")
     completed_command = create_completed_command(command_id="command-id-2")
     failed_command = create_failed_command(command_id="command-id-3")
@@ -119,21 +120,21 @@ def test_get_next_queued_returns_none_when_earlier_command_failed() -> None:
         ],
     )
 
-    assert subject.get_next_queued() is None
+    with pytest.raises(errors.ProtocolEngineStoppedError):
+        subject.get_next_queued()
 
 
-def test_get_next_queued_returns_none_if_stopped() -> None:
-    """It should return None if the engine is not running."""
-    pending_command = create_pending_command(command_id="command-id-1")
+def test_get_next_queued_raises_none_if_not_running_stopped() -> None:
+    """It should raise if the engine is not running or stopped."""
+    subject = get_command_view(is_running=False)
 
-    subject = get_command_view(
-        is_running=False,
-        commands_by_id=[
-            ("command-id-1", pending_command),
-        ],
-    )
+    with pytest.raises(errors.ProtocolEngineStoppedError):
+        subject.get_next_queued()
 
-    assert subject.get_next_queued() is None
+    subject = get_command_view(stop_requested=False)
+
+    with pytest.raises(errors.ProtocolEngineStoppedError):
+        subject.get_next_queued()
 
 
 def test_get_is_complete() -> None:
@@ -171,8 +172,8 @@ def test_get_is_complete_with_failed_command() -> None:
     assert subject.get_is_complete("command-id-2") is True
 
 
-def test_get_is_complete_with_all_commands() -> None:
-    """It should check whether all commands are completed if no command is specified."""
+def test_get_all_complete() -> None:
+    """It should return true if all commands completed or any failed."""
     completed_command = create_completed_command(command_id="command-id-1")
     running_command = create_running_command(command_id="command-id-2")
     pending_command = create_pending_command(command_id="command-id-3")
@@ -181,26 +182,36 @@ def test_get_is_complete_with_all_commands() -> None:
     subject = get_command_view(
         commands_by_id=[
             ("command-id-4", failed_command),
-            ("command-id-2", pending_command),
-        ]
+            ("command-id-3", pending_command),
+        ],
     )
 
-    assert subject.get_is_complete() is True
+    assert subject.get_all_complete() is True
 
     subject = get_command_view(
         commands_by_id=[
             ("command-id-1", completed_command),
             ("command-id-2", running_command),
-        ]
+            ("command-id-3", pending_command),
+        ],
     )
 
-    assert subject.get_is_complete() is False
+    assert subject.get_all_complete() is False
 
     subject = get_command_view(
         commands_by_id=[
             ("command-id-1", completed_command),
             ("command-id-2", completed_command),
-        ]
+        ],
     )
 
-    assert subject.get_is_complete() is True
+    assert subject.get_all_complete() is True
+
+
+def test_get_stop_requested() -> None:
+    """It should return true if the stop_requested flag is set."""
+    subject = get_command_view(stop_requested=True)
+    assert subject.get_stop_requested() is True
+
+    subject = get_command_view(stop_requested=False)
+    assert subject.get_stop_requested() is False
