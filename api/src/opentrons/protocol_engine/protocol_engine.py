@@ -53,7 +53,7 @@ class ProtocolEngine:
         self._state_store.handle_action(PauseAction())
 
     def add_command(self, request: CommandRequest) -> Command:
-        """Add a command to ProtocolEngine queue.
+        """Add a command to the `ProtocolEngine`'s queue.
 
         Arguments:
             request: The command type and payload data used to construct
@@ -82,7 +82,7 @@ class ProtocolEngine:
                 the command in state.
 
         Returns:
-            The completed command, whether or not it succeeded or failed.
+            The completed command, whether it succeeded or failed.
         """
         command = self.add_command(request)
 
