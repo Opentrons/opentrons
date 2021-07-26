@@ -10,11 +10,11 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 This release of the app is focussed on quality of life improvements as we continue large behind-the-scenes improvements.
 
-### New Features
+## New Features
 
 - Protocol uploads have been made substantially faster! (See OT-2 release notes for more details.)
 
-### Bug Fixes
+## Bug Fixes
 
 - Fixed issues with the run timer reading `00:00` in the middle of a paused protocol ([#7740][])
 

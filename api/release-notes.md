@@ -8,7 +8,7 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 # OT-2 Software Changes in 4.5.0
 
-The 4.5.0 release of the OT-2 Software improves the speed of protocol upload and fixes a handful of regressions and bugs.
+The 4.5.0 release of the OT-2 Software improves the speed of protocol uploads and fixes a handful of regressions and bugs.
 
 ## New Features
 
