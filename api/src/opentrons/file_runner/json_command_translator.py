@@ -181,8 +181,15 @@ class CommandTranslator:
     ) -> None:
         raise NotImplementedError()
 
-    def _delay(self, command: models.json_protocol.DelayCommand) -> None:
-        raise NotImplementedError()
+    def _delay(
+        self,
+        command: models.json_protocol.DelayCommand,
+    ) -> pe_commands.PauseRequest:
+        if command.params.wait is not True:
+            raise NotImplementedError("Delay translation not yet implemented.")
+
+        data = pe_commands.PauseData(message=command.params.message)
+        return pe_commands.PauseRequest(data=data)
 
     def _magnetic_module_engage(
         self,

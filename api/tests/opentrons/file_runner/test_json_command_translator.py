@@ -276,3 +276,21 @@ def test_pick_up_tip(subject: CommandTranslator) -> None:
 
     output = subject.translate(_make_json_protocol(commands=[input_json_command]))
     assert output == expected_output
+
+
+def test_pause(subject: CommandTranslator) -> None:
+    """It should translate delay with wait=True to a PauseRequest."""
+    input_command = models.json_protocol.DelayCommand(
+        command="delay",
+        params=models.json_protocol.DelayCommandParams(
+            wait=True,
+            message="hello world",
+        ),
+    )
+    input_protocol = _make_json_protocol(commands=[input_command])
+
+    result = subject.translate(input_protocol)
+
+    assert result == [
+        pe_commands.PauseRequest(data=pe_commands.PauseData(message="hello world"))
+    ]
