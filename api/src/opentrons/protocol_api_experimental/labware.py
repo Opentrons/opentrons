@@ -1,23 +1,14 @@
 # noqa: D100
 from __future__ import annotations
 
-import re
-from dataclasses import dataclass
+from functools import lru_cache
 from typing import Any, List, Dict, Optional, Union, cast
-from collections import defaultdict
 
-from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from .errors import LabwareIsNotTipRackError
 from .types import DeckSlotName, LabwareParameters, Point
 from .well import Well
-
-
-@dataclass
-class Grid:
-    """Class for a labware's wells as a grid of rows & columns."""
-    rows: Dict[str, List[Well]]
-    columns: Dict[str, List[Well]]
+from ..protocols.models import LabwareDefinition
 
 
 class Labware:  # noqa: D101
@@ -37,24 +28,6 @@ class Labware:  # noqa: D101
         """
         self._engine_client = engine_client
         self._labware_id = labware_id
-
-        self._definition = self._engine_client.state.labware.get_labware_definition(
-            labware_id=self._labware_id)
-
-        if self._definition:
-            self._wells_by_name: Dict[str, Well] = {
-                well_name: Well(
-                    well_name=well_name,
-                    engine_client=self._engine_client,
-                    labware=self,
-                )
-                for col in self._definition.ordering
-                for well_name in col
-            }
-            self._well_grid = self._get_well_grid()
-        else:
-            raise Exception("Labware definition not found. Definition required for "
-                            "labware initialization.")
 
     # TODO(mc, 2021-04-22): remove this property; it's redundant and
     # unlikely to be used by PAPI users
@@ -122,7 +95,7 @@ class Labware:  # noqa: D101
     # definition and call it a day?
     @property
     def parameters(self) -> LabwareParameters:  # noqa: D102
-        return cast(LabwareParameters, self._definition.parameters.dict())
+        return cast(LabwareParameters, self._definition().parameters.dict())
 
     # TODO(mc, 2021-05-03): this is an internal list of Opentrons-specific
     # data; does it really need to be a public property? Can we expose the
@@ -136,7 +109,7 @@ class Labware:  # noqa: D101
     # necessary with Protocol Engine controlling execution. Can we get rid of it?
     @property
     def magdeck_engage_height(self) -> Optional[float]:    # noqa: D102
-        return self._definition.parameters.magneticModuleEngageHeight
+        return self._definition().parameters.magneticModuleEngageHeight
 
     @property
     def calibrated_offset(self) -> Point:
@@ -164,7 +137,7 @@ class Labware:  # noqa: D101
     @property
     def is_tiprack(self) -> bool:
         """Whether this labware is a tiprack."""
-        return self._definition.parameters.isTiprack
+        return self._definition().parameters.isTiprack
 
     # TODO(mc, 2021-05-03): encode this in a specific `TipRack` interface that
     # extends from Labware
@@ -181,9 +154,10 @@ class Labware:  # noqa: D101
             LabwareIsNotTipRackError: will raise if this property is accessed
                 on a labware instance that is not a tip rack.
         """
-        if self._definition.parameters.tipLength is None:
+        tiplength = self._definition().parameters.tipLength
+        if tiplength is None:
             raise LabwareIsNotTipRackError(f"{self.load_name} is not a tip rack.")
-        return self._definition.parameters.tipLength
+        return tiplength
 
     def well(self, idx: int) -> Well:  # noqa: D102
         # TODO: figure out if we want to keep this as it is marked as deprecated in v2
@@ -192,39 +166,39 @@ class Labware:  # noqa: D101
     def wells(self) -> List[Well]:  # noqa: D102
         return list(self.wells_by_name().values())
 
+    @lru_cache(maxsize=1)
     def wells_by_name(self) -> Dict[str, Well]:  # noqa: D102
-        return self._wells_by_name
+        wells = self._engine_client.state.labware.get_wells(labware_id=self.labware_id)
+        return {well_name: Well(
+                    well_name=well_name,
+                    engine_client=self._engine_client,
+                    labware=self,
+                )
+                for well_name in wells}
 
     def rows(self) -> List[List[Well]]:  # noqa: D102
-        rows = list()
-        for row in self.rows_by_name().keys():
-            rows.append(self.rows_by_name()[row])
-        return rows
+        return list(self.rows_by_name().values())
 
+    @lru_cache(maxsize=1)
     def rows_by_name(self) -> Dict[str, List[Well]]:  # noqa: D102
-        return self._well_grid.rows
+        rows_dict = self._engine_client.state.labware.get_well_grid(
+            labware_id=self.labware_id).rows
+        return {row: [self.wells_by_name()[well_name] for well_name in row_wells] for
+                row, row_wells in rows_dict.items()}
 
     def columns(self) -> List[List[Well]]:  # noqa: D102
-        cols = list()
-        for col in self.columns_by_name().keys():
-            cols.append(self.columns_by_name()[col])
-        return cols
+        return list(self.columns_by_name().values())
 
+    @lru_cache(maxsize=1)
     def columns_by_name(self) -> Dict[str, List[Well]]:  # noqa: D102
-        return self._well_grid.columns
+        cols_dict = self._engine_client.state.labware.get_well_grid(
+            labware_id=self.labware_id).columns
+        return {col: [self.wells_by_name()[well_name] for well_name in col_wells]
+                for col, col_wells in cols_dict.items()}
 
-    def _get_well_grid(self) -> Grid:
-        """Arrange wells in rows and columns."""
-        pattern = re.compile(WELL_NAME_PATTERN, re.X)
-        wells_by_rows = defaultdict(list)
-        wells_by_cols = defaultdict(list)
-        assert self._wells_by_name, "Need _wells_by_name created before computing grid"
-        for well_name in self._wells_by_name.keys():
-            match = pattern.match(well_name)
-            assert match, f"Well name did not match pattern {pattern}"
-            wells_by_rows[match.group(1)].append(self._wells_by_name[well_name])
-            wells_by_cols[match.group(2)].append(self._wells_by_name[well_name])
-        return Grid(columns=dict(wells_by_cols), rows=dict(wells_by_rows))
+    def _definition(self) -> LabwareDefinition:
+        return self._engine_client.state.labware.get_labware_definition(
+            labware_id=self.labware_id)
 
     def __repr__(self) -> str:  # noqa: D105
         # TODO: (spp, 2021.07.14): Should this be a combination of display name & <obj>?

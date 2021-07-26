@@ -1,10 +1,11 @@
 """Tests for the Protocol API v3 labware interface."""
 import pytest
 from decoy import Decoy
-from pytest_lazyfixture import lazy_fixture     # type: ignore
 
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.protocol_engine import DeckSlotLocation
+from opentrons.protocol_engine.state.labware import WellGrid
+
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from opentrons.protocol_api_experimental import (DeckSlotName,
                                                  Labware,
@@ -27,48 +28,18 @@ def engine_client(decoy: Decoy) -> ProtocolEngineClient:
 
 
 @pytest.fixture
-def min_labware_definition(
-        minimal_labware_def: dev_types.LabwareDefinition
-) -> LabwareDefinition:
+def labware_definition(minimal_labware_def: dev_types.LabwareDefinition
+                       ) -> LabwareDefinition:
     """Create a labware definition fixture."""
     return LabwareDefinition.parse_obj(minimal_labware_def)
 
 
 @pytest.fixture
-def min_labware_definition2(
-        minimal_labware_def: dev_types.LabwareDefinition
-) -> LabwareDefinition:
-    """Create another labware definition fixture."""
-    minimal_labware_def['parameters'].update({'magneticModuleEngageHeight': 101.0,
-                                              'tipLength': 42.0})
-    return LabwareDefinition.parse_obj(minimal_labware_def)
-
-
-@pytest.fixture
-def labware_definition(
-        min_labware_definition: LabwareDefinition
-) -> LabwareDefinition:
-    """Labware definition fixture to use in subject, and to use for parametrization."""
-    return min_labware_definition
-
-
-@pytest.fixture
 def subject(decoy: Decoy,
             engine_client: ProtocolEngineClient,
-            labware_definition: LabwareDefinition,
             ) -> Labware:
     """Get a Labware test subject with its dependencies mocked out."""
-    decoy.when(
-        engine_client.state.labware.get_labware_definition(labware_id="labware-id")
-    ).then_return(labware_definition)
     return Labware(engine_client=engine_client, labware_id="labware-id")
-
-
-def test_raises_error_without_labware_definition(
-        engine_client: ProtocolEngineClient) -> None:
-    """Test that an exception is raised when no labware_definition found."""
-    with pytest.raises(Exception, match="Labware definition not found"):
-        Labware(engine_client=engine_client, labware_id="123")
 
 
 def test_labware_id_property(subject: Labware) -> None:
@@ -76,13 +47,8 @@ def test_labware_id_property(subject: Labware) -> None:
     assert subject.labware_id == "labware-id"
 
 
-def test_labware_equality(decoy: Decoy,
-                          engine_client: ProtocolEngineClient,
-                          labware_definition: LabwareDefinition) -> None:
+def test_labware_equality(engine_client: ProtocolEngineClient) -> None:
     """Two labware with the same ID should be considered equal."""
-    decoy.when(
-        engine_client.state.labware.get_labware_definition(labware_id="123")
-    ).then_return(labware_definition)
     labware_1 = Labware(engine_client=engine_client, labware_id="123")
     labware_2 = Labware(engine_client=engine_client, labware_id="123")
     assert labware_1 == labware_2
@@ -156,25 +122,30 @@ def test_labware_quirks(
 def test_labware_parameters(
     decoy: Decoy,
     engine_client: ProtocolEngineClient,
-    min_labware_definition: LabwareDefinition,
+    labware_definition: LabwareDefinition,
     subject: Labware,
 ) -> None:
     """It should return the labware definition's parameters."""
-    assert subject.parameters == min_labware_definition.parameters
+    decoy.when(
+        engine_client.state.labware.get_labware_definition(labware_id="labware-id")
+    ).then_return(labware_definition)
+    assert subject.parameters == labware_definition.parameters
 
 
 def test_labware_magdeck_engage_height_not_compatible(
     decoy: Decoy,
     engine_client: ProtocolEngineClient,
-    min_labware_definition: LabwareDefinition,
+    labware_definition: LabwareDefinition,
     subject: Labware,
 ) -> None:
     """It should return None for magdeck engage height if not in definition."""
+    decoy.when(
+        engine_client.state.labware.get_labware_definition(labware_id="labware-id")
+    ).then_return(labware_definition)
+
     assert subject.magdeck_engage_height is None
 
 
-@pytest.mark.parametrize("labware_definition",
-                         [lazy_fixture("min_labware_definition2")])
 def test_labware_magdeck_engage_height(
     decoy: Decoy,
     engine_client: ProtocolEngineClient,
@@ -182,38 +153,51 @@ def test_labware_magdeck_engage_height(
     subject: Labware,
 ) -> None:
     """It should return magdeck engage height from definition."""
+    labware_definition.parameters.magneticModuleEngageHeight = 101.0
+    decoy.when(
+        engine_client.state.labware.get_labware_definition(labware_id="labware-id")
+    ).then_return(labware_definition)
+
     assert subject.magdeck_engage_height == 101.0
 
 
 def test_labware_is_not_tiprack(
     decoy: Decoy,
     engine_client: ProtocolEngineClient,
-    min_labware_definition: LabwareDefinition,
+    labware_definition: LabwareDefinition,
     subject: Labware,
 ) -> None:
     """It should return False if not tiprack."""
+    decoy.when(
+        engine_client.state.labware.get_labware_definition(labware_id="labware-id")
+    ).then_return(labware_definition)
     assert subject.is_tiprack is False
 
 
-@pytest.mark.parametrize("labware_definition",
-                         [lazy_fixture("min_labware_definition2")])
 def test_labware_tip_length(
     decoy: Decoy,
     engine_client: ProtocolEngineClient,
-    min_labware_definition: LabwareDefinition,
+    labware_definition: LabwareDefinition,
     subject: Labware,
 ) -> None:
     """It should return tip length if present in the definition."""
+    labware_definition.parameters.tipLength = 42.0
+    decoy.when(
+        engine_client.state.labware.get_labware_definition(labware_id="labware-id")
+    ).then_return(labware_definition)
     assert subject.tip_length == 42.0
 
 
 def test_labware_no_tip_length(
     decoy: Decoy,
     engine_client: ProtocolEngineClient,
-    min_labware_definition: LabwareDefinition,
+    labware_definition: LabwareDefinition,
     subject: Labware,
 ) -> None:
     """It should raise a LabwareIsNotTiprackError if tip length is not present."""
+    decoy.when(
+        engine_client.state.labware.get_labware_definition(labware_id="labware-id")
+    ).then_return(labware_definition)
     with pytest.raises(errors.LabwareIsNotTipRackError):
         subject.tip_length
 
@@ -221,10 +205,13 @@ def test_labware_no_tip_length(
 def test_labware_has_wells_by_name(
         decoy: Decoy,
         engine_client: ProtocolEngineClient,
-        min_labware_definition: LabwareDefinition,
+        labware_definition: LabwareDefinition,
         subject: Labware,
 ) -> None:
     """It should return Dict of Well objects by name."""
+    decoy.when(
+        engine_client.state.labware.get_wells(labware_id="labware-id")
+    ).then_return(['A1', 'A2'])
     assert subject.wells_by_name() == {'A1': Well(well_name='A1',
                                                   engine_client=engine_client,
                                                   labware=subject),
@@ -236,10 +223,12 @@ def test_labware_has_wells_by_name(
 def test_labware_has_wells_list(
         decoy: Decoy,
         engine_client: ProtocolEngineClient,
-        min_labware_definition: LabwareDefinition,
         subject: Labware,
 ) -> None:
     """It should return List of Well objects."""
+    decoy.when(
+        engine_client.state.labware.get_wells(labware_id="labware-id")
+    ).then_return(['A1', 'A2'])
     assert subject.wells() == [Well(well_name='A1',
                                     engine_client=engine_client,
                                     labware=subject),
@@ -255,6 +244,15 @@ def test_labware_rows(
         subject: Labware,
 ) -> None:
     """It should return the labware's wells as list of rows."""
+    decoy.when(
+        engine_client.state.labware.get_wells(labware_id="labware-id")
+    ).then_return(['A1', 'A2'])
+
+    decoy.when(
+        engine_client.state.labware.get_well_grid(labware_id="labware-id")
+    ).then_return(WellGrid(rows={'A': ['A1', 'A2']},
+                           columns={'1': ['A1'], '2': ['A2']}))
+
     assert subject.rows() == [[Well(well_name='A1',
                                     engine_client=engine_client,
                                     labware=subject),
@@ -269,6 +267,14 @@ def test_labware_rows_by_name(
         subject: Labware,
 ) -> None:
     """It should return the labware's wells as dictionary of rows."""
+    decoy.when(
+        engine_client.state.labware.get_wells(labware_id="labware-id")
+    ).then_return(['A1', 'A2'])
+
+    decoy.when(
+        engine_client.state.labware.get_well_grid(labware_id="labware-id")
+    ).then_return(WellGrid(rows={'A': ['A1', 'A2']},
+                           columns={'1': ['A1'], '2': ['A2']}))
     assert subject.rows_by_name() == {"A": [Well(well_name='A1',
                                                  engine_client=engine_client,
                                                  labware=subject),
@@ -283,6 +289,15 @@ def test_labware_columns(
         subject: Labware,
 ) -> None:
     """It should return the labware's wells as list of columns."""
+    decoy.when(
+        engine_client.state.labware.get_wells(labware_id="labware-id")
+    ).then_return(['A1', 'A2'])
+
+    decoy.when(
+        engine_client.state.labware.get_well_grid(labware_id="labware-id")
+    ).then_return(WellGrid(rows={'A': ['A1', 'A2']},
+                           columns={'1': ['A1'], '2': ['A2']}))
+
     assert subject.columns() == [[Well(well_name='A1',
                                        engine_client=engine_client,
                                        labware=subject)],
@@ -297,6 +312,15 @@ def test_labware_columns_by_name(
         subject: Labware,
 ) -> None:
     """It should return the labware's wells as dictionary of columns."""
+    decoy.when(
+        engine_client.state.labware.get_wells(labware_id="labware-id")
+    ).then_return(['A1', 'A2'])
+
+    decoy.when(
+        engine_client.state.labware.get_well_grid(labware_id="labware-id")
+    ).then_return(WellGrid(rows={'A': ['A1', 'A2']},
+                           columns={'1': ['A1'], '2': ['A2']}))
+
     assert subject.columns_by_name() == {"1": [Well(well_name='A1',
                                                     engine_client=engine_client,
                                                     labware=subject)],
