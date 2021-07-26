@@ -179,14 +179,6 @@ test-js:
 .PHONY: lint
 lint: lint-py lint-js lint-json lint-css check-js circular-dependencies-js
 
-.PHONY: format
-format:
-ifeq ($(watch),true)
-	onchange $(FORMAT_FILE_GLOB) -- prettier --ignore-path .eslintignore --write {{changed}}
-else
-	prettier --ignore-path .eslintignore --write $(FORMAT_FILE_GLOB)
-endif
-
 .PHONY: lint-py
 lint-py:
 	$(MAKE) -C $(API_DIR) lint
@@ -207,6 +199,18 @@ lint-json:
 .PHONY: lint-css
 lint-css:
 	stylelint "**/*.css" "**/*.js"
+
+.PHONY: format
+format: format-js format-py
+
+.PHONY: format-py
+format-py:
+	$(MAKE) -C $(API_DIR) format
+	$(MAKE) -C $(ROBOT_SERVER_DIR) format
+
+.PHONY: format-js
+format-js:
+	prettier --ignore-path .eslintignore --write $(FORMAT_FILE_GLOB)
 
 .PHONY: check-js
 check-js: build-ts
