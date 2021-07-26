@@ -243,10 +243,48 @@ def magdeck_g_codes() -> List[GCode]:
     return [code[0] for code in g_code_list]
 
 
+def tempdeck_g_codes() -> List[GCode]:
+    raw_codes = [
+        # Test 48
+        ['M18', 'ok\r\nok\r\n'],
+
+        # Test 49
+        ['M104 S99.6 P0.4 I0.2 D0.3', 'ok\r\nok\r\n'],
+
+        # Test 50
+        ['M104 S102.5', '\r\nok\r\nok\r\n'],
+
+        # Test 51
+        ['M105', 'T:86.500 C:66.223\r\nok\r\nok\r\n'],
+
+        # Test 52
+        ['M105', 'T:none C:45.32\r\nok\r\nok\r\n'],
+
+        # Test 53
+        [
+            'M115', 'serial:TDV0118052801 model:temp_deck_v1 '
+            'version:edge-11aa22b\r\nok\r\nok\r\n'
+        ],
+    ]
+    g_code_list = [
+        GCode.from_raw_code(code, 'tempdeck', response)
+        for code, response in raw_codes
+    ]
+
+    for g_code in g_code_list:
+        if len(g_code) > 1:
+            tempdeck_g_codes = ', '.join([code.g_code for code in g_code])
+            raise Exception('Hey, you forgot to put a comma between the G-Codes for '
+                            f'{tempdeck_g_codes}')
+
+    return [code[0] for code in g_code_list]
+
+
 def all_g_codes() -> List[GCode]:
     g_codes = []
     g_codes.extend(smoothie_g_codes())
     g_codes.extend(magdeck_g_codes())
+    g_codes.extend(tempdeck_g_codes())
 
     return g_codes
 
@@ -296,13 +334,22 @@ def expected_function_name_values() -> List[str]:
         'MICROSTEPPING_C_DISABLE',  # Test 39
         'READ_INSTRUMENT_ID',  # Test 40
         'READ_INSTRUMENT_MODEL',  # Test 41
-        #  Magdeck
+
+        # Magdeck
         'HOME',  # Test 42
         'MOVE',  # Test 43
         'GET_CURRENT_POSITION',  # Test 44
         'PROBE_PLATE',  # Test 45
         'GET_PLATE_HEIGHT',  # Test 46
         'DEVICE_INFO',  # Test 47
+
+        # Tempdeck
+        'DISENGAGE',  # Test 48
+        'SET_TEMP',  # Test 49
+        'SET_TEMP',  # Test 50
+        'GET_TEMP',  # Test 51
+        'GET_TEMP',  # Test 52
+        'DEVICE_INFO'  # Test 53
     ]
 
 
@@ -464,6 +511,20 @@ def expected_arg_values() -> List[Dict[str, int]]:
         # Test 46
         {},
         # Test 47
+        {},
+
+        # Tempdeck
+        # Test 48
+        {},
+        # Test 49
+        {'S': 99.6, 'P': 0.4, 'I': 0.2, 'D': 0.3},
+        # Test 50
+        {'S': 102.5},
+        # Test 51
+        {},
+        # Test 52
+        {},
+        # Test 53
         {},
     ]
 
@@ -869,7 +930,7 @@ def explanations() -> List[Explanation]:
             command_explanation='Reading instrument model for Left pipette'
         ),
 
-        #  Magdeck
+        # Magdeck
         # Test 42
         Explanation(
             code='G28.2',
@@ -921,6 +982,66 @@ def explanations() -> List[Explanation]:
             provided_args={},
             command_explanation='Getting magdeck device info'
         ),
+
+        # Tempdeck
+        # Test 48
+        Explanation(
+            code='M18',
+            command_name='DISENGAGE',
+            response='',
+            provided_args={},
+            command_explanation='Halting holding temperature. Reducing temperature to '
+                                '55C if it is greater than 55C'
+        ),
+        # Test 49
+        Explanation(
+            code='M104',
+            command_name='SET_TEMP',
+            response='',
+            provided_args={'S': 99.6, 'P': 0.4, 'I': 0.2, 'D': 0.3},
+            command_explanation='Setting temperature values to the following:'
+                                '\n\tTemperature: 99.6C'
+                                '\n\tKp: 0.4'
+                                '\n\tKi: 0.2'
+                                '\n\tKd: 0.3'
+        ),
+        # Test 50
+        Explanation(
+            code='M104',
+            command_name='SET_TEMP',
+            response='',
+            provided_args={'S': 102.5},
+            command_explanation='Setting temperature values to the following:'
+                                '\n\tTemperature: 102.5C'
+
+        ),
+        # Test 51
+        Explanation(
+            code='M105',
+            command_name='GET_TEMP',
+            response='Set temperature is 86.500C. Current temperature is 66.223C',
+            provided_args={},
+            command_explanation='Getting temperature',
+        ),
+        # Test 52
+        Explanation(
+            code='M105',
+            command_name='GET_TEMP',
+            response='Temp deck is disengaged. Current temperature is 45.32C',
+            provided_args={},
+            command_explanation='Getting temperature',
+        ),
+        # Test 53
+        Explanation(
+            code='M115',
+            command_name='DEVICE_INFO',
+            response='Tempdeck info:'
+                     '\n\tSerial Number: TDV0118052801'
+                     '\n\tModel: temp_deck_v1'
+                     '\n\tFirmware Version: edge-11aa22b',
+            provided_args={},
+            command_explanation='Getting tempdeck device info'
+        )
     ]
 
 
