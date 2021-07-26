@@ -1,5 +1,4 @@
 from __future__ import annotations
-import os
 import json
 from typing import List, Union
 from opentrons.hardware_control.g_code_parsing.g_code_watcher import GCodeWatcher
@@ -79,8 +78,16 @@ class GCodeProgram:
             ]
         )
 
-    def save_json_to_file(self, file_name: str) -> None:
+    def save_text_explanation_to_file(
+            self,
+            file_path: str,
+            mode: Union[SupportedTextModes, str]
+    ):
+
+        with open(file_path, 'w') as file:
+            file.write(self.get_text_explanation(mode))
+
+    def save_json_to_file(self, file_path: str) -> None:
         """Save JSON to passed file name"""
-        file_path = os.path.join(os.getcwd(), file_name)
-        with open(file_path, 'w+') as file:
+        with open(file_path, 'w') as file:
             file.write(self.get_json())
