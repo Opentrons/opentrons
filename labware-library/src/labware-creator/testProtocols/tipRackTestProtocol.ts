@@ -61,9 +61,7 @@ def run(protocol: protocol_api.ProtocolContext):
     pipette.pick_up_tip()
     protocol.pause("If the pipette went into the center of the tip, click 'resume'")
     pipette.return_tip()
-    protocol.pause("If the pipette successfully picked up the tip(s) but does not
-    eject succesfully, pull the tip(s) off by hand and click
-    'resume'. Do not worry about tip ejection yet")
+    protocol.pause("If the pipette successfully picked up the tip(s) but does not eject succesfully, pull the tip(s) off by hand and click 'resume'. Do not worry about tip ejection yet")
 
     last_col = (num_cols * num_rows) - num_rows
     if (PIPETTE_NAME == 'p20_multi_gen2' or PIPETTE_NAME == 'p300_multi_gen2'):
@@ -80,9 +78,7 @@ def run(protocol: protocol_api.ProtocolContext):
 
     protocol.pause("If the pipette went to the center of the tip, click 'resume'")
     pipette.return_tip()
-    protocol.comment("If the pipette successfully picked up the tip(s) but does not
-    eject succesfully, pull the tip(s) off by hand and click
-    'resume'. Do not worry about tip ejection yet")
+    protocol.comment("If the pipette successfully picked up the tip(s) but does not eject succesfully, pull the tip(s) off by hand and click 'resume'. Do not worry about tip ejection yet")
 
 `
 }
