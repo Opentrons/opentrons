@@ -8,29 +8,36 @@ from typing_extensions import Literal
 
 from robot_server.robot.calibration.check.models import (
     CalibrationCheckSessionStatus,
-    SessionCreateParams as CalCheckCreateParams)
-from robot_server.robot.calibration.deck.models import \
-    DeckCalibrationSessionStatus
+    SessionCreateParams as CalCheckCreateParams,
+)
+from robot_server.robot.calibration.deck.models import DeckCalibrationSessionStatus
 from robot_server.robot.calibration.models import SessionCreateParams
-from robot_server.robot.calibration.pipette_offset.models import\
-    PipetteOffsetCalibrationSessionStatus
-from robot_server.robot.calibration.tip_length.models import\
-    TipCalibrationSessionStatus
+from robot_server.robot.calibration.pipette_offset.models import (
+    PipetteOffsetCalibrationSessionStatus,
+)
+from robot_server.robot.calibration.tip_length.models import TipCalibrationSessionStatus
 from robot_server.service.json_api import (
-    RequestModel, ResponseModel, ResponseDataModel, MultiResponseModel)
+    RequestModel,
+    ResponseModel,
+    ResponseDataModel,
+    MultiResponseModel,
+)
 from robot_server.service.session.models.common import EmptyModel
-from robot_server.service.session.session_types.protocol.models import \
-    ProtocolCreateParams, ProtocolSessionDetails
+from robot_server.service.session.session_types.protocol.models import (
+    ProtocolCreateParams,
+    ProtocolSessionDetails,
+)
 
 
 class SessionType(str, Enum):
     """The available session types"""
-    calibration_check = 'calibrationCheck'
-    tip_length_calibration = 'tipLengthCalibration'
-    deck_calibration = 'deckCalibration'
-    pipette_offset_calibration = 'pipetteOffsetCalibration'
-    protocol = 'protocol'
-    live_protocol = 'liveProtocol'
+
+    calibration_check = "calibrationCheck"
+    tip_length_calibration = "tipLengthCalibration"
+    deck_calibration = "deckCalibration"
+    pipette_offset_calibration = "pipetteOffsetCalibration"
+    protocol = "protocol"
+    live_protocol = "liveProtocol"
 
 
 """
@@ -52,76 +59,80 @@ SessionDetails = typing.Union[
     TipCalibrationSessionStatus,
     DeckCalibrationSessionStatus,
     ProtocolSessionDetails,
-    EmptyModel
+    EmptyModel,
 ]
 
 
 class SessionCreateAttributes(BaseModel):
     """Attributes required for creating a session"""
-    sessionType: SessionType =\
-        Field(...,
-              description="The type of the session")
+
+    sessionType: SessionType = Field(..., description="The type of the session")
 
 
 class SessionCreateAttributesNoParams(SessionCreateAttributes):
     """The base model of request that has no createParams."""
+
     createParams: typing.Optional[BaseModel]
 
 
 class CalibrationCheckCreateAttributes(SessionCreateAttributesNoParams):
     """The calibration check create request."""
-    sessionType: Literal[SessionType.calibration_check] =\
-        SessionType.calibration_check
+
+    sessionType: Literal[SessionType.calibration_check] = SessionType.calibration_check
     createParams: CalCheckCreateParams
 
 
 class TipLengthCalibrationCreateAttributes(SessionCreateAttributes):
     """The tip length calibration create request."""
-    sessionType: Literal[SessionType.tip_length_calibration] =\
+
+    sessionType: Literal[
         SessionType.tip_length_calibration
+    ] = SessionType.tip_length_calibration
     createParams: SessionCreateParams
 
 
 class DeckCalibrationCreateAttributes(SessionCreateAttributesNoParams):
     """The deck calibration create request."""
-    sessionType: Literal[SessionType.deck_calibration] =\
-        SessionType.deck_calibration
+
+    sessionType: Literal[SessionType.deck_calibration] = SessionType.deck_calibration
 
 
 class PipetteOffsetCalibrationCreateAttributes(SessionCreateAttributes):
     """Pipette offset calibration create request."""
-    sessionType: Literal[SessionType.pipette_offset_calibration] =\
+
+    sessionType: Literal[
         SessionType.pipette_offset_calibration
+    ] = SessionType.pipette_offset_calibration
     createParams: SessionCreateParams
 
 
 class ProtocolCreateAttributes(SessionCreateAttributes):
     """Protocol session create request."""
-    sessionType: Literal[SessionType.protocol] =\
-        SessionType.protocol
+
+    sessionType: Literal[SessionType.protocol] = SessionType.protocol
     createParams: ProtocolCreateParams
 
 
 class LiveProtocolCreateAttributes(SessionCreateAttributesNoParams):
     """Live protocol session create request."""
-    sessionType: Literal[SessionType.live_protocol] =\
-        SessionType.live_protocol
+
+    sessionType: Literal[SessionType.live_protocol] = SessionType.live_protocol
 
 
 class SessionResponseAttributes(ResponseDataModel):
     """Common session response attributes."""
-    createdAt: datetime = \
-        Field(...,
-              description="Date and time that this session was created")
-    details: BaseModel =\
-        Field(...,
-              description="Detailed session specific status")
+
+    createdAt: datetime = Field(
+        ..., description="Date and time that this session was created"
+    )
+    details: BaseModel = Field(..., description="Detailed session specific status")
 
 
 class CalibrationCheckResponseAttributes(
     CalibrationCheckCreateAttributes, SessionResponseAttributes
 ):
     """Response attributes of cal check session."""
+
     details: CalibrationCheckSessionStatus
 
 
@@ -129,6 +140,7 @@ class TipLengthCalibrationResponseAttributes(
     TipLengthCalibrationCreateAttributes, SessionResponseAttributes
 ):
     """Response attributes of tip length calibration session."""
+
     details: TipCalibrationSessionStatus
 
 
@@ -136,6 +148,7 @@ class DeckCalibrationResponseAttributes(
     DeckCalibrationCreateAttributes, SessionResponseAttributes
 ):
     """Response attributes of deck calibration session."""
+
     details: DeckCalibrationSessionStatus
 
 
@@ -143,13 +156,13 @@ class PipetteOffsetCalibrationResponseAttributes(
     PipetteOffsetCalibrationCreateAttributes, SessionResponseAttributes
 ):
     """Response attributes of pipette offset calibration session."""
+
     details: PipetteOffsetCalibrationSessionStatus
 
 
-class ProtocolResponseAttributes(
-    ProtocolCreateAttributes, SessionResponseAttributes
-):
+class ProtocolResponseAttributes(ProtocolCreateAttributes, SessionResponseAttributes):
     """Response attributes of protocol session."""
+
     details: ProtocolSessionDetails
 
 
@@ -157,6 +170,7 @@ class LiveProtocolResponseAttributes(
     LiveProtocolCreateAttributes, SessionResponseAttributes
 ):
     """Response attributes of live protocol session."""
+
     pass
 
 
@@ -166,7 +180,7 @@ RequestTypes = typing.Union[
     DeckCalibrationCreateAttributes,
     PipetteOffsetCalibrationCreateAttributes,
     ProtocolCreateAttributes,
-    LiveProtocolCreateAttributes
+    LiveProtocolCreateAttributes,
 ]
 
 
@@ -176,17 +190,11 @@ ResponseTypes = typing.Union[
     DeckCalibrationResponseAttributes,
     PipetteOffsetCalibrationResponseAttributes,
     ProtocolResponseAttributes,
-    LiveProtocolResponseAttributes
+    LiveProtocolResponseAttributes,
 ]
 
 
 # Session create and query requests/responses
-SessionCreateRequest = RequestModel[
-    RequestTypes
-]
-SessionResponse = ResponseModel[
-    ResponseTypes
-]
-MultiSessionResponse = MultiResponseModel[
-    ResponseTypes
-]
+SessionCreateRequest = RequestModel[RequestTypes]
+SessionResponse = ResponseModel[ResponseTypes]
+MultiSessionResponse = MultiResponseModel[ResponseTypes]

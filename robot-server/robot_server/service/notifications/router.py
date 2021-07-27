@@ -8,9 +8,7 @@ router = APIRouter()
 
 
 @router.websocket("/notifications/subscribe")
-async def handle_subscribe(
-        websocket: WebSocket,
-        topic: List[str] = Query(...)):
+async def handle_subscribe(websocket: WebSocket, topic: List[str] = Query(...)):
     """Accept a websocket connection."""
     await websocket.accept()
     await handle_subscriber.handle_socket(websocket, topic)

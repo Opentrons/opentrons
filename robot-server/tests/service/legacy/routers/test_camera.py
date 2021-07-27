@@ -6,9 +6,10 @@ from opentrons.system import camera
 
 @pytest.fixture
 def mock_take_picture():
-    with patch("robot_server.service.legacy.routers."
-               "camera.camera.take_picture",
-               spec=camera.take_picture) as m:
+    with patch(
+        "robot_server.service.legacy.routers." "camera.camera.take_picture",
+        spec=camera.take_picture,
+    ) as m:
         yield m
 
 
@@ -31,7 +32,7 @@ def test_camera_success(mock_take_picture, api_client):
 
     async def fake_picture(filename, loop=None):
         # Save the filename
-        state['filename'] = filename
+        state["filename"] = filename
         # Write some junk to the file
         with open(filename, "wb") as f:
             f.write(b"test image")
@@ -42,4 +43,4 @@ def test_camera_success(mock_take_picture, api_client):
     assert res.status_code == 200
     assert res.content == b"test image"
     # Make sure the tempfile was deleted
-    assert os.path.exists(state['filename']) is False
+    assert os.path.exists(state["filename"]) is False

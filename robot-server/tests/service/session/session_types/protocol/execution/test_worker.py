@@ -3,17 +3,21 @@ import typing
 from mock import MagicMock
 import pytest
 
-from robot_server.service.session.session_types.protocol \
-    .execution.protocol_runner import ProtocolRunner
-from robot_server.service.session.session_types.protocol \
-    .execution.worker import _Worker, WorkerListener, WorkerDirective
+from robot_server.service.session.session_types.protocol.execution.protocol_runner import (  # noqa: E501
+    ProtocolRunner,
+)
+from robot_server.service.session.session_types.protocol.execution.worker import (
+    _Worker,
+    WorkerListener,
+    WorkerDirective,
+)
 
 
 class DelegatingWorkerListener(WorkerListener):
     def __init__(self, delegate):
         self._delegate = delegate
 
-    async def on_directive(self, directive: 'WorkerDirective'):
+    async def on_directive(self, directive: "WorkerDirective"):
         await self._delegate.on_directive(directive)
 
     async def on_ready(self):
@@ -40,9 +44,11 @@ def mock_protocol_runner():
 
 @pytest.fixture
 async def worker(mock_protocol_runner, loop, mock_worker_listener):
-    w = _Worker(protocol_runner=mock_protocol_runner,
-                listener=DelegatingWorkerListener(mock_worker_listener),
-                loop=loop)
+    w = _Worker(
+        protocol_runner=mock_protocol_runner,
+        listener=DelegatingWorkerListener(mock_worker_listener),
+        loop=loop,
+    )
     yield w
     await w.close()
 
@@ -51,31 +57,38 @@ async def worker(mock_protocol_runner, loop, mock_worker_listener):
 def raiser():
     def _func():
         raise ValueError("")
+
     return _func
 
 
 class TestStartUp:
-    async def test_load_called(self, loop, worker, mock_protocol_runner,
-                               mock_worker_listener):
+    async def test_load_called(
+        self, loop, worker, mock_protocol_runner, mock_worker_listener
+    ):
         mock_protocol_runner.load.assert_called_once()
 
     async def test_load_failing_calls_listener(
-            self, loop, worker, mock_protocol_runner, raiser,
-            mock_worker_listener):
+        self, loop, worker, mock_protocol_runner, raiser, mock_worker_listener
+    ):
         mock_protocol_runner.load.side_effect = raiser
-        w = _Worker(protocol_runner=mock_protocol_runner,
-                    listener=DelegatingWorkerListener(mock_worker_listener),
-                    loop=loop)
+        w = _Worker(
+            protocol_runner=mock_protocol_runner,
+            listener=DelegatingWorkerListener(mock_worker_listener),
+            loop=loop,
+        )
         await w.close()
         mock_worker_listener.on_error.assert_called_once()
 
-    async def test_on_ready_called(self, loop, worker, mock_protocol_runner,
-                                   mock_worker_listener):
+    async def test_on_ready_called(
+        self, loop, worker, mock_protocol_runner, mock_worker_listener
+    ):
         event = asyncio.Event()
         mock_protocol_runner.load.side_effect = event.set
-        w = _Worker(protocol_runner=mock_protocol_runner,
-                    listener=DelegatingWorkerListener(mock_worker_listener),
-                    loop=loop)
+        w = _Worker(
+            protocol_runner=mock_protocol_runner,
+            listener=DelegatingWorkerListener(mock_worker_listener),
+            loop=loop,
+        )
         await event.wait()
         mock_worker_listener.on_ready.assert_called_once()
         await w.close()
@@ -89,8 +102,9 @@ class TestRun:
         await event.wait()
         mock_protocol_runner.run.assert_called_once()
 
-    async def test_handle_run_fails(self, loop, worker, mock_protocol_runner,
-                                    raiser, mock_worker_listener):
+    async def test_handle_run_fails(
+        self, loop, worker, mock_protocol_runner, raiser, mock_worker_listener
+    ):
         mock_protocol_runner.run.side_effect = raiser
         await worker.handle_run()
         await worker.close()
@@ -105,9 +119,9 @@ class TestSimulate:
         await event.wait()
         mock_protocol_runner.simulate.assert_called_once()
 
-    async def test_handle_simulate_fails(self, loop, worker,
-                                         mock_protocol_runner, raiser,
-                                         mock_worker_listener):
+    async def test_handle_simulate_fails(
+        self, loop, worker, mock_protocol_runner, raiser, mock_worker_listener
+    ):
         mock_protocol_runner.run.side_effect = raiser
         await worker.handle_run()
         await worker.close()
@@ -129,8 +143,7 @@ async def test_handle_resume(loop, worker, mock_protocol_runner):
     mock_protocol_runner.resume.assert_called_once()
 
 
-async def test_on_command(loop, worker,
-                          mock_protocol_runner, mock_worker_listener):
+async def test_on_command(loop, worker, mock_protocol_runner, mock_worker_listener):
     mock_protocol_runner.run.side_effect = lambda: worker._on_command(123)
     await worker.handle_run()
     await worker.close()

@@ -1,4 +1,4 @@
-metadata = {'apiLevel': '2.6'}
+metadata = {"apiLevel": "2.6"}
 
 
 def run(ctx):

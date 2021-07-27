@@ -14,4 +14,4 @@ class TipCalibrationState(str, Enum):
     WILDCARD = STATE_WILDCARD
 
 
-TIP_RACK_SLOT = '8'
+TIP_RACK_SLOT = "8"

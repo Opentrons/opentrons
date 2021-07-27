@@ -4,7 +4,7 @@ import json
 
 def load_config(name: str):
     """Load a configuration file"""
-    with open(name, 'rb') as f:
+    with open(name, "rb") as f:
         return json.load(f)
 
 

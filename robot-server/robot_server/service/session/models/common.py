@@ -3,7 +3,7 @@ from uuid import uuid4
 
 from pydantic import BaseModel
 
-IdentifierType = typing.NewType('IdentifierType', str)
+IdentifierType = typing.NewType("IdentifierType", str)
 
 
 def create_identifier() -> IdentifierType:
