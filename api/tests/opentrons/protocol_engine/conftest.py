@@ -56,7 +56,7 @@ def tip_rack_def() -> LabwareDefinition:
     return LabwareDefinition.parse_obj(load_definition("opentrons_96_tiprack_300ul", 1))
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def falcon_tuberack_def() -> LabwareDefinition:
     """Get the definition of the 6-well Falcon tuberack."""
     return LabwareDefinition.parse_obj(
