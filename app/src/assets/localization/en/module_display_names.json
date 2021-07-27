@@ -1,0 +1,5 @@
+{
+  "temperatureModuleType": "Temperature",
+  "magneticModuleType": "Magnetic",
+  "thermocyclerModuleType": "Thermocycler"
+}

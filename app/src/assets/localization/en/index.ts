@@ -1,3 +1,4 @@
+import module_display_names from './module_display_names.json'
 import shared from './shared.json'
 import protocol_calibration from './protocol_calibration.json'
 import protocol_info from './protocol_info.json'
@@ -10,6 +11,7 @@ import robot_info from './robot_info.json'
 import top_navigation from './top_navigation.json'
 
 export const en = {
+  module_display_names,
   shared,
   protocol_calibration,
   protocol_info,

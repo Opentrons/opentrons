@@ -1,19 +1,17 @@
 // NOTE: Ian 2019-10-24 these are by-eye numbers that intentionally
 // ignore the real-life data to emphasize overhangs etc
 import {
+  MAGNETIC_MODULE_TYPE,
+  TEMPERATURE_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
   STD_SLOT_X_DIM as SLOT_X,
   STD_SLOT_Y_DIM as SLOT_Y,
   STD_SLOT_DIVIDER_WIDTH as DIVIDER,
   SPAN7_8_10_11_SLOT,
-} from '../../constants'
-import {
-  MAGNETIC_MODULE_TYPE,
-  TEMPERATURE_MODULE_TYPE,
-  THERMOCYCLER_MODULE_TYPE,
-  ModuleRealType,
-} from '@opentrons/shared-data'
-import { DeckSlot, ModuleOrientation } from '../../types'
+} from '../constants'
+import { ModuleRealType, ModuleOrientation } from '../types'
 // NOTE: all dims are in 'left' orientation. Rotate & transform to obtain 'right' orientation.
+
 export interface ModuleVizDims {
   xOffset: number
   yOffset: number
@@ -71,6 +69,7 @@ export const getModuleVizDims = (
     childYOffset: SLOT_Y - dims.childYOffset - dims.childYDimension,
   }
 }
+type DeckSlot = string
 const LEFT_SIDE_SLOTS: DeckSlot[] = ['1', '4', '7', '10', SPAN7_8_10_11_SLOT]
 export const inferModuleOrientationFromSlot = (
   slot: DeckSlot

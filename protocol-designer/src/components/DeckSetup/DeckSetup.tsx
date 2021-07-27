@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux'
 import compact from 'lodash/compact'
 import values from 'lodash/values'
 import {
+  ModuleViz,
   RobotCoordsText,
   RobotWorkSpace,
   useOnClickOutside,
@@ -14,6 +15,8 @@ import {
 import { MODULES_WITH_COLLISION_ISSUES } from '@opentrons/step-generation'
 import {
   getLabwareHasQuirk,
+  getModuleVizDims,
+  inferModuleOrientationFromSlot,
   GEN_ONE_MULTI_PIPETTES,
   DeckSlot as DeckDefSlot,
   ModuleRealType,
@@ -29,10 +32,6 @@ import {
   selectors as labwareDefSelectors,
   LabwareDefByDefURI,
 } from '../../labware-defs'
-import {
-  getModuleVizDims,
-  inferModuleOrientationFromSlot,
-} from './getModuleVizDims'
 
 import { selectors as featureFlagSelectors } from '../../feature-flags'
 import {
@@ -43,7 +42,6 @@ import {
   ModuleOnDeck,
 } from '../../step-forms'
 import { BrowseLabwareModal } from '../labware'
-import { ModuleViz } from './ModuleViz'
 import { ModuleTag } from './ModuleTag'
 import { SlotWarning } from './SlotWarning'
 import { LabwareOnDeck } from './LabwareOnDeck'
@@ -267,7 +265,7 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
               x={moduleX}
               y={moduleY}
               orientation={orientation}
-              module={moduleOnDeck}
+              moduleType={moduleOnDeck.type}
               slotName={slot.id}
             />
             <ModuleTag
