@@ -261,7 +261,7 @@ def test_get_well_columns(falcon_tuberack_def: LabwareDefinition) -> None:
         },
         labware_definitions_by_uri={"some-tuberack-uri": falcon_tuberack_def},
     )
-    expected_columns = {'1': ['A1', 'B1'], '2': ['A2', 'B2'], '3': ['A3', 'B3']}
+    expected_columns = {"1": ["A1", "B1"], "2": ["A2", "B2"], "3": ["A3", "B3"]}
     result = subject.get_well_columns(labware_id="tuberack-id")
     assert result == expected_columns
 
@@ -278,7 +278,7 @@ def test_get_well_rows(falcon_tuberack_def: LabwareDefinition) -> None:
         },
         labware_definitions_by_uri={"some-tuberack-uri": falcon_tuberack_def},
     )
-    expected_rows = {'A': ['A1', 'A2', 'A3'], 'B': ['B1', 'B2', 'B3']}
+    expected_rows = {"A": ["A1", "A2", "A3"], "B": ["B1", "B2", "B3"]}
     result = subject.get_well_rows(labware_id="tuberack-id")
     assert result == expected_rows
 
@@ -442,5 +442,6 @@ def test_get_slot_position(standard_deck_def: DeckDefinitionV2) -> None:
     result = subject.get_slot_position(DeckSlotName.SLOT_3)
 
     assert result == Point(x=slot_pos[0], y=slot_pos[1], z=slot_pos[2])
+
 
 # TODO: Test get_wells and get_well_grid

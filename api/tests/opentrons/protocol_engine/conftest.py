@@ -60,4 +60,5 @@ def tip_rack_def() -> LabwareDefinition:
 def falcon_tuberack_def() -> LabwareDefinition:
     """Get the definition of the 6-well Falcon tuberack."""
     return LabwareDefinition.parse_obj(
-        load_definition("opentrons_6_tuberack_falcon_50ml_conical", 1))
+        load_definition("opentrons_6_tuberack_falcon_50ml_conical", 1)
+    )

@@ -110,7 +110,7 @@ class Labware:  # noqa: D101
     # operational logic, and its presence in this interface is no longer
     # necessary with Protocol Engine controlling execution. Can we get rid of it?
     @property
-    def magdeck_engage_height(self) -> Optional[float]:    # noqa: D102
+    def magdeck_engage_height(self) -> Optional[float]:  # noqa: D102
         return self._definition().parameters.magneticModuleEngageHeight
 
     @property
@@ -172,12 +172,16 @@ class Labware:  # noqa: D101
     def wells_by_name(self) -> Dict[str, Well]:  # noqa: D102
         if self._wells_by_name is None:
             wells = self._engine_client.state.labware.get_wells(
-                labware_id=self.labware_id)
-            self._wells_by_name = {well_name: Well(
-                                        well_name=well_name,
-                                        engine_client=self._engine_client,
-                                        labware=self,
-                                    ) for well_name in wells}
+                labware_id=self.labware_id
+            )
+            self._wells_by_name = {
+                well_name: Well(
+                    well_name=well_name,
+                    engine_client=self._engine_client,
+                    labware=self,
+                )
+                for well_name in wells
+            }
         return self._wells_by_name
 
     def rows(self) -> List[List[Well]]:  # noqa: D102
@@ -186,10 +190,12 @@ class Labware:  # noqa: D101
     def rows_by_name(self) -> Dict[str, List[Well]]:  # noqa: D102
         if self._rows_by_name is None:
             rows_dict = self._engine_client.state.labware.get_well_rows(
-                labware_id=self.labware_id)
-            self._rows_by_name = {row: [self.wells_by_name()[well_name]
-                                        for well_name in row_wells]
-                                  for row, row_wells in rows_dict.items()}
+                labware_id=self.labware_id
+            )
+            self._rows_by_name = {
+                row: [self.wells_by_name()[well_name] for well_name in row_wells]
+                for row, row_wells in rows_dict.items()
+            }
         return self._rows_by_name
 
     def columns(self) -> List[List[Well]]:  # noqa: D102
@@ -198,15 +204,18 @@ class Labware:  # noqa: D101
     def columns_by_name(self) -> Dict[str, List[Well]]:  # noqa: D102
         if self._columns_by_name is None:
             cols_dict = self._engine_client.state.labware.get_well_columns(
-                labware_id=self.labware_id)
-            self._columns_by_name = {col: [self.wells_by_name()[well_name]
-                                           for well_name in col_wells]
-                                     for col, col_wells in cols_dict.items()}
+                labware_id=self.labware_id
+            )
+            self._columns_by_name = {
+                col: [self.wells_by_name()[well_name] for well_name in col_wells]
+                for col, col_wells in cols_dict.items()
+            }
         return self._columns_by_name
 
     def _definition(self) -> LabwareDefinition:
         return self._engine_client.state.labware.get_labware_definition(
-            labware_id=self.labware_id)
+            labware_id=self.labware_id
+        )
 
     def __repr__(self) -> str:  # noqa: D105
         # TODO: (spp, 2021.07.14): Should this be a combination of display name & <obj>?

@@ -32,7 +32,8 @@ class Well:  # noqa: D101
         self._labware = labware
         self._well_name = well_name
         self._well_definition = self._engine_client.state.labware.get_well_definition(
-            labware_id=labware.labware_id, well_name=well_name)
+            labware_id=labware.labware_id, well_name=well_name
+        )
 
     # TODO(mc, 2021-04-22): remove this property; it's redundant and
     # unlikely to be used by PAPI users
@@ -111,9 +112,11 @@ class Well:  # noqa: D101
 
         Checks that other object is a `Well` and belongs to the same labware.
         """
-        return (isinstance(other, Well) and
-                self.well_name == other.well_name and
-                self.parent is other.parent)
+        return (
+            isinstance(other, Well)
+            and self.well_name == other.well_name
+            and self.parent is other.parent
+        )
 
     def __hash__(self) -> int:  # noqa: D105
         raise NotImplementedError()
