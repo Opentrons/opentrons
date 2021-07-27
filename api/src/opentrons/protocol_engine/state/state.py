@@ -84,7 +84,7 @@ class StateStore(StateView, HandlesActions):
         Arguments:
             deck_definition: The deck definition to preload into
                 labware state.
-            deck_fixed_labware: Labware definitinos from the deck
+            deck_fixed_labware: Labware definitions from the deck
                 definition to preload into labware state.
         """
         self._command_store = CommandStore()
