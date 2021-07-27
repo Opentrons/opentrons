@@ -15,7 +15,7 @@ from opentrons.protocol_engine.clients.transports import ChildThreadTransport
 @pytest.fixture
 async def engine(decoy: Decoy) -> ProtocolEngine:
     """Get a stubbed out ProtocolEngine."""
-    return decoy.create_decoy(spec=ProtocolEngine)
+    return decoy.mock(cls=ProtocolEngine)
 
 
 @pytest.fixture

@@ -2,7 +2,7 @@ import asyncio
 from unittest import mock
 try:
     import aionotify
-except OSError:
+except (OSError, ModuleNotFoundError):
     aionotify = None  # type: ignore
 import pytest
 import typeguard

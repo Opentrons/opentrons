@@ -62,8 +62,9 @@ class AttachedModulesControl:
             execution_manager=self.api._execution_manager,
             sim_model=sim_model)
 
-    def unregister_modules(self,
-                           mods_at_ports: List[modules.ModuleAtPort]) -> None:
+    async def unregister_modules(
+            self, mods_at_ports: List[modules.ModuleAtPort]
+    ) -> None:
         """
         De-register Modules.
 
@@ -83,7 +84,7 @@ class AttachedModulesControl:
         for removed_mod in removed_modules:
             log.info(f"Module {removed_mod.name()} detached"
                      f" from port {removed_mod.port}")
-            del removed_mod
+            await removed_mod.cleanup()
 
     async def register_modules(
             self,
@@ -103,7 +104,7 @@ class AttachedModulesControl:
             removed_mods_at_ports = []
 
         # destroy removed mods
-        self.unregister_modules(removed_mods_at_ports)
+        await self.unregister_modules(removed_mods_at_ports)
         sorted_mods_at_port =\
             self.api._backend._usb.match_virtual_ports(new_mods_at_ports)
 
@@ -141,21 +142,22 @@ class AttachedModulesControl:
             if mod_type == module.name():
                 matching_modules.append(module)
         if self.api.is_simulator:
-            mod_class = {
-                'magdeck': modules.MagDeck,
-                'tempdeck': modules.TempDeck,
-                'thermocycler': modules.Thermocycler
+            module_builder = {
+                'magdeck': modules.MagDeck.build,
+                'tempdeck': modules.TempDeck.build,
+                'thermocycler': modules.Thermocycler.build
             }[mod_type]
-            simulating_module = mod_class(
-                port='',
-                usb_port=self.api._backend._usb.find_port(''),
-                simulating=True,
-                loop=self.api.loop,
-                execution_manager=ExecutionManager(
-                    loop=self.api.loop),
-                sim_model=by_model.value)
-            await simulating_module._connect()
-            simulated_module = simulating_module
+            if module_builder:
+                simulating_module = await module_builder(
+                    port='',
+                    usb_port=self.api._backend._usb.find_port(''),
+                    simulating=True,
+                    loop=self.api.loop,
+                    execution_manager=ExecutionManager(
+                        loop=self.api.loop),
+                    sim_model=by_model.value
+                )
+                simulated_module = simulating_module
         return matching_modules, simulated_module
 
     def scan(self) -> List[modules.ModuleAtPort]:

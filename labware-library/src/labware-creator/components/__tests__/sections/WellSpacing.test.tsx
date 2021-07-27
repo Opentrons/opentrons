@@ -2,7 +2,11 @@ import React from 'react'
 import { FormikConfig } from 'formik'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { render, screen } from '@testing-library/react'
-import { getDefaultFormState, LabwareFields } from '../../../fields'
+import {
+  getDefaultFormState,
+  getInitialStatus,
+  LabwareFields,
+} from '../../../fields'
 import { isEveryFieldHidden, getLabwareName } from '../../../utils'
 import { WellSpacing } from '../../sections/WellSpacing'
 import { wrapInFormik } from '../../utils/wrapInFormik'
@@ -24,6 +28,7 @@ describe('WellSpacing', () => {
   beforeEach(() => {
     formikConfig = {
       initialValues: getDefaultFormState(),
+      initialStatus: getInitialStatus(),
       onSubmit: jest.fn(),
     }
 
@@ -48,7 +53,7 @@ describe('WellSpacing', () => {
 
     render(wrapInFormik(<WellSpacing />, formikConfig))
 
-    screen.getByRole('heading', { name: /Well Spacing/i })
+    screen.getByRole('heading', { name: /FAKE LABWARE NAME SINGULAR Spacing/i })
 
     screen.getByText(
       nestedTextMatcher(
@@ -66,14 +71,6 @@ describe('WellSpacing', () => {
     screen.getByRole('textbox', { name: /Y Spacing \(Ys\)/i })
   })
 
-  it('should render "Tip Spacing" instead of "Well Spacing" when tipRack is selected', () => {
-    formikConfig.initialValues.labwareType = 'tipRack'
-
-    render(wrapInFormik(<WellSpacing />, formikConfig))
-
-    screen.getByRole('heading', { name: /Tip Spacing/i })
-  })
-
   it('should NOT render when the labware type is aluminumBlock', () => {
     const { container } = render(
       wrapInFormik(<WellSpacing />, {
@@ -81,19 +78,6 @@ describe('WellSpacing', () => {
         initialValues: {
           ...formikConfig.initialValues,
           labwareType: 'aluminumBlock',
-        },
-      })
-    )
-    expect(container.firstChild).toBe(null)
-  })
-
-  it('should NOT render when the labware type is tubeRack', () => {
-    const { container } = render(
-      wrapInFormik(<WellSpacing />, {
-        ...formikConfig,
-        initialValues: {
-          ...formikConfig.initialValues,
-          labwareType: 'tubeRack',
         },
       })
     )

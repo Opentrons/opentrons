@@ -15,12 +15,12 @@ context('Tubes and Rack', () => {
         .first()
         .trigger('mousedown')
       cy.get('*[class^="Dropdown__option_label"]')
-        .contains('Tubes + Opentrons Tube Rack')
+        .contains('Tubes + Tube Rack')
         .click()
 
       // TODO(IL, 2021-05-15): give Dropdown component semantic selectors for E2E
       cy.get('label')
-        .contains('Which tube rack insert?')
+        .contains('Which tube rack?')
         .children()
         .first()
         .trigger('mousedown')
@@ -97,13 +97,13 @@ context('Tubes and Rack', () => {
         cy.get("input[name='wellXDimension']").should('exist')
         cy.get("input[name='wellYDimension']").should('exist')
         cy.get("input[name='wellXDimension']").focus().blur()
-        cy.contains('Well X is a required field').should('exist')
+        cy.contains('Tube X is a required field').should('exist')
         cy.get("input[name='wellXDimension']").type('10').blur()
-        cy.contains('Well X is a required field').should('not.exist')
+        cy.contains('Tube X is a required field').should('not.exist')
         cy.get("input[name='wellYDimension']").focus().blur()
-        cy.contains('Well Y is a required field').should('exist')
+        cy.contains('Tube Y is a required field').should('exist')
         cy.get("input[name='wellYDimension']").type('10').blur()
-        cy.contains('Well Y is a required field').should('not.exist')
+        cy.contains('Tube Y is a required field').should('not.exist')
       })
 
       it('tests well bottom shape and depth', () => {
@@ -145,18 +145,17 @@ context('Tubes and Rack', () => {
         ).should('exist')
         cy.contains('close').click({ force: true })
 
-        // Brand info
-        cy.contains('Brand is required').should('exist')
-        cy.get("input[name='brand']").type('TestPro')
-        cy.contains('Brand is required').should('not.exist')
-        cy.get("input[name='brandId']").type('001')
+        // Brand field should not be shown for Opentrons tube rack (aka non-custom)
+        cy.contains('Brand is a required field').should('not.exist')
 
         // File info
-        cy.get("input[placeholder='TestPro 6 Tube Rack 10 µL']").should('exist')
-        cy.get("input[placeholder='testpro_6_tuberack_10ul']").should('exist')
+        cy.get(
+          "input[placeholder='Opentrons 6 Tube Rack with Generic 0.01 mL']"
+        ).should('exist')
+        cy.get("input[placeholder='opentrons_6_tuberack_10ul']").should('exist')
 
         // Test pipette
-        cy.contains('Test Pipette is required').should('exist')
+        cy.contains('Test Pipette is a required field').should('exist')
         // TODO(IL, 2021-05-15): give Dropdown component semantic selectors for E2E
         cy.get('label')
           .contains('Test Pipette')
@@ -164,9 +163,9 @@ context('Tubes and Rack', () => {
           .first()
           .trigger('mousedown')
         cy.get('*[class^="Dropdown__option_label"]')
-          .contains('P10 Single GEN1')
+          .contains(/P10.*Single-Channel.*GEN1/)
           .click()
-        cy.contains('Test Pipette is required').should('not.exist')
+        cy.contains('Test Pipette is a required field').should('not.exist')
 
         // All fields present
         cy.get('button[class*="_export_button_"]').click({ force: true })
@@ -190,12 +189,12 @@ context('Tubes and Rack', () => {
         .first()
         .trigger('mousedown')
       cy.get('*[class^="Dropdown__option_label"]')
-        .contains('Tubes + Opentrons Tube Rack')
+        .contains('Tubes + Tube Rack')
         .click()
 
       // TODO(IL, 2021-05-15): give Dropdown component semantic selectors for E2E
       cy.get('label')
-        .contains('Which tube rack insert?')
+        .contains('Which tube rack?')
         .children()
         .first()
         .trigger('mousedown')
@@ -272,13 +271,13 @@ context('Tubes and Rack', () => {
         cy.get("input[name='wellXDimension']").should('exist')
         cy.get("input[name='wellYDimension']").should('exist')
         cy.get("input[name='wellXDimension']").focus().blur()
-        cy.contains('Well X is a required field').should('exist')
+        cy.contains('Tube X is a required field').should('exist')
         cy.get("input[name='wellXDimension']").type('10').blur()
-        cy.contains('Well X is a required field').should('not.exist')
+        cy.contains('Tube X is a required field').should('not.exist')
         cy.get("input[name='wellYDimension']").focus().blur()
-        cy.contains('Well Y is a required field').should('exist')
+        cy.contains('Tube Y is a required field').should('exist')
         cy.get("input[name='wellYDimension']").type('10').blur()
-        cy.contains('Well Y is a required field').should('not.exist')
+        cy.contains('Tube Y is a required field').should('not.exist')
       })
 
       it('tests well bottom shape and depth', () => {
@@ -320,20 +319,19 @@ context('Tubes and Rack', () => {
         ).should('exist')
         cy.contains('close').click({ force: true })
 
-        // Brand info
-        cy.contains('Brand is required').should('exist')
-        cy.get("input[name='brand']").type('TestPro')
-        cy.contains('Brand is required').should('not.exist')
-        cy.get("input[name='brandId']").type('001')
+        // Brand field should not be shown for Opentrons tube rack (aka non-custom)
+        cy.contains('Brand is a required field').should('not.exist')
 
         // File info
-        cy.get("input[placeholder='TestPro 15 Tube Rack 10 µL']").should(
+        cy.get(
+          "input[placeholder='Opentrons 15 Tube Rack with Generic 0.01 mL']"
+        ).should('exist')
+        cy.get("input[placeholder='opentrons_15_tuberack_10ul']").should(
           'exist'
         )
-        cy.get("input[placeholder='testpro_15_tuberack_10ul']").should('exist')
 
         // Test pipette
-        cy.contains('Test Pipette is required').should('exist')
+        cy.contains('Test Pipette is a required field').should('exist')
         // TODO(IL, 2021-05-15): give Dropdown component semantic selectors for E2E
         cy.get('label')
           .contains('Test Pipette')
@@ -341,9 +339,9 @@ context('Tubes and Rack', () => {
           .first()
           .trigger('mousedown')
         cy.get('*[class^="Dropdown__option_label"]')
-          .contains('P10 Single GEN1')
+          .contains(/P10.*Single-Channel.*GEN1/)
           .click()
-        cy.contains('Test Pipette is required').should('not.exist')
+        cy.contains('Test Pipette is a required field').should('not.exist')
 
         // All fields present
         cy.get('button[class*="_export_button_"]').click({ force: true })
@@ -367,18 +365,16 @@ context('Tubes and Rack', () => {
         .first()
         .trigger('mousedown')
       cy.get('*[class^="Dropdown__option_label"]')
-        .contains('Tubes + Opentrons Tube Rack')
+        .contains('Tubes + Tube Rack')
         .click()
 
       // TODO(IL, 2021-05-15): give Dropdown component semantic selectors for E2E
       cy.get('label')
-        .contains('Which tube rack insert?')
+        .contains('Which tube rack?')
         .children()
         .first()
         .trigger('mousedown')
-      cy.get('*[class^="Dropdown__option_label"]')
-        .contains('24 tubes (snap cap)')
-        .click()
+      cy.get('*[class^="Dropdown__option_label"]').contains('24 tubes').click()
 
       cy.contains('start creating labware').click({ force: true })
     })
@@ -451,13 +447,13 @@ context('Tubes and Rack', () => {
         cy.get("input[name='wellXDimension']").should('exist')
         cy.get("input[name='wellYDimension']").should('exist')
         cy.get("input[name='wellXDimension']").focus().blur()
-        cy.contains('Well X is a required field').should('exist')
+        cy.contains('Tube X is a required field').should('exist')
         cy.get("input[name='wellXDimension']").type('10').blur()
-        cy.contains('Well X is a required field').should('not.exist')
+        cy.contains('Tube X is a required field').should('not.exist')
         cy.get("input[name='wellYDimension']").focus().blur()
-        cy.contains('Well Y is a required field').should('exist')
+        cy.contains('Tube Y is a required field').should('exist')
         cy.get("input[name='wellYDimension']").type('10').blur()
-        cy.contains('Well Y is a required field').should('not.exist')
+        cy.contains('Tube Y is a required field').should('not.exist')
       })
 
       it('tests well bottom shape and depth', () => {
@@ -499,20 +495,19 @@ context('Tubes and Rack', () => {
         ).should('exist')
         cy.contains('close').click({ force: true })
 
-        // Brand info
-        cy.contains('Brand is required').should('exist')
-        cy.get("input[name='brand']").type('TestPro')
-        cy.contains('Brand is required').should('not.exist')
-        cy.get("input[name='brandId']").type('001')
+        // Brand field should not be shown for Opentrons tube rack (aka non-custom)
+        cy.contains('Brand is a required field').should('not.exist')
 
         // File info
-        cy.get("input[placeholder='TestPro 24 Tube Rack 10 µL']").should(
+        cy.get(
+          "input[placeholder='Opentrons 24 Tube Rack with Generic 0.01 mL']"
+        ).should('exist')
+        cy.get("input[placeholder='opentrons_24_tuberack_10ul']").should(
           'exist'
         )
-        cy.get("input[placeholder='testpro_24_tuberack_10ul']").should('exist')
 
         // Test pipette
-        cy.contains('Test Pipette is required').should('exist')
+        cy.contains('Test Pipette is a required field').should('exist')
         // TODO(IL, 2021-05-15): give Dropdown component semantic selectors for E2E
         cy.get('label')
           .contains('Test Pipette')
@@ -520,9 +515,9 @@ context('Tubes and Rack', () => {
           .first()
           .trigger('mousedown')
         cy.get('*[class^="Dropdown__option_label"]')
-          .contains('P10 Single GEN1')
+          .contains(/P10.*Single-Channel.*GEN1/)
           .click()
-        cy.contains('Test Pipette is required').should('not.exist')
+        cy.contains('Test Pipette is a required field').should('not.exist')
 
         // All fields present
         cy.get('button[class*="_export_button_"]').click({ force: true })

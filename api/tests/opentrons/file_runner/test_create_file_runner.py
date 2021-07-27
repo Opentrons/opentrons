@@ -19,7 +19,7 @@ async def protocol_engine(hardware: HardwareAPI) -> ProtocolEngine:
     return await create_protocol_engine(hardware=hardware)
 
 
-def test_create_json_runner(
+async def test_create_json_runner(
     protocol_engine: ProtocolEngine,
     json_protocol_file: Path,
 ) -> None:

@@ -57,7 +57,12 @@ export const Height = (): JSX.Element | null => {
     <div className={styles.new_definition_section}>
       <SectionBody label="Total Height" id="Height">
         <>
-          <FormAlerts touched={touched} errors={errors} fieldList={fieldList} />
+          <FormAlerts
+            values={values}
+            touched={touched}
+            errors={errors}
+            fieldList={fieldList}
+          />
           <HeightAlerts values={values} touched={touched} />
           <Content values={values} />
         </>

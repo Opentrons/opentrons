@@ -9,7 +9,7 @@ from opentrons.protocols.context.protocol_api.protocol_context import \
 
 try:
     import aionotify
-except OSError:
+except (OSError, ModuleNotFoundError):
     aionotify = None  # type: ignore
 import asyncio
 import os
@@ -23,7 +23,6 @@ from functools import partial
 import zipfile
 
 import pytest
-from decoy import Decoy
 
 from opentrons.api.routers import MainRouter
 from opentrons.api import models
@@ -50,12 +49,6 @@ def asyncio_loop_exception_handler(loop):
     loop.set_exception_handler(exception_handler)
     yield
     loop.set_exception_handler(None)
-
-
-@pytest.fixture
-def decoy() -> Decoy:
-    """Get a Decoy state container to clean up stubs after tests."""
-    return Decoy()
 
 
 def state(topic, state):
@@ -153,27 +146,7 @@ async def enable_door_safety_switch():
     await config.advanced_settings.set_adv_setting(
         'enableDoorSafetySwitch', False)
 
-
-@pytest.fixture
-async def use_new_calibration(monkeypatch):
-    await config.advanced_settings.set_adv_setting(
-        'enableTipLengthCalibration', True)
-    yield
-    await config.advanced_settings.set_adv_setting(
-        'enableTipLengthCalibration', False)
 # -----end feature flag fixtures-----------
-
-
-@pytest.fixture(params=[False, True])
-async def toggle_new_calibration(request):
-    if request.param:
-        await config.advanced_settings.set_adv_setting(
-            'enableTipLengthCalibration', True)
-        yield
-        await config.advanced_settings.set_adv_setting(
-            'enableTipLengthCalibration', False)
-    else:
-        yield
 
 
 @pytest.fixture(params=["testosaur_v2.py"])
@@ -264,6 +237,10 @@ async def ctx(loop, hardware) -> ProtocolContext:
         implementation=ProtocolContextImplementation(hardware=hardware),
         loop=loop
     )
+
+
+def data_dir() -> str:
+    return os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
 
 
 def build_v2_model(h, lw_name, loop):

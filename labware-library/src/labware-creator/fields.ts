@@ -1,4 +1,9 @@
-import type { WellBottomShape } from '@opentrons/shared-data'
+import capitalize from 'lodash/capitalize'
+import type {
+  LabwareDefinition2,
+  WellBottomShape,
+} from '@opentrons/shared-data'
+import { displayAsTube, getLabwareName } from './utils'
 
 export const MAX_X_DIMENSION = 129
 export const MIN_X_DIMENSION = 127
@@ -17,6 +22,9 @@ export const DISPLAY_VOLUME_UNITS = 'µL'
 
 // magic string for all validation errors that direct user away to the labware request form
 export const IRREGULAR_LABWARE_ERROR = 'IRREGULAR_LABWARE_ERROR'
+
+export const REQUIRED_FIELD_ERROR = 'REQUIRED_FIELD_ERROR'
+export const MUST_BE_A_NUMBER_ERROR = 'MUST_BE_A_NUMBER_ERROR'
 
 export const LOOSE_TIP_FIT_ERROR = 'LOOSE_TIP_FIT_ERROR'
 
@@ -47,6 +55,16 @@ export interface Option {
 }
 export type Options = Option[]
 
+// NOTE: annoyingly, some components support "rich" `name` values (eg Dropdown)
+// that can be a JSX.Element, and others like RadioField only support string values for `name` :(
+export interface RichOption {
+  name: string | JSX.Element
+  value: string
+  disabled?: boolean
+  imgSrc?: string
+}
+export type RichOptions = RichOption[]
+
 export type LabwareType =
   | 'wellPlate'
   | 'reservoir'
@@ -56,7 +74,7 @@ export type LabwareType =
 export const labwareTypeOptions: Options = [
   { name: 'Well Plate', value: 'wellPlate' },
   { name: 'Reservoir', value: 'reservoir' },
-  { name: 'Tubes + Opentrons Tube Rack', value: 'tubeRack' },
+  { name: 'Tubes + Tube Rack', value: 'tubeRack' },
   { name: 'Tubes / Plates + Opentrons Aluminum Block', value: 'aluminumBlock' },
   { name: 'Tip Rack', value: 'tipRack' },
 ]
@@ -122,6 +140,8 @@ export interface LabwareFields {
 
   brand: string | null | undefined
   brandId: string | null | undefined // comma-separated values
+  groupBrand: string | null | undefined
+  groupBrandId: string | null | undefined // comma-separated values
 
   loadName: string | null | undefined
   displayName: string | null | undefined
@@ -171,6 +191,8 @@ export interface ProcessedLabwareFields {
 
   brand: string
   brandId: string[]
+  groupBrand: string
+  groupBrandId: string[]
 
   // if loadName or displayName are left blank, Yup schema generates them
   loadName: string
@@ -182,27 +204,34 @@ export interface ProcessedLabwareFields {
 
 export const tubeRackInsertOptions: Options = [
   {
-    name: '6 tubes',
+    name: 'Opentrons 6 tubes',
     value: '6tubes',
     imgSrc: require('./images/6x50mL_insert_large.png'),
   },
   {
-    name: '15 tubes',
+    name: 'Opentrons 15 tubes',
     value: '15tubes',
     imgSrc: require('./images/15x15mL_insert_large.png'),
   },
   {
-    name: '24 tubes (snap cap)',
+    name: 'Opentrons 24 tubes',
     value: '24tubesSnapCap',
     imgSrc: require('./images/24x1_5mL_insert_large.png'),
   },
   {
-    name: '10 tubes (2 size)',
+    name: 'Opentrons 10 tubes',
     value: '10tubes',
     imgSrc: require('./images/6x15mL_and_4x50mL_insert_large.png'),
     disabled: true, // 6 + 4 tube rack not yet supported
   },
+  {
+    name: 'Non-Opentrons tube rack',
+    value: 'customTubeRack',
+    imgSrc: require('./images/blank_insert_large.png'),
+  },
 ]
+
+export const DEFAULT_RACK_BRAND = 'Opentrons'
 
 // fields that get auto-filled when tubeRackInsertLoadName is selected
 // NOTE: these are duplicate data derived from tube rack defs, but
@@ -221,6 +250,8 @@ export const tubeRackAutofills: {
     gridSpacingY: '35.0',
     gridOffsetX: '35.50',
     gridOffsetY: '25.24',
+    regularRowSpacing: 'true',
+    regularColumnSpacing: 'true',
   },
   '24tubesSnapCap': {
     // NOTE: based on opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap
@@ -232,6 +263,8 @@ export const tubeRackAutofills: {
     gridSpacingY: '19.28',
     gridOffsetX: '18.21',
     gridOffsetY: '10.07',
+    regularRowSpacing: 'true',
+    regularColumnSpacing: 'true',
   },
   '15tubes': {
     // NOTE: based on opentrons_15_tuberack_falcon_15ml_conical
@@ -243,7 +276,10 @@ export const tubeRackAutofills: {
     gridSpacingY: '25.00',
     gridOffsetX: '13.88',
     gridOffsetY: '17.74',
+    regularRowSpacing: 'true',
+    regularColumnSpacing: 'true',
   },
+  customTubeRack: {}, // not an insert, no autofills
 }
 
 // NOTE: these images are from labware-library, not labware creator's local images dir
@@ -277,6 +313,8 @@ export const aluminumBlockAutofills = {
     gridSpacingY: '17.25',
     gridOffsetX: '20.75',
     gridOffsetY: '16.87',
+    regularRowSpacing: 'true',
+    regularColumnSpacing: 'true',
   },
   '96well': {
     // NOTE: based on opentrons_96_aluminumblock_generic_pcr_strip_200ul
@@ -288,8 +326,10 @@ export const aluminumBlockAutofills = {
     gridSpacingY: '9.00',
     gridOffsetX: '14.38',
     gridOffsetY: '11.25',
+    regularRowSpacing: 'true',
+    regularColumnSpacing: 'true',
   },
-}
+} as const
 
 export const labwareTypeAutofills: Record<
   LabwareType,
@@ -321,20 +361,10 @@ export const aluminumBlockChildTypeOptions: Options = [
   },
 ]
 
-// For DRYness, these values aren't explicitly included in the autofill objects (eg tubeRackAutofills),
-// but should be included in the autofill spread
-export const getImplicitAutofillValues = (
-  preAutofilledValues: Partial<LabwareFields>
-): Partial<LabwareFields> => {
-  const result: Partial<LabwareFields> = {}
-  if ('gridRows' in preAutofilledValues) {
-    result.regularRowSpacing = 'true'
-  }
-  if ('gridColumns' in preAutofilledValues) {
-    result.regularColumnSpacing = 'true'
-  }
-  return result
-}
+export const getInitialStatus = (): FormStatus => ({
+  defaultedDef: null,
+  prevValues: null,
+})
 
 export const getDefaultFormState = (): LabwareFields => ({
   labwareType: null,
@@ -373,6 +403,8 @@ export const getDefaultFormState = (): LabwareFields => ({
 
   brand: null,
   brandId: null,
+  groupBrand: null,
+  groupBrandId: null,
 
   loadName: null,
   displayName: null,
@@ -383,7 +415,7 @@ export const getDefaultFormState = (): LabwareFields => ({
 
 export const LABELS: Record<keyof LabwareFields, string> = {
   labwareType: 'What type of labware are you creating?',
-  tubeRackInsertLoadName: 'Which tube rack insert?',
+  tubeRackInsertLoadName: 'Which tube rack?',
   aluminumBlockType: 'Which aluminum block?',
   aluminumBlockChildType: 'What labware is on top of your aluminum block?',
   handPlacedTipFit: 'Fit',
@@ -408,7 +440,40 @@ export const LABELS: Record<keyof LabwareFields, string> = {
   gridOffsetY: 'Y Offset (Yo)',
   brand: 'Brand',
   brandId: 'Manufacturer/Catalog #',
+  groupBrand: 'Tube Brand',
+  groupBrandId: 'Manufacturer/Catalog #',
   displayName: 'Display Name',
   loadName: 'API Load Name',
   pipetteName: 'Test Pipette',
+}
+
+export const getLabel = (
+  name: keyof LabwareFields,
+  values: LabwareFields
+): string => {
+  if (name === 'homogeneousWells') {
+    return `Are all your ${getLabwareName(
+      values,
+      true
+    )} the same shape and size?`
+  } else if (name === 'brand' && values.labwareType === 'tubeRack') {
+    return 'Rack Brand'
+  }
+  if (name === 'wellShape') {
+    return `${capitalize(getLabwareName(values, false))} shape`
+  }
+  if (name === 'wellXDimension' && displayAsTube(values)) {
+    return 'Tube X'
+  }
+  if (name === 'wellYDimension' && displayAsTube(values)) {
+    return 'Tube Y'
+  }
+  return LABELS[name]
+}
+
+// type of Formik status. We can't type status in useFormikContext so
+// this interface needs to be used explicitly each time :(
+export interface FormStatus {
+  defaultedDef: LabwareDefinition2 | null
+  prevValues: LabwareFields | null
 }

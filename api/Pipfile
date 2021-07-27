@@ -32,7 +32,9 @@ flake8 = "~=3.9.0"
 flake8-annotations = "~=2.6.2"
 flake8-docstrings = "~=1.6.0"
 flake8-noqa = "~=1.1.0"
-decoy = "~=1.4.0"
+diff-match-patch = "*"
+decoy = "~=1.6.4"
+black = "==21.7b0"
 
 [packages]
 aionotify = "==0.2.0"

@@ -3,16 +3,21 @@ import { render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import { FormikConfig } from 'formik'
 import { when, resetAllWhenMocks } from 'jest-when'
-import { getDefaultFormState, LabwareFields } from '../../../fields'
-import { displayAsTube } from '../../../utils'
+import {
+  getDefaultFormState,
+  getInitialStatus,
+  LabwareFields,
+  LabwareType,
+} from '../../../fields'
+import { getLabwareName } from '../../../utils'
 import { WellBottomAndDepth } from '../../sections/WellBottomAndDepth'
 
 import { wrapInFormik } from '../../utils/wrapInFormik'
 
-jest.mock('../../../utils/displayAsTube')
+jest.mock('../../../utils')
 
-const displayAsTubeMock = displayAsTube as jest.MockedFunction<
-  typeof displayAsTube
+const getLabwareNameMock = getLabwareName as jest.MockedFunction<
+  typeof getLabwareName
 >
 
 let formikConfig: FormikConfig<LabwareFields>
@@ -21,12 +26,9 @@ describe('WellBottomAndDepth', () => {
   beforeEach(() => {
     formikConfig = {
       initialValues: getDefaultFormState(),
+      initialStatus: getInitialStatus(),
       onSubmit: jest.fn(),
     }
-
-    when(displayAsTubeMock)
-      .calledWith(expect.any(Object))
-      .mockReturnValue(false)
   })
 
   afterEach(() => {
@@ -34,23 +36,39 @@ describe('WellBottomAndDepth', () => {
     resetAllWhenMocks()
   })
 
-  it('should render with the correct information', () => {
-    render(wrapInFormik(<WellBottomAndDepth />, formikConfig))
+  const labwareTypes: LabwareType[] = [
+    'tubeRack',
+    'wellPlate',
+    'reservoir',
+    'aluminumBlock',
+  ]
+  labwareTypes.forEach(labwareType => {
+    it(`should render with the correct information ${labwareType}`, () => {
+      formikConfig.initialValues.labwareType = labwareType
+      when(getLabwareNameMock)
+        .calledWith(formikConfig.initialValues, false)
+        .mockReturnValue('FAKE LABWARE NAME SINGULAR')
+      when(getLabwareNameMock)
+        .calledWith(formikConfig.initialValues, true)
+        .mockReturnValue('FAKE LABWARE NAME PLURAL')
 
-    expect(screen.getByRole('heading')).toHaveTextContent(
-      /Well Bottom & Depth/i
-    )
+      render(wrapInFormik(<WellBottomAndDepth />, formikConfig))
 
-    screen.getByText(
-      'Depth informs the robot how far down it can go inside a well.'
-    )
-    const radioElements = screen.getAllByRole('radio')
-    expect(radioElements).toHaveLength(3)
-    screen.getAllByRole('radio', { name: /flat/i })
-    screen.getAllByRole('radio', { name: /round/i })
-    screen.getAllByRole('radio', { name: /v-bottom/i })
+      expect(screen.getByRole('heading')).toHaveTextContent(
+        /FAKE LABWARE NAME SINGULAR Bottom & Depth/i
+      )
 
-    screen.getByRole('textbox', { name: /depth/i })
+      screen.getByText(
+        'Depth informs the robot how far down it can go inside a FAKE LABWARE NAME SINGULAR.'
+      )
+      const radioElements = screen.getAllByRole('radio')
+      expect(radioElements).toHaveLength(3)
+      screen.getAllByRole('radio', { name: /flat/i })
+      screen.getAllByRole('radio', { name: /round/i })
+      screen.getAllByRole('radio', { name: /v-bottom/i })
+
+      screen.getByRole('textbox', { name: /depth/i })
+    })
   })
 
   it('should render tip length when tipRack is selected and hide the well bottom shape radioFields', () => {
@@ -64,30 +82,6 @@ describe('WellBottomAndDepth', () => {
     expect(screen.queryByRole('radio', { name: /flat/i })).toBeNull()
     expect(screen.queryByRole('radio', { name: /u/i })).toBeNull()
     expect(screen.queryByRole('radio', { name: /v/i })).toBeNull()
-  })
-
-  it('should render tubes when labware that should displayAsTube is selected', () => {
-    when(displayAsTubeMock)
-      .expectCalledWith(formikConfig.initialValues)
-      .mockReturnValue(true)
-
-    render(wrapInFormik(<WellBottomAndDepth />, formikConfig))
-
-    screen.getByText(
-      'Depth informs the robot how far down it can go inside a tube.'
-    )
-  })
-
-  it('should render wells when labware that should NOT displayAsTube is selected', () => {
-    when(displayAsTubeMock)
-      .expectCalledWith(formikConfig.initialValues)
-      .mockReturnValue(false)
-
-    render(wrapInFormik(<WellBottomAndDepth />, formikConfig))
-
-    screen.getByText(
-      'Depth informs the robot how far down it can go inside a well.'
-    )
   })
 
   it('should render alert when error is present', () => {

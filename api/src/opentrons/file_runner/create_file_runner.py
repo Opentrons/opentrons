@@ -39,10 +39,11 @@ def create_file_runner(
                 protocol_engine=engine,
                 file_reader=JsonFileReader(),
                 command_translator=CommandTranslator(),
-                command_queue_worker=CommandQueueWorker(engine),
+                command_queue_worker=CommandQueueWorker(engine=engine),
             )
         elif protocol_file.file_type == ProtocolFileType.PYTHON:
             loop = asyncio.get_running_loop()
+
             return PythonFileRunner(
                 file=protocol_file,
                 file_reader=PythonFileReader(),

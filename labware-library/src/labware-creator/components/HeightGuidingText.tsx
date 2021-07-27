@@ -18,7 +18,7 @@ export const HeightGuidingText = (props: {
         <p>
           Reference{' '}
           <strong>from the top of the tube to bottom of the rack.</strong>{' '}
-          Include any well lip. Exclude any cover or cap.
+          Include any tube lip. Exclude any cover or cap.
         </p>
         {footer}
       </>

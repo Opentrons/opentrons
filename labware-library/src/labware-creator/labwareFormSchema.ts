@@ -5,6 +5,7 @@ import {
   labwareTypeOptions,
   wellBottomShapeOptions,
   wellShapeOptions,
+  DEFAULT_RACK_BRAND,
   IRREGULAR_LABWARE_ERROR,
   LABWARE_TOO_SMALL_ERROR,
   LABWARE_TOO_LARGE_ERROR,
@@ -15,17 +16,24 @@ import {
   MAX_Z_DIMENSION,
   MIN_X_DIMENSION,
   MIN_Y_DIMENSION,
+  REQUIRED_FIELD_ERROR,
+  MUST_BE_A_NUMBER_ERROR,
+  LabwareFields,
 } from './fields'
 import type { ProcessedLabwareFields } from './fields'
+
+// global overrides for Yup's default error messages.
+Yup.setLocale({
+  mixed: {
+    required: REQUIRED_FIELD_ERROR,
+  },
+})
 
 const ALL_DISPLAY_NAMES = new Set(
   getAllDisplayNames().map(n => n.toLowerCase().trim())
 )
-
-const REQUIRED_FIELD = '${label} is required' // eslint-disable-line no-template-curly-in-string
 const requiredString = (label: string): Yup.StringSchema =>
-  Yup.string().label(label).typeError(REQUIRED_FIELD).required()
-const MUST_BE_A_NUMBER = '${label} must be a number' // eslint-disable-line no-template-curly-in-string
+  Yup.string().label(label).typeError(REQUIRED_FIELD_ERROR).required()
 
 // put this in a transform to make Yup to show "this field is required"
 // instead of "must be a number". See https://github.com/jquense/yup/issues/971
@@ -36,7 +44,7 @@ const requiredPositiveNumber = (label: string): Yup.NumberSchema =>
   Yup.number()
     .label(label)
     .transform(nanToUndefined)
-    .typeError(MUST_BE_A_NUMBER)
+    .typeError(MUST_BE_A_NUMBER_ERROR)
     .moreThan(0)
     .required()
 
@@ -44,7 +52,7 @@ const requiredPositiveInteger = (label: string): Yup.NumberSchema =>
   Yup.number()
     .transform(nanToUndefined)
     .label(label)
-    .typeError(MUST_BE_A_NUMBER)
+    .typeError(MUST_BE_A_NUMBER_ERROR)
     .moreThan(0)
     .integer()
     .required()
@@ -53,7 +61,7 @@ const unsupportedLabwareIfFalse = (label: string): Yup.BooleanSchema =>
   Yup.boolean()
     .default(false)
     .label(label)
-    .typeError(REQUIRED_FIELD)
+    .typeError(REQUIRED_FIELD_ERROR)
     .oneOf([true], IRREGULAR_LABWARE_ERROR)
     .required()
 
@@ -61,6 +69,20 @@ const nameExistsError = (nameName: string): string =>
   `This ${nameName} already exists in the Opentrons default labware library. Please edit the ${nameName} to make it unique.`
 
 // NOTE: all IRREGULAR_LABWARE_ERROR messages will be converted to a special 'error' Alert
+
+// NOTE: same as getIsCustomTubeRack util, but different args type
+const matchCustomTubeRack = (
+  labwareType: LabwareFields['labwareType'],
+  tubeRackInsertLoadName: LabwareFields['tubeRackInsertLoadName']
+): boolean =>
+  labwareType === 'tubeRack' && tubeRackInsertLoadName === 'customTubeRack'
+
+// NOTE: same as getIsOpentronsTubeRack util, but different args type
+const matchOpentronsTubeRack = (
+  labwareType: LabwareFields['labwareType'],
+  tubeRackInsertLoadName: LabwareFields['tubeRackInsertLoadName']
+): boolean =>
+  labwareType === 'tubeRack' && tubeRackInsertLoadName !== 'customTubeRack'
 
 export const labwareFormSchemaBaseObject = Yup.object({
   labwareType: requiredString(LABELS.labwareType).oneOf(
@@ -102,7 +124,7 @@ export const labwareFormSchemaBaseObject = Yup.object({
   footprintXDimension: Yup.number()
     .transform(nanToUndefined)
     .label(LABELS.footprintXDimension)
-    .typeError(MUST_BE_A_NUMBER)
+    .typeError(MUST_BE_A_NUMBER_ERROR)
     .min(MIN_X_DIMENSION, LABWARE_TOO_SMALL_ERROR)
     .max(MAX_X_DIMENSION, LABWARE_TOO_LARGE_ERROR)
     .nullable()
@@ -110,7 +132,7 @@ export const labwareFormSchemaBaseObject = Yup.object({
   footprintYDimension: Yup.number()
     .transform(nanToUndefined)
     .label(LABELS.footprintYDimension)
-    .typeError(MUST_BE_A_NUMBER)
+    .typeError(MUST_BE_A_NUMBER_ERROR)
     .min(MIN_Y_DIMENSION, LABWARE_TOO_SMALL_ERROR)
     .max(MAX_Y_DIMENSION, LABWARE_TOO_LARGE_ERROR)
     .nullable()
@@ -161,7 +183,7 @@ export const labwareFormSchemaBaseObject = Yup.object({
     then: Yup.number()
       .transform(nanToUndefined)
       .label('Length')
-      .typeError(MUST_BE_A_NUMBER)
+      .typeError(MUST_BE_A_NUMBER_ERROR)
       .moreThan(0)
       .max(
         Yup.ref('labwareZDimension'),
@@ -171,7 +193,7 @@ export const labwareFormSchemaBaseObject = Yup.object({
     otherwise: Yup.number()
       .transform(nanToUndefined)
       .label(LABELS.wellDepth)
-      .typeError(MUST_BE_A_NUMBER)
+      .typeError(MUST_BE_A_NUMBER_ERROR)
       .moreThan(0)
       .max(
         Yup.ref('labwareZDimension'),
@@ -201,8 +223,13 @@ export const labwareFormSchemaBaseObject = Yup.object({
     then: requiredPositiveNumber(LABELS.wellYDimension),
     otherwise: Yup.mixed().nullable(),
   }),
-
-  brand: requiredString(LABELS.brand),
+  // non-custom tuberacks (aka Opentrons tube racks) default to "Opentrons" brand,
+  // and user cannot see or override brand (aka "rack brand")
+  brand: Yup.mixed().when(['labwareType', 'tubeRackInsertLoadName'], {
+    is: matchOpentronsTubeRack,
+    then: Yup.mixed().nullable(), // defaulted to DEFAULT_RACK_BRAND in form-level transform below
+    otherwise: requiredString(LABELS.brand),
+  }),
   // TODO(mc, 2020-06-02): should this be Yup.array() instead of mixed?
   brandId: Yup.mixed()
     .nullable()
@@ -211,6 +238,26 @@ export const labwareFormSchemaBaseObject = Yup.object({
         currentValue: string | null | undefined,
         originalValue: string | null | undefined
       ): ProcessedLabwareFields['brandId'] =>
+        (currentValue || '')
+          .trim()
+          .split(',')
+          .map(s => s.trim())
+          .filter(Boolean)
+    ),
+  // group brand (aka "tube brand") is only required for custom tube racks
+  groupBrand: Yup.mixed().when(['labwareType', 'tubeRackInsertLoadName'], {
+    is: matchCustomTubeRack,
+    then: requiredString(LABELS.groupBrand),
+    otherwise: Yup.mixed().nullable(),
+  }),
+  // TODO(mc, 2020-06-02): should this be Yup.array() instead of mixed?
+  groupBrandId: Yup.mixed()
+    .nullable()
+    .transform(
+      (
+        currentValue: string | null | undefined,
+        originalValue: string | null | undefined
+      ): ProcessedLabwareFields['groupBrandId'] =>
         (currentValue || '')
           .trim()
           .split(',')
@@ -251,14 +298,26 @@ export const labwareFormSchemaBaseObject = Yup.object({
 export const labwareFormSchema: Yup.Schema<ProcessedLabwareFields> = labwareFormSchemaBaseObject.transform(
   (currentValue, originalValue) => {
     // "form-level" transforms
-    // NOTE: the currentValue does NOT have transforms applied :(
+    // NOTE: the currentValue does NOT have field-level transforms applied :(
     // TODO: these results are not validated, ideally I could do these transforms in the fields
+
+    // Yup runs transforms before defaults. In order for brand defaulting to work for displayName/loadName
+    // creation, we can't do .default() to the brand field, but need to default it here.
+    const brand = matchOpentronsTubeRack(
+      currentValue.labwareType,
+      currentValue.tubeRackInsertLoadName
+    )
+      ? DEFAULT_RACK_BRAND
+      : currentValue.brand
+
+    const nextValues = { ...currentValue, brand }
+
     const displayName =
       currentValue.displayName == null || currentValue.displayName.trim() === ''
-        ? getDefaultDisplayName(currentValue)
+        ? getDefaultDisplayName(nextValues)
         : currentValue.displayName
 
-    const loadName = currentValue.loadName || getDefaultLoadName(currentValue)
+    const loadName = currentValue.loadName || getDefaultLoadName(nextValues)
 
     return {
       ...currentValue,

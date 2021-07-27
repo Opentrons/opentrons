@@ -277,7 +277,14 @@
         "C6",
         "D6"
       ],
-      "metadata": {}
+      "brand": {
+        "brand": "tube brand here",
+        "brandId": ["tube123", "other123"]
+      },
+      "metadata": {
+        "displayCategory": "tubeRack",
+        "wellBottomShape": "v"
+      }
     }
   ],
   "cornerOffsetFromSlot": {

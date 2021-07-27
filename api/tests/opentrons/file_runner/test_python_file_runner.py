@@ -19,31 +19,31 @@ def protocol_file(decoy: Decoy) -> ProtocolFile:
 @pytest.fixture
 def python_protocol(decoy: Decoy) -> PythonProtocol:
     """Get a mock PythonProtocol object."""
-    return decoy.create_decoy(spec=PythonProtocol)
+    return decoy.mock(cls=PythonProtocol)
 
 
 @pytest.fixture
 def protocol_context(decoy: Decoy) -> ProtocolContext:
     """Get a mock ProtocolContext API interface."""
-    return decoy.create_decoy(spec=ProtocolContext)
+    return decoy.mock(cls=ProtocolContext)
 
 
 @pytest.fixture
 def file_reader(decoy: Decoy) -> PythonFileReader:
     """Get a mock FileReader."""
-    return decoy.create_decoy(spec=PythonFileReader)
+    return decoy.mock(cls=PythonFileReader)
 
 
 @pytest.fixture
 def context_creator(decoy: Decoy) -> ContextCreator:
     """Get a mock ContextCreator."""
-    return decoy.create_decoy(spec=ContextCreator)
+    return decoy.mock(cls=ContextCreator)
 
 
 @pytest.fixture
 def executor(decoy: Decoy) -> PythonExecutor:
     """Get a mock PythonExecutor."""
-    return decoy.create_decoy(spec=PythonExecutor)
+    return decoy.mock(cls=PythonExecutor)
 
 
 @pytest.fixture

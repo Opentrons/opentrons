@@ -79,14 +79,6 @@ class UpdateError(RuntimeError):
     pass
 
 
-class UnsupportedModuleError(Exception):
-    pass
-
-
-class AbsentModuleError(Exception):
-    pass
-
-
 class ModuleInfo(NamedTuple):
     model: str        # A module model such as "magneticModuleV2"
     fw_version: str   # The version of the firmware
@@ -96,3 +88,11 @@ class ModuleInfo(NamedTuple):
 
 ModuleModel = Union[
     MagneticModuleModel, TemperatureModuleModel, ThermocyclerModuleModel]
+
+
+class TemperatureStatus(str, Enum):
+    HOLDING = 'holding at target'
+    COOLING = 'cooling'
+    HEATING = 'heating'
+    IDLE = 'idle'
+    ERROR = 'error'

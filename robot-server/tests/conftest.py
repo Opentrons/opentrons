@@ -11,7 +11,6 @@ import requests
 import pytest
 
 from datetime import datetime, timezone
-from decoy import Decoy
 from fastapi import routing
 from mock import MagicMock
 from typing import Any, Dict
@@ -41,12 +40,6 @@ async def always_raise():
     raise RuntimeError
 
 app.include_router(test_router)
-
-
-@pytest.fixture
-def decoy() -> Decoy:
-    """Get a Decoy state container to clean up stubs after tests."""
-    return Decoy()
 
 
 @pytest.fixture

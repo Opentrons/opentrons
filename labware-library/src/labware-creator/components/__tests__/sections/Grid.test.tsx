@@ -76,6 +76,7 @@ describe('Grid', () => {
     FormAlertsMock.mockImplementation(args => {
       if (
         isEqual(args, {
+          values: formikConfig.initialValues,
           touched: {},
           errors: {},
           fieldList: [
@@ -125,18 +126,6 @@ describe('Grid', () => {
         initialValues: {
           ...formikConfig.initialValues,
           labwareType: 'aluminumBlock',
-        },
-      })
-    )
-    expect(container.firstChild).toBe(null)
-  })
-  it('should NOT render when the labware type is tubeRack', () => {
-    const { container } = render(
-      wrapInFormik(<Grid />, {
-        ...formikConfig,
-        initialValues: {
-          ...formikConfig.initialValues,
-          labwareType: 'tubeRack',
         },
       })
     )

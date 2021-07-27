@@ -21,6 +21,7 @@ export function renderWithProviders<State>(
   const { initialState = {} as State, i18nInstance = null } = options || {}
 
   const store: Store<State> = createStore(jest.fn(), initialState)
+  store.dispatch = jest.fn()
 
   const ProviderWrapper: React.ComponentType<React.PropsWithChildren<{}>> = ({
     children,
@@ -36,5 +37,5 @@ export function renderWithProviders<State>(
     }
   }
 
-  return render(Component, { wrapper: ProviderWrapper })
+  return { ...render(Component, { wrapper: ProviderWrapper }), store }
 }

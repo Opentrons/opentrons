@@ -62,6 +62,7 @@ export function TitleBar(props: TitleBarProps): JSX.Element {
           {...back}
         />
       )}
+      {/*  @ts-expect-error(sa, 2021-6-23): cast value to boolean */}
       <h1 className={cx(styles.title, { [styles.right]: back })}>{title}</h1>
       {separator}
       {subheading}

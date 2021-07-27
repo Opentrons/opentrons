@@ -16,12 +16,6 @@ from opentrons.protocol_engine.state.geometry import GeometryView
 
 
 @pytest.fixture
-def decoy() -> Decoy:
-    """Decoy fixture."""
-    return Decoy()
-
-
-@pytest.fixture
 def subject(labware_view: LabwareView) -> GeometryView:
     """Get a GeometryView with its store dependencies mocked out."""
     return GeometryView(labware_view=labware_view)

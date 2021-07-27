@@ -469,7 +469,17 @@ exports[`LabwareList component renders 1`] = `
         },
         "groups": Array [
           Object {
-            "metadata": Object {},
+            "brand": Object {
+              "brand": "tube brand here",
+              "brandId": Array [
+                "tube123",
+                "other123",
+              ],
+            },
+            "metadata": Object {
+              "displayCategory": "tubeRack",
+              "wellBottomShape": "v",
+            },
             "wells": Array [
               "A1",
               "B1",

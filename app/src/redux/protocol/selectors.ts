@@ -28,9 +28,6 @@ export const getProtocolFile = (state: State): ProtocolFile | null =>
 export const getProtocolContents = (state: State): string | null =>
   state.protocol.contents
 
-// TODO(mc, 2020-08-05): this data needs to be runtime schema checked
-// to truly prevent invalid data bringing down the app. For now we're
-// relying on overuse of ?. accessors
 export const getProtocolData = (state: State): ProtocolData | null =>
   state.protocol.data
 
@@ -155,10 +152,11 @@ export const getProtocolDescription: (
 export const getProtocolSource: (
   state: State
 ) => string | null = createSelector(getProtocolData, data => {
-  // @ts-expect-error TODO: use in operator to protect against non existent source
-  return typeof data?.metadata?.source === 'string'
-    ? // @ts-expect-error TODO: use in operator to protect against non existent source
-      data.metadata.source
+  return data !== null &&
+    'metadata' in data &&
+    'source' in data.metadata &&
+    typeof data.metadata.source === 'string'
+    ? data.metadata.source
     : null
 })
 

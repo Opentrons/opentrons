@@ -14,27 +14,21 @@ from opentrons.protocols.runner.json_proto.command_translator import CommandTran
 
 
 @pytest.fixture
-def decoy() -> Decoy:
-    """Create a Decoy state container for this test suite."""
-    return Decoy()
-
-
-@pytest.fixture
 def protocol_engine(decoy: Decoy) -> ProtocolEngine:
     """Create a protocol engine fixture."""
-    return decoy.create_decoy(spec=ProtocolEngine)
+    return decoy.mock(cls=ProtocolEngine)
 
 
 @pytest.fixture
 def command_translator(decoy: Decoy) -> CommandTranslator:
     """Create a stubbed command translator fixture."""
-    return decoy.create_decoy(spec=CommandTranslator)
+    return decoy.mock(cls=CommandTranslator)
 
 
 @pytest.fixture
 def command_queue_worker(decoy: Decoy) -> CommandQueueWorker:
     """Create a stubbed command queue worker fixture."""
-    return decoy.create_decoy(spec=CommandQueueWorker)
+    return decoy.mock(cls=CommandQueueWorker)
 
 
 @pytest.fixture
@@ -44,7 +38,7 @@ def file_reader(
     json_protocol: JsonProtocol,
 ) -> JsonFileReader:
     """Create a stubbed JsonFileReader interface."""
-    reader = decoy.create_decoy(spec=JsonFileReader)
+    reader = decoy.mock(cls=JsonFileReader)
 
     decoy.when(reader.read(protocol_file)).then_return(json_protocol)
 
@@ -75,12 +69,26 @@ def subject(
     )
 
 
+async def test_json_runner_run(
+    decoy: Decoy,
+    subject: JsonFileRunner,
+    command_queue_worker: CommandQueueWorker,
+) -> None:
+    """It should be able to run the protocol until done."""
+    await subject.run()
+
+    decoy.verify(
+        command_queue_worker.play(),
+        await command_queue_worker.wait_for_done(),
+    )
+
+
 def test_json_runner_play(
     decoy: Decoy,
     subject: JsonFileRunner,
     command_queue_worker: CommandQueueWorker,
 ) -> None:
-    """It should be able to start the run."""
+    """It should be able to resume the run."""
     subject.play()
 
     decoy.verify(command_queue_worker.play())
@@ -97,6 +105,7 @@ def test_json_runner_pause(
     decoy.verify(command_queue_worker.pause())
 
 
+@pytest.mark.xfail(raises=NotImplementedError, strict=True)
 def test_json_runner_stop(
     decoy: Decoy,
     subject: JsonFileRunner,
@@ -104,8 +113,6 @@ def test_json_runner_stop(
 ) -> None:
     """It should be able to stop the run."""
     subject.stop()
-
-    decoy.verify(command_queue_worker.pause())
 
 
 def test_json_runner_load_commands_to_engine(

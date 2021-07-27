@@ -7,7 +7,7 @@ from typing import (Any, Dict, List, Optional, Tuple,
 from typing_extensions import Final
 try:
     import aionotify  # type: ignore
-except OSError:
+except (OSError, ModuleNotFoundError):
     aionotify = None  # type: ignore
 
 from opentrons.drivers.smoothie_drivers import driver_3_0

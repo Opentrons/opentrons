@@ -12,7 +12,8 @@
   "version": "4.4.0",
   "productName": "Opentrons Protocol Library",
   "description": "Protocol library stuff (WIP)",
-  "main": "src/index.js",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "bugs": {
     "url": "https://github.com/Opentrons/opentrons/issues"
   },

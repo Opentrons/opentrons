@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useFormikContext } from 'formik'
-import { LabwareFields } from '../../fields'
+import { FormStatus, LabwareFields } from '../../fields'
 import { getLabwareName } from '../../utils'
 import { ConditionalLabwareRender } from '../ConditionalLabwareRender'
 import { FormLevelErrorAlerts } from '../FormLevelErrorAlerts'
@@ -22,13 +22,15 @@ export const PreviewInstructions = (props: {
 }
 
 export const Preview = (): JSX.Element => {
-  const { values, errors } = useFormikContext<LabwareFields>()
+  const _context = useFormikContext<LabwareFields>()
+  const { values, errors } = _context
+  const status: FormStatus = _context.status
 
   return (
     <SectionBody label="Check your work" id="CheckYourWork">
       <FormLevelErrorAlerts errors={errors} />
       <div className={styles.preview_labware}>
-        <ConditionalLabwareRender values={values} />
+        <ConditionalLabwareRender definition={status.defaultedDef} />
         <PreviewInstructions values={values} />
       </div>
     </SectionBody>

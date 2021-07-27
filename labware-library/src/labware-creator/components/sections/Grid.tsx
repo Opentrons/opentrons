@@ -48,8 +48,7 @@ export const Grid = (): JSX.Element | null => {
   const { values, errors, touched } = useFormikContext<LabwareFields>()
   if (
     isEveryFieldHidden(fieldList, values) ||
-    (values.labwareType != null &&
-      ['aluminumBlock', 'tubeRack'].includes(values.labwareType))
+    (values.labwareType != null && values.labwareType === 'aluminumBlock')
   ) {
     return null
   }
@@ -57,7 +56,12 @@ export const Grid = (): JSX.Element | null => {
     <div className={styles.new_definition_section}>
       <SectionBody label="Grid" id="Grid">
         <>
-          <FormAlerts touched={touched} errors={errors} fieldList={fieldList} />
+          <FormAlerts
+            values={values}
+            touched={touched}
+            errors={errors}
+            fieldList={fieldList}
+          />
           <Content values={values} />
         </>
       </SectionBody>

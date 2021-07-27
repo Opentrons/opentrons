@@ -2,10 +2,6 @@
 Opentrons
 =============
 
-.. image:: https://badgen.net/travis/Opentrons/opentrons/edge
-   :target: https://travis-ci.org/Opentrons/opentrons
-   :alt: Build Status
-
 .. image:: https://badgen.net/codecov/c/github/Opentrons/opentrons
    :target: https://codecov.io/gh/Opentrons/opentrons
    :alt: Coverage Status

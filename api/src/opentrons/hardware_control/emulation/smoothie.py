@@ -23,9 +23,20 @@ class SmoothieEmulator(AbstractEmulator):
     """Smoothie emulator"""
 
     WRITE_INSTRUMENT_RE = re.compile(r"(?P<mount>[LR])\s*(?P<value>[a-f0-9]+)")
+    INSTRUMENT_AND_MODEL_STRING_LENGTH = 64
 
     def __init__(self, parser: Parser, settings: SmoothieSettings) -> None:
-        """Constructor"""
+        self._parser = parser
+        self._settings = settings
+        self.reset()
+
+    def handle(self, line: str) -> Optional[str]:
+        """Handle a line"""
+        results = (self._handle(c) for c in self._parser.parse(line))
+        joined = ' '.join(r for r in results if r)
+        return None if not joined else joined
+
+    def reset(self):
         _, fw_version = _find_smoothie_file()
         self._version_string = \
             f"Build version: {fw_version}, Build date: CURRENT, " \
@@ -48,15 +59,24 @@ class SmoothieEmulator(AbstractEmulator):
             'C': False,
         }
         self._speed = 0.0
+
         self._pipette_model = {
-            "L": utils.string_to_hex(settings.left.model, 64),
-            "R": utils.string_to_hex(settings.right.model, 64)
+            "L": utils.string_to_hex(
+                self._settings.left.model, self.INSTRUMENT_AND_MODEL_STRING_LENGTH
+            ),
+            "R": utils.string_to_hex(
+                self._settings.right.model, self.INSTRUMENT_AND_MODEL_STRING_LENGTH
+            ),
         }
+
         self._pipette_id = {
-            "L": utils.string_to_hex(settings.left.id, 64),
-            "R": utils.string_to_hex(settings.right.id, 64),
+            "L": utils.string_to_hex(
+                self._settings.left.id, self.INSTRUMENT_AND_MODEL_STRING_LENGTH
+            ),
+            "R": utils.string_to_hex(
+                self._settings.right.id, self.INSTRUMENT_AND_MODEL_STRING_LENGTH
+            ),
         }
-        self._parser = parser
 
         self._gcode_to_function_mapping = {
             GCODE.HOMING_STATUS.value: self._get_homing_status,
@@ -70,11 +90,8 @@ class SmoothieEmulator(AbstractEmulator):
             GCODE.HOME.value: self._home_gantry,
         }
 
-    def handle(self, line: str) -> Optional[str]:
-        """Handle a line"""
-        results = (self._handle(c) for c in self._parser.parse(line))
-        joined = ' '.join(r for r in results if r)
-        return None if not joined else joined
+    def get_current_position(self):
+        return self._pos
 
     def _get_homing_status(self, command: Command) -> str:
         """Get the current homing status of the emulated gantry"""
@@ -157,6 +174,12 @@ class SmoothieEmulator(AbstractEmulator):
         """
         pars = (i.groupdict() for i in
                 SmoothieEmulator.WRITE_INSTRUMENT_RE.finditer(command.body))
-        result = {p['mount']: p['value'] for p in pars}
+        result = {
+            p['mount']: p['value'] + '0' * (
+                SmoothieEmulator.INSTRUMENT_AND_MODEL_STRING_LENGTH - len(p['value'])
+            )
+            for p in pars
+        }
+
         assert result, f"missing mount values '{command.body}'"
         return result

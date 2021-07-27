@@ -3,6 +3,7 @@ import * as React from 'react'
 import {
   Icon,
   Text,
+  Flex,
   PrimaryBtn,
   SecondaryBtn,
   FONT_HEADER_DARK,
@@ -19,6 +20,7 @@ import {
   ALIGN_CENTER,
   C_SELECTED_DARK,
   C_WHITE,
+  JUSTIFY_CENTER,
 } from '@opentrons/components'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
@@ -51,7 +53,7 @@ const INPUT_STYLES = css`
 `
 
 export interface UploadInputProps {
-  createSession: (file: File) => unknown
+  onUpload: (file: File) => unknown
 }
 
 export function UploadInput(props: UploadInputProps): JSX.Element {
@@ -65,7 +67,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element {
     e.preventDefault()
     e.stopPropagation()
     const { files = [] } = 'dataTransfer' in e ? e.dataTransfer : {}
-    props.createSession(files[0])
+    props.onUpload(files[0])
     setIsFileOverDropZone(false)
   }
   const handleDragEnter: React.DragEventHandler<HTMLLabelElement> = e => {
@@ -89,7 +91,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element {
 
   const onChange: React.ChangeEventHandler<HTMLInputElement> = event => {
     const { files = [] } = event.target ?? {}
-    files?.[0] && props.createSession(files?.[0])
+    files?.[0] && props.onUpload(files?.[0])
     if ('value' in event.currentTarget) event.currentTarget.value = ''
   }
 
@@ -100,7 +102,12 @@ export function UploadInput(props: UploadInputProps): JSX.Element {
     : DROP_ZONE_STYLES
 
   return (
-    <>
+    <Flex
+      height="100%"
+      flexDirection={DIRECTION_COLUMN}
+      justifyContent={JUSTIFY_CENTER}
+      alignItems={ALIGN_CENTER}
+    >
       <Text as="h1" css={FONT_HEADER_DARK} marginBottom={SPACING_3}>
         {t('open_a_protocol')}
       </Text>
@@ -152,6 +159,6 @@ export function UploadInput(props: UploadInputProps): JSX.Element {
       >
         {t('launch_protocol_designer')}
       </SecondaryBtn>
-    </>
+    </Flex>
   )
 }
