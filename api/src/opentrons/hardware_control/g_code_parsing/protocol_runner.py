@@ -5,7 +5,7 @@ import asyncio
 from typing import Generator
 from collections import namedtuple
 
-from opentrons.hardware_control.emulation.settings import SmoothieSettings
+from opentrons.hardware_control.emulation.settings import Settings
 from opentrons.protocols.parse import parse
 from opentrons.protocols.execution import execute
 from contextlib import contextmanager
@@ -43,7 +43,7 @@ class ProtocolRunner:
     """
     URI_TEMPLATE = "socket://127.0.0.1:%s"
 
-    def __init__(self, smoothie_config: SmoothieSettings) -> None:
+    def __init__(self, smoothie_config: Settings) -> None:
         self._config = smoothie_config
         self._set_env_vars()
 
@@ -96,17 +96,17 @@ class ProtocolRunner:
         return Protocol(text=text, filename=file_path, filelike=file)
 
     @contextmanager
-    def run_protocol(self, file_name: str) -> Generator:
+    def run_protocol(self, file_path: str) -> Generator:
         """
         Runs passed protocol file and collects all G-Code I/O from it.
         Will cleanup emulation after execution
-        :param file_name: Path to file
+        :param file_path: Path to file
         :return: GCodeProgram with all the parsed data
         """
         server_manager = ServerManager(self._config)
         self._start_emulation_app(server_manager)
         emulated_hardware = self._emulate_hardware()
-        protocol = self._get_protocol(file_name)
+        protocol = self._get_protocol(file_path)
         context = ProtocolContext(
             implementation=ProtocolContextImplementation(hardware=emulated_hardware),
             loop=self._get_loop()

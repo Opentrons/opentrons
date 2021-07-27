@@ -232,6 +232,57 @@ def test_get_well_definition(well_plate_def: LabwareDefinition) -> None:
     assert result == expected_well_def
 
 
+def test_get_wells(falcon_tuberack_def: LabwareDefinition) -> None:
+    """It should return a list of wells from definition."""
+    subject = get_labware_view(
+        labware_by_id={
+            "tuberack-id": LabwareData(
+                location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
+                uri=cast(LabwareUri, "some-tuberack-uri"),
+                calibration=(1, 2, 3),
+            ),
+        },
+        labware_definitions_by_uri={"some-tuberack-uri": falcon_tuberack_def},
+    )
+    expected_wells = ["A1", "B1", "A2", "B2", "A3", "B3"]
+    result = subject.get_wells(labware_id="tuberack-id")
+    assert result == expected_wells
+
+
+def test_get_well_columns(falcon_tuberack_def: LabwareDefinition) -> None:
+    """It should return wells as dict of list of columns."""
+    subject = get_labware_view(
+        labware_by_id={
+            "tuberack-id": LabwareData(
+                location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
+                uri=cast(LabwareUri, "some-tuberack-uri"),
+                calibration=(1, 2, 3),
+            ),
+        },
+        labware_definitions_by_uri={"some-tuberack-uri": falcon_tuberack_def},
+    )
+    expected_columns = {"1": ["A1", "B1"], "2": ["A2", "B2"], "3": ["A3", "B3"]}
+    result = subject.get_well_columns(labware_id="tuberack-id")
+    assert result == expected_columns
+
+
+def test_get_well_rows(falcon_tuberack_def: LabwareDefinition) -> None:
+    """It should return wells as dict of list of rows."""
+    subject = get_labware_view(
+        labware_by_id={
+            "tuberack-id": LabwareData(
+                location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
+                uri=cast(LabwareUri, "some-tuberack-uri"),
+                calibration=(1, 2, 3),
+            ),
+        },
+        labware_definitions_by_uri={"some-tuberack-uri": falcon_tuberack_def},
+    )
+    expected_rows = {"A": ["A1", "A2", "A3"], "B": ["B1", "B2", "B3"]}
+    result = subject.get_well_rows(labware_id="tuberack-id")
+    assert result == expected_rows
+
+
 def test_get_tip_length_raises_with_non_tip_rack(
     well_plate_def: LabwareDefinition,
 ) -> None:
