@@ -27,6 +27,7 @@ class Labware:  # noqa: D101
         """
         self._engine_client = engine_client
         self._labware_id = labware_id
+        self._lw_definition: Optional[LabwareDefinition] = None
         self._wells_by_name: Optional[Dict[str, Well]] = None
         self._rows_by_name: Optional[Dict[str, List[Well]]] = None
         self._columns_by_name: Optional[Dict[str, List[Well]]] = None
@@ -213,9 +214,13 @@ class Labware:  # noqa: D101
         return self._columns_by_name
 
     def _definition(self) -> LabwareDefinition:
-        return self._engine_client.state.labware.get_labware_definition(
-            labware_id=self.labware_id
-        )
+        if self._lw_definition is None:
+            self._lw_definition = (
+                self._engine_client.state.labware.get_labware_definition(
+                    labware_id=self.labware_id
+                )
+            )
+        return self._lw_definition
 
     def __repr__(self) -> str:  # noqa: D105
         # TODO: (spp, 2021.07.14): Should this be a combination of display name & <obj>?
