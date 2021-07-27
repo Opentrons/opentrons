@@ -39,13 +39,6 @@ class LabwareState:
     deck_definition: DeckDefinitionV2
 
 
-@dataclass
-class WellGrid:
-    """Class for a labware's wells as a grid of rows & columns."""
-    rows: Dict[str, List[str]]
-    columns: Dict[str, List[str]]
-
-
 class LabwareStore(Substore[LabwareState], CommandReactive):
     """Labware state container."""
 
@@ -202,18 +195,25 @@ class LabwareView:
                 wells.append(well_name)
         return wells
 
-    def get_well_grid(self, labware_id: str) -> WellGrid:
-        """Get labware wells as WellGrid of rows & columns."""
-        wells = self.get_wells(labware_id=labware_id)
-        pattern = re.compile(WELL_NAME_PATTERN, re.X)
-        wells_by_rows = defaultdict(list)
+    def get_well_columns(self, labware_id: str) -> Dict[str, List[str]]:
+        """Get well columns."""
+        definition = self.get_labware_definition(labware_id=labware_id)
         wells_by_cols = defaultdict(list)
-        for well_name in wells:
-            match = pattern.match(well_name)
-            assert match, f"Well name did not match pattern {pattern}"
-            wells_by_rows[match.group(1)].append(well_name)
-            wells_by_cols[match.group(2)].append(well_name)
-        return WellGrid(rows=dict(wells_by_rows), columns=dict(wells_by_cols))
+        for i, col in enumerate(definition.ordering):
+            wells_by_cols[f"{i+1}"] = col
+        return wells_by_cols
+
+    def get_well_rows(self, labware_id: str) -> Dict[str, List[str]]:
+        """Get well rows."""
+        definition = self.get_labware_definition(labware_id=labware_id)
+        wells_by_rows = defaultdict(list)
+        pattern = re.compile(WELL_NAME_PATTERN, re.X)
+        for col in definition.ordering:
+            for well_name in col:
+                match = pattern.match(well_name)
+                assert match, f"Well name did not match pattern {pattern}"
+                wells_by_rows[match.group(1)].append(well_name)
+        return wells_by_rows
 
     def get_tip_length(self, labware_id: str) -> float:
         """Get the tip length of a tip rack."""

@@ -4,7 +4,6 @@ from decoy import Decoy
 
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.protocol_engine import DeckSlotLocation
-from opentrons.protocol_engine.state.labware import WellGrid
 
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from opentrons.protocol_api_experimental import (DeckSlotName,
@@ -220,6 +219,21 @@ def test_labware_has_wells_by_name(
                                                   labware=subject)}
 
 
+def test_wells_are_cached(
+        decoy: Decoy,
+        engine_client: ProtocolEngineClient,
+        labware_definition: LabwareDefinition,
+        subject: Labware,
+) -> None:
+    """It should return the same Well instances in each call."""
+    decoy.when(
+        engine_client.state.labware.get_wells(labware_id="labware-id")
+    ).then_return(['A1', 'A2'])
+    call1 = subject.wells_by_name()
+    call2 = subject.wells_by_name()
+    assert call1 is call2
+
+
 def test_labware_has_wells_list(
         decoy: Decoy,
         engine_client: ProtocolEngineClient,
@@ -249,9 +263,8 @@ def test_labware_rows(
     ).then_return(['A1', 'A2'])
 
     decoy.when(
-        engine_client.state.labware.get_well_grid(labware_id="labware-id")
-    ).then_return(WellGrid(rows={'A': ['A1', 'A2']},
-                           columns={'1': ['A1'], '2': ['A2']}))
+        engine_client.state.labware.get_well_rows(labware_id="labware-id")
+    ).then_return({'A': ['A1', 'A2']},)
 
     assert subject.rows() == [[Well(well_name='A1',
                                     engine_client=engine_client,
@@ -272,9 +285,8 @@ def test_labware_rows_by_name(
     ).then_return(['A1', 'A2'])
 
     decoy.when(
-        engine_client.state.labware.get_well_grid(labware_id="labware-id")
-    ).then_return(WellGrid(rows={'A': ['A1', 'A2']},
-                           columns={'1': ['A1'], '2': ['A2']}))
+        engine_client.state.labware.get_well_rows(labware_id="labware-id")
+    ).then_return({'A': ['A1', 'A2']},)
     assert subject.rows_by_name() == {"A": [Well(well_name='A1',
                                                  engine_client=engine_client,
                                                  labware=subject),
@@ -294,9 +306,8 @@ def test_labware_columns(
     ).then_return(['A1', 'A2'])
 
     decoy.when(
-        engine_client.state.labware.get_well_grid(labware_id="labware-id")
-    ).then_return(WellGrid(rows={'A': ['A1', 'A2']},
-                           columns={'1': ['A1'], '2': ['A2']}))
+        engine_client.state.labware.get_well_columns(labware_id="labware-id")
+    ).then_return({'1': ['A1'], '2': ['A2']})
 
     assert subject.columns() == [[Well(well_name='A1',
                                        engine_client=engine_client,
@@ -317,9 +328,8 @@ def test_labware_columns_by_name(
     ).then_return(['A1', 'A2'])
 
     decoy.when(
-        engine_client.state.labware.get_well_grid(labware_id="labware-id")
-    ).then_return(WellGrid(rows={'A': ['A1', 'A2']},
-                           columns={'1': ['A1'], '2': ['A2']}))
+        engine_client.state.labware.get_well_columns(labware_id="labware-id")
+    ).then_return({'1': ['A1'], '2': ['A2']})
 
     assert subject.columns_by_name() == {"1": [Well(well_name='A1',
                                                     engine_client=engine_client,
@@ -327,5 +337,3 @@ def test_labware_columns_by_name(
                                          "2": [Well(well_name='A2',
                                                     engine_client=engine_client,
                                                     labware=subject)]}
-
-# TODO: Test Well caching
