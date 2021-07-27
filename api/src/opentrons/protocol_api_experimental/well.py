@@ -114,7 +114,7 @@ class Well:  # noqa: D101
         return (
             isinstance(other, Well)
             and self.well_name == other.well_name
-            and self.parent is other.parent
+            and self.parent == other.parent
         )
 
     def __hash__(self) -> int:  # noqa: D105
