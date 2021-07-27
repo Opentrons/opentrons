@@ -223,7 +223,6 @@ class Labware:  # noqa: D101
         return self._lw_definition
 
     def __repr__(self) -> str:  # noqa: D105
-        # TODO: (spp, 2021.07.14): Should this be a combination of display name & <obj>?
         return f"{self.load_name}<id:{self.labware_id}>"
 
     def __eq__(self, other: object) -> bool:

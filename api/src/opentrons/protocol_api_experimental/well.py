@@ -104,7 +104,6 @@ class Well:  # noqa: D101
         raise NotImplementedError()
 
     def __repr__(self) -> str:  # noqa: D105
-        # TODO: (spp, 2021.07.14): Should this be a combination of display name & <obj>?
         return f"Well:{self._well_name}<Labware:{self.parent}>"
 
     def __eq__(self, other: object) -> bool:
