@@ -8,21 +8,15 @@ from opentrons_shared_data.labware import dev_types
 
 
 @pytest.fixture
-def decoy() -> Decoy:
-    """Get a Decoy test double container."""
-    return Decoy()
-
-
-@pytest.fixture
 def engine_client(decoy: Decoy) -> ProtocolEngineClient:
     """Get a mock instance of a ProtocolEngineClient."""
-    return decoy.create_decoy(spec=ProtocolEngineClient)
+    return decoy.mock(cls=ProtocolEngineClient)
 
 
 @pytest.fixture
 def labware(decoy: Decoy) -> Labware:
     """Get a mock instance of a Labware."""
-    lw = decoy.create_decoy(spec=Labware)
+    lw = decoy.mock(cls=Labware)
     lw.labware_id = "labware_id"    # type: ignore
     return lw
 
