@@ -86,11 +86,25 @@ class AsyncSerial:
         Returns:
             None
         """
-        with self._timeout_override("write_timeout", timeout):
-            return await self._loop.run_in_executor(
+        await self._loop.run_in_executor(
                 executor=self._executor,
-                func=lambda: self._serial.write(data=data)
+                func=lambda: self._sync_write(data=data, timeout=timeout)
             )
+
+    def _sync_write(self, data: bytes, timeout: Optional[float] = None) -> None:
+        """
+        The synchronous write function
+
+        Args:
+            data: data to write.
+            timeout: optional timeout in seconds.
+
+        Returns:
+            None
+        """
+        with self._timeout_override("write_timeout", timeout):
+            self._serial.reset_input_buffer()
+            self._serial.write(data=data)
 
     async def open(self) -> None:
         """
