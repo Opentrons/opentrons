@@ -172,7 +172,7 @@ def test_get_is_complete_with_failed_command() -> None:
 
 
 def test_get_is_complete_with_all_commands() -> None:
-    """It should return true if a given command will never be executed."""
+    """It should check whether all commands are completed if no command is specified."""
     completed_command = create_completed_command(command_id="command-id-1")
     running_command = create_running_command(command_id="command-id-2")
     pending_command = create_pending_command(command_id="command-id-3")

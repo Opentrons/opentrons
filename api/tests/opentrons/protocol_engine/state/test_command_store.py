@@ -71,7 +71,7 @@ def test_command_store_handle_start_action() -> None:
 
 
 def test_command_store_handle_stop_action() -> None:
-    """It should clear the running flag on top."""
+    """It should clear the running flag on stop/pause."""
     subject = CommandStore()
     subject.handle_action(PauseAction())
 
