@@ -1,5 +1,6 @@
 import * as React from 'react'
 import map from 'lodash/map'
+import { NavLink } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
   Flex,
@@ -10,6 +11,8 @@ import {
   RobotWorkSpace,
   SecondaryBtn,
   Text,
+  Tooltip,
+  useHoverTooltip,
   ALIGN_FLEX_END,
   DIRECTION_COLUMN,
   FONT_SIZE_BODY_1,
@@ -63,7 +66,12 @@ const DECK_LAYER_BLOCKLIST = [
 
 export const LabwareSetup = (props: LabwareSetupProps): JSX.Element | null => {
   const { modulesBySlot, labwareDefBySlot } = props
+  const proceedToRunDisabled = false
+  const proceedToRunDisabledReason = 'replace with actual tooltip text'
+  const LinkComponent = proceedToRunDisabled ? 'button' : NavLink
+  const linkProps = proceedToRunDisabled ? {} : { to: '/run' }
   const { t } = useTranslation('protocol_setup')
+  const [targetProps, tooltipProps] = useHoverTooltip()
   const [
     showLabwareHelpModal,
     setShowLabwareHelpModal,
@@ -151,18 +159,24 @@ export const LabwareSetup = (props: LabwareSetupProps): JSX.Element | null => {
         </Text>
         <Flex justifyContent={JUSTIFY_CENTER}>
           <SecondaryBtn
-            title="checkLabwarePositions"
+            title="Check Labware Positions"
             marginRight={SPACING_3}
             onClick={() => console.log('check labware positions!')}
           >
             {t('check_labware_positions')}
           </SecondaryBtn>
           <PrimaryBtn
-            title="proceedToRun"
-            onClick={() => console.log('proceed to run!')}
+            title="Proceed to Run"
+            disabled={proceedToRunDisabled}
+            as={LinkComponent}
+            {...linkProps}
+            {...targetProps}
           >
             {t('proceed_to_run')}
           </PrimaryBtn>
+          {proceedToRunDisabled && (
+            <Tooltip {...tooltipProps}>{proceedToRunDisabledReason}</Tooltip>
+          )}
         </Flex>
       </Flex>
     </React.Fragment>

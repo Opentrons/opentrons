@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
+import { StaticRouter } from 'react-router-dom'
 import { LabwareRender, RobotWorkSpace, ModuleViz } from '@opentrons/components'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
@@ -67,9 +68,14 @@ const deckSlotsById = standardDeckDef.locations.orderedSlots.reduce(
 )
 
 const render = (props: React.ComponentProps<typeof LabwareSetup>) => {
-  return renderWithProviders(<LabwareSetup {...props} />, {
-    i18nInstance: i18n,
-  })
+  return renderWithProviders(
+    <StaticRouter>
+      <LabwareSetup {...props} />
+    </StaticRouter>,
+    {
+      i18nInstance: i18n,
+    }
+  )
 }
 
 const STUBBED_ORIENTATION_VALUE = 'left'
