@@ -1,7 +1,7 @@
 """ProtocolEngine class definition."""
 from .resources import ResourceProviders
 from .commands import Command, CommandRequest, CommandMapper
-from .execution import CommandExecutor, QueueWorker
+from .execution import QueueWorker
 from .state import StateStore, StateView, PlayAction, PauseAction, UpdateCommandAction
 
 
@@ -14,7 +14,6 @@ class ProtocolEngine:
     """
 
     _state_store: StateStore
-    _command_executor: CommandExecutor
     _command_mapper: CommandMapper
     _resources: ResourceProviders
     _queue_worker: QueueWorker
@@ -22,7 +21,6 @@ class ProtocolEngine:
     def __init__(
         self,
         state_store: StateStore,
-        command_executor: CommandExecutor,
         command_mapper: CommandMapper,
         resources: ResourceProviders,
         queue_worker: QueueWorker,
@@ -33,7 +31,6 @@ class ProtocolEngine:
         ProtocolEngine.create factory classmethod.
         """
         self._state_store = state_store
-        self._command_executor = command_executor
         self._command_mapper = command_mapper
         self._resources = resources
         self._queue_worker = queue_worker

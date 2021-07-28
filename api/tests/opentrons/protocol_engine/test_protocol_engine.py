@@ -7,7 +7,7 @@ from opentrons.types import MountType
 from opentrons.protocol_engine import ProtocolEngine, commands
 from opentrons.protocol_engine.commands import CommandMapper
 from opentrons.protocol_engine.types import PipetteName
-from opentrons.protocol_engine.execution import CommandExecutor, QueueWorker
+from opentrons.protocol_engine.execution import QueueWorker
 from opentrons.protocol_engine.resources import ResourceProviders
 
 from opentrons.protocol_engine.state import (
@@ -22,12 +22,6 @@ from opentrons.protocol_engine.state import (
 def state_store(decoy: Decoy) -> StateStore:
     """Get a mock StateStore."""
     return decoy.mock(cls=StateStore)
-
-
-@pytest.fixture
-def command_executor(decoy: Decoy) -> CommandExecutor:
-    """Get a mock CommandExecutor."""
-    return decoy.mock(cls=CommandExecutor)
 
 
 @pytest.fixture
@@ -51,7 +45,6 @@ def resources(decoy: Decoy) -> ResourceProviders:
 @pytest.fixture
 def subject(
     state_store: StateStore,
-    command_executor: CommandExecutor,
     command_mapper: CommandMapper,
     resources: ResourceProviders,
     queue_worker: QueueWorker,
@@ -59,7 +52,6 @@ def subject(
     """Get a ProtocolEngine test subject with its dependencies stubbed out."""
     return ProtocolEngine(
         state_store=state_store,
-        command_executor=command_executor,
         queue_worker=queue_worker,
         command_mapper=command_mapper,
         resources=resources,
@@ -112,7 +104,6 @@ def test_add_command(
 async def test_execute_command(
     decoy: Decoy,
     state_store: StateStore,
-    command_executor: CommandExecutor,
     command_mapper: CommandMapper,
     resources: ResourceProviders,
     queue_worker: QueueWorker,
