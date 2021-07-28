@@ -1,5 +1,4 @@
 """Synchronous ProtocolEngine client module."""
-from uuid import uuid4
 from typing import cast
 
 from opentrons.types import MountType
@@ -22,10 +21,6 @@ class SyncClient:
         """Get a view of the engine's state."""
         return self._transport.state
 
-    @staticmethod
-    def _create_command_id() -> str:
-        return str(uuid4())
-
     def load_labware(
         self,
         location: DeckSlotLocation,
@@ -42,10 +37,7 @@ class SyncClient:
                 version=version,
             )
         )
-        result = self._transport.execute_command(
-            request=request,
-            command_id=self._create_command_id(),
-        )
+        result = self._transport.execute_command(request=request)
 
         return cast(commands.LoadLabwareResult, result)
 
@@ -61,10 +53,7 @@ class SyncClient:
                 mount=mount,
             )
         )
-        result = self._transport.execute_command(
-            request=request,
-            command_id=self._create_command_id(),
-        )
+        result = self._transport.execute_command(request=request)
 
         return cast(commands.LoadPipetteResult, result)
 
@@ -82,10 +71,7 @@ class SyncClient:
                 wellName=well_name,
             )
         )
-        result = self._transport.execute_command(
-            request=request,
-            command_id=self._create_command_id(),
-        )
+        result = self._transport.execute_command(request=request)
 
         return cast(commands.PickUpTipResult, result)
 
@@ -103,9 +89,7 @@ class SyncClient:
                 wellName=well_name,
             )
         )
-        result = self._transport.execute_command(
-            request=request, command_id=self._create_command_id()
-        )
+        result = self._transport.execute_command(request=request)
         return cast(commands.DropTipResult, result)
 
     def aspirate(
@@ -126,9 +110,7 @@ class SyncClient:
                 volume=volume,
             )
         )
-        result = self._transport.execute_command(
-            request=request, command_id=self._create_command_id()
-        )
+        result = self._transport.execute_command(request=request)
 
         return cast(commands.AspirateResult, result)
 
@@ -150,7 +132,5 @@ class SyncClient:
                 volume=volume,
             )
         )
-        result = self._transport.execute_command(
-            request=request, command_id=self._create_command_id()
-        )
+        result = self._transport.execute_command(request=request)
         return cast(commands.DispenseResult, result)

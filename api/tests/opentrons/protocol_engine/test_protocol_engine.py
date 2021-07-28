@@ -5,11 +5,17 @@ from decoy import Decoy
 
 from opentrons.types import MountType
 from opentrons.protocol_engine import ProtocolEngine, commands
-from opentrons.protocol_engine.commands import CommandMapper, CommandStatus
+from opentrons.protocol_engine.commands import CommandMapper
 from opentrons.protocol_engine.types import PipetteName
-from opentrons.protocol_engine.execution import CommandExecutor
+from opentrons.protocol_engine.execution import QueueWorker
 from opentrons.protocol_engine.resources import ResourceProviders
-from opentrons.protocol_engine.state import StateStore
+
+from opentrons.protocol_engine.state import (
+    StateStore,
+    PlayAction,
+    PauseAction,
+    UpdateCommandAction,
+)
 
 
 @pytest.fixture
@@ -19,9 +25,9 @@ def state_store(decoy: Decoy) -> StateStore:
 
 
 @pytest.fixture
-def command_executor(decoy: Decoy) -> CommandExecutor:
+def queue_worker(decoy: Decoy) -> QueueWorker:
     """Get a mock CommandExecutor."""
-    return decoy.mock(cls=CommandExecutor)
+    return decoy.mock(cls=QueueWorker)
 
 
 @pytest.fixture
@@ -39,14 +45,14 @@ def resources(decoy: Decoy) -> ResourceProviders:
 @pytest.fixture
 def subject(
     state_store: StateStore,
-    command_executor: CommandExecutor,
     command_mapper: CommandMapper,
     resources: ResourceProviders,
+    queue_worker: QueueWorker,
 ) -> ProtocolEngine:
     """Get a ProtocolEngine test subject with its dependencies stubbed out."""
     return ProtocolEngine(
         state_store=state_store,
-        command_executor=command_executor,
+        queue_worker=queue_worker,
         command_mapper=command_mapper,
         resources=resources,
     )
@@ -57,6 +63,7 @@ def test_add_command(
     state_store: StateStore,
     command_mapper: CommandMapper,
     resources: ResourceProviders,
+    queue_worker: QueueWorker,
     subject: ProtocolEngine,
 ) -> None:
     """It should add a command to the state from a request."""
@@ -89,89 +96,22 @@ def test_add_command(
     result = subject.add_command(request)
 
     assert result == queued_command
-    decoy.verify(state_store.handle_command(queued_command))
-
-
-async def test_execute_command_by_id(
-    decoy: Decoy,
-    state_store: StateStore,
-    command_executor: CommandExecutor,
-    command_mapper: CommandMapper,
-    resources: ResourceProviders,
-    subject: ProtocolEngine,
-) -> None:
-    """It should execute an existing command in the state."""
-    created_at = datetime(year=2021, month=1, day=1)
-    started_at = datetime(year=2022, month=2, day=2)
-    completed_at = datetime(year=2022, month=3, day=3)
-
-    data = commands.LoadPipetteData(
-        mount=MountType.LEFT,
-        pipetteName=PipetteName.P300_SINGLE,
-    )
-
-    queued_command = commands.LoadPipette(
-        id="command-id",
-        status=CommandStatus.QUEUED,
-        createdAt=created_at,
-        data=data,
-    )
-
-    running_command = commands.LoadPipette(
-        id="command-id",
-        status=CommandStatus.RUNNING,
-        createdAt=created_at,
-        startedAt=started_at,
-        data=data,
-    )
-
-    executed_command = commands.LoadPipette(
-        id="command-id",
-        status=CommandStatus.SUCCEEDED,
-        createdAt=datetime(year=2021, month=1, day=1),
-        startedAt=started_at,
-        completedAt=completed_at,
-        data=data,
-    )
-
-    decoy.when(state_store.state_view.commands.get("command-id")).then_return(
-        queued_command
-    )
-
-    decoy.when(resources.model_utils.get_timestamp()).then_return(started_at)
-
-    decoy.when(
-        command_mapper.update_command(
-            command=queued_command,
-            status=CommandStatus.RUNNING,
-            startedAt=started_at,
-        )
-    ).then_return(running_command)
-
-    decoy.when(await command_executor.execute(running_command)).then_return(
-        executed_command
-    )
-
-    result = await subject.execute_command_by_id("command-id")
-
-    assert result == executed_command
     decoy.verify(
-        state_store.handle_command(running_command),
-        state_store.handle_command(executed_command),
+        state_store.handle_action(UpdateCommandAction(command=queued_command)),
     )
 
 
 async def test_execute_command(
     decoy: Decoy,
     state_store: StateStore,
-    command_executor: CommandExecutor,
     command_mapper: CommandMapper,
     resources: ResourceProviders,
+    queue_worker: QueueWorker,
     subject: ProtocolEngine,
 ) -> None:
     """It should add and execute a command from a request."""
     created_at = datetime(year=2021, month=1, day=1)
-    completed_at = datetime(year=2022, month=3, day=3)
+    completed_at = datetime(year=2023, month=3, day=3)
 
     data = commands.LoadPipetteData(
         mount=MountType.LEFT,
@@ -187,14 +127,6 @@ async def test_execute_command(
         data=data,
     )
 
-    running_command = commands.LoadPipette(
-        id="command-id",
-        status=commands.CommandStatus.RUNNING,
-        createdAt=created_at,
-        startedAt=created_at,
-        data=data,
-    )
-
     executed_command = commands.LoadPipette(
         id="command-id",
         status=commands.CommandStatus.SUCCEEDED,
@@ -204,32 +136,66 @@ async def test_execute_command(
         data=data,
     )
 
+    decoy.when(resources.model_utils.generate_id()).then_return("command-id")
     decoy.when(resources.model_utils.get_timestamp()).then_return(created_at)
 
     decoy.when(
         command_mapper.map_request_to_command(
-            request=request,
-            created_at=created_at,
             command_id="command-id",
+            created_at=created_at,
+            request=request,
         )
     ).then_return(queued_command)
 
-    decoy.when(
-        command_mapper.update_command(
-            command=queued_command,
-            startedAt=created_at,
-            status=CommandStatus.RUNNING,
-        )
-    ).then_return(running_command)
-
-    decoy.when(await command_executor.execute(running_command)).then_return(
+    decoy.when(state_store.commands.get(command_id="command-id")).then_return(
         executed_command
     )
 
-    result = await subject.execute_command(request, "command-id")
+    result = await subject.add_and_execute_command(request)
 
     assert result == executed_command
+
     decoy.verify(
-        state_store.handle_command(running_command),
-        state_store.handle_command(executed_command),
+        state_store.handle_action(UpdateCommandAction(command=queued_command)),
+        await state_store.wait_for(
+            condition=state_store.commands.get_is_complete,
+            command_id="command-id",
+        ),
+    )
+
+
+def test_play(
+    decoy: Decoy,
+    state_store: StateStore,
+    subject: ProtocolEngine,
+) -> None:
+    """It should be able to start executing queued commands."""
+    subject.play()
+
+    decoy.verify(state_store.handle_action(PlayAction()))
+
+
+def test_pause(
+    decoy: Decoy,
+    state_store: StateStore,
+    subject: ProtocolEngine,
+) -> None:
+    """It should be able to stop executing queued commands."""
+    subject.pause()
+
+    decoy.verify(state_store.handle_action(PauseAction()))
+
+
+async def test_wait_for_done(
+    decoy: Decoy,
+    state_store: StateStore,
+    queue_worker: QueueWorker,
+    subject: ProtocolEngine,
+) -> None:
+    """It should be able to wait until the engine is done executing."""
+    await subject.wait_for_done()
+
+    decoy.verify(
+        await state_store.wait_for(state_store.commands.get_is_complete),
+        await queue_worker.stop(),
     )

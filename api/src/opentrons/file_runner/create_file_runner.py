@@ -10,7 +10,6 @@ from .protocol_file import ProtocolFileType, ProtocolFile
 
 from .json_file_runner import JsonFileRunner
 from .json_file_reader import JsonFileReader
-from .command_queue_worker import CommandQueueWorker
 
 from .python_file_runner import PythonFileRunner
 from .python_reader import PythonFileReader
@@ -36,10 +35,9 @@ def create_file_runner(
         if protocol_file.file_type == ProtocolFileType.JSON:
             return JsonFileRunner(
                 file=protocol_file,
-                protocol_engine=engine,
                 file_reader=JsonFileReader(),
+                protocol_engine=engine,
                 command_translator=CommandTranslator(),
-                command_queue_worker=CommandQueueWorker(engine=engine),
             )
         elif protocol_file.file_type == ProtocolFileType.PYTHON:
             loop = asyncio.get_running_loop()
@@ -47,6 +45,7 @@ def create_file_runner(
             return PythonFileRunner(
                 file=protocol_file,
                 file_reader=PythonFileReader(),
+                protocol_engine=engine,
                 context_creator=ContextCreator(engine=engine, loop=loop),
                 executor=PythonExecutor(loop=loop),
             )

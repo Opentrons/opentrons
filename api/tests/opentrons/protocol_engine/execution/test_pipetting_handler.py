@@ -98,7 +98,7 @@ async def test_handle_pick_up_tip_request(
 ) -> None:
     """It should handle a PickUpTipRequest properly."""
     decoy.when(
-        state_store.state_view.pipettes.get_hardware_pipette(
+        state_store.pipettes.get_hardware_pipette(
             pipette_id="pipette-id",
             attached_pipettes=mock_hw_pipettes.by_mount,
         )
@@ -107,7 +107,7 @@ async def test_handle_pick_up_tip_request(
     )
 
     decoy.when(
-        state_store.state_view.geometry.get_tip_geometry(
+        state_store.geometry.get_tip_geometry(
             labware_id="labware-id",
             well_name="B2",
             pipette_config=mock_hw_pipettes.left_config,
@@ -153,7 +153,7 @@ async def test_handle_drop_up_tip_request(
 ) -> None:
     """It should handle a DropTipRequest properly."""
     decoy.when(
-        state_store.state_view.pipettes.get_hardware_pipette(
+        state_store.pipettes.get_hardware_pipette(
             pipette_id="pipette-id",
             attached_pipettes=mock_hw_pipettes.by_mount,
         )
@@ -165,7 +165,7 @@ async def test_handle_drop_up_tip_request(
     )
 
     decoy.when(
-        state_store.state_view.geometry.get_tip_drop_location(
+        state_store.geometry.get_tip_drop_location(
             labware_id="labware-id",
             pipette_config=mock_hw_pipettes.right_config,
         )
@@ -200,7 +200,7 @@ async def test_handle_aspirate_request_without_prep(
     well_location = WellLocation(origin=WellOrigin.BOTTOM, offset=(0, 0, 1))
 
     decoy.when(
-        state_store.state_view.pipettes.get_hardware_pipette(
+        state_store.pipettes.get_hardware_pipette(
             pipette_id="pipette-id",
             attached_pipettes=mock_hw_pipettes.by_mount,
         )
@@ -212,7 +212,7 @@ async def test_handle_aspirate_request_without_prep(
     )
 
     decoy.when(
-        state_store.state_view.pipettes.get_is_ready_to_aspirate(
+        state_store.pipettes.get_is_ready_to_aspirate(
             pipette_id="pipette-id",
             pipette_config=mock_hw_pipettes.left_config,
         )
@@ -255,7 +255,7 @@ async def test_handle_aspirate_request_with_prep(
     well_location = WellLocation(origin=WellOrigin.BOTTOM, offset=(0, 0, 1))
 
     decoy.when(
-        state_store.state_view.pipettes.get_hardware_pipette(
+        state_store.pipettes.get_hardware_pipette(
             pipette_id="pipette-id",
             attached_pipettes=mock_hw_pipettes.by_mount,
         )
@@ -267,7 +267,7 @@ async def test_handle_aspirate_request_with_prep(
     )
 
     decoy.when(
-        state_store.state_view.pipettes.get_is_ready_to_aspirate(
+        state_store.pipettes.get_is_ready_to_aspirate(
             pipette_id="pipette-id",
             pipette_config=mock_hw_pipettes.left_config,
         )
@@ -316,7 +316,7 @@ async def test_handle_dispense_request(
     well_location = WellLocation(origin=WellOrigin.BOTTOM, offset=(0, 0, 1))
 
     decoy.when(
-        state_store.state_view.pipettes.get_hardware_pipette(
+        state_store.pipettes.get_hardware_pipette(
             pipette_id="pipette-id",
             attached_pipettes=mock_hw_pipettes.by_mount,
         )

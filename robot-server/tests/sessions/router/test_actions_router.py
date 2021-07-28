@@ -50,7 +50,7 @@ def setup_session_store(decoy: Decoy, session_store: SessionStore) -> None:
     decoy.when(session_store.get(session_id="session-id")).then_return(prev_session)
 
 
-def test_create_session_action(
+def test_create_start_action(
     decoy: Decoy,
     task_runner: TaskRunner,
     session_view: SessionView,

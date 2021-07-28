@@ -4,7 +4,6 @@ from opentrons.protocols.runner import CommandTranslator
 
 from .abstract_file_runner import AbstractFileRunner
 from .json_file_reader import JsonFileReader
-from .command_queue_worker import CommandQueueWorker
 from .protocol_file import ProtocolFile
 
 
@@ -17,7 +16,6 @@ class JsonFileRunner(AbstractFileRunner):
         file_reader: JsonFileReader,
         protocol_engine: ProtocolEngine,
         command_translator: CommandTranslator,
-        command_queue_worker: CommandQueueWorker,
     ) -> None:
         """JSON file runner constructor.
 
@@ -32,7 +30,6 @@ class JsonFileRunner(AbstractFileRunner):
         self._file_reader = file_reader
         self._protocol_engine = protocol_engine
         self._command_translator = command_translator
-        self._command_queue_worker = command_queue_worker
 
     def load(self) -> None:
         """Translate JSON commands and send them to protocol engine."""
@@ -43,16 +40,16 @@ class JsonFileRunner(AbstractFileRunner):
 
     async def run(self) -> None:
         """Run the protocol to completion."""
-        self.play()
-        await self._command_queue_worker.wait_for_done()
+        self._protocol_engine.play()
+        await self._protocol_engine.wait_for_done()
 
     def play(self) -> None:
         """Resume running the JSON protocol file."""
-        self._command_queue_worker.play()
+        self._protocol_engine.play()
 
     def pause(self) -> None:
         """Pause the running JSON protocol file's execution."""
-        self._command_queue_worker.pause()
+        self._protocol_engine.pause()
 
     def stop(self) -> None:
         """Cancel the running JSON protocol file."""

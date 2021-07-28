@@ -2,6 +2,7 @@
 import pytest
 import asyncio
 from functools import partial
+from typing import AsyncIterable
 
 from opentrons.file_runner.context_creator import ContextCreator
 from opentrons.hardware_control import API as HardwareAPI
@@ -14,9 +15,12 @@ from opentrons.protocol_engine import (
 
 
 @pytest.fixture
-async def protocol_engine(hardware: HardwareAPI) -> ProtocolEngine:
+async def protocol_engine(hardware: HardwareAPI) -> AsyncIterable[ProtocolEngine]:
     """Get a ProtocolEngine wired to a simulating HardwareAPI."""
-    return await create_protocol_engine(hardware=hardware)
+    engine = await create_protocol_engine(hardware=hardware)
+    engine.play()
+    yield engine
+    await engine.wait_for_done()
 
 
 def test_creates_protocol_context(

@@ -8,6 +8,7 @@ from opentrons.types import DeckSlotName
 
 from opentrons.protocol_engine.resources import DeckFixedLabware
 from opentrons.protocol_engine.types import DeckSlotLocation
+from opentrons.protocol_engine.state.actions import UpdateCommandAction
 from opentrons.protocol_engine.state.labware import (
     LabwareStore,
     LabwareState,
@@ -40,7 +41,7 @@ def test_initial_state(
     fixed_trash_def: LabwareDefinition,
     subject: LabwareStore,
 ) -> None:
-    """It should create the labware substore with preloaded fixed labware."""
+    """It should create the labware store with preloaded fixed labware."""
     expected_trash_uri = uri_from_details(
         namespace=fixed_trash_def.namespace,
         version=fixed_trash_def.version,
@@ -86,7 +87,7 @@ def test_handles_load_labware(
         calibration=(1, 2, 3),
     )
 
-    subject.handle_command(command)
+    subject.handle_action(UpdateCommandAction(command=command))
 
     # TODO(mc, 2021-06-02): usage of ._state over .state is temporary
     # until store.state returns the state instead of a state view
@@ -109,7 +110,7 @@ def test_handles_add_labware_defintion(
         version=well_plate_def.version,
     )
 
-    subject.handle_command(command)
+    subject.handle_action(UpdateCommandAction(command=command))
 
     # TODO(mc, 2021-06-02): usage of ._state over .state is temporary
     # until store.state returns the state instead of a state view

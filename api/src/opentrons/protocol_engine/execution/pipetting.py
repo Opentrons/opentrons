@@ -26,7 +26,7 @@ class PipettingHandler:
 
     @property
     def _state(self) -> StateView:
-        return self._state_store.state_view
+        return self._state_store
 
     async def pick_up_tip(
         self,

@@ -7,7 +7,7 @@ from typing import Optional, Type, cast
 
 from opentrons.protocol_engine.errors import ProtocolEngineError
 from opentrons.protocol_engine.resources import ResourceProviders
-
+from opentrons.protocol_engine.state import StateStore, UpdateCommandAction
 from opentrons.protocol_engine.commands import (
     AbstractCommandImpl,
     BaseCommand,
@@ -22,6 +22,12 @@ from opentrons.protocol_engine.execution import (
     MovementHandler,
     PipettingHandler,
 )
+
+
+@pytest.fixture
+def state_store(decoy: Decoy) -> StateStore:
+    """Get a mocked out StateStore."""
+    return decoy.mock(cls=StateStore)
 
 
 @pytest.fixture
@@ -56,6 +62,7 @@ def command_mapper(decoy: Decoy) -> CommandMapper:
 
 @pytest.fixture
 def subject(
+    state_store: StateStore,
     equipment: EquipmentHandler,
     movement: MovementHandler,
     pipetting: PipettingHandler,
@@ -64,6 +71,7 @@ def subject(
 ) -> CommandExecutor:
     """Get a CommandExecutor test subject with its dependencies mocked out."""
     return CommandExecutor(
+        state_store=state_store,
         equipment=equipment,
         movement=movement,
         pipetting=pipetting,
@@ -87,6 +95,7 @@ class _TestCommandImpl(AbstractCommandImpl[_TestCommandData, _TestCommandResult]
 
 async def test_execute(
     decoy: Decoy,
+    state_store: StateStore,
     equipment: EquipmentHandler,
     movement: MovementHandler,
     pipetting: PipettingHandler,
@@ -109,6 +118,16 @@ async def test_execute(
 
     command_data = _TestCommandData()
     command_result = _TestCommandResult()
+
+    queued_command = cast(
+        Command,
+        _TestCommand(
+            id="command-id",
+            createdAt=datetime(year=2021, month=1, day=1),
+            status=CommandStatus.QUEUED,
+            data=command_data,
+        ),
+    )
 
     running_command = cast(
         Command,
@@ -134,8 +153,12 @@ async def test_execute(
         ),
     )
 
+    decoy.when(state_store.commands.get(command_id="command-id")).then_return(
+        queued_command
+    )
+
     decoy.when(
-        running_command._ImplementationCls(
+        queued_command._ImplementationCls(
             equipment=equipment,
             movement=movement,
             pipetting=pipetting,
@@ -147,8 +170,17 @@ async def test_execute(
     decoy.when(await command_impl.execute(command_data)).then_return(command_result)
 
     decoy.when(resources.model_utils.get_timestamp()).then_return(
-        datetime(year=2023, month=3, day=3)
+        datetime(year=2022, month=2, day=2),
+        datetime(year=2023, month=3, day=3),
     )
+
+    decoy.when(
+        command_mapper.update_command(
+            command=queued_command,
+            status=CommandStatus.RUNNING,
+            startedAt=datetime(year=2022, month=2, day=2),
+        )
+    ).then_return(running_command)
 
     decoy.when(
         command_mapper.update_command(
@@ -160,13 +192,17 @@ async def test_execute(
         )
     ).then_return(completed_command)
 
-    result = await subject.execute(running_command)
+    await subject.execute("command-id")
 
-    assert result == completed_command
+    decoy.verify(
+        state_store.handle_action(UpdateCommandAction(command=running_command)),
+        state_store.handle_action(UpdateCommandAction(command=completed_command)),
+    )
 
 
 async def test_execute_raises_protocol_engine_error(
     decoy: Decoy,
+    state_store: StateStore,
     equipment: EquipmentHandler,
     movement: MovementHandler,
     pipetting: PipettingHandler,
@@ -189,6 +225,16 @@ async def test_execute_raises_protocol_engine_error(
 
     command_data = _TestCommandData()
     command_error = ProtocolEngineError("oh no")
+
+    queued_command = cast(
+        Command,
+        _TestCommand(
+            id="command-id",
+            createdAt=datetime(year=2021, month=1, day=1),
+            status=CommandStatus.QUEUED,
+            data=command_data,
+        ),
+    )
 
     running_command = cast(
         Command,
@@ -214,8 +260,12 @@ async def test_execute_raises_protocol_engine_error(
         ),
     )
 
+    decoy.when(state_store.commands.get(command_id="command-id")).then_return(
+        queued_command
+    )
+
     decoy.when(
-        running_command._ImplementationCls(
+        queued_command._ImplementationCls(
             equipment=equipment,
             movement=movement,
             pipetting=pipetting,
@@ -227,8 +277,17 @@ async def test_execute_raises_protocol_engine_error(
     decoy.when(await command_impl.execute(command_data)).then_raise(command_error)
 
     decoy.when(resources.model_utils.get_timestamp()).then_return(
-        datetime(year=2023, month=3, day=3)
+        datetime(year=2022, month=2, day=2),
+        datetime(year=2023, month=3, day=3),
     )
+
+    decoy.when(
+        command_mapper.update_command(
+            command=queued_command,
+            status=CommandStatus.RUNNING,
+            startedAt=datetime(year=2022, month=2, day=2),
+        )
+    ).then_return(running_command)
 
     decoy.when(
         command_mapper.update_command(
@@ -240,6 +299,9 @@ async def test_execute_raises_protocol_engine_error(
         )
     ).then_return(failed_command)
 
-    result = await subject.execute(running_command)
+    await subject.execute("command-id")
 
-    assert result == failed_command
+    decoy.verify(
+        state_store.handle_action(UpdateCommandAction(command=running_command)),
+        state_store.handle_action(UpdateCommandAction(command=failed_command)),
+    )

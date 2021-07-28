@@ -1,8 +1,8 @@
 """ProtocolEngine class definition."""
 from .resources import ResourceProviders
-from .state import State, StateStore, StateView
-from .commands import Command, CommandRequest, CommandStatus, CommandMapper
-from .execution import CommandExecutor
+from .commands import Command, CommandRequest, CommandMapper
+from .execution import QueueWorker
+from .state import StateStore, StateView, PlayAction, PauseAction, UpdateCommandAction
 
 
 class ProtocolEngine:
@@ -14,16 +14,16 @@ class ProtocolEngine:
     """
 
     _state_store: StateStore
-    _command_executor: CommandExecutor
     _command_mapper: CommandMapper
     _resources: ResourceProviders
+    _queue_worker: QueueWorker
 
     def __init__(
         self,
         state_store: StateStore,
-        command_executor: CommandExecutor,
         command_mapper: CommandMapper,
         resources: ResourceProviders,
+        queue_worker: QueueWorker,
     ) -> None:
         """Initialize a ProtocolEngine instance.
 
@@ -31,65 +31,74 @@ class ProtocolEngine:
         ProtocolEngine.create factory classmethod.
         """
         self._state_store = state_store
-        self._command_executor = command_executor
         self._command_mapper = command_mapper
         self._resources = resources
+        self._queue_worker = queue_worker
 
     @property
     def state_view(self) -> StateView:
         """Get an interface to retrieve calculated state values."""
-        return self._state_store.state_view
+        return self._state_store
 
-    def get_state(self) -> State:
-        """Get the engine's underlying state."""
-        return self._state_store.get_state()
+    def play(self) -> None:
+        """Start or resume executing commands in the queue."""
+        self._state_store.handle_action(PlayAction())
+        self._queue_worker.start()
+
+    def pause(self) -> None:
+        """Pause executing commands in the queue."""
+        self._state_store.handle_action(PauseAction())
 
     def add_command(self, request: CommandRequest) -> Command:
-        """Add a command to ProtocolEngine."""
+        """Add a command to the `ProtocolEngine`'s queue.
+
+        Arguments:
+            request: The command type and payload data used to construct
+                the command in state.
+
+        Returns:
+            The full, newly queued command.
+        """
         command = self._command_mapper.map_request_to_command(
             request=request,
             command_id=self._resources.model_utils.generate_id(),
             created_at=self._resources.model_utils.get_timestamp(),
         )
-        self._state_store.handle_command(command)
+        self._state_store.handle_action(UpdateCommandAction(command=command))
+
         return command
 
-    async def execute_command_by_id(self, command_id: str) -> Command:
-        """Execute a protocol engine command by its identifier."""
-        queued_command = self.state_view.commands.get(command_id)
+    async def add_and_execute_command(self, request: CommandRequest) -> Command:
+        """Add a command to the queue and wait for it to complete.
 
-        running_command = self._command_mapper.update_command(
-            command=queued_command,
-            startedAt=self._resources.model_utils.get_timestamp(),
-            status=CommandStatus.RUNNING,
+        The engine must be started by calling `play` before the command will
+        execute. You only need to call `play` once.
+
+        Arguments:
+            request: The command type and payload data used to construct
+                the command in state.
+
+        Returns:
+            The completed command, whether it succeeded or failed.
+        """
+        command = self.add_command(request)
+
+        await self._state_store.wait_for(
+            condition=self._state_store.commands.get_is_complete,
+            command_id=command.id,
         )
 
-        self._state_store.handle_command(running_command)
-        completed_command = await self._command_executor.execute(running_command)
-        self._state_store.handle_command(completed_command)
+        return self._state_store.commands.get(command_id=command.id)
 
-        return completed_command
+    async def wait_for_done(self) -> None:
+        """Wait for the ProtocolEngine to become idle.
 
-    async def execute_command(
-        self, request: CommandRequest, command_id: str
-    ) -> Command:
-        """Execute a command request, waiting for it to complete."""
-        created_at = self._resources.model_utils.get_timestamp()
+        The ProtocolEngine is considered "done" when there is no command
+        currently executing nor any commands left in the queue.
 
-        queued_command = self._command_mapper.map_request_to_command(
-            request=request,
-            command_id=command_id,
-            created_at=created_at,
-        )
-
-        running_command = self._command_mapper.update_command(
-            command=queued_command,
-            startedAt=created_at,
-            status=CommandStatus.RUNNING,
-        )
-
-        self._state_store.handle_command(running_command)
-        completed_command = await self._command_executor.execute(running_command)
-        self._state_store.handle_command(completed_command)
-
-        return completed_command
+        This method should not raise, but if any unexepected exceptions
+        happen during command execution that are not properly caught by
+        the CommandExecutor, this is where they will be raised.
+        """
+        await self._state_store.wait_for(self._state_store.commands.get_is_complete)
+        await self._queue_worker.stop()
