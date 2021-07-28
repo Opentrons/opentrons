@@ -401,7 +401,7 @@ class SmoothieDriver:
 
             log.info(f"Connecting to smoothie at port {port}")
 
-            self._connection = await SerialConnection.create(
+            self._connection = await SmoothieConnection.create(
                 port=port,
                 baud_rate=self._config.serial_speed,
                 name='smoothie',
