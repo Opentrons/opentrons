@@ -49,11 +49,7 @@ class CommandExecutor:
             pipetting=self._pipetting,
         )
 
-        result = None
-        error = None
-        completed_status = CommandStatus.SUCCEEDED
         started_at = self._resources.model_utils.get_timestamp()
-
         running_command = self._command_mapper.update_command(
             command=command,
             status=CommandStatus.RUNNING,
@@ -62,9 +58,12 @@ class CommandExecutor:
 
         self._state_store.handle_action(UpdateCommandAction(command=running_command))
 
+        result = None
+        error = None
         try:
             log.debug(f"Executing {command.id}, {command.commandType}, {command.data}")
             result = await command_impl.execute(command.data)  # type: ignore[arg-type]
+            completed_status = CommandStatus.SUCCEEDED
         except Exception as e:
             log.warn(
                 f"Execution of {command.id} failed",
