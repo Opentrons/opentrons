@@ -19,12 +19,12 @@ async def test_labware_data_gets_standard_definition() -> None:
     expected = get_labware_definition(
         load_name="opentrons_96_tiprack_300ul",
         namespace="opentrons",
-        version=1
+        version=1,
     )
     result = await LabwareDataProvider().get_labware_definition(
         load_name="opentrons_96_tiprack_300ul",
         namespace="opentrons",
-        version=1
+        version=1,
     )
 
     assert result == LabwareDefinition.parse_obj(expected)
@@ -37,7 +37,7 @@ async def test_labware_data_gets_calibration(
     # TODO(mc, 2020-10-18): this mock is a kinda code-smelly. Fetching labware
     #  calibration data is a little convoluted and could use some clean up
     with patch(
-        'opentrons.protocol_engine.resources.labware_data_provider.get_labware_calibration'  # noqa: E501
+        "opentrons.protocol_engine.resources.labware_data_provider.get_labware_calibration"  # noqa: E501
     ) as mock_get_lw_calibration:
         mock_get_lw_calibration.return_value = Point(1, 2, 3)
 
@@ -50,7 +50,7 @@ async def test_labware_data_gets_calibration(
 
         assert result == (1, 2, 3)
         mock_get_lw_calibration.assert_called_with(
-            f'{hash_labware_def(as_type_dict)}.json',
+            f"{hash_labware_def(as_type_dict)}.json",
             as_type_dict,
-            parent='',
+            parent="",
         )

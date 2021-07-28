@@ -59,7 +59,7 @@ async def test_get_deck_labware_fixtures(
         DeckFixedLabware(
             labware_id="fixedTrash",
             location=DeckSlotLocation(slot=DeckSlotName.FIXED_TRASH),
-            definition=fixed_trash_def
+            definition=fixed_trash_def,
         )
     ]
     mock_labware_data.get_labware_definition.assert_called_with(
@@ -84,7 +84,7 @@ async def test_get_deck_labware_fixtures_short_trash(
         DeckFixedLabware(
             labware_id="fixedTrash",
             location=DeckSlotLocation(slot=DeckSlotName.FIXED_TRASH),
-            definition=short_fixed_trash_def
+            definition=short_fixed_trash_def,
         )
     ]
     mock_labware_data.get_labware_definition.assert_called_with(

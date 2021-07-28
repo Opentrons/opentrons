@@ -45,7 +45,7 @@ class DeckDataProvider:
 
     async def get_deck_fixed_labware(
         self,
-        deck_definition: DeckDefinitionV2
+        deck_definition: DeckDefinitionV2,
     ) -> List[DeckFixedLabware]:
         """Get a list of all labware fixtures from a given deck definition."""
         labware = []

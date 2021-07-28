@@ -1,11 +1,13 @@
 # noqa: D100
 from __future__ import annotations
+
 from typing import Any, List, Dict, Optional, Union, cast
 
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from .errors import LabwareIsNotTipRackError
 from .types import DeckSlotName, LabwareParameters, Point
 from .well import Well
+from ..protocols.models import LabwareDefinition
 
 
 class Labware:  # noqa: D101
@@ -25,6 +27,10 @@ class Labware:  # noqa: D101
         """
         self._engine_client = engine_client
         self._labware_id = labware_id
+        self._lw_definition: Optional[LabwareDefinition] = None
+        self._wells_by_name: Optional[Dict[str, Well]] = None
+        self._rows_by_name: Optional[Dict[str, List[Well]]] = None
+        self._columns_by_name: Optional[Dict[str, List[Well]]] = None
 
     # TODO(mc, 2021-04-22): remove this property; it's redundant and
     # unlikely to be used by PAPI users
@@ -92,10 +98,7 @@ class Labware:  # noqa: D101
     # definition and call it a day?
     @property
     def parameters(self) -> LabwareParameters:  # noqa: D102
-        definition = self._engine_client.state.labware.get_labware_definition(
-            labware_id=self._labware_id
-        )
-        return cast(LabwareParameters, definition.parameters.dict())
+        return cast(LabwareParameters, self._definition().parameters.dict())
 
     # TODO(mc, 2021-05-03): this is an internal list of Opentrons-specific
     # data; does it really need to be a public property? Can we expose the
@@ -108,11 +111,8 @@ class Labware:  # noqa: D101
     # operational logic, and its presence in this interface is no longer
     # necessary with Protocol Engine controlling execution. Can we get rid of it?
     @property
-    def magdeck_engage_height(self) -> Optional[float]:    # noqa: D102
-        definition = self._engine_client.state.labware.get_labware_definition(
-            labware_id=self._labware_id
-        )
-        return definition.parameters.magneticModuleEngageHeight
+    def magdeck_engage_height(self) -> Optional[float]:  # noqa: D102
+        return self._definition().parameters.magneticModuleEngageHeight
 
     @property
     def calibrated_offset(self) -> Point:
@@ -140,10 +140,7 @@ class Labware:  # noqa: D101
     @property
     def is_tiprack(self) -> bool:
         """Whether this labware is a tiprack."""
-        definition = self._engine_client.state.labware.get_labware_definition(
-            labware_id=self._labware_id
-        )
-        return definition.parameters.isTiprack
+        return self._definition().parameters.isTiprack
 
     # TODO(mc, 2021-05-03): encode this in a specific `TipRack` interface that
     # extends from Labware
@@ -160,36 +157,73 @@ class Labware:  # noqa: D101
             LabwareIsNotTipRackError: will raise if this property is accessed
                 on a labware instance that is not a tip rack.
         """
-        definition = self._engine_client.state.labware.get_labware_definition(
-            labware_id=self._labware_id
-        )
-        if definition.parameters.tipLength is None:
+        tiplength = self._definition().parameters.tipLength
+        if tiplength is None:
             raise LabwareIsNotTipRackError(f"{self.load_name} is not a tip rack.")
-        return definition.parameters.tipLength
+        return tiplength
 
     def well(self, idx: int) -> Well:  # noqa: D102
-        raise NotImplementedError()
+        # TODO (spp: 2021-07-26): figure out if we want to keep this as it is marked
+        #  as deprecated in v2
+        return self.wells()[idx]
 
     def wells(self) -> List[Well]:  # noqa: D102
-        raise NotImplementedError()
+        return list(self.wells_by_name().values())
 
     def wells_by_name(self) -> Dict[str, Well]:  # noqa: D102
-        raise NotImplementedError()
+        if self._wells_by_name is None:
+            wells = self._engine_client.state.labware.get_wells(
+                labware_id=self.labware_id
+            )
+            self._wells_by_name = {
+                well_name: Well(
+                    well_name=well_name,
+                    engine_client=self._engine_client,
+                    labware=self,
+                )
+                for well_name in wells
+            }
+        return self._wells_by_name
 
     def rows(self) -> List[List[Well]]:  # noqa: D102
-        raise NotImplementedError()
+        return list(self.rows_by_name().values())
 
     def rows_by_name(self) -> Dict[str, List[Well]]:  # noqa: D102
-        raise NotImplementedError()
+        if self._rows_by_name is None:
+            rows_dict = self._engine_client.state.labware.get_well_rows(
+                labware_id=self.labware_id
+            )
+            self._rows_by_name = {
+                row: [self.wells_by_name()[well_name] for well_name in row_wells]
+                for row, row_wells in rows_dict.items()
+            }
+        return self._rows_by_name
 
     def columns(self) -> List[List[Well]]:  # noqa: D102
-        raise NotImplementedError()
+        return list(self.columns_by_name().values())
 
     def columns_by_name(self) -> Dict[str, List[Well]]:  # noqa: D102
-        raise NotImplementedError()
+        if self._columns_by_name is None:
+            cols_dict = self._engine_client.state.labware.get_well_columns(
+                labware_id=self.labware_id
+            )
+            self._columns_by_name = {
+                col: [self.wells_by_name()[well_name] for well_name in col_wells]
+                for col, col_wells in cols_dict.items()
+            }
+        return self._columns_by_name
+
+    def _definition(self) -> LabwareDefinition:
+        if self._lw_definition is None:
+            self._lw_definition = (
+                self._engine_client.state.labware.get_labware_definition(
+                    labware_id=self.labware_id
+                )
+            )
+        return self._lw_definition
 
     def __repr__(self) -> str:  # noqa: D105
-        raise NotImplementedError()
+        return f"{self.load_name}<id:{self.labware_id}>"
 
     def __eq__(self, other: object) -> bool:
         """Compare for object equality.

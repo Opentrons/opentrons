@@ -60,7 +60,8 @@ def default_builder(code: GCode):
     """
     message = f'Code: {code.g_code} {code.g_code_body}\n' \
               f'Explanation: {code.get_explanation().command_explanation}\n' \
-              f'Response: {code.get_explanation().response}'
+              f'Response: {code.get_explanation().response}' \
+              f'\n-----------------------------------------'
     return MULTIPLE_SPACE_REGEX.sub(' ', message).strip()
 
 

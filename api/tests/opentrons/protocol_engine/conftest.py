@@ -54,3 +54,11 @@ def reservoir_def() -> LabwareDefinition:
 def tip_rack_def() -> LabwareDefinition:
     """Get the definition of Opentrons 300 uL tip rack."""
     return LabwareDefinition.parse_obj(load_definition("opentrons_96_tiprack_300ul", 1))
+
+
+@pytest.fixture
+def falcon_tuberack_def() -> LabwareDefinition:
+    """Get the definition of the 6-well Falcon tuberack."""
+    return LabwareDefinition.parse_obj(
+        load_definition("opentrons_6_tuberack_falcon_50ml_conical", 1)
+    )

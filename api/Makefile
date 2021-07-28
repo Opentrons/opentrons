@@ -3,13 +3,6 @@
 include ../scripts/push.mk
 include ../scripts/python.mk
 
-# using bash instead of /bin/bash in SHELL prevents macOS optimizing away our PATH update
-SHELL := bash
-
-# add yarn CLI dev deps to PATH (for cross platform POSIX commands via shx)
-# and also make an explicit version for shx for use in the shell function,
-# where PATH won’t be propagated
-PATH := $(shell cd .. && yarn bin):$(PATH)
 SHX := npx shx
 
 # make push wheel file (= rather than := to expand at every use)
@@ -57,12 +50,26 @@ ot_shared_data_sources := $(filter %.json,$(shell $(SHX) find ../shared-data/))
 ot_resources := $(filter %,$(shell $(SHX) find src/opentrons/resources))
 ot_sources := $(ot_py_sources) $(ot_shared_data_sources) $(ot_resources)
 
+# test modules to typecheck
+# TODO(mc, 2021-07-23): expand this to all tests
 ot_tests_to_typecheck := \
 	tests/opentrons/protocol_api_experimental \
 	tests/opentrons/protocol_engine \
 	tests/opentrons/motion_planning \
 	tests/opentrons/file_runner \
 	tests/opentrons/protocols/runner
+
+# files and modules to format
+# TODO(mc, 2021-07-23): expand this to all files until we can format `.`
+ot_files_to_format := \
+	src/opentrons/file_runner \
+	src/opentrons/motion_planning \
+	src/opentrons/protocol_api_experimental \
+	src/opentrons/protocol_engine \
+	tests/opentrons/file_runner \
+	tests/opentrons/motion_planning  \
+	tests/opentrons/protocol_api_experimental \
+	tests/opentrons/protocol_engine
 
 # Defined separately than the clean target so the wheel file doesn’t have to
 # depend on a PHONY target
@@ -99,9 +106,14 @@ test:
 	$(pytest) $(tests) $(test_opts)
 
 .PHONY: lint
-lint: $(ot_py_sources)
+lint:
 	$(python) -m mypy src/opentrons $(ot_tests_to_typecheck)
+	$(python) -m black --check $(ot_files_to_format)
 	$(python) -m flake8 setup.py src/opentrons tests
+
+.PHONY: format
+format:
+	$(python) -m black $(ot_files_to_format)
 
 docs/build/html/v%: docs/v%
 	$(sphinx_build) -b html -d docs/build/doctrees -n $< $@

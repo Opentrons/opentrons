@@ -44,6 +44,10 @@ class GCodeDiffer:
     def get_html_diff(self):
         return dmp().diff_prettyHtml(self.get_diff())
 
+    def save_html_diff_to_file(self, file_path):
+        with open(file_path, 'w') as file:
+            file.write(self.get_html_diff())
+
     @classmethod
     def get_diff_type(cls, diff_tuple: Tuple[int, str]):
         return cls.DIFF_TYPE_LOOKUP[diff_tuple[0]]

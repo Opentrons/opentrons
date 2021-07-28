@@ -91,6 +91,7 @@ def test_default_mode(default_mode, g_code):
                '\n\tZ Axis: 400.000000' \
                '\n\tA Axis: 400.000000' \
                '\n\tB Axis: 955.000000' \
-               '\n\tC Axis: 768.000000'
+               '\n\tC Axis: 768.000000' \
+               '\n-----------------------------------------'
 
     assert default_mode.builder(g_code) == expected
