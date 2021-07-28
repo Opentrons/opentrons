@@ -100,7 +100,7 @@ async def test_cancel_noops_if_joined(
     command_executor: CommandExecutor,
     subject: QueueWorker,
 ) -> None:
-    """It should stop pulling jobs if it is cancelled."""
+    """It should noop on cancel if the worker has already been `join`'d."""
     subject.start()
     await subject.join()
     subject.cancel()
