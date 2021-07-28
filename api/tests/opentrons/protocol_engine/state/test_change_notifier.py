@@ -32,13 +32,25 @@ async def test_multiple_subscribers(count: int) -> None:
     This test runs multiple times to check for flakyness.
     """
     subject = ChangeNotifier()
+    results = []
 
-    result_1 = asyncio.create_task(subject.wait())
-    result_2 = asyncio.create_task(subject.wait())
-    result_3 = asyncio.create_task(subject.wait())
+    async def _do_task_1() -> None:
+        await subject.wait()
+        results.append(1)
+
+    async def _do_task_2() -> None:
+        await subject.wait()
+        results.append(2)
+
+    async def _do_task_3() -> None:
+        await subject.wait()
+        results.append(3)
+
+    task_1 = asyncio.create_task(_do_task_1())
+    task_2 = asyncio.create_task(_do_task_2())
+    task_3 = asyncio.create_task(_do_task_3())
 
     asyncio.get_running_loop().call_soon(subject.notify)
+    await asyncio.gather(task_1, task_2, task_3)
 
-    await result_1
-    await result_2
-    await result_3
+    assert results == [1, 2, 3]
