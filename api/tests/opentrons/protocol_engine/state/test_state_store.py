@@ -1,19 +1,28 @@
 """Tests for the top-level StateStore."""
-import asyncio
 import pytest
 from decoy import Decoy
-from typing import Callable
+from typing import Callable, Optional
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV2
-from opentrons.protocol_engine.state import StateStore, State, PlayAction, PauseAction
+from opentrons.protocol_engine.state import StateStore, State, PlayAction
+from opentrons.protocol_engine.state.change_notifier import ChangeNotifier
 
 
 @pytest.fixture
-def subject(standard_deck_def: DeckDefinitionV2) -> StateStore:
+def change_notifier(decoy: Decoy) -> ChangeNotifier:
+    """Get a mocked out ChangeNotifier."""
+    return decoy.mock(cls=ChangeNotifier)
+
+
+@pytest.fixture
+def subject(
+    change_notifier: ChangeNotifier, standard_deck_def: DeckDefinitionV2
+) -> StateStore:
     """Get a StateStore test subject."""
     return StateStore(
         deck_definition=standard_deck_def,
         deck_fixed_labware=[],
+        change_notifier=change_notifier,
     )
 
 
@@ -33,26 +42,51 @@ def test_state_is_immutable(subject: StateStore) -> None:
     assert result_1 is not result_2
 
 
-async def test_wait_for_state(decoy: Decoy, subject: StateStore) -> None:
+def test_notify_on_state_change(
+    decoy: Decoy,
+    change_notifier: ChangeNotifier,
+    subject: StateStore,
+) -> None:
+    """It should notify state changes when actions are handled."""
+    decoy.verify(change_notifier.notify(), times=0)
+    subject.handle_action(PlayAction())
+    decoy.verify(change_notifier.notify(), times=1)
+
+
+async def test_wait_for_state(
+    decoy: Decoy,
+    change_notifier: ChangeNotifier,
+    subject: StateStore,
+) -> None:
     """It should return an awaitable that signals state changes."""
-    check_condition: Callable[..., bool] = decoy.mock()
+    check_condition: Callable[..., Optional[str]] = decoy.mock()
 
     decoy.when(check_condition("foo", bar="baz")).then_return(
-        False,
-        False,
-        True,
+        None,
+        None,
+        "hello world",
     )
 
-    result = asyncio.create_task(subject.wait_for(check_condition, "foo", bar="baz"))
-    await asyncio.sleep(0)
+    result = await subject.wait_for(check_condition, "foo", bar="baz")
+    assert result == "hello world"
 
-    subject.handle_action(PauseAction())
-    await asyncio.sleep(0)
-    assert result.done() is False
+    decoy.verify(await change_notifier.wait(), times=2)
 
-    subject.handle_action(PlayAction())
-    await asyncio.sleep(0)
-    assert result.done() is True
+
+async def test_wait_for_state_short_circuit(
+    decoy: Decoy,
+    subject: StateStore,
+    change_notifier: ChangeNotifier,
+) -> None:
+    """It should short-circuit the change notifier if condition is satisfied."""
+    check_condition: Callable[..., Optional[str]] = decoy.mock()
+
+    decoy.when(check_condition("foo", bar="baz")).then_return("hello world")
+
+    result = await subject.wait_for(check_condition, "foo", bar="baz")
+    assert result == "hello world"
+
+    decoy.verify(await change_notifier.wait(), times=0)
 
 
 async def test_wait_for_already_true(decoy: Decoy, subject: StateStore) -> None:

@@ -64,6 +64,9 @@ async def queue_commands(decoy: Decoy, state_store: StateStore) -> None:
     ).then_do(_get_next_queued_command)
 
 
+# TODO(mc, 2021-07-27): the need for flush tasks in these tests a bit smelly.
+# Explore solutions like [AnyIO](https://anyio.readthedocs.io) for better async
+# task management that could make the QueueWorker interface more explicit.
 async def _flush_tasks() -> None:
     await asyncio.sleep(0)
 

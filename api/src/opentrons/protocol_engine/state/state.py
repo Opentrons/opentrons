@@ -1,7 +1,6 @@
 """Protocol engine state management."""
 from __future__ import annotations
 
-import asyncio
 from dataclasses import dataclass
 from functools import partial
 from typing import Any, Callable, List, Optional, Sequence, TypeVar
@@ -11,6 +10,7 @@ from opentrons_shared_data.deck.dev_types import DeckDefinitionV2
 from ..resources import DeckFixedLabware
 from .actions import Action
 from .abstract_store import HasState, HandlesActions
+from .change_notifier import ChangeNotifier
 from .commands import CommandState, CommandStore, CommandView
 from .labware import LabwareState, LabwareStore, LabwareView
 from .pipettes import PipetteState, PipetteStore, PipetteView
@@ -78,6 +78,7 @@ class StateStore(StateView, HandlesActions):
         self,
         deck_definition: DeckDefinitionV2,
         deck_fixed_labware: Sequence[DeckFixedLabware],
+        change_notifier: Optional[ChangeNotifier] = None,
     ) -> None:
         """Initialize a StateStore and its substores.
 
@@ -86,6 +87,7 @@ class StateStore(StateView, HandlesActions):
                 labware state.
             deck_fixed_labware: Labware definitions from the deck
                 definition to preload into labware state.
+            change_notifier: Internal state change notifier.
         """
         self._command_store = CommandStore()
         self._pipette_store = PipetteStore()
@@ -100,7 +102,7 @@ class StateStore(StateView, HandlesActions):
             self._labware_store,
         ]
 
-        self._state_update_event = asyncio.Event()
+        self._change_notifier = change_notifier or ChangeNotifier()
         self._initialize_state()
 
     def handle_action(self, action: Action) -> None:
@@ -123,6 +125,12 @@ class StateStore(StateView, HandlesActions):
     ) -> ReturnT:
         """Wait for a condition to become true, checking whenever state changes.
 
+        !!! Warning:
+            In general, callers should not trigger a state change via
+            `handle_action` directly after a `wait_for`, as it may interfere
+            with other subscribers. If you _must_ trigger a state change, ensure
+            the change cannot affect the `condition`'s of other `wait_for`'s.
+
         Arguments:
             condition: A function that returns a truthy value when the `await`
                 should resolve
@@ -136,8 +144,7 @@ class StateStore(StateView, HandlesActions):
         is_done = predicate()
 
         while not is_done:
-            self._state_update_event.clear()
-            await self._state_update_event.wait()
+            await self._change_notifier.wait()
             is_done = predicate()
 
         return is_done
@@ -177,5 +184,4 @@ class StateStore(StateView, HandlesActions):
         self._labware._state = state.labware
         self._pipettes._state = state.pipettes
 
-        # notify that state has been updated for watchers
-        self._state_update_event.set()
+        self._change_notifier.notify()
