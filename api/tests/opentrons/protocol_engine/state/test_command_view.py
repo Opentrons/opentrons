@@ -103,6 +103,19 @@ def test_get_next_queued_returns_none_when_no_pending() -> None:
     assert subject.get_next_queued() is None
 
 
+def test_get_next_queued_returns_none_if_not_running() -> None:
+    """It should return None if the engine is not running."""
+    pending_command = create_pending_command()
+
+    subject = get_command_view(
+        is_running=False,
+        commands_by_id=[("command-id", pending_command)],
+    )
+    result = subject.get_next_queued()
+
+    assert result is None
+
+
 def test_get_next_queued_raises_when_earlier_command_failed() -> None:
     """It should raise if any prior-added command is failed."""
     running_command = create_running_command(command_id="command-id-1")
@@ -124,14 +137,9 @@ def test_get_next_queued_raises_when_earlier_command_failed() -> None:
         subject.get_next_queued()
 
 
-def test_get_next_queued_raises_none_if_not_running_stopped() -> None:
-    """It should raise if the engine is not running or stopped."""
-    subject = get_command_view(is_running=False)
-
-    with pytest.raises(errors.ProtocolEngineStoppedError):
-        subject.get_next_queued()
-
-    subject = get_command_view(stop_requested=False)
+def test_get_next_queued_raises_if_stopped() -> None:
+    """It should raise if an engine stop has been requested."""
+    subject = get_command_view(stop_requested=True)
 
     with pytest.raises(errors.ProtocolEngineStoppedError):
         subject.get_next_queued()

@@ -89,10 +89,11 @@ class CommandView(HasState[CommandState]):
         Raises:
             EngineStoppedError:
         """
-        if not self._state.is_running:
-            raise ProtocolEngineStoppedError("Engine has not been started")
-        elif self._state.stop_requested:
+        if self._state.stop_requested:
             raise ProtocolEngineStoppedError("Engine was stopped")
+
+        if not self._state.is_running:
+            return None
 
         for command_id, command in self._state.commands_by_id.items():
             if command.status == CommandStatus.FAILED:
