@@ -42,15 +42,3 @@ class JsonFileRunner(AbstractFileRunner):
         """Run the protocol to completion."""
         self._protocol_engine.play()
         await self._protocol_engine.stop(wait_until_complete=True)
-
-    def play(self) -> None:
-        """Resume running the JSON protocol file."""
-        self._protocol_engine.play()
-
-    def pause(self) -> None:
-        """Pause the running JSON protocol file's execution."""
-        self._protocol_engine.pause()
-
-    def stop(self) -> None:
-        """Cancel the running JSON protocol file."""
-        raise NotImplementedError("Protocol cancellation not yet implemented")
