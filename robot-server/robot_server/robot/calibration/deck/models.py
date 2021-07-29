@@ -6,13 +6,15 @@ from ..helper_classes import AttachedPipette, RequiredLabware
 
 class DeckCalibrationSessionStatus(BaseModel):
     """The current status of a deck calibration session."""
+
     instrument: AttachedPipette
     currentStep: str = Field(
-        ...,
-        description="Current step of deck calibration user flow")
+        ..., description="Current step of deck calibration user flow"
+    )
     labware: List[RequiredLabware]
     supportedCommands: List[Optional[str]] = Field(
-        ..., description="A list of supported commands for this user flow")
+        ..., description="A list of supported commands for this user flow"
+    )
 
     class Config:
         schema_extra = {
@@ -33,11 +35,9 @@ class DeckCalibrationSessionStatus(BaseModel):
                             "namespace": "opentrons",
                             "version": 1,
                             "isTiprack": "true",
-                            "definition": {
-                                "ordering": "the ordering section..."
-                            }
+                            "definition": {"ordering": "the ordering section..."},
                         }
-                    ]
+                    ],
                 }
             ]
         }

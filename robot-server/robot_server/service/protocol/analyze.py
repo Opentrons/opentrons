@@ -6,8 +6,9 @@ from json import JSONDecodeError
 from opentrons.protocol_api import ProtocolContext
 from opentrons.protocols.execution.errors import ExceptionInProtocolError
 from opentrons.protocols.execution.execute import run_protocol
-from opentrons.protocols.context.simulator.protocol_context import \
-    ProtocolContextSimulation
+from opentrons.protocols.context.simulator.protocol_context import (
+    ProtocolContextSimulation,
+)
 from opentrons.protocols.parse import parse
 from opentrons.protocols.types import Protocol
 
@@ -64,36 +65,28 @@ def _analyze(protocol_contents: contents.Contents) -> AnalysisResult:
     meta = _extract_metadata(protocol)
     equipment = _extract_equipment(ctx)
 
-    return AnalysisResult(
-        meta=meta,
-        required_equipment=equipment,
-        errors=errors
-    )
+    return AnalysisResult(meta=meta, required_equipment=equipment, errors=errors)
 
 
 def _extract_metadata(protocol: typing.Optional[Protocol]) -> models.Meta:
     """Extract protocol metadata"""
     metadata = protocol.metadata if protocol else {}
     # Two alternatives for protocol name key
-    protocol_name = metadata.get('protocolName',
-                                 metadata.get('protocol-name'))
-    author = metadata.get('author')
+    protocol_name = metadata.get("protocolName", metadata.get("protocol-name"))
+    author = metadata.get("author")
     return models.Meta(
         name=str(protocol_name) if protocol_name else None,
         author=str(author) if author else None,
-        apiLevel=str(protocol.api_level) if protocol else None
+        apiLevel=str(protocol.api_level) if protocol else None,
     )
 
 
-def _extract_equipment(ctx: typing.Optional[ProtocolContext]) -> \
-        models.RequiredEquipment:
+def _extract_equipment(
+    ctx: typing.Optional[ProtocolContext],
+) -> models.RequiredEquipment:
     """Extract required equipment"""
     if not ctx:
-        return models.RequiredEquipment(
-            pipettes=[],
-            labware=[],
-            modules=[]
-        )
+        return models.RequiredEquipment(pipettes=[], labware=[], modules=[])
 
     return models.RequiredEquipment(
         pipettes=[
@@ -101,24 +94,23 @@ def _extract_equipment(ctx: typing.Optional[ProtocolContext]) -> \
                 mount=Mount(slot.lower()),
                 pipetteName=pipette.name,
                 channels=pipette.channels,
-                requestedAs=pipette.requested_as)
+                requestedAs=pipette.requested_as,
+            )
             for slot, pipette in sorted(ctx.loaded_instruments.items())
             if pipette
         ],
         labware=[
-            models.LoadedLabware(
-                label=labware.name,
-                uri=labware.uri,
-                location=slot)
+            models.LoadedLabware(label=labware.name, uri=labware.uri, location=slot)
             for slot, labware in sorted(ctx.loaded_labwares.items())
         ],
         modules=[
             models.LoadedModule(
                 type=module.geometry.module_type.value,
                 model=module.geometry.model.value,
-                location=int(module.geometry.location.labware.first_parent())
-            ) for slot, module in sorted(ctx.loaded_modules.items())
-        ]
+                location=int(module.geometry.location.labware.first_parent()),
+            )
+            for slot, module in sorted(ctx.loaded_modules.items())
+        ],
     )
 
 
@@ -131,16 +123,19 @@ def _parse_protocol(protocol_contents: contents.Contents) -> Protocol:
     try:
         extra_labware = contents.get_custom_labware(protocol_contents)
 
-        return parse(contents.get_protocol_contents(protocol_contents),
-                     extra_labware=extra_labware,
-                     filename=protocol_contents.protocol_file.path.name)
+        return parse(
+            contents.get_protocol_contents(protocol_contents),
+            extra_labware=extra_labware,
+            filename=protocol_contents.protocol_file.path.name,
+        )
     except SyntaxError as e:
         raise AnalyzeParseError(
             error=models.ProtocolError(
                 type=e.__class__.__name__,
                 description=e.msg,
                 lineNumber=e.lineno,
-                fileName=e.filename)
+                fileName=e.filename,
+            )
         )
     except JSONDecodeError as e:
         raise AnalyzeParseError(
@@ -148,14 +143,12 @@ def _parse_protocol(protocol_contents: contents.Contents) -> Protocol:
                 type=e.__class__.__name__,
                 description=e.msg,
                 lineNumber=e.lineno,
-                fileName=protocol_contents.protocol_file.path.name)
+                fileName=protocol_contents.protocol_file.path.name,
+            )
         )
     except Exception as e:
         raise AnalyzeParseError(
-            error=models.ProtocolError(
-                type=e.__class__.__name__,
-                description=str(e)
-            )
+            error=models.ProtocolError(type=e.__class__.__name__, description=str(e))
         )
 
 

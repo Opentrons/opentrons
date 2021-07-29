@@ -5,8 +5,7 @@ from ..errors import UnsupportedCommandException
 class CommandExecutor:
     """Interface for command executors"""
 
-    async def execute(self, command: Command) \
-            -> CompletedCommand:
+    async def execute(self, command: Command) -> CompletedCommand:
         """
         Execute a command
 

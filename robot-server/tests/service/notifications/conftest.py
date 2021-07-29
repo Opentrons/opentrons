@@ -14,13 +14,16 @@ def topic_event() -> TopicEvent:
         event=Event(
             createdOn=datetime(2020, 1, 1),
             publisher="some_one",
-            data=SampleTwo(val1=1, val2="2")
-        ))
+            data=SampleTwo(val1=1, val2="2"),
+        ),
+    )
 
 
 @pytest.fixture
 def mock_subscriber(topic_event) -> AsyncGenerator:
     """A mock subscriber."""
+
     async def _f():
         yield topic_event
+
     return _f()

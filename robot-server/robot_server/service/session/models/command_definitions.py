@@ -11,6 +11,7 @@ class CommandDefinition(str, Enum):
     _localname: str
 
     """The base of command definition enumerations."""
+
     def __new__(cls, value):
         """Create a string enum."""
         # https://docs.python.org/3/library/enum.html#when-to-use-new-vs-init
@@ -38,6 +39,7 @@ class CommandDefinition(str, Enum):
 
 class RobotCommand(CommandDefinition):
     """Robot commands"""
+
     home_all_motors = "homeAllMotors"
     home_pipette = "homePipette"
     toggle_lights = "toggleLights"
@@ -49,6 +51,7 @@ class RobotCommand(CommandDefinition):
 
 class ProtocolCommand(CommandDefinition):
     """Protocol commands"""
+
     start_run = "startRun"
     start_simulate = "startSimulate"
     cancel = "cancel"
@@ -82,6 +85,7 @@ class PipetteCommand(CommandDefinition):
 
 class CalibrationCommand(CommandDefinition):
     """Shared Between Calibration Flows"""
+
     load_labware = "loadLabware"
     jog = "jog"
     set_has_calibration_block = "setHasCalibrationBlock"
@@ -103,6 +107,7 @@ class CalibrationCommand(CommandDefinition):
 
 class DeckCalibrationCommand(CommandDefinition):
     """Deck Calibration Specific"""
+
     move_to_point_two = "moveToPointTwo"
     move_to_point_three = "moveToPointThree"
 
@@ -113,6 +118,7 @@ class DeckCalibrationCommand(CommandDefinition):
 
 class CheckCalibrationCommand(CommandDefinition):
     """Check Calibration Health Specific"""
+
     compare_point = "comparePoint"
     switch_pipette = "switchPipette"
     return_tip = "returnTip"

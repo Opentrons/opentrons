@@ -19,13 +19,15 @@ def _str_to_dict(res_str: str) -> Dict[str, Union[str, bool]]:
     for line in res_lines:
         if line:
             try:
-                prop, val = line.split('=')
+                prop, val = line.split("=")
                 res_dict[prop] = (
                     # Convert yes/no to boolean value
-                    val if val not in ['yes', 'no'] else val == 'yes'
+                    val
+                    if val not in ["yes", "no"]
+                    else val == "yes"
                 )
             except (ValueError, IndexError) as e:
-                log.error(f'Error converting timedatectl status line {line}:  {e}')
+                log.error(f"Error converting timedatectl status line {line}:  {e}")
 
     return cast(Dict[str, Union[str, bool]], res_dict)
 
@@ -39,10 +41,10 @@ async def _time_status() -> Dict[str, Union[str, bool]]:
         Dictionary of status params.
     """
     proc = await asyncio.create_subprocess_shell(
-        'timedatectl show',
+        "timedatectl show",
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.PIPE,
-        loop=asyncio.get_event_loop()
+        loop=asyncio.get_event_loop(),
     )
     out, err = await proc.communicate()
     return _str_to_dict(out.decode())
@@ -55,10 +57,10 @@ async def _set_time(time: str) -> Tuple[str, str]:
         Tuple of the output of `date --set` (usually the new date) and any error.
     """
     proc = await asyncio.create_subprocess_shell(
-        f'date --utc --set \"{time}\"',
+        f'date --utc --set "{time}"',
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.PIPE,
-        loop=asyncio.get_event_loop()
+        loop=asyncio.get_event_loop(),
     )
     out, err = await proc.communicate()
     return out.decode(), err.decode()
@@ -90,17 +92,19 @@ async def set_system_time(new_time_dt: datetime) -> datetime:
     if not IS_ROBOT:
         raise errors.SystemSetTimeException(
             msg="Not supported on dev server.",
-            definition=CommonErrorDef.NOT_IMPLEMENTED)
+            definition=CommonErrorDef.NOT_IMPLEMENTED,
+        )
 
     status = await _time_status()
-    if status.get('LocalRTC') is True or status.get('NTPSynchronized') is True:
+    if status.get("LocalRTC") is True or status.get("NTPSynchronized") is True:
         # TODO: Update this to handle RTC sync correctly once we introduce RTC
         raise errors.SystemTimeAlreadySynchronized(
-            'Cannot set system time; already synchronized with NTP or RTC')
+            "Cannot set system time; already synchronized with NTP or RTC"
+        )
     else:
         new_time_dt = new_time_dt.astimezone(tz=timezone.utc)
         new_time_str = new_time_dt.strftime("%Y-%m-%d %H:%M:%S")
-        log.info(f'Setting time to {new_time_str} UTC')
+        log.info(f"Setting time to {new_time_str} UTC")
         _, err = await _set_time(new_time_str)
         if err:
             raise errors.SystemSetTimeException(err)

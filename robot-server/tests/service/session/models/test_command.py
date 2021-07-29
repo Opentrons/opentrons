@@ -11,15 +11,13 @@ from robot_server.service.session.models import command, command_definitions
         command_definitions.ProtocolCommand.start_run,
         command_definitions.CalibrationCommand.move_to_deck,
         command_definitions.CheckCalibrationCommand.compare_point,
-    ])
+    ],
+)
 def test_empty(command_def: command_definitions.CommandDefinition):
     """Test creation of empty command request and response."""
-    request = command.CommandRequest.parse_obj({
-        "data": {
-            "command": command_def.value,
-            "data": {}
-        }
-    })
+    request = command.CommandRequest.parse_obj(
+        {"data": {"command": command_def.value, "data": {}}}
+    )
     assert request.data.command == command_def
     assert request.data.data == command.EmptyModel()
 
@@ -31,7 +29,7 @@ def test_empty(command_def: command_definitions.CommandDefinition):
         created_at=dt,
         started_at=None,
         completed_at=None,
-        result=None
+        result=None,
     )
 
     assert response.command == command_def
@@ -53,14 +51,12 @@ def test_empty(command_def: command_definitions.CommandDefinition):
         command_definitions.PipetteCommand.drop_tip,
         command_definitions.PipetteCommand.pick_up_tip,
         command_definitions.CalibrationCommand.jog,
-        command_definitions.CalibrationCommand.set_has_calibration_block
-    ])
+        command_definitions.CalibrationCommand.set_has_calibration_block,
+    ],
+)
 def test_requires_data(command_def: command_definitions.CommandDefinition):
     """Test creation of command requiring data will fail with empty body."""
     with pytest.raises(ValidationError):
-        command.CommandRequest.parse_obj({
-            "data": {
-                "command": command_def.value,
-                "data": {}
-            }
-        })
+        command.CommandRequest.parse_obj(
+            {"data": {"command": command_def.value, "data": {}}}
+        )

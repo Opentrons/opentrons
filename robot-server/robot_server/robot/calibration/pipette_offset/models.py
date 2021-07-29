@@ -6,18 +6,23 @@ from ..helper_classes import AttachedPipette, RequiredLabware, NextSteps
 
 class PipetteOffsetCalibrationSessionStatus(BaseModel):
     """The current status of a pipette offset calibration session."""
+
     instrument: AttachedPipette
     currentStep: str = Field(
-        ...,
-        description="Current step of pipette offset user flow")
+        ..., description="Current step of pipette offset user flow"
+    )
     labware: List[RequiredLabware]
-    shouldPerformTipLength: bool =\
-        Field(None, description="Does tip length calibration data exist for "
-                                "this pipette and tip rack combination")
+    shouldPerformTipLength: bool = Field(
+        None,
+        description="Does tip length calibration data exist for "
+        "this pipette and tip rack combination",
+    )
     supportedCommands: List[Optional[str]] = Field(
-        ..., description="A list of supported commands for this user flow")
-    nextSteps: Optional[NextSteps] =\
-        Field(None, description="Next Available Steps in Session")
+        ..., description="A list of supported commands for this user flow"
+    )
+    nextSteps: Optional[NextSteps] = Field(
+        None, description="Next Available Steps in Session"
+    )
 
     class Config:
         schema_extra = {
@@ -28,23 +33,19 @@ class PipetteOffsetCalibrationSessionStatus(BaseModel):
                         "name": "p300_single",
                         "tip_length": 51.7,
                         "mount": "left",
-                        "serial": "P3HS12123041"
+                        "serial": "P3HS12123041",
                     },
                     "currentStep": "sessionStarted",
-                    "nextSteps": {
-                        "links": {
-                            "loadLabware": {"url": "", "params": {}}
-                        }
-                    },
+                    "nextSteps": {"links": {"loadLabware": {"url": "", "params": {}}}},
                     "labware": [
-                      {
-                          "slot": "8",
-                          "loadName": "tiprack_loadname",
-                          "namespace": "opentrons",
-                          "version": "1",
-                          "isTiprack": "true",
-                          "definition": {"ordering": "the ordering section..."}
-                      },
+                        {
+                            "slot": "8",
+                            "loadName": "tiprack_loadname",
+                            "namespace": "opentrons",
+                            "version": "1",
+                            "isTiprack": "true",
+                            "definition": {"ordering": "the ordering section..."},
+                        },
                     ],
                     "shouldPerformTipLength": True,
                 }

@@ -33,22 +33,6 @@ ssh_opts ?= $(default_ssh_opts)
 ot_py_sources := $(filter %.py,$(shell $(SHX) find $(SRC_PATH)))
 ot_sources := $(ot_py_sources)
 
-# files and modules to format
-# TODO(mc, 2021-07-23): expand this to all files until we can format `.`
-ot_files_to_format := \
-	robot_server/errors \
-	robot_server/health \
-	robot_server/protocols \
-	robot_server/sessions \
-	robot_server/app.py \
-	robot_server/util.py \
-	tests/errors \
-	tests/health \
-	tests/protocols \
-	tests/sessions \
-	tests/test_app.py \
-	tests/test_util.py
-
 # Defined separately than the clean target so the wheel file doesn’t have to
 # depend on a PHONY target
 clean_cmd = $(SHX) rm -rf build dist .coverage coverage.xml '*.egg-info' '**/__pycache__' '**/*.pyc' 'robot_server/**/.mypy_cache'
@@ -101,12 +85,12 @@ test:
 .PHONY: lint
 lint:
 	$(python) -m mypy $(SRC_PATH) $(tests)
-	$(python) -m black --check $(ot_files_to_format)
+	$(python) -m black --check .
 	$(python) -m flake8 $(SRC_PATH) $(tests) setup.py
 
 .PHONY: format
 format:
-	$(python) -m black $(ot_files_to_format)
+	$(python) -m black .
 
 .PHONY: dev
 dev: export OT_ROBOT_SERVER_DOT_ENV_PATH ?= dev.env

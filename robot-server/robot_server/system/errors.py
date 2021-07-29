@@ -8,6 +8,7 @@ from robot_server.service.errors import (
 
 class SystemException(RobotServerError):
     """Base of all system exceptions."""
+
     pass
 
 

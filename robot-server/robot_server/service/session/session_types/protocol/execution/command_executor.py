@@ -10,16 +10,26 @@ if typing.TYPE_CHECKING:
 from opentrons.api import Session
 
 from robot_server.service.protocol.protocol import UploadedProtocol
-from robot_server.service.session.command_execution import CommandExecutor, \
-    Command, CompletedCommand, CommandResult
+from robot_server.service.session.command_execution import (
+    CommandExecutor,
+    Command,
+    CompletedCommand,
+    CommandResult,
+)
 from robot_server.service.session.configuration import SessionConfiguration
 from robot_server.service.session.errors import UnsupportedCommandException
-from robot_server.service.session.models.command_definitions import \
-    ProtocolCommand, CommandDefinitionType
-from robot_server.service.session.session_types.protocol.execution.\
-    protocol_runner import ProtocolRunner
-from robot_server.service.session.session_types.protocol.execution.worker \
-    import _Worker, WorkerListener, WorkerDirective
+from robot_server.service.session.models.command_definitions import (
+    ProtocolCommand,
+    CommandDefinitionType,
+)
+from robot_server.service.session.session_types.protocol.execution.protocol_runner import (  # noqa: E501
+    ProtocolRunner,
+)
+from robot_server.service.session.session_types.protocol.execution.worker import (
+    _Worker,
+    WorkerListener,
+    WorkerDirective,
+)
 from robot_server.util import duration
 from robot_server.service.session.session_types.protocol import models
 
@@ -30,34 +40,17 @@ log = logging.getLogger(__name__)
 class ProtocolCommandExecutor(CommandExecutor, WorkerListener):
     """The protocol command executor."""
 
-    STATE_COMMAND_MAP: typing.Dict[
-        'State',
-        typing.Set[CommandDefinitionType]
-    ] = {
-        'loaded': {
-            ProtocolCommand.start_run,
-            ProtocolCommand.start_simulate
-        },
-        'running': {
-            ProtocolCommand.cancel,
-            ProtocolCommand.pause
-        },
-        'error': set(),
-        'paused': {
-            ProtocolCommand.cancel,
-            ProtocolCommand.resume
-        },
-        'finished': {
-            ProtocolCommand.start_run,
-            ProtocolCommand.start_simulate
-        },
-        'stopped': set(),
+    STATE_COMMAND_MAP: typing.Dict["State", typing.Set[CommandDefinitionType]] = {
+        "loaded": {ProtocolCommand.start_run, ProtocolCommand.start_simulate},
+        "running": {ProtocolCommand.cancel, ProtocolCommand.pause},
+        "error": set(),
+        "paused": {ProtocolCommand.cancel, ProtocolCommand.resume},
+        "finished": {ProtocolCommand.start_run, ProtocolCommand.start_simulate},
+        "stopped": set(),
         None: set(),
     }
 
-    def __init__(self,
-                 protocol: UploadedProtocol,
-                 configuration: SessionConfiguration):
+    def __init__(self, protocol: UploadedProtocol, configuration: SessionConfiguration):
         """Constructor
 
         :param protocol: The protocol resource to use
@@ -66,7 +59,7 @@ class ProtocolCommandExecutor(CommandExecutor, WorkerListener):
         # We're using Session to manage state so I'm not
         #  adding states. Don't want to start with `None` and `stopped` seems
         #  the most reasonable start state.
-        self._worker_state: 'State' = 'stopped'
+        self._worker_state: "State" = "stopped"
         self._worker = self.create_worker(configuration, protocol, self)
         self._handlers: typing.Dict[CommandDefinitionType, typing.Any] = {
             ProtocolCommand.start_run: self._worker.handle_run,
@@ -79,9 +72,11 @@ class ProtocolCommandExecutor(CommandExecutor, WorkerListener):
         self._id_maker = IdMaker()
 
     @staticmethod
-    def create_worker(configuration: SessionConfiguration,
-                      protocol: UploadedProtocol,
-                      worker_listener: WorkerListener):
+    def create_worker(
+        configuration: SessionConfiguration,
+        protocol: UploadedProtocol,
+        worker_listener: WorkerListener,
+    ):
         """Create the _Worker instance that will handle commands and notify
         of progress"""
         # Create the protocol runner
@@ -90,22 +85,22 @@ class ProtocolCommandExecutor(CommandExecutor, WorkerListener):
             protocol=protocol,
             loop=loop,
             hardware=configuration.hardware,
-            motion_lock=configuration.motion_lock)
+            motion_lock=configuration.motion_lock,
+        )
         # The async worker to which all commands are delegated.
         return _Worker(
             protocol_runner=protocol_runner,
             listener=worker_listener,
-            loop=loop,)
+            loop=loop,
+        )
 
     async def execute(self, command: Command) -> CompletedCommand:
         """Command processing"""
         command_def = command.request.command
-        if command_def not in self.STATE_COMMAND_MAP.get(
-                self.current_state, {}
-        ):
+        if command_def not in self.STATE_COMMAND_MAP.get(self.current_state, {}):
             raise UnsupportedCommandException(
-                f"Can't execute '{command_def}' during "
-                f"state '{self.current_state}'")
+                f"Can't execute '{command_def}' during " f"state '{self.current_state}'"
+            )
 
         handler = self._handlers.get(command_def)
         if not handler:
@@ -128,19 +123,19 @@ class ProtocolCommandExecutor(CommandExecutor, WorkerListener):
         return CompletedCommand(
             request=command.request,
             meta=command.meta,
-            result=CommandResult(started_at=timed.start,
-                                 completed_at=timed.end))
+            result=CommandResult(started_at=timed.start, completed_at=timed.end),
+        )
 
     @property
     def events(self) -> typing.List[models.ProtocolSessionEvent]:
         return self._events
 
     @property
-    def current_state(self) -> 'State':
+    def current_state(self) -> "State":
         return self._worker_state
 
     @current_state.setter
-    def current_state(self, state: 'State'):
+    def current_state(self, state: "State"):
         log.info(f"New state: '{state}'")
         self._worker_state = state
 
@@ -166,34 +161,47 @@ class ProtocolCommandExecutor(CommandExecutor, WorkerListener):
     async def on_protocol_event(self, cmd: typing.Any):
         """worker listener callback"""
         # These are broker notifications from Session object.
-        topic = cmd.get('topic')
+        topic = cmd.get("topic")
         if topic == Session.TOPIC:
-            payload = cmd.get('payload')
+            payload = cmd.get("payload")
             if isinstance(payload, dict):
-                self.current_state = payload.get('state')
-            elif hasattr(payload, 'state'):
+                self.current_state = payload.get("state")
+            elif hasattr(payload, "state"):
                 self.current_state = payload.state
         else:
-            dollar_val = cmd.get('$')
-            event_name = cmd.get('name')
+            dollar_val = cmd.get("$")
+            event_name = cmd.get("name")
             event = None
-            if dollar_val == 'before':
+            if dollar_val == "before":
                 # text may be a format string using the payload vals as kwargs
-                text = deep_get(cmd, ('payload', 'text',), "")
+                text = deep_get(
+                    cmd,
+                    (
+                        "payload",
+                        "text",
+                    ),
+                    "",
+                )
                 if text:
-                    text = text.format(**cmd.get('payload', {}))
+                    text = text.format(**cmd.get("payload", {}))
                 event = models.ProtocolSessionEvent(
                     source=models.EventSource.protocol_event,
-                    event=f'{event_name}.start',
+                    event=f"{event_name}.start",
                     commandId=self._id_maker.create_id(),
-                    params={'text': text},
+                    params={"text": text},
                     timestamp=utc_now(),
                 )
-            elif dollar_val == 'after':
-                result = deep_get(cmd, ('payload', 'return',))
+            elif dollar_val == "after":
+                result = deep_get(
+                    cmd,
+                    (
+                        "payload",
+                        "return",
+                    ),
+                )
                 event = models.ProtocolSessionEvent(
                     source=models.EventSource.protocol_event,
-                    event=f'{event_name}.end',
+                    event=f"{event_name}.end",
                     commandId=self._id_maker.use_last_id(),
                     timestamp=utc_now(),
                     result=result,

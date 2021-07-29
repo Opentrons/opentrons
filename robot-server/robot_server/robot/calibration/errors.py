@@ -6,40 +6,42 @@ from robot_server.service.errors import ErrorDef, ErrorCreateDef
 class CalibrationError(ErrorDef):
     NO_PIPETTE_ON_MOUNT = ErrorCreateDef(
         status_code=HTTPStatus.FORBIDDEN,
-        title='No Pipette Attached',
-        format_string='No pipette present on {mount} mount')
+        title="No Pipette Attached",
+        format_string="No pipette present on {mount} mount",
+    )
     NO_PIPETTE_ATTACHED = ErrorCreateDef(
         status_code=HTTPStatus.FORBIDDEN,
-        title='No Pipette Attached',
-        format_string='Cannot start {flow} with fewer than one pipette')
+        title="No Pipette Attached",
+        format_string="Cannot start {flow} with fewer than one pipette",
+    )
     BAD_LABWARE_DEF = ErrorCreateDef(
         status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
-        title='Bad Labware Definition',
-        format_string='Bad definition for tip rack under calibration')
+        title="Bad Labware Definition",
+        format_string="Bad definition for tip rack under calibration",
+    )
     BAD_STATE_TRANSITION = ErrorCreateDef(
         status_code=HTTPStatus.CONFLICT,
-        title='Illegal State Transition',
-        format_string='The action {action} may not occur in the state {state}'
+        title="Illegal State Transition",
+        format_string="The action {action} may not occur in the state {state}",
     )
     NO_STATE_TRANSITION = ErrorCreateDef(
         status_code=HTTPStatus.CONFLICT,
-        title='No State Transition',
-        format_string='No transition available for state {state}'
+        title="No State Transition",
+        format_string="No transition available for state {state}",
     )
     UNMET_STATE_TRANSITION_REQ = ErrorCreateDef(
         status_code=HTTPStatus.CONFLICT,
-        title='Unmet State Transition Requirement',
-        format_string='The command handler {handler} may not occur in the'
-                      ' state {state} when "{condition}" is not true'
+        title="Unmet State Transition Requirement",
+        format_string="The command handler {handler} may not occur in the"
+        ' state {state} when "{condition}" is not true',
     )
     UNCALIBRATED_ROBOT = ErrorCreateDef(
         status_code=HTTPStatus.CONFLICT,
-        title='No Calibration Data Found',
-        format_string='Cannot start {flow} without robot calibration'
+        title="No Calibration Data Found",
+        format_string="Cannot start {flow} without robot calibration",
     )
     ERROR_DURING_TRANSITION = ErrorCreateDef(
         status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
-        title='Error During State Transition',
-        format_string='Event {action} failed to transition '
-                      'from {state}: {error}'
+        title="Error During State Transition",
+        format_string="Event {action} failed to transition " "from {state}: {error}",
     )

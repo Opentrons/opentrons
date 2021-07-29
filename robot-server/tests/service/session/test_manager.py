@@ -1,5 +1,5 @@
 import asyncio
-from mock import patch, AsyncMock
+from mock import patch, AsyncMock  # type: ignore[attr-defined]
 import pytest
 
 from robot_server.service.session.errors import SessionCreationException
@@ -11,37 +11,37 @@ from robot_server.service.session.models.session import SessionType
 @pytest.fixture
 async def session(session_manager, loop) -> BaseSession:
     """An added session"""
-    return await session_manager.add(session_type=SessionType.live_protocol,
-                                     session_meta_data=SessionMetaData())
+    return await session_manager.add(
+        session_type=SessionType.live_protocol, session_meta_data=SessionMetaData()
+    )
 
 
 @pytest.fixture
 def mock_session_create():
     """Patch of Session.create"""
-    with patch("robot_server.service.session."
-               "manager.LiveProtocolSession.create") as m:
+    with patch(
+        "robot_server.service.session." "manager.LiveProtocolSession.create"
+    ) as m:
         m.return_value = AsyncMock()
         yield m
 
 
-async def test_add_calls_session_create(session_manager,
-                                        mock_session_create,
-                                        session):
+async def test_add_calls_session_create(session_manager, mock_session_create, session):
     mock_session_create.assert_called_once()
-    assert mock_session_create.call_args[1]['configuration'] == \
-        session_manager._session_common
-    assert isinstance(mock_session_create.call_args[1]['instance_meta'],
-                      SessionMetaData)
+    assert (
+        mock_session_create.call_args[1]["configuration"]
+        == session_manager._session_common
+    )
+    assert isinstance(
+        mock_session_create.call_args[1]["instance_meta"], SessionMetaData
+    )
 
 
-async def test_add_no_class_doesnt_call_create(session_manager,
-                                               mock_session_create):
+async def test_add_no_class_doesnt_call_create(session_manager, mock_session_create):
     # Patch the type to class dict
-    with patch("robot_server.service.session.manager.SessionTypeToClass",
-               new={}):
+    with patch("robot_server.service.session.manager.SessionTypeToClass", new={}):
         with pytest.raises(SessionCreationException):
-            await session_manager.add(SessionType.live_protocol,
-                                      SessionMetaData())
+            await session_manager.add(SessionType.live_protocol, SessionMetaData())
         mock_session_create.assert_not_called()
 
 
@@ -60,8 +60,7 @@ async def test_remove_removes(session_manager, session):
 
 
 async def test_remove_calls_cleanup(session_manager):
-    session = await session_manager.add(SessionType.live_protocol,
-                                        SessionMetaData())
+    session = await session_manager.add(SessionType.live_protocol, SessionMetaData())
     session.clean_up = AsyncMock()
     await session_manager.remove(session.meta.identifier)
     session.clean_up.assert_called_once()
@@ -74,8 +73,9 @@ async def test_remove_active_session(session_manager, session):
 
 
 async def test_remove_inactive_session(session_manager, session):
-    active_session = await session_manager.add(SessionType.live_protocol,
-                                               SessionMetaData())
+    active_session = await session_manager.add(
+        SessionType.live_protocol, SessionMetaData()
+    )
     await session_manager.remove(session.meta.identifier)
     assert session_manager._active.active_id is active_session.meta.identifier
 
@@ -90,7 +90,10 @@ def test_get_by_id_not_found(session_manager):
 
 async def test_get_by_type(session_manager):
     sessions = await asyncio.gather(
-        *[session_manager.add(SessionType.live_protocol, SessionMetaData()) for _ in range(5)]  # noqa: E501
+        *[
+            session_manager.add(SessionType.live_protocol, SessionMetaData())
+            for _ in range(5)
+        ]
     )
     assert session_manager.get(SessionType.live_protocol) == tuple(sessions)
     assert session_manager.get(SessionType.calibration_check) == tuple()

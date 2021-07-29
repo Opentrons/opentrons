@@ -1,15 +1,20 @@
+import pytest
 from pathlib import Path
 from mock import MagicMock, patch, PropertyMock
-import pytest
+from typing import List
+
 from opentrons.api import Session
 from opentrons.hardware_control import ThreadedAsyncLock
 
 from robot_server.service.protocol.analyze import AnalysisResult, models
 from robot_server.service.protocol.contents import Contents
 from robot_server.service.protocol.protocol import (
-    UploadedProtocol, UploadedProtocolData)
-from robot_server.service.session.session_types.protocol.execution. \
-    protocol_runner import ProtocolRunner
+    UploadedProtocol,
+    UploadedProtocolData,
+)
+from robot_server.service.session.session_types.protocol.execution.protocol_runner import (  # noqa: E501
+    ProtocolRunner,
+)
 from robot_server.util import FileMeta
 
 
@@ -20,17 +25,15 @@ def uploaded_protocol_meta() -> UploadedProtocolData:
     return UploadedProtocolData(
         identifier="None",
         contents=Contents(
-            protocol_file=FileMeta(
-                path=Path("/some_path/abc.py"),
-                content_hash=""
-            ),
-            directory=mock_temp_dir
+            protocol_file=FileMeta(path=Path("/some_path/abc.py"), content_hash=""),
+            directory=mock_temp_dir,
         ),
         analysis_result=AnalysisResult(
             meta=models.Meta(apiLevel="123"),
             required_equipment=models.RequiredEquipment(
-                pipettes=[], labware=[], modules=[])
-        )
+                pipettes=[], labware=[], modules=[]
+            ),
+        ),
     )
 
 
@@ -49,15 +52,16 @@ def mock_context(mock_protocol):
 
 @pytest.fixture
 def protocol_runner(mock_protocol, loop, hardware):
-    setattr(hardware, 'sync', MagicMock())
-    return ProtocolRunner(protocol=mock_protocol,
-                          loop=loop,
-                          hardware=hardware,
-                          motion_lock=ThreadedAsyncLock())
+    setattr(hardware, "sync", MagicMock())
+    return ProtocolRunner(
+        protocol=mock_protocol,
+        loop=loop,
+        hardware=hardware,
+        motion_lock=ThreadedAsyncLock(),
+    )
 
 
-def test_load(protocol_runner, mock_context,
-              uploaded_protocol_meta, mock_protocol):
+def test_load(protocol_runner, mock_context, uploaded_protocol_meta, mock_protocol):
     with patch.object(Session, "build_and_prep") as mock:
         protocol_runner.load()
         mock_context.assert_called_once()
@@ -68,26 +72,35 @@ def test_load(protocol_runner, mock_context,
             loop=protocol_runner._loop,
             broker=protocol_runner._broker,
             motion_lock=protocol_runner._motion_lock,
-            extra_labware=[])
+            extra_labware=[],
+        )
 
 
-@pytest.mark.parametrize(argnames="func",
-                         argvalues=[ProtocolRunner.run,
-                                    ProtocolRunner.simulate,
-                                    ProtocolRunner.cancel,
-                                    ProtocolRunner.pause,
-                                    ProtocolRunner.resume])
+@pytest.mark.parametrize(
+    argnames="func",
+    argvalues=[
+        ProtocolRunner.run,
+        ProtocolRunner.simulate,
+        ProtocolRunner.cancel,
+        ProtocolRunner.pause,
+        ProtocolRunner.resume,
+    ],
+)
 def test_no_session_will_not_raise(func, protocol_runner, mock_context):
     func(protocol_runner)
     mock_context.assert_not_called()
 
 
-@pytest.mark.parametrize(argnames="func,target",
-                         argvalues=[[ProtocolRunner.run, "run"],
-                                    [ProtocolRunner.simulate, "refresh"],
-                                    [ProtocolRunner.cancel, "stop"],
-                                    [ProtocolRunner.pause, "pause"],
-                                    [ProtocolRunner.resume, "resume"]])
+@pytest.mark.parametrize(
+    argnames="func,target",
+    argvalues=[
+        [ProtocolRunner.run, "run"],
+        [ProtocolRunner.simulate, "refresh"],
+        [ProtocolRunner.cancel, "stop"],
+        [ProtocolRunner.pause, "pause"],
+        [ProtocolRunner.resume, "resume"],
+    ],
+)
 def test_session_calls(func, target, protocol_runner, mock_context):
     protocol_runner._session = MagicMock()
     func(protocol_runner)
@@ -95,8 +108,8 @@ def test_session_calls(func, target, protocol_runner, mock_context):
 
 
 def test_listeners(protocol_runner):
-    results1 = []
-    results2 = []
+    results1: List[int] = []
+    results2: List[int] = []
     protocol_runner.add_listener(results1.append)
     protocol_runner.add_listener(results2.append)
     protocol_runner._on_message(1)

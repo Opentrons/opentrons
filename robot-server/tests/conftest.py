@@ -15,8 +15,7 @@ from fastapi import routing
 from mock import MagicMock
 from typing import Any, Dict
 
-from opentrons.protocols.context.protocol_api.labware import \
-    LabwareImplementation
+from opentrons.protocols.context.protocol_api.labware import LabwareImplementation
 from starlette.testclient import TestClient
 from robot_server.app import app
 from robot_server.constants import API_VERSION_HEADER, API_VERSION_LATEST
@@ -35,9 +34,10 @@ from robot_server.service.session.manager import SessionManager
 test_router = routing.APIRouter()
 
 
-@test_router.get('/alwaysRaise')
+@test_router.get("/alwaysRaise")
 async def always_raise():
     raise RuntimeError
+
 
 app.include_router(test_router)
 
@@ -67,7 +67,6 @@ def hardware():
 
 @pytest.fixture
 def override_hardware(hardware):
-
     async def get_hardware_override() -> HardwareAPILike:
         """Override for get_hardware dependency"""
         return hardware
@@ -84,8 +83,8 @@ def api_client(override_hardware) -> TestClient:
 
 @pytest.fixture
 def api_client_no_errors(override_hardware) -> TestClient:
-    """ An API client that won't raise server exceptions.
-    Use only to test 500 pages; never use this for other tests. """
+    """An API client that won't raise server exceptions.
+    Use only to test 500 pages; never use this for other tests."""
     client = TestClient(app, raise_server_exceptions=False)
     client.headers.update({API_VERSION_HEADER: API_VERSION_LATEST})
     return client
@@ -101,13 +100,13 @@ def request_session():
 @pytest.fixture(scope="session")
 def server_temp_directory():
     new_dir = tempfile.mkdtemp()
-    os.environ['OT_API_CONFIG_DIR'] = new_dir
+    os.environ["OT_API_CONFIG_DIR"] = new_dir
     config.reload()
 
     yield new_dir
     shutil.rmtree(new_dir)
 
-    del os.environ['OT_API_CONFIG_DIR']
+    del os.environ["OT_API_CONFIG_DIR"]
 
 
 @pytest.fixture(scope="session")
@@ -116,14 +115,30 @@ def run_server(request_session, server_temp_directory):
     # In order to collect coverage we run using `coverage`.
     # `-a` is to append to existing `.coverage` file.
     # `--source` is the source code folder to collect coverage stats on.
-    with subprocess.Popen([sys.executable, "-m", "coverage", "run", "-a",
-                           "--source", "robot_server",
-                           "-m", "uvicorn", "robot_server:app",
-                           "--host", "localhost", "--port", "31950"],
-                          env={'OT_ROBOT_SERVER_DOT_ENV_PATH': "dev.env",
-                               'OT_API_CONFIG_DIR': server_temp_directory},
-                          stdout=subprocess.PIPE,
-                          stderr=subprocess.PIPE) as proc:
+    with subprocess.Popen(
+        [
+            sys.executable,
+            "-m",
+            "coverage",
+            "run",
+            "-a",
+            "--source",
+            "robot_server",
+            "-m",
+            "uvicorn",
+            "robot_server:app",
+            "--host",
+            "localhost",
+            "--port",
+            "31950",
+        ],
+        env={
+            "OT_ROBOT_SERVER_DOT_ENV_PATH": "dev.env",
+            "OT_API_CONFIG_DIR": server_temp_directory,
+        },
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    ) as proc:
         # Wait for a bit to get started by polling /health
         from requests.exceptions import ConnectionError
 
@@ -135,8 +150,9 @@ def run_server(request_session, server_temp_directory):
             else:
                 break
             time.sleep(0.5)
-        request_session.post("http://localhost:31950/robot/home",
-                             json={"target": "robot"})
+        request_session.post(
+            "http://localhost:31950/robot/home", json={"target": "robot"}
+        )
         yield proc
         proc.send_signal(signal.SIGTERM)
         proc.wait()
@@ -146,15 +162,12 @@ def run_server(request_session, server_temp_directory):
 def attach_pipettes(server_temp_directory):
     import json
 
-    pipette = {
-        "dropTipShake": True,
-        "model": "p300_multi_v1"
-    }
+    pipette = {"dropTipShake": True, "model": "p300_multi_v1"}
 
-    pipette_dir_path = os.path.join(server_temp_directory, 'pipettes')
-    pipette_file_path = os.path.join(pipette_dir_path, 'testpipette01.json')
+    pipette_dir_path = os.path.join(server_temp_directory, "pipettes")
+    pipette_file_path = os.path.join(pipette_dir_path, "testpipette01.json")
 
-    with open(pipette_file_path, 'w') as pipette_file:
+    with open(pipette_file_path, "w") as pipette_file:
         json.dump(pipette, pipette_file)
     yield
     os.remove(pipette_file_path)
@@ -165,26 +178,24 @@ def set_up_index_file_temporary_directory(server_temp_directory):
     delete.clear_calibrations()
     deck = Deck()
     labware_list = [
-        'nest_96_wellplate_2ml_deep',
-        'corning_384_wellplate_112ul_flat',
-        'geb_96_tiprack_1000ul',
-        'nest_12_reservoir_15ml',
-        'opentrons_96_tiprack_10ul']
+        "nest_96_wellplate_2ml_deep",
+        "corning_384_wellplate_112ul_flat",
+        "geb_96_tiprack_1000ul",
+        "nest_12_reservoir_15ml",
+        "opentrons_96_tiprack_10ul",
+    ]
     for idx, name in enumerate(labware_list):
         parent = deck.position_for(idx + 1)
         definition = labware.get_labware_definition(name)
-        lw = labware.Labware(
-            implementation=LabwareImplementation(definition, parent)
-        )
+        lw = labware.Labware(implementation=LabwareImplementation(definition, parent))
         labware.save_calibration(lw, Point(0, 0, 0))
 
 
 @pytest.fixture
 def set_up_pipette_offset_temp_directory(server_temp_directory):
-    attached_pip_list = ['123', '321']
+    attached_pip_list = ["123", "321"]
     mount_list = [Mount.LEFT, Mount.RIGHT]
-    definition =\
-        labware.get_labware_definition('opentrons_96_filtertiprack_200ul')
+    definition = labware.get_labware_definition("opentrons_96_filtertiprack_200ul")
     def_hash = helpers.hash_labware_def(definition)
     for pip, mount in zip(attached_pip_list, mount_list):
         modify.save_pipette_calibration(
@@ -192,37 +203,36 @@ def set_up_pipette_offset_temp_directory(server_temp_directory):
             pip_id=pip,
             mount=mount,
             tiprack_hash=def_hash,
-            tiprack_uri='opentrons/opentrons_96_filtertiprack_200ul/1')
+            tiprack_uri="opentrons/opentrons_96_filtertiprack_200ul/1",
+        )
 
 
 @pytest.fixture
 def set_up_tip_length_temp_directory(server_temp_directory):
-    attached_pip_list = ['123', '321']
+    attached_pip_list = ["123", "321"]
     tip_length_list = [30.5, 31.5]
-    definition =\
-        labware.get_labware_definition('opentrons_96_filtertiprack_200ul')
+    definition = labware.get_labware_definition("opentrons_96_filtertiprack_200ul")
     def_hash = helpers.hash_labware_def(definition)
     for pip, tip_len in zip(attached_pip_list, tip_length_list):
-        cal: Dict[str, Any] = {def_hash: {
-            'tipLength': tip_len,
-            'lastModified': datetime.now()}}
+        cal: Dict[str, Any] = {
+            def_hash: {"tipLength": tip_len, "lastModified": datetime.now()}
+        }
         modify.save_tip_length_calibration(pip, cal)
 
 
 @pytest.fixture
 def set_up_deck_calibration_temp_directory(server_temp_directory):
-    attitude = [
-        [1.0008, 0.0052, 0.0],
-        [-0.0, 0.992, 0.0],
-        [0.0, 0.0, 1.0]]
-    modify.save_robot_deck_attitude(attitude, 'pip_1', 'fakehash')
+    attitude = [[1.0008, 0.0052, 0.0], [-0.0, 0.992, 0.0], [0.0, 0.0, 1.0]]
+    modify.save_robot_deck_attitude(attitude, "pip_1", "fakehash")
 
 
 @pytest.fixture
 def session_manager(hardware) -> SessionManager:
-    return SessionManager(hardware=hardware,
-                          motion_lock=ThreadedAsyncLock(),
-                          protocol_manager=ProtocolManager())
+    return SessionManager(
+        hardware=hardware,
+        motion_lock=ThreadedAsyncLock(),
+        protocol_manager=ProtocolManager(),
+    )
 
 
 @pytest.fixture
@@ -230,13 +240,10 @@ def set_enable_http_protocol_sessions(request_session):
     """For integration tests that need to set then clear the
     enableHttpProtocolSessions feature flag"""
     url = "http://localhost:31950/settings"
-    data = {
-        "id": "enableHttpProtocolSessions",
-        "value": True
-    }
+    data = {"id": "enableHttpProtocolSessions", "value": True}
     request_session.post(url, json=data)
     yield None
-    data['value'] = None
+    data["value"] = None
     request_session.post(url, json=data)
 
 
@@ -244,11 +251,19 @@ def set_enable_http_protocol_sessions(request_session):
 def get_labware_fixture():
     def _get_labware_fixture(fixture_name):
         with open(
-            (pathlib.Path(__file__).parent / '..' / '..' / 'shared-data' /
-             'labware' / 'fixtures' / '2' / f'{fixture_name}.json'),
-            'rb'
+            (
+                pathlib.Path(__file__).parent
+                / ".."
+                / ".."
+                / "shared-data"
+                / "labware"
+                / "fixtures"
+                / "2"
+                / f"{fixture_name}.json"
+            ),
+            "rb",
         ) as f:
-            return json.loads(f.read().decode('utf-8'))
+            return json.loads(f.read().decode("utf-8"))
 
     return _get_labware_fixture
 
@@ -260,72 +275,14 @@ def minimal_labware_def():
             "displayName": "minimal labware",
             "displayCategory": "other",
             "displayVolumeUnits": "mL",
-
         },
-        "cornerOffsetFromSlot": {
-            "x": 10,
-            "y": 10,
-            "z": 5
-        },
+        "cornerOffsetFromSlot": {"x": 10, "y": 10, "z": 5},
         "parameters": {
             "isTiprack": False,
             "loadName": "minimal_labware_def",
             "isMagneticModuleCompatible": True,
             "quirks": ["a quirk"],
-            "format": "irregular"
-        },
-        "ordering": [["A1"], ["A2"]],
-        "wells": {
-            "A1": {
-              "depth": 40,
-              "totalLiquidVolume": 100,
-              "diameter": 30,
-              "x": 0,
-              "y": 0,
-              "z": 0,
-              "shape": "circular"
-            },
-            "A2": {
-              "depth": 40,
-              "totalLiquidVolume": 100,
-              "diameter": 30,
-              "x": 10,
-              "y": 0,
-              "z": 0,
-              "shape": "circular"
-            }
-        },
-        "dimensions": {
-            "xDimension": 1.0,
-            "yDimension": 2.0,
-            "zDimension": 3.0
-        },
-        "groups": [],
-        "brand": {
-            "brand": "opentrons"
-        },
-        "version": 1,
-        "schemaVersion": 2,
-        "namespace": "opentronstest"
-    }
-
-
-@pytest.fixture
-def custom_tiprack_def():
-    return {
-        "metadata": {
-            "displayName": "minimal labware"
-        },
-        "cornerOffsetFromSlot": {
-            "x": 10,
-            "y": 10,
-            "z": 5
-        },
-        "parameters": {
-            "isTiprack": True,
-            "tipLength": 55.3,
-            "tipOverlap": 2.8,
-            "loadName": "minimal_labware_def"
+            "format": "irregular",
         },
         "ordering": [["A1"], ["A2"]],
         "wells": {
@@ -336,7 +293,7 @@ def custom_tiprack_def():
                 "x": 0,
                 "y": 0,
                 "z": 0,
-                "shape": "circular"
+                "shape": "circular",
             },
             "A2": {
                 "depth": 40,
@@ -345,23 +302,61 @@ def custom_tiprack_def():
                 "x": 10,
                 "y": 0,
                 "z": 0,
-                "shape": "circular"
-            }
+                "shape": "circular",
+            },
         },
-        "dimensions": {
-            "xDimension": 1.0,
-            "yDimension": 2.0,
-            "zDimension": 3.0
+        "dimensions": {"xDimension": 1.0, "yDimension": 2.0, "zDimension": 3.0},
+        "groups": [],
+        "brand": {"brand": "opentrons"},
+        "version": 1,
+        "schemaVersion": 2,
+        "namespace": "opentronstest",
+    }
+
+
+@pytest.fixture
+def custom_tiprack_def():
+    return {
+        "metadata": {"displayName": "minimal labware"},
+        "cornerOffsetFromSlot": {"x": 10, "y": 10, "z": 5},
+        "parameters": {
+            "isTiprack": True,
+            "tipLength": 55.3,
+            "tipOverlap": 2.8,
+            "loadName": "minimal_labware_def",
         },
+        "ordering": [["A1"], ["A2"]],
+        "wells": {
+            "A1": {
+                "depth": 40,
+                "totalLiquidVolume": 100,
+                "diameter": 30,
+                "x": 0,
+                "y": 0,
+                "z": 0,
+                "shape": "circular",
+            },
+            "A2": {
+                "depth": 40,
+                "totalLiquidVolume": 100,
+                "diameter": 30,
+                "x": 10,
+                "y": 0,
+                "z": 0,
+                "shape": "circular",
+            },
+        },
+        "dimensions": {"xDimension": 1.0, "yDimension": 2.0, "zDimension": 3.0},
         "namespace": "custom",
-        "version": 1
+        "version": 1,
     }
 
 
 @pytest.fixture
 def clear_custom_tiprack_def_dir():
-    tiprack_path = config.get_custom_tiprack_def_path() \
-        / 'custom/minimal_labware_def/1.json'
+    tiprack_path = (
+        config.get_custom_tiprack_def_path() / "custom/minimal_labware_def/1.json"
+    )
     try:
         os.remove(tiprack_path)
     except FileNotFoundError:

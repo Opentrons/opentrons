@@ -1,21 +1,19 @@
 from typing import Dict, Type
 
-from robot_server.service.session.models.command_definitions import \
-    CommandDefinition, CalibrationCommand
-from robot_server.robot.calibration.util import (
-    SimpleStateMachine, StateTransitionError)
+from robot_server.service.session.models.command_definitions import (
+    CommandDefinition,
+    CalibrationCommand,
+)
+from robot_server.robot.calibration.util import SimpleStateMachine, StateTransitionError
 from .constants import (
     PipetteOffsetCalibrationState as POCState,
-    PipetteOffsetWithTipLengthCalibrationState as POWTState)
+    PipetteOffsetWithTipLengthCalibrationState as POWTState,
+)
 
-PipetteOffsetTransitions =\
-    Dict[POCState, Dict[CommandDefinition, POCState]]
-PipetteOffsetWithTLTransitions =\
-    Dict[POWTState, Dict[CommandDefinition, POWTState]]
+PipetteOffsetTransitions = Dict[POCState, Dict[CommandDefinition, POCState]]
+PipetteOffsetWithTLTransitions = Dict[POWTState, Dict[CommandDefinition, POWTState]]
 PIP_OFFSET_CAL_TRANSITIONS: PipetteOffsetTransitions = {
-    POCState.sessionStarted: {
-        CalibrationCommand.load_labware: POCState.labwareLoaded
-    },
+    POCState.sessionStarted: {CalibrationCommand.load_labware: POCState.labwareLoaded},
     POCState.labwareLoaded: {
         CalibrationCommand.move_to_tip_rack: POCState.preparingPipette,
     },
@@ -42,9 +40,7 @@ PIP_OFFSET_CAL_TRANSITIONS: PipetteOffsetTransitions = {
     POCState.calibrationComplete: {
         CalibrationCommand.move_to_tip_rack: POCState.calibrationComplete,
     },
-    POCState.WILDCARD: {
-        CalibrationCommand.exit: POCState.sessionExited
-    }
+    POCState.WILDCARD: {CalibrationCommand.exit: POCState.sessionExited},
 }
 
 PIP_OFFSET_WITH_TL_TRANSITIONS: PipetteOffsetWithTLTransitions = {
@@ -52,15 +48,13 @@ PIP_OFFSET_WITH_TL_TRANSITIONS: PipetteOffsetWithTLTransitions = {
         CalibrationCommand.load_labware: POWTState.labwareLoaded
     },
     POWTState.labwareLoaded: {
-        CalibrationCommand.move_to_reference_point:
-            POWTState.measuringNozzleOffset
+        CalibrationCommand.move_to_reference_point: POWTState.measuringNozzleOffset
     },
     POWTState.measuringNozzleOffset: {
         CalibrationCommand.save_offset: POWTState.measuringNozzleOffset,
         CalibrationCommand.jog: POWTState.measuringNozzleOffset,
         CalibrationCommand.move_to_tip_rack: POWTState.preparingPipette,
-        CalibrationCommand.invalidate_last_action:
-            POWTState.measuringNozzleOffset,
+        CalibrationCommand.invalidate_last_action: POWTState.measuringNozzleOffset,
     },
     POWTState.preparingPipette: {
         CalibrationCommand.jog: POWTState.preparingPipette,
@@ -69,8 +63,7 @@ PIP_OFFSET_WITH_TL_TRANSITIONS: PipetteOffsetWithTLTransitions = {
     },
     POWTState.inspectingTip: {
         CalibrationCommand.invalidate_tip: POWTState.preparingPipette,
-        CalibrationCommand.move_to_reference_point:
-            POWTState.measuringTipOffset,
+        CalibrationCommand.move_to_reference_point: POWTState.measuringTipOffset,
     },
     POWTState.measuringTipOffset: {
         CalibrationCommand.jog: POWTState.measuringTipOffset,
@@ -78,8 +71,7 @@ PIP_OFFSET_WITH_TL_TRANSITIONS: PipetteOffsetWithTLTransitions = {
         CalibrationCommand.invalidate_last_action: POWTState.preparingPipette,
     },
     POWTState.tipLengthComplete: {
-        CalibrationCommand.set_has_calibration_block:
-            POWTState.tipLengthComplete,
+        CalibrationCommand.set_has_calibration_block: POWTState.tipLengthComplete,
         CalibrationCommand.move_to_deck: POWTState.joggingToDeck,
     },
     POWTState.joggingToDeck: {
@@ -96,17 +88,14 @@ PIP_OFFSET_WITH_TL_TRANSITIONS: PipetteOffsetWithTLTransitions = {
     POWTState.calibrationComplete: {
         CalibrationCommand.move_to_tip_rack: POWTState.calibrationComplete,
     },
-    POWTState.WILDCARD: {
-        CalibrationCommand.exit: POWTState.sessionExited
-    }
+    POWTState.WILDCARD: {CalibrationCommand.exit: POWTState.sessionExited},
 }
 
 
 class PipetteOffsetCalibrationStateMachine:
     def __init__(self):
         self._state_machine = SimpleStateMachine(
-            states=set(s for s in POCState),
-            transitions=PIP_OFFSET_CAL_TRANSITIONS
+            states=set(s for s in POCState), transitions=PIP_OFFSET_CAL_TRANSITIONS
         )
         self._state = POCState
         self._current_state = POCState.sessionStarted
@@ -150,8 +139,7 @@ class PipetteOffsetWithTipLengthStateMachine:
     def set_state(self, state: POWTState):
         self._current_state = state
 
-    def get_next_state(
-            self, from_state: POWTState, command: CommandDefinition):
+    def get_next_state(self, from_state: POWTState, command: CommandDefinition):
         next_state = self._state_machine.get_next_state(from_state, command)
         if next_state:
             return next_state
