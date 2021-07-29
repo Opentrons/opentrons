@@ -35,5 +35,8 @@ class PythonFileRunner(AbstractFileRunner):
     async def run(self) -> None:
         """Run the protocol to completion."""
         self._protocol_engine.play()
-        await self._executor.execute()
-        await self._protocol_engine.stop()
+
+        try:
+            await self._executor.execute()
+        finally:
+            await self._protocol_engine.stop()

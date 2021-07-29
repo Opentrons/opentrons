@@ -105,3 +105,21 @@ async def test_python_runner_run(
         await executor.execute(),
         await protocol_engine.stop(),
     )
+
+
+async def test_python_runner_run_always_stops(
+    decoy: Decoy,
+    protocol_engine: ProtocolEngine,
+    executor: PythonExecutor,
+    subject: PythonFileRunner,
+) -> None:
+    """It should stop the engine even if Python execution fails."""
+    decoy.when(await executor.execute()).then_raise(RuntimeError("oh no"))
+
+    with pytest.raises(RuntimeError, match="oh no"):
+        await subject.run()
+
+    decoy.verify(
+        await protocol_engine.stop(),
+        times=1,
+    )
