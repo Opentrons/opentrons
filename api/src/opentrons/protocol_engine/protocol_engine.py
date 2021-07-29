@@ -106,10 +106,9 @@ class ProtocolEngine:
     def halt(self) -> None:
         """Halt execution, stopping all motion and cancelling future commands.
 
-        This method is synchronous to ensure the halt reaches hardware
-        as immediately as possible. You should call `stop` after
-        calling `halt` for cleanup and to allow the engine to settle before
-        continuing with recovery steps.
+        This method is synchronous to allow the halt to reach hardware
+        immediately. You should call `stop` after calling `halt` for cleanup
+        and to allow the engine to settle and recover.
         """
         self._state_store.handle_action(StopAction())
         self._queue_worker.cancel()
@@ -136,5 +135,8 @@ class ProtocolEngine:
             )
 
         self._state_store.handle_action(StopAction())
-        await self._queue_worker.join()
-        await self._hardware_api.stop(home_after=False)
+
+        try:
+            await self._queue_worker.join()
+        finally:
+            await self._hardware_api.stop(home_after=False)
