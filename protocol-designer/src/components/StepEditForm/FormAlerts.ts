@@ -12,7 +12,7 @@ import {
   getVisibleProfileFormLevelErrors,
 } from './utils'
 import { Dispatch } from 'redux'
-import { StepIdType } from '../../form-types'
+import { ProfileItem, StepIdType } from '../../form-types'
 import { StepFieldName } from '../../steplist/fieldLevel'
 import { BaseState } from '../../types'
 import { ProfileFormError } from '../../steplist/formLevel/profileErrors'
@@ -46,7 +46,9 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
     errors: formLevelErrors,
   })
   // deal with special-case dynamic field form-level errors
-  const { profileItemsById } = stepFormSelectors.getHydratedUnsavedForm(state)
+  const unsavedForm = stepFormSelectors.getHydratedUnsavedForm(state)
+  const profileItemsById: Record<string, ProfileItem> | null | undefined =
+    unsavedForm?.profileItemsById
   let visibleDynamicFieldFormErrors: ProfileFormError[] = []
 
   if (profileItemsById != null) {
