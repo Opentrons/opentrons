@@ -48,7 +48,8 @@ export const getProtocolCalibrationComplete: (
         reason: 'calibrate deck',
       }
     }
-    Object.values(protocolCalStatus).forEach(pipette => {
+    const protocolCalStatusValues = Object.values(protocolCalStatus)
+    protocolCalStatusValues.forEach(pipette => {
       if (
         pipette.exactMatch !== PipetteConstants.MATCH ||
         pipette.exactMatch !== PipetteConstants.INEXACT_MATCH
@@ -57,12 +58,17 @@ export const getProtocolCalibrationComplete: (
           complete: false,
           reason: 'attach pipette',
         }
-      } else if (pipette.lastModifiedDate == null) {
+      }
+    })
+    protocolCalStatusValues.forEach(pipette => {
+      if (pipette.lastModifiedDate == null) {
         return {
           complete: false,
           reason: 'calibrate pipette',
         }
       }
+    })
+    protocolCalStatusValues.forEach(pipette => {
       pipette.tipRacks.forEach(tiprack => {
         if (tiprack.lastModifiedDate == null) {
           return {
@@ -72,6 +78,7 @@ export const getProtocolCalibrationComplete: (
         }
       })
     })
+
     return { complete: true }
   }
 )
