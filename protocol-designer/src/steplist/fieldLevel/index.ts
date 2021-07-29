@@ -11,6 +11,7 @@ import {
 import {
   maskToInteger,
   maskToFloat,
+  numberOrNull,
   onlyPositiveNumbers,
   defaultTo,
   composeMaskers,
@@ -136,14 +137,14 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
     castValue: Number,
   },
   aspirate_delay_mmFromBottom: {
-    castValue: Number,
+    castValue: numberOrNull,
   },
   dispense_delay_seconds: {
     maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers, defaultTo(1)),
     castValue: Number,
   },
   dispense_delay_mmFromBottom: {
-    castValue: Number,
+    castValue: numberOrNull,
   },
   pauseHour: {
     maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),

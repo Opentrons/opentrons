@@ -1,4 +1,5 @@
 import { InnerDelayArgs } from '@opentrons/step-generation'
+import { getDefaultMmFromBottom } from '../../../components/StepEditForm/fields/TipPositionField/utils'
 import {
   DelayCheckboxFields,
   DelaySecondFields,
@@ -15,14 +16,22 @@ export function getMoveLiquidDelayData(
 ): InnerDelayArgs | null {
   const checkbox = hydratedFormData[checkboxField]
   const seconds = hydratedFormData[secondsField]
-  const mmFromBottom = hydratedFormData[mmFromBottomField]
-
+  let mmFromBottom: number | undefined
+  const mmFromBottomFormValue = hydratedFormData[mmFromBottomField]
+  if (typeof mmFromBottomFormValue === 'number') {
+    mmFromBottom = mmFromBottomFormValue
+  } else if (mmFromBottomFormValue === null) {
+    mmFromBottom = getDefaultMmFromBottom({
+      name: mmFromBottomField,
+      wellDepthMm: NaN /* NOTE: `wellDepthMm` should not be used for delay offsets */,
+    })
+  }
   if (
     checkbox &&
     typeof seconds === 'number' &&
     seconds > 0 &&
     typeof mmFromBottom === 'number' &&
-    mmFromBottom > 0
+    mmFromBottom >= 0
   ) {
     return {
       seconds,

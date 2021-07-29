@@ -23,7 +23,14 @@ export const trimDecimals = (
   const trimRegex = new RegExp(`(\\d*[.]{1}\\d{${decimals}})(\\d*)`)
   return String(rawValue).replace(trimRegex, (match, group1) => group1)
 }
-
+// if it's null, keep it null. Otherwise, try to cast to number
+export const numberOrNull = (rawValue: unknown): number | null => {
+  if (rawValue === null) {
+    return null
+  } else {
+    return Number(rawValue)
+  }
+}
 /*********************
  **  Value Limiters  **
  **********************/
