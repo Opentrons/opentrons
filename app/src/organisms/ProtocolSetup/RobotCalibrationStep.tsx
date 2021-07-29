@@ -53,7 +53,7 @@ export const RobotCalibrationStep: React.FunctionComponent<Props> = (
               pipetteData.exactMatch === PipetteConstants.MATCH
 
             return (
-              <div>
+              <div key={pipetteData.lastModified}>
                 <span>
                   {mount} Mount: {pipetteData.pipetteDisplayName}
                 </span>
@@ -79,7 +79,7 @@ export const RobotCalibrationStep: React.FunctionComponent<Props> = (
             return null
           } else {
             return (
-              <div>
+              <div key={pipetteData.pipetteDisplayName}>
                 <span>{pipetteData.pipetteDisplayName}</span>
                 {pipetteData.tipRacks.map(tiprack => (
                   <>

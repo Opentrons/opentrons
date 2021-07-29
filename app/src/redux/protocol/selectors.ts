@@ -16,6 +16,7 @@ import { getPipetteNameSpecs } from '@opentrons/shared-data'
 
 import type { State } from '../types'
 import type { ProtocolData, ProtocolType, ProtocolFile } from './types'
+import * as PipetteConstants from '../pipettes/constants'
 
 type ProtocolInfoSelector = (
   state: State
@@ -227,17 +228,17 @@ export const getProtocolMethod: (
   }
 )
 
-export interface ProtocolPipetteData {
-  key: string
-  mount: 'left' | 'right'
-  specs: PipetteNameSpecs
-  tipracks: Array<{}>
+export interface ProtocolLabwareData {
+  pipetteKey: string
+  mount: typeof PipetteConstants.LEFT | typeof PipetteConstants.RIGHT
+  pipetteSpecs: PipetteNameSpecs
+  tipracks: LabwareDefinition2[]
 }
 
 export const getProtocolLabwareData: (
   state: State
-) => ProtocolPipetteData[] = createSelector(getProtocolData, protocolData => {
-  // question about typing these protocol data objects
+) => ProtocolLabwareData[] = createSelector(getProtocolData, protocolData => {
+  // where are the type definitions of these protocol data objects?
   const { pipettes, labwareDefinitions, commands } = protocolData
   const tipRackCommands = commands.filter(
     commandObject => commandObject.command === 'pickUpTip'
@@ -245,14 +246,13 @@ export const getProtocolLabwareData: (
   const protocolPipetteValues = Object.values(pipettes)
   const protocolPipetteKeys = Object.keys(pipettes)
 
-  const pipetteData: ProtocolPipetteData[] = []
+  const pipetteData: ProtocolLabwareData[] = []
 
-  // construct new object with pipette key, mount, specs, and list of tiprackuris in protocol
   protocolPipetteValues.forEach((pipette, index) => {
     const pipetteObject = {
-      key: protocolPipetteKeys[index],
+      pipetteKey: protocolPipetteKeys[index],
       mount: pipette.mount,
-      specs: getPipetteNameSpecs(pipette.name),
+      pipetteSpecs: getPipetteNameSpecs(pipette.name),
       tipracks: [],
     }
     pipetteData.push(pipetteObject)
@@ -265,7 +265,7 @@ export const getProtocolLabwareData: (
 
   pipetteData.forEach(pipette => {
     tipRackCommands.forEach(command => {
-      if (pipette.key === command.params.pipette) {
+      if (pipette.pipetteKey === command.params.pipette) {
         const tiprackDefinition = tipracks.find(tiprack =>
           command.params.labware.includes(tiprack.parameters.loadName)
         )

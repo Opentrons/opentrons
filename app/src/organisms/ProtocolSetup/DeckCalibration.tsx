@@ -17,7 +17,6 @@ export const DeckCalibration: React.FunctionComponent<Props> = (
   const { robotName } = props
   const { t } = useTranslation(['robot_calibration', 'shared'])
 
-  // Deck Calibration Data
   const deckCalData: DeckCalibrationData | null = useSelector(
     (state: State) => {
       return Calibration.getDeckCalibrationData(state, robotName)
@@ -27,7 +26,6 @@ export const DeckCalibration: React.FunctionComponent<Props> = (
     return null
   }
 
-  // this will  always have a last calibrated date
   const buildDeckLastCalibrated: (
     deckCalData: DeckCalibrationData
   ) => string = deckCalData => {

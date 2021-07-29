@@ -273,19 +273,19 @@ export const getUncalibratedTipracksByMount: (
   }
 )
 
-interface PipetteMatchesByMount {
+interface ProtocolPipettesMatchByMount {
   left: string | null
   right: string | null
 }
 
-export const getProtocolPipetteMatch: (
+export const getProtocolPipettesMatch: (
   state: State,
   robotName: string
-) => PipetteMatchesByMount = createSelector(
+) => ProtocolPipettesMatchByMount = createSelector(
   getAttachedPipettes,
   getProtocolLabwareData,
   (attachedPipettes, protocolLabwareData) => {
-    return Constants.PIPETTE_MOUNTS.reduce<PipetteMatchesByMount>(
+    return Constants.PIPETTE_MOUNTS.reduce<ProtocolPipettesMatchByMount>(
       (result, mount) => {
         const attachedPipette = attachedPipettes[mount]
         const protocolPipette = protocolLabwareData.find(pipette => {
@@ -294,12 +294,14 @@ export const getProtocolPipetteMatch: (
         if (protocolPipette !== null && protocolPipette !== undefined) {
           if (
             pipettesAreInexactMatch(
-              protocolPipette.specs.name,
+              protocolPipette.pipetteSpecs.name,
               attachedPipette?.modelSpecs
             )
           ) {
             result[mount] = Constants.INEXACT_MATCH
-          } else if (protocolPipette?.specs.name === attachedPipette?.name) {
+          } else if (
+            protocolPipette?.pipetteSpecs.name === attachedPipette?.name
+          ) {
             result[mount] = Constants.MATCH
           } else {
             result[mount] = Constants.INCOMPATIBLE
@@ -316,10 +318,10 @@ interface ProtocolPipetteCalibrationsByMount {
   left: {
     pipetteDisplayName: string
     exactMatch: string | null
-    lastModifiedDate: string | null
+    lastModifiedDate?: string | null
     tipRacks: Array<{
       displayName: string
-      lastModifiedDate: string | null
+      lastModifiedDate?: string | null
     }>
   } | null
   right: {
@@ -328,7 +330,7 @@ interface ProtocolPipetteCalibrationsByMount {
     lastModifiedDate?: string | null
     tipRacks: Array<{
       displayName: string
-      lastModifiedDate: string | null
+      lastModifiedDate?: string | null
     }>
   } | null
 }
@@ -338,7 +340,7 @@ export const getProtocolPipetteCalibrationInfo: (
   robotName: string
 ) => ProtocolPipetteCalibrationsByMount = createSelector(
   getProtocolLabwareData,
-  getProtocolPipetteMatch,
+  getProtocolPipettesMatch,
   getAttachedPipetteCalibrations,
   (protocolLabwareData, protocolPipetteMatch, attachedPipetteCalibrations) => {
     return Constants.PIPETTE_MOUNTS.reduce<ProtocolPipetteCalibrationsByMount>(
@@ -348,7 +350,7 @@ export const getProtocolPipetteCalibrationInfo: (
         })
         if (protocolPipette !== null && protocolPipette !== undefined) {
           result[mount] = {
-            pipetteDisplayName: protocolPipette.specs.displayName,
+            pipetteDisplayName: protocolPipette.pipetteSpecs.displayName,
             exactMatch: protocolPipetteMatch[mount],
             lastModifiedDate: null,
             tipRacks: [],
@@ -357,6 +359,7 @@ export const getProtocolPipetteCalibrationInfo: (
             protocolPipetteMatch[mount] === Constants.INEXACT_MATCH ||
             protocolPipetteMatch[mount] === Constants.MATCH
           ) {
+            // why is this type error happening? I set result[mount] above
             result[mount].lastModifiedDate =
               attachedPipetteCalibrations[mount].offset?.lastModified
           }
