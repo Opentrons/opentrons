@@ -215,6 +215,7 @@ async def test_stop_after_wait(
     decoy: Decoy,
     state_store: StateStore,
     queue_worker: QueueWorker,
+    hardware_api: HardwareAPI,
     subject: ProtocolEngine,
 ) -> None:
     """It should be able to stop the engine after waiting for commands to complete."""
@@ -224,10 +225,11 @@ async def test_stop_after_wait(
         await state_store.wait_for(condition=state_store.commands.get_all_complete),
         state_store.handle_action(StopAction()),
         await queue_worker.join(),
+        await hardware_api.stop(home_after=False),
     )
 
 
-async def test_halt(
+def test_halt(
     decoy: Decoy,
     state_store: StateStore,
     queue_worker: QueueWorker,

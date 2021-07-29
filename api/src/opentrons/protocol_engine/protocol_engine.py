@@ -137,3 +137,4 @@ class ProtocolEngine:
 
         self._state_store.handle_action(StopAction())
         await self._queue_worker.join()
+        await self._hardware_api.stop(home_after=False)
