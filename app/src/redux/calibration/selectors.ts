@@ -1,4 +1,8 @@
+import { createSelector } from 'reselect'
 import type { State } from '../types'
+import * as PipetteConstants from '../pipettes/constants'
+import { getProtocolPipetteCalibrationInfo } from '../pipettes'
+
 import type {
   CalibrationStatus,
   DeckCalibrationStatus,
@@ -25,3 +29,49 @@ export const getDeckCalibrationData = (
 ): DeckCalibrationData | null => {
   return getCalibrationStatus(state, robotName)?.deckCalibration.data ?? null
 }
+
+export interface ProtocolCalibration {
+  complete: boolean
+  reason?: string
+}
+
+export const getProtocolCalibrationComplete: (
+  state: State,
+  robotName: string
+) => ProtocolCalibration = createSelector(
+  getDeckCalibrationStatus,
+  getProtocolPipetteCalibrationInfo,
+  (deckCalStatus, protocolCalStatus) => {
+    if (deckCalStatus !== 'OK') {
+      return {
+        complete: false,
+        reason: 'calibrate deck',
+      }
+    }
+    Object.values(protocolCalStatus).forEach(pipette => {
+      if (
+        pipette.exactMatch !== PipetteConstants.MATCH ||
+        pipette.exactMatch !== PipetteConstants.INEXACT_MATCH
+      ) {
+        return {
+          complete: false,
+          reason: 'attach pipette',
+        }
+      } else if (pipette.lastModifiedDate == null) {
+        return {
+          complete: false,
+          reason: 'calibrate pipette',
+        }
+      }
+      pipette.tipRacks.forEach(tiprack => {
+        if (tiprack.lastModifiedDate == null) {
+          return {
+            complete: false,
+            reason: 'calibrate tiprack',
+          }
+        }
+      })
+    })
+    return { complete: true }
+  }
+)

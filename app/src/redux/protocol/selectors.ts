@@ -1,12 +1,19 @@
 import path from 'path'
 import startCase from 'lodash/startCase'
+import uniq from 'lodash/uniq'
+import partition from 'lodash/partition'
 
 import { createSelector } from 'reselect'
 
 import { fileIsJson } from './protocol-data'
 import { createLogger } from '../../logger'
 
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type {
+  LabwareDefinition2,
+  PipetteNameSpecs,
+} from '@opentrons/shared-data'
+import { getPipetteNameSpecs } from '@opentrons/shared-data'
+
 import type { State } from '../types'
 import type { ProtocolData, ProtocolType, ProtocolFile } from './types'
 
@@ -219,3 +226,54 @@ export const getProtocolMethod: (
     return `${METHOD_OT_API}${apiVersion !== null ? ` v${apiVersion}` : ''}`
   }
 )
+
+export interface ProtocolPipetteData {
+  key: string
+  mount: 'left' | 'right'
+  specs: PipetteNameSpecs
+  tipracks: Array<{}>
+}
+
+export const getProtocolLabwareData: (
+  state: State
+) => ProtocolPipetteData[] = createSelector(getProtocolData, protocolData => {
+  // question about typing these protocol data objects
+  const { pipettes, labwareDefinitions, commands } = protocolData
+  const tipRackCommands = commands.filter(
+    commandObject => commandObject.command === 'pickUpTip'
+  )
+  const protocolPipetteValues = Object.values(pipettes)
+  const protocolPipetteKeys = Object.keys(pipettes)
+
+  const pipetteData: ProtocolPipetteData[] = []
+
+  // construct new object with pipette key, mount, specs, and list of tiprackuris in protocol
+  protocolPipetteValues.forEach((pipette, index) => {
+    const pipetteObject = {
+      key: protocolPipetteKeys[index],
+      mount: pipette.mount,
+      specs: getPipetteNameSpecs(pipette.name),
+      tipracks: [],
+    }
+    pipetteData.push(pipetteObject)
+  })
+
+  const [tipracks] = partition(
+    labwareDefinitions,
+    lw => lw.parameters.isTiprack
+  )
+
+  pipetteData.forEach(pipette => {
+    tipRackCommands.forEach(command => {
+      if (pipette.key === command.params.pipette) {
+        const tiprackDefinition = tipracks.find(tiprack =>
+          command.params.labware.includes(tiprack.parameters.loadName)
+        )
+        pipette.tipracks.push(tiprackDefinition)
+      }
+      pipette.tipracks = uniq(pipette.tipracks)
+    })
+  })
+
+  return pipetteData
+})

@@ -17,8 +17,10 @@ import { ModuleSetup } from './ModuleSetup'
 import { getModuleRenderCoords } from './utils/getModuleRenderCoords'
 import { getLabwareRenderCoords } from './utils/getLabwareRenderCoords'
 
+import { RobotCalibrationStep } from './RobotCalibrationStep'
 import type { JsonProtocolFile } from '@opentrons/shared-data'
 import type { State } from '../../redux/types'
+import { getConnectedRobot } from '../../redux/discovery/selectors'
 
 const ROBOT_CALIBRATION_STEP_KEY = 'robot_calibration_step' as const
 const MODULE_SETUP_KEY = 'module_setup_step' as const
@@ -43,9 +45,11 @@ export function RunSetupCard(): JSX.Element | null {
     protocolData,
     standardDeckDef as any
   )
+  const robot = useSelector((state: State) => getConnectedRobot(state))
 
   if (
     protocolData == null ||
+    robot == null ||
     ('metadata' in protocolData && Object.keys(protocolData).length === 1)
   )
     return null
@@ -62,9 +66,7 @@ export function RunSetupCard(): JSX.Element | null {
   }
 
   const StepComponentMap: Record<StepKey, JSX.Element> = {
-    [ROBOT_CALIBRATION_STEP_KEY]: (
-      <Text marginTop={SPACING_3}>TODO: robot calibration step contents</Text>
-    ),
+    [ROBOT_CALIBRATION_STEP_KEY]: <RobotCalibrationStep robot={robot} />,
     [MODULE_SETUP_KEY]: (
       <ModuleSetup
         moduleRenderCoords={moduleRenderCoords}

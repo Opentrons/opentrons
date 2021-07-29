@@ -7,8 +7,6 @@ import {
   getProtocolDescription,
 } from '../../redux/protocol'
 
-import type { State } from '../../redux/types'
-
 interface ProtocolMetadata {
   author: string | null
   lastUpdated: number | null

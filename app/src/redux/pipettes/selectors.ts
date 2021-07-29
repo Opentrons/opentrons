@@ -5,6 +5,7 @@ import head from 'lodash/head'
 import {
   getPipetteModelSpecs,
   getPipetteNameSpecs,
+  getLabwareDefURI,
 } from '@opentrons/shared-data'
 
 import {
@@ -32,6 +33,7 @@ import type {
 } from '@opentrons/shared-data'
 import type { State } from '../types'
 import type { TipracksByMountMap } from '../robot/types'
+import { getProtocolLabwareData } from '../protocol'
 
 import { PIPETTE_MOUNTS } from '../robot/constants'
 
@@ -267,6 +269,116 @@ export const getUncalibratedTipracksByMount: (
         return result
       },
       { left: [], right: [] }
+    )
+  }
+)
+
+interface PipetteMatchesByMount {
+  left: string | null
+  right: string | null
+}
+
+export const getProtocolPipetteMatch: (
+  state: State,
+  robotName: string
+) => PipetteMatchesByMount = createSelector(
+  getAttachedPipettes,
+  getProtocolLabwareData,
+  (attachedPipettes, protocolLabwareData) => {
+    return Constants.PIPETTE_MOUNTS.reduce<PipetteMatchesByMount>(
+      (result, mount) => {
+        const attachedPipette = attachedPipettes[mount]
+        const protocolPipette = protocolLabwareData.find(pipette => {
+          return pipette.mount === mount
+        })
+        if (protocolPipette !== null && protocolPipette !== undefined) {
+          if (
+            pipettesAreInexactMatch(
+              protocolPipette.specs.name,
+              attachedPipette?.modelSpecs
+            )
+          ) {
+            result[mount] = Constants.INEXACT_MATCH
+          } else if (protocolPipette?.specs.name === attachedPipette?.name) {
+            result[mount] = Constants.MATCH
+          } else {
+            result[mount] = Constants.INCOMPATIBLE
+          }
+        }
+        return result
+      },
+      { left: null, right: null }
+    )
+  }
+)
+
+interface ProtocolPipetteCalibrationsByMount {
+  left: {
+    pipetteDisplayName: string
+    exactMatch: string | null
+    lastModifiedDate: string | null
+    tipRacks: Array<{
+      displayName: string
+      lastModifiedDate: string | null
+    }>
+  } | null
+  right: {
+    pipetteDisplayName: string
+    exactMatch: string | null
+    lastModifiedDate?: string | null
+    tipRacks: Array<{
+      displayName: string
+      lastModifiedDate: string | null
+    }>
+  } | null
+}
+
+export const getProtocolPipetteCalibrationInfo: (
+  state: State,
+  robotName: string
+) => ProtocolPipetteCalibrationsByMount = createSelector(
+  getProtocolLabwareData,
+  getProtocolPipetteMatch,
+  getAttachedPipetteCalibrations,
+  (protocolLabwareData, protocolPipetteMatch, attachedPipetteCalibrations) => {
+    return Constants.PIPETTE_MOUNTS.reduce<ProtocolPipetteCalibrationsByMount>(
+      (result, mount) => {
+        const protocolPipette = protocolLabwareData.find(pipette => {
+          return pipette.mount === mount
+        })
+        if (protocolPipette !== null && protocolPipette !== undefined) {
+          result[mount] = {
+            pipetteDisplayName: protocolPipette.specs.displayName,
+            exactMatch: protocolPipetteMatch[mount],
+            lastModifiedDate: null,
+            tipRacks: [],
+          }
+          if (
+            protocolPipetteMatch[mount] === Constants.INEXACT_MATCH ||
+            protocolPipetteMatch[mount] === Constants.MATCH
+          ) {
+            result[mount].lastModifiedDate =
+              attachedPipetteCalibrations[mount].offset?.lastModified
+          }
+
+          protocolPipette?.tipracks.forEach(tiprack => {
+            let lastTiprackDate = null
+            if (
+              getLabwareDefURI(tiprack) ===
+              attachedPipetteCalibrations[mount].tipLength?.uri
+            ) {
+              lastTiprackDate =
+                attachedPipetteCalibrations[mount].tipLength?.lastModified
+            }
+            result[mount].tipRacks.push({
+              displayName: tiprack.metadata.displayName,
+              lastModifiedDate: lastTiprackDate,
+            })
+          })
+        }
+        return result
+      },
+      { left: null, right: null }
     )
   }
 )
