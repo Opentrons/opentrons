@@ -237,7 +237,7 @@ def magdeck_g_codes() -> List[GCode]:
 
     for g_code in g_code_list:
         if len(g_code) > 1:
-            g_codes = ', '.join([code.g_code for code in g_code])
+            g_codes = ', '.join(code.g_code for code in g_code)
             raise Exception('Hey, you forgot to put a comma between the G-Codes for '
                             f'{g_codes}')
 
