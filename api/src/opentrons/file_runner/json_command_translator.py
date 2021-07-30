@@ -1,4 +1,4 @@
-"""Translation of JSON protocol atomic commands into ProtocolEngine commands."""
+"""Translation of JSON protocol commands into ProtocolEngine commands."""
 from typing import Dict, List
 
 from opentrons.types import DeckSlotName, MountType
