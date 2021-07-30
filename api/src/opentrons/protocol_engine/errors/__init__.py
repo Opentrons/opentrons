@@ -91,6 +91,6 @@ class FailedToPlanMoveError(ProtocolEngineError):
 
 
 class ProtocolEngineStoppedError(ProtocolEngineError):
-    """An error raised when attempting an action with a stopped ProtocolEngine."""
+    """An error raised when attempting an invalid action with a stopped engine."""
 
     pass

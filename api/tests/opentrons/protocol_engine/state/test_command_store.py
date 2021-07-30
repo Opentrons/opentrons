@@ -1,8 +1,6 @@
 """Tests for the command lifecycle state."""
-import pytest
 from collections import OrderedDict
 
-from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.state.commands import CommandState, CommandStore
 
 from opentrons.protocol_engine.state.actions import (
@@ -106,10 +104,14 @@ def test_command_store_handles_stop_action() -> None:
     )
 
 
-def test_command_store_cannot_restart_after_Stop() -> None:
+def test_command_store_cannot_restart_after_stop() -> None:
     """It should reject a play action after a stop action."""
     subject = CommandStore()
     subject.handle_action(StopAction())
+    subject.handle_action(PlayAction())
 
-    with pytest.raises(errors.ProtocolEngineStoppedError):
-        subject.handle_action(PlayAction())
+    assert subject.state == CommandState(
+        is_running=False,
+        stop_requested=True,
+        commands_by_id=OrderedDict(),
+    )

@@ -1,11 +1,11 @@
 """Labware state store tests."""
 import pytest
 from collections import OrderedDict
-from typing import Sequence, Tuple
+from typing import List, NamedTuple, Optional, Sequence, Tuple, Type, Union
 
 from opentrons.protocol_engine import commands as cmd, errors
 from opentrons.protocol_engine.state.commands import CommandState, CommandView
-
+from opentrons.protocol_engine.state.actions import PlayAction, PauseAction
 
 from .command_fixtures import (
     create_pending_command,
@@ -223,3 +223,60 @@ def test_get_stop_requested() -> None:
 
     subject = get_command_view(stop_requested=False)
     assert subject.get_stop_requested() is False
+
+
+class ActionAllowedSpec(NamedTuple):
+    """Spec data to test CommandView.validate_action_allowed."""
+
+    subject: CommandView
+    action: Union[PlayAction, PauseAction]
+    expected_error: Optional[Type[errors.ProtocolEngineError]]
+
+
+action_allowed_specs: List[ActionAllowedSpec] = [
+    ActionAllowedSpec(
+        subject=get_command_view(stop_requested=False, is_running=False),
+        action=PlayAction(),
+        expected_error=None,
+    ),
+    ActionAllowedSpec(
+        subject=get_command_view(stop_requested=False, is_running=True),
+        action=PlayAction(),
+        expected_error=None,
+    ),
+    ActionAllowedSpec(
+        subject=get_command_view(stop_requested=True, is_running=False),
+        action=PlayAction(),
+        expected_error=errors.ProtocolEngineStoppedError,
+    ),
+    ActionAllowedSpec(
+        subject=get_command_view(stop_requested=False, is_running=False),
+        action=PauseAction(),
+        expected_error=None,
+    ),
+    ActionAllowedSpec(
+        subject=get_command_view(stop_requested=False, is_running=True),
+        action=PauseAction(),
+        expected_error=None,
+    ),
+    ActionAllowedSpec(
+        subject=get_command_view(stop_requested=True, is_running=False),
+        action=PauseAction(),
+        expected_error=errors.ProtocolEngineStoppedError,
+    ),
+]
+
+
+@pytest.mark.parametrize(ActionAllowedSpec._fields, action_allowed_specs)
+def test_validate_action_allowed(
+    subject: CommandView,
+    action: Union[PlayAction, PauseAction],
+    expected_error: Optional[Type[errors.ProtocolEngineError]],
+) -> None:
+    """It should validate allowed play/pause actions."""
+    if expected_error is None:
+        subject.validate_action_allowed(action)
+
+    else:
+        with pytest.raises(expected_error):
+            subject.validate_action_allowed(action)

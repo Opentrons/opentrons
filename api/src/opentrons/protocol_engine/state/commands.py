@@ -2,7 +2,7 @@
 from __future__ import annotations
 from collections import OrderedDict
 from dataclasses import dataclass, replace
-from typing import List, Optional
+from typing import List, Optional, Union
 
 from ..commands import Command, CommandStatus
 from ..errors import CommandDoesNotExistError, ProtocolEngineStoppedError
@@ -43,10 +43,8 @@ class CommandStore(HasState[CommandState], HandlesActions):
             self._state = replace(self._state, commands_by_id=commands_by_id)
 
         elif isinstance(action, PlayAction):
-            if self._state.stop_requested:
-                raise ProtocolEngineStoppedError("Cannot start a stopped protocol.")
-
-            self._state = replace(self._state, is_running=True)
+            if not self._state.stop_requested:
+                self._state = replace(self._state, is_running=True)
 
         elif isinstance(action, PauseAction):
             self._state = replace(self._state, is_running=False)
@@ -146,3 +144,15 @@ class CommandView(HasState[CommandState]):
         A command may still be executing while the engine is stopping.
         """
         return self._state.stop_requested
+
+    def validate_action_allowed(self, action: Union[PlayAction, PauseAction]) -> None:
+        """Validate if a PlayAction or PauseAction is allowed, raising if not.
+
+        For safety / reliability reasons, a StopAction is always allowed.
+
+        Raises:
+            ProtocolEngineStoppedError: the engine has been stopped.
+        """
+        if self._state.stop_requested:
+            action_desc = "play" if isinstance(action, PlayAction) else "pause"
+            raise ProtocolEngineStoppedError(f"Cannot {action_desc} a stopped engine.")

@@ -182,7 +182,10 @@ def test_play(
     """It should be able to start executing queued commands."""
     subject.play()
 
-    decoy.verify(state_store.handle_action(PlayAction()))
+    decoy.verify(
+        state_store.commands.validate_action_allowed(PlayAction()),
+        state_store.handle_action(PlayAction()),
+    )
 
 
 def test_pause(
@@ -193,7 +196,10 @@ def test_pause(
     """It should be able to pause executing queued commands."""
     subject.pause()
 
-    decoy.verify(state_store.handle_action(PauseAction()))
+    decoy.verify(
+        state_store.commands.validate_action_allowed(PauseAction()),
+        state_store.handle_action(PauseAction()),
+    )
 
 
 async def test_stop(
