@@ -55,14 +55,16 @@ class ProtocolEngine:
 
     def play(self) -> None:
         """Start or resume executing commands in the queue."""
-        self._state_store.commands.validate_action_allowed(PlayAction())
-        self._state_store.handle_action(PlayAction())
+        action = PlayAction()
+        self._state_store.commands.validate_action_allowed(action)
+        self._state_store.handle_action(action)
         self._queue_worker.start()
 
     def pause(self) -> None:
         """Pause executing commands in the queue."""
-        self._state_store.commands.validate_action_allowed(PauseAction())
-        self._state_store.handle_action(PauseAction())
+        action = PauseAction()
+        self._state_store.commands.validate_action_allowed(action)
+        self._state_store.handle_action(action)
 
     def add_command(self, request: CommandRequest) -> Command:
         """Add a command to the `ProtocolEngine`'s queue.
