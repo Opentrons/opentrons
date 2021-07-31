@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import List
+from typing import List, Optional
 from opentrons.drivers.asyncio.communication import SerialConnection
 from dataclasses import dataclass
 from opentrons.hardware_control.emulation.app import \
@@ -28,29 +28,26 @@ class GCodeWatcher:
 
     def __init__(self) -> None:
         self._command_list: List[WatcherData] = []
-        self._old_write_return = SerialConnection.send_data
+        self._original_send_data = SerialConnection.send_data
 
     def __enter__(self) -> GCodeWatcher:
         """Patch the send command function"""
-        async def _patch(_self: SerialConnection, data: str, *args, **kwargs) -> str:
+        async def _patch(_self: SerialConnection, data: str, retries: int = 0,
+                         timeout: Optional[float] = None) -> str:
             """
             Side-effect function that gathers arguments passed to
             SerialConnection.send_data and stores them internally.
 
-            Note: Does not do anything with the kwargs. They data
-            provided in them is not required. It is still required that
-            the parameter be specified in the method signature though.
-
             Args:
                 _self: the SerialConnection instance
                 data: the raw sent GCODE
-                *args: ignored further args
-                **kwargs: ignored further keyword args
+                retries: number of retries
+                timeout: optional timeout
 
             Returns:
                 the response
             """
-            response = await self._old_write_return(_self, data, *args, **kwargs)
+            response = await self._original_send_data(_self, data, retries, timeout)
             self._command_list.append(
                 WatcherData(
                     raw_g_code=data,
@@ -60,12 +57,14 @@ class GCodeWatcher:
             )
             return response
 
-        SerialConnection.send_data = _patch
+        # mypy error "Cannot assign to a method" is ignored
+        SerialConnection.send_data = _patch  # type: ignore
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         """Reset the the patch"""
-        SerialConnection.send_command = self._old_write_return
+        # mypy error "Cannot assign to a method" is ignored
+        SerialConnection.send_data = self._original_send_data  # type: ignore
 
     @classmethod
     def _parse_device(cls, serial_connection: SerialConnection):
