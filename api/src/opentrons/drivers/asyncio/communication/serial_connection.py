@@ -70,6 +70,7 @@ class SerialConnection:
         self._name = name
         self._ack = ack.encode()
         self._retry_wait_time_seconds = retry_wait_time_seconds
+        self._send_data_lock = asyncio.Lock()
 
     async def send_command(
             self, command: CommandBuilder, retries: int = 0,
@@ -91,6 +92,24 @@ class SerialConnection:
                                     timeout=timeout)
 
     async def send_data(
+            self, data: str, retries: int = 0, timeout: Optional[float] = None
+    ) -> str:
+        """
+        Send data and return the response.
+
+        Args:
+            data: The data to send.
+            retries: number of times to retry in case of timeout
+            timeout: optional override of default timeout in seconds
+
+        Returns: The command response
+
+        Raises: SerialException
+        """
+        async with self._send_data_lock:
+            return await self._send_data(data=data, retries=retries, timeout=timeout)
+
+    async def _send_data(
             self, data: str, retries: int = 0, timeout: Optional[float] = None
     ) -> str:
         """
