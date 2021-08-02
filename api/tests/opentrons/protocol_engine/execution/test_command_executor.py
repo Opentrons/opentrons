@@ -6,7 +6,7 @@ from pydantic import BaseModel
 from typing import Optional, Type, cast
 
 from opentrons.protocol_engine.errors import ProtocolEngineError
-from opentrons.protocol_engine.resources import ResourceProviders
+from opentrons.protocol_engine.resources import ModelUtils
 from opentrons.protocol_engine.state import StateStore, UpdateCommandAction
 from opentrons.protocol_engine.commands import (
     AbstractCommandImpl,
@@ -56,9 +56,9 @@ def run_control(decoy: Decoy) -> RunControlHandler:
 
 
 @pytest.fixture
-def resources(decoy: Decoy) -> ResourceProviders:
-    """Get a mocked out ResourceProviders."""
-    return decoy.mock(cls=ResourceProviders)
+def model_utils(decoy: Decoy) -> ModelUtils:
+    """Get a mocked out ModelUtils."""
+    return decoy.mock(cls=ModelUtils)
 
 
 @pytest.fixture
@@ -74,7 +74,7 @@ def subject(
     movement: MovementHandler,
     pipetting: PipettingHandler,
     run_control: RunControlHandler,
-    resources: ResourceProviders,
+    model_utils: ModelUtils,
     command_mapper: CommandMapper,
 ) -> CommandExecutor:
     """Get a CommandExecutor test subject with its dependencies mocked out."""
@@ -84,7 +84,7 @@ def subject(
         movement=movement,
         pipetting=pipetting,
         run_control=run_control,
-        resources=resources,
+        model_utils=model_utils,
         command_mapper=command_mapper,
     )
 
@@ -109,7 +109,7 @@ async def test_execute(
     movement: MovementHandler,
     pipetting: PipettingHandler,
     run_control: RunControlHandler,
-    resources: ResourceProviders,
+    model_utils: ModelUtils,
     command_mapper: CommandMapper,
     subject: CommandExecutor,
 ) -> None:
@@ -180,7 +180,7 @@ async def test_execute(
 
     decoy.when(await command_impl.execute(command_data)).then_return(command_result)
 
-    decoy.when(resources.model_utils.get_timestamp()).then_return(
+    decoy.when(model_utils.get_timestamp()).then_return(
         datetime(year=2022, month=2, day=2),
         datetime(year=2023, month=3, day=3),
     )
@@ -218,7 +218,7 @@ async def test_execute_raises_protocol_engine_error(
     movement: MovementHandler,
     pipetting: PipettingHandler,
     run_control: RunControlHandler,
-    resources: ResourceProviders,
+    model_utils: ModelUtils,
     command_mapper: CommandMapper,
     subject: CommandExecutor,
 ) -> None:
@@ -289,7 +289,7 @@ async def test_execute_raises_protocol_engine_error(
 
     decoy.when(await command_impl.execute(command_data)).then_raise(command_error)
 
-    decoy.when(resources.model_utils.get_timestamp()).then_return(
+    decoy.when(model_utils.get_timestamp()).then_return(
         datetime(year=2022, month=2, day=2),
         datetime(year=2023, month=3, day=3),
     )

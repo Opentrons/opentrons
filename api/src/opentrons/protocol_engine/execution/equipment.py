@@ -8,8 +8,8 @@ from opentrons.types import MountType
 from opentrons.hardware_control.api import API as HardwareAPI
 
 from ..errors import FailedToLoadPipetteError, LabwareDefinitionDoesNotExistError
-from ..resources import ResourceProviders
-from ..state import StateStore, StateView
+from ..resources import LabwareDataProvider, ModelUtils
+from ..state import StateStore
 from ..types import LabwareLocation, PipetteName
 
 
@@ -32,24 +32,23 @@ class LoadedPipette:
 class EquipmentHandler:
     """Implementation logic for labware, pipette, and module loading."""
 
-    _hardware: HardwareAPI
+    _hardware_api: HardwareAPI
     _state_store: StateStore
-    _resources: ResourceProviders
+    _labware_data_provider: LabwareDataProvider
+    _model_utils: ModelUtils
 
     def __init__(
         self,
-        hardware: HardwareAPI,
+        hardware_api: HardwareAPI,
         state_store: StateStore,
-        resources: ResourceProviders,
+        labware_data_provider: Optional[LabwareDataProvider] = None,
+        model_utils: Optional[ModelUtils] = None,
     ) -> None:
         """Initialize an EquipmentHandler instance."""
-        self._hardware = hardware
+        self._hardware_api = hardware_api
         self._state_store = state_store
-        self._resources = resources
-
-    @property
-    def _state(self) -> StateView:
-        return self._state_store
+        self._labware_data_provider = labware_data_provider or LabwareDataProvider()
+        self._model_utils = model_utils or ModelUtils()
 
     async def load_labware(
         self,
@@ -72,13 +71,11 @@ class EquipmentHandler:
         Returns:
             A LoadedLabware object.
         """
-        labware_id = (
-            labware_id if labware_id else self._resources.model_utils.generate_id()
-        )
+        labware_id = labware_id if labware_id else self._model_utils.generate_id()
 
         try:
             # Try to use existing definition in state.
-            definition = self._state.labware.get_definition_by_uri(
+            definition = self._state_store.labware.get_definition_by_uri(
                 uri_from_details(
                     load_name=load_name,
                     namespace=namespace,
@@ -86,13 +83,13 @@ class EquipmentHandler:
                 )
             )
         except LabwareDefinitionDoesNotExistError:
-            definition = await self._resources.labware_data.get_labware_definition(
+            definition = await self._labware_data_provider.get_labware_definition(
                 load_name=load_name,
                 namespace=namespace,
                 version=version,
             )
 
-        calibration = await self._resources.labware_data.get_labware_calibration(
+        calibration = await self._labware_data_provider.get_labware_calibration(
             definition=definition,
             location=location,
         )
@@ -121,7 +118,7 @@ class EquipmentHandler:
             A LoadedPipette object.
         """
         other_mount = mount.other_mount()
-        other_pipette = self._state.pipettes.get_pipette_data_by_mount(
+        other_pipette = self._state_store.pipettes.get_pipette_data_by_mount(
             other_mount,
         )
 
@@ -134,14 +131,10 @@ class EquipmentHandler:
         # pipette existence check
         # TODO(mc, 2021-04-16): reconcile PipetteName enum with PipetteName union
         try:
-            await self._hardware.cache_instruments(cache_request)  # type: ignore[arg-type]  # noqa: E501
+            await self._hardware_api.cache_instruments(cache_request)  # type: ignore[arg-type]  # noqa: E501
         except RuntimeError as e:
             raise FailedToLoadPipetteError(str(e)) from e
 
-        pipette_id = (
-            pipette_id
-            if pipette_id is not None
-            else self._resources.model_utils.generate_id()
-        )
+        pipette_id = pipette_id or self._model_utils.generate_id()
 
         return LoadedPipette(pipette_id=pipette_id)

@@ -14,8 +14,8 @@ class LabwareDataProvider:
 
     # NOTE(mc, 2020-10-18): async to allow file reading and parsing to be
     # async on a worker thread in the future
+    @staticmethod
     async def get_labware_definition(
-        self,
         load_name: str,
         namespace: str,
         version: int,
@@ -27,8 +27,8 @@ class LabwareDataProvider:
 
     # NOTE(mc, 2020-10-18): async to allow file reading and parsing to be
     # async on a worker thread in the future
+    @staticmethod
     async def get_labware_calibration(
-        self,
         definition: LabwareDefinition,
         location: LabwareLocation,
     ) -> Tuple[float, float, float]:

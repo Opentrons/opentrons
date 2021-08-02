@@ -50,7 +50,7 @@ def python_protocol_file(tmp_path: Path) -> ProtocolFile:
 @pytest.fixture
 async def engine(hardware: HardwareAPI) -> ProtocolEngine:
     """Get a real ProtocolEngine hooked into a simulating HardwareAPI."""
-    return await create_protocol_engine(hardware=hardware)
+    return await create_protocol_engine(hardware_api=hardware)
 
 
 @pytest.fixture

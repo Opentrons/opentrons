@@ -1,5 +1,6 @@
 """Command execution module."""
 
+from .create_queue_worker import create_queue_worker
 from .command_executor import CommandExecutor
 from .queue_worker import QueueWorker
 from .equipment import EquipmentHandler, LoadedLabware, LoadedPipette
@@ -17,4 +18,6 @@ __all__ = [
     "MovementHandler",
     "PipettingHandler",
     "RunControlHandler",
+    "QueueWorker",
+    "create_queue_worker",
 ]

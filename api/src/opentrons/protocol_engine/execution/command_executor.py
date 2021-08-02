@@ -1,8 +1,9 @@
 """Command side-effect execution logic container."""
 from logging import getLogger
+from typing import Optional
 
 from ..state import StateStore, UpdateCommandAction
-from ..resources import ResourceProviders
+from ..resources import ModelUtils
 from ..commands import CommandStatus, CommandMapper
 from .equipment import EquipmentHandler
 from .movement import MovementHandler
@@ -26,8 +27,8 @@ class CommandExecutor:
         movement: MovementHandler,
         pipetting: PipettingHandler,
         run_control: RunControlHandler,
-        command_mapper: CommandMapper,
-        resources: ResourceProviders,
+        command_mapper: Optional[CommandMapper] = None,
+        model_utils: Optional[ModelUtils] = None,
     ) -> None:
         """Initialize the CommandExecutor with access to its dependencies."""
         self._state_store = state_store
@@ -35,8 +36,8 @@ class CommandExecutor:
         self._movement = movement
         self._pipetting = pipetting
         self._run_control = run_control
-        self._command_mapper = command_mapper
-        self._resources = resources
+        self._command_mapper = command_mapper or CommandMapper()
+        self._model_utils = model_utils or ModelUtils()
 
     async def execute(self, command_id: str) -> None:
         """Run a given command's execution procedure.
@@ -53,7 +54,7 @@ class CommandExecutor:
             run_control=self._run_control,
         )
 
-        started_at = self._resources.model_utils.get_timestamp()
+        started_at = self._model_utils.get_timestamp()
         running_command = self._command_mapper.update_command(
             command=command,
             status=CommandStatus.RUNNING,
@@ -79,7 +80,7 @@ class CommandExecutor:
             error = str(e)
             completed_status = CommandStatus.FAILED
 
-        completed_at = self._resources.model_utils.get_timestamp()
+        completed_at = self._model_utils.get_timestamp()
         completed_command = self._command_mapper.update_command(
             command=running_command,
             result=result,
