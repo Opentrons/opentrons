@@ -1,0 +1,22 @@
+{
+  "$otSharedSchema": "module/schemas/2",
+  "moduleType": "magneticModuleType",
+  "model": "magneticModuleV1",
+  "labwareOffset": {
+    "x": 0.125,
+    "y": -0.125,
+    "z": 82.25
+  },
+  "dimensions": {
+    "bareOverallHeight": 110.152,
+    "overLabwareHeight": 4.052
+  },
+  "calibrationPoint": {
+    "x": 124.875,
+    "y": 2.75
+  },
+  "displayName": "Magnetic Module GEN1",
+  "quirks": [],
+  "slotTransforms": {},
+  "compatibleWith": []
+}

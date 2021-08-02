@@ -34,12 +34,11 @@
       "description": "A physical feature of the deck",
       "required": ["footprint"],
       "properties": {
-        "footprint": { "$ref": "#/definitions/pathDValue" },
-        "correspondingLocation": {
+        "layerName": {
           "type": "string",
-          "format": "uri-reference",
-          "description": "A path to a location entry that corresponds with this feature"
-        }
+          "description": "Unique identifying name for a given visual layer of the module"
+        },
+        "pathDValue": { "$ref": "#/definitions/pathDValue" }
       }
     }
   },
@@ -78,11 +77,13 @@
     "labwareOffset": { "$ref": "#/definitions/coordinates" },
     "dimensions": {
       "type": "object",
-      "required": ["bareOverallHeight", "overLabwareHeight"],
+      "required": ["bareOverallHeight", "overLabwareHeight", "xDimension", "yDimension"],
       "properties": {
         "bareOverallHeight": { "type": "number" },
         "overLabwareHeight": { "type": "number" },
-        "lidHeight": { "type": "number" }
+        "lidHeight": { "type": "number" },
+        "xDimension": { "type": "number" },
+        "yDimension": { "type": "number" }
       }
     },
     "calibrationPoint": { "$ref": "#/definitions/coordinates" },
@@ -126,13 +127,9 @@
       }
     },
     "layers": {
-      "type": "object",
-      "description": "Layered feature groups of the deck.",
-      "additionalProperties": {
-        "type": "array",
-        "description": "Individual features within a layer",
-        "items": { "$ref": "#/definitions/feature" }
-      }
+      "type": "array",
+      "description": "List of visual layers for a given module",
+      "items": { "$ref": "#/definitions/feature" }
     }
   }
 }
