@@ -145,6 +145,15 @@ def test_get_next_queued_raises_if_stopped() -> None:
         subject.get_next_queued()
 
 
+def test_get_is_running() -> None:
+    """It should be able to get if the engine is running."""
+    subject = get_command_view(is_running=False)
+    assert subject.get_is_running() is False
+
+    subject = get_command_view(is_running=True)
+    assert subject.get_is_running() is True
+
+
 def test_get_is_complete() -> None:
     """It should be able to tell if a command is complete."""
     completed_command = create_completed_command(command_id="command-id-1")

@@ -10,6 +10,7 @@ from .execution import (
     EquipmentHandler,
     MovementHandler,
     PipettingHandler,
+    RunControlHandler,
     QueueWorker,
 )
 
@@ -43,11 +44,14 @@ async def create_protocol_engine(hardware: HardwareAPI) -> ProtocolEngine:
         movement_handler=movement_handler,
     )
 
+    run_control_handler = RunControlHandler(state_store=state_store)
+
     command_executor = CommandExecutor(
         state_store=state_store,
         equipment=equipment_handler,
         movement=movement_handler,
         pipetting=pipetting_handler,
+        run_control=run_control_handler,
         resources=resources,
         command_mapper=command_mapper,
     )

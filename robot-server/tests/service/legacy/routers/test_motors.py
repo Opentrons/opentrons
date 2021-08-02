@@ -8,10 +8,10 @@ def test_engage_axes(api_client, hardware):
         "z": True,
         "a": True,
         "b": True,
-        "c": True
+        "c": True,
     }
 
-    res0 = api_client.get('/motors/engaged')
+    res0 = api_client.get("/motors/engaged")
     result0 = res0.json()
     assert res0.status_code == 200
     assert result0 == {
@@ -20,7 +20,7 @@ def test_engage_axes(api_client, hardware):
         "z": {"enabled": True},
         "a": {"enabled": True},
         "b": {"enabled": True},
-        "c": {"enabled": True}
+        "c": {"enabled": True},
     }
 
 
@@ -31,16 +31,15 @@ def test_engage_invalid_axes(api_client, hardware):
         "z": True,
         "a": True,
         "b": True,
-        "c": True
+        "c": True,
     }
 
-    res0 = api_client.get('/motors/engaged')
+    res0 = api_client.get("/motors/engaged")
     assert res0.status_code == 500
 
 
 def test_disengage_axes(api_client, hardware):
-    postres = api_client.post(
-        '/motors/disengage', json={'axes': ['x', 'b']})
+    postres = api_client.post("/motors/disengage", json={"axes": ["x", "b"]})
 
     hardware.disengage_axes.assert_called_once_with([Axis.X, Axis.B])
 
@@ -48,11 +47,9 @@ def test_disengage_axes(api_client, hardware):
     assert postres.json() == {"message": "Disengaged axes: x, b"}
 
 
-def test_disengage_axes_case_insensitive(api_client,
-                                         hardware):
+def test_disengage_axes_case_insensitive(api_client, hardware):
 
-    postres = api_client.post(
-        '/motors/disengage', json={'axes': ['Y', 'A']})
+    postres = api_client.post("/motors/disengage", json={"axes": ["Y", "A"]})
 
     hardware.disengage_axes.assert_called_once_with([Axis.Y, Axis.A])
 
@@ -61,8 +58,7 @@ def test_disengage_axes_case_insensitive(api_client,
 
 
 def test_disengage_invalid_axes(api_client, hardware):
-    postres = api_client.post(
-        '/motors/disengage', json={'axes': ['u']})
+    postres = api_client.post("/motors/disengage", json={"axes": ["u"]})
 
     hardware.disengage_axes.assert_not_called()
 
@@ -70,8 +66,7 @@ def test_disengage_invalid_axes(api_client, hardware):
 
 
 def test_disengage_no_axes(api_client, hardware):
-    postres = api_client.post(
-        '/motors/disengage', json={'axes': []})
+    postres = api_client.post("/motors/disengage", json={"axes": []})
 
     hardware.disengage_axes.assert_called_once_with([])
 

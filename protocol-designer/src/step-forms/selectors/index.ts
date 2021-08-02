@@ -543,15 +543,18 @@ export const getInvariantContext: Selector<
   })
 )
 // TODO(IL, 2020-03-24) type this as Selector<HydratedFormData>. See #3161
-export const getHydratedUnsavedForm: Selector<BaseState, any> = createSelector(
+export const getHydratedUnsavedForm: Selector<
+  BaseState,
+  FormData | null
+> = createSelector(
   getUnsavedForm,
   getInvariantContext,
   (unsavedForm, invariantContext) => {
-    if (!unsavedForm) return null
+    if (unsavedForm == null) return null
 
     const hydratedForm = _getHydratedForm(unsavedForm, invariantContext)
 
-    return hydratedForm
+    return hydratedForm ?? null
   }
 )
 export const getDynamicFieldFormErrorsForUnsavedForm: Selector<

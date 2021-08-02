@@ -3,13 +3,13 @@ import asyncio
 from typing import Optional
 
 from opentrons.protocol_engine import ProtocolEngine
-from opentrons.protocols.runner import CommandTranslator
 
 from .abstract_file_runner import AbstractFileRunner
 from .protocol_file import ProtocolFileType, ProtocolFile
 
 from .json_file_runner import JsonFileRunner
 from .json_file_reader import JsonFileReader
+from .json_command_translator import CommandTranslator
 
 from .python_file_runner import PythonFileRunner
 from .python_reader import PythonFileReader

@@ -7,6 +7,7 @@ from ..commands import CommandStatus, CommandMapper
 from .equipment import EquipmentHandler
 from .movement import MovementHandler
 from .pipetting import PipettingHandler
+from .run_control import RunControlHandler
 
 log = getLogger(__name__)
 
@@ -24,6 +25,7 @@ class CommandExecutor:
         equipment: EquipmentHandler,
         movement: MovementHandler,
         pipetting: PipettingHandler,
+        run_control: RunControlHandler,
         command_mapper: CommandMapper,
         resources: ResourceProviders,
     ) -> None:
@@ -32,6 +34,7 @@ class CommandExecutor:
         self._equipment = equipment
         self._movement = movement
         self._pipetting = pipetting
+        self._run_control = run_control
         self._command_mapper = command_mapper
         self._resources = resources
 
@@ -47,6 +50,7 @@ class CommandExecutor:
             equipment=self._equipment,
             movement=self._movement,
             pipetting=self._pipetting,
+            run_control=self._run_control,
         )
 
         started_at = self._resources.model_utils.get_timestamp()

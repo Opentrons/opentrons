@@ -6,15 +6,18 @@ from datetime import datetime
 from robot_server.service.dependencies import get_session_manager
 from robot_server.service.errors import RobotServerError
 from robot_server.service.session.errors import (
-    SessionCreationException, UnsupportedCommandException,
-    CommandExecutionException)
+    SessionCreationException,
+    UnsupportedCommandException,
+    CommandExecutionException,
+)
 from robot_server.service.session.manager import SessionManager
 from robot_server.service.session.models.command import (
-    SimpleCommandRequest, SimpleCommandResponse, CommandStatus
+    SimpleCommandRequest,
+    SimpleCommandResponse,
+    CommandStatus,
 )
 from robot_server.service.session.models.common import EmptyModel
-from robot_server.service.session.models.command_definitions import (
-    ProtocolCommand)
+from robot_server.service.session.models.command_definitions import ProtocolCommand
 from robot_server.service.session import router
 from robot_server.service.session.session_types import BaseSession
 
@@ -34,7 +37,7 @@ def mock_session():
         "createdAt": session.meta.created_at,
         "details": EmptyModel(),
         "id": session.meta.identifier,
-        "createParams": session.meta.create_params
+        "createParams": session.meta.create_params,
     }
     return session
 
@@ -42,8 +45,10 @@ def mock_session():
 @pytest.fixture
 def sessions_api_client(mock_session_manager, api_client):
     """Test api client that overrides get_session_manager dependency."""
+
     async def get():
         return mock_session_manager
+
     api_client.app.dependency_overrides[get_session_manager] = get
     return api_client
 
@@ -70,251 +75,229 @@ def test_get_session_not_found(mock_session_manager):
         router.get_session(mock_session_manager, session_id)
 
 
-def test_sessions_create_error(
-        sessions_api_client,
-        mock_session_manager):
+def test_sessions_create_error(sessions_api_client, mock_session_manager):
     """It raises an error if session manager raises an exception."""
+
     async def raiser(*args, **kwargs):
-        raise SessionCreationException(
-            "Please attach pipettes before proceeding"
-        )
+        raise SessionCreationException("Please attach pipettes before proceeding")
 
     mock_session_manager.add.side_effect = raiser
 
-    response = sessions_api_client.post("/sessions", json={
-        "data": {
-            "sessionType": "liveProtocol"
-        }
-    })
+    response = sessions_api_client.post(
+        "/sessions", json={"data": {"sessionType": "liveProtocol"}}
+    )
     assert response.json() == {
-        'errors': [{
-            'id': 'UncategorizedError',
-            'detail': "Please attach pipettes before proceeding",
-            'title': 'Action Forbidden'}
-        ]}
+        "errors": [
+            {
+                "id": "UncategorizedError",
+                "detail": "Please attach pipettes before proceeding",
+                "title": "Action Forbidden",
+            }
+        ]
+    }
     assert response.status_code == 403
 
 
-def test_sessions_create(
-        sessions_api_client,
-        mock_session_manager,
-        mock_session):
+def test_sessions_create(sessions_api_client, mock_session_manager, mock_session):
     """It creates a session."""
     mock_session_manager.add.return_value = mock_session
 
-    response = sessions_api_client.post("/sessions", json={
-        "data": {
-            "sessionType": "liveProtocol"
-        }
-    })
+    response = sessions_api_client.post(
+        "/sessions", json={"data": {"sessionType": "liveProtocol"}}
+    )
     assert response.json() == {
-        'data': {
-            'details': {},
-            'sessionType': 'liveProtocol',
-            'createdAt': mock_session.meta.created_at.isoformat(),
-            'createParams': None,
-            'id': mock_session.meta.identifier,
+        "data": {
+            "details": {},
+            "sessionType": "liveProtocol",
+            "createdAt": mock_session.meta.created_at.isoformat(),
+            "createParams": None,
+            "id": mock_session.meta.identifier,
         },
-        'links': {
-            'commandExecute': {
-                'href': f'/sessions/{mock_session.meta.identifier}/commands/execute',  # noqa: E501
-                'meta': None,
+        "links": {
+            "commandExecute": {
+                "href": f"/sessions/{mock_session.meta.identifier}/commands/execute",  # noqa: E501
+                "meta": None,
             },
-            'self': {
-                'href': f'/sessions/{mock_session.meta.identifier}',
-                'meta': None,
+            "self": {
+                "href": f"/sessions/{mock_session.meta.identifier}",
+                "meta": None,
             },
-            'sessions': {
-                'href': '/sessions', 'meta': None,
+            "sessions": {
+                "href": "/sessions",
+                "meta": None,
             },
-            'sessionById': {
-                'href': '/sessions/{sessionId}', 'meta': None,
-            }
-        }
+            "sessionById": {
+                "href": "/sessions/{sessionId}",
+                "meta": None,
+            },
+        },
     }
     assert response.status_code == 201
 
 
-def test_sessions_delete_not_found(
-        sessions_api_client,
-        mock_session_manager):
+def test_sessions_delete_not_found(sessions_api_client, mock_session_manager):
     """It fails when session is not found"""
     mock_session_manager.get_by_id.return_value = None
 
     response = sessions_api_client.delete("/sessions/check")
     assert response.json() == {
-        'errors': [{
-            'id': 'UncategorizedError',
-            'title': 'Resource Not Found',
-            'detail': "Resource type 'session' with id 'check' was not found",
-        }],
-        'links': {
-            'self': {'href': '/sessions'},
-            'sessionById': {'href': '/sessions/{sessionId}'}
+        "errors": [
+            {
+                "id": "UncategorizedError",
+                "title": "Resource Not Found",
+                "detail": "Resource type 'session' with id 'check' was not found",
+            }
+        ],
+        "links": {
+            "self": {"href": "/sessions"},
+            "sessionById": {"href": "/sessions/{sessionId}"},
         },
     }
     assert response.status_code == 404
 
 
-def test_sessions_delete(
-        sessions_api_client,
-        mock_session_manager,
-        mock_session):
+def test_sessions_delete(sessions_api_client, mock_session_manager, mock_session):
     """It deletes a found session."""
     mock_session_manager.get_by_id.return_value = mock_session
 
-    response = sessions_api_client.delete(
-        f"/sessions/{mock_session.meta.identifier}")
+    response = sessions_api_client.delete(f"/sessions/{mock_session.meta.identifier}")
 
-    mock_session_manager.remove.assert_called_once_with(
-        mock_session.meta.identifier)
+    mock_session_manager.remove.assert_called_once_with(mock_session.meta.identifier)
     assert response.json() == {
-        'data': {
-            'details': {},
-            'sessionType': 'liveProtocol',
-            'createdAt': mock_session.meta.created_at.isoformat(),
-            'createParams': None,
-            'id': mock_session.meta.identifier
+        "data": {
+            "details": {},
+            "sessionType": "liveProtocol",
+            "createdAt": mock_session.meta.created_at.isoformat(),
+            "createParams": None,
+            "id": mock_session.meta.identifier,
         },
-        'links': {
-            'self': {
-                'href': '/sessions', 'meta': None,
+        "links": {
+            "self": {
+                "href": "/sessions",
+                "meta": None,
             },
-            'sessionById': {
-                'href': '/sessions/{sessionId}', 'meta': None,
+            "sessionById": {
+                "href": "/sessions/{sessionId}",
+                "meta": None,
             },
-        }
+        },
     }
     assert response.status_code == 200
 
 
-def test_sessions_get_not_found(
-        mock_session_manager,
-        sessions_api_client):
+def test_sessions_get_not_found(mock_session_manager, sessions_api_client):
     """It returns an error when session is not found."""
     mock_session_manager.get_by_id.return_value = None
 
     response = sessions_api_client.get("/sessions/1234")
     assert response.json() == {
-        'errors': [{
-            'id': 'UncategorizedError',
-            'detail': "Resource type 'session' with id '1234' was not found",
-            'title': 'Resource Not Found'
-        }],
-        'links': {
-            'self': {'href': '/sessions'},
-            'sessionById': {'href': '/sessions/{sessionId}'}
+        "errors": [
+            {
+                "id": "UncategorizedError",
+                "detail": "Resource type 'session' with id '1234' was not found",
+                "title": "Resource Not Found",
+            }
+        ],
+        "links": {
+            "self": {"href": "/sessions"},
+            "sessionById": {"href": "/sessions/{sessionId}"},
         },
     }
     assert response.status_code == 404
 
 
-def test_sessions_get(
-        sessions_api_client,
-        mock_session_manager,
-        mock_session):
+def test_sessions_get(sessions_api_client, mock_session_manager, mock_session):
     """It returns the found session."""
     mock_session_manager.get_by_id.return_value = mock_session
 
-    response = sessions_api_client.get(
-        f"/sessions/{mock_session.meta.identifier}")
+    response = sessions_api_client.get(f"/sessions/{mock_session.meta.identifier}")
     assert response.json() == {
-        'data': {
-            'details': {},
-            'sessionType': 'liveProtocol',
-            'createdAt': mock_session.meta.created_at.isoformat(),
-            'createParams': None,
-            'id': mock_session.meta.identifier
+        "data": {
+            "details": {},
+            "sessionType": "liveProtocol",
+            "createdAt": mock_session.meta.created_at.isoformat(),
+            "createParams": None,
+            "id": mock_session.meta.identifier,
         },
-        'links': {
-            'commandExecute': {
-                'href': f'/sessions/{mock_session.meta.identifier}/commands/execute',  # noqa: E501
-                'meta': None,
+        "links": {
+            "commandExecute": {
+                "href": f"/sessions/{mock_session.meta.identifier}/commands/execute",  # noqa: E501
+                "meta": None,
             },
-            'self': {
-                'href': f'/sessions/{mock_session.meta.identifier}',
-                'meta': None,
+            "self": {
+                "href": f"/sessions/{mock_session.meta.identifier}",
+                "meta": None,
             },
-            'sessions': {
-                'href': '/sessions',
-                'meta': None,
+            "sessions": {
+                "href": "/sessions",
+                "meta": None,
             },
-            'sessionById': {
-                'href': '/sessions/{sessionId}',
-                'meta': None,
-            }
-        }
+            "sessionById": {
+                "href": "/sessions/{sessionId}",
+                "meta": None,
+            },
+        },
     }
     assert response.status_code == 200
 
 
-def test_sessions_get_all_no_sessions(
-        sessions_api_client,
-        mock_session_manager):
+def test_sessions_get_all_no_sessions(sessions_api_client, mock_session_manager):
     """It returns a response when there are no sessions."""
     mock_session_manager.get.return_value = []
 
     response = sessions_api_client.get("/sessions")
-    assert response.json() == {
-        'data': [], 'links': None
-    }
+    assert response.json() == {"data": [], "links": None}
     assert response.status_code == 200
 
 
-def test_sessions_get_all(
-        sessions_api_client,
-        mock_session_manager,
-        mock_session):
+def test_sessions_get_all(sessions_api_client, mock_session_manager, mock_session):
     """It returns the sessions."""
     mock_session_manager.get.return_value = [mock_session]
 
     response = sessions_api_client.get("/sessions")
     assert response.json() == {
-        'data': [{
-            'details': {},
-            'sessionType': 'liveProtocol',
-            'createdAt': mock_session.meta.created_at.isoformat(),
-            'createParams': None,
-            'id': mock_session.meta.identifier
-        }], 'links': None
+        "data": [
+            {
+                "details": {},
+                "sessionType": "liveProtocol",
+                "createdAt": mock_session.meta.created_at.isoformat(),
+                "createParams": None,
+                "id": mock_session.meta.identifier,
+            }
+        ],
+        "links": None,
     }
     assert response.status_code == 200
 
 
-def test_sessions_execute_command_no_session(
-        sessions_api_client,
-        mock_session_manager):
+def test_sessions_execute_command_no_session(sessions_api_client, mock_session_manager):
     """It rejects command if there's no session"""
     mock_session_manager.get_by_id.return_value = None
 
     response = sessions_api_client.post(
         "/sessions/1234/commands/execute",
-        json={
-            "data": {
-                "command": "protocol.pause",
-                "data": {}
-            }
-        }
+        json={"data": {"command": "protocol.pause", "data": {}}},
     )
     mock_session_manager.get_by_id.assert_called_once_with("1234")
     assert response.json() == {
-        'errors': [{
-            'id': 'UncategorizedError',
-            'title': 'Resource Not Found',
-            'detail': "Resource type 'session' with id '1234' was not found",  # noqa: E501
-        }],
-        'links': {
-            'self': {'href': '/sessions'},
-            'sessionById': {'href': '/sessions/{sessionId}'}
+        "errors": [
+            {
+                "id": "UncategorizedError",
+                "title": "Resource Not Found",
+                "detail": "Resource type 'session' with id '1234' was not found",  # noqa: E501
+            }
+        ],
+        "links": {
+            "self": {"href": "/sessions"},
+            "sessionById": {"href": "/sessions/{sessionId}"},
         },
     }
     assert response.status_code == 404
 
 
 def test_sessions_execute_command(
-        sessions_api_client,
-        mock_session_manager,
-        mock_session):
+    sessions_api_client, mock_session_manager, mock_session
+):
     """It accepts the session command"""
     mock_session_manager.get_by_id.return_value = mock_session
     mock_session.execute_command.return_value = SimpleCommandResponse(
@@ -324,67 +307,61 @@ def test_sessions_execute_command(
         createdAt=datetime(2020, 1, 2),
         startedAt=datetime(2020, 1, 3),
         completedAt=datetime(2020, 1, 4),
-        status=CommandStatus.executed
+        status=CommandStatus.executed,
     )
 
     response = sessions_api_client.post(
         f"/sessions/{mock_session.meta.identifier}/commands/execute",
-        json={
-            "data": {
-                "command": "protocol.pause",
-                "data": {}
-            }
-        }
+        json={"data": {"command": "protocol.pause", "data": {}}},
     )
 
     mock_session.execute_command.assert_called_once_with(
-        SimpleCommandRequest(command=ProtocolCommand.pause,
-                             data=EmptyModel())
+        SimpleCommandRequest(command=ProtocolCommand.pause, data=EmptyModel())
     )
 
     assert response.json() == {
-        'data': {
-            'command': 'protocol.pause',
-            'data': {},
-            'status': 'executed',
-            'createdAt': '2020-01-02T00:00:00',
-            'startedAt': '2020-01-03T00:00:00',
-            'completedAt': '2020-01-04T00:00:00',
-            'result': None,
-            'id': "44",
+        "data": {
+            "command": "protocol.pause",
+            "data": {},
+            "status": "executed",
+            "createdAt": "2020-01-02T00:00:00",
+            "startedAt": "2020-01-03T00:00:00",
+            "completedAt": "2020-01-04T00:00:00",
+            "result": None,
+            "id": "44",
         },
-        'links': {
-            'commandExecute': {
-                'href': f'/sessions/{mock_session.meta.identifier}/commands/execute',  # noqa: E501
-                'meta': None,
+        "links": {
+            "commandExecute": {
+                "href": f"/sessions/{mock_session.meta.identifier}/commands/execute",  # noqa: E501
+                "meta": None,
             },
-            'self': {
-                'href': f'/sessions/{mock_session.meta.identifier}',
-                'meta': None,
+            "self": {
+                "href": f"/sessions/{mock_session.meta.identifier}",
+                "meta": None,
             },
-            'sessions': {
-                'href': '/sessions',
-                'meta': None,
+            "sessions": {
+                "href": "/sessions",
+                "meta": None,
             },
-            'sessionById': {
-                'href': '/sessions/{sessionId}',
-                'meta': None,
+            "sessionById": {
+                "href": "/sessions/{sessionId}",
+                "meta": None,
             },
         },
     }
     assert response.status_code == 200
 
 
-@pytest.mark.parametrize(argnames="exception,expected_status",
-                         argvalues=[
-                             [UnsupportedCommandException, 403],
-                             [CommandExecutionException, 403],
-                         ])
-def test_execute_command_error(sessions_api_client,
-                               mock_session_manager,
-                               mock_session,
-                               exception,
-                               expected_status):
+@pytest.mark.parametrize(
+    argnames="exception,expected_status",
+    argvalues=[
+        [UnsupportedCommandException, 403],
+        [CommandExecutionException, 403],
+    ],
+)
+def test_execute_command_error(
+    sessions_api_client, mock_session_manager, mock_session, exception, expected_status
+):
     """Test that we handle executor errors correctly"""
     mock_session_manager.get_by_id.return_value = mock_session
 
@@ -395,20 +372,15 @@ def test_execute_command_error(sessions_api_client,
 
     response = sessions_api_client.post(
         f"/sessions/{mock_session.meta.identifier}/commands/execute",
-        json={
-            'data': {
-                'command': 'protocol.pause',
-                'data': {}
-            }
-        }
+        json={"data": {"command": "protocol.pause", "data": {}}},
     )
 
     assert response.json() == {
-        'errors': [
+        "errors": [
             {
-                'detail': 'Cannot do it',
-                'title': 'Action Forbidden',
-                'id': 'UncategorizedError',
+                "detail": "Cannot do it",
+                "title": "Action Forbidden",
+                "id": "UncategorizedError",
             }
         ]
     }
@@ -416,9 +388,9 @@ def test_execute_command_error(sessions_api_client,
 
 
 def test_execute_command_session_inactive(
-        sessions_api_client,
-        mock_session_manager,
-        mock_session,
+    sessions_api_client,
+    mock_session_manager,
+    mock_session,
 ):
     """Test that only the active session can execute commands"""
     mock_session_manager.get_by_id.return_value = mock_session
@@ -426,24 +398,18 @@ def test_execute_command_session_inactive(
 
     response = sessions_api_client.post(
         f"/sessions/{mock_session.meta.identifier}/commands/execute",
-        json={
-            'data': {
-                'command': 'protocol.pause',
-                'data': {}
-            }
-        }
+        json={"data": {"command": "protocol.pause", "data": {}}},
     )
 
-    mock_session_manager.is_active.assert_called_once_with(
-        mock_session.meta.identifier)
+    mock_session_manager.is_active.assert_called_once_with(mock_session.meta.identifier)
     assert response.json() == {
-        'errors': [
+        "errors": [
             {
-                'id': 'UncategorizedError',
-                'title': 'Action Forbidden',
-                'detail': f"Session '{mock_session.meta.identifier}'"
-                         f" is not active. Only the active session can "
-                         f"execute commands"
+                "id": "UncategorizedError",
+                "title": "Action Forbidden",
+                "detail": f"Session '{mock_session.meta.identifier}'"
+                f" is not active. Only the active session can "
+                f"execute commands",
             }
         ]
     }

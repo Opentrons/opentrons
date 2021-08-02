@@ -1,20 +1,17 @@
 from typing import Dict
 
-from robot_server.service.session.models.command_definitions import \
-    CommandDefinition, CalibrationCommand, \
-    DeckCalibrationCommand as DeckCalCommand
-from robot_server.robot.calibration.util import (
-    SimpleStateMachine, StateTransitionError)
+from robot_server.service.session.models.command_definitions import (
+    CommandDefinition,
+    CalibrationCommand,
+    DeckCalibrationCommand as DeckCalCommand,
+)
+from robot_server.robot.calibration.util import SimpleStateMachine, StateTransitionError
 from .constants import DeckCalibrationState as State
 
 
 DECK_CALIBRATION_TRANSITIONS: Dict[State, Dict[CommandDefinition, State]] = {
-    State.sessionStarted: {
-        CalibrationCommand.load_labware: State.labwareLoaded
-    },
-    State.labwareLoaded: {
-        CalibrationCommand.move_to_tip_rack: State.preparingPipette
-    },
+    State.sessionStarted: {CalibrationCommand.load_labware: State.labwareLoaded},
+    State.labwareLoaded: {CalibrationCommand.move_to_tip_rack: State.preparingPipette},
     State.preparingPipette: {
         CalibrationCommand.jog: State.preparingPipette,
         CalibrationCommand.pick_up_tip: State.inspectingTip,
@@ -49,17 +46,14 @@ DECK_CALIBRATION_TRANSITIONS: Dict[State, Dict[CommandDefinition, State]] = {
         CalibrationCommand.move_to_tip_rack: State.calibrationComplete,
         CalibrationCommand.invalidate_last_action: State.preparingPipette,
     },
-    State.WILDCARD: {
-        CalibrationCommand.exit: State.sessionExited
-    }
+    State.WILDCARD: {CalibrationCommand.exit: State.sessionExited},
 }
 
 
 class DeckCalibrationStateMachine:
     def __init__(self):
         self._state_machine = SimpleStateMachine(
-            states=set(s for s in State),
-            transitions=DECK_CALIBRATION_TRANSITIONS
+            states=set(s for s in State), transitions=DECK_CALIBRATION_TRANSITIONS
         )
 
     def get_next_state(self, from_state: State, command: CommandDefinition):

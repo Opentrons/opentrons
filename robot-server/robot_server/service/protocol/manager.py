@@ -17,10 +17,11 @@ class ProtocolManager:
     def __init__(self):
         self._protocols: typing.Dict[str, UploadedProtocol] = {}
 
-    def create(self,
-               protocol_file: UploadFile,
-               support_files: typing.List[UploadFile],
-               ) -> UploadedProtocol:
+    def create(
+        self,
+        protocol_file: UploadFile,
+        support_files: typing.List[UploadFile],
+    ) -> UploadedProtocol:
         """Create a protocol object from upload"""
         protocol_id = Path(protocol_file.filename).stem
         if protocol_id in self._protocols:
@@ -30,13 +31,13 @@ class ProtocolManager:
 
         if len(self._protocols) >= ProtocolManager.MAX_COUNT:
             raise errors.ProtocolUploadCountLimitReached(
-                f"Upload limit of {ProtocolManager.MAX_COUNT} has "
-                f"been reached.")
+                f"Upload limit of {ProtocolManager.MAX_COUNT} has " f"been reached."
+            )
 
         new_protocol = UploadedProtocol.create(
             protocol_id=protocol_id,
             protocol_file=protocol_file,
-            support_files=support_files
+            support_files=support_files,
         )
         log.debug(f"Created new protocol: {new_protocol.data}")
 

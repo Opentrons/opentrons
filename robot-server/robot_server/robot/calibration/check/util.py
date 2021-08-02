@@ -3,11 +3,9 @@ from typing import Optional, Union
 
 from opentrons.types import Point
 
-from .models import (
-    TipComparisonMap, PipetteOffsetComparisonMap,
-    DeckComparisonMap)
+from .models import TipComparisonMap, PipetteOffsetComparisonMap, DeckComparisonMap
 
-WILDCARD = '*'
+WILDCARD = "*"
 
 
 @dataclass
@@ -32,9 +30,10 @@ class ComparisonStatePerCalibration:
     deck: Optional[DeckComparisonMap] = None
 
     def set_value(
-            self, name: str,
-            value: Union[TipComparisonMap, PipetteOffsetComparisonMap,
-                         DeckComparisonMap]):
+        self,
+        name: str,
+        value: Union[TipComparisonMap, PipetteOffsetComparisonMap, DeckComparisonMap],
+    ):
         setattr(self, name, value)
 
 
@@ -43,14 +42,8 @@ class ComparisonStatePerPipette:
     first: ComparisonStatePerCalibration
     second: ComparisonStatePerCalibration
 
-    def set_value(
-            self, name: str,
-            value: ComparisonStatePerCalibration):
+    def set_value(self, name: str, value: ComparisonStatePerCalibration):
         setattr(self, name, value)
 
 
-REFERENCE_POINT_MAP = {
-    '1BLC': 'one',
-    '3BRC': 'two',
-    '7TLC': 'three'
-}
+REFERENCE_POINT_MAP = {"1BLC": "one", "3BRC": "two", "7TLC": "three"}

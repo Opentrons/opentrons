@@ -1,9 +1,9 @@
 """File runner interfaces for JSON protocols."""
 from opentrons.protocol_engine import ProtocolEngine
-from opentrons.protocols.runner import CommandTranslator
 
 from .abstract_file_runner import AbstractFileRunner
 from .json_file_reader import JsonFileReader
+from .json_command_translator import CommandTranslator
 from .protocol_file import ProtocolFile
 
 

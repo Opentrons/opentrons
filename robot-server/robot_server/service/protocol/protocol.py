@@ -25,17 +25,17 @@ class UploadedProtocolData:
 
 class UploadedProtocol:
     # TODO AL 20201219 - make the methods of this class async
-    def __init__(self,
-                 data: UploadedProtocolData):
+    def __init__(self, data: UploadedProtocolData):
         """Constructor"""
         self._data = data
 
     @classmethod
     def create(
-            cls,
-            protocol_id: str,
-            protocol_file: UploadFile,
-            support_files: typing.List[UploadFile]) -> 'UploadedProtocol':
+        cls,
+        protocol_id: str,
+        protocol_file: UploadFile,
+        support_files: typing.List[UploadFile],
+    ) -> "UploadedProtocol":
         """
         Create the UploadedProtocol object. The protocol is analyzed after the
          files are saved.
@@ -57,7 +57,7 @@ class UploadedProtocol:
             UploadedProtocolData(
                 identifier=protocol_id,
                 analysis_result=analysis_results,
-                contents=protocol_contents
+                contents=protocol_contents,
             )
         )
 

@@ -5,19 +5,25 @@ from opentrons.hardware_control import ThreadManager, ThreadedAsyncLock
 
 from robot_server.service.errors import RobotServerError, CommonErrorDef
 from robot_server.service.protocol.manager import ProtocolManager
-from robot_server.service.session.errors import SessionCreationException, \
-    SessionException
+from robot_server.service.session.errors import (
+    SessionCreationException,
+    SessionException,
+)
 from robot_server.service.session.session_types.base_session import BaseSession
 from robot_server.service.session.configuration import SessionConfiguration
 from robot_server.service.session.models.session import SessionType
 from robot_server.service.session.models.common import IdentifierType
 from robot_server.service.session.session_types import (
-    CheckSession, SessionMetaData, TipLengthCalibration,
-    DeckCalibrationSession, PipetteOffsetCalibrationSession)
-from robot_server.service.session.session_types.live_protocol.session import \
-    LiveProtocolSession
-from robot_server.service.session.session_types.protocol.session import \
-    ProtocolSession
+    CheckSession,
+    SessionMetaData,
+    TipLengthCalibration,
+    DeckCalibrationSession,
+    PipetteOffsetCalibrationSession,
+)
+from robot_server.service.session.session_types.live_protocol.session import (
+    LiveProtocolSession,
+)
+from robot_server.service.session.session_types.protocol.session import ProtocolSession
 
 log = logging.getLogger(__name__)
 
@@ -34,10 +40,12 @@ SessionTypeToClass: Dict[SessionType, Type[BaseSession]] = {
 class SessionManager:
     """Manager of session instances"""
 
-    def __init__(self,
-                 hardware: ThreadManager,
-                 motion_lock: ThreadedAsyncLock,
-                 protocol_manager: ProtocolManager):
+    def __init__(
+        self,
+        hardware: ThreadManager,
+        motion_lock: ThreadedAsyncLock,
+        protocol_manager: ProtocolManager,
+    ):
         """
         Construct the session manager
 
@@ -51,28 +59,28 @@ class SessionManager:
             hardware=hardware,
             is_active=self.is_active,
             motion_lock=motion_lock,
-            protocol_manager=protocol_manager
+            protocol_manager=protocol_manager,
         )
 
-    async def add(self,
-                  session_type: SessionType,
-                  session_meta_data: SessionMetaData,
-                  ) -> BaseSession:
+    async def add(
+        self,
+        session_type: SessionType,
+        session_meta_data: SessionMetaData,
+    ) -> BaseSession:
         """Add a new session."""
         session = await self._create_session(session_meta_data, session_type)
         if session.meta.identifier in self._sessions:
             raise RobotServerError(
                 definition=CommonErrorDef.RESOURCE_ALREADY_EXISTS,
                 resource="session",
-                id=session.meta.identifier
+                id=session.meta.identifier,
             )
         self._sessions[session.meta.identifier] = session
         self._active.active_id = session.meta.identifier
         log.debug(f"Added new session: {session}")
         return session
 
-    async def remove(self, identifier: IdentifierType) \
-            -> Optional[BaseSession]:
+    async def remove(self, identifier: IdentifierType) -> Optional[BaseSession]:
         """Remove a session"""
         session = self.deactivate(identifier)
         if session:
@@ -92,8 +100,7 @@ class SessionManager:
             except SessionException:
                 log.exception(f"Failed to remove '{session}'")
 
-    def get_by_id(self, identifier: IdentifierType) \
-            -> Optional[BaseSession]:
+    def get_by_id(self, identifier: IdentifierType) -> Optional[BaseSession]:
         """Get a session by identifier"""
         return self._sessions.get(identifier, None)
 
@@ -103,14 +110,17 @@ class SessionManager:
 
         :param session_type: Optional session type filter
         """
-        return tuple(session for session in self._sessions.values()
-                     if not session_type
-                     or session.session_type == session_type)
+        return tuple(
+            session
+            for session in self._sessions.values()
+            if not session_type or session.session_type == session_type
+        )
 
     def get_active(self) -> Optional[BaseSession]:
         """Get the active session"""
-        return self.get_by_id(self._active.active_id) \
-            if self._active.active_id else None
+        return (
+            self.get_by_id(self._active.active_id) if self._active.active_id else None
+        )
 
     def is_active(self, identifier: IdentifierType) -> bool:
         """Check if session identifier is active"""
@@ -123,8 +133,7 @@ class SessionManager:
             self._active.active_id = identifier
         return session
 
-    def deactivate(self, identifier: IdentifierType) \
-            -> Optional[BaseSession]:
+    def deactivate(self, identifier: IdentifierType) -> Optional[BaseSession]:
         """Deactivate a session"""
         if identifier == self._active.active_id:
             self._active.active_id = None
@@ -134,11 +143,10 @@ class SessionManager:
         """Create a new session."""
         cls = SessionTypeToClass.get(session_type)
         if not cls:
-            raise SessionCreationException(
-                "Session type is not supported"
-            )
-        session = await cls.create(configuration=self._session_common,
-                                   instance_meta=session_meta_data)
+            raise SessionCreationException("Session type is not supported")
+        session = await cls.create(
+            configuration=self._session_common, instance_meta=session_meta_data
+        )
         return session
 
 

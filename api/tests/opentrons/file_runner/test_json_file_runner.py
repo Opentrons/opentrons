@@ -5,11 +5,11 @@ from pathlib import Path
 
 from opentrons.file_runner import JsonFileRunner, ProtocolFile, ProtocolFileType
 from opentrons.file_runner.json_file_reader import JsonFileReader
+from opentrons.file_runner.json_command_translator import CommandTranslator
 
 from opentrons.protocol_engine import ProtocolEngine, WellLocation
 from opentrons.protocol_engine import commands as pe_commands
 from opentrons.protocols.models import JsonProtocol
-from opentrons.protocols.runner.json_proto.command_translator import CommandTranslator
 
 
 @pytest.fixture

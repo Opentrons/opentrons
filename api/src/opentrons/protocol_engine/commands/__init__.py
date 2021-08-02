@@ -81,6 +81,14 @@ from .pick_up_tip import (
     PickUpTipCommandType,
 )
 
+from .pause import (
+    Pause,
+    PauseData,
+    PauseRequest,
+    PauseResult,
+    PauseCommandType,
+)
+
 
 __all__ = [
     # command model factory
@@ -143,4 +151,10 @@ __all__ = [
     "DispenseData",
     "DispenseResult",
     "DispenseCommandType",
+    # pause command models
+    "Pause",
+    "PauseData",
+    "PauseRequest",
+    "PauseResult",
+    "PauseCommandType",
 ]

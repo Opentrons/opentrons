@@ -93,6 +93,11 @@ from opentrons.protocol_engine.types import (
             commands.MoveToWellRequest,
             commands.MoveToWell,
         ),
+        (
+            commands.PauseData(message="hello world"),
+            commands.PauseRequest,
+            commands.Pause,
+        ),
     ],
 )
 def test_map_request_to_command(

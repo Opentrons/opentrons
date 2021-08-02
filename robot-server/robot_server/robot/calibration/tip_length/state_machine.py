@@ -1,19 +1,16 @@
 from typing import Dict
-from robot_server.service.session.models.command_definitions import \
-    CommandDefinition, CalibrationCommand
-from robot_server.robot.calibration.util import (
-    SimpleStateMachine,
-    StateTransitionError
+from robot_server.service.session.models.command_definitions import (
+    CommandDefinition,
+    CalibrationCommand,
 )
+from robot_server.robot.calibration.util import SimpleStateMachine, StateTransitionError
 from robot_server.robot.calibration.tip_length.constants import (
     TipCalibrationState as State,
 )
 
 
 TIP_LENGTH_TRANSITIONS: Dict[State, Dict[CommandDefinition, State]] = {
-    State.sessionStarted: {
-        CalibrationCommand.load_labware: State.labwareLoaded
-    },
+    State.sessionStarted: {CalibrationCommand.load_labware: State.labwareLoaded},
     State.labwareLoaded: {
         CalibrationCommand.move_to_reference_point: State.measuringNozzleOffset
     },
@@ -36,19 +33,16 @@ TIP_LENGTH_TRANSITIONS: Dict[State, Dict[CommandDefinition, State]] = {
         CalibrationCommand.save_offset: State.measuringTipOffset,
         CalibrationCommand.jog: State.measuringTipOffset,
         CalibrationCommand.move_to_tip_rack: State.calibrationComplete,
-        CalibrationCommand.invalidate_last_action: State.preparingPipette
+        CalibrationCommand.invalidate_last_action: State.preparingPipette,
     },
-    State.WILDCARD: {
-        CalibrationCommand.exit: State.sessionExited
-    }
+    State.WILDCARD: {CalibrationCommand.exit: State.sessionExited},
 }
 
 
 class TipCalibrationStateMachine:
     def __init__(self):
         self._state_machine = SimpleStateMachine(
-            states=set(s for s in State),
-            transitions=TIP_LENGTH_TRANSITIONS
+            states=set(s for s in State), transitions=TIP_LENGTH_TRANSITIONS
         )
 
     def get_next_state(self, from_state: State, command: CommandDefinition):

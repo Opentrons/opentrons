@@ -5,25 +5,28 @@ import pytest
 import asyncio
 from opentrons.hardware_control import ExecutionManager
 from opentrons.hardware_control.modules import MagDeck, Thermocycler, TempDeck
-from opentrons.hardware_control.modules import utils, UpdateError, \
-    BundledFirmware
+from opentrons.hardware_control.modules import utils, UpdateError, BundledFirmware
 from opentrons.drivers.rpi_drivers.types import USBPort
 
 
 @pytest.fixture
 def magdeck():
     usb_port = USBPort(
-        name='', sub_names=[], hub=None,
-        port_number=None, device_path='/dev/ot_module_magdeck1')
+        name="",
+        sub_names=[],
+        hub=None,
+        port_number=None,
+        device_path="/dev/ot_module_magdeck1",
+    )
     m = asyncio.get_event_loop().run_until_complete(
         utils.build(
-            port='/dev/ot_module_magdeck1',
+            port="/dev/ot_module_magdeck1",
             usb_port=usb_port,
-            which='magdeck',
+            which="magdeck",
             simulating=True,
             interrupt_callback=lambda x: None,
             execution_manager=ExecutionManager(loop=asyncio.get_event_loop()),
-            loop=asyncio.get_event_loop()
+            loop=asyncio.get_event_loop(),
         )
     )
     MagDeck.current_height = PropertyMock(return_value=321)
@@ -34,17 +37,21 @@ def magdeck():
 @pytest.fixture
 def tempdeck():
     usb_port = USBPort(
-        name='', sub_names=[], hub=None,
-        port_number=None, device_path='/dev/ot_module_tempdeck1')
+        name="",
+        sub_names=[],
+        hub=None,
+        port_number=None,
+        device_path="/dev/ot_module_tempdeck1",
+    )
     t = asyncio.get_event_loop().run_until_complete(
         utils.build(
-            port='/dev/ot_module_tempdeck1',
+            port="/dev/ot_module_tempdeck1",
             usb_port=usb_port,
-            which='tempdeck',
+            which="tempdeck",
             simulating=True,
             interrupt_callback=lambda x: None,
             execution_manager=ExecutionManager(loop=asyncio.get_event_loop()),
-            loop=asyncio.get_event_loop()
+            loop=asyncio.get_event_loop(),
         )
     )
     TempDeck.temperature = PropertyMock(return_value=123.0)
@@ -56,17 +63,21 @@ def tempdeck():
 @pytest.fixture
 def thermocycler():
     usb_port = USBPort(
-        name='', sub_names=[], hub=None,
-        port_number=None, device_path='/dev/ot_module_thermocycler1')
+        name="",
+        sub_names=[],
+        hub=None,
+        port_number=None,
+        device_path="/dev/ot_module_thermocycler1",
+    )
     t = asyncio.get_event_loop().run_until_complete(
         utils.build(
-            port='/dev/ot_module_thermocycler1',
+            port="/dev/ot_module_thermocycler1",
             usb_port=usb_port,
-            which='thermocycler',
+            which="thermocycler",
             simulating=True,
             interrupt_callback=lambda x: None,
             execution_manager=ExecutionManager(loop=asyncio.get_event_loop()),
-            loop=asyncio.get_event_loop()
+            loop=asyncio.get_event_loop(),
         )
     )
     Thermocycler.lid_status = PropertyMock(return_value="open")
@@ -86,27 +97,27 @@ def thermocycler():
 def test_get_modules_magdeck(api_client, hardware, magdeck):
     hardware.attached_modules = [magdeck]
 
-    resp = api_client.get('/modules')
+    resp = api_client.get("/modules")
     body = resp.json()
     assert resp.status_code == 200
     assert body == {
-        'modules': [
+        "modules": [
             {
-                'displayName': 'magdeck',
-                'fwVersion': 'dummyVersionMD',
-                'hasAvailableUpdate': False,
-                'model': 'mag_deck_v1.1',
-                'moduleModel': 'magneticModuleV1',
-                'name': 'magdeck',
-                'port': '/dev/ot_module_magdeck1',
-                'usbPort': {'hub': None, 'port': None},
-                'revision': 'mag_deck_v1.1',
-                'serial': 'dummySerialMD',
-                'status': 'engaged',
-                'data': {
-                    'engaged': True,
-                    'height': 321,
-                }
+                "displayName": "magdeck",
+                "fwVersion": "dummyVersionMD",
+                "hasAvailableUpdate": False,
+                "model": "mag_deck_v1.1",
+                "moduleModel": "magneticModuleV1",
+                "name": "magdeck",
+                "port": "/dev/ot_module_magdeck1",
+                "usbPort": {"hub": None, "port": None},
+                "revision": "mag_deck_v1.1",
+                "serial": "dummySerialMD",
+                "status": "engaged",
+                "data": {
+                    "engaged": True,
+                    "height": 321,
+                },
             }
         ]
     }
@@ -115,29 +126,29 @@ def test_get_modules_magdeck(api_client, hardware, magdeck):
 def test_get_modules_tempdeck(api_client, hardware, tempdeck):
     hardware.attached_modules = [tempdeck]
 
-    for model in ('temp_deck_v1', 'temp_deck_v1.1', 'temp_deck_v2'):
-        tempdeck._device_info['model'] = model
-        resp = api_client.get('/modules')
+    for model in ("temp_deck_v1", "temp_deck_v1.1", "temp_deck_v2"):
+        tempdeck._device_info["model"] = model
+        resp = api_client.get("/modules")
         body = resp.json()
         assert resp.status_code == 200
         assert body == {
-            'modules': [
+            "modules": [
                 {
-                    'displayName': 'tempdeck',
-                    'fwVersion': 'dummyVersionTD',
-                    'hasAvailableUpdate': False,
-                    'model': model,
-                    'moduleModel': 'temperatureModuleV1',
-                    'name': 'tempdeck',
-                    'port': '/dev/ot_module_tempdeck1',
-                    'usbPort': {'hub': None, 'port': None},
-                    'revision': model,
-                    'serial': 'dummySerialTD',
-                    'status': 'idle',
-                    'data': {
-                        'currentTemp': 123,
-                        'targetTemp':  321,
-                    }
+                    "displayName": "tempdeck",
+                    "fwVersion": "dummyVersionTD",
+                    "hasAvailableUpdate": False,
+                    "model": model,
+                    "moduleModel": "temperatureModuleV1",
+                    "name": "tempdeck",
+                    "port": "/dev/ot_module_tempdeck1",
+                    "usbPort": {"hub": None, "port": None},
+                    "revision": model,
+                    "serial": "dummySerialTD",
+                    "status": "idle",
+                    "data": {
+                        "currentTemp": 123,
+                        "targetTemp": 321,
+                    },
                 }
             ]
         }
@@ -146,143 +157,145 @@ def test_get_modules_tempdeck(api_client, hardware, tempdeck):
 def test_get_modules_thermocycler(api_client, hardware, thermocycler):
     hardware.attached_modules = [thermocycler]
 
-    resp = api_client.get('/modules')
+    resp = api_client.get("/modules")
     body = resp.json()
     assert resp.status_code == 200
     assert body == {
-        'modules': [{
-            'displayName': 'thermocycler',
-            'fwVersion': 'dummyVersionTC',
-            'hasAvailableUpdate': False,
-            'model': 'dummyModelTC',
-            'moduleModel': 'thermocyclerModuleV1',
-            'name': 'thermocycler',
-            'port': '/dev/ot_module_thermocycler1',
-            'usbPort': {'hub': None, 'port': None},
-            'revision': 'dummyModelTC',
-            'serial': 'dummySerialTC',
-            'status': 'idle',
-            'data': {
-                'lid': "open",
-                'lidTarget': 1.2,
-                'lidTemp': 22,
-                'currentTemp': 100,
-                'targetTemp': 200,
-                'holdTime': 1,
-                'rampRate': 3,
-                'currentCycleIndex': 1,
-                'totalCycleCount': 3,
-                'currentStepIndex': 5,
-                'totalStepCount': 2,
+        "modules": [
+            {
+                "displayName": "thermocycler",
+                "fwVersion": "dummyVersionTC",
+                "hasAvailableUpdate": False,
+                "model": "dummyModelTC",
+                "moduleModel": "thermocyclerModuleV1",
+                "name": "thermocycler",
+                "port": "/dev/ot_module_thermocycler1",
+                "usbPort": {"hub": None, "port": None},
+                "revision": "dummyModelTC",
+                "serial": "dummySerialTC",
+                "status": "idle",
+                "data": {
+                    "lid": "open",
+                    "lidTarget": 1.2,
+                    "lidTemp": 22,
+                    "currentTemp": 100,
+                    "targetTemp": 200,
+                    "holdTime": 1,
+                    "rampRate": 3,
+                    "currentCycleIndex": 1,
+                    "totalCycleCount": 3,
+                    "currentStepIndex": 5,
+                    "totalStepCount": 2,
+                },
             }
-        }]
+        ]
     }
 
 
 def test_get_module_serial_magdeck(api_client, hardware, magdeck):
     hardware.attached_modules = [magdeck]
 
-    resp = api_client.get('/modules/dummySerialMD/data')
+    resp = api_client.get("/modules/dummySerialMD/data")
 
     body = resp.json()
     assert resp.status_code == 200
-    assert body == {"status": "engaged",
-                    "data": {
-                        "engaged": True,
-                        "height": 321.0
-                    }}
+    assert body == {"status": "engaged", "data": {"engaged": True, "height": 321.0}}
 
 
 def test_get_module_serial_tempdeck(api_client, hardware, tempdeck):
     hardware.attached_modules = [tempdeck]
 
-    resp = api_client.get('/modules/dummySerialTD/data')
+    resp = api_client.get("/modules/dummySerialTD/data")
 
     body = resp.json()
     assert resp.status_code == 200
-    assert body == {"status": "idle",
-                    "data": {
-                        "currentTemp": 123.0,
-                        "targetTemp": 321.0
-                    }}
+    assert body == {
+        "status": "idle",
+        "data": {"currentTemp": 123.0, "targetTemp": 321.0},
+    }
 
 
 def test_get_module_serial_thermocycler(api_client, hardware, thermocycler):
     hardware.attached_modules = [thermocycler]
 
-    resp = api_client.get('/modules/dummySerialTC/data')
+    resp = api_client.get("/modules/dummySerialTC/data")
 
     body = resp.json()
     assert resp.status_code == 200
-    assert body == {"status": "idle",
-                    "data": {
-                        'lid': "open",
-                        'lidTarget': 1.2,
-                        'lidTemp': 22,
-                        'currentTemp': 100,
-                        'targetTemp': 200,
-                        'holdTime': 1,
-                        'rampRate': 3,
-                        'currentCycleIndex': 1,
-                        'totalCycleCount': 3,
-                        'currentStepIndex': 5,
-                        'totalStepCount': 2,
-                    }}
+    assert body == {
+        "status": "idle",
+        "data": {
+            "lid": "open",
+            "lidTarget": 1.2,
+            "lidTemp": 22,
+            "currentTemp": 100,
+            "targetTemp": 200,
+            "holdTime": 1,
+            "rampRate": 3,
+            "currentCycleIndex": 1,
+            "totalCycleCount": 3,
+            "currentStepIndex": 5,
+            "totalStepCount": 2,
+        },
+    }
 
 
 def test_get_module_serial_no_match(api_client, hardware, magdeck):
     hardware.attached_modules = [magdeck]
 
-    resp = api_client.get('/modules/onions/data')
+    resp = api_client.get("/modules/onions/data")
 
     body = resp.json()
     assert resp.status_code == 404
-    assert 'message' in body
-    assert body['message'] == 'Module not found'
+    assert "message" in body
+    assert body["message"] == "Module not found"
 
 
 def test_get_module_serial_no_modules(api_client, hardware):
     hardware.attached_modules = []
 
-    resp = api_client.get('/modules/dummySerialMD/data')
+    resp = api_client.get("/modules/dummySerialMD/data")
 
     body = resp.json()
     assert resp.status_code == 404
-    assert 'message' in body
-    assert body['message'] == 'Module not found'
+    assert "message" in body
+    assert body["message"] == "Module not found"
 
 
 def test_execute_module_command(api_client, hardware, magdeck):
     hardware.attached_modules = [magdeck]
 
-    resp = api_client.post('/modules/dummySerialMD',
-                           json={'command_type': 'deactivate'})
+    resp = api_client.post(
+        "/modules/dummySerialMD", json={"command_type": "deactivate"}
+    )
     body = resp.json()
     assert resp.status_code == 200
-    assert 'message' in body
-    assert body['message'] == 'Success'
+    assert "message" in body
+    assert body["message"] == "Success"
 
 
 def test_execute_module_command_no_modules(api_client, hardware):
     hardware.attached_modules = []
 
-    resp = api_client.post('/modules/dummySerialMD',
-                           json={'command_type': 'deactivate'})
+    resp = api_client.post(
+        "/modules/dummySerialMD", json={"command_type": "deactivate"}
+    )
     body = resp.json()
     assert resp.status_code == 404
-    assert 'message' in body
-    assert body['message'] == 'No connected modules'
+    assert "message" in body
+    assert body["message"] == "No connected modules"
 
 
 def test_execute_module_command_bad_serial(api_client, hardware, magdeck):
     hardware.attached_modules = [magdeck]
 
-    resp = api_client.post('/modules/tooDummySerialMD',
-                           json={'command_type': 'deactivate'})
+    resp = api_client.post(
+        "/modules/tooDummySerialMD", json={"command_type": "deactivate"}
+    )
     body = resp.json()
     assert resp.status_code == 404
-    assert 'message' in body
-    assert body['message'] == 'Specified module not found'
+    assert "message" in body
+    assert body["message"] == "Specified module not found"
 
 
 def test_execute_module_command_bad_command(api_client, hardware, magdeck):
@@ -290,28 +303,28 @@ def test_execute_module_command_bad_command(api_client, hardware, magdeck):
 
     command_type = "something that doesn't exist"
 
-    resp = api_client.post('/modules/dummySerialMD',
-                           json={'command_type': command_type})
+    resp = api_client.post(
+        "/modules/dummySerialMD", json={"command_type": command_type}
+    )
     body = resp.json()
     assert resp.status_code == 400
-    assert 'message' in body
-    assert body['message'] == f'Module does not have command: {command_type}'
+    assert "message" in body
+    assert body["message"] == f"Module does not have command: {command_type}"
 
 
 def test_execute_module_command_bad_args(api_client, hardware, thermocycler):
     hardware.attached_modules = [thermocycler]
 
-    thermocycler.set_temperature = MagicMock(
-        side_effect=TypeError("found a 'str'")
-    )
+    thermocycler.set_temperature = MagicMock(side_effect=TypeError("found a 'str'"))
 
-    resp = api_client.post('modules/dummySerialTC',
-                           json={'command_type': 'set_temperature',
-                                 'args': ['30']})
+    resp = api_client.post(
+        "modules/dummySerialTC",
+        json={"command_type": "set_temperature", "args": ["30"]},
+    )
     body = resp.json()
     assert resp.status_code == 400
-    assert 'message' in body
-    assert 'TypeError' in body['message']
+    assert "message" in body
+    assert "TypeError" in body["message"]
 
 
 def test_execute_module_command_valid_args(api_client, hardware, thermocycler):
@@ -319,9 +332,9 @@ def test_execute_module_command_valid_args(api_client, hardware, thermocycler):
 
     thermocycler.set_temperature = MagicMock(return_value=None)
 
-    resp = api_client.post('modules/dummySerialTC',
-                           json={'command_type': 'set_temperature',
-                                 'args': [30]})
+    resp = api_client.post(
+        "modules/dummySerialTC", json={"command_type": "set_temperature", "args": [30]}
+    )
     assert resp.status_code == 200
 
 
@@ -329,35 +342,29 @@ def test_post_serial_update_no_bundled_fw(api_client, hardware, magdeck):
     magdeck._bundled_fw = None
 
     hardware.attached_modules = [magdeck]
-    resp = api_client.post('/modules/dummySerialMD/update')
+    resp = api_client.post("/modules/dummySerialMD/update")
 
     body = resp.json()
     assert resp.status_code == 500
-    assert body == {
-        'message': 'Bundled fw file not found for module of type: magdeck'
-    }
+    assert body == {"message": "Bundled fw file not found for module of type: magdeck"}
 
 
 def test_post_serial_update_no_modules(api_client, hardware):
-    resp = api_client.post('/modules/dummySerialMD/update')
+    resp = api_client.post("/modules/dummySerialMD/update")
 
     body = resp.json()
     assert resp.status_code == 404
-    assert body == {
-        'message': 'Module dummySerialMD not found'
-    }
+    assert body == {"message": "Module dummySerialMD not found"}
 
 
 def test_post_serial_update_no_match(api_client, hardware, tempdeck):
     hardware.attached_modules = [tempdeck]
 
-    resp = api_client.post('/modules/superDummySerialMD/update')
+    resp = api_client.post("/modules/superDummySerialMD/update")
 
     body = resp.json()
     assert resp.status_code == 404
-    assert body == {
-        'message': 'Module superDummySerialMD not found'
-    }
+    assert body == {"message": "Module superDummySerialMD not found"}
 
 
 def test_post_serial_update_error(api_client, hardware, magdeck):
@@ -370,13 +377,11 @@ def test_post_serial_update_error(api_client, hardware, magdeck):
 
     with patch("opentrons.hardware_control.modules.update_firmware") as p:
         p.side_effect = thrower
-        resp = api_client.post('/modules/dummySerialMD/update')
+        resp = api_client.post("/modules/dummySerialMD/update")
 
         body = resp.json()
         assert resp.status_code == 500
-        assert body == {
-            'message': 'Update error: not possible'
-        }
+        assert body == {"message": "Update error: not possible"}
 
 
 def test_post_serial_timeout_error(api_client, hardware, magdeck):
@@ -389,13 +394,11 @@ def test_post_serial_timeout_error(api_client, hardware, magdeck):
 
     with patch("opentrons.hardware_control.modules.update_firmware") as p:
         p.side_effect = thrower
-        resp = api_client.post('/modules/dummySerialMD/update')
+        resp = api_client.post("/modules/dummySerialMD/update")
 
         body = resp.json()
         assert resp.status_code == 500
-        assert body == {
-            'message': 'Module not responding'
-        }
+        assert body == {"message": "Module not responding"}
 
 
 def test_post_serial_update(api_client, hardware, tempdeck):
@@ -404,14 +407,12 @@ def test_post_serial_update(api_client, hardware, tempdeck):
     tempdeck._bundled_fw = BundledFirmware("1234", Path("c:/aaa"))
 
     with patch("opentrons.hardware_control.modules.update_firmware") as p:
-        resp = api_client.post('/modules/dummySerialTD/update')
+        resp = api_client.post("/modules/dummySerialTD/update")
 
-        p.assert_called_once_with(tempdeck,
-                                  tempdeck._bundled_fw.path,
-                                  asyncio.get_event_loop())
+        p.assert_called_once_with(
+            tempdeck, tempdeck._bundled_fw.path, asyncio.get_event_loop()
+        )
 
         body = resp.json()
         assert resp.status_code == 200
-        assert body == {
-            'message': 'Successfully updated module dummySerialTD'
-        }
+        assert body == {"message": "Successfully updated module dummySerialTD"}

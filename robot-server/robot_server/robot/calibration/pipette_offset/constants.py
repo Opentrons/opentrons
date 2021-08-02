@@ -35,4 +35,4 @@ class PipetteOffsetWithTipLengthCalibrationState(str, Enum):
     WILDCARD = STATE_WILDCARD
 
 
-TIP_RACK_SLOT: Final = '8'
+TIP_RACK_SLOT: Final = "8"
