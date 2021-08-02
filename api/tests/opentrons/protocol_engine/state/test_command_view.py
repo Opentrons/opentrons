@@ -1,6 +1,7 @@
 """Labware state store tests."""
 import pytest
 from collections import OrderedDict
+from contextlib import nullcontext as does_not_raise
 from typing import List, NamedTuple, Optional, Sequence, Tuple, Type, Union
 
 from opentrons.protocol_engine import commands as cmd, errors
@@ -283,9 +284,7 @@ def test_validate_action_allowed(
     expected_error: Optional[Type[errors.ProtocolEngineError]],
 ) -> None:
     """It should validate allowed play/pause actions."""
-    if expected_error is None:
-        subject.validate_action_allowed(action)
+    expectation = pytest.raises(expected_error) if expected_error else does_not_raise()
 
-    else:
-        with pytest.raises(expected_error):
-            subject.validate_action_allowed(action)
+    with expectation:  # type: ignore[attr-defined]
+        subject.validate_action_allowed(action)
