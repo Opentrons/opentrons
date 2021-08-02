@@ -46,4 +46,5 @@ jobs:
         run: make -C notify-server test
       - uses: 'codecov/codecov-action@v1'
         with:
-          file: ./notify-server/coverage.xml
+          files: ./notify-server/coverage.xml
+          flags: notify-server

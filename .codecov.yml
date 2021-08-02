@@ -17,3 +17,11 @@ ignore:
   - '**/*.json'
   - '**/*.config.js'
   - '**/*.mk'
+
+comment:
+  # add flags to `layout` configuration to show up in the PR comment
+  layout: "reach, diff, flags, files"
+
+flag_management:
+  default_rules:
+    carryforward: true
