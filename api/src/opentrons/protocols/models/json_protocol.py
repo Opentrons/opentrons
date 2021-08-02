@@ -246,8 +246,8 @@ class MoveToSlotCommand(BaseModel):
     params: Params3
 
 
-class Params4(BaseModel):
-    wait: Union[float, Literal[True]] = Field(
+class DelayCommandParams(BaseModel):
+    wait: Union[Literal[True], float] = Field(
         ...,
         description='either a number of seconds to wait (fractional values OK), '
                     'or `true` to wait indefinitely until the user manually '
@@ -265,7 +265,7 @@ class DelayCommand(BaseModel):
     """
 
     command: Literal['delay']
-    params: Params4
+    params: DelayCommandParams
 
 
 class Params5(BaseModel):

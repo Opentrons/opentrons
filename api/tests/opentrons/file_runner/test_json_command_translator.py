@@ -1,9 +1,10 @@
+"""Tests for the JSON CommandTranslator interface."""
 import pytest
 from typing import Any, Dict, List
 
 from opentrons.types import DeckSlotName, MountType
 from opentrons.protocols import models
-from opentrons.protocols.runner.json_proto.command_translator import CommandTranslator
+from opentrons.file_runner.json_command_translator import CommandTranslator
 from opentrons.protocol_engine import (
     commands as pe_commands,
     DeckSlotLocation,
@@ -15,15 +16,14 @@ from opentrons.protocol_engine import (
 
 @pytest.fixture
 def subject() -> CommandTranslator:
+    """Get a CommandTranslator test subject."""
     return CommandTranslator()
 
 
 def _assert_appear_in_order(elements: List[Any], source: List[Any]) -> None:
-    """
-    Assert all elements appear in source, in the given order relative to each other.
+    """Assert all elements appear in source, in the given order relative to each other.
 
     Example:
-
         _assert_appear_in_order(
             elements=["a", "c"]
             source=["a", "b", "c", "d"]
@@ -68,7 +68,7 @@ def test_labware(
     minimal_labware_def: dict,
     minimal_labware_def2: dict,
 ) -> None:
-    """It should emit AddLabwareDefinitionRequests and LoadLabwareRequests.
+    """It should emit AddLabwareDefinitionRequest and LoadLabwareRequest objects.
 
     A LoadLabwareRequest should always come after the AddLabwareDefinitionRequest
     that it depends on.
@@ -140,6 +140,7 @@ def test_labware(
 
 
 def test_pipettes(subject: CommandTranslator) -> None:
+    """It should translate pipette specs into LoadPipetteRequest objects."""
     json_pipettes = {
         "abc123": models.json_protocol.Pipettes(mount="left", name="p20_single_gen2"),
         "def456": models.json_protocol.Pipettes(mount="right", name="p300_multi"),
@@ -170,8 +171,7 @@ def test_pipettes(subject: CommandTranslator) -> None:
 
 
 def test_aspirate(subject: CommandTranslator) -> None:
-    """It should translate a JSON aspirate command to a Protocol Engine
-    aspirate request."""
+    """It should translate a JSON aspirate to a Protocol Engine AspirateRequest."""
     input_json_command = models.json_protocol.LiquidCommand(
         command="aspirate",
         params=models.json_protocol.Params(
@@ -203,8 +203,7 @@ def test_aspirate(subject: CommandTranslator) -> None:
 
 
 def test_dispense(subject: CommandTranslator) -> None:
-    """It should translate a JSON dispense command to a Protocol Engine
-    dispense request."""
+    """It should translate a JSON dispense to a ProtocolEngine DispenseRequest."""
     input_json_command = models.json_protocol.LiquidCommand(
         command="dispense",
         params=models.json_protocol.Params(
@@ -236,8 +235,7 @@ def test_dispense(subject: CommandTranslator) -> None:
 
 
 def test_drop_tip(subject: CommandTranslator) -> None:
-    """It should translate a JSON drop tip command to a Protocol Engine
-    drop tip request."""
+    """It should translate a JSON drop tip to a ProtocolEngine DropTipRequest."""
     input_json_command = models.json_protocol.PickUpDropTipCommand(
         command="dropTip",
         params=models.json_protocol.PipetteAccessParams(
@@ -258,11 +256,8 @@ def test_drop_tip(subject: CommandTranslator) -> None:
     assert output == expected_output
 
 
-def test_pick_up_tip(subject) -> None:
-    """
-    It should translate a JSON pick up tip command to a Protocol Engine
-    PickUpTip request.
-    """
+def test_pick_up_tip(subject: CommandTranslator) -> None:
+    """It should translate a JSON pick up tip to a ProtocolEngine PickUpTipRequest."""
     input_json_command = models.json_protocol.PickUpDropTipCommand(
         command="pickUpTip",
         params=models.json_protocol.PipetteAccessParams(
@@ -281,3 +276,21 @@ def test_pick_up_tip(subject) -> None:
 
     output = subject.translate(_make_json_protocol(commands=[input_json_command]))
     assert output == expected_output
+
+
+def test_pause(subject: CommandTranslator) -> None:
+    """It should translate delay with wait=True to a PauseRequest."""
+    input_command = models.json_protocol.DelayCommand(
+        command="delay",
+        params=models.json_protocol.DelayCommandParams(
+            wait=True,
+            message="hello world",
+        ),
+    )
+    input_protocol = _make_json_protocol(commands=[input_command])
+
+    result = subject.translate(input_protocol)
+
+    assert result == [
+        pe_commands.PauseRequest(data=pe_commands.PauseData(message="hello world"))
+    ]

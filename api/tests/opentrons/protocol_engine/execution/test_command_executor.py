@@ -21,6 +21,7 @@ from opentrons.protocol_engine.execution import (
     EquipmentHandler,
     MovementHandler,
     PipettingHandler,
+    RunControlHandler,
 )
 
 
@@ -49,6 +50,12 @@ def pipetting(decoy: Decoy) -> PipettingHandler:
 
 
 @pytest.fixture
+def run_control(decoy: Decoy) -> RunControlHandler:
+    """Get a mocked out RunControlHandler."""
+    return decoy.mock(cls=RunControlHandler)
+
+
+@pytest.fixture
 def resources(decoy: Decoy) -> ResourceProviders:
     """Get a mocked out ResourceProviders."""
     return decoy.mock(cls=ResourceProviders)
@@ -66,6 +73,7 @@ def subject(
     equipment: EquipmentHandler,
     movement: MovementHandler,
     pipetting: PipettingHandler,
+    run_control: RunControlHandler,
     resources: ResourceProviders,
     command_mapper: CommandMapper,
 ) -> CommandExecutor:
@@ -75,6 +83,7 @@ def subject(
         equipment=equipment,
         movement=movement,
         pipetting=pipetting,
+        run_control=run_control,
         resources=resources,
         command_mapper=command_mapper,
     )
@@ -99,6 +108,7 @@ async def test_execute(
     equipment: EquipmentHandler,
     movement: MovementHandler,
     pipetting: PipettingHandler,
+    run_control: RunControlHandler,
     resources: ResourceProviders,
     command_mapper: CommandMapper,
     subject: CommandExecutor,
@@ -162,6 +172,7 @@ async def test_execute(
             equipment=equipment,
             movement=movement,
             pipetting=pipetting,
+            run_control=run_control,
         )
     ).then_return(
         command_impl  # type: ignore[arg-type]
@@ -206,6 +217,7 @@ async def test_execute_raises_protocol_engine_error(
     equipment: EquipmentHandler,
     movement: MovementHandler,
     pipetting: PipettingHandler,
+    run_control: RunControlHandler,
     resources: ResourceProviders,
     command_mapper: CommandMapper,
     subject: CommandExecutor,
@@ -269,6 +281,7 @@ async def test_execute_raises_protocol_engine_error(
             equipment=equipment,
             movement=movement,
             pipetting=pipetting,
+            run_control=run_control,
         )
     ).then_return(
         command_impl  # type: ignore[arg-type]

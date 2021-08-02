@@ -1,5 +1,5 @@
 """Synchronous ProtocolEngine client module."""
-from typing import cast
+from typing import cast, Optional
 
 from opentrons.types import MountType
 
@@ -134,3 +134,9 @@ class SyncClient:
         )
         result = self._transport.execute_command(request=request)
         return cast(commands.DispenseResult, result)
+
+    def pause(self, message: Optional[str]) -> commands.PauseResult:
+        """Execute a ``PauseRequest``, returning the result."""
+        request = commands.PauseRequest(data=commands.PauseData(message=message))
+        result = self._transport.execute_command(request=request)
+        return cast(commands.PauseResult, result)

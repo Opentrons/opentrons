@@ -196,3 +196,19 @@ def test_dispense(
     )
 
     assert result == response
+
+
+def test_pause(
+    decoy: Decoy,
+    transport: AbstractSyncTransport,
+    subject: SyncClient,
+) -> None:
+    """It should execute a pause command."""
+    request = commands.PauseRequest(data=commands.PauseData(message="hello world"))
+    response = commands.PauseResult()
+
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+
+    result = subject.pause(message="hello world")
+
+    assert result == response

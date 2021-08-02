@@ -6,6 +6,7 @@ from opentrons.protocol_engine.execution import (
     EquipmentHandler,
     MovementHandler,
     PipettingHandler,
+    RunControlHandler,
 )
 
 from opentrons.protocol_engine.commands.add_labware_definition import (
@@ -21,12 +22,14 @@ async def test_add_labware_implementation(
     equipment: EquipmentHandler,
     movement: MovementHandler,
     pipetting: PipettingHandler,
+    run_control: RunControlHandler,
 ) -> None:
     """An AddLabwareRequest should have an execution implementation."""
     subject = AddLabwareDefinitionImplementation(
         equipment=equipment,
         movement=movement,
         pipetting=pipetting,
+        run_control=run_control,
     )
 
     data = AddLabwareDefinitionData(definition=well_plate_def)
