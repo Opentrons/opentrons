@@ -12,6 +12,7 @@ class SessionActionType(str, Enum):
     START = "start"
     PAUSE = "pause"
     RESUME = "resume"
+    HALT = "halt"
 
 
 class SessionActionCreateData(BaseModel):

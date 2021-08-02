@@ -103,31 +103,23 @@ async def test_python_runner_run(
     decoy.verify(
         protocol_engine.play(),
         await executor.execute(),
-        await protocol_engine.wait_for_done(),
+        await protocol_engine.stop(),
     )
 
 
-def test_python_runner_pause(
+async def test_python_runner_run_always_stops(
     decoy: Decoy,
     protocol_engine: ProtocolEngine,
+    executor: PythonExecutor,
     subject: PythonFileRunner,
 ) -> None:
-    """It should be able to pause the run."""
-    subject.pause()
-    decoy.verify(protocol_engine.pause())
+    """It should stop the engine even if Python execution fails."""
+    decoy.when(await executor.execute()).then_raise(RuntimeError("oh no"))
 
+    with pytest.raises(RuntimeError, match="oh no"):
+        await subject.run()
 
-def test_python_runner_play(
-    decoy: Decoy,
-    protocol_engine: ProtocolEngine,
-    subject: PythonFileRunner,
-) -> None:
-    """It should be able to resume the run."""
-    subject.play()
-    decoy.verify(protocol_engine.play())
-
-
-@pytest.mark.xfail(raises=NotImplementedError, strict=True)
-def test_python_runner_stop(subject: PythonFileRunner) -> None:
-    """It should be able to stop the run."""
-    subject.stop()
+    decoy.verify(
+        await protocol_engine.stop(),
+        times=1,
+    )

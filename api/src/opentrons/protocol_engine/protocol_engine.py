@@ -1,8 +1,18 @@
 """ProtocolEngine class definition."""
+from opentrons.hardware_control import API as HardwareAPI
+
 from .resources import ResourceProviders
 from .commands import Command, CommandRequest, CommandMapper
 from .execution import QueueWorker
-from .state import StateStore, StateView, PlayAction, PauseAction, UpdateCommandAction
+
+from .state import (
+    StateStore,
+    StateView,
+    PlayAction,
+    PauseAction,
+    StopAction,
+    UpdateCommandAction,
+)
 
 
 class ProtocolEngine:
@@ -17,6 +27,7 @@ class ProtocolEngine:
     _command_mapper: CommandMapper
     _resources: ResourceProviders
     _queue_worker: QueueWorker
+    _hardware_api: HardwareAPI
 
     def __init__(
         self,
@@ -24,6 +35,7 @@ class ProtocolEngine:
         command_mapper: CommandMapper,
         resources: ResourceProviders,
         queue_worker: QueueWorker,
+        hardware_api: HardwareAPI,
     ) -> None:
         """Initialize a ProtocolEngine instance.
 
@@ -34,6 +46,7 @@ class ProtocolEngine:
         self._command_mapper = command_mapper
         self._resources = resources
         self._queue_worker = queue_worker
+        self._hardware_api = hardware_api
 
     @property
     def state_view(self) -> StateView:
@@ -42,12 +55,16 @@ class ProtocolEngine:
 
     def play(self) -> None:
         """Start or resume executing commands in the queue."""
-        self._state_store.handle_action(PlayAction())
+        action = PlayAction()
+        self._state_store.commands.validate_action_allowed(action)
+        self._state_store.handle_action(action)
         self._queue_worker.start()
 
     def pause(self) -> None:
         """Pause executing commands in the queue."""
-        self._state_store.handle_action(PauseAction())
+        action = PauseAction()
+        self._state_store.commands.validate_action_allowed(action)
+        self._state_store.handle_action(action)
 
     def add_command(self, request: CommandRequest) -> Command:
         """Add a command to the `ProtocolEngine`'s queue.
@@ -90,15 +107,40 @@ class ProtocolEngine:
 
         return self._state_store.commands.get(command_id=command.id)
 
-    async def wait_for_done(self) -> None:
-        """Wait for the ProtocolEngine to become idle.
+    def halt(self) -> None:
+        """Halt execution, stopping all motion and cancelling future commands.
 
-        The ProtocolEngine is considered "done" when there is no command
-        currently executing nor any commands left in the queue.
-
-        This method should not raise, but if any unexepected exceptions
-        happen during command execution that are not properly caught by
-        the CommandExecutor, this is where they will be raised.
+        This method is synchronous to allow the halt to reach hardware
+        immediately. You should call `stop` after calling `halt` for cleanup
+        and to allow the engine to settle and recover.
         """
-        await self._state_store.wait_for(self._state_store.commands.get_is_complete)
-        await self._queue_worker.stop()
+        self._state_store.handle_action(StopAction())
+        self._queue_worker.cancel()
+        self._hardware_api.halt()
+
+    async def stop(self, wait_until_complete: bool = False) -> None:
+        """Gracefully stop the ProtocolEngine, waiting for it to become idle.
+
+        The engine will finish executing its current command (if any),
+        and then shut down. After an engine has been `stop`'ed, it cannot
+        be restarted.
+
+        This method should not raise, but if any exceptions happen during
+        execution that are not properly caught by the CommandExecutor, they
+        will be raised here.
+
+        Arguments:
+            wait_until_complete: Wait until _all_ commands have completed
+                before stopping the engine.
+        """
+        if wait_until_complete:
+            await self._state_store.wait_for(
+                condition=self._state_store.commands.get_all_complete
+            )
+
+        self._state_store.handle_action(StopAction())
+
+        try:
+            await self._queue_worker.join()
+        finally:
+            await self._hardware_api.stop(home_after=False)

@@ -79,9 +79,12 @@ async def create_session_action(
             # and place them in the session response
             task_runner.run(engine_store.runner.run)
         elif action.actionType == SessionActionType.RESUME:
-            engine_store.runner.play()
+            engine_store.engine.play()
         elif action.actionType == SessionActionType.PAUSE:
-            engine_store.runner.pause()
+            engine_store.engine.pause()
+        if action.actionType == SessionActionType.HALT:
+            engine_store.engine.halt()
+            task_runner.run(engine_store.engine.stop)
 
     except SessionNotFoundError as e:
         raise SessionNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)

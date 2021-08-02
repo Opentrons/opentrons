@@ -60,9 +60,7 @@ def test_create_start_action(
     client: TestClient,
 ) -> None:
     """It should handle a start action."""
-    session_created_at = datetime.now()
-
-    actions = SessionAction(
+    action = SessionAction(
         actionType=SessionActionType.START,
         createdAt=current_time,
         id=unique_id,
@@ -71,8 +69,8 @@ def test_create_start_action(
     next_session = SessionResource(
         session_id="session-id",
         create_data=BasicSessionCreateData(),
-        created_at=session_created_at,
-        actions=[actions],
+        created_at=datetime(year=2021, month=1, day=1),
+        actions=[action],
     )
 
     decoy.when(
@@ -82,14 +80,14 @@ def test_create_start_action(
             action_data=SessionActionCreateData(actionType=SessionActionType.START),
             created_at=current_time,
         ),
-    ).then_return((actions, next_session))
+    ).then_return((action, next_session))
 
     response = client.post(
         "/sessions/session-id/actions",
         json={"data": {"actionType": "start"}},
     )
 
-    verify_response(response, expected_status=201, expected_data=actions)
+    verify_response(response, expected_status=201, expected_data=action)
     decoy.verify(task_runner.run(engine_store.runner.run))
 
 
@@ -127,8 +125,6 @@ def test_create_session_action_without_runner(
     client: TestClient,
 ) -> None:
     """It should 400 if the runner is not able to handle the action."""
-    session_created_at = datetime.now()
-
     actions = SessionAction(
         actionType=SessionActionType.START,
         createdAt=current_time,
@@ -138,7 +134,7 @@ def test_create_session_action_without_runner(
     next_session = SessionResource(
         session_id="unique-id",
         create_data=BasicSessionCreateData(),
-        created_at=session_created_at,
+        created_at=datetime(year=2021, month=1, day=1),
         actions=[actions],
     )
 
@@ -179,9 +175,7 @@ def test_create_pause_action(
     client: TestClient,
 ) -> None:
     """It should handle a pause action."""
-    session_created_at = datetime.now()
-
-    actions = SessionAction(
+    action = SessionAction(
         actionType=SessionActionType.PAUSE,
         createdAt=current_time,
         id=unique_id,
@@ -190,8 +184,8 @@ def test_create_pause_action(
     next_session = SessionResource(
         session_id="unique-id",
         create_data=BasicSessionCreateData(),
-        created_at=session_created_at,
-        actions=[actions],
+        created_at=datetime(year=2021, month=1, day=1),
+        actions=[action],
     )
 
     decoy.when(
@@ -201,15 +195,15 @@ def test_create_pause_action(
             action_data=SessionActionCreateData(actionType=SessionActionType.PAUSE),
             created_at=current_time,
         ),
-    ).then_return((actions, next_session))
+    ).then_return((action, next_session))
 
     response = client.post(
         "/sessions/session-id/actions",
         json={"data": {"actionType": "pause"}},
     )
 
-    verify_response(response, expected_status=201, expected_data=actions)
-    decoy.verify(engine_store.runner.pause())
+    verify_response(response, expected_status=201, expected_data=action)
+    decoy.verify(engine_store.engine.pause())
 
 
 def test_create_resume_action(
@@ -221,9 +215,7 @@ def test_create_resume_action(
     client: TestClient,
 ) -> None:
     """It should handle a resume action."""
-    session_created_at = datetime.now()
-
-    actions = SessionAction(
+    action = SessionAction(
         actionType=SessionActionType.RESUME,
         createdAt=current_time,
         id=unique_id,
@@ -232,8 +224,8 @@ def test_create_resume_action(
     next_session = SessionResource(
         session_id="unique-id",
         create_data=BasicSessionCreateData(),
-        created_at=session_created_at,
-        actions=[actions],
+        created_at=datetime(year=2021, month=1, day=1),
+        actions=[action],
     )
 
     decoy.when(
@@ -243,12 +235,56 @@ def test_create_resume_action(
             action_data=SessionActionCreateData(actionType=SessionActionType.RESUME),
             created_at=current_time,
         ),
-    ).then_return((actions, next_session))
+    ).then_return((action, next_session))
 
     response = client.post(
         "/sessions/session-id/actions",
         json={"data": {"actionType": "resume"}},
     )
 
-    verify_response(response, expected_status=201, expected_data=actions)
-    decoy.verify(engine_store.runner.play())
+    verify_response(response, expected_status=201, expected_data=action)
+    decoy.verify(engine_store.engine.play())
+
+
+def test_create_halt_action(
+    decoy: Decoy,
+    task_runner: TaskRunner,
+    session_view: SessionView,
+    engine_store: EngineStore,
+    unique_id: str,
+    current_time: datetime,
+    client: TestClient,
+) -> None:
+    """It should handle a halt action."""
+    action = SessionAction(
+        actionType=SessionActionType.HALT,
+        createdAt=current_time,
+        id=unique_id,
+    )
+
+    next_session = SessionResource(
+        session_id="unique-id",
+        create_data=BasicSessionCreateData(),
+        created_at=datetime(year=2021, month=1, day=1),
+        actions=[action],
+    )
+
+    decoy.when(
+        session_view.with_action(
+            session=prev_session,
+            action_id=unique_id,
+            action_data=SessionActionCreateData(actionType=SessionActionType.HALT),
+            created_at=current_time,
+        ),
+    ).then_return((action, next_session))
+
+    response = client.post(
+        "/sessions/session-id/actions",
+        json={"data": {"actionType": "halt"}},
+    )
+
+    verify_response(response, expected_status=201, expected_data=action)
+    decoy.verify(
+        engine_store.engine.halt(),
+        task_runner.run(engine_store.engine.stop),
+    )

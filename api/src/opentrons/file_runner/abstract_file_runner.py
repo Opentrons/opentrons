@@ -14,18 +14,3 @@ class AbstractFileRunner(ABC):
     async def run(self) -> None:
         """Run the protocol file to completion."""
         ...
-
-    @abstractmethod
-    def play(self) -> None:
-        """Resume running the protocol file after a pause."""
-        ...
-
-    @abstractmethod
-    def pause(self) -> None:
-        """Pause the running protocol file's execution."""
-        ...
-
-    @abstractmethod
-    def stop(self) -> None:
-        """Cancel the running protocol file."""
-        ...

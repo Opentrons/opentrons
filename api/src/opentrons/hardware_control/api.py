@@ -591,9 +591,9 @@ class API(HardwareAPILike):
         asyncio.run_coroutine_threadsafe(self._execution_manager.cancel(),
                                          self._loop)
 
-    async def stop(self):
+    async def stop(self, home_after: bool = True):
         """
-        Stop motion as soon as possible, reset, and home.
+        Stop motion as soon as possible, reset, and optionally home.
 
         This will cancel motion (after the current call to :py:meth:`move`;
         see :py:meth:`pause` for more detail), then home and reset the
@@ -602,7 +602,9 @@ class API(HardwareAPILike):
         self._backend.halt()
         self._log.info("Recovering from halt")
         await self.reset()
-        await self.home()
+
+        if home_after:
+            await self.home()
 
     async def _wait_for_is_running(self):
         if not self.is_simulator:
