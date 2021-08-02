@@ -34,8 +34,8 @@ module.exports = {
     'step-generation/src/**/*.(js|ts|tsx)',
   ],
   coveragePathIgnorePatterns: [
-    "/node_modules/",
-    "/__mocks__/",
+    '/node_modules/',
+    '/__mocks__/',
     '/__tests__/',
     '/__fixtures__/',
     '/__utils__/',
