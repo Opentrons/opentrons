@@ -19,6 +19,7 @@ from typing import (Any, Dict, List, Mapping, TextIO, Tuple, BinaryIO,
 import opentrons
 from opentrons.hardware_control.simulator_setup import load_simulator
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
+from opentrons.protocols.duration import DurationEstimator
 from opentrons.protocols.execution import execute
 import opentrons.broker
 from opentrons.config import IS_ROBOT, JUPYTER_NOTEBOOK_LABWARE_DIR
@@ -236,7 +237,7 @@ def simulate(protocol_file: TextIO,
              custom_data_paths: List[str] = None,
              propagate_logs: bool = False,
              hardware_simulator_file_path: str = None,
-             estimate_duration: bool = False,
+             duration_estimator: Optional[DurationEstimator] = None,
              log_level: str = 'warning') -> Tuple[List[Mapping[str, Any]],
                                                   Optional[BundleContents]]:
     """
@@ -286,8 +287,7 @@ def simulate(protocol_file: TextIO,
                               :py:attr:`.ProtocolContext.bundled_data`.
     :param hardware_simulator_file_path: A path to a JSON file defining a
                                          hardware simulator.
-    :param estimate_duration: Whether this function should estimate how long
-                              the protocol will take to run.
+    :param duration_estimator: Optional duration estimator object.
     :param propagate_logs: Whether this function should allow logs from the
                            Opentrons stack to propagate up to the root handler.
                            This can be useful if you're integrating this
@@ -343,6 +343,9 @@ def simulate(protocol_file: TextIO,
     scraper = CommandScraper(stack_logger,
                              log_level,
                              broker)
+    if duration_estimator:
+        broker.subscribe(command_types.COMMAND, duration_estimator.on_message)
+
     try:
         execute.run_protocol(protocol, context)
         if isinstance(protocol, PythonProtocol)\
@@ -526,13 +529,15 @@ def main() -> int:
     args = parser.parse_args()
     # Try to migrate api v1 containers if needed
 
+    duration_estimator = DurationEstimator() if args.estimate_duration else None
+
     runlog, maybe_bundle = simulate(
         args.protocol,
         args.protocol.name,
         getattr(args, 'custom_labware_path', []),
         getattr(args, 'custom_data_path', [])
         + getattr(args, 'custom_data_file', []),
-        estimate_duration=args.estimate_duration,
+        duration_estimator=duration_estimator,
         hardware_simulator_file_path=getattr(args,
                                              'custom_hardware_simulator_file'),
         log_level=args.log_level)
@@ -549,6 +554,9 @@ def main() -> int:
 
     if args.output == 'runlog':
         print(format_runlog(runlog))
+
+    if duration_estimator:
+        print("estimate: ", duration_estimator.get_total_duration())
 
     return 0
 
