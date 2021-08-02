@@ -60,6 +60,7 @@ def subject(
 ) -> ProtocolEngine:
     """Get a ProtocolEngine test subject with its dependencies stubbed out."""
     return ProtocolEngine(
+        hardware_api=hardware_api,
         state_store=state_store,
         queue_worker=queue_worker,
         command_mapper=command_mapper,

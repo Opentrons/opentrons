@@ -22,5 +22,5 @@ async def create_protocol_engine(hardware_api: HardwareAPI) -> ProtocolEngine:
     return ProtocolEngine(
         state_store=state_store,
         queue_worker=queue_worker,
-        hardware_api=hardware,
+        hardware_api=hardware_api,
     )
