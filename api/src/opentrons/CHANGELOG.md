@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.5.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v4.5.0-alpha.0...v4.5.0-alpha.1) (2021-08-03)
+
+
+### Bug Fixes
+
+* **api:** reduce the severity of retry message from warning to info. ([#8192](https://github.com/Opentrons/opentrons/issues/8192)) ([47bc77a](https://github.com/Opentrons/opentrons/commit/47bc77a1a0b89becf9e43ac2f32b53f2b6efa048))
+
+
+
+
+
 # [4.5.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v4.4.0...v4.5.0-alpha.0) (2021-07-26)
 
 
