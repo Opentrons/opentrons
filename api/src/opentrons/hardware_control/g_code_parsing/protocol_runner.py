@@ -112,7 +112,7 @@ class ProtocolRunner:
             loop=self._get_loop()
         )
         parsed_protocol = parse(protocol.text, protocol.filename)
-        watcher = GCodeWatcher()
-        execute.run_protocol(parsed_protocol, context=context)
+        with GCodeWatcher() as watcher:
+            execute.run_protocol(parsed_protocol, context=context)
         yield GCodeProgram.from_g_code_watcher(watcher)
         server_manager.stop()
