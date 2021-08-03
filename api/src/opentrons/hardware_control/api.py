@@ -265,7 +265,7 @@ class API(HardwareAPILike):
         return rb_cal.validate_attitude_deck_calibration(
             self._robot_calibration.deck_calibration)
 
-    async def register_callback(self, cb):
+    def register_callback(self, cb):
         """ Allows the caller to register a callback, and returns a closure
         that can be used to unregister the provided callback
         """

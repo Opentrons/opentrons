@@ -49,7 +49,7 @@ async def test_init_hw_event(simulating_wrapper):
     """
     simulating_wrapper._tm = AsyncMock()
     await simulating_wrapper.init_event_watchers()
-    simulating_wrapper._tm.register_callback.assert_awaited_once_with(
+    simulating_wrapper._tm.register_callback.assert_called_once_with(
         simulating_wrapper._publish_hardware_event
     )
     simulating_wrapper._tm.reset_mock()

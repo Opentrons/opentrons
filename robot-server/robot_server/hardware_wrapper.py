@@ -57,12 +57,12 @@ class HardwareWrapper:
 
         if self._hardware_event_watcher is None:
             log.info("Starting hardware-event-notify publisher")
-            self._hardware_event_watcher = await self._tm.register_callback(
+            self._hardware_event_watcher = self._tm.register_callback(
                 self._publish_hardware_event
             )
         else:
             log.warning(
-                "Cannot start new hardware event watcher " "when one already exists"
+                "Cannot start new hardware event watcher when one already exists"
             )
 
     def _publish_hardware_event(self, hw_event: HardwareEvent) -> None:
