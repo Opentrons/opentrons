@@ -3,24 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [4.5.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v4.5.0-alpha.0...v4.5.0-alpha.1) (2021-08-03)
-
-
-### Bug Fixes
-
-* **api:** reduce the severity of retry message from warning to info. ([#8192](https://github.com/Opentrons/opentrons/issues/8192)) ([47bc77a](https://github.com/Opentrons/opentrons/commit/47bc77a1a0b89becf9e43ac2f32b53f2b6efa048))
-
-
-
-
-
-# [4.5.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v4.4.0...v4.5.0-alpha.0) (2021-07-26)
+# [4.5.0](https://github.com/Opentrons/opentrons/compare/v4.4.0...v4.5.0) (2021-08-03)
 
 
 ### Bug Fixes
 
 * **api:** fix module path for jupyter notebook ([#8009](https://github.com/Opentrons/opentrons/issues/8009)) ([f8bdf5c](https://github.com/Opentrons/opentrons/commit/f8bdf5c096c444320e9b70d5f88f6eec38a2dc01))
 * **api:** ignore missing aionotify more properly ([#8154](https://github.com/Opentrons/opentrons/issues/8154)) ([bb0e3a0](https://github.com/Opentrons/opentrons/commit/bb0e3a02720b4e7f9c3e0678ea6f8d4d9b5145a4))
+* **api:** reduce the severity of retry message from warning to info. ([#8192](https://github.com/Opentrons/opentrons/issues/8192)) ([47bc77a](https://github.com/Opentrons/opentrons/commit/47bc77a1a0b89becf9e43ac2f32b53f2b6efa048))
 * **api:** tolerate bad json in calibration defs ([#7962](https://github.com/Opentrons/opentrons/issues/7962)) ([588668a](https://github.com/Opentrons/opentrons/commit/588668a8500297ce52bb36d67a93b14790c4d91b))
 * **app:** Run timer stays at 00:00:00 if you reconnect in the middle of a delay ([#7937](https://github.com/Opentrons/opentrons/issues/7937)) ([6415c90](https://github.com/Opentrons/opentrons/commit/6415c9036e5f0368a9862cb11d6608702c0815a3))
 * **labware-creator:** add margin to bottom of LC ([#8034](https://github.com/Opentrons/opentrons/issues/8034)) ([eeace5b](https://github.com/Opentrons/opentrons/commit/eeace5b3f3f953e10c2052e645a7f1551d99a24f)), closes [#8027](https://github.com/Opentrons/opentrons/issues/8027)
