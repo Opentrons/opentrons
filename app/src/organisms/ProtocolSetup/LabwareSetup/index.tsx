@@ -24,34 +24,24 @@ import {
   C_DARK_GRAY,
   C_NEAR_WHITE,
 } from '@opentrons/components'
-import { inferModuleOrientationFromSlot } from '@opentrons/shared-data'
+import {
+  getModuleType,
+  inferModuleOrientationFromXCoordinate,
+} from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
-import { getLabwareDefBySlot } from '../../../redux/protocol'
 import { ModuleTag } from './ModuleTag'
 import { LabwareInfoOverlay } from './LabwareInfoOverlay'
 import { LabwareSetupModal } from './LabwareSetupModal'
 import styles from './styles.css'
-import type {
-  DeckSlot,
-  DeckSlotId,
-  LabwareOffset,
-  ModuleModel,
-  ModuleRealType,
-} from '@opentrons/shared-data'
-import type { Slot } from '../../../redux/robot'
 
-export type ModulesBySlot = Record<
-  DeckSlotId,
-  {
-    model: ModuleModel
-    labwareOffset: LabwareOffset
-    type: ModuleRealType
-  }
->
+import {
+  CoordinatesByModuleModel,
+  CoordinatesByLabwareId,
+} from '../RunSetupCard'
 
 interface LabwareSetupProps {
-  modulesBySlot: ModulesBySlot
-  labwareDefBySlot: ReturnType<typeof getLabwareDefBySlot>
+  moduleRenderCoords: CoordinatesByModuleModel
+  labwareRenderCoords: CoordinatesByLabwareId
 }
 
 const DECK_LAYER_BLOCKLIST = [
@@ -65,7 +55,7 @@ const DECK_LAYER_BLOCKLIST = [
 ]
 
 export const LabwareSetup = (props: LabwareSetupProps): JSX.Element | null => {
-  const { modulesBySlot, labwareDefBySlot } = props
+  const { moduleRenderCoords, labwareRenderCoords } = props
   const proceedToRunDisabled = false
   const proceedToRunDisabledReason = 'replace with actual tooltip text'
   const LinkComponent = proceedToRunDisabled ? 'button' : NavLink
@@ -104,55 +94,53 @@ export const LabwareSetup = (props: LabwareSetupProps): JSX.Element | null => {
           className={styles.deck_map}
           deckLayerBlocklist={DECK_LAYER_BLOCKLIST}
         >
-          {({ deckSlotsById }) =>
-            map<DeckSlot>(deckSlotsById, (slot: DeckSlot, slotId: string) => {
-              if (slot.matingSurfaceUnitVector == null) return null // if slot has no mating surface, don't render anything in it
-              const moduleInSlot = modulesBySlot[slotId]
-              const labwareDefInSlot = labwareDefBySlot[slotId as Slot]
-
-              const [slotPositionX, slotPositionY] = slot.position
-              const orientation = inferModuleOrientationFromSlot(slot.id)
-
-              return (
-                <React.Fragment key={slotId}>
-                  {moduleInSlot && (
-                    <React.Fragment>
+          {() => {
+            return (
+              <React.Fragment>
+                {map(moduleRenderCoords, ({ x, y, moduleModel }) => {
+                  const orientation = inferModuleOrientationFromXCoordinate(x)
+                  return (
+                    <React.Fragment
+                      key={`LabwareSetup_Module_${moduleModel}_${x}${y}`}
+                    >
                       <ModuleViz
-                        x={slotPositionX}
-                        y={slotPositionY}
+                        x={x}
+                        y={y}
                         orientation={orientation}
-                        moduleType={moduleInSlot.type}
-                        slotName={slot.id}
+                        moduleType={getModuleType(moduleModel)}
                       />
                       <ModuleTag
-                        x={slotPositionX}
-                        y={slotPositionY}
-                        module={moduleInSlot}
+                        x={x}
+                        y={y}
+                        moduleModel={moduleModel}
                         orientation={orientation}
                       />
                     </React.Fragment>
-                  )}
-                  {labwareDefInSlot != null && (
-                    <React.Fragment>
+                  )
+                })}
+                {map(labwareRenderCoords, ({ x, y, labwareDef }) => {
+                  return (
+                    <React.Fragment
+                      key={`LabwareSetup_Labware_${labwareDef.metadata.displayName}_${x}${y}`}
+                    >
                       <svg>
-                        <g
-                          transform={`translate(${slot.position[0]}, ${slot.position[1]})`}
-                        >
-                          <LabwareRender definition={labwareDefInSlot} />
+                        <g transform={`translate(${x},${y})`}>
+                          <LabwareRender definition={labwareDef} />
                         </g>
                         <g>
                           <LabwareInfoOverlay
-                            slotPosition={slot.position}
-                            definition={labwareDefInSlot}
+                            x={x}
+                            y={y}
+                            definition={labwareDef}
                           />
                         </g>
                       </svg>
                     </React.Fragment>
-                  )}
-                </React.Fragment>
-              )
-            })
-          }
+                  )
+                })}
+              </React.Fragment>
+            )
+          }}
         </RobotWorkSpace>
         <Text color={C_DARK_GRAY} margin={`${SPACING_4} ${SPACING_6}`}>
           {t('labware_position_check_text')}

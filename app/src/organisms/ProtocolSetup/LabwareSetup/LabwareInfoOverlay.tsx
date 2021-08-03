@@ -2,7 +2,6 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import cx from 'classnames'
 import {
-  DeckSlot,
   getLabwareDisplayName,
   LabwareDefinition2,
 } from '@opentrons/shared-data'
@@ -36,26 +35,24 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element => {
 }
 
 interface LabwareInfoOverlayProps {
-  slotPosition: DeckSlot['position']
+  x: number
+  y: number
   definition: LabwareDefinition2
 }
 export const LabwareInfoOverlay = (
   props: LabwareInfoOverlayProps
 ): JSX.Element => {
-  const { slotPosition, definition } = props
-  const [x, y] = slotPosition
+  const { x, y, definition } = props
   const width = definition.dimensions.xDimension
   const height = definition.dimensions.yDimension
   return (
-    <svg>
-      <RobotCoordsForeignDiv
-        {...{ x, y, width, height }}
-        innerDivProps={{
-          className: cx(styles.labware_info_overlay),
-        }}
-      >
-        <LabwareInfo displayName={getLabwareDisplayName(definition)} />
-      </RobotCoordsForeignDiv>
-    </svg>
+    <RobotCoordsForeignDiv
+      {...{ x, y, width, height }}
+      innerDivProps={{
+        className: cx(styles.labware_info_overlay),
+      }}
+    >
+      <LabwareInfo displayName={getLabwareDisplayName(definition)} />
+    </RobotCoordsForeignDiv>
   )
 }

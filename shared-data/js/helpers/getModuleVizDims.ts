@@ -83,3 +83,12 @@ export const inferModuleOrientationFromSlot = (
 
   return 'left'
 }
+
+export const inferModuleOrientationFromXCoordinate = (
+  xCoordinate: number
+): ModuleOrientation => {
+  if (xCoordinate === 0) {
+    return 'left'
+  }
+  return 'right'
+}

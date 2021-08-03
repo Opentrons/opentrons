@@ -3,7 +3,6 @@ import { RobotCoordsForeignDiv } from '@opentrons/components'
 import {
   getModuleType,
   getModuleVizDims,
-  LabwareOffset,
   ModuleModel,
   THERMOCYCLER_MODULE_TYPE,
   STD_SLOT_X_DIM,
@@ -17,10 +16,7 @@ export interface ModuleTagProps {
   x: number
   y: number
   orientation: 'left' | 'right'
-  module: {
-    model: ModuleModel
-    labwareOffset: LabwareOffset
-  }
+  moduleModel: ModuleModel
 }
 
 // eyeballed width/height to match designs
@@ -49,9 +45,9 @@ const getModuleGeneration = (model: ModuleModel): 'GEN1' | 'GEN2' => {
 }
 
 export const ModuleTag = (props: ModuleTagProps): JSX.Element => {
-  const { x, y, orientation, module } = props
+  const { x, y, orientation, moduleModel } = props
   const { t } = useTranslation('module_display_names')
-  const moduleType = getModuleType(module.model)
+  const moduleType = getModuleType(moduleModel)
   const { childXOffset, childYOffset } = getModuleVizDims(
     orientation,
     moduleType
@@ -82,7 +78,7 @@ export const ModuleTag = (props: ModuleTagProps): JSX.Element => {
       <div>
         <p className={styles.module_info}> {t(moduleType)} </p>
         <p className={styles.module_info}>
-          {getModuleGeneration(module.model)}{' '}
+          {getModuleGeneration(moduleModel)}{' '}
         </p>
       </div>
     </RobotCoordsForeignDiv>

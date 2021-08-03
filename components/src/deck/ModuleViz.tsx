@@ -7,7 +7,6 @@ interface Props {
   y: number
   orientation: 'left' | 'right'
   moduleType: ModuleRealType
-  slotName: string
 }
 
 export const ModuleViz = (props: Props): JSX.Element => {

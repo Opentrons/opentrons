@@ -16,8 +16,6 @@ export const STD_SLOT_X_DIM = 128
 export const STD_SLOT_Y_DIM = 86
 export const STD_SLOT_DIVIDER_WIDTH = 4
 
-export const SPAN7_8_10_11_SLOT: 'span7_8_10_11' = 'span7_8_10_11'
-
 export const OPENTRONS_LABWARE_NAMESPACE = 'opentrons'
 
 // TODO: IL 2020-02-19 These 3 constants are DEPRECATED because they're ambiguous model vs type.
@@ -43,6 +41,9 @@ export const GEN1: 'GEN1' = 'GEN1'
 // pipette mounts
 export const LEFT: 'left' = 'left'
 export const RIGHT: 'right' = 'right'
+
+// fake slot that PD uses to represent the slot the thermocycler sits in
+export const SPAN7_8_10_11_SLOT: 'span7_8_10_11' = 'span7_8_10_11'
 
 // NOTE: these are NOT module MODELs, they are `moduleType`s. Should match ENUM in module definition file.
 export const TEMPERATURE_MODULE_TYPE: 'temperatureModuleType' =

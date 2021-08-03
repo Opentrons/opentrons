@@ -12,7 +12,7 @@ import { LabwareSetupModal } from '../LabwareSetupModal'
 import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
 import { ModuleTag } from '../ModuleTag'
 import {
-  inferModuleOrientationFromSlot,
+  inferModuleOrientationFromXCoordinate,
   LabwareDefinition2,
   ModuleModel,
   ModuleRealType,
@@ -34,9 +34,21 @@ jest.mock('@opentrons/shared-data', () => {
   const actualSharedData = jest.requireActual('@opentrons/shared-data')
   return {
     ...actualSharedData,
-    inferModuleOrientationFromSlot: jest.fn(),
+    inferModuleOrientationFromXCoordinate: jest.fn(),
   }
 })
+
+// this is needed because under the hood react calls components with two arguments (props and some second argument nobody seems to know)
+// https://github.com/timkindberg/jest-when/issues/66
+const componentPropsMatcher = (matcher: unknown) =>
+  // @ts-expect-error(sa, 2021-08-03): when.allArgs not part of type definition yet for jest-when
+  when.allArgs((args, equals) => equals(args[0], matcher))
+
+const partialComponentPropsMatcher = (argsToMatch: unknown) =>
+  // @ts-expect-error(sa, 2021-08-03): when.allArgs not part of type definition yet for jest-when
+  when.allArgs((args, equals) =>
+    equals(args[0], expect.objectContaining(argsToMatch))
+  )
 
 const mockLabwareInfoOverlay = LabwareInfoOverlay as jest.MockedFunction<
   typeof LabwareInfoOverlay
@@ -46,8 +58,8 @@ const mockModuleTag = ModuleTag as jest.MockedFunction<typeof ModuleTag>
 
 const mockModuleViz = ModuleViz as jest.MockedFunction<typeof ModuleViz>
 
-const mockModuleOrientationFromSlot = inferModuleOrientationFromSlot as jest.MockedFunction<
-  typeof inferModuleOrientationFromSlot
+const mockInferModuleOrientationFromXCoordinate = inferModuleOrientationFromXCoordinate as jest.MockedFunction<
+  typeof inferModuleOrientationFromXCoordinate
 >
 
 const mockRobotWorkSpace = RobotWorkSpace as jest.MockedFunction<
@@ -79,6 +91,10 @@ const render = (props: React.ComponentProps<typeof LabwareSetup>) => {
 }
 
 const STUBBED_ORIENTATION_VALUE = 'left'
+const MOCK_300_UL_TIPRACK_ID = '300_ul_tiprack_id'
+const MOCK_MAGNETIC_MODULE_COORDS = [10, 20]
+const MOCK_TC_COORDS = [20, 30]
+const MOCK_300_UL_TIPRACK_COORDS = [30, 40]
 
 const mockMagneticModule = {
   labwareOffset: { x: 5, y: 5, z: 5 },
@@ -87,72 +103,78 @@ const mockMagneticModule = {
   type: 'magneticModuleType' as ModuleRealType,
 }
 
+const mockTCModule = {
+  labwareOffset: { x: 3, y: 3, z: 3 },
+  moduleId: 'TCModuleId',
+  model: 'thermocyclerModuleV1' as ModuleModel,
+  type: 'thermocyclerModuleType' as ModuleRealType,
+}
+
 describe('LabwareSetup', () => {
   let props: React.ComponentProps<typeof LabwareSetup>
   beforeEach(() => {
-    props = { labwareDefBySlot: {}, modulesBySlot: {} }
+    props = { moduleRenderCoords: {}, labwareRenderCoords: {} }
 
-    when(mockModuleOrientationFromSlot)
+    when(mockInferModuleOrientationFromXCoordinate)
       .calledWith(expect.anything())
       .mockReturnValue(STUBBED_ORIENTATION_VALUE)
 
-    mockLabwareSetupModal.mockImplementation(({ onCloseClick }) => {
-      return <div onClick={onCloseClick}>mock labware setup modal</div>
-    })
+    when(mockLabwareSetupModal)
+      .calledWith(
+        componentPropsMatcher({
+          onCloseClick: expect.anything(),
+        })
+      )
+      .mockImplementation(({ onCloseClick }) => (
+        <div onClick={onCloseClick}>mock labware setup modal</div>
+      ))
 
-    mockLabwareRender.mockImplementation(({ definition }) => {
-      if (definition === fixture_tiprack_300_ul) {
-        return (
-          <div>mock labware render of {definition.metadata.displayName}</div>
-        )
-      }
-      return <div></div>
-    })
+    when(mockLabwareRender)
+      .mockReturnValue(<div></div>) // this (default) empty div will be returned when LabwareRender isn't called with expected labware definition
+      .calledWith(
+        componentPropsMatcher({
+          definition: fixture_tiprack_300_ul,
+        })
+      )
+      .mockReturnValue(
+        <div>
+          mock labware render of {fixture_tiprack_300_ul.metadata.displayName}
+        </div>
+      )
 
-    mockLabwareInfoOverlay.mockImplementation(({ definition }) => {
-      if (definition === fixture_tiprack_300_ul) {
-        return (
-          <div>
-            mock labware info overlay of {definition.metadata.displayName}
-          </div>
-        )
-      }
-      return <div></div>
-    })
+    when(mockLabwareInfoOverlay)
+      .mockReturnValue(<div></div>) // this (default) empty div will be returned when LabwareInfoOverlay isn't called with expected props
+      .calledWith(
+        componentPropsMatcher({
+          definition: fixture_tiprack_300_ul,
+          x: MOCK_300_UL_TIPRACK_COORDS[0],
+          y: MOCK_300_UL_TIPRACK_COORDS[1],
+        })
+      )
+      .mockReturnValue(
+        <div>
+          mock labware info overlay of{' '}
+          {fixture_tiprack_300_ul.metadata.displayName}
+        </div>
+      )
 
-    mockModuleViz.mockImplementation(({ orientation, moduleType }) => {
-      if (
-        orientation === STUBBED_ORIENTATION_VALUE &&
-        moduleType === 'magneticModuleType'
-      ) {
-        return <div>mock module viz</div>
-      }
-      return <div></div>
-    })
-
-    mockModuleTag.mockImplementation(({ orientation, module }) => {
-      if (
-        orientation === STUBBED_ORIENTATION_VALUE &&
-        module === mockMagneticModule
-      ) {
-        return <div>mock module tag</div>
-      }
-      return <div></div>
-    })
-
-    mockRobotWorkSpace.mockImplementation(({ deckDef, children }) => {
-      if (children != null && deckDef === (standardDeckDef as any)) {
-        return (
-          <div>
-            {children({
-              deckSlotsById,
-              getRobotCoordsFromDOMCoords: {} as any,
-            })}
-          </div>
-        )
-      }
-      return null
-    })
+    when(mockRobotWorkSpace)
+      .mockReturnValue(<div></div>) // this (default) empty div will be returned when RobotWorkSpace isn't called with expected props
+      .calledWith(
+        partialComponentPropsMatcher({
+          deckDef: standardDeckDef,
+          children: expect.anything(),
+        })
+      )
+      .mockImplementation(({ children }) => (
+        <div>
+          {/* @ts-expect-error children won't be null since we checked for expect.anything() above */}
+          {children({
+            deckSlotsById,
+            getRobotCoordsFromDOMCoords: {} as any,
+          })}
+        </div>
+      ))
   })
 
   afterEach(() => {
@@ -181,13 +203,13 @@ describe('LabwareSetup', () => {
   })
 
   it('should render a deck WITHOUT labware and WITHOUT modules', () => {
-    const labwareDefBySlot = {}
-    const modulesBySlot = {}
+    const moduleRenderCoords = {}
+    const labwareRenderCoords = {}
 
     props = {
       ...props,
-      labwareDefBySlot,
-      modulesBySlot,
+      moduleRenderCoords,
+      labwareRenderCoords,
     }
 
     render(props)
@@ -197,16 +219,20 @@ describe('LabwareSetup', () => {
     expect(mockLabwareInfoOverlay).not.toHaveBeenCalled()
   })
   it('should render a deck WITH labware and WITHOUT modules', () => {
-    const labwareDefBySlot = {
-      '1': fixture_tiprack_300_ul as LabwareDefinition2,
+    const labwareRenderCoords = {
+      '300_ul_tiprack_id': {
+        labwareDef: fixture_tiprack_300_ul as LabwareDefinition2,
+        x: MOCK_300_UL_TIPRACK_COORDS[0],
+        y: MOCK_300_UL_TIPRACK_COORDS[1],
+      },
     }
 
-    const modulesBySlot = {}
+    const moduleRenderCoords = {}
 
     props = {
       ...props,
-      labwareDefBySlot,
-      modulesBySlot,
+      labwareRenderCoords,
+      moduleRenderCoords,
     }
 
     const { getByText } = render(props)
@@ -216,23 +242,81 @@ describe('LabwareSetup', () => {
     getByText('mock labware info overlay of 300ul Tiprack FIXTURE')
   })
   it('should render a deck WITH labware and WITH modules', () => {
-    const labwareDefBySlot = {
-      '1': fixture_tiprack_300_ul as LabwareDefinition2,
+    const labwareRenderCoords = {
+      [MOCK_300_UL_TIPRACK_ID]: {
+        labwareDef: fixture_tiprack_300_ul as LabwareDefinition2,
+        x: MOCK_300_UL_TIPRACK_COORDS[0],
+        y: MOCK_300_UL_TIPRACK_COORDS[1],
+      },
     }
 
-    const modulesBySlot = {
-      '1': mockMagneticModule,
+    const moduleRenderCoords = {
+      [mockMagneticModule.moduleId]: {
+        x: MOCK_MAGNETIC_MODULE_COORDS[0],
+        y: MOCK_MAGNETIC_MODULE_COORDS[1],
+        moduleModel: mockMagneticModule.model,
+      },
+      [mockTCModule.moduleId]: {
+        x: MOCK_TC_COORDS[0],
+        y: MOCK_TC_COORDS[1],
+        moduleModel: mockTCModule.model,
+      },
     }
+
+    when(mockModuleViz)
+      .calledWith(
+        componentPropsMatcher({
+          orientation: STUBBED_ORIENTATION_VALUE,
+          moduleType: mockMagneticModule.type,
+          x: MOCK_MAGNETIC_MODULE_COORDS[0],
+          y: MOCK_MAGNETIC_MODULE_COORDS[1],
+        })
+      )
+      .mockReturnValue(<div>mock module viz {mockMagneticModule.type} </div>)
+
+    when(mockModuleViz)
+      .calledWith(
+        componentPropsMatcher({
+          orientation: STUBBED_ORIENTATION_VALUE,
+          moduleType: mockTCModule.type,
+          x: MOCK_TC_COORDS[0],
+          y: MOCK_TC_COORDS[1],
+        })
+      )
+      .mockReturnValue(<div>mock module viz {mockTCModule.type} </div>)
+
+    when(mockModuleTag)
+      .calledWith(
+        componentPropsMatcher({
+          orientation: STUBBED_ORIENTATION_VALUE,
+          moduleModel: mockMagneticModule.model,
+          x: MOCK_MAGNETIC_MODULE_COORDS[0],
+          y: MOCK_MAGNETIC_MODULE_COORDS[1],
+        })
+      )
+      .mockReturnValue(<div>mock module tag {mockMagneticModule.model} </div>)
+
+    when(mockModuleTag)
+      .calledWith(
+        componentPropsMatcher({
+          orientation: STUBBED_ORIENTATION_VALUE,
+          moduleModel: mockTCModule.model,
+          x: MOCK_TC_COORDS[0],
+          y: MOCK_TC_COORDS[1],
+        })
+      )
+      .mockReturnValue(<div>mock module tag {mockTCModule.model} </div>)
 
     props = {
       ...props,
-      labwareDefBySlot,
-      modulesBySlot,
+      labwareRenderCoords,
+      moduleRenderCoords,
     }
 
     const { getByText } = render(props)
-    getByText('mock module viz')
-    getByText('mock module tag')
+    getByText('mock module viz magneticModuleType')
+    getByText('mock module viz thermocyclerModuleType')
+    getByText('mock module tag magneticModuleV2')
     getByText('mock labware render of 300ul Tiprack FIXTURE')
     getByText('mock labware info overlay of 300ul Tiprack FIXTURE')
   })

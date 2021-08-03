@@ -266,7 +266,6 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
               y={moduleY}
               orientation={orientation}
               moduleType={moduleOnDeck.type}
-              slotName={slot.id}
             />
             <ModuleTag
               x={moduleX}
