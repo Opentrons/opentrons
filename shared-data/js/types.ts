@@ -275,6 +275,10 @@ export interface ModuleCalibrationPoint {
   z?: number
 }
 
+export interface ModuleLayer {
+  name: string
+  pathDValues: string[]
+}
 export interface ModuleDefinition {
   labwareOffset: LabwareOffset
   dimensions: ModuleDimensions
@@ -282,6 +286,7 @@ export interface ModuleDefinition {
   displayName: string
   loadName: string
   quirks: string[]
+  layers: ModuleLayer[]
 }
 
 export type ModuleOrientation = 'left' | 'right'

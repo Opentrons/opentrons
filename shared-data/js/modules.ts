@@ -1,8 +1,8 @@
-import magneticModuleV1 from '../module/definitions/2/magneticModuleV1.json'
-import magneticModuleV2 from '../module/definitions/2/magneticModuleV2.json'
-import temperatureModuleV1 from '../module/definitions/2/temperatureModuleV1.json'
-import temperatureModuleV2 from '../module/definitions/2/temperatureModuleV2.json'
-import thermocyclerModuleV1 from '../module/definitions/2/thermocyclerModuleV1.json'
+import magneticModuleV1 from '../module/definitions/3/magneticModuleV1.json'
+import magneticModuleV2 from '../module/definitions/3/magneticModuleV2.json'
+import temperatureModuleV1 from '../module/definitions/3/temperatureModuleV1.json'
+import temperatureModuleV2 from '../module/definitions/3/temperatureModuleV2.json'
+import thermocyclerModuleV1 from '../module/definitions/3/thermocyclerModuleV1.json'
 
 import {
   MAGDECK,

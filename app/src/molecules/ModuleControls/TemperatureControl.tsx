@@ -181,3 +181,13 @@ const TEMPERATURE_RANGES: {
     secondary: { min: 37, max: 110 },
   },
 }
+
+
+const n = document.getElementById('MODULE')
+let map = []
+n.childNodes.forEach(c => {
+  if(c.nodeName === "g") {
+    map = [...map, {layerName: c.getAttribute('id'), pathDValues: Array.from(c.children).map(i => i.getAttribute('d'))}]
+  }
+})
+console.log(JSON.stringify(map))

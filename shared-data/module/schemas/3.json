@@ -29,12 +29,12 @@
       "type": "string",
       "description": "A valid d-attribute value for an svg path. Note: uses physical coordinate system which has origin at the bottom, front, left of the robot's workspace."
     },
-    "feature": {
+    "layer": {
       "type": "object",
       "description": "A physical feature of the deck",
-      "required": ["footprint"],
+      "required": ["name", "pathDValue"],
       "properties": {
-        "layerName": {
+        "name": {
           "type": "string",
           "description": "Unique identifying name for a given visual layer of the module"
         },
@@ -129,7 +129,7 @@
     "layers": {
       "type": "array",
       "description": "List of visual layers for a given module",
-      "items": { "$ref": "#/definitions/feature" }
+      "items": { "$ref": "#/definitions/layer" }
     }
   }
 }
