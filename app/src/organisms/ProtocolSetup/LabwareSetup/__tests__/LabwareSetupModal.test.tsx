@@ -34,7 +34,7 @@ describe('LabwareSetupModal', () => {
     expect(getByRole('heading', { name: 'Example' })).toBeTruthy()
 
     getByText(
-      'Alice is using a labware in Slot 6. During pre-run check, she adjust the pipette position while checking the A1 of the labware to 0.2mm in X, and 1.2mm in Z. Later, Bob is preparing to run the same protocol on that robot. The labware offset that Alice created in Slot 6 will be applied for Bob’s protocol unless he changes or clears it.'
+      'Alice is using a labware in Slot 6. During labware position check, she adjust the pipette position while checking the A1 of the labware to 0.2mm in X, and 1.2mm in Z. Later, Bob is preparing to run the same protocol on that robot. The labware offset that Alice created in Slot 6 will be applied for Bob’s protocol unless he changes or clears it.'
     )
   })
   it('should render a link to labware creator', () => {

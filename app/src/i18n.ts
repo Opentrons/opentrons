@@ -9,7 +9,6 @@ i18n.use(initReactI18next).init(
     fallbackLng: 'en',
     debug: true,
     ns: [
-      'module_display_names',
       'shared',
       'robot_advanced_settings',
       'robot_calibration',
