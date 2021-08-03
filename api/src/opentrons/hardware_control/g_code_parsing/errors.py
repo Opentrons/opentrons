@@ -32,3 +32,13 @@ class UnparsableCLICommandError(ValueError):
         )
         self.invalid_command = invalid_command
         self.joined_commands = joined_commands
+
+
+class PollingGCodeAdditionError(ValueError):
+    def __init__(self, invalid_g_code) -> None:
+
+        super().__init__(
+            f'Cannot add "{invalid_g_code}" to GCodeProgram because it is'
+            f'a polling command'
+        )
+        self.invalid_g_code = invalid_g_code

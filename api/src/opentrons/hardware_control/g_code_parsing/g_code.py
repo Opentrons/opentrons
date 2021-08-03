@@ -179,6 +179,16 @@ class GCode:
         THERMOCYCLER_IDENT: THERMOCYCLER_G_CODE_EXPLANATION_MAPPING
     }
 
+    # These are a list of codes that are called using polling.
+    # We want to filter these codes out because they are not
+    # actually called by users.
+    POLLING_CODES = [
+        TEMPDECK_G_CODE.GET_TEMP.value,
+        THERMOCYCLER_G_CODE.GET_LID_TEMP.value,
+        THERMOCYCLER_G_CODE.GET_PLATE_TEMP.value,
+        THERMOCYCLER_G_CODE.GET_LID_STATUS.value
+    ]
+
     @classmethod
     def from_raw_code(cls, raw_code: str, device: str, response: str) -> List[GCode]:
         g_code_list = []
@@ -268,6 +278,9 @@ class GCode:
         For instance, "G0 X100 Y200"
         """
         return f'{self.g_code} {self.g_code_body}'.strip()
+
+    def is_polling_command(self) -> bool:
+        return self.g_code in self.POLLING_CODES
 
     @property
     def response(self):
