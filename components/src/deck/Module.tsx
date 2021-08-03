@@ -1,5 +1,6 @@
 import * as React from 'react'
 import cx from 'classnames'
+import styled from 'styled-components'
 
 import {
   getModuleDisplayName,
@@ -15,7 +16,8 @@ import { RobotCoordsForeignDiv } from './RobotCoordsForeignDiv'
 import styles from './Module.css'
 
 import type { IconName } from '../icons'
-import type { ModuleModel, DeckSlot } from '@opentrons/shared-data'
+import type { ModuleModel, DeckSlot, ModuleDefinition, ModuleLayer } from '@opentrons/shared-data'
+import { StyleProps } from '../primitives'
 
 const FLIPPED_SLOTS = ['3', '6', '9']
 export interface ModuleProps {
@@ -137,5 +139,38 @@ function ModuleItemContents(props: ModuleItemContentsProps): JSX.Element {
         </div>
       </div>
     </>
+  )
+}
+
+
+// TODO: BC 2021-08-03 we should migrate to only using the ModuleFromData
+// component; once legacy Module viz is removed, we should rename it Module
+
+export interface ModuleFromDataProps {
+  def: ModuleDefinition
+  layerBlocklist?: string[]
+  stylePropsByLayer?: {[layer: string]: StyleProps}
+}
+
+const StyledPath = styled.path`stroke: #ccc;`
+
+export function ModuleFromData(props: ModuleFromDataProps): JSX.Element {
+  const { def, layerBlocklist = [], stylePropsByLayer = {}} = props
+
+  return (
+    <g>
+      {def.layers.map((layer: ModuleLayer) => {
+        const {name, pathDValues} = layer
+        if (layerBlocklist.includes(name)) return null
+        const styleProps = name in stylePropsByLayer ? stylePropsByLayer[name] : {}
+        return (
+          <g id={name} key={name}>
+            {pathDValues.map((dValue: string, i: number) => (
+              <StyledPath d={dValue} key={i} {...styleProps}/>
+            ))}
+          </g>
+        )
+      })}
+    </g>
   )
 }
