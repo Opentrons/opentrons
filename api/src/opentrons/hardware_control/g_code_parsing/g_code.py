@@ -2,16 +2,16 @@ from __future__ import annotations
 
 import re
 from typing import List
-
 from .errors import UnparsableGCodeError
 from opentrons.drivers.smoothie_drivers.driver_3_0 import GCODE as SMOOTHIE_G_CODE
 from opentrons.drivers.mag_deck.driver import GCODE as MAGDECK_G_CODE
 from opentrons.drivers.temp_deck.driver import GCODE as TEMPDECK_G_CODE
+from opentrons.drivers.thermocycler.driver import GCODE as THERMOCYCLER_G_CODE
 from opentrons.hardware_control.g_code_parsing.utils import reverse_enum
 from opentrons.hardware_control.emulation.parser import Parser
 from opentrons.hardware_control.g_code_parsing.g_code_functionality_defs.\
     g_code_functionality_def_base import Explanation
-from .g_code_functionality_defs import smoothie, magdeck, tempdeck
+from .g_code_functionality_defs import smoothie, magdeck, tempdeck, thermocycler
 
 
 class GCode:
@@ -113,6 +113,35 @@ class GCode:
             tempdeck.DeviceInfoGCodeFunctionalityDef
     }
 
+    THERMOCYCLER_G_CODE_EXPLANATION_MAPPING = {
+        THERMOCYCLER_G_CODE.CLOSE_LID.name:
+            thermocycler.CloseLidGCodeFunctionalityDef,
+        THERMOCYCLER_G_CODE.DEVICE_INFO.name:
+            thermocycler.DeviceInfoGCodeFunctionalityDef,
+        THERMOCYCLER_G_CODE.GET_PLATE_TEMP.name:
+            thermocycler.GetPlateTempGCodeFunctionalityDef,
+        THERMOCYCLER_G_CODE.GET_LID_STATUS.name:
+            thermocycler.LidStatusGCodeFunctionalityDef,
+        THERMOCYCLER_G_CODE.OPEN_LID.name:
+            thermocycler.OpenLidGCodeFunctionalityDef,
+        THERMOCYCLER_G_CODE.SET_PLATE_TEMP.name:
+            thermocycler.SetPlateTempGCodeFunctionalityDef,
+        THERMOCYCLER_G_CODE.SET_LID_TEMP.name:
+            thermocycler.SetLidTempGCodeFunctionalityDef,
+        THERMOCYCLER_G_CODE.GET_LID_TEMP.name:
+            thermocycler.GetLidTempGCodeFunctionalityDef,
+        THERMOCYCLER_G_CODE.SET_RAMP_RATE.name:
+            thermocycler.SetRampRateGCodeFunctionalityDef,
+        THERMOCYCLER_G_CODE.DEACTIVATE_LID.name:
+            thermocycler.DeactivateLidGCodeFunctionalityDef,
+        THERMOCYCLER_G_CODE.DEACTIVATE_BLOCK.name:
+            thermocycler.DeactivateBlockGCodeFunctionalityDef,
+        THERMOCYCLER_G_CODE.DEACTIVATE_ALL.name:
+            thermocycler.DeactivateAllGCodeFunctionalityDef,
+        THERMOCYCLER_G_CODE.EDIT_PID_PARAMS.name:
+            thermocycler.EditPIDParamsGCodeFunctionalityDef
+    }
+
     # Smoothie G-Code Parsing Characters
     SET_SPEED_CHARACTER = 'F'
     MOVE_CHARACTERS = ['X', 'Y', 'Z', 'A', 'B', 'C']
@@ -128,10 +157,14 @@ class GCode:
     TEMPDECK_IDENT = 'tempdeck'
     TEMPDECK_G_CODE_LOOKUP = reverse_enum(TEMPDECK_G_CODE)
 
+    THERMOCYCLER_IDENT = 'thermocycler'
+    THERMOCYCLER_G_CODE_LOOKUP = reverse_enum(THERMOCYCLER_G_CODE)
+
     DEVICE_GCODE_LOOKUP = {
         SMOOTHIE_IDENT: SMOOTHIE_G_CODE_LOOKUP,
         MAGDECK_IDENT: MAGDECK_G_CODE_LOOKUP,
         TEMPDECK_IDENT: TEMPDECK_G_CODE_LOOKUP,
+        THERMOCYCLER_IDENT: THERMOCYCLER_G_CODE_LOOKUP
     }
 
     SPECIAL_HANDLING_REQUIRED_G_CODES = [
@@ -142,7 +175,8 @@ class GCode:
     EXPLANATION_LOOKUP = {
         SMOOTHIE_IDENT: SMOOTHIE_G_CODE_EXPLANATION_MAPPING,
         MAGDECK_IDENT: MAGDECK_G_CODE_EXPLANATION_MAPPING,
-        TEMPDECK_IDENT: TEMPDECK_G_CODE_EXPLANATION_MAPPING
+        TEMPDECK_IDENT: TEMPDECK_G_CODE_EXPLANATION_MAPPING,
+        THERMOCYCLER_IDENT: THERMOCYCLER_G_CODE_EXPLANATION_MAPPING
     }
 
     @classmethod

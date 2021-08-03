@@ -199,9 +199,9 @@ def smoothie_g_codes() -> List[GCode]:
 
     for g_code in g_code_list:
         if len(g_code) > 1:
-            smoothie_g_codes = ', '.join([code.g_code for code in g_code])
+            g_codes = ', '.join([code.g_code for code in g_code])
             raise Exception('Hey, you forgot to put a comma between the G-Codes for '
-                            f'{smoothie_g_codes}')
+                            f'{g_codes}')
 
     return [code[0] for code in g_code_list]
 
@@ -227,7 +227,8 @@ def magdeck_g_codes() -> List[GCode]:
         [
             'M115', 'serial:MDV0118052801 model:mag_deck_v1 '
             'version:edge-11aa22b\r\nok\r\nok\r\n'
-         ]
+        ],
+
     ]
     g_code_list = [
         GCode.from_raw_code(code, 'magdeck', response)
@@ -236,9 +237,9 @@ def magdeck_g_codes() -> List[GCode]:
 
     for g_code in g_code_list:
         if len(g_code) > 1:
-            magdeck_g_codes = ', '.join([code.g_code for code in g_code])
+            g_codes = ', '.join(code.g_code for code in g_code)
             raise Exception('Hey, you forgot to put a comma between the G-Codes for '
-                            f'{magdeck_g_codes}')
+                            f'{g_codes}')
 
     return [code[0] for code in g_code_list]
 
@@ -280,11 +281,100 @@ def tempdeck_g_codes() -> List[GCode]:
     return [code[0] for code in g_code_list]
 
 
+def thermocycler_g_codes() -> List[GCode]:
+    raw_codes = [
+        # Test 54
+        ['M119', 'Lid:open\r\nok\r\nok\r\n'],
+        # Test 55
+        ['M119', 'Lid:closed\r\nok\r\nok\r\n'],
+        # Test 56
+        [
+            'M115',
+            'serial:TCV0220191127A01 model:v02 '
+            'version:v1.0.0-13-ge948da5\r\nok\r\nok\r\n'
+        ],
+        # Test 57
+        [
+            'M105',
+            'T:none C:22.173 H:none Total_H:none At_target?:0\r\nok\r\nok\r\n'
+        ],
+        # Test 58
+        [
+            'M105',
+            'T:89.9 C:22.173 H:360.3 Total_H:400.5 At_target?:false\r\nok\r\nok\r\n'
+        ],
+        # Test 59
+        [
+            'M105',
+            'T:70.9 C:70.9 H:0.0 Total_H:55.5 At_target?:true\r\nok\r\nok\r\n'
+        ],
+        # Test 60
+        [
+            'M105',
+            'T:55.6 C:46.6 H:45.3 Total_H:150.5 At_target?:ugh\r\nok\r\nok\r\n'
+        ],
+        # Test 61
+        [
+            'M105',
+            'T:40.000 C:23.823\r\nok\r\nok\r\n'
+        ],
+        # Test 62
+        [
+            'M104 S40.0',
+            'ok\r\nok\r\n'
+        ],
+        # Test 63
+        [
+            'M126',
+            'ok\r\nok\r\n'
+        ],
+        # Test 64
+        [
+            'M127',
+            'ok\r\nok\r\n'
+        ],
+        # Test 65
+        ['M140 S85.7', 'ok\r\nok\r\n'],
+        # Test 66
+        ['M141', 'T:none C:21.974\r\nok\r\nok\r\n'],
+        # Test 67
+        ['M141', 'T:40.0 C:23.700\r\nok\r\nok\r\n'],
+        # Test 68
+        ['M566', 'ok\r\nok\r\n'],
+        # Test 69
+        ['M566', 'ERROR:BUSY\r\nok\r\n'],
+        # Test 70
+        ['M108', 'ok\r\nok\r\n'],
+        # Test 71
+        ['M14', 'ok\r\nok\r\n'],
+        # Test 72
+        ['M18', 'ok\r\nok\r\n'],
+        # Test 73
+        ['M301 P0.2 I0.3 D0.4', 'ERROR:BUSY\r\nok\r\n'],
+        # Test 74
+        ['M301 P0.2 I0.3 D0.4', 'ok\r\nok\r\n'],
+
+    ]
+    g_code_list = [
+        GCode.from_raw_code(code, 'thermocycler', response)
+        for code, response in raw_codes
+    ]
+
+    for g_code in g_code_list:
+        if len(g_code) > 1:
+            g_codes = ', '.join([code.g_code for code in g_code])
+            raise Exception('Hey, you forgot to put a comma between the G-Codes for '
+                            f'{g_codes}')
+
+    return [code[0] for code in g_code_list]
+
+
 def all_g_codes() -> List[GCode]:
     g_codes = []
     g_codes.extend(smoothie_g_codes())
     g_codes.extend(magdeck_g_codes())
     g_codes.extend(tempdeck_g_codes())
+    g_codes.extend(thermocycler_g_codes())
 
     return g_codes
 
@@ -349,7 +439,30 @@ def expected_function_name_values() -> List[str]:
         'SET_TEMP',  # Test 50
         'GET_TEMP',  # Test 51
         'GET_TEMP',  # Test 52
-        'DEVICE_INFO'  # Test 53
+        'DEVICE_INFO',  # Test 53
+
+        # Thermocycler
+        'GET_LID_STATUS',  # Test 54
+        'GET_LID_STATUS',  # Test 55
+        'DEVICE_INFO',  # Test 56
+        'GET_PLATE_TEMP',  # Test 57
+        'GET_PLATE_TEMP',  # Test 58
+        'GET_PLATE_TEMP',  # Test 59
+        'GET_PLATE_TEMP',  # Test 60
+        'GET_PLATE_TEMP',  # Test 61
+        'SET_PLATE_TEMP',  # Test 62
+        'OPEN_LID',  # Test 63
+        'CLOSE_LID',  # Test 64
+        'SET_LID_TEMP',  # Test 65
+        'GET_LID_TEMP',  # Test 66
+        'GET_LID_TEMP',  # Test 67
+        'SET_RAMP_RATE',  # Test 68
+        'SET_RAMP_RATE',  # Test 69
+        'DEACTIVATE_LID',  # Test 70
+        'DEACTIVATE_BLOCK',  # Test 71
+        'DEACTIVATE_ALL',  # Test 72
+        'EDIT_PID_PARAMS',  # Test 73
+        'EDIT_PID_PARAMS',  # Test 74
     ]
 
 
@@ -526,6 +639,50 @@ def expected_arg_values() -> List[Dict[str, int]]:
         {},
         # Test 53
         {},
+
+        # Thermocycler
+        # Test 54
+        {},
+        # Test 55
+        {},
+        # Test 56
+        {},
+        # Test 57
+        {},
+        # Test 58
+        {},
+        # Test 59
+        {},
+        # Test 60
+        {},
+        # Test 61
+        {},
+        # Test 62
+        {'S': 40.0},
+        # Test 63
+        {},
+        # Test 64
+        {},
+        # Test 65
+        {'S': 85.7},
+        # Test 66
+        {},
+        # Test 67
+        {},
+        # Test 68
+        {},
+        # Test 69
+        {},
+        # Test 70
+        {},
+        # Test 71
+        {},
+        # Test 72
+        {},
+        # Test 73
+        {'P': 0.2, 'I': 0.3, 'D': 0.4},
+        # Test 74
+        {'P': 0.2, 'I': 0.3, 'D': 0.4},
     ]
 
 
@@ -1041,7 +1198,211 @@ def explanations() -> List[Explanation]:
                      '\n\tFirmware Version: edge-11aa22b',
             provided_args={},
             command_explanation='Getting tempdeck device info'
-        )
+        ),
+
+        # Thermocycler
+        # Test 54
+        Explanation(
+            code='M119',
+            command_name='GET_LID_STATUS',
+            response='Lid Status: Open',
+            provided_args={},
+            command_explanation='Getting status of thermocycler lid'
+        ),
+        # Test 55
+        Explanation(
+            code='M119',
+            command_name='GET_LID_STATUS',
+            response='Lid Status: Closed',
+            provided_args={},
+            command_explanation='Getting status of thermocycler lid',
+        ),
+        # Test 56
+        Explanation(
+            code='M115',
+            command_name='DEVICE_INFO',
+            response='Thermocycler info:'
+                     '\n\tSerial Number: TCV0220191127A01'
+                     '\n\tModel: v02'
+                     '\n\tFirmware Version: v1.0.0-13-ge948da5',
+            provided_args={},
+            command_explanation='Getting thermocycler device info'
+        ),
+        # Test 57
+        Explanation(
+            code='M105',
+            command_name='GET_PLATE_TEMP',
+            response='Temperature values for thermocycler are as follows:'
+                     '\n\tTarget temperature not set'
+                     '\n\tCurrent temperature is: 22.173C',
+            provided_args={},
+            command_explanation='Getting temperature values for thermocycler'
+        ),
+        # Test 58
+        Explanation(
+            code='M105',
+            command_name='GET_PLATE_TEMP',
+            response='Temperature values for thermocycler are as follows:'
+                     '\n\tTarget temperature is: 89.9C'
+                     '\n\tCurrent temperature is: 22.173C'
+                     '\n\tRemaining hold time is: 360.3ms'
+                     '\n\tTotal hold time is: 400.5ms'
+                     '\n\tNot at target temperature',
+            provided_args={},
+            command_explanation='Getting temperature values for thermocycler'
+        ),
+        # Test 59
+        Explanation(
+            code='M105',
+            command_name='GET_PLATE_TEMP',
+            response='Temperature values for thermocycler are as follows:'
+                     '\n\tTarget temperature is: 70.9C'
+                     '\n\tCurrent temperature is: 70.9C'
+                     '\n\tRemaining hold time is: 0.0ms'
+                     '\n\tTotal hold time is: 55.5ms'
+                     '\n\tAt target temperature',
+            provided_args={},
+            command_explanation='Getting temperature values for thermocycler'
+        ),
+        # Test 60
+        Explanation(
+            code='M105',
+            command_name='GET_PLATE_TEMP',
+            response='Temperature values for thermocycler are as follows:'
+                     '\n\tTarget temperature is: 55.6C'
+                     '\n\tCurrent temperature is: 46.6C'
+                     '\n\tRemaining hold time is: 45.3ms'
+                     '\n\tTotal hold time is: 150.5ms'
+                     '\n\tTarget temperature is unparsable: ugh',
+            provided_args={},
+            command_explanation='Getting temperature values for thermocycler'
+        ),
+        # Test 61
+        Explanation(
+            code='M105',
+            command_name='GET_PLATE_TEMP',
+            response='Temperature values for thermocycler are as follows:'
+                     '\n\tTarget temperature is: 40.000C'
+                     '\n\tCurrent temperature is: 23.823C',
+            provided_args={},
+            command_explanation='Getting temperature values for thermocycler'
+        ),
+        # Test 62
+        Explanation(
+            code='M104',
+            command_name='SET_PLATE_TEMP',
+            response='',
+            provided_args={'S': 40.0},
+            command_explanation='Setting thermocycler plate temp to 40.0C'
+        ),
+        # Test 63
+        Explanation(
+            code='M126',
+            command_name='OPEN_LID',
+            response='',
+            provided_args={},
+            command_explanation='Opening thermocycler lid'
+        ),
+        # Test 64
+        Explanation(
+            code='M127',
+            command_name='CLOSE_LID',
+            response='',
+            provided_args={},
+            command_explanation='Closing thermocycler lid'
+        ),
+        # Test 65
+        Explanation(
+            code='M140',
+            command_name='SET_LID_TEMP',
+            response='',
+            provided_args={'S': 85.7},
+            command_explanation='Setting thermocycler lid temp to 85.7C'
+        ),
+        # Test 66
+        Explanation(
+            code='M141',
+            command_name='GET_LID_TEMP',
+            response='Temperature for thermocycler lid is not set'
+                     '\nCurrent temperature of lid is 21.974C',
+            provided_args={},
+            command_explanation='Getting temperature for thermocycler lid'
+        ),
+        # Test 67
+        Explanation(
+            code='M141',
+            command_name='GET_LID_TEMP',
+            response='Set temperature for thermocycler lid is 40.0C'
+                     '\nCurrent temperature of lid is 23.700C',
+            provided_args={},
+            command_explanation='Getting temperature for thermocycler lid'
+        ),
+        # Test 68
+        Explanation(
+            code='M566',
+            command_name='SET_RAMP_RATE',
+            response='',
+            provided_args={},
+            command_explanation='Setting thermocycler ramp rate.'
+                                '\nNote: This is an unimplemented feature, '
+                                'setting this does nothing',
+        ),
+        # Test 69
+        Explanation(
+            code='M566',
+            command_name='SET_RAMP_RATE',
+            response='',
+            provided_args={},
+            command_explanation='Setting thermocycler ramp rate.'
+                                '\nNote: This is an unimplemented feature, '
+                                'setting this does nothing',
+        ),
+        # Test 70
+        Explanation(
+            code='M108',
+            command_name='DEACTIVATE_LID',
+            response='',
+            provided_args={},
+            command_explanation='Deactivating thermocycler lid'
+        ),
+        # Test 71
+        Explanation(
+            code='M14',
+            command_name='DEACTIVATE_BLOCK',
+            response='',
+            provided_args={},
+            command_explanation='Deactivating thermocycler block'
+        ),
+        # Test 72
+        Explanation(
+            code='M18',
+            command_name='DEACTIVATE_ALL',
+            response='',
+            provided_args={},
+            command_explanation='Deactivating thermocycler block and lid'
+        ),
+        # Test 73
+        Explanation(
+            code='M301',
+            command_name='EDIT_PID_PARAMS',
+            response='Cannot set PID values. Thermocycler busy',
+            provided_args={'P': 0.2, 'I': 0.3, 'D': 0.4},
+            command_explanation='Editing PID values to the following:'
+                                '\n\tKp: 0.2'
+                                '\n\tKi: 0.3'
+                                '\n\tKd: 0.4'
+        ),
+        # Test 74
+        Explanation(
+            code='M301',
+            command_name='EDIT_PID_PARAMS',
+            response='Edit successful',
+            provided_args={'P': 0.2, 'I': 0.3, 'D': 0.4},
+            command_explanation='Editing PID values to the following:'
+                                '\n\tKp: 0.2'
+                                '\n\tKi: 0.3'
+                                '\n\tKd: 0.4'
+        ),
     ]
 
 
