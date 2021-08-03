@@ -193,3 +193,17 @@ term:
 .PHONY: plot-session
 plot-session:
 	$(python) util/plot_session.py $(plot_type) $(plot_type).pdf
+
+###########################
+# G-Code Parsing Commands #
+###########################
+
+# Pull objects from S3 and output it's content to STDOUT
+.PHONY: g-code-s3-pull
+g-code-s3-pull:
+	@aws s3 cp s3://g-code-comparison/$(OBJECT_NAME) -
+
+# Push local file to S3
+.PHONY: g-code-s3-push
+g-code-s3-push:
+	@aws s3 cp $(SOURCE_FILE_PATH) s3://g-code-comparison/$(OBJECT_NAME)
