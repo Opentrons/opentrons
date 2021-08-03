@@ -119,7 +119,7 @@ class SerialConnection:
                 self.raise_on_error(response=str_response)
                 return str_response
 
-            log.warning(f'{self.name}: retry number {retry}/{retries}')
+            log.info(f'{self.name}: retry number {retry}/{retries}')
 
             await self.on_retry()
 
