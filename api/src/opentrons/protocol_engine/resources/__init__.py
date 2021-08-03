@@ -1,6 +1,6 @@
 """Interfaces to provide data and other external system resources.
 
-Classes in this module do not maintain state and can be instanciated
+Classes in this module do not maintain state and can be instantiated
 as needed. Some classes may contain solely static methods.
 """
 from .model_utils import ModelUtils
