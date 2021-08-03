@@ -17,7 +17,6 @@ import os
 import io
 import json
 import pathlib
-import re
 import tempfile
 from collections import namedtuple
 from functools import partial
@@ -171,18 +170,6 @@ def protocol(request):
 @pytest.fixture
 def session_manager(main_router):
     return main_router.session_manager
-
-
-def fuzzy_assert(result, expected):
-    expected_re = ['.*'.join(['^'] + item + ['$']) for item in expected]
-
-    assert len(result) == len(expected_re), \
-        'result and expected have different length'
-
-    for idx, (res, exp) in enumerate(zip(result, expected_re)):
-        assert re.compile(
-            exp.lower()).match(res.lower()), "element {}: {} didn't match {}" \
-            .format(idx, res, exp)
 
 
 @pytest.fixture
