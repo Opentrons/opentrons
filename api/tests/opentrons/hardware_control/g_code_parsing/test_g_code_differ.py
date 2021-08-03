@@ -93,7 +93,9 @@ def first_g_code_program() -> GCodeProgram:
         for code, response in raw_codes
     ]
 
-    return GCodeProgram([code[0] for code in g_code_list])
+    program = GCodeProgram()
+    program.add_g_codes([code[0] for code in g_code_list])
+    return program
 
 
 @pytest.fixture
@@ -109,7 +111,9 @@ def second_g_code_program() -> GCodeProgram:
         for code, response in raw_codes
     ]
 
-    return GCodeProgram([code[0] for code in g_code_list])
+    program = GCodeProgram()
+    program.add_g_codes([code[0] for code in g_code_list])
+    return program
 
 
 def test_naive_insertion():
