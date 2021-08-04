@@ -16,10 +16,10 @@ class RootFSInfo:
     minor: str
     disk: str
 
-""" A simple class for OT3 RootFS manipulation """
-""" ** Get current partiton RootFS is mounted on """
-""" ** Swap RootFS partition """
-""" ** Factory reset OT3 using bmap image on SD-Card """
+""" A simple class for OT3 RootFS manipulation "
+ ** Get current partition RootFS is mounted on 
+ ** Swap RootFS partition 
+ ** Factory reset OT3 using bmap image on SD-Card """
 
 class RootFS:
     """ CONFIG vars, can be changed through the commandline arguments """
@@ -93,11 +93,16 @@ def test():
     print('test me')
 
 def main():
+    rfs = RootFS()
     parser = argparse.ArgumentParser(description='Change OT3 RootFS partition to upgrage etc.')
     subparsers = parser.add_subparsers()
     # create Debug subcommand
-    parser_debug = subparsers.add_parser('test', help = 'Debug')
-    parser_debug.set_defaults(func=test)
+    parser_debug = subparsers.add_parser('debug', help = 'Debug')
+    parser_debug.set_defaults(func=rfs.debug)
+    parser_factoryRestore = subparsers.add_parser('restore', help = 'Restore')
+    parser_factoryRestore.set_defaults(func=rfs.factoryRestore)
+    parser_swapPartition = subparsers.add_parser('swap', help = 'Swap RootFS partitions')
+    parser_swapPartition.set_defaults(func=rfs.swapPartition)
     options = parser.parse_args()
     options.func()
 if __name__ == "__main__":
