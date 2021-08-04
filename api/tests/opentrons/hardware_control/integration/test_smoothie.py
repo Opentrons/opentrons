@@ -149,7 +149,8 @@ async def test_plunger_commands(subject: SmoothieDriver, spy: MagicMock):
         'C': 5.55})
     expected = [
         # Set active axes high
-        'M907 A0.8 B0.05 C0.05 X1.25 Y1.25 Z0.8 G4 P0.005 G0 B4.55 G0 A3.5 B4.25 C5.55 X10.988 Y2.123 Z2.5',
+        'M907 A0.8 B0.05 C0.05 X1.25 Y1.25 Z0.8 G4 P0.005 G0 B4.55 G0 A3.5'
+        ' B4.25 C5.55 X10.988 Y2.123 Z2.5',
         'M400',
         # Set plunger current low
         'M907 A0.8 B0.05 C0.05 X1.25 Y1.25 Z0.8 G4 P0.005',
@@ -183,7 +184,8 @@ async def test_move_with_split(subject: SmoothieDriver, spy: MagicMock):
 
     await subject.move({'X': 0, 'Y': 1.123456, 'Z': 2, 'C': 3})
     expected = [
-        'M55 M92 C0.03125 G4 P0.01 G0 F60 M907 A0.1 B0.05 C1.75 X1.25 Y1.25 Z0.8 G4 P0.005',
+        'M55 M92 C0.03125 G4 P0.01 G0 F60 M907 A0.1 B0.05 C1.75 X1.25 Y1.25'
+        ' Z0.8 G4 P0.005',
         'M400',
         'G0 C18.0',
         'M400',
@@ -201,7 +203,8 @@ async def test_move_with_split(subject: SmoothieDriver, spy: MagicMock):
 
     await subject.move({'B': 2})
     expected = [
-        'M53 M92 B0.03125 G4 P0.01 G0 F60 M907 A0.1 B1.75 C0.05 X0.3 Y0.3 Z0.1 G4 P0.005',
+        'M53 M92 B0.03125 G4 P0.01 G0 F60 M907 A0.1 B1.75 C0.05 X0.3 Y0.3 Z0.1'
+        ' G4 P0.005',
         'M400',
         'G0 B18.0',
         'M400',
