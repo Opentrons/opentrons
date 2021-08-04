@@ -54,6 +54,8 @@ const DECK_LAYER_BLOCKLIST = [
   'screwHoles',
 ]
 
+const DECK_MAP_VIEWBOX = '-64 -10 530 456'
+
 export const LabwareSetup = (props: LabwareSetupProps): JSX.Element | null => {
   const { moduleRenderCoords, labwareRenderCoords } = props
   const proceedToRunDisabled = false
@@ -90,7 +92,7 @@ export const LabwareSetup = (props: LabwareSetupProps): JSX.Element | null => {
         </Link>
         <RobotWorkSpace
           deckDef={standardDeckDef as any}
-          viewBox={`-64 -10 ${530} ${456}`}
+          viewBox={DECK_MAP_VIEWBOX}
           className={styles.deck_map}
           deckLayerBlocklist={DECK_LAYER_BLOCKLIST}
         >
