@@ -29,12 +29,13 @@ type StepKey =
 
 export type CoordinatesByModuleModel = Record<
   string,
-  { x: number; y: number; moduleModel: ModuleModel }
+  { x: number; y: number; z: number; moduleModel: ModuleModel }
 >
 export interface CoordinatesByLabwareId {
   [labwareId: string]: {
     x: number
     y: number
+    z: number
     matingSurfaceVector?: [number, number, number]
     labwareDef: LabwareDefinition2
   }
