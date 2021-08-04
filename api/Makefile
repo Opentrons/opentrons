@@ -199,11 +199,22 @@ plot-session:
 ###########################
 
 # Pull objects from S3 and output it's content to STDOUT
+# "object_name" is a required parameter
+# "object_name" is the name of the S3 object you want to pull from the g-code-comparison bucket
+# Example:
+#	make g-code-s3-pull object_name='smoothie-protocol-output.json'
 .PHONY: g-code-s3-pull
 g-code-s3-pull:
-	@aws s3 cp s3://g-code-comparison/$(OBJECT_NAME) -
+	@aws s3 cp s3://g-code-comparison/$(object_name) -
 
 # Push local file to S3
+# "source_file_path" and "object_name" are required parameters
+# "source_file_path" is the local path to the file you want to upload
+# "object_name" is what you want your file to be called in S3
+# Example:
+#	make g-code-s3-push \
+#	source_file_path=./api/tests/opentrons/data/g_code_validation_protocols/smoothie_protocol.py \
+#	object_name='smoothie-protocol-output.json'
 .PHONY: g-code-s3-push
 g-code-s3-push:
-	@aws s3 cp $(SOURCE_FILE_PATH) s3://g-code-comparison/$(OBJECT_NAME)
+	@aws s3 cp $(source_file_path) s3://g-code-comparison/$(object_name)
