@@ -83,7 +83,7 @@ async def create_session_action(
         elif action.actionType == SessionActionType.PAUSE:
             engine_store.engine.pause()
         if action.actionType == SessionActionType.HALT:
-            engine_store.engine.halt()
+            await engine_store.engine.halt()
             task_runner.run(engine_store.engine.stop)
 
     except SessionNotFoundError as e:

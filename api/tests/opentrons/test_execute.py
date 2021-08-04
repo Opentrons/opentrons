@@ -2,7 +2,7 @@
 import io
 import os
 from pathlib import Path
-from unittest import mock
+import mock
 
 import pytest
 
@@ -16,7 +16,7 @@ HERE = Path(__file__).parent
 
 @pytest.fixture
 def mock_get_attached_instr(monkeypatch, virtual_smoothie_env):
-    gai_mock = mock.Mock()
+    gai_mock = mock.AsyncMock()
 
     async def dummy_delay(self, duration_s):
         pass

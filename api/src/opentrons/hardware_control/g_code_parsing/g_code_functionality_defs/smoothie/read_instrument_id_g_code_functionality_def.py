@@ -1,7 +1,7 @@
 from typing import Dict
 from opentrons.hardware_control.g_code_parsing.g_code_functionality_defs.\
     g_code_functionality_def_base import GCodeFunctionalityDefBase
-from opentrons.drivers.smoothie_drivers.driver_3_0 import _byte_array_to_ascii_string
+from opentrons.drivers.smoothie_drivers.parse_utils import byte_array_to_ascii_string
 
 
 class ReadInstrumentIDGCodeFunctionalityDef(GCodeFunctionalityDefBase):
@@ -18,5 +18,5 @@ class ReadInstrumentIDGCodeFunctionalityDef(GCodeFunctionalityDefBase):
     @classmethod
     def _generate_response_explanation(cls, response: str) -> str:
         hex_string = response.split(':')[-1].strip()
-        instrument_id = _byte_array_to_ascii_string(bytearray.fromhex(hex_string))
+        instrument_id = byte_array_to_ascii_string(bytearray.fromhex(hex_string))
         return f'Read Instrument ID: {instrument_id}'

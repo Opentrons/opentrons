@@ -24,6 +24,7 @@ async def tempdeck(loop: asyncio.BaseEventLoop, emulation_app) -> TempDeck:
 
 
 def test_device_info(tempdeck) -> None:
+    """It should have the device info."""
     assert {'model': 'temp_deck_v20', 'serial': 'temperature_emulator',
             'version': 'v2.0.1'} == tempdeck.device_info
 

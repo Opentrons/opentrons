@@ -1,18 +1,19 @@
 import pytest
+from opentrons.drivers.smoothie_drivers import SmoothieDriver
 
-from opentrons.drivers.smoothie_drivers.driver_3_0 import (
+from opentrons.drivers.smoothie_drivers.constants import (
     AXES, HOMED_POSITION as HP
 )
 
 POSITION_ON_BOOT = {axis: 0 for axis in AXES}
 
 
-def test_driver_init(smoothie):
+def test_driver_init(smoothie: SmoothieDriver):
     assert smoothie.position == POSITION_ON_BOOT
 
 
-def test_home(smoothie):
-    smoothie.home()
+async def test_home(smoothie: SmoothieDriver):
+    await smoothie.home()
     assert smoothie.position == HP
 
 
@@ -37,7 +38,7 @@ def test_home(smoothie):
         }
     )
 ])
-def test_move(target_movement, expected_new_position, smoothie):
-    smoothie.home()
-    smoothie.move(target_movement)
+async def test_move(target_movement, expected_new_position, smoothie: SmoothieDriver):
+    await smoothie.home()
+    await smoothie.move(target_movement)
     assert smoothie.position == expected_new_position

@@ -405,7 +405,7 @@ class API(HardwareAPILike):
         for mount, name in checked_require.items():
             if name not in name_config():
                 raise RuntimeError(f'{name} is not a valid pipette name')
-        found = self._backend.get_attached_instruments(checked_require)
+        found = await self._backend.get_attached_instruments(checked_require)
 
         for mount, instrument_data in found.items():
             config = instrument_data.get('config')
@@ -431,7 +431,7 @@ class API(HardwareAPILike):
                 f"Doing full configuration on {mount.name}")
             hw_config = generate_hardware_configs(
                 p, self._config, self._backend.board_revision)
-            self._backend.configure_mount(mount, hw_config)
+            await self._backend.configure_mount(mount, hw_config)
         mod_log.info("Instruments found: {}".format(
             self._attached_instruments))
 
@@ -575,7 +575,7 @@ class API(HardwareAPILike):
 
         asyncio.run_coroutine_threadsafe(_chained_calls(), self._loop)
 
-    def halt(self):
+    async def halt(self):
         """ Immediately stop motion.
 
         Calls to :py:meth:`stop` through the synch adapter while other calls
@@ -587,7 +587,7 @@ class API(HardwareAPILike):
         After this call, the smoothie will be in a bad state until a call to
         :py:meth:`stop`.
         """
-        self._backend.hard_halt()
+        await self._backend.hard_halt()
         asyncio.run_coroutine_threadsafe(self._execution_manager.cancel(),
                                          self._loop)
 
@@ -599,7 +599,7 @@ class API(HardwareAPILike):
         see :py:meth:`pause` for more detail), then home and reset the
         robot.
         """
-        self._backend.halt()
+        await self._backend.halt()
         self._log.info("Recovering from halt")
         await self.reset()
 
@@ -654,7 +654,7 @@ class API(HardwareAPILike):
             with self._backend.save_current():
                 self._backend.set_active_current(
                     {checked_axis: instr.config.plunger_current})
-                self._backend.home([checked_axis.name.upper()])
+                await self._backend.home([checked_axis.name.upper()])
                 # either we were passed False for our acquire_lock and we
                 # should pass it on, or we acquired the lock above and
                 # shouldn't do it again
@@ -691,7 +691,7 @@ class API(HardwareAPILike):
 
         async with self._motion_lock:
             if smoothie_gantry:
-                smoothie_pos.update(self._backend.home(smoothie_gantry))
+                smoothie_pos.update(await self._backend.home(smoothie_gantry))
                 self._current_position = self._deck_from_smoothie(smoothie_pos)
             for plunger in plungers:
                 await self._do_plunger_home(axis=plunger, acquire_lock=False)
@@ -787,7 +787,7 @@ class API(HardwareAPILike):
         async with self._motion_lock:
             if refresh:
                 self._current_position = self._deck_from_smoothie(
-                    self._backend.update_position())
+                    await self._backend.update_position())
             if mount == top_types.Mount.RIGHT:
                 offset = top_types.Point(0, 0, 0)
             else:
@@ -1104,9 +1104,9 @@ class API(HardwareAPILike):
             if acquire_lock:
                 await stack.enter_async_context(self._motion_lock)
             try:
-                self._backend.move(smoothie_pos, speed=speed,
-                                   home_flagged_axes=home_flagged_axes,
-                                   axis_max_speeds=str_maxes)
+                await self._backend.move(smoothie_pos, speed=speed,
+                                         home_flagged_axes=home_flagged_axes,
+                                         axis_max_speeds=str_maxes)
             except Exception:
                 self._log.exception('Move failed')
                 self._current_position.clear()
@@ -1124,13 +1124,13 @@ class API(HardwareAPILike):
         return self.get_engaged_axes()
 
     async def disengage_axes(self, which: List[Axis]):
-        self._backend.disengage_axes([ax.name for ax in which])
+        await self._backend.disengage_axes([ax.name for ax in which])
 
-    def _fast_home(
+    async def _fast_home(
             self, axes: Sequence[str],
             margin: float) -> Dict[str, float]:
         converted_axes = ''.join(axes)
-        return self._backend.fast_home(converted_axes, margin)
+        return await self._backend.fast_home(converted_axes, margin)
 
     async def retract(
             self,
@@ -1149,7 +1149,7 @@ class API(HardwareAPILike):
             smoothie_ax = (Axis.by_mount(mount).name.upper(), )
 
         async with self._motion_lock:
-            smoothie_pos = self._fast_home(smoothie_ax, margin)
+            smoothie_pos = await self._fast_home(smoothie_ax, margin)
             self._current_position = self._deck_from_smoothie(smoothie_pos)
 
     def _critical_point_for(
@@ -1598,7 +1598,7 @@ class API(HardwareAPILike):
                 mount, droptip, speed=speed)
             if home_after:
                 safety_margin = abs(max(bottom) - max(droptip))
-                smoothie_pos = self._backend.fast_home(
+                smoothie_pos = await self._backend.fast_home(
                     plunger_axes, safety_margin)
                 self._current_position = self._deck_from_smoothie(
                     smoothie_pos)

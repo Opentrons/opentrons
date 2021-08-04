@@ -1,6 +1,7 @@
 # Uncomment to enable logging during tests
 # import logging
 # from logging.config import dictConfig
+from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
 from opentrons.protocol_api.labware import Labware
 from opentrons.protocols.context.protocol_api.labware import\
     LabwareImplementation
@@ -16,7 +17,6 @@ import os
 import io
 import json
 import pathlib
-import re
 import tempfile
 from collections import namedtuple
 from functools import partial
@@ -172,18 +172,6 @@ def session_manager(main_router):
     return main_router.session_manager
 
 
-def fuzzy_assert(result, expected):
-    expected_re = ['.*'.join(['^'] + item + ['$']) for item in expected]
-
-    assert len(result) == len(expected_re), \
-        'result and expected have different length'
-
-    for idx, (res, exp) in enumerate(zip(result, expected_re)):
-        assert re.compile(
-            exp.lower()).match(res.lower()), "element {}: {} didn't match {}" \
-            .format(idx, res, exp)
-
-
 @pytest.fixture
 def virtual_smoothie_env(monkeypatch):
     # TODO (ben 20180426): move this to the .env file
@@ -282,12 +270,11 @@ def model(request, hardware, loop):
 
 @pytest.fixture
 def smoothie(monkeypatch):
-    from opentrons.drivers.smoothie_drivers.driver_3_0 import \
-         SmoothieDriver_3_0_0 as SmoothieDriver
+    from opentrons.drivers.smoothie_drivers import SmoothieDriver
     from opentrons.config import robot_configs
 
     monkeypatch.setenv('ENABLE_VIRTUAL_SMOOTHIE', 'true')
-    driver = SmoothieDriver(robot_configs.load())
+    driver = SmoothieDriver(robot_configs.load(), SimulatingGPIOCharDev('simulated'))
     driver.connect()
     yield driver
     try:

@@ -170,17 +170,17 @@ class Simulator:
     def module_controls(self, module_controls: AttachedModulesControl):
         self._module_controls = module_controls
 
-    def update_position(self) -> Dict[str, float]:
+    async def update_position(self) -> Dict[str, float]:
         return self._position
 
-    def move(self, target_position: Dict[str, float],
-             home_flagged_axes: bool = True, speed: float = None,
-             axis_max_speeds: Dict[str, float] = None):
+    async def move(self, target_position: Dict[str, float],
+                   home_flagged_axes: bool = True, speed: float = None,
+                   axis_max_speeds: Dict[str, float] = None):
         self._position.update(target_position)
         self._engaged_axes.update({ax: True
                                    for ax in target_position})
 
-    def home(self, axes: List[str] = None) -> Dict[str, float]:
+    async def home(self, axes: List[str] = None) -> Dict[str, float]:
         # driver_3_0-> HOMED_POSITION
         checked_axes = axes or 'XYZABC'
         self._position.update({ax: self._smoothie_driver.homed_position[ax]
@@ -189,7 +189,7 @@ class Simulator:
                                    for ax in checked_axes})
         return self._position
 
-    def fast_home(
+    async def fast_home(
             self, axis: Sequence[str], margin: float) -> Dict[str, float]:
         for ax in axis:
             self._position[ax] = self._smoothie_driver.homed_position[ax]
@@ -240,7 +240,7 @@ class Simulator:
                 'config': None,
                 'id': None}
 
-    def get_attached_instruments(
+    async def get_attached_instruments(
             self, expected: Dict[types.Mount, PipetteName]
     ) -> AttachedInstruments:
         """ Update the internal cache of attached instruments.
@@ -306,7 +306,7 @@ class Simulator:
     def engaged_axes(self):
         return self._engaged_axes
 
-    def disengage_axes(self, axes: List[str]):
+    async def disengage_axes(self, axes: List[str]):
         self._engaged_axes.update({ax: False for ax in axes})
 
     def set_lights(self, button: Optional[bool], rails: Optional[bool]):
@@ -324,20 +324,20 @@ class Simulator:
     def resume(self):
         self._run_flag.set()
 
-    def halt(self):
+    async def halt(self):
         self._run_flag.set()
 
-    def hard_halt(self):
+    async def hard_halt(self):
         self._run_flag.set()
 
-    def probe(self, axis: str, distance: float) -> Dict[str, float]:
+    async def probe(self, axis: str, distance: float) -> Dict[str, float]:
         self._position[axis.upper()] = self._position[axis.upper()] + distance
         return self._position
 
     def clean_up(self):
         pass
 
-    def configure_mount(
+    async def configure_mount(
             self, mount: types.Mount, config: InstrumentHardwareConfigs):
         mount_axis = Axis.by_mount(mount)
         plunger_axis = Axis.of_plunger(mount)
