@@ -1,23 +1,19 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import reduce from 'lodash/reduce'
-import find from 'lodash/find'
 import { Card, Text, SPACING_3, FONT_HEADER_DARK } from '@opentrons/components'
 import {
-  getModuleDef2,
   protocolHasModules,
-  SPAN7_8_10_11_SLOT,
   LabwareDefinition2,
   ModuleModel,
-  DeckDefinition,
 } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
-
 import { getProtocolData } from '../../redux/protocol'
 import { Divider } from '../../atoms/structure'
 import { CollapsibleStep } from './CollapsibleStep'
 import { LabwareSetup } from './LabwareSetup'
+import { getModuleRenderCoords } from './LabwareSetup/utils/getModuleRenderCoords'
+import { getLabwareRenderCoords } from './LabwareSetup/utils/getLabwareRenderCoords'
 
 import type { JsonProtocolFile } from '@opentrons/shared-data'
 import type { State } from '../../redux/types'
@@ -43,154 +39,6 @@ export interface CoordinatesByLabwareId {
     labwareDef: LabwareDefinition2
   }
 }
-const getSlotPosition = (
-  deckDef: DeckDefinition,
-  slotNumber: string
-): [number, number] => {
-  let x = 0
-  let y = 0
-  const slotPosition = deckDef.locations.orderedSlots.find(
-    orderedSlot => orderedSlot.id === slotNumber
-  )?.position
-
-  if (slotPosition == null) {
-    console.error(
-      `expected to find a slot position for slot ${slotNumber} in ${deckDef.metadata.displayName}, but could not`
-    )
-  } else {
-    x = slotPosition[0]
-    y = slotPosition[1]
-  }
-
-  return [x, y]
-}
-
-const getSlotHasMatingSurfaceUnitVector = (
-  deckDef: DeckDefinition,
-  slotNumber: string
-): boolean => {
-  const matingSurfaceUnitVector = deckDef.locations.orderedSlots.find(
-    orderedSlot => orderedSlot.id === slotNumber
-  )?.matingSurfaceUnitVector
-
-  return Boolean(matingSurfaceUnitVector)
-}
-
-const getLabwareRenderCoords = (
-  protocolData: ReturnType<typeof getProtocolData>
-): CoordinatesByLabwareId => {
-  if (
-    protocolData != null &&
-    'labware' in protocolData &&
-    'labwareDefinitions' in protocolData
-  ) {
-    return reduce(
-      protocolData.labware,
-      (acc, labware, labwareId) => {
-        const labwareDefId = labware.definitionId
-        const labwareDef = protocolData.labwareDefinitions[labwareDefId]
-        const slot = labware.slot
-        let slotPosition = [0, 0]
-
-        if ('modules' in protocolData) {
-          const moduleInSlot = find(
-            protocolData.modules,
-            (_module, moduleId) => moduleId === slot
-          )
-          if (moduleInSlot) {
-            const moduleDef = getModuleDef2(moduleInSlot.model)
-            let slotNumber = moduleInSlot.slot
-            // Note: this is because PD represents the slot the TC sits in as a made up slot. We want it to be rendered in slot 7
-            if (slotNumber === SPAN7_8_10_11_SLOT) {
-              slotNumber = '7'
-            }
-            const slotPosition = getSlotPosition(
-              standardDeckDef as any,
-              slotNumber
-            )
-
-            const slotHasMatingSurfaceVector = getSlotHasMatingSurfaceUnitVector(
-              standardDeckDef as any,
-              slotNumber
-            )
-
-            return slotHasMatingSurfaceVector
-              ? {
-                  ...acc,
-                  [labwareId]: {
-                    x: slotPosition[0] + moduleDef.labwareOffset.x,
-                    y: slotPosition[1] + moduleDef.labwareOffset.y,
-                    labwareDef,
-                  },
-                }
-              : { ...acc }
-          }
-        }
-        slotPosition = getSlotPosition(standardDeckDef as any, slot)
-
-        const slotHasMatingSurfaceVector = getSlotHasMatingSurfaceUnitVector(
-          standardDeckDef as any,
-          slot
-        )
-
-        return slotHasMatingSurfaceVector
-          ? {
-              ...acc,
-              [labwareId]: {
-                x: slotPosition[0],
-                y: slotPosition[1],
-                labwareDef,
-              },
-            }
-          : { ...acc }
-      },
-      {}
-    )
-  }
-  return {}
-}
-
-const getModuleRenderCoords = (
-  protocolData: ReturnType<typeof getProtocolData>
-): CoordinatesByModuleModel => {
-  if (protocolData != null && 'modules' in protocolData) {
-    return reduce(
-      protocolData.modules,
-      (acc, module, moduleId) => {
-        const moduleModel = module.model
-        let slotNumber = module.slot
-        // Note: this is because PD represents the slot the TC sits in as a made up slot. We want it to be rendered in slot 7
-        if (slotNumber === SPAN7_8_10_11_SLOT) {
-          slotNumber = '7'
-        }
-        const slotPosition = standardDeckDef.locations.orderedSlots.find(
-          slot => slot.id === slotNumber
-        )?.position
-
-        if (slotPosition == null) {
-          console.error(
-            `expected to find a slot position for slot ${slotNumber} in the standard OT-2 deck definition, but could not`
-          )
-          return {
-            ...acc,
-            [moduleId]: {
-              x: 0,
-              y: 0,
-              moduleModel,
-            },
-          }
-        }
-        const [x, y] = slotPosition
-        return {
-          ...acc,
-          [moduleId]: { x, y, moduleModel },
-        }
-      },
-      {}
-    )
-  }
-  return {}
-}
 
 export function RunSetupCard(): JSX.Element | null {
   const { t } = useTranslation('protocol_setup')
@@ -198,8 +46,14 @@ export function RunSetupCard(): JSX.Element | null {
     ROBOT_CALIBRATION_STEP_KEY
   )
   const protocolData = useSelector((state: State) => getProtocolData(state))
-  const moduleRenderCoords = getModuleRenderCoords(protocolData)
-  const labwareRenderCoords = getLabwareRenderCoords(protocolData)
+  const moduleRenderCoords = getModuleRenderCoords(
+    protocolData,
+    standardDeckDef as any
+  )
+  const labwareRenderCoords = getLabwareRenderCoords(
+    protocolData,
+    standardDeckDef as any
+  )
 
   if (
     protocolData == null ||
