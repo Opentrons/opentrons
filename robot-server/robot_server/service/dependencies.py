@@ -55,26 +55,22 @@ async def get_hardware(state: State = Depends(get_app_state)) -> ThreadManager:
         ) from None
 
 
-@util.call_once
-async def get_motion_lock() -> ThreadedAsyncLock:
-    """
-    Get the single motion lock.
+async def get_motion_lock(
+    app_dependencies: AppDependencySet = Depends(get_app_dependencies),
+) -> ThreadedAsyncLock:
+    """Get the single motion lock.
 
     :return: a threaded async lock
     """
-    return ThreadedAsyncLock()
+    return app_dependencies.motion_lock
 
 
-@util.call_once
 async def get_rpc_server(
-    hardware: ThreadManager = Depends(get_hardware),
-    lock: ThreadedAsyncLock = Depends(get_motion_lock),
+    app_dependencies: AppDependencySet = Depends(get_app_dependencies),
 ) -> RPCServer:
     """The RPC Server instance"""
-    from opentrons.api import MainRouter
-
-    root = MainRouter(hardware, lock=lock)
-    return RPCServer(None, root)
+    # todo: Handle exception
+    return app_dependencies.rpc_server.get_if_ready()
 
 
 @util.call_once

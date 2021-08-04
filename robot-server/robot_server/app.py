@@ -24,6 +24,7 @@ from .service.dependencies import (
 from .errors import exception_handlers
 from .router import router
 from .service import initialize_logging
+from . import app_dependencies
 from . import constants
 from . import slow_initializing
 from . import hardware_initialization
@@ -75,26 +76,11 @@ app.include_router(router=router)
 
 
 @app.on_event("startup")
-async def on_startup() -> None:
-    """Handle app startup."""
+async def _on_startup() -> None:
     initialize_logging()
-    # Initialize api
-    factory = partial(hardware_initialization.initialize, _make_event_publisher())
-    # fixme(mm, 2021-08-09): We will also need to shut down the hardware
-    # object on server shutdown, or we could leak threads from
-    # ThreadManager.
-    app.state.hardware = slow_initializing.start_initializing(factory)
 
 
-@app.on_event("shutdown")
-async def on_shutdown() -> None:
-    """Handle app shutdown."""
-    s = await get_rpc_server()
-    await s.on_shutdown()
-    # Remove all sessions
-    await (await get_session_manager()).remove_all()
-    # Remove all uploaded protocols
-    (await get_protocol_manager()).remove_all()
+app_dependencies.install_startup_shutdown_handlers(app)
 
 
 @app.middleware("http")
