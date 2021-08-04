@@ -18,7 +18,8 @@ twine = "==2.0.0"
 wheel = "==0.30.0"
 "e1839a8" = {editable = true, path = "."}
 pytest = "==6.1.0"
-pytest-watch = "~=4.2.0"
+pytest-cov = "==2.10.1"
+pytest-xdist = "~=2.2.1 "
 typeguard = "==2.7.1"
 
 [packages]

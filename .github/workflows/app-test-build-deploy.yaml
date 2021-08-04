@@ -37,12 +37,10 @@ on:
       - 'scripts/**/*'
   workflow_dispatch:
 
-
 env:
   CI: true
   OT_APP_DEPLOY_BUCKET: opentrons-app
   OT_APP_DEPLOY_FOLDER: builds
-
 
 jobs:
   js-unit-test:
@@ -77,7 +75,12 @@ jobs:
           make setup-js
       - name: 'test frontend packages'
         run: |
-          yarn jest --coverage=true --ci=true --testPathIgnorePatterns 'labware-.*' 'protocol-.*' 'app-shell' 'discovery-client'
+          yarn jest --coverage=true --ci=true --collectCoverageFrom="app/src/**/*.(js|ts|tsx)" app/src components/src shared-data/js
+      - name: 'Upload coverage report'
+        uses: codecov/codecov-action@v2
+        with:
+          files: ./coverage/lcov.info
+          flags: app
 
   build-app-test-backend:
     # since js tests for "backend" projects (app-shell, discovery-client) need
@@ -113,10 +116,13 @@ jobs:
           make setup-js
       - name: 'test native(er) packages'
         run: |
-          yarn jest --coverage=true --ci=true --testPathPattern '(app-shell|discovery-client)'
-      - uses: 'codecov/codecov-action@v1'
+          yarn jest --coverage=true --ci=true --collectCoverageFrom="(app-shell|discovery-client)/src/**/*.(js|ts|tsx)" app-shell/src discovery-client/src
+      - name: 'Upload coverage report'
+        uses: 'codecov/codecov-action@v2'
         with:
-          file: coverage.xml
+          files: ./coverage/lcov.info
+          flags: app
+
       # build the app and deploy it
       - if: github.event_name != 'pull_request'
         name: 'build app for ${{ matrix.os }}'
@@ -130,7 +136,7 @@ jobs:
           APPLE_ID: ${{ secrets.OT_APP_APPLE_ID }}
           APPLE_ID_PASSWORD: ${{ secrets.OT_APP_APPLE_ID_PASSWORD }}
         run: |
-           make -C app-shell dist-${{ matrix.os }}
+          make -C app-shell dist-${{ matrix.os }}
 
       - if: github.event_name != 'pull_request'
         name: 'upload github artifact'
@@ -138,6 +144,7 @@ jobs:
         with:
           name: 'opentrons-${{ matrix.os }}'
           path: app-shell/dist/publish
+
   deploy-app:
     name: 'Deploy built app artifacts to S3'
     runs-on: 'ubuntu-18.04'

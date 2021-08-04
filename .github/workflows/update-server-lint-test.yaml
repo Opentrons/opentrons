@@ -67,6 +67,7 @@ jobs:
           project: 'update-server'
       - name: Test
         run: make -C update-server test
-      - uses: 'codecov/codecov-action@v1'
+      - uses: 'codecov/codecov-action@v2'
         with:
-          file: ./update-server/coverage.xml
+          files: ./update-server/coverage.xml
+          flags: update-server
