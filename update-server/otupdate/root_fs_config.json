@@ -1,0 +1,1 @@
+{"data": {"defaults": {"ROOTFS_PART1": "", "ROOTFS_PART2": "", "BMAP_IMAGE": "", "BMAP_FILE": "", "DISK": "mmcblk0", "BOOT_SRC_CARVE_OUT": "", "ROOT_FS_PARTITION": "2", "SD_CARD_MOUNT_POINT": "/media/mmcblk1p1"}, "currrent_root_FS": {"root_part": 2}}}
