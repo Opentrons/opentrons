@@ -6,10 +6,10 @@ from decoy import Decoy
 from opentrons.types import MountType
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.protocol_engine import ProtocolEngine, commands
-from opentrons.protocol_engine.commands import CommandMapper
 from opentrons.protocol_engine.types import PipetteName
+from opentrons.protocol_engine.commands import CommandMapper
 from opentrons.protocol_engine.execution import QueueWorker
-from opentrons.protocol_engine.resources import ResourceProviders
+from opentrons.protocol_engine.resources import ModelUtils
 
 from opentrons.protocol_engine.state import (
     StateStore,
@@ -28,7 +28,7 @@ def state_store(decoy: Decoy) -> StateStore:
 
 @pytest.fixture
 def queue_worker(decoy: Decoy) -> QueueWorker:
-    """Get a mock CommandExecutor."""
+    """Get a mock QueueWorker."""
     return decoy.mock(cls=QueueWorker)
 
 
@@ -39,9 +39,9 @@ def command_mapper(decoy: Decoy) -> CommandMapper:
 
 
 @pytest.fixture
-def resources(decoy: Decoy) -> ResourceProviders:
-    """Get mock ResourceProviders."""
-    return decoy.mock(cls=ResourceProviders)
+def model_utils(decoy: Decoy) -> ModelUtils:
+    """Get mock ModelUtils."""
+    return decoy.mock(cls=ModelUtils)
 
 
 @pytest.fixture
@@ -54,17 +54,17 @@ def hardware_api(decoy: Decoy) -> HardwareAPI:
 def subject(
     state_store: StateStore,
     command_mapper: CommandMapper,
-    resources: ResourceProviders,
+    model_utils: ModelUtils,
     queue_worker: QueueWorker,
     hardware_api: HardwareAPI,
 ) -> ProtocolEngine:
     """Get a ProtocolEngine test subject with its dependencies stubbed out."""
     return ProtocolEngine(
+        hardware_api=hardware_api,
         state_store=state_store,
         queue_worker=queue_worker,
         command_mapper=command_mapper,
-        resources=resources,
-        hardware_api=hardware_api,
+        model_utils=model_utils,
     )
 
 
@@ -72,7 +72,7 @@ def test_add_command(
     decoy: Decoy,
     state_store: StateStore,
     command_mapper: CommandMapper,
-    resources: ResourceProviders,
+    model_utils: ModelUtils,
     queue_worker: QueueWorker,
     subject: ProtocolEngine,
 ) -> None:
@@ -93,8 +93,8 @@ def test_add_command(
         data=data,
     )
 
-    decoy.when(resources.model_utils.generate_id()).then_return("command-id")
-    decoy.when(resources.model_utils.get_timestamp()).then_return(created_at)
+    decoy.when(model_utils.generate_id()).then_return("command-id")
+    decoy.when(model_utils.get_timestamp()).then_return(created_at)
     decoy.when(
         command_mapper.map_request_to_command(
             request=request,
@@ -115,7 +115,7 @@ async def test_execute_command(
     decoy: Decoy,
     state_store: StateStore,
     command_mapper: CommandMapper,
-    resources: ResourceProviders,
+    model_utils: ModelUtils,
     queue_worker: QueueWorker,
     subject: ProtocolEngine,
 ) -> None:
@@ -146,8 +146,8 @@ async def test_execute_command(
         data=data,
     )
 
-    decoy.when(resources.model_utils.generate_id()).then_return("command-id")
-    decoy.when(resources.model_utils.get_timestamp()).then_return(created_at)
+    decoy.when(model_utils.generate_id()).then_return("command-id")
+    decoy.when(model_utils.get_timestamp()).then_return(created_at)
 
     decoy.when(
         command_mapper.map_request_to_command(

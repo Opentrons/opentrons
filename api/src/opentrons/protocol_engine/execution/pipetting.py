@@ -1,7 +1,7 @@
 """Pipetting command handling."""
 from opentrons.hardware_control.api import API as HardwareAPI
 
-from ..state import StateStore, StateView
+from ..state import StateStore
 from ..types import DeckLocation, WellLocation, WellOrigin
 from .movement import MovementHandler
 
@@ -10,23 +10,19 @@ class PipettingHandler:
     """Implementation logic for liquid handling commands."""
 
     _state_store: StateStore
-    _hardware: HardwareAPI
+    _hardware_api: HardwareAPI
     _movement_handler: MovementHandler
 
     def __init__(
         self,
         state_store: StateStore,
-        hardware: HardwareAPI,
+        hardware_api: HardwareAPI,
         movement_handler: MovementHandler,
     ) -> None:
         """Initialize a PipettingHandler instance."""
         self._state_store = state_store
-        self._hardware = hardware
+        self._hardware_api = hardware_api
         self._movement_handler = movement_handler
-
-    @property
-    def _state(self) -> StateView:
-        return self._state_store
 
     async def pick_up_tip(
         self,
@@ -36,13 +32,13 @@ class PipettingHandler:
     ) -> None:
         """Pick up a tip at the specified "well"."""
         # get mount and config data from state and hardware controller
-        hw_pipette = self._state.pipettes.get_hardware_pipette(
+        hw_pipette = self._state_store.pipettes.get_hardware_pipette(
             pipette_id=pipette_id,
-            attached_pipettes=self._hardware.attached_instruments,
+            attached_pipettes=self._hardware_api.attached_instruments,
         )
 
         # use config data to get tip geometry (length, diameter, volume)
-        tip_geometry = self._state.geometry.get_tip_geometry(
+        tip_geometry = self._state_store.geometry.get_tip_geometry(
             labware_id=labware_id,
             well_name=well_name,
             pipette_config=hw_pipette.config,
@@ -56,7 +52,7 @@ class PipettingHandler:
         )
 
         # perform the tip pickup routine
-        await self._hardware.pick_up_tip(
+        await self._hardware_api.pick_up_tip(
             mount=hw_pipette.mount,
             tip_length=tip_geometry.effective_length,
             # TODO(mc, 2020-11-12): include these parameters in the request
@@ -65,11 +61,11 @@ class PipettingHandler:
         )
 
         # after a successful pickup, update the hardware controller state
-        self._hardware.set_current_tiprack_diameter(
+        self._hardware_api.set_current_tiprack_diameter(
             mount=hw_pipette.mount,
             tiprack_diameter=tip_geometry.diameter,
         )
-        self._hardware.set_working_volume(
+        self._hardware_api.set_working_volume(
             mount=hw_pipette.mount,
             tip_volume=tip_geometry.volume,
         )
@@ -82,13 +78,13 @@ class PipettingHandler:
     ) -> None:
         """Drop a tip at the specified "well"."""
         # get mount and config data from state and hardware controller
-        hw_pipette = self._state.pipettes.get_hardware_pipette(
+        hw_pipette = self._state_store.pipettes.get_hardware_pipette(
             pipette_id=pipette_id,
-            attached_pipettes=self._hardware.attached_instruments,
+            attached_pipettes=self._hardware_api.attached_instruments,
         )
 
         # get the tip drop location
-        well_location = self._state.geometry.get_tip_drop_location(
+        well_location = self._state_store.geometry.get_tip_drop_location(
             labware_id=labware_id,
             pipette_config=hw_pipette.config,
         )
@@ -102,7 +98,7 @@ class PipettingHandler:
         )
 
         # perform the tip drop routine
-        await self._hardware.drop_tip(
+        await self._hardware_api.drop_tip(
             mount=hw_pipette.mount,
             # TODO(mc, 2020-11-12): include this parameter in the request
             home_after=True,
@@ -118,12 +114,12 @@ class PipettingHandler:
     ) -> float:
         """Aspirate liquid from a well."""
         # get mount and config data from state and hardware controller
-        hw_pipette = self._state.pipettes.get_hardware_pipette(
+        hw_pipette = self._state_store.pipettes.get_hardware_pipette(
             pipette_id=pipette_id,
-            attached_pipettes=self._hardware.attached_instruments,
+            attached_pipettes=self._hardware_api.attached_instruments,
         )
 
-        ready_to_aspirate = self._state.pipettes.get_is_ready_to_aspirate(
+        ready_to_aspirate = self._state_store.pipettes.get_is_ready_to_aspirate(
             pipette_id=pipette_id,
             pipette_config=hw_pipette.config,
         )
@@ -138,7 +134,7 @@ class PipettingHandler:
                 well_location=WellLocation(origin=WellOrigin.TOP, offset=(0, 0, 0)),
             )
 
-            await self._hardware.prepare_for_aspirate(mount=hw_pipette.mount)
+            await self._hardware_api.prepare_for_aspirate(mount=hw_pipette.mount)
 
             # set our current deck location to the well now that we've made
             # an intermediate move for the "prepare for aspirate" step
@@ -156,7 +152,7 @@ class PipettingHandler:
             current_location=current_location,
         )
 
-        await self._hardware.aspirate(mount=hw_pipette.mount, volume=volume)
+        await self._hardware_api.aspirate(mount=hw_pipette.mount, volume=volume)
 
         return volume
 
@@ -169,9 +165,9 @@ class PipettingHandler:
         volume: float,
     ) -> float:
         """Dispense liquid to a well."""
-        hw_pipette = self._state.pipettes.get_hardware_pipette(
+        hw_pipette = self._state_store.pipettes.get_hardware_pipette(
             pipette_id=pipette_id,
-            attached_pipettes=self._hardware.attached_instruments,
+            attached_pipettes=self._hardware_api.attached_instruments,
         )
 
         await self._movement_handler.move_to_well(
@@ -181,6 +177,6 @@ class PipettingHandler:
             well_location=well_location,
         )
 
-        await self._hardware.dispense(mount=hw_pipette.mount, volume=volume)
+        await self._hardware_api.dispense(mount=hw_pipette.mount, volume=volume)
 
         return volume

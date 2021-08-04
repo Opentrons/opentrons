@@ -16,7 +16,7 @@ from opentrons.file_runner import (
 @pytest.fixture
 async def protocol_engine(hardware: HardwareAPI) -> ProtocolEngine:
     """Get an actual ProtocolEngine for smoke-test purposes."""
-    return await create_protocol_engine(hardware=hardware)
+    return await create_protocol_engine(hardware_api=hardware)
 
 
 async def test_create_json_runner(

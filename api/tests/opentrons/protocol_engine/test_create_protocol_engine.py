@@ -17,7 +17,7 @@ async def test_create_engine_initializes_state_with_deck_geometry(
     fixed_trash_def: LabwareDefinition,
 ) -> None:
     """It should load deck geometry data into the store on create."""
-    engine = await create_protocol_engine(hardware=hardware_api)
+    engine = await create_protocol_engine(hardware_api=hardware_api)
     state = engine.state_view
 
     assert isinstance(engine, ProtocolEngine)

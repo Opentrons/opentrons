@@ -1,7 +1,8 @@
 """ProtocolEngine class definition."""
+from typing import Optional
 from opentrons.hardware_control import API as HardwareAPI
 
-from .resources import ResourceProviders
+from .resources import ModelUtils
 from .commands import Command, CommandRequest, CommandMapper
 from .execution import QueueWorker
 
@@ -23,30 +24,30 @@ class ProtocolEngine:
     of the commands themselves.
     """
 
-    _state_store: StateStore
-    _command_mapper: CommandMapper
-    _resources: ResourceProviders
-    _queue_worker: QueueWorker
     _hardware_api: HardwareAPI
+    _state_store: StateStore
+    _queue_worker: QueueWorker
+    _command_mapper: CommandMapper
+    _model_utils: ModelUtils
 
     def __init__(
         self,
-        state_store: StateStore,
-        command_mapper: CommandMapper,
-        resources: ResourceProviders,
-        queue_worker: QueueWorker,
         hardware_api: HardwareAPI,
+        state_store: StateStore,
+        queue_worker: QueueWorker,
+        command_mapper: Optional[CommandMapper] = None,
+        model_utils: Optional[ModelUtils] = None,
     ) -> None:
         """Initialize a ProtocolEngine instance.
 
         This constructor does not inject provider implementations. Prefer the
         ProtocolEngine.create factory classmethod.
         """
-        self._state_store = state_store
-        self._command_mapper = command_mapper
-        self._resources = resources
-        self._queue_worker = queue_worker
         self._hardware_api = hardware_api
+        self._state_store = state_store
+        self._queue_worker = queue_worker
+        self._command_mapper = command_mapper or CommandMapper()
+        self._model_utils = model_utils or ModelUtils()
 
     @property
     def state_view(self) -> StateView:
@@ -78,8 +79,8 @@ class ProtocolEngine:
         """
         command = self._command_mapper.map_request_to_command(
             request=request,
-            command_id=self._resources.model_utils.generate_id(),
-            created_at=self._resources.model_utils.get_timestamp(),
+            command_id=self._model_utils.generate_id(),
+            created_at=self._model_utils.get_timestamp(),
         )
         self._state_store.handle_action(UpdateCommandAction(command=command))
 
