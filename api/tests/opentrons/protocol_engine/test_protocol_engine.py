@@ -258,7 +258,7 @@ async def test_stop_after_wait(
     )
 
 
-def test_halt(
+async def test_halt(
     decoy: Decoy,
     state_store: StateStore,
     queue_worker: QueueWorker,
@@ -266,10 +266,10 @@ def test_halt(
     subject: ProtocolEngine,
 ) -> None:
     """It should be able to halt the engine."""
-    subject.halt()
+    await subject.halt()
 
     decoy.verify(
         state_store.handle_action(StopAction()),
         queue_worker.cancel(),
-        hardware_api.halt(),
+        await hardware_api.halt(),
     )
