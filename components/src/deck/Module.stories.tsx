@@ -29,7 +29,7 @@ export default {
   title: 'Library/Molecules/Simulation/Module',
 } as Meta
 
-const Template: Story<React.ComponentProps<typeof ModuleComponent>> = args => {
+const Template: Story<React.ComponentProps<typeof ModuleFromData>> = args => {
   return (
     <RobotWorkSpace deckDef={getDeckDefinitions().ot2_standard}>
       {({ deckSlotsById }: RobotWorkSpaceRenderProps) => {
@@ -38,8 +38,9 @@ const Template: Story<React.ComponentProps<typeof ModuleComponent>> = args => {
           <g transform={`translate(${slot.position[0]}, ${slot.position[1]})`}>
             {/* <ModuleComponent mode={args.mode} model={args.model} slot={slot} /> */}
             <ModuleFromData
-              def={getModuleDef2(args.model)}
+              def={getModuleDef2(TEMPERATURE_MODULE_V2)}
               stylePropsByLayer={{'darkFill': {fill: '#ccc'}}}
+              layerBlocklist={args.layerBlocklist}
               />
           </g>
         )
@@ -49,18 +50,23 @@ const Template: Story<React.ComponentProps<typeof ModuleComponent>> = args => {
 }
 export const Module = Template.bind({})
 Module.argTypes = {
-  model: {
+  // model: {
+  //   control: {
+  //     type: 'select',
+  //     options: moduleModels,
+  //   },
+  //   defaultValue: moduleModels[0],
+  // },
+  // mode: {
+  //   control: {
+  //     type: 'select',
+  //     options: displayModes,
+  //   },
+  //   defaultValue: displayModes[0],
+  // },
+  layerBlocklist: {
     control: {
-      type: 'select',
-      options: moduleModels,
-    },
-    defaultValue: moduleModels[0],
-  },
-  mode: {
-    control: {
-      type: 'select',
-      options: displayModes,
-    },
-    defaultValue: displayModes[0],
-  },
+      type: 'text'
+    }
+  }
 }
