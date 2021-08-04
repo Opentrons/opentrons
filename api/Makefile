@@ -206,7 +206,7 @@ plot-session:
 #	Required Parameters:
 #		object_name - name of the S3 object you want to pull from the g-code-comparison bucket
 #	Example:
-#		make g-code-s3-pull object_name='smoothie-protocol-output.json'
+#		make g-code-s3-pull object_name='smoothie-protocol-output.txt'
 .PHONY: g-code-s3-pull
 g-code-s3-pull:
 	@aws s3 cp s3://g-code-comparison/$(object_name) -
@@ -220,7 +220,7 @@ g-code-s3-pull:
 # 	Example:
 #		make g-code-s3-push \
 #		source_file_path=./api/tests/opentrons/data/g_code_validation_protocols/smoothie_protocol.py \
-#		object_name='smoothie-protocol-output.json'
+#		object_name='smoothie-protocol-output.txt'
 .PHONY: g-code-s3-push
 g-code-s3-push:
 	@aws s3 cp $(source_file_path) s3://g-code-comparison/$(object_name)
@@ -278,3 +278,43 @@ g-code-diff:
 .PHONY: open-diff
 open-diff:
 	google-chrome file://$(diff_file)
+
+
+####################
+### G-CODE TESTS ###
+####################
+
+########################
+# smoothie_protocol.py #
+########################
+
+# g-code-smoothie-protocol-run
+#	Description - Run smoothie_protocol.py and store the output to /tmp/file_under_test.txt
+.PHONY: g-code-smoothie-protocol-run
+g-code-smoothie-protocol-run:
+	@$(MAKE) --no-print-directory g-code-run \
+		left_pipette='{"model": "p20_single_v2.0", "id": "P20SV202020070101"}' \
+		right_pipette='{"model": "p20_single_v2.0", "id": "P20SV202020070101"}' \
+		protocol_path='./tests/opentrons/data/g_code_validation_protocols/smoothie_protocol.py' \
+  		> $(file_under_test)
+
+# g-code-smoothie-protocol-run
+#	Description - Run smoothie_protocol.py and compare it's output to S3 master file. Store the diff to /tmp/diff.html
+.PHONY: g-code-smoothie-protocol-diff
+g-code-smoothie-protocol-diff:
+	@$(MAKE) --no-print-directory g-code-smoothie-protocol-run
+	@$(MAKE) --no-print-directory g-code-s3-pull \
+		object_name='smoothie-protocol-output.txt' \
+		> $(master_file)
+	@$(MAKE) --no-print-directory g-code-diff \
+	> $(diff_file)
+
+
+# g-code-smoothie-protocol-update-s3
+#	Description - Run smoothie_protocol.py and override the S3 master file with it's output
+.PHONY: g-code-smoothie-protocol-update-s3
+g-code-smoothie-protocol-update-s3:
+	@$(MAKE) --no-print-directory g-code-smoothie-protocol-run
+	@$(MAKE) --no-print-directory g-code-s3-push \
+		source_file_path=$(file_under_test) \
+		object_name='smoothie-protocol-output.txt'
