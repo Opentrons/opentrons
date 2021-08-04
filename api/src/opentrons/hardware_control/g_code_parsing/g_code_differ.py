@@ -85,6 +85,9 @@ class GCodeDiffer:
         with open(file_path, 'w') as file:
             file.write(self.get_html_diff())
 
+    def strings_are_equal(self):
+        return self._string_1 == self._string_2
+
     @classmethod
     def get_diff_type(cls, diff_tuple: Tuple[int, str]):
         return cls.DIFF_TYPE_LOOKUP[diff_tuple[0]]

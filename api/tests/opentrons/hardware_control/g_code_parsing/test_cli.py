@@ -211,12 +211,14 @@ def test_run_command(run_command):
 
 
 def test_same_file_content_diff_command(same_file_content_diff_command):
-    assert same_file_content_diff_command.execute() == "<span>Hello World</span>"
+    assert same_file_content_diff_command.execute() == \
+           "No difference between compared strings"
 
 
 def test_different_file_content_diff_command(different_file_content_diff_command):
     assert different_file_content_diff_command.execute() == \
-        '<span>Hello</span><del style="background:#ffe6e6;"> World</del>'
+        '<span>Hello</span>' \
+        '<del style="background:#ffe6e6;font-size:large;font-weight:bold;"> World</del>'
 
 
 def test_unparsable_cli_command_error():

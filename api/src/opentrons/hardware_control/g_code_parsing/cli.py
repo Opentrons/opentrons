@@ -66,7 +66,15 @@ class DiffCommand(CLICommand):
                 open(self.file_path_2, 'r') as file_2:
             file_1_text = '\n'.join(file_1.readlines())
             file_2_text = '\n'.join(file_2.readlines())
-            return GCodeDiffer(file_1_text, file_2_text).get_html_diff()
+
+            differ = GCodeDiffer(file_1_text, file_2_text)
+
+            if not differ.strings_are_equal():
+                text = differ.get_html_diff()
+            else:
+                text = 'No difference between compared strings'
+
+            return text
 
 
 class GCodeCLI:
