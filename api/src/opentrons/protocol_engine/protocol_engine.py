@@ -107,7 +107,7 @@ class ProtocolEngine:
 
         return self._state_store.commands.get(command_id=command.id)
 
-    def halt(self) -> None:
+    async def halt(self) -> None:
         """Halt execution, stopping all motion and cancelling future commands.
 
         This method is synchronous to allow the halt to reach hardware
@@ -116,7 +116,7 @@ class ProtocolEngine:
         """
         self._state_store.handle_action(StopAction())
         self._queue_worker.cancel()
-        self._hardware_api.halt()
+        await self._hardware_api.halt()
 
     async def stop(self, wait_until_complete: bool = False) -> None:
         """Gracefully stop the ProtocolEngine, waiting for it to become idle.
