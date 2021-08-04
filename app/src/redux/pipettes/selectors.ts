@@ -288,23 +288,27 @@ export const getProtocolPipettesMatch: (
     return Constants.PIPETTE_MOUNTS.reduce<ProtocolPipettesMatchByMount>(
       (result, mount) => {
         const attachedPipette = attachedPipettes[mount]
-        const protocolPipette = protocolLabwareData.find(pipette => {
-          return pipette.mount === mount
-        })
-        if (protocolPipette !== null && protocolPipette !== undefined) {
-          if (
-            pipettesAreInexactMatch(
-              protocolPipette.pipetteSpecs.name,
-              attachedPipette?.modelSpecs
-            )
-          ) {
-            result[mount] = Constants.INEXACT_MATCH
-          } else if (
-            protocolPipette?.pipetteSpecs.name === attachedPipette?.name
-          ) {
-            result[mount] = Constants.MATCH
-          } else {
-            result[mount] = Constants.INCOMPATIBLE
+        if (protocolLabwareData == null) {
+          result[mount] = null
+        } else {
+          const protocolPipette = protocolLabwareData.find(pipette => {
+            return pipette.mount === mount
+          })
+          if (protocolPipette !== null && protocolPipette !== undefined) {
+            if (
+              pipettesAreInexactMatch(
+                protocolPipette.pipetteSpecs.name,
+                attachedPipette?.modelSpecs
+              )
+            ) {
+              result[mount] = Constants.INEXACT_MATCH
+            } else if (
+              protocolPipette?.pipetteSpecs.name === attachedPipette?.name
+            ) {
+              result[mount] = Constants.MATCH
+            } else {
+              result[mount] = Constants.INCOMPATIBLE
+            }
           }
         }
         return result
@@ -335,6 +339,7 @@ interface ProtocolPipetteCalibrationsByMount {
   } | null
 }
 
+// update this to use tiplength calibrations instead of attached pipette calibrations
 export const getProtocolPipetteCalibrationInfo: (
   state: State,
   robotName: string
@@ -345,10 +350,14 @@ export const getProtocolPipetteCalibrationInfo: (
   (protocolLabwareData, protocolPipetteMatch, attachedPipetteCalibrations) => {
     return Constants.PIPETTE_MOUNTS.reduce<ProtocolPipetteCalibrationsByMount>(
       (result, mount) => {
-        const protocolPipette = protocolLabwareData.find(pipette => {
+        const protocolPipette = protocolLabwareData?.find(pipette => {
           return pipette.mount === mount
         })
-        if (protocolPipette !== null && protocolPipette !== undefined) {
+        if (
+          protocolPipette !== null &&
+          protocolPipette !== undefined &&
+          'pipetteSpecs' in protocolPipette
+        ) {
           result[mount] = {
             pipetteDisplayName: protocolPipette.pipetteSpecs.displayName,
             exactMatch: protocolPipetteMatch[mount],
@@ -364,17 +373,17 @@ export const getProtocolPipetteCalibrationInfo: (
               attachedPipetteCalibrations[mount].offset?.lastModified
           }
 
-          protocolPipette?.tipracks.forEach(tiprack => {
+          protocolPipette?.tipRackDefs.forEach(tipRackDef => {
             let lastTiprackDate = null
             if (
-              getLabwareDefURI(tiprack) ===
+              getLabwareDefURI(tipRackDef) ===
               attachedPipetteCalibrations[mount].tipLength?.uri
             ) {
               lastTiprackDate =
                 attachedPipetteCalibrations[mount].tipLength?.lastModified
             }
-            result[mount].tipRacks.push({
-              displayName: tiprack.metadata.displayName,
+            result[mount]?.tipRacks.push({
+              displayName: tipRackDef.metadata.displayName,
               lastModifiedDate: lastTiprackDate,
             })
           })

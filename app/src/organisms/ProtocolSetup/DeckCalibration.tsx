@@ -11,9 +11,7 @@ interface Props {
   robotName: string
 }
 
-export const DeckCalibration: React.FunctionComponent<Props> = (
-  props: Props
-) => {
+export function DeckCalibration(props: Props): JSX.Element | null {
   const { robotName } = props
   const { t } = useTranslation(['robot_calibration', 'shared'])
 
@@ -22,6 +20,8 @@ export const DeckCalibration: React.FunctionComponent<Props> = (
       return Calibration.getDeckCalibrationData(state, robotName)
     }
   )
+
+  // this component's parent should never be rendered if there is no deckCalData
   if (deckCalData == null) {
     return null
   }
@@ -35,8 +35,7 @@ export const DeckCalibration: React.FunctionComponent<Props> = (
         ? formatLastModified(deckCalData.lastModified)
         : t('shared:unknown')
     const getPrefix = (calData: DeckCalibrationData): string =>
-      // @ts-expect-error TODO protect against non existent source key with in operator
-      typeof deckCalData?.source === 'string'
+      'source' in calData && typeof calData?.source === 'string'
         ? 'source' in calData &&
           calData.source === Calibration.CALIBRATION_SOURCE_LEGACY
           ? t('last_migrated')

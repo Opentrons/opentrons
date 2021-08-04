@@ -16,9 +16,7 @@ interface Props {
   robot: ViewableRobot
 }
 
-export const RobotCalibrationStep: React.FunctionComponent<Props> = (
-  props: Props
-) => {
+export function RobotCalibrationStep(props: Props): JSX.Element {
   const { robot } = props
   const { name: robotName, status } = robot
 
@@ -30,21 +28,16 @@ export const RobotCalibrationStep: React.FunctionComponent<Props> = (
     robotName && dispatch(TipLength.fetchTipLengthCalibrations(robotName))
   }, [dispatch, robotName, status])
 
-  const protocolPipetteData = Object.entries(
-    useSelector((state: State) => {
-      return Pipettes.getProtocolPipetteCalibrationInfo(state, robotName)
-    })
-  )
+  const protocolPipetteData = useSelector((state: State) => {
+    return Pipettes.getProtocolPipetteCalibrationInfo(state, robotName)
+  })
 
   return (
     <>
       <DeckCalibration robotName={robotName} />
       <Text marginTop={SPACING_3}>Required Pipettes</Text>
       <div>
-        {protocolPipetteData.map(protocolPipette => {
-          const mount = protocolPipette[0]
-          const pipetteData = protocolPipette[1]
-
+        {Object.entries(protocolPipetteData).map(([mount, pipetteData]) => {
           if (pipetteData == null) {
             return null
           } else {
@@ -72,9 +65,7 @@ export const RobotCalibrationStep: React.FunctionComponent<Props> = (
       </div>
       <Text marginTop={SPACING_3}>Required Tip Length Calibration</Text>
       <div>
-        {protocolPipetteData.map(protocolPipette => {
-          const pipetteData = protocolPipette[1]
-
+        {Object.entries(protocolPipetteData).map(([mount, pipetteData]) => {
           if (pipetteData == null) {
             return null
           } else {

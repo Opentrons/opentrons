@@ -232,48 +232,62 @@ export interface ProtocolLabwareData {
   pipetteKey: string
   mount: typeof PipetteConstants.LEFT | typeof PipetteConstants.RIGHT
   pipetteSpecs: PipetteNameSpecs
-  tipracks: LabwareDefinition2[]
+  tipRackDefs: LabwareDefinition2[]
 }
 
 export const getProtocolLabwareData: (
   state: State
-) => ProtocolLabwareData[] = createSelector(getProtocolData, protocolData => {
-  // where are the type definitions of these protocol data objects?
-  const { pipettes, labwareDefinitions, commands } = protocolData
-  const tipRackCommands = commands.filter(
-    commandObject => commandObject.command === 'pickUpTip'
-  )
-  const protocolPipetteValues = Object.values(pipettes)
-  const protocolPipetteKeys = Object.keys(pipettes)
-
-  const pipetteData: ProtocolLabwareData[] = []
-
-  protocolPipetteValues.forEach((pipette, index) => {
-    const pipetteObject = {
-      pipetteKey: protocolPipetteKeys[index],
-      mount: pipette.mount,
-      pipetteSpecs: getPipetteNameSpecs(pipette.name),
-      tipracks: [],
+) => ProtocolLabwareData[] | null = createSelector(
+  getProtocolData,
+  protocolData => {
+    if (protocolData == null || !('commands' in protocolData)) {
+      return null
     }
-    pipetteData.push(pipetteObject)
-  })
+    const { pipettes, labwareDefinitions, commands } = protocolData
+    const tipRackCommands = commands.filter(
+      commandObject => commandObject.command === 'pickUpTip'
+    )
+    const protocolPipetteValues = Object.values(pipettes)
+    const protocolPipetteKeys = Object.keys(pipettes)
 
-  const [tipracks] = partition(
-    labwareDefinitions,
-    lw => lw.parameters.isTiprack
-  )
+    const pipetteData: ProtocolLabwareData[] = []
 
-  pipetteData.forEach(pipette => {
-    tipRackCommands.forEach(command => {
-      if (pipette.pipetteKey === command.params.pipette) {
-        const tiprackDefinition = tipracks.find(tiprack =>
-          command.params.labware.includes(tiprack.parameters.loadName)
-        )
-        pipette.tipracks.push(tiprackDefinition)
+    protocolPipetteValues.forEach((pipette, index) => {
+      const pipetteObject = {
+        pipetteKey: protocolPipetteKeys[index],
+        mount: pipette.mount,
+        pipetteSpecs: getPipetteNameSpecs(pipette.name),
+        tipRackDefs: [],
       }
-      pipette.tipracks = uniq(pipette.tipracks)
+      if (pipetteObject.pipetteSpecs !== null) {
+        pipetteData.push(pipetteObject)
+      }
     })
-  })
 
-  return pipetteData
-})
+    const [tipRacks] = partition(
+      labwareDefinitions,
+      lw => lw.parameters.isTiprack
+    )
+
+    pipetteData.forEach(pipette => {
+      tipRackCommands.forEach(command => {
+        if (
+          'pipette' in command.params &&
+          pipette.pipetteKey === command.params.pipette
+        ) {
+          const tipRackDefinition = tipRacks.find(tipRack =>
+            'labware' in command.params
+              ? command.params.labware.includes(tipRack.parameters.loadName)
+              : null
+          )
+          if (tipRackDefinition !== undefined) {
+            pipette.tipRackDefs.push(tipRackDefinition)
+          }
+        }
+        pipette.tipRackDefs = uniq(pipette.tipRackDefs)
+      })
+    })
+
+    return pipetteData
+  }
+)
