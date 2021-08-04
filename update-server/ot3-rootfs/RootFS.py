@@ -83,17 +83,22 @@ class RootFS:
         print ('ROOT_FS_PARTITION '+RootFS.ROOT_FS_PARTITION+'\n')
         print ('SD_CARD_MOUNT_POINT '+RootFS.SD_CARD_MOUNT_POINT+'\n')
         
-        
+    def debug(self):
+     self.printRootFSPartition()
+     self.printRootFSConfig()    
     def __init__(self):
         self.RootFSPartition = ROOT_FS_PARTITION
 
+def test():
+    print('test me')
+
 def main():
     parser = argparse.ArgumentParser(description='Change OT3 RootFS partition to upgrage etc.')
-    parser.add_argument('-p', '--partition', metavar='partition', type=str, help='partion for RootFS')
-    args = parser.parse_args()
-    rfs = RootFS()
-    rfs.printRootFSPartition()
-    rfs.printRootFSConfig()
-
+    subparsers = parser.add_subparsers()
+    # create Debug subcommand
+    parser_debug = subparsers.add_parser('test', help = 'Debug')
+    parser_debug.set_defaults(func=test)
+    options = parser.parse_args()
+    options.func()
 if __name__ == "__main__":
     main()
