@@ -587,7 +587,7 @@ class API(HardwareAPILike):
         After this call, the smoothie will be in a bad state until a call to
         :py:meth:`stop`.
         """
-        self._log.info("api.py: ====Got a hard halt====")
+        self._log.info("api.py: ====Got an api.halt====")
         self._backend.hard_halt()
         asyncio.run_coroutine_threadsafe(self._execution_manager.cancel(),
                                          self._loop)

@@ -458,11 +458,22 @@ class Session(RobotBusy):
 
     def stop(self) -> None:
         log.info("session.py: ==== stop() called ====")
+        log.info("Before calling api.halt:")
+        for mount, instr in self._hw_iface().attached_instruments.items():
+            log.info(f"@@@@ Instrument: {instr}")
+            current_loc = self._hw_iface().current_position(mount)
+            log.info(f"=== Location cache is: {current_loc}")
+            if instr['has_tip']:
+                log.info("=== Pipette has a tip! ===")
+                # instr.drop_tip()
+            else:
+                log.info("____ Pipette has NO tip. Safe to home____")
+
         self._hw_iface().halt()
         with self._motion_lock.lock():
             try:
-                log.info("session.py: stop(): "
-                         "====== Disposing off any tips left on the pipettes..")
+                log.info("session.py: stop(): ")
+                log.info("After calling api.halt:")
                 for instr in self._instruments:
                     log.info(f"@@@@ Instrument: {instr.name}")
                     current_loc = instr._ctx.location_cache
@@ -476,7 +487,7 @@ class Session(RobotBusy):
             except asyncio.CancelledError:
                 pass
         self.set_state('stopped')
-        log.info("session.py: ==== Exiting stop() ====")
+        log.info("session.py: ==== Exiting session.stop() ====")
 
     def pause(self,
               reason: str = None,
