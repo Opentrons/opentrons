@@ -1,5 +1,25 @@
-# noqa: D100
-# todo: docstring
+"""Dependencies (in the FastAPI sense) that last for the lifetime of the server.
+
+App dependencies are created when the server starts, before it responds to any requests,
+and are cleaned up when the server shuts down. This is as opposed to normal FastAPI
+dependencies, which are created on-demand when a request needs them, and are cleaned up
+after the response is sent.
+
+Something should be an app dependency when any of the following are true:
+
+* We want to initialize it, or start initializing it, as soon as the server starts up.
+* We need to clean it up when the server shuts down. Note that because we support hot
+  reloading, we do need to explicitly clean up most resources: we can't rely on things
+  automatically getting cleaned up when the process ends.
+* It's a prerequisite for a different dependency, and that different dependency is
+  an app dependency.
+
+This module is a stopgap until FastAPI has built-in support for dependencies like this.
+See, for example:
+
+* https://github.com/tiangolo/fastapi/issues/617
+* https://github.com/tiangolo/fastapi/pull/3516
+"""
 
 import contextlib
 from dataclasses import dataclass
@@ -117,8 +137,7 @@ async def _rpc_server(
 
 
 @contextlib.asynccontextmanager
-async def app_dependencies() -> typing.AsyncGenerator[AppDependencySet, None]:
-    """Todo: docstring."""
+async def _all_app_dependencies() -> typing.AsyncGenerator[AppDependencySet, None]:
     async with contextlib.AsyncExitStack() as stack:
         motion_lock = ThreadedAsyncLock()
         event_publisher = await stack.enter_async_context(_event_publisher())
@@ -141,12 +160,15 @@ async def app_dependencies() -> typing.AsyncGenerator[AppDependencySet, None]:
 
 
 def install_startup_shutdown_handlers(app: FastAPI) -> None:
-    """Todo: docstring."""
-    # - Must be called exactly once
-    # - Purpose is hot reloading
-    # - Temporary measure until FastAPI and Starlette support context manager startup
+    """Arrange for dependencies to be initialized and torn down with `app`.
 
-    context_manager = app_dependencies()
+    Must be called exactly once on our global FastAPI ``app`` object.
+    """
+    context_manager = _all_app_dependencies()
+
+    # Currently (Starlette v0.13.2 and FastAPI v0.54.1), we have to split the context
+    # manager into two halves. Later versions (Starlette v0.13.5?) will support using a
+    # `lifespan` context manager as one piece.
 
     @app.on_event("startup")
     async def on_startup() -> None:
@@ -155,7 +177,8 @@ def install_startup_shutdown_handlers(app: FastAPI) -> None:
     @app.on_event("shutdown")
     async def on_shutdown() -> None:
         # This shutdown handler has no way of knowing *why* we're shutting down, so the
-        # best we can do is pass None as the exception information. This should only
-        # matter if context_manager used something like contextlib.suppress to treat
-        # exceptions specially.
+        # best we can do is pass None as the exception information, indicating we're
+        # shutting down cleanly. This should only make a difference if context_manager
+        # comprised something like contextlib.suppress() to attempt to treat exceptions
+        # specially.
         await context_manager.__aexit__(None, None, None)

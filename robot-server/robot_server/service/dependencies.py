@@ -16,7 +16,6 @@ from robot_server.service.protocol.manager import ProtocolManager
 from robot_server.service.legacy.rpc import RPCServer
 from robot_server.slow_initializing import InitializationOngoingError, SlowInitializing
 
-
 class OutdatedApiVersionResponse(errors.ErrorDetails):
     """An error returned when you request an outdated HTTP API version."""
 
