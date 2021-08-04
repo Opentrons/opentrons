@@ -12,32 +12,6 @@
   border: 3px solid transparent;
 }
 
-.module_info {
-  /* NOTE(IL, 2020-05-20): font size 0.5rem isn't the same as 0.5rem outside of SVG + foreignObject world */
-  font-size: 0.5rem;
-  font-weight: var(--fw-semibold);
-  padding-bottom: 0.3rem;
-}
-
-.name_overlay {
-  width: 100%;
-  font-size: 0.5rem;
-  color: var(--c-font-light);
-  background-color: color-mod(var(--c-black) alpha(0.75));
-  padding: 0.25rem;
-  border-radius: 0 0 0.5rem 0.5rem;
-}
-
-.display_name {
-  font-weight: var(--fw-regular);
-  color: var(--c-font-light);
-  text-transform: uppercase;
-}
-
-.offset_label {
-  font-weight: var(--fw-semibold);
-}
-
 .labware_info_overlay {
   height: 100%;
   width: 100%;
@@ -57,9 +31,4 @@
   max-width: 100%;
   max-height: 100%;
   overflow-y: scroll;
-}
-
-.close_button_wrapper {
-  display: flex;
-  justify-content: center;
 }

@@ -5,7 +5,16 @@ import {
   getLabwareDisplayName,
   LabwareDefinition2,
 } from '@opentrons/shared-data'
-import { RobotCoordsForeignDiv } from '@opentrons/components'
+import {
+  Box,
+  RobotCoordsForeignDiv,
+  Text,
+  FONT_WEIGHT_REGULAR,
+  FONT_WEIGHT_SEMIBOLD,
+  SPACING_1,
+  C_WHITE,
+  OVERLAY_BLACK_90,
+} from '@opentrons/components'
 import styles from './styles.css'
 
 interface LabwareInfoProps {
@@ -17,20 +26,65 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element => {
   const { displayName } = props
   const { t } = useTranslation('protocol_setup')
   return (
-    <div className={cx(styles.name_overlay)}>
-      <p className={styles.display_name}> {displayName} </p>
-      <p className={cx(styles.display_name, styles.offset_label)}>
-        {' '}
-        {t('offset_data')}{' '}
-      </p>
-      <p className={styles.display_name}>
-        {' '}
-        <span className={styles.offset_label}>X </span>
-        {FAKE_OFFSET_DATA.x} <span className={styles.offset_label}>Y </span>
-        {FAKE_OFFSET_DATA.y} <span className={styles.offset_label}>Z </span>
-        {FAKE_OFFSET_DATA.z}{' '}
-      </p>
-    </div>
+    <Box
+      flexDirection={'column'}
+      backgroundColor={OVERLAY_BLACK_90}
+      fontSize={'0.5rem'}
+      color={C_WHITE}
+    >
+      <Text margin={SPACING_1}>{displayName}</Text>
+      <Text
+        margin={SPACING_1}
+        fontWeight={FONT_WEIGHT_SEMIBOLD}
+        textTransform={'uppercase'}
+      >
+        {t('offset_data')}
+      </Text>
+      <Box margin={SPACING_1}>
+        <Text
+          as={'span'}
+          fontWeight={FONT_WEIGHT_SEMIBOLD}
+          marginRight={'0.15rem'}
+        >
+          X
+        </Text>
+        <Text
+          as={'span'}
+          fontWeight={FONT_WEIGHT_REGULAR}
+          marginRight={'0.15rem'}
+        >
+          {FAKE_OFFSET_DATA.x.toFixed(1)}
+        </Text>
+        <Text
+          as={'span'}
+          fontWeight={FONT_WEIGHT_SEMIBOLD}
+          marginRight={'0.15rem'}
+        >
+          Y
+        </Text>
+        <Text
+          as={'span'}
+          fontWeight={FONT_WEIGHT_REGULAR}
+          marginRight={'0.15rem'}
+        >
+          {FAKE_OFFSET_DATA.y.toFixed(1)}
+        </Text>
+        <Text
+          as={'span'}
+          fontWeight={FONT_WEIGHT_SEMIBOLD}
+          marginRight={'0.15rem'}
+        >
+          Z
+        </Text>
+        <Text
+          as={'span'}
+          fontWeight={FONT_WEIGHT_REGULAR}
+          marginRight={'0.15rem'}
+        >
+          {FAKE_OFFSET_DATA.z.toFixed(1)}
+        </Text>
+      </Box>
+    </Box>
   )
 }
 

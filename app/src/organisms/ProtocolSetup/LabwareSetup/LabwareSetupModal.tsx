@@ -2,6 +2,7 @@ import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import {
   Box,
+  Flex,
   Link,
   Modal,
   PrimaryBtn,
@@ -10,6 +11,7 @@ import {
   FONT_SIZE_BODY_2,
   FONT_WEIGHT_REGULAR,
   FONT_WEIGHT_SEMIBOLD,
+  JUSTIFY_CENTER,
   SIZE_4,
   SPACING_3,
   SPACING_4,
@@ -94,11 +96,11 @@ export const LabwareSetupModal = (
             </Box>
           </Box>
 
-          <Box className={styles.close_button_wrapper}>
+          <Flex justifyContent={JUSTIFY_CENTER}>
             <PrimaryBtn onClick={props.onCloseClick} width={SIZE_4}>
               {t('shared:close')}
             </PrimaryBtn>
-          </Box>
+          </Flex>
         </Box>
       </Modal>
     </Portal>

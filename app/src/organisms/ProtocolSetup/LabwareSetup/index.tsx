@@ -150,6 +150,7 @@ export const LabwareSetup = (props: LabwareSetupProps): JSX.Element | null => {
             title="Check Labware Positions"
             marginRight={SPACING_3}
             onClick={() => console.log('check labware positions!')}
+            color={C_BLUE}
           >
             {t('check_labware_positions')}
           </SecondaryBtn>
@@ -157,6 +158,7 @@ export const LabwareSetup = (props: LabwareSetupProps): JSX.Element | null => {
             title="Proceed to Run"
             disabled={proceedToRunDisabled}
             as={LinkComponent}
+            backgroundColor={C_BLUE}
             {...linkProps}
             {...targetProps}
           >

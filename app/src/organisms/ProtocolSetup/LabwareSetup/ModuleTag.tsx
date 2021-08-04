@@ -1,5 +1,10 @@
 import * as React from 'react'
-import { RobotCoordsForeignDiv } from '@opentrons/components'
+import {
+  Text,
+  RobotCoordsForeignDiv,
+  FONT_WEIGHT_SEMIBOLD,
+  SPACING_2,
+} from '@opentrons/components'
 import {
   getModuleType,
   getModuleVizDims,
@@ -25,24 +30,6 @@ const STANDARD_TAG_WIDTH = 65
 // thermocycler has its slot farther right = more width, and it has more lines of content = more height
 const THERMOCYCLER_TAG_HEIGHT = 70
 const THERMOCYCLER_TAG_WIDTH = 75
-
-const getModuleGeneration = (model: ModuleModel): 'GEN1' | 'GEN2' => {
-  switch (model) {
-    case 'magneticModuleV1':
-      return 'GEN1'
-    case 'magneticModuleV2':
-      return 'GEN2'
-    case 'temperatureModuleV1':
-      return 'GEN1'
-    case 'temperatureModuleV2':
-      return 'GEN2'
-    case 'thermocyclerModuleV1':
-      return 'GEN1'
-    default:
-      console.warn(`expected a module of type ModuleModel, got ${model}`)
-      return 'GEN2'
-  }
-}
 
 export const ModuleTag = (props: ModuleTagProps): JSX.Element => {
   const { x, y, orientation, moduleModel } = props
@@ -74,15 +61,13 @@ export const ModuleTag = (props: ModuleTagProps): JSX.Element => {
         className: cx(styles.module_tag),
       }}
     >
-      <div>
-        <p className={styles.module_info}>
-          {' '}
-          {getModuleDisplayName(moduleModel)}{' '}
-        </p>
-        <p className={styles.module_info}>
-          {getModuleGeneration(moduleModel)}{' '}
-        </p>
-      </div>
+      <Text
+        fontWeight={FONT_WEIGHT_SEMIBOLD}
+        fontSize={'0.5rem'}
+        marginBottom={SPACING_2}
+      >
+        {getModuleDisplayName(moduleModel)}
+      </Text>
     </RobotCoordsForeignDiv>
   )
 }
