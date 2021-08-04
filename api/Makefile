@@ -198,6 +198,9 @@ plot-session:
 # G-Code Parsing Commands #
 ###########################
 
+# NOTE: The following 2 AWS commands `g-code-s3-pull` and `g-code-s3-push` expect you to have the following environment
+# variables defined:  `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, and `AWS_DEFAULT_REGION `
+
 # Pull objects from S3 and output it's content to STDOUT
 # "object_name" is a required parameter
 # "object_name" is the name of the S3 object you want to pull from the g-code-comparison bucket
