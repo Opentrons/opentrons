@@ -3,6 +3,36 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.5.0](https://github.com/Opentrons/opentrons/compare/v4.4.0...v4.5.0) (2021-08-03)
+
+
+### Bug Fixes
+
+* **api:** fix module path for jupyter notebook ([#8009](https://github.com/Opentrons/opentrons/issues/8009)) ([f8bdf5c](https://github.com/Opentrons/opentrons/commit/f8bdf5c096c444320e9b70d5f88f6eec38a2dc01))
+* **api:** ignore missing aionotify more properly ([#8154](https://github.com/Opentrons/opentrons/issues/8154)) ([bb0e3a0](https://github.com/Opentrons/opentrons/commit/bb0e3a02720b4e7f9c3e0678ea6f8d4d9b5145a4))
+* **api:** reduce the severity of retry message from warning to info. ([#8192](https://github.com/Opentrons/opentrons/issues/8192)) ([47bc77a](https://github.com/Opentrons/opentrons/commit/47bc77a1a0b89becf9e43ac2f32b53f2b6efa048))
+* **api:** tolerate bad json in calibration defs ([#7962](https://github.com/Opentrons/opentrons/issues/7962)) ([588668a](https://github.com/Opentrons/opentrons/commit/588668a8500297ce52bb36d67a93b14790c4d91b))
+
+
+### Features
+
+* **api:** Add G-Code parsing ([#8043](https://github.com/Opentrons/opentrons/issues/8043)) ([c2ccb10](https://github.com/Opentrons/opentrons/commit/c2ccb109b1d680f885bc13608cf35d131440ec07))
+* **api:** Add G-Code response handling to G-Code Parser ([#8096](https://github.com/Opentrons/opentrons/issues/8096)) ([a417735](https://github.com/Opentrons/opentrons/commit/a417735874e8550b3d48d6372b3996d37ab0106f))
+* **api:** Add G-Code to human-readable text parsing ([#8086](https://github.com/Opentrons/opentrons/issues/8086)) ([bedaeeb](https://github.com/Opentrons/opentrons/commit/bedaeeba9b5d2a30560442728aebc87493458e80))
+* **api:** Add Magdeck G-Code Parsing ([#8159](https://github.com/Opentrons/opentrons/issues/8159)) ([3185656](https://github.com/Opentrons/opentrons/commit/31856567f5753f1927a6c0328e8ab3699b88a3a9))
+* **api:** Create framework for running protocols against emulation ([#8149](https://github.com/Opentrons/opentrons/issues/8149)) ([1d046ea](https://github.com/Opentrons/opentrons/commit/1d046eabb1f7065cb603b3aae309c495c2fda017))
+* **api:** G-Code CLI ([#8156](https://github.com/Opentrons/opentrons/issues/8156)) ([73bd30c](https://github.com/Opentrons/opentrons/commit/73bd30c0e12ae6894e5dff5a5f6d4926e89744c8))
+* **api:** G-Code Diffing ([#8135](https://github.com/Opentrons/opentrons/issues/8135)) ([33e3ee3](https://github.com/Opentrons/opentrons/commit/33e3ee3b0c80e0897816ee0ad4e787d0249e6fe4))
+* **api:** promote fast protocol analysis to default behavior ([#8022](https://github.com/Opentrons/opentrons/issues/8022)) ([8d9a707](https://github.com/Opentrons/opentrons/commit/8d9a707064b6d471419a8ddf4ba33d6d0d6f2a02)), closes [#7835](https://github.com/Opentrons/opentrons/issues/7835)
+* **api:** Tempdeck G-Code Parsing ([#8160](https://github.com/Opentrons/opentrons/issues/8160)) ([79778e7](https://github.com/Opentrons/opentrons/commit/79778e7125bb496f0c6659464d976afae5ea754f))
+* **protocol-engine:** Add a command queue worker class ([#7817](https://github.com/Opentrons/opentrons/issues/7817)) ([8bdd223](https://github.com/Opentrons/opentrons/commit/8bdd2236cb09fc497f1884441605117521378478))
+* **protocol-engine:** Implement `CommandState.get_next_request()` ([#7936](https://github.com/Opentrons/opentrons/issues/7936)) ([61136a1](https://github.com/Opentrons/opentrons/commit/61136a128795bd6e3ee896e79e06455f782cbf01))
+* **protocol-engine:** Support loading pipettes and labware from JSON protocols ([#7950](https://github.com/Opentrons/opentrons/issues/7950)) ([e43c80f](https://github.com/Opentrons/opentrons/commit/e43c80f8f00a0146558345483993bc0c66fdce99))
+
+
+
+
+
 # [4.4.0](https://github.com/Opentrons/opentrons/compare/v4.3.1...v4.4.0) (2021-06-16)
 
 

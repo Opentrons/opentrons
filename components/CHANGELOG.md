@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.5.0](https://github.com/Opentrons/opentrons/compare/v4.4.0...v4.5.0) (2021-08-03)
+
+
+### Features
+
+* **labware-creator:** show whole labware in preview svg ([#8013](https://github.com/Opentrons/opentrons/issues/8013)) ([9b2fc17](https://github.com/Opentrons/opentrons/commit/9b2fc17843187d36746c10f4ba1ac6e551483ef9)), closes [#7164](https://github.com/Opentrons/opentrons/issues/7164)
+
+
+
+
+
 # [4.4.0](https://github.com/Opentrons/opentrons/compare/v4.3.1...v4.4.0) (2021-06-16)
 
 
