@@ -92,9 +92,9 @@ const render = (props: React.ComponentProps<typeof LabwareSetup>) => {
 
 const STUBBED_ORIENTATION_VALUE = 'left'
 const MOCK_300_UL_TIPRACK_ID = '300_ul_tiprack_id'
-const MOCK_MAGNETIC_MODULE_COORDS = [10, 20]
-const MOCK_TC_COORDS = [20, 30]
-const MOCK_300_UL_TIPRACK_COORDS = [30, 40]
+const MOCK_MAGNETIC_MODULE_COORDS = [10, 20, 0]
+const MOCK_TC_COORDS = [20, 30, 0]
+const MOCK_300_UL_TIPRACK_COORDS = [30, 40, 0]
 
 const mockMagneticModule = {
   labwareOffset: { x: 5, y: 5, z: 5 },
@@ -224,6 +224,7 @@ describe('LabwareSetup', () => {
         labwareDef: fixture_tiprack_300_ul as LabwareDefinition2,
         x: MOCK_300_UL_TIPRACK_COORDS[0],
         y: MOCK_300_UL_TIPRACK_COORDS[1],
+        z: MOCK_300_UL_TIPRACK_COORDS[2],
       },
     }
 
@@ -247,6 +248,7 @@ describe('LabwareSetup', () => {
         labwareDef: fixture_tiprack_300_ul as LabwareDefinition2,
         x: MOCK_300_UL_TIPRACK_COORDS[0],
         y: MOCK_300_UL_TIPRACK_COORDS[1],
+        z: MOCK_300_UL_TIPRACK_COORDS[2],
       },
     }
 
@@ -254,6 +256,7 @@ describe('LabwareSetup', () => {
       [mockMagneticModule.moduleId]: {
         x: MOCK_MAGNETIC_MODULE_COORDS[0],
         y: MOCK_MAGNETIC_MODULE_COORDS[1],
+        z: MOCK_MAGNETIC_MODULE_COORDS[2],
         moduleModel: mockMagneticModule.model,
       },
       [mockTCModule.moduleId]: {

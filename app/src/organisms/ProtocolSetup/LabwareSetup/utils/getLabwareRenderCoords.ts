@@ -84,7 +84,10 @@ export const getLabwareRenderCoords = (
                   [labwareId]: {
                     x: slotPosition[0] + moduleDef.labwareOffset.x,
                     y: slotPosition[1] + moduleDef.labwareOffset.y,
-                    z: slotPosition[2] + moduleDef.labwareOffset.z,
+                    z:
+                      moduleDef.labwareOffset.z != null
+                        ? slotPosition[2] + moduleDef.labwareOffset.z
+                        : slotPosition[2],
                     labwareDef,
                   },
                 }

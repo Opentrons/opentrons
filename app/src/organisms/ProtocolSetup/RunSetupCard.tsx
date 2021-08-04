@@ -29,7 +29,7 @@ type StepKey =
 
 export type CoordinatesByModuleModel = Record<
   string,
-  { x: number; y: number; z: number; moduleModel: ModuleModel }
+  { x: number; y: number; z?: number; moduleModel: ModuleModel }
 >
 export interface CoordinatesByLabwareId {
   [labwareId: string]: {
