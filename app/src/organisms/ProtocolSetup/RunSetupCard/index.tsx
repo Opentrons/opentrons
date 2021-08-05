@@ -9,8 +9,8 @@ import {
 } from '@opentrons/components'
 import { protocolHasModules } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
-import { getProtocolData } from '../../redux/protocol'
-import { Divider } from '../../atoms/structure'
+import { getProtocolData } from '../../../redux/protocol'
+import { Divider } from '../../../atoms/structure'
 import { CollapsibleStep } from './CollapsibleStep'
 import { LabwareSetup } from './LabwareSetup'
 import { ModuleSetup } from './ModuleSetup'
@@ -19,8 +19,8 @@ import { getLabwareRenderCoords } from './utils/getLabwareRenderCoords'
 
 import { RobotCalibrationStep } from './RobotCalibrationStep'
 import type { JsonProtocolFile } from '@opentrons/shared-data'
-import type { State } from '../../redux/types'
-import { getConnectedRobot } from '../../redux/discovery/selectors'
+import type { State } from '../../../redux/types'
+import { getConnectedRobot } from '../../../redux/discovery/selectors'
 
 const ROBOT_CALIBRATION_STEP_KEY = 'robot_calibration_step' as const
 const MODULE_SETUP_KEY = 'module_setup_step' as const

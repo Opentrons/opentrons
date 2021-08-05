@@ -2,10 +2,10 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { Text, SPACING_3 } from '@opentrons/components'
-import type { State } from '../../redux/types'
-import * as Calibration from '../../redux/calibration'
-import type { DeckCalibrationData } from '../../redux/calibration/types'
-import { formatLastModified } from '../../organisms/CalibrationPanels/utils'
+import type { State } from '../../../../redux/types'
+import * as Calibration from '../../../../redux/calibration'
+import type { DeckCalibrationData } from '../../../../redux/calibration/types'
+import { formatLastModified } from '../../../CalibrationPanels/utils'
 
 interface Props {
   robotName: string

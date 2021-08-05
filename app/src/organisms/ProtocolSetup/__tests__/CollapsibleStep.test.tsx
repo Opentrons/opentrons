@@ -3,7 +3,7 @@ import '@testing-library/jest-dom'
 import { renderWithProviders } from '@opentrons/components/__utils__'
 
 import { i18n } from '../../../i18n'
-import { CollapsibleStep } from '../CollapsibleStep'
+import { CollapsibleStep } from '../RunSetupCard/CollapsibleStep'
 import { fireEvent } from '@testing-library/react'
 
 describe('CollapsibleStep', () => {
