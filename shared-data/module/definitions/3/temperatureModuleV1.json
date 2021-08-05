@@ -25,5 +25,6 @@
   "displayName": "Temperature Module GEN1",
   "quirks": [],
   "slotTransforms": {},
-  "compatibleWith": ["temperatureModuleV2"]
+  "compatibleWith": ["temperatureModuleV2"],
+  "layers": []
 }

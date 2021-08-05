@@ -9,7 +9,14 @@
   },
   "dimensions": {
     "bareOverallHeight": 110.152,
-    "overLabwareHeight": 4.052
+    "overLabwareHeight": 4.052,
+    "xDimension": 137,
+    "yDimension": 91
+  },
+  "cornerOffsetFromSlot": {
+    "x": -7,
+    "y": 4,
+    "z": 0
   },
   "calibrationPoint": {
     "x": 124.875,
@@ -18,5 +25,6 @@
   "displayName": "Magnetic Module GEN1",
   "quirks": [],
   "slotTransforms": {},
-  "compatibleWith": []
+  "compatibleWith": [],
+  "layers": []
 }

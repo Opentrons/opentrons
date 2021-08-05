@@ -1,6 +1,8 @@
 import * as React from 'react'
 import cx from 'classnames'
 import styled from 'styled-components'
+import flatten from 'lodash/flatten'
+import reduce from 'lodash/reduce'
 
 import {
   getModuleDisplayName,
@@ -9,6 +11,7 @@ import {
   TEMPERATURE_MODULE_V1,
   TEMPERATURE_MODULE_V2,
   THERMOCYCLER_MODULE_V1,
+  getModuleDef2
 } from '@opentrons/shared-data'
 
 import { Icon } from '../icons'
@@ -30,66 +33,39 @@ export interface ModuleProps {
   /** USB port detail of the connected module */
   usbInfoString?: string
 }
-
+const IDENTITY_MATRIX = [1,0,0,1,0,0]
 export function Module(props: ModuleProps): JSX.Element {
   const { model, slot } = props
-  let x = 0
-  let y = 0
-  let { xDimension: width, yDimension: height } = slot.boundingBox
-  const shouldFlip = FLIPPED_SLOTS.includes(slot.id)
 
-  // TODO: BC 2019-7-23 get these from shared-data module defs, once available
-  switch (model) {
-    case MAGNETIC_MODULE_V1:
-    case MAGNETIC_MODULE_V2: {
-      width = 137
-      height = 91
-      x = -7
-      y = 4
-      break
-    }
-    case TEMPERATURE_MODULE_V1:
-    case TEMPERATURE_MODULE_V2: {
-      width = 196
-      height = 91
-      x = -66
-      y = 4
-      break
-    }
-    case THERMOCYCLER_MODULE_V1: {
-      // TODO: BC 2019-07-24 these are taken from snapshots of the cad file, they should
-      // be included in the module spec schema and added to the data
-      width = 172
-      height = 259.7
-      x = -22.125
-    }
-  }
+  const def = getModuleDef2(model)
 
+  const {xDimension, yDimension} = def.dimensions
+  const {x: xCornerOffset, y: yCornerOffset } = def.cornerOffsetFromSlot
+  const slotTransform = def.slotTransforms?.ot2_standard?.[slot.id]?.labwareOffset
+
+  console.log(slotTransform)
+  const extraTransform = Boolean(slotTransform)
+    ? [slotTransform[0][0], slotTransform[1][0], slotTransform[0][1], slotTransform[1][1], slotTransform[0][2], slotTransform[1][2], ] : IDENTITY_MATRIX
   return (
-    <RobotCoordsForeignDiv
-      width={width}
-      height={height}
-      x={x}
-      y={y - height}
-      transformWithSVG
-      extraTransform={`rotate(${shouldFlip ? 180 : 0}, ${
-        slot.boundingBox.xDimension / 2
-      }, ${slot.boundingBox.yDimension / -2})`}
-      innerDivProps={{
-        className: cx(styles.module, { [styles.flipped]: shouldFlip }),
-      }}
-    >
-      <ModuleItemContents {...props} shouldFlip={shouldFlip} />
-    </RobotCoordsForeignDiv>
+    <>
+      <RobotCoordsForeignDiv
+        width={xDimension}
+        height={yDimension}
+        x={xCornerOffset}
+        y={yCornerOffset - yDimension}
+        transformWithSVG
+        extraTransform={`matrix(${extraTransform.join(',')})`}
+        innerDivProps={{
+          className: cx(styles.module),
+        }}
+      />
+      <ModuleItemContents {...props} />
+    </>
   )
 }
 
-interface ModuleItemContentsProps extends ModuleProps {
-  shouldFlip: boolean
-}
-
-function ModuleItemContents(props: ModuleItemContentsProps): JSX.Element {
-  const { mode, model, usbInfoString, shouldFlip } = props
+function ModuleItemContents(props: ModuleProps): JSX.Element {
+  const { mode, model, usbInfoString } = props
   const displayName = getModuleDisplayName(model)
 
   const iconClassName = cx(styles.module_review_icon, {
@@ -105,40 +81,34 @@ function ModuleItemContents(props: ModuleItemContentsProps): JSX.Element {
   }
 
   return (
-    <>
-      <div
-        className={
-          shouldFlip ? styles.flipped_module_wrapper : styles.module_wrapper
-        }
-      >
-        {mode !== 'missing' && usbInfoString && (
-          <p
-            key="usbPortInfo"
-            className={
-              usbInfoString.includes('N/A')
-                ? styles.module_port_text_na
-                : styles.module_port_text
-            }
-          >
-            {usbInfoString}
-          </p>
-        )}
-        <p key="displayName" className={styles.module_review_text}>
-          {displayName}
+    <RobotCoordsForeignDiv innerDivProps={{className: styles.module_wrapper}} >
+      {mode !== 'missing' && usbInfoString && (
+        <p
+          key="usbPortInfo"
+          className={
+            usbInfoString.includes('N/A')
+              ? styles.module_port_text_na
+              : styles.module_port_text
+          }
+        >
+          {usbInfoString}
         </p>
-        <div className={styles.module_connect_info_wrapper}>
-          <Icon
-            key="icon"
-            className={iconClassName}
-            x="8"
-            y="0"
-            svgWidth="12"
-            name={iconNameByMode[mode] || 'usb'}
-          />
-          <p>{mode === 'missing' ? 'Not connected' : 'Connected'}</p>
-        </div>
+      )}
+      <p key="displayName" className={styles.module_review_text}>
+        {displayName}
+      </p>
+      <div className={styles.module_connect_info_wrapper}>
+        <Icon
+          key="icon"
+          className={iconClassName}
+          x="8"
+          y="0"
+          svgWidth="12"
+          name={iconNameByMode[mode] || 'usb'}
+        />
+        <p>{mode === 'missing' ? 'Not connected' : 'Connected'}</p>
       </div>
-    </>
+    </RobotCoordsForeignDiv>
   )
 }
 
