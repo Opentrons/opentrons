@@ -1,19 +1,16 @@
 import * as React from 'react'
-import { getModuleVizDims } from './getModuleVizDims'
 import styles from './ModuleViz.css'
-import { ModuleOnDeck } from '../../step-forms'
-import { ModuleOrientation } from '../../types'
+import { getModuleVizDims, ModuleRealType } from '@opentrons/shared-data'
 
 interface Props {
   x: number
   y: number
-  orientation: ModuleOrientation
-  module: ModuleOnDeck
-  slotName: string
+  orientation: 'left' | 'right'
+  moduleType: ModuleRealType
 }
 
 export const ModuleViz = (props: Props): JSX.Element => {
-  const moduleType = props.module.type
+  const moduleType = props.moduleType
   const {
     xOffset,
     yOffset,

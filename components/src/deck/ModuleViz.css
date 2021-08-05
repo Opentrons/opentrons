@@ -1,4 +1,4 @@
-@import '@opentrons/components';
+@import '..';
 
 .module_viz {
   rx: 6;

@@ -1,24 +1,71 @@
 import * as React from 'react'
+import { when } from 'jest-when'
 import '@testing-library/jest-dom'
+import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components/__utils__'
 import noModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/simpleV4.json'
 import withModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/testModulesProtocol.json'
+import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 
 import { i18n } from '../../../i18n'
 import { RunSetupCard } from '../RunSetupCard'
 
 import * as protocolSelectors from '../../../redux/protocol/selectors'
+import { LabwareSetup } from '../LabwareSetup'
+import { getModuleRenderCoords } from '../LabwareSetup/utils/getModuleRenderCoords'
+import { getLabwareRenderCoords } from '../LabwareSetup/utils/getLabwareRenderCoords'
 
 jest.mock('../../../redux/protocol/selectors')
-const getProtocolData = protocolSelectors.getProtocolData as jest.MockedFunction<
+jest.mock('../LabwareSetup')
+jest.mock('../LabwareSetup/utils/getModuleRenderCoords')
+jest.mock('../LabwareSetup/utils/getLabwareRenderCoords')
+
+const mockGetProtocolData = protocolSelectors.getProtocolData as jest.MockedFunction<
   typeof protocolSelectors.getProtocolData
 >
+const mockLabwareSetup = LabwareSetup as jest.MockedFunction<
+  typeof LabwareSetup
+>
+const mockGetModuleRenderCoords = getModuleRenderCoords as jest.MockedFunction<
+  typeof getModuleRenderCoords
+>
+const mockGetLabwareRenderCoords = getLabwareRenderCoords as jest.MockedFunction<
+  typeof getLabwareRenderCoords
+>
 
+// this is needed because under the hood react calls components with two arguments (props and some second argument nobody seems to know)
+// https://github.com/timkindberg/jest-when/issues/66
+const componentPropsMatcher = (matcher: unknown) =>
+  // @ts-expect-error(sa, 2021-08-03): when.allArgs not part of type definition yet for jest-when
+  when.allArgs((args, equals) => equals(args[0], matcher))
+
+const mockModuleRenderCoords = {
+  mockModuleId: { x: 0, y: 0, z: 0, moduleModel: 'mockModule' as any },
+}
+const mockLabwareRenderCoords = {
+  mockLabwareId: { x: 0, y: 0, z: 0, labwareDef: {} as any },
+}
 describe('RunSetupCard', () => {
   let render: () => ReturnType<typeof renderWithProviders>
 
   beforeEach(() => {
-    getProtocolData.mockReturnValue(noModulesProtocol as any)
+    mockGetProtocolData.mockReturnValue(noModulesProtocol as any)
+    when(mockGetModuleRenderCoords)
+      .calledWith(noModulesProtocol as any, standardDeckDef as any)
+      .mockReturnValue(mockModuleRenderCoords)
+    when(mockGetLabwareRenderCoords)
+      .calledWith(noModulesProtocol as any, standardDeckDef as any)
+      .mockReturnValue(mockLabwareRenderCoords)
+
+    when(mockLabwareSetup)
+      .mockReturnValue(<div></div>) // this (default) empty div will be returned when LabwareSetup isn't called with expected props
+      .calledWith(
+        componentPropsMatcher({
+          moduleRenderCoords: mockModuleRenderCoords,
+          labwareRenderCoords: mockLabwareRenderCoords,
+        })
+      )
+      .mockReturnValue(<div>Mock Labware Setup</div>)
     render = () => {
       return renderWithProviders(<RunSetupCard />, { i18nInstance: i18n })
     }
@@ -28,22 +75,35 @@ describe('RunSetupCard', () => {
     jest.resetAllMocks()
   })
 
-  it('renders robot calibration and labware setup if no modules in protocol', () => {
-    const { queryByText } = render()
-    expect(queryByText(/module setup/i)).toBeNull()
+  describe('when no modules are in the protocol', () => {
+    it('renders robot calibration', () => {
+      const { getByRole } = render()
+      getByRole('heading', { name: 'Robot Calibration' })
+    })
+    it('renders labware setup', () => {
+      const { getByRole, getByText } = render()
+      const labwareSetup = getByRole('heading', { name: 'Labware Setup' })
+      fireEvent.click(labwareSetup)
+      getByText('Mock Labware Setup')
+    })
+    it('does NOT render module setup', () => {
+      const { queryByText } = render()
+      expect(queryByText(/module setup/i)).toBeNull()
+    })
   })
+
   it('renders robot calibration, modules, and labware setup if some modules in protocol', () => {
-    getProtocolData.mockReturnValue(withModulesProtocol as any)
+    mockGetProtocolData.mockReturnValue(withModulesProtocol as any)
     const { getByText } = render()
     expect(getByText('Module Setup')).toBeTruthy()
   })
   it('renders null if python protocol with only metadata field', () => {
-    getProtocolData.mockReturnValue({ metadata: {} as any })
+    mockGetProtocolData.mockReturnValue({ metadata: {} as any })
     const { container } = render()
     expect(container.firstChild).toBeNull()
   })
   it('renders correct text contents', () => {
-    getProtocolData.mockReturnValue(withModulesProtocol as any)
+    mockGetProtocolData.mockReturnValue(withModulesProtocol as any)
     const { getByRole, getByText } = render()
     expect(getByRole('heading', { name: 'Setup for Run' })).toBeTruthy()
     expect(getByRole('heading', { name: 'STEP 1' })).toBeTruthy()

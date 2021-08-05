@@ -1,12 +1,20 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { Card, Text, SPACING_3, FONT_HEADER_DARK } from '@opentrons/components'
+import {
+  Card,
+  Text,
+  SPACING_3,
+  FONT_WEIGHT_SEMIBOLD,
+} from '@opentrons/components'
 import { protocolHasModules } from '@opentrons/shared-data'
-
+import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 import { getProtocolData } from '../../redux/protocol'
 import { Divider } from '../../atoms/structure'
 import { CollapsibleStep } from './CollapsibleStep'
+import { LabwareSetup } from './LabwareSetup'
+import { getModuleRenderCoords } from './LabwareSetup/utils/getModuleRenderCoords'
+import { getLabwareRenderCoords } from './LabwareSetup/utils/getLabwareRenderCoords'
 
 import type { JsonProtocolFile } from '@opentrons/shared-data'
 import type { State } from '../../redux/types'
@@ -26,6 +34,14 @@ export function RunSetupCard(): JSX.Element | null {
     ROBOT_CALIBRATION_STEP_KEY
   )
   const protocolData = useSelector((state: State) => getProtocolData(state))
+  const moduleRenderCoords = getModuleRenderCoords(
+    protocolData,
+    standardDeckDef as any
+  )
+  const labwareRenderCoords = getLabwareRenderCoords(
+    protocolData,
+    standardDeckDef as any
+  )
 
   if (
     protocolData == null ||
@@ -51,12 +67,17 @@ export function RunSetupCard(): JSX.Element | null {
     [MODULE_SETUP_KEY]: (
       <Text marginTop={SPACING_3}>TODO: module setup step contents</Text>
     ),
-    [LABWARE_SETUP_KEY]: <Text marginTop={SPACING_3}>TODO: labware setup</Text>,
+    [LABWARE_SETUP_KEY]: (
+      <LabwareSetup
+        moduleRenderCoords={moduleRenderCoords}
+        labwareRenderCoords={labwareRenderCoords}
+      />
+    ),
   }
 
   return (
     <Card width="100%" marginTop={SPACING_3} paddingY={SPACING_3}>
-      <Text as="h3" paddingX={SPACING_3} css={FONT_HEADER_DARK}>
+      <Text as="h2" paddingX={SPACING_3} fontWeight={FONT_WEIGHT_SEMIBOLD}>
         {t('setup_for_run')}
       </Text>
       {stepsKeysInOrder.map((stepKey, index) => (
