@@ -33,9 +33,9 @@ class RootFS:
     SD_CARD_MOUNT_POINT = '/media/mmcblk1p1'
 
     def setPartition(self, partitionName):
-        """ Run boot util command here to set partion """
-        """ Use the libubootenv utility to set bootargs """
-        """ boot.src has a carveout for bootargs, use that """
+        """ Run boot util command here to set partion 
+         Use the libubootenv utility to set bootargs 
+         boot.src has a carveout for bootargs, use that """
         subprocess.run(["fw_setenv",BOOT_SRC_CARVE_OUT,"boot="+PartitionName ])
 
     def getPartition(self):
