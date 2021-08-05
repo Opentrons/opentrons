@@ -99,6 +99,8 @@ async def create_session(
 
         # TODO(mc, 2021-05-28): return engine state to build response model
         await engine_store.create(protocol=protocol)
+        # TODO(mc, 2021-08-05): capture errors from `runner.join` and place
+        # them in the session resource
         task_runner.run(engine_store.runner.join)
     except ProtocolNotFoundError as e:
         raise ProtocolNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
