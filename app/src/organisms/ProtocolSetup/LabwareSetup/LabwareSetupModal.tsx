@@ -34,7 +34,7 @@ export const LabwareSetupModal = (
 ): JSX.Element => {
   const { t } = useTranslation(['protocol_setup', 'shared'])
   return (
-    <Portal>
+    <Portal level="top">
       <Modal className={styles.modal} contentsClassName={styles.modal_contents}>
         <Box>
           <Text as={'h3'} marginBottom={SPACING_3}>
