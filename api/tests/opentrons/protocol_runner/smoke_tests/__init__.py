@@ -1,1 +1,1 @@
-"""Smoke tests for the protocol file runners."""
+"""Smoke tests for the ProtocolRunner."""

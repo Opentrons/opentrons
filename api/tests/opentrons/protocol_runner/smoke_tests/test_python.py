@@ -15,9 +15,8 @@ from opentrons.protocol_engine import (
     create_protocol_engine,
 )
 
-from opentrons.file_runner import (
-    create_file_runner,
-    AbstractFileRunner,
+from opentrons.protocol_runner import (
+    ProtocolRunner,
     ProtocolFile,
     ProtocolFileType,
 )
@@ -48,30 +47,27 @@ def python_protocol_file(tmp_path: Path) -> ProtocolFile:
 
 
 @pytest.fixture
-async def engine(hardware: HardwareAPI) -> ProtocolEngine:
+async def protocol_engine(hardware: HardwareAPI) -> ProtocolEngine:
     """Get a real ProtocolEngine hooked into a simulating HardwareAPI."""
     return await create_protocol_engine(hardware_api=hardware)
 
 
 @pytest.fixture
-async def subject(
-    python_protocol_file: ProtocolFile,
-    engine: ProtocolEngine,
-) -> AbstractFileRunner:
-    """Get a real file runner."""
-    return create_file_runner(
-        protocol_file=python_protocol_file,
-        engine=engine,
-    )
+async def subject(protocol_engine: ProtocolEngine) -> ProtocolRunner:
+    """Get a ProtocolRunner test subject."""
+    return ProtocolRunner(protocol_engine=protocol_engine)
 
 
 async def test_python_protocol_runner(
-    engine: ProtocolEngine,
-    subject: AbstractFileRunner,
+    python_protocol_file: ProtocolFile,
+    protocol_engine: ProtocolEngine,
+    subject: ProtocolRunner,
 ) -> None:
     """It should run a Python protocol on the ProtocolEngine."""
-    subject.load()
-    await subject.run()
+    subject.load(python_protocol_file)
+
+    subject.play()
+    await subject.join()
 
     expected_labware_entry = (
         matchers.IsA(str),
@@ -82,4 +78,6 @@ async def test_python_protocol_runner(
         ),
     )
 
-    assert expected_labware_entry in engine.state_view.labware.get_all_labware()
+    assert (
+        expected_labware_entry in protocol_engine.state_view.labware.get_all_labware()
+    )

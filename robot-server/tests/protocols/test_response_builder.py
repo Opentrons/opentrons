@@ -3,7 +3,7 @@ import pytest
 from datetime import datetime
 from pathlib import Path
 
-from opentrons.file_runner import ProtocolFileType
+from opentrons.protocol_runner import ProtocolFileType
 from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.protocols.protocol_models import Protocol
 from robot_server.protocols.response_builder import ResponseBuilder

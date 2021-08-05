@@ -23,7 +23,7 @@ simfile ?=
 
 # These variables can be overriden when make is invoked to customize the
 # behavior of pytest. For instance,
-# make test tests=tests/opentrons/tools/test_pipette_memory.py would run only the
+# make test tests=tests/opentrons/tools/test_qc_scripts.py would run only the
 # specified test
 tests ?= tests
 test_opts ?=  --cov=src/opentrons --cov-report term-missing:skip-covered --cov-report xml:coverage.xml
@@ -56,19 +56,19 @@ ot_tests_to_typecheck := \
 	tests/opentrons/protocol_api_experimental \
 	tests/opentrons/protocol_engine \
 	tests/opentrons/motion_planning \
-	tests/opentrons/file_runner
+	tests/opentrons/protocol_runner
 
 # files and modules to format
 # TODO(mc, 2021-07-23): expand this to all files until we can format `.`
 ot_files_to_format := \
-	src/opentrons/file_runner \
 	src/opentrons/motion_planning \
 	src/opentrons/protocol_api_experimental \
 	src/opentrons/protocol_engine \
-	tests/opentrons/file_runner \
+	src/opentrons/protocol_runner \
 	tests/opentrons/motion_planning  \
 	tests/opentrons/protocol_api_experimental \
-	tests/opentrons/protocol_engine
+	tests/opentrons/protocol_engine \
+	tests/opentrons/protocol_runner
 
 # Defined separately than the clean target so the wheel file doesn’t have to
 # depend on a PHONY target
@@ -193,31 +193,3 @@ term:
 .PHONY: plot-session
 plot-session:
 	$(python) util/plot_session.py $(plot_type) $(plot_type).pdf
-
-###########################
-# G-Code Parsing Commands #
-###########################
-
-# NOTE: The following 2 AWS commands `g-code-s3-pull` and `g-code-s3-push` expect you to have the following environment
-# variables defined:  `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, and `AWS_DEFAULT_REGION `
-
-# Pull objects from S3 and output it's content to STDOUT
-# "object_name" is a required parameter
-# "object_name" is the name of the S3 object you want to pull from the g-code-comparison bucket
-# Example:
-#	make g-code-s3-pull object_name='smoothie-protocol-output.json'
-.PHONY: g-code-s3-pull
-g-code-s3-pull:
-	@aws s3 cp s3://g-code-comparison/$(object_name) -
-
-# Push local file to S3
-# "source_file_path" and "object_name" are required parameters
-# "source_file_path" is the local path to the file you want to upload
-# "object_name" is what you want your file to be called in S3
-# Example:
-#	make g-code-s3-push \
-#	source_file_path=./api/tests/opentrons/data/g_code_validation_protocols/smoothie_protocol.py \
-#	object_name='smoothie-protocol-output.json'
-.PHONY: g-code-s3-push
-g-code-s3-push:
-	@aws s3 cp $(source_file_path) s3://g-code-comparison/$(object_name)

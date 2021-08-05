@@ -4,7 +4,7 @@ import asyncio
 from functools import partial
 from typing import AsyncIterable
 
-from opentrons.file_runner.context_creator import ContextCreator
+from opentrons.protocol_runner.python_context_creator import PythonContextCreator
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.protocol_api_experimental import ProtocolContext, DeckSlotName
 from opentrons.protocol_engine import (
@@ -23,24 +23,21 @@ async def protocol_engine(hardware: HardwareAPI) -> AsyncIterable[ProtocolEngine
     await engine.stop()
 
 
-def test_creates_protocol_context(
-    protocol_engine: ProtocolEngine,
-    loop: asyncio.AbstractEventLoop,
-) -> None:
+async def test_creates_protocol_context(protocol_engine: ProtocolEngine) -> None:
     """It should return a ProtocolContext."""
-    subject = ContextCreator(engine=protocol_engine, loop=loop)
-    result = subject.create()
+    subject = PythonContextCreator()
+    result = subject.create(protocol_engine=protocol_engine)
 
     assert isinstance(result, ProtocolContext)
 
 
 async def test_wires_protocol_context_to_engine(
-    protocol_engine: ProtocolEngine,
     loop: asyncio.AbstractEventLoop,
+    protocol_engine: ProtocolEngine,
 ) -> None:
     """Smoke test the returned ProtocolContext by running a command."""
-    subject = ContextCreator(engine=protocol_engine, loop=loop)
-    context = subject.create()
+    subject = PythonContextCreator()
+    context = subject.create(protocol_engine=protocol_engine)
 
     # run a ProtocolContext command in a ThreadPoolExecutor to validate
     # commands are going to the engine across the thread boundary

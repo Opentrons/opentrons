@@ -3,12 +3,14 @@
 # with test logic in `api`. Try to rework the EngineStore / tests into more
 # of a collaborator
 import pytest
+from decoy import Decoy
 from datetime import datetime
-from mock import MagicMock
 from pathlib import Path
 
+from opentrons.hardware_control import API as HardwareAPI
 from opentrons.protocol_engine import ProtocolEngine
-from opentrons.file_runner import JsonFileRunner, PythonFileRunner
+from opentrons.protocol_runner import ProtocolRunner
+
 from robot_server.protocols import ProtocolResource, ProtocolFileType
 from robot_server.sessions.engine_store import (
     EngineStore,
@@ -18,20 +20,22 @@ from robot_server.sessions.engine_store import (
 
 
 @pytest.fixture
-def subject() -> EngineStore:
+def subject(decoy: Decoy) -> EngineStore:
     """Get a EngineStore test subject."""
     # TODO(mc, 2021-06-11): to make these test more effective and valuable, we
     # should pass in some sort of actual, valid HardwareAPI instead of a mock
-    return EngineStore(hardware_api=MagicMock())
+    hardware_api = decoy.mock(cls=HardwareAPI)
+    return EngineStore(hardware_api=hardware_api)
 
 
 async def test_create_engine(subject: EngineStore) -> None:
     """It should create an engine."""
     result = await subject.create(protocol=None)
 
-    assert result == subject.engine
-    assert isinstance(result, ProtocolEngine)
-    assert isinstance(subject.engine, ProtocolEngine)
+    assert isinstance(result.runner, ProtocolRunner)
+    assert isinstance(result.engine, ProtocolEngine)
+    assert result.engine is subject.engine
+    assert result.runner is subject.runner
 
 
 async def test_create_engine_for_json_protocol(
@@ -53,10 +57,8 @@ async def test_create_engine_for_json_protocol(
 
     result = await subject.create(protocol=protocol)
 
-    assert result == subject.engine
-    assert isinstance(result, ProtocolEngine)
-    assert isinstance(subject.engine, ProtocolEngine)
-    assert isinstance(subject.runner, JsonFileRunner)
+    # 10 PE commands: 1x load pipette, 3x add definition, 3x load labware, 3x command
+    assert len(result.engine.state_view.commands.get_all()) == 10
 
 
 async def test_create_engine_for_python_protocol(
@@ -77,11 +79,10 @@ async def test_create_engine_for_python_protocol(
     )
 
     result = await subject.create(protocol=protocol)
+    result.runner.play()
+    await result.runner.join()
 
-    assert result == subject.engine
-    assert isinstance(result, ProtocolEngine)
-    assert isinstance(subject.engine, ProtocolEngine)
-    assert isinstance(subject.runner, PythonFileRunner)
+    assert len(result.engine.state_view.commands.get_all()) == 1
 
 
 async def test_raise_if_engine_already_exists(subject: EngineStore) -> None:
@@ -105,6 +106,9 @@ def test_raise_if_engine_does_not_exist(subject: EngineStore) -> None:
     with pytest.raises(EngineMissingError):
         subject.engine
 
+    with pytest.raises(EngineMissingError):
+        subject.runner
+
 
 async def test_clear_engine(subject: EngineStore) -> None:
     """It should clear a stored engine entry."""
@@ -113,6 +117,9 @@ async def test_clear_engine(subject: EngineStore) -> None:
 
     with pytest.raises(EngineMissingError):
         subject.engine
+
+    with pytest.raises(EngineMissingError):
+        subject.runner
 
 
 async def test_clear_engine_noop(subject: EngineStore) -> None:

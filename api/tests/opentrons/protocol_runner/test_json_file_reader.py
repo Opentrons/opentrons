@@ -4,8 +4,8 @@ import json
 from pathlib import Path
 
 from opentrons.protocols.models import JsonProtocol
-from opentrons.file_runner import ProtocolFile, ProtocolFileType
-from opentrons.file_runner.json_file_reader import JsonFileReader
+from opentrons.protocol_runner.protocol_file import ProtocolFile, ProtocolFileType
+from opentrons.protocol_runner.json_file_reader import JsonFileReader
 
 
 @pytest.fixture

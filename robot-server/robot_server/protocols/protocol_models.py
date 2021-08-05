@@ -2,7 +2,7 @@
 from __future__ import annotations
 from datetime import datetime
 from pydantic import Field
-from opentrons.file_runner import ProtocolFileType
+from opentrons.protocol_runner import ProtocolFileType
 from robot_server.service.json_api import ResourceModel
 
 

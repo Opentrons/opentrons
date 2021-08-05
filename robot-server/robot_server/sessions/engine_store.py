@@ -1,9 +1,9 @@
 """In-memory storage of ProtocolEngine instances."""
-from typing import Optional
+from typing import Optional, NamedTuple
 
 from opentrons.hardware_control import API as HardwareAPI
-from opentrons.file_runner import AbstractFileRunner, ProtocolFile, create_file_runner
 from opentrons.protocol_engine import ProtocolEngine, create_protocol_engine
+from opentrons.protocol_runner import ProtocolRunner, ProtocolFile
 from robot_server.protocols import ProtocolResource
 
 
@@ -22,6 +22,13 @@ class EngineMissingError(RuntimeError):
     pass
 
 
+class RunnerEnginePair(NamedTuple):
+    """A stored ProtocolRunner/ProtocolEngine pair."""
+
+    runner: ProtocolRunner
+    engine: ProtocolEngine
+
+
 # TODO(mc, 2021-05-28): evaluate multi-engine logic, which this does not support
 class EngineStore:
     """Factory and in-memory storage for ProtocolEngine."""
@@ -34,8 +41,7 @@ class EngineStore:
                 construction.
         """
         self._hardware_api = hardware_api
-        self._engine: Optional[ProtocolEngine] = None
-        self._runner: Optional[AbstractFileRunner] = None
+        self._runner_engine_pair: Optional[RunnerEnginePair] = None
 
     @property
     def engine(self) -> ProtocolEngine:
@@ -44,28 +50,28 @@ class EngineStore:
         Raises:
             EngineMissingError: Engine has not yet been created and persisted.
         """
-        if self._engine is None:
+        if self._runner_engine_pair is None:
             raise EngineMissingError("Engine not yet created.")
 
-        return self._engine
+        return self._runner_engine_pair.engine
 
     @property
-    def runner(self) -> AbstractFileRunner:
+    def runner(self) -> ProtocolRunner:
         """Get the persisted AbstractFileRunner.
 
         Raises:
             EngineMissingError: Runner has not yet been created and persisted.
         """
-        if self._runner is None:
+        if self._runner_engine_pair is None:
             raise EngineMissingError("Runner not yet created.")
 
-        return self._runner
+        return self._runner_engine_pair.runner
 
-    async def create(self, protocol: Optional[ProtocolResource]) -> ProtocolEngine:
-        """Create and store a ProtocolEngine.
+    async def create(self, protocol: Optional[ProtocolResource]) -> RunnerEnginePair:
+        """Create and store a ProtocolRunner and ProtocolEngine.
 
         Returns:
-            The created and stored ProtocolEngine.
+            The created and stored ProtocolRunner / ProtocolEngine pair.
 
         Raises:
             EngineConflictError: a ProtocolEngine is already present.
@@ -75,9 +81,9 @@ class EngineStore:
         # set after the check but before the engine has finished getting created,
         # at the expense of having to potentially throw away an engine instance
         engine = await create_protocol_engine(hardware_api=self._hardware_api)
-        runner = None
+        runner = ProtocolRunner(protocol_engine=engine)
 
-        if self._engine is not None:
+        if self._runner_engine_pair is not None:
             raise EngineConflictError("Cannot load multiple sessions simultaneously.")
 
         if protocol is not None:
@@ -88,21 +94,13 @@ class EngineStore:
                 file_path=protocol.files[0],
                 file_type=protocol.protocol_type,
             )
-            runner = create_file_runner(
-                protocol_file=protocol_file,
-                engine=engine,
-            )
 
-            # TODO(mc, 2021-06-11): serparating load from creation is a potentially
-            # two-phase initialization. Revisit this, but for now keep the weirdness
-            # contained here in this factory method
-            runner.load()
+            runner.load(protocol_file)
 
-        self._engine = engine
-        self._runner = runner
+        self._runner_engine_pair = RunnerEnginePair(runner=runner, engine=engine)
 
-        return engine
+        return self._runner_engine_pair
 
     def clear(self) -> None:
         """Remove the persisted ProtocolEngine, if present, no-op otherwise."""
-        self._engine = None
+        self._runner_engine_pair = None

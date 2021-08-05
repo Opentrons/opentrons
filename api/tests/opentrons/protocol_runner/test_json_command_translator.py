@@ -1,10 +1,10 @@
-"""Tests for the JSON CommandTranslator interface."""
+"""Tests for the JSON JsonCommandTranslator interface."""
 import pytest
 from typing import Any, Dict, List
 
 from opentrons.types import DeckSlotName, MountType
 from opentrons.protocols import models
-from opentrons.file_runner.json_command_translator import CommandTranslator
+from opentrons.protocol_runner.json_command_translator import JsonCommandTranslator
 from opentrons.protocol_engine import (
     commands as pe_commands,
     DeckSlotLocation,
@@ -15,9 +15,9 @@ from opentrons.protocol_engine import (
 
 
 @pytest.fixture
-def subject() -> CommandTranslator:
-    """Get a CommandTranslator test subject."""
-    return CommandTranslator()
+def subject() -> JsonCommandTranslator:
+    """Get a JsonCommandTranslator test subject."""
+    return JsonCommandTranslator()
 
 
 def _assert_appear_in_order(elements: List[Any], source: List[Any]) -> None:
@@ -64,7 +64,7 @@ def _make_json_protocol(
 
 
 def test_labware(
-    subject: CommandTranslator,
+    subject: JsonCommandTranslator,
     minimal_labware_def: dict,
     minimal_labware_def2: dict,
 ) -> None:
@@ -139,7 +139,7 @@ def test_labware(
     assert len(result) == 4
 
 
-def test_pipettes(subject: CommandTranslator) -> None:
+def test_pipettes(subject: JsonCommandTranslator) -> None:
     """It should translate pipette specs into LoadPipetteRequest objects."""
     json_pipettes = {
         "abc123": models.json_protocol.Pipettes(mount="left", name="p20_single_gen2"),
@@ -170,7 +170,7 @@ def test_pipettes(subject: CommandTranslator) -> None:
     assert len(result) == 2
 
 
-def test_aspirate(subject: CommandTranslator) -> None:
+def test_aspirate(subject: JsonCommandTranslator) -> None:
     """It should translate a JSON aspirate to a Protocol Engine AspirateRequest."""
     input_json_command = models.json_protocol.LiquidCommand(
         command="aspirate",
@@ -202,7 +202,7 @@ def test_aspirate(subject: CommandTranslator) -> None:
     assert output == expected_output
 
 
-def test_dispense(subject: CommandTranslator) -> None:
+def test_dispense(subject: JsonCommandTranslator) -> None:
     """It should translate a JSON dispense to a ProtocolEngine DispenseRequest."""
     input_json_command = models.json_protocol.LiquidCommand(
         command="dispense",
@@ -234,7 +234,7 @@ def test_dispense(subject: CommandTranslator) -> None:
     assert output == expected_output
 
 
-def test_drop_tip(subject: CommandTranslator) -> None:
+def test_drop_tip(subject: JsonCommandTranslator) -> None:
     """It should translate a JSON drop tip to a ProtocolEngine DropTipRequest."""
     input_json_command = models.json_protocol.PickUpDropTipCommand(
         command="dropTip",
@@ -256,7 +256,7 @@ def test_drop_tip(subject: CommandTranslator) -> None:
     assert output == expected_output
 
 
-def test_pick_up_tip(subject: CommandTranslator) -> None:
+def test_pick_up_tip(subject: JsonCommandTranslator) -> None:
     """It should translate a JSON pick up tip to a ProtocolEngine PickUpTipRequest."""
     input_json_command = models.json_protocol.PickUpDropTipCommand(
         command="pickUpTip",
@@ -278,7 +278,7 @@ def test_pick_up_tip(subject: CommandTranslator) -> None:
     assert output == expected_output
 
 
-def test_pause(subject: CommandTranslator) -> None:
+def test_pause(subject: JsonCommandTranslator) -> None:
     """It should translate delay with wait=True to a PauseRequest."""
     input_command = models.json_protocol.DelayCommand(
         command="delay",

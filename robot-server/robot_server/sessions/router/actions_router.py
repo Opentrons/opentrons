@@ -72,19 +72,12 @@ async def create_session_action(
 
         # TODO(mc, 2021-07-06): add a dependency to verify that a given
         # action is allowed
-        if action.actionType == SessionActionType.START:
-            # TODO(mc, 2021-06-24): ensure the engine homes pipette plungers
-            # before starting the protocol run
-            # TODO(mc, 2021-06-30): capture errors (e.g. uncaught Python raise)
-            # and place them in the session response
-            task_runner.run(engine_store.runner.run)
-        elif action.actionType == SessionActionType.RESUME:
-            engine_store.engine.play()
+        if action.actionType == SessionActionType.PLAY:
+            engine_store.runner.play()
         elif action.actionType == SessionActionType.PAUSE:
-            engine_store.engine.pause()
-        if action.actionType == SessionActionType.HALT:
-            await engine_store.engine.halt()
-            task_runner.run(engine_store.engine.stop)
+            engine_store.runner.pause()
+        if action.actionType == SessionActionType.STOP:
+            engine_store.runner.stop()
 
     except SessionNotFoundError as e:
         raise SessionNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)

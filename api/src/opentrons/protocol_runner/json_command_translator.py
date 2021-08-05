@@ -18,7 +18,7 @@ class CommandTranslatorError(Exception):
     pass
 
 
-class CommandTranslator:
+class JsonCommandTranslator:
     """Class that translates commands from PD/JSON to ProtocolEngine."""
 
     def translate(
@@ -51,7 +51,7 @@ class CommandTranslator:
         command: models.json_protocol.AllCommands,
     ) -> pe_commands.CommandRequest:
         try:
-            h = CommandTranslator._COMMAND_TO_NAME[command.command]
+            h = self._COMMAND_TO_NAME[command.command]
             return getattr(self, h)(command)
         except KeyError:
             raise CommandTranslatorError(f"'{command.command}' is not recognized.")

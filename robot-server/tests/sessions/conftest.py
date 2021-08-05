@@ -97,7 +97,7 @@ def python_protocol_file(tmp_path: Path) -> Path:
                 "apiLevel": "3.0",
             }
             def run(ctx):
-                pass
+                ctx.load_labware("opentrons_96_tiprack_300ul", "1")
             """
         ),
         encoding="utf-8",

@@ -5,26 +5,14 @@ from opentrons.protocol_engine.clients import SyncClient, ChildThreadTransport
 from opentrons.protocol_api_experimental import ProtocolContext
 
 
-class ContextCreator:
+class PythonContextCreator:
     """A factory to build Python ProtocolContext instances."""
 
-    def __init__(
-        self,
-        engine: ProtocolEngine,
-        loop: asyncio.AbstractEventLoop,
-    ) -> None:
-        """Initialize the factory with access to a ProtocolEngine.
-
-        Arguments:
-            engine: ProtocolEngine instance the context should be using.
-            loop: Event loop where the ProtocolEngine is running.
-        """
-        self._engine = engine
-        self._loop = loop
-
-    def create(self) -> ProtocolContext:
+    @staticmethod
+    def create(protocol_engine: ProtocolEngine) -> ProtocolContext:
         """Create a fresh ProtocolContext wired to a ProtocolEngine."""
-        transport = ChildThreadTransport(engine=self._engine, loop=self._loop)
+        loop = asyncio.get_running_loop()
+        transport = ChildThreadTransport(engine=protocol_engine, loop=loop)
         client = SyncClient(transport=transport)
 
         return ProtocolContext(engine_client=client)
