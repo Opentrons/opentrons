@@ -7,7 +7,6 @@ from fastapi.testclient import TestClient
 from httpx import AsyncClient
 
 from tests.helpers import verify_response
-from robot_server.service.task_runner import TaskRunner
 from robot_server.sessions.session_view import SessionView, BasicSessionCreateData
 from robot_server.sessions.engine_store import EngineStore, EngineMissingError
 
@@ -53,7 +52,6 @@ def setup_session_store(decoy: Decoy, session_store: SessionStore) -> None:
 
 def test_create_play_action(
     decoy: Decoy,
-    task_runner: TaskRunner,
     session_view: SessionView,
     engine_store: EngineStore,
     unique_id: str,
@@ -203,7 +201,6 @@ def test_create_pause_action(
 
 async def test_create_stop_action(
     decoy: Decoy,
-    task_runner: TaskRunner,
     session_view: SessionView,
     engine_store: EngineStore,
     unique_id: str,
