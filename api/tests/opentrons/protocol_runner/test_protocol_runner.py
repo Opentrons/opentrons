@@ -134,7 +134,7 @@ async def test_pause(
     protocol_engine: ProtocolEngine,
     subject: ProtocolRunner,
 ) -> None:
-    """It should start a protocol run with play."""
+    """It should pause a protocol run with pause."""
     subject.pause()
 
     decoy.verify(protocol_engine.pause(), times=1)
@@ -145,7 +145,7 @@ async def test_stop(
     protocol_engine: ProtocolEngine,
     subject: ProtocolRunner,
 ) -> None:
-    """It should start a protocol run with play."""
+    """It should halt a protocol run with stop."""
     await subject.stop()
 
     decoy.verify(await protocol_engine.halt(), times=1)
@@ -156,7 +156,7 @@ async def test_join(
     task_queue: TaskQueue,
     subject: ProtocolRunner,
 ) -> None:
-    """It should start a protocol run with play."""
+    """It should join the run's background task."""
     await subject.join()
 
     decoy.verify(await task_queue.join(), times=1)

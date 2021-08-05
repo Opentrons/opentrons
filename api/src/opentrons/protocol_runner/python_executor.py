@@ -11,7 +11,7 @@ class PythonExecutor:
     """Execute a given PythonProtocol's run method with a ProtocolContext."""
 
     def __init__(self) -> None:
-        """Initialize the exector with its dependencies and a thread pool.
+        """Initialize the executor with a thread pool.
 
         A PythonExecutor uses its own ThreadPoolExecutor (rather than the default)
         to avoid thread pool exhaustion from tying up protocol execution.
