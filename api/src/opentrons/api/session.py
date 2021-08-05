@@ -459,31 +459,39 @@ class Session(RobotBusy):
     def stop(self) -> None:
         log.info("session.py: ==== stop() called ====")
         log.info("Before calling api.halt:")
-        for mount, instr in self._hw_iface().attached_instruments.items():
-            log.info(f"@@@@ Instrument: {instr}")
-            current_loc = self._hw_iface().current_position(mount)
-            log.info(f"=== Location cache is: {current_loc}")
-            if instr['has_tip']:
-                log.info("=== Pipette has a tip! ===")
-                # instr.drop_tip()
-            else:
-                log.info("____ Pipette has NO tip. Safe to home____")
 
         self._hw_iface().halt()
+        # The pipette could still move after halt. So the final pipette state should be considered
+        # after a motion lock has been achieved. But the location cache is lost after the halt....
+
+        # So, maybe we can do this: (all after achieving motion lock)
+        # 1. Save the labware/trash loaded from ctx
+        # 2. Get the pipette dict from hw_iface
+        # 3. In api.stop, don't home plunger if pipettes have tip(s); only x,y
+        # 4. If has_tip, move to above saved trash and finally move the plunger to drop tip.
+        #    The max distance the plunger can move to drop can be interpreted from whether
+        #    the tip has liquid in it. If yes, then calculate travel based on volume in tip.
+        #    This might require sending g-codes directly to move the plunger.
         with self._motion_lock.lock():
             try:
                 log.info("session.py: stop(): ")
                 log.info("After calling api.halt:")
+
+                self._hw_iface().stop()
+                # After api.stop(), all pipette state is reset so the pipette no longer
+                # knows whether it had tip or not.
                 for instr in self._instruments:
-                    log.info(f"@@@@ Instrument: {instr.name}")
-                    current_loc = instr._ctx.location_cache
-                    log.info(f"=== Location cache is: {current_loc}")
-                    if instr.has_tip:
+                    log.info(f"Pipette:{instr.name}'s trash -> {instr.trash_container}")
+                for mount, instr in self._hw_iface().attached_instruments.items():
+                    log.info(f"@@@@ Instrument: {instr}")
+                    # Can't get location after halt. Results in MustHomeError
+                    # current_loc = self._hw_iface().current_position(mount)
+                    # log.info(f"=== Location cache is: {current_loc}")
+                    if instr['has_tip']:
                         log.info("=== Pipette has a tip! ===")
                         # instr.drop_tip()
                     else:
                         log.info("____ Pipette has NO tip. Safe to home____")
-                self._hw_iface().stop()
             except asyncio.CancelledError:
                 pass
         self.set_state('stopped')
