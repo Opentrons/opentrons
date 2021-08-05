@@ -13,6 +13,10 @@ import {
   SPACING_1,
   C_WHITE,
   OVERLAY_BLACK_90,
+  BORDER_RADIUS_DEFAULT,
+  DISPLAY_FLEX,
+  DIRECTION_COLUMN,
+  JUSTIFY_FLEX_END,
 } from '@opentrons/components'
 interface LabwareInfoProps {
   displayName: string
@@ -26,6 +30,7 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element => {
     <Box
       flexDirection={'column'}
       backgroundColor={OVERLAY_BLACK_90}
+      borderRadius={BORDER_RADIUS_DEFAULT}
       fontSize={'0.5rem'}
       color={C_WHITE}
     >
@@ -35,7 +40,7 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element => {
         fontWeight={FONT_WEIGHT_SEMIBOLD}
         textTransform={'uppercase'}
       >
-        {t('offset_data')}
+        {t('offset_title')}
       </Text>
       <Box margin={SPACING_1}>
         <Text
@@ -48,7 +53,7 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element => {
         <Text
           as={'span'}
           fontWeight={FONT_WEIGHT_REGULAR}
-          marginRight={'0.15rem'}
+          marginRight={'0.35rem'}
         >
           {FAKE_OFFSET_DATA.x.toFixed(1)}
         </Text>
@@ -62,7 +67,7 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element => {
         <Text
           as={'span'}
           fontWeight={FONT_WEIGHT_REGULAR}
-          marginRight={'0.15rem'}
+          marginRight={'0.35rem'}
         >
           {FAKE_OFFSET_DATA.y.toFixed(1)}
         </Text>
@@ -76,7 +81,7 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element => {
         <Text
           as={'span'}
           fontWeight={FONT_WEIGHT_REGULAR}
-          marginRight={'0.15rem'}
+          marginRight={'0.35rem'}
         >
           {FAKE_OFFSET_DATA.z.toFixed(1)}
         </Text>
@@ -100,9 +105,9 @@ export const LabwareInfoOverlay = (
     <RobotCoordsForeignDiv
       {...{ x, y, width, height }}
       innerDivProps={{
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'flex-end',
+        display: DISPLAY_FLEX,
+        flexDirection: DIRECTION_COLUMN,
+        justifyContent: JUSTIFY_FLEX_END,
       }}
     >
       <LabwareInfo displayName={getLabwareDisplayName(definition)} />

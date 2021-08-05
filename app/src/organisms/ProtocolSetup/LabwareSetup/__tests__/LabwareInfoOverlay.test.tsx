@@ -18,9 +18,14 @@ jest.mock('@opentrons/shared-data', () => {
 })
 
 const render = (props: React.ComponentProps<typeof LabwareInfoOverlay>) => {
-  return renderWithProviders(<LabwareInfoOverlay {...props} />, {
-    i18nInstance: i18n,
-  })
+  return renderWithProviders(
+    <svg>
+      <LabwareInfoOverlay {...props} />
+    </svg>,
+    {
+      i18nInstance: i18n,
+    }
+  )
 }
 
 const mockGetLabwareDisplayName = getLabwareDisplayName as jest.MockedFunction<
@@ -49,7 +54,7 @@ describe('LabwareInfoOverlay', () => {
   })
   it('should render the offset data label', () => {
     const { getByText } = render(props)
-    getByText('Offset Data')
+    getByText('Offset')
   })
   // eslint-disable-next-line jest/no-disabled-tests
   it.skip('should renders labware offset data', () => {

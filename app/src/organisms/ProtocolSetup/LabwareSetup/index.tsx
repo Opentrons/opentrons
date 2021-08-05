@@ -18,7 +18,6 @@ import {
   FONT_SIZE_BODY_1,
   JUSTIFY_CENTER,
   SPACING_3,
-  SPACING_4,
   SPACING_6,
   C_BLUE,
   C_DARK_GRAY,
@@ -52,7 +51,7 @@ const DECK_LAYER_BLOCKLIST = [
   'screwHoles',
 ]
 
-const DECK_MAP_VIEWBOX = '-64 -10 530 456'
+const DECK_MAP_VIEWBOX = '-64 -100 650 550'
 
 export const LabwareSetup = (props: LabwareSetupProps): JSX.Element | null => {
   const { moduleRenderCoords, labwareRenderCoords } = props
@@ -126,13 +125,7 @@ export const LabwareSetup = (props: LabwareSetupProps): JSX.Element | null => {
                       <g transform={`translate(${x},${y})`}>
                         <LabwareRender definition={labwareDef} />
                       </g>
-                      <g>
-                        <LabwareInfoOverlay
-                          x={x}
-                          y={y}
-                          definition={labwareDef}
-                        />
-                      </g>
+                      <LabwareInfoOverlay x={x} y={y} definition={labwareDef} />
                     </React.Fragment>
                   )
                 })}
@@ -140,7 +133,7 @@ export const LabwareSetup = (props: LabwareSetupProps): JSX.Element | null => {
             )
           }}
         </RobotWorkSpace>
-        <Text color={C_DARK_GRAY} margin={`${SPACING_4} ${SPACING_6}`}>
+        <Text color={C_DARK_GRAY} marginX={SPACING_6} marginY={SPACING_3}>
           {t('labware_position_check_text')}
         </Text>
         <Flex justifyContent={JUSTIFY_CENTER}>

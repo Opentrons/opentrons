@@ -1,7 +1,7 @@
 @import '@opentrons/components';
 
 .deck_map {
-  margin: 5%;
+  margin: 0 5%;
 }
 
 .modal {
