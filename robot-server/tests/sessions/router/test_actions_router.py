@@ -4,6 +4,7 @@ from datetime import datetime
 from decoy import Decoy
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
+from httpx import AsyncClient
 
 from tests.helpers import verify_response
 from robot_server.service.task_runner import TaskRunner
@@ -131,14 +132,14 @@ def test_create_pause_action(
     decoy.verify(engine_store.runner.pause())
 
 
-def test_create_stop_action(
+async def test_create_stop_action(
     decoy: Decoy,
     task_runner: TaskRunner,
     session_view: SessionView,
     engine_store: EngineStore,
     unique_id: str,
     current_time: datetime,
-    client: TestClient,
+    async_client: AsyncClient,
 ) -> None:
     """It should handle a halt action."""
     action = SessionAction(
@@ -163,13 +164,13 @@ def test_create_stop_action(
         ),
     ).then_return((action, next_session))
 
-    response = client.post(
+    response = await async_client.post(
         "/sessions/session-id/actions",
         json={"data": {"actionType": "stop"}},
     )
 
     verify_response(response, expected_status=201, expected_data=action)
-    decoy.verify(engine_store.runner.stop())
+    decoy.verify(await engine_store.runner.stop())
 
 
 def test_create_session_action_with_missing_id(

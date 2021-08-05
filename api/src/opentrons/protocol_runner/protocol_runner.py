@@ -75,9 +75,9 @@ class ProtocolRunner:
         """Pause the run."""
         self._protocol_engine.pause()
 
-    def stop(self) -> None:
+    async def stop(self) -> None:
         """Stop (cancel) the run."""
-        self._protocol_engine.halt()
+        await self._protocol_engine.halt()
 
     async def join(self) -> None:
         """Wait for the run to complete, propagating any errors.

@@ -8,6 +8,8 @@ from httpx import AsyncClient
 
 from tests.helpers import verify_response
 
+from robot_server.service.task_runner import TaskRunner
+
 from robot_server.protocols import (
     ProtocolStore,
     ProtocolResource,
@@ -48,6 +50,7 @@ def setup_app(app: FastAPI) -> None:
 
 async def test_create_session(
     decoy: Decoy,
+    task_runner: TaskRunner,
     session_view: SessionView,
     session_store: SessionStore,
     engine_store: EngineStore,
@@ -93,6 +96,7 @@ async def test_create_session(
     # TODO(mc, 2021-05-27): spec the initialize method to return actual data
     decoy.verify(
         await engine_store.create(protocol=None),
+        task_runner.run(engine_store.runner.join),
         session_store.upsert(session=session),
     )
 

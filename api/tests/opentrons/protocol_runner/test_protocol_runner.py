@@ -146,9 +146,9 @@ async def test_stop(
     subject: ProtocolRunner,
 ) -> None:
     """It should start a protocol run with play."""
-    subject.stop()
+    await subject.stop()
 
-    decoy.verify(protocol_engine.halt(), times=1)
+    decoy.verify(await protocol_engine.halt(), times=1)
 
 
 async def test_join(

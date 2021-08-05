@@ -1,5 +1,6 @@
 """Tests for TaskQueue."""
 import pytest
+import asyncio
 from typing import Any
 from opentrons.protocol_runner.task_queue import TaskQueue, TaskQueuePhase
 
@@ -88,3 +89,15 @@ async def test_cleanup_always_runs() -> None:
         await subject.join()
 
     assert cleanup_result is True
+
+
+async def test_join_waits_for_start() -> None:
+    """It should wait until the queue is started when join is called."""
+    subject = TaskQueue()
+    join_task = asyncio.create_task(subject.join())
+
+    await asyncio.sleep(0)
+    assert join_task.done() is False
+
+    subject.start()
+    await join_task

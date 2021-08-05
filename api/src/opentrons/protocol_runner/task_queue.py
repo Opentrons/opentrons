@@ -20,13 +20,17 @@ class TaskQueueEntry(NamedTuple):
 
 
 class TaskQueue:
-    """A queue of async tasks to run."""
+    """A queue of async tasks to run.
+
+    Once started, a TaskQueue may not be re-used.
+    """
 
     def __init__(self) -> None:
         """Initialize the TaskQueue."""
         self._run_entry: Optional[TaskQueueEntry] = None
         self._cleanup_entry: Optional[TaskQueueEntry] = None
         self._run_task: Optional[asyncio.Task] = None
+        self._run_started_event: asyncio.Event = asyncio.Event()
 
     def add(
         self,
@@ -56,9 +60,12 @@ class TaskQueue:
     def start(self) -> None:
         """Start running tasks in the queue."""
         self._run_task = asyncio.create_task(self._run())
+        self._run_started_event.set()
 
     async def join(self) -> None:
         """Wait for the background run task to complete, propagating errors."""
+        await self._run_started_event.wait()
+
         if self._run_task:
             await self._run_task
 
