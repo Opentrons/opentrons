@@ -9,7 +9,14 @@
   },
   "dimensions": {
     "bareOverallHeight": 84,
-    "overLabwareHeight": 0
+    "overLabwareHeight": 0,
+    "xDimension": 196,
+    "yDimension": 91
+  },
+  "cornerOffsetFromSlot": {
+    "x": -66,
+    "y": 4,
+    "z": 0
   },
   "calibrationPoint": {
     "x": 11.7,

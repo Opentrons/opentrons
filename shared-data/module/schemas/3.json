@@ -49,12 +49,14 @@
     "moduleType",
     "model",
     "labwareOffset",
+    "cornerOffsetFromSlot",
     "dimensions",
     "calibrationPoint",
     "displayName",
     "quirks",
     "slotTransforms",
-    "compatibleWith"
+    "compatibleWith",
+    "layers"
   ],
   "additionalProperties": false,
   "properties": {
@@ -85,6 +87,10 @@
         "xDimension": { "type": "number" },
         "yDimension": { "type": "number" }
       }
+    },
+    "cornerOffsetFromSlot": {
+      "$ref": "#/definitions/coordinates",
+      "description": "Position of left-front-bottom corner of entire module chassis to slot footprint origin (left-front-bottom)"
     },
     "calibrationPoint": { "$ref": "#/definitions/coordinates" },
     "displayName": { "type": "string" },

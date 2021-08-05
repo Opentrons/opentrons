@@ -10,7 +10,15 @@
   "dimensions": {
     "bareOverallHeight": 98.0,
     "overLabwareHeight": 0.0,
-    "lidHeight": 37.7
+    "lidHeight": 37.7,
+    "xDimension": 172,
+    "yDimension": 259.7,
+    "footprintOffsetX": -22.125
+  },
+  "cornerOffsetFromSlot": {
+    "x": -22.125,
+    "y": 0,
+    "z": 0
   },
   "calibrationPoint": {
     "x": 14.4,
