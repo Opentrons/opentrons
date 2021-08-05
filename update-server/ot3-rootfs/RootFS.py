@@ -16,7 +16,7 @@ class RootFSInfo:
     minor: str
     disk: str
 
-""" A simple class for OT3 RootFS manipulation "
+""" A simple class for OT3 RootFS manipulation
  ** Get current partition RootFS is mounted on 
  ** Swap RootFS partition 
  ** Factory reset OT3 using bmap image on SD-Card """
@@ -99,6 +99,7 @@ def main():
     # create Debug subcommand
     parser_debug = subparsers.add_parser('debug', help = 'Debug')
     parser_debug.set_defaults(func=rfs.debug)
+    # create REstore subcommand
     parser_factoryRestore = subparsers.add_parser('restore', help = 'Restore')
     parser_factoryRestore.set_defaults(func=rfs.factoryRestore)
     parser_swapPartition = subparsers.add_parser('swap', help = 'Swap RootFS partitions')
