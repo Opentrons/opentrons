@@ -83,7 +83,7 @@ export const LabwareSetupModal = (
               t={t}
               i18nKey="labware_help_example"
               components={{
-                p: (
+                block: (
                   <Text
                     fontSize={FONT_SIZE_BODY_2}
                     fontWeight={FONT_WEIGHT_REGULAR}
