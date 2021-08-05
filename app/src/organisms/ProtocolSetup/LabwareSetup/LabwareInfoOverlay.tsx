@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import cx from 'classnames'
 import {
   getLabwareDisplayName,
   LabwareDefinition2,
@@ -15,8 +14,6 @@ import {
   C_WHITE,
   OVERLAY_BLACK_90,
 } from '@opentrons/components'
-import styles from './styles.css'
-
 interface LabwareInfoProps {
   displayName: string
 }
@@ -103,7 +100,9 @@ export const LabwareInfoOverlay = (
     <RobotCoordsForeignDiv
       {...{ x, y, width, height }}
       innerDivProps={{
-        className: cx(styles.labware_info_overlay),
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'flex-end',
       }}
     >
       <LabwareInfo displayName={getLabwareDisplayName(definition)} />

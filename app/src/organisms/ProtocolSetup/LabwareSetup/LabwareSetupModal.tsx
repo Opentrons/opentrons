@@ -44,7 +44,7 @@ export const LabwareSetupModal = (
             t={t}
             i18nKey="labware_help_explanation"
             components={{
-              p: (
+              block: (
                 <Text
                   fontSize={FONT_SIZE_BODY_2}
                   fontWeight={FONT_WEIGHT_REGULAR}
@@ -91,7 +91,7 @@ export const LabwareSetupModal = (
                 ),
               }}
             />
-            <Box margin={`${SPACING_3} ${SPACING_5}`}>
+            <Box marginY={SPACING_3} marginX={SPACING_5}>
               <img src={labwareHelpImage} />
             </Box>
           </Box>

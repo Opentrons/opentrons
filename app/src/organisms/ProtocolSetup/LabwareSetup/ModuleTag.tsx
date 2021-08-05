@@ -3,7 +3,11 @@ import {
   Text,
   RobotCoordsForeignDiv,
   FONT_WEIGHT_SEMIBOLD,
+  C_MED_LIGHT_GRAY,
+  SPACING_1,
   SPACING_2,
+  JUSTIFY_CENTER,
+  ALIGN_CENTER,
 } from '@opentrons/components'
 import {
   getModuleType,
@@ -14,8 +18,6 @@ import {
   STD_SLOT_Y_DIM,
   getModuleDisplayName,
 } from '@opentrons/shared-data'
-import cx from 'classnames'
-import styles from './styles.css'
 
 export interface ModuleTagProps {
   x: number
@@ -58,7 +60,11 @@ export const ModuleTag = (props: ModuleTagProps): JSX.Element => {
       width={tagWidth}
       innerDivProps={{
         'data-test': `ModuleTag_${moduleType}`,
-        className: cx(styles.module_tag),
+        display: 'flex',
+        justifyContent: JUSTIFY_CENTER,
+        alignItems: ALIGN_CENTER,
+        backgroundColor: C_MED_LIGHT_GRAY,
+        padding: SPACING_1,
       }}
     >
       <Text
