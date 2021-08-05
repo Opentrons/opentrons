@@ -57,7 +57,7 @@ class EngineStore:
 
     @property
     def runner(self) -> ProtocolRunner:
-        """Get the persisted AbstractFileRunner.
+        """Get the persisted ProtocolRunner.
 
         Raises:
             EngineMissingError: Runner has not yet been created and persisted.
