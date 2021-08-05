@@ -1,7 +1,12 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { Card, Text, SPACING_3, FONT_HEADER_DARK } from '@opentrons/components'
+import {
+  Card,
+  Text,
+  SPACING_3,
+  FONT_WEIGHT_SEMIBOLD,
+} from '@opentrons/components'
 import { protocolHasModules } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 import { getProtocolData } from '../../redux/protocol'
@@ -72,7 +77,7 @@ export function RunSetupCard(): JSX.Element | null {
 
   return (
     <Card width="100%" marginTop={SPACING_3} paddingY={SPACING_3}>
-      <Text as="h3" paddingX={SPACING_3} css={FONT_HEADER_DARK}>
+      <Text as="h2" paddingX={SPACING_3} fontWeight={FONT_WEIGHT_SEMIBOLD}>
         {t('setup_for_run')}
       </Text>
       {stepsKeysInOrder.map((stepKey, index) => (

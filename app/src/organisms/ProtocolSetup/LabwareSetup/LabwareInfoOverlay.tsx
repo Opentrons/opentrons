@@ -36,13 +36,13 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element => {
     >
       <Text margin={SPACING_1}>{displayName}</Text>
       <Text
-        margin={SPACING_1}
+        marginX={SPACING_1}
         fontWeight={FONT_WEIGHT_SEMIBOLD}
         textTransform={'uppercase'}
       >
         {t('offset_title')}
       </Text>
-      <Box margin={SPACING_1}>
+      <Box marginX={SPACING_1} marginBottom={SPACING_1}>
         <Text
           as={'span'}
           fontWeight={FONT_WEIGHT_SEMIBOLD}

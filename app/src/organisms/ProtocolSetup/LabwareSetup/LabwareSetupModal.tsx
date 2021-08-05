@@ -97,7 +97,11 @@ export const LabwareSetupModal = (
           </Box>
 
           <Flex justifyContent={JUSTIFY_CENTER}>
-            <PrimaryBtn onClick={props.onCloseClick} width={SIZE_4}>
+            <PrimaryBtn
+              onClick={props.onCloseClick}
+              width={SIZE_4}
+              backgroundColor={C_BLUE}
+            >
               {t('shared:close')}
             </PrimaryBtn>
           </Flex>
