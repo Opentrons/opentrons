@@ -1,7 +1,15 @@
 import { reduce } from 'lodash'
-import { DeckDefinition, SPAN7_8_10_11_SLOT } from '@opentrons/shared-data'
+import {
+  DeckDefinition,
+  ModuleModel,
+  SPAN7_8_10_11_SLOT,
+} from '@opentrons/shared-data'
 import { getProtocolData } from '../../../../redux/protocol'
-import type { CoordinatesByModuleModel } from '../../RunSetupCard'
+
+export type CoordinatesByModuleModel = Record<
+  string,
+  { x: number; y: number; z: number; moduleModel: ModuleModel }
+>
 
 export const getModuleRenderCoords = (
   protocolData: ReturnType<typeof getProtocolData>,

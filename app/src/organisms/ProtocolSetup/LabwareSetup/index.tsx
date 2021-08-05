@@ -34,10 +34,8 @@ import { LabwareInfoOverlay } from './LabwareInfoOverlay'
 import { LabwareSetupModal } from './LabwareSetupModal'
 import styles from './styles.css'
 
-import {
-  CoordinatesByModuleModel,
-  CoordinatesByLabwareId,
-} from '../RunSetupCard'
+import type { CoordinatesByModuleModel } from './utils/getModuleRenderCoords'
+import type { CoordinatesByLabwareId } from './utils/getLabwareRenderCoords'
 
 interface LabwareSetupProps {
   moduleRenderCoords: CoordinatesByModuleModel

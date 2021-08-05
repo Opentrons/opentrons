@@ -2,11 +2,7 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { Card, Text, SPACING_3, FONT_HEADER_DARK } from '@opentrons/components'
-import {
-  protocolHasModules,
-  LabwareDefinition2,
-  ModuleModel,
-} from '@opentrons/shared-data'
+import { protocolHasModules } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 import { getProtocolData } from '../../redux/protocol'
 import { Divider } from '../../atoms/structure'
@@ -26,20 +22,6 @@ type StepKey =
   | typeof ROBOT_CALIBRATION_STEP_KEY
   | typeof MODULE_SETUP_KEY
   | typeof LABWARE_SETUP_KEY
-
-export type CoordinatesByModuleModel = Record<
-  string,
-  { x: number; y: number; z?: number; moduleModel: ModuleModel }
->
-export interface CoordinatesByLabwareId {
-  [labwareId: string]: {
-    x: number
-    y: number
-    z: number
-    matingSurfaceVector?: [number, number, number]
-    labwareDef: LabwareDefinition2
-  }
-}
 
 export function RunSetupCard(): JSX.Element | null {
   const { t } = useTranslation('protocol_setup')

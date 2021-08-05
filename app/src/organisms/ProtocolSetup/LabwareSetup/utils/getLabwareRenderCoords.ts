@@ -1,11 +1,11 @@
 import {
   DeckDefinition,
   getModuleDef2,
+  LabwareDefinition2,
   SPAN7_8_10_11_SLOT,
 } from '@opentrons/shared-data'
 import { find, reduce } from 'lodash'
 import { getProtocolData } from '../../../../redux/protocol'
-import type { CoordinatesByLabwareId } from '../../RunSetupCard'
 
 const getSlotPosition = (
   deckDef: DeckDefinition,
@@ -40,6 +40,15 @@ const getSlotHasMatingSurfaceUnitVector = (
   )?.matingSurfaceUnitVector
 
   return Boolean(matingSurfaceUnitVector)
+}
+
+export interface CoordinatesByLabwareId {
+  [labwareId: string]: {
+    x: number
+    y: number
+    z: number
+    labwareDef: LabwareDefinition2
+  }
 }
 
 export const getLabwareRenderCoords = (

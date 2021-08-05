@@ -262,6 +262,7 @@ describe('LabwareSetup', () => {
       [mockTCModule.moduleId]: {
         x: MOCK_TC_COORDS[0],
         y: MOCK_TC_COORDS[1],
+        z: MOCK_TC_COORDS[2],
         moduleModel: mockTCModule.model,
       },
     }
