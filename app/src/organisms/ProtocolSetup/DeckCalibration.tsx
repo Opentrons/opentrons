@@ -46,7 +46,7 @@ export function DeckCalibration(props: Props): JSX.Element | null {
   }
   return (
     <div>
-      <Text marginTop={SPACING_3}>Deck Calibration</Text>
+      <Text marginTop={SPACING_3}>{`${t('deck_calibration_title')}`}</Text>
       <div>{buildDeckLastCalibrated(deckCalData)}</div>
     </div>
   )

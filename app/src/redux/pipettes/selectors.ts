@@ -318,25 +318,19 @@ export const getProtocolPipettesMatch: (
   }
 )
 
+interface ProtocolPipetteCalibration {
+  pipetteDisplayName: string
+  exactMatch: string | null
+  lastModifiedDate?: string | null
+  tipRacks: Array<{
+    displayName: string
+    lastModifiedDate?: string | null
+  }>
+}
+
 interface ProtocolPipetteCalibrationsByMount {
-  left: {
-    pipetteDisplayName: string
-    exactMatch: string | null
-    lastModifiedDate?: string | null
-    tipRacks: Array<{
-      displayName: string
-      lastModifiedDate?: string | null
-    }>
-  } | null
-  right: {
-    pipetteDisplayName: string
-    exactMatch: string | null
-    lastModifiedDate?: string | null
-    tipRacks: Array<{
-      displayName: string
-      lastModifiedDate?: string | null
-    }>
-  } | null
+  left: ProtocolPipetteCalibration | null
+  right: ProtocolPipetteCalibration | null
 }
 
 // update this to use tiplength calibrations instead of attached pipette calibrations

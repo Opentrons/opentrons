@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { Trans, useTranslation } from 'react-i18next'
 
 import { Text, SPACING_3 } from '@opentrons/components'
 
@@ -19,6 +20,7 @@ interface Props {
 export function RobotCalibrationStep(props: Props): JSX.Element {
   const { robot } = props
   const { name: robotName, status } = robot
+  const { t } = useTranslation(['protocol_setup'])
 
   const dispatch = useDispatch<Dispatch>()
   React.useEffect(() => {
@@ -31,11 +33,11 @@ export function RobotCalibrationStep(props: Props): JSX.Element {
   const protocolPipetteData = useSelector((state: State) => {
     return Pipettes.getProtocolPipetteCalibrationInfo(state, robotName)
   })
-
+  console.log(protocolPipetteData)
   return (
     <>
       <DeckCalibration robotName={robotName} />
-      <Text marginTop={SPACING_3}>Required Pipettes</Text>
+      <Text marginTop={SPACING_3}>{t('required_pipettes_title')}</Text>
       <div>
         {Object.entries(protocolPipetteData).map(([mount, pipetteData]) => {
           if (pipetteData == null) {
@@ -48,22 +50,24 @@ export function RobotCalibrationStep(props: Props): JSX.Element {
             return (
               <div key={pipetteData.lastModified}>
                 <span>
-                  {mount} Mount: {pipetteData.pipetteDisplayName}
+                  {mount}
+                  {` ${t('mount_title')}: `}
+                  {pipetteData.pipetteDisplayName}
                 </span>
-                {attached ? (
+                {attached && pipetteData.lastModifiedDate !== null ? (
                   <div>
-                    Last Calibrated:{' '}
-                    {formatLastModified(pipetteData.lastModified)}
+                    {`${t('last_calibrated')} `}
+                    {formatLastModified(pipetteData.lastModifiedDate)}
                   </div>
                 ) : (
-                  <div>Please attach and calibrate pipette</div>
+                  <div>{t('not_calibrated')}</div>
                 )}
               </div>
             )
           }
         })}
       </div>
-      <Text marginTop={SPACING_3}>Required Tip Length Calibration</Text>
+      <Text marginTop={SPACING_3}>{t('required_tip_racks_title')}</Text>
       <div>
         {Object.entries(protocolPipetteData).map(([mount, pipetteData]) => {
           if (pipetteData == null) {
@@ -77,11 +81,11 @@ export function RobotCalibrationStep(props: Props): JSX.Element {
                     <div key={tiprack.displayName}>{tiprack.displayName}</div>
                     {tiprack.lastModifiedDate !== null ? (
                       <span>
-                        Last Calibrated:{' '}
-                        {formatLastModified(tiprack.lastModified)}
+                        {`${t('last_calibrated')} `}
+                        {formatLastModified(tiprack.lastModifiedDate)}
                       </span>
                     ) : (
-                      <span>Calibrate tiprack</span>
+                      <span>{t('not_calibrated')}</span>
                     )}
                   </>
                 ))}
