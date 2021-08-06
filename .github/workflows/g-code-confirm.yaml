@@ -4,10 +4,10 @@ on:
   # Run on any change to the api directory
   pull_request:
     paths:
-      -'api/**'
+      -'*'
   push:
     paths:
-      -'api/**'
+      -'*'
 
   workflow_dispatch:
 
