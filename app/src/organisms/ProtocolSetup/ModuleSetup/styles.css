@@ -1,0 +1,17 @@
+@import '@opentrons/components';
+
+.deck_map {
+  margin: 0 5%;
+}
+
+.modal {
+  display: flex;
+  align-items: flex-start;
+  z-index: 100;
+}
+
+.modal_contents {
+  max-width: 100%;
+  max-height: 100%;
+  overflow-y: scroll;
+}

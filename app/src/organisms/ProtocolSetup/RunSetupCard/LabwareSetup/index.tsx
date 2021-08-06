@@ -135,10 +135,18 @@ export const LabwareSetup = (props: LabwareSetupProps): JSX.Element | null => {
                     <React.Fragment
                       key={`LabwareSetup_Labware_${labwareDef.metadata.displayName}_${x}${y}`}
                     >
-                      <g transform={`translate(${x},${y})`}>
-                        <LabwareRender definition={labwareDef} />
-                      </g>
-                      <LabwareInfoOverlay x={x} y={y} definition={labwareDef} />
+                      <svg>
+                        <g transform={`translate(${x},${y})`}>
+                          <LabwareRender definition={labwareDef} />
+                        </g>
+                        <g>
+                          <LabwareInfoOverlay
+                            x={x}
+                            y={y}
+                            definition={labwareDef}
+                          />
+                        </g>
+                      </svg>
                     </React.Fragment>
                   )
                 })}
