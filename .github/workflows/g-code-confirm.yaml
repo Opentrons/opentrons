@@ -26,7 +26,6 @@ jobs:
       - uses: './.github/actions/python/setup'
         with:
           project: 'api'
-      # This is a test
       - name: Basic Smoothie
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.S3_APP_DEPLOY_KEY_ID }}
