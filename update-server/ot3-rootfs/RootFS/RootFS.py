@@ -8,17 +8,16 @@ BMAP_IMAGE = ''
 BMAP_FILE = ''
 DISK = 'mmcblk0'
 BOOT_SRC_CARVE_OUT = ''
-ROOT_FS_PARTITION = '' 
+ROOT_FS_PARTITION = ''
 SD_CARD_MOUNT_POINT = '/media/mmcblk1p1'
 @dataclass
 class RootFSInfo:
     major: str
     minor: str
     disk: str
-
 """ A simple class for OT3 RootFS manipulation
- ** Get current partition RootFS is mounted on 
- ** Swap RootFS partition 
+ ** Get current partition RootFS is mounted on
+ ** Swap RootFS partition
  ** Factory reset OT3 using bmap image on SD-Card """
 
 class RootFS:
@@ -29,12 +28,11 @@ class RootFS:
     BMAP_FILE = ''
     DISK = 'mmcblk0'
     BOOT_SRC_CARVE_OUT = ''
-    ROOT_FS_PARTITION = '' 
+    ROOT_FS_PARTITION = ''
     SD_CARD_MOUNT_POINT = '/media/mmcblk1p1'
-
     def setPartition(self, partitionName):
-        """ Run boot util command here to set partion 
-         Use the libubootenv utility to set bootargs 
+        """ Run boot util command here to set partion
+         Use the libubootenv utility to set bootargs
          boot.src has a carveout for bootargs, use that """
         subprocess.run(["fw_setenv",BOOT_SRC_CARVE_OUT,"boot="+PartitionName ])
 
@@ -43,10 +41,8 @@ class RootFS:
         dev=os.stat('/')[stat.ST_DEV]
         major=os.major(dev)
         minor=os.minor(dev)
-
         out = subprocess.Popen(shlex.split("df /"), stdout=subprocess.PIPE).communicate()
         m = re.search(r'(/[^\s]+)s',str(out))
-	
         if m:
             mp = m.group(1)
             ri = RootFSInfo(major,minor,mp)
@@ -62,7 +58,6 @@ class RootFS:
                 setPartition(ROOTFS_PART2)
             else:
                 setPartition(ROOTFS_PART1)
-          
 
     def factoryRestore(self):
         """" bmap to factory reset here"""
@@ -72,7 +67,6 @@ class RootFS:
     def printRootFSPartition(self):
         tmp=self.getPartition()
         print ('Current RootFS Partition '+tmp.disk+'\n')
-    
     def printRootFSConfig(self):
         print ('ROOTFS_PART1 '+RootFS.ROOTFS_PART1+'\n')
         print ('ROOTFS_PART2 '+RootFS.ROOTFS_PART2+'\n')
@@ -82,10 +76,9 @@ class RootFS:
         print ('BOOT_SRC_CARVE_OUT '+RootFS.BOOT_SRC_CARVE_OUT+'\n')
         print ('ROOT_FS_PARTITION '+RootFS.ROOT_FS_PARTITION+'\n')
         print ('SD_CARD_MOUNT_POINT '+RootFS.SD_CARD_MOUNT_POINT+'\n')
-        
     def debug(self):
      self.printRootFSPartition()
-     self.printRootFSConfig()    
+     self.printRootFSConfig()
     def __init__(self):
         self.RootFSPartition = ROOT_FS_PARTITION
 
