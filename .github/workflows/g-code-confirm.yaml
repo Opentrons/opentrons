@@ -1,13 +1,13 @@
-name: G-Code-Confirm
+name: 'G-Code-Confirm'
 
 on:
   # Run on any change to the api directory
   pull_request:
     paths:
-      -'*'
+      - '*'
   push:
     paths:
-      -'*'
+      - '*'
 
   workflow_dispatch:
 
