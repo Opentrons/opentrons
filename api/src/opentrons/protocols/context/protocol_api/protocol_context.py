@@ -5,7 +5,7 @@ from collections import OrderedDict
 from opentrons import types, API
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.config import feature_flags as fflags
-from opentrons.hardware_control.types import DoorState, PauseType
+from opentrons.hardware_control.types import DoorState, PauseType, Axis
 from opentrons.hardware_control import SynchronousAdapter
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.geometry.deck import Deck
@@ -273,10 +273,13 @@ class ProtocolContextImplementation(AbstractProtocol):
         """Delay execution for x seconds."""
         self._hw_manager.hardware.delay(seconds)
 
-    def home(self) -> None:
+    def home(self, home_plungers: bool = True) -> None:
         """Home the robot."""
         self.set_last_location(None)
-        self._hw_manager.hardware.home()
+        if not home_plungers:
+            self._hw_manager.hardware.home([Axis.X, Axis.Y, Axis.Z, Axis.A])
+        else:
+            self._hw_manager.hardware.home()
 
     def get_deck(self) -> Deck:
         """Get the deck layout."""

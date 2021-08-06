@@ -136,7 +136,7 @@ class AbstractProtocol(ABC):
         ...
 
     @abstractmethod
-    def home(self) -> None:
+    def home(self, home_plungers: bool = True) -> None:
         ...
 
     @abstractmethod

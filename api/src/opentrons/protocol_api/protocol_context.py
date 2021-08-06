@@ -630,11 +630,11 @@ class ProtocolContext(CommandPublisher):
         self._implementation.delay(seconds=delay_time, msg=msg)
 
     @requires_version(2, 0)
-    def home(self):
+    def home(self, home_plungers: bool = True):
         """ Homes the robot.
         """
         self._log.debug("home")
-        self._implementation.home()
+        self._implementation.home(home_plungers)
 
     @property
     def location_cache(self) -> Optional[types.Location]:

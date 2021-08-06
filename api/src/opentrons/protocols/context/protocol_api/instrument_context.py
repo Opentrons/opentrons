@@ -1,3 +1,4 @@
+import logging
 from typing import Optional
 
 from opentrons import types
@@ -14,6 +15,9 @@ from opentrons.protocols.context.instrument import \
 from opentrons.protocols.context.protocol import \
     AbstractProtocol
 from opentrons.protocols.context.well import WellImplementation
+
+
+MODULE_LOG = logging.getLogger(__name__)
 
 
 class InstrumentContextImplementation(AbstractInstrument):
@@ -48,6 +52,7 @@ class InstrumentContextImplementation(AbstractInstrument):
         self._flow_rates = FlowRates(self)
         self._speeds = PlungerSpeeds(self)
         self._flow_rates.set_defaults(api_level=self._api_version)
+        self._log = MODULE_LOG.getChild(self.__class__.__name__)
 
     def get_default_speed(self) -> float:
         """Gets the speed at which the robot's gantry moves."""
@@ -155,16 +160,19 @@ class InstrumentContextImplementation(AbstractInstrument):
                 speed: Optional[float]) -> None:
         """Move the instrument."""
         # prevent direct movement bugs in PAPI version >= 2.10
+        self._log.info("===== Reached move_to ======")
         location_cache_mount = (
             self._mount
             if self._api_version >= APIVersion(2, 10) else
             None
         )
 
+        self._log.info(f"location_cache_mount={location_cache_mount}")
         last_location = self._protocol_interface.get_last_location(
             mount=location_cache_mount
         )
 
+        self._log.info(f"last_location={last_location}")
         if last_location:
             from_lw = last_location.labware
         else:
@@ -184,6 +192,7 @@ class InstrumentContextImplementation(AbstractInstrument):
                 self._mount, critical_point=cp_override),
             from_lw)
 
+        self._log.info(f"from_loc={from_loc}")
         instr_max_height = hardware.get_instrument_max_height(self._mount)
         moves = planning.plan_moves(from_loc, location,
                                     self._protocol_interface.get_deck(),
