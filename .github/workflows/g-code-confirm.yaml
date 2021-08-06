@@ -8,23 +8,20 @@ on:
   push:
     paths:
       - '*'
-
-  workflow_dispatch:
-
 jobs:
   confirm-g-code:
     # Please trigger
-    name: 'confirm G-Code'
-    runs-on: 'ubuntu-18.04'
+    name: confirm G-Code
+    runs-on: ubuntu-18.04
     steps:
-      - uses: 'actions/checkout@v2'
-      - uses: 'actions/setup-node@v1'
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
         with:
           node-version: '12'
-      - uses: 'actions/setup-python@v2'
+      - uses: actions/setup-python@v2
         with:
           python-version: '3.7'
-      - uses: './.github/actions/python/setup'
+      - uses: ./.github/actions/python/setup
         with:
           project: 'api'
       - name: Basic Smoothie
