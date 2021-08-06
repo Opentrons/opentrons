@@ -51,7 +51,7 @@ const DECK_LAYER_BLOCKLIST = [
   'screwHoles',
 ]
 
-const DECK_MAP_VIEWBOX = '-64 -100 650 550'
+const DECK_MAP_VIEWBOX = '-100 -100 650 550'
 
 export const LabwareSetup = (props: LabwareSetupProps): JSX.Element | null => {
   const { moduleRenderCoords, labwareRenderCoords } = props
