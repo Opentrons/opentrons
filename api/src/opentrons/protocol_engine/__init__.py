@@ -9,7 +9,7 @@ from .create_protocol_engine import create_protocol_engine
 from .protocol_engine import ProtocolEngine
 from .errors import ProtocolEngineError
 from .commands import Command, CommandRequest, CommandStatus, CommandType
-from .state import State, StateView, LabwareData
+from .state import State, StateView, LabwareData, PipetteData
 from .types import (
     DeckLocation,
     DeckSlotLocation,
@@ -34,6 +34,7 @@ __all__ = [
     "State",
     "StateView",
     "LabwareData",
+    "PipetteData",
     # type definitions and other value models
     "DeckLocation",
     "DeckSlotLocation",

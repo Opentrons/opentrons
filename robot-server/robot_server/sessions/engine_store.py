@@ -3,8 +3,7 @@ from typing import Optional, NamedTuple
 
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.protocol_engine import ProtocolEngine, create_protocol_engine
-from opentrons.protocol_runner import ProtocolRunner, ProtocolFile
-from robot_server.protocols import ProtocolResource
+from opentrons.protocol_runner import ProtocolRunner
 
 
 class EngineConflictError(RuntimeError):
@@ -67,7 +66,7 @@ class EngineStore:
 
         return self._runner_engine_pair.runner
 
-    async def create(self, protocol: Optional[ProtocolResource]) -> RunnerEnginePair:
+    async def create(self) -> RunnerEnginePair:
         """Create and store a ProtocolRunner and ProtocolEngine.
 
         Returns:
@@ -85,17 +84,6 @@ class EngineStore:
 
         if self._runner_engine_pair is not None:
             raise EngineConflictError("Cannot load multiple sessions simultaneously.")
-
-        if protocol is not None:
-            # TODO(mc, 2021-06-11): add multi-file support. As written, other
-            # parts of the API will make sure len(files) == 0, but this will
-            # not remain true as engine sessions are built out
-            protocol_file = ProtocolFile(
-                file_path=protocol.files[0],
-                file_type=protocol.protocol_type,
-            )
-
-            runner.load(protocol_file)
 
         self._runner_engine_pair = RunnerEnginePair(runner=runner, engine=engine)
 

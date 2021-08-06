@@ -1,23 +1,11 @@
 """Integration tests for the JsonFileReader interface."""
 import pytest
-import json
+from decoy import matchers
 from pathlib import Path
 
-from opentrons.protocols.models import JsonProtocol
 from opentrons.protocol_runner.protocol_file import ProtocolFile, ProtocolFileType
 from opentrons.protocol_runner.json_file_reader import JsonFileReader
-
-
-@pytest.fixture
-def json_protocol_file(
-    tmpdir: Path,
-    json_protocol_dict: dict,
-) -> ProtocolFile:
-    """Get a ProtocolFile with JSON on-disk."""
-    file_path = tmpdir / "protocol.json"
-    file_path.write_text(json.dumps(json_protocol_dict), encoding="utf-8")
-
-    return ProtocolFile(file_type=ProtocolFileType.JSON, file_path=file_path)
+from opentrons.protocols.models import json_protocol
 
 
 @pytest.fixture
@@ -26,14 +14,39 @@ def subject() -> JsonFileReader:
     return JsonFileReader()
 
 
-def test_reads_file(
-    json_protocol_dict: dict,
-    json_protocol_file: ProtocolFile,
-    subject: JsonFileReader,
-) -> None:
+def test_reads_file(json_protocol_file: Path, subject: JsonFileReader) -> None:
     """It should read a JSON file into a JsonProtocol model."""
-    result = subject.read(json_protocol_file)
+    protocol = ProtocolFile(
+        file_type=ProtocolFileType.JSON,
+        file_path=json_protocol_file,
+    )
+    result = subject.read(protocol)
 
-    # TODO(mc, 2021-06-03): this `parse_obj` is sort of mirroring
-    # the implementation exactly; rethink and revisit
-    assert result == JsonProtocol.parse_obj(json_protocol_dict)
+    assert result == json_protocol.Model.construct(
+        schemaVersion=3,
+        metadata=json_protocol.Metadata(),
+        robot=json_protocol.Robot(model="OT-2 Standard"),
+        pipettes={
+            "pipette-id": json_protocol.Pipettes(mount="left", name="p300_single"),
+        },
+        labware={
+            "labware-id": json_protocol.Labware(
+                slot="1",
+                displayName="Opentrons 96 Tip Rack 300 µL",
+                definitionId="opentrons/opentrons_96_tiprack_300ul/1",
+            ),
+        },
+        labwareDefinitions={
+            "opentrons/opentrons_96_tiprack_300ul/1": matchers.IsA(dict),
+        },
+        commands=[
+            json_protocol.PickUpDropTipCommand(
+                command="pickUpTip",
+                params=json_protocol.PipetteAccessParams(
+                    pipette="pipette-id",
+                    labware="labware-id",
+                    well="A1",
+                ),
+            )
+        ],
+    )
