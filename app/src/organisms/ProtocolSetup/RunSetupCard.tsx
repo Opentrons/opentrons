@@ -13,6 +13,7 @@ import { getProtocolData } from '../../redux/protocol'
 import { Divider } from '../../atoms/structure'
 import { CollapsibleStep } from './CollapsibleStep'
 import { LabwareSetup } from './LabwareSetup'
+import { ModuleSetup } from './ModuleSetup'
 import { getModuleRenderCoords } from './LabwareSetup/utils/getModuleRenderCoords'
 import { getLabwareRenderCoords } from './LabwareSetup/utils/getLabwareRenderCoords'
 
@@ -64,9 +65,7 @@ export function RunSetupCard(): JSX.Element | null {
     [ROBOT_CALIBRATION_STEP_KEY]: (
       <Text marginTop={SPACING_3}>TODO: robot calibration step contents</Text>
     ),
-    [MODULE_SETUP_KEY]: (
-      <Text marginTop={SPACING_3}>TODO: module setup step contents</Text>
-    ),
+    [MODULE_SETUP_KEY]: <ModuleSetup moduleRenderCoords={moduleRenderCoords} />,
     [LABWARE_SETUP_KEY]: (
       <LabwareSetup
         moduleRenderCoords={moduleRenderCoords}

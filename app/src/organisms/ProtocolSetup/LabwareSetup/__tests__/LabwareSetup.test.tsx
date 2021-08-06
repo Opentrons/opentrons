@@ -16,9 +16,9 @@ import { i18n } from '../../../../i18n'
 import { LabwareSetup } from '..'
 import { LabwareSetupModal } from '../LabwareSetupModal'
 import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
-import { ModuleTag } from '../ModuleTag'
 import { ExtraAttentionWarning } from '../ExtraAttentionWarning'
 import { getModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
+import { ModuleTag } from '../../ModuleTag'
 
 jest.mock('../LabwareSetupModal')
 jest.mock('../ModuleTag')

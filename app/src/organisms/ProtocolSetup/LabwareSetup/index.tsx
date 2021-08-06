@@ -19,6 +19,7 @@ import {
   FONT_SIZE_BODY_1,
   JUSTIFY_CENTER,
   SPACING_3,
+  SPACING_4,
   SPACING_6,
   C_BLUE,
   C_DARK_GRAY,
@@ -29,15 +30,17 @@ import {
   inferModuleOrientationFromXCoordinate,
 } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
-import { ModuleTag } from './ModuleTag'
+import { ModuleTag } from '../ModuleTag'
 import { LabwareInfoOverlay } from './LabwareInfoOverlay'
 import { LabwareSetupModal } from './LabwareSetupModal'
 import { getModuleTypesThatRequireExtraAttention } from './utils/getModuleTypesThatRequireExtraAttention'
 import { ExtraAttentionWarning } from './ExtraAttentionWarning'
 import styles from './styles.css'
 
-import type { CoordinatesByModuleModel } from './utils/getModuleRenderCoords'
-import type { CoordinatesByLabwareId } from './utils/getLabwareRenderCoords'
+import {
+  CoordinatesByModuleModel,
+  CoordinatesByLabwareId,
+} from '../RunSetupCard'
 
 interface LabwareSetupProps {
   moduleRenderCoords: CoordinatesByModuleModel
@@ -135,10 +138,18 @@ export const LabwareSetup = (props: LabwareSetupProps): JSX.Element | null => {
                     <React.Fragment
                       key={`LabwareSetup_Labware_${labwareDef.metadata.displayName}_${x}${y}`}
                     >
-                      <g transform={`translate(${x},${y})`}>
-                        <LabwareRender definition={labwareDef} />
-                      </g>
-                      <LabwareInfoOverlay x={x} y={y} definition={labwareDef} />
+                      <svg>
+                        <g transform={`translate(${x},${y})`}>
+                          <LabwareRender definition={labwareDef} />
+                        </g>
+                        <g>
+                          <LabwareInfoOverlay
+                            x={x}
+                            y={y}
+                            definition={labwareDef}
+                          />
+                        </g>
+                      </svg>
                     </React.Fragment>
                   )
                 })}
@@ -146,23 +157,21 @@ export const LabwareSetup = (props: LabwareSetupProps): JSX.Element | null => {
             )
           }}
         </RobotWorkSpace>
-        <Text color={C_DARK_GRAY} marginX={SPACING_6} marginY={SPACING_3}>
+        <Text color={C_DARK_GRAY} margin={`${SPACING_4} ${SPACING_6}`}>
           {t('labware_position_check_text')}
         </Text>
         <Flex justifyContent={JUSTIFY_CENTER}>
           <SecondaryBtn
-            title="Check Labware Positions"
+            title={t('check_labware_positions')}
             marginRight={SPACING_3}
             onClick={() => console.log('check labware positions!')}
-            color={C_BLUE}
           >
             {t('check_labware_positions')}
           </SecondaryBtn>
           <PrimaryBtn
-            title="Proceed to Run"
+            title={t('proceed_to_run')}
             disabled={proceedToRunDisabled}
             as={LinkComponent}
-            backgroundColor={C_BLUE}
             {...linkProps}
             {...targetProps}
           >
