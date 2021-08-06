@@ -5,7 +5,6 @@ from opentrons.hardware_control.g_code_parsing.g_code import GCode
 from opentrons.hardware_control.g_code_parsing.errors import UnparsableGCodeError
 from typing import List, Dict
 
-# Why won't the GitHub Action Trigger!?!?!
 
 def smoothie_g_codes() -> List[GCode]:
     raw_codes = [
