@@ -1,5 +1,4 @@
 """Integration tests for the JsonFileReader interface."""
-import pytest
 from decoy import matchers
 from pathlib import Path
 
@@ -8,18 +7,14 @@ from opentrons.protocol_runner.json_file_reader import JsonFileReader
 from opentrons.protocols.models import json_protocol
 
 
-@pytest.fixture
-def subject() -> JsonFileReader:
-    """Get a JsonFileReader test subject."""
-    return JsonFileReader()
-
-
-def test_reads_file(json_protocol_file: Path, subject: JsonFileReader) -> None:
+def test_reads_file(json_protocol_file: Path) -> None:
     """It should read a JSON file into a JsonProtocol model."""
     protocol = ProtocolFile(
         file_type=ProtocolFileType.JSON,
         file_path=json_protocol_file,
     )
+
+    subject = JsonFileReader()
     result = subject.read(protocol)
 
     assert result == json_protocol.Model.construct(
