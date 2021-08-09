@@ -35,12 +35,12 @@ async def initialize(event_publisher: Publisher) -> ThreadManager:
     else:
         # Create the hardware
         thread_manager = await initialize_api()
-    await _init_event_watchers(thread_manager, event_publisher)
+    _init_event_watchers(thread_manager, event_publisher)
     log.info("Opentrons API initialized")
     return thread_manager
 
 
-async def _init_event_watchers(
+def _init_event_watchers(
     thread_manager: ThreadManager,
     event_publisher: Publisher,
 ) -> None:
