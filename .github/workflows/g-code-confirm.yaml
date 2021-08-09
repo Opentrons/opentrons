@@ -33,26 +33,26 @@ jobs:
       - uses: './.github/actions/python/setup'
         with:
           project: 'api'
-      - name: 'Basic Smoothie'
+      - name: 'Run & Compare to S3 - Basic Smoothie'
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.S3_APP_DEPLOY_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_APP_DEPLOY_SECRET }}
           AWS_DEFAULT_REGION: us-east-2
         run: make -C api g-code-smoothie-protocol-diff
-      - name: Archive Smoothie Artifacts
+      - name: "Save Generated Diff - Basic Smoothie"
         if: always()
         uses: actions/upload-artifact@v2
         with:
           name: smoothie-protocol-diff
           path: /tmp/smoothie-diff.html
 
-      - name: '2 Modules - 1 Tempdeck & 1 Magdeck'
+      - name: 'Run & Compare to S3 - 2 Modules - 1 Tempdeck & 1 Magdeck'
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.S3_APP_DEPLOY_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_APP_DEPLOY_SECRET }}
           AWS_DEFAULT_REGION: us-east-2
         run: make -C api g-code-2-modules-1s-1m-v2-protocol-diff
-      - name: Archive "2 Modules - 1 Tempdeck & 1 Magdeck" Artifacts
+      - name: "Save Generated Diff - 2 Modules - 1 Tempdeck & 1 Magdeck"
         if: always()
         uses: actions/upload-artifact@v2
         with:
