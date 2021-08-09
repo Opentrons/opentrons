@@ -1,6 +1,5 @@
 import * as React from 'react'
 import map from 'lodash/map'
-
 import { useTranslation } from 'react-i18next'
 import {
   Flex,
@@ -9,6 +8,8 @@ import {
   ModuleViz,
   PrimaryBtn,
   RobotWorkSpace,
+  Tooltip,
+  useHoverTooltip,
   ALIGN_FLEX_END,
   DIRECTION_COLUMN,
   FONT_SIZE_BODY_1,
@@ -21,6 +22,7 @@ import {
   getModuleType,
   inferModuleOrientationFromXCoordinate,
 } from '@opentrons/shared-data'
+
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 import { ModuleInfo } from './ModuleInfo'
 import { MultipleModulesModal } from './MultipleModulesModal'
@@ -50,7 +52,6 @@ export const ModuleSetup = (props: ModuleSetupProps): JSX.Element | null => {
     showMultipleModulesModal,
     setShowMultipleModulesModal,
   ] = React.useState<boolean>(false)
-
   return (
     <React.Fragment>
       {showMultipleModulesModal && (
