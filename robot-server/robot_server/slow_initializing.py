@@ -114,7 +114,7 @@ class InitializationFailedError(Exception):
     """See `SlowInitializing.get_when_ready` and `SlowInitializing.get_if_ready`.
 
     The ``__cause__`` attribute is the underlying exception, as raised from the
-    `factory` coroutine.
+    ``factory`` coroutine.
     """
 
 

@@ -2,7 +2,6 @@
 
 
 import logging
-from functools import partial
 from pathlib import Path
 
 from opentrons import ThreadManager, initialize as initialize_api
@@ -47,19 +46,17 @@ async def _init_event_watchers(
 ) -> None:
     """Register the publisher callbacks with the hw thread manager."""
     log.info("Starting hardware-event-notify publisher")
-    thread_manager.register_callback(partial(_publish_hardware_event, event_publisher))
 
+    def publish_hardware_event(hw_event: HardwareEvent) -> None:
+        if hw_event.event == HardwareEventType.DOOR_SWITCH_CHANGE:
+            payload = DoorStatePayload(state=hw_event.new_state)
+        else:
+            return
+        topic = topics.RobotEventTopics.HARDWARE_EVENTS
+        publisher = "robot_server_event_publisher"
+        event_to_publish = event.Event(
+            createdOn=utc_now(), publisher=publisher, data=payload
+        )
+        event_publisher.send_nowait(topic, event_to_publish)
 
-def _publish_hardware_event(
-    event_publisher: Publisher, hw_event: HardwareEvent
-) -> None:
-    if hw_event.event == HardwareEventType.DOOR_SWITCH_CHANGE:
-        payload = DoorStatePayload(state=hw_event.new_state)
-    else:
-        return
-
-    topic = topics.RobotEventTopics.HARDWARE_EVENTS
-    publisher = "robot_server_event_publisher"
-    event_publisher.send_nowait(
-        topic, event.Event(createdOn=utc_now(), publisher=publisher, data=payload)
-    )
+    thread_manager.register_callback(publish_hardware_event)
