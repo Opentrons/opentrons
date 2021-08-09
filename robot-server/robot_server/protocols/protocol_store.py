@@ -6,7 +6,7 @@ from logging import getLogger
 from pathlib import Path
 from typing import Dict, List, Sequence
 
-from opentrons.file_runner import ProtocolFileType
+from opentrons.protocol_runner import ProtocolFileType
 
 log = getLogger(__name__)
 

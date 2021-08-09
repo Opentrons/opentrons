@@ -201,7 +201,7 @@ def test_create_action(current_time: datetime) -> None:
     )
 
     command_data = SessionActionCreateData(
-        actionType=SessionActionType.START,
+        actionType=SessionActionType.PLAY,
     )
 
     subject = SessionView()
@@ -215,7 +215,7 @@ def test_create_action(current_time: datetime) -> None:
     assert action_result == SessionAction(
         id="control-command-id",
         createdAt=current_time,
-        actionType=SessionActionType.START,
+        actionType=SessionActionType.PLAY,
     )
 
     assert session_result == SessionResource(

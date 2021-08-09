@@ -9,6 +9,7 @@ from typing_extensions import Literal
 
 from robot_server.errors import ErrorDetails, ErrorResponse
 from robot_server.service.dependencies import get_current_time, get_unique_id
+from robot_server.service.task_runner import TaskRunner
 from robot_server.service.json_api import (
     ResponseModel,
     EmptyResponseModel,
@@ -16,6 +17,7 @@ from robot_server.service.json_api import (
 )
 
 from robot_server.protocols import (
+    ProtocolFile,
     ProtocolStore,
     ProtocolNotFound,
     ProtocolNotFoundError,
@@ -68,6 +70,7 @@ async def create_session(
     protocol_store: ProtocolStore = Depends(get_protocol_store),
     session_id: str = Depends(get_unique_id),
     created_at: datetime = Depends(get_current_time),
+    task_runner: TaskRunner = Depends(TaskRunner),
 ) -> ResponseModel[Session]:
     """Create a new session.
 
@@ -78,7 +81,8 @@ async def create_session(
         engine_store: ProtocolEngine storage and control.
         protocol_store: Protocol resource storage.
         session_id: Generated ID to assign to the session.
-        created_at: Timestamp to attach to created session
+        created_at: Timestamp to attach to created session.
+        task_runner: Background task runner.
     """
     create_data = request_body.data if request_body is not None else None
     session = session_view.as_resource(
@@ -86,18 +90,31 @@ async def create_session(
         created_at=created_at,
         create_data=create_data,
     )
-    protocol = None
+    protocol_id = None
+
+    if isinstance(create_data, ProtocolSessionCreateData):
+        protocol_id = create_data.createParams.protocolId
 
     try:
-        if isinstance(create_data, ProtocolSessionCreateData):
-            protocol = protocol_store.get(
-                protocol_id=create_data.createParams.protocolId
-            )
+        await engine_store.create()
 
-        # TODO(mc, 2021-05-28): return engine state to build response model
-        await engine_store.create(protocol=protocol)
+        if protocol_id is not None:
+            protocol_resource = protocol_store.get(protocol_id=protocol_id)
+            # TODO(mc, 2021-06-11): add multi-file support. As written, the
+            # ProtocolStore will make sure len(files) != 0
+            protocol_file = ProtocolFile(
+                file_type=protocol_resource.protocol_type,
+                file_path=protocol_resource.files[0],
+            )
+            engine_store.runner.load(protocol_file)
+
+        # TODO(mc, 2021-08-05): capture errors from `runner.join` and place
+        # them in the session resource
+        task_runner.run(engine_store.runner.join)
+
     except ProtocolNotFoundError as e:
         raise ProtocolNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
+
     except EngineConflictError as e:
         raise SessionAlreadyActive(detail=str(e)).as_error(status.HTTP_409_CONFLICT)
 

@@ -5,12 +5,16 @@ from decoy import Decoy
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from httpx import AsyncClient
+from pathlib import Path
 
 from tests.helpers import verify_response
+
+from robot_server.service.task_runner import TaskRunner
 
 from robot_server.protocols import (
     ProtocolStore,
     ProtocolResource,
+    ProtocolFile,
     ProtocolFileType,
     ProtocolNotFoundError,
     ProtocolNotFound,
@@ -48,6 +52,7 @@ def setup_app(app: FastAPI) -> None:
 
 async def test_create_session(
     decoy: Decoy,
+    task_runner: TaskRunner,
     session_view: SessionView,
     session_store: SessionStore,
     engine_store: EngineStore,
@@ -90,9 +95,9 @@ async def test_create_session(
 
     verify_response(response, expected_status=201, expected_data=expected_response)
 
-    # TODO(mc, 2021-05-27): spec the initialize method to return actual data
     decoy.verify(
-        await engine_store.create(protocol=None),
+        await engine_store.create(),
+        task_runner.run(engine_store.runner.join),
         session_store.upsert(session=session),
     )
 
@@ -116,11 +121,15 @@ async def test_create_protocol_session(
         ),
         actions=[],
     )
-    protocol = ProtocolResource(
+    protocol_resource = ProtocolResource(
         protocol_id="protocol-id",
         protocol_type=ProtocolFileType.JSON,
         created_at=datetime.now(),
-        files=[],
+        files=[Path("/dev/null")],
+    )
+    protocol_file = ProtocolFile(
+        file_type=ProtocolFileType.JSON,
+        file_path=Path("/dev/null"),
     )
     expected_response = ProtocolSession(
         id=unique_id,
@@ -130,7 +139,9 @@ async def test_create_protocol_session(
         commands=[],
     )
 
-    decoy.when(protocol_store.get(protocol_id="protocol-id")).then_return(protocol)
+    decoy.when(protocol_store.get(protocol_id="protocol-id")).then_return(
+        protocol_resource
+    )
 
     decoy.when(
         session_view.as_resource(
@@ -160,9 +171,9 @@ async def test_create_protocol_session(
 
     verify_response(response, expected_status=201, expected_data=expected_response)
 
-    # TODO(mc, 2021-05-27): spec the initialize method to return actual data
     decoy.verify(
-        await engine_store.create(protocol=protocol),
+        await engine_store.create(),
+        engine_store.runner.load(protocol_file),
         session_store.upsert(session=session),
     )
 
@@ -224,9 +235,7 @@ async def test_create_session_conflict(
         )
     ).then_return(session)
 
-    decoy.when(await engine_store.create(protocol=None)).then_raise(
-        EngineConflictError("oh no")
-    )
+    decoy.when(await engine_store.create()).then_raise(EngineConflictError("oh no"))
 
     response = await async_client.post("/sessions")
 
