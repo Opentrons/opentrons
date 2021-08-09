@@ -7,9 +7,9 @@ Minimal, but valid and complete, protocol files are then loaded from
 disk into the runner, and the protocols are run to completion. From
 there, the ProtocolEngine state is inspected to everything was loaded
 and ran as expected.
-
-
 """
+
+
 import pytest
 from pathlib import Path
 from datetime import datetime
