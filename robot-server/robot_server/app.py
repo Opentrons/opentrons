@@ -29,12 +29,14 @@ from . import slow_initializing
 from . import hardware_initialization
 
 
-async def _make_event_publisher() -> notify_server_publisher.Publisher:
+def _make_event_publisher() -> notify_server_publisher.Publisher:
     """Create a notify-server event publisher instance."""
     notify_server_settings = NotifyServerSettings()
     event_publisher = notify_server_publisher.create(
         notify_server_settings.publisher_address.connection_string()
     )
+    # fixme(mm, 2021-08-09): Publisher has a .close() method that we must call, or
+    # we'll leak a socket.
     return event_publisher
 
 
