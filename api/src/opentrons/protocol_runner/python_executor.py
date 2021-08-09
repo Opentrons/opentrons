@@ -17,6 +17,8 @@ class PythonExecutor:
         to avoid thread pool exhaustion from tying up protocol execution.
         """
         self._loop = asyncio.get_running_loop()
+        # fixme(mm, 2021-08-09): This class should be a context manager and call
+        # self._thread_pool.shutdown(). Currently, I think we leak threads.
         self._thread_pool = ThreadPoolExecutor(max_workers=1)
 
     async def execute(self, protocol: PythonProtocol, context: ProtocolContext) -> None:
