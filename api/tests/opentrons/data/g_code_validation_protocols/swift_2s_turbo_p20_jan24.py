@@ -1,6 +1,6 @@
 # Opentrons Labworks
 # APIV2
-
+# type: ignore
 metadata = {"apiLevel": "2.2"}
 
 
@@ -69,7 +69,7 @@ def run(protocol_context):
         p20.blow_out()
         p20.mix(2, 10, well.top(-13.5))
         p20.move_to(well.top(-12))
-        protocol_context.delay(seconds=0.5)
+        # protocol_context.delay(seconds=0.5)
         p20.blow_out()
         p20.drop_tip()
 
@@ -84,27 +84,27 @@ def run(protocol_context):
 
     # Transfer Ligation Master Mix to the samples
 
-    # p20.pick_up_tip()
-    # p20.mix(3, 20, ligation_mm)
-    # p20.drop_tip()
-    # p20.home()
+    p20.pick_up_tip()
+    p20.mix(3, 20, ligation_mm)
+    p20.drop_tip()
+    p20.home()
 
     # repeat step
-    # for well in enzymatic_prep_samples:
-    #     p20.pick_up_tip()
-    #     p20.aspirate(18, ligation_mm)
-    #     p20.dispense(18, well.bottom())
-    #     p20.blow_out()
-    #     p20.drop_tip()
-    #     p20.pick_up_tip()
-    #     p20.aspirate(12, ligation_mm)
-    #     p20.dispense(12, well.bottom())
-    #     p20.mix(2, 15, well.top(-13.5))
-    #     p20.blow_out(well.top(-7))
-    #     p20.drop_tip()
+    for well in enzymatic_prep_samples:
+        p20.pick_up_tip()
+        p20.aspirate(18, ligation_mm)
+        p20.dispense(18, well.bottom())
+        p20.blow_out()
+        p20.drop_tip()
+        p20.pick_up_tip()
+        p20.aspirate(12, ligation_mm)
+        p20.dispense(12, well.bottom())
+        p20.mix(2, 15, well.top(-13.5))
+        p20.blow_out(well.top(-7))
+        p20.drop_tip()
 
-    # thermocycler.set_block_temperature(20.2, hold_time_minutes=2)
-    # thermocycler.set_block_temperature(4)
+    thermocycler.set_block_temperature(20.2, hold_time_minutes=2)
+    thermocycler.set_block_temperature(4)
 
     """Ligation Purification"""
     p300.home()
@@ -136,7 +136,7 @@ def run(protocol_context):
     p300.flow_rate.dispense = 50
     p300.mix(2, 80, mag_samples[0].bottom())
     p300.blow_out(mag_samples[0].top(-5))
-    # p300.touch_tip(v_offset=-2)
+    p300.touch_tip(v_offset=-2)
     p300.drop_tip()
 
     # Incubate for 5 minutes
@@ -148,14 +148,14 @@ def run(protocol_context):
     # protocol_context.delay(minutes=2)
 
     # # Remove supernatant
-    # p300.flow_rate.aspirate = 20
-    # p300.flow_rate.dispense = 50
+    p300.flow_rate.aspirate = 20
+    p300.flow_rate.dispense = 50
 
-    # p300.pick_up_tip()
-    # p300.aspirate(108, mag_samples[0].bottom(2))
-    # p300.dispense(108, waste.bottom(1.5))
-    # p300.air_gap(10)
-    # p300.drop_tip()
+    p300.pick_up_tip()
+    p300.aspirate(108, mag_samples[0].bottom(2))
+    p300.dispense(108, waste.bottom(1.5))
+    p300.air_gap(10)
+    p300.drop_tip()
 
     # Wash samples 2X with 180 uL of 80% EtOHt
     p300.default_speed = 200
@@ -168,7 +168,7 @@ def run(protocol_context):
     p300.air_gap(5)
     p300.dispense(210, mag_samples[0].top(-2))
     p300.air_gap(10)
-    protocol_context.delay(seconds=30)
+    # protocol_context.delay(seconds=30)
     p300.aspirate(190, mag_samples[0])
     p300.air_gap(5)
     p300.dispense(210, waste.bottom(1.5))
@@ -176,39 +176,39 @@ def run(protocol_context):
     p300.drop_tip()
 
     # #ethanol wash2, repeat step
-    # p300.pick_up_tip()
-    # p300.aspirate(180, ethanol)
-    # p300.air_gap(5)
-    # p300.dispense(210, mag_samples[0].top(-2))
-    # p300.air_gap(10)
+    p300.pick_up_tip()
+    p300.aspirate(180, ethanol)
+    p300.air_gap(5)
+    p300.dispense(210, mag_samples[0].top(-2))
+    p300.air_gap(10)
     # protocol_context.delay(seconds=30)
-    # p300.aspirate(190, mag_samples[0])
-    # p300.air_gap(5)
-    # p300.dispense(210, waste.bottom(1.5))
-    # p300.air_gap(10)
-    # p300.drop_tip()
+    p300.aspirate(190, mag_samples[0])
+    p300.air_gap(5)
+    p300.dispense(210, waste.bottom(1.5))
+    p300.air_gap(10)
+    p300.drop_tip()
 
     p300.pick_up_tip()
     p300.aspirate(30, mag_samples[0].bottom(-0.25))
     p300.air_gap(5)
     p300.drop_tip()
 
-    protocol_context.delay(seconds=30)
+    # protocol_context.delay(seconds=30)
     # Remove samples from the magnets
     magdeck.disengage()
 
     # Elute clean ligation product
-    # p300.pick_up_tip()
-    # p300.aspirate(22, te)
-    # p300.dispense(22, mag_samples[0].top(-12))
-    # p300.blow_out(mag_samples[0].top())
-    # p300.flow_rate.aspirate = 100
-    # p300.flow_rate.dispense = 200
-    # p300.mix(10, 20, mag_samples[0].top(-13.5))
-    # p300.flow_rate.aspirate = 75
-    # p300.flow_rate.dispense = 50
-    # p300.blow_out(mag_samples[0].top())
-    # p300.drop_tip()
+    p300.pick_up_tip()
+    p300.aspirate(22, te)
+    p300.dispense(22, mag_samples[0].top(-12))
+    p300.blow_out(mag_samples[0].top())
+    p300.flow_rate.aspirate = 100
+    p300.flow_rate.dispense = 200
+    p300.mix(10, 20, mag_samples[0].top(-13.5))
+    p300.flow_rate.aspirate = 75
+    p300.flow_rate.dispense = 50
+    p300.blow_out(mag_samples[0].top())
+    p300.drop_tip()
 
     # # Incubate for 1 minute
     # protocol_context.delay(minutes=2)
@@ -332,77 +332,77 @@ def run(protocol_context):
 
     # # Transfer samples to the PCR plate on the Magnetic Module
     # # Place samples on the magnets
-    # magdeck.engage()
-    protocol_context.delay(minutes=2)
+    magdeck.engage()
+    # protocol_context.delay(minutes=2)
 
     # # Aspirate supernatant
 
-    # p300.pick_up_tip()
-    # p300.flow_rate.dispense = 50
+    p300.pick_up_tip()
+    p300.flow_rate.dispense = 50
 
-    # p300.aspirate(82.5, mag_samples[0].bottom(2))
-    # p300.dispense(82.5, waste)
-    # p300.blow_out()
-    # p300.drop_tip()
+    p300.aspirate(82.5, mag_samples[0].bottom(2))
+    p300.dispense(82.5, waste)
+    p300.blow_out()
+    p300.drop_tip()
 
     # # Wash samples 2X with 180 uL of 80% EtOH
     # #1st ethanol wash
-    # p300.pick_up_tip()
-    # p300.aspirate(180, ethanol)
-    # p300.air_gap(5)
-    # p300.dispense(180, mag_samples[0].top(-2))
-    # p300.blow_out()
-    # p300.air_gap(5)
-    # #p300.drop_tip()
+    p300.pick_up_tip()
+    p300.aspirate(180, ethanol)
+    p300.air_gap(5)
+    p300.dispense(180, mag_samples[0].top(-2))
+    p300.blow_out()
+    p300.air_gap(5)
+    #p300.drop_tip()
     # protocol_context.delay(seconds=30)
-    # #p300.pick_up_tip()
-    # p300.aspirate(190, mag_samples[0])
-    # p300.air_gap(5)
-    # p300.dispense(190, waste)
-    # p300.blow_out()
-    # p300.air_gap(10)
-    # p300.drop_tip()
+    #p300.pick_up_tip()
+    p300.aspirate(190, mag_samples[0])
+    p300.air_gap(5)
+    p300.dispense(190, waste)
+    p300.blow_out()
+    p300.air_gap(10)
+    p300.drop_tip()
 
     # # #2nd ethanol wash
-    # p300.pick_up_tip()
-    # p300.aspirate(180, ethanol)
-    # p300.air_gap(5)
-    # p300.dispense(180, mag_samples[0].top(-2))
-    # p300.blow_out()
-    # p300.air_gap(5)
-    # #p300.drop_tip()
+    p300.pick_up_tip()
+    p300.aspirate(180, ethanol)
+    p300.air_gap(5)
+    p300.dispense(180, mag_samples[0].top(-2))
+    p300.blow_out()
+    p300.air_gap(5)
+    p300.drop_tip()
     # protocol_context.delay(seconds=30)
-    # #p300.pick_up_tip()
-    # p300.aspirate(190, mag_samples[0])
-    # p300.air_gap(5)
-    # p300.dispense(190, waste)
-    # p300.blow_out()
-    # p300.air_gap(10)
-    # # p300.drop_tip()
-    # # #use p300m to remove residual 80% etoh
-    # # p300.pick_up_tip()
-    # # p300.aspirate(30, mag_samples[0])
+    p300.pick_up_tip()
+    p300.aspirate(190, mag_samples[0])
+    p300.air_gap(5)
+    p300.dispense(190, waste)
+    p300.blow_out()
+    p300.air_gap(10)
+    p300.drop_tip()
+    # use p300m to remove residual 80% etoh
+    p300.pick_up_tip()
+    p300.aspirate(30, mag_samples[0])
 
-    # p300.air_gap(5)
-    # p300.drop_tip()
+    p300.air_gap(5)
+    p300.drop_tip()
 
     # protocol_context.delay(minutes=1)
-    # #Elute clean product
-    # # magdeck.disengage()
+    # Elute clean product
+    magdeck.disengage()
 
-    # # p300.pick_up_tip()
-    # # p300.aspirate(22, te)
-    # p300.dispense(22, mag_samples[0].top(-12))
-    # p300.blow_out(mag_samples[0].top())
-    # p300.mix(10, 20, mag_samples[0].top(-13.5))
-    # p300.blow_out(mag_samples[0].top())
-    # p300.drop_tip()
+    p300.pick_up_tip()
+    p300.aspirate(22, te)
+    p300.dispense(22, mag_samples[0].top(-12))
+    p300.blow_out(mag_samples[0].top())
+    p300.mix(10, 20, mag_samples[0].top(-13.5))
+    p300.blow_out(mag_samples[0].top())
+    p300.drop_tip()
 
     # # Incubate for 1 minute
     # protocol_context.delay(minutes=2)
 
     # # Place samples on the magnets
-    # magdeck.engage()
+    magdeck.engage()
     # protocol_context.delay(minutes=2)
 
     # # Transfer clean samples to aluminum block plate, new column/8-well strip
