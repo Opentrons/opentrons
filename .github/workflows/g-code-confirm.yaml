@@ -58,3 +58,16 @@ jobs:
         with:
           name: g-code-2-modules-1s-1m-v2-protocol-diff
           path: /tmp/2-modules-1s-1m-v2-diff.html
+
+      - name: 'Run & Compare to S3 - Swift Turbo'
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.S3_APP_DEPLOY_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_APP_DEPLOY_SECRET }}
+          AWS_DEFAULT_REGION: us-east-2
+        run: make -C api g-code-swift-2s-turbo-p20-jan24-protocol-diff
+      - name: "Save Generated Diff - Swift Turbo"
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: g-code-swift-2s-turbo-p20-jan24-protocol-diff
+          path: /tmp/swift-2s-turbo-p20-jan24-diff.html
