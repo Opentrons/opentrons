@@ -482,14 +482,10 @@ class Session(RobotBusy):
                 def get_pipette_data() -> Dict[Mount, Dict[str, Any]]:
                     """Get whether the pipettes have tips attached."""
                     new_dict = {}
-                    for instr_ctx in self._instruments:
-                        for mount, instr in self._hw_iface().attached_instruments.items():
-                            if mount.name.lower() == instr_ctx.mount:
-                                new_dict[mount] = {
-                                    'pip_ctx': instr_ctx,
-                                    'has_tip': instr['has_tip'],
-                                    'current_volume': instr['current_volume'],
-                                    'trash_container': instr_ctx.trash_container}
+                    for mount, instr in self._hw_iface().attached_instruments.items():
+                        new_dict[mount] = {
+                            'has_tip': instr['has_tip'],
+                            'current_volume': instr['current_volume']}
                     return new_dict
 
                 pipettes_data = get_pipette_data()
@@ -501,6 +497,10 @@ class Session(RobotBusy):
                          pipettes_data.get(Mount.RIGHT).get('has_tip')):
                     self._hw_iface().stop(home_after=False)
 
+                    # self._hw_iface().home([Axis.X, Axis.Y, Axis.Z, Axis.A])
+
+                    self._hardware.cache_instruments()
+                    self._hardware.reset_instrument()
                     ctx_impl = ProtocolContextImplementation.build_using(
                         self._protocol,
                         extra_labware=getattr(self._protocol, 'extra_labware', {}))
@@ -512,36 +512,27 @@ class Session(RobotBusy):
                     )
                     ctx.connect(self._hardware)
                     ctx.home(home_plungers=False)
-                    # self._hw_iface().home([Axis.X, Axis.Y, Axis.Z, Axis.A])
-                    #
+                    for instr in self._instruments:
+                        pip = ctx.load_instrument(instrument_name=instr.name,
+                                                  mount=instr.mount,
+                                                  tip_racks=instr.tip_racks)
+                        pip.trash_container = instr.trash_container
+                    instruments = ctx.loaded_instruments
+
+                    log.info(f"____Instruments: {instruments}____")
                     for mount, obj in pipettes_data.items():
                         if obj.get('has_tip'):
-                            pip_ctx = obj['pip_ctx']
-                            self._simulating_ctx.set_last_location(None)
+                            pip_ctx = instruments[mount.name.lower()]
+                            log.info(f"======== Pipette:{pip_ctx.name} "
+                                     f"has trash: {pip_ctx.trash_container}")
+                            ctx._implementation.set_last_location(None)
                             self._hw_iface().add_tip(
                                 mount=mount,
                                 tip_length=pip_ctx.tip_racks[0].tip_length)
                             pip_ctx.move_to(location=pip_ctx.trash_container.wells()[0].top(),
                                         publish=False)
-                else:
-                    self._hw_iface().stop(home_after=True)
-
-                # self._hw_iface().stop(home_after=True)
-
-                # After api.stop(), all pipette state is reset so the pipette no longer
-                # knows whether it had tip or not.
-                # for instr in self._instruments:
-                #     log.info(f"Pipette:{instr.name}'s trash -> {instr.trash_container}")
-                # for mount, instr in self._hw_iface().attached_instruments.items():
-                #     log.info(f"@@@@ Instrument: {instr}")
-                #     # Can't get location after halt. Results in MustHomeError
-                #     # current_loc = self._hw_iface().current_position(mount)
-                #     # log.info(f"=== Location cache is: {current_loc}")
-                #     if instr['has_tip']:
-                #         log.info("=== Pipette has a tip! ===")
-                #         # instr.drop_tip()
-                #     else:
-                #         log.info("____ Pipette has NO tip. Safe to home____")
+                            # TODO: Drop tip
+                self._hw_iface().stop(home_after=True)
             except asyncio.CancelledError:
                 pass
         self.set_state('stopped')
@@ -622,7 +613,7 @@ class Session(RobotBusy):
                 broker=self._broker
             )
             ctx.connect(self._hardware)
-            ctx.home(home_plungers=False)
+            ctx.home()
 
             run_protocol(self._protocol, context=ctx)
 
