@@ -159,9 +159,9 @@ g-code-2-modules-1s-1m-v2-protocol-update-s3:
 		source_file_path=$(file_under_test) \
 		object_name='2-modules-1s-1m-v2.txt'
 
-#########################
+###############################
 # swift_2s_turbo_p20_jan24.py #
-#########################
+###############################
 
 # g-code-swift-2s-turbo-p20-jan24-protocol-run
 #	Description - Run swift_2s_turbo_p20_jan24.py and store the output to /tmp/file_under_test.txt
@@ -193,3 +193,38 @@ g-code-swift-2s-turbo-p20-jan24-protocol-update-s3:
 	@$(MAKE) --no-print-directory g-code-s3-push \
 		source_file_path=$(file_under_test) \
 		object_name='swift-2s-turbo-p20-jan24.txt'
+
+##########################
+# 2_single_channel_v2.py #
+##########################
+
+# g-code-2-single-channel-protocol-run
+#	Description - Run 2_single_channel_v2.py and store the output to /tmp/file_under_test.txt
+.PHONY: g-code-2-single-channel-v2-protocol-run
+g-code-2-single-channel-v2-protocol-run:
+	@$(MAKE) --no-print-directory g-code-run \
+		left_pipette='{"model": "p20_single_v2.0", "id": "P20SV202020070101"}' \
+		right_pipette='{"model": "p300_single_v2.1", "id": "P20SV202020070101"}' \
+		protocol_path='./tests/opentrons/data/g_code_validation_protocols/2_single_channel_v2.py' \
+  		> $(file_under_test)
+
+# g-code-2-single-channel-v2-protocol-diff
+#	Description - Run 2_single_channel_v2.py and compare it's output to S3 master file. Store the diff to /tmp/diff.html
+.PHONY: g-code-2-single-channel-v2-protocol-diff
+g-code-2-single-channel-v2-protocol-diff:
+	@$(MAKE) --no-print-directory g-code-2-single-channel-v2-protocol-run
+	@$(MAKE) --no-print-directory g-code-s3-pull \
+		object_name='2-single-channel-v2.txt' \
+		> $(master_file)
+	@$(MAKE) --no-print-directory g-code-diff \
+	> /tmp/2-single-channel-v2-diff.html
+
+
+# g-code-2-single-channel-v2-protocol-update-s3
+#	Description - Run 2_single_channel_v2.py and override the S3 master file with it's output
+.PHONY: g-code-2-single-channel-v2-protocol-update-s3
+g-code-2-single-channel-v2-protocol-update-s3:
+	@$(MAKE) --no-print-directory g-code-2-single-channel-v2-protocol-run
+	@$(MAKE) --no-print-directory g-code-s3-push \
+		source_file_path=$(file_under_test) \
+		object_name='2-single-channel-v2.txt'
