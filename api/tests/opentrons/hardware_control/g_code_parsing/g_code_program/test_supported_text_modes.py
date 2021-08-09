@@ -60,7 +60,7 @@ def test_invalid_mode_name():
 
 
 def test_concise_mode(concise_mode, g_code):
-    expected = 'M92 X80.0 Y80.0 Z400.0 A400.0 -> ' \
+    expected = 'smoothie: M92 X80.0 Y80.0 Z400.0 A400.0 -> ' \
                'Setting the following axes steps per mm: ' \
                'X-Axis: 80.0 steps per mm ' \
                'Y-Axis: 80.0 steps per mm ' \
@@ -79,7 +79,8 @@ def test_concise_mode(concise_mode, g_code):
 
 
 def test_default_mode(default_mode, g_code):
-    expected = 'Code: M92 X80.0 Y80.0 Z400.0 A400.0' \
+    expected = 'Device: smoothie' \
+               '\nCode: M92 X80.0 Y80.0 Z400.0 A400.0' \
                '\nExplanation: Setting the following axes steps per mm:' \
                '\n\tX-Axis: 80.0 steps per mm' \
                '\n\tY-Axis: 80.0 steps per mm' \

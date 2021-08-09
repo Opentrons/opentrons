@@ -175,16 +175,19 @@ def test_g_code_explanation_insertion(
 
     assert GCodeDiffer.get_diff_type(line_1) == GCodeDiffer.EQUALITY_TYPE
     assert GCodeDiffer.get_diff_content(line_1) == \
-           'G28.2 A B C X Y Z -> Homing the following axes: X, Y, Z, A, B, C ->\n'
+           'smoothie: G28.2 A B C X Y Z -> ' \
+           'Homing the following axes: X, Y, Z, A, B, C ->' \
+           '\nsmoothie: '
 
     assert GCodeDiffer.get_diff_type(line_2) == GCodeDiffer.INSERTION_TYPE
     assert GCodeDiffer.get_diff_content(line_2) == \
            'G38.2 F420.0 Y-40.0 -> Probing -40.0 on the Y axis, at a speed of 420.0 ' \
-           '-> Probed to : X Axis: 296.825 Y Axis: 292.663 Z Axis: 218.000\n'
+           '-> Probed to : X Axis: 296.825 Y Axis: 292.663 Z Axis: 218.000\nsmoothie: '
     assert GCodeDiffer.get_diff_type(line_3) == GCodeDiffer.EQUALITY_TYPE
     assert GCodeDiffer.get_diff_content(line_3) == \
-           'M203.1 A125.0 B40.0 C40.0 X600.0 Y400.0 Z125.0 -> Setting the max speed ' \
-           'for the following axes: X-Axis: 600.0 Y-Axis: 400.0 Z-Axis: 125.0 ' \
+           'M203.1 A125.0 B40.0 C40.0 X600.0 Y400.0 Z125.0 -> ' \
+           'Setting the max speed for the following axes: ' \
+           'X-Axis: 600.0 Y-Axis: 400.0 Z-Axis: 125.0 ' \
            'A-Axis: 125.0 B-Axis: 40.0 C-Axis: 40.0 ->'
 
 
@@ -199,12 +202,14 @@ def test_g_code_explanation_deletion(
 
     assert GCodeDiffer.get_diff_type(line_1) == GCodeDiffer.EQUALITY_TYPE
     assert GCodeDiffer.get_diff_content(line_1) == \
-           'G28.2 A B C X Y Z -> Homing the following axes: X, Y, Z, A, B, C ->\n'
+           'smoothie: G28.2 A B C X Y Z -> ' \
+           'Homing the following axes: X, Y, Z, A, B, C ->' \
+           '\nsmoothie: '
 
     assert GCodeDiffer.get_diff_type(line_2) == GCodeDiffer.DELETION_TYPE
     assert GCodeDiffer.get_diff_content(line_2) == \
            'G38.2 F420.0 Y-40.0 -> Probing -40.0 on the Y axis, at a speed of 420.0 ' \
-           '-> Probed to : X Axis: 296.825 Y Axis: 292.663 Z Axis: 218.000\n'
+           '-> Probed to : X Axis: 296.825 Y Axis: 292.663 Z Axis: 218.000\nsmoothie: '
     assert GCodeDiffer.get_diff_type(line_3) == GCodeDiffer.EQUALITY_TYPE
     assert GCodeDiffer.get_diff_content(line_3) == \
            'M203.1 A125.0 B40.0 C40.0 X600.0 Y400.0 Z125.0 -> Setting the max speed ' \
@@ -228,7 +233,9 @@ def test_g_code_program_diff(first_g_code_program, second_g_code_program):
     assert GCodeDiffer.get_diff_type(line_1) == GCodeDiffer.EQUALITY_TYPE
     assert GCodeDiffer.get_diff_content(
         line_1
-    ) == 'G28.2 A B C X Y Z -> Homing the following axes: X, Y, Z, A, B, C ->\nG0 X113.'
+    ) == 'smoothie: G28.2 A B C X Y Z -> ' \
+         'Homing the following axes: X, Y, Z, A, B, C ->' \
+         '\nsmoothie: G0 X113.'
 
     assert GCodeDiffer.get_diff_type(remove_38) == GCodeDiffer.DELETION_TYPE
     assert GCodeDiffer.get_diff_content(remove_38) == '38'
@@ -252,28 +259,31 @@ def test_g_code_program_diff(first_g_code_program, second_g_code_program):
            GCodeDiffer.EQUALITY_TYPE
     assert GCodeDiffer.get_diff_content(
         remaining_partial_response
-    ) == ' on the X-Axis The gantry to 11.24 on the Y-Axis ->\nG4 P555.0 -> Pausing ' \
-         'movement for 555.0ms ->'
+    ) == ' on the X-Axis The gantry to 11.24 on the Y-Axis ->' \
+         '\nsmoothie: G4 P555.0 -> Pausing movement for 555.0ms ->'
 
     assert GCodeDiffer.get_diff_type(remove_last_line) == GCodeDiffer.DELETION_TYPE
     assert GCodeDiffer.get_diff_content(remove_last_line) == \
-           '\nM114.2 -> Getting current position for all axes -> The current ' \
-           'position of the robot is: A Axis: 218.0 B Axis: 0.0 C Axis: 0.0 ' \
-           'X Axis: 418.0 Y Axis: -3.0 Z Axis: 218.0'
+           '\nsmoothie: M114.2 -> Getting current position for all axes -> ' \
+           'The current position of the robot is: A Axis: 218.0 B Axis: 0.0 ' \
+           'C Axis: 0.0 X Axis: 418.0 Y Axis: -3.0 Z Axis: 218.0'
 
 
 def test_html_diff(
         first_g_code_explanation,
         second_g_code_explanation
 ):
-    expected_html = '<span>G28.2 A B C X Y Z -&gt; Homing the following axes: ' \
-                    'X, Y, Z, A, B, C -&gt;&para;<br></span><del style="background:' \
-                    '#ffe6e6;">G38.2 F420.0 Y-40.0 -&gt; Probing -40.0 on the Y ' \
-                    'axis, at a speed of 420.0 -&gt; Probed to : X Axis: 296.825 Y ' \
-                    'Axis: 292.663 Z Axis: 218.000&para;<br></del><span>M203.1 ' \
-                    'A125.0 B40.0 C40.0 X600.0 Y400.0 Z125.0 -&gt; Setting the max ' \
-                    'speed for the following axes: X-Axis: 600.0 Y-Axis: 400.0 ' \
-                    'Z-Axis: 125.0 A-Axis: 125.0 B-Axis: 40.0 C-Axis: 40.0 -&gt;</span>'
+    expected_html = '<span>smoothie: G28.2 A B C X Y Z -&gt; ' \
+                    'Homing the following axes: X, Y, Z, A, B, C -&gt;' \
+                    '<br>smoothie: </span>' \
+                    '<del style="background:#ffe6e6;font-size:large;'\
+                    'font-weight:bold;">G38.2 F420.0 Y-40.0 -&gt; ' \
+                    'Probing -40.0 on the Y axis, at a speed of 420.0 ' \
+                    '-&gt; Probed to : X Axis: 296.825 Y Axis: 292.663 ' \
+                    'Z Axis: 218.000<br>smoothie: </del><span>M203.1 A125.0 B40.0 ' \
+                    'C40.0 X600.0 Y400.0 Z125.0 -&gt; Setting the max speed for the ' \
+                    'following axes: X-Axis: 600.0 Y-Axis: 400.0 Z-Axis: 125.0 ' \
+                    'A-Axis: 125.0 B-Axis: 40.0 C-Axis: 40.0 -&gt;</span>'
     diff = GCodeDiffer(first_g_code_explanation, second_g_code_explanation)
     html = diff.get_html_diff()
     assert html == expected_html

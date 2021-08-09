@@ -10,14 +10,29 @@ from opentrons.hardware_control.g_code_parsing.g_code_program.supported_text_mod
 
 class GCodeDiffer:
     INSERTION_TYPE = 'Insertion'
+    INSERTION_VALUE = 1
     EQUALITY_TYPE = 'Equality'
+    EQUALITY_VALUE = 0
     DELETION_TYPE = 'Deletion'
+    DELETION_VALUE = -1
 
     DIFF_TYPE_LOOKUP = {
-        -1: DELETION_TYPE,
-        0: EQUALITY_TYPE,
-        1: INSERTION_TYPE
+        DELETION_VALUE: DELETION_TYPE,
+        EQUALITY_VALUE: EQUALITY_TYPE,
+        INSERTION_VALUE: INSERTION_TYPE
     }
+
+    INSERTION_STYLE = "<ins style=\"" \
+                      "background:#e6ffe6;" \
+                      "font-size:large;" \
+                      "font-weight:bold;" \
+                      "\">%s</ins>"
+
+    DELETION_STYLE = "<del style=\"" \
+                     "background:#ffe6e6;" \
+                     "font-size:large;" \
+                     "font-weight:bold;" \
+                     "\">%s</del>"
 
     @classmethod
     def from_g_code_program(
@@ -42,11 +57,36 @@ class GCodeDiffer:
         )
 
     def get_html_diff(self):
-        return dmp().diff_prettyHtml(self.get_diff())
+        return self._render_diff_as_html(self.get_diff())
+
+    def _render_diff_as_html(self, diffs):
+        """Convert a diff array into a pretty HTML report"""
+
+        def process_text(text_to_process: str):
+            return (
+                text_to_process.replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;")
+                .replace("\n", "<br>")
+            )
+
+        html = []
+        for (op, data) in diffs:
+            text = process_text(data)
+            if op == self.INSERTION_VALUE:
+                html.append(self.INSERTION_STYLE % text)
+            elif op == self.DELETION_VALUE:
+                html.append(self.DELETION_STYLE % text)
+            elif op == self.EQUALITY_VALUE:
+                html.append("<span>%s</span>" % text)
+        return "".join(html)
 
     def save_html_diff_to_file(self, file_path):
         with open(file_path, 'w') as file:
             file.write(self.get_html_diff())
+
+    def strings_are_equal(self):
+        return self._string_1 == self._string_2
 
     @classmethod
     def get_diff_type(cls, diff_tuple: Tuple[int, str]):

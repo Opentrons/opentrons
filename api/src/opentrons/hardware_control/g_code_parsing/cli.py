@@ -17,6 +17,9 @@ from opentrons.hardware_control.g_code_parsing.protocol_runner import ProtocolRu
 
 class CLICommand(abc.ABC):
     """ABC which all CLI command classes should inherit from"""
+    able_to_respond_with_error_code = False
+    respond_with_error_code = False
+    error_message = 'Error message not defined'
 
     @abc.abstractmethod
     def execute(self) -> str:
@@ -55,6 +58,9 @@ class DiffCommand(CLICommand):
     """The "diff" command of the CLI"""
     file_path_1: str
     file_path_2: str
+    able_to_respond_with_error_code: bool
+    respond_with_error_code = False
+    error_message = 'Compared files are different'
 
     def execute(self) -> str:
         """
@@ -66,7 +72,19 @@ class DiffCommand(CLICommand):
                 open(self.file_path_2, 'r') as file_2:
             file_1_text = '\n'.join(file_1.readlines())
             file_2_text = '\n'.join(file_2.readlines())
-            return GCodeDiffer(file_1_text, file_2_text).get_html_diff()
+
+            differ = GCodeDiffer(file_1_text, file_2_text)
+            strings_equal = differ.strings_are_equal()
+
+            if not strings_equal and self.able_to_respond_with_error_code:
+                self.respond_with_error_code = True
+
+            if not strings_equal:
+                text = differ.get_html_diff()
+            else:
+                text = 'No difference between compared strings'
+
+            return text
 
 
 class GCodeCLI:
@@ -86,6 +104,7 @@ class GCodeCLI:
     DIFF_FILES_COMMAND = 'diff'
     FILE_PATH_1_KEY = 'file_path_1'
     FILE_PATH_2_KEY = 'file_path_2'
+    ERROR_ON_DIFFERENT_FILES = 'error_on_different_files'
     DEFAULT_PIPETTE_CONFIG = SmoothieSettings()
 
     @classmethod
@@ -134,6 +153,9 @@ class GCodeCLI:
             command = DiffCommand(
                 file_path_1=processed_args[cls.FILE_PATH_1_KEY],
                 file_path_2=processed_args[cls.FILE_PATH_2_KEY],
+                able_to_respond_with_error_code=processed_args[
+                    cls.ERROR_ON_DIFFERENT_FILES
+                ]
             )
         else:
             raise UnparsableCLICommandError(
@@ -143,6 +165,7 @@ class GCodeCLI:
 
     def __init__(self):
         self._args = self.parse_args(sys.argv[1:])
+        self._command = self.to_command(self._args)
 
     @classmethod
     def _post_process_args(cls, args: Dict[str, Any]) -> Dict[str, Any]:
@@ -227,6 +250,11 @@ class GCodeCLI:
             cls.DIFF_FILES_COMMAND, help='Diff 2 G-Code files'
         )
         diff_parser.add_argument(
+            f'--{cls.ERROR_ON_DIFFERENT_FILES}',
+            help='If set, return code 1 on files with different content',
+            action='store_true',
+        )
+        diff_parser.add_argument(
             cls.FILE_PATH_1_KEY, type=str, help='Path to first file'
         )
         diff_parser.add_argument(
@@ -240,9 +268,25 @@ class GCodeCLI:
         Method to run passed command line command
         :return: Output of command
         """
-        return self.to_command(self._args).execute()
+        return self._command.execute()
+
+    @property
+    def respond_with_error(self):
+        return self._command.able_to_respond_with_error_code and \
+               self._command.respond_with_error_code
+
+    @property
+    def error_message(self):
+        return self._command.error_message
+
+    @property
+    def args(self):
+        return self._args
 
 
 if __name__ == '__main__':
     cli = GCodeCLI()
     print(cli.run_command())
+
+    if cli.respond_with_error:
+        sys.exit(cli.error_message)

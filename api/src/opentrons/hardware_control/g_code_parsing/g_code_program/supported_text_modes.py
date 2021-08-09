@@ -58,7 +58,8 @@ def default_builder(code: GCode):
     :param code: G-Code object to parse into a string
     :return: Textual description
     """
-    message = f'Code: {code.g_code} {code.g_code_body}\n' \
+    message = f'Device: {code.device_name}\n' \
+              f'Code: {code.g_code} {code.g_code_body}\n' \
               f'Explanation: {code.get_explanation().command_explanation}\n' \
               f'Response: {code.get_explanation().response}' \
               f'\n-----------------------------------------'
@@ -78,7 +79,7 @@ def concise_builder(code: GCode):
     :param code: G-Code object to parse into a string
     :return: Textual description
     """
-    message = f'{code.g_code} {code.g_code_body} -> ' \
+    message = f'{code.device_name}: {code.g_code} {code.g_code_body} -> ' \
               f'{code.get_explanation().command_explanation} -> ' \
               f'{code.get_explanation().response}'\
         .replace('\n', ' ')\
@@ -99,7 +100,7 @@ def g_code_only_builder(code: GCode):
     :param code: G-Code object to parse into a string
     :return: Textual description
     """
-    message = f'{code.g_code_line} -> {code.response}'
+    message = f'{code.device_name}: {code.g_code_line} -> {code.response}'
     return MULTIPLE_SPACE_REGEX.sub(' ', message).strip()
 
 
