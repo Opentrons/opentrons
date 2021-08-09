@@ -159,40 +159,75 @@ g-code-2-modules-1s-1m-v2-protocol-update-s3:
 		source_file_path=$(file_under_test) \
 		object_name='2-modules-1s-1m-v2.txt'
 
-###############################
-# swift_2s_turbo_p20_jan24.py #
-###############################
+##################
+# swift_turbo.py #
+##################
 
-# g-code-swift-2s-turbo-p20-jan24-protocol-run
-#	Description - Run swift_2s_turbo_p20_jan24.py and store the output to /tmp/file_under_test.txt
-.PHONY: g-code-swift-2s-turbo-p20-jan24-protocol-run
-g-code-swift-2s-turbo-p20-jan24-protocol-run:
+# g-code-swift-turbo-protocol-run
+#	Description - Run swift_turbo.py and store the output to /tmp/file_under_test.txt
+.PHONY: g-code-swift-turbo-protocol-run
+g-code-swift-turbo-protocol-run:
 	@$(MAKE) --no-print-directory g-code-run \
 		left_pipette='{"model": "p20_single_v2.0", "id": "P20SV202020070101"}' \
 		right_pipette='{"model": "p300_multi_v2.1", "id": "P20SV202020070101"}' \
-		protocol_path='./tests/opentrons/data/g_code_validation_protocols/swift_2s_turbo_p20_jan24.py' \
+		protocol_path='./tests/opentrons/data/g_code_validation_protocols/swift_turbo.py' \
   		> $(file_under_test)
 
-# g-code-swift-2s-turbo-p20-jan24-protocol-diff
-#	Description - Run swift_2s_turbo_p20_jan24.py and compare it's output to S3 master file. Store the diff to /tmp/diff.html
-.PHONY: g-code-swift-2s-turbo-p20-jan24-protocol-diff
-g-code-swift-2s-turbo-p20-jan24-protocol-diff:
-	@$(MAKE) --no-print-directory g-code-swift-2s-turbo-p20-jan24-protocol-run
+# g-code-swift-turbo-protocol-diff
+#	Description - Run swift_turbo.py and compare it's output to S3 master file. Store the diff to /tmp/diff.html
+.PHONY: g-code-swift-turbo-protocol-diff
+g-code-swift-turbo-protocol-diff:
+	@$(MAKE) --no-print-directory g-code-swift-turbo-protocol-run
 	@$(MAKE) --no-print-directory g-code-s3-pull \
-		object_name='swift-2s-turbo-p20-jan24.txt' \
+		object_name='swift-turbo.txt' \
 		> $(master_file)
 	@$(MAKE) --no-print-directory g-code-diff \
-	> /tmp/swift-2s-turbo-p20-jan24-diff.html
+	> /tmp/swift-turbo-diff.html
 
 
-# g-code-swift-2s-turbo-p20-jan24-protocol-update-s3
-#	Description - Run swift_2s_turbo_p20_jan24.py and override the S3 master file with it's output
-.PHONY: g-code-swift-2s-turbo-p20-jan24-protocol-update-s3
-g-code-swift-2s-turbo-p20-jan24-protocol-update-s3:
-	@$(MAKE) --no-print-directory g-code-swift-2s-turbo-p20-jan24-protocol-run
+# g-code-swift-turbo-protocol-update-s3
+#	Description - Run swift_turbo.py and override the S3 master file with it's output
+.PHONY: g-code-swift-turbo-protocol-update-s3
+g-code-swift-turbo-protocol-update-s3:
+	@$(MAKE) --no-print-directory g-code-swift-turbo-protocol-run
 	@$(MAKE) --no-print-directory g-code-s3-push \
 		source_file_path=$(file_under_test) \
-		object_name='swift-2s-turbo-p20-jan24.txt'
+		object_name='swift-turbo.txt'
+
+##################
+# swift_smoke.py #
+##################
+
+# g-code-swift-smoke-protocol-run
+#	Description - Run swift_smoke.py and store the output to /tmp/file_under_test.txt
+.PHONY: g-code-swift-smoke-protocol-run
+g-code-swift-smoke-protocol-run:
+	@$(MAKE) --no-print-directory g-code-run \
+		left_pipette='{"model": "p20_single_v2.0", "id": "P20SV202020070101"}' \
+		right_pipette='{"model": "p300_multi_v2.1", "id": "P20SV202020070101"}' \
+		protocol_path='./tests/opentrons/data/g_code_validation_protocols/swift_smoke.py' \
+  		> $(file_under_test)
+
+# g-code-swift-smoke-protocol-diff
+#	Description - Run swift_smoke.py and compare it's output to S3 master file. Store the diff to /tmp/diff.html
+.PHONY: g-code-swift-smoke-protocol-diff
+g-code-swift-smoke-protocol-diff:
+	@$(MAKE) --no-print-directory g-code-swift-smoke-protocol-run
+	@$(MAKE) --no-print-directory g-code-s3-pull \
+		object_name='swift-smoke.txt' \
+		> $(master_file)
+	@$(MAKE) --no-print-directory g-code-diff \
+	> /tmp/swift-smoke-diff.html
+
+
+# g-code-swift-smoke-protocol-update-s3
+#	Description - Run swift_smoke.py and override the S3 master file with it's output
+.PHONY: g-code-swift-smoke-protocol-update-s3
+g-code-swift-smoke-protocol-update-s3:
+	@$(MAKE) --no-print-directory g-code-swift-smoke-protocol-run
+	@$(MAKE) --no-print-directory g-code-s3-push \
+		source_file_path=$(file_under_test) \
+		object_name='swift-smoke.txt'
 
 ##########################
 # 2_single_channel_v2.py #
