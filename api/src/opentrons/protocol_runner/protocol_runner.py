@@ -27,6 +27,7 @@ class ProtocolRunner:
     def __init__(
         self,
         protocol_engine: ProtocolEngine,
+        *,
         task_queue: Optional[TaskQueue] = None,
         json_file_reader: Optional[JsonFileReader] = None,
         json_command_translator: Optional[JsonCommandTranslator] = None,

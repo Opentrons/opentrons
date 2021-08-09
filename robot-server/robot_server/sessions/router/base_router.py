@@ -2,10 +2,13 @@
 
 Contains routes dealing primarily with `Session` models.
 """
+import asyncio
 from fastapi import APIRouter, Depends, status
 from datetime import datetime
 from typing import Optional
 from typing_extensions import Literal
+
+from opentrons.protocol_runner import ButtonController
 
 from robot_server.errors import ErrorDetails, ErrorResponse
 from robot_server.service.dependencies import get_current_time, get_unique_id
@@ -29,7 +32,7 @@ from ..session_view import SessionView
 from ..session_models import Session, ProtocolSessionCreateData
 from ..schema_models import CreateSessionRequest, SessionResponse
 from ..engine_store import EngineStore, EngineConflictError
-from ..dependencies import get_session_store, get_engine_store
+from ..dependencies import get_session_store, get_engine_store, get_button_controller
 
 base_router = APIRouter()
 
@@ -68,6 +71,7 @@ async def create_session(
     session_store: SessionStore = Depends(get_session_store),
     engine_store: EngineStore = Depends(get_engine_store),
     protocol_store: ProtocolStore = Depends(get_protocol_store),
+    button_controller: ButtonController = Depends(get_button_controller),
     session_id: str = Depends(get_unique_id),
     created_at: datetime = Depends(get_current_time),
     task_runner: TaskRunner = Depends(TaskRunner),
@@ -80,6 +84,7 @@ async def create_session(
         session_store: Session storage interface.
         engine_store: ProtocolEngine storage and control.
         protocol_store: Protocol resource storage.
+        button_controller: Run control via button presses.
         session_id: Generated ID to assign to the session.
         created_at: Timestamp to attach to created session.
         task_runner: Background task runner.
@@ -107,6 +112,12 @@ async def create_session(
                 file_path=protocol_resource.files[0],
             )
             engine_store.runner.load(protocol_file)
+
+        task_runner.run(
+            button_controller.control,
+            protocol_runner=engine_store.runner,
+            protocol_engine=engine_store.engine,
+        )
 
         # TODO(mc, 2021-08-05): capture errors from `runner.join` and place
         # them in the session resource

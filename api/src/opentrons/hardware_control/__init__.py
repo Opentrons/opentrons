@@ -22,11 +22,13 @@ from .constants import DROP_TIP_RELEASE_DISTANCE
 from .thread_manager import ThreadManager
 from .execution_manager import ExecutionManager
 from .threaded_async_lock import ThreadedAsyncLock, ThreadedAsyncForbidden
+from .button_watcher import ButtonWatcher, ButtonEvent
 
 __all__ = [
     'API', 'Controller', 'Simulator', 'Pipette', 'PauseManager',
     'SynchronousAdapter', 'HardwareAPILike', 'CriticalPoint',
     'NoTipAttachedError', 'TipAttachedError', 'DROP_TIP_RELEASE_DISTANCE',
     'ThreadManager', 'ExecutionManager', 'ExecutionState',
-    'ExecutionCancelledError', 'ThreadedAsyncLock', 'ThreadedAsyncForbidden'
+    'ExecutionCancelledError', 'ThreadedAsyncLock', 'ThreadedAsyncForbidden',
+    "ButtonWatcher", "ButtonEvent"
 ]

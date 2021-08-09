@@ -1,5 +1,5 @@
 """ProtocolEngine class definition."""
-from typing import Optional
+from typing import Any, Callable, Optional, TypeVar
 from opentrons.hardware_control import API as HardwareAPI
 
 from .resources import ModelUtils
@@ -14,6 +14,9 @@ from .state import (
     StopAction,
     UpdateCommandAction,
 )
+
+
+ReturnT = TypeVar("ReturnT")
 
 
 class ProtocolEngine:
@@ -146,3 +149,29 @@ class ProtocolEngine:
             await self._queue_worker.join()
         finally:
             await self._hardware_api.stop(home_after=False)
+
+    async def wait_for(
+        self,
+        condition: Callable[..., Optional[ReturnT]],
+        *args: Any,
+        **kwargs: Any,
+    ) -> ReturnT:
+        """Wait for a condition to become true, checking whenever state changes.
+
+        !!! Warning:
+            Callers should not interact with a ProtocolEngine directly after a
+            `wait_for`, as it may interfere with other subscribers.
+
+        Arguments:
+            condition: A function that may return a truthy value
+            *args: Positional arguments to pass to `condition`
+            **kwargs: Named arguments to pass to `condition`
+
+        Returns:
+            The truthy value returned by the `condition` function.
+        """
+        return await self._state_store.wait_for(
+            condition=condition,
+            *args,
+            **kwargs,
+        )

@@ -8,6 +8,8 @@ from fastapi.testclient import TestClient
 from httpx import AsyncClient
 from typing import AsyncIterator
 
+from opentrons.protocol_runner import ButtonController
+
 from robot_server.errors import exception_handlers
 from robot_server.service.dependencies import get_current_time, get_unique_id
 from robot_server.service.task_runner import TaskRunner
@@ -15,7 +17,11 @@ from robot_server.protocols import ProtocolStore, get_protocol_store
 from robot_server.sessions.session_view import SessionView
 from robot_server.sessions.session_store import SessionStore
 from robot_server.sessions.engine_store import EngineStore
-from robot_server.sessions.dependencies import get_session_store, get_engine_store
+from robot_server.sessions.dependencies import (
+    get_session_store,
+    get_engine_store,
+    get_button_controller,
+)
 
 
 @pytest.fixture
@@ -49,12 +55,19 @@ def engine_store(decoy: Decoy) -> EngineStore:
 
 
 @pytest.fixture
+def button_controller(decoy: Decoy) -> ButtonController:
+    """Get a mock ButtonController interface."""
+    return decoy.mock(cls=ButtonController)
+
+
+@pytest.fixture
 def app(
     task_runner: TaskRunner,
     session_store: SessionStore,
     session_view: SessionView,
     engine_store: EngineStore,
     protocol_store: ProtocolStore,
+    button_controller: ButtonController,
     unique_id: str,
     current_time: datetime,
 ) -> FastAPI:
@@ -65,6 +78,7 @@ def app(
     app.dependency_overrides[get_session_store] = lambda: session_store
     app.dependency_overrides[get_engine_store] = lambda: engine_store
     app.dependency_overrides[get_protocol_store] = lambda: protocol_store
+    app.dependency_overrides[get_button_controller] = lambda: button_controller
     app.dependency_overrides[get_unique_id] = lambda: unique_id
     app.dependency_overrides[get_current_time] = lambda: current_time
 

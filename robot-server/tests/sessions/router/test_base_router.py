@@ -9,6 +9,8 @@ from pathlib import Path
 
 from tests.helpers import verify_response
 
+from opentrons.protocol_runner import ButtonController
+
 from robot_server.service.task_runner import TaskRunner
 
 from robot_server.protocols import (
@@ -56,6 +58,7 @@ async def test_create_session(
     session_view: SessionView,
     session_store: SessionStore,
     engine_store: EngineStore,
+    button_controller: ButtonController,
     unique_id: str,
     current_time: datetime,
     async_client: AsyncClient,
@@ -98,6 +101,11 @@ async def test_create_session(
     decoy.verify(
         await engine_store.create(),
         task_runner.run(engine_store.runner.join),
+        task_runner.run(
+            func=button_controller.control,
+            protocol_runner=engine_store.runner,
+            protocol_engine=engine_store.engine,
+        ),
         session_store.upsert(session=session),
     )
 

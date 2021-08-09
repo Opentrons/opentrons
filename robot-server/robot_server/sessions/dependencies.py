@@ -4,18 +4,18 @@ from starlette.datastructures import State
 from typing import cast
 
 from opentrons.hardware_control import ThreadManager, API as HardwareAPI
+from opentrons.protocol_runner import ButtonController
 
 from robot_server.service.dependencies import get_app_state, get_hardware
 
 from .engine_store import EngineStore
 from .session_store import SessionStore
 
-
 _SESSION_STORE_KEY = "session_store"
 _ENGINE_STORE_KEY = "engine_store"
 
 
-def get_session_store(state: State = Depends(get_app_state)) -> SessionStore:
+async def get_session_store(state: State = Depends(get_app_state)) -> SessionStore:
     """Get a singleton SessionStore to keep track of created sessions."""
     session_store = getattr(state, _SESSION_STORE_KEY, None)
 
@@ -26,7 +26,7 @@ def get_session_store(state: State = Depends(get_app_state)) -> SessionStore:
     return session_store
 
 
-def get_engine_store(
+async def get_engine_store(
     state: State = Depends(get_app_state),
     hardware: ThreadManager = Depends(get_hardware),
 ) -> EngineStore:
@@ -38,3 +38,10 @@ def get_engine_store(
         setattr(state, _ENGINE_STORE_KEY, engine_store)
 
     return engine_store
+
+
+async def get_button_controller(
+    hardware_api: ThreadManager = Depends(get_hardware),
+) -> ButtonController:
+    """Get a ButtonController wired to the HardwareAPI."""
+    return ButtonController(hardware_api=cast(HardwareAPI, hardware_api))

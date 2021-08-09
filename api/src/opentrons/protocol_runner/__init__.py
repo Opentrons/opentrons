@@ -5,5 +5,6 @@ protocol_runner.py for more details.
 """
 from .protocol_runner import ProtocolRunner
 from .protocol_file import ProtocolFile, ProtocolFileType
+from .button_controller import ButtonController
 
-__all__ = ["ProtocolRunner", "ProtocolFile", "ProtocolFileType"]
+__all__ = ["ProtocolRunner", "ProtocolFile", "ProtocolFileType", "ButtonController"]
