@@ -24,7 +24,7 @@ def run(protocol_context):
     magdeck = protocol_context.load_module('magneticModuleV2', '1')
     mag_plate = magdeck.load_labware('nest_96_wellplate_2ml_deep')
 
-    tempdeck = protocol_context.load_module('Temperature Module', '4')
+    tempdeck = protocol_context.load_module('temperatureModuleV2', '4')
     cool_reagents = tempdeck.load_labware(
         'opentrons_24_aluminumblock_generic_2ml_screwcap')
 

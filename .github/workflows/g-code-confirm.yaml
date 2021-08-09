@@ -64,26 +64,26 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.S3_APP_DEPLOY_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_APP_DEPLOY_SECRET }}
           AWS_DEFAULT_REGION: us-east-2
-        run: make -C api g-code-swift-2s-smoke-p20-jan24-protocol-diff
+        run: make -C api g-code-swift-smoke-protocol-diff
       - name: "Save Generated Diff - Swift Smoke"
         if: always()
         uses: actions/upload-artifact@v2
         with:
-          name: g-code-swift-2s-smoke-p20-jan24-protocol-diff
-          path: /tmp/swift-2s-smoke-p20-jan24-diff.html
+          name: g-code-swift-smoke-protocol-diff
+          path: /tmp/swift-smoke-diff.html
 
       - name: 'Run & Compare to S3 - Swift Turbo'
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.S3_APP_DEPLOY_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_APP_DEPLOY_SECRET }}
           AWS_DEFAULT_REGION: us-east-2
-        run: make -C api g-code-swift-2s-turbo-p20-jan24-protocol-diff
+        run: make -C api g-code-swift-turbo-protocol-diff
       - name: "Save Generated Diff - Swift Turbo"
         if: always()
         uses: actions/upload-artifact@v2
         with:
-          name: g-code-swift-2s-turbo-p20-jan24-protocol-diff
-          path: /tmp/swift-2s-turbo-p20-jan24-diff.html
+          name: g-code-swift-turbo-protocol-diff
+          path: /tmp/swift-turbo-diff.html
 
       - name: 'Run & Compare to S3 - 2 Single Channel Pipettes V2'
         env:
