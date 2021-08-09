@@ -26,7 +26,7 @@ from .router import router
 from .service import initialize_logging
 from . import constants
 from . import slow_initializing
-from . import hardware_wrapper
+from . import hardware_initialization
 
 
 async def _make_event_publisher() -> notify_server_publisher.Publisher:
@@ -77,7 +77,7 @@ async def on_startup() -> None:
     """Handle app startup."""
     initialize_logging()
     # Initialize api
-    factory = partial(hardware_wrapper.initialize, _make_event_publisher())
+    factory = partial(hardware_initialization.initialize, _make_event_publisher())
     app.state.hardware = slow_initializing.start_initializing(factory)
 
 
