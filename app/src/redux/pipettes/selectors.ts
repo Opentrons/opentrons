@@ -340,8 +340,16 @@ export const getProtocolPipetteCalibrationInfo: (
 ) => ProtocolPipetteCalibrationsByMount = createSelector(
   getProtocolLabwareData,
   getProtocolPipettesMatch,
+  getAttachedPipettes,
   getAttachedPipetteCalibrations,
-  (protocolLabwareData, protocolPipetteMatch, attachedPipetteCalibrations) => {
+  getTipLengthCalibrations,
+  (
+    protocolLabwareData,
+    protocolPipetteMatch,
+    attachedPipettes,
+    attachedPipetteCalibrations,
+    tipLengthCalibrations
+  ) => {
     return Constants.PIPETTE_MOUNTS.reduce<ProtocolPipetteCalibrationsByMount>(
       (result, mount) => {
         const protocolPipette = protocolLabwareData?.find(pipette => {
@@ -358,10 +366,10 @@ export const getProtocolPipetteCalibrationInfo: (
             lastModifiedDate: null,
             tipRacks: [],
           }
-          if (
+          const pipetteMatch =
             protocolPipetteMatch[mount] === Constants.INEXACT_MATCH ||
             protocolPipetteMatch[mount] === Constants.MATCH
-          ) {
+          if (pipetteMatch) {
             // why is this type error happening? I set result[mount] above
             result[mount].lastModifiedDate =
               attachedPipetteCalibrations[mount].offset?.lastModified
@@ -369,12 +377,14 @@ export const getProtocolPipetteCalibrationInfo: (
 
           protocolPipette?.tipRackDefs.forEach(tipRackDef => {
             let lastTiprackDate = null
+            const tipRackMatch = tipLengthCalibrations.find(
+              tipRack => tipRack.uri === getLabwareDefURI(tipRackDef)
+            )
             if (
-              getLabwareDefURI(tipRackDef) ===
-              attachedPipetteCalibrations[mount].tipLength?.uri
+              tipRackMatch?.pipette === attachedPipettes[mount]?.id &&
+              pipetteMatch
             ) {
-              lastTiprackDate =
-                attachedPipetteCalibrations[mount].tipLength?.lastModified
+              lastTiprackDate = tipRackMatch?.lastModified
             }
             result[mount]?.tipRacks.push({
               displayName: tipRackDef.metadata.displayName,

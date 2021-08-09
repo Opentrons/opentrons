@@ -243,7 +243,7 @@ export const getProtocolLabwareData: (
     if (protocolData == null || !('commands' in protocolData)) {
       return null
     }
-    const { pipettes, labwareDefinitions, commands } = protocolData
+    const { pipettes, labware, labwareDefinitions, commands } = protocolData
     const tipRackCommands = commands.filter(
       commandObject => commandObject.command === 'pickUpTip'
     )
@@ -264,7 +264,7 @@ export const getProtocolLabwareData: (
       }
     })
 
-    const [tipRacks] = partition(
+    const [tipRackDefinitions] = partition(
       labwareDefinitions,
       lw => lw.parameters.isTiprack
     )
@@ -275,10 +275,10 @@ export const getProtocolLabwareData: (
           'pipette' in command.params &&
           pipette.pipetteKey === command.params.pipette
         ) {
-          const tipRackDefinition = tipRacks.find(tipRack =>
-            'labware' in command.params
-              ? command.params.labware.includes(tipRack.parameters.loadName)
-              : null
+          const tipRack = labware[command.params.labware]
+          const tipRackDefinition = tipRackDefinitions.find(
+            tipRackDef =>
+              tipRackDef.metadata.displayName === tipRack.displayName
           )
           if (tipRackDefinition !== undefined) {
             pipette.tipRackDefs.push(tipRackDefinition)

@@ -1,6 +1,9 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Trans, useTranslation } from 'react-i18next'
+import { useTranslation } from 'react-i18next'
+import { getPipetteNameSpecs } from '@opentrons/shared-data'
+import uniq from 'lodash/uniq'
+import partition from 'lodash/partition'
 
 import { Text, SPACING_3 } from '@opentrons/components'
 
@@ -8,6 +11,8 @@ import type { Dispatch, State } from '../../../../redux/types'
 import type { ViewableRobot } from '../../../../redux/discovery/types'
 import * as PipetteOffset from '../../../../redux/calibration/pipette-offset'
 import * as Pipettes from '../../../../redux/pipettes'
+import * as Protocol from '../../../../redux/protocol'
+
 import * as PipetteConstants from '../../../../redux/pipettes/constants'
 import * as TipLength from '../../../../redux/calibration/tip-length'
 import { DeckCalibration } from './DeckCalibration'
@@ -33,7 +38,7 @@ export function RobotCalibrationStep(props: Props): JSX.Element {
   const protocolPipetteData = useSelector((state: State) => {
     return Pipettes.getProtocolPipetteCalibrationInfo(state, robotName)
   })
-  console.log(protocolPipetteData)
+
   return (
     <>
       <DeckCalibration robotName={robotName} />
@@ -51,12 +56,12 @@ export function RobotCalibrationStep(props: Props): JSX.Element {
               <div key={pipetteData.lastModified}>
                 <span>
                   {mount}
-                  {` ${t('mount_title')}: `}
+                  {` ${t('mount_title')} `}
                   {pipetteData.pipetteDisplayName}
                 </span>
                 {attached && pipetteData.lastModifiedDate !== null ? (
                   <div>
-                    {`${t('last_calibrated')} `}
+                    {`${t('last_calibrated')}: `}
                     {formatLastModified(pipetteData.lastModifiedDate)}
                   </div>
                 ) : (
@@ -74,20 +79,20 @@ export function RobotCalibrationStep(props: Props): JSX.Element {
             return null
           } else {
             return (
-              <div key={pipetteData.pipetteDisplayName}>
+              <div key={mount}>
                 <span>{pipetteData.pipetteDisplayName}</span>
-                {pipetteData.tipRacks.map(tiprack => (
-                  <>
-                    <div key={tiprack.displayName}>{tiprack.displayName}</div>
-                    {tiprack.lastModifiedDate !== null ? (
+                {pipetteData.tipRacks.map(tipRack => (
+                  <div key={tipRack.displayName}>
+                    <div>{tipRack.displayName}</div>
+                    {tipRack.lastModifiedDate !== null ? (
                       <span>
-                        {`${t('last_calibrated')} `}
-                        {formatLastModified(tiprack.lastModifiedDate)}
+                        {`${t('last_calibrated')}: `}
+                        {formatLastModified(tipRack.lastModifiedDate)}
                       </span>
                     ) : (
                       <span>{t('not_calibrated')}</span>
                     )}
-                  </>
+                  </div>
                 ))}
               </div>
             )
