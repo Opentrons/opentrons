@@ -80,6 +80,9 @@ async def on_startup() -> None:
     initialize_logging()
     # Initialize api
     factory = partial(hardware_initialization.initialize, _make_event_publisher())
+    # fixme(mm, 2021-08-09): We will also need to shut down the hardware
+    # object on server shutdown, or we could leak threads from
+    # ThreadManager.
     app.state.hardware = slow_initializing.start_initializing(factory)
 
 
