@@ -10,7 +10,7 @@ from starlette.requests import Request
 
 from opentrons.hardware_control import ThreadManager, ThreadedAsyncLock
 
-from robot_server import constants, util, errors
+from robot_server import app, constants, util, errors
 from robot_server.service.session.manager import SessionManager
 from robot_server.service.protocol.manager import ProtocolManager
 from robot_server.service.legacy.rpc import RPCServer
@@ -29,13 +29,18 @@ class OutdatedApiVersionResponse(errors.ErrorDetails):
     )
 
 
-async def get_app_state(request: Request) -> State:
+async def get_app_state() -> State:
     """Get the Starlette application's state from the framework.
 
     See https://www.starlette.io/applications/#storing-state-on-the-app-instance
     for more details.
     """
-    return request.app.state
+
+    # Ideally, we would access the app state through request.app.state. However,
+    # this function might be depended upon by a WebSocket endpoint, and current FastAPI
+    # (v0.54.1) raises runtime errors when trying to resolve the built-in `request`
+    # dependency for WebSocket endpoints.
+    return app.app.state
 
 
 async def get_hardware(state: State = Depends(get_app_state)) -> ThreadManager:
