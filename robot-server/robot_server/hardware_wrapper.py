@@ -4,7 +4,6 @@
 import logging
 from functools import partial
 from pathlib import Path
-from typing import Optional
 
 from opentrons import ThreadManager, initialize as initialize_api
 from opentrons.hardware_control.simulator_setup import load_simulator
@@ -47,11 +46,8 @@ async def _init_event_watchers(
     event_publisher: Publisher,
 ) -> None:
     """Register the publisher callbacks with the hw thread manager."""
-
     log.info("Starting hardware-event-notify publisher")
-    thread_manager.register_callback(
-        partial(_publish_hardware_event, event_publisher)
-    )
+    thread_manager.register_callback(partial(_publish_hardware_event, event_publisher))
 
 
 def _publish_hardware_event(
@@ -67,4 +63,3 @@ def _publish_hardware_event(
     event_publisher.send_nowait(
         topic, event.Event(createdOn=utc_now(), publisher=publisher, data=payload)
     )
-

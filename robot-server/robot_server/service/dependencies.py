@@ -11,13 +11,10 @@ from starlette.requests import Request
 from opentrons.hardware_control import ThreadManager, ThreadedAsyncLock
 
 from robot_server import constants, util, errors
-from robot_server.hardware_wrapper import HardwareWrapper
 from robot_server.service.session.manager import SessionManager
 from robot_server.service.protocol.manager import ProtocolManager
 from robot_server.service.legacy.rpc import RPCServer
-
-from notify_server.clients import publisher
-from notify_server.settings import Settings as NotifyServerSettings
+from robot_server.slow_initializing import InitializationOngoingError, SlowInitializing
 
 
 class OutdatedApiVersionResponse(errors.ErrorDetails):
@@ -32,38 +29,25 @@ class OutdatedApiVersionResponse(errors.ErrorDetails):
     )
 
 
-@util.call_once
-async def get_event_publisher() -> publisher.Publisher:
-    """A dependency creating a single notify-server event
-    publisher instance."""
-    notify_server_settings = NotifyServerSettings()
-    event_publisher = publisher.create(
-        notify_server_settings.publisher_address.connection_string()
-    )
-    return event_publisher
+async def get_app_state(request: Request) -> State:
+    """Get the Starlette application's state from the framework.
+
+    See https://www.starlette.io/applications/#storing-state-on-the-app-instance
+    for more details.
+    """
+    return request.app.state
 
 
-@util.call_once
-async def get_hardware_wrapper(
-    event_publisher: publisher.Publisher = Depends(get_event_publisher),
-) -> HardwareWrapper:
-    """Get the single HardwareWrapper instance."""
-    return HardwareWrapper(event_publisher=event_publisher)
-
-
-async def get_hardware(
-    api_wrapper: HardwareWrapper = Depends(get_hardware_wrapper),
-) -> ThreadManager:
+async def get_hardware(state: State = Depends(get_app_state)) -> ThreadManager:
     """Hardware dependency"""
-    hardware = api_wrapper.get_hardware()
-
-    if hardware is None:
+    slow_initializing_hardware: SlowInitializing[ThreadManager] = state.hardware
+    try:
+        return slow_initializing_hardware.get_if_ready()
+    except InitializationOngoingError:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="Robot motor controller is not ready.",
-        )
-
-    return hardware
+        ) from None
 
 
 @util.call_once
@@ -130,15 +114,6 @@ async def check_version_header(
     else:
         # Attach the api version to request's state dict
         request.state.api_version = min(requested_version, constants.API_VERSION)
-
-
-def get_app_state(request: Request) -> State:
-    """Get the Starlette application's state from the framework.
-
-    See https://www.starlette.io/applications/#storing-state-on-the-app-instance
-    for more details.
-    """
-    return request.app.state
 
 
 def get_unique_id() -> str:

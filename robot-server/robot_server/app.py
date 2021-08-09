@@ -1,4 +1,7 @@
 """Main FastAPI application."""
+
+
+from functools import partial
 import logging
 
 from opentrons import __version__
@@ -8,10 +11,13 @@ from starlette.responses import Response
 from starlette.requests import Request
 from starlette.middleware.base import RequestResponseEndpoint
 
+from notify_server.clients import publisher as notify_server_publisher
+from notify_server.settings import Settings as NotifyServerSettings
+
+
 from .service.dependencies import (
     get_rpc_server,
     get_protocol_manager,
-    get_hardware_wrapper,
     get_session_manager,
 )
 
@@ -19,9 +25,20 @@ from .errors import exception_handlers
 from .router import router
 from .service import initialize_logging
 from . import constants
+from . import slow_initializing
+from . import hardware_wrapper
+
+
+async def _make_event_publisher() -> notify_server_publisher.Publisher:
+    """Create a notify-server event publisher instance."""
+    notify_server_settings = NotifyServerSettings()
+    event_publisher = notify_server_publisher.create(
+        notify_server_settings.publisher_address.connection_string()
+    )
+    return event_publisher
+
 
 log = logging.getLogger(__name__)
-
 
 app = FastAPI(
     title="Opentrons OT-2 HTTP API Spec",
@@ -60,7 +77,8 @@ async def on_startup() -> None:
     """Handle app startup."""
     initialize_logging()
     # Initialize api
-    (await get_hardware_wrapper()).async_initialize()
+    factory = partial(hardware_wrapper.initialize, _make_event_publisher())
+    app.state.hardware = slow_initializing.start_initializing(factory)
 
 
 @app.on_event("shutdown")
