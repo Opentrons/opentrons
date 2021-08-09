@@ -103,6 +103,7 @@ def diff_expected_args():
     return [
         {
             'command': 'diff',
+            'error_on_different_files': False,
             'file_path_1': DIFF_FILE_PATH_1,
             'file_path_2': DIFF_FILE_PATH_2
         }
