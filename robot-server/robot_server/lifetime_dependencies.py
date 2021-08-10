@@ -1,21 +1,21 @@
 """Dependencies (in the FastAPI sense) that last for the lifetime of the server.
 
-App dependencies are created when the server starts, before it responds to any requests,
-and are cleaned up when the server shuts down. This is as opposed to normal FastAPI
-dependencies, which are created on-demand when a request needs them, and are cleaned up
-after the response is sent.
+Lifetime dependencies are created when the server starts, before it responds to any
+requests, and are cleaned up when the server shuts down, after it stops responding to
+requests. This is unlike normal FastAPI dependencies, which are created on-demand when a
+request needs them, and are cleaned up after the response is sent.
 
-Something should be an app dependency when any of the following are true:
+Something should be a lifetime dependency when any of the following are true:
 
 * We want to initialize it, or start initializing it, as soon as the server starts up.
 * We need to clean it up when the server shuts down. Note that because we support hot
-  reloading, we do need to explicitly clean up most resources: we can't rely on things
+  reloading, we do need to explicitly clean up most resources; we can't rely on things
   automatically getting cleaned up when the process ends.
 * It's a prerequisite for a different dependency, and that different dependency is
-  an app dependency.
+  a lifetime dependency.
 
-This module is a stopgap until FastAPI has built-in support for dependencies like this.
-See, for example:
+This module is a stopgap until FastAPI has some kind of built-in support for lifetime
+dependencies. Possibly good tickets to track:
 
 * https://github.com/tiangolo/fastapi/issues/617
 * https://github.com/tiangolo/fastapi/pull/3516
