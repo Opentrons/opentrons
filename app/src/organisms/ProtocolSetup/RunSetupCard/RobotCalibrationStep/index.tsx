@@ -1,9 +1,6 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { getPipetteNameSpecs } from '@opentrons/shared-data'
-import uniq from 'lodash/uniq'
-import partition from 'lodash/partition'
 
 import { Text, SPACING_3 } from '@opentrons/components'
 
@@ -11,7 +8,6 @@ import type { Dispatch, State } from '../../../../redux/types'
 import type { ViewableRobot } from '../../../../redux/discovery/types'
 import * as PipetteOffset from '../../../../redux/calibration/pipette-offset'
 import * as Pipettes from '../../../../redux/pipettes'
-import * as Protocol from '../../../../redux/protocol'
 
 import * as PipetteConstants from '../../../../redux/pipettes/constants'
 import * as TipLength from '../../../../redux/calibration/tip-length'

@@ -264,11 +264,6 @@ export const getProtocolLabwareData: (
       }
     })
 
-    const [tipRackDefinitions] = partition(
-      labwareDefinitions,
-      lw => lw.parameters.isTiprack
-    )
-
     pipetteData.forEach(pipette => {
       tipRackCommands.forEach(command => {
         if (
@@ -276,7 +271,7 @@ export const getProtocolLabwareData: (
           pipette.pipetteKey === command.params.pipette
         ) {
           const tipRack = labware[command.params.labware]
-          const tipRackDefinition = tipRackDefinitions[tipRack.definitionId]
+          const tipRackDefinition = labwareDefinitions[tipRack.definitionId]
           if (tipRackDefinition !== undefined) {
             pipette.tipRackDefs.push(tipRackDefinition)
           }

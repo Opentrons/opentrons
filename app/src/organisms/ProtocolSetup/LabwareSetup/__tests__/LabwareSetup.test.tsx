@@ -12,7 +12,7 @@ import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fi
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components/__utils__'
-import { i18n } from '../../../../../i18n'
+import { i18n } from '../../../../i18n'
 import { LabwareSetup } from '..'
 import { LabwareSetupModal } from '../LabwareSetupModal'
 import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
