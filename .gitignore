@@ -120,6 +120,10 @@ calibrations/
 # recent versions of setuptools create pyproject.toml automatically
 # we're ignoring the file for now to avoid confusion
 api/pyproject.toml
+robot-server/pyproject.toml
+update-server/pyproject.toml
+notify-server/pyproject.toml
+shared-data/python/pyproject.toml
 
 # typescript incremental files
 *.tsbuildinfo

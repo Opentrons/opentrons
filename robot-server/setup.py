@@ -50,13 +50,16 @@ KEYWORDS = ["robots", "protocols", "synbio", "pcr", "automation", "lab"]
 DESCRIPTION = "A server providing access to the Opentrons API"
 PACKAGES = find_packages(where=".", exclude=["tests.*", "tests"])
 INSTALL_REQUIRES = [
+    f"opentrons=={VERSION}",
+    f"opentrons-notify-server=={VERSION}",
+    f"opentrons-shared-data=={VERSION}",
+    "anyio==3.3.0",
     "fastapi==0.54.1",
-    "python-multipart==0.0.5",
-    "uvicorn==0.11.3",
-    "python-dotenv",
-    "opentrons",
-    "wsproto==0.15.0",
-    "typing-extensions>=3.7.4.3",
+    "python-dotenv==0.19.0",
+    "pydantic==1.4",
+    "typing-extensions==3.10.0.0",
+    "uvicorn==0.14.0",
+    "wsproto==1.0.0",
 ]
 
 

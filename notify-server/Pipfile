@@ -7,12 +7,14 @@ verify_ssl = true
 python_version = "3.7"
 
 [packages]
-pyzmq = "==19.*,>=19.0.2"
+opentrons = {editable = true, path = "../api"}
+opentrons-shared-data = {editable = true, path = "../shared-data/python"}
 pydantic = "==1.4"
-opentrons = {editable = true, path = "./../api"}
-opentrons-shared-data = {editable = true, path = "./../shared-data/python"}
+pyzmq = "==19.*,>=19.0.2"
+typing-extensions = "==3.10.0.0"
 
 [dev-packages]
+opentrons-notify-server = {editable = true, path = "."}
 flake8 = "==3.*,>=3.8.4"
 flake8-annotations = "==2.*,>=2.4.1"
 flake8-docstrings = "==1.*,>=1.5.0"
@@ -20,5 +22,5 @@ mock = "==4.*,>=4.0.2"
 mypy = "==0.800"
 pytest = "==6.*,>=6.1.0"
 pytest-cov = "==2.*,<2.11.0"
-pytest-watch = "==4.*,>=4.2.0"
-pytest-asyncio = "*"
+pytest-asyncio = "==0.15.1"
+pytest-xdist = "~=2.2.1"

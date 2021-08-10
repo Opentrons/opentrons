@@ -114,7 +114,7 @@ DESCRIPTION = (
     "opentrons package")
 PACKAGES = find_packages(where='.', exclude=['tests'])
 INSTALL_REQUIRES = [
-    'jsonschema>=3.0.2,<4',
+    'jsonschema==3.0.2',
 ]
 
 
