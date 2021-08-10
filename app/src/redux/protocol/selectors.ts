@@ -276,10 +276,7 @@ export const getProtocolLabwareData: (
           pipette.pipetteKey === command.params.pipette
         ) {
           const tipRack = labware[command.params.labware]
-          const tipRackDefinition = tipRackDefinitions.find(
-            tipRackDef =>
-              tipRackDef.metadata.displayName === tipRack.displayName
-          )
+          const tipRackDefinition = tipRackDefinitions[tipRack.definitionId]
           if (tipRackDefinition !== undefined) {
             pipette.tipRackDefs.push(tipRackDefinition)
           }
