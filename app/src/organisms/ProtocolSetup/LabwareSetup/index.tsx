@@ -3,6 +3,7 @@ import map from 'lodash/map'
 import { NavLink } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
+  Btn,
   Flex,
   LabwareRender,
   Link,
@@ -31,6 +32,8 @@ import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_stand
 import { ModuleTag } from './ModuleTag'
 import { LabwareInfoOverlay } from './LabwareInfoOverlay'
 import { LabwareSetupModal } from './LabwareSetupModal'
+import { getModuleTypesThatRequireExtraAttention } from './utils/getModuleTypesThatRequireExtraAttention'
+import { ExtraAttentionWarning } from './ExtraAttentionWarning'
 import styles from './styles.css'
 
 import type { CoordinatesByModuleModel } from './utils/getModuleRenderCoords'
@@ -55,6 +58,10 @@ const DECK_MAP_VIEWBOX = '-80 -100 550 560'
 
 export const LabwareSetup = (props: LabwareSetupProps): JSX.Element | null => {
   const { moduleRenderCoords, labwareRenderCoords } = props
+  const moduleModels = map(moduleRenderCoords, ({ moduleModel }) => moduleModel)
+  const moduleTypesThatRequireExtraAtention = getModuleTypesThatRequireExtraAttention(
+    moduleModels
+  )
   const proceedToRunDisabled = false
   const proceedToRunDisabledReason = 'replace with actual tooltip text'
   const LinkComponent = proceedToRunDisabled ? 'button' : NavLink
@@ -78,7 +85,8 @@ export const LabwareSetup = (props: LabwareSetupProps): JSX.Element | null => {
         borderRadius="6px"
         flexDirection={DIRECTION_COLUMN}
       >
-        <Link
+        <Btn
+          as={Link}
           fontSize={FONT_SIZE_BODY_1}
           color={C_BLUE}
           alignSelf={ALIGN_FLEX_END}
@@ -86,7 +94,12 @@ export const LabwareSetup = (props: LabwareSetupProps): JSX.Element | null => {
           data-test={'LabwareSetup_helpLink'}
         >
           {t('labware_help_link_title')}
-        </Link>
+        </Btn>
+        {moduleTypesThatRequireExtraAtention.length > 0 && (
+          <ExtraAttentionWarning
+            moduleTypes={moduleTypesThatRequireExtraAtention}
+          />
+        )}
         <RobotWorkSpace
           deckDef={standardDeckDef as any}
           viewBox={DECK_MAP_VIEWBOX}

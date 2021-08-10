@@ -11,7 +11,6 @@ import {
   FONT_WEIGHT_REGULAR,
   FONT_WEIGHT_SEMIBOLD,
   SPACING_1,
-  SPACING_2,
   C_WHITE,
   OVERLAY_BLACK_90,
   DISPLAY_FLEX,
@@ -31,7 +30,7 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element => {
     <Box
       flexDirection={'column'}
       backgroundColor={OVERLAY_BLACK_90}
-      borderRadius={`0 0 ${SPACING_2} ${SPACING_2}`}
+      borderRadius={`0 0 0.4rem 0.4rem`}
       fontSize={'0.5rem'}
       color={C_WHITE}
     >
