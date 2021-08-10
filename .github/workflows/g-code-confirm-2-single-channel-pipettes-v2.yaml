@@ -1,4 +1,4 @@
-name: G-Code-Confirm
+name: "G-Code-Confirm (2 Single Channel Pipettes V2)"
 
 on:
   # Run on any change to the api directory
@@ -18,9 +18,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  # This workflow contains a single job called "build"
   confirm-g-code:
-    name: 'Confirm G-Code'
+    name: 'Confirm G-Code (2 Single Channel Pipettes V2)'
     runs-on: 'ubuntu-18.04'
     steps:
       - uses: 'actions/checkout@v2'
@@ -33,15 +32,17 @@ jobs:
       - uses: './.github/actions/python/setup'
         with:
           project: 'api'
-      - name: 'Basic Smoothie'
+
+      - name: 'Run & Compare to S3'
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.S3_APP_DEPLOY_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_APP_DEPLOY_SECRET }}
           AWS_DEFAULT_REGION: us-east-2
-        run: make -C api g-code-smoothie-protocol-diff
-      - name: Archive Smoothie Artifacts
+        run: make -C api g-code-2-single-channel-v2-protocol-diff
+
+      - name: "Save Generated Diff"
         if: always()
         uses: actions/upload-artifact@v2
         with:
-          name: smoothie-protocol-diff
-          path: /tmp/smoothie-diff.html
+          name: g-code-2-single-channel-v2-protocol-diff
+          path: /tmp/2-single-channel-v2-diff.html
