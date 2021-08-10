@@ -1,3 +1,4 @@
+# flake8: noqa
 metadata = {"apiLevel": "2.7"}
 
 
