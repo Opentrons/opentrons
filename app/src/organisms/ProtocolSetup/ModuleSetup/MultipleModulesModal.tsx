@@ -8,17 +8,17 @@ import {
   PrimaryBtn,
   Text,
   C_BLUE,
-  FONT_SIZE_BODY_2,
+  FONT_SIZE_BODY_1,
   FONT_WEIGHT_REGULAR,
   FONT_WEIGHT_SEMIBOLD,
   JUSTIFY_CENTER,
   SIZE_4,
   SPACING_3,
-  SPACING_4,
-  SPACING_5,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
 } from '@opentrons/components'
 import { Portal } from '../../../App/portal'
-import labwareHelpImage from '../../../assets/images/labware_help_example.svg'
+import multipleModuleHelp from '../../../assets/images/multiple_module_help_example.png'
 
 import styles from './styles.css'
 
@@ -35,33 +35,33 @@ export const MultipleModulesModal = (
   return (
     <Portal level="top">
       <Modal className={styles.modal} contentsClassName={styles.modal_contents}>
-        <Box>
-          <Text as={'h3'} marginBottom={SPACING_3}>
-            {t('multiple_modules_modal_title')}
-          </Text>
-          <Trans
-            t={t}
-            i18nKey="multiple_modules_explanation"
-            components={{
-              block: (
-                <Text
-                  fontSize={FONT_SIZE_BODY_2}
-                  fontWeight={FONT_WEIGHT_REGULAR}
-                  marginBottom={SPACING_3}
-                />
-              ),
-              a_how_to_multiple_modules: (
-                <Link
-                  fontSize={FONT_SIZE_BODY_2}
-                  color={C_BLUE}
-                  href={HOW_TO_MULTIPLE_MODULES_HREF}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                />
-              ),
-            }}
-          />
-          <Box margin={`${SPACING_4} ${SPACING_5}`}>
+        <Text as={'h3'} marginBottom={SPACING_3}>
+          {t('multiple_modules_modal_title')}
+        </Text>
+        <Flex flexDirection={DIRECTION_ROW}>
+          <Flex flexDirection={DIRECTION_COLUMN}>
+            <Trans
+              t={t}
+              i18nKey="multiple_modules_explanation"
+              components={{
+                block: (
+                  <Text
+                    fontSize={FONT_SIZE_BODY_1}
+                    fontWeight={FONT_WEIGHT_REGULAR}
+                    marginBottom={SPACING_3}
+                  />
+                ),
+                a_how_to_multiple_modules: (
+                  <Link
+                    fontSize={FONT_SIZE_BODY_1}
+                    color={C_BLUE}
+                    href={HOW_TO_MULTIPLE_MODULES_HREF}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  />
+                ),
+              }}
+            />
             <Text
               as={'h4'}
               fontWeight={FONT_WEIGHT_SEMIBOLD}
@@ -75,27 +75,26 @@ export const MultipleModulesModal = (
               components={{
                 block: (
                   <Text
-                    fontSize={FONT_SIZE_BODY_2}
+                    fontSize={FONT_SIZE_BODY_1}
                     fontWeight={FONT_WEIGHT_REGULAR}
                   />
                 ),
               }}
             />
-            <Box marginY={SPACING_3} marginX={SPACING_5}>
-              <img src={labwareHelpImage} />
-            </Box>
-          </Box>
-
-          <Flex justifyContent={JUSTIFY_CENTER}>
-            <PrimaryBtn
-              onClick={props.onCloseClick}
-              width={SIZE_4}
-              backgroundColor={C_BLUE}
-            >
-              {t('shared:close')}
-            </PrimaryBtn>
           </Flex>
-        </Box>
+          <Flex>
+            <img src={multipleModuleHelp} />
+          </Flex>
+        </Flex>
+        <Flex justifyContent={JUSTIFY_CENTER}>
+          <PrimaryBtn
+            onClick={props.onCloseClick}
+            width={SIZE_4}
+            backgroundColor={C_BLUE}
+          >
+            {t('shared:close')}
+          </PrimaryBtn>
+        </Flex>
       </Modal>
     </Portal>
   )

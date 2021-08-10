@@ -1,6 +1,5 @@
 import * as React from 'react'
 import map from 'lodash/map'
-import { NavLink } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
   Flex,
@@ -8,8 +7,6 @@ import {
   ModuleViz,
   PrimaryBtn,
   RobotWorkSpace,
-  Tooltip,
-  useHoverTooltip,
   ALIGN_FLEX_END,
   DIRECTION_COLUMN,
   FONT_SIZE_BODY_1,
@@ -23,7 +20,7 @@ import {
 } from '@opentrons/shared-data'
 
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
-import { ModuleTag } from '../ModuleTag'
+import { ModuleInfo } from './ModuleInfo'
 import { MultipleModulesModal } from './MultipleModulesModal'
 import styles from './styles.css'
 
@@ -31,6 +28,7 @@ import type { CoordinatesByModuleModel } from '../utils/getModuleRenderCoords'
 
 interface ModuleSetupProps {
   moduleRenderCoords: CoordinatesByModuleModel
+  expandLabwareSetupStep: () => void
 }
 
 const DECK_LAYER_BLOCKLIST = [
@@ -42,15 +40,9 @@ const DECK_LAYER_BLOCKLIST = [
   'removableDeckOutline',
   'screwHoles',
 ]
-
 export const ModuleSetup = (props: ModuleSetupProps): JSX.Element | null => {
-  const { moduleRenderCoords } = props
-  const proceedToLabwareDisabled = false
-  const proceedToLabwareDisabledReason = 'replace with actual tooltip text'
-  const LinkComponent = proceedToLabwareDisabled ? 'button' : NavLink
-  const linkProps = proceedToLabwareDisabled ? {} : { to: '/protocol' }
+  const { moduleRenderCoords, expandLabwareSetupStep } = props
   const { t } = useTranslation('protocol_setup')
-  const [targetProps, tooltipProps] = useHoverTooltip()
   const [
     showMultipleModulesModal,
     setShowMultipleModulesModal,
@@ -59,7 +51,7 @@ export const ModuleSetup = (props: ModuleSetupProps): JSX.Element | null => {
     <React.Fragment>
       {showMultipleModulesModal && (
         <MultipleModulesModal
-          onClockClick={() => setShowMultipleModulesModal(false)}
+          onCloseClick={() => setShowMultipleModulesModal(false)}
         />
       )}
       <Flex
@@ -99,7 +91,7 @@ export const ModuleSetup = (props: ModuleSetupProps): JSX.Element | null => {
                         orientation={orientation}
                         moduleType={getModuleType(moduleModel)}
                       />
-                      <ModuleTag
+                      <ModuleInfo
                         x={x}
                         y={y}
                         moduleModel={moduleModel}
@@ -115,18 +107,10 @@ export const ModuleSetup = (props: ModuleSetupProps): JSX.Element | null => {
         <Flex justifyContent={JUSTIFY_CENTER}>
           <PrimaryBtn
             title={t('proceed_to_labware_setup_step')}
-            disabled={proceedToLabwareDisabled}
-            as={LinkComponent}
-            {...linkProps}
-            {...targetProps}
+            onClick={expandLabwareSetupStep}
           >
             {t('proceed_to_labware_setup_step')}
           </PrimaryBtn>
-          {proceedToLabwareDisabled && (
-            <Tooltip {...tooltipProps}>
-              {proceedToLabwareDisabledReason}
-            </Tooltip>
-          )}
         </Flex>
       </Flex>
     </React.Fragment>

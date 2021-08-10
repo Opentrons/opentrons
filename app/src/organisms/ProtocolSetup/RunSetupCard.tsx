@@ -65,7 +65,12 @@ export function RunSetupCard(): JSX.Element | null {
     [ROBOT_CALIBRATION_STEP_KEY]: (
       <Text marginTop={SPACING_3}>TODO: robot calibration step contents</Text>
     ),
-    [MODULE_SETUP_KEY]: <ModuleSetup moduleRenderCoords={moduleRenderCoords} />,
+    [MODULE_SETUP_KEY]: (
+      <ModuleSetup
+        moduleRenderCoords={moduleRenderCoords}
+        expandLabwareSetupStep={() => setExpandedStepKey(LABWARE_SETUP_KEY)}
+      />
+    ),
     [LABWARE_SETUP_KEY]: (
       <LabwareSetup
         moduleRenderCoords={moduleRenderCoords}
