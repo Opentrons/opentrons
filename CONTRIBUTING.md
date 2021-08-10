@@ -154,10 +154,11 @@ Your computer will need the following tools installed to be able to develop with
   pyenv install 3.7.10
   ```
 
-- Node v12 - [nvm][] is optional, but recommended
+- Node v14 - [nvm][] is optional, but recommended
 
   ```shell
-  nvm install 12
+  nvm install 14
+  nvm use 14
   ```
 
 - [yarn][yarn-install] - JavaScript package manager
