@@ -51,14 +51,14 @@ export function RobotCalibrationStep(props: Props): JSX.Element {
             return (
               <div key={pipetteData.lastModified}>
                 <span>
-                  {mount}
-                  {` ${t('mount_title')} `}
+                  {t('mount_title', { mount: mount })}
                   {pipetteData.pipetteDisplayName}
                 </span>
                 {attached && pipetteData.lastModifiedDate !== null ? (
                   <div>
-                    {`${t('last_calibrated')}: `}
-                    {formatLastModified(pipetteData.lastModifiedDate)}
+                    {t('last_calibrated', {
+                      date: formatLastModified(pipetteData.lastModifiedDate),
+                    })}
                   </div>
                 ) : (
                   <div>{t('not_calibrated')}</div>
@@ -82,8 +82,9 @@ export function RobotCalibrationStep(props: Props): JSX.Element {
                     <div>{tipRack.displayName}</div>
                     {tipRack.lastModifiedDate !== null ? (
                       <span>
-                        {`${t('last_calibrated')}: `}
-                        {formatLastModified(tipRack.lastModifiedDate)}
+                        {t('last_calibrated', {
+                          date: formatLastModified(tipRack.lastModifiedDate),
+                        })}
                       </span>
                     ) : (
                       <span>{t('not_calibrated')}</span>
