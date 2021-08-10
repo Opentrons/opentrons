@@ -461,7 +461,9 @@ class Session(RobotBusy):
     def stop(self) -> None:
         log.info("session.py: ==== stop() called ====")
         log.info("Before calling api.halt:")
-
+        for mount in Mount:
+            log.info(f":::::: HW current pos :::::: {mount}:: "
+                     f"{self._hw_iface().current_position(mount)}")
         self._hw_iface().halt()
         # The pipette could still move after halt. So the final pipette state should be considered
         # after a motion lock has been achieved. But the location cache is lost after the halt....
@@ -476,8 +478,7 @@ class Session(RobotBusy):
         #    This might require sending g-codes directly to move the plunger.
         with self._motion_lock.lock():
             try:
-                log.info("session.py: stop(): ")
-                log.info("After calling api.halt:")
+                log.info("===== with self._motion_lock.lock() =====")
 
                 def get_pipette_data() -> Dict[Mount, Dict[str, Any]]:
                     """Get whether the pipettes have tips attached."""
@@ -496,8 +497,6 @@ class Session(RobotBusy):
                         (pipettes_data.get(Mount.RIGHT) and
                          pipettes_data.get(Mount.RIGHT).get('has_tip')):
                     self._hw_iface().stop(home_after=False)
-
-                    # self._hw_iface().home([Axis.X, Axis.Y, Axis.Z, Axis.A])
 
                     self._hardware.cache_instruments()
                     self._hardware.reset_instrument()
@@ -529,9 +528,11 @@ class Session(RobotBusy):
                             self._hw_iface().add_tip(
                                 mount=mount,
                                 tip_length=pip_ctx.tip_racks[0].tip_length)
-                            pip_ctx.move_to(location=pip_ctx.trash_container.wells()[0].top(),
-                                        publish=False)
-                            # TODO: Drop tip
+                            # pip_ctx.move_to(location=pip_ctx.trash_container.wells()[0].top(),
+                            #             publish=False)
+                            log.info(f";;;;; ctx.location_cache: {ctx.location_cache}")
+                            pip_ctx.drop_tip()
+
                 self._hw_iface().stop(home_after=True)
             except asyncio.CancelledError:
                 pass
