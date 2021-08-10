@@ -33,16 +33,16 @@ jobs:
         with:
           project: 'api'
 
-    - name: 'Run & Compare to S3'
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.S3_APP_DEPLOY_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_APP_DEPLOY_SECRET }}
-        AWS_DEFAULT_REGION: us-east-2
-      run: make -C api g-code-2_single_channel_v2-protocol-diff
+      - name: 'Run & Compare to S3'
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.S3_APP_DEPLOY_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_APP_DEPLOY_SECRET }}
+          AWS_DEFAULT_REGION: us-east-2
+        run: make -C api g-code-2_single_channel_v2-protocol-diff
 
-    - name: "Save Generated Diff"
-      if: always()
-      uses: actions/upload-artifact@v2
-      with:
-        name: g-code-2_single_channel_v2-protocol-diff
-        path: /tmp/2_single_channel_v2-diff.html
+      - name: "Save Generated Diff"
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: g-code-2_single_channel_v2-protocol-diff
+          path: /tmp/2_single_channel_v2-diff.html
