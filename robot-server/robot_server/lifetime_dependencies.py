@@ -28,13 +28,24 @@ import typing
 from fastapi import FastAPI
 from starlette.requests import Request
 
-from . import slow_initializing
+from .slow_initializing import (
+    InitializationFailedError,
+    SlowInitializing,
+    start_initializing as start_slow_initializing
+)
 
 from notify_server.clients import publisher as notify_server_publisher
 from notify_server.settings import Settings as NotifyServerSettings
 from opentrons.hardware_control import ThreadedAsyncLock, ThreadManager
-from robot_server.hardware_wrapper import HardwareWrapper
+from robot_server.hardware_initialization import initialize as initialize_hardware
 from robot_server.service.legacy.rpc import RPCServer
+
+
+_YieldT = typing.TypeVar("_YieldT")
+# Helpers to be used as the return type annotations of factory functions that are
+# provided to contextlib.contextmanager or contextlib.asynccontextmanager, respectively.
+_CMFactory = typing.Generator[_YieldT, None, None]
+_ACMFactory = typing.AsyncGenerator[_YieldT, None]
 
 
 # todo(mm, 2021-08-04): Port get_session_manager() and get_protocol_manager()
@@ -43,8 +54,8 @@ from robot_server.service.legacy.rpc import RPCServer
 class AppDependencySet:
     """All app dependencies that are exposed to the request layer."""
 
-    hardware_wrapper: slow_initializing.SlowInitializing[HardwareWrapper]
-    rpc_server: slow_initializing.SlowInitializing[RPCServer]
+    thread_manager: SlowInitializing[ThreadManager]
+    rpc_server: SlowInitializing[RPCServer]
     motion_lock: ThreadedAsyncLock
 
 
@@ -78,80 +89,79 @@ def get_app_dependencies(request: Request) -> AppDependencySet:
     return _get_app_dependencies(request.app)
 
 
-@contextlib.asynccontextmanager
-async def _event_publisher() -> typing.AsyncGenerator[
-    notify_server_publisher.Publisher, None
-]:
-    """A dependency creating a single notify-server event publisher instance."""
+@contextlib.contextmanager
+def _event_publisher() -> _CMFactory[notify_server_publisher.Publisher]:
     notify_server_settings = NotifyServerSettings()
     event_publisher = notify_server_publisher.create(
         notify_server_settings.publisher_address.connection_string()
     )
-    # fixme(mm, 2021-07-29): Should close, and currently does not.
-    yield event_publisher
+    try:
+        yield event_publisher
+    finally:
+        event_publisher.close()
 
 
 @contextlib.asynccontextmanager
-async def _hardware_wrapper(
+async def _thread_manager(
     event_publisher: notify_server_publisher.Publisher,
-) -> typing.AsyncGenerator[slow_initializing.SlowInitializing[HardwareWrapper], None]:
-    async def factory() -> HardwareWrapper:
-        hardware_wrapper = HardwareWrapper(event_publisher=event_publisher)
-        await hardware_wrapper.initialize()
-        return hardware_wrapper
+) -> _ACMFactory[SlowInitializing[ThreadManager]]:
+    async def factory() -> ThreadManager:
+        return await initialize_hardware(event_publisher)
 
-    handle = slow_initializing.start_initializing(factory)
+    slow_initializing = start_slow_initializing(factory)
     try:
-        yield handle
+        yield slow_initializing
     finally:
-        # todo(mm, 2021-08-04): Any cleanup of hardware wrapper needed here?
-        # Probably yes. It has a ThreadManager, which has a thread that needs to be
-        # joined.
-        pass
+        try:
+            fully_initialized_result = await slow_initializing.get_when_ready()
+        except InitializationFailedError:
+            pass
+        else:
+            fully_initialized_result.clean_up()
+        # To do: Justify why we don't attempt to cancel.
+        # Codebase generally isn't prepared to handle it. Need something like task groups.
 
 
 @contextlib.asynccontextmanager
 async def _rpc_server(
-    hardware_wrapper: slow_initializing.SlowInitializing[HardwareWrapper],
+    thread_manager: SlowInitializing[ThreadManager],
     lock: ThreadedAsyncLock,
-) -> typing.AsyncGenerator[slow_initializing.SlowInitializing[RPCServer], None]:
+) -> _ACMFactory[SlowInitializing[RPCServer]]:
     async def factory() -> RPCServer:
-        # todo(mm, 2021-08-04): Eliminate wrapper and this indirection.
-        assert (await hardware_wrapper.get_when_ready()).get_hardware() is not None
-
         # todo(mm, 2021-08-04): Inherited from previous code. Why imported here?
         from opentrons.api import MainRouter
 
-        hardware = typing.cast(
-            ThreadManager, (await hardware_wrapper.get_when_ready()).get_hardware()
-        )
-        root = MainRouter(hardware=hardware, lock=lock)
+        root = MainRouter(hardware=(await thread_manager.get_when_ready()), lock=lock)
         return RPCServer(loop=None, root=root)
 
-    handle = slow_initializing.start_initializing(factory)
+    slow_initializing = start_slow_initializing(factory)
     try:
-        yield handle
+        yield slow_initializing
     finally:
-        # todo(mm, 2021-08-04): Waits to clean up. Expected?
-        await (await handle.get_when_ready()).on_shutdown()
+        try:
+            fully_initialized_result = await slow_initializing.get_when_ready()
+        except InitializationFailedError:
+            pass
+        else:
+            await fully_initialized_result.on_shutdown()
 
 
 @contextlib.asynccontextmanager
-async def _all_app_dependencies() -> typing.AsyncGenerator[AppDependencySet, None]:
+async def _all_app_dependencies() -> _ACMFactory[AppDependencySet]:
     async with contextlib.AsyncExitStack() as stack:
         motion_lock = ThreadedAsyncLock()
-        event_publisher = await stack.enter_async_context(_event_publisher())
-        hardware_wrapper = await stack.enter_async_context(
-            _hardware_wrapper(event_publisher)
+        event_publisher = stack.enter_context(_event_publisher())
+        thread_manager = await stack.enter_async_context(
+            _thread_manager(event_publisher)
         )
         # todo(mm, 2021-08-04): If wrong arguments are provided to the _rpc_server
         # factory, MyPy doesn't catch it. Why not?
         rpc_server = await stack.enter_async_context(
-            _rpc_server(hardware_wrapper=hardware_wrapper, lock=motion_lock)
+            _rpc_server(hardware_wrapper=thread_manager, lock=motion_lock)
         )
 
         complete_result = AppDependencySet(
-            hardware_wrapper=hardware_wrapper,
+            thread_manager=thread_manager,
             rpc_server=rpc_server,
             motion_lock=motion_lock,
         )
