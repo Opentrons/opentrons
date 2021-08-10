@@ -36,10 +36,6 @@ class SlowInitializing(typing.Generic[_T]):
         try:
             return await self._task
         except Exception as exception:
-            # Deliberately not interfering with BaseExceptions because asyncio seems to
-            # treat them specially? For example, a KeyboardInterrupt bubbling up from
-            # any task seems to prompt the event loop to cancel all current tasks,
-            # in Python 3.7. Seems undocumented.
             raise InitializationFailedError() from exception
 
     def get_if_ready(self) -> _T:
@@ -59,7 +55,6 @@ class SlowInitializing(typing.Generic[_T]):
             # This affects what's printed in stack traces.
             raise InitializationOngoingError() from None
         except Exception as exception:
-            # See comment in get_when_ready() about why we don't catch BaseException.
             raise InitializationFailedError() from exception
 
 
