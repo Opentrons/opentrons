@@ -13,6 +13,7 @@
   "flow:main": "flow-types/js/index.js.flow",
   "dependencies": {
     "ajv": "6.10.2",
-    "lodash": "4.17.15"
+    "lodash": "4.17.15",
+    "svgson": "^5.2.1"
   }
 }

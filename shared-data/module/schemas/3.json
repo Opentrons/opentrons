@@ -25,20 +25,31 @@
         }
       }
     },
-    "pathDValue": {
-      "type": "string",
-      "description": "A valid d-attribute value for an svg path. Note: uses physical coordinate system which has origin at the bottom, front, left of the robot's workspace."
-    },
-    "layer": {
+    "svgsonNode": {
       "type": "object",
-      "description": "A physical feature of the deck",
-      "required": ["name", "pathDValue"],
+      "description": "An svgson node that corresponds to a single svg tag",
       "properties": {
         "name": {
           "type": "string",
-          "description": "Unique identifying name for a given visual layer of the module"
+          "description": "Element name, like svg, circle, line…"
         },
-        "pathDValue": { "$ref": "#/definitions/pathDValue" }
+        "type": {
+          "type": "string",
+          "description": "Element type like element, text…"
+        },
+        "value": {
+          "type": "string",
+          "description": "Element value, used in text nodes."
+        },
+        "children": {
+          "type": "array",
+          "description": "List of element children",
+          "items": { "$ref": "#" }
+        },
+        "attributes": {
+          "type": "object",
+          "description": "Attributes for the element"
+        }
       }
     }
   },
@@ -132,10 +143,10 @@
         "description": "A compatible module model (e.g. temperatureModuleV1)"
       }
     },
-    "layers": {
-      "type": "array",
-      "description": "List of visual layers for a given module",
-      "items": { "$ref": "#/definitions/layer" }
+    "twoDimensionalRendering": {
+      "type": "object",
+      "description": "SVG rendering of the module represented as svgson",
+      "items": { "$ref": "#/definitions/svgsonNode" }
     }
   }
 }
