@@ -8,8 +8,6 @@ import {
   ModuleViz,
   PrimaryBtn,
   RobotWorkSpace,
-  Tooltip,
-  useHoverTooltip,
   ALIGN_FLEX_END,
   DIRECTION_COLUMN,
   FONT_SIZE_BODY_1,
@@ -43,7 +41,6 @@ const DECK_LAYER_BLOCKLIST = [
   'removableDeckOutline',
   'screwHoles',
 ]
-
 export const ModuleSetup = (props: ModuleSetupProps): JSX.Element | null => {
   const { moduleRenderCoords, expandLabwareSetupStep } = props
   const DECK_VIEW_BOX = `-64 -10 ${530} ${456}`
