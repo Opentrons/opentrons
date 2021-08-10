@@ -1,9 +1,10 @@
 # noqa: D100
 
+
 import asyncio
 import typing
-import unittest.mock
 
+from decoy import Decoy, matchers
 import pytest
 
 from robot_server import slow_initializing
@@ -17,11 +18,7 @@ class _FakeException(Exception):
     pass
 
 
-def _make_mock_exception_logger() -> typing.Callable[[BaseException], None]:
-    return unittest.mock.Mock(spec=[])
-
-
-async def test_progress_and_success() -> None:  # noqa: D103
+async def test_progress_and_success(decoy: Decoy) -> None:  # noqa: D103
     finish_making_object = asyncio.Event()
 
     expected_result = _FakeInitializedObject()
@@ -30,7 +27,7 @@ async def test_progress_and_success() -> None:  # noqa: D103
         await finish_making_object.wait()
         return expected_result
 
-    exception_logger = _make_mock_exception_logger()
+    exception_logger = decoy.mock(func=slow_initializing.log)
 
     subject = slow_initializing.start_initializing(
         factory=factory, exception_logger=exception_logger
@@ -46,14 +43,15 @@ async def test_progress_and_success() -> None:  # noqa: D103
     assert await subject.get_when_ready() == expected_result
     assert subject.get_if_ready() == expected_result
 
-    typing.cast(unittest.mock.Mock, exception_logger).assert_not_called()
+    # exception_logger should not have been called.
+    decoy.verify(exception_logger(matchers.Anything()), times=0)
 
 
-async def test_exception_propagated() -> None:  # noqa: D103
+async def test_exception_propagated(decoy: Decoy) -> None:  # noqa: D103
     async def failing_factory() -> _FakeInitializedObject:
         raise _FakeException()
 
-    exception_logger = _make_mock_exception_logger()
+    exception_logger = decoy.mock(func=slow_initializing.log)
 
     subject = slow_initializing.start_initializing(
         factory=failing_factory, exception_logger=exception_logger
@@ -73,6 +71,10 @@ async def test_exception_propagated() -> None:  # noqa: D103
     assert type(original_exception_1) == _FakeException
     assert original_exception_1 == original_exception_2
 
-    typing.cast(unittest.mock.Mock, exception_logger).assert_called_once_with(
-        original_exception_1
+    # This "is not None" assert is redundant after the type assertion above, but mypy
+    # v0.812 seems to need it for this decoy.verify().
+    assert original_exception_1 is not None
+    decoy.verify(
+        exception_logger(original_exception_1),
+        times=1
     )
