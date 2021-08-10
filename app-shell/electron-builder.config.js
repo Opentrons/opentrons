@@ -6,7 +6,7 @@ const DEV_MODE = process.env.NODE_ENV !== 'production'
 
 module.exports = {
   appId: 'com.opentrons.app',
-  electronVersion: '6.1.10',
+  electronVersion: '13.1.8',
   files: [
     '**/*',
     {
