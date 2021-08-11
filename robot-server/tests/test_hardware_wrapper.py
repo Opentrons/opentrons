@@ -21,7 +21,9 @@ def mock_time():
 
 @pytest.fixture
 def mock_utc(mock_time):
-    with patch.object(hardware_initialization, "utc_now", return_value=mock_time) as _mock:
+    with patch.object(
+        hardware_initialization, "utc_now", return_value=mock_time
+    ) as _mock:
         yield _mock
 
 
@@ -39,7 +41,9 @@ def simulating_wrapper(mock_event_publisher):
             simulator_configuration_file_path="simulators" "/test.json"
         ),
     ):
-        return hardware_initialization.HardwareWrapper(event_publisher=mock_event_publisher)
+        return hardware_initialization.HardwareWrapper(
+            event_publisher=mock_event_publisher
+        )
 
 
 async def test_init_hw_event(simulating_wrapper):

@@ -2,7 +2,6 @@
 
 
 import asyncio
-import typing
 
 from decoy import Decoy, matchers
 import pytest
@@ -74,7 +73,4 @@ async def test_exception_propagated(decoy: Decoy) -> None:  # noqa: D103
     # This "is not None" assert is redundant after the type assertion above, but mypy
     # v0.812 seems to need it for this decoy.verify().
     assert original_exception_1 is not None
-    decoy.verify(
-        exception_logger(original_exception_1),
-        times=1
-    )
+    decoy.verify(exception_logger(original_exception_1), times=1)
