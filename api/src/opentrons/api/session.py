@@ -36,7 +36,6 @@ from opentrons.hardware_control import (API, ThreadManager,
                                         SynchronousAdapter,
                                         ExecutionCancelledError,
                                         ThreadedAsyncLock)
-from opentrons.types import Mount
 from opentrons.hardware_control.types import Axis
 from opentrons.hardware_control.types import (HardwareEventType, HardwareEvent,
                                               PauseType)
@@ -476,7 +475,7 @@ class Session(RobotBusy):
         self._hw_iface().halt()
         with self._motion_lock.lock():
             try:
-                if any(pipette_state.get('has_tip').values()):
+                if any(pipette_state['has_tip'].values()):
                     self._hw_iface().stop(home_after=False)
                     self._drop_tip_after_cancel(pipette_state)
                 self._hw_iface().stop(home_after=True)
