@@ -15,9 +15,9 @@ import {
   C_DARK_GRAY,
   C_BLUE,
 } from '@opentrons/components'
+import { getModuleName } from './utils/getModuleName'
 import { SecureLabwareModal } from './SecureLabwareModal'
 import type { ModuleTypesThatRequiresExtraAttention } from './utils/getModuleTypesThatRequireExtraAttention'
-import { getModuleName } from './utils/getModuleName'
 
 interface ExtraAttentionWarningProps {
   moduleTypes: ModuleTypesThatRequiresExtraAttention[]
