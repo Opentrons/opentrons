@@ -86,7 +86,7 @@ export const ExtraAttentionWarning = (
         backgroundColor={OVERLAY_LIGHT_GRAY_50}
         color={C_DARK_GRAY}
       >
-        <Text as="h5" margin={SPACING_2}>
+        <Text as="h4" margin={SPACING_2}>
           Some labware and modules require extra attention
         </Text>
         {moduleTypes.map(moduleType => (
