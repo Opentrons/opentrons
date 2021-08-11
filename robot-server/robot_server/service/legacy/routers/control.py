@@ -83,21 +83,22 @@ async def post_home_robot(
     try:
         async with motion_lock.forbid():
             mount = robot_home_target.mount
-            target = robot_home_target.target
+            target = control.HomeTarget.robot
+            # target = robot_home_target.target
 
             home = hardware.home  # type: ignore
             home_plunger = hardware.home_plunger  # type: ignore
 
-            if target == control.HomeTarget.pipette and mount:
-                await home([Axis.by_mount(Mount[mount.upper()])])
-                await home_plunger(Mount[mount.upper()])
-                message = f"Pipette on {mount} homed successfully"
-            elif target == control.HomeTarget.robot:
-                await home()
+            # if target == control.HomeTarget.pipette and mount:
+            #     await home([Axis.by_mount(Mount[mount.upper()])])
+            #     await home_plunger(Mount[mount.upper()])
+            #     message = f"Pipette on {mount} homed successfully"
+            if target == control.HomeTarget.robot:
+                await home([Axis.X, Axis.Y])
                 message = "Homing robot."
             else:
-                raise V1HandlerError(message=f"{target} is invalid",
-                                     status_code=status.HTTP_400_BAD_REQUEST)
+                raise LegacyErrorResponse(
+                    message=f"{target} is invalid").as_error(status.HTTP_400_BAD_REQUEST)
 
             return V1BasicResponse(message=message)
     except ThreadedAsyncForbidden as e:
