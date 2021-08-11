@@ -80,7 +80,9 @@ describe('ExtraAttentionWarning', () => {
       .mockReturnValue(<div>mock secure labware modal magnetic module</div>)
 
     const { getByText } = render(props)
-    expect(screen.queryByText('mock secure labware modal magnetic module')).toBeNull()
+    expect(
+      screen.queryByText('mock secure labware modal magnetic module')
+    ).toBeNull()
 
     const modalLink = getByText('Securing labware to the Magnetic Module')
 
@@ -102,7 +104,9 @@ describe('ExtraAttentionWarning', () => {
       .mockReturnValue(<div>mock secure labware modal thermocycler</div>)
 
     const { getByText } = render(props)
-    expect(screen.queryByText('mock secure labware modal thermocycler')).toBeNull()
+    expect(
+      screen.queryByText('mock secure labware modal thermocycler')
+    ).toBeNull()
 
     const modalLink = getByText('Securing labware to the Thermocycler')
 
