@@ -37,10 +37,8 @@ import { getModuleTypesThatRequireExtraAttention } from './utils/getModuleTypesT
 import { ExtraAttentionWarning } from './ExtraAttentionWarning'
 import styles from './styles.css'
 
-import {
-  CoordinatesByModuleModel,
-  CoordinatesByLabwareId,
-} from '../RunSetupCard'
+import { CoordinatesByModuleModel } from '../utils/getModuleRenderCoords'
+import { CoordinatesByLabwareId } from '../utils/getLabwareRenderCoords'
 
 interface LabwareSetupProps {
   moduleRenderCoords: CoordinatesByModuleModel
