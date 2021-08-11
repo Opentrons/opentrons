@@ -1110,9 +1110,7 @@ class InstrumentContext(CommandPublisher):
         :param publish: Whether a call to this function should publish to the
         runlog or not.
         """
-        self._log.info("===== In instrument_context: move_to() =====")
         from_loc = self._ctx.location_cache
-        self._log.info(f"--- from loc: {from_loc}")
         if not from_loc:
             from_loc = types.Location(types.Point(0, 0, 0), LabwareLike(None))
 
@@ -1124,8 +1122,6 @@ class InstrumentContext(CommandPublisher):
             do_publish(self.broker, cmds.move_to, self.move_to, 'before',
                        None, None, self, location or self._ctx.location_cache)
 
-        self._log.info(f"=== Calling implementation move_to(): "
-                       f"{self._implementation} ===")
         self._implementation.move_to(
             location=location,
             force_direct=force_direct,

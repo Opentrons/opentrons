@@ -458,86 +458,66 @@ class Session(RobotBusy):
         self.startTime = None
         self.set_state('loaded')
 
-    def stop(self) -> None:
-        log.info("session.py: ==== stop() called ====")
-        log.info("Before calling api.halt:")
-        for mount in Mount:
-            log.info(f":::::: HW current pos :::::: {mount}:: "
-                     f"{self._hw_iface().current_position(mount)}")
-        self._hw_iface().halt()
-        # The pipette could still move after halt. So the final pipette state should be considered
-        # after a motion lock has been achieved. But the location cache is lost after the halt....
+    def _get_pipette_state(self) -> Dict[str, Any]:
+        """Get pipettes' tip & plunger states."""
+        instruments = self._hw_iface().attached_instruments
+        new_dict = {
+            'has_tip': {mount: pip['has_tip'] for mount, pip in instruments.items()},
+            'plunger_state': {
+                mount: self._hw_iface().current_position(mount)[Axis.of_plunger(mount)]
+                for mount, pip in instruments.items()}
+        }
+        return new_dict
 
-        # So, maybe we can do this: (all after achieving motion lock)
-        # 1. Save the labware/trash loaded from ctx
-        # 2. Get the pipette dict from hw_iface
-        # 3. In api.stop, don't home plunger if pipettes have tip(s); only x,y
-        # 4. If has_tip, move to above saved trash and finally move the plunger to drop tip.
-        #    The max distance the plunger can move to drop can be interpreted from whether
-        #    the tip has liquid in it. If yes, then calculate travel based on volume in tip.
-        #    This might require sending g-codes directly to move the plunger.
+    def stop(self) -> None:
+        # Save the pipette state before calling self._hw_iface().halt
+        # so we don't lose the data on hard halt.
+        pipette_state = self._get_pipette_state()
+        self._hw_iface().halt()
         with self._motion_lock.lock():
             try:
-                log.info("===== with self._motion_lock.lock() =====")
-
-                def get_pipette_data() -> Dict[Mount, Dict[str, Any]]:
-                    """Get whether the pipettes have tips attached."""
-                    new_dict = {}
-                    for mount, instr in self._hw_iface().attached_instruments.items():
-                        new_dict[mount] = {
-                            'has_tip': instr['has_tip'],
-                            'current_volume': instr['current_volume']}
-                    return new_dict
-
-                pipettes_data = get_pipette_data()
-                log.info(f"Pipette data: {pipettes_data}")
-
-                if (pipettes_data.get(Mount.LEFT) and
-                    pipettes_data.get(Mount.LEFT).get('has_tip')) or \
-                        (pipettes_data.get(Mount.RIGHT) and
-                         pipettes_data.get(Mount.RIGHT).get('has_tip')):
+                if any(pipette_state.get('has_tip').values()):
                     self._hw_iface().stop(home_after=False)
-
-                    self._hardware.cache_instruments()
-                    self._hardware.reset_instrument()
-                    ctx_impl = ProtocolContextImplementation.build_using(
-                        self._protocol,
-                        extra_labware=getattr(self._protocol, 'extra_labware', {}))
-                    ctx = ProtocolContext.build_using(
-                        protocol=self._protocol,
-                        implementation=ctx_impl,
-                        loop=self._loop,
-                        broker=self._broker
-                    )
-                    ctx.connect(self._hardware)
-                    ctx.home(home_plungers=False)
-                    for instr in self._instruments:
-                        pip = ctx.load_instrument(instrument_name=instr.name,
-                                                  mount=instr.mount,
-                                                  tip_racks=instr.tip_racks)
-                        pip.trash_container = instr.trash_container
-                    instruments = ctx.loaded_instruments
-
-                    log.info(f"____Instruments: {instruments}____")
-                    for mount, obj in pipettes_data.items():
-                        if obj.get('has_tip'):
-                            pip_ctx = instruments[mount.name.lower()]
-                            log.info(f"======== Pipette:{pip_ctx.name} "
-                                     f"has trash: {pip_ctx.trash_container}")
-                            ctx._implementation.set_last_location(None)
-                            self._hw_iface().add_tip(
-                                mount=mount,
-                                tip_length=pip_ctx.tip_racks[0].tip_length)
-                            # pip_ctx.move_to(location=pip_ctx.trash_container.wells()[0].top(),
-                            #             publish=False)
-                            log.info(f";;;;; ctx.location_cache: {ctx.location_cache}")
-                            pip_ctx.drop_tip()
-
+                    self._drop_tip_after_cancel(pipette_state)
                 self._hw_iface().stop(home_after=True)
             except asyncio.CancelledError:
                 pass
         self.set_state('stopped')
-        log.info("session.py: ==== Exiting session.stop() ====")
+
+    def _drop_tip_after_cancel(self, saved_pipette_state: Dict) -> None:
+        """Perform a drop_tip on the pipette with a tip."""
+        ctx = self._get_context_with_loaded_instruments()
+        ctx.home(home_plungers=False)
+        instruments = ctx.loaded_instruments
+
+        for mount, has_tip in saved_pipette_state['has_tip'].items():
+            if has_tip:
+                pip_ctx = instruments[mount.name.lower()]
+                self._hw_iface().add_tip(
+                    mount=mount,
+                    tip_length=pip_ctx.tip_racks[0].tip_length)
+                pip_ctx.drop_tip()
+
+    def _get_context_with_loaded_instruments(self) -> ProtocolContext:
+        """Return a Protocol context with all protocol instruments loaded."""
+        self._hardware.cache_instruments()
+        self._hardware.reset_instrument()
+        ctx_impl = ProtocolContextImplementation.build_using(
+            self._protocol,
+            extra_labware=getattr(self._protocol, 'extra_labware', {}))
+        ctx = ProtocolContext.build_using(
+            protocol=self._protocol,
+            implementation=ctx_impl,
+            loop=self._loop,
+            broker=self._broker
+        )
+        ctx.connect(self._hardware)
+        for instr in self._instruments:
+            pip = ctx.load_instrument(instrument_name=instr.name,
+                                      mount=instr.mount,
+                                      tip_racks=instr.tip_racks)
+            pip.trash_container = instr.trash_container
+        return ctx
 
     def pause(self,
               reason: str = None,
