@@ -167,7 +167,7 @@ describe('Protocols with Modules', () => {
         })
       })
       cy.get('input[class*="LabwareOverlays__name_input"]').type(
-        'Mag Deck Well'
+        'Mag Deck Well '
       )
 
       // Add labware to Temp Deck
@@ -193,7 +193,7 @@ describe('Protocols with Modules', () => {
       })
       cy.contains(aluminumWellBlock, { matchCase: false })
       cy.get('input[class*="LabwareOverlays__name_input"]').type(
-        'Temp Deck Block'
+        'Temp Deck Block '
       )
 
       // Add first liquid

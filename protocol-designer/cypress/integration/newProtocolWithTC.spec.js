@@ -142,9 +142,7 @@ describe('Protocols with Modules', () => {
           cy.contains('Nest 96 Well Plate', { matchCase: false }).click()
         })
       })
-      cy.get('input[class*="LabwareOverlays__name_input"]').type(
-        thermocyclerWellBlock
-      )
+      cy.get('input[class*="LabwareOverlays__name_input"]').type('TC Well ')
 
       // Add Thermocycler State Step
       cy.addStep('thermocycler')
@@ -270,9 +268,7 @@ describe('Protocols with Modules', () => {
             .click()
         })
       })
-      cy.get('input[class*="LabwareOverlays__name_input"]').type(
-        thermocyclerWellBlock
-      )
+      cy.get('input[class*="LabwareOverlays__name_input"]').type('TC Well ')
 
       // Add Thermocycler Profile Step
       cy.addStep('thermocycler')
