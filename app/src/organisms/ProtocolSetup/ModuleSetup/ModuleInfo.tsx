@@ -10,6 +10,8 @@ import {
   Flex,
   Icon,
   COLOR_ERROR,
+  FONT_STYLE_ITALIC,
+  FONT_WEIGHT_REGULAR,
 } from '@opentrons/components'
 import {
   getModuleType,
@@ -52,19 +54,12 @@ export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
             width="10px"
             color={COLOR_ERROR}
           />
-
-          <Text font_family={'Open Sans'} fontSize={'0.45rem'}>
-            &nbsp; Not Connected
-          </Text>
+          <Text fontSize={'0.5rem'}>&nbsp; Not Connected</Text>
         </Flex>
-        <Text font_family={'Open Sans'} fontSize={'0.65rem'} fontStyle={'bold'}>
+        <Text fontSize={'0.65rem'} fontWeight={FONT_WEIGHT_REGULAR}>
           {getModuleDisplayName(moduleModel)}
         </Text>
-        <Text
-          font_family={'Open Sans'}
-          fontSize={'0.4rem'}
-          fontStyle={'italic'}
-        >
+        <Text fontSize={'0.45rem'} fontStyle={FONT_STYLE_ITALIC}>
           No USB Port Yet
         </Text>
       </Flex>
