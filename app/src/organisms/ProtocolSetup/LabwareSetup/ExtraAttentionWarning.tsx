@@ -37,7 +37,7 @@ const ModuleWarning = (props: {
         marginBottom={SPACING_1}
         marginX={SPACING_2}
       >
-        Magnetic Module
+        {getModuleName(props.moduleType)}
       </Text>
       <Trans
         t={t}
