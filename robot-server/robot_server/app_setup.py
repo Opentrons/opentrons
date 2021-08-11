@@ -14,12 +14,6 @@ from starlette.middleware.base import RequestResponseEndpoint
 from notify_server.clients import publisher as notify_server_publisher
 from notify_server.settings import Settings as NotifyServerSettings
 
-from .service.dependencies import (
-    get_rpc_server,
-    get_protocol_manager,
-    get_session_manager,
-)
-
 from .errors import exception_handlers
 from .router import router
 from .service import initialize_logging
@@ -58,9 +52,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# main router
-app.include_router(router=router)
-
 @app.middleware("http")
 async def _api_version_response_header(
     request: Request,
@@ -77,6 +68,9 @@ async def _api_version_response_header(
     response.headers[constants.API_VERSION_HEADER] = str(request.state.api_version)
     response.headers[constants.MIN_API_VERSION_HEADER] = str(constants.MIN_API_VERSION)
     return response
+
+# main router
+app.include_router(router=router)
 
 app.on_event("startup")(initialize_logging)
 lifetime_dependencies.install_startup_shutdown_handlers(app)

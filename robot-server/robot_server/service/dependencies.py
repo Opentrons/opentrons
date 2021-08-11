@@ -3,20 +3,18 @@ from datetime import datetime, timezone
 from typing_extensions import Literal
 from uuid import uuid4
 
-from fastapi import Depends, HTTPException, Header
+from fastapi import Depends, FastAPI, HTTPException, Header
 from starlette import status
 from starlette.datastructures import State
 from starlette.requests import Request
 
 from opentrons.hardware_control import ThreadManager, ThreadedAsyncLock
 
-from robot_server import app
-from robot_server import constants, util, errors
+from robot_server import constants, lifetime_dependencies, util, errors
 from robot_server.service.session.manager import SessionManager
 from robot_server.service.protocol.manager import ProtocolManager
 from robot_server.service.legacy.rpc import RPCServer
 from robot_server.slow_initializing import InitializationOngoingError, SlowInitializing
-from robot_server.lifetime_dependencies import LifetimeDependencySet
 
 
 class OutdatedApiVersionResponse(errors.ErrorDetails):
@@ -31,25 +29,36 @@ class OutdatedApiVersionResponse(errors.ErrorDetails):
     )
 
 
-async def get_app_state() -> State:
-    """Get the Starlette application's state from the framework.
-
-    See https://www.starlette.io/applications/#storing-state-on-the-app-instance
-    for more details.
-    """
-
+async def get_app() -> FastAPI:
+    """Return the FastAPI ASGI app object that's handling the current request."""
     # Ideally, we would avoid this global variable access by using FastAPI's built-in
     # `request` dependency (fastapi.tiangolo.com/advanced/using-request-directly/) and
     # returning `request.app.state`. However, this function might be a dependency of a
     # WebSocket endpoint, and current FastAPI (v0.54.1) raises internal errors when
     # WebSocket endpoints depend on `request`.
+    #
+    # Local import to avoid an import loop:
+    #   dependencies -> `app` object setup -> routers -> dependencies
+    from robot_server import app
+    return app
+
+
+async def get_app_state(app: FastAPI = Depends(get_app)) -> State:
+    """Get the Starlette application's state from the framework.
+
+    The app state is a place for us to stash arbitrary objects that will persist across
+    requests.
+
+    See https://www.starlette.io/applications/#storing-state-on-the-app-instance
+    for more details.
+    """
     return app.state
 
 
 async def get_lifetime_dependencies(
-    state: State = Depends(get_app_state)
-) -> LifetimeDependencySet:
-    return lifetime_dependencies.get_lifetime_dependencies(state)
+    app: FastAPI = Depends(get_app)
+) -> lifetime_dependencies.LifetimeDependencySet:
+    return lifetime_dependencies.get(app)
 
 
 async def get_hardware(state: State = Depends(get_app_state)) -> ThreadManager:
@@ -65,21 +74,21 @@ async def get_hardware(state: State = Depends(get_app_state)) -> ThreadManager:
 
 
 async def get_motion_lock(
-    app_dependencies: AppDependencySet = Depends(get_app_dependencies),
+    lifetime_dependency_set: lifetime_dependencies.LifetimeDependencySet = Depends(get_lifetime_dependencies),
 ) -> ThreadedAsyncLock:
     """Get the single motion lock.
 
     :return: a threaded async lock
     """
-    return app_dependencies.motion_lock
+    return lifetime_dependency_set.motion_lock
 
 
 async def get_rpc_server(
-    app_dependencies: AppDependencySet = Depends(get_app_dependencies),
+    lifetime_dependency_set: lifetime_dependencies.LifetimeDependencySet = Depends(get_lifetime_dependencies),
 ) -> RPCServer:
     """The RPC Server instance"""
     # todo: Handle exception
-    return app_dependencies.rpc_server.get_if_ready()
+    return lifetime_dependency_set.rpc_server.get_if_ready()
 
 
 @util.call_once

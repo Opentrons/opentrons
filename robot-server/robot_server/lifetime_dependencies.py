@@ -26,7 +26,6 @@ from dataclasses import dataclass
 import typing
 
 from fastapi import FastAPI
-from starlette.requests import Request
 
 from .slow_initializing import (
     InitializationFailedError,
@@ -42,55 +41,26 @@ from robot_server.service.legacy.rpc import RPCServer
 
 
 _YieldT = typing.TypeVar("_YieldT")
-# Helpers to be used as the return type annotations of factory functions that are
-# provided to contextlib.contextmanager or contextlib.asynccontextmanager, respectively.
+# Helper to be used as the return type annotation of factory functions that are
+# provided to contextlib.contextmanager.
 _CMFactory = typing.Generator[_YieldT, None, None]
+# Ditto, but for contextlib.asynccontextmanager.
 _ACMFactory = typing.AsyncGenerator[_YieldT, None]
 
 
-# todo(mm, 2021-08-04): Port get_session_manager() and get_protocol_manager()
-# dependencies, and clean them up with their .remove_all() methods.
-@dataclass(frozen=True)
-class LifetimeDependencySet:
-    """All app dependencies that are exposed to the request layer."""
-
-    thread_manager: SlowInitializing[ThreadManager]
-    rpc_server: SlowInitializing[RPCServer]
-    motion_lock: ThreadedAsyncLock
-
-
-class AppDependenciesNotSetError(Exception):  # noqa: D101
-    def __init__(self) -> None:  # noqa: D107
-        super().__init__(
-            "Tried to access app dependencies, but the app has none set."
-            " Perhaps app_dependencies.install_startup_shutdown_handlers()"
-            " wasn't called, or the server was launched in a way that skips"
-            " running startup and shutdown handlers?"
-        )
-
-
-def _set_app_dependencies(app: FastAPI, dependencies: LifetimeDependencySet) -> None:
-    app.state.app_dependencies = dependencies
-
-
-def _get_app_dependencies(app: FastAPI) -> LifetimeDependencySet:
-    state = app.state
-    try:
-        return state.app_dependencies
-    except AttributeError as e:
-        raise AppDependenciesNotSetError() from e
-
-
-def get_app_dependencies(request: Request) -> LifetimeDependencySet:
-    """Return the app's dependencies.
-
-    This must be called as a FastAPI dependency.
-    """
-    return _get_app_dependencies(request.app)
+# Context managers to set up individual dependencies so that they're prepared to
+# be used by request handlers, and then tear them down...
 
 
 @contextlib.contextmanager
-def _event_publisher() -> _CMFactory[notify_server_publisher.Publisher]:
+def _prepared_motion_lock() -> _CMFactory[ThreadedAsyncLock]:
+    # This doesn't need to be a context manager. It's done this way just for
+    # symmetry with the other dependencies.
+    yield ThreadedAsyncLock()
+
+
+@contextlib.contextmanager
+def _prepared_event_publisher() -> _CMFactory[notify_server_publisher.Publisher]:
     notify_server_settings = NotifyServerSettings()
     event_publisher = notify_server_publisher.create(
         notify_server_settings.publisher_address.connection_string()
@@ -102,7 +72,7 @@ def _event_publisher() -> _CMFactory[notify_server_publisher.Publisher]:
 
 
 @contextlib.asynccontextmanager
-async def _thread_manager(
+async def _prepared_thread_manager(
     event_publisher: notify_server_publisher.Publisher,
 ) -> _ACMFactory[SlowInitializing[ThreadManager]]:
     async def factory() -> ThreadManager:
@@ -123,7 +93,7 @@ async def _thread_manager(
 
 
 @contextlib.asynccontextmanager
-async def _rpc_server(
+async def _prepared_rpc_server(
     thread_manager: SlowInitializing[ThreadManager],
     lock: ThreadedAsyncLock,
 ) -> _ACMFactory[SlowInitializing[RPCServer]]:
@@ -147,17 +117,27 @@ async def _rpc_server(
 
 
 @contextlib.asynccontextmanager
-async def _all_app_dependencies() -> _ACMFactory[LifetimeDependencySet]:
+async def _prepared_everything() -> _ACMFactory[LifetimeDependencySet]:
     async with contextlib.AsyncExitStack() as stack:
-        motion_lock = ThreadedAsyncLock()
-        event_publisher = stack.enter_context(_event_publisher())
+        # In general, when dependency A depends on dependency B, and B is a
+        # SlowInitializing, A should also be a SlowInitializing, and should take the
+        # SlowInitializing-wrapped B as an argument. A should not take the
+        # fully-initialized result of B as an argument, and this function should not
+        # have any `await slow_initializing.get_when_ready()` calls.
+
+        # For responsiveness on startup, this
+
+        motion_lock = stack.enter_context(_prepared_motion_lock())
+        event_publisher = stack.enter_context(_prepared_event_publisher())
         thread_manager = await stack.enter_async_context(
-            _thread_manager(event_publisher)
+            _prepared_thread_manager(event_publisher)
         )
         # todo(mm, 2021-08-04): If wrong arguments are provided to the _rpc_server
         # factory, MyPy doesn't catch it. Why not?
         rpc_server = await stack.enter_async_context(
-            _rpc_server(hardware_wrapper=thread_manager, lock=motion_lock)
+            _prepared_rpc_server(
+                thread_manager=thread_manager, lock=motion_lock
+            )
         )
 
         complete_result = LifetimeDependencySet(
@@ -169,16 +149,53 @@ async def _all_app_dependencies() -> _ACMFactory[LifetimeDependencySet]:
         yield complete_result
 
 
+
+# todo(mm, 2021-08-04): Port get_session_manager() and get_protocol_manager()
+# dependencies, and clean them up with their .remove_all() methods.
+@dataclass(frozen=True)
+class LifetimeDependencySet:
+    """All app dependencies that are exposed to the request layer."""
+
+    motion_lock: ThreadedAsyncLock
+    thread_manager: SlowInitializing[ThreadManager]
+    rpc_server: SlowInitializing[RPCServer]
+
+
+class NotSetError(Exception):  # noqa: D101
+    def __init__(self) -> None:  # noqa: D107
+        super().__init__(
+            "Tried to access lifetime dependencies, but the app has none set."
+            " Perhaps install_startup_shutdown_handlers()"
+            " wasn't called, or the server was launched in a way that skips"
+            " running startup and shutdown handlers?"
+        )
+
+
+def _set(app: FastAPI, dependencies: LifetimeDependencySet) -> None:
+    # starlette.io/applications/#storing-state-on-the-app-instance
+    app.state.app_dependencies = dependencies
+
+
+def get(app: FastAPI) -> LifetimeDependencySet:
+    """Return the lifetime dependencies associated with `app`."""
+    state = app.state
+    try:
+        return state.app_dependencies
+    except AttributeError as e:
+        raise NotSetError() from e
+
+
+
 def install_startup_shutdown_handlers(app: FastAPI) -> None:
     """Arrange for dependencies to be initialized and torn down with `app`.
 
     Must be called exactly once on our global FastAPI ``app`` object.
     """
-    context_manager = _all_app_dependencies()
+    context_manager = _prepared_everything()
 
     # Currently (Starlette v0.13.2 and FastAPI v0.54.1), we have to split the context
     # manager into two halves. Later versions (Starlette v0.13.5?) will support using a
-    # `lifespan` context manager as one piece.
+    # whole `lifespan` context manager as one piece.
 
     @app.on_event("startup")
     async def on_startup() -> None:
