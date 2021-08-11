@@ -12,13 +12,13 @@ import { RunSetupCard } from '../RunSetupCard'
 
 import * as protocolSelectors from '../../../redux/protocol/selectors'
 import { LabwareSetup } from '../LabwareSetup'
-import { getModuleRenderCoords } from '../LabwareSetup/utils/getModuleRenderCoords'
-import { getLabwareRenderCoords } from '../LabwareSetup/utils/getLabwareRenderCoords'
+import { getModuleRenderCoords } from '../utils/getModuleRenderCoords'
+import { getLabwareRenderCoords } from '../utils/getLabwareRenderCoords'
 
 jest.mock('../../../redux/protocol/selectors')
 jest.mock('../LabwareSetup')
-jest.mock('../LabwareSetup/utils/getModuleRenderCoords')
-jest.mock('../LabwareSetup/utils/getLabwareRenderCoords')
+jest.mock('../utils/getModuleRenderCoords')
+jest.mock('../utils/getLabwareRenderCoords')
 
 const mockGetProtocolData = protocolSelectors.getProtocolData as jest.MockedFunction<
   typeof protocolSelectors.getProtocolData
