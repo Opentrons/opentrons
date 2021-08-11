@@ -113,19 +113,8 @@ async def _prepared_rpc_server(
             await fully_initialized_result.on_shutdown()
 
 
-# todo(mm, 2021-08-04): Port get_session_manager() and get_protocol_manager()
-# dependencies, and clean them up with their .remove_all() methods.
-@dataclass(frozen=True)
-class LifetimeDependencySet:
-    """All app dependencies that are exposed to the request layer."""
-
-    motion_lock: ThreadedAsyncLock
-    thread_manager: SlowInitializing[ThreadManager]
-    rpc_server: SlowInitializing[RPCServer]
-
-
 @contextlib.asynccontextmanager
-async def _prepared_everything() -> _ACMFactory[LifetimeDependencySet]:
+async def _prepared_everything() -> _ACMFactory["LifetimeDependencySet"]:
     async with contextlib.AsyncExitStack() as stack:
         # In general, when dependency A depends on dependency B, and B is a
         # SlowInitializing, A should also be a SlowInitializing, and should take the
@@ -153,6 +142,17 @@ async def _prepared_everything() -> _ACMFactory[LifetimeDependencySet]:
         )
 
         yield complete_result
+
+
+# todo(mm, 2021-08-04): Port get_session_manager() and get_protocol_manager()
+# dependencies, and clean them up with their .remove_all() methods.
+@dataclass(frozen=True)
+class LifetimeDependencySet:
+    """All app dependencies that are exposed to the request layer."""
+
+    motion_lock: ThreadedAsyncLock
+    thread_manager: SlowInitializing[ThreadManager]
+    rpc_server: SlowInitializing[RPCServer]
 
 
 class NotSetError(Exception):  # noqa: D101
@@ -202,3 +202,11 @@ def install_startup_shutdown_handlers(app: FastAPI) -> None:
         # comprised something like contextlib.suppress() to attempt to treat exceptions
         # specially.
         await context_manager.__aexit__(None, None, None)
+
+
+__all__ = [
+    "get",
+    "install_startup_shutdown_handlers",
+    "LifetimeDependencySet",
+    "NotSetError",
+]

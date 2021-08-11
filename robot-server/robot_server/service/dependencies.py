@@ -14,7 +14,7 @@ from robot_server import constants, lifetime_dependencies, util, errors
 from robot_server.service.session.manager import SessionManager
 from robot_server.service.protocol.manager import ProtocolManager
 from robot_server.service.legacy.rpc import RPCServer
-from robot_server.slow_initializing import InitializationOngoingError, SlowInitializing
+from robot_server.slow_initializing import InitializationOngoingError
 
 
 class OutdatedApiVersionResponse(errors.ErrorDetails):
@@ -40,7 +40,6 @@ async def get_app() -> FastAPI:
     # Local import to avoid an import loop:
     #   dependencies -> `app` object setup -> routers -> dependencies
     from robot_server import app
-
     return app
 
 
@@ -62,7 +61,11 @@ async def get_lifetime_dependencies(
     return lifetime_dependencies.get(app)
 
 
-async def get_hardware(lifetime_dependency_set: lifetime_dependencies.LifetimeDependencySet = Depends(get_lifetime_dependencies)) -> ThreadManager:
+async def get_hardware(
+    lifetime_dependency_set: lifetime_dependencies.LifetimeDependencySet = Depends(
+        get_lifetime_dependencies
+    ),
+) -> ThreadManager:
     """Hardware dependency"""
     try:
         return lifetime_dependency_set.thread_manager.get_if_ready()
