@@ -12,7 +12,6 @@ import {
   FONT_WEIGHT_REGULAR,
   JUSTIFY_CENTER,
   SIZE_4,
-  SIZE_6,
   SPACING_3,
   SPACING_4,
   SPACING_5,
@@ -20,6 +19,7 @@ import {
 import { Portal } from '../../../App/portal'
 import secureMagModBracketImage from '../../../assets/images/secure_mag_mod_bracket.svg'
 import secureTCLatchImage from '../../../assets/images/secure_tc_latch.png'
+import { getModuleName } from './utils/getModuleName'
 
 import styles from './styles.css'
 import type { ModuleTypesThatRequiresExtraAttention } from './utils/getModuleTypesThatRequireExtraAttention'
@@ -27,17 +27,6 @@ import type { ModuleTypesThatRequiresExtraAttention } from './utils/getModuleTyp
 interface SecureLabwareModalProps {
   onCloseClick: () => unknown
   type: ModuleTypesThatRequiresExtraAttention
-}
-
-const getModuleName = (
-  type: ModuleTypesThatRequiresExtraAttention
-): 'Magnetic Module' | 'Thermocycler' => {
-  switch (type) {
-    case 'magneticModuleType':
-      return 'Magnetic Module'
-    case 'thermocyclerModuleType':
-      return 'Thermocycler'
-  }
 }
 
 export const SecureLabwareModal = (
@@ -92,7 +81,7 @@ export const SecureLabwareModal = (
                 {t(`secure_labware_explanation_${snakeCase(moduleName)}`)}
               </Text>
               <Flex justifyContent={JUSTIFY_CENTER} marginY={SPACING_3}>
-                <img src={secureTCLatchImage} style={{ maxWidth: SIZE_6 }} />
+                <img src={secureTCLatchImage} style={{ maxWidth: '24rem' }} />
               </Flex>
             </Box>
           )}
