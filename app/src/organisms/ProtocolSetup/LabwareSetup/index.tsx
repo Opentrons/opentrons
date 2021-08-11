@@ -59,7 +59,7 @@ const DECK_MAP_VIEWBOX = '-80 -100 550 560'
 export const LabwareSetup = (props: LabwareSetupProps): JSX.Element | null => {
   const { moduleRenderCoords, labwareRenderCoords } = props
   const moduleModels = map(moduleRenderCoords, ({ moduleModel }) => moduleModel)
-  const moduleTypesThatRequireExtraAtention = getModuleTypesThatRequireExtraAttention(
+  const moduleTypesThatRequireExtraAttention = getModuleTypesThatRequireExtraAttention(
     moduleModels
   )
   const proceedToRunDisabled = false
@@ -95,9 +95,9 @@ export const LabwareSetup = (props: LabwareSetupProps): JSX.Element | null => {
         >
           {t('labware_help_link_title')}
         </Btn>
-        {moduleTypesThatRequireExtraAtention.length > 0 && (
+        {moduleTypesThatRequireExtraAttention.length > 0 && (
           <ExtraAttentionWarning
-            moduleTypes={moduleTypesThatRequireExtraAtention}
+            moduleTypes={moduleTypesThatRequireExtraAttention}
           />
         )}
         <RobotWorkSpace
