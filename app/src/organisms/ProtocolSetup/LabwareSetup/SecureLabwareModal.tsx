@@ -63,10 +63,10 @@ export const SecureLabwareModal = (
               </Flex>
               <Flex justifyContent={JUSTIFY_CENTER}>
                 <Text fontSize={FONT_SIZE_BODY_2} marginX={SPACING_4}>
-                  Magnetic Module with 0.2 mL 96 well PCR Plate
+                  {t('magnetic_module_standard_plate_text')}
                 </Text>
                 <Text fontSize={FONT_SIZE_BODY_2} marginX={SPACING_4}>
-                  Magnetic Module with 2 mL Deep Well Plate
+                  {t('magnetic_module_deep_well_plate_text')}
                 </Text>
               </Flex>
             </Box>
