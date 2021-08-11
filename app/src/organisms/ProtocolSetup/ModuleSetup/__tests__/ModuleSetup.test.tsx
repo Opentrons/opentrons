@@ -6,14 +6,14 @@ import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_stand
 import { renderWithProviders } from '@opentrons/components/__utils__'
 import { i18n } from '../../../../i18n'
 import { ModuleSetup } from '..'
-import { ModuleTag } from '../../ModuleTag'
+import { ModuleInfo } from '../ModuleInfo'
 import {
   inferModuleOrientationFromXCoordinate,
   ModuleModel,
   ModuleRealType,
 } from '@opentrons/shared-data'
 
-jest.mock('../../ModuleTag')
+jest.mock('../ModuleInfo')
 jest.mock('@opentrons/components', () => {
   const actualComponents = jest.requireActual('@opentrons/components')
   return {
@@ -43,7 +43,7 @@ const partialComponentPropsMatcher = (argsToMatch: unknown) =>
     equals(args[0], expect.objectContaining(argsToMatch))
   )
 
-const mockModuleTag = ModuleTag as jest.MockedFunction<typeof ModuleTag>
+const mockModuleInfo = ModuleInfo as jest.MockedFunction<typeof ModuleInfo>
 
 const mockModuleViz = ModuleViz as jest.MockedFunction<typeof ModuleViz>
 
@@ -132,7 +132,7 @@ describe('ModuleSetup', () => {
 
     render(props)
     expect(mockModuleViz).not.toHaveBeenCalled()
-    expect(mockModuleTag).not.toHaveBeenCalled()
+    expect(mockModuleInfo).not.toHaveBeenCalled()
   })
   it('should render a deck WITH modules', () => {
     const moduleRenderCoords = {
@@ -172,7 +172,7 @@ describe('ModuleSetup', () => {
       )
       .mockReturnValue(<div>mock module viz {mockTCModule.type} </div>)
 
-    when(mockModuleTag)
+    when(mockModuleInfo)
       .calledWith(
         componentPropsMatcher({
           orientation: STUBBED_ORIENTATION_VALUE,
@@ -181,9 +181,9 @@ describe('ModuleSetup', () => {
           y: MOCK_MAGNETIC_MODULE_COORDS[1],
         })
       )
-      .mockReturnValue(<div>mock module tag {mockMagneticModule.model} </div>)
+      .mockReturnValue(<div>mock module info {mockMagneticModule.model} </div>)
 
-    when(mockModuleTag)
+    when(mockModuleInfo)
       .calledWith(
         componentPropsMatcher({
           orientation: STUBBED_ORIENTATION_VALUE,
@@ -192,7 +192,7 @@ describe('ModuleSetup', () => {
           y: MOCK_TC_COORDS[1],
         })
       )
-      .mockReturnValue(<div>mock module tag {mockTCModule.model} </div>)
+      .mockReturnValue(<div>mock module info {mockTCModule.model} </div>)
 
     props = {
       ...props,
@@ -202,6 +202,6 @@ describe('ModuleSetup', () => {
     const { getByText } = render(props)
     getByText('mock module viz magneticModuleType')
     getByText('mock module viz thermocyclerModuleType')
-    getByText('mock module tag magneticModuleV2')
+    getByText('mock module info magneticModuleV2')
   })
 })
