@@ -94,7 +94,7 @@ export const ExtraAttentionWarning = (
             <Box size={SIZE_2} paddingY={SPACING_1} paddingRight={SPACING_2}>
               <Icon name="alert-circle" color={COLOR_WARNING} />
             </Box>
-            <Text as="h4" margin={SPACING_2}>
+            <Text as="h4" marginY={SPACING_2}>
               Some labware and modules require extra attention
             </Text>
           </Flex>
