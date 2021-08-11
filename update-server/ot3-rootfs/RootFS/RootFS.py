@@ -59,15 +59,16 @@ class RootFS:
             else:
                 setPartition(ROOTFS_PART1)
 
-    def factoryRestore(self):
+    def factoryRestore(self,arg):
         """" bmap to factory reset here"""
         subprocess.run(["bmaptool", "copy", "--bmap", SD_CARD_MOUNT_POINT+BMAP_FILE, "--no-sig-verify", "--no-verify", SD_CARD_MOUNT_POINT+BMAP_IMAGE, DISK])
 
     """ debug fuctions """
-    def printRootFSPartition(self):
+    def printRootFSPartition(self,arg):
         tmp=self.getPartition()
         print ('Current RootFS Partition '+tmp.disk+'\n')
-    def printRootFSConfig(self):
+    def printRootFSConfig(self, arg):
+        print ('ROOTFS_TEST_TITLE '+arg.tt+'\n')
         print ('ROOTFS_PART1 '+RootFS.ROOTFS_PART1+'\n')
         print ('ROOTFS_PART2 '+RootFS.ROOTFS_PART2+'\n')
         print ('BMAP_IMAGE '+RootFS.BMAP_IMAGE+'\n')
@@ -76,9 +77,9 @@ class RootFS:
         print ('BOOT_SRC_CARVE_OUT '+RootFS.BOOT_SRC_CARVE_OUT+'\n')
         print ('ROOT_FS_PARTITION '+RootFS.ROOT_FS_PARTITION+'\n')
         print ('SD_CARD_MOUNT_POINT '+RootFS.SD_CARD_MOUNT_POINT+'\n')
-    def debug(self):
-     self.printRootFSPartition()
-     self.printRootFSConfig()
+    def debug(self, arg):
+     self.printRootFSPartition(arg)
+     self.printRootFSConfig(arg)
     def __init__(self):
         self.RootFSPartition = ROOT_FS_PARTITION
 
@@ -87,17 +88,26 @@ def test():
 
 def main():
     rfs = RootFS()
-    parser = argparse.ArgumentParser(description='Change OT3 RootFS partition to upgrage etc.')
+    parser = argparse.ArgumentParser(description='Change OT3 RootFS partition to upgrade fs.')
     subparsers = parser.add_subparsers()
     # create Debug subcommand
     parser_debug = subparsers.add_parser('debug', help = 'Debug')
+    parser_debug.add_argument('--tt', '-t', type=str, nargs='?', help="test title", default="OT3 RootFS Test", const="OT# RootFS Test")
+
     parser_debug.set_defaults(func=rfs.debug)
-    # create REstore subcommand
+    # create Restore subcommand
     parser_factoryRestore = subparsers.add_parser('restore', help = 'Restore')
+    parser_factoryRestore.add_argument('--wbm', '-b', nargs='?', const='opentrons-ot3-image-verdin-imx8mm.wic.bmap', default='opentrons-ot3-image-verdin-imx8mm.wic.bmap', type=str, help="wic bmap file")
+    parser_factoryRestore.add_argument('--wi', '-i', nargs='?', const='opentrons-ot3-image-verdin-imx8mm.wic.gz', default='opentrons-ot3-image-verdin-imx8mm.wic.gz', type=str, help="wic image file")
+
     parser_factoryRestore.set_defaults(func=rfs.factoryRestore)
     parser_swapPartition = subparsers.add_parser('swap', help = 'Swap RootFS partitions')
+    parser_swapPartition.add_argument('--bco', '-b', type=str, help="bootsrc carve out bootargs get appended to")
+    parser_swapPartition.add_argument('--part1', '-1', type=str, help="file system partition 1")
+    parser_swapPartition.add_argument('--part2', '-2', type=str, help="file system partition 2")
+
     parser_swapPartition.set_defaults(func=rfs.swapPartition)
     options = parser.parse_args()
-    options.func()
+    options.func(options)
 if __name__ == "__main__":
     main()
