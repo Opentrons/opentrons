@@ -92,7 +92,7 @@ const mockTCModule = {
 describe('ModuleSetup', () => {
   let props: React.ComponentProps<typeof ModuleSetup>
   beforeEach(() => {
-    props = { moduleRenderCoords: {} }
+    props = { moduleRenderCoords: {}, expandLabwareSetupStep: () => {} }
 
     when(mockInferModuleOrientationFromXCoordinate)
       .calledWith(expect.anything())
