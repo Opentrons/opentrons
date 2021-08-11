@@ -1121,7 +1121,6 @@ class InstrumentContext(CommandPublisher):
         if publish:
             do_publish(self.broker, cmds.move_to, self.move_to, 'before',
                        None, None, self, location or self._ctx.location_cache)
-
         self._implementation.move_to(
             location=location,
             force_direct=force_direct,

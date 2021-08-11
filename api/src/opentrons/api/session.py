@@ -595,7 +595,6 @@ class Session(RobotBusy):
             )
             ctx.connect(self._hardware)
             ctx.home()
-
             run_protocol(self._protocol, context=ctx)
 
             # If the last command in a protocol was a pause, the protocol
@@ -611,12 +610,10 @@ class Session(RobotBusy):
             while self.state == 'paused':
                 sleep(0.1)
             self.set_state('finished')
-            log.info("session.py: ===== Done with run_protocol(). Homing now. =====")
             self._hw_iface().home()
         except (SmoothieAlarm, asyncio.CancelledError,
-                ExecutionCancelledError) as e:
+                ExecutionCancelledError):
             log.info("Protocol cancelled")
-            log.info(f"^^^^^ Exception raised: {e}")
         except Exception as e:
             log.exception("Exception during run:")
             self.error_append(e)

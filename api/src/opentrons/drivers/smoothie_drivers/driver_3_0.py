@@ -1611,9 +1611,7 @@ class SmoothieDriver_3_0_0:
                 self._set_saved_current()
             self._axes_moved_at.mark_moved(moving_axes)
 
-        self._update_position(target)  # ==> why is this _ and not the update_position() function?
-        # Looks like using the update_position() fn could help keep track of last location
-        # so that it can be harnessed somehow in drop tip after cancel
+        self._update_position(target)
 
     def home(self,
              axis: str = AXES,
