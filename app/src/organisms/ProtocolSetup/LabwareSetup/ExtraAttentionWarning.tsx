@@ -4,16 +4,19 @@ import { Trans, useTranslation } from 'react-i18next'
 import {
   Btn,
   Box,
-  Link,
+  Flex,
+  Icon,
   Text,
   ALIGN_FLEX_END,
+  SIZE_2,
+  SPACING_1,
   SPACING_2,
   SPACING_3,
   SPACING_5,
+  COLOR_WARNING,
   COLOR_WARNING_LIGHT,
-  SPACING_1,
   C_DARK_GRAY,
-  C_BLUE,
+  TEXT_DECORATION_UNDERLINE,
 } from '@opentrons/components'
 import { getModuleName } from './utils/getModuleName'
 import { SecureLabwareModal } from './SecureLabwareModal'
@@ -52,10 +55,10 @@ const ModuleWarning = (props: {
           ),
           a: (
             <Btn
-              as={Link}
-              color={C_BLUE}
+              as={'span'}
               alignSelf={ALIGN_FLEX_END}
               onClick={props.onLinkClick}
+              textDecoration={TEXT_DECORATION_UNDERLINE}
             />
           ),
         }}
@@ -86,16 +89,23 @@ export const ExtraAttentionWarning = (
         backgroundColor={COLOR_WARNING_LIGHT}
         color={C_DARK_GRAY}
       >
-        <Text as="h4" margin={SPACING_2}>
-          Some labware and modules require extra attention
-        </Text>
-        {moduleTypes.map(moduleType => (
-          <ModuleWarning
-            key={moduleType}
-            moduleType={moduleType}
-            onLinkClick={() => setSecureLabwareModalType(moduleType)}
-          />
-        ))}
+        <Box margin={SPACING_3}>
+          <Flex margin={SPACING_2}>
+            <Box size={SIZE_2} paddingY={SPACING_1} paddingRight={SPACING_2}>
+              <Icon name="alert-circle" color={COLOR_WARNING} />
+            </Box>
+            <Text as="h4" margin={SPACING_2}>
+              Some labware and modules require extra attention
+            </Text>
+          </Flex>
+          {moduleTypes.map(moduleType => (
+            <ModuleWarning
+              key={moduleType}
+              moduleType={moduleType}
+              onLinkClick={() => setSecureLabwareModalType(moduleType)}
+            />
+          ))}
+        </Box>
       </Box>
     </React.Fragment>
   )
