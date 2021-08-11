@@ -10,7 +10,7 @@ import {
   SPACING_2,
   SPACING_3,
   SPACING_5,
-  OVERLAY_LIGHT_GRAY_50,
+  COLOR_WARNING_LIGHT,
   SPACING_1,
   C_DARK_GRAY,
   C_BLUE,
@@ -83,7 +83,7 @@ export const ExtraAttentionWarning = (
       <Box
         marginX={SPACING_5}
         marginY={SPACING_3}
-        backgroundColor={OVERLAY_LIGHT_GRAY_50}
+        backgroundColor={COLOR_WARNING_LIGHT}
         color={C_DARK_GRAY}
       >
         <Text as="h4" margin={SPACING_2}>
