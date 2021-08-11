@@ -51,7 +51,7 @@ _ACMFactory = typing.AsyncGenerator[_YieldT, None]
 # todo(mm, 2021-08-04): Port get_session_manager() and get_protocol_manager()
 # dependencies, and clean them up with their .remove_all() methods.
 @dataclass(frozen=True)
-class AppDependencySet:
+class LifetimeDependencySet:
     """All app dependencies that are exposed to the request layer."""
 
     thread_manager: SlowInitializing[ThreadManager]
@@ -69,11 +69,11 @@ class AppDependenciesNotSetError(Exception):  # noqa: D101
         )
 
 
-def _set_app_dependencies(app: FastAPI, dependencies: AppDependencySet) -> None:
+def _set_app_dependencies(app: FastAPI, dependencies: LifetimeDependencySet) -> None:
     app.state.app_dependencies = dependencies
 
 
-def _get_app_dependencies(app: FastAPI) -> AppDependencySet:
+def _get_app_dependencies(app: FastAPI) -> LifetimeDependencySet:
     state = app.state
     try:
         return state.app_dependencies
@@ -81,7 +81,7 @@ def _get_app_dependencies(app: FastAPI) -> AppDependencySet:
         raise AppDependenciesNotSetError() from e
 
 
-def get_app_dependencies(request: Request) -> AppDependencySet:
+def get_app_dependencies(request: Request) -> LifetimeDependencySet:
     """Return the app's dependencies.
 
     This must be called as a FastAPI dependency.
@@ -147,7 +147,7 @@ async def _rpc_server(
 
 
 @contextlib.asynccontextmanager
-async def _all_app_dependencies() -> _ACMFactory[AppDependencySet]:
+async def _all_app_dependencies() -> _ACMFactory[LifetimeDependencySet]:
     async with contextlib.AsyncExitStack() as stack:
         motion_lock = ThreadedAsyncLock()
         event_publisher = stack.enter_context(_event_publisher())
@@ -160,7 +160,7 @@ async def _all_app_dependencies() -> _ACMFactory[AppDependencySet]:
             _rpc_server(hardware_wrapper=thread_manager, lock=motion_lock)
         )
 
-        complete_result = AppDependencySet(
+        complete_result = LifetimeDependencySet(
             thread_manager=thread_manager,
             rpc_server=rpc_server,
             motion_lock=motion_lock,

@@ -10,11 +10,14 @@ from starlette.requests import Request
 
 from opentrons.hardware_control import ThreadManager, ThreadedAsyncLock
 
-from robot_server import app, constants, util, errors
+from robot_server import app
+from robot_server import constants, util, errors
 from robot_server.service.session.manager import SessionManager
 from robot_server.service.protocol.manager import ProtocolManager
 from robot_server.service.legacy.rpc import RPCServer
 from robot_server.slow_initializing import InitializationOngoingError, SlowInitializing
+from robot_server.lifetime_dependencies import LifetimeDependencySet
+
 
 class OutdatedApiVersionResponse(errors.ErrorDetails):
     """An error returned when you request an outdated HTTP API version."""
@@ -40,7 +43,13 @@ async def get_app_state() -> State:
     # returning `request.app.state`. However, this function might be a dependency of a
     # WebSocket endpoint, and current FastAPI (v0.54.1) raises internal errors when
     # WebSocket endpoints depend on `request`.
-    return app.app.state
+    return app.state
+
+
+async def get_lifetime_dependencies(
+    state: State = Depends(get_app_state)
+) -> LifetimeDependencySet:
+    return lifetime_dependencies.get_lifetime_dependencies(state)
 
 
 async def get_hardware(state: State = Depends(get_app_state)) -> ThreadManager:

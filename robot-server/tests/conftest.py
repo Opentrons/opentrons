@@ -17,7 +17,7 @@ from typing import Any, Dict
 
 from opentrons.protocols.context.protocol_api.labware import LabwareImplementation
 from starlette.testclient import TestClient
-from robot_server.app import app
+from robot_server import app
 from robot_server.constants import API_VERSION_HEADER, API_VERSION_LATEST
 from robot_server.service.dependencies import get_hardware, get_motion_lock
 from opentrons.hardware_control import API, HardwareAPILike, ThreadedAsyncLock

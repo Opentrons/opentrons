@@ -14,7 +14,6 @@ from starlette.middleware.base import RequestResponseEndpoint
 from notify_server.clients import publisher as notify_server_publisher
 from notify_server.settings import Settings as NotifyServerSettings
 
-
 from .service.dependencies import (
     get_rpc_server,
     get_protocol_manager,
@@ -24,25 +23,13 @@ from .service.dependencies import (
 from .errors import exception_handlers
 from .router import router
 from .service import initialize_logging
-from . import app_dependencies
+from . import lifetime_dependencies
 from . import constants
 from . import slow_initializing
 from . import hardware_initialization
 
-
-def _make_event_publisher() -> notify_server_publisher.Publisher:
-    """Create a notify-server event publisher instance."""
-    notify_server_settings = NotifyServerSettings()
-    event_publisher = notify_server_publisher.create(
-        notify_server_settings.publisher_address.connection_string()
-    )
-    # fixme(mm, 2021-08-09): Publisher has a .close() method that we must call, or
-    # we'll leak a socket.
-    return event_publisher
-
-
-log = logging.getLogger(__name__)
-
+# Our global ASGI app object. Our ASGI server (currently Uvicorn) finds this and
+# sends web requests to it.
 app = FastAPI(
     title="Opentrons OT-2 HTTP API Spec",
     description=(
@@ -74,17 +61,8 @@ app.add_middleware(
 # main router
 app.include_router(router=router)
 
-
-@app.on_event("startup")
-async def _on_startup() -> None:
-    initialize_logging()
-
-
-app_dependencies.install_startup_shutdown_handlers(app)
-
-
 @app.middleware("http")
-async def api_version_response_header(
+async def _api_version_response_header(
     request: Request,
     call_next: RequestResponseEndpoint,
 ) -> Response:
@@ -99,3 +77,8 @@ async def api_version_response_header(
     response.headers[constants.API_VERSION_HEADER] = str(request.state.api_version)
     response.headers[constants.MIN_API_VERSION_HEADER] = str(constants.MIN_API_VERSION)
     return response
+
+app.on_event("startup")(initialize_logging)
+lifetime_dependencies.install_startup_shutdown_handlers(app)
+
+__all__ = ["app"]
