@@ -1,15 +1,6 @@
 import argparse, os, stat, subprocess, shlex, re, sys
 from dataclasses import dataclass
 
-""" CONFIG vars, can be changed through the commandline arguments """
-ROOTFS_PART1 = ''
-ROOTFS_PART2 = ''
-BMAP_IMAGE = ''
-BMAP_FILE = ''
-DISK = 'mmcblk0'
-BOOT_SRC_CARVE_OUT = ''
-ROOT_FS_PARTITION = ''
-SD_CARD_MOUNT_POINT = '/media/mmcblk1p1'
 @dataclass
 class RootFSInfo:
     major: str
@@ -30,10 +21,12 @@ class RootFS:
     BOOT_SRC_CARVE_OUT = ''
     ROOT_FS_PARTITION = ''
     SD_CARD_MOUNT_POINT = '/media/mmcblk1p1'
-    def setPartition(self, partitionName):
+    def setPartition(self, arg, PartitionName):
         """ Run boot util command here to set partion
          Use the libubootenv utility to set bootargs
          boot.src has a carveout for bootargs, use that """
+        BOOT_SRC_CARVE_OUT = arg.bco
+
         subprocess.run(["fw_setenv",BOOT_SRC_CARVE_OUT,"boot="+PartitionName ])
 
     def getPartition(self):
@@ -55,16 +48,16 @@ class RootFS:
         currentPartition = getPartition()
         if currentPartition is not None:
             if currentPartition.disk == ROOTFS_PART1:
-                setPartition(ROOTFS_PART2)
+                setPartition(arg, ROOTFS_PART2)
             else:
-                setPartition(ROOTFS_PART1)
+                setPartition(arg, ROOTFS_PART1)
 
-    def factoryRestore(self,arg):
+    def factoryRestore(self, arg):
         """" bmap to factory reset here"""
         subprocess.run(["bmaptool", "copy", "--bmap", SD_CARD_MOUNT_POINT+BMAP_FILE, "--no-sig-verify", "--no-verify", SD_CARD_MOUNT_POINT+BMAP_IMAGE, DISK])
 
     """ debug fuctions """
-    def printRootFSPartition(self,arg):
+    def printRootFSPartition(self, arg):
         tmp=self.getPartition()
         print ('Current RootFS Partition '+tmp.disk+'\n')
     def printRootFSConfig(self, arg):
@@ -80,11 +73,6 @@ class RootFS:
     def debug(self, arg):
      self.printRootFSPartition(arg)
      self.printRootFSConfig(arg)
-    def __init__(self):
-        self.RootFSPartition = ROOT_FS_PARTITION
-
-def test():
-    print('test me')
 
 def main():
     rfs = RootFS()
