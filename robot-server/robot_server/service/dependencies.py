@@ -35,10 +35,11 @@ async def get_app_state() -> State:
     for more details.
     """
 
-    # Ideally, we would access the app state through request.app.state. However,
-    # this function might be depended upon by a WebSocket endpoint, and current FastAPI
-    # (v0.54.1) raises runtime errors when trying to resolve the built-in `request`
-    # dependency for WebSocket endpoints.
+    # Ideally, we would avoid this global variable access by using FastAPI's built-in
+    # `request` dependency (fastapi.tiangolo.com/advanced/using-request-directly/) and
+    # returning `request.app.state`. However, this function might be a dependency of a
+    # WebSocket endpoint, and current FastAPI (v0.54.1) raises internal errors when
+    # WebSocket endpoints depend on `request`.
     return app.app.state
 
 
