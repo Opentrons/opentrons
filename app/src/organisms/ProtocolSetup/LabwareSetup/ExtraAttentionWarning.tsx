@@ -40,7 +40,7 @@ const ModuleWarning = (props: {
         marginBottom={SPACING_1}
         marginX={SPACING_2}
       >
-        {getModuleName(props.moduleType)}
+        {moduleName}
       </Text>
       <Trans
         t={t}
@@ -75,6 +75,7 @@ export const ExtraAttentionWarning = (
     secureLabwareModalType,
     setSecureLabwareModalType,
   ] = React.useState<ModuleTypesThatRequiresExtraAttention | null>(null)
+  const { t } = useTranslation('protocol_setup')
   return (
     <React.Fragment>
       {secureLabwareModalType != null && (
@@ -95,7 +96,7 @@ export const ExtraAttentionWarning = (
               <Icon name="alert-circle" color={COLOR_WARNING} />
             </Box>
             <Text as="h4" marginY={SPACING_2}>
-              Some labware and modules require extra attention
+              {t('extra_attention_warning_title')}
             </Text>
           </Flex>
           {moduleTypes.map(moduleType => (
