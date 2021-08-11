@@ -22,6 +22,7 @@ from . import constants
 from . import slow_initializing
 from . import hardware_initialization
 
+
 # Our global ASGI app object. Our ASGI server (currently Uvicorn) finds this and
 # sends web requests to it.
 app = FastAPI(
@@ -36,12 +37,14 @@ app = FastAPI(
     version=__version__,
 )
 
+
 # exception handlers
 # TODO(mc, 2021-05-10): after upgrade to FastAPI > 0.61.2, we can pass these
 # to FastAPI's `exception_handlers` arg instead. Current version has bug, see:
 # https://github.com/tiangolo/fastapi/pull/1924
 for exc_cls, handler in exception_handlers.items():
     app.add_exception_handler(exc_cls, handler)
+
 
 # cors
 app.add_middleware(
@@ -51,6 +54,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 @app.middleware("http")
 async def _api_version_response_header(
@@ -69,10 +73,13 @@ async def _api_version_response_header(
     response.headers[constants.MIN_API_VERSION_HEADER] = str(constants.MIN_API_VERSION)
     return response
 
+
 # main router
 app.include_router(router=router)
 
+
 app.on_event("startup")(initialize_logging)
 lifetime_dependencies.install_startup_shutdown_handlers(app)
+
 
 __all__ = ["app"]

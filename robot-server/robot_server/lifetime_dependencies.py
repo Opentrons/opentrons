@@ -30,7 +30,7 @@ from fastapi import FastAPI
 from .slow_initializing import (
     InitializationFailedError,
     SlowInitializing,
-    start_initializing as start_slow_initializing
+    start_initializing as start_slow_initializing,
 )
 
 from notify_server.clients import publisher as notify_server_publisher
@@ -135,9 +135,7 @@ async def _prepared_everything() -> _ACMFactory[LifetimeDependencySet]:
         # todo(mm, 2021-08-04): If wrong arguments are provided to the _rpc_server
         # factory, MyPy doesn't catch it. Why not?
         rpc_server = await stack.enter_async_context(
-            _prepared_rpc_server(
-                thread_manager=thread_manager, lock=motion_lock
-            )
+            _prepared_rpc_server(thread_manager=thread_manager, lock=motion_lock)
         )
 
         complete_result = LifetimeDependencySet(
@@ -147,7 +145,6 @@ async def _prepared_everything() -> _ACMFactory[LifetimeDependencySet]:
         )
 
         yield complete_result
-
 
 
 # todo(mm, 2021-08-04): Port get_session_manager() and get_protocol_manager()
@@ -183,7 +180,6 @@ def get(app: FastAPI) -> LifetimeDependencySet:
         return state.app_dependencies
     except AttributeError as e:
         raise NotSetError() from e
-
 
 
 def install_startup_shutdown_handlers(app: FastAPI) -> None:

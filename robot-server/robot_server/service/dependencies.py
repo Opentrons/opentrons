@@ -40,6 +40,7 @@ async def get_app() -> FastAPI:
     # Local import to avoid an import loop:
     #   dependencies -> `app` object setup -> routers -> dependencies
     from robot_server import app
+
     return app
 
 
@@ -56,7 +57,7 @@ async def get_app_state(app: FastAPI = Depends(get_app)) -> State:
 
 
 async def get_lifetime_dependencies(
-    app: FastAPI = Depends(get_app)
+    app: FastAPI = Depends(get_app),
 ) -> lifetime_dependencies.LifetimeDependencySet:
     return lifetime_dependencies.get(app)
 
@@ -74,7 +75,9 @@ async def get_hardware(state: State = Depends(get_app_state)) -> ThreadManager:
 
 
 async def get_motion_lock(
-    lifetime_dependency_set: lifetime_dependencies.LifetimeDependencySet = Depends(get_lifetime_dependencies),
+    lifetime_dependency_set: lifetime_dependencies.LifetimeDependencySet = Depends(
+        get_lifetime_dependencies
+    ),
 ) -> ThreadedAsyncLock:
     """Get the single motion lock.
 
@@ -84,7 +87,9 @@ async def get_motion_lock(
 
 
 async def get_rpc_server(
-    lifetime_dependency_set: lifetime_dependencies.LifetimeDependencySet = Depends(get_lifetime_dependencies),
+    lifetime_dependency_set: lifetime_dependencies.LifetimeDependencySet = Depends(
+        get_lifetime_dependencies
+    ),
 ) -> RPCServer:
     """The RPC Server instance"""
     # todo: Handle exception
