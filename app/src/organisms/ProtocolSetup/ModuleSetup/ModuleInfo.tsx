@@ -27,22 +27,17 @@ export interface ModuleInfoProps {
   moduleModel: ModuleModel
 }
 
-const STANDARD_TAG_HEIGHT = SLOT_Y
-const STANDARD_TAG_WIDTH = SLOT_X
-
 export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
   const { x, y, orientation, moduleModel } = props
   const moduleType = getModuleType(moduleModel)
   const { childYOffset } = getModuleVizDims(orientation, moduleType)
-  let tagHeight = STANDARD_TAG_HEIGHT
-  let tagWidth = STANDARD_TAG_WIDTH
 
   return (
     <RobotCoordsForeignDiv
       x={x}
-      y={y + childYOffset + (SLOT_Y - tagHeight) / 2}
-      height={tagHeight}
-      width={tagWidth}
+      y={y + childYOffset}
+      height={SLOT_Y}
+      width={SLOT_X}
       innerDivProps={{
         justifyContent: JUSTIFY_CENTER,
         alignItems: ALIGN_CENTER,
