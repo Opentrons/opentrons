@@ -62,11 +62,10 @@ async def get_lifetime_dependencies(
     return lifetime_dependencies.get(app)
 
 
-async def get_hardware(state: State = Depends(get_app_state)) -> ThreadManager:
+async def get_hardware(lifetime_dependency_set: lifetime_dependencies.LifetimeDependencySet = Depends(get_lifetime_dependencies)) -> ThreadManager:
     """Hardware dependency"""
-    slow_initializing_hardware: SlowInitializing[ThreadManager] = state.hardware
     try:
-        return slow_initializing_hardware.get_if_ready()
+        return lifetime_dependency_set.thread_manager.get_if_ready()
     except InitializationOngoingError:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,

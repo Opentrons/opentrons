@@ -2,7 +2,6 @@
 
 
 import asyncio
-import typing
 
 from decoy import Decoy, matchers
 import pytest

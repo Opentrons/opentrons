@@ -89,7 +89,8 @@ async def _prepared_thread_manager(
         else:
             fully_initialized_result.clean_up()
         # To do: Justify why we don't attempt to cancel.
-        # Codebase generally isn't prepared to handle it. Need something like task groups.
+        # Codebase generally isn't prepared to handle it.
+        # Need something like task groups.
 
 
 @contextlib.asynccontextmanager
@@ -114,6 +115,17 @@ async def _prepared_rpc_server(
             pass
         else:
             await fully_initialized_result.on_shutdown()
+
+
+# todo(mm, 2021-08-04): Port get_session_manager() and get_protocol_manager()
+# dependencies, and clean them up with their .remove_all() methods.
+@dataclass(frozen=True)
+class LifetimeDependencySet:
+    """All app dependencies that are exposed to the request layer."""
+
+    motion_lock: ThreadedAsyncLock
+    thread_manager: SlowInitializing[ThreadManager]
+    rpc_server: SlowInitializing[RPCServer]
 
 
 @contextlib.asynccontextmanager
@@ -145,17 +157,6 @@ async def _prepared_everything() -> _ACMFactory[LifetimeDependencySet]:
         )
 
         yield complete_result
-
-
-# todo(mm, 2021-08-04): Port get_session_manager() and get_protocol_manager()
-# dependencies, and clean them up with their .remove_all() methods.
-@dataclass(frozen=True)
-class LifetimeDependencySet:
-    """All app dependencies that are exposed to the request layer."""
-
-    motion_lock: ThreadedAsyncLock
-    thread_manager: SlowInitializing[ThreadManager]
-    rpc_server: SlowInitializing[RPCServer]
 
 
 class NotSetError(Exception):  # noqa: D101

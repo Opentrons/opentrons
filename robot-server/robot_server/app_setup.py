@@ -1,9 +1,6 @@
 """Main FastAPI application."""
 
 
-from functools import partial
-import logging
-
 from opentrons import __version__
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -11,16 +8,11 @@ from starlette.responses import Response
 from starlette.requests import Request
 from starlette.middleware.base import RequestResponseEndpoint
 
-from notify_server.clients import publisher as notify_server_publisher
-from notify_server.settings import Settings as NotifyServerSettings
-
 from .errors import exception_handlers
 from .router import router
 from .service import initialize_logging
 from . import lifetime_dependencies
 from . import constants
-from . import slow_initializing
-from . import hardware_initialization
 
 
 # Our global ASGI app object. Our ASGI server (currently Uvicorn) finds this and
