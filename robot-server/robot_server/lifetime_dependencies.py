@@ -48,10 +48,6 @@ _CMFactory = typing.Generator[_YieldT, None, None]
 _ACMFactory = typing.AsyncGenerator[_YieldT, None]
 
 
-# Context managers to set up individual dependencies so that they're prepared to
-# be used by request handlers, and then tear them down...
-
-
 @contextlib.contextmanager
 def _prepared_motion_lock() -> _CMFactory[ThreadedAsyncLock]:
     # This doesn't need to be a context manager. It's done this way just for
