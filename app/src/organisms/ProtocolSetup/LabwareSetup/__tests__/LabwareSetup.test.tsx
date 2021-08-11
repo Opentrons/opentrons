@@ -2,6 +2,12 @@ import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { StaticRouter } from 'react-router-dom'
 import { LabwareRender, RobotWorkSpace, ModuleViz } from '@opentrons/components'
+import {
+  inferModuleOrientationFromXCoordinate,
+  LabwareDefinition2,
+  ModuleModel,
+  ModuleRealType,
+} from '@opentrons/shared-data'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 import { fireEvent, screen } from '@testing-library/react'
@@ -11,16 +17,14 @@ import { LabwareSetup } from '..'
 import { LabwareSetupModal } from '../LabwareSetupModal'
 import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
 import { ModuleTag } from '../ModuleTag'
-import {
-  inferModuleOrientationFromXCoordinate,
-  LabwareDefinition2,
-  ModuleModel,
-  ModuleRealType,
-} from '@opentrons/shared-data'
+import { ExtraAttentionWarning } from '../ExtraAttentionWarning'
+import { getModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
 
 jest.mock('../LabwareSetupModal')
 jest.mock('../ModuleTag')
 jest.mock('../LabwareInfoOverlay')
+jest.mock('../ExtraAttentionWarning')
+jest.mock('../utils/getModuleTypesThatRequireExtraAttention')
 jest.mock('@opentrons/components', () => {
   const actualComponents = jest.requireActual('@opentrons/components')
   return {
@@ -74,6 +78,14 @@ const mockLabwareSetupModal = LabwareSetupModal as jest.MockedFunction<
   typeof LabwareSetupModal
 >
 
+const mockGetModuleTypesThatRequireExtraAttention = getModuleTypesThatRequireExtraAttention as jest.MockedFunction<
+  typeof getModuleTypesThatRequireExtraAttention
+>
+
+const mockExtraAttentionWarning = ExtraAttentionWarning as jest.MockedFunction<
+  typeof ExtraAttentionWarning
+>
+
 const deckSlotsById = standardDeckDef.locations.orderedSlots.reduce(
   (acc, deckSlot) => ({ ...acc, [deckSlot.id]: deckSlot }),
   {}
@@ -118,6 +130,10 @@ describe('LabwareSetup', () => {
     when(mockInferModuleOrientationFromXCoordinate)
       .calledWith(expect.anything())
       .mockReturnValue(STUBBED_ORIENTATION_VALUE)
+
+    when(mockGetModuleTypesThatRequireExtraAttention)
+      .calledWith(expect.anything())
+      .mockReturnValue([])
 
     when(mockLabwareSetupModal)
       .calledWith(
@@ -330,5 +346,23 @@ describe('LabwareSetup', () => {
     getByText(
       'Labware Position Check is an optional workflow that guides you through checking the position of each labware on the deck. During this check, you can make an offset adjustment to the overall position of the labware.'
     )
+  })
+  it('should render the extra attention warning when there are modules/labware that need extra attention', () => {
+    when(mockGetModuleTypesThatRequireExtraAttention)
+      .calledWith([])
+      .mockReturnValue(['magneticModuleType', 'thermocyclerModuleType'])
+
+    when(mockExtraAttentionWarning)
+      .calledWith(
+        componentPropsMatcher({
+          moduleTypes: ['magneticModuleType', 'thermocyclerModuleType'],
+        })
+      )
+      .mockReturnValue(
+        <div>mock extra attention warning with magnetic module and TC</div>
+      )
+
+    const { getByText } = render(props)
+    getByText('mock extra attention warning with magnetic module and TC')
   })
 })

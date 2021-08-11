@@ -9,19 +9,19 @@ const MODULE_TYPES_THAT_REQUIRE_EXTRA_ATTENTION = [
   'thermocyclerModuleType',
 ] as const
 
-export type ModuleTypeThatRequiresExtraAttention = typeof MODULE_TYPES_THAT_REQUIRE_EXTRA_ATTENTION[number]
+export type ModuleTypesThatRequiresExtraAttention = typeof MODULE_TYPES_THAT_REQUIRE_EXTRA_ATTENTION[number]
 
 const doesModuleRequireExtraAttention = (
   moduleType: ModuleRealType
-): moduleType is ModuleTypeThatRequiresExtraAttention =>
+): moduleType is ModuleTypesThatRequiresExtraAttention =>
   MODULE_TYPES_THAT_REQUIRE_EXTRA_ATTENTION.includes(
-    moduleType as ModuleTypeThatRequiresExtraAttention
+    moduleType as ModuleTypesThatRequiresExtraAttention
   )
 
 export const getModuleTypesThatRequireExtraAttention = (
   moduleModels: ModuleModel[]
-): ModuleTypeThatRequiresExtraAttention[] =>
-  moduleModels.reduce<ModuleTypeThatRequiresExtraAttention[]>(
+): ModuleTypesThatRequiresExtraAttention[] =>
+  moduleModels.reduce<ModuleTypesThatRequiresExtraAttention[]>(
     (acc, moduleModel) => {
       const moduleType = getModuleType(moduleModel)
       return doesModuleRequireExtraAttention(moduleType) &&

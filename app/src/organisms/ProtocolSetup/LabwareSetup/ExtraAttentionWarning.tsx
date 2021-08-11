@@ -15,10 +15,10 @@ import {
   C_BLUE,
 } from '@opentrons/components'
 import { SecureLabwareModal } from './SecureLabwareModal'
-import type { ModuleTypeThatRequiresExtraAttention } from './utils/getModuleTypesThatRequireExtraAttention'
+import type { ModuleTypesThatRequiresExtraAttention } from './utils/getModuleTypesThatRequireExtraAttention'
 
 interface ExtraAttentionWarningProps {
-  moduleTypes: ModuleTypeThatRequiresExtraAttention[]
+  moduleTypes: ModuleTypesThatRequiresExtraAttention[]
 }
 export const ExtraAttentionWarning = (
   props: ExtraAttentionWarningProps
@@ -28,7 +28,7 @@ export const ExtraAttentionWarning = (
   const [
     secureLabwareModalType,
     setSecureLabwareModalType,
-  ] = React.useState<ModuleTypeThatRequiresExtraAttention | null>(null)
+  ] = React.useState<ModuleTypesThatRequiresExtraAttention | null>(null)
   return (
     <React.Fragment>
       {secureLabwareModalType && (

@@ -22,15 +22,15 @@ import secureMagModBracketImage from '../../../assets/images/secure_mag_mod_brac
 import secureTCLatchImage from '../../../assets/images/secure_tc_latch.png'
 
 import styles from './styles.css'
-import type { ModuleTypeThatRequiresExtraAttention } from './utils/getModuleTypesThatRequireExtraAttention'
+import type { ModuleTypesThatRequiresExtraAttention } from './utils/getModuleTypesThatRequireExtraAttention'
 
 interface SecureLabwareModalProps {
   onCloseClick: () => unknown
-  type: ModuleTypeThatRequiresExtraAttention
+  type: ModuleTypesThatRequiresExtraAttention
 }
 
 const getModuleName = (
-  type: ModuleTypeThatRequiresExtraAttention
+  type: ModuleTypesThatRequiresExtraAttention
 ): 'Magnetic Module' | 'Thermocycler' => {
   switch (type) {
     case 'magneticModuleType':
