@@ -17,6 +17,7 @@ env/
 # Generated files for local API server config paths
 api/.env
 api/index.json
+.opentrons_config
 
 # MyPy caches
 .mypy_cache
