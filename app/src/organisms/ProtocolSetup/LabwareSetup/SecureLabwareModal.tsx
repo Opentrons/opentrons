@@ -2,15 +2,20 @@ import * as React from 'react'
 import snakeCase from 'lodash/snakeCase'
 import { Trans, useTranslation } from 'react-i18next'
 import {
+  Btn,
   Box,
+  Icon,
   Flex,
   Modal,
   PrimaryBtn,
   Text,
   C_BLUE,
+  C_MED_DARK_GRAY,
   FONT_SIZE_BODY_2,
   FONT_WEIGHT_REGULAR,
+  JUSTIFY_SPACE_BETWEEN,
   JUSTIFY_CENTER,
+  SIZE_2,
   SIZE_4,
   SPACING_3,
   SPACING_4,
@@ -38,11 +43,17 @@ export const SecureLabwareModal = (
     <Portal level="top">
       <Modal className={styles.modal} contentsClassName={styles.modal_contents}>
         <Box>
-          <Text as={'h3'} marginBottom={SPACING_3}>
-            {t(`secure_labware_modal_title`, {
-              name: moduleName,
-            })}
-          </Text>
+          <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
+            <Text as={'h3'} marginBottom={SPACING_3}>
+              {t(`secure_labware_modal_title`, {
+                name: moduleName,
+              })}
+            </Text>
+            <Btn size={SIZE_2} onClick={props.onCloseClick}>
+              <Icon name={'close'} color={C_MED_DARK_GRAY}></Icon>
+            </Btn>
+          </Flex>
+
           {props.type === 'magneticModuleType' && (
             <Box>
               <Trans
