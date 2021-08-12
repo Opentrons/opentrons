@@ -16,11 +16,11 @@ import type { RobotWorkSpaceRenderProps } from './types'
 import type { Story, Meta } from '@storybook/react'
 
 const moduleModels = [
-  MAGNETIC_MODULE_V1,
-  MAGNETIC_MODULE_V2,
-  TEMPERATURE_MODULE_V1,
+  // MAGNETIC_MODULE_V1,
+  // MAGNETIC_MODULE_V2,
+  // TEMPERATURE_MODULE_V1,
   TEMPERATURE_MODULE_V2,
-  THERMOCYCLER_MODULE_V1,
+  // THERMOCYCLER_MODULE_V1,
 ]
 
 const displayModes = ['default', 'present', 'missing', 'info']
@@ -36,12 +36,12 @@ const Template: Story<React.ComponentProps<typeof ModuleComponent>> = args => {
         const slot = deckSlotsById['3']
         return (
           <g transform={`translate(${slot.position[0]}, ${slot.position[1]})`}>
-            <ModuleComponent mode={args.mode} model={args.model} slot={slot} />
-            {/* <ModuleFromData
+            {/* <ModuleComponent mode={args.mode} model={args.model} slot={slot} /> */}
+            <ModuleFromData
               def={getModuleDef2(TEMPERATURE_MODULE_V2)}
               stylePropsByLayer={{'darkFill': {fill: '#ccc'}}}
               layerBlocklist={args.layerBlocklist}
-              /> */}
+              />
           </g>
         )
       }}
