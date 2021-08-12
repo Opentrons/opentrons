@@ -1,5 +1,5 @@
 """
-Entrypoint for the buildroot update server
+Entrypoint for the openembedded update server
 """
 import argparse
 
