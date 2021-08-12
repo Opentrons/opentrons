@@ -33,7 +33,7 @@ import type {
 } from '@opentrons/shared-data'
 import type { State } from '../types'
 import type { TipracksByMountMap } from '../robot/types'
-import { getProtocolLabwareData } from '../protocol'
+import { getProtocolPipetteTipRacks } from '../protocol'
 
 import { PIPETTE_MOUNTS } from '../robot/constants'
 
@@ -273,42 +273,37 @@ export const getUncalibratedTipracksByMount: (
   }
 )
 
-interface ProtocolPipettesMatchByMount {
-  left: string | null
-  right: string | null
-}
-
 export const getProtocolPipettesMatch: (
   state: State,
   robotName: string
-) => ProtocolPipettesMatchByMount = createSelector(
+) => Types.ProtocolPipettesMatchByMount = createSelector(
   getAttachedPipettes,
-  getProtocolLabwareData,
-  (attachedPipettes, protocolLabwareData) => {
-    return Constants.PIPETTE_MOUNTS.reduce<ProtocolPipettesMatchByMount>(
+  getProtocolPipetteTipRacks,
+  (attachedPipettes, protocolPipetteTipRack) => {
+    return Constants.PIPETTE_MOUNTS.reduce<Types.ProtocolPipettesMatchByMount>(
       (result, mount) => {
         const attachedPipette = attachedPipettes[mount]
-        if (protocolLabwareData == null) {
+        const protocolPipette = protocolPipetteTipRack[mount]
+        if (
+          attachedPipette == null ||
+          protocolPipette == null ||
+          protocolPipette.pipetteSpecs == null
+        ) {
           result[mount] = null
         } else {
-          const protocolPipette = protocolLabwareData.find(pipette => {
-            return pipette.mount === mount
-          })
-          if (protocolPipette !== null && protocolPipette !== undefined) {
-            if (
-              pipettesAreInexactMatch(
-                protocolPipette.pipetteSpecs.name,
-                attachedPipette?.modelSpecs
-              )
-            ) {
-              result[mount] = Constants.INEXACT_MATCH
-            } else if (
-              protocolPipette?.pipetteSpecs.name === attachedPipette?.name
-            ) {
-              result[mount] = Constants.MATCH
-            } else {
-              result[mount] = Constants.INCOMPATIBLE
-            }
+          if (
+            pipettesAreInexactMatch(
+              protocolPipette.pipetteSpecs.name,
+              attachedPipette?.modelSpecs
+            )
+          ) {
+            result[mount] = Constants.INEXACT_MATCH
+          } else if (
+            protocolPipette.pipetteSpecs.name === attachedPipette.name
+          ) {
+            result[mount] = Constants.MATCH
+          } else {
+            result[mount] = Constants.INCOMPATIBLE
           }
         }
         return result
@@ -318,79 +313,62 @@ export const getProtocolPipettesMatch: (
   }
 )
 
-interface ProtocolPipetteCalibration {
-  pipetteDisplayName: string
-  exactMatch: string | null
-  lastModifiedDate?: string | null
-  tipRacks: Array<{
-    displayName: string
-    lastModifiedDate?: string | null
-  }>
-}
-
-interface ProtocolPipetteCalibrationsByMount {
-  left: ProtocolPipetteCalibration | null
-  right: ProtocolPipetteCalibration | null
-}
-
-// update this to use tiplength calibrations instead of attached pipette calibrations
-export const getProtocolPipetteCalibrationInfo: (
+export const getProtocolPipetteTipRackCalInfo: (
   state: State,
   robotName: string
-) => ProtocolPipetteCalibrationsByMount = createSelector(
-  getProtocolLabwareData,
+) => Types.ProtocolPipetteCalibrationsByMount = createSelector(
+  getProtocolPipetteTipRacks,
   getProtocolPipettesMatch,
   getAttachedPipettes,
   getAttachedPipetteCalibrations,
   getTipLengthCalibrations,
   (
-    protocolLabwareData,
+    protocolPipetteTipracks,
     protocolPipetteMatch,
     attachedPipettes,
     attachedPipetteCalibrations,
     tipLengthCalibrations
   ) => {
-    return Constants.PIPETTE_MOUNTS.reduce<ProtocolPipetteCalibrationsByMount>(
+    return Constants.PIPETTE_MOUNTS.reduce<Types.ProtocolPipetteCalibrationsByMount>(
       (result, mount) => {
-        const protocolPipette = protocolLabwareData?.find(pipette => {
-          return pipette.mount === mount
-        })
+        const protocolPipetteTiprack = protocolPipetteTipracks[mount]
+        const attachedPipette = attachedPipettes[mount]
         if (
-          protocolPipette !== null &&
-          protocolPipette !== undefined &&
-          'pipetteSpecs' in protocolPipette
+          protocolPipetteTiprack == null ||
+          attachedPipette == null ||
+          protocolPipetteTiprack.pipetteSpecs == null
         ) {
-          result[mount] = {
-            pipetteDisplayName: protocolPipette.pipetteSpecs.displayName,
-            exactMatch: protocolPipetteMatch[mount],
-            lastModifiedDate: null,
-            tipRacks: [],
-          }
-          const pipetteMatch =
+          result[mount] = null
+        } else {
+          const pipettesMatch =
             protocolPipetteMatch[mount] === Constants.INEXACT_MATCH ||
             protocolPipetteMatch[mount] === Constants.MATCH
-          if (pipetteMatch) {
-            // why is this type error happening? I set result[mount] above
-            result[mount].lastModifiedDate =
-              attachedPipetteCalibrations[mount].offset?.lastModified
-          }
-
-          protocolPipette?.tipRackDefs.forEach(tipRackDef => {
-            let lastTiprackDate = null
+          const pipetteLastCalDate = pipettesMatch
+            ? attachedPipetteCalibrations[mount].offset?.lastModified
+            : null
+          const tipRackCalData = new Array<Types.TipRackCalibrationData>()
+          protocolPipetteTiprack.tipRackDefs.forEach(tipRackDef => {
+            let lastTiprackCalDate = null
             const tipRackMatch = tipLengthCalibrations.find(
               tipRack => tipRack.uri === getLabwareDefURI(tipRackDef)
             )
-            if (
-              tipRackMatch?.pipette === attachedPipettes[mount]?.id &&
-              pipetteMatch
-            ) {
-              lastTiprackDate = tipRackMatch?.lastModified
-            }
-            result[mount]?.tipRacks.push({
+            lastTiprackCalDate =
+              tipRackMatch?.pipette === attachedPipette.id && pipettesMatch
+                ? tipRackMatch.lastModified
+                : null
+
+            tipRackCalData.push({
               displayName: tipRackDef.metadata.displayName,
-              lastModifiedDate: lastTiprackDate,
+              lastModifiedDate: lastTiprackCalDate,
             })
           })
+          result[mount] = {
+            pipetteDisplayName:
+              protocolPipetteTiprack.pipetteSpecs?.displayName,
+            exactPipetteMatch: protocolPipetteMatch[mount],
+            pipetteCalDate: pipetteLastCalDate,
+            tipRacks: tipRackCalData,
+          }
         }
         return result
       },

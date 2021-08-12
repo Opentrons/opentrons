@@ -1,7 +1,7 @@
 import { createSelector } from 'reselect'
 import type { State } from '../types'
 import * as PipetteConstants from '../pipettes/constants'
-import { getProtocolPipetteCalibrationInfo } from '../pipettes'
+import { getProtocolPipetteTipRackCalInfo } from '../pipettes'
 
 import type {
   CalibrationStatus,
@@ -40,19 +40,21 @@ export const getProtocolCalibrationComplete: (
   robotName: string
 ) => ProtocolCalibration = createSelector(
   getDeckCalibrationStatus,
-  getProtocolPipetteCalibrationInfo,
-  (deckCalStatus, labwareCalInfo) => {
+  getProtocolPipetteTipRackCalInfo,
+  (deckCalStatus, pipetteTipRackCalInfo) => {
     if (deckCalStatus !== 'OK') {
       return {
         complete: false,
         reason: 'calibrate deck',
       }
     }
-    const labwareCalInfoValues = Object.values(labwareCalInfo)
+    const labwareCalInfoValues = Object.values(pipetteTipRackCalInfo)
     labwareCalInfoValues.forEach(pipette => {
       if (
-        pipette.exactMatch !== PipetteConstants.MATCH ||
-        pipette.exactMatch !== PipetteConstants.INEXACT_MATCH
+        (pipette !== null &&
+          pipette.exactPipetteMatch !== PipetteConstants.MATCH) ||
+        (pipette !== null &&
+          pipette.exactPipetteMatch !== PipetteConstants.INEXACT_MATCH)
       ) {
         return {
           complete: false,
@@ -61,7 +63,7 @@ export const getProtocolCalibrationComplete: (
       }
     })
     labwareCalInfoValues.forEach(pipette => {
-      if (pipette.lastModifiedDate == null) {
+      if (pipette !== null && pipette.pipetteCalDate == null) {
         return {
           complete: false,
           reason: 'calibrate pipette',
@@ -69,7 +71,7 @@ export const getProtocolCalibrationComplete: (
       }
     })
     labwareCalInfoValues.forEach(pipette => {
-      pipette.tipRacks.forEach(tiprack => {
+      pipette?.tipRacks.forEach(tiprack => {
         if (tiprack.lastModifiedDate == null) {
           return {
             complete: false,

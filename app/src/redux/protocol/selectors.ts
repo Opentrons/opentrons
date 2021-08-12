@@ -1,21 +1,22 @@
 import path from 'path'
 import startCase from 'lodash/startCase'
 import uniq from 'lodash/uniq'
-import partition from 'lodash/partition'
 
 import { createSelector } from 'reselect'
 
 import { fileIsJson } from './protocol-data'
 import { createLogger } from '../../logger'
 
-import type {
-  LabwareDefinition2,
-  PipetteNameSpecs,
-} from '@opentrons/shared-data'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
 
 import type { State } from '../types'
-import type { ProtocolData, ProtocolType, ProtocolFile } from './types'
+import type {
+  ProtocolData,
+  ProtocolType,
+  ProtocolFile,
+  ProtocolPipetteTipRackByMount,
+} from './types'
 import * as PipetteConstants from '../pipettes/constants'
 
 type ProtocolInfoSelector = (
@@ -228,20 +229,13 @@ export const getProtocolMethod: (
   }
 )
 
-export interface ProtocolLabwareData {
-  pipetteKey: string
-  mount: typeof PipetteConstants.LEFT | typeof PipetteConstants.RIGHT
-  pipetteSpecs: PipetteNameSpecs
-  tipRackDefs: LabwareDefinition2[]
-}
-
-export const getProtocolLabwareData: (
+export const getProtocolPipetteTipRacks: (
   state: State
-) => ProtocolLabwareData[] | null = createSelector(
+) => ProtocolPipetteTipRackByMount = createSelector(
   getProtocolData,
   protocolData => {
     if (protocolData == null || !('commands' in protocolData)) {
-      return null
+      return { left: null, right: null }
     }
     const { pipettes, labware, labwareDefinitions, commands } = protocolData
     const tipRackCommands = commands.filter(
@@ -250,36 +244,39 @@ export const getProtocolLabwareData: (
     const protocolPipetteValues = Object.values(pipettes)
     const protocolPipetteKeys = Object.keys(pipettes)
 
-    const pipetteData: ProtocolLabwareData[] = []
-
-    protocolPipetteValues.forEach((pipette, index) => {
-      const pipetteObject = {
-        pipetteKey: protocolPipetteKeys[index],
-        mount: pipette.mount,
-        pipetteSpecs: getPipetteNameSpecs(pipette.name),
-        tipRackDefs: [],
-      }
-      if (pipetteObject.pipetteSpecs !== null) {
-        pipetteData.push(pipetteObject)
-      }
-    })
-
-    pipetteData.forEach(pipette => {
-      tipRackCommands.forEach(command => {
-        if (
-          'pipette' in command.params &&
-          pipette.pipetteKey === command.params.pipette
-        ) {
-          const tipRack = labware[command.params.labware]
-          const tipRackDefinition = labwareDefinitions[tipRack.definitionId]
-          if (tipRackDefinition !== undefined) {
-            pipette.tipRackDefs.push(tipRackDefinition)
+    return PipetteConstants.PIPETTE_MOUNTS.reduce<ProtocolPipetteTipRackByMount>(
+      (result, mount) => {
+        const pipetteOnMount = protocolPipetteValues.find(
+          pipette => pipette.mount === mount
+        )
+        if (pipetteOnMount !== undefined) {
+          const index = protocolPipetteValues.indexOf(pipetteOnMount)
+          const pipetteKey = protocolPipetteKeys[index]
+          let tipRackDefs = new Array<LabwareDefinition2>()
+          tipRackCommands.forEach(command => {
+            if (
+              'pipette' in command.params &&
+              'labware' in command.params &&
+              pipetteKey === command.params.pipette
+            ) {
+              const tipRack = labware[command.params.labware]
+              const tipRackDefinition = labwareDefinitions[tipRack.definitionId]
+              if (tipRackDefinition !== undefined) {
+                tipRackDefs.push(tipRackDefinition)
+              }
+            }
+            tipRackDefs = uniq(tipRackDefs)
+          })
+          result[mount] = {
+            pipetteSpecs: getPipetteNameSpecs(pipetteOnMount.name),
+            tipRackDefs: tipRackDefs,
           }
+        } else {
+          result[mount] = null
         }
-        pipette.tipRackDefs = uniq(pipette.tipRackDefs)
-      })
-    })
-
-    return pipetteData
+        return result
+      },
+      { left: null, right: null }
+    )
   }
 )
