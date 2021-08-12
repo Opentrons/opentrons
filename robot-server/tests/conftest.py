@@ -17,9 +17,9 @@ from typing import Any, Dict
 
 from opentrons.protocols.context.protocol_api.labware import LabwareImplementation
 from starlette.testclient import TestClient
-from robot_server.app import app
+from robot_server import app
 from robot_server.constants import API_VERSION_HEADER, API_VERSION_LATEST
-from robot_server.service.dependencies import get_hardware
+from robot_server.service.dependencies import get_hardware, get_motion_lock
 from opentrons.hardware_control import API, HardwareAPILike, ThreadedAsyncLock
 from opentrons import config
 
@@ -75,16 +75,39 @@ def override_hardware(hardware):
 
 
 @pytest.fixture
-def api_client(override_hardware) -> TestClient:
+def motion_lock() -> ThreadedAsyncLock:
+    return MagicMock(spec=ThreadedAsyncLock)
+
+
+@pytest.fixture
+def override_motion_lock(motion_lock) -> None:
+    async def get_motion_lock_override():
+        return motion_lock
+
+    app.dependency_overrides[get_motion_lock] = get_motion_lock_override
+
+
+@pytest.fixture
+def api_client(override_hardware, override_motion_lock) -> TestClient:
+    # Using the TestClient without a `with` block means the app's startup and shutdown
+    # handlers won't run (starlette.io/events/#running-event-handlers-in-tests).
+    # So certain dependencies won't be initialized. This doesn't fail our tests because
+    # We use FastAPI overrides to mock out the dependencies that matter.
+
     client = TestClient(app)
     client.headers.update({API_VERSION_HEADER: API_VERSION_LATEST})
     return client
 
 
 @pytest.fixture
-def api_client_no_errors(override_hardware) -> TestClient:
+def api_client_no_errors(override_hardware, override_motion_lock) -> TestClient:
     """An API client that won't raise server exceptions.
-    Use only to test 500 pages; never use this for other tests."""
+
+    Use only to test 500 pages; never use this for other tests.
+    """
+
+    # This skips running the app's startup and shutdown handlers. See comment in
+    # api_client fixture.
     client = TestClient(app, raise_server_exceptions=False)
     client.headers.update({API_VERSION_HEADER: API_VERSION_LATEST})
     return client
