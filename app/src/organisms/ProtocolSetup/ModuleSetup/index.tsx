@@ -22,7 +22,7 @@ import {
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 import { ModuleInfo } from './ModuleInfo'
 import { MultipleModulesModal } from './MultipleModulesModal'
-import styles from './styles.css'
+import styles from '../styles.css'
 
 import type { CoordinatesByModuleModel } from '../utils/getModuleRenderCoords'
 
@@ -42,6 +42,7 @@ const DECK_LAYER_BLOCKLIST = [
 ]
 export const ModuleSetup = (props: ModuleSetupProps): JSX.Element | null => {
   const { moduleRenderCoords, expandLabwareSetupStep } = props
+  const DECK_VIEW_BOX = `-64 -10 ${530} ${456}`
   const { t } = useTranslation('protocol_setup')
   const [
     showMultipleModulesModal,
@@ -60,7 +61,7 @@ export const ModuleSetup = (props: ModuleSetupProps): JSX.Element | null => {
         borderRadius="6px"
         flexDirection={DIRECTION_COLUMN}
       >
-        <Link
+        <Link //TODO IMMEDIATELY: make button show up only when MoaM is attached
           fontSize={FONT_SIZE_BODY_1}
           color={C_BLUE}
           alignSelf={ALIGN_FLEX_END}
@@ -72,7 +73,7 @@ export const ModuleSetup = (props: ModuleSetupProps): JSX.Element | null => {
 
         <RobotWorkSpace
           deckDef={standardDeckDef as any}
-          viewBox={`-64 -10 ${530} ${456}`}
+          viewBox={DECK_VIEW_BOX}
           className={styles.deck_map}
           deckLayerBlocklist={DECK_LAYER_BLOCKLIST}
         >

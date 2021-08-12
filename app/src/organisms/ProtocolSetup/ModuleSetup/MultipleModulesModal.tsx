@@ -19,7 +19,7 @@ import {
 import { Portal } from '../../../App/portal'
 import multipleModuleHelp from '../../../assets/images/multiple_module_help_example.png'
 
-import styles from './styles.css'
+import styles from '../styles.css'
 
 const HOW_TO_MULTIPLE_MODULES_HREF = '#' // TODO IMMEDIATELY: get the actual link
 
@@ -68,22 +68,16 @@ export const MultipleModulesModal = (
             >
               {t('example')}
             </Text>
-            <Trans
-              t={t}
-              i18nKey="multiple_modules_example"
-              components={{
-                block: (
-                  <Text
-                    fontSize={FONT_SIZE_BODY_1}
-                    fontWeight={FONT_WEIGHT_REGULAR}
-                  />
-                ),
-              }}
-            />
+
+            <Text
+              fontSize={FONT_SIZE_BODY_1}
+              fontWeight={FONT_WEIGHT_REGULAR}
+              title={t('multiple_modules_example')}
+            >
+              {t('multiple_modules_example')}
+            </Text>
           </Flex>
-          <Flex>
-            <img src={multipleModuleHelp} />
-          </Flex>
+          <img src={multipleModuleHelp} />
         </Flex>
         <Flex justifyContent={JUSTIFY_CENTER}>
           <PrimaryBtn

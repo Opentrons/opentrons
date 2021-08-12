@@ -35,10 +35,9 @@ import { LabwareInfoOverlay } from './LabwareInfoOverlay'
 import { LabwareSetupModal } from './LabwareSetupModal'
 import { getModuleTypesThatRequireExtraAttention } from './utils/getModuleTypesThatRequireExtraAttention'
 import { ExtraAttentionWarning } from './ExtraAttentionWarning'
-import styles from './styles.css'
-
-import { CoordinatesByModuleModel } from '../utils/getModuleRenderCoords'
-import { CoordinatesByLabwareId } from '../utils/getLabwareRenderCoords'
+import styles from '../styles.css'
+import type { CoordinatesByModuleModel } from '../utils/getModuleRenderCoords'
+import type { CoordinatesByLabwareId } from '../utils/getLabwareRenderCoords'
 
 interface LabwareSetupProps {
   moduleRenderCoords: CoordinatesByModuleModel

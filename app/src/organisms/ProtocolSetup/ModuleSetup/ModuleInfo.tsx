@@ -2,25 +2,29 @@ import * as React from 'react'
 import {
   Text,
   RobotCoordsForeignDiv,
-  SPACING_3,
-  JUSTIFY_CENTER,
-  ALIGN_CENTER,
+  SPACING_1,
+  JUSTIFY_CONTENT_CENTER,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
   Icon,
   COLOR_ERROR,
   FONT_STYLE_ITALIC,
-  FONT_WEIGHT_REGULAR,
+  FONT_BODY_1_DARK,
+  FONT_SIZE_BODY_2,
+  FONT_SIZE_CAPTION,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
 import {
   getModuleType,
   ModuleModel,
   getModuleVizDims,
   STD_SLOT_X_DIM as SLOT_X,
-  STD_SLOT_Y_DIM as SLOT_Y,
   getModuleDisplayName,
 } from '@opentrons/shared-data'
+import { ALIGN_FLEX_START } from '@opentrons/components'
+import { DISPLAY_FLEX } from '@opentrons/components'
+import { JUSTIFY_FLEX_START } from '@opentrons/components'
 
 export interface ModuleInfoProps {
   x: number
@@ -32,35 +36,42 @@ export interface ModuleInfoProps {
 export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
   const { x, y, orientation, moduleModel } = props
   const moduleType = getModuleType(moduleModel)
+  const { t } = useTranslation('protocol_setup')
   const { childYOffset } = getModuleVizDims(orientation, moduleType)
 
   return (
     <RobotCoordsForeignDiv
       x={x}
       y={y + childYOffset}
-      height={SLOT_Y}
+      height={'100%'}
       width={SLOT_X}
       innerDivProps={{
-        justifyContent: JUSTIFY_CENTER,
-        alignItems: ALIGN_CENTER,
-        padding: SPACING_3,
+        display: DISPLAY_FLEX,
+        justifyContent: JUSTIFY_FLEX_START,
+        alignItems: ALIGN_FLEX_START,
+        padding: SPACING_1,
       }}
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
         <Flex flexDirection={DIRECTION_ROW}>
           <Icon
             name="alert-circle"
-            height="10px"
-            width="10px"
+            height="0.625rem"
+            width="0.625rem"
             color={COLOR_ERROR}
+            marginright={SPACING_1}
           />
-          <Text fontSize={'0.5rem'}>&nbsp; Not Connected</Text>
+          <Text css={FONT_SIZE_BODY_2} title={t('module_not_connected')}>
+            {t('module_not_connected')}
+          </Text>
         </Flex>
-        <Text fontSize={'0.65rem'} fontWeight={FONT_WEIGHT_REGULAR}>
-          {getModuleDisplayName(moduleModel)}
-        </Text>
-        <Text fontSize={'0.45rem'} fontStyle={FONT_STYLE_ITALIC}>
-          No USB Port Yet
+        <Text css={FONT_BODY_1_DARK}>{getModuleDisplayName(moduleModel)}</Text>
+        <Text
+          fontSize={FONT_SIZE_CAPTION}
+          fontStyle={FONT_STYLE_ITALIC}
+          title={t('no_usb_port_yet')}
+        >
+          {t('no_usb_port_yet')}
         </Text>
       </Flex>
     </RobotCoordsForeignDiv>
