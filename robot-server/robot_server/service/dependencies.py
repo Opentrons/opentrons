@@ -36,10 +36,11 @@ async def get_app() -> FastAPI:
     # returning `request.app.state`. However, this function might be a dependency of a
     # WebSocket endpoint, and current FastAPI (v0.54.1) raises internal errors when
     # WebSocket endpoints depend on `request`.
-    #
+
     # Local import to avoid an import loop:
     #   dependencies -> `app` object setup -> routers -> dependencies
     from robot_server import app
+
     return app
 
 
