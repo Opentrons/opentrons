@@ -1,9 +1,8 @@
-import argparse
 import os
+import re
+import shlex
 import stat
 import subprocess
-import shlex
-import re
 from dataclasses import dataclass
 
 
@@ -90,5 +89,3 @@ class RootFS:
     def debug(self, arg):
         self.printRootFSPartition(arg)
         self.printRootFSConfig(arg)
-
-
