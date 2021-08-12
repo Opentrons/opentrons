@@ -1,9 +1,9 @@
 import * as React from 'react'
 import cx from 'classnames'
 import styled from 'styled-components'
+import parseHtml from 'html-react-parser'
 import { stringify } from 'svgson'
-import flatten from 'lodash/flatten'
-import reduce from 'lodash/reduce'
+import omitBy from 'lodash/omitBy'
 
 import {
   getModuleDisplayName,
@@ -22,6 +22,7 @@ import styles from './Module.css'
 import type { IconName } from '../icons'
 import type { ModuleModel, DeckSlot, ModuleDefinition, ModuleLayer } from '@opentrons/shared-data'
 import { StyleProps } from '../primitives'
+import { C_MED_LIGHT_GRAY } from '../styles'
 
 const FLIPPED_SLOTS = ['3', '6', '9']
 export interface ModuleProps {
@@ -120,17 +121,49 @@ function ModuleItemContents(props: ModuleProps): JSX.Element {
 export interface ModuleFromDataProps {
   def: ModuleDefinition
   layerBlocklist?: string[]
-  stylePropsByLayer?: {[layer: string]: StyleProps}
 }
 
-const StyledPath = styled.path`stroke: #ccc;`
-
 export function ModuleFromData(props: ModuleFromDataProps): JSX.Element {
-  const { def, layerBlocklist = [], stylePropsByLayer = {}} = props
+  const { def, layerBlocklist = []} = props
+
+  const layerGroupNodes = def.twoDimensionalRendering.children.filter(g => !layerBlocklist.includes(g.attributes?.id))
+
+  console.log(layerGroupNodes)
 
   return (
-    <>
-    {stringify(def.twoDimensionalRendering)}
-    </>
+    <g transform={`translate(${def.cornerOffsetFromSlot.x},${def.cornerOffsetFromSlot.y})`}>
+      {parseHtml(stringify(layerGroupNodes, {selfClose: false}))}
+    </g>
   )
+}
+
+export interface ThermocyclerVizProps {
+  lidMotorState: 'open' | 'closed' | 'unknown'
+}
+
+export function ThermocyclerViz(props: ThermocyclerVizProps): JSX.Element {
+  const { lidMotorState } = props
+  const def = getModuleDef2(THERMOCYCLER_MODULE_V1)
+  if (lidMotorState === 'unknown') { // just render a rectangle if we don't know the state of the lid
+    return (
+      <RobotCoordsForeignDiv
+        width={def.dimensions.xDimension}
+        height={def.dimensions.yDimension}
+        x={def.cornerOffsetFromSlot.x}
+        y={def.cornerOffsetFromSlot.y - def.dimensions.yDimension}
+        transformWithSVG
+        innerDivProps={{
+          borderRadius: '6px',
+          backgroundColor: C_MED_LIGHT_GRAY,
+          width: '100%',
+          height: '100%',
+        }}
+      />
+    )
+  }
+  const layerBlocklist = def.twoDimensionalRendering.children.reduce((acc, g) => {
+    const { id = '' } = g.attributes
+    return id.startsWith(lidMotorState === 'open' ? 'closed' : 'open') ? [...acc, id] : acc
+  }, [])
+  return <ModuleFromData {...{def, layerBlocklist}}/>
 }
