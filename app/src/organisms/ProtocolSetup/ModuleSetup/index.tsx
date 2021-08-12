@@ -61,7 +61,7 @@ export const ModuleSetup = (props: ModuleSetupProps): JSX.Element | null => {
         borderRadius="6px"
         flexDirection={DIRECTION_COLUMN}
       >
-        <Link //TODO IMMEDIATELY: make button show up only when MoaM is attached
+        <Link //    TODO IMMEDIATELY: make button show up only when MoaM is attached
           fontSize={FONT_SIZE_BODY_1}
           color={C_BLUE}
           alignSelf={ALIGN_FLEX_END}

@@ -13,6 +13,9 @@ import {
   FONT_BODY_1_DARK,
   FONT_SIZE_BODY_2,
   FONT_SIZE_CAPTION,
+  ALIGN_FLEX_START,
+  DISPLAY_FLEX,
+  JUSTIFY_FLEX_START,
 } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
 import {
@@ -22,9 +25,6 @@ import {
   STD_SLOT_X_DIM as SLOT_X,
   getModuleDisplayName,
 } from '@opentrons/shared-data'
-import { ALIGN_FLEX_START } from '@opentrons/components'
-import { DISPLAY_FLEX } from '@opentrons/components'
-import { JUSTIFY_FLEX_START } from '@opentrons/components'
 
 export interface ModuleInfoProps {
   x: number
