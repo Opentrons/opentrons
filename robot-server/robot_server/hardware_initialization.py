@@ -21,6 +21,9 @@ log = logging.getLogger(__name__)
 
 async def initialize(event_publisher: Publisher) -> ThreadManager:
     """Initialize the API."""
+    # todo(mm, 2021-08-12): It would be easier for tests to check that this function
+    # can successfully initialize simulating hardware if app_settings were passed in
+    # as an argument, instead of being fetched here.
     app_settings = get_settings()
     thread_manager: ThreadManager
     if app_settings.simulator_configuration_file_path:
@@ -35,28 +38,50 @@ async def initialize(event_publisher: Publisher) -> ThreadManager:
     else:
         # Create the hardware
         thread_manager = await initialize_api()
-    _init_event_watchers(thread_manager, event_publisher)
+
+    log.info("Starting hardware-event-notify publisher")
+    door_event_forwarder = DoorEventForwarder(event_publisher)
+    # fixme(mm, 2021-08-12): This might be a typing error. forward() can only
+    # take a HardwareEvent, but it looks like ThreadManager can also pass
+    # other things as the argument to a callback?
+    thread_manager.register_callback(door_event_forwarder.forward)
+
     log.info("Opentrons API initialized")
     return thread_manager
 
 
-def _init_event_watchers(
-    thread_manager: ThreadManager,
-    event_publisher: Publisher,
-) -> None:
-    """Register the publisher callbacks with the hw thread manager."""
-    log.info("Starting hardware-event-notify publisher")
+class DoorEventForwarder:
+    """Forwards front door open/close events to a notify-server publisher."""
 
-    def publish_hardware_event(hw_event: HardwareEvent) -> None:
-        if hw_event.event == HardwareEventType.DOOR_SWITCH_CHANGE:
-            payload = DoorStatePayload(state=hw_event.new_state)
+    def __init__(self, publisher: Publisher) -> None:
+        """Initialize the `DoorEventForwarder`.
+
+        Params:
+
+            publisher: Where subsequent calls to `forward_hardware_event` will forward
+                to.
+        """
+        self.publisher = publisher
+
+    def forward(self, hardware_event: HardwareEvent) -> None:
+        """Forward `hardware_event` if it's a door event.
+
+        Otherwise, no-op.
+        """
+        print("Called with", hardware_event)
+        if hardware_event.event == HardwareEventType.DOOR_SWITCH_CHANGE:
+            payload = DoorStatePayload(state=hardware_event.new_state)
         else:
+            print("Returning early.")
             return
+        print("Payload will be", payload)
         topic = topics.RobotEventTopics.HARDWARE_EVENTS
         publisher = "robot_server_event_publisher"
         event_to_publish = event.Event(
             createdOn=utc_now(), publisher=publisher, data=payload
         )
-        event_publisher.send_nowait(topic, event_to_publish)
+        print("Event to publish will be", event_to_publish)
+        self.publisher.send_nowait(topic, event_to_publish)
 
-    thread_manager.register_callback(publish_hardware_event)
+
+__all__ = ["initialize", "DoorEventForwarder"]
