@@ -13,7 +13,6 @@ import {
   SPACING_1,
   C_WHITE,
   OVERLAY_BLACK_90,
-  BORDER_RADIUS_DEFAULT,
   DISPLAY_FLEX,
   DIRECTION_COLUMN,
   JUSTIFY_FLEX_END,
@@ -22,7 +21,8 @@ interface LabwareInfoProps {
   displayName: string
 }
 
-const FAKE_OFFSET_DATA = { x: 0.0, y: 0.0, z: 0.0 } // TODO IMMEDIATELY: replace with real data when available
+const FAKE_OFFSET_DATA = { x: 1.2, y: 2.3, z: 4.4 } // TODO IMMEDIATELY: replace with real data when available
+// Also, if offset data does not exist for a piece of labware, the offseet data should not be rendered at all
 const LabwareInfo = (props: LabwareInfoProps): JSX.Element => {
   const { displayName } = props
   const { t } = useTranslation('protocol_setup')
@@ -30,7 +30,7 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element => {
     <Box
       flexDirection={'column'}
       backgroundColor={OVERLAY_BLACK_90}
-      borderRadius={BORDER_RADIUS_DEFAULT}
+      borderRadius={`0 0 0.4rem 0.4rem`}
       fontSize={'0.5rem'}
       color={C_WHITE}
     >

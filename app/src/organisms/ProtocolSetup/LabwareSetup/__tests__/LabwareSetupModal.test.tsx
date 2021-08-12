@@ -49,7 +49,7 @@ describe('LabwareSetupModal', () => {
     const { getByRole } = render(props)
     expect(
       getByRole('link', {
-        name: 'Learn More about labware and protocol best practices.',
+        name: 'Learn More about labware and protocol best practices',
       }).getAttribute('href')
     ).toBe('#') // replace when we have an actual link
   })
