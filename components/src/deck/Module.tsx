@@ -1,6 +1,7 @@
 import * as React from 'react'
 import cx from 'classnames'
 import styled from 'styled-components'
+import { stringify } from 'svgson'
 import flatten from 'lodash/flatten'
 import reduce from 'lodash/reduce'
 
@@ -128,19 +129,8 @@ export function ModuleFromData(props: ModuleFromDataProps): JSX.Element {
   const { def, layerBlocklist = [], stylePropsByLayer = {}} = props
 
   return (
-    <g>
-      {def.layers.map((layer: ModuleLayer) => {
-        const {name, pathDValues} = layer
-        if (layerBlocklist.includes(name)) return null
-        const styleProps = name in stylePropsByLayer ? stylePropsByLayer[name] : {}
-        return (
-          <g id={name} key={name}>
-            {pathDValues.map((dValue: string, i: number) => (
-              <StyledPath d={dValue} key={i} {...styleProps}/>
-            ))}
-          </g>
-        )
-      })}
-    </g>
+    <>
+    {stringify(def.twoDimensionalRendering)}
+    </>
   )
 }
