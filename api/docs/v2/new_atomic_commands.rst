@@ -438,21 +438,22 @@ Usually the above option is useful when moving inside of a well. Take a look at 
 .. versionadded:: 2.0
 
 
-Delay
-=====
+Delay for an Amount of Time
+===========================
 
-Sometimes you need to pause your protocol, for instance to wait for something to incubate. You can use :py:meth:`.ProtocolContext.delay` to pause your protocol for a specific amount of time. ``delay`` is a method of :py:class:`.ProtocolContext` since it concerns the protocol and the OT-2 as a whole.
+Sometimes you need to wait as a step in your protocol, for instance to wait for something to incubate. You can use :py:meth:`.ProtocolContext.delay` to wait your protocol for a specific amount of time. ``delay`` is a method of :py:class:`.ProtocolContext` since it concerns the protocol and the OT-2 as a whole.
 
-The value passed into ``delay()`` is the number of minutes or seconds the OT-2 will wait until moving on to the next command.
+The values passed into ``delay()`` specify the number of minutes and seconds that the OT-2 will wait until moving on to the next command.
 
 .. code-block:: python
 
-    protocol.delay(seconds=2)             # pause for 2 seconds
-    protocol.delay(minutes=5)             # pause for 5 minutes
-    protocol.delay(minutes=5, seconds=2)  # pause for 5 minutes and 2 seconds
+    protocol.delay(seconds=2)             # delay for 2 seconds
+    protocol.delay(minutes=5)             # delay for 5 minutes
+    protocol.delay(minutes=5, seconds=2)  # delay for 5 minutes and 2 seconds
 
-User-Specified Pause
-====================
+
+Pause Until Resumed
+===================
 
 The method :py:meth:`.ProtocolContext.pause` will pause protocol execution at a specific step.
 You can resume by pressing 'resume' in your Opentrons App. You can optionally specify a message that

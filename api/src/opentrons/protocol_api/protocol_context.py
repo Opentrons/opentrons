@@ -587,20 +587,30 @@ class ProtocolContext(CommandPublisher):
     @publish.both(command=cmds.pause)
     @requires_version(2, 0)
     def pause(self, msg=None) -> None:
-        """ Pause execution of the protocol until resume is called.
+        """Pause execution of the protocol until it's resumed.
+
+        A human can resume the protocol through the Opentrons App.
 
         This function returns immediately, but the next function call that
         is blocked by a paused robot (anything that involves moving) will
-        not return until :py:meth:`resume` is called.
+        not return until the protocol is resumed.
 
-        :param str msg: A message to echo back to connected clients.
+        :param str msg: An optional message to show to connected clients. The
+            Opentrons App will show this in the run log.
         """
         self._implementation.pause(msg=msg)
 
     @publish.both(command=cmds.resume)
     @requires_version(2, 0)
     def resume(self) -> None:
-        """ Resume a previously-paused protocol """
+        """Resume the protocol after :py:meth:`pause`.
+
+        .. deprecated:: 2.12
+           The Python Protocol API supports no safe way for a protocol to resume itself.
+           See https://github.com/Opentrons/opentrons/issues/8209.
+           If you're looking for a way for your protocol to resume automatically
+           after a period of time, use :py:meth:`delay`.
+        """
         self._implementation.resume()
 
     @publish.both(command=cmds.comment)
