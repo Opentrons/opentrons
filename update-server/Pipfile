@@ -10,7 +10,7 @@ python_version = "3.7"
 aiohttp = "==3.4.4"
 
 [dev-packages]
-opentrons-update-server = {path = ".", editable = true}
+otupdate = {path = ".", editable = true}
 flake8 = "~=3.9.0"
 flake8-annotations = "~=2.6.2"
 flake8-docstrings = "~=1.6.0"

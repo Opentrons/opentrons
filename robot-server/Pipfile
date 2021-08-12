@@ -7,7 +7,7 @@ name = "pypi"
 python_version = "3.7"
 
 [dev-packages]
-opentrons-robot-server = {editable = true, path = "."}
+robot-server = {editable = true, path = "."}
 pytest = "~=6.1"
 pytest-aiohttp = "==0.3.0"
 pytest-cov = "==2.10.1"
