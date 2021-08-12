@@ -3,7 +3,7 @@ import {
   Text,
   RobotCoordsForeignDiv,
   SPACING_1,
-  JUSTIFY_CONTENT_CENTER,
+  SPACING_2,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
@@ -59,7 +59,7 @@ export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
             height="0.625rem"
             width="0.625rem"
             color={COLOR_ERROR}
-            marginright={SPACING_1}
+            marginright={SPACING_2}
           />
           <Text css={FONT_SIZE_BODY_2} title={t('module_not_connected')}>
             {t('module_not_connected')}
