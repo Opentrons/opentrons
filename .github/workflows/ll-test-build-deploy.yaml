@@ -134,6 +134,8 @@ jobs:
       - uses: 'actions/setup-node@v1'
         with:
           node-version: '14'
+      - name: 'install udev for usb-detection'
+        run: sudo apt-get install libudev-dev
       - name: 'set complex environment variables'
         id: 'set-vars'
         uses: actions/github-script@v3.1
