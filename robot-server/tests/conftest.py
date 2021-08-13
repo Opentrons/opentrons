@@ -76,7 +76,7 @@ def override_hardware(hardware):
 
 @pytest.fixture
 def motion_lock() -> ThreadedAsyncLock:
-    return MagicMock(spec=ThreadedAsyncLock)
+    return ThreadedAsyncLock()
 
 
 @pytest.fixture
