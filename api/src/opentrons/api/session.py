@@ -37,7 +37,7 @@ from opentrons.hardware_control import (API, ThreadManager,
                                         ExecutionCancelledError,
                                         ThreadedAsyncLock)
 from opentrons.hardware_control.types import (HardwareEventType, HardwareEvent,
-                                              PauseType)
+                                              PauseType, Axis)
 from .models import Container, Instrument, Module
 from .dev_types import State, StateInfo, Message, LastCommand, Error, CommandShortId
 
@@ -527,7 +527,7 @@ class Session(RobotBusy):
 
         try:
             self.resume()
-            self._pre_run_hooks()
+            #self._pre_run_hooks()
             self._hardware.cache_instruments()
             self._hardware.reset_instrument()
             ctx_impl = ProtocolContextImplementation.build_using(
@@ -540,7 +540,8 @@ class Session(RobotBusy):
                 broker=self._broker
             )
             ctx.connect(self._hardware)
-            ctx.home()
+            self._hw_iface().home([Axis.X, Axis.Y])
+            #ctx.home()
             run_protocol(self._protocol, context=ctx)
 
             # If the last command in a protocol was a pause, the protocol
@@ -556,7 +557,7 @@ class Session(RobotBusy):
             while self.state == 'paused':
                 sleep(0.1)
             self.set_state('finished')
-            self._hw_iface().home()
+            self._hw_iface().home([Axis.X, Axis.Y])
         except (SmoothieAlarm, asyncio.CancelledError,
                 ExecutionCancelledError):
             log.info("Protocol cancelled")
