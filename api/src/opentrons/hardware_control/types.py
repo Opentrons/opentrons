@@ -79,16 +79,24 @@ class DoorState(enum.Enum):
     def __str__(self):
         return self.name.lower()
 
+class ButtonState(enum.Enum):
+    OPEN = False
+    CLOSED = True
+
+    def __str__(self):
+        return self.name.lower()
 
 class HardwareEventType(enum.Enum):
     DOOR_SWITCH_CHANGE = enum.auto()
+    BUTTON_SWITCH_CHANGE = enum.auto()
 
 
 @dataclass
 class DoorStateNotification:
-    event: 'DoorStateNotificationType' = \
-        HardwareEventType.DOOR_SWITCH_CHANGE
+    event: 'DoorStateNotificationType' = HardwareEventType.DOOR_SWITCH_CHANGE
     new_state: DoorState = DoorState.CLOSED
+    button_event: 'ButtonStateNotificationType' = HardwareEventType.BUTTON_SWITCH_CHANGE
+    button_state: ButtonState = ButtonState.CLOSED
 
 
 # new event types get new dataclasses
@@ -113,6 +121,14 @@ class HardwareAPILike(abc.ABC):
 
     @door_state.setter
     def door_state(self, door_state: DoorState) -> DoorState:
+        ...
+
+    @property
+    def button_state(self) -> ButtonState:
+        ...
+
+    @button_state.setter
+    def button_state(self, button_state: ButtonState) -> ButtonState:
         ...
 
     def validate_calibration(self):

@@ -25,7 +25,7 @@ from .constants import (SHAKE_OFF_TIPS_SPEED, SHAKE_OFF_TIPS_DROP_DISTANCE,
                         DROP_TIP_RELEASE_DISTANCE)
 from .execution_manager import ExecutionManager
 from .types import (Axis, HardwareAPILike, CriticalPoint,
-                    MustHomeError, NoTipAttachedError, DoorState,
+                    MustHomeError, NoTipAttachedError, ButtonState, DoorState,
                     DoorStateNotification, PipettePair, TipAttachedError,
                     HardwareAction, PairedPipetteConfigValueError,
                     MotionChecks)
@@ -91,6 +91,7 @@ class API(HardwareAPILike):
         # home() call succeeds or fails.
         self._motion_lock = asyncio.Lock(loop=self._loop)
         self._door_state = DoorState.CLOSED
+        self._button_state = ButtonState.OPEN
         self._robot_calibration = rb_cal.load()
 
     @property
@@ -121,6 +122,26 @@ class API(HardwareAPILike):
         for cb in self._callbacks:
             hw_event = DoorStateNotification(
                 new_state=door_state)
+            try:
+                cb(hw_event)
+            except Exception:
+                mod_log.exception('Errored during door state event callback')
+
+    @property
+    def button_state(self) -> ButtonState:
+        return self._button_state
+
+    @button_state.setter
+    def button_state(self, button_state: ButtonState):
+        self._button_state = button_state
+
+    def _update_button_state(self, button_state: ButtonState):
+        mod_log.info(
+            f'Updating the button status: {button_state}')
+        self.button_state = button_state
+        for cb in self._callbacks:
+            hw_event = DoorStateNotification(
+                button_state=button_state)
             try:
                 cb(hw_event)
             except Exception:
@@ -188,7 +209,7 @@ class API(HardwareAPILike):
                 register_modules=api_instance.register_modules))
             backend.start_gpio_door_watcher(
                 loop=checked_loop,
-                update_door_state=api_instance._update_door_state)
+                update_button_state=api_instance._update_button_state)
             return api_instance
         finally:
             blink_task.cancel()
@@ -312,6 +333,17 @@ class API(HardwareAPILike):
         :returns: A dict of the lights: `{'button': bool, 'rails': bool}`
         """
         return self._backend.get_lights()
+
+    async def set_button(self, red: bool, green: bool, blue: bool):
+
+        self._backend.set_button(red, green, blue)
+
+    def get_button(self) -> bool:
+        """ Return the current status of the button
+
+        :returns: boolean of button state
+        """
+        return self._backend.get_button()
 
     async def identify(self, duration_s: int = 5):
         """ Blink the button light to identify the robot.

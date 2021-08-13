@@ -167,6 +167,14 @@ settings = [
                     'Activating this will disable protocol running from the '
                     'Opentrons application.',
         restart_required=True,
+    ),
+    SettingDefinition(
+        _id='enableButtonSafetySwitch',
+        title='Enable robot button safety switch',
+        description="Automatically pause protocols when robot door opens. "
+                    "Opening the robot door during a run will "
+                    "pause your robot only after it has completed its "
+                    "current motion."
     )
 ]
 
@@ -352,9 +360,17 @@ def _migrate6to7(previous: SettingsMap) -> SettingsMap:
     newmap['enableHttpProtocolSessions'] = None
     return newmap
 
+def _migrate7to8(previous: SettingsMap) -> SettingsMap:
+    """
+    Migration to version 5 of the feature flags file. Adds the
+    enableDoorSafetyFeature config element.
+    """
+    newmap = {k: v for k, v in previous.items()}
+    newmap['enableButtonSafetySwitch'] = None
+    return newmap
 
 _MIGRATIONS = [_migrate0to1, _migrate1to2, _migrate2to3, _migrate3to4,
-               _migrate4to5, _migrate5to6, _migrate6to7]
+               _migrate4to5, _migrate5to6, _migrate6to7, _migrate7to8]
 """
 List of all migrations to apply, indexed by (version - 1). See _migrate below
 for how the migration functions are applied. Each migration function should

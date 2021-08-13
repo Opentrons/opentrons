@@ -28,6 +28,9 @@ def use_old_aspiration_functions():
 def enable_door_safety_switch():
     return advs.get_setting_with_env_overload('enableDoorSafetySwitch')
 
+def enable_button_safety_switch():
+    return advs.get_setting_with_env_overload('enablebuttonSafetySwitch')
+
 
 def enable_http_protocol_sessions():
     return advs.get_setting_with_env_overload('enableHttpProtocolSessions')

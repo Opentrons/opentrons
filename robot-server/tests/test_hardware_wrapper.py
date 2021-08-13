@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 
 from notify_server.models.hardware_event import DoorStatePayload
 from opentrons.hardware_control.types import (
-    HardwareEventType, DoorStateNotification, DoorState)
+    HardwareEventType, DoorStateNotification, DoorState, ButtonState)
 from notify_server.models.event import Event
 from robot_server import hardware_wrapper
 from robot_server.settings import RobotServerSettings
@@ -49,11 +49,11 @@ async def test_door_event(simulating_wrapper, mock_utc, mock_time):
     """ Verify that a door event is published on hw event. """
 
     hw_event = DoorStateNotification(
-        event=HardwareEventType.DOOR_SWITCH_CHANGE,
-        new_state=DoorState.OPEN)
+        event=HardwareEventType.BUTTON_SWITCH_CHANGE,
+        Button_state=ButtonState.CLOSED)
     pub_event = Event(createdOn=mock_time,
                       publisher='HardwareWrapper._publish_hardware_event',
-                      data=DoorStatePayload(state=DoorState.OPEN))
+                      data=DoorStatePayload(state=ButtonState.CLOSED))
     with patch.object(dependencies, 'get_event_publisher') as pub:
         simulating_wrapper._publish_hardware_event(hw_event)
         pub().send_nowait.assert_called_once_with('hardware_events',

@@ -61,8 +61,8 @@ class HardwareWrapper:
 
     def _publish_hardware_event(self, hw_event: HardwareEvent):
         from robot_server.service.dependencies import get_event_publisher
-        if hw_event.event == HardwareEventType.DOOR_SWITCH_CHANGE:
-            payload = DoorStatePayload(state=hw_event.new_state)
+        if hw_event.event == HardwareEventType.BUTTON_SWITCH_CHANGE:
+            payload = DoorStatePayload(state=hw_event.button_state)
         else:
             return
 

@@ -301,6 +301,18 @@ class Controller:
         return {'button': self.gpio_chardev.get_button_light()[2],
                 'rails': self.gpio_chardev.get_rail_lights()}
 
+    def set_button(self, red: bool = False,
+                        green: bool = False,
+                        blue: bool = False):
+        if opentrons.config.IS_ROBOT:
+            self._gpio_chardev.set_button_light(red, green, blue)
+
+    def get_button(self) -> Dict[str, bool]:
+        """Returns the bool state of the button pressed vs not pressed"""
+        if not opentrons.config.IS_ROBOT:
+            return {}
+        return {'button': self.gpio_chardev.read_button()}
+
     def pause(self):
         self._smoothie_driver.pause()
 

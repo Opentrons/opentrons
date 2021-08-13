@@ -33,7 +33,8 @@ class HasLoop(Protocol):
         ...
 
 
-DoorStateNotificationType = Literal[HardwareEventType.DOOR_SWITCH_CHANGE]
+DoorStateNotificationType = Literal[HardwareEventType.DOOR_SWITCH_CHANGE,
+                                    HardwareEventType.BUTTON_SWITCH_CHANGE]
 
 
 class InstrumentSpec(TypedDict):

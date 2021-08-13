@@ -4,7 +4,7 @@ marks:
   - usefixtures:
       - run_server
 stages:
-  - name: Settings GET request returns correct info 
+  - name: Settings GET request returns correct info
     request:
       method: GET
       url: "{host:s}:{port:d}/settings"
@@ -66,6 +66,12 @@ stages:
           description: !re_search "Activating this will disable protocol running from the Opentrons application"
           restart_required: true
           value: !anything
+         id: enableButtonSafetySwitch
+           old_id: Null
+           title: Enable robot button safety switch
+           description: !re_search "Automatically pause protocols when robot door opens"
+           restart_required: false
+           value: !anything
         links: !anydict
 
 ---
@@ -84,6 +90,7 @@ marks:
       - disableHomeOnBoot
       - useOldAspirationFunctions
       - enableDoorSafetySwitch
+      - enableButtonSafetySwitch
       - enableTipLengthCalibration
       - enableHttpProtocolSessions
   - parametrize:
@@ -92,11 +99,11 @@ marks:
       - "True"
       - "False"
 stages:
-  - name: Set each setting to acceptable values 
+  - name: Set each setting to acceptable values
     request:
       method: POST
       url: "{host:s}:{port:d}/settings"
-      json: 
+      json:
         id: "{id}"
         value: "{value}"
     response:
@@ -123,14 +130,15 @@ marks:
       - disableHomeOnBoot
       - useOldAspirationFunctions
       - enableDoorSafetySwitch
+      - enableButtonSafetySwitch
       - enableTipLengthCalibration
       - enableHttpProtocolSessions
 stages:
-  - name: Set each setting to acceptable values 
+  - name: Set each setting to acceptable values
     request:
       method: POST
       url: "{host:s}:{port:d}/settings"
-      json: 
+      json:
         id: "{id}"
     response:
       status_code: 200
@@ -151,7 +159,7 @@ stages:
     request:
       method: POST
       url: "{host:s}:{port:d}/settings"
-      json: 
+      json:
         id: notARealID
         value: true
     response:

@@ -3,7 +3,7 @@ import logging
 import pathlib
 import time
 from typing import Callable, Dict, Tuple
-from opentrons.hardware_control.types import BoardRevision, DoorState
+from opentrons.hardware_control.types import BoardRevision, DoorState, ButtonState
 from . import RevisionPinsError
 from .types import gpio_group, PinDir, GPIOPin
 
@@ -19,10 +19,13 @@ DTOVERLAY_PATH = '/proc/device-tree/soc/gpio@7e200000/gpio_rev_bit_pins'
 
 
 def _event_callback(
-            update_door_state: Callable[[DoorState], None],
-            get_door_state: Callable[..., DoorState]):
+            # update_door_state: Callable[[DoorState], None],
+            # get_door_state: Callable[..., DoorState],
+            update_button_state: Callable[[ButtonState], None],
+            get_button_state: Callable[..., ButtonState]):
     try:
-        update_door_state(get_door_state())
+        #update_door_state(get_door_state())
+        update_button_state(get_button_state())
     except Exception:
         MODULE_LOG.exception("Errored during event callback")
 
@@ -243,19 +246,32 @@ class GPIOCharDev:
         else:
             return DoorState.CLOSED
 
+    def get_button_state(self) -> ButtonState:
+        name = gpio_group.button_input.name
+        event = self.lines[name].event_read()
+        if event.type == gpiod.LineEvent.FALLING_EDGE:
+            return ButtonState.OPEN
+        else:
+            return ButtonState.CLOSED
+
     def start_door_switch_watcher(
             self, loop: asyncio.AbstractEventLoop,
-            update_door_state: Callable[[DoorState], None]):
+            update_button_state: Callable[[ButtonState], None]):
         current_door_value = self.read_window_switches()
-        if current_door_value == 0:
-            update_door_state(DoorState.OPEN)
+        current_button_value = self.read_button()
+        # if current_door_value == 0:
+        #     update_door_state(DoorState.OPEN)
+        # else:
+        #     update_door_state(DoorState.CLOSED)
+        if current_button_value == 0:
+            update_button_state(ButtonState.OPEN)
         else:
-            update_door_state(DoorState.CLOSED)
+            update_button_state(ButtonState.CLOSED)
 
         try:
-            door_fd = self.lines['window_door_sw'].event_get_fd()
-            loop.add_reader(door_fd, _event_callback,
-                            update_door_state, self.get_door_state)
+            button_fd = self.lines['button_input'].event_get_fd()
+            loop.add_reader(button_fd, _event_callback,
+                            update_button_state, self.get_button_state)
         except Exception:
             MODULE_LOG.exception(
                 "Failed to add fd reader, cannot not monitor window door "
@@ -267,7 +283,7 @@ class GPIOCharDev:
 
     def stop_door_switch_watcher(self, loop: asyncio.AbstractEventLoop):
         try:
-            door_fd = self.lines['window_door_sw'].event_get_fd()
+            door_fd = self.lines['button_input'].event_get_fd()
             loop.remove_reader(door_fd)
         except Exception:
             MODULE_LOG.exception(

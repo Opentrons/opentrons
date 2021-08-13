@@ -5,4 +5,4 @@ from enum import Enum
 class HardwareEventName(str, Enum):
     """The hardware event name enumeration."""
 
-    DOOR_STATE = "door_state"
+    BUTTON_STATE = "button_state"

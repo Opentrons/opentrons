@@ -34,10 +34,11 @@ from opentrons.hardware_control import (API, ThreadManager,
                                         SynchronousAdapter,
                                         ExecutionCancelledError,
                                         ThreadedAsyncLock)
-from opentrons.hardware_control.types import (DoorState, HardwareEventType,
+from opentrons.hardware_control.types import (ButtonState, DoorState, HardwareEventType,
                                               HardwareEvent, Axis)
 from .models import Container, Instrument, Module
 from .dev_types import State, StateInfo, Message, LastCommand, Error, CommandShortId
+from opentrons.tools import factory_test
 
 log = logging.getLogger(__name__)
 
@@ -292,6 +293,7 @@ class Session(RobotBusy):
         self._motion_lock = motion_lock
         self._event_watcher = None
         self.door_state: Optional[str] = None
+        self.button_state: Optional[str] = None
         self.blocked: Optional[bool] = None
 
     @property
@@ -452,6 +454,10 @@ class Session(RobotBusy):
         self._hw_iface().halt()
         with self._motion_lock.lock():
             try:
+                # Button turn Red
+                self._hardware._backend.set_button(red = True,
+                                                    green=False,
+                                                    blue=False)
                 self._hw_iface().stop()
             except asyncio.CancelledError:
                 pass
@@ -461,6 +467,10 @@ class Session(RobotBusy):
               reason: str = None,
               user_message: str = None,
               duration: float = None) -> None:
+        # Button turns yellow
+        self._hardware._backend.set_button(red = True,
+                                            green=True,
+                                            blue=False)
         self._hardware.pause()
         self.set_state(
             'paused', reason=reason,
@@ -468,13 +478,18 @@ class Session(RobotBusy):
 
     def resume(self) -> None:
         if not self.blocked:
+            # Button turns Blue
+            self._hardware._backend.set_button(red = False,
+                                                green=False,
+                                                blue = True)
             self._hardware.resume()
             self.set_state('running')
 
     def _start_hardware_event_watcher(self) -> None:
         if not callable(self._event_watcher):
             # initialize and update window switch state
-            self._update_window_state(self._hardware.door_state)
+            #self._update_window_state(self._hardware.door_state)
+            self._update_button_state(self._hardware.button_state)
             log.info('Starting hardware event watcher')
             self._event_watcher = self._hardware.register_callback(
                 self._handle_hardware_event)
@@ -488,19 +503,40 @@ class Session(RobotBusy):
             self._event_watcher = None
 
     def _handle_hardware_event(self, hw_event: HardwareEvent) -> None:
-        if hw_event.event == HardwareEventType.DOOR_SWITCH_CHANGE:
-            self._update_window_state(hw_event.new_state)
-            if ff.enable_door_safety_switch() and \
-                    hw_event.new_state == DoorState.OPEN and \
-                    self.state == 'running':
-                self.pause('Robot door is open')
+        #if hw_event.event == HardwareEventType.BUTTON_SWITCH_CHANGE:
+            #self._update_window_state(hw_event.new_state)
+            # self._update_button_state(hw_event.button_state)
+            # if ff.enable_door_safety_switch() and \
+            #         hw_event.new_state == DoorState.OPEN and \
+            #         self.state == 'running':
+            #     self.pause('Robot door is open')
+            # else:
+            #     self._on_state_changed()
+
+        if hw_event.button_event == HardwareEventType.BUTTON_SWITCH_CHANGE:
+            self._update_button_state(hw_event.button_state)
+            log.info('Button State: {}'.format(hw_event.button_state))
+            log.info('Robot State: {}'.format(self.state))
+            if hw_event.button_state == ButtonState.OPEN and self.state == 'running':
+                log.info('Pausing')
+                self.pause('Button Pressed')
+            elif hw_event.button_state == ButtonState.OPEN and self.state == 'paused':
+                log.info('Resume')
+                self.resume()
             else:
                 self._on_state_changed()
 
+
     def _update_window_state(self, state: DoorState) -> None:
         self.door_state = str(state)
-        if ff.enable_door_safety_switch() and \
-                state == DoorState.OPEN:
+        if ff.enable_door_safety_switch() and state == DoorState.OPEN:
+            self.blocked = True
+        else:
+            self.blocked = False
+
+    def _update_button_state(self, state: ButtonState) -> None:
+        self.button_state = str(state)
+        if ff.enable_button_safety_switch() and state == ButtonState.OPEN:
             self.blocked = True
         else:
             self.blocked = False
@@ -539,9 +575,11 @@ class Session(RobotBusy):
                 loop=self._loop,
                 broker=self._broker
             )
+            self._hardware._backend.set_button(red = False,
+                                                green=False,
+                                                blue = True)
             ctx.connect(self._hardware)
             self._hw_iface().home([Axis.X, Axis.Y])
-            #ctx.home([Axis.X, Axis.Y])
             run_protocol(self._protocol, context=ctx)
 
             # If the last command in a protocol was a pause, the protocol
@@ -558,10 +596,22 @@ class Session(RobotBusy):
                 sleep(0.1)
             self.set_state('finished')
             self._hw_iface().home([Axis.X, Axis.Y])
+            # Button turns Green
+            self._hardware._backend.set_button(red = False,
+                                                green=True,
+                                                blue = False)
         except (SmoothieAlarm, asyncio.CancelledError,
                 ExecutionCancelledError):
             log.info("Protocol cancelled")
+            # Button turns red
+            self._hardware._backend.set_button(red = True,
+                                                green=False,
+                                                blue = False)
         except Exception as e:
+            # Button turns red
+            self._hardware._backend.set_button(red = True,
+                                                green=False,
+                                                blue = False)
             log.exception("Exception during run:")
             self.error_append(e)
             self.set_state('error')
@@ -650,6 +700,7 @@ class Session(RobotBusy):
                 'stateInfo': self.stateInfo,
                 'startTime': self.startTime,
                 'doorState': self.door_state,
+                'buttonState': self.button_state,
                 'blocked': self.blocked,
                 'errors': self.errors,
                 'lastCommand': last_command
