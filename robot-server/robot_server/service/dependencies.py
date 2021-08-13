@@ -117,7 +117,6 @@ async def get_rpc_server(
         ) from None
 
 
-@util.call_once
 async def get_protocol_manager(
     lifetime_dependency_set: lifetime_dependencies.LifetimeDependencySet = Depends(
         get_lifetime_dependencies
@@ -127,7 +126,6 @@ async def get_protocol_manager(
     return lifetime_dependency_set.protocol_manager
 
 
-@util.call_once
 async def get_session_manager(
     lifetime_dependency_set: lifetime_dependencies.LifetimeDependencySet = Depends(
         get_lifetime_dependencies
