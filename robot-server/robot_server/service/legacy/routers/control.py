@@ -94,18 +94,18 @@ async def post_home_robot(
     """Home the robot or one of the pipettes"""
     try:
         async with motion_lock.forbid():
-            mount = robot_home_target.mount
-            target = robot_home_target.target
+            #mount = robot_home_target.mount
+            # target = robot_home_target.target
+            target = control.HomeTarget.robot
 
             home = hardware.home  # type: ignore
             home_plunger = hardware.home_plunger  # type: ignore
 
-            if target == control.HomeTarget.pipette and mount:
-                await home([Axis.by_mount(Mount[mount.upper()])])
-                await home_plunger(Mount[mount.upper()])
-                message = f"Pipette on {mount} homed successfully"
-            elif target == control.HomeTarget.robot:
-                await home()
+            # if target == control.HomeTarget.pipette and mount:
+            #     await home([Axis.by_mount(Mount[mount.upper()])])
+            #     await home_plunger(Mount[mount.upper()])
+            if target == control.HomeTarget.robot:
+                await home([Axis.X, Axis.Y])
                 message = "Homing robot."
             else:
                 raise LegacyErrorResponse(
