@@ -602,7 +602,7 @@ class API(HardwareAPILike):
         self._backend.halt()
         self._log.info("Recovering from halt")
         await self.reset()
-        await self.home()
+        await self.home([Axis.X, Axis.Y])
 
     async def _wait_for_is_running(self):
         if not self.is_simulator:
