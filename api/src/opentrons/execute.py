@@ -25,6 +25,7 @@ from opentrons.protocols.parse import parse, version_from_string
 from opentrons.protocols.types import PythonProtocol
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.hardware_control import API, ThreadManager
+from opentrons.hardware_control.types import Axis
 from .util.entrypoint_util import labware_from_paths, datafiles_from_paths
 
 if TYPE_CHECKING:
@@ -281,7 +282,7 @@ def execute(protocol_file: TextIO,
         opentrons.robot.connect()
         opentrons.robot.cache_instrument_models()
         opentrons.robot.discover_modules()
-        opentrons.robot.home()
+        opentrons.robot.home('XY')
         if emit_runlog:
             opentrons.robot.broker.subscribe(
                 command_types.COMMAND, emit_runlog)
@@ -301,7 +302,7 @@ def execute(protocol_file: TextIO,
             broker = context.broker
             broker.subscribe(
                 command_types.COMMAND, emit_runlog)
-        context.home()
+        context.home(Axis.X, Axis.Y)
         try:
             execute_apiv2.run_protocol(protocol, context)
         finally:
