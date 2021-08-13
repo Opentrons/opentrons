@@ -66,6 +66,12 @@ stages:
             description: !re_search 'Opentrons-internal setting to test new protocol execution logic'
             restart_required: true
             value: !anything
+          - id: enableButtonSafetySwitch
+            old_id: Null
+            title: Enable robot button safety switch
+            description: !re_search "Automatically pause protocols when robot door opens"
+            restart_required: false
+            value: !anything
         links: !anydict
 
 ---
@@ -83,6 +89,7 @@ marks:
         - disableHomeOnBoot
         - useOldAspirationFunctions
         - enableDoorSafetySwitch
+        - enableButtonSafetySwitch
         - disableFastProtocolUpload
         - enableHttpProtocolSessions
         - enableProtocolEngine
@@ -122,6 +129,7 @@ marks:
         - disableHomeOnBoot
         - useOldAspirationFunctions
         - enableDoorSafetySwitch
+        - enableButtonSafetySwitch
         - disableFastProtocolUpload
         - enableHttpProtocolSessions
 stages:
