@@ -374,7 +374,7 @@ describe('labware module dispatches', () => {
     handleAction(CustomLabware.openCustomLabwareDirectory())
 
     return flush().then(() => {
-      expect(electron.shell.openItem).toHaveBeenCalledWith(labwareDir)
+      expect(electron.shell.openPath).toHaveBeenCalledWith(labwareDir)
     })
   })
 })

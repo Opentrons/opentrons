@@ -23,8 +23,9 @@ import type { Config, Overrides } from './types'
 export * from './types'
 
 // make sure all arguments are included in production
-const argv =
-  'defaultApp' in process ? process.argv.slice(2) : process.argv.slice(1)
+const argv = process.argv0.endsWith('defaultApp')
+  ? process.argv.slice(2)
+  : process.argv.slice(1)
 
 const PARSE_ARGS_OPTS = {
   envPrefix: 'OT_APP',

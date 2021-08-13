@@ -29,7 +29,7 @@ const helpMenu: MenuItemConstructorOptions = {
     {
       label: `View ${_PKG_PRODUCT_NAME_} App Logs`,
       click: () => {
-        require('electron').shell.openItem(LOG_DIR)
+        require('electron').shell.openPath(LOG_DIR)
       },
     },
     {
