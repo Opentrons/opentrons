@@ -190,8 +190,6 @@ async def _prepared_everything() -> _ACMFactory["LifetimeDependencySet"]:
         yield complete_result
 
 
-# todo(mm, 2021-08-04): Port get_session_manager() and get_protocol_manager()
-# dependencies, and clean them up with their .remove_all() methods.
 @dataclass(frozen=True)
 class LifetimeDependencySet:
     """All app dependencies that are exposed to the request layer."""
