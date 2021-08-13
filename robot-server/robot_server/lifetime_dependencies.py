@@ -33,8 +33,12 @@ from .slow_initializing import (
     start_initializing as start_slow_initializing,
 )
 
-from notify_server.clients import publisher as notify_server_publisher
+from notify_server.clients.publisher import (
+    create as create_notify_server_publisher,
+    Publisher as NotifyServerPublisher,
+)
 from notify_server.settings import Settings as NotifyServerSettings
+from opentrons.api import MainRouter as APIMainRouter
 from opentrons.hardware_control import ThreadedAsyncLock, ThreadManager
 from robot_server.hardware_initialization import initialize as initialize_hardware
 from robot_server.service.legacy.rpc import RPCServer
@@ -58,9 +62,9 @@ def _prepared_motion_lock() -> _CMFactory[ThreadedAsyncLock]:
 
 
 @contextlib.contextmanager
-def _prepared_event_publisher() -> _CMFactory[notify_server_publisher.Publisher]:
+def _prepared_event_publisher() -> _CMFactory[NotifyServerPublisher]:
     notify_server_settings = NotifyServerSettings()
-    event_publisher = notify_server_publisher.create(
+    event_publisher = create_notify_server_publisher(
         notify_server_settings.publisher_address.connection_string()
     )
     try:
@@ -71,7 +75,7 @@ def _prepared_event_publisher() -> _CMFactory[notify_server_publisher.Publisher]
 
 @contextlib.asynccontextmanager
 async def _prepared_thread_manager(
-    event_publisher: notify_server_publisher.Publisher,
+    event_publisher: NotifyServerPublisher,
 ) -> _ACMFactory[SlowInitializing[ThreadManager]]:
     async def factory() -> ThreadManager:
         return await initialize_hardware(event_publisher)
@@ -98,9 +102,7 @@ async def _prepared_rpc_server(
 ) -> _ACMFactory[SlowInitializing[RPCServer]]:
     async def factory() -> RPCServer:
         # todo(mm, 2021-08-04): Inherited from previous code. Why imported here?
-        from opentrons.api import MainRouter
-
-        root = MainRouter(hardware=(await thread_manager.get_when_ready()), lock=lock)
+        root = APIMainRouter(hardware=await thread_manager.get_when_ready(), lock=lock)
         return RPCServer(loop=None, root=root)
 
     slow_initializing = start_slow_initializing(factory)
