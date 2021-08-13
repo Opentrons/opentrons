@@ -55,13 +55,6 @@ _ACMFactory = typing.AsyncGenerator[_YieldT, None]
 
 
 @contextlib.contextmanager
-def _prepared_motion_lock() -> _CMFactory[ThreadedAsyncLock]:
-    # This doesn't need to be a context manager. It's done this way just for
-    # symmetry with the other dependencies.
-    yield ThreadedAsyncLock()
-
-
-@contextlib.contextmanager
 def _prepared_event_publisher() -> _CMFactory[NotifyServerPublisher]:
     notify_server_settings = NotifyServerSettings()
     event_publisher = create_notify_server_publisher(
@@ -156,7 +149,7 @@ async def _prepared_everything() -> _ACMFactory["LifetimeDependencySet"]:
         # async context manager is typed like `def (*Any, **Any)`. Double-check
         # argument count, type, and order.
 
-        motion_lock = stack.enter_context(_prepared_motion_lock())
+        motion_lock = ThreadedAsyncLock()
 
         event_publisher = stack.enter_context(_prepared_event_publisher())
 
