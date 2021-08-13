@@ -76,7 +76,7 @@ jobs:
         with:
           node-version: '14'
       - name: 'install udev for usb-detection'
-        if: ${{ contains(matrix.os, 'ubuntu') }}
+        if: contains(matrix.os, 'ubuntu')
         run: sudo apt-get install libudev-dev
       - name: 'cache yarn cache'
         uses: actions/cache@v2
