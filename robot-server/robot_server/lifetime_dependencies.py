@@ -136,13 +136,13 @@ async def _prepared_session_manager(
 @contextlib.asynccontextmanager
 async def _prepared_everything() -> _ACMFactory["LifetimeDependencySet"]:
     async with contextlib.AsyncExitStack() as stack:
-        # In general, when dependency A depends on dependency B, and B is a
-        # SlowInitializing, A should also be a SlowInitializing, and should take the
-        # SlowInitializing-wrapped B as an argument. A should not take the
-        # fully-initialized result of B as an argument, and this function should not
-        # have any `await slow_initializing.get_when_ready()` calls.
-
-        # For responsiveness on startup, this
+        # For responsiveness during startup, we try not to take too long in here.
+        #
+        # If a dependency would take a while to initialize, it should be a
+        # SlowInitializing so it can do that in the background.
+        #
+        # And if another dependency depends on that one, it too should be a
+        # SlowInitializing, by the transitive property of slow-ification.
 
         # Beware: For some reason, MyPy at least up to v0.812 does not catch errors
         # in arguments provided to the async context managers here. It thinks each
