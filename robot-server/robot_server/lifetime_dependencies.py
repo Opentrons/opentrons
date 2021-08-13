@@ -38,6 +38,8 @@ from notify_server.settings import Settings as NotifyServerSettings
 from opentrons.hardware_control import ThreadedAsyncLock, ThreadManager
 from robot_server.hardware_initialization import initialize as initialize_hardware
 from robot_server.service.legacy.rpc import RPCServer
+from robot_server.service.protocol.manager import ProtocolManager
+from robot_server.service.session.manager import SessionManager
 
 
 _YieldT = typing.TypeVar("_YieldT")
@@ -113,6 +115,32 @@ async def _prepared_rpc_server(
             await fully_initialized_result.on_shutdown()
 
 
+@contextlib.contextmanager
+def _prepared_protocol_manager() -> _CMFactory[ProtocolManager]:
+    protocol_manager = ProtocolManager()
+    try:
+        yield protocol_manager
+    finally:
+        protocol_manager.remove_all()
+
+
+@contextlib.asynccontextmanager
+async def _prepared_session_manager(
+    thread_manager: SlowInitializing[ThreadManager],
+    motion_lock: ThreadedAsyncLock,
+    protocol_manager: ProtocolManager,
+) -> _ACMFactory[SessionManager]:
+    session_manager = SessionManager(
+        await thread_manager.get_when_ready(),
+        motion_lock,
+        protocol_manager,
+    )
+    try:
+        yield session_manager
+    finally:
+        await session_manager.remove_all()
+
+
 @contextlib.asynccontextmanager
 async def _prepared_everything() -> _ACMFactory["LifetimeDependencySet"]:
     async with contextlib.AsyncExitStack() as stack:
@@ -124,21 +152,39 @@ async def _prepared_everything() -> _ACMFactory["LifetimeDependencySet"]:
 
         # For responsiveness on startup, this
 
+        # Beware: For some reason, MyPy at least up to v0.812 does not catch errors
+        # in arguments provided to the async context managers here. It thinks each
+        # async context manager is typed like `def (*Any, **Any)`. Double-check
+        # argument count, type, and order.
+
         motion_lock = stack.enter_context(_prepared_motion_lock())
+
         event_publisher = stack.enter_context(_prepared_event_publisher())
+
         thread_manager = await stack.enter_async_context(
-            _prepared_thread_manager(event_publisher)
+            _prepared_thread_manager(event_publisher=event_publisher)
         )
-        # todo(mm, 2021-08-04): If wrong arguments are provided to the _rpc_server
-        # factory, MyPy doesn't catch it. Why not?
+
         rpc_server = await stack.enter_async_context(
             _prepared_rpc_server(thread_manager=thread_manager, lock=motion_lock)
         )
 
+        protocol_manager = stack.enter_context(_prepared_protocol_manager())
+
+        session_manager = await stack.enter_async_context(
+            _prepared_session_manager(
+                thread_manager=thread_manager,
+                motion_lock=motion_lock,
+                protocol_manager=protocol_manager,
+            )
+        )
+
         complete_result = LifetimeDependencySet(
-            thread_manager=thread_manager,
-            rpc_server=rpc_server,
-            motion_lock=motion_lock,
+            motion_lock,
+            thread_manager,
+            rpc_server,
+            protocol_manager,
+            session_manager,
         )
 
         yield complete_result
@@ -153,6 +199,8 @@ class LifetimeDependencySet:
     motion_lock: ThreadedAsyncLock
     thread_manager: SlowInitializing[ThreadManager]
     rpc_server: SlowInitializing[RPCServer]
+    protocol_manager: ProtocolManager
+    session_manager: SessionManager
 
 
 class NotSetError(Exception):  # noqa: D101

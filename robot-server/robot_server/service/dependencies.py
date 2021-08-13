@@ -100,21 +100,23 @@ async def get_rpc_server(
 
 
 @util.call_once
-async def get_protocol_manager() -> ProtocolManager:
+async def get_protocol_manager(
+    lifetime_dependency_set: lifetime_dependencies.LifetimeDependencySet = Depends(
+        get_lifetime_dependencies
+    ),
+) -> ProtocolManager:
     """The single protocol manager instance"""
-    return ProtocolManager()
+    return lifetime_dependency_set.protocol_manager
 
 
 @util.call_once
 async def get_session_manager(
-    hardware: ThreadManager = Depends(get_hardware),
-    motion_lock: ThreadedAsyncLock = Depends(get_motion_lock),
-    protocol_manager: ProtocolManager = Depends(get_protocol_manager),
+    lifetime_dependency_set: lifetime_dependencies.LifetimeDependencySet = Depends(
+        get_lifetime_dependencies
+    ),
 ) -> SessionManager:
-    """The single session manager instance"""
-    return SessionManager(
-        hardware=hardware, motion_lock=motion_lock, protocol_manager=protocol_manager
-    )
+    """The single protocol manager instance"""
+    return lifetime_dependency_set.session_manager
 
 
 async def check_version_header(

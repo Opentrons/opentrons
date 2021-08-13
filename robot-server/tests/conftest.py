@@ -19,7 +19,12 @@ from opentrons.protocols.context.protocol_api.labware import LabwareImplementati
 from starlette.testclient import TestClient
 from robot_server import app
 from robot_server.constants import API_VERSION_HEADER, API_VERSION_LATEST
-from robot_server.service.dependencies import get_hardware, get_motion_lock
+from robot_server.service.dependencies import (
+    get_hardware,
+    get_motion_lock,
+    get_protocol_manager,
+    get_session_manager,
+)
 from opentrons.hardware_control import API, HardwareAPILike, ThreadedAsyncLock
 from opentrons import config
 
@@ -88,7 +93,42 @@ def override_motion_lock(motion_lock) -> None:
 
 
 @pytest.fixture
-def api_client(override_hardware, override_motion_lock) -> TestClient:
+def protocol_manager() -> ProtocolManager:
+    return ProtocolManager()
+
+
+@pytest.fixture
+def override_protocol_manager(protocol_manager) -> None:
+    async def get_protocol_manager_override():
+        return protocol_manager
+
+    app.dependency_overrides[get_protocol_manager] = get_protocol_manager_override
+
+
+@pytest.fixture
+def session_manager(hardware, motion_lock, protocol_manager) -> SessionManager:
+    return SessionManager(
+        hardware=hardware,
+        motion_lock=motion_lock,
+        protocol_manager=protocol_manager,
+    )
+
+
+@pytest.fixture
+def override_session_manager(session_manager) -> None:
+    async def get_session_manager_override():
+        return session_manager
+
+    app.dependency_overrides[get_session_manager] = get_session_manager_override
+
+
+@pytest.fixture
+def api_client(
+    override_hardware,
+    override_motion_lock,
+    override_protocol_manager,
+    override_session_manager,
+) -> TestClient:
     # Using the TestClient without a `with` block means the app's startup and shutdown
     # handlers won't run (starlette.io/events/#running-event-handlers-in-tests).
     # So certain dependencies won't be initialized. This doesn't fail our tests because
@@ -100,7 +140,12 @@ def api_client(override_hardware, override_motion_lock) -> TestClient:
 
 
 @pytest.fixture
-def api_client_no_errors(override_hardware, override_motion_lock) -> TestClient:
+def api_client_no_errors(
+    override_hardware,
+    override_motion_lock,
+    override_protocol_manager,
+    override_session_manager,
+) -> TestClient:
     """An API client that won't raise server exceptions.
 
     Use only to test 500 pages; never use this for other tests.
@@ -247,15 +292,6 @@ def set_up_tip_length_temp_directory(server_temp_directory):
 def set_up_deck_calibration_temp_directory(server_temp_directory):
     attitude = [[1.0008, 0.0052, 0.0], [-0.0, 0.992, 0.0], [0.0, 0.0, 1.0]]
     modify.save_robot_deck_attitude(attitude, "pip_1", "fakehash")
-
-
-@pytest.fixture
-def session_manager(hardware) -> SessionManager:
-    return SessionManager(
-        hardware=hardware,
-        motion_lock=ThreadedAsyncLock(),
-        protocol_manager=ProtocolManager(),
-    )
 
 
 @pytest.fixture
