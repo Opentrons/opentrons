@@ -90,9 +90,6 @@ async def _prepared_thread_manager(
             pass
         else:
             fully_initialized_result.clean_up()
-        # To do: Justify why we don't attempt to cancel.
-        # Codebase generally isn't prepared to handle it.
-        # Need something like task groups.
 
 
 @contextlib.asynccontextmanager
