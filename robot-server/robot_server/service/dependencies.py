@@ -95,8 +95,26 @@ async def get_rpc_server(
     ),
 ) -> RPCServer:
     """The RPC Server instance"""
-    # todo: Handle exception
-    return lifetime_dependency_set.rpc_server.get_if_ready()
+    try:
+        return lifetime_dependency_set.rpc_server.get_if_ready()
+    except InitializationOngoingError:
+        # todo(mm, 2021-08-13): When this dependency is used by a WebSocket endpoint,
+        # raising HTTPException doesn't make sense. I don't think the status code and
+        # detail message will be be reported to the WebSocket client.
+        #
+        # We should either:
+        #
+        #   * Develop a strategy for dependencies to report "not ready yet" when they
+        #     may be used by both HTTP endpoints and WebSocket endpoints, and
+        #     implement that here.
+        #   * Document that this dependency may only be used from WebSocket endpoints,
+        #     not HTTP endpoints, and raise something like a WebSocketException here.
+        #     (But see the note on fastapi.tiangolo.com/advanced/websockets/ about
+        #     WebSocketException not existing yet, in FastAPI v0.54.1.)
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="RPC server is not ready.",
+        ) from None
 
 
 @util.call_once
