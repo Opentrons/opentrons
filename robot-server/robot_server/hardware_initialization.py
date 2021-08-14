@@ -68,19 +68,15 @@ class DoorEventForwarder:
 
         Otherwise, no-op.
         """
-        print("Called with", hardware_event)
         if hardware_event.event == HardwareEventType.DOOR_SWITCH_CHANGE:
             payload = DoorStatePayload(state=hardware_event.new_state)
         else:
-            print("Returning early.")
             return
-        print("Payload will be", payload)
         topic = topics.RobotEventTopics.HARDWARE_EVENTS
         publisher = "robot_server_event_publisher"
         event_to_publish = event.Event(
             createdOn=utc_now(), publisher=publisher, data=payload
         )
-        print("Event to publish will be", event_to_publish)
         self.publisher.send_nowait(topic, event_to_publish)
 
 
