@@ -10,7 +10,7 @@ from starlette.requests import Request
 
 from opentrons.hardware_control import ThreadManager, ThreadedAsyncLock
 
-from robot_server import constants, lifetime_dependencies, util, errors
+from robot_server import constants, lifetime_dependencies, errors
 from robot_server.service.session.manager import SessionManager
 from robot_server.service.protocol.manager import ProtocolManager
 from robot_server.service.legacy.rpc import RPCServer
