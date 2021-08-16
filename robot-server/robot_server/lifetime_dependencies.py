@@ -91,7 +91,6 @@ async def _prepared_rpc_server(
     lock: ThreadedAsyncLock,
 ) -> _ACMFactory[SlowInitializing[RPCServer]]:
     async def factory() -> RPCServer:
-        # todo(mm, 2021-08-04): Inherited from previous code. Why imported here?
         root = APIMainRouter(hardware=await thread_manager.get_when_ready(), lock=lock)
         return RPCServer(loop=None, root=root)
 
