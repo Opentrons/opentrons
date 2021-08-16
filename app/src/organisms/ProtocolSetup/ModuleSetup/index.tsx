@@ -29,7 +29,6 @@ import type { CoordinatesByModuleModel } from '../utils/getModuleRenderCoords'
 interface ModuleSetupProps {
   moduleRenderCoords: CoordinatesByModuleModel
   expandLabwareSetupStep: () => void
-  robotName: string
 }
 
 const DECK_LAYER_BLOCKLIST = [
