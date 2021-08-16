@@ -26,7 +26,8 @@ import multipleModuleHelp from '../../../assets/images/multiple_module_help_exam
 
 import styles from '../styles.css'
 
-const HOW_TO_MULTIPLE_MODULES_HREF = '#' // TODO IMMEDIATELY: get the actual link
+const HOW_TO_MULTIPLE_MODULES_HREF =
+  'https://support.opentrons.com/en/articles/5167312-using-modules-of-the-same-type-on-the-ot-2'
 
 interface MultipleModulesModalProps {
   onCloseClick: () => unknown
