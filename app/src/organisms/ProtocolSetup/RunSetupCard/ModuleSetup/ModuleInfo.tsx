@@ -1,4 +1,5 @@
 import * as React from 'react'
+import cx from 'classnames'
 import {
   Text,
   RobotCoordsForeignDiv,
@@ -18,6 +19,7 @@ import {
   FONT_WEIGHT_SEMIBOLD,
   SPACING_2,
 } from '@opentrons/components'
+import type { IconName } from '../../../../../components/src/icons/Icon'
 import { useTranslation } from 'react-i18next'
 import {
   getModuleType,
@@ -27,18 +29,33 @@ import {
   getModuleDisplayName,
 } from '@opentrons/shared-data'
 
+import styles from './moduleinfo.css'
+
 export interface ModuleInfoProps {
   x: number
   y: number
   orientation: 'left' | 'right'
   moduleModel: ModuleModel
+  usbInfoString?: string
+  mode: 'default' | 'present' | 'missing'
 }
 
 export function ModuleInfo(props: ModuleInfoProps): JSX.Element {
-  const { x, y, orientation, moduleModel } = props
+  const { x, y, orientation, moduleModel, mode, usbInfoString } = props
   const moduleType = getModuleType(moduleModel)
   const { t } = useTranslation('protocol_setup')
   const { childYOffset } = getModuleVizDims(orientation, moduleType)
+
+  const iconClassName = cx(styles.module_review_icon, {
+    [styles.module_review_icon_missing]: mode === 'missing',
+    [styles.module_review_icon_present]: mode === 'present',
+  })
+
+  const iconNameByMode: Record<string, IconName> = {
+    missing: 'alert-circle',
+    present: 'check-circle',
+    default: 'usb',
+  }
 
   return (
     <RobotCoordsForeignDiv
@@ -53,16 +70,32 @@ export function ModuleInfo(props: ModuleInfoProps): JSX.Element {
         padding: SPACING_1,
       }}
     >
+      {mode !== 'missing' && usbInfoString && (
+        <p
+          key="usbPortInfo"
+          className={
+            usbInfoString.includes('N/A')
+              ? styles.module_port_text_na
+              : styles.module_port_text
+          }
+        >
+          {usbInfoString}
+        </p>
+      )}
       <Flex flexDirection={DIRECTION_COLUMN}>
         <Flex flexDirection={DIRECTION_ROW}>
           <Icon
-            name="alert-circle"
+            name={iconNameByMode[mode] || 'usb'}
+            key="icon"
+            className={iconClassName}
             height="0.625rem"
             width="0.625rem"
             color={COLOR_ERROR}
             marginRight={SPACING_1}
             marginTop={SPACING_1}
           />
+          <p>{mode === 'missing' ? 'Not connected' : 'Connected'}</p>
+
           <Text css={FONT_SIZE_BODY_2} title={t('module_not_connected')}>
             {t('module_not_connected')}
           </Text>
