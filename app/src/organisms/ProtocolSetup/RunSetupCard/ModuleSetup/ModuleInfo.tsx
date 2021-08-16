@@ -95,10 +95,6 @@ export function ModuleInfo(props: ModuleInfoProps): JSX.Element {
             marginTop={SPACING_1}
           />
           <p>{mode === 'missing' ? 'Not connected' : 'Connected'}</p>
-
-          <Text css={FONT_SIZE_BODY_2} title={t('module_not_connected')}>
-            {t('module_not_connected')}
-          </Text>
         </Flex>
         <Text css={FONT_BODY_1_DARK}>{getModuleDisplayName(moduleModel)}</Text>
         <Text
