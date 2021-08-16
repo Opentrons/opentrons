@@ -183,13 +183,13 @@ describe('LabwareSetup', () => {
         })
       )
       .mockImplementation(({ children }) => (
-        <div>
+        <svg>
           {/* @ts-expect-error children won't be null since we checked for expect.anything() above */}
           {children({
             deckSlotsById,
             getRobotCoordsFromDOMCoords: {} as any,
           })}
-        </div>
+        </svg>
       ))
   })
 

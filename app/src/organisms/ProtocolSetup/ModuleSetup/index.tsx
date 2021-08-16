@@ -13,6 +13,7 @@ import {
   JUSTIFY_CENTER,
   C_BLUE,
   C_NEAR_WHITE,
+  SPACING_4,
 } from '@opentrons/components'
 import {
   getModuleType,
@@ -105,14 +106,14 @@ export const ModuleSetup = (props: ModuleSetupProps): JSX.Element | null => {
             )
           }}
         </RobotWorkSpace>
-        <Flex justifyContent={JUSTIFY_CENTER}>
-          <PrimaryBtn
-            title={t('proceed_to_labware_setup_step')}
-            onClick={expandLabwareSetupStep}
-          >
-            {t('proceed_to_labware_setup_step')}
-          </PrimaryBtn>
-        </Flex>
+      </Flex>
+      <Flex justifyContent={JUSTIFY_CENTER} margin={SPACING_4}>
+        <PrimaryBtn
+          title={t('proceed_to_labware_setup_step')}
+          onClick={expandLabwareSetupStep}
+        >
+          {t('proceed_to_labware_setup_step')}
+        </PrimaryBtn>
       </Flex>
     </React.Fragment>
   )

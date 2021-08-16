@@ -106,7 +106,7 @@ describe('RunSetupCard', () => {
     })
   })
 
-  it('renders robot calibration, modules, and labware setup if some modules in protocol', () => {
+  it('renders module setup and allows the user to proceed to labware setup', () => {
     mockGetProtocolData.mockReturnValue(withModulesProtocol as any)
     when(mockGetModuleRenderCoords)
       .calledWith(withModulesProtocol as any, standardDeckDef as any)

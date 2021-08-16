@@ -3,15 +3,20 @@ import { Trans, useTranslation } from 'react-i18next'
 import {
   Flex,
   Link,
+  Icon,
+  Btn,
   Modal,
   PrimaryBtn,
   Text,
   C_BLUE,
+  C_MED_DARK_GRAY,
   FONT_SIZE_BODY_1,
+  JUSTIFY_SPACE_BETWEEN,
   FONT_WEIGHT_REGULAR,
   FONT_WEIGHT_SEMIBOLD,
   JUSTIFY_CENTER,
   SIZE_4,
+  SIZE_2,
   SPACING_3,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
@@ -34,9 +39,14 @@ export const MultipleModulesModal = (
   return (
     <Portal level="top">
       <Modal className={styles.modal} contentsClassName={styles.modal_contents}>
-        <Text as={'h3'} marginBottom={SPACING_3}>
-          {t('multiple_modules_modal_title')}
-        </Text>
+        <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
+          <Text as={'h3'} marginBottom={SPACING_3}>
+            {t('multiple_modules_modal_title')}
+          </Text>
+          <Btn size={SIZE_2} onClick={props.onCloseClick}>
+            <Icon name={'close'} color={C_MED_DARK_GRAY}></Icon>
+          </Btn>
+        </Flex>
         <Flex flexDirection={DIRECTION_ROW}>
           <Flex flexDirection={DIRECTION_COLUMN}>
             <Trans

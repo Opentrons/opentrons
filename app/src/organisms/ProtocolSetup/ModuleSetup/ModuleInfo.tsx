@@ -52,13 +52,14 @@ export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
       }}
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <Flex flexDirection={DIRECTION_ROW}>
+        <Flex flexDirection={DIRECTION_ROW} margin>
           <Icon
             name="alert-circle"
             height="0.625rem"
             width="0.625rem"
             color={COLOR_ERROR}
             marginRight={SPACING_1}
+            marginTop={SPACING_1}
           />
           <Text css={FONT_SIZE_BODY_2} title={t('module_not_connected')}>
             {t('module_not_connected')}
