@@ -11,4 +11,4 @@ def test_parser_bad_arg():
     with pytest.raises(SystemExit):
         rfscli = RootFSCLI.RootFSCLI()
         parser = rfscli.parse_args(['debug', '--tt', 'testting', '--badarg'])
-        print (parser.__dict__)
+        print(parser.__dict__)
