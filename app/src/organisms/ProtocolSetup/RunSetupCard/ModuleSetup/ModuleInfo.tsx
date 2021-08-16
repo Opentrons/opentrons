@@ -15,6 +15,8 @@ import {
   ALIGN_FLEX_START,
   DISPLAY_FLEX,
   JUSTIFY_FLEX_START,
+  FONT_WEIGHT_SEMIBOLD,
+  SPACING_2,
 } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
 import {
@@ -32,7 +34,7 @@ export interface ModuleInfoProps {
   moduleModel: ModuleModel
 }
 
-export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
+export function ModuleInfo(props: ModuleInfoProps): JSX.Element {
   const { x, y, orientation, moduleModel } = props
   const moduleType = getModuleType(moduleModel)
   const { t } = useTranslation('protocol_setup')
