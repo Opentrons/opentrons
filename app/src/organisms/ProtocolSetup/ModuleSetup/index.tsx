@@ -1,5 +1,6 @@
 import * as React from 'react'
 import map from 'lodash/map'
+import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
   Flex,
@@ -13,22 +14,26 @@ import {
   JUSTIFY_CENTER,
   C_BLUE,
   C_NEAR_WHITE,
+  useInterval,
 } from '@opentrons/components'
 import {
   getModuleType,
   inferModuleOrientationFromXCoordinate,
 } from '@opentrons/shared-data'
+import { fetchModules } from '../../../redux/modules'
 
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 import { ModuleInfo } from './ModuleInfo'
 import { MultipleModulesModal } from './MultipleModulesModal'
 import styles from '../styles.css'
-
+import { getConnectedRobotName } from '../../../redux/robot/selectors'
+import type { Dispatch } from '../../../redux/types'
 import type { CoordinatesByModuleModel } from '../utils/getModuleRenderCoords'
 
 interface ModuleSetupProps {
   moduleRenderCoords: CoordinatesByModuleModel
   expandLabwareSetupStep: () => void
+  robotName: string
 }
 
 const DECK_LAYER_BLOCKLIST = [
@@ -40,14 +45,25 @@ const DECK_LAYER_BLOCKLIST = [
   'removableDeckOutline',
   'screwHoles',
 ]
+const POLL_MODULE_INTERVAL_MS = 5000
+
 export const ModuleSetup = (props: ModuleSetupProps): JSX.Element | null => {
-  const { moduleRenderCoords, expandLabwareSetupStep } = props
+  const { moduleRenderCoords, expandLabwareSetupStep, robotName } = props
   const DECK_VIEW_BOX = `-64 -10 ${530} ${456}`
+  const dispatch = useDispatch<Dispatch>()
+  const connectedRobotName = useSelector(getConnectedRobotName)
   const { t } = useTranslation('protocol_setup')
   const [
     showMultipleModulesModal,
     setShowMultipleModulesModal,
   ] = React.useState<boolean>(false)
+
+  useInterval(
+    () => dispatch(fetchModules(robotName)),
+    connectedRobotName === null ? POLL_MODULE_INTERVAL_MS : null,
+    true
+  )
+
   return (
     <React.Fragment>
       {showMultipleModulesModal && (

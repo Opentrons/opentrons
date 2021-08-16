@@ -24,20 +24,34 @@ import {
   STD_SLOT_X_DIM as SLOT_X,
   getModuleDisplayName,
 } from '@opentrons/shared-data'
-
+import styles from './module.css'
+import cx from 'classnames'
+import type { IconName } from '../../../../../components/src/icons/Icon'
 export interface ModuleInfoProps {
   x: number
   y: number
   orientation: 'left' | 'right'
   moduleModel: ModuleModel
+  mode: 'present' | 'missing' | 'info'
+  usbInfoString?: string
 }
 
-export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
-  const { x, y, orientation, moduleModel } = props
+export function ModuleInfo(props: ModuleInfoProps): JSX.Element {
+  const { mode, x, y, orientation, usbInfoString, moduleModel } = props
   const moduleType = getModuleType(moduleModel)
   const { t } = useTranslation('protocol_setup')
   const { childYOffset } = getModuleVizDims(orientation, moduleType)
 
+  const iconClassName = cx(styles.module_review_icon, {
+    [styles.module_review_icon_missing]: mode === 'missing',
+    [styles.module_review_icon_present]: mode === 'present',
+  })
+
+  const iconNameByMode: Record<string, IconName> = {
+    missing: 'alert-circle',
+    present: 'check-circle',
+    info: 'usb',
+  }
   return (
     <RobotCoordsForeignDiv
       x={x}
@@ -51,27 +65,40 @@ export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
         padding: SPACING_1,
       }}
     >
+      {mode !== 'missing' && usbInfoString && (
+        <p
+          key="usbPortInfo"
+          className={
+            usbInfoString.includes('N/A')
+              ? styles.module_port_text_na
+              : styles.module_port_text
+          }
+        >
+          {usbInfoString}
+        </p>
+      )}
       <Flex flexDirection={DIRECTION_COLUMN}>
         <Flex flexDirection={DIRECTION_ROW}>
-          <Icon
-            name="alert-circle"
-            height="0.625rem"
-            width="0.625rem"
-            color={COLOR_ERROR}
-            marginRight={SPACING_1}
-          />
-          <Text css={FONT_SIZE_BODY_2} title={t('module_not_connected')}>
-            {t('module_not_connected')}
-          </Text>
+          <div className={styles.module_connect_info_wrapper}>
+            <Icon
+              key="icon"
+              className={iconClassName}
+              x="8"
+              y="0"
+              svgWidth="12"
+              name={iconNameByMode[mode] || 'usb'}
+            />
+            <p>{mode === 'missing' ? 'Not connected' : 'Connected'}</p>
+          </div>
         </Flex>
-        <Text css={FONT_BODY_1_DARK}>{getModuleDisplayName(moduleModel)}</Text>
+        <Text>{getModuleDisplayName(moduleModel)}</Text>
         <Text
-          fontSize={FONT_SIZE_CAPTION}
-          fontStyle={FONT_STYLE_ITALIC}
-          title={t('no_usb_port_yet')}
-        >
-          {t('no_usb_port_yet')}
-        </Text>
+          className={iconClassName}
+          x="8"
+          y="0"
+          svgWidth="12"
+          name={iconNameByMode[mode] || 'usb'}
+        />
       </Flex>
     </RobotCoordsForeignDiv>
   )
