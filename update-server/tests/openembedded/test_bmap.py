@@ -12,12 +12,14 @@ def test_disk_image_write(tmp_path):
     d.mkdir()
     CONTENT = "mock_fs"
     p = d / "mockFS.wic"
+    bmap = d / 'image.bmap'
     p.write_text(CONTENT)
     subprocess.run(["bmaptool", "create", "-o",
-                    "disk_image/image.bmap", "disk_image/mockFS.wic"])
+                    bmap, p])
     rfs = RootFS.RootFS()
     RootFS.SD_CARD_MOUNT_POINT = os.getcwd()
-    RootFS.BMAP_FILE = 'disk_image/image..bmap'
+    RootFS.BMAP_FILE = bmap
     RootFS.DISK = d
-    RootFS.BMAP_IMAGE = 'disk_image/mockFS.wic'
+    RootFS.BMAP_IMAGE = p
     rfs.factoryRestore(None)
+    assert sum([len(files) for r, d, files in os.walk(d)]) == 2
