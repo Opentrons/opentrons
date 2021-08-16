@@ -19,7 +19,6 @@ import {
   FONT_SIZE_BODY_1,
   JUSTIFY_CENTER,
   SPACING_3,
-  SPACING_4,
   SPACING_6,
   C_BLUE,
   C_DARK_GRAY,
@@ -138,13 +137,7 @@ export const LabwareSetup = (props: LabwareSetupProps): JSX.Element | null => {
                       <g transform={`translate(${x},${y})`}>
                         <LabwareRender definition={labwareDef} />
                       </g>
-                      <g>
-                        <LabwareInfoOverlay
-                          x={x}
-                          y={y}
-                          definition={labwareDef}
-                        />
-                      </g>
+                      <LabwareInfoOverlay x={x} y={y} definition={labwareDef} />
                     </React.Fragment>
                   )
                 })}
@@ -152,7 +145,7 @@ export const LabwareSetup = (props: LabwareSetupProps): JSX.Element | null => {
             )
           }}
         </RobotWorkSpace>
-        <Text color={C_DARK_GRAY} margin={`${SPACING_4} ${SPACING_6}`}>
+        <Text color={C_DARK_GRAY} margin={`${SPACING_6} ${SPACING_3}`}>
           {t('labware_position_check_text')}
         </Text>
         <Flex justifyContent={JUSTIFY_CENTER}>
@@ -160,6 +153,7 @@ export const LabwareSetup = (props: LabwareSetupProps): JSX.Element | null => {
             title={t('check_labware_positions')}
             marginRight={SPACING_3}
             onClick={() => console.log('check labware positions!')}
+            color={C_BLUE}
           >
             {t('check_labware_positions')}
           </SecondaryBtn>
@@ -167,6 +161,7 @@ export const LabwareSetup = (props: LabwareSetupProps): JSX.Element | null => {
             title={t('proceed_to_run')}
             disabled={proceedToRunDisabled}
             as={LinkComponent}
+            backgroundColor={C_BLUE}
             {...linkProps}
             {...targetProps}
           >

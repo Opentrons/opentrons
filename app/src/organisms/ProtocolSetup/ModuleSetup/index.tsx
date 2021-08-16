@@ -1,5 +1,6 @@
 import * as React from 'react'
 import map from 'lodash/map'
+
 import { useTranslation } from 'react-i18next'
 import {
   Flex,
@@ -19,17 +20,16 @@ import {
   getModuleType,
   inferModuleOrientationFromXCoordinate,
 } from '@opentrons/shared-data'
-
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 import { ModuleInfo } from './ModuleInfo'
 import { MultipleModulesModal } from './MultipleModulesModal'
 import styles from '../styles.css'
-
 import type { CoordinatesByModuleModel } from '../utils/getModuleRenderCoords'
 
 interface ModuleSetupProps {
   moduleRenderCoords: CoordinatesByModuleModel
   expandLabwareSetupStep: () => void
+  robotName: string
 }
 
 const DECK_LAYER_BLOCKLIST = [
@@ -41,6 +41,7 @@ const DECK_LAYER_BLOCKLIST = [
   'removableDeckOutline',
   'screwHoles',
 ]
+
 export const ModuleSetup = (props: ModuleSetupProps): JSX.Element | null => {
   const { moduleRenderCoords, expandLabwareSetupStep } = props
   const DECK_VIEW_BOX = `-64 -10 ${530} ${456}`
@@ -49,6 +50,7 @@ export const ModuleSetup = (props: ModuleSetupProps): JSX.Element | null => {
     showMultipleModulesModal,
     setShowMultipleModulesModal,
   ] = React.useState<boolean>(false)
+
   return (
     <React.Fragment>
       {showMultipleModulesModal && (
@@ -111,6 +113,7 @@ export const ModuleSetup = (props: ModuleSetupProps): JSX.Element | null => {
         <PrimaryBtn
           title={t('proceed_to_labware_setup_step')}
           onClick={expandLabwareSetupStep}
+          backgroundColor={C_BLUE}
         >
           {t('proceed_to_labware_setup_step')}
         </PrimaryBtn>
