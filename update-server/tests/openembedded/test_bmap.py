@@ -13,7 +13,8 @@ def test_disk_image_write(tmp_path):
     CONTENT = "mock_fs"
     p = d / "mockFS.wic"
     p.write_text(CONTENT)
-    subprocess.run(["bmaptool", "create", "-o", "disk_image/image.bmap", "disk_image/mockFS.wic"])
+    subprocess.run(["bmaptool", "create", "-o",
+                    "disk_image/image.bmap", "disk_image/mockFS.wic"])
     rfs = RootFS.RootFS()
     RootFS.SD_CARD_MOUNT_POINT = os.getcwd()
     RootFS.BMAP_FILE = 'disk_image/image..bmap'
