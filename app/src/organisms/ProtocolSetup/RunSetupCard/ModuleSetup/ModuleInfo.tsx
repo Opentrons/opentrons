@@ -52,7 +52,7 @@ export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
       }}
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <Flex flexDirection={DIRECTION_ROW}>
+        <Flex flexDirection={DIRECTION_ROW} margin>
           <Icon
             name="alert-circle"
             height="0.625rem"
