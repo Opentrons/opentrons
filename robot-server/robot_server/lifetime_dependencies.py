@@ -56,6 +56,7 @@ _ACMFactory = typing.AsyncGenerator[_YieldT, None]
 
 @contextlib.contextmanager
 def _prepared_event_publisher() -> _CMFactory[NotifyServerPublisher]:
+    """Return a context manager for a `NotifyServerPublisher`."""
     notify_server_settings = NotifyServerSettings()
     event_publisher = create_notify_server_publisher(
         notify_server_settings.publisher_address.connection_string()
@@ -70,6 +71,18 @@ def _prepared_event_publisher() -> _CMFactory[NotifyServerPublisher]:
 async def _prepared_thread_manager(
     event_publisher: NotifyServerPublisher,
 ) -> _ACMFactory[SlowInitializing[ThreadManager]]:
+    """Return a context manager for a background-initializing `ThreadManager`.
+
+    When the context manager is entered, the `ThreadManager` will start initializing
+    in the background.
+
+    While still inside the context manager, you can use the returned `SlowInitializing`
+    to check whether the `ThreadManager` is ready yet, and retrieve it if so.
+
+    When the context manager is exited, the `ThreadManager` will be cleaned up
+    appropriately, even if it hasn't finished initializing by that time.
+    """
+
     async def factory() -> ThreadManager:
         return await initialize_hardware(event_publisher)
 
@@ -90,6 +103,11 @@ async def _prepared_rpc_server(
     thread_manager: SlowInitializing[ThreadManager],
     lock: ThreadedAsyncLock,
 ) -> _ACMFactory[SlowInitializing[RPCServer]]:
+    """Return a context manager for a background-initializing `RPCServer`.
+
+    The background initialization works the same way as in `_prepared_thread_manager()`.
+    """
+
     async def factory() -> RPCServer:
         root = APIMainRouter(hardware=await thread_manager.get_when_ready(), lock=lock)
         return RPCServer(loop=None, root=root)
@@ -108,6 +126,7 @@ async def _prepared_rpc_server(
 
 @contextlib.contextmanager
 def _prepared_protocol_manager() -> _CMFactory[ProtocolManager]:
+    """Return a context manager for a `ProtocolManager`."""
     protocol_manager = ProtocolManager()
     try:
         yield protocol_manager
@@ -121,6 +140,7 @@ async def _prepared_session_manager(
     motion_lock: ThreadedAsyncLock,
     protocol_manager: ProtocolManager,
 ) -> _ACMFactory[SessionManager]:
+    """Return a context manager for a `SessionManager`."""
     session_manager = SessionManager(
         await thread_manager.get_when_ready(),
         motion_lock,
@@ -134,20 +154,34 @@ async def _prepared_session_manager(
 
 @contextlib.asynccontextmanager
 async def _prepared_everything() -> _ACMFactory["LifetimeDependencySet"]:
+    """Return a context manager for a complete `LifetimeDependencySet`."""
+    # We already have a bunch of context managers that each represent an individual
+    # dependency. This function works by combining them, so that doing this:
+    #
+    #     with _prepared_everything() as everything:
+    #         ...
+    #
+    # Is equivalent to doing this:
+    #
+    #     with _dep_a() as a:
+    #         with _dep_b(a) as b:
+    #             with _dep_c() as c:
+    #                 with _dep_d(a, b, c) as d:
+    #                     ...
+
+    # For responsiveness during startup, we try not to take too long in here.
+    # If a dependency would take a while to initialize, it should be a
+    # SlowInitializing so it can do that in the background.
+    #
+    # And if another dependency depends on that one, it too should be a
+    # SlowInitializing, by the transitive property of slow-ification.
+
+    # Beware: For some reason, MyPy at least up to v0.812 does not catch errors
+    # in arguments provided to the async context managers here. It thinks each
+    # async context manager is typed like `def (*Any, **Any)`. Double-check
+    # argument count, type, and order.
+
     async with contextlib.AsyncExitStack() as stack:
-        # For responsiveness during startup, we try not to take too long in here.
-        #
-        # If a dependency would take a while to initialize, it should be a
-        # SlowInitializing so it can do that in the background.
-        #
-        # And if another dependency depends on that one, it too should be a
-        # SlowInitializing, by the transitive property of slow-ification.
-
-        # Beware: For some reason, MyPy at least up to v0.812 does not catch errors
-        # in arguments provided to the async context managers here. It thinks each
-        # async context manager is typed like `def (*Any, **Any)`. Double-check
-        # argument count, type, and order.
-
         motion_lock = ThreadedAsyncLock()
 
         event_publisher = stack.enter_context(_prepared_event_publisher())
@@ -183,7 +217,7 @@ async def _prepared_everything() -> _ACMFactory["LifetimeDependencySet"]:
 
 @dataclass(frozen=True)
 class LifetimeDependencySet:
-    """All app dependencies that are exposed to the request layer."""
+    """All lifetime dependencies that are exposed to request-handling functions."""
 
     motion_lock: ThreadedAsyncLock
     thread_manager: SlowInitializing[ThreadManager]
