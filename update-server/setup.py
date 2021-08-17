@@ -37,7 +37,7 @@ DESCRIPTION = (
     "A server to update software and firmware on Opentrons robots")
 PACKAGES = find_packages(where='.', exclude=["tests.*", "tests"])
 INSTALL_REQUIRES = [
-    'aiohttp==3.4.4'
+    'aiohttp==3.4.4',
     'bmap-tools==3.6',
     'certifi==2021.5.30',
     'charset-normalizer==2.0.4',

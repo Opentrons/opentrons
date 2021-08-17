@@ -6,10 +6,10 @@ name = "pypi"
 [packages]
 "e1839a8" = {path = ".", editable = true}
 virtualenv = "*"
+bmap-tools = {editable = true, ref = "master", git = "https://github.com/intel/bmap-tools.git"}
 aiohttp = "==3.4.4"
 
 [dev-packages]
-bmap-tools = "==3.6"
 flake8 = "~=3.9.0"
 flake8-annotations = "~=2.6.2"
 flake8-docstrings = "~=1.6.0"
