@@ -1,6 +1,6 @@
 // mock HTTP responses for pipettes endpoints
 
-import type { PipetteSettings } from '../types'
+import type { PipetteSettings, ProtocolPipetteTipRackCalData } from '../types'
 import type {
   RobotApiResponse,
   RobotApiResponseMeta,
@@ -117,4 +117,16 @@ export const mockUpdatePipetteSettingsFailure: RobotApiResponse = {
   ...mockUpdatePipetteSettingsFailureMeta,
   host: mockRobot,
   body: { message: 'AH' },
+}
+
+export const mockProtocolPipetteTipRackCalInfo: ProtocolPipetteTipRackCalData = {
+  pipetteDisplayName: 'My Pipette',
+  exactPipetteMatch: 'match',
+  pipetteCalDate: '2021-04-10',
+  tipRacks: [
+    {
+      displayName: 'My TipRack',
+      lastModifiedDate: '2021-04-10',
+    },
+  ],
 }

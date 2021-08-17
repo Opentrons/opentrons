@@ -221,13 +221,13 @@ export interface TipRackCalibrationData {
   lastModifiedDate: string | null
 }
 
-export interface ProtocolPipetteCalibration {
+export interface ProtocolPipetteTipRackCalData {
   pipetteDisplayName: string
   exactPipetteMatch: string | null
   pipetteCalDate?: string | null
   tipRacks: TipRackCalibrationData[]
 }
 
-export type ProtocolPipetteCalibrationsByMount = {
-  [mount in Mount]: ProtocolPipetteCalibration | null
+export type ProtocolPipetteTipRackCalDataByMount = {
+  [mount in Mount]: ProtocolPipetteTipRackCalData | null
 }

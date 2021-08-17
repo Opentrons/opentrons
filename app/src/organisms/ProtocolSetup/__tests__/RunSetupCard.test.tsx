@@ -8,6 +8,22 @@ import withModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/test
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 
 import { i18n } from '../../../i18n'
+import {
+  mockAttachedPipette,
+  mockProtocolPipetteTipRackCalInfo,
+} from '../../../redux/pipettes/__fixtures__'
+import { mockConnectedRobot } from '../../../redux/discovery/__fixtures__'
+import * as discoverySelectors from '../../../redux/discovery/selectors'
+import {
+  getAttachedPipettes,
+  getProtocolPipetteTipRackCalInfo,
+} from '../../../redux/pipettes'
+import type {
+  AttachedPipettesByMount,
+  ProtocolPipetteTipRackCalDataByMount,
+} from '../../../redux/pipettes/types'
+import { mockCalibrationStatus } from '../../../redux/calibration/__fixtures__'
+import * as calibrationSelectors from '../../../redux/calibration/selectors'
 import { RunSetupCard } from '../RunSetupCard'
 
 import * as protocolSelectors from '../../../redux/protocol/selectors'
@@ -17,10 +33,23 @@ import { getModuleRenderCoords } from '../utils/getModuleRenderCoords'
 import { getLabwareRenderCoords } from '../utils/getLabwareRenderCoords'
 
 jest.mock('../../../redux/protocol/selectors')
+jest.mock('../../../redux/discovery/selectors')
+jest.mock('../../../redux/pipettes/selectors')
+jest.mock('../../../redux/calibration/selectors')
 jest.mock('../LabwareSetup')
 jest.mock('../ModuleSetup')
 jest.mock('../utils/getModuleRenderCoords')
 jest.mock('../utils/getLabwareRenderCoords')
+
+const mockAttachedPipettes: AttachedPipettesByMount = {
+  left: mockAttachedPipette,
+  right: null,
+} as any
+
+const mockProtocolPipetteTipRackCalData: ProtocolPipetteTipRackCalDataByMount = {
+  left: mockProtocolPipetteTipRackCalInfo,
+  right: null,
+} as any
 
 const mockGetProtocolData = protocolSelectors.getProtocolData as jest.MockedFunction<
   typeof protocolSelectors.getProtocolData
@@ -34,6 +63,20 @@ const mockGetModuleRenderCoords = getModuleRenderCoords as jest.MockedFunction<
 >
 const mockGetLabwareRenderCoords = getLabwareRenderCoords as jest.MockedFunction<
   typeof getLabwareRenderCoords
+>
+const mockGetConnectedRobot = discoverySelectors.getConnectedRobot as jest.MockedFunction<
+  typeof discoverySelectors.getConnectedRobot
+>
+const mockGetAttachedPipettes = getAttachedPipettes as jest.MockedFunction<
+  typeof getAttachedPipettes
+>
+
+const mockGetProtocolPipetteTiprackData = getProtocolPipetteTipRackCalInfo as jest.MockedFunction<
+  typeof getProtocolPipetteTipRackCalInfo
+>
+
+const mockGetDeckCalData = calibrationSelectors.getDeckCalibrationData as jest.MockedFunction<
+  typeof calibrationSelectors.getDeckCalibrationData
 >
 
 // this is needed because under the hood react calls components with two arguments (props and some second argument nobody seems to know)
@@ -52,6 +95,14 @@ describe('RunSetupCard', () => {
   let render: () => ReturnType<typeof renderWithProviders>
 
   beforeEach(() => {
+    mockGetConnectedRobot.mockReturnValue(mockConnectedRobot)
+    mockGetAttachedPipettes.mockReturnValue(mockAttachedPipettes)
+    mockGetProtocolPipetteTiprackData.mockReturnValue(
+      mockProtocolPipetteTipRackCalData
+    )
+    mockGetDeckCalData.mockReturnValue(
+      mockCalibrationStatus.deckCalibration.data
+    )
     mockGetProtocolData.mockReturnValue(noModulesProtocol as any)
     when(mockGetModuleRenderCoords)
       .calledWith(noModulesProtocol as any, standardDeckDef as any)

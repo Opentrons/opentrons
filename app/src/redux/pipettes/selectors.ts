@@ -316,7 +316,7 @@ export const getProtocolPipettesMatch: (
 export const getProtocolPipetteTipRackCalInfo: (
   state: State,
   robotName: string
-) => Types.ProtocolPipetteCalibrationsByMount = createSelector(
+) => Types.ProtocolPipetteTipRackCalDataByMount = createSelector(
   getProtocolPipetteTipRacks,
   getProtocolPipettesMatch,
   getAttachedPipettes,
@@ -329,7 +329,7 @@ export const getProtocolPipetteTipRackCalInfo: (
     attachedPipetteCalibrations,
     tipLengthCalibrations
   ) => {
-    return Constants.PIPETTE_MOUNTS.reduce<Types.ProtocolPipetteCalibrationsByMount>(
+    return Constants.PIPETTE_MOUNTS.reduce<Types.ProtocolPipetteTipRackCalDataByMount>(
       (result, mount) => {
         const protocolPipetteTiprack = protocolPipetteTipracks[mount]
         const attachedPipette = attachedPipettes[mount]

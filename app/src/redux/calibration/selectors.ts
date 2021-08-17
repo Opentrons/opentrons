@@ -7,6 +7,7 @@ import type {
   CalibrationStatus,
   DeckCalibrationStatus,
   DeckCalibrationData,
+  ProtocolCalibration,
 } from './types'
 
 export const getCalibrationStatus = (
@@ -28,11 +29,6 @@ export const getDeckCalibrationData = (
   robotName: string
 ): DeckCalibrationData | null => {
   return getCalibrationStatus(state, robotName)?.deckCalibration.data ?? null
-}
-
-export interface ProtocolCalibration {
-  complete: boolean
-  reason?: string
 }
 
 export const getProtocolCalibrationComplete: (
