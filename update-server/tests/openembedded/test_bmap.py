@@ -21,5 +21,5 @@ def test_disk_image_write(tmp_path):
     RootFS.BMAP_FILE = bmap
     RootFS.DISK = d
     RootFS.BMAP_IMAGE = p
-    rfs.factoryRestore(None)
+    rfs.factory_restore(None)
     assert sum([len(files) for r, d, files in os.walk(d)]) == 2
