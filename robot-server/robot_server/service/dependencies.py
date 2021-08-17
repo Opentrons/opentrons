@@ -63,13 +63,13 @@ async def get_lifetime_dependencies(
 
 
 async def get_hardware(
-    lifetime_dependency_set: lifetime_dependencies.LifetimeDependencySet = Depends(
+    lifetime_dependencies: lifetime_dependencies.LifetimeDependencySet = Depends(
         get_lifetime_dependencies
     ),
 ) -> ThreadManager:
     """Hardware dependency"""
     try:
-        return lifetime_dependency_set.thread_manager.get_if_ready()
+        return lifetime_dependencies.thread_manager.get_if_ready()
     except InitializationOngoingError:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
@@ -78,7 +78,7 @@ async def get_hardware(
 
 
 async def get_motion_lock(
-    lifetime_dependency_set: lifetime_dependencies.LifetimeDependencySet = Depends(
+    lifetime_dependencies: lifetime_dependencies.LifetimeDependencySet = Depends(
         get_lifetime_dependencies
     ),
 ) -> ThreadedAsyncLock:
@@ -86,17 +86,17 @@ async def get_motion_lock(
 
     :return: a threaded async lock
     """
-    return lifetime_dependency_set.motion_lock
+    return lifetime_dependencies.motion_lock
 
 
 async def get_rpc_server(
-    lifetime_dependency_set: lifetime_dependencies.LifetimeDependencySet = Depends(
+    lifetime_dependencies: lifetime_dependencies.LifetimeDependencySet = Depends(
         get_lifetime_dependencies
     ),
 ) -> RPCServer:
     """The RPC Server instance"""
     try:
-        return lifetime_dependency_set.rpc_server.get_if_ready()
+        return lifetime_dependencies.rpc_server.get_if_ready()
     except InitializationOngoingError:
         # todo(mm, 2021-08-13): When this dependency is used by a WebSocket endpoint,
         # raising HTTPException doesn't make sense. I don't think the status code and
@@ -118,21 +118,21 @@ async def get_rpc_server(
 
 
 async def get_protocol_manager(
-    lifetime_dependency_set: lifetime_dependencies.LifetimeDependencySet = Depends(
+    lifetime_dependencies: lifetime_dependencies.LifetimeDependencySet = Depends(
         get_lifetime_dependencies
     ),
 ) -> ProtocolManager:
     """The single protocol manager instance"""
-    return lifetime_dependency_set.protocol_manager
+    return lifetime_dependencies.protocol_manager
 
 
 async def get_session_manager(
-    lifetime_dependency_set: lifetime_dependencies.LifetimeDependencySet = Depends(
+    lifetime_dependencies: lifetime_dependencies.LifetimeDependencySet = Depends(
         get_lifetime_dependencies
     ),
 ) -> SessionManager:
     """The single protocol manager instance"""
-    return lifetime_dependency_set.session_manager
+    return lifetime_dependencies.session_manager
 
 
 async def check_version_header(
