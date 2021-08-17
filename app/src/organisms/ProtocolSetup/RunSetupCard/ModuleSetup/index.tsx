@@ -1,6 +1,5 @@
 import * as React from 'react'
 import map from 'lodash/map'
-import { useDispatch, useSelector } from 'react-redux'
 
 import { useTranslation } from 'react-i18next'
 import {
@@ -17,13 +16,11 @@ import {
   C_BLUE,
   C_NEAR_WHITE,
   SPACING_4,
-  useInterval,
 } from '@opentrons/components'
 import {
   getModuleType,
   inferModuleOrientationFromXCoordinate,
 } from '@opentrons/shared-data'
-import { fetchModules } from '../../../../src/redux/modules/actions'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 import { ModuleInfo } from './ModuleInfo'
 import { MultipleModulesModal } from './MultipleModulesModal'
@@ -45,24 +42,15 @@ const DECK_LAYER_BLOCKLIST = [
   'removableDeckOutline',
   'screwHoles',
 ]
-const POLL_MODULE_INTERVAL_MS = 5000
 
 export const ModuleSetup = (props: ModuleSetupProps): JSX.Element | null => {
   const { moduleRenderCoords, expandLabwareSetupStep, robotName } = props
-  const dispatch = useDispatch<Dispatch>()
   const DECK_VIEW_BOX = `-64 -10 ${530} ${456}`
   const { t } = useTranslation('protocol_setup')
-  const connectedRobotName = useSelector(getConnectedRobotName)
   const [
     showMultipleModulesModal,
     setShowMultipleModulesModal,
   ] = React.useState<boolean>(false)
-
-  useInterval(
-    () => dispatch(fetchModules(robotName)),
-    connectedRobotName === null ? POLL_MODULE_INTERVAL_MS : null,
-    true
-  )
   return (
     <React.Fragment>
       {showMultipleModulesModal && (
@@ -115,6 +103,7 @@ export const ModuleSetup = (props: ModuleSetupProps): JSX.Element | null => {
                         moduleModel={moduleModel}
                         orientation={orientation}
                       />
+                      <AttachedModulesCard robotName={robotName} />
                     </React.Fragment>
                   )
                 })}
