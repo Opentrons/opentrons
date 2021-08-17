@@ -5,11 +5,13 @@ import * as Selectors from '../selectors'
 import * as Fixtures from '../__fixtures__'
 import * as RobotSelectors from '../../robot/selectors'
 import * as POCSelectors from '../../calibration/pipette-offset/selectors'
+import * as ProtocolSelectors from '../../protocol/selectors'
 import type { State } from '../../types'
 
 jest.mock('@opentrons/shared-data')
 jest.mock('../../robot/selectors')
 jest.mock('../../calibration/pipette-offset/selectors')
+jest.mock('../../protocol/selectors')
 
 interface SelectorSpec {
   name: string
@@ -17,6 +19,10 @@ interface SelectorSpec {
   expected: unknown
   matching: boolean
   calibrated: boolean
+  matchingByMount: {
+    left: string | null
+    right: string | null
+  }
   before?: () => unknown
   after?: () => unknown
 }
@@ -35,6 +41,10 @@ const mockGetPipetteNameSpecs = SharedData.getPipetteNameSpecs as jest.MockedFun
 
 const mockGetProtocolPipettes = RobotSelectors.getPipettes as jest.MockedFunction<
   typeof RobotSelectors.getPipettes
+>
+
+const mockGetProtocolPipetteTipRacks = ProtocolSelectors.getProtocolPipetteTipRacks as jest.MockedFunction<
+  typeof ProtocolSelectors.getProtocolPipetteTipRacks
 >
 
 const mockLeftPipette: any = {
@@ -119,8 +129,16 @@ const SPECS: SelectorSpec[] = [
     },
     matching: true,
     calibrated: true,
+    matchingByMount: {
+      left: null,
+      right: null,
+    },
     before: () => {
       mockGetPipetteOffsetCalibrations.mockReturnValue([])
+      mockGetProtocolPipetteTipRacks.mockReturnValue({
+        left: { pipetteSpecs: mockLeftSpecs, tipRackDefs: [] },
+        right: { pipetteSpecs: mockRightSpecs, tipRackDefs: [] },
+      })
     },
   },
   {
@@ -160,11 +178,19 @@ const SPECS: SelectorSpec[] = [
     },
     matching: true,
     calibrated: true,
+    matchingByMount: {
+      left: 'match',
+      right: 'incompatible',
+    },
     before: () => {
       mockGetPipetteOffsetCalibrations.mockReturnValue([
         mockLeftPipetteCalibration,
         mockRightPipetteCalibration,
       ])
+      mockGetProtocolPipetteTipRacks.mockReturnValue({
+        left: { pipetteSpecs: mockLeftSpecs, tipRackDefs: [] },
+        right: { pipetteSpecs: mockLeftSpecs, tipRackDefs: [] },
+      })
     },
   },
   {
@@ -189,6 +215,10 @@ const SPECS: SelectorSpec[] = [
         mockLeftPipetteCalibration,
         mockRightPipetteCalibration,
       ])
+      mockGetProtocolPipetteTipRacks.mockReturnValue({
+        left: { pipetteSpecs: mockLeftSpecs, tipRackDefs: [] },
+        right: { pipetteSpecs: mockRightSpecs, tipRackDefs: [] },
+      })
     },
     expected: {
       left: {
@@ -220,6 +250,10 @@ const SPECS: SelectorSpec[] = [
     },
     matching: true,
     calibrated: true,
+    matchingByMount: {
+      left: 'match',
+      right: 'match',
+    },
   },
   {
     name: 'marks as inexact match if spec names match in backcompat',
@@ -242,9 +276,17 @@ const SPECS: SelectorSpec[] = [
         mockLeftPipetteCalibration,
         mockRightPipetteCalibration,
       ])
+      mockGetProtocolPipetteTipRacks.mockReturnValue({
+        left: { pipetteSpecs: mockLeftLegacySpecs, tipRackDefs: [] },
+        right: { pipetteSpecs: mockRightSpecs, tipRackDefs: [] },
+      })
     },
     matching: true,
     calibrated: true,
+    matchingByMount: {
+      left: 'inexact_match',
+      right: null,
+    },
     expected: {
       left: {
         compatibility: 'inexact_match',
@@ -283,6 +325,10 @@ const SPECS: SelectorSpec[] = [
     } as any,
     matching: true,
     calibrated: true,
+    matchingByMount: {
+      left: 'inexact_match',
+      right: null,
+    },
     before: () => {
       mockGetProtocolPipettes.mockReturnValue([
         { ...mockLeftProtoPipette, requestedAs: mockLeftLegacySpecs.name },
@@ -291,6 +337,10 @@ const SPECS: SelectorSpec[] = [
         mockLeftPipetteCalibration,
         mockRightPipetteCalibration,
       ])
+      mockGetProtocolPipetteTipRacks.mockReturnValue({
+        left: { pipetteSpecs: mockLeftLegacySpecs, tipRackDefs: [] },
+        right: { pipetteSpecs: mockRightSpecs, tipRackDefs: [] },
+      })
     },
     expected: {
       left: {
@@ -359,6 +409,10 @@ const SPECS: SelectorSpec[] = [
     },
     matching: true,
     calibrated: false,
+    matchingByMount: {
+      left: 'inexact_match',
+      right: 'match',
+    },
     before: () => {
       mockGetProtocolPipettes.mockReturnValue([
         { ...mockLeftProtoPipette, requestedAs: mockLeftLegacySpecs.name },
@@ -367,6 +421,10 @@ const SPECS: SelectorSpec[] = [
       mockGetPipetteOffsetCalibrations.mockReturnValue([
         mockLeftPipetteCalibration,
       ])
+      mockGetProtocolPipetteTipRacks.mockReturnValue({
+        left: { pipetteSpecs: mockLeftLegacySpecs, tipRackDefs: [] },
+        right: { pipetteSpecs: mockRightSpecs, tipRackDefs: [] },
+      })
     },
   },
   {
@@ -413,6 +471,10 @@ const SPECS: SelectorSpec[] = [
     },
     matching: true,
     calibrated: true,
+    matchingByMount: {
+      left: 'inexact_match',
+      right: 'match',
+    },
     before: () => {
       mockGetProtocolPipettes.mockReturnValue([
         { ...mockLeftProtoPipette, requestedAs: mockLeftLegacySpecs.name },
@@ -422,6 +484,10 @@ const SPECS: SelectorSpec[] = [
         mockLeftPipetteCalibration,
         mockRightPipetteCalibration,
       ])
+      mockGetProtocolPipetteTipRacks.mockReturnValue({
+        left: { pipetteSpecs: mockLeftLegacySpecs, tipRackDefs: [] },
+        right: { pipetteSpecs: mockRightSpecs, tipRackDefs: [] },
+      })
     },
   },
   {
@@ -464,11 +530,19 @@ const SPECS: SelectorSpec[] = [
     },
     matching: true,
     calibrated: true,
+    matchingByMount: {
+      left: 'match',
+      right: 'match',
+    },
     before: () => {
       mockGetProtocolPipettes.mockReturnValue([mockLeftProtoPipette])
       mockGetPipetteOffsetCalibrations.mockReturnValue([
         mockLeftPipetteCalibration,
       ])
+      mockGetProtocolPipetteTipRacks.mockReturnValue({
+        left: { pipetteSpecs: mockLeftSpecs, tipRackDefs: [] },
+        right: { pipetteSpecs: mockRightSpecs, tipRackDefs: [] },
+      })
     },
   },
 ]
@@ -496,6 +570,7 @@ describe('protocol pipettes comparison selectors', () => {
       expected,
       matching,
       calibrated,
+      matchingByMount,
       before = noop,
       after = noop,
     } = spec
@@ -511,6 +586,9 @@ describe('protocol pipettes comparison selectors', () => {
       expect(
         Selectors.getProtocolPipettesCalibrated(state, 'robotName')
       ).toEqual(calibrated)
+      expect(Selectors.getProtocolPipettesMatch(state, 'robotName')).toEqual(
+        matchingByMount
+      )
       after()
     })
   })

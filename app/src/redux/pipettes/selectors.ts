@@ -299,7 +299,8 @@ export const getProtocolPipettesMatch: (
           ) {
             result[mount] = Constants.INEXACT_MATCH
           } else if (
-            protocolPipette.pipetteSpecs.name === attachedPipette.name
+            protocolPipette.pipetteSpecs.name ===
+            attachedPipette.modelSpecs.name
           ) {
             result[mount] = Constants.MATCH
           } else {
