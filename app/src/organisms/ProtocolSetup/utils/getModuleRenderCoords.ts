@@ -4,7 +4,7 @@ import {
   ModuleModel,
   SPAN7_8_10_11_SLOT,
 } from '@opentrons/shared-data'
-import { getProtocolData } from '../../../../redux/protocol'
+import { getProtocolData } from '../../../redux/protocol'
 
 export type CoordinatesByModuleModel = Record<
   string,

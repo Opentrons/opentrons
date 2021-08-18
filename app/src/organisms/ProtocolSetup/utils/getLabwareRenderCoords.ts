@@ -5,7 +5,7 @@ import {
   SPAN7_8_10_11_SLOT,
 } from '@opentrons/shared-data'
 import { find, reduce } from 'lodash'
-import { getProtocolData } from '../../../../redux/protocol'
+import { getProtocolData } from '../../../redux/protocol'
 
 const getSlotPosition = (
   deckDef: DeckDefinition,

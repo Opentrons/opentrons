@@ -12,13 +12,15 @@ import { RunSetupCard } from '../RunSetupCard'
 
 import * as protocolSelectors from '../../../redux/protocol/selectors'
 import { LabwareSetup } from '../LabwareSetup'
-import { getModuleRenderCoords } from '../LabwareSetup/utils/getModuleRenderCoords'
-import { getLabwareRenderCoords } from '../LabwareSetup/utils/getLabwareRenderCoords'
+import { ModuleSetup } from '../ModuleSetup'
+import { getModuleRenderCoords } from '../utils/getModuleRenderCoords'
+import { getLabwareRenderCoords } from '../utils/getLabwareRenderCoords'
 
 jest.mock('../../../redux/protocol/selectors')
 jest.mock('../LabwareSetup')
-jest.mock('../LabwareSetup/utils/getModuleRenderCoords')
-jest.mock('../LabwareSetup/utils/getLabwareRenderCoords')
+jest.mock('../ModuleSetup')
+jest.mock('../utils/getModuleRenderCoords')
+jest.mock('../utils/getLabwareRenderCoords')
 
 const mockGetProtocolData = protocolSelectors.getProtocolData as jest.MockedFunction<
   typeof protocolSelectors.getProtocolData
@@ -26,6 +28,7 @@ const mockGetProtocolData = protocolSelectors.getProtocolData as jest.MockedFunc
 const mockLabwareSetup = LabwareSetup as jest.MockedFunction<
   typeof LabwareSetup
 >
+const mockModuleSetup = ModuleSetup as jest.MockedFunction<typeof ModuleSetup>
 const mockGetModuleRenderCoords = getModuleRenderCoords as jest.MockedFunction<
   typeof getModuleRenderCoords
 >
@@ -66,6 +69,17 @@ describe('RunSetupCard', () => {
         })
       )
       .mockReturnValue(<div>Mock Labware Setup</div>)
+    when(mockModuleSetup)
+      .mockReturnValue(<div></div>) // this (default) empty div will be returned when ModuleSetup isn't called with expected props
+      .calledWith(
+        componentPropsMatcher({
+          moduleRenderCoords: mockModuleRenderCoords,
+          expandLabwareSetupStep: expect.anything(),
+        })
+      )
+      .mockImplementation(({ expandLabwareSetupStep }) => (
+        <div onClick={expandLabwareSetupStep}>Mock Module Setup</div>
+      ))
     render = () => {
       return renderWithProviders(<RunSetupCard />, { i18nInstance: i18n })
     }
@@ -92,10 +106,20 @@ describe('RunSetupCard', () => {
     })
   })
 
-  it('renders robot calibration, modules, and labware setup if some modules in protocol', () => {
+  it('renders module setup and allows the user to proceed to labware setup', () => {
     mockGetProtocolData.mockReturnValue(withModulesProtocol as any)
-    const { getByText } = render()
-    expect(getByText('Module Setup')).toBeTruthy()
+    when(mockGetModuleRenderCoords)
+      .calledWith(withModulesProtocol as any, standardDeckDef as any)
+      .mockReturnValue(mockModuleRenderCoords)
+    when(mockGetLabwareRenderCoords)
+      .calledWith(withModulesProtocol as any, standardDeckDef as any)
+      .mockReturnValue(mockLabwareRenderCoords)
+    const { getByRole, getByText } = render()
+    const moduleSetupHeading = getByRole('heading', { name: 'Module Setup' })
+    fireEvent.click(moduleSetupHeading)
+    const moduleSetup = getByText('Mock Module Setup')
+    fireEvent.click(moduleSetup)
+    getByText('Mock Labware Setup')
   })
   it('renders null if python protocol with only metadata field', () => {
     mockGetProtocolData.mockReturnValue({ metadata: {} as any })

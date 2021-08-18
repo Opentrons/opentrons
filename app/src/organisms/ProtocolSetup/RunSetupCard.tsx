@@ -13,8 +13,9 @@ import { getProtocolData } from '../../redux/protocol'
 import { Divider } from '../../atoms/structure'
 import { CollapsibleStep } from './CollapsibleStep'
 import { LabwareSetup } from './LabwareSetup'
-import { getModuleRenderCoords } from './LabwareSetup/utils/getModuleRenderCoords'
-import { getLabwareRenderCoords } from './LabwareSetup/utils/getLabwareRenderCoords'
+import { ModuleSetup } from './ModuleSetup'
+import { getModuleRenderCoords } from './utils/getModuleRenderCoords'
+import { getLabwareRenderCoords } from './utils/getLabwareRenderCoords'
 
 import type { JsonProtocolFile } from '@opentrons/shared-data'
 import type { State } from '../../redux/types'
@@ -65,7 +66,10 @@ export function RunSetupCard(): JSX.Element | null {
       <Text marginTop={SPACING_3}>TODO: robot calibration step contents</Text>
     ),
     [MODULE_SETUP_KEY]: (
-      <Text marginTop={SPACING_3}>TODO: module setup step contents</Text>
+      <ModuleSetup
+        moduleRenderCoords={moduleRenderCoords}
+        expandLabwareSetupStep={() => setExpandedStepKey(LABWARE_SETUP_KEY)}
+      />
     ),
     [LABWARE_SETUP_KEY]: (
       <LabwareSetup

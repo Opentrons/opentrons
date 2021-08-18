@@ -16,12 +16,12 @@ import { i18n } from '../../../../i18n'
 import { LabwareSetup } from '..'
 import { LabwareSetupModal } from '../LabwareSetupModal'
 import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
-import { ModuleTag } from '../ModuleTag'
 import { ExtraAttentionWarning } from '../ExtraAttentionWarning'
 import { getModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
+import { ModuleTag } from '../../ModuleTag'
 
 jest.mock('../LabwareSetupModal')
-jest.mock('../ModuleTag')
+jest.mock('../../ModuleTag')
 jest.mock('../LabwareInfoOverlay')
 jest.mock('../ExtraAttentionWarning')
 jest.mock('../utils/getModuleTypesThatRequireExtraAttention')
@@ -183,13 +183,13 @@ describe('LabwareSetup', () => {
         })
       )
       .mockImplementation(({ children }) => (
-        <div>
+        <svg>
           {/* @ts-expect-error children won't be null since we checked for expect.anything() above */}
           {children({
             deckSlotsById,
             getRobotCoordsFromDOMCoords: {} as any,
           })}
-        </div>
+        </svg>
       ))
   })
 
