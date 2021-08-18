@@ -1,0 +1,68 @@
+name: Opentrons App on Windows
+on:
+  workflow_dispatch:
+    inputs:
+      exe-url:
+        description: "Opentrons exe URL."
+        required: true
+        default: "https://s3.amazonaws.com/opentrons-app/builds/Opentrons-v4.5.0-win-b12575.exe"
+      chromedriver-version:
+        description: "Chromedriver binary version."
+        required: true
+        default: "76.0.3809.126"
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: "actions/setup-python@v2"
+        with:
+          python-version: "3.7"
+      - name: Check out repository code.
+        uses: actions/checkout@v2
+      - name: Get Opentrons EXE and Install
+        run: |
+          $filename="${{ github.event.inputs.exe-url }}"
+          $filename=$filename.split("/")[-1]
+          Invoke-WebRequest -Uri ${{ github.event.inputs.exe-url }} -OutFile $filename
+          $prm= '/S'
+          & ./$filename $prm
+          $executable_path = '????Where does it go?????'
+          echo $(Test-Path $executable_path)
+          echo "EXECUTABLE_PATH=${executable_path}" >> $Env:GITHUB_ENV
+      - name: Install Chromedriver on the path.
+        run: |
+          ./app-testing/ci-tools/windows_get_chromedriver.ps1 ${{ github.event.inputs.chromedriver-version }}
+          chromedriver --version
+      - name: Cache Python pip and pipenv
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.virtualenvs
+            ~/appdata/local/pip/cache
+          key: ${{ runner.os }}-venv-${{ hashFiles('app-testing/Pipfile') }}
+      - name: Install python dependencies.
+        working-directory: ./app-testing
+        run: |
+          pip install pipenv==2020.8.13
+          pipenv install --skip-lock
+      - name: Robot emulator
+        run: |
+          Set-MpPreference -DisableRealtimeMonitoring $true
+          make -C api setup
+          make -C api emulator &
+          make -C robot-server setup
+          make -C robot-server dev-with-emulator &
+          echo "Not sure these actually work... No connection could be made because the target machine actively refused it"
+      - name: Run Tests.
+        working-directory: ./app-testing
+        run: |
+          Set-Item -Path Env:ROBOT_BASE_URL -Value "http://127.0.0.1:31950"
+          make test
+      - name: Upload pytest test results.
+        uses: actions/upload-artifact@v2
+        with:
+          name: pytest-results
+          path: app-testing/results/results.xml
+        # Use always() to always run this step to publish test results when there are test failures
+        if: ${{ always() }}

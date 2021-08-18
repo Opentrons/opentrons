@@ -1,0 +1,21 @@
+[flake8]
+
+# set line-length for future black support
+# https://github.com/psf/black/blob/master/docs/compatible_configs.md
+max-line-length = 88
+
+# max cyclomatic complexity
+max-complexity = 9
+
+extend-ignore =
+    # ignore E203 because black might reformat it
+    E203,
+    # do not require type annotations for self nor cls
+    ANN101,
+    ANN102
+
+# configure flake8-docstrings
+# https://pypi.org/project/flake8-docstrings/
+docstring-convention = google
+
+noqa-require-code = true

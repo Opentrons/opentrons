@@ -1,0 +1,60 @@
+name: Opentrons App on macOS
+on:
+  workflow_dispatch:
+    inputs:
+      dmg-url:
+        description: "Opentrons dmg URL."
+        required: true
+        default: "https://s3.amazonaws.com/opentrons-app/builds/Opentrons-v4.5.0-mac-b12575.dmg"
+      chromedriver-version:
+        description: "Chromedriver binary version."
+        required: true
+        default: "76.0.3809.126"
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: "actions/setup-python@v2"
+        with:
+          python-version: "3.7"
+      - name: Check out repository code.
+        uses: actions/checkout@v2
+      - name: Replace Cask url with dmg-url input variable.
+        run: python app-testing/ci-tools/replace_url.py ${{ github.event.inputs.dmg-url }}
+      - name: Move the cask into the Brew core casks tap.
+        run: |
+          prefix=`brew --prefix`
+          target="$prefix/homebrew/Library/Taps/homebrew/homebrew-cask/Casks/opentrons.rb"
+          mv app-testing/ci-tools/opentrons.rb $target
+      - name: Brew Install Opentrons.
+        run: brew install opentrons
+      - name: Install Chromedriver on the path.
+        run: |
+          chmod +x ./app-testing/ci-tools/mac_get_chromedriver.sh
+          ./app-testing/ci-tools/mac_get_chromedriver.sh ${{ github.event.inputs.chromedriver-version }}
+          chromedriver --version
+      - name: Install python dependencies.
+        working-directory: ./app-testing
+        run: |
+          pip install pipenv==2020.8.13
+          pipenv install
+      - name: Robot emulator
+        run: |
+          make -C api setup
+          make -C api emulator &
+          make -C robot-server setup
+          make -C robot-server dev-with-emulator &
+      - name: Run Tests.
+        working-directory: ./app-testing
+        run: |
+          export EXECUTABLE_PATH="/Applications/Opentrons.app/Contents/MacOS/Opentrons"
+          export ROBOT_BASE_URL="http://127.0.0.1:31950"
+          make test
+      - name: Upload pytest test results.
+        uses: actions/upload-artifact@v2
+        with:
+          name: pytest-results
+          path: app-testing/results/results.xml
+        # Use always() to always run this step to publish test results when there are test failures
+        if: ${{ always() }}
