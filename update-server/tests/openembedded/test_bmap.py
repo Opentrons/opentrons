@@ -4,7 +4,7 @@ Checks functionaly and error casees for the bmap operations on RootFS
 """
 import os
 import subprocess
-from  unittest import mock
+from unittest import mock
 from otupdate.openembedded import RootFS
 
 
