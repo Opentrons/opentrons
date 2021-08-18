@@ -1,6 +1,7 @@
 import * as React from 'react'
 import map from 'lodash/map'
-
+import { useDispatch, useSelector } from 'react-redux'
+import { getConnectedRobotName } from '../../../redux/robot/selectors'
 import { useTranslation } from 'react-i18next'
 import {
   Flex,
@@ -16,7 +17,9 @@ import {
   C_BLUE,
   C_NEAR_WHITE,
   SPACING_4,
+  useInterval,
 } from '@opentrons/components'
+import { fetchModules, getAttachedModules } from '../../../redux/modules'
 import {
   getModuleType,
   inferModuleOrientationFromXCoordinate,
@@ -42,15 +45,30 @@ const DECK_LAYER_BLOCKLIST = [
   'removableDeckOutline',
   'screwHoles',
 ]
+const POLL_MODULE_INTERVAL_MS = 5000
+const DECK_VIEW_BOX = `-64 -10 ${530} ${456}`
 
-export const ModuleSetup = (props: ModuleSetupProps): JSX.Element | null => {
+export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
   const { moduleRenderCoords, expandLabwareSetupStep, robotName } = props
-  const DECK_VIEW_BOX = `-64 -10 ${530} ${456}`
-  const { t } = useTranslation('protocol_setup')
+  const dispatch = useDispatch<Dispatch>()
+  const connectedRobotName = useSelector(getConnectedRobotName)
+  const modules = useSelector((state: State) =>
+    getAttachedModules(state, robotName)
+  )
   const [
     showMultipleModulesModal,
     setShowMultipleModulesModal,
   ] = React.useState<boolean>(false)
+
+  console.log('modules needed', modules)
+  const { t } = useTranslation('protocol_setup')
+
+  useInterval(
+    () => dispatch(fetchModules(robotName)),
+    connectedRobotName === null ? POLL_MODULE_INTERVAL_MS : null,
+    true
+  )
+
   return (
     <React.Fragment>
       {showMultipleModulesModal && (
@@ -102,8 +120,8 @@ export const ModuleSetup = (props: ModuleSetupProps): JSX.Element | null => {
                         y={y}
                         moduleModel={moduleModel}
                         orientation={orientation}
+                        usbPort={port}
                       />
-                      <AttachedModulesCard robotName={robotName} />
                     </React.Fragment>
                   )
                 })}

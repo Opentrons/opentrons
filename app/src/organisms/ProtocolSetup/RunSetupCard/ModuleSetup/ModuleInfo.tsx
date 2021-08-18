@@ -30,10 +30,11 @@ export interface ModuleInfoProps {
   y: number
   orientation: 'left' | 'right'
   moduleModel: ModuleModel
+  usbPort?: string | null
 }
 
 export function ModuleInfo(props: ModuleInfoProps): JSX.Element {
-  const { x, y, orientation, moduleModel } = props
+  const { x, y, orientation, moduleModel, usbPort } = props
   const moduleType = getModuleType(moduleModel)
   const { t } = useTranslation('protocol_setup')
   const { childYOffset } = getModuleVizDims(orientation, moduleType)
@@ -72,7 +73,7 @@ export function ModuleInfo(props: ModuleInfoProps): JSX.Element {
           fontStyle={FONT_STYLE_ITALIC}
           title={t('no_usb_port_yet')}
         >
-          {t('no_usb_port_yet')}
+          {usbPort} {t('no_usb_port_yet')}
         </Text>
       </Flex>
     </RobotCoordsForeignDiv>

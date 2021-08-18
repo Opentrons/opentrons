@@ -78,6 +78,7 @@ export function AttachedModulesCard(props: Props): JSX.Element {
   const modules = useSelector((state: State) =>
     getAttachedModules(state, robotName)
   )
+  console.log(modules)
   const controlDisabledReason = useSelector((state: State) =>
     getModuleControlsDisabled(state, robotName)
   )
