@@ -65,6 +65,11 @@ MODELS = {
         'P20MV22': 'p20_multi_v2.2',
         'P20SV22': 'p20_single_v2.2',
         'P1KSV22': 'p1000_single_v2.2',
+    },
+    'v3.0': {
+        'P20SV30': 'p20_multi_v3.0',
+        'P300SV30': 'p20_single_v3.0',
+        'P1KSV30': 'p1000_single_v3.0',
     }
 }
 
