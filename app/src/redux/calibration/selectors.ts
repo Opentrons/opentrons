@@ -44,39 +44,39 @@ export const getProtocolCalibrationComplete: (
         reason: 'calibrate deck',
       }
     }
+    let calibrationStatus: ProtocolCalibration = {
+      complete: true,
+    }
     const labwareCalInfoValues = Object.values(pipetteTipRackCalInfo)
-    labwareCalInfoValues.forEach(pipette => {
-      if (
-        (pipette !== null &&
-          pipette.exactPipetteMatch !== PipetteConstants.MATCH) ||
-        (pipette !== null &&
-          pipette.exactPipetteMatch !== PipetteConstants.INEXACT_MATCH)
-      ) {
-        return {
-          complete: false,
-          reason: 'attach pipette',
-        }
-      }
-    })
-    labwareCalInfoValues.forEach(pipette => {
-      if (pipette !== null && pipette.pipetteCalDate == null) {
-        return {
-          complete: false,
-          reason: 'calibrate pipette',
-        }
-      }
-    })
     labwareCalInfoValues.forEach(pipette => {
       pipette?.tipRacks.forEach(tiprack => {
         if (tiprack.lastModifiedDate == null) {
-          return {
+          calibrationStatus = {
             complete: false,
             reason: 'calibrate tiprack',
           }
         }
       })
     })
-
-    return { complete: true }
+    labwareCalInfoValues.forEach(pipette => {
+      if (pipette !== null && pipette.pipetteCalDate == null) {
+        calibrationStatus = {
+          complete: false,
+          reason: 'calibrate pipette',
+        }
+      }
+    })
+    labwareCalInfoValues.forEach(pipette => {
+      const pipetteIsMatch =
+        pipette?.exactPipetteMatch === PipetteConstants.MATCH ||
+        pipette?.exactPipetteMatch === PipetteConstants.INEXACT_MATCH
+      if (pipette !== null && !pipetteIsMatch) {
+        calibrationStatus = {
+          complete: false,
+          reason: 'attach pipette',
+        }
+      }
+    })
+    return calibrationStatus
   }
 )
