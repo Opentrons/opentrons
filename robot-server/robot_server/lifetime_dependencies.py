@@ -236,16 +236,20 @@ class NotSetError(Exception):  # noqa: D101
         )
 
 
-def _set(app: FastAPI, dependencies: LifetimeDependencySet) -> None:
+def _store_on_app(app: FastAPI, dependencies: LifetimeDependencySet) -> None:
     # starlette.io/applications/#storing-state-on-the-app-instance
     app.state.app_dependencies = dependencies
+
+
+def _delete_stored_on_app(app: FastAPI) -> None:
+    del app.state.app_dependencies  # Previously set through _store_on_app().
 
 
 def get(app: FastAPI) -> LifetimeDependencySet:
     """Return the lifetime dependencies associated with `app`."""
     state = app.state
     try:
-        return state.app_dependencies
+        return state.app_dependencies  # Previously set through _store_on_app().
     except AttributeError as e:
         raise NotSetError() from e
 
@@ -263,10 +267,15 @@ def install_startup_shutdown_handlers(app: FastAPI) -> None:
 
     @app.on_event("startup")
     async def on_startup() -> None:
-        app.state.app_dependencies = await context_manager.__aenter__()
+        lifetime_dependencies = await context_manager.__aenter__()
+        _store_on_app(app, lifetime_dependencies)
 
     @app.on_event("shutdown")
     async def on_shutdown() -> None:
+        # For safety/debuggability, forbid further access to lifetime dependencies,
+        # now that we're cleaning them up.
+        _delete_stored_on_app(app)
+
         # This shutdown handler has no way of knowing *why* we're shutting down, so the
         # best we can do is pass None as the exception information, indicating we're
         # shutting down cleanly. This should only make a difference if context_manager
