@@ -3,6 +3,8 @@ import map from 'lodash/map'
 import { useDispatch, useSelector } from 'react-redux'
 import { getConnectedRobotName } from '../../../redux/robot/selectors'
 import { useTranslation } from 'react-i18next'
+import isEmpty from 'lodash/isEmpty'
+import mapValues from 'lodash/mapValues'
 import {
   Flex,
   Btn,
@@ -22,8 +24,12 @@ import {
 import { fetchModules, getAttachedModules } from '../../../redux/modules'
 import {
   getModuleType,
+  inferModuleOrientationFromSlot,
   inferModuleOrientationFromXCoordinate,
+  DeckSlot,
+  DeckSlotId,
 } from '@opentrons/shared-data'
+import { getMatchedModules } from '../../../redux/modules'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 import { ModuleInfo } from './ModuleInfo'
 import { MultipleModulesModal } from './MultipleModulesModal'
@@ -45,8 +51,21 @@ const DECK_LAYER_BLOCKLIST = [
   'removableDeckOutline',
   'screwHoles',
 ]
-const POLL_MODULE_INTERVAL_MS = 5000
+
+const POLL_MODULE_INTERVAL_MS = 1000
 const DECK_VIEW_BOX = `-64 -10 ${530} ${456}`
+
+interface ModuleSetupProps {
+  moduleRenderCoords: CoordinatesByModuleModel
+  expandLabwareSetupStep: () => void
+  robotName: string
+  usbPort?: string
+  mode?: React.ComponentProps<typeof ModuleInfo>['mode']
+}
+
+interface ModulesListByPort {
+  [port: string]: AttachedModule[]
+}
 
 export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
   const { moduleRenderCoords, expandLabwareSetupStep, robotName } = props
@@ -59,10 +78,27 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
     showMultipleModulesModal,
     setShowMultipleModulesModal,
   ] = React.useState<boolean>(false)
-
-  console.log('modules needed', modules)
   const { t } = useTranslation('protocol_setup')
 
+  console.log('modules attached are', modules) // TODO immediately remember to delete this
+
+  const modulesByPort = modules.reduce<{ [port: number]: AttachedModule[] }>(
+    (portMap, module) => {
+      const port = module.usbPort.hub || module.usbPort.port
+      if (port !== null) {
+        const portContents = portMap[port] ?? []
+        portMap[port] = [...portContents, module]
+      }
+      return portMap
+    },
+    {}
+  )
+
+  const modulesList = isEmpty(modulesByPort)
+    ? 'no modules attached'
+    : 'they are attached'
+
+  console.log(modulesList)
   useInterval(
     () => dispatch(fetchModules(robotName)),
     connectedRobotName === null ? POLL_MODULE_INTERVAL_MS : null,
@@ -120,8 +156,10 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
                         y={y}
                         moduleModel={moduleModel}
                         orientation={orientation}
-                        usbPort={port}
+                        mode={'present'}
+                        usbPort={'1'}
                       />
+                      )
                     </React.Fragment>
                   )
                 })}
