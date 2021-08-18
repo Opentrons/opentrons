@@ -2,7 +2,7 @@ import map from 'lodash/map'
 import values from 'lodash/values'
 import type { Command } from '@opentrons/shared-data/protocol/types/schemaV5'
 import type { ProtocolData } from '../../../redux/protocol/types'
-import { getPrimaryPipette } from './getPrimaryPipette'
+import { getPrimaryPipetteId } from './getPrimaryPipetteId'
 import { getPipetteWorkflow } from './getPipetteWorkflow'
 import { getOnePipetteWorkflowCommands } from './getOnePipetteWorkflowCommands'
 import { getTwoPipetteWorkflowCommands } from './getTwoPipetteWorkflowCommands'
@@ -17,30 +17,32 @@ export const getLabwarePositionCheckCommands = (
 ): CommandsByStepNumber => {
   if (protocolData != null && 'pipettes' in protocolData) {
     // @ts-expect-error v1 protocols do not have pipettes names (see the two different FilePipette types)
-    const pipettes: FilePipette[] = values(protocolData.pipettes)
+    const pipettesById: Record<string, FilePipette> = protocolData.pipettes
+    const pipettes: FilePipette[] = values(pipettesById)
+    const pipetteNames = pipettes.map(({ name }) => name)
     const labware = protocolData.labware
     // @ts-expect-error v1 protocols do not have commands
-    const commands = protocolData.commands
-    const primaryPipette = getPrimaryPipette(pipettes)
+    const commands: Command[] = protocolData.commands
+    const primaryPipetteId = getPrimaryPipetteId(pipettesById)
     const pipetteWorkflow = getPipetteWorkflow({
-      pipettes,
-      primaryPipette,
+      pipetteNames,
+      primaryPipetteId,
       labware,
       commands,
     })
 
     if (pipetteWorkflow === 1) {
       return getOnePipetteWorkflowCommands({
-        primaryPipette: primaryPipette,
+        primaryPipetteId,
         labware,
         commands,
       })
     } else {
       const secondaryPipette = pipettes.filter(
-        pipette => pipette.name !== primaryPipette
+        pipette => pipette.name !== primaryPipetteId
       )[0].name
       return getTwoPipetteWorkflowCommands({
-        primaryPipette,
+        primaryPipetteId,
         secondaryPipette,
         labware,
         commands,

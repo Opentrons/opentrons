@@ -1,5 +1,5 @@
 import { getLabwarePositionCheckCommands } from '../utils/getLabwarePositionCheckCommands'
-import { getPrimaryPipette } from '../utils/getPrimaryPipette'
+import { getPrimaryPipetteId } from '../utils/getPrimaryPipetteId'
 import { getPipetteWorkflow } from '../utils/getPipetteWorkflow'
 import { getOnePipetteWorkflowCommands } from '../utils/getOnePipetteWorkflowCommands'
 import { getTwoPipetteWorkflowCommands } from '../utils/getTwoPipetteWorkflowCommands'
@@ -13,13 +13,13 @@ import { ProtocolFileV5 } from '@opentrons/shared-data'
 const protocolWithOnePipette = _uncasted_protocolWithOnePipette as ProtocolFileV5<any>
 const protocolWithTwoPipettes = _uncasted_protocolWithTwoPipettes as ProtocolFileV5<any>
 
-jest.mock('../utils/getPrimaryPipette')
+jest.mock('../utils/getPrimaryPipetteId')
 jest.mock('../utils/getPipetteWorkflow')
 jest.mock('../utils/getOnePipetteWorkflowCommands')
 jest.mock('../utils/getTwoPipetteWorkflowCommands')
 
-const mockGetPrimaryPipette = getPrimaryPipette as jest.MockedFunction<
-  typeof getPrimaryPipette
+const mockGetPrimaryPipetteId = getPrimaryPipetteId as jest.MockedFunction<
+  typeof getPrimaryPipetteId
 >
 const mockGetPipetteWorkflow = getPipetteWorkflow as jest.MockedFunction<
   typeof getPipetteWorkflow
@@ -38,7 +38,7 @@ describe('getLabwarePositionCheckCommands', () => {
   })
   it('should generate commands with the one pipette workflow', () => {
     const mockPipette: FilePipette = protocolWithOnePipette.pipettes.pipetteId
-    when(mockGetPrimaryPipette)
+    when(mockGetPrimaryPipetteId)
       .calledWith([mockPipette])
       .mockReturnValue(mockPipette.name)
 
@@ -65,7 +65,7 @@ describe('getLabwarePositionCheckCommands', () => {
     const rightPipette: FilePipette =
       protocolWithTwoPipettes.pipettes['4da579b0-a9bf-11eb-bce6-9f1d5b9c1a1b']
 
-    when(mockGetPrimaryPipette)
+    when(mockGetPrimaryPipetteId)
       .calledWith([leftPipette, rightPipette])
       .mockReturnValue(leftPipette.name)
 
