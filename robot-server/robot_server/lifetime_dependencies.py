@@ -139,17 +139,32 @@ async def _prepared_session_manager(
     thread_manager: SlowInitializing[ThreadManager],
     motion_lock: ThreadedAsyncLock,
     protocol_manager: ProtocolManager,
-) -> _ACMFactory[SessionManager]:
-    """Return a context manager for a `SessionManager`."""
-    session_manager = SessionManager(
-        await thread_manager.get_when_ready(),
-        motion_lock,
-        protocol_manager,
-    )
+) -> _ACMFactory[SlowInitializing[SessionManager]]:
+    """Return a context manager for a background-initializing `SessionManager`.
+
+    The background initialization works the same way as in `_prepared_thread_manager()`.
+    """
+
+    async def factory() -> SessionManager:
+        return SessionManager(
+            await thread_manager.get_when_ready(),
+            motion_lock,
+            protocol_manager,
+        )
+
+    slow_initializing = start_slow_initializing(factory)
     try:
-        yield session_manager
+        yield slow_initializing
     finally:
-        await session_manager.remove_all()
+        try:
+            fully_initialized_result = (
+                await slow_initializing.get_when_ready()
+            )
+        except InitializationFailedError:
+            pass
+        else:
+            print("Closing session manager.")
+            await fully_initialized_result.remove_all()
 
 
 @contextlib.asynccontextmanager
@@ -223,7 +238,7 @@ class LifetimeDependencySet:
     thread_manager: SlowInitializing[ThreadManager]
     rpc_server: SlowInitializing[RPCServer]
     protocol_manager: ProtocolManager
-    session_manager: SessionManager
+    session_manager: SlowInitializing[SessionManager]
 
 
 class NotSetError(Exception):  # noqa: D101

@@ -132,7 +132,13 @@ async def get_session_manager(
     ),
 ) -> SessionManager:
     """The single protocol manager instance"""
-    return lifetime_dependencies.session_manager
+    try:
+        return lifetime_dependencies.session_manager.get_if_ready()
+    except InitializationOngoingError:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Session manager is not ready.",
+        ) from None
 
 
 async def check_version_header(
