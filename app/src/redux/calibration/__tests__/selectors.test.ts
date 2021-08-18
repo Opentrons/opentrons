@@ -83,7 +83,10 @@ describe('calibration selectors', () => {
 })
 describe('getProtocolCalibrationComplete without bad deck calibration', () => {
   beforeEach(() => {
-    mockGetProtocolPipetteTipRackCalInfo.mockReturnValue(null)
+    mockGetProtocolPipetteTipRackCalInfo.mockReturnValue({
+      left: null,
+      right: null,
+    })
   })
   it('should return calibrate deck if no robot cal state', () => {
     const state: State = {
