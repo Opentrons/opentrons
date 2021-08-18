@@ -87,10 +87,10 @@ class RootFS:
     def print_rootFS_config(self, arg):
         print('ROOTFS_TEST_TITLE '+arg.tt+'\n')
         print('ROOTFS_PART1 '+self.RootFSConfig_.ROOTFS_PART1+'\n')
-        print('ROOTFS_PART2 '+self.RootFSConfig_RootFS.ROOTFS_PART2+'\n')
-        print('BMAP_IMAGE '+self.RootFSConfig_RootFS.BMAP_IMAGE+'\n')
+        print('ROOTFS_PART2 '+self.RootFSConfig_.ROOTFS_PART2+'\n')
+        print('BMAP_IMAGE '+self.RootFSConfig_.BMAP_IMAGE+'\n')
         print('BMAP_FILE '+self.RootFSConfig_.BMAP_FILE+'\n')
-        print('DISK '+self.RootFSComfig_.DISK+'\n')
+        print('DISK '+self.RootFSConfig_.DISK+'\n')
         print('BOOT_SRC_CARVE_OUT '+self.RootFSConfig_.BOOT_SRC_CARVE_OUT+'\n')
         print('ROOT_FS_PARTITION '+self.RootFSConfig_.ROOT_FS_PARTITION+'\n')
         print('SD_CARD_MOUNT_POINT '+self.RootFSConfig_.SD_CARD_MOUNT_POINT+'\n')
