@@ -56,12 +56,12 @@ class RootFS:
     def swap_partition(self, arg):
         """swap partitions get current partition
            and swap it with the other available partition"""
-        currentPartition = RootFS.getPartition()
+        currentPartition = self.get_partition()
         if currentPartition is not None:
             if currentPartition.disk == RootFS.ROOTFS_PART1:
-                RootFS.set_partition(arg, RootFS.ROOTFS_PART2)
+                self.set_partition(arg, RootFS.ROOTFS_PART2)
             else:
-                RootFS.set_partition(arg, RootFS.ROOTFS_PART1)
+                self.set_partition(arg, RootFS.ROOTFS_PART1)
 
     def factory_restore(self, arg):
         """" bmap to factory reset here"""
