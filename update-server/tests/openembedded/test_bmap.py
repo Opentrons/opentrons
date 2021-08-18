@@ -32,3 +32,12 @@ def test_swap_partition():
     rfs.set_partition = mock.MagicMock()
     rfs.swap_partition(None)
     assert rfs.get_partition.called
+
+
+def test_debug():
+    rfs = RootFS.RootFS()
+    rfs.print_rootFS_config = mock.MagicMock()
+    rfs.print_rootFS_partition = mock.MagicMock()
+    rfs.debug(None)
+    assert rfs.print_rootFS_config.called
+    assert rfs.print_rootFS_partition.called
