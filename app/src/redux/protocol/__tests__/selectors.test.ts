@@ -547,6 +547,76 @@ const SPECS: Array<{
       },
     },
   },
+  {
+    name: 'getProtocolPipetteTipRacks with JSON protocol with missing commands',
+    selector: protocol.getProtocolPipetteTipRacks,
+    state: {
+      protocol: {
+        data: {
+          labware: {
+            'tiprack-id-1': {
+              slot: '1',
+              definitionId: 'tiprack-def-1',
+              displayName: 'TipRack 1',
+            },
+            'tiprack-id-2': {
+              slot: '2',
+              definitionId: 'tiprack-def-2',
+              displayName: 'TipRack 2',
+            },
+          },
+          pipettes: {
+            'pipette-id-1': { mount: 'left', name: 'pipette-name-1' },
+            'pipette-id-2': { mount: 'right', name: 'pipette-name-2' },
+          },
+          labwareDefinitions: {
+            'tiprack-def-1': { mockDefinition },
+            'tiprack-def-2': { mockDefinition },
+          },
+        },
+      },
+    } as any,
+    expected: {
+      left: null,
+      right: null,
+    },
+  },
+  {
+    name: 'getProtocolPipetteTipRacks with JSON protocol with one pipette',
+    selector: protocol.getProtocolPipetteTipRacks,
+    state: {
+      protocol: {
+        data: {
+          labware: {
+            'tiprack-id-1': {
+              slot: '1',
+              definitionId: 'tiprack-def-1',
+              displayName: 'TipRack 1',
+            },
+          },
+          pipettes: {
+            'pipette-id-1': { mount: 'left', name: 'pipette-name-1' },
+          },
+          labwareDefinitions: {
+            'tiprack-def-1': { mockDefinition },
+          },
+          commands: [
+            {
+              command: 'pickUpTip',
+              params: { pipette: 'pipette-id-1', labware: 'tiprack-id-1' },
+            },
+          ],
+        },
+      },
+    } as any,
+    expected: {
+      left: {
+        pipetteSpecs: mockPipetteSpecs1,
+        tipRackDefs: [{ mockDefinition }],
+      },
+      right: null,
+    },
+  },
 ]
 
 describe('protocol selectors', () => {

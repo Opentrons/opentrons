@@ -63,4 +63,26 @@ describe('calibration selectors', () => {
       )
     })
   })
+  describe('getProtocolCalibrationComplete', () => {
+    it('should return null if no robot in state', () => {
+      const state: State = { calibration: {} } as any
+      expect(Selectors.getDeckCalibrationStatus(state, 'robotName')).toBe(null)
+    })
+
+    it('should return status if in state', () => {
+      const state: State = {
+        calibration: {
+          robotName: {
+            calibrationStatus: Fixtures.mockCalibrationStatus,
+            labwareCalibrations: null,
+            pipetteOffsetCalibrations: null,
+            tipLengthCalibrations: null,
+          },
+        },
+      } as any
+      expect(Selectors.getDeckCalibrationStatus(state, 'robotName')).toEqual(
+        Fixtures.mockCalibrationStatus.deckCalibration.status
+      )
+    })
+  })
 })

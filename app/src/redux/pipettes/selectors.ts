@@ -336,7 +336,6 @@ export const getProtocolPipetteTipRackCalInfo: (
         const attachedPipette = attachedPipettes[mount]
         if (
           protocolPipetteTiprack == null ||
-          attachedPipette == null ||
           protocolPipetteTiprack.pipetteSpecs == null
         ) {
           result[mount] = null
@@ -354,7 +353,9 @@ export const getProtocolPipetteTipRackCalInfo: (
               tipRack => tipRack.uri === getLabwareDefURI(tipRackDef)
             )
             lastTiprackCalDate =
-              tipRackMatch?.pipette === attachedPipette.id && pipettesMatch
+              attachedPipette !== null &&
+              tipRackMatch?.pipette === attachedPipette.id &&
+              pipettesMatch
                 ? tipRackMatch.lastModified
                 : null
 
