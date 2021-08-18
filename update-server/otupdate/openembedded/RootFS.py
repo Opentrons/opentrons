@@ -8,8 +8,8 @@ from dataclasses import dataclass
 
 @dataclass
 class RootFSInfo:
-    major: str
-    minor: str
+    major: int
+    minor: int
     disk: str
 
 
@@ -20,23 +20,30 @@ class RootFSInfo:
 
 
 class RootFS:
-    """ CONFIG vars, can be changed through the commandline arguments """
-    ROOTFS_PART1 = ''
-    ROOTFS_PART2 = ''
-    BMAP_IMAGE = ''
-    BMAP_FILE = ''
-    DISK = 'mmcblk0'
-    BOOT_SRC_CARVE_OUT = ''
-    ROOT_FS_PARTITION = ''
-    SD_CARD_MOUNT_POINT = '/media/mmcblk1p1'
+    @dataclass
+    class RootFSConfig:
+        """ CONFIG vars, can be changed through the commandline arguments """
+        ROOTFS_PART1: str = ''
+        ROOTFS_PART2: str = ''
+        BMAP_IMAGE: str = ''
+        BMAP_FILE: str = ''
+        DISK: str = 'mmcblk0'
+        BOOT_SRC_CARVE_OUT: str = ''
+        ROOT_FS_PARTITION: str = ''
+        SD_CARD_MOUNT_POINT: str = '/media/mmcblk1p1'
+
+    def __init__(self):
+        self.RootFSConfig_ = self.RootFSConfig('' , '', '' , '',
+                                               'mmcblk0', '', '', '/media/mmcblkp1')
 
     def set_partition(self, arg, PartitionName):
         """ Run boot util command here to set partion
          Use the libubootenv utility to set bootargs
          boot.src has a carveout for bootargs, use that """
-        BOOT_SRC_CARVE_OUT = arg.bco
+        self.BootFSConfig_.BOOT_SRC_CARVE_OUT = arg.bco
 
-        subprocess.run(["fw_setenv", BOOT_SRC_CARVE_OUT, "boot="+PartitionName])
+        subprocess.run(["fw_setenv", self.RootFSConfig_.BOOT_SRC_CARVE_OUT,
+                        "boot="+PartitionName])
 
     def get_partition(self):
         """ print partition name"""
@@ -58,17 +65,19 @@ class RootFS:
            and swap it with the other available partition"""
         currentPartition = self.get_partition()
         if currentPartition is not None:
-            if currentPartition.disk == RootFS.ROOTFS_PART1:
-                self.set_partition(arg, RootFS.ROOTFS_PART2)
+            if currentPartition.disk == self.RootFSConfig_.ROOTFS_PART1:
+                self.set_partition(arg, self.RootFSConfig_.ROOTFS_PART2)
             else:
-                self.set_partition(arg, RootFS.ROOTFS_PART1)
+                self.set_partition(arg, self.RootFSConfig_.ROOTFS_PART1)
 
     def factory_restore(self, arg):
         """" bmap to factory reset here"""
-        subprocess.run(["bmaptool", "copy", "--bmap",
-                        RootFS.SD_CARD_MOUNT_POINT+RootFS.BMAP_FILE,
+        bmap = self.RootFSConfig_.SD_CARD_MOUNT_POINT+self.RootFSConfig_.BMAP_FILE
+        bmap_img = self.RootFSConfig_.SD_CARD_MOUNT_POINT+self.RootFSConfig_.BMAP_IMAGE
+        subprocess.run(["bmaptool", "copy", "--bmap", bmap ,
                         "--no-sig-verify", "--no-verify",
-                        RootFS.SD_CARD_MOUNT_POINT+RootFS.BMAP_IMAGE, RootFS.DISK])
+                        bmap_img,
+                        self.RootFSConfig_.DISK])
 
     """ debug fuctions """
     def print_rootFS_partition(self, arg):
@@ -77,14 +86,14 @@ class RootFS:
 
     def print_rootFS_config(self, arg):
         print('ROOTFS_TEST_TITLE '+arg.tt+'\n')
-        print('ROOTFS_PART1 '+RootFS.ROOTFS_PART1+'\n')
-        print('ROOTFS_PART2 '+RootFS.ROOTFS_PART2+'\n')
-        print('BMAP_IMAGE '+RootFS.BMAP_IMAGE+'\n')
-        print('BMAP_FILE '+RootFS.BMAP_FILE+'\n')
-        print('DISK '+RootFS.DISK+'\n')
-        print('BOOT_SRC_CARVE_OUT '+RootFS.BOOT_SRC_CARVE_OUT+'\n')
-        print('ROOT_FS_PARTITION '+RootFS.ROOT_FS_PARTITION+'\n')
-        print('SD_CARD_MOUNT_POINT '+RootFS.SD_CARD_MOUNT_POINT+'\n')
+        print('ROOTFS_PART1 '+self.RootFSConfig_.ROOTFS_PART1+'\n')
+        print('ROOTFS_PART2 '+self.RootFSConfig_RootFS.ROOTFS_PART2+'\n')
+        print('BMAP_IMAGE '+self.RootFSConfig_RootFS.BMAP_IMAGE+'\n')
+        print('BMAP_FILE '+self.RootFSConfig_.BMAP_FILE+'\n')
+        print('DISK '+self.RootFSComfig_.DISK+'\n')
+        print('BOOT_SRC_CARVE_OUT '+self.RootFSConfig_.BOOT_SRC_CARVE_OUT+'\n')
+        print('ROOT_FS_PARTITION '+self.RootFSConfig_.ROOT_FS_PARTITION+'\n')
+        print('SD_CARD_MOUNT_POINT '+self.RootFSConfig_.SD_CARD_MOUNT_POINT+'\n')
 
     def debug(self, arg):
         self.print_rootFS_partition(arg)
