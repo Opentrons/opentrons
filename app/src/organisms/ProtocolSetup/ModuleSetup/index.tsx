@@ -4,6 +4,7 @@ import map from 'lodash/map'
 import { useTranslation } from 'react-i18next'
 import {
   Flex,
+  Btn,
   Link,
   ModuleViz,
   PrimaryBtn,
@@ -63,7 +64,8 @@ export const ModuleSetup = (props: ModuleSetupProps): JSX.Element | null => {
         borderRadius="6px"
         flexDirection={DIRECTION_COLUMN}
       >
-        <Link //    TODO IMMEDIATELY: make button show up only when MoaM is attached
+        <Btn //    TODO IMMEDIATELY: make button show up only when MoaM is attached
+          as={Link}
           fontSize={FONT_SIZE_BODY_1}
           color={C_BLUE}
           alignSelf={ALIGN_FLEX_END}
@@ -71,7 +73,7 @@ export const ModuleSetup = (props: ModuleSetupProps): JSX.Element | null => {
           data-test={'LabwareSetup_helpLink'}
         >
           {t('multiple_modules_help_link_title')}
-        </Link>
+        </Btn>
 
         <RobotWorkSpace
           deckDef={standardDeckDef as any}
