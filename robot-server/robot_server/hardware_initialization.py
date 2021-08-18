@@ -44,7 +44,7 @@ async def initialize(event_publisher: Publisher) -> ThreadManager:
     # fixme(mm, 2021-08-12): This might be a typing error. forward() can only
     # take a HardwareEvent, but it looks like ThreadManager can also pass
     # other things as the argument to a callback?
-    thread_manager.register_callback(door_event_forwarder.forward)
+    await thread_manager.register_callback(door_event_forwarder.forward)
 
     log.info("Opentrons API initialized")
     return thread_manager
