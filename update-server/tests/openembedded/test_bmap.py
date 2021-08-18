@@ -4,6 +4,7 @@ Checks functionaly and error casees for the bmap operations on RootFS
 """
 import os
 import subprocess
+from  unittest import mock
 from otupdate.openembedded import RootFS
 
 
@@ -23,3 +24,11 @@ def test_disk_image_write(tmp_path):
     RootFS.BMAP_IMAGE = p
     rfs.factory_restore(None)
     assert sum([len(files) for r, d, files in os.walk(d)]) == 2
+
+
+def test_swap_partition():
+    rfs = RootFS.RootFS()
+    rfs.get_partition = mock.MagicMock()
+    rfs.set_partition = mock.MagicMock()
+    rfs.swap_partition(None)
+    assert rfs.get_partition.called
