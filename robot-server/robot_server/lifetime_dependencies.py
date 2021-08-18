@@ -157,9 +157,7 @@ async def _prepared_session_manager(
         yield slow_initializing
     finally:
         try:
-            fully_initialized_result = (
-                await slow_initializing.get_when_ready()
-            )
+            fully_initialized_result = await slow_initializing.get_when_ready()
         except InitializationFailedError:
             pass
         else:
