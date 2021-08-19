@@ -39,14 +39,15 @@ describe('getLabwarePositionCheckCommands', () => {
   it('should generate commands with the one pipette workflow', () => {
     const mockPipette: FilePipette = protocolWithOnePipette.pipettes.pipetteId
     when(mockGetPrimaryPipetteId)
-      .calledWith([mockPipette])
-      .mockReturnValue(mockPipette.name)
+      .calledWith(protocolWithOnePipette.pipettes)
+      .mockReturnValue('pipetteId')
 
     when(mockGetPipetteWorkflow)
       .calledWith({
-        pipettes: [mockPipette],
-        primaryPipette: mockPipette.name,
+        pipetteNames: [mockPipette.name],
+        primaryPipetteId: 'pipetteId',
         labware: protocolWithOnePipette.labware,
+        labwareDefinitions: protocolWithOnePipette.labwareDefinitions,
         commands: protocolWithOnePipette.commands,
       })
       .mockReturnValue(1)
@@ -54,26 +55,30 @@ describe('getLabwarePositionCheckCommands', () => {
     getLabwarePositionCheckCommands(protocolWithOnePipette)
 
     expect(mockGetOnePipetteWorkflowCommands).toHaveBeenCalledWith({
-      primaryPipette: mockPipette.name,
+      primaryPipetteId: 'pipetteId',
       labware: protocolWithOnePipette.labware,
-      commands: protocolWithOnePipette.commands,
+      labwareDefinitions: protocolWithOnePipette.labwareDefinitions,
+      modules: protocolWithOnePipette.modules,
     })
   })
   it('should generate commands with the two pipette workflow', () => {
+    const leftPipetteId = '3dff4f90-3412-11eb-ad93-ed232a2337cf'
+    const rightPipetteId = '4da579b0-a9bf-11eb-bce6-9f1d5b9c1a1b'
     const leftPipette: FilePipette =
-      protocolWithTwoPipettes.pipettes['3dff4f90-3412-11eb-ad93-ed232a2337cf']
+      protocolWithTwoPipettes.pipettes[leftPipetteId]
     const rightPipette: FilePipette =
-      protocolWithTwoPipettes.pipettes['4da579b0-a9bf-11eb-bce6-9f1d5b9c1a1b']
+      protocolWithTwoPipettes.pipettes[rightPipetteId]
 
     when(mockGetPrimaryPipetteId)
-      .calledWith([leftPipette, rightPipette])
-      .mockReturnValue(leftPipette.name)
+      .calledWith(protocolWithTwoPipettes.pipettes)
+      .mockReturnValue(leftPipetteId)
 
     when(mockGetPipetteWorkflow)
       .calledWith({
-        pipettes: [leftPipette, rightPipette],
-        primaryPipette: leftPipette.name,
+        pipetteNames: [leftPipette.name, rightPipette.name],
+        primaryPipetteId: leftPipetteId,
         labware: protocolWithTwoPipettes.labware,
+        labwareDefinitions: protocolWithTwoPipettes.labwareDefinitions,
         commands: protocolWithTwoPipettes.commands,
       })
       .mockReturnValue(2)
@@ -81,10 +86,11 @@ describe('getLabwarePositionCheckCommands', () => {
     getLabwarePositionCheckCommands(protocolWithTwoPipettes)
 
     expect(mockGetTwoPipetteWorkflowCommands).toHaveBeenCalledWith({
-      primaryPipette: leftPipette.name,
-      secondaryPipette: rightPipette.name,
+      primaryPipetteId: leftPipetteId,
+      secondaryPipetteId: rightPipetteId,
       labware: protocolWithTwoPipettes.labware,
-      commands: protocolWithTwoPipettes.commands,
+      labwareDefinitions: protocolWithTwoPipettes.labwareDefinitions,
+      modules: protocolWithTwoPipettes.modules,
     })
   })
 })

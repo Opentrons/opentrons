@@ -1,10 +1,16 @@
-import type { JsonProtocolFile, PipetteName } from '@opentrons/shared-data'
-import type { Command } from '@opentrons/shared-data/protocol/types/schemaV5'
-import type { CommandsByStepNumber } from './getLabwarePositionCheckCommands'
+import type {
+  JsonProtocolFile,
+  LabwareDefinition2,
+} from '@opentrons/shared-data'
+import type { FileModule } from '@opentrons/shared-data/protocol/types/schemaV4'
+import type { LabwarePositionCheckCommand } from '../types'
 
 export const getTwoPipetteWorkflowCommands = (args: {
-  primaryPipette: PipetteName
-  secondaryPipette: PipetteName
+  primaryPipetteId: string
+  secondaryPipetteId: string
   labware: JsonProtocolFile['labware']
-  commands: Command[]
-}): CommandsByStepNumber => {}
+  labwareDefinitions: Record<string, LabwareDefinition2>
+  modules: Record<string, FileModule>
+}): LabwarePositionCheckCommand[] => {
+  return []
+}

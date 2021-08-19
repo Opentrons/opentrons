@@ -2,10 +2,7 @@ import { PipetteName } from '@opentrons/shared-data'
 import { getPipetteWorkflow } from '../utils/getPipetteWorkflow'
 import { doesPipetteVisitAllTipracks } from '../utils/doesPipetteVisitAllTipracks'
 import { when, resetAllWhenMocks } from 'jest-when'
-import type {
-  Command,
-  MoveToWellParams,
-} from '@opentrons/shared-data/protocol/types/schemaV5'
+import type { Command } from '@opentrons/shared-data/protocol/types/schemaV5'
 
 jest.mock('../utils/doesPipetteVisitAllTipracks')
 
@@ -14,11 +11,6 @@ const mockDoesPipetteVisitAllTipracks = doesPipetteVisitAllTipracks as jest.Mock
 >
 
 describe('getPipetteWorkflow', () => {
-  beforeEach(() => {
-    when(mockDoesPipetteVisitAllTipracks)
-      .calledWith(expect.anything(), expect.anything(), expect.anything())
-      .mockReturnValue(true)
-  })
   afterEach(() => {
     resetAllWhenMocks()
   })
@@ -29,6 +21,7 @@ describe('getPipetteWorkflow', () => {
         pipetteNames,
         primaryPipetteId: 'someId',
         labware: {},
+        labwareDefinitions: {},
         commands: [],
       })
     ).toBe(1)
@@ -40,6 +33,7 @@ describe('getPipetteWorkflow', () => {
         pipetteNames,
         primaryPipetteId: 'someId',
         labware: {},
+        labwareDefinitions: {},
         commands: [],
       })
     ).toBe(1)
@@ -48,6 +42,7 @@ describe('getPipetteWorkflow', () => {
     const pipetteNames: PipetteName[] = ['p1000_single', 'p1000_single_gen2']
     const primaryPipetteId = 'someId'
     const labware = {}
+    const labwareDefinitions = {}
     const moveToWellCommand: Command = {
       command: 'moveToWell',
       params: {
@@ -64,14 +59,15 @@ describe('getPipetteWorkflow', () => {
     const commands: Command[] = [moveToWellCommand]
 
     when(mockDoesPipetteVisitAllTipracks)
-      .calledWith(primaryPipetteId, labware, commands)
-      .mockReturnValue(false)
+      .calledWith(primaryPipetteId, labware, labwareDefinitions, commands)
+      .mockReturnValue(true)
 
     expect(
       getPipetteWorkflow({
         pipetteNames,
         primaryPipetteId,
         labware,
+        labwareDefinitions,
         commands,
       })
     ).toBe(1)
@@ -80,6 +76,7 @@ describe('getPipetteWorkflow', () => {
     const pipetteNames: PipetteName[] = ['p1000_single', 'p1000_single_gen2']
     const primaryPipetteId = 'someId'
     const labware = {}
+    const labwareDefinitions = {}
     const moveToWellCommand: Command = {
       command: 'moveToWell',
       params: {
@@ -96,7 +93,7 @@ describe('getPipetteWorkflow', () => {
     const commands: Command[] = [moveToWellCommand]
 
     when(mockDoesPipetteVisitAllTipracks)
-      .calledWith(primaryPipetteId, labware, commands)
+      .calledWith(primaryPipetteId, labware, labwareDefinitions, commands)
       .mockReturnValue(false)
 
     expect(
@@ -104,6 +101,7 @@ describe('getPipetteWorkflow', () => {
         pipetteNames,
         primaryPipetteId,
         labware,
+        labwareDefinitions,
         commands,
       })
     ).toBe(2)
