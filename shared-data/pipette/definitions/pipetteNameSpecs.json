@@ -456,11 +456,6 @@
       "opentrons/geb_96_tiprack_1000ul/1"
     ]
   },
-<<<<<<< Updated upstream
-  "p1000_single_gen3": {
-    "displayName": "P1000 Single-Channel GEN2",
-    "displayCategory": "GEN2",
-=======
   "p20_single_gen3": {
     "displayName": "P20 Single-Channel GEN3",
     "displayCategory": "GEN3",
@@ -553,7 +548,6 @@
   "p1000_single_gen3": {
     "displayName": "P1000 Single-Channel GEN3",
     "displayCategory": "GEN3",
->>>>>>> Stashed changes
     "defaultAspirateFlowRate": {
       "value": 137.35,
       "min": 3,
@@ -586,13 +580,8 @@
     "maxVolume": 1000,
     "smoothieConfigs": {
       "stepsPerMM": 3200,
-<<<<<<< Updated upstream
-      "homePosition": 172.15,
-      "travelDistance": 60
-=======
       "homePosition": 220,
       "travelDistance": 80
->>>>>>> Stashed changes
     },
     "defaultTipracks": [
       "opentrons/opentrons_96_tiprack_1000ul/1",
