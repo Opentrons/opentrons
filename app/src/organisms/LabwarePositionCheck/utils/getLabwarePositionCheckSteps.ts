@@ -20,7 +20,7 @@ export const getLabwarePositionCheckSteps = (
     const labware = protocolData.labware
     // @ts-expect-error older protocols do not have modules
     const modules: Record<string, FileModule> = protocolData.modules
-    // @ts-expect-error v1 protocols do not have commands
+    // @ts-expect-error v1 protocols do not have labware defs
     const labwareDefinitions = protocolData.labwareDefinitions
     // @ts-expect-error v1 protocols do not have commands
     const commands: Command[] = protocolData.commands
