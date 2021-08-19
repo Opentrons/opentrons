@@ -1,15 +1,5 @@
 @import '@opentrons/components';
 
-.module {
-  color: var(--c-black);
-  background-color: var(--c-black);
-  opacity: 0.9;
-  border-radius: 6px;
-  width: 100%;
-  height: 100%;
-  display: flex;
-}
-
 .module_review_icon {
   color: var(--c-white);
   margin: 0 0.25rem 0 0;
@@ -19,20 +9,12 @@
 
 .module_review_icon_missing {
   color: var(--c-red);
+  margin-top: 0.2rem;
 }
 
 .module_review_icon_present {
   color: var(--c-green);
-}
-
-.module_review_text {
-  fill: currentColor;
-  font-size: 0.55rem;
-  font-weight: var(--fw-semibold);
-  color: var(--c-white);
-  text-transform: capitalize;
-  white-space: pre;
-  margin-bottom: 0.75rem;
+  margin-top: 0.2rem;
 }
 
 .module_name_overlay {
@@ -45,54 +27,4 @@
   flex-direction: row;
   font-size: 0.5rem;
   color: var(--c-white);
-}
-
-.module_port_text {
-  fill: currentColor;
-  color: var(--c-white);
-  font-size: 0.65rem;
-  font-weight: var(--fw-semibold);
-  text-transform: uppercase;
-}
-
-.module_port_text_na {
-  fill: currentColor;
-  color: var(--c-med-gray);
-  font-size: 0.65rem;
-  font-weight: var(--fw-semibold);
-  text-transform: uppercase;
-}
-
-.module_wrapper {
-  display: flex;
-  width: 100%;
-  padding: 1.15rem;
-  justify-content: center;
-  flex-direction: column;
-  align-items: flex-end;
-}
-
-.flipped_module_wrapper {
-  display: flex;
-  width: 100%;
-  padding: 1.15rem;
-  justify-content: center;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-.module_name_text {
-  fill: currentColor;
-  color: var(--c-white);
-  font-size: 0.5rem;
-  font-weight: var(--fw-semibold);
-  text-transform: uppercase;
-}
-
-.flipped {
-  transform: rotate(180deg);
-}
-
-.right_icon {
-  margin: 0 0 0 1rem;
 }

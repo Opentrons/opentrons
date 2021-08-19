@@ -40,12 +40,12 @@ export function ModuleInfo(props: ModuleInfoProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
   const { childYOffset } = getModuleVizDims(orientation, moduleType)
 
-  const iconClassName = cx(styles.module_review_icon, {
+  const iconName = cx(styles.module_review_icon, {
     [styles.module_review_icon_missing]: mode === 'missing',
     [styles.module_review_icon_present]: mode === 'present',
   })
 
-  const iconNameByMode: Record<string, IconName> = {
+  const iconModeName: Record<string, IconName> = {
     missing: 'alert-circle',
     present: 'check-circle',
     default: 'usb',
@@ -66,8 +66,8 @@ export function ModuleInfo(props: ModuleInfoProps): JSX.Element {
       <Flex flexDirection={DIRECTION_COLUMN}>
         <Flex flexDirection={DIRECTION_ROW}>
           <Icon
-            className={iconClassName}
-            name={iconNameByMode[mode] || 'usb'}
+            className={iconName}
+            name={iconModeName[mode] || 'usb'}
             key="icon"
             height="0.625rem"
             width="0.625rem"
