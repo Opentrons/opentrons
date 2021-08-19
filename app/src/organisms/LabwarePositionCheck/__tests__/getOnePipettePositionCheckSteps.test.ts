@@ -68,7 +68,7 @@ describe('getOnePipettePositionCheckSteps', () => {
       },
     }
 
-    const allCommands: LabwarePositionCheckStep[] = [
+    const allSteps: LabwarePositionCheckStep[] = [
       {
         labwareId: tiprackInSlot1Id,
         section: SECTIONS.PRIMARY_PIPETTE_TIPRACKS,
@@ -103,7 +103,7 @@ describe('getOnePipettePositionCheckSteps', () => {
         labwareDefinitions,
         modules,
       })
-    ).toEqual(allCommands)
+    ).toEqual(allSteps)
   })
   it('should check tiprack, pick up a tip at the final tiprack, move to all remaining labware (and open TC lid), and drop the tip', () => {
     const primaryPipetteId = 'c235a5a0-0042-11ec-8258-f7ffdf5ad45a' // this is just taken from the protocol fixture
@@ -182,7 +182,7 @@ describe('getOnePipettePositionCheckSteps', () => {
       },
     }
 
-    const allCommands: LabwarePositionCheckStep[] = [
+    const allSteps: LabwarePositionCheckStep[] = [
       {
         labwareId: tiprackInSlot1Id,
         section: SECTIONS.PRIMARY_PIPETTE_TIPRACKS,
@@ -222,6 +222,6 @@ describe('getOnePipettePositionCheckSteps', () => {
         labwareDefinitions,
         modules,
       })
-    ).toEqual(allCommands)
+    ).toEqual(allSteps)
   })
 })

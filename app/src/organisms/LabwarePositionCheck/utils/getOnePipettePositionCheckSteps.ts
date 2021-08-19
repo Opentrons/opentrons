@@ -139,7 +139,7 @@ export const getOnePipettePositionCheckSteps = (args: {
     modules
   )
 
-  const moveToTiprackCommands: LabwarePositionCheckStep[] = orderedTiprackIds.map(
+  const moveToTiprackSteps: LabwarePositionCheckStep[] = orderedTiprackIds.map(
     labwareId => {
       const section = SECTIONS.PRIMARY_PIPETTE_TIPRACKS
       const commands = [
@@ -158,7 +158,7 @@ export const getOnePipettePositionCheckSteps = (args: {
   )
 
   const lastTiprackId = orderedTiprackIds[orderedTiprackIds.length - 1]
-  const pickupTipFromLastTiprackCommand: LabwarePositionCheckStep = {
+  const pickupTipFromLastTiprackStep: LabwarePositionCheckStep = {
     labwareId: lastTiprackId,
     section: SECTIONS.PRIMARY_PIPETTE_TIPRACKS,
     commands: [
@@ -173,7 +173,7 @@ export const getOnePipettePositionCheckSteps = (args: {
     ],
   }
 
-  const moveToRemainingLabwareCommands: LabwarePositionCheckStep[] = orderedLabwareIds.map(
+  const moveToRemainingLabwareSteps: LabwarePositionCheckStep[] = orderedLabwareIds.map(
     labwareId => {
       const moveToWellCommand: Command = {
         command: 'moveToWell' as const,
@@ -212,7 +212,7 @@ export const getOnePipettePositionCheckSteps = (args: {
     }
   )
 
-  const dropTipInLastTiprackCommand: LabwarePositionCheckStep = {
+  const dropTipInLastTiprackStep: LabwarePositionCheckStep = {
     labwareId: lastTiprackId,
     section: SECTIONS.RETURN_TIP,
     commands: [
@@ -228,9 +228,9 @@ export const getOnePipettePositionCheckSteps = (args: {
   }
 
   return [
-    ...moveToTiprackCommands,
-    pickupTipFromLastTiprackCommand,
-    ...moveToRemainingLabwareCommands,
-    dropTipInLastTiprackCommand,
+    ...moveToTiprackSteps,
+    pickupTipFromLastTiprackStep,
+    ...moveToRemainingLabwareSteps,
+    dropTipInLastTiprackStep,
   ]
 }
