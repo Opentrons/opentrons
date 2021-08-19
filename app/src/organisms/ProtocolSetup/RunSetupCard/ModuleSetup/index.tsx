@@ -82,23 +82,6 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
 
   console.log('modules attached are', modules) // TODO immediately remember to delete this
 
-  const modulesByPort = modules.reduce<{ [port: number]: AttachedModule[] }>(
-    (portMap, module) => {
-      const port = module.usbPort.hub || module.usbPort.port
-      if (port !== null) {
-        const portContents = portMap[port] ?? []
-        portMap[port] = [...portContents, module]
-      }
-      return portMap
-    },
-    {}
-  )
-
-  const modulesList = isEmpty(modulesByPort)
-    ? 'no modules attached'
-    : 'they are attached'
-
-  console.log(modulesList)
   useInterval(
     () => dispatch(fetchModules(robotName)),
     connectedRobotName === null ? POLL_MODULE_INTERVAL_MS : null,
