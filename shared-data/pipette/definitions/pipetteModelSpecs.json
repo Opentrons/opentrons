@@ -5554,21 +5554,21 @@
         "type": "float"
       },
       "bottom": {
-        "value": -8.5,
+        "value": -20,
         "min": -45,
         "max": 45,
         "type": "float",
         "units": "mm"
       },
       "blowout": {
-        "value": -13,
+        "value": -25,
         "min": -45,
         "max": 45,
         "units": "mm",
         "type": "float"
       },
       "dropTip": {
-        "value": -27,
+        "value": -35,
         "min": -45,
         "max": 45,
         "units": "mm",
@@ -5612,7 +5612,7 @@
       "nozzleOffset": [14.5, 4.0, 6.45],
       "modelOffset": [0.0, 0.0, -14.55],
       "plungerCurrent": {
-        "value": 1.0,
+        "value": 1.5,
         "min": 0.01,
         "max": 2.0,
         "units": "amps",
@@ -5719,29 +5719,29 @@
       "backCompatNames": ["p300_single"],
       "top": {
         "value": 19.5,
-        "min": 5,
-        "max": 19.5,
+        "min": -45,
+        "max": 45,
         "units": "mm",
         "type": "float"
       },
       "bottom": {
-        "value": -14.5,
-        "min": -20,
-        "max": 19.0,
-        "units": "mm",
-        "type": "float"
+        "value": -20,
+        "min": -45,
+        "max": 45,
+        "type": "float",
+        "units": "mm"
       },
       "blowout": {
-        "value": -19,
-        "min": -30,
-        "max": 10,
+        "value": -25,
+        "min": -45,
+        "max": 45,
         "units": "mm",
         "type": "float"
       },
       "dropTip": {
-        "value": -37,
-        "min": -50,
-        "max": 2,
+        "value": -35,
+        "min": -45,
+        "max": 45,
         "units": "mm",
         "type": "float"
       },
@@ -5849,9 +5849,9 @@
         }
       ],
       "plungerCurrent": {
-        "value": 1.0,
+        "value": 1.5,
         "min": 0.1,
-        "max": 1.0,
+        "max": 1.5,
         "units": "amps",
         "type": "float"
       },
@@ -5889,29 +5889,29 @@
       "backCompatNames": ["p1000_single"],
       "top": {
         "value": 19.5,
-        "min": 5,
-        "max": 19.5,
+        "min": -45,
+        "max": 45,
         "units": "mm",
         "type": "float"
       },
       "bottom": {
-        "value": -18.5,
-        "min": -20,
-        "max": 19,
-        "units": "mm",
-        "type": "float"
+        "value": -20,
+        "min": -45,
+        "max": 45,
+        "type": "float",
+        "units": "mm"
       },
       "blowout": {
-        "value": -23,
-        "min": -30,
-        "max": 10,
+        "value": -25,
+        "min": -45,
+        "max": 45,
         "units": "mm",
         "type": "float"
       },
       "dropTip": {
-        "value": -37,
+        "value": -35,
         "min": -45,
-        "max": 2,
+        "max": 45,
         "units": "mm",
         "type": "float"
       },
@@ -6021,9 +6021,9 @@
         }
       ],
       "plungerCurrent": {
-        "value": 1.0,
+        "value": 1.5,
         "min": 0.1,
-        "max": 1.0,
+        "max": 1.5,
         "units": "amps",
         "type": "float"
       },
