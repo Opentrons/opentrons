@@ -6,7 +6,7 @@ import {
 import { CALIBRATION_STATUS_PATH, DECK_CAL_STATUS_IDENTITY } from '../constants'
 
 import type { ResponseFixtures } from '../../robot-api/__fixtures__'
-import type { CalibrationStatus, ProtocolCalibration } from '../types'
+import type { CalibrationStatus, ProtocolCalibrationStatus } from '../types'
 
 export const mockCalibrationStatus: CalibrationStatus = {
   deckCalibration: {
@@ -59,7 +59,7 @@ export const {
   failureBody: mockFailureBody,
 })
 
-export const mockProtocolCalibrationComplete: ProtocolCalibration = {
+export const mockProtocolCalibrationComplete: ProtocolCalibrationStatus = {
   complete: false,
   reason: 'calibrate deck',
 }

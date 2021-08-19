@@ -1,7 +1,6 @@
 {
   "attached_pipettes": "attached pipette calibrations",
   "calibrate_deck": "calibrate deck",
-  "deck_calibration_title": "Deck Calibration",
   "deck_calibration_description": "Calibrate the position of the robot's deck. Recommended for all new robots and after moving robots.",
   "deck_calibration_error_occured": "An error occurred while trying to start deck calibration",
   "deck_calibration_failure": "Failed to start deck calibration",

@@ -1,13 +1,13 @@
 import { createSelector } from 'reselect'
-import type { State } from '../types'
 import * as PipetteConstants from '../pipettes/constants'
 import { getProtocolPipetteTipRackCalInfo } from '../pipettes'
 
+import type { State } from '../types'
 import type {
   CalibrationStatus,
   DeckCalibrationStatus,
   DeckCalibrationData,
-  ProtocolCalibration,
+  ProtocolCalibrationStatus,
 } from './types'
 
 export const getCalibrationStatus = (
@@ -34,7 +34,7 @@ export const getDeckCalibrationData = (
 export const getProtocolCalibrationComplete: (
   state: State,
   robotName: string
-) => ProtocolCalibration = createSelector(
+) => ProtocolCalibrationStatus = createSelector(
   getDeckCalibrationStatus,
   getProtocolPipetteTipRackCalInfo,
   (deckCalStatus, pipetteTipRackCalInfo) => {
@@ -44,7 +44,7 @@ export const getProtocolCalibrationComplete: (
         reason: 'calibrate deck',
       }
     }
-    let calibrationStatus: ProtocolCalibration = {
+    let calibrationStatus: ProtocolCalibrationStatus = {
       complete: true,
     }
     const labwareCalInfoValues = Object.values(pipetteTipRackCalInfo)

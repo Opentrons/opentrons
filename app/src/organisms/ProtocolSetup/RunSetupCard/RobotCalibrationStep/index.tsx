@@ -1,18 +1,16 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-
 import { Text, SPACING_3 } from '@opentrons/components'
+import * as PipetteOffset from '../../../../redux/calibration/pipette-offset'
+import * as Pipettes from '../../../../redux/pipettes'
+import * as TipLength from '../../../../redux/calibration/tip-length'
+import { formatLastModified } from '../../../CalibrationPanels/utils'
+import * as PipetteConstants from '../../../../redux/pipettes/constants'
+import { DeckCalibration } from './DeckCalibration'
 
 import type { Dispatch, State } from '../../../../redux/types'
 import type { ViewableRobot } from '../../../../redux/discovery/types'
-import * as PipetteOffset from '../../../../redux/calibration/pipette-offset'
-import * as Pipettes from '../../../../redux/pipettes'
-
-import * as PipetteConstants from '../../../../redux/pipettes/constants'
-import * as TipLength from '../../../../redux/calibration/tip-length'
-import { DeckCalibration } from './DeckCalibration'
-import { formatLastModified } from '../../../CalibrationPanels/utils'
 
 interface Props {
   robot: ViewableRobot

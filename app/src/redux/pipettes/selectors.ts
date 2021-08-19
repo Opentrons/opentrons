@@ -12,7 +12,6 @@ import {
   getPipettes as getProtocolPipettes,
   getTipracksByMount,
 } from '../robot/selectors'
-
 import {
   getPipetteOffsetCalibrations,
   filterCalibrationForPipette,
@@ -22,10 +21,12 @@ import {
   filterTipLengthForPipetteAndTiprack,
   tipLengthExistsForPipetteAndTiprack,
 } from '../calibration/tip-length'
-import type { PipetteOffsetCalibration } from '../calibration/types'
+import { getProtocolPipetteTipRacks } from '../protocol'
+import { PIPETTE_MOUNTS } from '../robot/constants'
 import * as Constants from './constants'
-import * as Types from './types'
 
+import * as Types from './types'
+import type { PipetteOffsetCalibration } from '../calibration/types'
 import type {
   PipetteModelSpecs,
   PipetteName,
@@ -33,9 +34,6 @@ import type {
 } from '@opentrons/shared-data'
 import type { State } from '../types'
 import type { TipracksByMountMap } from '../robot/types'
-import { getProtocolPipetteTipRacks } from '../protocol'
-
-import { PIPETTE_MOUNTS } from '../robot/constants'
 
 export const getAttachedPipettes: (
   state: State,

@@ -67,7 +67,7 @@ export type CalibrationState = Readonly<
   }>
 >
 
-export interface ProtocolCalibration {
+export interface ProtocolCalibrationStatus {
   complete: boolean
   reason?: string
 }

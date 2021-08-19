@@ -18,19 +18,18 @@ import {
   getAttachedPipettes,
   getProtocolPipetteTipRackCalInfo,
 } from '../../../redux/pipettes'
+import { mockCalibrationStatus } from '../../../redux/calibration/__fixtures__'
+import * as calibrationSelectors from '../../../redux/calibration/selectors'
+import * as protocolSelectors from '../../../redux/protocol/selectors'
+import { getModuleRenderCoords } from '../LabwareSetup/utils/getModuleRenderCoords'
+import { getLabwareRenderCoords } from '../LabwareSetup/utils/getLabwareRenderCoords'
+import { RunSetupCard } from '../RunSetupCard'
+import { LabwareSetup } from '../LabwareSetup'
+
 import type {
   AttachedPipettesByMount,
   ProtocolPipetteTipRackCalDataByMount,
 } from '../../../redux/pipettes/types'
-import { mockCalibrationStatus } from '../../../redux/calibration/__fixtures__'
-import * as calibrationSelectors from '../../../redux/calibration/selectors'
-import { RunSetupCard } from '../RunSetupCard'
-
-import * as protocolSelectors from '../../../redux/protocol/selectors'
-import { LabwareSetup } from '../LabwareSetup'
-import { ModuleSetup } from '../ModuleSetup'
-import { getModuleRenderCoords } from '../utils/getModuleRenderCoords'
-import { getLabwareRenderCoords } from '../utils/getLabwareRenderCoords'
 
 jest.mock('../../../redux/protocol/selectors')
 jest.mock('../../../redux/discovery/selectors')

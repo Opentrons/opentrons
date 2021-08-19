@@ -5,12 +5,12 @@ import { renderWithProviders } from '@opentrons/components/__utils__'
 import withModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/testModulesProtocol.json'
 
 import { i18n } from '../../../i18n'
-import { ProtocolUpload } from '..'
 import { mockConnectedRobot } from '../../../redux/discovery/__fixtures__'
 import * as discoverySelectors from '../../../redux/discovery/selectors'
 import * as protocolSelectors from '../../../redux/protocol/selectors'
 import * as protocolUtils from '../../../redux/protocol/utils'
 import { closeProtocol } from '../../../redux/protocol/actions'
+import { ProtocolUpload } from '..'
 
 jest.mock('../../../redux/protocol/selectors')
 jest.mock('../../../redux/protocol/utils')

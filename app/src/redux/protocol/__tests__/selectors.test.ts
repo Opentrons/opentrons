@@ -1,8 +1,8 @@
 // protocol state selector tests
 
-import * as protocol from '..'
 import * as SharedData from '@opentrons/shared-data'
 import { mockDefinition } from '../../custom-labware/__fixtures__'
+import * as protocol from '..'
 import type { State } from '../../types'
 
 jest.mock('@opentrons/shared-data')
