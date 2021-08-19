@@ -93,6 +93,7 @@ export function AttachedModulesCard(props: Props): JSX.Element {
     },
     {}
   )
+
   const modulesList = isEmpty(modulesByPort)
     ? legacyModuleList(modules, controlDisabledReason)
     : moduleListWithUSBInfo(modulesByPort, controlDisabledReason)

@@ -21,7 +21,11 @@ import {
   SPACING_4,
   useInterval,
 } from '@opentrons/components'
-import { fetchModules, getAttachedModules } from '../../../redux/modules'
+import {
+  fetchModules,
+  getModuleControlsDisabled,
+  getAttachedModules,
+} from '../../../redux/modules'
 import {
   getModuleType,
   inferModuleOrientationFromSlot,
@@ -67,6 +71,28 @@ interface ModulesListByPort {
   [port: string]: AttachedModule[]
 }
 
+const moduleWithUSBInfo = (
+  modulesByPort: ModulesListByPort,
+  controlDisabledReason: string | null
+): JSX.Element[] => {
+  return Object.keys(modulesByPort).map(port =>
+    modulesByPort[port].length > 1 ? (
+      <UsbHubInfo
+        hub={port}
+        modules={modulesByPort[port]}
+        controlDisabledReason={controlDisabledReason}
+      />
+    ) : (
+      <ModuleItem
+        usbPort={port}
+        key={modulesByPort[port][0].serial}
+        module={modulesByPort[port][0]}
+        controlDisabledReason={controlDisabledReason}
+      />
+    )
+  )
+}
+
 export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
   const { moduleRenderCoords, expandLabwareSetupStep, robotName } = props
   const dispatch = useDispatch<Dispatch>()
@@ -81,6 +107,26 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
 
   console.log('modules attached are', modules) // TODO immediately remember to delete this
+  const controlDisabledReason = useSelector((state: State) =>
+    getModuleControlsDisabled(state, robotName)
+  )
+
+  const modulesByPort = modules.reduce<{ [port: number]: AttachedModule[] }>(
+    (portMap, module) => {
+      const port = module.usbPort.hub || module.usbPort.port
+      if (port !== null) {
+        const portContents = portMap[port] ?? []
+        portMap[port] = [...portContents, module]
+      }
+      return portMap
+    },
+    {}
+  )
+  const modulesList = isEmpty(modulesByPort)
+    ? null
+    : moduleWithUSBInfo(modulesByPort, controlDisabledReason)
+
+  console.log('module list is', modulesList)
 
   useInterval(
     () => dispatch(fetchModules(robotName)),
@@ -141,6 +187,7 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
                         orientation={orientation}
                         mode={'present'}
                         usbPort={'1'}
+                        hubPort={null}
                       />
                       )
                     </React.Fragment>
