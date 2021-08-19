@@ -8,7 +8,7 @@ import {
   getModuleType,
 } from '@opentrons/shared-data'
 import type { FileModule } from '@opentrons/shared-data/protocol/types/schemaV4'
-import type { LabwarePositionCheckCommand } from '../types'
+import type { LabwarePositionCheckStep } from '../types'
 import { SECTIONS } from '../constants'
 import { Command } from '@opentrons/shared-data/protocol/types/schemaV5'
 
@@ -120,12 +120,12 @@ const getIsLabwareOnTopOfTC = (
   )
 }
 
-export const getOnePipetteWorkflowCommands = (args: {
+export const getOnePipettePositionCheckSteps = (args: {
   primaryPipetteId: string
   labware: JsonProtocolFile['labware']
   labwareDefinitions: Record<string, LabwareDefinition2>
   modules: Record<string, FileModule>
-}): LabwarePositionCheckCommand[] => {
+}): LabwarePositionCheckStep[] => {
   const { primaryPipetteId, labware, labwareDefinitions, modules } = args
   const orderedTiprackIds = getTiprackIdsInOrder(
     labware,
@@ -139,7 +139,7 @@ export const getOnePipetteWorkflowCommands = (args: {
     modules
   )
 
-  const moveToTiprackCommands: LabwarePositionCheckCommand[] = orderedTiprackIds.map(
+  const moveToTiprackCommands: LabwarePositionCheckStep[] = orderedTiprackIds.map(
     labwareId => {
       const section = SECTIONS.PRIMARY_PIPETTE_TIPRACKS
       const commands = [
@@ -158,7 +158,7 @@ export const getOnePipetteWorkflowCommands = (args: {
   )
 
   const lastTiprackId = orderedTiprackIds[orderedTiprackIds.length - 1]
-  const pickupTipFromLastTiprackCommand: LabwarePositionCheckCommand = {
+  const pickupTipFromLastTiprackCommand: LabwarePositionCheckStep = {
     labwareId: lastTiprackId,
     section: SECTIONS.PRIMARY_PIPETTE_TIPRACKS,
     commands: [
@@ -173,7 +173,7 @@ export const getOnePipetteWorkflowCommands = (args: {
     ],
   }
 
-  const moveToRemainingLabwareCommands: LabwarePositionCheckCommand[] = orderedLabwareIds.map(
+  const moveToRemainingLabwareCommands: LabwarePositionCheckStep[] = orderedLabwareIds.map(
     labwareId => {
       const moveToWellCommand: Command = {
         command: 'moveToWell' as const,
@@ -212,7 +212,7 @@ export const getOnePipetteWorkflowCommands = (args: {
     }
   )
 
-  const dropTipInLastTiprackCommand: LabwarePositionCheckCommand = {
+  const dropTipInLastTiprackCommand: LabwarePositionCheckStep = {
     labwareId: lastTiprackId,
     section: SECTIONS.RETURN_TIP,
     commands: [

@@ -1,17 +1,17 @@
 import values from 'lodash/values'
 import { getPrimaryPipetteId } from './getPrimaryPipetteId'
 import { getPipetteWorkflow } from './getPipetteWorkflow'
-import { getOnePipetteWorkflowCommands } from './getOnePipetteWorkflowCommands'
-import { getTwoPipetteWorkflowCommands } from './getTwoPipetteWorkflowCommands'
+import { getOnePipettePositionCheckSteps } from './getOnePipettePositionCheckSteps'
+import { getTwoPipettePositionCheckSteps } from './getTwoPipettePositionCheckSteps'
 import type { Command } from '@opentrons/shared-data/protocol/types/schemaV5'
 import type { FilePipette } from '@opentrons/shared-data/protocol/types/schemaV3'
 import type { FileModule } from '@opentrons/shared-data/protocol/types/schemaV4'
 import type { ProtocolData } from '../../../redux/protocol/types'
-import type { LabwarePositionCheckCommand } from '../types'
+import type { LabwarePositionCheckStep } from '../types'
 
-export const getLabwarePositionCheckCommands = (
+export const getLabwarePositionCheckSteps = (
   protocolData: ProtocolData
-): LabwarePositionCheckCommand[] => {
+): LabwarePositionCheckStep[] => {
   if (protocolData != null && 'pipettes' in protocolData) {
     // @ts-expect-error v1 protocols do not have pipettes names (see the two different FilePipette types)
     const pipettesById: Record<string, FilePipette> = protocolData.pipettes
@@ -34,7 +34,7 @@ export const getLabwarePositionCheckCommands = (
     })
 
     if (pipetteWorkflow === 1) {
-      return getOnePipetteWorkflowCommands({
+      return getOnePipettePositionCheckSteps({
         primaryPipetteId,
         labware,
         labwareDefinitions,
@@ -45,7 +45,7 @@ export const getLabwarePositionCheckCommands = (
         pipetteId => pipetteId !== primaryPipetteId
       ) as string
 
-      return getTwoPipetteWorkflowCommands({
+      return getTwoPipettePositionCheckSteps({
         primaryPipetteId,
         secondaryPipetteId,
         labware,

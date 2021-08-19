@@ -7,7 +7,6 @@ import type {
 } from '@opentrons/shared-data'
 import type { Command } from '@opentrons/shared-data/protocol/types/schemaV5'
 
-// determines pre run check workflow 1 or 2
 export const getPipetteWorkflow = (args: {
   pipetteNames: PipetteName[]
   primaryPipetteId: string

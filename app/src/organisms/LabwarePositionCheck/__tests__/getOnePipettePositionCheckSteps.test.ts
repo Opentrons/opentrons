@@ -1,15 +1,15 @@
 import _uncastedProtocolMultipleTipracks from '@opentrons/shared-data/protocol/fixtures/5/multipleTipracks.json'
 import _uncastedProtocolWithTC from '@opentrons/shared-data/protocol/fixtures/5/multipleTipracksWithTC.json'
-import { getOnePipetteWorkflowCommands } from '../utils/getOnePipetteWorkflowCommands'
+import { getOnePipettePositionCheckSteps } from '../utils/getOnePipettePositionCheckSteps'
 import type { ProtocolFileV5 } from '@opentrons/shared-data'
 import type { Command } from '@opentrons/shared-data/protocol/types/schemaV5'
-import type { LabwarePositionCheckCommand } from '../types'
+import type { LabwarePositionCheckStep } from '../types'
 import { SECTIONS } from '../constants'
 
 const protocolMultipleTipracks = _uncastedProtocolMultipleTipracks as ProtocolFileV5<any>
 const protocolWithTC = _uncastedProtocolWithTC as ProtocolFileV5<any>
 
-describe('getOnePipetteWorkflowCommands', () => {
+describe('getOnePipettePositionCheckSteps', () => {
   it('should check tiprack, pick up a tip at the final tiprack, move to all remaining labware, and drop the tip', () => {
     const primaryPipetteId = 'c235a5a0-0042-11ec-8258-f7ffdf5ad45a' // this is just taken from the protocol fixture
     const labware = protocolMultipleTipracks.labware
@@ -68,7 +68,7 @@ describe('getOnePipetteWorkflowCommands', () => {
       },
     }
 
-    const allCommands: LabwarePositionCheckCommand[] = [
+    const allCommands: LabwarePositionCheckStep[] = [
       {
         labwareId: tiprackInSlot1Id,
         section: SECTIONS.PRIMARY_PIPETTE_TIPRACKS,
@@ -97,7 +97,7 @@ describe('getOnePipetteWorkflowCommands', () => {
     ]
 
     expect(
-      getOnePipetteWorkflowCommands({
+      getOnePipettePositionCheckSteps({
         primaryPipetteId,
         labware,
         labwareDefinitions,
@@ -182,7 +182,7 @@ describe('getOnePipetteWorkflowCommands', () => {
       },
     }
 
-    const allCommands: LabwarePositionCheckCommand[] = [
+    const allCommands: LabwarePositionCheckStep[] = [
       {
         labwareId: tiprackInSlot1Id,
         section: SECTIONS.PRIMARY_PIPETTE_TIPRACKS,
@@ -216,7 +216,7 @@ describe('getOnePipetteWorkflowCommands', () => {
     ]
 
     expect(
-      getOnePipetteWorkflowCommands({
+      getOnePipettePositionCheckSteps({
         primaryPipetteId,
         labware,
         labwareDefinitions,

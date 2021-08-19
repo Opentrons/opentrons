@@ -1,8 +1,8 @@
-import { getLabwarePositionCheckCommands } from '../utils/getLabwarePositionCheckCommands'
+import { getLabwarePositionCheckSteps } from '../utils/getLabwarePositionCheckSteps'
 import { getPrimaryPipetteId } from '../utils/getPrimaryPipetteId'
 import { getPipetteWorkflow } from '../utils/getPipetteWorkflow'
-import { getOnePipetteWorkflowCommands } from '../utils/getOnePipetteWorkflowCommands'
-import { getTwoPipetteWorkflowCommands } from '../utils/getTwoPipetteWorkflowCommands'
+import { getOnePipettePositionCheckSteps } from '../utils/getOnePipettePositionCheckSteps'
+import { getTwoPipettePositionCheckSteps } from '../utils/getTwoPipettePositionCheckSteps'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { FilePipette } from '@opentrons/shared-data/protocol/types/schemaV4'
 import _uncasted_protocolWithOnePipette from '@opentrons/shared-data/protocol/fixtures/4/simpleV4.json'
@@ -15,8 +15,8 @@ const protocolWithTwoPipettes = _uncasted_protocolWithTwoPipettes as ProtocolFil
 
 jest.mock('../utils/getPrimaryPipetteId')
 jest.mock('../utils/getPipetteWorkflow')
-jest.mock('../utils/getOnePipetteWorkflowCommands')
-jest.mock('../utils/getTwoPipetteWorkflowCommands')
+jest.mock('../utils/getOnePipettePositionCheckSteps')
+jest.mock('../utils/getTwoPipettePositionCheckSteps')
 
 const mockGetPrimaryPipetteId = getPrimaryPipetteId as jest.MockedFunction<
   typeof getPrimaryPipetteId
@@ -24,14 +24,14 @@ const mockGetPrimaryPipetteId = getPrimaryPipetteId as jest.MockedFunction<
 const mockGetPipetteWorkflow = getPipetteWorkflow as jest.MockedFunction<
   typeof getPipetteWorkflow
 >
-const mockGetOnePipetteWorkflowCommands = getOnePipetteWorkflowCommands as jest.MockedFunction<
-  typeof getOnePipetteWorkflowCommands
+const mockgetOnePipettePositionCheckSteps = getOnePipettePositionCheckSteps as jest.MockedFunction<
+  typeof getOnePipettePositionCheckSteps
 >
-const mockGetTwoPipetteWorkflowCommands = getTwoPipetteWorkflowCommands as jest.MockedFunction<
-  typeof getTwoPipetteWorkflowCommands
+const mockgetTwoPipettePositionCheckSteps = getTwoPipettePositionCheckSteps as jest.MockedFunction<
+  typeof getTwoPipettePositionCheckSteps
 >
 
-describe('getLabwarePositionCheckCommands', () => {
+describe('getLabwarePositionCheckSteps', () => {
   beforeEach(() => {})
   afterEach(() => {
     resetAllWhenMocks()
@@ -52,9 +52,9 @@ describe('getLabwarePositionCheckCommands', () => {
       })
       .mockReturnValue(1)
 
-    getLabwarePositionCheckCommands(protocolWithOnePipette)
+    getLabwarePositionCheckSteps(protocolWithOnePipette)
 
-    expect(mockGetOnePipetteWorkflowCommands).toHaveBeenCalledWith({
+    expect(mockgetOnePipettePositionCheckSteps).toHaveBeenCalledWith({
       primaryPipetteId: 'pipetteId',
       labware: protocolWithOnePipette.labware,
       labwareDefinitions: protocolWithOnePipette.labwareDefinitions,
@@ -83,9 +83,9 @@ describe('getLabwarePositionCheckCommands', () => {
       })
       .mockReturnValue(2)
 
-    getLabwarePositionCheckCommands(protocolWithTwoPipettes)
+    getLabwarePositionCheckSteps(protocolWithTwoPipettes)
 
-    expect(mockGetTwoPipetteWorkflowCommands).toHaveBeenCalledWith({
+    expect(mockgetTwoPipettePositionCheckSteps).toHaveBeenCalledWith({
       primaryPipetteId: leftPipetteId,
       secondaryPipetteId: rightPipetteId,
       labware: protocolWithTwoPipettes.labware,
