@@ -21,7 +21,7 @@ import { getModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypes
 import { ModuleTag } from '../../../ModuleTag'
 
 jest.mock('../LabwareSetupModal')
-jest.mock('../../ModuleTag')
+jest.mock('../../../ModuleTag')
 jest.mock('../LabwareInfoOverlay')
 jest.mock('../ExtraAttentionWarning')
 jest.mock('../utils/getModuleTypesThatRequireExtraAttention')
