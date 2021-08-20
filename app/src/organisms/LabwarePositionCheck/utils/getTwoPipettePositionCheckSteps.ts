@@ -8,15 +8,15 @@ import {
   getLabwareIdsInOrder,
   getAllTipracksIdsThatPipetteUsesInOrder,
 } from './labware'
-import type { FileModule } from '@opentrons/shared-data/protocol/types/schemaV4'
-import type { Command } from '@opentrons/shared-data/protocol/types/schemaV5'
-import type { LabwarePositionCheckStep } from '../types'
 import {
   getMoveToTiprackSteps,
   getPickupTipStep,
   getMoveToLabwareSteps,
   getDropTipStep,
 } from './stepCreators'
+import type { FileModule } from '@opentrons/shared-data/protocol/types/schemaV4'
+import type { Command } from '@opentrons/shared-data/protocol/types/schemaV5'
+import type { LabwarePositionCheckStep } from '../types'
 
 export const getTwoPipettePositionCheckSteps = (args: {
   primaryPipetteId: string

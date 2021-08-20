@@ -1,14 +1,14 @@
+import { when, resetAllWhenMocks } from 'jest-when'
 import { getLabwarePositionCheckSteps } from '../getLabwarePositionCheckSteps'
 import { getPrimaryPipetteId } from '../utils/getPrimaryPipetteId'
 import { getPipetteWorkflow } from '../utils/getPipetteWorkflow'
 import { getOnePipettePositionCheckSteps } from '../utils/getOnePipettePositionCheckSteps'
 import { getTwoPipettePositionCheckSteps } from '../utils/getTwoPipettePositionCheckSteps'
-import { when, resetAllWhenMocks } from 'jest-when'
-import { FilePipette } from '@opentrons/shared-data/protocol/types/schemaV4'
 import _uncasted_protocolWithOnePipette from '@opentrons/shared-data/protocol/fixtures/4/simpleV4.json'
 import _uncasted_protocolWithTwoPipettes from '@opentrons/shared-data/protocol/fixtures/4/transferSettings.json'
 
-import { ProtocolFileV5 } from '@opentrons/shared-data'
+import type { FilePipette } from '@opentrons/shared-data/protocol/types/schemaV4'
+import type { ProtocolFileV5 } from '@opentrons/shared-data'
 
 const protocolWithOnePipette = _uncasted_protocolWithOnePipette as ProtocolFileV5<any>
 const protocolWithTwoPipettes = _uncasted_protocolWithTwoPipettes as ProtocolFileV5<any>

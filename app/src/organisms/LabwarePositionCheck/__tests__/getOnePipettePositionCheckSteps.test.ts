@@ -1,10 +1,10 @@
 import _uncastedProtocolMultipleTipracks from '@opentrons/shared-data/protocol/fixtures/5/multipleTipracks.json'
 import _uncastedProtocolWithTC from '@opentrons/shared-data/protocol/fixtures/5/multipleTipracksWithTC.json'
 import { getOnePipettePositionCheckSteps } from '../utils/getOnePipettePositionCheckSteps'
+import { SECTIONS } from '../constants'
 import type { ProtocolFileV5 } from '@opentrons/shared-data'
 import type { Command } from '@opentrons/shared-data/protocol/types/schemaV5'
 import type { LabwarePositionCheckStep } from '../types'
-import { SECTIONS } from '../constants'
 
 const protocolMultipleTipracks = _uncastedProtocolMultipleTipracks as ProtocolFileV5<any>
 const protocolWithTC = _uncastedProtocolWithTC as ProtocolFileV5<any>

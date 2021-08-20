@@ -7,7 +7,7 @@ import {
   LabwareDefinition2,
 } from '@opentrons/shared-data'
 import type { FileModule } from '@opentrons/shared-data/protocol/types/schemaV4'
-import { Command } from '@opentrons/shared-data/protocol/types/schemaV5'
+import type { Command } from '@opentrons/shared-data/protocol/types/schemaV5'
 import type { LabwareToOrder, PickUpTipCommand } from '../types'
 
 export const tipRackOrderSort = (
