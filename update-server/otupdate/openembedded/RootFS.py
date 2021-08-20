@@ -46,7 +46,7 @@ class RootFS:
         subprocess.run(["fw_setenv", self.root_FS_config_.BOOT_SRC_CARVE_OUT,
                         "boot="+partition_name])
 
-    def get_partition(self):
+    def get_partition(self) -> RootFSInfo:
         """ print partition name"""
         dev = os.stat('/')[stat.ST_DEV]
         major = os.major(dev)
@@ -59,14 +59,14 @@ class RootFS:
             ri = RootFSInfo(major, minor, mp)
             return ri
         else:
-            return None
+            raise AssertionError("Unexpected value of partition")
 
     def swap_partition(self, arg):
         """swap partitions get current partition
            and swap it with the other available partition"""
-        currentPartition = self.get_partition()
-        if currentPartition is not None:
-            if currentPartition.disk == self.root_FS_config_.ROOTFS_PART1:
+        current_partition = self.get_partition()
+        if current_partition is not None:
+            if current_partition.disk == self.root_FS_config_.ROOTFS_PART1:
                 self.set_partition(arg, self.root_FS_config_.ROOTFS_PART2)
             else:
                 self.set_partition(arg, self.root_FS_config_.ROOTFS_PART1)
