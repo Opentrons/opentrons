@@ -2,8 +2,21 @@ import type {
   JsonProtocolFile,
   LabwareDefinition2,
 } from '@opentrons/shared-data'
+import { SECTIONS } from '../constants'
+import {
+  getTiprackIdsInOrder,
+  getLabwareIdsInOrder,
+  getAllTipracksIdsThatPipetteUsesInOrder,
+} from './labware'
 import type { FileModule } from '@opentrons/shared-data/protocol/types/schemaV4'
+import type { Command } from '@opentrons/shared-data/protocol/types/schemaV5'
 import type { LabwarePositionCheckStep } from '../types'
+import {
+  getMoveToTiprackSteps,
+  getPickupTipStep,
+  getMoveToLabwareSteps,
+  getDropTipStep,
+} from './stepCreators'
 
 export const getTwoPipettePositionCheckSteps = (args: {
   primaryPipetteId: string
@@ -11,6 +24,70 @@ export const getTwoPipettePositionCheckSteps = (args: {
   labware: JsonProtocolFile['labware']
   labwareDefinitions: Record<string, LabwareDefinition2>
   modules: Record<string, FileModule>
+  commands: Command[]
 }): LabwarePositionCheckStep[] => {
-  return []
+  const {
+    primaryPipetteId,
+    secondaryPipetteId,
+    labware,
+    labwareDefinitions,
+    modules,
+    commands,
+  } = args
+  const orderedTiprackIdsThatSecondaryPipetteUses = getAllTipracksIdsThatPipetteUsesInOrder(
+    secondaryPipetteId,
+    commands,
+    labware,
+    labwareDefinitions
+  )
+
+  const orderedTiprackIds = getTiprackIdsInOrder(labware, labwareDefinitions)
+
+  const orderedLabwareIds = getLabwareIdsInOrder(
+    labware,
+    labwareDefinitions,
+    modules
+  )
+
+  const moveSecondaryPipetteToTiprackSteps = getMoveToTiprackSteps(
+    orderedTiprackIdsThatSecondaryPipetteUses,
+    secondaryPipetteId,
+    SECTIONS.SECONDARY_PIPETTE_TIPRACKS
+  )
+
+  const movePrimaryPipetteToTiprackSteps = getMoveToTiprackSteps(
+    orderedTiprackIds,
+    primaryPipetteId,
+    SECTIONS.PRIMARY_PIPETTE_TIPRACKS
+  )
+
+  const lastTiprackId = orderedTiprackIds[orderedTiprackIds.length - 1]
+
+  const pickupTipFromLastTiprackStep = getPickupTipStep(
+    lastTiprackId,
+    primaryPipetteId,
+    SECTIONS.PRIMARY_PIPETTE_TIPRACKS
+  )
+
+  const moveToRemainingLabwareSteps = getMoveToLabwareSteps(
+    labware,
+    modules,
+    orderedLabwareIds,
+    primaryPipetteId,
+    SECTIONS.CHECK_REMAINING_LABWARE_WITH_PRIMARY_PIPETTE
+  )
+
+  const dropTipInLastTiprackStep = getDropTipStep(
+    lastTiprackId,
+    primaryPipetteId,
+    SECTIONS.RETURN_TIP
+  )
+
+  return [
+    ...moveSecondaryPipetteToTiprackSteps,
+    ...movePrimaryPipetteToTiprackSteps,
+    pickupTipFromLastTiprackStep,
+    ...moveToRemainingLabwareSteps,
+    dropTipInLastTiprackStep,
+  ]
 }

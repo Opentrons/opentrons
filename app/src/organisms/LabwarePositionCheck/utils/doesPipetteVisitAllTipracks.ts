@@ -5,12 +5,7 @@ import {
   LabwareDefinition2,
 } from '@opentrons/shared-data'
 import type { Command } from '@opentrons/shared-data/protocol/types/schemaV5'
-import type { PipetteAccessParams } from '@opentrons/shared-data/protocol/types/schemaV3'
-
-interface PickUpTipCommand {
-  command: 'pickUpTip'
-  params: PipetteAccessParams
-}
+import type { PickUpTipCommand } from '../types'
 
 export const doesPipetteVisitAllTipracks = (
   pipetteId: string,

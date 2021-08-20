@@ -1,13 +1,13 @@
 import values from 'lodash/values'
-import { getPrimaryPipetteId } from './getPrimaryPipetteId'
-import { getPipetteWorkflow } from './getPipetteWorkflow'
-import { getOnePipettePositionCheckSteps } from './getOnePipettePositionCheckSteps'
-import { getTwoPipettePositionCheckSteps } from './getTwoPipettePositionCheckSteps'
+import { getPrimaryPipetteId } from './utils/getPrimaryPipetteId'
+import { getPipetteWorkflow } from './utils/getPipetteWorkflow'
+import { getOnePipettePositionCheckSteps } from './utils/getOnePipettePositionCheckSteps'
+import { getTwoPipettePositionCheckSteps } from './utils/getTwoPipettePositionCheckSteps'
 import type { Command } from '@opentrons/shared-data/protocol/types/schemaV5'
 import type { FilePipette } from '@opentrons/shared-data/protocol/types/schemaV3'
 import type { FileModule } from '@opentrons/shared-data/protocol/types/schemaV4'
-import type { ProtocolData } from '../../../redux/protocol/types'
-import type { LabwarePositionCheckStep } from '../types'
+import type { ProtocolData } from '../../redux/protocol/types'
+import type { LabwarePositionCheckStep } from './types'
 
 export const getLabwarePositionCheckSteps = (
   protocolData: ProtocolData
@@ -51,6 +51,7 @@ export const getLabwarePositionCheckSteps = (
         labware,
         labwareDefinitions,
         modules,
+        commands,
       })
     }
   }

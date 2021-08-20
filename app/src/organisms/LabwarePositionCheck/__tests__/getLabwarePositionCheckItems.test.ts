@@ -1,4 +1,4 @@
-import { getLabwarePositionCheckSteps } from '../utils/getLabwarePositionCheckSteps'
+import { getLabwarePositionCheckSteps } from '../getLabwarePositionCheckSteps'
 import { getPrimaryPipetteId } from '../utils/getPrimaryPipetteId'
 import { getPipetteWorkflow } from '../utils/getPipetteWorkflow'
 import { getOnePipettePositionCheckSteps } from '../utils/getOnePipettePositionCheckSteps'
@@ -91,6 +91,7 @@ describe('getLabwarePositionCheckSteps', () => {
       labware: protocolWithTwoPipettes.labware,
       labwareDefinitions: protocolWithTwoPipettes.labwareDefinitions,
       modules: protocolWithTwoPipettes.modules,
+      commands: protocolWithTwoPipettes.commands,
     })
   })
 })
