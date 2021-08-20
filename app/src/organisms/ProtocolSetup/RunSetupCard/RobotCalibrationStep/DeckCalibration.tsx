@@ -27,6 +27,8 @@ export function DeckCalibration(props: Props): JSX.Element | null {
     return null
   }
 
+  // TODO: This is a simplified version of the function from the RobotSettings page
+  // we should extract this into a shared util to use in both places
   const buildDeckLastCalibrated: (
     deckCalData: DeckCalibrationData
   ) => string = deckCalData => {

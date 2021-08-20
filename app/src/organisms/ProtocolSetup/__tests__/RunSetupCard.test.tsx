@@ -23,8 +23,10 @@ import * as calibrationSelectors from '../../../redux/calibration/selectors'
 import * as protocolSelectors from '../../../redux/protocol/selectors'
 import { getModuleRenderCoords } from '../LabwareSetup/utils/getModuleRenderCoords'
 import { getLabwareRenderCoords } from '../LabwareSetup/utils/getLabwareRenderCoords'
+import { ModuleSetup } from '../ModuleSetup'
 import { RunSetupCard } from '../RunSetupCard'
 import { LabwareSetup } from '../LabwareSetup'
+import { RobotCalibrationStep } from '../RunSetupCard/RobotCalibrationStep'
 
 import type {
   AttachedPipettesByMount,
@@ -37,8 +39,9 @@ jest.mock('../../../redux/pipettes/selectors')
 jest.mock('../../../redux/calibration/selectors')
 jest.mock('../LabwareSetup')
 jest.mock('../ModuleSetup')
-jest.mock('../utils/getModuleRenderCoords')
-jest.mock('../utils/getLabwareRenderCoords')
+jest.mock('../RunSetupCard/RobotCalibrationStep')
+jest.mock('../LabwareSetup/utils/getModuleRenderCoords')
+jest.mock('../LabwareSetup/utils/getLabwareRenderCoords')
 
 const mockAttachedPipettes: AttachedPipettesByMount = {
   left: mockAttachedPipette,
@@ -57,6 +60,9 @@ const mockLabwareSetup = LabwareSetup as jest.MockedFunction<
   typeof LabwareSetup
 >
 const mockModuleSetup = ModuleSetup as jest.MockedFunction<typeof ModuleSetup>
+const mockRobotCalibrationStep = RobotCalibrationStep as jest.MockedFunction<
+  typeof RobotCalibrationStep
+>
 const mockGetModuleRenderCoords = getModuleRenderCoords as jest.MockedFunction<
   typeof getModuleRenderCoords
 >
@@ -130,6 +136,14 @@ describe('RunSetupCard', () => {
       .mockImplementation(({ expandLabwareSetupStep }) => (
         <div onClick={expandLabwareSetupStep}>Mock Module Setup</div>
       ))
+    when(mockRobotCalibrationStep)
+      .mockReturnValue(<div></div>) // this (default) empty div will be returned when RobotCalibration isn't called with expected props
+      .calledWith(
+        componentPropsMatcher({
+          robot: mockConnectedRobot,
+        })
+      )
+      .mockReturnValue(<div>Mock Robot Calibration</div>)
     render = () => {
       return renderWithProviders(<RunSetupCard />, { i18nInstance: i18n })
     }
@@ -140,9 +154,12 @@ describe('RunSetupCard', () => {
   })
 
   describe('when no modules are in the protocol', () => {
-    it('renders robot calibration', () => {
-      const { getByRole } = render()
-      getByRole('heading', { name: 'Robot Calibration' })
+    it('renders robot calibration by default', () => {
+      const { getByRole, getByText } = render()
+      getByRole('heading', {
+        name: 'Robot Calibration',
+      })
+      getByText('Mock Robot Calibration')
     })
     it('renders labware setup', () => {
       const { getByRole, getByText } = render()
