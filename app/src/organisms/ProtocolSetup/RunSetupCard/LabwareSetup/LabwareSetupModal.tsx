@@ -23,7 +23,7 @@ import {
   SPACING_4,
   SPACING_5,
 } from '@opentrons/components'
-import { Portal } from '../../../App/portal'
+import { Portal } from '../../../../App/portal'
 import labwareHelpImage from '../../../assets/images/labware_help_example.svg'
 
 import styles from '../styles.css'

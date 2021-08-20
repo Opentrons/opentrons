@@ -1,6 +1,6 @@
 import _protocolWithMagTempTC from '@opentrons/shared-data/protocol/fixtures/4/transferSettings.json'
 import _standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
-import { getLabwareRenderCoords } from '../../utils/getLabwareRenderCoords'
+import { getLabwareRenderCoords } from '../../../utils/getLabwareRenderCoords'
 import { JsonProtocolFile } from '@opentrons/shared-data'
 
 const protocolWithMagTempTC = _protocolWithMagTempTC as JsonProtocolFile

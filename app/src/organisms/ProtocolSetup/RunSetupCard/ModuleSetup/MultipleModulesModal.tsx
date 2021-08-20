@@ -21,7 +21,7 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
 } from '@opentrons/components'
-import { Portal } from '../../../App/portal'
+import { Portal } from '../../../../App/portal'
 import multipleModuleHelp from '../../../assets/images/multiple_module_help_example.png'
 
 import styles from '../styles.css'

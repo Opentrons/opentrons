@@ -4,7 +4,7 @@ import { StaticRouter } from 'react-router-dom'
 import { RobotWorkSpace, ModuleViz } from '@opentrons/components'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 import { renderWithProviders } from '@opentrons/components/__utils__'
-import { i18n } from '../../../../i18n'
+import { i18n } from '../../../../../i18n'
 import { ModuleSetup } from '..'
 import { ModuleInfo } from '../ModuleInfo'
 import {

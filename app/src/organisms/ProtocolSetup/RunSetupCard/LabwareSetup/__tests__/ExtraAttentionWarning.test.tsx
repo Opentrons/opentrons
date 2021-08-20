@@ -2,7 +2,7 @@ import * as React from 'react'
 import { when } from 'jest-when'
 import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components/__utils__'
-import { i18n } from '../../../../i18n'
+import { i18n } from '../../../../../i18n'
 import { ExtraAttentionWarning } from '../ExtraAttentionWarning'
 import { SecureLabwareModal } from '../SecureLabwareModal'
 

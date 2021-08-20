@@ -25,7 +25,7 @@ import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_stand
 import { ModuleInfo } from './ModuleInfo'
 import { MultipleModulesModal } from './MultipleModulesModal'
 import styles from '../styles.css'
-import type { CoordinatesByModuleModel } from '../utils/getModuleRenderCoords'
+import type { CoordinatesByModuleModel } from '../../utils/getModuleRenderCoords'
 
 interface ModuleSetupProps {
   moduleRenderCoords: CoordinatesByModuleModel
