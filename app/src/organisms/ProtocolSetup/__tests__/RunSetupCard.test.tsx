@@ -21,8 +21,8 @@ import {
 import { mockCalibrationStatus } from '../../../redux/calibration/__fixtures__'
 import * as calibrationSelectors from '../../../redux/calibration/selectors'
 import * as protocolSelectors from '../../../redux/protocol/selectors'
-import { getModuleRenderCoords } from '../RunSetupCard/LabwareSetup/utils/getModuleRenderCoords'
-import { getLabwareRenderCoords } from '../RunSetupCard/LabwareSetup/utils/getLabwareRenderCoords'
+import { getModuleRenderCoords } from '../utils/getModuleRenderCoords'
+import { getLabwareRenderCoords } from '../utils/getLabwareRenderCoords'
 import { ModuleSetup } from '../RunSetupCard/ModuleSetup'
 import { RunSetupCard } from '../RunSetupCard'
 import { LabwareSetup } from '../RunSetupCard/LabwareSetup'
@@ -40,8 +40,8 @@ jest.mock('../../../redux/calibration/selectors')
 jest.mock('../RunSetupCard/LabwareSetup')
 jest.mock('../RunSetupCard/ModuleSetup')
 jest.mock('../RunSetupCard/RobotCalibration')
-jest.mock('../RunSetupCard/LabwareSetup/utils/getModuleRenderCoords')
-jest.mock('../RunSetupCard/LabwareSetup/utils/getLabwareRenderCoords')
+jest.mock('../utils/getModuleRenderCoords')
+jest.mock('../utils/getLabwareRenderCoords')
 
 const mockAttachedPipettes: AttachedPipettesByMount = {
   left: mockAttachedPipette,
