@@ -21,7 +21,7 @@ class RootFSInfo:
 
 class RootFS:
     @dataclass
-    class root_FS_config:
+    class RootFSConfig:
         """ CONFIG vars, can be changed through the commandline arguments """
         ROOTFS_PART1: str = ''
         ROOTFS_PART2: str = ''
@@ -33,9 +33,9 @@ class RootFS:
         SD_CARD_MOUNT_POINT: str = '/media/mmcblk1p1'
 
     def __init__(self):
-        self.root_FS_config_ = self.root_FS_config('' , '', '' , '',
-                                                   'mmcblk0',
-                                                   '', '', '/media/mmcblkp1')
+        self.root_FS_config_ = self.RootFSConfig('' , '', '' , '',
+                                                 'mmcblk0',
+                                                 '', '', '/media/mmcblkp1')
 
     def set_partition(self, arg, partition_name):
         """ Run boot util command here to set partion
