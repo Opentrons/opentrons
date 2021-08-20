@@ -26,7 +26,7 @@ import { getLabwareRenderCoords } from '../LabwareSetup/utils/getLabwareRenderCo
 import { ModuleSetup } from '../ModuleSetup'
 import { RunSetupCard } from '../RunSetupCard'
 import { LabwareSetup } from '../LabwareSetup'
-import { RobotCalibrationStep } from '../RunSetupCard/RobotCalibrationStep'
+import { RobotCalibration } from '../RunSetupCard/RobotCalibration'
 
 import type {
   AttachedPipettesByMount,
@@ -39,7 +39,7 @@ jest.mock('../../../redux/pipettes/selectors')
 jest.mock('../../../redux/calibration/selectors')
 jest.mock('../LabwareSetup')
 jest.mock('../ModuleSetup')
-jest.mock('../RunSetupCard/RobotCalibrationStep')
+jest.mock('../RunSetupCard/RobotCalibration')
 jest.mock('../LabwareSetup/utils/getModuleRenderCoords')
 jest.mock('../LabwareSetup/utils/getLabwareRenderCoords')
 
@@ -60,8 +60,8 @@ const mockLabwareSetup = LabwareSetup as jest.MockedFunction<
   typeof LabwareSetup
 >
 const mockModuleSetup = ModuleSetup as jest.MockedFunction<typeof ModuleSetup>
-const mockRobotCalibrationStep = RobotCalibrationStep as jest.MockedFunction<
-  typeof RobotCalibrationStep
+const mockRobotCalibration = RobotCalibration as jest.MockedFunction<
+  typeof RobotCalibration
 >
 const mockGetModuleRenderCoords = getModuleRenderCoords as jest.MockedFunction<
   typeof getModuleRenderCoords
@@ -136,7 +136,7 @@ describe('RunSetupCard', () => {
       .mockImplementation(({ expandLabwareSetupStep }) => (
         <div onClick={expandLabwareSetupStep}>Mock Module Setup</div>
       ))
-    when(mockRobotCalibrationStep)
+    when(mockRobotCalibration)
       .mockReturnValue(<div></div>) // this (default) empty div will be returned when RobotCalibration isn't called with expected props
       .calledWith(
         componentPropsMatcher({

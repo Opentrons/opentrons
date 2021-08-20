@@ -17,7 +17,7 @@ import { ModuleSetup } from '../ModuleSetup'
 import { getModuleRenderCoords } from '../LabwareSetup/utils/getModuleRenderCoords'
 import { getLabwareRenderCoords } from '../LabwareSetup/utils/getLabwareRenderCoords'
 
-import { RobotCalibrationStep } from './RobotCalibrationStep'
+import { RobotCalibration } from './RobotCalibration'
 import type { JsonProtocolFile } from '@opentrons/shared-data'
 import type { State } from '../../../redux/types'
 import { getConnectedRobot } from '../../../redux/discovery/selectors'
@@ -66,7 +66,7 @@ export function RunSetupCard(): JSX.Element | null {
   }
 
   const StepComponentMap: Record<StepKey, JSX.Element> = {
-    [ROBOT_CALIBRATION_STEP_KEY]: <RobotCalibrationStep robot={robot} />,
+    [ROBOT_CALIBRATION_STEP_KEY]: <RobotCalibration robot={robot} />,
     [MODULE_SETUP_KEY]: (
       <ModuleSetup
         moduleRenderCoords={moduleRenderCoords}

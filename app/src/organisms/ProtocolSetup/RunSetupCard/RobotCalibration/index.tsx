@@ -16,7 +16,7 @@ interface Props {
   robot: ViewableRobot
 }
 
-export function RobotCalibrationStep(props: Props): JSX.Element {
+export function RobotCalibration(props: Props): JSX.Element {
   const { robot } = props
   const { name: robotName, status } = robot
   const { t } = useTranslation(['protocol_setup'])
