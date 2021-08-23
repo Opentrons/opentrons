@@ -1,11 +1,11 @@
 import { when, resetAllWhenMocks } from 'jest-when'
+import _uncasted_protocolWithOnePipette from '@opentrons/shared-data/protocol/fixtures/4/simpleV4.json'
+import _uncasted_protocolWithTwoPipettes from '@opentrons/shared-data/protocol/fixtures/4/transferSettings.json'
 import { getLabwarePositionCheckSteps } from '../getLabwarePositionCheckSteps'
 import { getPrimaryPipetteId } from '../utils/getPrimaryPipetteId'
 import { getPipetteWorkflow } from '../utils/getPipetteWorkflow'
 import { getOnePipettePositionCheckSteps } from '../utils/getOnePipettePositionCheckSteps'
 import { getTwoPipettePositionCheckSteps } from '../utils/getTwoPipettePositionCheckSteps'
-import _uncasted_protocolWithOnePipette from '@opentrons/shared-data/protocol/fixtures/4/simpleV4.json'
-import _uncasted_protocolWithTwoPipettes from '@opentrons/shared-data/protocol/fixtures/4/transferSettings.json'
 
 import type { FilePipette } from '@opentrons/shared-data/protocol/types/schemaV4'
 import type { ProtocolFileV5 } from '@opentrons/shared-data'
@@ -32,7 +32,6 @@ const mockgetTwoPipettePositionCheckSteps = getTwoPipettePositionCheckSteps as j
 >
 
 describe('getLabwarePositionCheckSteps', () => {
-  beforeEach(() => {})
   afterEach(() => {
     resetAllWhenMocks()
   })

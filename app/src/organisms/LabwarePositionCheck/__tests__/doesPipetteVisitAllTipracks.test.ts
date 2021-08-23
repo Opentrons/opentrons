@@ -8,7 +8,7 @@ const protocolMultipleTipracks = _uncastedProtocolMultipleTipracks as ProtocolFi
 const protocolOneTiprack = _uncastedProtocolOneTiprack as ProtocolFileV5<any>
 
 describe('doesPipetteVisitAllTipracks', () => {
-  it('should return true when the pipette visits all tipracks', () => {
+  it('should return true when the pipette visits both tipracks', () => {
     const pipetteId = 'c235a5a0-0042-11ec-8258-f7ffdf5ad45a' // this is just taken from the protocol fixture
     const labware = protocolMultipleTipracks.labware
     const labwareDefinitions = protocolMultipleTipracks.labwareDefinitions

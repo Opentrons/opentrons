@@ -9,7 +9,6 @@ export interface LabwarePositionCheckStep {
   section: Section
   commands: Command[]
 }
-
 export interface PickUpTipCommand {
   command: 'pickUpTip'
   params: PipetteAccessParams
