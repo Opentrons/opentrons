@@ -65,7 +65,7 @@ class InstrumentContextSimulation(AbstractInstrument):
     def pick_up_tip(self, well: WellImplementation, tip_length: float,
                     presses: typing.Optional[int],
                     increment: typing.Optional[float]) -> None:
-        self._raise_if_tip("drop tip")
+        self._raise_if_tip("pick up tip")
         self._pipette_dict['has_tip'] = True
         self._pipette_dict['current_volume'] = 0
 
