@@ -51,7 +51,7 @@ class RootFS:
         dev = os.stat('/')[stat.ST_DEV]
         major = os.major(dev)
         minor = os.minor(dev)
-        out = subprocess.Popen(shlex.split("df /"),
+        out = subprocess.Popen(shlex.split("mount"),
                                stdout=subprocess.PIPE).communicate()
         m = re.search(r'(/[^\s]+)s', str(out))
         if m is not None:
