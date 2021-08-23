@@ -1,7 +1,7 @@
 import * as React from 'react'
 import map from 'lodash/map'
 import { useDispatch, useSelector } from 'react-redux'
-import { getConnectedRobotName } from '../../../redux/robot/selectors'
+import { getConnectedRobotName } from '../../../../redux/robot/selectors'
 import { useTranslation } from 'react-i18next'
 import isEmpty from 'lodash/isEmpty'
 import mapValues from 'lodash/mapValues'
@@ -25,7 +25,7 @@ import {
   fetchModules,
   getModuleControlsDisabled,
   getAttachedModules,
-} from '../../../redux/modules'
+} from '../../../../redux/modules'
 import {
   getModuleType,
   inferModuleOrientationFromSlot,
@@ -34,7 +34,7 @@ import {
   DeckSlotId,
   ModuleModel,
 } from '@opentrons/shared-data'
-import { getMatchedModules } from '../../../redux/modules'
+import { getMatchedModules } from '../../../../redux/modules'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 import { ModuleInfo } from './ModuleInfo'
 import { MultipleModulesModal } from './MultipleModulesModal'
@@ -57,7 +57,7 @@ const DECK_LAYER_BLOCKLIST = [
   'screwHoles',
 ]
 
-const POLL_MODULE_INTERVAL_MS = 1000
+const POLL_MODULE_INTERVAL_MS = 5000
 const DECK_VIEW_BOX = `-64 -10 ${530} ${456}`
 
 interface ModuleSetupProps {
@@ -67,7 +67,6 @@ interface ModuleSetupProps {
   mode: React.ComponentProps<typeof ModuleInfo>['mode']
   
 }
-
 interface ModulesListByPort {
   [port: string]: AttachedModule[]
 }
@@ -103,9 +102,6 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
     {}
   )
   console.log(modulesByPort, 'this is modules by port')
-
-
-  //const portMap = {"ThermocyclerModule": {port: "1"}, "MagneticModule": {hub: "1"}, "TemperatureModule": {hub: "2"}}
   
   // const modulesList = isEmpty(modulesByPort)
   //   ? null
@@ -160,7 +156,8 @@ console.log('full module is ', fullModule)
 
                 {map(moduleRenderCoords, ({ x, y, moduleModel}) => {
                   const orientation = inferModuleOrientationFromXCoordinate(x)
-                  return (
+
+                  return Object.keys(modulesByPort).map(port => (
                     <React.Fragment
                       key={`LabwareSetup_Module_${moduleModel}_${x}${y}`}
                     >
@@ -177,11 +174,14 @@ console.log('full module is ', fullModule)
                         moduleModel={moduleModel}
                         orientation={orientation}
                         mode = {'present'}
-                        usbPort={null}
-                        hubPort={'2'}
+                        usbPort={port}
+                        hubPort={port}
+                        //module = {modulesByPort[port][0]}
+                        key={modulesByPort[port][0].serial}
                       />
                       )
                     </React.Fragment>
+                  )
                   )
                 })}
               </>
@@ -202,3 +202,4 @@ console.log('full module is ', fullModule)
     </React.Fragment>
   )
 }
+

@@ -24,6 +24,8 @@ import {
   STD_SLOT_X_DIM as SLOT_X,
   getModuleDisplayName,
 } from '@opentrons/shared-data'
+import type { AttachedModule } from '../../../redux/modules/types'
+
 
 export interface ModuleInfoProps {
   x: number
