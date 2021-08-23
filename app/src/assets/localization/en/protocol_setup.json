@@ -26,7 +26,7 @@
   "deck_calibration_title": "Deck Calibration",
   "last_calibrated": "Last calibrated: {{date}}",
   "module_setup_step_description": "Plug in and power up the required module via the OT-2 USB Port. Place the module as shown in the deck map.",
-  "multiple_modules_setup_step_description": "Plug in and power up the required modules via the OT-2 USB Ports. Place the modules as shown in the deck map.",
+  "modules_setup_step_description": "Plug in and power up the required modules via the OT-2 USB Ports. Place the modules as shown in the deck map.",
   "module_setup_step_title": "Module Setup",
   "mount_title": "{{mount}} MOUNT:",
   "not_calibrated": "Not calibrated yet",

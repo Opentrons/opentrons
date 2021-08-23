@@ -22,16 +22,27 @@ import type { JsonProtocolFile } from '@opentrons/shared-data'
 import type { State } from '../../../redux/types'
 import { getConnectedRobot } from '../../../redux/discovery/selectors'
 
-const ROBOT_CALIBRATION_STEP_KEY = 'robot_calibration_step' as const
-const MODULE_SETUP_KEY = 'module_setup_step' as const
-const LABWARE_SETUP_KEY = 'labware_setup_step' as const
-
-type StepKey =
-  | typeof ROBOT_CALIBRATION_STEP_KEY
-  | typeof MODULE_SETUP_KEY
-  | typeof LABWARE_SETUP_KEY
+const robotName = 'opentrons-dev' // TODO Immediately: remove this after rebasing with Sarahs PR
 
 export function RunSetupCard(): JSX.Element | null {
+  const modules = useSelector((state: State) =>
+    getAttachedModules(state, robotName)
+  )
+  console.log(modules)
+
+  if (modules.length > 1) {
+    var MODULE_SETUP_KEY = 'modules_setup_step'
+  } else {
+    var MODULE_SETUP_KEY = 'module_setup_step'
+  }
+  const ROBOT_CALIBRATION_STEP_KEY = 'robot_calibration_step' as const
+  const LABWARE_SETUP_KEY = 'labware_setup_step' as const
+
+  type StepKey =
+    | typeof ROBOT_CALIBRATION_STEP_KEY
+    | typeof MODULE_SETUP_KEY
+    | typeof LABWARE_SETUP_KEY
+
   const { t } = useTranslation('protocol_setup')
   const [expandedStepKey, setExpandedStepKey] = React.useState<StepKey | null>(
     ROBOT_CALIBRATION_STEP_KEY
@@ -71,7 +82,7 @@ export function RunSetupCard(): JSX.Element | null {
       <ModuleSetup
         moduleRenderCoords={moduleRenderCoords}
         expandLabwareSetupStep={() => setExpandedStepKey(LABWARE_SETUP_KEY)}
-        robotName={'opentrons-dev'} //  TODO: immediately change robotName to actual robotName rather than hardcoded opentrons-dev
+        robotName={'OT2CEP20190319A02'} //  TODO: immediately change robotName to actual robotName rather than hardcoded opentrons-dev
       />
     ),
     [LABWARE_SETUP_KEY]: (

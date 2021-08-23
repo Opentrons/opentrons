@@ -32,6 +32,7 @@ import {
   inferModuleOrientationFromXCoordinate,
   DeckSlot,
   DeckSlotId,
+  ModuleModel,
 } from '@opentrons/shared-data'
 import { getMatchedModules } from '../../../redux/modules'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
@@ -63,35 +64,14 @@ interface ModuleSetupProps {
   moduleRenderCoords: CoordinatesByModuleModel
   expandLabwareSetupStep: () => void
   robotName: string
-  usbPort?: string
-  mode?: React.ComponentProps<typeof ModuleInfo>['mode']
+  mode: React.ComponentProps<typeof ModuleInfo>['mode']
+  
 }
 
 interface ModulesListByPort {
   [port: string]: AttachedModule[]
 }
 
-const moduleWithUSBInfo = (
-  modulesByPort: ModulesListByPort,
-  controlDisabledReason: string | null
-): JSX.Element[] => {
-  return Object.keys(modulesByPort).map(port =>
-    modulesByPort[port].length > 1 ? (
-      <UsbHubInfo
-        hub={port}
-        modules={modulesByPort[port]}
-        controlDisabledReason={controlDisabledReason}
-      />
-    ) : (
-      <ModuleItem
-        usbPort={port}
-        key={modulesByPort[port][0].serial}
-        module={modulesByPort[port][0]}
-        controlDisabledReason={controlDisabledReason}
-      />
-    )
-  )
-}
 
 export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
   const { moduleRenderCoords, expandLabwareSetupStep, robotName } = props
@@ -106,34 +86,43 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
   ] = React.useState<boolean>(false)
   const { t } = useTranslation('protocol_setup')
 
-  console.log('modules attached are', modules) // TODO immediately remember to delete this
-  const controlDisabledReason = useSelector((state: State) =>
-    getModuleControlsDisabled(state, robotName)
-  )
+  console.log('modules attached are', modules)
 
-  const modulesByPort = modules.reduce<{ [port: number]: AttachedModule[] }>(
+  const modulesByPort = modules.reduce<{ [port: string]: AttachedModule[] }>(
     (portMap, module) => {
       const port = module.usbPort.hub || module.usbPort.port
+      console.log('port is ', port)
       if (port !== null) {
         const portContents = portMap[port] ?? []
         portMap[port] = [...portContents, module]
       }
+      console.log('portmap', portMap)
       return portMap
+
     },
     {}
   )
-  const modulesList = isEmpty(modulesByPort)
-    ? null
-    : moduleWithUSBInfo(modulesByPort, controlDisabledReason)
+  console.log(modulesByPort, 'this is modules by port')
 
-  console.log('module list is', modulesList)
+
+  //const portMap = {"ThermocyclerModule": {port: "1"}, "MagneticModule": {hub: "1"}, "TemperatureModule": {hub: "2"}}
+  
+  // const modulesList = isEmpty(modulesByPort)
+  //   ? null
+  //   : moduleWithUSBInfo(modulesByPort, controlDisabledReason)
+
+const fullModule = { ...moduleRenderCoords, ...modulesByPort};
+console.log('full module is ', fullModule)
+
+//{usbPort === null && hubPort === null
+//  ? mode === 'missing'
+//  : mode === 'present'}
 
   useInterval(
     () => dispatch(fetchModules(robotName)),
     connectedRobotName === null ? POLL_MODULE_INTERVAL_MS : null,
     true
   )
-
   return (
     <React.Fragment>
       {showMultipleModulesModal && (
@@ -168,7 +157,8 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
           {() => {
             return (
               <>
-                {map(moduleRenderCoords, ({ x, y, moduleModel }) => {
+
+                {map(moduleRenderCoords, ({ x, y, moduleModel}) => {
                   const orientation = inferModuleOrientationFromXCoordinate(x)
                   return (
                     <React.Fragment
@@ -180,14 +170,15 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
                         orientation={orientation}
                         moduleType={getModuleType(moduleModel)}
                       />
+
                       <ModuleInfo
                         x={x}
                         y={y}
                         moduleModel={moduleModel}
                         orientation={orientation}
-                        mode={'present'}
-                        usbPort={'1'}
-                        hubPort={null}
+                        mode = {'present'}
+                        usbPort={null}
+                        hubPort={'2'}
                       />
                       )
                     </React.Fragment>
