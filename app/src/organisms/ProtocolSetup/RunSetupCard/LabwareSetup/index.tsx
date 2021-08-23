@@ -173,6 +173,7 @@ export const LabwareSetup = (props: LabwareSetupProps): JSX.Element | null => {
             id={'LabwareSetup_proceedToRunButton'}
             {...linkProps}
             {...targetProps}
+            backgroundColor={C_BLUE}
           >
             {t('proceed_to_run')}
           </PrimaryBtn>
