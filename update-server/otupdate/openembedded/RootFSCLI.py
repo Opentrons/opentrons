@@ -17,8 +17,7 @@ class RootFSCLI:
         # create Debug subcommand
         parser_debug = subparsers.add_parser('debug', help='Debug')
         parser_debug.add_argument('--tt', '-t', type=str, nargs='?', help="test title",
-                                  default="OT3 RootFS Test",
-                                  const="OT# RootFS Test")
+                                  default="OT3 RootFS Test", const="OT# RootFS Test")
         parser_debug.set_defaults(func=rfs.debug)
         # create Restore subcommand
         parser_factoryRestore = subparsers.add_parser('restore', help='Restore')
