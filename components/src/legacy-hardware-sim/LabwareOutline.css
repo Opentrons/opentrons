@@ -1,0 +1,11 @@
+@import '..';
+
+.labware_outline {
+  fill: var(--c-white);
+  stroke: var(--c-black);
+}
+
+.tiprack_outline {
+  fill: var(--c-plate-bg);
+  stroke: var(--c-charcoal);
+}

@@ -12,8 +12,7 @@
     "overLabwareHeight": 0.0,
     "lidHeight": 37.7,
     "xDimension": 172,
-    "yDimension": 259.7,
-    "footprintOffsetX": -22.125
+    "yDimension": 259.7
   },
   "cornerOffsetFromSlot": {
     "x": -22.125,

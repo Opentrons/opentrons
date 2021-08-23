@@ -21,7 +21,7 @@ import {
   DeckSlot as DeckDefSlot,
   ModuleRealType,
 } from '@opentrons/shared-data'
-import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
+import { getDeckDefinitions } from '@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions'
 import { PSEUDO_DECK_SLOTS } from '../../constants'
 import { i18n } from '../../localization'
 import {

@@ -11,7 +11,9 @@
     "bareOverallHeight": 110.152,
     "overLabwareHeight": 4.052,
     "xDimension": 137,
-    "yDimension": 91
+    "yDimension": 91,
+    "footprintXDimension": 128,
+    "footprintYDimension": 86
   },
   "cornerOffsetFromSlot": {
     "x": -7,
