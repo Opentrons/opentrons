@@ -26,6 +26,8 @@ const moduleModelDropdown =
 const thermocyclerSlot = 'foreignObject[x="12"][y="267"]'
 const slotSeven = 'foreignObject[x="0"][y="181"]'
 
+const thermocyclerWellBlockWithExtraSpace = 'TC Well ' // Note: reason this is needed is because of a cypress race condition. see `https://stackoverflow.com/questions/66257661/how-to-resolve-missing-characters-bug-in-cypress-type-command`
+
 describe('Protocols with Modules', () => {
   beforeEach(() => {
     cy.viewport('macbook-15')
@@ -142,7 +144,9 @@ describe('Protocols with Modules', () => {
           cy.contains('Nest 96 Well Plate', { matchCase: false }).click()
         })
       })
-      cy.get('input[class*="LabwareOverlays__name_input"]').type('TC Well ')
+      cy.get('input[class*="LabwareOverlays__name_input"]').type(
+        thermocyclerWellBlockWithExtraSpace
+      )
 
       // Add Thermocycler State Step
       cy.addStep('thermocycler')
@@ -268,7 +272,9 @@ describe('Protocols with Modules', () => {
             .click()
         })
       })
-      cy.get('input[class*="LabwareOverlays__name_input"]').type('TC Well ')
+      cy.get('input[class*="LabwareOverlays__name_input"]').type(
+        thermocyclerWellBlockWithExtraSpace
+      )
 
       // Add Thermocycler Profile Step
       cy.addStep('thermocycler')
