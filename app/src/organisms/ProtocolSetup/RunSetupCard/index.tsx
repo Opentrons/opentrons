@@ -29,7 +29,16 @@ export function RunSetupCard(): JSX.Element | null {
     getAttachedModules(state, robotName)
   )
   console.log(modules)
-
+  const protocolData = useSelector((state: State) => getProtocolData(state))
+  const moduleRenderCoords = getModuleRenderCoords(
+    protocolData,
+    standardDeckDef as any
+  )
+  const labwareRenderCoords = getLabwareRenderCoords(
+    protocolData,
+    standardDeckDef as any
+  )
+  console.log('module model', moduleRenderCoords.moduleModel)
   if (modules.length > 1) {
     var MODULE_SETUP_KEY = 'modules_setup_step'
   } else {

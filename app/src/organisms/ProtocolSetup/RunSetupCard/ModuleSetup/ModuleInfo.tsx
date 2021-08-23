@@ -34,11 +34,11 @@ export interface ModuleInfoProps {
   moduleModel: ModuleModel
   usbPort?: string | null
   hubPort?: string | null
-  mode: 'present' | 'missing'
+  isAttached: boolean
 }
 
 export function ModuleInfo(props: ModuleInfoProps): JSX.Element {
-  const { x, y, orientation, moduleModel, usbPort, hubPort, mode } = props
+  const { x, y, orientation, moduleModel, usbPort, hubPort, isAttached } = props
   const moduleType = getModuleType(moduleModel)
   const { t } = useTranslation('protocol_setup')
   const { childYOffset } = getModuleVizDims(orientation, moduleType)
@@ -58,7 +58,7 @@ export function ModuleInfo(props: ModuleInfoProps): JSX.Element {
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
         <Flex flexDirection={DIRECTION_ROW}>
-          {mode === 'missing' ? (
+          {!isAttached ? (
             <Icon
               name="alert-circle"
               color={COLOR_ERROR}
@@ -80,7 +80,7 @@ export function ModuleInfo(props: ModuleInfoProps): JSX.Element {
             />
           )}
           <p>
-            {mode === 'missing'
+            {!isAttached
               ? t('module_not_connected')
               : t('module_connected')}
           </p>
