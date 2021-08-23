@@ -29,14 +29,14 @@ import {
   inferModuleOrientationFromXCoordinate,
 } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
-import { ModuleTag } from '../ModuleTag'
+import { ModuleTag } from '../../ModuleTag'
 import { LabwareInfoOverlay } from './LabwareInfoOverlay'
 import { LabwareSetupModal } from './LabwareSetupModal'
 import { getModuleTypesThatRequireExtraAttention } from './utils/getModuleTypesThatRequireExtraAttention'
 import { ExtraAttentionWarning } from './ExtraAttentionWarning'
-import styles from '../styles.css'
-import type { CoordinatesByModuleModel } from '../utils/getModuleRenderCoords'
-import type { CoordinatesByLabwareId } from '../utils/getLabwareRenderCoords'
+import styles from '../../styles.css'
+import type { CoordinatesByModuleModel } from '../../utils/getModuleRenderCoords'
+import type { CoordinatesByLabwareId } from '../../utils/getLabwareRenderCoords'
 
 interface LabwareSetupProps {
   moduleRenderCoords: CoordinatesByModuleModel

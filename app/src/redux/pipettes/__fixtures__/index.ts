@@ -1,6 +1,6 @@
 // mock HTTP responses for pipettes endpoints
 
-import type { PipetteSettings } from '../types'
+import type { PipetteSettings, ProtocolPipetteTipRackCalData } from '../types'
 import type {
   RobotApiResponse,
   RobotApiResponseMeta,
@@ -17,6 +17,12 @@ export const mockAttachedPipette = {
   tip_length: 42,
   mount_axis: 'c',
   plunger_axis: 'd',
+}
+
+export const mockP300PipetteSpecs: any = {
+  displayName: 'P300 Single-Channel GEN2',
+  name: 'p300_single_gen2',
+  backCompatNames: ['p300_single'],
 }
 
 export const mockUnattachedPipette = {
@@ -117,4 +123,71 @@ export const mockUpdatePipetteSettingsFailure: RobotApiResponse = {
   ...mockUpdatePipetteSettingsFailureMeta,
   host: mockRobot,
   body: { message: 'AH' },
+}
+
+export const mockProtocolPipetteTipRackCalInfo: ProtocolPipetteTipRackCalData = {
+  pipetteDisplayName: 'My Pipette',
+  exactPipetteMatch: 'match',
+  pipetteCalDate: '2021-04-10',
+  tipRacks: [
+    {
+      displayName: 'My TipRack',
+      lastModifiedDate: '2021-04-10',
+    },
+  ],
+}
+
+export const mockLeftPipette: any = {
+  id: 'abc',
+  model: 'mock_left_model',
+}
+
+export const mockRightPipette: any = {
+  id: 'def',
+  model: 'mock_right_model',
+}
+
+export const mockLeftSpecs: any = {
+  displayName: 'Left Pipette',
+  name: 'mock_left',
+  backCompatNames: ['mock_left_legacy'],
+}
+
+export const mockLeftLegacySpecs: any = {
+  displayName: 'Left Pipette Legacy',
+  name: 'mock_left_legacy',
+}
+
+export const mockRightSpecs: any = {
+  displayName: 'Right Pipette',
+  name: 'mock_right',
+}
+
+// NOTE: protocol pipettes use "name" for the exact "model" because reasons
+export const mockLeftProtoPipette: any = {
+  mount: 'left',
+  name: 'mock_left_model',
+  modelSpecs: mockLeftSpecs,
+}
+
+export const mockRightProtoPipette: any = {
+  mount: 'right',
+  name: 'mock_right_model',
+  modelSpecs: mockRightSpecs,
+}
+
+export const mockLeftPipetteCalibration: any = {
+  pipette: 'abc',
+  mount: 'left',
+  offset: [0, 1, 2],
+  tiprack: 'some-tiprack',
+  lastModified: '2020-08-30T10:02',
+}
+
+export const mockRightPipetteCalibration: any = {
+  pipette: 'def',
+  mount: 'right',
+  offset: [1, 2, 3],
+  tiprack: 'some-other-tiprack',
+  lastModified: '2020-08-25T20:25',
 }

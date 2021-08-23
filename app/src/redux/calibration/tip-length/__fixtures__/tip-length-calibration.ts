@@ -53,6 +53,25 @@ export const mockTipLengthCalibration3: TipLengthCalibration = {
   id: 'someID',
 }
 
+export const mockPipetteMatchTipLengthCalibration: AllTipLengthCalibrations = {
+  data: [
+    {
+      pipette: 'P3HSV2008052020A02',
+      tiprack: 'opentrons_96_tiprack_20ul_hash',
+      uri: 'custom/mock_tiprack_definition/1',
+      tipLength: 29.0,
+      lastModified: '2020-09-29T13:02',
+      source: 'user',
+      status: {
+        markedBad: false,
+        source: 'unknown',
+        markedAt: '',
+      },
+      id: 'someID',
+    },
+  ],
+}
+
 export const mockAllTipLengthCalibrations: AllTipLengthCalibrations = {
   data: [
     mockTipLengthCalibration1,

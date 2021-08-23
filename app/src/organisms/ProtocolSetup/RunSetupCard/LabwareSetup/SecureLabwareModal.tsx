@@ -21,12 +21,12 @@ import {
   SPACING_4,
   SPACING_5,
 } from '@opentrons/components'
-import { Portal } from '../../../App/portal'
-import secureMagModBracketImage from '../../../assets/images/secure_mag_mod_bracket.svg'
-import secureTCLatchImage from '../../../assets/images/secure_tc_latch.png'
+import { Portal } from '../../../../App/portal'
+import secureMagModBracketImage from '../../../../assets/images/secure_mag_mod_bracket.svg'
+import secureTCLatchImage from '../../../../assets/images/secure_tc_latch.png'
 import { getModuleName } from './utils/getModuleName'
 
-import styles from '../styles.css'
+import styles from '../../styles.css'
 import type { ModuleTypesThatRequiresExtraAttention } from './utils/getModuleTypesThatRequireExtraAttention'
 
 interface SecureLabwareModalProps {
