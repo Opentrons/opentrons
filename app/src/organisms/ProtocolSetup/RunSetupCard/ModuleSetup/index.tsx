@@ -24,7 +24,7 @@ import {
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 import { ModuleInfo } from './ModuleInfo'
 import { MultipleModulesModal } from './MultipleModulesModal'
-import styles from '../styles.css'
+import styles from '../../styles.css'
 import type { CoordinatesByModuleModel } from '../../utils/getModuleRenderCoords'
 
 interface ModuleSetupProps {

@@ -24,7 +24,7 @@ import {
 import { Portal } from '../../../../App/portal'
 import multipleModuleHelp from '../../../../assets/images/multiple_module_help_example.png'
 
-import styles from '../styles.css'
+import styles from '../../styles.css'
 
 const HOW_TO_MULTIPLE_MODULES_HREF =
   'https://support.opentrons.com/en/articles/5167312-using-modules-of-the-same-type-on-the-ot-2'

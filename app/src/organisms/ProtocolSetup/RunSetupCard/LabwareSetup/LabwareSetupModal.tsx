@@ -26,7 +26,7 @@ import {
 import { Portal } from '../../../../App/portal'
 import labwareHelpImage from '../../../../assets/images/labware_help_example.svg'
 
-import styles from '../styles.css'
+import styles from './styles.css'
 
 const LABWARE_AND_PROTOCOL_BEST_PRACTICES_HREF = '#' // TODO IMMEDIATELY: get the actual link
 const LABWARE_CREATOR_HREF = 'https://labware.opentrons.com/create'
