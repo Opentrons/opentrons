@@ -83,21 +83,22 @@ class RootFS:
                         self.root_FS_config_.DISK])
 
     """ debug fuctions """
-    def print_rootFS_partition(self, arg):
+    def print_rootFS_partition(self, arg) -> str:
         tmp = self.get_partition()
-        print('Current RootFS Partition '+tmp.disk+'\n')
+        return ('Current RootFS Partition '+tmp.disk+'\n')
 
-    def print_rootFS_config(self, arg):
-        print('ROOTFS_TEST_TITLE '+arg.tt+'\n')
-        print('ROOTFS_PART1 '+self.root_FS_config_.ROOTFS_PART1+'\n')
-        print('ROOTFS_PART2 '+self.root_FS_config_.ROOTFS_PART2+'\n')
-        print('BMAP_IMAGE '+self.root_FS_config_.BMAP_IMAGE+'\n')
-        print('BMAP_FILE '+self.root_FS_config_.BMAP_FILE+'\n')
-        print('DISK '+self.root_FS_config_.DISK+'\n')
-        print('BOOT_SRC_CARVE_OUT '+self.root_FS_config_.BOOT_SRC_CARVE_OUT+'\n')
-        print('ROOT_FS_PARTITION '+self.root_FS_config_.ROOT_FS_PARTITION+'\n')
-        print('SD_CARD_MOUNT_POINT '+self.root_FS_config_.SD_CARD_MOUNT_POINT+'\n')
+    def print_rootFS_config(self, arg) -> str:
+        return(('ROOTFS_TEST_TITLE '+arg.tt+'\n') +
+               ('ROOTFS_PART1 '+self.root_FS_config_.ROOTFS_PART1+'\n') +
+               ('ROOTFS_PART2 '+self.root_FS_config_.ROOTFS_PART2+'\n') +
+               ('BMAP_IMAGE '+self.root_FS_config_.BMAP_IMAGE+'\n') +
+               ('BMAP_FILE '+self.root_FS_config_.BMAP_FILE+'\n') +
+               ('DISK '+self.root_FS_config_.DISK+'\n') +
+               ('BOOT_SRC_CARVE_OUT '+self.root_FS_config_.BOOT_SRC_CARVE_OUT+'\n') +
+               ('ROOT_FS_PARTITION '+self.root_FS_config_.ROOT_FS_PARTITION+'\n') +
+               ('SD_CARD_MOUNT_POINT '+self.root_FS_config_.SD_CARD_MOUNT_POINT+'\n')
+               )
 
     def debug(self, arg):
-        self.print_rootFS_partition(arg)
-        self.print_rootFS_config(arg)
+        print(self.print_rootFS_partition(arg))
+        print(self.print_rootFS_config(arg))
