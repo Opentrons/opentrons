@@ -26,7 +26,7 @@ import secureMagModBracketImage from '../../../../assets/images/secure_mag_mod_b
 import secureTCLatchImage from '../../../../assets/images/secure_tc_latch.png'
 import { getModuleName } from './utils/getModuleName'
 
-import styles from './styles.css'
+import styles from '../../styles.css'
 import type { ModuleTypesThatRequiresExtraAttention } from './utils/getModuleTypesThatRequireExtraAttention'
 
 interface SecureLabwareModalProps {
