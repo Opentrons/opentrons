@@ -38,16 +38,7 @@ DESCRIPTION = (
 PACKAGES = find_packages(where='.', exclude=["tests.*", "tests"])
 INSTALL_REQUIRES = [
     'aiohttp==3.4.4',
-    'bmap-tools==3.6',
-    'certifi==2021.5.30',
-    'charset-normalizer==2.0.4',
-    'docopt==0.6.2',
-    'idna==3.2',
-    'pipreqs==0.4.10',
-    'requests==2.26.0',
-    'six==1.16.0',
-    'urllib3==1.26.6',
-    'yarg==0.1.9'
+    'bmap-tools==3.6'
 ]
 
 
