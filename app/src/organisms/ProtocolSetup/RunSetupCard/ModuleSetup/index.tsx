@@ -70,7 +70,7 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
     getAttachedModules(state, robotName)
   )
 
-  console.log('test', moduleModelsStrings)
+  console.log('test', moduleModelsStrings, '1 string', moduleModelsString)
   const [
     showMultipleModulesModal,
     setShowMultipleModulesModal,
@@ -87,9 +87,15 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
     },
     {}
   )
+  const hasADuplicateModule = 
+    Object.values(moduleRenderCoords).some(
+      m => Array.isArray(m) && m.length > 1
+    )
+  console.log(hasADuplicateModule)
+
 console.log('attachedmodules', attachedModules)
-const attachedtest = attachedModules.filter(attachedModule => (attachedModule.model === moduleModelsString))
-console.log(attachedtest)                   
+const sameModules = attachedModules.filter(attachedModule => (attachedModule.model === moduleModelsString))
+console.log('sameModules here', sameModules)                   
 
   useInterval(
     () => dispatch(fetchModules(robotName)),
@@ -110,7 +116,8 @@ console.log(attachedtest)
         borderRadius="6px"
         flexDirection={DIRECTION_COLUMN}
       >
-        <Btn //    TODO IMMEDIATELY: make button show up only when MoaM is attached
+        {hasADuplicateModule ? (
+        <Btn
           as={Link}
           fontSize={FONT_SIZE_BODY_1}
           color={C_BLUE}
@@ -120,6 +127,10 @@ console.log(attachedtest)
         >
           {t('multiple_modules_help_link_title')}
         </Btn>
+        ) : (
+          null
+        )
+        }
 
         <RobotWorkSpace
           deckDef={standardDeckDef as any}
@@ -234,7 +245,7 @@ console.log(attachedtest)
         </RobotWorkSpace>
       </Flex>
       <Flex justifyContent={JUSTIFY_CENTER} margin={SPACING_4}>
-        {attachedtest.length === moduleModelsStrings.length ? 
+        {sameModules.length === moduleModelsStrings.length ? 
         (
         <PrimaryBtn
           title={t('proceed_to_labware_setup_step')}
