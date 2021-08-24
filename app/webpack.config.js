@@ -19,6 +19,7 @@ const OUTPUT_PATH = path.join(__dirname, 'dist')
 const PORT = process.env.PORT || 8080
 const CONTENT_BASE = path.join(__dirname, './src')
 const PUBLIC_PATH = DEV_MODE ? `http://localhost:${PORT}/` : ''
+const STATIC = DEV_MODE ? {publicPath: '/', directory: CONTENT_BASE} : false
 
 module.exports = webpackMerge(baseConfig, {
   entry: [JS_ENTRY],
@@ -55,14 +56,10 @@ module.exports = webpackMerge(baseConfig, {
   ],
   node: {
     __filename: true,
-    // use userland events because webpack's is out of date
-    // https://github.com/webpack/node-libs-browser/issues/78
-    events: false,
   },
 
   devServer: {
     port: PORT,
-    publicPath: PUBLIC_PATH,
-    contentBase: [CONTENT_BASE],
+    static: STATIC,
   },
 })

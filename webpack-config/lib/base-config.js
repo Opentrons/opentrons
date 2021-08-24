@@ -52,7 +52,7 @@ module.exports = {
 
   optimization: {
     minimizer: [
-      new TerserPlugin({ cache: true, parallel: true, sourceMap: true }),
+      new TerserPlugin({ parallel: true  }),
       new OptimizeCSSAssetsPlugin({}),
     ],
 
@@ -73,6 +73,6 @@ module.exports = {
     historyApiFallback: true,
     port: DEFAULT_PORT,
     host: '0.0.0.0',
-    hotOnly: true,
+    hot: 'only',
   },
 }

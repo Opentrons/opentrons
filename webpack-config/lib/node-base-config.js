@@ -33,7 +33,7 @@ module.exports = webpackMerge.strategy(MERGE_STRATEGY)(baseConfig, {
   // exclude package.json dependencies from the bundle
   externals: [
     nodeExternals({
-      whitelist: /^@opentrons\/.*/,
+      allowlist: /^@opentrons\/.*/,
       modulesFromFile: {
         include: ['dependencies'],
         exclude: ['devDependencies'],
