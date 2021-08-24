@@ -22,8 +22,6 @@ import type { JsonProtocolFile } from '@opentrons/shared-data'
 import type { State } from '../../../redux/types'
 import { getConnectedRobot } from '../../../redux/discovery/selectors'
 
-const robotName = 'opentrons-dev' // TODO Immediately: remove this after rebasing with Sarahs PR
-
 export function RunSetupCard(): JSX.Element | null {
   const protocolData = useSelector((state: State) => getProtocolData(state))
   const moduleRenderCoords = getModuleRenderCoords(
@@ -52,15 +50,7 @@ export function RunSetupCard(): JSX.Element | null {
   const [expandedStepKey, setExpandedStepKey] = React.useState<StepKey | null>(
     ROBOT_CALIBRATION_STEP_KEY
   )
-  const protocolData = useSelector((state: State) => getProtocolData(state))
-  const moduleRenderCoords = getModuleRenderCoords(
-    protocolData,
-    standardDeckDef as any
-  )
-  const labwareRenderCoords = getLabwareRenderCoords(
-    protocolData,
-    standardDeckDef as any
-  )
+
   const robot = useSelector((state: State) => getConnectedRobot(state))
 
   if (

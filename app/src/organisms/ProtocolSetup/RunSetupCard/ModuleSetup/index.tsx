@@ -1,5 +1,6 @@
 import * as React from 'react'
 import map from 'lodash/map'
+import isEmpty from 'lodash/isEmpty'
 import { useDispatch, useSelector } from 'react-redux'
 import { getConnectedRobotName } from '../../../../redux/robot/selectors'
 import { useTranslation } from 'react-i18next'
@@ -33,6 +34,9 @@ import { ModuleInfo } from './ModuleInfo'
 import { MultipleModulesModal } from './MultipleModulesModal'
 import styles from '../../styles.css'
 import type { CoordinatesByModuleModel } from '../../utils/getModuleRenderCoords'
+import type { State, Dispatch } from '../../../../redux/types'
+import type { AttachedModule } from '../../../../redux/modules/types'
+
 
 interface ModuleSetupProps {
   moduleRenderCoords: CoordinatesByModuleModel
