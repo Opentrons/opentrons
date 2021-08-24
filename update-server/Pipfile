@@ -6,7 +6,6 @@ name = "pypi"
 [packages]
 "e1839a8" = {path = ".", editable = true}
 virtualenv = "*"
-bmap-tools = {editable = true, ref = "master", git = "https://github.com/intel/bmap-tools.git"}
 aiohttp = "==3.4.4"
 
 [dev-packages]

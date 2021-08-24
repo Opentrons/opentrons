@@ -38,7 +38,6 @@ DESCRIPTION = (
 PACKAGES = find_packages(where='.', exclude=["tests.*", "tests"])
 INSTALL_REQUIRES = [
     'aiohttp==3.4.4',
-    'bmap-tools==3.6'
 ]
 
 
