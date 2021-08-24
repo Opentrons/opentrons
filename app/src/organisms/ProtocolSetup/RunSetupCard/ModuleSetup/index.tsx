@@ -63,11 +63,14 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
   const { moduleRenderCoords, expandLabwareSetupStep, robotName} = props
   const dispatch = useDispatch<Dispatch>()
   const moduleModels = map(moduleRenderCoords, ({ moduleModel }) => moduleModel)
+  let moduleModelsString = moduleModels.toString()
+  const moduleModelsStrings = moduleModelsString.split(',')
   const connectedRobotName = useSelector(getConnectedRobotName)
   const attachedModules = useSelector((state: State) =>
     getAttachedModules(state, robotName)
   )
-  console.log('attached modules are', attachedModules)
+
+  console.log('test', moduleModelsStrings)
   const [
     showMultipleModulesModal,
     setShowMultipleModulesModal,
@@ -84,6 +87,9 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
     },
     {}
   )
+console.log('attachedmodules', attachedModules)
+const attachedtest = attachedModules.filter(attachedModule => (attachedModule.model === moduleModelsString))
+console.log(attachedtest)                   
 
   useInterval(
     () => dispatch(fetchModules(robotName)),
@@ -228,7 +234,7 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
         </RobotWorkSpace>
       </Flex>
       <Flex justifyContent={JUSTIFY_CENTER} margin={SPACING_4}>
-        {moduleModels.length <= attachedModules.length? 
+        {attachedtest.length === moduleModelsStrings.length ? 
         (
         <PrimaryBtn
           title={t('proceed_to_labware_setup_step')}
