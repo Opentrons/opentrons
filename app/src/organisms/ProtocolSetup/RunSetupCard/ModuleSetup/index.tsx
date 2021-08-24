@@ -57,16 +57,17 @@ interface ModuleSetupProps {
   moduleRenderCoords: CoordinatesByModuleModel
   expandLabwareSetupStep: () => void
   robotName: string
-  
 }
 
 export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
   const { moduleRenderCoords, expandLabwareSetupStep, robotName} = props
   const dispatch = useDispatch<Dispatch>()
+  const moduleModels = map(moduleRenderCoords, ({ moduleModel }) => moduleModel)
   const connectedRobotName = useSelector(getConnectedRobotName)
   const attachedModules = useSelector((state: State) =>
     getAttachedModules(state, robotName)
   )
+  console.log('attached modules are', attachedModules)
   const [
     showMultipleModulesModal,
     setShowMultipleModulesModal,
@@ -90,8 +91,6 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
     true
   )
 
-  const proceedToLabwareDisabled = false
-  
   return (
     <React.Fragment>
       {showMultipleModulesModal && (
@@ -130,8 +129,9 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
 
                 {map(moduleRenderCoords, ({ x, y, moduleModel}) => {
                   const orientation = inferModuleOrientationFromXCoordinate(x)
-                  const attached = attachedModules.some(attachedModule => (moduleModel === attachedModule.model)) 
-                  return Object.keys(modulesByPort).map(port =>
+                  const attached = attachedModules.some(attachedModule => (moduleModel === attachedModule.model))                   
+                  if (isEmpty(modulesByPort)) {
+                  return (
                     attached === true ?
                     (
                     <React.Fragment
@@ -149,8 +149,8 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
                         moduleModel={moduleModel}
                         orientation={orientation}
                         isAttached={attached}
-                        usbPort={port}
-                        hubPort={port}
+                        usbPort={null}
+                        hubPort={null}
                       />
                     </React.Fragment>
                   ) : (
@@ -175,6 +175,52 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
                   </React.Fragment>
                   )
                   )
+                  } else {
+                    return Object.keys(modulesByPort).map(port =>
+                      attached === true ?
+                      (
+                      <React.Fragment
+                        key={`LabwareSetup_Module_${moduleModel}_${x}${y}`}
+                      >
+                        <ModuleViz
+                          x={x}
+                          y={y}
+                          orientation={orientation}
+                          moduleType={getModuleType(moduleModel)}
+                        />
+                        <ModuleInfo
+                          x={x}
+                          y={y}
+                          moduleModel={moduleModel}
+                          orientation={orientation}
+                          isAttached={attached}
+                          usbPort={port}
+                          hubPort={port}
+                        />
+                      </React.Fragment>
+                    ) : (
+                      <React.Fragment
+                      key={`LabwareSetup_Module_${moduleModel}_${x}${y}`}
+                    >
+                      <ModuleViz
+                        x={x}
+                        y={y}
+                        orientation={orientation}
+                        moduleType={getModuleType(moduleModel)}
+                      />
+                      <ModuleInfo
+                        x={x}
+                        y={y}
+                        moduleModel={moduleModel}
+                        orientation={orientation}
+                        isAttached={attached}
+                        usbPort={null}
+                        hubPort={null}
+                      />     
+                    </React.Fragment>
+                    )
+                    )
+                  }
                 })}
               </>
             )
@@ -182,16 +228,28 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
         </RobotWorkSpace>
       </Flex>
       <Flex justifyContent={JUSTIFY_CENTER} margin={SPACING_4}>
+        {moduleModels.length <= attachedModules.length? 
+        (
         <PrimaryBtn
           title={t('proceed_to_labware_setup_step')}
-          disabled={proceedToLabwareDisabled}
+          disabled={false}
           onClick={expandLabwareSetupStep}
           backgroundColor={C_BLUE}
           id={'ModuleSetup_proceedToLabwareSetup'}
         >
           {t('proceed_to_labware_setup_step')}
-        </PrimaryBtn> 
-        {proceedToLabwareDisabled}
+        </PrimaryBtn>
+       ) : (
+        <PrimaryBtn
+        title={t('proceed_to_labware_setup_step')}
+        disabled={true}
+        onClick={expandLabwareSetupStep}
+        backgroundColor={C_BLUE}
+      >
+        {t('proceed_to_labware_setup_step')}
+      </PrimaryBtn>
+      )
+      } 
       </Flex>
     </React.Fragment>
   )

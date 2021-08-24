@@ -24,7 +24,6 @@ import {
   STD_SLOT_X_DIM as SLOT_X,
   getModuleDisplayName,
 } from '@opentrons/shared-data'
-import type { AttachedModule } from '../../../redux/modules/types'
 
 
 export interface ModuleInfoProps {
@@ -87,9 +86,11 @@ export function ModuleInfo(props: ModuleInfoProps): JSX.Element {
         </Flex>
         <Text css={FONT_BODY_1_DARK}>{getModuleDisplayName(moduleModel)}</Text>
         <Text fontSize={FONT_SIZE_CAPTION} fontStyle={FONT_STYLE_ITALIC}>
-          {usbPort === null && hubPort === null
+          {usbPort === null && hubPort === null && !isAttached
             ? t('no_usb_port_yet')
-            : hubPort === null && usbPort !== null
+            : usbPort === null && hubPort === null && isAttached
+            ? t('usb_port_connected_old')
+            : hubPort === null && usbPort !== null && isAttached
             ? t('usb_port_connected') + ' ' + usbPort
             : t('usb_port_connected') +
               ' ' +

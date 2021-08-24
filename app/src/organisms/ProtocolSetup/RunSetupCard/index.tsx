@@ -25,10 +25,6 @@ import { getConnectedRobot } from '../../../redux/discovery/selectors'
 const robotName = 'opentrons-dev' // TODO Immediately: remove this after rebasing with Sarahs PR
 
 export function RunSetupCard(): JSX.Element | null {
-  const modules = useSelector((state: State) =>
-    getAttachedModules(state, robotName)
-  )
-  console.log(modules)
   const protocolData = useSelector((state: State) => getProtocolData(state))
   const moduleRenderCoords = getModuleRenderCoords(
     protocolData,
@@ -38,8 +34,8 @@ export function RunSetupCard(): JSX.Element | null {
     protocolData,
     standardDeckDef as any
   )
-  console.log('module model', moduleRenderCoords.moduleModel)
-  if (modules.length > 1) {
+
+  if (Object.values(moduleRenderCoords).length > 1) {
     var MODULE_SETUP_KEY = 'modules_setup_step'
   } else {
     var MODULE_SETUP_KEY = 'module_setup_step'
@@ -91,7 +87,7 @@ export function RunSetupCard(): JSX.Element | null {
       <ModuleSetup
         moduleRenderCoords={moduleRenderCoords}
         expandLabwareSetupStep={() => setExpandedStepKey(LABWARE_SETUP_KEY)}
-        robotName={'OT2CEP20190319A02'} //  TODO: immediately change robotName to actual robotName rather than hardcoded opentrons-dev
+        robotName={'opentrons-dev'} //  TODO: immediately change robotName to actual robotName rather than hardcoded opentrons-dev
       />
     ),
     [LABWARE_SETUP_KEY]: (
