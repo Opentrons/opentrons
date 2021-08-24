@@ -34,7 +34,7 @@ class RootFS:
         SD_CARD_MOUNT_POINT: str = '/media/mmcblk1p1'
 
     def __init__(self):
-        self.root_FS_config_ = self.RootFSConfig('' , '', '' , '',
+        self._root_FS_config = self.RootFSConfig('' , '', '' , '',
                                                  'mmcblk0',
                                                  'root_part', '2', '/media/mmcblkp1')
 
@@ -42,9 +42,9 @@ class RootFS:
         """ Run boot util command here to set partion
          Use the libubootenv utility to set bootargs
          boot.src has a carveout for bootargs, use that """
-        self.BootFSConfig_.BOOT_SRC_CARVE_OUT = arg.bco
+        self._root_FS_config.BOOT_SRC_CARVE_OUT = arg.bco
 
-        subprocess.run(["fw_setenv", self.root_FS_config_.BOOT_SRC_CARVE_OUT,
+        subprocess.run(["fw_setenv", self._root_FS_config.BOOT_SRC_CARVE_OUT,
                         "boot="+partition_name])
 
     def get_partition(self) -> RootFSInfo:
@@ -67,21 +67,21 @@ class RootFS:
            and swap it with the other available partition"""
         current_partition = self.get_partition()
         if current_partition is not None:
-            if current_partition.disk == self.root_FS_config_.ROOTFS_PART1:
-                self.set_partition(arg, self.root_FS_config_.ROOTFS_PART2)
+            if current_partition.disk == self._root_FS_config.ROOTFS_PART1:
+                self.set_partition(arg, self._root_FS_config.ROOTFS_PART2)
             else:
-                self.set_partition(arg, self.root_FS_config_.ROOTFS_PART1)
+                self.set_partition(arg, self._root_FS_config_.ROOTFS_PART1)
 
     def factory_restore(self, arg: argparse.Namespace) -> None:
         """" bmap to factory reset here"""
-        bmap = (self.root_FS_config_.SD_CARD_MOUNT_POINT +
-                self.root_FS_config_.BMAP_FILE)
-        bmap_img = (self.root_FS_config_.SD_CARD_MOUNT_POINT +
-                    self.root_FS_config_.BMAP_IMAGE)
+        bmap = (self._root_FS_config.SD_CARD_MOUNT_POINT +
+                self._root_FS_config.BMAP_FILE)
+        bmap_img = (self._root_FS_config.SD_CARD_MOUNT_POINT +
+                    self._root_FS_config.BMAP_IMAGE)
         subprocess.run(["bmaptool", "copy", "--bmap", bmap ,
                         "--no-sig-verify", "--no-verify",
                         bmap_img,
-                        self.root_FS_config_.DISK])
+                        self._root_FS_config.DISK])
 
     """ debug fuctions """
     def print_rootFS_partition(self, arg: argparse.Namespace) -> str:
@@ -90,14 +90,14 @@ class RootFS:
 
     def print_rootFS_config(self, arg: argparse.Namespace) -> str:
         return(('ROOTFS_TEST_TITLE '+arg.tt+'\n') +
-               ('ROOTFS_PART1 '+self.root_FS_config_.ROOTFS_PART1+'\n') +
-               ('ROOTFS_PART2 '+self.root_FS_config_.ROOTFS_PART2+'\n') +
-               ('BMAP_IMAGE '+self.root_FS_config_.BMAP_IMAGE+'\n') +
-               ('BMAP_FILE '+self.root_FS_config_.BMAP_FILE+'\n') +
-               ('DISK '+self.root_FS_config_.DISK+'\n') +
-               ('BOOT_SRC_CARVE_OUT '+self.root_FS_config_.BOOT_SRC_CARVE_OUT+'\n') +
-               ('ROOT_FS_PARTITION '+self.root_FS_config_.ROOT_FS_PARTITION+'\n') +
-               ('SD_CARD_MOUNT_POINT '+self.root_FS_config_.SD_CARD_MOUNT_POINT+'\n')
+               ('ROOTFS_PART1 '+self._root_FS_config.ROOTFS_PART1+'\n') +
+               ('ROOTFS_PART2 '+self._root_FS_config.ROOTFS_PART2+'\n') +
+               ('BMAP_IMAGE '+self._root_FS_config.BMAP_IMAGE+'\n') +
+               ('BMAP_FILE '+self._root_FS_config.BMAP_FILE+'\n') +
+               ('DISK '+self._root_FS_config.DISK+'\n') +
+               ('BOOT_SRC_CARVE_OUT '+self._root_FS_config.BOOT_SRC_CARVE_OUT+'\n') +
+               ('ROOT_FS_PARTITION '+self._root_FS_config.ROOT_FS_PARTITION+'\n') +
+               ('SD_CARD_MOUNT_POINT '+self._root_FS_config.SD_CARD_MOUNT_POINT+'\n')
                )
 
     def debug(self, arg: argparse.Namespace) -> None:
