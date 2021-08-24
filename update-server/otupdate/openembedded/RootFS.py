@@ -88,7 +88,7 @@ class RootFS:
         tmp = self.get_partition()
         return ('Current RootFS Partition '+tmp.disk+'\n')
 
-    def print_rootFS_config(self,arg: argparse.Namespace) -> str:
+    def print_rootFS_config(self, arg: argparse.Namespace) -> str:
         return(('ROOTFS_TEST_TITLE '+arg.tt+'\n') +
                ('ROOTFS_PART1 '+self.root_FS_config_.ROOTFS_PART1+'\n') +
                ('ROOTFS_PART2 '+self.root_FS_config_.ROOTFS_PART2+'\n') +
