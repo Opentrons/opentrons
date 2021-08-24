@@ -70,7 +70,7 @@ class RootFS:
             if current_partition.disk == self._root_FS_config.ROOTFS_PART1:
                 self.set_partition(arg, self._root_FS_config.ROOTFS_PART2)
             else:
-                self.set_partition(arg, self._root_FS_config_.ROOTFS_PART1)
+                self.set_partition(arg, self._root_FS_config.ROOTFS_PART1)
 
     def factory_restore(self, arg: argparse.Namespace) -> None:
         """" bmap to factory reset here"""
