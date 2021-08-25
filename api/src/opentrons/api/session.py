@@ -477,7 +477,16 @@ class Session(RobotBusy):
         self.set_state('stopped')
 
     def _drop_tip_after_cancel(self, saved_tip_length: Dict) -> None:
-        """Perform a drop_tip on the pipette with a tip."""
+        """ Perform a drop_tip on the pipette with a tip.
+
+        Note: Moving the plunger the right amount to drop the tip depends on
+              knowing the previous plunger location. When the smoothie board is issued
+              a `halt`, we need to reset it in order to resume communication.
+              BUT, it seems like the smoothie doesn't wipe out the cached locations upon
+              reset, so, we can just resume moving the plunger without homing it first.
+              This behavior has been consistent so far but if ends up being unreliable
+              then we will have change this logic.
+        """
         assert self.instruments, "No instruments found for performing a drop tip."
         for instrument_wrapper in self.instruments:
             mount = MountType.string_to_mount(instrument_wrapper.mount)
