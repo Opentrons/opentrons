@@ -8,6 +8,7 @@ import { stringify } from 'svgson'
 import { THERMOCYCLER_MODULE_V1, getModuleDef2 } from '@opentrons/shared-data'
 
 import { RobotCoordsForeignDiv } from '../Deck'
+import { ModuleFromDef } from './ModuleFromDef'
 
 import { C_MED_LIGHT_GRAY } from '../../styles'
 
@@ -35,12 +36,17 @@ export function Thermocycler(props: ThermocyclerVizProps): JSX.Element {
       />
     )
   }
-  const layers = def.twoDimensionalRendering.children.filter(g =>
-    !g.attributes?.id.startsWith(lidMotorState === 'open' ? 'closed' : 'open')
+  const layerBlocklist = def.twoDimensionalRendering.children.reduce<string[]>(
+    (layerBlockList, layer) => {
+      const {id} = layer.attributes
+      if (id != null && id.startsWith(lidMotorState === 'open' ? 'closed' : 'open')){
+        return [...layerBlockList, id]
+      }
+      return layerBlockList
+    },
+    []
   )
   return (
-    <g transform={`translate(${def.cornerOffsetFromSlot.x},${def.cornerOffsetFromSlot.y})`}>
-      {parseHtml(stringify(layers, {selfClose: false}))}
-    </g>
+    <ModuleFromDef def={def} layerBlocklist={layerBlocklist} />
   )
 }

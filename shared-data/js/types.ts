@@ -15,6 +15,7 @@ import {
   LEFT,
   RIGHT,
 } from './constants'
+import type { INode } from 'svgson'
 
 // TODO Ian 2019-06-04 split this out into eg ../labware/flowTypes/labwareV1.js
 export interface WellDefinition {
@@ -81,11 +82,12 @@ export interface LabwareDimensions {
   zDimension: number
 }
 
-export interface LabwareOffset {
+export interface Coordinates {
   x: number
   y: number
   z: number
 }
+export type LabwareOffset = Coordinates
 
 // 1. Valid pipette type for a container (i.e. is there multi channel access?)
 // 2. Is the container a tiprack?
@@ -262,7 +264,11 @@ export interface DeckDefinition {
 export interface ModuleDimensions {
   bareOverallHeight: number
   overLabwareHeight: number
-  lidHeight: number
+  xDimension: number
+  yDimension: number
+  footprintXDimension?: number
+  footprintYDimension?: number
+  lidHeight?: number
 }
 
 export interface ModuleCalibrationPoint {
@@ -275,14 +281,34 @@ export interface ModuleLayer {
   name: string
   pathDValues: string[]
 }
+
+// module definition that adheres to the v3 module json schema
 export interface ModuleDefinition {
-  labwareOffset: LabwareOffset
+  moduleType: ModuleType
+  model: ModuleModel
+  labwareOffset: Coordinates
   dimensions: ModuleDimensions
+  cornerOffsetFromSlot: Coordinates
   calibrationPoint: ModuleCalibrationPoint
   displayName: string
-  loadName: string
   quirks: string[]
-  layers: ModuleLayer[]
+  slotTransforms: SlotTransforms
+  compatibleWith: ModuleModel[]
+  twoDimensionalRendering: INode
+}
+
+export type AffineTransformMatrix = [
+  [number, number, number],
+  [number, number, number],
+  [number, number, number]
+]
+
+export type SlotTransforms = {
+  [deckOtId: string]: {
+    [slotId: string]: {
+      [transformKey in keyof ModuleDefinition]?: AffineTransformMatrix
+    }
+  }
 }
 
 export type ModuleOrientation = 'left' | 'right'
