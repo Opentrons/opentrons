@@ -57,7 +57,10 @@ async def test_protocol_runner_with_python(
 ) -> None:
     """It should run a Python protocol on the ProtocolRunner."""
     subject.load(
-        ProtocolFile(file_path=python_protocol_file, file_type=ProtocolFileType.PYTHON)
+        ProtocolFile(
+            protocol_type=ProtocolFileType.PYTHON,
+            files=[python_protocol_file],
+        )
     )
 
     subject.play()
@@ -112,7 +115,10 @@ async def test_protocol_runner_with_json(
 ) -> None:
     """It should run a JSON protocol on the ProtocolRunner."""
     subject.load(
-        ProtocolFile(file_path=json_protocol_file, file_type=ProtocolFileType.JSON)
+        ProtocolFile(
+            protocol_type=ProtocolFileType.JSON,
+            files=[json_protocol_file],
+        )
     )
 
     subject.play()

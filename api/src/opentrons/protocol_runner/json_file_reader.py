@@ -8,7 +8,8 @@ class JsonFileReader:
     """Reads and parses JSON protocol files."""
 
     @staticmethod
-    def read(file: ProtocolFile) -> JsonProtocol:
+    def read(protocol_file: ProtocolFile) -> JsonProtocol:
         """Read and parse file into a JsonProtocol model."""
-        contents = file.file_path.read_text(encoding="utf-8")
+        # TODO(mc, 2021-08-25): validate files list length before access
+        contents = protocol_file.files[0].read_text(encoding="utf-8")
         return JsonProtocol.parse_raw(contents)

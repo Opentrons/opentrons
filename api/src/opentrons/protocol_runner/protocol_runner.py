@@ -51,12 +51,12 @@ class ProtocolRunner:
         Calling this method is only necessary if the runner will be used
         to control the run of a file-based protocol.
         """
-        file_type = protocol_file.file_type
+        protocol_type = protocol_file.protocol_type
 
-        if file_type == ProtocolFileType.JSON:
+        if protocol_type == ProtocolFileType.JSON:
             self._load_json(protocol_file)
 
-        elif file_type == ProtocolFileType.PYTHON:
+        elif protocol_type == ProtocolFileType.PYTHON:
             self._load_python(protocol_file)
 
     def play(self) -> None:

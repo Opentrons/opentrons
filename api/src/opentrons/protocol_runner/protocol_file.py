@@ -7,6 +7,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
+from typing import List
 
 
 class ProtocolFileType(str, Enum):
@@ -23,11 +24,12 @@ class ProtocolFileType(str, Enum):
 
 @dataclass(frozen=True)
 class ProtocolFile:
-    """A value object representing a protocol file on disk.
+    """A value object representing a protocol file (or files) on disk.
 
     Attributes:
-        file_type: Whether the file is a JSON protocol or Python protocol
+        protocol_type: Whether the file is a JSON protocol or Python protocol.
+        files: The list of files that make up the protocol.
     """
 
-    file_path: Path
-    file_type: ProtocolFileType
+    protocol_type: ProtocolFileType
+    files: List[Path]
