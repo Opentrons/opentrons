@@ -159,15 +159,11 @@ export interface LabwareDefinition2 {
   groups: LabwareWellGroup[]
 }
 
-// Module Type corresponds to `moduleType` key in a module definition. Is NOT model.
-// TODO: IL 2020-02-20 ModuleType is DEPRECATED. Replace all instances with ModuleRealType
-// (then finally rename ModuleRealType -> ModuleType)
-export type ModuleType = typeof MAGDECK | typeof TEMPDECK | typeof THERMOCYCLER
-
-export type ModuleRealType =
+export type ModuleType =
   | typeof MAGNETIC_MODULE_TYPE
   | typeof TEMPERATURE_MODULE_TYPE
   | typeof THERMOCYCLER_MODULE_TYPE
+
 // ModuleModel corresponds to top-level keys in shared-data/module/definitions/2
 export type MagneticModuleModel =
   | typeof MAGNETIC_MODULE_V1

@@ -15,7 +15,7 @@ import {
   THERMOCYCLER_MODULE_V1,
 } from './constants'
 
-import type { ModuleModel, ModuleRealType, ModuleType } from './types'
+import type { ModuleModel, ModuleType } from './types'
 
 // The module objects in v2 Module Definitions representing a single module model
 interface Coordinates {
@@ -27,7 +27,7 @@ interface Coordinates {
 type AffineTransform = [number, number, number]
 
 export interface ModuleDef2 {
-  moduleType: ModuleRealType
+  moduleType: ModuleType
   model: ModuleModel
   labwareOffset: Coordinates
   dimensions: {
@@ -87,7 +87,7 @@ export function normalizeModuleModel(legacyModule: ModuleType): ModuleModel {
   }
 }
 
-export function getModuleType(moduleModel: ModuleModel): ModuleRealType {
+export function getModuleType(moduleModel: ModuleModel): ModuleType {
   return getModuleDef2(moduleModel).moduleType
 }
 

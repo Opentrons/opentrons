@@ -5,13 +5,13 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
   LabwareDefinition2,
-  ModuleRealType,
+  ModuleType,
 } from '@opentrons/shared-data'
 import { LabwareDefByDefURI } from '../labware-defs'
 import { LabwareOnDeck } from '../step-forms'
 // NOTE: this does not distinguish btw versions. Standard labware only (assumes namespace is 'opentrons')
 const COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE: Record<
-  ModuleRealType,
+  ModuleType,
   Readonly<string[]>
 > = {
   [TEMPERATURE_MODULE_TYPE]: [
@@ -53,7 +53,7 @@ const COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE: Record<
 }
 export const getLabwareIsCompatible = (
   def: LabwareDefinition2,
-  moduleType: ModuleRealType
+  moduleType: ModuleType
 ): boolean => {
   assert(
     moduleType in COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE,

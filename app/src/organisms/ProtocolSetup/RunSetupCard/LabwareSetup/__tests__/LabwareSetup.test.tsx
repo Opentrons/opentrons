@@ -6,7 +6,7 @@ import {
   inferModuleOrientationFromXCoordinate,
   LabwareDefinition2,
   ModuleModel,
-  ModuleRealType,
+  ModuleType,
 } from '@opentrons/shared-data'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
@@ -104,14 +104,14 @@ const mockMagneticModule = {
   labwareOffset: { x: 5, y: 5, z: 5 },
   moduleId: 'someMagneticModule',
   model: 'magneticModuleV2' as ModuleModel,
-  type: 'magneticModuleType' as ModuleRealType,
+  type: 'magneticModuleType' as ModuleType,
 }
 
 const mockTCModule = {
   labwareOffset: { x: 3, y: 3, z: 3 },
   moduleId: 'TCModuleId',
   model: 'thermocyclerModuleV1' as ModuleModel,
-  type: 'thermocyclerModuleType' as ModuleRealType,
+  type: 'thermocyclerModuleType' as ModuleType,
 }
 
 describe('LabwareSetup', () => {

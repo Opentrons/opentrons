@@ -25,7 +25,7 @@ import type { ReactWrapper } from 'enzyme'
 import type { Dispatch } from 'redux'
 import { DispatchRequestsType } from '../../../redux/robot-api'
 
-jest.mock('@opentrons/components/src/deck/getDeckDefinitions')
+jest.mock('@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions')
 jest.mock('../../../redux/sessions/selectors')
 jest.mock('../../../redux/robot-api/selectors')
 

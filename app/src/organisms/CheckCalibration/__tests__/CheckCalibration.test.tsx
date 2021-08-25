@@ -24,7 +24,7 @@ import type { ReactWrapper } from 'enzyme'
 import type { Dispatch } from '../../../redux/types'
 import type { RobotCalibrationCheckStep } from '../../../redux/sessions/types'
 
-jest.mock('@opentrons/components/src/deck/getDeckDefinitions')
+jest.mock('@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions')
 jest.mock('../../../redux/calibration/selectors')
 
 interface CheckCalibrationSpec {

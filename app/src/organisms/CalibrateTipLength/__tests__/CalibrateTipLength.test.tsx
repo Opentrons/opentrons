@@ -22,7 +22,7 @@ import {
 import type { TipLengthCalibrationStep } from '../../../redux/sessions/types'
 import type { ReactWrapper } from 'enzyme'
 
-jest.mock('@opentrons/components/src/deck/getDeckDefinitions')
+jest.mock('@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions')
 jest.mock('../../../redux/sessions/selectors')
 jest.mock('../../../redux/robot-api/selectors')
 

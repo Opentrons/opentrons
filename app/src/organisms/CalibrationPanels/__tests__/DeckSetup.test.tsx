@@ -14,8 +14,8 @@ import type { ReactWrapper } from 'enzyme'
 import type { Mount } from '@opentrons/components'
 
 jest.mock('../../../assets/labware/getLabware')
-jest.mock('@opentrons/components/src/deck/getDeckDefinitions')
-jest.mock('@opentrons/components/src/deck/RobotWorkSpace', () => ({
+jest.mock('@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions')
+jest.mock('@opentrons/components/src/hardware-sim/Deck/RobotWorkSpace', () => ({
   RobotWorkSpace: () => <></>,
 }))
 
