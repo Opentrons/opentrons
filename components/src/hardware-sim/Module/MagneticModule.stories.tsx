@@ -6,28 +6,15 @@ import { Module } from './'
 
 import type { RobotWorkSpaceRenderProps } from '../Deck'
 import type { Story, Meta } from '@storybook/react'
-import { TEMPERATURE_MODULE_V2 } from '@opentrons/shared-data'
+import { MAGNETIC_MODULE_V2 } from '@opentrons/shared-data'
 
 const slots = ['1', '3', '4', '6', '7', '9', '10']
 
 export default {
-  title: 'Library/Molecules/Simulation/Modules/Temperature Module'
+  title: 'Library/Molecules/Simulation/Modules/Magnetic Module'
 } as Meta
 
-const Template: Story<{slot: string, standaloneSVG: boolean}> = args => {
-  if (args.standaloneSVG)
-  return (
-    <Module
-      x={0}
-      y={0}
-      model={TEMPERATURE_MODULE_V2}
-      orientation={
-        ['3','6','9'].includes(args.slot)
-          ? 'right'
-          : 'left'
-      }
-      standaloneSVG />
-  )
+const Template: Story<{slot: string}> = args => {
   return (
     <RobotWorkSpace deckDef={getDeckDefinitions()['ot2_standard']}>
       {({ deckSlotsById }: RobotWorkSpaceRenderProps) => {
@@ -36,13 +23,12 @@ const Template: Story<{slot: string, standaloneSVG: boolean}> = args => {
           <Module
             x={slot.position[0]}
             y={slot.position[1]}
-            model={TEMPERATURE_MODULE_V2}
+            model={MAGNETIC_MODULE_V2}
             orientation={
               ['3','6','9'].includes(args.slot)
                 ? 'right'
                 : 'left'
-            }
-            standaloneSVG={args.standaloneSVG} />
+            } />
         )
       }}
     </RobotWorkSpace>
@@ -56,11 +42,5 @@ TemperatureModule.argTypes = {
       options: slots
     },
     defaultValue: slots[0],
-  },
-  standaloneSVG: {
-    control: {
-      type: 'boolean',
-    },
-    defaultValue: false,
   },
 }

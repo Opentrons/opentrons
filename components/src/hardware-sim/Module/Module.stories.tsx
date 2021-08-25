@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { getModuleDef2, MAGNETIC_MODULE_V1, MAGNETIC_MODULE_V2, ModuleModel, TEMPERATURE_MODULE_V1, TEMPERATURE_MODULE_V2, THERMOCYCLER_MODULE_V1 } from '@opentrons/shared-data'
+import { MAGNETIC_MODULE_V1, MAGNETIC_MODULE_V2, ModuleModel, TEMPERATURE_MODULE_V1, TEMPERATURE_MODULE_V2, THERMOCYCLER_MODULE_V1 } from '@opentrons/shared-data'
 import { RobotWorkSpace } from '../Deck/RobotWorkSpace'
 import { getDeckDefinitions } from '../Deck/getDeckDefinitions'
 

@@ -15,63 +15,39 @@ import {
   THERMOCYCLER_MODULE_V1,
 } from './constants'
 
-import type { ModuleModel, ModuleType } from './types'
+import type {
+  ModuleModel,
+  ModuleModelWithLegacy,
+  ModuleType,
+  ModuleDefinition,
+} from './types'
 
-// The module objects in v2 Module Definitions representing a single module model
-interface Coordinates {
-  x: number
-  y: number
-  z?: number
-}
-
-type AffineTransform = [number, number, number]
-
-export interface ModuleDef2 {
-  moduleType: ModuleType
-  model: ModuleModel
-  labwareOffset: Coordinates
-  dimensions: {
-    bareOverallHeight: number
-    overLabwareHeight: number
-    lidHeight?: number
-  }
-  calibrationPoint: Coordinates
-  displayName: string
-  quirks: string[]
-  slotTransforms: {
-    [deckDef: string]: {
-      [slot: string]: {
-        [transformName: string]: AffineTransform
-      }
-    }
-  }
-  compatibleWith: ModuleModel[]
-}
-
-// TODO IMMEDIATELY: Phase out code that uses legacy models
-export const getModuleDef2 = (moduleModel: ModuleModel): ModuleDef2 => {
+// TODO: generate typescript types directly from JSON schema
+export const getModuleDef2 = (moduleModel: ModuleModel): ModuleDefinition => {
   switch (moduleModel) {
     case MAGNETIC_MODULE_V1:
-      return magneticModuleV1 as ModuleDef2
+      return magneticModuleV1 as ModuleDefinition
 
     case MAGNETIC_MODULE_V2:
-      return (magneticModuleV2 as unknown) as ModuleDef2
+      return (magneticModuleV2 as unknown) as ModuleDefinition
 
     case TEMPERATURE_MODULE_V1:
-      return temperatureModuleV1 as ModuleDef2
+      return temperatureModuleV1 as ModuleDefinition
 
     case TEMPERATURE_MODULE_V2:
-      return (temperatureModuleV2 as unknown) as ModuleDef2
+      return (temperatureModuleV2 as unknown) as ModuleDefinition
 
     case THERMOCYCLER_MODULE_V1:
-      return thermocyclerModuleV1 as ModuleDef2
+      return thermocyclerModuleV1 as ModuleDefinition
 
     default:
       throw new Error(`Invalid module model ${moduleModel as string}`)
   }
 }
 
-export function normalizeModuleModel(legacyModule: ModuleType): ModuleModel {
+export function normalizeModuleModel(
+  legacyModule: ModuleModelWithLegacy
+): ModuleModel {
   switch (legacyModule) {
     case TEMPDECK:
       return TEMPERATURE_MODULE_V1
