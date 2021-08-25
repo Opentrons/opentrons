@@ -5,6 +5,7 @@ from typing import List
 from typing_extensions import Literal
 
 from robot_server.errors import ErrorDetails, ErrorResponse
+from robot_server.service.task_runner import TaskRunner
 from robot_server.service.dependencies import get_unique_id, get_current_time
 from robot_server.service.json_api import (
     ResponseModel,
@@ -12,14 +13,16 @@ from robot_server.service.json_api import (
     EmptyResponseModel,
 )
 
-from .dependencies import get_protocol_store
+from .dependencies import get_protocol_store, get_protocol_analyzer
 from .protocol_models import Protocol
+from .protocol_analyzer import ProtocolAnalyzer
+from .response_builder import ResponseBuilder
+
 from .protocol_store import (
     ProtocolStore,
     ProtocolNotFoundError,
     ProtocolFileInvalidError,
 )
-from .response_builder import ResponseBuilder
 
 
 class ProtocolNotFound(ErrorDetails):
@@ -52,6 +55,8 @@ async def create_protocol(
     files: List[UploadFile] = File(...),
     response_builder: ResponseBuilder = Depends(ResponseBuilder),
     protocol_store: ProtocolStore = Depends(get_protocol_store),
+    protocol_analyzer: ProtocolAnalyzer = Depends(get_protocol_analyzer),
+    task_runner: TaskRunner = Depends(TaskRunner),
     protocol_id: str = Depends(get_unique_id),
     created_at: datetime = Depends(get_current_time),
 ) -> ResponseModel[Protocol]:
@@ -61,6 +66,8 @@ async def create_protocol(
         files: List of uploaded files, from form-data.
         response_builder: Interface to construct response models.
         protocol_store: In-memory database of protocol resources.
+        protocol_analyzer: Protocol analysis interface.
+        task_runner: Background task runner.
         protocol_id: Unique identifier to attach to the new resource.
         created_at: Timestamp to attach to the new resource.
     """
@@ -68,7 +75,7 @@ async def create_protocol(
         raise NotImplementedError("Multi-file protocols not yet supported.")
 
     try:
-        protocol_entry = await protocol_store.create(
+        protocol_resource = await protocol_store.create(
             protocol_id=protocol_id,
             created_at=created_at,
             files=files,
@@ -76,7 +83,8 @@ async def create_protocol(
     except ProtocolFileInvalidError as e:
         raise ProtocolFileInvalid(detail=str(e)).as_error(status.HTTP_400_BAD_REQUEST)
 
-    data = response_builder.build(protocol_entry)
+    task_runner.run(protocol_analyzer.analyze, protocol_resource=protocol_resource)
+    data = response_builder.build(protocol_resource)
 
     return ResponseModel(data=data)
 

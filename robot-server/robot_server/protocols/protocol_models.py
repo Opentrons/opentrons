@@ -2,8 +2,11 @@
 from __future__ import annotations
 from datetime import datetime
 from pydantic import Field
+from typing import Union
+
 from opentrons.protocol_runner import ProtocolFileType
 from robot_server.service.json_api import ResourceModel
+from .analysis_models import PendingAnalysis, CompletedAnalysis
 
 
 class Protocol(ResourceModel):
@@ -14,4 +17,8 @@ class Protocol(ResourceModel):
     protocolType: ProtocolFileType = Field(
         ...,
         description="The type of protocol file (JSON or Python).",
+    )
+    analysis: Union[PendingAnalysis, CompletedAnalysis] = Field(
+        ...,
+        description="An analysis of how the protocol is expected to run.",
     )

@@ -3,7 +3,9 @@ from fastapi import Request
 from logging import getLogger
 from pathlib import Path
 from tempfile import gettempdir
+
 from .protocol_store import ProtocolStore
+from .protocol_analyzer import ProtocolAnalyzer
 
 log = getLogger(__name__)
 
@@ -21,3 +23,8 @@ def get_protocol_store(request: Request) -> ProtocolStore:
         setattr(request.app.state, PROTOCOL_STORE_KEY, protocol_store)
 
     return protocol_store
+
+
+def get_protocol_analyzer() -> ProtocolAnalyzer:
+    """Construct a ProtocolAnalyzer for a single request."""
+    raise NotImplementedError("get_protocol_analyzer not yet implemented")

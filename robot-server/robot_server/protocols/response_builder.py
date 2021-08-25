@@ -1,6 +1,7 @@
 """Protocol response model factory."""
 from .protocol_store import ProtocolResource
 from .protocol_models import Protocol
+from .analysis_models import PendingAnalysis
 
 
 class ResponseBuilder:
@@ -20,4 +21,5 @@ class ResponseBuilder:
             id=protocol_entry.protocol_id,
             protocolType=protocol_entry.protocol_type,
             createdAt=protocol_entry.created_at,
+            analysis=PendingAnalysis(),
         )

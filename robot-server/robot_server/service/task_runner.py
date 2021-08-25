@@ -6,12 +6,12 @@ and end-to-end tests.
 """
 from fastapi import BackgroundTasks
 from logging import getLogger
-from typing import Awaitable, Callable
+from typing import Any, Awaitable, Callable
 
 log = getLogger(__name__)
 
 
-TaskFunc = Callable[[], Awaitable[None]]
+TaskFunc = Callable[..., Awaitable[None]]
 
 
 class TaskRunner:
@@ -26,7 +26,7 @@ class TaskRunner:
         """
         self._background_tasks = background_tasks
 
-    def run(self, func: TaskFunc) -> None:
+    def run(self, func: TaskFunc, **kwargs: Any) -> None:
         """Run an async function in the background.
 
         Will log when the function completes, including any error

@@ -6,6 +6,7 @@ from pathlib import Path
 from opentrons.protocol_runner import ProtocolFileType
 from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.protocols.protocol_models import Protocol
+from robot_server.protocols.analysis_models import PendingAnalysis
 from robot_server.protocols.response_builder import ResponseBuilder
 
 
@@ -33,4 +34,5 @@ def test_create_single_json_file_response(
         id="protocol-id",
         protocolType=ProtocolFileType.JSON,
         createdAt=current_time,
+        analysis=PendingAnalysis(),
     )

@@ -1,7 +1,7 @@
 """Protocol run control and management."""
-from typing import Optional
+from typing import Optional, Sequence
 
-from opentrons.protocol_engine import ProtocolEngine
+from opentrons.protocol_engine import ProtocolEngine, Command as ProtocolCommand
 
 from .protocol_file import ProtocolFile, ProtocolFileType
 from .task_queue import TaskQueue, TaskQueuePhase
@@ -86,6 +86,18 @@ class ProtocolRunner:
         it will wait for the run to start before waiting for completion.
         """
         return await self._task_queue.join()
+
+    async def run(self, protocol_file: ProtocolFile) -> Sequence[ProtocolCommand]:
+        """Run a given protocol to completion.
+
+        Equivalent of calling, in order:
+
+        1. protocol_runner.load(protocol_file)
+        2. protocol_runner.start()
+        3. await protocol_runner.join()
+        4. protocol_engine.state.commands.get_all()
+        """
+        raise NotImplementedError("ProtocolRunner.run not yet implemented")
 
     def _load_json(self, protocol_file: ProtocolFile) -> None:
         protocol = self._json_file_reader.read(protocol_file)
