@@ -1,8 +1,6 @@
-"""Protocol analysis module.
-
-Apologies for the American English spelling of analyzer.
-"""
-# TODO(mc, 2021-08-25): eventually, move this to opentrons.protocol_analyzer
+"""Protocol analysis module."""
+from typing import Sequence
+from opentrons.protocol_engine import Command as ProtocolCommand
 from opentrons.protocol_runner import ProtocolRunner
 
 from .protocol_store import ProtocolResource
@@ -10,7 +8,7 @@ from .analysis_store import AnalysisStore
 
 
 class ProtocolAnalyzer:
-    """An interface to perform a run analysis of a protocol."""
+    """A collaborator to perform an analysis of a protocol and store the result."""
 
     def __init__(
         self,
@@ -23,8 +21,16 @@ class ProtocolAnalyzer:
 
     async def analyze(self, protocol_resource: ProtocolResource) -> None:
         """Analyze a given protocol, storing the analysis when complete."""
-        commands = await self._protocol_runner.run(protocol_resource)
+        commands: Sequence[ProtocolCommand] = []
+        errors: Sequence[Exception] = []
+
+        try:
+            commands = await self._protocol_runner.run(protocol_resource)
+        except Exception as e:
+            errors = [e]
+
         self._analysis_store.add(
             protocol_id=protocol_resource.protocol_id,
             commands=commands,
+            errors=errors,
         )

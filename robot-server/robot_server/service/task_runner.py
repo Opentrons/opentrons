@@ -41,7 +41,7 @@ class TaskRunner:
 
         async def _run_async_task() -> None:
             try:
-                await func()
+                await func(**kwargs)
                 log.debug(f"Background task {func_name} succeeded")
             except Exception as e:
                 log.warning(f"Background task {func_name} failed", exc_info=e)

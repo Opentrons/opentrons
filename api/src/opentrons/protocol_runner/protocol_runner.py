@@ -87,17 +87,13 @@ class ProtocolRunner:
         """
         return await self._task_queue.join()
 
+    # TODO(mc, 2021-08-25): return errors along with commands
     async def run(self, protocol_file: ProtocolFile) -> Sequence[ProtocolCommand]:
-        """Run a given protocol to completion.
-
-        Equivalent of calling, in order:
-
-        1. protocol_runner.load(protocol_file)
-        2. protocol_runner.start()
-        3. await protocol_runner.join()
-        4. protocol_engine.state.commands.get_all()
-        """
-        raise NotImplementedError("ProtocolRunner.run not yet implemented")
+        """Run a given protocol to completion."""
+        self.load(protocol_file)
+        self.play()
+        await self.join()
+        return self._protocol_engine.state_view.commands.get_all()
 
     def _load_json(self, protocol_file: ProtocolFile) -> None:
         protocol = self._json_file_reader.read(protocol_file)

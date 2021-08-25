@@ -67,5 +67,34 @@ async def test_analyze(
     await subject.analyze(protocol_resource)
 
     decoy.verify(
-        analysis_store.add(protocol_id="protocol-id", commands=analysis_commands),
+        analysis_store.add(
+            protocol_id="protocol-id",
+            commands=analysis_commands,
+            errors=[],
+        ),
+    )
+
+
+async def test_analyze_error(
+    decoy: Decoy,
+    protocol_runner: ProtocolRunner,
+    analysis_store: AnalysisStore,
+    subject: ProtocolAnalyzer,
+) -> None:
+    """It should handle errors raised by the runner."""
+    protocol_resource = ProtocolResource(
+        protocol_id="protocol-id",
+        protocol_type=ProtocolFileType.JSON,
+        created_at=datetime(year=2021, month=1, day=1),
+        files=[Path("/dev/null")],
+    )
+
+    error = RuntimeError("oh no")
+
+    decoy.when(await protocol_runner.run(protocol_resource)).then_raise(error)
+
+    await subject.analyze(protocol_resource)
+
+    decoy.verify(
+        analysis_store.add(protocol_id="protocol-id", commands=[], errors=[error]),
     )
