@@ -7,9 +7,15 @@ from starlette.datastructures import UploadFile
 from robot_server.errors import ApiError
 from robot_server.service.task_runner import TaskRunner
 from robot_server.protocols.protocol_models import Protocol, ProtocolFileType
-from robot_server.protocols.analysis_models import PendingAnalysis
+from robot_server.protocols.analysis_store import AnalysisStore
 from robot_server.protocols.protocol_analyzer import ProtocolAnalyzer
 from robot_server.protocols.response_builder import ResponseBuilder
+
+from robot_server.protocols.analysis_models import (
+    PendingAnalysis,
+    CompletedAnalysis,
+    AnalysisStatus,
+)
 
 from robot_server.protocols.protocol_store import (
     ProtocolStore,
@@ -45,45 +51,63 @@ async def test_get_protocols_no_protocols(
 async def test_get_protocols(
     decoy: Decoy,
     protocol_store: ProtocolStore,
+    analysis_store: AnalysisStore,
     response_builder: ResponseBuilder,
 ) -> None:
     """It should return stored protocols."""
     created_at_1 = datetime(year=2021, month=1, day=1)
     created_at_2 = datetime(year=2022, month=2, day=2)
 
-    entry_1 = ProtocolResource(
+    resource_1 = ProtocolResource(
         protocol_id="abc",
         protocol_type=ProtocolFileType.PYTHON,
         created_at=created_at_1,
         files=[],
     )
-    entry_2 = ProtocolResource(
+    resource_2 = ProtocolResource(
         protocol_id="123",
         protocol_type=ProtocolFileType.JSON,
         created_at=created_at_2,
         files=[],
     )
 
+    analysis_1 = PendingAnalysis()
+
+    analysis_2 = CompletedAnalysis(
+        status=AnalysisStatus.SUCCEEDED,
+        pipettes=[],
+        labware=[],
+        commands=[],
+        errors=[],
+    )
+
     protocol_1 = Protocol(
         id="abc",
         createdAt=created_at_1,
         protocolType=ProtocolFileType.PYTHON,
-        analysis=PendingAnalysis(),
+        analysis=analysis_1,
     )
     protocol_2 = Protocol(
         id="123",
         createdAt=created_at_2,
         protocolType=ProtocolFileType.JSON,
-        analysis=PendingAnalysis(),
+        analysis=analysis_2,
     )
 
-    decoy.when(protocol_store.get_all()).then_return([entry_1, entry_2])
-    decoy.when(response_builder.build(entry_1)).then_return(protocol_1)
-    decoy.when(response_builder.build(entry_2)).then_return(protocol_2)
+    decoy.when(protocol_store.get_all()).then_return([resource_1, resource_2])
+    decoy.when(analysis_store.get("abc")).then_return(analysis_1)
+    decoy.when(analysis_store.get("123")).then_return(analysis_2)
+    decoy.when(
+        response_builder.build(resource=resource_1, analysis=analysis_1)
+    ).then_return(protocol_1)
+    decoy.when(
+        response_builder.build(resource=resource_2, analysis=analysis_2)
+    ).then_return(protocol_2)
 
     result = await get_protocols(
         response_builder=response_builder,
         protocol_store=protocol_store,
+        analysis_store=analysis_store,
     )
 
     assert result.data == [protocol_1, protocol_2]
@@ -92,30 +116,41 @@ async def test_get_protocols(
 async def test_get_protocol_by_id(
     decoy: Decoy,
     protocol_store: ProtocolStore,
+    analysis_store: AnalysisStore,
     response_builder: ResponseBuilder,
 ) -> None:
     """It should return a single protocol file."""
-    created_at = datetime.now()
-    entry = ProtocolResource(
+    resource = ProtocolResource(
         protocol_id="protocol-id",
         protocol_type=ProtocolFileType.PYTHON,
-        created_at=created_at,
+        created_at=datetime(year=2021, month=1, day=1),
         files=[],
+    )
+    analysis = CompletedAnalysis(
+        status=AnalysisStatus.SUCCEEDED,
+        pipettes=[],
+        labware=[],
+        commands=[],
+        errors=[],
     )
     protocol = Protocol(
         id="protocol-id",
-        createdAt=created_at,
+        createdAt=datetime(year=2021, month=1, day=1),
         protocolType=ProtocolFileType.PYTHON,
-        analysis=PendingAnalysis(),
+        analysis=analysis,
     )
 
-    decoy.when(protocol_store.get(protocol_id="protocol-id")).then_return(entry)
-    decoy.when(response_builder.build(entry)).then_return(protocol)
+    decoy.when(protocol_store.get(protocol_id="protocol-id")).then_return(resource)
+    decoy.when(analysis_store.get(protocol_id="protocol-id")).then_return(analysis)
+    decoy.when(
+        response_builder.build(resource=resource, analysis=analysis)
+    ).then_return(protocol)
 
     result = await get_protocol_by_id(
         "protocol-id",
         response_builder=response_builder,
         protocol_store=protocol_store,
+        analysis_store=analysis_store,
     )
 
     assert result.data == protocol

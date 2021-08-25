@@ -13,10 +13,11 @@ from robot_server.service.json_api import (
     EmptyResponseModel,
 )
 
-from .dependencies import get_protocol_store, get_protocol_analyzer
+from .dependencies import get_protocol_store, get_analysis_store, get_protocol_analyzer
 from .protocol_models import Protocol
 from .protocol_analyzer import ProtocolAnalyzer
 from .response_builder import ResponseBuilder
+from .analysis_store import AnalysisStore
 
 from .protocol_store import (
     ProtocolStore,
@@ -98,15 +99,20 @@ async def create_protocol(
 async def get_protocols(
     response_builder: ResponseBuilder = Depends(ResponseBuilder),
     protocol_store: ProtocolStore = Depends(get_protocol_store),
+    analysis_store: AnalysisStore = Depends(get_analysis_store),
 ) -> MultiResponseModel[Protocol]:
     """Get a list of all currently uploaded protocols.
 
     Arguments:
         response_builder: Interface to construct response models.
         protocol_store: In-memory database of protocol resources.
+        analysis_store: In-memory database of protocol analyses.
     """
-    protocol_entries = protocol_store.get_all()
-    data = [response_builder.build(e) for e in protocol_entries]
+    protocol_resources = protocol_store.get_all()
+    data = [
+        response_builder.build(resource=r, analysis=analysis_store.get(r.protocol_id))
+        for r in protocol_resources
+    ]
 
     return MultiResponseModel(data=data)
 
@@ -124,6 +130,7 @@ async def get_protocol_by_id(
     protocolId: str,
     response_builder: ResponseBuilder = Depends(ResponseBuilder),
     protocol_store: ProtocolStore = Depends(get_protocol_store),
+    analysis_store: AnalysisStore = Depends(get_analysis_store),
 ) -> ResponseModel[Protocol]:
     """Get an uploaded protocol by ID.
 
@@ -131,14 +138,16 @@ async def get_protocol_by_id(
         protocolId: Protocol identifier to fetch, pulled from URL.
         response_builder: Interface to construct response models.
         protocol_store: In-memory database of protocol resources.
+        analysis_store: In-memory database of protocol analyses.
     """
     try:
-        protocol_entry = protocol_store.get(protocol_id=protocolId)
+        resource = protocol_store.get(protocol_id=protocolId)
+        analysis = analysis_store.get(protocol_id=protocolId)
 
     except ProtocolNotFoundError as e:
         raise ProtocolNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
 
-    data = response_builder.build(protocol_entry)
+    data = response_builder.build(resource=resource, analysis=analysis)
 
     return ResponseModel(data=data)
 

@@ -80,3 +80,6 @@ class CompletedAnalysis(BaseAnalysis):
         ...,
         description="Any expected run errors or problems with the analysis",
     )
+
+
+ProtocolAnalysis = Union[PendingAnalysis, CompletedAnalysis]

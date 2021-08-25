@@ -4,6 +4,7 @@ from decoy import Decoy
 
 from robot_server.service.task_runner import TaskRunner
 from robot_server.protocols.protocol_store import ProtocolStore
+from robot_server.protocols.analysis_store import AnalysisStore
 from robot_server.protocols.response_builder import ResponseBuilder
 from robot_server.protocols.protocol_analyzer import ProtocolAnalyzer
 
@@ -16,8 +17,14 @@ def task_runner(decoy: Decoy) -> TaskRunner:
 
 @pytest.fixture
 def protocol_store(decoy: Decoy) -> ProtocolStore:
-    """Get a fake ProtocolStore interface."""
+    """Get a mocked out ProtocolStore interface."""
     return decoy.mock(cls=ProtocolStore)
+
+
+@pytest.fixture
+def analysis_store(decoy: Decoy) -> AnalysisStore:
+    """Get a mocked out AnalysisStore interface."""
+    return decoy.mock(cls=AnalysisStore)
 
 
 @pytest.fixture
