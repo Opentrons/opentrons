@@ -32,6 +32,14 @@ export function RunSetupCard(): JSX.Element | null {
     protocolData,
     standardDeckDef as any
   )
+  const robot = useSelector((state: State) => getConnectedRobot(state))
+
+  if (
+    protocolData == null ||
+    robot == null ||
+    ('metadata' in protocolData && Object.keys(protocolData).length === 1)
+  )
+    return null
 
   if (Object.values(moduleRenderCoords).length > 1) {
     var MODULE_SETUP_KEY = 'modules_setup_step'
@@ -51,14 +59,6 @@ export function RunSetupCard(): JSX.Element | null {
     ROBOT_CALIBRATION_STEP_KEY
   )
 
-  const robot = useSelector((state: State) => getConnectedRobot(state))
-
-  if (
-    protocolData == null ||
-    robot == null ||
-    ('metadata' in protocolData && Object.keys(protocolData).length === 1)
-  )
-    return null
 
   let stepsKeysInOrder: StepKey[] = [ROBOT_CALIBRATION_STEP_KEY]
   if (protocolHasModules(protocolData as JsonProtocolFile)) {

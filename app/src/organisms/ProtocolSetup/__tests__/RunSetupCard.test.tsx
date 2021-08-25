@@ -212,7 +212,7 @@ describe('RunSetupCard', () => {
     expect(getByRole('heading', { name: 'Module Setup' })).toBeTruthy()
     expect(
       getByText(
-        'Plug in and power up the required module(s) via the OT-2 USB Port(s). Place the module(s) as shown in the deck map.'
+        'Plug in and power up the required module via the OT-2 USB Port. Place the module as shown in the deck map.'
       )
     ).toBeTruthy()
   })

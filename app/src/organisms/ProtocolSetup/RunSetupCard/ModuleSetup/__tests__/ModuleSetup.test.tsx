@@ -65,6 +65,9 @@ const render = (props: React.ComponentProps<typeof ModuleSetup>) => {
 const STUBBED_ORIENTATION_VALUE = 'left'
 const MOCK_MAGNETIC_MODULE_COORDS = [10, 20, 0]
 const MOCK_TC_COORDS = [20, 30, 0]
+const MOCK_USBPORT_NUM = 1
+const MOCK_HUBPORT_NUM = 2
+const MOCK_ISATTACHED = true
 
 const mockMagneticModule = {
   labwareOffset: { x: 5, y: 5, z: 5 },
@@ -170,6 +173,9 @@ describe('ModuleSetup', () => {
           moduleModel: mockMagneticModule.model,
           x: MOCK_MAGNETIC_MODULE_COORDS[0],
           y: MOCK_MAGNETIC_MODULE_COORDS[1],
+          isAttached: MOCK_ISATTACHED,
+          usbPort: MOCK_USBPORT_NUM,
+          hubPort: MOCK_HUBPORT_NUM,
         })
       )
       .mockReturnValue(<div>mock module info {mockMagneticModule.model} </div>)
@@ -181,6 +187,9 @@ describe('ModuleSetup', () => {
           moduleModel: mockTCModule.model,
           x: MOCK_TC_COORDS[0],
           y: MOCK_TC_COORDS[1],
+          isAttached: MOCK_ISATTACHED,
+          usbPort: MOCK_USBPORT_NUM,
+          hubPort: MOCK_HUBPORT_NUM,
         })
       )
       .mockReturnValue(<div>mock module info {mockTCModule.model} </div>)
