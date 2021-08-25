@@ -77,7 +77,7 @@ export function RunSetupCard(): JSX.Element | null {
       <ModuleSetup
         moduleRenderCoords={moduleRenderCoords}
         expandLabwareSetupStep={() => setExpandedStepKey(LABWARE_SETUP_KEY)}
-        robotName={'opentrons-dev'} //  TODO: immediately change robotName to actual robotName rather than hardcoded opentrons-dev
+        robotName={'opentrons-dev'} //  TODO: immediately import robot name
       />
     ),
     [LABWARE_SETUP_KEY]: (

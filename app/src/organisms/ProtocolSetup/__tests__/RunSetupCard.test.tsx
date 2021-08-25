@@ -128,6 +128,7 @@ describe('RunSetupCard', () => {
         componentPropsMatcher({
           moduleRenderCoords: mockModuleRenderCoords,
           expandLabwareSetupStep: expect.anything(),
+          robotName: 'opentrons-dev', // replace this with a mocked robot name
         })
       )
       .mockImplementation(({ expandLabwareSetupStep }) => (

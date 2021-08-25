@@ -1,4 +1,5 @@
 import * as React from 'react'
+import '@testing-library/jest-dom'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { StaticRouter } from 'react-router-dom'
 import { RobotWorkSpace, ModuleViz } from '@opentrons/components'
@@ -16,7 +17,9 @@ import {
   ModuleModel,
   ModuleRealType,
 } from '@opentrons/shared-data'
+import {mockThermocycler as mockThermocyclerFixture, mockMagneticModule as mockMagneticModuleFixture} from '../../../../../redux/modules/__fixtures__/index'
 
+jest.mock('../../../../../redux/modules')
 jest.mock('../ModuleInfo')
 jest.mock('@opentrons/components', () => {
   const actualComponents = jest.requireActual('@opentrons/components')
@@ -65,9 +68,6 @@ const render = (props: React.ComponentProps<typeof ModuleSetup>) => {
 const STUBBED_ORIENTATION_VALUE = 'left'
 const MOCK_MAGNETIC_MODULE_COORDS = [10, 20, 0]
 const MOCK_TC_COORDS = [20, 30, 0]
-const MOCK_USBPORT_NUM = 1
-const MOCK_HUBPORT_NUM = 2
-const MOCK_ISATTACHED = true
 
 const mockMagneticModule = {
   labwareOffset: { x: 5, y: 5, z: 5 },
@@ -86,7 +86,7 @@ const mockTCModule = {
 describe('ModuleSetup', () => {
   let props: React.ComponentProps<typeof ModuleSetup>
   beforeEach(() => {
-    props = { robotName: '', moduleRenderCoords: {}, expandLabwareSetupStep: () => {} }
+    props = { robotName: 'opentrons-dev', moduleRenderCoords: {}, expandLabwareSetupStep: () => {} }
 
     when(mockInferModuleOrientationFromXCoordinate)
       .calledWith(expect.anything())
@@ -109,6 +109,9 @@ describe('ModuleSetup', () => {
           })}
         </div>
       ))
+      when(mockGetAttachedModules)
+      .calledWith(undefined as any, 'opentrons-dev')
+      .mockReturnValue([])
   })
 
   afterEach(() => {
@@ -128,7 +131,7 @@ describe('ModuleSetup', () => {
     expect(mockModuleViz).not.toHaveBeenCalled()
     expect(mockModuleInfo).not.toHaveBeenCalled()
   })
-  it('should render a deck WITH modules', () => {
+  it('should render a deck WITH modules with CTA disabled', () => {
     const moduleRenderCoords = {
       [mockMagneticModule.moduleId]: {
         x: MOCK_MAGNETIC_MODULE_COORDS[0],
@@ -173,9 +176,9 @@ describe('ModuleSetup', () => {
           moduleModel: mockMagneticModule.model,
           x: MOCK_MAGNETIC_MODULE_COORDS[0],
           y: MOCK_MAGNETIC_MODULE_COORDS[1],
-          isAttached: MOCK_ISATTACHED,
-          usbPort: MOCK_USBPORT_NUM,
-          hubPort: MOCK_HUBPORT_NUM,
+          isAttached: false,
+          usbPort: null,
+          hubPort: null,
         })
       )
       .mockReturnValue(<div>mock module info {mockMagneticModule.model} </div>)
@@ -187,9 +190,9 @@ describe('ModuleSetup', () => {
           moduleModel: mockTCModule.model,
           x: MOCK_TC_COORDS[0],
           y: MOCK_TC_COORDS[1],
-          isAttached: MOCK_ISATTACHED,
-          usbPort: MOCK_USBPORT_NUM,
-          hubPort: MOCK_HUBPORT_NUM,
+          isAttached: false,
+          usbPort: null,
+          hubPort: null,
         })
       )
       .mockReturnValue(<div>mock module info {mockTCModule.model} </div>)
@@ -199,9 +202,97 @@ describe('ModuleSetup', () => {
       moduleRenderCoords,
     }
 
-    const { getByText } = render(props)
+    const { getByText, getByRole } = render(props)
     getByText('mock module viz magneticModuleType')
     getByText('mock module viz thermocyclerModuleType')
     getByText('mock module info magneticModuleV2')
+    const button = getByRole('button', { name: 'Proceed to Labware Setup' })
+    expect(button).toHaveAttribute('disabled')
+
   })
+
+  it('should render a deck WITH modules with CTA enabled', () => {
+    const moduleRenderCoords = {
+      [mockMagneticModule.moduleId]: {
+        x: MOCK_MAGNETIC_MODULE_COORDS[0],
+        y: MOCK_MAGNETIC_MODULE_COORDS[1],
+        z: MOCK_MAGNETIC_MODULE_COORDS[2],
+        moduleModel: mockMagneticModule.model,
+      },
+      [mockTCModule.moduleId]: {
+        x: MOCK_TC_COORDS[0],
+        y: MOCK_TC_COORDS[1],
+        z: MOCK_TC_COORDS[2],
+        moduleModel: mockTCModule.model,
+      },
+    }
+    when(mockGetAttachedModules)
+      .calledWith(undefined as any, 'opentrons-dev')
+      .mockReturnValue([{...mockMagneticModuleFixture, model:mockMagneticModule.model}as any, {...mockThermocyclerFixture, model:mockTCModule.model}as any])
+
+
+    when(mockModuleViz)
+      .calledWith(
+        componentPropsMatcher({
+          orientation: STUBBED_ORIENTATION_VALUE,
+          moduleType: mockMagneticModule.type,
+          x: MOCK_MAGNETIC_MODULE_COORDS[0],
+          y: MOCK_MAGNETIC_MODULE_COORDS[1],
+        })
+      )
+      .mockReturnValue(<div>mock module viz {mockMagneticModule.type} </div>)
+
+    when(mockModuleViz)
+      .calledWith(
+        componentPropsMatcher({
+          orientation: STUBBED_ORIENTATION_VALUE,
+          moduleType: mockTCModule.type,
+          x: MOCK_TC_COORDS[0],
+          y: MOCK_TC_COORDS[1],
+        })
+      )
+      .mockReturnValue(<div>mock module viz {mockTCModule.type} </div>)
+
+    when(mockModuleInfo)
+      .calledWith(
+        componentPropsMatcher({
+          orientation: STUBBED_ORIENTATION_VALUE,
+          moduleModel: mockMagneticModule.model,
+          x: MOCK_MAGNETIC_MODULE_COORDS[0],
+          y: MOCK_MAGNETIC_MODULE_COORDS[1],
+          isAttached: true,
+          usbPort: String(mockMagneticModuleFixture.usbPort.port),
+          hubPort: String(mockMagneticModuleFixture.usbPort.hub),
+        })
+      )
+      .mockReturnValue(<div>mock module info {mockMagneticModule.model} </div>)
+
+    when(mockModuleInfo)
+      .calledWith(
+        componentPropsMatcher({
+          orientation: STUBBED_ORIENTATION_VALUE,
+          moduleModel: mockTCModule.model,
+          x: MOCK_TC_COORDS[0],
+          y: MOCK_TC_COORDS[1],
+          isAttached: true,
+          usbPort: String(mockThermocyclerFixture.usbPort.port),
+          hubPort: String(mockThermocyclerFixture.usbPort.hub),
+        })
+      )
+      .mockReturnValue(<div>mock module info {mockTCModule.model} </div>)
+
+    props = {
+      ...props,
+      moduleRenderCoords,
+    }
+
+    const { getByText, getByRole } = render(props)
+    getByText('mock module viz magneticModuleType')
+    getByText('mock module viz thermocyclerModuleType')
+    getByText('mock module info magneticModuleV2')
+    const button = getByRole('button', { name: 'Proceed to Labware Setup' })
+    expect(button).not.toHaveAttribute('disabled')
+
+  })
+
 })
