@@ -273,13 +273,10 @@ class ProtocolContextImplementation(AbstractProtocol):
         """Delay execution for x seconds."""
         self._hw_manager.hardware.delay(seconds)
 
-    def home(self, home_plungers: bool = True) -> None:
+    def home(self) -> None:
         """Home the robot."""
         self.set_last_location(None)
-        if not home_plungers:
-            self._hw_manager.hardware.home([Axis.X, Axis.Y, Axis.Z, Axis.A])
-        else:
-            self._hw_manager.hardware.home()
+        self._hw_manager.hardware.home([Axis.X, Axis.Y, Axis.Z, Axis.A])
 
     def get_deck(self) -> Deck:
         """Get the deck layout."""

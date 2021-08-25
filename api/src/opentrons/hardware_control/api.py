@@ -473,6 +473,7 @@ class API(HardwareAPILike):
             for key in configs:
                 result[key] = instr_dict[key]
             result['has_tip'] = instr.has_tip
+            result['tip_length'] = instr.current_tip_length
             result['aspirate_speed'] = self._plunger_speed(
                 instr, instr.aspirate_flow_rate, 'aspirate')
             result['dispense_speed'] = self._plunger_speed(

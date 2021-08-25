@@ -10,6 +10,7 @@ from typing import (
 from typing_extensions import Final
 from uuid import uuid4
 
+from opentrons.types import Mount as MountType
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 from opentrons.api.util import (RobotBusy, robot_is_busy,
@@ -457,66 +458,37 @@ class Session(RobotBusy):
         self.startTime = None
         self.set_state('loaded')
 
-    def _get_pipette_state(self) -> Dict[str, Any]:
-        """Get pipettes' tip & plunger states."""
-        instruments = self._hw_iface().attached_instruments
-        new_dict = {
-            'has_tip': {mount: pip['has_tip'] for mount, pip in instruments.items()},
-            'plunger_state': {
-                mount: self._hw_iface().current_position(mount)[Axis.of_plunger(mount)]
-                for mount, pip in instruments.items()}
-        }
-        return new_dict
-
     def stop(self) -> None:
-        # Save the pipette state before calling self._hw_iface().halt
-        # so we don't lose the data on hard halt.
-        pipette_state = self._get_pipette_state()
-        self._hw_iface().halt()
+        # Save the current pipette tip length before calling self._hardware.halt
+        # so we don't lose it on hard halt. Used for determining a need for tip dropping
+        instruments = self._hardware.attached_instruments
+        saved_tip_length = {mount: pip['tip_length']
+                            for mount, pip in instruments.items()}
+        self._hardware.halt()
         with self._motion_lock.lock():
             try:
-                if any(pipette_state['has_tip'].values()):
-                    self._hw_iface().stop(home_after=False)
-                    self._drop_tip_after_cancel(pipette_state)
-                self._hw_iface().stop(home_after=True)
+                if any(saved_tip_length.values()):
+                    self._hardware.stop(home_after=False)
+                    self._hardware.home(axes=Axis.gantry_axes())
+                    self._drop_tip_after_cancel(saved_tip_length)
+                self._hardware.stop(home_after=True)
             except asyncio.CancelledError:
                 pass
         self.set_state('stopped')
 
-    def _drop_tip_after_cancel(self, saved_pipette_state: Dict) -> None:
+    def _drop_tip_after_cancel(self, saved_tip_length: Dict) -> None:
         """Perform a drop_tip on the pipette with a tip."""
-        ctx = self._get_context_with_loaded_instruments()
-        ctx.home(home_plungers=False)
-        instruments = ctx.loaded_instruments
+        assert self.instruments, "No instruments found for performing a drop tip."
+        for instrument_wrapper in self.instruments:
+            mount = MountType.string_to_mount(instrument_wrapper.mount)
+            protocol_ctx = instrument_wrapper._context
+            tip_length = saved_tip_length[mount]
 
-        for mount, has_tip in saved_pipette_state['has_tip'].items():
-            if has_tip:
-                pip_ctx = instruments[mount.name.lower()]
-                self._hw_iface().add_tip(
-                    mount=mount,
-                    tip_length=pip_ctx.tip_racks[0].tip_length)
-                pip_ctx.drop_tip()
-
-    def _get_context_with_loaded_instruments(self) -> ProtocolContext:
-        """Return a Protocol context with all protocol instruments loaded."""
-        self._hardware.cache_instruments()
-        self._hardware.reset_instrument()
-        ctx_impl = ProtocolContextImplementation.build_using(
-            self._protocol,
-            extra_labware=getattr(self._protocol, 'extra_labware', {}))
-        ctx = ProtocolContext.build_using(
-            protocol=self._protocol,
-            implementation=ctx_impl,
-            loop=self._loop,
-            broker=self._broker
-        )
-        ctx.connect(self._hardware)
-        for instr in self._instruments:
-            pip = ctx.load_instrument(instrument_name=instr.name,
-                                      mount=instr.mount,
-                                      tip_racks=instr.tip_racks)
-            pip.trash_container = instr.trash_container
-        return ctx
+            if tip_length:
+                self._hardware.add_tip(mount=mount, tip_length=tip_length)
+                with protocol_ctx.temp_connect(self._hardware):
+                    protocol_ctx.location_cache = None
+                    instrument_wrapper._instrument.drop_tip()
 
     def pause(self,
               reason: str = None,
