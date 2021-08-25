@@ -10,7 +10,7 @@ import { i18n } from '../../localization'
 import { PDListItem } from '../lists'
 import { LabwareTooltipContents } from './LabwareTooltipContents'
 import styles from './StepItem.css'
-import { ModuleRealType } from '@opentrons/shared-data'
+import { ModuleType } from '@opentrons/shared-data'
 
 export interface ModuleStepItemRowProps {
   label?: string | null
@@ -33,7 +33,7 @@ export const ModuleStepItemRow = (
 
 interface Props {
   action?: string
-  moduleType: ModuleRealType
+  moduleType: ModuleType
   actionText: string
   labwareNickname?: string | null
   message?: string | null

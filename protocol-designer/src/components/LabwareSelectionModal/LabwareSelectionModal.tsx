@@ -14,7 +14,7 @@ import {
   MAGNETIC_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
   LabwareDefinition2,
-  ModuleRealType,
+  ModuleType,
 } from '@opentrons/shared-data'
 import { i18n } from '../../localization'
 import { SPAN7_8_10_11_SLOT } from '../../constants'
@@ -40,7 +40,7 @@ export interface Props {
   /** if adding to a module, the slot of the parent (for display) */
   parentSlot?: DeckSlot | null
   /** if adding to a module, the module's type */
-  moduleType?: ModuleRealType | null
+  moduleType?: ModuleType | null
   /** tipracks that may be added to deck (depends on pipette<>tiprack assignment) */
   permittedTipracks: string[]
 }
@@ -57,7 +57,7 @@ const orderedCategories: string[] = [
   // 'trash', // NOTE: trash intentionally hidden
 ]
 
-const RECOMMENDED_LABWARE_BY_MODULE: { [K in ModuleRealType]: string[] } = {
+const RECOMMENDED_LABWARE_BY_MODULE: { [K in ModuleType]: string[] } = {
   [TEMPERATURE_MODULE_TYPE]: [
     'opentrons_24_aluminumblock_generic_2ml_screwcap',
     'opentrons_96_aluminumblock_biorad_wellplate_200ul',
@@ -75,7 +75,7 @@ const RECOMMENDED_LABWARE_BY_MODULE: { [K in ModuleRealType]: string[] } = {
 
 export const getLabwareIsRecommended = (
   def: LabwareDefinition2,
-  moduleType?: ModuleRealType | null
+  moduleType?: ModuleType | null
 ): boolean =>
   moduleType
     ? RECOMMENDED_LABWARE_BY_MODULE[moduleType].includes(

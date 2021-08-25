@@ -9,7 +9,7 @@ import {
   STD_SLOT_DIVIDER_WIDTH as DIVIDER,
   SPAN7_8_10_11_SLOT,
 } from '../constants'
-import { ModuleRealType, ModuleOrientation } from '../types'
+import { ModuleType, ModuleOrientation } from '../types'
 // NOTE: all dims are in 'left' orientation. Rotate & transform to obtain 'right' orientation.
 
 export interface ModuleVizDims {
@@ -22,7 +22,7 @@ export interface ModuleVizDims {
   childXDimension: number
   childYDimension: number
 }
-const MODULE_VIZ_DIMS: Record<ModuleRealType, ModuleVizDims> = {
+const MODULE_VIZ_DIMS: Record<ModuleType, ModuleVizDims> = {
   [MAGNETIC_MODULE_TYPE]: {
     xOffset: -1 * (SLOT_X * 0.2 + DIVIDER),
     yOffset: -1 * DIVIDER,
@@ -56,7 +56,7 @@ const MODULE_VIZ_DIMS: Record<ModuleRealType, ModuleVizDims> = {
 }
 export const getModuleVizDims = (
   orientation: ModuleOrientation,
-  moduleType: ModuleRealType
+  moduleType: ModuleType
 ): ModuleVizDims => {
   const dims = MODULE_VIZ_DIMS[moduleType]
   if (orientation === 'left') return dims

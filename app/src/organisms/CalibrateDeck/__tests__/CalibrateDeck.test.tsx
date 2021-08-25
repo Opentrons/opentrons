@@ -25,7 +25,7 @@ import type { DispatchRequestsType } from '../../../redux/robot-api'
 import type { Dispatch } from '../../../redux/types'
 import type { CalibrationPanelProps } from '../../CalibrationPanels/types'
 
-jest.mock('@opentrons/components/src/deck/getDeckDefinitions')
+jest.mock('@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions')
 jest.mock('../../../redux/sessions/selectors')
 jest.mock('../../../redux/robot-api/selectors')
 

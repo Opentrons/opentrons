@@ -1,7 +1,7 @@
 import React from 'react'
 import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
-import { ModuleRealType } from '@opentrons/shared-data'
+import { ModuleType } from '@opentrons/shared-data'
 import { FilePage, Props } from '../FilePage'
 import { EditModules } from '../EditModules'
 import { EditModulesCard } from '../modules'
@@ -47,7 +47,7 @@ describe('File Page', () => {
   it('opens and closes Edit Modules when appropriate handlers are called', () => {
     const wrapper = render(props)
     wrapper.find(EditModulesCard).invoke('openEditModuleModal')(
-      {} as ModuleRealType
+      {} as ModuleType
     )
     expect(wrapper.find(EditModules)).toHaveLength(1)
 
