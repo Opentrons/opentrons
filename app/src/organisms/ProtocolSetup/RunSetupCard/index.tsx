@@ -16,7 +16,6 @@ import { LabwareSetup } from './LabwareSetup'
 import { ModuleSetup } from './ModuleSetup'
 import { getModuleRenderCoords } from '../utils/getModuleRenderCoords'
 import { getLabwareRenderCoords } from '../utils/getLabwareRenderCoords'
-
 import { RobotCalibration } from './RobotCalibration'
 import type { JsonProtocolFile } from '@opentrons/shared-data'
 import type { State } from '../../../redux/types'

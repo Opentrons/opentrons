@@ -72,6 +72,8 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
     setShowMultipleModulesModal,
   ] = React.useState<boolean>(false)
   const { t } = useTranslation('protocol_setup')
+  const hasADuplicateModule = new Set(moduleModels).size !== moduleModels.length
+  const proceedToLabwareDisabled = combinedModules.length - uniqueModules.length  !== moduleModels.length
   const modulesByPort = attachedModules.reduce<{ [port: string]: AttachedModule[] }>(
     (portMap, module) => {
       const port = module.usbPort.hub || module.usbPort.port
@@ -84,15 +86,11 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
     {}
   )
 
-  const hasADuplicateModule = new Set(moduleModels).size !== moduleModels.length
-  const proceedToLabwareDisabled = combinedModules.length - uniqueModules.length  !== moduleModels.length
-
   useInterval(
     () => dispatch(fetchModules(robotName)),
     robotName === null ? POLL_MODULE_INTERVAL_MS : null,
     true
   )
-
   return (
     <React.Fragment>
       {showMultipleModulesModal && (
@@ -121,7 +119,6 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
           null
         )
         }
-
         <RobotWorkSpace
           deckDef={standardDeckDef as any}
           viewBox={DECK_VIEW_BOX}
@@ -129,11 +126,9 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
           deckLayerBlocklist={DECK_LAYER_BLOCKLIST}
           id={'ModuleSetup_deckMap'}
         >
-          
           {() => {
             return (
               <>
-
                 {map(moduleRenderCoords, ({ x, y, moduleModel}) => {
                   const orientation = inferModuleOrientationFromXCoordinate(x)
                   const attached = attachedModules.some(attachedModule => (moduleModel === attachedModule.model))                   
@@ -259,7 +254,6 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
       {proceedToLabwareDisabled && (
         <Tooltip {...tooltipProps}>{proceedToLabwareDisabledReason}</Tooltip>
       )}
- 
       </Flex>
     </React.Fragment>
   )
