@@ -54,7 +54,7 @@ async def get_protocol_analyzer(
         strict_attached_instruments=False,
     )
 
-    # TODO(mc, 2021-08-25): this engine will not simulate pauses; need to figure that out
+    # TODO(mc, 2021-08-25): this engine will not simulate pauses
     protocol_engine = await create_protocol_engine(hardware_api=simulating_hardware_api)
     protocol_runner = ProtocolRunner(protocol_engine=protocol_engine)
 
