@@ -276,7 +276,7 @@ class ProtocolContextImplementation(AbstractProtocol):
     def home(self) -> None:
         """Home the robot."""
         self.set_last_location(None)
-        self._hw_manager.hardware.home([Axis.X, Axis.Y, Axis.Z, Axis.A])
+        self._hw_manager.hardware.home()
 
     def get_deck(self) -> Deck:
         """Get the deck layout."""
