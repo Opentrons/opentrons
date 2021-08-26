@@ -476,7 +476,10 @@ class Session(RobotBusy):
                 pass
         self.set_state('stopped')
 
-    def _drop_tip_after_cancel(self, saved_tip_length: Dict) -> None:
+    def _drop_tip_after_cancel(
+        self,
+        saved_tip_length: Dict[MountType, Optional[float]],
+    ) -> None:
         """ Perform a drop_tip on the pipette with a tip.
 
         Note: Moving the plunger the right amount to drop the tip depends on
