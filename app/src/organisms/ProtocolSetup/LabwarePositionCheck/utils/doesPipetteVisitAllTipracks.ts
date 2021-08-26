@@ -4,8 +4,9 @@ import {
   JsonProtocolFile,
   LabwareDefinition2,
 } from '@opentrons/shared-data'
+import { getPickUpTipCommandsWithPipette } from '../../utils/getPickUpTipCommandsWithPipette'
+import { getTipracksVisited } from '../../utils/getTipracksVisited'
 import type { Command } from '@opentrons/shared-data/protocol/types/schemaV5'
-import type { PickUpTipCommand } from '../types'
 
 export const doesPipetteVisitAllTipracks = (
   pipetteId: string,
@@ -23,19 +24,17 @@ export const doesPipetteVisitAllTipracks = (
     0
   )
 
-  const pickUpTipCommandsWithPipette: PickUpTipCommand[] = commands
-    .filter(
-      (command): command is PickUpTipCommand => command.command === 'pickUpTip'
-    )
-    .filter(command => command.params.pipette === pipetteId)
-
-  const tipracksVisited = pickUpTipCommandsWithPipette.reduce<string[]>(
-    (visited, command) => {
-      const tiprack = command.params.labware
-      return visited.includes(tiprack) ? visited : [...visited, tiprack]
-    },
-    []
+  const pickUpTipCommandsWithPipette = getPickUpTipCommandsWithPipette(
+    commands,
+    pipetteId
   )
+
+  const tipracksVisited = getTipracksVisited(pickUpTipCommandsWithPipette)
+
+  pickUpTipCommandsWithPipette.reduce<string[]>((visited, command) => {
+    const tiprack = command.params.labware
+    return visited.includes(tiprack) ? visited : [...visited, tiprack]
+  }, [])
 
   return numberOfTipracks === tipracksVisited.length
 }

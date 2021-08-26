@@ -6,7 +6,7 @@ import { getTwoPipettePositionCheckSteps } from './utils/getTwoPipettePositionCh
 import type { Command } from '@opentrons/shared-data/protocol/types/schemaV5'
 import type { FilePipette } from '@opentrons/shared-data/protocol/types/schemaV3'
 import type { FileModule } from '@opentrons/shared-data/protocol/types/schemaV4'
-import type { ProtocolData } from '../../redux/protocol/types'
+import type { ProtocolData } from '../../../redux/protocol/types'
 import type { LabwarePositionCheckStep } from './types'
 
 export const getLabwarePositionCheckSteps = (
