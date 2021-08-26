@@ -1,12 +1,16 @@
 config BR2_PACKAGE_PYTHON_OPENTRONS_API
   bool "python-opentrons-api"
   depends on BR2_PACKAGE_PYTHON3
-  select BR2_PACKAGE_PYTHON_NUMPY # runtime
-  select BR2_PACKAGE_PYTHON_SERIAL # runtime
-  select BR2_PACKAGE_PYTHON_URWID # runtime
-  select BR2_PACKAGE_PYTHON_AIOHTTP # runtime
+  select BR2_PACKAGE_PYTHON_AIONOTIFY # runtime
+  select BR2_PACKAGE_PYTHON_ANYIO # runtime
   select BR2_PACKAGE_PYTHON_JSONSCHEMA # runtime
+  select BR2_PACKAGE_PYTHON_NUMPY # runtime
+  select BR2_PACKAGE_PYTHON_PYDANTIC # runtime
+  select BR2_PACKAGE_PYTHON_SERIAL # runtime
+  select BR2_PACKAGE_PYTHON_SYSTEMD # runtime
+  select BR2_PACKAGE_PYTHON_TYPING_EXTENSIONS # runtime
+
   help
-    Opentrons API server. Controls an OT2 robot.
+    Opentrons API library. Used on an OT-2 robot.
 
     https://opentrons.com
