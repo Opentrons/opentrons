@@ -497,7 +497,8 @@ class Session(RobotBusy):
               That said, since plunger speeds during liquid handling commands are much
               lower, the probability of this causing an issue is very low.
         """
-        assert self.instruments, "No instruments found for performing a drop tip."
+        if not self.instruments:
+            return
         for instrument_wrapper in self.instruments:
             mount = MountType.string_to_mount(instrument_wrapper.mount)
             protocol_ctx = instrument_wrapper._context
