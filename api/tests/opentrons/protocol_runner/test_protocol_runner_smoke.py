@@ -56,15 +56,12 @@ async def test_protocol_runner_with_python(
     subject: ProtocolRunner,
 ) -> None:
     """It should run a Python protocol on the ProtocolRunner."""
-    subject.load(
-        ProtocolFile(
-            protocol_type=ProtocolFileType.PYTHON,
-            files=[python_protocol_file],
-        )
+    protocol_file = ProtocolFile(
+        protocol_type=ProtocolFileType.PYTHON,
+        files=[python_protocol_file],
     )
 
-    subject.play()
-    await subject.join()
+    await subject.run(protocol_file)
 
     pipette_id_captor = matchers.Captor()
     labware_id_captor = matchers.Captor()
@@ -114,15 +111,12 @@ async def test_protocol_runner_with_json(
     subject: ProtocolRunner,
 ) -> None:
     """It should run a JSON protocol on the ProtocolRunner."""
-    subject.load(
-        ProtocolFile(
-            protocol_type=ProtocolFileType.JSON,
-            files=[json_protocol_file],
-        )
+    protocol_file = ProtocolFile(
+        protocol_type=ProtocolFileType.JSON,
+        files=[json_protocol_file],
     )
 
-    subject.play()
-    await subject.join()
+    await subject.run(protocol_file)
 
     expected_pipette_entry = (
         "pipette-id",
