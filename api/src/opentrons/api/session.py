@@ -485,7 +485,14 @@ class Session(RobotBusy):
               BUT, it seems like the smoothie doesn't wipe out the cached locations upon
               reset, so, we can just resume moving the plunger without homing it first.
               This behavior has been consistent so far but if ends up being unreliable
-              then we will have change this logic.
+              then we will have to change this logic.
+
+              Also, `self._hardware.halt()` does not stop the motors gracefully. If the
+              plunger motor was moving at a speed above the pull-in speed at the time,
+              it could skip. So, even if the motor controller board's memory of the
+              plunger's current location isn't wiped out, it could be slightly wrong.
+              That said, since plunger speeds during liquid handling commands are much
+              lower, the probability of this causing an issue is very low.
         """
         assert self.instruments, "No instruments found for performing a drop tip."
         for instrument_wrapper in self.instruments:
