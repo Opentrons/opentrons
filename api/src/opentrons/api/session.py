@@ -462,7 +462,7 @@ class Session(RobotBusy):
         # Save the current pipette tip length before calling self._hardware.halt
         # so we don't lose it on hard halt. Used for determining a need for tip dropping
         instruments = self._hardware.attached_instruments
-        saved_tip_length = {mount: pip['tip_length']
+        saved_tip_length = {mount: pip.get('tip_length')
                             for mount, pip in instruments.items()}
         self._hardware.halt()
         with self._motion_lock.lock():
