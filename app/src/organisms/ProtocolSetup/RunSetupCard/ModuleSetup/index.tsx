@@ -21,10 +21,7 @@ import {
   Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
-import {
-  fetchModules,
-  getAttachedModules,
-} from '../../../../redux/modules'
+import { fetchModules, getAttachedModules } from '../../../../redux/modules'
 import {
   getModuleType,
   inferModuleOrientationFromXCoordinate,
@@ -56,35 +53,36 @@ interface ModuleSetupProps {
 }
 
 export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
-  const { moduleRenderCoords, expandLabwareSetupStep, robotName} = props
+  const { moduleRenderCoords, expandLabwareSetupStep, robotName } = props
   const dispatch = useDispatch<Dispatch>()
   const [targetProps, tooltipProps] = useHoverTooltip()
-  const proceedToLabwareDisabledReason = 'Plug in and power up the required modules to continue'
+  const proceedToLabwareDisabledReason =
+    'Plug in and power up the required modules to continue'
   const moduleModels = map(moduleRenderCoords, ({ moduleModel }) => moduleModel)
   const attachedModules = useSelector((state: State) =>
     getAttachedModules(state, robotName)
   )
   const attachedModulesModels = map(attachedModules, ({ model }) => model)
   const combinedModules = attachedModulesModels.concat(moduleModels)
-  const uniqueModules = [...new Set(combinedModules)];
+  const uniqueModules = [...new Set(combinedModules)]
   const [
     showMultipleModulesModal,
     setShowMultipleModulesModal,
   ] = React.useState<boolean>(false)
   const { t } = useTranslation('protocol_setup')
   const hasADuplicateModule = new Set(moduleModels).size !== moduleModels.length
-  const proceedToLabwareDisabled = combinedModules.length - uniqueModules.length  !== moduleModels.length
-  const modulesByPort = attachedModules.reduce<{ [port: string]: AttachedModule[] }>(
-    (portMap, module) => {
-      const port = module.usbPort.hub || module.usbPort.port
-      if (port !== null) {
-        const portContents = portMap[port] ?? []
-        portMap[port] = [...portContents, module]
-      }
-      return portMap
-    },
-    {}
-  )
+  const proceedToLabwareDisabled =
+    combinedModules.length - uniqueModules.length !== moduleModels.length
+  const modulesByPort = attachedModules.reduce<{
+    [port: string]: AttachedModule[]
+  }>((portMap, module) => {
+    const port = module.usbPort.hub || module.usbPort.port
+    if (port !== null) {
+      const portContents = portMap[port] ?? []
+      portMap[port] = [...portContents, module]
+    }
+    return portMap
+  }, {})
 
   useInterval(
     () => dispatch(fetchModules(robotName)),
@@ -105,20 +103,17 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
         flexDirection={DIRECTION_COLUMN}
       >
         {hasADuplicateModule ? (
-        <Btn
-          as={Link}
-          fontSize={FONT_SIZE_BODY_1}
-          color={C_BLUE}
-          alignSelf={ALIGN_FLEX_END}
-          onClick={() => setShowMultipleModulesModal(true)}
-          data-test={'LabwareSetup_helpLink'}
-        >
-          {t('multiple_modules_help_link_title')}
-        </Btn>
-        ) : (
-          null
-        )
-        }
+          <Btn
+            as={Link}
+            fontSize={FONT_SIZE_BODY_1}
+            color={C_BLUE}
+            alignSelf={ALIGN_FLEX_END}
+            onClick={() => setShowMultipleModulesModal(true)}
+            data-test={'LabwareSetup_helpLink'}
+          >
+            {t('multiple_modules_help_link_title')}
+          </Btn>
+        ) : null}
         <RobotWorkSpace
           deckDef={standardDeckDef as any}
           viewBox={DECK_VIEW_BOX}
@@ -129,58 +124,13 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
           {() => {
             return (
               <>
-                {map(moduleRenderCoords, ({ x, y, moduleModel}) => {
+                {map(moduleRenderCoords, ({ x, y, moduleModel }) => {
                   const orientation = inferModuleOrientationFromXCoordinate(x)
-                  const attached = attachedModules.some(attachedModule => (moduleModel === attachedModule.model))                   
+                  const attached = attachedModules.some(
+                    attachedModule => moduleModel === attachedModule.model
+                  )
                   if (isEmpty(modulesByPort)) {
-                  return (
-                    attached === true ?
-                    (
-                    <React.Fragment
-                      key={`LabwareSetup_Module_${moduleModel}_${x}${y}`}
-                    >
-                      <ModuleViz
-                        x={x}
-                        y={y}
-                        orientation={orientation}
-                        moduleType={getModuleType(moduleModel)}
-                      />
-                      <ModuleInfo
-                        x={x}
-                        y={y}
-                        moduleModel={moduleModel}
-                        orientation={orientation}
-                        isAttached={attached}
-                        usbPort={null}
-                        hubPort={null}
-                      />
-                    </React.Fragment>
-                  ) : (
-                    <React.Fragment
-                    key={`LabwareSetup_Module_${moduleModel}_${x}${y}`}
-                  >
-                    <ModuleViz
-                      x={x}
-                      y={y}
-                      orientation={orientation}
-                      moduleType={getModuleType(moduleModel)}
-                    />
-                    <ModuleInfo
-                      x={x}
-                      y={y}
-                      moduleModel={moduleModel}
-                      orientation={orientation}
-                      isAttached={attached}
-                      usbPort={null}
-                      hubPort={null}
-                    />     
-                  </React.Fragment>
-                  )
-                  )
-                  } else {
-                    return Object.keys(modulesByPort).map(port =>
-                      attached === true ?
-                      (
+                    return attached === true ? (
                       <React.Fragment
                         key={`LabwareSetup_Module_${moduleModel}_${x}${y}`}
                       >
@@ -196,31 +146,74 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
                           moduleModel={moduleModel}
                           orientation={orientation}
                           isAttached={attached}
-                          usbPort={port}
-                          hubPort={port}
+                          usbPort={null}
+                          hubPort={null}
                         />
                       </React.Fragment>
                     ) : (
                       <React.Fragment
-                      key={`LabwareSetup_Module_${moduleModel}_${x}${y}`}
-                    >
-                      <ModuleViz
-                        x={x}
-                        y={y}
-                        orientation={orientation}
-                        moduleType={getModuleType(moduleModel)}
-                      />
-                      <ModuleInfo
-                        x={x}
-                        y={y}
-                        moduleModel={moduleModel}
-                        orientation={orientation}
-                        isAttached={attached}
-                        usbPort={null}
-                        hubPort={null}
-                      />     
-                    </React.Fragment>
+                        key={`LabwareSetup_Module_${moduleModel}_${x}${y}`}
+                      >
+                        <ModuleViz
+                          x={x}
+                          y={y}
+                          orientation={orientation}
+                          moduleType={getModuleType(moduleModel)}
+                        />
+                        <ModuleInfo
+                          x={x}
+                          y={y}
+                          moduleModel={moduleModel}
+                          orientation={orientation}
+                          isAttached={attached}
+                          usbPort={null}
+                          hubPort={null}
+                        />
+                      </React.Fragment>
                     )
+                  } else {
+                    return Object.keys(modulesByPort).map(port =>
+                      attached === true ? (
+                        <React.Fragment
+                          key={`LabwareSetup_Module_${moduleModel}_${x}${y}`}
+                        >
+                          <ModuleViz
+                            x={x}
+                            y={y}
+                            orientation={orientation}
+                            moduleType={getModuleType(moduleModel)}
+                          />
+                          <ModuleInfo
+                            x={x}
+                            y={y}
+                            moduleModel={moduleModel}
+                            orientation={orientation}
+                            isAttached={attached}
+                            usbPort={port}
+                            hubPort={port}
+                          />
+                        </React.Fragment>
+                      ) : (
+                        <React.Fragment
+                          key={`LabwareSetup_Module_${moduleModel}_${x}${y}`}
+                        >
+                          <ModuleViz
+                            x={x}
+                            y={y}
+                            orientation={orientation}
+                            moduleType={getModuleType(moduleModel)}
+                          />
+                          <ModuleInfo
+                            x={x}
+                            y={y}
+                            moduleModel={moduleModel}
+                            orientation={orientation}
+                            isAttached={attached}
+                            usbPort={null}
+                            hubPort={null}
+                          />
+                        </React.Fragment>
+                      )
                     )
                   }
                 })}
@@ -243,19 +236,18 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
         </PrimaryBtn>
        ) : (
         <PrimaryBtn
-        title={t('proceed_to_labware_setup_step')}
-        disabled={proceedToLabwareDisabled}
-        onClick={expandLabwareSetupStep}
-        backgroundColor={C_BLUE}
-        {...targetProps}
-      >
-        {t('proceed_to_labware_setup_step')}
-      </PrimaryBtn>
-      {proceedToLabwareDisabled && (
-        <Tooltip {...tooltipProps}>{proceedToLabwareDisabledReason}</Tooltip>
-      )}
+          title={t('proceed_to_labware_setup_step')}
+          disabled={proceedToLabwareDisabled}
+          onClick={expandLabwareSetupStep}
+          backgroundColor={C_BLUE}
+          {...targetProps}
+        >
+          {t('proceed_to_labware_setup_step')}
+        </PrimaryBtn>
+        {proceedToLabwareDisabled && (
+          <Tooltip {...tooltipProps}>{proceedToLabwareDisabledReason}</Tooltip>
+        )}
       </Flex>
     </React.Fragment>
   )
 }
-

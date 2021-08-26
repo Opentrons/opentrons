@@ -86,7 +86,11 @@ const mockTCModule = {
 describe('ModuleSetup', () => {
   let props: React.ComponentProps<typeof ModuleSetup>
   beforeEach(() => {
-    props = { robotName: 'opentrons-dev', moduleRenderCoords: {}, expandLabwareSetupStep: () => {} }
+    props = {
+      robotName: 'opentrons-dev',
+      moduleRenderCoords: {},
+      expandLabwareSetupStep: () => {},
+    }
 
     when(mockInferModuleOrientationFromXCoordinate)
       .calledWith(expect.anything())
@@ -109,7 +113,7 @@ describe('ModuleSetup', () => {
           })}
         </div>
       ))
-      when(mockGetAttachedModules)
+    when(mockGetAttachedModules)
       .calledWith(undefined as any, 'opentrons-dev')
       .mockReturnValue([])
   })
@@ -208,7 +212,6 @@ describe('ModuleSetup', () => {
     getByText('mock module info magneticModuleV2')
     const button = getByRole('button', { name: 'Proceed to Labware Setup' })
     expect(button).toHaveAttribute('disabled')
-
   })
 
   it('should render a deck WITH modules with CTA enabled', () => {
@@ -228,8 +231,13 @@ describe('ModuleSetup', () => {
     }
     when(mockGetAttachedModules)
       .calledWith(undefined as any, 'opentrons-dev')
-      .mockReturnValue([{...mockMagneticModuleFixture, model:mockMagneticModule.model}as any, {...mockThermocyclerFixture, model:mockTCModule.model}as any])
-
+      .mockReturnValue([
+        {
+          ...mockMagneticModuleFixture,
+          model: mockMagneticModule.model,
+        } as any,
+        { ...mockThermocyclerFixture, model: mockTCModule.model } as any,
+      ])
 
     when(mockModuleViz)
       .calledWith(
@@ -292,7 +300,5 @@ describe('ModuleSetup', () => {
     getByText('mock module info magneticModuleV2')
     const button = getByRole('button', { name: 'Proceed to Labware Setup' })
     expect(button).not.toHaveAttribute('disabled')
-
   })
-
 })

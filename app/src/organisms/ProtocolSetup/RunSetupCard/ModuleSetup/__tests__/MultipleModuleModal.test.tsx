@@ -40,7 +40,9 @@ describe('MultipleModulesModal', () => {
       getByRole('link', {
         name: 'Learn more about how to use multiples of a module',
       }).getAttribute('href')
-    ).toBe('https://support.opentrons.com/en/articles/5167312-using-modules-of-the-same-type-on-the-ot-2')
+    ).toBe(
+      'https://support.opentrons.com/en/articles/5167312-using-modules-of-the-same-type-on-the-ot-2'
+    )
   })
   it('should call onCloseClick when the close button is pressed', () => {
     const { getByRole } = render(props)

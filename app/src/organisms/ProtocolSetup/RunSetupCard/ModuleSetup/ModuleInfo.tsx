@@ -25,7 +25,6 @@ import {
   getModuleDisplayName,
 } from '@opentrons/shared-data'
 
-
 export interface ModuleInfoProps {
   x: number
   y: number
@@ -79,9 +78,7 @@ export function ModuleInfo(props: ModuleInfoProps): JSX.Element {
             />
           )}
           <p>
-            {!isAttached
-              ? t('module_not_connected')
-              : t('module_connected')}
+            {!isAttached ? t('module_not_connected') : t('module_connected')}
           </p>
         </Flex>
         <Text css={FONT_BODY_1_DARK}>{getModuleDisplayName(moduleModel)}</Text>
