@@ -104,6 +104,7 @@ export const LabwareSetup = (props: LabwareSetupProps): JSX.Element | null => {
           viewBox={DECK_MAP_VIEWBOX}
           className={styles.deck_map}
           deckLayerBlocklist={DECK_LAYER_BLOCKLIST}
+          id={'LabwareSetup_deckMap'}
         >
           {() => {
             return (
@@ -154,6 +155,7 @@ export const LabwareSetup = (props: LabwareSetupProps): JSX.Element | null => {
             marginRight={SPACING_3}
             onClick={() => console.log('check labware positions!')}
             color={C_BLUE}
+            id={'LabwareSetup_checkLabwarePositionsButton'}
           >
             {t('check_labware_positions')}
           </SecondaryBtn>
@@ -162,6 +164,7 @@ export const LabwareSetup = (props: LabwareSetupProps): JSX.Element | null => {
             disabled={proceedToRunDisabled}
             as={LinkComponent}
             backgroundColor={C_BLUE}
+            id={'LabwareSetup_proceedToRunButton'}
             {...linkProps}
             {...targetProps}
           >

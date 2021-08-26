@@ -111,7 +111,11 @@ export function UploadInput(props: UploadInputProps): JSX.Element {
       <Text as="h1" css={FONT_HEADER_DARK} marginBottom={SPACING_3}>
         {t('open_a_protocol')}
       </Text>
-      <PrimaryBtn onClick={handleClick} marginBottom={SPACING_4}>
+      <PrimaryBtn
+        onClick={handleClick}
+        marginBottom={SPACING_4}
+        id={'UploadInput_protocolUploadButton'}
+      >
         {t('choose_file')}
       </PrimaryBtn>
       <label
@@ -148,6 +152,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element {
         href={PROTOCOL_LIBRARY_URL}
         width="19rem"
         marginBottom={SPACING_3}
+        id={'UploadInput_protocolLibraryButton'}
       >
         {t('browse_protocol_library')}
       </SecondaryBtn>
@@ -156,6 +161,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element {
         external
         href={PROTOCOL_DESIGNER_URL}
         width="19rem"
+        id={'UploadInput_protocolDesignerButton'}
       >
         {t('launch_protocol_designer')}
       </SecondaryBtn>
