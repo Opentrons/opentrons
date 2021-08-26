@@ -1,7 +1,10 @@
 import * as React from 'react'
 import { when } from 'jest-when'
 import { fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components/__utils__'
+import {
+  partialComponentPropsMatcher,
+  renderWithProviders,
+} from '@opentrons/components/__utils__'
 import { i18n } from '../../../../../i18n'
 import { ExtraAttentionWarning } from '../ExtraAttentionWarning'
 import { SecureLabwareModal } from '../SecureLabwareModal'
@@ -16,12 +19,6 @@ const render = (props: React.ComponentProps<typeof ExtraAttentionWarning>) => {
     i18nInstance: i18n,
   })
 }
-
-const partialComponentPropsMatcher = (argsToMatch: unknown) =>
-  // @ts-expect-error(sa, 2021-08-03): when.allArgs not part of type definition yet for jest-when
-  when.allArgs((args, equals) =>
-    equals(args[0], expect.objectContaining(argsToMatch))
-  )
 
 describe('ExtraAttentionWarning', () => {
   let props: React.ComponentProps<typeof ExtraAttentionWarning>

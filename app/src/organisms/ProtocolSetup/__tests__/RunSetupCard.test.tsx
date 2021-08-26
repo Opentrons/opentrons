@@ -2,7 +2,10 @@ import * as React from 'react'
 import { when } from 'jest-when'
 import '@testing-library/jest-dom'
 import { fireEvent } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components/__utils__'
+import {
+  componentPropsMatcher,
+  renderWithProviders,
+} from '@opentrons/components/__utils__'
 import noModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/simpleV4.json'
 import withModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/testModulesProtocol.json'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
@@ -83,12 +86,6 @@ const mockGetProtocolPipetteTiprackData = getProtocolPipetteTipRackCalInfo as je
 const mockGetDeckCalData = calibrationSelectors.getDeckCalibrationData as jest.MockedFunction<
   typeof calibrationSelectors.getDeckCalibrationData
 >
-
-// this is needed because under the hood react calls components with two arguments (props and some second argument nobody seems to know)
-// https://github.com/timkindberg/jest-when/issues/66
-const componentPropsMatcher = (matcher: unknown) =>
-  // @ts-expect-error(sa, 2021-08-03): when.allArgs not part of type definition yet for jest-when
-  when.allArgs((args, equals) => equals(args[0], matcher))
 
 const mockModuleRenderCoords = {
   mockModuleId: { x: 0, y: 0, z: 0, moduleModel: 'mockModule' as any },
