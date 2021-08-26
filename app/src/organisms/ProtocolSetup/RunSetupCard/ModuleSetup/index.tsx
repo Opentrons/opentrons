@@ -66,7 +66,7 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
   )
   const attachedModulesModels = map(attachedModules, ({ model }) => model)
   const combinedModules = attachedModulesModels.concat(moduleModels)
-  let uniqueModules = [...new Set(combinedModules)];
+  const uniqueModules = [...new Set(combinedModules)];
   const [
     showMultipleModulesModal,
     setShowMultipleModulesModal,

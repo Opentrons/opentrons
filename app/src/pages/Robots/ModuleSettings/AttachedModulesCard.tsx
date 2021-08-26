@@ -78,7 +78,6 @@ export function AttachedModulesCard(props: Props): JSX.Element {
   const modules = useSelector((state: State) =>
     getAttachedModules(state, robotName)
   )
-  console.log(modules, 'and', robotName)
   const controlDisabledReason = useSelector((state: State) =>
     getModuleControlsDisabled(state, robotName)
   )
@@ -98,7 +97,6 @@ export function AttachedModulesCard(props: Props): JSX.Element {
     ? legacyModuleList(modules, controlDisabledReason)
     : moduleListWithUSBInfo(modulesByPort, controlDisabledReason)
 
-  console.log('modulesList are', modulesList)
   // if robot is connected, the modules epic will poll /modules automatically,
   // but we need to poll ourselves if we're viewing this robot without
   // connecting to its RPC server

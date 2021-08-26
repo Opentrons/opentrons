@@ -22,6 +22,7 @@ import type { State } from '../../../redux/types'
 import { getConnectedRobot } from '../../../redux/discovery/selectors'
 
 export function RunSetupCard(): JSX.Element | null {
+  const { t } = useTranslation('protocol_setup')
   const protocolData = useSelector((state: State) => getProtocolData(state))
   const moduleRenderCoords = getModuleRenderCoords(
     protocolData,
@@ -33,31 +34,34 @@ export function RunSetupCard(): JSX.Element | null {
   )
   const robot = useSelector((state: State) => getConnectedRobot(state))
 
-  if (
-    protocolData == null ||
-    robot == null ||
-    ('metadata' in protocolData && Object.keys(protocolData).length === 1)
-  )
-    return null
-
-  if (Object.values(moduleRenderCoords).length > 1) {
-    var MODULE_SETUP_KEY = 'modules_setup_step'
-  } else {
-    var MODULE_SETUP_KEY = 'module_setup_step'
-  }
   const ROBOT_CALIBRATION_STEP_KEY = 'robot_calibration_step' as const
   const LABWARE_SETUP_KEY = 'labware_setup_step' as const
+
+  let MODULE_SETUP_KEY = 'module_setup_step'
+  if (
+    protocolData != null &&
+    robot != null &&
+    'metadata' in protocolData &&
+    Object.keys(protocolData).length !== 1 &&
+    Object.values(moduleRenderCoords).length > 1
+  ) {
+    MODULE_SETUP_KEY = 'modules_setup_step'
+  }
 
   type StepKey =
     | typeof ROBOT_CALIBRATION_STEP_KEY
     | typeof MODULE_SETUP_KEY
     | typeof LABWARE_SETUP_KEY
 
-  const { t } = useTranslation('protocol_setup')
   const [expandedStepKey, setExpandedStepKey] = React.useState<StepKey | null>(
     ROBOT_CALIBRATION_STEP_KEY
   )
-
+  if (
+    protocolData == null ||
+    robot == null ||
+    ('metadata' in protocolData && Object.keys(protocolData).length === 1)
+  )
+    return null
 
   let stepsKeysInOrder: StepKey[] = [ROBOT_CALIBRATION_STEP_KEY]
   if (protocolHasModules(protocolData as JsonProtocolFile)) {
