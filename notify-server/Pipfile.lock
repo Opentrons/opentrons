@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "960f30480108b8d56e47cf712d80ddaeaa8d4d05b86bfae03311cd0598d662f7"
+            "sha256": "d7244a0d7572639e86dffe113155228be1676343e1615a0450d0d64ecd5f089e"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -331,11 +331,11 @@
         },
         "importlib-metadata": {
             "hashes": [
-                "sha256:0645585859e9a6689c523927a5032f2ba5919f1f7d0e84bd4533312320de1ff9",
-                "sha256:51c6635429c77cf1ae634c997ff9e53ca3438b495f10a55ba28594dd69764a8b"
+                "sha256:9e04bf59076a15a9b6dd9c27806e8fcdf15280ba529c6a8cc3f4d5b4875bdd61",
+                "sha256:c4eb3dec5f697682e383a39701a7de11cd5c02daf8dd93534b69e3e6473f6b1b"
             ],
             "markers": "python_version < '3.8'",
-            "version": "==4.6.3"
+            "version": "==4.7.1"
         },
         "iniconfig": {
             "hashes": [
@@ -395,10 +395,6 @@
             "version": "==0.4.3"
         },
         "notify-server": {
-            "editable": true,
-            "path": "."
-        },
-        "opentrons-notify-server": {
             "editable": true,
             "path": "."
         },
