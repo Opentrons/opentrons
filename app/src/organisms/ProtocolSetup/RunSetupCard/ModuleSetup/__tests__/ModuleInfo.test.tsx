@@ -1,9 +1,6 @@
 import React from 'react'
 import '@testing-library/jest-dom'
-import { StaticRouter } from 'react-router-dom'
 import { ModuleModel, ModuleRealType } from '@opentrons/shared-data'
-import { renderWithProviders } from '@opentrons/components/__utils__'
-import { i18n } from '../../../../../i18n'
 import { ModuleInfo } from '../ModuleInfo'
 import { when } from 'jest-when'
 
@@ -13,16 +10,6 @@ const componentPropsMatcher = (matcher: unknown) =>
   // @ts-expect-error(sa, 2021-08-03): when.allArgs not part of type definition yet for jest-when
   when.allArgs((args, equals) => equals(args[0], matcher))
 
-const render = (props: React.ComponentProps<typeof ModuleInfo>) => {
-  return renderWithProviders(
-    <StaticRouter>
-      <ModuleInfo {...props} />
-    </StaticRouter>,
-    {
-      i18nInstance: i18n,
-    }
-  )
-}
 const mockModuleInfo = ModuleInfo as jest.MockedFunction<typeof ModuleInfo>
 const MOCK_IS_ATTACHED = false || true
 const MOCK_TC_COORDS = [20, 30, 0]
