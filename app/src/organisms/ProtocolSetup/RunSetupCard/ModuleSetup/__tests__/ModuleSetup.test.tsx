@@ -68,6 +68,7 @@ const render = (props: React.ComponentProps<typeof ModuleSetup>) => {
 const STUBBED_ORIENTATION_VALUE = 'left'
 const MOCK_MAGNETIC_MODULE_COORDS = [10, 20, 0]
 const MOCK_TC_COORDS = [20, 30, 0]
+const MOCK_ROBOT_NAME = 'ot-dev'
 
 const mockMagneticModule = {
   labwareOffset: { x: 5, y: 5, z: 5 },
@@ -87,7 +88,7 @@ describe('ModuleSetup', () => {
   let props: React.ComponentProps<typeof ModuleSetup>
   beforeEach(() => {
     props = {
-      robotName: 'opentrons-dev',
+      robotName: MOCK_ROBOT_NAME,
       moduleRenderCoords: {},
       expandLabwareSetupStep: () => {},
     }
@@ -114,7 +115,7 @@ describe('ModuleSetup', () => {
         </div>
       ))
     when(mockGetAttachedModules)
-      .calledWith(undefined as any, 'opentrons-dev')
+      .calledWith(undefined as any, MOCK_ROBOT_NAME)
       .mockReturnValue([])
   })
 
@@ -230,7 +231,7 @@ describe('ModuleSetup', () => {
       },
     }
     when(mockGetAttachedModules)
-      .calledWith(undefined as any, 'opentrons-dev')
+      .calledWith(undefined as any, MOCK_ROBOT_NAME)
       .mockReturnValue([
         {
           ...mockMagneticModuleFixture,
