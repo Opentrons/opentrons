@@ -5,7 +5,7 @@ from collections import OrderedDict
 from opentrons import types, API
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.config import feature_flags as fflags
-from opentrons.hardware_control.types import DoorState, PauseType, Axis
+from opentrons.hardware_control.types import DoorState, PauseType
 from opentrons.hardware_control import SynchronousAdapter
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.geometry.deck import Deck
