@@ -10,7 +10,7 @@ const protocolMultipleTipracks = _uncastedProtocolMultipleTipracks as ProtocolFi
 const protocolWithTC = _uncastedProtocolWithTC as ProtocolFileV5<any>
 
 describe('getTwoPipettePositionCheckSteps', () => {
-  it('should move to all tipracks that the secondary pipette uses, move to all tipracks with the primary pipette, pick up a tip at the final tiprack with the primary pipette, move to all remaining labware, and drop the tip back in the tiprack', () => {
+  it('should move to all tipracks that the secondary pipette uses, move to all tipracks with that the primary pipette uses, pick up a tip at the final tiprack that the primary pipette uses, move to all remaining labware, and drop the tip back in the tiprack that the primary pipette uses', () => {
     const primaryPipetteId = 'c235a5a0-0042-11ec-8258-f7ffdf5ad45a' // this is just taken from the protocol fixture
     const secondaryPipetteId = 'c235a5a0-0042-11ec-8258-f7ffdf5ad45a'
     const labware = protocolMultipleTipracks.labware
@@ -136,7 +136,7 @@ describe('getTwoPipettePositionCheckSteps', () => {
       })
     ).toEqual(allSteps)
   })
-  it('should move to all tipracks that the secondary pipette uses, move to all tipracks with the primary pipette, pick up a tip at the final tiprack with the primary pipette, move to all remaining labware (and open TC lid), and drop the tip back in the tiprack', () => {
+  it('should move to all tipracks that the secondary pipette uses, move to all tipracks with the primary pipette uses, pick up a tip at the final tiprack that the primary pipette uses, move to all remaining labware (and open TC lid), and drop the tip back in the tiprack that the primary pipette uses', () => {
     const primaryPipetteId = 'c235a5a0-0042-11ec-8258-f7ffdf5ad45a' // this is just taken from the protocol fixture
     const secondaryPipetteId = 'c235a5a0-0042-11ec-8258-f7ffdf5ad45a'
     const labware = protocolWithTC.labware

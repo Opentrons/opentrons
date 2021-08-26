@@ -4,7 +4,6 @@ import type {
 } from '@opentrons/shared-data'
 import { SECTIONS } from '../constants'
 import {
-  getTiprackIdsInOrder,
   getLabwareIdsInOrder,
   getAllTipracksIdsThatPipetteUsesInOrder,
 } from './labware'
@@ -41,7 +40,12 @@ export const getTwoPipettePositionCheckSteps = (args: {
     labwareDefinitions
   )
 
-  const orderedTiprackIds = getTiprackIdsInOrder(labware, labwareDefinitions)
+  const orderedTiprackIdsThatPrimaryPipetteUses = getAllTipracksIdsThatPipetteUsesInOrder(
+    primaryPipetteId,
+    commands,
+    labware,
+    labwareDefinitions
+  )
 
   const orderedLabwareIds = getLabwareIdsInOrder(
     labware,
@@ -56,12 +60,15 @@ export const getTwoPipettePositionCheckSteps = (args: {
   )
 
   const movePrimaryPipetteToTiprackSteps = getMoveToTiprackSteps(
-    orderedTiprackIds,
+    orderedTiprackIdsThatPrimaryPipetteUses,
     primaryPipetteId,
     SECTIONS.PRIMARY_PIPETTE_TIPRACKS
   )
 
-  const lastTiprackId = orderedTiprackIds[orderedTiprackIds.length - 1]
+  const lastTiprackId =
+    orderedTiprackIdsThatPrimaryPipetteUses[
+      orderedTiprackIdsThatPrimaryPipetteUses.length - 1
+    ]
 
   const pickupTipFromLastTiprackStep = getPickupTipStep(
     lastTiprackId,

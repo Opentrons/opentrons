@@ -1,4 +1,8 @@
-import { getModuleType, JsonProtocolFile } from '@opentrons/shared-data'
+import {
+  getModuleType,
+  JsonProtocolFile,
+  THERMOCYCLER_MODULE_TYPE,
+} from '@opentrons/shared-data'
 import type { FileModule } from '@opentrons/shared-data/protocol/types/schemaV4'
 import type { Command } from '@opentrons/shared-data/protocol/types/schemaV5'
 import type { LabwarePositionCheckStep, Section } from '../types'
@@ -11,7 +15,7 @@ const getIsLabwareOnTopOfTC = (
   const labwareSlot = labware[labwareId].slot
   return (
     Object.keys(modules).some(moduleId => moduleId === labwareSlot) &&
-    getModuleType(modules[labwareSlot].model) === 'thermocyclerModuleType'
+    getModuleType(modules[labwareSlot].model) === THERMOCYCLER_MODULE_TYPE
   )
 }
 
