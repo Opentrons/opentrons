@@ -17,7 +17,7 @@ flake8-docstrings = "~=1.6.0"
 flake8-noqa = "~=1.1.0"
 pytest = "==6.1.0"
 pytest-watch = "~=4.2.0"
-pytest-cov = "<2.11.0"
+pytest-cov = "==2.10.1"
 pytest-aiohttp = "*"
 twine = ">=1.12.0"
 wheel = "==0.30.0"
@@ -27,4 +27,4 @@ typing-extensions = "==3.10.0.0"
 # pytest dependencies on windows, spec'd here to force lockfile inclusion
 # https://github.com/pypa/pipenv/issues/4408#issuecomment-668324177
 atomicwrites = {version="==1.4.0", sys_platform="== 'win32'"}
-colorama = {version="0.4.4", sys_platform="== 'win32'"}
+colorama = {version="==0.4.4", sys_platform="== 'win32'"}
