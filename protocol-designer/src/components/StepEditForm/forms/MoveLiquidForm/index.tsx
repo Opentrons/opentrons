@@ -32,9 +32,9 @@ export const MoveLiquidForm = (props: StepFormProps): JSX.Element => {
         </span>
       </div>
       <div className={styles.form_row}>
-        <PipetteField {...propsForFields['pipette']} />
+        <PipetteField {...propsForFields.pipette} />
         <VolumeField
-          {...propsForFields['volume']}
+          {...propsForFields.volume}
           label={i18n.t('form.step_edit_form.field.volume.label')}
           stepType={stepType}
           className={styles.large_field}
@@ -87,14 +87,14 @@ export const MoveLiquidForm = (props: StepFormProps): JSX.Element => {
       <div className={styles.section_wrapper}>
         <div className={cx(styles.form_row, styles.section_column)}>
           <ChangeTipField
-            {...propsForFields['changeTip']}
+            {...propsForFields.changeTip}
             aspirateWells={formData.aspirate_wells}
             dispenseWells={formData.dispense_wells}
             path={formData.path}
             stepType={formData.stepType}
           />
           <PathField
-            {...propsForFields['path']}
+            {...propsForFields.path}
             aspirate_airGap_checkbox={formData.aspirate_airGap_checkbox}
             aspirate_airGap_volume={formData.aspirate_airGap_volume}
             aspirate_wells={formData.aspirate_wells}

@@ -53,7 +53,7 @@ export const getCollidingWells = (
     (acc: WellGroup, elem): WellGroup => {
       // TODO IMMEDIATELY no magic string 'wellname'
       if ('wellname' in elem.dataset) {
-        const wellName = elem.dataset['wellname']
+        const wellName = elem.dataset.wellname
         // @ts-expect-error(sa, 2021-6-21): wellName might be undefined
         return { ...acc, [wellName]: null }
       }

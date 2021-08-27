@@ -97,7 +97,7 @@ const SourceDestBatchEditMoveLiquidFields = (props: {
 
       {prefix === 'aspirate' && (
         <CheckboxRowField
-          {...propsForFields['preWetTip']}
+          {...propsForFields.preWetTip}
           label={i18n.t('form.step_edit_form.field.preWetTip.label')}
           className={styles.small_field}
         />
@@ -132,15 +132,15 @@ const SourceDestBatchEditMoveLiquidFields = (props: {
 
       {prefix === 'dispense' && (
         <CheckboxRowField
-          {...propsForFields['blowout_checkbox']}
+          {...propsForFields.blowout_checkbox}
           label={i18n.t('form.step_edit_form.field.blowout.label')}
           className={styles.small_field}
         >
           <BlowoutLocationField
-            {...propsForFields['blowout_location']}
+            {...propsForFields.blowout_location}
             className={styles.full_width}
             options={getBlowoutLocationOptionsForForm({
-              path: propsForFields['path'].value as any,
+              path: propsForFields.path.value as any,
               stepType: 'moveLiquid',
             })}
           />

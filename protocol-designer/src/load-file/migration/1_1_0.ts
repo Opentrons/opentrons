@@ -265,20 +265,18 @@ export function updateStepFormKeys(fileData: PDProtocolFile): PDProtocolFile {
       const updatedFields = {
         stepName: formData['step-name'],
         stepDetails: formData['step-details'],
-        changeTip: formData['aspirate_changeTip'],
-        blowout_checkbox: formData['dispense_blowout_checkbox'],
+        changeTip: formData.aspirate_changeTip,
+        blowout_checkbox: formData.dispense_blowout_checkbox,
         blowout_location:
-          formData['dispense_blowout_location'] ||
-          formData['dispense_blowout_labware'],
-        aspirate_touchTip_checkbox: formData['aspirate_touchTip'],
-        dispense_touchTip_checkbox: formData['dispense_touchTip'],
-        disposalVolume_checkbox: formData['aspirate_disposalVol_checkbox'],
-        disposalVolume_volume: formData['aspirate_disposalVol_volume'],
-        preWetTip: formData['aspirate_preWetTip'],
-        aspirate_touchTip_mmFromBottom:
-          formData['aspirate_touchTipMmFromBottom'],
-        dispense_touchTip_mmFromBottom:
-          formData['dispense_touchTipMmFromBottom'],
+          formData.dispense_blowout_location ||
+          formData.dispense_blowout_labware,
+        aspirate_touchTip_checkbox: formData.aspirate_touchTip,
+        dispense_touchTip_checkbox: formData.dispense_touchTip,
+        disposalVolume_checkbox: formData.aspirate_disposalVol_checkbox,
+        disposalVolume_volume: formData.aspirate_disposalVol_volume,
+        preWetTip: formData.aspirate_preWetTip,
+        aspirate_touchTip_mmFromBottom: formData.aspirate_touchTipMmFromBottom,
+        dispense_touchTip_mmFromBottom: formData.dispense_touchTipMmFromBottom,
       }
       return {
         ...omitBy(updatedFields, isUndefined),
@@ -288,16 +286,16 @@ export function updateStepFormKeys(fileData: PDProtocolFile): PDProtocolFile {
       const updatedFields = {
         stepName: formData['step-name'],
         stepDetails: formData['step-details'],
-        changeTip: formData['aspirate_changeTip'],
-        mix_mmFromBottom: formData['dispense_mmFromBottom'],
-        mix_wellOrder_first: formData['aspirate_wellOrder_first'],
-        mix_wellOrder_second: formData['aspirate_wellOrder_second'],
-        mix_touchTip_checkbox: formData['touchTip'],
-        blowout_checkbox: formData['dispense_blowout_checkbox'],
+        changeTip: formData.aspirate_changeTip,
+        mix_mmFromBottom: formData.dispense_mmFromBottom,
+        mix_wellOrder_first: formData.aspirate_wellOrder_first,
+        mix_wellOrder_second: formData.aspirate_wellOrder_second,
+        mix_touchTip_checkbox: formData.touchTip,
+        blowout_checkbox: formData.dispense_blowout_checkbox,
         blowout_location:
-          formData['dispense_blowout_location'] ||
-          formData['dispense_blowout_labware'],
-        mix_touchTip_mmFromBottom: formData['mix_touchTipMmFromBottom'],
+          formData.dispense_blowout_location ||
+          formData.dispense_blowout_labware,
+        mix_touchTip_mmFromBottom: formData.mix_touchTipMmFromBottom,
       }
       return {
         ...omitBy(updatedFields, isUndefined),
@@ -346,7 +344,7 @@ export function replaceTCDStepsWithMoveLiquidStep(
       aspirate_wells_grouped: false,
     }
     const pipetteEntities = mapValues(
-      fileData['pipettes'],
+      fileData.pipettes,
       (pipette, pipetteId) => ({
         ...pipette,
         tiprackModel:

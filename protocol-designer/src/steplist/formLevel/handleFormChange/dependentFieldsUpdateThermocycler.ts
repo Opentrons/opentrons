@@ -14,7 +14,7 @@ const updatePatchOnThermocyclerFormType = (
 ): FormPatch => {
   // Profile => State
   if (
-    rawForm['thermocyclerFormType'] !== null &&
+    rawForm.thermocyclerFormType !== null &&
     fieldHasChanged(rawForm, patch, 'thermocyclerFormType')
   ) {
     return {

@@ -218,18 +218,16 @@ describe('updateStepFormKeys', () => {
       const oldFields =
         stubbedTCDStepsFile['designer-application'].data.savedStepForms['1']
       const addedFields = {
-        aspirate_touchTip_checkbox: oldFields['aspirate_touchTip'],
-        aspirate_touchTip_mmFromBottom:
-          oldFields['aspirate_touchTipMmFromBottom'],
-        blowout_checkbox: oldFields['dispense_blowout_checkbox'],
-        blowout_location: oldFields['dispense_blowout_location'],
-        changeTip: oldFields['aspirate_changeTip'],
-        dispense_touchTip_checkbox: oldFields['dispense_touchTip'],
-        dispense_touchTip_mmFromBottom:
-          oldFields['dispense_touchTipMmFromBottom'],
-        disposalVolume_checkbox: oldFields['aspirate_disposalVol_checkbox'],
-        disposalVolume_volume: oldFields['aspirate_disposalVol_volume'],
-        preWetTip: oldFields['aspirate_preWetTip'],
+        aspirate_touchTip_checkbox: oldFields.aspirate_touchTip,
+        aspirate_touchTip_mmFromBottom: oldFields.aspirate_touchTipMmFromBottom,
+        blowout_checkbox: oldFields.dispense_blowout_checkbox,
+        blowout_location: oldFields.dispense_blowout_location,
+        changeTip: oldFields.aspirate_changeTip,
+        dispense_touchTip_checkbox: oldFields.dispense_touchTip,
+        dispense_touchTip_mmFromBottom: oldFields.dispense_touchTipMmFromBottom,
+        disposalVolume_checkbox: oldFields.aspirate_disposalVol_checkbox,
+        disposalVolume_volume: oldFields.aspirate_disposalVol_volume,
+        preWetTip: oldFields.aspirate_preWetTip,
         stepName: oldFields['step-name'],
         stepDetails: oldFields['step-details'],
       }
@@ -302,14 +300,14 @@ describe('updateStepFormKeys', () => {
       const addedFields = {
         stepName: oldFields['step-name'],
         stepDetails: oldFields['step-details'],
-        changeTip: oldFields['aspirate_changeTip'],
-        mix_mmFromBottom: oldFields['dispense_mmFromBottom'],
-        mix_wellOrder_first: oldFields['aspirate_wellOrder_first'],
-        mix_wellOrder_second: oldFields['aspirate_wellOrder_second'],
-        mix_touchTip_checkbox: oldFields['touchTip'],
-        mix_touchTip_mmFromBottom: oldFields['mix_touchTipMmFromBottom'],
-        blowout_checkbox: oldFields['dispense_blowout_checkbox'],
-        blowout_location: oldFields['dispense_blowout_location'],
+        changeTip: oldFields.aspirate_changeTip,
+        mix_mmFromBottom: oldFields.dispense_mmFromBottom,
+        mix_wellOrder_first: oldFields.aspirate_wellOrder_first,
+        mix_wellOrder_second: oldFields.aspirate_wellOrder_second,
+        mix_touchTip_checkbox: oldFields.touchTip,
+        mix_touchTip_mmFromBottom: oldFields.mix_touchTipMmFromBottom,
+        blowout_checkbox: oldFields.dispense_blowout_checkbox,
+        blowout_location: oldFields.dispense_blowout_location,
       }
       each(Object.keys(addedFields), fieldName => {
         each(

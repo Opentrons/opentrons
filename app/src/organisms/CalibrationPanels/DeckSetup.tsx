@@ -97,7 +97,7 @@ function HealthCheckText({
 }
 
 export function DeckSetup(props: CalibrationPanelProps): JSX.Element {
-  const deckDef = React.useMemo(() => getDeckDefinitions()['ot2_standard'], [])
+  const deckDef = React.useMemo(() => getDeckDefinitions().ot2_standard, [])
 
   const {
     tipRack,
