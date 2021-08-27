@@ -108,7 +108,7 @@ current_time = datetime.now()
             BasicSession(
                 id="session-id",
                 createdAt=current_time,
-                status=SessionStatus.READY_TO_START,
+                status=SessionStatus.READY_TO_RUN,
                 actions=[],
                 commands=[],
             ),
@@ -125,7 +125,7 @@ current_time = datetime.now()
             ProtocolSession(
                 id="session-id",
                 createdAt=current_time,
-                status=SessionStatus.READY_TO_START,
+                status=SessionStatus.READY_TO_RUN,
                 createParams=ProtocolSessionCreateParams(protocolId="protocol-id"),
                 actions=[],
                 commands=[],
@@ -142,7 +142,7 @@ def test_to_response(
     result = subject.as_response(
         session=session_resource,
         commands=[],
-        engine_status=EngineStatus.READY_TO_START,
+        engine_status=EngineStatus.READY_TO_RUN,
     )
     assert result == expected_response
 
