@@ -16,40 +16,38 @@
   },
   "pipettes": {
     "pipetteId": {
-      "mount": "left",
       "name": "p10_single"
     }
   },
   "modules": {
     "magneticModuleId": {
-      "slot": "2",
-      "model": "magdeck"
+      "model": "magneticModuleV2"
     },
     "temperatureModuleId": {
-      "slot": "3",
-      "model": "tempdeck"
+      "model": "temperatureModuleV2"
     }
   },
   "labware": {
     "trashId": {
-      "slot": "12",
       "displayName": "Trash",
       "definitionId": "opentrons/opentrons_1_trash_1100ml_fixed/1"
     },
-    "tiprackId": {
-      "slot": "1",
+    "tipRackId": {
       "displayName": "Opentrons 96 Tip Rack 10 µL",
       "definitionId": "opentrons/opentrons_96_tiprack_10ul/1"
     },
     "sourcePlateId": {
-      "slot": "2",
       "displayName": "Source Plate",
       "definitionId": "example/plate/1"
     },
     "destPlateId": {
-      "slot": "3",
       "displayName": "Dest Plate",
       "definitionId": "example/plate/1"
+    }
+  },
+  "liquid": {
+    "waterId": {
+      "displayName": "Liquid Water"
     }
   },
   "labwareDefinitions": {
@@ -1240,10 +1238,70 @@
   },
   "commands": [
     {
+      "command": "load_pipette",
+      "params": {
+        "entityId": "pipetteId",
+        "locationId": "leftMount"
+      }
+    },
+    {
+      "command": "load_module",
+      "params": {
+        "entityId": "magneticModuleId",
+        "locationId": "3"
+      }
+    },
+    {
+      "command": "load_module",
+      "params": {
+        "entityId": "temperatureModuleId",
+        "locationId": "1"
+      }
+    },
+    {
+      "command": "load_labware",
+      "params": {
+        "entityId": "sourcePlateId",
+        "locationId": "temperatureModuleId"
+      }
+    },
+    {
+      "command": "load_labware",
+      "params": {
+        "entityId": "destPlateId",
+        "locationId": "magneticModuleId"
+      }
+    },
+    {
+      "command": "load_labware",
+      "params": {
+        "entityId": "tipRackId",
+        "locationId": "magneticModuleId"
+      }
+    },
+    {
+      "command": "load_labware",
+      "params": {
+        "entityId": "trashId",
+        "locationId": "12"
+      }
+    },
+    {
+      "command": "load_liquid",
+      "params": {
+        "liquidId": "waterId",
+        "labwareId": "sourcePlateId",
+        "volumeByWell": {
+          "A1": 100,
+          "B1": 100
+        }
+      }
+    },
+    {
       "command": "pickUpTip",
       "params": {
         "pipette": "pipetteId",
-        "labware": "tiprackId",
+        "labware": "tipRackId",
         "well": "B1"
       }
     },
@@ -1331,21 +1389,6 @@
         "pipette": "pipetteId",
         "labware": "trashId",
         "well": "A1"
-      }
-    },
-    {
-      "command": "updateRobotState",
-      "params": {
-        "labware": {
-          "tiprackId": {"slot": "5"},
-          "sourcePlateId": {"slot": "6"},
-          "destPlateId": {"slot": "magneticModuleId"}
-        },
-        "modules": {"temperatureModuleId": {"slot": null} },
-        "tipState": {
-          "tipracks": {"tiprackId": {"A1": true, "A2": false}},
-          "pipettes": {"pipetteId": true}
-        }
       }
     }
   ]
