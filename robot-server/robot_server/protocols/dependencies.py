@@ -5,10 +5,8 @@ from tempfile import gettempdir
 from fastapi import Depends
 from starlette.datastructures import State as AppState
 
-from opentrons.hardware_control import API as HardwareAPI
-from opentrons.protocol_engine import create_protocol_engine
-from opentrons.protocol_runner import ProtocolRunner
-from robot_server.service.dependencies import get_app_state, get_hardware
+from opentrons.protocol_runner import create_simulating_runner
+from robot_server.service.dependencies import get_app_state
 
 from .protocol_store import ProtocolStore
 from .protocol_analyzer import ProtocolAnalyzer
@@ -47,19 +45,9 @@ def get_analysis_store(app_state: AppState = Depends(get_app_state)) -> Analysis
 
 async def get_protocol_analyzer(
     analysis_store: AnalysisStore = Depends(get_analysis_store),
-    actual_hardware_api: HardwareAPI = Depends(get_hardware),
 ) -> ProtocolAnalyzer:
     """Construct a ProtocolAnalyzer for a single request."""
-    simulating_hardware_api = await HardwareAPI.build_hardware_simulator(
-        strict_attached_instruments=False,
-    )
-
-    # TODO(mc, 2021-08-25): this engine will not simulate pauses
-    protocol_engine = await create_protocol_engine(hardware_api=simulating_hardware_api)
-    protocol_runner = ProtocolRunner(protocol_engine=protocol_engine)
-
-    # TODO(mc, 2021-08-25): move to protocol engine
-    await simulating_hardware_api.home()
+    protocol_runner = await create_simulating_runner()
 
     return ProtocolAnalyzer(
         protocol_runner=protocol_runner,

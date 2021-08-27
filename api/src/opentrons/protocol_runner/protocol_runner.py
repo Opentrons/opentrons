@@ -45,6 +45,11 @@ class ProtocolRunner:
         self._python_context_creator = python_context_creator or PythonContextCreator()
         self._python_executor = python_executor or PythonExecutor()
 
+    @property
+    def engine(self) -> ProtocolEngine:
+        """Get the runner's underlying ProtocolEngine."""
+        return self._protocol_engine
+
     def load(self, protocol_file: ProtocolFile) -> None:
         """Load a ProtocolFile into managed ProtocolEngine.
 

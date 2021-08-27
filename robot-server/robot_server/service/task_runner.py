@@ -18,7 +18,9 @@ class TaskRunner:
     def __init__(self, background_tasks: BackgroundTasks) -> None:
         """Initialize the TaskRunner.
 
-        Add to any route handler with `FastAPI.Depends`.
+        Add to any route handler with `FastAPI.Depends`. Based on FastAPI and
+        Starlett's background task system, which means background tasks
+        for a given request will run serially, not concurrently.
 
         Arguments:
             background_tasks: FastAPI's background task system, fed in
@@ -33,9 +35,8 @@ class TaskRunner:
         that may occur.
 
         Arguments:
-            func: An async, argumentless, None-returning function to run
-                in the background. Use functools.partial to add arguments,
-                if required.
+            func: An async, None-returning function to run in the background.
+            Use kwargs to add arguments if required.
         """
         func_name = func.__qualname__
 

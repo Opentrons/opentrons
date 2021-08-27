@@ -22,6 +22,8 @@ class ProtocolFileType(str, Enum):
     JSON = "json"
 
 
+# TODO(mc, 2021-08-27): rename to something that better reflects
+# the fact that a protocol need not be a single file
 @dataclass(frozen=True)
 class ProtocolFile:
     """A value object representing a protocol file (or files) on disk.
@@ -31,5 +33,6 @@ class ProtocolFile:
         files: The list of files that make up the protocol.
     """
 
+    # TODO(mc, 2021-08-27): `protocol_type` is a little redundant as a field name
     protocol_type: ProtocolFileType
     files: List[Path]
