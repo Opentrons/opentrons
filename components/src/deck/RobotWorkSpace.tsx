@@ -11,12 +11,13 @@ export interface RobotWorkSpaceProps {
   className?: string
   children?: (props: RobotWorkSpaceRenderProps) => React.ReactNode
   deckLayerBlocklist?: string[]
+  id?: string
 }
 
 type GetRobotCoordsFromDOMCoords = RobotWorkSpaceRenderProps['getRobotCoordsFromDOMCoords']
 
 export function RobotWorkSpace(props: RobotWorkSpaceProps): JSX.Element | null {
-  const { children, deckDef, deckLayerBlocklist = [], viewBox } = props
+  const { children, deckDef, deckLayerBlocklist = [], viewBox, id } = props
   const wrapperRef = React.useRef<SVGSVGElement>(null)
 
   // NOTE: getScreenCTM in Chrome a DOMMatrix type,
@@ -55,6 +56,7 @@ export function RobotWorkSpace(props: RobotWorkSpaceProps): JSX.Element | null {
       className={cx(styles.robot_work_space, props.className)}
       viewBox={viewBox || wholeDeckViewBox}
       ref={wrapperRef}
+      id={id}
     >
       {deckDef && (
         <DeckFromData def={deckDef} layerBlocklist={deckLayerBlocklist} />
