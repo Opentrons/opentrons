@@ -304,7 +304,7 @@ get_status_specs: List[GetStatusSpec] = [
             stop_requested=False,
             commands_by_id=[],
         ),
-        expected_status=EngineStatus.READY_TO_START,
+        expected_status=EngineStatus.READY_TO_RUN,
     ),
     GetStatusSpec(
         subject=get_command_view(
@@ -312,13 +312,24 @@ get_status_specs: List[GetStatusSpec] = [
             stop_requested=False,
             commands_by_id=[("command-id", create_pending_command())],
         ),
-        expected_status=EngineStatus.READY_TO_START,
+        expected_status=EngineStatus.READY_TO_RUN,
     ),
     GetStatusSpec(
         subject=get_command_view(
             is_running=False,
             stop_requested=False,
             commands_by_id=[("command-id", create_running_command())],
+        ),
+        expected_status=EngineStatus.PAUSE_REQUESTED,
+    ),
+    GetStatusSpec(
+        subject=get_command_view(
+            is_running=False,
+            stop_requested=False,
+            commands_by_id=[
+                ("command-id-1", create_completed_command()),
+                ("command-id-2", create_pending_command()),
+            ],
         ),
         expected_status=EngineStatus.PAUSED,
     ),
@@ -361,6 +372,33 @@ get_status_specs: List[GetStatusSpec] = [
             commands_by_id=[],
         ),
         expected_status=EngineStatus.SUCCEEDED,
+    ),
+    GetStatusSpec(
+        subject=get_command_view(
+            is_running=False,
+            stop_requested=True,
+            commands_by_id=[("command-id", create_completed_command())],
+        ),
+        expected_status=EngineStatus.SUCCEEDED,
+    ),
+    GetStatusSpec(
+        subject=get_command_view(
+            is_running=False,
+            stop_requested=True,
+            commands_by_id=[("command-id", create_running_command())],
+        ),
+        expected_status=EngineStatus.STOP_REQUESTED,
+    ),
+    GetStatusSpec(
+        subject=get_command_view(
+            is_running=False,
+            stop_requested=True,
+            commands_by_id=[
+                ("command-id", create_completed_command()),
+                ("command-id", create_pending_command()),
+            ],
+        ),
+        expected_status=EngineStatus.STOPPED,
     ),
 ]
 

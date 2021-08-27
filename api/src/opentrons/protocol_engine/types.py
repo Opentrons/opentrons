@@ -11,9 +11,12 @@ from opentrons.types import DeckSlotName
 class EngineStatus(str, Enum):
     """Current execution status of a ProtocolEngine."""
 
-    READY_TO_START = "ready-to-start"
-    PAUSED = "paused"
+    READY_TO_RUN = "ready-to-run"
     RUNNING = "running"
+    PAUSE_REQUESTED = "pause-requested"
+    PAUSED = "paused"
+    STOP_REQUESTED = "stop-requested"
+    STOPPED = "stopped"
     FAILED = "failed"
     SUCCEEDED = "succeeded"
 

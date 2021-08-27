@@ -164,22 +164,31 @@ class CommandView(HasState[CommandState]):
 
     def get_status(self) -> EngineStatus:
         """Get the current execution status of the engine."""
-        if any(
-            command.status == CommandStatus.FAILED
-            for command in self._state.commands_by_id.values()
-        ):
+        all_commands = self._state.commands_by_id.values()
+        all_statuses = [c.status for c in all_commands]
+
+        if any(s == CommandStatus.FAILED for s in all_statuses):
             return EngineStatus.FAILED
 
-        if self._state.stop_requested:
-            return EngineStatus.SUCCEEDED
+        elif self._state.stop_requested:
+            if all(s == CommandStatus.SUCCEEDED for s in all_statuses):
+                return EngineStatus.SUCCEEDED
 
-        if self._state.is_running:
+            elif any(s == CommandStatus.RUNNING for s in all_statuses):
+                return EngineStatus.STOP_REQUESTED
+
+            else:
+                return EngineStatus.STOPPED
+
+        elif not self._state.is_running:
+            if all(s == CommandStatus.QUEUED for s in all_statuses):
+                return EngineStatus.READY_TO_RUN
+
+            elif any(s == CommandStatus.RUNNING for s in all_statuses):
+                return EngineStatus.PAUSE_REQUESTED
+
+            else:
+                return EngineStatus.PAUSED
+
+        else:
             return EngineStatus.RUNNING
-
-        if all(
-            command.status == CommandStatus.QUEUED
-            for command in self._state.commands_by_id.values()
-        ):
-            return EngineStatus.READY_TO_START
-
-        return EngineStatus.PAUSED
