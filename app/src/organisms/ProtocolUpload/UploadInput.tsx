@@ -127,7 +127,11 @@ export function UploadInput(props: UploadInputProps): JSX.Element {
         css={dropZoneStyles}
       >
         <Icon width={SIZE_3} name="upload" marginBottom={SPACING_4} />
-        <span aria-controls="file_input" role="button">
+        <span
+          aria-controls="file_input"
+          role="button"
+          id={'UploadInput_fileUploadLabel'}
+        >
           {t('drag_file_here')}
         </span>
         <input
