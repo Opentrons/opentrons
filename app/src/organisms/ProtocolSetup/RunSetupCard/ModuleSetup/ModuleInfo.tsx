@@ -35,11 +35,18 @@ export interface ModuleInfoProps {
   isAttached: boolean
 }
 
-export function ModuleInfo(props: ModuleInfoProps): JSX.Element {
+export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
   const { x, y, orientation, moduleModel, usbPort, hubPort, isAttached } = props
   const moduleType = getModuleType(moduleModel)
   const { t } = useTranslation('protocol_setup')
   const { childYOffset } = getModuleVizDims(orientation, moduleType)
+  const moduleNotAttached = usbPort === null && hubPort === null && !isAttached
+  const moduleAttachedWithoutUSBNum =
+    usbPort === null && hubPort === null && isAttached
+  const moduleAttachedViaPort =
+    hubPort === null && usbPort !== null && isAttached
+  const moduleAttachedViaHub =
+    t('usb_port_connected') + ' ' + hubPort + ' ' + t('hub_connected')
 
   return (
     <RobotCoordsForeignDiv
@@ -56,44 +63,28 @@ export function ModuleInfo(props: ModuleInfoProps): JSX.Element {
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
         <Flex flexDirection={DIRECTION_ROW}>
-          {!isAttached ? (
-            <Icon
-              name="alert-circle"
-              color={COLOR_ERROR}
-              key="icon"
-              height="0.625rem"
-              width="0.625rem"
-              marginRight={SPACING_1}
-              marginTop={SPACING_1}
-            />
-          ) : (
-            <Icon
-              name="check-circle"
-              color={COLOR_SUCCESS}
-              key="icon"
-              height="0.625rem"
-              width="0.625rem"
-              marginRight={SPACING_1}
-              marginTop={SPACING_1}
-            />
-          )}
+          <Icon
+            name="alert-circle"
+            color={isAttached ? COLOR_SUCCESS : COLOR_ERROR}
+            key="icon"
+            height="0.625rem"
+            width="0.625rem"
+            marginRight={SPACING_1}
+            marginTop={SPACING_1}
+          />
           <p>
             {!isAttached ? t('module_not_connected') : t('module_connected')}
           </p>
         </Flex>
         <Text css={FONT_BODY_1_DARK}>{getModuleDisplayName(moduleModel)}</Text>
         <Text fontSize={FONT_SIZE_CAPTION} fontStyle={FONT_STYLE_ITALIC}>
-          {usbPort === null && hubPort === null && !isAttached
+          {moduleNotAttached
             ? t('no_usb_port_yet')
-            : usbPort === null && hubPort === null && isAttached
+            : moduleAttachedWithoutUSBNum
             ? t('usb_port_connected_old')
-            : hubPort === null && usbPort !== null && isAttached
+            : moduleAttachedViaPort
             ? t('usb_port_connected') + ' ' + usbPort
-            : t('usb_port_connected') +
-              ' ' +
-              hubPort +
-              ' ' +
-              t('hub_connected')}
+            : moduleAttachedViaHub}
         </Text>
       </Flex>
     </RobotCoordsForeignDiv>
