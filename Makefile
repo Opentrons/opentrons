@@ -189,7 +189,7 @@ lint-py:
 
 .PHONY: lint-js
 lint-js:
-	eslint ".*.@(js|ts|tsx)" "**/*.@(js|ts|tsx)"
+	eslint --quiet ".*.@(js|ts|tsx)" "**/*.@(js|ts|tsx)"
 	prettier --ignore-path .eslintignore --check $(FORMAT_FILE_GLOB)
 
 .PHONY: lint-json
