@@ -182,6 +182,18 @@ function _getNextRobotStateAndWarningsSingleCommand(
       )
       break
 
+    case 'loadLabware':
+      break
+
+    case 'loadModule':
+      break
+
+    case 'loadPipette':
+      break
+
+    case 'loadLiquid':
+      break
+
     default:
       assert(
         false,

@@ -9,8 +9,7 @@ import type {
 
 export const createTimelineFromCommands = (
   commands: Command[],
-  invariantContext: InvariantContext,
-  initialRobotState: RobotState
+  invariantContext: InvariantContext
 ): CommandsAndRobotState[] =>
   commands.reduce<CommandsAndRobotState[]>(
     (acc, command: Command) => {
@@ -27,5 +26,16 @@ export const createTimelineFromCommands = (
         },
       ]
     },
-    [{ robotState: initialRobotState, commands: [] }]
+    [
+      {
+        robotState: {
+          pipettes: {},
+          labware: {},
+          modules: {},
+          tipState: { tipracks: {}, pipettes: {} },
+          liquidState: { pipettes: {}, labware: {} },
+        },
+        commands: [],
+      },
+    ]
   )

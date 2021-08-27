@@ -36,6 +36,15 @@ export interface UpdateRobotStateParams {
     }
   }
 }
+export interface LoadEntityParams {
+  entityId: string
+  locationId: string
+}
+export interface LoadLiquidParams {
+  liquidId: string
+  labwareId: string
+  volumeByWell: { [wellId: string]: number }
+}
 
 export type Command =
   | V5Command
@@ -44,8 +53,20 @@ export type Command =
       params: AirGapParams
     }
   | {
-      command: 'updateRobotState'
-      params: UpdateRobotStateParams
+      command: 'loadLabware'
+      params: LoadEntityParams
+    }
+  | {
+      command: 'loadModule'
+      params: LoadEntityParams
+    }
+  | {
+      command: 'loadPipette'
+      params: LoadEntityParams
+    }
+  | {
+      command: 'loadLiquid'
+      params: LoadLiquidParams
     }
 
 // NOTE: must be kept in sync with '../schemas/5.json'

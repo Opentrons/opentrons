@@ -712,7 +712,7 @@
             "additionalProperties": false,
             "properties": {
               "command": {
-                "enum": ["load_pipette", "load_labware", "load_module"]
+                "enum": ["loadPipette", "loadLabware", "loadModule"]
               },
               "params": {
                 "required": ["entityId", "locationId"],
@@ -737,7 +737,7 @@
             "additionalProperties": false,
             "properties": {
               "command": {
-                "enum": ["load_liquid"]
+                "enum": ["loadLiquid"]
               },
               "params": {
                 "required": ["liquidId", "labwareId", "volumeByWell"],
