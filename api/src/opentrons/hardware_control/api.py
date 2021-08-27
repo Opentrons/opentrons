@@ -470,6 +470,8 @@ class API(HardwareAPILike):
                        'default_dispense_flow_rates']
 
             instr_dict = instr.as_dict()
+            # TODO (spp, 2021-08-27): Revisit this logic. Why do we need to build
+            #  this dict newly every time? Any why only a few items are being updated?
             for key in configs:
                 result[key] = instr_dict[key]
             result['has_tip'] = instr.has_tip
@@ -706,6 +708,8 @@ class API(HardwareAPILike):
         instr_dict = attached[mount]
         if instr and not instr.has_tip:
             instr.add_tip(tip_length=tip_length)
+            # TODO (spp, 2021-08-27): These items are being updated in a local copy
+            #  of the PipetteDict, which gets thrown away. Fix this.
             instr_dict['has_tip'] = True
             instr_dict['tip_length'] = tip_length
         else:
@@ -717,6 +721,8 @@ class API(HardwareAPILike):
         instr_dict = attached[mount]
         if instr and instr.has_tip:
             instr.remove_tip()
+            # TODO (spp, 2021-08-27): These items are being updated in a local copy
+            #  of the PipetteDict, which gets thrown away. Fix this.
             instr_dict['has_tip'] = False
             instr_dict['tip_length'] = 0.0
         else:
