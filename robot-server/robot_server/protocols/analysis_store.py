@@ -30,6 +30,8 @@ class AnalysisStore:
         """Add analysis results to the store."""
         labware = []
         pipettes = []
+        # TODO(mc, 2021-08-25): return error details objects, not strings
+        error_messages = [str(e) for e in errors]
 
         for c in commands:
             if isinstance(c, pe_commands.LoadLabware) and c.result is not None:
@@ -37,31 +39,33 @@ class AnalysisStore:
                     AnalysisLabware(
                         id=c.result.labwareId,
                         loadName=c.data.loadName,
-                        namespace=c.data.namespace,
-                        version=c.data.version,
                         definitionUri=uri_from_details(
                             load_name=c.data.loadName,
                             namespace=c.data.namespace,
                             version=c.data.version,
                         ),
+                        location=c.data.location,
                     )
                 )
             elif isinstance(c, pe_commands.LoadPipette) and c.result is not None:
                 pipettes.append(
                     AnalysisPipette(
                         id=c.result.pipetteId,
-                        loadName=c.data.pipetteName,
+                        pipetteName=c.data.pipetteName,
                         mount=c.data.mount,
                     )
                 )
+            elif c.error is not None:
+                error_messages.append(c.error)
 
         self._analyses_by_id[protocol_id] = CompletedAnalysis(
             status=(
-                AnalysisStatus.SUCCEEDED if len(errors) == 0 else AnalysisStatus.FAILED
+                AnalysisStatus.SUCCEEDED
+                if len(error_messages) == 0
+                else AnalysisStatus.FAILED
             ),
             commands=list(commands),
-            # TODO(mc, 2021-08-25): return error details objects, not strings
-            errors=[str(e) for e in errors],
+            errors=error_messages,
             labware=labware,
             pipettes=pipettes,
         )

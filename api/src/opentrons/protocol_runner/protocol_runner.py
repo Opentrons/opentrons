@@ -92,7 +92,6 @@ class ProtocolRunner:
         """
         return await self._task_queue.join()
 
-    # TODO(mc, 2021-08-25): return errors along with commands
     async def run(self, protocol_file: ProtocolFile) -> Sequence[ProtocolCommand]:
         """Run a given protocol to completion."""
         self.load(protocol_file)

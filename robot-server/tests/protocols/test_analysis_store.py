@@ -25,7 +25,7 @@ def test_get_pending() -> None:
     assert result == PendingAnalysis()
 
 
-def test_add_failed_analysis() -> None:
+def test_add_errored_analysis() -> None:
     """It should be able to add a failed analysis to the store."""
     subject = AnalysisStore()
     error = RuntimeError("oh no!")
@@ -47,6 +47,8 @@ class CommandAnalysisSpec(NamedTuple):
     """Spec data for command parsing tests."""
 
     commands: Sequence[pe_commands.Command]
+    expected_status: AnalysisStatus
+    expected_errors: List[str]
     expected_labware: List[AnalysisLabware]
     expected_pipettes: List[AnalysisPipette]
 
@@ -71,13 +73,14 @@ command_analysis_specs: List[CommandAnalysisSpec] = [
                 ),
             )
         ],
+        expected_status=AnalysisStatus.SUCCEEDED,
+        expected_errors=[],
         expected_labware=[
             AnalysisLabware(
                 id="labware-id",
                 loadName="load-name",
-                namespace="namespace",
-                version=42,
                 definitionUri="namespace/load-name/42",
+                location=pe_types.DeckSlotLocation(slot=DeckSlotName.SLOT_1),
             )
         ],
         expected_pipettes=[],
@@ -95,14 +98,36 @@ command_analysis_specs: List[CommandAnalysisSpec] = [
                 result=pe_commands.LoadPipetteResult(pipetteId="pipette-id"),
             )
         ],
+        expected_status=AnalysisStatus.SUCCEEDED,
+        expected_errors=[],
         expected_labware=[],
         expected_pipettes=[
             AnalysisPipette(
                 id="pipette-id",
-                loadName=pe_types.PipetteName.P300_SINGLE,
+                pipetteName=pe_types.PipetteName.P300_SINGLE,
                 mount=MountType.LEFT,
             )
         ],
+    ),
+    CommandAnalysisSpec(
+        commands=[
+            pe_commands.LoadLabware(
+                id="load-labware-1",
+                status=pe_commands.CommandStatus.FAILED,
+                createdAt=datetime(year=2021, month=1, day=1),
+                data=pe_commands.LoadLabwareData(
+                    location=pe_types.DeckSlotLocation(slot=DeckSlotName.SLOT_1),
+                    loadName="load-name",
+                    namespace="namespace",
+                    version=42,
+                ),
+                error="Oh no!",
+            )
+        ],
+        expected_status=AnalysisStatus.FAILED,
+        expected_errors=["Oh no!"],
+        expected_labware=[],
+        expected_pipettes=[],
     ),
 ]
 
@@ -110,6 +135,8 @@ command_analysis_specs: List[CommandAnalysisSpec] = [
 @pytest.mark.parametrize(CommandAnalysisSpec._fields, command_analysis_specs)
 def test_add_parses_labware_commands(
     commands: Sequence[pe_commands.Command],
+    expected_status: AnalysisStatus,
+    expected_errors: List[str],
     expected_labware: List[AnalysisLabware],
     expected_pipettes: List[AnalysisPipette],
 ) -> None:
@@ -120,9 +147,9 @@ def test_add_parses_labware_commands(
     result = subject.get("protocol-id")
 
     assert result == CompletedAnalysis(
-        status=AnalysisStatus.SUCCEEDED,
-        errors=[],
-        commands=list(commands),
+        status=expected_status,  # type: ignore[arg-type]
+        errors=expected_errors,
         labware=expected_labware,
         pipettes=expected_pipettes,
+        commands=list(commands),
     )

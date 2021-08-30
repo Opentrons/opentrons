@@ -6,7 +6,11 @@ from typing import List, Union
 from typing_extensions import Literal
 
 from opentrons.types import MountType
-from opentrons.protocol_engine import Command as EngineCommand, PipetteName
+from opentrons.protocol_engine import (
+    Command as EngineCommand,
+    PipetteName,
+    LabwareLocation,
+)
 
 
 class AnalysisStatus(str, Enum):
@@ -33,7 +37,7 @@ class AnalysisPipette(BaseModel):
     """A pipette that the protocol is expected to use, based on the analysis."""
 
     id: str
-    loadName: PipetteName
+    pipetteName: PipetteName
     mount: MountType
 
 
@@ -42,9 +46,8 @@ class AnalysisLabware(BaseModel):
 
     id: str
     loadName: str
-    namespace: str
-    version: int
     definitionUri: str
+    location: LabwareLocation
 
 
 class CompletedAnalysis(BaseAnalysis):
