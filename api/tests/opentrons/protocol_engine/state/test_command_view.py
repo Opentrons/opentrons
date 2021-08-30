@@ -407,10 +407,13 @@ get_status_specs: List[GetStatusSpec] = [
 def test_get_status(subject: CommandView, expected_status: EngineStatus) -> None:
     """It should set a status according to the command queue and running flag.
 
-    1. Not running, not done, only queued commands: READY_TO_RUN
-    2. Not running, not done, with commands: PAUSED
-    3. Running, not done, no failed commands: RUNNING
-    4. Any failed commands: FAILED
-    5. Done, no failed commands: SUCCEEDED
+    1. Not running, no stop requested, only queued commands: READY_TO_RUN
+    2. Running, no stop requested, no failed commands: RUNNING
+    3. Not running, no stop requested, command still running: PAUSE_REQUESTED
+    4. Not running, no stop requested, no running commands: PAUSED
+    5. Stop requested, command still running: STOP_REQUESTED
+    6. Stop requested, no running commands, with queued commands: STOPPED
+    7. Stop requested, all commands succeeded: SUCCEEDED
+    8. Any failed commands: FAILED
     """
     assert subject.get_status() == expected_status
