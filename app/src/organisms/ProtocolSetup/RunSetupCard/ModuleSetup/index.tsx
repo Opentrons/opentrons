@@ -223,18 +223,6 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
         </RobotWorkSpace>
       </Flex>
       <Flex justifyContent={JUSTIFY_CENTER} margin={SPACING_4}>
-        {combinedModules.length - uniqueModules.length  === moduleModels.length ? 
-        (
-        <PrimaryBtn
-          title={t('proceed_to_labware_setup_step')}
-          disabled={false}
-          onClick={expandLabwareSetupStep}
-          backgroundColor={C_BLUE}
-          id={'ModuleSetup_proceedToLabwareSetup'}
-        >
-          {t('proceed_to_labware_setup_step')}
-        </PrimaryBtn>
-       ) : (
         <PrimaryBtn
           title={t('proceed_to_labware_setup_step')}
           disabled={proceedToLabwareDisabled}

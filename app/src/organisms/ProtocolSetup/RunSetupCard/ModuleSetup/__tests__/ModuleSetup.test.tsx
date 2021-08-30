@@ -17,7 +17,11 @@ import {
   ModuleModel,
   ModuleRealType,
 } from '@opentrons/shared-data'
-import {mockThermocycler as mockThermocyclerFixture, mockMagneticModule as mockMagneticModuleFixture} from '../../../../../redux/modules/__fixtures__/index'
+import { getAttachedModules } from '../../../../../redux/modules'
+import {
+  mockThermocycler as mockThermocyclerFixture,
+  mockMagneticModule as mockMagneticModuleFixture,
+} from '../../../../../redux/modules/__fixtures__/index'
 
 jest.mock('../../../../../redux/modules')
 jest.mock('../ModuleInfo')
@@ -36,7 +40,9 @@ jest.mock('@opentrons/shared-data', () => {
     inferModuleOrientationFromXCoordinate: jest.fn(),
   }
 })
-
+const mockGetAttachedModules = getAttachedModules as jest.MockedFunction<
+  typeof getAttachedModules
+>
 const mockModuleInfo = ModuleInfo as jest.MockedFunction<typeof ModuleInfo>
 
 const mockModuleViz = ModuleViz as jest.MockedFunction<typeof ModuleViz>
