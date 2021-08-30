@@ -62,7 +62,7 @@ clean-js: clean-ts
 
 .PHONY: setup-py
 setup-py:
-	$(OT_PYTHON) -m pip install pipenv==2020.8.13
+	$(OT_PYTHON) -m pip install pipenv==2021.5.29
 	$(MAKE) -C $(API_DIR) setup
 	$(MAKE) -C $(UPDATE_SERVER_DIR) setup
 	$(MAKE) -C $(NOTIFY_SERVER_DIR) setup

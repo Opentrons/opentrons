@@ -8,6 +8,7 @@ shared-data/python/**
 **/dist/**
 **/build/**
 **/venv/**
+.opentrons_config
 
 # typescript
 app-shell/lib/**

@@ -44,6 +44,8 @@ DESCRIPTION = (
     "A pub sub system for the Opentrons OT2")
 PACKAGES = find_packages(where='.', exclude=["tests.*", "tests"])
 INSTALL_REQUIRES = [
+    f"opentrons=={VERSION}",
+    f"opentrons-shared-data=={VERSION}",
     'pyzmq==19.0.2',
     'pydantic==1.4'
 ]

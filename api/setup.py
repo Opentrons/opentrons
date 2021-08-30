@@ -52,13 +52,15 @@ DESCRIPTION = (
     "writing automated biology lab protocols easy.")
 PACKAGES = find_packages(where='src')
 INSTALL_REQUIRES = [
-    'pyserial==3.5',
-    'numpy>=1.15.1',
-    'jsonschema>=3.0.2,<4',
-    'aionotify==0.2.0',
-    f'opentrons_shared_data=={VERSION}',
-    'typing-extensions>=3.7.4.3',
-    'pydantic==1.4',
+    f"opentrons-shared-data=={VERSION}",
+    "aionotify==0.2.0",
+    "anyio==3.3.0",
+    "jsonschema==3.0.2",
+    "numpy==1.15.1",
+    "pydantic==1.4",
+    "pyserial==3.5",
+    "systemd-python==234; sys_platform=='linux'",
+    "typing-extensions==3.10.0.0",
 ]
 
 
