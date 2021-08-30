@@ -43,7 +43,7 @@ export const SourceDestHeaders = (props: Props): JSX.Element => {
         <WellSelectionField
           {...propsForFields[addFieldNamePrefix('wells')]}
           labwareId={formData[addFieldNamePrefix('labware')]}
-          pipetteId={formData['pipette']}
+          pipetteId={formData.pipette}
         />
       </div>
     </AspDispSection>

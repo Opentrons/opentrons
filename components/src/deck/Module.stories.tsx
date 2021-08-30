@@ -30,7 +30,7 @@ export default {
 
 const Template: Story<React.ComponentProps<typeof ModuleComponent>> = args => {
   return (
-    <RobotWorkSpace deckDef={getDeckDefinitions()['ot2_standard']}>
+    <RobotWorkSpace deckDef={getDeckDefinitions().ot2_standard}>
       {({ deckSlotsById }: RobotWorkSpaceRenderProps) => {
         const slot = deckSlotsById['7']
         return (

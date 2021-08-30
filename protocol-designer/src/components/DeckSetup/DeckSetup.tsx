@@ -368,7 +368,7 @@ export const DeckSetup = (props: DeckSetupProps): JSX.Element => {
   const showGen1MultichannelCollisionWarnings =
     !_disableCollisionWarnings && _hasGen1MultichannelPipette
 
-  const deckDef = React.useMemo(() => getDeckDefinitions()['ot2_standard'], [])
+  const deckDef = React.useMemo(() => getDeckDefinitions().ot2_standard, [])
   const wrapperRef: React.RefObject<HTMLDivElement> = useOnClickOutside({
     onClickOutside: props.handleClickOutside,
   })
@@ -405,7 +405,7 @@ export const DeckSetup = (props: DeckSetupProps): JSX.Element => {
 }
 
 export const NullDeckState = (): JSX.Element => {
-  const deckDef = React.useMemo(() => getDeckDefinitions()['ot2_standard'], [])
+  const deckDef = React.useMemo(() => getDeckDefinitions().ot2_standard, [])
 
   return (
     <div className={styles.deck_row}>
