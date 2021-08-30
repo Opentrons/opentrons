@@ -16,9 +16,7 @@ class Vertex(Generic[VertexName, VertexLike]):
     of a graph.
     """
 
-    def __init__(
-            self, vertex: VertexLike,
-            neighbors: List[VertexName]) -> None:
+    def __init__(self, vertex: VertexLike, neighbors: List[VertexName]) -> None:
         """Vertex class initializer.
 
         :param vertex: A node dataclass
@@ -93,9 +91,11 @@ class Graph(Generic[VertexName, VertexLike]):
     # passed into sort. See
     # https://github.com/python/typing/issues/760
     def __init__(
-            self, sorted_graph: List[Vertex],
-            lookup_table: Dict[VertexName, Vertex],
-            sort_by: Callable[[Vertex], str]) -> None:
+        self,
+        sorted_graph: List[Vertex],
+        lookup_table: Dict[VertexName, Vertex],
+        sort_by: Callable[[Vertex], str],
+    ) -> None:
         """Graph class initializer.
 
         :param sorted_graph: The initial graph, sorted
@@ -110,8 +110,7 @@ class Graph(Generic[VertexName, VertexLike]):
         self._lookup_table = lookup_table
 
     @classmethod
-    def build(cls, graph: List[VertexLike],
-              sort_by: Callable = default_sort) -> Graph:
+    def build(cls, graph: List[VertexLike], sort_by: Callable = default_sort) -> Graph:
         """Graph class builder.
 
         :param graph: A list of nodes to add to the graph.

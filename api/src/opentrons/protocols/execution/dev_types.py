@@ -3,18 +3,28 @@ from typing import Callable, Dict, TYPE_CHECKING
 from typing_extensions import Protocol, TypedDict
 
 from opentrons_shared_data.protocol.dev_types import (
-    BlowoutParams, DelayParams, PipetteAccessParams,
-    StandardLiquidHandlingParams, TouchTipParams, MoveToSlotParams,
-    TemperatureParams, ModuleIDParams, MagneticModuleEngageParams,
-    ThermocyclerRunProfileParams, ThermocyclerSetTargetBlockParams,
-    MoveToWellParams
+    BlowoutParams,
+    DelayParams,
+    PipetteAccessParams,
+    StandardLiquidHandlingParams,
+    TouchTipParams,
+    MoveToSlotParams,
+    TemperatureParams,
+    ModuleIDParams,
+    MagneticModuleEngageParams,
+    ThermocyclerRunProfileParams,
+    ThermocyclerSetTargetBlockParams,
+    MoveToWellParams,
 )
 
 if TYPE_CHECKING:
     from opentrons.protocol_api.protocol_context import ProtocolContext
     from opentrons.protocol_api.instrument_context import InstrumentContext
     from opentrons.protocol_api.module_contexts import (
-        MagneticModuleContext, ThermocyclerContext, TemperatureModuleContext)
+        MagneticModuleContext,
+        ThermocyclerContext,
+        TemperatureModuleContext,
+    )
     from opentrons.protocol_api.labware import Labware
 
 
@@ -27,12 +37,14 @@ if TYPE_CHECKING:
 #  - please include this file as close to a leaf as possible
 
 if Protocol is not None:
+
     class Dictable(Protocol):
-        """ A protocol defining the _asdict interface to
+        """A protocol defining the _asdict interface to
         classes generated from typing.NamedTuple, which cannot
         be used as a type annotation because it is a type ctor
         not a type (https://github.com/python/mypy/issues/3915)
         """
+
         async def _asdict(self):
             ...
 
@@ -41,93 +53,129 @@ if Protocol is not None:
 # opentrons_shared_data.protocol.constants because of
 # https://github.com/python/mypy/issues/4128
 PipetteDispatch = TypedDict(
-    'PipetteDispatch',
+    "PipetteDispatch",
     {
-        'delay': Callable[['ProtocolContext', 'DelayParams'], None],
-        'blowout': Callable[
-            [Dict[str, 'InstrumentContext'],
-             Dict[str, 'Labware'],
-             'BlowoutParams'], None],
-        'pickUpTip': Callable[
-            [Dict[str, 'InstrumentContext'],
-             Dict[str, 'Labware'],
-             'PipetteAccessParams'], None],
-        'dropTip': Callable[
-            [Dict[str, 'InstrumentContext'],
-             Dict[str, 'Labware'],
-             'PipetteAccessParams'], None],
-        'aspirate': Callable[
-            [Dict[str, 'InstrumentContext'],
-             Dict[str, 'Labware'],
-             'StandardLiquidHandlingParams'], None],
-        'dispense': Callable[
-            [Dict[str, 'InstrumentContext'],
-             Dict[str, 'Labware'],
-             'StandardLiquidHandlingParams'], None],
-        'touchTip': Callable[
-            [Dict[str, 'InstrumentContext'],
-             Dict[str, 'Labware'],
-             'TouchTipParams'], None],
-        'moveToSlot': Callable[
-            ['ProtocolContext',
-             Dict[str, 'InstrumentContext'],
-             'MoveToSlotParams'], None],
-        'moveToWell': Callable[
-            [Dict[str, 'InstrumentContext'],
-             Dict[str, 'Labware'],
-             'MoveToWellParams'], None],
-        'airGap': Callable[
-            [Dict[str, 'InstrumentContext'],
-             Dict[str, 'Labware'],
-             'StandardLiquidHandlingParams'], None],
+        "delay": Callable[["ProtocolContext", "DelayParams"], None],
+        "blowout": Callable[
+            [Dict[str, "InstrumentContext"], Dict[str, "Labware"], "BlowoutParams"],
+            None,
+        ],
+        "pickUpTip": Callable[
+            [
+                Dict[str, "InstrumentContext"],
+                Dict[str, "Labware"],
+                "PipetteAccessParams",
+            ],
+            None,
+        ],
+        "dropTip": Callable[
+            [
+                Dict[str, "InstrumentContext"],
+                Dict[str, "Labware"],
+                "PipetteAccessParams",
+            ],
+            None,
+        ],
+        "aspirate": Callable[
+            [
+                Dict[str, "InstrumentContext"],
+                Dict[str, "Labware"],
+                "StandardLiquidHandlingParams",
+            ],
+            None,
+        ],
+        "dispense": Callable[
+            [
+                Dict[str, "InstrumentContext"],
+                Dict[str, "Labware"],
+                "StandardLiquidHandlingParams",
+            ],
+            None,
+        ],
+        "touchTip": Callable[
+            [Dict[str, "InstrumentContext"], Dict[str, "Labware"], "TouchTipParams"],
+            None,
+        ],
+        "moveToSlot": Callable[
+            ["ProtocolContext", Dict[str, "InstrumentContext"], "MoveToSlotParams"],
+            None,
+        ],
+        "moveToWell": Callable[
+            [Dict[str, "InstrumentContext"], Dict[str, "Labware"], "MoveToWellParams"],
+            None,
+        ],
+        "airGap": Callable[
+            [
+                Dict[str, "InstrumentContext"],
+                Dict[str, "Labware"],
+                "StandardLiquidHandlingParams",
+            ],
+            None,
+        ],
     },
-    total=False)
+    total=False,
+)
 
 
 JsonV4MagneticModuleDispatch = TypedDict(
-    'JsonV4MagneticModuleDispatch',
+    "JsonV4MagneticModuleDispatch",
     {
-        'magneticModule/engageMagnet': Callable[
-            ['MagneticModuleContext', 'MagneticModuleEngageParams'], None],
-        'magneticModule/disengageMagnet': Callable[
-            ['MagneticModuleContext', 'ModuleIDParams'], None],
-    })
+        "magneticModule/engageMagnet": Callable[
+            ["MagneticModuleContext", "MagneticModuleEngageParams"], None
+        ],
+        "magneticModule/disengageMagnet": Callable[
+            ["MagneticModuleContext", "ModuleIDParams"], None
+        ],
+    },
+)
 
 JsonV4TemperatureModuleDispatch = TypedDict(
-    'JsonV4TemperatureModuleDispatch',
+    "JsonV4TemperatureModuleDispatch",
     {
-        'temperatureModule/setTargetTemperature': Callable[
-            ['TemperatureModuleContext', 'TemperatureParams'], None],
-        'temperatureModule/deactivate': Callable[
-            ['TemperatureModuleContext', 'ModuleIDParams'], None],
-        'temperatureModule/awaitTemperature': Callable[
-            ['TemperatureModuleContext', 'TemperatureParams'], None]
-    }
+        "temperatureModule/setTargetTemperature": Callable[
+            ["TemperatureModuleContext", "TemperatureParams"], None
+        ],
+        "temperatureModule/deactivate": Callable[
+            ["TemperatureModuleContext", "ModuleIDParams"], None
+        ],
+        "temperatureModule/awaitTemperature": Callable[
+            ["TemperatureModuleContext", "TemperatureParams"], None
+        ],
+    },
 )
 
 JsonV4ThermocyclerDispatch = TypedDict(
-    'JsonV4ThermocyclerDispatch',
+    "JsonV4ThermocyclerDispatch",
     {
-        'thermocycler/closeLid': Callable[
-            ['ThermocyclerContext', 'ModuleIDParams'], None],
-        'thermocycler/openLid': Callable[
-            ['ThermocyclerContext', 'ModuleIDParams'], None],
-        'thermocycler/deactivateBlock': Callable[
-            ['ThermocyclerContext', 'ModuleIDParams'], None],
-        'thermocycler/deactivateLid': Callable[
-            ['ThermocyclerContext', 'ModuleIDParams'], None],
-        'thermocycler/setTargetBlockTemperature': Callable[
-            ['ThermocyclerContext', 'ThermocyclerSetTargetBlockParams'],
-            None],
-        'thermocycler/setTargetLidTemperature': Callable[
-            ['ThermocyclerContext', 'TemperatureParams'], None],
-        'thermocycler/runProfile': Callable[
-            ['ThermocyclerContext', 'ThermocyclerRunProfileParams'], None],
-        'thermocycler/awaitBlockTemperature': Callable[
-            ['ThermocyclerContext', 'TemperatureParams'], None],
-        'thermocycler/awaitLidTemperature': Callable[
-            ['ThermocyclerContext', 'TemperatureParams'], None],
-        'thermocycler/awaitProfileComplete': Callable[
-            ['ThermocyclerContext', 'ModuleIDParams'], None]
-    }
+        "thermocycler/closeLid": Callable[
+            ["ThermocyclerContext", "ModuleIDParams"], None
+        ],
+        "thermocycler/openLid": Callable[
+            ["ThermocyclerContext", "ModuleIDParams"], None
+        ],
+        "thermocycler/deactivateBlock": Callable[
+            ["ThermocyclerContext", "ModuleIDParams"], None
+        ],
+        "thermocycler/deactivateLid": Callable[
+            ["ThermocyclerContext", "ModuleIDParams"], None
+        ],
+        "thermocycler/setTargetBlockTemperature": Callable[
+            ["ThermocyclerContext", "ThermocyclerSetTargetBlockParams"], None
+        ],
+        "thermocycler/setTargetLidTemperature": Callable[
+            ["ThermocyclerContext", "TemperatureParams"], None
+        ],
+        "thermocycler/runProfile": Callable[
+            ["ThermocyclerContext", "ThermocyclerRunProfileParams"], None
+        ],
+        "thermocycler/awaitBlockTemperature": Callable[
+            ["ThermocyclerContext", "TemperatureParams"], None
+        ],
+        "thermocycler/awaitLidTemperature": Callable[
+            ["ThermocyclerContext", "TemperatureParams"], None
+        ],
+        "thermocycler/awaitProfileComplete": Callable[
+            ["ThermocyclerContext", "ModuleIDParams"], None
+        ],
+    },
 )

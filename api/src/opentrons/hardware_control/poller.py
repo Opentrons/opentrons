@@ -103,11 +103,11 @@ class Poller(Generic[DataT]):
     """Asyncio poller."""
 
     def __init__(
-            self,
-            interval_seconds: float,
-            reader: Reader[DataT],
-            listener: Listener[DataT],
-            loop: Optional[asyncio.AbstractEventLoop] = None
+        self,
+        interval_seconds: float,
+        reader: Reader[DataT],
+        listener: Listener[DataT],
+        loop: Optional[asyncio.AbstractEventLoop] = None,
     ) -> None:
         """
         Constructor.

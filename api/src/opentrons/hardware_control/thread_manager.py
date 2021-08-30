@@ -17,29 +17,28 @@ class ThreadManagerException(Exception):
 
 
 async def call_coroutine_threadsafe(
-        loop: asyncio.AbstractEventLoop,
-        coro, *args, **kwargs) -> asyncio.Future:
+    loop: asyncio.AbstractEventLoop, coro, *args, **kwargs
+) -> asyncio.Future:
     fut = asyncio.run_coroutine_threadsafe(coro(*args, **kwargs), loop)
     wrapped = asyncio.wrap_future(fut)
     return await wrapped
 
 
-WrappedObj = TypeVar('WrappedObj')
+WrappedObj = TypeVar("WrappedObj")
 
 
 class CallBridger(Generic[WrappedObj]):
     def __init__(
-            self,
-            wrapped_obj: WrappedObj,
-            loop: asyncio.AbstractEventLoop) -> None:
+        self, wrapped_obj: WrappedObj, loop: asyncio.AbstractEventLoop
+    ) -> None:
         self.wrapped_obj = wrapped_obj
         self._loop = loop
 
     def __getattribute__(self, attr_name: str) -> Any:
         # Almost every attribute retrieved from us will be for people actually
         # looking for an attribute of the managed object, so check there first.
-        managed_obj = object.__getattribute__(self, 'wrapped_obj')
-        loop = object.__getattribute__(self, '_loop')
+        managed_obj = object.__getattribute__(self, "wrapped_obj")
+        loop = object.__getattribute__(self, "_loop")
         try:
             attr = getattr(managed_obj, attr_name)
         except AttributeError:
@@ -52,8 +51,7 @@ class CallBridger(Generic[WrappedObj]):
 
             @functools.wraps(attr)
             async def wrapper(*args, **kwargs):
-                return await call_coroutine_threadsafe(
-                    loop, attr, *args, **kwargs)
+                return await call_coroutine_threadsafe(loop, attr, *args, **kwargs)
 
             return wrapper
 
@@ -74,7 +72,7 @@ class CallBridger(Generic[WrappedObj]):
 # functionality. It is more readable and protected from
 # unintentional recursion.
 class ThreadManager:
-    """ A wrapper to make every call into :py:class:`.hardware_control.API`
+    """A wrapper to make every call into :py:class:`.hardware_control.API`
     execute within the same thread.
 
     This class spawns a worker thread and starts an event loop within.
@@ -98,7 +96,7 @@ class ThreadManager:
     """
 
     def __init__(self, builder, *args, **kwargs):
-        """ Build the ThreadManager.
+        """Build the ThreadManager.
 
         :param builder: The API function to use
         """
@@ -110,7 +108,8 @@ class ThreadManager:
         is_running = threading.Event()
         self._is_running = is_running
         self._cached_modules: weakref.WeakKeyDictionary[
-            AbstractModule, CallBridger[AbstractModule]] = weakref.WeakKeyDictionary()
+            AbstractModule, CallBridger[AbstractModule]
+        ] = weakref.WeakKeyDictionary()
         # TODO: remove this if we switch to python 3.8
         # https://docs.python.org/3/library/asyncio-subprocess.html#subprocess-and-threads  # noqa
         # On windows, the event loop and system interface is different and
@@ -119,27 +118,31 @@ class ThreadManager:
             asyncio.get_child_watcher()
         except NotImplementedError:
             pass
-        blocking = not kwargs.pop('threadmanager_nonblocking', False)
-        target = object.__getattribute__(self, '_build_and_start_loop')
-        thread = threading.Thread(target=target, name='ManagedThread',
-                                  args=(builder, *args), kwargs=kwargs,
-                                  daemon=True)
+        blocking = not kwargs.pop("threadmanager_nonblocking", False)
+        target = object.__getattribute__(self, "_build_and_start_loop")
+        thread = threading.Thread(
+            target=target,
+            name="ManagedThread",
+            args=(builder, *args),
+            kwargs=kwargs,
+            daemon=True,
+        )
         self._thread = thread
         thread.start()
         if blocking:
-            object.__getattribute__(self, 'managed_thread_ready_blocking')()
+            object.__getattribute__(self, "managed_thread_ready_blocking")()
 
     def managed_thread_ready_blocking(self):
-        object.__getattribute__(self, '_is_running').wait()
-        if not object.__getattribute__(self, 'managed_obj'):
+        object.__getattribute__(self, "_is_running").wait()
+        if not object.__getattribute__(self, "managed_obj"):
             raise ThreadManagerException("Failed to create Managed Object")
 
     async def managed_thread_ready_async(self):
-        is_running = object.__getattribute__(self, '_is_running')
+        is_running = object.__getattribute__(self, "_is_running")
         while not is_running.is_set():
             await asyncio.sleep(0.1)
         # Thread initialization is done.
-        if not object.__getattribute__(self, 'managed_obj'):
+        if not object.__getattribute__(self, "managed_obj"):
             raise ThreadManagerException("Failed to create Managed Object")
 
     def _build_and_start_loop(self, builder, *args, **kwargs):
@@ -147,16 +150,14 @@ class ThreadManager:
         asyncio.set_event_loop(loop)
         self._loop = loop
         try:
-            managed_obj = loop.run_until_complete(builder(*args,
-                                                          loop=loop,
-                                                          **kwargs))
+            managed_obj = loop.run_until_complete(builder(*args, loop=loop, **kwargs))
             self.managed_obj = managed_obj
             self.bridged_obj = CallBridger(managed_obj, loop)
             self._sync_managed_obj = SynchronousAdapter(managed_obj)
         except Exception:
-            MODULE_LOG.exception('Exception in Thread Manager build')
+            MODULE_LOG.exception("Exception in Thread Manager build")
         finally:
-            object.__getattribute__(self, '_is_running').set()
+            object.__getattribute__(self, "_is_running").set()
             loop.run_forever()
             loop.close()
 
@@ -169,19 +170,19 @@ class ThreadManager:
         return self._sync_managed_obj  # type: ignore
 
     def __repr__(self):
-        return '<ThreadManager>'
+        return "<ThreadManager>"
 
     def clean_up(self):
         try:
-            loop = object.__getattribute__(self, '_loop')
+            loop = object.__getattribute__(self, "_loop")
             loop.call_soon_threadsafe(loop.stop)
         except Exception:
             pass
-        object.__setattr__(self, '_cached_modules', weakref.WeakKeyDictionary({}))
-        object.__getattribute__(self, '_thread').join()
+        object.__setattr__(self, "_cached_modules", weakref.WeakKeyDictionary({}))
+        object.__getattribute__(self, "_thread").join()
 
     def wrap_module(self, module: AbstractModule) -> CallBridger[AbstractModule]:
-        """ Return the module object wrapped in a CallBridger and cache it.
+        """Return the module object wrapped in a CallBridger and cache it.
 
         The wrapped module objects are cached in `self._cached_modules` so they can be
         re-used throughout the module object's life, as creating a wrapper is expensive.
@@ -189,12 +190,13 @@ class ThreadManager:
         garbage collected when modules are detached (since entries in WeakKeyDictionary
         get discarded when there is no longer a strong reference to the key).
         """
-        wrapper_cache = object.__getattribute__(self, '_cached_modules')
+        wrapper_cache = object.__getattribute__(self, "_cached_modules")
         this_module_wrapper = wrapper_cache.get(module)
 
         if this_module_wrapper is None:
-            this_module_wrapper = CallBridger(module,
-                                              object.__getattribute__(self, '_loop'))
+            this_module_wrapper = CallBridger(
+                module, object.__getattribute__(self, "_loop")
+            )
             wrapper_cache.update({module: this_module_wrapper})
 
         return this_module_wrapper
@@ -205,24 +207,25 @@ class ThreadManager:
         # objects it returns have associated methods that can be called.
         # That means they need the same wrapping treatment as the API
         # itself.
-        if attr_name == 'attached_modules':
-            wrap = object.__getattribute__(self, 'wrap_module')
-            managed = object.__getattribute__(self, 'managed_obj')
+        if attr_name == "attached_modules":
+            wrap = object.__getattribute__(self, "wrap_module")
+            managed = object.__getattribute__(self, "managed_obj")
             attr = getattr(managed, attr_name)
             return [wrap(mod) for mod in attr]
-        elif attr_name == 'clean_up':
+        elif attr_name == "clean_up":
             # the wrapped object probably has this attr as well as us, and we
             # want to call both, with the wrapped one first
 
             # we only want to call cleanup once, and then only if the loop
             # is running
-            wrapped_loop = object.__getattribute__(self, '_loop')
+            wrapped_loop = object.__getattribute__(self, "_loop")
             if not wrapped_loop.is_running():
                 return lambda: None
 
             wrapped_cleanup = getattr(
-                    object.__getattribute__(self, 'bridged_obj'), 'clean_up')
-            our_cleanup = object.__getattribute__(self, 'clean_up')
+                object.__getattribute__(self, "bridged_obj"), "clean_up"
+            )
+            our_cleanup = object.__getattribute__(self, "clean_up")
 
             def call_both():
                 # the wrapped cleanup wants to happen in the managed thread,
@@ -236,8 +239,7 @@ class ThreadManager:
                     # for an asyncio.spin_once()
                     await asyncio.sleep(0.1)
 
-                fut = asyncio.run_coroutine_threadsafe(
-                    clean_and_notify(), wrapped_loop)
+                fut = asyncio.run_coroutine_threadsafe(clean_and_notify(), wrapped_loop)
                 fut.result()
                 our_cleanup()
 
@@ -245,7 +247,6 @@ class ThreadManager:
 
         else:
             try:
-                return getattr(
-                    object.__getattribute__(self, 'bridged_obj'), attr_name)
+                return getattr(object.__getattribute__(self, "bridged_obj"), attr_name)
             except AttributeError:
                 return object.__getattribute__(self, attr_name)

@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 # functionality. It is more readable and protected from
 # unintentional recursion.
 class SynchronousAdapter(HardwareAPILike):
-    """ A wrapper to make every call into :py:class:`.hardware_control.API`
+    """A wrapper to make every call into :py:class:`.hardware_control.API`
     synchronous.
 
     This class expects to wrap an asynchronous object running in its own thread
@@ -40,15 +40,15 @@ class SynchronousAdapter(HardwareAPILike):
     >>> sync_api.home()
     """
 
-    def __init__(self, asynchronous_instance: 'HasLoop') -> None:
-        """ Build the SynchronousAdapter.
+    def __init__(self, asynchronous_instance: "HasLoop") -> None:
+        """Build the SynchronousAdapter.
 
         :param asynchronous_instance: The asynchronous class instance to wrap
         """
         self._obj_to_adapt = asynchronous_instance
 
     def __repr__(self):
-        return '<SynchronousAdapter>'
+        return "<SynchronousAdapter>"
 
     @staticmethod
     def call_coroutine_sync(loop, to_call, *args, **kwargs):
@@ -56,10 +56,10 @@ class SynchronousAdapter(HardwareAPILike):
         return fut.result()
 
     def __getattribute__(self, attr_name):
-        """ Retrieve attributes from our API and wrap coroutines """
+        """Retrieve attributes from our API and wrap coroutines"""
         # Almost every attribute retrieved from us will be for people actually
         # looking for an attribute of the hardware API, so check there first.
-        obj_to_adapt = object.__getattribute__(self, '_obj_to_adapt')
+        obj_to_adapt = object.__getattribute__(self, "_obj_to_adapt")
         try:
             inner_attr = getattr(obj_to_adapt, attr_name)
         except AttributeError:
@@ -78,8 +78,10 @@ class SynchronousAdapter(HardwareAPILike):
         if asyncio.iscoroutinefunction(check):
             # Return a synchronized version of the coroutine
             return functools.partial(
-                object.__getattribute__(self, 'call_coroutine_sync'),
-                obj_to_adapt._loop, inner_attr)
+                object.__getattribute__(self, "call_coroutine_sync"),
+                obj_to_adapt._loop,
+                inner_attr,
+            )
         elif asyncio.iscoroutine(check):
             # Catch awaitable properties and reify the future before returning
             fut = asyncio.run_coroutine_threadsafe(check, obj_to_adapt._loop)

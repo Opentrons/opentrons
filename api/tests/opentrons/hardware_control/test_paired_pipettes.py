@@ -11,47 +11,47 @@ from opentrons.config import pipette_config as pc
 def dummy_instruments():
     dummy_instruments_attached = {
         types.Mount.LEFT: {
-            'model': 'p300_single_v2.0',
-            'id': 'fake',
-            'name': 'p300_single_gen2'
+            "model": "p300_single_v2.0",
+            "id": "fake",
+            "name": "p300_single_gen2",
         },
         types.Mount.RIGHT: {
-            'model': 'p20_single_v2.0',
-            'id': 'fake2',
-            'name': 'p20_single_gen2',
-        }
+            "model": "p20_single_v2.0",
+            "id": "fake2",
+            "name": "p20_single_gen2",
+        },
     }
     return dummy_instruments_attached
 
 
 async def test_move_z_axis(hardware_api, monkeypatch):
     mock_be_move = mock.AsyncMock()
-    monkeypatch.setattr(hardware_api._backend, 'move', mock_be_move)
+    monkeypatch.setattr(hardware_api._backend, "move", mock_be_move)
     mount = PipettePair.PRIMARY_RIGHT
     await hardware_api.home()
-    await hardware_api.move_to(mount,
-                               types.Point(0, 0, 0))
-    expected = {'X': 0.0, 'Y': 0.0, 'A': -30.0, 'Z': -30.0}
+    await hardware_api.move_to(mount, types.Point(0, 0, 0))
+    expected = {"X": 0.0, "Y": 0.0, "A": -30.0, "Z": -30.0}
     assert mock_be_move.call_args_list[0][0][0] == expected
     mock_be_move.reset_mock()
 
     mount = PipettePair.PRIMARY_LEFT
     await hardware_api.home()
-    await hardware_api.move_to(mount,
-                               types.Point(0, 0, 0))
-    expected = {'X': 34.0, 'Y': 0.0, 'A': -30.0, 'Z': -30.0}
+    await hardware_api.move_to(mount, types.Point(0, 0, 0))
+    expected = {"X": 34.0, "Y": 0.0, "A": -30.0, "Z": -30.0}
     assert mock_be_move.call_args_list[0][0][0] == expected
 
 
 async def test_move_gantry(hardware_api, is_robot):
     abs_position = types.Point(30, 20, 10)
     mount = PipettePair.PRIMARY_RIGHT
-    target_position1 = {Axis.X: 30,
-                        Axis.Y: 20,
-                        Axis.Z: -20,
-                        Axis.A: -20,
-                        Axis.B: 19,
-                        Axis.C: 19}
+    target_position1 = {
+        Axis.X: 30,
+        Axis.Y: 20,
+        Axis.Z: -20,
+        Axis.A: -20,
+        Axis.B: 19,
+        Axis.C: 19,
+    }
     await hardware_api.home()
     await hardware_api.move_to(mount, abs_position)
     assert hardware_api._current_position == target_position1
@@ -60,12 +60,14 @@ async def test_move_gantry(hardware_api, is_robot):
     # same time in the z.
     rel_position = types.Point(30, 20, -10)
     mount2 = PipettePair.PRIMARY_LEFT
-    target_position2 = {Axis.X: 60,
-                        Axis.Y: 40,
-                        Axis.Z: -30,
-                        Axis.A: -30,
-                        Axis.B: 19,
-                        Axis.C: 19}
+    target_position2 = {
+        Axis.X: 60,
+        Axis.Y: 40,
+        Axis.Z: -30,
+        Axis.A: -30,
+        Axis.B: 19,
+        Axis.C: 19,
+    }
     await hardware_api.move_rel(mount2, rel_position)
     assert hardware_api._current_position == target_position2
 
@@ -75,33 +77,33 @@ async def test_move_currents(smoothie, monkeypatch, loop):
     hardware_api = await hc.API.build_hardware_controller(loop=loop)
     mock_active_axes = mock.Mock()
     monkeypatch.setattr(
-        hardware_api._backend._smoothie_driver,
-        'activate_axes',
-        mock_active_axes)
+        hardware_api._backend._smoothie_driver, "activate_axes", mock_active_axes
+    )
 
     mount = PipettePair.PRIMARY_RIGHT
     await hardware_api.home()
     mock_active_axes.reset_mock()
-    await hardware_api.move_to(mount,
-                               types.Point(0, 0, 0))
-    expected_call_list = [mock.call('XYAZ')]
+    await hardware_api.move_to(mount, types.Point(0, 0, 0))
+    expected_call_list = [mock.call("XYAZ")]
     assert mock_active_axes.call_args_list == expected_call_list
 
 
-async def test_pick_up_tip(
-        dummy_instruments, loop, is_robot):
+async def test_pick_up_tip(dummy_instruments, loop, is_robot):
     hw_api = await hc.API.build_hardware_simulator(
-        attached_instruments=dummy_instruments, loop=loop)
+        attached_instruments=dummy_instruments, loop=loop
+    )
     mount = PipettePair.PRIMARY_RIGHT
     await hw_api.home()
     await hw_api.cache_instruments()
     tip_position = types.Point(12.13, 9, 150)
-    target_position = {Axis.X: 12.13,
-                       Axis.Y: 9.0,
-                       Axis.Z: 218.0,     # Z retracts after pick_up
-                       Axis.A: 218.0,
-                       Axis.B: -14.5,
-                       Axis.C: -8.5}
+    target_position = {
+        Axis.X: 12.13,
+        Axis.Y: 9.0,
+        Axis.Z: 218.0,  # Z retracts after pick_up
+        Axis.A: 218.0,
+        Axis.B: -14.5,
+        Axis.C: -8.5,
+    }
     await hw_api.move_to(mount, tip_position)
 
     # Note: pick_up_tip without a tip_length argument requires the pipette on
@@ -117,10 +119,10 @@ async def test_pick_up_tip(
     assert hw_api._current_position == target_position
 
 
-async def test_drop_tip(
-        dummy_instruments, loop, is_robot):
+async def test_drop_tip(dummy_instruments, loop, is_robot):
     hw_api = await hc.API.build_hardware_simulator(
-        attached_instruments=dummy_instruments, loop=loop)
+        attached_instruments=dummy_instruments, loop=loop
+    )
     mount = PipettePair.PRIMARY_RIGHT
     await hw_api.home()
     await hw_api.cache_instruments()
@@ -137,10 +139,10 @@ async def test_drop_tip(
     assert hw_api._attached_instruments[mount.secondary].current_volume == 0
 
 
-async def test_prep_aspirate(
-        dummy_instruments, loop):
+async def test_prep_aspirate(dummy_instruments, loop):
     hw_api = await hc.API.build_hardware_simulator(
-        attached_instruments=dummy_instruments, loop=loop)
+        attached_instruments=dummy_instruments, loop=loop
+    )
     await hw_api.home()
     await hw_api.cache_instruments()
 
@@ -159,7 +161,8 @@ async def test_prep_aspirate(
 
 async def test_aspirate_new(dummy_instruments, loop):
     hw_api = await hc.API.build_hardware_simulator(
-        attached_instruments=dummy_instruments, loop=loop)
+        attached_instruments=dummy_instruments, loop=loop
+    )
     await hw_api.home()
     await hw_api.cache_instruments()
 
@@ -180,7 +183,8 @@ async def test_aspirate_new(dummy_instruments, loop):
 
 async def test_aspirate_old(dummy_instruments, loop, old_aspiration):
     hw_api = await hc.API.build_hardware_simulator(
-        attached_instruments=dummy_instruments, loop=loop)
+        attached_instruments=dummy_instruments, loop=loop
+    )
     await hw_api.home()
     await hw_api.cache_instruments()
 
@@ -201,7 +205,8 @@ async def test_aspirate_old(dummy_instruments, loop, old_aspiration):
 
 async def test_dispense(dummy_instruments, loop):
     hw_api = await hc.API.build_hardware_simulator(
-        attached_instruments=dummy_instruments, loop=loop)
+        attached_instruments=dummy_instruments, loop=loop
+    )
     await hw_api.home()
 
     await hw_api.cache_instruments()
@@ -231,22 +236,25 @@ async def test_dispense(dummy_instruments, loop):
     assert pos2[Axis.C] == plunger_right_2
 
 
-async def test_tip_action_currents(
-        dummy_instruments, smoothie, monkeypatch, loop):
+async def test_tip_action_currents(dummy_instruments, smoothie, monkeypatch, loop):
     smoothie.simulating = False
     hardware_api = await hc.API.build_hardware_controller(loop=loop)
     mock_active_current = mock.Mock()
     monkeypatch.setattr(
         hardware_api._backend._smoothie_driver,
-        'set_active_current',
-        mock_active_current)
+        "set_active_current",
+        mock_active_current,
+    )
 
     async def fake_attached(stuff):
-        return {mount: {'config': pc.load(value['model']),
-                        'id': value['id']}
-                for mount, value in dummy_instruments.items()}
+        return {
+            mount: {"config": pc.load(value["model"]), "id": value["id"]}
+            for mount, value in dummy_instruments.items()
+        }
+
     monkeypatch.setattr(
-        hardware_api._backend, 'get_attached_instruments', fake_attached)
+        hardware_api._backend, "get_attached_instruments", fake_attached
+    )
 
     mount = PipettePair.PRIMARY_RIGHT
     await hardware_api.home()
@@ -257,19 +265,19 @@ async def test_tip_action_currents(
     await hardware_api.pick_up_tip(mount, tip_length)
 
     expected_call_list = [
-        mock.call({'C': 1.0, 'B': 1.0}),
-        mock.call({'A': 0.1, 'Z': 0.125}),
-        mock.call({
-            'X': 1.25, 'Y': 1.25, 'Z': 0.8,
-            'A': 0.8, 'B': 0.05, 'C': 0.05})]
+        mock.call({"C": 1.0, "B": 1.0}),
+        mock.call({"A": 0.1, "Z": 0.125}),
+        mock.call({"X": 1.25, "Y": 1.25, "Z": 0.8, "A": 0.8, "B": 0.05, "C": 0.05}),
+    ]
     assert mock_active_current.call_args_list == expected_call_list
     mock_active_current.reset_mock()
 
     await hardware_api.drop_tip(mount)
 
     expected_call_list = [
-        mock.call({'C': 1.0, 'B': 1.0}),
-        mock.call({'C': 1.0, 'B': 1.25}),
-        mock.call({'C': 1.0, 'B': 1.0}),
-        mock.call({'C': 1.0, 'B': 1.0})]
+        mock.call({"C": 1.0, "B": 1.0}),
+        mock.call({"C": 1.0, "B": 1.25}),
+        mock.call({"C": 1.0, "B": 1.0}),
+        mock.call({"C": 1.0, "B": 1.0}),
+    ]
     assert mock_active_current.call_args_list == expected_call_list

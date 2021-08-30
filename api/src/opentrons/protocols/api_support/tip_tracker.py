@@ -12,10 +12,9 @@ class TipTracker:
     def __init__(self, columns: WellColumns):
         self._columns = columns
 
-    def next_tip(self,
-                 num_tips: int = 1,
-                 starting_tip: Optional[WellImplementation] = None) \
-            -> Optional[WellImplementation]:
+    def next_tip(
+        self, num_tips: int = 1, starting_tip: Optional[WellImplementation] = None
+    ) -> Optional[WellImplementation]:
         """
         Find the next valid well for pick-up.
 
@@ -34,21 +33,24 @@ class TipTracker:
         if starting_tip:
             # Remove columns preceding the one with the pipette's starting tip
             drop_undefined_columns = list(
-                dropwhile(lambda x: starting_tip not in x, columns))
+                dropwhile(lambda x: starting_tip not in x, columns)
+            )
             # Remove tips preceding the starting tip in the first column
             drop_undefined_columns[0] = list(
-                dropwhile(lambda w: starting_tip is not w,
-                          drop_undefined_columns[0]))
+                dropwhile(lambda w: starting_tip is not w, drop_undefined_columns[0])
+            )
             columns = drop_undefined_columns
 
         drop_leading_empties = [
-            list(dropwhile(lambda x: not x.has_tip(), column))
-            for column in columns]
+            list(dropwhile(lambda x: not x.has_tip(), column)) for column in columns
+        ]
         drop_at_first_gap = [
             list(takewhile(lambda x: x.has_tip(), column))
-            for column in drop_leading_empties]
+            for column in drop_leading_empties
+        ]
         long_enough = [
-            column for column in drop_at_first_gap if len(column) >= num_tips]
+            column for column in drop_at_first_gap if len(column) >= num_tips
+        ]
 
         try:
             first_long_enough = long_enough[0]
@@ -58,10 +60,12 @@ class TipTracker:
 
         return result
 
-    def use_tips(self,
-                 start_well: WellImplementation,
-                 num_channels: int = 1,
-                 fail_if_full: bool = False):
+    def use_tips(
+        self,
+        start_well: WellImplementation,
+        num_channels: int = 1,
+        fail_if_full: bool = False,
+    ):
         """
         Removes tips from the tip tracker.
 
@@ -92,7 +96,7 @@ class TipTracker:
         # max of 4 tips, and picking up from the 2nd-to-bottom well in a
         # column would get a maximum of 2 tips)
         num_tips = min(len(target_column) - well_idx, num_channels)
-        target_wells = target_column[well_idx: well_idx + num_tips]
+        target_wells = target_column[well_idx : well_idx + num_tips]
 
         # In API version 2.2, we no longer reset the tip tracker when a tip
         # is dropped back into a tiprack well. This fixes a behavior where
@@ -103,8 +107,9 @@ class TipTracker:
         # dirty tips and non-present tips; but until then, we can avoid the
         # exception.
         if fail_if_full:
-            assert all(well.has_tip() for well in target_wells),\
-                '{} is out of tips'.format(str(self))
+            assert all(
+                well.has_tip() for well in target_wells
+            ), "{} is out of tips".format(str(self))
 
         for well in target_wells:
             well.set_has_tip(False)
@@ -123,21 +128,21 @@ class TipTracker:
         """
         columns = self._columns
         drop_leading_filled = [
-            list(dropwhile(lambda x: x.has_tip(), column))
-            for column in columns]
+            list(dropwhile(lambda x: x.has_tip(), column)) for column in columns
+        ]
         drop_at_first_gap = [
             list(takewhile(lambda x: not x.has_tip(), column))
-            for column in drop_leading_filled]
+            for column in drop_leading_filled
+        ]
         long_enough = [
-            column for column in drop_at_first_gap if len(column) >= num_tips]
+            column for column in drop_at_first_gap if len(column) >= num_tips
+        ]
         try:
             return long_enough[0][0]
         except IndexError:
             return None
 
-    def return_tips(self,
-                    start_well: WellImplementation,
-                    num_channels: int = 1):
+    def return_tips(self, start_well: WellImplementation, num_channels: int = 1):
         """
         Re-adds tips to the tip tracker
 
@@ -165,6 +170,6 @@ class TipTracker:
         drop_targets = target_column[well_idx:end_idx]
         for well in drop_targets:
             if well.has_tip():
-                raise AssertionError(f'Well {repr(well)} has a tip')
+                raise AssertionError(f"Well {repr(well)} has a tip")
         for well in drop_targets:
             well.set_has_tip(True)

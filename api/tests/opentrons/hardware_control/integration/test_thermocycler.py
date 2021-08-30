@@ -8,18 +8,15 @@ from opentrons.hardware_control.modules import Thermocycler
 
 
 @pytest.fixture
-async def thermocycler(
-        loop: asyncio.BaseEventLoop,
-        emulation_app) -> Thermocycler:
+async def thermocycler(loop: asyncio.BaseEventLoop, emulation_app) -> Thermocycler:
     """Thermocycler fixture."""
     execution_manager = ExecutionManager(loop)
     module = await Thermocycler.build(
         port=f"socket://127.0.0.1:{THERMOCYCLER_PORT}",
         execution_manager=execution_manager,
-        usb_port=USBPort(name="", port_number=1, sub_names=[], device_path="",
-                         hub=1),
+        usb_port=USBPort(name="", port_number=1, sub_names=[], device_path="", hub=1),
         loop=loop,
-        polling_frequency=0.01
+        polling_frequency=0.01,
     )
     yield module
     await execution_manager.cancel()
@@ -28,8 +25,11 @@ async def thermocycler(
 
 def test_device_info(thermocycler: Thermocycler):
     """It should have device info."""
-    assert {'model': 'v02', 'serial': 'thermocycler_emulator',
-            'version': 'v1.1.0'} == thermocycler.device_info
+    assert {
+        "model": "v02",
+        "serial": "thermocycler_emulator",
+        "version": "v1.1.0",
+    } == thermocycler.device_info
 
 
 async def test_lid_status(thermocycler: Thermocycler):
@@ -85,10 +85,12 @@ async def test_cycle_temperatures(thermocycler: Thermocycler):
             "temperature": 70.0,
         },
         {
-            "temperature": 60.0, "hold_time_minutes": 1.0,
+            "temperature": 60.0,
+            "hold_time_minutes": 1.0,
         },
         {
-            "temperature": 50.0, "hold_time_seconds": 22.0,
+            "temperature": 50.0,
+            "hold_time_seconds": 22.0,
         },
     ]
     await thermocycler.cycle_temperatures(steps, repetitions=2)

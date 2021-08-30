@@ -5,7 +5,7 @@ import contextlib
 from concurrent.futures.thread import ThreadPoolExecutor
 from typing import Optional
 
-from serial import Serial, serial_for_url   # type: ignore
+from serial import Serial, serial_for_url  # type: ignore
 
 
 class AsyncSerial:
@@ -13,9 +13,12 @@ class AsyncSerial:
 
     @classmethod
     async def create(
-            cls, port: str, baud_rate: int,
-            timeout: Optional[float] = None, write_timeout: Optional[float] = None,
-            loop: Optional[asyncio.AbstractEventLoop] = None
+        cls,
+        port: str,
+        baud_rate: int,
+        timeout: Optional[float] = None,
+        write_timeout: Optional[float] = None,
+        loop: Optional[asyncio.AbstractEventLoop] = None,
     ) -> AsyncSerial:
         """
         Create an AsyncSerial instance.
@@ -32,17 +35,19 @@ class AsyncSerial:
         serial = await loop.run_in_executor(
             executor=executor,
             func=lambda: serial_for_url(
-                url=port, baudrate=baud_rate,
-                timeout=timeout, write_timeout=write_timeout
-            )
+                url=port,
+                baudrate=baud_rate,
+                timeout=timeout,
+                write_timeout=write_timeout,
+            ),
         )
         return cls(serial=serial, executor=executor, loop=loop)
 
     def __init__(
-            self,
-            serial: Serial,
-            executor: ThreadPoolExecutor,
-            loop: asyncio.AbstractEventLoop
+        self,
+        serial: Serial,
+        executor: ThreadPoolExecutor,
+        loop: asyncio.AbstractEventLoop,
     ) -> None:
         """
         Constructor
@@ -70,8 +75,7 @@ class AsyncSerial:
         """
         with self._timeout_override("timeout", timeout):
             return await self._loop.run_in_executor(
-                executor=self._executor,
-                func=lambda: self._serial.read_until(match)
+                executor=self._executor, func=lambda: self._serial.read_until(match)
             )
 
     async def write(self, data: bytes, timeout: Optional[float] = None) -> None:
@@ -87,9 +91,9 @@ class AsyncSerial:
             None
         """
         await self._loop.run_in_executor(
-                executor=self._executor,
-                func=lambda: self._sync_write(data=data, timeout=timeout)
-            )
+            executor=self._executor,
+            func=lambda: self._sync_write(data=data, timeout=timeout),
+        )
 
     def _sync_write(self, data: bytes, timeout: Optional[float] = None) -> None:
         """
@@ -113,8 +117,7 @@ class AsyncSerial:
         Returns: None
         """
         return await self._loop.run_in_executor(
-            executor=self._executor,
-            func=self._serial.open
+            executor=self._executor, func=self._serial.open
         )
 
     async def close(self) -> None:
@@ -124,8 +127,7 @@ class AsyncSerial:
         Returns: None
         """
         return await self._loop.run_in_executor(
-            executor=self._executor,
-            func=self._serial.close
+            executor=self._executor, func=self._serial.close
         )
 
     async def is_open(self) -> bool:

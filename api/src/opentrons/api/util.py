@@ -13,17 +13,18 @@ class RobotBusy(ABC):
         ...
 
 
-Func = TypeVar('Func', bound=Callable[..., Any])
+Func = TypeVar("Func", bound=Callable[..., Any])
 
 
 def robot_is_busy(func: Func) -> Func:
-    """ Decorator to mark a function as putting the robot in a busy
+    """Decorator to mark a function as putting the robot in a busy
     state. Simultaneous attempts to call a busy function (from same or
     separate thread) will result in an exception.
      Must wrap a class of type RobotBusy.
 
      :raises ThreadedAsyncForbidden: on call during busy.
-     """
+    """
+
     @functools.wraps(func)
     def decorated(*args: Any, **kwargs: Any) -> Any:
         self = args[0]
@@ -42,13 +43,15 @@ def requires_http_protocols_disabled(func: Func) -> Func:
 
     :raises RuntimeError: if enableHttpProtocolSessions is enabled
     """
+
     @functools.wraps(func)
     def decorated(*args: Any, **kwargs: Any) -> Any:
         if enable_http_protocol_sessions():
             raise RuntimeError(
                 "Please disable the 'Enable Experimental HTTP Protocol "
                 "Sessions' advanced setting for this robot if you'd like to "
-                "upload protocols from the Opentrons App")
+                "upload protocols from the Opentrons App"
+            )
         return func(*args, **kwargs)
 
     return cast(Func, decorated)

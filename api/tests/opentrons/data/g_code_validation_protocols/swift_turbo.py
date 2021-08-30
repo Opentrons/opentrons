@@ -9,51 +9,57 @@ def run(protocol_context):
     protocol_context.home()
 
     # Labware Setup
-    rt_reagents = protocol_context.load_labware(
-        'nest_12_reservoir_15ml', '2')
+    rt_reagents = protocol_context.load_labware("nest_12_reservoir_15ml", "2")
 
-    p20rack = protocol_context.load_labware('opentrons_96_tiprack_20ul', '4')
+    p20rack = protocol_context.load_labware("opentrons_96_tiprack_20ul", "4")
 
-    p300racks = [protocol_context.load_labware(
-        'opentrons_96_tiprack_300ul', slot) for slot in ['5', '1', ]]
+    p300racks = [
+        protocol_context.load_labware("opentrons_96_tiprack_300ul", slot)
+        for slot in [
+            "5",
+            "1",
+        ]
+    ]
     # Pipette Setup
-    p20 = protocol_context.load_instrument('p20_single_gen2', 'left',
-                                           tip_racks=[p20rack])
-    p300 = protocol_context.load_instrument('p300_multi_gen2', 'right',
-                                            tip_racks=p300racks)
+    p20 = protocol_context.load_instrument(
+        "p20_single_gen2", "left", tip_racks=[p20rack]
+    )
+    p300 = protocol_context.load_instrument(
+        "p300_multi_gen2", "right", tip_racks=p300racks
+    )
     # Module Setup
-    magdeck = protocol_context.load_module('magneticModuleV2', '6')
-    mag_plate = magdeck.load_labware('nest_96_wellplate_100ul_pcr_full_skirt')
+    magdeck = protocol_context.load_module("magneticModuleV2", "6")
+    mag_plate = magdeck.load_labware("nest_96_wellplate_100ul_pcr_full_skirt")
 
-    tempdeck = protocol_context.load_module('temperatureModuleV2', '3')
+    tempdeck = protocol_context.load_module("temperatureModuleV2", "3")
     cool_reagents = tempdeck.load_labware(
-        'opentrons_24_aluminumblock_generic_2ml_screwcap')
+        "opentrons_24_aluminumblock_generic_2ml_screwcap"
+    )
 
-    thermocycler = protocol_context.load_module('thermocycler')
-    reaction_plate = thermocycler.load_labware(
-        'nest_96_wellplate_100ul_pcr_full_skirt')
+    thermocycler = protocol_context.load_module("thermocycler")
+    reaction_plate = thermocycler.load_labware("nest_96_wellplate_100ul_pcr_full_skirt")
 
     # Reagent Setup
-    enzymatic_prep_mm = cool_reagents.wells_by_name()['A1']
-    ligation_mm = cool_reagents.wells_by_name()['A2']
-    pcr_mm = cool_reagents.wells_by_name()['A3']
-    beads = rt_reagents.wells_by_name()['A2']
-    ethanol = rt_reagents.wells_by_name()['A3']
-    te = rt_reagents.wells_by_name()['A4']
-    waste = rt_reagents.wells_by_name()['A12']
+    enzymatic_prep_mm = cool_reagents.wells_by_name()["A1"]
+    ligation_mm = cool_reagents.wells_by_name()["A2"]
+    pcr_mm = cool_reagents.wells_by_name()["A3"]
+    beads = rt_reagents.wells_by_name()["A2"]
+    ethanol = rt_reagents.wells_by_name()["A3"]
+    te = rt_reagents.wells_by_name()["A4"]
+    waste = rt_reagents.wells_by_name()["A12"]
 
     # number of samples
     sample_num = 8
 
     # Destination of input DNA samples and samples on the magnetic module
     tc_samples = reaction_plate.columns_by_name()
-    enzymatic_prep_samples = tc_samples['2']
-    pcr_prep_samples = tc_samples['3']
-    purified_samples = tc_samples['4']
+    enzymatic_prep_samples = tc_samples["2"]
+    pcr_prep_samples = tc_samples["3"]
+    purified_samples = tc_samples["4"]
 
     # mag_samples = mag_plate.wells()[:sample_num]
     mag_column = mag_plate.columns_by_name()
-    mag_samples = mag_column['2']
+    mag_samples = mag_column["2"]
 
     p20.flow_rate.aspirate = 150
     p20.flow_rate.dispense = 300
@@ -234,8 +240,10 @@ def run(protocol_context):
     """PCR Prep"""
     # Transfer Dual Indexes to the sample
     # Primer screw tubes are shallow !!!!
-    primers = [well for well in cool_reagents.wells(
-        'B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'C1', 'C2')][:sample_num]
+    primers = [
+        well
+        for well in cool_reagents.wells("B1", "B2", "B3", "B4", "B5", "B6", "C1", "C2")
+    ][:sample_num]
     for primer, well in zip(primers, pcr_prep_samples):
         p20.pick_up_tip()
         p20.aspirate(5, primer.top(-25))
@@ -271,12 +279,20 @@ def run(protocol_context):
     # PLATE_TEMP_HOLD_5 = (72, 300)
     PLATE_TEMP_POST = 4
     NUM_CYCLES = 5
-    CYCLED_STEPS = [{'temperature': PLATE_TEMP_HOLD_2[0],
-                     'hold_time_seconds': PLATE_TEMP_HOLD_2[1]},
-                    {'temperature': PLATE_TEMP_HOLD_3[0],
-                     'hold_time_seconds': PLATE_TEMP_HOLD_3[1]},
-                    {'temperature': PLATE_TEMP_HOLD_4[0],
-                     'hold_time_seconds': PLATE_TEMP_HOLD_4[1]}]
+    CYCLED_STEPS = [
+        {
+            "temperature": PLATE_TEMP_HOLD_2[0],
+            "hold_time_seconds": PLATE_TEMP_HOLD_2[1],
+        },
+        {
+            "temperature": PLATE_TEMP_HOLD_3[0],
+            "hold_time_seconds": PLATE_TEMP_HOLD_3[1],
+        },
+        {
+            "temperature": PLATE_TEMP_HOLD_4[0],
+            "hold_time_seconds": PLATE_TEMP_HOLD_4[1],
+        },
+    ]
 
     # Set PRE temp
     thermocycler.set_block_temperature(PLATE_TEMP_PRE)
@@ -284,8 +300,9 @@ def run(protocol_context):
     thermocycler.set_lid_temperature(105)
     thermocycler.close_lid()
     # Set HOLD1 temp
-    thermocycler.set_block_temperature(PLATE_TEMP_HOLD_1[0],
-                                       hold_time_seconds=PLATE_TEMP_HOLD_1[1])
+    thermocycler.set_block_temperature(
+        PLATE_TEMP_HOLD_1[0], hold_time_seconds=PLATE_TEMP_HOLD_1[1]
+    )
     # Loop HOLD2 - HOLD4 temps NUM_CYCLES times
     thermocycler.execute_profile(steps=CYCLED_STEPS, repetitions=NUM_CYCLES)
     # Set POST temp
@@ -293,7 +310,7 @@ def run(protocol_context):
     thermocycler.open_lid()
 
     # PCR purification
-    mag_samples = mag_column['3']
+    mag_samples = mag_column["3"]
 
     # Transfer samples to the Magnetic Module
     p300.flow_rate.aspirate = 10
@@ -354,9 +371,9 @@ def run(protocol_context):
     p300.dispense(180, mag_samples[0].top(-2))
     p300.blow_out()
     p300.air_gap(5)
-    #p300.drop_tip()
+    # p300.drop_tip()
     # protocol_context.delay(seconds=30)
-    #p300.pick_up_tip()
+    # p300.pick_up_tip()
     p300.aspirate(190, mag_samples[0])
     p300.air_gap(5)
     p300.dispense(190, waste)

@@ -2,9 +2,11 @@ import typing
 from datetime import datetime, timezone
 
 
-def deep_get(obj: typing.Union[typing.Mapping, typing.Sequence],
-             key: typing.Sequence[typing.Union[str, int]],
-             default=None):
+def deep_get(
+    obj: typing.Union[typing.Mapping, typing.Sequence],
+    key: typing.Sequence[typing.Union[str, int]],
+    default=None,
+):
     """
     Utility to get deeply nested element in a list, tuple or dict without
      resorting to some_dict.get('k1', {}).get('k2', {}).get('k3', {})....etc.

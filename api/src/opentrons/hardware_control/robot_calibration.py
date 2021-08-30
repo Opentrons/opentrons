@@ -29,7 +29,9 @@ def build_temporary_identity_calibration() -> RobotCalibration:
         deck_calibration=types.DeckCalibration(
             attitude=linal.identity_deck_transform().tolist(),
             source=types.SourceType.default,
-            status=types.CalibrationStatus()))
+            status=types.CalibrationStatus(),
+        )
+    )
 
 
 def validate_attitude_deck_calibration(deck_cal: types.DeckCalibration):
@@ -84,12 +86,16 @@ def validate_gantry_calibration(gantry_cal: List[List[float]]):
 
 
 def migrate_affine_xy_to_attitude(
-        gantry_cal: List[List[float]]) -> types.AttitudeMatrix:
-    masked_transform = np.array([
-        [True, True, True, False],
-        [True, True, True, False],
-        [False, False, False, False],
-        [False, False, False, False]])
+    gantry_cal: List[List[float]],
+) -> types.AttitudeMatrix:
+    masked_transform = np.array(
+        [
+            [True, True, True, False],
+            [True, True, True, False],
+            [False, False, False, False],
+            [False, False, False, False],
+        ]
+    )
     masked_array = np.ma.masked_array(gantry_cal, ~masked_transform)
     attitude_array = np.zeros((3, 3))
     np.put(attitude_array, [0, 1, 2], masked_array[0].compressed())
@@ -99,8 +105,11 @@ def migrate_affine_xy_to_attitude(
 
 
 def save_attitude_matrix(
-        expected: linal.SolvePoints, actual: linal.SolvePoints,
-        pipette_id: str, tiprack_hash: str):
+    expected: linal.SolvePoints,
+    actual: linal.SolvePoints,
+    pipette_id: str,
+    tiprack_hash: str,
+):
     attitude = linal.solve_attitude(expected, actual)
     modify.save_robot_deck_attitude(attitude, pipette_id, tiprack_hash)
 
@@ -113,12 +122,16 @@ def load_attitude_matrix() -> types.DeckCalibration:
             log.debug(
                 "Attitude deck calibration matrix not found. Migrating "
                 "existing affine deck calibration matrix to {}".format(
-                    config.get_opentrons_path('robot_calibration_dir')))
+                    config.get_opentrons_path("robot_calibration_dir")
+                )
+            )
             attitude = migrate_affine_xy_to_attitude(gantry_cal)
-            modify.save_robot_deck_attitude(transform=attitude,
-                                            pip_id=None,
-                                            lw_hash=None,
-                                            source=types.SourceType.legacy)
+            modify.save_robot_deck_attitude(
+                transform=attitude,
+                pip_id=None,
+                lw_hash=None,
+                source=types.SourceType.legacy,
+            )
             calibration_data = get.get_robot_deck_attitude()
 
     if calibration_data:
@@ -128,17 +141,19 @@ def load_attitude_matrix() -> types.DeckCalibration:
         return types.DeckCalibration(
             attitude=config.robot_configs.DEFAULT_DECK_CALIBRATION_V2,
             source=types.SourceType.default,
-            status=types.CalibrationStatus())
+            status=types.CalibrationStatus(),
+        )
 
 
 def load_pipette_offset(
-        pip_id: Optional[str],
-        mount: Mount) -> types.PipetteOffsetByPipetteMount:
+    pip_id: Optional[str], mount: Mount
+) -> types.PipetteOffsetByPipetteMount:
     # load default if pipette offset data do not exist
     pip_cal_obj = types.PipetteOffsetByPipetteMount(
         offset=config.robot_configs.DEFAULT_PIPETTE_OFFSET,
         source=types.SourceType.default,
-        status=types.CalibrationStatus())
+        status=types.CalibrationStatus(),
+    )
     if pip_id:
         pip_offset_data = get.get_pipette_offset(pip_id, mount)
         if pip_offset_data:
@@ -147,5 +162,4 @@ def load_pipette_offset(
 
 
 def load() -> RobotCalibration:
-    return RobotCalibration(
-        deck_calibration=load_attitude_matrix())
+    return RobotCalibration(deck_calibration=load_attitude_matrix())

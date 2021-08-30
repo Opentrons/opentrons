@@ -2,7 +2,6 @@ import abc
 
 
 class DeckItem(abc.ABC):
-
     @property  # type: ignore
     @abc.abstractmethod
     def highest_z(self):

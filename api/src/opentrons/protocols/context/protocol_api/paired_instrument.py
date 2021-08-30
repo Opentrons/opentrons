@@ -7,8 +7,7 @@ from typing import TYPE_CHECKING, Union, Optional, Callable, Tuple
 from opentrons import types
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons.protocol_api.module_contexts import ThermocyclerContext
-from opentrons.protocol_api.labware import (
-    Labware, Well)
+from opentrons.protocol_api.labware import Labware, Well
 from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocols.geometry import planning
 from opentrons.protocols.api_support.util import build_edges
@@ -21,14 +20,15 @@ if TYPE_CHECKING:
 
 
 class PairedInstrument:
-
-    def __init__(self,
-                 primary_instrument: InstrumentContext,
-                 secondary_instrument: InstrumentContext,
-                 pair_policy: hc_types.PipettePair,
-                 ctx: ProtocolContext,
-                 hardware_manager: HardwareManager,
-                 log_parent: logging.Logger):
+    def __init__(
+        self,
+        primary_instrument: InstrumentContext,
+        secondary_instrument: InstrumentContext,
+        pair_policy: hc_types.PipettePair,
+        ctx: ProtocolContext,
+        hardware_manager: HardwareManager,
+        log_parent: logging.Logger,
+    ):
         self.p_instrument = primary_instrument
         self.s_instrument = secondary_instrument
         self._pair_policy = pair_policy
@@ -38,32 +38,44 @@ class PairedInstrument:
 
         self._last_location: Union[Labware, Well, None] = None
 
-    def pick_up_tip(self, target: Well, secondary_target: Well,
-                    tiprack: Labware, presses: Optional[int],
-                    increment: Optional[float], tip_length: float):
+    def pick_up_tip(
+        self,
+        target: Well,
+        secondary_target: Well,
+        tiprack: Labware,
+        presses: Optional[int],
+        increment: Optional[float],
+        tip_length: float,
+    ):
 
         self.move_to(target.top())
 
         self._hw_manager.hardware.set_current_tiprack_diameter(
-            self._pair_policy, target.diameter)
+            self._pair_policy, target.diameter
+        )
         self._hw_manager.hardware.pick_up_tip(
-            self._pair_policy, tip_length, presses, increment)
+            self._pair_policy, tip_length, presses, increment
+        )
 
         self._hw_manager.hardware.set_working_volume(
-            self._pair_policy, target.max_volume)
+            self._pair_policy, target.max_volume
+        )
 
         tiprack.use_tips(target, self.p_instrument.channels)
         tiprack.use_tips(secondary_target, self.s_instrument.channels)
 
     def drop_tip(self, target: types.Location, home_after: bool):
         self.move_to(target)
-        self._hw_manager.hardware.drop_tip(
-            self._pair_policy, home_after=home_after)
+        self._hw_manager.hardware.drop_tip(self._pair_policy, home_after=home_after)
         return self
 
-    def move_to(self, location: types.Location, force_direct: bool = False,
-                minimum_z_height: Optional[float] = None,
-                speed: Optional[float] = None):
+    def move_to(
+        self,
+        location: types.Location,
+        force_direct: bool = False,
+        minimum_z_height: Optional[float] = None,
+        speed: Optional[float] = None,
+    ):
         if not speed:
             speed = self.p_instrument.default_speed
 
@@ -73,39 +85,43 @@ class PairedInstrument:
         else:
             from_lw = LabwareLike(None)
 
-        from_center = 'centerMultichannelOnWells'\
-            in from_lw.quirks_from_any_parent()
+        from_center = "centerMultichannelOnWells" in from_lw.quirks_from_any_parent()
         cp_override = CriticalPoint.XY_CENTER if from_center else None
         from_loc = types.Location(
             self._hw_manager.hardware.gantry_position(
-                self._pair_policy.primary, critical_point=cp_override),
-            from_lw)
+                self._pair_policy.primary, critical_point=cp_override
+            ),
+            from_lw,
+        )
 
         for mod in self._ctx._modules:
             if isinstance(mod, ThermocyclerContext):
                 mod.flag_unsafe_move(to_loc=location, from_loc=from_loc)
 
-        primary_height = \
-            self._hw_manager.hardware.get_instrument_max_height(
-                self._pair_policy.primary)
-        secondary_height = \
-            self._hw_manager.hardware.get_instrument_max_height(
-                self._pair_policy.secondary)
-        moves = planning.plan_moves(from_loc,
-                                    location,
-                                    self._ctx._implementation.get_deck(),
-                                    min(primary_height, secondary_height),
-                                    force_direct=force_direct,
-                                    minimum_z_height=minimum_z_height
-                                    )
-        self._log.debug("move_to: {}->{} via:\n\t{}"
-                        .format(from_loc, location, moves))
+        primary_height = self._hw_manager.hardware.get_instrument_max_height(
+            self._pair_policy.primary
+        )
+        secondary_height = self._hw_manager.hardware.get_instrument_max_height(
+            self._pair_policy.secondary
+        )
+        moves = planning.plan_moves(
+            from_loc,
+            location,
+            self._ctx._implementation.get_deck(),
+            min(primary_height, secondary_height),
+            force_direct=force_direct,
+            minimum_z_height=minimum_z_height,
+        )
+        self._log.debug("move_to: {}->{} via:\n\t{}".format(from_loc, location, moves))
         try:
             for move in moves:
                 self._hw_manager.hardware.move_to(
-                    self._pair_policy, move[0], critical_point=move[1],
+                    self._pair_policy,
+                    move[0],
+                    critical_point=move[1],
                     speed=speed,
-                    max_speeds=self._ctx._implementation.get_max_speeds().data)
+                    max_speeds=self._ctx._implementation.get_max_speeds().data,
+                )
         except Exception:
             self._ctx.location_cache = None
             raise
@@ -114,9 +130,11 @@ class PairedInstrument:
         return self
 
     def aspirate(
-            self, volume: Optional[float],
-            location: Optional[types.Location] = None,
-            rate: Optional[float] = 1.0) -> Tuple[types.Location, Callable]:
+        self,
+        volume: Optional[float],
+        location: Optional[types.Location] = None,
+        rate: Optional[float] = 1.0,
+    ) -> Tuple[types.Location, Callable]:
         last_location = self._ctx.location_cache
         if location:
             loc = location
@@ -127,13 +145,14 @@ class PairedInstrument:
                 "If aspirate is called without an explicit location, another"
                 " method that moves to a location (such as move_to or "
                 "dispense) must previously have been called so the robot "
-                "knows where it is.")
+                "knows where it is."
+            )
 
         if self.p_instrument.current_volume == 0:
             # Make sure we're at the top of the labware and clear of any
             # liquid to prepare the pipette for aspiration
-            primary_ready = self.p_instrument.hw_pipette['ready_to_aspirate']
-            secondary_ready = self.s_instrument.hw_pipette['ready_to_aspirate']
+            primary_ready = self.p_instrument.hw_pipette["ready_to_aspirate"]
+            secondary_ready = self.s_instrument.hw_pipette["ready_to_aspirate"]
             if not primary_ready or not secondary_ready:
                 if loc.labware.is_well:
                     self.move_to(loc.labware.as_well().top())
@@ -145,9 +164,9 @@ class PairedInstrument:
                         "well relative position, we can't move to the top of"
                         " the well to prepare for aspiration. This might "
                         "cause over aspiration if the previous command is a "
-                        "blow_out.")
-                self._hw_manager.hardware.prepare_for_aspirate(
-                    self._pair_policy)
+                        "blow_out."
+                    )
+                self._hw_manager.hardware.prepare_for_aspirate(self._pair_policy)
             self.move_to(loc)
         elif loc != last_location:
             self.move_to(loc)
@@ -156,9 +175,8 @@ class PairedInstrument:
         return loc, partial(hw_aspirate, self._pair_policy, volume, rate)
 
     def dispense(
-            self, volume: Optional[float],
-            location: Optional[types.Location],
-            rate: float) -> Tuple[types.Location, Callable]:
+        self, volume: Optional[float], location: Optional[types.Location], rate: float
+    ) -> Tuple[types.Location, Callable]:
         last_location = self._ctx.location_cache
         if location:
             loc = location
@@ -171,7 +189,8 @@ class PairedInstrument:
                 "If dispense is called without an explicit location, another"
                 " method that moves to a location (such as move_to or "
                 "aspirate) must previously have been called so the robot "
-                "knows where it is.")
+                "knows where it is."
+            )
         hw_dispense = self._hw_manager.hardware.dispense
         return loc, partial(hw_dispense, self._pair_policy, volume, rate)
 
@@ -187,13 +206,14 @@ class PairedInstrument:
                 "If blow out is called without an explicit location, another"
                 " method that moves to a location (such as move_to or "
                 "dispense) must previously have been called so the robot "
-                "knows where it is.")
+                "knows where it is."
+            )
         self._hw_manager.hardware.blow_out(self._pair_policy)
 
     def air_gap(self, volume: Optional[float], height: float):
         loc = self._ctx.location_cache
         if not loc or not loc.labware.is_well:
-            raise RuntimeError('No previous Well cached to perform air gap')
+            raise RuntimeError("No previous Well cached to perform air gap")
         target = loc.labware.as_well().top(height)
         self.move_to(target)
         # Aspirate now returns a partial function for run log purposes
@@ -202,11 +222,11 @@ class PairedInstrument:
         self.aspirate(volume)[1]()
 
     def touch_tip(
-            self, location: Optional[Well], radius: float,
-            v_offset: float, speed: float):
+        self, location: Optional[Well], radius: float, v_offset: float, speed: float
+    ):
         if location is None:
             if not self._ctx.location_cache:
-                raise RuntimeError('No valid current location cache present')
+                raise RuntimeError("No valid current location cache present")
             else:
                 well = self._ctx.location_cache.labware  # type: ignore
                 # type checked below
@@ -214,25 +234,30 @@ class PairedInstrument:
             well = LabwareLike(location)
 
         if well.is_well:
-            if 'touchTipDisabled' in well.quirks_from_any_parent():
+            if "touchTipDisabled" in well.quirks_from_any_parent():
                 self._log.info(f"Ignoring touch tip on labware {well}")
                 return self
             if well.parent.as_labware().is_tiprack:
-                self._log.warning('Touch_tip being performed on a tiprack. '
-                                  'Please re-check your code')
+                self._log.warning(
+                    "Touch_tip being performed on a tiprack. "
+                    "Please re-check your code"
+                )
 
-            move_with_z_offset =\
-                well.as_well().top().point + types.Point(0, 0, v_offset)
+            move_with_z_offset = well.as_well().top().point + types.Point(
+                0, 0, v_offset
+            )
             to_loc = types.Location(move_with_z_offset, well)
             self.move_to(to_loc)
         else:
             # If location is a not a valid well, raise a type error
-            raise TypeError(
-                'location should be a Well, but it is {}'.format(location))
+            raise TypeError("location should be a Well, but it is {}".format(location))
 
         edges = build_edges(
-            well.as_well(), v_offset, self._pair_policy.primary,
-            self._ctx._implementation.get_deck(), radius)
+            well.as_well(),
+            v_offset,
+            self._pair_policy.primary,
+            self._ctx._implementation.get_deck(),
+            radius,
+        )
         for edge in edges:
-            self._hw_manager.hardware.move_to(
-                self._pair_policy, edge, speed)
+            self._hw_manager.hardware.move_to(self._pair_policy, edge, speed)
