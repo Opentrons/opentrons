@@ -228,6 +228,7 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
           disabled={proceedToLabwareDisabled}
           onClick={expandLabwareSetupStep}
           backgroundColor={C_BLUE}
+          id={'ModuleSetup_proceedToLabwareSetup'}
           {...targetProps}
         >
           {t('proceed_to_labware_setup_step')}
