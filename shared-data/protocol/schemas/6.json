@@ -190,8 +190,7 @@
       "description": "All labware definitions used by labware in this protocol, keyed by UUID",
       "patternProperties": {
         ".+": {
-          // "$ref": "opentronsLabwareSchemaV2"
-          "type": "object"
+          "$ref": "opentronsLabwareSchemaV2"
         }
       }
     },
