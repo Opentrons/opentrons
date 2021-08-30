@@ -64,7 +64,7 @@ export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
       <Flex flexDirection={DIRECTION_COLUMN}>
         <Flex flexDirection={DIRECTION_ROW}>
           <Icon
-            name={isAttached ? "check-circle" : "alert-circle"}
+            name={isAttached ? 'check-circle' : 'alert-circle'}
             color={isAttached ? COLOR_SUCCESS : COLOR_ERROR}
             key="icon"
             height="0.625rem"
