@@ -10,6 +10,7 @@ from typing import (
 from typing_extensions import Final
 from uuid import uuid4
 
+from opentrons.types import Mount as MountType
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 from opentrons.api.util import (RobotBusy, robot_is_busy,
@@ -36,6 +37,7 @@ from opentrons.hardware_control import (API, ThreadManager,
                                         SynchronousAdapter,
                                         ExecutionCancelledError,
                                         ThreadedAsyncLock)
+from opentrons.hardware_control.types import Axis
 from opentrons.hardware_control.types import (HardwareEventType, HardwareEvent,
                                               PauseType)
 from .models import Container, Instrument, Module
@@ -457,13 +459,56 @@ class Session(RobotBusy):
         self.set_state('loaded')
 
     def stop(self) -> None:
-        self._hw_iface().halt()
+        # Save the current pipette tip length before calling self._hardware.halt
+        # so we don't lose it on hard halt. Used for determining a need for tip dropping
+        instruments = self._hardware.attached_instruments
+        saved_tip_length = {mount: pip.get('tip_length')
+                            for mount, pip in instruments.items()}
+        self._hardware.halt()
         with self._motion_lock.lock():
             try:
-                self._hw_iface().stop()
+                if any(saved_tip_length.values()):
+                    self._hardware.stop(home_after=False)
+                    self._hardware.home(axes=Axis.gantry_axes())
+                    self._drop_tip_after_cancel(saved_tip_length)
+                self._hardware.stop(home_after=True)
             except asyncio.CancelledError:
                 pass
         self.set_state('stopped')
+
+    def _drop_tip_after_cancel(
+        self,
+        saved_tip_length: Dict[MountType, Optional[float]],
+    ) -> None:
+        """ Perform a drop_tip on the pipette with a tip.
+
+        Note: Moving the plunger the right amount to drop the tip depends on
+              knowing the previous plunger location. When the smoothie board is issued
+              a `halt`, we need to reset it in order to resume communication.
+              BUT, it seems like the smoothie doesn't wipe out the cached locations upon
+              reset, so, we can just resume moving the plunger without homing it first.
+              This behavior has been consistent so far but if ends up being unreliable
+              then we will have to change this logic.
+
+              Also, `self._hardware.halt()` does not stop the motors gracefully. If the
+              plunger motor was moving at a speed above the pull-in speed at the time,
+              it could skip. So, even if the motor controller board's memory of the
+              plunger's current location isn't wiped out, it could be slightly wrong.
+              That said, since plunger speeds during liquid handling commands are much
+              lower, the probability of this causing an issue is very low.
+        """
+        if not self.instruments:
+            return
+        for instrument_wrapper in self.instruments:
+            mount = MountType.string_to_mount(instrument_wrapper.mount)
+            protocol_ctx = instrument_wrapper._context
+            tip_length = saved_tip_length[mount]
+
+            if tip_length:
+                self._hardware.add_tip(mount=mount, tip_length=tip_length)
+                with protocol_ctx.temp_connect(self._hardware):
+                    protocol_ctx.location_cache = None
+                    instrument_wrapper._instrument.drop_tip()
 
     def pause(self,
               reason: str = None,

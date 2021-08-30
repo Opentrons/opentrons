@@ -36,7 +36,10 @@ export function ConfirmCancelModal(
         ]}
         alertOverlay
       >
-        <p>Doing so will terminate this run and home your robot.</p>
+        <p>
+          Doing so will terminate this run, drop any attached tips in the trash
+          container and home your robot.
+        </p>
         <p>
           Additionally, any hardware modules used within the protocol will
           remain active and maintain their current states until deactivated.
