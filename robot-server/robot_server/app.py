@@ -8,16 +8,13 @@ from starlette.responses import Response
 from starlette.requests import Request
 from starlette.middleware.base import RequestResponseEndpoint
 
-from .service.dependencies import (
-    get_rpc_server,
-    get_protocol_manager,
-    get_hardware_wrapper,
-    get_session_manager,
-)
+from .service.dependencies import get_protocol_manager, get_session_manager
+from .service.legacy.rpc import cleanup_rpc_server
 
 from .errors import exception_handlers
 from .router import router
 from .service import initialize_logging
+from .hardware import initialize_hardware, cleanup_hardware
 from . import constants
 
 log = logging.getLogger(__name__)
@@ -59,19 +56,19 @@ app.include_router(router=router)
 async def on_startup() -> None:
     """Handle app startup."""
     initialize_logging()
-    # Initialize api
-    (await get_hardware_wrapper()).async_initialize()
+    initialize_hardware(app.state)
 
 
 @app.on_event("shutdown")
 async def on_shutdown() -> None:
     """Handle app shutdown."""
-    s = await get_rpc_server()
-    await s.on_shutdown()
     # Remove all sessions
     await (await get_session_manager()).remove_all()
     # Remove all uploaded protocols
     (await get_protocol_manager()).remove_all()
+
+    await cleanup_rpc_server(app.state)
+    await cleanup_hardware(app.state)
 
 
 @app.middleware("http")

@@ -10,8 +10,7 @@ from starlette.testclient import WebSocketTestSession
 
 from opentrons.protocols.execution.errors import ExceptionInProtocolError
 
-from robot_server.service.dependencies import get_rpc_server
-from robot_server.service.legacy.rpc import rpc
+from robot_server.service.legacy import rpc
 
 
 class Session(typing.NamedTuple):
@@ -22,7 +21,7 @@ class Session(typing.NamedTuple):
 
 
 @pytest.fixture
-def session(loop, api_client, request) -> Session:
+def session(loop, api_client, request) -> typing.Iterator[Session]:
     """
     Create testing session. Tests using this fixture are expected
     to have @pytest.mark.parametrize('root', [value]) decorator set.
@@ -40,7 +39,7 @@ def session(loop, api_client, request) -> Session:
         return _internal_server
 
     # Override the RPC server dependency
-    api_client.app.dependency_overrides[get_rpc_server] = get_server
+    api_client.app.dependency_overrides[rpc.get_rpc_server] = get_server
 
     # Connect
     socket = api_client.websocket_connect("/")

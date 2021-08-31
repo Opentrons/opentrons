@@ -289,7 +289,7 @@ class API(HardwareAPILike):
             self._robot_calibration.deck_calibration
         )
 
-    async def register_callback(self, cb):
+    def register_callback(self, cb):
         """Allows the caller to register a callback, and returns a closure
         that can be used to unregister the provided callback
         """
@@ -314,7 +314,7 @@ class API(HardwareAPILike):
             return from_backend
 
     @property
-    def fw_version(self) -> Optional[str]:
+    def fw_version(self) -> str:
         return self.get_fw_version()
 
     @property
