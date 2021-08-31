@@ -1,10 +1,9 @@
 """Protocol file models."""
 from __future__ import annotations
 from datetime import datetime
-from pydantic import BaseModel, Field, Json
+from pydantic import BaseModel, Field
 from opentrons.protocol_runner import ProtocolFileType
 from robot_server.service.json_api import ResourceModel
-from typing import Optional
 
 
 class Metadata(BaseModel):
@@ -36,7 +35,8 @@ class Metadata(BaseModel):
     If a compelling need arises, this API may expose `apiLevel` some other way.)
     """
 
-    class Config:
+    class Config:  # noqa: D106
+        # Tell Pydantic that objects of this model can have arbitrary fields.
         extra = "allow"
 
 
@@ -46,9 +46,11 @@ class Protocol(ResourceModel):
     id: str = Field(..., description="A unique identifier for this protocol.")
     createdAt: datetime = Field(
         ...,
-        description="When this protocol was *uploaded.*"
-                    " (`metadata` may have information about"
-                    " when this protocol was *authored.*)"
+        description=(
+            "When this protocol was *uploaded.*"
+            " (`metadata` may have information about"
+            " when this protocol was *authored.*)"
+        ),
     )
     protocolType: ProtocolFileType = Field(
         ...,
