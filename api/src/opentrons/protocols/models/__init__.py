@@ -6,10 +6,7 @@
 # from the name of its parent submodule. e.g. re-exporting models.json_protocol.Labware
 # as models.Labware could be confusing.
 
-from .labware_definition import (
-    LabwareDefinition,
-    WellDefinition
-)
+from .labware_definition import LabwareDefinition, WellDefinition
 from .json_protocol import Model as JsonProtocol
 
 __all__ = [

@@ -11,28 +11,27 @@ import logging
 
 from pathlib import Path
 from itertools import dropwhile
-from typing import (
-    Any, AnyStr, List, Dict,
-    Optional, Union, Tuple,
-    TYPE_CHECKING)
+from typing import Any, AnyStr, List, Dict, Optional, Union, Tuple, TYPE_CHECKING
 
 
-from opentrons.protocols.api_support.util import (
-    requires_version, labware_column_shift)
-from opentrons.protocols.context.labware import \
-    AbstractLabware
+from opentrons.protocols.api_support.util import requires_version, labware_column_shift
+from opentrons.protocols.context.labware import AbstractLabware
 from opentrons.protocols.geometry.well_geometry import WellGeometry
 from opentrons.protocols import labware as labware_module
 from opentrons.protocols.context.well import WellImplementation
 from opentrons.types import Location, Point, LocationLabware
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.api_support.definitions import (
-    MAX_SUPPORTED_VERSION)
+from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.geometry.deck_item import DeckItem
+
 if TYPE_CHECKING:
-    from opentrons.protocols.geometry.module_geometry import ModuleGeometry  # noqa: F401, E501
+    from opentrons.protocols.geometry.module_geometry import (  # noqa: F401
+        ModuleGeometry,
+    )
     from opentrons_shared_data.labware.dev_types import (
-        LabwareDefinition, LabwareParameters)
+        LabwareDefinition,
+        LabwareParameters,
+    )
 
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -53,9 +52,12 @@ class Well:
     It provides functions to return positions used in operations on the well
     such as :py:meth:`top`, :py:meth:`bottom`
     """
-    def __init__(self,
-                 well_implementation: WellImplementation,
-                 api_level: Optional[APIVersion] = None):
+
+    def __init__(
+        self,
+        well_implementation: WellImplementation,
+        api_level: Optional[APIVersion] = None,
+    ):
         """
         Create a well, and track the Point corresponding to the top-center of
         the well (this Point is in absolute deck coordinates)
@@ -72,9 +74,8 @@ class Well:
 
     @property  # type: ignore
     @requires_version(2, 0)
-    def parent(self) -> 'Labware':
-        return Labware(implementation=self._geometry.parent,
-                       api_level=self.api_version)
+    def parent(self) -> "Labware":
+        return Labware(implementation=self._geometry.parent, api_level=self.api_version)
 
     @property  # type: ignore
     @requires_version(2, 0)
@@ -192,8 +193,9 @@ class Well:
         Private version of from_center_cartesian. Present only for backward
         compatibility.
         """
-        MODULE_LOG.warning("This method is deprecated. Please use "
-                           "'from_center_cartesian' instead.")
+        MODULE_LOG.warning(
+            "This method is deprecated. Please use " "'from_center_cartesian' instead."
+        )
         return self.from_center_cartesian(x, y, z)
 
     def __repr__(self):
@@ -239,10 +241,10 @@ class Labware(DeckItem):
        labware.columns_by_name()[0][0]
 
     """
+
     def __init__(
-            self,
-            implementation: AbstractLabware,
-            api_level: Optional[APIVersion] = None) -> None:
+        self, implementation: AbstractLabware, api_level: Optional[APIVersion] = None
+    ) -> None:
         """
         :param implementation: The class that implements the public interface
                                of the class.
@@ -256,9 +258,10 @@ class Labware(DeckItem):
             api_level = MAX_SUPPORTED_VERSION
         if api_level > MAX_SUPPORTED_VERSION:
             raise RuntimeError(
-                f'API version {api_level} is not supported by this '
-                f'robot software. Please either reduce your requested API '
-                f'version or update your robot.')
+                f"API version {api_level} is not supported by this "
+                f"robot software. Please either reduce your requested API "
+                f"version or update your robot."
+            )
         self._api_version = api_level
         self._implementation = implementation
 
@@ -277,7 +280,7 @@ class Labware(DeckItem):
     @property  # type: ignore
     @requires_version(2, 0)
     def uri(self) -> str:
-        """ A string fully identifying the labware.
+        """A string fully identifying the labware.
 
         :returns: The uri, ``"namespace/loadname/version"``
         """
@@ -286,48 +289,47 @@ class Labware(DeckItem):
     @property  # type: ignore
     @requires_version(2, 0)
     def parent(self) -> LocationLabware:
-        """ The parent of this labware. Usually a slot name.
-        """
+        """The parent of this labware. Usually a slot name."""
         return self._implementation.get_geometry().parent.labware.object
 
     @property  # type: ignore
     @requires_version(2, 0)
     def name(self) -> str:
-        """ Can either be the canonical name of the labware, which is used to
-        load it, or the label of the labware specified by a user. """
+        """Can either be the canonical name of the labware, which is used to
+        load it, or the label of the labware specified by a user."""
         return self._implementation.get_name()
 
     @name.setter  # type: ignore
     def name(self, new_name):
-        """ Set the labware name"""
+        """Set the labware name"""
         self._implementation.set_name(new_name)
 
     @property  # type: ignore
     @requires_version(2, 0)
     def load_name(self) -> str:
-        """ The API load name of the labware definition """
+        """The API load name of the labware definition"""
         return self._implementation.load_name
 
     @property  # type: ignore
     @requires_version(2, 0)
-    def parameters(self) -> 'LabwareParameters':
+    def parameters(self) -> "LabwareParameters":
         """Internal properties of a labware including type and quirks"""
         return self._implementation.get_parameters()
 
     @property  # type: ignore
     @requires_version(2, 0)
     def quirks(self) -> List[str]:
-        """ Quirks specific to this labware. """
+        """Quirks specific to this labware."""
         return self._implementation.get_quirks()
 
     @property  # type: ignore
     @requires_version(2, 0)
     def magdeck_engage_height(self) -> Optional[float]:
         p = self._implementation.get_parameters()
-        if not p['isMagneticModuleCompatible']:
+        if not p["isMagneticModuleCompatible"]:
             return None
         else:
-            return p['magneticModuleEngageHeight']
+            return p["magneticModuleEngageHeight"]
 
     def set_calibration(self, delta: Point):
         """
@@ -392,10 +394,7 @@ class Labware(DeckItem):
         :return: Dictionary of well objects keyed by well name
         """
         wells = self._implementation.get_wells_by_name()
-        return {
-            k: self._well_from_impl(v)
-            for k, v in wells.items()
-        }
+        return {k: self._well_from_impl(v) for k, v in wells.items()}
 
     @requires_version(2, 0)
     def wells_by_index(self) -> Dict[str, Well]:
@@ -404,7 +403,8 @@ class Labware(DeckItem):
             Use :py:meth:`wells_by_name` or dict access instead.
         """
         MODULE_LOG.warning(
-            'wells_by_index is deprecated. Use wells_by_name or dict access instead.')
+            "wells_by_index is deprecated. Use wells_by_name or dict access instead."
+        )
         return self.wells_by_name()
 
     @requires_version(2, 0)
@@ -447,11 +447,7 @@ class Labware(DeckItem):
         :return: Dictionary of Well lists keyed by row name
         """
         row_dict = self._implementation.get_well_grid().get_row_dict()
-        return {
-            k: [
-                self._well_from_impl(w) for w in v
-            ] for k, v in row_dict.items()
-        }
+        return {k: [self._well_from_impl(w) for w in v] for k, v in row_dict.items()}
 
     @requires_version(2, 0)
     def rows_by_index(self) -> Dict[str, List[Well]]:
@@ -459,8 +455,7 @@ class Labware(DeckItem):
         .. deprecated:: 2.0
             Use :py:meth:`rows_by_name` instead.
         """
-        MODULE_LOG.warning(
-            'rows_by_index is deprecated. Use rows_by_name instead.')
+        MODULE_LOG.warning("rows_by_index is deprecated. Use rows_by_name instead.")
         return self.rows_by_name()
 
     @requires_version(2, 0)
@@ -505,11 +500,7 @@ class Labware(DeckItem):
         :return: Dictionary of Well lists keyed by column name
         """
         column_dict = self._implementation.get_well_grid().get_column_dict()
-        return {
-            k: [
-                self._well_from_impl(w) for w in v
-            ] for k, v in column_dict.items()
-        }
+        return {k: [self._well_from_impl(w) for w in v] for k, v in column_dict.items()}
 
     @requires_version(2, 0)
     def columns_by_index(self) -> Dict[str, List[Well]]:
@@ -518,7 +509,8 @@ class Labware(DeckItem):
             Use :py:meth:`columns_by_name` instead.
         """
         MODULE_LOG.warning(
-            'columns_by_index is deprecated. Use columns_by_name instead.')
+            "columns_by_index is deprecated. Use columns_by_name instead."
+        )
         return self.columns_by_name()
 
     @property  # type: ignore
@@ -534,7 +526,7 @@ class Labware(DeckItem):
 
     @property
     def _is_tiprack(self) -> bool:
-        """ as is_tiprack but not subject to version checking for speed """
+        """as is_tiprack but not subject to version checking for speed"""
         return self._implementation.is_tiprack()
 
     @property  # type: ignore
@@ -551,9 +543,9 @@ class Labware(DeckItem):
     def tip_length(self, length: float):
         self._implementation.set_tip_length(length)
 
-    def next_tip(self,
-                 num_tips: int = 1,
-                 starting_tip: Optional[Well] = None) -> Optional[Well]:
+    def next_tip(
+        self, num_tips: int = 1, starting_tip: Optional[Well] = None
+    ) -> Optional[Well]:
         """
         Find the next valid well for pick-up.
 
@@ -568,11 +560,10 @@ class Labware(DeckItem):
         :type starting_tip: :py:class:`.Well`
         :return: the :py:class:`.Well` meeting the target criteria, or None
         """
-        assert num_tips > 0, 'Bad call to next_tip: num_tips <= 0'
+        assert num_tips > 0, "Bad call to next_tip: num_tips <= 0"
 
         well = self._implementation.get_tip_tracker().next_tip(
-            num_tips=num_tips,
-            starting_tip=starting_tip._impl if starting_tip else None
+            num_tips=num_tips, starting_tip=starting_tip._impl if starting_tip else None
         )
         return self._well_from_impl(well) if well else None
 
@@ -596,14 +587,14 @@ class Labware(DeckItem):
         :param num_channels: The number of channels for the current pipette
         :type num_channels: int
         """
-        assert num_channels > 0, 'Bad call to use_tips: num_channels<=0'
+        assert num_channels > 0, "Bad call to use_tips: num_channels<=0"
 
         fail_if_full = self._api_version < APIVersion(2, 2)
 
         self._implementation.get_tip_tracker().use_tips(
             start_well=start_well._impl,
             num_channels=num_channels,
-            fail_if_full=fail_if_full
+            fail_if_full=fail_if_full,
         )
 
     def __repr__(self):
@@ -630,11 +621,9 @@ class Labware(DeckItem):
         :return: The :py:class:`.Well` meeting the target criteria, or ``None``
         """
         # This logic is the inverse of :py:meth:`next_tip`
-        assert num_tips > 0, 'Bad call to previous_tip: num_tips <= 0'
+        assert num_tips > 0, "Bad call to previous_tip: num_tips <= 0"
 
-        well = self._implementation.get_tip_tracker().previous_tip(
-            num_tips=num_tips
-        )
+        well = self._implementation.get_tip_tracker().previous_tip(num_tips=num_tips)
         return self._well_from_impl(well) if well else None
 
     def return_tips(self, start_well: Well, num_channels: int = 1):
@@ -659,29 +648,26 @@ class Labware(DeckItem):
         :type num_channels: int
         """
         # This logic is the inverse of :py:meth:`use_tips`
-        assert num_channels > 0, 'Bad call to return_tips: num_channels <= 0'
+        assert num_channels > 0, "Bad call to return_tips: num_channels <= 0"
 
         self._implementation.get_tip_tracker().return_tips(
-            start_well=start_well._impl,
-            num_channels=num_channels
+            start_well=start_well._impl, num_channels=num_channels
         )
 
     @requires_version(2, 0)
     def reset(self):
-        """Reset all tips in a tiprack
-        """
+        """Reset all tips in a tiprack"""
         if self._is_tiprack:
             self._implementation.reset_tips()
 
     def _well_from_impl(self, well: WellImplementation) -> Well:
-        return Well(well_implementation=well,
-                    api_level=self._api_version)
+        return Well(well_implementation=well, api_level=self._api_version)
 
 
 def save_definition(
-    labware_def: 'LabwareDefinition',
+    labware_def: "LabwareDefinition",
     force: bool = False,
-    location: Optional[Path] = None
+    location: Optional[Path] = None,
 ) -> None:
     """
     Save a labware definition
@@ -691,15 +677,15 @@ def save_definition(
         Cannot overwrite Opentrons definitions.
     :param location: The path of the labware definition.
     """
-    labware_module.save_definition(labware_def=labware_def,
-                                   force=force,
-                                   location=location)
+    labware_module.save_definition(
+        labware_def=labware_def, force=force, location=location
+    )
 
 
-def verify_definition(contents: Union[
-        AnyStr, 'LabwareDefinition', Dict[str, Any]])\
-        -> 'LabwareDefinition':
-    """ Verify that an input string is a labware definition and return it.
+def verify_definition(
+    contents: Union[AnyStr, "LabwareDefinition", Dict[str, Any]]
+) -> "LabwareDefinition":
+    """Verify that an input string is a labware definition and return it.
 
     If the definition is invalid, an exception is raised; otherwise parse the
     json and return the valid definition.
@@ -715,9 +701,9 @@ def get_labware_definition(
     load_name: str,
     namespace: Optional[str] = None,
     version: Optional[int] = None,
-    bundled_defs: Dict[str, 'LabwareDefinition'] = None,
-    extra_defs: Dict[str, 'LabwareDefinition'] = None
-) -> 'LabwareDefinition':
+    bundled_defs: Dict[str, "LabwareDefinition"] = None,
+    extra_defs: Dict[str, "LabwareDefinition"] = None,
+) -> "LabwareDefinition":
     """
     Look up and return a definition by load_name + namespace + version and
         return it or raise an exception
@@ -737,7 +723,7 @@ def get_labware_definition(
         namespace=namespace,
         version=version,
         bundled_defs=bundled_defs,
-        extra_defs=extra_defs
+        extra_defs=extra_defs,
     )
 
 
@@ -758,9 +744,8 @@ def split_tipracks(tip_racks: List[Labware]) -> Tuple[Labware, List[Labware]]:
 
 
 def select_tiprack_from_list(
-        tip_racks: List[Labware],
-        num_channels: int,
-        starting_point: Optional[Well] = None) -> Tuple[Labware, Well]:
+    tip_racks: List[Labware], num_channels: int, starting_point: Optional[Well] = None
+) -> Tuple[Labware, Well]:
 
     try:
         first, rest = split_tipracks(tip_racks)
@@ -769,8 +754,8 @@ def select_tiprack_from_list(
 
     if starting_point and starting_point.parent != first:
         raise TipSelectionError(
-            'The starting tip you selected '
-            f'does not exist in {first}')
+            "The starting tip you selected " f"does not exist in {first}"
+        )
     elif starting_point:
         first_well = starting_point
     else:
@@ -784,10 +769,11 @@ def select_tiprack_from_list(
 
 
 def select_tiprack_from_list_paired_pipettes(
-        tip_racks: List[Labware],
-        p_channels: int,
-        s_channels: int,
-        starting_point: Optional[Well] = None) -> Tuple[Labware, Well]:
+    tip_racks: List[Labware],
+    p_channels: int,
+    s_channels: int,
+    starting_point: Optional[Well] = None,
+) -> Tuple[Labware, Well]:
     """
     Helper function utilized in :py:attr:`PairedInstrumentContext`
     to determine which pipette tiprack to pick up from.
@@ -810,8 +796,8 @@ def select_tiprack_from_list_paired_pipettes(
 
     if starting_point and starting_point.parent != first:
         raise TipSelectionError(
-            'The starting tip you selected '
-            f'does not exist in {first}')
+            "The starting tip you selected " f"does not exist in {first}"
+        )
     elif starting_point:
         primary_well = starting_point
     else:
@@ -820,56 +806,48 @@ def select_tiprack_from_list_paired_pipettes(
     try:
         secondary_point = labware_column_shift(primary_well, first)
     except IndexError:
-        return select_tiprack_from_list_paired_pipettes(
-            rest, p_channels, s_channels)
+        return select_tiprack_from_list_paired_pipettes(rest, p_channels, s_channels)
 
     primary_next_tip = first.next_tip(p_channels, starting_point)
     secondary_next_tip = first.next_tip(s_channels, secondary_point)
     if primary_next_tip and secondary_next_tip:
         return first, primary_next_tip
     else:
-        return select_tiprack_from_list_paired_pipettes(
-            rest, p_channels, s_channels)
+        return select_tiprack_from_list_paired_pipettes(rest, p_channels, s_channels)
 
 
 def filter_tipracks_to_start(
-        starting_point: Well,
-        tipracks: List[Labware]) -> List[Labware]:
-    return list(dropwhile(
-        lambda tr: starting_point.parent != tr, tipracks))
+    starting_point: Well, tipracks: List[Labware]
+) -> List[Labware]:
+    return list(dropwhile(lambda tr: starting_point.parent != tr, tipracks))
 
 
 def next_available_tip(
-        starting_tip: Optional[Well],
-        tip_racks: List[Labware],
-        channels: int) -> Tuple[Labware, Well]:
+    starting_tip: Optional[Well], tip_racks: List[Labware], channels: int
+) -> Tuple[Labware, Well]:
     start = starting_tip
     if start is None:
-        return select_tiprack_from_list(
-            tip_racks, channels)
+        return select_tiprack_from_list(tip_racks, channels)
     else:
         return select_tiprack_from_list(
-            filter_tipracks_to_start(start, tip_racks),
-            channels, start)
+            filter_tipracks_to_start(start, tip_racks), channels, start
+        )
 
 
-def get_labware_hash(labware: 'Labware') -> str:
-    return labware_module.get_labware_hash(
-        labware._implementation
-    )
+def get_labware_hash(labware: "Labware") -> str:
+    return labware_module.get_labware_hash(labware._implementation)
 
 
-def get_labware_hash_with_parent(labware: 'Labware') -> str:
-    return labware_module.get_labware_hash_with_parent(
-        labware._implementation
-    )
+def get_labware_hash_with_parent(labware: "Labware") -> str:
+    return labware_module.get_labware_hash_with_parent(labware._implementation)
 
 
 def load_from_definition(
-        definition: 'LabwareDefinition',
-        parent: Location,
-        label: Optional[str] = None,
-        api_level: Optional[APIVersion] = None) -> Labware:
+    definition: "LabwareDefinition",
+    parent: Location,
+    label: Optional[str] = None,
+    api_level: Optional[APIVersion] = None,
+) -> Labware:
     """
     Return a labware object constructed from a provided labware definition dict
 
@@ -891,15 +869,13 @@ def load_from_definition(
     """
     return Labware(
         implementation=labware_module.load_from_definition(
-            definition=definition,
-            parent=parent,
-            label=label
+            definition=definition, parent=parent, label=label
         ),
-        api_level=api_level
+        api_level=api_level,
     )
 
 
-def save_calibration(labware: 'Labware', delta: Point):
+def save_calibration(labware: "Labware", delta: Point):
     labware_module.save_calibration(labware._implementation, delta)
 
 
@@ -909,9 +885,9 @@ def load(
     label: Optional[str] = None,
     namespace: Optional[str] = None,
     version: int = 1,
-    bundled_defs: Optional[Dict[str, 'LabwareDefinition']] = None,
-    extra_defs: Optional[Dict[str, 'LabwareDefinition']] = None,
-    api_level: Optional[APIVersion] = None
+    bundled_defs: Optional[Dict[str, "LabwareDefinition"]] = None,
+    extra_defs: Optional[Dict[str, "LabwareDefinition"]] = None,
+    api_level: Optional[APIVersion] = None,
 ) -> Labware:
     """
     Return a labware object constructed from a labware definition dict looked
@@ -949,7 +925,7 @@ def load(
             namespace=namespace,
             version=version,
             bundled_defs=bundled_defs,
-            extra_defs=extra_defs
+            extra_defs=extra_defs,
         ),
         api_level=api_level,
     )

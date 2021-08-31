@@ -12,6 +12,7 @@ class GCodeProgram:
     Class for parsing various G-Code files and programs into a
     list of GCode objects
     """
+
     @classmethod
     def from_g_code_watcher(cls, watcher: GCodeWatcher) -> GCodeProgram:
         """
@@ -23,10 +24,8 @@ class GCodeProgram:
         g_codes = []
         for watcher_data in watcher.get_command_list():
             g_code_list = GCode.from_raw_code(
-                    watcher_data.raw_g_code,
-                    watcher_data.device,
-                    watcher_data.response
-                )
+                watcher_data.raw_g_code, watcher_data.device, watcher_data.response
+            )
             for g_code in g_code_list:
                 # Filtering out polling commands here because they are not actually
                 # called by the user. They are called by the systems and we don't
@@ -51,11 +50,10 @@ class GCodeProgram:
         """Add a list of G-Codes to the end of a program"""
         # See from_g_code_watcher for explanation
         polling_commands = [
-            g_code for g_code in g_code_list
-            if g_code.is_polling_command()
+            g_code for g_code in g_code_list if g_code.is_polling_command()
         ]
         if len(polling_commands) > 0:
-            g_codes = ', '.join(g_code.g_code for g_code in polling_commands)
+            g_codes = ", ".join(g_code.g_code for g_code in polling_commands)
             raise PollingGCodeAdditionError(g_codes)
 
         self._g_codes.extend(g_code_list)
@@ -72,11 +70,7 @@ class GCodeProgram:
     def get_json(self) -> str:
         """Get JSON representation of all G-Codes"""
         return json.dumps(
-            [
-                code.get_explanation().to_dict()
-                for code in self._g_codes
-            ],
-            indent=4
+            [code.get_explanation().to_dict() for code in self._g_codes], indent=4
         )
 
     def get_text_explanation(self, mode: Union[SupportedTextModes, str]) -> str:
@@ -90,23 +84,16 @@ class GCodeProgram:
             text_mode = SupportedTextModes.get_text_mode_by_enum_value(mode)
         else:
             text_mode = SupportedTextModes.get_text_mode(mode)
-        return '\n'.join(
-            [
-                text_mode.builder(code)
-                for code in self._g_codes
-            ]
-        )
+        return "\n".join([text_mode.builder(code) for code in self._g_codes])
 
     def save_text_explanation_to_file(
-            self,
-            file_path: str,
-            mode: Union[SupportedTextModes, str]
+        self, file_path: str, mode: Union[SupportedTextModes, str]
     ):
 
-        with open(file_path, 'w') as file:
+        with open(file_path, "w") as file:
             file.write(self.get_text_explanation(mode))
 
     def save_json_to_file(self, file_path: str) -> None:
         """Save JSON to passed file name"""
-        with open(file_path, 'w') as file:
+        with open(file_path, "w") as file:
             file.write(self.get_json())

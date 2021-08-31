@@ -1,7 +1,6 @@
 import pytest
 from opentrons.hardware_control import PauseManager
-from opentrons.hardware_control.types import (DoorState, PauseType,
-                                              PauseResumeError)
+from opentrons.hardware_control.types import DoorState, PauseType, PauseResumeError
 
 
 def test_pause_and_delay_separation():

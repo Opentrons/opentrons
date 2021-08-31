@@ -4,8 +4,16 @@ from asyncio import Queue
 from contextlib import contextmanager
 import logging
 from typing import (
-    Any, Callable, Dict, Sequence, overload, Generic, TypeVar,
-    cast, TYPE_CHECKING)
+    Any,
+    Callable,
+    Dict,
+    Sequence,
+    overload,
+    Generic,
+    TypeVar,
+    cast,
+    TYPE_CHECKING,
+)
 from typing_extensions import Literal
 
 from opentrons.commands import types
@@ -21,7 +29,7 @@ MODULE_LOG = logging.getLogger(__name__)
 UntypedMessage = Dict[str, Any]
 
 
-_HandledMessages = TypeVar('_HandledMessages')
+_HandledMessages = TypeVar("_HandledMessages")
 
 
 class Notifications(Generic[_HandledMessages]):
@@ -30,7 +38,8 @@ class Notifications(Generic[_HandledMessages]):
         self.queue: Queue[UntypedMessage] = Queue(loop=self.loop)
         self.snoozed = False
         self._unsubscribe = [
-            broker.subscribe(topic, self.on_notify) for topic in topics]
+            broker.subscribe(topic, self.on_notify) for topic in topics
+        ]
 
     @contextmanager
     def snooze(self):
@@ -60,28 +69,29 @@ class Broker:
 
     @overload
     def subscribe(
-            self,
-            topic: Literal['command'],
-            handler: Callable[[types.CommandMessage], None]) -> Callable[[], None]: ...
+        self, topic: Literal["command"], handler: Callable[[types.CommandMessage], None]
+    ) -> Callable[[], None]:
+        ...
 
     @overload
     def subscribe(
-            self,
-            topic: Literal['calibration'],
-            handler: Callable[[CalibrationStateMessage], None])\
-        -> Callable[[], None]: ...
+        self,
+        topic: Literal["calibration"],
+        handler: Callable[[CalibrationStateMessage], None],
+    ) -> Callable[[], None]:
+        ...
 
     @overload
     def subscribe(
-            self,
-            topic: Literal['session'],
-            handler: Callable[[SessionStateMessage], None]) -> Callable[[], None]: ...
+        self, topic: Literal["session"], handler: Callable[[SessionStateMessage], None]
+    ) -> Callable[[], None]:
+        ...
 
     @overload
     def subscribe(
-            self,
-            topic: str,
-            handler: Callable[[UntypedMessage], None]) -> Callable[[], None]: ...
+        self, topic: str, handler: Callable[[UntypedMessage], None]
+    ) -> Callable[[], None]:
+        ...
 
     def subscribe(self, topic, handler):
         if handler in self.subscriptions.setdefault(topic, []):
@@ -94,21 +104,22 @@ class Broker:
         return unsubscribe
 
     @overload
-    def publish(
-            self, topic: Literal['command'], message: types.CommandMessage) -> None: ...
+    def publish(self, topic: Literal["command"], message: types.CommandMessage) -> None:
+        ...
 
     @overload
     def publish(
-            self,
-            topic: Literal['calibration'],
-            message: CalibrationStateMessage) -> None: ...
+        self, topic: Literal["calibration"], message: CalibrationStateMessage
+    ) -> None:
+        ...
 
     @overload
-    def publish(
-            self, topic: Literal['session'], message: SessionStateMessage) -> None: ...
+    def publish(self, topic: Literal["session"], message: SessionStateMessage) -> None:
+        ...
 
     @overload
-    def publish(self, topic: str, message: UntypedMessage) -> None: ...
+    def publish(self, topic: str, message: UntypedMessage) -> None:
+        ...
 
     def publish(self, topic, message):
         [handler(message) for handler in self.subscriptions.get(topic, [])]

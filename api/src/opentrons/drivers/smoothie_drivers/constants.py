@@ -39,19 +39,19 @@ class GCODE(str, Enum):
 
 
 HOMED_POSITION: Final = {
-    'X': 418.0,
-    'Y': 353.0,
-    'Z': 218.0,
-    'A': 218.0,
-    'B': 19.0,
-    'C': 19.0
+    "X": 418.0,
+    "Y": 353.0,
+    "Z": 218.0,
+    "A": 218.0,
+    "B": 19.0,
+    "C": 19.0,
 }
 
 Y_BOUND_OVERRIDE: Final = 370
 
-SMOOTHIE_COMMAND_TERMINATOR = '\r\n\r\n'
+SMOOTHIE_COMMAND_TERMINATOR = "\r\n\r\n"
 
-SMOOTHIE_ACK = 'ok\r\nok\r\n'
+SMOOTHIE_ACK = "ok\r\nok\r\n"
 
 PLUNGER_BACKLASH_MM = 0.3
 
@@ -81,14 +81,14 @@ DEFAULT_AXES_SPEED = 400
 
 XY_HOMING_SPEED = 80
 
-HOME_SEQUENCE = ['ZABC', 'X', 'Y']
+HOME_SEQUENCE = ["ZABC", "X", "Y"]
 
-AXES = ''.join(HOME_SEQUENCE)
+AXES = "".join(HOME_SEQUENCE)
 
-DISABLE_AXES = ''
+DISABLE_AXES = ""
 """Ignore these axis when sending move or home command"""
 
-MOVEMENT_ERROR_MARGIN = 1/160  # Largest movement in mm for any step
+MOVEMENT_ERROR_MARGIN = 1 / 160  # Largest movement in mm for any step
 
 SEC_PER_MIN = 60
 
@@ -107,14 +107,14 @@ DEFAULT_STABILIZE_DELAY = 0.1
 DEFAULT_COMMAND_RETRIES = 3
 
 MICROSTEPPING_GCODES = {
-    'B': {
-        'ENABLE': GCODE.MICROSTEPPING_B_ENABLE,
-        'DISABLE': GCODE.MICROSTEPPING_B_DISABLE,
+    "B": {
+        "ENABLE": GCODE.MICROSTEPPING_B_ENABLE,
+        "DISABLE": GCODE.MICROSTEPPING_B_DISABLE,
     },
-    'C': {
-        'ENABLE': GCODE.MICROSTEPPING_C_ENABLE,
-        'DISABLE': GCODE.MICROSTEPPING_C_DISABLE,
-    }
+    "C": {
+        "ENABLE": GCODE.MICROSTEPPING_C_ENABLE,
+        "DISABLE": GCODE.MICROSTEPPING_C_DISABLE,
+    },
 }
 
 GCODE_ROUNDING_PRECISION = 3

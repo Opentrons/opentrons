@@ -7,7 +7,9 @@ from opentrons.hardware_control.poller import Reader, WaitableListener, Poller
 from typing_extensions import Final
 from opentrons.drivers.types import Temperature
 from opentrons.drivers.temp_deck import (
-    SimulatingDriver, AbstractTempDeckDriver, TempDeckDriver
+    SimulatingDriver,
+    AbstractTempDeckDriver,
+    TempDeckDriver,
 )
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.hardware_control.execution_manager import ExecutionManager
@@ -23,18 +25,21 @@ class TempDeck(mod_abc.AbstractModule):
     """
     Under development. API subject to change without a version bump
     """
+
     FIRST_GEN2_REVISION = 20
 
     @classmethod
-    async def build(cls,
-                    port: str,
-                    usb_port: USBPort,
-                    execution_manager: ExecutionManager,
-                    interrupt_callback: types.InterruptCallback = None,
-                    simulating: bool = False,
-                    loop: asyncio.AbstractEventLoop = None,
-                    sim_model: str = None,
-                    **kwargs):
+    async def build(
+        cls,
+        port: str,
+        usb_port: USBPort,
+        execution_manager: ExecutionManager,
+        interrupt_callback: types.InterruptCallback = None,
+        simulating: bool = False,
+        loop: asyncio.AbstractEventLoop = None,
+        sim_model: str = None,
+        **kwargs,
+    ):
         """
         Build a TempDeck
 
@@ -53,7 +58,7 @@ class TempDeck(mod_abc.AbstractModule):
         Returns:
             Tempdeck instance
         """
-        polling_frequency = kwargs.get('polling_frequency')
+        polling_frequency = kwargs.get("polling_frequency")
         driver: AbstractTempDeckDriver
         if not simulating:
             driver = await TempDeckDriver.create(port=port, loop=loop)
@@ -62,36 +67,39 @@ class TempDeck(mod_abc.AbstractModule):
             driver = SimulatingDriver(sim_model=sim_model)
             polling_frequency = polling_frequency or SIM_TEMP_POLL_INTERVAL_SECS
 
-        mod = cls(port=port,
-                  usb_port=usb_port,
-                  execution_manager=execution_manager,
-                  driver=driver,
-                  device_info=await driver.get_device_info(),
-                  loop=loop,
-                  polling_frequency=polling_frequency)
+        mod = cls(
+            port=port,
+            usb_port=usb_port,
+            execution_manager=execution_manager,
+            driver=driver,
+            device_info=await driver.get_device_info(),
+            loop=loop,
+            polling_frequency=polling_frequency,
+        )
         return mod
 
-    def __init__(self,
-                 port: str,
-                 usb_port: USBPort,
-                 execution_manager: ExecutionManager,
-                 driver: AbstractTempDeckDriver,
-                 device_info: Mapping[str, str],
-                 loop: asyncio.AbstractEventLoop = None,
-                 polling_frequency: float = TEMP_POLL_INTERVAL_SECS
-                 ) -> None:
+    def __init__(
+        self,
+        port: str,
+        usb_port: USBPort,
+        execution_manager: ExecutionManager,
+        driver: AbstractTempDeckDriver,
+        device_info: Mapping[str, str],
+        loop: asyncio.AbstractEventLoop = None,
+        polling_frequency: float = TEMP_POLL_INTERVAL_SECS,
+    ) -> None:
         """Constructor"""
-        super().__init__(port=port,
-                         usb_port=usb_port,
-                         loop=loop,
-                         execution_manager=execution_manager)
+        super().__init__(
+            port=port, usb_port=usb_port, loop=loop, execution_manager=execution_manager
+        )
         self._device_info = device_info
         self._driver = driver
         self._listener = TempdeckListener(loop=loop)
         self._poller = Poller(
             reader=PollerReader(driver=self._driver),
             interval_seconds=polling_frequency,
-            listener=self._listener, loop=loop
+            listener=self._listener,
+            loop=loop,
         )
 
     async def cleanup(self) -> None:
@@ -100,10 +108,10 @@ class TempDeck(mod_abc.AbstractModule):
 
     @classmethod
     def name(cls) -> str:
-        return 'tempdeck'
+        return "tempdeck"
 
     def model(self) -> str:
-        return self._model_from_revision(self._device_info.get('model'))
+        return self._model_from_revision(self._device_info.get("model"))
 
     @classmethod
     def bootloader(cls) -> mod_abc.UploadFunction:
@@ -159,7 +167,7 @@ class TempDeck(mod_abc.AbstractModule):
         return
 
     async def deactivate(self):
-        """ Stop heating/cooling and turn off the fan """
+        """Stop heating/cooling and turn off the fan"""
         await self.wait_for_is_running()
         await self._driver.deactivate()
 
@@ -170,11 +178,8 @@ class TempDeck(mod_abc.AbstractModule):
     @property
     def live_data(self) -> types.LiveData:
         return {
-            'status': self.status,
-            'data': {
-                'currentTemp': self.temperature,
-                'targetTemp': self.target
-            }
+            "status": self.status,
+            "data": {"currentTemp": self.temperature, "targetTemp": self.target},
         }
 
     @property
@@ -194,23 +199,25 @@ class TempDeck(mod_abc.AbstractModule):
         return isinstance(self._driver, SimulatingDriver)
 
     async def prep_for_update(self) -> str:
-        model = self._device_info and self._device_info.get('model')
-        if model in ('temp_deck_v1', 'temp_deck_v1.1', 'temp_deck_v2'):
-            raise types.UpdateError("This Temperature Module can't be updated."
-                                    "Please contact Opentrons Support.")
+        model = self._device_info and self._device_info.get("model")
+        if model in ("temp_deck_v1", "temp_deck_v1.1", "temp_deck_v2"):
+            raise types.UpdateError(
+                "This Temperature Module can't be updated."
+                "Please contact Opentrons Support."
+            )
         await self._poller.stop_and_wait()
         await self._driver.enter_programming_mode()
         new_port = await update.find_bootloader_port()
         return new_port or self.port
 
     def has_available_update(self) -> bool:
-        """ Override of abc implementation to suppress update notifications
-        for v1, v1.1, and v2 temperature modules which cannot be updated """
+        """Override of abc implementation to suppress update notifications
+        for v1, v1.1, and v2 temperature modules which cannot be updated"""
         if not self._device_info:
             model = None
         else:
-            model = self._device_info.get('model')
-        if model in {'temp_deck_v1', 'temp_deck_v1.1', 'temp_deck_v2', None}:
+            model = self._device_info.get("model")
+        if model in {"temp_deck_v1", "temp_deck_v1.1", "temp_deck_v2", None}:
             return False
         return super().has_available_update()
 
@@ -239,21 +246,21 @@ class TempDeck(mod_abc.AbstractModule):
 
     @staticmethod
     def _model_from_revision(revision: Optional[str]) -> str:
-        """ Defines the revision -> model mapping"""
-        if not revision or 'v' not in revision:
-            log.error(f'bad revision: {revision}')
-            return 'temperatureModuleV1'
+        """Defines the revision -> model mapping"""
+        if not revision or "v" not in revision:
+            log.error(f"bad revision: {revision}")
+            return "temperatureModuleV1"
         try:
-            revision_num = float(revision.split('v')[-1])  # type: ignore
+            revision_num = float(revision.split("v")[-1])  # type: ignore
         except (ValueError, TypeError):
             # none or corrupt
-            log.exception('no revision')
-            return 'temperatureModuleV1'
+            log.exception("no revision")
+            return "temperatureModuleV1"
 
         if revision_num < TempDeck.FIRST_GEN2_REVISION:
-            return 'temperatureModuleV1'
+            return "temperatureModuleV1"
         else:
-            return 'temperatureModuleV2'
+            return "temperatureModuleV2"
 
 
 class PollerReader(Reader[Temperature]):
@@ -270,10 +277,11 @@ class PollerReader(Reader[Temperature]):
 
 class TempdeckListener(WaitableListener[Temperature]):
     """Tempdeck state listener."""
+
     def __init__(
-            self,
-            loop: Optional[asyncio.AbstractEventLoop] = None,
-            interrupt_callback: types.InterruptCallback = None
+        self,
+        loop: Optional[asyncio.AbstractEventLoop] = None,
+        interrupt_callback: types.InterruptCallback = None,
     ) -> None:
         """Constructor."""
         super().__init__(loop=loop)

@@ -6,20 +6,25 @@ from typing import Union, Dict, Any, List
 import sys
 from dataclasses import dataclass
 
-from opentrons.hardware_control.emulation.settings import SmoothieSettings, \
-    PipetteSettings, Settings
+from opentrons.hardware_control.emulation.settings import (
+    SmoothieSettings,
+    PipetteSettings,
+    Settings,
+)
 from opentrons.hardware_control.g_code_parsing.errors import UnparsableCLICommandError
 from opentrons.hardware_control.g_code_parsing.g_code_differ import GCodeDiffer
-from opentrons.hardware_control.g_code_parsing.g_code_program.supported_text_modes \
-    import SupportedTextModes
+from opentrons.hardware_control.g_code_parsing.g_code_program.supported_text_modes import (  # noqa: E501
+    SupportedTextModes,
+)
 from opentrons.hardware_control.g_code_parsing.protocol_runner import ProtocolRunner
 
 
 class CLICommand(abc.ABC):
     """ABC which all CLI command classes should inherit from"""
+
     able_to_respond_with_error_code = False
     respond_with_error_code = False
-    error_message = 'Error message not defined'
+    error_message = "Error message not defined"
 
     @abc.abstractmethod
     def execute(self) -> str:
@@ -30,11 +35,12 @@ class CLICommand(abc.ABC):
 @dataclass
 class RunCommand(CLICommand):
     """The "run" command of the CLI."""
+
     protocol_file_path: str
     text_mode: str
     left_pipette_config: PipetteSettings
     right_pipette_config: PipetteSettings
-    host: str = '0.0.0.0'
+    host: str = "0.0.0.0"
 
     def execute(self) -> str:
         """
@@ -42,13 +48,9 @@ class RunCommand(CLICommand):
         :return: Text explanation of G-Code program ran
         """
         smoothie_settings = SmoothieSettings(
-            left=self.left_pipette_config,
-            right=self.right_pipette_config
+            left=self.left_pipette_config, right=self.right_pipette_config
         )
-        settings = Settings(
-            smoothie=smoothie_settings,
-            host=self.host
-        )
+        settings = Settings(smoothie=smoothie_settings, host=self.host)
         with ProtocolRunner(settings).run_protocol(self.protocol_file_path) as program:
             return program.get_text_explanation(self.text_mode)
 
@@ -56,22 +58,23 @@ class RunCommand(CLICommand):
 @dataclass
 class DiffCommand(CLICommand):
     """The "diff" command of the CLI"""
+
     file_path_1: str
     file_path_2: str
     able_to_respond_with_error_code: bool
     respond_with_error_code = False
-    error_message = 'Compared files are different'
+    error_message = "Compared files are different"
 
     def execute(self) -> str:
         """
         Opens both files and compares them to each other.
         :return: HTML encoded diff of files
         """
-        with \
-                open(self.file_path_1, 'r') as file_1, \
-                open(self.file_path_2, 'r') as file_2:
-            file_1_text = '\n'.join(file_1.readlines())
-            file_2_text = '\n'.join(file_2.readlines())
+        with open(self.file_path_1, "r") as file_1, open(
+            self.file_path_2, "r"
+        ) as file_2:
+            file_1_text = "\n".join(file_1.readlines())
+            file_2_text = "\n".join(file_2.readlines())
 
             differ = GCodeDiffer(file_1_text, file_2_text)
             strings_equal = differ.strings_are_equal()
@@ -82,7 +85,7 @@ class DiffCommand(CLICommand):
             if not strings_equal:
                 text = differ.get_html_diff()
             else:
-                text = 'No difference between compared strings'
+                text = "No difference between compared strings"
 
             return text
 
@@ -93,18 +96,19 @@ class GCodeCLI:
     Takes input from command line, parses it and performs any post-processing.
     The provides run_command method to run passed input.
     """
-    COMMAND_KEY = 'command'
 
-    RUN_PROTOCOL_COMMAND = 'run'
-    PROTOCOL_FILE_PATH_KEY = 'protocol_file_path'
-    TEXT_MODE_KEY_NAME = 'text_mode'
-    LEFT_PIPETTE_KEY_NAME = 'left_pipette'
-    RIGHT_PIPETTE_KEY_NAME = 'right_pipette'
+    COMMAND_KEY = "command"
 
-    DIFF_FILES_COMMAND = 'diff'
-    FILE_PATH_1_KEY = 'file_path_1'
-    FILE_PATH_2_KEY = 'file_path_2'
-    ERROR_ON_DIFFERENT_FILES = 'error_on_different_files'
+    RUN_PROTOCOL_COMMAND = "run"
+    PROTOCOL_FILE_PATH_KEY = "protocol_file_path"
+    TEXT_MODE_KEY_NAME = "text_mode"
+    LEFT_PIPETTE_KEY_NAME = "left_pipette"
+    RIGHT_PIPETTE_KEY_NAME = "right_pipette"
+
+    DIFF_FILES_COMMAND = "diff"
+    FILE_PATH_1_KEY = "file_path_1"
+    FILE_PATH_2_KEY = "file_path_2"
+    ERROR_ON_DIFFERENT_FILES = "error_on_different_files"
     DEFAULT_PIPETTE_CONFIG = SmoothieSettings()
 
     @classmethod
@@ -131,9 +135,7 @@ class GCodeCLI:
         return cls._post_process_args(parsed_dict)
 
     @classmethod
-    def to_command(
-            cls, processed_args
-    ) -> CLICommand:
+    def to_command(cls, processed_args) -> CLICommand:
         """
         Parse passed arguments to a cli command class
         :param processed_args: Arguments that have been ran through both the
@@ -147,7 +149,7 @@ class GCodeCLI:
                 protocol_file_path=processed_args[cls.PROTOCOL_FILE_PATH_KEY],
                 text_mode=processed_args[cls.TEXT_MODE_KEY_NAME],
                 left_pipette_config=processed_args[cls.LEFT_PIPETTE_KEY_NAME],
-                right_pipette_config=processed_args[cls.RIGHT_PIPETTE_KEY_NAME]
+                right_pipette_config=processed_args[cls.RIGHT_PIPETTE_KEY_NAME],
             )
         elif cls.DIFF_FILES_COMMAND == passed_command_name:
             command = DiffCommand(
@@ -155,7 +157,7 @@ class GCodeCLI:
                 file_path_2=processed_args[cls.FILE_PATH_2_KEY],
                 able_to_respond_with_error_code=processed_args[
                     cls.ERROR_ON_DIFFERENT_FILES
-                ]
+                ],
             )
         else:
             raise UnparsableCLICommandError(
@@ -191,74 +193,68 @@ class GCodeCLI:
         input
         :return: Parser object
         """
-        parser = argparse.ArgumentParser(
-            description='CLI for G-Code Parser'
-        )
+        parser = argparse.ArgumentParser(description="CLI for G-Code Parser")
         subparsers = parser.add_subparsers(
-            title='Supported commands',
+            title="Supported commands",
             dest=cls.COMMAND_KEY,
             required=True,
-            metavar=f'{cls.RUN_PROTOCOL_COMMAND} | {cls.DIFF_FILES_COMMAND}'
-
+            metavar=f"{cls.RUN_PROTOCOL_COMMAND} | {cls.DIFF_FILES_COMMAND}",
         )
 
         run_parser = subparsers.add_parser(
             cls.RUN_PROTOCOL_COMMAND,
-            help='Run a protocol against emulation',
-            formatter_class=argparse.RawTextHelpFormatter
-
+            help="Run a protocol against emulation",
+            formatter_class=argparse.RawTextHelpFormatter,
         )
         run_parser.add_argument(
-            'protocol_file_path',
-            type=str,
-            help='Path to protocol you want to run'
+            "protocol_file_path", type=str, help="Path to protocol you want to run"
         )
         run_parser.add_argument(
-            '--text-mode',
+            "--text-mode",
             type=str,
             default=SupportedTextModes.CONCISE.value,
             choices=SupportedTextModes.get_valid_modes(),
             dest=cls.TEXT_MODE_KEY_NAME,
-            help=f'{SupportedTextModes.DEFAULT.value}: Verbose output containing '
-                 f'G-Code, Explanation, and Response'
-                 f'\n{SupportedTextModes.CONCISE.value}: Same as default but all '
-                 f'newlines, tabs, and headers removed'
-                 f'\n{SupportedTextModes.G_CODE.value}: Only raw G-Code and raw '
-                 f'response\n',
-            metavar=' | '.join(SupportedTextModes.get_valid_modes())
+            help=f"{SupportedTextModes.DEFAULT.value}: Verbose output containing "
+            f"G-Code, Explanation, and Response"
+            f"\n{SupportedTextModes.CONCISE.value}: Same as default but all "
+            f"newlines, tabs, and headers removed"
+            f"\n{SupportedTextModes.G_CODE.value}: Only raw G-Code and raw "
+            f"response\n",
+            metavar=" | ".join(SupportedTextModes.get_valid_modes()),
         )
         run_parser.add_argument(
-            '--left-pipette',
+            "--left-pipette",
             type=str,
             default=json.dumps(SmoothieSettings().left.__dict__),
-            help='Configuration for left pipette. Expects JSON string.'
-                 f'\nDefaults to "{SmoothieSettings().left.model}" if not specified.'
-                 '\nExample: {"model": "p20_multi_v2.0", "id": "P3HMV202020041605"}',
-            metavar='left_pipette_config'
+            help="Configuration for left pipette. Expects JSON string."
+            f'\nDefaults to "{SmoothieSettings().left.model}" if not specified.'
+            '\nExample: {"model": "p20_multi_v2.0", "id": "P3HMV202020041605"}',
+            metavar="left_pipette_config",
         )
         run_parser.add_argument(
-            '--right-pipette',
+            "--right-pipette",
             type=str,
             default=json.dumps(SmoothieSettings().right.__dict__),
-            help='Configuration for right pipette. Expects JSON string.'
-                 f'\nDefaults to "{SmoothieSettings().right.model}" if not specified.'
-                 '\nExample: {"model": "p20_single_v2.0", "id": "P20SV202020070101"}',
-            metavar='right_pipette_config'
+            help="Configuration for right pipette. Expects JSON string."
+            f'\nDefaults to "{SmoothieSettings().right.model}" if not specified.'
+            '\nExample: {"model": "p20_single_v2.0", "id": "P20SV202020070101"}',
+            metavar="right_pipette_config",
         )
 
         diff_parser = subparsers.add_parser(
-            cls.DIFF_FILES_COMMAND, help='Diff 2 G-Code files'
+            cls.DIFF_FILES_COMMAND, help="Diff 2 G-Code files"
         )
         diff_parser.add_argument(
-            f'--{cls.ERROR_ON_DIFFERENT_FILES}',
-            help='If set, return code 1 on files with different content',
-            action='store_true',
+            f"--{cls.ERROR_ON_DIFFERENT_FILES}",
+            help="If set, return code 1 on files with different content",
+            action="store_true",
         )
         diff_parser.add_argument(
-            cls.FILE_PATH_1_KEY, type=str, help='Path to first file'
+            cls.FILE_PATH_1_KEY, type=str, help="Path to first file"
         )
         diff_parser.add_argument(
-            cls.FILE_PATH_2_KEY, type=str, help='Path to second file'
+            cls.FILE_PATH_2_KEY, type=str, help="Path to second file"
         )
 
         return parser
@@ -272,8 +268,10 @@ class GCodeCLI:
 
     @property
     def respond_with_error(self):
-        return self._command.able_to_respond_with_error_code and \
-               self._command.respond_with_error_code
+        return (
+            self._command.able_to_respond_with_error_code
+            and self._command.respond_with_error_code
+        )
 
     @property
     def error_message(self):
@@ -284,7 +282,7 @@ class GCodeCLI:
         return self._args
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     cli = GCodeCLI()
     print(cli.run_command())
 

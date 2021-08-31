@@ -5,7 +5,6 @@ from opentrons.drivers.types import Temperature
 
 
 class AbstractTempDeckDriver(ABC):
-
     @abstractmethod
     async def connect(self) -> None:
         ...

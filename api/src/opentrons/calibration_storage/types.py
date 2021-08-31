@@ -8,7 +8,7 @@ from os import PathLike
 from typing_extensions import Literal
 from opentrons_shared_data.pipette.dev_types import LabwareUri
 
-CalibrationID = typing.NewType('CalibrationID', str)
+CalibrationID = typing.NewType("CalibrationID", str)
 StrPath = typing.Union[str, PathLike]
 AttitudeMatrix = typing.List[typing.List[float]]
 PipetteOffset = typing.List[float]
@@ -16,11 +16,12 @@ PipetteOffset = typing.List[float]
 
 class SourceType(str, Enum):
     """Calibration source type"""
+
     default = "default"
     factory = "factory"
     user = "user"
     calibration_check = "calibration_check"
-    legacy = 'legacy'
+    legacy = "legacy"
     unknown = "unknown"
 
 
@@ -48,6 +49,7 @@ class OffsetData:
     Class to categorize the shape of a
     given calibration data.
     """
+
     value: typing.List[float]
     last_modified: typing.Optional[datetime]
 
@@ -58,6 +60,7 @@ class TipLengthData:
     Class to categorize the shape of a
     given calibration data.
     """
+
     value: typing.Optional[float] = None
     last_modified: typing.Optional[datetime] = None
 
@@ -72,8 +75,9 @@ class ParentOptions:
 
     The slot value will be the empty string.
     """
+
     slot: str
-    module: str = ''
+    module: str = ""
 
 
 @dataclass
@@ -82,6 +86,7 @@ class LabwareCalibrationTypes:
     Class to categorize what calibration
     data might be stored for a labware.
     """
+
     offset: OffsetData
     tip_length: TipLengthData
 
@@ -92,6 +97,7 @@ class CalibrationInformation:
     Class to store important calibration
     info for labware.
     """
+
     calibration: LabwareCalibrationTypes
     parent: ParentOptions
     labware_id: str
@@ -106,7 +112,7 @@ class TipLengthCalibration:
     pipette: str
     tiprack: str
     last_modified: datetime
-    uri: typing.Union[LabwareUri, Literal['']]
+    uri: typing.Union[LabwareUri, Literal[""]]
 
 
 @dataclass
@@ -124,6 +130,7 @@ class PipetteOffsetByPipetteMount:
     """
     Class to store pipette offset without pipette and mount info
     """
+
     offset: PipetteOffset
     source: SourceType
     status: CalibrationStatus
@@ -137,6 +144,7 @@ class PipetteOffsetCalibration:
     """
     Class to store pipette offset calibration with pipette and mount info
     """
+
     pipette: str
     mount: str
     offset: PipetteOffset

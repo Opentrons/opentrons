@@ -11,12 +11,13 @@ class UnparsableGCodeError(ValueError):
 
 class InvalidTextModeError(ValueError):
     """Error raised if passed text mode is not a valid mode"""
+
     def __init__(self, invalid_mode: str, valid_modes: List[str]) -> None:
-        joined_valid_modes = ', '.join(valid_modes)
+        joined_valid_modes = ", ".join(valid_modes)
 
         super().__init__(
             f'Mode named "{invalid_mode}" not found. '
-            f'Valid modes are: {joined_valid_modes}'
+            f"Valid modes are: {joined_valid_modes}"
         )
         self.invalid_mode = invalid_mode
         self.joined_valid_modes = joined_valid_modes
@@ -24,11 +25,11 @@ class InvalidTextModeError(ValueError):
 
 class UnparsableCLICommandError(ValueError):
     def __init__(self, invalid_command, valid_commands: List[str]) -> None:
-        joined_commands = ', '.join(valid_commands)
+        joined_commands = ", ".join(valid_commands)
 
         super().__init__(
             f'Command named "{invalid_command}" not valid. '
-            f'Valid commands are: {joined_commands}'
+            f"Valid commands are: {joined_commands}"
         )
         self.invalid_command = invalid_command
         self.joined_commands = joined_commands
@@ -39,6 +40,6 @@ class PollingGCodeAdditionError(ValueError):
 
         super().__init__(
             f'Cannot add "{invalid_g_code}" to GCodeProgram because it is'
-            f'a polling command'
+            f"a polling command"
         )
         self.invalid_g_code = invalid_g_code

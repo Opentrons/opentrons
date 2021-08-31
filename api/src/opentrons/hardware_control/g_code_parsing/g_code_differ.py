@@ -2,43 +2,47 @@ from __future__ import annotations
 
 from typing import Tuple
 from diff_match_patch import diff_match_patch as dmp  # type: ignore
-from opentrons.hardware_control.g_code_parsing.g_code_program.g_code_program import \
-    GCodeProgram
-from opentrons.hardware_control.g_code_parsing.g_code_program.supported_text_modes \
-    import SupportedTextModes
+from opentrons.hardware_control.g_code_parsing.g_code_program.g_code_program import (
+    GCodeProgram,
+)
+from opentrons.hardware_control.g_code_parsing.g_code_program.supported_text_modes import (  # noqa: E501
+    SupportedTextModes,
+)
 
 
 class GCodeDiffer:
-    INSERTION_TYPE = 'Insertion'
+    INSERTION_TYPE = "Insertion"
     INSERTION_VALUE = 1
-    EQUALITY_TYPE = 'Equality'
+    EQUALITY_TYPE = "Equality"
     EQUALITY_VALUE = 0
-    DELETION_TYPE = 'Deletion'
+    DELETION_TYPE = "Deletion"
     DELETION_VALUE = -1
 
     DIFF_TYPE_LOOKUP = {
         DELETION_VALUE: DELETION_TYPE,
         EQUALITY_VALUE: EQUALITY_TYPE,
-        INSERTION_VALUE: INSERTION_TYPE
+        INSERTION_VALUE: INSERTION_TYPE,
     }
 
-    INSERTION_STYLE = "<ins style=\"" \
-                      "background:#e6ffe6;" \
-                      "font-size:large;" \
-                      "font-weight:bold;" \
-                      "\">%s</ins>"
+    INSERTION_STYLE = (
+        '<ins style="'
+        "background:#e6ffe6;"
+        "font-size:large;"
+        "font-weight:bold;"
+        '">%s</ins>'
+    )
 
-    DELETION_STYLE = "<del style=\"" \
-                     "background:#ffe6e6;" \
-                     "font-size:large;" \
-                     "font-weight:bold;" \
-                     "\">%s</del>"
+    DELETION_STYLE = (
+        '<del style="'
+        "background:#ffe6e6;"
+        "font-size:large;"
+        "font-weight:bold;"
+        '">%s</del>'
+    )
 
     @classmethod
     def from_g_code_program(
-            cls,
-            program_1: GCodeProgram,
-            program_2: GCodeProgram
+        cls, program_1: GCodeProgram, program_2: GCodeProgram
     ) -> GCodeDiffer:
         string_1 = program_1.get_text_explanation(SupportedTextModes.CONCISE.value)
         string_2 = program_2.get_text_explanation(SupportedTextModes.CONCISE.value)
@@ -51,10 +55,7 @@ class GCodeDiffer:
     def get_diff(self, timeout_secs=10):
         differ = dmp()
         differ.Diff_Timeout = timeout_secs
-        return differ.diff_main(
-            text1=self._string_1,
-            text2=self._string_2
-        )
+        return differ.diff_main(text1=self._string_1, text2=self._string_2)
 
     def get_html_diff(self):
         return self._render_diff_as_html(self.get_diff())
@@ -82,7 +83,7 @@ class GCodeDiffer:
         return "".join(html)
 
     def save_html_diff_to_file(self, file_path):
-        with open(file_path, 'w') as file:
+        with open(file_path, "w") as file:
             file.write(self.get_html_diff())
 
     def strings_are_equal(self):

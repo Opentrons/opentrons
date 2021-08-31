@@ -11,7 +11,8 @@ if TYPE_CHECKING:
 
 
 class PipetteNotAttachedError(KeyError):
-    """ An error raised if a pipette is accessed that is not attached """
+    """An error raised if a pipette is accessed that is not attached"""
+
     pass
 
 
@@ -24,34 +25,33 @@ class Point(NamedTuple):
         if not isinstance(other, Point):
             return False
         pairs = ((self.x, other.x), (self.y, other.y), (self.z, other.z))
-        return all(isclose(s, o,
-                           rel_tol=1e-05, abs_tol=1e-08) for s, o in pairs)
+        return all(isclose(s, o, rel_tol=1e-05, abs_tol=1e-08) for s, o in pairs)
 
-    def __add__(self, other: Any) -> 'Point':
+    def __add__(self, other: Any) -> "Point":
         if not isinstance(other, Point):
             return NotImplemented
         return Point(self.x + other.x, self.y + other.y, self.z + other.z)
 
-    def __sub__(self, other: Any) -> 'Point':
+    def __sub__(self, other: Any) -> "Point":
         if not isinstance(other, Point):
             return NotImplemented
         return Point(self.x - other.x, self.y - other.y, self.z - other.z)
 
-    def __mul__(self, other: Union[int, float]) -> 'Point':
+    def __mul__(self, other: Union[int, float]) -> "Point":
         if not isinstance(other, (float, int)):
             return NotImplemented
         return Point(self.x * other, self.y * other, self.z * other)
 
-    def __rmul__(self, other: Union[int, float]) -> 'Point':
+    def __rmul__(self, other: Union[int, float]) -> "Point":
         if not isinstance(other, (float, int)):
             return NotImplemented
         return Point(self.x * other, self.y * other, self.z * other)
 
-    def __abs__(self) -> 'Point':
+    def __abs__(self) -> "Point":
         return Point(abs(self.x), abs(self.y), abs(self.z))
 
     def __str__(self):
-        return '({}, {}, {})'.format(self.x, self.y, self.z)
+        return "({}, {}, {})".format(self.x, self.y, self.z)
 
     def magnitude_to(self, other: Any) -> float:
         if not isinstance(other, Point):
@@ -59,15 +59,14 @@ class Point(NamedTuple):
         x_diff = self.x - other.x
         y_diff = self.y - other.y
         z_diff = self.z - other.z
-        return sqrt(x_diff**2 + y_diff**2 + z_diff**2)
+        return sqrt(x_diff ** 2 + y_diff ** 2 + z_diff ** 2)
 
 
-LocationLabware = Union['Labware', 'Well', str,
-                        'ModuleGeometry', LabwareLike, None]
+LocationLabware = Union["Labware", "Well", str, "ModuleGeometry", LabwareLike, None]
 
 
 class Location:
-    """ A location to target as a motion.
+    """A location to target as a motion.
 
     The location contains a :py:class:`.Point` (in
     :ref:`protocol-api-deck-coords`) and possibly an associated
@@ -107,14 +106,21 @@ class Location:
 
     def __iter__(self):
         """Iterable interface to support unpacking. Like a tuple."""
-        return iter((self._point, self._labware,))
+        return iter(
+            (
+                self._point,
+                self._labware,
+            )
+        )
 
     def __eq__(self, other):
-        return isinstance(other, Location) \
-            and other._point == self._point \
+        return (
+            isinstance(other, Location)
+            and other._point == self._point
             and other._labware == self._labware
+        )
 
-    def move(self, point: Point) -> 'Location':
+    def move(self, point: Point) -> "Location":
         """
         Alter the point stored in the location while preserving the labware.
 
@@ -133,8 +139,7 @@ class Location:
             >>> assert loc.point == Point(1, 1, 1)  # True
 
         """
-        return Location(point=self.point + point,
-                        labware=self._labware.object)
+        return Location(point=self.point + point, labware=self._labware.object)
 
     def __repr__(self) -> str:
         return f"Location(point={repr(self._point)}, labware={self._labware})"
@@ -149,8 +154,8 @@ class Mount(enum.Enum):
         return self.name
 
     @classmethod
-    def string_to_mount(cls, mount: str) -> 'Mount':
-        if mount == 'right':
+    def string_to_mount(cls, mount: str) -> "Mount":
+        if mount == "right":
             return cls.RIGHT
         else:
             return cls.LEFT
@@ -172,6 +177,7 @@ class MountType(str, enum.Enum):
 # https://github.com/Opentrons/opentrons/pull/6943#discussion_r519029833
 class DeckSlotName(int, enum.Enum):
     """Deck slot identifiers."""
+
     SLOT_1 = 1
     SLOT_2 = 2
     SLOT_3 = 3

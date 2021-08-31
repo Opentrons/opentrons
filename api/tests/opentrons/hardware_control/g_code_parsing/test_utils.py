@@ -22,14 +22,14 @@ def input_enum() -> Enum:
 @pytest.fixture
 def expected_dict() -> Dict:
     yield {
-        'G28.2': 'HOME',
-        'G0': 'MOVE',
-        'G4': 'DWELL',
-        'M114.2': 'CURRENT_POSITION',
-        'M119': 'LIMIT_SWITCH_STATUS',
-        'G38.2': 'PROBE',
-        'G90': 'ABSOLUTE_COORDS',
-        'G91': 'RELATIVE_COORDS',
+        "G28.2": "HOME",
+        "G0": "MOVE",
+        "G4": "DWELL",
+        "M114.2": "CURRENT_POSITION",
+        "M119": "LIMIT_SWITCH_STATUS",
+        "G38.2": "PROBE",
+        "G90": "ABSOLUTE_COORDS",
+        "G91": "RELATIVE_COORDS",
     }
 
 

@@ -32,30 +32,24 @@ class SmoothieEmulator(AbstractEmulator):
     def handle(self, line: str) -> Optional[str]:
         """Handle a line"""
         results = (self._handle(c) for c in self._parser.parse(line))
-        joined = ' '.join(r for r in results if r)
+        joined = " ".join(r for r in results if r)
         return None if not joined else joined
 
     def reset(self):
         _, fw_version = _find_smoothie_file()
-        self._version_string = \
-            f"Build version: {fw_version}, Build date: CURRENT, " \
+        self._version_string = (
+            f"Build version: {fw_version}, Build date: CURRENT, "
             f"MCU: NONE, System Clock: NONE"
+        )
 
-        self._pos = {
-            'A': 0.0,
-            'B': 0.0,
-            'C': 0.0,
-            'X': 0.0,
-            'Y': 0.0,
-            'Z': 0.0
-        }
+        self._pos = {"A": 0.0, "B": 0.0, "C": 0.0, "X": 0.0, "Y": 0.0, "Z": 0.0}
         self._home_status: Dict[str, bool] = {
-            'X': False,
-            'Y': False,
-            'Z': False,
-            'A': False,
-            'B': False,
-            'C': False,
+            "X": False,
+            "Y": False,
+            "Z": False,
+            "A": False,
+            "B": False,
+            "C": False,
         }
         self._speed = 0.0
 
@@ -139,7 +133,7 @@ class SmoothieEmulator(AbstractEmulator):
         """Moves the gantry to the position provided in the command"""
         for key, value in command.params.items():
             assert isinstance(value, float), f"invalid value '{value}'"
-            if 'F' == key:
+            if "F" == key:
                 self._speed = value
             else:
                 self._pos[key] = value
@@ -171,12 +165,14 @@ class SmoothieEmulator(AbstractEmulator):
         Returns:
             A dict of L and/or R to the string value following it.
         """
-        pars = (i.groupdict() for i in
-                SmoothieEmulator.WRITE_INSTRUMENT_RE.finditer(command.body))
+        pars = (
+            i.groupdict()
+            for i in SmoothieEmulator.WRITE_INSTRUMENT_RE.finditer(command.body)
+        )
         result = {
-            p['mount']: p['value'] + '0' * (
-                SmoothieEmulator.INSTRUMENT_AND_MODEL_STRING_LENGTH - len(p['value'])
-            )
+            p["mount"]: p["value"]
+            + "0"
+            * (SmoothieEmulator.INSTRUMENT_AND_MODEL_STRING_LENGTH - len(p["value"]))
             for p in pars
         }
 
