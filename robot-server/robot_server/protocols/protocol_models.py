@@ -54,5 +54,4 @@ class Protocol(ResourceModel):
         ...,
         description="The type of protocol file (JSON or Python).",
     )
-    pythonApiLevel: Optional[str]  # To do: Fix optional and document
     protocolMetadata: Metadata = Metadata()  # To do: Remove optional
