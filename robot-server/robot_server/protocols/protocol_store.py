@@ -1,11 +1,14 @@
 """Methods for saving and retrieving protocol files."""
-from dataclasses import dataclass
+from ast import parse as parse_python_file
+from dataclasses import dataclass, field
 from datetime import datetime
 from fastapi import UploadFile
 from logging import getLogger
 from pathlib import Path
-from typing import Dict, List, Sequence
+from typing import Any, Dict, List, Sequence
 
+from opentrons.protocols.parse import extract_metadata as extract_python_metadata
+from opentrons.protocols.models import JsonProtocol
 from opentrons.protocol_runner import ProtocolFileType
 
 log = getLogger(__name__)
@@ -19,6 +22,8 @@ class ProtocolResource:
     protocol_type: ProtocolFileType
     created_at: datetime
     files: List[Path]
+    # FIX BEFORE MERGE: Remove default.
+    protocol_metadata: Dict[str, Any] = field(default_factory=dict)
 
 
 class ProtocolNotFoundError(KeyError):
@@ -60,7 +65,7 @@ class ProtocolStore:
         protocol_dir = self._get_protocol_dir(protocol_id)
         # TODO(mc, 2021-06-02): check for protocol collision
         protocol_dir.mkdir(parents=True)
-        saved_files = []
+        saved_files: List[Path] = []
 
         for index, upload_file in enumerate(files):
             if upload_file.filename == "":
@@ -79,6 +84,7 @@ class ProtocolStore:
         entry = ProtocolResource(
             protocol_id=protocol_id,
             protocol_type=self._get_protocol_type(saved_files),
+            protocol_metadata=self._extract_protocol_metadata(saved_files),
             created_at=created_at,
             files=saved_files,
         )
@@ -132,3 +138,30 @@ class ProtocolStore:
             return ProtocolFileType.PYTHON
         else:
             raise NotImplementedError("Protocol type not yet supported")
+
+    @classmethod
+    def _extract_protocol_metadata(cls, files: List[Path]) -> Dict[str, Any]:
+        main_file = files[0]
+        if cls._get_protocol_type(files) == ProtocolFileType.PYTHON:
+            return cls._extract_python_metadata(main_file)
+        else:
+            return cls._extract_json_metadata(main_file)
+        # FIX BEFORE MERGE: Figure out strategy for avoiding redundant parsing
+        # (both JSON and Python), or leave a todo, or decide we don't care.
+
+    @staticmethod
+    def _extract_python_metadata(main_file: Path) -> Dict[str, Any]:
+        parsed_module = parse_python_file(
+            source=main_file.read_bytes(), filename=str(main_file)
+        )
+        # todo(mm, 2021-08-31): extract_python_metadata() is intolerant of metadata
+        # dicts that aren't flat collections of strings and ints. It will fail with an
+        # internal exception, which will propagate to become an HTTP 5xx error. It
+        # should instead raise a custom exception type that we catch and translate to
+        # an HTTP 4xx error.
+        return extract_python_metadata(parsed_module)
+
+    @staticmethod
+    def _extract_json_metadata(main_file: Path) -> Dict[str, Any]:
+        parsed_protocol = JsonProtocol.parse_file(main_file, encoding="utf-8")
+        return parsed_protocol.metadata.dict()
