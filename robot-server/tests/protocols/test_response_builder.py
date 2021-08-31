@@ -5,7 +5,7 @@ from pathlib import Path
 
 from opentrons.protocol_runner import ProtocolFileType
 from robot_server.protocols.protocol_store import ProtocolResource
-from robot_server.protocols.protocol_models import Protocol
+from robot_server.protocols.protocol_models import Protocol, Metadata
 from robot_server.protocols.response_builder import ResponseBuilder
 
 
@@ -32,5 +32,6 @@ def test_create_single_json_file_response(
     assert result == Protocol(
         id="protocol-id",
         protocolType=ProtocolFileType.JSON,
+        protocolMetadata=Metadata(),
         createdAt=current_time,
     )

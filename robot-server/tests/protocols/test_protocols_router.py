@@ -10,7 +10,7 @@ from httpx import AsyncClient
 from typing import AsyncIterator
 
 from robot_server.errors import exception_handlers
-from robot_server.protocols.protocol_models import Protocol, ProtocolFileType
+from robot_server.protocols.protocol_models import Metadata, Protocol, ProtocolFileType
 from robot_server.protocols.response_builder import ResponseBuilder
 from robot_server.protocols.protocol_store import (
     ProtocolStore,
@@ -105,11 +105,13 @@ def test_get_protocols(
         id="abc",
         createdAt=created_at_1,
         protocolType=ProtocolFileType.PYTHON,
+        protocolMetadata=Metadata(),
     )
     protocol_2 = Protocol(
         id="123",
         createdAt=created_at_2,
         protocolType=ProtocolFileType.JSON,
+        protocolMetadata=Metadata(),
     )
 
     decoy.when(protocol_store.get_all()).then_return([entry_1, entry_2])
@@ -143,6 +145,7 @@ def test_get_protocol_by_id(
         id="protocol-id",
         createdAt=created_at,
         protocolType=ProtocolFileType.PYTHON,
+        protocolMetadata=Metadata(),
     )
 
     decoy.when(protocol_store.get(protocol_id="protocol-id")).then_return(entry)
@@ -197,6 +200,7 @@ async def test_create_json_protocol(
         id=unique_id,
         createdAt=current_time,
         protocolType=ProtocolFileType.JSON,
+        protocolMetadata=Metadata(),
     )
 
     decoy.when(
@@ -243,6 +247,7 @@ async def test_create_python_protocol(
         id=unique_id,
         createdAt=current_time,
         protocolType=ProtocolFileType.PYTHON,
+        protocolMetadata=Metadata(),
     )
 
     decoy.when(

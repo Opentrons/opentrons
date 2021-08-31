@@ -56,4 +56,4 @@ class Protocol(ResourceModel):
         ...,
         description="The type of protocol file (JSON or Python).",
     )
-    protocolMetadata: Metadata = Metadata()  # To do: Remove optional
+    protocolMetadata: Metadata
