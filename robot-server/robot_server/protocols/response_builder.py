@@ -1,8 +1,8 @@
 """Protocol response model factory."""
-from typing import Optional
+from typing import List
 from .protocol_store import ProtocolResource
 from .protocol_models import Protocol
-from .analysis_models import ProtocolAnalysis, PendingAnalysis
+from .analysis_models import ProtocolAnalysis
 
 
 class ResponseBuilder:
@@ -11,7 +11,7 @@ class ResponseBuilder:
     @staticmethod
     def build(
         resource: ProtocolResource,
-        analysis: Optional[ProtocolAnalysis] = None,
+        analyses: List[ProtocolAnalysis],
     ) -> Protocol:
         """Build a protocol resource model.
 
@@ -26,5 +26,5 @@ class ResponseBuilder:
             id=resource.protocol_id,
             protocolType=resource.protocol_type,
             createdAt=resource.created_at,
-            analysis=analysis or PendingAnalysis(),
+            analyses=analyses,
         )

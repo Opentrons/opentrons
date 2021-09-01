@@ -21,13 +21,14 @@ class AnalysisStatus(str, Enum):
     SUCCEEDED = "succeeded"
 
 
-class BaseAnalysis(BaseModel):
+class AnalysisSummary(BaseModel):
     """Base model for an analyis of a protocol."""
 
+    id: str = Field(..., description="Unique identifier of this analysis resource")
     status: AnalysisStatus = Field(..., description="Status of the analysis")
 
 
-class PendingAnalysis(BaseAnalysis):
+class PendingAnalysis(AnalysisSummary):
     """A protocol analysis that is on-going."""
 
     status: Literal[AnalysisStatus.PENDING] = AnalysisStatus.PENDING
@@ -50,7 +51,7 @@ class AnalysisLabware(BaseModel):
     location: LabwareLocation
 
 
-class CompletedAnalysis(BaseAnalysis):
+class CompletedAnalysis(AnalysisSummary):
     """A completed protocol run analysis.
 
     This analyis provides three pieces of information:
@@ -90,6 +91,9 @@ class CompletedAnalysis(BaseAnalysis):
         ...,
         description="The protocol commands the run is expected to produce",
     )
+    # TODO(mc, 2021-09-01): replace string with error details object. Details
+    # object should try to distinguish between engine errors, Python execution
+    # errors, and unexpected errors due to Opentrons-sourced bugs
     errors: List[str] = Field(
         ...,
         description="Any expected run errors or problems with the analysis",

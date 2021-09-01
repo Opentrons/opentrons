@@ -2,7 +2,6 @@
 import pytest
 from decoy import Decoy
 from datetime import datetime
-from pathlib import Path
 
 from opentrons.protocol_engine import commands as pe_commands
 from opentrons.protocol_runner import ProtocolRunner
@@ -48,7 +47,7 @@ async def test_analyze(
         protocol_id="protocol-id",
         protocol_type=ProtocolFileType.JSON,
         created_at=datetime(year=2021, month=1, day=1),
-        files=[Path("/dev/null")],
+        files=[],
     )
 
     analysis_commands = [
@@ -64,11 +63,14 @@ async def test_analyze(
         analysis_commands
     )
 
-    await subject.analyze(protocol_resource)
+    await subject.analyze(
+        protocol_resource=protocol_resource,
+        analysis_id="analysis-id",
+    )
 
     decoy.verify(
-        analysis_store.add(
-            protocol_id="protocol-id",
+        analysis_store.update(
+            analysis_id="analysis-id",
             commands=analysis_commands,
             errors=[],
         ),
@@ -86,15 +88,18 @@ async def test_analyze_error(
         protocol_id="protocol-id",
         protocol_type=ProtocolFileType.JSON,
         created_at=datetime(year=2021, month=1, day=1),
-        files=[Path("/dev/null")],
+        files=[],
     )
 
     error = RuntimeError("oh no")
 
     decoy.when(await protocol_runner.run(protocol_resource)).then_raise(error)
 
-    await subject.analyze(protocol_resource)
+    await subject.analyze(
+        protocol_resource=protocol_resource,
+        analysis_id="analysis-id",
+    )
 
     decoy.verify(
-        analysis_store.add(protocol_id="protocol-id", commands=[], errors=[error]),
+        analysis_store.update(analysis_id="analysis-id", commands=[], errors=[error]),
     )

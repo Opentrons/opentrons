@@ -1,7 +1,8 @@
 """Tests for the AnalysisStore interface."""
 import pytest
 from datetime import datetime
-from typing import List, NamedTuple, Sequence, cast
+from typing import List, NamedTuple, Sequence, Union, cast
+from typing_extensions import Literal
 
 from opentrons.types import MountType, DeckSlotName
 from opentrons.protocols.models import LabwareDefinition
@@ -17,12 +18,20 @@ from robot_server.protocols.analysis_models import (
 )
 
 
-def test_get_pending() -> None:
-    """It should return a PendingAnalysis if no analysis saved."""
+def test_get_empty() -> None:
+    """It should return an empty list if no analysis saved."""
     subject = AnalysisStore()
-    result = subject.get("protocol-id")
+    result = subject.get_by_protocol("protocol-id")
 
-    assert result == PendingAnalysis()
+    assert result == []
+
+
+def test_add_pending() -> None:
+    """It should add a pending analysis to the store."""
+    subject = AnalysisStore()
+    result = subject.add_pending(protocol_id="protocol-id", analysis_id="analysis-id")
+
+    assert result == [PendingAnalysis(id="analysis-id")]
 
 
 def test_add_errored_analysis() -> None:
@@ -30,17 +39,21 @@ def test_add_errored_analysis() -> None:
     subject = AnalysisStore()
     error = RuntimeError("oh no!")
 
-    subject.add("protocol-id", commands=[], errors=[error])
+    result = subject.add_pending(protocol_id="protocol-id", analysis_id="analysis-id")
+    subject.update(analysis_id="analysis-id", commands=[], errors=[error])
 
-    result = subject.get("protocol-id")
+    result = subject.get_by_protocol("protocol-id")
 
-    assert result == CompletedAnalysis(
-        status=AnalysisStatus.FAILED,
-        errors=["oh no!"],
-        labware=[],
-        pipettes=[],
-        commands=[],
-    )
+    assert result == [
+        CompletedAnalysis(
+            id="analysis-id",
+            status=AnalysisStatus.FAILED,
+            errors=["oh no!"],
+            labware=[],
+            pipettes=[],
+            commands=[],
+        )
+    ]
 
 
 class CommandAnalysisSpec(NamedTuple):
@@ -135,7 +148,10 @@ command_analysis_specs: List[CommandAnalysisSpec] = [
 @pytest.mark.parametrize(CommandAnalysisSpec._fields, command_analysis_specs)
 def test_add_parses_labware_commands(
     commands: Sequence[pe_commands.Command],
-    expected_status: AnalysisStatus,
+    expected_status: Union[
+        Literal[AnalysisStatus.SUCCEEDED],
+        Literal[AnalysisStatus.FAILED],
+    ],
     expected_errors: List[str],
     expected_labware: List[AnalysisLabware],
     expected_pipettes: List[AnalysisPipette],
@@ -143,13 +159,17 @@ def test_add_parses_labware_commands(
     """It should be able to parse the commands list for analysis results."""
     subject = AnalysisStore()
 
-    subject.add("protocol-id", commands=commands, errors=[])
-    result = subject.get("protocol-id")
+    subject.add_pending(protocol_id="protocol-id", analysis_id="analysis-id")
+    subject.update(analysis_id="analysis-id", commands=commands, errors=[])
+    result = subject.get_by_protocol("protocol-id")
 
-    assert result == CompletedAnalysis(
-        status=expected_status,  # type: ignore[arg-type]
-        errors=expected_errors,
-        labware=expected_labware,
-        pipettes=expected_pipettes,
-        commands=list(commands),
-    )
+    assert result == [
+        CompletedAnalysis(
+            id="analysis-id",
+            status=expected_status,
+            errors=expected_errors,
+            labware=expected_labware,
+            pipettes=expected_pipettes,
+            commands=list(commands),
+        )
+    ]

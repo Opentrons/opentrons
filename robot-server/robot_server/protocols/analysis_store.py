@@ -1,5 +1,5 @@
 """Protocol analysis storage."""
-from typing import Dict, Sequence
+from typing import Dict, List, Set, Sequence
 
 from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.protocol_engine import commands as pe_commands
@@ -19,15 +19,26 @@ class AnalysisStore:
 
     def __init__(self) -> None:
         """Initialize the AnalysisStore's internal state."""
-        self._analyses_by_id: Dict[str, CompletedAnalysis] = {}
+        self._analysis_ids_by_protocol: Dict[str, Set[str]] = {}
+        self._analyses_by_id: Dict[str, ProtocolAnalysis] = {}
 
-    def add(
+    def add_pending(self, protocol_id: str, analysis_id: str) -> List[ProtocolAnalysis]:
+        """Add a pending analysis to the store."""
+        self._analyses_by_id[analysis_id] = PendingAnalysis(id=analysis_id)
+
+        ids_for_protocol = self._analysis_ids_by_protocol.get(protocol_id, set())
+        ids_for_protocol.add(analysis_id)
+        self._analysis_ids_by_protocol[protocol_id] = ids_for_protocol
+
+        return self.get_by_protocol(protocol_id)
+
+    def update(
         self,
-        protocol_id: str,
+        analysis_id: str,
         commands: Sequence[pe_commands.Command],
         errors: Sequence[Exception],
     ) -> None:
-        """Add analysis results to the store."""
+        """Update analysis results in the store."""
         labware = []
         pipettes = []
         # TODO(mc, 2021-08-25): return error details objects, not strings
@@ -58,7 +69,8 @@ class AnalysisStore:
             elif c.error is not None:
                 error_messages.append(c.error)
 
-        self._analyses_by_id[protocol_id] = CompletedAnalysis(
+        self._analyses_by_id[analysis_id] = CompletedAnalysis(
+            id=analysis_id,
             status=(
                 AnalysisStatus.SUCCEEDED
                 if len(error_messages) == 0
@@ -70,6 +82,8 @@ class AnalysisStore:
             pipettes=pipettes,
         )
 
-    def get(self, protocol_id: str) -> ProtocolAnalysis:
+    def get_by_protocol(self, protocol_id: str) -> List[ProtocolAnalysis]:
         """Get an analysis for a given protocol ID from the store."""
-        return self._analyses_by_id.get(protocol_id, PendingAnalysis())
+        ids_for_protocol = self._analysis_ids_by_protocol.get(protocol_id, set())
+
+        return [self._analyses_by_id[analysis_id] for analysis_id in ids_for_protocol]

@@ -28,9 +28,7 @@ async def create_simulating_runner() -> ProtocolRunner:
         commands: List[Command] = await runner.run(protocol)
         ```
     """
-    simulating_hardware_api = await HardwareAPI.build_hardware_simulator(
-        strict_attached_instruments=False,
-    )
+    simulating_hardware_api = await HardwareAPI.build_hardware_simulator()
 
     # TODO(mc, 2021-08-25): move initial home to protocol engine
     await simulating_hardware_api.home()

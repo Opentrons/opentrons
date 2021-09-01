@@ -19,7 +19,11 @@ class ProtocolAnalyzer:
         self._protocol_runner = protocol_runner
         self._analysis_store = analysis_store
 
-    async def analyze(self, protocol_resource: ProtocolResource) -> None:
+    async def analyze(
+        self,
+        protocol_resource: ProtocolResource,
+        analysis_id: str,
+    ) -> None:
         """Analyze a given protocol, storing the analysis when complete."""
         commands: Sequence[ProtocolCommand] = []
         errors: Sequence[Exception] = []
@@ -29,8 +33,8 @@ class ProtocolAnalyzer:
         except Exception as e:
             errors = [e]
 
-        self._analysis_store.add(
-            protocol_id=protocol_resource.protocol_id,
+        self._analysis_store.update(
+            analysis_id=analysis_id,
             commands=commands,
             errors=errors,
         )

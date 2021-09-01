@@ -56,9 +56,11 @@ async def create_protocol(
     files: List[UploadFile] = File(...),
     response_builder: ResponseBuilder = Depends(ResponseBuilder),
     protocol_store: ProtocolStore = Depends(get_protocol_store),
+    analysis_store: AnalysisStore = Depends(get_analysis_store),
     protocol_analyzer: ProtocolAnalyzer = Depends(get_protocol_analyzer),
     task_runner: TaskRunner = Depends(TaskRunner),
-    protocol_id: str = Depends(get_unique_id),
+    protocol_id: str = Depends(get_unique_id, use_cache=False),
+    analysis_id: str = Depends(get_unique_id, use_cache=False),
     created_at: datetime = Depends(get_current_time),
 ) -> ResponseModel[Protocol]:
     """Create a new protocol by uploading its files.
@@ -67,9 +69,11 @@ async def create_protocol(
         files: List of uploaded files, from form-data.
         response_builder: Interface to construct response models.
         protocol_store: In-memory database of protocol resources.
+        analysis_store: In-memory database of protocol analyses.
         protocol_analyzer: Protocol analysis interface.
         task_runner: Background task runner.
-        protocol_id: Unique identifier to attach to the new resource.
+        protocol_id: Unique identifier to attach to the protocol resource.
+        analysis_id: Unique identifier to attach to the analysis resource.
         created_at: Timestamp to attach to the new resource.
     """
     if len(files) > 1:
@@ -84,8 +88,16 @@ async def create_protocol(
     except ProtocolFileInvalidError as e:
         raise ProtocolFileInvalid(detail=str(e)).as_error(status.HTTP_400_BAD_REQUEST)
 
-    task_runner.run(protocol_analyzer.analyze, protocol_resource=protocol_resource)
-    data = response_builder.build(protocol_resource)
+    task_runner.run(
+        protocol_analyzer.analyze,
+        protocol_resource=protocol_resource,
+        analysis_id=analysis_id,
+    )
+    analyses = analysis_store.add_pending(
+        protocol_id=protocol_id,
+        analysis_id=analysis_id,
+    )
+    data = response_builder.build(resource=protocol_resource, analyses=analyses)
 
     return ResponseModel(data=data)
 
@@ -110,7 +122,10 @@ async def get_protocols(
     """
     protocol_resources = protocol_store.get_all()
     data = [
-        response_builder.build(resource=r, analysis=analysis_store.get(r.protocol_id))
+        response_builder.build(
+            resource=r,
+            analyses=analysis_store.get_by_protocol(r.protocol_id),
+        )
         for r in protocol_resources
     ]
 
@@ -142,12 +157,12 @@ async def get_protocol_by_id(
     """
     try:
         resource = protocol_store.get(protocol_id=protocolId)
-        analysis = analysis_store.get(protocol_id=protocolId)
+        analyses = analysis_store.get_by_protocol(protocol_id=protocolId)
 
     except ProtocolNotFoundError as e:
         raise ProtocolNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
 
-    data = response_builder.build(resource=resource, analysis=analysis)
+    data = response_builder.build(resource=resource, analyses=analyses)
 
     return ResponseModel(data=data)
 

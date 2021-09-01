@@ -22,7 +22,7 @@ class ProtocolFileType(str, Enum):
     JSON = "json"
 
 
-# TODO(mc, 2021-08-27): rename to something that better reflects
+# TODO(mc, 2021-08-27): rename to ProtocolSource to better reflect
 # the fact that a protocol need not be a single file
 @dataclass(frozen=True)
 class ProtocolFile:

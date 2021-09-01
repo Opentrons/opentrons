@@ -71,9 +71,10 @@ async def test_get_protocols(
         files=[],
     )
 
-    analysis_1 = PendingAnalysis()
+    analysis_1 = PendingAnalysis(id="pending-analyis-id")
 
     analysis_2 = CompletedAnalysis(
+        id="pending-analyis-id",
         status=AnalysisStatus.SUCCEEDED,
         pipettes=[],
         labware=[],
@@ -85,23 +86,23 @@ async def test_get_protocols(
         id="abc",
         createdAt=created_at_1,
         protocolType=ProtocolFileType.PYTHON,
-        analysis=analysis_1,
+        analyses=[analysis_1],
     )
     protocol_2 = Protocol(
         id="123",
         createdAt=created_at_2,
         protocolType=ProtocolFileType.JSON,
-        analysis=analysis_2,
+        analyses=[analysis_2],
     )
 
     decoy.when(protocol_store.get_all()).then_return([resource_1, resource_2])
-    decoy.when(analysis_store.get("abc")).then_return(analysis_1)
-    decoy.when(analysis_store.get("123")).then_return(analysis_2)
+    decoy.when(analysis_store.get_by_protocol("abc")).then_return([analysis_1])
+    decoy.when(analysis_store.get_by_protocol("123")).then_return([analysis_2])
     decoy.when(
-        response_builder.build(resource=resource_1, analysis=analysis_1)
+        response_builder.build(resource=resource_1, analyses=[analysis_1])
     ).then_return(protocol_1)
     decoy.when(
-        response_builder.build(resource=resource_2, analysis=analysis_2)
+        response_builder.build(resource=resource_2, analyses=[analysis_2])
     ).then_return(protocol_2)
 
     result = await get_protocols(
@@ -127,6 +128,7 @@ async def test_get_protocol_by_id(
         files=[],
     )
     analysis = CompletedAnalysis(
+        id="analysis-id",
         status=AnalysisStatus.SUCCEEDED,
         pipettes=[],
         labware=[],
@@ -137,13 +139,15 @@ async def test_get_protocol_by_id(
         id="protocol-id",
         createdAt=datetime(year=2021, month=1, day=1),
         protocolType=ProtocolFileType.PYTHON,
-        analysis=analysis,
+        analyses=[analysis],
     )
 
     decoy.when(protocol_store.get(protocol_id="protocol-id")).then_return(resource)
-    decoy.when(analysis_store.get(protocol_id="protocol-id")).then_return(analysis)
+    decoy.when(analysis_store.get_by_protocol(protocol_id="protocol-id")).then_return(
+        [analysis]
+    )
     decoy.when(
-        response_builder.build(resource=resource, analysis=analysis)
+        response_builder.build(resource=resource, analyses=[analysis])
     ).then_return(protocol)
 
     result = await get_protocol_by_id(
@@ -181,35 +185,42 @@ async def test_get_protocol_not_found(
 async def test_create_protocol(
     decoy: Decoy,
     protocol_store: ProtocolStore,
+    analysis_store: AnalysisStore,
     protocol_analyzer: ProtocolAnalyzer,
     response_builder: ResponseBuilder,
     task_runner: TaskRunner,
-    unique_id: str,
     current_time: datetime,
 ) -> None:
     """It should store an uploaded protocol file."""
     protocol_resource = ProtocolResource(
-        protocol_id=unique_id,
+        protocol_id="protocol-id",
         protocol_type=ProtocolFileType.JSON,
         created_at=current_time,
         files=[],
     )
+    analysis = PendingAnalysis(id="analysis-id")
     protocol = Protocol(
-        id=unique_id,
+        id="protocol-id",
         createdAt=current_time,
         protocolType=ProtocolFileType.JSON,
-        analysis=PendingAnalysis(),
+        analyses=[analysis],
     )
 
     decoy.when(
         await protocol_store.create(
-            protocol_id=unique_id,
+            protocol_id="protocol-id",
             created_at=current_time,
             files=[matchers.IsA(UploadFile, {"filename": "foo.json"})],
         )
     ).then_return(protocol_resource)
 
-    decoy.when(response_builder.build(protocol_resource)).then_return(protocol)
+    decoy.when(
+        analysis_store.add_pending(protocol_id="protocol-id", analysis_id="analysis-id")
+    ).then_return([analysis])
+
+    decoy.when(
+        response_builder.build(resource=protocol_resource, analyses=[analysis])
+    ).then_return(protocol)
 
     files = [UploadFile(filename="foo.json")]
 
@@ -217,16 +228,22 @@ async def test_create_protocol(
         files=files,
         response_builder=response_builder,
         protocol_store=protocol_store,
+        analysis_store=analysis_store,
         protocol_analyzer=protocol_analyzer,
         task_runner=task_runner,
-        protocol_id=unique_id,
+        protocol_id="protocol-id",
+        analysis_id="analysis-id",
         created_at=current_time,
     )
 
     assert result.data == protocol
 
     decoy.verify(
-        task_runner.run(protocol_analyzer.analyze, protocol_resource=protocol_resource)
+        task_runner.run(
+            protocol_analyzer.analyze,
+            analysis_id="analysis-id",
+            protocol_resource=protocol_resource,
+        )
     )
 
 

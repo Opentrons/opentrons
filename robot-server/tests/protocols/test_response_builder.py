@@ -17,6 +17,7 @@ def test_create_single_json_file_response() -> None:
         files=[],
     )
     protocol_analysis = CompletedAnalysis(
+        id="analysis-id",
         status=AnalysisStatus.SUCCEEDED,
         labware=[],
         pipettes=[],
@@ -25,11 +26,11 @@ def test_create_single_json_file_response() -> None:
     )
 
     subject = ResponseBuilder()
-    result = subject.build(resource=protocol_resource, analysis=protocol_analysis)
+    result = subject.build(resource=protocol_resource, analyses=[protocol_analysis])
 
     assert result == Protocol(
         id="protocol-id",
         protocolType=ProtocolFileType.JSON,
         createdAt=datetime(year=2021, month=1, day=1),
-        analysis=protocol_analysis,
+        analyses=[protocol_analysis],
     )
