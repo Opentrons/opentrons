@@ -276,12 +276,12 @@
       "items": {
         "anyOf": [
           {
-            "description": "Aspirate / dispense / air gap commands",
+            "description": "Aspirate Liquid / Dispense Liquid / Aspirate Air Gap / Dispense Air Aap",
             "type": "object",
-            "required": ["command", "params"],
+            "required": ["commandType", "params"],
             "additionalProperties": false,
             "properties": {
-              "command": {
+              "commandType": {
                 "enum": ["aspirate", "dispense", "aspirateAirGap", "dispenseAirGap"]
               },
               "params": {
@@ -296,12 +296,12 @@
           },
 
           {
-            "description": "Blowout command",
+            "description": "Blowout",
             "type": "object",
-            "required": ["command", "params"],
+            "required": ["commandType", "params"],
             "additionalProperties": false,
             "properties": {
-              "command": {
+              "commandType": {
                 "enum": ["blowout"]
               },
               "params": {
@@ -315,12 +315,12 @@
           },
 
           {
-            "description": "Touch tip commands",
+            "description": "Touch Tip",
             "type": "object",
-            "required": ["command", "params"],
+            "required": ["commandType", "params"],
             "additionalProperties": false,
             "properties": {
-              "command": {
+              "commandType": {
                 "enum": ["touchTip"]
               },
               "params": {
@@ -333,12 +333,12 @@
           },
 
           {
-            "description": "Pick up tip / drop tip commands",
+            "description": "Pick Up Tip / Drop Tip",
             "type": "object",
-            "required": ["command", "params"],
+            "required": ["commandType", "params"],
             "additionalProperties": false,
             "properties": {
-              "command": {
+              "commandType": {
                 "enum": ["pickUpTip", "dropTip"]
               },
               "params": {
@@ -348,12 +348,12 @@
           },
 
           {
-            "description": "Move to slot command. NOTE: this is an EXPERIMENTAL command, its behavior is subject to change in future releases.",
+            "description": "Move To Slot. NOTE: this is an EXPERIMENTAL command, its behavior is subject to change in future releases.",
             "type": "object",
-            "required": ["command", "params"],
+            "required": ["commandType", "params"],
             "additionalProperties": false,
             "properties": {
-              "command": { "enum": ["moveToSlot"] },
+              "commandType": { "enum": ["moveToSlot"] },
               "params": {
                 "type": "object",
                 "required": ["pipette", "slot"],
@@ -386,12 +386,12 @@
           },
 
           {
-            "description": "Delay command",
+            "description": "Delay Protocol Execution",
             "type": "object",
-            "required": ["command", "params"],
+            "required": ["commandType", "params"],
             "additionalProperties": false,
             "properties": {
-              "command": {
+              "commandType": {
                 "enum": ["delay"]
               },
               "params": {
@@ -412,12 +412,12 @@
           },
 
           {
-            "description": "Magnetic module engage command. Engages magnet to specified height",
+            "description": "Magnetic Module Engage: Engage magnet to specified height.",
             "type": "object",
-            "required": ["command", "params"],
+            "required": ["commandType", "params"],
             "additionalProperties": false,
             "properties": {
-              "command": {
+              "commandType": {
                 "enum": ["magneticModule/engageMagnet"]
               },
               "params": {
@@ -437,12 +437,12 @@
           },
 
           {
-            "description": "Magnetic module disengage command. Moves magnet down to disengaged (home) position",
+            "description": "Magnetic Module Disengage: Retract magnet to disengaged (home) position",
             "type": "object",
-            "required": ["command", "params"],
+            "required": ["commandType", "params"],
             "additionalProperties": false,
             "properties": {
-              "command": {
+              "commandType": {
                 "enum": ["magneticModule/disengageMagnet"]
               },
               "params": {
@@ -452,12 +452,12 @@
           },
 
           {
-            "description": "Temperature module set target temperature command. Module will begin moving to the target temperature. This command is non-blocking, it does not delay until the temperature is reached.",
+            "description": "Temperature Module Set Target Temperature: Module will begin moving to the target temperature. This command is non-blocking, it does not delay protocol execution while approaching the target temperature.",
             "type": "object",
-            "required": ["command", "params"],
+            "required": ["commandType", "params"],
             "additionalProperties": false,
             "properties": {
-              "command": { "enum": ["temperatureModule/setTargetTemperature"] },
+              "commandType": { "enum": ["temperatureModule/setTargetTemperature"] },
               "params": {
                 "required": ["module", "temperature"],
                 "additionalProperties": false,
@@ -470,12 +470,12 @@
           },
 
           {
-            "description": "Temperature module await temperature command. Delay further protocol execution until the specified temperature is reached.",
+            "description": "Temperature Module Await Temperature: Delay protocol execution until the specified temperature is reached.",
             "type": "object",
-            "required": ["command", "params"],
+            "required": ["commandType", "params"],
             "additionalProperties": false,
             "properties": {
-              "command": { "enum": ["temperatureModule/awaitTemperature"] },
+              "commandType": { "enum": ["temperatureModule/awaitTemperature"] },
               "params": {
                 "required": ["module", "temperature"],
                 "additionalProperties": false,
@@ -488,12 +488,12 @@
           },
 
           {
-            "description": "Temperature module deactivate command. Module will stop actively controlling its temperature and drift to ambient temperature.",
+            "description": "Temperature Module Deactivate: Module will stop actively controlling its temperature and drift to ambient temperature.",
             "type": "object",
-            "required": ["command", "params"],
+            "required": ["commandType", "params"],
             "additionalProperties": false,
             "properties": {
-              "command": { "enum": ["temperatureModule/deactivate"] },
+              "commandType": { "enum": ["temperatureModule/deactivate"] },
               "params": {
                 "$ref": "#/definitions/moduleOnlyParams"
               }
@@ -501,12 +501,12 @@
           },
 
           {
-            "description": "Thermocycler set target block temperature command. Lid will begin moving to the target temperature. This command is non-blocking, it does not delay until the temperature is reached.",
+            "description": "Thermocycler Set Target Block Temperature: Well block will begin moving to the target temperature. This command is non-blocking, it does not delay protocol execution while approaching the target temperature.",
             "type": "object",
-            "required": ["command", "params"],
+            "required": ["commandType", "params"],
             "additionalProperties": false,
             "properties": {
-              "command": { "enum": ["thermocycler/setTargetBlockTemperature"] },
+              "commandType": { "enum": ["thermocycler/setTargetBlockTemperature"] },
               "params": {
                 "required": ["module", "temperature"],
                 "additionalProperties": false,
@@ -522,12 +522,12 @@
           },
 
           {
-            "description": "Thermocycler set target lid temperature command. Lid will begin moving to the target temperature. This command is non-blocking, it does not delay until the temperature is reached.",
+            "description": "Thermocycler Set Target Lid Temperature: Lid will begin moving to the target temperature. This command is non-blocking, it does not delay protocol execution while approaching the target temperature.",
             "type": "object",
-            "required": ["command", "params"],
+            "required": ["commandType", "params"],
             "additionalProperties": false,
             "properties": {
-              "command": { "enum": ["thermocycler/setTargetLidTemperature"] },
+              "commandType": { "enum": ["thermocycler/setTargetLidTemperature"] },
               "params": {
                 "required": ["module", "temperature"],
                 "additionalProperties": false,
@@ -540,12 +540,12 @@
           },
 
           {
-            "description": "Thermocycler await block temperature command. Delay further protocol execution until the specified temperature is reached.",
+            "description": "Thermocycler Await Block Temperature: Delay protocol execution until the specified well block target temperature is reached.",
             "type": "object",
-            "required": ["command", "params"],
+            "required": ["commandType", "params"],
             "additionalProperties": false,
             "properties": {
-              "command": { "enum": ["thermocycler/awaitBlockTemperature"] },
+              "commandType": { "enum": ["thermocycler/awaitBlockTemperature"] },
               "params": {
                 "required": ["module", "temperature"],
                 "additionalProperties": false,
@@ -558,12 +558,12 @@
           },
 
           {
-            "description": "Thermocycler await lid temperature command. Delay further protocol execution until the specified temperature is reached.",
+            "description": "Thermocycler Await Lid Temperature: Delay protocol execution until the specified lid target temperature is reached.",
             "type": "object",
-            "required": ["command", "params"],
+            "required": ["commandType", "params"],
             "additionalProperties": false,
             "properties": {
-              "command": { "enum": ["thermocycler/awaitLidTemperature"] },
+              "commandType": { "enum": ["thermocycler/awaitLidTemperature"] },
               "params": {
                 "required": ["module", "temperature"],
                 "additionalProperties": false,
@@ -576,12 +576,12 @@
           },
 
           {
-            "description": "Thermocycler deactivate block command. Module will stop actively controlling its block temperature.",
+            "description": "Thermocycler Deactivate Block: Module will stop actively controlling its well block temperature.",
             "type": "object",
-            "required": ["command", "params"],
+            "required": ["commandType", "params"],
             "additionalProperties": false,
             "properties": {
-              "command": { "enum": ["thermocycler/deactivateBlock"] },
+              "commandType": { "enum": ["thermocycler/deactivateBlock"] },
               "params": {
                 "$ref": "#/definitions/moduleOnlyParams"
               }
@@ -589,12 +589,12 @@
           },
 
           {
-            "description": "Thermocycler deactivate lid command. Module will stop actively controlling its lid temperature.",
+            "description": "Thermocycler Deactivate Lid: Module will stop actively controlling its lid temperature.",
             "type": "object",
-            "required": ["command", "params"],
+            "required": ["commandType", "params"],
             "additionalProperties": false,
             "properties": {
-              "command": { "enum": ["thermocycler/deactivateLid"] },
+              "commandType": { "enum": ["thermocycler/deactivateLid"] },
               "params": {
                 "$ref": "#/definitions/moduleOnlyParams"
               }
@@ -602,12 +602,12 @@
           },
 
           {
-            "description": "Thermocycler open lid command. This command will block until the lid is fully open.",
+            "description": "Thermocycler Open Lid: Open lid of the module. This command will delay protocol execution until the lid is fully open.",
             "type": "object",
-            "required": ["command", "params"],
+            "required": ["commandType", "params"],
             "additionalProperties": false,
             "properties": {
-              "command": { "enum": ["thermocycler/openLid"] },
+              "commandType": { "enum": ["thermocycler/openLid"] },
               "params": {
                 "$ref": "#/definitions/moduleOnlyParams"
               }
@@ -615,12 +615,12 @@
           },
 
           {
-            "description": "Thermocycler close lid command. This command will block until the lid is fully closed.",
+            "description": "Thermocycler Close Lid: Close the lid of the module. This command will delay protocol execution until the lid is fully closed.",
             "type": "object",
-            "required": ["command", "params"],
+            "required": ["commandType", "params"],
             "additionalProperties": false,
             "properties": {
-              "command": { "enum": ["thermocycler/closeLid"] },
+              "commandType": { "enum": ["thermocycler/closeLid"] },
               "params": {
                 "$ref": "#/definitions/moduleOnlyParams"
               }
@@ -628,12 +628,12 @@
           },
 
           {
-            "description": "Thermocycler run profile command. Begin running the specified profile steps on the thermocycler. This command is non-blocking, it does not delay protocol execution outside of thermocycler steps. No more thermocycler commands should be given until a 'thermocycler/awaitProfileComplete' command is executed.",
+            "description": "Thermocycler Run Profile: Begin running the specified profile steps on the Thermocycler. This command is non-blocking, it does not delay protocol execution outside of thermocycler steps. No more thermocycler commands should be given until a 'thermocycler/awaitProfileComplete' command is executed.",
             "type": "object",
-            "required": ["command", "params"],
+            "required": ["commandType", "params"],
             "additionalProperties": false,
             "properties": {
-              "command": { "enum": ["thermocycler/runProfile"] },
+              "commandType": { "enum": ["thermocycler/runProfile"] },
               "params": {
                 "type": "object",
                 "required": ["module", "profile", "volume"],
@@ -667,12 +667,12 @@
           },
 
           {
-            "description": "Thermocycler await profile complete command. Blocks further protocol execution until profile execution is complete.",
+            "description": "Thermocycler Await Profile Complete: Delay protocol execution until profile execution is complete.",
             "type": "object",
-            "required": ["command", "params"],
+            "required": ["commandType", "params"],
             "additionalProperties": false,
             "properties": {
-              "command": { "enum": ["thermocycler/awaitProfileComplete"] },
+              "commandType": { "enum": ["thermocycler/awaitProfileComplete"] },
               "params": {
                 "$ref": "#/definitions/moduleOnlyParams"
               }
@@ -680,12 +680,12 @@
           },
 
           {
-            "description": "Move to well command. Move the pipette's critical point to the specified well in a labware, with an optional offset. The pipette's critical point is a reference point on the pipette. The critical point can be one of the following: (1) Single-channel pipette with no tip: end of nozzle. (2) Multi-channel pipette with no tip: end of backmost nozzle. (3) Single-channel pipette with a tip: end of tip. (4) Multi-channel pipette with tip: end of tip on backmost nozzle.",
+            "description": "Move To Well: Move the pipette's critical point to the specified well in a labware, with an optional offset. The pipette's critical point is a reference point on the pipette. The critical point can be one of the following: (1) Single-channel pipette with no tip: end of nozzle. (2) Multi-channel pipette with no tip: end of backmost nozzle. (3) Single-channel pipette with a tip: end of tip. (4) Multi-channel pipette with tip: end of tip on backmost nozzle.",
             "type": "object",
-            "required": ["command", "params"],
+            "required": ["commandType", "params"],
             "additionalProperties": false,
             "properties": {
-              "command": { "enum": ["moveToWell"] },
+              "commandType": { "enum": ["moveToWell"] },
               "params": {
                 "type": "object",
                 "required": ["pipette", "labware", "well"],
@@ -719,12 +719,12 @@
           },
 
           {
-            "description": "Load single physical entity command. Note these commands are only meant to make the Opentrons System aware of an entity's location and not meant instruct any specific hardware to carry out the physical action of moving the entity to the locaiton.",
+            "description": "Load Pipette / Load Labware / Load Module: These commands are only meant to make the Opentrons system aware of an entity's location. They do not instruct any specific hardware to carry out the physical action of moving the entity to the location.",
             "type": "object",
-            "required": ["command", "params"],
+            "required": ["commandType", "params"],
             "additionalProperties": false,
             "properties": {
-              "command": {
+              "commandType": {
                 "enum": ["loadPipette", "loadLabware", "loadModule"]
               },
               "params": {
@@ -744,12 +744,12 @@
           },
 
           {
-            "description": "Load liquid command. Note this command is only meant to make the Opentrons System aware of a liquid's location and not meant instruct any specific hardware to carry out the physical action of moving the liquid to the locaiton.",
+            "description": "Load Liquid: Note this command is only meant to make the Opentrons system aware of a liquid's location. It does not instruct any specific hardware to carry out the physical action of moving the liquid to the location.",
             "type": "object",
-            "required": ["command", "params"],
+            "required": ["commandType", "params"],
             "additionalProperties": false,
             "properties": {
-              "command": {
+              "commandType": {
                 "enum": ["loadLiquid"]
               },
               "params": {
@@ -776,7 +776,6 @@
               }
             }
           }
-
         ]
       }
     },
