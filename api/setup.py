@@ -8,49 +8,51 @@ import os.path
 from setuptools import setup, find_packages
 
 HERE = os.path.abspath(os.path.dirname(__file__))
-sys.path.append(os.path.join(HERE, '..', 'scripts'))
+sys.path.append(os.path.join(HERE, "..", "scripts"))
 
 from python_build_utils import normalize_version  # noqa: E402
 
 # make stdout blocking since Travis sets it to nonblocking
-if os.name == 'posix':
+if os.name == "posix":
     import fcntl
+
     flags = fcntl.fcntl(sys.stdout, fcntl.F_GETFL)
     fcntl.fcntl(sys.stdout, fcntl.F_SETFL, flags & ~os.O_NONBLOCK)
 
 
 def get_version():
-    buildno = os.getenv('BUILD_NUMBER')
+    buildno = os.getenv("BUILD_NUMBER")
     if buildno:
-        normalize_opts = {'extra_tag': buildno}
+        normalize_opts = {"extra_tag": buildno}
     else:
         normalize_opts = {}
-    return normalize_version('api', **normalize_opts)
+    return normalize_version("api", **normalize_opts)
 
 
 VERSION = get_version()
 
-DISTNAME = 'opentrons'
-LICENSE = 'Apache 2.0'
+DISTNAME = "opentrons"
+LICENSE = "Apache 2.0"
 AUTHOR = "Opentrons"
 EMAIL = "engineering@opentrons.com"
 URL = "https://github.com/OpenTrons/opentrons"
-DOWNLOAD_URL = ''
+DOWNLOAD_URL = ""
 CLASSIFIERS = [
-    'Development Status :: 5 - Production/Stable',
-    'Environment :: Console',
-    'Operating System :: OS Independent',
-    'Intended Audience :: Science/Research',
-    'Programming Language :: Python',
-    'Programming Language :: Python :: 3',
-    'Programming Language :: Python :: 3.7',
-    'Topic :: Scientific/Engineering',
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Topic :: Scientific/Engineering",
 ]
 KEYWORDS = ["robots", "protocols", "synbio", "pcr", "automation", "lab"]
 DESCRIPTION = (
     "The Opentrons API is a simple framework designed to make "
-    "writing automated biology lab protocols easy.")
-PACKAGES = find_packages(where='src')
+    "writing automated biology lab protocols easy."
+)
+PACKAGES = find_packages(where="src")
 INSTALL_REQUIRES = [
     f"opentrons-shared-data=={VERSION}",
     "aionotify==0.2.0",
@@ -75,7 +77,7 @@ def read(*parts):
 
 if __name__ == "__main__":
     setup(
-        python_requires='>=3.7',
+        python_requires=">=3.7",
         name=DISTNAME,
         description=DESCRIPTION,
         license=LICENSE,
@@ -91,18 +93,17 @@ if __name__ == "__main__":
         classifiers=CLASSIFIERS,
         install_requires=INSTALL_REQUIRES,
         include_package_data=True,
-        package_dir={'': 'src'},
-        package_data={'opentrons': ['py.typed', 'package.json']},
+        package_dir={"": "src"},
+        package_data={"opentrons": ["py.typed", "package.json"]},
         entry_points={
-            'console_scripts': [
-                'opentrons_simulate = opentrons.simulate:main',
-                'opentrons_execute = opentrons.execute:main',
+            "console_scripts": [
+                "opentrons_simulate = opentrons.simulate:main",
+                "opentrons_execute = opentrons.execute:main",
             ]
         },
         project_urls={
-            'opentrons.com': "https://www.opentrons.com",
-            'Source Code On Github':
-            "https://github.com/Opentrons/opentrons/tree/edge/api",
-            'Documentation': "https://docs.opentrons.com"
-        }
+            "opentrons.com": "https://www.opentrons.com",
+            "Source Code On Github": "https://github.com/Opentrons/opentrons/tree/edge/api",  # noqa: E501
+            "Documentation": "https://docs.opentrons.com",
+        },
     )

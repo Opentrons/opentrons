@@ -55,7 +55,7 @@ export const MagnetForm = (props: StepFormProps): JSX.Element => {
           className={styles.magnet_form_group}
         >
           <RadioGroupField
-            {...propsForFields['magnetAction']}
+            {...propsForFields.magnetAction}
             options={[
               {
                 name: i18n.t(
@@ -66,7 +66,7 @@ export const MagnetForm = (props: StepFormProps): JSX.Element => {
             ]}
           />
           <RadioGroupField
-            {...propsForFields['magnetAction']}
+            {...propsForFields.magnetAction}
             options={[
               {
                 name: i18n.t(
@@ -83,7 +83,7 @@ export const MagnetForm = (props: StepFormProps): JSX.Element => {
             className={styles.magnet_form_group}
           >
             <TextField
-              {...propsForFields['engageHeight']}
+              {...propsForFields.engageHeight}
               caption={engageHeightCaption}
               className={styles.small_field}
             />

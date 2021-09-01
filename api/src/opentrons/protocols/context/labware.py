@@ -9,8 +9,7 @@ from opentrons.protocols.api_support.tip_tracker import TipTracker
 from opentrons.protocols.context.well import WellImplementation
 from opentrons.protocols.api_support.well_grid import WellGrid
 from opentrons.types import Point
-from opentrons_shared_data.labware.dev_types import (
-    LabwareParameters, LabwareDefinition)
+from opentrons_shared_data.labware.dev_types import LabwareParameters, LabwareDefinition
 
 
 class AbstractLabware(DeckItem):

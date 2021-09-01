@@ -135,7 +135,7 @@ const mapSTP = (state: BaseState, ownProps: OP): SP => {
       .def
 
     // NOTE: only taking depth of first well in labware def, UI not currently equipped for multiple depths
-    const firstWell = labwareDef.wells['A1']
+    const firstWell = labwareDef.wells.A1
     if (firstWell) wellDepthMm = getWellsDepth(labwareDef, ['A1'])
   }
 

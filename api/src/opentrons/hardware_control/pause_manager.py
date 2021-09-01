@@ -6,7 +6,7 @@ from .types import DoorState, PauseType, PauseResumeError
 
 
 class PauseManager:
-    """ This class determines whether or not the hardware controller should
+    """This class determines whether or not the hardware controller should
     pause or resume by evaluating the pause and resume types. The use of two
     pause types are used to separate the delay resume (triggered when the delay
     timer runs out) and the pause resume (trigged by user via the app).

@@ -155,9 +155,9 @@ describe('MixForm', () => {
         firstValue: 'r2l',
         secondValue: 'b2t',
         updateFirstWellOrder:
-          props.propsForFields['mix_wellOrder_first'].updateValue,
+          props.propsForFields.mix_wellOrder_first.updateValue,
         updateSecondWellOrder:
-          props.propsForFields['mix_wellOrder_second'].updateValue,
+          props.propsForFields.mix_wellOrder_second.updateValue,
       })
     })
   })

@@ -12,17 +12,14 @@ class SerialException(Exception):
 
 class NoResponse(SerialException):
     def __init__(self, port: str, command: str):
-        super().__init__(
-            port=port, description=f"No response to '{command}'"
-        )
+        super().__init__(port=port, description=f"No response to '{command}'")
         self.command = command
 
 
 class FailedCommand(SerialException):
     def __init__(self, port: str, response: str):
         super().__init__(
-            port=port,
-            description=f"'Received error response '{response}'"
+            port=port, description=f"'Received error response '{response}'"
         )
         self.response = response
 

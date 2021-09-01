@@ -12,9 +12,7 @@ from typing import Callable, List, Tuple, Any
 from opentrons.algorithms import dfs, types
 
 
-def convert_to_vertex(
-        graph_dict: dict,
-        cast_type: Callable) -> List[types.GenericNode]:
+def convert_to_vertex(graph_dict: dict, cast_type: Callable) -> List[types.GenericNode]:
     """Convert to Vertex.
 
     Helper function to convert a json file to a list of
@@ -22,25 +20,24 @@ def convert_to_vertex(
     """
     graph = []
     for key, value in graph_dict.items():
-        vertex = types.GenericNode(
-            name=cast_type(key),
-            sub_names=value)
+        vertex = types.GenericNode(name=cast_type(key), sub_names=value)
         graph.append(vertex)
     return graph
 
 
-def load_graph() -> Tuple[Tuple[List[types.GenericNode], str],
-                          Tuple[List[types.GenericNode], str]]:
+def load_graph() -> Tuple[
+    Tuple[List[types.GenericNode], str], Tuple[List[types.GenericNode], str]
+]:
     """Load Graphs.
 
     Helper function to load the test json graph files.
     """
     path = Path(os.path.abspath(os.path.dirname(__file__)))
-    with (path / 'fixture_alphabetical_graph.json').open() as f:
+    with (path / "fixture_alphabetical_graph.json").open() as f:
         alphabet = convert_to_vertex(json.load(f), str)
-    with (path / 'fixture_numerical_graph.json').open() as f:
+    with (path / "fixture_numerical_graph.json").open() as f:
         numbers = convert_to_vertex(json.load(f), int)
-    return (alphabet, 'string'), (numbers, 'integer')
+    return (alphabet, "string"), (numbers, "integer")
 
 
 @pytest.fixture(scope="session", params=load_graph())
@@ -65,13 +62,10 @@ def test_vertices(dfs_graph: dfs.DFS) -> None:
     """
     _dfs, _type = dfs_graph
     graph = _dfs.graph
-    if _type == 'string':
-        additional_vertex = types.GenericNode(
-            name='K', sub_names=['H', 'J', 'A'])
+    if _type == "string":
+        additional_vertex = types.GenericNode(name="K", sub_names=["H", "J", "A"])
     else:
-        additional_vertex = types.GenericNode(
-            name=12, sub_names=[1, 9, 5]
-        )
+        additional_vertex = types.GenericNode(name=12, sub_names=[1, 9, 5])
     graph.add_vertex(additional_vertex)
     vertex_obj = graph.get_vertex(additional_vertex.name)
     assert additional_vertex.name in graph._lookup_table.keys()
@@ -89,11 +83,11 @@ def test_neighbors(dfs_graph: dfs.DFS) -> None:
     """
     _dfs, _type = dfs_graph
     graph = _dfs.graph
-    if _type == 'string':
-        key = 'A'
-        neighbor = 'J'
-        og_neighbors = ['B', 'E']
-        sorted_neighbors = ['B', 'E', 'J']
+    if _type == "string":
+        key = "A"
+        neighbor = "J"
+        og_neighbors = ["B", "E"]
+        sorted_neighbors = ["B", "E", "J"]
     else:
         key = 1
         neighbor = 4
@@ -115,8 +109,8 @@ def test_depth_first_search(dfs_graph: dfs.DFS) -> None:
     """
     _dfs, _type = dfs_graph
     visited_vertices = _dfs.dfs()
-    if _type == 'string':
-        sort = {'A', 'B', 'F', 'G', 'C', 'J', 'I', 'H', 'D', 'E'}
+    if _type == "string":
+        sort = {"A", "B", "F", "G", "C", "J", "I", "H", "D", "E"}
     else:
         sort = {1, 2, 6, 7, 3, 10, 9, 8, 4, 5}
     assert sort == visited_vertices

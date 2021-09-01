@@ -17,8 +17,8 @@ class CommandBuilder:
         self._elements: List[str] = []
 
     def add_float(
-            self, prefix: str, value: float,
-            precision: Optional[int]) -> CommandBuilder:
+        self, prefix: str, value: float, precision: Optional[int]
+    ) -> CommandBuilder:
         """
         Add a float value.
 

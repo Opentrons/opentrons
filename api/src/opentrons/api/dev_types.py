@@ -1,8 +1,7 @@
 from typing import Optional, List
 from typing_extensions import Literal, TypedDict
 
-State = Literal[
-    'loaded', 'running', 'finished', 'stopped', 'paused', 'error', None]
+State = Literal["loaded", "running", "finished", "stopped", "paused", "error", None]
 
 
 class StateInfo(TypedDict, total=False):
@@ -39,7 +38,7 @@ class SnapPayload(TypedDict):
 
 
 class Message(TypedDict):
-    topic: Literal['session']
+    topic: Literal["session"]
     payload: SnapPayload
 
 

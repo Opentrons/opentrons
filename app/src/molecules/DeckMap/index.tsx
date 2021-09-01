@@ -54,7 +54,7 @@ const deckSetupLayerBlocklist = [
 ]
 
 function DeckMapComponent(props: Props): JSX.Element {
-  const deckDef = React.useMemo(() => getDeckDefinitions()['ot2_standard'], [])
+  const deckDef = React.useMemo(() => getDeckDefinitions().ot2_standard, [])
   const {
     modulesBySlot,
     labwareBySlot,

@@ -4,8 +4,8 @@ from .get_temp_g_code_functionality_def import GetTempGCodeFunctionalityDef
 from .set_temp_g_code_functionality_def import SetTempGCodeFunctionalityDef
 
 __all__ = [
-    'DeviceInfoGCodeFunctionalityDef',
-    'DisengageGCodeFunctionalityDef',
-    'GetTempGCodeFunctionalityDef',
-    'SetTempGCodeFunctionalityDef'
+    "DeviceInfoGCodeFunctionalityDef",
+    "DisengageGCodeFunctionalityDef",
+    "GetTempGCodeFunctionalityDef",
+    "SetTempGCodeFunctionalityDef",
 ]

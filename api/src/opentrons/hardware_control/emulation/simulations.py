@@ -54,11 +54,12 @@ class Temperature(Simulation):
 
 class TemperatureWithHold(Temperature):
     """A model with a current, target temperature and hold time. The current
-     temperate is always moving towards the target.
+    temperate is always moving towards the target.
 
-     When the current temperature is within close enough from target the hold time
-     decrements once per tick.
+    When the current temperature is within close enough from target the hold time
+    decrements once per tick.
     """
+
     def __init__(self, per_tick: float, current: float) -> None:
         """Construct a temperature with hold simulation."""
         super().__init__(per_tick=per_tick, current=current)

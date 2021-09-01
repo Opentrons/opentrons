@@ -20,32 +20,57 @@ from math import isclose
 from opentrons.drivers.serial_communication import get_ports_by_name
 from serial.serialutil import SerialException  # type: ignore
 
-from opentrons.drivers.smoothie_drivers.connection import \
-    SmoothieConnection
+from opentrons.drivers.smoothie_drivers.connection import SmoothieConnection
 from opentrons.drivers.smoothie_drivers.constants import (
-    GCODE, HOMED_POSITION, Y_BOUND_OVERRIDE, SMOOTHIE_COMMAND_TERMINATOR, SMOOTHIE_ACK,
-    PLUNGER_BACKLASH_MM, CURRENT_CHANGE_DELAY, PIPETTE_READ_DELAY,
-    Y_SWITCH_BACK_OFF_MM, Y_SWITCH_REVERSE_BACK_OFF_MM, Y_BACKOFF_LOW_CURRENT,
-    Y_BACKOFF_SLOW_SPEED, Y_RETRACT_SPEED, Y_RETRACT_DISTANCE, UNSTICK_DISTANCE,
-    UNSTICK_SPEED, DEFAULT_AXES_SPEED, XY_HOMING_SPEED, HOME_SEQUENCE, AXES,
-    DISABLE_AXES, SEC_PER_MIN, DEFAULT_ACK_TIMEOUT, DEFAULT_EXECUTE_TIMEOUT,
-    DEFAULT_MOVEMENT_TIMEOUT, SMOOTHIE_BOOT_TIMEOUT, DEFAULT_STABILIZE_DELAY,
-    DEFAULT_COMMAND_RETRIES, MICROSTEPPING_GCODES, GCODE_ROUNDING_PRECISION
+    GCODE,
+    HOMED_POSITION,
+    Y_BOUND_OVERRIDE,
+    SMOOTHIE_COMMAND_TERMINATOR,
+    SMOOTHIE_ACK,
+    PLUNGER_BACKLASH_MM,
+    CURRENT_CHANGE_DELAY,
+    PIPETTE_READ_DELAY,
+    Y_SWITCH_BACK_OFF_MM,
+    Y_SWITCH_REVERSE_BACK_OFF_MM,
+    Y_BACKOFF_LOW_CURRENT,
+    Y_BACKOFF_SLOW_SPEED,
+    Y_RETRACT_SPEED,
+    Y_RETRACT_DISTANCE,
+    UNSTICK_DISTANCE,
+    UNSTICK_SPEED,
+    DEFAULT_AXES_SPEED,
+    XY_HOMING_SPEED,
+    HOME_SEQUENCE,
+    AXES,
+    DISABLE_AXES,
+    SEC_PER_MIN,
+    DEFAULT_ACK_TIMEOUT,
+    DEFAULT_EXECUTE_TIMEOUT,
+    DEFAULT_MOVEMENT_TIMEOUT,
+    SMOOTHIE_BOOT_TIMEOUT,
+    DEFAULT_STABILIZE_DELAY,
+    DEFAULT_COMMAND_RETRIES,
+    MICROSTEPPING_GCODES,
+    GCODE_ROUNDING_PRECISION,
 )
-from opentrons.drivers.smoothie_drivers.errors import SmoothieError, \
-    SmoothieAlarm, TipProbeError
+from opentrons.drivers.smoothie_drivers.errors import (
+    SmoothieError,
+    SmoothieAlarm,
+    TipProbeError,
+)
 from opentrons.drivers.smoothie_drivers import parse_utils
 from opentrons.drivers.command_builder import CommandBuilder
 
 from opentrons.config.types import RobotConfig
 from opentrons.config.robot_configs import current_for_revision
 from opentrons.drivers.asyncio.communication import (
-    SerialConnection, NoResponse, AlarmResponse, ErrorResponse
+    SerialConnection,
+    NoResponse,
+    AlarmResponse,
+    ErrorResponse,
 )
 from opentrons.drivers.types import MoveSplits
-from opentrons.drivers.utils import (
-    AxisMoveTimestamp, ParseError, string_to_hex
-)
+from opentrons.drivers.utils import AxisMoveTimestamp, ParseError, string_to_hex
 from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
 from opentrons.drivers.rpi_drivers.dev_types import GPIODriverLike
 from opentrons.system import smoothie_update
@@ -61,13 +86,12 @@ def _command_builder() -> CommandBuilder:
 
 
 class SmoothieDriver:
-
     @classmethod
     async def build(
-            cls,
-            port: str,
-            config: RobotConfig,
-            gpio_chardev: GPIODriverLike = None,
+        cls,
+        port: str,
+        config: RobotConfig,
+        gpio_chardev: GPIODriverLike = None,
     ) -> SmoothieDriver:
         """
         Build a smoothie driver
@@ -83,25 +107,22 @@ class SmoothieDriver:
         connection = await SmoothieConnection.create(
             port=port,
             baud_rate=config.serial_speed,
-            name='smoothie',
+            name="smoothie",
             timeout=DEFAULT_EXECUTE_TIMEOUT,
-            ack=SMOOTHIE_ACK
+            ack=SMOOTHIE_ACK,
         )
-        gpio_chardev = gpio_chardev or SimulatingGPIOCharDev('simulated')
+        gpio_chardev = gpio_chardev or SimulatingGPIOCharDev("simulated")
 
-        instance = cls(
-            config=config,
-            connection=connection,
-            gpio_chardev=gpio_chardev
-        )
+        instance = cls(config=config, connection=connection, gpio_chardev=gpio_chardev)
         await instance._setup()
         return instance
 
     def __init__(
-            self,
-            config: RobotConfig,
-            gpio_chardev: GPIODriverLike,
-            connection: Optional[SerialConnection] = None):
+        self,
+        config: RobotConfig,
+        gpio_chardev: GPIODriverLike,
+        connection: Optional[SerialConnection] = None,
+    ):
         """
         Constructor
 
@@ -165,12 +186,12 @@ class SmoothieDriver:
         # position after homing
         self._homed_position = HOMED_POSITION.copy()
         self.homed_flags: Dict[str, bool] = {
-            'X': False,
-            'Y': False,
-            'Z': False,
-            'A': False,
-            'B': False,
-            'C': False
+            "X": False,
+            "Y": False,
+            "Z": False,
+            "A": False,
+            "B": False,
+            "C": False,
         }
 
         self._is_hard_halting = asyncio.Event()
@@ -193,15 +214,14 @@ class SmoothieDriver:
     @property
     def axis_bounds(self) -> Dict[str, float]:
         bounds = {k: v for k, v in self._homed_position.items()}
-        bounds['Y'] = Y_BOUND_OVERRIDE
+        bounds["Y"] = Y_BOUND_OVERRIDE
         return bounds
 
     def _update_position(self, target: Dict[str, float]) -> None:
         """Update the cached position."""
-        self._position.update({
-            axis: value
-            for axis, value in target.items() if value is not None
-        })
+        self._position.update(
+            {axis: value for axis, value in target.items() if value is not None}
+        )
 
     async def update_position(self, default=None) -> None:
         """Get the current position from the smoothie and cache it."""
@@ -212,6 +232,7 @@ class SmoothieDriver:
             updated_position = self._position.copy()
             updated_position.update(**default)
         else:
+
             async def _recursive_update_position(retries):
                 try:
                     position_response = await self._send_command(
@@ -225,13 +246,12 @@ class SmoothieDriver:
                     await asyncio.sleep(DEFAULT_STABILIZE_DELAY)
                     return await _recursive_update_position(retries)
 
-            updated_position = await _recursive_update_position(
-                DEFAULT_COMMAND_RETRIES)
+            updated_position = await _recursive_update_position(DEFAULT_COMMAND_RETRIES)
 
         self._update_position(updated_position)
 
     def configure_splits_for(self, config: MoveSplits) -> None:
-        """ Configure the driver to automatically split moves on a given
+        """Configure the driver to automatically split moves on a given
         axis that execute (including pauses) after a specified amount of
         time. The move created will adhere to the split config.
 
@@ -239,8 +259,9 @@ class SmoothieDriver:
 
         Only pipette axes may be specified for splitting
         """
-        assert all((ax.lower() in 'bc' for ax in config.keys())),\
-            'splits may only be configured for plunger axes'
+        assert all(
+            (ax.lower() in "bc" for ax in config.keys())
+        ), "splits may only be configured for plunger axes"
         self._move_split_config.update(config)
         log.info(f"Updated move split config with {config}")
         self._axes_moved_at.reset_moved(config.keys())
@@ -255,7 +276,7 @@ class SmoothieDriver:
         """
         res: Optional[str] = None
         if self.simulating:
-            res = '1234567890'
+            res = "1234567890"
         else:
             try:
                 res = await self._read_from_pipette(GCODE.READ_INSTRUMENT_ID, mount)
@@ -275,18 +296,16 @@ class SmoothieDriver:
         if self.simulating:
             res = None
         else:
-            res = await self._read_from_pipette(
-                GCODE.READ_INSTRUMENT_MODEL, mount
-            )
-            if res and '_v' not in res:
+            res = await self._read_from_pipette(GCODE.READ_INSTRUMENT_MODEL, mount)
+            if res and "_v" not in res:
                 # Backward compatibility for pipettes programmed with model
                 # strings that did not include the _v# designation
-                res = res + '_v1'
-            elif res and '_v13' in res:
+                res = res + "_v1"
+            elif res and "_v13" in res:
                 # Backward compatibility for pipettes programmed with model
                 # strings that did not include the "." to seperate version
                 # major and minor values
-                res = res.replace('_v13', '_v1.3')
+                res = res.replace("_v13", "_v1.3")
         return res
 
     async def write_pipette_id(self, mount: str, data_string: str):
@@ -302,8 +321,7 @@ class SmoothieDriver:
             String (str) that is of unknown length, and should be unique to
             this one pipette
         """
-        await self._write_to_pipette(
-            GCODE.WRITE_INSTRUMENT_ID, mount, data_string)
+        await self._write_to_pipette(GCODE.WRITE_INSTRUMENT_ID, mount, data_string)
 
     async def write_pipette_model(self, mount: str, data_string: str) -> None:
         """
@@ -320,7 +338,7 @@ class SmoothieDriver:
         await self._write_to_pipette(GCODE.WRITE_INSTRUMENT_MODEL, mount, data_string)
 
     async def update_pipette_config(
-            self, axis: str, data: Dict[str, float]
+        self, axis: str, data: Dict[str, float]
     ) -> Dict[str, Dict[str, float]]:
         """
         Updates the following configs for a given pipette mount based on
@@ -338,27 +356,24 @@ class SmoothieDriver:
             return {axis: data}
 
         gcodes = {
-            'retract': GCODE.PIPETTE_RETRACT,
-            'debounce': GCODE.PIPETTE_DEBOUNCE,
-            'max_travel': GCODE.PIPETTE_MAX_TRAVEL,
-            'home': GCODE.PIPETTE_HOME
+            "retract": GCODE.PIPETTE_RETRACT,
+            "debounce": GCODE.PIPETTE_DEBOUNCE,
+            "max_travel": GCODE.PIPETTE_MAX_TRAVEL,
+            "home": GCODE.PIPETTE_HOME,
         }
 
         res_msg: Dict[str, Dict[str, float]] = {axis: {}}
 
         for key, value in data.items():
-            cmd = _command_builder().add_gcode(
-                gcode=gcodes[key]
-            )
-            if key == 'debounce':
+            cmd = _command_builder().add_gcode(gcode=gcodes[key])
+            if key == "debounce":
                 # debounce variable for all axes, so do not specify an axis
-                cmd.add_float(prefix='O', value=value, precision=None)
+                cmd.add_float(prefix="O", value=value, precision=None)
             else:
                 cmd.add_float(prefix=axis, value=value, precision=None)
             res = await self._send_command(cmd)
             if res is None:
-                raise ValueError(
-                    f'{key} was not updated to {value} on {axis} axis')
+                raise ValueError(f"{key} was not updated to {value} on {axis} axis")
             res_msg[axis][key] = value
 
         return res_msg
@@ -366,7 +381,7 @@ class SmoothieDriver:
     # FIXME (JG 9/28/17): Should have a more thought out
     # way of simulating vs really running
     async def connect(self, port: str = None) -> None:
-        if environ.get('ENABLE_VIRTUAL_SMOOTHIE', '').lower() == 'true':
+        if environ.get("ENABLE_VIRTUAL_SMOOTHIE", "").lower() == "true":
             self.simulating = True
             return
         await self.disconnect()
@@ -391,7 +406,7 @@ class SmoothieDriver:
         port = environ.get("OT_SMOOTHIE_EMULATOR_URI")
         if port:
             return port
-        smoothie_id = environ.get('OT_SMOOTHIE_ID', 'AMA')
+        smoothie_id = environ.get("OT_SMOOTHIE_ID", "AMA")
         # Let this raise an exception.
         return get_ports_by_name(device_name=smoothie_id)[0]
 
@@ -404,17 +419,17 @@ class SmoothieDriver:
             self._connection = await SmoothieConnection.create(
                 port=port,
                 baud_rate=self._config.serial_speed,
-                name='smoothie',
+                name="smoothie",
                 timeout=DEFAULT_EXECUTE_TIMEOUT,
-                ack=SMOOTHIE_ACK
+                ack=SMOOTHIE_ACK,
             )
             self.simulating = False
         except SerialException:
             # if another process is using the port, pyserial raises an
             # exception that describes a "readiness to read" which is confusing
-            error_msg = 'Unable to access UART port to Smoothie. This is '
-            error_msg += 'because another process is currently using it, or '
-            error_msg += 'the UART port is disabled on this device (OS)'
+            error_msg = "Unable to access UART port to Smoothie. This is "
+            error_msg += "because another process is currently using it, or "
+            error_msg += "the UART port is disabled on this device (OS)"
             raise SerialException(error_msg)
 
     @property
@@ -439,12 +454,13 @@ class SmoothieDriver:
         6 axis
         """
         if self.simulating:
-            version = 'Virtual Smoothie'
+            version = "Virtual Smoothie"
         else:
-            version = await self._send_command(_command_builder().add_gcode(
-                gcode=GCODE.VERSION))
-            version = version.split(',')[0].split(':')[-1].strip()
-            version = version.replace('NOMSD', '')
+            version = await self._send_command(
+                _command_builder().add_gcode(gcode=GCODE.VERSION)
+            )
+            version = version.split(",")[0].split(":")[-1].strip()
+            version = version.replace("NOMSD", "")
         return version
 
     @property
@@ -462,13 +478,12 @@ class SmoothieDriver:
 
     async def switch_state(self) -> Dict[str, bool]:
         """Returns the state of all SmoothieBoard limit switches"""
-        res = await self._send_command(_command_builder().add_gcode(
-            gcode=GCODE.LIMIT_SWITCH_STATUS
-        ))
+        res = await self._send_command(
+            _command_builder().add_gcode(gcode=GCODE.LIMIT_SWITCH_STATUS)
+        )
         return parse_utils.parse_switch_values(res)
 
-    async def update_homed_flags(
-            self, flags: Dict[str, bool] = None):
+    async def update_homed_flags(self, flags: Dict[str, bool] = None):
         """
         Returns Smoothieware's current homing-status, which is a dictionary
         of boolean values for each axis (XYZABC). If an axis is False, then it
@@ -485,7 +500,8 @@ class SmoothieDriver:
             async def _recursive_update_homed_flags(retries: int):
                 try:
                     res = await self._send_command(
-                        _command_builder().add_gcode(gcode=GCODE.HOMING_STATUS))
+                        _command_builder().add_gcode(gcode=GCODE.HOMING_STATUS)
+                    )
                     flags = parse_utils.parse_homing_status_values(res)
                     self.homed_flags.update(flags)
                 except ParseError as e:
@@ -519,12 +535,14 @@ class SmoothieDriver:
 
     @staticmethod
     def _build_speed_command(speed: float) -> CommandBuilder:
-        return _command_builder().add_gcode(
-            gcode=GCODE.SET_SPEED
-        ).add_int(prefix="F", value=int(float(speed) * SEC_PER_MIN))
+        return (
+            _command_builder()
+            .add_gcode(gcode=GCODE.SET_SPEED)
+            .add_int(prefix="F", value=int(float(speed) * SEC_PER_MIN))
+        )
 
     async def set_speed(self, value: Union[float, str], update: bool = True):
-        """ set total axes movement speed in mm/second"""
+        """set total axes movement speed in mm/second"""
         if update:
             self._combined_speed = float(value)
         command = self._build_speed_command(float(value))
@@ -546,7 +564,8 @@ class SmoothieDriver:
             self.set_axis_max_speed(self._max_speed_settings)  # type: ignore
 
     async def set_axis_max_speed(
-            self, settings: Dict[str, float], update: bool = True) -> None:
+        self, settings: Dict[str, float], update: bool = True
+    ) -> None:
         """
         Sets the maximum speed (mm/sec) that a given axis will move
 
@@ -561,9 +580,7 @@ class SmoothieDriver:
 
         command = _command_builder().add_gcode(gcode=GCODE.SET_MAX_SPEED)
         for axis, value in sorted(settings.items()):
-            command = command.add_float(
-                prefix=axis, value=value, precision=None
-            )
+            command = command.add_float(prefix=axis, value=value, precision=None)
 
         log.debug(f"set_axis_max_speed: {command}")
         await self._send_command(command)
@@ -584,10 +601,10 @@ class SmoothieDriver:
         """
         self._acceleration.update(settings)
 
-        command = _command_builder().add_gcode(
-            gcode=GCODE.ACCELERATION
-        ).add_int(
-            prefix="S", value=10000
+        command = (
+            _command_builder()
+            .add_gcode(gcode=GCODE.ACCELERATION)
+            .add_int(prefix="S", value=10000)
         )
         for axis, value in sorted(settings.items()):
             command.add_float(prefix=axis, value=value, precision=None)
@@ -628,9 +645,7 @@ class SmoothieDriver:
             self._save_current(active_axes_to_update, axes_active=True)
 
     def push_active_current(self) -> None:
-        self._active_current_settings.saved.update(
-            self._active_current_settings.now
-        )
+        self._active_current_settings.saved.update(self._active_current_settings.now)
 
     def pop_active_current(self) -> None:
         self.set_active_current(self._active_current_settings.saved)
@@ -670,7 +685,8 @@ class SmoothieDriver:
         self.set_dwelling_current(self._dwelling_current_settings.saved)
 
     def _save_current(
-            self, settings: Dict[str, float], axes_active: bool = True) -> None:
+        self, settings: Dict[str, float], axes_active: bool = True
+    ) -> None:
         """
         Sets the current in Amperes (A) by axis. Currents are limited to be
         between 0.0-2.0 amps per axis motor.
@@ -683,10 +699,7 @@ class SmoothieDriver:
             Dict with axes as valies (e.g.: 'X', 'Y', 'Z', 'A', 'B', or 'C')
             and floating point number for current (generally between 0.1 and 2)
         """
-        self._active_axes.update({
-            ax: axes_active
-            for ax in settings.keys()
-        })
+        self._active_axes.update({ax: axes_active for ax in settings.keys()})
         self._current_settings.now.update(settings)
         log.debug(f"_save_current: {self.current}")
 
@@ -708,9 +721,7 @@ class SmoothieDriver:
         for axis, value in sorted(self.current.items()):
             command.add_float(prefix=axis, value=value, precision=None)
 
-        command.add_gcode(
-            gcode=GCODE.DWELL
-        ).add_float(
+        command.add_gcode(gcode=GCODE.DWELL).add_float(
             prefix="P", value=CURRENT_CHANGE_DELAY, precision=None
         )
         log.debug(f"_generate_current_command: {command}")
@@ -727,13 +738,14 @@ class SmoothieDriver:
             (e.g.: 'XY' or 'ZA' or 'XYZABC')
         """
         available_axes = set(AXES)
-        axes = ''.join(a for a in axes.upper() if a in available_axes)
+        axes = "".join(a for a in axes.upper() if a in available_axes)
         if axes:
             log.debug(f"disengage_axis: {axes}")
             await self._send_command(
-                _command_builder().add_gcode(
-                    gcode=GCODE.DISENGAGE_MOTOR
-                ).add_element(element=axes))
+                _command_builder()
+                .add_gcode(gcode=GCODE.DISENGAGE_MOTOR)
+                .add_element(element=axes)
+            )
             for axis in axes:
                 self.engaged_axes[axis] = False
 
@@ -747,7 +759,7 @@ class SmoothieDriver:
         axes:
             String containing the axes to set to low current (eg: 'XYZABC')
         """
-        axes = ''.join(set(axes) & set(AXES) - set(DISABLE_AXES))
+        axes = "".join(set(axes) & set(AXES) - set(DISABLE_AXES))
         dwelling_currents = {
             ax: self._dwelling_current_settings.now[ax]
             for ax in axes
@@ -766,7 +778,7 @@ class SmoothieDriver:
         axes:
             String containing the axes to set to high current (eg: 'XYZABC')
         """
-        axes = ''.join(set(axes) & set(AXES) - set(DISABLE_AXES))
+        axes = "".join(set(axes) & set(AXES) - set(DISABLE_AXES))
         active_currents = {
             ax: self._active_current_settings.now[ax]
             for ax in axes
@@ -799,12 +811,13 @@ class SmoothieDriver:
 
     # Potential place for command optimization (buffering, flushing, etc)
     async def _send_command(
-            self,
-            command: CommandBuilder,
-            timeout: float = DEFAULT_EXECUTE_TIMEOUT,
-            suppress_error_msg: bool = False,
-            ack_timeout: float = DEFAULT_ACK_TIMEOUT,
-            suppress_home_after_error: bool = False) -> str:
+        self,
+        command: CommandBuilder,
+        timeout: float = DEFAULT_EXECUTE_TIMEOUT,
+        suppress_error_msg: bool = False,
+        ack_timeout: float = DEFAULT_ACK_TIMEOUT,
+        suppress_home_after_error: bool = False,
+    ) -> str:
         """
         Submit a GCODE command to the robot, followed by M400 to block until
         done. This method also ensures that any command on the B or C axis
@@ -854,36 +867,30 @@ class SmoothieDriver:
             await self._reset_from_error()
             error_axis = se.ret_code.strip()[-1]
             if not suppress_error_msg:
-                log.warning(
-                        f"alarm/error: command={command}, resp={se.ret_code}")
-            if (GCODE.MOVE in command or GCODE.PROBE in command)\
-               and not suppress_home_after_error:
-                if error_axis not in 'XYZABC':
+                log.warning(f"alarm/error: command={command}, resp={se.ret_code}")
+            if (
+                GCODE.MOVE in command or GCODE.PROBE in command
+            ) and not suppress_home_after_error:
+                if error_axis not in "XYZABC":
                     error_axis = AXES
                 log.info("Homing after alarm/error")
                 await self.home(error_axis)
             raise SmoothieError(se.ret_code, str(command))
 
     async def _send_command_unsynchronized(
-            self, command: CommandBuilder,
-            ack_timeout: float, execute_timeout: float) -> str:
+        self, command: CommandBuilder, ack_timeout: float, execute_timeout: float
+    ) -> str:
         assert self._connection, "There is no connection."
         command_result = ""
         try:
             command_result = await self._connection.send_command(
-                command=command,
-                retries=DEFAULT_COMMAND_RETRIES,
-                timeout=ack_timeout
+                command=command, retries=DEFAULT_COMMAND_RETRIES, timeout=ack_timeout
             )
             wait_command = CommandBuilder(
                 terminator=SMOOTHIE_COMMAND_TERMINATOR
-            ).add_gcode(
-                gcode=GCODE.WAIT
-            )
+            ).add_gcode(gcode=GCODE.WAIT)
             await self._connection.send_command(
-                command=wait_command,
-                retries=0,
-                timeout=execute_timeout
+                command=wait_command, retries=0, timeout=execute_timeout
             )
         except AlarmResponse as e:
             self._handle_return(ret_code=e.response, is_alarm=True)
@@ -892,9 +899,9 @@ class SmoothieDriver:
         return command_result
 
     def _handle_return(
-            self, ret_code: str, is_alarm: bool = False, is_error: bool = False
+        self, ret_code: str, is_alarm: bool = False, is_error: bool = False
     ) -> None:
-        """ Check the return string from smoothie for an error condition.
+        """Check the return string from smoothie for an error condition.
 
         Usually raises a SmoothieError, which can be handled by the error
         handling in write_with_retries. However, if the hard halt line has
@@ -914,7 +921,7 @@ class SmoothieDriver:
         else:
             if is_alarm or is_error:
                 # info-level logging for errors of form "no L instrument found"
-                if 'instrument found' in ret_code.lower():
+                if "instrument found" in ret_code.lower():
                     log.info(f"smoothie: {ret_code}")
                     raise SmoothieError(ret_code)
 
@@ -924,91 +931,108 @@ class SmoothieDriver:
                 # errors like these. if we raise exceptions here, they
                 # overwrite the original exception and we don't properly
                 #  handle it. This hack to get around this is really bad!
-                if 'alarm lock' not in ret_code.lower()\
-                   and 'after halt you should home' not in ret_code.lower():
+                if (
+                    "alarm lock" not in ret_code.lower()
+                    and "after halt you should home" not in ret_code.lower()
+                ):
                     log.error(f"alarm/error outside hard halt: {ret_code}")
                     raise SmoothieError(ret_code)
 
     async def _home_x(self) -> None:
         log.debug("_home_x")
         # move the gantry forward on Y axis with low power
-        self._save_current({'Y': Y_BACKOFF_LOW_CURRENT})
+        self._save_current({"Y": Y_BACKOFF_LOW_CURRENT})
         self.push_axis_max_speed()
-        await self.set_axis_max_speed({'Y': Y_BACKOFF_SLOW_SPEED})
+        await self.set_axis_max_speed({"Y": Y_BACKOFF_SLOW_SPEED})
 
         # move away from the Y endstop switch, then backward half that distance
-        relative_retract_command = _command_builder().add_gcode(
-            # set to relative coordinate system
-            gcode=GCODE.RELATIVE_COORDS
-        ).add_gcode(
-            gcode=GCODE.MOVE
-        ).add_int(
-            # move towards front of machine
-            prefix="Y", value=int(-Y_SWITCH_BACK_OFF_MM)
-        ).add_gcode(
-            gcode=GCODE.MOVE
-        ).add_int(
-            # move towards back of machine
-            prefix="Y", value=int(Y_SWITCH_REVERSE_BACK_OFF_MM)
-        ).add_gcode(
-            # set back to abs coordinate system
-            gcode=GCODE.ABSOLUTE_COORDS
+        relative_retract_command = (
+            _command_builder()
+            .add_gcode(
+                # set to relative coordinate system
+                gcode=GCODE.RELATIVE_COORDS
+            )
+            .add_gcode(gcode=GCODE.MOVE)
+            .add_int(
+                # move towards front of machine
+                prefix="Y",
+                value=int(-Y_SWITCH_BACK_OFF_MM),
+            )
+            .add_gcode(gcode=GCODE.MOVE)
+            .add_int(
+                # move towards back of machine
+                prefix="Y",
+                value=int(Y_SWITCH_REVERSE_BACK_OFF_MM),
+            )
+            .add_gcode(
+                # set back to abs coordinate system
+                gcode=GCODE.ABSOLUTE_COORDS
+            )
         )
 
         command = self._generate_current_command().add_builder(
             builder=relative_retract_command
         )
         await self._send_command(command)
-        self.dwell_axes('Y')
+        self.dwell_axes("Y")
 
         # time it is safe to home the X axis
         try:
             # override firmware's default XY homing speed, to avoid resonance
-            await self.set_axis_max_speed({'X': XY_HOMING_SPEED})
-            self.activate_axes('X')
-            command = self._generate_current_command().add_gcode(
-                gcode=GCODE.HOME
-            ).add_element("X")
+            await self.set_axis_max_speed({"X": XY_HOMING_SPEED})
+            self.activate_axes("X")
+            command = (
+                self._generate_current_command()
+                .add_gcode(gcode=GCODE.HOME)
+                .add_element("X")
+            )
             # home commands are acked after execution rather than queueing, so
             # we want a long ack timeout and a short execution timeout
-            home_timeout = (HOMED_POSITION['X'] / XY_HOMING_SPEED) * 2
+            home_timeout = (HOMED_POSITION["X"] / XY_HOMING_SPEED) * 2
             await self._send_command(command, ack_timeout=home_timeout, timeout=5)
-            await self.update_homed_flags(flags={'X': True})
+            await self.update_homed_flags(flags={"X": True})
         finally:
             await self.pop_axis_max_speed()
-            self.dwell_axes('X')
+            self.dwell_axes("X")
             await self._set_saved_current()
 
     async def _home_y(self) -> None:
         log.debug("_home_y")
         # override firmware's default XY homing speed, to avoid resonance
         self.push_axis_max_speed()
-        await self.set_axis_max_speed({'Y': XY_HOMING_SPEED})
+        await self.set_axis_max_speed({"Y": XY_HOMING_SPEED})
 
-        self.activate_axes('Y')
+        self.activate_axes("Y")
         # home the Y at normal speed (fast)
-        command = self._generate_current_command().add_gcode(
-            gcode=GCODE.HOME
-        ).add_element("Y")
-        fast_home_timeout = (HOMED_POSITION['Y'] / XY_HOMING_SPEED) * 2
+        command = (
+            self._generate_current_command()
+            .add_gcode(gcode=GCODE.HOME)
+            .add_element("Y")
+        )
+        fast_home_timeout = (HOMED_POSITION["Y"] / XY_HOMING_SPEED) * 2
         # home commands are executed before ack, set a long ack timeout
         await self._send_command(command, ack_timeout=fast_home_timeout, timeout=5)
 
         # slow the maximum allowed speed on Y axis
-        await self.set_axis_max_speed({'Y': Y_RETRACT_SPEED})
+        await self.set_axis_max_speed({"Y": Y_RETRACT_SPEED})
 
         # retract, then home, then retract again
-        relative_retract_command = _command_builder().add_gcode(
-            # set to relative coordinate system
-            gcode=GCODE.RELATIVE_COORDS
-        ).add_gcode(
-            gcode=GCODE.MOVE
-        ).add_int(
-            # move 3 millimeters away from switch
-            prefix="Y", value=-Y_RETRACT_DISTANCE
-        ).add_gcode(
-            # set back to abs coordinate system
-            gcode=GCODE.ABSOLUTE_COORDS
+        relative_retract_command = (
+            _command_builder()
+            .add_gcode(
+                # set to relative coordinate system
+                gcode=GCODE.RELATIVE_COORDS
+            )
+            .add_gcode(gcode=GCODE.MOVE)
+            .add_int(
+                # move 3 millimeters away from switch
+                prefix="Y",
+                value=-Y_RETRACT_DISTANCE,
+            )
+            .add_gcode(
+                # set back to abs coordinate system
+                gcode=GCODE.ABSOLUTE_COORDS
+            )
         )
         try:
             await self._send_command(relative_retract_command)
@@ -1017,13 +1041,13 @@ class SmoothieDriver:
             await self._send_command(
                 _command_builder().add_gcode(gcode=GCODE.HOME).add_element("Y"),
                 ack_timeout=slow_timeout,
-                timeout=5)
-            await self.update_homed_flags(flags={'Y': True})
-            await self._send_command(
-                relative_retract_command)
+                timeout=5,
+            )
+            await self.update_homed_flags(flags={"Y": True})
+            await self._send_command(relative_retract_command)
         finally:
             await self.pop_axis_max_speed()  # bring max speeds back to normal
-            self.dwell_axes('Y')
+            self.dwell_axes("Y")
             await self._set_saved_current()
 
     async def _setup(self) -> None:
@@ -1039,9 +1063,9 @@ class SmoothieDriver:
         await self._reset_from_error()
         log.debug("_reset")
         await self.update_steps_per_mm(self._config.gantry_steps_per_mm)
-        await self.update_steps_per_mm({
-            ax: self._config.default_pipette_configs['stepsPerMM']
-            for ax in 'BC'})
+        await self.update_steps_per_mm(
+            {ax: self._config.default_pipette_configs["stepsPerMM"] for ax in "BC"}
+        )
         log.debug("sent steps")
         await self._send_command(
             _command_builder().add_gcode(gcode=GCODE.ABSOLUTE_COORDS)
@@ -1056,15 +1080,13 @@ class SmoothieDriver:
         log.debug("setup done")
 
     def _build_steps_per_mm(self, data: Dict[str, float]) -> CommandBuilder:
-        """ Build the set steps/mm command string without sending """
+        """Build the set steps/mm command string without sending"""
         command = _command_builder()
 
         if not data:
             return command
 
-        command.add_gcode(
-            gcode=GCODE.STEPS_PER_MM
-        )
+        command.add_gcode(gcode=GCODE.STEPS_PER_MM)
         for axis, value in data.items():
             command.add_float(prefix=axis, value=value, precision=None)
         return command
@@ -1099,28 +1121,27 @@ class SmoothieDriver:
         mount:
             String (str) with value 'left' or 'right'
         """
-        allowed_mounts = {'left': 'L', 'right': 'R'}
+        allowed_mounts = {"left": "L", "right": "R"}
         allowed_mount = allowed_mounts.get(mount)
         if not allowed_mount:
-            raise ValueError(f'Unexpected mount: {mount}')
+            raise ValueError(f"Unexpected mount: {mount}")
         try:
             # EMI interference from both plunger motors has been found to
             # prevent the I2C lines from communicating between Smoothieware and
             # pipette's onboard EEPROM. To avoid, turn off both plunger motors
-            await self.disengage_axis('ZABC')
+            await self.disengage_axis("ZABC")
             await self.delay(PIPETTE_READ_DELAY)
             # request from Smoothieware the information from that pipette
             res = await self._send_command(
                 _command_builder().add_gcode(gcode=gcode).add_element(allowed_mount),
-                suppress_error_msg=True)
+                suppress_error_msg=True,
+            )
             if res:
                 parsed_res = parse_utils.parse_instrument_data(res)
                 assert allowed_mount in parsed_res
                 # data is read/written as strings of HEX characters
                 # to avoid firmware weirdness in how it parses GCode arguments
-                return parse_utils.byte_array_to_ascii_string(
-                    parsed_res[allowed_mount]
-                )
+                return parse_utils.byte_array_to_ascii_string(parsed_res[allowed_mount])
         except (ParseError, AssertionError, SmoothieError):
             pass
         return None
@@ -1140,27 +1161,25 @@ class SmoothieDriver:
         data_string:
             String (str) that is of unkown length
         """
-        allowed_mounts = {'left': 'L', 'right': 'R'}
+        allowed_mounts = {"left": "L", "right": "R"}
         allowed_mount = allowed_mounts.get(mount)
         if not allowed_mount:
-            raise ValueError(f'Unexpected mount: {mount}')
+            raise ValueError(f"Unexpected mount: {mount}")
         if not isinstance(data_string, str):
-            raise ValueError(
-                'Expected {0}, not {1}'.format(str, type(data_string)))
+            raise ValueError("Expected {0}, not {1}".format(str, type(data_string)))
         # EMI interference from both plunger motors has been found to
         # prevent the I2C lines from communicating between Smoothieware and
         # pipette's onboard EEPROM. To avoid, turn off both plunger motors
-        await self.disengage_axis('BC')
+        await self.disengage_axis("BC")
         await self.delay(CURRENT_CHANGE_DELAY)
         # data is read/written as strings of HEX characters
         # to avoid firmware weirdness in how it parses GCode arguments
         byte_string = string_to_hex(val=data_string)
-        command = _command_builder().add_gcode(
-            gcode=gcode
-        ).add_element(
-            element=allowed_mount
-        ).add_element(
-            element=byte_string
+        command = (
+            _command_builder()
+            .add_gcode(gcode=gcode)
+            .add_element(element=allowed_mount)
+            .add_element(element=byte_string)
         )
         log.debug(f"_write_to_pipette: {command}")
         await self._send_command(command)
@@ -1169,9 +1188,10 @@ class SmoothieDriver:
 
     # ----------- Public interface ---------------- #
     async def move(  # noqa: C901
-            self,
-            target: Dict[str, float], home_flagged_axes: bool = False,
-            speed: float = None
+        self,
+        target: Dict[str, float],
+        home_flagged_axes: bool = False,
+        speed: float = None,
     ) -> None:
         """
         Move to the `target` Smoothieware coordinate, along any of the size
@@ -1211,40 +1231,42 @@ class SmoothieDriver:
         await self.run_flag.wait()
 
         def valid_movement(axis: str, coord: float) -> bool:
-            """ True if the axis is not disabled and the coord is different
+            """True if the axis is not disabled and the coord is different
             from the current position cache
             """
             return not (
-                    (axis in DISABLE_AXES) or
-                    isclose(coord, self.position[axis],
-                            rel_tol=1e-05, abs_tol=1e-08)
+                (axis in DISABLE_AXES)
+                or isclose(coord, self.position[axis], rel_tol=1e-05, abs_tol=1e-08)
             )
 
         def only_moving(move_target: Dict[str, float]) -> Dict[str, float]:
-            """ Filter a target dict to have only those axes which have valid
+            """Filter a target dict to have only those axes which have valid
             movements"""
-            return {ax: coord for ax, coord in move_target.items()
-                    if valid_movement(ax, coord)}
+            return {
+                ax: coord
+                for ax, coord in move_target.items()
+                if valid_movement(ax, coord)
+            }
 
         def create_coords_list(coords_dict: Dict[str, float]) -> CommandBuilder:
-            """ Build the gcode string for a move """
+            """Build the gcode string for a move"""
             cmd = _command_builder()
             for axis, coords in sorted(coords_dict.items()):
                 if valid_movement(axis, coords):
-                    cmd.add_float(prefix=axis, value=coords,
-                                  precision=GCODE_ROUNDING_PRECISION)
+                    cmd.add_float(
+                        prefix=axis, value=coords, precision=GCODE_ROUNDING_PRECISION
+                    )
             return cmd
 
         moving_target = only_moving(target)
         if not moving_target:
-            log.info(
-                f"No axes move in {target} from position {self.position}")
+            log.info(f"No axes move in {target} from position {self.position}")
             return
 
         backlash_target = {
             axis: value + PLUNGER_BACKLASH_MM
             for axis, value in target.items()
-            if axis in 'BC' and self.position[axis] < value
+            if axis in "BC" and self.position[axis] < value
         }
 
         # whatever else we do to our motion target, if nothing moves in the
@@ -1254,13 +1276,12 @@ class SmoothieDriver:
         # cache which axes move because we might take them out of moving target
         moving_axes = list(moving_target.keys())
 
-        def build_split(
-                here: float, dest: float, split_distance: float) -> float:
-            """ Return the destination for the split move """
+        def build_split(here: float, dest: float, split_distance: float) -> float:
+            """Return the destination for the split move"""
             if dest < here:
-                return max(dest, here-split_distance)
+                return max(dest, here - split_distance)
             else:
-                return min(dest, here+split_distance)
+                return min(dest, here + split_distance)
 
         since_moved = self._axes_moved_at.time_since_moved()
         # generate the split moves if necessary
@@ -1268,7 +1289,8 @@ class SmoothieDriver:
             ax: build_split(
                 self.position[ax],
                 backlash_target.get(ax, moving_target[ax]),
-                split.split_distance)
+                split.split_distance,
+            )
             for ax, split in self._move_split_config.items()
             # a split is only necessary if:
             # - the axis is moving
@@ -1276,49 +1298,52 @@ class SmoothieDriver:
             # - we have a split configuration
             and split
             # - it's been long enough since the last time it moved
-            and ((since_moved[ax] is None)
-                 or (split.after_time < since_moved[ax]))}  # type: ignore
+            and ((since_moved[ax] is None) or (split.after_time < since_moved[ax]))  # type: ignore[operator]  # noqa: E501
+        }
 
         split_command_string = create_coords_list(split_target)
         primary_command_string = create_coords_list(moving_target)
         backlash_command_string = create_coords_list(backlash_target)
 
-        self.dwell_axes(''.join(non_moving_axes))
-        self.activate_axes(''.join(moving_axes))
+        self.dwell_axes("".join(non_moving_axes))
+        self.activate_axes("".join(moving_axes))
 
         checked_speed = speed or self._combined_speed
 
         if split_command_string:
             # set fullstepping if necessary
             split_prefix, split_postfix = self._build_fullstep_configurations(
-                ''.join((ax for ax in split_target.keys()
-                         if self._move_split_config[ax].fullstep))
+                "".join(
+                    (
+                        ax
+                        for ax in split_target.keys()
+                        if self._move_split_config[ax].fullstep
+                    )
+                )
             )
 
             # move at the slowest required speed
-            split_speed = min(split.split_speed
-                              for ax, split in self._move_split_config.items()
-                              if ax in split_target)
+            split_speed = min(
+                split.split_speed
+                for ax, split in self._move_split_config.items()
+                if ax in split_target
+            )
 
             # use the higher current from the split config without changing
             # our global cache
-            split_prefix.add_builder(
-                builder=self._build_speed_command(split_speed)
-            )
+            split_prefix.add_builder(builder=self._build_speed_command(split_speed))
             cached = {}
             for ax in split_target.keys():
                 cached[ax] = self.current[ax]
                 self.current[ax] = self._move_split_config[ax].split_current
-            split_prefix.add_builder(
-                builder=self._generate_current_command()
-            )
+            split_prefix.add_builder(builder=self._generate_current_command())
             for ax in split_target.keys():
                 self.current[ax] = cached[ax]
 
-            split_command = _command_builder().add_gcode(
-                gcode=GCODE.MOVE
-            ).add_builder(
-                builder=split_command_string
+            split_command = (
+                _command_builder()
+                .add_gcode(gcode=GCODE.MOVE)
+                .add_builder(builder=split_command_string)
             )
         else:
             split_prefix = _command_builder()
@@ -1328,36 +1353,24 @@ class SmoothieDriver:
         command = _command_builder()
 
         if split_command_string or (checked_speed != self._combined_speed):
-            command.add_builder(
-                builder=self._build_speed_command(checked_speed)
-            )
+            command.add_builder(builder=self._build_speed_command(checked_speed))
 
         # introduce the standard currents
-        command.add_builder(
-            builder=self._generate_current_command()
-        )
+        command.add_builder(builder=self._generate_current_command())
 
         if backlash_command_string:
-            command.add_gcode(
-                gcode=GCODE.MOVE
-            ).add_builder(
+            command.add_gcode(gcode=GCODE.MOVE).add_builder(
                 builder=backlash_command_string
             )
 
-        command.add_gcode(
-            GCODE.MOVE
-        ).add_builder(
-            builder=primary_command_string
-        )
+        command.add_gcode(GCODE.MOVE).add_builder(builder=primary_command_string)
         if checked_speed != self._combined_speed:
-            command.add_builder(
-                builder=self._build_speed_command(self._combined_speed)
-            )
+            command.add_builder(builder=self._build_speed_command(self._combined_speed))
 
         for axis in target.keys():
             self.engaged_axes[axis] = True
         if home_flagged_axes:
-            await self.home_flagged_axes(''.join(list(target.keys())))
+            await self.home_flagged_axes("".join(list(target.keys())))
 
         async def _do_split():
             try:
@@ -1366,6 +1379,7 @@ class SmoothieDriver:
             finally:
                 if split_postfix:
                     await self._send_command(split_postfix)
+
         try:
             log.debug(f"move: {command}")
             # TODO (hmg) a movement's timeout should be calculated by
@@ -1374,7 +1388,7 @@ class SmoothieDriver:
             await self._send_command(command, timeout=DEFAULT_EXECUTE_TIMEOUT)
         finally:
             # dwell pipette motors because they get hot
-            plunger_axis_moved = ''.join(set('BC') & set(target.keys()))
+            plunger_axis_moved = "".join(set("BC") & set(target.keys()))
             if plunger_axis_moved:
                 self.dwell_axes(plunger_axis_moved)
                 await self._set_saved_current()
@@ -1383,7 +1397,7 @@ class SmoothieDriver:
         self._update_position(target)
 
     async def home(
-            self, axis: str = AXES, disabled: str = DISABLE_AXES
+        self, axis: str = AXES, disabled: str = DISABLE_AXES
     ) -> Dict[str, float]:
 
         await self.run_flag.wait()
@@ -1391,11 +1405,11 @@ class SmoothieDriver:
         axis = axis.upper()
 
         # If Y is requested make sure we home X first
-        if 'Y' in axis:
-            axis += 'X'
+        if "Y" in axis:
+            axis += "X"
         # If horizontal movement is requested, ensure we raise the instruments
-        if 'X' in axis:
-            axis += 'ZA'
+        if "X" in axis:
+            axis += "ZA"
         # These two additions are safe even if they duplicate requested axes
         # because of the use of set operations below, which will de-duplicate
         # characters from the resulting string
@@ -1407,41 +1421,43 @@ class SmoothieDriver:
         # homed. This variable will contain the sequence just explained, but
         # filters out unrequested axes using set intersection (&) and then
         # filters out disabled axes using set difference (-)
-        home_sequence = list(filter(
-            None,
-            [
-                ''.join(set(group) & set(axis) - set(disabled))
-                for group in HOME_SEQUENCE
-            ]))
-
-        non_moving_axes = ''.join(
-            ax for ax in AXES if ax not in home_sequence
+        home_sequence = list(
+            filter(
+                None,
+                [
+                    "".join(set(group) & set(axis) - set(disabled))
+                    for group in HOME_SEQUENCE
+                ],
+            )
         )
+
+        non_moving_axes = "".join(ax for ax in AXES if ax not in home_sequence)
         self.dwell_axes(non_moving_axes)
         log.info(f"Homing axes {axis} in sequence {home_sequence}")
         for axes in home_sequence:
-            if 'X' in axes:
+            if "X" in axes:
                 await self._home_x()
-            elif 'Y' in axes:
+            elif "Y" in axes:
                 await self._home_y()
             else:
                 # if we are homing neither the X nor Y axes, simple home
                 self.activate_axes(axes)
                 await self._do_relative_splits_during_home_for(
-                    ''.join(ax for ax in axes if ax in 'BC'))
+                    "".join(ax for ax in axes if ax in "BC")
+                )
 
                 command = self._generate_current_command()
-                command.add_gcode(
-                    gcode=GCODE.HOME
-                ).add_element(
-                    element=''.join(sorted(axes))
+                command.add_gcode(gcode=GCODE.HOME).add_element(
+                    element="".join(sorted(axes))
                 )
                 try:
                     # home commands are executed before ack, use a long ack
                     # timeout and short execute timeout
                     await self._send_command(
-                        command, ack_timeout=DEFAULT_EXECUTE_TIMEOUT,
-                        timeout=DEFAULT_ACK_TIMEOUT)
+                        command,
+                        ack_timeout=DEFAULT_EXECUTE_TIMEOUT,
+                        timeout=DEFAULT_ACK_TIMEOUT,
+                    )
                     await self.update_homed_flags(flags={ax: True for ax in axes})
                 finally:
                     # always dwell an axis after it has been homed
@@ -1450,10 +1466,7 @@ class SmoothieDriver:
 
         # Only update axes that have been selected for homing
         homed_axes = "".join(home_sequence)
-        homed = {
-            ax: self.homed_position.get(ax)
-            for ax in homed_axes
-        }
+        homed = {ax: self.homed_position.get(ax) for ax in homed_axes}
         await self.update_position(default=homed)
 
         for ax in homed_axes:
@@ -1461,17 +1474,15 @@ class SmoothieDriver:
 
         # coordinate after homing might not sync with default in API
         # so update this driver's homed position using current coordinates
-        new = {
-            ax: self.position[ax]
-            for ax in homed_axes
-        }
+        new = {ax: self.position[ax] for ax in homed_axes}
         self._homed_position.update(new)
         self._axes_moved_at.mark_moved(homed_axes)
         return self.position
 
-    def _build_fullstep_configurations(self, axes: str) \
-            -> Tuple[CommandBuilder, CommandBuilder]:
-        """ For one or more specified pipette axes,
+    def _build_fullstep_configurations(
+        self, axes: str
+    ) -> Tuple[CommandBuilder, CommandBuilder]:
+        """For one or more specified pipette axes,
         build a prefix and postfix command string that will configure
         the step mode and steps/mm value to
         - in the prefix: set full stepping with an appropriate steps/mm
@@ -1485,30 +1496,27 @@ class SmoothieDriver:
         postfix = _command_builder()
         if not axes:
             return prefix, postfix
-        assert all((ax in 'BC' for ax in axes)),\
-            'only plunger axes have controllable microstepping'
+        assert all(
+            (ax in "BC" for ax in axes)
+        ), "only plunger axes have controllable microstepping"
         for ax in axes:
-            prefix.add_gcode(gcode=MICROSTEPPING_GCODES[ax]['DISABLE'])
+            prefix.add_gcode(gcode=MICROSTEPPING_GCODES[ax]["DISABLE"])
         for ax in axes:
-            postfix.add_gcode(gcode=MICROSTEPPING_GCODES[ax]['ENABLE'])
+            postfix.add_gcode(gcode=MICROSTEPPING_GCODES[ax]["ENABLE"])
 
-        prefix.add_builder(builder=self._build_steps_per_mm({
-            ax: self.steps_per_mm[ax] / 32
-            for ax in axes
-        })).add_gcode(
-            gcode=GCODE.DWELL
-        ).add_float(prefix='P', value=0.01, precision=None)
+        prefix.add_builder(
+            builder=self._build_steps_per_mm(
+                {ax: self.steps_per_mm[ax] / 32 for ax in axes}
+            )
+        ).add_gcode(gcode=GCODE.DWELL).add_float(prefix="P", value=0.01, precision=None)
 
-        postfix.add_builder(builder=self._build_steps_per_mm({
-            ax: self.steps_per_mm[ax]
-            for ax in axes
-        })).add_gcode(
-            gcode=GCODE.DWELL
-        ).add_float(prefix='P', value=0.01, precision=None)
+        postfix.add_builder(
+            builder=self._build_steps_per_mm({ax: self.steps_per_mm[ax] for ax in axes})
+        ).add_gcode(gcode=GCODE.DWELL).add_float(prefix="P", value=0.01, precision=None)
         return prefix, postfix
 
     async def _do_relative_splits_during_home_for(self, axes: str):
-        """ Handle split moves for unsticking axes before home.
+        """Handle split moves for unsticking axes before home.
 
         This is particularly ugly bit of code that flips the motor controller
         into relative mode since we don't necessarily know where we are.
@@ -1518,24 +1526,25 @@ class SmoothieDriver:
 
         :param axes: A string that is a sequence of plunger axis names.
         """
-        assert all(ax.lower() in 'bc' for ax in axes),\
-            'only plunger axes may be unstuck'
+        assert all(
+            ax.lower() in "bc" for ax in axes
+        ), "only plunger axes may be unstuck"
         since_moved = self._axes_moved_at.time_since_moved()
-        split_currents = _command_builder().add_gcode(
-            gcode=GCODE.SET_CURRENT
-        )
-        split_moves = _command_builder().add_gcode(
-            gcode=GCODE.MOVE
-        )
+        split_currents = _command_builder().add_gcode(gcode=GCODE.SET_CURRENT)
+        split_moves = _command_builder().add_gcode(gcode=GCODE.MOVE)
         applicable_speeds: List[float] = []
         log.debug(f"Finding splits for {axes} with since moved {since_moved}")
         to_unstick = [
-            ax for ax in axes if
-            (since_moved.get(ax) is None
-             or (
-             self._move_split_config.get(ax)
-             and since_moved[ax]  # type: ignore
-                 > self._move_split_config[ax].after_time))   # type: ignore
+            ax
+            for ax in axes
+            if (
+                since_moved.get(ax) is None
+                or (
+                    self._move_split_config.get(ax)
+                    and since_moved[ax]  # type: ignore
+                    > self._move_split_config[ax].after_time
+                )
+            )  # type: ignore
         ]
         for axis in axes:
             msc = self._move_split_config.get(axis)
@@ -1556,49 +1565,44 @@ class SmoothieDriver:
             # nothing to do
             return
 
-        fullstep_prefix, fullstep_postfix\
-            = self._build_fullstep_configurations(
-                ''.join(to_unstick))
+        fullstep_prefix, fullstep_postfix = self._build_fullstep_configurations(
+            "".join(to_unstick)
+        )
 
         command_sequence = [
-            fullstep_prefix.add_builder(
-                builder=split_currents
-            ).add_gcode(
-                gcode=GCODE.DWELL
-            ).add_float(
-                prefix="P", value=CURRENT_CHANGE_DELAY, precision=None
-            ).add_builder(
-                builder=self._build_speed_command(min(applicable_speeds))
-            ).add_gcode(gcode=GCODE.RELATIVE_COORDS),
-            split_moves
-            ]
+            fullstep_prefix.add_builder(builder=split_currents)
+            .add_gcode(gcode=GCODE.DWELL)
+            .add_float(prefix="P", value=CURRENT_CHANGE_DELAY, precision=None)
+            .add_builder(builder=self._build_speed_command(min(applicable_speeds)))
+            .add_gcode(gcode=GCODE.RELATIVE_COORDS),
+            split_moves,
+        ]
         try:
             for command_string in command_sequence:
                 await self._send_command(
-                    command_string, timeout=DEFAULT_EXECUTE_TIMEOUT,
-                    suppress_home_after_error=True)
+                    command_string,
+                    timeout=DEFAULT_EXECUTE_TIMEOUT,
+                    suppress_home_after_error=True,
+                )
         except SmoothieError:
             pass
         finally:
             await self._send_command(
-                _command_builder().add_gcode(
-                    gcode=GCODE.ABSOLUTE_COORDS
-                ).add_builder(
-                    builder=fullstep_postfix
-                ).add_builder(
-                    builder=self._build_speed_command(self._combined_speed))
+                _command_builder()
+                .add_gcode(gcode=GCODE.ABSOLUTE_COORDS)
+                .add_builder(builder=fullstep_postfix)
+                .add_builder(builder=self._build_speed_command(self._combined_speed))
             )
 
     async def fast_home(self, axis, safety_margin):
-        """ home after a controlled motor stall
+        """home after a controlled motor stall
 
         Given a known distance we have just stalled along an axis, move
         that distance away from the homing switch. Then finish with home.
         """
         # move some mm distance away from the target axes endstop switch(es)
         destination = {
-            ax: self.homed_position.get(ax) - abs(safety_margin)
-            for ax in axis.upper()
+            ax: self.homed_position.get(ax) - abs(safety_margin) for ax in axis.upper()
         }
 
         # there is a chance the axis will hit it's home switch too soon
@@ -1609,11 +1613,12 @@ class SmoothieDriver:
             pass
 
         # then home once we're closer to the endstop(s)
-        disabled = ''.join(ax for ax in AXES if ax not in axis.upper())
+        disabled = "".join(ax for ax in AXES if ax not in axis.upper())
         return await self.home(axis=axis, disabled=disabled)
 
     async def unstick_axes(
-            self, axes: str, distance: float = None, speed: float = None):
+        self, axes: str, distance: float = None, speed: float = None
+    ):
         """
         The plunger axes on OT2 can build up static friction over time and
         when it's cold. To get over this, the robot can move that plunger at
@@ -1631,7 +1636,7 @@ class SmoothieDriver:
         """
         for ax in axes:
             if ax not in AXES:
-                raise ValueError(f'Unknown axes: {axes}')
+                raise ValueError(f"Unknown axes: {axes}")
 
         if distance is None:
             distance = UNSTICK_DISTANCE
@@ -1639,10 +1644,12 @@ class SmoothieDriver:
             speed = UNSTICK_SPEED
 
         self.push_active_current()
-        self.set_active_current({
-            ax: self._config.high_current['default'][ax]  # type: ignore
-            for ax in axes
-            })
+        self.set_active_current(
+            {
+                ax: self._config.high_current["default"][ax]  # type: ignore
+                for ax in axes
+            }
+        )
         self.push_axis_max_speed()
         await self.set_axis_max_speed({ax: speed for ax in axes})
 
@@ -1650,7 +1657,7 @@ class SmoothieDriver:
         state_of_switches = await self.switch_state()
 
         # incase axes is pressing endstop, home it slowly instead of moving
-        homing_axes = ''.join(ax for ax in axes if state_of_switches[ax])
+        homing_axes = "".join(ax for ax in axes if state_of_switches[ax])
         moving_axes = {
             ax: self.position[ax] - distance  # retract
             for ax in axes
@@ -1677,35 +1684,37 @@ class SmoothieDriver:
     async def delay(self, seconds: float):
         # per http://smoothieware.org/supported-g-codes:
         # In grbl mode P is float seconds to comply with gcode standards
-        command = _command_builder().add_gcode(
-            gcode=GCODE.DWELL
-        ).add_float(
-            prefix="P", value=seconds, precision=None
+        command = (
+            _command_builder()
+            .add_gcode(gcode=GCODE.DWELL)
+            .add_float(prefix="P", value=seconds, precision=None)
         )
 
         log.debug(f"delay: {command}")
         await self._send_command(command, timeout=int(seconds) + 1)
 
-    async def probe_axis(
-            self, axis: str, probing_distance: float) -> Dict[str, float]:
+    async def probe_axis(self, axis: str, probing_distance: float) -> Dict[str, float]:
         if axis.upper() in AXES:
             self.engaged_axes[axis] = True
-            command = _command_builder().add_gcode(
-                gcode=GCODE.PROBE
-            ).add_int(
-                prefix="F", value=420   # 420 mm/min (7 mm/sec) to avoid resonance
-            ).add_float(
-                prefix=axis.upper(), value=probing_distance, precision=None
+            command = (
+                _command_builder()
+                .add_gcode(gcode=GCODE.PROBE)
+                .add_int(
+                    prefix="F", value=420  # 420 mm/min (7 mm/sec) to avoid resonance
+                )
+                .add_float(prefix=axis.upper(), value=probing_distance, precision=None)
             )
             log.debug(f"probe_axis: {command}")
             try:
                 await self._send_command(
-                    command=command, ack_timeout=DEFAULT_MOVEMENT_TIMEOUT,
-                    suppress_home_after_error=True)
+                    command=command,
+                    ack_timeout=DEFAULT_MOVEMENT_TIMEOUT,
+                    suppress_home_after_error=True,
+                )
             except SmoothieError as se:
                 log.exception("Tip probe failure")
                 await self.home(axis)
-                if 'probe' in str(se).lower():
+                if "probe" in str(se).lower():
                     raise TipProbeError(se.ret_code, se.command)
                 else:
                     raise
@@ -1724,8 +1733,7 @@ class SmoothieDriver:
         self._gpio_chardev.set_button_light(red=True)
 
     def turn_off_button_light(self):
-        self._gpio_chardev.set_button_light(
-            red=False, green=False, blue=False)
+        self._gpio_chardev.set_button_light(red=False, green=False, blue=False)
 
     def turn_on_rail_lights(self):
         self._gpio_chardev.set_rail_lights(True)
@@ -1749,8 +1757,10 @@ class SmoothieDriver:
             self._gpio_chardev.set_rail_lights(rails)
 
     def get_lights(self) -> Dict[str, bool]:
-        return {'button': self._gpio_chardev.get_button_light()[2],
-                'rails': self._gpio_chardev.get_rail_lights()}
+        return {
+            "button": self._gpio_chardev.get_button_light()[2],
+            "rails": self._gpio_chardev.get_rail_lights(),
+        }
 
     async def kill(self):
         """
@@ -1774,11 +1784,11 @@ class SmoothieDriver:
             axis for axis in axes_string if not self.homed_flags.get(axis)
         ]
         if axes_that_need_to_home:
-            axes_string = ''.join(axes_that_need_to_home)
+            axes_string = "".join(axes_that_need_to_home)
             await self.home(axes_string)
 
     async def _smoothie_reset(self):
-        log.debug(f'Resetting Smoothie (simulating: {self.simulating})')
+        log.debug(f"Resetting Smoothie (simulating: {self.simulating})")
         if self.simulating:
             pass
         else:
@@ -1791,8 +1801,7 @@ class SmoothieDriver:
             await self._reset_from_error()
 
     async def _smoothie_programming_mode(self):
-        log.debug(
-            f'Setting Smoothie to ISP mode (simulating: {self.simulating})')
+        log.debug(f"Setting Smoothie to ISP mode (simulating: {self.simulating})")
         if self.simulating:
             pass
         else:
@@ -1805,7 +1814,7 @@ class SmoothieDriver:
             await asyncio.sleep(0.25)
 
     async def hard_halt(self):
-        log.debug(f'Halting Smoothie (simulating: {self.simulating}')
+        log.debug(f"Halting Smoothie (simulating: {self.simulating}")
         if self.simulating:
             pass
         else:
@@ -1816,10 +1825,12 @@ class SmoothieDriver:
             await asyncio.sleep(0.25)
             self.run_flag.set()
 
-    async def update_firmware(self,  # noqa: C901
-                              filename: str,
-                              loop: asyncio.AbstractEventLoop = None,
-                              explicit_modeset: bool = True) -> str:
+    async def update_firmware(  # noqa: C901
+        self,  # noqa: C901
+        filename: str,
+        loop: asyncio.AbstractEventLoop = None,
+        explicit_modeset: bool = True,
+    ) -> str:
         """
         Program the smoothie board with a given hex file.
 
@@ -1842,8 +1853,7 @@ class SmoothieDriver:
             log.info("Getting port to connect")
             await self._connect_to_port()
 
-        assert self._connection,\
-            'driver must have been initialized with a port'
+        assert self._connection, "driver must have been initialized with a port"
         # get port name
         port = self._connection.port
 
@@ -1855,17 +1865,19 @@ class SmoothieDriver:
             await self._connection.close()
 
         # run lpc21isp, THIS WILL TAKE AROUND 1 MINUTE TO COMPLETE
-        update_cmd = f'lpc21isp -wipe -donotstart {filename} ' \
-                     f'{port} {self._config.serial_speed} 12000'
+        update_cmd = (
+            f"lpc21isp -wipe -donotstart {filename} "
+            f"{port} {self._config.serial_speed} 12000"
+        )
         kwargs: Dict[str, Any] = {
-            'stdout': asyncio.subprocess.PIPE,
-            'stderr': asyncio.subprocess.PIPE}
+            "stdout": asyncio.subprocess.PIPE,
+            "stderr": asyncio.subprocess.PIPE,
+        }
         if loop:
-            kwargs['loop'] = loop
+            kwargs["loop"] = loop
         log.info(update_cmd)
         before = time()
-        proc = await asyncio.create_subprocess_shell(
-            update_cmd, **kwargs)
+        proc = await asyncio.create_subprocess_shell(update_cmd, **kwargs)
         created = time()
         log.info(f"created lpc21isp subproc in {created-before}")
         out_b, err_b = await proc.communicate()
@@ -1873,16 +1885,17 @@ class SmoothieDriver:
         log.info(f"ran lpc21isp subproc in {done-created}")
         if proc.returncode != 0:
             log.error(
-                f"Smoothie update failed: {proc.returncode}"
-                f" {out_b!r} {err_b!r}")
+                f"Smoothie update failed: {proc.returncode}" f" {out_b!r} {err_b!r}"
+            )
             raise RuntimeError(
-                f"Failed to program smoothie: {proc.returncode}: {err_b!r}")
+                f"Failed to program smoothie: {proc.returncode}: {err_b!r}"
+            )
         else:
             log.info("Smoothie update complete")
         try:
             await self._connection.close()
         except Exception:
-            log.exception('Failed to close smoothie connection.')
+            log.exception("Failed to close smoothie connection.")
         # re-open the port
         await self._connection.open()
         # reset smoothieware

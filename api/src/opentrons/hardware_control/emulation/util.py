@@ -3,7 +3,7 @@ from typing import Optional, Generic, TypeVar
 TEMPERATURE_ROOM = 23
 
 
-ValueType = TypeVar('ValueType')
+ValueType = TypeVar("ValueType")
 
 
 class OptionalValue(Generic[ValueType]):
@@ -14,6 +14,7 @@ class OptionalValue(Generic[ValueType]):
     the thermocycler means the hold time is not set:
         H:none T:1.23
     """
+
     _value: Optional[ValueType]
 
     def __init__(self, value: Optional[ValueType] = None):

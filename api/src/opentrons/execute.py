@@ -10,16 +10,16 @@ import argparse
 import logging
 import os
 import sys
-from typing import (Any, Callable, Dict, List, Optional, TextIO, Union,
-                    TYPE_CHECKING)
+from typing import Any, Callable, Dict, List, Optional, TextIO, Union, TYPE_CHECKING
 
 import opentrons
 from opentrons import protocol_api, __version__
 from opentrons.config import IS_ROBOT, JUPYTER_NOTEBOOK_LABWARE_DIR
-from opentrons.protocol_api import (MAX_SUPPORTED_VERSION)
+from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocols.execution import execute as execute_apiv2
-from opentrons.protocols.context.protocol_api.protocol_context import \
-    ProtocolContextImplementation
+from opentrons.protocols.context.protocol_api.protocol_context import (
+    ProtocolContextImplementation,
+)
 from opentrons.commands import types as command_types
 from opentrons.protocols.parse import parse, version_from_string
 from opentrons.protocols.types import PythonProtocol
@@ -36,10 +36,10 @@ _THREAD_MANAGED_HW: Optional[ThreadManager] = None
 
 
 def get_protocol_api(
-        version: Union[str, APIVersion],
-        bundled_labware: Dict[str, 'LabwareDefinition'] = None,
-        bundled_data: Dict[str, bytes] = None,
-        extra_labware: Dict[str, 'LabwareDefinition'] = None,
+    version: Union[str, APIVersion],
+    bundled_labware: Dict[str, "LabwareDefinition"] = None,
+    bundled_data: Dict[str, bytes] = None,
+    extra_labware: Dict[str, "LabwareDefinition"] = None,
 ) -> protocol_api.ProtocolContext:
     """
     Build and return a :py:class:`ProtocolContext` connected to the robot.
@@ -94,35 +94,34 @@ def get_protocol_api(
     if isinstance(version, str):
         checked_version = version_from_string(version)
     elif not isinstance(version, APIVersion):
-        raise TypeError('version must be either a string or an APIVersion')
+        raise TypeError("version must be either a string or an APIVersion")
     else:
         checked_version = version
 
-    if extra_labware is None\
-       and IS_ROBOT\
-       and JUPYTER_NOTEBOOK_LABWARE_DIR.is_dir():  # type: ignore
-        extra_labware = labware_from_paths(
-            [str(JUPYTER_NOTEBOOK_LABWARE_DIR)])
+    if (
+        extra_labware is None
+        and IS_ROBOT
+        and JUPYTER_NOTEBOOK_LABWARE_DIR.is_dir()  # type: ignore[union-attr]
+    ):
+        extra_labware = labware_from_paths([str(JUPYTER_NOTEBOOK_LABWARE_DIR)])
 
     context_imp = ProtocolContextImplementation(
         hardware=_THREAD_MANAGED_HW,
         bundled_labware=bundled_labware,
         bundled_data=bundled_data,
         extra_labware=extra_labware,
-        api_version=checked_version
+        api_version=checked_version,
     )
 
     context = protocol_api.ProtocolContext(
-        implementation=context_imp,
-        api_version=checked_version
+        implementation=context_imp, api_version=checked_version
     )
     context_imp.get_hardware().hardware.cache_instruments()
     return context
 
 
-def get_arguments(
-        parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
-    """ Get the argument parser for this module
+def get_arguments(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
+    """Get the argument parser for this module
 
     Useful if you want to use this module as a component of another CLI program
     and want to add its arguments.
@@ -131,66 +130,83 @@ def get_arguments(
     :returns argparse.ArgumentParser: The parser with arguments added.
     """
     parser.add_argument(
-        '-l', '--log-level',
-        choices=['debug', 'info', 'warning', 'error', 'none'],
-        default='warning',
-        help='Specify the level filter for logs to show on the command line. '
-        'The logs stored in journald or local log files are unaffected by '
-        'this option and should be configured in the config file. If '
-        '\'none\', do not show logs')
+        "-l",
+        "--log-level",
+        choices=["debug", "info", "warning", "error", "none"],
+        default="warning",
+        help="Specify the level filter for logs to show on the command line. "
+        "The logs stored in journald or local log files are unaffected by "
+        "this option and should be configured in the config file. If "
+        "'none', do not show logs",
+    )
     parser.add_argument(
-        '-L', '--custom-labware-path',
-        action='append', default=[os.getcwd()],
-        help='Specify directories to search for custom labware definitions. '
-             'You can specify this argument multiple times. Once you specify '
-             'a directory in this way, labware definitions in that directory '
-             'will become available in ProtocolContext.load_labware(). '
-             'Only directories specified directly by '
-             'this argument are searched, not their children. JSON files that '
-             'do not define labware will be ignored with a message. '
-             'By default, the current directory (the one in which you are '
-             'invoking this program) will be searched for labware.')
+        "-L",
+        "--custom-labware-path",
+        action="append",
+        default=[os.getcwd()],
+        help="Specify directories to search for custom labware definitions. "
+        "You can specify this argument multiple times. Once you specify "
+        "a directory in this way, labware definitions in that directory "
+        "will become available in ProtocolContext.load_labware(). "
+        "Only directories specified directly by "
+        "this argument are searched, not their children. JSON files that "
+        "do not define labware will be ignored with a message. "
+        "By default, the current directory (the one in which you are "
+        "invoking this program) will be searched for labware.",
+    )
     parser.add_argument(
-        '-D', '--custom-data-path',
-        action='append', nargs='?', const='.', default=[],
-        help='Specify directories to search for custom data files. '
-             'You can specify this argument multiple times. Once you specify '
-             'a directory in this way, files located in the specified '
-             'directory will be available in ProtocolContext.bundled_data. '
-             'Note that bundle execution will still only allow data files in '
-             'the bundle. If you specify this without a path, it will '
-             'add the current path implicitly. If you do not specify this '
-             'argument at all, no data files will be added. Any file in the '
-             'specified paths will be loaded into memory and included in the '
-             'bundle if --bundle is passed, so be careful that any directory '
-             'you specify has only the files you want. It is usually a '
-             'better idea to use -d so no files are accidentally included. '
-             'Also note that data files are made available as their name, not '
-             'their full path, so name them uniquely.')
+        "-D",
+        "--custom-data-path",
+        action="append",
+        nargs="?",
+        const=".",
+        default=[],
+        help="Specify directories to search for custom data files. "
+        "You can specify this argument multiple times. Once you specify "
+        "a directory in this way, files located in the specified "
+        "directory will be available in ProtocolContext.bundled_data. "
+        "Note that bundle execution will still only allow data files in "
+        "the bundle. If you specify this without a path, it will "
+        "add the current path implicitly. If you do not specify this "
+        "argument at all, no data files will be added. Any file in the "
+        "specified paths will be loaded into memory and included in the "
+        "bundle if --bundle is passed, so be careful that any directory "
+        "you specify has only the files you want. It is usually a "
+        "better idea to use -d so no files are accidentally included. "
+        "Also note that data files are made available as their name, not "
+        "their full path, so name them uniquely.",
+    )
     parser.add_argument(
-        '-d', '--custom-data-file',
-        action='append', default=[],
-        help='Specify data files to be made available in '
-             'ProtocolContext.bundled_data (and possibly bundled if --bundle '
-             'is passed). Can be specified multiple times with different '
-             'files. It is usually a better idea to use this than -D because '
-             'there is less possibility of accidentally including something.')
+        "-d",
+        "--custom-data-file",
+        action="append",
+        default=[],
+        help="Specify data files to be made available in "
+        "ProtocolContext.bundled_data (and possibly bundled if --bundle "
+        "is passed). Can be specified multiple times with different "
+        "files. It is usually a better idea to use this than -D because "
+        "there is less possibility of accidentally including something.",
+    )
     parser.add_argument(
-        'protocol', metavar='PROTOCOL',
-        type=argparse.FileType('rb'),
-        help='The protocol file to execute. If you pass \'-\', you can pipe '
-        'the protocol via stdin; this could be useful if you want to use this '
-        'utility as part of an automated workflow.')
+        "protocol",
+        metavar="PROTOCOL",
+        type=argparse.FileType("rb"),
+        help="The protocol file to execute. If you pass '-', you can pipe "
+        "the protocol via stdin; this could be useful if you want to use this "
+        "utility as part of an automated workflow.",
+    )
     return parser
 
 
-def execute(protocol_file: TextIO,
-            protocol_name: str,
-            propagate_logs: bool = False,
-            log_level: str = 'warning',
-            emit_runlog: Callable[[Dict[str, Any]], None] = None,
-            custom_labware_paths: List[str] = None,
-            custom_data_paths: List[str] = None):
+def execute(
+    protocol_file: TextIO,
+    protocol_name: str,
+    propagate_logs: bool = False,
+    log_level: str = "warning",
+    emit_runlog: Callable[[Dict[str, Any]], None] = None,
+    custom_labware_paths: List[str] = None,
+    custom_data_paths: List[str] = None,
+):
     """
     Run the protocol itself.
 
@@ -262,7 +278,7 @@ def execute(protocol_file: TextIO,
 
 
     """
-    stack_logger = logging.getLogger('opentrons')
+    stack_logger = logging.getLogger("opentrons")
     stack_logger.propagate = propagate_logs
     stack_logger.setLevel(getattr(logging, log_level.upper(), logging.WARNING))
     contents = protocol_file.read()
@@ -274,33 +290,33 @@ def execute(protocol_file: TextIO,
         extra_data = datafiles_from_paths(custom_data_paths)
     else:
         extra_data = {}
-    protocol = parse(contents, protocol_name,
-                     extra_labware=extra_labware,
-                     extra_data=extra_data)
-    if getattr(protocol, 'api_level', APIVersion(2, 0)) < APIVersion(2, 0):
+    protocol = parse(
+        contents, protocol_name, extra_labware=extra_labware, extra_data=extra_data
+    )
+    if getattr(protocol, "api_level", APIVersion(2, 0)) < APIVersion(2, 0):
         opentrons.robot.connect()
         opentrons.robot.cache_instrument_models()
         opentrons.robot.discover_modules()
         opentrons.robot.home()
         if emit_runlog:
-            opentrons.robot.broker.subscribe(
-                command_types.COMMAND, emit_runlog)
-        assert isinstance(protocol, PythonProtocol),\
-            'Internal error: Only Python protocols may be executed in v1'
+            opentrons.robot.broker.subscribe(command_types.COMMAND, emit_runlog)
+        assert isinstance(
+            protocol, PythonProtocol
+        ), "Internal error: Only Python protocols may be executed in v1"
         exec(protocol.contents, {})
     else:
-        bundled_data = getattr(protocol, 'bundled_data', {})
+        bundled_data = getattr(protocol, "bundled_data", {})
         bundled_data.update(extra_data)
-        gpa_extras = getattr(protocol, 'extra_labware', None) or None
+        gpa_extras = getattr(protocol, "extra_labware", None) or None
         context = get_protocol_api(
-            getattr(protocol, 'api_level', MAX_SUPPORTED_VERSION),
-            bundled_labware=getattr(protocol, 'bundled_labware', None),
+            getattr(protocol, "api_level", MAX_SUPPORTED_VERSION),
+            bundled_labware=getattr(protocol, "bundled_labware", None),
             bundled_data=bundled_data,
-            extra_labware=gpa_extras)
+            extra_labware=gpa_extras,
+        )
         if emit_runlog:
             broker = context.broker
-            broker.subscribe(
-                command_types.COMMAND, emit_runlog)
+            broker.subscribe(command_types.COMMAND, emit_runlog)
         context.home()
         try:
             execute_apiv2.run_protocol(protocol, context)
@@ -316,23 +332,27 @@ def make_runlog_cb():
         nonlocal level
         nonlocal last_dollar
 
-        if last_dollar == command['$']:
-            if command['$'] == 'before':
+        if last_dollar == command["$"]:
+            if command["$"] == "before":
                 level += 1
             else:
                 level -= 1
-        last_dollar = command['$']
-        if command['$'] == 'before':
-            print(' '.join([
-                '\t' * level,
-                command['payload'].get('text', '')
-                .format(**command['payload'])]))
+        last_dollar = command["$"]
+        if command["$"] == "before":
+            print(
+                " ".join(
+                    [
+                        "\t" * level,
+                        command["payload"].get("text", "").format(**command["payload"]),
+                    ]
+                )
+            )
 
     return _print_runlog
 
 
 def main() -> int:
-    """ Handler for command line invocation to run a protocol.
+    """Handler for command line invocation to run a protocol.
 
     :param argv: The arguments the program was invoked with; this is usually
                  :py:attr:`sys.argv` but if you want to override that you can.
@@ -340,27 +360,29 @@ def main() -> int:
                   return code passed to :py:meth:`sys.exit` (0 means success,
                   anything else is a kind of failure).
     """
-    parser = argparse.ArgumentParser(prog='opentrons_execute',
-                                     description='Run an OT-2 protocol')
+    parser = argparse.ArgumentParser(
+        prog="opentrons_execute", description="Run an OT-2 protocol"
+    )
     parser = get_arguments(parser)
     # don't want to add this in get_arguments because if somebody upstream is
     # using that parser they probably want their own version
+    parser.add_argument("-v", "--version", action="version", version=__version__)
     parser.add_argument(
-        '-v', '--version', action='version', version=__version__)
-    parser.add_argument(
-        '-n', '--no-print-runlog', action='store_true',
-        help='Do not print the commands as they are executed')
+        "-n",
+        "--no-print-runlog",
+        action="store_true",
+        help="Do not print the commands as they are executed",
+    )
     args = parser.parse_args()
     printer = None if args.no_print_runlog else make_runlog_cb()
-    if args.log_level != 'none':
-        stack_logger = logging.getLogger('opentrons')
+    if args.log_level != "none":
+        stack_logger = logging.getLogger("opentrons")
         stack_logger.addHandler(logging.StreamHandler(sys.stdout))
         log_level = args.log_level
     else:
-        log_level = 'warning'
+        log_level = "warning"
     # Try to migrate containers from database to v2 format
-    execute(args.protocol, args.protocol.name,
-            log_level=log_level, emit_runlog=printer)
+    execute(args.protocol, args.protocol.name, log_level=log_level, emit_runlog=printer)
     return 0
 
 
@@ -372,5 +394,5 @@ def _clear_cached_hardware_controller():
         _THREAD_MANAGED_HW = None
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())

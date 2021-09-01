@@ -1,7 +1,10 @@
 import asyncio
 import pytest
-from opentrons.hardware_control import (ExecutionManager, ExecutionState,
-                                        ExecutionCancelledError)
+from opentrons.hardware_control import (
+    ExecutionManager,
+    ExecutionState,
+    ExecutionCancelledError,
+)
 
 
 async def test_state_machine(loop):
@@ -45,6 +48,7 @@ async def test_cancel_tasks(loop):
     Test that an execution manager cancels all un-protected
     running asyncio Tasks when cancel is called
     """
+
     async def fake_task():
         while True:
             await asyncio.sleep(1)

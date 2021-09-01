@@ -3,13 +3,14 @@ from typing import Set
 from .types import ExecutionState, ExecutionCancelledError
 
 
-class ExecutionManager():
-    """ This class holds onto a flag that is up/set while the hardware
+class ExecutionManager:
+    """This class holds onto a flag that is up/set while the hardware
     hardware controller is running and down/cleared when the hardware
     controller is "paused".
 
     It also handles loop clean up through its cancel method.
     """
+
     def __init__(self, loop: asyncio.AbstractEventLoop):
         self._state: ExecutionState = ExecutionState.RUNNING
         self._condition = asyncio.Condition(loop=loop)

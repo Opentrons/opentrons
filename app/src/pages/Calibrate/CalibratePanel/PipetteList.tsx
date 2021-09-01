@@ -75,8 +75,7 @@ export function PipetteListComponent(
           hash: string | null
         ): string => {
           const url =
-            urlsByMount[mount][hash ?? 'default'] ??
-            urlsByMount[mount]['default']
+            urlsByMount[mount][hash ?? 'default'] ?? urlsByMount[mount].default
           return url.path
         }
         return (
