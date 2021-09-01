@@ -5,7 +5,6 @@ from decoy import Decoy
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from httpx import AsyncClient
-from pathlib import Path
 
 from tests.helpers import verify_response
 
@@ -14,7 +13,6 @@ from robot_server.service.task_runner import TaskRunner
 from robot_server.protocols import (
     ProtocolStore,
     ProtocolResource,
-    ProtocolFile,
     ProtocolFileType,
     ProtocolNotFoundError,
     ProtocolNotFound,
@@ -135,11 +133,7 @@ async def test_create_protocol_session(
         protocol_id="protocol-id",
         protocol_type=ProtocolFileType.JSON,
         created_at=datetime.now(),
-        files=[Path("/dev/null")],
-    )
-    protocol_file = ProtocolFile(
-        file_type=ProtocolFileType.JSON,
-        file_path=Path("/dev/null"),
+        files=[],
     )
     expected_response = ProtocolSession(
         id=unique_id,
@@ -191,7 +185,7 @@ async def test_create_protocol_session(
 
     decoy.verify(
         await engine_store.create(),
-        engine_store.runner.load(protocol_file),
+        engine_store.runner.load(protocol_resource),
         session_store.upsert(session=session),
     )
 

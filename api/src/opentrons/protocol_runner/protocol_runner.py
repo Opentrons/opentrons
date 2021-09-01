@@ -1,7 +1,7 @@
 """Protocol run control and management."""
-from typing import Optional
+from typing import Optional, Sequence
 
-from opentrons.protocol_engine import ProtocolEngine
+from opentrons.protocol_engine import ProtocolEngine, Command as ProtocolCommand
 
 from .protocol_file import ProtocolFile, ProtocolFileType
 from .task_queue import TaskQueue, TaskQueuePhase
@@ -45,18 +45,23 @@ class ProtocolRunner:
         self._python_context_creator = python_context_creator or PythonContextCreator()
         self._python_executor = python_executor or PythonExecutor()
 
+    @property
+    def engine(self) -> ProtocolEngine:
+        """Get the runner's underlying ProtocolEngine."""
+        return self._protocol_engine
+
     def load(self, protocol_file: ProtocolFile) -> None:
         """Load a ProtocolFile into managed ProtocolEngine.
 
         Calling this method is only necessary if the runner will be used
         to control the run of a file-based protocol.
         """
-        file_type = protocol_file.file_type
+        protocol_type = protocol_file.protocol_type
 
-        if file_type == ProtocolFileType.JSON:
+        if protocol_type == ProtocolFileType.JSON:
             self._load_json(protocol_file)
 
-        elif file_type == ProtocolFileType.PYTHON:
+        elif protocol_type == ProtocolFileType.PYTHON:
             self._load_python(protocol_file)
 
     def play(self) -> None:
@@ -86,6 +91,13 @@ class ProtocolRunner:
         it will wait for the run to start before waiting for completion.
         """
         return await self._task_queue.join()
+
+    async def run(self, protocol_file: ProtocolFile) -> Sequence[ProtocolCommand]:
+        """Run a given protocol to completion."""
+        self.load(protocol_file)
+        self.play()
+        await self.join()
+        return self._protocol_engine.state_view.commands.get_all()
 
     def _load_json(self, protocol_file: ProtocolFile) -> None:
         protocol = self._json_file_reader.read(protocol_file)
