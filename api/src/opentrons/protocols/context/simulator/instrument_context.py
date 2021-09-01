@@ -1,9 +1,10 @@
 import typing
 
-from opentrons import types
+from opentrons import types, APIVersion
 from opentrons.hardware_control import NoTipAttachedError, TipAttachedError
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.hardware_control.types import HardwareAction
+from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocols.api_support.util import FlowRates, PlungerSpeeds, Clearances
 from opentrons.protocols.geometry import planning
@@ -22,6 +23,7 @@ class InstrumentContextSimulation(AbstractInstrument):
         mount: types.Mount,
         instrument_name: str,
         default_speed: float = 400.0,
+        api_version: typing.Optional[APIVersion] = None,
     ):
         """Constructor."""
         self._protocol_interface = protocol_interface
@@ -29,7 +31,9 @@ class InstrumentContextSimulation(AbstractInstrument):
         self._pipette_dict = pipette_dict
         self._instrument_name = instrument_name
         self._default_speed = default_speed
+        self._api_version = api_version or MAX_SUPPORTED_VERSION
         self._flow_rate = FlowRates(self)
+        self._flow_rate.set_defaults(api_level=self._api_version)
         self._plunger_speeds = PlungerSpeeds(self)
         # Cache the maximum instrument height
         self._instrument_max_height = (

@@ -39,7 +39,6 @@ class InstrumentContextImplementation(AbstractInstrument):
         api_version: Optional[APIVersion] = None,
     ):
         """ "Constructor"""
-        # TODO AL 20201110 - Remove need for api_version in this module
         self._api_version = api_version or MAX_SUPPORTED_VERSION
         self._protocol_interface = protocol_interface
         self._mount = mount
