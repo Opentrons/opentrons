@@ -6,6 +6,7 @@ import {
   Text,
   SPACING_3,
   FONT_WEIGHT_SEMIBOLD,
+  C_WHITE,
 } from '@opentrons/components'
 import { protocolHasModules } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
@@ -98,7 +99,12 @@ export function RunSetupCard(): JSX.Element | null {
     },
   }
   return (
-    <Card width="100%" marginTop={SPACING_3} paddingY={SPACING_3}>
+    <Card
+      width="100%"
+      marginTop={SPACING_3}
+      paddingY={SPACING_3}
+      backgroundColor={C_WHITE}
+    >
       <Text as="h2" paddingX={SPACING_3} fontWeight={FONT_WEIGHT_SEMIBOLD}>
         {t('setup_for_run')}
       </Text>

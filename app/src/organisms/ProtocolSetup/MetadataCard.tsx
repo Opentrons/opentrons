@@ -3,7 +3,13 @@ import { format } from 'date-fns'
 
 import { LabeledValue } from '../../atoms/structure'
 
-import { Card, Flex, SPACING_2, SPACING_3 } from '@opentrons/components'
+import {
+  Card,
+  Flex,
+  SPACING_2,
+  SPACING_3,
+  C_WHITE,
+} from '@opentrons/components'
 
 import { useProtocolMetadata } from './hooks'
 import { useTranslation } from 'react-i18next'
@@ -15,7 +21,7 @@ export function MetadataCard(): JSX.Element {
   const { author, lastUpdated, method, description } = useProtocolMetadata()
 
   return (
-    <Card width="100%" padding={SPACING_3}>
+    <Card width="100%" padding={SPACING_3} backgroundColor={C_WHITE}>
       <Flex>
         <LabeledValue
           flex={3}

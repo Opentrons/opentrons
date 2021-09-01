@@ -1,13 +1,19 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { Text, SPACING_3 } from '@opentrons/components'
+import {
+  Text,
+  SPACING_3,
+  FONT_WEIGHT_BOLD,
+  FONT_HEADER_THIN,
+  PrimaryBtn,
+} from '@opentrons/components'
 import * as PipetteOffset from '../../../../redux/calibration/pipette-offset'
 import * as Pipettes from '../../../../redux/pipettes'
 import * as TipLength from '../../../../redux/calibration/tip-length'
-import { formatLastModified } from '../../../CalibrationPanels/utils'
 import * as PipetteConstants from '../../../../redux/pipettes/constants'
 import { DeckCalibration } from './DeckCalibration'
+import { CalibrationItem } from './CalibrationItem'
 
 import type { Dispatch, State } from '../../../../redux/types'
 import type { ViewableRobot } from '../../../../redux/discovery/types'
@@ -36,9 +42,11 @@ export function RobotCalibration(props: Props): JSX.Element {
   return (
     <>
       <DeckCalibration robotName={robotName} />
-      <Text marginTop={SPACING_3}>{t('required_pipettes_title')}</Text>
+      <Text marginTop={SPACING_3} css={FONT_HEADER_THIN}>
+        {t('required_pipettes_title')}
+      </Text>
       <div>
-        {PipetteConstants.PIPETTE_MOUNTS.map(mount => {
+        {PipetteConstants.PIPETTE_MOUNTS.map((mount, index) => {
           const pipetteTipRackData = protocolPipetteTipRackData[mount]
           if (pipetteTipRackData == null) {
             return null
@@ -49,30 +57,25 @@ export function RobotCalibration(props: Props): JSX.Element {
               pipetteTipRackData.exactPipetteMatch === PipetteConstants.MATCH
 
             return (
-              <div key={pipetteTipRackData.pipetteDisplayName}>
-                <span>
-                  {t('mount_title', { mount: mount })}
-                  {pipetteTipRackData.pipetteDisplayName}
-                </span>
-                {attached &&
-                pipetteTipRackData.pipetteCalDate !== undefined &&
-                pipetteTipRackData.pipetteCalDate !== null ? (
-                  <div>
-                    {t('last_calibrated', {
-                      date: formatLastModified(
-                        pipetteTipRackData.pipetteCalDate
-                      ),
-                    })}
-                  </div>
-                ) : (
-                  <div>{t('not_calibrated')}</div>
-                )}
-              </div>
+              <CalibrationItem
+                index={index}
+                title={`${t('mount_title', { mount: mount.toUpperCase() })} ${
+                  pipetteTipRackData.pipetteDisplayName
+                }`}
+                calibratedDate={pipetteTipRackData.pipetteCalDate}
+                calibrated={
+                  attached &&
+                  pipetteTipRackData.pipetteCalDate !== undefined &&
+                  pipetteTipRackData.pipetteCalDate !== null
+                }
+              />
             )
           }
         })}
       </div>
-      <Text marginTop={SPACING_3}>{t('required_tip_racks_title')}</Text>
+      <Text marginTop={SPACING_3} css={FONT_HEADER_THIN}>
+        {t('required_tip_racks_title')}
+      </Text>
       <div>
         {PipetteConstants.PIPETTE_MOUNTS.map(mount => {
           const pipetteTipRackData = protocolPipetteTipRackData[mount]
@@ -81,20 +84,17 @@ export function RobotCalibration(props: Props): JSX.Element {
           } else {
             return (
               <div key={mount}>
-                <span>{pipetteTipRackData.pipetteDisplayName}</span>
-                {pipetteTipRackData.tipRacks.map(tipRack => (
-                  <div key={tipRack.displayName}>
-                    <div>{tipRack.displayName}</div>
-                    {tipRack.lastModifiedDate !== null ? (
-                      <span>
-                        {t('last_calibrated', {
-                          date: formatLastModified(tipRack.lastModifiedDate),
-                        })}
-                      </span>
-                    ) : (
-                      <span>{t('not_calibrated')}</span>
-                    )}
-                  </div>
+                <Text fontWeight={FONT_WEIGHT_BOLD}>
+                  {pipetteTipRackData.pipetteDisplayName}
+                </Text>
+                {pipetteTipRackData.tipRacks.map((tipRack, index) => (
+                  <CalibrationItem
+                    key={index}
+                    index={index}
+                    title={tipRack.displayName}
+                    calibratedDate={tipRack.lastModifiedDate}
+                    calibrated={tipRack.lastModifiedDate !== null}
+                  />
                 ))}
               </div>
             )
