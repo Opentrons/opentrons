@@ -1,4 +1,5 @@
 """Main FastAPI application."""
+import asyncio
 import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -12,6 +13,7 @@ from .router import router
 from .errors import exception_handlers
 from .hardware import initialize_hardware, cleanup_hardware
 from .service import initialize_logging
+from .service.dependencies import get_protocol_manager
 from .service.legacy.rpc import cleanup_rpc_server
 from . import constants
 
@@ -60,8 +62,19 @@ async def on_startup() -> None:
 @app.on_event("shutdown")
 async def on_shutdown() -> None:
     """Handle app shutdown."""
-    await cleanup_rpc_server(app.state)
-    await cleanup_hardware(app.state)
+    protocol_manager = await get_protocol_manager()
+    protocol_manager.remove_all()
+
+    shutdown_results = await asyncio.gather(
+        cleanup_rpc_server(app.state),
+        cleanup_hardware(app.state),
+        return_exceptions=True,
+    )
+
+    shutdown_errors = [r for r in shutdown_results if isinstance(r, BaseException)]
+
+    for e in shutdown_errors:
+        log.warning("Error during shutdown", exc_info=e)
 
 
 @app.middleware("http")
