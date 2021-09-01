@@ -171,6 +171,8 @@ async def test_get_all_protocols(
         files=[json_upload_file],
     )
 
+    await json_upload_file.seek(0)
+
     await subject.create(
         protocol_id="protocol-id-2",
         created_at=created_at_2,
