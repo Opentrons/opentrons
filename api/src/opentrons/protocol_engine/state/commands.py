@@ -167,10 +167,7 @@ class CommandView(HasState[CommandState]):
         all_commands = self._state.commands_by_id.values()
         all_statuses = [c.status for c in all_commands]
 
-        if any(s == CommandStatus.FAILED for s in all_statuses):
-            return EngineStatus.FAILED
-
-        elif self._state.stop_requested:
+        if self._state.stop_requested:
             if all(s == CommandStatus.SUCCEEDED for s in all_statuses):
                 return EngineStatus.SUCCEEDED
 
@@ -179,6 +176,9 @@ class CommandView(HasState[CommandState]):
 
             else:
                 return EngineStatus.STOPPED
+
+        elif any(s == CommandStatus.FAILED for s in all_statuses):
+            return EngineStatus.FAILED
 
         elif not self._state.is_running:
             if all(s == CommandStatus.QUEUED for s in all_statuses):

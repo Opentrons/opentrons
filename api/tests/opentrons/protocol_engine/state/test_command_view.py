@@ -363,7 +363,7 @@ get_status_specs: List[GetStatusSpec] = [
             stop_requested=True,
             commands_by_id=[("command-id", create_failed_command())],
         ),
-        expected_status=EngineStatus.FAILED,
+        expected_status=EngineStatus.STOPPED,
     ),
     GetStatusSpec(
         subject=get_command_view(
@@ -414,6 +414,6 @@ def test_get_status(subject: CommandView, expected_status: EngineStatus) -> None
     5. Stop requested, command still running: STOP_REQUESTED
     6. Stop requested, no running commands, with queued commands: STOPPED
     7. Stop requested, all commands succeeded: SUCCEEDED
-    8. Any failed commands: FAILED
+    8. No stop requested, any failed commands: FAILED
     """
     assert subject.get_status() == expected_status
