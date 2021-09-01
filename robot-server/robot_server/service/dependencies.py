@@ -61,7 +61,7 @@ async def check_version_header(
         description=(
             f"The requested HTTP API version must be at least "
             f"'{constants.MIN_API_VERSION}' or higher. To use the latest "
-            f"version unconditionally, specify {constants.API_VERSION_LATEST}'"
+            f"version unconditionally, specify '{constants.API_VERSION_LATEST}'"
         ),
     ),
 ) -> None:
