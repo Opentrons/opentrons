@@ -97,6 +97,8 @@ def _get_motor_control_serial_port() -> Any:
 
     if port is None:
         smoothie_id = os.environ.get("OT_SMOOTHIE_ID", "AMA")
+        # TODO(mc, 2021-08-01): raise a more informative exception than
+        # IndexError if a valid serial port is not found
         port = get_ports_by_name(device_name=smoothie_id)[0]
 
     log.info(f"Connecting to motor controller at port {port}")
