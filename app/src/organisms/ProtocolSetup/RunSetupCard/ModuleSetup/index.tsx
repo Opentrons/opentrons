@@ -1,8 +1,8 @@
 import * as React from 'react'
-import map from 'lodash/map'
-import isEmpty from 'lodash/isEmpty'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import map from 'lodash/map'
+import isEmpty from 'lodash/isEmpty'
 import {
   Flex,
   Btn,
@@ -21,12 +21,12 @@ import {
   Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
-import { fetchModules, getAttachedModules } from '../../../../redux/modules'
 import {
   getModuleType,
   inferModuleOrientationFromXCoordinate,
 } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
+import { fetchModules, getAttachedModules } from '../../../../redux/modules'
 import { ModuleInfo } from './ModuleInfo'
 import { MultipleModulesModal } from './MultipleModulesModal'
 import styles from '../../styles.css'
@@ -130,27 +130,7 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
                     attachedModule => moduleModel === attachedModule.model
                   )
                   if (isEmpty(modulesByPort)) {
-                    return attached === true ? (
-                      <React.Fragment
-                        key={`LabwareSetup_Module_${moduleModel}_${x}${y}`}
-                      >
-                        <ModuleViz
-                          x={x}
-                          y={y}
-                          orientation={orientation}
-                          moduleType={getModuleType(moduleModel)}
-                        />
-                        <ModuleInfo
-                          x={x}
-                          y={y}
-                          moduleModel={moduleModel}
-                          orientation={orientation}
-                          isAttached={attached}
-                          usbPort={null}
-                          hubPort={null}
-                        />
-                      </React.Fragment>
-                    ) : (
+                    return (
                       <React.Fragment
                         key={`LabwareSetup_Module_${moduleModel}_${x}${y}`}
                       >
@@ -172,49 +152,27 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
                       </React.Fragment>
                     )
                   } else {
-                    return Object.keys(modulesByPort).map(port =>
-                      attached === true ? (
-                        <React.Fragment
-                          key={`LabwareSetup_Module_${moduleModel}_${x}${y}`}
-                        >
-                          <ModuleViz
-                            x={x}
-                            y={y}
-                            orientation={orientation}
-                            moduleType={getModuleType(moduleModel)}
-                          />
-                          <ModuleInfo
-                            x={x}
-                            y={y}
-                            moduleModel={moduleModel}
-                            orientation={orientation}
-                            isAttached={attached}
-                            usbPort={port}
-                            hubPort={port}
-                          />
-                        </React.Fragment>
-                      ) : (
-                        <React.Fragment
-                          key={`LabwareSetup_Module_${moduleModel}_${x}${y}`}
-                        >
-                          <ModuleViz
-                            x={x}
-                            y={y}
-                            orientation={orientation}
-                            moduleType={getModuleType(moduleModel)}
-                          />
-                          <ModuleInfo
-                            x={x}
-                            y={y}
-                            moduleModel={moduleModel}
-                            orientation={orientation}
-                            isAttached={attached}
-                            usbPort={null}
-                            hubPort={null}
-                          />
-                        </React.Fragment>
-                      )
-                    )
+                    return Object.keys(modulesByPort).map(port => (
+                      <React.Fragment
+                        key={`LabwareSetup_Module_${moduleModel}_${x}${y}`}
+                      >
+                        <ModuleViz
+                          x={x}
+                          y={y}
+                          orientation={orientation}
+                          moduleType={getModuleType(moduleModel)}
+                        />
+                        <ModuleInfo
+                          x={x}
+                          y={y}
+                          moduleModel={moduleModel}
+                          orientation={orientation}
+                          isAttached={attached}
+                          usbPort={attached === true ? port : null}
+                          hubPort={attached === true ? port : null}
+                        />
+                      </React.Fragment>
+                    ))
                   }
                 })}
               </>

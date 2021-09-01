@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   Text,
   RobotCoordsForeignDiv,
@@ -16,7 +17,6 @@ import {
   COLOR_ERROR,
   COLOR_SUCCESS,
 } from '@opentrons/components'
-import { useTranslation } from 'react-i18next'
 import {
   getModuleType,
   ModuleModel,
@@ -81,7 +81,7 @@ export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
           {moduleNotAttached
             ? t('no_usb_port_yet')
             : moduleAttachedWithoutUSBNum
-            ? t('usb_port_connected_old')
+            ? t('usb_port_connected_old_server_version')
             : moduleAttachedViaPort
             ? t('usb_port_connected') + ' ' + usbPort
             : moduleAttachedViaHub}

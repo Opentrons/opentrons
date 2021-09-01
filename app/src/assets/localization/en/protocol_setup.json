@@ -45,5 +45,5 @@
   "no_usb_port_yet": "No USB Port Yet",
   "usb_port_connected": "USB Port",
   "hub_connected": "via hub",
-  "usb_port_connected_old": "USB Port Connected"
+  "usb_port_connected_old_server_version": "USB Port Connected"
 }
