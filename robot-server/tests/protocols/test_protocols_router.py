@@ -10,12 +10,7 @@ from robot_server.protocols.protocol_models import Protocol, ProtocolFileType
 from robot_server.protocols.analysis_store import AnalysisStore
 from robot_server.protocols.protocol_analyzer import ProtocolAnalyzer
 from robot_server.protocols.response_builder import ResponseBuilder
-
-from robot_server.protocols.analysis_models import (
-    PendingAnalysis,
-    CompletedAnalysis,
-    AnalysisStatus,
-)
+from robot_server.protocols.analysis_models import PendingAnalysis
 
 from robot_server.protocols.protocol_store import (
     ProtocolStore,
@@ -71,16 +66,8 @@ async def test_get_protocols(
         files=[],
     )
 
-    analysis_1 = PendingAnalysis(id="pending-analyis-id")
-
-    analysis_2 = CompletedAnalysis(
-        id="pending-analyis-id",
-        status=AnalysisStatus.SUCCEEDED,
-        pipettes=[],
-        labware=[],
-        commands=[],
-        errors=[],
-    )
+    analysis_1 = PendingAnalysis(id="analysis-id-abc")
+    analysis_2 = PendingAnalysis(id="analysis-id-123")
 
     protocol_1 = Protocol(
         id="abc",
@@ -127,14 +114,9 @@ async def test_get_protocol_by_id(
         created_at=datetime(year=2021, month=1, day=1),
         files=[],
     )
-    analysis = CompletedAnalysis(
-        id="analysis-id",
-        status=AnalysisStatus.SUCCEEDED,
-        pipettes=[],
-        labware=[],
-        commands=[],
-        errors=[],
-    )
+
+    analysis = PendingAnalysis(id="analysis-id")
+
     protocol = Protocol(
         id="protocol-id",
         createdAt=datetime(year=2021, month=1, day=1),

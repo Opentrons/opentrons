@@ -8,7 +8,7 @@ from .analysis_models import (
     ProtocolAnalysis,
     PendingAnalysis,
     CompletedAnalysis,
-    AnalysisStatus,
+    AnalysisResult,
     AnalysisLabware,
     AnalysisPipette,
 )
@@ -66,16 +66,17 @@ class AnalysisStore:
                         mount=c.data.mount,
                     )
                 )
-            elif c.error is not None:
-                error_messages.append(c.error)
+
+        if len(error_messages) > 0:
+            result = AnalysisResult.ERROR
+        elif any(c.status == pe_commands.CommandStatus.FAILED for c in commands):
+            result = AnalysisResult.NOT_OK
+        else:
+            result = AnalysisResult.OK
 
         self._analyses_by_id[analysis_id] = CompletedAnalysis(
             id=analysis_id,
-            status=(
-                AnalysisStatus.SUCCEEDED
-                if len(error_messages) == 0
-                else AnalysisStatus.FAILED
-            ),
+            result=result,
             commands=list(commands),
             errors=error_messages,
             labware=labware,

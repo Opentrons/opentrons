@@ -4,7 +4,7 @@ from datetime import datetime
 from opentrons.protocol_runner import ProtocolFileType
 from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.protocols.protocol_models import Protocol
-from robot_server.protocols.analysis_models import AnalysisStatus, CompletedAnalysis
+from robot_server.protocols.analysis_models import PendingAnalysis
 from robot_server.protocols.response_builder import ResponseBuilder
 
 
@@ -16,14 +16,8 @@ def test_create_single_json_file_response() -> None:
         created_at=datetime(year=2021, month=1, day=1),
         files=[],
     )
-    protocol_analysis = CompletedAnalysis(
-        id="analysis-id",
-        status=AnalysisStatus.SUCCEEDED,
-        labware=[],
-        pipettes=[],
-        commands=[],
-        errors=[],
-    )
+
+    protocol_analysis = PendingAnalysis(id="analysis-id")
 
     subject = ResponseBuilder()
     result = subject.build(resource=protocol_resource, analyses=[protocol_analysis])

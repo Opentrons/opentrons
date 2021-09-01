@@ -1,8 +1,7 @@
 """Tests for the AnalysisStore interface."""
 import pytest
 from datetime import datetime
-from typing import List, NamedTuple, Sequence, Union, cast
-from typing_extensions import Literal
+from typing import List, NamedTuple, Sequence, cast
 
 from opentrons.types import MountType, DeckSlotName
 from opentrons.protocols.models import LabwareDefinition
@@ -10,7 +9,7 @@ from opentrons.protocol_engine import commands as pe_commands, types as pe_types
 
 from robot_server.protocols.analysis_store import AnalysisStore
 from robot_server.protocols.analysis_models import (
-    AnalysisStatus,
+    AnalysisResult,
     AnalysisPipette,
     AnalysisLabware,
     PendingAnalysis,
@@ -47,7 +46,7 @@ def test_add_errored_analysis() -> None:
     assert result == [
         CompletedAnalysis(
             id="analysis-id",
-            status=AnalysisStatus.FAILED,
+            result=AnalysisResult.ERROR,
             errors=["oh no!"],
             labware=[],
             pipettes=[],
@@ -60,8 +59,7 @@ class CommandAnalysisSpec(NamedTuple):
     """Spec data for command parsing tests."""
 
     commands: Sequence[pe_commands.Command]
-    expected_status: AnalysisStatus
-    expected_errors: List[str]
+    expected_result: AnalysisResult
     expected_labware: List[AnalysisLabware]
     expected_pipettes: List[AnalysisPipette]
 
@@ -86,8 +84,7 @@ command_analysis_specs: List[CommandAnalysisSpec] = [
                 ),
             )
         ],
-        expected_status=AnalysisStatus.SUCCEEDED,
-        expected_errors=[],
+        expected_result=AnalysisResult.OK,
         expected_labware=[
             AnalysisLabware(
                 id="labware-id",
@@ -111,8 +108,7 @@ command_analysis_specs: List[CommandAnalysisSpec] = [
                 result=pe_commands.LoadPipetteResult(pipetteId="pipette-id"),
             )
         ],
-        expected_status=AnalysisStatus.SUCCEEDED,
-        expected_errors=[],
+        expected_result=AnalysisResult.OK,
         expected_labware=[],
         expected_pipettes=[
             AnalysisPipette(
@@ -137,8 +133,7 @@ command_analysis_specs: List[CommandAnalysisSpec] = [
                 error="Oh no!",
             )
         ],
-        expected_status=AnalysisStatus.FAILED,
-        expected_errors=["Oh no!"],
+        expected_result=AnalysisResult.NOT_OK,
         expected_labware=[],
         expected_pipettes=[],
     ),
@@ -148,11 +143,7 @@ command_analysis_specs: List[CommandAnalysisSpec] = [
 @pytest.mark.parametrize(CommandAnalysisSpec._fields, command_analysis_specs)
 def test_add_parses_labware_commands(
     commands: Sequence[pe_commands.Command],
-    expected_status: Union[
-        Literal[AnalysisStatus.SUCCEEDED],
-        Literal[AnalysisStatus.FAILED],
-    ],
-    expected_errors: List[str],
+    expected_result: AnalysisResult,
     expected_labware: List[AnalysisLabware],
     expected_pipettes: List[AnalysisPipette],
 ) -> None:
@@ -166,10 +157,10 @@ def test_add_parses_labware_commands(
     assert result == [
         CompletedAnalysis(
             id="analysis-id",
-            status=expected_status,
-            errors=expected_errors,
+            result=expected_result,
             labware=expected_labware,
             pipettes=expected_pipettes,
             commands=list(commands),
+            errors=[],
         )
     ]

@@ -17,8 +17,26 @@ class AnalysisStatus(str, Enum):
     """Status of a protocol analysis."""
 
     PENDING = "pending"
-    FAILED = "failed"
-    SUCCEEDED = "succeeded"
+    COMPLETED = "completed"
+
+
+class AnalysisResult(str, Enum):
+    """Result of a completed protocol analysis.
+
+    The result indicates whether the protocol is expected to run successfully.
+
+    Properties:
+        OK: No problems were found during protocol analysis.
+        NOT_OK: Problems were found with the logic of the protocol itself.
+            Inspect `analysis.commands` for commands that did not succeed.
+        ERROR: An error prevented the analysis from determining a conclusive
+            result, most likely due to a bug in the protocol's Python source
+            (for example, a syntax error). Inspect `analysis.errors`.
+    """
+
+    OK = "ok"
+    NOT_OK = "not-ok"
+    ERROR = "error"
 
 
 class AnalysisSummary(BaseModel):
@@ -72,10 +90,8 @@ class CompletedAnalysis(AnalysisSummary):
         JSON protocols are currently deterministic by design.
     """
 
-    status: Union[
-        Literal[AnalysisStatus.SUCCEEDED],
-        Literal[AnalysisStatus.FAILED],
-    ] = Field(
+    status: Literal[AnalysisStatus.COMPLETED] = AnalysisStatus.COMPLETED
+    result: AnalysisResult = Field(
         ...,
         description="Whether the protocol is expected to run successfully",
     )
@@ -96,7 +112,7 @@ class CompletedAnalysis(AnalysisSummary):
     # errors, and unexpected errors due to Opentrons-sourced bugs
     errors: List[str] = Field(
         ...,
-        description="Any expected run errors or problems with the analysis",
+        description="Any problems that prevented a conclusive analysis",
     )
 
 
