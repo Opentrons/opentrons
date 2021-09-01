@@ -5,7 +5,21 @@
   "definitions": {
     "pipetteName": {
       "description": "Name of a pipette. Does not contain info about specific model/version. Should match keys in pipetteNameSpecs.json file",
-      "type": "string"
+      "type": "string",
+      "enum": [
+        "p10_single",
+        "p10_multi",
+        "p20_single_gen2",
+        "p20_multi_gen2",
+        "p50_single",
+        "p50_multi",
+        "p300_single",
+        "p300_multi",
+        "p300_single_gen2",
+        "p300_multi_gen2",
+        "p1000_single",
+        "p1000_single_gen2"
+      ]
     },
 
     "moduleOnlyParams": {
@@ -218,7 +232,7 @@
     },
 
     "liquid": {
-      "description": "All instances of liquid protocol",
+      "description": "All instances of liquid used in this protocol",
       "patternProperties": {
         ".+": {
           "description": "Fields describing a single liquid, keyed by a unique identifier",
@@ -268,7 +282,7 @@
             "additionalProperties": false,
             "properties": {
               "command": {
-                "enum": ["aspirate", "dispense", "airGap"]
+                "enum": ["aspirate", "dispense", "aspirateAirGap", "dispenseAirGap"]
               },
               "params": {
                 "allOf": [
