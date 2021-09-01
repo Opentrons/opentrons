@@ -70,7 +70,7 @@ clean:
 teardown:
 	$(pipenv) --rm
 
-dist/robotserver-%-py2.py3-none-any.whl: setup.py $(ot_sources)
+dist/robot_server-%-py2.py3-none-any.whl: setup.py $(ot_sources)
 	$(clean_cmd)
 	$(python) setup.py $(wheel_opts) bdist_wheel
 	$(SHX) rm -rf build
