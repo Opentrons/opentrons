@@ -1,20 +1,18 @@
 """Main FastAPI application."""
 import logging
-
-from opentrons import __version__
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import Response
 from starlette.requests import Request
 from starlette.middleware.base import RequestResponseEndpoint
 
-from .service.dependencies import get_protocol_manager, get_session_manager
-from .service.legacy.rpc import cleanup_rpc_server
+from opentrons import __version__
 
-from .errors import exception_handlers
 from .router import router
-from .service import initialize_logging
+from .errors import exception_handlers
 from .hardware import initialize_hardware, cleanup_hardware
+from .service import initialize_logging
+from .service.legacy.rpc import cleanup_rpc_server
 from . import constants
 
 log = logging.getLogger(__name__)
@@ -62,11 +60,6 @@ async def on_startup() -> None:
 @app.on_event("shutdown")
 async def on_shutdown() -> None:
     """Handle app shutdown."""
-    # Remove all sessions
-    await (await get_session_manager()).remove_all()
-    # Remove all uploaded protocols
-    (await get_protocol_manager()).remove_all()
-
     await cleanup_rpc_server(app.state)
     await cleanup_hardware(app.state)
 
