@@ -17,8 +17,7 @@ class SerialNoResponse(Exception):
 def get_ports_by_name(device_name):
     """Returns all serial devices with a given name"""
     filtered_devices = filter(
-        lambda device: device_name in device[1],
-        list_ports.comports()
+        lambda device: device_name in device[1], list_ports.comports()
     )
     device_ports = [device[0] for device in filtered_devices]
     return device_ports
@@ -66,26 +65,26 @@ def _write_to_device_and_return(cmd, ack, device_connection, tag=None):
 
     encoded_write = cmd.encode()
     encoded_ack = ack.encode()
-    log.debug(f'{tag}: Write -> {encoded_write}')
+    log.debug(f"{tag}: Write -> {encoded_write}")
     device_connection.write(encoded_write)
     response = device_connection.read_until(encoded_ack)
-    log.debug(f'{tag}: Read <- {response}')
+    log.debug(f"{tag}: Read <- {response}")
     if encoded_ack not in response:
-        log.warning(f'{tag}: timed out after {device_connection.timeout}')
+        log.warning(f"{tag}: timed out after {device_connection.timeout}")
         raise SerialNoResponse(
-            'No response from serial port after {} second(s)'.format(
-                device_connection.timeout))
+            "No response from serial port after {} second(s)".format(
+                device_connection.timeout
+            )
+        )
     clean_response = _parse_serial_response(response, encoded_ack)
     if clean_response:
         return clean_response.decode()
-    return ''
+    return ""
 
 
 def _connect(port_name, baudrate):
     ser = serial.serial_for_url(
-        url=port_name,
-        baudrate=baudrate,
-        timeout=DEFAULT_SERIAL_TIMEOUT
+        url=port_name, baudrate=baudrate, timeout=DEFAULT_SERIAL_TIMEOUT
     )
     log.debug(ser)
     return ser
@@ -101,20 +100,18 @@ def _attempt_command_recovery(command, ack, serial_conn, tag=None):
         log.debug(f"{tag}: No valid response during _attempt_command_recovery")
         raise RuntimeError(
             "Recovery attempted - no valid serial response "
-            "for command: {} in {} seconds".format(
-                command.encode(), RECOVERY_TIMEOUT))
+            "for command: {} in {} seconds".format(command.encode(), RECOVERY_TIMEOUT)
+        )
     return response
 
 
 def write_and_return(
-        command, ack, serial_connection,
-        timeout=DEFAULT_WRITE_TIMEOUT, tag=None):
+    command, ack, serial_connection, timeout=DEFAULT_WRITE_TIMEOUT, tag=None
+):
     """Write a command and return the response"""
     clear_buffer(serial_connection)
-    with serial_with_temp_timeout(
-            serial_connection, timeout) as device_connection:
-        response = _write_to_device_and_return(
-            command, ack, device_connection, tag)
+    with serial_with_temp_timeout(serial_connection, timeout) as device_connection:
+        response = _write_to_device_and_return(command, ack, device_connection, tag)
     return response
 
 

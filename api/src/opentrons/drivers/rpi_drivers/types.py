@@ -12,18 +12,18 @@ class PinDir(enum.Enum):
     output = enum.auto()
 
 
-REV_OG_USB_PORTS = {'3': 1, '5': 2}
+REV_OG_USB_PORTS = {"3": 1, "5": 2}
 REV_A_USB_HUB = 3
 
 
 @dataclass(frozen=True)
 class USBPort(GenericNode):
     port_number: Optional[int] = None
-    device_path: str = ''
+    device_path: str = ""
     hub: Optional[int] = None
 
     @classmethod
-    def build(cls, port_path: str, board_revision: BoardRevision) -> 'USBPort':
+    def build(cls, port_path: str, board_revision: BoardRevision) -> "USBPort":
         """
         Build a USBPort dataclass.
 
@@ -33,21 +33,16 @@ class USBPort(GenericNode):
         :param port_path: Full path of a usb device
         :returns: Tuple of the port number, hub and name
         """
-        full_name, device_path = port_path.split(':')
+        full_name, device_path = port_path.split(":")
         port_nodes = cls.get_unique_nodes(full_name)
         *port_info, name = cls.find_hub(port_nodes)
         hub, port = cls.map_to_revision(board_revision, port_info)
         return cls(
-            name=name,
-            port_number=port,
-            sub_names=[],
-            device_path=device_path,
-            hub=hub)
+            name=name, port_number=port, sub_names=[], device_path=device_path, hub=hub
+        )
 
     @staticmethod
-    def find_hub(
-            port_nodes: List[str]
-            ) -> Tuple[Optional[int], int, str]:
+    def find_hub(port_nodes: List[str]) -> Tuple[Optional[int], int, str]:
         """
         Find Hub.
 
@@ -66,12 +61,12 @@ class USBPort(GenericNode):
         :returns: Tuple of the port number, hub and name
         """
         if len(port_nodes) > 1:
-            port_info = port_nodes[1].split('.')
+            port_info = port_nodes[1].split(".")
             hub: Optional[int] = int(port_info[1])
             port = int(port_info[2])
             name = port_nodes[1]
         else:
-            port = int(port_nodes[0].split('.')[1])
+            port = int(port_nodes[0].split(".")[1])
             hub = None
             name = port_nodes[0]
         return hub, port, name
@@ -91,15 +86,15 @@ class USBPort(GenericNode):
         :returns: List of separated USB port paths
         """
         port_nodes = []
-        for node in full_name.split('/'):
+        for node in full_name.split("/"):
             if node not in port_nodes:
                 port_nodes.append(node)
         return port_nodes
 
     @staticmethod
     def map_to_revision(
-            board_revision: BoardRevision,
-            port_info: List) -> Tuple[Optional[int], int]:
+        board_revision: BoardRevision, port_info: List
+    ) -> Tuple[Optional[int], int]:
         hub, port = port_info
         if board_revision == BoardRevision.OG:
             if hub:
@@ -125,24 +120,25 @@ class USBPort(GenericNode):
 
 
 class GPIOPin:
-
     @classmethod
     def build(cls, name: str, in_out: PinDir, pin: int):
         # use this method if the pin number is the same
         # across all board revisions
-        return cls(name, in_out, rev_og=pin,
-                   rev_a=pin, rev_b=pin, rev_c=pin)
+        return cls(name, in_out, rev_og=pin, rev_a=pin, rev_b=pin, rev_c=pin)
 
     @classmethod
-    def build_with_rev(cls, name: str, in_out: PinDir,
-                       **kwargs):
+    def build_with_rev(cls, name: str, in_out: PinDir, **kwargs):
         return cls(name, in_out, **kwargs)
 
-    def __init__(self, name: str, in_out: PinDir,
-                 rev_og: Optional[int] = None,
-                 rev_a: Optional[int] = None,
-                 rev_b: Optional[int] = None,
-                 rev_c: Optional[int] = None):
+    def __init__(
+        self,
+        name: str,
+        in_out: PinDir,
+        rev_og: Optional[int] = None,
+        rev_a: Optional[int] = None,
+        rev_b: Optional[int] = None,
+        rev_c: Optional[int] = None,
+    ):
         self.name = name
         self.in_out = in_out
         self.rev_og = rev_og
@@ -156,7 +152,8 @@ class GPIOPin:
             BoardRevision.A: self.rev_a,
             BoardRevision.B: self.rev_b,
             BoardRevision.C: self.rev_c,
-            BoardRevision.UNKNOWN: self.rev_og}
+            BoardRevision.UNKNOWN: self.rev_og,
+        }
         return ref[board_rev]
 
 
@@ -168,12 +165,10 @@ class GPIOGroup:
         return next(filter(lambda x: x.name is item, self.pins), None)
 
     def by_type(self, pin_dir: PinDir):
-        return GPIOGroup(list(
-            filter(lambda x: x.in_out is pin_dir, self.pins)))
+        return GPIOGroup(list(filter(lambda x: x.in_out is pin_dir, self.pins)))
 
     def by_names(self, names: List[str]):
-        return GPIOGroup(list(
-            filter(lambda x: x.name in names, self.pins)))
+        return GPIOGroup(list(filter(lambda x: x.name in names, self.pins)))
 
     def group_by_pins(self, board_rev: BoardRevision) -> List:
         c = groupby(self.pins, key=lambda x: x.by_board_rev(board_rev))
@@ -183,23 +178,24 @@ class GPIOGroup:
         return l
 
 
-gpio_group = GPIOGroup([
+gpio_group = GPIOGroup(
+    [
         # revision pins (input)
-        GPIOPin.build('rev_0', PinDir.rev_input, 17),
-        GPIOPin.build('rev_1', PinDir.rev_input, 27),
+        GPIOPin.build("rev_0", PinDir.rev_input, 17),
+        GPIOPin.build("rev_1", PinDir.rev_input, 27),
         # output pins
-        GPIOPin.build('frame_leds', PinDir.output, 6),
-        GPIOPin.build('blue_button', PinDir.output, 13),
-        GPIOPin.build('halt', PinDir.output, 18),
-        GPIOPin.build('green_button', PinDir.output, 19),
-        GPIOPin.build('audio_enable', PinDir.output, 21),
-        GPIOPin.build('isp', PinDir.output, 23),
-        GPIOPin.build('reset', PinDir.output, 24),
-        GPIOPin.build('red_button', PinDir.output, 26),
+        GPIOPin.build("frame_leds", PinDir.output, 6),
+        GPIOPin.build("blue_button", PinDir.output, 13),
+        GPIOPin.build("halt", PinDir.output, 18),
+        GPIOPin.build("green_button", PinDir.output, 19),
+        GPIOPin.build("audio_enable", PinDir.output, 21),
+        GPIOPin.build("isp", PinDir.output, 23),
+        GPIOPin.build("reset", PinDir.output, 24),
+        GPIOPin.build("red_button", PinDir.output, 26),
         # input pins
-        GPIOPin.build('button_input', PinDir.input, 5),
-        GPIOPin.build_with_rev('door_sw_filt', PinDir.input,
-                               rev_og=20, rev_a=12),
-        GPIOPin.build_with_rev('window_sw_filt', PinDir.input,
-                               rev_og=20, rev_a=16),
-        GPIOPin.build('window_door_sw', PinDir.input, 20)])
+        GPIOPin.build("button_input", PinDir.input, 5),
+        GPIOPin.build_with_rev("door_sw_filt", PinDir.input, rev_og=20, rev_a=12),
+        GPIOPin.build_with_rev("window_sw_filt", PinDir.input, rev_og=20, rev_a=16),
+        GPIOPin.build("window_door_sw", PinDir.input, 20),
+    ]
+)

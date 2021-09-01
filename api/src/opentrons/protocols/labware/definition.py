@@ -5,20 +5,22 @@ import shutil
 from dataclasses import dataclass
 
 from pathlib import Path
-from typing import (
-    Any, AnyStr, List, Dict, Union)
+from typing import Any, AnyStr, List, Dict, Union
 
 import jsonschema  # type: ignore
 
 from opentrons.protocols.api_support.util import ModifiedList
 from opentrons.calibration_storage import helpers, modify
-from opentrons.protocols.context.labware import \
-    AbstractLabware
+from opentrons.protocols.context.labware import AbstractLabware
 from opentrons.types import Point
 from opentrons_shared_data import load_shared_data, get_shared_data_root
 from opentrons.protocols.geometry.deck_item import DeckItem
 from opentrons.protocols.api_support.constants import (
-    OPENTRONS_NAMESPACE, CUSTOM_NAMESPACE, STANDARD_DEFS_PATH, USER_DEFS_PATH)
+    OPENTRONS_NAMESPACE,
+    CUSTOM_NAMESPACE,
+    STANDARD_DEFS_PATH,
+    USER_DEFS_PATH,
+)
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 
@@ -30,7 +32,7 @@ def get_labware_definition(
     namespace: str = None,
     version: int = None,
     bundled_defs: Dict[str, LabwareDefinition] = None,
-    extra_defs: Dict[str, LabwareDefinition] = None
+    extra_defs: Dict[str, LabwareDefinition] = None,
 ) -> LabwareDefinition:
     """
     Look up and return a definition by load_name + namespace + version and
@@ -50,18 +52,19 @@ def get_labware_definition(
 
     if bundled_defs is not None:
         return _get_labware_definition_from_bundle(
-            bundled_defs, load_name, namespace, version)
+            bundled_defs, load_name, namespace, version
+        )
 
     checked_extras = extra_defs or {}
 
     try:
         return _get_labware_definition_from_bundle(
-            checked_extras, load_name, namespace, version)
+            checked_extras, load_name, namespace, version
+        )
     except (FileNotFoundError, RuntimeError):
         pass
 
-    return _get_standard_labware_definition(
-        load_name, namespace, version)
+    return _get_standard_labware_definition(load_name, namespace, version)
 
 
 def get_all_labware_definitions() -> List[str]:
@@ -88,9 +91,7 @@ def get_all_labware_definitions() -> List[str]:
 
 
 def save_definition(
-    labware_def: LabwareDefinition,
-    force: bool = False,
-    location: Path = None
+    labware_def: LabwareDefinition, force: bool = False, location: Path = None
 ) -> None:
     """
     Save a labware definition
@@ -100,38 +101,41 @@ def save_definition(
         Cannot overwrite Opentrons definitions.
     :param location: File path
     """
-    namespace = labware_def['namespace']
-    load_name = labware_def['parameters']['loadName']
-    version = labware_def['version']
+    namespace = labware_def["namespace"]
+    load_name = labware_def["parameters"]["loadName"]
+    version = labware_def["version"]
 
     verify_definition(labware_def)
 
     if not namespace or not load_name or not version:
         raise RuntimeError(
-            'Could not save definition, labware def is missing a field: ' +
-            f'{namespace}, {load_name}, {version}')
+            "Could not save definition, labware def is missing a field: "
+            + f"{namespace}, {load_name}, {version}"
+        )
 
     if namespace == OPENTRONS_NAMESPACE:
         raise RuntimeError(
-            f'Saving definitions to the "{OPENTRONS_NAMESPACE}" namespace ' +
-            'is not permitted')
+            f'Saving definitions to the "{OPENTRONS_NAMESPACE}" namespace '
+            + "is not permitted"
+        )
 
     def_path = _get_path_to_labware(load_name, namespace, version, location)
 
     if not force and def_path.is_file():
         raise RuntimeError(
-            f'The given definition ({namespace}/{load_name} v{version}) ' +
-            'already exists. Cannot save definition without force=True')
+            f"The given definition ({namespace}/{load_name} v{version}) "
+            + "already exists. Cannot save definition without force=True"
+        )
 
     Path(def_path).parent.mkdir(parents=True, exist_ok=True)
-    with open(def_path, 'w') as f:
+    with open(def_path, "w") as f:
         json.dump(labware_def, f)
 
 
-def verify_definition(contents: Union[
-        AnyStr, LabwareDefinition, Dict[str, Any]])\
-        -> LabwareDefinition:
-    """ Verify that an input string is a labware definition and return it.
+def verify_definition(
+    contents: Union[AnyStr, LabwareDefinition, Dict[str, Any]]
+) -> LabwareDefinition:
+    """Verify that an input string is a labware definition and return it.
 
     If the definition is invalid, an exception is raised; otherwise parse the
     json and return the valid definition.
@@ -140,7 +144,7 @@ def verify_definition(contents: Union[
     :raises jsonschema.ValidationError: If the definition is not valid.
     :returns: The parsed definition
     """
-    schema_body = load_shared_data('labware/schemas/2.json').decode('utf-8')
+    schema_body = load_shared_data("labware/schemas/2.json").decode("utf-8")
     labware_schema_v2 = json.loads(schema_body)
 
     if isinstance(contents, dict):
@@ -159,16 +163,14 @@ def delete_all_custom_labware() -> None:
         shutil.rmtree(USER_DEFS_PATH)
 
 
-def save_calibration(
-        labware: AbstractLabware,
-        delta: Point) -> None:
+def save_calibration(labware: AbstractLabware, delta: Point) -> None:
     """Save a calibration"""
     index_info = IndexFileInformation.from_labware(labware)
     modify.save_labware_calibration(
         labware_path=index_info.path,
         definition=index_info.definition,
         delta=delta,
-        parent=index_info.parent
+        parent=index_info.parent,
     )
     labware.set_calibration(delta=delta)
 
@@ -194,33 +196,34 @@ def _get_labware_definition_from_bundle(
     load_name = load_name.lower()
 
     bundled_candidates = [
-        b for b in bundled_labware.values()
-        if b['parameters']['loadName'] == load_name]
+        b for b in bundled_labware.values() if b["parameters"]["loadName"] == load_name
+    ]
     if namespace:
         namespace = namespace.lower()
         bundled_candidates = [
-            b for b in bundled_candidates if b['namespace'] == namespace]
+            b for b in bundled_candidates if b["namespace"] == namespace
+        ]
     if version:
-        bundled_candidates = [
-            b for b in bundled_candidates if b['version'] == version]
+        bundled_candidates = [b for b in bundled_candidates if b["version"] == version]
 
     if len(bundled_candidates) == 1:
         return bundled_candidates[0]
     elif len(bundled_candidates) > 1:
         raise RuntimeError(
-            f'Ambiguous labware access. Bundle contains multiple '
-            f'labware with load name {load_name}, '
-            f'namespace {namespace}, and version {version}.')
+            f"Ambiguous labware access. Bundle contains multiple "
+            f"labware with load name {load_name}, "
+            f"namespace {namespace}, and version {version}."
+        )
     else:
         raise RuntimeError(
-            f'No labware found in bundle with load name {load_name}, '
-            f'namespace {namespace}, and version {version}.')
+            f"No labware found in bundle with load name {load_name}, "
+            f"namespace {namespace}, and version {version}."
+        )
 
 
 def _get_standard_labware_definition(
-        load_name: str,
-        namespace: str = None,
-        version: int = None) -> LabwareDefinition:
+    load_name: str, namespace: str = None, version: int = None
+) -> LabwareDefinition:
 
     if version is None:
         checked_version = 1
@@ -243,19 +246,21 @@ def _get_standard_labware_definition(
         for fallback_namespace in [OPENTRONS_NAMESPACE, CUSTOM_NAMESPACE]:
             try:
                 return _get_standard_labware_definition(
-                    load_name, fallback_namespace, checked_version)
+                    load_name, fallback_namespace, checked_version
+                )
             except FileNotFoundError:
                 pass
 
-        raise FileNotFoundError(error_msg_string.format(
-                load_name, checked_version, OPENTRONS_NAMESPACE))
+        raise FileNotFoundError(
+            error_msg_string.format(load_name, checked_version, OPENTRONS_NAMESPACE)
+        )
 
     namespace = namespace.lower()
     def_path = _get_path_to_labware(load_name, namespace, checked_version)
 
     try:
-        with open(def_path, 'rb') as f:
-            labware_def = json.loads(f.read().decode('utf-8'))
+        with open(def_path, "rb") as f:
+            labware_def = json.loads(f.read().decode("utf-8"))
     except FileNotFoundError:
         raise FileNotFoundError(
             f'Labware "{load_name}" not found with version {checked_version} '
@@ -278,7 +283,7 @@ def _get_parent_identifier(labware: AbstractLabware) -> str:
         # treat a given labware on a given module type as same
         return parent.load_name
     else:
-        return ''  # treat all slots as same
+        return ""  # treat all slots as same
 
 
 def get_labware_hash(labware: AbstractLabware) -> str:
@@ -286,13 +291,13 @@ def get_labware_hash(labware: AbstractLabware) -> str:
 
 
 def get_labware_hash_with_parent(labware: AbstractLabware) -> str:
-    return helpers.hash_labware_def(
-        labware.get_definition()
-    ) + _get_parent_identifier(labware)
+    return helpers.hash_labware_def(labware.get_definition()) + _get_parent_identifier(
+        labware
+    )
 
 
 def _get_labware_path(labware: AbstractLabware) -> str:
-    return f'{get_labware_hash_with_parent(labware)}.json'
+    return f"{get_labware_hash_with_parent(labware)}.json"
 
 
 @dataclass(frozen=True)
@@ -302,22 +307,23 @@ class IndexFileInformation:
     path: str
 
     @classmethod
-    def from_labware(cls, labware: AbstractLabware) -> 'IndexFileInformation':
+    def from_labware(cls, labware: AbstractLabware) -> "IndexFileInformation":
         return IndexFileInformation(
             definition=labware.get_definition(),
             path=_get_labware_path(labware),
-            parent=_get_parent_identifier(labware)
+            parent=_get_parent_identifier(labware),
         )
 
 
 def _get_path_to_labware(
-        load_name: str, namespace: str, version: int, base_path: Path = None
-        ) -> Path:
+    load_name: str, namespace: str, version: int, base_path: Path = None
+) -> Path:
     if namespace == OPENTRONS_NAMESPACE:
         # all labware in OPENTRONS_NAMESPACE is stored in shared data
-        return get_shared_data_root() / STANDARD_DEFS_PATH \
-               / load_name / f'{version}.json'
+        return (
+            get_shared_data_root() / STANDARD_DEFS_PATH / load_name / f"{version}.json"
+        )
     if not base_path:
         base_path = USER_DEFS_PATH
-    def_path = base_path / namespace / load_name / f'{version}.json'
+    def_path = base_path / namespace / load_name / f"{version}.json"
     return def_path

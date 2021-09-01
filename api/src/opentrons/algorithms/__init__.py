@@ -1,4 +1,3 @@
-
 """Algorithms Module.
 
 This module should only contain generic implementations for

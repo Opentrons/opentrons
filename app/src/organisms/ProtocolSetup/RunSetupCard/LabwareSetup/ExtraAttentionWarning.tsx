@@ -89,6 +89,7 @@ export const ExtraAttentionWarning = (
         marginY={SPACING_3}
         backgroundColor={COLOR_WARNING_LIGHT}
         color={C_DARK_GRAY}
+        id={'ExtraAttentionWarning'}
       >
         <Box margin={SPACING_3}>
           <Flex margin={SPACING_2}>

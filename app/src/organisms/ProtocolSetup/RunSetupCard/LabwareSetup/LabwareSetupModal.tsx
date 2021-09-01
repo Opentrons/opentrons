@@ -112,6 +112,7 @@ export const LabwareSetupModal = (
               onClick={props.onCloseClick}
               width={SIZE_4}
               backgroundColor={C_BLUE}
+              id={'LabwareSetupModal_closeButton'}
             >
               {t('shared:close')}
             </PrimaryBtn>

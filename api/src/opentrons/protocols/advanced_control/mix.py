@@ -4,8 +4,8 @@ from opentrons.protocols.advanced_control.transfers import MixStrategy, Mix
 
 
 def mix_from_kwargs(
-        top_kwargs: typing.Dict[str, typing.Any])\
-        -> typing.Tuple[MixStrategy, Mix]:
+    top_kwargs: typing.Dict[str, typing.Any]
+) -> typing.Tuple[MixStrategy, Mix]:
     """A utility function to determine mix strategy from key word arguments
     to InstrumentContext.mix"""
 
@@ -27,28 +27,36 @@ def mix_from_kwargs(
         return True
 
     mix_opts = Mix()
-    if _mix_requested(top_kwargs, 'mix_before')\
-       and _mix_requested(top_kwargs, 'mix_after'):
+    if _mix_requested(top_kwargs, "mix_before") and _mix_requested(
+        top_kwargs, "mix_after"
+    ):
         mix_strategy = MixStrategy.BOTH
-        before_opts = top_kwargs['mix_before']
-        after_opts = top_kwargs['mix_after']
+        before_opts = top_kwargs["mix_before"]
+        after_opts = top_kwargs["mix_after"]
         mix_opts = mix_opts._replace(
             mix_after=mix_opts.mix_after._replace(
-                repetitions=after_opts[0], volume=after_opts[1]),
+                repetitions=after_opts[0], volume=after_opts[1]
+            ),
             mix_before=mix_opts.mix_before._replace(
-                repetitions=before_opts[0], volume=before_opts[1]))
-    elif _mix_requested(top_kwargs, 'mix_before'):
+                repetitions=before_opts[0], volume=before_opts[1]
+            ),
+        )
+    elif _mix_requested(top_kwargs, "mix_before"):
         mix_strategy = MixStrategy.BEFORE
-        before_opts = top_kwargs['mix_before']
+        before_opts = top_kwargs["mix_before"]
         mix_opts = mix_opts._replace(
             mix_before=mix_opts.mix_before._replace(
-                repetitions=before_opts[0], volume=before_opts[1]))
-    elif _mix_requested(top_kwargs, 'mix_after'):
+                repetitions=before_opts[0], volume=before_opts[1]
+            )
+        )
+    elif _mix_requested(top_kwargs, "mix_after"):
         mix_strategy = MixStrategy.AFTER
-        after_opts = top_kwargs['mix_after']
+        after_opts = top_kwargs["mix_after"]
         mix_opts = mix_opts._replace(
             mix_after=mix_opts.mix_after._replace(
-                repetitions=after_opts[0], volume=after_opts[1]))
+                repetitions=after_opts[0], volume=after_opts[1]
+            )
+        )
     else:
         mix_strategy = MixStrategy.NEVER
     return mix_strategy, mix_opts

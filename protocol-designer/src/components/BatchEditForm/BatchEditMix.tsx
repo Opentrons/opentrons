@@ -80,12 +80,12 @@ export const BatchEditMix = (props: BatchEditMixProps): JSX.Element => {
           >
             <Box className={styles.form_row}>
               <FlowRateField
-                {...propsForFields['aspirate_flowRate']}
+                {...propsForFields.aspirate_flowRate}
                 pipetteId={getPipetteIdForForm()}
                 flowRateType="aspirate"
               />
               <TipPositionField
-                {...propsForFields['mix_mmFromBottom']}
+                {...propsForFields.mix_mmFromBottom}
                 labwareId={getLabwareIdForPositioningField('mix_mmFromBottom')}
               />
               <WellOrderField
@@ -96,10 +96,10 @@ export const BatchEditMix = (props: BatchEditMixProps): JSX.Element => {
                 firstName="mix_wellOrder_first"
                 secondName="mix_wellOrder_second"
                 updateFirstWellOrder={
-                  propsForFields['mix_wellOrder_first'].updateValue
+                  propsForFields.mix_wellOrder_first.updateValue
                 }
                 updateSecondWellOrder={
-                  propsForFields['mix_wellOrder_second'].updateValue
+                  propsForFields.mix_wellOrder_second.updateValue
                 }
               />
             </Box>
@@ -121,7 +121,7 @@ export const BatchEditMix = (props: BatchEditMixProps): JSX.Element => {
           >
             <Box className={styles.form_row}>
               <FlowRateField
-                {...propsForFields['dispense_flowRate']}
+                {...propsForFields.dispense_flowRate}
                 pipetteId={getPipetteIdForForm()}
                 flowRateType="dispense"
               />
@@ -135,24 +135,24 @@ export const BatchEditMix = (props: BatchEditMixProps): JSX.Element => {
               propsForFields={propsForFields}
             />
             <CheckboxRowField
-              {...propsForFields['mix_touchTip_checkbox']}
+              {...propsForFields.mix_touchTip_checkbox}
               label={i18n.t('form.step_edit_form.field.touchTip.label')}
               className={styles.small_field}
             >
               <TipPositionField
-                {...propsForFields['mix_touchTip_mmFromBottom']}
+                {...propsForFields.mix_touchTip_mmFromBottom}
                 labwareId={getLabwareIdForPositioningField(
                   'mix_touchTip_mmFromBottom'
                 )}
               />
             </CheckboxRowField>
             <CheckboxRowField
-              {...propsForFields['blowout_checkbox']}
+              {...propsForFields.blowout_checkbox}
               label={i18n.t('form.step_edit_form.field.blowout.label')}
               className={styles.small_field}
             >
               <BlowoutLocationField
-                {...propsForFields['blowout_location']}
+                {...propsForFields.blowout_location}
                 className={styles.full_width}
                 options={getBlowoutLocationOptionsForForm({
                   stepType: 'mix',

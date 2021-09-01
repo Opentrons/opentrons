@@ -42,9 +42,9 @@ export const MixForm = (props: StepFormProps): JSX.Element => {
         </span>
       </div>
       <div className={styles.form_row}>
-        <PipetteField {...propsForFields['pipette']} />
+        <PipetteField {...propsForFields.pipette} />
         <VolumeField
-          {...propsForFields['volume']}
+          {...propsForFields.volume}
           label={i18n.t('form.step_edit_form.mixVolumeLabel')}
           stepType="mix"
           className={styles.small_field}
@@ -54,7 +54,7 @@ export const MixForm = (props: StepFormProps): JSX.Element => {
           label={i18n.t('form.step_edit_form.mixRepetitions')}
         >
           <TextField
-            {...propsForFields['times']}
+            {...propsForFields.times}
             units={i18n.t('application.units.times')}
           />
         </FormGroup>
@@ -64,12 +64,12 @@ export const MixForm = (props: StepFormProps): JSX.Element => {
           label={i18n.t('form.step_edit_form.labwareLabel.mixLabware')}
           className={styles.large_field}
         >
-          <LabwareField {...propsForFields['labware']} />
+          <LabwareField {...propsForFields.labware} />
         </FormGroup>
         <WellSelectionField
-          {...propsForFields['wells']}
-          labwareId={formData['labware']}
-          pipetteId={formData['pipette']}
+          {...propsForFields.wells}
+          labwareId={formData.labware}
+          pipetteId={formData.pipette}
         />
       </div>
       <div className={styles.section_divider} />
@@ -96,12 +96,12 @@ export const MixForm = (props: StepFormProps): JSX.Element => {
           <div className={styles.section_column}>
             <div className={styles.form_row}>
               <FlowRateField
-                {...propsForFields['aspirate_flowRate']}
+                {...propsForFields.aspirate_flowRate}
                 pipetteId={formData.pipette}
                 flowRateType="aspirate"
               />
               <TipPositionField
-                {...propsForFields['mix_mmFromBottom']}
+                {...propsForFields.mix_mmFromBottom}
                 labwareId={
                   formData[
                     getLabwareFieldForPositioningField('mix_mmFromBottom')
@@ -110,15 +110,15 @@ export const MixForm = (props: StepFormProps): JSX.Element => {
               />
               <WellOrderField
                 updateFirstWellOrder={
-                  propsForFields['mix_wellOrder_first'].updateValue
+                  propsForFields.mix_wellOrder_first.updateValue
                 }
                 updateSecondWellOrder={
-                  propsForFields['mix_wellOrder_second'].updateValue
+                  propsForFields.mix_wellOrder_second.updateValue
                 }
                 prefix="mix"
                 label={i18n.t('form.step_edit_form.field.well_order.label')}
-                firstValue={formData['mix_wellOrder_first']}
-                secondValue={formData['mix_wellOrder_second']}
+                firstValue={formData.mix_wellOrder_first}
+                secondValue={formData.mix_wellOrder_second}
                 firstName={'mix_wellOrder_first'}
                 secondName={'mix_wellOrder_second'}
               />
@@ -140,7 +140,7 @@ export const MixForm = (props: StepFormProps): JSX.Element => {
           <div className={styles.section_column}>
             <div className={styles.form_row}>
               <FlowRateField
-                {...propsForFields['dispense_flowRate']}
+                {...propsForFields.dispense_flowRate}
                 pipetteId={formData.pipette}
                 flowRateType="dispense"
               />
@@ -159,12 +159,12 @@ export const MixForm = (props: StepFormProps): JSX.Element => {
                 }
               />
               <CheckboxRowField
-                {...propsForFields['mix_touchTip_checkbox']}
+                {...propsForFields.mix_touchTip_checkbox}
                 className={styles.small_field}
                 label={i18n.t('form.step_edit_form.field.touchTip.label')}
               >
                 <TipPositionField
-                  {...propsForFields['mix_touchTip_mmFromBottom']}
+                  {...propsForFields.mix_touchTip_mmFromBottom}
                   labwareId={
                     formData[
                       getLabwareFieldForPositioningField(
@@ -176,12 +176,12 @@ export const MixForm = (props: StepFormProps): JSX.Element => {
               </CheckboxRowField>
 
               <CheckboxRowField
-                {...propsForFields['blowout_checkbox']}
+                {...propsForFields.blowout_checkbox}
                 className={styles.small_field}
                 label={i18n.t('form.step_edit_form.field.blowout.label')}
               >
                 <BlowoutLocationField
-                  {...propsForFields['blowout_location']}
+                  {...propsForFields.blowout_location}
                   className={styles.full_width}
                   options={getBlowoutLocationOptionsForForm({
                     stepType: formData.stepType,
@@ -201,7 +201,7 @@ export const MixForm = (props: StepFormProps): JSX.Element => {
       <div className={styles.section_wrapper}>
         <div className={styles.form_row}>
           <ChangeTipField
-            {...propsForFields['changeTip']}
+            {...propsForFields.changeTip}
             aspirateWells={formData.aspirate_wells}
             dispenseWells={formData.dispense_wells}
             path={formData.path}

@@ -10,11 +10,9 @@ class WellImplementation:
 
     pattern = re.compile(WELL_NAME_PATTERN, re.X)
 
-    def __init__(self,
-                 well_geometry: WellGeometry,
-                 display_name: str,
-                 has_tip: bool,
-                 name: str):
+    def __init__(
+        self, well_geometry: WellGeometry, display_name: str, has_tip: bool, name: str
+    ):
         """
         Construct a well
 
@@ -33,8 +31,10 @@ class WellImplementation:
         self._name = name
 
         match = WellImplementation.pattern.match(name)
-        assert match, f"could not match '{name}' using " \
-                      f"pattern '{WellImplementation.pattern.pattern}'"
+        assert match, (
+            f"could not match '{name}' using "
+            f"pattern '{WellImplementation.pattern.pattern}'"
+        )
         self._row_name = match.group(1)
         self._column_name = match.group(2)
         self._geometry = well_geometry
@@ -68,6 +68,7 @@ class WellImplementation:
 
     def __eq__(self, other) -> bool:
         """Assume that if name is the same then it's the same well"""
-        return \
-            isinstance(other, WellImplementation) and\
-            self.get_name() == other.get_name()
+        return (
+            isinstance(other, WellImplementation)
+            and self.get_name() == other.get_name()
+        )

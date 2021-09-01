@@ -32,26 +32,27 @@ class TempDeckEmulator(AbstractEmulator):
     def handle(self, line: str) -> Optional[str]:
         """Handle a line"""
         results = (self._handle(c) for c in self._parser.parse(line))
-        joined = ' '.join(r for r in results if r)
+        joined = " ".join(r for r in results if r)
         return None if not joined else joined
 
     def reset(self):
-        self._temperature = Temperature(
-            per_tick=.25, current=0.0
-        )
+        self._temperature = Temperature(per_tick=0.25, current=0.0)
 
     def _handle(self, command: Command) -> Optional[str]:
         """Handle a command."""
         logger.info(f"Got command {command}")
         if command.gcode == GCODE.GET_TEMP:
-            res = f"T:{util.OptionalValue(self._temperature.target)} " \
-                  f"C:{self._temperature.current}"
+            res = (
+                f"T:{util.OptionalValue(self._temperature.target)} "
+                f"C:{self._temperature.current}"
+            )
             self._temperature.tick()
             return res
         elif command.gcode == GCODE.SET_TEMP:
-            temperature = command.params['S']
-            assert isinstance(temperature, float),\
-                f"invalid temperature '{temperature}'"
+            temperature = command.params["S"]
+            assert isinstance(
+                temperature, float
+            ), f"invalid temperature '{temperature}'"
             self._temperature.set_target(temperature)
         elif command.gcode == GCODE.DISENGAGE:
             self._temperature.deactivate(util.TEMPERATURE_ROOM)

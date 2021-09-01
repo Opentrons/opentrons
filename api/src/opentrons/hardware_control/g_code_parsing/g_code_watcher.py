@@ -2,8 +2,12 @@ from __future__ import annotations
 from typing import List, Optional
 from opentrons.drivers.asyncio.communication import SerialConnection
 from dataclasses import dataclass
-from opentrons.hardware_control.emulation.app import \
-    TEMPDECK_PORT, THERMOCYCLER_PORT, SMOOTHIE_PORT, MAGDECK_PORT
+from opentrons.hardware_control.emulation.app import (
+    TEMPDECK_PORT,
+    THERMOCYCLER_PORT,
+    SMOOTHIE_PORT,
+    MAGDECK_PORT,
+)
 
 
 @dataclass
@@ -20,10 +24,10 @@ class GCodeWatcher:
     """
 
     DEVICE_LOOKUP_BY_PORT = {
-        SMOOTHIE_PORT: 'smoothie',
-        TEMPDECK_PORT: 'tempdeck',
-        THERMOCYCLER_PORT: 'thermocycler',
-        MAGDECK_PORT: 'magdeck',
+        SMOOTHIE_PORT: "smoothie",
+        TEMPDECK_PORT: "tempdeck",
+        THERMOCYCLER_PORT: "thermocycler",
+        MAGDECK_PORT: "magdeck",
     }
 
     def __init__(self) -> None:
@@ -32,8 +36,13 @@ class GCodeWatcher:
 
     def __enter__(self) -> GCodeWatcher:
         """Patch the send command function"""
-        async def _patch(_self: SerialConnection, data: str, retries: int = 0,
-                         timeout: Optional[float] = None) -> str:
+
+        async def _patch(
+            _self: SerialConnection,
+            data: str,
+            retries: int = 0,
+            timeout: Optional[float] = None,
+        ) -> str:
             """
             Side-effect function that gathers arguments passed to
             SerialConnection.send_data and stores them internally.
@@ -50,9 +59,7 @@ class GCodeWatcher:
             response = await self._original_send_data(_self, data, retries, timeout)
             self._command_list.append(
                 WatcherData(
-                    raw_g_code=data,
-                    device=self._parse_device(_self),
-                    response=response
+                    raw_g_code=data, device=self._parse_device(_self), response=response
                 )
             )
             return response
@@ -73,7 +80,7 @@ class GCodeWatcher:
         of the device is
         """
         serial_port = serial_connection.port
-        device_port = serial_port[serial_port.rfind(':') + 1:]
+        device_port = serial_port[serial_port.rfind(":") + 1 :]
         return cls.DEVICE_LOOKUP_BY_PORT[int(device_port)]
 
     def get_command_list(self) -> List[WatcherData]:

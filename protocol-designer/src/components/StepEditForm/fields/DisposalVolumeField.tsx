@@ -65,7 +65,7 @@ const DisposalVolumeFieldComponent = (props: Props): JSX.Element => {
   const volumeField = (
     <div>
       <TextField
-        {...propsForFields['disposalVolume_volume']}
+        {...propsForFields.disposalVolume_volume}
         caption={volumeBoundsCaption}
         className={cx(styles.small_field, styles.orphan_field)}
         units={i18n.t('application.units.microliter')}
@@ -73,7 +73,7 @@ const DisposalVolumeFieldComponent = (props: Props): JSX.Element => {
     </div>
   )
 
-  const { value, updateValue } = propsForFields['disposalVolume_checkbox']
+  const { value, updateValue } = propsForFields.disposalVolume_checkbox
 
   return (
     <FormGroup label={i18n.t('form.step_edit_form.multiDispenseOptionsLabel')}>
@@ -96,7 +96,7 @@ const DisposalVolumeFieldComponent = (props: Props): JSX.Element => {
           <div className={styles.checkbox_row}>
             <div className={styles.sub_label_no_checkbox}>Blowout</div>
             <DropdownFormField
-              {...propsForFields['blowout_location']}
+              {...propsForFields.blowout_location}
               className={styles.large_field}
               options={props.disposalDestinationOptions}
             />

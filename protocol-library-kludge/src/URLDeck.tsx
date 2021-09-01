@@ -26,7 +26,7 @@ interface UrlData {
   modules: Record<DeckSlotId, ModuleModel>
 }
 
-const DECK_DEF = getDeckDefinitions()['ot2_standard']
+const DECK_DEF = getDeckDefinitions().ot2_standard
 
 const DECK_LAYER_BLOCKLIST = [
   'calibrationMarkings',

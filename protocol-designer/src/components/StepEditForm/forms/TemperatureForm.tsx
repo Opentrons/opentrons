@@ -32,7 +32,7 @@ export const TemperatureForm = (props: StepFormProps): JSX.Element => {
           className={styles.temperature_form_group}
         >
           <StepFormDropdown
-            {...propsForFields['moduleId']}
+            {...propsForFields.moduleId}
             options={moduleLabwareOptions}
           />
         </FormGroup>
@@ -53,7 +53,7 @@ export const TemperatureForm = (props: StepFormProps): JSX.Element => {
           <>
             <div className={styles.checkbox_row}>
               <RadioGroupField
-                {...propsForFields['setTemperature']}
+                {...propsForFields.setTemperature}
                 options={[
                   {
                     name: i18n.t(
@@ -65,7 +65,7 @@ export const TemperatureForm = (props: StepFormProps): JSX.Element => {
               />
               {setTemperature === 'true' && (
                 <TextField
-                  {...propsForFields['targetTemperature']}
+                  {...propsForFields.targetTemperature}
                   className={styles.small_field}
                   units={i18n.t('application.units.degrees')}
                 />
@@ -73,7 +73,7 @@ export const TemperatureForm = (props: StepFormProps): JSX.Element => {
             </div>
             <div className={styles.checkbox_row}>
               <RadioGroupField
-                {...propsForFields['setTemperature']}
+                {...propsForFields.setTemperature}
                 options={[
                   {
                     name: i18n.t(

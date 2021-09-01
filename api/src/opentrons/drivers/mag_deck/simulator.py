@@ -4,17 +4,15 @@ from .abstract import AbstractMagDeckDriver
 
 
 MAG_DECK_MODELS = {
-    'magneticModuleV1': 'mag_deck_v1.1',
-    'magneticModuleV2': 'mag_deck_v20'
+    "magneticModuleV1": "mag_deck_v1.1",
+    "magneticModuleV2": "mag_deck_v20",
 }
 
 
 class SimulatingDriver(AbstractMagDeckDriver):
-
     def __init__(self, sim_model: str = None):
         self._height = 0.0
-        self._model = MAG_DECK_MODELS[sim_model] if sim_model\
-            else 'mag_deck_v1.1'
+        self._model = MAG_DECK_MODELS[sim_model] if sim_model else "mag_deck_v1.1"
 
     async def probe_plate(self):
         pass
@@ -26,9 +24,11 @@ class SimulatingDriver(AbstractMagDeckDriver):
         self._height = location
 
     async def get_device_info(self) -> Dict[str, str]:
-        return {'serial': 'dummySerialMD',
-                'model': self._model,
-                'version': 'dummyVersionMD'}
+        return {
+            "serial": "dummySerialMD",
+            "model": self._model,
+            "version": "dummyVersionMD",
+        }
 
     async def connect(self):
         pass
