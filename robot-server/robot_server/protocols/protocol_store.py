@@ -1,6 +1,6 @@
 """Methods for saving and retrieving protocol files."""
 from ast import parse as parse_python_file
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime
 from fastapi import UploadFile
 from logging import getLogger
@@ -20,10 +20,10 @@ class ProtocolResource:
 
     protocol_id: str
     protocol_type: ProtocolFileType
+    # Dict[str, Any] is an approximation; should really be any JSON-serializable dict.
+    protocol_metadata: Dict[str, Any]
     created_at: datetime
     files: List[Path]
-    # FIX BEFORE MERGE: Remove default.
-    protocol_metadata: Dict[str, Any] = field(default_factory=dict)
 
 
 class ProtocolNotFoundError(KeyError):

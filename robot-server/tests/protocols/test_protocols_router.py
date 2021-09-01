@@ -91,12 +91,14 @@ def test_get_protocols(
     entry_1 = ProtocolResource(
         protocol_id="abc",
         protocol_type=ProtocolFileType.PYTHON,
+        protocol_metadata={},
         created_at=created_at_1,
         files=[],
     )
     entry_2 = ProtocolResource(
         protocol_id="123",
         protocol_type=ProtocolFileType.JSON,
+        protocol_metadata={},
         created_at=created_at_2,
         files=[],
     )
@@ -138,6 +140,7 @@ def test_get_protocol_by_id(
     entry = ProtocolResource(
         protocol_id="protocol-id",
         protocol_type=ProtocolFileType.PYTHON,
+        protocol_metadata={},
         created_at=created_at,
         files=[],
     )
@@ -193,6 +196,7 @@ async def test_create_json_protocol(
     entry = ProtocolResource(
         protocol_id=unique_id,
         protocol_type=ProtocolFileType.JSON,
+        protocol_metadata={},
         created_at=current_time,
         files=[],
     )
@@ -240,6 +244,7 @@ async def test_create_python_protocol(
     entry = ProtocolResource(
         protocol_id=unique_id,
         protocol_type=ProtocolFileType.PYTHON,
+        protocol_metadata={},
         created_at=current_time,
         files=[],
     )

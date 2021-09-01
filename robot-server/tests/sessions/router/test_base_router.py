@@ -124,6 +124,7 @@ async def test_create_protocol_session(
     protocol_resource = ProtocolResource(
         protocol_id="protocol-id",
         protocol_type=ProtocolFileType.JSON,
+        protocol_metadata={},
         created_at=datetime.now(),
         files=[Path("/dev/null")],
     )
