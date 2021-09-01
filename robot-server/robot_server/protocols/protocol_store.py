@@ -6,19 +6,17 @@ from logging import getLogger
 from pathlib import Path
 from typing import Dict, List, Sequence
 
-from opentrons.protocol_runner import ProtocolFileType
+from opentrons.protocol_runner import ProtocolFile, ProtocolFileType
 
 log = getLogger(__name__)
 
 
 @dataclass(frozen=True)
-class ProtocolResource:
-    """An entry in the session store, used to construct response models."""
+class ProtocolResource(ProtocolFile):
+    """An entry in the protocol store, used to construct response models."""
 
     protocol_id: str
-    protocol_type: ProtocolFileType
     created_at: datetime
-    files: List[Path]
 
 
 class ProtocolNotFoundError(KeyError):

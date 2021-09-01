@@ -17,7 +17,6 @@ from robot_server.service.json_api import (
 )
 
 from robot_server.protocols import (
-    ProtocolFile,
     ProtocolStore,
     ProtocolNotFound,
     ProtocolNotFoundError,
@@ -100,13 +99,7 @@ async def create_session(
 
         if protocol_id is not None:
             protocol_resource = protocol_store.get(protocol_id=protocol_id)
-            # TODO(mc, 2021-06-11): add multi-file support. As written, the
-            # ProtocolStore will make sure len(files) != 0
-            protocol_file = ProtocolFile(
-                file_type=protocol_resource.protocol_type,
-                file_path=protocol_resource.files[0],
-            )
-            engine_store.runner.load(protocol_file)
+            engine_store.runner.load(protocol_resource)
 
         # TODO(mc, 2021-08-05): capture errors from `runner.join` and place
         # them in the session resource

@@ -10,8 +10,8 @@ from opentrons.protocols.models import json_protocol
 def test_reads_file(json_protocol_file: Path) -> None:
     """It should read a JSON file into a JsonProtocol model."""
     protocol = ProtocolFile(
-        file_type=ProtocolFileType.JSON,
-        file_path=json_protocol_file,
+        protocol_type=ProtocolFileType.JSON,
+        files=[json_protocol_file],
     )
 
     subject = JsonFileReader()

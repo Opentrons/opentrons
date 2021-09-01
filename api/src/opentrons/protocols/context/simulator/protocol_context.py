@@ -14,11 +14,18 @@ class ProtocolContextSimulation(ProtocolContextImplementation):
     ) -> AbstractInstrument:
         """Create a simulating instrument context."""
         instr = self._instruments[mount]
-        if instr and not replace:
-            raise RuntimeError(
-                f"Instrument already present in {mount.name.lower()} "
-                f"mount: {instr.get_instrument_name()}"
-            )
+        if instr:
+            # There's already an instrument on this mount.
+            if not replace:
+                # If not replacing then error.
+                raise RuntimeError(
+                    f"Instrument already present in {mount.name.lower()} "
+                    f"mount: {instr.get_instrument_name()}"
+                )
+            elif instr.get_instrument_name() == instrument_name:
+                # Replacing with the exact same instrument name. Just return the
+                # existing instrument instance.
+                return instr
 
         attached = {
             att_mount: instr.get("name", None)
