@@ -1,4 +1,4 @@
-"""Hardware API initialization and management."""
+"""Hardware API wrapper module for initialization and management."""
 import asyncio
 import logging
 from pathlib import Path
@@ -78,8 +78,8 @@ async def get_hardware(app_state: AppState = Depends(get_app_state)) -> Hardware
     """Get the HardwareAPI as a route dependency.
 
     Arguments:
-        app_state: Global app state from `app.state`. If unspecified, FastAPI's
-            dependency injection system will attempt to provide it.
+        app_state: Global app state from `app.state`, provided by
+        FastAPI's dependency injection system via `fastapi.Depends`
 
     Returns:
         The initialized HardwareAPI.
@@ -130,7 +130,11 @@ async def _initialize_hardware_api(app_state: AppState) -> None:
     log.info("Opentrons hardware API initialized")
 
 
+# TODO(mc, 2021-09-01): if we're ever going to actually use the notification
+# server, this logic needs to be in its own unit and not tucked away here in
+# test-less wrapper module
 def _initialize_event_watchers(app_state: AppState, hardware_api: HardwareAPI) -> None:
+    """Initialize notification publishing for hardware events."""
     notify_server_settings = NotifyServerSettings()
     hw_event_publisher = publisher.create(
         notify_server_settings.publisher_address.connection_string()
