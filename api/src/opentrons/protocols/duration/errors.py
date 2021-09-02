@@ -1,3 +1,2 @@
 class DurationEstimatorException(Exception):
     pass
-
