@@ -33,6 +33,9 @@ class AppStateValue(Generic[ValueT]):
 
 
 async def get_app_state(
+    # NOTE: both of these must be typed as non-optional to allow FastAPI's
+    # dependency injection magic to work, but must have default values of
+    # None in order to function at runtime, as only one will be present
     request: Request = None,
     websocket: WebSocket = None,
 ) -> AppState:
