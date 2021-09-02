@@ -1,6 +1,6 @@
 """Protocol response model factory."""
 from .protocol_store import ProtocolResource
-from .protocol_models import Protocol, Metadata
+from .protocol_models import Protocol
 
 
 class ResponseBuilder:
@@ -19,6 +19,5 @@ class ResponseBuilder:
         return Protocol(
             id=protocol_entry.protocol_id,
             protocolType=protocol_entry.protocol_type,
-            protocolMetadata=Metadata.parse_obj(protocol_entry.protocol_metadata),
             createdAt=protocol_entry.created_at,
         )

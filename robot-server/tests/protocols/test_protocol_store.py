@@ -6,9 +6,6 @@ from pathlib import Path
 from fastapi import UploadFile
 from typing import Iterator
 
-from opentrons.protocols.models.json_protocol import (
-    make_minimal as make_minimal_json_protocol,
-)
 from opentrons.protocol_runner import ProtocolFileType
 
 from robot_server.protocols.protocol_store import (
@@ -22,11 +19,8 @@ from robot_server.protocols.protocol_store import (
 @pytest.fixture
 def json_upload_file(tmp_path: Path) -> Iterator[UploadFile]:
     """Get an UploadFile with contents."""
-    minimal_json_protocol_model = make_minimal_json_protocol()
-    minimal_json_protocol_text = minimal_json_protocol_model.json()
-
     file_path = tmp_path / "protocol.json"
-    file_path.write_text(minimal_json_protocol_text, encoding="utf-8")
+    file_path.write_text("{}\n", encoding="utf-8")
 
     with file_path.open() as json_file:
         yield UploadFile(filename="protocol.json", file=json_file)
@@ -65,13 +59,12 @@ async def test_create_json_protocol(
     assert result == ProtocolResource(
         protocol_id="protocol-id",
         protocol_type=ProtocolFileType.JSON,
-        protocol_metadata=matchers.Anything(),
         created_at=created_at,
         files=[matchers.Anything()],
     )
 
     file_path = result.files[0]
-    assert file_path.read_text("utf-8") != ""
+    assert file_path.read_text("utf-8") == "{}\n"
     assert str(file_path).startswith(str(tmp_path))
 
 
@@ -92,7 +85,6 @@ async def test_create_python_protocol(
     assert result == ProtocolResource(
         protocol_id="protocol-id",
         protocol_type=ProtocolFileType.PYTHON,
-        protocol_metadata=matchers.Anything(),
         created_at=created_at,
         files=[matchers.Anything()],
     )
@@ -137,13 +129,12 @@ async def test_get_protocol(
     assert result == ProtocolResource(
         protocol_id="protocol-id",
         protocol_type=ProtocolFileType.JSON,
-        protocol_metadata=matchers.Anything(),
         created_at=created_at,
         files=[matchers.Anything()],
     )
 
     file_path = result.files[0]
-    assert file_path.read_text("utf-8") != ""
+    assert file_path.read_text("utf-8") == "{}\n"
 
 
 async def test_get_missing_protocol_raises(
@@ -185,14 +176,12 @@ async def test_get_all_protocols(
         ProtocolResource(
             protocol_id="protocol-id-1",
             protocol_type=ProtocolFileType.JSON,
-            protocol_metadata=matchers.Anything(),
             created_at=created_at_1,
             files=[matchers.Anything()],
         ),
         ProtocolResource(
             protocol_id="protocol-id-2",
             protocol_type=ProtocolFileType.JSON,
-            protocol_metadata=matchers.Anything(),
             created_at=created_at_2,
             files=[matchers.Anything()],
         ),
