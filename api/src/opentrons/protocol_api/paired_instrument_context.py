@@ -9,7 +9,7 @@ from opentrons import types, hardware_control as hc
 from opentrons.commands import paired_commands as cmds
 from opentrons.commands.publisher import CommandPublisher, publish_paired, publish
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.context.protocol_api.paired_instrument import PairedInstrument
+from opentrons.protocols.context.paired_instrument import AbstractPairedInstrument
 
 from opentrons.protocols.api_support.util import (
     requires_version,
@@ -50,10 +50,10 @@ class PairedInstrumentContext(CommandPublisher):
         self,
         primary_instrument: InstrumentContext,
         secondary_instrument: InstrumentContext,
+        implementation: AbstractPairedInstrument,
         ctx: ProtocolContext,
         pair_policy: hc_types.PipettePair,
         api_version: APIVersion,
-        hardware_manager: HardwareManager,
         trash: Labware,
         log_parent: logging.Logger,
     ) -> None:
@@ -77,14 +77,7 @@ class PairedInstrumentContext(CommandPublisher):
         )
 
         self.trash_container = trash
-        self.paired_instrument_obj = PairedInstrument(
-            primary_instrument,
-            secondary_instrument,
-            pair_policy,
-            ctx,
-            hardware_manager,
-            self._log,
-        )
+        self.paired_instrument_obj = implementation
 
     @property  # type: ignore
     @requires_version(2, 7)

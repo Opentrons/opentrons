@@ -1593,10 +1593,10 @@ class InstrumentContext(CommandPublisher):
         return PairedInstrumentContext(
             primary_instrument=self,
             secondary_instrument=instrument,
+            implementation=self._implementation.pair_with(instrument._implementation),
             ctx=self._ctx,
             pair_policy=PipettePair.of_mount(self._implementation.get_mount()),
             api_version=self.api_version,
-            hardware_manager=self._ctx._implementation.get_hardware(),
             trash=self.trash_container,
             log_parent=self._log,
         )
