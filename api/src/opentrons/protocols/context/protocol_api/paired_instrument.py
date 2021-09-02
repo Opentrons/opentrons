@@ -81,7 +81,7 @@ class PairedInstrument(AbstractPairedInstrument):
         if not speed:
             speed = self.p_instrument.get_default_speed()
 
-        last_location = self._ctx.location_cache
+        last_location = self._ctx.get_last_location()
         if last_location:
             from_lw = last_location.labware
         else:
@@ -125,10 +125,10 @@ class PairedInstrument(AbstractPairedInstrument):
                     max_speeds=self._ctx.get_max_speeds().data,
                 )
         except Exception:
-            self._ctx.location_cache = None
+            self._ctx.set_last_location(None)
             raise
         else:
-            self._ctx.location_cache = location
+            self._ctx.set_last_location(location)
         return self
 
     def aspirate(
@@ -230,7 +230,7 @@ class PairedInstrument(AbstractPairedInstrument):
             if not self._ctx.get_last_location():
                 raise RuntimeError("No valid current location cache present")
             else:
-                well = self._ctx.location_cache.labware  # type: ignore
+                well = self._ctx.get_last_location().labware  # type: ignore
                 # type checked below
         else:
             well = LabwareLike(location)

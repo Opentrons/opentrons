@@ -1,3 +1,4 @@
+import logging
 from typing import Optional
 
 from opentrons import types
@@ -21,6 +22,9 @@ from opentrons.protocols.geometry import planning
 from opentrons.protocols.context.instrument import AbstractInstrument
 from opentrons.protocols.context.protocol import AbstractProtocol
 from opentrons.protocols.context.well import WellImplementation
+
+
+LLLL = logging.getLogger(__name__)
 
 
 class InstrumentContextImplementation(AbstractInstrument):
@@ -310,5 +314,5 @@ class InstrumentContextImplementation(AbstractInstrument):
             ctx=self._protocol_interface,
             pair_policy=PipettePair.of_mount(self.get_mount()),
             hardware_manager=self._protocol_interface.get_hardware(),
-            log_parent=None
+            log_parent=LLLL
         )
