@@ -1,5 +1,6 @@
 import logging
 from typing import Optional, List
+from typing_extensions import Final
 
 import numpy as np  # type: ignore
 import functools
@@ -11,7 +12,12 @@ from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocols.duration.errors import DurationEstimatorException
 from opentrons.types import Location
 
-START_MODULE_TEMPERATURE = 25
+TEMP_MOD_RATE_HIGH_AND_ABOVE: Final = 0.3611111111
+TEMP_MOD_RATE_LOW_TO_HIGH: Final = 0.2
+TEMP_MOD_RATE_ZERO_TO_LOW: Final = 0.0875
+TEMP_MOD_LOW_THRESH: Final = 25.0
+TEMP_MOD_HIGH_THRESH: Final = 37.0
+START_MODULE_TEMPERATURE: Final = 25.0
 
 logger = logging.getLogger(__name__)
 
@@ -29,12 +35,10 @@ class DurationEstimator:
     def __init__(self):
         # Which slot the last command was in.
         self._last_deckslot = None
-        self._last_temperature_module_temperature = float(START_MODULE_TEMPERATURE)
-        self._last_thermocyler_module_temperature = float(START_MODULE_TEMPERATURE)
+        self._last_temperature_module_temperature = START_MODULE_TEMPERATURE
+        self._last_thermocyler_module_temperature = START_MODULE_TEMPERATURE
         # Per step time estimate.
         self._increments: List[TimerEntry] = []
-        # New
-        self._labware_locations = []
 
     def get_total_duration(self) -> float:
         """Return the total duration"""
@@ -44,7 +48,7 @@ class DurationEstimator:
             0.0
         )
 
-    def on_message(self, message: types.CommandMessage) -> None:   # noqa: C901
+    def on_message(self, message: types.CommandMessage) -> None:
         """
         Message handler for Broker events.
 
@@ -72,10 +76,37 @@ class DurationEstimator:
             )
             return
 
-        duration = 0.0
-
         location = payload.get('location')  # type: ignore
 
+        try:
+            duration = self.handle_message(message_name, payload)
+        except Exception as e:
+            raise DurationEstimatorException(str(e))
+
+        if location:
+            self._last_deckslot = self.get_slot(location)
+
+        self._increments.append(
+            TimerEntry(
+                command=message,
+                duration=duration,
+            )
+        )
+
+    def handle_message(  # noqa: C901
+            self, message_name: str, payload: types.CommandPayload
+    ) -> float:
+        """
+        Handle the message payload
+
+        Args:
+            message_name: Name of message
+            payload: The command payload
+
+        Returns:
+            The duration in seconds
+        """
+        duration = 0.0
         if message_name == types.PICK_UP_TIP:
             duration = self.on_pick_up_tip(payload=payload)
         elif message_name == types.DROP_TIP:
@@ -108,16 +139,7 @@ class DurationEstimator:
             duration = self.on_thermocyler_deactivate_lid(payload=payload)
         elif message_name == types.THERMOCYCLER_OPEN:
             duration = self.on_thermocyler_lid_open(payload=payload)
-
-        if location:
-            self._last_deckslot = self.get_slot(location)
-
-        self._increments.append(
-            TimerEntry(
-                command=message,
-                duration=duration,
-            )
-        )
+        return duration
 
     def on_pick_up_tip(
             self,
@@ -166,16 +188,12 @@ class DurationEstimator:
     def on_aspirate(
             self,
             payload) -> float:
-        # How long this took
-        duration = 0
         # General aspiration code
         instrument = payload['instrument']
         volume = payload['volume']
         rate = payload['rate'] * instrument.flow_rate.aspirate
 
         aspiration_time = volume / rate
-
-        # okay lets add that in to duration.
 
         # now lets handle the aspiration z-axis code.
         location = payload['location']
@@ -244,7 +262,6 @@ class DurationEstimator:
 
         return duration
 
-    # self.on_touch_tip(payload=payload)
     def on_touch_tip(
             self,
             payload) -> float:
@@ -268,7 +285,6 @@ class DurationEstimator:
         # Specialist Code: This is code that doesn't fit pickup, drop_tip,
         # aspirate, and dispense
         # Explanation: we are gathering seconds and minutes here
-        duration = 0
         seconds_delay = payload['seconds']
         minutes_delay = payload['minutes']
         duration = seconds_delay + minutes_delay * 60
@@ -389,7 +405,7 @@ class DurationEstimator:
             # heating up!
             if temp1 > 70:
                 # the temp1 part that's over 70 is
-                total.append(abs(temp1 - 70) / (2))
+                total.append(abs(temp1 - 70) / 2)
                 # the temp1 part that's under 70 is:
                 total.append(abs(70 - temp0) / 4)
             else:
@@ -415,11 +431,11 @@ class DurationEstimator:
         timing_gather = []
         if temp1 == temp0:
             timing_gather.append(0)
-        if temp1 > 37:
+        if temp1 > TEMP_MOD_HIGH_THRESH:
             timing_gather.append(sum(self.rate_high(temp0, temp1)))
-        if temp1 >= 25 and temp1 <= 37:
+        if TEMP_MOD_LOW_THRESH <= temp1 <= TEMP_MOD_HIGH_THRESH:
             timing_gather.append(sum(self.rate_mid(temp0, temp1)))
-        if temp1 < 25:
+        if temp1 < TEMP_MOD_LOW_THRESH:
             timing_gather.append(sum(self.rate_low(temp0, temp1)))
         return sum(timing_gather)
 
@@ -503,56 +519,56 @@ class DurationEstimator:
 
     @staticmethod
     def rate_high(temp0, temp1):
-        rate_zero_to_amb = 0.0875
-        rate_ambient_to_37 = 0.2
-        rate_37_to_95 = 0.3611111111
+        rate_zero_to_amb = TEMP_MOD_RATE_ZERO_TO_LOW
+        rate_ambient_to_37 = TEMP_MOD_RATE_LOW_TO_HIGH
+        rate_37_to_95 = TEMP_MOD_RATE_HIGH_AND_ABOVE
         val = []
-        if temp0 >= 37:
+        if temp0 >= TEMP_MOD_HIGH_THRESH:
             val.append(abs(temp1 - temp0) / rate_37_to_95)
-        if 25 < temp0 <= 37:
-            val.append(abs(temp0 - 37) / rate_ambient_to_37)
-            val.append(abs(temp1 - 37) / rate_37_to_95)
-        if temp0 <= 25:
-            # the temp1 part that's under 25 is:
-            val.append(abs(25 - temp0) / rate_zero_to_amb)
-            val.append(abs(25 - temp1) / rate_37_to_95)
+        if TEMP_MOD_LOW_THRESH < temp0 <= TEMP_MOD_HIGH_THRESH:
+            val.append(abs(temp0 - TEMP_MOD_HIGH_THRESH) / rate_ambient_to_37)
+            val.append(abs(temp1 - TEMP_MOD_HIGH_THRESH) / rate_37_to_95)
+        if temp0 <= TEMP_MOD_LOW_THRESH:
+            # the temp1 part that's under TEMP_MOD_HIGH_THRESH is:
+            val.append(abs(TEMP_MOD_LOW_THRESH - temp0) / rate_zero_to_amb)
+            val.append(abs(TEMP_MOD_LOW_THRESH - temp1) / rate_37_to_95)
 
         return val
 
     @staticmethod
     def rate_mid(temp0, temp1):
-        rate_zero_to_amb = 0.0875
-        rate_37_to_95 = 0.3611111111
+        rate_zero_to_amb = TEMP_MOD_RATE_ZERO_TO_LOW
+        rate_37_to_95 = TEMP_MOD_RATE_HIGH_AND_ABOVE
         val = []
-        rate_ambient_to_37 = (37 - 25) / 60
-        if temp0 >= 25 and temp0 <= 37:
+        rate_ambient_to_37 = (TEMP_MOD_HIGH_THRESH - TEMP_MOD_LOW_THRESH) / 60
+        if TEMP_MOD_LOW_THRESH <= temp0 <= TEMP_MOD_HIGH_THRESH:
             val.append(abs(temp1 - temp0) / rate_ambient_to_37)
 
-        if temp0 < 25:
-            # the temp1 part that's over 25 is
-            val.append(abs(temp1 - 25) / rate_ambient_to_37)
-            # the temp0 part that's under 25 is:
-            val.append(abs(25 - temp0) / rate_zero_to_amb)
-        if temp0 > 37:
-            val.append(abs(temp0 - 37) / rate_37_to_95)
-            # the temp1 part that's under 25 is:
-            val.append(abs(37 - temp1) / rate_zero_to_amb)
+        if temp0 < TEMP_MOD_LOW_THRESH:
+            # the temp1 part that's over TEMP_MOD_HIGH_THRESH is
+            val.append(abs(temp1 - TEMP_MOD_LOW_THRESH) / rate_ambient_to_37)
+            # the temp0 part that's under TEMP_MOD_HIGH_THRESH is:
+            val.append(abs(TEMP_MOD_LOW_THRESH - temp0) / rate_zero_to_amb)
+        if temp0 > TEMP_MOD_HIGH_THRESH:
+            val.append(abs(temp0 - TEMP_MOD_HIGH_THRESH) / rate_37_to_95)
+            # the temp1 part that's under TEMP_MOD_HIGH_THRESH is:
+            val.append(abs(TEMP_MOD_HIGH_THRESH - temp1) / rate_zero_to_amb)
         return val
 
     @staticmethod
     def rate_low(temp0, temp1):
-        rate_zero_to_amb = 0.0875
-        rate_ambient_to_37 = 0.2
+        rate_zero_to_amb = TEMP_MOD_RATE_ZERO_TO_LOW
+        rate_ambient_to_37 = TEMP_MOD_RATE_LOW_TO_HIGH
         val = []
-        if temp0 <= 25:
+        if temp0 <= TEMP_MOD_LOW_THRESH:
             val.append(abs(temp1 - temp0) / rate_zero_to_amb)
-        if temp0 > 25 and temp0 <= 37:
-            # the temp0 part that's over 25 is
-            val.append(abs(temp0 - 25) / rate_ambient_to_37)
-            # the temp1 part that's under 25 is:
-            val.append(abs(25 - temp1) / rate_zero_to_amb)
-        if temp0 > 37:
-            val.append(abs(temp0 - 37) / rate_ambient_to_37)
-            # the temp1 part that's under 25 is:
-            val.append(abs(37 - temp1) / rate_zero_to_amb)
+        if TEMP_MOD_LOW_THRESH < temp0 <= TEMP_MOD_HIGH_THRESH:
+            # the temp0 part that's over TEMP_MOD_HIGH_THRESH is
+            val.append(abs(temp0 - TEMP_MOD_LOW_THRESH) / rate_ambient_to_37)
+            # the temp1 part that's under TEMP_MOD_HIGH_THRESH is:
+            val.append(abs(TEMP_MOD_LOW_THRESH - temp1) / rate_zero_to_amb)
+        if temp0 > TEMP_MOD_HIGH_THRESH:
+            val.append(abs(temp0 - TEMP_MOD_HIGH_THRESH) / rate_ambient_to_37)
+            # the temp1 part that's under TEMP_MOD_HIGH_THRESH is:
+            val.append(abs(TEMP_MOD_HIGH_THRESH - temp1) / rate_zero_to_amb)
         return val
