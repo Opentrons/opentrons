@@ -113,7 +113,12 @@ async def create_session(
 
     session_store.upsert(session=session)
     commands = engine_store.engine.state_view.commands.get_all()
-    data = session_view.as_response(session=session, commands=commands)
+    engine_status = engine_store.engine.state_view.commands.get_status()
+    data = session_view.as_response(
+        session=session,
+        commands=commands,
+        engine_status=engine_status,
+    )
 
     return ResponseModel(data=data)
 
@@ -142,7 +147,13 @@ async def get_sessions(
     for session in session_store.get_all():
         # TODO(mc, 2021-06-23): add multi-engine support
         commands = engine_store.engine.state_view.commands.get_all()
-        data.append(session_view.as_response(session=session, commands=commands))
+        engine_status = engine_store.engine.state_view.commands.get_status()
+        session_data = session_view.as_response(
+            session=session,
+            commands=commands,
+            engine_status=engine_status,
+        )
+        data.append(session_data)
 
     return MultiResponseModel(data=data)
 
@@ -177,7 +188,12 @@ async def get_session(
         raise SessionNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
 
     commands = engine_store.engine.state_view.commands.get_all()
-    data = session_view.as_response(session=session, commands=commands)
+    engine_status = engine_store.engine.state_view.commands.get_status()
+    data = session_view.as_response(
+        session=session,
+        commands=commands,
+        engine_status=engine_status,
+    )
 
     return ResponseModel(data=data)
 

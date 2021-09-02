@@ -6,6 +6,7 @@ from typing import List, Optional, Union
 
 from ..commands import Command, CommandStatus
 from ..errors import CommandDoesNotExistError, ProtocolEngineStoppedError
+from ..types import EngineStatus
 from .abstract_store import HasState, HandlesActions
 from .actions import Action, UpdateCommandAction, PlayAction, PauseAction, StopAction
 
@@ -160,3 +161,34 @@ class CommandView(HasState[CommandState]):
         if self._state.stop_requested:
             action_desc = "play" if isinstance(action, PlayAction) else "pause"
             raise ProtocolEngineStoppedError(f"Cannot {action_desc} a stopped engine.")
+
+    def get_status(self) -> EngineStatus:
+        """Get the current execution status of the engine."""
+        all_commands = self._state.commands_by_id.values()
+        all_statuses = [c.status for c in all_commands]
+
+        if self._state.stop_requested:
+            if all(s == CommandStatus.SUCCEEDED for s in all_statuses):
+                return EngineStatus.SUCCEEDED
+
+            elif any(s == CommandStatus.RUNNING for s in all_statuses):
+                return EngineStatus.STOP_REQUESTED
+
+            else:
+                return EngineStatus.STOPPED
+
+        elif any(s == CommandStatus.FAILED for s in all_statuses):
+            return EngineStatus.FAILED
+
+        elif not self._state.is_running:
+            if all(s == CommandStatus.QUEUED for s in all_statuses):
+                return EngineStatus.READY_TO_RUN
+
+            elif any(s == CommandStatus.RUNNING for s in all_statuses):
+                return EngineStatus.PAUSE_REQUESTED
+
+            else:
+                return EngineStatus.PAUSED
+
+        else:
+            return EngineStatus.RUNNING

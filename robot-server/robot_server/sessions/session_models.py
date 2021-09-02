@@ -5,7 +5,11 @@ from pydantic import BaseModel, Field
 from typing import List, Optional, Union
 from typing_extensions import Literal
 
-from opentrons.protocol_engine import CommandStatus, CommandType
+from opentrons.protocol_engine import (
+    CommandStatus,
+    CommandType,
+    EngineStatus as SessionStatus,
+)
 from robot_server.service.json_api import ResourceModel
 from .action_models import SessionAction
 
@@ -44,6 +48,7 @@ class AbstractSession(ResourceModel):
     id: str = Field(..., description="Unique session identifier.")
     sessionType: SessionType = Field(..., description="Specific session type.")
     createdAt: datetime = Field(..., description="When the session was created")
+    status: SessionStatus = Field(..., description="Execution status of the session")
     # TODO(mc, 2021-05-25): how hard would it be to rename this field to `config`?
     createParams: Optional[BaseModel] = Field(
         None,
