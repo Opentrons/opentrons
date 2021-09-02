@@ -1,6 +1,7 @@
 import abc
 import argparse
 import json
+import os
 from typing import Union, Dict, Any, List
 
 import sys
@@ -11,17 +12,20 @@ from opentrons.hardware_control.emulation.settings import (
     PipetteSettings,
     Settings,
 )
-from opentrons.hardware_control.g_code_parsing.errors import UnparsableCLICommandError
-from opentrons.hardware_control.g_code_parsing.g_code_differ import GCodeDiffer
-from opentrons.hardware_control.g_code_parsing.g_code_program.supported_text_modes import (  # noqa: E501
+
+from errors import UnparsableCLICommandError
+from g_code_differ import GCodeDiffer
+from g_code_program.supported_text_modes import (  # noqa: E501
     SupportedTextModes,
 )
-from opentrons.hardware_control.g_code_parsing.protocol_runner import ProtocolRunner
+from protocol_runner import ProtocolRunner
 
 
 class CLICommand(abc.ABC):
     """ABC which all CLI command classes should inherit from"""
-
+    CONFIGURATION_DIR_LOCATION = os.path.normpath(
+        os.path.join(os.getcwd(), '..', '..', 'test_data')
+    )
     able_to_respond_with_error_code = False
     respond_with_error_code = False
     error_message = "Error message not defined"
@@ -36,7 +40,7 @@ class CLICommand(abc.ABC):
 class RunCommand(CLICommand):
     """The "run" command of the CLI."""
 
-    protocol_file_path: str
+    configuration_path: str
     text_mode: str
     left_pipette_config: PipetteSettings
     right_pipette_config: PipetteSettings
@@ -51,8 +55,14 @@ class RunCommand(CLICommand):
             left=self.left_pipette_config, right=self.right_pipette_config
         )
         settings = Settings(smoothie=smoothie_settings, host=self.host)
-        with ProtocolRunner(settings).run_protocol(self.protocol_file_path) as program:
-            return program.get_text_explanation(self.text_mode)
+        file_path = os.path.join(
+            self.CONFIGURATION_DIR_LOCATION, self.configuration_path
+        )
+
+        if self.configuration_path.startswith('protocol'):
+
+            with ProtocolRunner(settings).run_protocol(file_path) as program:
+                return program.get_text_explanation(self.text_mode)
 
 
 @dataclass
@@ -71,7 +81,7 @@ class DiffCommand(CLICommand):
         :return: HTML encoded diff of files
         """
         with open(self.file_path_1, "r") as file_1, open(
-            self.file_path_2, "r"
+                self.file_path_2, "r"
         ) as file_2:
             file_1_text = "\n".join(file_1.readlines())
             file_2_text = "\n".join(file_2.readlines())
@@ -90,6 +100,21 @@ class DiffCommand(CLICommand):
             return text
 
 
+class ConfigurationCommand(CLICommand):
+    def execute(self) -> str:
+        paths = [
+            os.path.join(root, name).replace(self.CONFIGURATION_DIR_LOCATION + '/', '')
+            for root, dirs, files in os.walk(
+                self.CONFIGURATION_DIR_LOCATION, topdown=False
+            )
+            for name in files
+        ]
+
+        path_string = '\n'.join(paths)
+
+        return f'Runnable Configurations:\n{path_string}'
+
+
 class GCodeCLI:
     """
     CLI for G-Code Parser.
@@ -100,7 +125,7 @@ class GCodeCLI:
     COMMAND_KEY = "command"
 
     RUN_PROTOCOL_COMMAND = "run"
-    PROTOCOL_FILE_PATH_KEY = "protocol_file_path"
+    CONFIGURATION_PATH = "configuration_path"
     TEXT_MODE_KEY_NAME = "text_mode"
     LEFT_PIPETTE_KEY_NAME = "left_pipette"
     RIGHT_PIPETTE_KEY_NAME = "right_pipette"
@@ -111,6 +136,8 @@ class GCodeCLI:
     ERROR_ON_DIFFERENT_FILES = "error_on_different_files"
     DEFAULT_PIPETTE_CONFIG = SmoothieSettings()
 
+    CONFIGURATION_COMMAND = "configurations"
+
     @classmethod
     def parse_args(cls, args: List[str]) -> Dict[str, Any]:
         """
@@ -119,7 +146,7 @@ class GCodeCLI:
 
         python cli.py run  --text-mode Concise  \
         --left-pipette '{"model": "p20_single_v2.0", "id": "P20SV202020070101"}' \
-        $DATA_DIR/g_code_validation_protocols/smoothie_protocol.py
+        $DATA_DIR/protocols/smoothie_protocol.py
 
         will be split into:
         [
@@ -128,7 +155,7 @@ class GCodeCLI:
             'Concise',
             '--left-pipette',
             '{"model": "p20_single_v2.0", "id": "P20SV202020070101"}',
-             '$DATA_DIR/g_code_validation_protocols/smoothie_protocol.py'
+             '$DATA_DIR/protocols/smoothie_protocol.py'
         ]
         """
         parsed_dict = vars(cls.parser().parse_args(args))
@@ -146,7 +173,7 @@ class GCodeCLI:
         command: Union[RunCommand, DiffCommand]
         if cls.RUN_PROTOCOL_COMMAND == passed_command_name:
             command = RunCommand(
-                protocol_file_path=processed_args[cls.PROTOCOL_FILE_PATH_KEY],
+                configuration_path=processed_args[cls.CONFIGURATION_PATH],
                 text_mode=processed_args[cls.TEXT_MODE_KEY_NAME],
                 left_pipette_config=processed_args[cls.LEFT_PIPETTE_KEY_NAME],
                 right_pipette_config=processed_args[cls.RIGHT_PIPETTE_KEY_NAME],
@@ -159,6 +186,8 @@ class GCodeCLI:
                     cls.ERROR_ON_DIFFERENT_FILES
                 ],
             )
+        elif cls.CONFIGURATION_COMMAND == passed_command_name:
+            command = ConfigurationCommand()
         else:
             raise UnparsableCLICommandError(
                 passed_command_name, [cls.RUN_PROTOCOL_COMMAND, cls.DIFF_FILES_COMMAND]
@@ -198,7 +227,10 @@ class GCodeCLI:
             title="Supported commands",
             dest=cls.COMMAND_KEY,
             required=True,
-            metavar=f"{cls.RUN_PROTOCOL_COMMAND} | {cls.DIFF_FILES_COMMAND}",
+            metavar=f""
+                    f"{cls.RUN_PROTOCOL_COMMAND} | "
+                    f"{cls.DIFF_FILES_COMMAND} | "
+                    f"{cls.CONFIGURATION_COMMAND}",
         )
 
         run_parser = subparsers.add_parser(
@@ -207,7 +239,7 @@ class GCodeCLI:
             formatter_class=argparse.RawTextHelpFormatter,
         )
         run_parser.add_argument(
-            "protocol_file_path", type=str, help="Path to protocol you want to run"
+            "configuration_path", type=str, help="Path to configuration you want to run"
         )
         run_parser.add_argument(
             "--text-mode",
@@ -216,11 +248,11 @@ class GCodeCLI:
             choices=SupportedTextModes.get_valid_modes(),
             dest=cls.TEXT_MODE_KEY_NAME,
             help=f"{SupportedTextModes.DEFAULT.value}: Verbose output containing "
-            f"G-Code, Explanation, and Response"
-            f"\n{SupportedTextModes.CONCISE.value}: Same as default but all "
-            f"newlines, tabs, and headers removed"
-            f"\n{SupportedTextModes.G_CODE.value}: Only raw G-Code and raw "
-            f"response\n",
+                 f"G-Code, Explanation, and Response"
+                 f"\n{SupportedTextModes.CONCISE.value}: Same as default but all "
+                 f"newlines, tabs, and headers removed"
+                 f"\n{SupportedTextModes.G_CODE.value}: Only raw G-Code and raw "
+                 f"response\n",
             metavar=" | ".join(SupportedTextModes.get_valid_modes()),
         )
         run_parser.add_argument(
@@ -228,8 +260,8 @@ class GCodeCLI:
             type=str,
             default=json.dumps(SmoothieSettings().left.__dict__),
             help="Configuration for left pipette. Expects JSON string."
-            f'\nDefaults to "{SmoothieSettings().left.model}" if not specified.'
-            '\nExample: {"model": "p20_multi_v2.0", "id": "P3HMV202020041605"}',
+                 f'\nDefaults to "{SmoothieSettings().left.model}" if not specified.'
+                 '\nExample: {"model": "p20_multi_v2.0", "id": "P3HMV202020041605"}',
             metavar="left_pipette_config",
         )
         run_parser.add_argument(
@@ -237,8 +269,8 @@ class GCodeCLI:
             type=str,
             default=json.dumps(SmoothieSettings().right.__dict__),
             help="Configuration for right pipette. Expects JSON string."
-            f'\nDefaults to "{SmoothieSettings().right.model}" if not specified.'
-            '\nExample: {"model": "p20_single_v2.0", "id": "P20SV202020070101"}',
+                 f'\nDefaults to "{SmoothieSettings().right.model}" if not specified.'
+                 '\nExample: {"model": "p20_single_v2.0", "id": "P20SV202020070101"}',
             metavar="right_pipette_config",
         )
 
@@ -257,6 +289,10 @@ class GCodeCLI:
             cls.FILE_PATH_2_KEY, type=str, help="Path to second file"
         )
 
+        configuration_parser = subparsers.add_parser(
+            cls.CONFIGURATION_COMMAND, help="List of available configurations"
+        )
+
         return parser
 
     def run_command(self):
@@ -269,8 +305,8 @@ class GCodeCLI:
     @property
     def respond_with_error(self):
         return (
-            self._command.able_to_respond_with_error_code
-            and self._command.respond_with_error_code
+                self._command.able_to_respond_with_error_code
+                and self._command.respond_with_error_code
         )
 
     @property
