@@ -8,9 +8,9 @@ opentrons = {editable = true, path = "./../api"}
 notify-server = {editable = true, path = "./../notify-server"}
 robot-server = {editable = true, path = "./../robot-server"}
 diff-match-patch = "*"
+pytest = "~=6.1"
 
 [dev-packages]
 
 [requires]
 python_version = "3.7"
-
