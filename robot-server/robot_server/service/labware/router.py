@@ -149,11 +149,7 @@ async def get_all_labware_calibrations(
         )
     calibrations = _format_calibrations(all_calibrations)
 
-    # TODO(mc, 2020-09-17): the type of all_calibrations does not match
-    # what MultipleCalibrationsResponse expects for data
-    return lw_models.MultipleCalibrationsResponse(
-        data=calibrations  # type: ignore[arg-type]
-    )
+    return lw_models.MultipleCalibrationsResponse(data=calibrations)
 
 
 @router.get(
@@ -178,11 +174,8 @@ async def get_specific_labware_calibration(
         )
 
     formatted_calibrations = _format_calibrations([calibration])
-    # TODO(mc, 2020-09-17): type of formatted_calibrations[0] does not match
-    # what SingleCalibrationResponse expects for data
-    return lw_models.SingleCalibrationResponse(
-        data=formatted_calibrations[0]
-    )  # type: ignore[arg-type]
+
+    return lw_models.SingleCalibrationResponse(data=formatted_calibrations[0])
 
 
 @router.delete(
