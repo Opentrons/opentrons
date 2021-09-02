@@ -12,6 +12,7 @@ import logging
 import os
 import pathlib
 import queue
+from datetime import timedelta
 from typing import (Any, Dict, List, Mapping, TextIO, Tuple, BinaryIO,
                     Optional, Union, TYPE_CHECKING)
 
@@ -556,7 +557,10 @@ def main() -> int:
         print(format_runlog(runlog))
 
     if duration_estimator:
-        print("estimate: ", duration_estimator.get_total_duration())
+        print("--------------------------------------------------------------")
+        s = str(timedelta(seconds=int(duration_estimator.get_total_duration())))
+        print("The estimated protocol duration is", s, "(HH:MM:SS)")
+        print("--------------------------------------------------------------")
 
     return 0
 
