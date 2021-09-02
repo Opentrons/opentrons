@@ -73,9 +73,7 @@ async def test_get_session_commands(
             session_store=matchers.Anything(),
             engine_store=matchers.Anything(),
         ),
-    ).then_return(
-        ResponseModel(data=session_response)  # type: ignore[arg-type]
-    )
+    ).then_return(ResponseModel(data=session_response))
 
     response = await async_client.get("/sessions/session-id/commands")
 

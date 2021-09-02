@@ -192,7 +192,7 @@ class PipetteOffsetCalibrationUserFlow:
 
     def get_pipette(self) -> AttachedPipette:
         # TODO(mc, 2020-09-17): s/tip_length/tipLength
-        return AttachedPipette(  # type: ignore[call-arg]
+        return AttachedPipette(
             model=self._hw_pipette.model,
             name=self._hw_pipette.name,
             tipLength=self._hw_pipette.config.tip_length,

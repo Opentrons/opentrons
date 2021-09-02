@@ -46,9 +46,9 @@ async def get_pipettes(
     mount will report `'model': null`
     """
     if refresh is True:
-        await hardware.cache_instruments()  # type: ignore
+        await hardware.cache_instruments()
 
-    attached = hardware.attached_instruments  # type: ignore
+    attached = hardware.attached_instruments
 
     def make_pipette(mount, o):
         return pipettes.AttachedPipette(
