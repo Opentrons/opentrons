@@ -18,9 +18,9 @@ Start a terminal and change directory to the root of this repo.
    Enter `docker-compose build --force-rm` at the terminal.
 2. Run
    Enter `docker-compose up` at the terminal. _The build and run stages can be combined `docker-compose up --build`._
-3. Start the Opentrons application. 
+3. Start the Opentrons application.
 4. Click `MORE` on the bottom left. Then select `NETWORK & SYSTEM`. Click `MANAGE` and add `127.0.0.1` to the `Manually Add Robot Network Address` dialog.
-5.  The docker container will appear as `dev`. Connect and run just as you would on a robot.
+5. The docker container will appear as `dev`. Connect and run just as you would on a robot.
 
 ## Configuration
 
