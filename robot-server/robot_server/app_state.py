@@ -5,6 +5,31 @@ in-memory databases.
 """
 from fastapi import Request, WebSocket
 from starlette.datastructures import State as AppState
+from typing import Generic, Optional, TypeVar
+
+
+ValueT = TypeVar("ValueT")
+
+
+class AppStateValue(Generic[ValueT]):
+    """A wrapper for a value to be placed in AppState."""
+
+    def __init__(self, key: str) -> None:
+        """Initialize the value wrapper with a key in state.
+
+        Arguments:
+            key: Unique key on which to store the value. Must be
+                unique across all keys used.
+        """
+        self._key = key
+
+    def get_from(self, app_state: AppState) -> Optional[ValueT]:
+        """Get the value from state, returning None if not present."""
+        return getattr(app_state, self._key, None)
+
+    def set_on(self, app_state: AppState, value: Optional[ValueT]) -> None:
+        """Set the value on state."""
+        setattr(app_state, self._key, value)
 
 
 async def get_app_state(

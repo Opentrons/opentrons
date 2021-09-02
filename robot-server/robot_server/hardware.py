@@ -3,7 +3,7 @@ import asyncio
 import logging
 from pathlib import Path
 from fastapi import Depends, status
-from typing import cast
+from typing import Callable, cast
 from typing_extensions import Literal
 
 from opentrons import ThreadManager, initialize as initialize_api
@@ -18,15 +18,16 @@ from notify_server.settings import Settings as NotifyServerSettings
 from notify_server.models import event, topics
 from notify_server.models.hardware_event import DoorStatePayload
 
-from .app_state import AppState, get_app_state
+from .app_state import AppState, AppStateValue, get_app_state
 from .errors import ErrorDetails
 from .settings import get_settings
 
-_HARDWARE_API_KEY = "hardware_api"
-_HARDWARE_API_INIT_TASK_KEY = "hardware_api_init_task"
-_HARDWARE_EVENT_UNSUBSCRIBE_KEY = "hardware_event_unsubscribe"
 
 log = logging.getLogger(__name__)
+
+_hw_api = AppStateValue[HardwareAPI]("hardware_api")
+_init_task = AppStateValue[asyncio.Task]("hardware_init_task")
+_event_unsubscribe = AppStateValue[Callable[[], None]]("hardware_event_unsubscribe")
 
 
 class HardwareNotYetInitialized(ErrorDetails):
@@ -46,22 +47,22 @@ class HardwareFailedToInitialize(ErrorDetails):
 
 def initialize_hardware(app_state: AppState) -> None:
     """Initialize the HardwareAPI singleton, attaching it to global state."""
-    initialize_task = getattr(app_state, _HARDWARE_API_INIT_TASK_KEY, None)
+    initialize_task = _init_task.get_from(app_state)
 
     if initialize_task is None:
         initialize_task = asyncio.create_task(_initialize_hardware_api(app_state))
-        setattr(app_state, _HARDWARE_API_INIT_TASK_KEY, initialize_task)
+        _init_task.set_on(app_state, initialize_task)
 
 
 async def cleanup_hardware(app_state: AppState) -> None:
     """Shutdown the HardwareAPI singleton and remove it from global state."""
-    initialize_task = getattr(app_state, _HARDWARE_API_INIT_TASK_KEY, None)
-    hardware_api = getattr(app_state, _HARDWARE_API_KEY, None)
-    unsubscribe_from_events = getattr(app_state, _HARDWARE_EVENT_UNSUBSCRIBE_KEY, None)
+    initialize_task = _init_task.get_from(app_state)
+    hardware_api = _hw_api.get_from(app_state)
+    unsubscribe_from_events = _event_unsubscribe.get_from(app_state)
 
-    setattr(app_state, _HARDWARE_API_INIT_TASK_KEY, None)
-    setattr(app_state, _HARDWARE_API_KEY, None)
-    setattr(app_state, _HARDWARE_EVENT_UNSUBSCRIBE_KEY, None)
+    _init_task.set_on(app_state, None)
+    _hw_api.set_on(app_state, None)
+    _event_unsubscribe.set_on(app_state, None)
 
     if initialize_task is not None:
         initialize_task.cancel()
@@ -87,8 +88,8 @@ async def get_hardware(app_state: AppState = Depends(get_app_state)) -> Hardware
     Raises:
         ApiError: The Hardware API is still initializing or failed to initialize.
     """
-    initialize_task = getattr(app_state, _HARDWARE_API_INIT_TASK_KEY, None)
-    hardware_api = getattr(app_state, _HARDWARE_API_KEY, None)
+    initialize_task = _init_task.get_from(app_state)
+    hardware_api = _hw_api.get_from(app_state)
 
     if initialize_task is None or hardware_api is None or not initialize_task.done():
         raise HardwareNotYetInitialized().as_error(status.HTTP_503_SERVICE_UNAVAILABLE)
@@ -110,10 +111,11 @@ async def get_hardware(app_state: AppState = Depends(get_app_state)) -> Hardware
 async def _initialize_hardware_api(app_state: AppState) -> None:
     """Initialize the HardwareAPI and attach it to global state."""
     app_settings = get_settings()
+    simulator_config = app_settings.simulator_configuration_file_path
     use_thread_manager = feature_flags.enable_protocol_engine() is False
 
-    if app_settings.simulator_configuration_file_path:
-        simulator_config_path = Path(app_settings.simulator_configuration_file_path)
+    if simulator_config:
+        simulator_config_path = Path(simulator_config)
         log.info(f"Loading simulator from {simulator_config_path}")
 
         if use_thread_manager:
@@ -126,7 +128,7 @@ async def _initialize_hardware_api(app_state: AppState) -> None:
         hardware_api = await initialize_api()
 
     _initialize_event_watchers(app_state, hardware_api)
-    setattr(app_state, _HARDWARE_API_KEY, hardware_api)
+    _hw_api.set_on(app_state, hardware_api)
     log.info("Opentrons hardware API initialized")
 
 
@@ -153,4 +155,4 @@ def _initialize_event_watchers(app_state: AppState, hardware_api: HardwareAPI) -
         )
 
     unsubscribe = hardware_api.register_callback(_publish_hardware_event)
-    setattr(app_state, _HARDWARE_EVENT_UNSUBSCRIBE_KEY, unsubscribe)
+    _event_unsubscribe.set_on(app_state, unsubscribe)
