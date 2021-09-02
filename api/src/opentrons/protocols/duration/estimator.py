@@ -501,8 +501,8 @@ class DurationEstimator:
 
         return z_time
 
-    # Static
-    def rate_high(self, temp0, temp1):
+    @staticmethod
+    def rate_high(temp0, temp1):
         rate_zero_to_amb = 0.0875
         rate_ambient_to_37 = 0.2
         rate_37_to_95 = 0.3611111111
@@ -519,8 +519,8 @@ class DurationEstimator:
 
         return val
 
-    # Static
-    def rate_mid(self, temp0, temp1):
+    @staticmethod
+    def rate_mid(temp0, temp1):
         rate_zero_to_amb = 0.0875
         rate_37_to_95 = 0.3611111111
         val = []
@@ -539,8 +539,8 @@ class DurationEstimator:
             val.append(abs(37 - temp1) / rate_zero_to_amb)
         return val
 
-    # Static
-    def rate_low(self, temp0, temp1):
+    @staticmethod
+    def rate_low(temp0, temp1):
         rate_zero_to_amb = 0.0875
         rate_ambient_to_37 = 0.2
         val = []

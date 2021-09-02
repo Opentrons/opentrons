@@ -12,7 +12,6 @@ import logging
 import os
 import pathlib
 import queue
-from datetime import timedelta
 from typing import (Any, Dict, List, Mapping, TextIO, Tuple, BinaryIO,
                     Optional, Union, TYPE_CHECKING)
 
