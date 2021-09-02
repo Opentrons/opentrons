@@ -1,0 +1,16 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+opentrons = {editable = true, path = "./../api"}
+notify-server = {editable = true, path = "./../notify-server"}
+robot-server = {editable = true, path = "./../robot-server"}
+diff-match-patch = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.7"
+
