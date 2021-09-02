@@ -19,6 +19,8 @@ from opentrons.protocols.api_support.util import build_edges
 if TYPE_CHECKING:
     from opentrons.hardware_control import types as hc_types
     from opentrons.protocols.api_support.util import HardwareManager
+    
+logger = logging.getLogger(__name__)
 
 
 class PairedInstrument(AbstractPairedInstrument):
@@ -29,14 +31,12 @@ class PairedInstrument(AbstractPairedInstrument):
         pair_policy: hc_types.PipettePair,
         ctx: AbstractProtocol,
         hardware_manager: HardwareManager,
-        log_parent: logging.Logger,
     ):
         self.p_instrument = primary_instrument
         self.s_instrument = secondary_instrument
         self._pair_policy = pair_policy
         self._ctx = ctx
         self._hw_manager = hardware_manager
-        self._log = log_parent.getChild(repr(self))
 
         self._last_location: Union[Labware, Well, None] = None
 
@@ -114,7 +114,7 @@ class PairedInstrument(AbstractPairedInstrument):
             force_direct=force_direct,
             minimum_z_height=minimum_z_height,
         )
-        self._log.debug("move_to: {}->{} via:\n\t{}".format(from_loc, location, moves))
+        logger.debug("move_to: {}->{} via:\n\t{}".format(from_loc, location, moves))
         try:
             for move in moves:
                 self._hw_manager.hardware.move_to(
@@ -161,7 +161,7 @@ class PairedInstrument(AbstractPairedInstrument):
                 else:
                     # TODO(seth,2019/7/29): This should be a warning exposed
                     #  via rpc to the runapp
-                    self._log.warning(
+                    logger.warning(
                         "When aspirate is called on something other than a "
                         "well relative position, we can't move to the top of"
                         " the well to prepare for aspiration. This might "
@@ -237,10 +237,10 @@ class PairedInstrument(AbstractPairedInstrument):
 
         if well.is_well:
             if "touchTipDisabled" in well.quirks_from_any_parent():
-                self._log.info(f"Ignoring touch tip on labware {well}")
+                logger.info(f"Ignoring touch tip on labware {well}")
                 return self
             if well.parent.as_labware().is_tiprack:
-                self._log.warning(
+                logger.warning(
                     "Touch_tip being performed on a tiprack. "
                     "Please re-check your code"
                 )

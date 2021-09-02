@@ -49,7 +49,7 @@ from opentrons.protocols.api_support.util import (
 if TYPE_CHECKING:
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
-MODULE_LOG = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 ModuleTypes = Union[
     "TemperatureModuleContext", "MagneticModuleContext", "ThermocyclerContext"
@@ -106,7 +106,6 @@ class ProtocolContext(CommandPublisher):
         }
         self._modules: List[ModuleContext] = []
 
-        self._log = MODULE_LOG.getChild(self.__class__.__name__)
         self._commands: List[str] = []
         self._unsubscribe_commands: Optional[Callable[[], None]] = None
         self.clear_commands()
@@ -140,7 +139,7 @@ class ProtocolContext(CommandPublisher):
     def _hw_manager(self):
         # TODO (lc 01-05-2021) remove this once we have a more
         # user facing hardware control http api.
-        self._log.warning(
+        logger.warning(
             "This function will be deprecated in later versions."
             "Please use with caution."
         )
@@ -393,7 +392,7 @@ class ProtocolContext(CommandPublisher):
         .. deprecated:: 2.0
             Use :py:meth:`load_labware` instead.
         """
-        MODULE_LOG.warning(
+        logger.warning(
             "load_labware_by_name is deprecated. Use load_labware instead."
         )
         return self.load_labware(load_name, location, label, namespace, version)
@@ -561,7 +560,7 @@ class ProtocolContext(CommandPublisher):
                 "mount should be either an instance of opentrons.types.Mount"
                 " or a string, but is {}.".format(mount)
             )
-        self._log.info(
+        logger.info(
             "Trying to load {} on {} mount".format(
                 instrument_name, checked_mount.name.lower()
             )
@@ -577,7 +576,6 @@ class ProtocolContext(CommandPublisher):
             implementation=impl,
             at_version=self.api_version,
             tip_racks=tip_racks,
-            log_parent=self._log,
         )
         self._instruments[checked_mount] = new_instr
         return new_instr
@@ -664,7 +662,7 @@ class ProtocolContext(CommandPublisher):
     @requires_version(2, 0)
     def home(self):
         """Homes the robot."""
-        self._log.debug("home")
+        logger.debug("home")
         self._implementation.home()
 
     @property
