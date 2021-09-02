@@ -1,13 +1,14 @@
 import logging
 from typing import Optional, List
 
-import numpy as np
+import numpy as np  # type: ignore
 import functools
 
 from dataclasses import dataclass
 
 from opentrons.commands import types
 from opentrons.protocols.api_support.labware_like import LabwareLike
+from opentrons.protocols.duration.errors import DurationEstimatorException
 from opentrons.types import Location
 
 START_MODULE_TEMPERATURE = 25
@@ -28,8 +29,8 @@ class DurationEstimator:
     def __init__(self):
         # Which slot the last command was in.
         self._last_deckslot = None
-        self._last_temperature_module_temperature = START_MODULE_TEMPERATURE
-        self._last_thermocyler_module_temperature = START_MODULE_TEMPERATURE
+        self._last_temperature_module_temperature = float(START_MODULE_TEMPERATURE)
+        self._last_thermocyler_module_temperature = float(START_MODULE_TEMPERATURE)
         # Per step time estimate.
         self._increments: List[TimerEntry] = []
         # New
@@ -55,15 +56,24 @@ class DurationEstimator:
         """
         # Whether this message comes before or after the command is being executed..
         if message['$'] != 'after':
+            # We only want to process the afters.
             return
 
         # Extract the message name
         message_name = message['name']
         # The actual payload of the command that varies by message.
         payload = message['payload']
+
+        # We cannot handle paired pipette messages
+        if 'instruments' in payload or 'locations' in payload:
+            logger.warning(
+                f"Paired pipettes are not supported by the duration estimator. Command '{payload['text']}' cannot be estimated properly."
+            )
+            return
+
         duration = 0.0
 
-        location = payload.get('location')
+        location = payload.get('location')  # type: ignore
 
         if message_name == types.PICK_UP_TIP:
             duration = self.on_pick_up_tip(payload=payload)
@@ -98,7 +108,9 @@ class DurationEstimator:
         elif message_name == types.THERMOCYCLER_OPEN:
             duration = self.on_thermocyler_lid_open(payload=payload)
 
-        self._last_deckslot = self.get_slot(location)
+        if location:
+            self._last_deckslot = self.get_slot(location)
+
         self._increments.append(
             TimerEntry(
                 command=message,
@@ -135,7 +147,6 @@ class DurationEstimator:
         # The instrument is opentrons/api/src/opentrons/protocol_api/instrument_context.py
         instrument = payload['instrument']
         # The location is either a Well or a Labware: see opentrons/api/src/opentrons/protocol_api/labware.py
-        location = payload['location']
         # Use the utility to get the  slot
         ## We are going to once again use our "deck movement" set up. This should be in pickup, drop tip, aspirate, dispense
         location = payload['location']
@@ -287,13 +298,10 @@ class DurationEstimator:
     def on_execute_profile(
             self,
             payload) -> float:
-        # How long this took
-        duration = 0
-
         ## This is a bit copy and paste needs to be beautified
 
         profile_total_steps = payload['steps']
-        thermocyler_temperatures = [self._last_thermocyler_module_temperature]
+        thermocyler_temperatures = [float(self._last_thermocyler_module_temperature)]
         thermocyler_hold_times = []
         cycle_count = float(payload['text'].split(' ')[2])
 
@@ -302,11 +310,9 @@ class DurationEstimator:
             thermocyler_temperatures.append(float(step['temperature']))
             thermocyler_hold_times.append(float(step['hold_time_seconds']))
         # Initializing variable
-        total_hold_time = 0
         total_hold_time = float(cycle_count) * float(sum(thermocyler_hold_times))
         # This takes care of the cumulative hold time
         # WE DON't Have a way to deal with this currently in the way we have things set up.
-        cycling = 0
         cycling_counter = []
         thermocyler_temperatures.pop(0)
         for thermocyler_counter in range(0, len(thermocyler_temperatures)):
@@ -315,8 +321,8 @@ class DurationEstimator:
                                                   float(thermocyler_temperatures[thermocyler_counter])))
 
         # Sum hold time and cycling temp time
-        duration = sum(cycling_counter) + total_hold_time
-        self._last_thermocyler_module_temperature = float(thermocyler_temperatures[-1])
+        duration = float(sum(cycling_counter) + total_hold_time)
+        self._last_thermocyler_module_temperature = thermocyler_temperatures[-1]
 
         cycling_counter = []
         # Note will need to multiply minutes by 60
@@ -360,7 +366,6 @@ class DurationEstimator:
 
     def on_tempdeck_set_temp(self,
                              payload) -> float:
-        duration = 0.0
         temperature_tempdeck = payload['celsius']
         temp0 = self._last_temperature_module_temperature
         temp1 = float(temperature_tempdeck)
@@ -439,8 +444,6 @@ class DurationEstimator:
         ## why is
         start_point_pip = (2 * x_dist, 3 * y_dist)
 
-        deck_movement_time = 0
-
         deck_centers = {'1': (0, 0), '2': (x_dist, 0),
                         '3': (2 * x_dist, 0), '4': (0, y_dist),
                         '5': (x_dist, y_dist), '6': (2 * x_dist, y_dist),
@@ -449,6 +452,8 @@ class DurationEstimator:
                         '11': (x_dist, 3 * y_dist), '12': (2 * x_dist, 3 * y_dist)}
 
         current_deck_center = deck_centers.get(current_slot)
+        if not current_deck_center:
+            raise DurationEstimatorException(f"Current slot '{current_slot}' is not valid.")
 
         if previous_slot is None:
             init_x_diff = abs((current_deck_center[0]) - (start_point_pip[0]))
@@ -458,6 +463,8 @@ class DurationEstimator:
             return deck_movement_time
         else:
             previous_deck_center = deck_centers.get(previous_slot)
+            if not previous_deck_center:
+                raise DurationEstimatorException(f"Previous slot '{current_slot}' is not valid.")
             x_difference = abs(current_deck_center[0] - previous_deck_center[0])
             y_difference = abs(current_deck_center[1] - previous_deck_center[1])
 
