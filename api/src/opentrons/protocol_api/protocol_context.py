@@ -392,9 +392,7 @@ class ProtocolContext(CommandPublisher):
         .. deprecated:: 2.0
             Use :py:meth:`load_labware` instead.
         """
-        logger.warning(
-            "load_labware_by_name is deprecated. Use load_labware instead."
-        )
+        logger.warning("load_labware_by_name is deprecated. Use load_labware instead.")
         return self.load_labware(load_name, location, label, namespace, version)
 
     @property  # type: ignore

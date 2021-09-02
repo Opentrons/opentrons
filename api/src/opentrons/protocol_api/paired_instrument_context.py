@@ -29,7 +29,6 @@ if TYPE_CHECKING:
     from .protocol_context import ProtocolContext
     from .instrument_context import InstrumentContext
     from opentrons.hardware_control import types as hc_types
-    from opentrons.protocols.api_support.util import HardwareManager
 
 
 SBS_96_WELL_SPACING = 4

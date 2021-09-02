@@ -13,10 +13,8 @@ from opentrons.protocols.api_support.util import (
     FlowRates,
     PlungerSpeeds,
 )
-from opentrons.protocols.context.paired_instrument import \
-    AbstractPairedInstrument
-from opentrons.protocols.context.protocol_api.paired_instrument import \
-    PairedInstrument
+from opentrons.protocols.context.paired_instrument import AbstractPairedInstrument
+from opentrons.protocols.context.protocol_api.paired_instrument import PairedInstrument
 from opentrons.protocols.geometry import planning
 from opentrons.protocols.context.instrument import AbstractInstrument
 from opentrons.protocols.context.protocol import AbstractProtocol
@@ -302,7 +300,9 @@ class InstrumentContextImplementation(AbstractInstrument):
             blow_out=blow_out,
         )
 
-    def pair_with(self, other_instrument: AbstractInstrument) -> AbstractPairedInstrument:
+    def pair_with(
+        self, other_instrument: AbstractInstrument
+    ) -> AbstractPairedInstrument:
         """Create an AbstractPairedInstrument"""
         return PairedInstrument(
             primary_instrument=self,

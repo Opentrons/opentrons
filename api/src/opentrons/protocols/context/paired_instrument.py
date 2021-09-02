@@ -8,7 +8,6 @@ from opentrons.protocol_api.labware import Labware, Well
 
 
 class AbstractPairedInstrument(ABC):
-
     @abstractmethod
     def pick_up_tip(
         self,

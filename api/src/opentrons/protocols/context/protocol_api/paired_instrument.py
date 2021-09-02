@@ -10,8 +10,7 @@ from opentrons.protocol_api.module_contexts import ThermocyclerContext
 from opentrons.protocol_api.labware import Labware, Well
 from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocols.context.instrument import AbstractInstrument
-from opentrons.protocols.context.paired_instrument import \
-    AbstractPairedInstrument
+from opentrons.protocols.context.paired_instrument import AbstractPairedInstrument
 from opentrons.protocols.context.protocol import AbstractProtocol
 from opentrons.protocols.geometry import planning
 from opentrons.protocols.api_support.util import build_edges
@@ -19,7 +18,7 @@ from opentrons.protocols.api_support.util import build_edges
 if TYPE_CHECKING:
     from opentrons.hardware_control import types as hc_types
     from opentrons.protocols.api_support.util import HardwareManager
-    
+
 logger = logging.getLogger(__name__)
 
 
