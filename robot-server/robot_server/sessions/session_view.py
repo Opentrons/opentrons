@@ -3,7 +3,7 @@ from dataclasses import replace
 from datetime import datetime
 from typing import List, Optional, Tuple
 
-from opentrons.protocol_engine import Command as ProtocolEngineCommand
+from opentrons.protocol_engine import Command as ProtocolEngineCommand, EngineStatus
 from .session_store import SessionResource
 from .action_models import SessionAction, SessionActionCreateData
 from .session_models import (
@@ -85,6 +85,7 @@ class SessionView:
     def as_response(
         session: SessionResource,
         commands: List[ProtocolEngineCommand],
+        engine_status: EngineStatus,
     ) -> Session:
         """Transform a session resource into its public response model.
 
@@ -106,6 +107,7 @@ class SessionView:
                 createdAt=session.created_at,
                 actions=session.actions,
                 commands=command_summaries,
+                status=engine_status,
             )
         if isinstance(create_data, ProtocolSessionCreateData):
             return ProtocolSession.construct(
@@ -114,6 +116,7 @@ class SessionView:
                 createParams=create_data.createParams,
                 actions=session.actions,
                 commands=command_summaries,
+                status=engine_status,
             )
 
         raise ValueError(f"Invalid session resource {session}")
