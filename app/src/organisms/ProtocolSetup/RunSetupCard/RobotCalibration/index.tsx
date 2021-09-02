@@ -5,6 +5,7 @@ import { Link as RRDLink } from 'react-router-dom'
 import {
   Text,
   Flex,
+  Link,
   SPACING_3,
   FONT_WEIGHT_BOLD,
   FONT_SIZE_BODY_1,
@@ -17,7 +18,6 @@ import * as PipetteOffset from '../../../../redux/calibration/pipette-offset'
 import * as Pipettes from '../../../../redux/pipettes'
 import * as TipLength from '../../../../redux/calibration/tip-length'
 import * as PipetteConstants from '../../../../redux/pipettes/constants'
-import { formatLastModified } from '../../../CalibrationPanels/utils'
 import { DeckCalibration } from './DeckCalibration'
 import { CalibrationItem } from './CalibrationItem'
 
@@ -25,6 +25,8 @@ import type { Dispatch, State } from '../../../../redux/types'
 import type { ViewableRobot } from '../../../../redux/discovery/types'
 
 const pipettesPageUrl = `/robots/opentrons-dev/instruments`
+const inexactPipetteSupportArticle =
+  'https://support.opentrons.com/en/articles/3450143-gen2-pipette-compatibility'
 
 interface Props {
   robot: ViewableRobot
@@ -73,6 +75,30 @@ export function RobotCalibration(props: Props): JSX.Element {
               attached
             ) {
               calibrated = true
+              if (
+                pipetteTipRackData.exactPipetteMatch ===
+                PipetteConstants.INEXACT_MATCH
+              ) {
+                button = (
+                  <Flex flexDirection="row" alignItems="center">
+                    <Text
+                      fontSize={FONT_SIZE_BODY_1}
+                      fontStyle={FONT_STYLE_ITALIC}
+                      marginRight="2rem"
+                    >
+                      {t('pipette_mismatch')}
+                    </Text>
+                    <Link
+                      external
+                      fontSize={FONT_SIZE_BODY_1}
+                      href={inexactPipetteSupportArticle}
+                      marginRight="1rem"
+                    >
+                      {t('pipette_compat_help')}
+                    </Link>
+                  </Flex>
+                )
+              }
             } else if (!attached) {
               subText = t('attach_pipette_calibration')
               button = (
