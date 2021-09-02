@@ -1100,7 +1100,7 @@ class InstrumentContext(CommandPublisher):
 
             * *blowout_location* (``string``) --
                 - 'source well': blowout excess liquid into source well
-                - 'destintation well': blowout excess liquid into destination
+                - 'destination well': blowout excess liquid into destination
                    well
                 - 'trash': blowout excess liquid into the trash
                 If no `blowout_location` specified, no `disposal_volume`
