@@ -8,60 +8,39 @@ disk into the runner, and the protocols are run to completion. From
 there, the ProtocolEngine state is inspected to everything was loaded
 and ran as expected.
 """
-
-
-import pytest
 from pathlib import Path
 from datetime import datetime
 from decoy import matchers
 
 from opentrons_shared_data.pipette.dev_types import LabwareUri
 from opentrons.types import MountType
-from opentrons.hardware_control import API as HardwareAPI
 from opentrons.protocol_api_experimental import DeckSlotName
 
 from opentrons.protocol_engine import (
-    ProtocolEngine,
     LabwareData,
     PipetteData,
     PipetteName,
     DeckSlotLocation,
-    create_protocol_engine,
     commands,
 )
-
 from opentrons.protocol_runner import (
-    ProtocolRunner,
     ProtocolFile,
     ProtocolFileType,
+    create_simulating_runner,
 )
 
 
-@pytest.fixture
-async def protocol_engine(hardware: HardwareAPI) -> ProtocolEngine:
-    """Get a real ProtocolEngine hooked into a simulating HardwareAPI."""
-    await hardware.home()
-    return await create_protocol_engine(hardware_api=hardware)
-
-
-@pytest.fixture
-async def subject(protocol_engine: ProtocolEngine) -> ProtocolRunner:
-    """Get a ProtocolRunner test subject."""
-    return ProtocolRunner(protocol_engine=protocol_engine)
-
-
-async def test_protocol_runner_with_python(
-    python_protocol_file: Path,
-    protocol_engine: ProtocolEngine,
-    subject: ProtocolRunner,
-) -> None:
+async def test_protocol_runner_with_python(python_protocol_file: Path) -> None:
     """It should run a Python protocol on the ProtocolRunner."""
-    subject.load(
-        ProtocolFile(file_path=python_protocol_file, file_type=ProtocolFileType.PYTHON)
+    protocol_file = ProtocolFile(
+        protocol_type=ProtocolFileType.PYTHON,
+        files=[python_protocol_file],
     )
 
-    subject.play()
-    await subject.join()
+    subject = await create_simulating_runner()
+    commands_result = await subject.run(protocol_file)
+    pipettes_result = subject.engine.state_view.pipettes.get_all_pipettes()
+    labware_result = subject.engine.state_view.labware.get_all_labware()
 
     pipette_id_captor = matchers.Captor()
     labware_id_captor = matchers.Captor()
@@ -69,10 +48,6 @@ async def test_protocol_runner_with_python(
     expected_pipette_entry = (
         pipette_id_captor,
         PipetteData(pipette_name=PipetteName.P300_SINGLE, mount=MountType.LEFT),
-    )
-
-    assert (
-        expected_pipette_entry in protocol_engine.state_view.pipettes.get_all_pipettes()
     )
 
     expected_labware_entry = (
@@ -84,9 +59,8 @@ async def test_protocol_runner_with_python(
         ),
     )
 
-    assert (
-        expected_labware_entry in protocol_engine.state_view.labware.get_all_labware()
-    )
+    assert expected_pipette_entry in pipettes_result
+    assert expected_labware_entry in labware_result
 
     expected_command = commands.PickUpTip.construct(
         id=matchers.IsA(str),
@@ -102,29 +76,24 @@ async def test_protocol_runner_with_python(
         result=commands.PickUpTipResult(),
     )
 
-    assert expected_command in protocol_engine.state_view.commands.get_all()
+    assert expected_command in commands_result
 
 
-async def test_protocol_runner_with_json(
-    json_protocol_file: Path,
-    protocol_engine: ProtocolEngine,
-    subject: ProtocolRunner,
-) -> None:
+async def test_protocol_runner_with_json(json_protocol_file: Path) -> None:
     """It should run a JSON protocol on the ProtocolRunner."""
-    subject.load(
-        ProtocolFile(file_path=json_protocol_file, file_type=ProtocolFileType.JSON)
+    protocol_file = ProtocolFile(
+        protocol_type=ProtocolFileType.JSON,
+        files=[json_protocol_file],
     )
 
-    subject.play()
-    await subject.join()
+    subject = await create_simulating_runner()
+    commands_result = await subject.run(protocol_file)
+    pipettes_result = subject.engine.state_view.pipettes.get_all_pipettes()
+    labware_result = subject.engine.state_view.labware.get_all_labware()
 
     expected_pipette_entry = (
         "pipette-id",
         PipetteData(pipette_name=PipetteName.P300_SINGLE, mount=MountType.LEFT),
-    )
-
-    assert (
-        expected_pipette_entry in protocol_engine.state_view.pipettes.get_all_pipettes()
     )
 
     expected_labware_entry = (
@@ -136,9 +105,8 @@ async def test_protocol_runner_with_json(
         ),
     )
 
-    assert (
-        expected_labware_entry in protocol_engine.state_view.labware.get_all_labware()
-    )
+    assert expected_pipette_entry in pipettes_result
+    assert expected_labware_entry in labware_result
 
     expected_command = commands.PickUpTip.construct(
         id=matchers.IsA(str),
@@ -154,4 +122,4 @@ async def test_protocol_runner_with_json(
         result=commands.PickUpTipResult(),
     )
 
-    assert expected_command in protocol_engine.state_view.commands.get_all()
+    assert expected_command in commands_result

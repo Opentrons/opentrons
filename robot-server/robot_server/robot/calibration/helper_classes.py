@@ -132,7 +132,7 @@ class RequiredLabware(BaseModel):
     @classmethod
     def from_lw(cls, lw: labware.Labware, slot: typing.Optional[DeckLocation] = None):
         if not slot:
-            slot = lw.parent  # type: ignore[assignment]
+            slot = lw.parent
         lw_def = lw._implementation.get_definition()
         return cls(
             # TODO(mc, 2020-09-17): DeckLocation does not match

@@ -8,7 +8,6 @@ from .types import USBPort
 
 
 class USBDriverInterface(Protocol):
-
     @staticmethod
     def read_bus() -> List[str]:
         ...
@@ -47,6 +46,6 @@ class USBDriverInterface(Protocol):
         ...
 
     def match_virtual_ports(
-            self, virtual_port: List[ModuleAtPort]
-            ) -> List[ModuleAtPort]:
+        self, virtual_port: List[ModuleAtPort]
+    ) -> List[ModuleAtPort]:
         ...

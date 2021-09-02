@@ -25,7 +25,7 @@ async def get_engaged_motors(
     hardware: ThreadManager = Depends(get_hardware),
 ) -> model.EngagedMotors:  # type: ignore
     try:
-        engaged_axes = hardware.engaged_axes  # type: ignore
+        engaged_axes = hardware.engaged_axes
         axes_dict = {
             str(k).lower(): model.EngagedMotor(enabled=v)
             for k, v in engaged_axes.items()
@@ -47,5 +47,5 @@ async def post_disengage_motors(
 ) -> V1BasicResponse:
 
     input_axes = [Axis[ax.upper()] for ax in axes.axes]
-    await hardware.disengage_axes(input_axes)  # type: ignore
+    await hardware.disengage_axes(input_axes)
     return V1BasicResponse(message="Disengaged axes: {}".format(", ".join(axes.axes)))

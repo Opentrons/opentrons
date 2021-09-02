@@ -1,5 +1,7 @@
-from opentrons.drivers.smoothie_drivers.constants import HOMED_POSITION, \
-    Y_BOUND_OVERRIDE
+from opentrons.drivers.smoothie_drivers.constants import (
+    HOMED_POSITION,
+    Y_BOUND_OVERRIDE,
+)
 
 
 class SimulatingDriver:
@@ -34,14 +36,14 @@ class SimulatingDriver:
         pass
 
     def update_pipette_config(self, axis, data):
-        '''
+        """
         Updates the following configs for a given pipette mount based on
         the detected pipette type:
         - homing positions M365.0
         - Max Travel M365.1
         - endstop debounce M365.2 (NOT for zprobe debounce)
         - retract from endstop distance M365.3
-        '''
+        """
         pass
 
     @property
@@ -80,5 +82,5 @@ class SimulatingDriver:
     @property
     def axis_bounds(self):
         position = HOMED_POSITION.copy()
-        position['Y'] = Y_BOUND_OVERRIDE
+        position["Y"] = Y_BOUND_OVERRIDE
         return position

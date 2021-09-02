@@ -1,50 +1,63 @@
 import asyncio
 import contextlib
 import logging
-from typing import (Dict, Iterator, List, Callable,
-                    Optional, Tuple, Union, TYPE_CHECKING, cast)
+from typing import (
+    Dict,
+    Iterator,
+    List,
+    Callable,
+    Optional,
+    Tuple,
+    Union,
+    TYPE_CHECKING,
+    cast,
+)
 from collections import OrderedDict
 
-from opentrons.hardware_control import (SynchronousAdapter, ThreadManager)
+from opentrons.hardware_control import SynchronousAdapter, ThreadManager
 from opentrons import types
 from opentrons.hardware_control import API
 from opentrons.commands import protocol_commands as cmds, types as cmd_types
 from opentrons.commands.publisher import CommandPublisher, publish
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.context.protocol_api.instrument_context import \
-    InstrumentContextImplementation
-from opentrons.protocols.context.simulator.instrument_context import \
-    InstrumentContextSimulation
+from opentrons.protocols.context.protocol_api.instrument_context import (
+    InstrumentContextImplementation,
+)
+from opentrons.protocols.context.simulator.instrument_context import (
+    InstrumentContextSimulation,
+)
 from opentrons.protocols.types import Protocol
 from .labware import Labware
-from opentrons.protocols.context.labware import \
-    AbstractLabware
-from opentrons.protocols.context.protocol import \
-    AbstractProtocol
-from opentrons.protocols.geometry.module_geometry import (
-    ModuleGeometry, ModuleType)
+from opentrons.protocols.context.labware import AbstractLabware
+from opentrons.protocols.context.protocol import AbstractProtocol
+from opentrons.protocols.geometry.module_geometry import ModuleGeometry, ModuleType
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from .instrument_context import InstrumentContext
 from .module_contexts import (
-    ModuleContext, MagneticModuleContext, TemperatureModuleContext,
-    ThermocyclerContext)
+    ModuleContext,
+    MagneticModuleContext,
+    TemperatureModuleContext,
+    ThermocyclerContext,
+)
 from opentrons.protocols.api_support.util import (
-    AxisMaxSpeeds, requires_version, APIVersionError)
+    AxisMaxSpeeds,
+    requires_version,
+    APIVersionError,
+)
+
 if TYPE_CHECKING:
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 MODULE_LOG = logging.getLogger(__name__)
 
 ModuleTypes = Union[
-    'TemperatureModuleContext',
-    'MagneticModuleContext',
-    'ThermocyclerContext'
+    "TemperatureModuleContext", "MagneticModuleContext", "ThermocyclerContext"
 ]
 
 
 class ProtocolContext(CommandPublisher):
-    """ The Context class is a container for the state of a protocol.
+    """The Context class is a container for the state of a protocol.
 
     It encapsulates many of the methods formerly found in the Robot class,
     including labware, instrument, and module loading, as well as core
@@ -60,13 +73,14 @@ class ProtocolContext(CommandPublisher):
 
     """
 
-    def __init__(self,
-                 implementation: AbstractProtocol,
-                 loop: asyncio.AbstractEventLoop = None,
-                 broker=None,
-                 api_version: Optional[APIVersion] = None,
-                 ) -> None:
-        """ Build a :py:class:`.ProtocolContext`.
+    def __init__(
+        self,
+        implementation: AbstractProtocol,
+        loop: asyncio.AbstractEventLoop = None,
+        broker=None,
+        api_version: Optional[APIVersion] = None,
+    ) -> None:
+        """Build a :py:class:`.ProtocolContext`.
 
         :param loop: An event loop to use. If not specified, this ctor will
                      (eventually) call :py:meth:`asyncio.get_event_loop`.
@@ -82,12 +96,14 @@ class ProtocolContext(CommandPublisher):
         self._api_version = api_version or MAX_SUPPORTED_VERSION
         if self._api_version > MAX_SUPPORTED_VERSION:
             raise RuntimeError(
-                f'API version {self._api_version} is not supported by this '
-                f'robot software. Please either reduce your requested API '
-                f'version or update your robot.')
+                f"API version {self._api_version} is not supported by this "
+                f"robot software. Please either reduce your requested API "
+                f"version or update your robot."
+            )
         self._loop = loop or asyncio.get_event_loop()
-        self._instruments: Dict[types.Mount, Optional[InstrumentContext]]\
-            = {mount: None for mount in types.Mount}
+        self._instruments: Dict[types.Mount, Optional[InstrumentContext]] = {
+            mount: None for mount in types.Mount
+        }
         self._modules: List[ModuleContext] = []
 
         self._log = MODULE_LOG.getChild(self.__class__.__name__)
@@ -96,24 +112,22 @@ class ProtocolContext(CommandPublisher):
         self.clear_commands()
 
     @classmethod
-    def build_using(cls,
-                    implementation: AbstractProtocol,
-                    protocol: Protocol,
-                    *args, **kwargs):
-        """ Build an API instance for the specified parsed protocol
+    def build_using(
+        cls, implementation: AbstractProtocol, protocol: Protocol, *args, **kwargs
+    ):
+        """Build an API instance for the specified parsed protocol
 
         This is used internally to provision the context with bundle
         contents or api levels.
         """
-        kwargs['api_version'] = getattr(
-            protocol, 'api_level', MAX_SUPPORTED_VERSION)
-        kwargs['implementation'] = implementation
+        kwargs["api_version"] = getattr(protocol, "api_level", MAX_SUPPORTED_VERSION)
+        kwargs["implementation"] = implementation
         return cls(*args, **kwargs)
 
     @property  # type: ignore
     @requires_version(2, 0)
     def api_version(self) -> APIVersion:
-        """ Return the API version supported by this protocol context.
+        """Return the API version supported by this protocol context.
 
         The supported API version was specified when the protocol context
         was initialized. It may be lower than the highest version supported
@@ -128,13 +142,14 @@ class ProtocolContext(CommandPublisher):
         # user facing hardware control http api.
         self._log.warning(
             "This function will be deprecated in later versions."
-            "Please use with caution.")
+            "Please use with caution."
+        )
         return self._implementation.get_hardware()
 
     @property  # type: ignore
     @requires_version(2, 0)
     def bundled_data(self) -> Dict[str, bytes]:
-        """ Accessor for data files bundled with this protocol, if any.
+        """Accessor for data files bundled with this protocol, if any.
 
         This is a dictionary mapping the filenames of bundled datafiles, with
         extensions but without paths (e.g. if a file is stored in the bundle as
@@ -144,19 +159,19 @@ class ProtocolContext(CommandPublisher):
         return self._implementation.get_bundled_data()
 
     def cleanup(self):
-        """ Finalize and clean up the protocol context. """
+        """Finalize and clean up the protocol context."""
         if self._unsubscribe_commands:
             self._unsubscribe_commands()
             self._unsubscribe_commands = None
 
     def __del__(self):
-        if getattr(self, '_unsubscribe_commands', None):
+        if getattr(self, "_unsubscribe_commands", None):
             self._unsubscribe_commands()  # type: ignore
 
     @property  # type: ignore
     @requires_version(2, 0)
     def max_speeds(self) -> AxisMaxSpeeds:
-        """ Per-axis speed limits when moving this instrument.
+        """Per-axis speed limits when moving this instrument.
 
         Changing this value changes the speed limit for each non-plunger
         axis of the robot, when moving this pipette. Note that this does
@@ -197,20 +212,21 @@ class ProtocolContext(CommandPublisher):
             self._unsubscribe_commands()
 
         def on_command(message):
-            payload = message.get('payload')
-            text = payload.get('text')
+            payload = message.get("payload")
+            text = payload.get("text")
             if text is None:
                 return
 
-            if message['$'] == 'before':
+            if message["$"] == "before":
                 self._commands.append(text.format(**payload))
 
         self._unsubscribe_commands = self.broker.subscribe(
-            cmd_types.COMMAND, on_command)
+            cmd_types.COMMAND, on_command
+        )
 
     @contextlib.contextmanager
     def temp_connect(self, hardware: Union[ThreadManager, SynchronousAdapter]):
-        """ Connect temporarily to the specified hardware controller.
+        """Connect temporarily to the specified hardware controller.
 
         This should be used as a context manager:
 
@@ -237,9 +253,11 @@ class ProtocolContext(CommandPublisher):
             for mod_ctx in self._modules:
                 if isinstance(mod_ctx, ThermocyclerContext):
                     tc_context = mod_ctx
-                    hw_tc = next(hw_mod for hw_mod in
-                                 hardware.attached_modules
-                                 if hw_mod.name() == 'thermocycler')
+                    hw_tc = next(
+                        hw_mod
+                        for hw_mod in hardware.attached_modules
+                        if hw_mod.name() == "thermocycler"
+                    )
                     if hw_tc:
                         old_tc = mod_ctx._module
                         mod_ctx._module = hw_tc
@@ -256,14 +274,13 @@ class ProtocolContext(CommandPublisher):
                     continue
                 impl = instrument_ctx._implementation
                 if isinstance(impl, InstrumentContextSimulation):
-                    instrument_ctx._implementation = \
-                        InstrumentContextImplementation(
-                            protocol_interface=self._implementation,
-                            mount=impl.get_mount(),
-                            default_speed=impl.get_default_speed(),
-                            instrument_name=impl.get_instrument_name(),
-                            api_version=self._api_version
-                        )
+                    instrument_ctx._implementation = InstrumentContextImplementation(
+                        protocol_interface=self._implementation,
+                        mount=impl.get_mount(),
+                        default_speed=impl.get_default_speed(),
+                        instrument_name=impl.get_instrument_name(),
+                        api_version=self._api_version,
+                    )
 
             yield self
         finally:
@@ -278,7 +295,7 @@ class ProtocolContext(CommandPublisher):
 
     @requires_version(2, 0)
     def connect(self, hardware: API):
-        """ Connect to a running hardware API.
+        """Connect to a running hardware API.
 
         This can be either a simulator or a full hardware controller.
 
@@ -290,8 +307,7 @@ class ProtocolContext(CommandPublisher):
 
     @requires_version(2, 0)
     def disconnect(self):
-        """ Disconnect from currently-connected hardware and simulate instead
-        """
+        """Disconnect from currently-connected hardware and simulate instead"""
         self._implementation.disconnect()
 
     @requires_version(2, 0)
@@ -300,12 +316,12 @@ class ProtocolContext(CommandPublisher):
 
     @requires_version(2, 0)
     def load_labware_from_definition(
-            self,
-            labware_def: 'LabwareDefinition',
-            location: types.DeckLocation,
-            label: Optional[str] = None,
+        self,
+        labware_def: "LabwareDefinition",
+        location: types.DeckLocation,
+        label: Optional[str] = None,
     ) -> Labware:
-        """ Specify the presence of a piece of labware on the OT2 deck.
+        """Specify the presence of a piece of labware on the OT2 deck.
 
         This function loads the labware definition specified by `labware_def`
         to the location specified by `location`.
@@ -320,22 +336,20 @@ class ProtocolContext(CommandPublisher):
                           Opentrons app.
         """
         implementation = self._implementation.load_labware_from_definition(
-            labware_def=labware_def,
-            location=location,
-            label=label
+            labware_def=labware_def, location=location, label=label
         )
         return Labware(implementation=implementation)
 
     @requires_version(2, 0)
     def load_labware(
-            self,
-            load_name: str,
-            location: types.DeckLocation,
-            label: Optional[str] = None,
-            namespace: Optional[str] = None,
-            version: Optional[int] = None,
+        self,
+        load_name: str,
+        location: types.DeckLocation,
+        label: Optional[str] = None,
+        namespace: Optional[str] = None,
+        version: Optional[int] = None,
     ) -> Labware:
-        """ Load a labware onto the deck given its name.
+        """Load a labware onto the deck given its name.
 
         For labware already defined by Opentrons, this is a convenient way
         to collapse the two stages of labware initialization (creating
@@ -362,32 +376,32 @@ class ProtocolContext(CommandPublisher):
             location=location,
             label=label,
             namespace=namespace,
-            version=version
+            version=version,
         )
         return Labware(implementation=implementation)
 
     @requires_version(2, 0)
     def load_labware_by_name(
-            self,
-            load_name: str,
-            location: types.DeckLocation,
-            label: Optional[str] = None,
-            namespace: Optional[str] = None,
-            version: int = 1
+        self,
+        load_name: str,
+        location: types.DeckLocation,
+        label: Optional[str] = None,
+        namespace: Optional[str] = None,
+        version: int = 1,
     ) -> Labware:
         """
         .. deprecated:: 2.0
             Use :py:meth:`load_labware` instead.
         """
         MODULE_LOG.warning(
-            'load_labware_by_name is deprecated. Use load_labware instead.')
-        return self.load_labware(
-            load_name, location, label, namespace, version)
+            "load_labware_by_name is deprecated. Use load_labware instead."
+        )
+        return self.load_labware(load_name, location, label, namespace, version)
 
     @property  # type: ignore
     @requires_version(2, 0)
     def loaded_labwares(self) -> Dict[int, Labware]:
-        """ Get the labwares that have been loaded into the protocol context.
+        """Get the labwares that have been loaded into the protocol context.
 
         Slots with nothing in them will not be present in the return value.
 
@@ -404,8 +418,8 @@ class ProtocolContext(CommandPublisher):
         :returns: Dict mapping deck slot number to labware, sorted in order of
                   the locations.
         """
-        def _only_labwares() -> Iterator[
-                Tuple[int, Labware]]:
+
+        def _only_labwares() -> Iterator[Tuple[int, Labware]]:
             for slotnum, slotitem in self._implementation.get_deck().items():
                 if isinstance(slotitem, AbstractLabware):
                     yield slotnum, Labware(implementation=slotitem)
@@ -419,10 +433,12 @@ class ProtocolContext(CommandPublisher):
 
     @requires_version(2, 0)
     def load_module(
-            self, module_name: str,
-            location: Optional[types.DeckLocation] = None,
-            configuration: Optional[str] = None) -> ModuleTypes:
-        """ Load a module onto the deck given its name.
+        self,
+        module_name: str,
+        location: Optional[types.DeckLocation] = None,
+        configuration: Optional[str] = None,
+    ) -> ModuleTypes:
+        """Load a module onto the deck given its name.
 
         This is the function to call to use a module in your protocol, like
         :py:meth:`load_instrument` is the method to call to use an instrument
@@ -452,22 +468,21 @@ class ProtocolContext(CommandPublisher):
         """
         if self._api_version < APIVersion(2, 4) and configuration:
             raise APIVersionError(
-                f'You have specified API {self._api_version}, but you are'
-                'using thermocycler parameters only available in 2.4')
+                f"You have specified API {self._api_version}, but you are"
+                "using thermocycler parameters only available in 2.4"
+            )
 
         module = self._implementation.load_module(
-            module_name=module_name,
-            location=location,
-            configuration=configuration)
+            module_name=module_name, location=location, configuration=configuration
+        )
 
         if not module:
-            raise RuntimeError(
-                f'Could not find specified module: {module_name}')
+            raise RuntimeError(f"Could not find specified module: {module_name}")
 
         mod_class = {
             ModuleType.MAGNETIC: MagneticModuleContext,
             ModuleType.TEMPERATURE: TemperatureModuleContext,
-            ModuleType.THERMOCYCLER: ThermocyclerContext
+            ModuleType.THERMOCYCLER: ThermocyclerContext,
         }[module.type]
 
         module_context = mod_class(
@@ -478,8 +493,8 @@ class ProtocolContext(CommandPublisher):
 
     @property  # type: ignore
     @requires_version(2, 0)
-    def loaded_modules(self) -> Dict[int, 'ModuleContext']:
-        """ Get the modules loaded into the protocol context.
+    def loaded_modules(self) -> Dict[int, "ModuleContext"]:
+        """Get the modules loaded into the protocol context.
 
         This is a map of deck positions to modules loaded by previous calls
         to :py:meth:`load_module`. It is not necessarily the same as the
@@ -492,7 +507,8 @@ class ProtocolContext(CommandPublisher):
                                            contexts. The elements may not be
                                            ordered by slot number.
         """
-        def _modules() -> Iterator[Tuple[int, 'ModuleContext']]:
+
+        def _modules() -> Iterator[Tuple[int, "ModuleContext"]]:
             for module in self._modules:
                 yield int(str(module.geometry.parent)), module
 
@@ -500,12 +516,13 @@ class ProtocolContext(CommandPublisher):
 
     @requires_version(2, 0)
     def load_instrument(
-            self,
-            instrument_name: str,
-            mount: Union[types.Mount, str],
-            tip_racks: List[Labware] = None,
-            replace: bool = False) -> 'InstrumentContext':
-        """ Load a specific instrument required by the protocol.
+        self,
+        instrument_name: str,
+        mount: Union[types.Mount, str],
+        tip_racks: List[Labware] = None,
+        replace: bool = False,
+    ) -> "InstrumentContext":
+        """Load a specific instrument required by the protocol.
 
         This value will actually be checked when the protocol runs, to
         ensure that the correct instrument is attached in the specified
@@ -535,20 +552,23 @@ class ProtocolContext(CommandPublisher):
                 raise ValueError(
                     "If mount is specified as a string, it should be either"
                     "'left' or 'right' (ignoring capitalization, which the"
-                    " system strips), not {}".format(mount))
+                    " system strips), not {}".format(mount)
+                )
         elif isinstance(mount, types.Mount):
             checked_mount = mount
         else:
             raise TypeError(
                 "mount should be either an instance of opentrons.types.Mount"
-                " or a string, but is {}.".format(mount))
-        self._log.info("Trying to load {} on {} mount"
-                       .format(instrument_name, checked_mount.name.lower()))
+                " or a string, but is {}.".format(mount)
+            )
+        self._log.info(
+            "Trying to load {} on {} mount".format(
+                instrument_name, checked_mount.name.lower()
+            )
+        )
 
         impl = self._implementation.load_instrument(
-            instrument_name=instrument_name,
-            mount=checked_mount,
-            replace=replace
+            instrument_name=instrument_name, mount=checked_mount, replace=replace
         )
 
         new_instr = InstrumentContext(
@@ -564,8 +584,8 @@ class ProtocolContext(CommandPublisher):
 
     @property  # type: ignore
     @requires_version(2, 0)
-    def loaded_instruments(self) -> Dict[str, 'InstrumentContext']:
-        """ Get the instruments that have been loaded into the protocol.
+    def loaded_instruments(self) -> Dict[str, "InstrumentContext"]:
+        """Get the instruments that have been loaded into the protocol.
 
         This is a map of mount name to instruments previously loaded with
         :py:meth:`load_instrument`. It is not necessarily the same as the
@@ -580,27 +600,39 @@ class ProtocolContext(CommandPublisher):
                   If a mount has no loaded instrument,
                   that key will be missing from the dict.
         """
-        return {mount.name.lower(): instr for mount, instr
-                in self._instruments.items()
-                if instr}
+        return {
+            mount.name.lower(): instr
+            for mount, instr in self._instruments.items()
+            if instr
+        }
 
     @publish.both(command=cmds.pause)
     @requires_version(2, 0)
     def pause(self, msg=None) -> None:
-        """ Pause execution of the protocol until resume is called.
+        """Pause execution of the protocol until it's resumed.
+
+        A human can resume the protocol through the Opentrons App.
 
         This function returns immediately, but the next function call that
         is blocked by a paused robot (anything that involves moving) will
-        not return until :py:meth:`resume` is called.
+        not return until the protocol is resumed.
 
-        :param str msg: A message to echo back to connected clients.
+        :param str msg: An optional message to show to connected clients. The
+            Opentrons App will show this in the run log.
         """
         self._implementation.pause(msg=msg)
 
     @publish.both(command=cmds.resume)
     @requires_version(2, 0)
     def resume(self) -> None:
-        """ Resume a previously-paused protocol """
+        """Resume the protocol after :py:meth:`pause`.
+
+        .. deprecated:: 2.12
+           The Python Protocol API supports no safe way for a protocol to resume itself.
+           See https://github.com/Opentrons/opentrons/issues/8209.
+           If you're looking for a way for your protocol to resume automatically
+           after a period of time, use :py:meth:`delay`.
+        """
         self._implementation.resume()
 
     @publish.both(command=cmds.comment)
@@ -619,7 +651,7 @@ class ProtocolContext(CommandPublisher):
     @publish.both(command=cmds.delay)
     @requires_version(2, 0)
     def delay(self, seconds=0, minutes=0, msg=None):
-        """ Delay protocol execution for a specific amount of time.
+        """Delay protocol execution for a specific amount of time.
 
         :param float seconds: A time to delay in seconds
         :param float minutes: A time to delay in minutes
@@ -631,15 +663,13 @@ class ProtocolContext(CommandPublisher):
 
     @requires_version(2, 0)
     def home(self):
-        """ Homes the robot.
-        """
+        """Homes the robot."""
         self._log.debug("home")
         self._implementation.home()
 
     @property
     def location_cache(self) -> Optional[types.Location]:
-        """ The cache used by the robot to determine where it last was.
-        """
+        """The cache used by the robot to determine where it last was."""
         return self._implementation.get_last_location()
 
     @location_cache.setter
@@ -649,7 +679,7 @@ class ProtocolContext(CommandPublisher):
     @property  # type: ignore
     @requires_version(2, 0)
     def deck(self) -> Deck:
-        """ The object holding the deck layout of the robot.
+        """The object holding the deck layout of the robot.
 
         This object behaves like a dictionary with keys for both numeric
         and string slot numbers (for instance, ``protocol.deck[1]`` and
@@ -673,7 +703,7 @@ class ProtocolContext(CommandPublisher):
     @property  # type: ignore
     @requires_version(2, 0)
     def fixed_trash(self) -> Labware:
-        """ The trash fixed to slot 12 of the robot deck.
+        """The trash fixed to slot 12 of the robot deck.
 
         It has one well and should be accessed like labware in your protocol.
         e.g. ``protocol.fixed_trash['A1']``
@@ -697,11 +727,11 @@ class ProtocolContext(CommandPublisher):
     @property  # type: ignore
     @requires_version(2, 5)
     def rail_lights_on(self) -> bool:
-        """ Returns True if the rail lights are on """
+        """Returns True if the rail lights are on"""
         return self._implementation.get_rail_lights_on()
 
     @property  # type: ignore
     @requires_version(2, 5)
     def door_closed(self) -> bool:
-        """ Returns True if the robot door is closed """
+        """Returns True if the robot door is closed"""
         return self._implementation.door_closed()

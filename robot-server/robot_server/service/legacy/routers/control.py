@@ -27,7 +27,7 @@ async def post_identify(
     seconds: int = Query(..., description="Time to blink the lights for"),
     hardware: ThreadManager = Depends(get_hardware),
 ) -> V1BasicResponse:
-    identify = hardware.identify  # type: ignore
+    identify = hardware.identify
     asyncio.ensure_future(identify(seconds))
     return V1BasicResponse(message="identifying")
 
@@ -100,8 +100,8 @@ async def post_home_robot(
             mount = robot_home_target.mount
             target = robot_home_target.target
 
-            home = hardware.home  # type: ignore
-            home_plunger = hardware.home_plunger  # type: ignore
+            home = hardware.home
+            home_plunger = hardware.home_plunger
 
             if target == control.HomeTarget.pipette and mount:
                 await home([Axis.by_mount(Mount[mount.upper()])])
@@ -128,7 +128,7 @@ async def post_home_robot(
 async def get_robot_light_state(
     hardware: ThreadManager = Depends(get_hardware),
 ) -> control.RobotLightState:
-    light_state = hardware.get_lights()  # type: ignore
+    light_state = hardware.get_lights()
     return control.RobotLightState(on=light_state.get("rails", False))
 
 
@@ -141,13 +141,13 @@ async def post_robot_light_state(
     robot_light_state: control.RobotLightState,
     hardware: ThreadManager = Depends(get_hardware),
 ) -> control.RobotLightState:
-    await hardware.set_lights(rails=robot_light_state.on)  # type: ignore
+    await hardware.set_lights(rails=robot_light_state.on)
     return robot_light_state
 
 
 async def _do_move(hardware: ThreadManager, robot_move_target: control.RobotMoveTarget):
     """Perform the move"""
-    await hardware.cache_instruments()  # type: ignore
+    await hardware.cache_instruments()
 
     critical_point = None
     if robot_move_target.target == control.MotionTarget.mount:
@@ -157,10 +157,10 @@ async def _do_move(hardware: ThreadManager, robot_move_target: control.RobotMove
     target_pos = Point(*robot_move_target.point)
 
     # Reset z position
-    await hardware.home_z()  # type: ignore
+    await hardware.home_z()
 
-    gantry_position = hardware.gantry_position  # type: ignore
-    move_to = hardware.move_to  # type: ignore
+    gantry_position = hardware.gantry_position
+    move_to = hardware.move_to
 
     pos = await gantry_position(mount, critical_point=critical_point)
     # Move to requested x, y and current z position

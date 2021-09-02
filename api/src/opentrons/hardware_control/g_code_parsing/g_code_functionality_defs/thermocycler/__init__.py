@@ -8,23 +8,24 @@ from .set_lid_temp_g_code_functionality_def import SetLidTempGCodeFunctionalityD
 from .get_lid_temp_g_code_functionality_def import GetLidTempGCodeFunctionalityDef
 from .set_ramp_rate_g_code_functionality_def import SetRampRateGCodeFunctionalityDef
 from .deactivate_lid_g_code_functionality_def import DeactivateLidGCodeFunctionalityDef
-from .deactivate_block_g_code_functionality_def import \
-    DeactivateBlockGCodeFunctionalityDef
+from .deactivate_block_g_code_functionality_def import (
+    DeactivateBlockGCodeFunctionalityDef,
+)
 from .deactivate_all_g_code_functionality_def import DeactivateAllGCodeFunctionalityDef
 from .edit_pid_params_g_code_functionality_def import EditPIDParamsGCodeFunctionalityDef
 
 __all__ = [
-    'CloseLidGCodeFunctionalityDef',
-    'DeviceInfoGCodeFunctionalityDef',
-    'GetPlateTempGCodeFunctionalityDef',
-    'LidStatusGCodeFunctionalityDef',
-    'OpenLidGCodeFunctionalityDef',
-    'SetPlateTempGCodeFunctionalityDef',
-    'SetLidTempGCodeFunctionalityDef',
-    'GetLidTempGCodeFunctionalityDef',
-    'SetRampRateGCodeFunctionalityDef',
-    'DeactivateLidGCodeFunctionalityDef',
-    'DeactivateBlockGCodeFunctionalityDef',
-    'DeactivateAllGCodeFunctionalityDef',
-    'EditPIDParamsGCodeFunctionalityDef',
+    "CloseLidGCodeFunctionalityDef",
+    "DeviceInfoGCodeFunctionalityDef",
+    "GetPlateTempGCodeFunctionalityDef",
+    "LidStatusGCodeFunctionalityDef",
+    "OpenLidGCodeFunctionalityDef",
+    "SetPlateTempGCodeFunctionalityDef",
+    "SetLidTempGCodeFunctionalityDef",
+    "GetLidTempGCodeFunctionalityDef",
+    "SetRampRateGCodeFunctionalityDef",
+    "DeactivateLidGCodeFunctionalityDef",
+    "DeactivateBlockGCodeFunctionalityDef",
+    "DeactivateAllGCodeFunctionalityDef",
+    "EditPIDParamsGCodeFunctionalityDef",
 ]

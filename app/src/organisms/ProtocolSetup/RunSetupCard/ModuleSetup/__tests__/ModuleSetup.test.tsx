@@ -3,8 +3,12 @@ import { when, resetAllWhenMocks } from 'jest-when'
 import { StaticRouter } from 'react-router-dom'
 import { RobotWorkSpace, ModuleViz } from '@opentrons/components'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
-import { renderWithProviders } from '@opentrons/components/__utils__'
-import { i18n } from '../../../../i18n'
+import {
+  renderWithProviders,
+  partialComponentPropsMatcher,
+  componentPropsMatcher,
+} from '@opentrons/components/__utils__'
+import { i18n } from '../../../../../i18n'
 import { ModuleSetup } from '..'
 import { ModuleInfo } from '../ModuleInfo'
 import {
@@ -29,16 +33,6 @@ jest.mock('@opentrons/shared-data', () => {
     inferModuleOrientationFromXCoordinate: jest.fn(),
   }
 })
-
-const componentPropsMatcher = (matcher: unknown) =>
-  // @ts-expect-error(sa, 2021-08-03): when.allArgs not part of type definition yet for jest-when
-  when.allArgs((args, equals) => equals(args[0], matcher))
-
-const partialComponentPropsMatcher = (argsToMatch: unknown) =>
-  // @ts-expect-error(sa, 2021-08-03): when.allArgs not part of type definition yet for jest-when
-  when.allArgs((args, equals) =>
-    equals(args[0], expect.objectContaining(argsToMatch))
-  )
 
 const mockModuleInfo = ModuleInfo as jest.MockedFunction<typeof ModuleInfo>
 

@@ -28,9 +28,10 @@ class PythonFileReader:
     def read(protocol_file: ProtocolFile) -> PythonProtocol:
         """Read a Python protocol as a `import`ed Python module."""
         # TODO(mc, 2021-06-30): better module name logic
+        # TODO(mc, 2021-08-25): validate files list length before access
         spec = importlib.util.spec_from_file_location(
             name="protocol",
-            location=protocol_file.file_path,
+            location=protocol_file.files[0],
         )
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)  # type: ignore[union-attr]

@@ -204,12 +204,23 @@ Version 2.8
 
 Version 2.9
 +++++++++++
+
 - You can now access certain geometry data regarding a labware's well via a Well Object. See :ref:`new-labware-well-properties` for more information.
+
 
 Version 2.10
 ++++++++++++
+
 - In Python protocols requesting API version 2.10, moving to the same well twice in a row with different pipettes no longer results in strange diagonal movements.
+
 
 Version 2.11
 ++++++++++++
+
 - In Python protocols requesting API version 2.11, attempting to aspirate from or dispense to tip racks will raise an error.
+
+
+Version 2.12
+++++++++++++
+
+- :py:meth:`.ProtocolContext.resume` has been deprecated.

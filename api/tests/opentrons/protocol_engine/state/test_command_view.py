@@ -4,7 +4,7 @@ from collections import OrderedDict
 from contextlib import nullcontext as does_not_raise
 from typing import List, NamedTuple, Optional, Sequence, Tuple, Type, Union
 
-from opentrons.protocol_engine import commands as cmd, errors
+from opentrons.protocol_engine import EngineStatus, commands as cmd, errors
 from opentrons.protocol_engine.state.commands import CommandState, CommandView
 from opentrons.protocol_engine.state.actions import PlayAction, PauseAction
 
@@ -288,3 +288,132 @@ def test_validate_action_allowed(
 
     with expectation:  # type: ignore[attr-defined]
         subject.validate_action_allowed(action)
+
+
+class GetStatusSpec(NamedTuple):
+    """Spec data for get_status tests."""
+
+    subject: CommandView
+    expected_status: EngineStatus
+
+
+get_status_specs: List[GetStatusSpec] = [
+    GetStatusSpec(
+        subject=get_command_view(
+            is_running=False,
+            stop_requested=False,
+            commands_by_id=[],
+        ),
+        expected_status=EngineStatus.READY_TO_RUN,
+    ),
+    GetStatusSpec(
+        subject=get_command_view(
+            is_running=False,
+            stop_requested=False,
+            commands_by_id=[("command-id", create_pending_command())],
+        ),
+        expected_status=EngineStatus.READY_TO_RUN,
+    ),
+    GetStatusSpec(
+        subject=get_command_view(
+            is_running=False,
+            stop_requested=False,
+            commands_by_id=[("command-id", create_running_command())],
+        ),
+        expected_status=EngineStatus.PAUSE_REQUESTED,
+    ),
+    GetStatusSpec(
+        subject=get_command_view(
+            is_running=False,
+            stop_requested=False,
+            commands_by_id=[
+                ("command-id-1", create_completed_command()),
+                ("command-id-2", create_pending_command()),
+            ],
+        ),
+        expected_status=EngineStatus.PAUSED,
+    ),
+    GetStatusSpec(
+        subject=get_command_view(
+            is_running=True,
+            stop_requested=False,
+            commands_by_id=[],
+        ),
+        expected_status=EngineStatus.RUNNING,
+    ),
+    GetStatusSpec(
+        subject=get_command_view(
+            is_running=True,
+            stop_requested=False,
+            commands_by_id=[("command-id", create_failed_command())],
+        ),
+        expected_status=EngineStatus.FAILED,
+    ),
+    GetStatusSpec(
+        subject=get_command_view(
+            is_running=False,
+            stop_requested=False,
+            commands_by_id=[("command-id", create_failed_command())],
+        ),
+        expected_status=EngineStatus.FAILED,
+    ),
+    GetStatusSpec(
+        subject=get_command_view(
+            is_running=False,
+            stop_requested=True,
+            commands_by_id=[("command-id", create_failed_command())],
+        ),
+        expected_status=EngineStatus.STOPPED,
+    ),
+    GetStatusSpec(
+        subject=get_command_view(
+            is_running=False,
+            stop_requested=True,
+            commands_by_id=[],
+        ),
+        expected_status=EngineStatus.SUCCEEDED,
+    ),
+    GetStatusSpec(
+        subject=get_command_view(
+            is_running=False,
+            stop_requested=True,
+            commands_by_id=[("command-id", create_completed_command())],
+        ),
+        expected_status=EngineStatus.SUCCEEDED,
+    ),
+    GetStatusSpec(
+        subject=get_command_view(
+            is_running=False,
+            stop_requested=True,
+            commands_by_id=[("command-id", create_running_command())],
+        ),
+        expected_status=EngineStatus.STOP_REQUESTED,
+    ),
+    GetStatusSpec(
+        subject=get_command_view(
+            is_running=False,
+            stop_requested=True,
+            commands_by_id=[
+                ("command-id", create_completed_command()),
+                ("command-id", create_pending_command()),
+            ],
+        ),
+        expected_status=EngineStatus.STOPPED,
+    ),
+]
+
+
+@pytest.mark.parametrize(GetStatusSpec._fields, get_status_specs)
+def test_get_status(subject: CommandView, expected_status: EngineStatus) -> None:
+    """It should set a status according to the command queue and running flag.
+
+    1. Not running, no stop requested, only queued commands: READY_TO_RUN
+    2. Running, no stop requested, no failed commands: RUNNING
+    3. Not running, no stop requested, command still running: PAUSE_REQUESTED
+    4. Not running, no stop requested, no running commands: PAUSED
+    5. Stop requested, command still running: STOP_REQUESTED
+    6. Stop requested, no running commands, with queued commands: STOPPED
+    7. Stop requested, all commands succeeded: SUCCEEDED
+    8. No stop requested, any failed commands: FAILED
+    """
+    assert subject.get_status() == expected_status

@@ -4,10 +4,10 @@ from opentrons.commands import protocol_commands
 
 @pytest.mark.parametrize(
     argnames="seconds,"
-             "minutes,"
-             "expected_seconds,"
-             "expected_minutes,"
-             "expected_text",
+    "minutes,"
+    "expected_seconds,"
+    "expected_minutes,"
+    "expected_text",
     argvalues=[
         [10, 0, 10, 0, "Delaying for 0 minutes and 10.0 seconds"],
         [10, 9, 10, 9, "Delaying for 9 minutes and 10.0 seconds"],
@@ -18,22 +18,17 @@ from opentrons.commands import protocol_commands
         [0.998, 0, 0.998, 0, "Delaying for 0 minutes and 0.998 seconds"],
         [0.9998, 0, 0.9998, 0, "Delaying for 0 minutes and 1.0 seconds"],
         [1.0001, 0, 1.0001, 0, "Delaying for 0 minutes and 1.0 seconds"],
-    ]
+    ],
 )
-def test_delay(seconds,
-               minutes,
-               expected_seconds,
-               expected_minutes,
-               expected_text
-               ):
+def test_delay(seconds, minutes, expected_seconds, expected_minutes, expected_text):
     command = protocol_commands.delay(seconds, minutes)
-    name = command['name']
-    payload = command['payload']
+    name = command["name"]
+    payload = command["payload"]
 
-    assert name == 'command.DELAY'
-    assert payload['seconds'] == expected_seconds
-    assert payload['minutes'] == expected_minutes
-    assert payload['text'] == expected_text
+    assert name == "command.DELAY"
+    assert payload["seconds"] == expected_seconds
+    assert payload["minutes"] == expected_minutes
+    assert payload["text"] == expected_text
 
 
 def test_delay_with_message():

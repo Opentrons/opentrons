@@ -28,10 +28,11 @@ ROBOT_SERVER_DIR := robot-server
 # documentation
 BUILD_NUMBER ?=
 
-# watch, coverage, and update snapshot variables for tests
+# watch, coverage, update snapshot, and warning suppresion variables for tests and linting
 watch ?= false
 cover ?= true
 updateSnapshot ?= false
+quiet ?= false
 
 FORMAT_FILE_GLOB = ".*.@(js|ts|tsx|yml)" "**/*.@(ts|tsx|js|json|md|yml)"
 
@@ -62,7 +63,7 @@ clean-js: clean-ts
 
 .PHONY: setup-py
 setup-py:
-	$(OT_PYTHON) -m pip install pipenv==2020.8.13
+	$(OT_PYTHON) -m pip install pipenv==2021.5.29
 	$(MAKE) -C $(API_DIR) setup
 	$(MAKE) -C $(UPDATE_SERVER_DIR) setup
 	$(MAKE) -C $(NOTIFY_SERVER_DIR) setup
@@ -189,7 +190,7 @@ lint-py:
 
 .PHONY: lint-js
 lint-js:
-	eslint ".*.@(js|ts|tsx)" "**/*.@(js|ts|tsx)"
+	eslint --quiet=$(quiet) ".*.@(js|ts|tsx)" "**/*.@(js|ts|tsx)"
 	prettier --ignore-path .eslintignore --check $(FORMAT_FILE_GLOB)
 
 .PHONY: lint-json

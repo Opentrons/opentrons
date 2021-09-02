@@ -27,7 +27,7 @@ class MagDeckEmulator(AbstractEmulator):
     def handle(self, line: str) -> Optional[str]:
         """Handle a line"""
         results = (self._handle(c) for c in self._parser.parse(line))
-        joined = ' '.join(r for r in results if r)
+        joined = " ".join(r for r in results if r)
         return None if not joined else joined
 
     def reset(self):
@@ -40,7 +40,7 @@ class MagDeckEmulator(AbstractEmulator):
         if command.gcode == GCODE.HOME:
             self.height = 0
         elif command.gcode == GCODE.MOVE:
-            position = command.params['Z']
+            position = command.params["Z"]
             assert isinstance(position, float), f"invalid position '{position}'"
             self.position = position
         elif command.gcode == GCODE.PROBE_PLATE:

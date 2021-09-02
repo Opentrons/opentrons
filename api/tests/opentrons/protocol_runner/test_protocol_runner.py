@@ -1,7 +1,6 @@
 """Tests for the ProtocolRunner class."""
 import pytest
 from decoy import Decoy
-from pathlib import Path
 from typing import List
 
 from opentrons.protocols.models import JsonProtocol
@@ -171,8 +170,8 @@ def test_load_json(
 ) -> None:
     """It should load a JSON protocol file."""
     json_protocol_file = ProtocolFile(
-        file_type=ProtocolFileType.JSON,
-        file_path=Path("/dev/null"),
+        protocol_type=ProtocolFileType.JSON,
+        files=[],
     )
 
     json_protocol = JsonProtocol.construct()  # type: ignore[call-arg]
@@ -212,8 +211,8 @@ def test_load_python(
 ) -> None:
     """It should load a Python protocol file."""
     python_protocol_file = ProtocolFile(
-        file_type=ProtocolFileType.PYTHON,
-        file_path=Path("/dev/null"),
+        protocol_type=ProtocolFileType.PYTHON,
+        files=[],
     )
 
     python_protocol = decoy.mock(cls=PythonProtocol)

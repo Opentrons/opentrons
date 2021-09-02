@@ -21,9 +21,9 @@ from .types import USBPort
 # Example usb path might look like:
 # '/sys/bus/usb/devices/usb1/1-1/1-1.3/1-1.3:1.0/tty/ttyACM1/dev'.
 # There is only 1 bus that supports USB on the raspberry pi.
-BUS_PATH = '/sys/bus/usb/devices/usb1/'
-PORT_PATTERN = r'(/\d-\d(\.?\d)+)+:'
-DEVICE_PATH = r'\d.\d/tty/tty(\w{4})/dev'
+BUS_PATH = "/sys/bus/usb/devices/usb1/"
+PORT_PATTERN = r"(/\d-\d(\.?\d)+)+:"
+DEVICE_PATH = r"\d.\d/tty/tty(\w{4})/dev"
 USB_PORT_INFO = re.compile(PORT_PATTERN + DEVICE_PATH)
 
 
@@ -42,19 +42,21 @@ class USBBus(USBDriverInterface):
         Use the sys bus path to find all of the USBs with
         active devices connected to them.
         """
-        read = ['']
+        read = [""]
         try:
-            read = subprocess.check_output(
-                ['find', BUS_PATH, '-name', 'dev']).decode().splitlines()
+            read = (
+                subprocess.check_output(["find", BUS_PATH, "-name", "dev"])
+                .decode()
+                .splitlines()
+            )
         except Exception:
             pass
         return read
 
     @staticmethod
     def read_symlink(virtual_port: str) -> str:
-        """
-        """
-        symlink = ''
+        """ """
+        symlink = ""
         try:
             symlink = os.readlink(virtual_port)
         except OSError:
@@ -117,9 +119,8 @@ class USBBus(USBDriverInterface):
             match = USB_PORT_INFO.search(port)
             if match:
                 port_matches.append(
-                    USBPort.build(
-                        match.group(0).strip('/'),
-                        self.board_revision))
+                    USBPort.build(match.group(0).strip("/"), self.board_revision)
+                )
         return port_matches
 
     def find_port(self, device_path: str) -> USBPort:
@@ -138,8 +139,8 @@ class USBBus(USBDriverInterface):
             if port.device_path.find(device_path):
                 return port
         return USBPort(
-            name='', sub_names=[], hub=None,
-            port_number=None, device_path=device_path)
+            name="", sub_names=[], hub=None, port_number=None, device_path=device_path
+        )
 
     def sort_ports(self) -> None:
         """
@@ -164,8 +165,8 @@ class USBBus(USBDriverInterface):
             self.usb_dev = updated_bus
 
     def match_virtual_ports(
-            self, virtual_ports: List[ModuleAtPort]
-            ) -> List[ModuleAtPort]:
+        self, virtual_ports: List[ModuleAtPort]
+    ) -> List[ModuleAtPort]:
         """
         Match Virtual Ports
 

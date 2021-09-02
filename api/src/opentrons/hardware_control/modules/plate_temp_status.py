@@ -55,6 +55,5 @@ class PlateTemperatureStatus:
             return False
         else:
             return all(
-                abs(target - t) < PlateTemperatureStatus.TEMP_THRESHOLD
-                for t in history
+                abs(target - t) < PlateTemperatureStatus.TEMP_THRESHOLD for t in history
             )

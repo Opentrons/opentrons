@@ -4,8 +4,18 @@ from dataclasses import replace
 import logging
 import pathlib
 from collections import OrderedDict
-from typing import (Any, Dict, Union, List, Optional, Tuple,
-                    TYPE_CHECKING, cast, overload, Sequence)
+from typing import (
+    Any,
+    Dict,
+    Union,
+    List,
+    Optional,
+    Tuple,
+    TYPE_CHECKING,
+    cast,
+    overload,
+    Sequence,
+)
 
 from opentrons_shared_data.pipette import name_config
 from opentrons import types as top_types
@@ -14,29 +24,38 @@ from functools import lru_cache
 from opentrons.config import robot_configs
 from opentrons.config.types import RobotConfig
 
-from .util import (
-    use_or_initialize_loop, DeckTransformState, check_motion_bounds)
-from .pipette import (
-    Pipette, generate_hardware_configs, load_from_config_and_check_skip)
+from .util import use_or_initialize_loop, DeckTransformState, check_motion_bounds
+from .pipette import Pipette, generate_hardware_configs, load_from_config_and_check_skip
 from .controller import Controller
 from .simulator import Simulator
-from .constants import (SHAKE_OFF_TIPS_SPEED, SHAKE_OFF_TIPS_DROP_DISTANCE,
-                        SHAKE_OFF_TIPS_PICKUP_DISTANCE,
-                        DROP_TIP_RELEASE_DISTANCE)
+from .constants import (
+    SHAKE_OFF_TIPS_SPEED,
+    SHAKE_OFF_TIPS_DROP_DISTANCE,
+    SHAKE_OFF_TIPS_PICKUP_DISTANCE,
+    DROP_TIP_RELEASE_DISTANCE,
+)
 from .execution_manager import ExecutionManager
 from .pause_manager import PauseManager
 from .module_control import AttachedModulesControl
-from .types import (Axis, HardwareAPILike, CriticalPoint,
-                    MustHomeError, NoTipAttachedError, DoorState,
-                    DoorStateNotification, PipettePair, TipAttachedError,
-                    HardwareAction, PairedPipetteConfigValueError,
-                    MotionChecks, PauseType)
+from .types import (
+    Axis,
+    HardwareAPILike,
+    CriticalPoint,
+    MustHomeError,
+    NoTipAttachedError,
+    DoorState,
+    DoorStateNotification,
+    PipettePair,
+    TipAttachedError,
+    HardwareAction,
+    PairedPipetteConfigValueError,
+    MotionChecks,
+    PauseType,
+)
 from . import modules, robot_calibration as rb_cal
 
 if TYPE_CHECKING:
-    from opentrons_shared_data.pipette.dev_types import (
-        UlPerMmAction, PipetteName
-    )
+    from opentrons_shared_data.pipette.dev_types import UlPerMmAction, PipetteName
     from .dev_types import PipetteDict
 
 
@@ -48,7 +67,7 @@ PipetteHandlingData = Tuple[Pipette, top_types.Mount]
 
 
 class API(HardwareAPILike):
-    """ This API is the primary interface to the hardware controller.
+    """This API is the primary interface to the hardware controller.
 
     Because the hardware manager controls access to the system's hardware
     as a whole, it is designed as a class of which only one should be
@@ -58,14 +77,15 @@ class API(HardwareAPILike):
     but its purpose is to be gathered here to provide a single interface.
     """
 
-    CLS_LOG = mod_log.getChild('API')
+    CLS_LOG = mod_log.getChild("API")
 
-    def __init__(self,
-                 backend: Union[Controller, Simulator],
-                 loop: asyncio.AbstractEventLoop,
-                 config: RobotConfig
-                 ) -> None:
-        """ Initialize an API instance.
+    def __init__(
+        self,
+        backend: Union[Controller, Simulator],
+        loop: asyncio.AbstractEventLoop,
+        config: RobotConfig,
+    ) -> None:
+        """Initialize an API instance.
 
         This should rarely be explicitly invoked by an external user; instead,
         one of the factory methods build_hardware_controller or
@@ -83,7 +103,7 @@ class API(HardwareAPILike):
 
         self._attached_instruments: InstrumentsByMount = {
             top_types.Mount.LEFT: None,
-            top_types.Mount.RIGHT: None
+            top_types.Mount.RIGHT: None,
         }
         self._last_moved_mount: Optional[top_types.Mount] = None
         # The motion lock synchronizes calls to long-running physical tasks
@@ -104,8 +124,7 @@ class API(HardwareAPILike):
         self._calculate_valid_attitude.cache_clear()
         self._robot_calibration = rb_cal.load()
 
-    def set_robot_calibration(
-            self, robot_calibration: rb_cal.RobotCalibration):
+    def set_robot_calibration(self, robot_calibration: rb_cal.RobotCalibration):
         self._calculate_valid_attitude.cache_clear()
         self._robot_calibration = robot_calibration
 
@@ -118,29 +137,30 @@ class API(HardwareAPILike):
         self._door_state = door_state
 
     def _update_door_state(self, door_state: DoorState):
-        mod_log.info(
-            f'Updating the window switch status: {door_state}')
+        mod_log.info(f"Updating the window switch status: {door_state}")
         self.door_state = door_state
         self._pause_manager.set_door(self.door_state)
         for cb in self._callbacks:
             hw_event = DoorStateNotification(
-                new_state=door_state,
-                blocking=self._pause_manager.blocked_by_door)
+                new_state=door_state, blocking=self._pause_manager.blocked_by_door
+            )
             try:
                 cb(hw_event)
             except Exception:
-                mod_log.exception('Errored during door state event callback')
+                mod_log.exception("Errored during door state event callback")
 
     def _reset_last_mount(self):
         self._last_moved_mount = None
 
     @classmethod
     async def build_hardware_controller(
-            cls, config: RobotConfig = None,
-            port: str = None,
-            loop: asyncio.AbstractEventLoop = None,
-            firmware: Tuple[pathlib.Path, str] = None) -> 'API':
-        """ Build a hardware controller that will actually talk to hardware.
+        cls,
+        config: RobotConfig = None,
+        port: str = None,
+        loop: asyncio.AbstractEventLoop = None,
+        firmware: Tuple[pathlib.Path, str] = None,
+    ) -> "API":
+        """Build a hardware controller that will actually talk to hardware.
 
         This method should not be used outside of a real robot, and on a
         real robot only one true hardware controller may be active at one
@@ -171,18 +191,19 @@ class API(HardwareAPILike):
                 fw_version = backend.fw_version
             except Exception:
                 mod_log.exception(
-                    'Motor driver could not connect, reprogramming if possible'
+                    "Motor driver could not connect, reprogramming if possible"
                 )
                 fw_version = None
 
             if firmware is not None:
                 if fw_version != firmware[1]:
-                    await backend.update_firmware(
-                        str(firmware[0]), checked_loop, True)
+                    await backend.update_firmware(str(firmware[0]), checked_loop, True)
                     await backend.connect(port)
             elif firmware is None and fw_version is None:
-                msg = 'Motor controller could not be connected and no '\
-                    'firmware was provided for (re)programming'
+                msg = (
+                    "Motor controller could not be connected and no "
+                    "firmware was provided for (re)programming"
+                )
                 mod_log.error(msg)
                 raise RuntimeError(msg)
 
@@ -192,21 +213,22 @@ class API(HardwareAPILike):
             backend.module_controls = module_controls
             checked_loop.create_task(backend.watch(loop=checked_loop))
             backend.start_gpio_door_watcher(
-                loop=checked_loop,
-                update_door_state=api_instance._update_door_state)
+                loop=checked_loop, update_door_state=api_instance._update_door_state
+            )
             return api_instance
         finally:
             blink_task.cancel()
 
     @classmethod
     async def build_hardware_simulator(
-            cls,
-            attached_instruments: Dict[top_types.Mount, Dict[str, Optional[str]]] = None,  # noqa: E501
-            attached_modules: List[str] = None,
-            config: RobotConfig = None,
-            loop: asyncio.AbstractEventLoop = None,
-            strict_attached_instruments: bool = True) -> 'API':
-        """ Build a simulating hardware controller.
+        cls,
+        attached_instruments: Dict[top_types.Mount, Dict[str, Optional[str]]] = None,
+        attached_modules: List[str] = None,
+        config: RobotConfig = None,
+        loop: asyncio.AbstractEventLoop = None,
+        strict_attached_instruments: bool = True,
+    ) -> "API":
+        """Build a simulating hardware controller.
 
         This method may be used both on a real robot and on dev machines.
         Multiple simulating hardware controllers may be active at one time.
@@ -223,8 +245,10 @@ class API(HardwareAPILike):
         backend = await Simulator.build(
             attached_instruments,
             attached_modules,
-            checked_config, checked_loop,
-            strict_attached_instruments)
+            checked_config,
+            checked_loop,
+            strict_attached_instruments,
+        )
         api_instance = cls(backend, loop=checked_loop, config=checked_config)
         await api_instance.cache_instruments()
         module_controls = await AttachedModulesControl.build(api_instance)
@@ -233,12 +257,11 @@ class API(HardwareAPILike):
         return api_instance
 
     def __repr__(self):
-        return '<{} using backend {}>'.format(type(self),
-                                              type(self._backend))
+        return "<{} using backend {}>".format(type(self), type(self._backend))
 
     @property
     def loop(self) -> asyncio.AbstractEventLoop:
-        """ The event loop used by this instance. """
+        """The event loop used by this instance."""
         return self._loop
 
     def set_loop(self, loop: asyncio.AbstractEventLoop):
@@ -247,7 +270,7 @@ class API(HardwareAPILike):
 
     @property
     def is_simulator(self):
-        """ `True` if this is a simulator; `False` otherwise. """
+        """`True` if this is a simulator; `False` otherwise."""
         return isinstance(self._backend, Simulator)
 
     def validate_calibration(self) -> DeckTransformState:
@@ -263,10 +286,11 @@ class API(HardwareAPILike):
     @lru_cache(maxsize=1)
     def _calculate_valid_attitude(self) -> DeckTransformState:
         return rb_cal.validate_attitude_deck_calibration(
-            self._robot_calibration.deck_calibration)
+            self._robot_calibration.deck_calibration
+        )
 
     async def register_callback(self, cb):
-        """ Allows the caller to register a callback, and returns a closure
+        """Allows the caller to register a callback, and returns a closure
         that can be used to unregister the provided callback
         """
         self._callbacks.add(cb)
@@ -285,7 +309,7 @@ class API(HardwareAPILike):
         """
         from_backend = self._backend.fw_version
         if from_backend is None:
-            return 'unknown'
+            return "unknown"
         else:
             return from_backend
 
@@ -300,7 +324,7 @@ class API(HardwareAPILike):
     # Incidentals (i.e. not motion) API
 
     async def set_lights(self, button: bool = None, rails: bool = None):
-        """ Control the robot lights.
+        """Control the robot lights.
 
         :param button: If specified, turn the button light on (`True`) or
                        off (`False`). If not specified, do not change the
@@ -312,14 +336,14 @@ class API(HardwareAPILike):
         self._backend.set_lights(button, rails)
 
     def get_lights(self) -> Dict[str, bool]:
-        """ Return the current status of the robot lights.
+        """Return the current status of the robot lights.
 
         :returns: A dict of the lights: `{'button': bool, 'rails': bool}`
         """
         return self._backend.get_lights()
 
     async def identify(self, duration_s: int = 5):
-        """ Blink the button light to identify the robot.
+        """Blink the button light to identify the robot.
 
         :param int duration_s: The duration to blink for, in seconds.
         """
@@ -334,14 +358,15 @@ class API(HardwareAPILike):
         await self.set_lights(button=True)
 
     async def delay(self, duration_s: float):
-        """ Delay execution by pausing and sleeping.
-        """
+        """Delay execution by pausing and sleeping."""
         await self._wait_for_is_running()
         self.pause(PauseType.DELAY)
         try:
             if not self.is_simulator:
+
                 async def sleep_for_seconds(seconds: float):
                     await asyncio.sleep(seconds)
+
                 delay_task = self._loop.create_task(sleep_for_seconds(duration_s))
                 await self._execution_manager.register_cancellable_task(delay_task)
         finally:
@@ -356,15 +381,15 @@ class API(HardwareAPILike):
         :param mount: If specified, reset that mount. If not specified,
                       reset both
         """
+
         def _reset(m: top_types.Mount):
             self._log.info(f"Resetting configuration for {m}")
             p = self._attached_instruments[m]
             if not p:
                 return
             new_p = Pipette(
-                p._config,
-                rb_cal.load_pipette_offset(p.pipette_id, m),
-                p.pipette_id)
+                p._config, rb_cal.load_pipette_offset(p.pipette_id, m), p.pipette_id
+            )
             new_p.act_as(p.acting_as)
             self._attached_instruments[m] = new_p
 
@@ -375,8 +400,8 @@ class API(HardwareAPILike):
             _reset(mount)
 
     async def cache_instruments(
-            self,
-            require: Dict[top_types.Mount, 'PipetteName'] = None):
+        self, require: Dict[top_types.Mount, "PipetteName"] = None
+    ):
         """
         Scan the attached instruments, take necessary configuration actions,
         and set up hardware controller internal state if necessary.
@@ -404,40 +429,38 @@ class API(HardwareAPILike):
         checked_require = require or {}
         for mount, name in checked_require.items():
             if name not in name_config():
-                raise RuntimeError(f'{name} is not a valid pipette name')
+                raise RuntimeError(f"{name} is not a valid pipette name")
         found = await self._backend.get_attached_instruments(checked_require)
 
         for mount, instrument_data in found.items():
-            config = instrument_data.get('config')
+            config = instrument_data.get("config")
             req_instr = checked_require.get(mount, None)
-            pip_id = instrument_data.get('id')
+            pip_id = instrument_data.get("id")
             pip_offset_cal = rb_cal.load_pipette_offset(pip_id, mount)
             p, may_skip = load_from_config_and_check_skip(
                 config,
                 self._attached_instruments[mount],
                 req_instr,
                 pip_id,
-                pip_offset_cal)
+                pip_offset_cal,
+            )
             self._attached_instruments[mount] = p
             if req_instr and p:
                 p.act_as(req_instr)
 
             if may_skip:
-                self._log.info(
-                    f"Skipping configuration on {mount.name}")
+                self._log.info(f"Skipping configuration on {mount.name}")
                 continue
 
-            self._log.info(
-                f"Doing full configuration on {mount.name}")
+            self._log.info(f"Doing full configuration on {mount.name}")
             hw_config = generate_hardware_configs(
-                p, self._config, self._backend.board_revision)
+                p, self._config, self._backend.board_revision
+            )
             await self._backend.configure_mount(mount, hw_config)
-        mod_log.info("Instruments found: {}".format(
-            self._attached_instruments))
+        mod_log.info("Instruments found: {}".format(self._attached_instruments))
 
-    def get_attached_instruments(self) -> Dict[top_types.Mount,
-                                               'PipetteDict']:
-        """ Get the status dicts of the cached attached instruments.
+    def get_attached_instruments(self) -> Dict[top_types.Mount, "PipetteDict"]:
+        """Get the status dicts of the cached attached instruments.
 
         Also available as :py:meth:`get_attached_instruments`.
 
@@ -456,49 +479,65 @@ class API(HardwareAPILike):
             for m in (top_types.Mount.LEFT, top_types.Mount.RIGHT)
         }
 
-    def get_attached_instrument(self, mount: top_types.Mount) -> 'PipetteDict':
+    def get_attached_instrument(self, mount: top_types.Mount) -> "PipetteDict":
         instr = self._attached_instruments[mount]
         result: Dict[str, Any] = {}
         if instr:
-            configs = ['name', 'min_volume', 'max_volume', 'channels',
-                       'aspirate_flow_rate', 'dispense_flow_rate',
-                       'pipette_id', 'current_volume', 'display_name',
-                       'tip_length', 'model', 'blow_out_flow_rate',
-                       'working_volume', 'tip_overlap', 'available_volume',
-                       'return_tip_height', 'default_aspirate_flow_rates',
-                       'default_blow_out_flow_rates',
-                       'default_dispense_flow_rates']
+            configs = [
+                "name",
+                "min_volume",
+                "max_volume",
+                "channels",
+                "aspirate_flow_rate",
+                "dispense_flow_rate",
+                "pipette_id",
+                "current_volume",
+                "display_name",
+                "tip_length",
+                "model",
+                "blow_out_flow_rate",
+                "working_volume",
+                "tip_overlap",
+                "available_volume",
+                "return_tip_height",
+                "default_aspirate_flow_rates",
+                "default_blow_out_flow_rates",
+                "default_dispense_flow_rates",
+            ]
 
             instr_dict = instr.as_dict()
+            # TODO (spp, 2021-08-27): Revisit this logic. Why do we need to build
+            #  this dict newly every time? Any why only a few items are being updated?
             for key in configs:
                 result[key] = instr_dict[key]
-            result['has_tip'] = instr.has_tip
-            result['aspirate_speed'] = self._plunger_speed(
-                instr, instr.aspirate_flow_rate, 'aspirate')
-            result['dispense_speed'] = self._plunger_speed(
-                instr, instr.dispense_flow_rate, 'dispense')
-            result['blow_out_speed'] = self._plunger_speed(
-                instr, instr.blow_out_flow_rate, 'dispense')
-            result['ready_to_aspirate'] = instr.ready_to_aspirate
-            result['default_blow_out_speeds'] = {
-                alvl: self._plunger_speed(instr, fr, 'dispense')
-                for alvl, fr
-                in instr.config.default_aspirate_flow_rates.items()
+            result["has_tip"] = instr.has_tip
+            result["tip_length"] = instr.current_tip_length
+            result["aspirate_speed"] = self._plunger_speed(
+                instr, instr.aspirate_flow_rate, "aspirate"
+            )
+            result["dispense_speed"] = self._plunger_speed(
+                instr, instr.dispense_flow_rate, "dispense"
+            )
+            result["blow_out_speed"] = self._plunger_speed(
+                instr, instr.blow_out_flow_rate, "dispense"
+            )
+            result["ready_to_aspirate"] = instr.ready_to_aspirate
+            result["default_blow_out_speeds"] = {
+                alvl: self._plunger_speed(instr, fr, "dispense")
+                for alvl, fr in instr.config.default_aspirate_flow_rates.items()
             }
-            result['default_dispense_speeds'] = {
-                alvl: self._plunger_speed(instr, fr, 'dispense')
-                for alvl, fr
-                in instr.config.default_dispense_flow_rates.items()
+            result["default_dispense_speeds"] = {
+                alvl: self._plunger_speed(instr, fr, "dispense")
+                for alvl, fr in instr.config.default_dispense_flow_rates.items()
             }
-            result['default_aspirate_speeds'] = {
-                alvl: self._plunger_speed(instr, fr, 'aspirate')
-                for alvl, fr
-                in instr.config.default_aspirate_flow_rates.items()
+            result["default_aspirate_speeds"] = {
+                alvl: self._plunger_speed(instr, fr, "aspirate")
+                for alvl, fr in instr.config.default_aspirate_flow_rates.items()
             }
-        return cast('PipetteDict', result)
+        return cast("PipetteDict", result)
 
     @property
-    def attached_instruments(self) -> Dict[top_types.Mount, 'PipetteDict']:
+    def attached_instruments(self) -> Dict[top_types.Mount, "PipetteDict"]:
         return self.get_attached_instruments()
 
     @property
@@ -506,11 +545,12 @@ class API(HardwareAPILike):
         return self._backend.module_controls.available_modules
 
     async def update_firmware(
-            self,
-            firmware_file: str,
-            loop: asyncio.AbstractEventLoop = None,
-            explicit_modeset: bool = True) -> str:
-        """ Update the firmware on the Smoothie board.
+        self,
+        firmware_file: str,
+        loop: asyncio.AbstractEventLoop = None,
+        explicit_modeset: bool = True,
+    ) -> str:
+        """Update the firmware on the Smoothie board.
 
         :param firmware_file: The path to the firmware file.
         :param explicit_modeset: `True` to force the smoothie into programming
@@ -524,9 +564,9 @@ class API(HardwareAPILike):
             checked_loop = self._loop
         else:
             checked_loop = loop
-        return await self._backend.update_firmware(firmware_file,
-                                                   checked_loop,
-                                                   explicit_modeset)
+        return await self._backend.update_firmware(
+            firmware_file, checked_loop, explicit_modeset
+        )
 
     # Global actions API
     def pause(self, pause_type: PauseType):
@@ -550,7 +590,7 @@ class API(HardwareAPILike):
         asyncio.run_coroutine_threadsafe(_chained_calls(), self._loop)
 
     def pause_with_message(self, message):
-        self._log.warning('Pause with message: {}'.format(message))
+        self._log.warning("Pause with message: {}".format(message))
         for cb in self._callbacks:
             cb(message)
         self.pause(PauseType.PAUSE)
@@ -576,7 +616,7 @@ class API(HardwareAPILike):
         asyncio.run_coroutine_threadsafe(_chained_calls(), self._loop)
 
     async def halt(self):
-        """ Immediately stop motion.
+        """Immediately stop motion.
 
         Calls to :py:meth:`stop` through the synch adapter while other calls
         are ongoing will typically wait until those calls are done, since most
@@ -588,8 +628,7 @@ class API(HardwareAPILike):
         :py:meth:`stop`.
         """
         await self._backend.hard_halt()
-        asyncio.run_coroutine_threadsafe(self._execution_manager.cancel(),
-                                         self._loop)
+        asyncio.run_coroutine_threadsafe(self._execution_manager.cancel(), self._loop)
 
     async def stop(self, home_after: bool = True):
         """
@@ -611,7 +650,7 @@ class API(HardwareAPILike):
             await self._execution_manager.wait_for_is_running()
 
     async def reset(self):
-        """ Reset the stored state of the system.
+        """Reset the stored state of the system.
 
         This will re-scan instruments and models, clearing any cached
         information about their presence or state.
@@ -619,12 +658,13 @@ class API(HardwareAPILike):
         self._pause_manager.reset()
         await self._execution_manager.reset()
         self._attached_instruments = {
-            k: None for k in self._attached_instruments.keys()}
+            k: None for k in self._attached_instruments.keys()
+        }
         await self.cache_instruments()
 
     # Gantry/frame (i.e. not pipette) action API
     async def home_z(self, mount: top_types.Mount = None):
-        """ Home the two z-axes """
+        """Home the two z-axes"""
         self._reset_last_mount()
         if not mount:
             axes = [Axis.Z, Axis.A]
@@ -633,12 +673,12 @@ class API(HardwareAPILike):
         await self.home(axes)
 
     async def _do_plunger_home(
-            self,
-            axis: Axis = None,
-            mount: top_types.Mount = None,
-            acquire_lock: bool = True):
-        assert (axis is not None) ^ (mount is not None),\
-            'specify either axis or mount'
+        self,
+        axis: Axis = None,
+        mount: top_types.Mount = None,
+        acquire_lock: bool = True,
+    ):
+        assert (axis is not None) ^ (mount is not None), "specify either axis or mount"
         if axis:
             checked_axis = axis
             checked_mount = Axis.to_mount(checked_axis)
@@ -653,14 +693,15 @@ class API(HardwareAPILike):
                 await stack.enter_async_context(self._motion_lock)
             with self._backend.save_current():
                 self._backend.set_active_current(
-                    {checked_axis: instr.config.plunger_current})
+                    {checked_axis: instr.config.plunger_current}
+                )
                 await self._backend.home([checked_axis.name.upper()])
                 # either we were passed False for our acquire_lock and we
                 # should pass it on, or we acquired the lock above and
                 # shouldn't do it again
-                await self._move_plunger(checked_mount,
-                                         (instr.config.bottom,),
-                                         acquire_lock=False)
+                await self._move_plunger(
+                    checked_mount, (instr.config.bottom,), acquire_lock=False
+                )
 
     async def home_plunger(self, mount: top_types.Mount):
         """
@@ -671,11 +712,10 @@ class API(HardwareAPILike):
         :type mount: :py:class:`.top_types.Mount`
         """
         await self.current_position(mount=mount, refresh=True)
-        await self._do_plunger_home(mount=mount,
-                                    acquire_lock=True)
+        await self._do_plunger_home(mount=mount, acquire_lock=True)
 
     async def home(self, axes: List[Axis] = None):
-        """ Home the entire robot and initialize current position.
+        """Home the entire robot and initialize current position.
         :param axes: A list of axes to home. Default is `None`, which will
                      home everything.
         """
@@ -686,8 +726,7 @@ class API(HardwareAPILike):
         gantry = [ax for ax in checked_axes if ax in Axis.gantry_axes()]
         smoothie_gantry = [ax.name.upper() for ax in gantry]
         smoothie_pos = {}
-        plungers = [ax for ax in checked_axes
-                    if ax not in Axis.gantry_axes()]
+        plungers = [ax for ax in checked_axes if ax not in Axis.gantry_axes()]
 
         async with self._motion_lock:
             if smoothie_gantry:
@@ -696,19 +735,18 @@ class API(HardwareAPILike):
             for plunger in plungers:
                 await self._do_plunger_home(axis=plunger, acquire_lock=False)
 
-    async def add_tip(
-            self,
-            mount: top_types.Mount,
-            tip_length: float):
+    async def add_tip(self, mount: top_types.Mount, tip_length: float):
         instr = self._attached_instruments[mount]
         attached = self.attached_instruments
         instr_dict = attached[mount]
         if instr and not instr.has_tip:
             instr.add_tip(tip_length=tip_length)
-            instr_dict['has_tip'] = True
-            instr_dict['tip_length'] = tip_length
+            # TODO (spp, 2021-08-27): These items are being updated in a local copy
+            #  of the PipetteDict, which gets thrown away. Fix this.
+            instr_dict["has_tip"] = True
+            instr_dict["tip_length"] = tip_length
         else:
-            mod_log.warning('attach tip called while tip already attached')
+            mod_log.warning("attach tip called while tip already attached")
 
     async def remove_tip(self, mount: top_types.Mount):
         instr = self._attached_instruments[mount]
@@ -716,14 +754,15 @@ class API(HardwareAPILike):
         instr_dict = attached[mount]
         if instr and instr.has_tip:
             instr.remove_tip()
-            instr_dict['has_tip'] = False
-            instr_dict['tip_length'] = 0.0
+            # TODO (spp, 2021-08-27): These items are being updated in a local copy
+            #  of the PipetteDict, which gets thrown away. Fix this.
+            instr_dict["has_tip"] = False
+            instr_dict["tip_length"] = 0.0
         else:
-            mod_log.warning('detach tip called with no tip')
+            mod_log.warning("detach tip called with no tip")
 
-    def _deck_from_smoothie(
-            self, smoothie_pos: Dict[str, float]) -> Dict[Axis, float]:
-        """ Build a deck-abs position store from the smoothie's position
+    def _deck_from_smoothie(self, smoothie_pos: Dict[str, float]) -> Dict[Axis, float]:
+        """Build a deck-abs position store from the smoothie's position
 
         This should take the smoothie style position {'X': float, etc}
         and turn it into the position dict used here {Axis.X: float} in
@@ -741,34 +780,39 @@ class API(HardwareAPILike):
               added to the smoothie coordinates here.
         """
         with_enum = {Axis[k]: v for k, v in smoothie_pos.items()}
-        plunger_axes = {k: v for k, v in with_enum.items()
-                        if k not in Axis.gantry_axes()}
+        plunger_axes = {
+            k: v for k, v in with_enum.items() if k not in Axis.gantry_axes()
+        }
         right = (
-            with_enum[Axis.X], with_enum[Axis.Y],
-            with_enum[Axis.by_mount(top_types.Mount.RIGHT)])
-        left = (with_enum[Axis.X],
-                with_enum[Axis.Y],
-                with_enum[Axis.by_mount(top_types.Mount.LEFT)])
+            with_enum[Axis.X],
+            with_enum[Axis.Y],
+            with_enum[Axis.by_mount(top_types.Mount.RIGHT)],
+        )
+        left = (
+            with_enum[Axis.X],
+            with_enum[Axis.Y],
+            with_enum[Axis.by_mount(top_types.Mount.LEFT)],
+        )
 
-        gantry_calibration =\
-            self.robot_calibration.deck_calibration.attitude
-        right_deck = linal.apply_reverse(
-            gantry_calibration, right)
-        left_deck = linal.apply_reverse(
-            gantry_calibration, left)
-        deck_pos = {Axis.X: right_deck[0],
-                    Axis.Y: right_deck[1],
-                    Axis.by_mount(top_types.Mount.RIGHT): right_deck[2],
-                    Axis.by_mount(top_types.Mount.LEFT): left_deck[2]}
+        gantry_calibration = self.robot_calibration.deck_calibration.attitude
+        right_deck = linal.apply_reverse(gantry_calibration, right)
+        left_deck = linal.apply_reverse(gantry_calibration, left)
+        deck_pos = {
+            Axis.X: right_deck[0],
+            Axis.Y: right_deck[1],
+            Axis.by_mount(top_types.Mount.RIGHT): right_deck[2],
+            Axis.by_mount(top_types.Mount.LEFT): left_deck[2],
+        }
         deck_pos.update(plunger_axes)
         return deck_pos
 
     async def current_position(
-            self,
-            mount: top_types.Mount,
-            critical_point: CriticalPoint = None,
-            refresh: bool = False) -> Dict[Axis, float]:
-        """ Return the postion (in deck coords) of the critical point of the
+        self,
+        mount: top_types.Mount,
+        critical_point: CriticalPoint = None,
+        refresh: bool = False,
+    ) -> Dict[Axis, float]:
+        """Return the postion (in deck coords) of the critical point of the
         specified mount.
 
         This returns cached position to avoid hitting the smoothie driver
@@ -787,7 +831,8 @@ class API(HardwareAPILike):
         async with self._motion_lock:
             if refresh:
                 self._current_position = self._deck_from_smoothie(
-                    await self._backend.update_position())
+                    await self._backend.update_position()
+                )
             if mount == top_types.Mount.RIGHT:
                 offset = top_types.Point(0, 0, 0)
             else:
@@ -799,15 +844,16 @@ class API(HardwareAPILike):
                 Axis.X: self._current_position[Axis.X] + offset[0] + cp.x,
                 Axis.Y: self._current_position[Axis.Y] + offset[1] + cp.y,
                 z_ax: self._current_position[z_ax] + offset[2] + cp.z,
-                plunger_ax: self._current_position[plunger_ax]
+                plunger_ax: self._current_position[plunger_ax],
             }
 
     async def gantry_position(
-            self,
-            mount: top_types.Mount,
-            critical_point: CriticalPoint = None,
-            refresh: bool = False) -> top_types.Point:
-        """ Return the position of the critical point as pertains to the gantry
+        self,
+        mount: top_types.Mount,
+        critical_point: CriticalPoint = None,
+        refresh: bool = False,
+    ) -> top_types.Point:
+        """Return the position of the critical point as pertains to the gantry
 
         This ignores the plunger position and gives the Z-axis a predictable
         name (as :py:attr:`.Point.z`).
@@ -819,30 +865,32 @@ class API(HardwareAPILike):
         smoothie driver (see :py:meth:`current_position`).
         """
         cur_pos = await self.current_position(mount, critical_point, refresh)
-        return top_types.Point(x=cur_pos[Axis.X],
-                               y=cur_pos[Axis.Y],
-                               z=cur_pos[Axis.by_mount(mount)])
+        return top_types.Point(
+            x=cur_pos[Axis.X], y=cur_pos[Axis.Y], z=cur_pos[Axis.by_mount(mount)]
+        )
 
     @overload
-    def _mounts(
-        self,
-        z_axis: PipettePair) -> Tuple[top_types.Mount, top_types.Mount]: ...
+    def _mounts(self, z_axis: PipettePair) -> Tuple[top_types.Mount, top_types.Mount]:
+        ...
 
     @overload
-    def _mounts(self, z_axis: top_types.Mount) -> Tuple[top_types.Mount]: ...
+    def _mounts(self, z_axis: top_types.Mount) -> Tuple[top_types.Mount]:
+        ...
 
     def _mounts(self, z_axis):
         if isinstance(z_axis, PipettePair):
             return (z_axis.primary, z_axis.secondary)
-        return (z_axis, )
+        return (z_axis,)
 
     async def move_to(
-            self, mount: Union[top_types.Mount, PipettePair],
-            abs_position: top_types.Point,
-            speed: float = None,
-            critical_point: CriticalPoint = None,
-            max_speeds: Dict[Axis, float] = None):
-        """ Move the critical point of the specified mount to a location
+        self,
+        mount: Union[top_types.Mount, PipettePair],
+        abs_position: top_types.Point,
+        speed: float = None,
+        critical_point: CriticalPoint = None,
+        max_speeds: Dict[Axis, float] = None,
+    ):
+        """Move the critical point of the specified mount to a location
         relative to the deck, at the specified speed. 'speed' sets the speed
         of all robot axes to the given value. So, if multiple axes are to be
         moved, they will do so at the same speed
@@ -902,38 +950,42 @@ class API(HardwareAPILike):
         if secondary_mount:
             primary_z = Axis.by_mount(primary_mount)
             secondary_z = Axis.by_mount(secondary_mount)
-            primary_cp = self._critical_point_for(
-                primary_mount, critical_point)
-            s_cp = self._critical_point_for(
-                secondary_mount, critical_point)
+            primary_cp = self._critical_point_for(primary_mount, critical_point)
+            s_cp = self._critical_point_for(secondary_mount, critical_point)
             target_position = OrderedDict(
-                ((Axis.X, abs_position.x - primary_offset.x - primary_cp.x),
-                 (Axis.Y, abs_position.y - primary_offset.y - primary_cp.y),
-                 (primary_z, abs_position.z - primary_offset.z - primary_cp.z),
-                 (secondary_z, abs_position.z - s_offset.z - s_cp.z)
-                 ))
+                (
+                    (Axis.X, abs_position.x - primary_offset.x - primary_cp.x),
+                    (Axis.Y, abs_position.y - primary_offset.y - primary_cp.y),
+                    (primary_z, abs_position.z - primary_offset.z - primary_cp.z),
+                    (secondary_z, abs_position.z - s_offset.z - s_cp.z),
+                )
+            )
         else:
-            primary_cp =\
-                self._critical_point_for(primary_mount, critical_point)
+            primary_cp = self._critical_point_for(primary_mount, critical_point)
             primary_z = Axis.by_mount(primary_mount)
             secondary_z = None
             target_position = OrderedDict(
-                ((Axis.X, abs_position.x - primary_offset.x - primary_cp.x),
-                 (Axis.Y, abs_position.y - primary_offset.y - primary_cp.y),
-                 (primary_z, abs_position.z - primary_offset.z - primary_cp.z)
-                 ))
+                (
+                    (Axis.X, abs_position.x - primary_offset.x - primary_cp.x),
+                    (Axis.Y, abs_position.y - primary_offset.y - primary_cp.y),
+                    (primary_z, abs_position.z - primary_offset.z - primary_cp.z),
+                )
+            )
 
         await self._cache_and_maybe_retract_mount(primary_mount)
         await self._move(
-            target_position, speed=speed,
-            max_speeds=max_speeds, secondary_z=secondary_z)
+            target_position, speed=speed, max_speeds=max_speeds, secondary_z=secondary_z
+        )
 
-    async def move_rel(self, mount: Union[top_types.Mount, PipettePair],
-                       delta: top_types.Point,
-                       speed: float = None,
-                       max_speeds: Dict[Axis, float] = None,
-                       check_bounds: MotionChecks = MotionChecks.NONE):
-        """ Move the critical point of the specified mount by a specified
+    async def move_rel(
+        self,
+        mount: Union[top_types.Mount, PipettePair],
+        delta: top_types.Point,
+        speed: float = None,
+        max_speeds: Dict[Axis, float] = None,
+        check_bounds: MotionChecks = MotionChecks.NONE,
+    ):
+        """Move the critical point of the specified mount by a specified
         displacement in a specified direction, at the specified speed.
         'speed' sets the speed of all axes to the given value. So, if multiple
         axes are to be moved, they will do so at the same speed
@@ -954,28 +1006,35 @@ class API(HardwareAPILike):
             primary_z = Axis.by_mount(primary_mount)
             secondary_z = Axis.by_mount(secondary_mount)
             target_position = OrderedDict(
-                ((Axis.X, self._current_position[Axis.X] + delta.x),
-                 (Axis.Y, self._current_position[Axis.Y] + delta.y),
-                 (primary_z, self._current_position[primary_z] + delta.z),
-                 (secondary_z, self._current_position[secondary_z] + delta.z))
+                (
+                    (Axis.X, self._current_position[Axis.X] + delta.x),
+                    (Axis.Y, self._current_position[Axis.Y] + delta.y),
+                    (primary_z, self._current_position[primary_z] + delta.z),
+                    (secondary_z, self._current_position[secondary_z] + delta.z),
+                )
             )
         else:
             z_axis = Axis.by_mount(primary_mount)
             secondary_z = None
             target_position = OrderedDict(
-                ((Axis.X, self._current_position[Axis.X] + delta.x),
-                 (Axis.Y, self._current_position[Axis.Y] + delta.y),
-                 (z_axis, self._current_position[z_axis] + delta.z))
+                (
+                    (Axis.X, self._current_position[Axis.X] + delta.x),
+                    (Axis.Y, self._current_position[Axis.Y] + delta.y),
+                    (z_axis, self._current_position[z_axis] + delta.z),
+                )
             )
 
         await self._cache_and_maybe_retract_mount(primary_mount)
         await self._move(
-            target_position, speed=speed,
-            max_speeds=max_speeds, secondary_z=secondary_z,
-            check_bounds=check_bounds)
+            target_position,
+            speed=speed,
+            max_speeds=max_speeds,
+            secondary_z=secondary_z,
+            check_bounds=check_bounds,
+        )
 
     async def _cache_and_maybe_retract_mount(self, mount: top_types.Mount):
-        """ Retract the 'other' mount if necessary
+        """Retract the 'other' mount if necessary
 
         If `mount` does not match the value in :py:attr:`_last_moved_mount`
         (and :py:attr:`_last_moved_mount` exists) then retract the mount
@@ -986,13 +1045,19 @@ class API(HardwareAPILike):
             await self.retract(self._last_moved_mount, 10)
         self._last_moved_mount = mount
 
-    async def _move_plunger(self, mount: Union[top_types.Mount, PipettePair],
-                            dist: Sequence[float], speed: float = None,
-                            acquire_lock: bool = True):
-        all_axes_pos = OrderedDict((
-            (Axis.X, self._current_position[Axis.X]),
-            (Axis.Y, self._current_position[Axis.Y]),
-        ))
+    async def _move_plunger(
+        self,
+        mount: Union[top_types.Mount, PipettePair],
+        dist: Sequence[float],
+        speed: float = None,
+        acquire_lock: bool = True,
+    ):
+        all_axes_pos = OrderedDict(
+            (
+                (Axis.X, self._current_position[Axis.X]),
+                (Axis.Y, self._current_position[Axis.Y]),
+            )
+        )
         plunger_pos = OrderedDict()
         mounts = self._mounts(mount)
         secondary_z = None
@@ -1004,19 +1069,32 @@ class API(HardwareAPILike):
             if idx == 1:
                 secondary_z = z
         all_axes_pos.update(plunger_pos)
-        await self._move(all_axes_pos, speed, False,
-                         acquire_lock=acquire_lock,
-                         secondary_z=secondary_z)
+        await self._move(
+            all_axes_pos,
+            speed,
+            False,
+            acquire_lock=acquire_lock,
+            secondary_z=secondary_z,
+        )
 
     async def _move_relative_n_axes(
-            self, mount: Union[top_types.Mount, PipettePair],
-            target: Sequence[float], speed: float = None):
-        all_axes_pos = OrderedDict((
-            (Axis.X, self._current_position[Axis.X] + target[0]),
-            (Axis.Y, self._current_position[Axis.Y] + target[1])))
+        self,
+        mount: Union[top_types.Mount, PipettePair],
+        target: Sequence[float],
+        speed: float = None,
+    ):
+        all_axes_pos = OrderedDict(
+            (
+                (Axis.X, self._current_position[Axis.X] + target[0]),
+                (Axis.Y, self._current_position[Axis.Y] + target[1]),
+            )
+        )
         mounts = self._mounts(mount)
         secondary_z = None
-        for idx, m, in enumerate(mounts):
+        for (
+            idx,
+            m,
+        ) in enumerate(mounts):
             z = Axis.by_mount(m)
             t_index = idx + 2
             all_axes_pos[z] = self._current_position[z] + target[t_index]
@@ -1025,9 +1103,9 @@ class API(HardwareAPILike):
         await self._move(all_axes_pos, speed=speed, secondary_z=secondary_z)
 
     def _get_transformed(
-            self,
-            to_transform_primary: Tuple[float, ...],
-            to_transform_secondary: Tuple[float, ...]
+        self,
+        to_transform_primary: Tuple[float, ...],
+        to_transform_secondary: Tuple[float, ...],
     ) -> Tuple[Tuple, Tuple]:
         # Type ignored below because linal.apply_transform (rightly) specifies
         # Tuple[float, float, float] and the implied type from
@@ -1036,19 +1114,25 @@ class API(HardwareAPILike):
         # above that makes this OK
         primary_transformed = linal.apply_transform(
             self.robot_calibration.deck_calibration.attitude,
-            to_transform_primary)  # type: ignore
+            to_transform_primary,  # type: ignore[arg-type]
+        )
         secondary_transformed = linal.apply_transform(
             self.robot_calibration.deck_calibration.attitude,
-            to_transform_secondary)  # type: ignore
+            to_transform_secondary,  # type: ignore[arg-type]
+        )
         return primary_transformed, secondary_transformed
 
-    async def _move(self, target_position: 'OrderedDict[Axis, float]',
-                    speed: float = None, home_flagged_axes: bool = True,
-                    max_speeds: Dict[Axis, float] = None,
-                    acquire_lock: bool = True,
-                    secondary_z: Axis = None,
-                    check_bounds: MotionChecks = MotionChecks.NONE):
-        """ Worker function to apply robot motion.
+    async def _move(
+        self,
+        target_position: "OrderedDict[Axis, float]",
+        speed: float = None,
+        home_flagged_axes: bool = True,
+        max_speeds: Dict[Axis, float] = None,
+        acquire_lock: bool = True,
+        secondary_z: Axis = None,
+        check_bounds: MotionChecks = MotionChecks.NONE,
+    ):
+        """Worker function to apply robot motion.
 
         Robot motion means the kind of motions that are relevant to the robot,
         i.e. only one pipette plunger and mount move at the same time, and an
@@ -1062,27 +1146,37 @@ class API(HardwareAPILike):
         await self._wait_for_is_running()
         # Transform only the x, y, and (z or a) axes specified since this could
         # get the b or c axes as well
-        to_transform_primary = tuple((tp
-                                      for ax, tp in target_position.items()
-                                      if (ax in Axis.gantry_axes()
-                                          and ax != secondary_z)))
+        to_transform_primary = tuple(
+            (
+                tp
+                for ax, tp in target_position.items()
+                if (ax in Axis.gantry_axes() and ax != secondary_z)
+            )
+        )
         if secondary_z:
-            to_transform_secondary = tuple(
-                (0, 0, target_position[secondary_z]))
+            to_transform_secondary = tuple((0, 0, target_position[secondary_z]))
         else:
             to_transform_secondary = tuple((0, 0, 0))
         # Pre-fill the dict we’ll send to the backend with the axes we don’t
         # need to transform
-        smoothie_pos = {ax.name: pos for ax, pos in target_position.items()
-                        if ax not in Axis.gantry_axes()}
+        smoothie_pos = {
+            ax.name: pos
+            for ax, pos in target_position.items()
+            if ax not in Axis.gantry_axes()
+        }
         if len(to_transform_primary) != 3:
-            self._log.error("Move derived {} axes to transform from {}"
-                            .format(len(to_transform_primary),
-                                    target_position))
-            raise ValueError("Moves must specify either exactly an "
-                             "x, y, and (z or a) or none of them")
-        primary_transformed, secondary_transformed =\
-            self._get_transformed(to_transform_primary, to_transform_secondary)
+            self._log.error(
+                "Move derived {} axes to transform from {}".format(
+                    len(to_transform_primary), target_position
+                )
+            )
+            raise ValueError(
+                "Moves must specify either exactly an "
+                "x, y, and (z or a) or none of them"
+            )
+        primary_transformed, secondary_transformed = self._get_transformed(
+            to_transform_primary, to_transform_secondary
+        )
         transformed = (*primary_transformed, secondary_transformed[2])
         # Since target_position is an OrderedDict with the axes ordered by
         # (x, y, z, a, b, c), and we’ll only have one of a or z (as checked
@@ -1090,13 +1184,12 @@ class API(HardwareAPILike):
         # fuse the specified axes and the transformed values back together.
         # While we do this iteration, we’ll also check axis bounds.
         bounds = self._backend.axis_bounds
-        to_check = {ax: transformed[idx]
-                    for idx, ax in enumerate(target_position.keys())
-                    if ax in Axis.gantry_axes()}
-        check_motion_bounds(
-            to_check,
-            target_position,
-            bounds, check_bounds)
+        to_check = {
+            ax: transformed[idx]
+            for idx, ax in enumerate(target_position.keys())
+            if ax in Axis.gantry_axes()
+        }
+        check_motion_bounds(to_check, target_position, bounds, check_bounds)
         smoothie_pos.update({ax.name: pos for ax, pos in to_check.items()})
         checked_maxes = max_speeds or {}
         str_maxes = {ax.name: val for ax, val in checked_maxes.items()}
@@ -1104,20 +1197,22 @@ class API(HardwareAPILike):
             if acquire_lock:
                 await stack.enter_async_context(self._motion_lock)
             try:
-                await self._backend.move(smoothie_pos, speed=speed,
-                                         home_flagged_axes=home_flagged_axes,
-                                         axis_max_speeds=str_maxes)
+                await self._backend.move(
+                    smoothie_pos,
+                    speed=speed,
+                    home_flagged_axes=home_flagged_axes,
+                    axis_max_speeds=str_maxes,
+                )
             except Exception:
-                self._log.exception('Move failed')
+                self._log.exception("Move failed")
                 self._current_position.clear()
                 raise
             else:
                 self._current_position.update(target_position)
 
     def get_engaged_axes(self) -> Dict[Axis, bool]:
-        """ Which axes are engaged and holding. """
-        return {Axis[ax]: eng
-                for ax, eng in self._backend.engaged_axes().items()}
+        """Which axes are engaged and holding."""
+        return {Axis[ax]: eng for ax, eng in self._backend.engaged_axes().items()}
 
     @property
     def engaged_axes(self):
@@ -1126,17 +1221,14 @@ class API(HardwareAPILike):
     async def disengage_axes(self, which: List[Axis]):
         await self._backend.disengage_axes([ax.name for ax in which])
 
-    async def _fast_home(
-            self, axes: Sequence[str],
-            margin: float) -> Dict[str, float]:
-        converted_axes = ''.join(axes)
+    async def _fast_home(self, axes: Sequence[str], margin: float) -> Dict[str, float]:
+        converted_axes = "".join(axes)
         return await self._backend.fast_home(converted_axes, margin)
 
     async def retract(
-            self,
-            mount: Union[top_types.Mount, PipettePair],
-            margin: float = 10):
-        """ Pull the specified mount up to its home position.
+        self, mount: Union[top_types.Mount, PipettePair], margin: float = 10
+    ):
+        """Pull the specified mount up to its home position.
 
         Works regardless of critical point or home status.
         """
@@ -1146,16 +1238,16 @@ class API(HardwareAPILike):
             secondary_ax = Axis.by_mount(mount.secondary).name.upper()
             smoothie_ax: Tuple[str, ...] = (primary_ax, secondary_ax)
         else:
-            smoothie_ax = (Axis.by_mount(mount).name.upper(), )
+            smoothie_ax = (Axis.by_mount(mount).name.upper(),)
 
         async with self._motion_lock:
             smoothie_pos = await self._fast_home(smoothie_ax, margin)
             self._current_position = self._deck_from_smoothie(smoothie_pos)
 
     def _critical_point_for(
-            self, mount: top_types.Mount,
-            cp_override: CriticalPoint = None) -> top_types.Point:
-        """ Return the current critical point of the specified mount.
+        self, mount: top_types.Mount, cp_override: CriticalPoint = None
+    ) -> top_types.Point:
+        """Return the current critical point of the specified mount.
 
         The mount's critical point is the position of the mount itself, if no
         pipette is attached, or the pipette's critical point (which depends on
@@ -1174,20 +1266,20 @@ class API(HardwareAPILike):
 
     # Gantry/frame (i.e. not pipette) config API
     def get_config(self) -> RobotConfig:
-        """ Get the robot's configuration object.
+        """Get the robot's configuration object.
 
         :returns .RobotConfig: The object.
         """
         return self._config
 
     def set_config(self, config: RobotConfig):
-        """ Replace the currently-loaded config """
+        """Replace the currently-loaded config"""
         self._config = config
 
     config = property(fget=get_config, fset=set_config)
 
     async def update_config(self, **kwargs):
-        """ Update values of the robot's configuration.
+        """Update values of the robot's configuration.
 
         `kwargs` should contain keys of the robot's configuration. For
         instance, `update_config(log_level='debug)` would change the API
@@ -1203,8 +1295,8 @@ class API(HardwareAPILike):
 
     # Pipette action API
     async def prepare_for_aspirate(
-            self, mount: Union[top_types.Mount, PipettePair],
-            rate: float = 1.0):
+        self, mount: Union[top_types.Mount, PipettePair], rate: float = 1.0
+    ):
         """
         Prepare the pipette for aspiration.
 
@@ -1223,20 +1315,23 @@ class API(HardwareAPILike):
         raise an exception if this method has not previously been called.
         """
         instruments = self._instruments_for(mount)
-        self._ready_for_tip_action(
-            instruments, HardwareAction.PREPARE_ASPIRATE)
+        self._ready_for_tip_action(instruments, HardwareAction.PREPARE_ASPIRATE)
 
         with_zero = filter(lambda i: i[0].current_volume == 0, instruments)
         for instr in with_zero:
             speed = self._plunger_speed(
-                instr[0],
-                instr[0].blow_out_flow_rate, 'aspirate')
-            bottom = (instr[0].config.bottom, )
+                instr[0], instr[0].blow_out_flow_rate, "aspirate"
+            )
+            bottom = (instr[0].config.bottom,)
             await self._move_plunger(instr[1], bottom, speed=(speed * rate))
             instr[0].ready_to_aspirate = True
 
-    async def aspirate(self, mount: Union[top_types.Mount, PipettePair],
-                       volume: float = None, rate: float = 1.0):
+    async def aspirate(
+        self,
+        mount: Union[top_types.Mount, PipettePair],
+        volume: float = None,
+        rate: float = 1.0,
+    ):
         """
         Aspirate a volume of liquid (in microliters/uL) using this pipette
         from the *current location*. If no volume is passed, `aspirate` will
@@ -1260,12 +1355,14 @@ class API(HardwareAPILike):
         self._ready_for_tip_action(instruments, HardwareAction.ASPIRATE)
         plunger_currents = {
             Axis.of_plunger(instr[1]): instr[0].config.plunger_current
-            for instr in instruments}
+            for instr in instruments
+        }
 
         if volume is None:
             mod_log.debug(
                 "No aspirate volume defined. Aspirating up to "
-                "max_volume for the pipette")
+                "max_volume for the pipette"
+            )
             asp_vol = tuple(instr[0].available_volume for instr in instruments)
         else:
             asp_vol = tuple(volume for instr in instruments)
@@ -1273,26 +1370,28 @@ class API(HardwareAPILike):
         if all([vol == 0 for vol in asp_vol]):
             return
         elif 0 in asp_vol:
-            raise PairedPipetteConfigValueError(
-                "Cannot only aspirate from one pipette")
+            raise PairedPipetteConfigValueError("Cannot only aspirate from one pipette")
 
         for instr, vol in zip(instruments, asp_vol):
-            assert instr[0].ok_to_add_volume(vol), \
-                "Cannot aspirate more than pipette max volume"
+            assert instr[0].ok_to_add_volume(
+                vol
+            ), "Cannot aspirate more than pipette max volume"
 
-        dist = tuple(self._plunger_position(
-                     instr[0],
-                     instr[0].current_volume + vol, 'aspirate')
-                     for instr, vol in zip(instruments, asp_vol))
+        dist = tuple(
+            self._plunger_position(instr[0], instr[0].current_volume + vol, "aspirate")
+            for instr, vol in zip(instruments, asp_vol)
+        )
         speed = min(
             self._plunger_speed(
-                instr[0], instr[0].aspirate_flow_rate * rate, 'aspirate')
-            for instr in instruments)
+                instr[0], instr[0].aspirate_flow_rate * rate, "aspirate"
+            )
+            for instr in instruments
+        )
         try:
             self._backend.set_active_current(plunger_currents)
             await self._move_plunger(mount, dist, speed=speed)
         except Exception:
-            self._log.exception('Aspirate failed')
+            self._log.exception("Aspirate failed")
             for instr in instruments:
                 instr[0].set_current_volume(0)
             raise
@@ -1300,8 +1399,12 @@ class API(HardwareAPILike):
             for instr, vol in zip(instruments, asp_vol):
                 instr[0].add_current_volume(vol)
 
-    async def dispense(self, mount: Union[top_types.Mount, PipettePair],
-                       volume: float = None, rate: float = 1.0):
+    async def dispense(
+        self,
+        mount: Union[top_types.Mount, PipettePair],
+        volume: float = None,
+        rate: float = 1.0,
+    ):
         """
         Dispense a volume of liquid in microliters(uL) using this pipette
         at the current location. If no volume is specified, `dispense` will
@@ -1317,39 +1420,44 @@ class API(HardwareAPILike):
 
         plunger_currents = {
             Axis.of_plunger(instr[1]): instr[0].config.plunger_current
-            for instr in instruments}
+            for instr in instruments
+        }
         if volume is None:
             disp_vol = tuple(instr[0].current_volume for instr in instruments)
-            mod_log.debug("No dispense volume specified. Dispensing all "
-                          "remaining liquid ({}uL) from pipette".format
-                          (disp_vol))
+            mod_log.debug(
+                "No dispense volume specified. Dispensing all "
+                "remaining liquid ({}uL) from pipette".format(disp_vol)
+            )
         else:
             disp_vol = tuple(volume for instr in instruments)
 
         # Ensure we don't dispense more than the current volume
         disp_vol = tuple(
             min(instr[0].current_volume, vol)
-            for instr, vol in zip(instruments, disp_vol))
+            for instr, vol in zip(instruments, disp_vol)
+        )
 
         if all([vol == 0 for vol in disp_vol]):
             return
         elif 0 in disp_vol:
-            raise PairedPipetteConfigValueError(
-                "Cannot only dispense from one pipette")
+            raise PairedPipetteConfigValueError("Cannot only dispense from one pipette")
 
-        dist = tuple(self._plunger_position(
-                     instr[0],
-                     instr[0].current_volume - vol, 'dispense')
-                     for instr, vol in zip(instruments, disp_vol))
-        speed = min(self._plunger_speed(instr[0],
-                    instr[0].dispense_flow_rate * rate, 'dispense')
-                    for instr in instruments)
+        dist = tuple(
+            self._plunger_position(instr[0], instr[0].current_volume - vol, "dispense")
+            for instr, vol in zip(instruments, disp_vol)
+        )
+        speed = min(
+            self._plunger_speed(
+                instr[0], instr[0].dispense_flow_rate * rate, "dispense"
+            )
+            for instr in instruments
+        )
 
         try:
             self._backend.set_active_current(plunger_currents)
             await self._move_plunger(mount, dist, speed=speed)
         except Exception:
-            self._log.exception('Dispense failed')
+            self._log.exception("Dispense failed")
             for instr in instruments:
                 instr[0].set_current_volume(0)
             raise
@@ -1357,21 +1465,22 @@ class API(HardwareAPILike):
             for instr, vol in zip(instruments, disp_vol):
                 instr[0].remove_current_volume(vol)
 
-    def _plunger_position(self, instr: Pipette, ul: float,
-                          action: 'UlPerMmAction') -> float:
+    def _plunger_position(
+        self, instr: Pipette, ul: float, action: "UlPerMmAction"
+    ) -> float:
         mm = ul / instr.ul_per_mm(ul, action)
         position = mm + instr.config.bottom
         return round(position, 6)
 
     def _plunger_speed(
-            self, instr: Pipette, ul_per_s: float,
-            action: 'UlPerMmAction') -> float:
+        self, instr: Pipette, ul_per_s: float, action: "UlPerMmAction"
+    ) -> float:
         mm_per_s = ul_per_s / instr.ul_per_mm(instr.config.max_volume, action)
         return round(mm_per_s, 6)
 
     def _plunger_flowrate(
-            self, instr: Pipette, mm_per_s: float,
-            action: 'UlPerMmAction') -> float:
+        self, instr: Pipette, mm_per_s: float, action: "UlPerMmAction"
+    ) -> float:
         ul_per_s = mm_per_s * instr.ul_per_mm(instr.config.max_volume, action)
         return round(ul_per_s, 6)
 
@@ -1384,17 +1493,19 @@ class API(HardwareAPILike):
         self._ready_for_tip_action(instruments, HardwareAction.BLOWOUT)
         plunger_currents = {
             Axis.of_plunger(instr[1]): instr[0].config.plunger_current
-            for instr in instruments}
+            for instr in instruments
+        }
         blow_out = tuple(instr[0].config.blow_out for instr in instruments)
 
         self._backend.set_active_current(plunger_currents)
-        speed = max(self._plunger_speed(
-            instr[0], instr[0].blow_out_flow_rate, 'dispense')
-            for instr in instruments)
+        speed = max(
+            self._plunger_speed(instr[0], instr[0].blow_out_flow_rate, "dispense")
+            for instr in instruments
+        )
         try:
             await self._move_plunger(mount, blow_out, speed=speed)
         except Exception:
-            self._log.exception('Blow out failed')
+            self._log.exception("Blow out failed")
             raise
         finally:
             for instr in instruments:
@@ -1402,13 +1513,14 @@ class API(HardwareAPILike):
                 instr[0].ready_to_aspirate = False
 
     @overload
-    def _instruments_for(
-        self, mount: top_types.Mount) -> Tuple[PipetteHandlingData]: ...
+    def _instruments_for(self, mount: top_types.Mount) -> Tuple[PipetteHandlingData]:
+        ...
 
     @overload
     def _instruments_for(
-        self, mount: PipettePair) ->\
-        Tuple[PipetteHandlingData, PipetteHandlingData]: ...
+        self, mount: PipettePair
+    ) -> Tuple[PipetteHandlingData, PipetteHandlingData]:
+        ...
 
     def _instruments_for(self, mount):
         if isinstance(mount, PipettePair):
@@ -1420,39 +1532,45 @@ class API(HardwareAPILike):
         else:
             primary_mount = mount
             instr1 = self._attached_instruments[primary_mount]
-            return ((instr1, primary_mount), )
+            return ((instr1, primary_mount),)
 
     def _ready_for_pick_up_tip(self, targets: Sequence[PipetteHandlingData]):
         for pipettes in targets:
             if not pipettes[0]:
                 raise top_types.PipetteNotAttachedError(
-                    f'No pipette attached to {pipettes[1].name} mount')
+                    f"No pipette attached to {pipettes[1].name} mount"
+                )
             if pipettes[0].has_tip:
-                raise TipAttachedError(
-                    'Cannot pick up tip with a tip attached')
-            self._log.debug(f'Picking up tip on {pipettes[0].name}')
+                raise TipAttachedError("Cannot pick up tip with a tip attached")
+            self._log.debug(f"Picking up tip on {pipettes[0].name}")
 
     def _ready_for_tip_action(
-            self, targets: Sequence[PipetteHandlingData],
-            action: HardwareAction):
+        self, targets: Sequence[PipetteHandlingData], action: HardwareAction
+    ):
         for pipettes in targets:
             if not pipettes[0]:
                 raise top_types.PipetteNotAttachedError(
-                    f'No pipette attached to {pipettes[1].name} mount')
+                    f"No pipette attached to {pipettes[1].name} mount"
+                )
             if not pipettes[0].has_tip:
                 raise NoTipAttachedError(
-                    f'Cannot perform {action} without a tip attached')
-            if (action == HardwareAction.ASPIRATE and
-                pipettes[0].current_volume == 0 and
-                    not pipettes[0].ready_to_aspirate):
-                raise RuntimeError('Pipette not ready to aspirate')
-            self._log.debug(f'{action} on {pipettes[0].name}')
+                    f"Cannot perform {action} without a tip attached"
+                )
+            if (
+                action == HardwareAction.ASPIRATE
+                and pipettes[0].current_volume == 0
+                and not pipettes[0].ready_to_aspirate
+            ):
+                raise RuntimeError("Pipette not ready to aspirate")
+            self._log.debug(f"{action} on {pipettes[0].name}")
 
-    async def pick_up_tip(self,
-                          mount: Union[top_types.Mount, PipettePair],
-                          tip_length: float,
-                          presses: int = None,
-                          increment: float = None):
+    async def pick_up_tip(
+        self,
+        mount: Union[top_types.Mount, PipettePair],
+        tip_length: float,
+        presses: int = None,
+        increment: float = None,
+    ):
         """
         Pick up tip from current location.
 
@@ -1473,48 +1591,50 @@ class API(HardwareAPILike):
         self._ready_for_pick_up_tip(instruments)
         plunger_currents = {
             Axis.of_plunger(instr[1]): instr[0].config.plunger_current
-            for instr in instruments}
+            for instr in instruments
+        }
         z_axis_currents = {
             Axis.by_mount(instr[1]): instr[0].config.pick_up_current
-            for instr in instruments}
+            for instr in instruments
+        }
 
         self._backend.set_active_current(plunger_currents)
         # Initialize plunger to bottom position
-        bottom_positions = tuple(
-            instr[0].config.bottom for instr in instruments)
-        await self._move_plunger(
-            mount, bottom_positions)
+        bottom_positions = tuple(instr[0].config.bottom for instr in instruments)
+        await self._move_plunger(mount, bottom_positions)
 
         if not presses or presses < 0:
             all_presses = tuple(
-                instr[0].config.pick_up_presses for instr in instruments)
+                instr[0].config.pick_up_presses for instr in instruments
+            )
             if len(all_presses) > 1 and all_presses[0] != all_presses[1]:
                 raise PairedPipetteConfigValueError(
-                    "Number of pipette pickups must match")
+                    "Number of pipette pickups must match"
+                )
             checked_presses = all_presses[0]
         else:
             checked_presses = presses
 
         if not increment or increment < 0:
             check_incr = tuple(
-                instr[0].config.pick_up_increment for instr in instruments)
+                instr[0].config.pick_up_increment for instr in instruments
+            )
         else:
             check_incr = tuple(increment for instr in instruments)
 
-        pick_up_speed = min(
-            instr[0].config.pick_up_speed for instr in instruments)
+        pick_up_speed = min(instr[0].config.pick_up_speed for instr in instruments)
         # Press the nozzle into the tip <presses> number of times,
         # moving further by <increment> mm after each press
         for i in range(checked_presses):
             # move nozzle down into the tip
             with self._backend.save_current():
                 self._backend.set_active_current(z_axis_currents)
-                dist = tuple(-1.0 * instr[0].config.pick_up_distance
-                             + -1.0 * incrt * i
-                             for instr, incrt in zip(instruments, check_incr))
+                dist = tuple(
+                    -1.0 * instr[0].config.pick_up_distance + -1.0 * incrt * i
+                    for instr, incrt in zip(instruments, check_incr)
+                )
                 target_pos = (0, 0, *dist)
-                await self._move_relative_n_axes(
-                    mount, target_pos, pick_up_speed)
+                await self._move_relative_n_axes(mount, target_pos, pick_up_speed)
 
             # move nozzle back up
             backup_pos = (0, 0, *tuple(-d for d in dist))
@@ -1526,45 +1646,46 @@ class API(HardwareAPILike):
         # neighboring tips tend to get stuck in the space between
         # the volume chamber and the drop-tip sleeve on p1000.
         # This extra shake ensures those tips are removed
-        if any(['pickupTipShake' in instr[0].config.quirks
-                for instr in instruments]):
+        if any(["pickupTipShake" in instr[0].config.quirks for instr in instruments]):
             await self._shake_off_tips_pick_up(mount)
             await self._shake_off_tips_pick_up(mount)
 
         # Here we add in the debounce distance for the switch as
         # a safety precaution
-        retract_target = max(instr[0].config.pick_up_distance
-                             + incrt * checked_presses + 2
-                             for instr, incrt in zip(instruments, check_incr))
+        retract_target = max(
+            instr[0].config.pick_up_distance + incrt * checked_presses + 2
+            for instr, incrt in zip(instruments, check_incr)
+        )
 
         await self.retract(mount, retract_target)
 
     def set_current_tiprack_diameter(
-            self, mount: Union[top_types.Mount, PipettePair],
-            tiprack_diameter: float):
+        self, mount: Union[top_types.Mount, PipettePair], tiprack_diameter: float
+    ):
         instruments = self._instruments_for(mount)
         for instr in instruments:
             assert instr[0]
             self._log.info(
                 "Updating tip rack diameter on pipette mount: "
-                f"{instr[1]}, tip diameter: {tiprack_diameter} mm")
+                f"{instr[1]}, tip diameter: {tiprack_diameter} mm"
+            )
             instr[0].current_tiprack_diameter = tiprack_diameter
 
     def set_working_volume(
-            self, mount: Union[top_types.Mount, PipettePair],
-            tip_volume: int):
+        self, mount: Union[top_types.Mount, PipettePair], tip_volume: int
+    ):
         instruments = self._instruments_for(mount)
         for instr in instruments:
             assert instr[0]
             self._log.info(
                 "Updating working volume on pipette mount:"
-                f"{instr[1]}, tip volume: {tip_volume} ul")
+                f"{instr[1]}, tip volume: {tip_volume} ul"
+            )
             instr[0].working_volume = tip_volume
 
     async def drop_tip(
-            self,
-            mount: Union[top_types.Mount, PipettePair],
-            home_after=True):
+        self, mount: Union[top_types.Mount, PipettePair], home_after=True
+    ):
         """
         Drop tip at the current location
 
@@ -1579,12 +1700,15 @@ class API(HardwareAPILike):
         self._ready_for_tip_action(instruments, HardwareAction.DROPTIP)
         plunger_currents = {
             Axis.of_plunger(instr[1]): instr[0].config.plunger_current
-            for instr in instruments}
+            for instr in instruments
+        }
         drop_tip_currents = {
             Axis.of_plunger(instr[1]): instr[0].config.drop_tip_current
-            for instr in instruments}
+            for instr in instruments
+        }
         plunger_axes = tuple(
-            Axis.of_plunger(instr[1]).name.upper() for instr in instruments)
+            Axis.of_plunger(instr[1]).name.upper() for instr in instruments
+        )
 
         bottom = tuple(instr[0].config.bottom for instr in instruments)
         droptip = tuple(instr[0].config.drop_tip for instr in instruments)
@@ -1594,27 +1718,22 @@ class API(HardwareAPILike):
             self._backend.set_active_current(plunger_currents)
             await self._move_plunger(mount, bottom)
             self._backend.set_active_current(drop_tip_currents)
-            await self._move_plunger(
-                mount, droptip, speed=speed)
+            await self._move_plunger(mount, droptip, speed=speed)
             if home_after:
                 safety_margin = abs(max(bottom) - max(droptip))
                 smoothie_pos = await self._backend.fast_home(
-                    plunger_axes, safety_margin)
-                self._current_position = self._deck_from_smoothie(
-                    smoothie_pos)
+                    plunger_axes, safety_margin
+                )
+                self._current_position = self._deck_from_smoothie(smoothie_pos)
                 self._backend.set_active_current(plunger_currents)
                 await self._move_plunger(mount, bottom)
 
-        if any(['doubleDropTip' in instr[0].config.quirks
-                for instr in instruments]):
+        if any(["doubleDropTip" in instr[0].config.quirks for instr in instruments]):
             await _drop_tip()
         await _drop_tip()
 
-        if any(['dropTipShake' in instr[0].config.quirks
-                for instr in instruments]):
-            diameter = min(
-                instr[0].current_tiprack_diameter
-                for instr in instruments)
+        if any(["dropTipShake" in instr[0].config.quirks for instr in instruments]):
+            diameter = min(instr[0].current_tiprack_diameter for instr in instruments)
             await self._shake_off_tips_drop(mount, diameter)
         self._backend.set_active_current(plunger_currents)
         for instr in instruments:
@@ -1634,7 +1753,7 @@ class API(HardwareAPILike):
 
         shake_pos = top_types.Point(-shake_off_dist, 0, 0)  # move left
         await self.move_rel(mount, shake_pos, speed=SHAKE_OFF_TIPS_SPEED)
-        shake_pos = top_types.Point(2 * shake_off_dist, 0, 0)    # move right
+        shake_pos = top_types.Point(2 * shake_off_dist, 0, 0)  # move right
         await self.move_rel(mount, shake_pos, speed=SHAKE_OFF_TIPS_SPEED)
         shake_pos = top_types.Point(-shake_off_dist, 0, 0)  # original position
         await self.move_rel(mount, shake_pos, speed=SHAKE_OFF_TIPS_SPEED)
@@ -1642,9 +1761,7 @@ class API(HardwareAPILike):
         up_pos = top_types.Point(0, 0, DROP_TIP_RELEASE_DISTANCE)
         await self.move_rel(mount, up_pos)
 
-    async def _shake_off_tips_pick_up(
-            self,
-            mount: Union[top_types.Mount, PipettePair]):
+    async def _shake_off_tips_pick_up(self, mount: Union[top_types.Mount, PipettePair]):
         # tips don't always fall off, especially if resting against
         # tiprack or other tips below it. To ensure the tip has fallen
         # first, shake the pipette to dislodge partially-sealed tips,
@@ -1653,13 +1770,13 @@ class API(HardwareAPILike):
 
         shake_pos = top_types.Point(-shake_off_dist, 0, 0)  # move left
         await self.move_rel(mount, shake_pos, speed=SHAKE_OFF_TIPS_SPEED)
-        shake_pos = top_types.Point(2 * shake_off_dist, 0, 0)    # move right
+        shake_pos = top_types.Point(2 * shake_off_dist, 0, 0)  # move right
         await self.move_rel(mount, shake_pos, speed=SHAKE_OFF_TIPS_SPEED)
         shake_pos = top_types.Point(-shake_off_dist, 0, 0)  # original position
         await self.move_rel(mount, shake_pos, speed=SHAKE_OFF_TIPS_SPEED)
         shake_pos = top_types.Point(0, -shake_off_dist, 0)  # move front
         await self.move_rel(mount, shake_pos, speed=SHAKE_OFF_TIPS_SPEED)
-        shake_pos = top_types.Point(0, 2 * shake_off_dist, 0)    # move back
+        shake_pos = top_types.Point(0, 2 * shake_off_dist, 0)  # move back
         await self.move_rel(mount, shake_pos, speed=SHAKE_OFF_TIPS_SPEED)
         shake_pos = top_types.Point(0, -shake_off_dist, 0)  # original position
         await self.move_rel(mount, shake_pos, speed=SHAKE_OFF_TIPS_SPEED)
@@ -1668,18 +1785,24 @@ class API(HardwareAPILike):
         await self.move_rel(mount, up_pos)
 
     async def find_modules(
-            self, by_model: modules.types.ModuleModel,
-            resolved_type: modules.types.ModuleType
-            ) -> Tuple[List[modules.AbstractModule], Optional[modules.AbstractModule]]:
+        self,
+        by_model: modules.types.ModuleModel,
+        resolved_type: modules.types.ModuleType,
+    ) -> Tuple[List[modules.AbstractModule], Optional[modules.AbstractModule]]:
         modules_result = await self._backend.module_controls.parse_modules(
-            by_model, resolved_type)
+            by_model, resolved_type
+        )
         return modules_result
 
     # Pipette config api
-    def calibrate_plunger(self,
-                          mount: top_types.Mount,
-                          top: float = None, bottom: float = None,
-                          blow_out: float = None, drop_tip: float = None):
+    def calibrate_plunger(
+        self,
+        mount: top_types.Mount,
+        top: float = None,
+        bottom: float = None,
+        blow_out: float = None,
+        drop_tip: float = None,
+    ):
         """
         Set calibration values for the pipette plunger.
         This can be called multiple times as the user sets each value,
@@ -1694,30 +1817,32 @@ class API(HardwareAPILike):
         instr = self._attached_instruments[mount]
         if not instr:
             raise top_types.PipetteNotAttachedError(
-                "No pipette attached to {} mount".format(mount.name))
+                "No pipette attached to {} mount".format(mount.name)
+            )
 
         pos_dict: Dict = {
-            'top': instr.config.top,
-            'bottom': instr.config.bottom,
-            'blow_out': instr.config.blow_out,
-            'drop_tip': instr.config.drop_tip}
+            "top": instr.config.top,
+            "bottom": instr.config.bottom,
+            "blow_out": instr.config.blow_out,
+            "drop_tip": instr.config.drop_tip,
+        }
         if top is not None:
-            pos_dict['top'] = top
+            pos_dict["top"] = top
         if bottom is not None:
-            pos_dict['bottom'] = bottom
+            pos_dict["bottom"] = bottom
         if blow_out is not None:
-            pos_dict['blow_out'] = blow_out
+            pos_dict["blow_out"] = blow_out
         if bottom is not None:
-            pos_dict['drop_tip'] = drop_tip
+            pos_dict["drop_tip"] = drop_tip
         for key in pos_dict.keys():
             instr.update_config_item(key, pos_dict[key])
 
-    def set_flow_rate(self, mount,
-                      aspirate=None, dispense=None, blow_out=None):
+    def set_flow_rate(self, mount, aspirate=None, dispense=None, blow_out=None):
         this_pipette = self._attached_instruments[mount]
         if not this_pipette:
             raise top_types.PipetteNotAttachedError(
-                "No pipette attached to {} mount".format(mount))
+                "No pipette attached to {} mount".format(mount)
+            )
         if aspirate:
             this_pipette.aspirate_flow_rate = aspirate
         if dispense:
@@ -1725,26 +1850,28 @@ class API(HardwareAPILike):
         if blow_out:
             this_pipette.blow_out_flow_rate = blow_out
 
-    def set_pipette_speed(self, mount,
-                          aspirate=None, dispense=None, blow_out=None):
+    def set_pipette_speed(self, mount, aspirate=None, dispense=None, blow_out=None):
         this_pipette = self._attached_instruments[mount]
         if not this_pipette:
             raise top_types.PipetteNotAttachedError(
-                "No pipette attached to {} mount".format(mount))
+                "No pipette attached to {} mount".format(mount)
+            )
         if aspirate:
             this_pipette.aspirate_flow_rate = self._plunger_flowrate(
-                this_pipette, aspirate, 'aspirate')
+                this_pipette, aspirate, "aspirate"
+            )
         if dispense:
             this_pipette.dispense_flow_rate = self._plunger_flowrate(
-                this_pipette, dispense, 'dispense')
+                this_pipette, dispense, "dispense"
+            )
         if blow_out:
             this_pipette.blow_out_flow_rate = self._plunger_flowrate(
-                this_pipette, blow_out, 'dispense')
+                this_pipette, blow_out, "dispense"
+            )
 
     def get_instrument_max_height(
-            self,
-            mount: top_types.Mount,
-            critical_point: CriticalPoint = None) -> float:
+        self, mount: top_types.Mount, critical_point: CriticalPoint = None
+    ) -> float:
         """Return max achievable height of the attached instrument
         based on the current critical point
         """
@@ -1752,11 +1879,10 @@ class API(HardwareAPILike):
         assert pip
         cp = self._critical_point_for(mount, critical_point)
 
-        max_height = pip.config.home_position - \
-            self._config.z_retract_distance + cp.z
+        max_height = pip.config.home_position - self._config.z_retract_distance + cp.z
 
         return max_height
 
     def clean_up(self):
-        """ Get the API ready to stop cleanly. """
+        """Get the API ready to stop cleanly."""
         self._backend.clean_up()

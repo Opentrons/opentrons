@@ -135,7 +135,7 @@ export class FilePage extends React.Component<Props, State> {
                       placeholder="Untitled"
                       name="protocolName"
                       onChange={handleChange}
-                      value={values['protocolName']}
+                      value={values.protocolName}
                     />
                   </FormGroup>
 

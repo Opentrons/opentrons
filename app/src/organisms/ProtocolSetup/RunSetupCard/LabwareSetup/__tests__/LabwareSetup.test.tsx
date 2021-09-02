@@ -11,17 +11,21 @@ import {
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 import { fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components/__utils__'
-import { i18n } from '../../../../i18n'
+import {
+  renderWithProviders,
+  componentPropsMatcher,
+  partialComponentPropsMatcher,
+} from '@opentrons/components/__utils__'
+import { i18n } from '../../../../../i18n'
 import { LabwareSetup } from '..'
 import { LabwareSetupModal } from '../LabwareSetupModal'
 import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
 import { ExtraAttentionWarning } from '../ExtraAttentionWarning'
 import { getModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
-import { ModuleTag } from '../../ModuleTag'
+import { ModuleTag } from '../../../ModuleTag'
 
 jest.mock('../LabwareSetupModal')
-jest.mock('../../ModuleTag')
+jest.mock('../../../ModuleTag')
 jest.mock('../LabwareInfoOverlay')
 jest.mock('../ExtraAttentionWarning')
 jest.mock('../utils/getModuleTypesThatRequireExtraAttention')
@@ -41,18 +45,6 @@ jest.mock('@opentrons/shared-data', () => {
     inferModuleOrientationFromXCoordinate: jest.fn(),
   }
 })
-
-// this is needed because under the hood react calls components with two arguments (props and some second argument nobody seems to know)
-// https://github.com/timkindberg/jest-when/issues/66
-const componentPropsMatcher = (matcher: unknown) =>
-  // @ts-expect-error(sa, 2021-08-03): when.allArgs not part of type definition yet for jest-when
-  when.allArgs((args, equals) => equals(args[0], matcher))
-
-const partialComponentPropsMatcher = (argsToMatch: unknown) =>
-  // @ts-expect-error(sa, 2021-08-03): when.allArgs not part of type definition yet for jest-when
-  when.allArgs((args, equals) =>
-    equals(args[0], expect.objectContaining(argsToMatch))
-  )
 
 const mockLabwareInfoOverlay = LabwareInfoOverlay as jest.MockedFunction<
   typeof LabwareInfoOverlay

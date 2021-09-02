@@ -3,7 +3,6 @@ from typing import Dict
 
 
 class AbstractMagDeckDriver(ABC):
-
     @abstractmethod
     async def connect(self) -> None:
         ...

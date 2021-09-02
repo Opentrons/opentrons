@@ -144,7 +144,7 @@ export function getFootprintDiagram(props: DiagramProps): string[] {
   if (category === 'aluminumBlock') {
     return insertCategory ? ALUM_BLOCK_FOOTPRINTS[insertCategory] : []
   } else if (category === 'tubeRack' && irregular) {
-    return FOOTPRINT_DIAGRAMS['irregular']
+    return FOOTPRINT_DIAGRAMS.irregular
   }
   return category ? FOOTPRINT_DIAGRAMS[category] : []
 }
@@ -153,8 +153,8 @@ export function getSpacingDiagram(props: DiagramProps): string[] {
   const { category, isMultiRow, shape } = props
   if (category === 'reservoir') {
     return isMultiRow
-      ? RESERVOIR_SPACING_DIAGRAMS['multiRow']
-      : RESERVOIR_SPACING_DIAGRAMS['singleRow']
+      ? RESERVOIR_SPACING_DIAGRAMS.multiRow
+      : RESERVOIR_SPACING_DIAGRAMS.singleRow
   }
 
   return shape ? SPACING_DIAGRAMS[shape] : []

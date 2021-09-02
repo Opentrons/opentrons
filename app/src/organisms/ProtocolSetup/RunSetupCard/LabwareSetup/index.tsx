@@ -29,14 +29,14 @@ import {
   inferModuleOrientationFromXCoordinate,
 } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
-import { ModuleTag } from '../ModuleTag'
+import { ModuleTag } from '../../ModuleTag'
 import { LabwareInfoOverlay } from './LabwareInfoOverlay'
 import { LabwareSetupModal } from './LabwareSetupModal'
 import { getModuleTypesThatRequireExtraAttention } from './utils/getModuleTypesThatRequireExtraAttention'
 import { ExtraAttentionWarning } from './ExtraAttentionWarning'
-import styles from '../styles.css'
-import type { CoordinatesByModuleModel } from '../utils/getModuleRenderCoords'
-import type { CoordinatesByLabwareId } from '../utils/getLabwareRenderCoords'
+import styles from '../../styles.css'
+import type { CoordinatesByModuleModel } from '../../utils/getModuleRenderCoords'
+import type { CoordinatesByLabwareId } from '../../utils/getLabwareRenderCoords'
 
 interface LabwareSetupProps {
   moduleRenderCoords: CoordinatesByModuleModel
@@ -104,6 +104,7 @@ export const LabwareSetup = (props: LabwareSetupProps): JSX.Element | null => {
           viewBox={DECK_MAP_VIEWBOX}
           className={styles.deck_map}
           deckLayerBlocklist={DECK_LAYER_BLOCKLIST}
+          id={'LabwareSetup_deckMap'}
         >
           {() => {
             return (
@@ -154,6 +155,7 @@ export const LabwareSetup = (props: LabwareSetupProps): JSX.Element | null => {
             marginRight={SPACING_3}
             onClick={() => console.log('check labware positions!')}
             color={C_BLUE}
+            id={'LabwareSetup_checkLabwarePositionsButton'}
           >
             {t('check_labware_positions')}
           </SecondaryBtn>
@@ -162,6 +164,7 @@ export const LabwareSetup = (props: LabwareSetupProps): JSX.Element | null => {
             disabled={proceedToRunDisabled}
             as={LinkComponent}
             backgroundColor={C_BLUE}
+            id={'LabwareSetup_proceedToRunButton'}
             {...linkProps}
             {...targetProps}
           >

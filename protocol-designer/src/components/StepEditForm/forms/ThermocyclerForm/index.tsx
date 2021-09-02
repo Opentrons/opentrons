@@ -22,7 +22,7 @@ export const ThermocyclerForm = (props: StepFormProps): JSX.Element => {
       <div className={styles.tc_step_group}>
         <div className={styles.checkbox_row}>
           <RadioGroupField
-            {...propsForFields['thermocyclerFormType']}
+            {...propsForFields.thermocyclerFormType}
             className={styles.tc_step_option}
             options={[
               {
@@ -34,13 +34,12 @@ export const ThermocyclerForm = (props: StepFormProps): JSX.Element => {
             ]}
           />
         </div>
-        {propsForFields['thermocyclerFormType']?.value ===
-          THERMOCYCLER_STATE && (
+        {propsForFields.thermocyclerFormType?.value === THERMOCYCLER_STATE && (
           <StateFields propsForFields={propsForFields} formData={formData} />
         )}
         <div className={styles.checkbox_row}>
           <RadioGroupField
-            {...propsForFields['thermocyclerFormType']}
+            {...propsForFields.thermocyclerFormType}
             className={styles.tc_step_option}
             options={[
               {
@@ -54,8 +53,7 @@ export const ThermocyclerForm = (props: StepFormProps): JSX.Element => {
         </div>
       </div>
 
-      {propsForFields['thermocyclerFormType']?.value ===
-        THERMOCYCLER_PROFILE && (
+      {propsForFields.thermocyclerFormType?.value === THERMOCYCLER_PROFILE && (
         <div className={styles.profile_form}>
           <div className={styles.section_header}>
             <span className={styles.section_header_text}>

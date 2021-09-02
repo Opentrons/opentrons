@@ -6,8 +6,8 @@ from .types import GPIOPin
 
 
 class GPIODriverLike(Protocol):
-    """ Interface for the GPIO drivers
-    """
+    """Interface for the GPIO drivers"""
+
     def __init__(self, chip_name: str):
         ...
 
@@ -39,10 +39,9 @@ class GPIODriverLike(Protocol):
     def set_low(self, output_pin: GPIOPin):
         ...
 
-    def set_button_light(self,
-                         red: bool = False,
-                         green: bool = False,
-                         blue: bool = False):
+    def set_button_light(
+        self, red: bool = False, green: bool = False, blue: bool = False
+    ):
         ...
 
     def set_rail_lights(self, on: bool = True):
@@ -82,8 +81,10 @@ class GPIODriverLike(Protocol):
         ...
 
     def start_door_switch_watcher(
-            self, loop: asyncio.AbstractEventLoop,
-            update_door_state: Callable[[DoorState], None]):
+        self,
+        loop: asyncio.AbstractEventLoop,
+        update_door_state: Callable[[DoorState], None],
+    ):
         ...
 
     def release_line(self, pin: GPIOPin):

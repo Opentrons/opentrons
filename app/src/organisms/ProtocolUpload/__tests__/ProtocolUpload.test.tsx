@@ -5,13 +5,16 @@ import { renderWithProviders } from '@opentrons/components/__utils__'
 import withModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/testModulesProtocol.json'
 
 import { i18n } from '../../../i18n'
-import { ProtocolUpload } from '..'
+import { mockConnectedRobot } from '../../../redux/discovery/__fixtures__'
+import * as discoverySelectors from '../../../redux/discovery/selectors'
 import * as protocolSelectors from '../../../redux/protocol/selectors'
 import * as protocolUtils from '../../../redux/protocol/utils'
 import { closeProtocol } from '../../../redux/protocol/actions'
+import { ProtocolUpload } from '..'
 
 jest.mock('../../../redux/protocol/selectors')
 jest.mock('../../../redux/protocol/utils')
+jest.mock('../../../redux/discovery/selectors')
 
 const getProtocolFile = protocolSelectors.getProtocolFile as jest.MockedFunction<
   typeof protocolSelectors.getProtocolFile
@@ -22,11 +25,15 @@ const getProtocolName = protocolSelectors.getProtocolName as jest.MockedFunction
 const ingestProtocolFile = protocolUtils.ingestProtocolFile as jest.MockedFunction<
   typeof protocolUtils.ingestProtocolFile
 >
+const getConnectedRobot = discoverySelectors.getConnectedRobot as jest.MockedFunction<
+  typeof discoverySelectors.getConnectedRobot
+>
 
 describe('ProtocolUpload', () => {
   let render: () => ReturnType<typeof renderWithProviders>
 
   beforeEach(() => {
+    getConnectedRobot.mockReturnValue(mockConnectedRobot)
     getProtocolFile.mockReturnValue(null)
     getProtocolName.mockReturnValue(null)
     ingestProtocolFile.mockImplementation((_f, _s, _e) => {})

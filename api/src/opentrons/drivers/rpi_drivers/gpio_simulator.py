@@ -46,8 +46,7 @@ class SimulatingGPIOCharDev:
         pass
 
     def config_by_board_rev(self):
-        self.board_rev = BoardRevision.by_bits(
-            self.read_revision_bits())
+        self.board_rev = BoardRevision.by_bits(self.read_revision_bits())
 
     def set_high(self, output_pin: GPIOPin):
         self._values[output_pin.name] = 1
@@ -55,10 +54,9 @@ class SimulatingGPIOCharDev:
     def set_low(self, output_pin: GPIOPin):
         self._values[output_pin.name] = 0
 
-    def set_button_light(self,
-                         red: bool = False,
-                         green: bool = False,
-                         blue: bool = False):
+    def set_button_light(
+        self, red: bool = False, green: bool = False, blue: bool = False
+    ):
         pass
 
     def set_rail_lights(self, on: bool = True):
@@ -77,9 +75,11 @@ class SimulatingGPIOCharDev:
         return self._values[input_pin.name]
 
     def get_button_light(self) -> Tuple[bool, bool, bool]:
-        return (bool(self._read(gpio_group.red_button)),
-                bool(self._read(gpio_group.green_button)),
-                bool(self._read(gpio_group.blue_button)))
+        return (
+            bool(self._read(gpio_group.red_button)),
+            bool(self._read(gpio_group.green_button)),
+            bool(self._read(gpio_group.blue_button)),
+        )
 
     def get_rail_lights(self) -> bool:
         return bool(self._read(gpio_group.frame_leds))
@@ -98,8 +98,7 @@ class SimulatingGPIOCharDev:
         return bool(self._read(gpio_group.door_sw_filt))
 
     def read_revision_bits(self) -> Tuple[bool, bool]:
-        return (bool(self._read(gpio_group.rev_0)),
-                bool(self._read(gpio_group.rev_1)))
+        return (bool(self._read(gpio_group.rev_0)), bool(self._read(gpio_group.rev_1)))
 
     def get_door_state(self) -> DoorState:
         val = self.read_window_switches()
@@ -109,8 +108,10 @@ class SimulatingGPIOCharDev:
             return DoorState.OPEN
 
     def start_door_switch_watcher(
-            self, loop: asyncio.AbstractEventLoop,
-            update_door_state: Callable[[DoorState], None]):
+        self,
+        loop: asyncio.AbstractEventLoop,
+        update_door_state: Callable[[DoorState], None],
+    ):
         current_door_value = self.read_window_switches()
         if current_door_value == 0:
             update_door_state(DoorState.OPEN)

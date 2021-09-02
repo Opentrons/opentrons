@@ -24,8 +24,8 @@ import {
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 import { ModuleInfo } from './ModuleInfo'
 import { MultipleModulesModal } from './MultipleModulesModal'
-import styles from '../styles.css'
-import type { CoordinatesByModuleModel } from '../utils/getModuleRenderCoords'
+import styles from '../../styles.css'
+import type { CoordinatesByModuleModel } from '../../utils/getModuleRenderCoords'
 
 interface ModuleSetupProps {
   moduleRenderCoords: CoordinatesByModuleModel
@@ -80,6 +80,7 @@ export const ModuleSetup = (props: ModuleSetupProps): JSX.Element | null => {
           viewBox={DECK_VIEW_BOX}
           className={styles.deck_map}
           deckLayerBlocklist={DECK_LAYER_BLOCKLIST}
+          id={'ModuleSetup_deckMap'}
         >
           {() => {
             return (
@@ -115,6 +116,7 @@ export const ModuleSetup = (props: ModuleSetupProps): JSX.Element | null => {
           title={t('proceed_to_labware_setup_step')}
           onClick={expandLabwareSetupStep}
           backgroundColor={C_BLUE}
+          id={'ModuleSetup_proceedToLabwareSetup'}
         >
           {t('proceed_to_labware_setup_step')}
         </PrimaryBtn>

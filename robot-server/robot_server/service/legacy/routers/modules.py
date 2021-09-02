@@ -27,7 +27,7 @@ router = APIRouter()
     response_model=Modules,
 )
 async def get_modules(hardware: ThreadManager = Depends(get_hardware)) -> Modules:
-    attached_modules = hardware.attached_modules  # type: ignore
+    attached_modules = hardware.attached_modules
     module_data = [
         Module(
             name=mod.name(),  # TODO: legacy, remove
@@ -66,7 +66,7 @@ async def get_module_serial(
 ) -> ModuleSerial:
     res = None
 
-    attached_modules = hardware.attached_modules  # type: ignore
+    attached_modules = hardware.attached_modules
     matching_module = find_matching_module(serial, attached_modules)
     if matching_module and hasattr(matching_module, "live_data"):
         res = matching_module.live_data
@@ -105,7 +105,7 @@ async def post_serial_command(
     hardware: ThreadManager = Depends(get_hardware),
 ) -> SerialCommandResponse:
     """Send a command on device identified by serial"""
-    attached_modules = hardware.attached_modules  # type: ignore
+    attached_modules = hardware.attached_modules
     if not attached_modules:
         raise LegacyErrorResponse(message="No connected modules").as_error(
             status.HTTP_404_NOT_FOUND
@@ -159,7 +159,7 @@ async def post_serial_update(
     hardware: ThreadManager = Depends(get_hardware),
 ) -> V1BasicResponse:
     """Update module firmware"""
-    attached_modules = hardware.attached_modules  # type: ignore
+    attached_modules = hardware.attached_modules
     matching_module = find_matching_module(serial, attached_modules)
 
     if not matching_module:

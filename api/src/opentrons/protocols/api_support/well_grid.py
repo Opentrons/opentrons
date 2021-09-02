@@ -25,8 +25,7 @@ class WellGrid:
         """
         self._grid = self._create_row_column(wells)
         self._row_headers = sorted(self._grid.rows.keys())
-        self._column_headers = sorted(self._grid.columns.keys(),
-                                      key=lambda k: int(k))
+        self._column_headers = sorted(self._grid.columns.keys(), key=lambda k: int(k))
         self._rows = [self._grid.rows[h] for h in self._row_headers]
         self._columns = [self._grid.columns[h] for h in self._column_headers]
 

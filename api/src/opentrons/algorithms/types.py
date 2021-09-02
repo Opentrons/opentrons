@@ -8,7 +8,7 @@ from typing import TypeVar, Generic, List
 from dataclasses import dataclass
 
 
-VertexName = TypeVar('VertexName')
+VertexName = TypeVar("VertexName")
 
 
 @dataclass(frozen=True)
@@ -34,4 +34,4 @@ class GenericNode(Generic[VertexName]):
         return hash((self.name, *self.sub_names))
 
 
-VertexLike = TypeVar('VertexLike', bound=GenericNode)
+VertexLike = TypeVar("VertexLike", bound=GenericNode)

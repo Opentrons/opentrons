@@ -5,7 +5,6 @@ from opentrons.drivers.types import Temperature, ThermocyclerLidStatus, PlateTem
 
 
 class AbstractThermocyclerDriver(ABC):
-
     @abstractmethod
     async def connect(self) -> None:
         """Connect to thermocycler"""
@@ -48,10 +47,11 @@ class AbstractThermocyclerDriver(ABC):
 
     @abstractmethod
     async def set_plate_temperature(
-            self,
-            temp: float,
-            hold_time: Optional[float] = None,
-            volume: Optional[float] = None) -> None:
+        self,
+        temp: float,
+        hold_time: Optional[float] = None,
+        volume: Optional[float] = None,
+    ) -> None:
         """Send set plate temperature command"""
         ...
 

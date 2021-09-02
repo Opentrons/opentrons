@@ -6,13 +6,15 @@ from opentrons.hardware_control import CriticalPoint
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.api_support.labware_like import LabwareLike
-from opentrons.protocols.api_support.util import Clearances, build_edges, \
-    FlowRates, PlungerSpeeds
+from opentrons.protocols.api_support.util import (
+    Clearances,
+    build_edges,
+    FlowRates,
+    PlungerSpeeds,
+)
 from opentrons.protocols.geometry import planning
-from opentrons.protocols.context.instrument import \
-    AbstractInstrument
-from opentrons.protocols.context.protocol import \
-    AbstractProtocol
+from opentrons.protocols.context.instrument import AbstractInstrument
+from opentrons.protocols.context.protocol import AbstractProtocol
 from opentrons.protocols.context.well import WellImplementation
 
 
@@ -28,22 +30,22 @@ class InstrumentContextImplementation(AbstractInstrument):
     _flow_rates: FlowRates
     _speeds: PlungerSpeeds
 
-    def __init__(self,
-                 protocol_interface: AbstractProtocol,
-                 mount: types.Mount,
-                 instrument_name: str,
-                 default_speed: float,
-                 api_version: Optional[APIVersion] = None):
-        """"Constructor"""
-        # TODO AL 20201110 - Remove need for api_version in this module
+    def __init__(
+        self,
+        protocol_interface: AbstractProtocol,
+        mount: types.Mount,
+        instrument_name: str,
+        default_speed: float,
+        api_version: Optional[APIVersion] = None,
+    ):
+        """ "Constructor"""
         self._api_version = api_version or MAX_SUPPORTED_VERSION
         self._protocol_interface = protocol_interface
         self._mount = mount
         self._instrument_name = instrument_name
         self._default_speed = default_speed
         self._well_bottom_clearances = Clearances(
-            default_aspirate=1.0,
-            default_dispense=1.0
+            default_aspirate=1.0, default_dispense=1.0
         )
         self._flow_rates = FlowRates(self)
         self._speeds = PlungerSpeeds(self)
@@ -75,11 +77,9 @@ class InstrumentContextImplementation(AbstractInstrument):
         """Blow liquid out of the tip."""
         self._protocol_interface.get_hardware().hardware.blow_out(self._mount)
 
-    def touch_tip(self,
-                  location: WellImplementation,
-                  radius: float,
-                  v_offset: float,
-                  speed: float) -> None:
+    def touch_tip(
+        self, location: WellImplementation, radius: float, v_offset: float, speed: float
+    ) -> None:
         """
         Touch the pipette tip to the sides of a well, with the intent of
         removing left-over droplets
@@ -96,41 +96,33 @@ class InstrumentContextImplementation(AbstractInstrument):
             mount=self._mount,
             deck=self._protocol_interface.get_deck(),
             radius=radius,
-            version=self._api_version
+            version=self._api_version,
         )
         for edge in edges:
             self._protocol_interface.get_hardware().hardware.move_to(
-                self._mount,
-                edge,
-                speed
+                self._mount, edge, speed
             )
 
-    def pick_up_tip(self,
-                    well: WellImplementation,
-                    tip_length: float,
-                    presses: Optional[int],
-                    increment: Optional[float]) -> None:
+    def pick_up_tip(
+        self,
+        well: WellImplementation,
+        tip_length: float,
+        presses: Optional[int],
+        increment: Optional[float],
+    ) -> None:
         """Pick up a tip for the pipette to run liquid-handling commands."""
         hw = self._protocol_interface.get_hardware().hardware
         geometry = well.get_geometry()
 
-        hw.set_current_tiprack_diameter(
-            self._mount, geometry.diameter)
+        hw.set_current_tiprack_diameter(self._mount, geometry.diameter)
 
-        hw.pick_up_tip(
-            self._mount,
-            tip_length,
-            presses,
-            increment
-        )
-        hw.set_working_volume(
-            self._mount, geometry.max_volume)
+        hw.pick_up_tip(self._mount, tip_length, presses, increment)
+        hw.set_working_volume(self._mount, geometry.max_volume)
 
     def drop_tip(self, home_after: bool) -> None:
         """Drop the tip."""
         self._protocol_interface.get_hardware().hardware.drop_tip(
-            self._mount,
-            home_after=home_after
+            self._mount, home_after=home_after
         )
 
     def home(self) -> None:
@@ -140,25 +132,23 @@ class InstrumentContextImplementation(AbstractInstrument):
 
     def home_plunger(self) -> None:
         """Home the plunger associated with this mount."""
-        self._protocol_interface.get_hardware().hardware.home_plunger(
-            self._mount
-        )
+        self._protocol_interface.get_hardware().hardware.home_plunger(self._mount)
 
     def delay(self) -> None:
         """Delay protocol execution."""
         self._protocol_interface.delay(seconds=0, msg=None)
 
-    def move_to(self,
-                location: types.Location,
-                force_direct: bool,
-                minimum_z_height: Optional[float],
-                speed: Optional[float]) -> None:
+    def move_to(
+        self,
+        location: types.Location,
+        force_direct: bool,
+        minimum_z_height: Optional[float],
+        speed: Optional[float],
+    ) -> None:
         """Move the instrument."""
         # prevent direct movement bugs in PAPI version >= 2.10
         location_cache_mount = (
-            self._mount
-            if self._api_version >= APIVersion(2, 10) else
-            None
+            self._mount if self._api_version >= APIVersion(2, 10) else None
         )
 
         last_location = self._protocol_interface.get_last_location(
@@ -175,34 +165,38 @@ class InstrumentContextImplementation(AbstractInstrument):
 
         hardware = self._protocol_interface.get_hardware().hardware
 
-        from_center = from_lw.center_multichannel_on_wells() \
-            if from_lw else False
+        from_center = from_lw.center_multichannel_on_wells() if from_lw else False
         cp_override = CriticalPoint.XY_CENTER if from_center else None
 
         from_loc = types.Location(
-            hardware.gantry_position(
-                self._mount, critical_point=cp_override),
-            from_lw)
+            hardware.gantry_position(self._mount, critical_point=cp_override), from_lw
+        )
 
         instr_max_height = hardware.get_instrument_max_height(self._mount)
-        moves = planning.plan_moves(from_loc, location,
-                                    self._protocol_interface.get_deck(),
-                                    instr_max_height,
-                                    force_direct=force_direct,
-                                    minimum_z_height=minimum_z_height)
+        moves = planning.plan_moves(
+            from_loc,
+            location,
+            self._protocol_interface.get_deck(),
+            instr_max_height,
+            force_direct=force_direct,
+            minimum_z_height=minimum_z_height,
+        )
 
         try:
             for move in moves:
                 hardware.move_to(
-                    self._mount, move[0], critical_point=move[1], speed=speed,
-                    max_speeds=self._protocol_interface.get_max_speeds().data)
+                    self._mount,
+                    move[0],
+                    critical_point=move[1],
+                    speed=speed,
+                    max_speeds=self._protocol_interface.get_max_speeds().data,
+                )
         except Exception:
             self._protocol_interface.set_last_location(None)
             raise
         else:
             self._protocol_interface.set_last_location(
-                location=location,
-                mount=location_cache_mount
+                location=location, mount=location_cache_mount
             )
 
     def get_mount(self) -> types.Mount:
@@ -215,27 +209,27 @@ class InstrumentContextImplementation(AbstractInstrument):
 
     def get_pipette_name(self) -> str:
         """Get the pipette name."""
-        return self.get_pipette()['name']
+        return self.get_pipette()["name"]
 
     def get_model(self) -> str:
         """Get the model name."""
-        return self.get_pipette()['model']
+        return self.get_pipette()["model"]
 
     def get_min_volume(self) -> float:
         """Get the min volume."""
-        return self.get_pipette()['min_volume']
+        return self.get_pipette()["min_volume"]
 
     def get_max_volume(self) -> float:
         """Get the max volume."""
-        return self.get_pipette()['max_volume']
+        return self.get_pipette()["max_volume"]
 
     def get_current_volume(self) -> float:
         """Get the current volume."""
-        return self.get_pipette()['current_volume']
+        return self.get_pipette()["current_volume"]
 
     def get_available_volume(self) -> float:
         """Get the available volume."""
-        return self.get_pipette()['available_volume']
+        return self.get_pipette()["available_volume"]
 
     def get_pipette(self) -> PipetteDict:
         """Get the hardware pipette dictionary."""
@@ -247,23 +241,23 @@ class InstrumentContextImplementation(AbstractInstrument):
 
     def get_channels(self) -> int:
         """Number of channels."""
-        return self.get_pipette()['channels']
+        return self.get_pipette()["channels"]
 
     def has_tip(self) -> bool:
         """Whether a tip is attached."""
-        return self.get_pipette()['has_tip']
+        return self.get_pipette()["has_tip"]
 
     def is_ready_to_aspirate(self) -> bool:
-        return self.get_pipette()['ready_to_aspirate']
+        return self.get_pipette()["ready_to_aspirate"]
 
     def prepare_for_aspirate(self) -> None:
-        self._protocol_interface.get_hardware(
-
-        ).hardware.prepare_for_aspirate(self._mount)
+        self._protocol_interface.get_hardware().hardware.prepare_for_aspirate(
+            self._mount
+        )
 
     def get_return_height(self) -> float:
         """The height to return a tip to its tiprack."""
-        return self.get_pipette().get('return_tip_height', 0.5)
+        return self.get_pipette().get("return_tip_height", 0.5)
 
     def get_well_bottom_clearance(self) -> Clearances:
         """The distance above the bottom of a well to aspirate or dispense."""
@@ -276,10 +270,11 @@ class InstrumentContextImplementation(AbstractInstrument):
         return self._speeds
 
     def set_flow_rate(
-            self,
-            aspirate: Optional[float] = None,
-            dispense: Optional[float] = None,
-            blow_out: Optional[float] = None) -> None:
+        self,
+        aspirate: Optional[float] = None,
+        dispense: Optional[float] = None,
+        blow_out: Optional[float] = None,
+    ) -> None:
         """Set the flow rates."""
         self._protocol_interface.get_hardware().hardware.set_flow_rate(
             mount=self._mount,
@@ -289,10 +284,11 @@ class InstrumentContextImplementation(AbstractInstrument):
         )
 
     def set_pipette_speed(
-            self,
-            aspirate: Optional[float] = None,
-            dispense: Optional[float] = None,
-            blow_out: Optional[float] = None) -> None:
+        self,
+        aspirate: Optional[float] = None,
+        dispense: Optional[float] = None,
+        blow_out: Optional[float] = None,
+    ) -> None:
         """Set pipette speeds."""
         self._protocol_interface.get_hardware().hardware.set_pipette_speed(
             mount=self._mount,

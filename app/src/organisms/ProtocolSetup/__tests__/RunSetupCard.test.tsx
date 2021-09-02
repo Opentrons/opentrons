@@ -2,25 +2,59 @@ import * as React from 'react'
 import { when } from 'jest-when'
 import '@testing-library/jest-dom'
 import { fireEvent } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components/__utils__'
+import {
+  componentPropsMatcher,
+  renderWithProviders,
+} from '@opentrons/components/__utils__'
 import noModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/simpleV4.json'
 import withModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/testModulesProtocol.json'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 
 import { i18n } from '../../../i18n'
-import { RunSetupCard } from '../RunSetupCard'
-
+import {
+  mockAttachedPipette,
+  mockProtocolPipetteTipRackCalInfo,
+} from '../../../redux/pipettes/__fixtures__'
+import { mockConnectedRobot } from '../../../redux/discovery/__fixtures__'
+import * as discoverySelectors from '../../../redux/discovery/selectors'
+import {
+  getAttachedPipettes,
+  getProtocolPipetteTipRackCalInfo,
+} from '../../../redux/pipettes'
+import { mockCalibrationStatus } from '../../../redux/calibration/__fixtures__'
+import * as calibrationSelectors from '../../../redux/calibration/selectors'
 import * as protocolSelectors from '../../../redux/protocol/selectors'
-import { LabwareSetup } from '../LabwareSetup'
-import { ModuleSetup } from '../ModuleSetup'
 import { getModuleRenderCoords } from '../utils/getModuleRenderCoords'
 import { getLabwareRenderCoords } from '../utils/getLabwareRenderCoords'
+import { ModuleSetup } from '../RunSetupCard/ModuleSetup'
+import { RunSetupCard } from '../RunSetupCard'
+import { LabwareSetup } from '../RunSetupCard/LabwareSetup'
+import { RobotCalibration } from '../RunSetupCard/RobotCalibration'
+
+import type {
+  AttachedPipettesByMount,
+  ProtocolPipetteTipRackCalDataByMount,
+} from '../../../redux/pipettes/types'
 
 jest.mock('../../../redux/protocol/selectors')
-jest.mock('../LabwareSetup')
-jest.mock('../ModuleSetup')
+jest.mock('../../../redux/discovery/selectors')
+jest.mock('../../../redux/pipettes/selectors')
+jest.mock('../../../redux/calibration/selectors')
+jest.mock('../RunSetupCard/LabwareSetup')
+jest.mock('../RunSetupCard/ModuleSetup')
+jest.mock('../RunSetupCard/RobotCalibration')
 jest.mock('../utils/getModuleRenderCoords')
 jest.mock('../utils/getLabwareRenderCoords')
+
+const mockAttachedPipettes: AttachedPipettesByMount = {
+  left: mockAttachedPipette,
+  right: null,
+} as any
+
+const mockProtocolPipetteTipRackCalData: ProtocolPipetteTipRackCalDataByMount = {
+  left: mockProtocolPipetteTipRackCalInfo,
+  right: null,
+} as any
 
 const mockGetProtocolData = protocolSelectors.getProtocolData as jest.MockedFunction<
   typeof protocolSelectors.getProtocolData
@@ -29,18 +63,29 @@ const mockLabwareSetup = LabwareSetup as jest.MockedFunction<
   typeof LabwareSetup
 >
 const mockModuleSetup = ModuleSetup as jest.MockedFunction<typeof ModuleSetup>
+const mockRobotCalibration = RobotCalibration as jest.MockedFunction<
+  typeof RobotCalibration
+>
 const mockGetModuleRenderCoords = getModuleRenderCoords as jest.MockedFunction<
   typeof getModuleRenderCoords
 >
 const mockGetLabwareRenderCoords = getLabwareRenderCoords as jest.MockedFunction<
   typeof getLabwareRenderCoords
 >
+const mockGetConnectedRobot = discoverySelectors.getConnectedRobot as jest.MockedFunction<
+  typeof discoverySelectors.getConnectedRobot
+>
+const mockGetAttachedPipettes = getAttachedPipettes as jest.MockedFunction<
+  typeof getAttachedPipettes
+>
 
-// this is needed because under the hood react calls components with two arguments (props and some second argument nobody seems to know)
-// https://github.com/timkindberg/jest-when/issues/66
-const componentPropsMatcher = (matcher: unknown) =>
-  // @ts-expect-error(sa, 2021-08-03): when.allArgs not part of type definition yet for jest-when
-  when.allArgs((args, equals) => equals(args[0], matcher))
+const mockGetProtocolPipetteTiprackData = getProtocolPipetteTipRackCalInfo as jest.MockedFunction<
+  typeof getProtocolPipetteTipRackCalInfo
+>
+
+const mockGetDeckCalData = calibrationSelectors.getDeckCalibrationData as jest.MockedFunction<
+  typeof calibrationSelectors.getDeckCalibrationData
+>
 
 const mockModuleRenderCoords = {
   mockModuleId: { x: 0, y: 0, z: 0, moduleModel: 'mockModule' as any },
@@ -52,6 +97,14 @@ describe('RunSetupCard', () => {
   let render: () => ReturnType<typeof renderWithProviders>
 
   beforeEach(() => {
+    mockGetConnectedRobot.mockReturnValue(mockConnectedRobot)
+    mockGetAttachedPipettes.mockReturnValue(mockAttachedPipettes)
+    mockGetProtocolPipetteTiprackData.mockReturnValue(
+      mockProtocolPipetteTipRackCalData
+    )
+    mockGetDeckCalData.mockReturnValue(
+      mockCalibrationStatus.deckCalibration.data
+    )
     mockGetProtocolData.mockReturnValue(noModulesProtocol as any)
     when(mockGetModuleRenderCoords)
       .calledWith(noModulesProtocol as any, standardDeckDef as any)
@@ -80,6 +133,14 @@ describe('RunSetupCard', () => {
       .mockImplementation(({ expandLabwareSetupStep }) => (
         <div onClick={expandLabwareSetupStep}>Mock Module Setup</div>
       ))
+    when(mockRobotCalibration)
+      .mockReturnValue(<div></div>) // this (default) empty div will be returned when RobotCalibration isn't called with expected props
+      .calledWith(
+        componentPropsMatcher({
+          robot: mockConnectedRobot,
+        })
+      )
+      .mockReturnValue(<div>Mock Robot Calibration</div>)
     render = () => {
       return renderWithProviders(<RunSetupCard />, { i18nInstance: i18n })
     }
@@ -90,9 +151,12 @@ describe('RunSetupCard', () => {
   })
 
   describe('when no modules are in the protocol', () => {
-    it('renders robot calibration', () => {
-      const { getByRole } = render()
-      getByRole('heading', { name: 'Robot Calibration' })
+    it('renders robot calibration by default', () => {
+      const { getByRole, getByText } = render()
+      getByRole('heading', {
+        name: 'Robot Calibration',
+      })
+      getByText('Mock Robot Calibration')
     })
     it('renders labware setup', () => {
       const { getByRole, getByText } = render()

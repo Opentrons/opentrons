@@ -59,18 +59,6 @@ ot_tests_to_typecheck := \
 	tests/opentrons/protocol_engine \
 	tests/opentrons/protocol_runner
 
-# files and modules to format
-# TODO(mc, 2021-07-23): expand this to all files until we can format `.`
-ot_files_to_format := \
-	src/opentrons/motion_planning \
-	src/opentrons/protocol_api_experimental \
-	src/opentrons/protocol_engine \
-	src/opentrons/protocol_runner \
-	tests/opentrons/motion_planning  \
-	tests/opentrons/protocol_api_experimental \
-	tests/opentrons/protocol_engine \
-	tests/opentrons/protocol_runner
-
 # Defined separately than the clean target so the wheel file doesn’t have to
 # depend on a PHONY target
 clean_cmd = $(SHX) rm -rf build dist .coverage coverage.xml '*.egg-info' '**/__pycache__' '**/*.pyc' 'src/**/.mypy_cache'
@@ -107,13 +95,13 @@ test:
 
 .PHONY: lint
 lint:
-	$(python) -m mypy src/opentrons $(ot_tests_to_typecheck)
-	$(python) -m black --check $(ot_files_to_format)
-	$(python) -m flake8 setup.py src/opentrons tests
+	$(python) -m mypy src $(ot_tests_to_typecheck)
+	$(python) -m black --check src tests setup.py
+	$(python) -m flake8 src tests setup.py
 
 .PHONY: format
 format:
-	$(python) -m black $(ot_files_to_format)
+	$(python) -m black src tests setup.py
 
 docs/build/html/v%: docs/v%
 	$(sphinx_build) -b html -d docs/build/doctrees -n $< $@

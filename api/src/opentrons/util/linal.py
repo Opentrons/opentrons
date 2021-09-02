@@ -10,38 +10,26 @@ mod_log = logging.getLogger(__name__)
 
 # (TODO(lc, 8/11/2020): temporary type until
 # old calibration data is removed.
-AxisPosition = Union[
-    Tuple[float, float, float], Tuple[float, float]]
+AxisPosition = Union[Tuple[float, float, float], Tuple[float, float]]
 
 SolvePoints = Tuple[
-    Tuple[float, float, float],
-    Tuple[float, float, float],
-    Tuple[float, float, float]]
+    Tuple[float, float, float], Tuple[float, float, float], Tuple[float, float, float]
+]
 
 
 def identity_deck_transform() -> np.ndarray:
-    """ The default deck transform """
+    """The default deck transform"""
     return np.identity(3)
 
 
-def solve_attitude(
-        expected: SolvePoints,
-        actual: SolvePoints
-        ) -> AttitudeMatrix:
-    ex = np.array([
-        list(point)
-        for point in expected
-    ]).transpose()
-    ac = np.array([
-            list(point)
-            for point in actual
-        ]).transpose()
+def solve_attitude(expected: SolvePoints, actual: SolvePoints) -> AttitudeMatrix:
+    ex = np.array([list(point) for point in expected]).transpose()
+    ac = np.array([list(point) for point in actual]).transpose()
     t = np.dot(ac, inv(ex))
 
-    mask_transform = np.array([
-        [True, True, False],
-        [True, True, False],
-        [False, False, False]])
+    mask_transform = np.array(
+        [[True, True, False], [True, True, False], [False, False, False]]
+    )
     masked_array = np.ma.masked_array(t, ~mask_transform)
 
     no_z_component = np.zeros((3, 3))
@@ -51,8 +39,9 @@ def solve_attitude(
     return transform.round(4).tolist()
 
 
-def solve(expected: List[Tuple[float, float]],
-          actual: List[Tuple[float, float]]) -> np.ndarray:
+def solve(
+    expected: List[Tuple[float, float]], actual: List[Tuple[float, float]]
+) -> np.ndarray:
     """
     Takes two lists of 3 x-y points each, and calculates the matrix
     representing the transformation from one space to the other.
@@ -99,15 +88,9 @@ def solve(expected: List[Tuple[float, float]],
     # [ (x1, y1),
     #   (x2, y2),
     #   (x3, y3) ]
-    ex = np.array([
-            list(point) + [1]
-            for point in expected
-        ]).transpose()
+    ex = np.array([list(point) + [1] for point in expected]).transpose()
 
-    ac = np.array([
-            list(point) + [1]
-            for point in actual
-        ]).transpose()
+    ac = np.array([list(point) + [1] for point in actual]).transpose()
     # Shape of `ex` and `ac`:
     # [ x1 x2 x3 ]
     # [ y1 y2 y3 ]
@@ -147,11 +130,7 @@ def add_z(xy: np.ndarray, z: float) -> np.ndarray:
     # [ 0  0  0  1 ]
 
     # Then, insert the z row to create a properly formed 3-D transform matrix:
-    xyz = insert(
-        interm,
-        2,
-        [0, 0, 1, z],
-        axis=0)
+    xyz = insert(interm, 2, [0, 0, 1, z], axis=0)
     # Result:
     # [ 1  0  0  x ]
     # [ 0  1  0  y ]
@@ -162,8 +141,8 @@ def add_z(xy: np.ndarray, z: float) -> np.ndarray:
 
 
 def add_matrices(
-        t1: Tuple[float, float, float],
-        t2: Tuple[float, float, float]) -> Tuple[float, float, float]:
+    t1: Tuple[float, float, float], t2: Tuple[float, float, float]
+) -> Tuple[float, float, float]:
     """
     Simple method to convert tuples to numpy arrays and add them.
     """
@@ -171,8 +150,8 @@ def add_matrices(
 
 
 def apply_transform(
-        t: Union[List[List[float]], np.ndarray],
-        pos: AxisPosition) -> Tuple[float, float, float]:
+    t: Union[List[List[float]], np.ndarray], pos: AxisPosition
+) -> Tuple[float, float, float]:
     """
     Change of base using a transform matrix. Primarily used to render a point
     in space in a way that is more readable for the user.
@@ -185,8 +164,7 @@ def apply_transform(
 
 
 def apply_reverse(
-        t: Union[List[List[float]], np.ndarray],
-        pos: AxisPosition) -> Tuple[float, float, float]:
-    """ Like apply_transform but inverts the transform first
-    """
+    t: Union[List[List[float]], np.ndarray], pos: AxisPosition
+) -> Tuple[float, float, float]:
+    """Like apply_transform but inverts the transform first"""
     return apply_transform(inv(t), pos)
