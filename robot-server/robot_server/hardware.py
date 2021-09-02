@@ -79,7 +79,7 @@ async def get_hardware(app_state: AppState = Depends(get_app_state)) -> Hardware
 
     Arguments:
         app_state: Global app state from `app.state`, provided by
-        FastAPI's dependency injection system via `fastapi.Depends`
+            FastAPI's dependency injection system via `fastapi.Depends`
 
     Returns:
         The initialized HardwareAPI.
