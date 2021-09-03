@@ -603,7 +603,13 @@ def main() -> int:
         print(format_runlog(runlog))
 
     if duration_estimator:
-        print("estimate: ", duration_estimator.get_total_duration())
+        duration_seconds = duration_estimator.get_total_duration()
+        hours = int(duration_seconds / 60 / 60)
+        minutes = int((duration_seconds % (60 * 60)) / 60)
+        print("--------------------------------------------------------------")
+        print(f"Estimated protocol duration: {hours}h:{minutes}m")
+        print("--------------------------------------------------------------")
+        print("WARNING: Protocol duration estimation is an experimental feature")
 
     return 0
 
