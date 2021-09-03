@@ -15,6 +15,7 @@ API_DIR := api
 APP_SHELL_DIR := app-shell
 COMPONENTS_DIR := components
 DISCOVERY_CLIENT_DIR := discovery-client
+G_CODE_TESTING_DIR := g-code-testing
 LABWARE_LIBRARY_DIR := labware-library
 NOTIFY_SERVER_DIR := notify-server
 PROTOCOL_DESIGNER_DIR := protocol-designer
@@ -55,6 +56,7 @@ clean-py:
 	$(MAKE) -C $(UPDATE_SERVER_DIR) clean
 	$(MAKE) -C $(ROBOT_SERVER_DIR) clean
 	$(MAKE) -C $(SHARED_DATA_DIR) clean
+	$(MAKE) -C $(G_CODE_TESTING_DIR) clean
 
 .PHONY: clean-js
 clean-js: clean-ts
@@ -69,6 +71,7 @@ setup-py:
 	$(MAKE) -C $(NOTIFY_SERVER_DIR) setup
 	$(MAKE) -C $(ROBOT_SERVER_DIR) setup
 	$(MAKE) -C $(SHARED_DATA_DIR) setup-py
+	$(MAKE) -C $(G_CODE_TESTING_DIR) setup
 
 # front-end dependecies handled by yarn
 .PHONY: setup-js
@@ -88,6 +91,7 @@ teardown-py:
 	$(MAKE) -C $(ROBOT_SERVER_DIR) clean teardown
 	$(MAKE) -C $(NOTIFY_SERVER_DIR) clean teardown
 	$(MAKE) -C $(SHARED_DATA_DIR) clean-py teardown-py
+	$(MAKE) -C $(G_CODE_TESTING_DIR) clean teardown
 
 .PHONY: teardown-js
 teardown-js: clean-js
@@ -167,6 +171,7 @@ test-py: test-py-windows
 	$(MAKE) -C $(UPDATE_SERVER_DIR) test
 	$(MAKE) -C $(ROBOT_SERVER_DIR) test
 	$(MAKE) -C $(NOTIFY_SERVER_DIR) test
+	$(MAKE) -C $(G_CODE_TESTING_DIR) test
 
 .PHONY: test-js
 test-js:
@@ -187,6 +192,7 @@ lint-py:
 	$(MAKE) -C $(ROBOT_SERVER_DIR) lint
 	$(MAKE) -C $(SHARED_DATA_DIR) lint-py
 	$(MAKE) -C $(NOTIFY_SERVER_DIR) lint
+	$(MAKE) -C $(G_CODE_TESTING_DIR) lint
 
 .PHONY: lint-js
 lint-js:
@@ -208,6 +214,7 @@ format: format-js format-py
 format-py:
 	$(MAKE) -C $(API_DIR) format
 	$(MAKE) -C $(ROBOT_SERVER_DIR) format
+	$(MAKE) -C $(G_CODE_TESTING_DIR) format
 
 .PHONY: format-js
 format-js:
