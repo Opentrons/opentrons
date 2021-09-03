@@ -519,56 +519,48 @@ class DurationEstimator:
 
     @staticmethod
     def rate_high(temp0, temp1):
-        rate_zero_to_amb = TEMP_MOD_RATE_ZERO_TO_LOW
-        rate_ambient_to_37 = TEMP_MOD_RATE_LOW_TO_HIGH
-        rate_37_to_95 = TEMP_MOD_RATE_HIGH_AND_ABOVE
         val = []
         if temp0 >= TEMP_MOD_HIGH_THRESH:
-            val.append(abs(temp1 - temp0) / rate_37_to_95)
+            val.append(abs(temp1 - temp0) / TEMP_MOD_RATE_HIGH_AND_ABOVE)
         if TEMP_MOD_LOW_THRESH < temp0 <= TEMP_MOD_HIGH_THRESH:
-            val.append(abs(temp0 - TEMP_MOD_HIGH_THRESH) / rate_ambient_to_37)
-            val.append(abs(temp1 - TEMP_MOD_HIGH_THRESH) / rate_37_to_95)
+            val.append(abs(temp0 - TEMP_MOD_HIGH_THRESH) / TEMP_MOD_RATE_LOW_TO_HIGH)
+            val.append(abs(temp1 - TEMP_MOD_HIGH_THRESH) / TEMP_MOD_RATE_HIGH_AND_ABOVE)
         if temp0 <= TEMP_MOD_LOW_THRESH:
             # the temp1 part that's under TEMP_MOD_HIGH_THRESH is:
-            val.append(abs(TEMP_MOD_LOW_THRESH - temp0) / rate_zero_to_amb)
-            val.append(abs(TEMP_MOD_LOW_THRESH - temp1) / rate_37_to_95)
+            val.append(abs(TEMP_MOD_LOW_THRESH - temp0) / TEMP_MOD_RATE_ZERO_TO_LOW)
+            val.append(abs(TEMP_MOD_LOW_THRESH - temp1) / TEMP_MOD_RATE_HIGH_AND_ABOVE)
 
         return val
 
     @staticmethod
     def rate_mid(temp0, temp1):
-        rate_zero_to_amb = TEMP_MOD_RATE_ZERO_TO_LOW
-        rate_37_to_95 = TEMP_MOD_RATE_HIGH_AND_ABOVE
         val = []
-        rate_ambient_to_37 = (TEMP_MOD_HIGH_THRESH - TEMP_MOD_LOW_THRESH) / 60
         if TEMP_MOD_LOW_THRESH <= temp0 <= TEMP_MOD_HIGH_THRESH:
-            val.append(abs(temp1 - temp0) / rate_ambient_to_37)
+            val.append(abs(temp1 - temp0) / TEMP_MOD_RATE_LOW_TO_HIGH)
 
         if temp0 < TEMP_MOD_LOW_THRESH:
             # the temp1 part that's over TEMP_MOD_HIGH_THRESH is
-            val.append(abs(temp1 - TEMP_MOD_LOW_THRESH) / rate_ambient_to_37)
+            val.append(abs(temp1 - TEMP_MOD_LOW_THRESH) / TEMP_MOD_RATE_LOW_TO_HIGH)
             # the temp0 part that's under TEMP_MOD_HIGH_THRESH is:
-            val.append(abs(TEMP_MOD_LOW_THRESH - temp0) / rate_zero_to_amb)
+            val.append(abs(TEMP_MOD_LOW_THRESH - temp0) / TEMP_MOD_RATE_ZERO_TO_LOW)
         if temp0 > TEMP_MOD_HIGH_THRESH:
-            val.append(abs(temp0 - TEMP_MOD_HIGH_THRESH) / rate_37_to_95)
+            val.append(abs(temp0 - TEMP_MOD_HIGH_THRESH) / TEMP_MOD_RATE_HIGH_AND_ABOVE)
             # the temp1 part that's under TEMP_MOD_HIGH_THRESH is:
-            val.append(abs(TEMP_MOD_HIGH_THRESH - temp1) / rate_zero_to_amb)
+            val.append(abs(TEMP_MOD_HIGH_THRESH - temp1) / TEMP_MOD_RATE_ZERO_TO_LOW)
         return val
 
     @staticmethod
     def rate_low(temp0, temp1):
-        rate_zero_to_amb = TEMP_MOD_RATE_ZERO_TO_LOW
-        rate_ambient_to_37 = TEMP_MOD_RATE_LOW_TO_HIGH
         val = []
         if temp0 <= TEMP_MOD_LOW_THRESH:
-            val.append(abs(temp1 - temp0) / rate_zero_to_amb)
+            val.append(abs(temp1 - temp0) / TEMP_MOD_RATE_ZERO_TO_LOW)
         if TEMP_MOD_LOW_THRESH < temp0 <= TEMP_MOD_HIGH_THRESH:
             # the temp0 part that's over TEMP_MOD_HIGH_THRESH is
-            val.append(abs(temp0 - TEMP_MOD_LOW_THRESH) / rate_ambient_to_37)
+            val.append(abs(temp0 - TEMP_MOD_LOW_THRESH) / TEMP_MOD_RATE_LOW_TO_HIGH)
             # the temp1 part that's under TEMP_MOD_HIGH_THRESH is:
-            val.append(abs(TEMP_MOD_LOW_THRESH - temp1) / rate_zero_to_amb)
+            val.append(abs(TEMP_MOD_LOW_THRESH - temp1) / TEMP_MOD_RATE_ZERO_TO_LOW)
         if temp0 > TEMP_MOD_HIGH_THRESH:
-            val.append(abs(temp0 - TEMP_MOD_HIGH_THRESH) / rate_ambient_to_37)
+            val.append(abs(temp0 - TEMP_MOD_HIGH_THRESH) / TEMP_MOD_RATE_LOW_TO_HIGH)
             # the temp1 part that's under TEMP_MOD_HIGH_THRESH is:
-            val.append(abs(TEMP_MOD_HIGH_THRESH - temp1) / rate_zero_to_amb)
+            val.append(abs(TEMP_MOD_HIGH_THRESH - temp1) / TEMP_MOD_RATE_ZERO_TO_LOW)
         return val
