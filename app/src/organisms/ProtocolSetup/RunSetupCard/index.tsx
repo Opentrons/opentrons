@@ -36,17 +36,7 @@ export function RunSetupCard(): JSX.Element | null {
 
   const ROBOT_CALIBRATION_STEP_KEY = 'robot_calibration_step' as const
   const LABWARE_SETUP_KEY = 'labware_setup_step' as const
-
-  let MODULE_SETUP_KEY = 'module_setup_step'
-  if (
-    protocolData != null &&
-    robot != null &&
-    'metadata' in protocolData &&
-    Object.keys(protocolData).length !== 1 &&
-    Object.values(moduleRenderCoords).length > 1
-  ) {
-    MODULE_SETUP_KEY = 'modules_setup_step'
-  }
+  const MODULE_SETUP_KEY = 'module_setup_step' as const
 
   type StepKey =
     | typeof ROBOT_CALIBRATION_STEP_KEY
@@ -74,23 +64,39 @@ export function RunSetupCard(): JSX.Element | null {
     stepsKeysInOrder = [...stepsKeysInOrder, LABWARE_SETUP_KEY]
   }
 
-  const StepComponentMap: Record<StepKey, JSX.Element> = {
-    [ROBOT_CALIBRATION_STEP_KEY]: <RobotCalibration robot={robot} />,
-    [MODULE_SETUP_KEY]: (
-      <ModuleSetup
-        moduleRenderCoords={moduleRenderCoords}
-        expandLabwareSetupStep={() => setExpandedStepKey(LABWARE_SETUP_KEY)}
-        robotName={robot.name}
-      />
-    ),
-    [LABWARE_SETUP_KEY]: (
-      <LabwareSetup
-        moduleRenderCoords={moduleRenderCoords}
-        labwareRenderCoords={labwareRenderCoords}
-      />
-    ),
+  const StepDetailMap: Record<
+    StepKey,
+    { stepInternals: JSX.Element; description: string }
+  > = {
+    [ROBOT_CALIBRATION_STEP_KEY]: {
+      stepInternals: <RobotCalibration robot={robot} />,
+      description: t(`${ROBOT_CALIBRATION_STEP_KEY}_description`),
+    },
+    [MODULE_SETUP_KEY]: {
+      stepInternals: (
+        <ModuleSetup
+          moduleRenderCoords={moduleRenderCoords}
+          expandLabwareSetupStep={() => setExpandedStepKey(LABWARE_SETUP_KEY)}
+          robotName={robot.name}
+        />
+      ),
+      description: t(`${MODULE_SETUP_KEY}_description`, {
+        count:
+          'modules' in protocolData
+            ? Object.keys(protocolData.modules).length
+            : 0,
+      }),
+    },
+    [LABWARE_SETUP_KEY]: {
+      stepInternals: (
+        <LabwareSetup
+          moduleRenderCoords={moduleRenderCoords}
+          labwareRenderCoords={labwareRenderCoords}
+        />
+      ),
+      description: t(`${LABWARE_SETUP_KEY}_description`),
+    },
   }
-
   return (
     <Card width="100%" marginTop={SPACING_3} paddingY={SPACING_3}>
       <Text as="h2" paddingX={SPACING_3} fontWeight={FONT_WEIGHT_SEMIBOLD}>
@@ -103,14 +109,14 @@ export function RunSetupCard(): JSX.Element | null {
             expanded={stepKey === expandedStepKey}
             label={t('step', { index: index + 1 })}
             title={t(`${stepKey}_title`)}
-            description={t(`${stepKey}_description`)}
+            description={StepDetailMap[stepKey].description}
             toggleExpanded={() =>
               stepKey === expandedStepKey
                 ? setExpandedStepKey(null)
                 : setExpandedStepKey(stepKey)
             }
           >
-            {StepComponentMap[stepKey]}
+            {StepDetailMap[stepKey].stepInternals}
           </CollapsibleStep>
         </React.Fragment>
       ))}
