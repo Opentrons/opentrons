@@ -35,6 +35,7 @@ import type {
   AttachedPipettesByMount,
   ProtocolPipetteTipRackCalDataByMount,
 } from '../../../redux/pipettes/types'
+import { pick } from 'lodash'
 
 jest.mock('../../../redux/protocol/selectors')
 jest.mock('../../../redux/discovery/selectors')
@@ -128,6 +129,7 @@ describe('RunSetupCard', () => {
         componentPropsMatcher({
           moduleRenderCoords: mockModuleRenderCoords,
           expandLabwareSetupStep: expect.anything(),
+          robotName: mockConnectedRobot.name,
         })
       )
       .mockImplementation(({ expandLabwareSetupStep }) => (
@@ -190,7 +192,7 @@ describe('RunSetupCard', () => {
     const { container } = render()
     expect(container.firstChild).toBeNull()
   })
-  it('renders correct text contents', () => {
+  it('renders correct text contents for multiple modules', () => {
     mockGetProtocolData.mockReturnValue(withModulesProtocol as any)
     const { getByRole, getByText } = render()
     expect(getByRole('heading', { name: 'Setup for Run' })).toBeTruthy()
@@ -212,7 +214,39 @@ describe('RunSetupCard', () => {
     expect(getByRole('heading', { name: 'Module Setup' })).toBeTruthy()
     expect(
       getByText(
-        'Plug in and power up the required module(s) via the OT-2 USB Port(s). Place the module(s) as shown in the deck map.'
+        'Plug in and power up the required modules via the OT-2 USB Ports. Place the modules as shown in the deck map.'
+      )
+    ).toBeTruthy()
+  })
+  it('renders correct text contents for single module', () => {
+    mockGetProtocolData.mockReturnValue({
+      ...withModulesProtocol,
+      modules: pick(
+        withModulesProtocol.modules,
+        Object.keys(withModulesProtocol.modules)[0]
+      ),
+    } as any)
+    const { getByRole, getByText } = render()
+    expect(getByRole('heading', { name: 'Setup for Run' })).toBeTruthy()
+    expect(getByRole('heading', { name: 'STEP 1' })).toBeTruthy()
+    expect(getByRole('heading', { name: 'Robot Calibration' })).toBeTruthy()
+    expect(
+      getByText(
+        'Review required pipettes and tip length calibrations for this protocol.'
+      )
+    ).toBeTruthy()
+    expect(getByRole('heading', { name: 'STEP 2' })).toBeTruthy()
+    expect(getByRole('heading', { name: 'Labware Setup' })).toBeTruthy()
+    expect(
+      getByText(
+        'Position full tip racks and labware in the deck slots as shown in the deck map.'
+      )
+    ).toBeTruthy()
+    expect(getByRole('heading', { name: 'STEP 3' })).toBeTruthy()
+    expect(getByRole('heading', { name: 'Module Setup' })).toBeTruthy()
+    expect(
+      getByText(
+        'Plug in and power up the required module via the OT-2 USB Port. Place the module as shown in the deck map.'
       )
     ).toBeTruthy()
   })
