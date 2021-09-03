@@ -1,4 +1,4 @@
-from typing import Optional, Tuple, Callable
+from typing import Optional
 
 from opentrons import types
 from opentrons.protocol_api.labware import Well, Labware
@@ -60,36 +60,22 @@ class PairedInstrumentSimulation(AbstractPairedInstrument):
 
     def aspirate(
         self,
-        volume: Optional[float],
-        location: Optional[types.Location] = None,
-        rate: Optional[float] = 1.0,
-    ) -> Tuple[types.Location, Callable]:
-        location = location or self._protocol_interface.get_last_location()
+        volume: float,
+        location: types.Location,
+        rate: float,
+    ) -> None:
+        self._primary.aspirate(volume, rate)
+        self._secondary.aspirate(volume, rate)
 
-        def _aspirate():
-            self._primary.aspirate(volume, rate)
-            self._secondary.aspirate(volume, rate)
-
-        return location, _aspirate
-
-    def dispense(
-        self, volume: Optional[float], location: Optional[types.Location], rate: float
-    ) -> Tuple[types.Location, Callable]:
-        location = location or self._protocol_interface.get_last_location()
-
-        def _aspirate():
-            self._primary.dispense(volume, rate)
-            self._secondary.dispense(volume, rate)
-
-        return location, _aspirate
+    def dispense(self, volume: float, location: types.Location, rate: float) -> None:
+        self._primary.dispense(volume, rate)
+        self._secondary.dispense(volume, rate)
 
     def blow_out(self, location: types.Location) -> None:
-        pass
-
-    def air_gap(self, volume: Optional[float], height: float) -> None:
-        pass
+        self._primary.blow_out()
+        self._secondary.blow_out()
 
     def touch_tip(
-        self, location: Optional[Well], radius: float, v_offset: float, speed: float
+        self, well: Well, radius: float, v_offset: float, speed: float
     ) -> None:
         pass

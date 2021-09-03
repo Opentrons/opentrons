@@ -1,8 +1,7 @@
 from __future__ import annotations
 
 import logging
-from functools import partial
-from typing import TYPE_CHECKING, Union, Optional, Callable, Tuple
+from typing import TYPE_CHECKING, Optional
 
 from opentrons import types
 from opentrons.hardware_control.types import CriticalPoint
@@ -37,8 +36,6 @@ class PairedInstrument(AbstractPairedInstrument):
         self._ctx = ctx
         self._hw_manager = hardware_manager
 
-        self._last_location: Union[Labware, Well, None] = None
-
     def pick_up_tip(
         self,
         target: Well,
@@ -48,7 +45,6 @@ class PairedInstrument(AbstractPairedInstrument):
         increment: Optional[float],
         tip_length: float,
     ):
-
         self.move_to(target.top())
 
         self._hw_manager.hardware.set_current_tiprack_diameter(
@@ -132,22 +128,10 @@ class PairedInstrument(AbstractPairedInstrument):
 
     def aspirate(
         self,
-        volume: Optional[float],
-        location: Optional[types.Location] = None,
-        rate: Optional[float] = 1.0,
-    ) -> Tuple[types.Location, Callable]:
-        last_location = self._ctx.get_last_location()
-        if location:
-            loc = location
-        elif last_location:
-            loc = last_location
-        else:
-            raise RuntimeError(
-                "If aspirate is called without an explicit location, another"
-                " method that moves to a location (such as move_to or "
-                "dispense) must previously have been called so the robot "
-                "knows where it is."
-            )
+        volume: float,
+        location: types.Location,
+        rate: float,
+    ) -> None:
 
         if self.p_instrument.get_current_volume() == 0:
             # Make sure we're at the top of the labware and clear of any
@@ -155,8 +139,8 @@ class PairedInstrument(AbstractPairedInstrument):
             primary_ready = self.p_instrument.get_pipette()["ready_to_aspirate"]
             secondary_ready = self.s_instrument.get_pipette()["ready_to_aspirate"]
             if not primary_ready or not secondary_ready:
-                if loc.labware.is_well:
-                    self.move_to(loc.labware.as_well().top())
+                if location.labware.is_well:
+                    self.move_to(location.labware.as_well().top())
                 else:
                     # TODO(seth,2019/7/29): This should be a warning exposed
                     #  via rpc to the runapp
@@ -168,93 +152,25 @@ class PairedInstrument(AbstractPairedInstrument):
                         "blow_out."
                     )
                 self._hw_manager.hardware.prepare_for_aspirate(self._pair_policy)
-            self.move_to(loc)
-        elif loc != last_location:
-            self.move_to(loc)
-
-        hw_aspirate = self._hw_manager.hardware.aspirate
-        return loc, partial(hw_aspirate, self._pair_policy, volume, rate)
-
-    def dispense(
-        self, volume: Optional[float], location: Optional[types.Location], rate: float
-    ) -> Tuple[types.Location, Callable]:
-        last_location = self._ctx.get_last_location()
-        if location:
-            loc = location
             self.move_to(location)
-        elif last_location:
-            loc = last_location
-            pass
-        else:
-            raise RuntimeError(
-                "If dispense is called without an explicit location, another"
-                " method that moves to a location (such as move_to or "
-                "aspirate) must previously have been called so the robot "
-                "knows where it is."
-            )
-        hw_dispense = self._hw_manager.hardware.dispense
-        return loc, partial(hw_dispense, self._pair_policy, volume, rate)
+        elif location != self._ctx.get_last_location():
+            self.move_to(location)
+
+        self._hw_manager.hardware.aspirate(self._pair_policy, volume, rate)
+
+    def dispense(self, volume: float, location: types.Location, rate: float) -> None:
+        if location != self._ctx.get_last_location():
+            self.move_to(location)
+        self._hw_manager.hardware.dispense(self._pair_policy, volume, rate)
 
     def blow_out(self, location: types.Location):
-        if location:
+        if location != self._ctx.get_last_location():
             self.move_to(location)
-        elif self._ctx.get_last_location():
-            # if location cache exists, pipette blows out immediately at
-            # current location, no movement is needed
-            pass
-        else:
-            raise RuntimeError(
-                "If blow out is called without an explicit location, another"
-                " method that moves to a location (such as move_to or "
-                "dispense) must previously have been called so the robot "
-                "knows where it is."
-            )
         self._hw_manager.hardware.blow_out(self._pair_policy)
 
-    def air_gap(self, volume: Optional[float], height: float):
-        loc = self._ctx.get_last_location()
-        if not loc or not loc.labware.is_well:
-            raise RuntimeError("No previous Well cached to perform air gap")
-        target = loc.labware.as_well().top(height)
-        self.move_to(target)
-        # Aspirate now returns a partial function for run log purposes
-        # but air gap only cares about executing an aspirate so here
-        # we automatically call the partial function
-        self.aspirate(volume)[1]()
-
-    def touch_tip(
-        self, location: Optional[Well], radius: float, v_offset: float, speed: float
-    ):
-        if location is None:
-            if not self._ctx.get_last_location():
-                raise RuntimeError("No valid current location cache present")
-            else:
-                well = self._ctx.get_last_location().labware  # type: ignore
-                # type checked below
-        else:
-            well = LabwareLike(location)
-
-        if well.is_well:
-            if "touchTipDisabled" in well.quirks_from_any_parent():
-                logger.info(f"Ignoring touch tip on labware {well}")
-                return self
-            if well.parent.as_labware().is_tiprack:
-                logger.warning(
-                    "Touch_tip being performed on a tiprack. "
-                    "Please re-check your code"
-                )
-
-            move_with_z_offset = well.as_well().top().point + types.Point(
-                0, 0, v_offset
-            )
-            to_loc = types.Location(move_with_z_offset, well)
-            self.move_to(to_loc)
-        else:
-            # If location is a not a valid well, raise a type error
-            raise TypeError("location should be a Well, but it is {}".format(location))
-
+    def touch_tip(self, well: Well, radius: float, v_offset: float, speed: float):
         edges = build_edges(
-            well.as_well(),
+            well,
             v_offset,
             self._pair_policy.primary,
             self._ctx.get_deck(),

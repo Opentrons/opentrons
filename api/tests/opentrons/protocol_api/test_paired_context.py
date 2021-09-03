@@ -296,7 +296,7 @@ def test_air_gap(set_up_paired_instrument, monkeypatch, ctx):
     assert aspirate_mock.call_args_list == [mock.call(paired._pair_policy, 20, 1.0)]
     aspirate_mock.reset_mock()
     paired.air_gap()
-    assert aspirate_mock.call_args_list == [mock.call(paired._pair_policy, None, 1.0)]
+    assert aspirate_mock.call_args_list == [mock.call(paired._pair_policy, 300, 1.0)]
 
 
 def test_touch_tip_new_default_args(ctx, monkeypatch):

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Optional, Callable, Tuple
+from typing import Optional
 
 from opentrons import types
 from opentrons.protocol_api.labware import Labware, Well
@@ -37,16 +37,14 @@ class AbstractPairedInstrument(ABC):
     @abstractmethod
     def aspirate(
         self,
-        volume: Optional[float],
-        location: Optional[types.Location] = None,
-        rate: Optional[float] = 1.0,
-    ) -> Tuple[types.Location, Callable]:
+        volume: float,
+        location: types.Location,
+        rate: float,
+    ) -> None:
         ...
 
     @abstractmethod
-    def dispense(
-        self, volume: Optional[float], location: Optional[types.Location], rate: float
-    ) -> Tuple[types.Location, Callable]:
+    def dispense(self, volume: float, location: types.Location, rate: float) -> None:
         ...
 
     @abstractmethod
@@ -54,11 +52,7 @@ class AbstractPairedInstrument(ABC):
         ...
 
     @abstractmethod
-    def air_gap(self, volume: Optional[float], height: float) -> None:
-        ...
-
-    @abstractmethod
     def touch_tip(
-        self, location: Optional[Well], radius: float, v_offset: float, speed: float
+        self, well: Well, radius: float, v_offset: float, speed: float
     ) -> None:
         ...

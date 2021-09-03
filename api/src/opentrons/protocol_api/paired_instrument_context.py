@@ -74,7 +74,7 @@ class PairedInstrumentContext(CommandPublisher):
         self._well_bottom_clearance = Clearances(
             default_aspirate=1.0, default_dispense=1.0
         )
-
+        self._ctx = ctx
         self.trash_container = trash
         self.paired_instrument_obj = implementation
 
@@ -417,34 +417,42 @@ class PairedInstrumentContext(CommandPublisher):
             )
         )
 
-        loc: Optional[types.Location] = None
+        # checked_location: Optional[types.Location] = None
         if isinstance(location, Well):
             point, well = location.bottom()
-            loc = types.Location(
+            checked_location = types.Location(
                 point + types.Point(0, 0, self.well_bottom_clearance.aspirate), well
             )
-        elif location is not None and not isinstance(location, types.Location):
+        elif isinstance(location, types.Location):
+            checked_location = location
+        elif location is not None:
             raise TypeError(
-                "location should be a Well or Location, but it is {}".format(location)
+                f"location should be a Well or Location, but it is {location}"
             )
+        elif self._ctx.location_cache:
+            checked_location = self._ctx.location_cache
         else:
-            loc = location
+            raise RuntimeError(
+                "If aspirate is called without an explicit location, another"
+                " method that moves to a location (such as move_to or "
+                "dispense) must previously have been called so the robot "
+                "knows where it is."
+            )
 
-        if not volume:
-            c_vol = self._get_minimum_available_volume(self._instruments)
-        else:
-            c_vol = volume
+        c_vol = (
+            volume
+            if volume is not None
+            else self._get_minimum_available_volume(self._instruments)
+        )
 
         instruments = list(self._instruments.values())
-        primary_loc, aspirate_func = self.paired_instrument_obj.aspirate(
-            volume, loc, rate
-        )
-        if primary_loc.labware.is_well:
-            well = primary_loc.labware.as_well()
+        if checked_location.labware.is_well:
+            well = checked_location.labware.as_well()
             labware = well.parent
-            locations = [primary_loc, self._get_secondary_target(labware, well)]
+            locations = [checked_location, self._get_secondary_target(labware, well)]
         else:
-            locations = [primary_loc]
+            locations = [checked_location]
+
         publish_paired(
             self.broker,
             cmds.paired_aspirate,
@@ -455,7 +463,11 @@ class PairedInstrumentContext(CommandPublisher):
             locations,
             rate,
         )
-        aspirate_func()
+
+        self.paired_instrument_obj.aspirate(
+            volume=c_vol, location=checked_location, rate=rate
+        )
+
         publish_paired(
             self.broker,
             cmds.paired_aspirate,
@@ -526,20 +538,30 @@ class PairedInstrumentContext(CommandPublisher):
                 volume, location if location else "current position", rate
             )
         )
+        checked_location: types.Location
         if isinstance(location, Well):
             if LabwareLike(location).is_fixed_trash():
-                loc = location.top()
+                checked_location = location.top()
             else:
                 point, well = location.bottom()
-                loc = types.Location(
+                checked_location = types.Location(
                     point + types.Point(0, 0, self.well_bottom_clearance.dispense), well
                 )
-        elif location is not None and not isinstance(location, types.Location):
+        elif isinstance(location, types.Location):
+            checked_location = location
+        elif location is not None:
             raise TypeError(
-                "location should be a Well or Location, but it is {}".format(location)
+                f"location should be a Well or Location, but it is {location}"
             )
+        elif self._ctx.location_cache:
+            checked_location = self._ctx.location_cache
         else:
-            loc = location
+            raise RuntimeError(
+                "If dispense is called without an explicit location, another"
+                " method that moves to a location (such as move_to or "
+                "aspirate) must previously have been called so the robot "
+                "knows where it is."
+            )
 
         if not volume:
             c_vol = self._get_minimum_current_volume(self._instruments)
@@ -547,16 +569,14 @@ class PairedInstrumentContext(CommandPublisher):
             c_vol = volume
 
         instruments = list(self._instruments.values())
-        primary_loc, dispense_func = self.paired_instrument_obj.dispense(
-            volume, loc, rate
-        )
 
-        if isinstance(primary_loc.labware, Well):
-            well = primary_loc.labware.as_well()
+        if isinstance(checked_location.labware, Well):
+            well = checked_location.labware.as_well()
             labware = well.parent
-            locations = [primary_loc, self._get_secondary_target(labware, well)]
+            locations = [checked_location, self._get_secondary_target(labware, well)]
         else:
-            locations = [primary_loc]
+            locations = [checked_location]
+
         publish_paired(
             self.broker,
             cmds.paired_dispense,
@@ -567,7 +587,11 @@ class PairedInstrumentContext(CommandPublisher):
             locations,
             rate,
         )
-        dispense_func()
+
+        self.paired_instrument_obj.dispense(
+            volume=c_vol, location=checked_location, rate=rate
+        )
+
         publish_paired(
             self.broker,
             cmds.paired_dispense,
@@ -622,7 +646,18 @@ class PairedInstrumentContext(CommandPublisher):
 
         if height is None:
             height = 5
-        self.paired_instrument_obj.air_gap(volume, height)
+        c_vol = (
+            volume
+            if volume is not None
+            else self._get_minimum_available_volume(self._instruments)
+        )
+
+        loc = self._ctx.location_cache
+        if not loc or not loc.labware.is_well:
+            raise RuntimeError("No previous Well cached to perform air gap")
+        target = loc.labware.as_well().top(height)
+        self.paired_instrument_obj.move_to(target)
+        self.paired_instrument_obj.aspirate(volume=c_vol, location=loc, rate=1.0)
         return self
 
     @requires_version(2, 7)
@@ -657,12 +692,21 @@ class PairedInstrumentContext(CommandPublisher):
                     "Please re-check your code"
                 )
             loc = location.top()
-        elif location is not None and not isinstance(location, types.Location):
+        elif isinstance(location, types.Location):
+            loc = location
+        elif location is not None:
             raise TypeError(
                 "location should be a Well or Location, but it is {}".format(location)
             )
+        elif self._ctx.location_cache:
+            loc = self._ctx.location_cache
         else:
-            loc = location
+            raise RuntimeError(
+                "If blow out is called without an explicit location, another"
+                " method that moves to a location (such as move_to or "
+                "dispense) must previously have been called so the robot "
+                "knows where it is."
+            )
 
         locations: Optional[List] = None
         if loc and isinstance(loc.labware, Well):
@@ -727,10 +771,11 @@ class PairedInstrumentContext(CommandPublisher):
             if not instr.hw_pipette["has_tip"]:
                 raise hc.NoTipAttachedError("Pipette has no tip. Aborting mix()")
 
-        if not volume:
-            c_vol = self._get_minimum_available_volume(self._instruments)
-        else:
-            c_vol = volume
+        c_vol = (
+            volume
+            if volume is not None
+            else self._get_minimum_available_volume(self._instruments)
+        )
 
         instruments = list(self._instruments.values())
         locations: Optional[List] = None
@@ -807,6 +852,34 @@ class PairedInstrumentContext(CommandPublisher):
             :py:class:`.Placeable` as the ``location`` parameter)
 
         """
+        if location is None:
+            if not self._ctx.location_cache:
+                raise RuntimeError("No valid current location cache present")
+            else:
+                well = self._ctx.location_cache.labware  # type: ignore
+                # type checked below
+        else:
+            well = LabwareLike(location)
+
+        if well.is_well:
+            if "touchTipDisabled" in well.quirks_from_any_parent():
+                self._log.info(f"Ignoring touch tip on labware {well}")
+                return self
+            if well.parent.as_labware().is_tiprack:
+                self._log.warning(
+                    "Touch_tip being performed on a tiprack. "
+                    "Please re-check your code"
+                )
+
+            move_with_z_offset = well.as_well().top().point + types.Point(
+                0, 0, v_offset
+            )
+            to_loc = types.Location(move_with_z_offset, well)
+            self.paired_instrument_obj.move_to(to_loc)
+        else:
+            # If location is a not a valid well, raise a type error
+            raise TypeError(f"location should be a Well, but it is {location}")
+
         for instr in self._instruments.values():
             if not instr.hw_pipette["has_tip"]:
                 raise hc.NoTipAttachedError("Pipette has no tip to touch_tip()")
@@ -824,7 +897,9 @@ class PairedInstrumentContext(CommandPublisher):
         publish_paired(
             self.broker, cmds.paired_touch_tip, "before", None, instruments, locations
         )
-        self.paired_instrument_obj.touch_tip(location, radius, v_offset, checked_speed)
+        self.paired_instrument_obj.touch_tip(
+            well.as_well(), radius, v_offset, checked_speed
+        )
         publish_paired(
             self.broker, cmds.paired_touch_tip, "after", self, instruments, locations
         )
