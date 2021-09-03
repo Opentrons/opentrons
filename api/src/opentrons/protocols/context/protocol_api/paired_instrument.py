@@ -6,7 +6,6 @@ from typing import TYPE_CHECKING, Optional, cast
 from opentrons import types
 from opentrons.hardware_control.modules import Thermocycler
 from opentrons.hardware_control.types import CriticalPoint
-from opentrons.protocol_api.module_contexts import ThermocyclerContext
 from opentrons.protocol_api.labware import Labware, Well
 from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocols.context.instrument import AbstractInstrument
