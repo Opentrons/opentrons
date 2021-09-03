@@ -1,3 +1,5 @@
+from typing import Generator
+
 import pytest
 from g_code_parsing import g_code_watcher
 from g_code_parsing.g_code import GCode
@@ -8,7 +10,7 @@ from g_code_parsing.errors import PollingGCodeAdditionError
 
 
 @pytest.fixture
-def watcher() -> g_code_watcher.GCodeWatcher:
+def watcher() -> Generator:
     def temp_return(self):
         return [
             g_code_watcher.WatcherData("M400", "smoothie", "ok\r\nok\r\n"),
@@ -29,9 +31,9 @@ def watcher() -> g_code_watcher.GCodeWatcher:
         ]
 
     old_function = g_code_watcher.GCodeWatcher.get_command_list
-    g_code_watcher.GCodeWatcher.get_command_list = temp_return
+    g_code_watcher.GCodeWatcher.get_command_list = temp_return  # type: ignore
     yield g_code_watcher.GCodeWatcher()
-    g_code_watcher.GCodeWatcher = old_function
+    g_code_watcher.GCodeWatcher = old_function  # type: ignore
 
 
 @pytest.fixture

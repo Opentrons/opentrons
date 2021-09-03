@@ -4,7 +4,7 @@ from g_code_parsing.g_code_functionality_defs.g_code_functionality_def_base impo
 )
 from g_code_parsing.g_code import GCode
 from g_code_parsing.errors import UnparsableGCodeError
-from typing import List, Dict
+from typing import List, Dict, Union
 
 
 def smoothie_g_codes() -> List[GCode]:
@@ -367,7 +367,7 @@ def expected_function_name_values() -> List[str]:
     ]
 
 
-def expected_arg_values() -> List[Dict[str, int]]:
+def expected_arg_values() -> List[Dict[str, Union[int, float, str, None]]]:
     return [
         #  Smoothie
         # Test 0

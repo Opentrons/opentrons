@@ -32,4 +32,4 @@ def reverse_enum(
 
 
 def get_configuration_dir():
-    return os.path.normpath(os.path.join(os.getcwd(), '..', 'test_data'))
+    return os.path.normpath(os.path.join(os.getcwd(), "..", "test_data"))
