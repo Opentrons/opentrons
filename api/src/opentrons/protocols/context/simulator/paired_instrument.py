@@ -1,7 +1,9 @@
 from typing import Optional
 
 from opentrons import types
+from opentrons.protocol_api import ThermocyclerContext
 from opentrons.protocol_api.labware import Well, Labware
+from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocols.context.instrument import AbstractInstrument
 from opentrons.protocols.context.paired_instrument import AbstractPairedInstrument
 from opentrons.protocols.context.protocol import AbstractProtocol
@@ -56,7 +58,28 @@ class PairedInstrumentSimulation(AbstractPairedInstrument):
         minimum_z_height: Optional[float] = None,
         speed: Optional[float] = None,
     ) -> None:
-        self._protocol_interface.set_last_location(location)
+
+        # Check for unsafe moves while thermocycler is open.
+        from_loc = self._protocol_interface.get_last_location()
+        if not from_loc:
+            from_loc = types.Location(types.Point(0, 0, 0), LabwareLike(None))
+
+        for mod in self._protocol_interface.get_loaded_modules():
+            if isinstance(mod, ThermocyclerContext):
+                mod.flag_unsafe_move(to_loc=location, from_loc=from_loc)
+
+        self._primary.move_to(
+            location=location,
+            force_direct=force_direct,
+            minimum_z_height=minimum_z_height,
+            speed=speed,
+        )
+        self._secondary.move_to(
+            location=location,
+            force_direct=force_direct,
+            minimum_z_height=minimum_z_height,
+            speed=speed,
+        )
 
     def aspirate(
         self,
