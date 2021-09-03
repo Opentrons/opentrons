@@ -2,7 +2,6 @@
 
 include ../scripts/push.mk
 include ../scripts/python.mk
-include ./g_code_parsing.mk
 
 SHX := npx shx
 
