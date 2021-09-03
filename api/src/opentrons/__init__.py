@@ -106,7 +106,7 @@ def _get_motor_control_serial_port() -> Any:
 
 
 async def _create_thread_manager() -> ThreadManager:
-    """Build the hardware controller wrapped in a TheadManager.
+    """Build the hardware controller wrapped in a ThreadManager.
 
     .. deprecated:: 4.6
         ThreadManager is on its way out.
