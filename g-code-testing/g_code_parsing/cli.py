@@ -24,6 +24,7 @@ from g_code_parsing.utils import get_configuration_dir
 
 class CLICommand(abc.ABC):
     """ABC which all CLI command classes should inherit from"""
+
     CONFIGURATION_DIR_LOCATION = get_configuration_dir()
     able_to_respond_with_error_code = False
     respond_with_error_code = False
@@ -57,11 +58,8 @@ class RunCommand(CLICommand):
         file_path = os.path.join(
             self.CONFIGURATION_DIR_LOCATION, self.configuration_path
         )
-
-        if self.configuration_path.startswith('protocols'):
-
-            with ProtocolRunner(settings).run_protocol(file_path) as program:
-                return program.get_text_explanation(self.text_mode)
+        with ProtocolRunner(settings).run_protocol(file_path) as program:
+            return program.get_text_explanation(self.text_mode)
 
 
 @dataclass
@@ -80,7 +78,7 @@ class DiffCommand(CLICommand):
         :return: HTML encoded diff of files
         """
         with open(self.file_path_1, "r") as file_1, open(
-                self.file_path_2, "r"
+            self.file_path_2, "r"
         ) as file_2:
             file_1_text = "\n".join(file_1.readlines())
             file_2_text = "\n".join(file_2.readlines())
@@ -102,16 +100,16 @@ class DiffCommand(CLICommand):
 class ConfigurationCommand(CLICommand):
     def execute(self) -> str:
         paths = [
-            os.path.join(root, name).replace(self.CONFIGURATION_DIR_LOCATION + '/', '')
+            os.path.join(root, name).replace(self.CONFIGURATION_DIR_LOCATION + "/", "")
             for root, dirs, files in os.walk(
                 self.CONFIGURATION_DIR_LOCATION, topdown=False
             )
             for name in files
         ]
 
-        path_string = '\n'.join(paths)
+        path_string = "\n".join(paths)
 
-        return f'Runnable Configurations:\n{path_string}'
+        return f"Runnable Configurations:\n{path_string}"
 
 
 class GCodeCLI:
@@ -169,7 +167,7 @@ class GCodeCLI:
         :return: Command class that inherits from CLICommand
         """
         passed_command_name = processed_args[cls.COMMAND_KEY]
-        command: Union[RunCommand, DiffCommand]
+        command: Union[RunCommand, DiffCommand, ConfigurationCommand]
         if cls.RUN_PROTOCOL_COMMAND == passed_command_name:
             command = RunCommand(
                 configuration_path=processed_args[cls.CONFIGURATION_PATH],
@@ -227,9 +225,9 @@ class GCodeCLI:
             dest=cls.COMMAND_KEY,
             required=True,
             metavar=f""
-                    f"{cls.RUN_PROTOCOL_COMMAND} | "
-                    f"{cls.DIFF_FILES_COMMAND} | "
-                    f"{cls.CONFIGURATION_COMMAND}",
+            f"{cls.RUN_PROTOCOL_COMMAND} | "
+            f"{cls.DIFF_FILES_COMMAND} | "
+            f"{cls.CONFIGURATION_COMMAND}",
         )
 
         run_parser = subparsers.add_parser(
@@ -247,11 +245,11 @@ class GCodeCLI:
             choices=SupportedTextModes.get_valid_modes(),
             dest=cls.TEXT_MODE_KEY_NAME,
             help=f"{SupportedTextModes.DEFAULT.value}: Verbose output containing "
-                 f"G-Code, Explanation, and Response"
-                 f"\n{SupportedTextModes.CONCISE.value}: Same as default but all "
-                 f"newlines, tabs, and headers removed"
-                 f"\n{SupportedTextModes.G_CODE.value}: Only raw G-Code and raw "
-                 f"response\n",
+            f"G-Code, Explanation, and Response"
+            f"\n{SupportedTextModes.CONCISE.value}: Same as default but all "
+            f"newlines, tabs, and headers removed"
+            f"\n{SupportedTextModes.G_CODE.value}: Only raw G-Code and raw "
+            f"response\n",
             metavar=" | ".join(SupportedTextModes.get_valid_modes()),
         )
         run_parser.add_argument(
@@ -259,8 +257,8 @@ class GCodeCLI:
             type=str,
             default=json.dumps(SmoothieSettings().left.__dict__),
             help="Configuration for left pipette. Expects JSON string."
-                 f'\nDefaults to "{SmoothieSettings().left.model}" if not specified.'
-                 '\nExample: {"model": "p20_multi_v2.0", "id": "P3HMV202020041605"}',
+            f'\nDefaults to "{SmoothieSettings().left.model}" if not specified.'
+            '\nExample: {"model": "p20_multi_v2.0", "id": "P3HMV202020041605"}',
             metavar="left_pipette_config",
         )
         run_parser.add_argument(
@@ -268,8 +266,8 @@ class GCodeCLI:
             type=str,
             default=json.dumps(SmoothieSettings().right.__dict__),
             help="Configuration for right pipette. Expects JSON string."
-                 f'\nDefaults to "{SmoothieSettings().right.model}" if not specified.'
-                 '\nExample: {"model": "p20_single_v2.0", "id": "P20SV202020070101"}',
+            f'\nDefaults to "{SmoothieSettings().right.model}" if not specified.'
+            '\nExample: {"model": "p20_single_v2.0", "id": "P20SV202020070101"}',
             metavar="right_pipette_config",
         )
 
@@ -304,8 +302,8 @@ class GCodeCLI:
     @property
     def respond_with_error(self):
         return (
-                self._command.able_to_respond_with_error_code
-                and self._command.respond_with_error_code
+            self._command.able_to_respond_with_error_code
+            and self._command.respond_with_error_code
         )
 
     @property
