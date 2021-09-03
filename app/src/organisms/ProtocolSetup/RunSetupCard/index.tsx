@@ -92,6 +92,7 @@ export function RunSetupCard(): JSX.Element | null {
         <LabwareSetup
           moduleRenderCoords={moduleRenderCoords}
           labwareRenderCoords={labwareRenderCoords}
+          robotName={robot.name}
         />
       ),
       description: t(`${LABWARE_SETUP_KEY}_description`),

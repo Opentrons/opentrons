@@ -64,6 +64,11 @@ const DECK_MAP_VIEWBOX = '-80 -100 550 560'
 export const LabwareSetup = (props: LabwareSetupProps): JSX.Element | null => {
   const { moduleRenderCoords, labwareRenderCoords, robotName } = props
   const { t } = useTranslation('protocol_setup')
+  const [targetProps, tooltipProps] = useHoverTooltip()
+  const [
+    showLabwareHelpModal,
+    setShowLabwareHelpModal,
+  ] = React.useState<boolean>(false)
   const moduleModels = map(moduleRenderCoords, ({ moduleModel }) => moduleModel)
   const moduleTypesThatRequireExtraAttention = getModuleTypesThatRequireExtraAttention(
     moduleModels
@@ -111,12 +116,6 @@ export const LabwareSetup = (props: LabwareSetupProps): JSX.Element | null => {
   }
   const LinkComponent = proceedToRunDisabled ? 'button' : NavLink
   const linkProps = proceedToRunDisabled ? {} : { to: '/run' }
-
-  const [targetProps, tooltipProps] = useHoverTooltip()
-  const [
-    showLabwareHelpModal,
-    setShowLabwareHelpModal,
-  ] = React.useState<boolean>(false)
   return (
     <React.Fragment>
       {showLabwareHelpModal && (
