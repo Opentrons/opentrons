@@ -493,8 +493,6 @@ class TransferPlan:
             - self._strategy.air_gap,
         )
         for step_vol, (src, dest) in plan_iter:
-            if self._strategy.new_tip == types.TransferTipPolicy.ALWAYS:
-                yield self._format_dict("pick_up_tip", kwargs=self._tip_opts)
             max_vol = (
                 self._max_volume
                 - self._strategy.disposal_volume
