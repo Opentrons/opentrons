@@ -1,27 +1,28 @@
 import pytest
 from g_code_parsing.g_code import reverse_enum
-from typing import Dict
+from typing import Dict, Type
 from enum import Enum
 
 
-@pytest.fixture
-def input_enum() -> Enum:
-    class InputEnum(str, Enum):
-        HOME = "G28.2"
-        MOVE = "G0"
-        DWELL = "G4"
-        CURRENT_POSITION = "M114.2"
-        LIMIT_SWITCH_STATUS = "M119"
-        PROBE = "G38.2"
-        ABSOLUTE_COORDS = "G90"
-        RELATIVE_COORDS = "G91"
+class InputEnum(str, Enum):
+    HOME = "G28.2"
+    MOVE = "G0"
+    DWELL = "G4"
+    CURRENT_POSITION = "M114.2"
+    LIMIT_SWITCH_STATUS = "M119"
+    PROBE = "G38.2"
+    ABSOLUTE_COORDS = "G90"
+    RELATIVE_COORDS = "G91"
 
-    yield InputEnum
+
+@pytest.fixture
+def input_enum() -> Type[InputEnum]:
+    return InputEnum
 
 
 @pytest.fixture
 def expected_dict() -> Dict:
-    yield {
+    return {
         "G28.2": "HOME",
         "G0": "MOVE",
         "G4": "DWELL",

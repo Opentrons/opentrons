@@ -12,7 +12,12 @@ from opentrons.hardware_control.emulation.parser import Parser
 from g_code_parsing.g_code_functionality_defs.g_code_functionality_def_base import (  # noqa: E501
     Explanation,
 )
-from g_code_parsing.g_code_functionality_defs import smoothie, magdeck, tempdeck, thermocycler
+from g_code_parsing.g_code_functionality_defs import (
+    smoothie,
+    magdeck,
+    tempdeck,
+    thermocycler,
+)
 
 
 class GCode:

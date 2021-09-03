@@ -149,12 +149,20 @@ def run_command() -> RunCommand:
 
 @pytest.fixture
 def same_file_content_diff_command(setup_same_files) -> DiffCommand:
-    return DiffCommand(file_path_1=DIFF_FILE_PATH_1, file_path_2=DIFF_FILE_PATH_2)
+    return DiffCommand(
+        file_path_1=DIFF_FILE_PATH_1,
+        file_path_2=DIFF_FILE_PATH_2,
+        able_to_respond_with_error_code=True,
+    )
 
 
 @pytest.fixture
 def different_file_content_diff_command(setup_different_files) -> DiffCommand:
-    return DiffCommand(file_path_1=DIFF_FILE_PATH_1, file_path_2=DIFF_FILE_PATH_2)
+    return DiffCommand(
+        file_path_1=DIFF_FILE_PATH_1,
+        file_path_2=DIFF_FILE_PATH_2,
+        able_to_respond_with_error_code=True,
+    )
 
 
 @pytest.mark.parametrize(

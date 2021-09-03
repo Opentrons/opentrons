@@ -29,7 +29,7 @@ def get_version():
 
 
 VERSION = get_version()
-DISTNAME = 'g-code-testing'
+DISTNAME = "g-code-testing"
 LICENSE = "Apache 2.0"
 AUTHOR = "Opentrons"
 EMAIL = "engineering@opentrons.com"
@@ -46,13 +46,14 @@ CLASSIFIERS = [
     "Topic :: Scientific/Engineering",
 ]
 KEYWORDS = ["robots", "protocols", "synbio", "pcr", "automation", "lab"]
-DESCRIPTION = 'Library to run emulated OT-2 and gather it\'s G-Code output'
+DESCRIPTION = "Library to run emulated OT-2 and gather it's G-Code output"
 PACKAGES = find_packages(where=".", exclude=["tests.*", "tests"])
 INSTALL_REQUIRES = [
     f"opentrons=={VERSION}",
     f"robot-server=={VERSION}",
     f"notify-server=={VERSION}",
 ]
+
 
 def read(*parts):
     """
@@ -61,6 +62,7 @@ def read(*parts):
     """
     with codecs.open(os.path.join(HERE, *parts), "rb", "utf-8") as f:
         return f.read()
+
 
 setup(
     python_requires=">=3.7",
@@ -80,5 +82,4 @@ setup(
     classifiers=CLASSIFIERS,
     install_requires=INSTALL_REQUIRES,
     include_package_data=True,
-
 )
