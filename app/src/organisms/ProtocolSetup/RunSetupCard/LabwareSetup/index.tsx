@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useSelector } from 'react-redux'
 import map from 'lodash/map'
 import { NavLink } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -29,18 +30,23 @@ import {
   inferModuleOrientationFromXCoordinate,
 } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
+import { getAttachedModules } from '../../../../redux/modules'
 import { ModuleTag } from '../../ModuleTag'
 import { LabwareInfoOverlay } from './LabwareInfoOverlay'
 import { LabwareSetupModal } from './LabwareSetupModal'
 import { getModuleTypesThatRequireExtraAttention } from './utils/getModuleTypesThatRequireExtraAttention'
 import { ExtraAttentionWarning } from './ExtraAttentionWarning'
+import * as Pipettes from '../../../../redux/pipettes'
 import styles from '../../styles.css'
+import * as PipetteConstants from '../../../../redux/pipettes/constants'
 import type { CoordinatesByModuleModel } from '../../utils/getModuleRenderCoords'
 import type { CoordinatesByLabwareId } from '../../utils/getLabwareRenderCoords'
+import type { State } from '../../../../redux/types'
 
 interface LabwareSetupProps {
   moduleRenderCoords: CoordinatesByModuleModel
   labwareRenderCoords: CoordinatesByLabwareId
+  robotName: string
 }
 
 const DECK_LAYER_BLOCKLIST = [
@@ -56,16 +62,56 @@ const DECK_LAYER_BLOCKLIST = [
 const DECK_MAP_VIEWBOX = '-80 -100 550 560'
 
 export const LabwareSetup = (props: LabwareSetupProps): JSX.Element | null => {
-  const { moduleRenderCoords, labwareRenderCoords } = props
+  const { moduleRenderCoords, labwareRenderCoords, robotName } = props
+  const { t } = useTranslation('protocol_setup')
   const moduleModels = map(moduleRenderCoords, ({ moduleModel }) => moduleModel)
   const moduleTypesThatRequireExtraAttention = getModuleTypesThatRequireExtraAttention(
     moduleModels
   )
-  const proceedToRunDisabled = false
-  const proceedToRunDisabledReason = 'replace with actual tooltip text'
+  const attachedModules = useSelector((state: State) =>
+    getAttachedModules(state, robotName)
+  )
+  const attachedModulesModels = map(attachedModules, ({ model }) => model)
+  const combinedModules = attachedModulesModels.concat(moduleModels)
+  const uniqueModules = [...new Set(combinedModules)]
+  const allModulesAttached =
+    combinedModules.length - uniqueModules.length === moduleModels.length
+  const protocolPipetteTipRackData = useSelector((state: State) => {
+    return Pipettes.getProtocolPipetteTipRackCalInfo(state, robotName)
+  })
+  const pipettesMountInfo = PipetteConstants.PIPETTE_MOUNTS.reduce(
+    mount => mount
+  )
+  const pipetteCalibrationInfo = protocolPipetteTipRackData[pipettesMountInfo]
+  if (pipetteCalibrationInfo == null) {
+    return null
+  }
+  const pipettesCalibrated =
+    pipetteCalibrationInfo.pipetteCalDate !== undefined &&
+    pipetteCalibrationInfo.pipetteCalDate !== null
+  let proceedToRunDisabledReason = ''
+  let proceedToRunDisabled = true
+  if (allModulesAttached === false && pipettesCalibrated === true) {
+    proceedToRunDisabledReason = t(
+      'proceed_to_run_disabled_modules_not_connected_tooltip'
+    )
+    proceedToRunDisabled = true
+  } else if (allModulesAttached === true && pipettesCalibrated === false) {
+    proceedToRunDisabledReason = t(
+      'proceed_to_run_disabled_calibration_not_complete_tooltip'
+    )
+    proceedToRunDisabled = true
+  } else if (allModulesAttached === false && pipettesCalibrated === false) {
+    proceedToRunDisabledReason = t(
+      'proceed_to_run_disabled_modules_and_calibration_not_complete_tooltip'
+    )
+    proceedToRunDisabled = true
+  } else {
+    proceedToRunDisabled = false
+  }
   const LinkComponent = proceedToRunDisabled ? 'button' : NavLink
   const linkProps = proceedToRunDisabled ? {} : { to: '/run' }
-  const { t } = useTranslation('protocol_setup')
+
   const [targetProps, tooltipProps] = useHoverTooltip()
   const [
     showLabwareHelpModal,

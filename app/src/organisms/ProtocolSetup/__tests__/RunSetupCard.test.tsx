@@ -120,6 +120,7 @@ describe('RunSetupCard', () => {
         componentPropsMatcher({
           moduleRenderCoords: mockModuleRenderCoords,
           labwareRenderCoords: mockLabwareRenderCoords,
+          robotName: mockConnectedRobot.name,
         })
       )
       .mockReturnValue(<div>Mock Labware Setup</div>)

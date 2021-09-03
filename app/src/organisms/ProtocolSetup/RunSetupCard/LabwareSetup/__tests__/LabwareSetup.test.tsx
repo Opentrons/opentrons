@@ -21,9 +21,17 @@ import { LabwareSetup } from '..'
 import { LabwareSetupModal } from '../LabwareSetupModal'
 import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
 import { ExtraAttentionWarning } from '../ExtraAttentionWarning'
+import { getAttachedModules } from '../../../../../redux/modules'
 import { getModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
+import { getProtocolPipetteTipRackCalInfo } from '../../../../../redux/pipettes/selectors'
+import {
+  mockThermocycler as mockThermocyclerFixture,
+  mockMagneticModule as mockMagneticModuleFixture,
+} from '../../../../../redux/modules/__fixtures__/index'
 import { ModuleTag } from '../../../ModuleTag'
 
+jest.mock('../../../../../redux/modules')
+jest.mock('../../../../../redux/pipettes/selectors')
 jest.mock('../LabwareSetupModal')
 jest.mock('../../../ModuleTag')
 jest.mock('../LabwareInfoOverlay')
@@ -45,6 +53,12 @@ jest.mock('@opentrons/shared-data', () => {
     inferModuleOrientationFromXCoordinate: jest.fn(),
   }
 })
+const mockGetAttachedModules = getAttachedModules as jest.MockedFunction<
+  typeof getAttachedModules
+>
+const mockGetProtocolPipetteTipRackCalInfo = getProtocolPipetteTipRackCalInfo as jest.MockedFunction<
+  typeof getProtocolPipetteTipRackCalInfo
+>
 
 const mockLabwareInfoOverlay = LabwareInfoOverlay as jest.MockedFunction<
   typeof LabwareInfoOverlay
@@ -99,6 +113,7 @@ const MOCK_300_UL_TIPRACK_ID = '300_ul_tiprack_id'
 const MOCK_MAGNETIC_MODULE_COORDS = [10, 20, 0]
 const MOCK_TC_COORDS = [20, 30, 0]
 const MOCK_300_UL_TIPRACK_COORDS = [30, 40, 0]
+const MOCK_ROBOT_NAME = 'ot-dev'
 
 const mockMagneticModule = {
   labwareOffset: { x: 5, y: 5, z: 5 },
@@ -117,7 +132,18 @@ const mockTCModule = {
 describe('LabwareSetup', () => {
   let props: React.ComponentProps<typeof LabwareSetup>
   beforeEach(() => {
-    props = { moduleRenderCoords: {}, labwareRenderCoords: {} }
+    props = {
+      robotName: MOCK_ROBOT_NAME,
+      moduleRenderCoords: {},
+      labwareRenderCoords: {},
+    }
+
+    when(mockGetProtocolPipetteTipRackCalInfo)
+      .calledWith(undefined as any, MOCK_ROBOT_NAME)
+      .mockReturnValue({
+        left: null,
+        right: null,
+      })
 
     when(mockInferModuleOrientationFromXCoordinate)
       .calledWith(expect.anything())
@@ -183,6 +209,10 @@ describe('LabwareSetup', () => {
           })}
         </svg>
       ))
+    
+    when(mockGetAttachedModules)
+      .calledWith(undefined as any, MOCK_ROBOT_NAME)
+      .mockReturnValue([])
   })
 
   afterEach(() => {
@@ -191,7 +221,8 @@ describe('LabwareSetup', () => {
   })
 
   describe('labware help link', () => {
-    it('opens up the labware help modal when clicked', () => {
+
+    it.only('opens up the labware help modal when clicked', () => {
       const { getByText } = render(props)
 
       expect(screen.queryByText('mock labware setup modal')).toBeNull()
@@ -214,6 +245,27 @@ describe('LabwareSetup', () => {
     const moduleRenderCoords = {}
     const labwareRenderCoords = {}
 
+    when(mockGetAttachedModules)
+      .calledWith(undefined as any, MOCK_ROBOT_NAME)
+      .mockReturnValue([])
+
+    when(mockGetProtocolPipetteTipRackCalInfo)
+      .calledWith(undefined as any, MOCK_ROBOT_NAME)
+      .mockReturnValue({
+        left: {
+          exactPipetteMatch: 'incompatible',
+          pipetteCalDate: 'abcde',
+          pipetteDisplayName: 'Left Pipette',
+          tipRacks: [
+            {
+              displayName: 'Mock TipRack Definition',
+              lastModifiedDate: null,
+            },
+          ],
+        },
+        right: null,
+      })
+
     props = {
       ...props,
       moduleRenderCoords,
@@ -226,7 +278,7 @@ describe('LabwareSetup', () => {
     expect(mockLabwareRender).not.toHaveBeenCalled()
     expect(mockLabwareInfoOverlay).not.toHaveBeenCalled()
   })
-  it('should render a deck WITH labware and WITHOUT modules', () => {
+  it('should render a deck WITH labware and WITHOUT modules with CTA enabled', () => {
     const labwareRenderCoords = {
       '300_ul_tiprack_id': {
         labwareDef: fixture_tiprack_300_ul as LabwareDefinition2,
@@ -237,6 +289,23 @@ describe('LabwareSetup', () => {
     }
 
     const moduleRenderCoords = {}
+
+    when(mockGetProtocolPipetteTipRackCalInfo)
+      .calledWith(undefined as any, MOCK_ROBOT_NAME)
+      .mockReturnValue({
+        left: {
+          exactPipetteMatch: 'incompatible',
+          pipetteCalDate: 'abcde',
+          pipetteDisplayName: 'Left Pipette',
+          tipRacks: [
+            {
+              displayName: 'Mock TipRack Definition',
+              lastModifiedDate: null,
+            },
+          ],
+        },
+        right: null,
+      })
 
     props = {
       ...props,
@@ -250,7 +319,7 @@ describe('LabwareSetup', () => {
     getByText('mock labware render of 300ul Tiprack FIXTURE')
     getByText('mock labware info overlay of 300ul Tiprack FIXTURE')
   })
-  it('should render a deck WITH labware and WITH modules', () => {
+  it('should render a deck WITH labware and WITH modules with CTA enabled', () => {
     const labwareRenderCoords = {
       [MOCK_300_UL_TIPRACK_ID]: {
         labwareDef: fixture_tiprack_300_ul as LabwareDefinition2,
@@ -319,6 +388,32 @@ describe('LabwareSetup', () => {
       )
       .mockReturnValue(<div>mock module tag {mockTCModule.model} </div>)
 
+    when(mockGetAttachedModules)
+      .calledWith(undefined as any, MOCK_ROBOT_NAME)
+      .mockReturnValue([
+        {
+          ...mockMagneticModuleFixture,
+          model: mockMagneticModule.model,
+        } as any,
+        { ...mockThermocyclerFixture, model: mockTCModule.model } as any,
+      ])
+
+    when(mockGetProtocolPipetteTipRackCalInfo)
+      .calledWith(undefined as any, MOCK_ROBOT_NAME)
+      .mockReturnValue({
+        left: {
+          exactPipetteMatch: 'compatible',
+          pipetteCalDate: 'abcde',
+          pipetteDisplayName: 'Left Pipette',
+          tipRacks: [
+            {
+              displayName: 'Mock TipRack Definition',
+              lastModifiedDate: null,
+            },
+          ],
+        },
+        right: null,
+      })
     props = {
       ...props,
       labwareRenderCoords,
@@ -334,7 +429,6 @@ describe('LabwareSetup', () => {
   })
   it('should render the labware position check text', () => {
     const { getByText } = render(props)
-
     getByText(
       'Labware Position Check is an optional workflow that guides you through checking the position of each labware on the deck. During this check, you can make an offset adjustment to the overall position of the labware.'
     )
