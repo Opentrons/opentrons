@@ -502,7 +502,6 @@ class TransferPlan:
             )
             xferred_vol = 0.0
             while xferred_vol < step_vol:
-                # Check to see if this updates
                 # TODO: account for unequal length sources, dests
                 # TODO: ensure last transfer is > min_vol
                 vol = min(max_vol, step_vol - xferred_vol)
