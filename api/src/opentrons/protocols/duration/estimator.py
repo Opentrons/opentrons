@@ -12,6 +12,10 @@ from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocols.duration.errors import DurationEstimatorException
 from opentrons.types import Location
 
+
+# We refer to page 3 of the GEN2 Temperature Module White-Paper
+# https://blog.opentrons.com/opentrons-technical-documentation/ Through the data we notice that there are different
+# rates of Celsius/second depending on temperature range. These were all tested to be ~95% consistent with the data
 TEMP_MOD_RATE_HIGH_AND_ABOVE: Final = 0.3611111111
 TEMP_MOD_RATE_LOW_TO_HIGH: Final = 0.2
 TEMP_MOD_RATE_ZERO_TO_LOW: Final = 0.0875
@@ -198,12 +202,15 @@ class DurationEstimator:
         # now lets handle the aspiration z-axis code.
         location = payload['location']
         slot = self.get_slot(location)
+
+        ## What's happening with this "If else statement?
         slot_module = 1 if location.labware.parent.parent.is_module else 0
         gantry_speed = instrument.default_speed
         z_total_time = self.z_time(slot_module, gantry_speed)
 
-        # We are going to once again use our "deck movement" set up. This
-        # should be in pickup, drop tip, aspirate, dispense
+        # We are going to once again use our "deck movement" set up. Might be changed in future PR if our travel
+        # calculations adjust
+        # This should be in pickup, drop tip, aspirate, dispense
         location = payload['location']
         prev_slot = self._last_deckslot
         curr_slot = self.get_slot(location)
@@ -257,7 +264,8 @@ class DurationEstimator:
         location = payload['location']
         curr_slot = self.get_slot(location)
         duration = 0.5
-        # Note will need to multiply minutes by 60
+        ## In theory, we could use instrument.flow_rate.blow_out, but we don't know how much is in the tip left to blow out
+        ## So we are defaulting to 0.5 seconds
         logger.info(f"blowing_out_for {duration} seconds, in slot {curr_slot}")
 
         return duration
@@ -272,9 +280,13 @@ class DurationEstimator:
         curr_slot = self.get_slot(location)
         duration = 0.5
         """
-        # base assumption
+        # base assumption. Touch_tip takes 0.5 seconds This is consisten with a ~7.5mm diameter (default 60mm/s, 4 sides)
+        # plate = protocol.load_labware('corning_96_wellplate_360ul_flat', '1')
+        # depth = plate['A1'].diameter
+        # Then use the speed of the touch tip ( plate = protocol.load_labware('corning_96_wellplate_360ul_flat', '1')
+        # depth = plate['A1'].diameter)
+        #
         duration = 0.5
-        # Note will need to multiply minutes by 60
         logger.info(f"touch_tip for {duration} seconds")
 
         return duration
@@ -300,6 +312,8 @@ class DurationEstimator:
         hold_time = payload['hold_time']
         temp0 = self._last_thermocyler_module_temperature
         temp1 = temperature
+        # we are referring to a thermocyler_handler(temp0, temp1) function. Magic numbers come from testing and have been
+        # consistent
         temperature_changing_time = self.thermocyler_handler(temp0, temp1)
         if hold_time is None:
             hold_time = 0
@@ -316,7 +330,8 @@ class DurationEstimator:
     def on_execute_profile(
             self,
             payload) -> float:
-        # This is a bit copy and paste needs to be beautified
+        # Overview We need to run each time a temperature change happens through thermocyler_handler and multiply
+        # By the cycle count. Then we also (in parallel) do the same with delays
 
         profile_total_steps = payload['steps']
         thermocyler_temperatures = [float(self._last_thermocyler_module_temperature)]
@@ -356,7 +371,7 @@ class DurationEstimator:
 
     def on_thermocyler_set_lid_temp(self,
                                     payload) -> float:
-        # How long this took
+        # Hardware said ~1 minute
         duration = 60
         thermoaction = 'set lid temperature'
         logger.info(f"thermocation =  {thermoaction}")
@@ -364,7 +379,7 @@ class DurationEstimator:
 
     def on_thermocyler_lid_close(self,
                                  payload) -> float:
-        # How long this took
+        # Hardware said ~24 seconds
         duration = 24
         thermoaction = 'closing'
         logger.info(f"thermocation =  {thermoaction}")
@@ -373,7 +388,7 @@ class DurationEstimator:
 
     def on_thermocyler_lid_open(self,
                                 payload) -> float:
-        # How long this took
+        # Hardware said ~24 seconds
         duration = 24
         thermoaction = 'opening'
         logger.info(f"thermocation =  {thermoaction}")
@@ -382,7 +397,7 @@ class DurationEstimator:
 
     def on_thermocyler_deactivate_lid(self,
                                       payload) -> float:
-        # How long this took
+        # Hardware said ~23 seconds
         duration = 23
         thermoaction = 'Deactivating'
         logger.info(f"thermocation =  {thermoaction}")
@@ -464,7 +479,9 @@ class DurationEstimator:
         y_dist = 88.9
         x_dist = 133.35
 
-        # why is
+        # Quick summary we set coordinates for each deck slot and found ways to move between deck slots.
+        # Each deck slot is a key for a coordinate value
+        # Moving between coordinate values
         start_point_pip = (2 * x_dist, 3 * y_dist)
 
         deck_centers = {'1': (0, 0), '2': (x_dist, 0),
@@ -532,6 +549,8 @@ class DurationEstimator:
 
         return val
 
+
+
     @staticmethod
     def rate_mid(temp0, temp1):
         val = []
@@ -549,6 +568,7 @@ class DurationEstimator:
             val.append(abs(TEMP_MOD_HIGH_THRESH - temp1) / TEMP_MOD_RATE_ZERO_TO_LOW)
         return val
 
+    # How to handle temperatures where one of them is low temp
     @staticmethod
     def rate_low(temp0, temp1):
         val = []
