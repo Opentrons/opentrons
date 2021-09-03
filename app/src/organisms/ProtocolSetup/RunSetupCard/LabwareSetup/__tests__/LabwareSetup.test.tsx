@@ -53,12 +53,6 @@ jest.mock('@opentrons/shared-data', () => {
     inferModuleOrientationFromXCoordinate: jest.fn(),
   }
 })
-const mockGetAttachedModules = getAttachedModules as jest.MockedFunction<
-  typeof getAttachedModules
->
-const mockGetProtocolPipetteTipRackCalInfo = getProtocolPipetteTipRackCalInfo as jest.MockedFunction<
-  typeof getProtocolPipetteTipRackCalInfo
->
 
 const mockLabwareInfoOverlay = LabwareInfoOverlay as jest.MockedFunction<
   typeof LabwareInfoOverlay
@@ -90,6 +84,13 @@ const mockGetModuleTypesThatRequireExtraAttention = getModuleTypesThatRequireExt
 
 const mockExtraAttentionWarning = ExtraAttentionWarning as jest.MockedFunction<
   typeof ExtraAttentionWarning
+>
+
+const mockGetAttachedModules = getAttachedModules as jest.MockedFunction<
+  typeof getAttachedModules
+>
+const mockGetProtocolPipetteTipRackCalInfo = getProtocolPipetteTipRackCalInfo as jest.MockedFunction<
+  typeof getProtocolPipetteTipRackCalInfo
 >
 
 const deckSlotsById = standardDeckDef.locations.orderedSlots.reduce(
@@ -137,13 +138,6 @@ describe('LabwareSetup', () => {
       moduleRenderCoords: {},
       labwareRenderCoords: {},
     }
-
-    when(mockGetProtocolPipetteTipRackCalInfo)
-      .calledWith(undefined as any, MOCK_ROBOT_NAME)
-      .mockReturnValue({
-        left: null,
-        right: null,
-      })
 
     when(mockInferModuleOrientationFromXCoordinate)
       .calledWith(expect.anything())
@@ -209,10 +203,33 @@ describe('LabwareSetup', () => {
           })}
         </svg>
       ))
-    
+
     when(mockGetAttachedModules)
       .calledWith(undefined as any, MOCK_ROBOT_NAME)
-      .mockReturnValue([])
+      .mockReturnValue([
+        {
+          ...mockMagneticModuleFixture,
+          model: mockMagneticModule.model,
+        } as any,
+        { ...mockThermocyclerFixture, model: mockTCModule.model } as any,
+      ])
+
+    when(mockGetProtocolPipetteTipRackCalInfo)
+      .calledWith(undefined as any, MOCK_ROBOT_NAME)
+      .mockReturnValue({
+        left: {
+          exactPipetteMatch: 'compatible',
+          pipetteCalDate: 'abcde',
+          pipetteDisplayName: 'Left Pipette',
+          tipRacks: [
+            {
+              displayName: 'Mock TipRack Definition',
+              lastModifiedDate: null,
+            },
+          ],
+        },
+        right: null,
+      })
   })
 
   afterEach(() => {
@@ -221,8 +238,7 @@ describe('LabwareSetup', () => {
   })
 
   describe('labware help link', () => {
-
-    it.only('opens up the labware help modal when clicked', () => {
+    it('opens up the labware help modal when clicked', () => {
       const { getByText } = render(props)
 
       expect(screen.queryByText('mock labware setup modal')).toBeNull()
@@ -245,24 +261,26 @@ describe('LabwareSetup', () => {
     const moduleRenderCoords = {}
     const labwareRenderCoords = {}
 
-    when(mockGetAttachedModules)
-      .calledWith(undefined as any, MOCK_ROBOT_NAME)
-      .mockReturnValue([])
+    props = {
+      ...props,
+      moduleRenderCoords,
+      labwareRenderCoords,
+    }
+
+    render(props)
+    expect(mockModuleViz).not.toHaveBeenCalled()
+    expect(mockModuleTag).not.toHaveBeenCalled()
+    expect(mockLabwareRender).not.toHaveBeenCalled()
+    expect(mockLabwareInfoOverlay).not.toHaveBeenCalled()
+  })
+  it('should render a deck WITHOUT labware and WITHOUT modules and CTA disabled', () => {
+    const moduleRenderCoords = {}
+    const labwareRenderCoords = {}
 
     when(mockGetProtocolPipetteTipRackCalInfo)
       .calledWith(undefined as any, MOCK_ROBOT_NAME)
       .mockReturnValue({
-        left: {
-          exactPipetteMatch: 'incompatible',
-          pipetteCalDate: 'abcde',
-          pipetteDisplayName: 'Left Pipette',
-          tipRacks: [
-            {
-              displayName: 'Mock TipRack Definition',
-              lastModifiedDate: null,
-            },
-          ],
-        },
+        left: null,
         right: null,
       })
 
@@ -289,23 +307,6 @@ describe('LabwareSetup', () => {
     }
 
     const moduleRenderCoords = {}
-
-    when(mockGetProtocolPipetteTipRackCalInfo)
-      .calledWith(undefined as any, MOCK_ROBOT_NAME)
-      .mockReturnValue({
-        left: {
-          exactPipetteMatch: 'incompatible',
-          pipetteCalDate: 'abcde',
-          pipetteDisplayName: 'Left Pipette',
-          tipRacks: [
-            {
-              displayName: 'Mock TipRack Definition',
-              lastModifiedDate: null,
-            },
-          ],
-        },
-        right: null,
-      })
 
     props = {
       ...props,
@@ -388,32 +389,6 @@ describe('LabwareSetup', () => {
       )
       .mockReturnValue(<div>mock module tag {mockTCModule.model} </div>)
 
-    when(mockGetAttachedModules)
-      .calledWith(undefined as any, MOCK_ROBOT_NAME)
-      .mockReturnValue([
-        {
-          ...mockMagneticModuleFixture,
-          model: mockMagneticModule.model,
-        } as any,
-        { ...mockThermocyclerFixture, model: mockTCModule.model } as any,
-      ])
-
-    when(mockGetProtocolPipetteTipRackCalInfo)
-      .calledWith(undefined as any, MOCK_ROBOT_NAME)
-      .mockReturnValue({
-        left: {
-          exactPipetteMatch: 'compatible',
-          pipetteCalDate: 'abcde',
-          pipetteDisplayName: 'Left Pipette',
-          tipRacks: [
-            {
-              displayName: 'Mock TipRack Definition',
-              lastModifiedDate: null,
-            },
-          ],
-        },
-        right: null,
-      })
     props = {
       ...props,
       labwareRenderCoords,
