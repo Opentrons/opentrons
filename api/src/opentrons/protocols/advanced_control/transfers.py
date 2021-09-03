@@ -502,13 +502,16 @@ class TransferPlan:
             )
             xferred_vol = 0.0
             while xferred_vol < step_vol:
+                # only pick up/drop tips when the volume is greater than zero
+                if self._strategy.new_tip == types.TransferTipPolicy.ALWAYS:
+                    yield self._format_dict("pick_up_tip", kwargs=self._tip_opts)
                 # TODO: account for unequal length sources, dests
                 # TODO: ensure last transfer is > min_vol
                 vol = min(max_vol, step_vol - xferred_vol)
                 yield from self._aspirate_actions(vol, src)
                 yield from self._dispense_actions(vol=vol, dest=dest, src=src)
                 xferred_vol += vol
-            yield from self._new_tip_action()
+                yield from self._new_tip_action()
 
     @staticmethod
     def _extend_source_target_lists(
