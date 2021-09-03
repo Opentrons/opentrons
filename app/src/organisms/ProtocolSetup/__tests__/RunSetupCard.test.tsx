@@ -221,7 +221,10 @@ describe('RunSetupCard', () => {
   it('renders correct text contents for single module', () => {
     mockGetProtocolData.mockReturnValue({
       ...withModulesProtocol,
-      modules: pick(withModulesProtocol.modules, Object.keys(withModulesProtocol.modules)[0])
+      modules: pick(
+        withModulesProtocol.modules,
+        Object.keys(withModulesProtocol.modules)[0]
+      ),
     } as any)
     const { getByRole, getByText } = render()
     expect(getByRole('heading', { name: 'Setup for Run' })).toBeTruthy()
