@@ -14,8 +14,10 @@ from opentrons.types import Location
 
 
 # We refer to page 3 of the GEN2 Temperature Module White-Paper
-# https://blog.opentrons.com/opentrons-technical-documentation/ Through the data we notice that there are different
-# rates of Celsius/second depending on temperature range. These were all tested to be ~95% consistent with the data
+# https://blog.opentrons.com/opentrons-technical-documentation/ 
+# Through the data we notice that there are different
+# rates of Celsius/second depending on temperature range. 
+# These were all tested to be ~95% consistent with the data
 TEMP_MOD_RATE_HIGH_AND_ABOVE: Final = 0.3611111111
 TEMP_MOD_RATE_LOW_TO_HIGH: Final = 0.2
 TEMP_MOD_RATE_ZERO_TO_LOW: Final = 0.0875
@@ -208,7 +210,8 @@ class DurationEstimator:
         gantry_speed = instrument.default_speed
         z_total_time = self.z_time(slot_module, gantry_speed)
 
-        # We are going to once again use our "deck movement" set up. Might be changed in future PR if our travel
+        # We are going to once again use our "deck movement" set up. 
+        #Might be changed in future PR if our travel
         # calculations adjust
         # This should be in pickup, drop tip, aspirate, dispense
         location = payload['location']
@@ -264,7 +267,8 @@ class DurationEstimator:
         location = payload['location']
         curr_slot = self.get_slot(location)
         duration = 0.5
-        ## In theory, we could use instrument.flow_rate.blow_out, but we don't know how much is in the tip left to blow out
+        ## In theory, we could use instrument.flow_rate.blow_out, but we don't 
+        ## know how much is in the tip left to blow out
         ## So we are defaulting to 0.5 seconds
         logger.info(f"blowing_out_for {duration} seconds, in slot {curr_slot}")
 
@@ -284,8 +288,7 @@ class DurationEstimator:
         # plate = protocol.load_labware('corning_96_wellplate_360ul_flat', '1')
         # depth = plate['A1'].diameter
         # Then use the speed of the touch tip ( plate = protocol.load_labware('corning_96_wellplate_360ul_flat', '1')
-        # depth = plate['A1'].diameter)
-        #
+        # depth = plate['A1'].diameter
         duration = 0.5
         logger.info(f"touch_tip for {duration} seconds")
 
@@ -312,8 +315,8 @@ class DurationEstimator:
         hold_time = payload['hold_time']
         temp0 = self._last_thermocyler_module_temperature
         temp1 = temperature
-        # we are referring to a thermocyler_handler(temp0, temp1) function. Magic numbers come from testing and have been
-        # consistent
+        # we are referring to a thermocyler_handler(temp0, temp1) function. 
+        #Magic numbers come from testing and have been consistent
         temperature_changing_time = self.thermocyler_handler(temp0, temp1)
         if hold_time is None:
             hold_time = 0
@@ -330,7 +333,8 @@ class DurationEstimator:
     def on_execute_profile(
             self,
             payload) -> float:
-        # Overview We need to run each time a temperature change happens through thermocyler_handler and multiply
+        # Overview We need to run each time a temperature change happens
+        #through thermocyler_handler and multiply
         # By the cycle count. Then we also (in parallel) do the same with delays
 
         profile_total_steps = payload['steps']
@@ -478,7 +482,6 @@ class DurationEstimator:
     def calc_deck_movement_time(current_slot, previous_slot, gantry_speed):
         y_dist = 88.9
         x_dist = 133.35
-
         # Quick summary we set coordinates for each deck slot and found ways to move between deck slots.
         # Each deck slot is a key for a coordinate value
         # Moving between coordinate values
@@ -522,9 +525,11 @@ class DurationEstimator:
     @staticmethod
     def z_time(piece, gantry_speed):
         z_default_labware_height = 177.8
-        z_default_module_height = 95.25  # 177.8 - 82.55 Where did we get 177.8 from?
+        z_default_module_height = 95.25  
+        # 177.8 - 82.55 Where did we get 177.8 from?
         # Would it be better to just use
-        # https://docs.opentrons.com/v2/new_protocol_api.html#opentrons.protocol_api.labware.Well.top  # noqa: E501
+        # protocol_api.labware.Well.top 
+        # noqa: E501
         # labware.top() ?
 
         if piece == 0:
