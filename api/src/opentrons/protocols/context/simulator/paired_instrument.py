@@ -1,12 +1,13 @@
-from typing import Optional
+from typing import Optional, cast
 
 from opentrons import types
-from opentrons.protocol_api import ThermocyclerContext
+from opentrons.hardware_control.modules import Thermocycler
 from opentrons.protocol_api.labware import Well, Labware
 from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocols.context.instrument import AbstractInstrument
 from opentrons.protocols.context.paired_instrument import AbstractPairedInstrument
 from opentrons.protocols.context.protocol import AbstractProtocol
+from opentrons.protocols.geometry.module_geometry import ThermocyclerGeometry
 
 
 class PairedInstrumentSimulation(AbstractPairedInstrument):
@@ -58,15 +59,18 @@ class PairedInstrumentSimulation(AbstractPairedInstrument):
         minimum_z_height: Optional[float] = None,
         speed: Optional[float] = None,
     ) -> None:
-
         # Check for unsafe moves while thermocycler is open.
         from_loc = self._protocol_interface.get_last_location()
         if not from_loc:
             from_loc = types.Location(types.Point(0, 0, 0), LabwareLike(None))
 
-        for mod in self._protocol_interface.get_loaded_modules():
-            if isinstance(mod, ThermocyclerContext):
-                mod.flag_unsafe_move(to_loc=location, from_loc=from_loc)
+        for mod in self._protocol_interface.get_loaded_modules().values():
+            if isinstance(mod.module, Thermocycler):
+                cast(ThermocyclerGeometry, mod.geometry).flag_unsafe_move(
+                    to_loc=location,
+                    from_loc=from_loc,
+                    lid_position=mod.module.lid_status,
+                )
 
         self._primary.move_to(
             location=location,

@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Optional, cast
 
 from opentrons import types
+from opentrons.hardware_control.modules import Thermocycler
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons.protocol_api.module_contexts import ThermocyclerContext
 from opentrons.protocol_api.labware import Labware, Well
@@ -13,6 +14,7 @@ from opentrons.protocols.context.paired_instrument import AbstractPairedInstrume
 from opentrons.protocols.context.protocol import AbstractProtocol
 from opentrons.protocols.geometry import planning
 from opentrons.protocols.api_support.util import build_edges
+from opentrons.protocols.geometry.module_geometry import ThermocyclerGeometry
 
 if TYPE_CHECKING:
     from opentrons.hardware_control import types as hc_types
@@ -91,9 +93,13 @@ class PairedInstrument(AbstractPairedInstrument):
             from_lw,
         )
 
-        for mod in self._ctx.get_loaded_modules():
-            if isinstance(mod, ThermocyclerContext):
-                mod.flag_unsafe_move(to_loc=location, from_loc=from_loc)
+        for mod in self._ctx.get_loaded_modules().values():
+            if isinstance(mod.module, Thermocycler):
+                cast(ThermocyclerGeometry, mod.geometry).flag_unsafe_move(
+                    to_loc=location,
+                    from_loc=from_loc,
+                    lid_position=mod.module.lid_status,
+                )
 
         primary_height = self._hw_manager.hardware.get_instrument_max_height(
             self._pair_policy.primary
