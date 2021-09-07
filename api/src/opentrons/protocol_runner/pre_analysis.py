@@ -1,13 +1,13 @@
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, Union, List
+from typing import Any, Dict, List, Union
 
 
 class PreAnalyzer:
     @staticmethod
     def analyze(
-        protocol_files: List[Path]
-    ) -> Union[PythonPreAnalysis, JsonPreAnalysis]:
+        protocol_files: List[Path],
+    ) -> Union["PythonPreAnalysis", "JsonPreAnalysis"]:
         raise NotImplementedError()
 
 
