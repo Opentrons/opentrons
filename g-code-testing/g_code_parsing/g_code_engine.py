@@ -112,7 +112,7 @@ class GCodeEngine(ABC):
         ...
 
 
-class ProtocolEngine(GCodeEngine):
+class ProtocolGCodeEngine(GCodeEngine):
 
     @contextmanager
     def run(self, input_str: str) -> Generator:
@@ -141,7 +141,7 @@ class ProtocolEngine(GCodeEngine):
         server_manager.stop()
 
 
-class HTTPEngine(GCodeEngine):
+class HTTPGCodeEngine(GCodeEngine):
 
     def _get_func(self, input_str):
         formatted_config_path = os.path.splitext(input_str)[0].replace(
