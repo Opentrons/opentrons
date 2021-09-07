@@ -5,12 +5,14 @@ on:
   pull_request:
     paths:
       - 'api/**'
+      - 'g-code-testing/**'
       - 'Makefile'
     branches:
       - '*'
   push:
     paths:
       - 'api/**'
+      - 'g-code-testing/**'
       - 'Makefile'
     branches:
       - '*'
@@ -31,7 +33,7 @@ jobs:
           python-version: '3.7'
       - uses: './.github/actions/python/setup'
         with:
-          project: 'api'
+          project: 'g-code-testing'
 
       - name: 'Run & Compare to S3'
         env:
