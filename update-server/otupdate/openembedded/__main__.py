@@ -3,7 +3,7 @@ Entrypoint for the openembedded update server
 """
 import sys
 
-from . import (RootFSCLI)
+from . import RootFSCLI
 
 
 def main():

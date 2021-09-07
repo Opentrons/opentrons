@@ -1,4 +1,5 @@
 import argparse
+import configparser
 import os
 import re
 import shlex
@@ -21,6 +22,7 @@ class RootFSInfo:
 
 
 class RootFS:
+
     @dataclass
     class RootFSConfig:
         """ CONFIG vars, can be changed through the commandline arguments """
@@ -33,10 +35,21 @@ class RootFS:
         ROOT_FS_PARTITION: str = ''
         SD_CARD_MOUNT_POINT: str = '/media/mmcblk1p1'
 
+        def __init__(self):
+            self._root_FS_config_parser = self.RootFSConfigParser()
+
+        class RootFSConfigParser:
+            def __init__(self):
+                self.config = configparser.ConfigParser()
+                self.config.read('RootFS.ini')
+
     def __init__(self):
-        self._root_FS_config = self.RootFSConfig('' , '', '' , '',
-                                                 'mmcblk0',
-                                                 'root_part', '2', '/media/mmcblkp1')
+        self._root_FS_config = self.RootFSConfig()
+        self._root_FS_config_parser = self._root_FS_config._root_FS_config_parser
+        print('check this \n')
+        print(self._root_FS_config_parser.config['DEFAULTS']['ROOT_FS_PARTITION'])
+        tmp = self._root_FS_config_parser.config['DEFAULTS']['ROOT_FS_PARTITION']
+        self._root_FS_config.ROOT_FS_PARTITION = tmp
 
     def set_partition(self, arg: argparse.Namespace, partition_name: str) -> None:
         """ Run boot util command here to set partion
@@ -45,7 +58,7 @@ class RootFS:
         self._root_FS_config.BOOT_SRC_CARVE_OUT = arg.bco
 
         subprocess.run(["fw_setenv", self._root_FS_config.BOOT_SRC_CARVE_OUT,
-                        "boot="+partition_name])
+                        partition_name])
 
     def get_partition(self) -> RootFSInfo:
         """ print partition name"""
