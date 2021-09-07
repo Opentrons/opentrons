@@ -53,7 +53,7 @@ export interface Option {
   disabled?: boolean
   imgSrc?: string
 }
-export type Options = readonly Option[]
+export type Options = Option[]
 
 // NOTE: annoyingly, some components support "rich" `name` values (eg Dropdown)
 // that can be a JSX.Element, and others like RadioField only support string values for `name` :(
@@ -63,7 +63,7 @@ export interface RichOption {
   disabled?: boolean
   imgSrc?: string
 }
-export type RichOptions = RichOption[]
+export type RichOptions = readonly RichOption[]
 
 export type LabwareType =
   | 'wellPlate'
@@ -363,7 +363,7 @@ export const getInitialStatus = (): FormStatus => ({
   prevValues: null,
 })
 
-export const getDefaultFormState = (): Readonly<LabwareFields> => ({
+export const getDefaultFormState = (): LabwareFields => ({
   labwareType: null,
   tubeRackInsertLoadName: null,
   aluminumBlockType: null,
@@ -410,7 +410,7 @@ export const getDefaultFormState = (): Readonly<LabwareFields> => ({
   pipetteName: null,
 })
 
-export const LABELS: Readonly<Record<keyof LabwareFields, string>> = {
+export const LABELS: Record<keyof LabwareFields, string> = {
   labwareType: 'What type of labware are you creating?',
   tubeRackInsertLoadName: 'Which tube rack?',
   aluminumBlockType: 'Which aluminum block?',
