@@ -38,7 +38,7 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.S3_APP_DEPLOY_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_APP_DEPLOY_SECRET }}
           AWS_DEFAULT_REGION: us-east-2
-        run: make -C api g-code-2-single-channel-v2-protocol-diff
+        run: make -C g-code-testing g-code-2-single-channel-v2-protocol-diff
 
       - name: "Save Generated Diff"
         if: always()
