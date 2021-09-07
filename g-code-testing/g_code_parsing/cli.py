@@ -105,6 +105,7 @@ class ConfigurationCommand(CLICommand):
                 self.CONFIGURATION_DIR_LOCATION, topdown=False
             )
             for name in files
+            if name not in ['__init__.py']
         ]
 
         path_string = "\n".join(paths)
