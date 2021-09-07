@@ -4,7 +4,7 @@ from decoy import Decoy
 from datetime import datetime
 
 from opentrons.protocol_engine import commands as pe_commands
-from opentrons.protocol_runner import ProtocolRunner
+from opentrons.protocol_runner import ProtocolRunner, JsonPreAnalysis
 
 from robot_server.protocols import ProtocolFileType
 from robot_server.protocols.analysis_store import AnalysisStore
@@ -46,6 +46,7 @@ async def test_analyze(
     protocol_resource = ProtocolResource(
         protocol_id="protocol-id",
         protocol_type=ProtocolFileType.JSON,
+        pre_analysis=JsonPreAnalysis(metadata={}),
         created_at=datetime(year=2021, month=1, day=1),
         files=[],
     )
@@ -87,6 +88,7 @@ async def test_analyze_error(
     protocol_resource = ProtocolResource(
         protocol_id="protocol-id",
         protocol_type=ProtocolFileType.JSON,
+        pre_analysis=JsonPreAnalysis(metadata={}),
         created_at=datetime(year=2021, month=1, day=1),
         files=[],
     )

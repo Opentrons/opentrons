@@ -8,12 +8,12 @@ from robot_server.protocols.analysis_models import PendingAnalysis
 from robot_server.protocols.response_builder import ResponseBuilder
 
 
-def test_create_single_json_file_response() -> None:
+def test_create_single_json_file_response() -> None:  # noqa: D103
     metadata_as_dict = {
         "a_string": "hello",
         "an_int": 9001,
         "a_float": 3.14,
-        "a_nested_object": {"a_bool": True}
+        "a_nested_object": {"a_bool": True},
     }
 
     protocol_resource = ProtocolResource(

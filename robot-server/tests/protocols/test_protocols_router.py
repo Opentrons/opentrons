@@ -4,9 +4,11 @@ from datetime import datetime
 from decoy import Decoy, matchers
 from starlette.datastructures import UploadFile
 
+from opentrons.protocol_runner import JsonPreAnalysis, PythonPreAnalysis
+
 from robot_server.errors import ApiError
 from robot_server.service.task_runner import TaskRunner
-from robot_server.protocols.protocol_models import Protocol, ProtocolFileType
+from robot_server.protocols.protocol_models import Metadata, Protocol, ProtocolFileType
 from robot_server.protocols.analysis_store import AnalysisStore
 from robot_server.protocols.protocol_analyzer import ProtocolAnalyzer
 from robot_server.protocols.response_builder import ResponseBuilder
@@ -55,14 +57,19 @@ async def test_get_protocols(
 
     resource_1 = ProtocolResource(
         protocol_id="abc",
-        protocol_type=ProtocolFileType.PYTHON,
         created_at=created_at_1,
+        protocol_type=ProtocolFileType.PYTHON,
+        pre_analysis=PythonPreAnalysis(
+            metadata={},
+            api_level="1234.5678",
+        ),
         files=[],
     )
     resource_2 = ProtocolResource(
         protocol_id="123",
-        protocol_type=ProtocolFileType.JSON,
         created_at=created_at_2,
+        protocol_type=ProtocolFileType.JSON,
+        pre_analysis=JsonPreAnalysis(metadata={}),
         files=[],
     )
 
@@ -73,12 +80,14 @@ async def test_get_protocols(
         id="abc",
         createdAt=created_at_1,
         protocolType=ProtocolFileType.PYTHON,
+        metadata=Metadata(),
         analyses=[analysis_1],
     )
     protocol_2 = Protocol(
         id="123",
         createdAt=created_at_2,
         protocolType=ProtocolFileType.JSON,
+        metadata=Metadata(),
         analyses=[analysis_2],
     )
 
@@ -111,6 +120,10 @@ async def test_get_protocol_by_id(
     resource = ProtocolResource(
         protocol_id="protocol-id",
         protocol_type=ProtocolFileType.PYTHON,
+        pre_analysis=PythonPreAnalysis(
+            metadata={},
+            api_level="1234.5678",
+        ),
         created_at=datetime(year=2021, month=1, day=1),
         files=[],
     )
@@ -121,6 +134,7 @@ async def test_get_protocol_by_id(
         id="protocol-id",
         createdAt=datetime(year=2021, month=1, day=1),
         protocolType=ProtocolFileType.PYTHON,
+        metadata=Metadata(),
         analyses=[analysis],
     )
 
@@ -177,6 +191,7 @@ async def test_create_protocol(
     protocol_resource = ProtocolResource(
         protocol_id="protocol-id",
         protocol_type=ProtocolFileType.JSON,
+        pre_analysis=JsonPreAnalysis(metadata={}),
         created_at=current_time,
         files=[],
     )
@@ -185,6 +200,7 @@ async def test_create_protocol(
         id="protocol-id",
         createdAt=current_time,
         protocolType=ProtocolFileType.JSON,
+        metadata=Metadata(),
         analyses=[analysis],
     )
 

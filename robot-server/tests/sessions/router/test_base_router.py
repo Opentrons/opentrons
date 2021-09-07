@@ -8,6 +8,8 @@ from httpx import AsyncClient
 
 from tests.helpers import verify_response
 
+from opentrons.protocol_runner import JsonPreAnalysis
+
 from robot_server.service.task_runner import TaskRunner
 
 from robot_server.protocols import (
@@ -132,6 +134,7 @@ async def test_create_protocol_session(
     protocol_resource = ProtocolResource(
         protocol_id="protocol-id",
         protocol_type=ProtocolFileType.JSON,
+        pre_analysis=JsonPreAnalysis(metadata={}),
         created_at=datetime.now(),
         files=[],
     )

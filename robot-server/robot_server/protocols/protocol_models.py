@@ -57,12 +57,14 @@ class Protocol(ResourceModel):
         ),
     )
 
+    # todo(mm, 2021-09-07): Should this be exposed to clients? We don't expose Python
+    # apiLevel.
     protocolType: ProtocolFileType = Field(
         ...,
         description="The type of protocol file (JSON or Python).",
     )
 
-    protocolMetadata: Metadata
+    metadata: Metadata
 
     # TODO(mc, 2021-09-01): consider reporting summary objects here, with the
     # option to `GET /protocols/:pid/analysis/:aid` if needed

@@ -4,9 +4,14 @@ from datetime import datetime
 from fastapi import UploadFile
 from logging import getLogger
 from pathlib import Path
-from typing import Dict, List, Sequence
+from typing import Dict, List, Sequence, Union
 
-from opentrons.protocol_runner import ProtocolFile, ProtocolFileType
+from opentrons.protocol_runner import (
+    ProtocolFile,
+    ProtocolFileType,
+    JsonPreAnalysis,
+    PythonPreAnalysis,
+)
 
 log = getLogger(__name__)
 
@@ -17,6 +22,7 @@ class ProtocolResource(ProtocolFile):
 
     protocol_id: str
     created_at: datetime
+    pre_analysis: Union[JsonPreAnalysis, PythonPreAnalysis]
 
 
 class ProtocolNotFoundError(KeyError):
@@ -58,7 +64,7 @@ class ProtocolStore:
         protocol_dir = self._get_protocol_dir(protocol_id)
         # TODO(mc, 2021-06-02): check for protocol collision
         protocol_dir.mkdir(parents=True)
-        saved_files = []
+        saved_files: List[Path] = []
 
         for index, upload_file in enumerate(files):
             if upload_file.filename == "":
@@ -74,9 +80,12 @@ class ProtocolStore:
 
             saved_files.append(file_path)
 
+        pre_analysis = NotImplemented  # type: JsonPreAnalysis
+
         entry = ProtocolResource(
             protocol_id=protocol_id,
             protocol_type=self._get_protocol_type(saved_files),
+            pre_analysis=pre_analysis,
             created_at=created_at,
             files=saved_files,
         )
