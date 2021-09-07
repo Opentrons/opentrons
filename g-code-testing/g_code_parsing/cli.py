@@ -18,7 +18,7 @@ from g_code_parsing.g_code_differ import GCodeDiffer
 from g_code_parsing.g_code_program.supported_text_modes import (
     SupportedTextModes,
 )
-from g_code_parsing.protocol_runner import ProtocolRunner
+from g_code_parsing.g_code_engine import HTTPGCodeEngine, ProtocolGCodeEngine
 from g_code_parsing.utils import get_configuration_dir
 
 
@@ -55,10 +55,14 @@ class RunCommand(CLICommand):
             left=self.left_pipette_config, right=self.right_pipette_config
         )
         settings = Settings(smoothie=smoothie_settings, host=self.host)
-        file_path = os.path.join(
-            self.CONFIGURATION_DIR_LOCATION, self.configuration_path
-        )
-        with ProtocolRunner(settings).run_protocol(file_path) as program:
+
+        if self.configuration_path.startswith('protocols'):
+            engine = ProtocolGCodeEngine(settings)
+
+        elif self.configuration_path.startswith('http'):
+            engine = HTTPGCodeEngine(settings)
+
+        with engine.run(self.configuration_path) as program:
             return program.get_text_explanation(self.text_mode)
 
 
