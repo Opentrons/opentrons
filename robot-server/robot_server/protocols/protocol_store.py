@@ -9,6 +9,7 @@ from typing import Dict, List, Sequence, Union
 from opentrons.protocol_runner import (
     ProtocolFile,
     ProtocolFileType,
+    PreAnalyzer,
     JsonPreAnalysis,
     PythonPreAnalysis,
 )
@@ -45,13 +46,17 @@ class ProtocolFileInvalidError(ValueError):
 class ProtocolStore:
     """Methods for storing and retrieving protocol files."""
 
-    def __init__(self, directory: Path) -> None:
+    def __init__(self, directory: Path, pre_analyzer: PreAnalyzer) -> None:
         """Initialize the ProtocolStore.
 
         Arguments:
             directory: Directory in which to place created files.
+
+            pre_analyzer: Called to extract basic info from protocols when they are
+            `create()`ed.
         """
         self._directory = directory
+        self._pre_analyzer = pre_analyzer
         self._protocols_by_id: Dict[str, ProtocolResource] = {}
 
     async def create(
@@ -80,11 +85,11 @@ class ProtocolStore:
 
             saved_files.append(file_path)
 
-        pre_analysis = NotImplemented  # type: JsonPreAnalysis
+        pre_analysis = self._pre_analyzer.analyze(saved_files)
 
         entry = ProtocolResource(
             protocol_id=protocol_id,
-            protocol_type=self._get_protocol_type(saved_files),
+            protocol_type=self._get_protocol_type(pre_analysis),
             pre_analysis=pre_analysis,
             created_at=created_at,
             files=saved_files,
@@ -127,15 +132,11 @@ class ProtocolStore:
     def _get_protocol_dir(self, protocol_id: str) -> Path:
         return self._directory / protocol_id
 
-    # TODO(mc, 2021-06-01): add multi-file support and ditch all of this
-    # logic in favor of whatever protocol analyzer we come up with
     @staticmethod
-    def _get_protocol_type(files: List[Path]) -> ProtocolFileType:
-        file_path = files[0]
-
-        if file_path.suffix == ".json":
+    def _get_protocol_type(
+        pre_analysis: Union[JsonPreAnalysis, PythonPreAnalysis]
+    ) -> ProtocolFileType:
+        if isinstance(pre_analysis, JsonPreAnalysis):
             return ProtocolFileType.JSON
-        elif file_path.suffix == ".py":
-            return ProtocolFileType.PYTHON
         else:
-            raise NotImplementedError("Protocol type not yet supported")
+            return ProtocolFileType.PYTHON

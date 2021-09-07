@@ -52,9 +52,18 @@ def upload_files(
 
 
 @pytest.fixture
-def subject(tmp_path: Path) -> ProtocolStore:
-    """Get a ProtocolStore test subject."""
-    return ProtocolStore(directory=tmp_path)
+def pre_analyzer(decoy: Decoy) -> PreAnalyzer:
+    """Return a mock PreAnalyzer."""
+    return decoy.mock(cls=PreAnalyzer)
+
+
+@pytest.fixture
+def subject(tmp_path: Path, pre_analyzer: PreAnalyzer) -> ProtocolStore:
+    """Get a ProtocolStore test subject, with mocked dependencies."""
+    return ProtocolStore(
+        tmp_path,
+        pre_analyzer,
+    )
 
 
 async def test_create_and_get_json_protocol(
@@ -81,7 +90,7 @@ async def test_create_and_get_json_protocol(
         protocol_type=ProtocolFileType.JSON,
         pre_analysis=pre_analysis,
         created_at=created_at,
-        files=[matchers.Anything()],
+        files=matchers.Anything(),
     )
 
     for file_path in creation_result.files:
@@ -116,7 +125,7 @@ async def test_create_and_get_python_protocol(
         protocol_type=ProtocolFileType.PYTHON,
         pre_analysis=pre_analysis,
         created_at=created_at,
-        files=[matchers.Anything()],
+        files=matchers.Anything(),
     )
 
     for file_path in creation_result.files:

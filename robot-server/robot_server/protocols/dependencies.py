@@ -5,7 +5,7 @@ from tempfile import gettempdir
 from fastapi import Depends
 from starlette.datastructures import State as AppState
 
-from opentrons.protocol_runner import create_simulating_runner
+from opentrons.protocol_runner import PreAnalyzer, create_simulating_runner
 from robot_server.service.dependencies import get_app_state
 
 from .protocol_store import ProtocolStore
@@ -26,7 +26,7 @@ def get_protocol_store(app_state: AppState = Depends(get_app_state)) -> Protocol
 
     if protocol_store is None:
         log.info(f"Storing protocols in {_PROTOCOL_STORE_DIRECTORY}")
-        protocol_store = ProtocolStore(directory=_PROTOCOL_STORE_DIRECTORY)
+        protocol_store = ProtocolStore(_PROTOCOL_STORE_DIRECTORY, PreAnalyzer())
         setattr(app_state, _PROTOCOL_STORE_KEY, protocol_store)
 
     return protocol_store
