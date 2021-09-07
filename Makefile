@@ -184,12 +184,13 @@ test-js:
 .PHONY: lint
 lint: lint-py lint-js lint-json lint-css check-js circular-dependencies-js
 
-PYTHON_LINT = $(addsuffix -py-lint, $(PYTHON_DIRS))
-%-py-lint:
-	$(MAKE) -C $* lint
+PYTHON_LINT_TARGETS  = $(addsuffix -py-lint, $(PYTHON_DIRS))
 
 .PHONY: lint-py
-lint-py: $(PYTHON_LINT)
+lint-py: $(PYTHON_LINT_TARGETS)
+
+%-py-lint:
+	$(MAKE) -C $* lint
 
 .PHONY: lint-js
 lint-js:
