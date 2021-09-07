@@ -16,8 +16,8 @@ Framework supporting the following:
 
 ### G-Code Parser
 
-Using the `ProtocolRunner` you can run a Python protocol file against emulation.
-The `ProtocolRunner` instance will return a `GCodeProgram` instance 
+Using the `GCodeEngine` you can run a Python protocol file against emulation.
+The `GCodeEngine` instance will return a `GCodeProgram` instance 
 
 **Example:**
 ```python
@@ -27,7 +27,7 @@ against emulation.
 In "Concise" format store parsed G-Code to /where/I/want/to/store/my/output.txt  
 """
 import os.path
-from protocol_runner import ProtocolRunner
+from g_code_engine import GCodeEngine
 from g_code_program.supported_text_modes \
     import SupportedTextModes
 from opentrons.hardware_control.emulation.settings import Settings
@@ -36,7 +36,7 @@ PROTOCOL_PATH = os.path.join('my', 'absolute', 'path', 'to', 'my', 'protocol.py'
 OUTPUT_PATH = os.path.join('where', 'I', 'want', 'to', 'store', 'my', 'output.txt')
 
 settings = Settings()  # Using default settings defined in class
-with ProtocolRunner(settings).run_protocol(PROTOCOL_PATH) as program:
+with GCodeEngine(settings).run_protocol(PROTOCOL_PATH) as program:
     program.save_text_explanation_to_file(OUTPUT_PATH, SupportedTextModes.CONCISE)
 ```
 
