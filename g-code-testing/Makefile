@@ -13,7 +13,6 @@ tests ?= tests
 test_opts ?=  --cov=g_code_parsing --cov-report term-missing:skip-covered --cov-report xml:coverage.xml
 
 # test modules to typecheck
-# TODO(mc, 2021-07-23): expand this to all tests
 tests_to_typecheck := \
 	tests/g_code_parsing
 
