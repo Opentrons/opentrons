@@ -1,6 +1,4 @@
 from .estimator import DurationEstimator
 
 
-__all__ = [
-    "DurationEstimator"
-]
+__all__ = ["DurationEstimator"]
