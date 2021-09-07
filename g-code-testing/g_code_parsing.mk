@@ -44,10 +44,10 @@ g-code-s3-push:
 #		text_mode=Concise
 #		left_pipette='{"model": "p20_single_v2.0", "id": "P20SV202020070101"}' \
 #		right_pipette='{"model": "p20_single_v2.0", "id": "P20SV202020070101"}' \
-#		protocol_path='./tests/opentrons/data/g_code_validation_protocols/smoothie_protocol.py'
+#		protocol_path='protocols/smoothie_protocol.py'
 .PHONY: g-code-run
 g-code-run:
-	@$(python) src/opentrons/hardware_control/g_code_parsing/cli.py \
+	@$(pipenv) run python -m g_code_parsing.cli \
 		run \
 		--text-mode '$(text_mode)' \
 		--left-pipette '$(left_pipette)' \
@@ -69,7 +69,7 @@ text_mode = Concise
 #		g-code-diff master_file=/path/to/master/file.txt file_under_test=/path/to/file/under/test.txt
 .PHONY: g-code-diff
 g-code-diff:
-	@$(python) src/opentrons/hardware_control/g_code_parsing/cli.py \
+	@$(pipenv) run python -m g_code_parsing.cli \
 		diff --error_on_different_files $(master_file) $(file_under_test)
 
 
@@ -99,7 +99,7 @@ g-code-smoothie-protocol-run:
 	@$(MAKE) --no-print-directory g-code-run \
 		left_pipette='{"model": "p20_single_v2.0", "id": "P20SV202020070101"}' \
 		right_pipette='{"model": "p20_single_v2.0", "id": "P20SV202020070101"}' \
-		protocol_path='./tests/opentrons/data/g_code_validation_protocols/smoothie_protocol.py' \
+		protocol_path='protocols/smoothie_protocol.py' \
   		> $(file_under_test)
 
 # g-code-smoothie-protocol-run
@@ -135,7 +135,7 @@ g-code-2-modules-1s-1m-v2-protocol-run:
 	@$(MAKE) --no-print-directory g-code-run \
 		left_pipette='{"model": "p300_single_v2.1", "id": "P20SV202020070101"}' \
 		right_pipette='{"model": "p20_multi_v2.1", "id": "P20SV202020070101"}' \
-		protocol_path='./tests/opentrons/data/g_code_validation_protocols/2_modules_1s_1m_v2.py' \
+		protocol_path='protocols/2_modules_1s_1m_v2.py' \
   		> $(file_under_test)
 
 # g-code-2-modules-1s-1m-v2-protocol-diff
@@ -170,7 +170,7 @@ g-code-swift-turbo-protocol-run:
 	@$(MAKE) --no-print-directory g-code-run \
 		left_pipette='{"model": "p20_single_v2.0", "id": "P20SV202020070101"}' \
 		right_pipette='{"model": "p300_multi_v2.1", "id": "P20SV202020070101"}' \
-		protocol_path='./tests/opentrons/data/g_code_validation_protocols/swift_turbo.py' \
+		protocol_path='protocols/swift_turbo.py' \
   		> $(file_under_test)
 
 # g-code-swift-turbo-protocol-diff
@@ -205,7 +205,7 @@ g-code-swift-smoke-protocol-run:
 	@$(MAKE) --no-print-directory g-code-run \
 		left_pipette='{"model": "p20_single_v2.0", "id": "P20SV202020070101"}' \
 		right_pipette='{"model": "p300_multi_v2.1", "id": "P20SV202020070101"}' \
-		protocol_path='./tests/opentrons/data/g_code_validation_protocols/swift_smoke.py' \
+		protocol_path='protocols/swift_smoke.py' \
   		> $(file_under_test)
 
 # g-code-swift-smoke-protocol-diff
@@ -240,7 +240,7 @@ g-code-2-single-channel-v2-protocol-run:
 	@$(MAKE) --no-print-directory g-code-run \
 		left_pipette='{"model": "p20_single_v2.0", "id": "P20SV202020070101"}' \
 		right_pipette='{"model": "p300_single_v2.1", "id": "P20SV202020070101"}' \
-		protocol_path='./tests/opentrons/data/g_code_validation_protocols/2_single_channel_v2.py' \
+		protocol_path='protocols/2_single_channel_v2.py' \
   		> $(file_under_test)
 
 # g-code-2-single-channel-v2-protocol-diff
