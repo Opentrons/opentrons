@@ -7,6 +7,11 @@ Framework supporting the following:
 * Diffing human-readable text or JSON format
 * CLI access to all the above features
 
+## Setup
+
+1. Navigate into `g-code-testing` directory
+2. Run `make setup`
+
 ## Python Framework
 
 ### G-Code Parser
@@ -60,22 +65,26 @@ with open(FILE_1_PATH, 'r') as file_1, open(FILE_2_PATH, 'r') as file_2:
 ## CLI
 
 Using the CLI you can access the above functionality through the command line.
-It currently supports 2 commands `run` and `diff`.
+
+### Supported commands:
+* `run` - Execute passed file 
+* `diff` - Diff passed files
+* `configurations` - Print available files to run
 
 ## Viewing Help Message
 
 To view available commands run:
 ```shell
-python cli.py -h
+pipenv run python -m g_code_parsing.cli -h
 ```
 
 To view help for specific command run: 
 ```shell
-python cli.py <your_command> -h
+pipenv run python -m g_code_parsing.cli <your_command> -h
 ```
 For example, 
 ```shell
-python cli.py run -h
+pipenv run python -m g_code_parsing.cli run -h
 ```
 
 ## Running Protocol
@@ -91,10 +100,10 @@ cli.py run [-h] [--text-mode Concise | Default | G-Code]
 
 Usage Example:
 ```shell
-python cli.py run \
+pipenv run python -m g_code_parsing.cli run \
   --text-mode G-Code \
   --left-pipette '{"model": "p20_single_v2.0", "id": "P20SV202020070101"}' \
-  $HOME/Documents/repos/opentrons/api/tests/opentrons/data/g_code_validation_protocols/smoothie_protocol.py
+  protocols/smoothie_protocol.py
 ```
 
 ### Command Breakdown
@@ -203,7 +212,7 @@ usage: cli.py diff [-h] file_path_1 file_path_2
 
 Usage Example:
 ```shell
-python cli.py diff /file/path/one.txt /file/path/two.txt
+pipenv run python -m g_code_parsing.cli diff /file/path/one.txt /file/path/two.txt
 ```
 
 ### Command Breakdown
