@@ -4,6 +4,8 @@ import threading
 import asyncio
 from typing import Generator
 from collections import namedtuple
+from abc import ABC, abstractmethod
+from importlib import import_module
 
 from opentrons.hardware_control.emulation.settings import Settings
 from opentrons.protocols.parse import parse
@@ -26,20 +28,23 @@ from g_code_parsing.g_code_watcher import GCodeWatcher
 from opentrons.protocols.context.protocol_api.protocol_context import (
     ProtocolContextImplementation,
 )
+from g_code_parsing.utils import get_configuration_dir
 
 
 Protocol = namedtuple("Protocol", ["text", "filename", "filelike"])
 
 
-class ProtocolRunner:
+class GCodeEngine(ABC):
     """
-    Class for running a Protocol against the emulator.
+    Class for running a thing against the emulator.
     See src/opentrons/hardware_control/emulation/settings.py for example explanation
     of Smoothie configs
 
+    Add new run_* methods to class to support different inputs to the engine
+
     Workflow is as follows:
-        1. Instantiate Protocol Runner
-        2. Call run_protocol method
+        1. Instantiate GCodeEngine
+        2. Call run_* method
         3. Gather parsed data from returned GCodeProgram
     """
 
@@ -63,13 +68,13 @@ class ProtocolRunner:
     def _set_env_vars() -> None:
         """Set URLs of where to find modules and config for smoothie"""
         os.environ["OT_MAGNETIC_EMULATOR_URI"] = (
-            ProtocolRunner.URI_TEMPLATE % MAGDECK_PORT
+                GCodeEngine.URI_TEMPLATE % MAGDECK_PORT
         )
         os.environ["OT_THERMOCYCLER_EMULATOR_URI"] = (
-            ProtocolRunner.URI_TEMPLATE % THERMOCYCLER_PORT
+                GCodeEngine.URI_TEMPLATE % THERMOCYCLER_PORT
         )
         os.environ["OT_TEMPERATURE_EMULATOR_URI"] = (
-            ProtocolRunner.URI_TEMPLATE % TEMPDECK_PORT
+                GCodeEngine.URI_TEMPLATE % TEMPDECK_PORT
         )
 
     @staticmethod
@@ -90,7 +95,7 @@ class ProtocolRunner:
         emulator = ThreadManager(
             API.build_hardware_controller,
             conf,
-            ProtocolRunner.URI_TEMPLATE % SMOOTHIE_PORT,
+            GCodeEngine.URI_TEMPLATE % SMOOTHIE_PORT,
         )
         return emulator
 
@@ -102,24 +107,60 @@ class ProtocolRunner:
 
         return Protocol(text=text, filename=file_path, filelike=file)
 
+    @abstractmethod
+    def run(self, input_str: str):
+        ...
+
+
+class ProtocolEngine(GCodeEngine):
+
     @contextmanager
-    def run_protocol(self, file_path: str) -> Generator:
+    def run(self, input_str: str) -> Generator:
         """
         Runs passed protocol file and collects all G-Code I/O from it.
         Will cleanup emulation after execution
-        :param file_path: Path to file
+        :param input_str: Path to file
         :return: GCodeProgram with all the parsed data
         """
+        file_path = os.path.join(
+            get_configuration_dir(), input_str
+        )
         server_manager = ServerManager(self._config)
         self._start_emulation_app(server_manager)
-        emulated_hardware = self._emulate_hardware()
         protocol = self._get_protocol(file_path)
         context = ProtocolContext(
-            implementation=ProtocolContextImplementation(hardware=emulated_hardware),
+            implementation=ProtocolContextImplementation(
+                hardware=self._emulate_hardware()
+            ),
             loop=self._get_loop(),
         )
         parsed_protocol = parse(protocol.text, protocol.filename)
         with GCodeWatcher() as watcher:
             execute.run_protocol(parsed_protocol, context=context)
+        yield GCodeProgram.from_g_code_watcher(watcher)
+        server_manager.stop()
+
+
+class HTTPEngine(GCodeEngine):
+
+    def _get_func(self, input_str):
+        formatted_config_path = os.path.splitext(input_str)[0].replace(
+            '/', '.')
+        module_string = f'test_data.{formatted_config_path}'
+        module = import_module(module_string)
+        return module.main()
+
+    @contextmanager
+    def run(self, input_str: str):
+        """
+        Runs http request and returns all G-Code I/O from it
+        :param input_str:
+        :return:
+        """
+        func = self._get_func(input_str)
+        server_manager = ServerManager(self._config)
+        self._start_emulation_app(server_manager)
+        with GCodeWatcher() as watcher:
+            asyncio.run(func(hardware=self._emulate_hardware()))
         yield GCodeProgram.from_g_code_watcher(watcher)
         server_manager.stop()
