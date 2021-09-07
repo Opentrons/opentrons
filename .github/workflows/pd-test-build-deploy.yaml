@@ -6,6 +6,7 @@ on:
   pull_request:
     paths:
       - 'protocol-designer/**'
+      - 'step-generation/**'
       - 'shared-data/**'
       - 'components/**'
       - 'webpack-config/**'
@@ -14,6 +15,7 @@ on:
   push:
     paths:
       - 'protocol-designer/**'
+      - 'step-generation/**'
       - 'shared-data/**'
       - 'components/**'
       - 'webpack-config/**'
@@ -23,6 +25,7 @@ on:
       - '*'
     tags:
       - 'protocol-designer*'
+  workflow_dispatch:
 
 defaults:
   run:
@@ -57,7 +60,13 @@ jobs:
           make setup-js
       - name: 'run PD unit tests'
         run: |
-          yarn jest --coverage=true --ci=true protocol-designer/
+          yarn jest --coverage=true --ci=true --collectCoverageFrom="protocol-designer/src/**/*.(js|ts|tsx)" protocol-designer/src
+      - name: 'Upload coverage report'
+        uses: codecov/codecov-action@v2
+        with:
+          files: ./coverage/lcov.info
+          flags: protocol-designer
+  
   e2e-test:
     name: 'pd e2e tests'
     timeout-minutes: 30

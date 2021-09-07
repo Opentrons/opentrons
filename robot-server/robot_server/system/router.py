@@ -21,7 +21,7 @@ def _create_time_response(dt: datetime) -> SystemTimeResponse:
     """Create a SystemTimeResponse from a datetime."""
     return SystemTimeResponse(
         data=SystemTimeResponseAttributes(id="time", systemTime=dt),
-        links={ResourceLinkKey.self: ResourceLink(href='/system/time')}
+        links={ResourceLinkKey.self: ResourceLink(href="/system/time")},
     )
 
 
@@ -33,7 +33,7 @@ def _create_time_response(dt: datetime) -> SystemTimeResponse:
         "date & time, local timezone, whether robot time is "
         "synced with an NTP server &/or it has an active RTC."
     ),
-    response_model=SystemTimeResponse
+    response_model=SystemTimeResponse,
 )
 async def get_time() -> SystemTimeResponse:
     """Get the robot's system time."""
@@ -45,7 +45,7 @@ async def get_time() -> SystemTimeResponse:
     "/system/time",
     description="Update system time",
     summary="Set robot time",
-    response_model=SystemTimeResponse
+    response_model=SystemTimeResponse,
 )
 async def set_time(new_time: SystemTimeRequest) -> SystemTimeResponse:
     """Set the robot's system time."""

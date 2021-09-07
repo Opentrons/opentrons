@@ -18,7 +18,7 @@ export function getActiveInterfaces(): NetworkInterface[] {
   const ifaces = os.networkInterfaces()
 
   return Object.keys(ifaces).flatMap<NetworkInterface>((name: string) => {
-    // $FlowFixMe(mc, 2020-05-27): Flow def of os.networkInterfaces return is incomplete
+    // @ts-expect-error(sa, 2021-6-28): this could be undefined because Object.keys returns a list of strings (too generic)
     return ifaces[name]
       .filter(iface => !iface.internal)
       .map(iface => ({ ...iface, name }))

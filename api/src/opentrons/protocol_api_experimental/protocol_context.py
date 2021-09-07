@@ -95,5 +95,16 @@ class ProtocolContext:  # noqa: D101
 
         return Labware(engine_client=self._engine_client, labware_id=result.labwareId)
 
+    def pause(self, msg: Optional[str] = None) -> None:
+        """Pause execution of the protocol until resumed by the user.
+
+        This method will block until the protocol is resumed.
+
+        Arguments:
+            msg: An optional message to attach to the pause command. This message
+                will be available to the app or client controlling the protocol.
+        """
+        self._engine_client.pause(message=msg)
+
     # todo(mm, 2021-04-09): Add all other public methods from the APIv2
     # ProtocolContext.

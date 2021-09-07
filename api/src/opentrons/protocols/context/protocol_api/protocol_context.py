@@ -1,27 +1,32 @@
 import logging
-from typing import Dict, Optional, Set, TYPE_CHECKING
+from typing import Dict, Optional, Set, List, TYPE_CHECKING
+from collections import OrderedDict
 
 from opentrons import types, API
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.config import feature_flags as fflags
-from opentrons.hardware_control.types import DoorState
+from opentrons.hardware_control.types import DoorState, PauseType
 from opentrons.hardware_control import SynchronousAdapter
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.geometry import module_geometry
 from opentrons.protocols.geometry.deck_item import DeckItem
-from opentrons.protocols.context.protocol_api.instrument_context import \
-    InstrumentContextImplementation
-from opentrons.protocols.context.instrument import \
-    AbstractInstrument
-from opentrons.protocols.context.labware import \
-    AbstractLabware
-from opentrons.protocols.context.protocol import \
-    AbstractProtocol, InstrumentDict, LoadModuleResult
+from opentrons.protocols.context.protocol_api.instrument_context import (
+    InstrumentContextImplementation,
+)
+from opentrons.protocols.context.instrument import AbstractInstrument
+from opentrons.protocols.context.labware import AbstractLabware
+from opentrons.protocols.context.protocol import (
+    AbstractProtocol,
+    InstrumentDict,
+    LoadModuleResult,
+)
 from opentrons.protocols.api_support.util import (
-    AxisMaxSpeeds, HardwareToManage, HardwareManager)
-from opentrons.protocols.labware import load_from_definition, \
-    get_labware_definition
+    AxisMaxSpeeds,
+    HardwareToManage,
+    HardwareManager,
+)
+from opentrons.protocols.labware import load_from_definition, get_labware_definition
 from opentrons.protocols.types import Protocol
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
@@ -31,20 +36,20 @@ if TYPE_CHECKING:
 
 MODULE_LOG = logging.getLogger(__name__)
 
-SHORT_TRASH_DECK = 'ot2_short_trash'
-STANDARD_DECK = 'ot2_standard'
+SHORT_TRASH_DECK = "ot2_short_trash"
+STANDARD_DECK = "ot2_standard"
 
 
 class ProtocolContextImplementation(AbstractProtocol):
-
-    def __init__(self,
-                 api_version: Optional[APIVersion] = None,
-                 hardware: Optional[HardwareToManage] = None,
-                 bundled_labware: Dict[str, LabwareDefinition] = None,
-                 bundled_data: Dict[str, bytes] = None,
-                 extra_labware: Dict[str, LabwareDefinition] = None,
-                 ) -> None:
-        """ Build a :py:class:`.ProtocolContextImplementation`.
+    def __init__(
+        self,
+        api_version: Optional[APIVersion] = None,
+        hardware: Optional[HardwareToManage] = None,
+        bundled_labware: Dict[str, LabwareDefinition] = None,
+        bundled_data: Dict[str, bytes] = None,
+        extra_labware: Dict[str, LabwareDefinition] = None,
+    ) -> None:
+        """Build a :py:class:`.ProtocolContextImplementation`.
 
         :param api_version: The API version to use. If this is ``None``, uses
                             the max supported version.
@@ -69,13 +74,12 @@ class ProtocolContextImplementation(AbstractProtocol):
         # TODO AL 20201110 - Find a way to omit api_version from this class.
         #  it is used in creating module geometry and instrument context.
         self._api_version = api_version or MAX_SUPPORTED_VERSION
-        deck_load_name = SHORT_TRASH_DECK if fflags.short_fixed_trash() \
-            else STANDARD_DECK
+        deck_load_name = (
+            SHORT_TRASH_DECK if fflags.short_fixed_trash() else STANDARD_DECK
+        )
         self._deck_layout = Deck(load_name=deck_load_name)
-        self._instruments: InstrumentDict = {
-            mount: None for mount in types.Mount
-        }
-        self._modules: Set[LoadModuleResult] = set()
+        self._instruments: InstrumentDict = {mount: None for mount in types.Mount}
+        self._modules: List[LoadModuleResult] = []
 
         self._hw_manager = HardwareManager(hardware)
         self._log = MODULE_LOG.getChild(self.__class__.__name__)
@@ -87,22 +91,19 @@ class ProtocolContextImplementation(AbstractProtocol):
         self._default_max_speeds = AxisMaxSpeeds()
         self._last_location: Optional[types.Location] = None
         self._last_mount: Optional[types.Mount] = None
-        self._loaded_modules: Set['AbstractModule'] = set()
+        self._loaded_modules: Set["AbstractModule"] = set()
 
     @classmethod
-    def build_using(cls,
-                    protocol: Protocol,
-                    *args, **kwargs):
-        """ Build an API instance for the specified parsed protocol
+    def build_using(cls, protocol: Protocol, *args, **kwargs):
+        """Build an API instance for the specified parsed protocol
 
         This is used internally to provision the context with bundle
         contents or api levels.
         """
-        kwargs['bundled_data'] = getattr(protocol, 'bundled_data', None)
-        kwargs['bundled_labware'] = getattr(protocol, 'bundled_labware', None)
-        kwargs['extra_labware'] = getattr(protocol, 'extra_labware', None)
-        kwargs['api_version'] = getattr(
-            protocol, 'api_level', MAX_SUPPORTED_VERSION)
+        kwargs["bundled_data"] = getattr(protocol, "bundled_data", None)
+        kwargs["bundled_labware"] = getattr(protocol, "bundled_labware", None)
+        kwargs["extra_labware"] = getattr(protocol, "extra_labware", None)
+        kwargs["api_version"] = getattr(protocol, "api_level", MAX_SUPPORTED_VERSION)
         return cls(*args, **kwargs)
 
     def get_bundled_data(self) -> Dict[str, bytes]:
@@ -139,7 +140,7 @@ class ProtocolContextImplementation(AbstractProtocol):
         self._hw_manager.hardware.cache_instruments()
 
     def disconnect(self) -> None:
-        """"Disconnect from the hardware."""
+        """ "Disconnect from the hardware."""
         self._hw_manager.reset_hw()
 
     def is_simulating(self) -> bool:
@@ -147,10 +148,11 @@ class ProtocolContextImplementation(AbstractProtocol):
         return self._hw_manager.hardware.is_simulator
 
     def load_labware_from_definition(
-            self,
-            labware_def: LabwareDefinition,
-            location: types.DeckLocation,
-            label: Optional[str]) -> AbstractLabware:
+        self,
+        labware_def: LabwareDefinition,
+        location: types.DeckLocation,
+        label: Optional[str],
+    ) -> AbstractLabware:
         """Load a labware from definition"""
         parent = self.get_deck().position_for(location)
         labware_obj = load_from_definition(labware_def, parent, label)
@@ -158,47 +160,54 @@ class ProtocolContextImplementation(AbstractProtocol):
         return labware_obj
 
     def load_labware(
-            self,
-            load_name: str,
-            location: types.DeckLocation,
-            label: Optional[str],
-            namespace: Optional[str],
-            version: Optional[int]) -> AbstractLabware:
+        self,
+        load_name: str,
+        location: types.DeckLocation,
+        label: Optional[str],
+        namespace: Optional[str],
+        version: Optional[int],
+    ) -> AbstractLabware:
         """Load a labware."""
         labware_def = get_labware_definition(
-            load_name, namespace, version,
+            load_name,
+            namespace,
+            version,
             bundled_defs=self._bundled_labware,
-            extra_defs=self._extra_labware)
-        return self.load_labware_from_definition(
-            labware_def, location, label)
+            extra_defs=self._extra_labware,
+        )
+        return self.load_labware_from_definition(labware_def, location, label)
 
     def load_module(
-            self,
-            module_name: str,
-            location: Optional[types.DeckLocation],
-            configuration: Optional[str]) -> Optional[LoadModuleResult]:
+        self,
+        module_name: str,
+        location: Optional[types.DeckLocation],
+        configuration: Optional[str],
+    ) -> Optional[LoadModuleResult]:
         """Load a module."""
         resolved_model = module_geometry.resolve_module_model(module_name)
         resolved_type = module_geometry.resolve_module_type(resolved_model)
         resolved_location = self._deck_layout.resolve_module_location(
-            resolved_type, location)
+            resolved_type, location
+        )
 
         # Load the geometry
         geometry = module_geometry.load_module(
             model=resolved_model,
             parent=self._deck_layout.position_for(resolved_location),
             api_level=self._api_version,
-            configuration=configuration)
+            configuration=configuration,
+        )
 
         # Try to find in the hardware instance
         available_modules, simulating_module = self._hw_manager.hardware.find_modules(
-            resolved_model, resolved_type)
+            resolved_model, resolved_type
+        )
 
         hc_mod_instance = None
         for mod in available_modules:
             compatible = module_geometry.models_compatible(
-                module_geometry.module_model_from_string(mod.model()),
-                resolved_model)
+                module_geometry.module_model_from_string(mod.model()), resolved_model
+            )
             if compatible and mod not in self._loaded_modules:
                 self._loaded_modules.add(mod)
                 hc_mod_instance = SynchronousAdapter(mod)
@@ -210,34 +219,36 @@ class ProtocolContextImplementation(AbstractProtocol):
         if not hc_mod_instance:
             return None
 
-        result = LoadModuleResult(type=resolved_type,
-                                  geometry=geometry,
-                                  module=hc_mod_instance)
+        result = LoadModuleResult(
+            type=resolved_type, geometry=geometry, module=hc_mod_instance
+        )
 
-        self._modules.add(result)
+        self._modules.append(result)
         self._deck_layout[resolved_location] = geometry
         return result
 
     def get_loaded_modules(self) -> Dict[int, LoadModuleResult]:
         """Get a mapping of deck location to loaded module."""
-        return {int(str(module.geometry.parent)): module
-                for module in self._modules}
+        return OrderedDict(
+            {int(str(module.geometry.parent)): module for module in self._modules}
+        )
 
-    def load_instrument(self,
-                        instrument_name: str,
-                        mount: types.Mount,
-                        replace: bool) -> AbstractInstrument:
+    def load_instrument(
+        self, instrument_name: str, mount: types.Mount, replace: bool
+    ) -> AbstractInstrument:
         """Load an instrument."""
         instr = self._instruments[mount]
         if instr and not replace:
             raise RuntimeError(
                 f"Instrument already present in {mount.name.lower()} "
-                f"mount: {instr.get_instrument_name()}")
+                f"mount: {instr.get_instrument_name()}"
+            )
 
-        attached = {att_mount: instr.get('name', None)
-                    for att_mount, instr
-                    in self._hw_manager.hardware.attached_instruments.items()
-                    if instr}
+        attached = {
+            att_mount: instr.get("name", None)
+            for att_mount, instr in self._hw_manager.hardware.attached_instruments.items()  # noqa: E501
+            if instr
+        }
         attached[mount] = instrument_name
         self._hw_manager.hardware.cache_instruments(attached)
         # If the cache call didn’t raise, the instrument is attached
@@ -246,7 +257,7 @@ class ProtocolContextImplementation(AbstractProtocol):
             protocol_interface=self,
             mount=mount,
             instrument_name=instrument_name,
-            default_speed=400.0
+            default_speed=400.0,
         )
         self._instruments[mount] = new_instr
         self._log.info("Instrument {} loaded".format(new_instr))
@@ -258,11 +269,11 @@ class ProtocolContextImplementation(AbstractProtocol):
 
     def pause(self, msg: Optional[str]) -> None:
         """Pause the protocol."""
-        self._hw_manager.hardware.pause()
+        self._hw_manager.hardware.pause(PauseType.PAUSE)
 
     def resume(self) -> None:
         """Result the protocol."""
-        self._hw_manager.hardware.resume()
+        self._hw_manager.hardware.resume(PauseType.PAUSE)
 
     def comment(self, msg: str) -> None:
         """Add comment to run log."""
@@ -283,7 +294,7 @@ class ProtocolContextImplementation(AbstractProtocol):
 
     def get_fixed_trash(self) -> DeckItem:
         """The trash fixed to slot 12 of the robot deck."""
-        trash = self._deck_layout['12']
+        trash = self._deck_layout["12"]
         if not trash:
             raise RuntimeError("Robot must have a trash container in 12")
         return trash
@@ -294,7 +305,7 @@ class ProtocolContextImplementation(AbstractProtocol):
 
     def get_rail_lights_on(self) -> bool:
         """Get the rail light state."""
-        return self._hw_manager.hardware.get_lights()['rails']
+        return self._hw_manager.hardware.get_lights()["rails"]
 
     def door_closed(self) -> bool:
         """Check if door is closed."""

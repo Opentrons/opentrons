@@ -2,10 +2,6 @@
 Opentrons OT-2 HTTP API
 =======================
 
-.. image:: https://badgen.net/travis/Opentrons/opentrons/edge
-   :target: https://travis-ci.org/Opentrons/opentrons
-   :alt: Build Status
-
 .. image:: https://badgen.net/codecov/c/github/Opentrons/opentrons
    :target: https://codecov.io/gh/Opentrons/opentrons
    :alt: Coverage Status
@@ -52,3 +48,31 @@ Tests should be organized similarly to the organization of the module itself.
 We use `Flake8 <https://flake8.pycqa.org>`_ for lint checks, and `mypy <http://mypy-lang.org/>`_ for type-checking annotations. Both of these tools are run in the ``lint`` makefile target, and is run in CI; PRs will not be merged with failing lint. Usage of ``noqa`` to temporarily disable lint is discouraged, but if you need to please disable only a specific rule and leave a comment explaining exactly why. The same goes with ``type: ignore``.
 
 New code should have appropriate type annotations, and refactors of old code should try to add type annotations. We’re flexible about the refactor part, though - if adding type annotations greatly expands the scope of a PR, it’s OK to not add them as long as you explain this in the PR message.
+
+Developer Modes
+-----------------
+
+The robot server can be run on a PC in one of two development modes.
+
+These can be useful when an OT-2 and modules are not available.
+
+The **Opentrons** application will automatically discover a locally running robot server as **dev**.
+
+***************
+Simulators
+***************
+Simulation mode will run the robot-server with simple software simulations of the Smoothie and magnetic, temperature, and thermocycler modules. This mode is ideal for rapid testing as the GCODE communication layer is bypassed.
+
+- ``make -C robot-server dev``
+
+***************
+Emulators
+***************
+Using the emulation mode will have the robot server send GCODE commands to a running emulation application. In this mode, the robot server is running exactly as it would on the OT-2.
+
+This requires two steps. Enter these commands from the opentrons directory:
+
+- ``make -C api emulator``
+- ``make -C robot-server dev-with-emulator``
+
+By default a ``p20_multi_v2.0`` is on the left mount and ``p20_single_v2.0`` is on the right. These can be changed by modifying the ``OT_EMULATOR_smoothie`` environment variable which contains a stringified JSON object with a ``model`` and ``id`` field for the ``left`` and ``right``. All fields are optional. For example to use a ``p300_multi`` on the right use  ``export OT_EMULATOR_smoothie='{"right": {"model": "p300_multi"}}' && make -C api emulator``

@@ -1,49 +1,49 @@
 """Test pick up tip commands."""
-from mock import AsyncMock  # type: ignore[attr-defined]
+from decoy import Decoy
 
-from opentrons.protocol_engine.commands import (
-    PickUpTipRequest,
+from opentrons.protocol_engine.execution import (
+    EquipmentHandler,
+    MovementHandler,
+    PipettingHandler,
+    RunControlHandler,
+)
+
+from opentrons.protocol_engine.commands.pick_up_tip import (
+    PickUpTipData,
     PickUpTipResult,
+    PickUpTipImplementation,
 )
 
 
-def test_pick_up_tip_request() -> None:
-    """It should be able to create a PickUpTipRequest."""
-    request = PickUpTipRequest(
+async def test_pick_up_tip_implementation(
+    decoy: Decoy,
+    equipment: EquipmentHandler,
+    movement: MovementHandler,
+    pipetting: PipettingHandler,
+    run_control: RunControlHandler,
+) -> None:
+    """A PickUpTip command should have an execution implementation."""
+    subject = PickUpTipImplementation(
+        equipment=equipment,
+        movement=movement,
+        pipetting=pipetting,
+        run_control=run_control,
+    )
+
+    data = PickUpTipData(
         pipetteId="abc",
         labwareId="123",
         wellName="A3",
     )
 
-    assert request.pipetteId == "abc"
-    assert request.labwareId == "123"
-    assert request.wellName == "A3"
-
-
-def test_pick_up_tip_result() -> None:
-    """It should be able to create a PickUpTipResult."""
-    # NOTE(mc, 2020-11-17): this model has no properties at this time
-    result = PickUpTipResult()
-
-    assert result
-
-
-async def test_pick_up_tip_implementation(mock_handlers: AsyncMock) -> None:
-    """A PickUpTipRequest should have an execution implementation."""
-    mock_handlers.pipetting.pick_up_tip.return_value = None
-
-    request = PickUpTipRequest(
-        pipetteId="abc",
-        labwareId="123",
-        wellName="A3",
-    )
-
-    impl = request.get_implementation()
-    result = await impl.execute(mock_handlers)
+    result = await subject.execute(data)
 
     assert result == PickUpTipResult()
-    mock_handlers.pipetting.pick_up_tip.assert_called_with(
-        pipette_id="abc",
-        labware_id="123",
-        well_name="A3",
+
+    decoy.verify(
+        await pipetting.pick_up_tip(
+            pipette_id="abc",
+            labware_id="123",
+            well_name="A3",
+        )
     )

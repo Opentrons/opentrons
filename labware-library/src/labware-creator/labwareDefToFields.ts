@@ -1,5 +1,8 @@
 import { getUniqueWellProperties } from '../labwareInference'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type {
+  LabwareDefinition2,
+  LabwareWellGroup,
+} from '@opentrons/shared-data'
 import type { LabwareFields, BooleanString } from './fields'
 
 // NOTE: this is just String() with some typing for flow
@@ -49,7 +52,8 @@ export function labwareDefToFields(
     def.metadata.displayCategory === 'wellPlate' ||
     def.metadata.displayCategory === 'tubeRack' ||
     def.metadata.displayCategory === 'aluminumBlock' ||
-    def.metadata.displayCategory === 'reservoir'
+    def.metadata.displayCategory === 'reservoir' ||
+    def.metadata.displayCategory === 'tipRack'
   ) {
     labwareType = def.metadata.displayCategory
   }
@@ -74,11 +78,17 @@ export function labwareDefToFields(
     return null
   }
 
+  const firstGroup: LabwareWellGroup | undefined = def.groups[0]
+  const firstGroupBrand = firstGroup?.brand
+
   return {
     // NOTE: Ian 2019-08-26 these LC-specific fields cannot easily/reliably be inferred
     tubeRackInsertLoadName: null,
     aluminumBlockType: null,
     aluminumBlockChildType: null,
+
+    // We assume all tipracks are snug upon import
+    handPlacedTipFit: labwareType === 'tipRack' ? 'snug' : null,
 
     labwareType,
     footprintXDimension: String(def.dimensions.xDimension),
@@ -99,7 +109,7 @@ export function labwareDefToFields(
     regularColumnSpacing: boolToBoolString(regularColumnSpacing),
 
     wellVolume: String(totalLiquidVolume),
-    wellBottomShape: metadata.wellBottomShape || null,
+    wellBottomShape: metadata.wellBottomShape ?? null,
     wellDepth: String(depth),
     wellShape: shape.shape,
 
@@ -113,7 +123,9 @@ export function labwareDefToFields(
       shape.shape === 'rectangular' ? String(shape.yDimension) : null,
 
     brand: def.brand.brand,
-    brandId: def.brand.brandId ? def.brand.brandId.join(',') : null, // comma-separated values
+    brandId: def.brand.brandId != null ? def.brand.brandId.join(',') : null, // comma-separated values
+    groupBrand: firstGroupBrand?.brand,
+    groupBrandId: firstGroupBrand?.brandId?.join(',') ?? undefined,
 
     // NOTE: intentionally null these fields, do not import them
     loadName: null,

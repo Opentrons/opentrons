@@ -1,49 +1,48 @@
 """Test move to well commands."""
-from mock import AsyncMock  # type: ignore[attr-defined]
+from decoy import Decoy
 
-from opentrons.protocol_engine.commands import (
-    MoveToWellRequest,
+from opentrons.protocol_engine.execution import (
+    EquipmentHandler,
+    MovementHandler,
+    PipettingHandler,
+    RunControlHandler,
+)
+
+from opentrons.protocol_engine.commands.move_to_well import (
+    MoveToWellData,
     MoveToWellResult,
+    MoveToWellImplementation,
 )
 
 
-def test_move_to_well_request() -> None:
-    """It should be able to create a MoveToWellRequest."""
-    request = MoveToWellRequest(
+async def test_move_to_well_implementation(
+    decoy: Decoy,
+    equipment: EquipmentHandler,
+    movement: MovementHandler,
+    pipetting: PipettingHandler,
+    run_control: RunControlHandler,
+) -> None:
+    """A MoveToWell command should have an execution implementation."""
+    subject = MoveToWellImplementation(
+        equipment=equipment,
+        movement=movement,
+        pipetting=pipetting,
+        run_control=run_control,
+    )
+
+    data = MoveToWellData(
         pipetteId="abc",
         labwareId="123",
         wellName="A3",
     )
 
-    assert request.pipetteId == "abc"
-    assert request.labwareId == "123"
-    assert request.wellName == "A3"
-
-
-def test_move_to_well_result() -> None:
-    """It should be able to create a MoveToWellResult."""
-    # NOTE(mc, 2020-11-17): this model has no properties at this time
-    result = MoveToWellResult()
-
-    assert result
-
-
-async def test_move_to_well_implementation(mock_handlers: AsyncMock) -> None:
-    """A MoveToWellRequest should have an execution implementation."""
-    mock_handlers.movement.move_to_well.return_value = None
-
-    request = MoveToWellRequest(
-        pipetteId="abc",
-        labwareId="123",
-        wellName="A3",
-    )
-
-    impl = request.get_implementation()
-    result = await impl.execute(mock_handlers)
+    result = await subject.execute(data)
 
     assert result == MoveToWellResult()
-    mock_handlers.movement.move_to_well.assert_called_with(
-        pipette_id="abc",
-        labware_id="123",
-        well_name="A3",
+    decoy.verify(
+        await movement.move_to_well(
+            pipette_id="abc",
+            labware_id="123",
+            well_name="A3",
+        )
     )

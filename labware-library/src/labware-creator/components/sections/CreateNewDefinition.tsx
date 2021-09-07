@@ -1,10 +1,11 @@
 import * as React from 'react'
 import { useFormikContext } from 'formik'
 import cx from 'classnames'
-import { PrimaryButton } from '@opentrons/components'
+import { PrimaryBtn } from '@opentrons/components'
 import { Dropdown } from '../../components/Dropdown'
-import { labwareTypeOptions } from '../../fields'
-import { getFormAlerts } from '../utils/getFormAlerts'
+import { isEveryFieldHidden, makeAutofillOnChange } from '../../utils'
+import { labwareTypeOptions, labwareTypeAutofills } from '../../fields'
+import { FormAlerts } from '../alerts/FormAlerts'
 import { SectionBody } from './SectionBody'
 
 import styles from '../../styles.css'
@@ -17,41 +18,60 @@ interface Props {
   onClick: () => void
 }
 
-const getContent = (props: Props): JSX.Element => {
-  const {
-    disabled,
-    labwareTypeChildFields,
-    onClick,
-    showDropDownOptions,
-  } = props
-  return (
-    <div className={styles.labware_type_fields}>
-      {showDropDownOptions && (
-        <>
-          <Dropdown name="labwareType" options={labwareTypeOptions} />
-          {labwareTypeChildFields}
-        </>
-      )}
-
-      <PrimaryButton
-        className={styles.start_creating_btn}
-        disabled={disabled}
-        onClick={onClick}
-      >
-        start creating labware
-      </PrimaryButton>
-    </div>
-  )
-}
-
-export const CreateNewDefinition = (props: Props): JSX.Element => {
+export const CreateNewDefinition = (props: Props): JSX.Element | null => {
   const fieldList: Array<keyof LabwareFields> = [
     'labwareType',
     'tubeRackInsertLoadName',
     'aluminumBlockType',
     'aluminumBlockChildType',
   ]
-  const { values, errors, touched } = useFormikContext<LabwareFields>()
+  const {
+    disabled,
+    onClick,
+    showDropDownOptions,
+    labwareTypeChildFields,
+  } = props
+  const {
+    values,
+    errors,
+    touched,
+    setValues,
+    setTouched,
+  } = useFormikContext<LabwareFields>()
+
+  if (isEveryFieldHidden(fieldList, values)) {
+    return null
+  }
+
+  const content = (
+    <div className={styles.labware_type_fields}>
+      {showDropDownOptions && (
+        <>
+          <Dropdown
+            name="labwareType"
+            options={labwareTypeOptions}
+            onValueChange={makeAutofillOnChange({
+              name: 'labwareType',
+              autofills: labwareTypeAutofills,
+              values,
+              touched,
+              setTouched,
+              setValues,
+            })}
+          />
+          {labwareTypeChildFields}
+        </>
+      )}
+
+      <PrimaryBtn
+        className={styles.start_creating_btn}
+        disabled={disabled}
+        onClick={onClick}
+      >
+        start creating labware
+      </PrimaryBtn>
+    </div>
+  )
 
   return (
     <div className={styles.new_definition_section}>
@@ -62,8 +82,13 @@ export const CreateNewDefinition = (props: Props): JSX.Element => {
         })}
       >
         <>
-          {getFormAlerts({ values, touched, errors, fieldList })}
-          {getContent({ ...props })}
+          <FormAlerts
+            values={values}
+            touched={touched}
+            errors={errors}
+            fieldList={fieldList}
+          />
+          {content}
         </>
       </SectionBody>
     </div>

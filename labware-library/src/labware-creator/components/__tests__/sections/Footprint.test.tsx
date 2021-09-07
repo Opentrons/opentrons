@@ -1,25 +1,18 @@
 import React from 'react'
+import '@testing-library/jest-dom'
 import { FormikConfig } from 'formik'
-import { when } from 'jest-when'
+import { when, resetAllWhenMocks } from 'jest-when'
 import { render, screen } from '@testing-library/react'
 import { getDefaultFormState, LabwareFields } from '../../../fields'
 import { Footprint } from '../../sections/Footprint'
-import { getFormAlerts } from '../../utils/getFormAlerts'
-import { TextField } from '../../TextField'
 import { wrapInFormik } from '../../utils/wrapInFormik'
-import { getXYDimensionAlerts } from '../../utils/getXYDimensionAlerts'
+import { isEveryFieldHidden } from '../../../utils'
+import { nestedTextMatcher } from '../../__testUtils__/nestedTextMatcher'
 
-jest.mock('../../TextField')
-jest.mock('../../utils/getFormAlerts')
-jest.mock('../../utils/getXYDimensionAlerts')
+jest.mock('../../../utils')
 
-const getFormAlertsMock = getFormAlerts as jest.MockedFunction<
-  typeof getFormAlerts
->
-const textFieldMock = TextField as jest.MockedFunction<typeof TextField>
-
-const getXYDimensionAlertsMock = getXYDimensionAlerts as jest.MockedFunction<
-  typeof getXYDimensionAlerts
+const isEveryFieldHiddenMock = isEveryFieldHidden as jest.MockedFunction<
+  typeof isEveryFieldHidden
 >
 
 const formikConfig: FormikConfig<LabwareFields> = {
@@ -29,46 +22,82 @@ const formikConfig: FormikConfig<LabwareFields> = {
 
 describe('Footprint', () => {
   beforeEach(() => {
-    textFieldMock.mockImplementation(args => {
-      if (args.name === 'footprintXDimension') {
-        return <div>footprintXDimension text field</div>
-      }
-      if (args.name === 'footprintYDimension') {
-        return <div>footprintYDimension text field</div>
-      }
-      throw new Error(
-        `Text field should have been called with footprintXDimension or footprintYDimension, instead got ${args.name} `
+    when(isEveryFieldHiddenMock)
+      .calledWith(
+        ['footprintXDimension', 'footprintYDimension'],
+        formikConfig.initialValues
       )
-    })
-
-    when(getFormAlertsMock)
-      .expectCalledWith({
-        values: getDefaultFormState(),
-        touched: {},
-        errors: {},
-        fieldList: ['footprintXDimension', 'footprintYDimension'],
-      })
-      .mockReturnValue([<div key="mock key">mock alerts</div>])
-
-    when(getXYDimensionAlertsMock)
-      .expectCalledWith(getDefaultFormState(), {})
-      .mockReturnValue(<div>mock getXYDimensionAlertsMock alerts</div>)
+      .mockReturnValue(false)
   })
 
   afterEach(() => {
     jest.restoreAllMocks()
+    resetAllWhenMocks()
   })
-  it('should render with the correct information', () => {
+  it('should render alerts and text fields when fields are visible', () => {
     render(wrapInFormik(<Footprint />, formikConfig))
-    expect(screen.getByText('Footprint'))
+    expect(screen.getByRole('heading')).toHaveTextContent(/total footprint/i)
+    screen.getByText(
+      `The footprint measurement helps determine if the labware (in adapter if needed) fits firmly into the slots on the OT-2 deck.`
+    )
+    const textBoxElements = screen.getAllByRole('textbox')
+    expect(textBoxElements).toHaveLength(2)
+    screen.getByRole('textbox', { name: /Length/i })
+    screen.getByRole('textbox', { name: /Width/i })
+  })
+
+  it('should render correct copy when tipRack is selected', () => {
+    formikConfig.initialValues.labwareType = 'tipRack'
+    render(wrapInFormik(<Footprint />, formikConfig))
+
     expect(
       screen.getByText(
-        'The footprint measurement helps determine if the labware fits firmly into the slots on the OT-2 deck.'
+        nestedTextMatcher(
+          'If your Tip Rack has an adapter, place it in the adapter.'
+        )
       )
+    ).toBeInTheDocument()
+  })
+
+  it('should not render extra copy when tipRack is not selected', () => {
+    formikConfig.initialValues.labwareType = 'wellPlate'
+    render(wrapInFormik(<Footprint />, formikConfig))
+    expect(
+      screen.queryByText(
+        nestedTextMatcher(
+          'If your Tip Rack has an adapter, place it in the adapter.'
+        )
+      )
+    ).toBe(null)
+  })
+
+  it('should render form alert when error is present', () => {
+    const FAKE_ERROR = 'ahh'
+    formikConfig.initialErrors = { footprintXDimension: FAKE_ERROR }
+    formikConfig.initialTouched = { footprintXDimension: true }
+    render(wrapInFormik(<Footprint />, formikConfig))
+    screen.getByText(FAKE_ERROR)
+  })
+
+  it('should render xydimension alert when error is present', () => {
+    formikConfig.initialValues.footprintXDimension = '130'
+    formikConfig.initialTouched = { footprintXDimension: true }
+    const { container } = render(wrapInFormik(<Footprint />, formikConfig))
+    const error = container.querySelector('[class="alert info"]')
+    expect(error?.textContent).toBe(
+      'Our recommended footprint for labware is 127.76 by 85.47 +/- 1mm. If you can fit your labware snugly into a single slot on the deck continue through the form. If not please request custom labware via this form.'
     )
-    expect(screen.getByText('mock alerts'))
-    expect(screen.getByText('footprintXDimension text field'))
-    expect(screen.getByText('footprintYDimension text field'))
-    expect(screen.getByText('mock getXYDimensionAlertsMock alerts'))
+  })
+
+  it('should not render when all fields are hidden', () => {
+    when(isEveryFieldHiddenMock)
+      .calledWith(
+        ['footprintXDimension', 'footprintYDimension'],
+        formikConfig.initialValues
+      )
+      .mockReturnValue(true)
+
+    const { container } = render(wrapInFormik(<Footprint />, formikConfig))
+    expect(container.firstChild).toBe(null)
   })
 })

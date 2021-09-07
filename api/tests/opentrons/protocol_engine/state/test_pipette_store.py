@@ -1,0 +1,195 @@
+"""Tests for pipette state changes in the protocol_engine state store."""
+import pytest
+
+from opentrons.types import MountType
+from opentrons.protocol_engine import commands as cmd
+from opentrons.protocol_engine.types import PipetteName, DeckLocation
+from opentrons.protocol_engine.state.actions import UpdateCommandAction
+from opentrons.protocol_engine.state.pipettes import (
+    PipetteStore,
+    PipetteState,
+    PipetteData,
+)
+
+from .command_fixtures import (
+    create_load_pipette_command,
+    create_aspirate_command,
+    create_dispense_command,
+    create_pick_up_tip_command,
+    create_drop_tip_command,
+    create_move_to_well_command,
+)
+
+
+@pytest.fixture
+def subject() -> PipetteStore:
+    """Get a PipetteStore test subject for all subsequent tests."""
+    return PipetteStore()
+
+
+def test_sets_initial_state(subject: PipetteStore) -> None:
+    """It should initialize its state object properly."""
+    result = subject.state
+
+    assert result == PipetteState(
+        pipettes_by_id={},
+        aspirated_volume_by_id={},
+        current_location=None,
+    )
+
+
+def test_handles_load_pipette(subject: PipetteStore) -> None:
+    """It should add the pipette data to the state."""
+    command = create_load_pipette_command(
+        pipette_id="pipette-id",
+        pipette_name=PipetteName.P300_SINGLE,
+        mount=MountType.LEFT,
+    )
+
+    subject.handle_action(UpdateCommandAction(command=command))
+
+    result = subject.state
+
+    assert result.pipettes_by_id["pipette-id"] == PipetteData(
+        pipette_name=PipetteName.P300_SINGLE,
+        mount=MountType.LEFT,
+    )
+    assert result.aspirated_volume_by_id["pipette-id"] == 0
+
+
+def test_pipette_volume_adds_aspirate(subject: PipetteStore) -> None:
+    """It should add volume to pipette after an aspirate."""
+    load_command = create_load_pipette_command(
+        pipette_id="pipette-id",
+        pipette_name=PipetteName.P300_SINGLE,
+        mount=MountType.LEFT,
+    )
+    aspirate_command = create_aspirate_command(
+        pipette_id="pipette-id",
+        volume=42,
+    )
+
+    subject.handle_action(UpdateCommandAction(command=load_command))
+    subject.handle_action(UpdateCommandAction(command=aspirate_command))
+
+    assert subject.state.aspirated_volume_by_id["pipette-id"] == 42
+
+    subject.handle_action(UpdateCommandAction(command=aspirate_command))
+
+    assert subject.state.aspirated_volume_by_id["pipette-id"] == 84
+
+
+def test_pipette_volume_subtracts_dispense(subject: PipetteStore) -> None:
+    """It should subtract volume from pipette after a dispense."""
+    load_command = create_load_pipette_command(
+        pipette_id="pipette-id",
+        pipette_name=PipetteName.P300_SINGLE,
+        mount=MountType.LEFT,
+    )
+    aspirate_command = create_aspirate_command(
+        pipette_id="pipette-id",
+        volume=42,
+    )
+    dispense_command = create_dispense_command(
+        pipette_id="pipette-id",
+        volume=21,
+    )
+
+    subject.handle_action(UpdateCommandAction(command=load_command))
+    subject.handle_action(UpdateCommandAction(command=aspirate_command))
+    subject.handle_action(UpdateCommandAction(command=dispense_command))
+
+    assert subject.state.aspirated_volume_by_id["pipette-id"] == 21
+
+    subject.handle_action(UpdateCommandAction(command=dispense_command))
+
+    assert subject.state.aspirated_volume_by_id["pipette-id"] == 0
+
+    subject.handle_action(UpdateCommandAction(command=dispense_command))
+
+    assert subject.state.aspirated_volume_by_id["pipette-id"] == 0
+
+
+@pytest.mark.parametrize(
+    ("command", "expected_location"),
+    (
+        (
+            create_aspirate_command(
+                pipette_id="aspirate-pipette-id",
+                labware_id="aspirate-labware-id",
+                well_name="aspirate-well-name",
+                volume=1337,
+            ),
+            DeckLocation(
+                pipette_id="aspirate-pipette-id",
+                labware_id="aspirate-labware-id",
+                well_name="aspirate-well-name",
+            ),
+        ),
+        (
+            create_dispense_command(
+                pipette_id="dispense-pipette-id",
+                labware_id="dispense-labware-id",
+                well_name="dispense-well-name",
+                volume=1337,
+            ),
+            DeckLocation(
+                pipette_id="dispense-pipette-id",
+                labware_id="dispense-labware-id",
+                well_name="dispense-well-name",
+            ),
+        ),
+        (
+            create_pick_up_tip_command(
+                pipette_id="pick-up-tip-pipette-id",
+                labware_id="pick-up-tip-labware-id",
+                well_name="pick-up-tip-well-name",
+            ),
+            DeckLocation(
+                pipette_id="pick-up-tip-pipette-id",
+                labware_id="pick-up-tip-labware-id",
+                well_name="pick-up-tip-well-name",
+            ),
+        ),
+        (
+            create_drop_tip_command(
+                pipette_id="drop-tip-pipette-id",
+                labware_id="drop-tip-labware-id",
+                well_name="drop-tip-well-name",
+            ),
+            DeckLocation(
+                pipette_id="drop-tip-pipette-id",
+                labware_id="drop-tip-labware-id",
+                well_name="drop-tip-well-name",
+            ),
+        ),
+        (
+            create_move_to_well_command(
+                pipette_id="move-to-well-pipette-id",
+                labware_id="move-to-well-labware-id",
+                well_name="move-to-well-well-name",
+            ),
+            DeckLocation(
+                pipette_id="move-to-well-pipette-id",
+                labware_id="move-to-well-labware-id",
+                well_name="move-to-well-well-name",
+            ),
+        ),
+    ),
+)
+def test_movement_commands_update_current_location(
+    command: cmd.Command,
+    expected_location: DeckLocation,
+    subject: PipetteStore,
+) -> None:
+    """It should save the last used pipette, labware, and well for movement commands."""
+    load_pipette_command = create_load_pipette_command(
+        pipette_id=command.data.pipetteId,  # type: ignore[arg-type, union-attr]
+        pipette_name=PipetteName.P300_SINGLE,
+        mount=MountType.LEFT,
+    )
+
+    subject.handle_action(UpdateCommandAction(command=load_pipette_command))
+    subject.handle_action(UpdateCommandAction(command=command))
+
+    assert subject.state.current_location == expected_location

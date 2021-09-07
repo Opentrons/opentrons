@@ -53,6 +53,7 @@ jobs:
         run: make -C robot-server lint
       - name: Test
         run: make -C robot-server test
-      - uses: 'codecov/codecov-action@v1'
+      - uses: 'codecov/codecov-action@v2'
         with:
-          file: ./robot-server/coverage.xml
+          files: ./robot-server/coverage.xml
+          flags: robot-server

@@ -13,116 +13,148 @@ they are part of the public input / output of the engine, and need validation
 and/or schema generation.
 """
 
-from typing import Union
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandRequest, CommandStatus
+from .command_mapper import CommandMapper
+from .command_unions import Command, CommandRequest, CommandResult, CommandType
 
-from .command import PendingCommand, RunningCommand, CompletedCommand, FailedCommand
+from .add_labware_definition import (
+    AddLabwareDefinition,
+    AddLabwareDefinitionData,
+    AddLabwareDefinitionRequest,
+    AddLabwareDefinitionResult,
+    AddLabwareDefinitionCommandType,
+)
 
-from .load_labware import LoadLabwareRequest, LoadLabwareResult
-from .load_pipette import LoadPipetteRequest, LoadPipetteResult
-from .move_to_well import MoveToWellRequest, MoveToWellResult
-from .pick_up_tip import PickUpTipRequest, PickUpTipResult
-from .drop_tip import DropTipRequest, DropTipResult
-from .aspirate import AspirateRequest, AspirateResult
-from .dispense import DispenseRequest, DispenseResult
-
-CommandRequestType = Union[
-    LoadLabwareRequest,
-    LoadPipetteRequest,
-    MoveToWellRequest,
-    PickUpTipRequest,
-    DropTipRequest,
+from .aspirate import (
+    Aspirate,
+    AspirateData,
     AspirateRequest,
-    DispenseRequest,
-]
-
-CommandResultType = Union[
-    LoadLabwareResult,
-    LoadPipetteResult,
-    MoveToWellResult,
-    PickUpTipResult,
-    DropTipResult,
     AspirateResult,
+    AspirateCommandType,
+)
+
+from .dispense import (
+    Dispense,
+    DispenseData,
+    DispenseRequest,
     DispenseResult,
-]
+    DispenseCommandType,
+)
 
-PendingCommandType = Union[
-    PendingCommand[LoadLabwareRequest, LoadLabwareResult],
-    PendingCommand[LoadPipetteRequest, LoadPipetteResult],
-    PendingCommand[MoveToWellRequest, MoveToWellResult],
-    PendingCommand[PickUpTipRequest, PickUpTipResult],
-    PendingCommand[DropTipRequest, DropTipResult],
-    PendingCommand[AspirateRequest, AspirateResult],
-    PendingCommand[DispenseRequest, DispenseResult],
-]
+from .drop_tip import (
+    DropTip,
+    DropTipData,
+    DropTipRequest,
+    DropTipResult,
+    DropTipCommandType,
+)
 
-RunningCommandType = Union[
-    RunningCommand[LoadLabwareRequest, LoadLabwareResult],
-    RunningCommand[LoadPipetteRequest, LoadPipetteResult],
-    RunningCommand[MoveToWellRequest, MoveToWellResult],
-    RunningCommand[PickUpTipRequest, PickUpTipResult],
-    RunningCommand[DropTipRequest, DropTipResult],
-    RunningCommand[AspirateRequest, AspirateResult],
-    RunningCommand[DispenseRequest, DispenseResult],
-]
+from .load_labware import (
+    LoadLabware,
+    LoadLabwareData,
+    LoadLabwareRequest,
+    LoadLabwareResult,
+    LoadLabwareCommandType,
+)
 
-CompletedCommandType = Union[
-    CompletedCommand[LoadLabwareRequest, LoadLabwareResult],
-    CompletedCommand[LoadPipetteRequest, LoadPipetteResult],
-    CompletedCommand[MoveToWellRequest, MoveToWellResult],
-    CompletedCommand[PickUpTipRequest, PickUpTipResult],
-    CompletedCommand[DropTipRequest, DropTipResult],
-    CompletedCommand[AspirateRequest, AspirateResult],
-    CompletedCommand[DispenseRequest, DispenseResult],
-]
+from .load_pipette import (
+    LoadPipette,
+    LoadPipetteData,
+    LoadPipetteRequest,
+    LoadPipetteResult,
+    LoadPipetteCommandType,
+)
 
-FailedCommandType = Union[
-    FailedCommand[LoadLabwareRequest],
-    FailedCommand[LoadPipetteRequest],
-    FailedCommand[MoveToWellRequest],
-    FailedCommand[PickUpTipRequest],
-    FailedCommand[DropTipRequest],
-    FailedCommand[AspirateRequest],
-    FailedCommand[DispenseRequest],
-]
+from .move_to_well import (
+    MoveToWell,
+    MoveToWellData,
+    MoveToWellRequest,
+    MoveToWellResult,
+    MoveToWellCommandType,
+)
 
-CommandType = Union[
-    PendingCommandType,
-    RunningCommandType,
-    CompletedCommandType,
-    FailedCommandType,
-]
+from .pick_up_tip import (
+    PickUpTip,
+    PickUpTipData,
+    PickUpTipRequest,
+    PickUpTipResult,
+    PickUpTipCommandType,
+)
+
+from .pause import (
+    Pause,
+    PauseData,
+    PauseRequest,
+    PauseResult,
+    PauseCommandType,
+)
+
 
 __all__ = [
-    # command lifecycle state models
-    "PendingCommand",
-    "RunningCommand",
-    "CompletedCommand",
-    "FailedCommand",
-
-    # type unions
-    "CommandRequestType",
-    "CommandResultType",
-    "PendingCommandType",
-    "RunningCommandType",
-    "CompletedCommandType",
-    "FailedCommandType",
+    # command model factory
+    "CommandMapper",
+    # command type unions
+    "Command",
+    "CommandRequest",
+    "CommandResult",
     "CommandType",
-
-    # equipment request/result models
+    # base interfaces
+    "AbstractCommandImpl",
+    "BaseCommand",
+    "BaseCommandRequest",
+    "CommandStatus",
+    # load labware command models
+    "LoadLabware",
     "LoadLabwareRequest",
+    "LoadLabwareData",
     "LoadLabwareResult",
+    "LoadLabwareCommandType",
+    # add labware definition command models
+    "AddLabwareDefinition",
+    "AddLabwareDefinitionRequest",
+    "AddLabwareDefinitionData",
+    "AddLabwareDefinitionResult",
+    "AddLabwareDefinitionCommandType",
+    # load pipette command models
+    "LoadPipette",
     "LoadPipetteRequest",
+    "LoadPipetteData",
     "LoadPipetteResult",
-
-    # pipetting request/result models
+    "LoadPipetteCommandType",
+    # move to well command models
+    "MoveToWell",
     "MoveToWellRequest",
+    "MoveToWellData",
     "MoveToWellResult",
+    "MoveToWellCommandType",
+    # pick up tip command models
+    "PickUpTip",
     "PickUpTipRequest",
+    "PickUpTipData",
     "PickUpTipResult",
+    "PickUpTipCommandType",
+    # drop tip command models
+    "DropTip",
     "DropTipRequest",
+    "DropTipData",
     "DropTipResult",
+    "DropTipCommandType",
+    # aspirate command models
+    "Aspirate",
     "AspirateRequest",
+    "AspirateData",
     "AspirateResult",
+    "AspirateCommandType",
+    # dispense command models
+    "Dispense",
     "DispenseRequest",
+    "DispenseData",
     "DispenseResult",
+    "DispenseCommandType",
+    # pause command models
+    "Pause",
+    "PauseData",
+    "PauseRequest",
+    "PauseResult",
+    "PauseCommandType",
 ]

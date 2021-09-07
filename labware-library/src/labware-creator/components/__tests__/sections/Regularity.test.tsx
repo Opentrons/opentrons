@@ -1,54 +1,81 @@
 import React from 'react'
+import { when, resetAllWhenMocks } from 'jest-when'
 import { FormikConfig } from 'formik'
-import { when } from 'jest-when'
 import { render, screen } from '@testing-library/react'
+import '@testing-library/jest-dom'
 import {
   getDefaultFormState,
+  getInitialStatus,
   LabwareFields,
-  yesNoOptions,
 } from '../../../fields'
+import { isEveryFieldHidden, getLabwareName } from '../../../utils'
 import { Regularity } from '../../sections/Regularity'
-import { getFormAlerts } from '../../utils/getFormAlerts'
-import { RadioField } from '../../RadioField'
 import { wrapInFormik } from '../../utils/wrapInFormik'
 
-jest.mock('../../RadioField')
-jest.mock('../../utils/getFormAlerts')
+jest.mock('../../../utils')
 
-const getFormAlertsMock = getFormAlerts as jest.MockedFunction<
-  typeof getFormAlerts
+const isEveryFieldHiddenMock = isEveryFieldHidden as jest.MockedFunction<
+  typeof isEveryFieldHidden
 >
-const radioFieldMock = RadioField as jest.MockedFunction<typeof RadioField>
 
-const formikConfig: FormikConfig<LabwareFields> = {
-  initialValues: getDefaultFormState(),
-  onSubmit: jest.fn(),
-}
+const getLabwareNameMock = getLabwareName as jest.MockedFunction<
+  typeof getLabwareName
+>
+
+let formikConfig: FormikConfig<LabwareFields>
 
 describe('Regularity', () => {
   beforeEach(() => {
-    radioFieldMock.mockImplementation(args => {
-      expect(args).toEqual({ name: 'homogeneousWells', options: yesNoOptions })
-      return <div>homogeneousWells radio group</div>
-    })
+    formikConfig = {
+      initialValues: getDefaultFormState(),
+      initialStatus: getInitialStatus(),
+      onSubmit: jest.fn(),
+    }
 
-    when(getFormAlertsMock)
-      .expectCalledWith({
-        values: getDefaultFormState(),
-        touched: {},
-        errors: {},
-        fieldList: ['homogeneousWells'],
-      })
-      .mockReturnValue([<div key="mock key">mock alerts</div>])
+    when(isEveryFieldHiddenMock)
+      .calledWith(['homogeneousWells'], formikConfig.initialValues)
+      .mockReturnValue(false)
   })
 
   afterEach(() => {
     jest.restoreAllMocks()
+    resetAllWhenMocks()
   })
-  it('should render with the correct information', () => {
+
+  it('should render radio fields when fields are visible', () => {
+    when(getLabwareNameMock)
+      .calledWith(formikConfig.initialValues, true)
+      .mockReturnValue('FAKE LABWARE NAME PLURAL')
+
     render(wrapInFormik(<Regularity />, formikConfig))
-    expect(screen.getByText('Regularity'))
-    expect(screen.getByText('mock alerts'))
-    expect(screen.getByText('homogeneousWells radio group'))
+    expect(screen.getByRole('heading')).toHaveTextContent(/regularity/i)
+    // TODO(IL, 2021-05-26): this should be a semantic label, but is just a div
+    screen.getByText(
+      'Are all your FAKE LABWARE NAME PLURAL the same shape and size?'
+    )
+
+    const radioElements = screen.getAllByRole('radio')
+    expect(radioElements).toHaveLength(2)
+    screen.getByRole('radio', { name: /yes/i })
+    screen.getByRole('radio', { name: /no/i })
+  })
+
+  it('should render alert when error is present', () => {
+    const FAKE_ERROR = 'ahh'
+    formikConfig.initialErrors = { homogeneousWells: FAKE_ERROR }
+    formikConfig.initialTouched = { homogeneousWells: true }
+    render(wrapInFormik(<Regularity />, formikConfig))
+
+    // TODO(IL, 2021-05-26): AlertItem should have role="alert", then we can `getByRole('alert', {name: FAKE_ERROR})`
+    screen.getByText(FAKE_ERROR)
+  })
+
+  it('should not render when all of the fields are hidden', () => {
+    when(isEveryFieldHiddenMock)
+      .calledWith(['homogeneousWells'], formikConfig.initialValues)
+      .mockReturnValue(true)
+
+    const { container } = render(wrapInFormik(<Regularity />, formikConfig))
+    expect(container.firstChild).toBe(null)
   })
 })

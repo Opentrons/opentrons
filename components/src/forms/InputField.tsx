@@ -12,7 +12,7 @@ export interface InputFieldProps {
   /** field is disabled if value is true */
   disabled?: boolean
   /** change handler */
-  onChange?: (event: React.SyntheticEvent<HTMLInputElement>) => unknown
+  onChange?: React.ChangeEventHandler<HTMLInputElement>
   /** classes to apply to outer element */
   className?: string
   /** inline label text. DEPRECATED */
@@ -93,6 +93,7 @@ function Input(props: InputFieldProps): JSX.Element {
     <div className={styles.input_field_container}>
       <div className={styles.input_field}>
         <input
+          disabled={props.disabled}
           id={props.id}
           type={props.type ?? INPUT_TYPE_TEXT}
           value={value}

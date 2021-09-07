@@ -1,12 +1,19 @@
-fixes:
-  - 'api/src/opentrons/::opentrons/'
 ignore:
-  - 'audio'
-  - 'compute'
   - '**/node_modules'
   - 'protocol-library-kludge'
-  - 'shared-data/deck/definitions'
-  - 'shared-data/labware/definitions'
-  - 'shared-data/module/definitions'
-  - 'shared-data/pipette/definitions'
   - 'webpack-config'
+  - '**/*.md'
+  - '**/*.yaml'
+  - '**/Makefile'
+  - '**/*.in'
+  - '**/*.json'
+  - '**/*.config.js'
+  - '**/*.mk'
+
+comment:
+  # add flags to `layout` configuration to show up in the PR comment
+  layout: 'reach, diff, flags, files'
+
+flag_management:
+  default_rules:
+    carryforward: true

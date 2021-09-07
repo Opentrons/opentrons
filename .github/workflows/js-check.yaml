@@ -74,5 +74,3 @@ jobs:
         run: make lint-json
       - name: 'lint css'
         run: make lint-css
-      - name: 'stylecheck js'
-        run: make format

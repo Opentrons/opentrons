@@ -20,6 +20,7 @@ class MotorName(str, Enum):
 
 class EngagedMotor(BaseModel):
     """Engaged motor"""
+
     enabled: bool = Field(..., description="Is engine enabled")
 
 
@@ -30,17 +31,16 @@ EngagedMotors = create_model(
     __base__=None,
     __module__=None,
     __validators__=None,
-    **{
-        motor.value: (EngagedMotor, ...) for motor in MotorName
-    }
+    **{motor.value: (EngagedMotor, ...) for motor in MotorName}
 )
 EngagedMotors.__doc__ = "Which motors are engaged"
 
 
 class Axes(BaseModel):
     """A list of motor axes to disengage"""
+
     axes: typing.List[MotorName]
 
-    @validator('axes', pre=True)
+    @validator("axes", pre=True)
     def lower_case_motor_name(cls, v):
         return [m.lower() for m in v]

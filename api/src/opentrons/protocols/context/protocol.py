@@ -4,20 +4,16 @@ from __future__ import annotations
 
 from abc import abstractmethod, ABC
 from dataclasses import dataclass
-from typing import (Dict, Optional)
+from typing import Dict, Optional
 
 from opentrons import types
 from opentrons.hardware_control import API, SynchronousAdapter
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.geometry.deck_item import DeckItem
-from opentrons.protocols.geometry.module_geometry import (
-    ModuleGeometry, ModuleType)
-from opentrons.protocols.context.instrument \
-    import AbstractInstrument
-from opentrons.protocols.api_support.util import (
-    AxisMaxSpeeds, HardwareManager)
-from opentrons.protocols.context.labware import \
-    AbstractLabware
+from opentrons.protocols.geometry.module_geometry import ModuleGeometry, ModuleType
+from opentrons.protocols.context.instrument import AbstractInstrument
+from opentrons.protocols.api_support.util import AxisMaxSpeeds, HardwareManager
+from opentrons.protocols.context.labware import AbstractLabware
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 
@@ -27,13 +23,13 @@ InstrumentDict = Dict[types.Mount, Optional[AbstractInstrument]]
 @dataclass(frozen=True)
 class LoadModuleResult:
     """The result of load_module"""
+
     type: ModuleType
     geometry: ModuleGeometry
     module: SynchronousAdapter
 
 
 class AbstractProtocol(ABC):
-
     @abstractmethod
     def get_bundled_data(self) -> Dict[str, bytes]:
         """Get a mapping of name to contents"""
@@ -73,30 +69,31 @@ class AbstractProtocol(ABC):
 
     @abstractmethod
     def load_labware_from_definition(
-            self,
-            labware_def: LabwareDefinition,
-            location: types.DeckLocation,
-            label: Optional[str],
+        self,
+        labware_def: LabwareDefinition,
+        location: types.DeckLocation,
+        label: Optional[str],
     ) -> AbstractLabware:
         ...
 
     @abstractmethod
     def load_labware(
-            self,
-            load_name: str,
-            location: types.DeckLocation,
-            label: Optional[str],
-            namespace: Optional[str],
-            version: Optional[int],
+        self,
+        load_name: str,
+        location: types.DeckLocation,
+        label: Optional[str],
+        namespace: Optional[str],
+        version: Optional[int],
     ) -> AbstractLabware:
         ...
 
     @abstractmethod
     def load_module(
-            self,
-            module_name: str,
-            location: Optional[types.DeckLocation],
-            configuration: Optional[str]) -> Optional[LoadModuleResult]:
+        self,
+        module_name: str,
+        location: Optional[types.DeckLocation],
+        configuration: Optional[str],
+    ) -> Optional[LoadModuleResult]:
         ...
 
     @abstractmethod
@@ -105,10 +102,8 @@ class AbstractProtocol(ABC):
 
     @abstractmethod
     def load_instrument(
-            self,
-            instrument_name: str,
-            mount: types.Mount,
-            replace: bool) -> AbstractInstrument:
+        self, instrument_name: str, mount: types.Mount, replace: bool
+    ) -> AbstractInstrument:
         ...
 
     @abstractmethod
@@ -116,8 +111,7 @@ class AbstractProtocol(ABC):
         ...
 
     @abstractmethod
-    def pause(self,
-              msg: Optional[str]) -> None:
+    def pause(self, msg: Optional[str]) -> None:
         ...
 
     @abstractmethod
@@ -125,14 +119,11 @@ class AbstractProtocol(ABC):
         ...
 
     @abstractmethod
-    def comment(self,
-                msg: str) -> None:
+    def comment(self, msg: str) -> None:
         ...
 
     @abstractmethod
-    def delay(self,
-              seconds: float,
-              msg: Optional[str]) -> None:
+    def delay(self, seconds: float, msg: Optional[str]) -> None:
         ...
 
     @abstractmethod

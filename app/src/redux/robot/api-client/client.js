@@ -22,8 +22,6 @@ import { fileIsBundle, fileIsPython } from '../../protocol/protocol-data'
 import { getCustomLabwareDefinitions } from '../../custom-labware/selectors'
 import { normalizeModuleModel } from '@opentrons/shared-data'
 
-const RUN_TIME_TICK_INTERVAL_MS = 1000
-const NO_INTERVAL = -1
 const RE_TIPRACK = /tip ?rack/i
 
 const THIS_ROBOT_DOES_NOT_SUPPORT_BUNDLES =
@@ -39,9 +37,6 @@ export function client(dispatch) {
   let freshUpload = false
   let rpcClient
   let remote
-
-  // TODO(mc, 2017-09-22): build some sort of timer middleware instead?
-  let runTimerInterval = NO_INTERVAL
 
   // return an action handler
   return function receive(state = {}, action = {}) {
@@ -150,7 +145,6 @@ export function client(dispatch) {
       rpcClient = null
     }
 
-    clearRunTimerInterval()
     remote = null
     dispatch(actions.disconnectResponse())
   }
@@ -388,12 +382,10 @@ export function client(dispatch) {
   }
 
   function run(state, action) {
-    setRunTimerInterval()
     remote.session_manager.session
       .run()
       .then(() => dispatch(actions.runResponse()))
       .catch(error => dispatch(actions.runResponse(error)))
-      .then(() => clearRunTimerInterval())
   }
 
   function pause(state, action) {
@@ -426,29 +418,8 @@ export function client(dispatch) {
       .catch(error => dispatch(actions.sessionResponse(error)))
   }
 
-  function setRunTimerInterval() {
-    if (runTimerInterval === NO_INTERVAL) {
-      runTimerInterval = setInterval(
-        () => dispatch(actions.tickRunTime()),
-        RUN_TIME_TICK_INTERVAL_MS
-      )
-    }
-  }
-
-  function clearRunTimerInterval() {
-    clearInterval(runTimerInterval)
-    runTimerInterval = NO_INTERVAL
-  }
-
   function handleApiSession(apiSession) {
     const update = { state: apiSession.state, startTime: apiSession.startTime }
-
-    // ensure run timer is running or stopped
-    if (update.state === constants.RUNNING) {
-      setRunTimerInterval()
-    } else {
-      clearRunTimerInterval()
-    }
 
     update.statusInfo = {
       message: apiSession.stateInfo?.message ?? null,
@@ -643,11 +614,12 @@ export function client(dispatch) {
       update.labwareBySlot[slot] = labware
     }
 
-    function addApiModuleToModules(apiModule) {
+    function addApiModuleToModules(apiModule, index) {
       const { name, ...noName } = apiModule
       update.modulesBySlot[apiModule.slot] = {
         ...noName,
         model: apiModule?.model ?? normalizeModuleModel(apiModule.name),
+        protocolLoadOrder: index,
       }
     }
   }

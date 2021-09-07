@@ -6,10 +6,10 @@ const FULLSTORY_ORG = process.env.OT_LL_FULLSTORY_ORG
 export const initializeFullstory = (): void => {
   console.debug('initializing Fullstory')
   // NOTE: this code snippet is distributed by Fullstory, last updated 2019-10-04
-  global['_fs_debug'] = false
-  global['_fs_host'] = 'fullstory.com'
-  global['_fs_org'] = FULLSTORY_ORG
-  global['_fs_namespace'] = FULLSTORY_NAMESPACE
+  global._fs_debug = false
+  global._fs_host = 'fullstory.com'
+  global._fs_org = FULLSTORY_ORG
+  global._fs_namespace = FULLSTORY_NAMESPACE
   ;(function (m, n, e, t, l, o, g, y) {
     if (e in m) {
       if (m.console && m.console.log) {
@@ -58,7 +58,7 @@ export const initializeFullstory = (): void => {
       g(o, v)
     }
     g.clearUserCookie = function () {}
-  })(global, global.document, global['_fs_namespace'], 'script', 'user')
+  })(global, global.document, global._fs_namespace, 'script', 'user')
 
   _setAnalyticsTags()
 }

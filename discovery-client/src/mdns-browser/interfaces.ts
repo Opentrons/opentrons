@@ -18,6 +18,7 @@ export function getSystemInterfaces(): NetworkInterface[] {
   const interfaceMap = networkInterfaces()
 
   return Object.keys(interfaceMap).flatMap(ifaceName => {
+    // @ts-expect-error TS thinks interfaceMap[ifaceName] could be undefined because Object.keys returns a list of strings (too generic)
     return interfaceMap[ifaceName]
       .filter(iface => iface.family === 'IPv4' && !iface.internal)
       .map(iface => ({ name: ifaceName, address: iface.address }))

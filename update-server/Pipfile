@@ -3,26 +3,28 @@ url = "https://pypi.python.org/simple"
 verify_ssl = true
 name = "pypi"
 
+[requires]
+python_version = "3.7"
+
 [packages]
-"e1839a8" = {path = ".", editable = true}
-virtualenv = "*"
 aiohttp = "==3.4.4"
 
 [dev-packages]
+otupdate = {path = ".", editable = true}
 flake8 = "~=3.9.0"
 flake8-annotations = "~=2.6.2"
 flake8-docstrings = "~=1.6.0"
 flake8-noqa = "~=1.1.0"
 pytest = "==6.1.0"
 pytest-watch = "~=4.2.0"
-pytest-cov = "<2.11.0"
+pytest-cov = "==2.10.1"
 pytest-aiohttp = "*"
 twine = ">=1.12.0"
 wheel = "==0.30.0"
-coverage = "==4.4.2"
-colorama = "*"
+coverage = "==5.1"
 mypy = "==0.800"
-typing-extensions = "*"
-
-[requires]
-python_version = "3.7"
+typing-extensions = "==3.10.0.0"
+# pytest dependencies on windows, spec'd here to force lockfile inclusion
+# https://github.com/pypa/pipenv/issues/4408#issuecomment-668324177
+atomicwrites = {version="==1.4.0", sys_platform="== 'win32'"}
+colorama = {version="==0.4.4", sys_platform="== 'win32'"}

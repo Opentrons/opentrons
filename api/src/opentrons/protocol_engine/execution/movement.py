@@ -3,23 +3,23 @@ from typing import Optional
 from opentrons.hardware_control.api import API as HardwareAPI
 
 from ..types import DeckLocation, WellLocation
-from ..state import StateView
+from ..state import StateStore
 
 
 class MovementHandler:
     """Implementation logic for gantry movement."""
 
-    _state: StateView
-    _hardware: HardwareAPI
+    _state_store: StateStore
+    _hardware_api: HardwareAPI
 
     def __init__(
         self,
-        state: StateView,
-        hardware: HardwareAPI,
+        state_store: StateStore,
+        hardware_api: HardwareAPI,
     ) -> None:
         """Initialize a MovementHandler instance."""
-        self._state = state
-        self._hardware = hardware
+        self._state_store = state_store
+        self._hardware_api = hardware_api
 
     async def move_to_well(
         self,
@@ -31,7 +31,7 @@ class MovementHandler:
     ) -> None:
         """Move to a specific well."""
         # get the pipette's mount and current critical point, if applicable
-        pipette_location = self._state.motion.get_pipette_location(
+        pipette_location = self._state_store.motion.get_pipette_location(
             pipette_id=pipette_id,
             current_location=current_location,
         )
@@ -40,14 +40,14 @@ class MovementHandler:
         origin_cp = pipette_location.critical_point
 
         # get the origin of the movement from the hardware controller
-        origin = await self._hardware.gantry_position(
+        origin = await self._hardware_api.gantry_position(
             mount=hw_mount,
             critical_point=origin_cp,
         )
-        max_travel_z = self._hardware.get_instrument_max_height(mount=hw_mount)
+        max_travel_z = self._hardware_api.get_instrument_max_height(mount=hw_mount)
 
         # calculate the movement's waypoints
-        waypoints = self._state.motion.get_movement_waypoints(
+        waypoints = self._state_store.motion.get_movement_waypoints(
             pipette_id=pipette_id,
             labware_id=labware_id,
             well_name=well_name,
@@ -60,8 +60,8 @@ class MovementHandler:
 
         # move through the waypoints
         for wp in waypoints:
-            await self._hardware.move_to(
+            await self._hardware_api.move_to(
                 mount=hw_mount,
                 abs_position=wp.position,
-                critical_point=wp.critical_point
+                critical_point=wp.critical_point,
             )

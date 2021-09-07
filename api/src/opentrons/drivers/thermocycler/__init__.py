@@ -1,7 +1,6 @@
-from .driver import Thermocycler, SimulatingDriver, ThermocyclerError
+from .driver import ThermocyclerDriver
+from .simulator import SimulatingDriver
+from .abstract import AbstractThermocyclerDriver
 
-__all__ = [
-    'Thermocycler',
-    'SimulatingDriver',
-    'ThermocyclerError'
-]
+
+__all__ = ["ThermocyclerDriver", "SimulatingDriver", "AbstractThermocyclerDriver"]

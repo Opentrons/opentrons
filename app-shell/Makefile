@@ -110,7 +110,7 @@ dist-macos-latest: dist-osx
 dist-ubuntu-latest: dist-linux
 
 .PHONY: dist-ubuntu-18.04
-dist-ubuntu-latest: dist-linux
+dist-ubuntu-18.04: dist-linux
 
 .PHONY: dist-windows-latest
 dist-windows-latest: dist-win

@@ -44,9 +44,9 @@ This accomplishes the same thing as the following basic commands:
         p300 = protocol.load_instrument('p300_single', 'right', tip_racks=[tiprack_1])
 
         p300.pick_up_tip()
-        p300.aspirate(100, plate.wells('A1'))
-        p300.dispense(100, plate.wells('B1'))
-        p300.return_tip()
+        p300.aspirate(100, plate['A1'])
+        p300.dispense(100, plate['B1'])
+        p300.drop_tip()
 
 ******************************
 

@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [4.3.0-beta.0](https://github.com/Opentrons/opentrons/compare/v4.3.0-alpha.3...v4.3.0-beta.0) (2021-04-19)
+# [4.5.0](https://github.com/Opentrons/opentrons/compare/v4.4.0...v4.5.0) (2021-08-03)
 
 **Note:** Version bump only for package protocol-designer
 
@@ -11,7 +11,25 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 
 
-# [4.3.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v4.3.0-alpha.2...v4.3.0-alpha.3) (2021-04-19)
+# [4.4.0](https://github.com/Opentrons/opentrons/compare/v4.3.1...v4.4.0) (2021-06-16)
+
+
+### Features
+
+* **components, protocol-library:** pass thru semantic 'disabled' attr to InputField elem ([#7759](https://github.com/Opentrons/opentrons/issues/7759)) ([1ec53d1](https://github.com/Opentrons/opentrons/commit/1ec53d1))
+* **labware-library:** fix mixpanel id bug ([#7761](https://github.com/Opentrons/opentrons/issues/7761)) ([6a9d611](https://github.com/Opentrons/opentrons/commit/6a9d611)), closes [#7536](https://github.com/Opentrons/opentrons/issues/7536)
+* **protocol-designer:** Add batch edit hint modal ([#7626](https://github.com/Opentrons/opentrons/issues/7626)) ([0ff9179](https://github.com/Opentrons/opentrons/commit/0ff9179)), closes [#7488](https://github.com/Opentrons/opentrons/issues/7488)
+* **protocol-designer:** add DOM identifiers for e2e tests ([#7667](https://github.com/Opentrons/opentrons/issues/7667)) ([d4e43e1](https://github.com/Opentrons/opentrons/commit/d4e43e1)), closes [#7607](https://github.com/Opentrons/opentrons/issues/7607)
+* **protocol-designer:** add form level volume error to mix form ([#7625](https://github.com/Opentrons/opentrons/issues/7625)) ([3393368](https://github.com/Opentrons/opentrons/commit/3393368))
+* **protocol-designer:** Add tooltip for indeterminate checkboxes ([#7614](https://github.com/Opentrons/opentrons/issues/7614)) ([b1f43fb](https://github.com/Opentrons/opentrons/commit/b1f43fb)), closes [#7491](https://github.com/Opentrons/opentrons/issues/7491)
+* **protocol-designer:** remove FF and bump version for batch edit mix ([#7679](https://github.com/Opentrons/opentrons/issues/7679)) ([1968164](https://github.com/Opentrons/opentrons/commit/1968164)), closes [#7560](https://github.com/Opentrons/opentrons/issues/7560)
+* **protocol-designer:** show default tooltips when no indeterminate available ([#7714](https://github.com/Opentrons/opentrons/issues/7714)) ([c623f0c](https://github.com/Opentrons/opentrons/commit/c623f0c)), closes [#7711](https://github.com/Opentrons/opentrons/issues/7711)
+
+
+
+
+
+## [4.3.1](https://github.com/Opentrons/opentrons/compare/v4.3.0...v4.3.1) (2021-05-10)
 
 **Note:** Version bump only for package protocol-designer
 
@@ -19,24 +37,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 
 
-# [4.3.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v4.3.0-alpha.1...v4.3.0-alpha.2) (2021-04-19)
-
-**Note:** Version bump only for package protocol-designer
-
-
-
-
-
-# [4.3.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v4.3.0-alpha.0...v4.3.0-alpha.1) (2021-04-15)
-
-**Note:** Version bump only for package protocol-designer
-
-
-
-
-
-# [4.3.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v4.2.1...v4.3.0-alpha.0) (2021-04-14)
-
+# [4.3.0](https://github.com/Opentrons/opentrons/compare/v4.2.1...v4.3.0) (2021-05-06)
 
 ### Bug Fixes
 

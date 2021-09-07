@@ -1,189 +1,275 @@
 """Tests for the ProtocolEngine class."""
-from datetime import datetime, timezone
-from math import isclose
-from mock import AsyncMock, MagicMock  # type: ignore[attr-defined]
-from typing import cast
+import pytest
+from datetime import datetime
+from decoy import Decoy
 
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV2
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
-from opentrons.types import DeckSlotName
-from opentrons.protocols.geometry.deck import FIXED_TRASH_ID
+from opentrons.types import MountType
+from opentrons.hardware_control import API as HardwareAPI
+from opentrons.protocol_engine import ProtocolEngine, commands
+from opentrons.protocol_engine.types import PipetteName
+from opentrons.protocol_engine.commands import CommandMapper
+from opentrons.protocol_engine.execution import QueueWorker
+from opentrons.protocol_engine.resources import ModelUtils
 
-from opentrons.protocol_engine import ProtocolEngine, errors
-from opentrons.protocol_engine.types import DeckSlotLocation
-from opentrons.protocol_engine.commands import (
-    MoveToWellRequest,
-    MoveToWellResult,
-    PendingCommand,
-    RunningCommand,
-    CompletedCommand,
-    FailedCommand,
+from opentrons.protocol_engine.state import (
+    StateStore,
+    PlayAction,
+    PauseAction,
+    StopAction,
+    UpdateCommandAction,
 )
-from opentrons.protocol_engine.state import LabwareData
-from opentrons.protocol_engine.commands.move_to_well import MoveToWellImplementation
 
 
-class CloseToNow:
-    """Matcher for any datetime that is close to now."""
+@pytest.fixture
+def state_store(decoy: Decoy) -> StateStore:
+    """Get a mock StateStore."""
+    return decoy.mock(cls=StateStore)
 
-    def __init__(self) -> None:
-        """Initialize a CloseToNow matcher."""
-        self._now = datetime.now(tz=timezone.utc)
 
-    def __eq__(self, other: object) -> bool:
-        """Check if a target object is a datetime that is close to now."""
-        return (
-            isinstance(other, datetime) and
-            isclose(self._now.timestamp(), other.timestamp(), rel_tol=5)
+@pytest.fixture
+def queue_worker(decoy: Decoy) -> QueueWorker:
+    """Get a mock QueueWorker."""
+    return decoy.mock(cls=QueueWorker)
+
+
+@pytest.fixture
+def command_mapper(decoy: Decoy) -> CommandMapper:
+    """Get a mock CommandMapper."""
+    return decoy.mock(cls=CommandMapper)
+
+
+@pytest.fixture
+def model_utils(decoy: Decoy) -> ModelUtils:
+    """Get mock ModelUtils."""
+    return decoy.mock(cls=ModelUtils)
+
+
+@pytest.fixture
+def hardware_api(decoy: Decoy) -> HardwareAPI:
+    """Get a mock HardwareAPI."""
+    return decoy.mock(cls=HardwareAPI)
+
+
+@pytest.fixture
+def subject(
+    state_store: StateStore,
+    command_mapper: CommandMapper,
+    model_utils: ModelUtils,
+    queue_worker: QueueWorker,
+    hardware_api: HardwareAPI,
+) -> ProtocolEngine:
+    """Get a ProtocolEngine test subject with its dependencies stubbed out."""
+    return ProtocolEngine(
+        hardware_api=hardware_api,
+        state_store=state_store,
+        queue_worker=queue_worker,
+        command_mapper=command_mapper,
+        model_utils=model_utils,
+    )
+
+
+def test_add_command(
+    decoy: Decoy,
+    state_store: StateStore,
+    command_mapper: CommandMapper,
+    model_utils: ModelUtils,
+    queue_worker: QueueWorker,
+    subject: ProtocolEngine,
+) -> None:
+    """It should add a command to the state from a request."""
+    data = commands.LoadPipetteData(
+        mount=MountType.LEFT,
+        pipetteName=PipetteName.P300_SINGLE,
+    )
+
+    request = commands.LoadPipetteRequest(data=data)
+
+    created_at = datetime(year=2021, month=1, day=1)
+
+    queued_command = commands.LoadPipette(
+        id="command-id",
+        status=commands.CommandStatus.QUEUED,
+        createdAt=created_at,
+        data=data,
+    )
+
+    decoy.when(model_utils.generate_id()).then_return("command-id")
+    decoy.when(model_utils.get_timestamp()).then_return(created_at)
+    decoy.when(
+        command_mapper.map_request_to_command(
+            request=request,
+            command_id="command-id",
+            created_at=created_at,
         )
+    ).then_return(queued_command)
 
-    def __repr__(self) -> str:
-        """Represent the matcher as a string."""
-        return f"<datetime close to {self._now}>"
+    result = subject.add_command(request)
 
-
-async def test_create_engine_initializes_state_with_deck_geometry(
-    mock_hardware: MagicMock,
-    standard_deck_def: DeckDefinitionV2,
-    fixed_trash_def: LabwareDefinition,
-) -> None:
-    """It should load deck geometry data into the store on create."""
-    engine = await ProtocolEngine.create(hardware=mock_hardware)
-    state = engine.state_store
-
-    assert state.geometry.get_deck_definition() == standard_deck_def
-    assert state.labware.get_labware_data_by_id(FIXED_TRASH_ID) == LabwareData(
-        location=DeckSlotLocation(slot=DeckSlotName.FIXED_TRASH),
-        definition=fixed_trash_def,
-        calibration=(0, 0, 0),
+    assert result == queued_command
+    decoy.verify(
+        state_store.handle_action(UpdateCommandAction(command=queued_command)),
     )
 
 
-async def test_execute_command_creates_command(
-    engine: ProtocolEngine,
-    mock_state_store: MagicMock
+async def test_execute_command(
+    decoy: Decoy,
+    state_store: StateStore,
+    command_mapper: CommandMapper,
+    model_utils: ModelUtils,
+    queue_worker: QueueWorker,
+    subject: ProtocolEngine,
 ) -> None:
-    """It should create a command in the state store when executing."""
-    req = MoveToWellRequest(pipetteId="123", labwareId="abc", wellName="A1")
+    """It should add and execute a command from a request."""
+    created_at = datetime(year=2021, month=1, day=1)
+    completed_at = datetime(year=2023, month=3, day=3)
 
-    await engine.execute_command(req, command_id="unique-id")
-    mock_state_store.handle_command.assert_any_call(
-        RunningCommand(
-            created_at=cast(datetime, CloseToNow()),
-            started_at=cast(datetime, CloseToNow()),
-            request=req
+    data = commands.LoadPipetteData(
+        mount=MountType.LEFT,
+        pipetteName=PipetteName.P300_SINGLE,
+    )
+
+    request = commands.LoadPipetteRequest(data=data)
+
+    queued_command = commands.LoadPipette(
+        id="command-id",
+        status=commands.CommandStatus.QUEUED,
+        createdAt=created_at,
+        data=data,
+    )
+
+    executed_command = commands.LoadPipette(
+        id="command-id",
+        status=commands.CommandStatus.SUCCEEDED,
+        createdAt=created_at,
+        startedAt=created_at,
+        completedAt=completed_at,
+        data=data,
+    )
+
+    decoy.when(model_utils.generate_id()).then_return("command-id")
+    decoy.when(model_utils.get_timestamp()).then_return(created_at)
+
+    decoy.when(
+        command_mapper.map_request_to_command(
+            command_id="command-id",
+            created_at=created_at,
+            request=request,
+        )
+    ).then_return(queued_command)
+
+    decoy.when(state_store.commands.get(command_id="command-id")).then_return(
+        executed_command
+    )
+
+    result = await subject.add_and_execute_command(request)
+
+    assert result == executed_command
+
+    decoy.verify(
+        state_store.handle_action(UpdateCommandAction(command=queued_command)),
+        await state_store.wait_for(
+            condition=state_store.commands.get_is_complete,
+            command_id="command-id",
         ),
-        command_id="unique-id"
     )
 
 
-async def test_execute_command_calls_implementation_executor(
-    engine: ProtocolEngine,
-    mock_handlers: AsyncMock,
+def test_play(
+    decoy: Decoy,
+    state_store: StateStore,
+    subject: ProtocolEngine,
 ) -> None:
-    """It should create a command in the state store when executing."""
-    mock_req = MagicMock(spec=MoveToWellRequest)
-    mock_impl = AsyncMock(spec=MoveToWellImplementation)
+    """It should be able to start executing queued commands."""
+    subject.play()
 
-    mock_req.get_implementation.return_value = mock_impl
-
-    await engine.execute_command(mock_req, command_id="unique-id")
-
-    mock_impl.execute.assert_called_with(mock_handlers)
+    decoy.verify(
+        state_store.commands.validate_action_allowed(PlayAction()),
+        state_store.handle_action(PlayAction()),
+    )
 
 
-async def test_execute_command_adds_result_to_state(
-    engine: ProtocolEngine,
-    mock_handlers: AsyncMock,
-    mock_state_store: MagicMock,
-    now: datetime,
+def test_pause(
+    decoy: Decoy,
+    state_store: StateStore,
+    subject: ProtocolEngine,
 ) -> None:
-    """It should upsert the completed command into state."""
-    result = MoveToWellResult()
-    mock_req = MagicMock(spec=MoveToWellRequest)
-    mock_impl = AsyncMock(spec=MoveToWellImplementation)
+    """It should be able to pause executing queued commands."""
+    subject.pause()
 
-    mock_req.get_implementation.return_value = mock_impl
-    mock_impl.create_command.return_value = PendingCommand(
-        request=mock_req,
-        created_at=now
-    )
-    mock_impl.execute.return_value = result
-
-    cmd = await engine.execute_command(mock_req, command_id="unique-id")
-
-    assert cmd == CompletedCommand(
-        created_at=cast(datetime, CloseToNow()),
-        started_at=cast(datetime, CloseToNow()),
-        completed_at=cast(datetime, CloseToNow()),
-        request=mock_req,
-        result=result,
-    )
-
-    mock_state_store.handle_command.assert_called_with(
-        cmd,
-        command_id="unique-id",
+    decoy.verify(
+        state_store.commands.validate_action_allowed(PauseAction()),
+        state_store.handle_action(PauseAction()),
     )
 
 
-async def test_execute_command_adds_error_to_state(
-    engine: ProtocolEngine,
-    mock_handlers: AsyncMock,
-    mock_state_store: MagicMock,
-    now: datetime,
+async def test_stop(
+    decoy: Decoy,
+    state_store: StateStore,
+    queue_worker: QueueWorker,
+    hardware_api: HardwareAPI,
+    subject: ProtocolEngine,
 ) -> None:
-    """It should upsert a failed command into state."""
-    error = errors.ProtocolEngineError("oh no!")
-    mock_req = MagicMock(spec=MoveToWellRequest)
-    mock_impl = AsyncMock(spec=MoveToWellImplementation)
+    """It should be able to stop the engine."""
+    await subject.stop()
 
-    mock_req.get_implementation.return_value = mock_impl
-    mock_impl.create_command.return_value = PendingCommand(
-        request=mock_req,
-        created_at=now
-    )
-    mock_impl.execute.side_effect = error
-
-    cmd = await engine.execute_command(mock_req, command_id="unique-id")
-
-    assert cmd == FailedCommand(
-        created_at=cast(datetime, CloseToNow()),
-        started_at=cast(datetime, CloseToNow()),
-        failed_at=cast(datetime, CloseToNow()),
-        request=mock_req,
-        error=error,
-    )
-
-    mock_state_store.handle_command.assert_called_with(
-        cmd,
-        command_id="unique-id",
+    decoy.verify(
+        state_store.handle_action(StopAction()),
+        await queue_worker.join(),
+        await hardware_api.stop(home_after=False),
     )
 
 
-async def test_execute_command_adds_unexpected_error_to_state(
-    engine: ProtocolEngine,
-    mock_handlers: AsyncMock,
-    mock_state_store: MagicMock,
-    now: datetime,
+async def test_stop_stops_hardware_if_queue_worker_join_fails(
+    decoy: Decoy,
+    state_store: StateStore,
+    queue_worker: QueueWorker,
+    hardware_api: HardwareAPI,
+    subject: ProtocolEngine,
 ) -> None:
-    """It should upsert an unexpectedly failed command into state."""
-    error = RuntimeError("oh no!")
-    mock_req = MagicMock(spec=MoveToWellRequest)
-    mock_impl = AsyncMock(spec=MoveToWellImplementation)
+    """It should be able to stop the engine."""
+    decoy.when(
+        await queue_worker.join(),
+    ).then_raise(RuntimeError("oh no"))
 
-    mock_req.get_implementation.return_value = mock_impl
-    mock_impl.create_command.return_value = PendingCommand(
-        request=mock_req,
-        created_at=now
+    with pytest.raises(RuntimeError, match="oh no"):
+        await subject.stop()
+
+    decoy.verify(
+        await hardware_api.stop(home_after=False),
+        times=1,
     )
-    mock_impl.execute.side_effect = error
 
-    cmd = await engine.execute_command(mock_req, command_id="unique-id")
 
-    assert type(cmd.error) == errors.UnexpectedProtocolError  # type: ignore[union-attr]
-    assert cmd.error.original_error == error  # type: ignore[union-attr]
+async def test_stop_after_wait(
+    decoy: Decoy,
+    state_store: StateStore,
+    queue_worker: QueueWorker,
+    hardware_api: HardwareAPI,
+    subject: ProtocolEngine,
+) -> None:
+    """It should be able to stop the engine after waiting for commands to complete."""
+    await subject.stop(wait_until_complete=True)
 
-    mock_state_store.handle_command.assert_called_with(
-        cmd,
-        command_id="unique-id",
+    decoy.verify(
+        await state_store.wait_for(condition=state_store.commands.get_all_complete),
+        state_store.handle_action(StopAction()),
+        await queue_worker.join(),
+        await hardware_api.stop(home_after=False),
+    )
+
+
+async def test_halt(
+    decoy: Decoy,
+    state_store: StateStore,
+    queue_worker: QueueWorker,
+    hardware_api: HardwareAPI,
+    subject: ProtocolEngine,
+) -> None:
+    """It should be able to halt the engine."""
+    await subject.halt()
+
+    decoy.verify(
+        state_store.handle_action(StopAction()),
+        queue_worker.cancel(),
+        await hardware_api.halt(),
     )

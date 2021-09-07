@@ -1,130 +1,70 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
 import assert from 'assert'
 import Ajv from 'ajv'
-import cx from 'classnames'
 import * as React from 'react'
 import { Formik } from 'formik'
-import mapValues from 'lodash/mapValues'
 import { saveAs } from 'file-saver'
 import JSZip from 'jszip'
 import { reportEvent } from '../analytics'
 import { reportErrors } from './analyticsUtils'
-import { AlertModal, PrimaryButton } from '@opentrons/components'
+import { AlertModal } from '@opentrons/components'
 import labwareSchema from '@opentrons/shared-data/labware/schemas/2.json'
-import { makeMaskToDecimal, maskToInteger, maskLoadName } from './fieldMasks'
 import {
-  tubeRackInsertOptions,
   aluminumBlockAutofills,
-  aluminumBlockTypeOptions,
   aluminumBlockChildTypeOptions,
+  aluminumBlockTypeOptions,
+  FormStatus,
   getDefaultFormState,
-  getImplicitAutofillValues,
-  yesNoOptions,
+  getInitialStatus,
   tubeRackAutofills,
+  tubeRackInsertOptions,
 } from './fields'
+import { makeAutofillOnChange } from './utils/makeAutofillOnChange'
 import { labwareDefToFields } from './labwareDefToFields'
 import { labwareFormSchema } from './labwareFormSchema'
-import { getDefaultDisplayName, getDefaultLoadName } from './formSelectors'
-import { labwareTestProtocol, pipetteNameOptions } from './labwareTestProtocol'
+import {
+  formLevelValidation,
+  LabwareCreatorErrors,
+} from './formLevelValidation'
+import { labwareTestProtocol } from './testProtocols/labwareTestProtocol'
+import { tipRackTestProtocol } from './testProtocols/tipRackTestProtocol'
 import { fieldsToLabware } from './fieldsToLabware'
 import { LabwareCreator as LabwareCreatorComponent } from './components/LabwareCreator'
-import { ConditionalLabwareRender } from './components/ConditionalLabwareRender'
 import { Dropdown } from './components/Dropdown'
 import { IntroCopy } from './components/IntroCopy'
-import { LinkOut } from './components/LinkOut'
-import { RadioField } from './components/RadioField'
-import { Section } from './components/Section'
-import { TextField } from './components/TextField'
-import { HeightGuidingText } from './components/HeightGuidingText'
+
 import { ImportErrorModal } from './components/ImportErrorModal'
 import { CreateNewDefinition } from './components/sections/CreateNewDefinition'
 import { UploadExisting } from './components/sections/UploadExisting'
-import { Regularity } from './components/sections/Regularity'
-import { getHeightAlerts } from './components/utils/getHeightAlerts'
+
+import { CustomTiprackWarning } from './components/sections/CustomTiprackWarning'
+import { Description } from './components/sections/Description'
+import { Export } from './components/sections/Export'
+import { File } from './components/sections/File'
 import { Footprint } from './components/sections/Footprint'
-import {
-  HeightImg,
-  GridImg,
-  WellXYImg,
-  XYSpacingImg,
-  DepthImg,
-  XYOffsetImg,
-} from './components/diagrams'
-import {
-  wellShapeOptionsWithIcons,
-  wellBottomShapeOptionsWithIcons,
-} from './components/optionsWithImages'
+import { Grid } from './components/sections/Grid'
+import { GridOffset } from './components/sections/GridOffset'
+import { HandPlacedTipFit } from './components/sections/HandPlacedTipFit'
+import { Height } from './components/sections/Height'
+import { Preview } from './components/sections/Preview'
+import { Regularity } from './components/sections/Regularity'
+import { Volume } from './components/sections/Volume'
+import { WellBottomAndDepth } from './components/sections/WellBottomAndDepth'
+import { WellShapeAndSides } from './components/sections/WellShapeAndSides'
+import { WellSpacing } from './components/sections/WellSpacing'
+
 import styles from './styles.css'
 
-import type { FormikProps, FormikTouched } from 'formik'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   ImportError,
   LabwareFields,
   ProcessedLabwareFields,
 } from './fields'
+import { getDefaultedDef } from './getDefaultedDef'
+import { getIsXYGeometryChanged } from './utils/getIsXYGeometryChanged'
 
 const ajv = new Ajv()
 const validateLabwareSchema = ajv.compile(labwareSchema)
-
-const maskTo2Decimal = makeMaskToDecimal(2)
-
-interface MakeAutofillOnChangeArgs {
-  name: keyof LabwareFields
-  autofills: Record<string, Partial<LabwareFields>>
-  values: LabwareFields
-  touched: Object
-  setTouched: (touched: FormikTouched<LabwareFields>) => unknown
-  setValues: (values: LabwareFields) => unknown
-}
-
-const PDF_URL =
-  'https://opentrons-publications.s3.us-east-2.amazonaws.com/labwareDefinition_testGuide.pdf'
-
-const makeAutofillOnChange = ({
-  autofills,
-  values,
-  touched,
-  setValues,
-  setTouched,
-}: MakeAutofillOnChangeArgs) => (
-  name: string,
-  value: string | null | undefined
-) => {
-  if (value == null) {
-    console.log(`no value for ${name}, skipping autofill`)
-    return
-  }
-  const _autofillValues = autofills[value]
-  if (_autofillValues) {
-    const autofillValues = {
-      ..._autofillValues,
-      ...getImplicitAutofillValues(_autofillValues),
-    }
-
-    const namesToTrue = mapValues(autofillValues, () => true)
-    setValues({
-      ...values,
-      ...autofillValues,
-      [name]: value,
-    })
-    setTouched({
-      ...touched,
-      ...namesToTrue,
-    })
-  } else {
-    console.error(
-      `expected autofills for ${name}: ${value} -- is the value missing from the autofills object?`
-    )
-  }
-}
-
-const displayAsTube = (values: LabwareFields): boolean =>
-  values.labwareType === 'tubeRack' ||
-  (values.labwareType === 'aluminumBlock' &&
-    values.aluminumBlockType === '96well' &&
-    // @ts-expect-error(IL, 2021-03-24): `includes` doesn't want to take null/undefined
-    ['tubes', 'pcrTubeStrip'].includes(values.aluminumBlockChildType))
 
 export const LabwareCreator = (): JSX.Element => {
   const [
@@ -292,7 +232,8 @@ export const LabwareCreator = (): JSX.Element => {
           setLastUploaded(fields, parsedLabwareDef)
           if (
             fields.labwareType === 'wellPlate' ||
-            fields.labwareType === 'reservoir'
+            fields.labwareType === 'reservoir' ||
+            fields.labwareType === 'tipRack'
           ) {
             // no additional required labware type child fields, we can scroll right away
             scrollToForm()
@@ -343,6 +284,8 @@ export const LabwareCreator = (): JSX.Element => {
         initialValues={lastUploaded || getDefaultFormState()}
         enableReinitialize
         validationSchema={labwareFormSchema}
+        validate={formLevelValidation}
+        initialStatus={getInitialStatus}
         onSubmit={(values: LabwareFields) => {
           const castValues: ProcessedLabwareFields = labwareFormSchema.cast(
             values
@@ -352,12 +295,15 @@ export const LabwareCreator = (): JSX.Element => {
           const { displayName } = def.metadata
           const { loadName } = def.parameters
 
+          const testProtocol =
+            values.labwareType === 'tipRack'
+              ? tipRackTestProtocol({ pipetteName, definition: def })
+              : labwareTestProtocol({ pipetteName, definition: def })
+
           const zip = new JSZip()
           zip.file(`${loadName}.json`, JSON.stringify(def, null, 4))
-          zip.file(
-            `test_${loadName}.py`,
-            labwareTestProtocol({ pipetteName, definition: def })
-          )
+
+          zip.file(`test_${loadName}.py`, testProtocol)
 
           // TODO(IL, 2021-03-31): add `catch`
           // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -379,21 +325,51 @@ export const LabwareCreator = (): JSX.Element => {
           })
         }}
       >
-        {({
-          handleSubmit,
-          values,
-          isValid,
-          errors,
-          touched,
-          setTouched,
-          setValues,
-        }: FormikProps<LabwareFields>) => {
+        {bag => {
+          const {
+            values,
+            touched,
+            setTouched,
+            setValues,
+            isValid,
+            handleSubmit,
+          } = bag
+          const status: FormStatus = bag.status
+          const setStatus: (status: FormStatus) => void = bag.setStatus
+          const errors: LabwareCreatorErrors = bag.errors
+
+          if (
+            (status.prevValues !== values && status.prevValues == null) ||
+            getIsXYGeometryChanged(status.prevValues, values)
+          ) {
+            // since geometry has changed, clear the pipette field (to avoid multi-channel selection
+            // for labware not that is not multi-channel compatible)
+            setValues({
+              ...values,
+              pipetteName: getDefaultFormState().pipetteName,
+            })
+
+            // update defaultedDef with new values
+            setStatus({
+              defaultedDef: getDefaultedDef(values),
+              prevValues: values,
+            })
+          }
+
+          const onExportClick = (): void => {
+            if (!isValid && !showExportErrorModal) {
+              setShowExportErrorModal(true, values)
+            }
+            handleSubmit()
+          }
+
           // @ts-expect-error(IL, 2021-03-24): values/errors/touched not typed for reportErrors to be happy
           reportErrors({ values, errors, touched })
           // TODO (ka 2019-8-27): factor out this as sub-schema from Yup schema and use it to validate instead of repeating the logic
           const canProceedToForm = Boolean(
             values.labwareType === 'wellPlate' ||
               values.labwareType === 'reservoir' ||
+              values.labwareType === 'tipRack' ||
               (values.labwareType === 'tubeRack' &&
                 values.tubeRackInsertLoadName) ||
               (values.labwareType === 'aluminumBlock' &&
@@ -466,385 +442,21 @@ export const LabwareCreator = (): JSX.Element => {
               <div ref={scrollRef} />
               {showCreatorForm && (
                 <>
-                  {/* PAGE 1 - Labware */}
+                  <CustomTiprackWarning />
+                  <HandPlacedTipFit />
                   <Regularity />
                   <Footprint />
-                  <Section
-                    label={
-                      // @ts-expect-error(IL, 2021-03-24): `includes` doesn't want to take null/undefined
-                      ['aluminumBlock', 'tubeRack'].includes(values.labwareType)
-                        ? 'Total Height'
-                        : 'Height'
-                    }
-                    fieldList={['labwareZDimension']}
-                    additionalAlerts={getHeightAlerts(values, touched)}
-                  >
-                    <div className={styles.flex_row}>
-                      <div className={styles.instructions_column}>
-                        <HeightGuidingText labwareType={values.labwareType} />
-                      </div>
-                      <div className={styles.diagram_column}>
-                        <HeightImg
-                          labwareType={values.labwareType}
-                          aluminumBlockChildType={values.aluminumBlockChildType}
-                        />
-                      </div>
-                      <div className={styles.form_fields_column}>
-                        <TextField
-                          name="labwareZDimension"
-                          inputMasks={[maskTo2Decimal]}
-                          units="mm"
-                        />
-                      </div>
-                    </div>
-                  </Section>
-                  <Section
-                    label="Grid"
-                    fieldList={[
-                      'gridRows',
-                      'gridColumns',
-                      'regularRowSpacing',
-                      'regularColumnSpacing',
-                    ]}
-                  >
-                    <div className={styles.flex_row}>
-                      <div className={styles.instructions_column}>
-                        <p>
-                          The grid of wells on your labware is arranged via rows
-                          and columns. Rows run horizontally across your labware
-                          (left to right). Columns run top to bottom.
-                        </p>
-                      </div>
-                      <div className={styles.diagram_column}>
-                        <GridImg />
-                      </div>
-                      <div className={styles.form_fields_column}>
-                        <TextField
-                          name="gridRows"
-                          inputMasks={[maskToInteger]}
-                        />
-                        <RadioField
-                          name="regularRowSpacing"
-                          options={yesNoOptions}
-                        />
-                        <TextField
-                          name="gridColumns"
-                          inputMasks={[maskToInteger]}
-                        />
-                        <RadioField
-                          name="regularColumnSpacing"
-                          options={yesNoOptions}
-                        />
-                      </div>
-                    </div>
-                  </Section>
-                  {/* PAGE 2 */}
-                  <Section label="Volume" fieldList={['wellVolume']}>
-                    <div className={styles.flex_row}>
-                      <div className={styles.volume_instructions_column}>
-                        <p>Total maximum volume of each well.</p>
-                      </div>
-
-                      <div className={styles.form_fields_column}>
-                        <TextField
-                          name="wellVolume"
-                          inputMasks={[maskTo2Decimal]}
-                          units="μL"
-                        />
-                      </div>
-                    </div>
-                  </Section>
-                  <Section
-                    label="Well Shape & Sides"
-                    fieldList={[
-                      'wellShape',
-                      'wellDiameter',
-                      'wellXDimension',
-                      'wellYDimension',
-                    ]}
-                  >
-                    <div className={styles.flex_row}>
-                      <div className={styles.instructions_column}>
-                        {displayAsTube(values) ? (
-                          <>
-                            <p>
-                              Reference the <strong>top</strong> of the{' '}
-                              <strong>inside</strong> of the tube. Ignore any
-                              lip.{' '}
-                            </p>
-                            <p>
-                              Diameter helps the robot locate the sides of the
-                              tubes. If there are multiple measurements for this
-                              dimension then use the smaller one.{' '}
-                            </p>
-                          </>
-                        ) : (
-                          <>
-                            <p>
-                              Reference the <strong>inside</strong> of the well.
-                              Ignore any lip.
-                            </p>
-                            <p>
-                              Diameter helps the robot locate the sides of the
-                              wells.
-                            </p>
-                          </>
-                        )}
-                      </div>
-                      <div className={styles.diagram_column}>
-                        <WellXYImg wellShape={values.wellShape} />
-                      </div>
-                      <div className={styles.form_fields_column}>
-                        <RadioField
-                          name="wellShape"
-                          labelTextClassName={styles.hidden}
-                          options={wellShapeOptionsWithIcons}
-                        />
-                        {values.wellShape === 'rectangular' ? (
-                          <>
-                            <TextField
-                              name="wellXDimension"
-                              inputMasks={[maskTo2Decimal]}
-                              units="mm"
-                            />
-                            <TextField
-                              name="wellYDimension"
-                              inputMasks={[maskTo2Decimal]}
-                              units="mm"
-                            />
-                          </>
-                        ) : (
-                          <TextField
-                            name="wellDiameter"
-                            inputMasks={[maskTo2Decimal]}
-                            units="mm"
-                          />
-                        )}
-                      </div>
-                    </div>
-                  </Section>
-                  <Section
-                    label="Well Bottom & Depth"
-                    fieldList={['wellBottomShape', 'wellDepth']}
-                  >
-                    <div className={styles.flex_row}>
-                      <div className={styles.instructions_column}>
-                        <p>
-                          Reference the measurement from the top of the well
-                          (include any lip but exclude any cap) to the bottom of
-                          the <strong>inside</strong> of the{' '}
-                          {displayAsTube(values) ? 'tube' : 'well'}.
-                        </p>
-
-                        <p>
-                          Depth informs the robot how far down it can go inside
-                          a well.
-                        </p>
-                      </div>
-                      <div className={styles.diagram_column}>
-                        <DepthImg
-                          labwareType={values.labwareType}
-                          wellBottomShape={values.wellBottomShape}
-                        />
-                      </div>
-                      <div className={styles.form_fields_column}>
-                        <RadioField
-                          name="wellBottomShape"
-                          labelTextClassName={styles.hidden}
-                          options={wellBottomShapeOptionsWithIcons}
-                        />
-                        <TextField
-                          name="wellDepth"
-                          inputMasks={[maskTo2Decimal]}
-                          units="mm"
-                        />
-                      </div>
-                    </div>
-                  </Section>
-                  <Section
-                    label="Well Spacing"
-                    fieldList={['gridSpacingX', 'gridSpacingY']}
-                  >
-                    <div className={styles.flex_row}>
-                      <div className={styles.instructions_column}>
-                        <p>
-                          Spacing is between the <strong>center</strong> of
-                          wells.
-                        </p>
-                        <p>
-                          Well spacing measurements inform the robot how far
-                          away rows and columns are from each other.
-                        </p>
-                      </div>
-                      <div className={styles.diagram_column}>
-                        <XYSpacingImg
-                          labwareType={values.labwareType}
-                          wellShape={values.wellShape}
-                          gridRows={values.gridRows}
-                        />
-                      </div>
-                      <div className={styles.form_fields_column}>
-                        <TextField
-                          name="gridSpacingX"
-                          inputMasks={[maskTo2Decimal]}
-                          units="mm"
-                        />
-                        <TextField
-                          name="gridSpacingY"
-                          inputMasks={[maskTo2Decimal]}
-                          units="mm"
-                        />
-                      </div>
-                    </div>
-                  </Section>
-                  <Section
-                    label="Grid Offset"
-                    fieldList={['gridOffsetX', 'gridOffsetY']}
-                  >
-                    <div className={styles.flex_row}>
-                      <div className={styles.instructions_column}>
-                        <p>
-                          Find the measurement from the center of{' '}
-                          <strong>
-                            {values.labwareType === 'reservoir'
-                              ? 'the top left-most well'
-                              : 'well A1'}
-                          </strong>{' '}
-                          to the edge of the labware{"'"}s footprint.
-                        </p>
-                        <p>
-                          Corner offset informs the robot how far the grid of
-                          wells is from the slot{"'"}s top left corner.
-                        </p>
-                        <div className={styles.help_text}>
-                          <img src={require('./images/offset_helpText.svg')} />
-                        </div>
-                      </div>
-                      <div className={styles.diagram_column}>
-                        <XYOffsetImg
-                          labwareType={values.labwareType}
-                          wellShape={values.wellShape}
-                        />
-                      </div>
-                      <div className={styles.form_fields_column}>
-                        <TextField
-                          name="gridOffsetX"
-                          inputMasks={[maskTo2Decimal]}
-                          units="mm"
-                        />
-                        <TextField
-                          name="gridOffsetY"
-                          inputMasks={[maskTo2Decimal]}
-                          units="mm"
-                        />
-                      </div>
-                    </div>
-                  </Section>
-                  <Section label="Check your work">
-                    <div className={styles.preview_labware}>
-                      <ConditionalLabwareRender values={values} />
-                      <p className={styles.preview_instructions}>
-                        Check that the size, spacing, and shape of your wells
-                        looks correct.
-                      </p>
-                    </div>
-                  </Section>
-
-                  {/* PAGE 3 */}
-                  <Section label="Description" fieldList={['brand', 'brandId']}>
-                    <div className={styles.flex_row}>
-                      <div className={styles.brand_column}>
-                        <TextField name="brand" />
-                      </div>
-                      <div className={styles.brand_id_column}>
-                        <TextField
-                          name="brandId"
-                          caption="Separate multiple by comma"
-                        />
-                      </div>
-                    </div>
-                  </Section>
-                  {/* PAGE 4 */}
-
-                  <Section label="File" fieldList={['loadName', 'displayName']}>
-                    <div className={styles.flex_row}>
-                      <div className={styles.export_form_fields}>
-                        <TextField
-                          name="displayName"
-                          placeholder={getDefaultDisplayName(values)}
-                        />
-                        <TextField
-                          name="loadName"
-                          placeholder={getDefaultLoadName(values)}
-                          caption="Only lower case letters, numbers, periods, and underscores may be used"
-                          inputMasks={[maskLoadName]}
-                        />
-                      </div>
-                    </div>
-                  </Section>
-                  <Section
-                    label="Labware Test Protocol"
-                    fieldList={['pipetteName']}
-                  >
-                    <div className={cx(styles.flex_row, styles.flex_row_start)}>
-                      <div className={styles.instructions_column}>
-                        <p>
-                          Your file will be exported with a protocol that will
-                          help you test and troubleshoot your labware definition
-                          on the robot. The protocol requires a Single Channel
-                          pipette on the right mount of your robot.
-                        </p>
-                      </div>
-                      <div className={styles.pipette_field_wrapper}>
-                        <Dropdown
-                          name="pipetteName"
-                          options={pipetteNameOptions}
-                        />
-                      </div>
-                    </div>
-                    <div className={styles.export_section}>
-                      <div
-                        className={cx(styles.callout, styles.export_callout)}
-                      >
-                        <h4 className={styles.test_labware_heading}>
-                          Please test your definition file!
-                        </h4>
-
-                        <p>
-                          Use the labware test protocol contained in the
-                          downloaded file to check the accuracy of your
-                          definition. It’s important to create definitions that
-                          are precise and do not rely on excessive calibration
-                          prior to each run to achieve accuracy.
-                        </p>
-                        <p>
-                          Use the test guide to troubleshoot your definition.
-                        </p>
-                        <LinkOut
-                          onClick={() =>
-                            reportEvent({
-                              name: 'labwareCreatorClickTestLabware',
-                            })
-                          }
-                          href={PDF_URL}
-                          className={styles.test_guide_button}
-                        >
-                          view test guide
-                        </LinkOut>
-                      </div>
-                      <PrimaryButton
-                        className={styles.export_button}
-                        onClick={() => {
-                          if (!isValid && !showExportErrorModal) {
-                            setShowExportErrorModal(true, values)
-                          }
-                          handleSubmit()
-                        }}
-                      >
-                        EXPORT FILE
-                      </PrimaryButton>
-                    </div>
-                  </Section>
+                  <Height />
+                  <Grid />
+                  <Volume />
+                  <WellShapeAndSides />
+                  <WellBottomAndDepth />
+                  <WellSpacing />
+                  <GridOffset />
+                  <Preview />
+                  <Description />
+                  <File />
+                  <Export onExportClick={onExportClick} />
                 </>
               )}
             </div>

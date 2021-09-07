@@ -8,7 +8,7 @@ log = logging.getLogger(__name__)
 
 
 class ThreadedAsyncLock:
-    """ A thread-safe async lock
+    """A thread-safe async lock
 
     This is required to properly lock access to motion calls, which are
     a) done in async contexts (rpc methods and http methods) and should
@@ -26,11 +26,11 @@ class ThreadedAsyncLock:
     def __init__(self):
         self._thread_lock = threading.Lock()
 
-    def lock(self) -> '_Internal':
+    def lock(self) -> "_Internal":
         """Create a context manager that locks access to a code block"""
         return _Internal(lock=self._thread_lock, forbid=False)
 
-    def forbid(self) -> '_Internal':
+    def forbid(self) -> "_Internal":
         """Create a context manager that forbids concurrent attempts to
         access to a code block"""
         return _Internal(lock=self._thread_lock, forbid=True)
@@ -40,8 +40,10 @@ class ThreadedAsyncForbidden(Exception):
     """Exception indicating that lock is acquired and that blocking
     is forbidden"""
 
-    def __init__(self, msg="Robot is currently moving. Please wait and try "
-                           "this command again."):
+    def __init__(
+        self,
+        msg="Robot is currently moving. Please wait and try " "this command again.",
+    ):
         super().__init__(msg)
 
 
@@ -61,9 +63,11 @@ class _Internal:
         self._forbid = forbid
 
     async def __aenter__(self):
-        pref = f"[ThreadedAsyncLock tid {threading.get_ident()} "\
-            f"task {asyncio.Task.current_task()}] "
-        log.debug(pref + 'will acquire')
+        pref = (
+            f"[ThreadedAsyncLock tid {threading.get_ident()} "
+            f"task {asyncio.current_task()}] "
+        )
+        log.debug(pref + "will acquire")
         then = time.perf_counter()
         while not self._thread_lock.acquire(blocking=False):
             if self._forbid:
@@ -71,11 +75,13 @@ class _Internal:
                 raise ThreadedAsyncForbidden()
             await asyncio.sleep(0.1)
         now = time.perf_counter()
-        log.debug(pref + f'acquired in {now-then}s')
+        log.debug(pref + f"acquired in {now-then}s")
 
     async def __aexit__(self, exc_type, exc, tb):
-        log.debug(f"[ThreadedAsyncLock tid {threading.get_ident()} "
-                  f"task {asyncio.Task.current_task()}] will release")
+        log.debug(
+            f"[ThreadedAsyncLock tid {threading.get_ident()} "
+            f"task {asyncio.current_task()}] will release"
+        )
         self._thread_lock.release()
 
     def __enter__(self):

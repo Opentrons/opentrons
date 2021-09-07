@@ -2,10 +2,8 @@ from datetime import datetime
 from dataclasses import dataclass, field
 from typing import Optional, Generic, TypeVar
 
-from robot_server.service.session.models.command import (
-    CommandStatus, RequestTypes)
-from robot_server.service.session.models.common import (
-    IdentifierType, create_identifier)
+from robot_server.service.session.models.command import CommandStatus, RequestTypes
+from robot_server.service.session.models.common import IdentifierType, create_identifier
 from opentrons.util.helpers import utc_now
 
 
@@ -41,6 +39,4 @@ class CompletedCommand:
 
 def create_command(request: RequestTypes) -> Command:
     """Create a command object"""
-    return Command(
-        request=request
-    )
+    return Command(request=request)

@@ -77,10 +77,11 @@ This project (along with our other front-end projects) uses [webpack][] to gener
 
 Certain environment variables, when set, will affect the artifact output.
 
-| variable            | value                                | description                                               |
-| ------------------- | ------------------------------------ | --------------------------------------------------------- |
-| NODE_ENV            | production, development, test        | Optimizes output for a specific environment               |
-| OT_LL_FULLSTORY_ORG | some string ID                       | Fullstory organization ID.                                |
-| OT_LL_MIXPANEL_ID   | some string ID                       | Mixpanel token.                                           |
-| OT_LL_VERSION       | semver string eg "1.2.3"             | reported to analytics. Read from package.json by default. |
-| OT_LL_BUILD_DATE    | result of `new Date().toUTCString()` | reported to analytics. Uses current date-time by default. |
+| variable              | value                                | description                                               |
+| --------------------- | ------------------------------------ | --------------------------------------------------------- |
+| NODE_ENV              | production, development, test        | Optimizes output for a specific environment               |
+| OT_LL_FULLSTORY_ORG   | some string ID                       | Fullstory organization ID.                                |
+| OT_LL_MIXPANEL_ID     | some string ID                       | Mixpanel token for prod environment.                      |
+| OT_LL_MIXPANEL_DEV_ID | some string ID                       | Mixpanel token for dev environment.                       |
+| OT_LL_VERSION         | semver string eg "1.2.3"             | reported to analytics. Read from package.json by default. |
+| OT_LL_BUILD_DATE      | result of `new Date().toUTCString()` | reported to analytics. Uses current date-time by default. |

@@ -4,23 +4,84 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 [technical change log]: https://github.com/Opentrons/opentrons/blob/edge/CHANGELOG.md
 [opentrons issue tracker]: https://github.com/Opentrons/opentrons/issues?q=is%3Aopen+is%3Aissue+label%3Abug
 
-# OT-2 Software Changes in 4.3.0
+---
 
-OT-2 software 4.3.0 brings a major new feature: the ability to use multiple modules of the same type in a protocol. For instance, you can use two Opentrons Temperature modules in a protocol at the same time. There are also several bugfixes.
+# OT-2 Software Changes in 4.5.0
+
+The 4.5.0 release of the OT-2 Software improves the speed of protocol uploads and fixes a handful of regressions and bugs.
 
 ## New Features
 
-- Protocols may now load more than one of the same module type by calling `protocol.load_module()` multiple times with the same type of module and different deck slots
+- The OT-2 now uses a faster analysis method on protocol upload
+  - Thanks to everyone who beta tested this feature over the last few months!
+  - You may revert to the old analysis method with the **Use Older Protocol Analysis Method** in your OT-2's advanced settings
+  - If you encounter any issues (e.g. protocol run errors not caught during upload) please reach out to Opentrons Support or [open an issue][] in GitHub so we can continue to improve this feature
 
-## Bugfixes
+## Bug Fixes
 
-- Fix an issue where pipettes would move diagonally when accessing the same well one after another ([#7156](https://github.com/Opentrons/opentrons/issues/7156))
-- Fixes an issue causing slow protocol uploads in protocols using Thermocycler Modules or Temperature Modules ([#7506](https://github.com/Opentrons/opentrons/issues/7506))
-- Fixes an issue where labware could not have a 0 column. You can now once again create custom labware with a column 0 ([#7531](https://github.com/Opentrons/opentrons/issues/7531))
+- Fixed a regression that prevented use of OT-2 Modules in Jupyter notebook ([#8009][])
+- Fixed an uncaught import error on macOS and Windows ([#8154][], thanks to [Maksim Rakitin][] for the fix!)
+- Fixed a crash caused by invalid calibration data ([#7962][])
 
 ## Known Issues
 
-In 4.3.0 and previous releases, the OT-2 will only use TLS 1.0 for WPA2 Enterprise association. Some RADIUS servers have disabled this version of TLS; it must be enabled to connect the OT-2 to a RADIUS-secured network.
+In 4.5.0 and previous releases, the OT-2 will only use TLS 1.0 for WPA2 Enterprise association. Some RADIUS servers have disabled this version of TLS; it must be enabled to connect the OT-2 to a RADIUS-secured network.
+
+[#7962]: https://github.com/Opentrons/opentrons/issues/7962
+[#8009]: https://github.com/Opentrons/opentrons/issues/8009
+[#8154]: https://github.com/Opentrons/opentrons/issues/8154
+[maksim rakitin]: https://github.com/mrakitin
+[open an issue]: https://github.com/Opentrons/opentrons/issues
+
+---
+
+## OT-2 Software Changes in 4.4.0
+
+### New Features
+
+- Triggering a `move_to` to a labware will now count the labware as "used" in the protocol, allowing it to show up in the calibration list ([#7812][])
+- Various documentation and error message improvements
+
+### Bug Fixes
+
+- A new Protocol API version was added - `2.11` - to ensure that liquid handling commands like `aspirate` and `dispense` will reject if the source or destination labware is a tip rack (thanks to [@andeecode] for reporting [#7552][]!)
+- The robot's built-in HTTP server now sends the correct headers for CORS (thanks to [Benedict Diederich][] for reporting [#7599]!)
+- Added guards to prevent resumptions from a delay overriding higher priority pauses ([#7773][])
+- Fixed several memory leaks in module handling that could lead to spurious error logs and other issues ([#7641][] and [#7690][])
+
+### Known Issues
+
+In 4.4.0 and previous releases, the OT-2 will only use TLS 1.0 for WPA2 Enterprise association. Some RADIUS servers have disabled this version of TLS; it must be enabled to connect the OT-2 to a RADIUS-secured network.
+
+[@andeecode]: https://github.com/andeecode
+[benedict diederich]: https://github.com/beniroquai
+[#7552]: https://github.com/Opentrons/opentrons/issues/7552
+[#7599]: https://github.com/Opentrons/opentrons/issues/7599
+[#7641]: https://github.com/Opentrons/opentrons/issues/7641
+[#7690]: https://github.com/Opentrons/opentrons/issues/7690
+[#7773]: https://github.com/Opentrons/opentrons/issues/7773
+[#7812]: https://github.com/Opentrons/opentrons/issues/7812
+
+---
+
+## OT-2 Software Changes in 4.3.1
+
+OT-2 software 4.3.0 brings a major new feature: the ability to use multiple modules of the same type in a protocol. For instance, you can use two Opentrons Temperature modules in a protocol at the same time. There are also several bugfixes.
+
+### New Features
+
+- The OT-2 now supports the use of two Magnetic Modules or two Temperature Modules in the same Python API protocol. See our Help Center article on [using modules of the same type](https://support.opentrons.com/en/articles/5167312-using-modules-of-the-same-type-on-the-ot-2) for an overview of how this feature should be configured.
+- New API level: 2.10. This API level contains a bugfix for an issue where pipettes would move diagonally when accessing the same well one after another ([#7156](https://github.com/Opentrons/opentrons/issues/7156)). The fix is only applied when API Level 2.10 is requested in a protocol to avoid changing the behavior of existing protocols.
+
+### Bugfixes
+
+- Fixes an issue causing slow protocol uploads in protocols using Thermocycler Modules or Temperature Modules ([#7506](https://github.com/Opentrons/opentrons/issues/7506))
+- Fixes an issue where labware could not have a 0 column. You can now once again create custom labware with a column 0 ([#7531](https://github.com/Opentrons/opentrons/issues/7531))
+- Fixes an issue where tip length calibration would not be applied during labware calibration, so calibrating labware would cause incorrect movement during protocol runes ([#7765](https://github.com/Opentrons/opentrons/issues/7765))
+
+### Known Issues
+
+In 4.3.1 and previous releases, the OT-2 will only use TLS 1.0 for WPA2 Enterprise association. Some RADIUS servers have disabled this version of TLS; it must be enabled to connect the OT-2 to a RADIUS-secured network.
 
 ---
 
@@ -63,6 +124,8 @@ This is a hotfix for an issue with package installation; it does not include any
 
 - Fixed an issue where the version of the pyserial dependency in the `opentrons` package metadata did not match the version installed on the OT-2, which would cause installation of Python packages that depend on the `opentrons` package to the robot to fail ([#7250](https://github.com/Opentrons/opentrons/pull/7250))
 
+---
+
 ## OT-2 Software Changes in 4.1.0
 
 Opentrons Robot Software 4.1.0 brings support for some new robot calibration features and some bugfixes. It also brings a new Protocol API level.
@@ -76,7 +139,7 @@ Opentrons Robot Software 4.1.0 brings support for some new robot calibration fea
 
 - In Python Protocol API Level 2.9, we added accessors for well properties that had previously been undocumented. To see more details, see [the documentation](http://docs.opentrons.com/v2/new_labware.html#new-labware-well-properties).
 
-## Bugfixes
+## Bug Fixes
 
 - Fixed an issue that prevented calibration of labware in slots 10 and 11 while using a single channel pipette ([#6886](https://github.com/opentrons/opentrons/issues/6886))
 - Protocol upload should be much faster

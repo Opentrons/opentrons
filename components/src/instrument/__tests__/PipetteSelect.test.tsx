@@ -46,7 +46,7 @@ describe('PipetteSelect', () => {
       'channels'
     )
       .map(getPipetteNameSpecs)
-      .filter(Boolean)
+      .filter((specs): specs is PipetteNameSpecs => specs !== null)
 
     const gen2Specs = pipetteSpecs.filter(s => s.displayCategory === GEN2)
     const gen1Specs = pipetteSpecs.filter(s => s.displayCategory === GEN1)
@@ -67,7 +67,7 @@ describe('PipetteSelect', () => {
       'channels'
     )
       .map(getPipetteNameSpecs)
-      .filter(Boolean)
+      .filter((specs): specs is PipetteNameSpecs => specs !== null)
 
     const gen2Specs = pipetteSpecs.filter(s => s.displayCategory === GEN2)
     const nameBlocklist = pipetteSpecs

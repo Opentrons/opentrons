@@ -1,9 +1,7 @@
 from __future__ import annotations
 
 import logging
-from functools import lru_cache
-from typing import (
-    List, Optional, Sequence, TYPE_CHECKING, Union)
+from typing import List, Optional, Sequence, TYPE_CHECKING, Union
 from opentrons.broker import Broker
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons import types, hardware_control as hc
@@ -11,34 +9,42 @@ from opentrons.commands import commands as cmds
 from opentrons.commands.publisher import CommandPublisher, do_publish, publish
 from opentrons.hardware_control.types import PipettePair
 from opentrons.protocols.advanced_control.mix import mix_from_kwargs
-from opentrons.protocols.api_support.instrument import \
-    validate_blowout_location, tip_length_for, validate_tiprack, \
-    determine_drop_target
+from opentrons.protocols.api_support.instrument import (
+    validate_blowout_location,
+    tip_length_for,
+    validate_tiprack,
+    determine_drop_target,
+    validate_can_aspirate,
+    validate_can_dispense,
+)
 from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocol_api.module_contexts import ThermocyclerContext
 from opentrons.protocols.api_support.util import (
-    FlowRates, PlungerSpeeds, Clearances, clamp_value, requires_version)
-from opentrons.protocols.context.instrument import \
-    AbstractInstrument
+    FlowRates,
+    PlungerSpeeds,
+    Clearances,
+    clamp_value,
+    requires_version,
+)
+from opentrons.protocols.context.instrument import AbstractInstrument
 from opentrons.protocols.api_support.types import APIVersion
-from .labware import (
-    Labware, OutOfTipsError, Well, next_available_tip)
+from .labware import Labware, OutOfTipsError, Well, next_available_tip
 from opentrons.protocols.advanced_control import transfers
 from .paired_instrument_context import (
-    PairedInstrumentContext, UnsupportedInstrumentPairingError)
+    PairedInstrumentContext,
+    UnsupportedInstrumentPairingError,
+)
 
 if TYPE_CHECKING:
     from opentrons.protocol_api import ProtocolContext
 
 AdvancedLiquidHandling = Union[
-    Well,
-    types.Location,
-    List[Union[Well, types.Location]],
-    List[List[Well]]]
+    Well, types.Location, List[Union[Well, types.Location]], List[List[Well]]
+]
 
 
 class InstrumentContext(CommandPublisher):
-    """ A context for a specific pipette or instrument.
+    """A context for a specific pipette or instrument.
 
     This can be used to call methods related to pipettes - moves or
     aspirates or dispenses, or higher-level methods.
@@ -55,15 +61,16 @@ class InstrumentContext(CommandPublisher):
 
     """
 
-    def __init__(self,
-                 implementation: AbstractInstrument,
-                 ctx: ProtocolContext,
-                 broker: Broker,
-                 log_parent: logging.Logger,
-                 at_version: APIVersion,
-                 tip_racks: List[Labware] = None,
-                 trash: Optional[Labware] = None,
-                 ) -> None:
+    def __init__(
+        self,
+        implementation: AbstractInstrument,
+        ctx: ProtocolContext,
+        broker: Broker,
+        log_parent: logging.Logger,
+        at_version: APIVersion,
+        tip_racks: List[Labware] = None,
+        trash: Optional[Labware] = None,
+    ) -> None:
 
         super().__init__(broker)
         self._api_version = at_version
@@ -92,8 +99,7 @@ class InstrumentContext(CommandPublisher):
     @property  # type: ignore
     @requires_version(2, 0)
     def starting_tip(self) -> Union[Well, None]:
-        """ The starting tip from which the pipette pick up
-        """
+        """The starting tip from which the pipette pick up"""
         return self._starting_tip
 
     @starting_tip.setter
@@ -102,8 +108,7 @@ class InstrumentContext(CommandPublisher):
 
     @requires_version(2, 0)
     def reset_tipracks(self):
-        """ Reload all tips in each tip rack and reset starting tip
-        """
+        """Reload all tips in each tip rack and reset starting tip"""
         for tiprack in self.tip_racks:
             tiprack.reset()
         self.starting_tip = None
@@ -111,7 +116,7 @@ class InstrumentContext(CommandPublisher):
     @property  # type: ignore
     @requires_version(2, 0)
     def default_speed(self) -> float:
-        """ The speed at which the robot's gantry moves.
+        """The speed at which the robot's gantry moves.
 
         By default, 400 mm/s. Changing this value will change the speed of the
         pipette when moving between labware. In addition to changing the
@@ -124,11 +129,13 @@ class InstrumentContext(CommandPublisher):
     def default_speed(self, speed: float):
         self._implementation.set_default_speed(speed)
 
-    @requires_version(2, 0)
-    def aspirate(self,
-                 volume: Optional[float] = None,
-                 location: Union[types.Location, Well] = None,
-                 rate: float = 1.0) -> InstrumentContext:
+    @requires_version(2, 0)  # noqa: C901
+    def aspirate(
+        self,
+        volume: Optional[float] = None,
+        location: Union[types.Location, Well] = None,
+        rate: float = 1.0,
+    ) -> InstrumentContext:
         """
         Aspirate a given volume of liquid from the specified location, using
         this pipette.
@@ -162,20 +169,22 @@ class InstrumentContext(CommandPublisher):
             ``instr.aspirate(location=wellplate['A1'])``
 
         """
-        self._log.debug("aspirate {} from {} at {}"
-                        .format(volume,
-                                location if location else 'current position',
-                                rate))
+        self._log.debug(
+            "aspirate {} from {} at {}".format(
+                volume, location if location else "current position", rate
+            )
+        )
 
         if isinstance(location, Well):
             dest = location.bottom().move(
-                types.Point(0, 0, self.well_bottom_clearance.aspirate))
+                types.Point(0, 0, self.well_bottom_clearance.aspirate)
+            )
         elif isinstance(location, types.Location):
             dest = location
         elif location is not None:
             raise TypeError(
-                'location should be a Well or Location, but it is {}'
-                .format(location))
+                "location should be a Well or Location, but it is {}".format(location)
+            )
         elif self._ctx.location_cache:
             dest = self._ctx.location_cache
         else:
@@ -183,16 +192,21 @@ class InstrumentContext(CommandPublisher):
                 "If aspirate is called without an explicit location, another"
                 " method that moves to a location (such as move_to or "
                 "dispense) must previously have been called so the robot "
-                "knows where it is.")
+                "knows where it is."
+            )
+        if self.api_version >= APIVersion(2, 11):
+            validate_can_aspirate(dest)
 
         if self.current_volume == 0:
             # Make sure we're at the top of the labware and clear of any
             # liquid to prepare the pipette for aspiration
 
-            if self.api_version < APIVersion(2, 3) or \
-                    not self._implementation.is_ready_to_aspirate():
+            if (
+                self.api_version < APIVersion(2, 3)
+                or not self._implementation.is_ready_to_aspirate()
+            ):
                 if dest.labware.is_well:
-                    self.move_to(dest.labware.as_well().top())
+                    self.move_to(dest.labware.as_well().top(), publish=False)
                 else:
                     # TODO(seth,2019/7/29): This should be a warning exposed
                     #  via rpc to the runapp
@@ -201,27 +215,49 @@ class InstrumentContext(CommandPublisher):
                         "well relative position, we can't move to the top of"
                         " the well to prepare for aspiration. This might "
                         "cause over aspiration if the previous command is a "
-                        "blow_out.")
+                        "blow_out."
+                    )
                 self._implementation.prepare_for_aspirate()
-            self.move_to(dest)
+            self.move_to(dest, publish=False)
         elif dest != self._ctx.location_cache:
-            self.move_to(dest)
+            self.move_to(dest, publish=False)
 
-        c_vol = self._implementation.get_available_volume() \
-            if not volume else volume
+        c_vol = self._implementation.get_available_volume() if not volume else volume
 
-        do_publish(self.broker, cmds.aspirate, self.aspirate,
-                   'before', None, None, self, c_vol, dest, rate)
+        do_publish(
+            self.broker,
+            cmds.aspirate,
+            self.aspirate,
+            "before",
+            None,
+            None,
+            self,
+            c_vol,
+            dest,
+            rate,
+        )
         self._implementation.aspirate(volume=c_vol, rate=rate)
-        do_publish(self.broker, cmds.aspirate, self.aspirate,
-                   'after', self, None, self, c_vol, dest, rate)
+        do_publish(
+            self.broker,
+            cmds.aspirate,
+            self.aspirate,
+            "after",
+            self,
+            None,
+            self,
+            c_vol,
+            dest,
+            rate,
+        )
         return self
 
     @requires_version(2, 0)
-    def dispense(self,
-                 volume: Optional[float] = None,
-                 location: Union[types.Location, Well] = None,
-                 rate: float = 1.0) -> InstrumentContext:
+    def dispense(
+        self,
+        volume: Optional[float] = None,
+        location: Union[types.Location, Well] = None,
+        rate: float = 1.0,
+    ) -> InstrumentContext:
         """
         Dispense a volume of liquid (in microliters/uL) using this pipette
         into the specified location.
@@ -232,8 +268,8 @@ class InstrumentContext(CommandPublisher):
         aspirated into the pipette will be dispensed (this volume is accessible
         through :py:attr:`current_volume`).
 
-        :param volume: The volume of liquid to dispense, in microliters. If not
-                       specified, defaults to :py:attr:`current_volume`.
+        :param volume: The volume of liquid to dispense, in microliters. If 0
+                       or unspecified, defaults to :py:attr:`current_volume`.
         :type volume: int or float
 
         :param location: Where to dispense into. If `location` is a
@@ -262,23 +298,26 @@ class InstrumentContext(CommandPublisher):
             ``instr.dispense(location=wellplate['A1'])``
 
         """
-        self._log.debug("dispense {} from {} at {}"
-                        .format(volume,
-                                location if location else 'current position',
-                                rate))
+        self._log.debug(
+            "dispense {} from {} at {}".format(
+                volume, location if location else "current position", rate
+            )
+        )
         if isinstance(location, Well):
             if LabwareLike(location).is_fixed_trash():
                 loc = location.top()
             else:
                 loc = location.bottom().move(
-                    types.Point(0, 0, self.well_bottom_clearance.dispense))
-            self.move_to(loc)
+                    types.Point(0, 0, self.well_bottom_clearance.dispense)
+                )
+            self.move_to(loc, publish=False)
         elif isinstance(location, types.Location):
             loc = location
-            self.move_to(location)
+            self.move_to(location, publish=False)
         elif location is not None:
             raise TypeError(
-                f'location should be a Well or Location, but it is {location}')
+                f"location should be a Well or Location, but it is {location}"
+            )
         elif self._ctx.location_cache:
             loc = self._ctx.location_cache
         else:
@@ -286,23 +325,48 @@ class InstrumentContext(CommandPublisher):
                 "If dispense is called without an explicit location, another"
                 " method that moves to a location (such as move_to or "
                 "aspirate) must previously have been called so the robot "
-                "knows where it is.")
+                "knows where it is."
+            )
+        if self.api_version >= APIVersion(2, 11):
+            validate_can_dispense(loc)
 
         c_vol = self.current_volume if not volume else volume
 
-        do_publish(self.broker, cmds.dispense, self.dispense,
-                   'before', None, None, self, c_vol, loc, rate)
+        do_publish(
+            self.broker,
+            cmds.dispense,
+            self.dispense,
+            "before",
+            None,
+            None,
+            self,
+            c_vol,
+            loc,
+            rate,
+        )
         self._implementation.dispense(volume=c_vol, rate=rate)
-        do_publish(self.broker, cmds.dispense, self.dispense,
-                   'after', self, None, self, c_vol, loc, rate)
+        do_publish(
+            self.broker,
+            cmds.dispense,
+            self.dispense,
+            "after",
+            self,
+            None,
+            self,
+            c_vol,
+            loc,
+            rate,
+        )
         return self
 
     @requires_version(2, 0)
-    def mix(self,
-            repetitions: int = 1,
-            volume: Optional[float] = None,
-            location: Union[types.Location, Well] = None,
-            rate: float = 1.0) -> InstrumentContext:
+    def mix(
+        self,
+        repetitions: int = 1,
+        volume: Optional[float] = None,
+        location: Union[types.Location, Well] = None,
+        rate: float = 1.0,
+    ) -> InstrumentContext:
         """
         Mix a volume of liquid (uL) using this pipette, by repeatedly
         aspirating and dispensing in the same place.
@@ -340,33 +404,51 @@ class InstrumentContext(CommandPublisher):
 
         """
         self._log.debug(
-            'mixing {}uL with {} repetitions in {} at rate={}'.format(
-                volume, repetitions,
-                location if location else 'current position', rate))
+            "mixing {}uL with {} repetitions in {} at rate={}".format(
+                volume, repetitions, location if location else "current position", rate
+            )
+        )
         if not self._implementation.has_tip():
-            raise hc.NoTipAttachedError('Pipette has no tip. Aborting mix()')
+            raise hc.NoTipAttachedError("Pipette has no tip. Aborting mix()")
 
-        c_vol = self._implementation.get_available_volume() \
-            if not volume else volume
+        c_vol = self._implementation.get_available_volume() if not volume else volume
 
-        do_publish(self.broker, cmds.mix, self.mix,
-                   'before', None, None,
-                   self, repetitions, c_vol, location)
+        do_publish(
+            self.broker,
+            cmds.mix,
+            self.mix,
+            "before",
+            None,
+            None,
+            self,
+            repetitions,
+            c_vol,
+            location,
+        )
         self.aspirate(volume, location, rate)
         while repetitions - 1 > 0:
             self.dispense(volume, rate=rate)
             self.aspirate(volume, rate=rate)
             repetitions -= 1
         self.dispense(volume, rate=rate)
-        do_publish(self.broker, cmds.mix, self.mix,
-                   'after', None, None,
-                   self, repetitions, c_vol, location)
+        do_publish(
+            self.broker,
+            cmds.mix,
+            self.mix,
+            "after",
+            None,
+            None,
+            self,
+            repetitions,
+            c_vol,
+            location,
+        )
         return self
 
     @requires_version(2, 0)
-    def blow_out(self,
-                 location: Union[types.Location, Well] = None
-                 ) -> InstrumentContext:
+    def blow_out(
+        self, location: Union[types.Location, Well] = None
+    ) -> InstrumentContext:
         """
         Blow liquid out of the tip.
 
@@ -391,17 +473,19 @@ class InstrumentContext(CommandPublisher):
 
         if isinstance(location, Well):
             if location.parent.is_tiprack:
-                self._log.warning('Blow_out being performed on a tiprack. '
-                                  'Please re-check your code')
+                self._log.warning(
+                    "Blow_out being performed on a tiprack. "
+                    "Please re-check your code"
+                )
             loc = location.top()
-            self.move_to(loc)
+            self.move_to(loc, publish=False)
         elif isinstance(location, types.Location):
             loc = location
-            self.move_to(loc)
+            self.move_to(loc, publish=False)
         elif location is not None:
             raise TypeError(
-                'location should be a Well or Location, but it is {}'
-                .format(location))
+                "location should be a Well or Location, but it is {}".format(location)
+            )
         elif self._ctx.location_cache:
             # if location cache exists, pipette blows out immediately at
             # current location, no movement is needed
@@ -411,28 +495,47 @@ class InstrumentContext(CommandPublisher):
                 "If blow out is called without an explicit location, another"
                 " method that moves to a location (such as move_to or "
                 "dispense) must previously have been called so the robot "
-                "knows where it is.")
+                "knows where it is."
+            )
 
-        do_publish(self.broker, cmds.blow_out, self.blow_out, 'before',
-                   None, None, self, location or self._ctx.location_cache)
+        do_publish(
+            self.broker,
+            cmds.blow_out,
+            self.blow_out,
+            "before",
+            None,
+            None,
+            self,
+            location or self._ctx.location_cache,
+        )
         self._implementation.blow_out()
-        do_publish(self.broker, cmds.blow_out, self.blow_out, 'after',
-                   None, None, self, location or self._ctx.location_cache)
+        do_publish(
+            self.broker,
+            cmds.blow_out,
+            self.blow_out,
+            "after",
+            None,
+            None,
+            self,
+            location or self._ctx.location_cache,
+        )
         return self
 
     def _determine_speed(self, speed: float):
         if self.api_version < APIVersion(2, 4):
-            return clamp_value(speed, 80, 20, 'touch_tip:')
+            return clamp_value(speed, 80, 20, "touch_tip:")
         else:
-            return clamp_value(speed, 80, 1, 'touch_tip:')
+            return clamp_value(speed, 80, 1, "touch_tip:")
 
     @publish.both(command=cmds.touch_tip)
     @requires_version(2, 0)
-    def touch_tip(self,
-                  location: Optional[Well] = None,
-                  radius: float = 1.0,
-                  v_offset: float = -1.0,
-                  speed: float = 60.0) -> InstrumentContext:
+    def touch_tip(
+        self,
+        location: Optional[Well] = None,
+        radius: float = 1.0,
+        v_offset: float = -1.0,
+        speed: float = 60.0,
+    ) -> InstrumentContext:
         """
         Touch the pipette tip to the sides of a well, with the intent of
         removing left-over droplets
@@ -468,7 +571,7 @@ class InstrumentContext(CommandPublisher):
 
         """
         if not self._implementation.has_tip():
-            raise hc.NoTipAttachedError('Pipette has no tip to touch_tip()')
+            raise hc.NoTipAttachedError("Pipette has no tip to touch_tip()")
 
         checked_speed = self._determine_speed(speed)
 
@@ -476,7 +579,7 @@ class InstrumentContext(CommandPublisher):
         if location is None:
             last_location = self._ctx.location_cache
             if not last_location:
-                raise RuntimeError('No valid current location cache present')
+                raise RuntimeError("No valid current location cache present")
             else:
                 well = last_location.labware
                 # type checked below
@@ -484,37 +587,39 @@ class InstrumentContext(CommandPublisher):
             well = LabwareLike(location)
 
         if well.is_well:
-            if 'touchTipDisabled' in well.quirks_from_any_parent():
+            if "touchTipDisabled" in well.quirks_from_any_parent():
                 self._log.info(f"Ignoring touch tip on labware {well}")
                 return self
             if well.parent.as_labware().is_tiprack:
-                self._log.warning('Touch_tip being performed on a tiprack. '
-                                  'Please re-check your code')
+                self._log.warning(
+                    "Touch_tip being performed on a tiprack. "
+                    "Please re-check your code"
+                )
 
             if self.api_version < APIVersion(2, 4):
                 to_loc = well.as_well().top()
             else:
-                move_with_z_offset =\
-                    well.as_well().top().point + types.Point(0, 0, v_offset)
+                move_with_z_offset = well.as_well().top().point + types.Point(
+                    0, 0, v_offset
+                )
                 to_loc = types.Location(move_with_z_offset, well)
-            self.move_to(to_loc)
+            self.move_to(to_loc, publish=False)
         else:
-            raise TypeError(
-                'location should be a Well, but it is {}'.format(location))
+            raise TypeError("location should be a Well, but it is {}".format(location))
 
         self._implementation.touch_tip(
             location=well.as_well()._impl,
             radius=radius,
             v_offset=v_offset,
-            speed=checked_speed
+            speed=checked_speed,
         )
         return self
 
     @publish.both(command=cmds.air_gap)
     @requires_version(2, 0)
-    def air_gap(self,
-                volume: Optional[float] = None,
-                height: Optional[float] = None) -> InstrumentContext:
+    def air_gap(
+        self, volume: Optional[float] = None, height: Optional[float] = None
+    ) -> InstrumentContext:
         """
         Pull air into the pipette current tip at the current location
 
@@ -547,15 +652,15 @@ class InstrumentContext(CommandPublisher):
 
         """
         if not self._implementation.has_tip():
-            raise hc.NoTipAttachedError('Pipette has no tip. Aborting air_gap')
+            raise hc.NoTipAttachedError("Pipette has no tip. Aborting air_gap")
 
         if height is None:
             height = 5
         loc = self._ctx.location_cache
         if not loc or not loc.labware.is_well:
-            raise RuntimeError('No previous Well cached to perform air gap')
+            raise RuntimeError("No previous Well cached to perform air gap")
         target = loc.labware.as_well().top(height)
-        self.move_to(target)
+        self.move_to(target, publish=False)
         self.aspirate(volume)
         return self
 
@@ -574,25 +679,27 @@ class InstrumentContext(CommandPublisher):
             See the ``home_after`` parameter in :py:obj:`drop_tip`.
         """
         if not self._implementation.has_tip():
-            self._log.warning('Pipette has no tip to return')
+            self._log.warning("Pipette has no tip to return")
         loc = self._last_tip_picked_up_from
         if not isinstance(loc, Well):
-            raise TypeError('Last tip location should be a Well but it is: '
-                            '{}'.format(loc))
+            raise TypeError(
+                "Last tip location should be a Well but it is: " "{}".format(loc)
+            )
         return_height = self._implementation.get_return_height()
-        drop_loc = determine_drop_target(self.api_version,
-                                         loc,
-                                         return_height,
-                                         APIVersion(2, 3))
+        drop_loc = determine_drop_target(
+            self.api_version, loc, return_height, APIVersion(2, 3)
+        )
         self.drop_tip(drop_loc, home_after=home_after)
 
         return self
 
     @requires_version(2, 0)
     def pick_up_tip(
-            self, location: Union[types.Location, Well] = None,
-            presses: Optional[int] = None,
-            increment: Optional[float] = None) -> InstrumentContext:
+        self,
+        location: Union[types.Location, Well] = None,
+        presses: Optional[int] = None,
+        increment: Optional[float] = None,
+    ) -> InstrumentContext:
         """
         Pick up a tip for the pipette to run liquid-handling commands with
 
@@ -646,32 +753,49 @@ class InstrumentContext(CommandPublisher):
             tiprack = location.parent
             target = location
         elif not location:
-            tiprack, target = next_available_tip(self.starting_tip,
-                                                 self.tip_racks,
-                                                 self.channels)
+            tiprack, target = next_available_tip(
+                self.starting_tip, self.tip_racks, self.channels
+            )
         else:
             raise TypeError(
                 "If specified, location should be an instance of "
                 "types.Location (e.g. the return value from "
                 "tiprack.wells()[0].top()) or a Well (e.g. tiprack.wells()[0]."
-                " However, it is a {}".format(location))
+                " However, it is a {}".format(location)
+            )
 
         assert tiprack.is_tiprack, "{} is not a tiprack".format(str(tiprack))
         validate_tiprack(self.name, tiprack, self._log)
-        do_publish(self.broker, cmds.pick_up_tip, self.pick_up_tip,
-                   'before', None, None, self, location=target)
+        do_publish(
+            self.broker,
+            cmds.pick_up_tip,
+            self.pick_up_tip,
+            "before",
+            None,
+            None,
+            self,
+            location=target,
+        )
 
-        self.move_to(target.top())
+        self.move_to(target.top(), publish=False)
 
         self._implementation.pick_up_tip(
             well=target._impl,
             tip_length=self._tip_length_for(tiprack),
             presses=presses,
-            increment=increment
+            increment=increment,
         )
         # Note that the hardware API pick_up_tip action includes homing z after
-        do_publish(self.broker, cmds.pick_up_tip, self.pick_up_tip,
-                   'after', self, None, self, location=target)
+        do_publish(
+            self.broker,
+            cmds.pick_up_tip,
+            self.pick_up_tip,
+            "after",
+            self,
+            None,
+            self,
+            location=target,
+        )
 
         tiprack.use_tips(target, self.channels)
         self._last_tip_picked_up_from = target
@@ -680,10 +804,8 @@ class InstrumentContext(CommandPublisher):
 
     @requires_version(2, 0)
     def drop_tip(
-            self,
-            location: Union[types.Location, Well] = None,
-            home_after: bool = True)\
-            -> InstrumentContext:
+        self, location: Union[types.Location, Well] = None, home_after: bool = True
+    ) -> InstrumentContext:
         """
         Drop the current tip.
 
@@ -762,15 +884,16 @@ class InstrumentContext(CommandPublisher):
                     "tiprack.wells()[0].top()) it must be a location "
                     "relative to a well, since that is where a tip is "
                     "dropped. The passed location, however, is in "
-                    "reference to {}".format(location.labware))
+                    "reference to {}".format(location.labware)
+                )
         elif location and isinstance(location, Well):
             if LabwareLike(location).is_fixed_trash():
                 target = location.top()
             else:
                 return_height = self._implementation.get_return_height()
-                target = determine_drop_target(self.api_version,
-                                               location,
-                                               return_height)
+                target = determine_drop_target(
+                    self.api_version, location, return_height
+                )
         elif not location:
             target = self.trash_container.wells()[0].top()
         else:
@@ -778,49 +901,70 @@ class InstrumentContext(CommandPublisher):
                 "If specified, location should be an instance of "
                 "types.Location (e.g. the return value from "
                 "tiprack.wells()[0].top()) or a Well (e.g. tiprack.wells()[0]."
-                " However, it is a {}".format(location))
-        do_publish(self.broker, cmds.drop_tip, self.drop_tip,
-                   'before', None, None, self, location=target)
-        self.move_to(target)
+                " However, it is a {}".format(location)
+            )
+        do_publish(
+            self.broker,
+            cmds.drop_tip,
+            self.drop_tip,
+            "before",
+            None,
+            None,
+            self,
+            location=target,
+        )
+        self.move_to(target, publish=False)
 
         self._implementation.drop_tip(home_after=home_after)
-        do_publish(self.broker, cmds.drop_tip, self.drop_tip,
-                   'after', self, None, self, location=target)
+        do_publish(
+            self.broker,
+            cmds.drop_tip,
+            self.drop_tip,
+            "after",
+            self,
+            None,
+            self,
+            location=target,
+        )
 
-        if self.api_version < APIVersion(2, 2) \
-                and target.labware.is_well \
-                and target.labware.as_well().parent.is_tiprack:
+        if (
+            self.api_version < APIVersion(2, 2)
+            and target.labware.is_well
+            and target.labware.as_well().parent.is_tiprack
+        ):
             # If this is a tiprack we can try and add the tip back to the
             # tracker
             try:
                 target.labware.as_well().parent.return_tips(
-                    target.labware.as_well(), self.channels)
+                    target.labware.as_well(), self.channels
+                )
             except AssertionError:
                 # Similarly to :py:meth:`return_tips`, the failure case here
                 # just means the tip can't be reused, so don't actually stop
                 # the protocol
-                self._log.exception(f'Could not return tip to {target}')
+                self._log.exception(f"Could not return tip to {target}")
         self._last_tip_picked_up_from = None
         return self
 
     @requires_version(2, 0)
     def home(self) -> InstrumentContext:
-        """ Home the robot.
+        """Home the robot.
 
         :returns: This instance.
         """
-        def home_dummy(mount): pass
+
+        def home_dummy(mount):
+            pass
+
         mount_name = self._implementation.get_mount().name.lower()
-        do_publish(self.broker, cmds.home, home_dummy,
-                   'before', None, None, mount_name)
+        do_publish(self.broker, cmds.home, home_dummy, "before", None, None, mount_name)
         self._implementation.home()
-        do_publish(self.broker, cmds.home, home_dummy,
-                   'after', self, None, mount_name)
+        do_publish(self.broker, cmds.home, home_dummy, "after", self, None, mount_name)
         return self
 
     @requires_version(2, 0)
     def home_plunger(self) -> InstrumentContext:
-        """ Home the plunger associated with this mount
+        """Home the plunger associated with this mount
 
         :returns: This instance.
         """
@@ -829,11 +973,14 @@ class InstrumentContext(CommandPublisher):
 
     @publish.both(command=cmds.distribute)
     @requires_version(2, 0)
-    def distribute(self,
-                   volume: Union[float, Sequence[float]],
-                   source: Well,
-                   dest: List[Well],
-                   *args, **kwargs) -> InstrumentContext:
+    def distribute(
+        self,
+        volume: Union[float, Sequence[float]],
+        source: Well,
+        dest: List[Well],
+        *args,
+        **kwargs,
+    ) -> InstrumentContext:
         """
         Move a volume of liquid from one source to multiple destinations.
 
@@ -848,24 +995,25 @@ class InstrumentContext(CommandPublisher):
                        minimum volume of the pipette
         :returns: This instance
         """
-        self._log.debug("Distributing {} from {} to {}"
-                        .format(volume, source, dest))
-        kwargs['mode'] = 'distribute'
-        kwargs['disposal_volume'] = kwargs.get(
-            'disposal_volume', self.min_volume)
-        kwargs['mix_after'] = (0, 0)
-        blowout_location = kwargs.get('blowout_location')
-        validate_blowout_location(self.api_version, 'distribute', blowout_location)
+        self._log.debug("Distributing {} from {} to {}".format(volume, source, dest))
+        kwargs["mode"] = "distribute"
+        kwargs["disposal_volume"] = kwargs.get("disposal_volume", self.min_volume)
+        kwargs["mix_after"] = (0, 0)
+        blowout_location = kwargs.get("blowout_location")
+        validate_blowout_location(self.api_version, "distribute", blowout_location)
 
         return self.transfer(volume, source, dest, **kwargs)
 
     @publish.both(command=cmds.consolidate)
     @requires_version(2, 0)
-    def consolidate(self,
-                    volume: Union[float, Sequence[float]],
-                    source: List[Well],
-                    dest: Well,
-                    *args, **kwargs) -> InstrumentContext:
+    def consolidate(
+        self,
+        volume: Union[float, Sequence[float]],
+        source: List[Well],
+        dest: Well,
+        *args,
+        **kwargs,
+    ) -> InstrumentContext:
         """
         Move liquid from multiple wells (sources) to a single well(destination)
 
@@ -879,24 +1027,25 @@ class InstrumentContext(CommandPublisher):
                        and ``disposal_volume`` is ignored and set to 0.
         :returns: This instance
         """
-        self._log.debug("Consolidate {} from {} to {}"
-                        .format(volume, source, dest))
-        kwargs['mode'] = 'consolidate'
-        kwargs['mix_before'] = (0, 0)
-        kwargs['disposal_volume'] = 0
-        blowout_location = kwargs.get('blowout_location')
-        validate_blowout_location(self.api_version, 'consolidate', blowout_location)
+        self._log.debug("Consolidate {} from {} to {}".format(volume, source, dest))
+        kwargs["mode"] = "consolidate"
+        kwargs["mix_before"] = (0, 0)
+        kwargs["disposal_volume"] = 0
+        blowout_location = kwargs.get("blowout_location")
+        validate_blowout_location(self.api_version, "consolidate", blowout_location)
 
         return self.transfer(volume, source, dest, **kwargs)
 
     @publish.both(command=cmds.transfer)  # noqa: C901
     @requires_version(2, 0)
-    def transfer(self,
-                 volume: Union[float, Sequence[float]],
-                 source: AdvancedLiquidHandling,
-                 dest: AdvancedLiquidHandling,
-                 trash=True,
-                 **kwargs) -> InstrumentContext:
+    def transfer(
+        self,
+        volume: Union[float, Sequence[float]],
+        source: AdvancedLiquidHandling,
+        dest: AdvancedLiquidHandling,
+        trash=True,
+        **kwargs,
+    ) -> InstrumentContext:
         # source: Union[Well, List[Well], List[List[Well]]],
         # dest: Union[Well, List[Well], List[List[Well]]],
         # TODO: Reach consensus on kwargs
@@ -951,7 +1100,7 @@ class InstrumentContext(CommandPublisher):
 
             * *blowout_location* (``string``) --
                 - 'source well': blowout excess liquid into source well
-                - 'destintation well': blowout excess liquid into destination
+                - 'destination well': blowout excess liquid into destination
                    well
                 - 'trash': blowout excess liquid into the trash
                 If no `blowout_location` specified, no `disposal_volume`
@@ -993,13 +1142,12 @@ class InstrumentContext(CommandPublisher):
 
         :returns: This instance
         """
-        self._log.debug("Transfer {} from {} to {}".format(
-            volume, source, dest))
+        self._log.debug("Transfer {} from {} to {}".format(volume, source, dest))
 
-        blowout_location = kwargs.get('blowout_location')
-        validate_blowout_location(self.api_version, 'transfer', blowout_location)
+        blowout_location = kwargs.get("blowout_location")
+        validate_blowout_location(self.api_version, "transfer", blowout_location)
 
-        kwargs['mode'] = kwargs.get('mode', 'transfer')
+        kwargs["mode"] = kwargs.get("mode", "transfer")
 
         mix_strategy, mix_opts = mix_from_kwargs(kwargs)
 
@@ -1008,11 +1156,11 @@ class InstrumentContext(CommandPublisher):
         else:
             drop_tip = transfers.DropTipStrategy.RETURN
 
-        new_tip = kwargs.get('new_tip')
+        new_tip = kwargs.get("new_tip")
         if isinstance(new_tip, str):
             new_tip = types.TransferTipPolicy[new_tip.upper()]
 
-        blow_out = kwargs.get('blow_out')
+        blow_out = kwargs.get("blow_out")
         blow_out_strategy = None
 
         if blow_out and not blowout_location:
@@ -1021,75 +1169,85 @@ class InstrumentContext(CommandPublisher):
             else:
                 blow_out_strategy = transfers.BlowOutStrategy.TRASH
         elif blow_out and blowout_location:
-            if blowout_location == 'source well':
+            if blowout_location == "source well":
                 blow_out_strategy = transfers.BlowOutStrategy.SOURCE
-            elif blowout_location == 'destination well':
+            elif blowout_location == "destination well":
                 blow_out_strategy = transfers.BlowOutStrategy.DEST
-            elif blowout_location == 'trash':
+            elif blowout_location == "trash":
                 blow_out_strategy = transfers.BlowOutStrategy.TRASH
 
         if new_tip != types.TransferTipPolicy.NEVER:
-            tr, next_tip = next_available_tip(self.starting_tip,
-                                              self.tip_racks,
-                                              self.channels)
+            tr, next_tip = next_available_tip(
+                self.starting_tip, self.tip_racks, self.channels
+            )
             max_volume = min(next_tip.max_volume, self.max_volume)
         else:
-            max_volume = self.hw_pipette['working_volume']
+            max_volume = self.hw_pipette["working_volume"]
 
         touch_tip = None
-        if kwargs.get('touch_tip'):
+        if kwargs.get("touch_tip"):
             touch_tip = transfers.TouchTipStrategy.ALWAYS
 
         default_args = transfers.Transfer()
 
-        disposal = kwargs.get('disposal_volume')
+        disposal = kwargs.get("disposal_volume")
         if disposal is None:
             disposal = default_args.disposal_volume
 
-        air_gap = kwargs.get('air_gap', default_args.air_gap)
+        air_gap = kwargs.get("air_gap", default_args.air_gap)
         if air_gap < 0 or air_gap >= max_volume:
             raise ValueError(
                 "air_gap must be between 0uL and the pipette's expected "
-                f"working volume, {max_volume}uL")
+                f"working volume, {max_volume}uL"
+            )
 
         transfer_args = transfers.Transfer(
             new_tip=new_tip or default_args.new_tip,
             air_gap=air_gap,
-            carryover=kwargs.get('carryover') or default_args.carryover,
-            gradient_function=(kwargs.get('gradient_function') or
-                               default_args.gradient_function),
+            carryover=kwargs.get("carryover") or default_args.carryover,
+            gradient_function=(
+                kwargs.get("gradient_function") or default_args.gradient_function
+            ),
             disposal_volume=disposal,
             mix_strategy=mix_strategy,
             drop_tip_strategy=drop_tip,
-            blow_out_strategy=blow_out_strategy or
-            default_args.blow_out_strategy,
-            touch_tip_strategy=(touch_tip or
-                                default_args.touch_tip_strategy)
+            blow_out_strategy=blow_out_strategy or default_args.blow_out_strategy,
+            touch_tip_strategy=(touch_tip or default_args.touch_tip_strategy),
         )
-        transfer_options = transfers.TransferOptions(transfer=transfer_args,
-                                                     mix=mix_opts)
-        plan = transfers.TransferPlan(volume, source, dest, self, max_volume,
-                                      self.api_version, kwargs['mode'],
-                                      transfer_options)
+        transfer_options = transfers.TransferOptions(
+            transfer=transfer_args, mix=mix_opts
+        )
+        plan = transfers.TransferPlan(
+            volume,
+            source,
+            dest,
+            self,
+            max_volume,
+            self.api_version,
+            kwargs["mode"],
+            transfer_options,
+        )
         self._execute_transfer(plan)
         return self
 
     def _execute_transfer(self, plan: transfers.TransferPlan):
         for cmd in plan:
-            getattr(self, cmd['method'])(*cmd['args'], **cmd['kwargs'])
+            getattr(self, cmd["method"])(*cmd["args"], **cmd["kwargs"])
 
     @requires_version(2, 0)
     def delay(self):
         return self._implementation.delay()
 
     @requires_version(2, 0)
-    def move_to(self,
-                location: types.Location,
-                force_direct: bool = False,
-                minimum_z_height: Optional[float] = None,
-                speed: Optional[float] = None
-                ) -> InstrumentContext:
-        """ Move the instrument.
+    def move_to(
+        self,
+        location: types.Location,
+        force_direct: bool = False,
+        minimum_z_height: Optional[float] = None,
+        speed: Optional[float] = None,
+        publish: bool = True,
+    ) -> InstrumentContext:
+        """Move the instrument.
 
         :param location: The location to move to.
         :type location: :py:class:`.types.Location`
@@ -1102,6 +1260,8 @@ class InstrumentContext(CommandPublisher):
                       the straight linear speed of the motion; to limit
                       individual axis speeds, you can use
                       :py:attr:`.ProtocolContext.max_speeds`.
+        :param publish: Whether a call to this function should publish to the
+        runlog or not.
         """
         from_loc = self._ctx.location_cache
         if not from_loc:
@@ -1111,24 +1271,46 @@ class InstrumentContext(CommandPublisher):
             if isinstance(mod, ThermocyclerContext):
                 mod.flag_unsafe_move(to_loc=location, from_loc=from_loc)
 
+        if publish:
+            do_publish(
+                self.broker,
+                cmds.move_to,
+                self.move_to,
+                "before",
+                None,
+                None,
+                self,
+                location or self._ctx.location_cache,
+            )
         self._implementation.move_to(
             location=location,
             force_direct=force_direct,
             minimum_z_height=minimum_z_height,
-            speed=speed
+            speed=speed,
         )
+        if publish:
+            do_publish(
+                self.broker,
+                cmds.move_to,
+                self.move_to,
+                "after",
+                None,
+                None,
+                self,
+                location or self._ctx.location_cache,
+            )
         return self
 
     @property  # type: ignore
     @requires_version(2, 0)
     def mount(self) -> str:
-        """ Return the name of the mount this pipette is attached to """
+        """Return the name of the mount this pipette is attached to"""
         return self._implementation.get_mount().name.lower()
 
     @property  # type: ignore
     @requires_version(2, 0)
-    def speed(self) -> 'PlungerSpeeds':
-        """ The speeds (in mm/s) configured for the pipette plunger.
+    def speed(self) -> "PlungerSpeeds":
+        """The speeds (in mm/s) configured for the pipette plunger.
 
         This is an object with attributes ``aspirate``, ``dispense``, and
         ``blow_out`` holding the plunger speeds for the corresponding
@@ -1154,8 +1336,8 @@ class InstrumentContext(CommandPublisher):
 
     @property  # type: ignore
     @requires_version(2, 0)
-    def flow_rate(self) -> 'FlowRates':
-        """ The speeds (in uL/s) configured for the pipette.
+    def flow_rate(self) -> "FlowRates":
+        """The speeds (in uL/s) configured for the pipette.
 
         This is an object with attributes ``aspirate``, ``dispense``, and
         ``blow_out`` holding the flow rates for the corresponding operation.
@@ -1182,13 +1364,12 @@ class InstrumentContext(CommandPublisher):
     @property  # type: ignore
     @requires_version(2, 0)
     def type(self) -> str:
-        """ One of `'single'` or `'multi'`.
-        """
+        """One of `'single'` or `'multi'`."""
         model = self.name
-        if 'single' in model:
-            return 'single'
-        elif 'multi' in model:
-            return 'multi'
+        if "single" in model:
+            return "single"
+        elif "multi" in model:
+            return "multi"
         else:
             raise RuntimeError("Bad pipette name: {}".format(model))
 
@@ -1210,7 +1391,7 @@ class InstrumentContext(CommandPublisher):
     @property  # type: ignore
     @requires_version(2, 0)
     def trash_container(self) -> Labware:
-        """ The trash container associated with this pipette.
+        """The trash container associated with this pipette.
 
         This is the property used to determine where to drop tips and blow out
         liquids when calling :py:meth:`drop_tip` or :py:meth:`blow_out` without
@@ -1285,7 +1466,7 @@ class InstrumentContext(CommandPublisher):
     @property  # type: ignore
     @requires_version(2, 0)
     def hw_pipette(self) -> PipetteDict:
-        """ View the information returned by the hardware API directly.
+        """View the information returned by the hardware API directly.
 
         :raises: a :py:class:`.types.PipetteNotAttachedError` if the pipette is
                  no longer attached (should not happen).
@@ -1295,19 +1476,19 @@ class InstrumentContext(CommandPublisher):
     @property  # type: ignore
     @requires_version(2, 0)
     def channels(self) -> int:
-        """ The number of channels on the pipette. """
+        """The number of channels on the pipette."""
         return self._implementation.get_channels()
 
     @property  # type: ignore
     @requires_version(2, 2)
     def return_height(self) -> float:
-        """ The height to return a tip to its tiprack. """
+        """The height to return a tip to its tiprack."""
         return self._implementation.get_return_height()
 
     @property  # type: ignore
     @requires_version(2, 0)
-    def well_bottom_clearance(self) -> 'Clearances':
-        """ The distance above the bottom of a well to aspirate or dispense.
+    def well_bottom_clearance(self) -> "Clearances":
+        """The distance above the bottom of a well to aspirate or dispense.
 
         This is an object with attributes ``aspirate`` and ``dispense``,
         describing the default heights of the corresponding operation. The
@@ -1328,18 +1509,18 @@ class InstrumentContext(CommandPublisher):
         return self._implementation.get_well_bottom_clearance()
 
     def __repr__(self):
-        return '<{}: {} in {}>'.format(self.__class__.__name__,
-                                       self._implementation.get_model(),
-                                       self._implementation.get_mount().name)
+        return "<{}: {} in {}>".format(
+            self.__class__.__name__,
+            self._implementation.get_model(),
+            self._implementation.get_mount().name,
+        )
 
     def __str__(self):
-        return '{} on {} mount'.format(self.hw_pipette['display_name'],
-                                       self.mount)
+        return "{} on {} mount".format(self.hw_pipette["display_name"], self.mount)
 
     @requires_version(2, 7)
-    def pair_with(
-            self, instrument: InstrumentContext) -> PairedInstrumentContext:
-        """ This function allows you to pair both of your pipettes and use
+    def pair_with(self, instrument: InstrumentContext) -> PairedInstrumentContext:
+        """This function allows you to pair both of your pipettes and use
         them simultaneously. The function implicitly decides a primary
         and secondary pipette based on which instrument you call this
         function on.
@@ -1406,8 +1587,8 @@ class InstrumentContext(CommandPublisher):
         """
         if instrument.name != self.name:
             raise UnsupportedInstrumentPairingError(
-                'At this time, you cannot pair'
-                f'{instrument.name} with {self.name}')
+                "At this time, you cannot pair" f"{instrument.name} with {self.name}"
+            )
 
         return PairedInstrumentContext(
             primary_instrument=self,
@@ -1417,10 +1598,9 @@ class InstrumentContext(CommandPublisher):
             api_version=self.api_version,
             hardware_manager=self._ctx._implementation.get_hardware(),
             trash=self.trash_container,
-            log_parent=self._log
+            log_parent=self._log,
         )
 
-    @lru_cache(maxsize=12)
     def _tip_length_for(self, tiprack: Labware) -> float:
-        """ Get the tip length, including overlap, for a tip from this rack """
+        """Get the tip length, including overlap, for a tip from this rack"""
         return tip_length_for(self.hw_pipette, tiprack)

@@ -55,8 +55,7 @@ class RPCServer(object):
     def root(self, value):
         if self.monitor_events_task:
             self.monitor_events_task.cancel()
-        self.monitor_events_task = \
-            self.loop.create_task(self.monitor_events(value))
+        self.monitor_events_task = self.loop.create_task(self.monitor_events(value))
         self._root = value
 
     def shutdown(self):
@@ -96,7 +95,7 @@ class RPCServer(object):
             while True:
                 payload = await queue_.get()
                 if socket_.client_state == WebSocketState.DISCONNECTED:
-                    log.debug(f'Websocket {_id} closed')
+                    log.debug(f"Websocket {_id} closed")
                     break
 
                 await socket_.send_json(payload)
@@ -104,7 +103,7 @@ class RPCServer(object):
         queue: asyncio.Queue = asyncio.Queue(loop=self.loop)
         task = self.loop.create_task(send_task(socket, queue))
         task.add_done_callback(task_done)
-        log.debug(f'Send task for {_id} started')
+        log.debug(f"Send task for {_id} started")
 
         return ClientWriterTask(socket=socket, queue=queue, task=task)
 
@@ -113,15 +112,10 @@ class RPCServer(object):
             try:
                 # Apply notification_max_depth to control object tree depth
                 # during serialization to avoid flooding comms
-                data = self.call_and_serialize(
-                    lambda: event)
-                self.send(
-                    {
-                        '$': {'type': NOTIFICATION_MESSAGE},
-                        'data': data
-                    })
+                data = self.call_and_serialize(lambda: event)
+                self.send({"$": {"type": NOTIFICATION_MESSAGE}, "data": data})
             except Exception:
-                log.exception('While processing event {0}:'.format(event))
+                log.exception("While processing event {0}:".format(event))
 
     async def handle_new_connection(self, socket: WebSocket):
         """Handle a new client connection"""
@@ -131,23 +125,25 @@ class RPCServer(object):
             exception = future.exception()
             if exception:
                 log.warning(
-                    'While processing message: {0}\nDetails: {1}'.format(
-                        exception,
-                        traceback.format_exc())
+                    "While processing message: {0}\nDetails: {1}".format(
+                        exception, traceback.format_exc()
+                    )
                 )
 
         socket_id = id(socket)
 
-        log.info('Opening Websocket {0}'.format(id(socket)))
+        log.info("Opening Websocket {0}".format(id(socket)))
 
         try:
-            await socket.send_json({
-                '$': {'type': CONTROL_MESSAGE, 'monitor': True},
-                'root': self.call_and_serialize(lambda: self.root),
-                'type': self.call_and_serialize(lambda: type(self.root))
-            })
+            await socket.send_json(
+                {
+                    "$": {"type": CONTROL_MESSAGE, "monitor": True},
+                    "root": self.call_and_serialize(lambda: self.root),
+                    "type": self.call_and_serialize(lambda: type(self.root)),
+                }
+            )
         except Exception:
-            log.exception('While sending root info to {0}'.format(socket_id))
+            log.exception("While sending root info to {0}".format(socket_id))
 
         try:
             # Add new client to list of clients
@@ -159,9 +155,9 @@ class RPCServer(object):
                 task.add_done_callback(task_done)
                 self.tasks += [task]
         except Exception:
-            log.exception('While reading from socket:')
+            log.exception("While reading from socket:")
         finally:
-            log.info('Closing WebSocket {0}'.format(id(socket)))
+            log.info("Closing WebSocket {0}".format(id(socket)))
             await socket.close()
             # Remove the client from the list
             self.clients = [c for c in self.clients if c.socket != socket]
@@ -170,8 +166,7 @@ class RPCServer(object):
 
     def build_call(self, _id, name, args):
         if _id not in self.objects:
-            raise ValueError(
-                'object with id {0} not found'.format(_id))
+            raise ValueError("object with id {0} not found".format(_id))
 
         obj = self.objects[_id]
         function = getattr(type(obj), name)
@@ -185,13 +180,12 @@ class RPCServer(object):
             kwargs = args.pop()
 
         if not function:
-            raise ValueError(
-                'Function {0} not found in {1}'.format(name, type(obj)))
+            raise ValueError("Function {0} not found in {1}".format(name, type(obj)))
 
         if not callable(function):
             raise ValueError(
-                'Attribute {0} of {1} is not a function'
-                .format(name, type(obj)))
+                "Attribute {0} of {1} is not a function".format(name, type(obj))
+            )
 
         log.info(f"rpc built call {name} on {obj}")
 
@@ -202,14 +196,15 @@ class RPCServer(object):
         Resolve function call arguments that have object ids
         into instances of these objects
         """
+
         def resolve(a):
             if isinstance(a, dict):
-                _id = a.get('i', None)
+                _id = a.get("i", None)
                 # If it's a compound type (including dict)
                 # Check if it has id (i) to determine that it has
                 # a reference in object storage. If it's None, then it's
                 # a dict originated at the remote
-                return self.objects[_id] if _id else a['v']
+                return self.objects[_id] if _id else a["v"]
             # if array, resolve it's elements
             if isinstance(a, (list, tuple)):
                 return [resolve(i) for i in a]
@@ -225,11 +220,11 @@ class RPCServer(object):
         :return: None
         """
         try:
-            meta = data.get('$', {})
-            token = meta.get('token')
-            _id = data.get('id')
+            meta = data.get("$", {})
+            token = meta.get("token")
+            _id = data.get("id")
 
-            if meta.get('ping'):
+            if meta.get("ping"):
                 return self.send_pong()
 
             # if id is missing from payload or explicitly set to null,
@@ -240,95 +235,83 @@ class RPCServer(object):
             try:
                 self.send_ack(token)
                 func = self.build_call(
-                    _id=_id,
-                    name=data.get('name'),
-                    args=data.get('args', []))
+                    _id=_id, name=data.get("name"), args=data.get("args", [])
+                )
             except Exception as e:
                 log.exception("Exception during rpc.Server.process:")
-                error = '{0}: {1}'.format(e.__class__.__name__, e)
+                error = "{0}: {1}".format(e.__class__.__name__, e)
                 self.send_error(error, token)
             else:
                 response = await self.make_call(func, token)
                 self.send(response)
         except Exception:
-            log.exception('Error while processing request')
+            log.exception("Error while processing request")
 
     def call_and_serialize(self, func, max_depth=0):
         # XXXX: This should really only be called in a new thread (as in
         #       the normal case where it is called in a threadpool)
         call_result = func()
-        serialized, refs = serialize.get_object_tree(
-            call_result, max_depth=max_depth)
+        serialized, refs = serialize.get_object_tree(call_result, max_depth=max_depth)
         self.objects.update(refs)
         return serialized
 
     async def make_call(self, func, token):
-        response = {'$': {'type': CALL_RESULT_MESSAGE, 'token': token}}
+        response = {"$": {"type": CALL_RESULT_MESSAGE, "token": token}}
         try:
             call_result = await self.loop.run_in_executor(
-                self.executor, self.call_and_serialize, func)
-            response['$']['status'] = 'success'
+                self.executor, self.call_and_serialize, func
+            )
+            response["$"]["status"] = "success"
         except ExceptionInProtocolError as eipe:
             log.exception("Smart exception in protocol")
-            response['$']['status'] = 'error'
+            response["$"]["status"] = "error"
             call_result = {
-                'message': str(eipe),
-                'traceback': ''.join(traceback.format_exception(
-                    type(eipe.original_exc),
-                    eipe.original_exc,
-                    eipe.original_tb))
+                "message": str(eipe),
+                "traceback": "".join(
+                    traceback.format_exception(
+                        type(eipe.original_exc), eipe.original_exc, eipe.original_tb
+                    )
+                ),
             }
         except Exception as e:
             log.exception("Exception during RPC call:")
             trace = traceback.format_exc()
             try:
-                line_msg = ' [line ' + [
-                    line.split(',')[0].strip()
-                    for line in trace.split('line')
-                    if '<module>' in line][0] + ']'
+                line_msg = (
+                    " [line "
+                    + [
+                        line.split(",")[0].strip()
+                        for line in trace.split("line")
+                        if "<module>" in line
+                    ][0]
+                    + "]"
+                )
             except Exception:
-                line_msg = ''
+                line_msg = ""
             finally:
-                response['$']['status'] = 'error'
+                response["$"]["status"] = "error"
                 call_result = {
-                    'message': '{0}{1}: {2}'.format(
-                        e.__class__.__name__, line_msg, str(e)),
-                    'traceback': trace
+                    "message": "{0}{1}: {2}".format(
+                        e.__class__.__name__, line_msg, str(e)
+                    ),
+                    "traceback": trace,
                 }
         finally:
-            response['data'] = call_result
+            response["data"] = call_result
         return response
 
     def send_error(self, text, token):
-        self.send({
-            '$': {
-                'token': token,
-                'type': CALL_NACK_MESSAGE
-            },
-            'reason': text
-        })
+        self.send({"$": {"token": token, "type": CALL_NACK_MESSAGE}, "reason": text})
 
     def send_ack(self, token):
-        self.send({
-            '$': {
-                'token': token,
-                'type': CALL_ACK_MESSAGE
-            }
-        })
+        self.send({"$": {"token": token, "type": CALL_ACK_MESSAGE}})
 
     def send_pong(self):
-        self.send({
-            '$': {
-                'type': PONG_MESSAGE
-            }
-        })
+        self.send({"$": {"type": PONG_MESSAGE}})
 
     def send(self, payload):
         for writer in self.clients:
-            asyncio.run_coroutine_threadsafe(
-                writer.queue.put(payload),
-                self.loop
-            )
+            asyncio.run_coroutine_threadsafe(writer.queue.put(payload), self.loop)
 
 
 class SystemCalls(object):

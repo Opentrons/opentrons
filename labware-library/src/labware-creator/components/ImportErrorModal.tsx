@@ -15,7 +15,7 @@ const ERROR_MAP: Record<ImportErrorKey, React.ReactNode> = {
       </p>
       <p>
         Labware Creator currently only supports labware with a single regular
-        grid. Also, it does not support tipracks or trash boxes.
+        grid. Also, it does not support trash boxes.
       </p>
     </>
   ),

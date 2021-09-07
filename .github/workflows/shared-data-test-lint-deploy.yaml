@@ -45,6 +45,7 @@ jobs:
           project: 'shared-data/python'
       - name: Lint
         run: make -C shared-data/python lint
+  
   python-test:
     name: 'shared-data package python tests'
     timeout-minutes: 20
@@ -72,6 +73,44 @@ jobs:
             buildComplexEnvVars(core, context)
       - name: Test
         run: make -C shared-data/python test
+      - name: 'Upload coverage report'
+        uses: codecov/codecov-action@v2
+        with:
+          files: ./shared-data/python/coverage.xml
+          flags: shared-data
+
+  js-test:
+    name: 'shared-data JS tests'
+    runs-on: 'ubuntu-18.04'
+    timeout-minutes: 30
+    steps:
+      - uses: 'actions/checkout@v2'
+      - uses: 'actions/setup-node@v1'
+        with:
+          node-version: '12'
+      - name: 'cache yarn cache'
+        uses: actions/cache@v2
+        with:
+          path: |
+            ${{ github.workspace }}/.yarn-cache
+            ${{ github.workspace }}/.npm-cache
+          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
+      - name: 'setup-js'
+        run: |
+          npm config set cache ./.npm-cache
+          yarn config set cache-folder ./.yarn-cache
+          make setup-js
+      - name: 'run shared-data JS unit tests'
+        run: |
+          yarn jest --coverage=true --ci=true --collectCoverageFrom="shared-data/js/**/*.(js|ts|tsx)" shared-data/js
+      - name: 'Upload coverage report'
+        uses: codecov/codecov-action@v2
+        with:
+          files: ./coverage/lcov.info
+          flags: shared-data
+
   python-deploy:
     name: 'shared-data package deploy'
     needs: [python-test]

@@ -1,5 +1,4 @@
 import * as React from 'react'
-import cloneDeep from 'lodash/cloneDeep'
 import {
   LabwareRender,
   LabwareOutline,
@@ -7,73 +6,67 @@ import {
   RobotWorkSpace,
 } from '@opentrons/components'
 import {
+  LabwareDefinition2,
   SLOT_LENGTH_MM as DEFAULT_X_DIMENSION,
   SLOT_WIDTH_MM as DEFAULT_Y_DIMENSION,
 } from '@opentrons/shared-data'
-import { labwareFormSchema } from '../labwareFormSchema'
-import { fieldsToLabware } from '../fieldsToLabware'
-import type { LabwareFields, ProcessedLabwareFields } from '../fields'
 import styles from './ConditionalLabwareRender.css'
 
 interface Props {
-  values: LabwareFields
+  definition: LabwareDefinition2 | null
+}
+
+const calculateViewBox = (args: {
+  bBox: DOMRect | undefined
+  xDim: number
+  yDim: number
+}): string => {
+  const { bBox, xDim, yDim } = args
+
+  // by-eye margin to make sure there is no visual clipping
+  const MARGIN = 5
+
+  // calculate viewBox such that SVG is zoomed and panned with the bBox fully in view,
+  // in a "zoom to fit" manner, plus some visual margin to prevent clipping
+  return `${(bBox?.x ?? 0) - MARGIN} ${(bBox?.y ?? 0) - MARGIN} ${
+    xDim + MARGIN * 2
+  } ${yDim + MARGIN * 2}`
 }
 
 export const ConditionalLabwareRender = (props: Props): JSX.Element => {
-  const definition = React.useMemo(() => {
-    const values = cloneDeep(props.values)
+  const { definition } = props
+  const gRef = React.useRef<SVGGElement>(null)
+  const [bBox, updateBBox] = React.useState<DOMRect | undefined>(
+    gRef.current ? gRef.current.getBBox() : undefined
+  )
 
-    // Fill arbitrary values in to any missing fields that aren't needed for this render,
-    // eg some required definition data like well volume, height, and bottom shape don't affect the render.
-    values.footprintXDimension =
-      values.footprintXDimension || `${DEFAULT_X_DIMENSION}`
-    values.footprintYDimension =
-      values.footprintYDimension || `${DEFAULT_Y_DIMENSION}`
-    values.labwareZDimension = values.wellDepth || '100'
-    values.wellDepth = values.wellDepth || '80'
-    values.wellVolume = values.wellVolume || '50'
-    values.wellBottomShape = values.wellBottomShape || 'flat'
-    values.labwareType = values.labwareType || 'wellPlate'
-
-    values.displayName = values.displayName || 'Some Labware'
-    values.loadName = values.loadName || 'some_labware'
-    values.brand = values.brand || 'somebrand'
-    // A few other fields don't even go into the definition (eg "is row spacing uniform" etc).
-    values.homogeneousWells = 'true'
-    values.regularRowSpacing = 'true'
-    values.regularColumnSpacing = 'true'
-    values.pipetteName = 'whatever'
-
-    let castValues: ProcessedLabwareFields | null = null
-    try {
-      castValues = labwareFormSchema.cast(values)
-    } catch (error) {}
-
-    if (castValues === null) {
-      return null
+  // In order to implement "zoom to fit", we're calculating the desired viewBox based on getBBox of the child.
+  // So we have to actually render the child to get its bounding box. After that, we re-calculate the viewBox.
+  // Once the viewBox is re-calculated, we use setState to force a re-render.
+  const nextBBox = gRef.current?.getBBox()
+  React.useLayoutEffect((): void => {
+    if (
+      nextBBox != null &&
+      (nextBBox.width !== bBox?.width || nextBBox.height !== bBox?.height)
+    ) {
+      updateBBox(nextBBox)
     }
+  }, [bBox?.height, bBox?.width, nextBBox])
 
-    let def = null
-    if (castValues) {
-      def = fieldsToLabware(castValues)
-    } else {
-      console.log('invalid, no def for conditional render')
-    }
-    return def
-  }, [props.values])
-
-  const xDim = definition
-    ? definition.dimensions.xDimension
-    : DEFAULT_X_DIMENSION
-  const yDim = definition
-    ? definition.dimensions.yDimension
-    : DEFAULT_Y_DIMENSION
+  const xDim =
+    definition != null
+      ? bBox?.width ?? definition.dimensions.xDimension
+      : DEFAULT_X_DIMENSION
+  const yDim =
+    definition != null
+      ? bBox?.height ?? definition.dimensions.yDimension
+      : DEFAULT_Y_DIMENSION
 
   return (
-    <RobotWorkSpace viewBox={`0 0 ${xDim} ${yDim}`}>
+    <RobotWorkSpace viewBox={calculateViewBox({ bBox, xDim, yDim })}>
       {() =>
-        definition ? (
-          <LabwareRender definition={definition} />
+        definition != null ? (
+          <LabwareRender definition={definition} gRef={gRef} />
         ) : (
           <>
             <LabwareOutline />

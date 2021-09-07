@@ -1,4 +1,6 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+
+from robot_server.service.dependencies import check_version_header
 
 from . import (
     networking,
@@ -10,29 +12,69 @@ from . import (
     motors,
     camera,
     logs,
-    rpc
+    rpc,
 )
 
 legacy_routes = APIRouter()
 
-legacy_routes.include_router(router=networking.router, tags=["Networking"])
+legacy_routes.include_router(
+    router=networking.router,
+    tags=["Networking"],
+    dependencies=[Depends(check_version_header)],
+)
 
-legacy_routes.include_router(router=control.router, tags=["Control"])
+legacy_routes.include_router(
+    router=control.router,
+    tags=["Control"],
+    dependencies=[Depends(check_version_header)],
+)
 
-legacy_routes.include_router(router=settings.router, tags=["Settings"])
+legacy_routes.include_router(
+    router=settings.router,
+    tags=["Settings"],
+    dependencies=[Depends(check_version_header)],
+)
 
-legacy_routes.include_router(router=deck_calibration.router, tags=["Deck Calibration"])
+legacy_routes.include_router(
+    router=deck_calibration.router,
+    tags=["Deck Calibration"],
+    dependencies=[Depends(check_version_header)],
+)
 
-legacy_routes.include_router(router=modules.router, tags=["Modules"])
+legacy_routes.include_router(
+    router=modules.router,
+    tags=["Modules"],
+    dependencies=[Depends(check_version_header)],
+)
 
-legacy_routes.include_router(router=pipettes.router, tags=["Pipettes"])
+legacy_routes.include_router(
+    router=pipettes.router,
+    tags=["Pipettes"],
+    dependencies=[Depends(check_version_header)],
+)
 
-legacy_routes.include_router(router=motors.router, tags=["Motors"])
+legacy_routes.include_router(
+    router=motors.router,
+    tags=["Motors"],
+    dependencies=[Depends(check_version_header)],
+)
 
-legacy_routes.include_router(router=camera.router, tags=["Camera"])
+legacy_routes.include_router(
+    router=camera.router,
+    tags=["Camera"],
+    dependencies=[Depends(check_version_header)],
+)
 
-legacy_routes.include_router(router=logs.router, tags=["Logs"])
+# logs routes are exempt from version header requirements
+legacy_routes.include_router(
+    router=logs.router,
+    tags=["Logs"],
+)
 
-legacy_routes.include_router(router=rpc.router, tags=["RPC"])
+# RPC websocket route is exempt from version header requirements
+legacy_routes.include_router(
+    router=rpc.router,
+    tags=["RPC"],
+)
 
 __all__ = ["legacy_routes"]

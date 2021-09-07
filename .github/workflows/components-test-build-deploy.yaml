@@ -5,6 +5,7 @@ name: 'Components test, build, and deploy'
 on:
   pull_request:
     paths:
+      - 'Makefile'
       - 'components/**'
       - 'webpack-config/**'
       - 'package.json'
@@ -53,7 +54,13 @@ jobs:
           make setup-js
       - name: 'run components unit tests'
         run: |
-          yarn jest --coverage=true --ci=true components/
+          yarn jest --coverage=true --ci=true --collectCoverageFrom="components/src/**/*.(js|ts|tsx)" components/src
+      - name: 'Upload coverage report'
+        uses: codecov/codecov-action@v2
+        with:
+          files: ./coverage/lcov.info
+          flags: components
+  
   build-components:
     name: 'build components artifact'
     runs-on: 'ubuntu-18.04'
@@ -78,17 +85,16 @@ jobs:
           yarn config set cache-folder ./.yarn-cache
           make setup-js
       - name: 'build components'
-        run: |
-          make -C components
+        run: make -C components
       - name: 'upload github artifact'
         uses: actions/upload-artifact@v2
         with:
           name: 'components-artifact'
-          path: components/dist
+          path: storybook-static
   deploy-components:
     name: 'deploy components artifact to S3'
     runs-on: 'ubuntu-18.04'
-    needs: ["js-unit-test", "build-components"]
+    needs: ['js-unit-test', 'build-components']
     if: github.event_name != 'pull_request'
     steps:
       - uses: 'actions/checkout@v2'

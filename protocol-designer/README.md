@@ -59,7 +59,11 @@ Used for FullStory. Should be provided in the Travis build.
 
 ### `OT_PD_MIXPANEL_ID`
 
-Used for Mixpanel. Should be provided in the Travis build.
+Used for Mixpanel in prod. Should be provided in the CI build.
+
+### `OT_PD_MIXPANEL_DEV_ID`
+
+Used for Mixpanel in dev (eg via a sandbox URL). Should be provided in the CI build.
 
 ### `OT_PD_SHOW_GATE`
 
@@ -68,3 +72,27 @@ If truthy, uses the `GateModal` component in development. The `GateModal` compon
 [chrome]: https://www.google.com/chrome/
 [json-schema]: https://json-schema.org/
 [ot-2]: https://opentrons.com/ot-2
+
+## Protocol schema versioning on import and save, and how protocol versioning is exposed to users
+
+This info is current as of 2021/07/01:
+
+Our protocol executor (in robot server) doesn't support older versions of JSON protocols (v1 and v2 will not execute). Users with v1/v2 PD protocols need to upload them into PD and save them again so that they can run them on a recent version of Run App + robot.
+
+PD supports importing of all PD JSON protocols, back to schema v1. It has machinery to transform v1 to v2, v2 to v3, and so on. We internally call these "migrations", but to the user it's just exposed in an "Update Protocol" modal that users see upon importing an older protocol into PD.
+
+Regardless of version upon import, PD will save the lowest schema version depending on features of the protocol. Right now PD saves version 3, 4, or 5. PD chooses the lowest possible version given the features used by the protocol. It doesn't matter what version was imported, only what features it has when you go to save it.
+
+- A protocol that uses Air Gap will be saved as v5.
+- A protocol with modules (and no air gap) will be saved as v4.
+- A protocol with no modules and no air gap will be saved as v3.
+
+We chose to make PD save the oldest workable version (of 3/4/5) because users are resistant to upgrading their robots. With this ability to export the oldest workable version, users who are not taking advantage of newer features don't need to upgrade. For example, if I wasn't using modules in my protocol, and I'm still not using modules, I as a user don't want to have to upgrade my robot to run my existing protocol that I'm working on in PD.
+
+However, it becomes unmaintainable to support saving older versions indefinitely -- eg sometime soon we'll drop support for PD saving v3 (and maybe also drop saving v4). Users would still be able to import any old versions back to v1, but only save newer ones.
+
+Users never have to think about protocol version numbers directly. But we do make them aware in some ways that protocols are tied to updates:
+
+- Upon importing an older protocol into PD, we make them aware of "PD is upgrading your protocol, please check it to make sure nothing has broken".
+- In Run App, upon uploading a newer protocol to an older robot version, users may see a message like "you have to upgrade your robot to run this protocol" (if they have a schema newer than their run app / robot server version)
+- Upon exporting from PD, we also have a message like "you may have to upgrade your robot" when a user is taking advantage of certain new features for the first time. PD can't tell what version their robot is, so we can't be more specific, currently.

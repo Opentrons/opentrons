@@ -29,14 +29,18 @@ export interface LabwareRenderProps {
   /** Special class which, together with 'data-wellname' on the well elements,
     allows drag-to-select behavior */
   selectableWellClass?: string
+  gRef?: React.RefObject<SVGGElement>
 }
 
-export function LabwareRender(props: LabwareRenderProps): JSX.Element {
+export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
+  const { gRef } = props
   const cornerOffsetFromSlot = props.definition.cornerOffsetFromSlot
+
   return (
     <g
       /* eslint-disable-next-line @typescript-eslint/restrict-template-expressions */
       transform={`translate(${cornerOffsetFromSlot.x}, ${cornerOffsetFromSlot.y})`}
+      ref={gRef}
     >
       <StaticLabware
         definition={props.definition}

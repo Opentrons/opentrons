@@ -1,14 +1,15 @@
 import * as React from 'react'
-import styles from '../Section.css'
+import styles from './SectionBody.css'
 
 interface Props {
-  children: JSX.Element
+  children: React.ReactNode
   headingClassName?: string
   label: string
+  id?: string
 }
 
 export const SectionBody = (props: Props): JSX.Element => (
-  <div className={styles.section_wrapper}>
+  <div className={styles.section_wrapper} id={props.id}>
     <h2 className={props.headingClassName || styles.section_header}>
       {props.label}
     </h2>

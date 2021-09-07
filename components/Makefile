@@ -1,11 +1,7 @@
 # opentrons component library makefile
 
 # dev server port
-port ?= 8081
-
-# type definitions
-typedefs := $(shell yarn -s shx find "lib/**/*.d.ts")
-flow_out := $(patsubst lib/%.d.ts,flow-types/%.js.flow,$(typedefs))
+port ?= 6060
 
 # standard targets
 #####################################################################
@@ -13,32 +9,20 @@ flow_out := $(patsubst lib/%.d.ts,flow-types/%.js.flow,$(typedefs))
 .PHONY: all
 all: clean dist
 
-.PHONY: setup
-setup:
-	yarn
-
 .PHONY: clean
 clean:
-	yarn shx rm -rf dist
+	yarn --cwd .. shx rm -rf storybook-static
 
 # artifacts
 #####################################################################
 
 .PHONY: dist
-dist: export NODE_ENV := development
 dist:
-	yarn styleguidist build
-
-.PHONY: flow-types
-flow-types: $(flow_out)
-
-flow-types/%.js.flow: lib/%.d.ts
-	yarn flowgen $< --add-flow-header --interface-records --no-inexact --output-file $@
+	yarn --cwd .. build-storybook
 
 # development
 #####################################################################
 
 .PHONY: dev
-build: export NODE_ENV := development
 dev:
-	yarn styleguidist server
+	yarn --cwd .. start-storybook --port $(port)

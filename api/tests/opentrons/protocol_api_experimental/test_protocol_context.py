@@ -2,7 +2,9 @@
 import pytest
 from decoy import Decoy
 
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons_shared_data.labware import dev_types
+
+from opentrons.protocols.models import LabwareDefinition
 from opentrons.protocol_engine import commands
 from opentrons.protocol_engine.clients import SyncClient
 
@@ -23,15 +25,9 @@ from opentrons.protocol_api_experimental import (
 
 
 @pytest.fixture
-def decoy() -> Decoy:
-    """Get a Decoy test-double container fixture."""
-    return Decoy()
-
-
-@pytest.fixture
 def engine_client(decoy: Decoy) -> SyncClient:
     """Get a fake ProtocolEngine client."""
-    return decoy.create_decoy(spec=SyncClient)
+    return decoy.mock(cls=SyncClient)
 
 
 @pytest.fixture
@@ -112,7 +108,7 @@ def test_load_pipette_with_bad_args(
         subject.load_pipette(pipette_name="p300_single", mount="west")
 
 
-@pytest.mark.xfail(raises=NotImplementedError)
+@pytest.mark.xfail(raises=NotImplementedError, strict=True)
 def test_load_pipette_with_tipracks_list(subject: ProtocolContext) -> None:
     """TODO: it should do something with the `tip_racks` parameter to load_pipette."""
     subject.load_pipette(
@@ -122,7 +118,7 @@ def test_load_pipette_with_tipracks_list(subject: ProtocolContext) -> None:
     )
 
 
-@pytest.mark.xfail(raises=NotImplementedError)
+@pytest.mark.xfail(raises=NotImplementedError, strict=True)
 def test_load_pipette_with_replace(subject: ProtocolContext) -> None:
     """TODO: it should do something with the `replace` parameter to load_pipette."""
     subject.load_pipette(pipette_name="p300_single", mount="left", replace=True)
@@ -130,7 +126,7 @@ def test_load_pipette_with_replace(subject: ProtocolContext) -> None:
 
 def test_load_labware(
     decoy: Decoy,
-    minimal_labware_def: LabwareDefinition,
+    minimal_labware_def: dev_types.LabwareDefinition,
     engine_client: SyncClient,
     subject: ProtocolContext,
 ) -> None:
@@ -145,7 +141,7 @@ def test_load_labware(
     ).then_return(
         commands.LoadLabwareResult(
             labwareId="abc123",
-            definition=minimal_labware_def,
+            definition=LabwareDefinition.parse_obj(minimal_labware_def),
             calibration=(1, 2, 3),
         )
     )
@@ -187,7 +183,20 @@ def test_load_labware_default_namespace_and_version(
     assert result == Labware(labware_id="abc123", engine_client=engine_client)
 
 
-@pytest.mark.xfail(raises=NotImplementedError)
+@pytest.mark.xfail(raises=NotImplementedError, strict=True)
 def test_load_labware_with_label(subject: ProtocolContext) -> None:
     """TODO: it should do something with the `label` parameter to load_labware."""
     subject.load_labware(load_name="some_labware", location=5, label="some_label")
+
+
+def test_pause(
+    decoy: Decoy,
+    engine_client: SyncClient,
+    subject: ProtocolContext,
+) -> None:
+    """It should be able to issue a Pause command through the client."""
+    subject.pause()
+    decoy.verify(engine_client.pause(message=None), times=1)
+
+    subject.pause(msg="hello world")
+    decoy.verify(engine_client.pause(message="hello world"), times=1)

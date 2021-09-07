@@ -12,7 +12,7 @@ class MotionPlanningError(Exception):
         clearance: float,
         min_travel_z: float,
         max_travel_z: float,
-        message: str
+        message: str,
     ) -> None:
         """Initialize an error with properties of the planned motion."""
         super().__init__(message)

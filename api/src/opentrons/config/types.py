@@ -17,12 +17,10 @@ class CurrentDictDefault(TypedDict):
 
 
 CurrentDictModelEntries = TypedDict(
-    'CurrentDictModelEntries',
-    {'2.1': AxisDict,
-     'A': AxisDict,
-     'B': AxisDict,
-     'C': AxisDict},
-    total=False)
+    "CurrentDictModelEntries",
+    {"2.1": AxisDict, "A": AxisDict, "B": AxisDict, "C": AxisDict},
+    total=False,
+)
 
 
 class CurrentDict(CurrentDictDefault, CurrentDictModelEntries):
@@ -38,7 +36,7 @@ class RobotConfig:
     serial_speed: int
     default_pipette_configs: Dict[str, float]
     default_current: CurrentDict
-    low_current:  CurrentDict
+    low_current: CurrentDict
     high_current: CurrentDict
     default_max_speed: AxisDict
     log_level: str

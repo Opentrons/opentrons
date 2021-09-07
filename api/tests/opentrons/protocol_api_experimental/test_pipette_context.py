@@ -8,15 +8,9 @@ from opentrons.protocol_api_experimental import PipetteContext, Labware, Well
 
 
 @pytest.fixture
-def decoy() -> Decoy:
-    """Decoy fixture."""
-    return Decoy()
-
-
-@pytest.fixture
 def engine_client(decoy: Decoy) -> EngineClient:
     """Mock sync client."""
-    return decoy.create_decoy(spec=EngineClient)
+    return decoy.mock(cls=EngineClient)
 
 
 @pytest.fixture

@@ -70,7 +70,7 @@
       "volume": { "label": "volume per well" },
       "well_order": {
         "label": "Well order",
-        "mixed": "mixed",
+        "unknown": "unknown",
         "option": {
           "l2r": "Left to right",
           "r2l": "Right to left",

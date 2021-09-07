@@ -7,52 +7,59 @@ import os.path
 from setuptools import setup, find_packages
 
 # make stdout blocking since Travis sets it to nonblocking
-if os.name == 'posix':
+if os.name == "posix":
     import fcntl
+
     flags = fcntl.fcntl(sys.stdout, fcntl.F_GETFL)
     fcntl.fcntl(sys.stdout, fcntl.F_SETFL, flags & ~os.O_NONBLOCK)
 
 HERE = os.path.abspath(os.path.dirname(__file__))
-sys.path.append(os.path.join(HERE, '..', 'scripts'))
+sys.path.append(os.path.join(HERE, "..", "scripts"))
 
 from python_build_utils import normalize_version  # noqa: E402
 
 
 def get_version():
-    buildno = os.getenv('BUILD_NUMBER')
+    buildno = os.getenv("BUILD_NUMBER")
     if buildno:
-        normalize_opts = {'extra_tag': buildno}
+        normalize_opts = {"extra_tag": buildno}
     else:
         normalize_opts = {}
-    return normalize_version('robot-server', **normalize_opts)
+    return normalize_version("robot-server", **normalize_opts)
 
 
 VERSION = get_version()
 
-DISTNAME = 'robotserver'
-LICENSE = 'Apache 2.0'
+DISTNAME = "robot_server"
+LICENSE = "Apache 2.0"
 AUTHOR = "Opentrons"
 EMAIL = "engineering@opentrons.com"
 URL = "https://github.com/Opentrons/opentrons"
-DOWNLOAD_URL = ''
+DOWNLOAD_URL = ""
 CLASSIFIERS = [
-    'Development Status :: 5 - Production/Stable',
-    'Environment :: Console',
-    'Operating System :: OS Independent',
-    'Intended Audience :: Science/Research',
-    'Programming Language :: Python',
-    'Programming Language :: Python :: 3',
-    'Programming Language :: Python :: 3.7',
-    'Topic :: Scientific/Engineering',
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Topic :: Scientific/Engineering",
 ]
 KEYWORDS = ["robots", "protocols", "synbio", "pcr", "automation", "lab"]
-DESCRIPTION = (
-    "A server providing access to the Opentrons API")
-PACKAGES = find_packages(where='.', exclude=["tests.*", "tests"])
+DESCRIPTION = "A server providing access to the Opentrons API"
+PACKAGES = find_packages(where=".", exclude=["tests.*", "tests"])
 INSTALL_REQUIRES = [
-    'fastapi==0.54.1',
-    'python-multipart==0.0.5',
-    'opentrons',
+    f"opentrons=={VERSION}",
+    f"opentrons-shared-data=={VERSION}",
+    f"notify-server=={VERSION}",
+    "anyio==3.3.0",
+    "fastapi==0.54.1",
+    "python-dotenv==0.19.0",
+    "pydantic==1.4",
+    "typing-extensions==3.10.0.0",
+    "uvicorn==0.14.0",
+    "wsproto==1.0.0",
 ]
 
 
@@ -67,7 +74,7 @@ def read(*parts):
 
 if __name__ == "__main__":
     setup(
-        python_requires='>=3.7',
+        python_requires=">=3.7",
         name=DISTNAME,
         description=DESCRIPTION,
         license=LICENSE,
@@ -83,5 +90,5 @@ if __name__ == "__main__":
         zip_safe=False,
         classifiers=CLASSIFIERS,
         install_requires=INSTALL_REQUIRES,
-        include_package_data=True
+        include_package_data=True,
     )

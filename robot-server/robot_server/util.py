@@ -33,7 +33,7 @@ def save_upload(directory: Path, upload_file: UploadFile) -> FileMeta:
     content_hash = hashlib.sha256(contents).hexdigest()
 
     # write contents to file
-    with path.open('wb') as p:
+    with path.open("wb") as p:
         p.write(contents)
 
     return FileMeta(path=path, content_hash=content_hash)
@@ -51,6 +51,7 @@ def call_once(fn):
 
     :param fn: a coroutine
     """
+
     @wraps(fn)
     async def wrapped(*args, **kwargs):
         if not hasattr(wrapped, CALL_ONCE_RESULT_ATTR):

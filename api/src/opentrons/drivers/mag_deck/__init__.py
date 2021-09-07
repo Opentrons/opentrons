@@ -1,7 +1,6 @@
-from opentrons.drivers.mag_deck.driver import MagDeck, SimulatingDriver
+from .abstract import AbstractMagDeckDriver
+from .simulator import SimulatingDriver
+from .driver import MagDeckDriver
 
 
-__all__ = [
-    'MagDeck',
-    'SimulatingDriver'
-]
+__all__ = ["AbstractMagDeckDriver", "SimulatingDriver", "MagDeckDriver"]

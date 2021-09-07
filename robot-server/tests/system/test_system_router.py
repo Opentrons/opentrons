@@ -18,16 +18,14 @@ def mock_system_time() -> datetime:
 @pytest.fixture
 def mock_set_system_time(mock_system_time: datetime) -> Iterator[MagicMock]:
     """Patch set_system_time in time_utils."""
-    with patch.object(router, 'set_system_time') as p:
+    with patch.object(router, "set_system_time") as p:
         yield p
 
 
 @pytest.fixture
 def response_links() -> ResourceLinks:
     """Get expected /system/time resource links."""
-    return {
-        ResourceLinkKey.self: ResourceLink(href='/system/time')
-    }
+    return {ResourceLinkKey.self: ResourceLink(href="/system/time")}
 
 
 def test_raise_system_synchronized_error(
@@ -37,19 +35,23 @@ def test_raise_system_synchronized_error(
 ) -> None:
     """It should raise a SystemTimeAlreadySynchronized from set_system_time."""
     mock_set_system_time.side_effect = errors.SystemTimeAlreadySynchronized(
-        'Cannot set system time; already synchronized with NTP or RTC')
+        "Cannot set system time; already synchronized with NTP or RTC"
+    )
 
-    response = api_client.put("/system/time", json={
-        "data": {
-            "id": "time",
-            "systemTime": mock_system_time.isoformat()
-        }
-    })
-    assert response.json() == {'errors': [{
-        'detail': 'Cannot set system time; already synchronized with NTP '
-                  'or RTC',
-        'status': '403',
-        'title': 'Action Forbidden'}]}
+    response = api_client.put(
+        "/system/time",
+        json={"data": {"id": "time", "systemTime": mock_system_time.isoformat()}},
+    )
+    assert response.json() == {
+        "errors": [
+            {
+                "id": "UncategorizedError",
+                "detail": "Cannot set system time; already synchronized with NTP "
+                "or RTC",
+                "title": "Action Forbidden",
+            }
+        ]
+    }
     assert response.status_code == 403
 
 
@@ -60,18 +62,22 @@ def test_raise_system_exception(
 ) -> None:
     """It should raise a SystemSetTimeException from set_system_time."""
     mock_set_system_time.side_effect = errors.SystemSetTimeException(
-        'Something went wrong')
+        "Something went wrong"
+    )
 
-    response = api_client.put("/system/time", json={
-        "data": {
-            "id": "time",
-            "systemTime": mock_system_time.isoformat()
-        }
-    })
-    assert response.json() == {'errors': [{
-        'detail': 'Something went wrong',
-        'status': '500',
-        'title': 'Internal Server Error'}]}
+    response = api_client.put(
+        "/system/time",
+        json={"data": {"id": "time", "systemTime": mock_system_time.isoformat()}},
+    )
+    assert response.json() == {
+        "errors": [
+            {
+                "id": "UncategorizedError",
+                "detail": "Something went wrong",
+                "title": "Internal Server Error",
+            }
+        ]
+    }
     assert response.status_code == 500
 
 
@@ -88,17 +94,14 @@ def test_set_system_time(
     response = api_client.put(
         "/system/time",
         json={
-            'data': {
-                'systemTime': mock_system_time.isoformat(),
-                'id': 'time',
+            "data": {
+                "systemTime": mock_system_time.isoformat(),
+                "id": "time",
             },
         },
     )
     assert response.json() == {
-        'data': {
-            'systemTime': mock_system_time.isoformat(),
-            'id': 'time'
-        },
-        'links': response_links,
+        "data": {"systemTime": mock_system_time.isoformat(), "id": "time"},
+        "links": response_links,
     }
     assert response.status_code == 200

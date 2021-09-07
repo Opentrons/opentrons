@@ -3,13 +3,6 @@
 include ../scripts/push.mk
 include ../scripts/python.mk
 
-# using bash instead of /bin/bash in SHELL prevents macOS optimizing away our PATH update
-SHELL := bash
-
-# add yarn CLI dev deps to PATH (for cross platform POSIX commands via shx)
-# and also make an explicit version for shx for use in the shell function,
-# where PATH won’t be propagated
-PATH := $(shell cd .. && yarn bin):$(PATH)
 SHX := npx shx
 
 # Path of source package
@@ -18,7 +11,7 @@ SRC_PATH = robot_server
 # Find the version of the wheel from package.json using a helper script. We
 # use python here so we can use the same version normalization that will be
 # used to create the wheel.
-wheel_file = dist/$(call python_get_wheelname,robot-server,robotserver,$(BUILD_NUMBER))
+wheel_file = dist/$(call python_get_wheelname,robot-server,robot_server,$(BUILD_NUMBER))
 
 
 # These variables can be overriden when make is invoked to customize the
@@ -26,7 +19,7 @@ wheel_file = dist/$(call python_get_wheelname,robot-server,robotserver,$(BUILD_N
 # make test tests=tests/opentrons/tools/test_qc_scripts.py would run only the
 # specified test
 tests ?= tests
-test_opts ?=  --cov=$(SRC_PATH) --cov-report term-missing:skip-covered --cov-report xml:coverage.xml
+test_opts ?= --cov=$(SRC_PATH) --cov-report term-missing:skip-covered --cov-report xml:coverage.xml
 
 # Host key location for buildroot robot
 br_ssh_key ?= $(default_ssh_key)
@@ -44,6 +37,23 @@ ot_sources := $(ot_py_sources)
 # depend on a PHONY target
 clean_cmd = $(SHX) rm -rf build dist .coverage coverage.xml '*.egg-info' '**/__pycache__' '**/*.pyc' 'robot_server/**/.mypy_cache'
 
+# Uvicorn command to run the robot server in dev mode.
+#
+# "--lifespan on" ensures errors in startup and shutdown handlers won't be hidden.
+# See github.com/encode/starlette/issues/1138, fixed in Starlette v0.16.0?
+#
+# todo(mm, 2021-07-08): Figure out how to run the server with Python development
+# mode enabled, to expose more errors and warnings.
+#   * Using a Makefile target-specific variable to set PYTHONDEVMODE=1
+#     doesn't work because it applies the variable to the whole `pipenv run`
+#     command, and we only want our inner server process running under dev mode,
+#     not the outer pipenv process.
+#   * Adding PYTHONDEVMODE=1 to the .env file specified by
+#     OT_ROBOT_SERVER_DOT_ENV_PATH doesn't work because that's read too late.
+#   * Doing `pipenv run env PYTHONDEVMODE=1 uvicorn ...` works, except it's
+#     probably POSIX-only.
+run_dev ?= uvicorn "robot_server:app" --host localhost --port 31950 --ws wsproto --lifespan on --reload
+
 .PHONY: all
 all: clean wheel
 
@@ -60,7 +70,7 @@ clean:
 teardown:
 	$(pipenv) --rm
 
-dist/robotserver-%-py2.py3-none-any.whl: setup.py $(ot_sources)
+$(wheel_file): setup.py $(ot_sources)
 	$(clean_cmd)
 	$(python) setup.py $(wheel_opts) bdist_wheel
 	$(SHX) rm -rf build
@@ -73,14 +83,24 @@ test:
 	$(pytest) $(tests) $(test_opts)
 
 .PHONY: lint
-lint: $(ot_py_sources)
-	$(python) -m mypy $(SRC_PATH) tests/health tests/system
-	$(python) -m flake8 $(SRC_PATH) tests setup.py
+lint:
+	$(python) -m mypy $(SRC_PATH) $(tests)
+	$(python) -m black --check .
+	$(python) -m flake8 $(SRC_PATH) $(tests) setup.py
+
+.PHONY: format
+format:
+	$(python) -m black .
 
 .PHONY: dev
 dev: export OT_ROBOT_SERVER_DOT_ENV_PATH ?= dev.env
 dev:
-	$(pipenv) run uvicorn "robot_server:app" --host localhost --port 31950 --ws wsproto --reload
+	$(pipenv) run $(run_dev)
+
+.PHONY: dev-with-emulator
+dev-with-emulator: export OT_ROBOT_SERVER_DOT_ENV_PATH ?= emulator.env
+dev-with-emulator:
+	$(pipenv) run $(run_dev)
 
 .PHONY: local-shell
 local-shell:

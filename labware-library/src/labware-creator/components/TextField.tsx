@@ -3,7 +3,7 @@ import { Field } from 'formik'
 import { InputField } from '@opentrons/components'
 import { reportFieldEdit } from '../analyticsUtils'
 import { getIsHidden } from '../formSelectors'
-import { LABELS } from '../fields'
+import { getLabel } from '../fields'
 import type { InputFieldProps } from '@opentrons/components'
 import type { LabwareFields } from '../fields'
 import type { FieldProps } from 'formik'
@@ -11,6 +11,7 @@ import fieldStyles from './fieldStyles.css'
 
 interface Props {
   name: keyof LabwareFields
+  label?: string
   placeholder?: string
   caption?: InputFieldProps['caption']
   inputMasks?: Array<(prevValue: string, update: string) => string>
@@ -21,7 +22,7 @@ interface Props {
 // because sections are laid out to contain groups of autofilled fields.
 // This functionality in TextField may be removed if we clearly don't need it.
 export const TextField = (props: Props): JSX.Element => {
-  const { caption, name, placeholder, units } = props
+  const { label, caption, placeholder, units } = props
   const inputMasks = props.inputMasks || []
   // @ts-expect-error(IL, 2021-03-24): formik types need cleanup w LabwareFields
   const makeHandleChange = ({ field, form }) => (
@@ -35,24 +36,27 @@ export const TextField = (props: Props): JSX.Element => {
     )
     form.setFieldValue(props.name, nextValue)
   }
+
   return (
     <Field name={props.name}>
       {({ field, form }: FieldProps) =>
         getIsHidden(props.name, form.values) ? null : (
           <div className={fieldStyles.field_wrapper}>
-            <div className={fieldStyles.field_label}>{LABELS[name]}</div>
-            <InputField
-              name={field.name}
-              value={field.value}
-              caption={caption}
-              placeholder={placeholder}
-              onChange={makeHandleChange({ field, form })}
-              onBlur={(e: React.FocusEvent<HTMLInputElement>) => {
-                reportFieldEdit({ value: field.value, name: field.name })
-                field.onBlur(e)
-              }}
-              units={units}
-            />
+            <label className={fieldStyles.field_label}>
+              {label !== undefined ? label : getLabel(props.name, form.values)}
+              <InputField
+                name={field.name}
+                value={field.value}
+                caption={caption}
+                placeholder={placeholder}
+                onChange={makeHandleChange({ field, form })}
+                onBlur={(e: React.FocusEvent<HTMLInputElement>) => {
+                  reportFieldEdit({ value: field.value, name: field.name })
+                  field.onBlur(e)
+                }}
+                units={units}
+              />
+            </label>
           </div>
         )
       }

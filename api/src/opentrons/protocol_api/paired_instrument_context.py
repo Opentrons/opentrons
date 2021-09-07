@@ -7,17 +7,23 @@ from typing import TYPE_CHECKING, Union, Tuple, List, Optional, Dict
 from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons import types, hardware_control as hc
 from opentrons.commands import paired_commands as cmds
-from opentrons.commands.publisher import (
-    CommandPublisher, publish_paired, publish)
+from opentrons.commands.publisher import CommandPublisher, publish_paired, publish
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.context.protocol_api.paired_instrument import\
-    PairedInstrument
+from opentrons.protocols.context.protocol_api.paired_instrument import PairedInstrument
 
 from opentrons.protocols.api_support.util import (
-    requires_version, labware_column_shift, Clearances, clamp_value)
+    requires_version,
+    labware_column_shift,
+    Clearances,
+    clamp_value,
+)
 from .labware import (
-    Labware, Well, OutOfTipsError, select_tiprack_from_list_paired_pipettes,
-    filter_tipracks_to_start)
+    Labware,
+    Well,
+    OutOfTipsError,
+    select_tiprack_from_list_paired_pipettes,
+    filter_tipracks_to_start,
+)
 
 if TYPE_CHECKING:
     from .protocol_context import ProtocolContext
@@ -40,37 +46,45 @@ class PipettePairPickUpTipError(Exception):
 
 
 class PairedInstrumentContext(CommandPublisher):
-
-    def __init__(self,
-                 primary_instrument: InstrumentContext,
-                 secondary_instrument: InstrumentContext,
-                 ctx: ProtocolContext,
-                 pair_policy: hc_types.PipettePair,
-                 api_version: APIVersion,
-                 hardware_manager: HardwareManager,
-                 trash: Labware,
-                 log_parent: logging.Logger) -> None:
+    def __init__(
+        self,
+        primary_instrument: InstrumentContext,
+        secondary_instrument: InstrumentContext,
+        ctx: ProtocolContext,
+        pair_policy: hc_types.PipettePair,
+        api_version: APIVersion,
+        hardware_manager: HardwareManager,
+        trash: Labware,
+        log_parent: logging.Logger,
+    ) -> None:
         super().__init__(ctx.broker)
         self._instruments = {
             pair_policy.primary: primary_instrument,
-            pair_policy.secondary: secondary_instrument}
+            pair_policy.secondary: secondary_instrument,
+        }
         self._api_version = api_version
         self._log = log_parent.getChild(repr(self))
         self._tip_racks = list(
-            set(primary_instrument.tip_racks) &
-            set(secondary_instrument.tip_racks))
+            set(primary_instrument.tip_racks) & set(secondary_instrument.tip_racks)
+        )
         self._pair_policy = pair_policy
 
         self._starting_tip: Union[Well, None] = None
         self._last_tip_picked_up_from: Union[Well, None] = None
 
         self._well_bottom_clearance = Clearances(
-            default_aspirate=1.0, default_dispense=1.0)
+            default_aspirate=1.0, default_dispense=1.0
+        )
 
         self.trash_container = trash
         self.paired_instrument_obj = PairedInstrument(
-            primary_instrument, secondary_instrument, pair_policy,
-            ctx, hardware_manager, self._log)
+            primary_instrument,
+            secondary_instrument,
+            pair_policy,
+            ctx,
+            hardware_manager,
+            self._log,
+        )
 
     @property  # type: ignore
     @requires_version(2, 7)
@@ -85,8 +99,7 @@ class PairedInstrumentContext(CommandPublisher):
     @property  # type: ignore
     @requires_version(2, 7)
     def starting_tip(self) -> Union[Well, None]:
-        """ The starting tip from which the pipette pick up
-        """
+        """The starting tip from which the pipette pick up"""
         return self._starting_tip
 
     @starting_tip.setter
@@ -95,8 +108,7 @@ class PairedInstrumentContext(CommandPublisher):
 
     @requires_version(2, 7)
     def reset_tipracks(self):
-        """ Reload all tips in each tip rack and reset starting tip
-        """
+        """Reload all tips in each tip rack and reset starting tip"""
         for tiprack in self.tip_racks:
             tiprack.reset()
         self.starting_tip = None
@@ -104,7 +116,7 @@ class PairedInstrumentContext(CommandPublisher):
     @property  # type: ignore
     @requires_version(2, 7)
     def well_bottom_clearance(self) -> Clearances:
-        """ The distance above the bottom of a well to aspirate or dispense.
+        """The distance above the bottom of a well to aspirate or dispense.
 
         This is an object with attributes ``aspirate`` and ``dispense``,
         describing the default heights of the corresponding operation. The
@@ -132,9 +144,11 @@ class PairedInstrumentContext(CommandPublisher):
 
     @requires_version(2, 7)
     def pick_up_tip(
-            self, location: Union[types.Location, Well] = None,
-            presses: Optional[int] = None,
-            increment: Optional[float] = None) -> PairedInstrumentContext:
+        self,
+        location: Union[types.Location, Well] = None,
+        presses: Optional[int] = None,
+        increment: Optional[float] = None,
+    ) -> PairedInstrumentContext:
         """
         Pick up a tip for the pipette to run liquid-handling commands with
         a paired pipette object.
@@ -215,19 +229,15 @@ class PairedInstrumentContext(CommandPublisher):
         if location and isinstance(location, types.Location):
             if location.labware.is_labware:
                 tiprack = location.labware.as_labware()
-                primary_channels =\
-                    self._instruments[self._pair_policy.primary].channels
-                target: Well =\
-                    tiprack.next_tip(primary_channels)  # type: ignore
+                primary_channels = self._instruments[self._pair_policy.primary].channels
+                target: Well = tiprack.next_tip(primary_channels)  # type: ignore
                 if not target:
                     raise OutOfTipsError
             elif location.labware.is_well:
                 tiprack = location.labware.parent.as_labware()
                 target = location.labware.as_well()
             else:
-                raise TypeError(
-                    "The location must be in a well or labware."
-                )
+                raise TypeError("The location must be in a well or labware.")
         elif location and isinstance(location, Well):
             tiprack = location.parent
             target = location
@@ -238,7 +248,8 @@ class PairedInstrumentContext(CommandPublisher):
                 "If specified, location should be an instance of "
                 "types.Location (e.g. the return value from "
                 "tiprack.wells()[0].top()) or a Well (e.g. tiprack.wells()[0]."
-                " However, it is a {}".format(location))
+                " However, it is a {}".format(location)
+            )
         assert tiprack.is_tiprack, "{} is not a tiprack".format(str(tiprack))
 
         # We must check that you can also pick up from
@@ -249,21 +260,22 @@ class PairedInstrumentContext(CommandPublisher):
 
         instruments = list(self._instruments.values())
         targets = [target, secondary_target]
-        publish_paired(self.broker, cmds.paired_pick_up_tip,
-                       'before', None, instruments, targets)
+        publish_paired(
+            self.broker, cmds.paired_pick_up_tip, "before", None, instruments, targets
+        )
         self.paired_instrument_obj.pick_up_tip(
-            target, secondary_target, tiprack, presses, increment, tip_length)
+            target, secondary_target, tiprack, presses, increment, tip_length
+        )
         self._last_tip_picked_up_from = target
-        publish_paired(self.broker, cmds.paired_pick_up_tip,
-                       'after', self, instruments, targets)
+        publish_paired(
+            self.broker, cmds.paired_pick_up_tip, "after", self, instruments, targets
+        )
         return self
 
     @requires_version(2, 7)
     def drop_tip(
-            self,
-            location: Union[types.Location, Well] = None,
-            home_after: bool = True)\
-            -> PairedInstrumentContext:
+        self, location: Union[types.Location, Well] = None, home_after: bool = True
+    ) -> PairedInstrumentContext:
         """
         Drop the current tip.
 
@@ -318,7 +330,8 @@ class PairedInstrumentContext(CommandPublisher):
                     "tiprack.wells()[0].top()) it must be a location "
                     "relative to a well, since that is where a tip is "
                     "dropped. The passed location, however, is in "
-                    "reference to {}".format(location.labware))
+                    "reference to {}".format(location.labware)
+                )
         elif location and isinstance(location, Well):
             if LabwareLike(location).is_fixed_trash():
                 target = location.top()
@@ -334,28 +347,34 @@ class PairedInstrumentContext(CommandPublisher):
                 "If specified, location should be an instance of "
                 "types.Location (e.g. the return value from "
                 "tiprack.wells()[0].top()) or a Well (e.g. tiprack.wells()[0]."
-                " However, it is a {}".format(location))
+                " However, it is a {}".format(location)
+            )
 
         instruments = list(self._instruments.values())
         if not is_trash and tiprack and isinstance(target.labware, Well):
             targets = [
                 target,
-                self._get_secondary_target(tiprack, target.labware.as_well())]
+                self._get_secondary_target(tiprack, target.labware.as_well()),
+            ]
         else:
             targets = [target]
-        publish_paired(self.broker, cmds.paired_drop_tip,
-                       'before', None, instruments, targets)
+        publish_paired(
+            self.broker, cmds.paired_drop_tip, "before", None, instruments, targets
+        )
         self.paired_instrument_obj.drop_tip(target, home_after)
-        publish_paired(self.broker, cmds.paired_drop_tip,
-                       'after', self, instruments, targets)
+        publish_paired(
+            self.broker, cmds.paired_drop_tip, "after", self, instruments, targets
+        )
         self._last_tip_picked_up_from = None
         return self
 
     @requires_version(2, 7)
-    def aspirate(self,
-                 volume: Optional[float] = None,
-                 location: Union[types.Location, Well] = None,
-                 rate: float = 1.0) -> PairedInstrumentContext:
+    def aspirate(
+        self,
+        volume: Optional[float] = None,
+        location: Union[types.Location, Well] = None,
+        rate: float = 1.0,
+    ) -> PairedInstrumentContext:
         """
         Aspirate a volume of liquid (in microliters/uL) using both pipettes
         from a specified location. You must pass in the location you
@@ -400,22 +419,22 @@ class PairedInstrumentContext(CommandPublisher):
             ``instr.aspirate(location=wellplate['A1'])``
 
         """
-        self._log.debug("aspirate {} from {} at {}"
-                        .format(volume,
-                                location if location else 'current position',
-                                rate))
+        self._log.debug(
+            "aspirate {} from {} at {}".format(
+                volume, location if location else "current position", rate
+            )
+        )
 
         loc: Optional[types.Location] = None
         if isinstance(location, Well):
             point, well = location.bottom()
             loc = types.Location(
-                point + types.Point(0, 0,
-                                    self.well_bottom_clearance.aspirate),
-                well)
+                point + types.Point(0, 0, self.well_bottom_clearance.aspirate), well
+            )
         elif location is not None and not isinstance(location, types.Location):
             raise TypeError(
-                'location should be a Well or Location, but it is {}'
-                .format(location))
+                "location should be a Well or Location, but it is {}".format(location)
+            )
         else:
             loc = location
 
@@ -425,28 +444,45 @@ class PairedInstrumentContext(CommandPublisher):
             c_vol = volume
 
         instruments = list(self._instruments.values())
-        primary_loc, aspirate_func =\
-            self.paired_instrument_obj.aspirate(volume, loc, rate)
+        primary_loc, aspirate_func = self.paired_instrument_obj.aspirate(
+            volume, loc, rate
+        )
         if primary_loc.labware.is_well:
             well = primary_loc.labware.as_well()
             labware = well.parent
-            locations = [
-                primary_loc,
-                self._get_secondary_target(labware, well)]
+            locations = [primary_loc, self._get_secondary_target(labware, well)]
         else:
             locations = [primary_loc]
-        publish_paired(self.broker, cmds.paired_aspirate, 'before',
-                       None, instruments, c_vol, locations, rate)
+        publish_paired(
+            self.broker,
+            cmds.paired_aspirate,
+            "before",
+            None,
+            instruments,
+            c_vol,
+            locations,
+            rate,
+        )
         aspirate_func()
-        publish_paired(self.broker, cmds.paired_aspirate, 'after',
-                       self, instruments, c_vol, locations, rate)
+        publish_paired(
+            self.broker,
+            cmds.paired_aspirate,
+            "after",
+            self,
+            instruments,
+            c_vol,
+            locations,
+            rate,
+        )
         return self
 
     @requires_version(2, 7)
-    def dispense(self,
-                 volume: Optional[float] = None,
-                 location: Union[types.Location, Well] = None,
-                 rate: float = 1.0) -> PairedInstrumentContext:
+    def dispense(
+        self,
+        volume: Optional[float] = None,
+        location: Union[types.Location, Well] = None,
+        rate: float = 1.0,
+    ) -> PairedInstrumentContext:
         """
         Dispense a volume of liquid (in microliters/uL) using both pipettes
         into the specified location.  You must pass in the location you
@@ -493,23 +529,23 @@ class PairedInstrumentContext(CommandPublisher):
             ``instr.dispense(location=wellplate['A1'])``
 
         """
-        self._log.debug("dispense {} from {} at {}"
-                        .format(volume,
-                                location if location else 'current position',
-                                rate))
+        self._log.debug(
+            "dispense {} from {} at {}".format(
+                volume, location if location else "current position", rate
+            )
+        )
         if isinstance(location, Well):
             if LabwareLike(location).is_fixed_trash():
                 loc = location.top()
             else:
                 point, well = location.bottom()
                 loc = types.Location(
-                    point + types.Point(0, 0,
-                                        self.well_bottom_clearance.dispense),
-                    well)
+                    point + types.Point(0, 0, self.well_bottom_clearance.dispense), well
+                )
         elif location is not None and not isinstance(location, types.Location):
             raise TypeError(
-                'location should be a Well or Location, but it is {}'
-                .format(location))
+                "location should be a Well or Location, but it is {}".format(location)
+            )
         else:
             loc = location
 
@@ -519,29 +555,44 @@ class PairedInstrumentContext(CommandPublisher):
             c_vol = volume
 
         instruments = list(self._instruments.values())
-        primary_loc, dispense_func =\
-            self.paired_instrument_obj.dispense(volume, loc, rate)
+        primary_loc, dispense_func = self.paired_instrument_obj.dispense(
+            volume, loc, rate
+        )
 
         if isinstance(primary_loc.labware, Well):
             well = primary_loc.labware.as_well()
             labware = well.parent
-            locations = [
-                primary_loc,
-                self._get_secondary_target(labware, well)]
+            locations = [primary_loc, self._get_secondary_target(labware, well)]
         else:
             locations = [primary_loc]
-        publish_paired(self.broker, cmds.paired_dispense, 'before',
-                       None, instruments, c_vol, locations, rate)
+        publish_paired(
+            self.broker,
+            cmds.paired_dispense,
+            "before",
+            None,
+            instruments,
+            c_vol,
+            locations,
+            rate,
+        )
         dispense_func()
-        publish_paired(self.broker, cmds.paired_dispense, 'after',
-                       self, instruments, c_vol, locations, rate)
+        publish_paired(
+            self.broker,
+            cmds.paired_dispense,
+            "after",
+            self,
+            instruments,
+            c_vol,
+            locations,
+            rate,
+        )
         return self
 
     @publish.both(command=cmds.air_gap)
     @requires_version(2, 7)
-    def air_gap(self,
-                volume: Optional[float] = None,
-                height: Optional[float] = None) -> PairedInstrumentContext:
+    def air_gap(
+        self, volume: Optional[float] = None, height: Optional[float] = None
+    ) -> PairedInstrumentContext:
         """
         Pull air into the pipette current tip at the current location
 
@@ -574,9 +625,8 @@ class PairedInstrumentContext(CommandPublisher):
 
         """
         for instr in self._instruments.values():
-            if not instr.hw_pipette['has_tip']:
-                raise hc.NoTipAttachedError(
-                    'Pipette has no tip. Aborting air_gap')
+            if not instr.hw_pipette["has_tip"]:
+                raise hc.NoTipAttachedError("Pipette has no tip. Aborting air_gap")
 
         if height is None:
             height = 5
@@ -584,9 +634,9 @@ class PairedInstrumentContext(CommandPublisher):
         return self
 
     @requires_version(2, 7)
-    def blow_out(self,
-                 location: Union[types.Location, Well] = None
-                 ) -> PairedInstrumentContext:
+    def blow_out(
+        self, location: Union[types.Location, Well] = None
+    ) -> PairedInstrumentContext:
         """
         Blow liquid out of the tip.
 
@@ -610,14 +660,15 @@ class PairedInstrumentContext(CommandPublisher):
         """
         if isinstance(location, Well):
             if location.parent.is_tiprack:
-                self._log.warning('Blow_out being performed on a tiprack. '
-                                  'Please re-check your code')
+                self._log.warning(
+                    "Blow_out being performed on a tiprack. "
+                    "Please re-check your code"
+                )
             loc = location.top()
-        elif location is not None and\
-                not isinstance(location, types.Location):
+        elif location is not None and not isinstance(location, types.Location):
             raise TypeError(
-                'location should be a Well or Location, but it is {}'
-                .format(location))
+                "location should be a Well or Location, but it is {}".format(location)
+            )
         else:
             loc = location
 
@@ -626,19 +677,23 @@ class PairedInstrumentContext(CommandPublisher):
             locations = self._get_locations(loc)
 
         instruments = list(self._instruments.values())
-        publish_paired(self.broker, cmds.paired_blow_out,
-                       'before', None, instruments, locations)
+        publish_paired(
+            self.broker, cmds.paired_blow_out, "before", None, instruments, locations
+        )
         self.paired_instrument_obj.blow_out(loc)
-        publish_paired(self.broker, cmds.paired_blow_out,
-                       'after', self, instruments, locations)
+        publish_paired(
+            self.broker, cmds.paired_blow_out, "after", self, instruments, locations
+        )
         return self
 
     @requires_version(2, 7)
-    def mix(self,
-            repetitions: int = 1,
-            volume: Optional[float] = None,
-            location: Union[types.Location, Well] = None,
-            rate: float = 1.0) -> PairedInstrumentContext:
+    def mix(
+        self,
+        repetitions: int = 1,
+        volume: Optional[float] = None,
+        location: Union[types.Location, Well] = None,
+        rate: float = 1.0,
+    ) -> PairedInstrumentContext:
         """
         Mix a volume of liquid (uL) using this pipette.
         If no location is specified, the pipette will mix from its current
@@ -672,13 +727,13 @@ class PairedInstrumentContext(CommandPublisher):
 
         """
         self._log.debug(
-            'mixing {}uL with {} repetitions in {} at rate={}'.format(
-                volume, repetitions,
-                location if location else 'current position', rate))
+            "mixing {}uL with {} repetitions in {} at rate={}".format(
+                volume, repetitions, location if location else "current position", rate
+            )
+        )
         for instr in self._instruments.values():
-            if not instr.hw_pipette['has_tip']:
-                raise hc.NoTipAttachedError(
-                    'Pipette has no tip. Aborting mix()')
+            if not instr.hw_pipette["has_tip"]:
+                raise hc.NoTipAttachedError("Pipette has no tip. Aborting mix()")
 
         if not volume:
             c_vol = self._get_minimum_available_volume(self._instruments)
@@ -689,24 +744,42 @@ class PairedInstrumentContext(CommandPublisher):
         locations: Optional[List] = None
         if location:
             locations = self._get_locations(location)
-        publish_paired(self.broker, cmds.paired_mix, 'before', None,
-                       instruments, locations, repetitions, c_vol)
+        publish_paired(
+            self.broker,
+            cmds.paired_mix,
+            "before",
+            None,
+            instruments,
+            locations,
+            repetitions,
+            c_vol,
+        )
         self.aspirate(volume, location, rate)
         while repetitions - 1 > 0:
             self.dispense(volume, rate=rate)
             self.aspirate(volume, rate=rate)
             repetitions -= 1
         self.dispense(volume, rate=rate)
-        publish_paired(self.broker, cmds.paired_mix, 'after', self,
-                       instruments, locations, repetitions, c_vol)
+        publish_paired(
+            self.broker,
+            cmds.paired_mix,
+            "after",
+            self,
+            instruments,
+            locations,
+            repetitions,
+            c_vol,
+        )
         return self
 
     @requires_version(2, 7)
-    def touch_tip(self,
-                  location: Optional[Well] = None,
-                  radius: float = 1.0,
-                  v_offset: float = -1.0,
-                  speed: float = 60.0) -> PairedInstrumentContext:
+    def touch_tip(
+        self,
+        location: Optional[Well] = None,
+        radius: float = 1.0,
+        v_offset: float = -1.0,
+        speed: float = 60.0,
+    ) -> PairedInstrumentContext:
         """
         Touch the pipette tip to the sides of a well, with the intent of
         removing left-over droplets. For :py:class:`PairedInstrumentContext`
@@ -743,31 +816,31 @@ class PairedInstrumentContext(CommandPublisher):
 
         """
         for instr in self._instruments.values():
-            if not instr.hw_pipette['has_tip']:
-                raise hc.NoTipAttachedError(
-                    'Pipette has no tip to touch_tip()')
+            if not instr.hw_pipette["has_tip"]:
+                raise hc.NoTipAttachedError("Pipette has no tip to touch_tip()")
 
-        checked_speed = clamp_value(speed, 80, 1, 'touch_tip:')
+        checked_speed = clamp_value(speed, 80, 1, "touch_tip:")
 
         instruments = list(self._instruments.values())
         locations: Optional[List] = None
         if location:
             locations = [
                 location,
-                self._get_secondary_target(location.parent, location)]
+                self._get_secondary_target(location.parent, location),
+            ]
 
-        publish_paired(self.broker, cmds.paired_touch_tip,
-                       'before', None, instruments, locations)
-        self.paired_instrument_obj.touch_tip(
-            location, radius, v_offset, checked_speed)
-        publish_paired(self.broker, cmds.paired_touch_tip,
-                       'after', self, instruments, locations)
+        publish_paired(
+            self.broker, cmds.paired_touch_tip, "before", None, instruments, locations
+        )
+        self.paired_instrument_obj.touch_tip(location, radius, v_offset, checked_speed)
+        publish_paired(
+            self.broker, cmds.paired_touch_tip, "after", self, instruments, locations
+        )
         return self
 
     @publish.both(command=cmds.return_tip)
     @requires_version(2, 7)
-    def return_tip(self,
-                   home_after: bool = True) -> PairedInstrumentContext:
+    def return_tip(self, home_after: bool = True) -> PairedInstrumentContext:
         """
         If a tip is currently attached to both of the pipettes, then it will
         return the tip to it's location in the tiprack.
@@ -777,23 +850,25 @@ class PairedInstrumentContext(CommandPublisher):
         :returns: This instance
         """
         for mount, instr in self._instruments.items():
-            if not instr.hw_pipette['has_tip']:
-                self._log.warning('Pipette has no tip to return')
+            if not instr.hw_pipette["has_tip"]:
+                self._log.warning("Pipette has no tip to return")
         loc = self._last_tip_picked_up_from
         if not isinstance(loc, Well):
-            raise TypeError('Last tip location should be a Well but it is: '
-                            f'{loc}')
+            raise TypeError("Last tip location should be a Well but it is: " f"{loc}")
         primary_pipette = self._instruments[self._pair_policy.primary]
         drop_loc = self._drop_tip_target(loc, primary_pipette)
         self.drop_tip(drop_loc, home_after=home_after)
         return self
 
     @requires_version(2, 7)
-    def move_to(self, location: types.Location, force_direct: bool = False,
-                minimum_z_height: Optional[float] = None,
-                speed: Optional[float] = None
-                ) -> PairedInstrumentContext:
-        """ Move the full gantry with the primary pipette used as the basis
+    def move_to(
+        self,
+        location: types.Location,
+        force_direct: bool = False,
+        minimum_z_height: Optional[float] = None,
+        speed: Optional[float] = None,
+    ) -> PairedInstrumentContext:
+        """Move the full gantry with the primary pipette used as the basis
         for the XY position within a given labware.
 
         :param location: The location to move to.
@@ -808,8 +883,20 @@ class PairedInstrumentContext(CommandPublisher):
                       to limit individual axis speeds, you can use
                       :py:attr:`.ProtocolContext.max_speeds`.
         """
+        instruments = list(self._instruments.values())
+        locations: Optional[List] = None
+        if location:
+            locations = self._get_locations(location)
+
+        publish_paired(
+            self.broker, cmds.paired_move_to, "before", None, instruments, locations
+        )
         self.paired_instrument_obj.move_to(
-            location, force_direct, minimum_z_height, speed)
+            location, force_direct, minimum_z_height, speed
+        )
+        publish_paired(
+            self.broker, cmds.paired_move_to, "after", None, instruments, locations
+        )
         return self
 
     def _next_available_tip(self) -> Tuple[Labware, Well]:
@@ -817,17 +904,19 @@ class PairedInstrumentContext(CommandPublisher):
         # both the primary and secondary tip with a spacing
         # of approximately 34 mm.
         start = self.starting_tip
-        primary_channels =\
-            self._instruments[self._pair_policy.primary].channels
-        secondary_channels =\
-            self._instruments[self._pair_policy.secondary].channels
+        primary_channels = self._instruments[self._pair_policy.primary].channels
+        secondary_channels = self._instruments[self._pair_policy.secondary].channels
         if start is None:
             return select_tiprack_from_list_paired_pipettes(
-                self.tip_racks, primary_channels, secondary_channels)
+                self.tip_racks, primary_channels, secondary_channels
+            )
         else:
             return select_tiprack_from_list_paired_pipettes(
                 filter_tipracks_to_start(start, self.tip_racks),
-                primary_channels, secondary_channels, starting_point=start)
+                primary_channels,
+                secondary_channels,
+                starting_point=start,
+            )
 
     def _get_locations(self, location: Union[types.Location, Well]) -> List:
         if isinstance(location, Well):
@@ -841,9 +930,7 @@ class PairedInstrumentContext(CommandPublisher):
         return []
 
     @staticmethod
-    def _drop_tip_target(
-            location: Well,
-            pipette: InstrumentContext) -> types.Location:
+    def _drop_tip_target(location: Well, pipette: InstrumentContext) -> types.Location:
         tr = location.parent
         assert tr.is_tiprack
         z_height = pipette.return_height * tr.tip_length
@@ -861,23 +948,23 @@ class PairedInstrumentContext(CommandPublisher):
             else:
                 spacing = SBS_96_WELL_SPACING
                 modulo_value = 8
-            return labware_column_shift(
-                primary_loc, labware, spacing, modulo_value)
+            return labware_column_shift(primary_loc, labware, spacing, modulo_value)
         except IndexError:
             raise PipettePairPickUpTipError(
-                f'The location you specified ({primary_loc}) is'
-                'incompatible with a PipettePair pickup.')
+                f"The location you specified ({primary_loc}) is"
+                "incompatible with a PipettePair pickup."
+            )
 
     @staticmethod
     def _get_minimum_available_volume(
-            instruments: Dict[types.Mount, InstrumentContext]) -> float:
+        instruments: Dict[types.Mount, InstrumentContext]
+    ) -> float:
         return min(
-            instr.hw_pipette['available_volume']
-            for instr in instruments.values())
+            instr.hw_pipette["available_volume"] for instr in instruments.values()
+        )
 
     @staticmethod
     def _get_minimum_current_volume(
-            instruments: Dict[types.Mount, InstrumentContext]) -> float:
-        return min(
-            instr.hw_pipette['current_volume']
-            for instr in instruments.values())
+        instruments: Dict[types.Mount, InstrumentContext]
+    ) -> float:
+        return min(instr.hw_pipette["current_volume"] for instr in instruments.values())

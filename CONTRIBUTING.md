@@ -148,6 +148,12 @@ Your computer will need the following tools installed to be able to develop with
   pyenv install 3.7.6
   ```
 
+  **MacOS Big Sur Note:** due to this [known issue](https://github.com/pyenv/pyenv/issues/1737) we recommend using:
+
+  ```shell
+  pyenv install 3.7.10
+  ```
+
 - Node v12 - [nvm][] is optional, but recommended
 
   ```shell
@@ -243,8 +249,8 @@ To help with code quality and maintainability, we use a collection of tools that
   - [stylelint][] - CSS linter
 - [Typecheckers][type-check]
   - Verify that the code is [type safe][type-safe]
+  - [typescript][]
   - [mypy][] - Static type checker for Python
-  - [Flow][flow] - Static type checker for JavaScript
 - Formatters
   - (Re)format source code to adhere to a consistent [style][code-style]
   - [Prettier][prettier] - Code formatter for JavaScript, JSON, Markdown, and YAML
@@ -276,7 +282,7 @@ make format
 [eslint]: https://eslint.org/
 [flake8]: https://flake8.pycqa.org
 [stylelint]: https://stylelint.io/
-[flow]: https://flow.org/
+[typescript]: https://www.typescriptlang.org/
 [mypy]: http://mypy-lang.org/
 [prettier]: https://prettier.io/
 
@@ -288,7 +294,7 @@ Most, if not all, of the tools above have plugins available for your code editor
 - ESLint - <https://eslint.org/docs/user-guide/integrations#editors>
 - stylelint - <https://stylelint.io/user-guide/complementary-tools/#editor-plugins>
 - mypy - Search your editor's package manager
-- Flow - <https://flow.org/en/docs/editors/>
+- TypeScript - <https://github.com/Microsoft/TypeScript/wiki/TypeScript-Editor-Support>
 - Prettier - <https://prettier.io/docs/en/editors.html>
 
 ### Adding dependencies
@@ -302,7 +308,7 @@ JavaScript dependencies are installed by [yarn][]. When calling yarn, you should
 A development dependency is any dependency that is used only to help manage the project. Examples of development dependencies would be:
 
 - Build tools (webpack, babel)
-- Testing/linting/checking tools (jest, flow, eslint)
+- Testing/linting/checking tools (jest, typescript, eslint)
 - Libraries used only in support scripts (aws, express)
 
 To add a development dependency:
@@ -330,16 +336,9 @@ yarn workspace <project_name> add <dependency_name>
 
 ##### Adding type definitions
 
-After you have installed a dependency (development or project), you may find that you need to also install [flow][] type definitions. Without type definitions for our external dependencies, we are unable to typecheck anything we `import`. We use [flow-typed][] to install community-created type definitions. To add type definitions for an installed package:
+After you have installed a dependency (development or project), you may find that you need to also install [typescript][] type definitions. Without type definitions for our external dependencies, we are unable to typecheck anything we `import`. If you are using a dependency that does not come with type definitions, see the [typescript consumption guide](https://www.typescriptlang.org/docs/handbook/declaration-files/consumption.html) for how to find and use community-created type definitions.
 
-```shell
-yarn run flow-typed install <dependency_name>@<installed_version>
-```
-
-Not every JavaScript package has an available flow-typed definition. In this case, flow-typed will generate a stub file in the directory `flow-typed/npm/`. You may find it useful to fill out this stub; See the [flow-typed wiki][writing-flow-definitions] for a library definition writing guide.
-
-[flow-typed]: https://github.com/flow-typed/flow-typed
-[writing-flow-definitions]: https://github.com/flow-typed/flow-typed/wiki/Contributing-Library-Definitions
+Not every JavaScript package has an available TypeScript definition. If you find yourself using such a library, you may need to create your own [ambient type declaration](https://www.typescriptlang.org/docs/handbook/declaration-files/introduction.html).
 
 #### Python
 

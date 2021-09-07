@@ -134,15 +134,15 @@
           }
         },
         "isTiprack": {
-          "description": "Flag marking whether a labware is a tiprack or not",
+          "description": "Flag marking whether this labware is a tip rack or not",
           "type": "boolean"
         },
         "tipLength": {
-          "description": "Required if labware is tiprack, specifies length of tip from drawing or as measured with calipers",
+          "description": "Required if this labware is a tip rack. Specifies the total length of one of this rack's tips, from top to bottom, as specified by technical drawings or as measured with calipers.",
           "$ref": "#/definitions/positiveNumber"
         },
         "tipOverlap": {
-          "description": "Required if labware is tiprack, specifies the length of the area of the tip that overlaps the nozzle of the pipette",
+          "description": "Required if this labware is a tip rack. Specifies how far one of this rack's tips is expected to overlap with the nozzle of a pipette. In other words: tipLength, minus the distance between the bottom of the pipette and the bottom of the tip. A robot's positional calibration may fine-tune this estimate.",
           "$ref": "#/definitions/positiveNumber"
         },
         "loadName": {
@@ -219,7 +219,10 @@
             ]
           },
           "properties": {
-            "depth": { "$ref": "#/definitions/positiveNumber" },
+            "depth": {
+              "description": "The distance between the top and bottom of this well. If the labware is a tip rack, this will be ignored in favor of tipLength, but the values should match.",
+              "$ref": "#/definitions/positiveNumber"
+            },
             "x": {
               "description": "x location of center-bottom of well in reference to left-front-bottom of labware",
               "$ref": "#/definitions/positiveNumber"

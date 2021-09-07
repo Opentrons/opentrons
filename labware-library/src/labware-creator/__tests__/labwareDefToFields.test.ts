@@ -1,12 +1,15 @@
 import { labwareDefToFields } from '../labwareDefToFields'
-import _fixture96Plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 import _fixture12Trough from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough.json'
+import _fixture24Tuberack from '@opentrons/shared-data/labware/fixtures/2/fixture_24_tuberack.json'
+import _fixture96Plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 import _fixtureIrregularExample1 from '@opentrons/shared-data/labware/fixtures/2/fixture_irregular_example_1.json'
+
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 const fixture96Plate = _fixture96Plate as LabwareDefinition2
 const fixture12Trough = _fixture12Trough as LabwareDefinition2
 const fixtureIrregularExample1 = _fixtureIrregularExample1 as LabwareDefinition2
+const fixture24Tuberack = _fixture24Tuberack as LabwareDefinition2
 
 jest.mock('../../definitions')
 
@@ -19,6 +22,7 @@ describe('labwareDefToFields', () => {
       tubeRackInsertLoadName: null,
       aluminumBlockType: null,
       aluminumBlockChildType: null,
+      handPlacedTipFit: null,
 
       footprintXDimension: String(def.dimensions.xDimension),
       footprintYDimension: String(def.dimensions.yDimension),
@@ -71,5 +75,18 @@ describe('labwareDefToFields', () => {
     const def = fixtureIrregularExample1
     const result = labwareDefToFields(def)
     expect(result).toEqual(null)
+  })
+
+  it('fixture_24_tuberack should match snapshot', () => {
+    const def = fixture24Tuberack
+    const result = labwareDefToFields(def)
+
+    expect(result?.labwareType).toEqual('tubeRack')
+    expect(result?.brand).toBe('Opentrons')
+    expect(result?.brandId).toBe('649020')
+    expect(result?.groupBrand).toBe('tube brand here')
+    expect(result?.groupBrandId).toBe('tube123,other123')
+
+    expect(result).toMatchSnapshot()
   })
 })

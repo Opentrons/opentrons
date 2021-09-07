@@ -3,7 +3,12 @@
 import mixpanel from 'mixpanel-browser'
 
 // pulled in from environment at build time
-const MIXPANEL_ID = process.env.OT_LL_MIXPANEL_ID
+export const getIsProduction = (): boolean =>
+  window.location.host === 'labware.opentrons.com'
+
+const MIXPANEL_ID = getIsProduction()
+  ? process.env.OT_LL_MIXPANEL_ID
+  : process.env.OT_LL_MIXPANEL_DEV_ID
 
 const MIXPANEL_OPTS = {
   // opt out by default
@@ -31,6 +36,7 @@ export function initializeMixpanel(): void {
     mixpanel.init(MIXPANEL_ID, MIXPANEL_OPTS)
   } else {
     console.warn('MIXPANEL_ID not found; this is a bug if build is production')
+    mixpanel.init('FAKE_MIXPANEL_DEV_ID', MIXPANEL_OPTS)
   }
 }
 

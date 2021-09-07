@@ -31,6 +31,7 @@
   max-width: 50rem;
   margin: 1rem auto;
   padding: 1rem;
+  padding-bottom: 10rem;
 
   & p {
     margin: 1rem 0;
@@ -133,7 +134,9 @@
 .preview_instructions,
 .brand_column,
 .brand_id_column,
-.volume_instructions_column {
+.volume_instructions_column,
+.instructions_text,
+.tip_fit_column {
   flex-basis: 100%;
   flex-shrink: 0;
   font-size: var(--fs-body-1);
@@ -175,7 +178,8 @@
   .brand_id_column,
   .help_text,
   .export_form_fields,
-  .volume_instructions_column {
+  .volume_instructions_column,
+  .tip_fit_column {
     flex-basis: var(--size-50p);
     flex-shrink: 1;
   }
@@ -207,7 +211,8 @@
   .instructions_column,
   .diagram_column,
   .form_fields_column,
-  .brand_column {
+  .brand_column,
+  .tip_fit_column {
     flex-basis: var(--size-third);
     flex-shrink: 1;
   }
@@ -237,6 +242,7 @@
 
 .export_button {
   margin-top: 2rem;
+  width: 100%;
 }
 
 .export_callout {
@@ -254,4 +260,8 @@
 
   margin-top: 0;
   padding: 1rem 4rem;
+}
+
+.capitalize {
+  text-transform: capitalize;
 }

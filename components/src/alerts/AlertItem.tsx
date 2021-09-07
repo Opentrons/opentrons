@@ -8,7 +8,6 @@ import type { IconProps } from '../icons'
 
 export type AlertType = 'success' | 'warning' | 'error' | 'info'
 
-// TODO(bc, 2021-03-23): create and use AlertType Enum here and in rest of file
 export interface AlertItemProps {
   /** name constant of the icon to display */
   type: AlertType

@@ -1,0 +1,30 @@
+version: '3'
+services:
+  emulator:
+    build: .
+    command: python3 -m opentrons.hardware_control.emulation.app
+    ports:
+      - '9996:9996'
+      - '9997:9997'
+      - '9998:9998'
+      - '9999:9999'
+    # Uncomment lines below to override the pipette(s) loaded by emulator
+    #environment:
+    #  OT_EMULATOR_smoothie: '{"right": {"model": "p300_multi"}, "left": {"model": "p20_single_v2.0"}}'
+  robot-server:
+    build: .
+    command: uvicorn "robot_server:app" --host 0.0.0.0 --port 31950 --ws wsproto --reload
+    ports:
+      - '31950:31950'
+    environment:
+      - OT_API_CONFIG_DIR=/config
+      - OT_SMOOTHIE_EMULATOR_URI=socket://emulator:9996
+      - OT_THERMOCYCLER_EMULATOR_URI=socket://emulator:9997
+      - OT_TEMPERATURE_EMULATOR_URI=socket://emulator:9998
+      - OT_MAGNETIC_EMULATOR_URI=socket://emulator:9999
+    links:
+      - 'emulator'
+    depends_on:
+      - 'emulator'
+    volumes:
+      - .opentrons_config:/config:rw

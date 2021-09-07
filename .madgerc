@@ -2,6 +2,12 @@
   "detectiveOptions": {
     "es6": {
       "skipTypeImports": true
-    }
+    },
+    "ts": {
+        "skipTypeImports": true
+      },
+    "tsx": {
+        "skipTypeImports": true
+      }
   }
 }

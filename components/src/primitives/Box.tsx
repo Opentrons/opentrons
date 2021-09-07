@@ -5,7 +5,7 @@ import { styleProps, isntStyleProp } from './style-props'
 import type { PrimitiveComponent } from './types'
 
 /**
- * Box primitive
+ * Simple Box atom. Renders a `div` by default and accepts all primitive styling props.
  *
  * @component
  */

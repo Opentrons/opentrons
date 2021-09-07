@@ -6,6 +6,9 @@ import styles from './lists.css'
 import { Icon } from '../icons'
 import type { IconName, IconProps } from '../icons'
 
+// TODO(bc, 2021-03-31): reconsider whether this belongs in components library
+// it is bloated with application specific functionality
+
 export interface TitledListProps {
   /** id attribute */
   id?: string
@@ -84,8 +87,8 @@ export function TitledList(props: TitledListProps): JSX.Element {
     [styles.titled_list_selected]: !disabled && props.selected,
     [styles.hover_border]: !disabled && props.hovered,
   })
-
-  const titleBarClass = cx(styles.title_bar, {
+  // @ts-expect-error(sa, 2021-6-23): cast value to boolean
+  const titleBarClass = cx(styles.titled_list_title_bar, {
     [styles.clickable]: props.onClick,
   })
 

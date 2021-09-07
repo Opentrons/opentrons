@@ -1,5 +1,9 @@
 @import '@opentrons/components';
 
+.disabled {
+  color: var(--c-font-disabled);
+}
+
 .field_wrapper {
   margin: 1rem 0;
 }

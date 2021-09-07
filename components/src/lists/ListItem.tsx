@@ -7,6 +7,8 @@ import styles from './lists.css'
 import { Icon } from '../icons'
 import type { IconName } from '../icons'
 
+// TODO(bc, 2021-03-31): this is only used in the app
+// reconsider whether this belongs in components library
 interface ListItemProps {
   /** click handler */
   onClick?: (event: React.SyntheticEvent) => unknown
@@ -43,7 +45,7 @@ export const ListItem = React.forwardRef(
   (props: ListItemProps, ref: React.ForwardedRef<HTMLLIElement>) => {
     const { url, isDisabled, iconName, activeClassName, exact } = props
     const onClick = props.onClick && !isDisabled ? props.onClick : undefined
-
+    // @ts-expect-error(sa, 2021-6-23): cast value to boolean
     const className = classnames(props.className, styles.list_item, {
       [styles.disabled]: isDisabled,
       [styles.clickable]: onClick,

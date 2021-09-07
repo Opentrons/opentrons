@@ -1,30 +1,24 @@
 from __future__ import annotations
+
 # this file defines types that require dev dependencies
 # and are only relevant for static typechecking. this file should only
 # be imported if typing.TYPE_CHECKING is True
 import asyncio
-from typing import List, Optional, Dict, Union
+from typing import Optional, Dict, Union
 
 from typing_extensions import Protocol, TypedDict, Literal
 
 from opentrons_shared_data.pipette.dev_types import (
-    PipetteModel, PipetteName, ChannelCount
+    PipetteModel,
+    PipetteName,
+    ChannelCount,
 )
 
 from opentrons.drivers.types import MoveSplit
-from .modules import ModuleAtPort
 from .types import HardwareEventType
 
 from opentrons.types import Mount
 from opentrons.config.pipette_config import PipetteConfig
-
-
-class RegisterModules(Protocol):
-    async def __call__(
-        self,
-        new_mods_at_ports: List[ModuleAtPort] = None,
-        removed_mods_at_ports: List[ModuleAtPort] = None
-    ) -> None: ...
 
 
 class HasLoop(Protocol):
@@ -75,7 +69,7 @@ class PipetteDict(TypedDict):
     return_tip_height: float
     default_aspirate_flow_rates: Dict[str, float]
     default_dispense_flow_rates: Dict[str, float]
-    default_blow_out_flow_rates: Dict[str,  float]
+    default_blow_out_flow_rates: Dict[str, float]
     default_aspirate_speeds: Dict[str, float]
     default_dispense_speeds: Dict[str, float]
     default_blow_out_speeds: Dict[str, float]

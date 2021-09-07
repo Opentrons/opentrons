@@ -8,14 +8,16 @@ from enum import Enum
 
 
 class CommandDefinition(str, Enum):
+    _localname: str
+
     """The base of command definition enumerations."""
+
     def __new__(cls, value):
         """Create a string enum."""
+        # https://docs.python.org/3/library/enum.html#when-to-use-new-vs-init
         namespace = cls.namespace()
         full_name = f"{namespace}.{value}" if namespace else value
-        # Ignoring type errors because this is exactly as described here
-        # https://docs.python.org/3/library/enum.html#when-to-use-new-vs-init
-        obj = str.__new__(cls, full_name)  # type: ignore
+        obj = str.__new__(cls, full_name)
         obj._value_ = full_name
         obj._localname = value
         return obj
@@ -32,11 +34,12 @@ class CommandDefinition(str, Enum):
     @property
     def localname(self):
         """Get the name of the command without the namespace"""
-        return self._localname  # type: ignore
+        return self._localname
 
 
 class RobotCommand(CommandDefinition):
     """Robot commands"""
+
     home_all_motors = "homeAllMotors"
     home_pipette = "homePipette"
     toggle_lights = "toggleLights"
@@ -48,6 +51,7 @@ class RobotCommand(CommandDefinition):
 
 class ProtocolCommand(CommandDefinition):
     """Protocol commands"""
+
     start_run = "startRun"
     start_simulate = "startSimulate"
     cancel = "cancel"
@@ -81,6 +85,7 @@ class PipetteCommand(CommandDefinition):
 
 class CalibrationCommand(CommandDefinition):
     """Shared Between Calibration Flows"""
+
     load_labware = "loadLabware"
     jog = "jog"
     set_has_calibration_block = "setHasCalibrationBlock"
@@ -102,6 +107,7 @@ class CalibrationCommand(CommandDefinition):
 
 class DeckCalibrationCommand(CommandDefinition):
     """Deck Calibration Specific"""
+
     move_to_point_two = "moveToPointTwo"
     move_to_point_three = "moveToPointThree"
 
@@ -112,6 +118,7 @@ class DeckCalibrationCommand(CommandDefinition):
 
 class CheckCalibrationCommand(CommandDefinition):
     """Check Calibration Health Specific"""
+
     compare_point = "comparePoint"
     switch_pipette = "switchPipette"
     return_tip = "returnTip"

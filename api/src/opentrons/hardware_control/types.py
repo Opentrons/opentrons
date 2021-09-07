@@ -3,7 +3,7 @@ import asyncio
 import enum
 import logging
 from dataclasses import dataclass
-from typing import cast, Tuple, Union, TYPE_CHECKING
+from typing import cast, Tuple, Union, List, TYPE_CHECKING
 from typing_extensions import Literal
 from opentrons import types as top_types
 
@@ -19,10 +19,10 @@ class OutOfBoundsMove(RuntimeError):
         super().__init__()
 
     def __str__(self) -> str:
-        return f'OutOfBoundsMove: {self.message}'
+        return f"OutOfBoundsMove: {self.message}"
 
     def __repr__(self) -> str:
-        return f'<{str(self.__class__)}: {self.message}>'
+        return f"<{str(self.__class__)}: {self.message}>"
 
 
 class MotionChecks(enum.Enum):
@@ -42,30 +42,28 @@ class Axis(enum.Enum):
 
     @classmethod
     def by_mount(cls, mount: top_types.Mount):
-        bm = {top_types.Mount.LEFT: cls.Z,
-              top_types.Mount.RIGHT: cls.A}
+        bm = {top_types.Mount.LEFT: cls.Z, top_types.Mount.RIGHT: cls.A}
         return bm[mount]
 
     @classmethod
-    def gantry_axes(cls) -> Tuple['Axis', 'Axis', 'Axis', 'Axis']:
-        """ The axes which are tied to the gantry and require the deck
+    def gantry_axes(cls) -> Tuple["Axis", "Axis", "Axis", "Axis"]:
+        """The axes which are tied to the gantry and require the deck
         calibration transform
         """
         return (cls.X, cls.Y, cls.Z, cls.A)
 
     @classmethod
     def of_plunger(cls, mount: top_types.Mount):
-        pm = {top_types.Mount.LEFT: cls.B,
-              top_types.Mount.RIGHT: cls.C}
+        pm = {top_types.Mount.LEFT: cls.B, top_types.Mount.RIGHT: cls.C}
         return pm[mount]
 
     @classmethod
-    def to_mount(cls, inst: 'Axis'):
+    def to_mount(cls, inst: "Axis"):
         return {
             cls.Z: top_types.Mount.LEFT,
             cls.A: top_types.Mount.RIGHT,
             cls.B: top_types.Mount.LEFT,
-            cls.C: top_types.Mount.RIGHT
+            cls.C: top_types.Mount.RIGHT,
         }[inst]
 
     def __str__(self):
@@ -86,9 +84,9 @@ class HardwareEventType(enum.Enum):
 
 @dataclass
 class DoorStateNotification:
-    event: 'DoorStateNotificationType' = \
-        HardwareEventType.DOOR_SWITCH_CHANGE
+    event: "DoorStateNotificationType" = HardwareEventType.DOOR_SWITCH_CHANGE
     new_state: DoorState = DoorState.CLOSED
+    blocking: bool = False
 
 
 # new event types get new dataclasses
@@ -97,8 +95,8 @@ HardwareEvent = Union[DoorStateNotification]
 
 
 class HardwareAPILike(abc.ABC):
-    """ A dummy class useful in isinstance checks to accept an API or adapter
-    """
+    """A dummy class useful in isinstance checks to accept an API or adapter"""
+
     @property
     def loop(self) -> asyncio.AbstractEventLoop:
         ...
@@ -119,7 +117,7 @@ class HardwareAPILike(abc.ABC):
         ...
 
 
-RevisionLiteral = Literal['2.1', 'A', 'B', 'C', 'UNKNOWN']
+RevisionLiteral = Literal["2.1", "A", "B", "C", "UNKNOWN"]
 
 
 class BoardRevision(enum.Enum):
@@ -135,24 +133,25 @@ class BoardRevision(enum.Enum):
             (True, True): cls.OG,
             (False, True): cls.A,
             (True, False): cls.B,
-            (False, False): cls.C
+            (False, False): cls.C,
         }
         return br[rev_bits]
 
-    def real_name(self) -> Union[RevisionLiteral, Literal['UNKNOWN']]:
-        rn = '2.1' if self.name == 'OG' else self.name
-        return cast(Union[RevisionLiteral, Literal['UNKNOWN']], rn)
+    def real_name(self) -> Union[RevisionLiteral, Literal["UNKNOWN"]]:
+        rn = "2.1" if self.name == "OG" else self.name
+        return cast(Union[RevisionLiteral, Literal["UNKNOWN"]], rn)
 
     def __str__(self) -> str:
         return self.real_name()
 
 
 class CriticalPoint(enum.Enum):
-    """ Possibilities for the point to move in a move call.
+    """Possibilities for the point to move in a move call.
 
     The active critical point determines the offsets that are added to the
     gantry position when moving a pipette around.
     """
+
     MOUNT = enum.auto()
     """
     For legacy reasons, the position of the end of a P300 single. The default
@@ -205,22 +204,24 @@ class PipettePair(enum.Enum):
 
     @property
     def primary(self) -> top_types.Mount:
-        if self.name == 'PRIMARY_RIGHT':
+        if self.name == "PRIMARY_RIGHT":
             return top_types.Mount.RIGHT
         else:
             return top_types.Mount.LEFT
 
     @property
     def secondary(self) -> top_types.Mount:
-        if self.name == 'PRIMARY_RIGHT':
+        if self.name == "PRIMARY_RIGHT":
             return top_types.Mount.LEFT
         else:
             return top_types.Mount.RIGHT
 
     @classmethod
-    def of_mount(cls, mount: top_types.Mount) -> 'PipettePair':
-        pair = {top_types.Mount.LEFT: cls.PRIMARY_LEFT,
-                top_types.Mount.RIGHT: cls.PRIMARY_RIGHT}
+    def of_mount(cls, mount: top_types.Mount) -> "PipettePair":
+        pair = {
+            top_types.Mount.LEFT: cls.PRIMARY_LEFT,
+            top_types.Mount.RIGHT: cls.PRIMARY_RIGHT,
+        }
         return pair[mount]
 
 
@@ -233,6 +234,32 @@ class HardwareAction(enum.Enum):
 
     def __str__(self):
         return self.name
+
+
+class PauseType(enum.Enum):
+    PAUSE = 0
+    DELAY = 1
+
+
+@dataclass
+class AionotifyEvent:
+    flags: enum.EnumMeta
+    name: str
+
+    @classmethod
+    def build(cls, name: str, flags: List[enum.Enum]) -> "AionotifyEvent":
+        # See https://github.com/python/mypy/issues/5317
+        # as to why mypy cannot detect that list
+        # comprehension or variables cannot be dynamically
+        # determined to meet the argument criteria for
+        # enums. Hence, the type ignore below.
+        flag_list = [f.name for f in flags]
+        Flag = enum.Enum("Flag", flag_list)  # type: ignore
+        return cls(flags=Flag, name=name)
+
+
+class PauseResumeError(RuntimeError):
+    pass
 
 
 class ExecutionCancelledError(RuntimeError):

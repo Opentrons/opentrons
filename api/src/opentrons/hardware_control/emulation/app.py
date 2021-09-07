@@ -1,9 +1,9 @@
 import asyncio
 import logging
-
-from opentrons.hardware_control.emulation.connection_handler import \
-    ConnectionHandler
+from opentrons.hardware_control.emulation.connection_handler import ConnectionHandler
 from opentrons.hardware_control.emulation.magdeck import MagDeckEmulator
+from opentrons.hardware_control.emulation.parser import Parser
+from opentrons.hardware_control.emulation.settings import Settings
 from opentrons.hardware_control.emulation.tempdeck import TempDeckEmulator
 from opentrons.hardware_control.emulation.thermocycler import ThermocyclerEmulator
 from opentrons.hardware_control.emulation.smoothie import SmoothieEmulator
@@ -17,37 +17,70 @@ TEMPDECK_PORT = 9998
 MAGDECK_PORT = 9999
 
 
-async def run_server(host: str, port: int, handler: ConnectionHandler) -> None:
-    """Run a server."""
-    server = await asyncio.start_server(handler, host, port)
+class ServerManager:
+    """
+    Class to start and stop emulated smoothie and modules.
+    """
 
-    async with server:
-        await server.serve_forever()
+    def __init__(self, settings=Settings()) -> None:
+        host = settings.host
+        self._mag_emulator = MagDeckEmulator(parser=Parser())
+        self._temp_emulator = TempDeckEmulator(parser=Parser())
+        self._therm_emulator = ThermocyclerEmulator(parser=Parser())
+        self._smoothie_emulator = SmoothieEmulator(
+            parser=Parser(), settings=settings.smoothie
+        )
 
+        self._mag_server = self._create_server(
+            host=host,
+            port=MAGDECK_PORT,
+            handler=ConnectionHandler(self._mag_emulator),
+        )
+        self._temp_server = self._create_server(
+            host=host,
+            port=TEMPDECK_PORT,
+            handler=ConnectionHandler(self._temp_emulator),
+        )
+        self._therm_server = self._create_server(
+            host=host,
+            port=THERMOCYCLER_PORT,
+            handler=ConnectionHandler(self._therm_emulator),
+        )
+        self._smoothie_server = self._create_server(
+            host=host,
+            port=SMOOTHIE_PORT,
+            handler=ConnectionHandler(self._smoothie_emulator),
+        )
 
-async def run() -> None:
-    """Run the module emulators."""
-    host = "127.0.0.1"
+    async def run(self):
+        await asyncio.gather(
+            self._mag_server,
+            self._temp_server,
+            self._therm_server,
+            self._smoothie_server,
+        )
 
-    await asyncio.gather(
-        run_server(host=host,
-                   port=MAGDECK_PORT,
-                   handler=ConnectionHandler(MagDeckEmulator())),
-        run_server(host=host,
-                   port=TEMPDECK_PORT,
-                   handler=ConnectionHandler(TempDeckEmulator())),
-        run_server(host=host,
-                   port=THERMOCYCLER_PORT,
-                   handler=ConnectionHandler(ThermocyclerEmulator())),
-        run_server(host=host,
-                   port=SMOOTHIE_PORT,
-                   handler=ConnectionHandler(SmoothieEmulator())),
-    )
+    @staticmethod
+    async def _create_server(host: str, port: int, handler: ConnectionHandler) -> None:
+        """Run a server."""
+        server = await asyncio.start_server(handler, host, port)
+
+        async with server:
+            await server.serve_forever()
+
+    def reset(self):
+        self._smoothie_emulator.reset()
+        self._mag_emulator.reset()
+        self._temp_emulator.reset()
+        self._therm_emulator.reset()
+
+    def stop(self):
+        self._smoothie_server.close()
+        self._temp_server.close()
+        self._therm_server.close()
+        self._mag_server.close()
 
 
 if __name__ == "__main__":
-    h = logging.StreamHandler()
-    h.setLevel(logging.DEBUG)
-    logger.setLevel(logging.DEBUG)
-    logger.addHandler(h)
-    asyncio.run(run())
+    logging.basicConfig(format="%(asctime)s:%(message)s", level=logging.DEBUG)
+    asyncio.run(ServerManager().run())

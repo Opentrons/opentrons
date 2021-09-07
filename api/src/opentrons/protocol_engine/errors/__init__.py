@@ -40,8 +40,20 @@ class PipetteNotAttachedError(ProtocolEngineError):
     pass
 
 
+class CommandDoesNotExistError(ProtocolEngineError):
+    """An error raised when referencing a command that does not exist."""
+
+    pass
+
+
 class LabwareDoesNotExistError(ProtocolEngineError):
     """An error raised when referencing a labware that does not exist."""
+
+    pass
+
+
+class LabwareDefinitionDoesNotExistError(ProtocolEngineError):
+    """An error raised when referencing a labware definition that does not exist."""
 
     pass
 
@@ -74,5 +86,11 @@ class SlotDoesNotExistError(ProtocolEngineError):
 # existing LabwareHeightError
 class FailedToPlanMoveError(ProtocolEngineError):
     """An error raised when a requested movement could not be planned."""
+
+    pass
+
+
+class ProtocolEngineStoppedError(ProtocolEngineError):
+    """An error raised when attempting an invalid action with a stopped engine."""
 
     pass

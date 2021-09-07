@@ -23,7 +23,14 @@ from .instrument_context import InstrumentContext
 from .labware import Labware
 from .well import Well
 from .errors import InvalidPipetteNameError, InvalidMountError
-from .types import PipetteName, Mount, DeprecatedMount
+from .types import (
+    DeckSlotName,
+    LabwareParameters,
+    PipetteName,
+    Point,
+    Mount,
+    DeprecatedMount,
+)
 
 __all__ = [
     # Protocol API classes
@@ -36,7 +43,10 @@ __all__ = [
     "InvalidPipetteNameError",
     "InvalidMountError",
     # Protocol API types and data classes
+    "DeckSlotName",
+    "LabwareParameters",
     "PipetteName",
+    "Point",
     "Mount",
     "DeprecatedMount",
 ]

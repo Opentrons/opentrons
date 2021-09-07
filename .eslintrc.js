@@ -4,12 +4,12 @@ module.exports = {
   root: true,
 
   parserOptions: {
-    project: './*/tsconfig.json',
+    project: './tsconfig-eslint.json',
   },
 
   extends: ['standard-with-typescript', 'plugin:react/recommended', 'prettier'],
 
-  plugins: ['flowtype', 'react', 'react-hooks', 'json', 'jest'],
+  plugins: ['react', 'react-hooks', 'json', 'jest'],
 
   rules: {
     camelcase: 'off',
@@ -23,7 +23,7 @@ module.exports = {
     '@typescript-eslint/promise-function-async': 'off',
 
     // TODO(mc, 2021-01-29): fix these and remove warning overrides
-    'dot-notation': 'warn',
+    '@typescript-eslint/default-param-last': 'warn',
     'lines-between-class-members': 'warn',
     'array-callback-return': 'warn',
     'no-prototype-builtins': 'warn',
@@ -44,10 +44,6 @@ module.exports = {
   settings: {
     react: {
       version: '16.8',
-      flowVersion: '0.125.1',
-    },
-    flowtype: {
-      onlyFilesWithFlowAnnotation: true,
     },
   },
 
@@ -55,17 +51,20 @@ module.exports = {
     {
       files: ['**/*.js'],
       parser: '@babel/eslint-parser',
-      extends: ['plugin:flowtype/recommended', 'prettier'],
     },
     {
       // TODO(mc, 2021-03-18): remove to default these rules back to errors
       files: ['**/*.@(ts|tsx)'],
       rules: {
-        '@typescript-eslint/dot-notation': 'warn',
         '@typescript-eslint/strict-boolean-expressions': 'warn',
         '@typescript-eslint/prefer-nullish-coalescing': 'warn',
         '@typescript-eslint/prefer-optional-chain': 'warn',
         '@typescript-eslint/restrict-plus-operands': 'warn',
+        '@typescript-eslint/restrict-template-expressions': 'warn',
+        '@typescript-eslint/naming-convention': 'warn',
+        '@typescript-eslint/no-floating-promises': 'warn',
+        '@typescript-eslint/no-unnecessary-type-assertion': 'warn',
+        '@typescript-eslint/no-unnecessary-boolean-literal-compare': 'warn',
       },
     },
     {
@@ -87,12 +86,21 @@ module.exports = {
         'jest/no-disabled-tests': 'error',
         'jest/consistent-test-it': 'error',
         '@typescript-eslint/consistent-type-assertions': 'off',
+        '@typescript-eslint/no-var-requires': 'off',
+        '@typescript-eslint/explicit-function-return-type': 'off',
 
         // TODO(mc, 2021-01-29): fix these and remove warning overrides
         'jest/no-deprecated-functions': 'warn',
         'jest/valid-title': 'warn',
         'jest/no-conditional-expect': 'warn',
         'jest/no-done-callback': 'warn',
+      },
+    },
+    {
+      files: ['**/*.stories.tsx'],
+      rules: {
+        'import/no-default-export': 'off',
+        '@typescript-eslint/consistent-type-assertions': 'off',
       },
     },
     {

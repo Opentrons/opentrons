@@ -23,6 +23,7 @@ on:
       - '*'
     tags:
       - 'labware-library*'
+  workflow_dispatch:
 
 defaults:
   run:
@@ -57,7 +58,13 @@ jobs:
           make setup-js
       - name: 'run labware library unit tests'
         run: |
-          yarn jest --coverage=true --ci=true labware-library/
+          yarn jest --coverage=true --ci=true --collectCoverageFrom="labware-library/src/**/*.(js|ts|tsx)" labware-library/src
+      - name: 'Upload coverage report'
+        uses: codecov/codecov-action@v2
+        with:
+          files: ./coverage/lcov.info
+          flags: labware-library
+
   e2e-test:
     name: 'labware library e2e tests on ${{ matrix.os }}'
     timeout-minutes: 30
@@ -85,6 +92,9 @@ jobs:
           yarn config set cache-folder ./.yarn-cache
           make setup-js
       - name: 'test-e2e'
+        env:
+          OT_LL_MIXPANEL_ID: ${{ secrets.OT_LL_MIXPANEL_ID }}
+          OT_LL_MIXPANEL_DEV_ID: ${{ secrets.OT_LL_MIXPANEL_DEV_ID }}
         run: make -C labware-library test-e2e
   build-ll:
     name: 'build labware library artifact'
@@ -110,6 +120,9 @@ jobs:
           yarn config set cache-folder ./.yarn-cache
           make setup-js
       - name: 'build LL'
+        env:
+          OT_LL_MIXPANEL_ID: ${{ secrets.OT_LL_MIXPANEL_ID }}
+          OT_LL_MIXPANEL_DEV_ID: ${{ secrets.OT_LL_MIXPANEL_DEV_ID }}
         run: |
           make -C labware-library
       - name: 'upload github artifact'

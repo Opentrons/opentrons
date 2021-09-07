@@ -1,45 +1,40 @@
 """Test dispense commands."""
 from decoy import Decoy
 
-from opentrons.protocol_engine import CommandHandlers, WellLocation, WellOrigin
-from opentrons.protocol_engine.commands import DispenseRequest, DispenseResult
+from opentrons.protocol_engine import WellLocation, WellOrigin
+from opentrons.protocol_engine.execution import (
+    EquipmentHandler,
+    MovementHandler,
+    PipettingHandler,
+    RunControlHandler,
+)
 
 
-def test_dispense_request() -> None:
-    """It should be able to create a DispenseRequest."""
-    request = DispenseRequest(
-        pipetteId="abc",
-        labwareId="123",
-        wellName="A3",
-        wellLocation=WellLocation(origin=WellOrigin.BOTTOM, offset=(0, 0, 1)),
-        volume=50,
-    )
-
-    assert request.pipetteId == "abc"
-    assert request.labwareId == "123"
-    assert request.wellName == "A3"
-    assert request.wellLocation == WellLocation(
-        origin=WellOrigin.BOTTOM,
-        offset=(0, 0, 1),
-    )
-    assert request.volume == 50
-
-
-def test_dispense_result() -> None:
-    """It should be able to create a DispenseResult."""
-    result = DispenseResult(volume=50)
-
-    assert result.volume == 50
+from opentrons.protocol_engine.commands.dispense import (
+    DispenseData,
+    DispenseResult,
+    DispenseImplementation,
+)
 
 
 async def test_dispense_implementation(
     decoy: Decoy,
-    mock_cmd_handlers: CommandHandlers,
+    equipment: EquipmentHandler,
+    movement: MovementHandler,
+    pipetting: PipettingHandler,
+    run_control: RunControlHandler,
 ) -> None:
     """A PickUpTipRequest should have an execution implementation."""
+    subject = DispenseImplementation(
+        equipment=equipment,
+        movement=movement,
+        pipetting=pipetting,
+        run_control=run_control,
+    )
+
     location = WellLocation(origin=WellOrigin.BOTTOM, offset=(0, 0, 1))
 
-    request = DispenseRequest(
+    data = DispenseData(
         pipetteId="abc",
         labwareId="123",
         wellName="A3",
@@ -48,7 +43,7 @@ async def test_dispense_implementation(
     )
 
     decoy.when(
-        await mock_cmd_handlers.pipetting.dispense(
+        await pipetting.dispense(
             pipette_id="abc",
             labware_id="123",
             well_name="A3",
@@ -57,7 +52,6 @@ async def test_dispense_implementation(
         )
     ).then_return(42)
 
-    impl = request.get_implementation()
-    result = await impl.execute(mock_cmd_handlers)
+    result = await subject.execute(data)
 
     assert result == DispenseResult(volume=42)

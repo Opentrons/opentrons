@@ -1,23 +1,27 @@
 """Basic pipette data state and store."""
-from dataclasses import dataclass
+from __future__ import annotations
+from dataclasses import dataclass, replace
 from typing import Dict, List, Mapping, Optional, Tuple
-from typing_extensions import final
 
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.types import MountType, Mount as HwMount
 
 from .. import errors
-from ..types import PipetteName
+from ..types import PipetteName, DeckLocation
+
 from ..commands import (
-    CompletedCommandType,
+    Command,
     LoadPipetteResult,
     AspirateResult,
     DispenseResult,
+    MoveToWellResult,
+    PickUpTipResult,
+    DropTipResult,
 )
-from .substore import Substore, CommandReactive
+from .actions import Action, UpdateCommandAction
+from .abstract_store import HasState, HandlesActions
 
 
-@final
 @dataclass(frozen=True)
 class PipetteData:
     """Pipette state data."""
@@ -26,7 +30,6 @@ class PipetteData:
     pipette_name: PipetteName
 
 
-@final
 @dataclass(frozen=True)
 class HardwarePipette:
     """Hardware pipette data."""
@@ -35,31 +38,120 @@ class HardwarePipette:
     config: PipetteDict
 
 
+@dataclass(frozen=True)
 class PipetteState:
     """Basic labware data state and getter methods."""
 
-    _pipettes_by_id: Dict[str, PipetteData]
-    _aspirated_volume_by_id: Dict[str, float]
+    pipettes_by_id: Dict[str, PipetteData]
+    aspirated_volume_by_id: Dict[str, float]
+    current_location: Optional[DeckLocation]
+
+
+class PipetteStore(HasState[PipetteState], HandlesActions):
+    """Pipette state container."""
+
+    _state: PipetteState
 
     def __init__(self) -> None:
-        """Initialize a PipetteState instance."""
-        self._pipettes_by_id = {}
-        self._aspirated_volume_by_id = {}
+        """Initialize a PipetteStore and its state."""
+        self._state = PipetteState(
+            pipettes_by_id={},
+            aspirated_volume_by_id={},
+            current_location=None,
+        )
+
+    def handle_action(self, action: Action) -> None:
+        """Modify state in reaction to an action."""
+        if isinstance(action, UpdateCommandAction):
+            self._handle_command(action.command)
+
+    def _handle_command(self, command: Command) -> None:
+        if isinstance(
+            command.result,
+            (
+                MoveToWellResult,
+                PickUpTipResult,
+                DropTipResult,
+                AspirateResult,
+                DispenseResult,
+            ),
+        ):
+            self._state = replace(
+                self._state,
+                current_location=DeckLocation(
+                    pipette_id=command.data.pipetteId,
+                    labware_id=command.data.labwareId,
+                    well_name=command.data.wellName,
+                ),
+            )
+
+        if isinstance(command.result, LoadPipetteResult):
+            pipette_id = command.result.pipetteId
+            pipettes_by_id = self._state.pipettes_by_id.copy()
+            aspirated_volume_by_id = self._state.aspirated_volume_by_id.copy()
+
+            pipettes_by_id[pipette_id] = PipetteData(
+                pipette_name=command.data.pipetteName,
+                mount=command.data.mount,
+            )
+            aspirated_volume_by_id[pipette_id] = 0
+
+            self._state = replace(
+                self._state,
+                pipettes_by_id=pipettes_by_id,
+                aspirated_volume_by_id=aspirated_volume_by_id,
+            )
+
+        elif isinstance(command.result, AspirateResult):
+            pipette_id = command.data.pipetteId
+            aspirated_volume_by_id = self._state.aspirated_volume_by_id.copy()
+
+            previous_volume = self._state.aspirated_volume_by_id[pipette_id]
+            next_volume = previous_volume + command.result.volume
+            aspirated_volume_by_id[pipette_id] = next_volume
+
+            self._state = replace(
+                self._state,
+                aspirated_volume_by_id=aspirated_volume_by_id,
+            )
+
+        elif isinstance(command.result, DispenseResult):
+            pipette_id = command.data.pipetteId
+            aspirated_volume_by_id = self._state.aspirated_volume_by_id.copy()
+
+            previous_volume = self._state.aspirated_volume_by_id[pipette_id]
+            next_volume = max(0, previous_volume - command.result.volume)
+            aspirated_volume_by_id[pipette_id] = next_volume
+
+            self._state = replace(
+                self._state,
+                aspirated_volume_by_id=aspirated_volume_by_id,
+            )
+
+
+class PipetteView(HasState[PipetteState]):
+    """Read-only view of computed pipettes state."""
+
+    _state: PipetteState
+
+    def __init__(self, state: PipetteState) -> None:
+        """Initialize the view with its backing state value."""
+        self._state = state
 
     def get_pipette_data_by_id(self, pipette_id: str) -> PipetteData:
         """Get pipette data by the pipette's unique identifier."""
         try:
-            return self._pipettes_by_id[pipette_id]
+            return self._state.pipettes_by_id[pipette_id]
         except KeyError:
             raise errors.PipetteDoesNotExistError(f"Pipette {pipette_id} not found.")
 
     def get_all_pipettes(self) -> List[Tuple[str, PipetteData]]:
         """Get a list of all pipette entries in state."""
-        return [entry for entry in self._pipettes_by_id.items()]
+        return [entry for entry in self._state.pipettes_by_id.items()]
 
     def get_pipette_data_by_mount(self, mount: MountType) -> Optional[PipetteData]:
         """Get pipette data by the pipette's mount."""
-        for pipette in self._pipettes_by_id.values():
+        for pipette in self._state.pipettes_by_id.values():
             if pipette.mount == mount:
                 return pipette
         return None
@@ -88,10 +180,14 @@ class PipetteState:
 
         return HardwarePipette(mount=hw_mount, config=hw_config)
 
+    def get_current_deck_location(self) -> Optional[DeckLocation]:
+        """Get the current pipette and deck location the protocol is at."""
+        return self._state.current_location
+
     def get_aspirated_volume(self, pipette_id: str) -> float:
         """Get the currently aspirated volume of a pipette by ID."""
         try:
-            return self._aspirated_volume_by_id[pipette_id]
+            return self._state.aspirated_volume_by_id[pipette_id]
         except KeyError:
             raise errors.PipetteDoesNotExistError(
                 f"Pipette {pipette_id} not found; unable to get current volume."
@@ -107,37 +203,3 @@ class PipetteState:
             self.get_aspirated_volume(pipette_id) > 0
             or pipette_config["ready_to_aspirate"]
         )
-
-
-class PipetteStore(Substore[PipetteState], CommandReactive):
-    """Pipette state container."""
-
-    _state: PipetteState
-
-    def __init__(self) -> None:
-        """Initialize a PipetteStore and its state."""
-        self._state = PipetteState()
-
-    def handle_completed_command(self, command: CompletedCommandType) -> None:
-        """Modify state in reaction to a completed command."""
-        if isinstance(command.result, LoadPipetteResult):
-            pipette_id = command.result.pipetteId
-
-            self._state._pipettes_by_id[pipette_id] = PipetteData(
-                pipette_name=command.request.pipetteName, mount=command.request.mount
-            )
-            self._state._aspirated_volume_by_id[pipette_id] = 0
-
-        elif isinstance(command.result, AspirateResult):
-            pipette_id = command.request.pipetteId
-            previous_volume = self._state._aspirated_volume_by_id[pipette_id]
-            next_volume = previous_volume + command.result.volume
-
-            self._state._aspirated_volume_by_id[pipette_id] = next_volume
-
-        elif isinstance(command.result, DispenseResult):
-            pipette_id = command.request.pipetteId
-            previous_volume = self._state._aspirated_volume_by_id[pipette_id]
-            next_volume = max(0, previous_volume - command.result.volume)
-
-            self._state._aspirated_volume_by_id[pipette_id] = next_volume

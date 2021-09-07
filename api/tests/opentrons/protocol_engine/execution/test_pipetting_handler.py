@@ -8,8 +8,8 @@ from opentrons.types import Mount
 from opentrons.hardware_control.api import API as HardwareAPI
 from opentrons.hardware_control.dev_types import PipetteDict
 
-from opentrons.protocol_engine import StateView, DeckLocation, WellLocation, WellOrigin
-from opentrons.protocol_engine.state import TipGeometry, HardwarePipette
+from opentrons.protocol_engine import DeckLocation, WellLocation, WellOrigin
+from opentrons.protocol_engine.state import StateStore, TipGeometry, HardwarePipette
 from opentrons.protocol_engine.execution.movement import MovementHandler
 from opentrons.protocol_engine.execution.pipetting import PipettingHandler
 
@@ -31,22 +31,29 @@ class MockPipettes:
         return {Mount.LEFT: self.left_config, Mount.RIGHT: self.right_config}
 
 
-# TODO(mc, 2020-01-07): move to protocol_engine conftest
 @pytest.fixture
-def mock_state_view(decoy: Decoy) -> StateView:
-    """Get a mock in the shape of a StateView."""
-    return decoy.create_decoy(spec=StateView)
+def hardware_api(decoy: Decoy) -> HardwareAPI:
+    """Get a mock in the shape of a HardwareAPI."""
+    return decoy.mock(cls=HardwareAPI)
 
 
 @pytest.fixture
-def mock_hw_pipettes(
-    mock_hw_controller: HardwareAPI
-) -> MockPipettes:
+def state_store(decoy: Decoy) -> StateStore:
+    """Get a mock in the shape of a StateStore."""
+    return decoy.mock(cls=StateStore)
+
+
+@pytest.fixture
+def movement_handler(decoy: Decoy) -> MovementHandler:
+    """Get a mock in the shape of a MovementHandler."""
+    return decoy.mock(cls=MovementHandler)
+
+
+@pytest.fixture
+def mock_hw_pipettes(hardware_api: HardwareAPI) -> MockPipettes:
     """Get mock pipette configs and attach them to the mock HW controller."""
     mock_hw_pipettes = MockPipettes()
-    mock_hw_controller.attached_instruments = (  # type: ignore[misc]
-        mock_hw_pipettes.by_mount
-    )
+    hardware_api.attached_instruments = mock_hw_pipettes.by_mount  # type: ignore[misc]
 
     return mock_hw_pipettes
 
@@ -69,29 +76,29 @@ def mock_right_pipette_config(
 
 @pytest.fixture
 def handler(
-    mock_state_view: StateView,
-    mock_hw_controller: HardwareAPI,
-    mock_movement_handler: MovementHandler,
+    state_store: StateStore,
+    hardware_api: HardwareAPI,
+    movement_handler: MovementHandler,
 ) -> PipettingHandler:
     """Create a PipettingHandler with its dependencies mocked out."""
     return PipettingHandler(
-        state=mock_state_view,
-        hardware=mock_hw_controller,
-        movement_handler=mock_movement_handler,
+        state_store=state_store,
+        hardware_api=hardware_api,
+        movement_handler=movement_handler,
     )
 
 
 async def test_handle_pick_up_tip_request(
     decoy: Decoy,
-    mock_state_view: StateView,
-    mock_hw_controller: HardwareAPI,
-    mock_movement_handler: MovementHandler,
+    state_store: StateStore,
+    hardware_api: HardwareAPI,
+    movement_handler: MovementHandler,
     mock_hw_pipettes: MockPipettes,
     handler: PipettingHandler,
 ) -> None:
     """It should handle a PickUpTipRequest properly."""
     decoy.when(
-        mock_state_view.pipettes.get_hardware_pipette(
+        state_store.pipettes.get_hardware_pipette(
             pipette_id="pipette-id",
             attached_pipettes=mock_hw_pipettes.by_mount,
         )
@@ -100,7 +107,7 @@ async def test_handle_pick_up_tip_request(
     )
 
     decoy.when(
-        mock_state_view.geometry.get_tip_geometry(
+        state_store.geometry.get_tip_geometry(
             labware_id="labware-id",
             well_name="B2",
             pipette_config=mock_hw_pipettes.left_config,
@@ -120,36 +127,33 @@ async def test_handle_pick_up_tip_request(
     )
 
     decoy.verify(
-        await mock_movement_handler.move_to_well(
+        await movement_handler.move_to_well(
             pipette_id="pipette-id",
             labware_id="labware-id",
             well_name="B2",
         ),
-        await mock_hw_controller.pick_up_tip(
+        await hardware_api.pick_up_tip(
             mount=Mount.LEFT,
             tip_length=50,
             presses=None,
             increment=None,
         ),
-        mock_hw_controller.set_current_tiprack_diameter(
-            mount=Mount.LEFT,
-            tiprack_diameter=5
-        ),
-        mock_hw_controller.set_working_volume(mount=Mount.LEFT, tip_volume=300)
+        hardware_api.set_current_tiprack_diameter(mount=Mount.LEFT, tiprack_diameter=5),
+        hardware_api.set_working_volume(mount=Mount.LEFT, tip_volume=300),
     )
 
 
 async def test_handle_drop_up_tip_request(
     decoy: Decoy,
-    mock_state_view: StateView,
-    mock_hw_controller: HardwareAPI,
-    mock_movement_handler: MovementHandler,
+    state_store: StateStore,
+    hardware_api: HardwareAPI,
+    movement_handler: MovementHandler,
     mock_hw_pipettes: MockPipettes,
     handler: PipettingHandler,
 ) -> None:
     """It should handle a DropTipRequest properly."""
     decoy.when(
-        mock_state_view.pipettes.get_hardware_pipette(
+        state_store.pipettes.get_hardware_pipette(
             pipette_id="pipette-id",
             attached_pipettes=mock_hw_pipettes.by_mount,
         )
@@ -161,7 +165,7 @@ async def test_handle_drop_up_tip_request(
     )
 
     decoy.when(
-        mock_state_view.geometry.get_tip_drop_location(
+        state_store.geometry.get_tip_drop_location(
             labware_id="labware-id",
             pipette_config=mock_hw_pipettes.right_config,
         )
@@ -174,21 +178,21 @@ async def test_handle_drop_up_tip_request(
     )
 
     decoy.verify(
-        await mock_movement_handler.move_to_well(
+        await movement_handler.move_to_well(
             pipette_id="pipette-id",
             labware_id="labware-id",
             well_name="A1",
-            well_location=WellLocation(offset=(0, 0, 10))
+            well_location=WellLocation(offset=(0, 0, 10)),
         ),
-        await mock_hw_controller.drop_tip(mount=Mount.RIGHT, home_after=True),
+        await hardware_api.drop_tip(mount=Mount.RIGHT, home_after=True),
     )
 
 
 async def test_handle_aspirate_request_without_prep(
     decoy: Decoy,
-    mock_state_view: StateView,
-    mock_hw_controller: HardwareAPI,
-    mock_movement_handler: MovementHandler,
+    state_store: StateStore,
+    hardware_api: HardwareAPI,
+    movement_handler: MovementHandler,
     mock_hw_pipettes: MockPipettes,
     handler: PipettingHandler,
 ) -> None:
@@ -196,7 +200,7 @@ async def test_handle_aspirate_request_without_prep(
     well_location = WellLocation(origin=WellOrigin.BOTTOM, offset=(0, 0, 1))
 
     decoy.when(
-        mock_state_view.pipettes.get_hardware_pipette(
+        state_store.pipettes.get_hardware_pipette(
             pipette_id="pipette-id",
             attached_pipettes=mock_hw_pipettes.by_mount,
         )
@@ -208,7 +212,7 @@ async def test_handle_aspirate_request_without_prep(
     )
 
     decoy.when(
-        mock_state_view.pipettes.get_is_ready_to_aspirate(
+        state_store.pipettes.get_is_ready_to_aspirate(
             pipette_id="pipette-id",
             pipette_config=mock_hw_pipettes.left_config,
         )
@@ -225,14 +229,14 @@ async def test_handle_aspirate_request_without_prep(
     assert volume == 25
 
     decoy.verify(
-        await mock_movement_handler.move_to_well(
+        await movement_handler.move_to_well(
             pipette_id="pipette-id",
             labware_id="labware-id",
             well_name="C6",
             well_location=well_location,
             current_location=None,
         ),
-        await mock_hw_controller.aspirate(
+        await hardware_api.aspirate(
             mount=Mount.LEFT,
             volume=25,
         ),
@@ -241,9 +245,9 @@ async def test_handle_aspirate_request_without_prep(
 
 async def test_handle_aspirate_request_with_prep(
     decoy: Decoy,
-    mock_state_view: StateView,
-    mock_hw_controller: HardwareAPI,
-    mock_movement_handler: MovementHandler,
+    state_store: StateStore,
+    hardware_api: HardwareAPI,
+    movement_handler: MovementHandler,
     mock_hw_pipettes: MockPipettes,
     handler: PipettingHandler,
 ) -> None:
@@ -251,7 +255,7 @@ async def test_handle_aspirate_request_with_prep(
     well_location = WellLocation(origin=WellOrigin.BOTTOM, offset=(0, 0, 1))
 
     decoy.when(
-        mock_state_view.pipettes.get_hardware_pipette(
+        state_store.pipettes.get_hardware_pipette(
             pipette_id="pipette-id",
             attached_pipettes=mock_hw_pipettes.by_mount,
         )
@@ -263,7 +267,7 @@ async def test_handle_aspirate_request_with_prep(
     )
 
     decoy.when(
-        mock_state_view.pipettes.get_is_ready_to_aspirate(
+        state_store.pipettes.get_is_ready_to_aspirate(
             pipette_id="pipette-id",
             pipette_config=mock_hw_pipettes.left_config,
         )
@@ -280,32 +284,31 @@ async def test_handle_aspirate_request_with_prep(
     assert volume == 25
 
     decoy.verify(
-        await mock_movement_handler.move_to_well(
+        await movement_handler.move_to_well(
             pipette_id="pipette-id",
             labware_id="labware-id",
             well_name="C6",
             well_location=WellLocation(origin=WellOrigin.TOP),
         ),
-        await mock_hw_controller.prepare_for_aspirate(mount=Mount.LEFT),
-        await mock_movement_handler.move_to_well(
+        await hardware_api.prepare_for_aspirate(mount=Mount.LEFT),
+        await movement_handler.move_to_well(
             pipette_id="pipette-id",
             labware_id="labware-id",
             well_name="C6",
             well_location=well_location,
             current_location=DeckLocation(
-                pipette_id="pipette-id",
-                labware_id="labware-id",
-                well_name="C6"),
+                pipette_id="pipette-id", labware_id="labware-id", well_name="C6"
+            ),
         ),
-        await mock_hw_controller.aspirate(mount=Mount.LEFT, volume=25),
+        await hardware_api.aspirate(mount=Mount.LEFT, volume=25),
     )
 
 
 async def test_handle_dispense_request(
     decoy: Decoy,
-    mock_state_view: StateView,
-    mock_hw_controller: HardwareAPI,
-    mock_movement_handler: MovementHandler,
+    state_store: StateStore,
+    hardware_api: HardwareAPI,
+    movement_handler: MovementHandler,
     mock_hw_pipettes: MockPipettes,
     handler: PipettingHandler,
 ) -> None:
@@ -313,7 +316,7 @@ async def test_handle_dispense_request(
     well_location = WellLocation(origin=WellOrigin.BOTTOM, offset=(0, 0, 1))
 
     decoy.when(
-        mock_state_view.pipettes.get_hardware_pipette(
+        state_store.pipettes.get_hardware_pipette(
             pipette_id="pipette-id",
             attached_pipettes=mock_hw_pipettes.by_mount,
         )
@@ -335,11 +338,11 @@ async def test_handle_dispense_request(
     assert volume == 25
 
     decoy.verify(
-        await mock_movement_handler.move_to_well(
+        await movement_handler.move_to_well(
             pipette_id="pipette-id",
             labware_id="labware-id",
             well_name="C6",
             well_location=well_location,
         ),
-        await mock_hw_controller.dispense(mount=Mount.RIGHT, volume=25),
+        await hardware_api.dispense(mount=Mount.RIGHT, volume=25),
     )

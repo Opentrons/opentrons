@@ -1,48 +1,52 @@
 """Test load pipette commands."""
-from mock import AsyncMock  # type: ignore[attr-defined]
+from decoy import Decoy
 
 from opentrons.types import MountType
 from opentrons.protocol_engine.types import PipetteName
-from opentrons.protocol_engine.execution import LoadedPipette
-from opentrons.protocol_engine.commands import (
-    LoadPipetteRequest,
+
+from opentrons.protocol_engine.execution import (
+    LoadedPipette,
+    EquipmentHandler,
+    MovementHandler,
+    PipettingHandler,
+    RunControlHandler,
+)
+from opentrons.protocol_engine.commands.load_pipette import (
+    LoadPipetteData,
     LoadPipetteResult,
+    LoadPipetteImplementation,
 )
 
 
-def test_load_pipette_request() -> None:
-    """It should have a LoadPipetteRequest model."""
-    request = LoadPipetteRequest(
+async def test_load_pipette_implementation(
+    decoy: Decoy,
+    equipment: EquipmentHandler,
+    movement: MovementHandler,
+    pipetting: PipettingHandler,
+    run_control: RunControlHandler,
+) -> None:
+    """A LoadPipette command should have an execution implementation."""
+    subject = LoadPipetteImplementation(
+        equipment=equipment,
+        movement=movement,
+        pipetting=pipetting,
+        run_control=run_control,
+    )
+
+    data = LoadPipetteData(
         pipetteName=PipetteName.P300_SINGLE,
         mount=MountType.LEFT,
+        pipetteId="some id",
     )
 
-    assert request.pipetteName == "p300_single"
-    assert request.mount == MountType.LEFT
+    decoy.when(
+        await equipment.load_pipette(
+            pipette_name=PipetteName.P300_SINGLE,
+            mount=MountType.LEFT,
+            pipette_id="some id",
+        )
+    ).then_return(LoadedPipette(pipette_id="pipette-id"))
 
-
-def test_load_pipette_result() -> None:
-    """It should have a LoadPipetteResult model."""
-    result = LoadPipetteResult(pipetteId="pipette-id")
-
-    assert result.pipetteId == "pipette-id"
-
-
-async def test_load_pipette_implementation(mock_handlers: AsyncMock) -> None:
-    """A LoadPipetteRequest should have an execution implementation."""
-    mock_handlers.equipment.load_pipette.return_value = LoadedPipette(
-        pipette_id="pipette-id",
-    )
-
-    request = LoadPipetteRequest(
-        pipetteName=PipetteName.P300_SINGLE,
-        mount=MountType.LEFT,
-    )
-    impl = request.get_implementation()
-    result = await impl.execute(mock_handlers)
+    result = await subject.execute(data)
 
     assert result == LoadPipetteResult(pipetteId="pipette-id")
-    mock_handlers.equipment.load_pipette.assert_called_with(
-        pipette_name="p300_single",
-        mount=MountType.LEFT,
-    )

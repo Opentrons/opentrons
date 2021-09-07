@@ -1,45 +1,39 @@
 """Test aspirate commands."""
 from decoy import Decoy
 
-from opentrons.protocol_engine import CommandHandlers, WellLocation, WellOrigin
-from opentrons.protocol_engine.commands import AspirateRequest, AspirateResult
+from opentrons.protocol_engine import WellLocation, WellOrigin
+from opentrons.protocol_engine.execution import (
+    EquipmentHandler,
+    MovementHandler,
+    PipettingHandler,
+    RunControlHandler,
+)
 
-
-def test_aspirate_request() -> None:
-    """It should be able to create a AspirateRequest."""
-    request = AspirateRequest(
-        pipetteId="abc",
-        labwareId="123",
-        wellName="A3",
-        wellLocation=WellLocation(origin=WellOrigin.BOTTOM, offset=(0, 0, 1)),
-        volume=50,
-    )
-
-    assert request.pipetteId == "abc"
-    assert request.labwareId == "123"
-    assert request.wellName == "A3"
-    assert request.wellLocation == WellLocation(
-        origin=WellOrigin.BOTTOM,
-        offset=(0, 0, 1),
-    )
-    assert request.volume == 50
-
-
-def test_aspirate_result() -> None:
-    """It should be able to create a AspirateResult."""
-    result = AspirateResult(volume=50)
-
-    assert result.volume == 50
+from opentrons.protocol_engine.commands.aspirate import (
+    AspirateData,
+    AspirateResult,
+    AspirateImplementation,
+)
 
 
 async def test_aspirate_implementation(
     decoy: Decoy,
-    mock_cmd_handlers: CommandHandlers,
+    equipment: EquipmentHandler,
+    movement: MovementHandler,
+    pipetting: PipettingHandler,
+    run_control: RunControlHandler,
 ) -> None:
-    """A PickUpTipRequest should have an execution implementation."""
+    """An Aspirate should have an execution implementation."""
+    subject = AspirateImplementation(
+        equipment=equipment,
+        movement=movement,
+        pipetting=pipetting,
+        run_control=run_control,
+    )
+
     location = WellLocation(origin=WellOrigin.BOTTOM, offset=(0, 0, 1))
 
-    request = AspirateRequest(
+    data = AspirateData(
         pipetteId="abc",
         labwareId="123",
         wellName="A3",
@@ -48,7 +42,7 @@ async def test_aspirate_implementation(
     )
 
     decoy.when(
-        await mock_cmd_handlers.pipetting.aspirate(
+        await pipetting.aspirate(
             pipette_id="abc",
             labware_id="123",
             well_name="A3",
@@ -57,7 +51,6 @@ async def test_aspirate_implementation(
         )
     ).then_return(42)
 
-    impl = request.get_implementation()
-    result = await impl.execute(mock_cmd_handlers)
+    result = await subject.execute(data)
 
     assert result == AspirateResult(volume=42)

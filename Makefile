@@ -12,14 +12,15 @@ SHELL := bash
 PATH := $(shell yarn bin):$(PATH)
 
 API_DIR := api
+APP_SHELL_DIR := app-shell
+COMPONENTS_DIR := components
 DISCOVERY_CLIENT_DIR := discovery-client
 LABWARE_LIBRARY_DIR := labware-library
+NOTIFY_SERVER_DIR := notify-server
 PROTOCOL_DESIGNER_DIR := protocol-designer
 SHARED_DATA_DIR := shared-data
 UPDATE_SERVER_DIR := update-server
 ROBOT_SERVER_DIR := robot-server
-NOTIFY_SERVER_DIR := notify-server
-APP_SHELL_DIR := app-shell
 
 # This may be set as an environment variable (and is by CI tasks that upload
 # to test pypi) to add a .dev extension to the python package versions. If
@@ -27,10 +28,11 @@ APP_SHELL_DIR := app-shell
 # documentation
 BUILD_NUMBER ?=
 
-# watch, coverage, and update snapshot variables for tests
+# watch, coverage, update snapshot, and warning suppresion variables for tests and linting
 watch ?= false
 cover ?= true
 updateSnapshot ?= false
+quiet ?= false
 
 FORMAT_FILE_GLOB = ".*.@(js|ts|tsx|yml)" "**/*.@(ts|tsx|js|json|md|yml)"
 
@@ -50,6 +52,7 @@ setup: setup-js setup-py
 .PHONY: clean-js
 clean-js: clean-ts
 	$(MAKE) -C $(DISCOVERY_CLIENT_DIR) clean
+	$(MAKE) -C $(COMPONENTS_DIR) clean
 
 PYTHON_DIRS = $(API_DIR) $(UPDATE_SERVER_DIR) $(NOTIFY_SERVER_DIR) $(ROBOT_SERVER_DIR) $(SHARED_DATA_DIR)/python
 PYTHON_CLEAN = $(addsuffix -py-clean, $(PYTHON_DIRS))
@@ -66,14 +69,14 @@ PYTHON_SETUP = $(addsuffix -py-setup, $(PYTHON_DIRS))
 
 .PHONY: prepare-setup-py
 prepare-setup-py:
-	$(OT_PYTHON) -m pip install pipenv==2020.8.13
+	$(OT_PYTHON) -m pip install pipenv==2021.5.29
 
 .PHONY: setup-py
-setup-py: prepare-setup-py 
+setup-py: prepare-setup-py
 	$(MAKE) $(PYTHON_SETUP)
 
 PYTHON_TEARDOWN = $(addsuffix -py-teardown, $(PYTHON_DIRS))
-%-py-teardown: 
+%-py-teardown:
 	$(MAKE) -C $* clean teardown
 
 # front-end dependecies handled by yarn
@@ -182,24 +185,16 @@ test-js:
 .PHONY: lint
 lint: lint-py lint-js lint-json lint-css check-js circular-dependencies-js
 
-.PHONY: format
-format:
-ifeq ($(watch),true)
-	onchange $(FORMAT_FILE_GLOB) -- prettier --ignore-path .eslintignore --write {{changed}}
-else
-	prettier --ignore-path .eslintignore --write $(FORMAT_FILE_GLOB)
-endif
-
 PYTHON_LINT = $(addsuffix -py-lint, $(PYTHON_DIRS))
 %-py-lint:
 	$(MAKE) -C $* lint
 
 .PHONY: lint-py
-lint-py: $(PYTHON_LINT) 
+lint-py: $(PYTHON_LINT)
 
 .PHONY: lint-js
 lint-js:
-	eslint ".*.@(js|ts|tsx)" "**/*.@(js|ts|tsx)"
+	eslint --quiet=$(quiet) ".*.@(js|ts|tsx)" "**/*.@(js|ts|tsx)"
 	prettier --ignore-path .eslintignore --check $(FORMAT_FILE_GLOB)
 
 .PHONY: lint-json
@@ -210,9 +205,20 @@ lint-json:
 lint-css:
 	stylelint "**/*.css" "**/*.js"
 
+.PHONY: format
+format: format-js format-py
+
+.PHONY: format-py
+format-py:
+	$(MAKE) -C $(API_DIR) format
+	$(MAKE) -C $(ROBOT_SERVER_DIR) format
+
+.PHONY: format-js
+format-js:
+	prettier --ignore-path .eslintignore --write $(FORMAT_FILE_GLOB)
+
 .PHONY: check-js
 check-js: build-ts
-	yarn flow $(if $(CI),check,status)
 
 .PHONY: build-ts
 build-ts:
@@ -225,9 +231,10 @@ clean-ts:
 # TODO: Ian 2019-12-17 gradually add components and shared-data
 .PHONY: circular-dependencies-js
 circular-dependencies-js:
-	madge $(and $(CI),--no-spinner --no-color) --circular protocol-designer/src/index.js
+	madge $(and $(CI),--no-spinner --no-color) --circular protocol-designer/src/index.tsx
+	madge $(and $(CI),--no-spinner --no-color) --circular step-generation/src/index.ts
 	madge $(and $(CI),--no-spinner --no-color) --circular labware-library/src/index.tsx
-	madge $(and $(CI),--no-spinner --no-color) --circular app/src/index.js
+	madge $(and $(CI),--no-spinner --no-color) --circular app/src/index.tsx
 
 .PHONY: bump
 bump:

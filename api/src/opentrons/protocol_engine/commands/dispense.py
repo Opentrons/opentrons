@@ -1,41 +1,57 @@
 """Dispense command request, result, and implementation models."""
 from __future__ import annotations
-from typing_extensions import final
+from typing import Optional, Type
+from typing_extensions import Literal
 
-from .command import CommandImplementation, CommandHandlers
-from .pipetting_common import BaseLiquidHandlingRequest, BaseLiquidHandlingResult
-
-
-@final
-class DispenseRequest(BaseLiquidHandlingRequest):
-    """A request to aspirate from a specific well."""
-
-    def get_implementation(self) -> DispenseImplementation:
-        """Get the execution implementation of the DispenseRequest."""
-        return DispenseImplementation(self)
+from .pipetting_common import BaseLiquidHandlingData, BaseLiquidHandlingResult
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandRequest
 
 
-@final
+DispenseCommandType = Literal["dispense"]
+
+
+class DispenseData(BaseLiquidHandlingData):
+    """Data required to dispense to a specific well."""
+
+    pass
+
+
 class DispenseResult(BaseLiquidHandlingResult):
     """Result data from the execution of a DispenseRequest."""
 
     pass
 
 
-@final
-class DispenseImplementation(
-    CommandImplementation[DispenseRequest, DispenseResult]
-):
+class DispenseImplementation(AbstractCommandImpl[DispenseData, DispenseResult]):
     """Dispense command implementation."""
 
-    async def execute(self, handlers: CommandHandlers) -> DispenseResult:
+    async def execute(self, data: DispenseData) -> DispenseResult:
         """Move to and dispense to the requested well."""
-        volume = await handlers.pipetting.dispense(
-            pipette_id=self._request.pipetteId,
-            labware_id=self._request.labwareId,
-            well_name=self._request.wellName,
-            well_location=self._request.wellLocation,
-            volume=self._request.volume,
+        volume = await self._pipetting.dispense(
+            pipette_id=data.pipetteId,
+            labware_id=data.labwareId,
+            well_name=data.wellName,
+            well_location=data.wellLocation,
+            volume=data.volume,
         )
 
         return DispenseResult(volume=volume)
+
+
+class Dispense(BaseCommand[DispenseData, DispenseResult]):
+    """Dispense command model."""
+
+    commandType: DispenseCommandType = "dispense"
+    data: DispenseData
+    result: Optional[DispenseResult]
+
+    _ImplementationCls: Type[DispenseImplementation] = DispenseImplementation
+
+
+class DispenseRequest(BaseCommandRequest[DispenseData]):
+    """Create dispense command request model."""
+
+    commandType: DispenseCommandType = "dispense"
+    data: DispenseData
+
+    _CommandCls: Type[Dispense] = Dispense

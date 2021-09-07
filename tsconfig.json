@@ -2,16 +2,34 @@
   "files": [],
   "references": [
     {
-      "path": "./components"
+      "path": "./app"
     },
     {
       "path": "./app-shell"
+    },
+    {
+      "path": "./components"
     },
     {
       "path": "./discovery-client"
     },
     {
       "path": "./labware-library"
+    },
+    {
+      "path": "./labware-designer"
+    },
+    {
+      "path": "./step-generation"
+    },
+    {
+      "path": "./shared-data"
+    },
+    {
+      "path": "./protocol-designer"
+    },
+    {
+      "path": "./protocol-library-kludge"
     }
   ]
 }

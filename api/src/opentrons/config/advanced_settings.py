@@ -3,8 +3,7 @@ import logging
 import os
 import sys
 from functools import lru_cache
-from typing import Any, Dict, Mapping, Tuple, Union, \
-    Optional, TYPE_CHECKING, NamedTuple
+from typing import Any, Dict, Mapping, Tuple, Union, Optional, TYPE_CHECKING, NamedTuple
 
 from opentrons.config import CONFIG, ARCHITECTURE, SystemArchitecture
 from opentrons.system import log_control
@@ -30,10 +29,15 @@ class SettingsData(NamedTuple):
 
 
 class SettingDefinition:
-    def __init__(self, _id: str, title: str, description: str,
-                 old_id: str = None,
-                 restart_required: bool = False,
-                 show_if: Tuple[str, bool] = None):
+    def __init__(
+        self,
+        _id: str,
+        title: str,
+        description: str,
+        old_id: str = None,
+        restart_required: bool = False,
+        show_if: Tuple[str, bool] = None,
+    ):
         self.id = _id
         #: The id of the setting for programmatic access through
         #: get_adv_setting
@@ -50,7 +54,7 @@ class SettingDefinition:
         #: to show this setting in http endpoints
 
     def __repr__(self):
-        return '{}: {}'.format(self.__class__, self.id)
+        return "{}: {}".format(self.__class__, self.id)
 
     def should_show(self) -> bool:
         """
@@ -59,8 +63,7 @@ class SettingDefinition:
         """
         if not self.show_if:
             return True
-        return get_setting_with_env_overload(self.show_if[0]) == \
-            self.show_if[1]
+        return get_setting_with_env_overload(self.show_if[0]) == self.show_if[1]
 
     async def on_change(self, value: Optional[bool]):
         """
@@ -74,25 +77,26 @@ class SettingDefinition:
 class DisableLogIntegrationSettingDefinition(SettingDefinition):
     def __init__(self):
         super().__init__(
-            _id='disableLogAggregation',
-            title='Disable Opentrons Log Collection',
-            description='Prevent the robot from sending its logs to Opentrons'
-                        ' for analysis. Opentrons uses these logs to'
-                        ' troubleshoot robot issues and spot error trends.')
+            _id="disableLogAggregation",
+            title="Disable Opentrons Log Collection",
+            description="Prevent the robot from sending its logs to Opentrons"
+            " for analysis. Opentrons uses these logs to"
+            " troubleshoot robot issues and spot error trends.",
+        )
 
     async def on_change(self, value: Optional[bool]):
         """Special side effect for this setting"""
         if ARCHITECTURE == SystemArchitecture.BUILDROOT:
             code, stdout, stderr = await log_control.set_syslog_level(
-                'emerg' if value else 'info'
+                "emerg" if value else "info"
             )
             if code != 0:
                 log.error(
                     f"Could not set log control: {code}: stdout={stdout}"
-                    f" stderr={stderr}")
+                    f" stderr={stderr}"
+                )
                 raise SettingException(
-                    f'Failed to set log upstreaming: {code}',
-                    'log-config-failure'
+                    f"Failed to set log upstreaming: {code}", "log-config-failure"
                 )
         await super().on_change(value)
 
@@ -107,97 +111,87 @@ class Setting(NamedTuple):
 # api/tests/opentrons/config/test_advanced_settings_migration.py
 settings = [
     SettingDefinition(
-        _id='shortFixedTrash',
-        old_id='short-fixed-trash',
-        title='Short (55mm) fixed trash',
-        description='Trash box is 55mm tall (rather than the 77mm default)'
+        _id="shortFixedTrash",
+        old_id="short-fixed-trash",
+        title="Short (55mm) fixed trash",
+        description="Trash box is 55mm tall (rather than the 77mm default)",
     ),
     SettingDefinition(
-        _id='calibrateToBottom',
-        old_id='calibrate-to-bottom',
-        title='Calibrate to bottom',
-        description='Calibrate using the bottom-center of well A1 for each'
-                    ' labware (rather than the top-center)'
+        _id="calibrateToBottom",
+        old_id="calibrate-to-bottom",
+        title="Calibrate to bottom",
+        description="Calibrate using the bottom-center of well A1 for each"
+        " labware (rather than the top-center)",
     ),
     SettingDefinition(
-        _id='deckCalibrationDots',
-        old_id='dots-deck-type',
-        title='Deck calibration to dots',
-        description='Perform deck calibration to dots rather than crosses, for'
-                    ' robots that do not have crosses etched on the deck'
+        _id="deckCalibrationDots",
+        old_id="dots-deck-type",
+        title="Deck calibration to dots",
+        description="Perform deck calibration to dots rather than crosses, for"
+        " robots that do not have crosses etched on the deck",
     ),
     SettingDefinition(
-        _id='useProtocolApi2',
-        title='Use Protocol API version 2',
-        description='Deprecated feature flag'
+        _id="disableHomeOnBoot",
+        old_id="disable-home-on-boot",
+        title="Disable home on boot",
+        description="Prevent robot from homing motors on boot",
     ),
     SettingDefinition(
-        _id='disableHomeOnBoot',
-        old_id='disable-home-on-boot',
-        title='Disable home on boot',
-        description='Prevent robot from homing motors on boot'
+        _id="useOldAspirationFunctions",
+        title="Use older aspirate behavior",
+        description="Aspirate with the less accurate volumetric calibrations"
+        " that were used before version 3.7.0. Use this if you"
+        " need consistency with pre-v3.7.0 results. This only"
+        " affects GEN1 P10S, P10M, P50S, P50M, and P300S pipettes.",
     ),
     SettingDefinition(
-        _id='useOldAspirationFunctions',
-        title='Use older aspirate behavior',
-        description='Aspirate with the less accurate volumetric calibrations'
-                    ' that were used before version 3.7.0. Use this if you'
-                    ' need consistency with pre-v3.7.0 results. This only'
-                    ' affects GEN1 P10S, P10M, P50S, P50M, and P300S pipettes.'
-    ),
-    SettingDefinition(
-        _id='enableDoorSafetySwitch',
-        title='Enable robot door safety switch',
+        _id="enableDoorSafetySwitch",
+        title="Enable robot door safety switch",
         description="Automatically pause protocols when robot door opens. "
-                    "Opening the robot door during a run will "
-                    "pause your robot only after it has completed its "
-                    "current motion."
+        "Opening the robot door during a run will "
+        "pause your robot only after it has completed its "
+        "current motion.",
     ),
     SettingDefinition(
-        _id='enableTipLengthCalibration',
-        title='Enable Under-Development Calibration Flows',
-        description='Do not activate this unless you are a developer. '
-                    'Enables the in-progress robot calibration flows '
-                    'for tip length, deck, and instrument calibration.'
-    ),
-    SettingDefinition(
-        _id='enableHttpProtocolSessions',
-        title='Enable Experimental HTTP Protocol Sessions',
-        description='Do not activate this unless you are a developer. '
-                    'Activating this will disable protocol running from the '
-                    'Opentrons application.',
-        restart_required=True,
-    ),
-    SettingDefinition(
-        _id='enableFastProtocolUpload',
-        title='Enable Experimental Fast Protocol Upload',
-        description='Enabling this flag will skip simulation for a faster '
-                    'upload. The protocol will be analyzed for syntax errors, '
-                    'run steps, and equipment requirements. This feature '
-                    'should only be used if a protocol has been simulated '
-                    'before.',
+        _id="disableFastProtocolUpload",
+        title="Use older protocol analysis method",
+        description=(
+            "Use an older, slower method of analyzing uploaded protocols. "
+            "This changes how the OT-2 validates your protocol during the upload "
+            "step, but does not affect how your protocol actually runs. "
+            "Opentrons Support might ask you to change this setting if you encounter "
+            "problems with the newer, faster protocol analysis method."
+        ),
         restart_required=False,
     ),
     SettingDefinition(
+        _id="enableHttpProtocolSessions",
+        title="Enable experimental HTTP protocol sessions",
+        description="Do not activate this unless you are a developer. "
+        "Activating this will disable protocol running from the "
+        "Opentrons application.",
+        restart_required=True,
+    ),
+    SettingDefinition(
         _id="enableProtocolEngine",
-        title="Enable Experimental Protocol Engine",
+        title="Enable experimental protocol engine",
         description=(
             "Do not enable. This is an Opentrons-internal setting to test "
             "new protocol execution logic. This feature is not yet complete; "
             "your protocols will break if you enable this setting."
         ),
-        restart_required=False,
-    )
+        restart_required=True,
+    ),
 ]
 
 if ARCHITECTURE == SystemArchitecture.BUILDROOT:
     settings.append(DisableLogIntegrationSettingDefinition())
 
 
-settings_by_id: Dict[str, SettingDefinition] = \
-    {s.id: s for s in settings}
-settings_by_old_id: Dict[str, SettingDefinition] = \
-    {s.old_id: s for s in settings if s.old_id}
+settings_by_id: Dict[str, SettingDefinition] = {s.id: s for s in settings}
+settings_by_old_id: Dict[str, SettingDefinition] = {
+    s.old_id: s for s in settings if s.old_id
+}
 
 
 def get_adv_setting(setting: str) -> Optional[Setting]:
@@ -209,19 +203,20 @@ def get_adv_setting(setting: str) -> Optional[Setting]:
 @lru_cache(maxsize=1)
 def get_all_adv_settings() -> Dict[str, Setting]:
     """Get all the advanced setting values and definitions"""
-    settings_file = CONFIG['feature_flags_file']
+    settings_file = CONFIG["feature_flags_file"]
 
     values, _ = _read_settings_file(settings_file)
 
     return {
         key: Setting(value=value, definition=settings_by_id[key])
-        for key, value in values.items() if key in settings_by_id
+        for key, value in values.items()
+        if key in settings_by_id
     }
 
 
 async def set_adv_setting(_id: str, value: Optional[bool]):
     _id = _clean_id(_id)
-    settings_file = CONFIG['feature_flags_file']
+    settings_file = CONFIG["feature_flags_file"]
     setting_data = _read_settings_file(settings_file)
     if _id not in setting_data.settings_map:
         raise ValueError(f"{_id} is not recognized")
@@ -229,9 +224,7 @@ async def set_adv_setting(_id: str, value: Optional[bool]):
     await settings_by_id[_id].on_change(value)
 
     setting_data.settings_map[_id] = value
-    _write_settings_file(setting_data.settings_map,
-                         setting_data.version,
-                         settings_file)
+    _write_settings_file(setting_data.settings_map, setting_data.version, settings_file)
     # Clear the lru cache
     get_all_adv_settings.cache_clear()
 
@@ -242,20 +235,19 @@ def _clean_id(_id: str) -> str:
     return _id
 
 
-def _read_json_file(path: Union[str, 'Path']) -> Dict[str, Any]:
+def _read_json_file(path: Union[str, "Path"]) -> Dict[str, Any]:
     try:
-        with open(path, 'r') as fd:
+        with open(path, "r") as fd:
             data = json.load(fd)
     except FileNotFoundError:
         data = {}
     except json.JSONDecodeError as e:
-        sys.stderr.write(
-            f'Could not load advanced settings file {path}: {e}\n')
+        sys.stderr.write(f"Could not load advanced settings file {path}: {e}\n")
         data = {}
     return data
 
 
-def _read_settings_file(settings_file: 'Path') -> SettingsData:
+def _read_settings_file(settings_file: "Path") -> SettingsData:
     """
     Read the settings file, which is a json object with settings IDs as keys
     and boolean values. For each key, look up the `Settings` object with that
@@ -272,23 +264,20 @@ def _read_settings_file(settings_file: 'Path') -> SettingsData:
     settings, version = _migrate(data)
     settings = _ensure(settings)
 
-    if data.get('_version') != version:
+    if data.get("_version") != version:
         _write_settings_file(settings, version, settings_file)
 
     return SettingsData(settings_map=settings, version=version)
 
 
-def _write_settings_file(data: Mapping[str, Any],
-                         version: int,
-                         settings_file: 'Path'):
+def _write_settings_file(data: Mapping[str, Any], version: int, settings_file: "Path"):
     try:
-        with settings_file.open('w') as fd:
-            json.dump({**data, '_version': version}, fd)
+        with settings_file.open("w") as fd:
+            json.dump({**data, "_version": version}, fd)
             fd.flush()
             os.fsync(fd.fileno())
     except OSError:
-        log.exception(
-            f'Failed to write advanced settings file to {settings_file}')
+        log.exception(f"Failed to write advanced settings file to {settings_file}")
 
 
 def _migrate0to1(previous: Mapping[str, Any]) -> SettingsMap:
@@ -318,7 +307,7 @@ def _migrate1to2(previous: SettingsMap) -> SettingsMap:
     disableLogAggregation config element.
     """
     newmap = {k: v for k, v in previous.items()}
-    newmap['disableLogAggregation'] = None
+    newmap["disableLogAggregation"] = None
     return newmap
 
 
@@ -328,8 +317,8 @@ def _migrate2to3(previous: SettingsMap) -> SettingsMap:
     enableApi1BackCompat config element.
     """
     newmap = {k: v for k, v in previous.items()}
-    newmap['enableApi1BackCompat'] = None
-    newmap['useProtocolApi2'] = None
+    newmap["enableApi1BackCompat"] = None
+    newmap["useProtocolApi2"] = None
     return newmap
 
 
@@ -339,7 +328,7 @@ def _migrate3to4(previous: SettingsMap) -> SettingsMap:
     useV1HttpApi config element.
     """
     newmap = {k: v for k, v in previous.items()}
-    newmap['useV1HttpApi'] = None
+    newmap["useV1HttpApi"] = None
     return newmap
 
 
@@ -349,7 +338,7 @@ def _migrate4to5(previous: SettingsMap) -> SettingsMap:
     enableDoorSafetyFeature config element.
     """
     newmap = {k: v for k, v in previous.items()}
-    newmap['enableDoorSafetySwitch'] = None
+    newmap["enableDoorSafetySwitch"] = None
     return newmap
 
 
@@ -359,7 +348,7 @@ def _migrate5to6(previous: SettingsMap) -> SettingsMap:
     enableTipLengthCalibration config element.
     """
     newmap = {k: v for k, v in previous.items()}
-    newmap['enableTipLengthCalibration'] = None
+    newmap["enableTipLengthCalibration"] = None
     return newmap
 
 
@@ -369,7 +358,7 @@ def _migrate6to7(previous: SettingsMap) -> SettingsMap:
     enableHttpProtocolSessions config element.
     """
     newmap = {k: v for k, v in previous.items()}
-    newmap['enableHttpProtocolSessions'] = None
+    newmap["enableHttpProtocolSessions"] = None
     return newmap
 
 
@@ -379,23 +368,54 @@ def _migrate7to8(previous: SettingsMap) -> SettingsMap:
     enableFastProtocolUpload config element.
     """
     newmap = {k: v for k, v in previous.items()}
-    newmap['enableFastProtocolUpload'] = None
+    newmap["enableFastProtocolUpload"] = None
     return newmap
 
 
 def _migrate8to9(previous: SettingsMap) -> SettingsMap:
-    """
-    Migration to version 8 of the feature flags file. Adds the
-    enableFastProtocolUpload config element.
+    """Migrate to version 9 of the feature flags file.
+
+    - Adds the enableProtocolEngine config element.
     """
     newmap = {k: v for k, v in previous.items()}
     newmap["enableProtocolEngine"] = None
     return newmap
 
 
-_MIGRATIONS = [_migrate0to1, _migrate1to2, _migrate2to3, _migrate3to4,
-               _migrate4to5, _migrate5to6, _migrate6to7, _migrate7to8,
-               _migrate8to9]
+def _migrate9to10(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 10 of the feature flags file.
+
+    - Removes deprecated useProtocolApi2 option
+    - Removes deprecated enableApi1BackCompat option
+    - Removed deprecated useV1HttpApi option
+    - Removes deprecated enableTipLengthCalibration option
+    - Removes deprecated enableFastProtocolUpload option
+    - Adds disableFastProtocolUpload option
+    """
+    removals = [
+        "useProtocolApi2",
+        "enableApi1BackCompat",
+        "useV1HttpApi",
+        "enableTipLengthCalibration",
+        "enableFastProtocolUpload",
+    ]
+    newmap = {k: v for k, v in previous.items() if k not in removals}
+    newmap["disableFastProtocolUpload"] = None
+    return newmap
+
+
+_MIGRATIONS = [
+    _migrate0to1,
+    _migrate1to2,
+    _migrate2to3,
+    _migrate3to4,
+    _migrate4to5,
+    _migrate5to6,
+    _migrate6to7,
+    _migrate7to8,
+    _migrate8to9,
+    _migrate9to10,
+]
 """
 List of all migrations to apply, indexed by (version - 1). See _migrate below
 for how the migration functions are applied. Each migration function should
@@ -410,14 +430,16 @@ def _migrate(data: Mapping[str, Any]) -> SettingsData:
     settings and version migrated to
     """
     next = dict(data)
-    version = next.pop('_version', 0)
+    version = next.pop("_version", 0)
     target_version = len(_MIGRATIONS)
     migrations = _MIGRATIONS[version:]
 
     if len(migrations) > 0:
         log.info(
-            "Migrating advanced settings from version {} to {}"
-            .format(version, target_version))
+            "Migrating advanced settings from version {} to {}".format(
+                version, target_version
+            )
+        )
 
     for m in migrations:
         next = m(next)
@@ -426,9 +448,11 @@ def _migrate(data: Mapping[str, Any]) -> SettingsData:
 
 
 def _ensure(data: Mapping[str, Any]) -> SettingsMap:
-    """
+    """Ensure config data is valid, regardless of version.
+
     Even after migration, we may have an invalid file. For instance,
-    we may have _downgraded_. Make sure all required keys are present.
+    the user may have _downgraded_. Make sure all required keys are present,
+    regardless of config version.
     """
     newdata = {k: v for k, v in data.items()}
     for s in settings:
@@ -438,9 +462,9 @@ def _ensure(data: Mapping[str, Any]) -> SettingsMap:
 
 
 def get_setting_with_env_overload(setting_name) -> bool:
-    env_name = 'OT_API_FF_' + setting_name
+    env_name = "OT_API_FF_" + setting_name
     if env_name in os.environ:
-        return os.environ[env_name].lower() in {'1', 'true', 'on'}
+        return os.environ[env_name].lower() in {"1", "true", "on"}
     else:
         s = get_adv_setting(setting_name)
         return s.value is True if s is not None else False

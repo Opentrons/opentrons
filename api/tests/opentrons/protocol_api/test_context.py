@@ -6,59 +6,68 @@ from unittest import mock
 import opentrons.protocol_api as papi
 import opentrons.protocols.api_support as papi_support
 import opentrons.protocols.geometry as papi_geometry
-from opentrons.protocols.context.protocol_api.protocol_context import \
-    ProtocolContextImplementation
-from opentrons.protocols.context.simulator.protocol_context import \
-    ProtocolContextSimulation
+from opentrons.protocols.context.protocol_api.protocol_context import (
+    ProtocolContextImplementation,
+)
+from opentrons.protocols.context.simulator.protocol_context import (
+    ProtocolContextSimulation,
+)
 from opentrons_shared_data import load_shared_data
 from opentrons.types import Mount, Point, Location, TransferTipPolicy
-from opentrons.hardware_control import API, NoTipAttachedError, \
-    SynchronousAdapter
+from opentrons.hardware_control import API, NoTipAttachedError, SynchronousAdapter
 from opentrons.hardware_control.pipette import Pipette
 from opentrons.hardware_control.types import Axis
 from opentrons.protocol_api import paired_instrument_context as paired
 from opentrons.protocols.advanced_control import transfers as tf
 from opentrons.config.pipette_config import config_names
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.calibration_storage import (
-    get, modify, delete, types as cs_types)
+from opentrons.calibration_storage import get, modify, delete, types as cs_types
 
 import pytest
 
 
 def set_version_added(attr, mp, version):
-    """ helper to mock versionadded for an attr
+    """helper to mock versionadded for an attr
 
     attr is the attr
     mp is a monkeypatch fixture
     version is an APIVersion
     """
+
     def get_wrapped(attr):
-        if hasattr(attr, '__wrapped__'):
+        if hasattr(attr, "__wrapped__"):
             return get_wrapped(attr.__wrapped__)
         return attr
 
-    if hasattr(attr, 'fget'):
+    if hasattr(attr, "fget"):
         # this is a property probably
         orig = get_wrapped(attr.fget)
     else:
         orig = get_wrapped(attr)
-    mp.setattr(orig, '__opentrons_version_added', version)
+    mp.setattr(orig, "__opentrons_version_added", version)
     return attr
 
 
 @pytest.fixture
 def get_labware_def(monkeypatch):
-    def dummy_load(labware_name, namespace=None, version=None,
-                   bundled_defs=None, extra_defs=None, api_level=None):
+    def dummy_load(
+        labware_name,
+        namespace=None,
+        version=None,
+        bundled_defs=None,
+        extra_defs=None,
+        api_level=None,
+    ):
         # TODO: Ian 2019-05-30 use fixtures not real defs
         labware_def = json.loads(
-            load_shared_data(f'labware/definitions/2/{labware_name}/1.json'))
+            load_shared_data(f"labware/definitions/2/{labware_name}/1.json")
+        )
         return labware_def
-    monkeypatch.setattr(papi.labware, 'get_labware_definition', dummy_load)
+
+    monkeypatch.setattr(papi.labware, "get_labware_definition", dummy_load)
 
 
-@pytest.mark.parametrize('name', config_names)
+@pytest.mark.parametrize("name", config_names)
 def test_load_instrument(name, ctx):
     assert ctx.loaded_instruments == {}
     loaded = ctx.load_instrument(name, Mount.LEFT, replace=True)
@@ -72,17 +81,15 @@ def test_load_instrument(name, ctx):
 async def test_motion(ctx, hardware):
     ctx.connect(hardware)
     ctx.home()
-    instr = ctx.load_instrument('p10_single', Mount.RIGHT)
-    old_pos = await hardware.current_position(
-        instr._implementation.get_mount())
+    instr = ctx.load_instrument("p10_single", Mount.RIGHT)
+    old_pos = await hardware.current_position(instr._implementation.get_mount())
     instr.home()
     assert instr.move_to(Location(Point(0, 0, 0), None)) is instr
     old_pos[Axis.X] = 0
     old_pos[Axis.Y] = 0
     old_pos[Axis.A] = 0
     old_pos[Axis.C] = 2
-    assert await hardware.current_position(
-        instr._implementation.get_mount()) == old_pos
+    assert await hardware.current_position(instr._implementation.get_mount()) == old_pos
 
 
 async def test_max_speeds(ctx, monkeypatch, hardware):
@@ -90,49 +97,53 @@ async def test_max_speeds(ctx, monkeypatch, hardware):
     ctx.home()
     mock_move = mock.Mock()
     monkeypatch.setattr(
-        ctx._implementation.get_hardware().hardware, 'move_to', mock_move)
-    instr = ctx.load_instrument('p10_single', Mount.RIGHT)
+        ctx._implementation.get_hardware().hardware, "move_to", mock_move
+    )
+    instr = ctx.load_instrument("p10_single", Mount.RIGHT)
     instr.move_to(Location(Point(0, 0, 0), None))
-    assert all(
-        kwargs['max_speeds'] == {}
-        for args, kwargs in mock_move.call_args_list)
+    assert all(kwargs["max_speeds"] == {} for args, kwargs in mock_move.call_args_list)
 
     mock_move.reset_mock()
-    ctx.max_speeds['x'] = 10
+    ctx.max_speeds["x"] = 10
     instr.move_to(Location(Point(0, 0, 1), None))
     assert all(
-        kwargs['max_speeds'] == {Axis.X: 10}
-        for args, kwargs in mock_move.call_args_list)
+        kwargs["max_speeds"] == {Axis.X: 10}
+        for args, kwargs in mock_move.call_args_list
+    )
 
     mock_move.reset_mock()
-    ctx.max_speeds['x'] = None
+    ctx.max_speeds["x"] = None
     instr.move_to(Location(Point(1, 0, 1), None))
-    assert all(
-        kwargs['max_speeds'] == {}
-        for args, kwargs in mock_move.call_args_list)
+    assert all(kwargs["max_speeds"] == {} for args, kwargs in mock_move.call_args_list)
 
 
 async def test_location_cache(ctx, monkeypatch, get_labware_def, hardware):
     ctx.connect(hardware)
 
-    right = ctx.load_instrument('p10_single', Mount.RIGHT)
-    lw = ctx.load_labware('corning_96_wellplate_360ul_flat', 1)
+    right = ctx.load_instrument("p10_single", Mount.RIGHT)
+    lw = ctx.load_labware("corning_96_wellplate_360ul_flat", 1)
     ctx.home()
 
     test_args = None
 
-    def fake_plan_move(from_loc, to_loc, deck,
-                       well_z_margin=None,
-                       lw_z_margin=None,
-                       force_direct=False,
-                       minimum_z_height=None):
+    def fake_plan_move(
+        from_loc,
+        to_loc,
+        deck,
+        well_z_margin=None,
+        lw_z_margin=None,
+        force_direct=False,
+        minimum_z_height=None,
+    ):
         nonlocal test_args
         test_args = (from_loc, to_loc, deck, well_z_margin, lw_z_margin)
-        return [(Point(0, 1, 10), None),
-                (Point(1, 2, 10), None),
-                (Point(1, 2, 3), None)]
+        return [
+            (Point(0, 1, 10), None),
+            (Point(1, 2, 10), None),
+            (Point(1, 2, 3), None),
+        ]
 
-    monkeypatch.setattr(papi_geometry.planning, 'plan_moves', fake_plan_move)
+    monkeypatch.setattr(papi_geometry.planning, "plan_moves", fake_plan_move)
     # When we move without a cache, the from location should be the gantry
     # position
     right.move_to(lw.wells()[0].top())
@@ -151,8 +162,8 @@ async def test_location_cache_two_pipettes(ctx, get_labware_def, hardware):
     """It should be invalidated when next movement is a different pipette
     than the cached location."""
     ctx.home()
-    left = ctx.load_instrument('p10_single', Mount.LEFT)
-    right = ctx.load_instrument('p10_single', Mount.RIGHT)
+    left = ctx.load_instrument("p10_single", Mount.LEFT)
+    right = ctx.load_instrument("p10_single", Mount.RIGHT)
 
     left_loc = Location(point=Point(1, 2, 3), labware="1")
     right_loc = Location(point=Point(3, 4, 5), labware="2")
@@ -170,14 +181,13 @@ async def test_location_cache_two_pipettes(ctx, get_labware_def, hardware):
 
 
 async def test_location_cache_two_pipettes_fails_pre_2_10(
-        ctx,
-        get_labware_def, hardware
+    ctx, get_labware_def, hardware
 ):
     """It should reuse location cache even if cached location was set by
     move of a different pipette."""
     ctx.home()
-    left = ctx.load_instrument('p10_single', Mount.LEFT)
-    right = ctx.load_instrument('p10_single', Mount.RIGHT)
+    left = ctx.load_instrument("p10_single", Mount.LEFT)
+    right = ctx.load_instrument("p10_single", Mount.RIGHT)
     left._implementation._api_version = APIVersion(2, 9)
     right._implementation._api_version = APIVersion(2, 9)
 
@@ -197,8 +207,8 @@ async def test_location_cache_two_pipettes_fails_pre_2_10(
 async def test_move_uses_arc(ctx, monkeypatch, get_labware_def, hardware):
     ctx.connect(hardware)
     ctx.home()
-    right = ctx.load_instrument('p10_single', Mount.RIGHT)
-    lw = ctx.load_labware('corning_96_wellplate_360ul_flat', 1)
+    right = ctx.load_instrument("p10_single", Mount.RIGHT)
+    lw = ctx.load_labware("corning_96_wellplate_360ul_flat", 1)
     ctx.home()
 
     targets = []
@@ -206,7 +216,8 @@ async def test_move_uses_arc(ctx, monkeypatch, get_labware_def, hardware):
     async def fake_move(self, mount, target_pos, **kwargs):
         nonlocal targets
         targets.append((mount, target_pos, kwargs))
-    monkeypatch.setattr(API, 'move_to', fake_move)
+
+    monkeypatch.setattr(API, "move_to", fake_move)
 
     right.move_to(lw.wells()[0].top())
     assert len(targets) == 3
@@ -215,32 +226,32 @@ async def test_move_uses_arc(ctx, monkeypatch, get_labware_def, hardware):
 
 
 def test_pipette_info(ctx):
-    right = ctx.load_instrument('p300_multi', Mount.RIGHT)
-    left = ctx.load_instrument('p1000_single', Mount.LEFT)
-    assert right.type == 'multi'
+    right = ctx.load_instrument("p300_multi", Mount.RIGHT)
+    left = ctx.load_instrument("p1000_single", Mount.LEFT)
+    assert right.type == "multi"
     hardware = ctx._implementation.get_hardware().hardware
-    name = hardware.attached_instruments[Mount.RIGHT]['name']
-    model = hardware.attached_instruments[Mount.RIGHT]['model']
+    name = hardware.attached_instruments[Mount.RIGHT]["name"]
+    model = hardware.attached_instruments[Mount.RIGHT]["model"]
     assert right.name == name
     assert right.model == model
-    assert left.type == 'single'
-    name = hardware.attached_instruments[Mount.LEFT]['name']
-    model = hardware.attached_instruments[Mount.LEFT]['model']
+    assert left.type == "single"
+    name = hardware.attached_instruments[Mount.LEFT]["name"]
+    model = hardware.attached_instruments[Mount.LEFT]["model"]
     assert left.name == name
     assert left.model == model
 
 
 def test_pipette_pairing(ctx):
-    right = ctx.load_instrument('p300_multi', Mount.RIGHT)
-    left = ctx.load_instrument('p300_multi', Mount.LEFT)
+    right = ctx.load_instrument("p300_multi", Mount.RIGHT)
+    left = ctx.load_instrument("p300_multi", Mount.LEFT)
 
     paired_object = right.pair_with(left)
     assert isinstance(paired_object, paired.PairedInstrumentContext)
 
 
 def test_pipette_pairing_unsupported_instrument(ctx):
-    right = ctx.load_instrument('p300_multi', Mount.RIGHT)
-    left = ctx.load_instrument('p300_multi_gen2', Mount.LEFT)
+    right = ctx.load_instrument("p300_multi", Mount.RIGHT)
+    left = ctx.load_instrument("p300_multi_gen2", Mount.LEFT)
 
     with pytest.raises(paired.UnsupportedInstrumentPairingError):
         right.pair_with(left)
@@ -248,22 +259,23 @@ def test_pipette_pairing_unsupported_instrument(ctx):
 
 def test_pick_up_and_drop_tip(ctx, get_labware_def):
     ctx.home()
-    tiprack = ctx.load_labware('opentrons_96_tiprack_300ul', 1)
+    tiprack = ctx.load_labware("opentrons_96_tiprack_300ul", 1)
     tip_length = tiprack.tip_length
     mount = Mount.LEFT
 
-    instr = ctx.load_instrument('p300_single', mount, tip_racks=[tiprack])
+    instr = ctx.load_instrument("p300_single", mount, tip_racks=[tiprack])
 
-    pipette: Pipette = ctx._implementation.get_hardware().hardware._attached_instruments[mount]  # noqa: E501
+    pipette: Pipette = (
+        ctx._implementation.get_hardware().hardware._attached_instruments[mount]
+    )
     nozzle_offset = Point(*pipette.config.nozzle_offset)
     assert pipette.critical_point() == nozzle_offset
-    target_location = tiprack['A1'].top()
+    target_location = tiprack["A1"].top()
 
     instr.pick_up_tip(target_location)
     assert not tiprack.wells()[0].has_tip
-    overlap = instr.hw_pipette['tip_overlap'][tiprack.uri]
-    new_offset = nozzle_offset - Point(0, 0,
-                                       tip_length - overlap)
+    overlap = instr.hw_pipette["tip_overlap"][tiprack.uri]
+    new_offset = nozzle_offset - Point(0, 0, tip_length - overlap)
     assert pipette.critical_point() == new_offset
     assert pipette.has_tip
 
@@ -279,20 +291,22 @@ def test_return_tip_old_version(loop, get_labware_def):
     ctx = papi.ProtocolContext(
         implementation=ProtocolContextImplementation(api_version=api_version),
         loop=loop,
-        api_version=api_version
+        api_version=api_version,
     )
     ctx.home()
-    tiprack = ctx.load_labware('opentrons_96_tiprack_300ul', 1)
+    tiprack = ctx.load_labware("opentrons_96_tiprack_300ul", 1)
     mount = Mount.LEFT
 
-    instr = ctx.load_instrument('p300_single', mount, tip_racks=[tiprack])
+    instr = ctx.load_instrument("p300_single", mount, tip_racks=[tiprack])
 
     with pytest.raises(TypeError):
         instr.return_tip()
 
-    pipette: Pipette = ctx._implementation.get_hardware().hardware._attached_instruments[mount]  # noqa: E501
+    pipette: Pipette = (
+        ctx._implementation.get_hardware().hardware._attached_instruments[mount]
+    )
 
-    target_location = tiprack['A1'].top()
+    target_location = tiprack["A1"].top()
     instr.pick_up_tip(target_location)
     assert not tiprack.wells()[0].has_tip
     assert pipette.has_tip
@@ -308,17 +322,19 @@ def test_return_tip_old_version(loop, get_labware_def):
 
 def test_return_tip(ctx, get_labware_def):
     ctx.home()
-    tiprack = ctx.load_labware('opentrons_96_tiprack_300ul', 1)
+    tiprack = ctx.load_labware("opentrons_96_tiprack_300ul", 1)
     mount = Mount.LEFT
 
-    instr = ctx.load_instrument('p300_single', mount, tip_racks=[tiprack])
+    instr = ctx.load_instrument("p300_single", mount, tip_racks=[tiprack])
 
     with pytest.raises(TypeError):
         instr.return_tip()
 
-    pipette: Pipette = ctx._implementation.get_hardware().hardware._attached_instruments[mount]  # noqa: E501
+    pipette: Pipette = (
+        ctx._implementation.get_hardware().hardware._attached_instruments[mount]
+    )
 
-    target_location = tiprack['A1'].top()
+    target_location = tiprack["A1"].top()
     instr.pick_up_tip(target_location)
     assert not tiprack.wells()[0].has_tip
     assert pipette.has_tip
@@ -335,12 +351,14 @@ def test_return_tip(ctx, get_labware_def):
 def test_use_filter_tips(ctx, get_labware_def):
     ctx.home()
 
-    tiprack = ctx.load_labware_by_name('opentrons_96_filtertiprack_200ul', 2)
+    tiprack = ctx.load_labware_by_name("opentrons_96_filtertiprack_200ul", 2)
 
     mount = Mount.LEFT
 
-    instr = ctx.load_instrument('p300_single', mount, tip_racks=[tiprack])
-    pipette: Pipette = ctx._implementation.get_hardware().hardware._attached_instruments[mount]  # noqa: E501
+    instr = ctx.load_instrument("p300_single", mount, tip_racks=[tiprack])
+    pipette: Pipette = (
+        ctx._implementation.get_hardware().hardware._attached_instruments[mount]
+    )
 
     assert pipette.available_volume == pipette.config.max_volume
 
@@ -348,13 +366,11 @@ def test_use_filter_tips(ctx, get_labware_def):
     assert pipette.available_volume < pipette.config.max_volume
 
 
-@pytest.mark.parametrize('pipette_model',
-                         ['p10_single', 'p20_single_gen2'])
+@pytest.mark.parametrize("pipette_model", ["p10_single", "p20_single_gen2"])
 @pytest.mark.parametrize(
-    'tiprack_kind',
-    ['opentrons_96_tiprack_10ul', 'eppendorf_96_tiprack_10ul_eptips'])
-def test_pick_up_tip_no_location(ctx, get_labware_def,
-                                 pipette_model, tiprack_kind):
+    "tiprack_kind", ["opentrons_96_tiprack_10ul", "eppendorf_96_tiprack_10ul_eptips"]
+)
+def test_pick_up_tip_no_location(ctx, get_labware_def, pipette_model, tiprack_kind):
     ctx.home()
 
     tiprack1 = ctx.load_labware(tiprack_kind, 1)
@@ -366,21 +382,20 @@ def test_pick_up_tip_no_location(ctx, get_labware_def,
 
     mount = Mount.LEFT
 
-    instr = ctx.load_instrument(
-        pipette_model, mount, tip_racks=[tiprack1, tiprack2])
+    instr = ctx.load_instrument(pipette_model, mount, tip_racks=[tiprack1, tiprack2])
 
-    pipette: Pipette = ctx._implementation.get_hardware().hardware._attached_instruments[mount]  # noqa: E501
+    pipette: Pipette = (
+        ctx._implementation.get_hardware().hardware._attached_instruments[mount]
+    )
     nozzle_offset = Point(*pipette.config.nozzle_offset)
     assert pipette.critical_point() == nozzle_offset
 
     instr.pick_up_tip()
 
-    assert 'picking up tip' in ','.join([cmd.lower()
-                                         for cmd in ctx.commands()])
+    assert "picking up tip" in ",".join([cmd.lower() for cmd in ctx.commands()])
     assert not tiprack1.wells()[0].has_tip
-    overlap = instr.hw_pipette['tip_overlap'][tiprack1.uri]
-    new_offset = nozzle_offset - Point(0, 0,
-                                       tip_length1 - overlap)
+    overlap = instr.hw_pipette["tip_overlap"][tiprack1.uri]
+    new_offset = nozzle_offset - Point(0, 0, tip_length1 - overlap)
     assert pipette.critical_point() == new_offset
 
     # TODO: remove argument and verify once trash container is added
@@ -403,36 +418,39 @@ def test_instrument_trash(ctx, get_labware_def):
     ctx.home()
 
     mount = Mount.LEFT
-    instr = ctx.load_instrument('p300_single', mount)
+    instr = ctx.load_instrument("p300_single", mount)
 
-    assert instr.trash_container.name == 'opentrons_1_trash_1100ml_fixed'
+    assert instr.trash_container.name == "opentrons_1_trash_1100ml_fixed"
 
-    new_trash = ctx.load_labware('usascientific_12_reservoir_22ml', 2)
+    new_trash = ctx.load_labware("usascientific_12_reservoir_22ml", 2)
     instr.trash_container = new_trash
 
-    assert instr.trash_container.name == 'usascientific_12_reservoir_22ml'
+    assert instr.trash_container.name == "usascientific_12_reservoir_22ml"
 
 
 def test_aspirate(ctx, get_labware_def, monkeypatch):
     ctx.home()
-    lw = ctx.load_labware('corning_96_wellplate_360ul_flat', 1)
-    tiprack = ctx.load_labware('opentrons_96_tiprack_10ul', 2)
-    instr = ctx.load_instrument(
-        'p10_single', Mount.RIGHT, tip_racks=[tiprack])
+    lw = ctx.load_labware("corning_96_wellplate_360ul_flat", 1)
+    tiprack = ctx.load_labware("opentrons_96_tiprack_10ul", 2)
+    instr = ctx.load_instrument("p10_single", Mount.RIGHT, tip_racks=[tiprack])
 
     fake_hw_aspirate = mock.Mock()
     fake_move = mock.Mock()
-    monkeypatch.setattr(API, 'aspirate', fake_hw_aspirate)
-    monkeypatch.setattr(API, 'move_to', fake_move)
+    monkeypatch.setattr(API, "aspirate", fake_hw_aspirate)
+    monkeypatch.setattr(API, "move_to", fake_move)
 
     instr.pick_up_tip()
     instr.aspirate(2.0, lw.wells()[0].bottom())
-    assert 'aspirating' in ','.join([cmd.lower() for cmd in ctx.commands()])
+    assert "aspirating" in ",".join([cmd.lower() for cmd in ctx.commands()])
 
     fake_hw_aspirate.assert_called_once_with(Mount.RIGHT, 2.0, 1.0)
-    assert fake_move.call_args_list[-1] ==\
-        mock.call(Mount.RIGHT, lw.wells()[0].bottom().point,
-                  critical_point=None, speed=400, max_speeds={})
+    assert fake_move.call_args_list[-1] == mock.call(
+        Mount.RIGHT,
+        lw.wells()[0].bottom().point,
+        critical_point=None,
+        speed=400,
+        max_speeds={},
+    )
     fake_move.reset_mock()
     fake_hw_aspirate.reset_mock()
     instr.well_bottom_clearance.aspirate = 1.0
@@ -440,15 +458,12 @@ def test_aspirate(ctx, get_labware_def, monkeypatch):
     dest_point, dest_lw = lw.wells()[0].bottom()
     dest_point = dest_point._replace(z=dest_point.z + 1.0)
     assert len(fake_move.call_args_list) == 1
-    assert fake_move.call_args_list[0] ==\
-        mock.call(
-            Mount.RIGHT, dest_point, critical_point=None, speed=400,
-            max_speeds={})
+    assert fake_move.call_args_list[0] == mock.call(
+        Mount.RIGHT, dest_point, critical_point=None, speed=400, max_speeds={}
+    )
     fake_move.reset_mock()
     hardware = ctx._implementation.get_hardware().hardware
-    hardware._obj_to_adapt._attached_instruments[
-        Mount.RIGHT
-    ]._current_volume = 1
+    hardware._obj_to_adapt._attached_instruments[Mount.RIGHT]._current_volume = 1
 
     instr.aspirate(2.0)
     fake_move.assert_not_called()
@@ -458,20 +473,22 @@ def test_aspirate(ctx, get_labware_def, monkeypatch):
     instr.aspirate(2.0)
     assert len(fake_move.call_args_list) == 2
     # reset plunger at the top of the well after blowout
-    assert fake_move.call_args_list[0] ==\
-        mock.call(
-            Mount.RIGHT, dest_lw.as_well().top().point, critical_point=None,
-            speed=400, max_speeds={})
-    assert fake_move.call_args_list[1] ==\
-        mock.call(
-            Mount.RIGHT, dest_point, critical_point=None,
-            speed=400, max_speeds={})
+    assert fake_move.call_args_list[0] == mock.call(
+        Mount.RIGHT,
+        dest_lw.as_well().top().point,
+        critical_point=None,
+        speed=400,
+        max_speeds={},
+    )
+    assert fake_move.call_args_list[1] == mock.call(
+        Mount.RIGHT, dest_point, critical_point=None, speed=400, max_speeds={}
+    )
 
 
 def test_dispense(ctx, get_labware_def, monkeypatch):
     ctx.home()
-    lw = ctx.load_labware('corning_96_wellplate_360ul_flat', 1)
-    instr = ctx.load_instrument('p10_single', Mount.RIGHT)
+    lw = ctx.load_labware("corning_96_wellplate_360ul_flat", 1)
+    instr = ctx.load_instrument("p10_single", Mount.RIGHT)
 
     disp_called_with = None
 
@@ -485,25 +502,27 @@ def test_dispense(ctx, get_labware_def, monkeypatch):
         nonlocal move_called_with
         move_called_with = (mount, loc, kwargs)
 
-    monkeypatch.setattr(API, 'dispense', fake_hw_dispense)
-    monkeypatch.setattr(API, 'move_to', fake_move)
+    monkeypatch.setattr(API, "dispense", fake_hw_dispense)
+    monkeypatch.setattr(API, "move_to", fake_move)
 
     instr.dispense(2.0, lw.wells()[0].bottom())
-    assert 'dispensing' in ','.join([cmd.lower() for cmd in ctx.commands()])
+    assert "dispensing" in ",".join([cmd.lower() for cmd in ctx.commands()])
     assert disp_called_with == (Mount.RIGHT, 2.0, 1.0)
-    assert move_called_with == (Mount.RIGHT, lw.wells()[0].bottom().point,
-                                {'critical_point': None,
-                                 'speed': 400,
-                                 'max_speeds': {}})
+    assert move_called_with == (
+        Mount.RIGHT,
+        lw.wells()[0].bottom().point,
+        {"critical_point": None, "speed": 400, "max_speeds": {}},
+    )
 
     instr.well_bottom_clearance.dispense = 2.0
     instr.dispense(2.0, lw.wells()[0])
     dest_point, dest_lw = lw.wells()[0].bottom()
     dest_point = dest_point._replace(z=dest_point.z + 2.0)
-    assert move_called_with == (Mount.RIGHT, dest_point,
-                                {'critical_point': None,
-                                 'speed': 400,
-                                 'max_speeds': {}})
+    assert move_called_with == (
+        Mount.RIGHT,
+        dest_point,
+        {"critical_point": None, "speed": 400, "max_speeds": {}},
+    )
 
     move_called_with = None
     instr.dispense(2.0)
@@ -513,10 +532,9 @@ def test_dispense(ctx, get_labware_def, monkeypatch):
 def test_prevent_liquid_handling_without_tip(ctx):
     ctx.home()
 
-    tr = ctx.load_labware('opentrons_96_tiprack_300ul', '1')
-    plate = ctx.load_labware('corning_384_wellplate_112ul_flat', '2')
-    pipR = ctx.load_instrument('p300_single', Mount.RIGHT,
-                               tip_racks=[tr])
+    tr = ctx.load_labware("opentrons_96_tiprack_300ul", "1")
+    plate = ctx.load_labware("corning_384_wellplate_112ul_flat", "2")
+    pipR = ctx.load_instrument("p300_single", Mount.RIGHT, tip_racks=[tr])
 
     with pytest.raises(NoTipAttachedError):
         pipR.aspirate(100, plate.wells()[0])
@@ -533,12 +551,10 @@ def test_prevent_liquid_handling_without_tip(ctx):
 def test_starting_tip_and_reset_tipracks(ctx, get_labware_def, monkeypatch):
     ctx.home()
 
-    tr = ctx.load_labware('opentrons_96_tiprack_300ul', 1)
-    tr_2 = ctx.load_labware('opentrons_96_tiprack_300ul', 2)
-    pipL = ctx.load_instrument('p300_single', Mount.LEFT,
-                               tip_racks=[tr, tr_2])
-    pipR = ctx.load_instrument('p300_single', Mount.RIGHT,
-                               tip_racks=[tr, tr_2])
+    tr = ctx.load_labware("opentrons_96_tiprack_300ul", 1)
+    tr_2 = ctx.load_labware("opentrons_96_tiprack_300ul", 2)
+    pipL = ctx.load_instrument("p300_single", Mount.LEFT, tip_racks=[tr, tr_2])
+    pipR = ctx.load_instrument("p300_single", Mount.RIGHT, tip_racks=[tr, tr_2])
 
     pipL.starting_tip = tr.wells()[2]
     pipL.pick_up_tip()
@@ -562,11 +578,9 @@ def test_starting_tip_and_reset_tipracks(ctx, get_labware_def, monkeypatch):
 
 def test_mix(ctx, monkeypatch):
     ctx.home()
-    lw = ctx.load_labware(
-        'opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap', 1)
-    tiprack = ctx.load_labware('opentrons_96_tiprack_300ul', 3)
-    instr = ctx.load_instrument('p300_single', Mount.RIGHT,
-                                tip_racks=[tiprack])
+    lw = ctx.load_labware("opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap", 1)
+    tiprack = ctx.load_labware("opentrons_96_tiprack_300ul", 3)
+    instr = ctx.load_instrument("p300_single", Mount.RIGHT, tip_racks=[tiprack])
 
     instr.pick_up_tip()
     mix_steps = []
@@ -576,27 +590,29 @@ def test_mix(ctx, monkeypatch):
     def fake_aspirate(vol=None, loc=None, rate=None):
         nonlocal aspirate_called_with
         nonlocal mix_steps
-        aspirate_called_with = ('aspirate', vol, loc, rate)
+        aspirate_called_with = ("aspirate", vol, loc, rate)
         mix_steps.append(aspirate_called_with)
 
     def fake_dispense(vol=None, loc=None, rate=None):
         nonlocal dispense_called_with
         nonlocal mix_steps
-        dispense_called_with = ('dispense', vol, loc, rate)
+        dispense_called_with = ("dispense", vol, loc, rate)
         mix_steps.append(dispense_called_with)
 
-    monkeypatch.setattr(instr, 'aspirate', fake_aspirate)
-    monkeypatch.setattr(instr, 'dispense', fake_dispense)
+    monkeypatch.setattr(instr, "aspirate", fake_aspirate)
+    monkeypatch.setattr(instr, "dispense", fake_dispense)
 
     repetitions = 2
     volume = 5
     location = lw.wells()[0]
     rate = 2
     instr.mix(repetitions, volume, location, rate)
-    expected_mix_steps = [('aspirate', volume, location, 2),
-                          ('dispense', volume, None, 2),
-                          ('aspirate', volume, None, 2),
-                          ('dispense', volume, None, 2)]
+    expected_mix_steps = [
+        ("aspirate", volume, location, 2),
+        ("dispense", volume, None, 2),
+        ("aspirate", volume, None, 2),
+        ("dispense", volume, None, 2),
+    ]
 
     assert mix_steps == expected_mix_steps
 
@@ -606,32 +622,33 @@ def test_touch_tip_default_args(loop, monkeypatch):
     ctx = papi.ProtocolContext(
         implementation=ProtocolContextImplementation(api_version=api_version),
         loop=loop,
-        api_version=api_version
+        api_version=api_version,
     )
     ctx.home()
-    lw = ctx.load_labware(
-        'opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap', 1)
-    tiprack = ctx.load_labware('opentrons_96_tiprack_300ul', 3)
-    instr = ctx.load_instrument('p300_single', Mount.RIGHT,
-                                tip_racks=[tiprack])
+    lw = ctx.load_labware("opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap", 1)
+    tiprack = ctx.load_labware("opentrons_96_tiprack_300ul", 3)
+    instr = ctx.load_instrument("p300_single", Mount.RIGHT, tip_racks=[tiprack])
 
     instr.pick_up_tip()
     total_hw_moves = []
 
-    async def fake_hw_move(self, mount, abs_position, speed=None,
-                           critical_point=None, max_speeds=None):
+    async def fake_hw_move(
+        self, mount, abs_position, speed=None, critical_point=None, max_speeds=None
+    ):
         nonlocal total_hw_moves
         total_hw_moves.append((abs_position, speed))
 
     instr.aspirate(10, lw.wells()[0])
-    monkeypatch.setattr(API, 'move_to', fake_hw_move)
+    monkeypatch.setattr(API, "move_to", fake_hw_move)
     instr.touch_tip()
-    z_offset = Point(0, 0, 1)   # default z offset of 1mm
-    speed = 60                  # default speed
-    edges = [lw.wells()[0].from_center_cartesian(1, 0, 1) - z_offset,
-             lw.wells()[0].from_center_cartesian(-1, 0, 1) - z_offset,
-             lw.wells()[0].from_center_cartesian(0, 1, 1) - z_offset,
-             lw.wells()[0].from_center_cartesian(0, -1, 1) - z_offset]
+    z_offset = Point(0, 0, 1)  # default z offset of 1mm
+    speed = 60  # default speed
+    edges = [
+        lw.wells()[0].from_center_cartesian(1, 0, 1) - z_offset,
+        lw.wells()[0].from_center_cartesian(-1, 0, 1) - z_offset,
+        lw.wells()[0].from_center_cartesian(0, 1, 1) - z_offset,
+        lw.wells()[0].from_center_cartesian(0, -1, 1) - z_offset,
+    ]
     for i in range(1, 5):
         assert total_hw_moves[i] == (edges[i - 1], speed)
     # Check that the old api version initial well move has the same z height
@@ -643,30 +660,31 @@ def test_touch_tip_default_args(loop, monkeypatch):
 
 def test_touch_tip_new_default_args(ctx, monkeypatch):
     ctx.home()
-    lw = ctx.load_labware(
-        'opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap', 1)
-    tiprack = ctx.load_labware('opentrons_96_tiprack_300ul', 3)
-    instr = ctx.load_instrument('p300_single', Mount.RIGHT,
-                                tip_racks=[tiprack])
+    lw = ctx.load_labware("opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap", 1)
+    tiprack = ctx.load_labware("opentrons_96_tiprack_300ul", 3)
+    instr = ctx.load_instrument("p300_single", Mount.RIGHT, tip_racks=[tiprack])
 
     instr.pick_up_tip()
     total_hw_moves = []
 
-    async def fake_hw_move(self, mount, abs_position, speed=None,
-                           critical_point=None, max_speeds=None):
+    async def fake_hw_move(
+        self, mount, abs_position, speed=None, critical_point=None, max_speeds=None
+    ):
         nonlocal total_hw_moves
         total_hw_moves.append((abs_position, speed))
 
     instr.aspirate(10, lw.wells()[0])
-    monkeypatch.setattr(API, 'move_to', fake_hw_move)
+    monkeypatch.setattr(API, "move_to", fake_hw_move)
     instr.touch_tip()
-    z_offset = Point(0, 0, 1)   # default z offset of 1mm
-    speed = 60                  # default speed
-    edges = [lw.wells()[0].from_center_cartesian(1, 0, 1) - z_offset,
-             lw.wells()[0].from_center_cartesian(-1, 0, 1) - z_offset,
-             lw.wells()[0].from_center_cartesian(0, 0, 1) - z_offset,
-             lw.wells()[0].from_center_cartesian(0, 1, 1) - z_offset,
-             lw.wells()[0].from_center_cartesian(0, -1, 1) - z_offset]
+    z_offset = Point(0, 0, 1)  # default z offset of 1mm
+    speed = 60  # default speed
+    edges = [
+        lw.wells()[0].from_center_cartesian(1, 0, 1) - z_offset,
+        lw.wells()[0].from_center_cartesian(-1, 0, 1) - z_offset,
+        lw.wells()[0].from_center_cartesian(0, 0, 1) - z_offset,
+        lw.wells()[0].from_center_cartesian(0, 1, 1) - z_offset,
+        lw.wells()[0].from_center_cartesian(0, -1, 1) - z_offset,
+    ]
     for i in range(1, 5):
         assert total_hw_moves[i] == (edges[i - 1], speed)
 
@@ -679,35 +697,32 @@ def test_touch_tip_new_default_args(ctx, monkeypatch):
 
 def test_touch_tip_disabled(ctx, monkeypatch, get_labware_fixture):
     ctx.home()
-    trough1 = get_labware_fixture('fixture_12_trough')
-    trough_lw = ctx.load_labware_from_definition(trough1, '1')
-    tiprack = ctx.load_labware('opentrons_96_tiprack_300ul', 3)
-    instr = ctx.load_instrument('p300_single', Mount.RIGHT,
-                                tip_racks=[tiprack])
+    trough1 = get_labware_fixture("fixture_12_trough")
+    trough_lw = ctx.load_labware_from_definition(trough1, "1")
+    tiprack = ctx.load_labware("opentrons_96_tiprack_300ul", 3)
+    instr = ctx.load_instrument("p300_single", Mount.RIGHT, tip_racks=[tiprack])
     instr.pick_up_tip()
     move_mock = mock.Mock()
-    monkeypatch.setattr(API, 'move_to', move_mock)
-    instr.touch_tip(trough_lw['A1'])
+    monkeypatch.setattr(API, "move_to", move_mock)
+    instr.touch_tip(trough_lw["A1"])
     move_mock.assert_not_called()
 
 
 def test_blow_out(ctx, monkeypatch):
     ctx.home()
-    lw = ctx.load_labware(
-        'opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap', 1)
-    tiprack = ctx.load_labware('opentrons_96_tiprack_300ul', 3)
-    instr = ctx.load_instrument('p300_single', Mount.RIGHT,
-                                tip_racks=[tiprack])
+    lw = ctx.load_labware("opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap", 1)
+    tiprack = ctx.load_labware("opentrons_96_tiprack_300ul", 3)
+    instr = ctx.load_instrument("p300_single", Mount.RIGHT, tip_racks=[tiprack])
 
     move_location = None
     instr.pick_up_tip()
     instr.aspirate(10, lw.wells()[0])
 
-    def fake_move(loc):
+    def fake_move(loc, publish):
         nonlocal move_location
         move_location = loc
 
-    monkeypatch.setattr(instr, 'move_to', fake_move)
+    monkeypatch.setattr(instr, "move_to", fake_move)
 
     instr.blow_out()
     # pipette should not move, if no location is passed
@@ -725,11 +740,10 @@ def test_blow_out(ctx, monkeypatch):
 
 
 def test_transfer_options(ctx, monkeypatch):
-    lw1 = ctx.load_labware('biorad_96_wellplate_200ul_pcr', 1)
-    lw2 = ctx.load_labware('corning_96_wellplate_360ul_flat', 2)
-    tiprack = ctx.load_labware('opentrons_96_tiprack_300ul', 3)
-    instr = ctx.load_instrument('p300_single', Mount.RIGHT,
-                                tip_racks=[tiprack])
+    lw1 = ctx.load_labware("biorad_96_wellplate_200ul_pcr", 1)
+    lw2 = ctx.load_labware("corning_96_wellplate_360ul_flat", 2)
+    tiprack = ctx.load_labware("opentrons_96_tiprack_300ul", 3)
+    instr = ctx.load_instrument("p300_single", Mount.RIGHT, tip_racks=[tiprack])
 
     ctx.home()
     transfer_options = None
@@ -738,10 +752,16 @@ def test_transfer_options(ctx, monkeypatch):
         nonlocal transfer_options
         transfer_options = xfer_plan._options
 
-    monkeypatch.setattr(instr, '_execute_transfer', fake_execute_transfer)
-    instr.transfer(10, lw1.columns()[0], lw2.columns()[0],
-                   new_tip='always', mix_before=(2, 10),
-                   mix_after=(3, 20), blow_out=True)
+    monkeypatch.setattr(instr, "_execute_transfer", fake_execute_transfer)
+    instr.transfer(
+        10,
+        lw1.columns()[0],
+        lw2.columns()[0],
+        new_tip="always",
+        mix_before=(2, 10),
+        mix_after=(3, 20),
+        blow_out=True,
+    )
     expected_xfer_options1 = tf.TransferOptions(
         transfer=tf.Transfer(
             new_tip=TransferTipPolicy.ALWAYS,
@@ -756,26 +776,28 @@ def test_transfer_options(ctx, monkeypatch):
         ),
         pick_up_tip=tf.PickUpTipOpts(),
         mix=tf.Mix(
-            mix_before=tf.MixOpts(repetitions=2,
-                                  volume=10,
-                                  rate=None),
-            mix_after=tf.MixOpts(repetitions=3,
-                                 volume=20,
-                                 rate=None)
+            mix_before=tf.MixOpts(repetitions=2, volume=10, rate=None),
+            mix_after=tf.MixOpts(repetitions=3, volume=20, rate=None),
         ),
         blow_out=tf.BlowOutOpts(),
         touch_tip=tf.TouchTipOpts(),
         aspirate=tf.AspirateOpts(),
-        dispense=tf.DispenseOpts()
+        dispense=tf.DispenseOpts(),
     )
     assert transfer_options == expected_xfer_options1
 
     instr.pick_up_tip()
-    instr.distribute(50, lw1.rows()[0][0], lw2.columns()[0],
-                     new_tip='never', touch_tip=True, trash=False,
-                     disposal_volume=10,
-                     mix_before=(2, 30),
-                     mix_after=(3, 20))
+    instr.distribute(
+        50,
+        lw1.rows()[0][0],
+        lw2.columns()[0],
+        new_tip="never",
+        touch_tip=True,
+        trash=False,
+        disposal_volume=10,
+        mix_before=(2, 30),
+        mix_after=(3, 20),
+    )
     instr.drop_tip()
     expected_xfer_options2 = tf.TransferOptions(
         transfer=tf.Transfer(
@@ -787,23 +809,23 @@ def test_transfer_options(ctx, monkeypatch):
             mix_strategy=tf.MixStrategy.BEFORE,
             drop_tip_strategy=tf.DropTipStrategy.RETURN,
             blow_out_strategy=tf.BlowOutStrategy.NONE,
-            touch_tip_strategy=tf.TouchTipStrategy.ALWAYS
+            touch_tip_strategy=tf.TouchTipStrategy.ALWAYS,
         ),
         pick_up_tip=tf.PickUpTipOpts(),
-        mix=tf.Mix(mix_before=tf.MixOpts(repetitions=2,
-                                         volume=30,
-                                         rate=None),
-                   mix_after=tf.MixOpts()),
+        mix=tf.Mix(
+            mix_before=tf.MixOpts(repetitions=2, volume=30, rate=None),
+            mix_after=tf.MixOpts(),
+        ),
         blow_out=tf.BlowOutOpts(),
         touch_tip=tf.TouchTipOpts(),
         aspirate=tf.AspirateOpts(),
-        dispense=tf.DispenseOpts()
+        dispense=tf.DispenseOpts(),
     )
     assert transfer_options == expected_xfer_options2
-    with pytest.raises(ValueError, match='air_gap.*'):
-        instr.transfer(300, lw1['A1'], lw2['A1'], air_gap=300)
-    with pytest.raises(ValueError, match='air_gap.*'):
-        instr.transfer(300, lw1['A1'], lw2['A1'], air_gap=10000)
+    with pytest.raises(ValueError, match="air_gap.*"):
+        instr.transfer(300, lw1["A1"], lw2["A1"], air_gap=300)
+    with pytest.raises(ValueError, match="air_gap.*"):
+        instr.transfer(300, lw1["A1"], lw2["A1"], air_gap=10000)
 
 
 def test_flow_rate(ctx, monkeypatch):
@@ -813,10 +835,10 @@ def test_flow_rate(ctx, monkeypatch):
         old_sfm(mount, aspirate=None, dispense=None, blow_out=None)
 
     set_flow_rate = mock.Mock(side_effect=pass_on)
-    monkeypatch.setattr(ctx._implementation.get_hardware().hardware,
-                        'set_flow_rate',
-                        set_flow_rate)
-    instr = ctx.load_instrument('p300_single', Mount.RIGHT)
+    monkeypatch.setattr(
+        ctx._implementation.get_hardware().hardware, "set_flow_rate", set_flow_rate
+    )
+    instr = ctx.load_instrument("p300_single", Mount.RIGHT)
 
     ctx.home()
     instr.flow_rate.aspirate = 1
@@ -839,10 +861,10 @@ def test_pipette_speed(ctx, monkeypatch):
         old_sfm(aspirate=None, dispense=None, blow_out=None)
 
     set_speed = mock.Mock(side_effect=pass_on)
-    monkeypatch.setattr(ctx._implementation.get_hardware().hardware,
-                        'set_pipette_speed',
-                        set_speed)
-    instr = ctx.load_instrument('p300_single', Mount.RIGHT)
+    monkeypatch.setattr(
+        ctx._implementation.get_hardware().hardware, "set_pipette_speed", set_speed
+    )
+    instr = ctx.load_instrument("p300_single", Mount.RIGHT)
 
     ctx.home()
     instr.speed.aspirate = 1
@@ -858,35 +880,45 @@ def test_pipette_speed(ctx, monkeypatch):
 
 def test_loaded_labwares(ctx):
     assert ctx.loaded_labwares == {12: ctx.fixed_trash}
-    lw1 = ctx.load_labware('opentrons_96_tiprack_300ul', 3)
-    lw2 = ctx.load_labware('opentrons_96_tiprack_300ul', 8)
-    ctx.load_module('tempdeck', 4)
-    mod2 = ctx.load_module('magdeck', 5)
-    mod_lw = mod2.load_labware('biorad_96_wellplate_200ul_pcr')
+    lw1 = ctx.load_labware("opentrons_96_tiprack_300ul", 3)
+    lw2 = ctx.load_labware("opentrons_96_tiprack_300ul", 8)
+    ctx.load_module("tempdeck", 4)
+    mod2 = ctx.load_module("magdeck", 5)
+    mod_lw = mod2.load_labware("biorad_96_wellplate_200ul_pcr")
     assert ctx.loaded_labwares[3] == lw1
     assert ctx.loaded_labwares[8] == lw2
     assert ctx.loaded_labwares[5] == mod_lw
-    assert sorted(ctx.loaded_labwares.keys())\
-        == sorted([3, 5, 8, 12])
+    assert sorted(ctx.loaded_labwares.keys()) == sorted([3, 5, 8, 12])
 
 
 def test_loaded_modules(ctx, monkeypatch):
     assert ctx.loaded_modules == {}
-    mod1 = ctx.load_module('tempdeck', 4)
-    mod1.load_labware('biorad_96_wellplate_200ul_pcr')
-    mod2 = ctx.load_module('thermocycler')
-    assert ctx.loaded_modules[4] == mod1
-    assert ctx.loaded_modules[7] == mod2
+    from collections import OrderedDict
+
+    mag1 = ctx.load_module("magnetic module gen2", 1)
+    mag2 = ctx.load_module("magnetic module", 2)
+    temp1 = ctx.load_module("temperature module", 3)
+    temp2 = ctx.load_module("temperature module", 4)
+
+    expected_load_order = OrderedDict(
+        {int(mod.geometry.parent): mod for mod in [mag1, mag2, temp1, temp2]}
+    )
+
+    assert ctx.loaded_modules == expected_load_order
+    assert ctx.loaded_modules[1] == mag1
+    assert ctx.loaded_modules[2] == mag2
+    assert ctx.loaded_modules[3] == temp1
+    assert ctx.loaded_modules[4] == temp2
 
 
 def test_order_of_module_load(loop, hardware):
     import opentrons.hardware_control as hardware_control
     import opentrons.protocol_api as protocol_api
 
-    mods = [
-        'tempdeck', 'thermocycler', 'tempdeck']
+    mods = ["tempdeck", "thermocycler", "tempdeck"]
     thread_manager = hardware_control.ThreadManager(
-        hardware_control.API.build_hardware_simulator, attached_modules=mods)
+        hardware_control.API.build_hardware_simulator, attached_modules=mods
+    )
     fake_hardware = thread_manager.sync
 
     attached_modules = fake_hardware.attached_modules
@@ -894,12 +926,12 @@ def test_order_of_module_load(loop, hardware):
     hw_temp2 = attached_modules[2]
 
     ctx1 = protocol_api.ProtocolContext(
-        implementation=ProtocolContextImplementation(hardware=hardware),
-        loop=loop)
+        implementation=ProtocolContextImplementation(hardware=hardware), loop=loop
+    )
     with ctx1.temp_connect(fake_hardware) as c:
-        temp1 = c.load_module('tempdeck', 4)
-        c.load_module('thermocycler')
-        temp2 = c.load_module('tempdeck', 1)
+        temp1 = c.load_module("tempdeck", 4)
+        c.load_module("thermocycler")
+        temp2 = c.load_module("tempdeck", 1)
         async_temp1 = temp1._module._obj_to_adapt
         async_temp2 = temp2._module._obj_to_adapt
 
@@ -910,13 +942,13 @@ def test_order_of_module_load(loop, hardware):
     # hardware modules regardless of the slot it
     # was loaded into
     ctx2 = protocol_api.ProtocolContext(
-        implementation=ProtocolContextImplementation(hardware=hardware),
-        loop=loop)
+        implementation=ProtocolContextImplementation(hardware=hardware), loop=loop
+    )
 
     with ctx2.temp_connect(fake_hardware) as c:
-        c.load_module('thermocycler')
-        temp1 = c.load_module('tempdeck', 1)
-        temp2 = c.load_module('tempdeck', 4)
+        c.load_module("thermocycler")
+        temp1 = c.load_module("tempdeck", 1)
+        temp2 = c.load_module("tempdeck", 4)
 
         async_temp1 = temp1._module._obj_to_adapt
         async_temp2 = temp2._module._obj_to_adapt
@@ -925,48 +957,45 @@ def test_order_of_module_load(loop, hardware):
 
 
 def test_tip_length_for(ctx, monkeypatch):
-    instr = ctx.load_instrument('p20_single_gen2', 'left')
-    tiprack = ctx.load_labware('geb_96_tiprack_10ul', '1')
-    instr._tip_length_for.cache_clear()
-    assert instr._tip_length_for(tiprack)\
-        == (tiprack._implementation.get_definition()['parameters']['tipLength']
-            - instr.hw_pipette['tip_overlap']
-            ['opentrons/geb_96_tiprack_10ul/1'])
+    instr = ctx.load_instrument("p20_single_gen2", "left")
+    tiprack = ctx.load_labware("geb_96_tiprack_10ul", "1")
+    assert instr._tip_length_for(tiprack) == (
+        tiprack._implementation.get_definition()["parameters"]["tipLength"]
+        - instr.hw_pipette["tip_overlap"]["opentrons/geb_96_tiprack_10ul/1"]
+    )
 
 
-def test_tip_length_for_caldata(ctx, monkeypatch, use_new_calibration):
-    instr = ctx.load_instrument('p20_single_gen2', 'left')
-    tiprack = ctx.load_labware('geb_96_tiprack_10ul', '1')
+def test_tip_length_for_caldata(ctx, monkeypatch):
+    instr = ctx.load_instrument("p20_single_gen2", "left")
+    tiprack = ctx.load_labware("geb_96_tiprack_10ul", "1")
     mock_tip_length = mock.Mock()
-    mock_tip_length.return_value =\
-        cs_types.TipLengthCalibration(
-            tip_length=2,
-            pipette='fake id',
-            tiprack='fake_hash',
-            last_modified='some time',
-            source=cs_types.SourceType.user,
-            status=cs_types.CalibrationStatus(markedBad=False),
-            uri='opentrons/geb_96_tiprack_10ul/1')
-    monkeypatch.setattr(get, 'load_tip_length_calibration', mock_tip_length)
-    instr._tip_length_for.cache_clear()
+    mock_tip_length.return_value = cs_types.TipLengthCalibration(
+        tip_length=2,
+        pipette="fake id",
+        tiprack="fake_hash",
+        last_modified="some time",
+        source=cs_types.SourceType.user,
+        status=cs_types.CalibrationStatus(markedBad=False),
+        uri="opentrons/geb_96_tiprack_10ul/1",
+    )
+    monkeypatch.setattr(get, "load_tip_length_calibration", mock_tip_length)
     assert instr._tip_length_for(tiprack) == 2
-    instr._tip_length_for.cache_clear()
     mock_tip_length.side_effect = cs_types.TipLengthCalNotFound
     assert instr._tip_length_for(tiprack) == (
-        tiprack._implementation.get_definition()['parameters']['tipLength']
-        - instr.hw_pipette['tip_overlap']
-        ['opentrons/geb_96_tiprack_10ul/1'])
+        tiprack._implementation.get_definition()["parameters"]["tipLength"]
+        - instr.hw_pipette["tip_overlap"]["opentrons/geb_96_tiprack_10ul/1"]
+    )
 
 
 def test_tip_length_for_load_caldata(ctx):
-    instr = ctx.load_instrument('p20_single_gen2', 'left')
-    tiprack = ctx.load_labware('geb_96_tiprack_10ul', '1')
-    pip_id = instr.hw_pipette['pipette_id']
+    instr = ctx.load_instrument("p20_single_gen2", "left")
+    tiprack = ctx.load_labware("geb_96_tiprack_10ul", "1")
+    pip_id = instr.hw_pipette["pipette_id"]
     fake_tip_length = 31
 
     test_data = modify.create_tip_length_data(
-        tiprack._implementation.get_definition(),
-        fake_tip_length)
+        tiprack._implementation.get_definition(), fake_tip_length
+    )
     modify.save_tip_length_calibration(pip_id, test_data)
 
     assert instr._tip_length_for(tiprack) == fake_tip_length
@@ -974,136 +1003,127 @@ def test_tip_length_for_load_caldata(ctx):
 
 
 def test_bundled_labware(loop, get_labware_fixture, hardware):
-    fixture_96_plate = get_labware_fixture('fixture_96_plate')
-    bundled_labware = {
-        'fixture/fixture_96_plate/1': fixture_96_plate
-    }
+    fixture_96_plate = get_labware_fixture("fixture_96_plate")
+    bundled_labware = {"fixture/fixture_96_plate/1": fixture_96_plate}
 
     ctx = papi.ProtocolContext(
         implementation=ProtocolContextImplementation(
-            hardware=hardware,
-            bundled_labware=bundled_labware),
-        loop=loop
+            hardware=hardware, bundled_labware=bundled_labware
+        ),
+        loop=loop,
     )
 
-    lw1 = ctx.load_labware('fixture_96_plate', 3, namespace='fixture')
+    lw1 = ctx.load_labware("fixture_96_plate", 3, namespace="fixture")
     assert ctx.loaded_labwares[3] == lw1
-    assert ctx.loaded_labwares[3]._implementation.get_definition() ==\
-        fixture_96_plate
+    assert ctx.loaded_labwares[3]._implementation.get_definition() == fixture_96_plate
 
 
 def test_bundled_labware_missing(loop, get_labware_fixture, hardware):
     bundled_labware = {}
     with pytest.raises(
-        RuntimeError,
-        match='No labware found in bundle with load name fixture_96_plate'
+        RuntimeError, match="No labware found in bundle with load name fixture_96_plate"
     ):
         ctx = papi.ProtocolContext(
             implementation=ProtocolContextImplementation(
-                bundled_labware=bundled_labware,
-                hardware=hardware
+                bundled_labware=bundled_labware, hardware=hardware
             ),
-            loop=loop)
-        ctx.load_labware('fixture_96_plate', 3, namespace='fixture')
-
-    fixture_96_plate = get_labware_fixture('fixture_96_plate')
-    bundled_labware = {
-        'fixture/fixture_96_plate/1': fixture_96_plate
-    }
-    with pytest.raises(
-        RuntimeError,
-        match='No labware found in bundle with load name fixture_96_plate'
-    ):
-        ctx = papi.ProtocolContext(
-            implementation=ProtocolContextImplementation(
-                bundled_labware={},
-                extra_labware=bundled_labware,
-                hardware=hardware
-            ),
-            loop=loop
+            loop=loop,
         )
-        ctx.load_labware('fixture_96_plate', 3, namespace='fixture')
+        ctx.load_labware("fixture_96_plate", 3, namespace="fixture")
+
+    fixture_96_plate = get_labware_fixture("fixture_96_plate")
+    bundled_labware = {"fixture/fixture_96_plate/1": fixture_96_plate}
+    with pytest.raises(
+        RuntimeError, match="No labware found in bundle with load name fixture_96_plate"
+    ):
+        ctx = papi.ProtocolContext(
+            implementation=ProtocolContextImplementation(
+                bundled_labware={}, extra_labware=bundled_labware, hardware=hardware
+            ),
+            loop=loop,
+        )
+        ctx.load_labware("fixture_96_plate", 3, namespace="fixture")
 
 
 def test_bundled_data(loop, hardware):
-    bundled_data = {'foo': b'1,2,3'}
+    bundled_data = {"foo": b"1,2,3"}
     ctx = papi.ProtocolContext(
         implementation=ProtocolContextImplementation(
-            bundled_data=bundled_data,
-            hardware=hardware
+            bundled_data=bundled_data, hardware=hardware
         ),
-        loop=loop
+        loop=loop,
     )
     assert ctx.bundled_data == bundled_data
 
 
 def test_extra_labware(loop, get_labware_fixture, hardware):
-    fixture_96_plate = get_labware_fixture('fixture_96_plate')
-    bundled_labware = {
-        'fixture/fixture_96_plate/1': fixture_96_plate
-    }
+    fixture_96_plate = get_labware_fixture("fixture_96_plate")
+    bundled_labware = {"fixture/fixture_96_plate/1": fixture_96_plate}
     ctx = papi.ProtocolContext(
         implementation=ProtocolContextImplementation(
             extra_labware=bundled_labware, hardware=hardware
         ),
-        loop=loop
+        loop=loop,
     )
 
-    ls1 = ctx.load_labware('fixture_96_plate', 3, namespace='fixture')
+    ls1 = ctx.load_labware("fixture_96_plate", 3, namespace="fixture")
     assert ctx.loaded_labwares[3] == ls1
-    assert ctx.loaded_labwares[3]._implementation.get_definition() ==\
-        fixture_96_plate
+    assert ctx.loaded_labwares[3]._implementation.get_definition() == fixture_96_plate
 
 
 def test_api_version_checking(hardware):
-    minor_over = (papi.MAX_SUPPORTED_VERSION.major,
-                  papi.MAX_SUPPORTED_VERSION.minor + 1)
+    minor_over = (
+        papi.MAX_SUPPORTED_VERSION.major,
+        papi.MAX_SUPPORTED_VERSION.minor + 1,
+    )
     with pytest.raises(RuntimeError):
-        papi.ProtocolContext(api_version=minor_over,
-                             implementation=ProtocolContextImplementation(
-                                 hardware=hardware
-                             ))
+        papi.ProtocolContext(
+            api_version=minor_over,
+            implementation=ProtocolContextImplementation(hardware=hardware),
+        )
 
-    major_over = (papi.MAX_SUPPORTED_VERSION.major + 1,
-                  papi.MAX_SUPPORTED_VERSION.minor)
+    major_over = (
+        papi.MAX_SUPPORTED_VERSION.major + 1,
+        papi.MAX_SUPPORTED_VERSION.minor,
+    )
     with pytest.raises(RuntimeError):
-        papi.ProtocolContext(api_version=major_over,
-                             implementation=ProtocolContextImplementation(
-                                 hardware=hardware
-                             ))
+        papi.ProtocolContext(
+            api_version=major_over,
+            implementation=ProtocolContextImplementation(hardware=hardware),
+        )
 
 
 def test_api_per_call_checking(monkeypatch, hardware):
     implementation = ProtocolContextImplementation(hardware=hardware)
 
-    ctx = papi.ProtocolContext(implementation=implementation,
-                               api_version=APIVersion(1, 9))
+    ctx = papi.ProtocolContext(
+        implementation=implementation, api_version=APIVersion(1, 9)
+    )
     assert ctx.deck  # 1.9 < 2.0, but api version 1 is excepted from checking
     monkeypatch.setattr(
-        papi.protocol_context, 'MAX_SUPPORTED_VERSION',
-        APIVersion(2, 1))
-    ctx = papi.ProtocolContext(implementation=implementation,
-                               api_version=APIVersion(2, 1))
+        papi.protocol_context, "MAX_SUPPORTED_VERSION", APIVersion(2, 1)
+    )
+    ctx = papi.ProtocolContext(
+        implementation=implementation, api_version=APIVersion(2, 1)
+    )
     # versions > 2.0 are ok
     assert ctx.deck
     # pretend disconnect() was only added in 2.1
-    set_version_added(
-        papi.ProtocolContext.disconnect, monkeypatch, APIVersion(2, 1))
-    ctx = papi.ProtocolContext(implementation=implementation,
-                               api_version=APIVersion(2, 0))
+    set_version_added(papi.ProtocolContext.disconnect, monkeypatch, APIVersion(2, 1))
+    ctx = papi.ProtocolContext(
+        implementation=implementation, api_version=APIVersion(2, 0)
+    )
     with pytest.raises(papi_support.util.APIVersionError):
         ctx.disconnect()
 
 
 def test_home_plunger(monkeypatch, hardware):
     ctx = papi.ProtocolContext(
-        implementation=ProtocolContextImplementation(
-            hardware=hardware
-        ),
-        api_version=APIVersion(2, 0)
+        implementation=ProtocolContextImplementation(hardware=hardware),
+        api_version=APIVersion(2, 0),
     )
     ctx.home()
-    instr = ctx.load_instrument('p1000_single', 'left')
+    instr = ctx.load_instrument("p1000_single", "left")
     instr.home_plunger()
 
 
@@ -1111,9 +1131,9 @@ def test_move_to_with_thermocycler(ctx):
     def raiser(*args, **kwargs):
         raise RuntimeError("Cannot")
 
-    mod = ctx.load_module('thermocycler')
+    mod = ctx.load_module("thermocycler")
     mod.flag_unsafe_move = mock.MagicMock(side_effect=raiser)
-    instr = ctx.load_instrument('p1000_single', 'left')
+    instr = ctx.load_instrument("p1000_single", "left")
     with pytest.raises(RuntimeError, match="Cannot"):
         instr.move_to(Location(Point(0, 0, 0), None))
 
@@ -1123,7 +1143,8 @@ def test_move_to_with_thermocycler(ctx):
     argvalues=[
         [ProtocolContextImplementation],
         [ProtocolContextSimulation],
-    ])
+    ],
+)
 def test_temp_connect(implementation_class, hardware):
     """Test that temp_connect can be used to assign hardware controller to
     protocol implementation."""
@@ -1132,17 +1153,19 @@ def test_temp_connect(implementation_class, hardware):
     wrappable_hardware = mock.MagicMock()
     # Must mock result of get_attached_instrument for temp_connect to work.
     wrappable_hardware.get_attached_instrument.return_value = {
-        'default_aspirate_flow_rates': {'2.0': 100},
-        'default_dispense_flow_rates': {'2.0': 100},
-        'default_blow_out_flow_rates': {'2.0': 100}
+        "default_aspirate_flow_rates": {"2.0": 100},
+        "default_dispense_flow_rates": {"2.0": 100},
+        "default_blow_out_flow_rates": {"2.0": 100},
     }
 
     # Create the SynchronousAdapter wrapping the wrappable_hardware.
     temp_hardware = SynchronousAdapter(wrappable_hardware)
 
-    ctx = papi.ProtocolContext(implementation=implementation_class(hardware=hardware),
-                               api_version=APIVersion(2, 0))
-    instr = ctx.load_instrument('p1000_single', 'left')
+    ctx = papi.ProtocolContext(
+        implementation=implementation_class(hardware=hardware),
+        api_version=APIVersion(2, 0),
+    )
+    instr = ctx.load_instrument("p1000_single", "left")
 
     with ctx.temp_connect(temp_hardware):
         instr.home()

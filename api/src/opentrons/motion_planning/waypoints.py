@@ -62,7 +62,7 @@ def get_waypoints(
             clearance=MINIMUM_Z_MARGIN,
             min_travel_z=min_travel_z,
             max_travel_z=max_travel_z,
-            message="Destination out of bounds in the Z-axis"
+            message="Destination out of bounds in the Z-axis",
         )
 
     # ensure that the passed in min_travel_z and max_travel_z are compatible
@@ -73,7 +73,7 @@ def get_waypoints(
             clearance=MINIMUM_Z_MARGIN,
             min_travel_z=min_travel_z,
             max_travel_z=max_travel_z,
-            message="Arc out of bounds in the Z-axis"
+            message="Arc out of bounds in the Z-axis",
         )
 
     # set the z clearance according to the arc type
@@ -88,10 +88,7 @@ def get_waypoints(
     # if any of those exceed max_travel_z, just use max_travel_z
     # if max_travel_z does not provide enough clearance, check above would
     # raise an ArcOutOfBoundsError
-    travel_z = min(
-        max_travel_z,
-        max(min_travel_z + travel_z_margin, origin.z, dest.z)
-    )
+    travel_z = min(max_travel_z, max(min_travel_z + travel_z_margin, origin.z, dest.z))
 
     # if origin.z isn't the travel height: add waypoint to move to origin.z
     if travel_z > origin.z:

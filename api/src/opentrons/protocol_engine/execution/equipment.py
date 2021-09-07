@@ -1,14 +1,15 @@
 """Equipment command side-effect logic."""
 from dataclasses import dataclass
-from typing import Tuple
+from typing import Tuple, Optional
 
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons.calibration_storage.helpers import uri_from_details
+from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import MountType
 from opentrons.hardware_control.api import API as HardwareAPI
 
-from ..errors import FailedToLoadPipetteError
-from ..resources import ResourceProviders
-from ..state import StateView
+from ..errors import FailedToLoadPipetteError, LabwareDefinitionDoesNotExistError
+from ..resources import LabwareDataProvider, ModelUtils
+from ..state import StateStore
 from ..types import LabwareLocation, PipetteName
 
 
@@ -31,20 +32,23 @@ class LoadedPipette:
 class EquipmentHandler:
     """Implementation logic for labware, pipette, and module loading."""
 
-    _hardware: HardwareAPI
-    _state: StateView
-    _resources: ResourceProviders
+    _hardware_api: HardwareAPI
+    _state_store: StateStore
+    _labware_data_provider: LabwareDataProvider
+    _model_utils: ModelUtils
 
     def __init__(
         self,
-        hardware: HardwareAPI,
-        state: StateView,
-        resources: ResourceProviders,
+        hardware_api: HardwareAPI,
+        state_store: StateStore,
+        labware_data_provider: Optional[LabwareDataProvider] = None,
+        model_utils: Optional[ModelUtils] = None,
     ) -> None:
         """Initialize an EquipmentHandler instance."""
-        self._hardware = hardware
-        self._state = state
-        self._resources = resources
+        self._hardware_api = hardware_api
+        self._state_store = state_store
+        self._labware_data_provider = labware_data_provider or LabwareDataProvider()
+        self._model_utils = model_utils or ModelUtils()
 
     async def load_labware(
         self,
@@ -52,17 +56,40 @@ class EquipmentHandler:
         namespace: str,
         version: int,
         location: LabwareLocation,
+        labware_id: Optional[str],
     ) -> LoadedLabware:
-        """Load labware by assigning an identifier and pulling required data."""
-        labware_id = self._resources.id_generator.generate_id()
+        """Load labware by assigning an identifier and pulling required data.
 
-        definition = await self._resources.labware_data.get_labware_definition(
-            load_name=load_name,
-            namespace=namespace,
-            version=version,
-        )
+        Args:
+            load_name: The labware's load name.
+            namespace: The namespace.
+            version: Version
+            location: The deck location at which labware is placed.
+            labware_id: An optional identifier to assign the labware. If None, an
+                identifier will be generated.
 
-        calibration = await self._resources.labware_data.get_labware_calibration(
+        Returns:
+            A LoadedLabware object.
+        """
+        labware_id = labware_id if labware_id else self._model_utils.generate_id()
+
+        try:
+            # Try to use existing definition in state.
+            definition = self._state_store.labware.get_definition_by_uri(
+                uri_from_details(
+                    load_name=load_name,
+                    namespace=namespace,
+                    version=version,
+                )
+            )
+        except LabwareDefinitionDoesNotExistError:
+            definition = await self._labware_data_provider.get_labware_definition(
+                load_name=load_name,
+                namespace=namespace,
+                version=version,
+            )
+
+        calibration = await self._labware_data_provider.get_labware_calibration(
             definition=definition,
             location=location,
         )
@@ -77,10 +104,21 @@ class EquipmentHandler:
         self,
         pipette_name: PipetteName,
         mount: MountType,
+        pipette_id: Optional[str],
     ) -> LoadedPipette:
-        """Ensure the requested pipette is attached."""
+        """Ensure the requested pipette is attached.
+
+        Args:
+            pipette_name: The pipette name.
+            mount: The mount on which pipette must be attached.
+            pipette_id: An optional identifier to assign the pipette. If None, an
+                identifier will be generated.
+
+        Returns:
+            A LoadedPipette object.
+        """
         other_mount = mount.other_mount()
-        other_pipette = self._state.pipettes.get_pipette_data_by_mount(
+        other_pipette = self._state_store.pipettes.get_pipette_data_by_mount(
             other_mount,
         )
 
@@ -93,10 +131,10 @@ class EquipmentHandler:
         # pipette existence check
         # TODO(mc, 2021-04-16): reconcile PipetteName enum with PipetteName union
         try:
-            await self._hardware.cache_instruments(cache_request)  # type: ignore[arg-type]  # noqa: E501
+            await self._hardware_api.cache_instruments(cache_request)  # type: ignore[arg-type]  # noqa: E501
         except RuntimeError as e:
             raise FailedToLoadPipetteError(str(e)) from e
 
-        pipette_id = self._resources.id_generator.generate_id()
+        pipette_id = pipette_id or self._model_utils.generate_id()
 
         return LoadedPipette(pipette_id=pipette_id)

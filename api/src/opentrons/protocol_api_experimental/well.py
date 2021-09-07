@@ -31,6 +31,9 @@ class Well:  # noqa: D101
         self._engine_client = engine_client
         self._labware = labware
         self._well_name = well_name
+        self._well_definition = self._engine_client.state.labware.get_well_definition(
+            labware_id=labware.labware_id, well_name=well_name
+        )
 
     # TODO(mc, 2021-04-22): remove this property; it's redundant and
     # unlikely to be used by PAPI users
@@ -52,7 +55,7 @@ class Well:  # noqa: D101
 
     @property
     def max_volume(self) -> float:  # noqa: D102
-        raise NotImplementedError()
+        return self._well_definition.totalLiquidVolume
 
     # TODO(mc, 2021-04-22): explore collapsing WellGeometry into Well
     @property
@@ -61,7 +64,7 @@ class Well:  # noqa: D101
 
     @property
     def diameter(self) -> Optional[float]:  # noqa: D102
-        raise NotImplementedError()
+        return self._well_definition.diameter
 
     @property
     def length(self) -> Optional[float]:  # noqa: D102
@@ -73,7 +76,7 @@ class Well:  # noqa: D101
 
     @property
     def depth(self) -> float:  # noqa: D102
-        raise NotImplementedError()
+        return self._well_definition.depth
 
     @property
     def display_name(self) -> str:  # noqa: D102
@@ -101,10 +104,18 @@ class Well:  # noqa: D101
         raise NotImplementedError()
 
     def __repr__(self) -> str:  # noqa: D105
-        raise NotImplementedError()
+        return f"Well:{self._well_name}<Labware:{self.parent}>"
 
-    def __eq__(self, other: object) -> bool:  # noqa: D105
-        raise NotImplementedError()
+    def __eq__(self, other: object) -> bool:
+        """Compare for object equality.
+
+        Checks that other object is a `Well` and belongs to the same labware.
+        """
+        return (
+            isinstance(other, Well)
+            and self.well_name == other.well_name
+            and self.parent == other.parent
+        )
 
     def __hash__(self) -> int:  # noqa: D105
         raise NotImplementedError()

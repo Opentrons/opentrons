@@ -17,6 +17,7 @@ env/
 # Generated files for local API server config paths
 api/.env
 api/index.json
+.opentrons_config
 
 # MyPy caches
 .mypy_cache
@@ -52,6 +53,7 @@ pip-delete-this-directory.txt
 
 # node packages
 node_modules
+package-lock.json
 
 # Unit test / coverage reports
 htmlcov/
@@ -119,6 +121,13 @@ calibrations/
 # recent versions of setuptools create pyproject.toml automatically
 # we're ignoring the file for now to avoid confusion
 api/pyproject.toml
+robot-server/pyproject.toml
+update-server/pyproject.toml
+notify-server/pyproject.toml
+shared-data/python/pyproject.toml
 
 # typescript incremental files
 *.tsbuildinfo
+
+# Static storybook build artifacts
+storybook-static/

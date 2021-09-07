@@ -25,10 +25,11 @@ def mock_dict_config():
         [False, "booboo", rs_logging._dev_log_config(logging.INFO)],
         [True, "ERROR", rs_logging._robot_log_config(logging.ERROR)],
         [True, "booboo", rs_logging._robot_log_config(logging.INFO)],
-    ]
+    ],
 )
-def test_logging(mock_robot_config, mock_dict_config,
-                 is_robot, level_str, expected_dict_conf):
+def test_logging(
+    mock_robot_config, mock_dict_config, is_robot, level_str, expected_dict_conf
+):
     mock_robot_config.log_level = level_str
     with patch("robot_server.service.logging.IS_ROBOT", new=is_robot):
         rs_logging.initialize_logging()

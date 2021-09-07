@@ -15,6 +15,7 @@ log = logging.getLogger(__name__)
 
 class CancelledException(Exception):
     """Exception raised when a simulation or run is cancelled"""
+
     pass
 
 
@@ -31,12 +32,13 @@ class ProtocolRunner:
     Protocols are run and simulated synchronously. A listener callback can
     be provided for inspecting and control flow of the protocol execution."""
 
-    def __init__(self,
-                 protocol: UploadedProtocol,
-                 loop: asyncio.AbstractEventLoop,
-                 hardware: ThreadManager,
-                 motion_lock: ThreadedAsyncLock,
-                 ):
+    def __init__(
+        self,
+        protocol: UploadedProtocol,
+        loop: asyncio.AbstractEventLoop,
+        hardware: ThreadManager,
+        motion_lock: ThreadedAsyncLock,
+    ):
         """Constructor"""
         self._protocol = protocol
         self._loop = loop
@@ -66,7 +68,8 @@ class ProtocolRunner:
                 loop=self._loop,
                 broker=self._broker,
                 motion_lock=self._motion_lock,
-                extra_labware=list(self._protocol.get_custom_labware().values()))
+                extra_labware=list(self._protocol.get_custom_labware().values()),
+            )
 
     def run(self):
         """Run the protocol"""

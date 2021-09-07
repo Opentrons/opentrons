@@ -19,16 +19,23 @@ MoveSplits = Dict[str, MoveSplit]
 @dataclass
 class Temperature:
     """Tempdeck temperature and thermocycler plate temperature."""
-    current: Optional[float]
+
+    current: float
     target: Optional[float]
 
 
 @dataclass
 class PlateTemperature(Temperature):
     """Thermocycler lid temperature"""
+
     hold: Optional[float]
 
 
-class LidStatus(str, Enum):
-    OPEN = "open"
+class ThermocyclerLidStatus(str, Enum):
+    """Thermocycler lid status."""
+
+    UNKNOWN = "unknown"
     CLOSED = "closed"
+    IN_BETWEEN = "in_between"
+    OPEN = "open"
+    MAX = "max"

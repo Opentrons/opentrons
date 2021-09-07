@@ -1,41 +1,57 @@
 """Aspirate command request, result, and implementation models."""
 from __future__ import annotations
-from typing_extensions import final
-
-from .command import CommandImplementation, CommandHandlers
-from .pipetting_common import BaseLiquidHandlingRequest, BaseLiquidHandlingResult
+from typing import Optional, Type
+from typing_extensions import Literal
 
 
-@final
-class AspirateRequest(BaseLiquidHandlingRequest):
-    """A request to move to a specific well and aspirate from it."""
+from .pipetting_common import BaseLiquidHandlingData, BaseLiquidHandlingResult
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandRequest
 
-    def get_implementation(self) -> AspirateImplementation:
-        """Get the execution implementation of the AspirateRequest."""
-        return AspirateImplementation(self)
+AspirateCommandType = Literal["aspirate"]
 
 
-@final
+class AspirateData(BaseLiquidHandlingData):
+    """Data required to aspirate from a specific well."""
+
+    pass
+
+
 class AspirateResult(BaseLiquidHandlingResult):
     """Result data from the execution of a AspirateRequest."""
 
     pass
 
 
-@final
-class AspirateImplementation(
-    CommandImplementation[AspirateRequest, AspirateResult]
-):
+class AspirateImplementation(AbstractCommandImpl[AspirateData, AspirateResult]):
     """Aspirate command implementation."""
 
-    async def execute(self, handlers: CommandHandlers) -> AspirateResult:
+    async def execute(self, data: AspirateData) -> AspirateResult:
         """Move to and aspirate from the requested well."""
-        volume = await handlers.pipetting.aspirate(
-            pipette_id=self._request.pipetteId,
-            labware_id=self._request.labwareId,
-            well_name=self._request.wellName,
-            well_location=self._request.wellLocation,
-            volume=self._request.volume,
+        volume = await self._pipetting.aspirate(
+            pipette_id=data.pipetteId,
+            labware_id=data.labwareId,
+            well_name=data.wellName,
+            well_location=data.wellLocation,
+            volume=data.volume,
         )
 
         return AspirateResult(volume=volume)
+
+
+class Aspirate(BaseCommand[AspirateData, AspirateResult]):
+    """Aspirate command model."""
+
+    commandType: AspirateCommandType = "aspirate"
+    data: AspirateData
+    result: Optional[AspirateResult]
+
+    _ImplementationCls: Type[AspirateImplementation] = AspirateImplementation
+
+
+class AspirateRequest(BaseCommandRequest[AspirateData]):
+    """Create aspirate command request model."""
+
+    commandType: AspirateCommandType = "aspirate"
+    data: AspirateData
+
+    _CommandCls: Type[Aspirate] = Aspirate

@@ -3,7 +3,29 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [4.3.0-beta.0](https://github.com/Opentrons/opentrons/compare/v4.3.0-alpha.3...v4.3.0-beta.0) (2021-04-19)
+# [4.5.0](https://github.com/Opentrons/opentrons/compare/v4.4.0...v4.5.0) (2021-08-03)
+
+
+### Features
+
+* **labware-creator:** show whole labware in preview svg ([#8013](https://github.com/Opentrons/opentrons/issues/8013)) ([9b2fc17](https://github.com/Opentrons/opentrons/commit/9b2fc17843187d36746c10f4ba1ac6e551483ef9)), closes [#7164](https://github.com/Opentrons/opentrons/issues/7164)
+
+
+
+
+
+# [4.4.0](https://github.com/Opentrons/opentrons/compare/v4.3.1...v4.4.0) (2021-06-16)
+
+
+### Features
+
+* **components, protocol-library:** pass thru semantic 'disabled' attr to InputField elem ([#7759](https://github.com/Opentrons/opentrons/issues/7759)) ([1ec53d1](https://github.com/Opentrons/opentrons/commit/1ec53d1))
+
+
+
+
+
+## [4.3.1](https://github.com/Opentrons/opentrons/compare/v4.3.0...v4.3.1) (2021-05-10)
 
 **Note:** Version bump only for package @opentrons/components
 
@@ -11,35 +33,11 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 
 
-# [4.3.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v4.3.0-alpha.2...v4.3.0-alpha.3) (2021-04-19)
-
-**Note:** Version bump only for package @opentrons/components
-
-
-
-
-
-# [4.3.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v4.3.0-alpha.1...v4.3.0-alpha.2) (2021-04-19)
-
-**Note:** Version bump only for package @opentrons/components
-
-
-
-
-
-# [4.3.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v4.3.0-alpha.0...v4.3.0-alpha.1) (2021-04-15)
-
-**Note:** Version bump only for package @opentrons/components
-
-
-
-
-
-# [4.3.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v4.2.1...v4.3.0-alpha.0) (2021-04-14)
-
+# [4.3.0](https://github.com/Opentrons/opentrons/compare/v4.2.1...v4.3.0) (2021-05-06)
 
 ### Bug Fixes
 
+* **app:** add USB hub port number ([#7738](https://github.com/Opentrons/opentrons/issues/7738)) ([2f317bc](https://github.com/Opentrons/opentrons/commit/2f317bc))
 * **components:** bump the components library version manually ([#7606](https://github.com/Opentrons/opentrons/issues/7606)) ([247c5dc](https://github.com/Opentrons/opentrons/commit/247c5dc))
 
 

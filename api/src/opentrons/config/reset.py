@@ -8,7 +8,7 @@ from typing import NamedTuple, Dict, Set
 from opentrons.config import IS_ROBOT
 from opentrons.calibration_storage import delete
 
-DATA_BOOT_D = Path('/data/boot.d')
+DATA_BOOT_D = Path("/data/boot.d")
 
 log = logging.getLogger(__name__)
 
@@ -24,41 +24,33 @@ class CommonResetOption(NamedTuple):
 
 class ResetOptionId(str, Enum):
     """The available reset options"""
-    labware_calibration = 'labwareCalibration'
-    boot_scripts = 'bootScripts'
-    deck_calibration = 'deckCalibration'
-    pipette_offset = 'pipetteOffsetCalibrations'
-    tip_length_calibrations = 'tipLengthCalibrations'
+
+    labware_calibration = "labwareCalibration"
+    boot_scripts = "bootScripts"
+    deck_calibration = "deckCalibration"
+    pipette_offset = "pipetteOffsetCalibrations"
+    tip_length_calibrations = "tipLengthCalibrations"
 
 
 _settings_reset_options = {
-    ResetOptionId.labware_calibration:
-        CommonResetOption(
-            name='Labware Calibration',
-            description='Clear labware calibration'
-        ),
-    ResetOptionId.boot_scripts:
-        CommonResetOption(
-            name='Boot Scripts',
-            description='Clear custom boot scripts'
-        ),
-    ResetOptionId.deck_calibration:
-        CommonResetOption(
-            name='Deck Calibration',
-            description='Clear deck calibration (will also clear pipette '
-                        'offset)'
-        ),
-    ResetOptionId.pipette_offset:
-        CommonResetOption(
-            name='Pipette Offset Calibrations',
-            description='Clear pipette offset calibrations'
-        ),
-    ResetOptionId.tip_length_calibrations:
-        CommonResetOption(
-            name='Tip Length Calibrations',
-            description='Clear tip length calibrations (will also clear '
-                        'pipette offset)'
-        )
+    ResetOptionId.labware_calibration: CommonResetOption(
+        name="Labware Calibration", description="Clear labware calibration"
+    ),
+    ResetOptionId.boot_scripts: CommonResetOption(
+        name="Boot Scripts", description="Clear custom boot scripts"
+    ),
+    ResetOptionId.deck_calibration: CommonResetOption(
+        name="Deck Calibration",
+        description="Clear deck calibration (will also clear pipette " "offset)",
+    ),
+    ResetOptionId.pipette_offset: CommonResetOption(
+        name="Pipette Offset Calibrations",
+        description="Clear pipette offset calibrations",
+    ),
+    ResetOptionId.tip_length_calibrations: CommonResetOption(
+        name="Tip Length Calibrations",
+        description="Clear tip length calibrations (will also clear " "pipette offset)",
+    ),
 }
 
 
@@ -95,7 +87,7 @@ def reset_boot_scripts():
         if os.path.exists(DATA_BOOT_D):
             shutil.rmtree(DATA_BOOT_D)
     else:
-        log.debug(f'Not on pi, not removing {DATA_BOOT_D}')
+        log.debug(f"Not on pi, not removing {DATA_BOOT_D}")
 
 
 def reset_deck_calibration():

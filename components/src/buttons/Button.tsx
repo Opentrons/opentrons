@@ -18,7 +18,7 @@ export interface ButtonProps {
   /** id attribute */
   id?: string
   /** click handler */
-  onClick?: (event: React.MouseEvent) => unknown
+  onClick?: React.MouseEventHandler
   /** name attribute */
   name?: string
   /** title attribute */

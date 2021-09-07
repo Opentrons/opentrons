@@ -1,0 +1,30 @@
+{
+  "extends": "./tsconfig-base.json",
+  "compilerOptions": {
+    "emitDeclarationOnly": false,
+    "noEmit": true
+  },
+  "include": [
+    "app/src",
+    "app/typings",
+    "app-shell/src",
+    "app-shell/typings",
+    "components/src",
+    "components/typings",
+    "discovery-client/src",
+    "discovery-client/typings",
+    "labware-designer/src",
+    "labware-designer/typings",
+    "labware-library/src",
+    "labware-library/typings",
+    "shared-data/js",
+    "shared-data/protocol",
+    "shared-data/pipette",
+    "step-generation/src",
+    "step-generation/typings",
+    "protocol-designer/src",
+    "protocol-designer/typings",
+    "protocol-library-kludge/src",
+    "protocol-library-kludge/typings"
+  ]
+}

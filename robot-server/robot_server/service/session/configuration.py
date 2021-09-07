@@ -8,13 +8,15 @@ from robot_server.service.session.models.common import IdentifierType
 
 class SessionConfiguration:
     """Data and utilities common to all session types
-     provided by session manager"""
+    provided by session manager"""
 
-    def __init__(self,
-                 hardware: ThreadManager,
-                 is_active: Callable[[IdentifierType], bool],
-                 motion_lock: ThreadedAsyncLock,
-                 protocol_manager: ProtocolManager):
+    def __init__(
+        self,
+        hardware: ThreadManager,
+        is_active: Callable[[IdentifierType], bool],
+        motion_lock: ThreadedAsyncLock,
+        protocol_manager: ProtocolManager,
+    ):
         self._hardware = hardware
         self._is_active = is_active
         self._motion_lock = motion_lock

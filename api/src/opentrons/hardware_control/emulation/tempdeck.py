@@ -1,42 +1,63 @@
-import logging
-from typing import Optional, List
+"""An emulation of the opentrons temperature module.
 
-from opentrons.drivers.temp_deck.driver import GCODES
+The purpose is to provide a fake backend that responds to GCODE commands.
+"""
+
+import logging
+from typing import Optional
+
+from opentrons.drivers.temp_deck.driver import GCODE
+from opentrons.hardware_control.emulation import util
+from opentrons.hardware_control.emulation.parser import Parser, Command
 
 from .abstract_emulator import AbstractEmulator
+from .simulations import Temperature
+
 
 logger = logging.getLogger(__name__)
 
-GCODE_GET_TEMP = GCODES['GET_TEMP']
-GCODE_SET_TEMP = GCODES['SET_TEMP']
-GCODE_DEVICE_INFO = GCODES['DEVICE_INFO']
-GCODE_DISENGAGE = GCODES['DISENGAGE']
-GCODE_DFU = GCODES['PROGRAMMING_MODE']
 
-SERIAL = "fake_serial"
-MODEL = "temp_emulator"
-VERSION = 1
+SERIAL = "temperature_emulator"
+MODEL = "temp_deck_v20"
+VERSION = "v2.0.1"
 
 
 class TempDeckEmulator(AbstractEmulator):
     """TempDeck emulator"""
 
-    def __init__(self) -> None:
-        self.target_temp = 0
-        self.current_temp = 0
+    def __init__(self, parser: Parser) -> None:
+        self.reset()
+        self._parser = parser
 
-    def handle(self, words: List[str]) -> Optional[str]:
+    def handle(self, line: str) -> Optional[str]:
+        """Handle a line"""
+        results = (self._handle(c) for c in self._parser.parse(line))
+        joined = " ".join(r for r in results if r)
+        return None if not joined else joined
+
+    def reset(self):
+        self._temperature = Temperature(per_tick=0.25, current=0.0)
+
+    def _handle(self, command: Command) -> Optional[str]:
         """Handle a command."""
-        cmd = words[0]
-        logger.info(f"Got command {cmd}")
-        if cmd == GCODE_GET_TEMP:
-            return f"T:{self.target_temp} C:{self.current_temp}"
-        elif cmd == GCODE_SET_TEMP:
-            pass
-        elif cmd == GCODE_DISENGAGE:
-            pass
-        elif cmd == GCODE_DEVICE_INFO:
+        logger.info(f"Got command {command}")
+        if command.gcode == GCODE.GET_TEMP:
+            res = (
+                f"T:{util.OptionalValue(self._temperature.target)} "
+                f"C:{self._temperature.current}"
+            )
+            self._temperature.tick()
+            return res
+        elif command.gcode == GCODE.SET_TEMP:
+            temperature = command.params["S"]
+            assert isinstance(
+                temperature, float
+            ), f"invalid temperature '{temperature}'"
+            self._temperature.set_target(temperature)
+        elif command.gcode == GCODE.DISENGAGE:
+            self._temperature.deactivate(util.TEMPERATURE_ROOM)
+        elif command.gcode == GCODE.DEVICE_INFO:
             return f"serial:{SERIAL} model:{MODEL} version:{VERSION}"
-        elif cmd == GCODE_DFU:
+        elif command.gcode == GCODE.PROGRAMMING_MODE:
             pass
         return None

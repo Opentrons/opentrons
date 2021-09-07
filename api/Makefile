@@ -2,14 +2,8 @@
 
 include ../scripts/push.mk
 include ../scripts/python.mk
+include ./g_code_parsing.mk
 
-# using bash instead of /bin/bash in SHELL prevents macOS optimizing away our PATH update
-SHELL := bash
-
-# add yarn CLI dev deps to PATH (for cross platform POSIX commands via shx)
-# and also make an explicit version for shx for use in the shell function,
-# where PATH won’t be propagated
-PATH := $(shell cd .. && yarn bin):$(PATH)
 SHX := npx shx
 
 # make push wheel file (= rather than := to expand at every use)
@@ -30,7 +24,7 @@ simfile ?=
 
 # These variables can be overriden when make is invoked to customize the
 # behavior of pytest. For instance,
-# make test tests=tests/opentrons/tools/test_qc_scripts.py would run only the
+# make test tests=tests/opentrons/tools/test_pipette_memory.py would run only the
 # specified test
 tests ?= tests
 test_opts ?=  --cov=src/opentrons --cov-report term-missing:skip-covered --cov-report xml:coverage.xml
@@ -57,7 +51,13 @@ ot_shared_data_sources := $(filter %.json,$(shell $(SHX) find ../shared-data/))
 ot_resources := $(filter %,$(shell $(SHX) find src/opentrons/resources))
 ot_sources := $(ot_py_sources) $(ot_shared_data_sources) $(ot_resources)
 
-ot_tests_to_typecheck := tests/opentrons/protocol_api_experimental tests/opentrons/protocol_engine tests/opentrons/motion_planning
+# test modules to typecheck
+# TODO(mc, 2021-07-23): expand this to all tests
+ot_tests_to_typecheck := \
+	tests/opentrons/motion_planning \
+	tests/opentrons/protocol_api_experimental \
+	tests/opentrons/protocol_engine \
+	tests/opentrons/protocol_runner
 
 # Defined separately than the clean target so the wheel file doesn’t have to
 # depend on a PHONY target
@@ -94,9 +94,14 @@ test:
 	$(pytest) $(tests) $(test_opts)
 
 .PHONY: lint
-lint: $(ot_py_sources)
-	$(python) -m mypy src/opentrons $(ot_tests_to_typecheck)
-	$(python) -m flake8 setup.py src/opentrons tests
+lint:
+	$(python) -m mypy src $(ot_tests_to_typecheck)
+	$(python) -m black --check src tests setup.py
+	$(python) -m flake8 src tests setup.py
+
+.PHONY: format
+format:
+	$(python) -m black src tests setup.py
 
 docs/build/html/v%: docs/v%
 	$(sphinx_build) -b html -d docs/build/doctrees -n $< $@
@@ -159,6 +164,11 @@ push: push-no-restart
 .PHONY: simulate
 simulate:
 	-$(python) -m opentrons.simulate -l $(sim_log_level) $(simfile)
+
+# Launch the emulator application.
+.PHONY: emulator
+emulator:
+	-$(python) -m opentrons.hardware_control.emulation.app
 
 .PHONY: deploy
 deploy: wheel

@@ -1,19 +1,17 @@
 import * as React from 'react'
 import cx from 'classnames'
-import type {
-  PipetteNameSpecs,
-  PipetteModelSpecs,
-} from '@opentrons/shared-data'
 
-import type { Mount } from '../robot-types'
 import singleSrc from './pipetteSingle.png'
 import multiSrc from './pipetteMulti.png'
 import singleGEN2Src from './pipetteGEN2Single.png'
 import multiGEN2Src from './pipetteGEN2Multi.png'
 import styles from './instrument.css'
 
+import type { PipetteNameSpecs } from '@opentrons/shared-data'
+import type { Mount } from '../robot-types'
+
 export interface InstrumentDiagramProps {
-  pipetteSpecs?: PipetteNameSpecs | PipetteModelSpecs | null
+  pipetteSpecs?: Pick<PipetteNameSpecs, 'displayCategory' | 'channels'> | null
   className?: string
   mount: Mount
 }

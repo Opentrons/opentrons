@@ -1,0 +1,299 @@
+{
+  "ordering": [
+    ["A1", "B1", "C1", "D1", "E1"],
+    ["A2", "B2", "C2", "D2", "E2"],
+    ["A3", "B3", "C3", "D3", "E3"],
+    ["A4", "B4", "C4", "D4", "E4"],
+    ["A5", "B5", "C5", "D5", "E5"]
+  ],
+  "brand": {
+    "brand": "Brand Chalu",
+    "brandId": ["abcd12345!@#$%", "efghij6789^&*()"]
+  },
+  "metadata": {
+    "displayName": "Brand Chalu 1 Tip Rack 20ul",
+    "displayCategory": "tipRack",
+    "displayVolumeUnits": "µL",
+    "tags": []
+  },
+  "dimensions": {
+    "xDimension": 127,
+    "yDimension": 85,
+    "zDimension": 24
+  },
+  "wells": {
+    "A1": {
+      "depth": 12,
+      "totalLiquidVolume": 20,
+      "shape": "circular",
+      "diameter": 10,
+      "x": 10,
+      "y": 75,
+      "z": 12
+    },
+    "B1": {
+      "depth": 12,
+      "totalLiquidVolume": 20,
+      "shape": "circular",
+      "diameter": 10,
+      "x": 10,
+      "y": 60,
+      "z": 12
+    },
+    "C1": {
+      "depth": 12,
+      "totalLiquidVolume": 20,
+      "shape": "circular",
+      "diameter": 10,
+      "x": 10,
+      "y": 45,
+      "z": 12
+    },
+    "D1": {
+      "depth": 12,
+      "totalLiquidVolume": 20,
+      "shape": "circular",
+      "diameter": 10,
+      "x": 10,
+      "y": 30,
+      "z": 12
+    },
+    "E1": {
+      "depth": 12,
+      "totalLiquidVolume": 20,
+      "shape": "circular",
+      "diameter": 10,
+      "x": 10,
+      "y": 15,
+      "z": 12
+    },
+    "A2": {
+      "depth": 12,
+      "totalLiquidVolume": 20,
+      "shape": "circular",
+      "diameter": 10,
+      "x": 25,
+      "y": 75,
+      "z": 12
+    },
+    "B2": {
+      "depth": 12,
+      "totalLiquidVolume": 20,
+      "shape": "circular",
+      "diameter": 10,
+      "x": 25,
+      "y": 60,
+      "z": 12
+    },
+    "C2": {
+      "depth": 12,
+      "totalLiquidVolume": 20,
+      "shape": "circular",
+      "diameter": 10,
+      "x": 25,
+      "y": 45,
+      "z": 12
+    },
+    "D2": {
+      "depth": 12,
+      "totalLiquidVolume": 20,
+      "shape": "circular",
+      "diameter": 10,
+      "x": 25,
+      "y": 30,
+      "z": 12
+    },
+    "E2": {
+      "depth": 12,
+      "totalLiquidVolume": 20,
+      "shape": "circular",
+      "diameter": 10,
+      "x": 25,
+      "y": 15,
+      "z": 12
+    },
+    "A3": {
+      "depth": 12,
+      "totalLiquidVolume": 20,
+      "shape": "circular",
+      "diameter": 10,
+      "x": 40,
+      "y": 75,
+      "z": 12
+    },
+    "B3": {
+      "depth": 12,
+      "totalLiquidVolume": 20,
+      "shape": "circular",
+      "diameter": 10,
+      "x": 40,
+      "y": 60,
+      "z": 12
+    },
+    "C3": {
+      "depth": 12,
+      "totalLiquidVolume": 20,
+      "shape": "circular",
+      "diameter": 10,
+      "x": 40,
+      "y": 45,
+      "z": 12
+    },
+    "D3": {
+      "depth": 12,
+      "totalLiquidVolume": 20,
+      "shape": "circular",
+      "diameter": 10,
+      "x": 40,
+      "y": 30,
+      "z": 12
+    },
+    "E3": {
+      "depth": 12,
+      "totalLiquidVolume": 20,
+      "shape": "circular",
+      "diameter": 10,
+      "x": 40,
+      "y": 15,
+      "z": 12
+    },
+    "A4": {
+      "depth": 12,
+      "totalLiquidVolume": 20,
+      "shape": "circular",
+      "diameter": 10,
+      "x": 55,
+      "y": 75,
+      "z": 12
+    },
+    "B4": {
+      "depth": 12,
+      "totalLiquidVolume": 20,
+      "shape": "circular",
+      "diameter": 10,
+      "x": 55,
+      "y": 60,
+      "z": 12
+    },
+    "C4": {
+      "depth": 12,
+      "totalLiquidVolume": 20,
+      "shape": "circular",
+      "diameter": 10,
+      "x": 55,
+      "y": 45,
+      "z": 12
+    },
+    "D4": {
+      "depth": 12,
+      "totalLiquidVolume": 20,
+      "shape": "circular",
+      "diameter": 10,
+      "x": 55,
+      "y": 30,
+      "z": 12
+    },
+    "E4": {
+      "depth": 12,
+      "totalLiquidVolume": 20,
+      "shape": "circular",
+      "diameter": 10,
+      "x": 55,
+      "y": 15,
+      "z": 12
+    },
+    "A5": {
+      "depth": 12,
+      "totalLiquidVolume": 20,
+      "shape": "circular",
+      "diameter": 10,
+      "x": 70,
+      "y": 75,
+      "z": 12
+    },
+    "B5": {
+      "depth": 12,
+      "totalLiquidVolume": 20,
+      "shape": "circular",
+      "diameter": 10,
+      "x": 70,
+      "y": 60,
+      "z": 12
+    },
+    "C5": {
+      "depth": 12,
+      "totalLiquidVolume": 20,
+      "shape": "circular",
+      "diameter": 10,
+      "x": 70,
+      "y": 45,
+      "z": 12
+    },
+    "D5": {
+      "depth": 12,
+      "totalLiquidVolume": 20,
+      "shape": "circular",
+      "diameter": 10,
+      "x": 70,
+      "y": 30,
+      "z": 12
+    },
+    "E5": {
+      "depth": 12,
+      "totalLiquidVolume": 20,
+      "shape": "circular",
+      "diameter": 10,
+      "x": 70,
+      "y": 15,
+      "z": 12
+    }
+  },
+  "groups": [
+    {
+      "metadata": {},
+      "wells": [
+        "A1",
+        "B1",
+        "C1",
+        "D1",
+        "E1",
+        "A2",
+        "B2",
+        "C2",
+        "D2",
+        "E2",
+        "A3",
+        "B3",
+        "C3",
+        "D3",
+        "E3",
+        "A4",
+        "B4",
+        "C4",
+        "D4",
+        "E4",
+        "A5",
+        "B5",
+        "C5",
+        "D5",
+        "E5"
+      ]
+    }
+  ],
+  "parameters": {
+    "format": "irregular",
+    "quirks": [],
+    "isTiprack": true,
+    "tipLength": 12,
+    "isMagneticModuleCompatible": false,
+    "loadName": "generic_1_tiprack_20ul"
+  },
+  "namespace": "custom_beta",
+  "version": 1,
+  "schemaVersion": 2,
+  "cornerOffsetFromSlot": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  }
+}

@@ -54,7 +54,9 @@ export function SelectField(props: SelectFieldProps): JSX.Element {
   const allOptions = options.flatMap(og => og.options || [og])
   const value = find(allOptions, opt => opt.value === props.value) || null
   const caption = error || props.caption
+  // @ts-expect-error(sa, 2021-6-23): cast value to boolean
   const captionCx = cx(styles.select_caption, { [styles.error]: error })
+  // @ts-expect-error(sa, 2021-6-23): cast value to boolean
   const fieldCx = cx(styles.select_field, { [styles.error]: error }, className)
 
   return (

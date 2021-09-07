@@ -1,13 +1,6 @@
 # Opentrons Platform
 
-[![Travis CI][travis-badge]][travis]
-[![AppVeyor][appveyor-badge]][appveyor]
 [![Codecov][codecov-badge]][codecov]
-
-- [Overview](#overview)
-- [Opentrons API](#opentrons-api)
-- [Opentrons App](#opentrons-app)
-- [Contributing](#contributing)
 
 ## Overview
 
@@ -41,7 +34,7 @@ Easily upload a protocol, calibrate positions, and run your experiment from your
 - [Documentation](https://support.opentrons.com/)
 - [Source code](./app)
 
-![ot-app](https://s3.amazonaws.com/opentrons-images/standalone/ot-2-app.png)
+![The Opentrons App, showing a map of where labware should be placed on the OT-2's deck for a certain protocol, and showing positional calibration data for pipettes and labware.](.github/images/opentrons_app.png)
 
 ## Opentrons Protocol Designer
 
@@ -63,10 +56,6 @@ For more information and development setup instructions, please read [the contri
 
 Enjoy!
 
-[travis]: https://travis-ci.org/Opentrons/opentrons/branches
-[travis-badge]: https://img.shields.io/travis/Opentrons/opentrons/edge.svg?style=flat-square&maxAge=3600&label=*nix%20build
-[appveyor]: https://ci.appveyor.com/project/Opentrons/opentrons
-[appveyor-badge]: https://img.shields.io/appveyor/ci/Opentrons/opentrons/edge.svg?style=flat-square&maxAge=3600&label=windows%20build
 [codecov]: https://codecov.io/gh/Opentrons/opentrons/branches
 [codecov-badge]: https://img.shields.io/codecov/c/github/Opentrons/opentrons/edge.svg?style=flat-square&maxAge=3600
 [contributing]: ./CONTRIBUTING.md

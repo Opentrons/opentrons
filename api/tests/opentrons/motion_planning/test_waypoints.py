@@ -21,9 +21,7 @@ def test_get_waypoints_direct() -> None:
         max_travel_z=100,
     )
 
-    assert result == [
-        Waypoint(Point(1, 2, 4))
-    ]
+    assert result == [Waypoint(Point(1, 2, 4))]
 
 
 def test_get_waypoints_in_labware_arc() -> None:
@@ -239,6 +237,4 @@ def test_get_waypoints_direct_moves_ignore_clearance_requirements() -> None:
         max_travel_z=5.9,
     )
 
-    assert result == [
-        Waypoint(Point(1, 1, 5.5))
-    ]
+    assert result == [Waypoint(Point(1, 1, 5.5))]

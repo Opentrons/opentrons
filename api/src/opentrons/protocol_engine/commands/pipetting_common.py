@@ -4,8 +4,8 @@ from pydantic import BaseModel, Field
 from ..types import WellLocation
 
 
-class BasePipettingRequest(BaseModel):
-    """Base class for pipetting requests that interact with wells."""
+class BasePipettingData(BaseModel):
+    """Base class for data payloads of commands that interact with wells."""
 
     pipetteId: str = Field(
         ...,
@@ -21,13 +21,13 @@ class BasePipettingRequest(BaseModel):
     )
 
 
-class BaseLiquidHandlingRequest(BasePipettingRequest):
-    """Base class for liquid handling requests."""
+class BaseLiquidHandlingData(BasePipettingData):
+    """Base class for data payloads of commands that handle liquid."""
 
     volume: float = Field(
         ...,
         description="Amount of liquid in uL. Must be greater than 0 and less "
-                    "than a pipette-specific maximum volume.",
+        "than a pipette-specific maximum volume.",
         gt=0,
     )
     wellLocation: WellLocation = Field(

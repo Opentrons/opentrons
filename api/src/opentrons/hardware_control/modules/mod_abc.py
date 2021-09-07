@@ -14,64 +14,67 @@ mod_log = logging.getLogger(__name__)
 
 
 class AbstractModule(abc.ABC):
-    """ Defines the common methods of a module. """
+    """Defines the common methods of a module."""
 
     @classmethod
     @abc.abstractmethod
-    async def build(cls,
-                    port: str,
-                    usb_port: USBPort,
-                    execution_manager: ExecutionManager,
-                    interrupt_callback: InterruptCallback = None,
-                    simulating: bool = False,
-                    loop: asyncio.AbstractEventLoop = None,
-                    sim_model: str = None) \
-            -> 'AbstractModule':
-        """ Modules should always be created using this factory.
+    async def build(
+        cls,
+        port: str,
+        usb_port: USBPort,
+        execution_manager: ExecutionManager,
+        interrupt_callback: InterruptCallback = None,
+        simulating: bool = False,
+        loop: asyncio.AbstractEventLoop = None,
+        sim_model: str = None,
+        **kwargs,
+    ) -> "AbstractModule":
+        """Modules should always be created using this factory.
 
         This lets the (perhaps blocking) work of connecting to and initializing
         a module be in a place that can be async.
         """
         pass
 
-    @abc.abstractmethod
-    def __init__(self,
-                 port: str,
-                 usb_port: USBPort,
-                 execution_manager: ExecutionManager,
-                 simulating: bool = False,
-                 loop: asyncio.AbstractEventLoop = None,
-                 sim_model: str = None) -> None:
+    def __init__(
+        self,
+        port: str,
+        usb_port: USBPort,
+        execution_manager: ExecutionManager,
+        simulating: bool = False,
+        loop: asyncio.AbstractEventLoop = None,
+        sim_model: str = None,
+    ) -> None:
         self._port = port
         self._usb_port = usb_port
         self._loop = use_or_initialize_loop(loop)
         self._execution_manager = execution_manager
-        self._device_info: Mapping[str, str]
         self._bundled_fw: Optional[BundledFirmware] = self.get_bundled_fw()
 
     def get_bundled_fw(self) -> Optional[BundledFirmware]:
-        """ Get absolute path to bundled version of module fw if available. """
+        """Get absolute path to bundled version of module fw if available."""
         if not IS_ROBOT:
             return None
         name_to_fw_file_prefix = {
-            "tempdeck": "temperature-module", "magdeck": "magnetic-module"}
+            "tempdeck": "temperature-module",
+            "magdeck": "magnetic-module",
+        }
         name = self.name()
         file_prefix = name_to_fw_file_prefix.get(name, name)
 
-        MODULE_FW_RE = re.compile(f'^{file_prefix}@v(.*)[.](hex|bin)$')
+        MODULE_FW_RE = re.compile(f"^{file_prefix}@v(.*)[.](hex|bin)$")
         for fw_resource in ROBOT_FIRMWARE_DIR.iterdir():  # type: ignore
             matches = MODULE_FW_RE.search(fw_resource.name)
             if matches:
-                return BundledFirmware(version=matches.group(1),
-                                       path=fw_resource)
+                return BundledFirmware(version=matches.group(1), path=fw_resource)
 
         mod_log.info(f"no available fw file found for: {file_prefix}")
         return None
 
     def has_available_update(self) -> bool:
-        """ Return whether a newer firmware file is available """
-        if self._device_info and self._bundled_fw:
-            device_version = parse_version(self._device_info['version'])
+        """Return whether a newer firmware file is available"""
+        if self.device_info and self._bundled_fw:
+            device_version = parse_version(self.device_info["version"])
             available_version = parse_version(self._bundled_fw.version)
             return available_version > device_version
         return False
@@ -85,48 +88,46 @@ class AbstractModule(abc.ABC):
 
     @abc.abstractmethod
     def deactivate(self):
-        """ Deactivate the module. """
+        """Deactivate the module."""
         pass
 
     @property
     @abc.abstractmethod
     def status(self) -> str:
-        """ Return some string describing status. """
+        """Return some string describing status."""
         pass
 
     @property
     @abc.abstractmethod
     def device_info(self) -> Mapping[str, str]:
-        """ Return a dict of the module's static information (serial, etc)"""
+        """Return a dict of the module's static information (serial, etc)"""
         pass
 
     @property
     @abc.abstractmethod
     def live_data(self) -> LiveData:
-        """ Return a dict of the module's dynamic information """
+        """Return a dict of the module's dynamic information"""
         pass
 
     @property
     @abc.abstractmethod
     def is_simulated(self) -> bool:
-        """ True if >this is a simulated module. """
+        """True if >this is a simulated module."""
         pass
 
     @property
-    @abc.abstractmethod
     def port(self) -> str:
-        """ The virtual port where the module is connected. """
-        pass
+        """The virtual port where the module is connected."""
+        return self._port
 
     @property
-    @abc.abstractmethod
     def usb_port(self) -> USBPort:
-        """ The physical port where the module is connected. """
-        pass
+        """The physical port where the module is connected."""
+        return self._usb_port
 
     @abc.abstractmethod
     async def prep_for_update(self) -> str:
-        """ Prepare for an update.
+        """Prepare for an update.
 
         By the time this coroutine completes, the hardware should be ready
         to take an update. This implicitly tears down the module instance;
@@ -138,33 +139,28 @@ class AbstractModule(abc.ABC):
         pass
 
     @property
-    @abc.abstractmethod
-    def interrupt_callback(self) -> InterruptCallback:
-        pass
-
-    @property
     def bundled_fw(self):
         return self._bundled_fw
 
     @abc.abstractmethod
     def model(self) -> str:
-        """ A name for this specific module, matching module defs """
+        """A name for this specific module, matching module defs"""
         pass
 
     @classmethod
     @abc.abstractmethod
     def name(cls) -> str:
-        """ A shortname used for looking up firmware, among other things """
+        """A shortname used for looking up firmware, among other things"""
         pass
 
     @classmethod
     @abc.abstractmethod
     def bootloader(cls) -> UploadFunction:
-        """ Method used to upload file to this module's bootloader. """
+        """Method used to upload file to this module's bootloader."""
         pass
 
-    def cleanup(self) -> None:
-        """ Clean up the module instance.
+    async def cleanup(self) -> None:
+        """Clean up the module instance.
 
         Clean up, i.e. stop pollers, disconnect serial, etc in preparation for
         object destruction.

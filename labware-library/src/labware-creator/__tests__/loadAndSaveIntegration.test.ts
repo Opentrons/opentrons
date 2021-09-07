@@ -4,12 +4,15 @@ import { labwareFormSchema } from '../labwareFormSchema'
 import { DEFAULT_CUSTOM_NAMESPACE } from '@opentrons/shared-data'
 import _fixture96Plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 import _fixture12Trough from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough.json'
+import _fixtureTiprack300ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
+import _fixture24TubeRack from '@opentrons/shared-data/labware/fixtures/2/fixture_24_tuberack.json'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { ProcessedLabwareFields } from '../fields'
 
 const fixture96Plate = _fixture96Plate as LabwareDefinition2
 const fixture12Trough = _fixture12Trough as LabwareDefinition2
-
+const fixtureTiprack = _fixtureTiprack300ul as LabwareDefinition2
+const fixture24TubeRack = _fixture24TubeRack as LabwareDefinition2
 jest.mock('../../definitions')
 
 describe('load and immediately save integrity test', () => {
@@ -27,6 +30,14 @@ describe('load and immediately save integrity test', () => {
     {
       inputDef: fixture12Trough,
       extraFields: { pipetteName },
+    },
+    {
+      inputDef: fixtureTiprack,
+      extraFields: { pipetteName },
+    },
+    {
+      inputDef: fixture24TubeRack,
+      extraFields: { pipetteName, tubeRackInsertLoadName: 'customTubeRack' },
     },
   ]
   testCases.forEach(({ inputDef, extraFields }) => {
@@ -59,12 +70,12 @@ describe('load and immediately save integrity test', () => {
         ...inputDef,
         brand: {
           ...inputDef.brand,
-          brandId: inputDef.brand.brandId || [],
+          brandId: inputDef.brand.brandId ?? [],
         },
         parameters: {
           ...inputDef.parameters,
           format: 'irregular', // 'format' use is deprecated, LC always uses 'irregular'
-          quirks: inputDef.parameters.quirks || [],
+          quirks: inputDef.parameters.quirks ?? [],
           loadName: fakeLoadName,
         },
         metadata: {

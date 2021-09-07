@@ -2,7 +2,11 @@ from typing import List
 
 from opentrons.hardware_control.util import plan_arc, check_motion_bounds
 from opentrons.hardware_control.types import (
-    CriticalPoint, MotionChecks, OutOfBoundsMove, Axis)
+    CriticalPoint,
+    MotionChecks,
+    OutOfBoundsMove,
+    Axis,
+)
 from opentrons.types import Point
 
 
@@ -10,7 +14,7 @@ import pytest
 
 
 def check_arc_basic(arc: List[Point], from_pt: Point, to_pt: Point):
-    """ Check the tests that should always be true for different-well moves
+    """Check the tests that should always be true for different-well moves
     - we should always go only up, then only xy, then only down
     - we should have three moves
     """
@@ -30,23 +34,22 @@ def check_arc_basic(arc: List[Point], from_pt: Point, to_pt: Point):
 
 
 @pytest.mark.parametrize(
-    argnames=['from_pt', 'to_pt', 'z_height'],
+    argnames=["from_pt", "to_pt", "z_height"],
     argvalues=[
         [Point(10, 20, 30), Point(10, 30, 30), 100],
         [Point(10, 20, 30), Point(10, 30, 40), 100],
         [Point(10, 20, 40), Point(10, 30, 30), 40],
-        [Point(10, 20, 30), Point(10, 30, 40), 40]])
+        [Point(10, 20, 30), Point(10, 30, 40), 40],
+    ],
+)
 def test_basic_arcs(from_pt, to_pt, z_height):
-    check_arc_basic([a[0] for a in plan_arc(from_pt, to_pt, z_height)],
-                    from_pt, to_pt)
+    check_arc_basic([a[0] for a in plan_arc(from_pt, to_pt, z_height)], from_pt, to_pt)
 
 
 def test_arc_with_waypoint():
     from_pt = Point(20, 20, 40)
     to_pt = Point(0, 0, 10)
-    arc = plan_arc(from_pt, to_pt,
-                   50,
-                   extra_waypoints=[(5, 10), (20, 30)])
+    arc = plan_arc(from_pt, to_pt, 50, extra_waypoints=[(5, 10), (20, 30)])
     check_arc_basic([a[0] for a in arc], from_pt, to_pt)
     assert arc[1][0].x == 5
     assert arc[1][0].y == 10
@@ -73,24 +76,25 @@ def test_cp_blending():
 
 
 @pytest.mark.parametrize(
-    'xformed,deck,bounds,check,catch,phrase',
+    "xformed,deck,bounds,check,catch,phrase",
     [
         # acceptable moves, iterating through checks
-        ({Axis.X: 2}, {Axis.X: -15}, {Axis.X: (1, 4)}, MotionChecks.NONE, False, ''),
-        ({Axis.X: 2}, {Axis.X: -10}, {Axis.X: (1, 4)}, MotionChecks.LOW, False, ''),
-        ({Axis.X: 2}, {Axis.X: 0}, {Axis.X: (1, 4)}, MotionChecks.HIGH, False, ''),
-        ({Axis.X: 2}, {Axis.X: 10}, {Axis.X: (1, 4)}, MotionChecks.BOTH, False, ''),
+        ({Axis.X: 2}, {Axis.X: -15}, {Axis.X: (1, 4)}, MotionChecks.NONE, False, ""),
+        ({Axis.X: 2}, {Axis.X: -10}, {Axis.X: (1, 4)}, MotionChecks.LOW, False, ""),
+        ({Axis.X: 2}, {Axis.X: 0}, {Axis.X: (1, 4)}, MotionChecks.HIGH, False, ""),
+        ({Axis.X: 2}, {Axis.X: 10}, {Axis.X: (1, 4)}, MotionChecks.BOTH, False, ""),
         # unacceptable low, with and without checking
-        ({Axis.Z: 1}, {Axis.Z: 3}, {Axis.Z: (2, 4)}, MotionChecks.NONE, False, ''),
-        ({Axis.Z: 1}, {Axis.Z: 3}, {Axis.Z: (2, 4)}, MotionChecks.LOW, True, 'low'),
-        ({Axis.Z: 1}, {Axis.Z: 3}, {Axis.Z: (2, 4)}, MotionChecks.HIGH, False, ''),
-        ({Axis.Z: 1}, {Axis.Z: 3}, {Axis.Z: (2, 4)}, MotionChecks.BOTH, True, 'low'),
+        ({Axis.Z: 1}, {Axis.Z: 3}, {Axis.Z: (2, 4)}, MotionChecks.NONE, False, ""),
+        ({Axis.Z: 1}, {Axis.Z: 3}, {Axis.Z: (2, 4)}, MotionChecks.LOW, True, "low"),
+        ({Axis.Z: 1}, {Axis.Z: 3}, {Axis.Z: (2, 4)}, MotionChecks.HIGH, False, ""),
+        ({Axis.Z: 1}, {Axis.Z: 3}, {Axis.Z: (2, 4)}, MotionChecks.BOTH, True, "low"),
         # unacceptable high, with and without checking
-        ({Axis.Z: 5}, {Axis.Z: 3}, {Axis.Z: (2, 4)}, MotionChecks.NONE, False, ''),
-        ({Axis.Z: 5}, {Axis.Z: 3}, {Axis.Z: (2, 4)}, MotionChecks.LOW, False, ''),
-        ({Axis.Z: 5}, {Axis.Z: 3}, {Axis.Z: (2, 4)}, MotionChecks.HIGH, True, 'high'),
-        ({Axis.Z: 5}, {Axis.Z: 3}, {Axis.Z: (2, 4)}, MotionChecks.BOTH, True, 'high')
-    ])
+        ({Axis.Z: 5}, {Axis.Z: 3}, {Axis.Z: (2, 4)}, MotionChecks.NONE, False, ""),
+        ({Axis.Z: 5}, {Axis.Z: 3}, {Axis.Z: (2, 4)}, MotionChecks.LOW, False, ""),
+        ({Axis.Z: 5}, {Axis.Z: 3}, {Axis.Z: (2, 4)}, MotionChecks.HIGH, True, "high"),
+        ({Axis.Z: 5}, {Axis.Z: 3}, {Axis.Z: (2, 4)}, MotionChecks.BOTH, True, "high"),
+    ],
+)
 def test_check_motion_bounds(xformed, deck, bounds, check, catch, phrase):
     if catch:
         with pytest.raises(OutOfBoundsMove, match=phrase):

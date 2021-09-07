@@ -20,7 +20,7 @@ const PROTOCOL_DESIGNER_ENV_VAR_PREFIX = 'OT_PD_'
 const OT_PD_VERSION = '5.2.6'
 const OT_PD_BUILD_DATE = new Date().toUTCString()
 
-const JS_ENTRY = path.join(__dirname, 'src/index.js')
+const JS_ENTRY = path.join(__dirname, 'src/index.tsx')
 const HTML_ENTRY = path.join(__dirname, 'src/index.hbs')
 const ERROR_HTML = path.join(__dirname, 'src/error.html')
 

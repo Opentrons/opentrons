@@ -1,0 +1,61 @@
+# Run tests for step generation
+
+name: 'Step generation test'
+
+on:
+  pull_request:
+    paths:
+      - 'step-generation/**'
+      - 'shared-data/**'
+      - 'webpack-config/**'
+      - 'package.json'
+      - '.github/workflows/step-generation-test.yaml'
+  push:
+    paths:
+      - 'step-generation/**'
+      - 'shared-data/**'
+      - 'webpack-config/**'
+      - 'package.json'
+      - '.github/workflows/step-generation-test.yaml'
+    branches:
+      - '*'
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  CI: true
+
+jobs:
+  js-unit-test:
+    name: 'step generation unit tests'
+    runs-on: 'ubuntu-18.04'
+    timeout-minutes: 30
+    steps:
+      - uses: 'actions/checkout@v2'
+      - uses: 'actions/setup-node@v1'
+        with:
+          node-version: '12'
+      - name: 'cache yarn cache'
+        uses: actions/cache@v2
+        with:
+          path: |
+            ${{ github.workspace }}/.yarn-cache
+            ${{ github.workspace }}/.npm-cache
+          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
+      - name: 'setup-js'
+        run: |
+          npm config set cache ./.npm-cache
+          yarn config set cache-folder ./.yarn-cache
+          make setup-js
+      - name: 'run step generation unit tests'
+        run: |
+          yarn jest --coverage=true --ci=true --collectCoverageFrom="step-generation/src/**/*.(js|ts|tsx)" step-generation/src
+      - name: 'Upload coverage report'
+        uses: codecov/codecov-action@v2
+        with:
+          files: ./coverage/lcov.info
+          flags: step-generation

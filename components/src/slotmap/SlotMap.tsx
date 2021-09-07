@@ -3,6 +3,9 @@ import cx from 'classnames'
 import { Icon } from '../icons'
 import styles from './styles.css'
 
+// TODO(bc, 2021-03-29): this component is only used in PD
+// reconsider whether it belongs in components library
+
 export interface SlotMapProps {
   /** Slot(s) to highlight */
   occupiedSlots: string[]

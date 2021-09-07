@@ -29,6 +29,7 @@ updated component library cards after redesign/refactor
   display: flex;
   align-items: center;
   justify-content: space-between;
+  border-top: var(--bd-light) 1px solid;
 }
 
 .card_row:not(:last-child) {

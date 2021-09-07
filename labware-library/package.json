@@ -1,7 +1,7 @@
 {
   "name": "@opentrons/labware-library",
   "productName": "Labware Library",
-  "version": "4.3.0-beta.0",
+  "version": "4.5.0",
   "description": "Opentrons standard labware library",
   "main": "dist/index.js",
   "source": "src/index.tsx",
@@ -25,11 +25,11 @@
     "@types/query-string": "6.2.0",
     "@types/react-router-dom": "^5.1.7",
     "@types/webpack-env": "^1.16.0",
-    "@types/yup": "0.28.0"
+    "@types/yup": "0.29.11"
   },
   "dependencies": {
     "@hot-loader/react-dom": "16.8.6",
-    "@opentrons/components": "4.3.0-beta.0",
+    "@opentrons/components": "4.5.0",
     "ajv": "6.10.2",
     "classnames": "2.2.5",
     "cookie": "0.4.0",
@@ -44,6 +44,6 @@
     "react-dom": "16.8.6",
     "react-hot-loader": "4.12.19",
     "react-router-dom": "5.1.1",
-    "yup": "0.27.0"
+    "yup": "0.32.9"
   }
 }

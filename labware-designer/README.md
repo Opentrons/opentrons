@@ -34,10 +34,18 @@ OR
 1. From the top level folder type: `make -C labware-designer`
 2. Open `labware-designer/dist/index.html` in your browser
 
+## React-based GUI Usage
+
+- In the browser window you should be presented with a sandbox-style live update form.
+- The radio buttons in the top left allow you to switch between the two internal functions `createRegularLabware` and `createIrregularLabware`.
+- The large text area labeled "Input Options" is a live-editable JSON representation of the `options` object to be passed to the selected creator function.
+- If the supplied `options` object is parseable and produces valid results, the output labware definition will be render, and the text area labeled "Output Definition" will update to contain the generated labware definition.
+- If the supplied `options` object is not parseable or otherwise throws an error, the render and output will not update and instead show the last valid state. Error details are logged to the Javascript Console.
+
+## Javascript Console Usage
+
 - In the browser window, open the console (in Chrome, right click in the middle of the page, select "Inspect" and then select the "Console" tab--other browsers vary but are similar).
 - In the console, you can use the global variable `sharedData` and use any public functions which are exported in that project.
-
-## Usage
 
 The generator has the following functions:
 

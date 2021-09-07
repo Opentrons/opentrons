@@ -18,7 +18,7 @@ export const HeightGuidingText = (props: {
         <p>
           Reference{' '}
           <strong>from the top of the tube to bottom of the rack.</strong>{' '}
-          Include any well lip. Exclude any cover or cap.
+          Include any tube lip. Exclude any cover or cap.
         </p>
         {footer}
       </>
@@ -34,6 +34,17 @@ export const HeightGuidingText = (props: {
             from the top of your labware to the bottom of the block.
           </strong>{' '}
           Include any well or tube lip. Exclude any cover or cap.
+        </p>
+        {footer}
+      </>
+    )
+  }
+  if (labwareType === 'tipRack') {
+    return (
+      <>
+        <p>
+          Include the <strong>adapter and tops of the pipette tips</strong> in
+          the measurement.
         </p>
         {footer}
       </>

@@ -2,6 +2,7 @@ from datetime import timedelta, datetime
 
 import pytest
 from mock import patch, MagicMock
+from typing import Any
 
 from robot_server import util
 
@@ -17,6 +18,7 @@ def mock_utc_now(mock_start_time):
 
     First call will be mock_start_time. Subsequent calls will increment by
     1 day."""
+
     class _TimeIncrementer:
         def __init__(self, t):
             self._time = t
@@ -26,7 +28,7 @@ def mock_utc_now(mock_start_time):
             self._time += timedelta(days=1)
             return ret
 
-    with patch.object(util, 'utc_now') as p:
+    with patch.object(util, "utc_now") as p:
         p.side_effect = _TimeIncrementer(mock_start_time)
         yield p
 
@@ -51,7 +53,7 @@ def test_duration_raises(mock_utc_now, mock_start_time):
 
 
 async def test_call_once():
-    return_value = dict()
+    return_value: Any = dict()
     mock = MagicMock(return_value=return_value)
 
     @util.call_once
