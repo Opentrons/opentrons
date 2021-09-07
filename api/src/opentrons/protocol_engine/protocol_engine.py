@@ -1,8 +1,19 @@
 """ProtocolEngine class definition."""
-from .resources import ResourceProviders
+from typing import Optional
+from opentrons.hardware_control import API as HardwareAPI
+
+from .resources import ModelUtils
 from .commands import Command, CommandRequest, CommandMapper
 from .execution import QueueWorker
-from .state import StateStore, StateView, PlayAction, PauseAction, UpdateCommandAction
+
+from .state import (
+    StateStore,
+    StateView,
+    PlayAction,
+    PauseAction,
+    StopAction,
+    UpdateCommandAction,
+)
 
 
 class ProtocolEngine:
@@ -13,27 +24,30 @@ class ProtocolEngine:
     of the commands themselves.
     """
 
+    _hardware_api: HardwareAPI
     _state_store: StateStore
-    _command_mapper: CommandMapper
-    _resources: ResourceProviders
     _queue_worker: QueueWorker
+    _command_mapper: CommandMapper
+    _model_utils: ModelUtils
 
     def __init__(
         self,
+        hardware_api: HardwareAPI,
         state_store: StateStore,
-        command_mapper: CommandMapper,
-        resources: ResourceProviders,
         queue_worker: QueueWorker,
+        command_mapper: Optional[CommandMapper] = None,
+        model_utils: Optional[ModelUtils] = None,
     ) -> None:
         """Initialize a ProtocolEngine instance.
 
         This constructor does not inject provider implementations. Prefer the
         ProtocolEngine.create factory classmethod.
         """
+        self._hardware_api = hardware_api
         self._state_store = state_store
-        self._command_mapper = command_mapper
-        self._resources = resources
         self._queue_worker = queue_worker
+        self._command_mapper = command_mapper or CommandMapper()
+        self._model_utils = model_utils or ModelUtils()
 
     @property
     def state_view(self) -> StateView:
@@ -42,12 +56,18 @@ class ProtocolEngine:
 
     def play(self) -> None:
         """Start or resume executing commands in the queue."""
-        self._state_store.handle_action(PlayAction())
+        # TODO(mc, 2021-08-05): if starting, ensure plungers motors are
+        # homed if necessary
+        action = PlayAction()
+        self._state_store.commands.validate_action_allowed(action)
+        self._state_store.handle_action(action)
         self._queue_worker.start()
 
     def pause(self) -> None:
         """Pause executing commands in the queue."""
-        self._state_store.handle_action(PauseAction())
+        action = PauseAction()
+        self._state_store.commands.validate_action_allowed(action)
+        self._state_store.handle_action(action)
 
     def add_command(self, request: CommandRequest) -> Command:
         """Add a command to the `ProtocolEngine`'s queue.
@@ -61,8 +81,8 @@ class ProtocolEngine:
         """
         command = self._command_mapper.map_request_to_command(
             request=request,
-            command_id=self._resources.model_utils.generate_id(),
-            created_at=self._resources.model_utils.get_timestamp(),
+            command_id=self._model_utils.generate_id(),
+            created_at=self._model_utils.get_timestamp(),
         )
         self._state_store.handle_action(UpdateCommandAction(command=command))
 
@@ -90,15 +110,39 @@ class ProtocolEngine:
 
         return self._state_store.commands.get(command_id=command.id)
 
-    async def wait_for_done(self) -> None:
-        """Wait for the ProtocolEngine to become idle.
+    async def halt(self) -> None:
+        """Halt execution, stopping all motion and cancelling future commands.
 
-        The ProtocolEngine is considered "done" when there is no command
-        currently executing nor any commands left in the queue.
-
-        This method should not raise, but if any unexepected exceptions
-        happen during command execution that are not properly caught by
-        the CommandExecutor, this is where they will be raised.
+        You should call `stop` after calling `halt` for cleanup and to allow
+        the engine to settle and recover.
         """
-        await self._state_store.wait_for(self._state_store.commands.get_is_complete)
-        await self._queue_worker.stop()
+        self._state_store.handle_action(StopAction())
+        self._queue_worker.cancel()
+        await self._hardware_api.halt()
+
+    async def stop(self, wait_until_complete: bool = False) -> None:
+        """Gracefully stop the ProtocolEngine, waiting for it to become idle.
+
+        The engine will finish executing its current command (if any),
+        and then shut down. After an engine has been `stop`'ed, it cannot
+        be restarted.
+
+        This method should not raise, but if any exceptions happen during
+        execution that are not properly caught by the CommandExecutor, they
+        will be raised here.
+
+        Arguments:
+            wait_until_complete: Wait until _all_ commands have completed
+                before stopping the engine.
+        """
+        if wait_until_complete:
+            await self._state_store.wait_for(
+                condition=self._state_store.commands.get_all_complete
+            )
+
+        self._state_store.handle_action(StopAction())
+
+        try:
+            await self._queue_worker.join()
+        finally:
+            await self._hardware_api.stop(home_after=False)

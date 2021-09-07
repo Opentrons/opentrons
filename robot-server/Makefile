@@ -11,7 +11,7 @@ SRC_PATH = robot_server
 # Find the version of the wheel from package.json using a helper script. We
 # use python here so we can use the same version normalization that will be
 # used to create the wheel.
-wheel_file = dist/$(call python_get_wheelname,robot-server,robotserver,$(BUILD_NUMBER))
+wheel_file = dist/$(call python_get_wheelname,robot-server,robot_server,$(BUILD_NUMBER))
 
 
 # These variables can be overriden when make is invoked to customize the
@@ -32,22 +32,6 @@ ssh_opts ?= $(default_ssh_opts)
 # For the python sources
 ot_py_sources := $(filter %.py,$(shell $(SHX) find $(SRC_PATH)))
 ot_sources := $(ot_py_sources)
-
-# files and modules to format
-# TODO(mc, 2021-07-23): expand this to all files until we can format `.`
-ot_files_to_format := \
-	robot_server/errors \
-	robot_server/health \
-	robot_server/protocols \
-	robot_server/sessions \
-	robot_server/app.py \
-	robot_server/util.py \
-	tests/errors \
-	tests/health \
-	tests/protocols \
-	tests/sessions \
-	tests/test_app.py \
-	tests/test_util.py
 
 # Defined separately than the clean target so the wheel file doesn’t have to
 # depend on a PHONY target
@@ -86,7 +70,7 @@ clean:
 teardown:
 	$(pipenv) --rm
 
-dist/robotserver-%-py2.py3-none-any.whl: setup.py $(ot_sources)
+$(wheel_file): setup.py $(ot_sources)
 	$(clean_cmd)
 	$(python) setup.py $(wheel_opts) bdist_wheel
 	$(SHX) rm -rf build
@@ -101,12 +85,12 @@ test:
 .PHONY: lint
 lint:
 	$(python) -m mypy $(SRC_PATH) $(tests)
-	$(python) -m black --check $(ot_files_to_format)
+	$(python) -m black --check .
 	$(python) -m flake8 $(SRC_PATH) $(tests) setup.py
 
 .PHONY: format
 format:
-	$(python) -m black $(ot_files_to_format)
+	$(python) -m black .
 
 .PHONY: dev
 dev: export OT_ROBOT_SERVER_DOT_ENV_PATH ?= dev.env

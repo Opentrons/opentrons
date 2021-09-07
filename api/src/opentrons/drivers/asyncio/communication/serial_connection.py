@@ -13,17 +13,16 @@ log = logging.getLogger(__name__)
 
 
 class SerialConnection:
-
     @classmethod
     async def create(
-            cls,
-            port: str,
-            baud_rate: int,
-            timeout: int,
-            ack: str,
-            name: Optional[str] = None,
-            retry_wait_time_seconds: float = 0.1,
-            loop: Optional[asyncio.AbstractEventLoop] = None,
+        cls,
+        port: str,
+        baud_rate: int,
+        timeout: float,
+        ack: str,
+        name: Optional[str] = None,
+        retry_wait_time_seconds: float = 0.1,
+        loop: Optional[asyncio.AbstractEventLoop] = None,
     ) -> SerialConnection:
         """
         Create a connection.
@@ -39,21 +38,25 @@ class SerialConnection:
 
         Returns: SerialConnection
         """
-        serial = await AsyncSerial.create(port=port, baud_rate=baud_rate,
-                                          timeout=timeout, loop=loop)
+        serial = await AsyncSerial.create(
+            port=port, baud_rate=baud_rate, timeout=timeout, loop=loop
+        )
         name = name or port
         return cls(
-            serial=serial, port=port, name=name,
-            ack=ack, retry_wait_time_seconds=retry_wait_time_seconds
+            serial=serial,
+            port=port,
+            name=name,
+            ack=ack,
+            retry_wait_time_seconds=retry_wait_time_seconds,
         )
 
     def __init__(
-            self,
-            serial: AsyncSerial,
-            port: str,
-            name: str,
-            ack: str,
-            retry_wait_time_seconds: float
+        self,
+        serial: AsyncSerial,
+        port: str,
+        name: str,
+        ack: str,
+        retry_wait_time_seconds: float,
     ) -> None:
         """
         Constructor
@@ -70,9 +73,10 @@ class SerialConnection:
         self._name = name
         self._ack = ack.encode()
         self._retry_wait_time_seconds = retry_wait_time_seconds
+        self._send_data_lock = asyncio.Lock()
 
     async def send_command(
-            self, command: CommandBuilder, retries: int = 0
+        self, command: CommandBuilder, retries: int = 0, timeout: Optional[float] = None
     ) -> str:
         """
         Send a command and return the response.
@@ -80,15 +84,18 @@ class SerialConnection:
         Args:
             command: A command builder.
             retries: number of times to retry in case of timeout
+            timeout: optional override of default timeout in seconds
 
         Returns: The command response
 
         Raises: SerialException
         """
-        return await self.send_data(data=command.build(), retries=retries)
+        return await self.send_data(
+            data=command.build(), retries=retries, timeout=timeout
+        )
 
     async def send_data(
-            self, data: str, retries: int = 0
+        self, data: str, retries: int = 0, timeout: Optional[float] = None
     ) -> str:
         """
         Send data and return the response.
@@ -96,6 +103,25 @@ class SerialConnection:
         Args:
             data: The data to send.
             retries: number of times to retry in case of timeout
+            timeout: optional override of default timeout in seconds
+
+        Returns: The command response
+
+        Raises: SerialException
+        """
+        async with self._send_data_lock:
+            return await self._send_data(data=data, retries=retries, timeout=timeout)
+
+    async def _send_data(
+        self, data: str, retries: int = 0, timeout: Optional[float] = None
+    ) -> str:
+        """
+        Send data and return the response.
+
+        Args:
+            data: The data to send.
+            retries: number of times to retry in case of timeout
+            timeout: optional override of default timeout in seconds
 
         Returns: The command response
 
@@ -104,22 +130,22 @@ class SerialConnection:
         data_encode = data.encode()
 
         for retry in range(retries + 1):
-            log.debug(f'{self.name}: Write -> {data_encode!r}')
+            log.debug(f"{self.name}: Write -> {data_encode!r}")
             await self._serial.write(data=data_encode)
 
-            response = await self._serial.read_until(match=self._ack)
-            log.debug(f'{self.name}: Read <- {response!r}')
+            response = await self._serial.read_until(match=self._ack, timeout=timeout)
+            log.debug(f"{self.name}: Read <- {response!r}")
 
             if self._ack in response:
                 # Remove ack from response
-                response = response.replace(self._ack, b'')
+                response = response.replace(self._ack, b"")
                 str_response = self.process_raw_response(
                     command=data, response=response.decode()
                 )
                 self.raise_on_error(response=str_response)
                 return str_response
 
-            log.warning(f'{self.name}: retry number {retry}/{retries}')
+            log.info(f"{self.name}: retry number {retry}/{retries}")
 
             await self.on_retry()
 

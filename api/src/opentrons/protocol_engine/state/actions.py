@@ -25,6 +25,13 @@ class PauseAction:
 
 
 @dataclass(frozen=True)
+class StopAction:
+    """Stop processing commands in the engine, marking the engine status as done."""
+
+    pass
+
+
+@dataclass(frozen=True)
 class UpdateCommandAction:
     """Update a given command."""
 
@@ -34,5 +41,6 @@ class UpdateCommandAction:
 Action = Union[
     PlayAction,
     PauseAction,
+    StopAction,
     UpdateCommandAction,
 ]

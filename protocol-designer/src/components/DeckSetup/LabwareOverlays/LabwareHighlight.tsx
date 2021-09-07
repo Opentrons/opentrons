@@ -29,7 +29,7 @@ export const LabwareHighlight = (
   if (
     formData &&
     formData.stepType === 'thermocycler' &&
-    formData['thermocyclerFormType'] === THERMOCYCLER_PROFILE
+    formData.thermocyclerFormType === THERMOCYCLER_PROFILE
   ) {
     isTcProfile = true
   }

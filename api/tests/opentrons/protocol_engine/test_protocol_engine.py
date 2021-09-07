@@ -4,16 +4,18 @@ from datetime import datetime
 from decoy import Decoy
 
 from opentrons.types import MountType
+from opentrons.hardware_control import API as HardwareAPI
 from opentrons.protocol_engine import ProtocolEngine, commands
-from opentrons.protocol_engine.commands import CommandMapper
 from opentrons.protocol_engine.types import PipetteName
+from opentrons.protocol_engine.commands import CommandMapper
 from opentrons.protocol_engine.execution import QueueWorker
-from opentrons.protocol_engine.resources import ResourceProviders
+from opentrons.protocol_engine.resources import ModelUtils
 
 from opentrons.protocol_engine.state import (
     StateStore,
     PlayAction,
     PauseAction,
+    StopAction,
     UpdateCommandAction,
 )
 
@@ -26,7 +28,7 @@ def state_store(decoy: Decoy) -> StateStore:
 
 @pytest.fixture
 def queue_worker(decoy: Decoy) -> QueueWorker:
-    """Get a mock CommandExecutor."""
+    """Get a mock QueueWorker."""
     return decoy.mock(cls=QueueWorker)
 
 
@@ -37,24 +39,32 @@ def command_mapper(decoy: Decoy) -> CommandMapper:
 
 
 @pytest.fixture
-def resources(decoy: Decoy) -> ResourceProviders:
-    """Get mock ResourceProviders."""
-    return decoy.mock(cls=ResourceProviders)
+def model_utils(decoy: Decoy) -> ModelUtils:
+    """Get mock ModelUtils."""
+    return decoy.mock(cls=ModelUtils)
+
+
+@pytest.fixture
+def hardware_api(decoy: Decoy) -> HardwareAPI:
+    """Get a mock HardwareAPI."""
+    return decoy.mock(cls=HardwareAPI)
 
 
 @pytest.fixture
 def subject(
     state_store: StateStore,
     command_mapper: CommandMapper,
-    resources: ResourceProviders,
+    model_utils: ModelUtils,
     queue_worker: QueueWorker,
+    hardware_api: HardwareAPI,
 ) -> ProtocolEngine:
     """Get a ProtocolEngine test subject with its dependencies stubbed out."""
     return ProtocolEngine(
+        hardware_api=hardware_api,
         state_store=state_store,
         queue_worker=queue_worker,
         command_mapper=command_mapper,
-        resources=resources,
+        model_utils=model_utils,
     )
 
 
@@ -62,7 +72,7 @@ def test_add_command(
     decoy: Decoy,
     state_store: StateStore,
     command_mapper: CommandMapper,
-    resources: ResourceProviders,
+    model_utils: ModelUtils,
     queue_worker: QueueWorker,
     subject: ProtocolEngine,
 ) -> None:
@@ -83,8 +93,8 @@ def test_add_command(
         data=data,
     )
 
-    decoy.when(resources.model_utils.generate_id()).then_return("command-id")
-    decoy.when(resources.model_utils.get_timestamp()).then_return(created_at)
+    decoy.when(model_utils.generate_id()).then_return("command-id")
+    decoy.when(model_utils.get_timestamp()).then_return(created_at)
     decoy.when(
         command_mapper.map_request_to_command(
             request=request,
@@ -105,7 +115,7 @@ async def test_execute_command(
     decoy: Decoy,
     state_store: StateStore,
     command_mapper: CommandMapper,
-    resources: ResourceProviders,
+    model_utils: ModelUtils,
     queue_worker: QueueWorker,
     subject: ProtocolEngine,
 ) -> None:
@@ -136,8 +146,8 @@ async def test_execute_command(
         data=data,
     )
 
-    decoy.when(resources.model_utils.generate_id()).then_return("command-id")
-    decoy.when(resources.model_utils.get_timestamp()).then_return(created_at)
+    decoy.when(model_utils.generate_id()).then_return("command-id")
+    decoy.when(model_utils.get_timestamp()).then_return(created_at)
 
     decoy.when(
         command_mapper.map_request_to_command(
@@ -172,7 +182,10 @@ def test_play(
     """It should be able to start executing queued commands."""
     subject.play()
 
-    decoy.verify(state_store.handle_action(PlayAction()))
+    decoy.verify(
+        state_store.commands.validate_action_allowed(PlayAction()),
+        state_store.handle_action(PlayAction()),
+    )
 
 
 def test_pause(
@@ -180,22 +193,83 @@ def test_pause(
     state_store: StateStore,
     subject: ProtocolEngine,
 ) -> None:
-    """It should be able to stop executing queued commands."""
+    """It should be able to pause executing queued commands."""
     subject.pause()
 
-    decoy.verify(state_store.handle_action(PauseAction()))
+    decoy.verify(
+        state_store.commands.validate_action_allowed(PauseAction()),
+        state_store.handle_action(PauseAction()),
+    )
 
 
-async def test_wait_for_done(
+async def test_stop(
     decoy: Decoy,
     state_store: StateStore,
     queue_worker: QueueWorker,
+    hardware_api: HardwareAPI,
     subject: ProtocolEngine,
 ) -> None:
-    """It should be able to wait until the engine is done executing."""
-    await subject.wait_for_done()
+    """It should be able to stop the engine."""
+    await subject.stop()
 
     decoy.verify(
-        await state_store.wait_for(state_store.commands.get_is_complete),
-        await queue_worker.stop(),
+        state_store.handle_action(StopAction()),
+        await queue_worker.join(),
+        await hardware_api.stop(home_after=False),
+    )
+
+
+async def test_stop_stops_hardware_if_queue_worker_join_fails(
+    decoy: Decoy,
+    state_store: StateStore,
+    queue_worker: QueueWorker,
+    hardware_api: HardwareAPI,
+    subject: ProtocolEngine,
+) -> None:
+    """It should be able to stop the engine."""
+    decoy.when(
+        await queue_worker.join(),
+    ).then_raise(RuntimeError("oh no"))
+
+    with pytest.raises(RuntimeError, match="oh no"):
+        await subject.stop()
+
+    decoy.verify(
+        await hardware_api.stop(home_after=False),
+        times=1,
+    )
+
+
+async def test_stop_after_wait(
+    decoy: Decoy,
+    state_store: StateStore,
+    queue_worker: QueueWorker,
+    hardware_api: HardwareAPI,
+    subject: ProtocolEngine,
+) -> None:
+    """It should be able to stop the engine after waiting for commands to complete."""
+    await subject.stop(wait_until_complete=True)
+
+    decoy.verify(
+        await state_store.wait_for(condition=state_store.commands.get_all_complete),
+        state_store.handle_action(StopAction()),
+        await queue_worker.join(),
+        await hardware_api.stop(home_after=False),
+    )
+
+
+async def test_halt(
+    decoy: Decoy,
+    state_store: StateStore,
+    queue_worker: QueueWorker,
+    hardware_api: HardwareAPI,
+    subject: ProtocolEngine,
+) -> None:
+    """It should be able to halt the engine."""
+    await subject.halt()
+
+    decoy.verify(
+        state_store.handle_action(StopAction()),
+        queue_worker.cancel(),
+        await hardware_api.halt(),
     )

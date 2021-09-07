@@ -10,9 +10,7 @@ class SimulatingDriver(AbstractThermocyclerDriver):
     def __init__(self):
         self._ramp_rate: Optional[float] = None
         self._lid_status = ThermocyclerLidStatus.OPEN
-        self._lid_temperature = Temperature(
-            current=self.DEFAULT_TEMP, target=None
-        )
+        self._lid_temperature = Temperature(current=self.DEFAULT_TEMP, target=None)
         self._plate_temperature = PlateTemperature(
             current=self.DEFAULT_TEMP, target=None, hold=None
         )
@@ -38,9 +36,12 @@ class SimulatingDriver(AbstractThermocyclerDriver):
     async def get_lid_temperature(self) -> Temperature:
         return self._lid_temperature
 
-    async def set_plate_temperature(self, temp: float,
-                                    hold_time: Optional[float] = None,
-                                    volume: Optional[float] = None) -> None:
+    async def set_plate_temperature(
+        self,
+        temp: float,
+        hold_time: Optional[float] = None,
+        volume: Optional[float] = None,
+    ) -> None:
         self._plate_temperature.target = temp
         self._plate_temperature.current = temp
         self._plate_temperature.hold = hold_time
@@ -52,7 +53,7 @@ class SimulatingDriver(AbstractThermocyclerDriver):
         self._ramp_rate = ramp_rate
 
     async def set_lid_temperature(self, temp: float) -> None:
-        """ Set the lid temperature in deg Celsius """
+        """Set the lid temperature in deg Celsius"""
         self._lid_temperature.target = temp
         self._lid_temperature.current = temp
 
@@ -71,9 +72,11 @@ class SimulatingDriver(AbstractThermocyclerDriver):
         await self.deactivate_block()
 
     async def get_device_info(self):
-        return {'serial': 'dummySerialTC',
-                'model': 'dummyModelTC',
-                'version': 'dummyVersionTC'}
+        return {
+            "serial": "dummySerialTC",
+            "model": "dummyModelTC",
+            "version": "dummyVersionTC",
+        }
 
     async def enter_programming_mode(self):
         pass

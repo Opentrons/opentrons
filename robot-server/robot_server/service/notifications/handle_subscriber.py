@@ -14,17 +14,11 @@ from robot_server.settings import get_settings
 log = logging.getLogger(__name__)
 
 
-async def handle_socket(
-        websocket: WebSocket,
-        topics: List[str]) -> None:
+async def handle_socket(websocket: WebSocket, topics: List[str]) -> None:
     """Handle a websocket connection."""
-    subscriber = create(
-        get_settings().notification_server_subscriber_address,
-        topics
-    )
+    subscriber = create(get_settings().notification_server_subscriber_address, topics)
     await asyncio.gather(
-        receive(websocket, subscriber),
-        route_events(websocket, subscriber)
+        receive(websocket, subscriber), route_events(websocket, subscriber)
     )
 
 

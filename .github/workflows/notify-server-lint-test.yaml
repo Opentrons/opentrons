@@ -44,6 +44,8 @@ jobs:
         run: make -C notify-server lint
       - name: Test
         run: make -C notify-server test
-      - uses: 'codecov/codecov-action@v1'
+      - name: 'Upload coverage report'
+        uses: 'codecov/codecov-action@v2'
         with:
-          file: ./notify-server/coverage.xml
+          files: ./notify-server/coverage.xml
+          flags: notify-server

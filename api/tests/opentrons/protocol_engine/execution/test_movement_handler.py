@@ -27,7 +27,7 @@ def state_store(decoy: Decoy) -> StateStore:
 @pytest.fixture
 def handler(state_store: StateStore, hardware_api: HardwareAPI) -> MovementHandler:
     """Create a PipettingHandler with its dependencies mocked out."""
-    return MovementHandler(state_store=state_store, hardware=hardware_api)
+    return MovementHandler(state_store=state_store, hardware_api=hardware_api)
 
 
 async def test_move_to_well(

@@ -34,23 +34,16 @@ class AbstractLabwareGeometry(ABC):
 
 
 class LabwareGeometry(AbstractLabwareGeometry):
-
-    def __init__(self,
-                 definition: LabwareDefinition,
-                 parent: Location):
+    def __init__(self, definition: LabwareDefinition, parent: Location):
         """Constructor"""
         self._parent = parent
-        offset = definition['cornerOffsetFromSlot']
-        self._offset = Point(
-            offset['x'],
-            offset['y'],
-            offset['z']
-        ) + parent.point
+        offset = definition["cornerOffsetFromSlot"]
+        self._offset = Point(offset["x"], offset["y"], offset["z"]) + parent.point
 
-        dimensions = definition['dimensions']
-        self._x_dimension = dimensions['xDimension']
-        self._y_dimension = dimensions['yDimension']
-        self._z_dimension = dimensions['zDimension']
+        dimensions = definition["dimensions"]
+        self._x_dimension = dimensions["xDimension"]
+        self._y_dimension = dimensions["yDimension"]
+        self._z_dimension = dimensions["zDimension"]
 
     @property
     def parent(self) -> Location:

@@ -96,4 +96,4 @@ deploy: wheel
 
 .PHONY: test
 test:
-	$(python) -m pytest tests
+	$(python) -m pytest --cov=opentrons_shared_data --cov-report xml:coverage.xml tests

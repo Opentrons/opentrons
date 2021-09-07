@@ -16,8 +16,8 @@ from robot_server.util import FileMeta, save_upload
 log = logging.getLogger(__name__)
 
 
-DIR_PREFIX = 'opentrons_'
-DIR_SUFFIX = '._proto_dir'
+DIR_PREFIX = "opentrons_"
+DIR_SUFFIX = "._proto_dir"
 
 
 @dataclass
@@ -28,8 +28,8 @@ class Contents:
 
 
 def create(
-        protocol_file: UploadFile,
-        support_files: typing.List[UploadFile]) -> Contents:
+    protocol_file: UploadFile, support_files: typing.List[UploadFile]
+) -> Contents:
     """
     Create the temporary directory.
 
@@ -38,14 +38,12 @@ def create(
     :raise ProtocolIOException:
     """
     try:
-        temp_dir = TemporaryDirectory(suffix=DIR_SUFFIX,
-                                      prefix=DIR_PREFIX)
+        temp_dir = TemporaryDirectory(suffix=DIR_SUFFIX, prefix=DIR_PREFIX)
 
         try:
             temp_dir_path = Path(temp_dir.name)
             protocol_file_meta = save_upload(temp_dir_path, protocol_file)
-            support_files_meta = [save_upload(temp_dir_path, s)
-                                  for s in support_files]
+            support_files_meta = [save_upload(temp_dir_path, s) for s in support_files]
         except IOError:
             # File saving failed. Remove the temporary directory and reraise.
             temp_dir.cleanup()
@@ -61,9 +59,7 @@ def create(
     )
 
 
-def update(
-        contents: Contents,
-        upload_file: UploadFile) -> Contents:
+def update(contents: Contents, upload_file: UploadFile) -> Contents:
     """
     Update the contents of the protocol temp directory.
 
@@ -80,14 +76,11 @@ def update(
 
     if file_meta.path == contents.protocol_file.path:
         # The protocol file has been replaced
-        return replace(
-            contents,
-            protocol_file=file_meta)
+        return replace(contents, protocol_file=file_meta)
     else:
         # A support file has been added or replaces.
         # Omit the file being replaced from existing support files (if found).
-        filtered_files = [f for f in contents.support_files
-                          if f.path != file_meta.path]
+        filtered_files = [f for f in contents.support_files if f.path != file_meta.path]
         return replace(
             contents,
             support_files=filtered_files + [file_meta],

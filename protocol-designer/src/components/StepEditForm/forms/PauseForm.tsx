@@ -51,7 +51,7 @@ export const PauseForm = (props: StepFormProps): JSX.Element => {
         <div className={styles.section_column}>
           <div className={styles.checkbox_row}>
             <RadioGroupField
-              {...propsForFields['pauseAction']}
+              {...propsForFields.pauseAction}
               options={[
                 {
                   name: i18n.t(
@@ -64,7 +64,7 @@ export const PauseForm = (props: StepFormProps): JSX.Element => {
           </div>
           <div className={styles.checkbox_row}>
             <RadioGroupField
-              {...propsForFields['pauseAction']}
+              {...propsForFields.pauseAction}
               options={[
                 {
                   name: i18n.t(
@@ -78,17 +78,17 @@ export const PauseForm = (props: StepFormProps): JSX.Element => {
           {pauseAction === PAUSE_UNTIL_TIME && (
             <div className={styles.form_row}>
               <TextField
-                {...propsForFields['pauseHour']}
+                {...propsForFields.pauseHour}
                 className={styles.small_field}
                 units={i18n.t('application.units.hours')}
               />
               <TextField
-                {...propsForFields['pauseMinute']}
+                {...propsForFields.pauseMinute}
                 className={styles.small_field}
                 units={i18n.t('application.units.minutes')}
               />
               <TextField
-                {...propsForFields['pauseSecond']}
+                {...propsForFields.pauseSecond}
                 className={styles.small_field}
                 units={i18n.t('application.units.seconds')}
               />
@@ -103,7 +103,7 @@ export const PauseForm = (props: StepFormProps): JSX.Element => {
           <div {...targetProps}>
             <div className={styles.checkbox_row}>
               <RadioGroupField
-                {...propsForFields['pauseAction']}
+                {...propsForFields.pauseAction}
                 className={cx({
                   [styles.disabled]: !pauseUntilTempEnabled,
                 })}
@@ -125,7 +125,7 @@ export const PauseForm = (props: StepFormProps): JSX.Element => {
                   )}
                 >
                   <StepFormDropdown
-                    {...propsForFields['moduleId']}
+                    {...propsForFields.moduleId}
                     options={moduleLabwareOptions}
                   />
                 </FormGroup>
@@ -135,7 +135,7 @@ export const PauseForm = (props: StepFormProps): JSX.Element => {
                   )}
                 >
                   <TextField
-                    {...propsForFields['pauseTemperature']}
+                    {...propsForFields.pauseTemperature}
                     className={styles.small_field}
                     units={i18n.t('application.units.degrees')}
                   />
@@ -153,11 +153,9 @@ export const PauseForm = (props: StepFormProps): JSX.Element => {
             >
               <textarea
                 className={styles.textarea_field}
-                value={propsForFields['pauseMessage'].value as string}
+                value={propsForFields.pauseMessage.value as string}
                 onChange={(e: React.ChangeEvent<any>) =>
-                  propsForFields['pauseMessage'].updateValue(
-                    e.currentTarget.value
-                  )
+                  propsForFields.pauseMessage.updateValue(e.currentTarget.value)
                 }
               />
             </FormGroup>

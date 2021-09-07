@@ -1,9 +1,13 @@
-from typing import List
-from serial import Serial  # type: ignore
-from opentrons.drivers import serial_communication
+from __future__ import annotations
+from typing import List, Optional
+from opentrons.drivers.asyncio.communication import SerialConnection
 from dataclasses import dataclass
-from opentrons.hardware_control.emulation.app import \
-    TEMPDECK_PORT, THERMOCYCLER_PORT, SMOOTHIE_PORT, MAGDECK_PORT
+from opentrons.hardware_control.emulation.app import (
+    TEMPDECK_PORT,
+    THERMOCYCLER_PORT,
+    SMOOTHIE_PORT,
+    MAGDECK_PORT,
+)
 
 
 @dataclass
@@ -20,53 +24,67 @@ class GCodeWatcher:
     """
 
     DEVICE_LOOKUP_BY_PORT = {
-        SMOOTHIE_PORT: 'smoothie',
-        TEMPDECK_PORT: 'tempdeck',
-        THERMOCYCLER_PORT: 'thermocycler',
-        MAGDECK_PORT: 'magdeck',
+        SMOOTHIE_PORT: "smoothie",
+        TEMPDECK_PORT: "tempdeck",
+        THERMOCYCLER_PORT: "thermocycler",
+        MAGDECK_PORT: "magdeck",
     }
 
     def __init__(self) -> None:
         self._command_list: List[WatcherData] = []
+        self._original_send_data = SerialConnection.send_data
 
-        self._old_write_return = serial_communication.write_and_return
-        serial_communication.write_and_return = self._pull_info
+    def __enter__(self) -> GCodeWatcher:
+        """Patch the send command function"""
+
+        async def _patch(
+            _self: SerialConnection,
+            data: str,
+            retries: int = 0,
+            timeout: Optional[float] = None,
+        ) -> str:
+            """
+            Side-effect function that gathers arguments passed to
+            SerialConnection.send_data and stores them internally.
+
+            Args:
+                _self: the SerialConnection instance
+                data: the raw sent GCODE
+                retries: number of retries
+                timeout: optional timeout
+
+            Returns:
+                the response
+            """
+            response = await self._original_send_data(_self, data, retries, timeout)
+            self._command_list.append(
+                WatcherData(
+                    raw_g_code=data, device=self._parse_device(_self), response=response
+                )
+            )
+            return response
+
+        # mypy error "Cannot assign to a method" is ignored
+        SerialConnection.send_data = _patch  # type: ignore
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """Reset the the patch"""
+        # mypy error "Cannot assign to a method" is ignored
+        SerialConnection.send_data = self._original_send_data  # type: ignore
 
     @classmethod
-    def _parse_device(cls, serial_connection: Serial):
+    def _parse_device(cls, serial_connection: SerialConnection):
         """
         Based on port specified in connection URL, parse out what the name
         of the device is
         """
         serial_port = serial_connection.port
-        device_port = serial_port[serial_port.rfind(':') + 1:]
+        device_port = serial_port[serial_port.rfind(":") + 1 :]
         return cls.DEVICE_LOOKUP_BY_PORT[int(device_port)]
-
-    def _pull_info(self, *args, **kwargs):
-        """
-        Side-effect function that gathers arguments passed to
-        write_and_return, adds the current datetime to the list
-        of arguments, and stores them internally.
-
-        Note: Does not do anything with the kwargs. They data
-        provided in them is not required. It is still required that
-        the parameter be specified in the method signature though.
-        """
-        response = self._old_write_return(*args, **kwargs)
-        self._command_list.append(
-            WatcherData(
-                raw_g_code=args[0],
-                device=self._parse_device(args[2]),
-                response=response
-            )
-        )
-        return response
 
     def get_command_list(self) -> List[WatcherData]:
         return self._command_list
 
     def flush_command_list(self) -> None:
         self._command_list = []
-
-    def cleanup(self) -> None:
-        serial_communication.write_and_return = self._old_write_return

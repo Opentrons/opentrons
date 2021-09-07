@@ -11,7 +11,13 @@ export const SLOT_RENDER_HEIGHT = SLOT_WIDTH_MM // along Y axis in SVG coords
 // taken from opentrons_1_trash_1100ml_fixed v1's dimensions
 export const FIXED_TRASH_RENDER_HEIGHT = 165.86 // along Y axis in SVG coords
 
+// used for module visualization, remove this when we start using actual module dimensions
+export const STD_SLOT_X_DIM = 128
+export const STD_SLOT_Y_DIM = 86
+export const STD_SLOT_DIVIDER_WIDTH = 4
+
 export const OPENTRONS_LABWARE_NAMESPACE = 'opentrons'
+export const FIXED_TRASH_ID = 'trashId'
 
 // TODO: IL 2020-02-19 These 3 constants are DEPRECATED because they're ambiguous model vs type.
 export const THERMOCYCLER: 'thermocycler' = 'thermocycler'
@@ -36,6 +42,9 @@ export const GEN1: 'GEN1' = 'GEN1'
 // pipette mounts
 export const LEFT: 'left' = 'left'
 export const RIGHT: 'right' = 'right'
+
+// fake slot that PD uses to represent the slot the thermocycler sits in
+export const SPAN7_8_10_11_SLOT: 'span7_8_10_11' = 'span7_8_10_11'
 
 // NOTE: these are NOT module MODELs, they are `moduleType`s. Should match ENUM in module definition file.
 export const TEMPERATURE_MODULE_TYPE: 'temperatureModuleType' =

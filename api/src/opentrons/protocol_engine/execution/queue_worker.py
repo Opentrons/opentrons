@@ -4,6 +4,7 @@ from logging import getLogger
 from typing import Optional
 
 from ..state import StateStore
+from ..errors import ProtocolEngineStoppedError
 from .command_executor import CommandExecutor
 
 
@@ -37,28 +38,38 @@ class QueueWorker:
         if self._worker_task is None:
             self._worker_task = asyncio.create_task(self._run_commands())
 
-    async def stop(self) -> None:
-        """Stop proccessing commands and clean up.
+    def cancel(self) -> None:
+        """Cancel any in-progress commands.
 
-        This method should be called when you are done executing commands.
+        This method is synchronous to allow synchronous callers to
+        cancel the ongoing background task in situations where it
+        needs to happen immediately.
+
+        You should call `join` after calling `cancel` to clean up and
+        propagate errors.
         """
+        if self._worker_task:
+            self._worker_task.cancel()
+
+    async def join(self) -> None:
+        """Wait for the worker to finish, propagating any errors."""
         worker_task = self._worker_task
 
         if worker_task:
             self._worker_task = None
-            worker_task.cancel()
 
             try:
                 await worker_task
-            except asyncio.CancelledError:
+            except (ProtocolEngineStoppedError, asyncio.CancelledError):
                 pass
             except Exception as e:
                 log.error("Unhandled exception in QueueWorker job", exc_info=e)
                 raise e
 
     async def _run_commands(self) -> None:
-        while True:
-            get_next_queued = self._state_store.commands.get_next_queued
-            command_id = await self._state_store.wait_for(condition=get_next_queued)
+        while not self._state_store.commands.get_stop_requested():
+            command_id = await self._state_store.wait_for(
+                condition=self._state_store.commands.get_next_queued
+            )
 
             await self._command_executor.execute(command_id=command_id)

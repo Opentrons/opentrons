@@ -43,4 +43,3 @@ export type WellVolumes = Record<string, number>
 // or special PD-specific 'span7_8_10_11' slot (for thermocycler)
 // or a module ID.
 export type DeckSlot = string
-export type ModuleOrientation = 'left' | 'right'

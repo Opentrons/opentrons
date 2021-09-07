@@ -4,6 +4,7 @@ import * as ConfigSelectors from '../../config/selectors'
 import * as CalibrationSelectors from '../../calibration/selectors'
 import * as DiscoverySelectors from '../../discovery/selectors'
 import * as PipetteSelectors from '../../pipettes/selectors'
+import * as ProtocolSelectors from '../../protocol/selectors'
 import * as RobotSelectors from '../../robot/selectors'
 import * as BuildrootSelectors from '../../buildroot/selectors'
 import * as ShellSelectors from '../../shell'
@@ -28,6 +29,7 @@ jest.mock('../../config/selectors')
 jest.mock('../../calibration/selectors')
 jest.mock('../../discovery/selectors')
 jest.mock('../../pipettes/selectors')
+jest.mock('../../protocol/selectors')
 jest.mock('../../buildroot/selectors')
 jest.mock('../../system-info/selectors')
 jest.mock('../../shell')
@@ -38,6 +40,9 @@ const mockGetFeatureFlags = ConfigSelectors.getFeatureFlags as jest.MockedFuncti
 >
 const mockGetConnectedRobot = DiscoverySelectors.getConnectedRobot as jest.MockedFunction<
   typeof DiscoverySelectors.getConnectedRobot
+>
+const mockGetProtocolData = ProtocolSelectors.getProtocolData as jest.MockedFunction<
+  typeof ProtocolSelectors.getProtocolData
 >
 const mockGetProtocolPipettesMatching = PipetteSelectors.getProtocolPipettesMatching as jest.MockedFunction<
   typeof PipetteSelectors.getProtocolPipettesMatching
@@ -127,6 +132,7 @@ describe('nav selectors', () => {
       preProtocolFlowWithoutRPC: false,
     })
     mockGetConnectedRobot.mockReturnValue(null)
+    mockGetProtocolData.mockReturnValue(null)
     mockGetProtocolPipettesMatching.mockReturnValue(false)
     mockGetProtocolPipettesCalibrated.mockReturnValue(false)
     mockGetAvailableShellUpdate.mockReturnValue(null)
@@ -458,6 +464,123 @@ describe('nav selectors', () => {
       before()
       expect(selector(state)).toEqual(expected)
       after()
+    })
+  })
+
+  // rename this when RPC FF is removed and remove the next describe block as it will be unnecessary
+  describe('getRunDisabledReasonNoRPC', () => {
+    let robot: unknown
+    let protocolData: unknown
+    let pipettesMatch: boolean
+    let pipettesCalibrated: boolean
+    let deckCalOk: boolean
+    beforeEach(() => {
+      robot = {}
+      protocolData = {}
+      pipettesMatch = true
+      pipettesCalibrated = true
+      deckCalOk = true
+    })
+    it('should tell user to connect to a robot', () => {
+      robot = null
+      expect(
+        // @ts-expect-error resultFunc not part of Selector interface :(
+        Selectors.getRunDisabledReasonNoRPC.resultFunc(
+          robot,
+          protocolData,
+          pipettesMatch,
+          pipettesCalibrated,
+          deckCalOk
+        )
+      ).toBe('Please connect to a robot to proceed')
+    })
+    it('should tell user to load a protocol', () => {
+      protocolData = null
+      expect(
+        // @ts-expect-error resultFunc not part of Selector interface :(
+        Selectors.getRunDisabledReasonNoRPC.resultFunc(
+          robot,
+          protocolData,
+          pipettesMatch,
+          pipettesCalibrated,
+          deckCalOk
+        )
+      ).toBe('Please load a protocol to proceed')
+    })
+    it('should tell user that the attached pipettes do not match', () => {
+      pipettesMatch = false
+      expect(
+        // @ts-expect-error resultFunc not part of Selector interface :(
+        Selectors.getRunDisabledReasonNoRPC.resultFunc(
+          robot,
+          protocolData,
+          pipettesMatch,
+          pipettesCalibrated,
+          deckCalOk
+        )
+      ).toBe(
+        'Attached pipettes do not match pipettes specified in loaded protocol'
+      )
+    })
+    it('should tell user to calibrate pipettes', () => {
+      pipettesCalibrated = false
+      expect(
+        // @ts-expect-error resultFunc not part of Selector interface :(
+        Selectors.getRunDisabledReasonNoRPC.resultFunc(
+          robot,
+          protocolData,
+          pipettesMatch,
+          pipettesCalibrated,
+          deckCalOk
+        )
+      ).toBe(
+        'Please calibrate all pipettes specified in loaded protocol to proceed'
+      )
+    })
+    it('should tell user to calibrate the deck', () => {
+      deckCalOk = false
+      expect(
+        // @ts-expect-error resultFunc not part of Selector interface :(
+        Selectors.getRunDisabledReasonNoRPC.resultFunc(
+          robot,
+          protocolData,
+          pipettesMatch,
+          pipettesCalibrated,
+          deckCalOk
+        )
+      ).toBe('Calibrate your deck to proceed')
+    })
+  })
+  describe('getRunDisabledReason', () => {
+    let runDisabledReasonRPC: any
+    let runDisabledReasonNoRPC: any
+    let featureFlags: any
+    beforeEach(() => {
+      runDisabledReasonRPC = 'disabled reason RPC'
+      runDisabledReasonNoRPC = 'disabled reason No RPC'
+      featureFlags = { preProtocolFlowWithoutRPC: false }
+    })
+    it('should return the disabled reason for pre protocol flow WITHOUT RPC when FF ENABLED', () => {
+      featureFlags.preProtocolFlowWithoutRPC = true
+      expect(
+        // @ts-expect-error resultFunc not part of Selector interface :(
+        Selectors.getRunDisabledReason.resultFunc(
+          runDisabledReasonRPC,
+          runDisabledReasonNoRPC,
+          featureFlags
+        )
+      ).toBe('disabled reason No RPC')
+    })
+    it('should return the disabled reason for pre protocol flow WITH RPC when FF DISABLED', () => {
+      featureFlags.preProtocolFlowWithoutRPC = false
+      expect(
+        // @ts-expect-error resultFunc not part of Selector interface :(
+        Selectors.getRunDisabledReason.resultFunc(
+          runDisabledReasonRPC,
+          runDisabledReasonNoRPC,
+          featureFlags
+        )
+      ).toBe('disabled reason RPC')
     })
   })
 })

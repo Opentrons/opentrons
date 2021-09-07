@@ -35,8 +35,8 @@ class Parser:
         for i in self.GCODE_RE.finditer(line):
             if previous:
                 yield self._create_command(
-                    line[previous.start(): previous.end()],
-                    line[previous.end(): i.start()]
+                    line[previous.start() : previous.end()],
+                    line[previous.end() : i.start()],
                 )
             else:
                 # This is the first match. It better be at the beginning or
@@ -47,8 +47,7 @@ class Parser:
         if previous:
             # Create command from final GCODE and remainder of the line.
             yield self._create_command(
-                line[previous.start(): previous.end()],
-                line[previous.end():]
+                line[previous.start() : previous.end()], line[previous.end() :]
             )
         elif line:
             # There are no GCODEs and it's a non-empty line.
@@ -70,6 +69,6 @@ class Parser:
             gcode=gcode,
             body=body.strip(),
             params={
-                p['prefix']: float(p['number']) if p['number'] else None for p in pars
-            }
+                p["prefix"]: float(p["number"]) if p["number"] else None for p in pars
+            },
         )

@@ -83,7 +83,7 @@ def handler(
     """Create a PipettingHandler with its dependencies mocked out."""
     return PipettingHandler(
         state_store=state_store,
-        hardware=hardware_api,
+        hardware_api=hardware_api,
         movement_handler=movement_handler,
     )
 

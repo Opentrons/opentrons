@@ -12,7 +12,7 @@ log = logging.getLogger(__name__)
 
 
 @lru_cache(maxsize=1)
-def get_settings() -> 'RobotServerSettings':
+def get_settings() -> "RobotServerSettings":
     """Get the settings"""
     load_dotenv(get_dotenv_path())
     return RobotServerSettings()
@@ -25,7 +25,8 @@ def get_dotenv_path() -> Path:
 
 class Environment(BaseSettings):
     """Environment related settings"""
-    dot_env_path: Path = infer_config_base_dir() / 'robot.env'
+
+    dot_env_path: Path = infer_config_base_dir() / "robot.env"
 
     class Config:
         env_prefix = "OT_ROBOT_SERVER_"
@@ -38,33 +39,34 @@ class RobotServerSettings(BaseSettings):
     To override any of these create an environment variable with prefix
     OT_ROBOT_SERVER_.
     """
+
     ws_host_name: str = Field(
         "localhost",
         description="TCP/IP hostname to serve on. Will be ignored if domain "
-                    "socket is defined.")
+        "socket is defined.",
+    )
     ws_port: int = Field(
         31950,
         description="TCP/IP port to serve on. Will be ignored if domain socket"
-                    " is defined.")
+        " is defined.",
+    )
     ws_domain_socket: typing.Optional[str] = Field(
         "/run/aiohttp.sock",
         description="Unix file system path to serve on. This value supersedes"
-                    " the port and host name settings."
+        " the port and host name settings.",
     )
     simulator_configuration_file_path: str = Field(
         None,
-        description="Path to a json file that describes the hardware"
-                    " simulator."
+        description="Path to a json file that describes the hardware" " simulator.",
     )
 
     protocol_manager_max_protocols: int = Field(
-        1,
-        description="The maximum number of protocols allowed for upload"
+        1, description="The maximum number of protocols allowed for upload"
     )
 
     notification_server_subscriber_address: str = Field(
         "tcp://localhost:5555",
-        description="The endpoint to subscribe to notification server topics."
+        description="The endpoint to subscribe to notification server topics.",
     )
 
     class Config:

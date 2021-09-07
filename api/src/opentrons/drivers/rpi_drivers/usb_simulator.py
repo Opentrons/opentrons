@@ -27,13 +27,12 @@ class USBBusSimulator(USBDriverInterface):
         Use the sys bus path to find all of the USBs with
         active devices connected to them.
         """
-        return ['']
+        return [""]
 
     @staticmethod
     def read_symlink(virtual_port: str) -> str:
-        """
-        """
-        return ''
+        """ """
+        return ""
 
     @property
     def board_revision(self) -> BoardRevision:
@@ -97,13 +96,12 @@ class USBBusSimulator(USBDriverInterface):
         generally contains tty/tty* in its name.
         :returns: The matching port, or an empty port dataclass
         """
-        return USBPort(
-            name='', sub_names=[], device_path=device_path)
+        return USBPort(name="", sub_names=[], device_path=device_path)
 
     def sort_ports(self) -> None:
         pass
 
     def match_virtual_ports(
-            self, virtual_port: List[ModuleAtPort]
-            ) -> List[ModuleAtPort]:
+        self, virtual_port: List[ModuleAtPort]
+    ) -> List[ModuleAtPort]:
         return virtual_port

@@ -59,6 +59,7 @@ export function ProtocolUpload(): JSX.Element {
             onClick: handleCloseProtocol,
             title: t('shared:close'),
             children: t('shared:close'),
+            iconName: 'close' as const,
           },
         }
       : {

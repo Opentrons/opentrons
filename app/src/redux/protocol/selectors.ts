@@ -1,14 +1,21 @@
 import path from 'path'
 import startCase from 'lodash/startCase'
-
+import uniq from 'lodash/uniq'
 import { createSelector } from 'reselect'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import { getPipetteNameSpecs } from '@opentrons/shared-data'
 
 import { fileIsJson } from './protocol-data'
 import { createLogger } from '../../logger'
+import * as PipetteConstants from '../pipettes/constants'
 
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { State } from '../types'
-import type { ProtocolData, ProtocolType, ProtocolFile } from './types'
+import type {
+  ProtocolData,
+  ProtocolType,
+  ProtocolFile,
+  ProtocolPipetteTipRackByMount,
+} from './types'
 
 type ProtocolInfoSelector = (
   state: State
@@ -217,5 +224,57 @@ export const getProtocolMethod: (
     if (!file || !contents) return null
     if (readableJsonName) return readableJsonName
     return `${METHOD_OT_API}${apiVersion !== null ? ` v${apiVersion}` : ''}`
+  }
+)
+
+export const getProtocolPipetteTipRacks: (
+  state: State
+) => ProtocolPipetteTipRackByMount = createSelector(
+  getProtocolData,
+  protocolData => {
+    if (protocolData == null || !('commands' in protocolData)) {
+      return { left: null, right: null }
+    }
+    const { pipettes, labware, labwareDefinitions, commands } = protocolData
+    const tipRackCommands = commands.filter(
+      commandObject => commandObject.command === 'pickUpTip'
+    )
+    const protocolPipetteValues = Object.values(pipettes)
+    const protocolPipetteKeys = Object.keys(pipettes)
+
+    return PipetteConstants.PIPETTE_MOUNTS.reduce<ProtocolPipetteTipRackByMount>(
+      (result, mount) => {
+        const pipetteOnMount = protocolPipetteValues.find(
+          pipette => pipette.mount === mount
+        )
+        if (pipetteOnMount !== undefined) {
+          const index = protocolPipetteValues.indexOf(pipetteOnMount)
+          const pipetteKey = protocolPipetteKeys[index]
+          let tipRackDefs = new Array<LabwareDefinition2>()
+          tipRackCommands.forEach(command => {
+            if (
+              'pipette' in command.params &&
+              'labware' in command.params &&
+              pipetteKey === command.params.pipette
+            ) {
+              const tipRack = labware[command.params.labware]
+              const tipRackDefinition = labwareDefinitions[tipRack.definitionId]
+              if (tipRackDefinition !== undefined) {
+                tipRackDefs.push(tipRackDefinition)
+              }
+            }
+            tipRackDefs = uniq(tipRackDefs)
+          })
+          result[mount] = {
+            pipetteSpecs: getPipetteNameSpecs(pipetteOnMount.name),
+            tipRackDefs: tipRackDefs,
+          }
+        } else {
+          result[mount] = null
+        }
+        return result
+      },
+      { left: null, right: null }
+    )
   }
 )

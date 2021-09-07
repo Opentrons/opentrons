@@ -18,7 +18,7 @@ class TipLengthCalibration(TypedDict):
     lastModified: datetime
     source: SourceType
     status: CalibrationStatusDict
-    uri: typing.Union[LabwareUri, Literal['']]
+    uri: typing.Union[LabwareUri, Literal[""]]
 
 
 class ModuleDict(TypedDict):
@@ -31,6 +31,7 @@ class CalibrationIndexDict(TypedDict):
     The dict that is returned from
     the index.json file.
     """
+
     uri: str
     slot: str
     module: ModuleDict
@@ -51,6 +52,7 @@ class CalibrationDict(TypedDict):
     The dict that is returned from a labware
     offset file.
     """
+
     default: OffsetDict
     tipLength: TipLengthDict
 

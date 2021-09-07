@@ -2,11 +2,11 @@
 import cookie from 'cookie'
 
 export const shutdownFullstory = (): void => {
-  if (window[window['_fs_namespace']]) {
-    window[window['_fs_namespace']].shutdown()
+  if (window[window._fs_namespace]) {
+    window[window._fs_namespace].shutdown()
   }
   // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-  delete window[window['_fs_namespace']]
+  delete window[window._fs_namespace]
 }
 
 const _setAnalyticsTags = (): void => {
@@ -19,8 +19,8 @@ const _setAnalyticsTags = (): void => {
   // NOTE: fullstory expects the keys 'displayName' and 'email' verbatim
   // though all other key names must be fit the schema described here
   // https://help.fullstory.com/develop-js/137380
-  if (window[window['_fs_namespace']]) {
-    window[window['_fs_namespace']].setUserVars({
+  if (window[window._fs_namespace]) {
+    window[window._fs_namespace].setUserVars({
       displayName,
       email,
       commit_str,
@@ -32,10 +32,10 @@ const _setAnalyticsTags = (): void => {
 }
 
 // NOTE: this code snippet is distributed by Fullstory and formatting has been maintained
-window['_fs_debug'] = false
-window['_fs_host'] = 'fullstory.com'
-window['_fs_org'] = process.env.OT_PD_FULLSTORY_ORG
-window['_fs_namespace'] = 'FS'
+window._fs_debug = false
+window._fs_host = 'fullstory.com'
+window._fs_org = process.env.OT_PD_FULLSTORY_ORG
+window._fs_namespace = 'FS'
 
 export const initializeFullstory = (): void => {
   ;(function (m, n, e, t, l, o, g: any, y: any) {
@@ -86,6 +86,6 @@ export const initializeFullstory = (): void => {
       g(o, v)
     }
     g.clearUserCookie = function () {}
-  })(global, global.document, global['_fs_namespace'], 'script', 'user')
+  })(global, global.document, global._fs_namespace, 'script', 'user')
   _setAnalyticsTags()
 }

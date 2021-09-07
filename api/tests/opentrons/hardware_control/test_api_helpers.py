@@ -1,5 +1,8 @@
 from opentrons.calibration_storage.types import (
-    DeckCalibration, SourceType, CalibrationStatus)
+    DeckCalibration,
+    SourceType,
+    CalibrationStatus,
+)
 from opentrons.hardware_control.util import DeckTransformState
 from opentrons.hardware_control.robot_calibration import RobotCalibration
 
@@ -9,9 +12,10 @@ async def test_validating_attitude(hardware):
     inrange_matrix = [[1, 0, 1], [0, 1, 2], [0, 0, 1]]
     deck_cal = DeckCalibration(
         attitude=inrange_matrix,
-        last_modified='sometime',
+        last_modified="sometime",
         source=SourceType.user,
-        status=CalibrationStatus())
+        status=CalibrationStatus(),
+    )
 
     hardware.set_robot_calibration(RobotCalibration(deck_calibration=deck_cal))
 

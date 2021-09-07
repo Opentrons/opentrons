@@ -10,23 +10,27 @@ from robot_server.system import errors, time_utils
 @pytest.fixture
 def mock_status_str() -> str:
     """Get mock output from `timedatectl`."""
-    return "Timezone=Etc/UTC\n" \
-           "LocalRTC=no\n" \
-           "CanNTP=yes\n" \
-           "NTP=yes\n" \
-           "NTPSynchronized=no\n" \
-           "TimeUSec=Fri 2020-08-14 21:44:16 UTC\n"
+    return (
+        "Timezone=Etc/UTC\n"
+        "LocalRTC=no\n"
+        "CanNTP=yes\n"
+        "NTP=yes\n"
+        "NTPSynchronized=no\n"
+        "TimeUSec=Fri 2020-08-14 21:44:16 UTC\n"
+    )
 
 
 @pytest.fixture
 def mock_status_dict() -> Dict[str, Union[str, bool]]:
     """Expected dictionary format of `mock_status_str`."""
-    return {'Timezone': 'Etc/UTC',
-            'LocalRTC': False,
-            'CanNTP': True,
-            'NTP': True,
-            'NTPSynchronized': False,
-            'TimeUSec': 'Fri 2020-08-14 21:44:16 UTC'}
+    return {
+        "Timezone": "Etc/UTC",
+        "LocalRTC": False,
+        "CanNTP": True,
+        "NTP": True,
+        "NTPSynchronized": False,
+        "TimeUSec": "Fri 2020-08-14 21:44:16 UTC",
+    }
 
 
 @pytest.fixture
@@ -46,7 +50,8 @@ def test_str_to_dict(
 
 @pytest.mark.parametrize(
     argnames=["mock_status_err_str"],
-    argvalues=[[""], ["There is no equal sign"], ["=== Too many ==="]])
+    argvalues=[[""], ["There is no equal sign"], ["=== Too many ==="]],
+)
 def test_str_to_dict_does_not_raise_error(mock_status_err_str: str) -> None:
     """It should not raise errors due to parsing failures."""
     res_dict = time_utils._str_to_dict(mock_status_err_str)
@@ -57,6 +62,7 @@ async def test_set_time_synchronized_error_response(
     mock_status_dict: Dict[str, Union[str, bool]],
 ) -> None:
     """It should raise an error if time is already synced."""
+
     async def async_mock_time_status(*args: Any, **kwargs: Any) -> Any:
         _stat = mock_status_dict
         _stat.update(NTPSynchronized=True)
@@ -73,6 +79,7 @@ async def test_set_time_general_error_response(
     mock_status_dict: Dict[str, Union[str, bool]],
 ) -> None:
     """It should raise an error it `date` fails."""
+
     async def async_mock_time_status(*args: Any, **kwargs: Any) -> Any:
         _stat = mock_status_dict
         _stat.update(NTPSynchronized=False)
@@ -93,6 +100,7 @@ async def test_set_time_response(
     mock_time: datetime,
 ) -> None:
     """It should return the correct datetime."""
+
     async def async_mock_time_status(*args: Any, **kwargs: Any) -> Any:
         _stat = mock_status_dict
         _stat.update(NTPSynchronized=False)
@@ -111,6 +119,7 @@ async def test_set_time_response(
         time_utils._set_time.assert_called_once()
 
         # Datetime is converted to the correct format with UTC for _set_time
-        await time_utils.set_system_time(datetime.fromisoformat(
-            "2020-08-14T16:44:16-05:00"))   # from EST
+        await time_utils.set_system_time(
+            datetime.fromisoformat("2020-08-14T16:44:16-05:00")
+        )  # from EST
         time_utils._set_time.assert_called_with("2020-08-14 21:44:16")  # to UTC

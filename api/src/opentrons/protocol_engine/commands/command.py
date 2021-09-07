@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING, Generic, Optional, TypeVar
 
 # convenience type alias to work around type-only circular dependency
 if TYPE_CHECKING:
-    from ..execution import EquipmentHandler, MovementHandler, PipettingHandler
+    from opentrons.protocol_engine import execution
 
 CommandDataT = TypeVar("CommandDataT", bound=BaseModel)
 
@@ -94,14 +94,16 @@ class AbstractCommandImpl(
 
     def __init__(
         self,
-        equipment: EquipmentHandler,
-        movement: MovementHandler,
-        pipetting: PipettingHandler,
+        equipment: execution.EquipmentHandler,
+        movement: execution.MovementHandler,
+        pipetting: execution.PipettingHandler,
+        run_control: execution.RunControlHandler,
     ) -> None:
         """Initialize the command implementation with execution handlers."""
         self._equipment = equipment
         self._movement = movement
         self._pipetting = pipetting
+        self._run_control = run_control
 
     @abstractmethod
     async def execute(self, data: CommandDataT) -> CommandResultT:

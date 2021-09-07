@@ -5,6 +5,7 @@ from typing import List
 from typing_extensions import Literal
 
 from robot_server.errors import ErrorDetails, ErrorResponse
+from robot_server.service.task_runner import TaskRunner
 from robot_server.service.dependencies import get_unique_id, get_current_time
 from robot_server.service.json_api import (
     ResponseModel,
@@ -12,14 +13,17 @@ from robot_server.service.json_api import (
     EmptyResponseModel,
 )
 
-from .dependencies import get_protocol_store
+from .dependencies import get_protocol_store, get_analysis_store, get_protocol_analyzer
 from .protocol_models import Protocol
+from .protocol_analyzer import ProtocolAnalyzer
+from .response_builder import ResponseBuilder
+from .analysis_store import AnalysisStore
+
 from .protocol_store import (
     ProtocolStore,
     ProtocolNotFoundError,
     ProtocolFileInvalidError,
 )
-from .response_builder import ResponseBuilder
 
 
 class ProtocolNotFound(ErrorDetails):
@@ -52,7 +56,11 @@ async def create_protocol(
     files: List[UploadFile] = File(...),
     response_builder: ResponseBuilder = Depends(ResponseBuilder),
     protocol_store: ProtocolStore = Depends(get_protocol_store),
-    protocol_id: str = Depends(get_unique_id),
+    analysis_store: AnalysisStore = Depends(get_analysis_store),
+    protocol_analyzer: ProtocolAnalyzer = Depends(get_protocol_analyzer),
+    task_runner: TaskRunner = Depends(TaskRunner),
+    protocol_id: str = Depends(get_unique_id, use_cache=False),
+    analysis_id: str = Depends(get_unique_id, use_cache=False),
     created_at: datetime = Depends(get_current_time),
 ) -> ResponseModel[Protocol]:
     """Create a new protocol by uploading its files.
@@ -61,14 +69,18 @@ async def create_protocol(
         files: List of uploaded files, from form-data.
         response_builder: Interface to construct response models.
         protocol_store: In-memory database of protocol resources.
-        protocol_id: Unique identifier to attach to the new resource.
+        analysis_store: In-memory database of protocol analyses.
+        protocol_analyzer: Protocol analysis interface.
+        task_runner: Background task runner.
+        protocol_id: Unique identifier to attach to the protocol resource.
+        analysis_id: Unique identifier to attach to the analysis resource.
         created_at: Timestamp to attach to the new resource.
     """
     if len(files) > 1:
         raise NotImplementedError("Multi-file protocols not yet supported.")
 
     try:
-        protocol_entry = await protocol_store.create(
+        protocol_resource = await protocol_store.create(
             protocol_id=protocol_id,
             created_at=created_at,
             files=files,
@@ -76,7 +88,16 @@ async def create_protocol(
     except ProtocolFileInvalidError as e:
         raise ProtocolFileInvalid(detail=str(e)).as_error(status.HTTP_400_BAD_REQUEST)
 
-    data = response_builder.build(protocol_entry)
+    task_runner.run(
+        protocol_analyzer.analyze,
+        protocol_resource=protocol_resource,
+        analysis_id=analysis_id,
+    )
+    analyses = analysis_store.add_pending(
+        protocol_id=protocol_id,
+        analysis_id=analysis_id,
+    )
+    data = response_builder.build(resource=protocol_resource, analyses=analyses)
 
     return ResponseModel(data=data)
 
@@ -90,15 +111,23 @@ async def create_protocol(
 async def get_protocols(
     response_builder: ResponseBuilder = Depends(ResponseBuilder),
     protocol_store: ProtocolStore = Depends(get_protocol_store),
+    analysis_store: AnalysisStore = Depends(get_analysis_store),
 ) -> MultiResponseModel[Protocol]:
     """Get a list of all currently uploaded protocols.
 
     Arguments:
         response_builder: Interface to construct response models.
         protocol_store: In-memory database of protocol resources.
+        analysis_store: In-memory database of protocol analyses.
     """
-    protocol_entries = protocol_store.get_all()
-    data = [response_builder.build(e) for e in protocol_entries]
+    protocol_resources = protocol_store.get_all()
+    data = [
+        response_builder.build(
+            resource=r,
+            analyses=analysis_store.get_by_protocol(r.protocol_id),
+        )
+        for r in protocol_resources
+    ]
 
     return MultiResponseModel(data=data)
 
@@ -116,6 +145,7 @@ async def get_protocol_by_id(
     protocolId: str,
     response_builder: ResponseBuilder = Depends(ResponseBuilder),
     protocol_store: ProtocolStore = Depends(get_protocol_store),
+    analysis_store: AnalysisStore = Depends(get_analysis_store),
 ) -> ResponseModel[Protocol]:
     """Get an uploaded protocol by ID.
 
@@ -123,14 +153,16 @@ async def get_protocol_by_id(
         protocolId: Protocol identifier to fetch, pulled from URL.
         response_builder: Interface to construct response models.
         protocol_store: In-memory database of protocol resources.
+        analysis_store: In-memory database of protocol analyses.
     """
     try:
-        protocol_entry = protocol_store.get(protocol_id=protocolId)
+        resource = protocol_store.get(protocol_id=protocolId)
+        analyses = analysis_store.get_by_protocol(protocol_id=protocolId)
 
     except ProtocolNotFoundError as e:
         raise ProtocolNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
 
-    data = response_builder.build(protocol_entry)
+    data = response_builder.build(resource=resource, analyses=analyses)
 
     return ResponseModel(data=data)
 

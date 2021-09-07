@@ -2,11 +2,11 @@
 from decoy import Decoy
 
 from opentrons.protocol_engine import WellLocation, WellOrigin
-
 from opentrons.protocol_engine.execution import (
     EquipmentHandler,
     MovementHandler,
     PipettingHandler,
+    RunControlHandler,
 )
 
 from opentrons.protocol_engine.commands.aspirate import (
@@ -21,12 +21,14 @@ async def test_aspirate_implementation(
     equipment: EquipmentHandler,
     movement: MovementHandler,
     pipetting: PipettingHandler,
+    run_control: RunControlHandler,
 ) -> None:
     """An Aspirate should have an execution implementation."""
     subject = AspirateImplementation(
         equipment=equipment,
         movement=movement,
         pipetting=pipetting,
+        run_control=run_control,
     )
 
     location = WellLocation(origin=WellOrigin.BOTTOM, offset=(0, 0, 1))

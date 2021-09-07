@@ -1,10 +1,9 @@
 """Tests for the command QueueWorker in opentrons.protocol_engine."""
-import asyncio
 import pytest
 from decoy import Decoy, matchers
-from typing import Any, AsyncIterable
 
 from opentrons.protocol_engine.state import StateStore
+from opentrons.protocol_engine.errors import ProtocolEngineStoppedError
 from opentrons.protocol_engine.execution import CommandExecutor, QueueWorker
 
 
@@ -27,48 +26,24 @@ def command_executor(decoy: Decoy) -> CommandExecutor:
 
 
 @pytest.fixture
-async def subject(
+def subject(
     state_store: StateStore,
     command_executor: CommandExecutor,
-) -> AsyncIterable[QueueWorker]:
+) -> QueueWorker:
     """Get a QueueWorker instance."""
-    subject = QueueWorker(state_store=state_store, command_executor=command_executor)
-    yield subject
-
-    try:
-        await subject.stop()
-    except BreakLoopError:
-        pass
+    return QueueWorker(state_store=state_store, command_executor=command_executor)
 
 
 @pytest.fixture(autouse=True)
 async def queue_commands(decoy: Decoy, state_store: StateStore) -> None:
-    """Load the command queue with 2 queued commands, then a break.
-
-    Since `state_store.wait_for` will not return a `None` command ID,
-    we raise to make sure the tests stop no matter what.
-    """
-    call_count = 0
-
-    def _get_next_queued_command(condition: Any) -> str:
-        nonlocal call_count
-        call_count = call_count + 1
-
-        if call_count < 3:
-            return f"command-id-{call_count}"
-        else:
-            raise BreakLoopError()
-
+    """Load the command queue with 2 queued commands, then stop."""
     decoy.when(
         await state_store.wait_for(condition=state_store.commands.get_next_queued)
-    ).then_do(_get_next_queued_command)
+    ).then_return("command-id-1", "command-id-2")
 
-
-# TODO(mc, 2021-07-27): the need for flush tasks in these tests a bit smelly.
-# Explore solutions like [AnyIO](https://anyio.readthedocs.io) for better async
-# task management that could make the QueueWorker interface more explicit.
-async def _flush_tasks() -> None:
-    await asyncio.sleep(0)
+    decoy.when(state_store.commands.get_stop_requested()).then_return(
+        False, False, True
+    )
 
 
 async def test_start_processes_commands(
@@ -78,6 +53,14 @@ async def test_start_processes_commands(
     subject: QueueWorker,
 ) -> None:
     """It should pull commands off the queue and execute them."""
+    decoy.when(
+        await state_store.wait_for(condition=state_store.commands.get_next_queued)
+    ).then_return("command-id-1", "command-id-2")
+
+    decoy.when(state_store.commands.get_stop_requested()).then_return(
+        False, False, True
+    )
+
     subject.start()
 
     decoy.verify(
@@ -85,7 +68,7 @@ async def test_start_processes_commands(
         times=0,
     )
 
-    await _flush_tasks()
+    await subject.join()
 
     decoy.verify(
         await command_executor.execute(command_id="command-id-1"),
@@ -93,20 +76,34 @@ async def test_start_processes_commands(
     )
 
 
-async def test_stop(
+async def test_cancel(
     decoy: Decoy,
     state_store: StateStore,
     command_executor: CommandExecutor,
     subject: QueueWorker,
 ) -> None:
-    """It should stop pulling jobs once it is stopped."""
+    """It should stop pulling jobs if it is cancelled."""
     subject.start()
-    await subject.stop()
+    subject.cancel()
+
+    await subject.join()
 
     decoy.verify(
         await command_executor.execute(command_id=matchers.Anything()),
         times=0,
     )
+
+
+async def test_cancel_noops_if_joined(
+    decoy: Decoy,
+    state_store: StateStore,
+    command_executor: CommandExecutor,
+    subject: QueueWorker,
+) -> None:
+    """It should noop on cancel if the worker has already been `join`'d."""
+    subject.start()
+    await subject.join()
+    subject.cancel()
 
 
 async def test_unhandled_exception_breaks_loop(
@@ -115,13 +112,27 @@ async def test_unhandled_exception_breaks_loop(
     command_executor: CommandExecutor,
     subject: QueueWorker,
 ) -> None:
-    """It should raise any unhandled exceptions in `stop`."""
+    """It should raise any unhandled exceptions in `join`."""
     decoy.when(await command_executor.execute(command_id="command-id-1")).then_raise(
         RuntimeError("oh no")
     )
 
     subject.start()
-    await _flush_tasks()
 
     with pytest.raises(RuntimeError, match="oh no"):
-        await subject.stop()
+        await subject.join()
+
+
+async def test_engine_stopped_exception_breaks_loop_gracefully(
+    decoy: Decoy,
+    state_store: StateStore,
+    command_executor: CommandExecutor,
+    subject: QueueWorker,
+) -> None:
+    """It should `join` gracefully if a ProtocolEngineStoppedError is raised."""
+    decoy.when(
+        await state_store.wait_for(condition=state_store.commands.get_next_queued)
+    ).then_raise(ProtocolEngineStoppedError("oh no"))
+
+    subject.start()
+    await subject.join()

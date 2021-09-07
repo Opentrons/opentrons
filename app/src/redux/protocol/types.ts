@@ -2,7 +2,11 @@
 import type {
   JsonProtocolFile,
   ProtocolFileV1,
-} from '@opentrons/shared-data/protocol'
+  LabwareDefinition2,
+  PipetteNameSpecs,
+} from '@opentrons/shared-data'
+
+import type { Mount } from '../pipettes/types'
 
 import { TYPE_JSON, TYPE_PYTHON, TYPE_ZIP } from './constants'
 
@@ -56,6 +60,15 @@ export interface CloseProtocolAction {
 export interface InvalidProtocolFileAction {
   type: 'protocol:INVALID_FILE'
   payload: { file: ProtocolFile; message: string }
+}
+
+export interface ProtocolPipetteTiprackData {
+  pipetteSpecs: PipetteNameSpecs | null
+  tipRackDefs: LabwareDefinition2[]
+}
+
+export type ProtocolPipetteTipRackByMount = {
+  [mount in Mount]: null | ProtocolPipetteTiprackData
 }
 
 export type ProtocolAction =

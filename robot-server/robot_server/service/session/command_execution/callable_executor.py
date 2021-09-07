@@ -6,8 +6,8 @@ from .command import Command, CompletedCommand, CommandResult
 
 
 CommandHandler = typing.Callable[
-    [str, typing.Dict[typing.Any, typing.Any]],
-    typing.Coroutine]
+    [str, typing.Dict[typing.Any, typing.Any]], typing.Coroutine
+]
 
 
 class CallableExecutor(CommandExecutor):
@@ -33,6 +33,5 @@ class CallableExecutor(CommandExecutor):
         return CompletedCommand(
             request=command.request,
             meta=command.meta,
-            result=CommandResult(started_at=time_it.start,
-                                 completed_at=time_it.end)
+            result=CommandResult(started_at=time_it.start, completed_at=time_it.end),
         )

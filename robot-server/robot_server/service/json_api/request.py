@@ -3,12 +3,10 @@ from pydantic import Field
 from pydantic.generics import GenericModel
 
 
-RequestDataT = TypeVar('RequestDataT')
+RequestDataT = TypeVar("RequestDataT")
 
 
 class RequestModel(GenericModel, Generic[RequestDataT]):
-    """
-    """
-    data: RequestDataT = \
-        Field(...,
-              description="the document’s 'primary data'")
+    """ """
+
+    data: RequestDataT = Field(..., description="the document’s 'primary data'")

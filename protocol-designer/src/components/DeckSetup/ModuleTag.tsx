@@ -3,10 +3,12 @@ import { useSelector } from 'react-redux'
 import cx from 'classnames'
 import { RobotCoordsForeignDiv } from '@opentrons/components'
 import {
+  getModuleVizDims,
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
   ModuleRealType,
+  ModuleOrientation,
 } from '@opentrons/shared-data'
 import {
   TEMPERATURE_AT_TARGET,
@@ -24,9 +26,7 @@ import { STD_SLOT_X_DIM, STD_SLOT_Y_DIM } from '../../constants'
 import * as uiSelectors from '../../ui/steps'
 import { getLabwareOnModule } from '../../ui/modules/utils'
 import { makeTemperatureText } from '../../utils'
-import { getModuleVizDims } from './getModuleVizDims'
 import styles from './ModuleTag.css'
-import { ModuleOrientation } from '../../types'
 
 export interface ModuleTagProps {
   x: number

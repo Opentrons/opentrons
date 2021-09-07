@@ -1,9 +1,18 @@
+import { noop } from 'lodash'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
-import * as Fixtures from '../__fixtures__'
 import * as POCFixtures from '../../calibration/pipette-offset/__fixtures__'
 import * as TLCFixtures from '../../calibration/tip-length/__fixtures__'
+import * as ProtocolSelectors from '../../protocol/selectors'
+import { mockTipRackDefinition } from '../../custom-labware/__fixtures__'
 import * as Selectors from '../selectors'
+import * as Fixtures from '../__fixtures__'
 import type { State } from '../../types'
+
+jest.mock('../../protocol/selectors')
+
+const mockGetProtocolPipetteTipRacks = ProtocolSelectors.getProtocolPipetteTipRacks as jest.MockedFunction<
+  typeof ProtocolSelectors.getProtocolPipetteTipRacks
+>
 
 interface SelectorSpec {
   name: string
@@ -11,6 +20,7 @@ interface SelectorSpec {
   state: State
   args?: any[]
   expected: unknown
+  before?: () => unknown
 }
 
 const SPECS: SelectorSpec[] = [
@@ -169,6 +179,161 @@ describe('getAttachedPipetteCalibrations', () => {
     ).toEqual({
       left: { offset: null, tipLength: null },
       right: { offset: null, tipLength: null },
+    })
+  })
+})
+
+const ProtocolSPECS: SelectorSpec[] = [
+  {
+    name: 'getProtocolPipetteTipRackCalInfo returns null if none in protocol',
+    selector: Selectors.getProtocolPipetteTipRackCalInfo,
+    state: {
+      pipettes: {
+        robotName: {
+          attachedByMount: {
+            left: Fixtures.mockAttachedPipette,
+            right: Fixtures.mockAttachedPipette,
+          },
+        },
+      },
+      calibration: {
+        robotName: {
+          pipetteOffsetCalibrations:
+            POCFixtures.mockAllPipetteOffsetsCalibration,
+          calibrationStatus: null,
+          labwareCalibrations: null,
+          tipLengthCalibrations: TLCFixtures.mockAllTipLengthCalibrations,
+        },
+      },
+    } as any,
+    args: ['robotName'],
+    before: () => {
+      mockGetProtocolPipetteTipRacks.mockReturnValue({
+        left: null,
+        right: null,
+      })
+    },
+    expected: { left: null, right: null },
+  },
+  {
+    name:
+      'getProtocolPipetteTipRackCalInfo returns attached pipette and tiprack calibration data',
+    selector: Selectors.getProtocolPipetteTipRackCalInfo,
+    state: {
+      pipettes: {
+        robotName: {
+          attachedByMount: {
+            left: {
+              ...Fixtures.mockAttachedPipette,
+              id: POCFixtures.mockPipetteOffsetCalibration1.pipette,
+            },
+            right: {
+              ...Fixtures.mockAttachedPipette,
+              id: POCFixtures.mockPipetteOffsetCalibration2.pipette,
+            },
+          },
+          settingsById: null,
+        },
+      },
+      calibration: {
+        robotName: {
+          pipetteOffsetCalibrations:
+            POCFixtures.mockAllPipetteOffsetsCalibration,
+          calibrationStatus: null,
+          labwareCalibrations: null,
+          tipLengthCalibrations:
+            TLCFixtures.mockPipetteMatchTipLengthCalibration,
+        },
+      },
+    } as any,
+    args: ['robotName'],
+    before: () => {
+      mockGetProtocolPipetteTipRacks.mockReturnValue({
+        left: {
+          pipetteSpecs: Fixtures.mockP300PipetteSpecs,
+          tipRackDefs: [mockTipRackDefinition],
+        },
+        right: { pipetteSpecs: Fixtures.mockRightSpecs, tipRackDefs: [] },
+      })
+    },
+    expected: {
+      left: {
+        exactPipetteMatch: 'match',
+        pipetteCalDate: '2020-08-30T10:02',
+        pipetteDisplayName: 'P300 Single-Channel GEN2',
+        tipRacks: [
+          {
+            displayName: 'Mock TipRack Definition',
+            lastModifiedDate: '2020-09-29T13:02',
+          },
+        ],
+      },
+      right: {
+        exactPipetteMatch: 'incompatible',
+        pipetteCalDate: null,
+        pipetteDisplayName: 'Right Pipette',
+        tipRacks: [],
+      },
+    },
+  },
+  {
+    name:
+      'getProtocolPipetteTipRackCalInfo returns null calibration data if pipettes do not match',
+    selector: Selectors.getProtocolPipetteTipRackCalInfo,
+    state: {
+      pipettes: {
+        robotName: {
+          attachedByMount: {
+            left: Fixtures.mockAttachedPipette,
+            right: Fixtures.mockAttachedPipette,
+          },
+        },
+      },
+      calibration: {
+        robotName: {
+          pipetteOffsetCalibrations:
+            POCFixtures.mockAllPipetteOffsetsCalibration,
+          calibrationStatus: null,
+          labwareCalibrations: null,
+          tipLengthCalibrations: TLCFixtures.mockAllTipLengthCalibrations,
+        },
+      },
+    } as any,
+    args: ['robotName'],
+    before: () => {
+      mockGetProtocolPipetteTipRacks.mockReturnValue({
+        left: {
+          pipetteSpecs: Fixtures.mockLeftSpecs,
+          tipRackDefs: [mockTipRackDefinition],
+        },
+        right: { pipetteSpecs: Fixtures.mockRightSpecs, tipRackDefs: [] },
+      })
+    },
+    expected: {
+      left: {
+        exactPipetteMatch: 'incompatible',
+        pipetteCalDate: null,
+        pipetteDisplayName: 'Left Pipette',
+        tipRacks: [
+          { displayName: 'Mock TipRack Definition', lastModifiedDate: null },
+        ],
+      },
+      right: {
+        exactPipetteMatch: 'incompatible',
+        pipetteCalDate: null,
+        pipetteDisplayName: 'Right Pipette',
+        tipRacks: [],
+      },
+    },
+  },
+]
+
+describe('getProtocolPipetteTipRackCalInfo selector', () => {
+  ProtocolSPECS.forEach(spec => {
+    const { name, selector, state, args = [], expected, before = noop } = spec
+    it(name, () => {
+      before()
+      expect(selector(state, ...args)).toEqual(expected)
     })
   })
 })

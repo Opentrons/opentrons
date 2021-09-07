@@ -1,6 +1,6 @@
 """Protocol file upload and management."""
 
-from opentrons.file_runner import ProtocolFileType
+from opentrons.protocol_runner import ProtocolFile, ProtocolFileType
 
 from .router import protocols_router, ProtocolNotFound
 from .dependencies import get_protocol_store
@@ -17,5 +17,6 @@ __all__ = [
     "ProtocolResource",
     "ProtocolNotFoundError",
     # convenience re-exports from opentrons
+    "ProtocolFile",
     "ProtocolFileType",
 ]

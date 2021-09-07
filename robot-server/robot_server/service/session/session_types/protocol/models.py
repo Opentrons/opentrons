@@ -12,10 +12,9 @@ class EventSource(str, Enum):
 
 class ProtocolSessionEvent(BaseModel):
     """An event occurring during a protocol session"""
-    source: EventSource = \
-        Field(..., description="Initiator of this event")
-    event: str = \
-        Field(..., description="The event that occurred")
+
+    source: EventSource = Field(..., description="Initiator of this event")
+    event: str = Field(..., description="The event that occurred")
     timestamp: datetime
     commandId: typing.Optional[str] = None
     params: typing.Optional[typing.Dict[str, typing.Any]] = None
@@ -23,13 +22,11 @@ class ProtocolSessionEvent(BaseModel):
 
 
 class ProtocolSessionDetails(BaseModel):
-    protocolId: str = \
-        Field(...,
-              description="The protocol used by this session")
+    protocolId: str = Field(..., description="The protocol used by this session")
     currentState: typing.Optional[str]
-    events: typing.List[ProtocolSessionEvent] =\
-        Field(...,
-              description="The events that have occurred thus far")
+    events: typing.List[ProtocolSessionEvent] = Field(
+        ..., description="The events that have occurred thus far"
+    )
 
 
 class ProtocolCreateParams(BaseModel):

@@ -42,6 +42,13 @@ from .pick_up_tip import (
     PickUpTipCommandType,
 )
 
+from .pause import (
+    Pause,
+    PauseRequest,
+    PauseResult,
+    PauseCommandType,
+)
+
 Command = Union[
     AddLabwareDefinition,
     Aspirate,
@@ -51,6 +58,7 @@ Command = Union[
     LoadPipette,
     MoveToWell,
     PickUpTip,
+    Pause,
 ]
 
 CommandType = Union[
@@ -62,6 +70,7 @@ CommandType = Union[
     LoadPipetteCommandType,
     MoveToWellCommandType,
     PickUpTipCommandType,
+    PauseCommandType,
 ]
 
 CommandRequest = Union[
@@ -73,6 +82,7 @@ CommandRequest = Union[
     LoadPipetteRequest,
     MoveToWellRequest,
     PickUpTipRequest,
+    PauseRequest,
 ]
 
 CommandResult = Union[
@@ -84,4 +94,5 @@ CommandResult = Union[
     LoadPipetteResult,
     MoveToWellResult,
     PickUpTipResult,
+    PauseResult,
 ]

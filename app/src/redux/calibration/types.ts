@@ -66,3 +66,8 @@ export type CalibrationState = Readonly<
     [robotName: string]: PerRobotCalibrationState
   }>
 >
+
+export interface ProtocolCalibrationStatus {
+  complete: boolean
+  reason?: string
+}
