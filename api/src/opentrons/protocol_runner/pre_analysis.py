@@ -1,11 +1,13 @@
+# noqa: D100
+
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Union
 
 
-class PreAnalyzer:
+class PreAnalyzer:  # noqa: D101
     @staticmethod
-    def analyze(
+    def analyze(  # noqa: D102
         protocol_files: List[Path],
     ) -> Union["PythonPreAnalysis", "JsonPreAnalysis"]:
         raise NotImplementedError()
@@ -24,11 +26,11 @@ support recursive types.
 
 
 @dataclass(frozen=True)
-class PythonPreAnalysis:
+class PythonPreAnalysis:  # noqa: D101
     metadata: Metadata
     api_level: str
 
 
 @dataclass(frozen=True)
-class JsonPreAnalysis:
+class JsonPreAnalysis:  # noqa: D101
     metadata: Metadata
