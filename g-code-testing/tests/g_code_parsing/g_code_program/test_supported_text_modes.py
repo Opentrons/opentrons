@@ -2,7 +2,7 @@ import pytest
 
 from g_code_parsing.errors import InvalidTextModeError
 from g_code_parsing.g_code import GCode
-from g_code_parsing.g_code_program.supported_text_modes import (  # noqa: E501
+from g_code_parsing.g_code_program.supported_text_modes import (
     SupportedTextModes,
     TextMode,
     default_builder,

@@ -5,7 +5,7 @@ from diff_match_patch import diff_match_patch as dmp  # type: ignore
 from g_code_parsing.g_code_program.g_code_program import (
     GCodeProgram,
 )
-from g_code_parsing.g_code_program.supported_text_modes import (  # noqa: E501
+from g_code_parsing.g_code_program.supported_text_modes import (
     SupportedTextModes,
 )
 
