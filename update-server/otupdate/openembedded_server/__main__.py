@@ -1,12 +1,11 @@
 """
 Entrypoint for the openembedded update server
 """
-import argparse
 import logging
 import logging.config
 import sys
 
-from .  import get_app
+from . import get_app
 from aiohttp import web
 from openembedded import RootFSCLI
 LOG = logging.getLogger(__name__)

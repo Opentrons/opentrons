@@ -17,18 +17,18 @@ class RootFSCLI:
         # create Debug subcommand
         parser_debug = subparsers.add_parser('debug', help='Debug')
         parser_debug.add_argument('-p', '--port', dest='port', type=int,
-                            help='Port to listen on. Passed to aiohttp')
+                                  help='Port to listen on. Passed to aiohttp')
         parser_debug.add_argument('--host', dest='host', type=str, default='127.0.0.1',
-                            help='Host to listen on. Passed to aiohttp')
+                                  help='Host to listen on. Passed to aiohttp')
         parser_debug.add_argument('--version-file', dest='version_file',
-                            type=str, default='IGNORE',
-                            help='Version file path if not default')
+                                  type=str, default='IGNORE',
+                                  help='Version file path if not default')
         parser_debug.add_argument('--log-level', dest='log_level',
-                            choices=['debug', 'info', 'warning', 'error'],
-                            help='Log level', default='info')
+                                  choices=['debug', 'info', 'warning', 'error'],
+                                  help='Log level', default='info')
         parser_debug.add_argument('--config-file', dest='config_file',
-                            type=str, default=None,
-                            help='Config file path.')
+                                  type=str, default=None,
+                                  help='Config file path.')
         parser_debug.add_argument('--tt', '-t', type=str, nargs='?', help="test title",
                                   default="OT3 RootFS Test", const="OT# RootFS Test")
         parser_debug.set_defaults(func=rfs.debug)

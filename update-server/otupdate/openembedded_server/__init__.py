@@ -2,7 +2,7 @@
 import asyncio
 import logging
 from aiohttp import web
-from openembedded import (RootFS, RootFSCLI)
+from openembedded import RootFS
 
 LOG = logging.getLogger(__name__)
 
@@ -33,8 +33,7 @@ def get_app(system_version_file: str = None,
     rfs = RootFS.RootFS()
     app = web.Application(middlewares=[log_error_middleware])
     app.router.add_routes([
-        web.post('/server/oe//restore',
-                rfs.factory_restore),
+        web.post('/server/oe//restore', rfs.factory_restore),
         web.post('/server/oe/swap', rfs.swap_partition),
         web.get('/server/oe/partition', rfs.get_partition),
     ])
