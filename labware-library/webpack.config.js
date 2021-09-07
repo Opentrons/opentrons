@@ -53,7 +53,7 @@ module.exports = merge(baseConfig, {
       description: pkg.description,
       author: pkg.author.name,
       gtmId: process.env.GTM_ID,
-      favicon: './src/images/favicon-logo.png',
+      favicon: './src/images/favicon.ico',
     }),
   ],
 

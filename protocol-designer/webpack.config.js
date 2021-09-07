@@ -75,7 +75,7 @@ module.exports = merge(baseConfig, {
       description,
       author,
       template: HTML_ENTRY,
-      favicon: './src/images/favicon-logo.png',
+      favicon: './src/images/favicon.ico',
     }),
     new HtmlWebpackPlugin({
       filename: 'error.html',
