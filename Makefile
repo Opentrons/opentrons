@@ -4,13 +4,6 @@
 # make OT_PYTHON available
 include ./scripts/python.mk
 
-# using bash instead of /bin/bash in SHELL prevents macOS optimizing away our PATH update
-SHELL := bash
-
-# add node_modules/.bin to PATH
-# TODO(mc, 2021-02-12): remove in favor of `yarn run` directly
-PATH := $(shell yarn bin):$(PATH)
-
 API_DIR := api
 APP_SHELL_DIR := app-shell
 COMPONENTS_DIR := components
@@ -21,6 +14,8 @@ PROTOCOL_DESIGNER_DIR := protocol-designer
 SHARED_DATA_DIR := shared-data
 UPDATE_SERVER_DIR := update-server
 ROBOT_SERVER_DIR := robot-server
+
+PYTHON_DIRS := $(API_DIR) $(UPDATE_SERVER_DIR) $(NOTIFY_SERVER_DIR) $(ROBOT_SERVER_DIR) $(SHARED_DATA_DIR)/python
 
 # This may be set as an environment variable (and is by CI tasks that upload
 # to test pypi) to add a .dev extension to the python package versions. If
@@ -44,40 +39,9 @@ endif
 # todo(mm, 2021-03-17): Deduplicate with scripts/python.mk.
 usb_host=$(shell yarn run -s discovery find -i 169.254)
 
-
 # install all project dependencies
 .PHONY: setup
 setup: setup-js setup-py
-
-.PHONY: clean-js
-clean-js: clean-ts
-	$(MAKE) -C $(DISCOVERY_CLIENT_DIR) clean
-	$(MAKE) -C $(COMPONENTS_DIR) clean
-
-PYTHON_DIRS = $(API_DIR) $(UPDATE_SERVER_DIR) $(NOTIFY_SERVER_DIR) $(ROBOT_SERVER_DIR) $(SHARED_DATA_DIR)/python
-PYTHON_CLEAN = $(addsuffix -py-clean, $(PYTHON_DIRS))
-
-%-py-clean:
-	$(MAKE) -C $* clean
-
-.PHONY: clean-py
-clean-py: $(PYTHON_CLEAN)
-
-PYTHON_SETUP = $(addsuffix -py-setup, $(PYTHON_DIRS))
-%-py-setup:
-	$(MAKE) -C $* setup
-
-.PHONY: prepare-setup-py
-prepare-setup-py:
-	$(OT_PYTHON) -m pip install pipenv==2021.5.29
-
-.PHONY: setup-py
-setup-py: prepare-setup-py
-	$(MAKE) $(PYTHON_SETUP)
-
-PYTHON_TEARDOWN = $(addsuffix -py-teardown, $(PYTHON_DIRS))
-%-py-teardown:
-	$(MAKE) -C $* clean teardown
 
 # front-end dependecies handled by yarn
 .PHONY: setup-js
@@ -87,16 +51,51 @@ setup-js:
 	$(MAKE) -C $(APP_SHELL_DIR) setup
 	$(MAKE) -C $(SHARED_DATA_DIR) setup-js
 
-# uninstall all project dependencies
-.PHONY: teardown
-teardown: teardown-py teardown-js
+PYTHON_SETUP_TARGETS := $(addsuffix -py-setup, $(PYTHON_DIRS))
 
-.PHONY: teardown-py
-teardown-py: $(PYTHON_TEARDOWN)
+.PHONY: setup-py
+setup-py:
+	$(OT_PYTHON) -m pip install pipenv==2021.5.29
+	$(MAKE) $(PYTHON_SETUP_TARGETS)
+
+%-py-setup:
+	$(MAKE) -C $* setup
+
+# uninstall all project dependencies
+# tear down JS after Python, because Python cleanup depends on JS dep shx
+.PHONY: teardown
+teardown:
+	$(MAKE) teardown-py
+	$(MAKE) teardown-js
 
 .PHONY: teardown-js
 teardown-js: clean-js
 	yarn shx rm -rf "**/node_modules"
+
+PYTHON_TEARDOWN_TARGETS := $(addsuffix -py-teardown, $(PYTHON_DIRS))
+
+.PHONY: teardown-py
+teardown-py: $(PYTHON_TEARDOWN_TARGETS)
+
+%-py-teardown: %-py-clean
+	$(MAKE) -C $* teardown
+
+# clean all project output
+.PHONY: clean
+clean: clean-js clean-py
+
+.PHONY: clean-js
+clean-js: clean-ts
+	$(MAKE) -C $(DISCOVERY_CLIENT_DIR) clean
+	$(MAKE) -C $(COMPONENTS_DIR) clean
+
+PYTHON_CLEAN_TARGETS := $(addsuffix -py-clean, $(PYTHON_DIRS))
+
+.PHONY: clean-py
+clean-py: $(PYTHON_CLEAN_TARGETS)
+
+%-py-clean:
+	$(MAKE) -C $* clean
 
 .PHONY: deploy-py
 deploy-py: export twine_repository_url = $(twine_repository_url)
@@ -175,7 +174,7 @@ test-py: test-py-windows
 
 .PHONY: test-js
 test-js:
-	jest \
+	yarn jest \
 		--coverage=$(cover) \
 		--watch=$(watch) \
 		--updateSnapshot=$(updateSnapshot) \
@@ -194,16 +193,16 @@ lint-py: $(PYTHON_LINT)
 
 .PHONY: lint-js
 lint-js:
-	eslint --quiet=$(quiet) ".*.@(js|ts|tsx)" "**/*.@(js|ts|tsx)"
-	prettier --ignore-path .eslintignore --check $(FORMAT_FILE_GLOB)
+	yarn eslint --quiet=$(quiet) ".*.@(js|ts|tsx)" "**/*.@(js|ts|tsx)"
+	yarn prettier --ignore-path .eslintignore --check $(FORMAT_FILE_GLOB)
 
 .PHONY: lint-json
 lint-json:
-	eslint --max-warnings 0 --ext .json .
+	yarn eslint --max-warnings 0 --ext .json .
 
 .PHONY: lint-css
 lint-css:
-	stylelint "**/*.css" "**/*.js"
+	yarn stylelint "**/*.css" "**/*.js"
 
 .PHONY: format
 format: format-js format-py
@@ -215,7 +214,7 @@ format-py:
 
 .PHONY: format-js
 format-js:
-	prettier --ignore-path .eslintignore --write $(FORMAT_FILE_GLOB)
+	yarn prettier --ignore-path .eslintignore --write $(FORMAT_FILE_GLOB)
 
 .PHONY: check-js
 check-js: build-ts
@@ -231,12 +230,12 @@ clean-ts:
 # TODO: Ian 2019-12-17 gradually add components and shared-data
 .PHONY: circular-dependencies-js
 circular-dependencies-js:
-	madge $(and $(CI),--no-spinner --no-color) --circular protocol-designer/src/index.tsx
-	madge $(and $(CI),--no-spinner --no-color) --circular step-generation/src/index.ts
-	madge $(and $(CI),--no-spinner --no-color) --circular labware-library/src/index.tsx
-	madge $(and $(CI),--no-spinner --no-color) --circular app/src/index.tsx
+	yarn madge $(and $(CI),--no-spinner --no-color) --circular protocol-designer/src/index.tsx
+	yarn madge $(and $(CI),--no-spinner --no-color) --circular step-generation/src/index.ts
+	yarn madge $(and $(CI),--no-spinner --no-color) --circular labware-library/src/index.tsx
+	yarn madge $(and $(CI),--no-spinner --no-color) --circular app/src/index.tsx
 
 .PHONY: bump
 bump:
 	@echo "Bumping versions"
-	lerna version $(or $(version),prerelease)
+	yarn lerna version $(or $(version),prerelease)
