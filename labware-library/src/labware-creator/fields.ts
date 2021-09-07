@@ -53,7 +53,7 @@ export interface Option {
   disabled?: boolean
   imgSrc?: string
 }
-export type Options = Option[]
+export type Options = readonly Option[]
 
 // NOTE: annoyingly, some components support "rich" `name` values (eg Dropdown)
 // that can be a JSX.Element, and others like RadioField only support string values for `name` :(
@@ -331,22 +331,19 @@ export const aluminumBlockAutofills = {
   },
 } as const
 
-export const labwareTypeAutofills: Record<
-  LabwareType,
-  Partial<LabwareFields>
-> = {
+export const labwareTypeAutofills = {
   tipRack: {
-    homogeneousWells: 'true' as const,
-    wellShape: 'circular' as const,
+    homogeneousWells: 'true',
+    wellShape: 'circular',
     wellBottomShape: null,
   },
   tubeRack: {},
   wellPlate: {},
   reservoir: {},
   aluminumBlock: {},
-}
+} as const
 
-export const aluminumBlockChildTypeOptions: Options = [
+export const aluminumBlockChildTypeOptions = [
   {
     name: 'Tubes',
     value: 'tubes',
@@ -359,14 +356,14 @@ export const aluminumBlockChildTypeOptions: Options = [
     name: 'PCR Plate',
     value: 'pcrPlate',
   },
-]
+] as const
 
 export const getInitialStatus = (): FormStatus => ({
   defaultedDef: null,
   prevValues: null,
 })
 
-export const getDefaultFormState = (): LabwareFields => ({
+export const getDefaultFormState = (): Readonly<LabwareFields> => ({
   labwareType: null,
   tubeRackInsertLoadName: null,
   aluminumBlockType: null,
@@ -413,7 +410,7 @@ export const getDefaultFormState = (): LabwareFields => ({
   pipetteName: null,
 })
 
-export const LABELS: Record<keyof LabwareFields, string> = {
+export const LABELS: Readonly<Record<keyof LabwareFields, string>> = {
   labwareType: 'What type of labware are you creating?',
   tubeRackInsertLoadName: 'Which tube rack?',
   aluminumBlockType: 'Which aluminum block?',
