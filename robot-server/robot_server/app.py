@@ -1,23 +1,20 @@
 """Main FastAPI application."""
+import asyncio
 import logging
-
-from opentrons import __version__
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import Response
 from starlette.requests import Request
 from starlette.middleware.base import RequestResponseEndpoint
 
-from .service.dependencies import (
-    get_rpc_server,
-    get_protocol_manager,
-    get_hardware_wrapper,
-    get_session_manager,
-)
+from opentrons import __version__
 
-from .errors import exception_handlers
 from .router import router
+from .errors import exception_handlers
+from .hardware import initialize_hardware, cleanup_hardware
 from .service import initialize_logging
+from .service.dependencies import get_protocol_manager
+from .service.legacy.rpc import cleanup_rpc_server
 from . import constants
 
 log = logging.getLogger(__name__)
@@ -59,19 +56,25 @@ app.include_router(router=router)
 async def on_startup() -> None:
     """Handle app startup."""
     initialize_logging()
-    # Initialize api
-    (await get_hardware_wrapper()).async_initialize()
+    initialize_hardware(app.state)
 
 
 @app.on_event("shutdown")
 async def on_shutdown() -> None:
     """Handle app shutdown."""
-    s = await get_rpc_server()
-    await s.on_shutdown()
-    # Remove all sessions
-    await (await get_session_manager()).remove_all()
-    # Remove all uploaded protocols
-    (await get_protocol_manager()).remove_all()
+    protocol_manager = await get_protocol_manager()
+    protocol_manager.remove_all()
+
+    shutdown_results = await asyncio.gather(
+        cleanup_rpc_server(app.state),
+        cleanup_hardware(app.state),
+        return_exceptions=True,
+    )
+
+    shutdown_errors = [r for r in shutdown_results if isinstance(r, BaseException)]
+
+    for e in shutdown_errors:
+        log.warning("Error during shutdown", exc_info=e)
 
 
 @app.middleware("http")

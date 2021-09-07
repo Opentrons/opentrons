@@ -6,7 +6,7 @@ from pathlib import Path
 import logging
 import asyncio
 import re
-from typing import List, Tuple
+from typing import Any, List, Tuple, cast
 
 from opentrons.drivers.serial_communication import get_ports_by_name
 from opentrons.hardware_control import API, ThreadManager
@@ -92,67 +92,91 @@ def _find_smoothie_file() -> Tuple[Path, str]:
     raise OSError(f"Could not find smoothie firmware file in {resources_path}")
 
 
-async def initialize_robot() -> ThreadManager:
-    """Build the hardware controller."""
-    if os.environ.get("ENABLE_VIRTUAL_SMOOTHIE"):
-        log.info("Initialized robot using virtual Smoothie")
-        systemdd_notify()
-        return ThreadManager(API.build_hardware_simulator)
-
-    # Check if smoothie emulator is to be used
+def _get_motor_control_serial_port() -> Any:
     port = os.environ.get("OT_SMOOTHIE_EMULATOR_URI")
-    if not port:
+
+    if port is None:
         smoothie_id = os.environ.get("OT_SMOOTHIE_ID", "AMA")
-        # Let this raise an exception.
+        # TODO(mc, 2021-08-01): raise a more informative exception than
+        # IndexError if a valid serial port is not found
         port = get_ports_by_name(device_name=smoothie_id)[0]
 
-    log.info(f"Connecting to smoothie at port {port}")
+    log.info(f"Connecting to motor controller at port {port}")
+    return port
 
-    packed_smoothie_fw_file, packed_smoothie_fw_ver = _find_smoothie_file()
-    systemdd_notify()
-    hardware = ThreadManager(
+
+async def _create_thread_manager() -> ThreadManager:
+    """Build the hardware controller wrapped in a ThreadManager.
+
+    .. deprecated:: 4.6
+        ThreadManager is on its way out.
+    """
+    if os.environ.get("ENABLE_VIRTUAL_SMOOTHIE"):
+        log.info("Initialized robot using virtual Smoothie")
+        return ThreadManager(API.build_hardware_simulator)
+
+    thread_manager = ThreadManager(
         API.build_hardware_controller,
         threadmanager_nonblocking=True,
-        port=port,
-        firmware=(packed_smoothie_fw_file, packed_smoothie_fw_ver),
+        port=_get_motor_control_serial_port(),
+        firmware=_find_smoothie_file(),
     )
+
     try:
-        await hardware.managed_thread_ready_async()
+        await thread_manager.managed_thread_ready_async()
     except RuntimeError:
         log.exception("Could not build hardware controller, forcing virtual")
         return ThreadManager(API.build_hardware_simulator)
 
-    loop = asyncio.get_event_loop()
-
-    async def blink():
-        while True:
-            await hardware.set_lights(button=True)
-            await asyncio.sleep(0.5)
-            await hardware.set_lights(button=False)
-            await asyncio.sleep(0.5)
-
-    blink_task = loop.create_task(blink())
-
-    if not ff.disable_home_on_boot():
-        log.info("Homing Z axes")
-        await hardware.home_z()
-
-    blink_task.cancel()
-    await hardware.set_lights(button=True)
-
-    return hardware
+    return thread_manager
 
 
-async def initialize() -> ThreadManager:
+async def _create_hardware_api() -> API:
+    use_hardware_simulator = os.environ.get("ENABLE_VIRTUAL_SMOOTHIE")
+
+    if use_hardware_simulator:
+        return await API.build_hardware_simulator()
+
+    return await API.build_hardware_controller(
+        port=_get_motor_control_serial_port(),
+        firmware=_find_smoothie_file(),
+    )
+
+
+async def initialize() -> API:
     """
     Initialize the Opentrons hardware returning a hardware instance.
     """
     robot_conf = robot_configs.load()
     logging_config.log_init(robot_conf.log_level)
 
-    log.info(f"API server version:  {__version__}")
+    log.info(f"API server version: {__version__}")
     log.info(f"Robot Name: {name()}")
+    systemdd_notify()
 
-    hardware = await initialize_robot()
+    use_thread_manager = ff.enable_protocol_engine() is False
+
+    if use_thread_manager:
+        thread_manager = await _create_thread_manager()
+        hardware = cast(API, thread_manager)
+    else:
+        hardware = await _create_hardware_api()
+
+    async def _blink():
+        while True:
+            await hardware.set_lights(button=True)
+            await asyncio.sleep(0.5)
+            await hardware.set_lights(button=False)
+            await asyncio.sleep(0.5)
+
+    blink_task = asyncio.create_task(_blink())
+
+    if not ff.disable_home_on_boot():
+        log.info("Homing Z axes")
+        await hardware.home_z()
+
+    blink_task.cancel()
+    await asyncio.gather(blink_task, return_exceptions=True)
+    await hardware.set_lights(button=True)
 
     return hardware

@@ -5,7 +5,8 @@ from typing import cast
 
 from opentrons.hardware_control import ThreadManager, API as HardwareAPI
 
-from robot_server.service.dependencies import get_app_state, get_hardware
+from robot_server.app_state import get_app_state
+from robot_server.hardware import get_hardware
 
 from .engine_store import EngineStore
 from .session_store import SessionStore
