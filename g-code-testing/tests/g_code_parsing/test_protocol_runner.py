@@ -1,7 +1,7 @@
 import pytest
 import os
 from g_code_parsing.protocol_runner import ProtocolRunner
-from g_code_parsing.g_code_program.supported_text_modes import (  # noqa: E501
+from g_code_parsing.g_code_program.supported_text_modes import (
     SupportedTextModes,
 )
 from opentrons.hardware_control.emulation.settings import (

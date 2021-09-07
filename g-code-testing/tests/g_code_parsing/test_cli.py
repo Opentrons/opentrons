@@ -10,7 +10,7 @@ from g_code_parsing.cli import (
     DiffCommand,
 )
 from g_code_parsing.errors import UnparsableCLICommandError
-from g_code_parsing.g_code_program.supported_text_modes import (  # noqa: E501
+from g_code_parsing.g_code_program.supported_text_modes import (
     SupportedTextModes,
 )
 
@@ -134,7 +134,13 @@ def run_expected_commands() -> List[RunCommand]:
 
 
 def diff_expected_command():
-    return [DiffCommand(file_path_1=DIFF_FILE_PATH_1, file_path_2=DIFF_FILE_PATH_2)]
+    return [
+        DiffCommand(
+            file_path_1=DIFF_FILE_PATH_1,
+            file_path_2=DIFF_FILE_PATH_2,
+            able_to_respond_with_error_code=False,
+        )
+    ]
 
 
 @pytest.fixture
