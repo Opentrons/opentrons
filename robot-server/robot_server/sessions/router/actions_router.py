@@ -5,7 +5,6 @@ from typing_extensions import Literal
 
 from robot_server.errors import ErrorDetails, ErrorResponse
 from robot_server.service.dependencies import get_current_time, get_unique_id
-from robot_server.service.task_runner import TaskRunner
 from robot_server.service.json_api import RequestModel, ResponseModel
 
 from ..session_store import SessionStore, SessionNotFoundError
@@ -46,7 +45,6 @@ async def create_session_action(
     engine_store: EngineStore = Depends(get_engine_store),
     action_id: str = Depends(get_unique_id),
     created_at: datetime = Depends(get_current_time),
-    task_runner: TaskRunner = Depends(TaskRunner),
 ) -> ResponseModel[SessionAction]:
     """Create a session control action.
 
@@ -58,7 +56,6 @@ async def create_session_action(
         engine_store: Protocol engine and runner storage.
         action_id: Generated ID to assign to the control action.
         created_at: Timestamp to attach to the control action.
-        task_runner: Background task runner.
     """
     try:
         prev_session = session_store.get(session_id=sessionId)
@@ -72,16 +69,12 @@ async def create_session_action(
 
         # TODO(mc, 2021-07-06): add a dependency to verify that a given
         # action is allowed
-        if action.actionType == SessionActionType.START:
-            # TODO(mc, 2021-06-24): ensure the engine homes pipette plungers
-            # before starting the protocol run
-            # TODO(mc, 2021-06-30): capture errors (e.g. uncaught Python raise)
-            # and place them in the session response
-            task_runner.run(engine_store.runner.run)
-        elif action.actionType == SessionActionType.RESUME:
+        if action.actionType == SessionActionType.PLAY:
             engine_store.runner.play()
         elif action.actionType == SessionActionType.PAUSE:
             engine_store.runner.pause()
+        if action.actionType == SessionActionType.STOP:
+            await engine_store.runner.stop()
 
     except SessionNotFoundError as e:
         raise SessionNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)

@@ -1,13 +1,13 @@
 import asyncio
 import logging
-from opentrons.hardware_control.emulation.connection_handler import \
-    ConnectionHandler
+from opentrons.hardware_control.emulation.connection_handler import ConnectionHandler
 from opentrons.hardware_control.emulation.magdeck import MagDeckEmulator
 from opentrons.hardware_control.emulation.parser import Parser
 from opentrons.hardware_control.emulation.settings import Settings
 from opentrons.hardware_control.emulation.tempdeck import TempDeckEmulator
 from opentrons.hardware_control.emulation.thermocycler import ThermocyclerEmulator
 from opentrons.hardware_control.emulation.smoothie import SmoothieEmulator
+
 logger = logging.getLogger(__name__)
 
 
@@ -21,6 +21,7 @@ class ServerManager:
     """
     Class to start and stop emulated smoothie and modules.
     """
+
     def __init__(self, settings=Settings()) -> None:
         host = settings.host
         self._mag_emulator = MagDeckEmulator(parser=Parser())
@@ -56,7 +57,7 @@ class ServerManager:
             self._mag_server,
             self._temp_server,
             self._therm_server,
-            self._smoothie_server
+            self._smoothie_server,
         )
 
     @staticmethod
@@ -81,5 +82,5 @@ class ServerManager:
 
 
 if __name__ == "__main__":
-    logging.basicConfig(format='%(asctime)s:%(message)s', level=logging.DEBUG)
+    logging.basicConfig(format="%(asctime)s:%(message)s", level=logging.DEBUG)
     asyncio.run(ServerManager().run())

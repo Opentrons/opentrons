@@ -18,7 +18,7 @@ export default {
       defaultValue: 'ot2_standard',
     },
     deckLayerBlocklist: {
-      options: Object.keys(allDeckDefs['ot2_standard'].layers),
+      options: Object.keys(allDeckDefs.ot2_standard.layers),
       control: {
         type: 'check',
       },

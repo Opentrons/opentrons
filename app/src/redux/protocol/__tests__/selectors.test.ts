@@ -1,7 +1,25 @@
 // protocol state selector tests
 
+import * as SharedData from '@opentrons/shared-data'
+import { mockDefinition } from '../../custom-labware/__fixtures__'
 import * as protocol from '..'
 import type { State } from '../../types'
+
+jest.mock('@opentrons/shared-data')
+
+const mockGetPipetteNameSpecs = SharedData.getPipetteNameSpecs as jest.MockedFunction<
+  typeof SharedData.getPipetteNameSpecs
+>
+
+const mockPipetteSpecs1: any = {
+  displayName: 'Pipette 1',
+  name: 'pipette-name-1',
+}
+
+const mockPipetteSpecs2: any = {
+  displayName: 'Pipette 2',
+  name: 'pipette-name-2',
+}
 
 const SPECS: Array<{
   name: string
@@ -479,9 +497,136 @@ const SPECS: Array<{
       7: { mockDefinition2: true },
     },
   },
+  {
+    name: 'getProtocolPipetteTipRacks with JSON protocol',
+    selector: protocol.getProtocolPipetteTipRacks,
+    state: {
+      protocol: {
+        data: {
+          labware: {
+            'tiprack-id-1': {
+              slot: '1',
+              definitionId: 'tiprack-def-1',
+              displayName: 'TipRack 1',
+            },
+            'tiprack-id-2': {
+              slot: '2',
+              definitionId: 'tiprack-def-2',
+              displayName: 'TipRack 2',
+            },
+          },
+          pipettes: {
+            'pipette-id-1': { mount: 'left', name: 'pipette-name-1' },
+            'pipette-id-2': { mount: 'right', name: 'pipette-name-2' },
+          },
+          labwareDefinitions: {
+            'tiprack-def-1': { mockDefinition },
+            'tiprack-def-2': { mockDefinition },
+          },
+          commands: [
+            {
+              command: 'pickUpTip',
+              params: { pipette: 'pipette-id-1', labware: 'tiprack-id-1' },
+            },
+            {
+              command: 'pickUpTip',
+              params: { pipette: 'pipette-id-2', labware: 'tiprack-id-2' },
+            },
+          ],
+        },
+      },
+    } as any,
+    expected: {
+      left: {
+        pipetteSpecs: mockPipetteSpecs1,
+        tipRackDefs: [{ mockDefinition }],
+      },
+      right: {
+        pipetteSpecs: mockPipetteSpecs2,
+        tipRackDefs: [{ mockDefinition }],
+      },
+    },
+  },
+  {
+    name: 'getProtocolPipetteTipRacks with JSON protocol with missing commands',
+    selector: protocol.getProtocolPipetteTipRacks,
+    state: {
+      protocol: {
+        data: {
+          labware: {
+            'tiprack-id-1': {
+              slot: '1',
+              definitionId: 'tiprack-def-1',
+              displayName: 'TipRack 1',
+            },
+            'tiprack-id-2': {
+              slot: '2',
+              definitionId: 'tiprack-def-2',
+              displayName: 'TipRack 2',
+            },
+          },
+          pipettes: {
+            'pipette-id-1': { mount: 'left', name: 'pipette-name-1' },
+            'pipette-id-2': { mount: 'right', name: 'pipette-name-2' },
+          },
+          labwareDefinitions: {
+            'tiprack-def-1': { mockDefinition },
+            'tiprack-def-2': { mockDefinition },
+          },
+        },
+      },
+    } as any,
+    expected: {
+      left: null,
+      right: null,
+    },
+  },
+  {
+    name: 'getProtocolPipetteTipRacks with JSON protocol with one pipette',
+    selector: protocol.getProtocolPipetteTipRacks,
+    state: {
+      protocol: {
+        data: {
+          labware: {
+            'tiprack-id-1': {
+              slot: '1',
+              definitionId: 'tiprack-def-1',
+              displayName: 'TipRack 1',
+            },
+          },
+          pipettes: {
+            'pipette-id-1': { mount: 'left', name: 'pipette-name-1' },
+          },
+          labwareDefinitions: {
+            'tiprack-def-1': { mockDefinition },
+          },
+          commands: [
+            {
+              command: 'pickUpTip',
+              params: { pipette: 'pipette-id-1', labware: 'tiprack-id-1' },
+            },
+          ],
+        },
+      },
+    } as any,
+    expected: {
+      left: {
+        pipetteSpecs: mockPipetteSpecs1,
+        tipRackDefs: [{ mockDefinition }],
+      },
+      right: null,
+    },
+  },
 ]
 
 describe('protocol selectors', () => {
+  beforeEach(() => {
+    mockGetPipetteNameSpecs.mockImplementation(name => {
+      if (name === mockPipetteSpecs1.name) return mockPipetteSpecs1
+      if (name === mockPipetteSpecs2.name) return mockPipetteSpecs2
+      return null
+    })
+  })
   SPECS.forEach(spec => {
     const { name, selector, state, expected } = spec
     it(name, () => expect(selector(state)).toEqual(expected))

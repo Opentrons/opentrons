@@ -12,10 +12,11 @@ import { UPGRADE, getBuildrootUpdateAvailable } from '../buildroot'
 import { getAvailableShellUpdate } from '../shell'
 import { getU2EWindowsDriverStatus, OUTDATED } from '../system-info'
 import { getDeckCalibrationStatus, DECK_CAL_STATUS_OK } from '../calibration'
+import { getFeatureFlags } from '../config'
+import { getProtocolData } from '../protocol'
 
 import type { State } from '../types'
 import type { NavLocation } from './types'
-import { getFeatureFlags } from '../config'
 
 // TODO(mc, 2019-11-26): i18n
 const ROBOT = 'Robot'
@@ -97,7 +98,9 @@ const getRobotCalibrationOk = (state: State): boolean => {
   return deckCalOk
 }
 
-const getRunDisabledReason: (state: State) => string | null = createSelector(
+export const getRunDisabledReasonRPC: (
+  state: State
+) => string | null = createSelector(
   getConnectedRobot,
   RobotSelectors.getSessionIsLoaded,
   RobotSelectors.getCommands,
@@ -112,6 +115,38 @@ const getRunDisabledReason: (state: State) => string | null = createSelector(
     if (!pipettesCalibrated) return PIPETTES_NOT_CALIBRATED
     if (!deckCalOk) return CALIBRATE_DECK_TO_PROCEED
     return null
+  }
+)
+
+export const getRunDisabledReasonNoRPC: (
+  state: State
+) => string | null = createSelector(
+  getConnectedRobot,
+  getProtocolData,
+  getConnectedRobotPipettesMatch,
+  getConnectedRobotPipettesCalibrated,
+  getDeckCalibrationOk,
+  (robot, protocolData, pipettesMatch, pipettesCalibrated, deckCalOk) => {
+    if (!robot) return PLEASE_CONNECT_TO_A_ROBOT
+    if (!protocolData) return PLEASE_LOAD_A_PROTOCOL
+    if (!pipettesMatch) return ATTACHED_PIPETTES_DO_NOT_MATCH
+    if (!pipettesCalibrated) return PIPETTES_NOT_CALIBRATED
+    if (!deckCalOk) return CALIBRATE_DECK_TO_PROCEED
+    return null
+  }
+)
+
+export const getRunDisabledReason: (
+  state: State
+) => string | null = createSelector(
+  getRunDisabledReasonRPC,
+  getRunDisabledReasonNoRPC,
+  getFeatureFlags,
+  (disabledReasonRPC, disabledReasonNoRPC, featureFlags) => {
+    if (Boolean(featureFlags.preProtocolFlowWithoutRPC)) {
+      return disabledReasonNoRPC
+    }
+    return disabledReasonRPC
   }
 )
 

@@ -14,16 +14,15 @@ if typing.TYPE_CHECKING:
 
 
 class RobotHealthCheck(Enum):
-    IN_THRESHOLD = 'IN_THRESHOLD'
-    OUTSIDE_THRESHOLD = 'OUTSIDE_THRESHOLD'
+    IN_THRESHOLD = "IN_THRESHOLD"
+    OUTSIDE_THRESHOLD = "OUTSIDE_THRESHOLD"
 
     def __str__(self):
         return self.name
 
     @classmethod
-    def status_from_string(
-            cls, status: str) -> 'RobotHealthCheck':
-        if status == 'IN_THRESHOLD':
+    def status_from_string(cls, status: str) -> "RobotHealthCheck":
+        if status == "IN_THRESHOLD":
             return cls.IN_THRESHOLD
         else:
             return cls.OUTSIDE_THRESHOLD
@@ -31,8 +30,9 @@ class RobotHealthCheck(Enum):
 
 class PipetteRank(str, Enum):
     """The rank in the order of pipettes to use within flow"""
-    first = 'first'
-    second = 'second'
+
+    first = "first"
+    second = "second"
 
     def __str__(self):
         return self.name
@@ -64,8 +64,8 @@ class PipetteInfo:
     mount: Mount
     max_volume: int
     channels: int
-    tip_rack: 'Labware'
-    default_tipracks: typing.List['LabwareDefinition']
+    tip_rack: "Labware"
+    default_tipracks: typing.List["LabwareDefinition"]
 
 
 @dataclass
@@ -74,6 +74,7 @@ class SupportedCommands:
     A class that allows you to set currently supported
     commands depending on the current state.
     """
+
     loadLabware: bool = False
 
     def __init__(self, namespace: str):
@@ -95,22 +96,24 @@ class SupportedCommands:
 # the middle ware before they are returned to the client
 class AttachedPipette(BaseModel):
     """Pipette (if any) attached to the mount"""
-    model: str =\
-        Field(None,
-              description="The model of the attached pipette. These are snake "
-                          "case as in the Protocol API. This includes the full"
-                          " version string")
-    name: str =\
-        Field(None, description="Short name of pipette model without"
-                                "generation version")
-    tipLength: float =\
-        Field(None, description="The default tip length for this pipette")
-    mount: str =\
-        Field(None, description="The mount this pipette attached to")
-    serial: str =\
-        Field(None, description="The serial number of the attached pipette")
-    defaultTipracks: typing.List[dict] =\
-        Field(None, description="A list of default tipracks for this pipette")
+
+    model: str = Field(
+        None,
+        description="The model of the attached pipette. These are snake "
+        "case as in the Protocol API. This includes the full"
+        " version string",
+    )
+    name: str = Field(
+        None, description="Short name of pipette model without" "generation version"
+    )
+    tipLength: float = Field(
+        None, description="The default tip length for this pipette"
+    )
+    mount: str = Field(None, description="The mount this pipette attached to")
+    serial: str = Field(None, description="The serial number of the attached pipette")
+    defaultTipracks: typing.List[dict] = Field(
+        None, description="A list of default tipracks for this pipette"
+    )
 
 
 class RequiredLabware(BaseModel):
@@ -118,6 +121,7 @@ class RequiredLabware(BaseModel):
     A model that describes a single labware required for performing a
     calibration action.
     """
+
     slot: DeckLocation
     loadName: str
     namespace: str
@@ -126,23 +130,22 @@ class RequiredLabware(BaseModel):
     definition: dict
 
     @classmethod
-    def from_lw(cls,
-                lw: labware.Labware,
-                slot: typing.Optional[DeckLocation] = None):
+    def from_lw(cls, lw: labware.Labware, slot: typing.Optional[DeckLocation] = None):
         if not slot:
-            slot = lw.parent  # type: ignore[assignment]
+            slot = lw.parent
         lw_def = lw._implementation.get_definition()
         return cls(
             # TODO(mc, 2020-09-17): DeckLocation does not match
             #  Union[int,str,None] expected by cls
             slot=slot,  # type: ignore[arg-type]
             loadName=lw.load_name,
-            namespace=lw_def['namespace'],
-            version=str(lw_def['version']),
+            namespace=lw_def["namespace"],
+            version=str(lw_def["version"]),
             isTiprack=lw.is_tiprack,
             # TODO(mc, 2020-09-17): LabwareDefinition does not match
             # Dict[any,any] expected by cls
-            definition=lw_def)  # type: ignore[arg-type]
+            definition=lw_def,  # type: ignore[arg-type]
+        )
 
 
 class NextStepLink(BaseModel):

@@ -13,9 +13,9 @@ class AbstractEmulator(ABC):
     @staticmethod
     def get_terminator() -> bytes:
         """Get the command terminator for messages coming from PI."""
-        return b'\r\n\r\n'
+        return b"\r\n\r\n"
 
     @staticmethod
     def get_ack() -> bytes:
         """Get the command ack send to the PI."""
-        return b'ok\r\nok\r\n'
+        return b"ok\r\nok\r\n"

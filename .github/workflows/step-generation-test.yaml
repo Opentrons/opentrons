@@ -55,4 +55,9 @@ jobs:
           make setup-js
       - name: 'run step generation unit tests'
         run: |
-          yarn jest --coverage=true --ci=true step-generation/
+          yarn jest --coverage=true --ci=true --collectCoverageFrom="step-generation/src/**/*.(js|ts|tsx)" step-generation/src
+      - name: 'Upload coverage report'
+        uses: codecov/codecov-action@v2
+        with:
+          files: ./coverage/lcov.info
+          flags: step-generation

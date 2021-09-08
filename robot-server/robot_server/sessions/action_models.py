@@ -9,9 +9,9 @@ from robot_server.service.json_api import ResourceModel
 class SessionActionType(str, Enum):
     """Types of session control actions."""
 
-    START = "start"
+    PLAY = "play"
     PAUSE = "pause"
-    RESUME = "resume"
+    STOP = "stop"
 
 
 class SessionActionCreateData(BaseModel):

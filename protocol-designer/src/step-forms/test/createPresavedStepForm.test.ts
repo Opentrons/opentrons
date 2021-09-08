@@ -301,9 +301,8 @@ describe('createPresavedStepForm', () => {
           }
         } else {
           const thermocyclerModuleState =
-            defaultArgs.robotStateTimeline.timeline[0].robotState.modules[
-              'someThermocyclerModuleId'
-            ]
+            defaultArgs.robotStateTimeline.timeline[0].robotState.modules
+              .someThermocyclerModuleId
           thermocyclerModuleState.moduleState = {
             ...thermocyclerModuleState.moduleState,
             blockTargetTemp: 42,

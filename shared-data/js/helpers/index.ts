@@ -11,6 +11,7 @@ export { wellIsRect } from './wellIsRect'
 export * from './parseProtocolData'
 export * from './volume'
 export * from './wellSets'
+export * from './getModuleVizDims'
 
 export const getLabwareDefIsStandard = (def: LabwareDefinition2): boolean =>
   def?.namespace === OPENTRONS_LABWARE_NAMESPACE
@@ -58,7 +59,7 @@ export const getTiprackVolume = (labwareDef: LabwareDefinition2): number => {
     )}, but 'isTiprack' isn't true`
   )
   // NOTE: Ian 2019-04-16 assuming all tips are the same volume across the rack
-  const volume = labwareDef.wells['A1'].totalLiquidVolume
+  const volume = labwareDef.wells.A1.totalLiquidVolume
   assert(
     volume >= 0,
     `getTiprackVolume expected tip volume to be at least 0, got ${volume}`

@@ -5,7 +5,7 @@ import traceback
 import sys
 from typing import Any, Dict
 
-from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieAlarm
+from opentrons.drivers.smoothie_drivers.errors import SmoothieAlarm
 from opentrons.protocol_api.contexts import ProtocolContext
 from opentrons.protocols.execution.errors import ExceptionInProtocolError
 from opentrons.protocols.types import PythonProtocol, MalformedProtocolError
@@ -25,8 +25,8 @@ def _runfunc_ok(run_func: Any):
             if param.default == inspect.Parameter.empty:
                 raise SyntaxError(
                     "Function 'run{}' must be called with more than one "
-                    "argument but would be called as 'run(ctx)'"
-                    .format(str(sig)))
+                    "argument but would be called as 'run(ctx)'".format(str(sig))
+                )
 
 
 def _find_protocol_error(tb, proto_name):
@@ -41,24 +41,23 @@ def _find_protocol_error(tb, proto_name):
         raise KeyError
 
 
-def run_python(
-        proto: PythonProtocol, context: ProtocolContext):
+def run_python(proto: PythonProtocol, context: ProtocolContext):
     new_globs: Dict[Any, Any] = {}
     exec(proto.contents, new_globs)
     # If the protocol is written correctly, it will have defined a function
     # like run(context: ProtocolContext). If so, that function is now in the
     # current scope.
-    if proto.filename and proto.filename.endswith('zip'):
-        filename = 'protocol.ot2.py'
+    if proto.filename and proto.filename.endswith("zip"):
+        filename = "protocol.ot2.py"
     else:
-        filename = proto.filename or '<protocol>'
+        filename = proto.filename or "<protocol>"
     try:
-        _runfunc_ok(new_globs.get('run'))
+        _runfunc_ok(new_globs.get("run"))
     except SyntaxError as se:
         raise MalformedProtocolError(str(se))
-    new_globs['__context'] = context
+    new_globs["__context"] = context
     try:
-        exec('run(__context)', new_globs)
+        exec("run(__context)", new_globs)
     except (SmoothieAlarm, asyncio.CancelledError, ExecutionCancelledError):
         # this is a protocol cancel and shouldn't have special logging
         raise

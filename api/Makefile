@@ -2,6 +2,7 @@
 
 include ../scripts/push.mk
 include ../scripts/python.mk
+include ./g_code_parsing.mk
 
 SHX := npx shx
 
@@ -23,7 +24,7 @@ simfile ?=
 
 # These variables can be overriden when make is invoked to customize the
 # behavior of pytest. For instance,
-# make test tests=tests/opentrons/tools/test_qc_scripts.py would run only the
+# make test tests=tests/opentrons/tools/test_pipette_memory.py would run only the
 # specified test
 tests ?= tests
 test_opts ?=  --cov=src/opentrons --cov-report term-missing:skip-covered --cov-report xml:coverage.xml
@@ -53,23 +54,10 @@ ot_sources := $(ot_py_sources) $(ot_shared_data_sources) $(ot_resources)
 # test modules to typecheck
 # TODO(mc, 2021-07-23): expand this to all tests
 ot_tests_to_typecheck := \
+	tests/opentrons/motion_planning \
 	tests/opentrons/protocol_api_experimental \
 	tests/opentrons/protocol_engine \
-	tests/opentrons/motion_planning \
-	tests/opentrons/file_runner \
-	tests/opentrons/protocols/runner
-
-# files and modules to format
-# TODO(mc, 2021-07-23): expand this to all files until we can format `.`
-ot_files_to_format := \
-	src/opentrons/file_runner \
-	src/opentrons/motion_planning \
-	src/opentrons/protocol_api_experimental \
-	src/opentrons/protocol_engine \
-	tests/opentrons/file_runner \
-	tests/opentrons/motion_planning  \
-	tests/opentrons/protocol_api_experimental \
-	tests/opentrons/protocol_engine
+	tests/opentrons/protocol_runner
 
 # Defined separately than the clean target so the wheel file doesn’t have to
 # depend on a PHONY target
@@ -107,13 +95,13 @@ test:
 
 .PHONY: lint
 lint:
-	$(python) -m mypy src/opentrons $(ot_tests_to_typecheck)
-	$(python) -m black --check $(ot_files_to_format)
-	$(python) -m flake8 setup.py src/opentrons tests
+	$(python) -m mypy src $(ot_tests_to_typecheck)
+	$(python) -m black --check src tests setup.py
+	$(python) -m flake8 src tests setup.py
 
 .PHONY: format
 format:
-	$(python) -m black $(ot_files_to_format)
+	$(python) -m black src tests setup.py
 
 docs/build/html/v%: docs/v%
 	$(sphinx_build) -b html -d docs/build/doctrees -n $< $@

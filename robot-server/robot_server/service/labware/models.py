@@ -5,62 +5,72 @@ from functools import partial
 from pydantic import BaseModel, Field
 
 from robot_server.service.json_api import (
-    ResponseModel, ResponseDataModel, MultiResponseModel)
+    ResponseModel,
+    ResponseDataModel,
+    MultiResponseModel,
+)
 
 OffsetVector = typing.Tuple[float, float, float]
 
-OffsetVectorField = partial(Field, ...,
-                            description="A labware offset vector in deck "
-                                        "coordinates (x, y, z)")
+OffsetVectorField = partial(
+    Field, ..., description="A labware offset vector in deck " "coordinates (x, y, z)"
+)
 
 
 class OffsetData(BaseModel):
     value: OffsetVector = OffsetVectorField()
-    lastModified: datetime =\
-        Field(..., description="When this calibration was last modified")
+    lastModified: datetime = Field(
+        ..., description="When this calibration was last modified"
+    )
 
 
 class TipData(BaseModel):
     """
     A model for tip length calibration data
     """
-    value: typing.Optional[float] =\
-        Field(..., description="The tip length of a labware")
-    lastModified: typing.Optional[datetime] =\
-        Field(..., description="When this calibration was last modified")
+
+    value: typing.Optional[float] = Field(
+        ..., description="The tip length of a labware"
+    )
+    lastModified: typing.Optional[datetime] = Field(
+        ..., description="When this calibration was last modified"
+    )
 
 
 class CalibrationData(BaseModel):
     """
     A model for labware calibration data
     """
+
     offset: OffsetData = Field(..., description="An array of XYZ offset data.")
-    tipLength: TipData =\
-        Field(..., description="The tip length of a labware, if relevant.")
+    tipLength: TipData = Field(
+        ..., description="The tip length of a labware, if relevant."
+    )
 
 
 class LabwareCalibration(ResponseDataModel):
     """
     A model describing labware calibrations (tiplength and offset)
     """
-    calibrationData: CalibrationData =\
-        Field(...,
-              description="A dictionary of calibration data"
-                          "including tip length and offsets")
-    loadName: str =\
-        Field(...,
-              description="The loadname of the labware definition.")
-    namespace: str =\
-        Field(...,
-              description="The namespace location of the labware definition")
+
+    calibrationData: CalibrationData = Field(
+        ...,
+        description="A dictionary of calibration data"
+        "including tip length and offsets",
+    )
+    loadName: str = Field(..., description="The loadname of the labware definition.")
+    namespace: str = Field(
+        ..., description="The namespace location of the labware definition"
+    )
     version: int = Field(..., description="The labware definition version")
-    parent: str =\
-        Field(...,
-              description="The module associated with this offset or an empty"
-                          " string if the offset is associated with a slot")
-    definitionHash: str =\
-        Field(...,
-              description="The sha256 hash of key labware definition details")
+    parent: str = Field(
+        ...,
+        description="The module associated with this offset or an empty"
+        " string if the offset is associated with a slot",
+    )
+    definitionHash: str = Field(
+        ..., description="The sha256 hash of key labware definition details"
+    )
 
     class Config:
         schema_extra = {
@@ -69,12 +79,12 @@ class LabwareCalibration(ResponseDataModel):
                     "calibrationData": {
                         "tipLength": {
                             "value": 10,
-                            "lastModified": "2020-07-10T12:50:47.156321"
-                            },
+                            "lastModified": "2020-07-10T12:50:47.156321",
+                        },
                         "offset": {
                             "value": [1, -2, 10],
-                            "lastModified": "2020-07-10T12:40:17.05"
-                        }
+                            "lastModified": "2020-07-10T12:40:17.05",
+                        },
                     },
                     "version": "1",
                     "parent": "",
@@ -85,26 +95,22 @@ class LabwareCalibration(ResponseDataModel):
                     "calibrationData": {
                         "tipLength": {
                             "value": 10,
-                            "lastModified": "2020-07-10T12:50:47.156321"
-                            },
+                            "lastModified": "2020-07-10T12:50:47.156321",
+                        },
                         "offset": {
                             "value": [1, -2, 10],
-                            "lastModified": "2020-07-10T12:40:17.05"
-                        }
+                            "lastModified": "2020-07-10T12:40:17.05",
+                        },
                     },
                     "version": "1",
                     "parent": "temperatureModuleV2",
                     "namespace": "opentrons",
                     "loadName": "corning_96_wellPlate_384ul",
-                }
+                },
             ]
         }
 
 
-MultipleCalibrationsResponse = MultiResponseModel[
-    LabwareCalibration
-]
+MultipleCalibrationsResponse = MultiResponseModel[LabwareCalibration]
 
-SingleCalibrationResponse = ResponseModel[
-    LabwareCalibration
-]
+SingleCalibrationResponse = ResponseModel[LabwareCalibration]

@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.5.0](https://github.com/Opentrons/opentrons/compare/v4.4.0...v4.5.0) (2021-08-03)
+
+
+### Features
+
+* **labware-designer:** add prototype react-based sandbox-style live labware editor ([#8010](https://github.com/Opentrons/opentrons/issues/8010)) ([e56aea5](https://github.com/Opentrons/opentrons/commit/e56aea54a0b44b99c4914bf05fc39bc2e08cef0f))
+
+
+
+
+
 # [4.4.0](https://github.com/Opentrons/opentrons/compare/v4.3.1...v4.4.0) (2021-06-16)
 
 **Note:** Version bump only for package labware-designer

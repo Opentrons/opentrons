@@ -6,7 +6,7 @@ from pathlib import Path
 from fastapi import UploadFile
 from typing import Iterator
 
-from opentrons.file_runner import ProtocolFileType
+from opentrons.protocol_runner import ProtocolFileType
 
 from robot_server.protocols.protocol_store import (
     ProtocolStore,

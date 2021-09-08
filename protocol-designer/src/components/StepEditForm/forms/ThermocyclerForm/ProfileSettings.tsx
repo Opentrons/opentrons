@@ -22,7 +22,7 @@ export const ProfileSettings = (props: Props): JSX.Element => {
         className={styles.profile_settings_group}
       >
         <TextField
-          {...propsForFields['profileVolume']}
+          {...propsForFields.profileVolume}
           className={styles.small_field}
           units={i18n.t('application.units.microliter')}
         />
@@ -32,7 +32,7 @@ export const ProfileSettings = (props: Props): JSX.Element => {
         className={styles.profile_settings_group}
       >
         <TextField
-          {...propsForFields['profileTargetLidTemp']}
+          {...propsForFields.profileTargetLidTemp}
           className={styles.small_field}
           units={i18n.t('application.units.degrees')}
         />

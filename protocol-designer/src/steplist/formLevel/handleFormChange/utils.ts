@@ -70,10 +70,8 @@ export function getMaxDisposalVolumeForMultidispense(
   const pipetteEntity = pipetteEntities[pipetteId]
   const pipetteCapacity = getPipetteCapacity(pipetteEntity)
   const volume = Number(values.volume)
-  const airGapChecked = values['aspirate_airGap_checkbox']
-  let airGapVolume = airGapChecked
-    ? Number(values['aspirate_airGap_volume'])
-    : 0
+  const airGapChecked = values.aspirate_airGap_checkbox
+  let airGapVolume = airGapChecked ? Number(values.aspirate_airGap_volume) : 0
   airGapVolume = Number.isFinite(airGapVolume) ? airGapVolume : 0
   return round(pipetteCapacity - volume * 2 - airGapVolume, DISPOSAL_VOL_DIGITS)
 }
@@ -91,10 +89,8 @@ export function volumeInCapacityForMulti(
   const pipetteEntity = pipetteEntities[rawForm.pipette]
   const pipetteCapacity = pipetteEntity && getPipetteCapacity(pipetteEntity)
   const volume = Number(rawForm.volume)
-  const airGapChecked = rawForm['aspirate_airGap_checkbox']
-  let airGapVolume = airGapChecked
-    ? Number(rawForm['aspirate_airGap_volume'])
-    : 0
+  const airGapChecked = rawForm.aspirate_airGap_checkbox
+  let airGapVolume = airGapChecked ? Number(rawForm.aspirate_airGap_volume) : 0
   airGapVolume = Number.isFinite(airGapVolume) ? airGapVolume : 0
   return rawForm.path === 'multiAspirate'
     ? volumeInCapacityForMultiAspirate({

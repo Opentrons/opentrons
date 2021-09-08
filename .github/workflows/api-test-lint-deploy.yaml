@@ -76,9 +76,10 @@ jobs:
           project: 'api'
       - name: Test
         run: make -C api test
-      - uses: 'codecov/codecov-action@v1'
+      - uses: 'codecov/codecov-action@v2'
         with:
-          file: ./api/coverage.xml
+          files: ./api/coverage.xml
+          flags: api
 
   deploy:
     name: 'deploy opentrons package'

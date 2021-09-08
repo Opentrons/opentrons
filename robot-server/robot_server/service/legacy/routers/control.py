@@ -3,8 +3,11 @@ import asyncio
 from fastapi import APIRouter, Query, Depends
 from starlette import status
 
-from opentrons.hardware_control import ThreadManager, ThreadedAsyncLock, \
-    ThreadedAsyncForbidden
+from opentrons.hardware_control import (
+    ThreadManager,
+    ThreadedAsyncLock,
+    ThreadedAsyncForbidden,
+)
 from opentrons.hardware_control.types import Axis, CriticalPoint
 from opentrons.types import Mount, Point
 
@@ -16,22 +19,24 @@ from robot_server.service.legacy.models import control
 router = APIRouter()
 
 
-@router.post("/identify",
-             description="Blink the OT-2's gantry lights so you can pick it "
-                         "out of a crowd")
+@router.post(
+    "/identify",
+    description="Blink the OT-2's gantry lights so you can pick it " "out of a crowd",
+)
 async def post_identify(
-        seconds: int = Query(...,
-                             description="Time to blink the lights for"),
-        hardware: ThreadManager = Depends(get_hardware)) \
-        -> V1BasicResponse:
-    identify = hardware.identify  # type: ignore
+    seconds: int = Query(..., description="Time to blink the lights for"),
+    hardware: ThreadManager = Depends(get_hardware),
+) -> V1BasicResponse:
+    identify = hardware.identify
     asyncio.ensure_future(identify(seconds))
     return V1BasicResponse(message="identifying")
 
 
-@router.get("/robot/positions",
-            description="Get a list of useful positions",
-            response_model=control.RobotPositionsResponse)
+@router.get(
+    "/robot/positions",
+    description="Get a list of useful positions",
+    response_model=control.RobotPositionsResponse,
+)
 async def get_robot_positions() -> control.RobotPositionsResponse:
     """
     Positions determined experimentally by issuing move commands. Change
@@ -40,11 +45,12 @@ async def get_robot_positions() -> control.RobotPositionsResponse:
     position places either pipette roughly in the front-center of the deck area
     """
     robot_positions = control.RobotPositions(
-        change_pipette=control.ChangePipette(target=control.MotionTarget.mount,
-                                             left=[300, 40, 30],
-                                             right=[95, 40, 30]),
-        attach_tip=control.AttachTip(target=control.MotionTarget.pipette,
-                                     point=[200, 90, 150])
+        change_pipette=control.ChangePipette(
+            target=control.MotionTarget.mount, left=[300, 40, 30], right=[95, 40, 30]
+        ),
+        attach_tip=control.AttachTip(
+            target=control.MotionTarget.pipette, point=[200, 90, 150]
+        ),
     )
     return control.RobotPositionsResponse(positions=robot_positions)
 
@@ -61,18 +67,15 @@ async def get_robot_positions() -> control.RobotPositionsResponse:
     },
 )
 async def post_move_robot(
-        robot_move_target: control.RobotMoveTarget,
-        hardware: ThreadManager = Depends(get_hardware),
-        motion_lock: ThreadedAsyncLock = Depends(get_motion_lock))\
-        -> V1BasicResponse:
+    robot_move_target: control.RobotMoveTarget,
+    hardware: ThreadManager = Depends(get_hardware),
+    motion_lock: ThreadedAsyncLock = Depends(get_motion_lock),
+) -> V1BasicResponse:
     """Move the robot"""
     try:
         async with motion_lock.forbid():
-            pos = await _do_move(hardware=hardware,
-                                 robot_move_target=robot_move_target)
-            return V1BasicResponse(
-                message=f"Move complete. New position: {pos}"
-            )
+            pos = await _do_move(hardware=hardware, robot_move_target=robot_move_target)
+            return V1BasicResponse(message=f"Move complete. New position: {pos}")
     except ThreadedAsyncForbidden as e:
         raise LegacyErrorResponse(message=str(e)).as_error(status.HTTP_403_FORBIDDEN)
 
@@ -87,18 +90,18 @@ async def post_move_robot(
     },
 )
 async def post_home_robot(
-        robot_home_target: control.RobotHomeTarget,
-        hardware: ThreadManager = Depends(get_hardware),
-        motion_lock: ThreadedAsyncLock = Depends(get_motion_lock)) \
-        -> V1BasicResponse:
+    robot_home_target: control.RobotHomeTarget,
+    hardware: ThreadManager = Depends(get_hardware),
+    motion_lock: ThreadedAsyncLock = Depends(get_motion_lock),
+) -> V1BasicResponse:
     """Home the robot or one of the pipettes"""
     try:
         async with motion_lock.forbid():
             mount = robot_home_target.mount
             target = robot_home_target.target
 
-            home = hardware.home  # type: ignore
-            home_plunger = hardware.home_plunger  # type: ignore
+            home = hardware.home
+            home_plunger = hardware.home_plunger
 
             if target == control.HomeTarget.pipette and mount:
                 await home([Axis.by_mount(Mount[mount.upper()])])
@@ -108,40 +111,43 @@ async def post_home_robot(
                 await home()
                 message = "Homing robot."
             else:
-                raise LegacyErrorResponse(
-                    message=f"{target} is invalid"
-                ).as_error(status.HTTP_400_BAD_REQUEST)
+                raise LegacyErrorResponse(message=f"{target} is invalid").as_error(
+                    status.HTTP_400_BAD_REQUEST
+                )
 
             return V1BasicResponse(message=message)
     except ThreadedAsyncForbidden as e:
         raise LegacyErrorResponse(message=str(e)).as_error(status.HTTP_403_FORBIDDEN)
 
 
-@router.get("/robot/lights",
-            description="Get the current status of the OT-2's rail lights",
-            response_model=control.RobotLightState,)
+@router.get(
+    "/robot/lights",
+    description="Get the current status of the OT-2's rail lights",
+    response_model=control.RobotLightState,
+)
 async def get_robot_light_state(
-        hardware: ThreadManager = Depends(get_hardware)) \
-        -> control.RobotLightState:
-    light_state = hardware.get_lights()  # type: ignore
-    return control.RobotLightState(on=light_state.get('rails', False))
+    hardware: ThreadManager = Depends(get_hardware),
+) -> control.RobotLightState:
+    light_state = hardware.get_lights()
+    return control.RobotLightState(on=light_state.get("rails", False))
 
 
-@router.post("/robot/lights",
-             description="Turn the rail lights on or off",
-             response_model=control.RobotLightState)
+@router.post(
+    "/robot/lights",
+    description="Turn the rail lights on or off",
+    response_model=control.RobotLightState,
+)
 async def post_robot_light_state(
-        robot_light_state: control.RobotLightState,
-        hardware: ThreadManager = Depends(get_hardware)) \
-        -> control.RobotLightState:
-    await hardware.set_lights(rails=robot_light_state.on)  # type: ignore
+    robot_light_state: control.RobotLightState,
+    hardware: ThreadManager = Depends(get_hardware),
+) -> control.RobotLightState:
+    await hardware.set_lights(rails=robot_light_state.on)
     return robot_light_state
 
 
-async def _do_move(hardware: ThreadManager,
-                   robot_move_target: control.RobotMoveTarget):
+async def _do_move(hardware: ThreadManager, robot_move_target: control.RobotMoveTarget):
     """Perform the move"""
-    await hardware.cache_instruments()  # type: ignore
+    await hardware.cache_instruments()
 
     critical_point = None
     if robot_move_target.target == control.MotionTarget.mount:
@@ -151,15 +157,18 @@ async def _do_move(hardware: ThreadManager,
     target_pos = Point(*robot_move_target.point)
 
     # Reset z position
-    await hardware.home_z()  # type: ignore
+    await hardware.home_z()
 
-    gantry_position = hardware.gantry_position  # type: ignore
-    move_to = hardware.move_to  # type: ignore
+    gantry_position = hardware.gantry_position
+    move_to = hardware.move_to
 
     pos = await gantry_position(mount, critical_point=critical_point)
     # Move to requested x, y and current z position
-    await move_to(mount, Point(x=target_pos.x, y=target_pos.y, z=pos.z),
-                  critical_point=critical_point)
+    await move_to(
+        mount,
+        Point(x=target_pos.x, y=target_pos.y, z=pos.z),
+        critical_point=critical_point,
+    )
     # Move to requested z position
     await move_to(mount, target_pos, critical_point=critical_point)
     return await gantry_position(mount)

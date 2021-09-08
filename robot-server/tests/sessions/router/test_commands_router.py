@@ -17,7 +17,11 @@ from opentrons.protocol_engine import (
 )
 
 from robot_server.service.json_api import ResponseModel
-from robot_server.sessions.session_models import BasicSession, SessionCommandSummary
+from robot_server.sessions.session_models import (
+    BasicSession,
+    SessionStatus,
+    SessionCommandSummary,
+)
 from robot_server.sessions.engine_store import EngineStore
 from robot_server.sessions.router.base_router import get_session as real_get_session
 from robot_server.sessions.router.commands_router import (
@@ -57,6 +61,7 @@ async def test_get_session_commands(
     session_response = BasicSession(
         id="session-id",
         createdAt=datetime(year=2021, month=1, day=1),
+        status=SessionStatus.RUNNING,
         actions=[],
         commands=[command_summary],
     )
@@ -68,9 +73,7 @@ async def test_get_session_commands(
             session_store=matchers.Anything(),
             engine_store=matchers.Anything(),
         ),
-    ).then_return(
-        ResponseModel(data=session_response)  # type: ignore[arg-type]
-    )
+    ).then_return(ResponseModel(data=session_response))
 
     response = await async_client.get("/sessions/session-id/commands")
 

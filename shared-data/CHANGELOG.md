@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.5.0](https://github.com/Opentrons/opentrons/compare/v4.4.0...v4.5.0) (2021-08-03)
+
+
+### Features
+
+* **labware-creator:** added tube brand and rack brand ([#8082](https://github.com/Opentrons/opentrons/issues/8082)) ([22ee36f](https://github.com/Opentrons/opentrons/commit/22ee36f79129b04d2588ae72a173ea1eb1253a12)), closes [#7986](https://github.com/Opentrons/opentrons/issues/7986)
+* **labware-creator:** export and import tiprack defs ([#7947](https://github.com/Opentrons/opentrons/issues/7947)) ([a90e66d](https://github.com/Opentrons/opentrons/commit/a90e66d191a47d2a92a839e9554b8610aac27603)), closes [#7696](https://github.com/Opentrons/opentrons/issues/7696) [#7697](https://github.com/Opentrons/opentrons/issues/7697)
+* **labware-creator:** implement and test saving custom tube racks ([#8089](https://github.com/Opentrons/opentrons/issues/8089)) ([2f6f7e0](https://github.com/Opentrons/opentrons/commit/2f6f7e0c313a9ef9a0d04da67aa8e05e579ca916)), closes [#7964](https://github.com/Opentrons/opentrons/issues/7964)
+
+
+
+
+
 # [4.4.0](https://github.com/Opentrons/opentrons/compare/v4.3.1...v4.4.0) (2021-06-16)
 
 

@@ -15,11 +15,9 @@ def clear_calibrations():
     Delete all calibration files for labware. This includes deleting tip-length
     data for tipracks.
     """
-    calibration_path =\
-        config.get_opentrons_path('labware_calibration_offsets_dir_v2')
+    calibration_path = config.get_opentrons_path("labware_calibration_offsets_dir_v2")
     try:
-        targets = [
-            f for f in calibration_path.iterdir() if f.suffix == '.json']
+        targets = [f for f in calibration_path.iterdir() if f.suffix == ".json"]
         for target in targets:
             target.unlink()
     except FileNotFoundError:
@@ -34,12 +32,11 @@ def _remove_offset_from_index(calibration_id: local_types.CalibrationID):
     :raises FileNotFoundError: If index file does not exist or
     the specified id is not in the index file.
     """
-    offset_path =\
-        config.get_opentrons_path('labware_calibration_offsets_dir_v2')
-    index_path = offset_path / 'index.json'
+    offset_path = config.get_opentrons_path("labware_calibration_offsets_dir_v2")
+    index_path = offset_path / "index.json"
     blob = io.read_cal_file(str(index_path))
 
-    del blob['data'][calibration_id]
+    del blob["data"][calibration_id]
     io.save_to_file(index_path, blob)
 
 
@@ -49,9 +46,8 @@ def delete_offset_file(calibration_id: local_types.CalibrationID):
 
     :param calibration_id: labware hash
     """
-    offset_path =\
-        config.get_opentrons_path('labware_calibration_offsets_dir_v2')
-    offset = offset_path / f'{calibration_id}.json'
+    offset_path = config.get_opentrons_path("labware_calibration_offsets_dir_v2")
+    offset = offset_path / f"{calibration_id}.json"
     try:
         _remove_offset_from_index(calibration_id)
         offset.unlink()
@@ -64,7 +60,7 @@ def _remove_tip_length_from_index(tiprack: str, pipette: str):
     Remove tip length data from the index file
     """
     tip_length_dir = config.get_tip_length_cal_path()
-    index_path = tip_length_dir / 'index.json'
+    index_path = tip_length_dir / "index.json"
     blob = io.read_cal_file(str(index_path))
 
     if tiprack in blob and pipette in blob[tiprack]:
@@ -81,7 +77,7 @@ def delete_tip_length_calibration(tiprack: str, pipette: str):
     :param pipette: pipette serial number
     """
     tip_length_dir = config.get_tip_length_cal_path()
-    tip_length_path = tip_length_dir / f'{pipette}.json'
+    tip_length_path = tip_length_dir / f"{pipette}.json"
     blob = io.read_cal_file(str(tip_length_path))
 
     if tiprack in blob:
@@ -99,8 +95,7 @@ def clear_tip_length_calibration():
     """
     tip_length_path = config.get_tip_length_cal_path()
     try:
-        targets = (
-            f for f in tip_length_path.iterdir() if f.suffix == '.json')
+        targets = (f for f in tip_length_path.iterdir() if f.suffix == ".json")
         for target in targets:
             target.unlink()
     except FileNotFoundError:
@@ -116,8 +111,8 @@ def _remove_pipette_offset_from_index(pipette: str, mount: Mount):
     :raises FileNotFoundError: If index file does not exist or
     the specified id is not in the index file.
     """
-    offset_dir = config.get_opentrons_path('pipette_calibration_dir')
-    index_path = offset_dir / 'index.json'
+    offset_dir = config.get_opentrons_path("pipette_calibration_dir")
+    index_path = offset_dir / "index.json"
     blob = io.read_cal_file(str(index_path))
 
     try:
@@ -136,8 +131,8 @@ def delete_pipette_offset_file(pipette: str, mount: Mount):
     :param pipette: pipette serial number
     :param mount: pipette mount
     """
-    offset_dir = config.get_opentrons_path('pipette_calibration_dir')
-    offset_path = offset_dir / mount.name.lower() / f'{pipette}.json'
+    offset_dir = config.get_opentrons_path("pipette_calibration_dir")
+    offset_path = offset_dir / mount.name.lower() / f"{pipette}.json"
 
     try:
         _remove_pipette_offset_from_index(pipette, mount)
@@ -155,10 +150,10 @@ def clear_pipette_offset_calibrations():
         for item in p.iterdir():
             if item.is_dir():
                 _remove_json_files_in_directories(item)
-            elif item.suffix == '.json':
+            elif item.suffix == ".json":
                 item.unlink()
 
-    offset_dir = config.get_opentrons_path('pipette_calibration_dir')
+    offset_dir = config.get_opentrons_path("pipette_calibration_dir")
     try:
         _remove_json_files_in_directories(offset_dir)
     except FileNotFoundError:
@@ -170,7 +165,7 @@ def delete_robot_deck_attitude():
     Delete the robot deck attitude calibration.
     """
 
-    robot_dir = config.get_opentrons_path('robot_calibration_dir')
-    gantry_path = robot_dir / 'deck_calibration.json'
+    robot_dir = config.get_opentrons_path("robot_calibration_dir")
+    gantry_path = robot_dir / "deck_calibration.json"
     if gantry_path.exists():
         gantry_path.unlink()

@@ -1,27 +1,26 @@
 from typing import cast, List, Optional, Tuple
 from opentrons.types import Point
-from opentrons.protocol_api import (
-    labware, InstrumentContext, ProtocolContext)
+from opentrons.protocol_api import labware, InstrumentContext, ProtocolContext
 
 from opentrons.protocols.geometry import module_geometry
 
 
 def _get_parent_slot_and_position(
-        labware_obj: labware.Labware) -> Tuple[str, Optional[Point]]:
+    labware_obj: labware.Labware,
+) -> Tuple[str, Optional[Point]]:
     if isinstance(labware_obj.parent, (module_geometry.ModuleGeometry)):
-        return (
-            cast(str, labware_obj.parent.parent),
-            labware_obj.parent.labware_offset)
+        return (cast(str, labware_obj.parent.parent), labware_obj.parent.labware_offset)
     else:
         return (cast(str, labware_obj.parent), None)
 
 
 class Container:
     def __init__(
-            self,
-            container: labware.Labware,
-            instruments: List[InstrumentContext],
-            context: ProtocolContext) -> None:
+        self,
+        container: labware.Labware,
+        instruments: List[InstrumentContext],
+        context: ProtocolContext,
+    ) -> None:
         self._container = container
         self._context = context
         self.id = id(container)
@@ -36,19 +35,19 @@ class Container:
         self.position = position
         self.is_legacy = False
         self.is_tiprack = container.is_tiprack
-        self.definition_hash = labware.get_labware_hash_with_parent(
-            container)
+        self.definition_hash = labware.get_labware_hash_with_parent(container)
         self.instruments = [
-            Instrument(instrument, [], self._context)
-            for instrument in instruments]
+            Instrument(instrument, [], self._context) for instrument in instruments
+        ]
 
 
 class Instrument:
     def __init__(
-            self,
-            instrument: InstrumentContext,
-            containers: List[labware.Labware],
-            context: ProtocolContext) -> None:
+        self,
+        instrument: InstrumentContext,
+        containers: List[labware.Labware],
+        context: ProtocolContext,
+    ) -> None:
         containers = containers or []
         self._instrument = instrument
         self._context = context
@@ -61,28 +60,29 @@ class Instrument:
         self.channels = instrument.channels
         self.mount = instrument.mount
         self.containers = [
-            Container(container, [], self._context)
-            for container in containers
+            Container(container, [], self._context) for container in containers
         ]
         self.tip_racks = [
             Container(container, [], self._context)
-            for container in instrument.tip_racks]
+            for container in instrument.tip_racks
+        ]
         if context:
-            self.tip_racks.extend([
-                c for c in self.containers if c._container.is_tiprack])
+            self.tip_racks.extend(
+                [c for c in self.containers if c._container.is_tiprack]
+            )
         self.requested_as = instrument.requested_as
 
 
 class Module:
     def __init__(
-            self,
-            module: module_geometry.ModuleGeometry,
-            context: ProtocolContext) -> None:
+        self, module: module_geometry.ModuleGeometry, context: ProtocolContext
+    ) -> None:
         self.id = id(module)
         _type_lookup = {
-            module_geometry.ModuleType.MAGNETIC: 'magdeck',
-            module_geometry.ModuleType.TEMPERATURE: 'tempdeck',
-            module_geometry.ModuleType.THERMOCYCLER: 'thermocycler'}
+            module_geometry.ModuleType.MAGNETIC: "magdeck",
+            module_geometry.ModuleType.TEMPERATURE: "tempdeck",
+            module_geometry.ModuleType.THERMOCYCLER: "thermocycler",
+        }
         self.name = _type_lookup[module.module_type]
         self.model = module.model.value
         self.slot = module.parent

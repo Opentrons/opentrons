@@ -10,8 +10,8 @@ class ThingWithLink(BaseModel):
 
 def test_follows_structure():
     structure_to_validate = {
-        'links': {
-            'self': {'href': '/items/1', 'meta': None},
+        "links": {
+            "self": {"href": "/items/1", "meta": None},
         }
     }
     validated = ThingWithLink(**structure_to_validate)
@@ -20,16 +20,12 @@ def test_follows_structure():
 
 def test_must_be_self_key_with_string_value():
     invalid_structure_to_validate = {
-        'invalid': {
-            'key': 'value',
+        "invalid": {
+            "key": "value",
         }
     }
     with raises(ValidationError) as e:
         ThingWithLink(**invalid_structure_to_validate)
     assert e.value.errors() == [
-        {
-            'loc': ('links',),
-            'msg': 'field required',
-            'type': 'value_error.missing'
-        }
+        {"loc": ("links",), "msg": "field required", "type": "value_error.missing"}
     ]

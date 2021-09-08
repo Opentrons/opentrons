@@ -5,22 +5,22 @@ from opentrons.types import Point
 from .constants import DeckCalibrationState
 
 SavedPoints = TypedDict(
-    'SavedPoints',
+    "SavedPoints",
     {
-        '1BLC': Point,
-        '3BRC': Point,
-        '7TLC': Point,
+        "1BLC": Point,
+        "3BRC": Point,
+        "7TLC": Point,
     },
-    total=False
-    )
+    total=False,
+)
 
 ExpectedPoints = TypedDict(
-    'ExpectedPoints',
+    "ExpectedPoints",
     {
-        '1BLC': Point,
-        '3BRC': Point,
-        '7TLC': Point,
-    })
+        "1BLC": Point,
+        "3BRC": Point,
+        "7TLC": Point,
+    },
+)
 
-StatePointMap = Dict[
-    DeckCalibrationState, Union[Literal['1BLC', '3BRC', '7TLC']]]
+StatePointMap = Dict[DeckCalibrationState, Union[Literal["1BLC", "3BRC", "7TLC"]]]

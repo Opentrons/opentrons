@@ -1,13 +1,18 @@
 from typing import Awaitable
 
-from robot_server.robot.calibration.deck.user_flow import \
-    DeckCalibrationUserFlow
-from robot_server.robot.calibration.deck.models import \
-    DeckCalibrationSessionStatus
-from robot_server.service.session.errors import (SessionCreationException,
-                                                 CommandExecutionException)
-from robot_server.service.session.command_execution import \
-    CallableExecutor, Command, CompletedCommand, CommandQueue, CommandExecutor
+from robot_server.robot.calibration.deck.user_flow import DeckCalibrationUserFlow
+from robot_server.robot.calibration.deck.models import DeckCalibrationSessionStatus
+from robot_server.service.session.errors import (
+    SessionCreationException,
+    CommandExecutionException,
+)
+from robot_server.service.session.command_execution import (
+    CallableExecutor,
+    Command,
+    CompletedCommand,
+    CommandQueue,
+    CommandExecutor,
+)
 
 from .base_session import BaseSession, SessionMetaData
 from ..configuration import SessionConfiguration
@@ -16,7 +21,6 @@ from ..errors import UnsupportedFeature
 
 
 class DeckCalibrationCommandExecutor(CallableExecutor):
-
     async def execute(self, command: Command) -> CompletedCommand:
         try:
             return await super().execute(command)
@@ -25,11 +29,13 @@ class DeckCalibrationCommandExecutor(CallableExecutor):
 
 
 class DeckCalibrationSession(BaseSession):
-    def __init__(self,
-                 configuration: SessionConfiguration,
-                 instance_meta: SessionMetaData,
-                 deck_cal_user_flow: DeckCalibrationUserFlow,
-                 shutdown_handler: Awaitable[None] = None):
+    def __init__(
+        self,
+        configuration: SessionConfiguration,
+        instance_meta: SessionMetaData,
+        deck_cal_user_flow: DeckCalibrationUserFlow,
+        shutdown_handler: Awaitable[None] = None,
+    ):
         super().__init__(configuration, instance_meta)
         self._deck_cal_user_flow = deck_cal_user_flow
         self._command_executor = DeckCalibrationCommandExecutor(
@@ -38,18 +44,18 @@ class DeckCalibrationSession(BaseSession):
         self._shutdown_coroutine = shutdown_handler
 
     @classmethod
-    async def create(cls,
-                     configuration: SessionConfiguration,
-                     instance_meta: SessionMetaData) -> 'BaseSession':
+    async def create(
+        cls, configuration: SessionConfiguration, instance_meta: SessionMetaData
+    ) -> "BaseSession":
         # if lights are on already it's because the user clicked the button,
         # so a) we don't need to turn them on now and b) we shouldn't turn them
         # off after
-        session_controls_lights =\
-            not configuration.hardware.get_lights()['rails']
+        session_controls_lights = not configuration.hardware.get_lights()["rails"]
         await configuration.hardware.cache_instruments()
         try:
             deck_cal_user_flow = DeckCalibrationUserFlow(
-                hardware=configuration.hardware)
+                hardware=configuration.hardware
+            )
         except AssertionError as e:
             raise SessionCreationException(str(e))
 
@@ -59,10 +65,12 @@ class DeckCalibrationSession(BaseSession):
         else:
             shutdown_handler = None
 
-        return cls(configuration=configuration,
-                   instance_meta=instance_meta,
-                   deck_cal_user_flow=deck_cal_user_flow,
-                   shutdown_handler=shutdown_handler)
+        return cls(
+            configuration=configuration,
+            instance_meta=instance_meta,
+            deck_cal_user_flow=deck_cal_user_flow,
+            shutdown_handler=shutdown_handler,
+        )
 
     @property
     def command_executor(self) -> CommandExecutor:
@@ -81,7 +89,7 @@ class DeckCalibrationSession(BaseSession):
             id=self.meta.identifier,
             createParams=self.meta.create_params,
             details=self._get_response_details(),
-            createdAt=self.meta.created_at
+            createdAt=self.meta.created_at,
         )
 
     def _get_response_details(self) -> DeckCalibrationSessionStatus:
@@ -92,7 +100,8 @@ class DeckCalibrationSession(BaseSession):
             instrument=self._deck_cal_user_flow.get_pipette(),  # type: ignore[arg-type]  # noqa: E501
             currentStep=self._deck_cal_user_flow.current_state,
             labware=self._deck_cal_user_flow.get_required_labware(),
-            supportedCommands=supported_commands)
+            supportedCommands=supported_commands,
+        )
 
     async def clean_up(self):
         if self._shutdown_coroutine:

@@ -10,26 +10,29 @@ from robot_server.service.legacy.models import pipettes
 router = APIRouter()
 
 
-@router.get("/pipettes",
-            summary="Get the pipettes currently attached",
-            description="This endpoint lists properties of the pipettes "
-                        "currently attached to the robot like name, model, "
-                        "and mount. It queries a cached value unless the "
-                        "refresh query parameter is set to true, in which "
-                        "case it will actively scan for pipettes. This "
-                        "requires disabling the pipette motors (which is done "
-                        "automatically) and therefore should only be done "
-                        "through user intent.",
-            response_model=pipettes.PipettesByMount)
+@router.get(
+    "/pipettes",
+    summary="Get the pipettes currently attached",
+    description="This endpoint lists properties of the pipettes "
+    "currently attached to the robot like name, model, "
+    "and mount. It queries a cached value unless the "
+    "refresh query parameter is set to true, in which "
+    "case it will actively scan for pipettes. This "
+    "requires disabling the pipette motors (which is done "
+    "automatically) and therefore should only be done "
+    "through user intent.",
+    response_model=pipettes.PipettesByMount,
+)
 async def get_pipettes(
-        refresh: typing.Optional[bool] = Query(
-            False,
-            description="If true, actively scan for attached pipettes. Note:"
-                        " this requires  disabling the pipette motors and"
-                        " should only be done when no  protocol is running "
-                        "and you know  it won't cause a problem"),
-        hardware: ThreadManager = Depends(get_hardware))\
-        -> pipettes.PipettesByMount:
+    refresh: typing.Optional[bool] = Query(
+        False,
+        description="If true, actively scan for attached pipettes. Note:"
+        " this requires  disabling the pipette motors and"
+        " should only be done when no  protocol is running "
+        "and you know  it won't cause a problem",
+    ),
+    hardware: ThreadManager = Depends(get_hardware),
+) -> pipettes.PipettesByMount:
     """
     Query robot for model strings on 'left' and 'right' mounts, and return a
     dict with the results keyed by mount. By default, this endpoint provides
@@ -43,21 +46,23 @@ async def get_pipettes(
     mount will report `'model': null`
     """
     if refresh is True:
-        await hardware.cache_instruments()     # type: ignore
+        await hardware.cache_instruments()
 
-    attached = hardware.attached_instruments   # type: ignore
+    attached = hardware.attached_instruments
 
     def make_pipette(mount, o):
         return pipettes.AttachedPipette(
-            model=o.get('model'),
-            name=o.get('name'),
-            id=o.get('pipette_id'),
+            model=o.get("model"),
+            name=o.get("name"),
+            id=o.get("pipette_id"),
             mount_axis=str(Axis.by_mount(mount)).lower(),
             plunger_axis=str(Axis.of_plunger(mount)).lower(),
-            tip_length=o.get('tip_length', 0) if o.get('model') else None
+            tip_length=o.get("tip_length", 0) if o.get("model") else None,
         )
 
-    e = {mount.name.lower(): make_pipette(mount, data)
-         for mount, data in attached.items()}
+    e = {
+        mount.name.lower(): make_pipette(mount, data)
+        for mount, data in attached.items()
+    }
 
     return pipettes.PipettesByMount(**e)

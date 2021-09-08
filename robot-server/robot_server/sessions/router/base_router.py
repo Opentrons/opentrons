@@ -9,6 +9,7 @@ from typing_extensions import Literal
 
 from robot_server.errors import ErrorDetails, ErrorResponse
 from robot_server.service.dependencies import get_current_time, get_unique_id
+from robot_server.service.task_runner import TaskRunner
 from robot_server.service.json_api import (
     ResponseModel,
     EmptyResponseModel,
@@ -68,6 +69,7 @@ async def create_session(
     protocol_store: ProtocolStore = Depends(get_protocol_store),
     session_id: str = Depends(get_unique_id),
     created_at: datetime = Depends(get_current_time),
+    task_runner: TaskRunner = Depends(TaskRunner),
 ) -> ResponseModel[Session]:
     """Create a new session.
 
@@ -78,7 +80,8 @@ async def create_session(
         engine_store: ProtocolEngine storage and control.
         protocol_store: Protocol resource storage.
         session_id: Generated ID to assign to the session.
-        created_at: Timestamp to attach to created session
+        created_at: Timestamp to attach to created session.
+        task_runner: Background task runner.
     """
     create_data = request_body.data if request_body is not None else None
     session = session_view.as_resource(
@@ -86,24 +89,36 @@ async def create_session(
         created_at=created_at,
         create_data=create_data,
     )
-    protocol = None
+    protocol_id = None
+
+    if isinstance(create_data, ProtocolSessionCreateData):
+        protocol_id = create_data.createParams.protocolId
 
     try:
-        if isinstance(create_data, ProtocolSessionCreateData):
-            protocol = protocol_store.get(
-                protocol_id=create_data.createParams.protocolId
-            )
+        await engine_store.create()
 
-        # TODO(mc, 2021-05-28): return engine state to build response model
-        await engine_store.create(protocol=protocol)
+        if protocol_id is not None:
+            protocol_resource = protocol_store.get(protocol_id=protocol_id)
+            engine_store.runner.load(protocol_resource)
+
+        # TODO(mc, 2021-08-05): capture errors from `runner.join` and place
+        # them in the session resource
+        task_runner.run(engine_store.runner.join)
+
     except ProtocolNotFoundError as e:
         raise ProtocolNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
+
     except EngineConflictError as e:
         raise SessionAlreadyActive(detail=str(e)).as_error(status.HTTP_409_CONFLICT)
 
     session_store.upsert(session=session)
     commands = engine_store.engine.state_view.commands.get_all()
-    data = session_view.as_response(session=session, commands=commands)
+    engine_status = engine_store.engine.state_view.commands.get_status()
+    data = session_view.as_response(
+        session=session,
+        commands=commands,
+        engine_status=engine_status,
+    )
 
     return ResponseModel(data=data)
 
@@ -132,7 +147,13 @@ async def get_sessions(
     for session in session_store.get_all():
         # TODO(mc, 2021-06-23): add multi-engine support
         commands = engine_store.engine.state_view.commands.get_all()
-        data.append(session_view.as_response(session=session, commands=commands))
+        engine_status = engine_store.engine.state_view.commands.get_status()
+        session_data = session_view.as_response(
+            session=session,
+            commands=commands,
+            engine_status=engine_status,
+        )
+        data.append(session_data)
 
     return MultiResponseModel(data=data)
 
@@ -167,7 +188,12 @@ async def get_session(
         raise SessionNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
 
     commands = engine_store.engine.state_view.commands.get_all()
-    data = session_view.as_response(session=session, commands=commands)
+    engine_status = engine_store.engine.state_view.commands.get_status()
+    data = session_view.as_response(
+        session=session,
+        commands=commands,
+        engine_status=engine_status,
+    )
 
     return ResponseModel(data=data)
 

@@ -56,7 +56,13 @@ jobs:
           make setup-js
       - name: 'run components unit tests'
         run: |
-          yarn jest --coverage=true --ci=true components/
+          yarn jest --coverage=true --ci=true --collectCoverageFrom="components/src/**/*.(js|ts|tsx)" components/src
+      - name: 'Upload coverage report'
+        uses: codecov/codecov-action@v2
+        with:
+          files: ./coverage/lcov.info
+          flags: components
+  
   build-components:
     name: 'build components artifact'
     runs-on: 'ubuntu-18.04'

@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.5.0](https://github.com/Opentrons/opentrons/compare/v4.4.0...v4.5.0) (2021-08-03)
+
+
+### Bug Fixes
+
+* **app:** Run timer stays at 00:00:00 if you reconnect in the middle of a delay ([#7937](https://github.com/Opentrons/opentrons/issues/7937)) ([6415c90](https://github.com/Opentrons/opentrons/commit/6415c9036e5f0368a9862cb11d6608702c0815a3))
+
+
+### Features
+
+* **labware-creator:** export and import tiprack defs ([#7947](https://github.com/Opentrons/opentrons/issues/7947)) ([a90e66d](https://github.com/Opentrons/opentrons/commit/a90e66d191a47d2a92a839e9554b8610aac27603)), closes [#7696](https://github.com/Opentrons/opentrons/issues/7696) [#7697](https://github.com/Opentrons/opentrons/issues/7697)
+
+
+
+
+
 # [4.4.0](https://github.com/Opentrons/opentrons/compare/v4.3.1...v4.4.0) (2021-06-16)
 
 **Note:** Version bump only for package @opentrons/app

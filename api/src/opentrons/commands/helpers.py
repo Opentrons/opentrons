@@ -30,6 +30,5 @@ def _stringify_new_loc(loc: Union[Location, Well]) -> str:
 
 
 def stringify_location(location: CommandLocation) -> str:
-    loc_str_list = [_stringify_new_loc(loc)
-                    for loc in listify(location)]
-    return ', '.join(loc_str_list)
+    loc_str_list = [_stringify_new_loc(loc) for loc in listify(location)]
+    return ", ".join(loc_str_list)

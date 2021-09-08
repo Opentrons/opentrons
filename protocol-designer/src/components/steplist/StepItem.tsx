@@ -432,8 +432,8 @@ export const StepItemContents = (
 
   // headers
   if (stepType === 'moveLiquid') {
-    const sourceLabwareId = rawForm['aspirate_labware']
-    const destLabwareId = rawForm['dispense_labware']
+    const sourceLabwareId = rawForm.aspirate_labware
+    const destLabwareId = rawForm.dispense_labware
 
     result.push(
       <AspirateDispenseHeader
@@ -445,7 +445,7 @@ export const StepItemContents = (
   }
 
   if (stepType === 'mix') {
-    const mixLabwareId = rawForm['labware']
+    const mixLabwareId = rawForm.labware
     result.push(
       <MixHeader
         key="mix-header"

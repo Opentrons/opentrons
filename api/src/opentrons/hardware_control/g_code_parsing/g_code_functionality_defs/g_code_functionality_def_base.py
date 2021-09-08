@@ -8,11 +8,12 @@ class Explanation:
     """
     Dataclass containing information about the ran G-Code.
     """
-    CODE_KEY = 'Code'
-    COMMAND_NAME_KEY = 'Command Name'
-    PROVIDED_ARGS_KEY = 'Provided Arguments'
-    COMMAND_EXPLANATION_KEY = 'Command Explanation'
-    RESPONSE_KEY = 'Response'
+
+    CODE_KEY = "Code"
+    COMMAND_NAME_KEY = "Command Name"
+    PROVIDED_ARGS_KEY = "Provided Arguments"
+    COMMAND_EXPLANATION_KEY = "Command Explanation"
+    RESPONSE_KEY = "Response"
 
     code: str
     command_name: str
@@ -26,7 +27,7 @@ class Explanation:
             self.COMMAND_NAME_KEY: self.command_name,
             self.PROVIDED_ARGS_KEY: self.provided_args,
             self.COMMAND_EXPLANATION_KEY: self.command_explanation,
-            self.RESPONSE_KEY: self.response
+            self.RESPONSE_KEY: self.response,
         }
 
 
@@ -36,27 +37,21 @@ class GCodeFunctionalityDefBase(ABC):
     each G-Code. It is required that each child class implements
     _generate_command_explanations
     """
+
     @classmethod
     def generate_explanation(
-        cls,
-        code,
-        command_name,
-        provided_args,
-        response
+        cls, code, command_name, provided_args, response
     ) -> Explanation:
         return Explanation(
             code,
             command_name,
             provided_args,
             cls._generate_command_explanation(provided_args),
-            cls._generate_response_explanation(response)
+            cls._generate_response_explanation(response),
         )
 
     @classmethod
-    def _generate_command_explanation(
-            cls,
-            g_code_args: Dict[str, str]
-    ) -> str:
+    def _generate_command_explanation(cls, g_code_args: Dict[str, str]) -> str:
         ...
 
     @classmethod
@@ -66,4 +61,4 @@ class GCodeFunctionalityDefBase(ABC):
         All child classes should either parse response into human readable text or
         return an empty string
         """
-        return ''
+        return ""

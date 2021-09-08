@@ -5,6 +5,7 @@ from opentrons.protocol_engine.execution import (
     EquipmentHandler,
     MovementHandler,
     PipettingHandler,
+    RunControlHandler,
 )
 
 from opentrons.protocol_engine.commands.move_to_well import (
@@ -19,12 +20,14 @@ async def test_move_to_well_implementation(
     equipment: EquipmentHandler,
     movement: MovementHandler,
     pipetting: PipettingHandler,
+    run_control: RunControlHandler,
 ) -> None:
     """A MoveToWell command should have an execution implementation."""
     subject = MoveToWellImplementation(
         equipment=equipment,
         movement=movement,
         pipetting=pipetting,
+        run_control=run_control,
     )
 
     data = MoveToWellData(

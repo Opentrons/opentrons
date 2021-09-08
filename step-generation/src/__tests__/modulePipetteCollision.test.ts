@@ -16,15 +16,15 @@ let collisionArgs: {
 }
 beforeEach(() => {
   invariantContext = makeContext()
-  invariantContext.moduleEntities['magDeckId'] = {
+  invariantContext.moduleEntities.magDeckId = {
     id: 'magDeckId',
     type: MAGNETIC_MODULE_TYPE,
     model: MAGNETIC_MODULE_V1,
   }
   robotState = getInitialRobotStateStandard(invariantContext)
-  robotState.labware['destPlateId'].slot = '4'
-  robotState.labware['tiprack1Id'].slot = '10'
-  robotState.modules['magDeckId'] = {
+  robotState.labware.destPlateId.slot = '4'
+  robotState.labware.tiprack1Id.slot = '10'
+  robotState.modules.magDeckId = {
     slot: '1',
     moduleState: {
       type: MAGNETIC_MODULE_TYPE,
@@ -57,7 +57,7 @@ describe('modulePipetteCollision', () => {
     )
   })
   it('should return false when module is GEN2', () => {
-    invariantContext.moduleEntities['magDeckId'].model = MAGNETIC_MODULE_V2
+    invariantContext.moduleEntities.magDeckId.model = MAGNETIC_MODULE_V2
     expect(
       modulePipetteCollision({
         pipette: 'p10MultiId',

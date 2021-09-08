@@ -3,14 +3,16 @@ import logging
 import typing
 from enum import Enum, auto
 
-from robot_server.service.session.session_types.protocol.\
-    execution.protocol_runner import ProtocolRunner
+from robot_server.service.session.session_types.protocol.execution.protocol_runner import (  # noqa: E501
+    ProtocolRunner,
+)
 
 log = logging.getLogger(__name__)
 
 
 class WorkerDirective(int, Enum):
     """Direction for the worker task"""
+
     none = auto()
     # End the task. This is used for cleanup.
     terminate = auto()
@@ -25,10 +27,13 @@ class _Worker:
     A private class used by ProtocolCommandExecutor to handle protocol session
      commands. It manages a ProtocolRunner's behavior in an asyncio task.
     """
-    def __init__(self,
-                 protocol_runner: ProtocolRunner,
-                 listener: 'WorkerListener',
-                 loop: asyncio.AbstractEventLoop):
+
+    def __init__(
+        self,
+        protocol_runner: ProtocolRunner,
+        listener: "WorkerListener",
+        loop: asyncio.AbstractEventLoop,
+    ):
         """Constructor the command handling worker"""
         self._protocol_runner = protocol_runner
         self._protocol_runner.add_listener(self._on_command)
@@ -117,13 +122,12 @@ class _Worker:
         """ProtocolRunner command listener"""
         # Notify command on main thread
         asyncio.run_coroutine_threadsafe(
-            self._listener.on_protocol_event(msg),
-            self._loop
+            self._listener.on_protocol_event(msg), self._loop
         )
 
 
 class WorkerListener:
-    async def on_directive(self, directive: 'WorkerDirective'):
+    async def on_directive(self, directive: "WorkerDirective"):
         """Called when worker has a new directive"""
         pass
 

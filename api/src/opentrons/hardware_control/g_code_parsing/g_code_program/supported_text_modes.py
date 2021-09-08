@@ -5,7 +5,7 @@ from opentrons.hardware_control.g_code_parsing.errors import InvalidTextModeErro
 from typing import Callable
 from enum import Enum
 
-MULTIPLE_SPACE_REGEX = re.compile(' +')
+MULTIPLE_SPACE_REGEX = re.compile(" +")
 
 
 # Can't use a dataclass because mypy doesn't like a dataclass
@@ -18,6 +18,7 @@ class TextMode:
     Class representing the name of a text mode and it's
     function to build the correct text
     """
+
     def __init__(self, name: str, builder: Callable[[GCode], str]) -> None:
         self._name = name
         self._builder = builder
@@ -58,11 +59,14 @@ def default_builder(code: GCode):
     :param code: G-Code object to parse into a string
     :return: Textual description
     """
-    message = f'Code: {code.g_code} {code.g_code_body}\n' \
-              f'Explanation: {code.get_explanation().command_explanation}\n' \
-              f'Response: {code.get_explanation().response}' \
-              f'\n-----------------------------------------'
-    return MULTIPLE_SPACE_REGEX.sub(' ', message).strip()
+    message = (
+        f"Device: {code.device_name}\n"
+        f"Code: {code.g_code} {code.g_code_body}\n"
+        f"Explanation: {code.get_explanation().command_explanation}\n"
+        f"Response: {code.get_explanation().response}"
+        f"\n-----------------------------------------"
+    )
+    return MULTIPLE_SPACE_REGEX.sub(" ", message).strip()
 
 
 def concise_builder(code: GCode):
@@ -78,12 +82,12 @@ def concise_builder(code: GCode):
     :param code: G-Code object to parse into a string
     :return: Textual description
     """
-    message = f'{code.g_code} {code.g_code_body} -> ' \
-              f'{code.get_explanation().command_explanation} -> ' \
-              f'{code.get_explanation().response}'\
-        .replace('\n', ' ')\
-        .replace('\t', '')
-    return MULTIPLE_SPACE_REGEX.sub(' ', message).strip()
+    message = (
+        f"{code.device_name}: {code.g_code} {code.g_code_body} -> "
+        f"{code.get_explanation().command_explanation} -> "
+        f"{code.get_explanation().response}".replace("\n", " ").replace("\t", "")
+    )
+    return MULTIPLE_SPACE_REGEX.sub(" ", message).strip()
 
 
 def g_code_only_builder(code: GCode):
@@ -99,8 +103,8 @@ def g_code_only_builder(code: GCode):
     :param code: G-Code object to parse into a string
     :return: Textual description
     """
-    message = f'{code.g_code_line} -> {code.response}'
-    return MULTIPLE_SPACE_REGEX.sub(' ', message).strip()
+    message = f"{code.device_name}: {code.g_code_line} -> {code.response}"
+    return MULTIPLE_SPACE_REGEX.sub(" ", message).strip()
 
 
 class SupportedTextModes(Enum):
@@ -117,9 +121,10 @@ class SupportedTextModes(Enum):
     Concise: Same as Default but with all newlines and tabs removed to fit everything on
         a single line
     """
-    DEFAULT = 'Default'
-    CONCISE = 'Concise'
-    G_CODE = 'G-Code'
+
+    DEFAULT = "Default"
+    CONCISE = "Concise"
+    G_CODE = "G-Code"
 
     @classmethod
     def get_valid_modes(cls):
@@ -132,7 +137,7 @@ class SupportedTextModes(Enum):
         _internal_mapping = {
             cls.DEFAULT.value: TextMode(cls.DEFAULT.value, default_builder),
             cls.CONCISE.value: TextMode(cls.CONCISE.value, concise_builder),
-            cls.G_CODE.value: TextMode(cls.G_CODE.value, g_code_only_builder)
+            cls.G_CODE.value: TextMode(cls.G_CODE.value, g_code_only_builder),
         }
         members = [member.value for member in list(cls.__members__.values())]
         if key not in members:

@@ -284,6 +284,8 @@ export interface ModuleDefinition {
   quirks: string[]
 }
 
+export type ModuleOrientation = 'left' | 'right'
+
 export type PipetteChannels = 1 | 8
 
 export type PipetteDisplayCategory = typeof GEN1 | typeof GEN2
