@@ -1,8 +1,10 @@
 import * as React from 'react'
 import { MAGNETIC_MODULE_V1, MAGNETIC_MODULE_V2, ModuleModel, TEMPERATURE_MODULE_V1, TEMPERATURE_MODULE_V2, THERMOCYCLER_MODULE_V1 } from '@opentrons/shared-data'
+import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 import { RobotWorkSpace } from '../Deck/RobotWorkSpace'
 import { getDeckDefinitions } from '../Deck/getDeckDefinitions'
 
+import { LabwareRender } from '../Labware'
 import { Module as ModuleComponent } from './'
 
 import type { RobotWorkSpaceRenderProps } from '../Deck'
@@ -43,7 +45,9 @@ const Template: Story<{slot: string, model: ModuleModel, orientation: 'left' | '
                 </>
               )}
               innerProps={{lidMotorState: 'open'}}
-              orientation={args.orientation} />
+              orientation={args.orientation}>
+              <LabwareRender definition={fixture_96_plate}/>
+            </ModuleComponent>
           </g>
         )
       }}
