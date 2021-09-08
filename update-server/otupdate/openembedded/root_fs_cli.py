@@ -5,12 +5,12 @@ CLI for RootFS
 
 import argparse
 
-from . import RootFS
+from . import root_fs
 
 
 class RootFSCLI:
     def parse_args(self, args):
-        rfs = RootFS.RootFS()
+        rfs = root_fs.RootFS()
         parser = argparse.ArgumentParser(description='Change OT3 RootFS partition'
                                                      'to upgrade fs.')
         subparsers = parser.add_subparsers()

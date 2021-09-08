@@ -7,7 +7,7 @@ import sys
 
 from . import get_app
 from aiohttp import web
-from openembedded import RootFSCLI
+from openembedded import (root_fs, root_fs_cli)
 LOG = logging.getLogger(__name__)
 
 try:
@@ -63,35 +63,23 @@ def configure_logging(level: int):
         'handlers': {
             'journald': _handler_for('opentrons-update', level)
         },
-        'loggers': {
-            'otupdate': {
-                'handlers': ['journald'],
-                'level': level,
-                'propagate': False
-            },
-            '__main__': {
-                'handlers': ['journald'],
-                'level': level,
-                'propagate': False,
-            }
-        },
         'root': {
             'handlers': ['journald'],
             'level': level
         }
     }
-    logging.config.dictConfig(config)
+    # logging.config.dictConfig(config)
 
 
 def main():
 
-    rfscli = RootFSCLI.RootFSCLI()
+    rfscli = root_fs_cli.RootFSCLI()
     options = rfscli.parse_args(sys.argv[1:])
     args = options
     configure_logging(getattr(logging, args.log_level.upper()))
-
+    rfs = root_fs.RootFS()
     LOG.info('Building buildroot update server')
-    app = get_app(args.version_file, args.config_file)
+    app = get_app(args.version_file, args.config_file, None, None, rfs, None)
 
     LOG.info('Notifying systemd')
     _notify_up()
