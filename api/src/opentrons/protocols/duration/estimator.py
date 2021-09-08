@@ -48,7 +48,7 @@ class DurationEstimator:
         # Which slot the last command was in.
         self._last_deckslot = None
         self._last_temperature_module_temperature = START_MODULE_TEMPERATURE
-        self._last_thermocyler_module_temperature = START_MODULE_TEMPERATURE
+        self._last_thermocycler_module_temperature = START_MODULE_TEMPERATURE
         # Per step time estimate.
         self._increments: List[TimerEntry] = []
 
@@ -138,17 +138,17 @@ class DurationEstimator:
         elif message_name == types.TEMPDECK_AWAIT_TEMP:
             duration = self.on_tempdeck_await_temp(payload=payload)
         elif message_name == types.THERMOCYCLER_SET_BLOCK_TEMP:
-            duration = self.on_thermocyler_block_temp(payload=payload)
+            duration = self.on_thermocycler_block_temp(payload=payload)
         elif message_name == types.THERMOCYCLER_EXECUTE_PROFILE:
             duration = self.on_execute_profile(payload=payload)
         elif message_name == types.THERMOCYCLER_SET_LID_TEMP:
-            duration = self.on_thermocyler_set_lid_temp(payload=payload)
+            duration = self.on_thermocycler_set_lid_temp(payload=payload)
         elif message_name == types.THERMOCYCLER_CLOSE:
-            duration = self.on_thermocyler_lid_close(payload=payload)
+            duration = self.on_thermocycler_lid_close(payload=payload)
         elif message_name == types.THERMOCYCLER_DEACTIVATE_LID:
-            duration = self.on_thermocyler_deactivate_lid(payload=payload)
+            duration = self.on_thermocycler_deactivate_lid(payload=payload)
         elif message_name == types.THERMOCYCLER_OPEN:
-            duration = self.on_thermocyler_lid_open(payload=payload)
+            duration = self.on_thermocycler_lid_open(payload=payload)
         return duration
 
     def on_pick_up_tip(self, payload) -> float:
@@ -297,12 +297,12 @@ class DurationEstimator:
 
         return duration
 
-    def on_thermocyler_block_temp(self, payload) -> float:
+    def on_thermocycler_block_temp(self, payload) -> float:
         temperature = payload["temperature"]
         hold_time = payload["hold_time"]
-        temp0 = self._last_thermocyler_module_temperature
+        temp0 = self._last_thermocycler_module_temperature
         temp1 = temperature
-        # we are referring to a thermocyler_handler(temp0, temp1) function.
+        # we are referring to a thermocycler_handler(temp0, temp1) function.
         # Magic numbers come from testing and have been consistent
         temperature_changing_time = self.thermocycler_handler(temp0, temp1)
         if hold_time is None:
@@ -325,33 +325,33 @@ class DurationEstimator:
         # By the cycle count. Then we also (in parallel) do the same with delays
 
         profile_total_steps = payload["steps"]
-        thermocyler_temperatures = [self._last_thermocyler_module_temperature]
-        thermocyler_hold_times = []
+        thermocycler_temperatures = [self._last_thermocycler_module_temperature]
+        thermocycler_hold_times = []
         cycle_count = float(payload["text"].split(" ")[2])
 
         # We are going to need to treat this theromcycler part a bit differently
         # for a bit and just send out total times
         for step in profile_total_steps:
-            thermocyler_temperatures.append(float(step["temperature"]))
-            thermocyler_hold_times.append(float(step["hold_time_seconds"]))
+            thermocycler_temperatures.append(float(step["temperature"]))
+            thermocycler_hold_times.append(float(step["hold_time_seconds"]))
         # Initializing variable
-        total_hold_time = float(cycle_count) * float(sum(thermocyler_hold_times))
+        total_hold_time = float(cycle_count) * float(sum(thermocycler_hold_times))
         # This takes care of the cumulative hold time
         # WE DON't Have a way to deal with this currently in the way we
         # have things set up.
         cycling_counter = []
-        thermocyler_temperatures.pop(0)
-        for thermocyler_counter in range(0, len(thermocyler_temperatures)):
+        thermocycler_temperatures.pop(0)
+        for thermocycler_counter in range(0, len(thermocycler_temperatures)):
             cycling_counter.append(
                 self.thermocycler_handler(
-                    float(thermocyler_temperatures[thermocyler_counter - 1]),
-                    float(thermocyler_temperatures[thermocyler_counter]),
+                    float(thermocycler_temperatures[thermocycler_counter - 1]),
+                    float(thermocycler_temperatures[thermocycler_counter]),
                 )
             )
 
         # Sum hold time and cycling temp time
         duration = float(sum(cycling_counter) + total_hold_time)
-        self._last_thermocyler_module_temperature = thermocyler_temperatures[-1]
+        self._last_thermocycler_module_temperature = thermocycler_temperatures[-1]
 
         cycling_counter = []
         # Note will need to multiply minutes by 60
@@ -362,14 +362,14 @@ class DurationEstimator:
         )
         return duration
 
-    def on_thermocyler_set_lid_temp(self, payload) -> float:
+    def on_thermocycler_set_lid_temp(self, payload) -> float:
         # Hardware said ~1 minute
         duration = 60
         thermoaction = "set lid temperature"
         logger.info(f"thermocation =  {thermoaction}")
         return duration
 
-    def on_thermocyler_lid_close(self, payload) -> float:
+    def on_thermocycler_lid_close(self, payload) -> float:
         # Hardware said ~24 seconds
         duration = 24
         thermoaction = "closing"
@@ -377,7 +377,7 @@ class DurationEstimator:
 
         return duration
 
-    def on_thermocyler_lid_open(self, payload) -> float:
+    def on_thermocycler_lid_open(self, payload) -> float:
         # Hardware said ~24 seconds
         duration = 24
         thermoaction = "opening"
@@ -385,7 +385,7 @@ class DurationEstimator:
 
         return duration
 
-    def on_thermocyler_deactivate_lid(self, payload) -> float:
+    def on_thermocycler_deactivate_lid(self, payload) -> float:
         # Hardware said ~23 seconds
         duration = 23
         thermoaction = "Deactivating"
