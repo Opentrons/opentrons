@@ -32,7 +32,7 @@ export const Module = (props: Props): JSX.Element => {
   const {xDimension, yDimension, footprintXDimension, footprintYDimension} = def.dimensions
 
   // apply translation to compensate for the offset of the overall module's
-  // left-bottom-front corner, from the footprint's (slot interface)
+  // left-bottom-front corner, from the footprint's left-bottom-front corner (slot interface)
   const offsetTransform = `translate(${translateX}, ${translateY})`
 
   // find coordinates of center of footprint, fallback to overall center if not defined
