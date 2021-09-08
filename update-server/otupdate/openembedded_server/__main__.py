@@ -7,7 +7,7 @@ import sys
 
 from . import get_app
 from aiohttp import web
-from openembedded import (root_fs, root_fs_cli)
+from openembedded import (root_fs, oe_server_mode)
 LOG = logging.getLogger(__name__)
 
 try:
@@ -73,8 +73,8 @@ def configure_logging(level: int):
 
 def main():
 
-    rfscli = root_fs_cli.RootFSCLI()
-    options = rfscli.parse_args(sys.argv[1:])
+    oesi = oe_server_mode.OEServerMode()
+    options = oesi.parse_args(sys.argv[1:])
     args = options
     configure_logging(getattr(logging, args.log_level.upper()))
     rfs = root_fs.RootFS()

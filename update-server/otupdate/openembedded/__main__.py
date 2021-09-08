@@ -3,12 +3,12 @@ Entrypoint for the openembedded update server
 """
 import sys
 
-from . import RootFSCLI
+from . import oe_server_mode
 
 
 def main():
-    rfscli = RootFSCLI.RootFSCLI()
-    options = rfscli.parse_args(sys.argv[1:])
+    oesm = oe_server_mode.OEServerMode()
+    options = oesm.parse_args(sys.argv[1:])
     options.func(options)
 
 
