@@ -1,9 +1,15 @@
 """Session response model factory."""
 from dataclasses import replace
 from datetime import datetime
-from typing import List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
-from opentrons.protocol_engine import Command as ProtocolEngineCommand, EngineStatus
+from opentrons.protocol_engine import (
+    Command as ProtocolEngineCommand,
+    EngineStatus,
+    LoadedLabware,
+    LoadedPipette,
+)
+
 from .session_store import SessionResource
 from .action_models import SessionAction, SessionActionCreateData
 from .session_models import (
@@ -85,6 +91,8 @@ class SessionView:
     def as_response(
         session: SessionResource,
         commands: List[ProtocolEngineCommand],
+        pipettes: List[LoadedPipette],
+        labware: List[LoadedLabware],
         engine_status: EngineStatus,
     ) -> Session:
         """Transform a session resource into its public response model.
@@ -101,22 +109,21 @@ class SessionView:
             for c in commands
         ]
 
+        response_fields: Dict[str, Any] = {
+            "id": session.session_id,
+            "createdAt": session.created_at,
+            "actions": session.actions,
+            "commands": command_summaries,
+            "pipettes": pipettes,
+            "labware": labware,
+            "status": engine_status,
+        }
+
         if isinstance(create_data, BasicSessionCreateData):
-            return BasicSession.construct(
-                id=session.session_id,
-                createdAt=session.created_at,
-                actions=session.actions,
-                commands=command_summaries,
-                status=engine_status,
-            )
+            return BasicSession.construct(**response_fields)
+
         if isinstance(create_data, ProtocolSessionCreateData):
-            return ProtocolSession.construct(
-                id=session.session_id,
-                createdAt=session.created_at,
-                createParams=create_data.createParams,
-                actions=session.actions,
-                commands=command_summaries,
-                status=engine_status,
-            )
+            response_fields["createParams"] = create_data.createParams
+            return ProtocolSession.construct(**response_fields)
 
         raise ValueError(f"Invalid session resource {session}")
