@@ -45,7 +45,8 @@ def test_pick_up_tip(subject: DurationEstimator, mock_instrument: MagicMock):
     # Movement in same slot
     subject._last_deckslot = "1"
     message = types.PickUpTipCommand(
-        payload=types.PickUpTipCommandPayload(location="1", instrument=mock_instrument))
+        payload=types.PickUpTipCommandPayload(location="1", instrument=mock_instrument)
+    )
     message["$"] = "after"
     message["name"] = types.PICK_UP_TIP
     subject.on_message(message)
@@ -58,7 +59,8 @@ def test_drop_tip(subject: DurationEstimator, mock_instrument: MagicMock):
     # Movement in same slot
     subject._last_deckslot = "1"
     message = types.DropTipCommand(
-        payload=types.DropTipCommandPayload(location="1", instrument=mock_instrument))
+        payload=types.DropTipCommandPayload(location="1", instrument=mock_instrument)
+    )
     message["$"] = "after"
     message["name"] = types.DROP_TIP
     subject.on_message(message)
