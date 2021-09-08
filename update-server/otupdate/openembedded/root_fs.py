@@ -42,7 +42,6 @@ class RootFS:
 
         class RootFSConfigParser:
             def __init__(self):
-                self.reset_config_file()
                 try:
                     f = open('root_fs_config.json')
                 except OSError:
