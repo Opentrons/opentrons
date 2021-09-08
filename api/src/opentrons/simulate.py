@@ -519,7 +519,7 @@ def get_arguments(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
         action="store_true",
         # TODO (AL, 2021-07-26): Better wording.
         help="Estimate how long the protocol will take to complete."
-        "This is a beta feature.",
+        " This is an experimental feature.",
     )
 
     parser.add_argument(
