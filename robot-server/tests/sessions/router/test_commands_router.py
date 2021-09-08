@@ -64,6 +64,8 @@ async def test_get_session_commands(
         status=SessionStatus.RUNNING,
         actions=[],
         commands=[command_summary],
+        pipettes=[],
+        labware=[],
     )
 
     decoy.when(

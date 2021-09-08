@@ -12,15 +12,14 @@ from pathlib import Path
 from datetime import datetime
 from decoy import matchers
 
-from opentrons_shared_data.pipette.dev_types import LabwareUri
 from opentrons.types import MountType
 from opentrons.protocol_api_experimental import DeckSlotName
 
 from opentrons.protocol_engine import (
-    LabwareData,
-    PipetteData,
-    PipetteName,
     DeckSlotLocation,
+    LoadedLabware,
+    LoadedPipette,
+    PipetteName,
     commands,
 )
 from opentrons.protocol_runner import (
@@ -38,29 +37,29 @@ async def test_protocol_runner_with_python(python_protocol_file: Path) -> None:
     )
 
     subject = await create_simulating_runner()
-    commands_result = await subject.run(protocol_file)
-    pipettes_result = subject.engine.state_view.pipettes.get_all_pipettes()
-    labware_result = subject.engine.state_view.labware.get_all_labware()
+    result = await subject.run(protocol_file)
+    commands_result = result.commands
+    pipettes_result = result.pipettes
+    labware_result = result.labware
 
     pipette_id_captor = matchers.Captor()
     labware_id_captor = matchers.Captor()
 
-    expected_pipette_entry = (
-        pipette_id_captor,
-        PipetteData(pipette_name=PipetteName.P300_SINGLE, mount=MountType.LEFT),
+    expected_pipette = LoadedPipette.construct(
+        id=pipette_id_captor,
+        pipetteName=PipetteName.P300_SINGLE,
+        mount=MountType.LEFT,
     )
 
-    expected_labware_entry = (
-        labware_id_captor,
-        LabwareData(
-            location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
-            uri=LabwareUri("opentrons/opentrons_96_tiprack_300ul/1"),
-            calibration=(matchers.IsA(float), matchers.IsA(float), matchers.IsA(float)),
-        ),
+    expected_labware = LoadedLabware.construct(
+        id=labware_id_captor,
+        location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
+        loadName="opentrons_96_tiprack_300ul",
+        definitionUri="opentrons/opentrons_96_tiprack_300ul/1",
     )
 
-    assert expected_pipette_entry in pipettes_result
-    assert expected_labware_entry in labware_result
+    assert expected_pipette in pipettes_result
+    assert expected_labware in labware_result
 
     expected_command = commands.PickUpTip.construct(
         id=matchers.IsA(str),
@@ -87,26 +86,26 @@ async def test_protocol_runner_with_json(json_protocol_file: Path) -> None:
     )
 
     subject = await create_simulating_runner()
-    commands_result = await subject.run(protocol_file)
-    pipettes_result = subject.engine.state_view.pipettes.get_all_pipettes()
-    labware_result = subject.engine.state_view.labware.get_all_labware()
+    result = await subject.run(protocol_file)
+    commands_result = result.commands
+    pipettes_result = result.pipettes
+    labware_result = result.labware
 
-    expected_pipette_entry = (
-        "pipette-id",
-        PipetteData(pipette_name=PipetteName.P300_SINGLE, mount=MountType.LEFT),
+    expected_pipette = LoadedPipette(
+        id="pipette-id",
+        pipetteName=PipetteName.P300_SINGLE,
+        mount=MountType.LEFT,
     )
 
-    expected_labware_entry = (
-        "labware-id",
-        LabwareData(
-            location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
-            uri=LabwareUri("opentrons/opentrons_96_tiprack_300ul/1"),
-            calibration=(matchers.IsA(float), matchers.IsA(float), matchers.IsA(float)),
-        ),
+    expected_labware = LoadedLabware(
+        id="labware-id",
+        location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
+        loadName="opentrons_96_tiprack_300ul",
+        definitionUri="opentrons/opentrons_96_tiprack_300ul/1",
     )
 
-    assert expected_pipette_entry in pipettes_result
-    assert expected_labware_entry in labware_result
+    assert expected_pipette in pipettes_result
+    assert expected_labware in labware_result
 
     expected_command = commands.PickUpTip.construct(
         id=matchers.IsA(str),

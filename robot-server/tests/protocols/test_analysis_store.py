@@ -1,17 +1,14 @@
 """Tests for the AnalysisStore interface."""
 import pytest
 from datetime import datetime
-from typing import List, NamedTuple, Sequence, cast
+from typing import List, NamedTuple, Sequence
 
 from opentrons.types import MountType, DeckSlotName
-from opentrons.protocols.models import LabwareDefinition
 from opentrons.protocol_engine import commands as pe_commands, types as pe_types
 
 from robot_server.protocols.analysis_store import AnalysisStore
 from robot_server.protocols.analysis_models import (
     AnalysisResult,
-    AnalysisPipette,
-    AnalysisLabware,
     PendingAnalysis,
     CompletedAnalysis,
 )
@@ -39,7 +36,13 @@ def test_add_errored_analysis() -> None:
     error = RuntimeError("oh no!")
 
     result = subject.add_pending(protocol_id="protocol-id", analysis_id="analysis-id")
-    subject.update(analysis_id="analysis-id", commands=[], errors=[error])
+    subject.update(
+        analysis_id="analysis-id",
+        commands=[],
+        labware=[],
+        pipettes=[],
+        errors=[error],
+    )
 
     result = subject.get_by_protocol("protocol-id")
 
@@ -55,87 +58,76 @@ def test_add_errored_analysis() -> None:
     ]
 
 
+def test_add_analysis_equipment() -> None:
+    """It should add labware and pipettes to the stored analysis."""
+    labware = pe_types.LoadedLabware(
+        id="labware-id",
+        loadName="load-name",
+        definitionUri="namespace/load-name/42",
+        location=pe_types.DeckSlotLocation(slot=DeckSlotName.SLOT_1),
+    )
+
+    pipette = pe_types.LoadedPipette(
+        id="pipette-id",
+        pipetteName=pe_types.PipetteName.P300_SINGLE,
+        mount=MountType.LEFT,
+    )
+
+    subject = AnalysisStore()
+    subject.add_pending(protocol_id="protocol-id", analysis_id="analysis-id")
+    subject.update(
+        analysis_id="analysis-id",
+        labware=[labware],
+        pipettes=[pipette],
+        commands=[],
+        errors=[],
+    )
+
+    result = subject.get_by_protocol("protocol-id")
+
+    assert result == [
+        CompletedAnalysis(
+            id="analysis-id",
+            result=AnalysisResult.OK,
+            labware=[labware],
+            pipettes=[pipette],
+            commands=[],
+            errors=[],
+        )
+    ]
+
+
 class CommandAnalysisSpec(NamedTuple):
     """Spec data for command parsing tests."""
 
     commands: Sequence[pe_commands.Command]
     expected_result: AnalysisResult
-    expected_labware: List[AnalysisLabware]
-    expected_pipettes: List[AnalysisPipette]
 
 
 command_analysis_specs: List[CommandAnalysisSpec] = [
     CommandAnalysisSpec(
         commands=[
-            pe_commands.LoadLabware(
-                id="load-labware-1",
+            pe_commands.Pause(
+                id="pause-1",
                 status=pe_commands.CommandStatus.SUCCEEDED,
                 createdAt=datetime(year=2021, month=1, day=1),
-                data=pe_commands.LoadLabwareData(
-                    location=pe_types.DeckSlotLocation(slot=DeckSlotName.SLOT_1),
-                    loadName="load-name",
-                    namespace="namespace",
-                    version=42,
-                ),
-                result=pe_commands.LoadLabwareResult.construct(
-                    labwareId="labware-id",
-                    definition=cast(LabwareDefinition, {}),
-                    calibration=(1, 2, 3),
-                ),
+                data=pe_commands.PauseData(message="hello world"),
+                result=pe_commands.PauseResult(),
             )
         ],
         expected_result=AnalysisResult.OK,
-        expected_labware=[
-            AnalysisLabware(
-                id="labware-id",
-                loadName="load-name",
-                definitionUri="namespace/load-name/42",
-                location=pe_types.DeckSlotLocation(slot=DeckSlotName.SLOT_1),
-            )
-        ],
-        expected_pipettes=[],
     ),
     CommandAnalysisSpec(
         commands=[
-            pe_commands.LoadPipette(
-                id="load-pipette-1",
-                status=pe_commands.CommandStatus.SUCCEEDED,
-                createdAt=datetime(year=2021, month=1, day=1),
-                data=pe_commands.LoadPipetteData(
-                    pipetteName=pe_types.PipetteName.P300_SINGLE,
-                    mount=MountType.LEFT,
-                ),
-                result=pe_commands.LoadPipetteResult(pipetteId="pipette-id"),
-            )
-        ],
-        expected_result=AnalysisResult.OK,
-        expected_labware=[],
-        expected_pipettes=[
-            AnalysisPipette(
-                id="pipette-id",
-                pipetteName=pe_types.PipetteName.P300_SINGLE,
-                mount=MountType.LEFT,
-            )
-        ],
-    ),
-    CommandAnalysisSpec(
-        commands=[
-            pe_commands.LoadLabware(
-                id="load-labware-1",
+            pe_commands.Pause(
+                id="pause-1",
                 status=pe_commands.CommandStatus.FAILED,
                 createdAt=datetime(year=2021, month=1, day=1),
-                data=pe_commands.LoadLabwareData(
-                    location=pe_types.DeckSlotLocation(slot=DeckSlotName.SLOT_1),
-                    loadName="load-name",
-                    namespace="namespace",
-                    version=42,
-                ),
+                data=pe_commands.PauseData(message="hello world"),
                 error="Oh no!",
             )
         ],
         expected_result=AnalysisResult.NOT_OK,
-        expected_labware=[],
-        expected_pipettes=[],
     ),
 ]
 
@@ -144,23 +136,18 @@ command_analysis_specs: List[CommandAnalysisSpec] = [
 def test_add_parses_labware_commands(
     commands: Sequence[pe_commands.Command],
     expected_result: AnalysisResult,
-    expected_labware: List[AnalysisLabware],
-    expected_pipettes: List[AnalysisPipette],
 ) -> None:
     """It should be able to parse the commands list for analysis results."""
     subject = AnalysisStore()
 
     subject.add_pending(protocol_id="protocol-id", analysis_id="analysis-id")
-    subject.update(analysis_id="analysis-id", commands=commands, errors=[])
-    result = subject.get_by_protocol("protocol-id")
+    subject.update(
+        analysis_id="analysis-id",
+        commands=commands,
+        labware=[],
+        pipettes=[],
+        errors=[],
+    )
+    res = subject.get_by_protocol("protocol-id")[0].result  # type: ignore[union-attr]
 
-    assert result == [
-        CompletedAnalysis(
-            id="analysis-id",
-            result=expected_result,
-            labware=expected_labware,
-            pipettes=expected_pipettes,
-            commands=list(commands),
-            errors=[],
-        )
-    ]
+    assert res == expected_result

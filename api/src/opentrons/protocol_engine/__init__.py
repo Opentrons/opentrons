@@ -9,13 +9,15 @@ from .create_protocol_engine import create_protocol_engine
 from .protocol_engine import ProtocolEngine
 from .errors import ProtocolEngineError
 from .commands import Command, CommandRequest, CommandStatus, CommandType
-from .state import State, StateView, LabwareData, PipetteData
+from .state import State, StateView
 from .types import (
-    DeckLocation,
+    CalibrationOffset,
     DeckSlotLocation,
     Dimensions,
     EngineStatus,
     LabwareLocation,
+    LoadedLabware,
+    LoadedPipette,
     PipetteName,
     WellLocation,
     WellOrigin,
@@ -35,14 +37,14 @@ __all__ = [
     # state interfaces and models
     "State",
     "StateView",
-    "LabwareData",
-    "PipetteData",
-    # type definitions and other value models
-    "DeckLocation",
+    # public value interfaces ana models
+    "CalibrationOffset",
     "DeckSlotLocation",
     "Dimensions",
     "EngineStatus",
     "LabwareLocation",
+    "LoadedLabware",
+    "LoadedPipette",
     "PipetteName",
     "WellLocation",
     "WellOrigin",

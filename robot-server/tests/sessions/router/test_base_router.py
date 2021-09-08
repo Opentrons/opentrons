@@ -72,10 +72,13 @@ async def test_create_session(
         status=SessionStatus.READY_TO_RUN,
         actions=[],
         commands=[],
+        pipettes=[],
+        labware=[],
     )
 
     decoy.when(engine_store.engine.state_view.commands.get_all()).then_return([])
-
+    decoy.when(engine_store.engine.state_view.pipettes.get_all()).then_return([])
+    decoy.when(engine_store.engine.state_view.labware.get_all()).then_return([])
     decoy.when(engine_store.engine.state_view.commands.get_status()).then_return(
         SessionStatus.READY_TO_RUN
     )
@@ -92,6 +95,8 @@ async def test_create_session(
         session_view.as_response(
             session=session,
             commands=[],
+            pipettes=[],
+            labware=[],
             engine_status=SessionStatus.READY_TO_RUN,
         ),
     ).then_return(expected_response)
@@ -142,6 +147,8 @@ async def test_create_protocol_session(
         createParams=ProtocolSessionCreateParams(protocolId="protocol-id"),
         actions=[],
         commands=[],
+        pipettes=[],
+        labware=[],
     )
 
     decoy.when(protocol_store.get(protocol_id="protocol-id")).then_return(
@@ -159,6 +166,8 @@ async def test_create_protocol_session(
     ).then_return(session)
 
     decoy.when(engine_store.engine.state_view.commands.get_all()).then_return([])
+    decoy.when(engine_store.engine.state_view.pipettes.get_all()).then_return([])
+    decoy.when(engine_store.engine.state_view.labware.get_all()).then_return([])
     decoy.when(engine_store.engine.state_view.commands.get_status()).then_return(
         SessionStatus.READY_TO_RUN
     )
@@ -167,6 +176,8 @@ async def test_create_protocol_session(
         session_view.as_response(
             session=session,
             commands=[],
+            pipettes=[],
+            labware=[],
             engine_status=SessionStatus.READY_TO_RUN,
         ),
     ).then_return(expected_response)
@@ -280,11 +291,15 @@ def test_get_session(
         status=SessionStatus.READY_TO_RUN,
         actions=[],
         commands=[],
+        pipettes=[],
+        labware=[],
     )
 
     decoy.when(session_store.get(session_id="session-id")).then_return(session)
 
     decoy.when(engine_store.engine.state_view.commands.get_all()).then_return([])
+    decoy.when(engine_store.engine.state_view.pipettes.get_all()).then_return([])
+    decoy.when(engine_store.engine.state_view.labware.get_all()).then_return([])
     decoy.when(engine_store.engine.state_view.commands.get_status()).then_return(
         SessionStatus.READY_TO_RUN
     )
@@ -293,6 +308,8 @@ def test_get_session(
         session_view.as_response(
             session=session,
             commands=[],
+            pipettes=[],
+            labware=[],
             engine_status=SessionStatus.READY_TO_RUN,
         ),
     ).then_return(expected_response)
@@ -358,11 +375,15 @@ def test_get_sessions_not_empty(
         status=SessionStatus.SUCCEEDED,
         actions=[],
         commands=[],
+        pipettes=[],
+        labware=[],
     )
 
     decoy.when(session_store.get_all()).then_return([session_1])
 
     decoy.when(engine_store.engine.state_view.commands.get_all()).then_return([])
+    decoy.when(engine_store.engine.state_view.pipettes.get_all()).then_return([])
+    decoy.when(engine_store.engine.state_view.labware.get_all()).then_return([])
     decoy.when(engine_store.engine.state_view.commands.get_status()).then_return(
         SessionStatus.SUCCEEDED
     )
@@ -371,6 +392,8 @@ def test_get_sessions_not_empty(
         session_view.as_response(
             session=session_1,
             commands=[],
+            pipettes=[],
+            labware=[],
             engine_status=SessionStatus.SUCCEEDED,
         ),
     ).then_return(response_1)

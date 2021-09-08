@@ -1,12 +1,12 @@
 """Load labware command request, result, and implementation models."""
 from __future__ import annotations
 from pydantic import BaseModel, Field
-from typing import Optional, Tuple, Type
+from typing import Optional, Type
 from typing_extensions import Literal
 
 from opentrons.protocols.models import LabwareDefinition
 
-from opentrons.protocol_engine.types import LabwareLocation
+from opentrons.protocol_engine.types import LabwareLocation, CalibrationOffset
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandRequest
 
 LoadLabwareCommandType = Literal["loadLabware"]
@@ -49,7 +49,7 @@ class LoadLabwareResult(BaseModel):
         ...,
         description="The full definition data for this labware.",
     )
-    calibration: Tuple[float, float, float] = Field(
+    calibration: CalibrationOffset = Field(
         ...,
         description="Calibration offset data for this labware at load time.",
     )
@@ -69,11 +69,12 @@ class LoadLabwareImplementation(
             location=data.location,
             labware_id=data.labwareId,
         )
+        x_offset, y_offset, z_offset = loaded_labware.calibration
 
         return LoadLabwareResult(
             labwareId=loaded_labware.labware_id,
             definition=loaded_labware.definition,
-            calibration=loaded_labware.calibration,
+            calibration=CalibrationOffset(x=x_offset, y=y_offset, z=z_offset),
         )
 
 

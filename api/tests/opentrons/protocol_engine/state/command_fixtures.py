@@ -1,12 +1,17 @@
 """Command factories to use in tests as data fixtures."""
 from datetime import datetime
 from pydantic import BaseModel
-from typing import Optional, Tuple, cast
+from typing import Optional, cast
 
 from opentrons.types import MountType
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.protocol_engine import commands as cmd
-from opentrons.protocol_engine.types import PipetteName, WellLocation, LabwareLocation
+from opentrons.protocol_engine.types import (
+    CalibrationOffset,
+    PipetteName,
+    WellLocation,
+    LabwareLocation,
+)
 
 
 def create_pending_command(
@@ -87,7 +92,7 @@ def create_load_labware_command(
     labware_id: str,
     location: LabwareLocation,
     definition: LabwareDefinition,
-    calibration: Tuple[float, float, float],
+    calibration: CalibrationOffset,
 ) -> cmd.LoadLabware:
     """Create a completed LoadLabware command."""
     data = cmd.LoadLabwareData(

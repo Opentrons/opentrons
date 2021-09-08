@@ -1,16 +1,18 @@
 """Protocol analysis storage."""
 from typing import Dict, List, Set, Sequence
 
-from opentrons.calibration_storage.helpers import uri_from_details
-from opentrons.protocol_engine import commands as pe_commands
+from opentrons.protocol_engine import (
+    Command,
+    CommandStatus,
+    LoadedPipette,
+    LoadedLabware,
+)
 
 from .analysis_models import (
     ProtocolAnalysis,
     PendingAnalysis,
     CompletedAnalysis,
     AnalysisResult,
-    AnalysisLabware,
-    AnalysisPipette,
 )
 
 
@@ -35,41 +37,18 @@ class AnalysisStore:
     def update(
         self,
         analysis_id: str,
-        commands: Sequence[pe_commands.Command],
+        commands: Sequence[Command],
+        labware: List[LoadedLabware],
+        pipettes: List[LoadedPipette],
         errors: Sequence[Exception],
     ) -> None:
         """Update analysis results in the store."""
-        labware = []
-        pipettes = []
         # TODO(mc, 2021-08-25): return error details objects, not strings
         error_messages = [str(e) for e in errors]
 
-        for c in commands:
-            if isinstance(c, pe_commands.LoadLabware) and c.result is not None:
-                labware.append(
-                    AnalysisLabware(
-                        id=c.result.labwareId,
-                        loadName=c.data.loadName,
-                        definitionUri=uri_from_details(
-                            load_name=c.data.loadName,
-                            namespace=c.data.namespace,
-                            version=c.data.version,
-                        ),
-                        location=c.data.location,
-                    )
-                )
-            elif isinstance(c, pe_commands.LoadPipette) and c.result is not None:
-                pipettes.append(
-                    AnalysisPipette(
-                        id=c.result.pipetteId,
-                        pipetteName=c.data.pipetteName,
-                        mount=c.data.mount,
-                    )
-                )
-
         if len(error_messages) > 0:
             result = AnalysisResult.ERROR
-        elif any(c.status == pe_commands.CommandStatus.FAILED for c in commands):
+        elif any(c.status == CommandStatus.FAILED for c in commands):
             result = AnalysisResult.NOT_OK
         else:
             result = AnalysisResult.OK
