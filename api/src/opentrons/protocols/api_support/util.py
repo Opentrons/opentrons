@@ -5,7 +5,17 @@ from collections import UserDict
 import functools
 import logging
 from dataclasses import dataclass, field, astuple
-from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, TypeVar, Union
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Dict,
+    List,
+    Optional,
+    TypeVar,
+    Union,
+    cast,
+)
 
 from opentrons import types as top_types
 from opentrons.protocols.api_support.types import APIVersion
@@ -391,7 +401,7 @@ def requires_version(major: int, minor: int) -> Callable[[FuncT], FuncT]:
             decorated_obj.__doc__ = docstr
 
         @functools.wraps(decorated_obj)
-        def _check_version_wrapper(*args, **kwargs):
+        def _check_version_wrapper(*args: Any, **kwargs: Any) -> Any:
             slf = args[0]
             added_in = decorated_obj.__opentrons_version_added  # type: ignore
             current_version = slf._api_version
@@ -409,7 +419,7 @@ def requires_version(major: int, minor: int) -> Callable[[FuncT], FuncT]:
                 )
             return decorated_obj(*args, **kwargs)
 
-        return _check_version_wrapper  # type: ignore[return-value]
+        return cast(FuncT, _check_version_wrapper)
 
     return _set_version
 
