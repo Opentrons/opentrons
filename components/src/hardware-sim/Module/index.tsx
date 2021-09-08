@@ -61,6 +61,7 @@ export const Module = (props: Props): JSX.Element => {
   const {x: translateX, y: translateY} = def.cornerOffsetFromSlot
   const {xDimension, yDimension, footprintXDimension, footprintYDimension, labwareInterfaceXDimension, labwareInterfaceYDimension } = def.dimensions
 
+
   // apply translation to compensate for the offset of the overall module's
   // left-bottom-front corner, from the footprint's left-bottom-front corner (slot interface)
   const offsetTransform = `translate(${translateX}, ${translateY})`
@@ -72,6 +73,9 @@ export const Module = (props: Props): JSX.Element => {
   const orientationTransform = orientation === 'left'
     ? 'rotate(0, 0, 0)'
     : `rotate(180, ${rotationCenterX}, ${rotationCenterY})`
+
+  // transform to be applied to children which render within the labware interfacing surface of the module
+  const childrenTransform = `translate(${labwareOffsetX}, ${labwareOffsetY})`
 
   const renderStatusInfo = () => {
     if(statusInfo == null) return null
@@ -92,7 +96,7 @@ export const Module = (props: Props): JSX.Element => {
 
   return (
     <g x={x} y={y} data-test={`Module_${moduleType}`}>
-      <g  transform={orientationTransform}>
+      <g transform={orientationTransform}>
         <g transform={offsetTransform}>
           {moduleType === THERMOCYCLER_MODULE_TYPE
             ? (<Thermocycler {...innerProps as React.ComponentProps<typeof Thermocycler>} />)
@@ -101,7 +105,14 @@ export const Module = (props: Props): JSX.Element => {
         </g>
       </g>
       {renderStatusInfo()}
-      {children}
+      {children != null
+        ? (
+          <g transform={childrenTransform}>
+            {children}
+          </g>
+        )
+        : null
+      }
     </g>
   )
 }
