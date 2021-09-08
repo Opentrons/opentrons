@@ -516,6 +516,16 @@ class DurationEstimator:
 
     @staticmethod
     def rate_high(temp0: float, temp1: float) -> float:
+        """
+        Calculate temp deck temperature change to a high temperature.
+
+        Args:
+            temp0: Current
+            temp1: Target
+
+        Returns:
+            Duration in seconds.
+        """
         val = 0.0
         if temp0 >= TEMP_MOD_HIGH_THRESH:
             val = abs(temp1 - temp0) / TEMP_MOD_RATE_HIGH_AND_ABOVE
@@ -531,6 +541,16 @@ class DurationEstimator:
 
     @staticmethod
     def rate_mid(temp0: float, temp1: float) -> float:
+        """
+        Calculate temp deck temperature change to a medium temperature.
+
+        Args:
+            temp0: Current
+            temp1: Target
+
+        Returns:
+            Duration in seconds.
+        """
         val = 0.0
         if TEMP_MOD_LOW_THRESH <= temp0 <= TEMP_MOD_HIGH_THRESH:
             val = abs(temp1 - temp0) / TEMP_MOD_RATE_LOW_TO_HIGH
@@ -548,6 +568,16 @@ class DurationEstimator:
     # How to handle temperatures where one of them is low temp
     @staticmethod
     def rate_low(temp0: float, temp1: float) -> float:
+        """
+        Calculate temp deck temperature change to a low temperature.
+
+        Args:
+            temp0: Current
+            temp1: Target
+
+        Returns:
+            Duration in seconds.
+        """
         val = 0.0
         if temp0 <= TEMP_MOD_LOW_THRESH:
             val = abs(temp1 - temp0) / TEMP_MOD_RATE_ZERO_TO_LOW
