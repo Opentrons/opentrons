@@ -23,7 +23,12 @@ TEMP_MOD_RATE_LOW_TO_HIGH: Final = 0.2
 TEMP_MOD_RATE_ZERO_TO_LOW: Final = 0.0875
 TEMP_MOD_LOW_THRESH: Final = 25.0
 TEMP_MOD_HIGH_THRESH: Final = 37.0
+
+THERMO_LOW_THRESH: Final = 23.0
+THERMO_HIGH_THRESH: Final = 70.0
+
 START_MODULE_TEMPERATURE: Final = 25.0
+
 
 logger = logging.getLogger(__name__)
 
@@ -200,10 +205,10 @@ class DurationEstimator:
         location = payload["location"]
         slot = self.get_slot(location)
 
-        # What's happening with this "If else statement?
-        slot_module = 1 if location.labware.parent.parent.is_module else 0
         gantry_speed = instrument.default_speed
-        z_total_time = self.z_time(slot_module, gantry_speed)
+        z_total_time = self.z_time(
+            location.labware.parent.parent.is_module, gantry_speed
+        )
 
         # We are going to once again use our "deck movement" set up.
         # Might be changed in future PR if our travel
@@ -233,10 +238,11 @@ class DurationEstimator:
         # define variables
         location = payload["location"]
         slot = self.get_slot(location)
-        slot_module = 1 if location.labware.parent.parent.is_module else 0
         gantry_speed = instrument.default_speed
 
-        z_total_time = self.z_time(slot_module, gantry_speed)
+        z_total_time = self.z_time(
+            location.labware.parent.parent.is_module, gantry_speed
+        )
         # We are going to once again use our "deck movement" set up.
         # This should be in pickup, drop tip, aspirate, dispense
         location = payload["location"]
@@ -274,7 +280,7 @@ class DurationEstimator:
         curr_slot = self.get_slot(location)
         duration = 0.5
         """
-        # base assumption. Touch_tip takes 0.5 seconds This is consisten with a
+        # base assumption. Touch_tip takes 0.5 seconds This is consistent with a
         # ~7.5mm diameter (default 60mm/s, 4 sides)
         # plate = protocol.load_labware('corning_96_wellplate_360ul_flat', '1')
         # depth = plate['A1'].diameter
@@ -326,7 +332,7 @@ class DurationEstimator:
         # By the cycle count. Then we also (in parallel) do the same with delays
 
         profile_total_steps = payload["steps"]
-        thermocyler_temperatures = [float(self._last_thermocyler_module_temperature)]
+        thermocyler_temperatures = [self._last_thermocyler_module_temperature]
         thermocyler_hold_times = []
         cycle_count = float(payload["text"].split(" ")[2])
 
@@ -403,45 +409,42 @@ class DurationEstimator:
         logger.info(f"tempdeck {duration} ")
         return duration
 
-    def thermocyler_handler(self, temp0, temp1):
-        total = []
+    def thermocyler_handler(self, temp0: float, temp1: float) -> float:
+        total = 0.0
         if temp1 - temp0 > 0:
             # heating up!
-            if temp1 > 70:
+            if temp1 > THERMO_HIGH_THRESH:
                 # the temp1 part that's over 70 is
-                total.append(abs(temp1 - 70) / 2)
+                total = abs(temp1 - THERMO_HIGH_THRESH) / 2
                 # the temp1 part that's under 70 is:
-                total.append(abs(70 - temp0) / 4)
+                total += abs(THERMO_HIGH_THRESH - temp0) / 4
             else:
-                total.append(abs(temp1 - temp0) / 4)
+                total = abs(temp1 - temp0) / 4
         # This is where the error is. if it's 10 and 94 this would not
         # @Matt please look into this
         elif temp1 - temp0 < 0:
-            if temp1 >= 70:
-                total.append(abs(temp1 - temp0) / 2)
-
+            if temp1 >= THERMO_HIGH_THRESH:
+                total = abs(temp1 - temp0) / 2
+            elif temp1 >= THERMO_LOW_THRESH:
+                total = abs(temp1 - temp0) / 1
             else:
-                if temp1 >= 23:
-                    total.append(abs(temp1 - temp0) / 1)
-                else:
-                    # 70 to 23 2 C/s
-                    total.append(abs(temp0 - 23) / 0.5)
-                    # 23 to temp1 0.1 C/s
-                    total.append(abs(temp1 - 23) / 0.1)
+                # 70 to 23 2 C/s
+                total = abs(temp0 - THERMO_LOW_THRESH) / 0.5
+                # 23 to temp1 0.1 C/s
+                total += abs(temp1 - THERMO_LOW_THRESH) / 0.1
 
-        return sum(total)
+        return total
 
-    def temperature_module(self, temp0, temp1: float) -> float:
-        timing_gather = []
-        if temp1 == temp0:
-            timing_gather.append(0)
-        if temp1 > TEMP_MOD_HIGH_THRESH:
-            timing_gather.append(sum(self.rate_high(temp0, temp1)))
-        if TEMP_MOD_LOW_THRESH <= temp1 <= TEMP_MOD_HIGH_THRESH:
-            timing_gather.append(sum(self.rate_mid(temp0, temp1)))
-        if temp1 < TEMP_MOD_LOW_THRESH:
-            timing_gather.append(sum(self.rate_low(temp0, temp1)))
-        return sum(timing_gather)
+    def temperature_module(self, temp0: float, temp1: float) -> float:
+        duration = 0.0
+        if temp1 != temp0:
+            if temp1 > TEMP_MOD_HIGH_THRESH:
+                duration = self.rate_high(temp0, temp1)
+            elif TEMP_MOD_LOW_THRESH <= temp1 <= TEMP_MOD_HIGH_THRESH:
+                duration = self.rate_mid(temp0, temp1)
+            elif temp1 < TEMP_MOD_LOW_THRESH:
+                duration = self.rate_low(temp0, temp1)
+        return duration
 
     def on_tempdeck_deactivate(self, payload) -> float:
         duration = 0.0
@@ -507,7 +510,7 @@ class DurationEstimator:
             x_difference = abs(current_deck_center[0] - previous_deck_center[0])
             y_difference = abs(current_deck_center[1] - previous_deck_center[1])
 
-            if x_difference and y_difference == 0:
+            if x_difference == 0 and y_difference == 0:
                 deck_movement_time = 0.5
             else:
                 deck_distance = np.sqrt((x_difference ** 2) + (y_difference ** 2))
@@ -515,7 +518,7 @@ class DurationEstimator:
             return deck_movement_time
 
     @staticmethod
-    def z_time(piece, gantry_speed):
+    def z_time(is_module: bool, gantry_speed: float) -> float:
         z_default_labware_height = 177.8
         z_default_module_height = 95.25
         # 177.8 - 82.55 Where did we get 177.8 from?
@@ -523,7 +526,7 @@ class DurationEstimator:
         # protocol_api.labware.Well.top
         # labware.top() ?
 
-        if piece == 0:
+        if is_module:
             z_time = z_default_module_height / gantry_speed
         else:
             z_time = z_default_labware_height / gantry_speed
@@ -531,50 +534,49 @@ class DurationEstimator:
         return z_time
 
     @staticmethod
-    def rate_high(temp0, temp1):
-        val = []
+    def rate_high(temp0: float, temp1: float) -> float:
+        val = 0.0
         if temp0 >= TEMP_MOD_HIGH_THRESH:
-            val.append(abs(temp1 - temp0) / TEMP_MOD_RATE_HIGH_AND_ABOVE)
-        if TEMP_MOD_LOW_THRESH < temp0 <= TEMP_MOD_HIGH_THRESH:
-            val.append(abs(temp0 - TEMP_MOD_HIGH_THRESH) / TEMP_MOD_RATE_LOW_TO_HIGH)
-            val.append(abs(temp1 - TEMP_MOD_HIGH_THRESH) / TEMP_MOD_RATE_HIGH_AND_ABOVE)
-        if temp0 <= TEMP_MOD_LOW_THRESH:
+            val = abs(temp1 - temp0) / TEMP_MOD_RATE_HIGH_AND_ABOVE
+        elif TEMP_MOD_LOW_THRESH < temp0 < TEMP_MOD_HIGH_THRESH:
+            val = abs(temp0 - TEMP_MOD_HIGH_THRESH) / TEMP_MOD_RATE_LOW_TO_HIGH
+            val += abs(temp1 - TEMP_MOD_HIGH_THRESH) / TEMP_MOD_RATE_HIGH_AND_ABOVE
+        elif temp0 <= TEMP_MOD_LOW_THRESH:
             # the temp1 part that's under TEMP_MOD_HIGH_THRESH is:
-            val.append(abs(TEMP_MOD_LOW_THRESH - temp0) / TEMP_MOD_RATE_ZERO_TO_LOW)
-            val.append(abs(TEMP_MOD_LOW_THRESH - temp1) / TEMP_MOD_RATE_HIGH_AND_ABOVE)
+            val = abs(TEMP_MOD_LOW_THRESH - temp0) / TEMP_MOD_RATE_ZERO_TO_LOW
+            val += abs(TEMP_MOD_LOW_THRESH - temp1) / TEMP_MOD_RATE_HIGH_AND_ABOVE
 
         return val
 
     @staticmethod
-    def rate_mid(temp0, temp1):
-        val = []
+    def rate_mid(temp0: float, temp1: float) -> float:
+        val = 0.0
         if TEMP_MOD_LOW_THRESH <= temp0 <= TEMP_MOD_HIGH_THRESH:
-            val.append(abs(temp1 - temp0) / TEMP_MOD_RATE_LOW_TO_HIGH)
-
-        if temp0 < TEMP_MOD_LOW_THRESH:
+            val = abs(temp1 - temp0) / TEMP_MOD_RATE_LOW_TO_HIGH
+        elif temp0 < TEMP_MOD_LOW_THRESH:
             # the temp1 part that's over TEMP_MOD_HIGH_THRESH is
-            val.append(abs(temp1 - TEMP_MOD_LOW_THRESH) / TEMP_MOD_RATE_LOW_TO_HIGH)
+            val = abs(temp1 - TEMP_MOD_LOW_THRESH) / TEMP_MOD_RATE_LOW_TO_HIGH
             # the temp0 part that's under TEMP_MOD_HIGH_THRESH is:
-            val.append(abs(TEMP_MOD_LOW_THRESH - temp0) / TEMP_MOD_RATE_ZERO_TO_LOW)
-        if temp0 > TEMP_MOD_HIGH_THRESH:
-            val.append(abs(temp0 - TEMP_MOD_HIGH_THRESH) / TEMP_MOD_RATE_HIGH_AND_ABOVE)
+            val += abs(TEMP_MOD_LOW_THRESH - temp0) / TEMP_MOD_RATE_ZERO_TO_LOW
+        elif temp0 > TEMP_MOD_HIGH_THRESH:
+            val = abs(temp0 - TEMP_MOD_HIGH_THRESH) / TEMP_MOD_RATE_HIGH_AND_ABOVE
             # the temp1 part that's under TEMP_MOD_HIGH_THRESH is:
-            val.append(abs(TEMP_MOD_HIGH_THRESH - temp1) / TEMP_MOD_RATE_ZERO_TO_LOW)
+            val += abs(TEMP_MOD_HIGH_THRESH - temp1) / TEMP_MOD_RATE_ZERO_TO_LOW
         return val
 
     # How to handle temperatures where one of them is low temp
     @staticmethod
-    def rate_low(temp0, temp1):
-        val = []
+    def rate_low(temp0: float, temp1: float) -> float:
+        val = 0.0
         if temp0 <= TEMP_MOD_LOW_THRESH:
-            val.append(abs(temp1 - temp0) / TEMP_MOD_RATE_ZERO_TO_LOW)
-        if TEMP_MOD_LOW_THRESH < temp0 <= TEMP_MOD_HIGH_THRESH:
+            val = abs(temp1 - temp0) / TEMP_MOD_RATE_ZERO_TO_LOW
+        elif TEMP_MOD_LOW_THRESH < temp0 < TEMP_MOD_HIGH_THRESH:
             # the temp0 part that's over TEMP_MOD_HIGH_THRESH is
-            val.append(abs(temp0 - TEMP_MOD_LOW_THRESH) / TEMP_MOD_RATE_LOW_TO_HIGH)
+            val = abs(temp0 - TEMP_MOD_LOW_THRESH) / TEMP_MOD_RATE_LOW_TO_HIGH
             # the temp1 part that's under TEMP_MOD_HIGH_THRESH is:
-            val.append(abs(TEMP_MOD_LOW_THRESH - temp1) / TEMP_MOD_RATE_ZERO_TO_LOW)
-        if temp0 > TEMP_MOD_HIGH_THRESH:
-            val.append(abs(temp0 - TEMP_MOD_HIGH_THRESH) / TEMP_MOD_RATE_LOW_TO_HIGH)
+            val += abs(TEMP_MOD_LOW_THRESH - temp1) / TEMP_MOD_RATE_ZERO_TO_LOW
+        elif temp0 >= TEMP_MOD_HIGH_THRESH:
+            val = abs(temp0 - TEMP_MOD_HIGH_THRESH) / TEMP_MOD_RATE_LOW_TO_HIGH
             # the temp1 part that's under TEMP_MOD_HIGH_THRESH is:
-            val.append(abs(TEMP_MOD_HIGH_THRESH - temp1) / TEMP_MOD_RATE_ZERO_TO_LOW)
+            val += abs(TEMP_MOD_HIGH_THRESH - temp1) / TEMP_MOD_RATE_ZERO_TO_LOW
         return val
