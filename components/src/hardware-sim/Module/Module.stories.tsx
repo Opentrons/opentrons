@@ -33,6 +33,16 @@ const Template: Story<{slot: string, model: ModuleModel, orientation: 'left' | '
               model={args.model}
               x={slot.position[0]}
               y={slot.position[1]}
+              statusInfo={(
+                <>
+                  <div>TEMPERATURE</div>
+                  <div>LID</div>
+                  <div>UP now</div>
+                  <div>TEMPERATURE</div>
+                  <div>ramping</div>
+                </>
+              )}
+              innerProps={{lidMotorState: 'open'}}
               orientation={args.orientation} />
           </g>
         )

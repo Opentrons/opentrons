@@ -13,7 +13,9 @@
     "xDimension": 196,
     "yDimension": 91,
     "footprintXDimension": 128,
-    "footprintYDimension": 86
+    "footprintYDimension": 86,
+    "labwareInterfaceXDimension": 128,
+    "labwareInterfaceYDimension": 86
   },
   "cornerOffsetFromSlot": {
     "x": -66,

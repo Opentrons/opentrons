@@ -268,6 +268,8 @@ export interface ModuleDimensions {
   yDimension: number
   footprintXDimension?: number
   footprintYDimension?: number
+  labwareInterfaceXDimension?: number
+  labwareInterfaceYDimension?: number
   lidHeight?: number
 }
 
