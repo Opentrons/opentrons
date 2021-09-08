@@ -1,5 +1,5 @@
 import logging
-from typing import List, Optional, Tuple, Awaitable, Callable, Dict, Any, TYPE_CHECKING
+from typing import List, Optional, Tuple, Awaitable, Callable, Dict, Any
 from typing_extensions import Literal
 
 from opentrons.calibration_storage import get, helpers, modify, types as cal_types
@@ -20,6 +20,8 @@ from opentrons.protocol_api import labware
 from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
 from opentrons.config import feature_flags as ff
 from opentrons.protocols.geometry.deck import Deck
+
+from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 from robot_server.robot.calibration.constants import (
     SHORT_TRASH_DECK,
@@ -68,9 +70,6 @@ from .constants import (
 )
 from ..errors import CalibrationError
 
-if TYPE_CHECKING:
-    from opentrons_shared_data.labware.dev_types import LabwareDefinition
-
 MODULE_LOG = logging.getLogger(__name__)
 
 """
@@ -89,7 +88,7 @@ class CheckCalibrationUserFlow:
         self,
         hardware: "ThreadManager",
         has_calibration_block: bool = False,
-        tip_rack_defs: Optional[List["LabwareDefinition"]] = None,
+        tip_rack_defs: Optional[List[LabwareDefinition]] = None,
     ):
         self._hardware = hardware
         self._state_machine = CalibrationCheckStateMachine()
@@ -115,7 +114,7 @@ class CheckCalibrationUserFlow:
         ) = self._get_current_calibrations()
         self._check_valid_calibrations()
 
-        self._tip_racks: Optional[List["LabwareDefinition"]] = tip_rack_defs
+        self._tip_racks: Optional[List[LabwareDefinition]] = tip_rack_defs
         self._active_pipette, self._pip_info = self._select_starting_pipette()
 
         self._has_calibration_block = has_calibration_block
@@ -199,7 +198,7 @@ class CheckCalibrationUserFlow:
     def supported_commands(self) -> List[str]:
         return self._supported_commands.supported()
 
-    async def transition(self, tiprackDefinition: Optional["LabwareDefinition"] = None):
+    async def transition(self, tiprackDefinition: Optional[LabwareDefinition] = None):
         pass
 
     async def change_active_pipette(self):
@@ -387,7 +386,7 @@ class CheckCalibrationUserFlow:
     def _is_checking_both_mounts(self):
         return len(self._pip_info) == 2
 
-    def _get_volume_from_tiprack_def(self, tip_rack_def: "LabwareDefinition") -> float:
+    def _get_volume_from_tiprack_def(self, tip_rack_def: LabwareDefinition) -> float:
         first_well = tip_rack_def["wells"]["A1"]
         return float(first_well["totalLiquidVolume"])
 
@@ -414,7 +413,7 @@ class CheckCalibrationUserFlow:
 
     @staticmethod
     def _get_tr_lw(
-        tip_rack_def: Optional["LabwareDefinition"],
+        tip_rack_def: Optional[LabwareDefinition],
         existing_calibration: PipetteOffsetByPipetteMount,
         volume: float,
         position: Location,

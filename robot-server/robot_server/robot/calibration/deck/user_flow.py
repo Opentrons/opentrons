@@ -10,7 +10,6 @@ from typing import (
     Optional,
     Tuple,
     Union,
-    TYPE_CHECKING,
 )
 
 from opentrons.calibration_storage import get, delete
@@ -24,6 +23,8 @@ from opentrons.protocol_api import labware
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.types import Mount, Point, Location
 from opentrons.util import linal
+
+from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 from robot_server.robot.calibration.constants import TIP_RACK_LOOKUP_BY_MAX_VOL
 from robot_server.service.errors import RobotServerError
@@ -50,12 +51,9 @@ from .constants import (
     SAVE_POINT_STATE_MAP,
 )
 from .state_machine import DeckCalibrationStateMachine
+from .dev_types import SavedPoints, ExpectedPoints
 from ..errors import CalibrationError
 from ..helper_classes import RequiredLabware, AttachedPipette, SupportedCommands
-
-if TYPE_CHECKING:
-    from .dev_types import SavedPoints, ExpectedPoints
-    from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -216,7 +214,7 @@ class DeckCalibrationUserFlow:
             )[0]
 
     def _get_tip_rack_lw(
-        self, tiprack_definition: Optional["LabwareDefinition"] = None
+        self, tiprack_definition: Optional[LabwareDefinition] = None
     ) -> labware.Labware:
         if tiprack_definition:
             return labware.load_from_definition(
@@ -270,7 +268,7 @@ class DeckCalibrationUserFlow:
     async def get_current_point(self, critical_point: CriticalPoint = None) -> Point:
         return await self._hardware.gantry_position(self._mount, critical_point)
 
-    async def load_labware(self, tiprackDefinition: "LabwareDefinition"):
+    async def load_labware(self, tiprackDefinition: LabwareDefinition):
         self._supported_commands.loadLabware = False
         if tiprackDefinition:
             verified_definition = labware.verify_definition(tiprackDefinition)
