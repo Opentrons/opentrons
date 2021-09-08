@@ -34,7 +34,7 @@ if TYPE_CHECKING:
     from .pipette_offset.user_flow import PipetteOffsetCalibrationUserFlow
     from .check.user_flow import CheckCalibrationUserFlow
     from opentrons_shared_data.pipette.dev_types import LabwareUri
-    from opentrons_shared_data.labware import LabwareDefinition
+    from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 ValidState = Union[
     TipCalibrationState,

@@ -55,7 +55,7 @@ from ..helper_classes import RequiredLabware, AttachedPipette, SupportedCommands
 
 if TYPE_CHECKING:
     from .dev_types import SavedPoints, ExpectedPoints
-    from opentrons_shared_data.labware import LabwareDefinition
+    from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -157,7 +157,7 @@ class DeckCalibrationUserFlow:
         self._tip_origin_pt = None
 
     @property
-    def supported_commands(self) -> List:
+    def supported_commands(self) -> List[str]:
         return self._supported_commands.supported()
 
     @property
@@ -270,7 +270,7 @@ class DeckCalibrationUserFlow:
     async def get_current_point(self, critical_point: CriticalPoint = None) -> Point:
         return await self._hardware.gantry_position(self._mount, critical_point)
 
-    async def load_labware(self, tiprackDefinition: dict):
+    async def load_labware(self, tiprackDefinition: "LabwareDefinition"):
         self._supported_commands.loadLabware = False
         if tiprackDefinition:
             verified_definition = labware.verify_definition(tiprackDefinition)

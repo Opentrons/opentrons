@@ -28,7 +28,7 @@ from ..models.session import SessionType, PipetteOffsetCalibrationResponseAttrib
 from ..errors import UnsupportedFeature
 
 if TYPE_CHECKING:
-    from opentrons_shared_data.labware import LabwareDefinition
+    from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 log = logging.getLogger(__name__)
 

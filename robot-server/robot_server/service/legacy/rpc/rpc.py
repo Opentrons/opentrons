@@ -28,8 +28,8 @@ PONG_MESSAGE = 5
 
 class ClientWriterTask(typing.NamedTuple):
     socket: WebSocket
-    queue: asyncio.Queue
-    task: asyncio.Task
+    queue: "asyncio.Queue[typing.Dict[str, typing.Any]]"
+    task: "asyncio.Task[None]"
 
 
 class RPCServer(object):
@@ -91,7 +91,10 @@ class RPCServer(object):
             except Exception:
                 log.exception("send_task for socket {} threw:".format(_id))
 
-        async def send_task(socket_: WebSocket, queue_: asyncio.Queue):
+        async def send_task(
+            socket_: WebSocket,
+            queue_: "asyncio.Queue[typing.Dict[str, typing.Any]]",
+        ):
             while True:
                 payload = await queue_.get()
                 if socket_.client_state == WebSocketState.DISCONNECTED:
@@ -100,7 +103,9 @@ class RPCServer(object):
 
                 await socket_.send_json(payload)
 
-        queue: asyncio.Queue = asyncio.Queue(loop=self.loop)
+        queue: "asyncio.Queue[typing.Dict[str, typing.Any]]" = asyncio.Queue(
+            loop=self.loop
+        )
         task = self.loop.create_task(send_task(socket, queue))
         task.add_done_callback(task_done)
         log.debug(f"Send task for {_id} started")

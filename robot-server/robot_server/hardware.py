@@ -26,7 +26,7 @@ from .settings import get_settings
 log = logging.getLogger(__name__)
 
 _hw_api = AppStateValue[HardwareAPI]("hardware_api")
-_init_task = AppStateValue[asyncio.Task]("hardware_init_task")
+_init_task = AppStateValue["asyncio.Task[None]"]("hardware_init_task")
 _event_unsubscribe = AppStateValue[Callable[[], None]]("hardware_event_unsubscribe")
 
 

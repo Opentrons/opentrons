@@ -18,6 +18,7 @@ from opentrons.protocol_engine import (
 
 from robot_server.service.json_api import ResponseModel
 from robot_server.sessions.session_models import (
+    Session,
     BasicSession,
     SessionStatus,
     SessionCommandSummary,
@@ -31,14 +32,14 @@ from robot_server.sessions.router.commands_router import (
 
 
 @pytest.fixture
-def get_session(decoy: Decoy) -> Callable[..., Awaitable[ResponseModel]]:
+def get_session(decoy: Decoy) -> Callable[..., Awaitable[ResponseModel[Session]]]:
     """Get a mock version of the get_session route handler."""
     return decoy.mock(func=real_get_session)
 
 
 @pytest.fixture(autouse=True)
 def setup_app(
-    get_session: Callable[..., Awaitable[ResponseModel]],
+    get_session: Callable[..., Awaitable[ResponseModel[Session]]],
     app: FastAPI,
 ) -> None:
     """Setup the FastAPI app with commands routes and dependencies."""
@@ -48,7 +49,7 @@ def setup_app(
 
 async def test_get_session_commands(
     decoy: Decoy,
-    get_session: Callable[..., Awaitable[ResponseModel]],
+    get_session: Callable[..., Awaitable[ResponseModel[Session]]],
     async_client: AsyncClient,
 ) -> None:
     """It should return a list of all commands in a session."""

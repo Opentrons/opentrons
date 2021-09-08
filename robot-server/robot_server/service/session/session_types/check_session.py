@@ -1,4 +1,4 @@
-from typing import Awaitable, cast, TYPE_CHECKING
+from typing import Awaitable, cast
 
 from robot_server.robot.calibration.check.user_flow import CheckCalibrationUserFlow
 from robot_server.robot.calibration.check.models import (
@@ -29,9 +29,6 @@ from robot_server.service.session.errors import (
     CommandExecutionException,
     UnsupportedFeature,
 )
-
-if TYPE_CHECKING:
-    from opentrons_shared_data.labware import LabwareDefinition
 
 
 class CheckSessionCommandExecutor(CallableExecutor):
@@ -75,7 +72,7 @@ class CheckSession(BaseSession):
             calibration_check = CheckCalibrationUserFlow(
                 configuration.hardware,
                 has_calibration_block=has_calibration_block,
-                tip_rack_defs=[cast("LabwareDefinition", rack) for rack in tip_racks],
+                tip_rack_defs=[rack for rack in tip_racks],
             )
         except AssertionError as e:
             raise SessionCreationException(str(e))

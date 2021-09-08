@@ -69,7 +69,7 @@ from .constants import (
 from ..errors import CalibrationError
 
 if TYPE_CHECKING:
-    from opentrons_shared_data.labware import LabwareDefinition
+    from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -196,10 +196,10 @@ class CheckCalibrationUserFlow:
         return self._get_hw_pipettes()[0]
 
     @property
-    def supported_commands(self) -> List:
+    def supported_commands(self) -> List[str]:
         return self._supported_commands.supported()
 
-    async def transition(self, tiprackDefinition: Optional[dict] = None):
+    async def transition(self, tiprackDefinition: Optional["LabwareDefinition"] = None):
         pass
 
     async def change_active_pipette(self):
@@ -532,7 +532,7 @@ class CheckCalibrationUserFlow:
                 rank=info_pip.rank.value,
                 mount=str(info_pip.mount),
                 serial=hw_pip.pipette_id,  # type: ignore[arg-type]
-                defaultTipracks=info_pip.default_tipracks,  # type: ignore[arg-type]
+                defaultTipracks=info_pip.default_tipracks,
             )
             for hw_pip, info_pip in zip(hw_pips, info_pips)
         ]
@@ -555,7 +555,7 @@ class CheckCalibrationUserFlow:
             rank=self.active_pipette.rank.value,
             mount=str(self.mount),
             serial=self.hw_pipette.pipette_id,  # type: ignore[arg-type]
-            defaultTipracks=self.active_pipette.default_tipracks,  # type: ignore[arg-type]  # noqa: E501
+            defaultTipracks=self.active_pipette.default_tipracks,
         )
 
     def _determine_threshold(self) -> Point:
