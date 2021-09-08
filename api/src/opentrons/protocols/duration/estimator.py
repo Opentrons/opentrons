@@ -2,7 +2,7 @@ import logging
 from typing import Optional, List
 from typing_extensions import Final
 
-import numpy as np  # type: ignore
+import math
 import functools
 
 from dataclasses import dataclass
@@ -495,7 +495,7 @@ class DurationEstimator:
         if previous_slot is None:
             init_x_diff = abs((current_deck_center[0]) - (start_point_pip[0]))
             init_y_diff = abs((current_deck_center[1]) - (start_point_pip[1]))
-            init_deck_d = np.sqrt((init_x_diff ** 2) + (init_y_diff ** 2))
+            init_deck_d = math.sqrt((init_x_diff ** 2) + (init_y_diff ** 2))
             deck_movement_time = init_deck_d / gantry_speed
             return deck_movement_time
         else:
@@ -511,7 +511,7 @@ class DurationEstimator:
                 # Inter slot movement defaults to half a second.
                 deck_movement_time = 0.5
             else:
-                deck_distance = np.sqrt((x_difference ** 2) + (y_difference ** 2))
+                deck_distance = math.sqrt((x_difference ** 2) + (y_difference ** 2))
                 deck_movement_time = deck_distance / gantry_speed
             return deck_movement_time
 
