@@ -1,13 +1,13 @@
 """Basic pipette data state and store."""
 from __future__ import annotations
 from dataclasses import dataclass, replace
-from typing import Dict, List, Mapping, Optional, Tuple
+from typing import Dict, List, Mapping, Optional
 
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.types import MountType, Mount as HwMount
 
 from .. import errors
-from ..types import PipetteName, DeckLocation
+from ..types import LoadedPipette
 
 from ..commands import (
     Command,
@@ -23,14 +23,6 @@ from .abstract_store import HasState, HandlesActions
 
 
 @dataclass(frozen=True)
-class PipetteData:
-    """Pipette state data."""
-
-    mount: MountType
-    pipette_name: PipetteName
-
-
-@dataclass(frozen=True)
 class HardwarePipette:
     """Hardware pipette data."""
 
@@ -39,12 +31,21 @@ class HardwarePipette:
 
 
 @dataclass(frozen=True)
+class CurrentWell:
+    """The latest well that the robot has accessed."""
+
+    pipette_id: str
+    labware_id: str
+    well_name: str
+
+
+@dataclass(frozen=True)
 class PipetteState:
     """Basic labware data state and getter methods."""
 
-    pipettes_by_id: Dict[str, PipetteData]
+    pipettes_by_id: Dict[str, LoadedPipette]
     aspirated_volume_by_id: Dict[str, float]
-    current_location: Optional[DeckLocation]
+    current_well: Optional[CurrentWell]
 
 
 class PipetteStore(HasState[PipetteState], HandlesActions):
@@ -57,7 +58,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         self._state = PipetteState(
             pipettes_by_id={},
             aspirated_volume_by_id={},
-            current_location=None,
+            current_well=None,
         )
 
     def handle_action(self, action: Action) -> None:
@@ -78,7 +79,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         ):
             self._state = replace(
                 self._state,
-                current_location=DeckLocation(
+                current_well=CurrentWell(
                     pipette_id=command.data.pipetteId,
                     labware_id=command.data.labwareId,
                     well_name=command.data.wellName,
@@ -90,8 +91,9 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             pipettes_by_id = self._state.pipettes_by_id.copy()
             aspirated_volume_by_id = self._state.aspirated_volume_by_id.copy()
 
-            pipettes_by_id[pipette_id] = PipetteData(
-                pipette_name=command.data.pipetteName,
+            pipettes_by_id[pipette_id] = LoadedPipette(
+                id=pipette_id,
+                pipetteName=command.data.pipetteName,
                 mount=command.data.mount,
             )
             aspirated_volume_by_id[pipette_id] = 0
@@ -138,18 +140,18 @@ class PipetteView(HasState[PipetteState]):
         """Initialize the view with its backing state value."""
         self._state = state
 
-    def get_pipette_data_by_id(self, pipette_id: str) -> PipetteData:
+    def get(self, pipette_id: str) -> LoadedPipette:
         """Get pipette data by the pipette's unique identifier."""
         try:
             return self._state.pipettes_by_id[pipette_id]
         except KeyError:
             raise errors.PipetteDoesNotExistError(f"Pipette {pipette_id} not found.")
 
-    def get_all_pipettes(self) -> List[Tuple[str, PipetteData]]:
+    def get_all(self) -> List[LoadedPipette]:
         """Get a list of all pipette entries in state."""
-        return [entry for entry in self._state.pipettes_by_id.items()]
+        return list(self._state.pipettes_by_id.values())
 
-    def get_pipette_data_by_mount(self, mount: MountType) -> Optional[PipetteData]:
+    def get_by_mount(self, mount: MountType) -> Optional[LoadedPipette]:
         """Get pipette data by the pipette's mount."""
         for pipette in self._state.pipettes_by_id.values():
             if pipette.mount == mount:
@@ -162,8 +164,8 @@ class PipetteView(HasState[PipetteState]):
         attached_pipettes: Mapping[HwMount, Optional[PipetteDict]],
     ) -> HardwarePipette:
         """Get a pipette's hardware configuration and state by ID."""
-        pipette_data = self.get_pipette_data_by_id(pipette_id)
-        pipette_name = pipette_data.pipette_name
+        pipette_data = self.get(pipette_id)
+        pipette_name = pipette_data.pipetteName
         mount = pipette_data.mount
 
         hw_mount = mount.to_hw_mount()
@@ -180,9 +182,9 @@ class PipetteView(HasState[PipetteState]):
 
         return HardwarePipette(mount=hw_mount, config=hw_config)
 
-    def get_current_deck_location(self) -> Optional[DeckLocation]:
-        """Get the current pipette and deck location the protocol is at."""
-        return self._state.current_location
+    def get_current_well(self) -> Optional[CurrentWell]:
+        """Get the last accessed well and which pipette accessed it."""
+        return self._state.current_well
 
     def get_aspirated_volume(self, pipette_id: str) -> float:
         """Get the currently aspirated volume of a pipette by ID."""

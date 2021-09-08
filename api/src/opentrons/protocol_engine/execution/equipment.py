@@ -14,7 +14,7 @@ from ..types import LabwareLocation, PipetteName
 
 
 @dataclass(frozen=True)
-class LoadedLabware:
+class LoadedLabwareData:
     """The result of a load labware procedure."""
 
     labware_id: str
@@ -23,7 +23,7 @@ class LoadedLabware:
 
 
 @dataclass(frozen=True)
-class LoadedPipette:
+class LoadedPipetteData:
     """The result of a load pipette procedure."""
 
     pipette_id: str
@@ -57,7 +57,7 @@ class EquipmentHandler:
         version: int,
         location: LabwareLocation,
         labware_id: Optional[str],
-    ) -> LoadedLabware:
+    ) -> LoadedLabwareData:
         """Load labware by assigning an identifier and pulling required data.
 
         Args:
@@ -69,7 +69,7 @@ class EquipmentHandler:
                 identifier will be generated.
 
         Returns:
-            A LoadedLabware object.
+            A LoadedLabwareData object.
         """
         labware_id = labware_id if labware_id else self._model_utils.generate_id()
 
@@ -94,7 +94,7 @@ class EquipmentHandler:
             location=location,
         )
 
-        return LoadedLabware(
+        return LoadedLabwareData(
             labware_id=labware_id,
             definition=definition,
             calibration=calibration,
@@ -105,7 +105,7 @@ class EquipmentHandler:
         pipette_name: PipetteName,
         mount: MountType,
         pipette_id: Optional[str],
-    ) -> LoadedPipette:
+    ) -> LoadedPipetteData:
         """Ensure the requested pipette is attached.
 
         Args:
@@ -115,16 +115,14 @@ class EquipmentHandler:
                 identifier will be generated.
 
         Returns:
-            A LoadedPipette object.
+            A LoadedPipetteData object.
         """
         other_mount = mount.other_mount()
-        other_pipette = self._state_store.pipettes.get_pipette_data_by_mount(
-            other_mount,
-        )
+        other_pipette = self._state_store.pipettes.get_by_mount(other_mount)
 
         cache_request = {mount.to_hw_mount(): pipette_name}
         if other_pipette is not None:
-            cache_request[other_mount.to_hw_mount()] = other_pipette.pipette_name
+            cache_request[other_mount.to_hw_mount()] = other_pipette.pipetteName
 
         # TODO(mc, 2020-10-18): calling `cache_instruments` mirrors the
         # behavior of protocol_context.load_instrument, and is used here as a
@@ -137,4 +135,4 @@ class EquipmentHandler:
 
         pipette_id = pipette_id or self._model_utils.generate_id()
 
-        return LoadedPipette(pipette_id=pipette_id)
+        return LoadedPipetteData(pipette_id=pipette_id)

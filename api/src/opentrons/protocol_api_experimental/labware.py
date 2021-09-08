@@ -71,7 +71,7 @@ class Labware:  # noqa: D101
         deck slot. Otherwise, the labware is on a module, and the object
         returned will be a :py:class:`ModuleContext`.
         """
-        parent = self._engine_client.state.labware.get_labware_location(
+        parent = self._engine_client.state.labware.get_location(
             labware_id=self._labware_id
         )
         return str(parent.slot)
@@ -215,10 +215,8 @@ class Labware:  # noqa: D101
 
     def _definition(self) -> LabwareDefinition:
         if self._lw_definition is None:
-            self._lw_definition = (
-                self._engine_client.state.labware.get_labware_definition(
-                    labware_id=self.labware_id
-                )
+            self._lw_definition = self._engine_client.state.labware.get_definition(
+                labware_id=self.labware_id
             )
         return self._lw_definition
 
