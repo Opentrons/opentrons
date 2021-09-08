@@ -1,5 +1,6 @@
 from unittest.mock import MagicMock
 
+import math
 import pytest
 
 from opentrons.commands import types
@@ -14,6 +15,8 @@ from opentrons.protocols.duration.estimator import (
     THERMO_HIGH_THRESH,
     THERMO_LOW_THRESH,
 )
+from opentrons.protocols.geometry.deck import Deck
+from opentrons.types import Location, Point
 
 
 @pytest.fixture
@@ -34,7 +37,7 @@ def test_ignore_before(subject: DurationEstimator):
         payload=types.DelayCommandPayload(minutes=1, seconds=1)
     )
     message["$"] = "before"
-    message["name"] = "command.DELAY"
+    message["name"] = types.DELAY
     subject.on_message(message)
     assert subject.get_total_duration() == 0
 
@@ -94,6 +97,56 @@ def test_delay(subject: DurationEstimator):
     message["name"] = types.DELAY
     subject.on_message(message)
     assert subject.get_total_duration() == 61
+
+
+@pytest.fixture
+def mock_deck() -> MagicMock:
+    """A mock deck fixture"""
+
+    def position_for(slot):
+        # zero based
+        s = int(slot) - 1
+        row = int(s / 3)
+        col = int(s % 3)
+        return Location(point=Point(x=col * 10, y=row * 100), labware=None)
+
+    m = MagicMock(spec=Deck)
+    m.position_for.side_effect = position_for
+    return m
+
+
+@pytest.mark.parametrize(
+    argnames=["current_slot", "previous_slot", "speed", "expected_duration"],
+    argvalues=[
+        # Within same slot
+        ["12", "12", 1, 0.5],
+        # Same row sqrt(10**2) / 2
+        ["1", "2", 2, 5],
+        # Same col sqrt(100**2) / 2
+        ["1", "4", 2, 50],
+        # Extremes
+        ["1", "12", 2, math.sqrt(20 ** 2 + 300 ** 2) / 2],
+        # Same row sqrt(10**2) / 2
+        ["3", "2", 2, 5],
+        # Same col sqrt(100**2) / 2
+        ["5", "2", 2, 50],
+        # Extremes
+        ["12", "1", 2, math.sqrt(20 ** 2 + 300 ** 2) / 2],
+    ],
+)
+def test_calc_deck_movement_time(
+    subject: DurationEstimator,
+    mock_deck: MagicMock,
+    current_slot: str,
+    previous_slot: str,
+    speed: float,
+    expected_duration: float,
+):
+    """It should calculate deck movement correctly."""
+    assert (
+        subject.calc_deck_movement_time(mock_deck, current_slot, previous_slot, speed)
+        == expected_duration
+    )
 
 
 @pytest.mark.parametrize(

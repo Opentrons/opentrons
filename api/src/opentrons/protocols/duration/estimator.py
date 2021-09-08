@@ -7,6 +7,7 @@ import functools
 
 from dataclasses import dataclass
 
+from opentrons.protocols.geometry.deck import Deck
 from opentrons.commands import types
 from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocols.duration.errors import DurationEstimatorException
@@ -29,6 +30,8 @@ THERMO_HIGH_THRESH: Final = 70.0
 
 START_MODULE_TEMPERATURE: Final = 25.0
 
+STARTING_SLOT: Final[str] = "12"
+
 
 logger = logging.getLogger(__name__)
 
@@ -46,13 +49,14 @@ class DurationEstimator:
 
     def __init__(self):
         # Which slot the last command was in.
-        self._last_deckslot = None
+        self._last_deckslot = STARTING_SLOT
         # todo(mm, 2021-09-08): Support protocols with more than one
         # Temperature or Thermocycler Module.
         self._last_temperature_module_temperature = START_MODULE_TEMPERATURE
         self._last_thermocycler_module_temperature = START_MODULE_TEMPERATURE
         # Per step time estimate.
         self._increments: List[TimerEntry] = []
+        self._deck = Deck()
 
     def get_total_duration(self) -> float:
         """Return the total duration"""
@@ -96,7 +100,8 @@ class DurationEstimator:
             raise DurationEstimatorException(str(e))
 
         if location:
-            self._last_deckslot = self.get_slot(location)
+            slot = self.get_slot(location)
+            self._last_deckslot = slot if slot else self._last_deckslot
 
         self._increments.append(
             TimerEntry(
@@ -164,7 +169,7 @@ class DurationEstimator:
         gantry_speed = instrument.default_speed
 
         deck_travel_time = self.calc_deck_movement_time(
-            curr_slot, prev_slot, gantry_speed
+            self._deck, curr_slot, prev_slot, gantry_speed
         )
 
         # The time to pick up tip is 4 seconds. Determined by testing on hardware.
@@ -186,7 +191,7 @@ class DurationEstimator:
         prev_slot = self._last_deckslot
         gantry_speed = instrument.default_speed
         deck_travel_time = self.calc_deck_movement_time(
-            curr_slot, prev_slot, gantry_speed
+            self._deck, curr_slot, prev_slot, gantry_speed
         )
         # TODO (al, 2021-09-08): Should we be checking for drop tip home_after = False?
 
@@ -224,7 +229,7 @@ class DurationEstimator:
 
         gantry_speed = instrument.default_speed
         deck_travel_time = self.calc_deck_movement_time(
-            curr_slot, prev_slot, gantry_speed
+            self._deck, curr_slot, prev_slot, gantry_speed
         )
         duration = deck_travel_time + z_total_time + aspiration_time
         logger.info(
@@ -255,7 +260,7 @@ class DurationEstimator:
 
         gantry_speed = instrument.default_speed
         deck_travel_time = self.calc_deck_movement_time(
-            curr_slot, prev_slot, gantry_speed
+            self._deck, curr_slot, prev_slot, gantry_speed
         )
 
         duration = deck_travel_time + z_total_time + dispense_time
@@ -360,7 +365,7 @@ class DurationEstimator:
         logger.info(
             f"temperatures {sum(cycling_counter)}, "
             f"hold_times {total_hold_time} , cycles are {cycle_count}, "
-            f"{duration} boop"
+            f"{duration}"
         )
         return duration
 
@@ -462,61 +467,39 @@ class DurationEstimator:
             return LabwareLike(location).first_parent()
 
     @staticmethod
-    def calc_deck_movement_time(current_slot, previous_slot, gantry_speed):
-        y_dist = 88.9
-        x_dist = 133.35
+    def calc_deck_movement_time(
+        deck: Deck, current_slot: Optional[str], previous_slot: str, gantry_speed: float
+    ) -> float:
         # Quick summary we set coordinates for each deck slot and found ways
         # to move between deck slots.
         # Each deck slot is a key for a coordinate value
         # Moving between coordinate values
-        start_point_pip = (2 * x_dist, 3 * y_dist)
-
-        deck_centers = {
-            "1": (0, 0),
-            "2": (x_dist, 0),
-            "3": (2 * x_dist, 0),
-            "4": (0, y_dist),
-            "5": (x_dist, y_dist),
-            "6": (2 * x_dist, y_dist),
-            "7": (0, 2 * y_dist),
-            "8": (x_dist, 2 * y_dist),
-            "9": (2 * x_dist, 2 * y_dist),
-            "10": (0, 3 * y_dist),
-            "11": (x_dist, 3 * y_dist),
-            "12": (2 * x_dist, 3 * y_dist),
-        }
-
-        current_deck_center = deck_centers.get(current_slot)
-        if not current_deck_center:
+        if not current_slot:
             raise DurationEstimatorException(
                 f"Current slot '{current_slot}' is not valid."
             )
 
-        if previous_slot is None:
-            init_x_diff = abs((current_deck_center[0]) - (start_point_pip[0]))
-            init_y_diff = abs((current_deck_center[1]) - (start_point_pip[1]))
-            init_deck_d = math.sqrt((init_x_diff ** 2) + (init_y_diff ** 2))
-            deck_movement_time = init_deck_d / gantry_speed
-            return deck_movement_time
-        else:
-            previous_deck_center = deck_centers.get(previous_slot)
-            if not previous_deck_center:
-                raise DurationEstimatorException(
-                    f"Previous slot '{current_slot}' is not valid."
-                )
-            x_difference = abs(current_deck_center[0] - previous_deck_center[0])
-            y_difference = abs(current_deck_center[1] - previous_deck_center[1])
+        previous_deck_center = deck.position_for(previous_slot)
+        if not previous_deck_center:
+            raise DurationEstimatorException(
+                f"Previous slot '{current_slot}' is not valid."
+            )
+        current_deck_center = deck.position_for(current_slot)
 
-            if x_difference == 0 and y_difference == 0:
-                # Inter slot movement defaults to half a second.
-                deck_movement_time = 0.5
-            else:
-                deck_distance = math.sqrt((x_difference ** 2) + (y_difference ** 2))
-                deck_movement_time = deck_distance / gantry_speed
-            return deck_movement_time
+        x_difference = abs(current_deck_center.point.x - previous_deck_center.point.x)
+        y_difference = abs(current_deck_center.point.y - previous_deck_center.point.y)
+
+        if x_difference == 0 and y_difference == 0:
+            # Inter slot movement defaults to half a second.
+            deck_movement_time = 0.5
+        else:
+            deck_distance = math.sqrt((x_difference ** 2) + (y_difference ** 2))
+            deck_movement_time = deck_distance / gantry_speed
+        return deck_movement_time
 
     @staticmethod
     def z_time(is_module: bool, gantry_speed: float) -> float:
+        # TODO (al, 2021-09-08): Use definitions from protocol context objects.
         z_default_labware_height = 177.8
         z_default_module_height = 95.25
         # 177.8 - 82.55 Where did we get 177.8 from?
@@ -533,6 +516,16 @@ class DurationEstimator:
 
     @staticmethod
     def rate_high(temp0: float, temp1: float) -> float:
+        """
+        Calculate temp deck temperature change to a high temperature.
+
+        Args:
+            temp0: Current
+            temp1: Target
+
+        Returns:
+            Duration in seconds.
+        """
         val = 0.0
         if temp0 >= TEMP_MOD_HIGH_THRESH:
             val = abs(temp1 - temp0) / TEMP_MOD_RATE_HIGH_AND_ABOVE
@@ -548,6 +541,16 @@ class DurationEstimator:
 
     @staticmethod
     def rate_mid(temp0: float, temp1: float) -> float:
+        """
+        Calculate temp deck temperature change to a medium temperature.
+
+        Args:
+            temp0: Current
+            temp1: Target
+
+        Returns:
+            Duration in seconds.
+        """
         val = 0.0
         if TEMP_MOD_LOW_THRESH <= temp0 <= TEMP_MOD_HIGH_THRESH:
             val = abs(temp1 - temp0) / TEMP_MOD_RATE_LOW_TO_HIGH
@@ -565,6 +568,16 @@ class DurationEstimator:
     # How to handle temperatures where one of them is low temp
     @staticmethod
     def rate_low(temp0: float, temp1: float) -> float:
+        """
+        Calculate temp deck temperature change to a low temperature.
+
+        Args:
+            temp0: Current
+            temp1: Target
+
+        Returns:
+            Duration in seconds.
+        """
         val = 0.0
         if temp0 <= TEMP_MOD_LOW_THRESH:
             val = abs(temp1 - temp0) / TEMP_MOD_RATE_ZERO_TO_LOW
