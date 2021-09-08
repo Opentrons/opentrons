@@ -36,7 +36,7 @@ def get_app(system_version_file: str = None,
         return web.Response(text="hello")
     app = web.Application(middlewares=[log_error_middleware])
     app.router.add_routes([
-        web.post('/server/oe//restore', rfs.factory_restore),
+        web.post('/server/oe/restore', rfs.factory_restore),
         web.post('/server/oe/swap', rfs.swap_partition),
         web.get('/server/oe/partition', rfs.get_partition_api),
         web.get('/server/oe/hello', hello),
