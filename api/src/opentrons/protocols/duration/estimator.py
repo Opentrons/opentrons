@@ -1,5 +1,7 @@
 import logging
 from typing import Optional, List
+
+from opentrons.protocols.geometry.deck import Deck
 from typing_extensions import Final
 
 import numpy as np  # type: ignore
@@ -29,6 +31,8 @@ THERMO_HIGH_THRESH: Final = 70.0
 
 START_MODULE_TEMPERATURE: Final = 25.0
 
+STARTING_SLOT: Final[str] = "12"
+
 
 logger = logging.getLogger(__name__)
 
@@ -46,11 +50,13 @@ class DurationEstimator:
 
     def __init__(self):
         # Which slot the last command was in.
-        self._last_deckslot = None
+
+        self._last_deckslot = STARTING_SLOT
         self._last_temperature_module_temperature = START_MODULE_TEMPERATURE
-        self._last_thermocyler_module_temperature = START_MODULE_TEMPERATURE
+        self._last_thermocycler_module_temperature = START_MODULE_TEMPERATURE
         # Per step time estimate.
         self._increments: List[TimerEntry] = []
+        self._deck = Deck()
 
     def get_total_duration(self) -> float:
         """Return the total duration"""
@@ -94,7 +100,8 @@ class DurationEstimator:
             raise DurationEstimatorException(str(e))
 
         if location:
-            self._last_deckslot = self.get_slot(location)
+            slot = self.get_slot(location)
+            self._last_deckslot = slot if slot else self._last_deckslot
 
         self._increments.append(
             TimerEntry(
@@ -138,17 +145,17 @@ class DurationEstimator:
         elif message_name == types.TEMPDECK_AWAIT_TEMP:
             duration = self.on_tempdeck_await_temp(payload=payload)
         elif message_name == types.THERMOCYCLER_SET_BLOCK_TEMP:
-            duration = self.on_thermocyler_block_temp(payload=payload)
+            duration = self.on_thermocycler_block_temp(payload=payload)
         elif message_name == types.THERMOCYCLER_EXECUTE_PROFILE:
             duration = self.on_execute_profile(payload=payload)
         elif message_name == types.THERMOCYCLER_SET_LID_TEMP:
-            duration = self.on_thermocyler_set_lid_temp(payload=payload)
+            duration = self.on_thermocycler_set_lid_temp(payload=payload)
         elif message_name == types.THERMOCYCLER_CLOSE:
-            duration = self.on_thermocyler_lid_close(payload=payload)
+            duration = self.on_thermocycler_lid_close(payload=payload)
         elif message_name == types.THERMOCYCLER_DEACTIVATE_LID:
-            duration = self.on_thermocyler_deactivate_lid(payload=payload)
+            duration = self.on_thermocycler_deactivate_lid(payload=payload)
         elif message_name == types.THERMOCYCLER_OPEN:
-            duration = self.on_thermocyler_lid_open(payload=payload)
+            duration = self.on_thermocycler_lid_open(payload=payload)
         return duration
 
     def on_pick_up_tip(self, payload) -> float:
@@ -162,9 +169,10 @@ class DurationEstimator:
         gantry_speed = instrument.default_speed
 
         deck_travel_time = self.calc_deck_movement_time(
-            curr_slot, prev_slot, gantry_speed
+            self._deck, curr_slot, prev_slot, gantry_speed
         )
 
+        # The time to pick up tip is 4 seconds. Determined by testing on hardware.
         duration = deck_travel_time + 4
 
         logger.info(
@@ -183,13 +191,14 @@ class DurationEstimator:
         prev_slot = self._last_deckslot
         gantry_speed = instrument.default_speed
         deck_travel_time = self.calc_deck_movement_time(
-            curr_slot, prev_slot, gantry_speed
+            self._deck, curr_slot, prev_slot, gantry_speed
         )
-        # Should we be checking for drop tip home_after = False?
-        # we need to add default 10 second drop tip time
-        duration = deck_travel_time + 10
-        # let's only log the message after the pick up tip is done.
+        # TODO (al, 2021-09-08): Should we be checking for drop tip home_after = False?
 
+        # The time to drop up tip is 10 seconds. Determined by testing on hardware.
+        duration = deck_travel_time + 10
+
+        # let's only log the message after the pick up tip is done.
         logger.info(f"{instrument.name}, drop tip duration is {duration}")
         return duration
 
@@ -220,7 +229,7 @@ class DurationEstimator:
 
         gantry_speed = instrument.default_speed
         deck_travel_time = self.calc_deck_movement_time(
-            curr_slot, prev_slot, gantry_speed
+            self._deck, curr_slot, prev_slot, gantry_speed
         )
         duration = deck_travel_time + z_total_time + aspiration_time
         logger.info(
@@ -251,7 +260,7 @@ class DurationEstimator:
 
         gantry_speed = instrument.default_speed
         deck_travel_time = self.calc_deck_movement_time(
-            curr_slot, prev_slot, gantry_speed
+            self._deck, curr_slot, prev_slot, gantry_speed
         )
 
         duration = deck_travel_time + z_total_time + dispense_time
@@ -264,22 +273,15 @@ class DurationEstimator:
     def on_blow_out(self, payload) -> float:
         location = payload["location"]
         curr_slot = self.get_slot(location)
-        duration = 0.5
         # In theory, we could use instrument.flow_rate.blow_out, but we don't
         # know how much is in the tip left to blow out
         # So we are defaulting to 0.5 seconds
+        duration = 0.5
         logger.info(f"blowing_out_for {duration} seconds, in slot {curr_slot}")
 
         return duration
 
     def on_touch_tip(self, payload) -> float:
-        """
-        location = payload['location']
-        duration = 0
-        prev_slot = self._last_deckslot
-        curr_slot = self.get_slot(location)
-        duration = 0.5
-        """
         # base assumption. Touch_tip takes 0.5 seconds This is consistent with a
         # ~7.5mm diameter (default 60mm/s, 4 sides)
         # plate = protocol.load_labware('corning_96_wellplate_360ul_flat', '1')
@@ -293,8 +295,6 @@ class DurationEstimator:
         return duration
 
     def on_delay(self, payload) -> float:
-        # Specialist Code: This is code that doesn't fit pickup, drop_tip,
-        # aspirate, and dispense
         # Explanation: we are gathering seconds and minutes here
         seconds_delay = payload["seconds"]
         minutes_delay = payload["minutes"]
@@ -304,14 +304,14 @@ class DurationEstimator:
 
         return duration
 
-    def on_thermocyler_block_temp(self, payload) -> float:
+    def on_thermocycler_block_temp(self, payload) -> float:
         temperature = payload["temperature"]
         hold_time = payload["hold_time"]
-        temp0 = self._last_thermocyler_module_temperature
+        temp0 = self._last_thermocycler_module_temperature
         temp1 = temperature
-        # we are referring to a thermocyler_handler(temp0, temp1) function.
+        # we are referring to a thermocycler_handler(temp0, temp1) function.
         # Magic numbers come from testing and have been consistent
-        temperature_changing_time = self.thermocyler_handler(temp0, temp1)
+        temperature_changing_time = self.thermocycler_handler(temp0, temp1)
         if hold_time is None:
             hold_time = 0
         else:
@@ -328,37 +328,37 @@ class DurationEstimator:
 
     def on_execute_profile(self, payload) -> float:
         # Overview We need to run each time a temperature change happens
-        # through thermocyler_handler and multiply
+        # through thermocycler_handler and multiply
         # By the cycle count. Then we also (in parallel) do the same with delays
 
         profile_total_steps = payload["steps"]
-        thermocyler_temperatures = [self._last_thermocyler_module_temperature]
-        thermocyler_hold_times = []
+        thermocycler_temperatures = [self._last_thermocycler_module_temperature]
+        thermocycler_hold_times = []
         cycle_count = float(payload["text"].split(" ")[2])
 
-        # We are going to need to treat this theromcyler part a bit differently
+        # We are going to need to treat this theromcycler part a bit differently
         # for a bit and just send out total times
         for step in profile_total_steps:
-            thermocyler_temperatures.append(float(step["temperature"]))
-            thermocyler_hold_times.append(float(step["hold_time_seconds"]))
+            thermocycler_temperatures.append(float(step["temperature"]))
+            thermocycler_hold_times.append(float(step["hold_time_seconds"]))
         # Initializing variable
-        total_hold_time = float(cycle_count) * float(sum(thermocyler_hold_times))
+        total_hold_time = float(cycle_count) * float(sum(thermocycler_hold_times))
         # This takes care of the cumulative hold time
         # WE DON't Have a way to deal with this currently in the way we
         # have things set up.
         cycling_counter = []
-        thermocyler_temperatures.pop(0)
-        for thermocyler_counter in range(0, len(thermocyler_temperatures)):
+        thermocycler_temperatures.pop(0)
+        for thermocycler_counter in range(0, len(thermocycler_temperatures)):
             cycling_counter.append(
-                self.thermocyler_handler(
-                    float(thermocyler_temperatures[thermocyler_counter - 1]),
-                    float(thermocyler_temperatures[thermocyler_counter]),
+                self.thermocycler_handler(
+                    float(thermocycler_temperatures[thermocycler_counter - 1]),
+                    float(thermocycler_temperatures[thermocycler_counter]),
                 )
             )
 
         # Sum hold time and cycling temp time
         duration = float(sum(cycling_counter) + total_hold_time)
-        self._last_thermocyler_module_temperature = thermocyler_temperatures[-1]
+        self._last_thermocycler_module_temperature = thermocycler_temperatures[-1]
 
         cycling_counter = []
         # Note will need to multiply minutes by 60
@@ -369,14 +369,14 @@ class DurationEstimator:
         )
         return duration
 
-    def on_thermocyler_set_lid_temp(self, payload) -> float:
+    def on_thermocycler_set_lid_temp(self, payload) -> float:
         # Hardware said ~1 minute
         duration = 60
         thermoaction = "set lid temperature"
         logger.info(f"thermocation =  {thermoaction}")
         return duration
 
-    def on_thermocyler_lid_close(self, payload) -> float:
+    def on_thermocycler_lid_close(self, payload) -> float:
         # Hardware said ~24 seconds
         duration = 24
         thermoaction = "closing"
@@ -384,7 +384,7 @@ class DurationEstimator:
 
         return duration
 
-    def on_thermocyler_lid_open(self, payload) -> float:
+    def on_thermocycler_lid_open(self, payload) -> float:
         # Hardware said ~24 seconds
         duration = 24
         thermoaction = "opening"
@@ -392,7 +392,7 @@ class DurationEstimator:
 
         return duration
 
-    def on_thermocyler_deactivate_lid(self, payload) -> float:
+    def on_thermocycler_deactivate_lid(self, payload) -> float:
         # Hardware said ~23 seconds
         duration = 23
         thermoaction = "Deactivating"
@@ -409,7 +409,7 @@ class DurationEstimator:
         logger.info(f"tempdeck {duration} ")
         return duration
 
-    def thermocyler_handler(self, temp0: float, temp1: float) -> float:
+    def thermocycler_handler(self, temp0: float, temp1: float) -> float:
         total = 0.0
         if temp1 - temp0 > 0:
             # heating up!
@@ -447,11 +447,13 @@ class DurationEstimator:
         return duration
 
     def on_tempdeck_deactivate(self, payload) -> float:
+        # TODO (al, 2021-09-08: Find an answer for this value.
         duration = 0.0
         logger.info("tempdeck deactivating")
         return duration
 
     def on_tempdeck_await_temp(self, payload) -> float:
+        # The duration is accounted for in set temperature
         duration = 0.0
         logger.info("tempdeck awaiting temperature")
         return duration
@@ -465,60 +467,39 @@ class DurationEstimator:
             return LabwareLike(location).first_parent()
 
     @staticmethod
-    def calc_deck_movement_time(current_slot, previous_slot, gantry_speed):
-        y_dist = 88.9
-        x_dist = 133.35
+    def calc_deck_movement_time(
+        deck: Deck, current_slot: Optional[str], previous_slot: str, gantry_speed: float
+    ) -> float:
         # Quick summary we set coordinates for each deck slot and found ways
         # to move between deck slots.
         # Each deck slot is a key for a coordinate value
         # Moving between coordinate values
-        start_point_pip = (2 * x_dist, 3 * y_dist)
-
-        deck_centers = {
-            "1": (0, 0),
-            "2": (x_dist, 0),
-            "3": (2 * x_dist, 0),
-            "4": (0, y_dist),
-            "5": (x_dist, y_dist),
-            "6": (2 * x_dist, y_dist),
-            "7": (0, 2 * y_dist),
-            "8": (x_dist, 2 * y_dist),
-            "9": (2 * x_dist, 2 * y_dist),
-            "10": (0, 3 * y_dist),
-            "11": (x_dist, 3 * y_dist),
-            "12": (2 * x_dist, 3 * y_dist),
-        }
-
-        current_deck_center = deck_centers.get(current_slot)
-        if not current_deck_center:
+        if not current_slot:
             raise DurationEstimatorException(
                 f"Current slot '{current_slot}' is not valid."
             )
 
-        if previous_slot is None:
-            init_x_diff = abs((current_deck_center[0]) - (start_point_pip[0]))
-            init_y_diff = abs((current_deck_center[1]) - (start_point_pip[1]))
-            init_deck_d = np.sqrt((init_x_diff ** 2) + (init_y_diff ** 2))
-            deck_movement_time = init_deck_d / gantry_speed
-            return deck_movement_time
-        else:
-            previous_deck_center = deck_centers.get(previous_slot)
-            if not previous_deck_center:
-                raise DurationEstimatorException(
-                    f"Previous slot '{current_slot}' is not valid."
-                )
-            x_difference = abs(current_deck_center[0] - previous_deck_center[0])
-            y_difference = abs(current_deck_center[1] - previous_deck_center[1])
+        current_deck_center = deck.position_for(current_slot)
 
-            if x_difference == 0 and y_difference == 0:
-                deck_movement_time = 0.5
-            else:
-                deck_distance = np.sqrt((x_difference ** 2) + (y_difference ** 2))
-                deck_movement_time = deck_distance / gantry_speed
-            return deck_movement_time
+        previous_deck_center = deck.position_for(previous_slot)
+        if not previous_deck_center:
+            raise DurationEstimatorException(
+                f"Previous slot '{current_slot}' is not valid."
+            )
+        x_difference = abs(current_deck_center.point.x - previous_deck_center.point.x)
+        y_difference = abs(current_deck_center.point.y - previous_deck_center.point.y)
+
+        if x_difference == 0 and y_difference == 0:
+            # Inter slot movement defaults to half a second.
+            deck_movement_time = 0.5
+        else:
+            deck_distance = np.sqrt((x_difference ** 2) + (y_difference ** 2))
+            deck_movement_time = deck_distance / gantry_speed
+        return deck_movement_time
 
     @staticmethod
     def z_time(is_module: bool, gantry_speed: float) -> float:
+        # TODO (al, 2021-09-08): Use definitions from protocol context objects.
         z_default_labware_height = 177.8
         z_default_module_height = 95.25
         # 177.8 - 82.55 Where did we get 177.8 from?
