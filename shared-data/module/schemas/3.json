@@ -96,7 +96,11 @@
         "overLabwareHeight": { "type": "number" },
         "lidHeight": { "type": "number" },
         "xDimension": { "type": "number" },
-        "yDimension": { "type": "number" }
+        "yDimension": { "type": "number" },
+        "footprintXDimension": { "type": "number" },
+        "footprintYDimension": { "type": "number" },
+        "labwareInterfaceXDimension": { "type": "number" },
+        "labwareInterfaceYDimension": { "type": "number" }
       }
     },
     "cornerOffsetFromSlot": {
