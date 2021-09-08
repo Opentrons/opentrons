@@ -7,7 +7,7 @@ import type { ModuleDefinition } from '@opentrons/shared-data'
 export interface ModuleFromDataProps {
   def: ModuleDefinition
   layerBlocklist?: string[]
-  standaloneSVG?: boolean
+  standaloneSVG?: boolean // default is false (wrapping tag is <g>), if true wrapping tag will be <svg>
 }
 
 export function ModuleFromDef(props: ModuleFromDataProps): JSX.Element {

@@ -12,7 +12,6 @@ interface Props {
   model: ModuleModel
   orientation?: 'left' | 'right'
   innerProps?: React.ComponentProps<typeof Thermocycler> | React.ComponentProps<typeof ModuleFromDef>
-  standaloneSVG?: boolean
 }
 
 export const Module = (props: Props): JSX.Element => {
@@ -22,7 +21,6 @@ export const Module = (props: Props): JSX.Element => {
     y,
     orientation = 'left',
     innerProps = {},
-    standaloneSVG = false
   } = props
   const def = getModuleDef2(model)
   const moduleType = getModuleType(model)
@@ -47,18 +45,11 @@ export const Module = (props: Props): JSX.Element => {
 
   return (
     <g data-test={`Module_${moduleType}`} x={x} y={y} transform={orientationTransform}>
-      {standaloneSVG ? (
-          <ModuleFromDef
-            {...innerProps as React.ComponentProps<typeof ModuleFromDef>}
-            def={def}
-            standaloneSVG />
-        ) : (
-        <g transform={offsetTransform}>
-          <ModuleFromDef
-            {...innerProps as React.ComponentProps<typeof ModuleFromDef>}
-            def={def} />
-        </g>)
-      }
+      <g transform={offsetTransform}>
+        <ModuleFromDef
+          {...innerProps as React.ComponentProps<typeof ModuleFromDef>}
+          def={def} />
+      </g>
     </g>
   )
 }
