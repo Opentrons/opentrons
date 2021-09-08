@@ -18,7 +18,7 @@ Framework supporting the following:
 ### G-Code Parser
 
 Using the `GCodeEngine` you can run a Python protocol file against emulation.
-The `GCodeEngine` instance will return a `GCodeProgram` instance 
+The `GCodeEngine` instance will return a `GCodeProgram` instance
 
 **Example:**
 

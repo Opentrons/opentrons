@@ -56,10 +56,10 @@ class RunCommand(CLICommand):
         )
         settings = Settings(smoothie=smoothie_settings, host=self.host)
 
-        if self.configuration_path.startswith('protocols'):
+        if self.configuration_path.startswith("protocols"):
             engine = ProtocolGCodeEngine(settings)
 
-        elif self.configuration_path.startswith('http'):
+        elif self.configuration_path.startswith("http"):
             engine = HTTPGCodeEngine(settings)
 
         with engine.run(self.configuration_path) as program:
@@ -109,7 +109,7 @@ class ConfigurationCommand(CLICommand):
                 self.CONFIGURATION_DIR_LOCATION, topdown=False
             )
             for name in files
-            if name not in ['__init__.py']
+            if name not in ["__init__.py"]
         ]
 
         path_string = "\n".join(paths)

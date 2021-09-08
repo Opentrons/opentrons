@@ -67,14 +67,12 @@ class GCodeEngine(ABC):
     @staticmethod
     def _set_env_vars() -> None:
         """Set URLs of where to find modules and config for smoothie"""
-        os.environ["OT_MAGNETIC_EMULATOR_URI"] = (
-                GCodeEngine.URI_TEMPLATE % MAGDECK_PORT
-        )
+        os.environ["OT_MAGNETIC_EMULATOR_URI"] = GCodeEngine.URI_TEMPLATE % MAGDECK_PORT
         os.environ["OT_THERMOCYCLER_EMULATOR_URI"] = (
-                GCodeEngine.URI_TEMPLATE % THERMOCYCLER_PORT
+            GCodeEngine.URI_TEMPLATE % THERMOCYCLER_PORT
         )
         os.environ["OT_TEMPERATURE_EMULATOR_URI"] = (
-                GCodeEngine.URI_TEMPLATE % TEMPDECK_PORT
+            GCodeEngine.URI_TEMPLATE % TEMPDECK_PORT
         )
 
     @staticmethod
@@ -113,7 +111,6 @@ class GCodeEngine(ABC):
 
 
 class ProtocolGCodeEngine(GCodeEngine):
-
     @contextmanager
     def run(self, input_str: str) -> Generator:
         """
@@ -122,9 +119,7 @@ class ProtocolGCodeEngine(GCodeEngine):
         :param input_str: Path to file
         :return: GCodeProgram with all the parsed data
         """
-        file_path = os.path.join(
-            get_configuration_dir(), input_str
-        )
+        file_path = os.path.join(get_configuration_dir(), input_str)
         server_manager = ServerManager(self._config)
         self._start_emulation_app(server_manager)
         protocol = self._get_protocol(file_path)
@@ -142,11 +137,9 @@ class ProtocolGCodeEngine(GCodeEngine):
 
 
 class HTTPGCodeEngine(GCodeEngine):
-
     def _get_func(self, input_str):
-        formatted_config_path = os.path.splitext(input_str)[0].replace(
-            '/', '.')
-        module_string = f'test_data.{formatted_config_path}'
+        formatted_config_path = os.path.splitext(input_str)[0].replace("/", ".")
+        module_string = f"test_data.{formatted_config_path}"
         module = import_module(module_string)
         return module.main()
 
