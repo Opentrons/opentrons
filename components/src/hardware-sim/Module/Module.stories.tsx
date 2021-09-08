@@ -24,7 +24,7 @@ export default {
 
 const Template: Story<{slot: string, model: ModuleModel, orientation: 'left' | 'right'}> = args => {
   return (
-    <RobotWorkSpace deckDef={getDeckDefinitions()['ot2_standard']}>
+    <RobotWorkSpace deckDef={getDeckDefinitions().ot2_standard}>
       {({ deckSlotsById }: RobotWorkSpaceRenderProps) => {
         const slot = deckSlotsById[args.slot]
         return (
