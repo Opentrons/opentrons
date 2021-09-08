@@ -23,6 +23,6 @@ def _move_to_well(
 
     pipette.move_to(
         well.bottom().move(offsetPoint),
-        force_direct=params.get("forceDirect"),
+        force_direct=params.get("forceDirect", False),
         minimum_z_height=params.get("minimumZHeight"),
     )

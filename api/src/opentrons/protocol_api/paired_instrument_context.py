@@ -480,7 +480,7 @@ class PairedInstrumentContext(CommandPublisher):
     def dispense(
         self,
         volume: Optional[float] = None,
-        location: Union[types.Location, Well] = None,
+        location: Optional[Union[types.Location, Well]] = None,
         rate: float = 1.0,
     ) -> PairedInstrumentContext:
         """
@@ -534,6 +534,9 @@ class PairedInstrumentContext(CommandPublisher):
                 volume, location if location else "current position", rate
             )
         )
+
+        loc: Optional[types.Location] = None
+
         if isinstance(location, Well):
             if LabwareLike(location).is_fixed_trash():
                 loc = location.top()
@@ -658,6 +661,8 @@ class PairedInstrumentContext(CommandPublisher):
                               :py:meth:`dispense`)
         :returns: This instance
         """
+        loc: Optional[types.Location] = None
+
         if isinstance(location, Well):
             if location.parent.is_tiprack:
                 self._log.warning(

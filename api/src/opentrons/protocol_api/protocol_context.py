@@ -1,3 +1,4 @@
+from __future__ import annotations
 import asyncio
 import contextlib
 import logging
@@ -16,7 +17,6 @@ from collections import OrderedDict
 
 from opentrons.hardware_control import SynchronousAdapter, ThreadManager
 from opentrons import types
-from opentrons.hardware_control import API
 from opentrons.commands import protocol_commands as cmds, types as cmd_types
 from opentrons.commands.publisher import CommandPublisher, publish
 from opentrons.protocols.api_support.types import APIVersion
@@ -114,7 +114,7 @@ class ProtocolContext(CommandPublisher):
     @classmethod
     def build_using(
         cls, implementation: AbstractProtocol, protocol: Protocol, *args, **kwargs
-    ):
+    ) -> ProtocolContext:
         """Build an API instance for the specified parsed protocol
 
         This is used internally to provision the context with bundle
@@ -294,7 +294,7 @@ class ProtocolContext(CommandPublisher):
                     instrument_context._implementation = instrument_impl
 
     @requires_version(2, 0)
-    def connect(self, hardware: API):
+    def connect(self, hardware: Union[ThreadManager, SynchronousAdapter]):
         """Connect to a running hardware API.
 
         This can be either a simulator or a full hardware controller.

@@ -398,7 +398,8 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
         If none of the above, return the labware engage heights as defined in
         the labware definitions
         """
-        assert self.labware, self.labware.magdeck_engage_height
+        assert self.labware
+        assert self.labware.magdeck_engage_height
 
         engage_height = self.labware.magdeck_engage_height
 

@@ -486,12 +486,13 @@ class PipetteOffsetCalibrationUserFlow:
                 command_handler="move_to_reference_point",
                 unmet_condition="performing additional tip length calibration",
             )
+
+        cal_block_target_well: Optional[labware.Well] = None
         if self._has_calibration_block:
             cb_setup = CAL_BLOCK_SETUP_BY_MOUNT[self._mount]
             calblock: labware.Labware = self._deck[cb_setup.slot]  # type: ignore
             cal_block_target_well = calblock.wells_by_name()[cb_setup.well]
-        else:
-            cal_block_target_well = None
+
         ref_loc = util.get_reference_location(
             deck=self._deck, cal_block_target_well=cal_block_target_well
         )

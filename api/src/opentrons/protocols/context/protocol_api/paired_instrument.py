@@ -194,7 +194,7 @@ class PairedInstrument:
         hw_dispense = self._hw_manager.hardware.dispense
         return loc, partial(hw_dispense, self._pair_policy, volume, rate)
 
-    def blow_out(self, location: types.Location):
+    def blow_out(self, location: Optional[types.Location]):
         if location:
             self.move_to(location)
         elif self._ctx.location_cache:
