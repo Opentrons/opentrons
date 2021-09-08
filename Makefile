@@ -8,6 +8,7 @@ API_DIR := api
 APP_SHELL_DIR := app-shell
 COMPONENTS_DIR := components
 DISCOVERY_CLIENT_DIR := discovery-client
+G_CODE_TESTING_DIR := g-code-testing
 LABWARE_LIBRARY_DIR := labware-library
 NOTIFY_SERVER_DIR := notify-server
 PROTOCOL_DESIGNER_DIR := protocol-designer
@@ -15,7 +16,7 @@ SHARED_DATA_DIR := shared-data
 UPDATE_SERVER_DIR := update-server
 ROBOT_SERVER_DIR := robot-server
 
-PYTHON_DIRS := $(API_DIR) $(UPDATE_SERVER_DIR) $(NOTIFY_SERVER_DIR) $(ROBOT_SERVER_DIR) $(SHARED_DATA_DIR)/python
+PYTHON_DIRS := $(API_DIR) $(UPDATE_SERVER_DIR) $(NOTIFY_SERVER_DIR) $(ROBOT_SERVER_DIR) $(SHARED_DATA_DIR)/python $(G_CODE_TESTING_DIR)
 
 # This may be set as an environment variable (and is by CI tasks that upload
 # to test pypi) to add a .dev extension to the python package versions. If
@@ -57,6 +58,7 @@ PYTHON_SETUP_TARGETS := $(addsuffix -py-setup, $(PYTHON_DIRS))
 setup-py:
 	$(OT_PYTHON) -m pip install pipenv==2021.5.29
 	$(MAKE) $(PYTHON_SETUP_TARGETS)
+
 
 %-py-setup:
 	$(MAKE) -C $* setup
@@ -171,6 +173,7 @@ test-py: test-py-windows
 	$(MAKE) -C $(UPDATE_SERVER_DIR) test
 	$(MAKE) -C $(ROBOT_SERVER_DIR) test
 	$(MAKE) -C $(NOTIFY_SERVER_DIR) test
+	$(MAKE) -C $(G_CODE_TESTING_DIR) test
 
 .PHONY: test-js
 test-js:
@@ -212,6 +215,7 @@ format: format-js format-py
 format-py:
 	$(MAKE) -C $(API_DIR) format
 	$(MAKE) -C $(ROBOT_SERVER_DIR) format
+	$(MAKE) -C $(G_CODE_TESTING_DIR) format
 
 .PHONY: format-js
 format-js:

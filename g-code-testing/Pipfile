@@ -1,0 +1,32 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+opentrons = {editable = true, path = "./../api"}
+notify-server = {editable = true, path = "./../notify-server"}
+robot-server = {editable = true, path = "./../robot-server"}
+opentrons-shared-data = {editable = true, path = "../shared-data/python"}
+g-code-testing = {editable = true, path = "."}
+anyio = "==3.3.0"
+
+
+[dev-packages]
+diff-match-patch = "*"
+pytest = "~=6.1"
+pytest-aiohttp = "==0.3.0"
+pytest-cov = "==2.10.1"
+pytest-xdist = "~=2.2.1 "
+mock = "~=4.0.2"
+mypy = "==0.812.0"
+flake8 = "~=3.9.0"
+flake8-annotations = "~=2.6.2"
+flake8-docstrings = "~=1.6.0"
+flake8-noqa = "~=1.1.0"
+black = "==21.7b0"
+decoy = "~=1.6.7"
+
+
+[requires]
+python_version = "3.7"
