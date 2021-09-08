@@ -246,7 +246,7 @@ def test_blow_out(set_up_paired_instrument, monkeypatch, ctx):
         nonlocal move_location
         move_location = loc
 
-    monkeypatch.setattr(paired.paired_instrument_obj, "move_to", fake_move)
+    monkeypatch.setattr(paired._implementation, "move_to", fake_move)
 
     paired.blow_out()
     assert "blowing out" in ",".join([cmd.lower() for cmd in ctx.commands()])

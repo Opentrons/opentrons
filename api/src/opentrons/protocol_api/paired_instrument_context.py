@@ -76,7 +76,7 @@ class PairedInstrumentContext(CommandPublisher):
         )
         self._ctx = ctx
         self.trash_container = trash
-        self.paired_instrument_obj = implementation
+        self._implementation = implementation
 
     @property  # type: ignore
     @requires_version(2, 7)
@@ -255,7 +255,7 @@ class PairedInstrumentContext(CommandPublisher):
         publish_paired(
             self.broker, cmds.paired_pick_up_tip, "before", None, instruments, targets
         )
-        self.paired_instrument_obj.pick_up_tip(
+        self._implementation.pick_up_tip(
             target, secondary_target, tiprack, presses, increment, tip_length
         )
         self._last_tip_picked_up_from = target
@@ -353,7 +353,7 @@ class PairedInstrumentContext(CommandPublisher):
         publish_paired(
             self.broker, cmds.paired_drop_tip, "before", None, instruments, targets
         )
-        self.paired_instrument_obj.drop_tip(target, home_after)
+        self._implementation.drop_tip(target, home_after)
         publish_paired(
             self.broker, cmds.paired_drop_tip, "after", self, instruments, targets
         )
@@ -417,7 +417,6 @@ class PairedInstrumentContext(CommandPublisher):
             )
         )
 
-        # checked_location: Optional[types.Location] = None
         if isinstance(location, Well):
             point, well = location.bottom()
             checked_location = types.Location(
@@ -464,7 +463,7 @@ class PairedInstrumentContext(CommandPublisher):
             rate,
         )
 
-        self.paired_instrument_obj.aspirate(
+        self._implementation.aspirate(
             volume=c_vol, location=checked_location, rate=rate
         )
 
@@ -588,7 +587,7 @@ class PairedInstrumentContext(CommandPublisher):
             rate,
         )
 
-        self.paired_instrument_obj.dispense(
+        self._implementation.dispense(
             volume=c_vol, location=checked_location, rate=rate
         )
 
@@ -656,8 +655,8 @@ class PairedInstrumentContext(CommandPublisher):
         if not loc or not loc.labware.is_well:
             raise RuntimeError("No previous Well cached to perform air gap")
         target = loc.labware.as_well().top(height)
-        self.paired_instrument_obj.move_to(target)
-        self.paired_instrument_obj.aspirate(volume=c_vol, location=loc, rate=1.0)
+        self._implementation.move_to(target)
+        self._implementation.aspirate(volume=c_vol, location=loc, rate=1.0)
         return self
 
     @requires_version(2, 7)
@@ -716,7 +715,7 @@ class PairedInstrumentContext(CommandPublisher):
         publish_paired(
             self.broker, cmds.paired_blow_out, "before", None, instruments, locations
         )
-        self.paired_instrument_obj.blow_out(loc)
+        self._implementation.blow_out(loc)
         publish_paired(
             self.broker, cmds.paired_blow_out, "after", self, instruments, locations
         )
@@ -875,7 +874,7 @@ class PairedInstrumentContext(CommandPublisher):
                 0, 0, v_offset
             )
             to_loc = types.Location(move_with_z_offset, well)
-            self.paired_instrument_obj.move_to(to_loc)
+            self._implementation.move_to(to_loc)
         else:
             # If location is a not a valid well, raise a type error
             raise TypeError(f"location should be a Well, but it is {location}")
@@ -897,9 +896,7 @@ class PairedInstrumentContext(CommandPublisher):
         publish_paired(
             self.broker, cmds.paired_touch_tip, "before", None, instruments, locations
         )
-        self.paired_instrument_obj.touch_tip(
-            well.as_well(), radius, v_offset, checked_speed
-        )
+        self._implementation.touch_tip(well.as_well(), radius, v_offset, checked_speed)
         publish_paired(
             self.broker, cmds.paired_touch_tip, "after", self, instruments, locations
         )
@@ -958,9 +955,7 @@ class PairedInstrumentContext(CommandPublisher):
         publish_paired(
             self.broker, cmds.paired_move_to, "before", None, instruments, locations
         )
-        self.paired_instrument_obj.move_to(
-            location, force_direct, minimum_z_height, speed
-        )
+        self._implementation.move_to(location, force_direct, minimum_z_height, speed)
         publish_paired(
             self.broker, cmds.paired_move_to, "after", None, instruments, locations
         )
