@@ -192,4 +192,4 @@ def test_thermocycler_handler(
     subject: DurationEstimator, current: float, target: float, expected_duration: float
 ):
     """It should compute the duration of a temperature change correctly."""
-    assert subject.thermocyler_handler(current, target) == expected_duration
+    assert subject.thermocycler_handler(current, target) == expected_duration
