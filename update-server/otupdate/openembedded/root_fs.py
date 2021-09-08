@@ -9,7 +9,7 @@ import subprocess
 from aiohttp import web
 from dataclasses import dataclass
 
-
+# just nest this into RootFSConfigParser class.
 @dataclass
 class RootFSInfo:
     major: int
@@ -27,7 +27,7 @@ class RootFS:
 
     @dataclass
     class RootFSConfig:
-        """ CONFIG vars, can be changed through the commandline arguments """
+        """ CONFIG vars, read in from config files """
         ROOTFS_PART1: str = ''
         ROOTFS_PART2: str = ''
         BMAP_IMAGE: str = ''
