@@ -6,10 +6,10 @@ marks:
 stages:
   - name: Upload and check for JSONDecodeError in response
     request:
-      url: "{host:s}:{port:d}/protocols"
+      url: '{host:s}:{port:d}/protocols'
       method: POST
       files:
-        protocolFile: "tests/integration/protocols/invalid_json.json"
+        protocolFile: 'tests/integration/protocols/invalid_json.json'
     response:
       save:
         json:
@@ -25,14 +25,14 @@ stages:
           metadata: !anydict
           requiredEquipment: !anydict
           errors:
-          - type: JSONDecodeError
-            description: !anystr
-            lineNumber: 1
-            fileName: invalid_json.json
+            - type: JSONDecodeError
+              description: !anystr
+              lineNumber: 1
+              fileName: invalid_json.json
         links: !anydict
   - name: Delete the protocol
     request:
-      url: "{host:s}:{port:d}/protocols/{protocol_id}"
+      url: '{host:s}:{port:d}/protocols/{protocol_id}'
       method: DELETE
     response:
       status_code: 200
@@ -51,10 +51,10 @@ marks:
 stages:
   - name: Upload protocol and check for exception
     request:
-      url: "{host:s}:{port:d}/protocols"
+      url: '{host:s}:{port:d}/protocols'
       method: POST
       files:
-        protocolFile: "tests/integration/protocols/load_unknown_module.py"
+        protocolFile: 'tests/integration/protocols/load_unknown_module.py'
     response:
       save:
         json:
@@ -70,13 +70,13 @@ stages:
           metadata: !anydict
           requiredEquipment: !anydict
           errors:
-          - type: ExceptionInProtocolError
-            description: !anystr
-            lineNumber: 9
+            - type: ExceptionInProtocolError
+              description: !anystr
+              lineNumber: 11
         links: !anydict
   - name: Delete the protocol
     request:
-      url: "{host:s}:{port:d}/protocols/{protocol_id}"
+      url: '{host:s}:{port:d}/protocols/{protocol_id}'
       method: DELETE
     response:
       status_code: 200
@@ -95,10 +95,10 @@ marks:
 stages:
   - name: Upload protocol and check for error
     request:
-      url: "{host:s}:{port:d}/protocols"
+      url: '{host:s}:{port:d}/protocols'
       method: POST
       files:
-        protocolFile: "tests/integration/protocols/runtime_error.py"
+        protocolFile: 'tests/integration/protocols/runtime_error.py'
     response:
       save:
         json:
@@ -114,13 +114,13 @@ stages:
           metadata: !anydict
           requiredEquipment: !anydict
           errors:
-          - type: ExceptionInProtocolError
-            description: !anystr
-            lineNumber: 5
+            - type: ExceptionInProtocolError
+              description: !anystr
+              lineNumber: 7
         links: !anydict
   - name: Delete the protocol
     request:
-      url: "{host:s}:{port:d}/protocols/{protocol_id}"
+      url: '{host:s}:{port:d}/protocols/{protocol_id}'
       method: DELETE
     response:
       status_code: 200

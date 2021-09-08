@@ -18,11 +18,12 @@ from robot_server.protocols import (
     ProtocolNotFound,
 )
 
-from robot_server.sessions.session_view import SessionView, BasicSessionCreateData
+from robot_server.sessions.session_view import SessionView
 
 from robot_server.sessions.session_models import (
     SessionStatus,
     BasicSession,
+    BasicSessionCreateData,
     ProtocolSession,
     ProtocolSessionCreateData,
     ProtocolSessionCreateParams,

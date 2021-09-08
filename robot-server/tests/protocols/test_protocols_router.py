@@ -4,9 +4,10 @@ from datetime import datetime
 from decoy import Decoy, matchers
 from starlette.datastructures import UploadFile
 
+from opentrons.protocol_runner import ProtocolFileType
 from robot_server.errors import ApiError
 from robot_server.service.task_runner import TaskRunner
-from robot_server.protocols.protocol_models import Protocol, ProtocolFileType
+from robot_server.protocols.protocol_models import Protocol
 from robot_server.protocols.analysis_store import AnalysisStore
 from robot_server.protocols.protocol_analyzer import ProtocolAnalyzer
 from robot_server.protocols.response_builder import ResponseBuilder

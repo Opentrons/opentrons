@@ -1,3 +1,5 @@
+from opentrons.protocol_api import ProtocolContext
+
 metadata = {
     "protocolName": "custom",
     "author": "Opentrons <protocols@opentrons.com>",
@@ -5,7 +7,7 @@ metadata = {
 }
 
 
-def run(ctx):
+def run(ctx: ProtocolContext) -> None:
     ctx.load_labware(
         load_name="test_1_reservoir_5ul",
         location=1,

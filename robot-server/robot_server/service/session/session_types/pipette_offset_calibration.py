@@ -1,5 +1,5 @@
 import logging
-from typing import Awaitable, cast, TYPE_CHECKING
+from typing import Awaitable, Optional, cast, TYPE_CHECKING
 from opentrons.types import Mount
 from opentrons.protocol_api import labware
 
@@ -28,7 +28,7 @@ from ..models.session import SessionType, PipetteOffsetCalibrationResponseAttrib
 from ..errors import UnsupportedFeature
 
 if TYPE_CHECKING:
-    from opentrons_shared_data.labware import LabwareDefinition
+    from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 log = logging.getLogger(__name__)
 
@@ -47,7 +47,7 @@ class PipetteOffsetCalibrationSession(BaseSession):
         configuration: SessionConfiguration,
         instance_meta: SessionMetaData,
         pip_offset_cal_user_flow: PipetteOffsetCalibrationUserFlow,
-        shutdown_handler: Awaitable[None] = None,
+        shutdown_handler: Optional[Awaitable[None]] = None,
     ):
         super().__init__(configuration, instance_meta)
         self._pip_offset_cal_user_flow = pip_offset_cal_user_flow

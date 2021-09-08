@@ -8,10 +8,13 @@ from typing_extensions import Literal
 from opentrons.protocol_engine import (
     CommandStatus,
     CommandType,
-    EngineStatus as SessionStatus,
+    EngineStatus,
 )
 from robot_server.service.json_api import ResourceModel
 from .action_models import SessionAction
+
+
+SessionStatus = EngineStatus
 
 
 class SessionType(str, Enum):

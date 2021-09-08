@@ -104,7 +104,10 @@ class SessionManager:
         """Get a session by identifier"""
         return self._sessions.get(identifier, None)
 
-    def get(self, session_type: SessionType = None) -> Tuple[BaseSession, ...]:
+    def get(
+        self,
+        session_type: Optional[SessionType] = None,
+    ) -> Tuple[BaseSession, ...]:
         """
         Get all the sessions with optional filter
 
@@ -139,7 +142,11 @@ class SessionManager:
             self._active.active_id = None
         return self.get_by_id(identifier)
 
-    async def _create_session(self, session_meta_data, session_type):
+    async def _create_session(
+        self,
+        session_meta_data: SessionMetaData,
+        session_type: SessionType,
+    ) -> BaseSession:
         """Create a new session."""
         cls = SessionTypeToClass.get(session_type)
         if not cls:
