@@ -112,16 +112,13 @@ async def create_session(
         raise SessionAlreadyActive(detail=str(e)).as_error(status.HTTP_409_CONFLICT)
 
     session_store.upsert(session=session)
-    commands = engine_store.engine.state_view.commands.get_all()
-    pipettes = engine_store.engine.state_view.pipettes.get_all()
-    labware = engine_store.engine.state_view.labware.get_all()
-    engine_status = engine_store.engine.state_view.commands.get_status()
+
     data = session_view.as_response(
         session=session,
-        commands=commands,
-        pipettes=pipettes,
-        labware=labware,
-        engine_status=engine_status,
+        commands=engine_store.engine.state_view.commands.get_all(),
+        pipettes=engine_store.engine.state_view.pipettes.get_all(),
+        labware=engine_store.engine.state_view.labware.get_all(),
+        engine_status=engine_store.engine.state_view.commands.get_status(),
     )
 
     return ResponseModel(data=data)
