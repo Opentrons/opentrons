@@ -12,12 +12,12 @@ class DeckItem(abc.ABC):
     def highest_z(self, new_z: float):
         pass
 
-    @property  # type: ignore
+    @property
     @abc.abstractmethod
     def separate_calibration(self) -> bool:
         pass
 
-    @property  # type: ignore
+    @property
     @abc.abstractmethod
     def load_name(self) -> str:
         pass

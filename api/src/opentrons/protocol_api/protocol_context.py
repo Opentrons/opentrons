@@ -606,7 +606,7 @@ class ProtocolContext(CommandPublisher):
             if instr
         }
 
-    @publish.both(command=cmds.pause)
+    @publish(command=cmds.pause)
     @requires_version(2, 0)
     def pause(self, msg=None) -> None:
         """Pause execution of the protocol until it's resumed.
@@ -622,7 +622,7 @@ class ProtocolContext(CommandPublisher):
         """
         self._implementation.pause(msg=msg)
 
-    @publish.both(command=cmds.resume)
+    @publish(command=cmds.resume)
     @requires_version(2, 0)
     def resume(self) -> None:
         """Resume the protocol after :py:meth:`pause`.
@@ -635,7 +635,7 @@ class ProtocolContext(CommandPublisher):
         """
         self._implementation.resume()
 
-    @publish.both(command=cmds.comment)
+    @publish(command=cmds.comment)
     @requires_version(2, 0)
     def comment(self, msg) -> None:
         """
@@ -648,7 +648,7 @@ class ProtocolContext(CommandPublisher):
         """
         self._implementation.comment(msg=msg)
 
-    @publish.both(command=cmds.delay)
+    @publish(command=cmds.delay)
     @requires_version(2, 0)
     def delay(self, seconds=0, minutes=0, msg=None):
         """Delay protocol execution for a specific amount of time.

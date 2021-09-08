@@ -12,17 +12,17 @@ class FakeClass(CommandPublisher):
     def __init__(self):
         super().__init__(None)
 
-    @publish.both(command=my_command, meta="{arg1} {arg2} {arg3}")
+    @publish(command=my_command, meta="{arg1} {arg2} {arg3}")
     def A(self, arg1, arg2, arg3="foo"):
         self.B(0)
         return 100
 
-    @publish.both(command=my_command, meta="{arg1} {arg2} {arg3}")
+    @publish(command=my_command, meta="{arg1} {arg2} {arg3}")
     def C(self, arg1, arg2, arg3="bar"):
         self.B(0)
         return 100
 
-    @publish.both(command=my_command, meta="{arg1}")
+    @publish(command=my_command, meta="{arg1}")
     def B(self, arg1):
         return None
 

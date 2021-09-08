@@ -228,7 +228,7 @@ class PairedInstrument:
             if not self._ctx.location_cache:
                 raise RuntimeError("No valid current location cache present")
             else:
-                well = self._ctx.location_cache.labware  # type: ignore
+                well = self._ctx.location_cache.labware
                 # type checked below
         else:
             well = LabwareLike(location)

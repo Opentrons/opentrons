@@ -425,7 +425,7 @@ def test_get_tip_geometry(
     )
 
     assert tip_geometry.effective_length == 40
-    assert tip_geometry.diameter == well_def.diameter  # type: ignore[misc]
+    assert tip_geometry.diameter == well_def.diameter
     assert tip_geometry.volume == well_def.totalLiquidVolume
 
 

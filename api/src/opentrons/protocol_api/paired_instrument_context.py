@@ -591,7 +591,7 @@ class PairedInstrumentContext(CommandPublisher):
         )
         return self
 
-    @publish.both(command=cmds.air_gap)
+    @publish(command=cmds.air_gap)
     @requires_version(2, 7)
     def air_gap(
         self, volume: Optional[float] = None, height: Optional[float] = None
@@ -843,7 +843,7 @@ class PairedInstrumentContext(CommandPublisher):
         )
         return self
 
-    @publish.both(command=cmds.return_tip)
+    @publish(command=cmds.return_tip)
     @requires_version(2, 7)
     def return_tip(self, home_after: bool = True) -> PairedInstrumentContext:
         """

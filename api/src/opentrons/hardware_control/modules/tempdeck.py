@@ -251,7 +251,7 @@ class TempDeck(mod_abc.AbstractModule):
             log.error(f"bad revision: {revision}")
             return "temperatureModuleV1"
         try:
-            revision_num = float(revision.split("v")[-1])  # type: ignore
+            revision_num = float(revision.split("v")[-1])
         except (ValueError, TypeError):
             # none or corrupt
             log.exception("no revision")
