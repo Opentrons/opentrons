@@ -27,16 +27,15 @@ against emulation.
 In "Concise" format store parsed G-Code to /where/I/want/to/store/my/output.txt  
 """
 import os.path
-from g_code_engine import GCodeEngine
-from g_code_program.supported_text_modes \
-    import SupportedTextModes
+from g_code_parsing.g_code_engine import HTTPGCodeEngine
+from g_code_parsing.g_code_program.supported_text_modes import SupportedTextModes
 from opentrons.hardware_control.emulation.settings import Settings
  
 PROTOCOL_PATH = os.path.join('my', 'absolute', 'path', 'to', 'my', 'protocol.py')
 OUTPUT_PATH = os.path.join('where', 'I', 'want', 'to', 'store', 'my', 'output.txt')
 
 settings = Settings()  # Using default settings defined in class
-with GCodeEngine(settings).run_protocol(PROTOCOL_PATH) as program:
+with HTTPGCodeEngine(settings).run_protocol(PROTOCOL_PATH) as program:
     program.save_text_explanation_to_file(OUTPUT_PATH, SupportedTextModes.CONCISE)
 ```
 
@@ -51,7 +50,7 @@ them in HTML format.
 Compare 2 files and save the diff to a file
 """
 import os.path
-from g_code_differ import GCodeDiffer
+from g_code_parsing.g_code_differ import GCodeDiffer
 FILE_1_PATH = os.path.join('tmp', 'file_1.txt')
 FILE_2_PATH = os.path.join('tmp', 'file_2.txt')
 HTML_PATH = os.path.join('home', 'derek_maggio', 'Desktop', 'my_diff.html')
