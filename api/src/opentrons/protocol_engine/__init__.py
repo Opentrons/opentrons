@@ -37,7 +37,7 @@ __all__ = [
     # state interfaces and models
     "State",
     "StateView",
-    # public value interfaces ana models
+    # public value interfaces and models
     "CalibrationOffset",
     "DeckSlotLocation",
     "Dimensions",

@@ -6,7 +6,7 @@ from typing_extensions import Literal
 
 from opentrons.protocols.models import LabwareDefinition
 
-from opentrons.protocol_engine.types import LabwareLocation, CalibrationOffset
+from ..types import LabwareLocation, CalibrationOffset
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandRequest
 
 LoadLabwareCommandType = Literal["loadLabware"]
