@@ -684,6 +684,7 @@ class Model(BaseModel):
 
 def make_minimal(
     *,
+    metadata=Metadata(),
     pipettes: Dict[str, Pipettes] = {},
     labware_definitions: Dict[str, LabwareDefinition] = {},
     labware: Dict[str, Labware] = {},
@@ -698,7 +699,7 @@ def make_minimal(
         # schemaVersion is arbitrary. Currently (2021-06-28), the model
         # isn't smart enough to validate differently depending on this field.
         schemaVersion=5,
-        metadata=Metadata(),
+        metadata=metadata,
         robot=Robot(model="OT-2 Standard"),
         pipettes=pipettes,
         labwareDefinitions=labware_definitions,
