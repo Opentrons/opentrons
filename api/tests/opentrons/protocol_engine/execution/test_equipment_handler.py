@@ -9,14 +9,14 @@ from opentrons.protocols.models import LabwareDefinition
 
 from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.errors import LabwareDefinitionDoesNotExistError
-from opentrons.protocol_engine.types import DeckSlotLocation, PipetteName
-from opentrons.protocol_engine.state import StateStore, PipetteData
+from opentrons.protocol_engine.types import DeckSlotLocation, PipetteName, LoadedPipette
+from opentrons.protocol_engine.state import StateStore
 from opentrons.protocol_engine.resources import ModelUtils, LabwareDataProvider
 
 from opentrons.protocol_engine.execution.equipment import (
     EquipmentHandler,
-    LoadedLabware,
-    LoadedPipette,
+    LoadedLabwareData,
+    LoadedPipetteData,
 )
 
 
@@ -98,7 +98,7 @@ async def test_load_labware(
         labware_id=None,
     )
 
-    assert result == LoadedLabware(
+    assert result == LoadedLabwareData(
         labware_id="unique-id",
         definition=minimal_labware_def,
         calibration=(1, 2, 3),
@@ -141,7 +141,7 @@ async def test_load_labware_uses_provided_id(
         labware_id="my-labware-id",
     )
 
-    assert result == LoadedLabware(
+    assert result == LoadedLabwareData(
         labware_id="my-labware-id",
         definition=minimal_labware_def,
         calibration=(1, 2, 3),
@@ -184,7 +184,7 @@ async def test_load_labware_uses_loaded_labware_def(
         labware_id=None,
     )
 
-    assert result == LoadedLabware(
+    assert result == LoadedLabwareData(
         labware_id="unique-id",
         definition=minimal_labware_def,
         calibration=(1, 2, 3),
@@ -215,7 +215,7 @@ async def test_load_pipette(
         pipette_id=None,
     )
 
-    assert result == LoadedPipette(pipette_id="unique-id")
+    assert result == LoadedPipetteData(pipette_id="unique-id")
     decoy.verify(
         await hardware_api.cache_instruments(
             {HwMount.LEFT: PipetteName.P300_SINGLE}  # type: ignore[dict-item]
@@ -231,7 +231,7 @@ async def test_load_pipette_uses_provided_id(subject: EquipmentHandler) -> None:
         pipette_id="my-pipette-id",
     )
 
-    assert result == LoadedPipette(pipette_id="my-pipette-id")
+    assert result == LoadedPipetteData(pipette_id="my-pipette-id")
 
 
 async def test_load_pipette_checks_checks_existence_with_already_loaded(
@@ -244,10 +244,12 @@ async def test_load_pipette_checks_checks_existence_with_already_loaded(
     """Loading a pipette should cache with pipettes already attached."""
     decoy.when(model_utils.generate_id()).then_return("unique-id")
 
-    decoy.when(
-        state_store.pipettes.get_pipette_data_by_mount(MountType.RIGHT)
-    ).then_return(
-        PipetteData(mount=MountType.RIGHT, pipette_name=PipetteName.P300_MULTI_GEN2)
+    decoy.when(state_store.pipettes.get_by_mount(MountType.RIGHT)).then_return(
+        LoadedPipette(
+            id="pipette-id",
+            mount=MountType.RIGHT,
+            pipetteName=PipetteName.P300_MULTI_GEN2,
+        )
     )
 
     result = await subject.load_pipette(
@@ -256,7 +258,7 @@ async def test_load_pipette_checks_checks_existence_with_already_loaded(
         pipette_id=None,
     )
 
-    assert result == LoadedPipette(pipette_id="unique-id")
+    assert result == LoadedPipetteData(pipette_id="unique-id")
     decoy.verify(
         await hardware_api.cache_instruments(
             {

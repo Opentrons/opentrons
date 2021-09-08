@@ -2,8 +2,8 @@
 from typing import Optional
 from opentrons.hardware_control.api import API as HardwareAPI
 
-from ..types import DeckLocation, WellLocation
-from ..state import StateStore
+from ..types import WellLocation
+from ..state import StateStore, CurrentWell
 
 
 class MovementHandler:
@@ -27,13 +27,13 @@ class MovementHandler:
         labware_id: str,
         well_name: str,
         well_location: Optional[WellLocation] = None,
-        current_location: Optional[DeckLocation] = None,
+        current_well: Optional[CurrentWell] = None,
     ) -> None:
         """Move to a specific well."""
         # get the pipette's mount and current critical point, if applicable
         pipette_location = self._state_store.motion.get_pipette_location(
             pipette_id=pipette_id,
-            current_location=current_location,
+            current_well=current_well,
         )
 
         hw_mount = pipette_location.mount.to_hw_mount()
@@ -55,7 +55,7 @@ class MovementHandler:
             origin=origin,
             origin_cp=origin_cp,
             max_travel_z=max_travel_z,
-            current_location=current_location,
+            current_well=current_well,
         )
 
         # move through the waypoints

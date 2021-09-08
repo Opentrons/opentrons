@@ -1,8 +1,8 @@
 """Pipetting command handling."""
 from opentrons.hardware_control.api import API as HardwareAPI
 
-from ..state import StateStore
-from ..types import DeckLocation, WellLocation, WellOrigin
+from ..state import StateStore, CurrentWell
+from ..types import WellLocation, WellOrigin
 from .movement import MovementHandler
 
 
@@ -124,7 +124,7 @@ class PipettingHandler:
             pipette_config=hw_pipette.config,
         )
 
-        current_location = None
+        current_well = None
 
         if not ready_to_aspirate:
             await self._movement_handler.move_to_well(
@@ -138,7 +138,7 @@ class PipettingHandler:
 
             # set our current deck location to the well now that we've made
             # an intermediate move for the "prepare for aspirate" step
-            current_location = DeckLocation(
+            current_well = CurrentWell(
                 pipette_id=pipette_id,
                 labware_id=labware_id,
                 well_name=well_name,
@@ -149,7 +149,7 @@ class PipettingHandler:
             labware_id=labware_id,
             well_name=well_name,
             well_location=well_location,
-            current_location=current_location,
+            current_well=current_well,
         )
 
         await self._hardware_api.aspirate(mount=hw_pipette.mount, volume=volume)

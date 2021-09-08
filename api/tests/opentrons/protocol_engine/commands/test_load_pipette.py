@@ -5,7 +5,7 @@ from opentrons.types import MountType
 from opentrons.protocol_engine.types import PipetteName
 
 from opentrons.protocol_engine.execution import (
-    LoadedPipette,
+    LoadedPipetteData,
     EquipmentHandler,
     MovementHandler,
     PipettingHandler,
@@ -45,7 +45,7 @@ async def test_load_pipette_implementation(
             mount=MountType.LEFT,
             pipette_id="some id",
         )
-    ).then_return(LoadedPipette(pipette_id="pipette-id"))
+    ).then_return(LoadedPipetteData(pipette_id="pipette-id"))
 
     result = await subject.execute(data)
 

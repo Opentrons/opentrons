@@ -7,8 +7,8 @@ from opentrons.types import Point
 from opentrons.hardware_control.dev_types import PipetteDict
 
 from .. import errors
-from ..types import WellLocation, WellOrigin
-from .labware import LabwareView, LabwareData
+from ..types import LoadedLabware, WellLocation, WellOrigin
+from .labware import LabwareView
 
 
 DEFAULT_TIP_DROP_HEIGHT_FACTOR = 0.5
@@ -38,7 +38,7 @@ class GeometryView:
 
     def get_labware_highest_z(self, labware_id: str) -> float:
         """Get the highest Z-point of a labware."""
-        labware_data = self._labware.get_labware_data_by_id(labware_id)
+        labware_data = self._labware.get(labware_id)
 
         return self._get_highest_z_from_labware_data(labware_data)
 
@@ -47,24 +47,22 @@ class GeometryView:
         return max(
             [
                 self._get_highest_z_from_labware_data(lw_data)
-                for uid, lw_data in self._labware.get_all_labware()
+                for lw_data in self._labware.get_all()
             ]
         )
 
     def get_labware_parent_position(self, labware_id: str) -> Point:
         """Get the position of the labware's parent slot (deck or module)."""
-        labware_data = self._labware.get_labware_data_by_id(labware_id)
+        labware_data = self._labware.get(labware_id)
         slot_pos = self._labware.get_slot_position(labware_data.location.slot)
 
         return slot_pos
 
     def get_labware_origin_position(self, labware_id: str) -> Point:
         """Get the position of the labware's origin, without calibration."""
-        labware_data = self._labware.get_labware_data_by_id(labware_id)
+        labware_data = self._labware.get(labware_id)
         slot_pos = self._labware.get_slot_position(labware_data.location.slot)
-        origin_offset = self._labware.get_definition_by_uri(
-            labware_data.uri
-        ).cornerOffsetFromSlot
+        origin_offset = self._labware.get_definition(labware_id).cornerOffsetFromSlot
 
         return Point(
             x=slot_pos.x + origin_offset.x,
@@ -74,14 +72,13 @@ class GeometryView:
 
     def get_labware_position(self, labware_id: str) -> Point:
         """Get the calibrated origin of the labware."""
-        labware_data = self._labware.get_labware_data_by_id(labware_id)
-        origin_pos = self.get_labware_origin_position(labware_id=labware_id)
-        cal_offset = labware_data.calibration
+        origin_pos = self.get_labware_origin_position(labware_id)
+        cal_offset = self._labware.get_calibration_offset(labware_id)
 
         return Point(
-            x=origin_pos.x + cal_offset[0],
-            y=origin_pos.y + cal_offset[1],
-            z=origin_pos.z + cal_offset[2],
+            x=origin_pos.x + cal_offset.x,
+            y=origin_pos.y + cal_offset.y,
+            z=origin_pos.z + cal_offset.z,
         )
 
     def get_well_position(
@@ -110,11 +107,12 @@ class GeometryView:
             z=labware_pos.z + offset[2] + well_def.z,
         )
 
-    def _get_highest_z_from_labware_data(self, lw_data: LabwareData) -> float:
-        z_dim = self._labware.get_definition_by_uri(lw_data.uri).dimensions.zDimension
-        slot_pos = self._labware.get_slot_position(lw_data.location.slot)
+    def _get_highest_z_from_labware_data(self, lw_data: LoadedLabware) -> float:
+        labware_pos = self.get_labware_position(lw_data.id)
+        definition = self._labware.get_definition(lw_data.id)
+        z_dim = definition.dimensions.zDimension
 
-        return z_dim + slot_pos[2] + lw_data.calibration[2]
+        return labware_pos.z + z_dim
 
     # TODO(mc, 2020-11-12): reconcile with existing protocol logic and include
     # data from tip-length calibration once v4.0.0 is in `edge`
@@ -173,7 +171,7 @@ class GeometryView:
     ) -> WellLocation:
         """Get tip drop location given labware and hardware pipette."""
         # return to top if labware is fixed trash
-        is_fixed_trash = self._labware.get_labware_has_quirk(
+        is_fixed_trash = self._labware.get_has_quirk(
             labware_id=labware_id,
             quirk="fixedTrash",
         )
