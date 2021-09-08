@@ -304,7 +304,8 @@ def simulate(
                               :py:attr:`.ProtocolContext.bundled_data`.
     :param hardware_simulator_file_path: A path to a JSON file defining a
                                          hardware simulator.
-    :param duration_estimator: Optional duration estimator object.
+    :param duration_estimator: For internal use only.
+                               Optional duration estimator object.
     :param propagate_logs: Whether this function should allow logs from the
                            Opentrons stack to propagate up to the root handler.
                            This can be useful if you're integrating this
