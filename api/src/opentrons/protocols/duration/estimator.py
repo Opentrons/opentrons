@@ -47,6 +47,8 @@ class DurationEstimator:
     def __init__(self):
         # Which slot the last command was in.
         self._last_deckslot = None
+        # todo(mm, 2021-09-08): Support protocols with more than one
+        # Temperature or Thermocycler Module.
         self._last_temperature_module_temperature = START_MODULE_TEMPERATURE
         self._last_thermocycler_module_temperature = START_MODULE_TEMPERATURE
         # Per step time estimate.
