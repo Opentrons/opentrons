@@ -1,18 +1,19 @@
 """
 
-openembedded server modes. Allows us to start server in differeent modes.
-For instance debug modes, just runs the debug functions and prints out
-current config values.
+openembedded server mode
+Allows us to start oe update server in different modes.
+For instance,  debug mode. This mode runs the debug functions
+and prints out current config values.
 Debug mode:
 Gives us something to debug the api points, and whatever else additions
 we might make to the server. Command line flag for debug mode has the
 debug function associated with it.
 Run mode:
-Run mode can be what systemd service can use to run the server in (would have
-a command line flag for it and a initialization function to go with it)
+systemd service can use this mode (would have
+a command line flag for it and an initialization function to go with it)
 
 Command line arguments are used to run the server in these different modes
-I'm just calling this class OEServerMode, and not a CLI. All config to be
+I'm just calling this class OEServerMode, and not a CLI. All server config
 done using root_fs_config.json, or additional json files if need be.
 """
 
