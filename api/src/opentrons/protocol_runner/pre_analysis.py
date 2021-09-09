@@ -52,3 +52,11 @@ class JsonPreAnalysis:  # noqa: D101
 
 class ProtocolNotPreAnalyzableError(Exception):
     """Raised when an error in the protocol prevents pre-analysis."""
+
+
+class JsonParseError(ProtocolNotPreAnalyzableError):
+    """Raised when an apparent JSON protocol isn't actually parseable as JSON."""
+
+
+class JsonSchemaValidationError(ProtocolNotPreAnalyzableError):
+    """Raised when an apparent JSON protocol doesn't conform to our schema."""

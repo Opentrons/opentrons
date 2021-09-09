@@ -3,6 +3,8 @@
 from pathlib import Path
 from textwrap import dedent
 
+import pytest
+
 from opentrons.protocols.models.json_protocol import (
     Metadata as JsonProtocolMetadata,
     make_minimal as make_minimal_json_protocol,
@@ -13,6 +15,9 @@ from opentrons.protocol_runner.pre_analysis import (
     JsonPreAnalysis,
     PythonPreAnalysis,
     Metadata as ExtractedMetadata,
+    ProtocolNotPreAnalyzableError,
+    JsonParseError,
+    JsonSchemaValidationError,
 )
 
 
@@ -39,9 +44,6 @@ def test_json_pre_analysis(tmp_path: Path) -> None:
     assert result == JsonPreAnalysis(expected_metadata)
 
 
-# Ideally, we'd use a shared expected metadata dict for both JSON and Python, but each
-# protocol type currently imposes its own restrictions on what can appear in the
-# metadata, so these tests need to be separate.
 def test_python_pre_analysis(tmp_path: Path) -> None:
     """Test Python pre-analysis.
 
@@ -74,25 +76,41 @@ def test_python_pre_analysis(tmp_path: Path) -> None:
 
 
 def test_error_if_python_has_no_metadata() -> None:
+    """It should raise if the .py file is missing its metadata block."""
     # Metadata missing and apiLevel missing from metadata
     raise NotImplementedError()
 
 
 def test_error_if_python_metadata_has_no_apilevel() -> None:
+    """It should raise if the .py file's metadata block is missing apiLevel."""
     raise NotImplementedError()
 
 
-def test_error_if_json_unparseable_as_json() -> None:
-    raise NotImplementedError()
+def test_error_if_json_file_is_not_valid_json(tmp_path: Path) -> None:
+    """It should raise if a .json file isn't parseable as JSON."""
+    protocol_file = tmp_path / "My JSON Protocol.json"
+    protocol_file.write_text("This is not valid JSON.")
+    with pytest.raises(JsonParseError):
+        PreAnalyzer.analyze([protocol_file])
 
 
-def test_error_if_json_not_valid_as_protocol() -> None:
-    raise NotImplementedError()
+def test_error_if_json_file_does_not_conform_to_schema(tmp_path: Path) -> None:
+    """It should raise if a .json file is valid JSON, but doesn't match our schema."""
+    protocol_file = tmp_path / "My JSON Protocol.json"
+    protocol_file.write_text('{"this_is_valid_json": true}')
+    with pytest.raises(JsonSchemaValidationError):
+        PreAnalyzer.analyze([protocol_file])
 
 
 def test_error_if_no_files() -> None:
-    raise NotImplementedError()
+    """It should raise if no files are supplied."""
+    with pytest.raises(ProtocolNotPreAnalyzableError):
+        PreAnalyzer().analyze([])
 
 
-def test_error_if_too_many_files() -> None:
-    raise NotImplementedError()
+# Update or replace this placeholder test when we support multi-file protocols.
+@pytest.mark.xfail(strict=True, raises=NotImplementedError)
+def test_multi_file_protocol(tmp_path: Path) -> None:  # noqa: D103
+    file_1 = tmp_path / "protocol_file_1"
+    file_2 = tmp_path / "protocol_file_2"
+    PreAnalyzer.analyze([file_1, file_2])
