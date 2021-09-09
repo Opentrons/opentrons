@@ -22,9 +22,9 @@ describe('CalibrationItem', () => {
   }
 
   it('renders all nodes with prop contents', () => {
-    const { getByRole } = render({ subText: 'stub subtext' })
-    expect(getByRole('heading', { name: 'stub title' })).toBeTruthy()
-    expect(getByRole('heading', { name: 'stub subtext' })).toBeTruthy()
+    const { getByRole, getByText } = render({ subText: 'stub subtext' })
+    expect(getByText('stub title')).toBeTruthy()
+    expect(getByText('stub subtext')).toBeTruthy()
     expect(getByRole('button', { name: 'stub button' })).toBeTruthy()
   })
   it('renders calibrated date if there is no subtext', () => {
