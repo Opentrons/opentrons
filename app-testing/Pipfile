@@ -7,13 +7,13 @@ verify_ssl = true
 
 [packages]
 pytest = "*"
-black = "==21.7b0"
+black = "==21.8b0"
 pylint = "*"
 flake8 = "~=3.9.0"
 flake8-annotations = "~=2.6.2"
 flake8-docstrings = "~=1.6.0"
 flake8-noqa = "~=1.1.0"
-selenium = "==4.0.0.b4"
+selenium = "==4.0.0.rc1"
 importlib-metadata = "*"
 requests = "*"
 python-dotenv = "*"
@@ -21,6 +21,8 @@ pytest-xdist = "*"
 pyautogui = "*"
 pyobjc = {version = "*", markers="sys_platform == 'darwin'"}
 python-xlib = "*"
+mypy = "*"
+types-requests = "*"
 
 [requires]
 python_version = "3.7"

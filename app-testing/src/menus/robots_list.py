@@ -1,5 +1,6 @@
 """Model for the list of robots."""
 import logging
+from typing import Tuple
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.common.by import By
@@ -12,21 +13,21 @@ from src.driver.highlight import highlight
 logger = logging.getLogger(__name__)
 
 
-def get_robot_toggle_selector(name: str) -> tuple:
-    """Get the locator tuple for a robot's toggle by name of the robot."""
+def get_robot_toggle_selector(name: str) -> Tuple[str, str]:
+    """Get the locator Tuple for a robot's toggle by name of the robot."""
     return (By.XPATH, f"//a[contains(@href,{name})]//button")
 
 
-def get_robot_pipette_link_selector(name: str) -> tuple:
-    """Get the locator tuple for a robot's pipette link by name of the robot."""
+def get_robot_pipette_link_selector(name: str) -> Tuple[str, str]:
+    """Get the locator Tuple for a robot's pipette link by name of the robot."""
     return (
         By.XPATH,
         f'//ol//a[contains(@href,"#/robots/opentrons-{name}/instruments")]',
     )
 
 
-def get_robot_modules_link_selector(name: str) -> tuple:
-    """Get the locator tuple for a robot's modules link by name of the robot."""
+def get_robot_modules_link_selector(name: str) -> Tuple[str, str]:
+    """Get the locator Tuple for a robot's modules link by name of the robot."""
     return (
         By.XPATH,
         f'//ol//a[contains(@href,"#/robots/opentrons-{name}/modules")]',
@@ -37,11 +38,11 @@ class RobotsList:
     """All elements and actions for the Robots List."""
 
     DEV = "dev"
-    spinner: tuple = (By.CSS_SELECTOR, "svg[class*=spin]")
-    header: tuple = (By.XPATH, '//h2[text()="Robots"]')
-    refresh_list: tuple = (By.XPATH, '//button[text()="refresh list"]')
-    no_robots_found: tuple = (By.XPATH, '//h3[text()="No robots found!"]')
-    try_again_button: tuple = (By.XPATH, '//button[text()="try again"]')
+    spinner: Tuple[str, str] = (By.CSS_SELECTOR, "svg[class*=spin]")
+    header: Tuple[str, str] = (By.XPATH, '//h2[text()="Robots"]')
+    refresh_list: Tuple[str, str] = (By.XPATH, '//button[text()="refresh list"]')
+    no_robots_found: Tuple[str, str] = (By.XPATH, '//h3[text()="No robots found!"]')
+    try_again_button: Tuple[str, str] = (By.XPATH, '//button[text()="try again"]')
 
     def __init__(self, driver: WebDriver) -> None:
         """Initialize with driver."""
@@ -49,12 +50,14 @@ class RobotsList:
 
     def is_robot_toggle_active(self, name: str) -> bool:
         """Is a toggle for a robot 'on' using the name of the robot."""
-        return self.get_robot_toggle(name).get_attribute("class").find("_on_") != -1
+        return bool(
+            self.get_robot_toggle(name).get_attribute("class").find("_on_") != -1
+        )
 
     @highlight
     def get_robot_toggle(self, name: str) -> WebElement:
         """Retrieve the Webelement toggle buttone for a robot by name."""
-        toggle_locator: tuple = get_robot_toggle_selector(name)
+        toggle_locator: Tuple[str, str] = get_robot_toggle_selector(name)
         toggle: WebElement = WebDriverWait(self.driver, 5).until(
             EC.element_to_be_clickable(toggle_locator)
         )
@@ -63,7 +66,7 @@ class RobotsList:
     @highlight
     def get_robot_pipettes_link(self, name: str) -> WebElement:
         """Retrieve the pipettes link for a robot by name."""
-        link_locator: tuple = get_robot_pipette_link_selector(name)
+        link_locator: Tuple[str, str] = get_robot_pipette_link_selector(name)
         link: WebElement = WebDriverWait(self.driver, 2).until(
             EC.element_to_be_clickable(link_locator)
         )
@@ -72,7 +75,7 @@ class RobotsList:
     @highlight
     def get_robot_modules_link(self, name: str) -> WebElement:
         """Retrieve the modules link for a robot by name."""
-        link_locator: tuple = get_robot_modules_link_selector(name)
+        link_locator: Tuple[str, str] = get_robot_modules_link_selector(name)
         link: WebElement = WebDriverWait(self.driver, 2).until(
             EC.element_to_be_clickable(link_locator)
         )

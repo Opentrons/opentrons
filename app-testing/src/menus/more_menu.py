@@ -1,5 +1,6 @@
 """Middle Menu after clicking more on the bottom left."""
 from enum import Enum
+from typing import Tuple
 from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
@@ -18,7 +19,7 @@ class MenuItems(Enum):
     RESOURCES = "resources"
 
 
-def get_menu_locator(link: MenuItems) -> tuple:
+def get_menu_locator(link: MenuItems) -> Tuple[str, str]:
     """Construct the locator for the more menu items."""
     return (By.XPATH, f'//a[contains(@href,"#/more/{link.value}")]')
 

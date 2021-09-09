@@ -25,21 +25,21 @@ def apply_border(
     apply_style(original_style)
 
 
-Func = Callable[..., Any]
+Func = Callable[..., WebElement]
 
 
-def highlight(func: Func) -> Optional[WebElement]:
+def highlight(func: Func) -> WebElement:
     """Highlight the Webelement returned by the function."""
 
     @functools.wraps(func)
-    def wrapper_highlight(*args: Any, **kwargs: Any) -> WebElement:
+    def wrapper_highlight(*args: Any, **kwargs: Any) -> Optional[WebElement]:
         element = func(*args, **kwargs)
-        if not os.getenv("SLOWMO"):
-            return element
-        if os.getenv("SLOWMO").lower() == "true" and element:
-            apply_border(
-                element, int(os.getenv("HIGHLIGHT_SECONDS", "2")), "magenta", 3
-            )
+        slow_mo: Optional[str] = os.getenv("SLOWMO")
+        if slow_mo:
+            if slow_mo.lower() == "true" and element:
+                apply_border(
+                    element, int(os.getenv("HIGHLIGHT_SECONDS", "2")), "magenta", 3
+                )
         return element
 
     return wrapper_highlight
@@ -47,7 +47,9 @@ def highlight(func: Func) -> Optional[WebElement]:
 
 def highlight_element(element: WebElement) -> None:
     """Highlight an element."""
-    if not os.getenv("SLOWMO"):
-        return
-    if os.getenv("SLOWMO").lower() == "true":
-        apply_border(element, int(os.getenv("HIGHLIGHT_SECONDS", "2")), "magenta", 3)
+    slow_mo: Optional[str] = os.getenv("SLOWMO")
+    if slow_mo:
+        if slow_mo.lower() == "true":
+            apply_border(
+                element, int(os.getenv("HIGHLIGHT_SECONDS", "2")), "magenta", 3
+            )

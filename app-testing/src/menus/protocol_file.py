@@ -1,4 +1,5 @@
 """Model for the list of robots."""
+from typing import Tuple
 from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
@@ -11,7 +12,7 @@ from src.driver.highlight import highlight
 class ProtocolFile:
     """All elements and actions for the protocol file upload."""
 
-    open: tuple = (
+    open: Tuple[str, str] = (
         By.XPATH,
         "//label[contains(normalize-space(@class), 'upload-panel__upload_button')]",
     )

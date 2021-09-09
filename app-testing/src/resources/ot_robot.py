@@ -1,6 +1,7 @@
 """Model the the Opentrons Robot."""
 import logging
 import os
+from typing import Optional
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 import requests
@@ -18,11 +19,11 @@ class OtRobot:
 
     def __init__(
         self,
-        base_url: str = os.getenv("ROBOT_BASE_URL"),
+        base_url: Optional[str] = os.getenv("ROBOT_BASE_URL"),
     ) -> None:
         """Initialize the robot."""
-        self.base_url: str = base_url
-        self.alive: bool = None
+        self.base_url: Optional[str] = base_url
+        self.alive: bool = False
         session = requests.session()
         retry = Retry(
             total=OtRobot.RETRIES,

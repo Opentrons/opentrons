@@ -1,5 +1,6 @@
 """Model for the Robot page that displays info and settings for the robot."""
 import logging
+from typing import Optional, Tuple
 from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
@@ -16,22 +17,22 @@ logger = logging.getLogger(__name__)
 class RobotPage:
     """Elements and actions for the robot detail page."""
 
-    experimental_protocol_engine_toggle_locator = (
+    experimental_protocol_engine_toggle_locator: Tuple[str, str] = (
         By.CSS_SELECTOR,
         "button[aria-label='Enable experimental protocol engine']",
     )
 
-    calibrate_deck_button_locator: tuple = (
+    calibrate_deck_button_locator: Tuple[str, str] = (
         By.XPATH,
         "//button[text()='calibrate deck']",
     )
 
-    recalibrate_deck_button_locator: tuple = (
+    recalibrate_deck_button_locator: Tuple[str, str] = (
         By.XPATH,
         "//button[text()='recalibrate deck']",
     )
 
-    calibrate_deck_header: tuple = (
+    calibrate_deck_header: Tuple[str, str] = (
         By.XPATH,
         "//h4[text()='calibrate deck']",
     )
@@ -81,7 +82,7 @@ class RobotPage:
         return button
 
     @highlight
-    def deck_last_calibrated(self) -> WebElement:
+    def deck_last_calibrated(self) -> Optional[WebElement]:
         """Text in Calibrate Deck section stating date."""
         calibrate_deck = self.driver.find_element(*RobotPage.calibrate_deck_header)
         highlight_element(calibrate_deck)
@@ -95,7 +96,7 @@ class RobotPage:
 
     def is_calibrated(self) -> bool:
         """Is the robot showing that the deck is calibrated."""
-        if self.deck_last_calibrated():
+        if self.deck_last_calibrated() is not None:
             return True
         return False
 

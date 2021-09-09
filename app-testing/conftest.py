@@ -1,11 +1,8 @@
 """For pytest."""
 import logging
 import os
-import shutil
-from os import listdir
-from os.path import isfile, join
 from pathlib import Path
-from typing import List
+from typing import Dict
 import pytest
 from dotenv import load_dotenv, find_dotenv
 from selenium.webdriver.chrome.options import Options
@@ -41,49 +38,8 @@ def chrome_options() -> Options:
     return options
 
 
-# not sure that moving these files into the robot config
-# actually works to bootstrap calibration
-@pytest.fixture(scope="function")
-def emulated_robot_config() -> List[str]:
-    """A fixture which will inject config files for the docker robot.
-
-    This makes the docker robot think it is calibrated.
-    """
-    # delete and re-create the .opentrons_config directory
-    # this conftest file is always one directory up
-    # from the repository parent directory
-    repo_home = Path(__file__).resolve().parents[1]
-    config_dir = Path(repo_home, ".opentrons_config")
-    if os.path.exists(config_dir):
-        shutil.rmtree(config_dir)
-    os.mkdir(config_dir)
-    # get all of our robot config files and map them into .opentrons_config
-    config_files_folder = Path(Path(__file__).resolve().parent, "files/config")
-    config_files_paths = [
-        file
-        for file in listdir(config_files_folder)
-        if isfile(join(config_files_folder, file))
-    ]
-    destination_paths: List[str] = []
-    for path in config_files_paths:
-        source_path = Path(config_files_folder, path)
-        period_count = path.count(".")
-        # periods are the delimiter in the filename for mapping into .opentrons_config
-        # except for the last period which is for the file extension
-        new_path = path.replace(".", "/", period_count - 1)
-        destination_path = Path(config_dir, new_path)
-        logger.debug(f"config file destination = {destination_path}")
-        os.makedirs(os.path.dirname(destination_path), exist_ok=True)
-        shutil.copy(source_path, destination_path)
-        destination_paths.append(destination_path)
-    yield destination_paths
-    # remove .opentrons_config
-    if os.path.exists(config_dir):
-        shutil.rmtree(config_dir)
-
-
 @pytest.fixture(scope="session")
-def test_protocols() -> dict:
+def test_protocols() -> Dict[str, Path]:
     """Provide a fixture with a dictionary of test protocol files."""
     # build this manually for now
     return {

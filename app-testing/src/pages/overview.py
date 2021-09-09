@@ -1,6 +1,6 @@
 """Model for the Overview page that describes the protocol uploaded to the robot."""
 import logging
-from typing import Optional
+from typing import Optional, Tuple
 from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
@@ -15,11 +15,11 @@ logger = logging.getLogger(__name__)
 class Overview:
     """Elements and actions for the robot detail page."""
 
-    continue_button_locator: tuple = (
+    continue_button_locator: Tuple[str, str] = (
         By.XPATH,
         "//button[text()='continue']",
     )
-    cancel_button_locator: tuple = (
+    cancel_button_locator: Tuple[str, str] = (
         By.XPATH,
         "//button[text()='cancel']",
     )

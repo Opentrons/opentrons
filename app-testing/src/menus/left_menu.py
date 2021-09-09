@@ -1,4 +1,5 @@
 """Left Menu Locators."""
+from typing import Tuple
 from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
@@ -15,11 +16,11 @@ class LeftMenu:
         """Initialize with driver."""
         self.driver: WebDriver = driver
 
-    robot: tuple = (By.XPATH, '//a[contains(@href,"#/robots")]')
-    protocol: tuple = (By.XPATH, '//a[contains(@href,"#/protocol")]')
-    protocol_upload: tuple = (By.XPATH, '//a[contains(@href,"#/upload")]')
-    calibrate: tuple = (By.XPATH, '//a[contains(@href,"#/calibrate")]')
-    more: tuple = (By.XPATH, '//a[contains(@href,"#/more")]')
+    robot: Tuple[str, str] = (By.XPATH, '//a[contains(@href,"#/robots")]')
+    protocol: Tuple[str, str] = (By.XPATH, '//a[contains(@href,"#/protocol")]')
+    protocol_upload: Tuple[str, str] = (By.XPATH, '//a[contains(@href,"#/upload")]')
+    calibrate: Tuple[str, str] = (By.XPATH, '//a[contains(@href,"#/calibrate")]')
+    more: Tuple[str, str] = (By.XPATH, '//a[contains(@href,"#/more")]')
 
     @highlight
     def get_more_button(self) -> WebElement:
