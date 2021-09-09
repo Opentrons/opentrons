@@ -11,6 +11,9 @@ import {
   PrimaryBtn,
   SPACING_2,
   SPACING_3,
+  SPACING_4,
+  SIZE_1,
+  SIZE_2,
   SIZE_4,
   C_BLUE,
   FONT_HEADER_DARK,
@@ -79,8 +82,8 @@ export function DeckCalibration(props: Props): JSX.Element | null {
       />
       {helpModalIsOpen && (
         <Portal level={'top'}>
-          <BaseModal borderRadius={'14px'}>
-            <Box width="800">
+          <BaseModal borderRadius={SIZE_1}>
+            <Box>
               <Flex
                 flexDirection={DIRECTION_ROW}
                 alignItems={ALIGN_CENTER}
@@ -88,10 +91,10 @@ export function DeckCalibration(props: Props): JSX.Element | null {
               >
                 <Text css={FONT_HEADER_DARK}>{t('robot_cal_help_title')}</Text>
                 <div onClick={() => setHelpModalIsOpen(false)}>
-                  <Icon name={'close'} size={'1.5rem'} />
+                  <Icon name={'close'} size={SIZE_2} />
                 </div>
               </Flex>
-              <Text css={FONT_BODY_1_DARK} marginTop={'1.5rem'}>
+              <Text css={FONT_BODY_1_DARK} marginTop={SPACING_4}>
                 <Trans
                   t={t}
                   i18nKey="robot_cal_description"
@@ -107,44 +110,43 @@ export function DeckCalibration(props: Props): JSX.Element | null {
                   }}
                 />
               </Text>
-              <Box textAlign="center" marginTop={'1.5rem'}>
+              <Box textAlign={ALIGN_CENTER} marginTop={SPACING_4}>
                 <img
                   src={'../../../../assets/images/robot_calibration_help.png'}
-                  width="700"
-                  height="275"
+                  width="100%"
                 />
               </Box>
               <Text
                 fontWeight={FONT_WEIGHT_SEMIBOLD}
                 fontSize={FONT_SIZE_BODY_1}
-                marginTop={'1rem'}
+                marginTop={SPACING_3}
               >
                 {t('deck_calibration_title')}
               </Text>
-              <Text fontSize={FONT_SIZE_BODY_1} marginTop={'.75rem'}>
+              <Text fontSize={FONT_SIZE_BODY_1} marginTop={SPACING_3}>
                 {t('deck_cal_description')}
               </Text>
               <Text
                 fontWeight={FONT_WEIGHT_SEMIBOLD}
                 fontSize={FONT_SIZE_BODY_1}
-                marginTop={'1rem'}
+                marginTop={SPACING_3}
               >
                 {t('tip_length_cal_title')}
               </Text>
-              <Text fontSize={FONT_SIZE_BODY_1} marginTop={'.75rem'}>
+              <Text fontSize={FONT_SIZE_BODY_1} marginTop={SPACING_3}>
                 {t('tip_length_cal_description')}
               </Text>
               <Text
                 fontWeight={FONT_WEIGHT_SEMIBOLD}
                 fontSize={FONT_SIZE_BODY_1}
-                marginTop={'1rem'}
+                marginTop={SPACING_3}
               >
                 {t('pipette_offset_cal')}
               </Text>
-              <Text fontSize={FONT_SIZE_BODY_1} marginTop={'.75rem'}>
+              <Text fontSize={FONT_SIZE_BODY_1} marginTop={SPACING_3}>
                 <Trans t={t} i18nKey="pipette_offset_cal_description" />
               </Text>
-              <Box textAlign="center" marginTop={'1.5rem'}>
+              <Box textAlign={ALIGN_CENTER} marginTop={SPACING_4}>
                 <PrimaryBtn
                   onClick={() => setHelpModalIsOpen(false)}
                   width={SIZE_4}

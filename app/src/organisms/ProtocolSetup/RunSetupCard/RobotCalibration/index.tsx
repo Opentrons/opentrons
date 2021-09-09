@@ -8,6 +8,7 @@ import {
   Tooltip,
   SPACING_2,
   SPACING_3,
+  ALIGN_CENTER,
   SIZE_6,
   C_BLUE,
   FONT_WEIGHT_BOLD,
@@ -119,7 +120,7 @@ export function RobotCalibration(props: Props): JSX.Element {
         })}
       </div>
       <Divider marginY={SPACING_3} />
-      <Box textAlign={'center'}>
+      <Box textAlign={ALIGN_CENTER}>
         <PrimaryBtn
           disabled={!calibrationStatus.complete}
           onClick={() => expandNextStep(nextStep)}

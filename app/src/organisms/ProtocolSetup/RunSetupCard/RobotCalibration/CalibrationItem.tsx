@@ -4,12 +4,17 @@ import {
   Text,
   Flex,
   Icon,
+  SIZE_2,
   FONT_SIZE_BODY_1,
   FONT_SIZE_BODY_2,
   FONT_STYLE_ITALIC,
   C_NEAR_WHITE,
   C_WHITE,
   COLOR_SUCCESS,
+  SPACING_2,
+  ALIGN_CENTER,
+  DIRECTION_ROW,
+  BORDER_SOLID_MEDIUM,
   Box,
   JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
@@ -38,29 +43,27 @@ export function CalibrationItem(props: Props): JSX.Element | null {
   return (
     <Box backgroundColor={backgroundColor}>
       <Flex
-        flexDirection="row"
-        alignItems="center"
-        padding=".5rem"
+        flexDirection={DIRECTION_ROW}
+        alignItems={ALIGN_CENTER}
+        padding={SPACING_2}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
       >
-        <Flex flexDirection="row" alignItems="center">
+        <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
           {calibrated ? (
             <Icon
               name={'check-circle'}
-              height="1.5rem"
-              width="1.5rem"
+              size={SIZE_2}
               color={COLOR_SUCCESS}
-              marginRight="0.75rem"
+              marginRight={SPACING_2}
             />
           ) : (
             <Icon
-              height="1.5rem"
-              width="1.5rem"
               name={'circle'}
+              size={SIZE_2}
               color={C_WHITE}
-              border="1px solid #9B9B9B"
-              borderRadius="1.5rem"
-              marginRight="0.75rem"
+              border={BORDER_SOLID_MEDIUM}
+              borderRadius={SIZE_2}
+              marginRight={SPACING_2}
             />
           )}
           <span>

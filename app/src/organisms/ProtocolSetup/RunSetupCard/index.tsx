@@ -44,6 +44,11 @@ export function RunSetupCard(): JSX.Element | null {
     standardDeckDef as any
   )
   const robot = useSelector((state: State) => getConnectedRobot(state))
+  const robotName =
+    robot?.name !== null && robot?.name !== undefined ? robot?.name : ''
+  const calibrationStatus = useSelector((state: State) => {
+    return getProtocolCalibrationComplete(state, robotName)
+  })
 
   const [expandedStepKey, setExpandedStepKey] = React.useState<StepKey | null>(
     ROBOT_CALIBRATION_STEP_KEY
@@ -54,10 +59,6 @@ export function RunSetupCard(): JSX.Element | null {
     ('metadata' in protocolData && Object.keys(protocolData).length === 1)
   )
     return null
-
-  const calibrationStatus = useSelector((state: State) => {
-    return getProtocolCalibrationComplete(state, robot?.name)
-  })
 
   let stepsKeysInOrder: StepKey[] = [ROBOT_CALIBRATION_STEP_KEY]
   if (protocolHasModules(protocolData as JsonProtocolFile)) {

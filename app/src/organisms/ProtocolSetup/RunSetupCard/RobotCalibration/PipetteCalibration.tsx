@@ -7,6 +7,10 @@ import {
   Flex,
   Link,
   PrimaryBtn,
+  SPACING_3,
+  SPACING_4,
+  ALIGN_CENTER,
+  DIRECTION_ROW,
   FONT_SIZE_BODY_1,
   FONT_STYLE_ITALIC,
   C_BLUE,
@@ -79,11 +83,11 @@ export function PipetteCalibration(props: Props): JSX.Element {
       pipetteTipRackData.exactPipetteMatch === PipetteConstants.INEXACT_MATCH
     ) {
       button = (
-        <Flex flexDirection="row" alignItems="center">
+        <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
           <Text
             fontSize={FONT_SIZE_BODY_1}
             fontStyle={FONT_STYLE_ITALIC}
-            marginRight="2rem"
+            marginRight={SPACING_4}
           >
             {t('pipette_mismatch')}
           </Text>
@@ -91,7 +95,7 @@ export function PipetteCalibration(props: Props): JSX.Element {
             external
             fontSize={FONT_SIZE_BODY_1}
             href={inexactPipetteSupportArticle}
-            marginRight="1rem"
+            marginRight={SPACING_3}
           >
             {t('pipette_compat_help')}
           </Link>
@@ -101,11 +105,11 @@ export function PipetteCalibration(props: Props): JSX.Element {
   } else if (!attached) {
     subText = t('attach_pipette_calibration')
     button = (
-      <Flex flexDirection="row" alignItems="center">
+      <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
         <Text
           fontSize={FONT_SIZE_BODY_1}
           fontStyle={FONT_STYLE_ITALIC}
-          marginRight="2rem"
+          marginRight={SPACING_4}
         >
           {t('pipette_missing')}
         </Text>

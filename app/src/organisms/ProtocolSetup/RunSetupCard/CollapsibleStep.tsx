@@ -68,7 +68,7 @@ export function CollapsibleStep({
             <Icon
               size={SIZE_1}
               color={COLOR_WARNING}
-              marginRight={'.5rem'}
+              marginRight={SPACING_2}
               name={'alert-circle'}
             />
             <Text fontSize={FONT_SIZE_BODY_1}>{t('calibration_needed')}</Text>
