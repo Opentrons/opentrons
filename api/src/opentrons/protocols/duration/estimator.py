@@ -124,6 +124,10 @@ class DurationEstimator:
             The duration in seconds
         """
         duration = 0.0
+        # TODO (al 2021-09-09):
+        #  - Make this into a map
+        #  - Remove "# noqa: C901"
+        #  - type the payload in the on_X methods.
         if message_name == types.PICK_UP_TIP:
             duration = self.on_pick_up_tip(payload=payload)
         elif message_name == types.DROP_TIP:
@@ -156,6 +160,11 @@ class DurationEstimator:
             duration = self.on_thermocycler_deactivate_lid(payload=payload)
         elif message_name == types.THERMOCYCLER_OPEN:
             duration = self.on_thermocycler_lid_open(payload=payload)
+        else:
+            logger.warning(
+                f"Command type '{message_name}' is not yet supported by the "
+                f"duration estimator."
+            )
         return duration
 
     def on_pick_up_tip(self, payload) -> float:
