@@ -52,7 +52,7 @@ g-code-run:
 		--text-mode '$(text_mode)' \
 		--left-pipette '$(left_pipette)' \
 		--right-pipette '$(right_pipette)' \
-		$(protocol_path) \
+		$(configuration_name) \
 		2> /dev/null
 
 master_file = /tmp/master_file.txt  # File pulled from S3
@@ -99,7 +99,7 @@ g-code-smoothie-protocol-run:
 	@$(MAKE) --no-print-directory g-code-run \
 		left_pipette='{"model": "p20_single_v2.0", "id": "P20SV202020070101"}' \
 		right_pipette='{"model": "p20_single_v2.0", "id": "P20SV202020070101"}' \
-		protocol_path='protocols/smoothie_protocol.py' \
+		configuration_name='protocol_smoothie' \
   		> $(file_under_test)
 
 # g-code-smoothie-protocol-run
@@ -135,7 +135,7 @@ g-code-2-modules-1s-1m-v2-protocol-run:
 	@$(MAKE) --no-print-directory g-code-run \
 		left_pipette='{"model": "p300_single_v2.1", "id": "P20SV202020070101"}' \
 		right_pipette='{"model": "p20_multi_v2.1", "id": "P20SV202020070101"}' \
-		protocol_path='protocols/2_modules_1s_1m_v2.py' \
+		configuration_name='protocol_2_modules' \
   		> $(file_under_test)
 
 # g-code-2-modules-1s-1m-v2-protocol-diff
@@ -170,7 +170,7 @@ g-code-swift-turbo-protocol-run:
 	@$(MAKE) --no-print-directory g-code-run \
 		left_pipette='{"model": "p20_single_v2.0", "id": "P20SV202020070101"}' \
 		right_pipette='{"model": "p300_multi_v2.1", "id": "P20SV202020070101"}' \
-		protocol_path='protocols/swift_turbo.py' \
+		configuration_name='protocol_swift_turbo' \
   		> $(file_under_test)
 
 # g-code-swift-turbo-protocol-diff
@@ -205,7 +205,7 @@ g-code-swift-smoke-protocol-run:
 	@$(MAKE) --no-print-directory g-code-run \
 		left_pipette='{"model": "p20_single_v2.0", "id": "P20SV202020070101"}' \
 		right_pipette='{"model": "p300_multi_v2.1", "id": "P20SV202020070101"}' \
-		protocol_path='protocols/swift_smoke.py' \
+		configuration_name='protocol_swift_smoke' \
   		> $(file_under_test)
 
 # g-code-swift-smoke-protocol-diff
@@ -240,7 +240,7 @@ g-code-2-single-channel-v2-protocol-run:
 	@$(MAKE) --no-print-directory g-code-run \
 		left_pipette='{"model": "p20_single_v2.0", "id": "P20SV202020070101"}' \
 		right_pipette='{"model": "p300_single_v2.1", "id": "P20SV202020070101"}' \
-		protocol_path='protocols/2_single_channel_v2.py' \
+		configuration_name='protocol_2_single_channel' \
   		> $(file_under_test)
 
 # g-code-2-single-channel-v2-protocol-diff
