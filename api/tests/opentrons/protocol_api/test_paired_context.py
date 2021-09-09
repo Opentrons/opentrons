@@ -246,7 +246,7 @@ def test_blow_out(set_up_paired_instrument, monkeypatch, ctx):
         nonlocal move_location
         move_location = loc
 
-    monkeypatch.setattr(paired.paired_instrument_obj, "move_to", fake_move)
+    monkeypatch.setattr(paired._implementation, "move_to", fake_move)
 
     paired.blow_out()
     assert "blowing out" in ",".join([cmd.lower() for cmd in ctx.commands()])
@@ -296,7 +296,7 @@ def test_air_gap(set_up_paired_instrument, monkeypatch, ctx):
     assert aspirate_mock.call_args_list == [mock.call(paired._pair_policy, 20, 1.0)]
     aspirate_mock.reset_mock()
     paired.air_gap()
-    assert aspirate_mock.call_args_list == [mock.call(paired._pair_policy, None, 1.0)]
+    assert aspirate_mock.call_args_list == [mock.call(paired._pair_policy, 300, 1.0)]
 
 
 def test_touch_tip_new_default_args(ctx, monkeypatch):

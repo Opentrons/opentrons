@@ -42,6 +42,8 @@ AdvancedLiquidHandling = Union[
     Well, types.Location, List[Union[Well, types.Location]], List[List[Well]]
 ]
 
+logger = logging.getLogger(__name__)
+
 
 class InstrumentContext(CommandPublisher):
     """A context for a specific pipette or instrument.
@@ -66,7 +68,6 @@ class InstrumentContext(CommandPublisher):
         implementation: AbstractInstrument,
         ctx: ProtocolContext,
         broker: Broker,
-        log_parent: logging.Logger,
         at_version: APIVersion,
         tip_racks: List[Labware] = None,
         trash: Optional[Labware] = None,
@@ -76,12 +77,11 @@ class InstrumentContext(CommandPublisher):
         self._api_version = at_version
         self._implementation = implementation
         self._ctx = ctx
-        self._log = log_parent.getChild(repr(self))
 
         self._tip_racks = tip_racks or list()
         for tip_rack in self.tip_racks:
             assert tip_rack.is_tiprack
-            validate_tiprack(self.name, tip_rack, self._log)
+            validate_tiprack(self.name, tip_rack, logger)
         if trash is None:
             self.trash_container = self._ctx.fixed_trash
         else:
@@ -169,7 +169,7 @@ class InstrumentContext(CommandPublisher):
             ``instr.aspirate(location=wellplate['A1'])``
 
         """
-        self._log.debug(
+        logger.debug(
             "aspirate {} from {} at {}".format(
                 volume, location if location else "current position", rate
             )
@@ -210,7 +210,7 @@ class InstrumentContext(CommandPublisher):
                 else:
                     # TODO(seth,2019/7/29): This should be a warning exposed
                     #  via rpc to the runapp
-                    self._log.warning(
+                    logger.warning(
                         "When aspirate is called on something other than a "
                         "well relative position, we can't move to the top of"
                         " the well to prepare for aspiration. This might "
@@ -298,7 +298,7 @@ class InstrumentContext(CommandPublisher):
             ``instr.dispense(location=wellplate['A1'])``
 
         """
-        self._log.debug(
+        logger.debug(
             "dispense {} from {} at {}".format(
                 volume, location if location else "current position", rate
             )
@@ -403,7 +403,7 @@ class InstrumentContext(CommandPublisher):
             ``location`` unless you use keywords.
 
         """
-        self._log.debug(
+        logger.debug(
             "mixing {}uL with {} repetitions in {} at rate={}".format(
                 volume, repetitions, location if location else "current position", rate
             )
@@ -473,7 +473,7 @@ class InstrumentContext(CommandPublisher):
 
         if isinstance(location, Well):
             if location.parent.is_tiprack:
-                self._log.warning(
+                logger.warning(
                     "Blow_out being performed on a tiprack. "
                     "Please re-check your code"
                 )
@@ -588,10 +588,10 @@ class InstrumentContext(CommandPublisher):
 
         if well.is_well:
             if "touchTipDisabled" in well.quirks_from_any_parent():
-                self._log.info(f"Ignoring touch tip on labware {well}")
+                logger.info(f"Ignoring touch tip on labware {well}")
                 return self
             if well.parent.as_labware().is_tiprack:
-                self._log.warning(
+                logger.warning(
                     "Touch_tip being performed on a tiprack. "
                     "Please re-check your code"
                 )
@@ -679,7 +679,7 @@ class InstrumentContext(CommandPublisher):
             See the ``home_after`` parameter in :py:obj:`drop_tip`.
         """
         if not self._implementation.has_tip():
-            self._log.warning("Pipette has no tip to return")
+            logger.warning("Pipette has no tip to return")
         loc = self._last_tip_picked_up_from
         if not isinstance(loc, Well):
             raise TypeError(
@@ -765,7 +765,7 @@ class InstrumentContext(CommandPublisher):
             )
 
         assert tiprack.is_tiprack, "{} is not a tiprack".format(str(tiprack))
-        validate_tiprack(self.name, tiprack, self._log)
+        validate_tiprack(self.name, tiprack, logger)
         do_publish(
             self.broker,
             cmds.pick_up_tip,
@@ -942,7 +942,7 @@ class InstrumentContext(CommandPublisher):
                 # Similarly to :py:meth:`return_tips`, the failure case here
                 # just means the tip can't be reused, so don't actually stop
                 # the protocol
-                self._log.exception(f"Could not return tip to {target}")
+                logger.exception(f"Could not return tip to {target}")
         self._last_tip_picked_up_from = None
         return self
 
@@ -995,7 +995,7 @@ class InstrumentContext(CommandPublisher):
                        minimum volume of the pipette
         :returns: This instance
         """
-        self._log.debug("Distributing {} from {} to {}".format(volume, source, dest))
+        logger.debug("Distributing {} from {} to {}".format(volume, source, dest))
         kwargs["mode"] = "distribute"
         kwargs["disposal_volume"] = kwargs.get("disposal_volume", self.min_volume)
         kwargs["mix_after"] = (0, 0)
@@ -1027,7 +1027,7 @@ class InstrumentContext(CommandPublisher):
                        and ``disposal_volume`` is ignored and set to 0.
         :returns: This instance
         """
-        self._log.debug("Consolidate {} from {} to {}".format(volume, source, dest))
+        logger.debug("Consolidate {} from {} to {}".format(volume, source, dest))
         kwargs["mode"] = "consolidate"
         kwargs["mix_before"] = (0, 0)
         kwargs["disposal_volume"] = 0
@@ -1142,7 +1142,7 @@ class InstrumentContext(CommandPublisher):
 
         :returns: This instance
         """
-        self._log.debug("Transfer {} from {} to {}".format(volume, source, dest))
+        logger.debug("Transfer {} from {} to {}".format(volume, source, dest))
 
         blowout_location = kwargs.get("blowout_location")
         validate_blowout_location(self.api_version, "transfer", blowout_location)
@@ -1593,12 +1593,12 @@ class InstrumentContext(CommandPublisher):
         return PairedInstrumentContext(
             primary_instrument=self,
             secondary_instrument=instrument,
+            implementation=self._implementation.pair_with(instrument._implementation),
             ctx=self._ctx,
             pair_policy=PipettePair.of_mount(self._implementation.get_mount()),
             api_version=self.api_version,
-            hardware_manager=self._ctx._implementation.get_hardware(),
             trash=self.trash_container,
-            log_parent=self._log,
+            log_parent=logger,
         )
 
     def _tip_length_for(self, tiprack: Labware) -> float:

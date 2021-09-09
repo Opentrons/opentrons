@@ -8,23 +8,56 @@ from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import DeckSlotName, Point
 
 from opentrons.protocol_engine import errors
-from opentrons.protocol_engine.types import DeckSlotLocation, Dimensions
-from opentrons.protocol_engine.state.labware import (
-    LabwareState,
-    LabwareView,
-    LabwareData,
+from opentrons.protocol_engine.types import (
+    CalibrationOffset,
+    DeckSlotLocation,
+    Dimensions,
+    LoadedLabware,
+)
+
+from opentrons.protocol_engine.state.labware import LabwareState, LabwareView
+
+
+plate = LoadedLabware(
+    id="plate-id",
+    loadName="plate-load-name",
+    location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
+    definitionUri="some-plate-uri",
+)
+
+reservoir = LoadedLabware(
+    id="reservoir-id",
+    loadName="reservoir-load-name",
+    location=DeckSlotLocation(slot=DeckSlotName.SLOT_2),
+    definitionUri="some-reservoir-uri",
+)
+
+tube_rack = LoadedLabware(
+    id="tube-rack-id",
+    loadName="tube-rack-load-name",
+    location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
+    definitionUri="some-tube-rack-uri",
+)
+
+tip_rack = LoadedLabware(
+    id="tip-rack-id",
+    loadName="tip-rack-load-name",
+    location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
+    definitionUri="some-tip-rack-uri",
 )
 
 
 def get_labware_view(
-    labware_by_id: Optional[Dict[str, LabwareData]] = None,
-    labware_definitions_by_uri: Optional[Dict[str, LabwareDefinition]] = None,
+    labware_by_id: Optional[Dict[str, LoadedLabware]] = None,
+    calibrations_by_id: Optional[Dict[str, CalibrationOffset]] = None,
+    definitions_by_uri: Optional[Dict[str, LabwareDefinition]] = None,
     deck_definition: Optional[DeckDefinitionV2] = None,
 ) -> LabwareView:
     """Get a labware view test subject."""
     state = LabwareState(
         labware_by_id=labware_by_id or {},
-        labware_definitions_by_uri=labware_definitions_by_uri or {},
+        calibrations_by_id=calibrations_by_id or {},
+        definitions_by_uri=definitions_by_uri or {},
         deck_definition=deck_definition or cast(DeckDefinitionV2, {"fake": True}),
     )
 
@@ -36,42 +69,24 @@ def test_get_labware_data_bad_id() -> None:
     subject = get_labware_view()
 
     with pytest.raises(errors.LabwareDoesNotExistError):
-        subject.get_labware_data_by_id("asdfghjkl")
+        subject.get("asdfghjkl")
 
 
 def test_get_labware_data_by_id() -> None:
     """It should retrieve labware data from the state."""
-    subject = get_labware_view(
-        labware_by_id={
-            "plate-id": LabwareData(
-                location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
-                uri=cast(LabwareUri, "some-definition-uri"),
-                calibration=(1, 2, 3),
-            )
-        }
-    )
+    subject = get_labware_view(labware_by_id={"plate-id": plate})
 
-    assert subject.get_labware_data_by_id("plate-id") == LabwareData(
-        location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
-        uri=cast(LabwareUri, "some-definition-uri"),
-        calibration=(1, 2, 3),
-    )
+    assert subject.get("plate-id") == plate
 
 
 def test_get_labware_definition(well_plate_def: LabwareDefinition) -> None:
     """It should get a labware's definition from the state."""
     subject = get_labware_view(
-        labware_by_id={
-            "plate-id": LabwareData(
-                location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
-                uri=cast(LabwareUri, "some-definition-uri"),
-                calibration=(1, 2, 3),
-            )
-        },
-        labware_definitions_by_uri={"some-definition-uri": well_plate_def},
+        labware_by_id={"plate-id": plate},
+        definitions_by_uri={"some-plate-uri": well_plate_def},
     )
 
-    assert subject.get_labware_definition("plate-id") == well_plate_def
+    assert subject.get_definition("plate-id") == well_plate_def
 
 
 def test_get_labware_definition_bad_id() -> None:
@@ -89,74 +104,47 @@ def test_get_all_labware(
     """It should return all labware."""
     subject = get_labware_view(
         labware_by_id={
-            "plate-id": LabwareData(
-                location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
-                uri=cast(LabwareUri, "some-definition-uri"),
-                calibration=(1, 2, 3),
-            ),
-            "reservoir-id": LabwareData(
-                location=DeckSlotLocation(slot=DeckSlotName.SLOT_2),
-                uri=cast(LabwareUri, "other-definition-uri"),
-                calibration=(4, 5, 6),
-            ),
+            "plate-id": plate,
+            "reservoir-id": reservoir,
         }
     )
 
-    all_labware = subject.get_all_labware()
+    all_labware = subject.get_all()
 
-    assert all_labware == [
-        ("plate-id", subject.get_labware_data_by_id("plate-id")),
-        ("reservoir-id", subject.get_labware_data_by_id("reservoir-id")),
-    ]
+    assert all_labware == [plate, reservoir]
 
 
 def test_get_labware_location() -> None:
     """It should return labware location."""
-    subject = get_labware_view(
-        labware_by_id={
-            "plate-id": LabwareData(
-                location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
-                uri=cast(LabwareUri, "some-definition-uri"),
-                calibration=(1, 2, 3),
-            )
-        }
-    )
+    subject = get_labware_view(labware_by_id={"plate-id": plate})
 
-    result = subject.get_labware_location("plate-id")
+    result = subject.get_location("plate-id")
 
     assert result == DeckSlotLocation(slot=DeckSlotName.SLOT_1)
 
 
-def test_get_labware_has_quirk(
+def test_get_has_quirk(
     well_plate_def: LabwareDefinition,
     reservoir_def: LabwareDefinition,
 ) -> None:
     """It should return whether a labware by ID has a given quirk."""
     subject = get_labware_view(
         labware_by_id={
-            "plate-id": LabwareData(
-                location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
-                uri=cast(LabwareUri, "some-plate-uri"),
-                calibration=(1, 2, 3),
-            ),
-            "reservoir-id": LabwareData(
-                location=DeckSlotLocation(slot=DeckSlotName.SLOT_2),
-                uri=cast(LabwareUri, "some-reservoir-uri"),
-                calibration=(4, 5, 6),
-            ),
+            "plate-id": plate,
+            "reservoir-id": reservoir,
         },
-        labware_definitions_by_uri={
+        definitions_by_uri={
             "some-plate-uri": well_plate_def,
             "some-reservoir-uri": reservoir_def,
         },
     )
 
-    well_plate_has_center_quirk = subject.get_labware_has_quirk(
+    well_plate_has_center_quirk = subject.get_has_quirk(
         labware_id="plate-id",
         quirk="centerMultichannelOnWells",
     )
 
-    reservoir_has_center_quirk = subject.get_labware_has_quirk(
+    reservoir_has_center_quirk = subject.get_has_quirk(
         labware_id="reservoir-id",
         quirk="centerMultichannelOnWells",
     )
@@ -172,18 +160,10 @@ def test_quirks(
     """It should return a labware's quirks."""
     subject = get_labware_view(
         labware_by_id={
-            "plate-id": LabwareData(
-                location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
-                uri=cast(LabwareUri, "some-plate-uri"),
-                calibration=(1, 2, 3),
-            ),
-            "reservoir-id": LabwareData(
-                location=DeckSlotLocation(slot=DeckSlotName.SLOT_2),
-                uri=cast(LabwareUri, "some-reservoir-uri"),
-                calibration=(4, 5, 6),
-            ),
+            "plate-id": plate,
+            "reservoir-id": reservoir,
         },
-        labware_definitions_by_uri={
+        definitions_by_uri={
             "some-plate-uri": well_plate_def,
             "some-reservoir-uri": reservoir_def,
         },
@@ -199,14 +179,8 @@ def test_quirks(
 def test_get_well_definition_bad_id(well_plate_def: LabwareDefinition) -> None:
     """get_well_definition should raise if well name doesn't exist."""
     subject = get_labware_view(
-        labware_by_id={
-            "plate-id": LabwareData(
-                location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
-                uri=cast(LabwareUri, "some-plate-uri"),
-                calibration=(1, 2, 3),
-            ),
-        },
-        labware_definitions_by_uri={"some-plate-uri": well_plate_def},
+        labware_by_id={"plate-id": plate},
+        definitions_by_uri={"some-plate-uri": well_plate_def},
     )
 
     with pytest.raises(errors.WellDoesNotExistError):
@@ -216,14 +190,8 @@ def test_get_well_definition_bad_id(well_plate_def: LabwareDefinition) -> None:
 def test_get_well_definition(well_plate_def: LabwareDefinition) -> None:
     """It should return a well definition by well ID."""
     subject = get_labware_view(
-        labware_by_id={
-            "plate-id": LabwareData(
-                location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
-                uri=cast(LabwareUri, "some-plate-uri"),
-                calibration=(1, 2, 3),
-            ),
-        },
-        labware_definitions_by_uri={"some-plate-uri": well_plate_def},
+        labware_by_id={"plate-id": plate},
+        definitions_by_uri={"some-plate-uri": well_plate_def},
     )
 
     expected_well_def = well_plate_def.wells["B2"]
@@ -235,51 +203,36 @@ def test_get_well_definition(well_plate_def: LabwareDefinition) -> None:
 def test_get_wells(falcon_tuberack_def: LabwareDefinition) -> None:
     """It should return a list of wells from definition."""
     subject = get_labware_view(
-        labware_by_id={
-            "tuberack-id": LabwareData(
-                location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
-                uri=cast(LabwareUri, "some-tuberack-uri"),
-                calibration=(1, 2, 3),
-            ),
-        },
-        labware_definitions_by_uri={"some-tuberack-uri": falcon_tuberack_def},
+        labware_by_id={"tube-rack-id": tube_rack},
+        definitions_by_uri={"some-tube-rack-uri": falcon_tuberack_def},
     )
+
     expected_wells = ["A1", "B1", "A2", "B2", "A3", "B3"]
-    result = subject.get_wells(labware_id="tuberack-id")
+    result = subject.get_wells(labware_id="tube-rack-id")
     assert result == expected_wells
 
 
 def test_get_well_columns(falcon_tuberack_def: LabwareDefinition) -> None:
     """It should return wells as dict of list of columns."""
     subject = get_labware_view(
-        labware_by_id={
-            "tuberack-id": LabwareData(
-                location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
-                uri=cast(LabwareUri, "some-tuberack-uri"),
-                calibration=(1, 2, 3),
-            ),
-        },
-        labware_definitions_by_uri={"some-tuberack-uri": falcon_tuberack_def},
+        labware_by_id={"tube-rack-id": tube_rack},
+        definitions_by_uri={"some-tube-rack-uri": falcon_tuberack_def},
     )
+
     expected_columns = {"1": ["A1", "B1"], "2": ["A2", "B2"], "3": ["A3", "B3"]}
-    result = subject.get_well_columns(labware_id="tuberack-id")
+    result = subject.get_well_columns(labware_id="tube-rack-id")
     assert result == expected_columns
 
 
 def test_get_well_rows(falcon_tuberack_def: LabwareDefinition) -> None:
     """It should return wells as dict of list of rows."""
     subject = get_labware_view(
-        labware_by_id={
-            "tuberack-id": LabwareData(
-                location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
-                uri=cast(LabwareUri, "some-tuberack-uri"),
-                calibration=(1, 2, 3),
-            ),
-        },
-        labware_definitions_by_uri={"some-tuberack-uri": falcon_tuberack_def},
+        labware_by_id={"tube-rack-id": tube_rack},
+        definitions_by_uri={"some-tube-rack-uri": falcon_tuberack_def},
     )
+
     expected_rows = {"A": ["A1", "A2", "A3"], "B": ["B1", "B2", "B3"]}
-    result = subject.get_well_rows(labware_id="tuberack-id")
+    result = subject.get_well_rows(labware_id="tube-rack-id")
     assert result == expected_rows
 
 
@@ -288,14 +241,8 @@ def test_get_tip_length_raises_with_non_tip_rack(
 ) -> None:
     """It should raise if you try to get the tip length of a regular labware."""
     subject = get_labware_view(
-        labware_by_id={
-            "plate-id": LabwareData(
-                location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
-                uri=cast(LabwareUri, "some-plate-uri"),
-                calibration=(1, 2, 3),
-            ),
-        },
-        labware_definitions_by_uri={"some-plate-uri": well_plate_def},
+        labware_by_id={"plate-id": plate},
+        definitions_by_uri={"some-plate-uri": well_plate_def},
     )
 
     with pytest.raises(errors.LabwareIsNotTipRackError):
@@ -307,14 +254,8 @@ def test_get_tip_length_gets_length_from_definition(
 ) -> None:
     """It should return the tip length from the definition."""
     subject = get_labware_view(
-        labware_by_id={
-            "tip-rack-id": LabwareData(
-                location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
-                uri=cast(LabwareUri, "some-tip-rack-uri"),
-                calibration=(1, 2, 3),
-            ),
-        },
-        labware_definitions_by_uri={"some-tip-rack-uri": tip_rack_def},
+        labware_by_id={"tip-rack-id": tip_rack},
+        definitions_by_uri={"some-tip-rack-uri": tip_rack_def},
     )
 
     length = subject.get_tip_length("tip-rack-id")
@@ -323,15 +264,16 @@ def test_get_tip_length_gets_length_from_definition(
 
 def test_get_labware_uri_from_definition(tip_rack_def: LabwareDefinition) -> None:
     """It should return the labware's definition URI."""
+    tip_rack = LoadedLabware(
+        id="tip-rack-id",
+        loadName="tip-rack-load-name",
+        location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
+        definitionUri="some-tip-rack-uri",
+    )
+
     subject = get_labware_view(
-        labware_by_id={
-            "tip-rack-id": LabwareData(
-                location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
-                uri=cast(LabwareUri, "some-tip-rack-uri"),
-                calibration=(1, 2, 3),
-            ),
-        },
-        labware_definitions_by_uri={"some-tip-rack-uri": tip_rack_def},
+        labware_by_id={"tip-rack-id": tip_rack},
+        definitions_by_uri={"some-tip-rack-uri": tip_rack_def},
     )
 
     result = subject.get_definition_uri(labware_id="tip-rack-id")
@@ -344,18 +286,10 @@ def test_is_tiprack(
     """It should determine if labware is a tip rack."""
     subject = get_labware_view(
         labware_by_id={
-            "tip-rack-id": LabwareData(
-                location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
-                uri=cast(LabwareUri, "some-tip-rack-uri"),
-                calibration=(1, 2, 3),
-            ),
-            "reservoir-id": LabwareData(
-                location=DeckSlotLocation(slot=DeckSlotName.SLOT_2),
-                uri=cast(LabwareUri, "some-reservoir-uri"),
-                calibration=(4, 5, 6),
-            ),
+            "tip-rack-id": tip_rack,
+            "reservoir-id": reservoir,
         },
-        labware_definitions_by_uri={
+        definitions_by_uri={
             "some-tip-rack-uri": tip_rack_def,
             "some-reservoir-uri": reservoir_def,
         },
@@ -368,14 +302,8 @@ def test_is_tiprack(
 def test_get_load_name(reservoir_def: LabwareDefinition) -> None:
     """It should return the load name."""
     subject = get_labware_view(
-        labware_by_id={
-            "reservoir-id": LabwareData(
-                location=DeckSlotLocation(slot=DeckSlotName.SLOT_2),
-                uri=cast(LabwareUri, "some-reservoir-uri"),
-                calibration=(4, 5, 6),
-            ),
-        },
-        labware_definitions_by_uri={"some-reservoir-uri": reservoir_def},
+        labware_by_id={"reservoir-id": reservoir},
+        definitions_by_uri={"some-reservoir-uri": reservoir_def},
     )
 
     result = subject.get_load_name("reservoir-id")
@@ -386,14 +314,8 @@ def test_get_load_name(reservoir_def: LabwareDefinition) -> None:
 def test_get_dimensions(well_plate_def: LabwareDefinition) -> None:
     """It should compute the dimensions of a labware."""
     subject = get_labware_view(
-        labware_by_id={
-            "plate-id": LabwareData(
-                location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
-                uri=cast(LabwareUri, "some-plate-uri"),
-                calibration=(1, 2, 3),
-            ),
-        },
-        labware_definitions_by_uri={"some-plate-uri": well_plate_def},
+        labware_by_id={"plate-id": plate},
+        definitions_by_uri={"some-plate-uri": well_plate_def},
     )
 
     result = subject.get_dimensions(labware_id="plate-id")
@@ -442,3 +364,16 @@ def test_get_slot_position(standard_deck_def: DeckDefinitionV2) -> None:
     result = subject.get_slot_position(DeckSlotName.SLOT_3)
 
     assert result == Point(x=slot_pos[0], y=slot_pos[1], z=slot_pos[2])
+
+
+def test_get_calibration_offset() -> None:
+    """It should get a labware's calibrated offset."""
+    offset = CalibrationOffset(x=1, y=2, z=3)
+    subject = get_labware_view(calibrations_by_id={"labware-id": offset})
+
+    result = subject.get_calibration_offset("labware-id")
+
+    assert result == offset
+
+    with pytest.raises(errors.LabwareDoesNotExistError):
+        subject.get_calibration_offset("wrong-id")

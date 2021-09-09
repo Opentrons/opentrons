@@ -1,3 +1,5 @@
+import logging
+
 from opentrons import types
 from opentrons.protocols.context.instrument import AbstractInstrument
 from opentrons.protocols.context.protocol_api.protocol_context import (
@@ -6,6 +8,9 @@ from opentrons.protocols.context.protocol_api.protocol_context import (
 from opentrons.protocols.context.simulator.instrument_context import (
     InstrumentContextSimulation,
 )
+
+
+logger = logging.getLogger(__name__)
 
 
 class ProtocolContextSimulation(ProtocolContextImplementation):
@@ -43,5 +48,5 @@ class ProtocolContextSimulation(ProtocolContextImplementation):
             api_version=self._api_version,
         )
         self._instruments[mount] = new_instr
-        self._log.info(f"Instrument {new_instr} loaded")
+        logger.info(f"Instrument {new_instr} loaded")
         return new_instr
