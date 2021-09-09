@@ -57,6 +57,5 @@
   "deck_cal_description": "This measures the deck X and Y value relative to the gantry. This calibration is the foundation for Tip Length and Pipette Offset calibrations. Calibrate your deck during new robot setup or if you move your robot.",
   "tip_length_cal_title": "Tip Length Calibration",
   "tip_length_cal_description": "This measures the Z distance between the bottom of the tip and the pipette's nozzle. Calibrate tip length for each new tip type you use on a pipette. If you redo the tip length calibration for the tip you used to calibrate a pipette, you will also be prompted to recalibrate that pipette.",
-  "pipette_offset_cal_description": "This measures a pipette's X, Y, and Z value in relation to the pipette mount and the deck. Pipette Offset calibration relies on Deck calibration and Tip Length calibration.<br/><br/>Calibrate a pipette's offset the first time you attach it to a unique mount, after doing a Deck calibration or if you redo the Tip Length calibration for the tip you used to calibrate the pipette.",
-  "close_cta": "Close"
+  "pipette_offset_cal_description": "This measures a pipette's X, Y, and Z value in relation to the pipette mount and the deck. Pipette Offset calibration relies on Deck calibration and Tip Length calibration.<br/><br/>Calibrate a pipette's offset the first time you attach it to a unique mount, after doing a Deck calibration or if you redo the Tip Length calibration for the tip you used to calibrate the pipette."
 }

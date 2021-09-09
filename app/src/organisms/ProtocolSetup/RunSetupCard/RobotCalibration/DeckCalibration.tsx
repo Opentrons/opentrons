@@ -61,9 +61,13 @@ export function DeckCalibration(props: Props): JSX.Element | null {
         justifyContent={JUSTIFY_SPACE_BETWEEN}
       >
         <Text css={FONT_HEADER_THIN}>{`${t('deck_calibration_title')}`}</Text>
-        <Text onClick={() => setHelpModalIsOpen(true)} color={C_BLUE}>
+        <Link
+          onClick={() => setHelpModalIsOpen(true)}
+          color={C_BLUE}
+          fontSize={FONT_SIZE_BODY_1}
+        >
           {t('robot_cal_help_title')}
-        </Text>
+        </Link>
       </Flex>
       <CalibrationItem
         index={0}
@@ -72,7 +76,7 @@ export function DeckCalibration(props: Props): JSX.Element | null {
       />
       {helpModalIsOpen && (
         <Portal level={'top'}>
-          <BaseModal>
+          <BaseModal borderRadius={'14px'}>
             <Box width="800">
               <Flex
                 flexDirection={DIRECTION_ROW}
@@ -115,7 +119,7 @@ export function DeckCalibration(props: Props): JSX.Element | null {
                 {t('deck_calibration_title')}
               </Text>
               <Text fontSize={FONT_SIZE_BODY_1} marginTop={'.75rem'}>
-                {t('robot_cal_description')}
+                {t('deck_cal_description')}
               </Text>
               <Text
                 fontWeight={FONT_WEIGHT_SEMIBOLD}

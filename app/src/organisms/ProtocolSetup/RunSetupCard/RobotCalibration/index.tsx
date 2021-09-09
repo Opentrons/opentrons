@@ -7,6 +7,7 @@ import {
   FONT_WEIGHT_BOLD,
   FONT_HEADER_THIN,
 } from '@opentrons/components'
+import { Divider } from '../../../../atoms/structure'
 import { CalibrateTipLengthControl } from '../../../../pages/Calibrate/CalibrateTipLengthControl'
 import * as PipetteOffset from '../../../../redux/calibration/pipette-offset'
 import * as Pipettes from '../../../../redux/pipettes'
@@ -43,6 +44,7 @@ export function RobotCalibration(props: Props): JSX.Element {
   return (
     <>
       <DeckCalibration robotName={robotName} />
+      <Divider />
       <Text marginTop={SPACING_3} css={FONT_HEADER_THIN}>
         {t('required_pipettes_title')}
       </Text>
@@ -63,6 +65,7 @@ export function RobotCalibration(props: Props): JSX.Element {
           }
         })}
       </div>
+      <Divider />
       <Text marginTop={SPACING_3} css={FONT_HEADER_THIN}>
         {t('required_tip_racks_title')}
       </Text>
@@ -100,6 +103,7 @@ export function RobotCalibration(props: Props): JSX.Element {
           }
         })}
       </div>
+      <Divider />
     </>
   )
 }
