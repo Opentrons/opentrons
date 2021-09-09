@@ -6,9 +6,9 @@ from typing import Any, Dict, List, Optional, Tuple, TYPE_CHECKING, Union, Seque
 from typing_extensions import Final
 
 try:
-    import aionotify  # type: ignore
+    import aionotify  # type: ignore[import]
 except (OSError, ModuleNotFoundError):
-    aionotify = None  # type: ignore
+    aionotify = None
 
 from opentrons.drivers.smoothie_drivers import SmoothieDriver
 from opentrons.drivers.rpi_drivers import build_gpio_chardev, usb

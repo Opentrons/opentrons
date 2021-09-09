@@ -18,7 +18,7 @@ from typing import Any, Dict, Optional, Union, List, Tuple
 from math import isclose
 
 from opentrons.drivers.serial_communication import get_ports_by_name
-from serial.serialutil import SerialException  # type: ignore
+from serial.serialutil import SerialException  # type: ignore[import]
 
 from opentrons.drivers.smoothie_drivers.connection import SmoothieConnection
 from opentrons.drivers.smoothie_drivers.constants import (
@@ -1544,7 +1544,7 @@ class SmoothieDriver:
                     and since_moved[ax]  # type: ignore
                     > self._move_split_config[ax].after_time
                 )
-            )  # type: ignore
+            )
         ]
         for axis in axes:
             msc = self._move_split_config.get(axis)

@@ -55,9 +55,9 @@ def _get_locations(
 def _get_instruments(
     command: command_types.HasInstrumentPayload,
 ) -> List[InstrumentContext]:
-    if "instrument" in command:  # type: ignore
+    if "instrument" in command:
         return [cast(command_types.SingleInstrumentPayload, command)["instrument"]]
-    else:  # type: ignore
+    else:
         return [
             inst
             for inst in cast(command_types.MultiInstrumentPayload, command)[

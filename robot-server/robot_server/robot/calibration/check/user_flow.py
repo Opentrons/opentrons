@@ -862,12 +862,12 @@ class CheckCalibrationUserFlow:
         return loc.move(point=Point(0, 0, self._z_height_reference))
 
     async def move_to_reference_point(self):
+        cal_block_target_well: Optional[labware.Well] = None
         if self._has_calibration_block:
             cb_setup = CAL_BLOCK_SETUP_CAL_CHECK
             calblock: labware.Labware = self._deck[cb_setup.slot]  # type: ignore
             cal_block_target_well = calblock.wells_by_name()[cb_setup.well]
-        else:
-            cal_block_target_well = None
+
         ref_loc = uf.get_reference_location(
             deck=self._deck, cal_block_target_well=cal_block_target_well
         )

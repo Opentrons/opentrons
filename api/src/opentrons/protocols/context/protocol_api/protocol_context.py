@@ -1,12 +1,12 @@
 import logging
-from typing import Dict, Optional, Set, List, TYPE_CHECKING
+from typing import Dict, Optional, Set, List, Union, TYPE_CHECKING
 from collections import OrderedDict
 
-from opentrons import types, API
+from opentrons import types
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.config import feature_flags as fflags
 from opentrons.hardware_control.types import DoorState, PauseType
-from opentrons.hardware_control import SynchronousAdapter
+from opentrons.hardware_control import ThreadManager, SynchronousAdapter
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.geometry import module_geometry
@@ -133,7 +133,7 @@ class ProtocolContextImplementation(AbstractProtocol):
         """Access to the hardware manager."""
         return self._hw_manager
 
-    def connect(self, hardware: API) -> None:
+    def connect(self, hardware: Union[ThreadManager, SynchronousAdapter]) -> None:
         """Connect to the hardware."""
         self._hw_manager.set_hw(hardware)
         self._hw_manager.hardware.cache_instruments()

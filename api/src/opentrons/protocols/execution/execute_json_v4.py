@@ -69,7 +69,7 @@ def load_modules_from_json(
     ctx: ProtocolContext, protocol: "JsonProtocolV4"
 ) -> Dict[str, ModuleContext]:
     module_data = protocol["modules"]
-    modules_by_id = {}
+    modules_by_id: Dict[str, ModuleContext] = {}
 
     # the sort order doesn't matter, we just need it to be stable
     # to ensure `load_module` side-effects are deterministic

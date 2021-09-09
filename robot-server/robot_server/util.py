@@ -1,11 +1,12 @@
 import hashlib
 from dataclasses import dataclass
+from fastapi import UploadFile
 from functools import wraps
 from pathlib import Path
-
-from fastapi import UploadFile
-from opentrons.util.helpers import utc_now
+from typing import cast, Any, Awaitable, Callable, TypeVar
 from typing_extensions import Final
+
+from opentrons.util.helpers import utc_now
 
 
 class duration:
@@ -41,8 +42,10 @@ def save_upload(directory: Path, upload_file: UploadFile) -> FileMeta:
 
 CALL_ONCE_RESULT_ATTR: Final = "_call_once_result"
 
+AsyncFuncT = TypeVar("AsyncFuncT", bound=Callable[..., Awaitable[Any]])
 
-def call_once(fn):
+
+def call_once(fn: AsyncFuncT) -> AsyncFuncT:
     """
     Decorator used to ensure an async function is called only once. Subsequent
      calls will return the result of ths initial call regardless of arguments.
@@ -60,4 +63,4 @@ def call_once(fn):
 
         return getattr(wrapped, CALL_ONCE_RESULT_ATTR)
 
-    return wrapped
+    return cast(AsyncFuncT, wrapped)

@@ -225,7 +225,7 @@ def _move_to_slot(
 
     pipette.move_to(
         slot_obj.move(offsetPoint),
-        force_direct=params.get("forceDirect"),
+        force_direct=params.get("forceDirect", False),
         minimum_z_height=params.get("minimumZHeight"),
     )
 
