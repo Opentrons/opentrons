@@ -9,6 +9,7 @@ import {
   Icon,
   BaseModal,
   PrimaryBtn,
+  SPACING_2,
   SPACING_3,
   SIZE_4,
   C_BLUE,
@@ -60,7 +61,9 @@ export function DeckCalibration(props: Props): JSX.Element | null {
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
       >
-        <Text css={FONT_HEADER_THIN}>{`${t('deck_calibration_title')}`}</Text>
+        <Text css={FONT_HEADER_THIN} paddingBottom={SPACING_2}>{`${t(
+          'deck_calibration_title'
+        )}`}</Text>
         <Link
           onClick={() => setHelpModalIsOpen(true)}
           color={C_BLUE}

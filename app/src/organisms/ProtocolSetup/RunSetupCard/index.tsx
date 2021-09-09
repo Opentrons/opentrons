@@ -21,6 +21,16 @@ import { RobotCalibration } from './RobotCalibration'
 import type { JsonProtocolFile } from '@opentrons/shared-data'
 import type { State } from '../../../redux/types'
 import { getConnectedRobot } from '../../../redux/discovery/selectors'
+import { getProtocolCalibrationComplete } from '../../../redux/calibration/selectors'
+
+const ROBOT_CALIBRATION_STEP_KEY = 'robot_calibration_step' as const
+const MODULE_SETUP_KEY = 'module_setup_step' as const
+const LABWARE_SETUP_KEY = 'labware_setup_step' as const
+
+export type StepKey =
+  | typeof ROBOT_CALIBRATION_STEP_KEY
+  | typeof MODULE_SETUP_KEY
+  | typeof LABWARE_SETUP_KEY
 
 export function RunSetupCard(): JSX.Element | null {
   const { t } = useTranslation('protocol_setup')
@@ -35,15 +45,6 @@ export function RunSetupCard(): JSX.Element | null {
   )
   const robot = useSelector((state: State) => getConnectedRobot(state))
 
-  const ROBOT_CALIBRATION_STEP_KEY = 'robot_calibration_step' as const
-  const LABWARE_SETUP_KEY = 'labware_setup_step' as const
-  const MODULE_SETUP_KEY = 'module_setup_step' as const
-
-  type StepKey =
-    | typeof ROBOT_CALIBRATION_STEP_KEY
-    | typeof MODULE_SETUP_KEY
-    | typeof LABWARE_SETUP_KEY
-
   const [expandedStepKey, setExpandedStepKey] = React.useState<StepKey | null>(
     ROBOT_CALIBRATION_STEP_KEY
   )
@@ -53,6 +54,10 @@ export function RunSetupCard(): JSX.Element | null {
     ('metadata' in protocolData && Object.keys(protocolData).length === 1)
   )
     return null
+
+  const calibrationStatus = useSelector((state: State) => {
+    return getProtocolCalibrationComplete(state, robot?.name)
+  })
 
   let stepsKeysInOrder: StepKey[] = [ROBOT_CALIBRATION_STEP_KEY]
   if (protocolHasModules(protocolData as JsonProtocolFile)) {
@@ -70,7 +75,14 @@ export function RunSetupCard(): JSX.Element | null {
     { stepInternals: JSX.Element; description: string }
   > = {
     [ROBOT_CALIBRATION_STEP_KEY]: {
-      stepInternals: <RobotCalibration robot={robot} />,
+      stepInternals: (
+        <RobotCalibration
+          robot={robot}
+          nextStep={stepsKeysInOrder[1]}
+          expandNextStep={nextStep => setExpandedStepKey(nextStep)}
+          calibrationStatus={calibrationStatus}
+        />
+      ),
       description: t(`${ROBOT_CALIBRATION_STEP_KEY}_description`),
     },
     [MODULE_SETUP_KEY]: {
@@ -120,6 +132,10 @@ export function RunSetupCard(): JSX.Element | null {
               stepKey === expandedStepKey
                 ? setExpandedStepKey(null)
                 : setExpandedStepKey(stepKey)
+            }
+            calibrationRequired={
+              stepKey === ROBOT_CALIBRATION_STEP_KEY &&
+              !calibrationStatus.complete
             }
           >
             {StepDetailMap[stepKey].stepInternals}
