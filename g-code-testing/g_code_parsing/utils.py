@@ -31,7 +31,7 @@ def reverse_enum(
     return dict(zip(values, members))
 
 
-def get_configuration_dir():
+def get_configuration_dir() -> str:
     return os.path.normpath(
-        os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "test_data")
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "g_code_test_data")
     )

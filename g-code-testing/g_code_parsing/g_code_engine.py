@@ -139,7 +139,7 @@ class ProtocolGCodeEngine(GCodeEngine):
 class HTTPGCodeEngine(GCodeEngine):
     def _get_func(self, input_str):
         formatted_config_path = os.path.splitext(input_str)[0].replace("/", ".")
-        module_string = f"test_data.{formatted_config_path}"
+        module_string = f"g_code_test_data.{formatted_config_path}"
         module = import_module(module_string)
         return module.main()
 
