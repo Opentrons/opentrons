@@ -1,62 +1,62 @@
 [
-    {
-      "name": "http_move_left_pipette",
-      "path": "http/robot/move/left_pipette.py",
-      "driver": "http"
-    },
-    {
-      "name":  "http_move_right_pipette",
-      "path":  "http/robot/move/right_pipette.py",
-      "driver":  "http"
-    },
-    {
-      "name":  "http_move_left_mount",
-      "path":  "http/robot/move/left_mount.py",
-      "driver":  "http"
-    },
-    {
-      "name":  "http_move_right_mount",
-      "path":  "http/robot/move/right_mount.py",
-      "driver":  "http"
-    },
-    {
-      "name":  "http_home_robot",
-      "path":  "http/robot/home/robot.py",
-      "driver":  "http"
-    },
-    {
-      "name":  "http_home_left_pipette",
-      "path":  "http/robot/home/pipette/left_pipette.py",
-      "driver":  "http"
-    },
-    {
-      "name":  "http_home_right_pipette",
-      "path":  "http/robot/home/pipette/right_pipette.py",
-      "driver":  "http"
-    },
-    {
-      "name":  "protocol_2_modules",
-      "path": "protocols/2_modules_1s_1m_v2.py",
-      "driver": "protocol"
-    },
-    {
-      "name":  "protocol_2_single_channel",
-      "path":  "protocols/2_single_channel_v2.py",
-      "driver": "protocol"
-    },
-    {
-      "name":  "protocol_smoothie",
-      "path":  "protocols/smoothie_protocol.py",
-      "driver": "protocol"
-    },
-    {
-      "name":  "protocol_swift_smoke",
-      "path":  "protocols/swift_smoke.py",
-      "driver": "protocol"
-    },
-    {
-      "name":  "protocol_swift_turbo",
-      "path":  "protocols/swift_turbo.py",
-      "driver": "protocol"
-    }
-  ]
+  {
+    "name": "http_move_left_pipette",
+    "path": "http/robot/move/left_pipette.py",
+    "driver": "http"
+  },
+  {
+    "name": "http_move_right_pipette",
+    "path": "http/robot/move/right_pipette.py",
+    "driver": "http"
+  },
+  {
+    "name": "http_move_left_mount",
+    "path": "http/robot/move/left_mount.py",
+    "driver": "http"
+  },
+  {
+    "name": "http_move_right_mount",
+    "path": "http/robot/move/right_mount.py",
+    "driver": "http"
+  },
+  {
+    "name": "http_home_robot",
+    "path": "http/robot/home/robot.py",
+    "driver": "http"
+  },
+  {
+    "name": "http_home_left_pipette",
+    "path": "http/robot/home/pipette/left_pipette.py",
+    "driver": "http"
+  },
+  {
+    "name": "http_home_right_pipette",
+    "path": "http/robot/home/pipette/right_pipette.py",
+    "driver": "http"
+  },
+  {
+    "name": "protocol_2_modules",
+    "path": "protocols/2_modules_1s_1m_v2.py",
+    "driver": "protocol"
+  },
+  {
+    "name": "protocol_2_single_channel",
+    "path": "protocols/2_single_channel_v2.py",
+    "driver": "protocol"
+  },
+  {
+    "name": "protocol_smoothie",
+    "path": "protocols/smoothie_protocol.py",
+    "driver": "protocol"
+  },
+  {
+    "name": "protocol_swift_smoke",
+    "path": "protocols/swift_smoke.py",
+    "driver": "protocol"
+  },
+  {
+    "name": "protocol_swift_turbo",
+    "path": "protocols/swift_turbo.py",
+    "driver": "protocol"
+  }
+]
