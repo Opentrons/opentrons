@@ -229,9 +229,7 @@ describe('labware directory utilities', () => {
       const filename = path.join(dir, 'foo.json')
       const setup = fs.writeJson(filename, { name: 'a' })
 
-      trashItem.mockImplementation(_ =>
-        Promise.reject(Error('something went wrong'))
-      )
+      trashItem.mockRejectedValue(Error('something went wrong'))
 
       return setup
         .then(() => removeLabwareFile(filename))
