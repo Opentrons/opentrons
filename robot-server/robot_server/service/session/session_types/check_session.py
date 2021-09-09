@@ -72,6 +72,8 @@ class CheckSession(BaseSession):
             calibration_check = CheckCalibrationUserFlow(
                 configuration.hardware,
                 has_calibration_block=has_calibration_block,
+                # TODO(mc, 2021-09-09): convert to an explicit clone if necessary,
+                # otherwise remove redundant list comprehension
                 tip_rack_defs=[rack for rack in tip_racks],
             )
         except AssertionError as e:
