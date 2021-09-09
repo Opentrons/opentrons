@@ -19,6 +19,7 @@ from g_code_parsing.g_code_program.supported_text_modes import (
     SupportedTextModes,
 )
 from g_code_parsing.g_code_engine import HTTPGCodeEngine, ProtocolGCodeEngine
+from g_code_parsing.g_code_test_data import TestFile, ValidDriverTypes
 from g_code_parsing.utils import get_configuration_dir
 
 
@@ -40,7 +41,7 @@ class CLICommand(abc.ABC):
 class RunCommand(CLICommand):
     """The "run" command of the CLI."""
 
-    configuration_path: str
+    configuration_name: str
     text_mode: str
     left_pipette_config: PipetteSettings
     right_pipette_config: PipetteSettings
@@ -56,13 +57,15 @@ class RunCommand(CLICommand):
         )
         settings = Settings(smoothie=smoothie_settings, host=self.host)
 
-        if self.configuration_path.startswith("protocols"):
+        configuration = TestFile.from_config_file().get_by_name(self.configuration_name)
+
+        if configuration.driver == ValidDriverTypes.PROTOCOL.value:
             engine = ProtocolGCodeEngine(settings)
 
-        elif self.configuration_path.startswith("http"):
+        if configuration.driver == ValidDriverTypes.HTTP.value:
             engine = HTTPGCodeEngine(settings)
 
-        with engine.run(self.configuration_path) as program:
+        with engine.run(configuration.path) as program:
             return program.get_text_explanation(self.text_mode)
 
 
@@ -103,17 +106,7 @@ class DiffCommand(CLICommand):
 
 class ConfigurationCommand(CLICommand):
     def execute(self) -> str:
-        paths = [
-            os.path.join(root, name).replace(self.CONFIGURATION_DIR_LOCATION + "/", "")
-            for root, dirs, files in os.walk(
-                self.CONFIGURATION_DIR_LOCATION, topdown=False
-            )
-            for name in files
-            if name not in ["__init__.py"]
-        ]
-
-        path_string = "\n".join(paths)
-
+        path_string = "\n".join(TestFile.from_config_file().names)
         return f"Runnable Configurations:\n{path_string}"
 
 
@@ -127,7 +120,7 @@ class GCodeCLI:
     COMMAND_KEY = "command"
 
     RUN_PROTOCOL_COMMAND = "run"
-    CONFIGURATION_PATH = "configuration_path"
+    CONFIGURATION_PATH = "configuration_name"
     TEXT_MODE_KEY_NAME = "text_mode"
     LEFT_PIPETTE_KEY_NAME = "left_pipette"
     RIGHT_PIPETTE_KEY_NAME = "right_pipette"
@@ -175,7 +168,7 @@ class GCodeCLI:
         command: Union[RunCommand, DiffCommand, ConfigurationCommand]
         if cls.RUN_PROTOCOL_COMMAND == passed_command_name:
             command = RunCommand(
-                configuration_path=processed_args[cls.CONFIGURATION_PATH],
+                configuration_name=processed_args[cls.CONFIGURATION_PATH],
                 text_mode=processed_args[cls.TEXT_MODE_KEY_NAME],
                 left_pipette_config=processed_args[cls.LEFT_PIPETTE_KEY_NAME],
                 right_pipette_config=processed_args[cls.RIGHT_PIPETTE_KEY_NAME],
@@ -241,7 +234,7 @@ class GCodeCLI:
             formatter_class=argparse.RawTextHelpFormatter,
         )
         run_parser.add_argument(
-            "configuration_path", type=str, help="Path to configuration you want to run"
+            "configuration_name", type=str, help="Name of configuration you want to run"
         )
         run_parser.add_argument(
             "--text-mode",
