@@ -35,3 +35,7 @@ def get_configuration_dir() -> str:
     return os.path.normpath(
         os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "g_code_test_data")
     )
+
+
+def get_configuration_file_path() -> str:
+    return os.path.join(get_configuration_dir(), 'configurations.json')
