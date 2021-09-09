@@ -1,6 +1,5 @@
 """Session router dependency-injection wire-up."""
 from fastapi import Depends
-from starlette.datastructures import State
 
 from opentrons.hardware_control import API as HardwareAPI
 
@@ -27,7 +26,7 @@ def get_session_store(app_state: AppState = Depends(get_app_state)) -> SessionSt
 
 
 def get_engine_store(
-    app_state: State = Depends(get_app_state),
+    app_state: AppState = Depends(get_app_state),
     hardware_api: HardwareAPI = Depends(get_hardware),
 ) -> EngineStore:
     """Get a singleton EngineStore to keep track of created engines / runners."""
