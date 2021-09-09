@@ -120,7 +120,7 @@ class GCodeCLI:
     COMMAND_KEY = "command"
 
     RUN_PROTOCOL_COMMAND = "run"
-    CONFIGURATION_PATH = "configuration_name"
+    CONFIGURATION_NAME = "configuration_name"
     TEXT_MODE_KEY_NAME = "text_mode"
     LEFT_PIPETTE_KEY_NAME = "left_pipette"
     RIGHT_PIPETTE_KEY_NAME = "right_pipette"
@@ -168,7 +168,7 @@ class GCodeCLI:
         command: Union[RunCommand, DiffCommand, ConfigurationCommand]
         if cls.RUN_PROTOCOL_COMMAND == passed_command_name:
             command = RunCommand(
-                configuration_name=processed_args[cls.CONFIGURATION_PATH],
+                configuration_name=processed_args[cls.CONFIGURATION_NAME],
                 text_mode=processed_args[cls.TEXT_MODE_KEY_NAME],
                 left_pipette_config=processed_args[cls.LEFT_PIPETTE_KEY_NAME],
                 right_pipette_config=processed_args[cls.RIGHT_PIPETTE_KEY_NAME],
