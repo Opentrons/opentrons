@@ -42,6 +42,10 @@ class TimerEntry:
     duration: float
 
 
+# TODO (al, 2021-09-09): Write doc strings for each method detailing how the
+#  duration is computed.
+
+
 class DurationEstimator:
     """
     Broker listener that calculates the duration of protocol steps.
@@ -124,7 +128,7 @@ class DurationEstimator:
             The duration in seconds
         """
         duration = 0.0
-        # TODO (al 2021-09-09):
+        # TODO (al, 2021-09-09):
         #  - Make this into a map
         #  - Remove "# noqa: C901"
         #  - type the payload in the on_X methods.
