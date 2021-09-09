@@ -7,13 +7,13 @@ from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import DeckSlotName
 
 from opentrons.protocol_engine.resources import DeckFixedLabware
-from opentrons.protocol_engine.types import DeckSlotLocation
-from opentrons.protocol_engine.state.actions import UpdateCommandAction
-from opentrons.protocol_engine.state.labware import (
-    LabwareStore,
-    LabwareState,
-    LabwareData,
+from opentrons.protocol_engine.types import (
+    CalibrationOffset,
+    DeckSlotLocation,
+    LoadedLabware,
 )
+from opentrons.protocol_engine.state.actions import UpdateCommandAction
+from opentrons.protocol_engine.state.labware import LabwareStore, LabwareState
 
 from .command_fixtures import create_load_labware_command, create_add_definition_command
 
@@ -48,18 +48,18 @@ def test_initial_state(
         load_name=fixed_trash_def.parameters.loadName,
     )
 
-    # TODO(mc, 2021-06-02): usage of ._state over .state is temporary
-    # until store.state returns the state instead of a state view
-    assert subject._state == LabwareState(
+    assert subject.state == LabwareState(
         deck_definition=standard_deck_def,
         labware_by_id={
-            "fixedTrash": LabwareData(
+            "fixedTrash": LoadedLabware(
+                id="fixedTrash",
+                loadName=fixed_trash_def.parameters.loadName,
+                definitionUri=expected_trash_uri,
                 location=DeckSlotLocation(slot=DeckSlotName.FIXED_TRASH),
-                uri=expected_trash_uri,
-                calibration=(0, 0, 0),
             )
         },
-        labware_definitions_by_uri={expected_trash_uri: fixed_trash_def},
+        calibrations_by_id={"fixedTrash": CalibrationOffset(x=0, y=0, z=0)},
+        definitions_by_uri={expected_trash_uri: fixed_trash_def},
     )
 
 
@@ -72,7 +72,7 @@ def test_handles_load_labware(
         location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
         labware_id="test-labware-id",
         definition=well_plate_def,
-        calibration=(1, 2, 3),
+        calibration=CalibrationOffset(x=1, y=2, z=3),
     )
 
     expected_definition_uri = uri_from_details(
@@ -81,20 +81,21 @@ def test_handles_load_labware(
         version=well_plate_def.version,
     )
 
-    expected_labware_data = LabwareData(
-        uri=expected_definition_uri,
+    expected_labware_data = LoadedLabware(
+        id="test-labware-id",
+        loadName=well_plate_def.parameters.loadName,
+        definitionUri=expected_definition_uri,
         location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
-        calibration=(1, 2, 3),
     )
 
     subject.handle_action(UpdateCommandAction(command=command))
 
-    # TODO(mc, 2021-06-02): usage of ._state over .state is temporary
-    # until store.state returns the state instead of a state view
-    assert subject._state.labware_by_id["test-labware-id"] == expected_labware_data
-    assert (
-        subject._state.labware_definitions_by_uri[expected_definition_uri]
-        == well_plate_def
+    assert subject.state.labware_by_id["test-labware-id"] == expected_labware_data
+
+    assert subject.state.definitions_by_uri[expected_definition_uri] == well_plate_def
+
+    assert subject.state.calibrations_by_id["test-labware-id"] == CalibrationOffset(
+        x=1, y=2, z=3
     )
 
 
@@ -112,6 +113,4 @@ def test_handles_add_labware_defintion(
 
     subject.handle_action(UpdateCommandAction(command=command))
 
-    # TODO(mc, 2021-06-02): usage of ._state over .state is temporary
-    # until store.state returns the state instead of a state view
-    assert subject._state.labware_definitions_by_uri[expected_uri] == well_plate_def
+    assert subject.state.definitions_by_uri[expected_uri] == well_plate_def

@@ -7,8 +7,7 @@ from opentrons.hardware_control import API as HardwareAPI
 from opentrons.protocols.geometry.deck import FIXED_TRASH_ID
 
 from opentrons.protocol_engine import ProtocolEngine, create_protocol_engine
-from opentrons.protocol_engine.types import DeckSlotLocation
-from opentrons.protocol_engine.state import LabwareData
+from opentrons.protocol_engine.types import DeckSlotLocation, LoadedLabware
 
 
 async def test_create_engine_initializes_state_with_deck_geometry(
@@ -22,12 +21,15 @@ async def test_create_engine_initializes_state_with_deck_geometry(
 
     assert isinstance(engine, ProtocolEngine)
     assert state.labware.get_deck_definition() == standard_deck_def
-    assert state.labware.get_labware_data_by_id(FIXED_TRASH_ID) == LabwareData(
-        location=DeckSlotLocation(slot=DeckSlotName.FIXED_TRASH),
-        uri=uri_from_details(
-            load_name=fixed_trash_def.parameters.loadName,
-            namespace=fixed_trash_def.namespace,
-            version=fixed_trash_def.version,
-        ),
-        calibration=(0, 0, 0),
-    )
+    assert state.labware.get_all() == [
+        LoadedLabware(
+            id=FIXED_TRASH_ID,
+            loadName=fixed_trash_def.parameters.loadName,
+            definitionUri=uri_from_details(
+                load_name=fixed_trash_def.parameters.loadName,
+                namespace=fixed_trash_def.namespace,
+                version=fixed_trash_def.version,
+            ),
+            location=DeckSlotLocation(slot=DeckSlotName.FIXED_TRASH),
+        )
+    ]

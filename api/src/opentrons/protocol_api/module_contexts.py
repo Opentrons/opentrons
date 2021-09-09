@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from typing import Generic, List, Optional, TYPE_CHECKING, TypeVar, Union
+from typing import Generic, List, Optional, TYPE_CHECKING, TypeVar, Union, cast
 
 from opentrons import types
 from opentrons.hardware_control import modules
@@ -475,17 +475,9 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
             instr.move_to(types.Location(safe_point, None), force_direct=True)
 
     def flag_unsafe_move(self, to_loc: types.Location, from_loc: types.Location):
-        to_lw, to_well = to_loc.labware.get_parent_labware_and_well()
-        from_lw, from_well = from_loc.labware.get_parent_labware_and_well()
-        if (
-            self.labware is not None
-            and (self.labware == to_lw or self.labware == from_lw)
-            and self.lid_position != "open"
-        ):
-            raise RuntimeError(
-                "Cannot move to labware loaded in Thermocycler"
-                " when lid is not fully open."
-            )
+        cast(ThermocyclerGeometry, self.geometry).flag_unsafe_move(
+            to_loc, from_loc, self.lid_position
+        )
 
     @publish(command=cmds.thermocycler_open)
     @requires_version(2, 0)

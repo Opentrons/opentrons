@@ -3,8 +3,8 @@ from __future__ import annotations
 
 import re
 from collections import defaultdict
-from dataclasses import dataclass
-from typing import Dict, List, Sequence, Tuple
+from dataclasses import dataclass, replace
+from typing import Dict, List, Sequence
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV2, SlotDefV2
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
@@ -17,26 +17,18 @@ from opentrons.calibration_storage.helpers import uri_from_details
 from .. import errors
 from ..resources import DeckFixedLabware
 from ..commands import Command, LoadLabwareResult, AddLabwareDefinitionResult
-from ..types import LabwareLocation, Dimensions
+from ..types import CalibrationOffset, LabwareLocation, LoadedLabware, Dimensions
 from .actions import Action, UpdateCommandAction
 from .abstract_store import HasState, HandlesActions
-
-
-@dataclass(frozen=True)
-class LabwareData:
-    """Labware data entry."""
-
-    location: LabwareLocation
-    uri: LabwareUri
-    calibration: Tuple[float, float, float]
 
 
 @dataclass(frozen=True)
 class LabwareState:
     """State of all loaded labware resources."""
 
-    labware_by_id: Dict[str, LabwareData]
-    labware_definitions_by_uri: Dict[str, LabwareDefinition]
+    labware_by_id: Dict[str, LoadedLabware]
+    calibrations_by_id: Dict[str, CalibrationOffset]
+    definitions_by_uri: Dict[str, LabwareDefinition]
     deck_definition: DeckDefinitionV2
 
 
@@ -51,7 +43,7 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
         deck_fixed_labware: Sequence[DeckFixedLabware],
     ) -> None:
         """Initialize a labware store and its state."""
-        labware_definitions_by_uri: Dict[str, LabwareDefinition] = {
+        definitions_by_uri: Dict[str, LabwareDefinition] = {
             uri_from_details(
                 load_name=fixed_labware.definition.parameters.loadName,
                 namespace=fixed_labware.definition.namespace,
@@ -60,20 +52,26 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
             for fixed_labware in deck_fixed_labware
         }
         labware_by_id = {
-            fixed_labware.labware_id: LabwareData(
+            fixed_labware.labware_id: LoadedLabware(
+                id=fixed_labware.labware_id,
                 location=fixed_labware.location,
-                uri=uri_from_details(
+                loadName=fixed_labware.definition.parameters.loadName,
+                definitionUri=uri_from_details(
                     load_name=fixed_labware.definition.parameters.loadName,
                     namespace=fixed_labware.definition.namespace,
                     version=fixed_labware.definition.version,
                 ),
-                calibration=(0, 0, 0),
             )
+            for fixed_labware in deck_fixed_labware
+        }
+        calibrations_by_id = {
+            fixed_labware.labware_id: CalibrationOffset(x=0, y=0, z=0)
             for fixed_labware in deck_fixed_labware
         }
 
         self._state = LabwareState(
-            labware_definitions_by_uri=labware_definitions_by_uri,
+            definitions_by_uri=definitions_by_uri,
+            calibrations_by_id=calibrations_by_id,
             labware_by_id=labware_by_id,
             deck_definition=deck_definition,
         )
@@ -86,24 +84,41 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
     def _handle_command(self, command: Command) -> None:
         """Modify state in reaction to a command."""
         if isinstance(command.result, LoadLabwareResult):
-            uri = uri_from_details(
+            labware_id = command.result.labwareId
+            definition_uri = uri_from_details(
                 namespace=command.result.definition.namespace,
                 load_name=command.result.definition.parameters.loadName,
                 version=command.result.definition.version,
             )
-            self._state.labware_definitions_by_uri[uri] = command.result.definition
-            self._state.labware_by_id[command.result.labwareId] = LabwareData(
+            labware_by_id = self._state.labware_by_id.copy()
+            calibrations_by_id = self._state.calibrations_by_id.copy()
+            definitions_by_uri = self._state.definitions_by_uri.copy()
+
+            definitions_by_uri[definition_uri] = command.result.definition
+            calibrations_by_id[labware_id] = command.result.calibration
+            labware_by_id[labware_id] = LoadedLabware(
+                id=labware_id,
                 location=command.data.location,
-                uri=uri,
-                calibration=command.result.calibration,
+                loadName=command.result.definition.parameters.loadName,
+                definitionUri=definition_uri,
             )
+
+            self._state = replace(
+                self._state,
+                labware_by_id=labware_by_id,
+                calibrations_by_id=calibrations_by_id,
+                definitions_by_uri=definitions_by_uri,
+            )
+
         elif isinstance(command.result, AddLabwareDefinitionResult):
-            uri = uri_from_details(
+            definition_uri = uri_from_details(
                 namespace=command.result.namespace,
                 load_name=command.result.loadName,
                 version=command.result.version,
             )
-            self._state.labware_definitions_by_uri[uri] = command.data.definition
+            definitions_by_uri = self._state.definitions_by_uri.copy()
+            definitions_by_uri[definition_uri] = command.data.definition
+            self._state = replace(self._state, definitions_by_uri=definitions_by_uri)
 
 
 class LabwareView(HasState[LabwareState]):
@@ -119,16 +134,18 @@ class LabwareView(HasState[LabwareState]):
         """
         self._state = state
 
-    def get_labware_data_by_id(self, labware_id: str) -> LabwareData:
+    def get(self, labware_id: str) -> LoadedLabware:
         """Get labware data by the labware's unique identifier."""
         try:
             return self._state.labware_by_id[labware_id]
         except KeyError:
             raise errors.LabwareDoesNotExistError(f"Labware {labware_id} not found.")
 
-    def get_labware_definition(self, labware_id: str) -> LabwareDefinition:
+    def get_definition(self, labware_id: str) -> LabwareDefinition:
         """Get labware definition by the labware's unique identifier."""
-        return self.get_definition_by_uri(self.get_labware_data_by_id(labware_id).uri)
+        return self.get_definition_by_uri(
+            LabwareUri(self.get(labware_id).definitionUri)
+        )
 
     def get_deck_definition(self) -> DeckDefinitionV2:
         """Get the current deck definition."""
@@ -156,27 +173,27 @@ class LabwareView(HasState[LabwareState]):
     def get_definition_by_uri(self, uri: LabwareUri) -> LabwareDefinition:
         """Get the labware definition matching loadName namespace and version."""
         try:
-            return self._state.labware_definitions_by_uri[uri]
+            return self._state.definitions_by_uri[uri]
         except KeyError:
             raise errors.LabwareDefinitionDoesNotExistError(
                 f"Labware definition for matching {uri} not found."
             )
 
-    def get_labware_location(self, labware_id: str) -> LabwareLocation:
+    def get_location(self, labware_id: str) -> LabwareLocation:
         """Get labware location by the labware's unique identifier."""
-        return self.get_labware_data_by_id(labware_id).location
+        return self.get(labware_id).location
 
-    def get_all_labware(self) -> List[Tuple[str, LabwareData]]:
+    def get_all(self) -> List[LoadedLabware]:
         """Get a list of all labware entries in state."""
-        return [entry for entry in self._state.labware_by_id.items()]
+        return list(self._state.labware_by_id.values())
 
-    def get_labware_has_quirk(self, labware_id: str, quirk: str) -> bool:
+    def get_has_quirk(self, labware_id: str, quirk: str) -> bool:
         """Get if a labware has a certain quirk."""
         return quirk in self.get_quirks(labware_id=labware_id)
 
     def get_quirks(self, labware_id: str) -> List[str]:
         """Get a labware's quirks."""
-        definition = self.get_labware_definition(labware_id)
+        definition = self.get_definition(labware_id)
         return definition.parameters.quirks or []
 
     def get_well_definition(
@@ -185,7 +202,7 @@ class LabwareView(HasState[LabwareState]):
         well_name: str,
     ) -> WellDefinition:
         """Get a well's definition by labware and well identifier."""
-        definition = self.get_labware_definition(labware_id)
+        definition = self.get_definition(labware_id)
 
         try:
             return definition.wells[well_name]
@@ -196,7 +213,7 @@ class LabwareView(HasState[LabwareState]):
 
     def get_wells(self, labware_id: str) -> List[str]:
         """Get labware wells as a list of well names."""
-        definition = self.get_labware_definition(labware_id=labware_id)
+        definition = self.get_definition(labware_id=labware_id)
         wells = list()
         for col in definition.ordering:
             for well_name in col:
@@ -205,7 +222,7 @@ class LabwareView(HasState[LabwareState]):
 
     def get_well_columns(self, labware_id: str) -> Dict[str, List[str]]:
         """Get well columns."""
-        definition = self.get_labware_definition(labware_id=labware_id)
+        definition = self.get_definition(labware_id=labware_id)
         wells_by_cols = defaultdict(list)
         for i, col in enumerate(definition.ordering):
             wells_by_cols[f"{i+1}"] = col
@@ -213,7 +230,7 @@ class LabwareView(HasState[LabwareState]):
 
     def get_well_rows(self, labware_id: str) -> Dict[str, List[str]]:
         """Get well rows."""
-        definition = self.get_labware_definition(labware_id=labware_id)
+        definition = self.get_definition(labware_id=labware_id)
         wells_by_rows = defaultdict(list)
         pattern = re.compile(WELL_NAME_PATTERN, re.X)
         for col in definition.ordering:
@@ -225,7 +242,7 @@ class LabwareView(HasState[LabwareState]):
 
     def get_tip_length(self, labware_id: str) -> float:
         """Get the tip length of a tip rack."""
-        definition = self.get_labware_definition(labware_id)
+        definition = self.get_definition(labware_id)
         if definition.parameters.tipLength is None:
             raise errors.LabwareIsNotTipRackError(
                 f"Labware {labware_id} has no tip length defined."
@@ -234,21 +251,21 @@ class LabwareView(HasState[LabwareState]):
 
     def get_definition_uri(self, labware_id: str) -> str:
         """Get a labware's definition URI."""
-        return self.get_labware_data_by_id(labware_id).uri
+        return self.get(labware_id).definitionUri
 
     def is_tiprack(self, labware_id: str) -> bool:
         """Get whether labware is a tiprack."""
-        definition = self.get_labware_definition(labware_id)
+        definition = self.get_definition(labware_id)
         return definition.parameters.isTiprack
 
     def get_load_name(self, labware_id: str) -> str:
         """Get the labware's load name."""
-        definition = self.get_labware_definition(labware_id)
+        definition = self.get_definition(labware_id)
         return definition.parameters.loadName
 
     def get_dimensions(self, labware_id: str) -> Dimensions:
         """Get the labware's dimensions."""
-        definition = self.get_labware_definition(labware_id)
+        definition = self.get_definition(labware_id)
         dims = definition.dimensions
 
         return Dimensions(
@@ -256,3 +273,10 @@ class LabwareView(HasState[LabwareState]):
             y=dims.yDimension,
             z=dims.zDimension,
         )
+
+    def get_calibration_offset(self, labware_id: str) -> CalibrationOffset:
+        """Get the labware's calibration offset."""
+        try:
+            return self._state.calibrations_by_id[labware_id]
+        except KeyError:
+            raise errors.LabwareDoesNotExistError(f"Labware {labware_id} not found.")
