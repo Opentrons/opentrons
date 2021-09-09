@@ -15,7 +15,7 @@ from g_code_parsing.g_code_program.supported_text_modes import (
 )
 
 
-VALIDATION_PROTOCOL_PATH = os.path.join("protocols", "smoothie_protocol.py")
+VALIDATION_PROTOCOL_NAME = "protocol_smoothie"
 DEFAULT_LEFT_PIPETTE = SmoothieSettings().left
 DEFAULT_RIGHT_PIPETTE = SmoothieSettings().right
 
@@ -39,17 +39,17 @@ def setup_different_files():
 
 def run_cli_inputs():
     return [
-        ["run", VALIDATION_PROTOCOL_PATH],
-        ["run", VALIDATION_PROTOCOL_PATH, "--text-mode", "Default"],
+        ["run", VALIDATION_PROTOCOL_NAME],
+        ["run", VALIDATION_PROTOCOL_NAME, "--text-mode", "Default"],
         [
             "run",
-            VALIDATION_PROTOCOL_PATH,
+            VALIDATION_PROTOCOL_NAME,
             "--left-pipette",
             '{"model": "p20_single_v2.0", "id": "P20SV202020070101"}',
         ],
         [
             "run",
-            VALIDATION_PROTOCOL_PATH,
+            VALIDATION_PROTOCOL_NAME,
             "--right-pipette",
             '{"model": "p20_multi_v2.0", "id": "P3HMV202020041605"}',
         ],
@@ -64,28 +64,28 @@ def run_expected_args():
     return [
         {
             "command": "run",
-            "configuration_path": VALIDATION_PROTOCOL_PATH,
+            "configuration_name": VALIDATION_PROTOCOL_NAME,
             "text_mode": SupportedTextModes.CONCISE.value,
             "left_pipette": DEFAULT_LEFT_PIPETTE,
             "right_pipette": DEFAULT_RIGHT_PIPETTE,
         },
         {
             "command": "run",
-            "configuration_path": VALIDATION_PROTOCOL_PATH,
+            "configuration_name": VALIDATION_PROTOCOL_NAME,
             "text_mode": SupportedTextModes.DEFAULT.value,
             "left_pipette": DEFAULT_LEFT_PIPETTE,
             "right_pipette": DEFAULT_RIGHT_PIPETTE,
         },
         {
             "command": "run",
-            "configuration_path": VALIDATION_PROTOCOL_PATH,
+            "configuration_name": VALIDATION_PROTOCOL_NAME,
             "text_mode": SupportedTextModes.CONCISE.value,
             "left_pipette": DEFAULT_RIGHT_PIPETTE,
             "right_pipette": DEFAULT_RIGHT_PIPETTE,
         },
         {
             "command": "run",
-            "configuration_path": VALIDATION_PROTOCOL_PATH,
+            "configuration_name": VALIDATION_PROTOCOL_NAME,
             "text_mode": SupportedTextModes.CONCISE.value,
             "left_pipette": DEFAULT_LEFT_PIPETTE,
             "right_pipette": DEFAULT_LEFT_PIPETTE,
@@ -107,25 +107,25 @@ def diff_expected_args():
 def run_expected_commands() -> List[RunCommand]:
     return [
         RunCommand(
-            configuration_path=VALIDATION_PROTOCOL_PATH,
+            configuration_name=VALIDATION_PROTOCOL_NAME,
             text_mode=SupportedTextModes.CONCISE.value,
             left_pipette_config=DEFAULT_LEFT_PIPETTE,
             right_pipette_config=DEFAULT_RIGHT_PIPETTE,
         ),
         RunCommand(
-            configuration_path=VALIDATION_PROTOCOL_PATH,
+            configuration_name=VALIDATION_PROTOCOL_NAME,
             text_mode=SupportedTextModes.DEFAULT.value,
             left_pipette_config=DEFAULT_LEFT_PIPETTE,
             right_pipette_config=DEFAULT_RIGHT_PIPETTE,
         ),
         RunCommand(
-            configuration_path=VALIDATION_PROTOCOL_PATH,
+            configuration_name=VALIDATION_PROTOCOL_NAME,
             text_mode=SupportedTextModes.CONCISE.value,
             left_pipette_config=DEFAULT_RIGHT_PIPETTE,
             right_pipette_config=DEFAULT_RIGHT_PIPETTE,
         ),
         RunCommand(
-            configuration_path=VALIDATION_PROTOCOL_PATH,
+            configuration_name=VALIDATION_PROTOCOL_NAME,
             text_mode=SupportedTextModes.CONCISE.value,
             left_pipette_config=DEFAULT_LEFT_PIPETTE,
             right_pipette_config=DEFAULT_LEFT_PIPETTE,
@@ -146,7 +146,7 @@ def diff_expected_command():
 @pytest.fixture
 def run_command() -> RunCommand:
     return RunCommand(
-        configuration_path=VALIDATION_PROTOCOL_PATH,
+        configuration_name=VALIDATION_PROTOCOL_NAME,
         text_mode=SupportedTextModes.CONCISE.value,
         left_pipette_config=DEFAULT_RIGHT_PIPETTE,
         right_pipette_config=DEFAULT_RIGHT_PIPETTE,
