@@ -6,10 +6,10 @@ on:
         description: "Opentrons dmg URL."
         required: true
         default: "https://s3.amazonaws.com/opentrons-app/builds/Opentrons-v4.5.0-mac-b12575.dmg"
-      chromedriver-version:
-        description: "Chromedriver binary version."
+      electron-version:
+        description: "Electron version."
         required: true
-        default: "76.0.3809.126"
+        default: "6.1.10"
 
 jobs:
   build:
@@ -32,7 +32,7 @@ jobs:
       - name: Install Chromedriver on the path.
         run: |
           chmod +x ./app-testing/ci-tools/mac_get_chromedriver.sh
-          ./app-testing/ci-tools/mac_get_chromedriver.sh ${{ github.event.inputs.chromedriver-version }}
+          ./app-testing/ci-tools/mac_get_chromedriver.sh ${{ github.event.inputs.electron-version }}
           chromedriver --version
       - name: Install python dependencies.
         working-directory: ./app-testing

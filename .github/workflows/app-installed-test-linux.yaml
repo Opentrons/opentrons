@@ -6,10 +6,10 @@ on:
         description: "Opentrons AppImage URL."
         required: true
         default: "https://s3.amazonaws.com/opentrons-app/builds/Opentrons-v4.5.0-linux-b12575.AppImage"
-      chromedriver-version:
-        description: "Chromedriver binary version."
+      electron-version:
+        description: "Electron version."
         required: true
-        default: "76.0.3809.126"
+        default: "6.1.10"
 
 jobs:
   build:
@@ -30,7 +30,7 @@ jobs:
       - name: Install Chromedriver on the path.
         run: |
           chmod +x ./app-testing/ci-tools/linux_get_chromedriver.sh
-          ./app-testing/ci-tools/linux_get_chromedriver.sh ${{ github.event.inputs.chromedriver-version }}
+          ./app-testing/ci-tools/linux_get_chromedriver.sh ${{ github.event.inputs.electron-version }}
           chromedriver --version
       - name: Run docker robot
         run: docker-compose up -d

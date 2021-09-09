@@ -19,13 +19,13 @@ Slices of the tests will be selected as candidates for automation and then perfo
    2. This could also be done by building the installer on a branch and installing the App.
 3. Install Chromedriver
    1. in the app-testing directory
-      1. `sudo ./ci-tools/mac_get_chromedriver.sh 76.0.3809.126`
+      1. `sudo ./ci-tools/mac_get_chromedriver.sh 6.1.10` per the version of electron in the root package.json for electron
          1. if you experience `wget: command not found`
             1. brew install wget and try again
    2. when you run `chromedriver --version`
       1. It should work
       2. It should output the below. The chromedriver version must match Electron version we build into the App.
-         1. ChromeDriver 76.0.3809.126 (d80a294506b4c9d18015e755cee48f953ddc3f2f-refs/branch-heads/3809@{#1024})
+         1. ChromeDriver 76.0.3809.146 (3dfe6f2950443b9b0b0e7106cd3619637eec700f-refs/heads/master@{#747376})
 4. Create .env from example.env `cp example.env .env`
    1. Fill in values (if there are secrets)
    2. Make sure the paths work on your machine
@@ -42,7 +42,7 @@ Slices of the tests will be selected as candidates for automation and then perfo
 
 ## Possible ToDo
 
-- Once there is a mass off tests to see the patterns to abstract:
+- Once there is a mass of tests to see the patterns to abstract:
   - Abstract env variables and config file setup into data structures and functions instead of inline?
   - Extend or change the reporting output?
 - Caching in mac and linux github action runners?
