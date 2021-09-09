@@ -131,9 +131,15 @@ class TempDeck(mod_abc.AbstractModule):
         """
         await self.wait_for_is_running()
         await self._driver.set_temperature(celsius=celsius)
-        # Wait until we reach the target temperature.
-        while self.status != TemperatureStatus.HOLDING:
-            await self.wait_next_poll()
+
+        async def _wait():
+            # Wait until we reach the target temperature.
+            while self.status != TemperatureStatus.HOLDING:
+                await self.wait_next_poll()
+
+        task = self._loop.create_task(_wait())
+        await self.make_cancellable(task)
+        await task
 
     async def start_set_temperature(self, celsius) -> None:
         """
@@ -146,7 +152,7 @@ class TempDeck(mod_abc.AbstractModule):
         await self.wait_for_is_running()
         await self._driver.set_temperature(celsius)
 
-    async def await_temperature(self, awaiting_temperature: float):
+    async def await_temperature(self, awaiting_temperature: float) -> None:
         """
         Await temperature in degree Celsius
         Polls temperature module's temperature until
@@ -157,14 +163,17 @@ class TempDeck(mod_abc.AbstractModule):
 
         await self.wait_for_is_running()
 
-        if self.status == TemperatureStatus.HEATING:
-            while self.temperature < awaiting_temperature:
-                await self.wait_next_poll()
-        elif self.status == TemperatureStatus.COOLING:
-            while self.temperature > awaiting_temperature:
-                await self.wait_next_poll()
+        async def _await_temperature():
+            if self.status == TemperatureStatus.HEATING:
+                while self.temperature < awaiting_temperature:
+                    await self.wait_next_poll()
+            elif self.status == TemperatureStatus.COOLING:
+                while self.temperature > awaiting_temperature:
+                    await self.wait_next_poll()
 
-        return
+        t = self._loop.create_task(_await_temperature())
+        await self.make_cancellable(t)
+        await t
 
     async def deactivate(self):
         """Stop heating/cooling and turn off the fan"""
