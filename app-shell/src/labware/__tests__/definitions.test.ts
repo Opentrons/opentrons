@@ -217,7 +217,7 @@ describe('labware directory utilities', () => {
       const dir = makeEmptyDir()
       const filename = path.join(dir, 'foo.json')
 
-      trashItem.mockImplementation(_ => Promise.resolve())
+      trashItem.mockResolvedValue()
 
       return removeLabwareFile(filename).then(() => {
         expect(Electron.shell.trashItem).toHaveBeenCalledWith(filename)
