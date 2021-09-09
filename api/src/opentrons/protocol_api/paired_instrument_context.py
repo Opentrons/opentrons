@@ -684,8 +684,6 @@ class PairedInstrumentContext(CommandPublisher):
                               :py:meth:`dispense`)
         :returns: This instance
         """
-        loc: Optional[types.Location] = None
-
         if isinstance(location, Well):
             if location.parent.is_tiprack:
                 self._log.warning(
