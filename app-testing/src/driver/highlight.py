@@ -1,4 +1,6 @@
-"""Highlight an element."""
+"""Functions to apply a border with javascript around an
+element in the App (Electron/Browser) while a test is running.
+Useful for troubleshooting and demonstrations."""
 import functools
 import os
 import time

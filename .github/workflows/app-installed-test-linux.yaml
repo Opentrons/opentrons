@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
     inputs:
       appimage-url:
-        description: "Opentrons dmg URL."
+        description: "Opentrons AppImage URL."
         required: true
         default: "https://s3.amazonaws.com/opentrons-app/builds/Opentrons-v4.5.0-linux-b12575.AppImage"
       chromedriver-version:
@@ -22,7 +22,7 @@ jobs:
         uses: actions/checkout@v2
       - name: Get Opentrons AppImage and set env.EXECUTABLE_PATH
         run: |
-          wget https://s3.amazonaws.com/opentrons-app/builds/Opentrons-v4.5.0-linux-b12575.AppImage
+          wget ${{ github.event.inputs.appimage-url }}
           filename=$(basename ${{ github.event.inputs.appimage-url }})
           chmod +x $filename
           filepath=$(pwd)/$filename

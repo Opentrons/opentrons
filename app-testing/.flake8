@@ -1,6 +1,6 @@
 [flake8]
 
-# set line-length for future black support
+# set line-length for compatibility with black
 # https://github.com/psf/black/blob/master/docs/compatible_configs.md
 max-line-length = 88
 

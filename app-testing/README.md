@@ -5,11 +5,11 @@
 Slices of the tests will be selected as candidates for automation and then performed against the Opentrons run app executable on [Windows,Mac,Linux] and various robot configurations [Real Robot, Emulation, No Robot].
 
 ## Notes
-- This folder is not plugged into the global Make ecosystem of the Opentrons mono repository.  This is intentional, the tools in this folder are independent and will likely be used by only a few and are in no way a dependency of any other part of this repository.
-- Because this is not a released module it is easier to use the `pipenv update` feature and only lock dependencies when required.  Periodically put in a PR after running `pipenv update`
-- Currently [Github Action on Windows](../.github/workflows/app-installed-test-windows.yaml) does not work.  When I install the app silently I can't find where the .exe is placed.  I am also not sure that the spin up of the robot emulation is running on the Windows VM.
-- Tests may be run against mac and linux in github runner.  Linux is by far the fastest and can use docker-compose to fire up the robot emulator.
 
+- This folder is not plugged into the global Make ecosystem of the Opentrons mono repository. This is intentional, the tools in this folder are independent and will likely be used by only a few and are in no way a dependency of any other part of this repository.
+- Because this is not a released module it is easier to use the `pipenv update` feature and only lock dependencies when required. Periodically put in a PR after running `pipenv update`
+- Currently [Github Action on Windows](../.github/workflows/app-installed-test-windows.yaml) does not work. When I install the app silently I can't find where the .exe is placed. I am also not sure that the spin up of the robot emulation is running on the Windows VM.
+- Tests may be run against mac and linux in github runner. Linux is by far the fastest and can use docker-compose to run the robot emulator.
 
 ## Steps
 
@@ -23,9 +23,9 @@ Slices of the tests will be selected as candidates for automation and then perfo
          1. if you experience `wget: command not found`
             1. brew install wget and try again
    2. when you run `chromedriver --version`
-         1. It should work
-         2. It should output the below.  The chromedriver version must match Electron version we build into the App.
-            1. ChromeDriver 76.0.3809.126 (d80a294506b4c9d18015e755cee48f953ddc3f2f-refs/branch-heads/3809@{#1024})
+      1. It should work
+      2. It should output the below. The chromedriver version must match Electron version we build into the App.
+         1. ChromeDriver 76.0.3809.126 (d80a294506b4c9d18015e755cee48f953ddc3f2f-refs/branch-heads/3809@{#1024})
 4. Create .env from example.env `cp example.env .env`
    1. Fill in values (if there are secrets)
    2. Make sure the paths work on your machine
@@ -59,8 +59,8 @@ Slices of the tests will be selected as candidates for automation and then perfo
 use xdist
 `pipenv run pytest -n3`
 
-format and lint
-`make flint`
+run black, mypy, pylint, and flake8
+`make check`
 
 ## Tools
 

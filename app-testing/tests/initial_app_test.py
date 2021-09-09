@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 
 def test_initial_load_robot_available(chrome_options: Options) -> None:
-    """Test the initail load of the app with a docker or dev mode emulated robot."""
+    """Test the initial load of the app with a docker or dev mode emulated robot."""
     robot = OtRobot()
     # expecting robot
     assert robot.is_alive(), "is a robot available?"
@@ -57,7 +57,7 @@ def test_initial_load_robot_available(chrome_options: Options) -> None:
 
 
 def test_initial_load_no_robot(chrome_options: Options) -> None:
-    """Test the initail load of the app with NO robot.
+    """Test the initial load of the app with NO robot.
 
     Note that this test takes > 30 seconds.  The spinner stops after 30 seconds.
     If the machine has Wi-Fi or USB connected robot(s) this test will fail.
