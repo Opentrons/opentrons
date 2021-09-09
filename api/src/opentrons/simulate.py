@@ -29,6 +29,7 @@ from typing import (
 import opentrons
 from opentrons.hardware_control.simulator_setup import load_simulator
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
+from opentrons.protocols.duration import DurationEstimator
 from opentrons.protocols.execution import execute
 import opentrons.broker
 from opentrons.config import IS_ROBOT, JUPYTER_NOTEBOOK_LABWARE_DIR
@@ -253,6 +254,7 @@ def simulate(
     custom_data_paths: List[str] = None,
     propagate_logs: bool = False,
     hardware_simulator_file_path: str = None,
+    duration_estimator: Optional[DurationEstimator] = None,
     log_level: str = "warning",
 ) -> Tuple[List[Mapping[str, Any]], Optional[BundleContents]]:
     """
@@ -302,6 +304,8 @@ def simulate(
                               :py:attr:`.ProtocolContext.bundled_data`.
     :param hardware_simulator_file_path: A path to a JSON file defining a
                                          hardware simulator.
+    :param duration_estimator: For internal use only.
+                               Optional duration estimator object.
     :param propagate_logs: Whether this function should allow logs from the
                            Opentrons stack to propagate up to the root handler.
                            This can be useful if you're integrating this
@@ -344,40 +348,32 @@ def simulate(
     )
     bundle_contents: Optional[BundleContents] = None
 
-    if getattr(protocol, "api_level", APIVersion(2, 0)) < APIVersion(2, 0):
+    # we want a None literal rather than empty dict so get_protocol_api
+    # will look for custom labware if this is a robot
+    gpa_extras = getattr(protocol, "extra_labware", None) or None
+    context = get_protocol_api(
+        getattr(protocol, "api_level", MAX_SUPPORTED_VERSION),
+        bundled_labware=getattr(protocol, "bundled_labware", None),
+        bundled_data=getattr(protocol, "bundled_data", None),
+        hardware_simulator=hardware_simulator,
+        extra_labware=gpa_extras,
+    )
+    broker = context.broker
+    scraper = CommandScraper(stack_logger, log_level, broker)
+    if duration_estimator:
+        broker.subscribe(command_types.COMMAND, duration_estimator.on_message)
 
-        def _simulate_v1():
-            opentrons.robot.disconnect()
-            opentrons.robot.reset()
-            scraper = CommandScraper(stack_logger, log_level, opentrons.robot.broker)
-            exec(protocol.contents, {})  # type: ignore
-            return scraper
-
-        scraper = _simulate_v1()
-    else:
-        # we want a None literal rather than empty dict so get_protocol_api
-        # will look for custom labware if this is a robot
-        gpa_extras = getattr(protocol, "extra_labware", None) or None
-        context = get_protocol_api(
-            getattr(protocol, "api_level", MAX_SUPPORTED_VERSION),
-            bundled_labware=getattr(protocol, "bundled_labware", None),
-            bundled_data=getattr(protocol, "bundled_data", None),
-            hardware_simulator=hardware_simulator,
-            extra_labware=gpa_extras,
-        )
-        broker = context.broker
-        scraper = CommandScraper(stack_logger, log_level, broker)
-        try:
-            execute.run_protocol(protocol, context)
-            if (
-                isinstance(protocol, PythonProtocol)
-                and protocol.api_level >= APIVersion(2, 0)
-                and protocol.bundled_labware is None
-                and allow_bundle()
-            ):
-                bundle_contents = bundle_from_sim(protocol, context)
-        finally:
-            context.cleanup()
+    try:
+        execute.run_protocol(protocol, context)
+        if (
+            isinstance(protocol, PythonProtocol)
+            and protocol.api_level >= APIVersion(2, 0)
+            and protocol.bundled_labware is None
+            and allow_bundle()
+        ):
+            bundle_contents = bundle_from_sim(protocol, context)
+    finally:
+        context.cleanup()
 
     return scraper.commands, bundle_contents
 
@@ -518,6 +514,15 @@ def get_arguments(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
         parser = _get_bundle_args(parser)
 
     parser.add_argument(
+        "-e",
+        "--estimate-duration",
+        action="store_true",
+        # TODO (AL, 2021-07-26): Better wording.
+        help="Estimate how long the protocol will take to complete."
+        " This is an experimental feature.",
+    )
+
+    parser.add_argument(
         "protocol",
         metavar="PROTOCOL",
         type=argparse.FileType("rb"),
@@ -575,11 +580,14 @@ def main() -> int:
     args = parser.parse_args()
     # Try to migrate api v1 containers if needed
 
+    duration_estimator = DurationEstimator() if args.estimate_duration else None
+
     runlog, maybe_bundle = simulate(
         args.protocol,
         args.protocol.name,
         getattr(args, "custom_labware_path", []),
         getattr(args, "custom_data_path", []) + getattr(args, "custom_data_file", []),
+        duration_estimator=duration_estimator,
         hardware_simulator_file_path=getattr(args, "custom_hardware_simulator_file"),
         log_level=args.log_level,
     )
@@ -596,6 +604,15 @@ def main() -> int:
 
     if args.output == "runlog":
         print(format_runlog(runlog))
+
+    if duration_estimator:
+        duration_seconds = duration_estimator.get_total_duration()
+        hours = int(duration_seconds / 60 / 60)
+        minutes = int((duration_seconds % (60 * 60)) / 60)
+        print("--------------------------------------------------------------")
+        print(f"Estimated protocol duration: {hours}h:{minutes}m")
+        print("--------------------------------------------------------------")
+        print("WARNING: Protocol duration estimation is an experimental feature")
 
     return 0
 
