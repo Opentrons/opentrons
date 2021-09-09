@@ -51,6 +51,11 @@
     },
     {
       "name":  "protocol_swift_smoke",
+      "path":  "protocols/swift_smoke.py",
+      "driver": "protocol"
+    },
+    {
+      "name":  "protocol_swift_turbo",
       "path":  "protocols/swift_turbo.py",
       "driver": "protocol"
     }
