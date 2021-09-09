@@ -1,5 +1,6 @@
 # noqa: D100
 
+from json import dumps as json_dumps
 from pathlib import Path
 from textwrap import dedent
 
@@ -23,20 +24,36 @@ from opentrons.protocol_runner.pre_analysis import (
 
 def test_json_pre_analysis(tmp_path: Path) -> None:
     """It should identify the protocol as JSON and extract its metadata."""
-    input_protocol_text = make_minimal_json_protocol(
+    input_protocol_dict = make_minimal_json_protocol(
         metadata=JsonProtocolMetadata(
             author="Dr. Sy N. Tist",
             tags=["tag1", "tag2"],
             created=123.456,
         )
-    ).json()
+    ).dict(exclude_unset=True)
+    # exclude_unset=True prevents Pydantic from auto-filling metadata fields that the
+    # model has but that we omit here (like metadata.lastModified) with the value None.
+    #
+    # A caller could provide a protocol with fields omitted like this. We want to test
+    # that we preserve that omission, in case there's ever a meaningful difference
+    # between an omitted field and a null field.
+
+    # Give the input protocol a metadata field that our JSON protocol schema bindings
+    # don't know about. We want to test that we retain it, instead of silently
+    # discarding it. An old robot server, with old schema bindings, should be able to
+    # pass along metadata from new protocols even if it doesn't know about that
+    # metadata.
+    input_protocol_dict["metadata"]["some_unknown_extra_field"] = "hello"
 
     expected_metadata: ExtractedMetadata = {
         "author": "Dr. Sy N. Tist",
         "tags": ["tag1", "tag2"],
         "created": 123.456,
+        # Other known fields, like lastModified, are expected to be omitted.
+        "some_unknown_extra_field": "hello",
     }
 
+    input_protocol_text = json_dumps(input_protocol_dict)
     protocol_file = tmp_path / "My JSON Protocol.json"
     protocol_file.write_text(input_protocol_text)
 

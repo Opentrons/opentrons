@@ -1,8 +1,13 @@
 # noqa: D100
 
 from dataclasses import dataclass
+from json import JSONDecodeError, loads as json_loads
 from pathlib import Path
 from typing import Any, Dict, List, Union
+
+from pydantic import ValidationError as PydanticValidationError
+
+from opentrons.protocols.models import JsonProtocol
 
 
 class PreAnalyzer:  # noqa: D101
@@ -20,11 +25,29 @@ class PreAnalyzer:  # noqa: D101
         suffix = main_file.suffix
 
         if suffix == ".json":
-            raise NotImplementedError()
+            return _analyze_json(main_file)
         elif suffix == ".py":
             raise NotImplementedError()
         else:
             raise ProtocolNotPreAnalyzableError(f'Unrecognized file suffix "{suffix}"')
+
+
+def _analyze_json(main_file: Path) -> "JsonPreAnalysis":
+    try:
+        parsed_json = json_loads(main_file.read_bytes())
+    except JSONDecodeError as exception:
+        raise JsonParseError() from exception
+
+    try:
+        JsonProtocol.parse_obj(parsed_json)
+    except PydanticValidationError as exception:
+        raise JsonSchemaValidationError() from exception
+
+    # We extract metadata directly from the JSON dict,
+    # instead of from the fully parsed Pydantic model.
+    # This way, we preserve metadata fields that the Pydantic model doesn't know about.
+    # (Otherwise, they would be silently discarded.)
+    return JsonPreAnalysis(metadata=parsed_json["metadata"])
 
 
 Metadata = Dict[str, Any]
