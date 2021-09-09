@@ -88,6 +88,10 @@ const mockGetDeckCalData = calibrationSelectors.getDeckCalibrationData as jest.M
   typeof calibrationSelectors.getDeckCalibrationData
 >
 
+const mockGetProtocolCalibrationComplete = calibrationSelectors.getProtocolCalibrationComplete as jest.MockedFunction<
+  typeof calibrationSelectors.getProtocolCalibrationComplete
+>
+
 const mockModuleRenderCoords = {
   mockModuleId: { x: 0, y: 0, z: 0, moduleModel: 'mockModule' as any },
 }
@@ -106,6 +110,7 @@ describe('RunSetupCard', () => {
     mockGetDeckCalData.mockReturnValue(
       mockCalibrationStatus.deckCalibration.data
     )
+    mockGetProtocolCalibrationComplete.mockReturnValue({ complete: true })
     mockGetProtocolData.mockReturnValue(noModulesProtocol as any)
     when(mockGetModuleRenderCoords)
       .calledWith(noModulesProtocol as any, standardDeckDef as any)
@@ -159,6 +164,11 @@ describe('RunSetupCard', () => {
         name: 'Robot Calibration',
       })
       getByText('Mock Robot Calibration')
+    })
+    it('renders calibration needed when robt cal not complete', () => {
+      mockGetProtocolCalibrationComplete.mockReturnValue({ complete: false })
+      const { getByText } = render()
+      getByText('Calibration needed')
     })
     it('renders labware setup', () => {
       const { getByRole, getByText } = render()
