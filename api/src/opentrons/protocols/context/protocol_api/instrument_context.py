@@ -1,6 +1,7 @@
 from typing import Optional
 
 from opentrons import types
+from opentrons.hardware_control.types import PipettePair
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.hardware_control import CriticalPoint
 from opentrons.hardware_control.dev_types import PipetteDict
@@ -12,6 +13,8 @@ from opentrons.protocols.api_support.util import (
     FlowRates,
     PlungerSpeeds,
 )
+from opentrons.protocols.context.paired_instrument import AbstractPairedInstrument
+from opentrons.protocols.context.protocol_api.paired_instrument import PairedInstrument
 from opentrons.protocols.geometry import planning
 from opentrons.protocols.context.instrument import AbstractInstrument
 from opentrons.protocols.context.protocol import AbstractProtocol
@@ -295,4 +298,16 @@ class InstrumentContextImplementation(AbstractInstrument):
             aspirate=aspirate,
             dispense=dispense,
             blow_out=blow_out,
+        )
+
+    def pair_with(
+        self, other_instrument: AbstractInstrument
+    ) -> AbstractPairedInstrument:
+        """Create an AbstractPairedInstrument"""
+        return PairedInstrument(
+            primary_instrument=self,
+            secondary_instrument=other_instrument,
+            ctx=self._protocol_interface,
+            pair_policy=PipettePair.of_mount(self.get_mount()),
+            hardware_manager=self._protocol_interface.get_hardware(),
         )

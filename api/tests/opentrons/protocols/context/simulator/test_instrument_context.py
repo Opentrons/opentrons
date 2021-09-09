@@ -5,69 +5,27 @@ from pytest_lazyfixture import lazy_fixture
 from opentrons.hardware_control import NoTipAttachedError
 from opentrons.hardware_control.types import TipAttachedError
 from opentrons.protocols.context.labware import AbstractLabware
-from opentrons.protocols.context.protocol_api.labware import LabwareImplementation
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
-from opentrons import types, ThreadManager
 from opentrons.protocols.context.instrument import AbstractInstrument
-from opentrons.protocols.context.protocol_api.protocol_context import (
-    ProtocolContextImplementation,
-)
-from opentrons.protocols.context.simulator.instrument_context import (
-    InstrumentContextSimulation,
-)
-
-
-@pytest.fixture
-def protocol_context(hardware: ThreadManager) -> ProtocolContextImplementation:
-    """Protocol context implementation fixture."""
-    return ProtocolContextImplementation(hardware=hardware)
-
-
-@pytest.fixture
-def instrument_context(
-    protocol_context: ProtocolContextImplementation,
-) -> AbstractInstrument:
-    """Instrument context backed by hardware simulator."""
-    return protocol_context.load_instrument(
-        "p300_single_gen2", types.Mount.RIGHT, replace=False
-    )
-
-
-@pytest.fixture
-def simulating_context(
-    protocol_context: ProtocolContextImplementation,
-    instrument_context: AbstractInstrument,
-) -> AbstractInstrument:
-    """A simulating instrument context."""
-    return InstrumentContextSimulation(
-        protocol_interface=protocol_context,
-        pipette_dict=instrument_context.get_pipette(),
-        mount=types.Mount.RIGHT,
-        instrument_name="p300_single_gen2",
-    )
-
-
-@pytest.fixture
-def labware(minimal_labware_def: LabwareDefinition) -> AbstractLabware:
-    """Labware fixture."""
-    return LabwareImplementation(
-        definition=minimal_labware_def,
-        parent=types.Location(types.Point(0, 0, 0), "1"),
-    )
 
 
 @pytest.fixture(
-    params=[lazy_fixture("instrument_context"), lazy_fixture("simulating_context")]
+    params=[
+        lazy_fixture("instrument_context"),
+        lazy_fixture("simulating_instrument_context"),
+    ]
 )
 def subject(request) -> AbstractInstrument:
     return request.param
 
 
 def test_same_pipette(
-    instrument_context: AbstractInstrument, simulating_context: AbstractInstrument
+    instrument_context: AbstractInstrument,
+    simulating_instrument_context: AbstractInstrument,
 ) -> None:
     """It should have the same pipette as hardware backed instrument context."""
-    assert instrument_context.get_pipette() == simulating_context.get_pipette()
+    assert (
+        instrument_context.get_pipette() == simulating_instrument_context.get_pipette()
+    )
 
 
 def test_aspirate_no_tip(subject: AbstractInstrument) -> None:
