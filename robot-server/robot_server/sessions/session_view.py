@@ -120,10 +120,10 @@ class SessionView:
         }
 
         if isinstance(create_data, BasicSessionCreateData):
-            return BasicSession.construct(**response_fields)
+            return BasicSession(**response_fields)
 
         if isinstance(create_data, ProtocolSessionCreateData):
             response_fields["createParams"] = create_data.createParams
-            return ProtocolSession.construct(**response_fields)
+            return ProtocolSession(**response_fields)
 
         raise ValueError(f"Invalid session resource {session}")
