@@ -7,6 +7,7 @@ import {
   FONT_WEIGHT_BOLD,
   FONT_HEADER_THIN,
 } from '@opentrons/components'
+import { CalibrateTipLengthControl } from '../../../../pages/Calibrate/CalibrateTipLengthControl'
 import * as PipetteOffset from '../../../../redux/calibration/pipette-offset'
 import * as Pipettes from '../../../../redux/pipettes'
 import * as TipLength from '../../../../redux/calibration/tip-length'
@@ -83,6 +84,15 @@ export function RobotCalibration(props: Props): JSX.Element {
                     calibratedDate={tipRack.lastModifiedDate}
                     index={index}
                     title={tipRack.displayName}
+                    button={
+                      <CalibrateTipLengthControl
+                        mount={mount}
+                        robotName={robotName}
+                        hasCalibrated={tipRack.lastModifiedDate !== null}
+                        tipRackDefinition={tipRack.tipRackDef}
+                        isExtendedPipOffset={false}
+                      />
+                    }
                   />
                 ))}
               </div>

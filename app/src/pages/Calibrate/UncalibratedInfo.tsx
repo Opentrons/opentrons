@@ -52,6 +52,7 @@ interface UncalibratedInfoProps {
   hasCalibrated: boolean
   handleStart: () => unknown
   showSpinner: boolean
+  robotCalStep?: boolean
 }
 
 export function UncalibratedInfo(props: UncalibratedInfoProps): JSX.Element {
@@ -61,6 +62,7 @@ export function UncalibratedInfo(props: UncalibratedInfoProps): JSX.Element {
     hasCalibrated,
     handleStart,
     showSpinner,
+    robotCalStep,
   } = props
   const dispatch = useDispatch<Dispatch>()
 

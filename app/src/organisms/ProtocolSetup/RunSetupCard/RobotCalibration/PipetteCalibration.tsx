@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { Link as RRDLink } from 'react-router-dom'
 import {
@@ -10,6 +11,9 @@ import {
   FONT_STYLE_ITALIC,
   C_BLUE,
 } from '@opentrons/components'
+import { Portal } from '../../../../App/portal'
+import { AskForCalibrationBlockModal } from '../../../../organisms/CalibrateTipLength/AskForCalibrationBlockModal'
+import * as Config from '../../../../redux/config'
 import * as PipetteConstants from '../../../../redux/pipettes/constants'
 import { INTENT_CALIBRATE_PIPETTE_OFFSET } from '../../../CalibrationPanels'
 import { useCalibratePipetteOffset } from '../../../CalibratePipetteOffset/useCalibratePipetteOffset'
@@ -31,11 +35,32 @@ interface Props {
 export function PipetteCalibration(props: Props): JSX.Element {
   const { pipetteTipRackData, index, mount, robotName } = props
   const { t } = useTranslation(['protocol_setup'])
+  const [showCalBlockModal, setShowCalBlockModal] = React.useState(false)
+  const configHasCalibrationBlock = useSelector(Config.getHasCalibrationBlock)
 
   const [
     startPipetteOffsetCalibration,
     PipetteOffsetCalibrationWizard,
   ] = useCalibratePipetteOffset(robotName, { mount })
+
+  const startPipetteOffsetCalibrationBlockModal = (
+    hasBlockModalResponse: boolean | null
+  ): void => {
+    // TODO: update this to check the setting before prompting
+    if (hasBlockModalResponse === null && configHasCalibrationBlock === null) {
+      setShowCalBlockModal(true)
+    } else {
+      startPipetteOffsetCalibration({
+        overrideParams: {
+          hasCalibrationBlock: Boolean(
+            configHasCalibrationBlock ?? hasBlockModalResponse
+          ),
+        },
+        withIntent: INTENT_CALIBRATE_PIPETTE_OFFSET,
+      })
+      setShowCalBlockModal(false)
+    }
+  }
 
   let calibrated = false
   let button
@@ -94,15 +119,22 @@ export function PipetteCalibration(props: Props): JSX.Element {
       <>
         <PrimaryBtn
           backgroundColor={C_BLUE}
-          onClick={() =>
-            startPipetteOffsetCalibration({
-              withIntent: INTENT_CALIBRATE_PIPETTE_OFFSET,
-            })
-          }
+          onClick={() => startPipetteOffsetCalibrationBlockModal(null)}
         >
           {t('calibrate_now_cta')}
         </PrimaryBtn>
         {PipetteOffsetCalibrationWizard}
+        {showCalBlockModal && (
+          <Portal level="top">
+            <AskForCalibrationBlockModal
+              onResponse={hasBlockModalResponse => {
+                startPipetteOffsetCalibrationBlockModal(hasBlockModalResponse)
+              }}
+              titleBarTitle={t('pipette_offset_cal')}
+              closePrompt={() => setShowCalBlockModal(false)}
+            />
+          </Portal>
+        )}
       </>
     )
   }

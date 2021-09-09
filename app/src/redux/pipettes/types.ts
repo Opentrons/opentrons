@@ -1,10 +1,14 @@
-import type { PipetteModelSpecs } from '@opentrons/shared-data'
+import type {
+  LabwareDefinition2,
+  PipetteModelSpecs,
+} from '@opentrons/shared-data'
 import type { Pipette as ProtocolPipette } from '../robot/types'
 import type { RobotApiRequestMeta } from '../robot-api/types'
 import type {
   PipetteOffsetCalibration,
   TipLengthCalibration,
 } from '../calibration/types'
+import { Labware } from '@opentrons/components'
 
 // common types
 
@@ -219,6 +223,7 @@ export type ProtocolPipettesMatchByMount = {
 export interface TipRackCalibrationData {
   displayName: string
   lastModifiedDate: string | null
+  tipRackDef: LabwareDefinition2
 }
 
 export interface ProtocolPipetteTipRackCalData {

@@ -360,6 +360,7 @@ export const getProtocolPipetteTipRackCalInfo: (
             tipRackCalData.push({
               displayName: tipRackDef.metadata.displayName,
               lastModifiedDate: lastTiprackCalDate,
+              tipRackDef: tipRackDef,
             })
           })
           result[mount] = {
