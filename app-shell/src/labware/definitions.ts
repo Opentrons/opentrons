@@ -76,12 +76,5 @@ export function addLabwareFile(file: string, dir: string): Promise<void> {
 }
 
 export function removeLabwareFile(file: string): Promise<void> {
-  return shell.trashItem(file).then(
-    () => {
-      Promise.resolve()
-    },
-    () => {
-      return fs.promises.unlink(file)
-    }
-  )
+  return shell.trashItem(file).catch(() => fs.unlink(file))
 }
