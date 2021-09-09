@@ -68,9 +68,15 @@ export function CalibrationItem(props: Props): JSX.Element | null {
           )}
           <span>
             {title !== undefined && (
-              <Text fontSize={FONT_SIZE_BODY_2}>{title}</Text>
+              <Text fontSize={FONT_SIZE_BODY_2} as="h1">
+                {title}
+              </Text>
             )}
-            <Text fontSize={FONT_SIZE_BODY_1} fontStyle={FONT_STYLE_ITALIC}>
+            <Text
+              fontSize={FONT_SIZE_BODY_1}
+              as="h2"
+              fontStyle={FONT_STYLE_ITALIC}
+            >
               {subText !== undefined ? subText : calibratedText}
             </Text>
           </span>
