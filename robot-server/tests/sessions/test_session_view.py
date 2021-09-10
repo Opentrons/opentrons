@@ -2,11 +2,14 @@
 import pytest
 from datetime import datetime
 
-from opentrons.types import MountType
+from opentrons.types import DeckSlotName, MountType
 from opentrons.protocol_engine import (
+    DeckSlotLocation,
     EngineStatus,
     CommandStatus,
     PipetteName,
+    LoadedPipette,
+    LoadedLabware,
     commands as pe_commands,
 )
 
@@ -111,6 +114,8 @@ current_time = datetime.now()
                 status=SessionStatus.READY_TO_RUN,
                 actions=[],
                 commands=[],
+                pipettes=[],
+                labware=[],
             ),
         ),
         (
@@ -129,6 +134,8 @@ current_time = datetime.now()
                 createParams=ProtocolSessionCreateParams(protocolId="protocol-id"),
                 actions=[],
                 commands=[],
+                pipettes=[],
+                labware=[],
             ),
         ),
     ),
@@ -142,6 +149,8 @@ def test_to_response(
     result = subject.as_response(
         session=session_resource,
         commands=[],
+        pipettes=[],
+        labware=[],
         engine_status=EngineStatus.READY_TO_RUN,
     )
     assert result == expected_response
@@ -177,6 +186,8 @@ def test_to_response_maps_commands() -> None:
     result = subject.as_response(
         session=session_resource,
         commands=[command_1, command_2],
+        pipettes=[],
+        labware=[],
         engine_status=EngineStatus.RUNNING,
     )
 
@@ -197,6 +208,50 @@ def test_to_response_maps_commands() -> None:
                 status=CommandStatus.QUEUED,
             ),
         ],
+        pipettes=[],
+        labware=[],
+    )
+
+
+def test_to_response_adds_equipment() -> None:
+    """It should add ProtocolEngine equipment to Session response model."""
+    session_resource = SessionResource(
+        session_id="session-id",
+        create_data=BasicSessionCreateData(),
+        created_at=datetime(year=2021, month=1, day=1),
+        actions=[],
+    )
+
+    labware = LoadedLabware(
+        id="labware-id",
+        loadName="load-name",
+        definitionUri="namespace/load-name/42",
+        location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
+    )
+
+    pipette = LoadedPipette(
+        id="pipette-id",
+        pipetteName=PipetteName.P300_SINGLE,
+        mount=MountType.LEFT,
+    )
+
+    subject = SessionView()
+    result = subject.as_response(
+        session=session_resource,
+        commands=[],
+        pipettes=[pipette],
+        labware=[labware],
+        engine_status=EngineStatus.RUNNING,
+    )
+
+    assert result == BasicSession(
+        id="session-id",
+        createdAt=datetime(year=2021, month=1, day=1),
+        status=SessionStatus.RUNNING,
+        actions=[],
+        commands=[],
+        pipettes=[pipette],
+        labware=[labware],
     )
 
 

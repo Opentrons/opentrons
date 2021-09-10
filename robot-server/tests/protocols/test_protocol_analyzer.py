@@ -3,8 +3,9 @@ import pytest
 from decoy import Decoy
 from datetime import datetime
 
-from opentrons.protocol_engine import commands as pe_commands
-from opentrons.protocol_runner import ProtocolRunner
+from opentrons.types import MountType
+from opentrons.protocol_engine import commands as pe_commands, types as pe_types
+from opentrons.protocol_runner import ProtocolRunner, ProtocolRunData
 
 from robot_server.protocols import ProtocolFileType
 from robot_server.protocols.analysis_store import AnalysisStore
@@ -50,17 +51,32 @@ async def test_analyze(
         files=[],
     )
 
-    analysis_commands = [
-        pe_commands.Pause(
-            id="command-id",
-            status=pe_commands.CommandStatus.SUCCEEDED,
-            createdAt=datetime(year=2022, month=2, day=2),
-            data=pe_commands.PauseData(message="hello world"),
-        )
-    ]
+    analysis_command = pe_commands.Pause(
+        id="command-id",
+        status=pe_commands.CommandStatus.SUCCEEDED,
+        createdAt=datetime(year=2022, month=2, day=2),
+        data=pe_commands.PauseData(message="hello world"),
+    )
+
+    analysis_labware = pe_types.LoadedLabware(
+        id="labware-id",
+        loadName="load-name",
+        definitionUri="namespace/load-name/42",
+        location=pe_types.DeckSlotLocation(slot=pe_types.DeckSlotName.SLOT_1),
+    )
+
+    analysis_pipette = pe_types.LoadedPipette(
+        id="pipette-id",
+        pipetteName=pe_types.PipetteName.P300_SINGLE,
+        mount=MountType.LEFT,
+    )
 
     decoy.when(await protocol_runner.run(protocol_resource)).then_return(
-        analysis_commands
+        ProtocolRunData(
+            commands=[analysis_command],
+            labware=[analysis_labware],
+            pipettes=[analysis_pipette],
+        )
     )
 
     await subject.analyze(
@@ -71,7 +87,9 @@ async def test_analyze(
     decoy.verify(
         analysis_store.update(
             analysis_id="analysis-id",
-            commands=analysis_commands,
+            commands=[analysis_command],
+            labware=[analysis_labware],
+            pipettes=[analysis_pipette],
             errors=[],
         ),
     )
@@ -101,5 +119,11 @@ async def test_analyze_error(
     )
 
     decoy.verify(
-        analysis_store.update(analysis_id="analysis-id", commands=[], errors=[error]),
+        analysis_store.update(
+            analysis_id="analysis-id",
+            commands=[],
+            labware=[],
+            pipettes=[],
+            errors=[error],
+        ),
     )
