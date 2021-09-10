@@ -20,6 +20,7 @@ import { ModuleFromDef } from './ModuleFromDef'
 export * from './Thermocycler'
 export * from './ModuleFromDef'
 
+const LABWARE_OFFSET_DISPLAY_THRESHOLD = 2
 interface Props {
   x: number
   y: number
@@ -74,8 +75,11 @@ export const Module = (props: Props): JSX.Element => {
     ? 'rotate(0, 0, 0)'
     : `rotate(180, ${rotationCenterX}, ${rotationCenterY})`
 
+  // labwareOffset values are more accurate than our SVG renderings, so ignore any deviations under a certain threshold
+  const clampedLabwareOffsetX = Math.abs(labwareOffsetX) > LABWARE_OFFSET_DISPLAY_THRESHOLD ? labwareOffsetX : 0
+  const clampedLabwareOffsetY = Math.abs(labwareOffsetY) > LABWARE_OFFSET_DISPLAY_THRESHOLD ? labwareOffsetY : 0
   // transform to be applied to children which render within the labware interfacing surface of the module
-  const childrenTransform = `translate(${labwareOffsetX}, ${labwareOffsetY})`
+  const childrenTransform = `translate(${clampedLabwareOffsetX}, ${clampedLabwareOffsetY})`
 
   const renderStatusInfo = () => {
     if(statusInfo == null) return null
@@ -95,7 +99,7 @@ export const Module = (props: Props): JSX.Element => {
   }
 
   return (
-    <g x={x} y={y} data-test={`Module_${moduleType}`}>
+    <g x={x} y={y}  data-test={`Module_${moduleType}`}>
       <g transform={orientationTransform}>
         <g transform={offsetTransform}>
           {moduleType === THERMOCYCLER_MODULE_TYPE
