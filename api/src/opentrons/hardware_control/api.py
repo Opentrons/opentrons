@@ -29,6 +29,7 @@ from .util import use_or_initialize_loop, DeckTransformState, check_motion_bound
 from .pipette import Pipette, generate_hardware_configs, load_from_config_and_check_skip
 from .controller import Controller
 from .simulator import Simulator
+from .ot3controller import OT3Controller
 from .constants import (
     SHAKE_OFF_TIPS_SPEED,
     SHAKE_OFF_TIPS_DROP_DISTANCE,
@@ -83,7 +84,7 @@ class API(HardwareAPILike):
 
     def __init__(
         self,
-        backend: Union[Controller, Simulator],
+        backend: Union[Controller, Simulator, OT3Controller],
         loop: asyncio.AbstractEventLoop,
         config: RobotConfig,
     ) -> None:
