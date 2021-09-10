@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import {
   Text,
   RobotCoordsForeignDiv,
+  RobotCoordsForeignObject,
   SPACING_1,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
@@ -16,6 +17,7 @@ import {
   JUSTIFY_FLEX_START,
   COLOR_ERROR,
   COLOR_SUCCESS,
+  C_LIGHT_GRAY,
 } from '@opentrons/components'
 import {
   getModuleType,
@@ -23,6 +25,7 @@ import {
   getModuleVizDims,
   STD_SLOT_X_DIM as SLOT_X,
   getModuleDisplayName,
+  getModuleDef2,
 } from '@opentrons/shared-data'
 
 export interface ModuleInfoProps {
@@ -38,6 +41,8 @@ export interface ModuleInfoProps {
 export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
   const { x, y, orientation, moduleModel, usbPort, hubPort, isAttached } = props
   const moduleType = getModuleType(moduleModel)
+  const moduleDef = getModuleDef2(moduleModel)
+  const {xDimension, yDimension, labwareInterfaceYDimension, labwareInterfaceXDimension} = moduleDef.dimensions
   const { t } = useTranslation('protocol_setup')
   const { childYOffset } = getModuleVizDims(orientation, moduleType)
   const moduleNotAttached = usbPort === null && hubPort === null && !isAttached
@@ -49,16 +54,15 @@ export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
     t('usb_port_connected') + ' ' + hubPort + ' ' + t('hub_connected')
 
   return (
-    <RobotCoordsForeignDiv
-      x={x}
-      y={y + childYOffset}
-      height={'100%'}
-      width={SLOT_X}
-      innerDivProps={{
-        display: DISPLAY_FLEX,
-        justifyContent: JUSTIFY_FLEX_START,
-        alignItems: ALIGN_FLEX_START,
+    <RobotCoordsForeignObject
+      x={0}
+      y={0}
+      height={labwareInterfaceYDimension ?? yDimension}
+      width={labwareInterfaceXDimension ?? xDimension}
+      flexProps={{
         padding: SPACING_1,
+        backgroundColor: C_LIGHT_GRAY,
+        opacity: 0.8
       }}
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
@@ -87,6 +91,6 @@ export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
             : moduleAttachedViaHub}
         </Text>
       </Flex>
-    </RobotCoordsForeignDiv>
+    </RobotCoordsForeignObject>
   )
 }

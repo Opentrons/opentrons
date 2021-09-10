@@ -7,7 +7,7 @@ import {
   Flex,
   Btn,
   Link,
-  ModuleViz,
+  Module,
   PrimaryBtn,
   RobotWorkSpace,
   ALIGN_FLEX_END,
@@ -89,6 +89,7 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
     robotName === null ? POLL_MODULE_INTERVAL_MS : null,
     true
   )
+  console.log(moduleRenderCoords)
   return (
     <React.Fragment>
       {showMultipleModulesModal && (
@@ -134,21 +135,20 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
                       <React.Fragment
                         key={`LabwareSetup_Module_${moduleModel}_${x}${y}`}
                       >
-                        <ModuleViz
+                        <Module
                           x={x}
                           y={y}
                           orientation={orientation}
-                          moduleType={getModuleType(moduleModel)}
-                        />
-                        <ModuleInfo
-                          x={x}
-                          y={y}
-                          moduleModel={moduleModel}
-                          orientation={orientation}
-                          isAttached={attached}
-                          usbPort={null}
-                          hubPort={null}
-                        />
+                          model={moduleModel}
+                        >
+                          <ModuleInfo
+                            moduleModel={moduleModel}
+                            orientation={orientation}
+                            isAttached={attached}
+                            usbPort={null}
+                            hubPort={null}
+                          />
+                        </Module>
                       </React.Fragment>
                     )
                   } else {
@@ -156,11 +156,11 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
                       <React.Fragment
                         key={`LabwareSetup_Module_${moduleModel}_${x}${y}`}
                       >
-                        <ModuleViz
+                        <Module
                           x={x}
                           y={y}
                           orientation={orientation}
-                          moduleType={getModuleType(moduleModel)}
+                          model={moduleModel}
                         />
                         <ModuleInfo
                           x={x}
