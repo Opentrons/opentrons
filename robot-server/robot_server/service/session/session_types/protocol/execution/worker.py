@@ -40,7 +40,9 @@ class _Worker:
         self._loop = loop
         self._listener = listener
         # For passing WorkerDirective from main to worker task
-        self._async_command_queue: asyncio.Queue = asyncio.Queue(maxsize=1)
+        self._async_command_queue: "asyncio.Queue[WorkerDirective]" = asyncio.Queue(
+            maxsize=1
+        )
         # Protocol running WorkerDirective handling task
         self._async_command_task = self._loop.create_task(self._runner_task())
 

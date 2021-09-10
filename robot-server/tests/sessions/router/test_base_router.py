@@ -18,12 +18,12 @@ from robot_server.protocols import (
     ProtocolNotFound,
 )
 
-from robot_server.sessions.session_view import SessionView, BasicSessionCreateData
+from robot_server.sessions.session_view import SessionView
 
 from robot_server.sessions.session_models import (
-    SessionStatus,
     SessionCommandSummary,
     BasicSession,
+    BasicSessionCreateData,
     ProtocolSession,
     ProtocolSessionCreateData,
     ProtocolSessionCreateParams,
@@ -72,7 +72,7 @@ async def test_create_session(
     expected_response = BasicSession(
         id=unique_id,
         createdAt=current_time,
-        status=SessionStatus.READY_TO_RUN,
+        status=pe_types.EngineStatus.READY_TO_RUN,
         actions=[],
         commands=[],
         pipettes=[],
@@ -83,7 +83,7 @@ async def test_create_session(
     decoy.when(engine_store.engine.state_view.pipettes.get_all()).then_return([])
     decoy.when(engine_store.engine.state_view.labware.get_all()).then_return([])
     decoy.when(engine_store.engine.state_view.commands.get_status()).then_return(
-        SessionStatus.READY_TO_RUN
+        pe_types.EngineStatus.READY_TO_RUN
     )
 
     decoy.when(
@@ -100,7 +100,7 @@ async def test_create_session(
             commands=[],
             pipettes=[],
             labware=[],
-            engine_status=SessionStatus.READY_TO_RUN,
+            engine_status=pe_types.EngineStatus.READY_TO_RUN,
         ),
     ).then_return(expected_response)
 
@@ -146,7 +146,7 @@ async def test_create_protocol_session(
     expected_response = ProtocolSession(
         id=unique_id,
         createdAt=current_time,
-        status=SessionStatus.READY_TO_RUN,
+        status=pe_types.EngineStatus.READY_TO_RUN,
         createParams=ProtocolSessionCreateParams(protocolId="protocol-id"),
         actions=[],
         commands=[],
@@ -172,7 +172,7 @@ async def test_create_protocol_session(
     decoy.when(engine_store.engine.state_view.pipettes.get_all()).then_return([])
     decoy.when(engine_store.engine.state_view.labware.get_all()).then_return([])
     decoy.when(engine_store.engine.state_view.commands.get_status()).then_return(
-        SessionStatus.READY_TO_RUN
+        pe_types.EngineStatus.READY_TO_RUN
     )
 
     decoy.when(
@@ -181,7 +181,7 @@ async def test_create_protocol_session(
             commands=[],
             pipettes=[],
             labware=[],
-            engine_status=SessionStatus.READY_TO_RUN,
+            engine_status=pe_types.EngineStatus.READY_TO_RUN,
         ),
     ).then_return(expected_response)
 
@@ -312,7 +312,7 @@ def test_get_session(
     expected_response = BasicSession(
         id="session-id",
         createdAt=created_at,
-        status=SessionStatus.READY_TO_RUN,
+        status=pe_types.EngineStatus.READY_TO_RUN,
         actions=[],
         commands=[
             SessionCommandSummary(
@@ -331,7 +331,7 @@ def test_get_session(
     decoy.when(engine_store.engine.state_view.pipettes.get_all()).then_return([pipette])
     decoy.when(engine_store.engine.state_view.labware.get_all()).then_return([labware])
     decoy.when(engine_store.engine.state_view.commands.get_status()).then_return(
-        SessionStatus.READY_TO_RUN
+        pe_types.EngineStatus.READY_TO_RUN
     )
 
     decoy.when(
@@ -340,7 +340,7 @@ def test_get_session(
             commands=[command],
             pipettes=[pipette],
             labware=[labware],
-            engine_status=SessionStatus.READY_TO_RUN,
+            engine_status=pe_types.EngineStatus.READY_TO_RUN,
         ),
     ).then_return(expected_response)
 
@@ -402,7 +402,7 @@ def test_get_sessions_not_empty(
     response_1 = BasicSession(
         id="unique-id-1",
         createdAt=created_at_1,
-        status=SessionStatus.SUCCEEDED,
+        status=pe_types.EngineStatus.SUCCEEDED,
         actions=[],
         commands=[],
         pipettes=[],
@@ -415,7 +415,7 @@ def test_get_sessions_not_empty(
     decoy.when(engine_store.engine.state_view.pipettes.get_all()).then_return([])
     decoy.when(engine_store.engine.state_view.labware.get_all()).then_return([])
     decoy.when(engine_store.engine.state_view.commands.get_status()).then_return(
-        SessionStatus.SUCCEEDED
+        pe_types.EngineStatus.SUCCEEDED
     )
 
     decoy.when(
@@ -424,7 +424,7 @@ def test_get_sessions_not_empty(
             commands=[],
             pipettes=[],
             labware=[],
-            engine_status=SessionStatus.SUCCEEDED,
+            engine_status=pe_types.EngineStatus.SUCCEEDED,
         ),
     ).then_return(response_1)
 

@@ -15,7 +15,7 @@ class TipCalibrationSessionStatus(BaseModel):
         None, description="Next Available Steps in Session"
     )
     labware: List[RequiredLabware]
-    supportedCommands: List[Optional[str]] = Field(
+    supportedCommands: List[str] = Field(
         ..., description="A list of supported commands for this user flow"
     )
 

@@ -111,7 +111,10 @@ def _check_parent(parentOpts: cal_types.ParentOptions, parent: str) -> bool:
     response_model=lw_models.MultipleCalibrationsResponse,
 )
 async def get_all_labware_calibrations(
-    loadName: str = None, namespace: str = None, version: int = None, parent: str = None
+    loadName: Optional[str] = None,
+    namespace: Optional[str] = None,
+    version: Optional[int] = None,
+    parent: Optional[str] = None,
 ) -> lw_models.MultipleCalibrationsResponse:
     all_calibrations = get_cal.get_all_calibrations()
 

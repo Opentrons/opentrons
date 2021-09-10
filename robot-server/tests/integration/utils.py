@@ -1,4 +1,7 @@
-def verify_settings_value(response, id: str, value: str):
+from requests import Response
+
+
+def verify_settings_value(response: Response, id: str, value: str) -> None:
     """Verify settings are updated as expectted"""
     for setting in response.json().get("settings"):
         if setting.get("id") == id:

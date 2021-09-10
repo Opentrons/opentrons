@@ -1,4 +1,5 @@
 """Errors returned from /system endpoints."""
+from typing import Optional
 from robot_server.service.errors import (
     RobotServerError,
     CommonErrorDef,
@@ -30,7 +31,7 @@ class SystemTimeAlreadySynchronized(SystemException):
 class SystemSetTimeException(SystemException):
     """Failure to set system time due to failure in `date` utility."""
 
-    def __init__(self, msg: str, definition: ErrorDef = None) -> None:
+    def __init__(self, msg: str, definition: Optional[ErrorDef] = None) -> None:
         """Initialize a SystemSetTimeException error.
 
         Args:

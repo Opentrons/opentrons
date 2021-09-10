@@ -3,6 +3,7 @@ from typing_extensions import Literal
 from functools import partial
 from pydantic import BaseModel, Field
 
+from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from ..helper_classes import RequiredLabware, AttachedPipette
 
 OffsetVector = Tuple[float, float, float]
@@ -97,7 +98,7 @@ class SessionCreateParams(BaseModel):
         description="Whether to use a calibration block in the"
         "calibration health check flow.",
     )
-    tipRacks: List[dict] = Field(
+    tipRacks: List[LabwareDefinition] = Field(
         [],
         description="A list of labware definitions to use in"
         "calibration health check",
@@ -113,7 +114,7 @@ class CalibrationCheckSessionStatus(BaseModel):
     comparisonsByPipette: ComparisonStatePerPipette
     labware: List[RequiredLabware]
     activeTipRack: RequiredLabware
-    supportedCommands: List[Optional[str]] = Field(
+    supportedCommands: List[str] = Field(
         ..., description="A list of supported commands for this user flow"
     )
 
