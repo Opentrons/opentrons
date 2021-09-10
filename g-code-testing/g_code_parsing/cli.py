@@ -1,7 +1,6 @@
 import abc
 import argparse
 import json
-import os
 from typing import Union, Dict, Any, List
 
 import sys
@@ -59,6 +58,8 @@ class RunCommand(CLICommand):
         configuration = GCodeTestFile.from_config_file(
             get_configuration_file_path()
         ).get_by_name(self.configuration_name)
+
+        engine: Union[HTTPGCodeEngine, ProtocolGCodeEngine]
 
         if configuration.driver == ValidDriverTypes.PROTOCOL.value:
             engine = ProtocolGCodeEngine(settings)

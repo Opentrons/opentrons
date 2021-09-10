@@ -140,8 +140,11 @@ class HTTPGCodeEngine(GCodeEngine):
     def _get_func(self, input_str):
         formatted_config_path = os.path.splitext(input_str)[0].replace("/", ".")
         module_string = f"g_code_test_data.{formatted_config_path}"
+
+        # TODO: The below code is very implicit and I don't like it.
+        # It should get fixed
         module = import_module(module_string)
-        return module.main()
+        return module.main()  # type: ignore
 
     @contextmanager
     def run(self, input_str: str):
