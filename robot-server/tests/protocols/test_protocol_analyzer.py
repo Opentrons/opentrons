@@ -3,7 +3,7 @@ import pytest
 from decoy import Decoy
 from datetime import datetime
 
-from opentrons.types import MountType
+from opentrons.types import MountType, DeckSlotName
 from opentrons.protocol_engine import commands as pe_commands, types as pe_types
 from opentrons.protocol_runner import ProtocolRunner, ProtocolRunData
 
@@ -62,7 +62,7 @@ async def test_analyze(
         id="labware-id",
         loadName="load-name",
         definitionUri="namespace/load-name/42",
-        location=pe_types.DeckSlotLocation(slot=pe_types.DeckSlotName.SLOT_1),
+        location=pe_types.DeckSlotLocation(slot=DeckSlotName.SLOT_1),
     )
 
     analysis_pipette = pe_types.LoadedPipette(

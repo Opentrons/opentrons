@@ -17,7 +17,6 @@ from robot_server.sessions.session_store import SessionResource
 from robot_server.sessions.session_view import SessionView
 from robot_server.sessions.session_models import (
     Session,
-    SessionStatus,
     BasicSession,
     BasicSessionCreateData,
     ProtocolSession,
@@ -111,7 +110,7 @@ current_time = datetime.now()
             BasicSession(
                 id="session-id",
                 createdAt=current_time,
-                status=SessionStatus.READY_TO_RUN,
+                status=EngineStatus.READY_TO_RUN,
                 actions=[],
                 commands=[],
                 pipettes=[],
@@ -130,7 +129,7 @@ current_time = datetime.now()
             ProtocolSession(
                 id="session-id",
                 createdAt=current_time,
-                status=SessionStatus.READY_TO_RUN,
+                status=EngineStatus.READY_TO_RUN,
                 createParams=ProtocolSessionCreateParams(protocolId="protocol-id"),
                 actions=[],
                 commands=[],
@@ -194,7 +193,7 @@ def test_to_response_maps_commands() -> None:
     assert result == BasicSession(
         id="session-id",
         createdAt=datetime(year=2021, month=1, day=1),
-        status=SessionStatus.RUNNING,
+        status=EngineStatus.RUNNING,
         actions=[],
         commands=[
             SessionCommandSummary(
@@ -247,7 +246,7 @@ def test_to_response_adds_equipment() -> None:
     assert result == BasicSession(
         id="session-id",
         createdAt=datetime(year=2021, month=1, day=1),
-        status=SessionStatus.RUNNING,
+        status=EngineStatus.RUNNING,
         actions=[],
         commands=[],
         pipettes=[pipette],
