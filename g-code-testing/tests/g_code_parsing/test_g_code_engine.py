@@ -30,7 +30,7 @@ def protocol_g_code_engine() -> ProtocolGCodeEngine:
 
 
 async def test_watcher_command_list_is_cleared(
-        protocol_g_code_engine: ProtocolGCodeEngine
+    protocol_g_code_engine: ProtocolGCodeEngine,
 ):
     """
     If everything is cleaning up correctly then 2 runs of the same protocol
