@@ -3,12 +3,14 @@ import os
 import re
 import sys
 import json
+import logging
 import shlex
 import stat
 import subprocess
 from aiohttp import web
 from dataclasses import dataclass
 
+LOG = logging.getLogger(__name__)
 # just nest this into RootFSConfigParser class.
 @dataclass
 class RootFSInfo:
@@ -45,7 +47,7 @@ class RootFS:
                 try:
                     f = open('root_fs_config.json')
                 except OSError:
-                    print("Could not open/read root_fs_config.json")
+                    ("Could not open/read root_fs_config.json")
                     sys.exit()
                 with f:
                     self.config = json.load(f)
@@ -73,7 +75,7 @@ class RootFS:
                 try:
                     f = open('root_fs_config.json', 'w+')
                 except OSError:
-                    print("Could not open/create root_fs_config.json")
+                    LOG.warning("Could not open/create root_fs_config.json")
                     sys.exit()
                 with f:
                     json.dump(root_FS_config, f)
@@ -81,10 +83,10 @@ class RootFS:
     def __init__(self):
         self._root_FS_config = self.RootFSConfig()
         self._root_FS_config_parser = self._root_FS_config._root_FS_config_parser
-        print('check this \n')
+        LOG.debug('check parser init \n')
         tmp = self._root_FS_config_parser.config
         tmp = tmp['data']['defaults']['ROOT_FS_PARTITION']
-        print(tmp)
+        LOG.debug(tmp)
         self._root_FS_config.ROOT_FS_PARTITION = tmp
 
     def set_partition(self, arg: argparse.Namespace, partition_name: str) -> None:
@@ -100,8 +102,6 @@ class RootFS:
         return web.Response(text="hello, world")
 
     def get_partition_api_(self) -> web.Response:
-        print('hello api')
-        """ print partition name"""
         dev = os.stat('/')[stat.ST_DEV]
         major = os.major(dev)
         minor = os.minor(dev)
@@ -119,8 +119,6 @@ class RootFS:
             raise AssertionError("Unexpected value of partition")
 
     def get_partition(self) -> RootFSInfo:
-        print('hello')
-        """ print partition name"""
         dev = os.stat('/')[stat.ST_DEV]
         major = os.major(dev)
         minor = os.minor(dev)
