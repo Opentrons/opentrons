@@ -124,14 +124,8 @@ def test_move_mount(api_client, hardware_move):
     )
     hardware_move.move_to.assert_has_calls(
         [
-            call(
-                Mount.RIGHT,
-                Point(100.0, 200.0, 0.0)
-            ),
-            call(
-                Mount.RIGHT,
-                Point(100.0, 200.0, 50.0)
-            ),
+            call(Mount.RIGHT, Point(100.0, 200.0, 0.0)),
+            call(Mount.RIGHT, Point(100.0, 200.0, 50.0)),
         ]
     )
 
@@ -146,7 +140,6 @@ def test_move_pipette(api_client, hardware_move):
     res = api_client.post("/robot/move", json=data)
     assert res.status_code == 200
     assert res.json() == {"message": "Move complete. New position: (50.0, 100.0, 25.0)"}
-
 
     hardware_move.gantry_position.assert_has_calls(
         [
