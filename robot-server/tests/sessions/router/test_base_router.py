@@ -6,10 +6,10 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from httpx import AsyncClient
 
-from tests.helpers import verify_response
+from opentrons.types import DeckSlotName, MountType
+from opentrons.protocol_engine import commands as pe_commands, types as pe_types
 
 from robot_server.service.task_runner import TaskRunner
-
 from robot_server.protocols import (
     ProtocolStore,
     ProtocolResource,
@@ -22,6 +22,7 @@ from robot_server.sessions.session_view import SessionView
 
 from robot_server.sessions.session_models import (
     SessionStatus,
+    SessionCommandSummary,
     BasicSession,
     BasicSessionCreateData,
     ProtocolSession,
@@ -42,6 +43,8 @@ from robot_server.sessions.router.base_router import (
     SessionNotFound,
     SessionAlreadyActive,
 )
+
+from tests.helpers import verify_response
 
 
 @pytest.fixture(autouse=True)
@@ -73,10 +76,13 @@ async def test_create_session(
         status=SessionStatus.READY_TO_RUN,
         actions=[],
         commands=[],
+        pipettes=[],
+        labware=[],
     )
 
     decoy.when(engine_store.engine.state_view.commands.get_all()).then_return([])
-
+    decoy.when(engine_store.engine.state_view.pipettes.get_all()).then_return([])
+    decoy.when(engine_store.engine.state_view.labware.get_all()).then_return([])
     decoy.when(engine_store.engine.state_view.commands.get_status()).then_return(
         SessionStatus.READY_TO_RUN
     )
@@ -93,6 +99,8 @@ async def test_create_session(
         session_view.as_response(
             session=session,
             commands=[],
+            pipettes=[],
+            labware=[],
             engine_status=SessionStatus.READY_TO_RUN,
         ),
     ).then_return(expected_response)
@@ -143,6 +151,8 @@ async def test_create_protocol_session(
         createParams=ProtocolSessionCreateParams(protocolId="protocol-id"),
         actions=[],
         commands=[],
+        pipettes=[],
+        labware=[],
     )
 
     decoy.when(protocol_store.get(protocol_id="protocol-id")).then_return(
@@ -160,6 +170,8 @@ async def test_create_protocol_session(
     ).then_return(session)
 
     decoy.when(engine_store.engine.state_view.commands.get_all()).then_return([])
+    decoy.when(engine_store.engine.state_view.pipettes.get_all()).then_return([])
+    decoy.when(engine_store.engine.state_view.labware.get_all()).then_return([])
     decoy.when(engine_store.engine.state_view.commands.get_status()).then_return(
         SessionStatus.READY_TO_RUN
     )
@@ -168,6 +180,8 @@ async def test_create_protocol_session(
         session_view.as_response(
             session=session,
             commands=[],
+            pipettes=[],
+            labware=[],
             engine_status=SessionStatus.READY_TO_RUN,
         ),
     ).then_return(expected_response)
@@ -275,17 +289,48 @@ def test_get_session(
         created_at=created_at,
         actions=[],
     )
+
+    command = pe_commands.Pause(
+        id="command-id",
+        status=pe_commands.CommandStatus.QUEUED,
+        createdAt=datetime(year=2021, month=1, day=1),
+        data=pe_commands.PauseData(message="hello world"),
+    )
+
+    labware = pe_types.LoadedLabware(
+        id="labware-id",
+        loadName="load-name",
+        definitionUri="namespace/load-name/42",
+        location=pe_types.DeckSlotLocation(slot=DeckSlotName.SLOT_1),
+    )
+
+    pipette = pe_types.LoadedPipette(
+        id="pipette-id",
+        pipetteName=pe_types.PipetteName.P300_SINGLE,
+        mount=MountType.LEFT,
+    )
+
     expected_response = BasicSession(
         id="session-id",
         createdAt=created_at,
         status=SessionStatus.READY_TO_RUN,
         actions=[],
-        commands=[],
+        commands=[
+            SessionCommandSummary(
+                id=command.id,
+                commandType=command.commandType,
+                status=command.status,
+            ),
+        ],
+        pipettes=[pipette],
+        labware=[labware],
     )
 
     decoy.when(session_store.get(session_id="session-id")).then_return(session)
 
-    decoy.when(engine_store.engine.state_view.commands.get_all()).then_return([])
+    decoy.when(engine_store.engine.state_view.commands.get_all()).then_return([command])
+    decoy.when(engine_store.engine.state_view.pipettes.get_all()).then_return([pipette])
+    decoy.when(engine_store.engine.state_view.labware.get_all()).then_return([labware])
     decoy.when(engine_store.engine.state_view.commands.get_status()).then_return(
         SessionStatus.READY_TO_RUN
     )
@@ -293,7 +338,9 @@ def test_get_session(
     decoy.when(
         session_view.as_response(
             session=session,
-            commands=[],
+            commands=[command],
+            pipettes=[pipette],
+            labware=[labware],
             engine_status=SessionStatus.READY_TO_RUN,
         ),
     ).then_return(expected_response)
@@ -359,11 +406,15 @@ def test_get_sessions_not_empty(
         status=SessionStatus.SUCCEEDED,
         actions=[],
         commands=[],
+        pipettes=[],
+        labware=[],
     )
 
     decoy.when(session_store.get_all()).then_return([session_1])
 
     decoy.when(engine_store.engine.state_view.commands.get_all()).then_return([])
+    decoy.when(engine_store.engine.state_view.pipettes.get_all()).then_return([])
+    decoy.when(engine_store.engine.state_view.labware.get_all()).then_return([])
     decoy.when(engine_store.engine.state_view.commands.get_status()).then_return(
         SessionStatus.SUCCEEDED
     )
@@ -372,6 +423,8 @@ def test_get_sessions_not_empty(
         session_view.as_response(
             session=session_1,
             commands=[],
+            pipettes=[],
+            labware=[],
             engine_status=SessionStatus.SUCCEEDED,
         ),
     ).then_return(response_1)
