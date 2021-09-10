@@ -116,11 +116,9 @@ def test_move_mount(api_client, hardware_move):
         "message": "Move complete. New position: (100.0, 200.0, 50.0)"
     }
 
-    hardware_move.cache_instruments.assert_called_once()
-
     hardware_move.gantry_position.assert_has_calls(
         [
-            call(Mount.RIGHT, critical_point=CriticalPoint.MOUNT),
+            call(Mount.RIGHT),
             call(Mount.RIGHT),
         ]
     )
@@ -128,13 +126,11 @@ def test_move_mount(api_client, hardware_move):
         [
             call(
                 Mount.RIGHT,
-                Point(100.0, 200.0, 0.0),
-                critical_point=CriticalPoint.MOUNT,
+                Point(100.0, 200.0, 0.0)
             ),
             call(
                 Mount.RIGHT,
-                Point(100.0, 200.0, 50.0),
-                critical_point=CriticalPoint.MOUNT,
+                Point(100.0, 200.0, 50.0)
             ),
         ]
     )
@@ -151,18 +147,17 @@ def test_move_pipette(api_client, hardware_move):
     assert res.status_code == 200
     assert res.json() == {"message": "Move complete. New position: (50.0, 100.0, 25.0)"}
 
-    hardware_move.cache_instruments.assert_called_once()
 
     hardware_move.gantry_position.assert_has_calls(
         [
-            call(Mount.LEFT, critical_point=None),
+            call(Mount.LEFT),
             call(Mount.LEFT),
         ]
     )
     hardware_move.move_to.assert_has_calls(
         [
-            call(Mount.LEFT, Point(50.0, 100.0, 0.0), critical_point=None),
-            call(Mount.LEFT, Point(50.0, 100.0, 25.0), critical_point=None),
+            call(Mount.LEFT, Point(50.0, 100.0, 0.0)),
+            call(Mount.LEFT, Point(50.0, 100.0, 25.0)),
         ]
     )
 
