@@ -102,7 +102,7 @@ export function DeckCalibration(props: Props): JSX.Element | null {
                     a_help_article: (
                       <Link
                         color={C_BLUE}
-                        onClick={() => null}
+                        href="https://support.opentrons.com/en/articles/3499692-how-positional-calibration-works-on-the-ot-2"
                         target="_blank"
                         rel="noopener noreferrer"
                       />
