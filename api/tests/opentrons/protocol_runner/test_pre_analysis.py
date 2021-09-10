@@ -16,9 +16,10 @@ from opentrons.protocol_runner.pre_analysis import (
     JsonPreAnalysis,
     PythonPreAnalysis,
     Metadata as ExtractedMetadata,
-    ProtocolNotPreAnalyzableError,
+    FileTypeError,
     JsonParseError,
     JsonSchemaValidationError,
+    NoFilesError,
 )
 
 
@@ -121,13 +122,23 @@ def test_error_if_json_file_does_not_conform_to_schema(tmp_path: Path) -> None:
 
 def test_error_if_no_files() -> None:
     """It should raise if no files are supplied."""
-    with pytest.raises(ProtocolNotPreAnalyzableError):
+    with pytest.raises(NoFilesError):
         PreAnalyzer().analyze([])
+
+
+def test_error_if_file_extension_unrecognized(tmp_path: Path) -> None:
+    """It should raise if a file doesn't have a valid extension for a protocol."""
+    protocol_file = tmp_path / "Foo.jpg"
+    protocol_file.touch()
+    with pytest.raises(FileTypeError):
+        PreAnalyzer().analyze([protocol_file])
 
 
 # Update or replace this placeholder test when we support multi-file protocols.
 @pytest.mark.xfail(strict=True, raises=NotImplementedError)
 def test_multi_file_protocol(tmp_path: Path) -> None:  # noqa: D103
     file_1 = tmp_path / "protocol_file_1"
+    file_1.touch()
     file_2 = tmp_path / "protocol_file_2"
+    file_2.touch()
     PreAnalyzer.analyze([file_1, file_2])

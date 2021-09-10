@@ -16,7 +16,7 @@ class PreAnalyzer:  # noqa: D101
         protocol_files: List[Path],
     ) -> Union["PythonPreAnalysis", "JsonPreAnalysis"]:
         if len(protocol_files) == 0:
-            raise ProtocolNotPreAnalyzableError("Protocol must have at least one file.")
+            raise NoFilesError("Protocol must have at least one file.")
         elif len(protocol_files) > 1:
             # TODO(mm, 2021-09-07): add multi-file support
             raise NotImplementedError("Multi-file protocols not yet supported.")
@@ -29,7 +29,7 @@ class PreAnalyzer:  # noqa: D101
         elif suffix == ".py":
             raise NotImplementedError()
         else:
-            raise ProtocolNotPreAnalyzableError(f'Unrecognized file suffix "{suffix}"')
+            raise FileTypeError(f'Unrecognized file extension "{suffix}"')
 
 
 def _analyze_json(main_file: Path) -> "JsonPreAnalysis":
@@ -46,7 +46,7 @@ def _analyze_json(main_file: Path) -> "JsonPreAnalysis":
     # We extract metadata directly from the JSON dict,
     # instead of from the fully parsed Pydantic model.
     # This way, we preserve metadata fields that the Pydantic model doesn't know about.
-    # (Otherwise, they would be silently discarded.)
+    # (Otherwise, Pydantic would silently discard them.)
     return JsonPreAnalysis(metadata=parsed_json["metadata"])
 
 
@@ -73,13 +73,21 @@ class JsonPreAnalysis:  # noqa: D101
     metadata: Metadata
 
 
-class ProtocolNotPreAnalyzableError(Exception):
-    """Raised when an error in the protocol prevents pre-analysis."""
+class NotPreAnalyzableError(Exception):
+    """Raised when a problem with the provided files prevents pre-analysis."""
 
 
-class JsonParseError(ProtocolNotPreAnalyzableError):
+class FileTypeError(NotPreAnalyzableError):
+    """Raised when a file is provided that's apparently not a protocol file."""
+
+
+class JsonParseError(NotPreAnalyzableError):
     """Raised when an apparent JSON protocol isn't actually parseable as JSON."""
 
 
-class JsonSchemaValidationError(ProtocolNotPreAnalyzableError):
+class JsonSchemaValidationError(NotPreAnalyzableError):
     """Raised when an apparent JSON protocol doesn't conform to our schema."""
+
+
+class NoFilesError(NotPreAnalyzableError):
+    """Raised when an empty list of files is provided."""
