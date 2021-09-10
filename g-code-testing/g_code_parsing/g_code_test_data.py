@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import json
 from typing import List
-from g_code_parsing.utils import get_configuration_file_path
 from pydantic import BaseModel, validator
 from g_code_parsing.errors import ConfigurationNotFoundError
 from enum import Enum
@@ -13,14 +12,14 @@ class ValidDriverTypes(str, Enum):
     PROTOCOL = "protocol"
 
 
-class TestData(BaseModel):
+class GCodeTestData(BaseModel):
     name: str
     path: str
     driver: ValidDriverTypes
 
 
-class TestFile(BaseModel):
-    configs: List[TestData]
+class GCodeTestFile(BaseModel):
+    configs: List[GCodeTestData]
 
     # Pydantic stuff
 
@@ -43,9 +42,9 @@ class TestFile(BaseModel):
     # Public Methods
 
     @classmethod
-    def from_config_file(cls) -> TestFile:
-        json_file = open(get_configuration_file_path(), "r")
-        return TestFile(configs=json.load(json_file))
+    def from_config_file(cls, file_path: str) -> GCodeTestFile:
+        json_file = open(file_path, "r")
+        return GCodeTestFile(configs=json.load(json_file))
 
     def get_by_name(self, name: str):
         for config in self.configs:
@@ -61,8 +60,3 @@ class TestFile(BaseModel):
     @property
     def paths(self) -> List[str]:
         return [config.path for config in self.configs]
-
-
-if __name__ == "__main__":
-    test_file = TestFile.from_config_file()
-    print(test_file.paths)

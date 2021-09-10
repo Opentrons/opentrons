@@ -19,14 +19,13 @@ from g_code_parsing.g_code_program.supported_text_modes import (
     SupportedTextModes,
 )
 from g_code_parsing.g_code_engine import HTTPGCodeEngine, ProtocolGCodeEngine
-from g_code_parsing.g_code_test_data import TestFile, ValidDriverTypes
-from g_code_parsing.utils import get_configuration_dir
+from g_code_parsing.g_code_test_data import GCodeTestFile, ValidDriverTypes
+from g_code_parsing.utils import get_configuration_file_path
 
 
 class CLICommand(abc.ABC):
     """ABC which all CLI command classes should inherit from"""
 
-    CONFIGURATION_DIR_LOCATION = get_configuration_dir()
     able_to_respond_with_error_code = False
     respond_with_error_code = False
     error_message = "Error message not defined"
@@ -57,7 +56,9 @@ class RunCommand(CLICommand):
         )
         settings = Settings(smoothie=smoothie_settings, host=self.host)
 
-        configuration = TestFile.from_config_file().get_by_name(self.configuration_name)
+        configuration = GCodeTestFile.from_config_file(
+            get_configuration_file_path()
+        ).get_by_name(self.configuration_name)
 
         if configuration.driver == ValidDriverTypes.PROTOCOL.value:
             engine = ProtocolGCodeEngine(settings)
@@ -106,7 +107,9 @@ class DiffCommand(CLICommand):
 
 class ConfigurationCommand(CLICommand):
     def execute(self) -> str:
-        path_string = "\n".join(TestFile.from_config_file().names)
+        path_string = "\n".join(
+            GCodeTestFile.from_config_file(get_configuration_file_path()).names
+        )
         return f"Runnable Configurations:\n{path_string}"
 
 
@@ -149,7 +152,7 @@ class GCodeCLI:
             '--text-mode',
             'Concise',
             '--left-pipette',
-            '{"model": "p20_single_v2.0", "id": "P20SV202020070101"}',
+            '{"model": "p20_single_v2.0", "id": "P20SV202020070101 "}',
              '$DATA_DIR/protocols/smoothie_protocol.py'
         ]
         """
