@@ -2,7 +2,7 @@ from asyncio import Event
 from mock import call, MagicMock
 
 import pytest
-from opentrons.hardware_control.types import Axis, CriticalPoint
+from opentrons.hardware_control.types import Axis
 from opentrons.types import Mount, Point
 
 from robot_server.errors import ApiError
