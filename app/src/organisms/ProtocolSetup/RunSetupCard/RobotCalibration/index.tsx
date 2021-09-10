@@ -16,7 +16,6 @@ import {
   Box,
 } from '@opentrons/components'
 import { Divider } from '../../../../atoms/structure'
-import { CalibrateTipLengthControl } from '../../../../pages/Calibrate/CalibrateTipLengthControl'
 import * as PipetteOffset from '../../../../redux/calibration/pipette-offset'
 import * as Pipettes from '../../../../redux/pipettes'
 import * as TipLength from '../../../../redux/calibration/tip-length'
@@ -24,7 +23,7 @@ import * as PipetteConstants from '../../../../redux/pipettes/constants'
 import { DeckCalibration } from './DeckCalibration'
 import { CalibrationItem } from './CalibrationItem'
 import { PipetteCalibration } from './PipetteCalibration'
-
+import { TipLengthCalibration } from './TipLengthCalibration'
 import type { Dispatch, State } from '../../../../redux/types'
 import type { ViewableRobot } from '../../../../redux/discovery/types'
 import type { ProtocolCalibrationStatus } from '../../../../redux/calibration/types'
@@ -74,6 +73,7 @@ export function RobotCalibration(props: Props): JSX.Element {
           } else {
             return (
               <PipetteCalibration
+                key={index}
                 pipetteTipRackData={pipetteTipRackData}
                 index={index}
                 mount={mount}
@@ -104,7 +104,7 @@ export function RobotCalibration(props: Props): JSX.Element {
                     index={index}
                     title={tipRack.displayName}
                     button={
-                      <CalibrateTipLengthControl
+                      <TipLengthCalibration
                         mount={mount}
                         robotName={robotName}
                         hasCalibrated={tipRack.lastModifiedDate !== null}

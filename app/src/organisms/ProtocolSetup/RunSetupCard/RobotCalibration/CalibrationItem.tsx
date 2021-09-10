@@ -52,14 +52,14 @@ export function CalibrationItem(props: Props): JSX.Element | null {
           {calibrated ? (
             <Icon
               name={'check-circle'}
-              size={SIZE_2}
+              size={'1.5rem'}
               color={COLOR_SUCCESS}
               marginRight={SPACING_2}
             />
           ) : (
             <Icon
               name={'circle'}
-              size={SIZE_2}
+              size={'1.5rem'}
               color={C_WHITE}
               border={BORDER_SOLID_MEDIUM}
               borderRadius={SIZE_2}

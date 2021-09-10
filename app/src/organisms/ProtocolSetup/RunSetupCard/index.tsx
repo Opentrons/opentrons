@@ -134,9 +134,10 @@ export function RunSetupCard(): JSX.Element | null {
                 ? setExpandedStepKey(null)
                 : setExpandedStepKey(stepKey)
             }
-            calibrationRequired={
-              stepKey === ROBOT_CALIBRATION_STEP_KEY &&
-              !calibrationStatus.complete
+            calibrationComplete={
+              stepKey === ROBOT_CALIBRATION_STEP_KEY
+                ? calibrationStatus.complete
+                : undefined
             }
           >
             {StepDetailMap[stepKey].stepInternals}

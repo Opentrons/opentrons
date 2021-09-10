@@ -18,6 +18,7 @@ import {
   SPACING_2,
   SPACING_3,
   SPACING_7,
+  COLOR_SUCCESS,
 } from '@opentrons/components'
 
 interface CollapsibleStepProps {
@@ -27,7 +28,7 @@ interface CollapsibleStepProps {
   label: string
   toggleExpanded: () => void
   children: React.ReactNode
-  calibrationRequired?: boolean
+  calibrationComplete?: boolean
 }
 
 export function CollapsibleStep({
@@ -37,7 +38,7 @@ export function CollapsibleStep({
   label,
   toggleExpanded,
   children,
-  calibrationRequired,
+  calibrationComplete,
 }: CollapsibleStepProps): JSX.Element {
   const { t } = useTranslation(['protocol_setup'])
   return (
@@ -59,7 +60,7 @@ export function CollapsibleStep({
             {description}
           </Text>
         </Flex>
-        {calibrationRequired === true && (
+        {calibrationComplete !== undefined && (
           <Flex
             flexDirection={DIRECTION_ROW}
             alignItems={ALIGN_START}
@@ -67,11 +68,15 @@ export function CollapsibleStep({
           >
             <Icon
               size={SIZE_1}
-              color={COLOR_WARNING}
+              color={calibrationComplete ? COLOR_SUCCESS : COLOR_WARNING}
               marginRight={SPACING_2}
-              name={'alert-circle'}
+              name={calibrationComplete ? 'check-circle' : 'alert-circle'}
             />
-            <Text fontSize={FONT_SIZE_BODY_1}>{t('calibration_needed')}</Text>
+            <Text fontSize={FONT_SIZE_BODY_1}>
+              {calibrationComplete
+                ? t('calibration_ready')
+                : t('calibration_needed')}
+            </Text>
           </Flex>
         )}
         <Icon size={SIZE_1} name={expanded ? 'minus' : 'plus'} />

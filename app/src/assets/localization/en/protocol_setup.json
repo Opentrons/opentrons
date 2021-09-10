@@ -62,5 +62,6 @@
   "calibrate_tiprack_failure_reason": "Calibrate the required tip lengths to continue",
   "calibrate_pipette_failure_reason": "Calibrate the required pipette(s) to continue",
   "attach_pipette_failure_reason": "Attach the required pipette(s) to continue",
-  "calibration_needed": "Calibration needed"
+  "calibration_needed": "Calibration needed",
+  "calibration_ready": "Calibration ready"
 }

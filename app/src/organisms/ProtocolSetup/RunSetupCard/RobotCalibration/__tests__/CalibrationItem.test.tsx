@@ -28,10 +28,11 @@ describe('CalibrationItem', () => {
     expect(getByRole('button', { name: 'stub button' })).toBeTruthy()
   })
   it('renders calibrated date if there is no subtext', () => {
-    const { getByText } = render({
+    const { getByText, getByTitle } = render({
       calibratedDate: 'Thursday, September 9, 2021',
     })
     expect(getByText('Last calibrated: September 09, 2021 00:00')).toBeTruthy()
+    expect(getByTitle('check-circle')).toBeTruthy()
   })
   it('renders not calibrated if there is no subtext or cal date', () => {
     const { getByText } = render()
