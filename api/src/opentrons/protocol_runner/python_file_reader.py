@@ -15,7 +15,7 @@ class PythonProtocol:
 
     def run(self, context: ProtocolContext) -> None:
         """Call the protocol module's run method."""
-        return self._protocol_module.run(context)  # type: ignore[attr-defined]
+        self._protocol_module.run(context)  # type: ignore[attr-defined]
 
 
 class PythonFileReader:
@@ -33,6 +33,11 @@ class PythonFileReader:
             name="protocol",
             location=protocol_file.files[0],
         )
+
+        # TODO(mc, 2021-09-13): figure out why this would happen and raise
+        # a well defined error accordingly
+        assert spec is not None, "Unable to load module spec from file"
+
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)  # type: ignore[union-attr]
 

@@ -2,13 +2,14 @@ from typing import cast, List, Optional, Tuple
 from opentrons.types import Point
 from opentrons.protocol_api import labware, InstrumentContext, ProtocolContext
 
-from opentrons.protocols.geometry import module_geometry
+from opentrons.hardware_control.modules.types import ModuleType
+from opentrons.protocols.geometry.module_geometry import ModuleGeometry
 
 
 def _get_parent_slot_and_position(
     labware_obj: labware.Labware,
 ) -> Tuple[str, Optional[Point]]:
-    if isinstance(labware_obj.parent, (module_geometry.ModuleGeometry)):
+    if isinstance(labware_obj.parent, (ModuleGeometry)):
         return (cast(str, labware_obj.parent.parent), labware_obj.parent.labware_offset)
     else:
         return (cast(str, labware_obj.parent), None)
@@ -74,14 +75,12 @@ class Instrument:
 
 
 class Module:
-    def __init__(
-        self, module: module_geometry.ModuleGeometry, context: ProtocolContext
-    ) -> None:
+    def __init__(self, module: ModuleGeometry, context: ProtocolContext) -> None:
         self.id = id(module)
         _type_lookup = {
-            module_geometry.ModuleType.MAGNETIC: "magdeck",
-            module_geometry.ModuleType.TEMPERATURE: "tempdeck",
-            module_geometry.ModuleType.THERMOCYCLER: "thermocycler",
+            ModuleType.MAGNETIC: "magdeck",
+            ModuleType.TEMPERATURE: "tempdeck",
+            ModuleType.THERMOCYCLER: "thermocycler",
         }
         self.name = _type_lookup[module.module_type]
         self.model = module.model.value

@@ -1,6 +1,6 @@
 """Deck data resource provider."""
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import List, Optional, cast
 from typing_extensions import final
 
 from opentrons_shared_data.deck import load as load_deck
@@ -49,8 +49,8 @@ class DeckDataProvider:
 
         for fixture in deck_definition["locations"]["fixtures"]:
             labware_id = fixture["id"]
-            load_name = fixture.get("labware")  # type: ignore[misc]
-            slot = fixture.get("slot")  # type: ignore[misc]
+            load_name = cast(Optional[str], fixture.get("labware", None))
+            slot = cast(Optional[str], fixture.get("slot", None))
 
             if load_name is not None and slot is not None:
                 location = DeckSlotLocation(slot=DeckSlotName.from_primitive(slot))

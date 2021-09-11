@@ -2,6 +2,7 @@
 import pytest
 from typing import Any, Dict, List
 
+from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons.types import DeckSlotName, MountType
 from opentrons.protocols import models
 from opentrons.protocol_runner.json_command_translator import JsonCommandTranslator
@@ -65,8 +66,8 @@ def _make_json_protocol(
 
 def test_labware(
     subject: JsonCommandTranslator,
-    minimal_labware_def: dict,
-    minimal_labware_def2: dict,
+    minimal_labware_def: LabwareDefinition,
+    minimal_labware_def2: LabwareDefinition,
 ) -> None:
     """It should emit AddLabwareDefinitionRequest and LoadLabwareRequest objects.
 

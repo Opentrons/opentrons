@@ -36,11 +36,11 @@ def test_execute_function_apiv2(
 ):
 
     mock_get_attached_instr.return_value[types.Mount.LEFT] = {
-        "config": load("p10_single_v1.5"),
+        "config": load("p10_single_v1.5"),  # type: ignore[arg-type]
         "id": "testid",
     }
     mock_get_attached_instr.return_value[types.Mount.RIGHT] = {
-        "config": load("p300_single_v1.5"),
+        "config": load("p300_single_v1.5"),  # type: ignore[arg-type]
         "id": "testid2",
     }
     entries = []
@@ -70,7 +70,7 @@ def test_execute_function_json_v3_apiv2(
         entries.append(entry)
 
     mock_get_attached_instr.return_value[types.Mount.LEFT] = {
-        "config": load("p10_single_v1.5"),
+        "config": load("p10_single_v1.5"),  # type: ignore[arg-type]
         "id": "testid",
     }
     execute.execute(filelike, "simple.json", emit_runlog=emit_runlog)
@@ -98,7 +98,7 @@ def test_execute_function_json_v4_apiv2(
         entries.append(entry)
 
     mock_get_attached_instr.return_value[types.Mount.LEFT] = {
-        "config": load("p10_single_v1.5"),
+        "config": load("p10_single_v1.5"),  # type: ignore[arg-type]
         "id": "testid",
     }
     execute.execute(filelike, "simple.json", emit_runlog=emit_runlog)
@@ -126,7 +126,7 @@ def test_execute_function_json_v5_apiv2(
         entries.append(entry)
 
     mock_get_attached_instr.return_value[types.Mount.LEFT] = {
-        "config": load("p10_single_v1.5"),
+        "config": load("p10_single_v1.5"),  # type: ignore[arg-type]
         "id": "testid",
     }
     execute.execute(filelike, "simple.json", emit_runlog=emit_runlog)
@@ -155,7 +155,7 @@ def test_execute_function_bundle_apiv2(
         entries.append(entry)
 
     mock_get_attached_instr.return_value[types.Mount.LEFT] = {
-        "config": load("p10_single_v1.5"),
+        "config": load("p10_single_v1.5"),  # type: ignore[arg-type]
         "id": "testid",
     }
     execute.execute(bundle["filelike"], "simple_bundle.zip", emit_runlog=emit_runlog)
@@ -192,7 +192,7 @@ def test_execute_extra_labware(
         entries.append(entry)
 
     mock_get_attached_instr.return_value[types.Mount.RIGHT] = {
-        "config": load("p300_single_v2.0"),
+        "config": load("p300_single_v2.0"),  # type: ignore[arg-type]
         "id": "testid",
     }
     # make sure we can load labware explicitly
@@ -211,7 +211,9 @@ def test_execute_extra_labware(
     with pytest.raises(ExceptionInProtocolError, match=".*FileNotFoundError.*"):
         execute.execute(protocol.filelike, "custom_labware.py")
     no_lw = execute.get_protocol_api("2.0")
-    assert not no_lw._implementation._extra_labware
+
+    # TODO(mc, 2021-09-13): `_extra_labware` is not defined on `AbstractProtocol`
+    assert not no_lw._implementation._extra_labware  # type: ignore[attr-defined]
     protocol.filelike.seek(0)
     monkeypatch.setattr(execute, "IS_ROBOT", True)
     monkeypatch.setattr(execute, "JUPYTER_NOTEBOOK_LABWARE_DIR", fixturedir)
@@ -223,7 +225,10 @@ def test_execute_extra_labware(
 
     # make sure the extra labware loaded by default is right
     ctx = execute.get_protocol_api("2.0")
-    assert len(ctx._implementation._extra_labware.keys()) == len(os.listdir(fixturedir))
+    # TODO(mc, 2021-09-13): `_extra_labware` is not defined on `AbstractProtocol`
+    assert len(
+        ctx._implementation._extra_labware.keys()  # type: ignore[attr-defined]
+    ) == len(os.listdir(fixturedir))
 
     assert ctx.load_labware("fixture_12_trough", 1, namespace="fixture")
 
