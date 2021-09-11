@@ -469,7 +469,7 @@ def load_module_from_definition(
     """
     api_level = api_level or MAX_SUPPORTED_VERSION
     # def not yet discriminated, mypy complains sadly
-    schema = definition.get("$otSharedSchema")  # type: ignore
+    schema = definition.get("$otSharedSchema")
     if not schema:
         # v1 definitions don't have schema versions
         # but unfortunately we can't tell mypy that because it can only

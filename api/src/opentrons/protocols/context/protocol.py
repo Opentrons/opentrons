@@ -8,9 +8,10 @@ from typing import Dict, Optional, Union
 
 from opentrons import types
 from opentrons.hardware_control import SynchronousAdapter, ThreadManager
+from opentrons.hardware_control.modules.types import ModuleType
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.geometry.deck_item import DeckItem
-from opentrons.protocols.geometry.module_geometry import ModuleGeometry, ModuleType
+from opentrons.protocols.geometry.module_geometry import ModuleGeometry
 from opentrons.protocols.context.instrument import AbstractInstrument
 from opentrons.protocols.api_support.util import AxisMaxSpeeds, HardwareManager
 from opentrons.protocols.context.labware import AbstractLabware
