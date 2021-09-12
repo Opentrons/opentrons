@@ -21,7 +21,7 @@ class GenericNode(Generic[VertexName]):
     """
 
     name: VertexName
-    sub_names: List[str]
+    sub_names: List[VertexName]
 
     def __hash__(self) -> int:
         """Hash function.

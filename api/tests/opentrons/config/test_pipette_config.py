@@ -1,13 +1,14 @@
 import json
 from unittest.mock import patch
-from numpy import isclose
+from numpy import isclose  # type: ignore[import]
+from typing import Any, Dict, Iterator
 
 import pytest
 from opentrons import types
 
 from opentrons.config import pipette_config, feature_flags as ff, CONFIG
 from opentrons_shared_data import load_shared_data
-
+from opentrons_shared_data.pipette.dev_types import PipetteModel
 
 defs = json.loads(load_shared_data("pipette/definitions/pipetteModelSpecs.json"))
 
@@ -117,7 +118,7 @@ def test_ul_per_mm_continuous(pipette_model):
 def test_override_load(ot_config_tempdir):
     cdir = CONFIG["pipette_config_overrides_dir"]
 
-    existing_overrides = {
+    existing_overrides: Dict[str, Dict[str, Any]] = {
         "pickUpCurrent": {"value": 1231.213},
         "dropTipSpeed": {"value": 121},
         "quirks": {"dropTipShake": True},
@@ -127,18 +128,18 @@ def test_override_load(ot_config_tempdir):
     with (cdir / f"{existing_id}.json").open("w") as ovf:
         json.dump(existing_overrides, ovf)
 
-    pconf = pipette_config.load("p300_multi_v1.4", existing_id)
+    pconf = pipette_config.load(PipetteModel("p300_multi_v1.4"), existing_id)
 
     assert pconf.pick_up_current == existing_overrides["pickUpCurrent"]["value"]
     assert pconf.drop_tip_speed == existing_overrides["dropTipSpeed"]["value"]
     assert pconf.quirks == ["dropTipShake"]
 
     new_id = "0djaisoa921jas"
-    new_pconf = pipette_config.load("p300_multi_v1.4", new_id)
+    new_pconf = pipette_config.load(PipetteModel("p300_multi_v1.4"), new_id)
 
     assert new_pconf != pconf
 
-    unspecced = pipette_config.load("p300_multi_v1.4")
+    unspecced = pipette_config.load(PipetteModel("p300_multi_v1.4"))
     assert unspecced == new_pconf
 
 
@@ -150,11 +151,11 @@ def test_override_save(ot_config_tempdir):
     new_id = "aoa2109j09cj2a"
     model = "p300_multi_v1"
 
-    old_pconf = pipette_config.load("p300_multi_v1.4", new_id)
+    old_pconf = pipette_config.load(PipetteModel("p300_multi_v1.4"), new_id)
 
     assert old_pconf.quirks == ["dropTipShake"]
 
-    pipette_config.save_overrides(new_id, overrides, model)
+    pipette_config.save_overrides(new_id, overrides, PipetteModel(model))
 
     assert (cdir / f"{new_id}.json").is_file()
 
@@ -163,12 +164,12 @@ def test_override_save(ot_config_tempdir):
     assert loaded["pickUpCurrent"]["value"] == overrides["pickUpCurrent"]
     assert loaded["dropTipSpeed"]["value"] == overrides["dropTipSpeed"]
 
-    new_pconf = pipette_config.load("p300_multi_v1.4", new_id)
+    new_pconf = pipette_config.load(PipetteModel("p300_multi_v1.4"), new_id)
     assert new_pconf.quirks == []
 
 
 @pytest.fixture
-def new_id_for_save() -> str:
+def new_id_for_save() -> Iterator[str]:
     """Fixture to provide a pipette id then delete it's generated file."""
     r = "aoa2109j09cj2a"
     yield r
@@ -183,7 +184,7 @@ def test_mutable_configs_only(monkeypatch, new_id_for_save):
         pipette_config, "MUTABLE_CONFIGS", ["tipLength", "plungerCurrent"]
     )
 
-    model = "p300_multi_v1"
+    model = PipetteModel("p300_multi_v1")
 
     pipette_config.save_overrides(new_id_for_save, {}, model)
 
@@ -211,7 +212,7 @@ def mock_pipette_config_model():
         "quirks": {"quirk1": True, "quirk2": True},
     }
     # Patch VALID_QUIRKS to reflect quirks in the mock pipette config model
-    with patch.object(pipette_config, "VALID_QUIRKS", new=list(model["quirks"].keys())):
+    with patch.object(pipette_config, "VALID_QUIRKS", new=["quirk1", "quirk2"]):
         yield model
 
 
@@ -247,7 +248,7 @@ def test_validate_overrides_fail(
 )
 def test_validate_overrides_pass(override_field, mock_pipette_config_model):
     assert (
-        pipette_config.validate_overrides(override_field, mock_pipette_config_model)
+        pipette_config.validate_overrides(override_field, mock_pipette_config_model)  # type: ignore[func-returns-value]  # noqa: E501
         is None
     )
 

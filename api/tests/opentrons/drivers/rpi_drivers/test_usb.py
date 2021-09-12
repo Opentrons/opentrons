@@ -1,6 +1,7 @@
 import pytest
-
 from mock import patch, MagicMock
+from typing import Iterator
+
 from opentrons.hardware_control.modules.types import ModuleAtPort
 from opentrons.hardware_control.types import BoardRevision
 from opentrons.drivers.rpi_drivers.usb import USBBus
@@ -44,8 +45,8 @@ filtered_port_refresh = [
 
 
 @pytest.fixture
-def usb_bus() -> USBBus:
-    @staticmethod
+def usb_bus() -> Iterator[USBBus]:
+    @staticmethod  # type: ignore[misc]
     def fake_read_bus():
         return fake_bus_og
 
@@ -54,10 +55,10 @@ def usb_bus() -> USBBus:
 
 
 @pytest.fixture(params=[BoardRevision.OG, BoardRevision.A])
-def usb_revision(request) -> USBBus:
+def usb_revision(request) -> Iterator[USBBus]:
     revision = request.param
 
-    @staticmethod
+    @staticmethod  # type: ignore[misc]
     def fake_read_bus():
         if revision == BoardRevision.OG:
             return fake_bus_og
@@ -115,7 +116,7 @@ def test_unplug_device(usb_bus: USBBus) -> None:
     copy_bus.remove(u)
     copy_ports.remove("1-1.3/1-1.3:1.0/tty/ttyACM1/dev")
 
-    usb_bus.read_bus = MagicMock(return_value=copy_bus)
+    usb_bus.read_bus = MagicMock(return_value=copy_bus)  # type: ignore[assignment]
     usb_bus.sort_ports()
 
     expected_ports = [USBPort.build(p, usb_bus._board_revision) for p in copy_ports]
@@ -128,14 +129,14 @@ def test_sorted_usb_bus(usb_bus: USBBus) -> None:
 
 
 def test_modify_module_list(usb_bus: USBBus):
-    usb_bus.read_symlink = MagicMock(return_value="ttyACM1")
+    usb_bus.read_symlink = MagicMock(return_value="ttyACM1")  # type: ignore[assignment]
     mod_at_port_list = [
         ModuleAtPort(name="temperature module", port="dev/ot_module_temperature_module")
     ]
     updated_list = usb_bus.match_virtual_ports(mod_at_port_list)
     assert updated_list[0].usb_port == usb_bus.usb_dev[0]
 
-    usb_bus.read_symlink = MagicMock(return_value="ttyACM2")
+    usb_bus.read_symlink = MagicMock(return_value="ttyACM2")  # type: ignore[assignment]
     mod_at_port_list = [
         ModuleAtPort(name="magnetic module", port="dev/ot_module_magnetic_module")
     ]

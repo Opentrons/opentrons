@@ -50,14 +50,6 @@ ot_shared_data_sources := $(filter %.json,$(shell $(SHX) find ../shared-data/))
 ot_resources := $(filter %,$(shell $(SHX) find src/opentrons/resources))
 ot_sources := $(ot_py_sources) $(ot_shared_data_sources) $(ot_resources)
 
-# test modules to typecheck
-# TODO(mc, 2021-07-23): expand this to all tests
-ot_tests_to_typecheck := \
-	tests/opentrons/motion_planning \
-	tests/opentrons/protocol_api_experimental \
-	tests/opentrons/protocol_engine \
-	tests/opentrons/protocol_runner
-
 # Defined separately than the clean target so the wheel file doesn’t have to
 # depend on a PHONY target
 clean_cmd = $(SHX) rm -rf build dist .coverage coverage.xml '*.egg-info' '**/__pycache__' '**/*.pyc' 'src/**/.mypy_cache'
@@ -94,7 +86,7 @@ test:
 
 .PHONY: lint
 lint:
-	$(python) -m mypy src $(ot_tests_to_typecheck)
+	$(python) -m mypy src/opentrons tests/opentrons
 	$(python) -m black --check src tests setup.py
 	$(python) -m flake8 src tests setup.py
 
