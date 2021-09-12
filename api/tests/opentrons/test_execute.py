@@ -212,7 +212,7 @@ def test_execute_extra_labware(
         execute.execute(protocol.filelike, "custom_labware.py")
     no_lw = execute.get_protocol_api("2.0")
 
-    # TODO(mc, 2021-09-13): `_extra_labware` is not defined on `AbstractProtocol`
+    # TODO(mc, 2021-09-12): `_extra_labware` is not defined on `AbstractProtocol`
     assert not no_lw._implementation._extra_labware  # type: ignore[attr-defined]
     protocol.filelike.seek(0)
     monkeypatch.setattr(execute, "IS_ROBOT", True)
@@ -225,7 +225,7 @@ def test_execute_extra_labware(
 
     # make sure the extra labware loaded by default is right
     ctx = execute.get_protocol_api("2.0")
-    # TODO(mc, 2021-09-13): `_extra_labware` is not defined on `AbstractProtocol`
+    # TODO(mc, 2021-09-12): `_extra_labware` is not defined on `AbstractProtocol`
     assert len(
         ctx._implementation._extra_labware.keys()  # type: ignore[attr-defined]
     ) == len(os.listdir(fixturedir))

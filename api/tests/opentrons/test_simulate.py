@@ -89,7 +89,7 @@ def test_simulate_extra_labware(protocol, protocol_file, monkeypatch):
     with pytest.raises(ExceptionInProtocolError, match=".*FileNotFoundError.*"):
         simulate.simulate(protocol.filelike, "custom_labware.py")
     no_lw = simulate.get_protocol_api("2.0")
-    # TODO(mc, 2021-09-13): `_extra_labware` is not defined on `AbstractProtocol`
+    # TODO(mc, 2021-09-12): `_extra_labware` is not defined on `AbstractProtocol`
     assert not no_lw._implementation._extra_labware  # type: ignore[attr-defined]
     protocol.filelike.seek(0)
     monkeypatch.setattr(simulate, "IS_ROBOT", True)
@@ -100,7 +100,7 @@ def test_simulate_extra_labware(protocol, protocol_file, monkeypatch):
 
     # make sure the extra labware loaded by default is right
     ctx = simulate.get_protocol_api("2.0")
-    # TODO(mc, 2021-09-13): `_extra_labware` is not defined on `AbstractProtocol`
+    # TODO(mc, 2021-09-12): `_extra_labware` is not defined on `AbstractProtocol`
     assert len(
         ctx._implementation._extra_labware.keys()  # type: ignore[attr-defined]
     ) == len(os.listdir(fixturedir))

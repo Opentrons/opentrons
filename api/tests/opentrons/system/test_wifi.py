@@ -63,7 +63,7 @@ def test_eap_check_option():
         wifi._eap_check_option_ok(
             {
                 "name": "test-opt",
-                # TODO(mc, 2021-09-13): typechecking expects string
+                # TODO(mc, 2021-09-12): typechecking expects string
                 "required": True,  # type: ignore[dict-item]
                 "displayName": "Test Option",
             },
@@ -73,7 +73,7 @@ def test_eap_check_option():
     wifi._eap_check_option_ok(
         {
             "name": "test-1",
-            # TODO(mc, 2021-09-13): typechecking expects string
+            # TODO(mc, 2021-09-12): typechecking expects string
             "required": False,  # type: ignore[dict-item]
             "type": "string",
             "displayName": "Test Option",
@@ -87,7 +87,7 @@ def test_eap_check_option():
             {
                 "name": "identity",
                 "displayName": "Username",
-                # TODO(mc, 2021-09-13): typechecking expects string
+                # TODO(mc, 2021-09-12): typechecking expects string
                 "required": True,  # type: ignore[dict-item]
                 "type": "string",
             },
@@ -96,7 +96,7 @@ def test_eap_check_option():
     wifi._eap_check_option_ok(
         {
             "name": "identity",
-            # TODO(mc, 2021-09-13): typechecking expects string
+            # TODO(mc, 2021-09-12): typechecking expects string
             "required": True,  # type: ignore[dict-item]
             "displayName": "Username",
             "type": "string",
@@ -107,7 +107,7 @@ def test_eap_check_option():
         wifi._eap_check_option_ok(
             {
                 "name": "password",
-                # TODO(mc, 2021-09-13): typechecking expects string
+                # TODO(mc, 2021-09-12): typechecking expects string
                 "required": True,  # type: ignore[dict-item]
                 "displayName": "Password",
                 "type": "password",
@@ -117,7 +117,7 @@ def test_eap_check_option():
     wifi._eap_check_option_ok(
         {
             "name": "password",
-            # TODO(mc, 2021-09-13): typechecking expects string
+            # TODO(mc, 2021-09-12): typechecking expects string
             "required": True,  # type: ignore[dict-item]
             "displayName": "password",
             "type": "password",
@@ -129,7 +129,7 @@ def test_eap_check_option():
             {
                 "name": "phase2CaCert",
                 "displayName": "some file who cares",
-                # TODO(mc, 2021-09-13): typechecking expects string
+                # TODO(mc, 2021-09-12): typechecking expects string
                 "required": True,  # type: ignore[dict-item]
                 "type": "file",
             },
@@ -138,7 +138,7 @@ def test_eap_check_option():
     wifi._eap_check_option_ok(
         {
             "name": "phase2CaCert",
-            # TODO(mc, 2021-09-13): typechecking expects string
+            # TODO(mc, 2021-09-12): typechecking expects string
             "required": True,  # type: ignore[dict-item]
             "displayName": "hello",
             "type": "file",
@@ -177,7 +177,7 @@ async def test_key_lifecycle(loop, wifi_keys_tempdir):
             with open(path, "w") as f:
                 f.write(str(random.getrandbits(2048)))
 
-            # TODO(mc, 2021-09-13): use pathlib
+            # TODO(mc, 2021-09-12): use pathlib
             with open(path, "rb") as f:  # type: ignore[assignment]
                 add_response = wifi.add_key(fn, f.read())  # type: ignore[arg-type]
                 assert add_response.created is True
@@ -185,7 +185,7 @@ async def test_key_lifecycle(loop, wifi_keys_tempdir):
                 results[fn] = add_response
 
         # We should not be able to upload a duplicate
-        # TODO(mc, 2021-09-13): use pathlib
+        # TODO(mc, 2021-09-12): use pathlib
         with open(os.path.join(source_td, "test1.pem"), "rb") as f:  # type: ignore[assignment]  # noqa: E501
             add_response = wifi.add_key("test1.pem", f.read())  # type: ignore[arg-type]
             assert add_response.created is False

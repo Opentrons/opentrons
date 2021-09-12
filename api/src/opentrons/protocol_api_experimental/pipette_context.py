@@ -243,7 +243,7 @@ class PipetteContext:  # noqa: D101
     def home_plunger(self) -> PipetteContext:  # noqa: D102
         raise NotImplementedError()
 
-    # TODO(mc, 2021-09-13): explicitely type kwargs, remove args
+    # TODO(mc, 2021-09-12): explicitely type kwargs, remove args
     def distribute(  # noqa: D102
         self,
         volume: Union[float, Sequence[float]],
@@ -254,7 +254,7 @@ class PipetteContext:  # noqa: D101
     ) -> PipetteContext:
         raise NotImplementedError()
 
-    # TODO(mc, 2021-09-13): explicitely type kwargs, remove args
+    # TODO(mc, 2021-09-12): explicitely type kwargs, remove args
     def consolidate(  # noqa: D102
         self,
         volume: Union[float, Sequence[float]],
@@ -265,7 +265,7 @@ class PipetteContext:  # noqa: D101
     ) -> PipetteContext:
         raise NotImplementedError()
 
-    # TODO(mc, 2021-09-13): explicitely type kwargs
+    # TODO(mc, 2021-09-12): explicitely type kwargs
     def transfer(  # noqa: D102
         self,
         volume: Union[float, Sequence[float]],

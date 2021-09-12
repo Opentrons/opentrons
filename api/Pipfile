@@ -33,8 +33,8 @@ black = "==21.7b0"
 # https://github.com/pypa/pipenv/issues/4408#issuecomment-668324177
 atomicwrites = {version="==1.4.0", sys_platform="== 'win32'"}
 colorama = {version="==0.4.4", sys_platform="== 'win32'"}
-types-mock = "*"
-types-setuptools = "*"
+types-mock = "==4.0.1"
+types-setuptools = "==57.0.2"
 
 [packages]
 opentrons-shared-data = {editable = true, path = "../shared-data/python"}

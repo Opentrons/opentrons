@@ -86,7 +86,7 @@ test:
 
 .PHONY: lint
 lint:
-	$(python) -m mypy src/opentrons tests/opentrons
+	$(python) -m mypy src tests
 	$(python) -m black --check src tests setup.py
 	$(python) -m flake8 src tests setup.py
 

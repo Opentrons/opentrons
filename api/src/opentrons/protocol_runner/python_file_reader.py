@@ -34,7 +34,7 @@ class PythonFileReader:
             location=protocol_file.files[0],
         )
 
-        # TODO(mc, 2021-09-13): figure out why this would happen and raise
+        # TODO(mc, 2021-09-12): figure out why this would happen and raise
         # a well defined error accordingly
         assert spec is not None, "Unable to load module spec from file"
 

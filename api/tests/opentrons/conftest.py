@@ -186,7 +186,7 @@ async def hardware(request, loop, virtual_smoothie_env):
 @pytest.fixture
 def main_router(loop, virtual_smoothie_env, hardware):
     router = MainRouter(hardware=hardware, loop=loop, lock=ThreadedAsyncLock())
-    # TODO(mc, 2021-09-13): What is this mocking? `MainRouter` does not
+    # TODO(mc, 2021-09-12): What is this mocking? `MainRouter` does not
     # have a `wait_until` method
     router.wait_until = partial(  # type: ignore[attr-defined]
         wait_until, notifications=router.notifications, loop=loop
