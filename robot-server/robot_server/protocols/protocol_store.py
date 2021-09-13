@@ -84,6 +84,7 @@ class ProtocolStore:
 
             saved_files.append(file_path)
 
+        # todo(mm, 2021-09-13): Handle invalid protocols with a nice error.
         pre_analysis = self._pre_analyzer.analyze(saved_files)
 
         entry = ProtocolResource(
