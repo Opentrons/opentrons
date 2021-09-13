@@ -1,4 +1,4 @@
-name: "G-Code-Confirm (Basic Smoothie)"
+name: HTTP G-Code Tests
 
 on:
   # Run on any change to the api directory
@@ -21,7 +21,7 @@ on:
 
 jobs:
   confirm-g-code:
-    name: Confirm G-Code (Basic Smoothie)
+    name: HTTP G-Code Tests
     runs-on: ubuntu-18.04
     steps:
       - name: Checkout Monorepo
