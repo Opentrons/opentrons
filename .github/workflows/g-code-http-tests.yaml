@@ -101,3 +101,48 @@ jobs:
         with:
           name: http-move-right-mount-diff
           path: /tmp/http-move-right-mount-diff.html
+
+      - name: Run HTTP call - Home Left Pipette
+        if: always()
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.S3_APP_DEPLOY_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_APP_DEPLOY_SECRET }}
+          AWS_DEFAULT_REGION: us-east-2
+        run: make -C g-code-testing g-code-http-home-left-pipette-diff
+
+      - name: Save Generated Diff - Home Left Pipette
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: http-home-left-pipette-diff
+          path: /tmp/http-home-left-pipette-diff.html
+
+      - name: Run HTTP call - Home Right Pipette
+        if: always()
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.S3_APP_DEPLOY_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_APP_DEPLOY_SECRET }}
+          AWS_DEFAULT_REGION: us-east-2
+        run: make -C g-code-testing g-code-http-home-right-pipette-diff
+
+      - name: Save Generated Diff - Home Right Pipette
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: http-home-right-pipette-diff
+          path: /tmp/http-home-right-pipette-diff.html
+
+      - name: Run HTTP call - Home Robot
+        if: always()
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.S3_APP_DEPLOY_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_APP_DEPLOY_SECRET }}
+          AWS_DEFAULT_REGION: us-east-2
+        run: make -C g-code-testing g-code-http-home-robot-diff
+
+      - name: Save Generated Diff - Home Robot
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: http-home-robot-diff
+          path: /tmp/http-home-robot-diff.html
