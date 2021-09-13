@@ -512,9 +512,9 @@ class TransferPlan:
                     vol = min(max_vol, step_vol - xferred_vol)
                     yield from self._aspirate_actions(vol, src)
                     yield from self._dispense_actions(vol=vol, dest=dest, src=src)
-                    yield from self._new_tip_action()
                     xferred_vol += vol
-
+                if step_vol>0:
+                    yield from self._new_tip_action()
         else:
             for step_vol, (src, dest) in plan_iter:
                 if self._strategy.new_tip == types.TransferTipPolicy.ALWAYS:
@@ -530,8 +530,6 @@ class TransferPlan:
                     yield from self._dispense_actions(vol, dest)
                     xferred_vol += vol
                 yield from self._new_tip_action()
-
-
     @staticmethod
     def _extend_source_target_lists(
         sources: List[Union[Well, types.Location]],
