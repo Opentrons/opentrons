@@ -4,8 +4,6 @@ import threading
 import asyncio
 from typing import Generator
 from collections import namedtuple
-from abc import ABC, abstractmethod
-from importlib import import_module
 
 from opentrons.hardware_control.emulation.settings import Settings
 from opentrons.protocols.parse import parse
@@ -29,12 +27,13 @@ from opentrons.protocols.context.protocol_api.protocol_context import (
     ProtocolContextImplementation,
 )
 from g_code_parsing.utils import get_configuration_dir
+from g_code_parsing.g_code_test_data import HTTPTestData, ProtocolTestData
 
 
 Protocol = namedtuple("Protocol", ["text", "filename", "filelike"])
 
 
-class GCodeEngine(ABC):
+class GCodeEngine:
     """
     Class for running a thing against the emulator.
     See src/opentrons/hardware_control/emulation/settings.py for example explanation
@@ -105,21 +104,15 @@ class GCodeEngine(ABC):
 
         return Protocol(text=text, filename=file_path, filelike=file)
 
-    @abstractmethod
-    def run(self, input_str: str):
-        ...
-
-
-class ProtocolGCodeEngine(GCodeEngine):
     @contextmanager
-    def run(self, input_str: str) -> Generator:
+    def run_protocol(self, test_data: ProtocolTestData) -> Generator:
         """
         Runs passed protocol file and collects all G-Code I/O from it.
         Will cleanup emulation after execution
-        :param input_str: Path to file
+        :param test_data: Path to file
         :return: GCodeProgram with all the parsed data
         """
-        file_path = os.path.join(get_configuration_dir(), input_str)
+        file_path = os.path.join(get_configuration_dir(), test_data.path)
         server_manager = ServerManager(self._config)
         self._start_emulation_app(server_manager)
         protocol = self._get_protocol(file_path)
@@ -135,28 +128,16 @@ class ProtocolGCodeEngine(GCodeEngine):
         yield GCodeProgram.from_g_code_watcher(watcher)
         server_manager.stop()
 
-
-class HTTPGCodeEngine(GCodeEngine):
-    def _get_func(self, input_str):
-        formatted_config_path = os.path.splitext(input_str)[0].replace("/", ".")
-        module_string = f"g_code_test_data.{formatted_config_path}"
-
-        # TODO: The below code is very implicit and I don't like it.
-        # It should get fixed
-        module = import_module(module_string)
-        return module.main()  # type: ignore
-
     @contextmanager
-    def run(self, input_str: str):
+    def run_http(self, test_data: HTTPTestData):
         """
         Runs http request and returns all G-Code I/O from it
-        :param input_str:
+        :param test_data: Function connected to HTTP Request to execute
         :return:
         """
-        func = self._get_func(input_str)
         server_manager = ServerManager(self._config)
         self._start_emulation_app(server_manager)
         with GCodeWatcher() as watcher:
-            asyncio.run(func(hardware=self._emulate_hardware()))
+            asyncio.run(test_data.executable(hardware=self._emulate_hardware()))
         yield GCodeProgram.from_g_code_watcher(watcher)
         server_manager.stop()
