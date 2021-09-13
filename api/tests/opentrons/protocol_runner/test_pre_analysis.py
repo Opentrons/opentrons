@@ -19,6 +19,8 @@ from opentrons.protocol_runner.pre_analysis import (
     FileTypeError,
     JsonParseError,
     JsonSchemaValidationError,
+    PythonFileParseError,
+    PythonMetadataError,
     NoFilesError,
 )
 
@@ -71,7 +73,6 @@ def test_python_pre_analysis(tmp_path: Path) -> None:
         """
         metadata = {
             "author": "Dr. Sy. N. Tist",
-            "aFloat": 987.654,
             "apiLevel": "123.456",
         }
         """
@@ -79,7 +80,6 @@ def test_python_pre_analysis(tmp_path: Path) -> None:
 
     expected_metadata: ExtractedMetadata = {
         "author": "Dr. Sy. N. Tist",
-        "aFloat": 987.654,
         # We don't actually care if apiLevel is present here, since it's extracted into
         # its own attribute. But it's simpler to assert that apiLevel is here anyway.
         "apiLevel": "123.456",
@@ -93,15 +93,99 @@ def test_python_pre_analysis(tmp_path: Path) -> None:
     assert result == PythonPreAnalysis(expected_metadata, expected_api_level)
 
 
-def test_error_if_python_has_no_metadata() -> None:
-    """It should raise if the .py file is missing its metadata block."""
-    # Metadata missing and apiLevel missing from metadata
-    raise NotImplementedError()
+# Apparently a bug in opentrons.protocols.parse.extract_metadata.
+# It errors when a field isn't a string, even though its return type suggests
+# it should allow ints.
+@pytest.mark.xfail(strict=True)
+def test_python_non_string_metadata(tmp_path: Path) -> None:
+    """It should pass along metadata fields that aren't strings."""
+    input_protocol_text = dedent(
+        """
+        metadata = {
+            "apiLevel": "123.456",
+            "anInt": 7890
+        }
+        """
+    )
+
+    expected_metadata: ExtractedMetadata = {
+        "apiLevel": "123.456",
+        "anInt": 7890,
+    }
+    expected_api_level = "123.456"
+
+    protocol_file = tmp_path / "My Python Protocol.py"
+    protocol_file.write_text(input_protocol_text)
+
+    result = PreAnalyzer().analyze([protocol_file])
+    assert result == PythonPreAnalysis(expected_metadata, expected_api_level)
 
 
-def test_error_if_python_metadata_has_no_apilevel() -> None:
-    """It should raise if the .py file's metadata block is missing apiLevel."""
-    raise NotImplementedError()
+def test_error_if_python_file_has_syntax_error(tmp_path: Path) -> None:
+    """It should raise if the .py file isn't compilable."""
+    protocol_text = dedent(
+        """
+        metadata = {
+            'apiLevel': '123.456'
+        }
+
+        def run()  # Syntax error: missing colon.
+            pass
+        """
+    )
+    protocol_file = tmp_path / "My Python Protocol.py"
+    protocol_file.write_text(protocol_text)
+
+    with pytest.raises(PythonFileParseError):
+        PreAnalyzer().analyze([protocol_file])
+
+
+# todo(mm, 2021-09-13): Some of these tests overlap with
+# opentrons.protocol_runner.parse.
+# Decide where this logic should canonically live, and deduplicate.
+@pytest.mark.parametrize(
+    "input_text",
+    [
+        dedent(
+            """
+            # Metadata missing entirely.
+            """
+        ),
+        dedent(
+            """
+            # Metadata provided, but not as a dict.
+            metadata = "Hello"
+            """
+        ),
+        dedent(
+            """
+            # Metadata not statically parsable.
+            metadata = {"apiLevel": "123" + ".456"}
+            """
+        ),
+        dedent(
+            """
+            # apiLevel missing from metadata.
+            metadata = {"Hello": "World"}
+            """
+        ),
+        dedent(
+            """
+            # apiLevel provided, but not as a string.
+            metadata = {"apiLevel": 123.456}
+            """
+        ),
+    ],
+)
+def test_error_if_bad_python_metadata(
+    tmp_path: Path,
+    input_text: str,
+) -> None:
+    """It should raise if something's wrong with the metadata block."""
+    protocol_file = tmp_path / "My Python Protocol.py"
+    protocol_file.write_text(input_text)
+    with pytest.raises(PythonMetadataError):
+        PreAnalyzer().analyze([protocol_file])
 
 
 def test_error_if_json_file_is_not_valid_json(tmp_path: Path) -> None:
@@ -128,10 +212,10 @@ def test_error_if_no_files() -> None:
 
 def test_error_if_file_extension_unrecognized(tmp_path: Path) -> None:
     """It should raise if a file doesn't have a valid extension for a protocol."""
-    protocol_file = tmp_path / "Foo.jpg"
-    protocol_file.touch()
+    non_protocol_file = tmp_path / "Foo.jpg"
+    non_protocol_file.touch()
     with pytest.raises(FileTypeError):
-        PreAnalyzer().analyze([protocol_file])
+        PreAnalyzer().analyze([non_protocol_file])
 
 
 # Update or replace this placeholder test when we support multi-file protocols.
