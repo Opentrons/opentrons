@@ -2,7 +2,11 @@
 from decoy import matchers
 from pathlib import Path
 
-from opentrons.protocol_runner.protocol_file import ProtocolFile, ProtocolFileType
+from opentrons.protocol_runner.protocol_file import (
+    ProtocolFile,
+    ProtocolFileType,
+    EngineExecution,
+)
 from opentrons.protocol_runner.json_file_reader import JsonFileReader
 from opentrons.protocols.models import json_protocol
 
@@ -11,6 +15,7 @@ def test_reads_file(json_protocol_file: Path) -> None:
     """It should read a JSON file into a JsonProtocol model."""
     protocol = ProtocolFile(
         protocol_type=ProtocolFileType.JSON,
+        execution_method=EngineExecution(),
         files=[json_protocol_file],
     )
 

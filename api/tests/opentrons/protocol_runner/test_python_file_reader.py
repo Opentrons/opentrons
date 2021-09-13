@@ -3,7 +3,11 @@ from pathlib import Path
 from inspect import Signature, Parameter, signature
 
 from opentrons.protocol_api_experimental import ProtocolContext
-from opentrons.protocol_runner.protocol_file import ProtocolFile, ProtocolFileType
+from opentrons.protocol_runner.protocol_file import (
+    ProtocolFile,
+    ProtocolFileType,
+    EngineExecution,
+)
 from opentrons.protocol_runner.python_file_reader import PythonFileReader
 
 
@@ -12,6 +16,7 @@ def test_read_gets_run_method(python_protocol_file: Path) -> None:
     subject = PythonFileReader()
     protocol_file = ProtocolFile(
         protocol_type=ProtocolFileType.PYTHON,
+        execution_method=EngineExecution(),
         files=[python_protocol_file],
     )
     result = subject.read(protocol_file)

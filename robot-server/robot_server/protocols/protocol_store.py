@@ -6,7 +6,8 @@ from logging import getLogger
 from pathlib import Path
 from typing import Dict, List, Sequence
 
-from opentrons.protocol_runner import ProtocolFile, ProtocolFileType
+# from opentrons.protocol_api import MAX_SUPPORTED_VERSION
+from opentrons.protocol_runner import ProtocolFile, ProtocolFileType, EngineExecution
 
 log = getLogger(__name__)
 
@@ -77,6 +78,7 @@ class ProtocolStore:
         entry = ProtocolResource(
             protocol_id=protocol_id,
             protocol_type=self._get_protocol_type(saved_files),
+            execution_method=EngineExecution(),
             created_at=created_at,
             files=saved_files,
         )

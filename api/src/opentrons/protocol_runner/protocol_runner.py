@@ -2,6 +2,8 @@
 from dataclasses import dataclass
 from typing import List, Optional
 
+from opentrons.hardware_control import API as HardwareAPI
+from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_engine import (
     ProtocolEngine,
     Command,
@@ -9,13 +11,14 @@ from opentrons.protocol_engine import (
     LoadedPipette,
 )
 
-from .protocol_file import ProtocolFile, ProtocolFileType
+from .protocol_file import ProtocolFile, ProtocolFileType, LegacyExecution
 from .task_queue import TaskQueue, TaskQueuePhase
 from .json_file_reader import JsonFileReader
 from .json_command_translator import JsonCommandTranslator
 from .python_file_reader import PythonFileReader
 from .python_context_creator import PythonContextCreator
 from .python_executor import PythonExecutor
+from .legacy_wrappers import LegacyFileReader, LegacyContextCreator, LegacyExecutor
 
 
 @dataclass(frozen=True)
@@ -42,12 +45,16 @@ class ProtocolRunner:
     def __init__(
         self,
         protocol_engine: ProtocolEngine,
+        hardware_api: HardwareAPI,
         task_queue: Optional[TaskQueue] = None,
         json_file_reader: Optional[JsonFileReader] = None,
         json_command_translator: Optional[JsonCommandTranslator] = None,
         python_file_reader: Optional[PythonFileReader] = None,
         python_context_creator: Optional[PythonContextCreator] = None,
         python_executor: Optional[PythonExecutor] = None,
+        legacy_file_reader: Optional[LegacyFileReader] = None,
+        legacy_context_creator: Optional[LegacyContextCreator] = None,
+        legacy_executor: Optional[LegacyExecutor] = None,
     ) -> None:
         """Initialize the ProtocolRunner with its dependencies."""
         self._protocol_engine = protocol_engine
@@ -59,6 +66,11 @@ class ProtocolRunner:
         self._python_file_reader = python_file_reader or PythonFileReader()
         self._python_context_creator = python_context_creator or PythonContextCreator()
         self._python_executor = python_executor or PythonExecutor()
+        self._legacy_file_reader = legacy_file_reader or LegacyFileReader()
+        self._legacy_context_creator = legacy_context_creator or LegacyContextCreator(
+            hardware_api=hardware_api
+        )
+        self._legacy_executor = legacy_executor or LegacyExecutor()
 
     def load(self, protocol_file: ProtocolFile) -> None:
         """Load a ProtocolFile into managed ProtocolEngine.
@@ -67,8 +79,12 @@ class ProtocolRunner:
         to control the run of a file-based protocol.
         """
         protocol_type = protocol_file.protocol_type
+        execution_method = protocol_file.execution_method
 
-        if protocol_type == ProtocolFileType.JSON:
+        if isinstance(execution_method, LegacyExecution):
+            self._load_legacy(protocol_file, api_version=execution_method.api_version)
+
+        elif protocol_type == ProtocolFileType.JSON:
             self._load_json(protocol_file)
 
         elif protocol_type == ProtocolFileType.PYTHON:
@@ -129,3 +145,19 @@ class ProtocolRunner:
             protocol=protocol,
             context=context,
         )
+
+    def _load_legacy(
+        self,
+        protocol_file: ProtocolFile,
+        api_version: APIVersion,
+    ) -> None:
+        protocol = self._legacy_file_reader.read(protocol_file)
+        context = self._legacy_context_creator.create(api_version)
+        self._task_queue.add(
+            phase=TaskQueuePhase.RUN,
+            func=self._legacy_executor.execute,
+            protocol=protocol,
+            context=context,
+        )
+
+        # self._context = context

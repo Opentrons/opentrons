@@ -13,6 +13,7 @@ from datetime import datetime
 from decoy import matchers
 
 from opentrons.types import MountType
+from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocol_api_experimental import DeckSlotName
 
 from opentrons.protocol_engine import (
@@ -25,14 +26,17 @@ from opentrons.protocol_engine import (
 from opentrons.protocol_runner import (
     ProtocolFile,
     ProtocolFileType,
+    EngineExecution,
+    LegacyExecution,
     create_simulating_runner,
 )
 
 
-async def test_protocol_runner_with_python(python_protocol_file: Path) -> None:
+async def test_runner_with_python(python_protocol_file: Path) -> None:
     """It should run a Python protocol on the ProtocolRunner."""
     protocol_file = ProtocolFile(
         protocol_type=ProtocolFileType.PYTHON,
+        execution_method=EngineExecution(),
         files=[python_protocol_file],
     )
 
@@ -78,10 +82,11 @@ async def test_protocol_runner_with_python(python_protocol_file: Path) -> None:
     assert expected_command in commands_result
 
 
-async def test_protocol_runner_with_json(json_protocol_file: Path) -> None:
+async def test_runner_with_json(json_protocol_file: Path) -> None:
     """It should run a JSON protocol on the ProtocolRunner."""
     protocol_file = ProtocolFile(
         protocol_type=ProtocolFileType.JSON,
+        execution_method=EngineExecution(),
         files=[json_protocol_file],
     )
 
@@ -122,3 +127,117 @@ async def test_protocol_runner_with_json(json_protocol_file: Path) -> None:
     )
 
     assert expected_command in commands_result
+
+
+async def test_runner_with_legacy_python(legacy_python_protocol_file: Path) -> None:
+    """It should run a Python protocol on the ProtocolRunner."""
+    protocol_file = ProtocolFile(
+        protocol_type=ProtocolFileType.PYTHON,
+        execution_method=LegacyExecution(api_version=MAX_SUPPORTED_VERSION),
+        files=[legacy_python_protocol_file],
+    )
+
+    subject = await create_simulating_runner()
+    result = await subject.run(protocol_file)
+
+    # TODO(mc, 2021-09-13): uncomment (and edit as necessary) below
+    # once command / equipment translation layer is in place
+
+    print(result)
+    # print(subject._context.commands())
+
+    # commands_result = result.commands
+    # pipettes_result = result.pipettes
+    # labware_result = result.labware
+
+    # pipette_id_captor = matchers.Captor()
+    # labware_id_captor = matchers.Captor()
+
+    # expected_pipette = LoadedPipette.construct(
+    #     id=pipette_id_captor,
+    #     pipetteName=PipetteName.P300_SINGLE,
+    #     mount=MountType.LEFT,
+    # )
+
+    # expected_labware = LoadedLabware.construct(
+    #     id=labware_id_captor,
+    #     location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
+    #     loadName="opentrons_96_tiprack_300ul",
+    #     definitionUri="opentrons/opentrons_96_tiprack_300ul/1",
+    # )
+
+    # assert expected_pipette in pipettes_result
+    # assert expected_labware in labware_result
+
+    # expected_command = commands.PickUpTip.construct(
+    #     id=matchers.IsA(str),
+    #     status=commands.CommandStatus.SUCCEEDED,
+    #     createdAt=matchers.IsA(datetime),
+    #     startedAt=matchers.IsA(datetime),
+    #     completedAt=matchers.IsA(datetime),
+    #     data=commands.PickUpTipData(
+    #         pipetteId=pipette_id_captor.value,
+    #         labwareId=labware_id_captor.value,
+    #         wellName="A1",
+    #     ),
+    #     result=commands.PickUpTipResult(),
+    # )
+
+    # assert expected_command in commands_result
+
+
+async def test_runner_with_legacy_json(legacy_json_protocol_file: Path) -> None:
+    """It should run a Python protocol on the ProtocolRunner."""
+    protocol_file = ProtocolFile(
+        protocol_type=ProtocolFileType.JSON,
+        execution_method=LegacyExecution(api_version=MAX_SUPPORTED_VERSION),
+        files=[legacy_json_protocol_file],
+    )
+
+    subject = await create_simulating_runner()
+    result = await subject.run(protocol_file)
+
+    # TODO(mc, 2021-09-13): uncomment (and edit as necessary) below
+    # once command / equipment translation layer is in place
+
+    print(result)
+    # print(subject._context.commands())
+
+    # commands_result = result.commands
+    # pipettes_result = result.pipettes
+    # labware_result = result.labware
+
+    # pipette_id_captor = matchers.Captor()
+    # labware_id_captor = matchers.Captor()
+
+    # expected_pipette = LoadedPipette.construct(
+    #     id=pipette_id_captor,
+    #     pipetteName=PipetteName.P300_SINGLE,
+    #     mount=MountType.LEFT,
+    # )
+
+    # expected_labware = LoadedLabware.construct(
+    #     id=labware_id_captor,
+    #     location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
+    #     loadName="opentrons_96_tiprack_300ul",
+    #     definitionUri="opentrons/opentrons_96_tiprack_300ul/1",
+    # )
+
+    # assert expected_pipette in pipettes_result
+    # assert expected_labware in labware_result
+
+    # expected_command = commands.PickUpTip.construct(
+    #     id=matchers.IsA(str),
+    #     status=commands.CommandStatus.SUCCEEDED,
+    #     createdAt=matchers.IsA(datetime),
+    #     startedAt=matchers.IsA(datetime),
+    #     completedAt=matchers.IsA(datetime),
+    #     data=commands.PickUpTipData(
+    #         pipetteId=pipette_id_captor.value,
+    #         labwareId=labware_id_captor.value,
+    #         wellName="A1",
+    #     ),
+    #     result=commands.PickUpTipResult(),
+    # )
+
+    # assert expected_command in commands_result

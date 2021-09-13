@@ -7,7 +7,9 @@ from __future__ import annotations
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import List
+from typing import List, Union
+
+from opentrons.protocols.api_support.types import APIVersion
 
 
 class ProtocolFileType(str, Enum):
@@ -20,6 +22,18 @@ class ProtocolFileType(str, Enum):
 
     PYTHON = "python"
     JSON = "json"
+
+
+@dataclass(frozen=True)
+class LegacyExecution:
+    """Data used to execute a protocol on the legacy PAPIv2 structures."""
+
+    api_version: APIVersion
+
+
+@dataclass(frozen=True)
+class EngineExecution:
+    """Data used to execute a protocol using a `ProtocolEngine`."""
 
 
 # TODO(mc, 2021-08-27): rename to ProtocolSource to better reflect
@@ -36,3 +50,4 @@ class ProtocolFile:
     # TODO(mc, 2021-08-27): `protocol_type` is a little redundant as a field name
     protocol_type: ProtocolFileType
     files: List[Path]
+    execution_method: Union[EngineExecution, LegacyExecution]

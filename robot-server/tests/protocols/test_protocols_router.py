@@ -4,7 +4,7 @@ from datetime import datetime
 from decoy import Decoy, matchers
 from starlette.datastructures import UploadFile
 
-from opentrons.protocol_runner import ProtocolFileType
+from opentrons.protocol_runner import ProtocolFileType, EngineExecution
 from robot_server.errors import ApiError
 from robot_server.service.task_runner import TaskRunner
 from robot_server.protocols.protocol_models import Protocol
@@ -57,12 +57,14 @@ async def test_get_protocols(
     resource_1 = ProtocolResource(
         protocol_id="abc",
         protocol_type=ProtocolFileType.PYTHON,
+        execution_method=EngineExecution(),
         created_at=created_at_1,
         files=[],
     )
     resource_2 = ProtocolResource(
         protocol_id="123",
         protocol_type=ProtocolFileType.JSON,
+        execution_method=EngineExecution(),
         created_at=created_at_2,
         files=[],
     )
@@ -112,6 +114,7 @@ async def test_get_protocol_by_id(
     resource = ProtocolResource(
         protocol_id="protocol-id",
         protocol_type=ProtocolFileType.PYTHON,
+        execution_method=EngineExecution(),
         created_at=datetime(year=2021, month=1, day=1),
         files=[],
     )
@@ -178,6 +181,7 @@ async def test_create_protocol(
     protocol_resource = ProtocolResource(
         protocol_id="protocol-id",
         protocol_type=ProtocolFileType.JSON,
+        execution_method=EngineExecution(),
         created_at=current_time,
         files=[],
     )

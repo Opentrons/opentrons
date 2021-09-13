@@ -5,7 +5,7 @@ from datetime import datetime
 
 from opentrons.types import MountType, DeckSlotName
 from opentrons.protocol_engine import commands as pe_commands, types as pe_types
-from opentrons.protocol_runner import ProtocolRunner, ProtocolRunData
+from opentrons.protocol_runner import ProtocolRunner, ProtocolRunData, EngineExecution
 
 from robot_server.protocols import ProtocolFileType
 from robot_server.protocols.analysis_store import AnalysisStore
@@ -47,6 +47,7 @@ async def test_analyze(
     protocol_resource = ProtocolResource(
         protocol_id="protocol-id",
         protocol_type=ProtocolFileType.JSON,
+        execution_method=EngineExecution(),
         created_at=datetime(year=2021, month=1, day=1),
         files=[],
     )
@@ -105,6 +106,7 @@ async def test_analyze_error(
     protocol_resource = ProtocolResource(
         protocol_id="protocol-id",
         protocol_type=ProtocolFileType.JSON,
+        execution_method=EngineExecution(),
         created_at=datetime(year=2021, month=1, day=1),
         files=[],
     )

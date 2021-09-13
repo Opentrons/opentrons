@@ -6,7 +6,7 @@ from pathlib import Path
 from fastapi import UploadFile
 from typing import Iterator
 
-from opentrons.protocol_runner import ProtocolFileType
+from opentrons.protocol_runner import ProtocolFileType, EngineExecution
 
 from robot_server.protocols.protocol_store import (
     ProtocolStore,
@@ -59,6 +59,7 @@ async def test_create_json_protocol(
     assert result == ProtocolResource(
         protocol_id="protocol-id",
         protocol_type=ProtocolFileType.JSON,
+        execution_method=EngineExecution(),
         created_at=created_at,
         files=[matchers.Anything()],
     )
@@ -85,6 +86,7 @@ async def test_create_python_protocol(
     assert result == ProtocolResource(
         protocol_id="protocol-id",
         protocol_type=ProtocolFileType.PYTHON,
+        execution_method=EngineExecution(),
         created_at=created_at,
         files=[matchers.Anything()],
     )
@@ -129,6 +131,7 @@ async def test_get_protocol(
     assert result == ProtocolResource(
         protocol_id="protocol-id",
         protocol_type=ProtocolFileType.JSON,
+        execution_method=EngineExecution(),
         created_at=created_at,
         files=[matchers.Anything()],
     )
@@ -174,12 +177,14 @@ async def test_get_all_protocols(
         ProtocolResource(
             protocol_id="protocol-id-1",
             protocol_type=ProtocolFileType.JSON,
+            execution_method=EngineExecution(),
             created_at=created_at_1,
             files=[matchers.Anything()],
         ),
         ProtocolResource(
             protocol_id="protocol-id-2",
             protocol_type=ProtocolFileType.JSON,
+            execution_method=EngineExecution(),
             created_at=created_at_2,
             files=[matchers.Anything()],
         ),

@@ -37,4 +37,7 @@ async def create_simulating_runner() -> ProtocolRunner:
     # https://github.com/Opentrons/opentrons/issues/8265
     protocol_engine = await create_protocol_engine(hardware_api=simulating_hardware_api)
 
-    return ProtocolRunner(protocol_engine=protocol_engine)
+    return ProtocolRunner(
+        protocol_engine=protocol_engine,
+        hardware_api=simulating_hardware_api,
+    )
