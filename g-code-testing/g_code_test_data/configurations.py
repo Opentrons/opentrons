@@ -1,0 +1,53 @@
+from g_code_parsing.g_code_test_data import HTTPTestData, ProtocolTestData
+from g_code_test_data import http
+
+CONFIGURATIONS = [
+  HTTPTestData(
+    name="http_move_left_pipette",
+    executable=http.RobotMoveLeftPipette.main
+  ),
+  HTTPTestData(
+    name="http_move_right_pipette",
+    executable=http.RobotMoveRightPipette.main
+  ),
+  HTTPTestData(
+    name="http_move_left_mount",
+    executable=http.RobotMoveLeftMount.main
+  ),
+  HTTPTestData(
+    name="http_move_right_mount",
+    executable=http.RobotMoveRightMount.main
+  ),
+  HTTPTestData(
+    name="http_home_robot",
+    executable=http.RobotHomeRobot.main
+  ),
+  HTTPTestData(
+    name="http_home_left_pipette",
+    executable=http.RobotHomeLeftPipette.main
+  ),
+  HTTPTestData(
+    name="http_home_right_pipette",
+    executable=http.RobotHomeRightPipette.main
+  ),
+  ProtocolTestData(
+    name="protocol_2_modules",
+    path="protocols/2_modules_1s_1m_v2.py"
+  ),
+  ProtocolTestData(
+    name="protocol_2_single_channel",
+    path="protocols/2_single_channel_v2.py"
+  ),
+  ProtocolTestData(
+    name="protocol_smoothie",
+    path="protocols/smoothie_protocol.py"
+  ),
+  ProtocolTestData(
+    name="protocol_swift_smoke",
+    path="protocols/swift_smoke.py"
+  ),
+  ProtocolTestData(
+    name="protocol_swift_turbo",
+    path="protocols/swift_turbo.py"
+  )
+]
