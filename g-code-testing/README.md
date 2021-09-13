@@ -10,42 +10,43 @@ Framework supporting the following:
 
 ## Test Cases
 
-The following section is to explain why each test case inside the `g-code-testing` project has either been included or 
-omitted. Also, it will also explain at a high-level, the different categories of tests. 
+The following section is to explain why each test case inside the `g-code-testing` project has either been included or
+omitted. Also, it will also explain at a high-level, the different categories of tests.
 
 ## Test Categories
 
 ### Protocol Tests
 
-**Description:** These tests have a Python Protocol file as an input. The framework will run the protocol and 
+**Description:** These tests have a Python Protocol file as an input. The framework will run the protocol and
 collect all G-Code output.
 
 **Tests**
-* protocol_2_modules - Test using 2 modules in the same protocol 
-* protocol_2_single_channel - Test using 2 single channel pipettes in the same protocol
-* protocol_smoothie - Test an extremely simple protocol with no modules
-* protocol_swift_smoke - Test the "smoke" version of the Swift Turbo protocol
-* protocol_swift_turbo - Test the actual Swift Turbo protocol
+
+- protocol_2_modules - Test using 2 modules in the same protocol
+- protocol_2_single_channel - Test using 2 single channel pipettes in the same protocol
+- protocol_smoothie - Test an extremely simple protocol with no modules
+- protocol_swift_smoke - Test the "smoke" version of the Swift Turbo protocol
+- protocol_swift_turbo - Test the actual Swift Turbo protocol
 
 ### HTTP Tests
 
-**Description:** The tests execute the underlying function from calling an HTTP endpoint and collect all the G-Code 
+**Description:** The tests execute the underlying function from calling an HTTP endpoint and collect all the G-Code
 output. Some of the HTTP endpoints have been skipped.
 
 **[Control Tests:](https://github.com/Opentrons/opentrons/blob/edge/robot-server/robot_server/service/legacy/routers/control.py)**
-* Implemented Tests
-  * http_move_left_pipette - Test moving the left pipette with the `robot/move` HTTP endpoint
-  * http_move_right_pipette - Test moving the right pipette with the `robot/move` HTTP endpoint
-  * http_move_left_mount - Test moving the left mount with the `robot/move` HTTP endpoint
-  * http_move_right_mount - Test moving the right mount with the `robot/move` HTTP endpoint
-  * http_home_robot - Test homing the gantry with the `robot/home` HTTP endpoint
-  * http_home_left_pipette - Test homing the left pipette with the `robot/home` HTTP endpoint
-  * http_home_right_pipette - Test homing the right pipette with the `robot/home` HTTP endpoint
-* Skipped Tests
-  * `identify` endpoint - Only goes to the Raspberry Pi, does not generate any G-Code
-  * `robot/positions` endpoint - Tests by issuing move commands which is already covered
-  * `robot/lights` endpoint - Only goes to the Raspberry Pi, does not generate any G-Code
 
+- Implemented Tests
+  - http_move_left_pipette - Test moving the left pipette with the `robot/move` HTTP endpoint
+  - http_move_right_pipette - Test moving the right pipette with the `robot/move` HTTP endpoint
+  - http_move_left_mount - Test moving the left mount with the `robot/move` HTTP endpoint
+  - http_move_right_mount - Test moving the right mount with the `robot/move` HTTP endpoint
+  - http_home_robot - Test homing the gantry with the `robot/home` HTTP endpoint
+  - http_home_left_pipette - Test homing the left pipette with the `robot/home` HTTP endpoint
+  - http_home_right_pipette - Test homing the right pipette with the `robot/home` HTTP endpoint
+- Skipped Tests
+  - `identify` endpoint - Only goes to the Raspberry Pi, does not generate any G-Code
+  - `robot/positions` endpoint - Tests by issuing move commands which is already covered
+  - `robot/lights` endpoint - Only goes to the Raspberry Pi, does not generate any G-Code
 
 ## Setup
 
