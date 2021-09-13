@@ -1,9 +1,9 @@
 import asyncio
 from opentrons import ThreadManager
 from g_code_test_data.http.http_base import HTTPBase
-from robot_server.service.legacy.routers.control import post_move_robot
-from robot_server.service.legacy.models.control import RobotMoveTarget
-from robot_server.service.dependencies import get_motion_lock
+from robot_server.service.legacy.routers.control import post_move_robot  # type: ignore
+from robot_server.service.legacy.models.control import RobotMoveTarget  # type: ignore
+from robot_server.service.dependencies import get_motion_lock  # type: ignore
 
 
 class RobotMoveRightMount(HTTPBase):
