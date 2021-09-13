@@ -1,7 +1,8 @@
 """Tests for the protocol response model builder."""
 from datetime import datetime
 
-from opentrons.protocol_runner import ProtocolFileType, JsonPreAnalysis
+from opentrons.protocol_runner import ProtocolFileType
+from opentrons.protocol_runner.pre_analysis import JsonPreAnalysis
 from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.protocols.protocol_models import Protocol, Metadata
 from robot_server.protocols.analysis_models import PendingAnalysis

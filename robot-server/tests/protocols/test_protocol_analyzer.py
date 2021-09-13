@@ -4,7 +4,8 @@ from decoy import Decoy
 from datetime import datetime
 
 from opentrons.protocol_engine import commands as pe_commands
-from opentrons.protocol_runner import ProtocolRunner, JsonPreAnalysis
+from opentrons.protocol_runner import ProtocolRunner
+from opentrons.protocol_runner.pre_analysis import JsonPreAnalysis
 
 from robot_server.protocols import ProtocolFileType
 from robot_server.protocols.analysis_store import AnalysisStore

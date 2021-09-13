@@ -8,7 +8,7 @@ from httpx import AsyncClient
 
 from tests.helpers import verify_response
 
-from opentrons.protocol_runner import JsonPreAnalysis
+from opentrons.protocol_runner.pre_analysis import JsonPreAnalysis
 
 from robot_server.service.task_runner import TaskRunner
 

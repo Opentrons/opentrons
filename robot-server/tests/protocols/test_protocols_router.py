@@ -4,7 +4,7 @@ from datetime import datetime
 from decoy import Decoy, matchers
 from starlette.datastructures import UploadFile
 
-from opentrons.protocol_runner import JsonPreAnalysis, PythonPreAnalysis
+from opentrons.protocol_runner.pre_analysis import JsonPreAnalysis, PythonPreAnalysis
 
 from robot_server.errors import ApiError
 from robot_server.service.task_runner import TaskRunner
