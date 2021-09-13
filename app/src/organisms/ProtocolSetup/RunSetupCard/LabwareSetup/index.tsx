@@ -35,12 +35,12 @@ import { LabwareSetupModal } from './LabwareSetupModal'
 import { getModuleTypesThatRequireExtraAttention } from './utils/getModuleTypesThatRequireExtraAttention'
 import { ExtraAttentionWarning } from './ExtraAttentionWarning'
 import styles from '../../styles.css'
-import type { CoordinatesByModuleModel } from '../../utils/getModuleRenderCoords'
-import type { CoordinatesByLabwareId } from '../../utils/getLabwareRenderCoords'
+import type { ModuleCoordinatesById } from '../../utils/getModuleRenderCoords'
+import type { LabwareCoordinatesById } from '../../utils/getLabwareRenderCoords'
 
 interface LabwareSetupProps {
-  moduleRenderCoords: CoordinatesByModuleModel
-  labwareRenderCoords: CoordinatesByLabwareId
+  moduleRenderCoords: ModuleCoordinatesById
+  labwareRenderCoords: LabwareCoordinatesById
 }
 
 const DECK_LAYER_BLOCKLIST = [

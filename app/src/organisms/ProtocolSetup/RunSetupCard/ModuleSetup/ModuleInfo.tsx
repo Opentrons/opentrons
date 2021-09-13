@@ -31,8 +31,8 @@ import {
 
 export interface ModuleInfoProps {
   moduleModel: ModuleModel
-  usbPort?: string | null
-  hubPort?: string | null
+  usbPort?: number | null
+  hubPort?: number | null
   isAttached: boolean
 }
 

@@ -42,7 +42,7 @@ const getSlotHasMatingSurfaceUnitVector = (
   return Boolean(matingSurfaceUnitVector)
 }
 
-export interface CoordinatesByLabwareId {
+export interface LabwareCoordinatesById {
   [labwareId: string]: {
     x: number
     y: number
@@ -54,7 +54,7 @@ export interface CoordinatesByLabwareId {
 export const getLabwareRenderCoords = (
   protocolData: ReturnType<typeof getProtocolData>,
   deckDef: DeckDefinition
-): CoordinatesByLabwareId => {
+): LabwareCoordinatesById => {
   if (
     protocolData != null &&
     'labware' in protocolData &&
