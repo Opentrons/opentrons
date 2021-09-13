@@ -89,7 +89,6 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
     robotName === null ? POLL_MODULE_INTERVAL_MS : null,
     true
   )
-  console.log(moduleRenderCoords)
   return (
     <React.Fragment>
       {showMultipleModulesModal && (
@@ -128,7 +127,7 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
                 {map(moduleRenderCoords, ({ x, y, moduleModel }) => {
                   const orientation = inferModuleOrientationFromXCoordinate(x)
                   const attached = attachedModules.some(
-                    attachedModule => moduleModel === attachedModule.model
+                    attachedModule => getModuleType(moduleModel) === getModuleType(attachedModule.model)
                   )
                   if (isEmpty(modulesByPort)) {
                     return (
@@ -143,7 +142,6 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
                         >
                           <ModuleInfo
                             moduleModel={moduleModel}
-                            orientation={orientation}
                             isAttached={attached}
                             usbPort={null}
                             hubPort={null}
