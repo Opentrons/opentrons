@@ -40,4 +40,4 @@ def get_configuration_dir() -> str:
 
 
 def get_configuration_file_path() -> str:
-    return os.path.join(get_configuration_dir(), "configurations.json")
+    return os.path.join(get_configuration_dir(), "configurations.py")

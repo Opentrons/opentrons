@@ -17,9 +17,13 @@ from g_code_parsing.g_code_differ import GCodeDiffer
 from g_code_parsing.g_code_program.supported_text_modes import (
     SupportedTextModes,
 )
-from g_code_parsing.g_code_engine import HTTPGCodeEngine, ProtocolGCodeEngine
-from g_code_parsing.g_code_test_data import GCodeTestFile, ValidDriverTypes
-from g_code_parsing.utils import get_configuration_file_path
+from g_code_parsing.g_code_engine import GCodeEngine
+from g_code_parsing.g_code_test_data import (
+    GCodeTestFile,
+    ProtocolTestData,
+    HTTPTestData,
+)
+from g_code_test_data.configurations import CONFIGURATIONS
 
 
 class CLICommand(abc.ABC):
@@ -54,21 +58,22 @@ class RunCommand(CLICommand):
             left=self.left_pipette_config, right=self.right_pipette_config
         )
         settings = Settings(smoothie=smoothie_settings, host=self.host)
-
-        configuration = GCodeTestFile.from_config_file(
-            get_configuration_file_path()
+        # Ignoring because mypy is throwing an error saying that configs
+        # is of type List[BaseModel] when it for sure isn't
+        configuration = GCodeTestFile(
+            configs=CONFIGURATIONS  # type: ignore
         ).get_by_name(self.configuration_name)
 
-        engine: Union[HTTPGCodeEngine, ProtocolGCodeEngine]
+        engine = GCodeEngine(settings)
 
-        if configuration.driver == ValidDriverTypes.PROTOCOL.value:
-            engine = ProtocolGCodeEngine(settings)
+        if isinstance(configuration, ProtocolTestData):
+            with engine.run_protocol(configuration) as program:
+                text = program.get_text_explanation(self.text_mode)
+        elif isinstance(configuration, HTTPTestData):
+            with engine.run_http(configuration) as program:
+                text = program.get_text_explanation(self.text_mode)
 
-        if configuration.driver == ValidDriverTypes.HTTP.value:
-            engine = HTTPGCodeEngine(settings)
-
-        with engine.run(configuration.path) as program:
-            return program.get_text_explanation(self.text_mode)
+        return text
 
 
 @dataclass
@@ -108,8 +113,10 @@ class DiffCommand(CLICommand):
 
 class ConfigurationCommand(CLICommand):
     def execute(self) -> str:
+        # Ignoring because mypy is throwing an error saying that configs
+        # is of type List[BaseModel] when it for sure isn't
         path_string = "\n".join(
-            GCodeTestFile.from_config_file(get_configuration_file_path()).names
+            GCodeTestFile(configs=CONFIGURATIONS).names  # type: ignore
         )
         return f"Runnable Configurations:\n{path_string}"
 
