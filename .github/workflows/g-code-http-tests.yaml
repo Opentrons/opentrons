@@ -20,7 +20,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  confirm-g-code:
+  http-g-code:
     name: HTTP G-Code Tests
     runs-on: ubuntu-18.04
     steps:
