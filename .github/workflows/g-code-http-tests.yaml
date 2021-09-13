@@ -1,0 +1,73 @@
+name: HTTP G-Code Tests
+
+on:
+  # Run on any change to the api directory
+  pull_request:
+    paths:
+      - 'api/**'
+      - 'g-code-testing/**'
+      - 'Makefile'
+    branches:
+      - '*'
+  push:
+    paths:
+      - 'api/**'
+      - 'g-code-testing/**'
+      - 'Makefile'
+    branches:
+      - '*'
+
+  workflow_dispatch:
+
+jobs:
+  http-g-code:
+    name: HTTP G-Code Tests
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Check out Monorepo
+        uses: actions/checkout@v2
+
+      - name: Setup Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+
+      - name: Setup Python Environment
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+
+      - name: Setup G-Code Testing Project
+        uses: ./.github/actions/python/setup
+        with:
+          project: g-code-testing
+
+      - name: Run HTTP call - Move Left Pipette
+        if: always()
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.S3_APP_DEPLOY_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_APP_DEPLOY_SECRET }}
+          AWS_DEFAULT_REGION: us-east-2
+        run: make -C g-code-testing g-code-http-move-left-pipette-diff
+
+      - name: Save Generated Diff - Move Left Pipette
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: http-move-left-pipette-diff
+          path: /tmp/http-move-left-pipette-diff.html
+
+      - name: Run HTTP call - Move Right Pipette
+        if: always()
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.S3_APP_DEPLOY_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_APP_DEPLOY_SECRET }}
+          AWS_DEFAULT_REGION: us-east-2
+        run: make -C g-code-testing g-code-http-move-right-pipette-diff
+
+      - name: Save Generated Diff - Move Right Pipette
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: http-move-right-pipette-diff
+          path: /tmp/http-move-right-pipette-diff.html
