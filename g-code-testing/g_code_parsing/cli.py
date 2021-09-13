@@ -1,7 +1,6 @@
 import abc
 import argparse
 import json
-import os
 from typing import Union, Dict, Any, List
 
 import sys
@@ -18,14 +17,18 @@ from g_code_parsing.g_code_differ import GCodeDiffer
 from g_code_parsing.g_code_program.supported_text_modes import (
     SupportedTextModes,
 )
-from g_code_parsing.protocol_runner import ProtocolRunner
-from g_code_parsing.utils import get_configuration_dir
+from g_code_parsing.g_code_engine import GCodeEngine
+from g_code_parsing.g_code_test_data import (
+    GCodeTestFile,
+    ProtocolTestData,
+    HTTPTestData,
+)
+from g_code_test_data.configurations import CONFIGURATIONS
 
 
 class CLICommand(abc.ABC):
     """ABC which all CLI command classes should inherit from"""
 
-    CONFIGURATION_DIR_LOCATION = get_configuration_dir()
     able_to_respond_with_error_code = False
     respond_with_error_code = False
     error_message = "Error message not defined"
@@ -40,7 +43,7 @@ class CLICommand(abc.ABC):
 class RunCommand(CLICommand):
     """The "run" command of the CLI."""
 
-    configuration_path: str
+    configuration_name: str
     text_mode: str
     left_pipette_config: PipetteSettings
     right_pipette_config: PipetteSettings
@@ -55,11 +58,22 @@ class RunCommand(CLICommand):
             left=self.left_pipette_config, right=self.right_pipette_config
         )
         settings = Settings(smoothie=smoothie_settings, host=self.host)
-        file_path = os.path.join(
-            self.CONFIGURATION_DIR_LOCATION, self.configuration_path
-        )
-        with ProtocolRunner(settings).run_protocol(file_path) as program:
-            return program.get_text_explanation(self.text_mode)
+        # Ignoring because mypy is throwing an error saying that configs
+        # is of type List[BaseModel] when it for sure isn't
+        configuration = GCodeTestFile(
+            configs=CONFIGURATIONS  # type: ignore
+        ).get_by_name(self.configuration_name)
+
+        engine = GCodeEngine(settings)
+
+        if isinstance(configuration, ProtocolTestData):
+            with engine.run_protocol(configuration) as program:
+                text = program.get_text_explanation(self.text_mode)
+        elif isinstance(configuration, HTTPTestData):
+            with engine.run_http(configuration) as program:
+                text = program.get_text_explanation(self.text_mode)
+
+        return text
 
 
 @dataclass
@@ -99,16 +113,11 @@ class DiffCommand(CLICommand):
 
 class ConfigurationCommand(CLICommand):
     def execute(self) -> str:
-        paths = [
-            os.path.join(root, name).replace(self.CONFIGURATION_DIR_LOCATION + "/", "")
-            for root, dirs, files in os.walk(
-                self.CONFIGURATION_DIR_LOCATION, topdown=False
-            )
-            for name in files
-        ]
-
-        path_string = "\n".join(paths)
-
+        # Ignoring because mypy is throwing an error saying that configs
+        # is of type List[BaseModel] when it for sure isn't
+        path_string = "\n".join(
+            GCodeTestFile(configs=CONFIGURATIONS).names  # type: ignore
+        )
         return f"Runnable Configurations:\n{path_string}"
 
 
@@ -122,7 +131,7 @@ class GCodeCLI:
     COMMAND_KEY = "command"
 
     RUN_PROTOCOL_COMMAND = "run"
-    CONFIGURATION_PATH = "configuration_path"
+    CONFIGURATION_NAME = "configuration_name"
     TEXT_MODE_KEY_NAME = "text_mode"
     LEFT_PIPETTE_KEY_NAME = "left_pipette"
     RIGHT_PIPETTE_KEY_NAME = "right_pipette"
@@ -170,7 +179,7 @@ class GCodeCLI:
         command: Union[RunCommand, DiffCommand, ConfigurationCommand]
         if cls.RUN_PROTOCOL_COMMAND == passed_command_name:
             command = RunCommand(
-                configuration_path=processed_args[cls.CONFIGURATION_PATH],
+                configuration_name=processed_args[cls.CONFIGURATION_NAME],
                 text_mode=processed_args[cls.TEXT_MODE_KEY_NAME],
                 left_pipette_config=processed_args[cls.LEFT_PIPETTE_KEY_NAME],
                 right_pipette_config=processed_args[cls.RIGHT_PIPETTE_KEY_NAME],
@@ -236,7 +245,7 @@ class GCodeCLI:
             formatter_class=argparse.RawTextHelpFormatter,
         )
         run_parser.add_argument(
-            "configuration_path", type=str, help="Path to configuration you want to run"
+            "configuration_name", type=str, help="Name of configuration you want to run"
         )
         run_parser.add_argument(
             "--text-mode",
