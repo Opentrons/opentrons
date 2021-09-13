@@ -247,10 +247,8 @@ def test_validate_overrides_fail(
     ],
 )
 def test_validate_overrides_pass(override_field, mock_pipette_config_model):
-    assert (
-        pipette_config.validate_overrides(override_field, mock_pipette_config_model)  # type: ignore[func-returns-value]  # noqa: E501
-        is None
-    )
+    # calling validate_overrides should not raise
+    pipette_config.validate_overrides(override_field, mock_pipette_config_model)
 
 
 @pytest.fixture

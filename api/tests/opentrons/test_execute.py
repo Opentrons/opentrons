@@ -6,6 +6,7 @@ import mock
 
 import pytest
 
+from opentrons_shared_data.pipette.dev_types import PipetteModel
 from opentrons import execute, types
 from opentrons.hardware_control import controller, api
 from opentrons.protocols.execution.errors import ExceptionInProtocolError
@@ -36,11 +37,11 @@ def test_execute_function_apiv2(
 ):
 
     mock_get_attached_instr.return_value[types.Mount.LEFT] = {
-        "config": load("p10_single_v1.5"),  # type: ignore[arg-type]
+        "config": load(PipetteModel("p10_single_v1.5")),
         "id": "testid",
     }
     mock_get_attached_instr.return_value[types.Mount.RIGHT] = {
-        "config": load("p300_single_v1.5"),  # type: ignore[arg-type]
+        "config": load(PipetteModel("p300_single_v1.5")),
         "id": "testid2",
     }
     entries = []
@@ -52,8 +53,8 @@ def test_execute_function_apiv2(
     execute.execute(protocol.filelike, "testosaur_v2.py", emit_runlog=emit_runlog)
     assert [item["payload"]["text"] for item in entries if item["$"] == "before"] == [
         "Picking up tip from A1 of Opentrons 96 Tip Rack 300 µL on 1",
-        "Aspirating 10.0 uL from A1 of Corning 96 Well Plate 360 µL Flat on 2 at 150.0 uL/sec",  # noqa: E501,
-        "Dispensing 10.0 uL into B1 of Corning 96 Well Plate 360 µL Flat on 2 at 300.0 uL/sec",  # noqa: E501,
+        "Aspirating 10.0 uL from A1 of Corning 96 Well Plate 360 µL Flat on 2 at 150.0 uL/sec",  # noqa: E501
+        "Dispensing 10.0 uL into B1 of Corning 96 Well Plate 360 µL Flat on 2 at 300.0 uL/sec",  # noqa: E501
         "Dropping tip into H12 of Opentrons 96 Tip Rack 300 µL on 1",
     ]
 
@@ -70,7 +71,7 @@ def test_execute_function_json_v3_apiv2(
         entries.append(entry)
 
     mock_get_attached_instr.return_value[types.Mount.LEFT] = {
-        "config": load("p10_single_v1.5"),  # type: ignore[arg-type]
+        "config": load(PipetteModel("p10_single_v1.5")),
         "id": "testid",
     }
     execute.execute(filelike, "simple.json", emit_runlog=emit_runlog)
@@ -98,7 +99,7 @@ def test_execute_function_json_v4_apiv2(
         entries.append(entry)
 
     mock_get_attached_instr.return_value[types.Mount.LEFT] = {
-        "config": load("p10_single_v1.5"),  # type: ignore[arg-type]
+        "config": load(PipetteModel("p10_single_v1.5")),
         "id": "testid",
     }
     execute.execute(filelike, "simple.json", emit_runlog=emit_runlog)
@@ -126,7 +127,7 @@ def test_execute_function_json_v5_apiv2(
         entries.append(entry)
 
     mock_get_attached_instr.return_value[types.Mount.LEFT] = {
-        "config": load("p10_single_v1.5"),  # type: ignore[arg-type]
+        "config": load(PipetteModel("p10_single_v1.5")),
         "id": "testid",
     }
     execute.execute(filelike, "simple.json", emit_runlog=emit_runlog)
@@ -155,7 +156,7 @@ def test_execute_function_bundle_apiv2(
         entries.append(entry)
 
     mock_get_attached_instr.return_value[types.Mount.LEFT] = {
-        "config": load("p10_single_v1.5"),  # type: ignore[arg-type]
+        "config": load(PipetteModel("p10_single_v1.5")),
         "id": "testid",
     }
     execute.execute(bundle["filelike"], "simple_bundle.zip", emit_runlog=emit_runlog)
@@ -192,7 +193,7 @@ def test_execute_extra_labware(
         entries.append(entry)
 
     mock_get_attached_instr.return_value[types.Mount.RIGHT] = {
-        "config": load("p300_single_v2.0"),  # type: ignore[arg-type]
+        "config": load(PipetteModel("p300_single_v2.0")),
         "id": "testid",
     }
     # make sure we can load labware explicitly

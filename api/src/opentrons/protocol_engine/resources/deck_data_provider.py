@@ -49,8 +49,8 @@ class DeckDataProvider:
 
         for fixture in deck_definition["locations"]["fixtures"]:
             labware_id = fixture["id"]
-            load_name = cast(Optional[str], fixture.get("labware", None))
-            slot = cast(Optional[str], fixture.get("slot", None))
+            load_name = cast(Optional[str], fixture.get("labware"))
+            slot = cast(Optional[str], fixture.get("slot"))
 
             if load_name is not None and slot is not None:
                 location = DeckSlotLocation(slot=DeckSlotName.from_primitive(slot))
