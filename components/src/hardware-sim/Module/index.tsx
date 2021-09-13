@@ -63,6 +63,9 @@ export const Module = (props: Props): JSX.Element => {
   const {xDimension, yDimension, footprintXDimension, footprintYDimension, labwareInterfaceXDimension, labwareInterfaceYDimension } = def.dimensions
 
 
+  // apply translation to position module in viewport
+  const positionTransform = `translate(${x}, ${y})`
+
   // apply translation to compensate for the offset of the overall module's
   // left-bottom-front corner, from the footprint's left-bottom-front corner (slot interface)
   const offsetTransform = `translate(${translateX}, ${translateY})`
@@ -99,7 +102,7 @@ export const Module = (props: Props): JSX.Element => {
   }
 
   return (
-    <g x={x} y={y}  data-test={`Module_${moduleType}`}>
+    <g transform={positionTransform} data-test={`Module_${moduleType}`}>
       <g transform={orientationTransform}>
         <g transform={offsetTransform}>
           {moduleType === THERMOCYCLER_MODULE_TYPE

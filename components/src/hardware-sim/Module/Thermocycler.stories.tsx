@@ -2,10 +2,12 @@ import * as React from 'react'
 import { RobotWorkSpace } from '../Deck/RobotWorkSpace'
 import { getDeckDefinitions } from '../Deck/getDeckDefinitions'
 
-import { Thermocycler as ThermocyclerComponent } from './Thermocycler'
+import { Module } from './'
 
+import type { ThermocyclerVizProps } from './Thermocycler'
 import type { RobotWorkSpaceRenderProps } from '../Deck/RobotWorkSpace'
 import type { Story, Meta } from '@storybook/react'
+import { THERMOCYCLER_MODULE_V1 } from '@opentrons/shared-data'
 
 const lidMotorStates = ['open', 'closed', 'unknown']
 
@@ -13,15 +15,14 @@ export default {
   title: 'Library/Molecules/Simulation/Modules/Thermocycler'
 } as Meta
 
-const Template: Story<React.ComponentProps<typeof ThermocyclerComponent>> = args => {
+const Template: Story<ThermocyclerVizProps> = args => {
   return (
     <RobotWorkSpace deckDef={getDeckDefinitions()['ot2_standard']}>
       {({ deckSlotsById }: RobotWorkSpaceRenderProps) => {
         const slot = deckSlotsById['7']
+        const [x, y] = slot.position
         return (
-          <g transform={`translate(${slot.position[0]}, ${slot.position[1]})`}>
-            <ThermocyclerComponent lidMotorState={args.lidMotorState} />
-          </g>
+          <Module x={x} y={y} model={THERMOCYCLER_MODULE_V1} innerProps={{lidMotorState: args.lidMotorState}} />
         )
       }}
     </RobotWorkSpace>
