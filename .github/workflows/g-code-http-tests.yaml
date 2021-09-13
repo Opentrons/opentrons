@@ -71,3 +71,33 @@ jobs:
         with:
           name: http-move-right-pipette-diff
           path: /tmp/http-move-right-pipette-diff.html
+
+      - name: Run HTTP call - Move Left Mount
+        if: always()
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.S3_APP_DEPLOY_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_APP_DEPLOY_SECRET }}
+          AWS_DEFAULT_REGION: us-east-2
+        run: make -C g-code-testing g-code-http-move-left-mount-diff
+
+      - name: Save Generated Diff - Move Left Mount
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: http-move-left-mount-diff
+          path: /tmp/http-move-left-mount-diff.html
+
+      - name: Run HTTP call - Move Right Mount
+        if: always()
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.S3_APP_DEPLOY_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_APP_DEPLOY_SECRET }}
+          AWS_DEFAULT_REGION: us-east-2
+        run: make -C g-code-testing g-code-http-move-right-mount-diff
+
+      - name: Save Generated Diff - Move Right Mount
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: http-move-right-mount-diff
+          path: /tmp/http-move-right-mount-diff.html
