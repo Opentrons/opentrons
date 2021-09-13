@@ -43,6 +43,7 @@ jobs:
           project: g-code-testing
 
       - name: Run HTTP call - Move Left Pipette
+        if: always()
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.S3_APP_DEPLOY_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_APP_DEPLOY_SECRET }}
@@ -57,6 +58,7 @@ jobs:
           path: /tmp/http-move-left-pipette-diff.html
 
       - name: Run HTTP call - Move Right Pipette
+        if: always()
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.S3_APP_DEPLOY_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_APP_DEPLOY_SECRET }}
