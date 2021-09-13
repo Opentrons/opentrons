@@ -34,13 +34,13 @@ const Template: Story<{slot: string}> = args => {
     </RobotWorkSpace>
   )
 }
-export const TemperatureModule = Template.bind({})
-TemperatureModule.argTypes = {
+export const MagneticModule = Template.bind({})
+MagneticModule.argTypes = {
   slot: {
     control: {
       type: 'select',
       options: slots
     },
-    defaultValue: slots[0],
+    defaultValue: slots[slots.length - 1],
   },
 }

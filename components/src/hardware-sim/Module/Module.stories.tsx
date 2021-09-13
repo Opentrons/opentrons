@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { MAGNETIC_MODULE_V1, MAGNETIC_MODULE_V2, ModuleModel, TEMPERATURE_MODULE_V1, TEMPERATURE_MODULE_V2, THERMOCYCLER_MODULE_V1 } from '@opentrons/shared-data'
+import { LabwareDefinition2, MAGNETIC_MODULE_V1, MAGNETIC_MODULE_V2, ModuleModel, TEMPERATURE_MODULE_V1, TEMPERATURE_MODULE_V2, THERMOCYCLER_MODULE_V1 } from '@opentrons/shared-data'
 import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 import { RobotWorkSpace } from '../Deck/RobotWorkSpace'
 import { getDeckDefinitions } from '../Deck/getDeckDefinitions'
@@ -24,31 +24,25 @@ export default {
   title: 'Library/Molecules/Simulation/Modules/Module'
 } as Meta
 
-const Template: Story<{slot: string, model: ModuleModel, orientation: 'left' | 'right'}> = args => {
+const Template: Story<{
+ slot: string,
+ model: ModuleModel,
+ orientation: 'left' | 'right',
+ hasLabware: boolean
+}> = args => {
   return (
     <RobotWorkSpace deckDef={getDeckDefinitions().ot2_standard}>
       {({ deckSlotsById }: RobotWorkSpaceRenderProps) => {
         const slot = deckSlotsById[args.slot]
         return (
-          <g transform={`translate(${slot.position[0]}, ${slot.position[1]})`}>
             <ModuleComponent
               model={args.model}
               x={slot.position[0]}
               y={slot.position[1]}
-              // statusInfo={(
-              //   <>
-              //     <div>TEMPERATURE</div>
-              //     <div>LID</div>
-              //     <div>UP now</div>
-              //     <div>TEMPERATURE</div>
-              //     <div>ramping</div>
-              //   </>
-              // )}
               innerProps={{lidMotorState: 'open'}}
               orientation={args.orientation}>
-              {/* <LabwareRender definition={fixture_96_plate}/> */}
+              {args.hasLabware ? <LabwareRender definition={fixture_96_plate as LabwareDefinition2}/> : null}
             </ModuleComponent>
-          </g>
         )
       }}
     </RobotWorkSpace>
@@ -61,7 +55,7 @@ Module.argTypes = {
       type: 'select',
       options: slots
     },
-    defaultValue: slots[0],
+    defaultValue: slots[slots.length - 1],
   },
   model: {
     control: {
@@ -76,5 +70,11 @@ Module.argTypes = {
       options: ['left' , 'right'],
     },
     defaultValue: 'left',
+  },
+  hasLabware: {
+    control: {
+      type: 'boolean',
+    },
+    defaultValue: false,
   },
 }

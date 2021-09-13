@@ -15,19 +15,6 @@ export default {
 } as Meta
 
 const Template: Story<{slot: string, standaloneSVG: boolean}> = args => {
-  if (args.standaloneSVG)
-  return (
-    <Module
-      x={0}
-      y={0}
-      model={TEMPERATURE_MODULE_V2}
-      orientation={
-        ['3','6','9'].includes(args.slot)
-          ? 'right'
-          : 'left'
-      }
-      standaloneSVG />
-  )
   return (
     <RobotWorkSpace deckDef={getDeckDefinitions()['ot2_standard']}>
       {({ deckSlotsById }: RobotWorkSpaceRenderProps) => {
@@ -41,8 +28,7 @@ const Template: Story<{slot: string, standaloneSVG: boolean}> = args => {
               ['3','6','9'].includes(args.slot)
                 ? 'right'
                 : 'left'
-            }
-            standaloneSVG={args.standaloneSVG} />
+            } />
         )
       }}
     </RobotWorkSpace>
@@ -55,7 +41,7 @@ TemperatureModule.argTypes = {
       type: 'select',
       options: slots
     },
-    defaultValue: slots[0],
+    defaultValue: slots[slots.length - 1],
   },
   standaloneSVG: {
     control: {
