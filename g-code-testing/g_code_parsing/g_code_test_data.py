@@ -1,7 +1,5 @@
 from __future__ import annotations
-
-import json
-from typing import List
+from typing import List, Union, Callable
 from pydantic import BaseModel, validator
 from g_code_parsing.errors import ConfigurationNotFoundError
 from enum import Enum
@@ -12,14 +10,18 @@ class ValidDriverTypes(str, Enum):
     PROTOCOL = "protocol"
 
 
-class GCodeTestData(BaseModel):
+class HTTPTestData(BaseModel):
+    name: str
+    executable: Callable
+
+
+class ProtocolTestData(BaseModel):
     name: str
     path: str
-    driver: ValidDriverTypes
 
 
 class GCodeTestFile(BaseModel):
-    configs: List[GCodeTestData]
+    configs: List[Union[HTTPTestData, ProtocolTestData]]
 
     # Pydantic stuff
 
@@ -31,21 +33,6 @@ class GCodeTestFile(BaseModel):
         )
         return configs
 
-    @validator("configs")
-    def paths_must_be_unique(cls, configs):
-        path = [item.path for item in configs]
-        assert len(path) == len(set(path)), (
-            "You have items with duplicate paths in " "your schema"
-        )
-        return configs
-
-    # Public Methods
-
-    @classmethod
-    def from_config_file(cls, file_path: str) -> GCodeTestFile:
-        json_file = open(file_path, "r")
-        return GCodeTestFile(configs=json.load(json_file))
-
     def get_by_name(self, name: str):
         for config in self.configs:
             if config.name == name:
@@ -56,7 +43,3 @@ class GCodeTestFile(BaseModel):
     @property
     def names(self) -> List[str]:
         return [config.name for config in self.configs]
-
-    @property
-    def paths(self) -> List[str]:
-        return [config.path for config in self.configs]
