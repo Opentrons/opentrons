@@ -55,3 +55,17 @@ jobs:
         with:
           name: http-move-left-pipette-diff
           path: /tmp/http-move-left-pipette-diff.html
+
+      - name: Run HTTP call - Move Right Pipette
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.S3_APP_DEPLOY_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_APP_DEPLOY_SECRET }}
+          AWS_DEFAULT_REGION: us-east-2
+        run: make -C g-code-testing g-code-http-move-right-pipette-diff
+
+      - name: Save Generated Diff - Move Right Pipette
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: http-move-right-pipette-diff
+          path: /tmp/http-move-right-pipette-diff.html
