@@ -8,9 +8,9 @@ from opentrons.protocol_api.labware import load as load_lw, Labware
 from opentrons.protocols.api_support.constants import STANDARD_DECK
 from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocols.geometry.deck_item import DeckItem
+from opentrons.hardware_control.modules.types import ModuleType
 from opentrons.protocols.geometry.module_geometry import (
     ModuleGeometry,
-    ModuleType,
     ThermocyclerGeometry,
 )
 from opentrons_shared_data.deck import load as load_deck
@@ -261,16 +261,12 @@ class Deck(UserDict):
     def get_fixed_trash(self) -> Optional[Labware]:
         fixtures = self._definition["locations"]["fixtures"]
         ft = next((f for f in fixtures if f["id"] == FIXED_TRASH_ID), None)
-        return (
-            self.data[self._check_name(ft.get("slot"))] if ft else None  # type: ignore
-        )
+        return self.data[self._check_name(ft.get("slot"))] if ft else None
 
     def get_non_fixture_slots(self) -> List[types.DeckLocation]:
         fixtures = self._definition["locations"]["fixtures"]
         fixture_slots = {
-            self._check_name(f.get("slot"))  # type: ignore[misc]
-            for f in fixtures
-            if f.get("slot")  # type: ignore[misc]
+            self._check_name(f.get("slot")) for f in fixtures if f.get("slot")
         }
         return [s for s in self.data.keys() if s not in fixture_slots]
 

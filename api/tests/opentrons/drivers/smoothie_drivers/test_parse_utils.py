@@ -36,6 +36,7 @@ def test_parse_pipette_data():
     mount = "L"
     good_data = mount + ": " + utils.string_to_hex(msg)
     parsed = parse_utils.parse_instrument_data(good_data).get(mount)
+    assert parsed
     assert parsed.decode() == msg
 
 

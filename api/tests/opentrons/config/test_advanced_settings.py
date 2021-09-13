@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import patch
 
-from opentrons.config import advanced_settings, CONFIG
+from opentrons.config import advanced_settings, ARCHITECTURE, CONFIG
 
 
 @pytest.fixture
@@ -54,6 +54,7 @@ def test_get_advanced_setting_found(
 ):
     for k, v in mock_settings_values.items():
         s = advanced_settings.get_adv_setting(k)
+        assert s is not None
         assert s.value == v
         assert s.definition == advanced_settings.settings_by_id[k]
 
@@ -199,7 +200,7 @@ async def test_disable_log_integration_side_effect(loop, v, expected_level):
         mock_log_control.set_syslog_level.side_effect = set_syslog_level
         with patch(
             "opentrons.config.advanced_settings.ARCHITECTURE",
-            new=advanced_settings.ARCHITECTURE.BUILDROOT,
+            new=ARCHITECTURE.BUILDROOT,
         ):
             s = advanced_settings.DisableLogIntegrationSettingDefinition()
             await s.on_change(v)
@@ -215,7 +216,7 @@ async def test_disable_log_integration_side_effect_error(loop):
         mock_log_control.set_syslog_level.side_effect = set_syslog_level
         with patch(
             "opentrons.config.advanced_settings.ARCHITECTURE",
-            new=advanced_settings.ARCHITECTURE.BUILDROOT,
+            new=ARCHITECTURE.BUILDROOT,
         ):
             s = advanced_settings.DisableLogIntegrationSettingDefinition()
             with pytest.raises(advanced_settings.SettingException):

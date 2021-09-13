@@ -619,7 +619,7 @@ class API(HardwareAPILike):
 
         asyncio.run_coroutine_threadsafe(_chained_calls(), self._loop)
 
-    async def halt(self):
+    async def halt(self) -> None:
         """Immediately stop motion.
 
         Calls to :py:meth:`stop` through the synch adapter while other calls

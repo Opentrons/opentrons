@@ -1,6 +1,6 @@
 import functools
 import inspect
-from typing import Any, Callable, cast, Dict, Tuple, Mapping, Generic, TypeVar
+from typing import Any, Callable, Dict, Generic, Mapping, Optional, Tuple, TypeVar, cast
 from opentrons.broker import Broker
 from . import types as command_types
 
@@ -28,7 +28,7 @@ getfullargspec_cache = InspectMemoizer(inspect.getfullargspec)
 
 
 class CommandPublisher:
-    def __init__(self, broker: Broker) -> None:
+    def __init__(self, broker: Optional[Broker]) -> None:
         self._broker = broker or Broker()
 
     @property

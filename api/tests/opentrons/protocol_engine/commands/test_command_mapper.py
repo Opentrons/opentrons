@@ -5,14 +5,9 @@ from pydantic import BaseModel
 from typing import Type, cast
 from opentrons.protocols.models import LabwareDefinition
 
-from opentrons.types import MountType
+from opentrons.types import MountType, DeckSlotName
 from opentrons.protocol_engine import commands
-from opentrons.protocol_engine.types import (
-    DeckSlotLocation,
-    DeckSlotName,
-    PipetteName,
-    WellLocation,
-)
+from opentrons.protocol_engine.types import DeckSlotLocation, PipetteName, WellLocation
 
 
 @pytest.mark.parametrize(

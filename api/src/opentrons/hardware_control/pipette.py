@@ -6,6 +6,8 @@ from dataclasses import asdict, replace
 import logging
 from typing import Any, Dict, Optional, Set, Tuple, Union, TYPE_CHECKING
 
+from opentrons_shared_data.pipette import name_config as pipette_name_config
+
 from opentrons.types import Point
 from opentrons.calibration_storage.types import PipetteOffsetByPipetteMount
 from opentrons.config import pipette_config, robot_configs
@@ -87,7 +89,7 @@ class Pipette:
         assert name in self._config.back_compat_names + [
             self.name
         ], f"{self._name} is not back-compatible with {name}"
-        name_conf = pipette_config.name_config()
+        name_conf = pipette_name_config()
         bc_conf = name_conf[name]
         self.working_volume = bc_conf["maxVolume"]
         self.update_config_item("min_volume", bc_conf["minVolume"])

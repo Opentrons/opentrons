@@ -1,13 +1,13 @@
 """Test the DFS module.
 
-Generic testing of a depth first search algo
+Generic testing of a depth first search algorithm.
 """
 from pathlib import Path
 
 import pytest
 import json
 import os
-from typing import Callable, List, Tuple, Any
+from typing import Any, Callable, List, Set, Tuple, Union
 
 from opentrons.algorithms import dfs, types
 
@@ -49,10 +49,10 @@ def dfs_graph(request: Any) -> Tuple[dfs.DFS, str]:
     """
     graph = request.param[0]
     _type = request.param[1]
-    yield dfs.DFS(graph), _type
+    return dfs.DFS(graph), _type
 
 
-def test_vertices(dfs_graph: dfs.DFS) -> None:
+def test_vertices(dfs_graph: Tuple[dfs.DFS, str]) -> None:
     """Test vertices.
 
     Test adding and removing the vertices of a graph.
@@ -62,6 +62,7 @@ def test_vertices(dfs_graph: dfs.DFS) -> None:
     """
     _dfs, _type = dfs_graph
     graph = _dfs.graph
+    additional_vertex: Union[types.GenericNode[str], types.GenericNode[int]]
     if _type == "string":
         additional_vertex = types.GenericNode(name="K", sub_names=["H", "J", "A"])
     else:
@@ -75,7 +76,7 @@ def test_vertices(dfs_graph: dfs.DFS) -> None:
     assert vertex_obj not in graph._sorted_graph
 
 
-def test_neighbors(dfs_graph: dfs.DFS) -> None:
+def test_neighbors(dfs_graph: Tuple[dfs.DFS, str]) -> None:
     """Test neighbors.
 
     Test adding neighbors to a vertex.
@@ -84,10 +85,10 @@ def test_neighbors(dfs_graph: dfs.DFS) -> None:
     _dfs, _type = dfs_graph
     graph = _dfs.graph
     if _type == "string":
-        key = "A"
-        neighbor = "J"
-        og_neighbors = ["B", "E"]
-        sorted_neighbors = ["B", "E", "J"]
+        key: Union[str, int] = "A"
+        neighbor: Union[str, int] = "J"
+        og_neighbors: Union[List[str], List[int]] = ["B", "E"]
+        sorted_neighbors: Union[List[str], List[int]] = ["B", "E", "J"]
     else:
         key = 1
         neighbor = 4
@@ -101,7 +102,7 @@ def test_neighbors(dfs_graph: dfs.DFS) -> None:
     assert vertex.neighbors == og_neighbors
 
 
-def test_depth_first_search(dfs_graph: dfs.DFS) -> None:
+def test_depth_first_search(dfs_graph: Tuple[dfs.DFS, str]) -> None:
     """Test the depth first search algorithm.
 
     The method should dig down into the bottom leaf node
@@ -109,6 +110,7 @@ def test_depth_first_search(dfs_graph: dfs.DFS) -> None:
     """
     _dfs, _type = dfs_graph
     visited_vertices = _dfs.dfs()
+    sort: Union[Set[str], Set[int]]
     if _type == "string":
         sort = {"A", "B", "F", "G", "C", "J", "I", "H", "D", "E"}
     else:

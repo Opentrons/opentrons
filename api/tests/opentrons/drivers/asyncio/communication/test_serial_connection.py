@@ -25,7 +25,7 @@ def ack() -> str:
 @pytest.fixture
 def subject(mock_serial_port: AsyncMock, ack: str) -> SerialConnection:
     """Create the test subject."""
-    SerialConnection.RETRY_WAIT_TIME = 0
+    SerialConnection.RETRY_WAIT_TIME = 0  # type: ignore[attr-defined]
     return SerialConnection(
         serial=mock_serial_port,
         ack=ack,
