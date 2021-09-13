@@ -31,6 +31,8 @@
   "modules_setup_step_title": "Module Setup",
   "mount_title": "{{mount}} MOUNT:",
   "not_calibrated": "Not calibrated yet",
+  "plug_in_required_module": "Plug in and power up the required module to continue",
+  "plug_in_required_module_plural": "Plug in and power up the required modules to continue",
   "proceed_to_labware_setup_step": "Proceed to Labware Setup",
   "proceed_to_module_setup_step": "Proceed to Module Setup",
   "attach_pipette_cta": "Attach Pipette",

@@ -6,7 +6,7 @@ import {
 } from '@opentrons/shared-data'
 import { getProtocolData } from '../../../redux/protocol'
 
-export type CoordinatesByModuleModel = Record<
+export type ModuleCoordinatesById = Record<
   string,
   { x: number; y: number; z: number; moduleModel: ModuleModel }
 >
@@ -14,7 +14,7 @@ export type CoordinatesByModuleModel = Record<
 export const getModuleRenderCoords = (
   protocolData: ReturnType<typeof getProtocolData>,
   deckDef: DeckDefinition
-): CoordinatesByModuleModel => {
+): ModuleCoordinatesById => {
   if (protocolData != null && 'modules' in protocolData) {
     return reduce(
       protocolData.modules,
