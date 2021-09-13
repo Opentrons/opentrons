@@ -41,12 +41,15 @@ export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
   const moduleDef = getModuleDef2(moduleModel)
   const {xDimension, yDimension, labwareInterfaceYDimension, labwareInterfaceXDimension} = moduleDef.dimensions
   const { t } = useTranslation('protocol_setup')
-  const moduleNotAttached = usbPort === null && hubPort === null && !isAttached
-  const moduleAttachedWithoutUSBNum =
-    usbPort === null && hubPort === null && isAttached
-  const moduleAttachedViaPort =
-    hubPort === null && usbPort !== null && isAttached
-  const moduleAttachedViaHub = `${t('usb_port_connected')} ${hubPort} ${t('hub_connected')}`
+
+  let connectionStatus = t('no_usb_port_yet')
+  if (usbPort === null && hubPort === null && isAttached) {
+    connectionStatus = t('usb_connected_no_port_info')
+  } else if (hubPort === null && usbPort !== null && isAttached) {
+    connectionStatus = t('usb_port_connected', {port: usbPort})
+  } else if (hubPort !== null && isAttached) {
+    connectionStatus = t('hub_port_connected', {port: hubPort})
+  }
 
   return (
     <RobotCoordsForeignObject
@@ -71,13 +74,7 @@ export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
         </Flex>
         <Text fontWeight={FONT_WEIGHT_SEMIBOLD} color={C_DARK_GRAY} fontSize={FONT_SIZE_BODY_1}>{getModuleDisplayName(moduleModel)}</Text>
         <Text color={C_DARK_GRAY} fontSize="0.5rem" fontStyle={FONT_STYLE_ITALIC}>
-          {moduleNotAttached
-            ? t('no_usb_port_yet')
-            : moduleAttachedWithoutUSBNum
-            ? t('usb_port_connected_old_server_version')
-            : moduleAttachedViaPort
-            ? t('usb_port_connected') + ' ' + usbPort
-            : moduleAttachedViaHub}
+          {connectionStatus}
         </Text>
       </Flex>
     </RobotCoordsForeignObject>

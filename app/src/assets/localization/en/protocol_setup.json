@@ -43,7 +43,7 @@
   "module_not_connected": "Not Connected",
   "module_connected": "Connected",
   "no_usb_port_yet": "No USB Port Yet",
-  "usb_port_connected": "USB Port",
-  "hub_connected": "via hub",
-  "usb_port_connected_old_server_version": "USB Port Connected"
+  "usb_port_connected": "USB Port {{port}}",
+  "hub_port_connected": "USB Port {{port}} via hub",
+  "usb_connected_no_port_info": "USB Port Connected"
 }
