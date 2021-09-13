@@ -21,6 +21,10 @@ TEMP_POLL_INTERVAL_SECS = 1.0
 SIM_TEMP_POLL_INTERVAL_SECS = TEMP_POLL_INTERVAL_SECS / 20.0
 
 
+class TempdeckError(Exception):
+    pass
+
+
 class TempDeck(mod_abc.AbstractModule):
     """
     Under development. API subject to change without a version bump
@@ -158,10 +162,21 @@ class TempDeck(mod_abc.AbstractModule):
         Polls temperature module's temperature until
         the specified temperature is reached
         """
+        await self.wait_for_is_running()
+        await self.wait_next_poll()
+
+        if self.target is not None:
+            # Validity of an awaiting temperature is almost unpredictable when no target
+            # is set, as it will depend on ambient temperatures.
+            if not (self.temperature <= awaiting_temperature <= self.target) and not (
+                self.target <= awaiting_temperature <= self.temperature
+            ):
+                raise TempdeckError(f"await_temperature of {awaiting_temperature} is "
+                                    f"unreachable with a target of {self.target} when"
+                                    f" current temperature is {self.temperature}.")
+
         if self.is_simulated:
             return
-
-        await self.wait_for_is_running()
 
         async def _await_temperature():
             if self.status == TemperatureStatus.HEATING:
