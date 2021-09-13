@@ -24,16 +24,19 @@ jobs:
     name: HTTP G-Code Tests
     runs-on: ubuntu-18.04
     steps:
-      - name: Checkout Monorepo
+      - name: Check out Monorepo
         uses: actions/checkout@v2
+
       - name: Setup Node
         uses: actions/setup-node@v1
         with:
           node-version: 12
+
       - name: Setup Python Environment
         uses: actions/setup-python@v2
         with:
           python-version: 3.7
+
       - name: Setup G-Code Testing Project
         uses: ./.github/actions/python/setup
         with:
@@ -44,7 +47,7 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.S3_APP_DEPLOY_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_APP_DEPLOY_SECRET }}
           AWS_DEFAULT_REGION: us-east-2
-        run: make -C g-code-http-move-left-pipette-run
+        run: make -C g-code-testing g-code-http-move-left-pipette-run
 
       - name: Save Generated Diff - Move Left Pipette
         if: always()
