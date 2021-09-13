@@ -160,7 +160,7 @@ class GCodeCLI:
             '--text-mode',
             'Concise',
             '--left-pipette',
-            '{"model": "p20_single_v2.0", "id": "P20SV202020070101 "}',
+            '{"model": "p20_single_v2.0", "id": "P20SV202020070101"}',
              '$DATA_DIR/protocols/smoothie_protocol.py'
         ]
         """
