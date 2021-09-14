@@ -11,6 +11,7 @@ opentrons-shared-data = {editable = true, path = "../shared-data/python"}
 g-code-testing = {editable = true, path = "."}
 anyio = "==3.3.0"
 pydantic = "==1.4"
+boto3 = "*"
 
 [dev-packages]
 diff-match-patch = "==20200713"
