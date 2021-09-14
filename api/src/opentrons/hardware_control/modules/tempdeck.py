@@ -162,6 +162,9 @@ class TempDeck(mod_abc.AbstractModule):
         Polls temperature module's temperature until
         the specified temperature is reached
         """
+        if self.is_simulated:
+            return
+
         await self.wait_for_is_running()
         await self.wait_next_poll()
 
@@ -171,12 +174,11 @@ class TempDeck(mod_abc.AbstractModule):
             if not (self.temperature <= awaiting_temperature <= self.target) and not (
                 self.target <= awaiting_temperature <= self.temperature
             ):
-                raise TempdeckError(f"await_temperature of {awaiting_temperature} is "
-                                    f"unreachable with a target of {self.target} when"
-                                    f" current temperature is {self.temperature}.")
-
-        if self.is_simulated:
-            return
+                raise TempdeckError(
+                    f"await_temperature of {awaiting_temperature} is "
+                    f"unreachable with a target of {self.target} when"
+                    f" current temperature is {self.temperature}."
+                )
 
         async def _await_temperature():
             if self.status == TemperatureStatus.HEATING:
