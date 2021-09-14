@@ -26,6 +26,7 @@ import {
   inferModuleOrientationFromXCoordinate,
 } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
+import { useAttachedModulesEqualsProtocolModules } from '../useAttachedModulesEqualsProtocolModules'
 import { fetchModules, getAttachedModules } from '../../../../redux/modules'
 import { ModuleInfo } from './ModuleInfo'
 import { MultipleModulesModal } from './MultipleModulesModal'
@@ -62,17 +63,14 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
   const attachedModules = useSelector((state: State) =>
     getAttachedModules(state, robotName)
   )
-  const attachedModulesModels = map(attachedModules, ({ model }) => model)
-  const combinedModules = attachedModulesModels.concat(moduleModels)
-  const uniqueModules = [...new Set(combinedModules)]
   const [
     showMultipleModulesModal,
     setShowMultipleModulesModal,
   ] = React.useState<boolean>(false)
   const { t } = useTranslation('protocol_setup')
   const hasADuplicateModule = new Set(moduleModels).size !== moduleModels.length
-  const proceedToLabwareDisabled =
-    combinedModules.length - uniqueModules.length !== moduleModels.length
+  const { allModulesAttached } = useAttachedModulesEqualsProtocolModules()
+  const proceedToLabwareDisabled = !allModulesAttached
   const modulesByPort = attachedModules.reduce<{
     [port: string]: AttachedModule[]
   }>((portMap, module) => {

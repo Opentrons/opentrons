@@ -21,14 +21,10 @@ import { LabwareSetup } from '..'
 import { LabwareSetupModal } from '../LabwareSetupModal'
 import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
 import { ExtraAttentionWarning } from '../ExtraAttentionWarning'
-import { getAttachedModules } from '../../../../../redux/modules'
 import { getModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
 import { getProtocolPipetteTipRackCalInfo } from '../../../../../redux/pipettes/selectors'
-import {
-  mockThermocycler as mockThermocyclerFixture,
-  mockMagneticModule as mockMagneticModuleFixture,
-} from '../../../../../redux/modules/__fixtures__/index'
 import { ModuleTag } from '../../../ModuleTag'
+import * as useAttachedModulesEqualsProtocolModules from '../../useAttachedModulesEqualsProtocolModules'
 
 jest.mock('../../../../../redux/modules')
 jest.mock('../../../../../redux/pipettes/selectors')
@@ -36,6 +32,7 @@ jest.mock('../LabwareSetupModal')
 jest.mock('../../../ModuleTag')
 jest.mock('../LabwareInfoOverlay')
 jest.mock('../ExtraAttentionWarning')
+jest.mock('../../useAttachedModulesEqualsProtocolModules')
 jest.mock('../utils/getModuleTypesThatRequireExtraAttention')
 jest.mock('@opentrons/components', () => {
   const actualComponents = jest.requireActual('@opentrons/components')
@@ -53,6 +50,9 @@ jest.mock('@opentrons/shared-data', () => {
     inferModuleOrientationFromXCoordinate: jest.fn(),
   }
 })
+const mockUseAttachedModulesEqualsProtocolModules = useAttachedModulesEqualsProtocolModules.useAttachedModulesEqualsProtocolModules as jest.MockedFunction<
+  typeof useAttachedModulesEqualsProtocolModules.useAttachedModulesEqualsProtocolModules
+>
 
 const mockLabwareInfoOverlay = LabwareInfoOverlay as jest.MockedFunction<
   typeof LabwareInfoOverlay
@@ -86,9 +86,6 @@ const mockExtraAttentionWarning = ExtraAttentionWarning as jest.MockedFunction<
   typeof ExtraAttentionWarning
 >
 
-const mockGetAttachedModules = getAttachedModules as jest.MockedFunction<
-  typeof getAttachedModules
->
 const mockGetProtocolPipetteTipRackCalInfo = getProtocolPipetteTipRackCalInfo as jest.MockedFunction<
   typeof getProtocolPipetteTipRackCalInfo
 >
@@ -138,6 +135,9 @@ describe('LabwareSetup', () => {
       moduleRenderCoords: {},
       labwareRenderCoords: {},
     }
+    mockUseAttachedModulesEqualsProtocolModules.mockReturnValue({
+      allModulesAttached: false,
+    })
 
     when(mockInferModuleOrientationFromXCoordinate)
       .calledWith(expect.anything())
@@ -203,16 +203,6 @@ describe('LabwareSetup', () => {
           })}
         </svg>
       ))
-
-    when(mockGetAttachedModules)
-      .calledWith(undefined as any, MOCK_ROBOT_NAME)
-      .mockReturnValue([
-        {
-          ...mockMagneticModuleFixture,
-          model: mockMagneticModule.model,
-        } as any,
-        { ...mockThermocyclerFixture, model: mockTCModule.model } as any,
-      ])
 
     when(mockGetProtocolPipetteTipRackCalInfo)
       .calledWith(undefined as any, MOCK_ROBOT_NAME)
@@ -344,6 +334,9 @@ describe('LabwareSetup', () => {
         moduleModel: mockTCModule.model,
       },
     }
+    mockUseAttachedModulesEqualsProtocolModules.mockReturnValue({
+      allModulesAttached: true,
+    })
 
     when(mockModuleViz)
       .calledWith(

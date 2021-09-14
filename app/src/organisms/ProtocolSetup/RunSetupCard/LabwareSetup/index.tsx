@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import map from 'lodash/map'
 import { NavLink } from 'react-router-dom'
+import { useAttachedModulesEqualsProtocolModules } from '../useAttachedModulesEqualsProtocolModules'
 import { useTranslation } from 'react-i18next'
 import {
   Btn,
@@ -30,7 +31,6 @@ import {
   inferModuleOrientationFromXCoordinate,
 } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
-import { getAttachedModules } from '../../../../redux/modules'
 import { ModuleTag } from '../../ModuleTag'
 import { LabwareInfoOverlay } from './LabwareInfoOverlay'
 import { LabwareSetupModal } from './LabwareSetupModal'
@@ -73,14 +73,7 @@ export const LabwareSetup = (props: LabwareSetupProps): JSX.Element | null => {
   const moduleTypesThatRequireExtraAttention = getModuleTypesThatRequireExtraAttention(
     moduleModels
   )
-  const attachedModules = useSelector((state: State) =>
-    getAttachedModules(state, robotName)
-  )
-  const attachedModulesModels = map(attachedModules, ({ model }) => model)
-  const combinedModules = attachedModulesModels.concat(moduleModels)
-  const uniqueModules = [...new Set(combinedModules)]
-  const allModulesAttached =
-    combinedModules.length - uniqueModules.length === moduleModels.length
+  const { allModulesAttached } = useAttachedModulesEqualsProtocolModules()
   const protocolPipetteTipRackData = useSelector((state: State) => {
     return Pipettes.getProtocolPipetteTipRackCalInfo(state, robotName)
   })
@@ -96,17 +89,17 @@ export const LabwareSetup = (props: LabwareSetupProps): JSX.Element | null => {
     pipetteCalibrationInfo.pipetteCalDate !== null
   let proceedToRunDisabledReason = ''
   let proceedToRunDisabled = true
-  if (allModulesAttached === false && pipettesCalibrated === true) {
+  if (!allModulesAttached && pipettesCalibrated) {
     proceedToRunDisabledReason = t(
       'proceed_to_run_disabled_modules_not_connected_tooltip'
     )
     proceedToRunDisabled = true
-  } else if (allModulesAttached === true && pipettesCalibrated === false) {
+  } else if (allModulesAttached && !pipettesCalibrated) {
     proceedToRunDisabledReason = t(
       'proceed_to_run_disabled_calibration_not_complete_tooltip'
     )
     proceedToRunDisabled = true
-  } else if (allModulesAttached === false && pipettesCalibrated === false) {
+  } else if (!allModulesAttached && !pipettesCalibrated) {
     proceedToRunDisabledReason = t(
       'proceed_to_run_disabled_modules_and_calibration_not_complete_tooltip'
     )
