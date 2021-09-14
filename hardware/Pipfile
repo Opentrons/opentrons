@@ -1,0 +1,24 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+python-can = "==3.3.4"
+pyserial = "==3.5"
+typing-extensions = "==3.10.0.0"
+
+[dev-packages]
+pytest = "==6.1.0"
+pytest-aiohttp = "==0.3.0"
+pytest-cov = "==2.10.1"
+mypy = "==0.800"
+black = "==21.7b0"
+flake8 = "~=3.9.0"
+flake8-annotations = "~=2.6.2"
+flake8-docstrings = "~=1.6.0"
+flake8-noqa = "~=1.1.0"
+
+
+[requires]
+python_version = "3.7"
