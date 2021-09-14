@@ -95,7 +95,9 @@ async def test_start_set_temperature_heat(tempdeck) -> None:
     argnames="start_temp,target_temp,await_temp",
     argvalues=[
         [20.0, 40.0, 41.0],
+        [20.0, 40.0, 19.0],
         [50.0, 30.0, 25.0],
+        [50.0, 30.0, 55.0],
     ],
 )
 async def test_invalid_await_temperature(
