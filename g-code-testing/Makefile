@@ -35,7 +35,23 @@ teardown:
 
 .PHONY: test
 test:
-	$(pytest) $(tests) $(test_opts)
+	$(pytest) -m 'not slow' $(tests) $(test_opts)
+
+.PHONY: test-slow
+test-slow:
+	$(pytest) -m 'slow' $(tests) $(test_opts)
+
+.PHONY: test-2-modules
+test-2-modules:
+	$(pytest) -m 'slow' -k 'test_two_modules_protocol' $(tests) $(test_opts)
+
+.PHONY: test-swift-smoke
+test-swift-smoke:
+	$(pytest) -m 'slow' -k 'test_swift_smoke' $(tests) $(test_opts)
+
+.PHONY: test-swift-turbo
+test-swift-turbo:
+	$(pytest) -m 'slow' -k 'test_swift_turbo' $(tests) $(test_opts)
 
 .PHONY: lint
 lint:
