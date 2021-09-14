@@ -9,9 +9,8 @@ import {
   SPACING_2,
   SPACING_3,
   ALIGN_CENTER,
-  SIZE_6,
   C_BLUE,
-  FONT_WEIGHT_BOLD,
+  FONT_WEIGHT_SEMIBOLD,
   FONT_HEADER_THIN,
   Box,
 } from '@opentrons/components'
@@ -32,12 +31,12 @@ import type { StepKey } from '../index'
 interface Props {
   robot: ViewableRobot
   nextStep: StepKey
-  expandNextStep: (step: StepKey) => void
+  expandStep: (step: StepKey) => void
   calibrationStatus: ProtocolCalibrationStatus
 }
 
 export function RobotCalibration(props: Props): JSX.Element {
-  const { robot, nextStep, expandNextStep, calibrationStatus } = props
+  const { robot, nextStep, expandStep, calibrationStatus } = props
   const { name: robotName, status } = robot
   const { t } = useTranslation(['protocol_setup'])
   const nextStepButtonKey =
@@ -93,7 +92,7 @@ export function RobotCalibration(props: Props): JSX.Element {
           } else {
             return (
               <div key={mount}>
-                <Text paddingY={SPACING_2} fontWeight={FONT_WEIGHT_BOLD}>
+                <Text paddingY={SPACING_2} fontWeight={FONT_WEIGHT_SEMIBOLD}>
                   {pipetteTipRackData.pipetteDisplayName}
                 </Text>
                 {pipetteTipRackData.tipRacks.map((tipRack, index) => (
@@ -123,8 +122,7 @@ export function RobotCalibration(props: Props): JSX.Element {
       <Box textAlign={ALIGN_CENTER}>
         <PrimaryBtn
           disabled={!calibrationStatus.complete}
-          onClick={() => expandNextStep(nextStep)}
-          width={SIZE_6}
+          onClick={() => expandStep(nextStep)}
           backgroundColor={C_BLUE}
           {...targetProps}
         >

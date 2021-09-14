@@ -44,8 +44,7 @@ export function RunSetupCard(): JSX.Element | null {
     standardDeckDef as any
   )
   const robot = useSelector((state: State) => getConnectedRobot(state))
-  const robotName =
-    robot?.name !== null && robot?.name !== undefined ? robot?.name : ''
+  const robotName = robot?.name != null ? robot?.name : ''
   const calibrationStatus = useSelector((state: State) => {
     return getProtocolCalibrationComplete(state, robotName)
   })
@@ -80,7 +79,7 @@ export function RunSetupCard(): JSX.Element | null {
         <RobotCalibration
           robot={robot}
           nextStep={stepsKeysInOrder[1]}
-          expandNextStep={nextStep => setExpandedStepKey(nextStep)}
+          expandStep={nextStep => setExpandedStepKey(nextStep)}
           calibrationStatus={calibrationStatus}
         />
       ),

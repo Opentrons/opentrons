@@ -73,11 +73,7 @@ export function PipetteCalibration(props: Props): JSX.Element {
     pipetteTipRackData.exactPipetteMatch === PipetteConstants.INEXACT_MATCH ||
     pipetteTipRackData.exactPipetteMatch === PipetteConstants.MATCH
 
-  if (
-    pipetteTipRackData.pipetteCalDate !== undefined &&
-    pipetteTipRackData.pipetteCalDate !== null &&
-    attached
-  ) {
+  if (pipetteTipRackData.pipetteCalDate != null && attached) {
     calibrated = true
     if (
       pipetteTipRackData.exactPipetteMatch === PipetteConstants.INEXACT_MATCH

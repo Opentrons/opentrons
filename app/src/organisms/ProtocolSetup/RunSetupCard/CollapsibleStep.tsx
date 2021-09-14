@@ -40,7 +40,7 @@ export function CollapsibleStep({
   children,
   calibrationComplete,
 }: CollapsibleStepProps): JSX.Element {
-  const { t } = useTranslation(['protocol_setup'])
+  const { t } = useTranslation('protocol_setup')
   return (
     <Flex flexDirection={DIRECTION_COLUMN} paddingX={SPACING_3}>
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} onClick={toggleExpanded}>

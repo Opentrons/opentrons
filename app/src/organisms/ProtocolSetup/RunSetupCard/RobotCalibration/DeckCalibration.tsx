@@ -25,6 +25,7 @@ import {
   ALIGN_CENTER,
   JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
+import RobotCalHelpImage from '../../../../assets/images/robot_calibration_help.png'
 import { Portal } from '../../../../App/portal'
 import * as Calibration from '../../../../redux/calibration'
 import { CalibrationItem } from './CalibrationItem'
@@ -64,9 +65,9 @@ export function DeckCalibration(props: Props): JSX.Element | null {
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
       >
-        <Text css={FONT_HEADER_THIN} paddingBottom={SPACING_2}>{`${t(
-          'deck_calibration_title'
-        )}`}</Text>
+        <Text css={FONT_HEADER_THIN} paddingBottom={SPACING_2}>
+          {t('deck_calibration_title')}
+        </Text>
         <Link
           onClick={() => setHelpModalIsOpen(true)}
           color={C_BLUE}
@@ -111,10 +112,7 @@ export function DeckCalibration(props: Props): JSX.Element | null {
                 />
               </Text>
               <Box textAlign={ALIGN_CENTER} marginTop={SPACING_4}>
-                <img
-                  src={'../../../../assets/images/robot_calibration_help.png'}
-                  width="100%"
-                />
+                <img src={RobotCalHelpImage} width="100%" />
               </Box>
               <Text
                 fontWeight={FONT_WEIGHT_SEMIBOLD}
@@ -144,7 +142,7 @@ export function DeckCalibration(props: Props): JSX.Element | null {
                 {t('pipette_offset_cal')}
               </Text>
               <Text fontSize={FONT_SIZE_BODY_1} marginTop={SPACING_3}>
-                <Trans t={t} i18nKey="pipette_offset_cal_description" />
+                {t('pipette_offset_cal_description')}
               </Text>
               <Box textAlign={ALIGN_CENTER} marginTop={SPACING_4}>
                 <PrimaryBtn

@@ -194,7 +194,7 @@ export function TipLengthCalibration({
           onClick={() => handleStart()}
           textDecoration={TEXT_DECORATION_UNDERLINE}
           css={FONT_BODY_2_DARK}
-        ></Link>
+        />
       ) : (
         <PrimaryBtn backgroundColor={C_BLUE} onClick={() => handleStart()}>
           {t('calibrate_now_cta')}

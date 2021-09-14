@@ -31,11 +31,11 @@ interface Props {
 
 export function CalibrationItem(props: Props): JSX.Element | null {
   const { index, title, subText, calibratedDate, calibrated, button } = props
-  const { t } = useTranslation(['protocol_setup'])
+  const { t } = useTranslation('protocol_setup')
   const backgroundColor =
     index !== undefined && index % 2 === 0 ? C_NEAR_WHITE : C_WHITE
   const calibratedText =
-    calibratedDate !== null && calibratedDate !== undefined
+    calibratedDate != null
       ? t('last_calibrated', {
           date: formatLastModified(calibratedDate),
         })
