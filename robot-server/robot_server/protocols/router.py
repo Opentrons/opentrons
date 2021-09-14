@@ -76,8 +76,6 @@ async def create_protocol(
         analysis_id: Unique identifier to attach to the analysis resource.
         created_at: Timestamp to attach to the new resource.
     """
-    if len(files) > 1:
-        raise NotImplementedError("Multi-file protocols not yet supported.")
 
     try:
         protocol_resource = await protocol_store.create(
