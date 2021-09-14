@@ -99,6 +99,8 @@ async def create_protocol(
     )
     data = response_builder.build(resource=protocol_resource, analyses=analyses)
 
+    # todo(mm, 2021-09-14): Do we need to close the UploadFiles in our `files` arg?
+
     return ResponseModel(data=data)
 
 
