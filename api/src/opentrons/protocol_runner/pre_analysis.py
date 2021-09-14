@@ -8,14 +8,26 @@ protocol, and if so, what kind of protocol it is.
 
 from ast import parse as parse_python
 from dataclasses import dataclass
-from json import JSONDecodeError, loads as json_loads
+from json import JSONDecodeError, load as json_load
 from pathlib import Path
-from typing import Any, Dict, List, Union
+from typing import Any, BinaryIO, Dict, List, Union
 
 from pydantic import ValidationError as PydanticValidationError
 
 from opentrons.protocols.parse import extract_metadata as extract_python_metadata
 from opentrons.protocols.models import JsonProtocol
+
+
+@dataclass(frozen=True)
+class InputFile:  # noqa: D101
+    # todo(mm, 2021-09-14): Specify whether this is allowed to contain path separators,
+    # and consider making it a pathlib.PurePath.
+    #
+    # Pre-analysis can read `file_like`. If, after pre-analysis, you want to read
+    # `file_like` again, it's your responsibility to call `file_like.seek(0)` to reset
+    # it.
+    name: str
+    file_like: BinaryIO
 
 
 # todo(mm, 2021-09-13): Currently wrapped in a class so dependency-injection and mocking
@@ -24,7 +36,7 @@ from opentrons.protocols.models import JsonProtocol
 class PreAnalyzer:  # noqa: D101
     @staticmethod
     def analyze(
-        protocol_files: List[Path],
+        protocol_files: List[InputFile],
     ) -> Union["PythonPreAnalysis", "JsonPreAnalysis"]:
         """Pre-analyze a set of files that's thought to define a protocol.
 
@@ -42,7 +54,7 @@ class PreAnalyzer:  # noqa: D101
             raise NotImplementedError("Multi-file protocols not yet supported.")
 
         main_file = protocol_files[0]
-        suffix = main_file.suffix
+        suffix = Path(main_file.name).suffix
 
         if suffix == ".json":
             return _analyze_json(main_file)
@@ -52,9 +64,9 @@ class PreAnalyzer:  # noqa: D101
             raise FileTypeError(f'Unrecognized file extension "{suffix}"')
 
 
-def _analyze_json(main_file: Path) -> "JsonPreAnalysis":
+def _analyze_json(main_file: InputFile) -> "JsonPreAnalysis":
     try:
-        parsed_json = json_loads(main_file.read_bytes())
+        parsed_json = json_load(main_file.file_like)
     except JSONDecodeError as exception:
         raise JsonParseError() from exception
 
@@ -71,13 +83,13 @@ def _analyze_json(main_file: Path) -> "JsonPreAnalysis":
 
 
 # todo(mm, 2021-09-13): Deduplicate with opentrons.protocols.parse.
-def _analyze_python(main_file: Path) -> "PythonPreAnalysis":
+def _analyze_python(main_file: InputFile) -> "PythonPreAnalysis":
     try:
         # todo(mm, 2021-09-13): Investigate whether it's really appropriate to leave
         # the Python compilation flags at their defaults. For example, we probably
         # don't truly want the protocol to inherit our own __future__ features.
         module_ast = parse_python(
-            source=main_file.read_bytes(), filename=main_file.name
+            source=main_file.file_like.read(), filename=main_file.name
         )
     except (SyntaxError, ValueError) as exception:
         # parse_python() raises SyntaxError for most errors,

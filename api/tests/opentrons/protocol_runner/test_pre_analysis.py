@@ -1,8 +1,10 @@
 # noqa: D100
 
+from contextlib import contextmanager
 from json import dumps as json_dumps
 from pathlib import Path
 from textwrap import dedent
+from typing import Generator
 
 import pytest
 
@@ -13,6 +15,7 @@ from opentrons.protocols.models.json_protocol import (
 
 from opentrons.protocol_runner.pre_analysis import (
     PreAnalyzer,
+    InputFile,
     JsonPreAnalysis,
     PythonPreAnalysis,
     Metadata as ExtractedMetadata,
@@ -23,6 +26,16 @@ from opentrons.protocol_runner.pre_analysis import (
     PythonMetadataError,
     NoFilesError,
 )
+
+
+@contextmanager
+def _input_file(
+    directory: Path, name: str, contents: str
+) -> Generator[InputFile, None, None]:
+    with open(directory / name, "w+b") as file:
+        file.write(contents.encode("utf-8"))
+        file.seek(0)
+        yield InputFile(name, file)
 
 
 def test_json_pre_analysis(tmp_path: Path) -> None:
@@ -56,12 +69,11 @@ def test_json_pre_analysis(tmp_path: Path) -> None:
         "some_unknown_extra_field": "hello",
     }
 
-    input_protocol_text = json_dumps(input_protocol_dict)
-    protocol_file = tmp_path / "My JSON Protocol.json"
-    protocol_file.write_text(input_protocol_text)
-
-    result = PreAnalyzer().analyze([protocol_file])
-    assert result == JsonPreAnalysis(expected_metadata)
+    with _input_file(
+        tmp_path, "My JSON Protocol.json", json_dumps(input_protocol_dict)
+    ) as protocol_file:
+        result = PreAnalyzer().analyze([protocol_file])
+        assert result == JsonPreAnalysis(expected_metadata)
 
 
 def test_python_pre_analysis(tmp_path: Path) -> None:
@@ -86,11 +98,11 @@ def test_python_pre_analysis(tmp_path: Path) -> None:
     }
     expected_api_level = "123.456"
 
-    protocol_file = tmp_path / "My Python Protocol.py"
-    protocol_file.write_text(input_protocol_text)
-
-    result = PreAnalyzer().analyze([protocol_file])
-    assert result == PythonPreAnalysis(expected_metadata, expected_api_level)
+    with _input_file(
+        tmp_path, "My Python Protocol.py", input_protocol_text
+    ) as protocol_file:
+        result = PreAnalyzer().analyze([protocol_file])
+        assert result == PythonPreAnalysis(expected_metadata, expected_api_level)
 
 
 # Apparently a bug in opentrons.protocols.parse.extract_metadata.
@@ -114,11 +126,11 @@ def test_python_non_string_metadata(tmp_path: Path) -> None:
     }
     expected_api_level = "123.456"
 
-    protocol_file = tmp_path / "My Python Protocol.py"
-    protocol_file.write_text(input_protocol_text)
-
-    result = PreAnalyzer().analyze([protocol_file])
-    assert result == PythonPreAnalysis(expected_metadata, expected_api_level)
+    with _input_file(
+        tmp_path, "My Python Protocol.py", input_protocol_text
+    ) as protocol_file:
+        result = PreAnalyzer().analyze([protocol_file])
+        assert result == PythonPreAnalysis(expected_metadata, expected_api_level)
 
 
 def test_error_if_python_file_has_syntax_error(tmp_path: Path) -> None:
@@ -133,11 +145,10 @@ def test_error_if_python_file_has_syntax_error(tmp_path: Path) -> None:
             pass
         """
     )
-    protocol_file = tmp_path / "My Python Protocol.py"
-    protocol_file.write_text(protocol_text)
 
-    with pytest.raises(PythonFileParseError):
-        PreAnalyzer().analyze([protocol_file])
+    with _input_file(tmp_path, "My Python Protocol.py", protocol_text) as protocol_file:
+        with pytest.raises(PythonFileParseError):
+            PreAnalyzer().analyze([protocol_file])
 
 
 # todo(mm, 2021-09-13): Some of these tests overlap with
@@ -182,26 +193,27 @@ def test_error_if_bad_python_metadata(
     input_text: str,
 ) -> None:
     """It should raise if something's wrong with the metadata block."""
-    protocol_file = tmp_path / "My Python Protocol.py"
-    protocol_file.write_text(input_text)
-    with pytest.raises(PythonMetadataError):
-        PreAnalyzer().analyze([protocol_file])
+    with _input_file(tmp_path, "My Python Protocol.py", input_text) as protocol_file:
+        with pytest.raises(PythonMetadataError):
+            PreAnalyzer().analyze([protocol_file])
 
 
 def test_error_if_json_file_is_not_valid_json(tmp_path: Path) -> None:
     """It should raise if a .json file isn't parseable as JSON."""
-    protocol_file = tmp_path / "My JSON Protocol.json"
-    protocol_file.write_text("This is not valid JSON.")
-    with pytest.raises(JsonParseError):
-        PreAnalyzer.analyze([protocol_file])
+    with _input_file(
+        tmp_path, "My JSON Protocol.json", "These contents are not valid JSON"
+    ) as protocol_file:
+        with pytest.raises(JsonParseError):
+            PreAnalyzer.analyze([protocol_file])
 
 
 def test_error_if_json_file_does_not_conform_to_schema(tmp_path: Path) -> None:
     """It should raise if a .json file is valid JSON, but doesn't match our schema."""
-    protocol_file = tmp_path / "My JSON Protocol.json"
-    protocol_file.write_text('{"this_is_valid_json": true}')
-    with pytest.raises(JsonSchemaValidationError):
-        PreAnalyzer.analyze([protocol_file])
+    with _input_file(
+        tmp_path, "My JSON Protocol.json", '{"these_contents_are_valid_json": true}'
+    ) as protocol_file:
+        with pytest.raises(JsonSchemaValidationError):
+            PreAnalyzer.analyze([protocol_file])
 
 
 def test_error_if_no_files() -> None:
@@ -212,17 +224,14 @@ def test_error_if_no_files() -> None:
 
 def test_error_if_file_extension_unrecognized(tmp_path: Path) -> None:
     """It should raise if a file doesn't have a valid extension for a protocol."""
-    non_protocol_file = tmp_path / "Foo.jpg"
-    non_protocol_file.touch()
-    with pytest.raises(FileTypeError):
-        PreAnalyzer().analyze([non_protocol_file])
+    with _input_file(tmp_path, "Foo.jpg", "") as non_protocol_file:
+        with pytest.raises(FileTypeError):
+            PreAnalyzer().analyze([non_protocol_file])
 
 
 # Update or replace this placeholder test when we support multi-file protocols.
 @pytest.mark.xfail(strict=True, raises=NotImplementedError)
 def test_multi_file_protocol(tmp_path: Path) -> None:  # noqa: D103
-    file_1 = tmp_path / "protocol_file_1"
-    file_1.touch()
-    file_2 = tmp_path / "protocol_file_2"
-    file_2.touch()
-    PreAnalyzer.analyze([file_1, file_2])
+    with _input_file(tmp_path, "protocol_file_1", "") as file_1:
+        with _input_file(tmp_path, "protocol_file_2", "") as file_2:
+            PreAnalyzer.analyze([file_1, file_2])
