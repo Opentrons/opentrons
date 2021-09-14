@@ -52,7 +52,7 @@ describe('LabwareInfoOverlay', () => {
   })
   it('should render the offset data label', () => {
     const { getByText } = render(props)
-    getByText('Offset')
+    getByText('Offset Data')
   })
   // eslint-disable-next-line jest/no-disabled-tests
   it.skip('should renders labware offset data', () => {

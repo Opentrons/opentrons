@@ -22,9 +22,6 @@ describe('ModuleInfo', () => {
   let props: React.ComponentProps<typeof ModuleInfo>
   beforeEach(() => {
     props = {
-      x: mockTCModule.labwareOffset.x,
-      y: mockTCModule.labwareOffset.y,
-      orientation: STUBBED_ORIENTATION_VALUE,
       moduleModel: mockTCModule.model,
       isAttached: false,
       usbPort: null,
@@ -34,11 +31,11 @@ describe('ModuleInfo', () => {
 
   it('should show module not connected', () => {
     const { getByText } = render(props)
-    expect(getByText('Not Connected')).toBeTruthy()
+    expect(getByText('Not connected')).toBeTruthy()
   })
 
   it('should show module connected and hub number', () => {
-    props = { ...props, usbPort: '1', hubPort: '1', isAttached: true }
+    props = { ...props, usbPort: 1, hubPort: 1, isAttached: true }
     const { getByText } = render(props)
     expect(getByText('Connected')).toBeTruthy()
     expect(getByText('USB Port 1 via hub')).toBeTruthy()
@@ -52,7 +49,7 @@ describe('ModuleInfo', () => {
   })
 
   it('should show module connected and USB number', () => {
-    props = { ...props, usbPort: '1', hubPort: null, isAttached: true }
+    props = { ...props, usbPort: 1, hubPort: null, isAttached: true }
     const { getByText } = render(props)
     expect(getByText('Connected')).toBeTruthy()
     expect(getByText('USB Port 1')).toBeTruthy()
