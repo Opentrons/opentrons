@@ -30,8 +30,9 @@ import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_stand
 import { fetchModules, getAttachedModules } from '../../../../redux/modules'
 import { ModuleInfo } from './ModuleInfo'
 import { MultipleModulesModal } from './MultipleModulesModal'
+import {useModuleRenderInfoById} from '../../hooks'
 import styles from '../../styles.css'
-import type { ModuleCoordinatesById } from '../../utils/getModuleRenderCoords'
+
 import type { State, Dispatch } from '../../../../redux/types'
 import type { AttachedModule } from '../../../../redux/modules/types'
 
@@ -48,16 +49,16 @@ const POLL_MODULE_INTERVAL_MS = 5000
 const DECK_VIEW_BOX = `-64 -10 ${530} ${456}`
 
 interface ModuleSetupProps {
-  moduleRenderCoords: ModuleCoordinatesById
   expandLabwareSetupStep: () => void
   robotName: string
 }
 
 export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
-  const { moduleRenderCoords, expandLabwareSetupStep, robotName } = props
+  const { expandLabwareSetupStep, robotName } = props
   const dispatch = useDispatch<Dispatch>()
   const { t } = useTranslation('protocol_setup')
   const [targetProps, tooltipProps] = useHoverTooltip()
+  const moduleRenderInfoById = useModuleRenderInfoById()
   const [
     showMultipleModulesModal,
     setShowMultipleModulesModal,
@@ -71,17 +72,17 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
     getAttachedModules(state, robotName)
   )
 
-
-  const moduleModels = map(moduleRenderCoords, ({ moduleModel }) => moduleModel)
+  const moduleModels = map(moduleRenderInfoById, ({ moduleDef}) => moduleDef.model)
 
   const hasADuplicateModule = new Set(moduleModels).size !== moduleModels.length
 
   type ModuleMatchResults = {missingModuleIds: string[], remainingAttachedModules: AttachedModule[]}
-  const {missingModuleIds } = reduce<typeof moduleRenderCoords, ModuleMatchResults>(
-    moduleRenderCoords,
-    (acc, {moduleModel}, id) => {
+  const { missingModuleIds } = reduce<typeof moduleRenderInfoById, ModuleMatchResults>(
+    moduleRenderInfoById,
+    (acc, {moduleDef}, id) => {
+      const {model} = moduleDef
       const moduleTypeMatchIndex = acc.remainingAttachedModules.findIndex((attachedModule) => (
-        getModuleType(moduleModel) === getModuleType(attachedModule.model)
+        getModuleType(model) === getModuleType(attachedModule.model)
       ))
       return moduleTypeMatchIndex !== -1
         ? {
@@ -134,23 +135,23 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
         >
           {() => (
             <>
-              {map(moduleRenderCoords, ({ x, y, moduleModel }) => {
-                const orientation = inferModuleOrientationFromXCoordinate(x)
+              {map(moduleRenderInfoById, ({ x, y, moduleDef}) => {
+                const {model} = moduleDef
                 const attachedModuleMatch = attachedModules.find(
-                  attachedModule => getModuleType(moduleModel) === getModuleType(attachedModule.model)
+                  attachedModule => getModuleType(model) === getModuleType(attachedModule.model)
                 )
                 return (
                   <React.Fragment
-                    key={`LabwareSetup_Module_${moduleModel}_${x}${y}`}
+                    key={`LabwareSetup_Module_${model}_${x}${y}`}
                   >
                     <Module
                       x={x}
                       y={y}
-                      orientation={orientation}
-                      model={moduleModel}
+                      orientation={inferModuleOrientationFromXCoordinate(x)}
+                      def={moduleDef}
                     >
                       <ModuleInfo
-                        moduleModel={moduleModel}
+                        moduleModel={model}
                         isAttached={attachedModuleMatch != null}
                         usbPort={attachedModuleMatch?.usbPort.port}
                         hubPort={attachedModuleMatch?.usbPort.hub}

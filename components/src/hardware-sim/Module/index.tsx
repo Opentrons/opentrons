@@ -1,6 +1,7 @@
 import * as React from 'react'
-import { getModuleDef2, getModuleType, ModuleModel, THERMOCYCLER_MODULE_TYPE } from '@opentrons/shared-data'
+import { getModuleDef2, getModuleType, ModuleDefinition, THERMOCYCLER_MODULE_TYPE } from '@opentrons/shared-data'
 import {
+  C_DARK_GRAY,
   C_MED_LIGHT_GRAY,
   SPACING_1,
   JUSTIFY_CENTER,
@@ -24,9 +25,9 @@ const LABWARE_OFFSET_DISPLAY_THRESHOLD = 2
 interface Props {
   x: number
   y: number
-  model: ModuleModel
+  def: ModuleDefinition
   orientation?: 'left' | 'right'
-  innerProps?: React.ComponentProps<typeof Thermocycler> | React.ComponentProps<typeof ModuleFromDef>
+  innerProps?: React.ComponentProps<typeof Thermocycler> | React.ComponentProps<typeof ModuleFromDef> | {}
   statusInfo?: React.ReactNode // contents of small status rectangle, not displayed if absent
   children?: React.ReactNode // contents to be rendered on top of the labware mating surface of the module
 }
@@ -47,7 +48,7 @@ const statusInfoFlexProps = {
 
 export const Module = (props: Props): JSX.Element => {
   const {
-    model,
+    def,
     x,
     y,
     orientation = 'left',
@@ -55,8 +56,7 @@ export const Module = (props: Props): JSX.Element => {
     statusInfo,
     children
   } = props
-  const def = getModuleDef2(model)
-  const moduleType = getModuleType(model)
+  const moduleType = getModuleType(def.model)
 
   const {x: labwareOffsetX, y: labwareOffsetY} = def.labwareOffset
   const {x: translateX, y: translateY} = def.cornerOffsetFromSlot
@@ -104,7 +104,7 @@ export const Module = (props: Props): JSX.Element => {
   return (
     <g transform={positionTransform} data-test={`Module_${moduleType}`}>
       <g transform={orientationTransform}>
-        <g transform={offsetTransform}>
+        <g transform={offsetTransform} style={{fill: C_DARK_GRAY}}>
           {moduleType === THERMOCYCLER_MODULE_TYPE
             ? (<Thermocycler {...innerProps as React.ComponentProps<typeof Thermocycler>} />)
             : (<ModuleFromDef {...innerProps as React.ComponentProps<typeof ModuleFromDef>} def={def} />)

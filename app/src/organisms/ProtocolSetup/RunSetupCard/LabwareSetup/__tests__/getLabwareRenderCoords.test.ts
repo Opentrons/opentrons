@@ -1,12 +1,12 @@
 import _protocolWithMagTempTC from '@opentrons/shared-data/protocol/fixtures/4/transferSettings.json'
 import _standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
-import { getLabwareRenderCoords } from '../../../utils/getLabwareRenderCoords'
+import { getLabwareRenderInfo } from '../../../utils/getLabwareRenderInfo'
 import { JsonProtocolFile } from '@opentrons/shared-data'
 
 const protocolWithMagTempTC = _protocolWithMagTempTC as JsonProtocolFile
 const standardDeckDef = _standardDeckDef as any
 
-describe('getLabwareRenderCoords', () => {
+describe('getLabwareRenderInfo', () => {
   it('should gather labware coordinates with module offsets', () => {
     // these are just taken from the ot-2 deck def for readability
     const SLOT_1_COORDS = [0, 0, 0]
@@ -99,7 +99,7 @@ describe('getLabwareRenderCoords', () => {
     }
 
     expect(
-      getLabwareRenderCoords(protocolWithMagTempTC, standardDeckDef)
+      getLabwareRenderInfo(protocolWithMagTempTC, standardDeckDef)
     ).toEqual(expected)
   })
 })

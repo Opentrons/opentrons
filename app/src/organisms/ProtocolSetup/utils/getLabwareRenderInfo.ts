@@ -42,7 +42,7 @@ const getSlotHasMatingSurfaceUnitVector = (
   return Boolean(matingSurfaceUnitVector)
 }
 
-export interface LabwareCoordinatesById {
+export interface LabwareRenderInfoById {
   [labwareId: string]: {
     x: number
     y: number
@@ -51,10 +51,10 @@ export interface LabwareCoordinatesById {
   }
 }
 
-export const getLabwareRenderCoords = (
+export const getLabwareRenderInfo = (
   protocolData: ReturnType<typeof getProtocolData>,
   deckDef: DeckDefinition
-): LabwareCoordinatesById => {
+): LabwareRenderInfoById => {
   if (
     protocolData != null &&
     'labware' in protocolData &&
@@ -65,49 +65,17 @@ export const getLabwareRenderCoords = (
       (acc, labware, labwareId) => {
         const labwareDefId = labware.definitionId
         const labwareDef = protocolData.labwareDefinitions[labwareDefId]
-        const slot = labware.slot
-        let slotPosition = [0, 0, 0]
 
-        if ('modules' in protocolData) {
-          const moduleInSlot = find(
-            protocolData.modules,
-            (_module, moduleId) => moduleId === slot
-          )
-          if (moduleInSlot) {
-            const moduleDef = getModuleDef2(moduleInSlot.model)
-            let slotNumber = moduleInSlot.slot
-            // Note: this is because PD represents the slot the TC sits in as a made up slot. We want it to be rendered in slot 7
-            if (slotNumber === SPAN7_8_10_11_SLOT) {
-              slotNumber = '7'
-            }
-            const slotPosition = getSlotPosition(deckDef, slotNumber)
-
-            const slotHasMatingSurfaceVector = getSlotHasMatingSurfaceUnitVector(
-              deckDef,
-              slotNumber
-            )
-
-            return slotHasMatingSurfaceVector
-              ? {
-                  ...acc,
-                  [labwareId]: {
-                    x: slotPosition[0] + moduleDef.labwareOffset.x,
-                    y: slotPosition[1] + moduleDef.labwareOffset.y,
-                    z:
-                      moduleDef.labwareOffset.z != null
-                        ? slotPosition[2] + moduleDef.labwareOffset.z
-                        : slotPosition[2],
-                    labwareDef,
-                  },
-                }
-              : { ...acc }
-          }
+        // skip labware on modules as they are loaded with module render info
+        if ('modules' in protocolData && labware.slot in protocolData.modules) {
+          return acc
         }
-        slotPosition = getSlotPosition(deckDef, slot)
+
+        const slotPosition = getSlotPosition(deckDef, labware.slot)
 
         const slotHasMatingSurfaceVector = getSlotHasMatingSurfaceUnitVector(
           deckDef,
-          slot
+          labware.slot
         )
 
         return slotHasMatingSurfaceVector

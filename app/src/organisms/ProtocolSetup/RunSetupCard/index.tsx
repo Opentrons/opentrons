@@ -14,8 +14,7 @@ import { Divider } from '../../../atoms/structure'
 import { CollapsibleStep } from './CollapsibleStep'
 import { LabwareSetup } from './LabwareSetup'
 import { ModuleSetup } from './ModuleSetup'
-import { getModuleRenderCoords } from '../utils/getModuleRenderCoords'
-import { getLabwareRenderCoords } from '../utils/getLabwareRenderCoords'
+import { useModuleRenderInfoById, useLabwareRenderInfoById } from '../hooks'
 import { RobotCalibration } from './RobotCalibration'
 import type { JsonProtocolFile } from '@opentrons/shared-data'
 import type { State } from '../../../redux/types'
@@ -24,14 +23,8 @@ import { getConnectedRobot } from '../../../redux/discovery/selectors'
 export function RunSetupCard(): JSX.Element | null {
   const { t } = useTranslation('protocol_setup')
   const protocolData = useSelector((state: State) => getProtocolData(state))
-  const moduleRenderCoords = getModuleRenderCoords(
-    protocolData,
-    standardDeckDef as any
-  )
-  const labwareRenderCoords = getLabwareRenderCoords(
-    protocolData,
-    standardDeckDef as any
-  )
+  const moduleRenderCoords = useModuleRenderInfoById()
+  const labwareRenderCoords = useLabwareRenderInfoById()
   const robot = useSelector((state: State) => getConnectedRobot(state))
 
   const ROBOT_CALIBRATION_STEP_KEY = 'robot_calibration_step' as const
@@ -75,7 +68,6 @@ export function RunSetupCard(): JSX.Element | null {
     [MODULE_SETUP_KEY]: {
       stepInternals: (
         <ModuleSetup
-          moduleRenderCoords={moduleRenderCoords}
           expandLabwareSetupStep={() => setExpandedStepKey(LABWARE_SETUP_KEY)}
           robotName={robot.name}
         />
@@ -88,12 +80,7 @@ export function RunSetupCard(): JSX.Element | null {
       }),
     },
     [LABWARE_SETUP_KEY]: {
-      stepInternals: (
-        <LabwareSetup
-          moduleRenderCoords={moduleRenderCoords}
-          labwareRenderCoords={labwareRenderCoords}
-        />
-      ),
+      stepInternals: <LabwareSetup />,
       description: t(`${LABWARE_SETUP_KEY}_description`),
     },
   }

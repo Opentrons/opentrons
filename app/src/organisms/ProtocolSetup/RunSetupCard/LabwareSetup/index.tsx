@@ -7,7 +7,7 @@ import {
   Flex,
   LabwareRender,
   Link,
-  ModuleViz,
+  Module,
   PrimaryBtn,
   RobotWorkSpace,
   SecondaryBtn,
@@ -18,30 +18,23 @@ import {
   DIRECTION_COLUMN,
   FONT_SIZE_BODY_1,
   JUSTIFY_CENTER,
+  SPACING_2,
   SPACING_3,
-  SPACING_6,
   C_BLUE,
   C_DARK_GRAY,
   C_NEAR_WHITE,
 } from '@opentrons/components'
 import {
-  getModuleType,
   inferModuleOrientationFromXCoordinate,
+  THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
-import { ModuleTag } from '../../ModuleTag'
 import { LabwareInfoOverlay } from './LabwareInfoOverlay'
 import { LabwareSetupModal } from './LabwareSetupModal'
 import { getModuleTypesThatRequireExtraAttention } from './utils/getModuleTypesThatRequireExtraAttention'
 import { ExtraAttentionWarning } from './ExtraAttentionWarning'
 import styles from '../../styles.css'
-import type { ModuleCoordinatesById } from '../../utils/getModuleRenderCoords'
-import type { LabwareCoordinatesById } from '../../utils/getLabwareRenderCoords'
-
-interface LabwareSetupProps {
-  moduleRenderCoords: ModuleCoordinatesById
-  labwareRenderCoords: LabwareCoordinatesById
-}
+import { useModuleRenderInfoById, useLabwareRenderInfoById } from '../../hooks'
 
 const DECK_LAYER_BLOCKLIST = [
   'calibrationMarkings',
@@ -55,9 +48,17 @@ const DECK_LAYER_BLOCKLIST = [
 
 const DECK_MAP_VIEWBOX = '-80 -100 550 560'
 
-export const LabwareSetup = (props: LabwareSetupProps): JSX.Element | null => {
-  const { moduleRenderCoords, labwareRenderCoords } = props
-  const moduleModels = map(moduleRenderCoords, ({ moduleModel }) => moduleModel)
+export const LabwareSetup = (): JSX.Element | null => {
+  const moduleRenderInfoById = useModuleRenderInfoById()
+  const labwareRenderInfoById = useLabwareRenderInfoById()
+  const { t } = useTranslation('protocol_setup')
+  const [targetProps, tooltipProps] = useHoverTooltip()
+  const [
+    showLabwareHelpModal,
+    setShowLabwareHelpModal,
+  ] = React.useState<boolean>(false)
+
+  const moduleModels = map(moduleRenderInfoById, ({ moduleDef }) => moduleDef.model)
   const moduleTypesThatRequireExtraAttention = getModuleTypesThatRequireExtraAttention(
     moduleModels
   )
@@ -65,12 +66,6 @@ export const LabwareSetup = (props: LabwareSetupProps): JSX.Element | null => {
   const proceedToRunDisabledReason = 'replace with actual tooltip text'
   const LinkComponent = proceedToRunDisabled ? 'button' : NavLink
   const linkProps = proceedToRunDisabled ? {} : { to: '/run' }
-  const { t } = useTranslation('protocol_setup')
-  const [targetProps, tooltipProps] = useHoverTooltip()
-  const [
-    showLabwareHelpModal,
-    setShowLabwareHelpModal,
-  ] = React.useState<boolean>(false)
   return (
     <React.Fragment>
       {showLabwareHelpModal && (
@@ -109,36 +104,32 @@ export const LabwareSetup = (props: LabwareSetupProps): JSX.Element | null => {
           {() => {
             return (
               <React.Fragment>
-                {map(moduleRenderCoords, ({ x, y, moduleModel }) => {
-                  const orientation = inferModuleOrientationFromXCoordinate(x)
-                  return (
-                    <React.Fragment
-                      key={`LabwareSetup_Module_${moduleModel}_${x}${y}`}
-                    >
-                      <ModuleViz
-                        x={x}
-                        y={y}
-                        orientation={orientation}
-                        moduleType={getModuleType(moduleModel)}
-                      />
-                      <ModuleTag
-                        x={x}
-                        y={y}
-                        moduleModel={moduleModel}
-                        orientation={orientation}
-                      />
-                    </React.Fragment>
-                  )
-                })}
-                {map(labwareRenderCoords, ({ x, y, labwareDef }) => {
+                {map(moduleRenderInfoById, ({ x, y, moduleDef, nestedLabwareDef}) => (
+                  <Module
+                    key={`LabwareSetup_Module_${moduleDef.model}_${x}${y}`}
+                    x={x}
+                    y={y}
+                    orientation={inferModuleOrientationFromXCoordinate(x)}
+                    def={moduleDef}
+                    innerProps={moduleDef.model === THERMOCYCLER_MODULE_V1 ? {lidMotorState: 'open'} : {}}
+                  >
+                    {nestedLabwareDef != null
+                      ?  <React.Fragment key={`LabwareSetup_Labware_${nestedLabwareDef.metadata.displayName}_${x}${y}`}>
+                          <LabwareRender definition={nestedLabwareDef} />
+                          <LabwareInfoOverlay definition={nestedLabwareDef} />
+                        </React.Fragment>
+                      : null}
+                  </Module>
+                ))}
+                {map(labwareRenderInfoById, ({ x, y, labwareDef }) => {
                   return (
                     <React.Fragment
                       key={`LabwareSetup_Labware_${labwareDef.metadata.displayName}_${x}${y}`}
                     >
                       <g transform={`translate(${x},${y})`}>
                         <LabwareRender definition={labwareDef} />
+                        <LabwareInfoOverlay definition={labwareDef} />
                       </g>
-                      <LabwareInfoOverlay x={x} y={y} definition={labwareDef} />
                     </React.Fragment>
                   )
                 })}
@@ -146,7 +137,7 @@ export const LabwareSetup = (props: LabwareSetupProps): JSX.Element | null => {
             )
           }}
         </RobotWorkSpace>
-        <Text color={C_DARK_GRAY} margin={`${SPACING_6} ${SPACING_3}`}>
+        <Text color={C_DARK_GRAY} marginY={SPACING_2}>
           {t('labware_position_check_text')}
         </Text>
         <Flex justifyContent={JUSTIFY_CENTER}>
