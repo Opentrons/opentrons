@@ -10,7 +10,7 @@ from ast import parse as parse_python
 from dataclasses import dataclass
 from json import JSONDecodeError, load as json_load
 from pathlib import Path
-from typing import Any, BinaryIO, Dict, List, Union
+from typing import Any, IO, Dict, List, Union
 
 from pydantic import ValidationError as PydanticValidationError
 
@@ -27,7 +27,11 @@ class InputFile:  # noqa: D101
     # `file_like` again, it's your responsibility to call `file_like.seek(0)` to reset
     # it.
     name: str
-    file_like: BinaryIO
+
+    # This currently needs to be IO[bytes] instead of the more intuitive BinaryIO type
+    # because mypy can't see that a TemporaryFile is a BinaryIO.
+    # https://github.com/python/typeshed/issues/1780
+    file_like: IO[bytes]
 
 
 # todo(mm, 2021-09-13): Currently wrapped in a class so dependency-injection and mocking

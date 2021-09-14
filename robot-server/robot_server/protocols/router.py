@@ -1,8 +1,15 @@
 """Router for /protocols endpoints."""
 from datetime import datetime
 from fastapi import APIRouter, Depends, File, UploadFile, status
+from tempfile import SpooledTemporaryFile
 from typing import List
 from typing_extensions import Literal
+
+from opentrons.protocol_runner.pre_analysis import (
+    PreAnalyzer,
+    InputFile as PreAnalysisInputFile,
+    NotPreAnalyzableError,
+)
 
 from robot_server.errors import ErrorDetails, ErrorResponse
 from robot_server.service.task_runner import TaskRunner
@@ -13,7 +20,12 @@ from robot_server.service.json_api import (
     EmptyResponseModel,
 )
 
-from .dependencies import get_protocol_store, get_analysis_store, get_protocol_analyzer
+from .dependencies import (
+    get_protocol_store,
+    get_analysis_store,
+    get_protocol_analyzer,
+    get_pre_analyzer,
+)
 from .protocol_models import Protocol
 from .protocol_analyzer import ProtocolAnalyzer
 from .response_builder import ResponseBuilder
@@ -57,6 +69,7 @@ async def create_protocol(
     response_builder: ResponseBuilder = Depends(ResponseBuilder),
     protocol_store: ProtocolStore = Depends(get_protocol_store),
     analysis_store: AnalysisStore = Depends(get_analysis_store),
+    pre_analyzer: PreAnalyzer = Depends(get_pre_analyzer),
     protocol_analyzer: ProtocolAnalyzer = Depends(get_protocol_analyzer),
     task_runner: TaskRunner = Depends(TaskRunner),
     protocol_id: str = Depends(get_unique_id, use_cache=False),
@@ -70,18 +83,49 @@ async def create_protocol(
         response_builder: Interface to construct response models.
         protocol_store: In-memory database of protocol resources.
         analysis_store: In-memory database of protocol analyses.
+        pre_analyzer: Protocol pre-analysis interface.
         protocol_analyzer: Protocol analysis interface.
         task_runner: Background task runner.
         protocol_id: Unique identifier to attach to the protocol resource.
         analysis_id: Unique identifier to attach to the analysis resource.
         created_at: Timestamp to attach to the new resource.
     """
+    def convert_upload_file_to_pre_analysis_input(
+        upload_file: UploadFile,
+    ) -> PreAnalysisInputFile:
+        underlying_file = upload_file.file
+
+        # Starlette clearly documents this as a SpooledTemporaryFile, but currently
+        # (Starlette v0.13.2), mypy infers Union[SpooledTemporaryFile[bytes], IO[Any]].
+        assert isinstance(underlying_file, SpooledTemporaryFile)
+
+        return PreAnalysisInputFile(upload_file.filename, underlying_file)
+
+    pre_analysis_input = [convert_upload_file_to_pre_analysis_input(u) for u in files]
+
+    try:
+        pre_analysis = pre_analyzer.analyze(pre_analysis_input)
+    except NotPreAnalyzableError as e:
+        # todo(mm, 2021-09-14):
+        # Not every NotPreAnalyzableError will have been constructed with a message,
+        # and str(e) will not include the exception type,
+        # so this detail string might be uselessly empty.
+        #
+        # todo(mm, 2021-09-14): Should this be HTTP 422?
+        raise ProtocolFileInvalid(detail=str(e)).as_error(status.HTTP_400_BAD_REQUEST)
+
+    # Pre-analysis may have read files.
+    # Reset them so that if protocol_store.create() reads them again,
+    # it will correctly start from the beginning.
+    for file in files:
+        file.seek(0)
 
     try:
         protocol_resource = await protocol_store.create(
             protocol_id=protocol_id,
             created_at=created_at,
             files=files,
+            pre_analysis=pre_analysis,
         )
     except ProtocolFileInvalidError as e:
         raise ProtocolFileInvalid(detail=str(e)).as_error(status.HTTP_400_BAD_REQUEST)

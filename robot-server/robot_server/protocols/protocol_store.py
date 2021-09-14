@@ -45,7 +45,7 @@ class ProtocolFileInvalidError(ValueError):
 class ProtocolStore:
     """Methods for storing and retrieving protocol files."""
 
-    def __init__(self, directory: Path, pre_analyzer: PreAnalyzer) -> None:
+    def __init__(self, directory: Path) -> None:
         """Initialize the ProtocolStore.
 
         Arguments:
@@ -55,7 +55,6 @@ class ProtocolStore:
             `create()`ed.
         """
         self._directory = directory
-        self._pre_analyzer = pre_analyzer
         self._protocols_by_id: Dict[str, ProtocolResource] = {}
 
     async def create(
@@ -63,6 +62,7 @@ class ProtocolStore:
         protocol_id: str,
         created_at: datetime,
         files: Sequence[UploadFile],
+        pre_analysis: Union[JsonPreAnalysis, PythonPreAnalysis],
     ) -> ProtocolResource:
         """Add a protocol to the store.
 
@@ -87,9 +87,6 @@ class ProtocolStore:
                 file_path.write_bytes(contents)
 
             saved_files.append(file_path)
-
-        # todo(mm, 2021-09-13): Handle invalid protocols with a nice error.
-        pre_analysis = self._pre_analyzer.analyze(saved_files)
 
         entry = ProtocolResource(
             protocol_id=protocol_id,

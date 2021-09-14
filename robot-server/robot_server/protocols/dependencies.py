@@ -27,7 +27,7 @@ def get_protocol_store(app_state: AppState = Depends(get_app_state)) -> Protocol
 
     if protocol_store is None:
         log.info(f"Storing protocols in {_PROTOCOL_STORE_DIRECTORY}")
-        protocol_store = ProtocolStore(_PROTOCOL_STORE_DIRECTORY, PreAnalyzer())
+        protocol_store = ProtocolStore(_PROTOCOL_STORE_DIRECTORY)
         setattr(app_state, _PROTOCOL_STORE_KEY, protocol_store)
 
     return protocol_store
@@ -42,6 +42,10 @@ def get_analysis_store(app_state: AppState = Depends(get_app_state)) -> Analysis
         setattr(app_state, _ANALYSIS_STORE_KEY, analysis_store)
 
     return analysis_store
+
+
+async def get_pre_analyzer(app_state: AppState = Depends(get_app_state)) -> PreAnalyzer:
+    return PreAnalyzer()
 
 
 async def get_protocol_analyzer(
