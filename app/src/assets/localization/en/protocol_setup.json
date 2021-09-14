@@ -48,7 +48,7 @@
   "robot_calibration_step_title": "Robot Calibration",
   "setup_for_run": "Setup for Run",
   "step": "STEP {{index}}",
-  "module_not_connected": "Not Connected",
+  "module_not_connected": "Not connected",
   "module_connected": "Connected",
   "no_usb_port_yet": "No USB Port Yet",
   "usb_port_connected": "USB Port {{port}}",
