@@ -24,9 +24,6 @@ export function Thermocycler(props: ThermocyclerVizProps): JSX.Element {
       <RobotCoordsForeignDiv
         width={def.dimensions.xDimension}
         height={def.dimensions.yDimension}
-        x={def.cornerOffsetFromSlot.x}
-        y={def.cornerOffsetFromSlot.y - def.dimensions.yDimension}
-        transformWithSVG
         innerDivProps={{
           borderRadius: '6px',
           backgroundColor: C_MED_LIGHT_GRAY,

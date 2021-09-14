@@ -36,8 +36,6 @@ describe('LabwareInfoOverlay', () => {
   let props: React.ComponentProps<typeof LabwareInfoOverlay>
   beforeEach(() => {
     props = {
-      x: 0,
-      y: 0,
       definition: fixture_tiprack_300_ul as LabwareDefinition2,
     }
     when(mockGetLabwareDisplayName)

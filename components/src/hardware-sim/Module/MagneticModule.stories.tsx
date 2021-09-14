@@ -6,7 +6,7 @@ import { Module } from './'
 
 import type { RobotWorkSpaceRenderProps } from '../Deck'
 import type { Story, Meta } from '@storybook/react'
-import { MAGNETIC_MODULE_V2 } from '@opentrons/shared-data'
+import { MAGNETIC_MODULE_V2, getModuleDef2 } from '@opentrons/shared-data'
 
 const slots = ['1', '3', '4', '6', '7', '9', '10']
 
@@ -23,7 +23,7 @@ const Template: Story<{slot: string}> = args => {
           <Module
             x={slot.position[0]}
             y={slot.position[1]}
-            model={MAGNETIC_MODULE_V2}
+            def={getModuleDef2(MAGNETIC_MODULE_V2)}
             orientation={
               ['3','6','9'].includes(args.slot)
                 ? 'right'

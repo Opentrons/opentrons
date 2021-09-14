@@ -24,8 +24,8 @@ import {
 import { mockCalibrationStatus } from '../../../redux/calibration/__fixtures__'
 import * as calibrationSelectors from '../../../redux/calibration/selectors'
 import * as protocolSelectors from '../../../redux/protocol/selectors'
-import { getModuleRenderCoords } from '../utils/getModuleRenderCoords'
-import { getLabwareRenderCoords } from '../utils/getLabwareRenderCoords'
+import { getModuleRenderInfo } from '../utils/getModuleRenderInfo'
+import { getLabwareRenderInfo } from '../utils/getLabwareRenderInfo'
 import { ModuleSetup } from '../RunSetupCard/ModuleSetup'
 import { RunSetupCard } from '../RunSetupCard'
 import { LabwareSetup } from '../RunSetupCard/LabwareSetup'
@@ -44,8 +44,8 @@ jest.mock('../../../redux/calibration/selectors')
 jest.mock('../RunSetupCard/LabwareSetup')
 jest.mock('../RunSetupCard/ModuleSetup')
 jest.mock('../RunSetupCard/RobotCalibration')
-jest.mock('../utils/getModuleRenderCoords')
-jest.mock('../utils/getLabwareRenderCoords')
+jest.mock('../utils/getModuleRenderInfo')
+jest.mock('../utils/getLabwareRenderInfo')
 
 const mockAttachedPipettes: AttachedPipettesByMount = {
   left: mockAttachedPipette,
@@ -67,11 +67,11 @@ const mockModuleSetup = ModuleSetup as jest.MockedFunction<typeof ModuleSetup>
 const mockRobotCalibration = RobotCalibration as jest.MockedFunction<
   typeof RobotCalibration
 >
-const mockGetModuleRenderCoords = getModuleRenderCoords as jest.MockedFunction<
-  typeof getModuleRenderCoords
+const mockGetModuleRenderCoords = getModuleRenderInfo as jest.MockedFunction<
+  typeof getModuleRenderInfo
 >
-const mockGetLabwareRenderCoords = getLabwareRenderCoords as jest.MockedFunction<
-  typeof getLabwareRenderCoords
+const mockGetLabwareRenderCoords = getLabwareRenderInfo as jest.MockedFunction<
+  typeof getLabwareRenderInfo
 >
 const mockGetConnectedRobot = discoverySelectors.getConnectedRobot as jest.MockedFunction<
   typeof discoverySelectors.getConnectedRobot
