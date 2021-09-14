@@ -94,8 +94,8 @@ async def test_start_set_temperature_heat(tempdeck) -> None:
 @pytest.mark.parametrize(
     argnames="start_temp,target_temp,await_temp",
     argvalues=[
-        [20, 40, 41],
-        [50, 30, 25],
+        [20.0, 40.0, 41.0],
+        [50.0, 30.0, 25.0],
     ],
 )
 async def test_invalid_await_temperature(
@@ -109,7 +109,12 @@ async def test_invalid_await_temperature(
 
     # Set new target and check that error is raised for all unreachable await temps
     await tempdeck.start_set_temperature(target_temp)
-    with pytest.raises(TempdeckError, match="is unreachable with a target of"):
+    with pytest.raises(
+        TempdeckError,
+        match=f"{await_temp} is unreachable"
+        f" with a target of {target_temp} when"
+        f" current temperature is {start_temp}",
+    ):
         await tempdeck.await_temperature(awaiting_temperature=await_temp)
 
 

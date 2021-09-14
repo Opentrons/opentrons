@@ -135,6 +135,7 @@ class TempDeck(mod_abc.AbstractModule):
         """
         await self.wait_for_is_running()
         await self._driver.set_temperature(celsius=celsius)
+        await self.wait_next_poll()
 
         async def _wait():
             # Wait until we reach the target temperature.
@@ -168,17 +169,7 @@ class TempDeck(mod_abc.AbstractModule):
         await self.wait_for_is_running()
         await self.wait_next_poll()
 
-        if self.target is not None:
-            # Validity of an awaiting temperature is almost unpredictable when no target
-            # is set, as it will depend on ambient temperatures.
-            if not (self.temperature <= awaiting_temperature <= self.target) and not (
-                self.target <= awaiting_temperature <= self.temperature
-            ):
-                raise TempdeckError(
-                    f"await_temperature of {awaiting_temperature} is "
-                    f"unreachable with a target of {self.target} when"
-                    f" current temperature is {self.temperature}."
-                )
+        self._validate_awaiting_temperature(awaiting_temperature)
 
         async def _await_temperature():
             if self.status == TemperatureStatus.HEATING:
@@ -191,6 +182,26 @@ class TempDeck(mod_abc.AbstractModule):
         t = self._loop.create_task(_await_temperature())
         await self.make_cancellable(t)
         await t
+
+    def _validate_awaiting_temperature(self, awaiting_temperature: float) -> None:
+        """Verify that the temperature we are awaiting is reachable.
+
+        This is a runtime validation with the goal of avoiding forever waits
+        while running a protocol.
+        """
+        if self.target is None:
+            # Validity of an awaiting temperature is almost unpredictable when no target
+            # is set, as it will depend on ambient temperatures.
+            return
+
+        if not (self.temperature <= awaiting_temperature <= self.target) and not (
+            self.target <= awaiting_temperature <= self.temperature
+        ):
+            raise TempdeckError(
+                f"await_temperature of {awaiting_temperature} is "
+                f"unreachable with a target of {self.target} when"
+                f" current temperature is {self.temperature}."
+            )
 
     async def deactivate(self):
         """Stop heating/cooling and turn off the fan"""
