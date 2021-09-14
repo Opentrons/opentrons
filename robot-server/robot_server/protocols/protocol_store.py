@@ -64,7 +64,11 @@ class ProtocolStore:
         created_at: datetime,
         files: Sequence[UploadFile],
     ) -> ProtocolResource:
-        """Add a protocol to the store."""
+        """Add a protocol to the store.
+
+        Raises:
+            ProtocolFileInvalidError
+        """
         protocol_dir = self._get_protocol_dir(protocol_id)
         # TODO(mc, 2021-06-02): check for protocol collision
         protocol_dir.mkdir(parents=True)
