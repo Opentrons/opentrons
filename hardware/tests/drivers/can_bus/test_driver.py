@@ -1,5 +1,6 @@
 """Can Driver tests."""
 import asyncio
+from typing import AsyncGenerator
 
 import pytest
 from can import Bus, Message
@@ -18,15 +19,19 @@ def bus_channel() -> str:
 @pytest.fixture
 def can_bus(bus_channel: str) -> Bus:
     """A virtual can bus fixture."""
-    bus = Bus(bus_channel, bustype="virtual")
+    bus = Bus(bus_channel, interface="virtual")
     yield bus
     bus.shutdown()
 
 
 @pytest.fixture
-async def subject(loop: asyncio.BaseEventLoop, bus_channel: str) -> CanDriver:
+async def subject(
+    loop: asyncio.BaseEventLoop, bus_channel: str
+) -> AsyncGenerator[CanDriver, None]:
     """The can driver under test."""
-    return CanDriver(bus=Bus(bus_channel, bustype="virtual"), loop=loop)
+    driver = await CanDriver.build(channel=bus_channel, interface="virtual", bitrate=0)
+    yield driver
+    driver.shutdown()
 
 
 async def test_send(subject: CanDriver, can_bus: Bus) -> None:

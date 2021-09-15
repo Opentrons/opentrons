@@ -26,7 +26,7 @@ if platform.system() == "Darwin":
 class CanDriver:
     """The can driver."""
 
-    def __init__(self, bus: Bus, loop: asyncio.BaseEventLoop) -> None:
+    def __init__(self, bus: Bus, loop: asyncio.AbstractEventLoop) -> None:
         """Constructor.
 
         Args:
@@ -37,6 +37,14 @@ class CanDriver:
         self._loop = loop
         self._reader = AsyncBufferedReader(loop=loop)
         self._notifier = Notifier(bus=self._bus, listeners=[self._reader], loop=loop)
+
+    @classmethod
+    async def build(cls, channel: str, bitrate: int, interface: str) -> CanDriver:
+        """Build a CanDriver."""
+        return CanDriver(
+            bus=Bus(channel=channel, bitrate=bitrate, interface=interface),
+            loop=asyncio.get_event_loop(),
+        )
 
     def shutdown(self) -> None:
         """Stop the driver."""
