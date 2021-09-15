@@ -7,6 +7,7 @@ from starlette.datastructures import UploadFile
 from opentrons.protocol_runner.pre_analysis import (
     PreAnalyzer,
     InputFile as PreAnalysisInputFile,
+    NotPreAnalyzableError,
     JsonPreAnalysis,
     PythonPreAnalysis,
 )
@@ -259,14 +260,30 @@ async def test_create_protocol(
     )
 
 
+async def test_create_protocol_not_pre_analyzable(
+    decoy: Decoy,
+    pre_analyzer: PreAnalyzer,
+) -> None:
+    """It should 400 if the protocol is rejected by the pre-analyzer."""
+    decoy.when(pre_analyzer.analyze(matchers.Anything())).then_raise(
+        NotPreAnalyzableError()
+    )
+
+    with pytest.raises(ApiError) as exc_info:
+        await create_protocol(files=[], pre_analyzer=pre_analyzer)
+
+    assert exc_info.value.status_code == 400
+
+
 async def test_create_protocol_invalid_file(
     decoy: Decoy,
     protocol_store: ProtocolStore,
+    pre_analyzer: PreAnalyzer,
     response_builder: ResponseBuilder,
     unique_id: str,
     current_time: datetime,
 ) -> None:
-    """It should 400 if the file is rejected."""
+    """It should 400 if the file is rejected by the protocol store."""
     decoy.when(
         await protocol_store.create(
             protocol_id=unique_id,
