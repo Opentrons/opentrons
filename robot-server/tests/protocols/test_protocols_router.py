@@ -284,11 +284,16 @@ async def test_create_protocol_invalid_file(
     current_time: datetime,
 ) -> None:
     """It should 400 if the file is rejected by the protocol store."""
+    decoy.when(pre_analyzer.analyze(matchers.Anything())).then_return(
+        JsonPreAnalysis(metadata={})
+    )
+
     decoy.when(
         await protocol_store.create(
             protocol_id=unique_id,
             created_at=current_time,
             files=[matchers.IsA(UploadFile, {"filename": "foo.json"})],
+            pre_analysis=JsonPreAnalysis(metadata={}),
         )
     ).then_raise(ProtocolFileInvalidError("oh no"))
 
@@ -299,6 +304,7 @@ async def test_create_protocol_invalid_file(
             files=files,
             response_builder=response_builder,
             protocol_store=protocol_store,
+            pre_analyzer=pre_analyzer,
             protocol_id=unique_id,
             created_at=current_time,
         )
