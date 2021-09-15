@@ -1,1 +1,1 @@
-"""Can bus drivers package"""
+"""Can bus drivers package."""
