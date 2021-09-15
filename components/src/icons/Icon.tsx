@@ -68,10 +68,8 @@ export function Icon(props: IconProps): JSX.Element | null {
       viewBox={viewBox}
       className={cx(className, { spin })}
       css={spinStyle}
-      pointerEvents="none"
       {...svgProps}
     >
-      <title>{name}</title>
       <path fillRule="evenodd" d={path} />
       {props.children}
     </Svg>
