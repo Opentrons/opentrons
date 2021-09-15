@@ -98,7 +98,6 @@ export function RobotCalibration(props: Props): JSX.Element {
                 {pipetteTipRackData.tipRacks.map((tipRack, index) => (
                   <CalibrationItem
                     key={index}
-                    calibrated={tipRack.lastModifiedDate !== null}
                     calibratedDate={tipRack.lastModifiedDate}
                     index={index}
                     title={tipRack.displayName}

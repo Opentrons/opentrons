@@ -58,7 +58,7 @@ export function DeckCalibration(props: Props): JSX.Element | null {
   }
 
   return (
-    <div>
+    <Box>
       <Flex
         marginTop={SPACING_3}
         flexDirection={DIRECTION_ROW}
@@ -76,11 +76,7 @@ export function DeckCalibration(props: Props): JSX.Element | null {
           {t('robot_cal_help_title')}
         </Link>
       </Flex>
-      <CalibrationItem
-        index={0}
-        calibratedDate={deckCalData.lastModified}
-        calibrated={true}
-      />
+      <CalibrationItem index={0} calibratedDate={deckCalData.lastModified} />
       {helpModalIsOpen && (
         <Portal level={'top'}>
           <BaseModal borderRadius={SIZE_1}>
@@ -91,9 +87,9 @@ export function DeckCalibration(props: Props): JSX.Element | null {
                 justifyContent={JUSTIFY_SPACE_BETWEEN}
               >
                 <Text css={FONT_HEADER_DARK}>{t('robot_cal_help_title')}</Text>
-                <div onClick={() => setHelpModalIsOpen(false)}>
+                <Box onClick={() => setHelpModalIsOpen(false)}>
                   <Icon name={'close'} size={SIZE_2} />
-                </div>
+                </Box>
               </Flex>
               <Text css={FONT_BODY_1_DARK} marginTop={SPACING_4}>
                 <Trans
@@ -157,6 +153,6 @@ export function DeckCalibration(props: Props): JSX.Element | null {
           </BaseModal>
         </Portal>
       )}
-    </div>
+    </Box>
   )
 }

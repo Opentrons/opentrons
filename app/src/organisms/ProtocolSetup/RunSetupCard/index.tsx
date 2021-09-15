@@ -4,9 +4,19 @@ import { useTranslation } from 'react-i18next'
 import {
   Card,
   Text,
+  Flex,
+  Icon,
+  SPACING_2,
   SPACING_3,
+  SPACING_7,
+  SIZE_1,
+  DIRECTION_ROW,
+  ALIGN_START,
   FONT_WEIGHT_SEMIBOLD,
+  FONT_SIZE_BODY_1,
   C_WHITE,
+  COLOR_SUCCESS,
+  COLOR_WARNING,
 } from '@opentrons/components'
 import { protocolHasModules } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
@@ -133,10 +143,32 @@ export function RunSetupCard(): JSX.Element | null {
                 ? setExpandedStepKey(null)
                 : setExpandedStepKey(stepKey)
             }
-            calibrationComplete={
-              stepKey === ROBOT_CALIBRATION_STEP_KEY
-                ? calibrationStatus.complete
-                : undefined
+            rightAlignedNode={
+              stepKey === ROBOT_CALIBRATION_STEP_KEY ? (
+                <Flex
+                  flexDirection={DIRECTION_ROW}
+                  alignItems={ALIGN_START}
+                  marginLeft={SPACING_7}
+                >
+                  <Icon
+                    size={SIZE_1}
+                    color={
+                      calibrationStatus.complete ? COLOR_SUCCESS : COLOR_WARNING
+                    }
+                    marginRight={SPACING_2}
+                    name={
+                      calibrationStatus.complete
+                        ? 'check-circle'
+                        : 'alert-circle'
+                    }
+                  />
+                  <Text fontSize={FONT_SIZE_BODY_1}>
+                    {calibrationStatus.complete
+                      ? t('calibration_ready')
+                      : t('calibration_needed')}
+                  </Text>
+                </Flex>
+              ) : null
             }
           >
             {StepDetailMap[stepKey].stepInternals}

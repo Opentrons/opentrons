@@ -8,7 +8,6 @@ import type {
   PipetteOffsetCalibration,
   TipLengthCalibration,
 } from '../calibration/types'
-import { Labware } from '@opentrons/components'
 
 // common types
 

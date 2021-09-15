@@ -22,7 +22,6 @@ import { formatLastModified } from '../../../CalibrationPanels/utils'
 
 interface Props {
   button?: JSX.Element
-  calibrated: boolean
   calibratedDate?: string | null
   index?: number
   subText?: string
@@ -30,7 +29,7 @@ interface Props {
 }
 
 export function CalibrationItem(props: Props): JSX.Element | null {
-  const { index, title, subText, calibratedDate, calibrated, button } = props
+  const { index, title, subText, calibratedDate, button } = props
   const { t } = useTranslation('protocol_setup')
   const backgroundColor =
     index !== undefined && index % 2 === 0 ? C_NEAR_WHITE : C_WHITE
@@ -49,7 +48,7 @@ export function CalibrationItem(props: Props): JSX.Element | null {
         justifyContent={JUSTIFY_SPACE_BETWEEN}
       >
         <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
-          {calibrated ? (
+          {calibratedDate != null ? (
             <Icon
               name={'check-circle'}
               size={'1.5rem'}

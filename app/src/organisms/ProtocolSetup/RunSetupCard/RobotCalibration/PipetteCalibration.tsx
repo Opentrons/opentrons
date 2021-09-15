@@ -66,7 +66,6 @@ export function PipetteCalibration(props: Props): JSX.Element {
     }
   }
 
-  let calibrated = false
   let button
   let subText
   const attached =
@@ -74,7 +73,6 @@ export function PipetteCalibration(props: Props): JSX.Element {
     pipetteTipRackData.exactPipetteMatch === PipetteConstants.MATCH
 
   if (pipetteTipRackData.pipetteCalDate != null && attached) {
-    calibrated = true
     if (
       pipetteTipRackData.exactPipetteMatch === PipetteConstants.INEXACT_MATCH
     ) {
@@ -142,8 +140,7 @@ export function PipetteCalibration(props: Props): JSX.Element {
   return (
     <CalibrationItem
       button={button}
-      calibrated={calibrated}
-      calibratedDate={pipetteTipRackData.pipetteCalDate}
+      calibratedDate={attached ? pipetteTipRackData.pipetteCalDate : null}
       index={index}
       subText={subText}
       title={`${t('mount_title', { mount: mount.toUpperCase() })} ${
