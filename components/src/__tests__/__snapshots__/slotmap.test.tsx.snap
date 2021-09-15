@@ -70,6 +70,7 @@ exports[`SlotMap renders correctly with collision warning 1`] = `
       className="sc-AxmLO c0 collision_icon"
       fill="currentColor"
       height={20}
+      pointerEvents="none"
       version="1.1"
       viewBox="0 0 24 24"
       width={20}
@@ -77,6 +78,9 @@ exports[`SlotMap renders correctly with collision warning 1`] = `
       xmlns="http://www.w3.org/2000/svg"
       y={1.5}
     >
+      <title>
+        information
+      </title>
       <path
         d="M13 9h-2V7h2m0 10h-2v-6h2m-1-9A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2z"
         fillRule="evenodd"
@@ -307,6 +311,7 @@ exports[`SlotMap renders correctly with error and collision warning 1`] = `
       className="sc-AxmLO c0 collision_icon"
       fill="currentColor"
       height={20}
+      pointerEvents="none"
       version="1.1"
       viewBox="0 0 24 24"
       width={20}
@@ -314,6 +319,9 @@ exports[`SlotMap renders correctly with error and collision warning 1`] = `
       xmlns="http://www.w3.org/2000/svg"
       y={1.5}
     >
+      <title>
+        information
+      </title>
       <path
         d="M13 9h-2V7h2m0 10h-2v-6h2m-1-9A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2z"
         fillRule="evenodd"

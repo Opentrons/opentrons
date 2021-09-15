@@ -7,16 +7,13 @@ import { CalibrationItem } from '../CalibrationItem'
 
 describe('CalibrationItem', () => {
   const render = ({
-    calibrated = true,
     subText = undefined,
     calibratedDate = undefined,
     title = 'stub title',
     button = <button>stub button</button>,
   }: Partial<React.ComponentProps<typeof CalibrationItem>> = {}) => {
     return renderWithProviders(
-      <CalibrationItem
-        {...{ calibrated, subText, calibratedDate, title, button }}
-      />,
+      <CalibrationItem {...{ subText, calibratedDate, title, button }} />,
       { i18nInstance: i18n }
     )
   }
