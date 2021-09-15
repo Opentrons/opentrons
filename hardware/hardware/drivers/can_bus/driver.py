@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import asyncio
 import platform
+from typing import Optional
 
 from can import Notifier, Bus, AsyncBufferedReader, Message
 
@@ -39,8 +40,20 @@ class CanDriver:
         self._notifier = Notifier(bus=self._bus, listeners=[self._reader], loop=loop)
 
     @classmethod
-    async def build(cls, channel: str, bitrate: int, interface: str) -> CanDriver:
-        """Build a CanDriver."""
+    async def build(
+        cls, bitrate: int, interface: str, channel: Optional[str] = None
+    ) -> CanDriver:
+        """Build a CanDriver.
+
+        Args:
+            bitrate: The bitrate to use.
+            interface: The interface for pycan to use.
+                see https://python-can.readthedocs.io/en/master/interfaces.html
+            channel: Optional channel
+
+        Returns:
+            A CanDriver instance.
+        """
         return CanDriver(
             bus=Bus(channel=channel, bitrate=bitrate, interface=interface),
             loop=asyncio.get_event_loop(),
