@@ -265,6 +265,7 @@ const ProtocolSPECS: SelectorSpec[] = [
           {
             displayName: 'Mock TipRack Definition',
             lastModifiedDate: '2020-09-29T13:02',
+            tipRackDef: mockTipRackDefinition,
           },
         ],
       },
@@ -315,7 +316,11 @@ const ProtocolSPECS: SelectorSpec[] = [
         pipetteCalDate: null,
         pipetteDisplayName: 'Left Pipette',
         tipRacks: [
-          { displayName: 'Mock TipRack Definition', lastModifiedDate: null },
+          {
+            displayName: 'Mock TipRack Definition',
+            lastModifiedDate: null,
+            tipRackDef: mockTipRackDefinition,
+          },
         ],
       },
       right: {

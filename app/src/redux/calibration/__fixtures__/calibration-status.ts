@@ -61,5 +61,5 @@ export const {
 
 export const mockProtocolCalibrationComplete: ProtocolCalibrationStatus = {
   complete: false,
-  reason: 'calibrate deck',
+  reason: 'calibrate_deck_failure_reason',
 }
