@@ -4,7 +4,12 @@ from datetime import datetime
 from decoy import Decoy, matchers
 from starlette.datastructures import UploadFile
 
-from opentrons.protocol_runner.pre_analysis import JsonPreAnalysis, PythonPreAnalysis
+from opentrons.protocol_runner.pre_analysis import (
+    PreAnalyzer,
+    InputFile as PreAnalysisInputFile,
+    JsonPreAnalysis,
+    PythonPreAnalysis
+)
 
 from robot_server.errors import ApiError
 from robot_server.service.task_runner import TaskRunner
@@ -182,16 +187,19 @@ async def test_create_protocol(
     decoy: Decoy,
     protocol_store: ProtocolStore,
     analysis_store: AnalysisStore,
+    pre_analyzer: PreAnalyzer,
     protocol_analyzer: ProtocolAnalyzer,
     response_builder: ResponseBuilder,
     task_runner: TaskRunner,
     current_time: datetime,
 ) -> None:
     """It should store an uploaded protocol file."""
+    metadata_as_dict = {"this_is_fake_metadata": True}
+    pre_analysis = JsonPreAnalysis(metadata_as_dict)
     protocol_resource = ProtocolResource(
         protocol_id="protocol-id",
         protocol_type=ProtocolFileType.JSON,
-        pre_analysis=JsonPreAnalysis(metadata={}),
+        pre_analysis=pre_analysis,
         created_at=current_time,
         files=[],
     )
@@ -200,15 +208,20 @@ async def test_create_protocol(
         id="protocol-id",
         createdAt=current_time,
         protocolType=ProtocolFileType.JSON,
-        metadata=Metadata(),
+        metadata=Metadata.parse_obj(metadata_as_dict),
         analyses=[analysis],
     )
+
+    decoy.when(
+        pre_analyzer.analyze([matchers.IsA(PreAnalysisInputFile, {"name": "foo.json"})])
+    ).then_return(pre_analysis)
 
     decoy.when(
         await protocol_store.create(
             protocol_id="protocol-id",
             created_at=current_time,
             files=[matchers.IsA(UploadFile, {"filename": "foo.json"})],
+            pre_analysis=pre_analysis,
         )
     ).then_return(protocol_resource)
 
@@ -227,6 +240,7 @@ async def test_create_protocol(
         response_builder=response_builder,
         protocol_store=protocol_store,
         analysis_store=analysis_store,
+        pre_analyzer=pre_analyzer,
         protocol_analyzer=protocol_analyzer,
         task_runner=task_runner,
         protocol_id="protocol-id",
