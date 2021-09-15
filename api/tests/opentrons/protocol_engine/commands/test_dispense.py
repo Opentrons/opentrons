@@ -1,7 +1,7 @@
 """Test dispense commands."""
 from decoy import Decoy
 
-from opentrons.protocol_engine import WellLocation, WellOrigin
+from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset
 from opentrons.protocol_engine.execution import (
     EquipmentHandler,
     MovementHandler,
@@ -32,7 +32,7 @@ async def test_dispense_implementation(
         run_control=run_control,
     )
 
-    location = WellLocation(origin=WellOrigin.BOTTOM, offset=(0, 0, 1))
+    location = WellLocation(origin=WellOrigin.BOTTOM, offset=WellOffset(x=0, y=0, z=1))
 
     data = DispenseData(
         pipetteId="abc",

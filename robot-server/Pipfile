@@ -36,10 +36,10 @@ opentrons = {editable = true, path = "../api"}
 opentrons-shared-data = {editable = true, path = "../shared-data/python"}
 notify-server = {editable = true, path = "../notify-server"}
 anyio = "==3.3.0"
-fastapi = "==0.54.1"
+fastapi = "==0.68.1"
 python-dotenv = "==0.19.0"
 python-multipart = "==0.0.5"
-pydantic = "==1.4"
+pydantic = "==1.8.2"
 typing-extensions = "==3.10.0.0"
 uvicorn = "==0.14.0"
 wsproto = "==1.0.0"

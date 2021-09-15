@@ -8,19 +8,23 @@ from pydantic import BaseModel, Field
 from robot_server.service.shared_models import calibration as cal_model
 
 
-Offset = typing.Tuple[float, float, float]
+# NOTE: this would be more accurately typed as
+# a typing.Tuple[float, float, float], but tuple is
+# not able to be expressed in OpenAPI Spec
+Offset = typing.Sequence[float]
 
-AffineMatrix = typing.Tuple[
-    typing.Tuple[float, float, float, float],
-    typing.Tuple[float, float, float, float],
-    typing.Tuple[float, float, float, float],
-    typing.Tuple[float, float, float, float],
+# NOTE: this would be more accurately typed as
+# a 4x4 motraix using typing.Tuple, but tuple is
+# not able to be expressed in OpenAPI Spec
+AffineMatrix = typing.Sequence[
+    typing.Sequence[float],
 ]
 
-AttitudeMatrix = typing.Tuple[
-    typing.Tuple[float, float, float],
-    typing.Tuple[float, float, float],
-    typing.Tuple[float, float, float],
+# NOTE: this would be more accurately typed as
+# a 3x3 motraix using typing.Tuple, but tuple is
+# not able to be expressed in OpenAPI Spec
+AttitudeMatrix = typing.Sequence[
+    typing.Sequence[float],
 ]
 
 
@@ -43,7 +47,7 @@ class MatrixType(str, Enum):
 
 class DeckCalibrationData(BaseModel):
     type: MatrixType = Field(
-        ..., description="The type of deck calibration matrix:" "affine or attitude"
+        ..., description="The type of deck calibration matrix: affine or attitude"
     )
     matrix: typing.Union[AffineMatrix, AttitudeMatrix] = Field(
         ..., description="The deck calibration transform matrix"
@@ -55,7 +59,7 @@ class DeckCalibrationData(BaseModel):
         None, description="The ID of the pipette used in this calibration"
     )
     tiprack: typing.Optional[str] = Field(
-        None, description="The sha256 hash of the tiprack used in this" "calibration"
+        None, description="The sha256 hash of the tiprack used in this calibration"
     )
     source: SourceType = Field(None, description="The calibration source")
     status: cal_model.CalibrationStatus = Field(

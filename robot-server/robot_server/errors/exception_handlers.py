@@ -1,6 +1,7 @@
 """App exception handlers."""
 from logging import getLogger
 from fastapi import Request, Response, status
+from fastapi.routing import APIRoute
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
@@ -25,9 +26,11 @@ log = getLogger(__name__)
 def _route_is_legacy(request: Request) -> bool:
     """Check if router handling the request is a legacy v1 endpoint."""
     router = request.scope.get("router")
+    endpoint = request.scope.get("endpoint")
+
     if router:
         for route in router.routes:
-            if route.endpoint == request.scope.get("endpoint"):
+            if isinstance(route, APIRoute) and route.endpoint == endpoint:
                 return V1_TAG in route.tags
 
     return False
@@ -39,8 +42,8 @@ def _format_validation_source(
     """Format a validation location from FastAPI into an ErrorSource."""
     try:
         if parts[0] == "body":
-            # ["body", "model", "field"] > { "pointer": "/field" }
-            return ErrorSource(pointer=f"/{'/'.join(str(p) for p in parts[2::])}")
+            # ["body", "field"] > { "pointer": "/field" }
+            return ErrorSource(pointer=f"/{'/'.join(str(p) for p in parts[1::])}")
         elif parts[0] == "query":
             # ["query", "param"] > { parameter: "param" }
             return ErrorSource(parameter=str(parts[1]))

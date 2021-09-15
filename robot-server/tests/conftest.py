@@ -13,21 +13,23 @@ import pytest
 from datetime import datetime, timezone
 from fastapi import routing
 from mock import MagicMock
-from typing import Any, Dict
-
-from opentrons.protocols.context.protocol_api.labware import LabwareImplementation
 from starlette.testclient import TestClient
-from robot_server.app import app
-from robot_server.constants import API_VERSION_HEADER, API_VERSION_LATEST
-from robot_server.service.dependencies import get_hardware
-from opentrons.hardware_control import API, HardwareAPILike, ThreadedAsyncLock
-from opentrons import config
+from typing import Any, Callable, Dict, Iterator, cast
+from typing_extensions import NoReturn
 
+from opentrons_shared_data.labware.dev_types import LabwareDefinition
+
+from opentrons import config
+from opentrons.hardware_control import API, HardwareAPILike, ThreadedAsyncLock
+from opentrons.protocols.context.protocol_api.labware import LabwareImplementation
 from opentrons.calibration_storage import delete, modify, helpers
 from opentrons.protocol_api import labware
 from opentrons.types import Point, Mount
 from opentrons.protocols.geometry.deck import Deck
 
+from robot_server.app import app
+from robot_server.constants import API_VERSION_HEADER, API_VERSION_LATEST
+from robot_server.service.dependencies import get_hardware
 from robot_server.service.protocol.manager import ProtocolManager
 from robot_server.service.session.manager import SessionManager
 
@@ -35,7 +37,7 @@ test_router = routing.APIRouter()
 
 
 @test_router.get("/alwaysRaise")
-async def always_raise():
+async def always_raise() -> NoReturn:
     raise RuntimeError
 
 
@@ -66,7 +68,7 @@ def hardware() -> MagicMock:
 
 
 @pytest.fixture
-def override_hardware(hardware: MagicMock):
+def override_hardware(hardware: MagicMock) -> None:
     async def get_hardware_override() -> HardwareAPILike:
         """Override for get_hardware dependency"""
         return hardware
@@ -75,14 +77,14 @@ def override_hardware(hardware: MagicMock):
 
 
 @pytest.fixture
-def api_client(override_hardware) -> TestClient:
+def api_client(override_hardware: None) -> TestClient:
     client = TestClient(app)
     client.headers.update({API_VERSION_HEADER: API_VERSION_LATEST})
     return client
 
 
 @pytest.fixture
-def api_client_no_errors(override_hardware) -> TestClient:
+def api_client_no_errors(override_hardware: None) -> TestClient:
     """An API client that won't raise server exceptions.
     Use only to test 500 pages; never use this for other tests."""
     client = TestClient(app, raise_server_exceptions=False)
@@ -236,7 +238,7 @@ def session_manager(hardware) -> SessionManager:
 
 
 @pytest.fixture
-def set_enable_http_protocol_sessions(request_session):
+def set_enable_http_protocol_sessions(request_session) -> Iterator[None]:
     """For integration tests that need to set then clear the
     enableHttpProtocolSessions feature flag"""
     url = "http://localhost:31950/settings"
@@ -248,8 +250,8 @@ def set_enable_http_protocol_sessions(request_session):
 
 
 @pytest.fixture
-def get_labware_fixture():
-    def _get_labware_fixture(fixture_name):
+def get_labware_fixture() -> Callable[[str], LabwareDefinition]:
+    def _get_labware_fixture(fixture_name: str) -> LabwareDefinition:
         with open(
             (
                 pathlib.Path(__file__).parent
@@ -263,13 +265,13 @@ def get_labware_fixture():
             ),
             "rb",
         ) as f:
-            return json.loads(f.read().decode("utf-8"))
+            return cast(LabwareDefinition, json.loads(f.read().decode("utf-8")))
 
     return _get_labware_fixture
 
 
 @pytest.fixture
-def minimal_labware_def():
+def minimal_labware_def() -> LabwareDefinition:
     return {
         "metadata": {
             "displayName": "minimal labware",
@@ -315,7 +317,7 @@ def minimal_labware_def():
 
 
 @pytest.fixture
-def custom_tiprack_def():
+def custom_tiprack_def() -> LabwareDefinition:
     return {
         "metadata": {"displayName": "minimal labware"},
         "cornerOffsetFromSlot": {"x": 10, "y": 10, "z": 5},
@@ -346,14 +348,22 @@ def custom_tiprack_def():
                 "shape": "circular",
             },
         },
+        "groups": [
+            {
+                "wells": ["A1", "A2"],
+                "metadata": {},
+            }
+        ],
         "dimensions": {"xDimension": 1.0, "yDimension": 2.0, "zDimension": 3.0},
         "namespace": "custom",
         "version": 1,
+        "schemaVersion": 2,
+        "brand": {"brand": "Opentrons"},
     }
 
 
 @pytest.fixture
-def clear_custom_tiprack_def_dir():
+def clear_custom_tiprack_def_dir() -> Iterator[None]:
     tiprack_path = (
         config.get_custom_tiprack_def_path() / "custom/minimal_labware_def/1.json"
     )

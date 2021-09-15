@@ -10,7 +10,7 @@ robot-server = {editable = true, path = "./../robot-server"}
 opentrons-shared-data = {editable = true, path = "../shared-data/python"}
 g-code-testing = {editable = true, path = "."}
 anyio = "==3.3.0"
-pydantic = "==1.4"
+pydantic = "==1.8.2"
 
 [dev-packages]
 diff-match-patch = "==20200713"

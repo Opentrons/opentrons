@@ -7,7 +7,7 @@ from opentrons.types import Point
 from opentrons.hardware_control.dev_types import PipetteDict
 
 from .. import errors
-from ..types import LoadedLabware, WellLocation, WellOrigin
+from ..types import LoadedLabware, WellLocation, WellOrigin, WellOffset
 from .labware import LabwareView
 
 
@@ -96,15 +96,15 @@ class GeometryView:
             offset = well_location.offset
 
             if well_location.origin == WellOrigin.TOP:
-                offset = (offset[0], offset[1], offset[2] + well_depth)
+                offset = offset.copy(update={"z": offset.z + well_depth})
 
         else:
-            offset = (0, 0, well_depth)
+            offset = WellOffset(x=0, y=0, z=well_depth)
 
         return Point(
-            x=labware_pos.x + offset[0] + well_def.x,
-            y=labware_pos.y + offset[1] + well_def.y,
-            z=labware_pos.z + offset[2] + well_def.z,
+            x=labware_pos.x + offset.x + well_def.x,
+            y=labware_pos.y + offset.y + well_def.y,
+            z=labware_pos.z + offset.z + well_def.z,
         )
 
     def _get_highest_z_from_labware_data(self, lw_data: LoadedLabware) -> float:
@@ -181,5 +181,6 @@ class GeometryView:
 
         nominal_length = self._labware.get_tip_length(labware_id)
         offset_factor = pipette_config["return_tip_height"]
+        offset = WellOffset(x=0, y=0, z=-nominal_length * offset_factor)
 
-        return WellLocation(offset=(0, 0, -nominal_length * offset_factor))
+        return WellLocation(offset=offset)

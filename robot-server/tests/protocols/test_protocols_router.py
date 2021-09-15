@@ -2,7 +2,7 @@
 import pytest
 from datetime import datetime
 from decoy import Decoy, matchers
-from starlette.datastructures import UploadFile
+from fastapi import UploadFile
 
 from opentrons.protocol_runner import ProtocolFileType
 from robot_server.errors import ApiError
