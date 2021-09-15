@@ -45,6 +45,7 @@ def get_analysis_store(app_state: AppState = Depends(get_app_state)) -> Analysis
 
 
 async def get_pre_analyzer(app_state: AppState = Depends(get_app_state)) -> PreAnalyzer:
+    """Return a PreAnalyzer."""
     return PreAnalyzer()
 
 

@@ -8,7 +8,6 @@ from typing import Iterator, List
 
 from opentrons.protocol_runner import ProtocolFileType
 from opentrons.protocol_runner.pre_analysis import (
-    PreAnalyzer,
     JsonPreAnalysis,
     PythonPreAnalysis,
 )

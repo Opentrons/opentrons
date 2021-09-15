@@ -8,7 +8,6 @@ from typing import Dict, List, Sequence, Union
 
 from opentrons.protocol_runner import ProtocolFile, ProtocolFileType
 from opentrons.protocol_runner.pre_analysis import (
-    PreAnalyzer,
     JsonPreAnalysis,
     PythonPreAnalysis,
 )
