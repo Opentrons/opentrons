@@ -36,6 +36,8 @@ TEST_DATA = [
     ],
 ]
 
+
+@pytest.mark.g_code_confirm
 @pytest.mark.parametrize(
     "master_file_name,path,settings",
     TEST_DATA
