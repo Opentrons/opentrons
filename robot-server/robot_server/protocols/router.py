@@ -90,6 +90,7 @@ async def create_protocol(
         analysis_id: Unique identifier to attach to the analysis resource.
         created_at: Timestamp to attach to the new resource.
     """
+
     def convert_upload_file_to_pre_analysis_input(
         upload_file: UploadFile,
     ) -> PreAnalysisInputFile:

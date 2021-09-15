@@ -134,7 +134,7 @@ async def test_create_protocol_raises_for_missing_filename(
             protocol_id="protocol-id",
             created_at=created_at,
             files=[invalid_file],
-            pre_analysis=JsonPreAnalysis(metadata={})
+            pre_analysis=JsonPreAnalysis(metadata={}),
         )
 
 
@@ -203,7 +203,7 @@ async def test_remove_protocol(
         protocol_id="protocol-id",
         created_at=created_at,
         files=[json_upload_file],
-        pre_analysis=JsonPreAnalysis(metadata={})
+        pre_analysis=JsonPreAnalysis(metadata={}),
     )
 
     result = subject.remove("protocol-id")

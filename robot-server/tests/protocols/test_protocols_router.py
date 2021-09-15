@@ -8,7 +8,7 @@ from opentrons.protocol_runner.pre_analysis import (
     PreAnalyzer,
     InputFile as PreAnalysisInputFile,
     JsonPreAnalysis,
-    PythonPreAnalysis
+    PythonPreAnalysis,
 )
 
 from robot_server.errors import ApiError
