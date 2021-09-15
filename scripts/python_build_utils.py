@@ -38,7 +38,7 @@ package_entries = {
         os.path.join(HERE, '..', 'notify-server', 'notify_server', 'package.json'),
         'notify_server'),
     'hardware': PackageEntry(
-        os.path.join(HERE, '..', 'hardware', 'hardware', 'package.json'),
+        os.path.join(HERE, '..', 'hardware', 'opentrons_hardware', 'package.json'),
         'opentrons_hardware'),
 }
 
