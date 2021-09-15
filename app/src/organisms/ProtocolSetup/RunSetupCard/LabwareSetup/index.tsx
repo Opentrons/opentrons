@@ -18,7 +18,7 @@ import {
   DIRECTION_COLUMN,
   FONT_SIZE_BODY_1,
   JUSTIFY_CENTER,
-  SPACING_2,
+  SPACING_4,
   SPACING_3,
   C_BLUE,
   C_DARK_GRAY,
@@ -46,7 +46,7 @@ const DECK_LAYER_BLOCKLIST = [
   'screwHoles',
 ]
 
-const DECK_MAP_VIEWBOX = '-80 -100 550 560'
+const DECK_MAP_VIEWBOX = '-80 -40 550 510'
 
 export const LabwareSetup = (): JSX.Element | null => {
   const moduleRenderInfoById = useModuleRenderInfoById()
@@ -137,7 +137,7 @@ export const LabwareSetup = (): JSX.Element | null => {
             )
           }}
         </RobotWorkSpace>
-        <Text color={C_DARK_GRAY} marginY={SPACING_2}>
+        <Text color={C_DARK_GRAY} margin={SPACING_4}>
           {t('labware_position_check_text')}
         </Text>
         <Flex justifyContent={JUSTIFY_CENTER}>
