@@ -52,37 +52,26 @@ def upload_files(
 
 
 @pytest.fixture
-def pre_analyzer(decoy: Decoy) -> PreAnalyzer:
-    """Return a mock PreAnalyzer."""
-    return decoy.mock(cls=PreAnalyzer)
-
-
-@pytest.fixture
-def subject(tmp_path: Path, pre_analyzer: PreAnalyzer) -> ProtocolStore:
-    """Get a ProtocolStore test subject, with mocked dependencies."""
-    return ProtocolStore(
-        tmp_path,
-        pre_analyzer,
-    )
+def subject(tmp_path: Path) -> ProtocolStore:
+    """Get a ProtocolStore test subject."""
+    return ProtocolStore(directory=tmp_path)
 
 
 async def test_create_and_get_json_protocol(
     decoy: Decoy,
     tmp_path: Path,
     upload_files: List[UploadFile],
-    pre_analyzer: PreAnalyzer,
     subject: ProtocolStore,
 ) -> None:
     """It should save a single protocol to disk."""
     created_at = datetime.now()
     pre_analysis = JsonPreAnalysis(metadata={"this_is_fake_metadata": True})
 
-    decoy.when(pre_analyzer.analyze(matchers.Anything())).then_return(pre_analysis)
-
     creation_result = await subject.create(
         protocol_id="protocol-id",
         created_at=created_at,
         files=upload_files,
+        pre_analysis=pre_analysis,
     )
 
     assert creation_result == ProtocolResource(
@@ -103,7 +92,6 @@ async def test_create_and_get_python_protocol(
     decoy: Decoy,
     tmp_path: Path,
     upload_files: List[UploadFile],
-    pre_analyzer: PreAnalyzer,
     subject: ProtocolStore,
 ) -> None:
     """It should save a single protocol to disk."""
@@ -112,12 +100,11 @@ async def test_create_and_get_python_protocol(
         api_level="9001.0", metadata={"this_is_fake_metadata": True}
     )
 
-    decoy.when(pre_analyzer.analyze(matchers.Anything())).then_return(pre_analysis)
-
     creation_result = await subject.create(
         protocol_id="protocol-id",
         created_at=created_at,
         files=upload_files,
+        pre_analysis=pre_analysis,
     )
 
     assert creation_result == ProtocolResource(
@@ -147,6 +134,7 @@ async def test_create_protocol_raises_for_missing_filename(
             protocol_id="protocol-id",
             created_at=created_at,
             files=[invalid_file],
+            pre_analysis=JsonPreAnalysis(metadata={})
         )
 
 
@@ -215,6 +203,7 @@ async def test_remove_protocol(
         protocol_id="protocol-id",
         created_at=created_at,
         files=[json_upload_file],
+        pre_analysis=JsonPreAnalysis(metadata={})
     )
 
     result = subject.remove("protocol-id")
