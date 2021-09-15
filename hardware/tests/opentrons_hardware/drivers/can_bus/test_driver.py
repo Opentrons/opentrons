@@ -5,9 +5,7 @@ from typing import AsyncGenerator
 import pytest
 from can import Bus, Message
 
-from hardware.drivers.can_bus.arbitration_id import ArbitrationId
-from hardware.drivers.can_bus.driver import CanDriver
-from hardware.drivers.can_bus.message import CanMessage
+from opentrons_hardware.drivers.can_bus import CanDriver, ArbitrationId, CanMessage
 
 
 @pytest.fixture

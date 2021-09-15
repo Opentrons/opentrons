@@ -3,7 +3,7 @@ import argparse
 import asyncio
 from typing import Optional
 
-from hardware.drivers.can_bus import (
+from opentrons_hardware.drivers.can_bus import (
     CanDriver,
     MessageId,
     FunctionCode,

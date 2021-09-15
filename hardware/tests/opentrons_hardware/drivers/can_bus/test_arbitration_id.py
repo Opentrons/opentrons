@@ -1,6 +1,6 @@
 """Arbitration id tests."""
 import pytest
-from hardware.drivers.can_bus.arbitration_id import ArbitrationId, ArbitrationIdParts
+from opentrons_hardware.drivers.can_bus import ArbitrationId, ArbitrationIdParts
 
 
 @pytest.mark.parametrize(
