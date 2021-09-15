@@ -16,7 +16,8 @@
     "step-generation",
     "update-server/otupdate",
     "webpack-config",
-    "notify-server/notify_server"
+    "notify-server/notify_server",
+    "hardware/hardware"
   ],
   "config": {
     "commitizen": {
