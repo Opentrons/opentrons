@@ -11,7 +11,7 @@ from tests.g_code_comparision.utils import get_master_file
 def two_modules_settings() -> Settings:
     smoothie = SmoothieSettings(
         left={"model": "p300_single_v2.1", "id": "P20SV202020070101"},
-        right={"model": "p20_multi_v2.1", "id": "P20SV202020070101"}
+        right={"model": "p20_multi_v2.1", "id": "P20SV202020070101"},
     )
     return Settings(smoothie=smoothie)
 
@@ -25,13 +25,13 @@ def swift_settings() -> Settings:
     return Settings(smoothie=smoothie)
 
 
-TWO_MODULES_S3_FILE_NAME = '2-modules-1s-1m-v2.txt'
+TWO_MODULES_S3_FILE_NAME = "2-modules-1s-1m-v2.txt"
 TWO_MODULES_PATH = "protocols/2_modules_1s_1m_v2.py"
 
-SWIFT_SMOKE_FILE_NAME = 'swift-smoke.txt'
+SWIFT_SMOKE_FILE_NAME = "swift-smoke.txt"
 SWIFT_SMOKE_PATH = "protocols/swift_smoke.py"
 
-SWIFT_TURBO_FILE_NAME = 'swift-turbo.txt'
+SWIFT_TURBO_FILE_NAME = "swift-turbo.txt"
 SWIFT_TURBO_PATH = "protocols/swift_turbo.py"
 
 
@@ -40,8 +40,9 @@ def run_test(settings: SmoothieSettings, master_file_name: str, path: str) -> No
     with GCodeEngine(settings).run_protocol(path=path) as program:
         actual_output = program.get_text_explanation(SupportedTextModes.CONCISE)
 
-    assert actual_output == expected_output, \
-        GCodeDiffer(actual_output, expected_output).get_html_diff()
+    assert actual_output == expected_output, GCodeDiffer(
+        actual_output, expected_output
+    ).get_html_diff()
 
 
 @pytest.mark.g_code_confirm
@@ -60,4 +61,3 @@ def test_swift_smoke(swift_settings):
 @pytest.mark.slow
 def test_swift_turbo(swift_settings):
     run_test(swift_settings, SWIFT_TURBO_FILE_NAME, SWIFT_TURBO_PATH)
-
