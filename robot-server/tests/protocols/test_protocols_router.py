@@ -259,26 +259,6 @@ async def test_create_protocol(
     )
 
 
-@pytest.mark.xfail(raises=NotImplementedError)
-async def test_create_multifile_protocol(
-    decoy: Decoy,
-    protocol_store: ProtocolStore,
-    response_builder: ResponseBuilder,
-    unique_id: str,
-    current_time: datetime,
-) -> None:
-    """It should store multiple protocol files."""
-    files = [UploadFile(filename="foo.py"), UploadFile(filename="bar.py")]
-
-    await create_protocol(
-        files=files,
-        response_builder=response_builder,
-        protocol_store=protocol_store,
-        protocol_id=unique_id,
-        created_at=current_time,
-    )
-
-
 async def test_create_protocol_invalid_file(
     decoy: Decoy,
     protocol_store: ProtocolStore,
