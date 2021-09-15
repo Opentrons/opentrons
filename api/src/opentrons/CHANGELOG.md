@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.6.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v4.5.0...v4.6.0-alpha.0) (2021-09-15)
+
+
+### Bug Fixes
+
+* **api:** drop tip after cancel ([#8229](https://github.com/Opentrons/opentrons/issues/8229)) ([bb44718](https://github.com/Opentrons/opentrons/commit/bb447184b97f7607604eb79a4cdad942a9366bc1))
+* **api:** ensure decorators do not erase ProtocolContext types ([#8323](https://github.com/Opentrons/opentrons/issues/8323)) ([2a8a370](https://github.com/Opentrons/opentrons/commit/2a8a37025e8894230cdeb0376a7bf832b4e9f12f))
+* **api:** Make tip pickup error say "pick up tip," not "drop tip" ([#8251](https://github.com/Opentrons/opentrons/issues/8251)) ([430fbeb](https://github.com/Opentrons/opentrons/commit/430fbeb9b59cbbcb8a9288a5afc9445030711b34))
+* **api:** wait for poll before awaiting tempdeck temperature ([#8340](https://github.com/Opentrons/opentrons/issues/8340)) ([acb394d](https://github.com/Opentrons/opentrons/commit/acb394d72260f3660df9e2086a8e44e0b349b632))
+* **fastsim:** fast sim fails when using InstrumentContext.pair_with function ([#8290](https://github.com/Opentrons/opentrons/issues/8290)) ([02b78de](https://github.com/Opentrons/opentrons/commit/02b78de18ba03bfceafb98374f04ef41431f8d51)), closes [#8222](https://github.com/Opentrons/opentrons/issues/8222)
+* **fastsim:** set_defaults for FlowRates in InstrumentContextSimulation ([165dd5d](https://github.com/Opentrons/opentrons/commit/165dd5d45a3fef4a4af9756fbfcc774e674e102c)), closes [#8272](https://github.com/Opentrons/opentrons/issues/8272)
+* **simulation:** NoTipAttachedError in fast simulation only ([#8280](https://github.com/Opentrons/opentrons/issues/8280)) ([b7e93f1](https://github.com/Opentrons/opentrons/commit/b7e93f1e2e47a70c61f40432ac60010163d2fb5b)), closes [#8273](https://github.com/Opentrons/opentrons/issues/8273)
+* **tempdeck:** make tempdeck waiting functions cancelable ([#8327](https://github.com/Opentrons/opentrons/issues/8327)) ([70b956f](https://github.com/Opentrons/opentrons/commit/70b956f4aa8bb344385787ea07f1d4f5ccef28da))
+
+
+### Features
+
+* **api:** Add filtering of polling messages to G-Code Parser ([#8198](https://github.com/Opentrons/opentrons/issues/8198)) ([5719c62](https://github.com/Opentrons/opentrons/commit/5719c62bd6daee7e557cfb5c23ef56fe62c65e3c))
+* **api:** Add G-Code Parser CI Integration ([#8203](https://github.com/Opentrons/opentrons/issues/8203)) ([0f3f066](https://github.com/Opentrons/opentrons/commit/0f3f066deae94b6e31b2258d1a2f0fd2360c7f19))
+* **api:** Add G-Code parsing for Thermocycler ([#8173](https://github.com/Opentrons/opentrons/issues/8173)) ([f162300](https://github.com/Opentrons/opentrons/commit/f162300cab76ae7a77608458af6e66f726864a30))
+* **api:** opentrons_simulate gets duration estimation ([#8321](https://github.com/Opentrons/opentrons/issues/8321)) ([5c59fc7](https://github.com/Opentrons/opentrons/commit/5c59fc7fa5e7c2a0b318f64b2aca7149747eb550)), closes [#8279](https://github.com/Opentrons/opentrons/issues/8279) [#8300](https://github.com/Opentrons/opentrons/issues/8300) [#8311](https://github.com/Opentrons/opentrons/issues/8311)
+* **protocol-engine:** implement well & labware's well accessor methods ([#8151](https://github.com/Opentrons/opentrons/issues/8151)) ([bff281a](https://github.com/Opentrons/opentrons/commit/bff281a273ae2dce99e770f76b823ec503217d3f))
+
+
+
+
+
 # [4.5.0](https://github.com/Opentrons/opentrons/compare/v4.4.0...v4.5.0) (2021-08-03)
 
 
