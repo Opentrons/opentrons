@@ -44,16 +44,19 @@ def run_test(settings: SmoothieSettings, master_file_name: str, path: str) -> No
         GCodeDiffer(actual_output, expected_output).get_html_diff()
 
 
+@pytest.mark.g_code_confirm
 @pytest.mark.slow
 def test_two_modules_protocol(two_modules_settings):
     run_test(two_modules_settings, TWO_MODULES_S3_FILE_NAME, TWO_MODULES_PATH)
 
 
+@pytest.mark.g_code_confirm
 @pytest.mark.slow
 def test_swift_smoke(swift_settings):
     run_test(swift_settings, SWIFT_SMOKE_FILE_NAME, SWIFT_SMOKE_PATH)
 
 
+@pytest.mark.g_code_confirm
 @pytest.mark.slow
 def test_swift_turbo(swift_settings):
     run_test(swift_settings, SWIFT_TURBO_FILE_NAME, SWIFT_TURBO_PATH)
