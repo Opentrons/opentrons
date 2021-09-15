@@ -1,1 +1,1 @@
-"""Hardware package"""
+"""Hardware package."""

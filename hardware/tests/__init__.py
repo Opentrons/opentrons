@@ -1,1 +1,1 @@
-"""Tests for hardware package"""
+"""Tests for hardware package."""
