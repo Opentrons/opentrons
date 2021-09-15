@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from arbitration_id import ArbitrationId  # type: ignore
+from .arbitration_id import ArbitrationId
 
 
 @dataclass

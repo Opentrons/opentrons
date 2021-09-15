@@ -41,6 +41,16 @@ class ArbitrationId(ctypes.Union):
         ("id", ctypes.c_uint32),
     )
 
+    def __eq__(self, other: object) -> bool:
+        """Check equality."""
+        if isinstance(other, ArbitrationId):
+            return bool(other.id == self.id)
+        return False
+
+    def __repr__(self) -> str:
+        """Return string representation of class."""
+        return f"id: 0x{self.id:x}, " f"parts: {self.parts}"
+
 
 class NodeId(Enum):
     """Can bus arbitration id node id."""

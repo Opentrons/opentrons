@@ -4,8 +4,9 @@ from __future__ import annotations
 import asyncio
 import platform
 
-from can import Notifier, Bus, AsyncBufferedReader
+from can import Notifier, Bus, AsyncBufferedReader, Message
 
+from hardware.drivers.can_bus.arbitration_id import ArbitrationId
 from hardware.drivers.can_bus.message import CanMessage
 
 if platform.system() == "Darwin":
@@ -37,6 +38,10 @@ class CanDriver:
         self._reader = AsyncBufferedReader(loop=loop)
         self._notifier = Notifier(bus=self._bus, listeners=[self._reader], loop=loop)
 
+    def shutdown(self) -> None:
+        """Stop the driver."""
+        self._notifier.stop()
+
     async def send(self, message: CanMessage) -> None:
         """Send a can message.
 
@@ -46,7 +51,13 @@ class CanDriver:
         Returns:
             None
         """
-        await self._loop.run_in_executor(executor=None, func=self._bus.send(message))
+        m = Message(
+            arbitration_id=message.arbitration_id.id,
+            is_extended_id=True,
+            is_fd=True,
+            data=message.data,
+        )
+        await self._loop.run_in_executor(None, self._bus.send, m)
 
     async def read(self) -> CanMessage:
         """Read a message.
@@ -55,8 +66,10 @@ class CanDriver:
             A can message
         """
         ...
-        # m = await self._reader.get_message()
-        # return m
+        m: Message = await self._reader.get_message()
+        return CanMessage(
+            arbitration_id=ArbitrationId(id=m.arbitration_id), data=m.data
+        )
 
     def __aiter__(self) -> CanDriver:
         """Enter iterator.
@@ -73,5 +86,4 @@ class CanDriver:
             CanMessage
 
         """
-        ...
-        # return await self.read()
+        return await self.read()
