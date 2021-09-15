@@ -102,7 +102,9 @@ TEST_DATA = [
 
 @pytest.mark.g_code_confirm
 @pytest.mark.parametrize("master_file_name,executable", TEST_DATA)
-def test_robot_home_robot(master_file_name, executable, http_settings):
+def test_robot_home_robot(
+    master_file_name: str, executable: Callable, http_settings: Settings
+):
     expected_output = get_master_file(master_file_name)
     with GCodeEngine(http_settings).run_http(executable=executable) as program:
         actual_output = program.get_text_explanation(SupportedTextModes.CONCISE)

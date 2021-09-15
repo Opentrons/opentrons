@@ -107,7 +107,7 @@ class GCodeEngine:
         """
         Runs passed protocol file and collects all G-Code I/O from it.
         Will cleanup emulation after execution
-        :param test_data: Path to file
+        :param path: Path to file
         :return: GCodeProgram with all the parsed data
         """
         file_path = os.path.join(get_configuration_dir(), path)
@@ -130,7 +130,7 @@ class GCodeEngine:
     def run_http(self, executable: Callable):
         """
         Runs http request and returns all G-Code I/O from it
-        :param test_data: Function connected to HTTP Request to execute
+        :param executable: Function connected to HTTP Request to execute
         :return:
         """
         server_manager = ServerManager(self._config)

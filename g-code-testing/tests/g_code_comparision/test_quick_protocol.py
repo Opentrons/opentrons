@@ -39,7 +39,7 @@ TEST_DATA = [
 
 @pytest.mark.g_code_confirm
 @pytest.mark.parametrize("master_file_name,path,settings", TEST_DATA)
-def test_quick_protocols(master_file_name, path, settings):
+def test_quick_protocols(master_file_name: str, path: str, settings: Settings):
     expected_output = get_master_file(master_file_name)
     with GCodeEngine(settings).run_protocol(path=path) as program:
         actual_output = program.get_text_explanation(SupportedTextModes.CONCISE)

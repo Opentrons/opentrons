@@ -47,17 +47,17 @@ def run_test(settings: SmoothieSettings, master_file_name: str, path: str) -> No
 
 @pytest.mark.g_code_confirm
 @pytest.mark.slow
-def test_two_modules_protocol(two_modules_settings):
+def test_two_modules_protocol(two_modules_settings: Settings):
     run_test(two_modules_settings, TWO_MODULES_S3_FILE_NAME, TWO_MODULES_PATH)
 
 
 @pytest.mark.g_code_confirm
 @pytest.mark.slow
-def test_swift_smoke(swift_settings):
+def test_swift_smoke(swift_settings: Settings):
     run_test(swift_settings, SWIFT_SMOKE_FILE_NAME, SWIFT_SMOKE_PATH)
 
 
 @pytest.mark.g_code_confirm
 @pytest.mark.slow
-def test_swift_turbo(swift_settings):
+def test_swift_turbo(swift_settings: Settings):
     run_test(swift_settings, SWIFT_TURBO_FILE_NAME, SWIFT_TURBO_PATH)
