@@ -3,12 +3,11 @@ import logging
 from pathlib import Path
 from tempfile import gettempdir
 from fastapi import Depends
-from starlette.datastructures import State as AppState
 
 from opentrons.protocol_runner import create_simulating_runner
 from opentrons.protocol_runner.pre_analysis import PreAnalyzer
-from robot_server.service.dependencies import get_app_state
 
+from robot_server.app_state import AppState, get_app_state
 from .protocol_store import ProtocolStore
 from .protocol_analyzer import ProtocolAnalyzer
 from .analysis_store import AnalysisStore

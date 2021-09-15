@@ -4,10 +4,10 @@ from __future__ import annotations
 
 from abc import abstractmethod, ABC
 from dataclasses import dataclass
-from typing import Dict, Optional
+from typing import Dict, Optional, Union
 
 from opentrons import types
-from opentrons.hardware_control import API, SynchronousAdapter
+from opentrons.hardware_control import SynchronousAdapter, ThreadManager
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.geometry.deck_item import DeckItem
 from opentrons.protocols.geometry.module_geometry import ModuleGeometry, ModuleType
@@ -56,7 +56,7 @@ class AbstractProtocol(ABC):
         ...
 
     @abstractmethod
-    def connect(self, hardware: API) -> None:
+    def connect(self, hardware: Union[ThreadManager, SynchronousAdapter]) -> None:
         ...
 
     @abstractmethod

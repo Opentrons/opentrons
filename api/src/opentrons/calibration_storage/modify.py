@@ -216,7 +216,7 @@ def save_robot_deck_attitude(
         status = local_types.CalibrationStatus()
     status_dict: "CalibrationStatusDict" = helpers.convert_to_dict(  # type: ignore[assignment]  # noqa: E501
         status
-    )  # type: ignore
+    )
 
     gantry_dict: "DeckCalibrationData" = {
         "attitude": transform,
@@ -261,7 +261,7 @@ def save_pipette_calibration(
         status = local_types.CalibrationStatus()
     status_dict: "CalibrationStatusDict" = helpers.convert_to_dict(  # type: ignore[assignment]  # noqa: E501
         status
-    )  # type: ignore
+    )
     offset_path = pip_dir / f"{pip_id}.json"
     offset_dict: "PipetteCalibrationData" = {
         "offset": [offset.x, offset.y, offset.z],

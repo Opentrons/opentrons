@@ -299,7 +299,7 @@ class Labware(DeckItem):
         load it, or the label of the labware specified by a user."""
         return self._implementation.get_name()
 
-    @name.setter  # type: ignore
+    @name.setter
     def name(self, new_name):
         """Set the labware name"""
         self._implementation.set_name(new_name)

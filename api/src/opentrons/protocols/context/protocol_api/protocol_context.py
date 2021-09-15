@@ -1,12 +1,12 @@
 import logging
-from typing import Dict, Optional, Set, List, TYPE_CHECKING
+from typing import Dict, Optional, Set, List, Union, TYPE_CHECKING
 from collections import OrderedDict
 
-from opentrons import types, API
+from opentrons import types
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.config import feature_flags as fflags
 from opentrons.hardware_control.types import DoorState, PauseType
-from opentrons.hardware_control import SynchronousAdapter
+from opentrons.hardware_control import ThreadManager, SynchronousAdapter
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.geometry import module_geometry
@@ -34,7 +34,7 @@ if TYPE_CHECKING:
     from opentrons.hardware_control.modules import AbstractModule
 
 
-MODULE_LOG = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 SHORT_TRASH_DECK = "ot2_short_trash"
 STANDARD_DECK = "ot2_standard"
@@ -82,7 +82,6 @@ class ProtocolContextImplementation(AbstractProtocol):
         self._modules: List[LoadModuleResult] = []
 
         self._hw_manager = HardwareManager(hardware)
-        self._log = MODULE_LOG.getChild(self.__class__.__name__)
 
         self._bundled_labware = bundled_labware
         self._extra_labware = extra_labware or {}
@@ -134,7 +133,7 @@ class ProtocolContextImplementation(AbstractProtocol):
         """Access to the hardware manager."""
         return self._hw_manager
 
-    def connect(self, hardware: API) -> None:
+    def connect(self, hardware: Union[ThreadManager, SynchronousAdapter]) -> None:
         """Connect to the hardware."""
         self._hw_manager.set_hw(hardware)
         self._hw_manager.hardware.cache_instruments()
@@ -260,7 +259,7 @@ class ProtocolContextImplementation(AbstractProtocol):
             default_speed=400.0,
         )
         self._instruments[mount] = new_instr
-        self._log.info("Instrument {} loaded".format(new_instr))
+        logger.info("Instrument {} loaded".format(new_instr))
         return new_instr
 
     def get_loaded_instruments(self) -> InstrumentDict:

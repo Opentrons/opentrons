@@ -92,8 +92,8 @@ def _extract_equipment(
         pipettes=[
             models.LoadedPipette(
                 mount=Mount(slot.lower()),
-                pipetteName=pipette.name,
-                channels=pipette.channels,
+                pipetteName=pipette.name,  # type: ignore[arg-type]
+                channels=pipette.channels,  # type: ignore[arg-type]
                 requestedAs=pipette.requested_as,
             )
             for slot, pipette in sorted(ctx.loaded_instruments.items())
@@ -107,7 +107,7 @@ def _extract_equipment(
             models.LoadedModule(
                 type=module.geometry.module_type.value,
                 model=module.geometry.model.value,
-                location=int(module.geometry.location.labware.first_parent()),
+                location=int(module.geometry.location.labware.first_parent()),  # type: ignore[arg-type]  # noqa: E501
             )
             for slot, module in sorted(ctx.loaded_modules.items())
         ],

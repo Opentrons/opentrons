@@ -161,7 +161,7 @@ class MagDeck(mod_abc.AbstractModule):
             log.error(f"bad revision: {revision}")
             return "magneticModuleV1"
         try:
-            revision_num = float(revision.split("v")[-1])  # type: ignore
+            revision_num = float(revision.split("v")[-1])
         except (ValueError, TypeError):
             log.exception("bad revision: {revision}")
             return "magneticModuleV1"

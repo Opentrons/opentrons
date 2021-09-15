@@ -1,6 +1,6 @@
 import logging
 import contextlib
-from typing import Set, Dict, Any, Union, List, TYPE_CHECKING
+from typing import Set, Dict, Any, Union, List, Optional, TYPE_CHECKING
 
 from opentrons.hardware_control import Pipette
 from opentrons.hardware_control.util import plan_arc
@@ -171,7 +171,7 @@ async def move(
 
 
 def get_reference_location(
-    deck: Deck, cal_block_target_well: labware.Well = None
+    deck: Deck, cal_block_target_well: Optional[labware.Well] = None
 ) -> Location:
     """
     Get location of static z reference point.

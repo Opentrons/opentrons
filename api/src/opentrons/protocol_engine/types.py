@@ -1,11 +1,10 @@
-"""Base protocol engine types and interfaces."""
+"""Public protocol engine value types and models."""
 from enum import Enum
 from dataclasses import dataclass
 from pydantic import BaseModel
 from typing import Union, Tuple
-from typing_extensions import final
 
-from opentrons.types import DeckSlotName
+from opentrons.types import MountType, DeckSlotName
 
 
 class EngineStatus(str, Enum):
@@ -31,7 +30,6 @@ LabwareLocation = Union[DeckSlotLocation]
 """Union of all legal labware locations."""
 
 
-@final
 class WellOrigin(str, Enum):
     """Origin of WellLocation offset."""
 
@@ -46,23 +44,17 @@ class WellLocation(BaseModel):
     offset: Tuple[float, float, float] = (0, 0, 0)
 
 
-class DeckLocation(BaseModel):
-    """A symbolic reference to a location on the deck.
-
-    Specified as the pipette, labware, and well. A `DeckLocation` may be
-    combined with a `WellLocation` to produce an absolute position in deck
-    coordinates.
-    """
-
-    pipette_id: str
-    labware_id: str
-    well_name: str
-
-
-@final
 @dataclass(frozen=True)
 class Dimensions:
     """Dimensions of an object in deck-space."""
+
+    x: float
+    y: float
+    z: float
+
+
+class CalibrationOffset(BaseModel):
+    """Calibration offset from nomimal to actual position."""
 
     x: float
     y: float
@@ -86,3 +78,20 @@ class PipetteName(str, Enum):
     P300_MULTI_GEN2 = "p300_multi_gen2"
     P1000_SINGLE = "p1000_single"
     P1000_SINGLE_GEN2 = "p1000_single_gen2"
+
+
+class LoadedPipette(BaseModel):
+    """A pipette that has been loaded."""
+
+    id: str
+    pipetteName: PipetteName
+    mount: MountType
+
+
+class LoadedLabware(BaseModel):
+    """A labware that has been loaded."""
+
+    id: str
+    loadName: str
+    definitionUri: str
+    location: LabwareLocation

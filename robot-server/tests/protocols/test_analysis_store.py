@@ -80,7 +80,7 @@ command_analysis_specs: List[CommandAnalysisSpec] = [
                 result=pe_commands.LoadLabwareResult.construct(
                     labwareId="labware-id",
                     definition=cast(LabwareDefinition, {}),
-                    calibration=(1, 2, 3),
+                    calibration=pe_types.CalibrationOffset(x=1, y=2, z=3),
                 ),
             )
         ],

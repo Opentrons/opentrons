@@ -55,13 +55,14 @@ class RobotServerSettings(BaseSettings):
         description="Unix file system path to serve on. This value supersedes"
         " the port and host name settings.",
     )
-    simulator_configuration_file_path: str = Field(
+    simulator_configuration_file_path: typing.Optional[str] = Field(
         None,
         description="Path to a json file that describes the hardware" " simulator.",
     )
 
     protocol_manager_max_protocols: int = Field(
-        1, description="The maximum number of protocols allowed for upload"
+        1,
+        description="The maximum number of protocols allowed for upload",
     )
 
     notification_server_subscriber_address: str = Field(

@@ -12,9 +12,9 @@ from opentrons.motion_planning import (
 )
 
 from .. import errors
-from ..types import WellLocation, DeckLocation
+from ..types import WellLocation
 from .labware import LabwareView
-from .pipettes import PipetteView
+from .pipettes import PipetteView, CurrentWell
 from .geometry import GeometryView
 
 
@@ -47,11 +47,11 @@ class MotionView:
     def get_pipette_location(
         self,
         pipette_id: str,
-        current_location: Optional[DeckLocation] = None,
+        current_well: Optional[CurrentWell] = None,
     ) -> PipetteLocationData:
         """Get the critical point of a pipette given the current location."""
-        current_loc = current_location or self._pipettes.get_current_deck_location()
-        pipette_data = self._pipettes.get_pipette_data_by_id(pipette_id)
+        current_well = current_well or self._pipettes.get_current_well()
+        pipette_data = self._pipettes.get(pipette_id)
 
         mount = pipette_data.mount
         critical_point = None
@@ -59,10 +59,11 @@ class MotionView:
         # if the pipette was last used to move to a labware that requires
         # centering, set the critical point to XY_CENTER
         if (
-            current_loc is not None
-            and current_loc.pipette_id == pipette_id
-            and self._labware.get_labware_has_quirk(
-                current_loc.labware_id, "centerMultichannelOnWells"
+            current_well is not None
+            and current_well.pipette_id == pipette_id
+            and self._labware.get_has_quirk(
+                current_well.labware_id,
+                "centerMultichannelOnWells",
             )
         ):
             critical_point = CriticalPoint.XY_CENTER
@@ -78,11 +79,11 @@ class MotionView:
         origin: Point,
         origin_cp: Optional[CriticalPoint],
         max_travel_z: float,
-        current_location: Optional[DeckLocation] = None,
+        current_well: Optional[CurrentWell] = None,
     ) -> List[Waypoint]:
         """Get the movement waypoints from an origin to a given location."""
-        location = current_location or self._pipettes.get_current_deck_location()
-        center_dest = self._labware.get_labware_has_quirk(
+        location = current_well or self._pipettes.get_current_well()
+        center_dest = self._labware.get_has_quirk(
             labware_id,
             "centerMultichannelOnWells",
         )
