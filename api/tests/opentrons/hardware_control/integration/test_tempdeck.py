@@ -5,7 +5,6 @@ from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.hardware_control import ExecutionManager
 from opentrons.hardware_control.emulation.app import TEMPDECK_PORT
 from opentrons.hardware_control.modules import TempDeck
-from opentrons.hardware_control.modules.tempdeck import TempdeckError
 
 
 @pytest.fixture
@@ -89,35 +88,6 @@ async def test_start_set_temperature_heat(tempdeck) -> None:
         "status": "holding at target",
         "data": {"currentTemp": new_temp, "targetTemp": new_temp},
     }
-
-
-@pytest.mark.parametrize(
-    argnames="start_temp,target_temp,await_temp",
-    argvalues=[
-        [20.0, 40.0, 41.0],
-        [20.0, 40.0, 19.0],
-        [50.0, 30.0, 25.0],
-        [50.0, 30.0, 55.0],
-    ],
-)
-async def test_invalid_await_temperature(
-    tempdeck, start_temp, target_temp, await_temp
-) -> None:
-    """It should raise error when awaiting an unreachable temperature."""
-    await tempdeck.start_set_temperature(start_temp)
-    await tempdeck.wait_next_poll()
-    # Get tempdeck to start_temp
-    await tempdeck.await_temperature(start_temp)
-
-    # Set new target and check that error is raised for all unreachable await temps
-    await tempdeck.start_set_temperature(target_temp)
-    with pytest.raises(
-        TempdeckError,
-        match=f"{await_temp} is unreachable"
-        f" with a target of {target_temp} when"
-        f" current temperature is {start_temp}",
-    ):
-        await tempdeck.await_temperature(awaiting_temperature=await_temp)
 
 
 async def test_deactivate(tempdeck) -> None:
