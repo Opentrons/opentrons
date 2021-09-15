@@ -214,6 +214,12 @@
             "markers": "python_version >= '3.5'",
             "version": "==0.19.0"
         },
+        "python-multipart": {
+            "hashes": [
+                "sha256:f7bb5f611fc600d15fa47b3974c8aa16e93724513b49b5f95c81e6624c83fa43"
+            ],
+            "version": "==0.0.5"
+        },
         "pyzmq": {
             "hashes": [
                 "sha256:00dca814469436455399660247d74045172955459c0bd49b54a540ce4d652185",

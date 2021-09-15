@@ -56,6 +56,7 @@ INSTALL_REQUIRES = [
     "anyio==3.3.0",
     "fastapi==0.68.1",
     "python-dotenv==0.19.0",
+    "python-multipart==0.0.5",
     "pydantic==1.8.2",
     "typing-extensions==3.10.0.0",
     "uvicorn==0.14.0",
