@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.6.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v4.5.0...v4.6.0-alpha.0) (2021-09-15)
+
+
+### Bug Fixes
+
+* **protocol-designer:** fix whitescreen when adding addtl temp steps ([#8181](https://github.com/Opentrons/opentrons/issues/8181)) ([34dbc35](https://github.com/Opentrons/opentrons/commit/34dbc351f4e1d8039878e9485685f2b508a88f17)), closes [#7819](https://github.com/Opentrons/opentrons/issues/7819)
+
+
+### Features
+
+* **app:** add labware setup step to protocol setup flow ([#8172](https://github.com/Opentrons/opentrons/issues/8172)) ([e33deb7](https://github.com/Opentrons/opentrons/commit/e33deb7ca641900196dbc6c8edff0bea7e14343e)), closes [#7665](https://github.com/Opentrons/opentrons/issues/7665)
+
+
+
+
+
 # [4.5.0](https://github.com/Opentrons/opentrons/compare/v4.4.0...v4.5.0) (2021-08-03)
 
 **Note:** Version bump only for package protocol-designer

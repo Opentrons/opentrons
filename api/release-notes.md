@@ -6,24 +6,44 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
-# OT-2 Software Changes in 4.5.0
+# OT-2 Software Changes in 4.6.0
+
+## New Features
+
+- The `opentrons_simulate` command-line application can now estimate protocol duration using the `-e` option. This feature is experimental, but very cool!
+
+## Bug Fixes
+
+- If a protocol is canceled mid-run while there is a tip on a pipette, the tip will be dropped prior to resetting the plunger to avoid contaminating the pipette internals with liquids.
+- Fixed a movement planning issue that could cause multi-channel pipettes to collide with the deck when changing pipettes.
+- Fixed an issue that could cause the protocol to proceed before an awaited temperature module target was actually hit.
+- Fixed a few issues with the faster protocol analysis method added in the 4.5.0 release.
+- Fixed type annotations of the `ProtocolContext` classes.
+
+## Known Issues
+
+In 4.6.0 and previous releases, the OT-2 will only use TLS 1.0 for WPA2 Enterprise association. Some RADIUS servers have disabled this version of TLS; it must be enabled to connect the OT-2 to a RADIUS-secured network.
+
+---
+
+## OT-2 Software Changes in 4.5.0
 
 The 4.5.0 release of the OT-2 Software improves the speed of protocol uploads and fixes a handful of regressions and bugs.
 
-## New Features
+### New Features
 
 - The OT-2 now uses a faster analysis method on protocol upload
   - Thanks to everyone who beta tested this feature over the last few months!
   - You may revert to the old analysis method with the **Use Older Protocol Analysis Method** in your OT-2's advanced settings
   - If you encounter any issues (e.g. protocol run errors not caught during upload) please reach out to Opentrons Support or [open an issue][] in GitHub so we can continue to improve this feature
 
-## Bug Fixes
+### Bug Fixes
 
 - Fixed a regression that prevented use of OT-2 Modules in Jupyter notebook ([#8009][])
 - Fixed an uncaught import error on macOS and Windows ([#8154][], thanks to [Maksim Rakitin][] for the fix!)
 - Fixed a crash caused by invalid calibration data ([#7962][])
 
-## Known Issues
+### Known Issues
 
 In 4.5.0 and previous releases, the OT-2 will only use TLS 1.0 for WPA2 Enterprise association. Some RADIUS servers have disabled this version of TLS; it must be enabled to connect the OT-2 to a RADIUS-secured network.
 

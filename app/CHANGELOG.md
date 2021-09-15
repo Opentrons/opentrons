@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.6.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v4.5.0...v4.6.0-alpha.0) (2021-09-15)
+
+
+### Bug Fixes
+
+* **api:** drop tip after cancel ([#8229](https://github.com/Opentrons/opentrons/issues/8229)) ([bb44718](https://github.com/Opentrons/opentrons/commit/bb447184b97f7607604eb79a4cdad942a9366bc1))
+
+
+### Features
+
+* **app:** add id attributes for e2e testing ([#8262](https://github.com/Opentrons/opentrons/issues/8262)) ([9d4274c](https://github.com/Opentrons/opentrons/commit/9d4274c565a43ddaeb748752ea17afa8c90a6fe0))
+* **app:** add labware setup step to protocol setup flow ([#8172](https://github.com/Opentrons/opentrons/issues/8172)) ([e33deb7](https://github.com/Opentrons/opentrons/commit/e33deb7ca641900196dbc6c8edff0bea7e14343e)), closes [#7665](https://github.com/Opentrons/opentrons/issues/7665)
+* **app:** add module attention warning to labware setup  ([#8230](https://github.com/Opentrons/opentrons/issues/8230)) ([618161c](https://github.com/Opentrons/opentrons/commit/618161c74e582845d5907e9368c199396486ed6f))
+* **app:** add module setup step to protocol setup ([#8224](https://github.com/Opentrons/opentrons/issues/8224)) ([2b9e77c](https://github.com/Opentrons/opentrons/commit/2b9e77cc0644b8582ceb84764f073f260bdc8c2c))
+* **app:** establish logic for labware position check ([#8246](https://github.com/Opentrons/opentrons/issues/8246)) ([9bf7f61](https://github.com/Opentrons/opentrons/commit/9bf7f615660d5949d47b7c410580cf5394011c29))
+* **app:** gather all protocol and calibration data  ([#8182](https://github.com/Opentrons/opentrons/issues/8182)) ([31b8df5](https://github.com/Opentrons/opentrons/commit/31b8df583f23f79829e2e046b6db11c123acf4dc)), closes [#8097](https://github.com/Opentrons/opentrons/issues/8097)
+* **app:** usb connection and moam modal functionality in module setup ([#8257](https://github.com/Opentrons/opentrons/issues/8257)) ([da516da](https://github.com/Opentrons/opentrons/commit/da516da0cfc6d8a88372f9282d9899d632a5eba4))
+
+
+
+
+
 # [4.5.0](https://github.com/Opentrons/opentrons/compare/v4.4.0...v4.5.0) (2021-08-03)
 
 
