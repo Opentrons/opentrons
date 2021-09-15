@@ -6,11 +6,11 @@ import codecs
 import os
 import os.path
 from setuptools import setup, find_packages
-from python_build_utils import normalize_version
-
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 sys.path.append(os.path.join(HERE, "..", "scripts"))
+
+from python_build_utils import normalize_version  # noqa: E402
 
 
 def get_version() -> str:

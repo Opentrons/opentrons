@@ -8,14 +8,14 @@ SHX := npx shx
 # Find the version of the wheel from package.json using a helper script. We
 # use python here so we can use the same version normalization that will be
 # used to create the wheel.
-wheel_file = dist/$(call python_get_wheelname,api,opentrons-hardware,$(BUILD_NUMBER))
+wheel_file = dist/$(call python_get_wheelname,hardware,opentrons_hardware,$(BUILD_NUMBER))
 
 # These variables can be overriden when make is invoked to customize the
 # behavior of pytest. For instance,
 # make test tests=tests/opentrons/tools/test_pipette_memory.py would run only the
 # specified test
 tests ?= tests
-test_opts ?=  --cov=hardware --cov-report term-missing:skip-covered --cov-report xml:coverage.xml
+test_opts ?=  --cov=opentrons_hardware --cov-report term-missing:skip-covered --cov-report xml:coverage.xml
 
 # These variables must be overridden when make deploy or make deploy-staging is run
 # to set the auth details for pypi
@@ -32,7 +32,7 @@ twine_repository_url ?= $(pypi_test_upload_url)
 
 # Source discovery
 # For the python sources
-ot_py_sources := $(filter %.py,$(shell $(SHX) find hardware/))
+ot_py_sources := $(filter %.py,$(shell $(SHX) find opentrons_hardware/))
 ot_sources := $(ot_py_sources)
 
 # Defined separately than the clean target so the wheel file doesn’t have to
@@ -52,7 +52,7 @@ setup:
 teardown:
 	$(pipenv) --rm
 
-dist/opentrons-hardware-%-py2.py3-none-any.whl: setup.py $(ot_sources)
+dist/opentrons_hardware-%-py2.py3-none-any.whl: setup.py $(ot_sources)
 	$(clean_cmd)
 	$(python) setup.py $(wheel_opts) bdist_wheel
 	$(SHX) rm -rf build
@@ -66,13 +66,13 @@ test:
 
 .PHONY: lint
 lint:
-	$(python) -m mypy hardware tests
-	$(python) -m black --check hardware tests setup.py
-	$(python) -m flake8 hardware tests setup.py
+	$(python) -m mypy opentrons_hardware tests
+	$(python) -m black --check opentrons_hardware tests setup.py
+	$(python) -m flake8 opentrons_hardware tests setup.py
 
 .PHONY: format
 format:
-	$(python) -m black hardware tests setup.py
+	$(python) -m black opentrons_hardware tests setup.py
 
 # launch hardware controller in dev mode
 .PHONY: dev
