@@ -17,6 +17,9 @@ on:
       - '.github/workflows/g-code-confirm-tests.yaml'
     branches:
       - '*'
+  create:
+    tags:
+      - 'v*'
 
   workflow_dispatch:
 
