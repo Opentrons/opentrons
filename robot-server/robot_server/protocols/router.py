@@ -118,7 +118,7 @@ async def create_protocol(
     # Reset them so that if protocol_store.create() reads them again,
     # it will correctly start from the beginning.
     for file in files:
-        file.seek(0)
+        await file.seek(0)
 
     try:
         protocol_resource = await protocol_store.create(
