@@ -163,7 +163,9 @@ describe('RunSetupCard', () => {
       getByRole('heading', {
         name: 'Robot Calibration',
       })
-      getByText('Mock Robot Calibration')
+      getByText(
+        'Review required pipettes and tip length calibrations for this protocol.'
+      )
     })
     it('renders calibration needed when robt cal not complete', () => {
       mockGetProtocolCalibrationComplete.mockReturnValue({ complete: false })

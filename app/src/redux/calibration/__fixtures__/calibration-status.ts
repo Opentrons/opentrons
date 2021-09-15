@@ -6,7 +6,11 @@ import {
 import { CALIBRATION_STATUS_PATH, DECK_CAL_STATUS_IDENTITY } from '../constants'
 
 import type { ResponseFixtures } from '../../robot-api/__fixtures__'
-import type { CalibrationStatus, ProtocolCalibrationStatus } from '../types'
+import type {
+  CalibrationStatus,
+  ProtocolCalibrationStatus,
+  DeckCalibrationInfo,
+} from '../types'
 
 export const mockCalibrationStatus: CalibrationStatus = {
   deckCalibration: {
@@ -62,4 +66,23 @@ export const {
 export const mockProtocolCalibrationComplete: ProtocolCalibrationStatus = {
   complete: false,
   reason: 'calibrate_deck_failure_reason',
+}
+
+export const mockDeckCalData: DeckCalibrationInfo = {
+  type: 'affine',
+  matrix: [
+    [1.0, 0.0, 0.0, 0.0],
+    [0.0, 1.0, 0.0, 0.0],
+    [0.0, 0.0, 1.0, 0.0],
+    [0.0, 0.0, 0.0, 1.0],
+  ],
+  lastModified: 'September 15, 2021',
+  pipetteCalibratedWith: null,
+  tiprack: null,
+  source: 'user',
+  status: {
+    markedBad: false,
+    source: 'unknown',
+    markedAt: '',
+  },
 }
