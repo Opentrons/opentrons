@@ -1,13 +1,4 @@
 import boto3
-import pytest
-import asyncio
-
-from opentrons import ThreadManager
-
-from robot_server.service.legacy.routers.control import post_home_robot  # type: ignore
-from robot_server.service.legacy.models.control import RobotHomeTarget  # type: ignore
-from robot_server.service.dependencies import get_motion_lock  # type: ignore
-
 
 BUCKET_NAME = "g-code-comparison"
 

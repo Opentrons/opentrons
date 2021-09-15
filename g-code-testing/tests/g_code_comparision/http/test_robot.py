@@ -2,9 +2,6 @@ from typing import Callable
 
 import pytest
 import asyncio
-
-from opentrons import ThreadManager
-
 from robot_server.service.legacy.routers.control import (
     post_home_robot,
     post_move_robot,
