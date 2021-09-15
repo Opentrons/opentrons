@@ -1,0 +1,111 @@
+name: "G-Code-Confirm"
+
+on:
+  # Run on any change to the api directory
+  pull_request:
+    paths:
+      - 'api/**'
+      - 'g-code-testing/**'
+      - 'Makefile'
+    branches:
+      - '*'
+  push:
+    paths:
+      - 'api/**'
+      - 'g-code-testing/**'
+      - 'Makefile'
+    branches:
+      - '*'
+
+  workflow_dispatch:
+
+jobs:
+  confirm-g-code-2-modules:
+    name: 'Confirm G-Code (2 Modules)'
+    runs-on: 'ubuntu-18.04'
+    steps:
+      - uses: 'actions/checkout@v2'
+      - uses: 'actions/setup-node@v1'
+        with:
+          node-version: '12'
+      - uses: 'actions/setup-python@v2'
+        with:
+          python-version: '3.7'
+      - uses: './.github/actions/python/setup'
+        with:
+          project: 'g-code-testing'
+
+      - name: 'Run & Compare to S3'
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.S3_APP_DEPLOY_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_APP_DEPLOY_SECRET }}
+          AWS_DEFAULT_REGION: us-east-2
+        run: make -C g-code-testing test-2-modules
+
+  confirm-g-code-swift-smoke:
+    name: 'Confirm G-Code (Swift Smoke)'
+    runs-on: 'ubuntu-18.04'
+    steps:
+      - uses: 'actions/checkout@v2'
+      - uses: 'actions/setup-node@v1'
+        with:
+          node-version: '12'
+      - uses: 'actions/setup-python@v2'
+        with:
+          python-version: '3.7'
+      - uses: './.github/actions/python/setup'
+        with:
+          project: 'g-code-testing'
+
+      - name: 'Run & Compare to S3'
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.S3_APP_DEPLOY_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_APP_DEPLOY_SECRET }}
+          AWS_DEFAULT_REGION: us-east-2
+        run: make -C g-code-testing test-swift-smoke
+
+  confirm-g-code-swift-turbo:
+    name: 'Confirm G-Code (Swift Turbo)'
+    runs-on: 'ubuntu-18.04'
+    steps:
+      - uses: 'actions/checkout@v2'
+      - uses: 'actions/setup-node@v1'
+        with:
+          node-version: '12'
+      - uses: 'actions/setup-python@v2'
+        with:
+          python-version: '3.7'
+      - uses: './.github/actions/python/setup'
+        with:
+          project: 'g-code-testing'
+
+      - name: 'Run & Compare to S3'
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.S3_APP_DEPLOY_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_APP_DEPLOY_SECRET }}
+          AWS_DEFAULT_REGION: us-east-2
+        run: make -C g-code-testing test-swift-turbo
+
+  confirm-g-code-fast-tests:
+    name: 'Confirm G-Code (Fast Tests)'
+    runs-on: 'ubuntu-18.04'
+    steps:
+      - uses: 'actions/checkout@v2'
+      - uses: 'actions/setup-node@v1'
+        with:
+          node-version: '12'
+      - uses: 'actions/setup-python@v2'
+        with:
+          python-version: '3.7'
+      - uses: './.github/actions/python/setup'
+        with:
+          project: 'g-code-testing'
+
+      - name: 'Run & Compare to S3'
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.S3_APP_DEPLOY_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_APP_DEPLOY_SECRET }}
+          AWS_DEFAULT_REGION: us-east-2
+        run: make -C g-code-testing test-g-code-fast
+
+
