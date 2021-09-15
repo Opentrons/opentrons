@@ -19,7 +19,7 @@ on:
       - '*'
   create:
     tags:
-      - 'p*'
+      - 'v*'
 
   workflow_dispatch:
 
