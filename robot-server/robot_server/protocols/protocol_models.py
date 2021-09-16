@@ -57,8 +57,6 @@ class Protocol(ResourceModel):
         ),
     )
 
-    # todo(mm, 2021-09-07): Should this be exposed to clients? We don't expose Python
-    # apiLevel.
     protocolType: ProtocolFileType = Field(
         ...,
         description="The type of protocol file (JSON or Python).",
