@@ -6,11 +6,13 @@ upgrades dont start at the same time,
 token assignment, etc
 """
 
-import asyncio
 import functools
 import logging
-# from openembedded
+from openembedded_server.update import session_from_request, config
 
+from aiohttp import web
+
+SESSION_VARNAME = 'OT3' + 'session'
 LOG = logging.getLogger(__name__)
 
 
@@ -19,7 +21,7 @@ def active_session_check(handler):
         start a new one if not present
     """
     @functools.wraps(handler)
-    async def decorated(request: web.Request) -> web.Response:
+    def decorated(request: web.Request) -> web.Response:
         if session_from_request(request) is None:
             LOG.warning("check_session: active session exists!")
             return web.json_response(
@@ -31,6 +33,7 @@ def active_session_check(handler):
             pass
     return decorated
 
+
 def start_session(handler):
     """ decorator to start new session
         add active_session_check decorator
@@ -38,7 +41,7 @@ def start_session(handler):
         session on top of an one
     """
     @functools.wraps(handler)
-    async def decorated(request: web.Request) -> web.Response:
+    def decorated(request: web.Request) -> web.Response:
         session = handler(
             config.config_from_request(request).download_storage_path)
         request.app[SESSION_VARNAME] = session
