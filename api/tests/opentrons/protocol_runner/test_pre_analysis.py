@@ -5,6 +5,7 @@ from json import dumps as json_dumps
 from pathlib import Path
 from textwrap import dedent
 from typing import Generator
+from typing_extensions import Literal
 
 import pytest
 
@@ -29,11 +30,13 @@ from opentrons.protocol_runner.pre_analysis import (
 )
 
 
-def _make_minimal_json_protocol(metadata: JsonProtocolMetadata) -> JsonProtocol:
+def _make_minimal_json_protocol(
+    schema_version: Literal[1, 2, 3, 4, 5], metadata: JsonProtocolMetadata
+) -> JsonProtocol:
     return JsonProtocol(
         # schemaVersion is arbitrary. Currently (2021-06-28), the model
         # isn't smart enough to validate differently depending on this field.
-        schemaVersion=5,
+        schemaVersion=schema_version,
         metadata=metadata,
         robot=JsonProtocolRobot(model="OT-2 Standard"),
         pipettes={},
@@ -56,11 +59,12 @@ def _input_file(
 def test_json_pre_analysis(tmp_path: Path) -> None:
     """It should identify the protocol as JSON and extract its metadata."""
     input_protocol_dict = _make_minimal_json_protocol(
+        schema_version=5,
         metadata=JsonProtocolMetadata(
             author="Dr. Sy N. Tist",
             tags=["tag1", "tag2"],
             created=123.456,
-        )
+        ),
     ).dict(exclude_unset=True)
     # exclude_unset=True prevents Pydantic from auto-filling metadata fields that the
     # model has but that we omit here (like metadata.lastModified) with the value None.
@@ -88,7 +92,7 @@ def test_json_pre_analysis(tmp_path: Path) -> None:
         tmp_path, "My JSON Protocol.json", json_dumps(input_protocol_dict)
     ) as protocol_file:
         result = PreAnalyzer().analyze([protocol_file])
-        assert result == JsonPreAnalysis(expected_metadata)
+        assert result == JsonPreAnalysis(schema_version=5, metadata=expected_metadata)
 
 
 def test_python_pre_analysis(tmp_path: Path) -> None:

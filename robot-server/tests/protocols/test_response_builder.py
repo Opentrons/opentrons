@@ -21,7 +21,7 @@ def test_create_single_json_file_response() -> None:
     protocol_resource = ProtocolResource(
         protocol_id="protocol-id",
         protocol_type=ProtocolFileType.JSON,
-        pre_analysis=JsonPreAnalysis(metadata=metadata_as_dict),
+        pre_analysis=JsonPreAnalysis(schema_version=123, metadata=metadata_as_dict),
         created_at=datetime(year=2021, month=1, day=1),
         files=[],
     )

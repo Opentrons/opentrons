@@ -84,7 +84,10 @@ def _analyze_json(main_file: InputFile) -> "JsonPreAnalysis":
     except PydanticValidationError as exception:
         raise JsonSchemaValidationError() from exception
 
-    return JsonPreAnalysis(parsed_protocol.metadata.dict(exclude_unset=True))
+    return JsonPreAnalysis(
+        parsed_protocol.metadata.dict(exclude_unset=True),
+        parsed_protocol.schemaVersion,
+    )
 
 
 # todo(mm, 2021-09-13): Deduplicate with opentrons.protocols.parse.
@@ -151,6 +154,7 @@ class JsonPreAnalysis:
     """A pre-analysis of a JSON protocol."""
 
     metadata: Metadata
+    schema_version: int
 
 
 class NotPreAnalyzableError(Exception):

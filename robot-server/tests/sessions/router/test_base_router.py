@@ -142,7 +142,7 @@ async def test_create_protocol_session(
     protocol_resource = ProtocolResource(
         protocol_id="protocol-id",
         protocol_type=ProtocolFileType.JSON,
-        pre_analysis=JsonPreAnalysis(metadata={}),
+        pre_analysis=JsonPreAnalysis(schema_version=123, metadata={}),
         created_at=datetime.now(),
         files=[],
     )

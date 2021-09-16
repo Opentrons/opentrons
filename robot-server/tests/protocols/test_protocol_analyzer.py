@@ -48,7 +48,7 @@ async def test_analyze(
     protocol_resource = ProtocolResource(
         protocol_id="protocol-id",
         protocol_type=ProtocolFileType.JSON,
-        pre_analysis=JsonPreAnalysis(metadata={}),
+        pre_analysis=JsonPreAnalysis(schema_version=123, metadata={}),
         created_at=datetime(year=2021, month=1, day=1),
         files=[],
     )
@@ -107,7 +107,7 @@ async def test_analyze_error(
     protocol_resource = ProtocolResource(
         protocol_id="protocol-id",
         protocol_type=ProtocolFileType.JSON,
-        pre_analysis=JsonPreAnalysis(metadata={}),
+        pre_analysis=JsonPreAnalysis(schema_version=123, metadata={}),
         created_at=datetime(year=2021, month=1, day=1),
         files=[],
     )

@@ -64,7 +64,9 @@ async def test_create_and_get_json_protocol(
 ) -> None:
     """It should save a single protocol to disk."""
     created_at = datetime.now()
-    pre_analysis = JsonPreAnalysis(metadata={"this_is_fake_metadata": True})
+    pre_analysis = JsonPreAnalysis(
+        schema_version=123, metadata={"this_is_fake_metadata": True}
+    )
 
     creation_result = await subject.create(
         protocol_id="protocol-id",
@@ -132,7 +134,7 @@ async def test_create_protocol_raises_for_missing_filename(
             protocol_id="protocol-id",
             created_at=created_at,
             files=[invalid_file],
-            pre_analysis=JsonPreAnalysis(metadata={}),
+            pre_analysis=JsonPreAnalysis(schema_version=123, metadata={}),
         )
 
 
@@ -158,7 +160,9 @@ async def test_get_all_protocols(
         protocol_id="protocol-id-1",
         created_at=created_at_1,
         files=upload_files,
-        pre_analysis=JsonPreAnalysis(metadata={"protocol1Metadata": "hello"}),
+        pre_analysis=JsonPreAnalysis(
+            schema_version=123, metadata={"protocol1Metadata": "hello"}
+        ),
     )
 
     # The first subject.create() may have read the upload files.
@@ -170,7 +174,9 @@ async def test_get_all_protocols(
         protocol_id="protocol-id-2",
         created_at=created_at_2,
         files=upload_files,
-        pre_analysis=JsonPreAnalysis(metadata={"protocol2Metadata": "hello"}),
+        pre_analysis=JsonPreAnalysis(
+            schema_version=123, metadata={"protocol2Metadata": "hello"}
+        ),
     )
 
     result = subject.get_all()
@@ -181,14 +187,18 @@ async def test_get_all_protocols(
             protocol_type=ProtocolFileType.JSON,
             created_at=created_at_1,
             files=matchers.Anything(),
-            pre_analysis=JsonPreAnalysis(metadata={"protocol1Metadata": "hello"}),
+            pre_analysis=JsonPreAnalysis(
+                schema_version=123, metadata={"protocol1Metadata": "hello"}
+            ),
         ),
         ProtocolResource(
             protocol_id="protocol-id-2",
             protocol_type=ProtocolFileType.JSON,
             created_at=created_at_2,
             files=matchers.Anything(),
-            pre_analysis=JsonPreAnalysis(metadata={"protocol2Metadata": "hello"}),
+            pre_analysis=JsonPreAnalysis(
+                schema_version=123, metadata={"protocol2Metadata": "hello"}
+            ),
         ),
     ]
 
@@ -205,7 +215,7 @@ async def test_remove_protocol(
         protocol_id="protocol-id",
         created_at=created_at,
         files=[json_upload_file],
-        pre_analysis=JsonPreAnalysis(metadata={}),
+        pre_analysis=JsonPreAnalysis(schema_version=123, metadata={}),
     )
 
     result = subject.remove("protocol-id")

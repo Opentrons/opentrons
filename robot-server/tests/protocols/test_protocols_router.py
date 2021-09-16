@@ -76,7 +76,7 @@ async def test_get_protocols(
         protocol_id="123",
         created_at=created_at_2,
         protocol_type=ProtocolFileType.JSON,
-        pre_analysis=JsonPreAnalysis(metadata={}),
+        pre_analysis=JsonPreAnalysis(schema_version=123, metadata={}),
         files=[],
     )
 
@@ -197,7 +197,7 @@ async def test_create_protocol(
 ) -> None:
     """It should store an uploaded protocol file."""
     metadata_as_dict = {"this_is_fake_metadata": True}
-    pre_analysis = JsonPreAnalysis(metadata_as_dict)
+    pre_analysis = JsonPreAnalysis(schema_version=123, metadata=metadata_as_dict)
     protocol_resource = ProtocolResource(
         protocol_id="protocol-id",
         protocol_type=ProtocolFileType.JSON,
@@ -286,7 +286,7 @@ async def test_create_protocol_invalid_file(
 ) -> None:
     """It should 400 if the file is rejected by the protocol store."""
     decoy.when(pre_analyzer.analyze(matchers.Anything())).then_return(
-        JsonPreAnalysis(metadata={})
+        JsonPreAnalysis(schema_version=123, metadata={})
     )
 
     decoy.when(
@@ -294,7 +294,7 @@ async def test_create_protocol_invalid_file(
             protocol_id=unique_id,
             created_at=current_time,
             files=[matchers.IsA(UploadFile, {"filename": "foo.json"})],
-            pre_analysis=JsonPreAnalysis(metadata={}),
+            pre_analysis=JsonPreAnalysis(schema_version=123, metadata={}),
         )
     ).then_raise(ProtocolFileInvalidError("oh no"))
 
