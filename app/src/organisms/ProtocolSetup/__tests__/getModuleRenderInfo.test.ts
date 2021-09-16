@@ -1,6 +1,6 @@
 import _protocolWithMagTempTC from '@opentrons/shared-data/protocol/fixtures/4/transferSettings.json'
 import _standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
-import { getModuleRenderInfo } from '../../../utils/getModuleRenderInfo'
+import { getModuleRenderInfo } from '../utils/getModuleRenderInfo'
 import {
   getModuleDef2,
   JsonProtocolFile,
