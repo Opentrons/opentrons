@@ -145,6 +145,7 @@ export function DeckCalibration(props: Props): JSX.Element | null {
                   onClick={() => setHelpModalIsOpen(false)}
                   width={SIZE_4}
                   backgroundColor={C_BLUE}
+                  name="close"
                 >
                   {t('shared:close')}
                 </PrimaryBtn>
