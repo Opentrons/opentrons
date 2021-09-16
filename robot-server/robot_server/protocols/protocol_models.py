@@ -40,6 +40,7 @@ class Metadata(BaseModel):
 
     class Config:
         """Tell Pydantic that metadata objects can have arbitrary fields."""
+
         extra = Extra.allow
 
 
