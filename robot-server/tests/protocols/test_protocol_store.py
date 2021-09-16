@@ -1,7 +1,7 @@
 """Tests for the ProtocolStore interface."""
 import pytest
 from datetime import datetime
-from decoy import Decoy, matchers
+from decoy import matchers
 from pathlib import Path
 from fastapi import UploadFile
 from typing import Iterator, List
@@ -57,7 +57,6 @@ def subject(tmp_path: Path) -> ProtocolStore:
 
 
 async def test_create_and_get_json_protocol(
-    decoy: Decoy,
     tmp_path: Path,
     upload_files: List[UploadFile],
     subject: ProtocolStore,
@@ -88,7 +87,6 @@ async def test_create_and_get_json_protocol(
 
 
 async def test_create_and_get_python_protocol(
-    decoy: Decoy,
     tmp_path: Path,
     upload_files: List[UploadFile],
     subject: ProtocolStore,
