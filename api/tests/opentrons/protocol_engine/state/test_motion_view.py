@@ -6,7 +6,7 @@ from typing import Optional
 
 from opentrons.types import Point, MountType
 from opentrons.hardware_control.types import CriticalPoint
-from opentrons.protocols.geometry.planning import MoveType, get_waypoints
+from opentrons.motion_planning import MoveType, get_waypoints
 
 from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.types import (

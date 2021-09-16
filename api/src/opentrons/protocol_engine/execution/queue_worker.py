@@ -28,7 +28,7 @@ class QueueWorker:
         """
         self._state_store: StateStore = state_store
         self._command_executor: CommandExecutor = command_executor
-        self._worker_task: Optional[asyncio.Task] = None
+        self._worker_task: Optional["asyncio.Task[None]"] = None
 
     def start(self) -> None:
         """Start processing jobs.

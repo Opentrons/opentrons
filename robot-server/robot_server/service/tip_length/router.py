@@ -1,5 +1,6 @@
 from starlette import status
 from fastapi import APIRouter
+from typing import Optional
 
 from opentrons.calibration_storage import (
     types as cal_types,
@@ -42,7 +43,9 @@ def _format_calibration(
     response_model=tl_models.MultipleCalibrationsResponse,
 )
 async def get_all_tip_length_calibrations(
-    tiprack_hash: str = None, pipette_id: str = None, tiprack_uri: str = None
+    tiprack_hash: Optional[str] = None,
+    pipette_id: Optional[str] = None,
+    tiprack_uri: Optional[str] = None,
 ) -> tl_models.MultipleCalibrationsResponse:
     all_calibrations = get_cal.get_all_tip_length_calibrations()
 

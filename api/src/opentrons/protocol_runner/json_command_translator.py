@@ -1,5 +1,5 @@
 """Translation of JSON protocol commands into ProtocolEngine commands."""
-from typing import Dict, List
+from typing import Dict, List, cast
 
 from opentrons.types import DeckSlotName, MountType
 from opentrons.protocols import models
@@ -52,7 +52,7 @@ class JsonCommandTranslator:
     ) -> pe_commands.CommandRequest:
         try:
             h = self._COMMAND_TO_NAME[command.command]
-            return getattr(self, h)(command)
+            return cast(pe_commands.CommandRequest, getattr(self, h)(command))
         except KeyError:
             raise CommandTranslatorError(f"'{command.command}' is not recognized.")
         except AttributeError:

@@ -1,9 +1,11 @@
+from __future__ import annotations
 import hashlib
 from dataclasses import dataclass
 from fastapi import UploadFile
 from functools import wraps
 from pathlib import Path
-from typing import cast, Any, Awaitable, Callable, TypeVar
+from types import TracebackType
+from typing import cast, Any, Awaitable, Callable, Optional, Type, TypeVar
 from typing_extensions import Final
 
 from opentrons.util.helpers import utc_now
@@ -12,11 +14,16 @@ from opentrons.util.helpers import utc_now
 class duration:
     """Context manager to mark start and end times of a block"""
 
-    def __enter__(self):
+    def __enter__(self) -> duration:
         self.start = utc_now()
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
+    ) -> None:
         self.end = utc_now()
 
 
@@ -56,7 +63,7 @@ def call_once(fn: AsyncFuncT) -> AsyncFuncT:
     """
 
     @wraps(fn)
-    async def wrapped(*args, **kwargs):
+    async def wrapped(*args: Any, **kwargs: Any) -> Any:
         if not hasattr(wrapped, CALL_ONCE_RESULT_ATTR):
             result = await fn(*args, **kwargs)
             setattr(wrapped, CALL_ONCE_RESULT_ATTR, result)

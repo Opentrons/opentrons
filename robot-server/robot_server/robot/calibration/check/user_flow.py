@@ -1,5 +1,5 @@
 import logging
-from typing import List, Optional, Tuple, Awaitable, Callable, Dict, Any, TYPE_CHECKING
+from typing import List, Optional, Tuple, Awaitable, Callable, Dict, Any
 from typing_extensions import Literal
 
 from opentrons.calibration_storage import get, helpers, modify, types as cal_types
@@ -20,6 +20,8 @@ from opentrons.protocol_api import labware
 from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
 from opentrons.config import feature_flags as ff
 from opentrons.protocols.geometry.deck import Deck
+
+from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 from robot_server.robot.calibration.constants import (
     SHORT_TRASH_DECK,
@@ -68,9 +70,6 @@ from .constants import (
 )
 from ..errors import CalibrationError
 
-if TYPE_CHECKING:
-    from opentrons_shared_data.labware import LabwareDefinition
-
 MODULE_LOG = logging.getLogger(__name__)
 
 """
@@ -89,7 +88,7 @@ class CheckCalibrationUserFlow:
         self,
         hardware: "ThreadManager",
         has_calibration_block: bool = False,
-        tip_rack_defs: Optional[List["LabwareDefinition"]] = None,
+        tip_rack_defs: Optional[List[LabwareDefinition]] = None,
     ):
         self._hardware = hardware
         self._state_machine = CalibrationCheckStateMachine()
@@ -115,7 +114,7 @@ class CheckCalibrationUserFlow:
         ) = self._get_current_calibrations()
         self._check_valid_calibrations()
 
-        self._tip_racks: Optional[List["LabwareDefinition"]] = tip_rack_defs
+        self._tip_racks: Optional[List[LabwareDefinition]] = tip_rack_defs
         self._active_pipette, self._pip_info = self._select_starting_pipette()
 
         self._has_calibration_block = has_calibration_block
@@ -196,10 +195,10 @@ class CheckCalibrationUserFlow:
         return self._get_hw_pipettes()[0]
 
     @property
-    def supported_commands(self) -> List:
+    def supported_commands(self) -> List[str]:
         return self._supported_commands.supported()
 
-    async def transition(self, tiprackDefinition: Optional[dict] = None):
+    async def transition(self, tiprackDefinition: Optional[LabwareDefinition] = None):
         pass
 
     async def change_active_pipette(self):
@@ -375,7 +374,10 @@ class CheckCalibrationUserFlow:
                 flow="Calibration Health Check",
             )
 
-    async def get_current_point(self, critical_point: CriticalPoint = None) -> Point:
+    async def get_current_point(
+        self,
+        critical_point: Optional[CriticalPoint] = None,
+    ) -> Point:
         return await self._hardware.gantry_position(self.mount, critical_point)
 
     def _get_pipette_by_rank(self, rank: PipetteRank) -> Optional[PipetteInfo]:
@@ -387,7 +389,7 @@ class CheckCalibrationUserFlow:
     def _is_checking_both_mounts(self):
         return len(self._pip_info) == 2
 
-    def _get_volume_from_tiprack_def(self, tip_rack_def: "LabwareDefinition") -> float:
+    def _get_volume_from_tiprack_def(self, tip_rack_def: LabwareDefinition) -> float:
         first_well = tip_rack_def["wells"]["A1"]
         return float(first_well["totalLiquidVolume"])
 
@@ -399,7 +401,9 @@ class CheckCalibrationUserFlow:
             )
 
     def _get_stored_pipette_offset_cal(
-        self, pipette: Pipette = None, mount: Mount = None
+        self,
+        pipette: Optional[Pipette] = None,
+        mount: Optional[Mount] = None,
     ) -> PipetteOffsetByPipetteMount:
         if not pipette or not mount:
             pip_offset = get.get_pipette_offset(
@@ -414,7 +418,7 @@ class CheckCalibrationUserFlow:
 
     @staticmethod
     def _get_tr_lw(
-        tip_rack_def: Optional["LabwareDefinition"],
+        tip_rack_def: Optional[LabwareDefinition],
         existing_calibration: PipetteOffsetByPipetteMount,
         volume: float,
         position: Location,
@@ -532,7 +536,7 @@ class CheckCalibrationUserFlow:
                 rank=info_pip.rank.value,
                 mount=str(info_pip.mount),
                 serial=hw_pip.pipette_id,  # type: ignore[arg-type]
-                defaultTipracks=info_pip.default_tipracks,  # type: ignore[arg-type]
+                defaultTipracks=info_pip.default_tipracks,
             )
             for hw_pip, info_pip in zip(hw_pips, info_pips)
         ]
@@ -555,7 +559,7 @@ class CheckCalibrationUserFlow:
             rank=self.active_pipette.rank.value,
             mount=str(self.mount),
             serial=self.hw_pipette.pipette_id,  # type: ignore[arg-type]
-            defaultTipracks=self.active_pipette.default_tipracks,  # type: ignore[arg-type]  # noqa: E501
+            defaultTipracks=self.active_pipette.default_tipracks,
         )
 
     def _determine_threshold(self) -> Point:

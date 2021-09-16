@@ -1,7 +1,7 @@
 from typing import Dict, Optional
 
 import pytest
-from pytest_lazyfixture import lazy_fixture
+from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
 from opentrons.config.advanced_settings import _migrate, _ensure
 
 

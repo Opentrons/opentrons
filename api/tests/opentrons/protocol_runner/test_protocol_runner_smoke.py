@@ -16,10 +16,10 @@ from opentrons.types import MountType
 from opentrons.protocol_api_experimental import DeckSlotName
 
 from opentrons.protocol_engine import (
+    DeckSlotLocation,
     LoadedLabware,
     LoadedPipette,
     PipetteName,
-    DeckSlotLocation,
     commands,
 )
 from opentrons.protocol_runner import (
@@ -37,22 +37,25 @@ async def test_protocol_runner_with_python(python_protocol_file: Path) -> None:
     )
 
     subject = await create_simulating_runner()
-    commands_result = await subject.run(protocol_file)
-    pipettes_result = subject.engine.state_view.pipettes.get_all()
-    labware_result = subject.engine.state_view.labware.get_all()
+    result = await subject.run(protocol_file)
+    commands_result = result.commands
+    pipettes_result = result.pipettes
+    labware_result = result.labware
 
     pipette_id_captor = matchers.Captor()
     labware_id_captor = matchers.Captor()
 
     expected_pipette = LoadedPipette.construct(
-        id=pipette_id_captor, pipetteName=PipetteName.P300_SINGLE, mount=MountType.LEFT
+        id=pipette_id_captor,
+        pipetteName=PipetteName.P300_SINGLE,
+        mount=MountType.LEFT,
     )
 
     expected_labware = LoadedLabware.construct(
         id=labware_id_captor,
+        location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
         loadName="opentrons_96_tiprack_300ul",
         definitionUri="opentrons/opentrons_96_tiprack_300ul/1",
-        location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
     )
 
     assert expected_pipette in pipettes_result
@@ -83,9 +86,10 @@ async def test_protocol_runner_with_json(json_protocol_file: Path) -> None:
     )
 
     subject = await create_simulating_runner()
-    commands_result = await subject.run(protocol_file)
-    pipettes_result = subject.engine.state_view.pipettes.get_all()
-    labware_result = subject.engine.state_view.labware.get_all()
+    result = await subject.run(protocol_file)
+    commands_result = result.commands
+    pipettes_result = result.pipettes
+    labware_result = result.labware
 
     expected_pipette = LoadedPipette(
         id="pipette-id",
@@ -95,9 +99,9 @@ async def test_protocol_runner_with_json(json_protocol_file: Path) -> None:
 
     expected_labware = LoadedLabware(
         id="labware-id",
+        location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
         loadName="opentrons_96_tiprack_300ul",
         definitionUri="opentrons/opentrons_96_tiprack_300ul/1",
-        location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
     )
 
     assert expected_pipette in pipettes_result

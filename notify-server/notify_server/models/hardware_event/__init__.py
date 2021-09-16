@@ -5,3 +5,5 @@ from .door_state import DoorStatePayload
 
 
 HardwareEventPayload = Union[DoorStatePayload]
+
+__all__ = ["HardwareEventPayload", "DoorStatePayload"]

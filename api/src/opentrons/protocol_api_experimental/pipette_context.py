@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
-from typing import Optional, Union, Sequence, List
+from typing import Any, Optional, Union, Sequence, List
 
-from .labware import Well, Labware
+from .labware import Labware
+from .well import Well
 
-from opentrons import APIVersion, types
+from opentrons import types
+from opentrons.protocols.api_support.types import APIVersion
 from opentrons.hardware_control.dev_types import PipetteDict
 
 # todo(mm, 2021-04-09): Duplicate these classes in this package to
@@ -88,7 +90,7 @@ class PipetteContext:  # noqa: D101
     def aspirate(  # noqa: D102
         self,
         volume: Optional[float] = None,
-        location: Union[types.Location, Well] = None,
+        location: Optional[Union[types.Location, Well]] = None,
         rate: float = 1.0,
     ) -> PipetteContext:
 
@@ -128,7 +130,7 @@ class PipetteContext:  # noqa: D101
     def dispense(  # noqa: D102
         self,
         volume: Optional[float] = None,
-        location: Union[types.Location, Well] = None,
+        location: Optional[Union[types.Location, Well]] = None,
         rate: float = 1.0,
     ) -> PipetteContext:
 
@@ -161,14 +163,14 @@ class PipetteContext:  # noqa: D101
         self,
         repetitions: int = 1,
         volume: Optional[float] = None,
-        location: Union[types.Location, Well] = None,
+        location: Optional[Union[types.Location, Well]] = None,
         rate: float = 1.0,
     ) -> PipetteContext:
         raise NotImplementedError()
 
     def blow_out(  # noqa: D102
         self,
-        location: Union[types.Location, Well] = None,
+        location: Optional[Union[types.Location, Well]] = None,
     ) -> PipetteContext:
         raise NotImplementedError()
 
@@ -193,7 +195,7 @@ class PipetteContext:  # noqa: D101
 
     def pick_up_tip(  # noqa: D102
         self,
-        location: Union[types.Location, Well] = None,
+        location: Optional[Union[types.Location, Well]] = None,
         presses: Optional[int] = None,
         increment: Optional[float] = None,
     ) -> PipetteContext:
@@ -217,7 +219,7 @@ class PipetteContext:  # noqa: D101
 
     def drop_tip(  # noqa: D102
         self,
-        location: Union[types.Location, Well] = None,
+        location: Optional[Union[types.Location, Well]] = None,
         home_after: bool = True,
     ) -> PipetteContext:
         # TODO(al, 2021-04-12): What about home_after?
@@ -241,33 +243,36 @@ class PipetteContext:  # noqa: D101
     def home_plunger(self) -> PipetteContext:  # noqa: D102
         raise NotImplementedError()
 
+    # TODO(mc, 2021-09-12): explicitely type kwargs, remove args
     def distribute(  # noqa: D102
         self,
         volume: Union[float, Sequence[float]],
         source: Well,
         dest: List[Well],
-        *args,  # noqa: ANN002
-        **kwargs,  # noqa: ANN003
+        *args: Any,
+        **kwargs: Any,
     ) -> PipetteContext:
         raise NotImplementedError()
 
+    # TODO(mc, 2021-09-12): explicitely type kwargs, remove args
     def consolidate(  # noqa: D102
         self,
         volume: Union[float, Sequence[float]],
         source: List[Well],
         dest: Well,
-        *args,  # noqa: ANN002
-        **kwargs,  # noqa: ANN003
+        *args: Any,
+        **kwargs: Any,
     ) -> PipetteContext:
         raise NotImplementedError()
 
+    # TODO(mc, 2021-09-12): explicitely type kwargs
     def transfer(  # noqa: D102
         self,
         volume: Union[float, Sequence[float]],
         source: AdvancedLiquidHandling,
         dest: AdvancedLiquidHandling,
         trash: bool = True,
-        **kwargs,  # noqa: ANN003
+        **kwargs: Any,
     ) -> PipetteContext:
         raise NotImplementedError()
 

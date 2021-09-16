@@ -26,9 +26,9 @@ def plan_arc(
     origin_point: Point,
     dest_point: Point,
     z_height: float,
-    origin_cp: CriticalPoint = None,
-    dest_cp: CriticalPoint = None,
-    extra_waypoints: List[Tuple[float, float]] = None,
+    origin_cp: Optional[CriticalPoint] = None,
+    dest_cp: Optional[CriticalPoint] = None,
+    extra_waypoints: Optional[List[Tuple[float, float]]] = None,
 ) -> List[Tuple[Point, Optional[CriticalPoint]]]:
 
     assert z_height >= max(origin_point.z, dest_point.z)

@@ -16,6 +16,7 @@ from typing import (
 from collections import OrderedDict
 
 from opentrons.hardware_control import SynchronousAdapter, ThreadManager
+from opentrons.hardware_control.modules.types import ModuleType
 from opentrons import types
 from opentrons.commands import protocol_commands as cmds, types as cmd_types
 from opentrons.commands.publisher import CommandPublisher, publish
@@ -30,7 +31,7 @@ from opentrons.protocols.types import Protocol
 from .labware import Labware
 from opentrons.protocols.context.labware import AbstractLabware
 from opentrons.protocols.context.protocol import AbstractProtocol
-from opentrons.protocols.geometry.module_geometry import ModuleGeometry, ModuleType
+from opentrons.protocols.geometry.module_geometry import ModuleGeometry
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from .instrument_context import InstrumentContext

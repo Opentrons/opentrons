@@ -3,7 +3,7 @@ from dataclasses import dataclass
 import logging
 import json
 import numbers
-from typing import Any, Dict, List, Union, Tuple, Sequence, TYPE_CHECKING
+from typing import Any, Dict, List, Mapping, Union, Tuple, Sequence, TYPE_CHECKING
 
 from opentrons import config
 from opentrons.config import feature_flags as ff
@@ -245,7 +245,7 @@ def piecewise_volume_conversion(ul: float, sequence: List[List[float]]) -> float
     raise IndexError()
 
 
-TypeOverrides = Dict[str, Union[float, bool, None]]
+TypeOverrides = Mapping[str, Union[float, bool, None]]
 
 
 def validate_overrides(data: TypeOverrides, config_model: Dict) -> None:

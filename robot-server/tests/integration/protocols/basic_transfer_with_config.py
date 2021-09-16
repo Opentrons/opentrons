@@ -1,10 +1,10 @@
-from opentrons import protocol_api
-from helpers import load_config, pick_up_then_drop
+from opentrons.protocol_api import ProtocolContext
+from helpers import load_config, pick_up_then_drop  # type: ignore[import]
 
 metadata = {"apiLevel": "2.6"}
 
 
-def run(protocol: protocol_api.ProtocolContext):
+def run(protocol: ProtocolContext) -> None:
     configuration = load_config("basic_transfer_config.json")
 
     plate = protocol.load_labware(configuration["plate"], 1)

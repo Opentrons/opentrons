@@ -3,15 +3,15 @@ import asyncio
 import logging
 from pathlib import Path
 from fastapi import Depends, status
-from typing import Callable, cast
+from typing import Callable, Union, cast
 from typing_extensions import Literal
 
-from opentrons import ThreadManager, initialize as initialize_api
+from opentrons import initialize as initialize_api
 from opentrons.config import feature_flags
 from opentrons.util.helpers import utc_now
-from opentrons.hardware_control import API as HardwareAPI
+from opentrons.hardware_control import API as HardwareAPI, ThreadManager
 from opentrons.hardware_control.simulator_setup import load_simulator
-from opentrons.hardware_control.types import HardwareEvent, HardwareEventType
+from opentrons.hardware_control.types import HardwareEvent, DoorStateNotification
 
 from notify_server.clients import publisher
 from notify_server.settings import Settings as NotifyServerSettings
@@ -26,7 +26,7 @@ from .settings import get_settings
 log = logging.getLogger(__name__)
 
 _hw_api = AppStateValue[HardwareAPI]("hardware_api")
-_init_task = AppStateValue[asyncio.Task]("hardware_init_task")
+_init_task = AppStateValue["asyncio.Task[None]"]("hardware_init_task")
 _event_unsubscribe = AppStateValue[Callable[[], None]]("hardware_event_unsubscribe")
 
 
@@ -142,8 +142,8 @@ def _initialize_event_watchers(app_state: AppState, hardware_api: HardwareAPI) -
         notify_server_settings.publisher_address.connection_string()
     )
 
-    def _publish_hardware_event(hw_event: HardwareEvent) -> None:
-        if hw_event.event == HardwareEventType.DOOR_SWITCH_CHANGE:
+    def _publish_hardware_event(hw_event: Union[str, HardwareEvent]) -> None:
+        if isinstance(hw_event, DoorStateNotification):
             payload = DoorStatePayload(state=hw_event.new_state)
         else:
             return

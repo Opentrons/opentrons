@@ -1,3 +1,4 @@
+from requests import Response
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION, MIN_SUPPORTED_VERSION
 from opentrons import __version__, config
 
@@ -5,7 +6,7 @@ minimum_version = list(MIN_SUPPORTED_VERSION)
 maximum_version = list(MAX_SUPPORTED_VERSION)
 
 
-def check_health_response(response):
+def check_health_response(response: Response) -> None:
     expected = {
         "name": "opentrons-dev",
         "api_version": __version__,

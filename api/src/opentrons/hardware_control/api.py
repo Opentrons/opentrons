@@ -6,6 +6,7 @@ import pathlib
 from collections import OrderedDict
 from typing import (
     Any,
+    Callable,
     Dict,
     Union,
     List,
@@ -45,6 +46,7 @@ from .types import (
     NoTipAttachedError,
     DoorState,
     DoorStateNotification,
+    HardwareEvent,
     PipettePair,
     TipAttachedError,
     HardwareAction,
@@ -289,7 +291,9 @@ class API(HardwareAPILike):
             self._robot_calibration.deck_calibration
         )
 
-    def register_callback(self, cb):
+    def register_callback(
+        self, cb: Callable[[Union[str, HardwareEvent]], None]
+    ) -> Callable[[], None]:
         """Allows the caller to register a callback, and returns a closure
         that can be used to unregister the provided callback
         """
@@ -615,7 +619,7 @@ class API(HardwareAPILike):
 
         asyncio.run_coroutine_threadsafe(_chained_calls(), self._loop)
 
-    async def halt(self):
+    async def halt(self) -> None:
         """Immediately stop motion.
 
         Calls to :py:meth:`stop` through the synch adapter while other calls
@@ -1883,6 +1887,6 @@ class API(HardwareAPILike):
 
         return max_height
 
-    def clean_up(self):
+    def clean_up(self) -> None:
         """Get the API ready to stop cleanly."""
         self._backend.clean_up()

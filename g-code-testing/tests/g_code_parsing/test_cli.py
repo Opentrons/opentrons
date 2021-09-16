@@ -15,7 +15,8 @@ from g_code_parsing.g_code_program.supported_text_modes import (
 )
 
 
-VALIDATION_PROTOCOL_PATH = os.path.join("protocols", "smoothie_protocol.py")
+VALIDATION_PROTOCOL_NAME = "protocol_smoothie"
+VALIDATION_HTTP_NAME = "http_home_robot"
 DEFAULT_LEFT_PIPETTE = SmoothieSettings().left
 DEFAULT_RIGHT_PIPETTE = SmoothieSettings().right
 
@@ -39,20 +40,21 @@ def setup_different_files():
 
 def run_cli_inputs():
     return [
-        ["run", VALIDATION_PROTOCOL_PATH],
-        ["run", VALIDATION_PROTOCOL_PATH, "--text-mode", "Default"],
+        ["run", VALIDATION_PROTOCOL_NAME],
+        ["run", VALIDATION_PROTOCOL_NAME, "--text-mode", "Default"],
         [
             "run",
-            VALIDATION_PROTOCOL_PATH,
+            VALIDATION_PROTOCOL_NAME,
             "--left-pipette",
             '{"model": "p20_single_v2.0", "id": "P20SV202020070101"}',
         ],
         [
             "run",
-            VALIDATION_PROTOCOL_PATH,
+            VALIDATION_PROTOCOL_NAME,
             "--right-pipette",
             '{"model": "p20_multi_v2.0", "id": "P3HMV202020041605"}',
         ],
+        ["run", VALIDATION_HTTP_NAME],
     ]
 
 
@@ -64,31 +66,38 @@ def run_expected_args():
     return [
         {
             "command": "run",
-            "configuration_path": VALIDATION_PROTOCOL_PATH,
+            "configuration_name": VALIDATION_PROTOCOL_NAME,
             "text_mode": SupportedTextModes.CONCISE.value,
             "left_pipette": DEFAULT_LEFT_PIPETTE,
             "right_pipette": DEFAULT_RIGHT_PIPETTE,
         },
         {
             "command": "run",
-            "configuration_path": VALIDATION_PROTOCOL_PATH,
+            "configuration_name": VALIDATION_PROTOCOL_NAME,
             "text_mode": SupportedTextModes.DEFAULT.value,
             "left_pipette": DEFAULT_LEFT_PIPETTE,
             "right_pipette": DEFAULT_RIGHT_PIPETTE,
         },
         {
             "command": "run",
-            "configuration_path": VALIDATION_PROTOCOL_PATH,
+            "configuration_name": VALIDATION_PROTOCOL_NAME,
             "text_mode": SupportedTextModes.CONCISE.value,
             "left_pipette": DEFAULT_RIGHT_PIPETTE,
             "right_pipette": DEFAULT_RIGHT_PIPETTE,
         },
         {
             "command": "run",
-            "configuration_path": VALIDATION_PROTOCOL_PATH,
+            "configuration_name": VALIDATION_PROTOCOL_NAME,
             "text_mode": SupportedTextModes.CONCISE.value,
             "left_pipette": DEFAULT_LEFT_PIPETTE,
             "right_pipette": DEFAULT_LEFT_PIPETTE,
+        },
+        {
+            "command": "run",
+            "configuration_name": VALIDATION_HTTP_NAME,
+            "text_mode": SupportedTextModes.CONCISE.value,
+            "left_pipette": DEFAULT_LEFT_PIPETTE,
+            "right_pipette": DEFAULT_RIGHT_PIPETTE,
         },
     ]
 
@@ -107,28 +116,34 @@ def diff_expected_args():
 def run_expected_commands() -> List[RunCommand]:
     return [
         RunCommand(
-            configuration_path=VALIDATION_PROTOCOL_PATH,
+            configuration_name=VALIDATION_PROTOCOL_NAME,
             text_mode=SupportedTextModes.CONCISE.value,
             left_pipette_config=DEFAULT_LEFT_PIPETTE,
             right_pipette_config=DEFAULT_RIGHT_PIPETTE,
         ),
         RunCommand(
-            configuration_path=VALIDATION_PROTOCOL_PATH,
+            configuration_name=VALIDATION_PROTOCOL_NAME,
             text_mode=SupportedTextModes.DEFAULT.value,
             left_pipette_config=DEFAULT_LEFT_PIPETTE,
             right_pipette_config=DEFAULT_RIGHT_PIPETTE,
         ),
         RunCommand(
-            configuration_path=VALIDATION_PROTOCOL_PATH,
+            configuration_name=VALIDATION_PROTOCOL_NAME,
             text_mode=SupportedTextModes.CONCISE.value,
             left_pipette_config=DEFAULT_RIGHT_PIPETTE,
             right_pipette_config=DEFAULT_RIGHT_PIPETTE,
         ),
         RunCommand(
-            configuration_path=VALIDATION_PROTOCOL_PATH,
+            configuration_name=VALIDATION_PROTOCOL_NAME,
             text_mode=SupportedTextModes.CONCISE.value,
             left_pipette_config=DEFAULT_LEFT_PIPETTE,
             right_pipette_config=DEFAULT_LEFT_PIPETTE,
+        ),
+        RunCommand(
+            configuration_name=VALIDATION_HTTP_NAME,
+            text_mode=SupportedTextModes.CONCISE.value,
+            left_pipette_config=DEFAULT_LEFT_PIPETTE,
+            right_pipette_config=DEFAULT_RIGHT_PIPETTE,
         ),
     ]
 
@@ -143,14 +158,21 @@ def diff_expected_command():
     ]
 
 
-@pytest.fixture
-def run_command() -> RunCommand:
-    return RunCommand(
-        configuration_path=VALIDATION_PROTOCOL_PATH,
-        text_mode=SupportedTextModes.CONCISE.value,
-        left_pipette_config=DEFAULT_RIGHT_PIPETTE,
-        right_pipette_config=DEFAULT_RIGHT_PIPETTE,
-    )
+def run_commands() -> List[RunCommand]:
+    return [
+        RunCommand(
+            configuration_name=VALIDATION_PROTOCOL_NAME,
+            text_mode=SupportedTextModes.CONCISE.value,
+            left_pipette_config=DEFAULT_RIGHT_PIPETTE,
+            right_pipette_config=DEFAULT_RIGHT_PIPETTE,
+        ),
+        RunCommand(
+            configuration_name=VALIDATION_HTTP_NAME,
+            text_mode=SupportedTextModes.CONCISE.value,
+            left_pipette_config=DEFAULT_RIGHT_PIPETTE,
+            right_pipette_config=DEFAULT_RIGHT_PIPETTE,
+        ),
+    ]
 
 
 @pytest.fixture
@@ -199,6 +221,7 @@ def test_diff_command_vals(diff_input_args, command):
     assert GCodeCLI.to_command(GCodeCLI.parse_args(diff_input_args)) == command
 
 
+@pytest.mark.parametrize("run_command", run_commands())
 def test_run_command(run_command):
     # TODO: This assert sucks. Need to figure out how to make it better
     assert len(run_command.execute()) > 0
@@ -221,3 +244,8 @@ def test_different_file_content_diff_command(different_file_content_diff_command
 def test_unparsable_cli_command_error():
     with pytest.raises(UnparsableCLICommandError):
         GCodeCLI.to_command({"command": "bad"})
+
+
+def test_cli_configurations_command():
+    command = GCodeCLI.to_command({"command": "configurations"})
+    assert "Runnable Configurations" in command.execute()

@@ -1,6 +1,6 @@
 from datetime import datetime
 from dataclasses import dataclass, field
-from typing import Optional, Generic, TypeVar
+from typing import Any, Optional, Generic, TypeVar
 
 from robot_server.service.session.models.command import CommandStatus, RequestTypes
 from robot_server.service.session.models.common import IdentifierType, create_identifier
@@ -34,7 +34,7 @@ class Command:
 class CompletedCommand:
     request: RequestTypes
     meta: CommandMeta
-    result: CommandResult
+    result: CommandResult[Any]
 
 
 def create_command(request: RequestTypes) -> Command:

@@ -1,12 +1,12 @@
 import pytest
 from unittest import mock
 from functools import partial
-from tests.opentrons.conftest import state
+from tests.opentrons.conftest import state as _state
 from opentrons.types import Point, Mount
 from opentrons.hardware_control import CriticalPoint, API
 from opentrons.hardware_control.types import MotionChecks
 
-state = partial(state, "calibration")
+state = partial(_state, "calibration")
 
 
 @pytest.mark.api2_only
