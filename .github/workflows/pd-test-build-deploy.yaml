@@ -83,7 +83,7 @@ jobs:
           node-version: '14'
       - name: 'install udev for usb-detection'
         if: startsWith(matrix.os, 'ubuntu')
-        run: sudo apt-get install libudev-dev
+        run: sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'cache yarn cache'
         uses: actions/cache@v2
         with:
@@ -110,7 +110,7 @@ jobs:
         with:
           node-version: '14'
       - name: 'install udev for usb-detection'
-        run: sudo apt-get install libudev-dev
+        run: sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'cache yarn cache'
         uses: actions/cache@v2
         with:
@@ -147,7 +147,7 @@ jobs:
         with:
           node-version: '14'
       - name: 'install udev for usb-detection'
-        run: sudo apt-get install libudev-dev
+        run: sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'set complex environment variables'
         id: 'set-vars'
         uses: actions/github-script@v3.1
