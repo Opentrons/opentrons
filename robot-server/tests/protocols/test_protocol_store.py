@@ -23,25 +23,26 @@ from robot_server.protocols.protocol_store import (
 @pytest.fixture
 def json_upload_file(tmp_path: Path) -> Iterator[UploadFile]:
     """Get an UploadFile with JSON contents."""
-    file_path = tmp_path / "protocol.json"
+    file_path = tmp_path / "my json file.json"
     file_path.write_text("{}\n", encoding="utf-8")
 
     with file_path.open() as json_file:
-        yield UploadFile(filename="protocol.json", file=json_file)
+        yield UploadFile(filename="my json file.json", file=json_file)
 
 
 @pytest.fixture
 def python_upload_file(tmp_path: Path) -> Iterator[UploadFile]:
     """Get an UploadFile with Python contents."""
-    file_path = tmp_path / "protocol.py"
+    file_path = tmp_path / "my python file.py"
     file_path.write_text("# my protocol\n", encoding="utf-8")
 
     with file_path.open() as python_file:
-        yield UploadFile(filename="protocol.py", file=python_file)
+        yield UploadFile(filename="my python file.py", file=python_file)
 
 
-# Todo: Add spaces and maybe Unicode characters into one of these filenames
-# Remove meaning of files; this layer doesn't care if they're JSON or Python
+# todo(mm, 2021-09-16): Don't use JSON and Python files here.
+# This unit shouldn't be reading these files, so it shouldn't care even if we pass it
+# arbitrary binary junk.
 @pytest.fixture
 def upload_files(
     python_upload_file: UploadFile, json_upload_file: UploadFile
