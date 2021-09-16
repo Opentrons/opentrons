@@ -15,16 +15,23 @@ from opentrons_hardware.drivers.can_bus import (
 def run(file: Path) -> None:
     """Entry point for script."""
     with io.StringIO() as output:
-        output.write("/********************************************\n")
-        output.write("* This is a generated file. Do not modify.  *\n")
-        output.write("********************************************/\n")
-        output.write("#pragma once\n\n")
+        generate(output)
 
-        write_enum(FunctionCode, output)
-        write_enum(MessageId, output)
-        write_enum(NodeId, output)
+        output_string = output.getvalue()
+        file.write_text(output_string)
 
-        file.write_text(output.getvalue())
+        print(output_string)
+
+
+def generate(output: io.StringIO) -> None:
+    """Generate source code into output."""
+    output.write("/********************************************\n")
+    output.write("* This is a generated file. Do not modify.  *\n")
+    output.write("********************************************/\n")
+    output.write("#pragma once\n\n")
+    write_enum(FunctionCode, output)
+    write_enum(MessageId, output)
+    write_enum(NodeId, output)
 
 
 def write_enum(e: Type[Enum], output: io.StringIO) -> None:
@@ -33,7 +40,7 @@ def write_enum(e: Type[Enum], output: io.StringIO) -> None:
     output.write(f"enum class {e.__name__} {{\n")
     for i in e:
         output.write(f"  {i.name} = 0x{i.value:x},\n")
-    output.write("}\n\n")
+    output.write("};\n\n")
 
 
 if __name__ == "__main__":
