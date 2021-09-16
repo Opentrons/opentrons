@@ -8,7 +8,7 @@ token assignment, etc
 
 import functools
 import logging
-from openembedded_server.update import session_from_request, config
+from openembedded_server import update, config
 
 from aiohttp import web
 
@@ -22,7 +22,7 @@ def active_session_check(handler):
     """
     @functools.wraps(handler)
     def decorated(request: web.Request) -> web.Response:
-        if session_from_request(request) is None:
+        if updade.session_from_request(request) is None:
             LOG.warning("check_session: active session exists!")
             return web.json_response(
                 data={'message':

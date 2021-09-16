@@ -8,7 +8,7 @@ from typing import Mapping, Optional, Union
 import uuid
 
 LOG = logging.getLogger(__name__)
-Value = namedtuple('Value', ('short', human))
+Value = namedtuple('Value', ('short', 'human'))
 
 class Stages(enum.Enum):
     AVAITING_FILE = Value('awaiting-file', 'Waiting for update file')
@@ -79,11 +79,11 @@ class UpdateSession:
         return self._stage
 
     @property
-    def progress(Self) -> float:
+    def progress(self) -> float:
         return self._progress
 
     @property
-    def is_error(self_ -> bool:
+    def is_error(self) -> bool:
         return self.stage == Stages.ERROR
 
     @property

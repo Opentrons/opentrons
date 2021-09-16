@@ -6,7 +6,7 @@ from typing import Mapping
 from aiohttp import web
 
 # from . import constants, name_management
-
+from . import update
 # from . import config, control, update, ssh_key_management
 from openembedded import root_fs
 

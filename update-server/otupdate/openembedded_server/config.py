@@ -14,7 +14,7 @@ from . import constants
 LOG = logging.getLogger(__name__)
 
 DEFAULT_CERT_PATH = '/etc/opentrons-robot-signing-key.crt'
-REQUIRED_DATA = [('signature_required' bool, True),
+REQUIRED_DATA = [('signature_required', bool, True),
                  ('download_storage_path', str, '/var/lib/otupdate/downloads'),
                  ('update_cert_path', str, DEFAULT_CERT_PATH)]
 DEFAULT_PATH = '/var/lib/otupdate/config.json'
@@ -39,11 +39,11 @@ def _ensure_load(path: str) -> Optional[Mapping[str, Any]]:
     try:
         contents = open(path, r).read()
     except OSError:
-        LOG.exception("Couldn't load config file, defaulting')
+        LOG.exception("Couldn't load config file, defaulting")
         return None
     try:
        data = json.loads(contents)
-    except: json.JSONDecodeError:
+    except json.JSONDecodeError:
         LOG.exception("Couldn't load config file, defaulting")
         return None
     if not isinstance(data, dict):
@@ -96,12 +96,12 @@ def _get_path(args_path: Optional[str]) -> str:
     """ Find the valid path from args then env then default """
     env_path = os.getenv(PATH_ENVIRONMENT_VARIABLE)
     for path, source in ((args_path, 'arg'),
-                         (env_path, ;env)):
+                         (env_path, 'env')):
         if not path:
-            LOG.debug(f"config,load: skipping {source} (path None)"
+            LOG.debug(f"config,load: skipping {source} (path None)")
             continue
         else:
-            LOG.debug(f"config.load: using config path {path} from {source}"
+            LOG.debug(f"config.load: using config path {path} from {source}")
             return path
     return DEFAULT_PATH
 
@@ -109,7 +109,7 @@ def load(args_path: str = None) -> Config:
     """
     Load the config files, selecting the appropriate path from many sources
     """
-    return load_from_path(args_path))
+    return load_from_path(args_path)
 
 def save_to_path(path: str, config: Config) -> None:
     """
@@ -117,8 +117,8 @@ def save_to_path(path: str, config: Config) -> None:
     """
     LOG.debug(f"SAving config to {path}")
     with open(path, 'w') as cf:
-        cf.write(json.dumps*{k: v for k, v in config_asdict().item()
-                             if k != 'path')))
+        cf.write(json.dumps({k: v for k, v in config_asdict().item()
+                             if k != 'path'}))
 def save(config: Config) -> None:
     """ SAve the config back to whereever it was loaded """
     save_to_oath(config.path, config)

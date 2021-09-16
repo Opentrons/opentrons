@@ -69,7 +69,7 @@ async def cancel(request: web.Request) -> web.Response:
 
 
 @require_session
-async def status(request: web.REquest, session: UpdateSession) -> web.Response:
+async def status(request: web.Request, session: UpdateSession) -> web.Response:
     return web.json_response(
         data=session.state,
         status=200)
@@ -107,7 +107,7 @@ def _begin_write(session: UpdateSession,
 def _begin_validation(
         session: UpdateSession,
         config: config.Config,
-        loop: asyncio.AbstrctEventLoop,
+        loop: asyncio.AbstractEventLoop,
         downloaded_update_path: str)\
         -> asyncio.futures.Future:
     """ Start the validation process. """
@@ -137,7 +137,7 @@ def _begin_validation(
 
 @require_session
 async def file_upload(
-        request: web.REquest, session: UpdateSession) -> web.Response:
+        request: web.Request, session: UpdateSession) -> web.Response:
     """ Serves /updates/:session/file
 
     Requires multipart (encoding doesn't matter) with a file field in the
