@@ -52,7 +52,7 @@ class Protocol(ResourceModel):
         ...,
         description=(
             "When this protocol was *uploaded.*"
-            " (`protocolMetadata` may have information about"
+            " (`metadata` may have information about"
             " when this protocol was *authored.*)"
         ),
     )
