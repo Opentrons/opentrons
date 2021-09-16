@@ -1,8 +1,5 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
 import map from 'lodash/map'
-import { NavLink } from 'react-router-dom'
-import { useAttachedModulesEqualsProtocolModules } from '../useAttachedModulesEqualsProtocolModules'
 import { useTranslation } from 'react-i18next'
 import {
   Btn,
@@ -10,18 +7,14 @@ import {
   LabwareRender,
   Link,
   ModuleViz,
-  PrimaryBtn,
   RobotWorkSpace,
   SecondaryBtn,
   Text,
-  Tooltip,
-  useHoverTooltip,
   ALIGN_FLEX_END,
   DIRECTION_COLUMN,
   FONT_SIZE_BODY_1,
   JUSTIFY_CENTER,
   SPACING_3,
-  SPACING_6,
   C_BLUE,
   C_DARK_GRAY,
   C_NEAR_WHITE,
@@ -36,17 +29,12 @@ import { LabwareInfoOverlay } from './LabwareInfoOverlay'
 import { LabwareSetupModal } from './LabwareSetupModal'
 import { getModuleTypesThatRequireExtraAttention } from './utils/getModuleTypesThatRequireExtraAttention'
 import { ExtraAttentionWarning } from './ExtraAttentionWarning'
-import * as Pipettes from '../../../../redux/pipettes'
 import styles from '../../styles.css'
-import * as PipetteConstants from '../../../../redux/pipettes/constants'
-import type { CoordinatesByModuleModel } from '../../utils/getModuleRenderCoords'
+import { useModuleRenderInfoById } from '../../hooks'
 import type { CoordinatesByLabwareId } from '../../utils/getLabwareRenderCoords'
-import type { State } from '../../../../redux/types'
 
 interface LabwareSetupProps {
-  moduleRenderCoords: CoordinatesByModuleModel
   labwareRenderCoords: CoordinatesByLabwareId
-  robotName: string
 }
 
 const DECK_LAYER_BLOCKLIST = [
@@ -58,57 +46,24 @@ const DECK_LAYER_BLOCKLIST = [
   'removableDeckOutline',
   'screwHoles',
 ]
-
-const DECK_MAP_VIEWBOX = '-80 -100 550 560'
+const DECK_MAP_VIEWBOX = '-80 -40 550 500'
 
 export const LabwareSetup = (props: LabwareSetupProps): JSX.Element | null => {
-  const { moduleRenderCoords, labwareRenderCoords, robotName } = props
+  const { labwareRenderCoords } = props
   const { t } = useTranslation('protocol_setup')
-  const [targetProps, tooltipProps] = useHoverTooltip()
+  const moduleRenderInfoById = useModuleRenderInfoById()
   const [
     showLabwareHelpModal,
     setShowLabwareHelpModal,
   ] = React.useState<boolean>(false)
-  const moduleModels = map(moduleRenderCoords, ({ moduleModel }) => moduleModel)
+  const moduleModels = map(
+    moduleRenderInfoById,
+    ({ moduleDef }) => moduleDef.model
+  )
   const moduleTypesThatRequireExtraAttention = getModuleTypesThatRequireExtraAttention(
     moduleModels
   )
-  const { allModulesAttached } = useAttachedModulesEqualsProtocolModules()
-  const protocolPipetteTipRackData = useSelector((state: State) => {
-    return Pipettes.getProtocolPipetteTipRackCalInfo(state, robotName)
-  })
-  const pipettesMountInfo = PipetteConstants.PIPETTE_MOUNTS.reduce(
-    mount => mount
-  )
-  const pipetteCalibrationInfo = protocolPipetteTipRackData[pipettesMountInfo]
-  if (pipetteCalibrationInfo == null) {
-    return null
-  }
-  const pipettesCalibrated =
-    pipetteCalibrationInfo.pipetteCalDate !== undefined &&
-    pipetteCalibrationInfo.pipetteCalDate !== null
-  let proceedToRunDisabledReason = ''
-  let proceedToRunDisabled = true
-  if (!allModulesAttached && pipettesCalibrated) {
-    proceedToRunDisabledReason = t(
-      'proceed_to_run_disabled_modules_not_connected_tooltip'
-    )
-    proceedToRunDisabled = true
-  } else if (allModulesAttached && !pipettesCalibrated) {
-    proceedToRunDisabledReason = t(
-      'proceed_to_run_disabled_calibration_not_complete_tooltip'
-    )
-    proceedToRunDisabled = true
-  } else if (!allModulesAttached && !pipettesCalibrated) {
-    proceedToRunDisabledReason = t(
-      'proceed_to_run_disabled_modules_and_calibration_not_complete_tooltip'
-    )
-    proceedToRunDisabled = true
-  } else {
-    proceedToRunDisabled = false
-  }
-  const LinkComponent = proceedToRunDisabled ? 'button' : NavLink
-  const linkProps = proceedToRunDisabled ? {} : { to: '/run' }
+
   return (
     <React.Fragment>
       {showLabwareHelpModal && (
@@ -147,22 +102,23 @@ export const LabwareSetup = (props: LabwareSetupProps): JSX.Element | null => {
           {() => {
             return (
               <React.Fragment>
-                {map(moduleRenderCoords, ({ x, y, moduleModel }) => {
+                {map(moduleRenderInfoById, ({ x, y, moduleDef }) => {
+                  const { model } = moduleDef
                   const orientation = inferModuleOrientationFromXCoordinate(x)
                   return (
                     <React.Fragment
-                      key={`LabwareSetup_Module_${moduleModel}_${x}${y}`}
+                      key={`LabwareSetup_Module_${model}_${x}${y}`}
                     >
                       <ModuleViz
                         x={x}
                         y={y}
                         orientation={orientation}
-                        moduleType={getModuleType(moduleModel)}
+                        moduleType={getModuleType(model)}
                       />
                       <ModuleTag
                         x={x}
                         y={y}
-                        moduleModel={moduleModel}
+                        moduleModel={model}
                         orientation={orientation}
                       />
                     </React.Fragment>
@@ -184,33 +140,21 @@ export const LabwareSetup = (props: LabwareSetupProps): JSX.Element | null => {
             )
           }}
         </RobotWorkSpace>
-        <Text color={C_DARK_GRAY} margin={`${SPACING_6} ${SPACING_3}`}>
+        <Text as={'h4'} marginLeft={SPACING_3}>
+          Labware Position Check
+        </Text>
+        <Text color={C_DARK_GRAY} margin={SPACING_3}>
           {t('labware_position_check_text')}
         </Text>
         <Flex justifyContent={JUSTIFY_CENTER}>
           <SecondaryBtn
             title={t('check_labware_positions')}
-            marginRight={SPACING_3}
             onClick={() => console.log('check labware positions!')}
             color={C_BLUE}
             id={'LabwareSetup_checkLabwarePositionsButton'}
           >
             {t('check_labware_positions')}
           </SecondaryBtn>
-          <PrimaryBtn
-            title={t('proceed_to_run')}
-            disabled={proceedToRunDisabled}
-            as={LinkComponent}
-            backgroundColor={C_BLUE}
-            id={'LabwareSetup_proceedToRunButton'}
-            {...linkProps}
-            {...targetProps}
-          >
-            {t('proceed_to_run')}
-          </PrimaryBtn>
-          {proceedToRunDisabled && (
-            <Tooltip {...tooltipProps}>{proceedToRunDisabledReason}</Tooltip>
-          )}
         </Flex>
       </Flex>
     </React.Fragment>

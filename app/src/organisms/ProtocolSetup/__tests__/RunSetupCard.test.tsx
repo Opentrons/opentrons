@@ -24,12 +24,12 @@ import {
 import { mockCalibrationStatus } from '../../../redux/calibration/__fixtures__'
 import * as calibrationSelectors from '../../../redux/calibration/selectors'
 import * as protocolSelectors from '../../../redux/protocol/selectors'
-import { getModuleRenderCoords } from '../utils/getModuleRenderCoords'
 import { getLabwareRenderCoords } from '../utils/getLabwareRenderCoords'
 import { ModuleSetup } from '../RunSetupCard/ModuleSetup'
 import { RunSetupCard } from '../RunSetupCard'
 import { LabwareSetup } from '../RunSetupCard/LabwareSetup'
 import { RobotCalibration } from '../RunSetupCard/RobotCalibration'
+import { ProceedToRun } from '../RunSetupCard/ProceedToRunCta'
 
 import type {
   AttachedPipettesByMount,
@@ -44,8 +44,9 @@ jest.mock('../../../redux/calibration/selectors')
 jest.mock('../RunSetupCard/LabwareSetup')
 jest.mock('../RunSetupCard/ModuleSetup')
 jest.mock('../RunSetupCard/RobotCalibration')
-jest.mock('../utils/getModuleRenderCoords')
+jest.mock('../utils/getModuleRenderInfo')
 jest.mock('../utils/getLabwareRenderCoords')
+jest.mock('../RunSetupCard/ProceedToRunCta')
 
 const mockAttachedPipettes: AttachedPipettesByMount = {
   left: mockAttachedPipette,
@@ -63,12 +64,14 @@ const mockGetProtocolData = protocolSelectors.getProtocolData as jest.MockedFunc
 const mockLabwareSetup = LabwareSetup as jest.MockedFunction<
   typeof LabwareSetup
 >
+
+const mockProceedToRun = ProceedToRun as jest.MockedFunction<
+  typeof ProceedToRun
+>
+
 const mockModuleSetup = ModuleSetup as jest.MockedFunction<typeof ModuleSetup>
 const mockRobotCalibration = RobotCalibration as jest.MockedFunction<
   typeof RobotCalibration
->
-const mockGetModuleRenderCoords = getModuleRenderCoords as jest.MockedFunction<
-  typeof getModuleRenderCoords
 >
 const mockGetLabwareRenderCoords = getLabwareRenderCoords as jest.MockedFunction<
   typeof getLabwareRenderCoords
@@ -88,9 +91,6 @@ const mockGetDeckCalData = calibrationSelectors.getDeckCalibrationData as jest.M
   typeof calibrationSelectors.getDeckCalibrationData
 >
 
-const mockModuleRenderCoords = {
-  mockModuleId: { x: 0, y: 0, z: 0, moduleModel: 'mockModule' as any },
-}
 const mockLabwareRenderCoords = {
   mockLabwareId: { x: 0, y: 0, z: 0, labwareDef: {} as any },
 }
@@ -107,9 +107,7 @@ describe('RunSetupCard', () => {
       mockCalibrationStatus.deckCalibration.data
     )
     mockGetProtocolData.mockReturnValue(noModulesProtocol as any)
-    when(mockGetModuleRenderCoords)
-      .calledWith(noModulesProtocol as any, standardDeckDef as any)
-      .mockReturnValue(mockModuleRenderCoords)
+
     when(mockGetLabwareRenderCoords)
       .calledWith(noModulesProtocol as any, standardDeckDef as any)
       .mockReturnValue(mockLabwareRenderCoords)
@@ -118,9 +116,7 @@ describe('RunSetupCard', () => {
       .mockReturnValue(<div></div>) // this (default) empty div will be returned when LabwareSetup isn't called with expected props
       .calledWith(
         componentPropsMatcher({
-          moduleRenderCoords: mockModuleRenderCoords,
           labwareRenderCoords: mockLabwareRenderCoords,
-          robotName: mockConnectedRobot.name,
         })
       )
       .mockReturnValue(<div>Mock Labware Setup</div>)
@@ -128,7 +124,6 @@ describe('RunSetupCard', () => {
       .mockReturnValue(<div></div>) // this (default) empty div will be returned when ModuleSetup isn't called with expected props
       .calledWith(
         componentPropsMatcher({
-          moduleRenderCoords: mockModuleRenderCoords,
           expandLabwareSetupStep: expect.anything(),
           robotName: mockConnectedRobot.name,
         })
@@ -147,6 +142,14 @@ describe('RunSetupCard', () => {
     render = () => {
       return renderWithProviders(<RunSetupCard />, { i18nInstance: i18n })
     }
+    when(mockProceedToRun)
+      .mockReturnValue(<div></div>)
+      .calledWith(
+        componentPropsMatcher({
+          robotName: mockConnectedRobot.name,
+        })
+      )
+      .mockReturnValue(<div>Mock Proceed To Run</div>)
   })
 
   afterEach(() => {
@@ -175,9 +178,7 @@ describe('RunSetupCard', () => {
 
   it('renders module setup and allows the user to proceed to labware setup', () => {
     mockGetProtocolData.mockReturnValue(withModulesProtocol as any)
-    when(mockGetModuleRenderCoords)
-      .calledWith(withModulesProtocol as any, standardDeckDef as any)
-      .mockReturnValue(mockModuleRenderCoords)
+
     when(mockGetLabwareRenderCoords)
       .calledWith(withModulesProtocol as any, standardDeckDef as any)
       .mockReturnValue(mockLabwareRenderCoords)

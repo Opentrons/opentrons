@@ -282,6 +282,7 @@ export interface ModuleDefinition {
   displayName: string
   loadName: string
   quirks: string[]
+  model: ModuleModel
 }
 
 export type ModuleOrientation = 'left' | 'right'

@@ -24,7 +24,7 @@ import { ExtraAttentionWarning } from '../ExtraAttentionWarning'
 import { getModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
 import { getProtocolPipetteTipRackCalInfo } from '../../../../../redux/pipettes/selectors'
 import { ModuleTag } from '../../../ModuleTag'
-import * as useAttachedModulesEqualsProtocolModules from '../../useAttachedModulesEqualsProtocolModules'
+import { useModuleRenderInfoById } from '../../../hooks'
 
 jest.mock('../../../../../redux/modules')
 jest.mock('../../../../../redux/pipettes/selectors')
@@ -32,7 +32,7 @@ jest.mock('../LabwareSetupModal')
 jest.mock('../../../ModuleTag')
 jest.mock('../LabwareInfoOverlay')
 jest.mock('../ExtraAttentionWarning')
-jest.mock('../../useAttachedModulesEqualsProtocolModules')
+jest.mock('../../../hooks')
 jest.mock('../utils/getModuleTypesThatRequireExtraAttention')
 jest.mock('@opentrons/components', () => {
   const actualComponents = jest.requireActual('@opentrons/components')
@@ -50,10 +50,6 @@ jest.mock('@opentrons/shared-data', () => {
     inferModuleOrientationFromXCoordinate: jest.fn(),
   }
 })
-const mockUseAttachedModulesEqualsProtocolModules = useAttachedModulesEqualsProtocolModules.useAttachedModulesEqualsProtocolModules as jest.MockedFunction<
-  typeof useAttachedModulesEqualsProtocolModules.useAttachedModulesEqualsProtocolModules
->
-
 const mockLabwareInfoOverlay = LabwareInfoOverlay as jest.MockedFunction<
   typeof LabwareInfoOverlay
 >
@@ -64,6 +60,10 @@ const mockModuleViz = ModuleViz as jest.MockedFunction<typeof ModuleViz>
 
 const mockInferModuleOrientationFromXCoordinate = inferModuleOrientationFromXCoordinate as jest.MockedFunction<
   typeof inferModuleOrientationFromXCoordinate
+>
+
+const mockUseModuleRenderInfoById = useModuleRenderInfoById as jest.MockedFunction<
+  typeof useModuleRenderInfoById
 >
 
 const mockRobotWorkSpace = RobotWorkSpace as jest.MockedFunction<
@@ -131,13 +131,8 @@ describe('LabwareSetup', () => {
   let props: React.ComponentProps<typeof LabwareSetup>
   beforeEach(() => {
     props = {
-      robotName: MOCK_ROBOT_NAME,
-      moduleRenderCoords: {},
       labwareRenderCoords: {},
     }
-    mockUseAttachedModulesEqualsProtocolModules.mockReturnValue({
-      allModulesAttached: false,
-    })
 
     when(mockInferModuleOrientationFromXCoordinate)
       .calledWith(expect.anything())
@@ -248,69 +243,20 @@ describe('LabwareSetup', () => {
   })
 
   it('should render a deck WITHOUT labware and WITHOUT modules', () => {
-    const moduleRenderCoords = {}
     const labwareRenderCoords = {}
 
     props = {
       ...props,
-      moduleRenderCoords,
       labwareRenderCoords,
     }
+    when(mockUseModuleRenderInfoById).calledWith().mockReturnValue({})
 
-    render(props)
     expect(mockModuleViz).not.toHaveBeenCalled()
     expect(mockModuleTag).not.toHaveBeenCalled()
     expect(mockLabwareRender).not.toHaveBeenCalled()
     expect(mockLabwareInfoOverlay).not.toHaveBeenCalled()
   })
-  it('should render a deck WITHOUT labware and WITHOUT modules and CTA disabled', () => {
-    const moduleRenderCoords = {}
-    const labwareRenderCoords = {}
-
-    when(mockGetProtocolPipetteTipRackCalInfo)
-      .calledWith(undefined as any, MOCK_ROBOT_NAME)
-      .mockReturnValue({
-        left: null,
-        right: null,
-      })
-
-    props = {
-      ...props,
-      moduleRenderCoords,
-      labwareRenderCoords,
-    }
-
-    render(props)
-    expect(mockModuleViz).not.toHaveBeenCalled()
-    expect(mockModuleTag).not.toHaveBeenCalled()
-    expect(mockLabwareRender).not.toHaveBeenCalled()
-    expect(mockLabwareInfoOverlay).not.toHaveBeenCalled()
-  })
-  it('should render a deck WITH labware and WITHOUT modules with CTA enabled', () => {
-    const labwareRenderCoords = {
-      '300_ul_tiprack_id': {
-        labwareDef: fixture_tiprack_300_ul as LabwareDefinition2,
-        x: MOCK_300_UL_TIPRACK_COORDS[0],
-        y: MOCK_300_UL_TIPRACK_COORDS[1],
-        z: MOCK_300_UL_TIPRACK_COORDS[2],
-      },
-    }
-
-    const moduleRenderCoords = {}
-
-    props = {
-      ...props,
-      labwareRenderCoords,
-      moduleRenderCoords,
-    }
-
-    const { getByText } = render(props)
-    expect(mockModuleViz).not.toHaveBeenCalled()
-    expect(mockModuleTag).not.toHaveBeenCalled()
-    getByText('mock labware render of 300ul Tiprack FIXTURE')
-    getByText('mock labware info overlay of 300ul Tiprack FIXTURE')
-  })
-  it('should render a deck WITH labware and WITH modules with CTA enabled', () => {
+  it('should render a deck WITH labware and WITHOUT modules', () => {
     const labwareRenderCoords = {
       [MOCK_300_UL_TIPRACK_ID]: {
         labwareDef: fixture_tiprack_300_ul as LabwareDefinition2,
@@ -320,23 +266,46 @@ describe('LabwareSetup', () => {
       },
     }
 
-    const moduleRenderCoords = {
-      [mockMagneticModule.moduleId]: {
-        x: MOCK_MAGNETIC_MODULE_COORDS[0],
-        y: MOCK_MAGNETIC_MODULE_COORDS[1],
-        z: MOCK_MAGNETIC_MODULE_COORDS[2],
-        moduleModel: mockMagneticModule.model,
-      },
-      [mockTCModule.moduleId]: {
-        x: MOCK_TC_COORDS[0],
-        y: MOCK_TC_COORDS[1],
-        z: MOCK_TC_COORDS[2],
-        moduleModel: mockTCModule.model,
+    props = {
+      ...props,
+      labwareRenderCoords,
+    }
+    when(mockUseModuleRenderInfoById).calledWith().mockReturnValue({})
+
+    render(props)
+    expect(mockModuleViz).not.toHaveBeenCalled()
+    expect(mockModuleTag).not.toHaveBeenCalled()
+    expect(mockLabwareRender).toHaveBeenCalled()
+    expect(mockLabwareInfoOverlay).toHaveBeenCalled()
+  })
+
+  it('should render a deck WITH labware and WITH modules', () => {
+    const labwareRenderCoords = {
+      [MOCK_300_UL_TIPRACK_ID]: {
+        labwareDef: fixture_tiprack_300_ul as LabwareDefinition2,
+        x: MOCK_300_UL_TIPRACK_COORDS[0],
+        y: MOCK_300_UL_TIPRACK_COORDS[1],
+        z: MOCK_300_UL_TIPRACK_COORDS[2],
       },
     }
-    mockUseAttachedModulesEqualsProtocolModules.mockReturnValue({
-      allModulesAttached: true,
-    })
+    when(mockUseModuleRenderInfoById)
+      .calledWith()
+      .mockReturnValue({
+        [mockMagneticModule.moduleId]: {
+          x: MOCK_MAGNETIC_MODULE_COORDS[0],
+          y: MOCK_MAGNETIC_MODULE_COORDS[1],
+          z: MOCK_MAGNETIC_MODULE_COORDS[2],
+          moduleDef: mockMagneticModule as any,
+          nestedLabwareDef: null,
+        },
+        [mockTCModule.moduleId]: {
+          x: MOCK_TC_COORDS[0],
+          y: MOCK_TC_COORDS[1],
+          z: MOCK_TC_COORDS[2],
+          moduleDef: mockTCModule,
+          nestedLabwareDef: null,
+        },
+      })
 
     when(mockModuleViz)
       .calledWith(
@@ -385,7 +354,6 @@ describe('LabwareSetup', () => {
     props = {
       ...props,
       labwareRenderCoords,
-      moduleRenderCoords,
     }
 
     const { getByText } = render(props)
@@ -396,9 +364,13 @@ describe('LabwareSetup', () => {
     getByText('mock labware info overlay of 300ul Tiprack FIXTURE')
   })
   it('should render the labware position check text', () => {
-    const { getByText } = render(props)
+    const { getByText, getByRole } = render(props)
+
+    getByRole('heading', {
+      name: 'Labware Position Check',
+    })
     getByText(
-      'Labware Position Check is an optional workflow that guides you through checking the position of each labware on the deck. During this check, you can make an offset adjustment to the overall position of the labware.'
+      'This workflow guides you through checking the position of each labware on the deck. Any adjustments you make will be saved as offset data for this protocol.'
     )
   })
   it('should render the extra attention warning when there are modules/labware that need extra attention', () => {

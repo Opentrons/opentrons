@@ -12,9 +12,9 @@ import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_stand
 import { getProtocolData } from '../../../redux/protocol'
 import { Divider } from '../../../atoms/structure'
 import { CollapsibleStep } from './CollapsibleStep'
+import { ProceedToRun } from './ProceedToRunCta'
 import { LabwareSetup } from './LabwareSetup'
 import { ModuleSetup } from './ModuleSetup'
-import { getModuleRenderCoords } from '../utils/getModuleRenderCoords'
 import { getLabwareRenderCoords } from '../utils/getLabwareRenderCoords'
 import { RobotCalibration } from './RobotCalibration'
 import type { JsonProtocolFile } from '@opentrons/shared-data'
@@ -24,10 +24,6 @@ import { getConnectedRobot } from '../../../redux/discovery/selectors'
 export function RunSetupCard(): JSX.Element | null {
   const { t } = useTranslation('protocol_setup')
   const protocolData = useSelector((state: State) => getProtocolData(state))
-  const moduleRenderCoords = getModuleRenderCoords(
-    protocolData,
-    standardDeckDef as any
-  )
   const labwareRenderCoords = getLabwareRenderCoords(
     protocolData,
     standardDeckDef as any
@@ -75,7 +71,6 @@ export function RunSetupCard(): JSX.Element | null {
     [MODULE_SETUP_KEY]: {
       stepInternals: (
         <ModuleSetup
-          moduleRenderCoords={moduleRenderCoords}
           expandLabwareSetupStep={() => setExpandedStepKey(LABWARE_SETUP_KEY)}
           robotName={robot.name}
         />
@@ -88,13 +83,7 @@ export function RunSetupCard(): JSX.Element | null {
       }),
     },
     [LABWARE_SETUP_KEY]: {
-      stepInternals: (
-        <LabwareSetup
-          moduleRenderCoords={moduleRenderCoords}
-          labwareRenderCoords={labwareRenderCoords}
-          robotName={robot.name}
-        />
-      ),
+      stepInternals: <LabwareSetup labwareRenderCoords={labwareRenderCoords} />,
       description: t(`${LABWARE_SETUP_KEY}_description`),
     },
   }
@@ -121,6 +110,8 @@ export function RunSetupCard(): JSX.Element | null {
           </CollapsibleStep>
         </React.Fragment>
       ))}
+      <Divider marginY={SPACING_3} />
+      <ProceedToRun robotName={robot.name} />
     </Card>
   )
 }

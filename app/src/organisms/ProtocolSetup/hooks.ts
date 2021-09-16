@@ -1,12 +1,15 @@
 import { useSelector } from 'react-redux'
+import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 
 import {
   getProtocolAuthor,
   getProtocolLastUpdated,
   getProtocolMethod,
   getProtocolDescription,
+  getProtocolData,
 } from '../../redux/protocol'
-
+import { getModuleRenderInfo } from './utils/getModuleRenderInfo'
+import type { ModuleRenderInfoById } from './utils/getModuleRenderInfo'
 import type { State } from '../../redux/types'
 
 interface ProtocolMetadata {
@@ -26,4 +29,9 @@ export function useProtocolMetadata(): ProtocolMetadata {
     getProtocolDescription(state)
   )
   return { author, lastUpdated, method, description }
+}
+
+export function useModuleRenderInfoById(): ModuleRenderInfoById {
+  const protocolData = useSelector((state: State) => getProtocolData(state))
+  return getModuleRenderInfo(protocolData, standardDeckDef as any)
 }

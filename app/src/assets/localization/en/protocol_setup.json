@@ -14,7 +14,7 @@
   "multiple_modules_explanation": "<block>To use multiples of a module in one protocol, you need to plug in the module that’s in the lowest numbered deck slot in the lowest numbered USB port on the OT-2.</block> <block>Currently, you can use multiple Magnetic Modules or multiple Temperature Modules. You won’t be able to load multiple Thermocycler Modules. <a_how_to_multiple_modules>Learn more about how to use multiples of a module </a_how_to_best_practices> </block>",
   "multiple_modules_example": "Your protocol has 2 Temperature Modules. The Temperature Module attached to the first port starting from the left will be related to the first Temperature Module in your protocol while the second Temperature Module loaded would be related to the Temperature Module connected to the next port to the right. If using a hub, follow the same logic with the port ordered.",
   "offset_title": "Offset",
-  "labware_position_check_text": "Labware Position Check is an optional workflow that guides you through checking the position of each labware on the deck. During this check, you can make an offset adjustment to the overall position of the labware.",
+  "labware_position_check_text": "This workflow guides you through checking the position of each labware on the deck. Any adjustments you make will be saved as offset data for this protocol.",
   "magnetic_module_attention_warning": "<block>Opentrons recommends securing labware with the module’s bracket. <a>Securing labware to the Magnetic Module</a></block>",
   "thermocycler_attention_warning": "<block> Labware must be secured with the module’s latch. <a>Securing labware to the Thermocycler</a></block> <block>Thermocycler lid must be open when robot moves to the slots it occupies. Opentrons will automatically open the lid to move to these slots during Labware Position Check.</block>",
   "secure_labware_modal_title": "Securing Labware to the {{name}}",
@@ -46,7 +46,9 @@
   "usb_port_connected": "USB Port",
   "hub_connected": "via hub",
   "usb_port_connected_old_server_version": "USB Port Connected",
-  "proceed_to_run_disabled_modules_not_connected_tooltip": "Make sure all modules are connected before proceeding to run",
+  "proceed_to_run_disabled_modules_not_connected_tooltip": "Make sure the module is connected before proceeding to run",
+  "proceed_to_run_disabled_modules_not_connected_tooltip_plural": "Make sure all modules are connected before proceeding to run",
   "proceed_to_run_disabled_calibration_not_complete_tooltip": "Make sure robot calibration is complete before proceeding to run",
-  "proceed_to_run_disabled_modules_and_calibration_not_complete_tooltip": "Make sure robot calibration is complete and all modules are connected before proceeding to run"
+  "proceed_to_run_disabled_modules_and_calibration_not_complete_tooltip": "Make sure robot calibration is complete and the module is connected before proceeding to run",
+  "proceed_to_run_disabled_modules_and_calibration_not_complete_tooltip_plural": "Make sure robot calibration is complete and all modules are connected before proceeding to run"
 }

@@ -26,12 +26,12 @@ import {
   inferModuleOrientationFromXCoordinate,
 } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
-import { useAttachedModulesEqualsProtocolModules } from '../useAttachedModulesEqualsProtocolModules'
+import { useMissingModuleIds } from '../hooks'
 import { fetchModules, getAttachedModules } from '../../../../redux/modules'
 import { ModuleInfo } from './ModuleInfo'
 import { MultipleModulesModal } from './MultipleModulesModal'
 import styles from '../../styles.css'
-import type { CoordinatesByModuleModel } from '../../utils/getModuleRenderCoords'
+import { useModuleRenderInfoById } from '../../hooks'
 import type { State, Dispatch } from '../../../../redux/types'
 import type { AttachedModule } from '../../../../redux/modules/types'
 
@@ -48,18 +48,22 @@ const POLL_MODULE_INTERVAL_MS = 5000
 const DECK_VIEW_BOX = `-64 -10 ${530} ${456}`
 
 interface ModuleSetupProps {
-  moduleRenderCoords: CoordinatesByModuleModel
   expandLabwareSetupStep: () => void
   robotName: string
 }
 
 export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
-  const { moduleRenderCoords, expandLabwareSetupStep, robotName } = props
+  const { expandLabwareSetupStep, robotName } = props
   const dispatch = useDispatch<Dispatch>()
   const [targetProps, tooltipProps] = useHoverTooltip()
+  const moduleRenderInfoById = useModuleRenderInfoById()
+  console.log(moduleRenderInfoById)
   const proceedToLabwareDisabledReason =
     'Plug in and power up the required modules to continue'
-  const moduleModels = map(moduleRenderCoords, ({ moduleModel }) => moduleModel)
+  const moduleModels = map(
+    moduleRenderInfoById,
+    ({ moduleDef }) => moduleDef.model
+  )
   const attachedModules = useSelector((state: State) =>
     getAttachedModules(state, robotName)
   )
@@ -69,8 +73,8 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
   ] = React.useState<boolean>(false)
   const { t } = useTranslation('protocol_setup')
   const hasADuplicateModule = new Set(moduleModels).size !== moduleModels.length
-  const { allModulesAttached } = useAttachedModulesEqualsProtocolModules()
-  const proceedToLabwareDisabled = !allModulesAttached
+  const { missingModuleIds } = useMissingModuleIds()
+  const proceedToLabwareDisabled = missingModuleIds.length > 0
   const modulesByPort = attachedModules.reduce<{
     [port: string]: AttachedModule[]
   }>((portMap, module) => {
@@ -122,26 +126,27 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
           {() => {
             return (
               <>
-                {map(moduleRenderCoords, ({ x, y, moduleModel }) => {
+                {map(moduleRenderInfoById, ({ x, y, moduleDef }) => {
+                  const { model } = moduleDef
                   const orientation = inferModuleOrientationFromXCoordinate(x)
                   const attached = attachedModules.some(
-                    attachedModule => moduleModel === attachedModule.model
+                    attachedModule => model === attachedModule.model
                   )
                   if (isEmpty(modulesByPort)) {
                     return (
                       <React.Fragment
-                        key={`LabwareSetup_Module_${moduleModel}_${x}${y}`}
+                        key={`LabwareSetup_Module_${model}_${x}${y}`}
                       >
                         <ModuleViz
                           x={x}
                           y={y}
                           orientation={orientation}
-                          moduleType={getModuleType(moduleModel)}
+                          moduleType={getModuleType(model)}
                         />
                         <ModuleInfo
                           x={x}
                           y={y}
-                          moduleModel={moduleModel}
+                          moduleModel={model}
                           orientation={orientation}
                           isAttached={attached}
                           usbPort={null}
@@ -152,18 +157,18 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
                   } else {
                     return Object.keys(modulesByPort).map(port => (
                       <React.Fragment
-                        key={`LabwareSetup_Module_${moduleModel}_${x}${y}`}
+                        key={`LabwareSetup_Module_${model}_${x}${y}`}
                       >
                         <ModuleViz
                           x={x}
                           y={y}
                           orientation={orientation}
-                          moduleType={getModuleType(moduleModel)}
+                          moduleType={getModuleType(model)}
                         />
                         <ModuleInfo
                           x={x}
                           y={y}
-                          moduleModel={moduleModel}
+                          moduleModel={model}
                           orientation={orientation}
                           isAttached={attached}
                           usbPort={attached === true ? port : null}
