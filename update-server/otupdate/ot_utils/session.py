@@ -29,3 +29,20 @@ def active_session_check(handler):
                 status=409)
         else:
             pass
+    return decorated
+
+def start_session(handler):
+    """ decorator to start new session
+        add active_session_check decorator
+        before this. Dont want to start a
+        session on top of an one
+    """
+    @functools.wraps(handler)
+    async def decorated(request: web.Request) -> web.Response:
+        session = handler(
+            config.config_from_request(request).download_storage_path)
+        request.app[SESSION_VARNAME] = session
+        return web.json_response(
+            data={'tokem': session.token},
+            status=201)
+    return decorated
