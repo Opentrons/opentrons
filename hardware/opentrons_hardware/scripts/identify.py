@@ -52,7 +52,6 @@ async def wait_responses(can_driver: CanDriver) -> None:
 
 async def run(interface: str, bitrate: int, channel: Optional[str] = None) -> None:
     """Entry point for script."""
-    ...
     driver = await CanDriver.build(
         bitrate=bitrate, interface=interface, channel=channel
     )
@@ -72,7 +71,7 @@ if __name__ == "__main__":
         "--interface",
         type=str,
         required=True,
-        help="the interface to use (ie: virtual, pcan, socketcan",
+        help="the interface to use (ie: virtual, pcan, socketcan)",
     )
     parser.add_argument(
         "--bitrate", type=int, default=250000, required=False, help="the bitrate"
