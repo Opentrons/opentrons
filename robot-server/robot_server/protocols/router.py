@@ -88,6 +88,21 @@ async def create_protocol(
         analysis_id: Unique identifier to attach to the analysis resource.
         created_at: Timestamp to attach to the new resource.
     """
+    # todo(mm, 2021-09-16):
+    #
+    # Different units have different competing ideas about how to represent a protocol's
+    # files, which is unnecessarily complex.
+    #
+    # Python offers no standard *in-memory* file abstraction that suits all our needs:
+    #
+    # * Protocol files have contents
+    # * Protocol files have names
+    # * Protocol files can be arranged in a hierarchy
+    #
+    # For simplicity, then, we should not bother trying to keep things in-memory.
+    # We should change this so the pre-analyzer, or something before the
+    # pre-analyzer, saves all uploaded files to the filesystem. Then, all downstream
+    # units can receive a pathlib.Path pointing to the protocol's enclosing directory.
     pre_analysis_input = [PreAnalysisInputFile(f.filename, f.file) for f in files]
 
     try:
