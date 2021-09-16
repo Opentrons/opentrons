@@ -55,7 +55,7 @@ jobs:
         with:
           node-version: '14'
       - name: 'install udev'
-        run: sudo apt-get install libudev-dev
+        run: sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'set complex environment variables'
         id: 'set-vars'
         uses: actions/github-script@v3.1
@@ -99,7 +99,7 @@ jobs:
           node-version: '14'
       - name: 'install libudev'
         if: startsWith(matrix.os, 'ubuntu')
-        run: sudo apt-get install libudev-dev
+        run: sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'set complex environment variables'
         id: 'set-vars'
         uses: actions/github-script@v3.1
