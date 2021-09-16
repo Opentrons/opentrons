@@ -5,9 +5,9 @@ import json
 from typing import Mapping
 from aiohttp import web
 
-from . import constants, name_management
+# from . import constants, name_management
 
-from . import config, control, update, ssh_key_management
+# from . import config, control, update, ssh_key_management
 from openembedded import root_fs
 
 LOG = logging.getLogger(__name__)
@@ -42,7 +42,7 @@ def get_app(system_version_file: str = None,
         return web.Response(text="hello")
     app = web.Application(middlewares=[log_error_middleware])
     app.router.add_routes([
-        wen.post('/server/update/begin', update.begin),
+        web.post('/server/update/begin', update.begin),
         web.post('/server/oe/restore', rfs.factory_restore),
         web.post('/server/oe/swap', rfs.swap_partition),
         web.get('/server/oe/partition', rfs.get_partition_api),
