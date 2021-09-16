@@ -78,15 +78,11 @@ def _analyze_json(main_file: InputFile) -> "JsonPreAnalysis":
         raise JsonParseError() from exception
 
     try:
-        JsonProtocol.parse_obj(parsed_json)
+        parsed_protocol = JsonProtocol.parse_obj(parsed_json)
     except PydanticValidationError as exception:
         raise JsonSchemaValidationError() from exception
 
-    # We extract metadata directly from the JSON dict,
-    # instead of from the fully parsed Pydantic model.
-    # This way, we preserve metadata fields that the Pydantic model doesn't know about.
-    # (Otherwise, Pydantic would silently discard them.)
-    return JsonPreAnalysis(metadata=parsed_json["metadata"])
+    return JsonPreAnalysis(parsed_protocol.metadata.dict(exclude_unset=True))
 
 
 # todo(mm, 2021-09-13): Deduplicate with opentrons.protocols.parse.
