@@ -1,7 +1,6 @@
 """Router for /protocols endpoints."""
 from datetime import datetime
 from fastapi import APIRouter, Depends, File, UploadFile, status
-from tempfile import SpooledTemporaryFile
 from typing import List
 from typing_extensions import Literal
 
@@ -90,19 +89,7 @@ async def create_protocol(
         analysis_id: Unique identifier to attach to the analysis resource.
         created_at: Timestamp to attach to the new resource.
     """
-
-    def convert_upload_file_to_pre_analysis_input(
-        upload_file: UploadFile,
-    ) -> PreAnalysisInputFile:
-        underlying_file = upload_file.file
-
-        # Starlette clearly documents this as a SpooledTemporaryFile, but currently
-        # (Starlette v0.13.2), mypy infers Union[SpooledTemporaryFile[bytes], IO[Any]].
-        assert isinstance(underlying_file, SpooledTemporaryFile)
-
-        return PreAnalysisInputFile(upload_file.filename, underlying_file)
-
-    pre_analysis_input = [convert_upload_file_to_pre_analysis_input(u) for u in files]
+    pre_analysis_input = [PreAnalysisInputFile(f.filename, f.file) for f in files]
 
     try:
         pre_analysis = pre_analyzer.analyze(pre_analysis_input)
