@@ -138,7 +138,6 @@ async def test_create_protocol_raises_for_missing_filename(
 
 async def test_get_missing_protocol_raises(
     tmp_path: Path,
-    json_upload_file: UploadFile,
     subject: ProtocolStore,
 ) -> None:
     """It should raise an error when protocol not found."""
@@ -146,47 +145,52 @@ async def test_get_missing_protocol_raises(
         subject.get("protocol-id")
 
 
-# async def test_get_all_protocols(
-#     tmp_path: Path,
-#     json_upload_file: UploadFile,
-#     subject: ProtocolStore,
-# ) -> None:
-#     """It should get all protocols existing in the store."""
-#     created_at_1 = datetime.now()
-#     created_at_2 = datetime.now()
+async def test_get_all_protocols(
+    tmp_path: Path,
+    upload_files: List[UploadFile],
+    subject: ProtocolStore,
+) -> None:
+    """It should get all protocols existing in the store."""
+    created_at_1 = datetime.now()
+    created_at_2 = datetime.now()
 
-#     await subject.create(
-#         protocol_id="protocol-id-1",
-#         created_at=created_at_1,
-#         files=[json_upload_file],
-#     )
+    await subject.create(
+        protocol_id="protocol-id-1",
+        created_at=created_at_1,
+        files=upload_files,
+        pre_analysis=JsonPreAnalysis(metadata={"protocol1Metadata": "hello"}),
+    )
 
-#     await json_upload_file.seek(0)
+    # The first subject.create() may have read the upload files.
+    # Reset them so the second subject.create() can read them, too.
+    for f in upload_files:
+        await f.seek(0)
 
-#     await subject.create(
-#         protocol_id="protocol-id-2",
-#         created_at=created_at_2,
-#         files=[json_upload_file],
-#     )
+    await subject.create(
+        protocol_id="protocol-id-2",
+        created_at=created_at_2,
+        files=upload_files,
+        pre_analysis=JsonPreAnalysis(metadata={"protocol2Metadata": "hello"}),
+    )
 
-#     result = subject.get_all()
+    result = subject.get_all()
 
-#     assert result == [
-#         ProtocolResource(
-#             protocol_id="protocol-id-1",
-#             protocol_type=ProtocolFileType.JSON,
-#             pre_analysis=NotImplemented,  # type: ignore
-#             created_at=created_at_1,
-#             files=[matchers.Anything()],
-#         ),
-#         ProtocolResource(
-#             protocol_id="protocol-id-2",
-#             protocol_type=ProtocolFileType.JSON,
-#             pre_analysis=NotImplemented,  # type: ignore
-#             created_at=created_at_2,
-#             files=[matchers.Anything()],
-#         ),
-#     ]
+    assert result == [
+        ProtocolResource(
+            protocol_id="protocol-id-1",
+            protocol_type=ProtocolFileType.JSON,
+            created_at=created_at_1,
+            files=matchers.Anything(),
+            pre_analysis=JsonPreAnalysis(metadata={"protocol1Metadata": "hello"}),
+        ),
+        ProtocolResource(
+            protocol_id="protocol-id-2",
+            protocol_type=ProtocolFileType.JSON,
+            created_at=created_at_2,
+            files=matchers.Anything(),
+            pre_analysis=JsonPreAnalysis(metadata={"protocol2Metadata": "hello"}),
+        ),
+    ]
 
 
 async def test_remove_protocol(
