@@ -1,6 +1,6 @@
 """Tests for the JSON JsonCommandTranslator interface."""
 import pytest
-from typing import Any, List
+from typing import Any, Dict, List
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons.types import DeckSlotName, MountType
@@ -41,6 +41,27 @@ def _assert_appear_in_order(elements: List[Any], source: List[Any]) -> None:
         assert element in source
     element_indexes = [source.index(element) for element in elements]
     assert sorted(element_indexes) == element_indexes
+
+
+def _make_json_protocol(
+    *,
+    pipettes: Dict[str, models.json_protocol.Pipettes] = {},
+    labware_definitions: Dict[str, models.LabwareDefinition] = {},
+    labware: Dict[str, models.json_protocol.Labware] = {},
+    commands: List[models.json_protocol.AllCommands] = [],
+) -> models.JsonProtocol:
+    """Return a minimal JsonProtocol with the given elements, to use as test input."""
+    return models.JsonProtocol(
+        # schemaVersion is arbitrary. Currently (2021-06-28), JsonProtocol.parse_obj()
+        # isn't smart enough to validate differently depending on this field.
+        schemaVersion=5,
+        metadata=models.json_protocol.Metadata(),
+        robot=models.json_protocol.Robot(model="OT-2 Standard"),
+        pipettes=pipettes,
+        labwareDefinitions=labware_definitions,
+        labware=labware,
+        commands=commands,
+    )
 
 
 def test_labware(
@@ -103,9 +124,7 @@ def test_labware(
     )
 
     result = subject.translate(
-        models.json_protocol.make_minimal(
-            labware_definitions=definition_map, labware=labware_map
-        )
+        _make_json_protocol(labware_definitions=definition_map, labware=labware_map)
     )
 
     _assert_appear_in_order(
@@ -144,9 +163,7 @@ def test_pipettes(subject: JsonCommandTranslator) -> None:
         )
     )
 
-    result = subject.translate(
-        models.json_protocol.make_minimal(pipettes=json_pipettes)
-    )
+    result = subject.translate(_make_json_protocol(pipettes=json_pipettes))
 
     # set() would be a nicer way to write this, but our Pydantic models aren't hashable.
     assert expected_request_1 in result
@@ -182,9 +199,7 @@ def test_aspirate(subject: JsonCommandTranslator) -> None:
         )
     ]
 
-    output = subject.translate(
-        models.json_protocol.make_minimal(commands=[input_json_command])
-    )
+    output = subject.translate(_make_json_protocol(commands=[input_json_command]))
     assert output == expected_output
 
 
@@ -216,9 +231,7 @@ def test_dispense(subject: JsonCommandTranslator) -> None:
         )
     ]
 
-    output = subject.translate(
-        models.json_protocol.make_minimal(commands=[input_json_command])
-    )
+    output = subject.translate(_make_json_protocol(commands=[input_json_command]))
     assert output == expected_output
 
 
@@ -240,9 +253,7 @@ def test_drop_tip(subject: JsonCommandTranslator) -> None:
         )
     ]
 
-    output = subject.translate(
-        models.json_protocol.make_minimal(commands=[input_json_command])
-    )
+    output = subject.translate(_make_json_protocol(commands=[input_json_command]))
     assert output == expected_output
 
 
@@ -264,9 +275,7 @@ def test_pick_up_tip(subject: JsonCommandTranslator) -> None:
         )
     ]
 
-    output = subject.translate(
-        models.json_protocol.make_minimal(commands=[input_json_command])
-    )
+    output = subject.translate(_make_json_protocol(commands=[input_json_command]))
     assert output == expected_output
 
 
@@ -279,7 +288,7 @@ def test_pause(subject: JsonCommandTranslator) -> None:
             message="hello world",
         ),
     )
-    input_protocol = models.json_protocol.make_minimal(commands=[input_command])
+    input_protocol = _make_json_protocol(commands=[input_command])
 
     result = subject.translate(input_protocol)
 

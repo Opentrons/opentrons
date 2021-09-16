@@ -683,29 +683,3 @@ class Model(BaseModel):
         "Its usage has not yet been defined, so its shape is not "
         "enforced by this schema.",
     )
-
-
-def make_minimal(
-    *,
-    metadata=Metadata(),
-    pipettes: Dict[str, Pipettes] = {},
-    labware_definitions: Dict[str, LabwareDefinition] = {},
-    labware: Dict[str, Labware] = {},
-    commands: List[AllCommands] = [],
-) -> Model:
-    """Return a minimal JSON protocol with the given elements.
-
-    This is intended as a convenience for unit tests that need to create full, valid
-    JSON protocols, but that only care about a few specific fields.
-    """
-    return Model(
-        # schemaVersion is arbitrary. Currently (2021-06-28), the model
-        # isn't smart enough to validate differently depending on this field.
-        schemaVersion=5,
-        metadata=metadata,
-        robot=Robot(model="OT-2 Standard"),
-        pipettes=pipettes,
-        labwareDefinitions=labware_definitions,
-        labware=labware,
-        commands=commands,
-    )

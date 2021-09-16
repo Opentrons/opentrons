@@ -10,7 +10,8 @@ import pytest
 
 from opentrons.protocols.models.json_protocol import (
     Metadata as JsonProtocolMetadata,
-    make_minimal as make_minimal_json_protocol,
+    Model as JsonProtocol,
+    Robot as JsonProtocolRobot,
 )
 
 from opentrons.protocol_runner.pre_analysis import (
@@ -28,6 +29,20 @@ from opentrons.protocol_runner.pre_analysis import (
 )
 
 
+def _make_minimal_json_protocol(metadata: JsonProtocolMetadata) -> JsonProtocol:
+    return JsonProtocol(
+        # schemaVersion is arbitrary. Currently (2021-06-28), the model
+        # isn't smart enough to validate differently depending on this field.
+        schemaVersion=5,
+        metadata=metadata,
+        robot=JsonProtocolRobot(model="OT-2 Standard"),
+        pipettes={},
+        labwareDefinitions={},
+        labware={},
+        commands=[],
+    )
+
+
 @contextmanager
 def _input_file(
     directory: Path, name: str, contents: str
@@ -40,7 +55,7 @@ def _input_file(
 
 def test_json_pre_analysis(tmp_path: Path) -> None:
     """It should identify the protocol as JSON and extract its metadata."""
-    input_protocol_dict = make_minimal_json_protocol(
+    input_protocol_dict = _make_minimal_json_protocol(
         metadata=JsonProtocolMetadata(
             author="Dr. Sy N. Tist",
             tags=["tag1", "tag2"],
