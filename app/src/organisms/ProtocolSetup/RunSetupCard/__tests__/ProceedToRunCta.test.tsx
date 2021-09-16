@@ -52,13 +52,14 @@ describe('ProceedToRunCta', () => {
     mockUseMissingModuleIds.mockReturnValue({
       missingModuleIds: [],
     })
-    render(props)
     expect(typeof ProceedToRunCta).toBe('function')
   })
   it('should enabled with a tooltip and a missing Id', () => {
     mockUseMissingModuleIds.mockReturnValue({
       missingModuleIds: ['temperatureModuleV1'],
     })
+    const { getByRole } = render(props)
     expect(typeof ProceedToRunCta).toBe('function')
+    getByRole('button', { name: 'Proceed to Run' })
   })
 })

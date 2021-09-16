@@ -19,7 +19,9 @@ interface ProceedToRunProps {
   robotName: string
 }
 
-export const ProceedToRunCta = (props: ProceedToRunProps): JSX.Element | null => {
+export const ProceedToRunCta = (
+  props: ProceedToRunProps
+): JSX.Element | null => {
   const { robotName } = props
   const { t } = useTranslation('protocol_setup')
   const [targetProps, tooltipProps] = useHoverTooltip()
