@@ -167,7 +167,7 @@ describe('RunSetupCard', () => {
         'Review required pipettes and tip length calibrations for this protocol.'
       )
     })
-    it('renders calibration needed when robt cal not complete', () => {
+    it('renders calibration needed when robot cal not complete', () => {
       mockGetProtocolCalibrationComplete.mockReturnValue({ complete: false })
       const { getByText } = render()
       getByText('Calibration needed')

@@ -61,7 +61,7 @@ export function RobotCalibration(props: Props): JSX.Element {
     <>
       <DeckCalibration robotName={robotName} />
       <Divider marginY={SPACING_3} />
-      <Text paddingBottom={SPACING_2} css={FONT_HEADER_THIN}>
+      <Text as="h2" paddingBottom={SPACING_2} css={FONT_HEADER_THIN}>
         {t('required_pipettes_title')}
       </Text>
       <div>
@@ -83,7 +83,9 @@ export function RobotCalibration(props: Props): JSX.Element {
         })}
       </div>
       <Divider marginY={SPACING_3} />
-      <Text css={FONT_HEADER_THIN}>{t('required_tip_racks_title')}</Text>
+      <Text as="h2" css={FONT_HEADER_THIN}>
+        {t('required_tip_racks_title')}
+      </Text>
       <div>
         {PipetteConstants.PIPETTE_MOUNTS.map(mount => {
           const pipetteTipRackData = protocolPipetteTipRackData[mount]
@@ -92,7 +94,11 @@ export function RobotCalibration(props: Props): JSX.Element {
           } else {
             return (
               <div key={mount}>
-                <Text paddingY={SPACING_2} fontWeight={FONT_WEIGHT_SEMIBOLD}>
+                <Text
+                  as="h4"
+                  paddingY={SPACING_2}
+                  fontWeight={FONT_WEIGHT_SEMIBOLD}
+                >
                   {pipetteTipRackData.pipetteDisplayName}
                 </Text>
                 {pipetteTipRackData.tipRacks.map((tipRack, index) => (
