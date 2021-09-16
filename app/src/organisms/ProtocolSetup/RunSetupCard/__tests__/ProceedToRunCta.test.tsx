@@ -3,7 +3,7 @@ import { StaticRouter } from 'react-router-dom'
 import { renderWithProviders } from '@opentrons/components/__utils__'
 import { i18n } from '../../../../i18n'
 import * as hooks from '../hooks'
-import { ProceedToRun } from '../proceedToRunCta'
+import { ProceedToRunCta } from '../ProceedToRunCta'
 import { mockProtocolPipetteTipRackCalInfo } from '../../../../redux/pipettes/__fixtures__'
 import { getProtocolPipetteTipRackCalInfo } from '../../../../redux/pipettes'
 import type { ProtocolPipetteTipRackCalDataByMount } from '../../../../redux/pipettes/types'
@@ -27,10 +27,10 @@ const mockProtocolPipetteTipRackCalData: ProtocolPipetteTipRackCalDataByMount = 
 } as any
 
 const MOCK_ROBOT_NAME = 'ot-dev'
-const render = (props: React.ComponentProps<typeof ProceedToRun>) => {
+const render = (props: React.ComponentProps<typeof ProceedToRunCta>) => {
   return renderWithProviders(
     <StaticRouter>
-      <ProceedToRun {...props} />
+      <ProceedToRunCta {...props} />
     </StaticRouter>,
     {
       i18nInstance: i18n,
@@ -38,7 +38,7 @@ const render = (props: React.ComponentProps<typeof ProceedToRun>) => {
   )
 }
 describe('ProceedToRunCta', () => {
-  let props: React.ComponentProps<typeof ProceedToRun>
+  let props: React.ComponentProps<typeof ProceedToRunCta>
   beforeEach(() => {
     props = {
       robotName: MOCK_ROBOT_NAME,
@@ -53,13 +53,12 @@ describe('ProceedToRunCta', () => {
       missingModuleIds: [],
     })
     render(props)
-    expect(typeof ProceedToRun).toBe('function')
+    expect(typeof ProceedToRunCta).toBe('function')
   })
   it('should enabled with a tooltip and a missing Id', () => {
     mockUseMissingModuleIds.mockReturnValue({
       missingModuleIds: ['temperatureModuleV1'],
     })
-    render(props)
-    expect(typeof ProceedToRun).toBe('function')
+    expect(typeof ProceedToRunCta).toBe('function')
   })
 })

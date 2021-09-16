@@ -29,7 +29,7 @@ import { ModuleSetup } from '../RunSetupCard/ModuleSetup'
 import { RunSetupCard } from '../RunSetupCard'
 import { LabwareSetup } from '../RunSetupCard/LabwareSetup'
 import { RobotCalibration } from '../RunSetupCard/RobotCalibration'
-import { ProceedToRun } from '../RunSetupCard/ProceedToRunCta'
+import { ProceedToRunCta } from '../RunSetupCard/ProceedToRunCta'
 
 import type {
   AttachedPipettesByMount,
@@ -65,8 +65,8 @@ const mockLabwareSetup = LabwareSetup as jest.MockedFunction<
   typeof LabwareSetup
 >
 
-const mockProceedToRun = ProceedToRun as jest.MockedFunction<
-  typeof ProceedToRun
+const mockProceedToRun = ProceedToRunCta as jest.MockedFunction<
+  typeof ProceedToRunCta
 >
 
 const mockModuleSetup = ModuleSetup as jest.MockedFunction<typeof ModuleSetup>

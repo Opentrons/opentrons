@@ -19,7 +19,7 @@ interface ProceedToRunProps {
   robotName: string
 }
 
-export const ProceedToRun = (props: ProceedToRunProps): JSX.Element | null => {
+export const ProceedToRunCta = (props: ProceedToRunProps): JSX.Element | null => {
   const { robotName } = props
   const { t } = useTranslation('protocol_setup')
   const [targetProps, tooltipProps] = useHoverTooltip()
@@ -43,7 +43,6 @@ export const ProceedToRun = (props: ProceedToRunProps): JSX.Element | null => {
     missingModuleIds.length > 0 && pipettesCalibrated === true
   const moduleAndCalibrationIncomplete =
     missingModuleIds.length > 0 && pipettesCalibrated === false
-  console.log('pipettes calibrated ' + pipettesCalibrated)
 
   const proceedToRunDisabledReason = calibrationIncomplete
     ? t('proceed_to_run_disabled_calibration_not_complete_tooltip')
@@ -57,9 +56,6 @@ export const ProceedToRun = (props: ProceedToRunProps): JSX.Element | null => {
         count: missingModuleIds.length,
       })
     : null
-
-  console.log('proceed to run disabled reason ' + proceedToRunDisabledReason)
-  console.log('modules missing ' + missingModuleIds.length)
 
   const LinkComponent = proceedToRunDisabledReason != null ? 'button' : NavLink
   const linkProps = proceedToRunDisabledReason != null ? {} : { to: '/run' }

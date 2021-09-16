@@ -57,7 +57,6 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
   const dispatch = useDispatch<Dispatch>()
   const [targetProps, tooltipProps] = useHoverTooltip()
   const moduleRenderInfoById = useModuleRenderInfoById()
-  console.log(moduleRenderInfoById)
   const proceedToLabwareDisabledReason =
     'Plug in and power up the required modules to continue'
   const moduleModels = map(
