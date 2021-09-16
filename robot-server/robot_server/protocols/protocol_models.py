@@ -1,7 +1,7 @@
 """Protocol file models."""
 from __future__ import annotations
 from datetime import datetime
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Extra, Field
 from typing import Sequence
 
 from opentrons.protocol_runner import ProtocolFileType
@@ -38,9 +38,9 @@ class Metadata(BaseModel):
     If a compelling need arises, this API may expose `apiLevel` some other way.)
     """
 
-    class Config:  # noqa: D106
-        # Tell Pydantic that objects of this model can have arbitrary fields.
-        extra = "allow"
+    class Config:
+        """Tell Pydantic that metadata objects can have arbitrary fields."""
+        extra = Extra.allow
 
 
 class Protocol(ResourceModel):
@@ -62,6 +62,8 @@ class Protocol(ResourceModel):
         description="The type of protocol file (JSON or Python).",
     )
 
+    # todo(mm, 2021-09-16): Investigate whether something like `dict[str, Any]` would
+    # be a better way (e.g. produce better OpenAPI) to represent an arbitrary JSON obj.
     metadata: Metadata
 
     # TODO(mc, 2021-09-01): consider reporting summary objects here, with the
