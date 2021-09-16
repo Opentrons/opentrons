@@ -12,7 +12,9 @@ g-code-testing = {editable = true, path = "."}
 anyio = "==3.3.0"
 pydantic = "==1.4"
 
+
 [dev-packages]
+boto3 = "==1.18.41"
 diff-match-patch = "==20200713"
 pytest = "~=6.1"
 pytest-aiohttp = "==0.3.0"

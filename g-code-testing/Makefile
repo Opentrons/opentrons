@@ -1,7 +1,6 @@
 # opentrons g-code-testing makefile
 
 include ../scripts/python.mk
-include ./g_code_parsing.mk
 
 SHX := npx shx
 
@@ -35,7 +34,23 @@ teardown:
 
 .PHONY: test
 test:
-	$(pytest) $(tests) $(test_opts)
+	$(pytest) -m 'not slow and not g_code_confirm' $(tests) $(test_opts)
+
+.PHONY: test-g-code-fast
+test-g-code-fast:
+	$(pytest) -m 'g_code_confirm and not slow' $(tests) $(test_opts)
+
+.PHONY: test-g-code-2-modules
+test-g-code-2-modules:
+	$(pytest) -m 'slow' -k 'test_two_modules_protocol' $(tests) $(test_opts)
+
+.PHONY: test-g-code-swift-smoke
+test-g-code-swift-smoke:
+	$(pytest) -m 'slow' -k 'test_swift_smoke' $(tests) $(test_opts)
+
+.PHONY: test-g-code-swift-turbo
+test-g-code-swift-turbo:
+	$(pytest) -m 'slow' -k 'test_swift_turbo' $(tests) $(test_opts)
 
 .PHONY: lint
 lint:
