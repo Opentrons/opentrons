@@ -40,7 +40,9 @@ class InputFile:
 # todo(mm, 2021-09-13): Currently wrapped in a class so dependency-injection and mocking
 # feel less fragile, pending a team discussion about whether we still think this is
 # a good thing to do in Python.
-class PreAnalyzer:  # noqa: D101
+class PreAnalyzer:
+    """A protocol pre-analyzer."""
+
     @staticmethod
     def analyze(
         protocol_files: List[InputFile],
@@ -137,13 +139,17 @@ needed because mypy doesn't support recursive types.
 
 
 @dataclass(frozen=True)
-class PythonPreAnalysis:  # noqa: D101
+class PythonPreAnalysis:
+    """A pre-analysis of a Python protocol."""
+
     metadata: Metadata
     api_level: str
 
 
 @dataclass(frozen=True)
-class JsonPreAnalysis:  # noqa: D101
+class JsonPreAnalysis:
+    """A pre-analysis of a JSON protocol."""
+
     metadata: Metadata
 
 

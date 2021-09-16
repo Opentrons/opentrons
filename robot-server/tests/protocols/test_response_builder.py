@@ -9,7 +9,8 @@ from robot_server.protocols.analysis_models import PendingAnalysis
 from robot_server.protocols.response_builder import ResponseBuilder
 
 
-def test_create_single_json_file_response() -> None:  # noqa: D103
+def test_create_single_json_file_response() -> None:
+    """It should create a response for a single-file JSON `ProtocolResource`."""
     metadata_as_dict = {
         "a_string": "hello",
         "an_int": 9001,
