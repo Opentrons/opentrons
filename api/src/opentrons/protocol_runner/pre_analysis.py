@@ -19,19 +19,22 @@ from opentrons.protocols.models import JsonProtocol
 
 
 @dataclass(frozen=True)
-class InputFile:  # noqa: D101
-    # todo(mm, 2021-09-14): Specify whether this is allowed to contain path separators,
-    # and consider making it a pathlib.PurePath.
-    #
-    # Pre-analysis can read `file_like`. If, after pre-analysis, you want to read
-    # `file_like` again, it's your responsibility to call `file_like.seek(0)` to reset
-    # it.
-    name: str
+class InputFile:
+    """An individual file to be pre-analyzed as part of a protocol."""
 
-    # This currently needs to be IO[bytes] instead of the more intuitive BinaryIO type
-    # because mypy can't see that a TemporaryFile is a BinaryIO.
-    # https://github.com/python/typeshed/issues/1780
+    name: str
+    """The filename, including extension, without any path separators."""
+
     file_like: IO[bytes]
+    """A file-like object for the `PreAnalyzer` to read the contents.
+
+    If you want to reuse this object (read it again) after pre-analysis,
+    it's your responsibility to call ``.seek(0)`` on it to reset it.
+
+    This currently needs to be IO[bytes] instead of the more intuitive BinaryIO type
+    because mypy can't see that a TemporaryFile is a BinaryIO.
+    https://github.com/python/typeshed/issues/1780
+    """
 
 
 # todo(mm, 2021-09-13): Currently wrapped in a class so dependency-injection and mocking
