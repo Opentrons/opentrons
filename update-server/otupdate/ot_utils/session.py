@@ -8,7 +8,9 @@ token assignment, etc
 
 import functools
 import logging
-from openembedded_server import update, config
+from openembedded import (root_fs, oe_server_mode)
+
+# from openembedded_server import update, config
 
 from aiohttp import web
 
@@ -22,7 +24,7 @@ def active_session_check(handler):
     """
     @functools.wraps(handler)
     def decorated(request: web.Request) -> web.Response:
-        if updade.session_from_request(request) is None:
+        if update.session_from_request(request) is None:
             LOG.warning("check_session: active session exists!")
             return web.json_response(
                 data={'message':
@@ -31,6 +33,7 @@ def active_session_check(handler):
                 status=409)
         else:
             pass
+        handler(request)
     return decorated
 
 
@@ -38,7 +41,7 @@ def start_session(handler):
     """ decorator to start new session
         add active_session_check decorator
         before this. Dont want to start a
-        session on top of an one
+        session on top of another one
     """
     @functools.wraps(handler)
     def decorated(request: web.Request) -> web.Response:

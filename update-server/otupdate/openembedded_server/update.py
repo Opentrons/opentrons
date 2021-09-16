@@ -18,6 +18,8 @@ from .constants import RESTART_LOCK_NAME
 from . import config, file_actions
 from .update_session import UpdateSession, Stages
 
+from ot_utils import session
+
 APP_VARIABLE_PREFIX = 'OT3_SESSION'
 SESSION_VARNAME = APP_VARIABLE_PREFIX + 'session'
 LOG = logging.getLogger(__name__)
@@ -43,16 +45,10 @@ def require_session(handler):
     return decorated
 
 
+@session.active_session_check
 async def begin(request: web.Request) -> web.Response:
     """ Begin a session
     """
-    if session_from_request(request) is not None:
-        LOG.warning("begin: requested with active session")
-        return web.json_response(
-                data={'message':
-                      'An update session is already on this robot',
-                      'error': 'session-already-active'},
-                status=409)
     session = UpdateSession(
         config.config_from_request(request).download_storage_path)
     request.app[SESSION_VARNAME] = session
