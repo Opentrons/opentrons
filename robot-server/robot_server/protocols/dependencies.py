@@ -5,7 +5,6 @@ from tempfile import gettempdir
 from fastapi import Depends
 
 from opentrons.protocol_runner import create_simulating_runner
-from opentrons.protocol_runner.pre_analysis import PreAnalyzer
 
 from robot_server.app_state import AppState, AppStateValue, get_app_state
 from .protocol_store import ProtocolStore
@@ -41,11 +40,6 @@ def get_analysis_store(app_state: AppState = Depends(get_app_state)) -> Analysis
         _analysis_store.set_on(app_state, analysis_store)
 
     return analysis_store
-
-
-async def get_pre_analyzer(app_state: AppState = Depends(get_app_state)) -> PreAnalyzer:
-    """Return a PreAnalyzer."""
-    return PreAnalyzer()
 
 
 async def get_protocol_analyzer(

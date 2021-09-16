@@ -23,7 +23,6 @@ from .dependencies import (
     get_protocol_store,
     get_analysis_store,
     get_protocol_analyzer,
-    get_pre_analyzer,
 )
 from .protocol_models import Protocol
 from .protocol_analyzer import ProtocolAnalyzer
@@ -68,7 +67,7 @@ async def create_protocol(
     response_builder: ResponseBuilder = Depends(ResponseBuilder),
     protocol_store: ProtocolStore = Depends(get_protocol_store),
     analysis_store: AnalysisStore = Depends(get_analysis_store),
-    pre_analyzer: PreAnalyzer = Depends(get_pre_analyzer),
+    pre_analyzer: PreAnalyzer = Depends(PreAnalyzer),
     protocol_analyzer: ProtocolAnalyzer = Depends(get_protocol_analyzer),
     task_runner: TaskRunner = Depends(TaskRunner),
     protocol_id: str = Depends(get_unique_id, use_cache=False),
