@@ -68,5 +68,9 @@
   "calibration_ready": "Calibration ready",
   "run_disabled_modules_not_connected": "Make sure all modules are connected before proceeding to run",
   "run_disabled_calibration_not_complete": "Make sure robot calibration is complete before proceeding to run",
-  "run_disabled_modules_and_calibration_not_complete": "Make sure robot calibration is complete and all modules are connected before proceeding to run"
+  "run_disabled_modules_and_calibration_not_complete": "Make sure robot calibration is complete and all modules are connected before proceeding to run",
+  "labware_position_check": "Labware Position Check",
+  "labware_position_check_overview": "Labware Position Check Overview",
+  "position_check_description": "Labware Position Check check jogs your pipette(s) to each labware on the deck to ensure the OT-2 will move accurately during a protocol run. You will use {{number_of_tips}} from the {{labware_name}} in Slot {{labware_slot}} to check this protocol’s labware.",
+  "start_position_check": "begin labware position check, move to slot {{initial_labware_slot}}"
 }

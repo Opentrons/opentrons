@@ -14,6 +14,7 @@ const getIsLabwareOnTopOfTC = (
 ): boolean => {
   const labwareSlot = labware[labwareId].slot
   return (
+    modules != null &&
     Object.keys(modules).some(moduleId => moduleId === labwareSlot) &&
     getModuleType(modules[labwareSlot].model) === THERMOCYCLER_MODULE_TYPE
   )
