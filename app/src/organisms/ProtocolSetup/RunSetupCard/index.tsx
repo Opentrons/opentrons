@@ -44,8 +44,6 @@ export type StepKey =
 export function RunSetupCard(): JSX.Element | null {
   const { t } = useTranslation('protocol_setup')
   const protocolData = useSelector((state: State) => getProtocolData(state))
-  const moduleRenderCoords = useModuleRenderInfoById()
-  const labwareRenderCoords = useLabwareRenderInfoById()
   const robot = useSelector((state: State) => getConnectedRobot(state))
   const robotName = robot?.name != null ? robot?.name : ''
   const calibrationStatus = useSelector((state: State) => {
