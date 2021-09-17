@@ -26,6 +26,7 @@ class Metadata(BaseModel):
     protocols define their `apiLevel` inside their metadata, but
     this should be considered an exception to the rule.
     """
+
     # todo(mm, 2021-09-17): Revise these docs after specifying
     # metadata more. github.com/Opentrons/opentrons/issues/8334
 

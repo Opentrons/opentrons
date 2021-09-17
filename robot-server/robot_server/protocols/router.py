@@ -103,7 +103,9 @@ async def create_protocol(
     # We should change this so the pre-analyzer, or something before the
     # pre-analyzer, saves all uploaded files to the filesystem. Then, all downstream
     # units can receive a pathlib.Path pointing to the protocol's enclosing directory.
-    pre_analysis_input = [PreAnalysisInputFile(f.filename, f.file) for f in files]
+    pre_analysis_input = [
+        PreAnalysisInputFile(name=f.filename, file_like=f.file) for f in files
+    ]
 
     try:
         pre_analysis = pre_analyzer.analyze(pre_analysis_input)
