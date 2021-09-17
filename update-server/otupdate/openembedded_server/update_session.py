@@ -11,7 +11,7 @@ LOG = logging.getLogger(__name__)
 Value = namedtuple('Value', ('short', 'human'))
 
 class Stages(enum.Enum):
-    AVAITING_FILE = Value('awaiting-file', 'Waiting for update file')
+    AWAITING_FILE = Value('awaiting-file', 'Waiting for update file')
     VALIDATING = Value('validating', 'Validating update file')
     WRITING = Value('writing', 'Writing update to system')
     Done = Value('done', 'Ready to commit update')
@@ -23,13 +23,13 @@ class UpdateSession:
     State machine for update sessions
     """
     def __init__(self, storage_path: str) -> None:
-        self._token = base64.urlsdafe_base64encode(uuid.uuid4().bytes)\
+        self._token = base64.urlsafe_b64encode(uuid.uuid4().bytes)\
                             .decode().strip('=')
         self._state = Stages.AWAITING_FILE
         self._progress = 0.0
         self._message = ''
         self._error: Optional[Value] = None
-        self.storage_path = storage_path
+        self._storage_path = storage_path
         self._setup_dl_area()
         self._rootfs_file: Optional[str] = None
         LOG.info(f"update session: created {self._token}")

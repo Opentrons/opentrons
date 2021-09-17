@@ -15,7 +15,7 @@ LOG = logging.getLogger(__name__)
 
 DEFAULT_CERT_PATH = '/etc/opentrons-robot-signing-key.crt'
 REQUIRED_DATA = [('signature_required', bool, True),
-                 ('download_storage_path', str, '/var/lib/otupdate/downloads'),
+                 ('download_storage_path', str, 'downloads'),
                  ('update_cert_path', str, DEFAULT_CERT_PATH)]
 DEFAULT_PATH = '/var/lib/otupdate/config.json'
 PATH_ENVIRONMENT_VARIABLE = 'OTUPDATE_CONFIG_PATH'
