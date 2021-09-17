@@ -20,35 +20,22 @@ LOG = logging.getLogger(__name__)
 
 def active_session_check(handler):
     """ decorator to check session status
-        start a new one if not present
     """
     @functools.wraps(handler)
-    def decorated(request: web.Request) -> web.Response:
+    async def decorated(request: web.Request, response: web.Response) -> web.Response:
         if update.session_from_request(request) is None:
             LOG.warning("check_session: active session exists!")
-            return web.json_response(
+            response= web.json_response(
                 data={'message':
                       'An update session is already active on this robot',
                       'error': 'session-already-active'},
                 status=409)
         else:
-            pass
-        handler(request)
-    return decorated
-
-
-def start_session(handler):
-    """ decorator to start new session
-        add active_session_check decorator
-        before this. Dont want to start a
-        session on top of another one
-    """
-    @functools.wraps(handler)
-    def decorated(request: web.Request) -> web.Response:
-        session = handler(
-            config.config_from_request(request).download_storage_path)
-        request.app[SESSION_VARNAME] = session
-        return web.json_response(
-            data={'tokem': session.token},
+            session = UpdateSession(
+                config.config_from_request(request).download_storage_path)
+            request.app[SESSION_VARNAME] = session
+            response = web.json_response(
+            data={'token': session.token},
             status=201)
+        return await handler(request, response)
     return decorated

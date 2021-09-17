@@ -46,15 +46,8 @@ def require_session(handler):
 
 
 @session.active_session_check
-async def begin(request: web.Request) -> web.Response:
-    """ Begin a session
-    """
-    session = UpdateSession(
-        config.config_from_request(request).download_storage_path)
-    request.app[SESSION_VARNAME] = session
-    return web.json_response(
-        data={'token': session.token},
-        status=201)
+async def begin(request: web.Request, response: web.Response) -> web.Response:
+    return response
 
 
 async def cancel(request: web.Request) -> web.Response:
