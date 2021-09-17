@@ -19,13 +19,13 @@ Slices of the tests will be selected as candidates for automation and then perfo
    2. This could also be done by building the installer on a branch and installing the App.
 3. Install Chromedriver
    1. in the app-testing directory
-      1. `sudo ./ci-tools/mac_get_chromedriver.sh 6.1.10` per the version of electron in the root package.json for electron
+      1. `sudo ./ci-tools/mac_get_chromedriver.sh 13.1.8` per the version of electron in the root package.json for electron
          1. if you experience `wget: command not found`
             1. brew install wget and try again
    2. when you run `chromedriver --version`
       1. It should work
       2. It should output the below. The chromedriver version must match Electron version we build into the App.
-         1. ChromeDriver 76.0.3809.146 (3dfe6f2950443b9b0b0e7106cd3619637eec700f-refs/heads/master@{#747376})
+         1. ChromeDriver 91.0.4472.164 (6c672af59118e1b9f132f26dedbd34fdce3affb1-refs/heads/master@{#883390})
 4. Create .env from example.env `cp example.env .env`
    1. Fill in values (if there are secrets)
    2. Make sure the paths work on your machine

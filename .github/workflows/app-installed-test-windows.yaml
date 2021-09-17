@@ -9,7 +9,7 @@ on:
       electron-version:
         description: "Electron version."
         required: true
-        default: "6.1.10"
+        default: "13.1.8"
 
 jobs:
   build:
