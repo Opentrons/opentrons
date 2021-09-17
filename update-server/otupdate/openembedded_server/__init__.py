@@ -1,8 +1,6 @@
 """ update-server implementation for openembedded systems """
 import asyncio
 import logging
-import json
-from typing import Mapping
 from aiohttp import web
 
 # from . import constants, name_management
@@ -38,9 +36,8 @@ def get_app(system_version_file: str = None,
     if not loop:
         loop = asyncio.get_event_loop()
 
-    version = 'todo'
-    name = 'todo'
-    boot_id = 'todo'
+    # name = 'todo'
+    # boot_id = 'todo'
 
     config_obj = config.load(config_file_override)
 
@@ -49,9 +46,9 @@ def get_app(system_version_file: str = None,
         return web.Response(text="hello")
     app = web.Application(middlewares=[log_error_middleware])
     app[config.CONFIG_VARNAME] = config_obj
-    app[constants.RESTART_LOCK_NAME] = asyncio.Lock()
-    app[constants.DEVICE_BOOT_ID_NAME] = boot_id
-    app[constants.DEVICE_NAME_VARNAME] = name
+    # app[constants.RESTART_LOCK_NAME] = asyncio.Lock()
+    # app[constants.DEVICE_BOOT_ID_NAME] = boot_id
+    # app[constants.DEVICE_NAME_VARNAME] = name
     app.router.add_routes([
         web.post('/server/update/begin', update.begin),
         web.post('/server/oe/restore', rfs.factory_restore),
