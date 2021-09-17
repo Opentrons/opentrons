@@ -12,31 +12,22 @@ from .analysis_models import ProtocolAnalysis
 class Metadata(BaseModel):
     """Extra, nonessential information about the protocol.
 
-    This can include things like:
+    This can include data like:
 
     * A human-readable title and description.
     * A last-modified date.
     * A list of authors.
 
-    The exact set of fields is not defined by this API.
-    A protocol can define whatever it likes as its metadata,
-    and this API will pass it along without modification.
-    When reading a protocol's metadata,
-    you should treat it as an arbitrary JSON object from an untrusted source.
+    Metadata may contain fields other than those explicitly
+    listed in this schema.
 
-    This metadata does *not* include
-    anything material to how the robot will run the protocol.
-    For example, it does not include the protocol's pipette and labware requirements.
-
-    (Exception:
-    Python protocols define their `apiLevel`,
-    which *does* affect how they're run,
-    as part of their metadata.
-    This is for historical reasons;
-    `apiLevel` is not truly metadata and doesn't really belong here.
-    You should not rely on a Python protocol's correct `apiLevel` being present here.
-    If a compelling need arises, this API may expose `apiLevel` some other way.)
+    The metadata *should not* include information needed
+    to run the protocol correctly. For historical reasons, Python
+    protocols define their `apiLevel` inside their metadata, but
+    this should be considered an exception to the rule.
     """
+    # todo(mm, 2021-09-17): Revise these docs after specifying
+    # metadata more. github.com/Opentrons/opentrons/issues/8334
 
     class Config:
         """Tell Pydantic that metadata objects can have arbitrary fields."""
