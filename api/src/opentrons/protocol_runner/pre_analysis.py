@@ -8,7 +8,7 @@ protocol, and if so, what kind of protocol it is.
 
 from ast import parse as parse_python
 from dataclasses import dataclass
-from json import JSONDecodeError, load as json_load
+from json import JSONDecodeError
 from pathlib import Path
 from typing import Any, IO, Dict, List, Union
 
@@ -54,7 +54,10 @@ class PreAnalyzer:
             basically valid JSON or Python protocol, respectively.
 
         Raises:
-            Any of the subclasses of `NotPreAnalyzableError` defined in this module.
+            Any `NotPreAnalyzableError` subclass defined in this module: If a problem
+                with the protocol prevents pre-analysis.
+
+            IOError: If a file isn't readable.
         """
         if len(protocol_files) == 0:
             raise NoFilesError("Protocol must have at least one file.")
@@ -65,40 +68,40 @@ class PreAnalyzer:
         main_file = protocol_files[0]
         suffix = Path(main_file.name).suffix
 
+        # May raise IOError.
+        main_file_contents = main_file.file_like.read()
+
         if suffix == ".json":
-            return _analyze_json(main_file)
+            return _analyze_json(main_file_contents)
         elif suffix == ".py":
-            return _analyze_python(main_file)
+            return _analyze_python(main_file_contents, main_file.name)
         else:
             raise FileTypeError(f'Unrecognized file extension "{suffix}"')
 
 
-def _analyze_json(main_file: InputFile) -> "JsonPreAnalysis":
+def _analyze_json(main_file_contents: bytes) -> "JsonPreAnalysis":
     try:
-        parsed_json = json_load(main_file.file_like)
+        parsed_protocol = JsonProtocol.parse_raw(main_file_contents)
     except JSONDecodeError as exception:
         raise JsonParseError() from exception
-
-    try:
-        parsed_protocol = JsonProtocol.parse_obj(parsed_json)
     except PydanticValidationError as exception:
         raise JsonSchemaValidationError() from exception
 
     return JsonPreAnalysis(
-        parsed_protocol.metadata.dict(exclude_unset=True),
-        parsed_protocol.schemaVersion,
+        metadata=parsed_protocol.metadata.dict(exclude_unset=True),
+        schema_version=parsed_protocol.schemaVersion,
     )
 
 
 # todo(mm, 2021-09-13): Deduplicate with opentrons.protocols.parse.
-def _analyze_python(main_file: InputFile) -> "PythonPreAnalysis":
+def _analyze_python(
+    main_file_contents: bytes, main_file_name: str
+) -> "PythonPreAnalysis":
     try:
         # todo(mm, 2021-09-13): Investigate whether it's really appropriate to leave
         # the Python compilation flags at their defaults. For example, we probably
         # don't truly want the protocol to inherit our own __future__ features.
-        module_ast = parse_python(
-            source=main_file.file_like.read(), filename=main_file.name
-        )
+        module_ast = parse_python(source=main_file_contents, filename=main_file_name)
     except (SyntaxError, ValueError) as exception:
         # parse_python() raises SyntaxError for most errors,
         # but ValueError if the source contains null bytes.
@@ -126,7 +129,7 @@ def _analyze_python(main_file: InputFile) -> "PythonPreAnalysis":
             f' "{type(api_level)}".'
         )
 
-    return PythonPreAnalysis(metadata, api_level)
+    return PythonPreAnalysis(metadata=metadata, api_level=api_level)
 
 
 Metadata = Dict[str, Any]
