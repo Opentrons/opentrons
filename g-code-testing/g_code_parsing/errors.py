@@ -43,3 +43,10 @@ class PollingGCodeAdditionError(ValueError):
             f"a polling command"
         )
         self.invalid_g_code = invalid_g_code
+
+
+class ConfigurationNotFoundError(ValueError):
+    def __init__(self, configuration_name) -> None:
+
+        super().__init__(f'Configuration "{configuration_name}" not found')
+        self.configuration_name = configuration_name

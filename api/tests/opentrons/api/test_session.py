@@ -90,8 +90,8 @@ async def test_load_and_run_v2(main_router, protocol, protocol_file, loop):
 def test_accumulate():
     res = _accumulate(
         [
-            (["a"], ["d"], ["g", "h"], [("l", "m")]),
-            (["b", "c"], ["e", "f"], ["i"], [("m", "n")]),
+            (["a"], ["d"], ["g", "h"], [("l", "m")]),  # type: ignore[list-item]
+            (["b", "c"], ["e", "f"], ["i"], [("m", "n")]),  # type: ignore[list-item]
         ]
     )
 

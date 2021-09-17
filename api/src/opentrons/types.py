@@ -27,27 +27,27 @@ class Point(NamedTuple):
         pairs = ((self.x, other.x), (self.y, other.y), (self.z, other.z))
         return all(isclose(s, o, rel_tol=1e-05, abs_tol=1e-08) for s, o in pairs)
 
-    def __add__(self, other: Any) -> "Point":
+    def __add__(self, other: Any) -> Point:
         if not isinstance(other, Point):
             return NotImplemented
         return Point(self.x + other.x, self.y + other.y, self.z + other.z)
 
-    def __sub__(self, other: Any) -> "Point":
+    def __sub__(self, other: Any) -> Point:
         if not isinstance(other, Point):
             return NotImplemented
         return Point(self.x - other.x, self.y - other.y, self.z - other.z)
 
-    def __mul__(self, other: Union[int, float]) -> "Point":
+    def __mul__(self, other: Union[int, float]) -> Point:
         if not isinstance(other, (float, int)):
             return NotImplemented
         return Point(self.x * other, self.y * other, self.z * other)
 
-    def __rmul__(self, other: Union[int, float]) -> "Point":
+    def __rmul__(self, other: Union[int, float]) -> Point:
         if not isinstance(other, (float, int)):
             return NotImplemented
         return Point(self.x * other, self.y * other, self.z * other)
 
-    def __abs__(self) -> "Point":
+    def __abs__(self) -> Point:
         return Point(abs(self.x), abs(self.y), abs(self.z))
 
     def __str__(self):

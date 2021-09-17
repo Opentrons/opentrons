@@ -23,7 +23,7 @@ DIR_SUFFIX = "._proto_dir"
 @dataclass
 class Contents:
     protocol_file: FileMeta
-    directory: TemporaryDirectory
+    directory: "TemporaryDirectory[str]"
     support_files: typing.List[FileMeta] = field(default_factory=list)
 
 

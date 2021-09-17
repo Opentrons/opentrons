@@ -39,7 +39,10 @@ if TYPE_CHECKING:
     from opentrons.protocol_api import ProtocolContext
 
 AdvancedLiquidHandling = Union[
-    Well, types.Location, List[Union[Well, types.Location]], List[List[Well]]
+    Well,
+    types.Location,
+    Sequence[Union[Well, types.Location]],
+    Sequence[Sequence[Well]],
 ]
 
 logger = logging.getLogger(__name__)
@@ -527,7 +530,7 @@ class InstrumentContext(CommandPublisher):
         else:
             return clamp_value(speed, 80, 1, "touch_tip:")
 
-    @publish.both(command=cmds.touch_tip)
+    @publish(command=cmds.touch_tip)
     @requires_version(2, 0)
     def touch_tip(
         self,
@@ -615,7 +618,7 @@ class InstrumentContext(CommandPublisher):
         )
         return self
 
-    @publish.both(command=cmds.air_gap)
+    @publish(command=cmds.air_gap)
     @requires_version(2, 0)
     def air_gap(
         self, volume: Optional[float] = None, height: Optional[float] = None
@@ -664,7 +667,7 @@ class InstrumentContext(CommandPublisher):
         self.aspirate(volume)
         return self
 
-    @publish.both(command=cmds.return_tip)
+    @publish(command=cmds.return_tip)
     @requires_version(2, 0)
     def return_tip(self, home_after: bool = True) -> InstrumentContext:
         """
@@ -971,7 +974,7 @@ class InstrumentContext(CommandPublisher):
         self._implementation.home_plunger()
         return self
 
-    @publish.both(command=cmds.distribute)
+    @publish(command=cmds.distribute)
     @requires_version(2, 0)
     def distribute(
         self,
@@ -1004,7 +1007,7 @@ class InstrumentContext(CommandPublisher):
 
         return self.transfer(volume, source, dest, **kwargs)
 
-    @publish.both(command=cmds.consolidate)
+    @publish(command=cmds.consolidate)
     @requires_version(2, 0)
     def consolidate(
         self,
@@ -1036,7 +1039,7 @@ class InstrumentContext(CommandPublisher):
 
         return self.transfer(volume, source, dest, **kwargs)
 
-    @publish.both(command=cmds.transfer)  # noqa: C901
+    @publish(command=cmds.transfer)  # noqa: C901
     @requires_version(2, 0)
     def transfer(
         self,
@@ -1455,7 +1458,7 @@ class InstrumentContext(CommandPublisher):
         """
         return self._implementation.has_tip()
 
-    @property  # type: ignore
+    @property
     def _has_tip(self) -> bool:
         """
         Internal function used to check whether this instrument has a

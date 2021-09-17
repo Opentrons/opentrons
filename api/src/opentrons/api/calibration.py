@@ -28,7 +28,7 @@ def _well0(cont: labware.Labware) -> labware.Well:
     return cont.wells()[0]
 
 
-Func = TypeVar("Func", bound=Callable)
+Func = TypeVar("Func", bound=Callable[..., Any])
 
 
 def _home_if_first_call(func: Func) -> Func:

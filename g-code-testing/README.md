@@ -8,6 +8,46 @@ Framework supporting the following:
 - Diffing human-readable text or JSON format
 - CLI access to all the above features
 
+## Test Cases
+
+The following section is to explain why each test case inside the `g-code-testing` project has either been included or
+omitted. Also, it will also explain at a high-level, the different categories of tests.
+
+## Test Categories
+
+### Protocol Tests
+
+**Description:** These tests have a Python Protocol file as an input. The framework will run the protocol and
+collect all G-Code output.
+
+**Tests**
+
+- protocol_2_modules - Test using 2 modules in the same protocol
+- protocol_2_single_channel - Test using 2 single channel pipettes in the same protocol
+- protocol_smoothie - Test an extremely simple protocol with no modules
+- protocol_swift_smoke - Test the "smoke" version of the Swift Turbo protocol
+- protocol_swift_turbo - Test the actual Swift Turbo protocol
+
+### HTTP Tests
+
+**Description:** The tests execute the underlying function from calling an HTTP endpoint and collect all the G-Code
+output. Some of the HTTP endpoints have been skipped.
+
+**[Control Tests:](https://github.com/Opentrons/opentrons/blob/edge/robot-server/robot_server/service/legacy/routers/control.py)**
+
+- Implemented Tests
+  - http_move_left_pipette - Test moving the left pipette with the `robot/move` HTTP endpoint
+  - http_move_right_pipette - Test moving the right pipette with the `robot/move` HTTP endpoint
+  - http_move_left_mount - Test moving the left mount with the `robot/move` HTTP endpoint
+  - http_move_right_mount - Test moving the right mount with the `robot/move` HTTP endpoint
+  - http_home_robot - Test homing the gantry with the `robot/home` HTTP endpoint
+  - http_home_left_pipette - Test homing the left pipette with the `robot/home` HTTP endpoint
+  - http_home_right_pipette - Test homing the right pipette with the `robot/home` HTTP endpoint
+- Skipped Tests
+  - `identify` endpoint - Only goes to the Raspberry Pi, does not generate any G-Code
+  - `robot/positions` endpoint - Tests by issuing move commands which is already covered
+  - `robot/lights` endpoint - Only goes to the Raspberry Pi, does not generate any G-Code
+
 ## Setup
 
 1. Navigate into `g-code-testing` directory
@@ -17,8 +57,8 @@ Framework supporting the following:
 
 ### G-Code Parser
 
-Using the `ProtocolRunner` you can run a Python protocol file against emulation.
-The `ProtocolRunner` instance will return a `GCodeProgram` instance
+Using the `GCodeEngine` you can run a Python protocol file against emulation.
+The `GCodeEngine` instance will return a `GCodeProgram` instance
 
 **Example:**
 
@@ -29,16 +69,15 @@ against emulation.
 In "Concise" format store parsed G-Code to /where/I/want/to/store/my/output.txt
 """
 import os.path
-from protocol_runner import ProtocolRunner
-from g_code_program.supported_text_modes \
-    import SupportedTextModes
+from g_code_parsing.g_code_engine import HTTPGCodeEngine
+from g_code_parsing.g_code_program.supported_text_modes import SupportedTextModes
 from opentrons.hardware_control.emulation.settings import Settings
 
 PROTOCOL_PATH = os.path.join('my', 'absolute', 'path', 'to', 'my', 'protocol.py')
 OUTPUT_PATH = os.path.join('where', 'I', 'want', 'to', 'store', 'my', 'output.txt')
 
 settings = Settings()  # Using default settings defined in class
-with ProtocolRunner(settings).run_protocol(PROTOCOL_PATH) as program:
+with HTTPGCodeEngine(settings).run_protocol(PROTOCOL_PATH) as program:
     program.save_text_explanation_to_file(OUTPUT_PATH, SupportedTextModes.CONCISE)
 ```
 
@@ -54,7 +93,7 @@ them in HTML format.
 Compare 2 files and save the diff to a file
 """
 import os.path
-from g_code_differ import GCodeDiffer
+from g_code_parsing.g_code_differ import GCodeDiffer
 FILE_1_PATH = os.path.join('tmp', 'file_1.txt')
 FILE_2_PATH = os.path.join('tmp', 'file_2.txt')
 HTML_PATH = os.path.join('home', 'derek_maggio', 'Desktop', 'my_diff.html')

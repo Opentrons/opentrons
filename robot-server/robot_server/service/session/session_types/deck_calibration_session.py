@@ -1,4 +1,4 @@
-from typing import Awaitable
+from typing import Awaitable, Optional
 
 from robot_server.robot.calibration.deck.user_flow import DeckCalibrationUserFlow
 from robot_server.robot.calibration.deck.models import DeckCalibrationSessionStatus
@@ -34,7 +34,7 @@ class DeckCalibrationSession(BaseSession):
         configuration: SessionConfiguration,
         instance_meta: SessionMetaData,
         deck_cal_user_flow: DeckCalibrationUserFlow,
-        shutdown_handler: Awaitable[None] = None,
+        shutdown_handler: Optional[Awaitable[None]] = None,
     ):
         super().__init__(configuration, instance_meta)
         self._deck_cal_user_flow = deck_cal_user_flow

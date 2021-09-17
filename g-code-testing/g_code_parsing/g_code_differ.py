@@ -57,10 +57,10 @@ class GCodeDiffer:
         differ.Diff_Timeout = timeout_secs
         return differ.diff_main(text1=self._string_1, text2=self._string_2)
 
-    def get_html_diff(self):
+    def get_html_diff(self) -> str:
         return self._render_diff_as_html(self.get_diff())
 
-    def _render_diff_as_html(self, diffs):
+    def _render_diff_as_html(self, diffs) -> str:
         """Convert a diff array into a pretty HTML report"""
 
         def process_text(text_to_process: str):
@@ -82,7 +82,7 @@ class GCodeDiffer:
                 html.append("<span>%s</span>" % text)
         return "".join(html)
 
-    def save_html_diff_to_file(self, file_path):
+    def save_html_diff_to_file(self, file_path: str) -> None:
         with open(file_path, "w") as file:
             file.write(self.get_html_diff())
 
@@ -90,9 +90,9 @@ class GCodeDiffer:
         return self._string_1 == self._string_2
 
     @classmethod
-    def get_diff_type(cls, diff_tuple: Tuple[int, str]):
+    def get_diff_type(cls, diff_tuple: Tuple[int, str]) -> str:
         return cls.DIFF_TYPE_LOOKUP[diff_tuple[0]]
 
     @classmethod
-    def get_diff_content(cls, diff_tuple: Tuple[int, str]):
+    def get_diff_content(cls, diff_tuple: Tuple[int, str]) -> str:
         return diff_tuple[1]

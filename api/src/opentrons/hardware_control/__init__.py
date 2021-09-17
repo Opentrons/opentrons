@@ -11,7 +11,8 @@ functions are available elsewhere.
 """
 
 from .adapters import SynchronousAdapter
-from .api import API, PauseManager
+from .api import API
+from .pause_manager import PauseManager
 from .controller import Controller
 from .simulator import Simulator
 from .pipette import Pipette

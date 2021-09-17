@@ -1,0 +1,50 @@
+# This workflow runs test and lint on branch pushes that touch the
+# notify-server project or its dependencies
+
+name: 'G-Code Testing Lint & Test'
+
+on:
+  # Most of the time, we run on pull requests, which lets us handle external PRs
+  push:
+    paths:
+      - 'Makefile'
+      - 'g-code-testing/**'
+      - '.github/workflows/g-code-testing-lint-test.yaml'
+      - '.github/actions/python/**'
+    tags-ignore:
+      - '*'
+  pull_request:
+    paths:
+      - 'Makefile'
+      - 'g-code-testing/**'
+  workflow_dispatch:
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  lint-test:
+    name: 'g-code-testing package linting and tests'
+    runs-on: 'ubuntu-18.04'
+    steps:
+      - uses: 'actions/checkout@v2'
+      - uses: 'actions/setup-node@v1'
+        with:
+          node-version: '12'
+      - uses: 'actions/setup-python@v2'
+        with:
+          python-version: '3.7'
+
+      - uses: './.github/actions/python/setup'
+        with:
+          project: 'g-code-testing'
+      - name: Lint
+        run: make -C g-code-testing lint
+      - name: Test
+        run: make -C g-code-testing test
+      - name: 'Upload coverage report'
+        uses: 'codecov/codecov-action@v2'
+        with:
+          files: ./g-code-testing/coverage.xml
+          flags: g-code-testing

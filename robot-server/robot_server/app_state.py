@@ -5,7 +5,7 @@ in-memory databases.
 """
 from fastapi import Request, WebSocket
 from starlette.datastructures import State as AppState
-from typing import Generic, Optional, TypeVar
+from typing import cast, Generic, Optional, TypeVar
 
 
 ValueT = TypeVar("ValueT")
@@ -25,7 +25,10 @@ class AppStateValue(Generic[ValueT]):
 
     def get_from(self, app_state: AppState) -> Optional[ValueT]:
         """Get the value from state, returning None if not present."""
-        return getattr(app_state, self._key, None)
+        return cast(
+            Optional[ValueT],
+            getattr(app_state, self._key, None),
+        )
 
     def set_on(self, app_state: AppState, value: Optional[ValueT]) -> None:
         """Set the value on state."""
@@ -36,8 +39,8 @@ async def get_app_state(
     # NOTE: both of these must be typed as non-optional to allow FastAPI's
     # dependency injection magic to work, but must have default values of
     # None in order to function at runtime, as only one will be present
-    request: Request = None,
-    websocket: WebSocket = None,
+    request: Request = cast(Request, None),
+    websocket: WebSocket = cast(WebSocket, None),
 ) -> AppState:
     """Get the global application's state from the framework.
 
@@ -56,7 +59,7 @@ async def get_app_state(
         A dictionary-like object containing global application state.
     """
     request_scope = request or websocket
-    return request_scope.app.state  # type: ignore[union-attr]
+    return cast(AppState, request_scope.app.state)
 
 
 __all__ = ["AppState", "get_app_state"]

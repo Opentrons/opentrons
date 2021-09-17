@@ -16,7 +16,8 @@
     "step-generation",
     "update-server/otupdate",
     "webpack-config",
-    "notify-server/notify_server"
+    "notify-server/notify_server",
+    "hardware/hardware"
   ],
   "config": {
     "commitizen": {
@@ -24,7 +25,7 @@
     }
   },
   "engines": {
-    "node": ">=12"
+    "node": ">=14"
   },
   "devDependencies": {
     "@babel/core": "^7.12.10",
@@ -70,11 +71,11 @@
     "cypress": "^6.6.0",
     "cypress-file-upload": "3.5.3",
     "cz-conventional-changelog": "2.1.0",
-    "electron": "6.1.10",
-    "electron-builder": "^21.2.0",
-    "electron-notarize": "^0.1.1",
+    "electron": "13.1.8",
+    "electron-builder": "^22.12.0",
+    "electron-notarize": "^1.1.0",
     "electron-publisher-s3": "^20.17.2",
-    "electron-rebuild": "^1.10.1",
+    "electron-rebuild": "^3.1.1",
     "enzyme": "^3.11.0",
     "enzyme-adapter-react-16": "^1.15.2",
     "enzyme-to-json": "^3.4.4",
@@ -92,7 +93,6 @@
     "eslint-plugin-react-hooks": "^4.2.0",
     "eslint-plugin-standard": "^5.0.0",
     "express": "^4.16.4",
-    "favicons-webpack-plugin": "^1.0.2",
     "file-loader": "^5.0.2",
     "form-data": "2.5.0",
     "fs-extra": "^6.0.1",

@@ -16,7 +16,7 @@ from opentrons.protocol_engine.state.pipettes import (
 
 def get_pipette_view(
     pipettes_by_id: Optional[Dict[str, LoadedPipette]] = None,
-    aspirated_volume_by_id: Dict[str, float] = None,
+    aspirated_volume_by_id: Optional[Dict[str, float]] = None,
     current_well: Optional[CurrentWell] = None,
 ) -> PipetteView:
     """Get a pipette view test subject with the specified state."""

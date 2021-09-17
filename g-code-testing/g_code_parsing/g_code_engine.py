@@ -2,7 +2,7 @@ import os
 import sys
 import threading
 import asyncio
-from typing import Generator
+from typing import Generator, Callable
 from collections import namedtuple
 
 from opentrons.hardware_control.emulation.settings import Settings
@@ -26,20 +26,22 @@ from g_code_parsing.g_code_watcher import GCodeWatcher
 from opentrons.protocols.context.protocol_api.protocol_context import (
     ProtocolContextImplementation,
 )
-
+from g_code_parsing.utils import get_configuration_dir
 
 Protocol = namedtuple("Protocol", ["text", "filename", "filelike"])
 
 
-class ProtocolRunner:
+class GCodeEngine:
     """
-    Class for running a Protocol against the emulator.
+    Class for running a thing against the emulator.
     See src/opentrons/hardware_control/emulation/settings.py for example explanation
     of Smoothie configs
 
+    Add new run_* methods to class to support different inputs to the engine
+
     Workflow is as follows:
-        1. Instantiate Protocol Runner
-        2. Call run_protocol method
+        1. Instantiate GCodeEngine
+        2. Call run_* method
         3. Gather parsed data from returned GCodeProgram
     """
 
@@ -62,14 +64,12 @@ class ProtocolRunner:
     @staticmethod
     def _set_env_vars() -> None:
         """Set URLs of where to find modules and config for smoothie"""
-        os.environ["OT_MAGNETIC_EMULATOR_URI"] = (
-            ProtocolRunner.URI_TEMPLATE % MAGDECK_PORT
-        )
+        os.environ["OT_MAGNETIC_EMULATOR_URI"] = GCodeEngine.URI_TEMPLATE % MAGDECK_PORT
         os.environ["OT_THERMOCYCLER_EMULATOR_URI"] = (
-            ProtocolRunner.URI_TEMPLATE % THERMOCYCLER_PORT
+            GCodeEngine.URI_TEMPLATE % THERMOCYCLER_PORT
         )
         os.environ["OT_TEMPERATURE_EMULATOR_URI"] = (
-            ProtocolRunner.URI_TEMPLATE % TEMPDECK_PORT
+            GCodeEngine.URI_TEMPLATE % TEMPDECK_PORT
         )
 
     @staticmethod
@@ -90,7 +90,7 @@ class ProtocolRunner:
         emulator = ThreadManager(
             API.build_hardware_controller,
             conf,
-            ProtocolRunner.URI_TEMPLATE % SMOOTHIE_PORT,
+            GCodeEngine.URI_TEMPLATE % SMOOTHIE_PORT,
         )
         return emulator
 
@@ -103,23 +103,39 @@ class ProtocolRunner:
         return Protocol(text=text, filename=file_path, filelike=file)
 
     @contextmanager
-    def run_protocol(self, file_path: str) -> Generator:
+    def run_protocol(self, path: str) -> Generator:
         """
         Runs passed protocol file and collects all G-Code I/O from it.
         Will cleanup emulation after execution
-        :param file_path: Path to file
+        :param path: Path to file
         :return: GCodeProgram with all the parsed data
         """
+        file_path = os.path.join(get_configuration_dir(), path)
         server_manager = ServerManager(self._config)
         self._start_emulation_app(server_manager)
-        emulated_hardware = self._emulate_hardware()
         protocol = self._get_protocol(file_path)
         context = ProtocolContext(
-            implementation=ProtocolContextImplementation(hardware=emulated_hardware),
+            implementation=ProtocolContextImplementation(
+                hardware=self._emulate_hardware()
+            ),
             loop=self._get_loop(),
         )
         parsed_protocol = parse(protocol.text, protocol.filename)
         with GCodeWatcher() as watcher:
             execute.run_protocol(parsed_protocol, context=context)
+        yield GCodeProgram.from_g_code_watcher(watcher)
+        server_manager.stop()
+
+    @contextmanager
+    def run_http(self, executable: Callable):
+        """
+        Runs http request and returns all G-Code I/O from it
+        :param executable: Function connected to HTTP Request to execute
+        :return:
+        """
+        server_manager = ServerManager(self._config)
+        self._start_emulation_app(server_manager)
+        with GCodeWatcher() as watcher:
+            asyncio.run(executable(hardware=self._emulate_hardware()))
         yield GCodeProgram.from_g_code_watcher(watcher)
         server_manager.stop()

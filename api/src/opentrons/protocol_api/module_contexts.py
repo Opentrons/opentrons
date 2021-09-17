@@ -221,7 +221,7 @@ class TemperatureModuleContext(ModuleContext[ModuleGeometry]):
         self._loop = loop
         super().__init__(ctx, geometry, at_version)
 
-    @publish.both(command=cmds.tempdeck_set_temp)
+    @publish(command=cmds.tempdeck_set_temp)
     @requires_version(2, 0)
     def set_temperature(self, celsius: float):
         """Set the target temperature, in C.
@@ -232,7 +232,7 @@ class TemperatureModuleContext(ModuleContext[ModuleGeometry]):
         """
         return self._module.set_temperature(celsius)
 
-    @publish.both(command=cmds.tempdeck_set_temp)
+    @publish(command=cmds.tempdeck_set_temp)
     @requires_version(2, 3)
     def start_set_temperature(self, celsius: float):
         """Start setting the target temperature, in C.
@@ -243,7 +243,7 @@ class TemperatureModuleContext(ModuleContext[ModuleGeometry]):
         """
         return self._module.start_set_temperature(celsius)
 
-    @publish.both(command=cmds.tempdeck_await_temp)
+    @publish(command=cmds.tempdeck_await_temp)
     @requires_version(2, 3)
     def await_temperature(self, celsius: float):
         """Wait until module reaches temperature, in C.
@@ -254,7 +254,7 @@ class TemperatureModuleContext(ModuleContext[ModuleGeometry]):
         """
         return self._module.await_temperature(celsius)
 
-    @publish.both(command=cmds.tempdeck_deactivate)
+    @publish(command=cmds.tempdeck_deactivate)
     @requires_version(2, 0)
     def deactivate(self):
         """Stop heating (or cooling) and turn off the fan."""
@@ -305,7 +305,7 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
         self._loop = loop
         super().__init__(ctx, geometry, at_version)
 
-    @publish.both(command=cmds.magdeck_calibrate)
+    @publish(command=cmds.magdeck_calibrate)
     @requires_version(2, 0)
     def calibrate(self):
         """Calibrate the Magnetic Module.
@@ -328,7 +328,7 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
             )
         return super().load_labware_object(labware)
 
-    @publish.both(command=cmds.magdeck_engage)
+    @publish(command=cmds.magdeck_engage)
     @requires_version(2, 0)
     def engage(
         self,
@@ -398,7 +398,8 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
         If none of the above, return the labware engage heights as defined in
         the labware definitions
         """
-        assert self.labware, self.labware.magdeck_engage_height
+        assert self.labware
+        assert self.labware.magdeck_engage_height
 
         engage_height = self.labware.magdeck_engage_height
 
@@ -413,7 +414,7 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
         else:
             return engage_height
 
-    @publish.both(command=cmds.magdeck_disengage)
+    @publish(command=cmds.magdeck_disengage)
     @requires_version(2, 0)
     def disengage(self):
         """Lower the magnets back into the Magnetic Module."""
@@ -478,7 +479,7 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
             to_loc, from_loc, self.lid_position
         )
 
-    @publish.both(command=cmds.thermocycler_open)
+    @publish(command=cmds.thermocycler_open)
     @requires_version(2, 0)
     def open_lid(self):
         """Opens the lid"""
@@ -486,7 +487,7 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
         self._geometry.lid_status = self._module.open()  # type: ignore
         return self._geometry.lid_status
 
-    @publish.both(command=cmds.thermocycler_close)
+    @publish(command=cmds.thermocycler_close)
     @requires_version(2, 0)
     def close_lid(self):
         """Closes the lid"""
@@ -494,7 +495,7 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
         self._geometry.lid_status = self._module.close()  # type: ignore
         return self._geometry.lid_status
 
-    @publish.both(command=cmds.thermocycler_set_block_temp)
+    @publish(command=cmds.thermocycler_set_block_temp)
     @requires_version(2, 0)
     def set_block_temperature(
         self,
@@ -541,7 +542,7 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
             volume=block_max_volume,
         )
 
-    @publish.both(command=cmds.thermocycler_set_lid_temperature)
+    @publish(command=cmds.thermocycler_set_lid_temperature)
     @requires_version(2, 0)
     def set_lid_temperature(self, temperature: float):
         """Set the target temperature for the heated lid, in °C.
@@ -557,7 +558,7 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
         """
         self._module.set_lid_temperature(temperature)
 
-    @publish.both(command=cmds.thermocycler_execute_profile)
+    @publish(command=cmds.thermocycler_execute_profile)
     @requires_version(2, 0)
     def execute_profile(
         self,
@@ -601,19 +602,19 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
             steps=steps, repetitions=repetitions, volume=block_max_volume
         )
 
-    @publish.both(command=cmds.thermocycler_deactivate_lid)
+    @publish(command=cmds.thermocycler_deactivate_lid)
     @requires_version(2, 0)
     def deactivate_lid(self):
         """Turn off the heated lid"""
         self._module.deactivate_lid()
 
-    @publish.both(command=cmds.thermocycler_deactivate_block)
+    @publish(command=cmds.thermocycler_deactivate_block)
     @requires_version(2, 0)
     def deactivate_block(self):
         """Turn off the well block temperature controller"""
         self._module.deactivate_block()
 
-    @publish.both(command=cmds.thermocycler_deactivate)
+    @publish(command=cmds.thermocycler_deactivate)
     @requires_version(2, 0)
     def deactivate(self):
         """Turn off the well block temperature controller, and heated lid"""

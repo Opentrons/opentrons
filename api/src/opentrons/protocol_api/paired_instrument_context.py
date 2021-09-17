@@ -483,7 +483,7 @@ class PairedInstrumentContext(CommandPublisher):
     def dispense(
         self,
         volume: Optional[float] = None,
-        location: Union[types.Location, Well] = None,
+        location: Optional[Union[types.Location, Well]] = None,
         rate: float = 1.0,
     ) -> PairedInstrumentContext:
         """
@@ -603,7 +603,7 @@ class PairedInstrumentContext(CommandPublisher):
         )
         return self
 
-    @publish.both(command=cmds.air_gap)
+    @publish(command=cmds.air_gap)
     @requires_version(2, 7)
     def air_gap(
         self, volume: Optional[float] = None, height: Optional[float] = None
@@ -855,7 +855,7 @@ class PairedInstrumentContext(CommandPublisher):
             if not self._ctx.location_cache:
                 raise RuntimeError("No valid current location cache present")
             else:
-                well = self._ctx.location_cache.labware  # type: ignore
+                well = self._ctx.location_cache.labware
                 # type checked below
         else:
             well = LabwareLike(location)
@@ -902,7 +902,7 @@ class PairedInstrumentContext(CommandPublisher):
         )
         return self
 
-    @publish.both(command=cmds.return_tip)
+    @publish(command=cmds.return_tip)
     @requires_version(2, 7)
     def return_tip(self, home_after: bool = True) -> PairedInstrumentContext:
         """

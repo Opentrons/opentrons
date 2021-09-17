@@ -7,7 +7,6 @@ from typing import (
     List,
     Optional,
     Union,
-    TYPE_CHECKING,
     Tuple,
 )
 
@@ -51,8 +50,7 @@ from .state_machine import (
     PipetteOffsetWithTipLengthStateMachine,
 )
 
-if TYPE_CHECKING:
-    from opentrons_shared_data.labware import LabwareDefinition
+from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -80,7 +78,7 @@ class PipetteOffsetCalibrationUserFlow:
         mount: Mount = Mount.RIGHT,
         recalibrate_tip_length: bool = False,
         has_calibration_block: bool = False,
-        tip_rack_def: Optional["LabwareDefinition"] = None,
+        tip_rack_def: Optional[LabwareDefinition] = None,
     ):
 
         self._hardware = hardware
@@ -198,7 +196,7 @@ class PipetteOffsetCalibrationUserFlow:
             tipLength=self._hw_pipette.config.tip_length,
             mount=str(self._mount),
             serial=self._hw_pipette.pipette_id,
-            defaultTipracks=self._default_tipracks,  # type: ignore[arg-type]
+            defaultTipracks=self._default_tipracks,
         )
 
     def get_required_labware(self) -> List[RequiredLabware]:
@@ -255,7 +253,10 @@ class PipetteOffsetCalibrationUserFlow:
     async def get_current_point(self, critical_point: Optional[CriticalPoint]) -> Point:
         return await self._hardware.gantry_position(self._mount, critical_point)
 
-    async def load_labware(self, tiprackDefinition: Optional[dict] = None):
+    async def load_labware(
+        self,
+        tiprackDefinition: Optional[LabwareDefinition] = None,
+    ):
         self._supported_commands.loadLabware = False
         if tiprackDefinition:
             verified_definition = labware.verify_definition(tiprackDefinition)
@@ -282,7 +283,7 @@ class PipetteOffsetCalibrationUserFlow:
         self._tip_origin_pt = None
 
     @property
-    def supported_commands(self) -> List:
+    def supported_commands(self) -> List[str]:
         return self._supported_commands.supported()
 
     async def move_to_tip_rack(self):
@@ -337,7 +338,7 @@ class PipetteOffsetCalibrationUserFlow:
 
     @staticmethod
     def _get_tr_lw(
-        tip_rack_def: Optional["LabwareDefinition"],
+        tip_rack_def: Optional[LabwareDefinition],
         existing_calibration: Optional[PipetteOffsetByPipetteMount],
         volume: float,
         position: Location,
@@ -366,7 +367,7 @@ class PipetteOffsetCalibrationUserFlow:
 
     def _load_tip_rack(
         self,
-        tip_rack_def: Optional["LabwareDefinition"],
+        tip_rack_def: Optional[LabwareDefinition],
         existing_calibration: Optional[PipetteOffsetByPipetteMount],
     ):
         """
@@ -486,12 +487,13 @@ class PipetteOffsetCalibrationUserFlow:
                 command_handler="move_to_reference_point",
                 unmet_condition="performing additional tip length calibration",
             )
+
+        cal_block_target_well: Optional[labware.Well] = None
         if self._has_calibration_block:
             cb_setup = CAL_BLOCK_SETUP_BY_MOUNT[self._mount]
             calblock: labware.Labware = self._deck[cb_setup.slot]  # type: ignore
             cal_block_target_well = calblock.wells_by_name()[cb_setup.well]
-        else:
-            cal_block_target_well = None
+
         ref_loc = util.get_reference_location(
             deck=self._deck, cal_block_target_well=cal_block_target_well
         )

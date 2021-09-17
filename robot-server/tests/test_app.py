@@ -1,6 +1,8 @@
-from mock import patch
 import pytest
+from mock import MagicMock, patch
 from http import HTTPStatus
+from fastapi.testclient import TestClient
+from typing import Dict, Iterator
 
 from robot_server.constants import (
     API_VERSION_HEADER,
@@ -28,14 +30,18 @@ from robot_server.constants import (
         ],
     ],
 )
-def test_api_versioning(api_client, headers, expected_version):
+def test_api_versioning(
+    api_client: TestClient,
+    headers: Dict[str, str],
+    expected_version: int,
+) -> None:
     resp = api_client.get("/settings", headers=headers)
     assert resp.headers.get(API_VERSION_HEADER) == str(expected_version)
     assert resp.headers.get(MIN_API_VERSION_HEADER) == str(MIN_API_VERSION)
 
 
 @pytest.fixture
-def mock_log_control():
+def mock_log_control() -> Iterator[MagicMock]:
     with patch("opentrons.system.log_control.get_records_dumb") as p:
         p.return_value = b""
         yield p
@@ -53,14 +59,18 @@ def mock_log_control():
         "/",
     ],
 )
-def test_api_versioning_non_versions_endpoints(api_client, path, mock_log_control):
+def test_api_versioning_non_versions_endpoints(
+    api_client: TestClient,
+    path: str,
+    mock_log_control: MagicMock,
+) -> None:
     del api_client.headers["Opentrons-Version"]
     resp = api_client.get(path)
     assert resp.headers.get(API_VERSION_HEADER) == str(API_VERSION)
     assert resp.status_code != HTTPStatus.BAD_REQUEST
 
 
-def test_api_version_too_low(api_client):
+def test_api_version_too_low(api_client: TestClient) -> None:
     """It should reject any API version lower than 2."""
     resp = api_client.get("/settings", headers={API_VERSION_HEADER: "1"})
 
@@ -88,7 +98,7 @@ def test_api_version_too_low(api_client):
         "/calibration/tip_length",
     ],
 )
-def test_api_version_missing(api_client, path):
+def test_api_version_missing(api_client: TestClient, path: str) -> None:
     """It should reject any request without an version header."""
     del api_client.headers["Opentrons-Version"]
     resp = api_client.get(path)

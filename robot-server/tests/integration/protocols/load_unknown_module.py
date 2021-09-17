@@ -1,3 +1,5 @@
+from opentrons.protocol_api import ProtocolContext
+
 metadata = {
     "protocolName": "Extraction",
     "author": "Opentrons <protocols@opentrons.com>",
@@ -5,5 +7,5 @@ metadata = {
 }
 
 
-def run(ctx):
+def run(ctx: ProtocolContext) -> None:
     ctx.load_module("pickle maker", "6")

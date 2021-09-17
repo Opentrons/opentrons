@@ -96,7 +96,7 @@ class DurationEstimator:
             )
             return
 
-        location = payload.get("location")  # type: ignore
+        location = payload.get("location")
 
         try:
             duration = self.handle_message(message_name, payload)
