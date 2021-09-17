@@ -1,4 +1,4 @@
-name: "G-Code-Confirm (2 Modules)"
+name: "G-Code-Confirm"
 
 on:
   # Run on any change to the api directory
@@ -14,6 +14,7 @@ on:
       - 'api/**'
       - 'g-code-testing/**'
       - 'Makefile'
+      - '.github/workflows/g-code-confirm-tests.yaml'
     branches:
       - '*'
 
@@ -21,7 +22,15 @@ on:
 
 jobs:
   confirm-g-code:
-    name: 'Confirm G-Code (2 Modules)'
+    strategy:
+      matrix:
+        command: [
+          '2-modules',
+          'swift-smoke',
+          'swift-turbo',
+          'fast'
+        ]
+    name: 'Confirm G-Code (${{ matrix.command }})'
     runs-on: 'ubuntu-18.04'
     steps:
       - uses: 'actions/checkout@v2'
@@ -40,11 +49,4 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.S3_APP_DEPLOY_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_APP_DEPLOY_SECRET }}
           AWS_DEFAULT_REGION: us-east-2
-        run: make -C g-code-testing g-code-2-modules-1s-1m-v2-protocol-diff
-
-      - name: "Save Generated Diff"
-        if: always()
-        uses: actions/upload-artifact@v2
-        with:
-          name: g-code-2-modules-1s-1m-v2-protocol-diff
-          path: /tmp/2-modules-1s-1m-v2-diff.html
+        run: make -C g-code-testing test-g-code-${{ matrix.command }}

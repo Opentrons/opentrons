@@ -25,6 +25,11 @@ const WINDOW_OPTS = {
       // NOTE: __dirname refers to output directory
       preload: path.join(__dirname, './preload.js'),
       nodeIntegration: false,
+      // TODO: remove this by using electron contextBridge to specify
+      // exact, argument-sanitation-involved methods instead of just
+      // binding the entire ipcRenderer in. This is necessary because
+      // as of electron 12, contextIsolation defaults to true.
+      contextIsolation: false,
     },
     config.webPreferences
   ),

@@ -178,7 +178,7 @@ class GCode:
         self._response = self._cleanup_response(response)
 
     @staticmethod
-    def _cleanup_response(response):
+    def _cleanup_response(response: str) -> str:
         pre_space_cleanup = (
             response.replace("ok", " ").replace("\r", " ").replace("\n", " ")
         )
@@ -230,7 +230,7 @@ class GCode:
         return self.g_code in self.POLLING_CODES
 
     @property
-    def response(self):
+    def response(self) -> str:
         """Unparsed G-Code Response"""
         return self._response
 

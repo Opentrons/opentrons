@@ -11,8 +11,12 @@ opentrons-shared-data = {editable = true, path = "../shared-data/python"}
 g-code-testing = {editable = true, path = "."}
 anyio = "==3.3.0"
 pydantic = "==1.8.2"
+# opentrons dependency on linux, spec'd here to force lockfile inclusion
+# https://github.com/pypa/pipenv/issues/4408#issuecomment-668324177
+systemd-python = {version="==234", sys_platform="== 'linux'"}
 
 [dev-packages]
+boto3 = "==1.18.41"
 diff-match-patch = "==20200713"
 pytest = "~=6.1"
 pytest-aiohttp = "==0.3.0"
