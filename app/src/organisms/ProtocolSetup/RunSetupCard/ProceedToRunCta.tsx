@@ -25,7 +25,7 @@ export const ProceedToRunCta = (
   const { robotName } = props
   const { t } = useTranslation('protocol_setup')
   const [targetProps, tooltipProps] = useHoverTooltip()
-  const { missingModuleIds } = useMissingModuleIds()
+  const missingModuleIds = useMissingModuleIds()
   const protocolPipetteTipRackData = useSelector((state: State) => {
     return Pipettes.getProtocolPipetteTipRackCalInfo(state, robotName)
   })
@@ -46,39 +46,44 @@ export const ProceedToRunCta = (
   const moduleAndCalibrationIncomplete =
     missingModuleIds.length > 0 && pipettesCalibrated === false
 
-  const proceedToRunDisabledReason = calibrationIncomplete
-    ? t('proceed_to_run_disabled_calibration_not_complete_tooltip')
-    : moduleAndCalibrationIncomplete
-    ? t(
-        'proceed_to_run_disabled_modules_and_calibration_not_complete_tooltip',
-        { count: missingModuleIds.length }
-      )
-    : moduleSetupIncomplete
-    ? t('proceed_to_run_disabled_modules_not_connected_tooltip', {
+  let proceedToRunDisabledReason = null
+  if (calibrationIncomplete) {
+    proceedToRunDisabledReason = t(
+      'proceed_to_run_disabled_calibration_not_complete_tooltip'
+    )
+  } else if (moduleAndCalibrationIncomplete) {
+    proceedToRunDisabledReason = t(
+      'proceed_to_run_disabled_modules_and_calibration_not_complete_tooltip',
+      { count: missingModuleIds.length }
+    )
+  } else if (moduleSetupIncomplete) {
+    proceedToRunDisabledReason = t(
+      'proceed_to_run_disabled_modules_not_connected_tooltip',
+      {
         count: missingModuleIds.length,
-      })
-    : null
+      }
+    )
+  }
 
   const LinkComponent = proceedToRunDisabledReason != null ? 'button' : NavLink
   const linkProps = proceedToRunDisabledReason != null ? {} : { to: '/run' }
   return (
-    <React.Fragment>
-      <Flex justifyContent={JUSTIFY_CENTER}>
-        <PrimaryBtn
-          title={t('proceed_to_run')}
-          disabled={proceedToRunDisabledReason != null}
-          as={LinkComponent}
-          backgroundColor={C_BLUE}
-          id={'LabwareSetup_proceedToRunButton'}
-          {...linkProps}
-          {...targetProps}
-        >
-          {t('proceed_to_run')}
-        </PrimaryBtn>
-        {proceedToRunDisabledReason != null && (
-          <Tooltip {...tooltipProps}>{proceedToRunDisabledReason}</Tooltip>
-        )}
-      </Flex>
-    </React.Fragment>
+    <Flex justifyContent={JUSTIFY_CENTER}>
+      <PrimaryBtn
+        role="button"
+        title={t('proceed_to_run')}
+        disabled={proceedToRunDisabledReason != null}
+        as={LinkComponent}
+        backgroundColor={C_BLUE}
+        id={'LabwareSetup_proceedToRunButton'}
+        {...linkProps}
+        {...targetProps}
+      >
+        {t('proceed_to_run')}
+      </PrimaryBtn>
+      {proceedToRunDisabledReason != null && (
+        <Tooltip {...tooltipProps}>{proceedToRunDisabledReason}</Tooltip>
+      )}
+    </Flex>
   )
 }

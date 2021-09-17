@@ -252,4 +252,17 @@ describe('RunSetupCard', () => {
       )
     ).toBeTruthy()
   })
+  it('renders robot calibration by default, skips module setup, renders labware setup heading, and allows the user to proceed to run', () => {
+    const { getByRole, getByText } = render()
+    getByRole('heading', {
+      name: 'Robot Calibration',
+    })
+    getByText('Mock Robot Calibration')
+    getByRole('heading', {
+      name: 'Labware Setup',
+    })
+    const proceedToRun = getByText('Mock Proceed To Run')
+    fireEvent.click(proceedToRun)
+    getByText('Mock Proceed To Run')
+  })
 })

@@ -27,7 +27,9 @@ const mockGetAttachedModules = getAttachedModules as jest.MockedFunction<
   typeof getAttachedModules
 >
 
-describe('useAttachedmodulesEqualsProtocolModules', () => {
+const MOCK_MODULE_MISSING_ID = ['temperatureModuleV1']
+
+describe('useMissingModuleIds', () => {
   const store: Store<State> = createStore(jest.fn(), {})
 
   beforeEach(() => {
@@ -47,13 +49,18 @@ describe('useAttachedmodulesEqualsProtocolModules', () => {
     jest.restoreAllMocks()
   })
 
-  it('should render no missing Module Ids', () => {
+  it('should return no missing Module Ids', () => {
     const wrapper: React.FunctionComponent<{}> = ({ children }) => (
       <Provider store={store}>{children}</Provider>
     )
     const { result } = renderHook(useMissingModuleIds, { wrapper })
-    const { missingModuleIds } = result.current
+    const missingModuleIds = result.current
     expect(missingModuleIds).toStrictEqual([])
+    expect(typeof useMissingModuleIds).toBe('function')
+  })
+  it('should return 1 missing Module Ids', () => {
+    const missingModuleIds = MOCK_MODULE_MISSING_ID
+    expect(missingModuleIds).toStrictEqual(['temperatureModuleV1'])
     expect(typeof useMissingModuleIds).toBe('function')
   })
 })

@@ -18,7 +18,7 @@ import {
   ModuleRealType,
 } from '@opentrons/shared-data'
 import { getAttachedModules } from '../../../../../redux/modules'
-import * as useMissingModuleIds from '../../hooks'
+import * as hooks from '../../hooks'
 import { useModuleRenderInfoById } from '../../../hooks'
 import {
   mockThermocycler as mockThermocyclerFixture,
@@ -45,8 +45,8 @@ jest.mock('@opentrons/shared-data', () => {
     inferModuleOrientationFromXCoordinate: jest.fn(),
   }
 })
-const mockUseMissingModuleIds = useMissingModuleIds.useMissingModuleIds as jest.MockedFunction<
-  typeof useMissingModuleIds.useMissingModuleIds
+const mockUseMissingModuleIds = hooks.useMissingModuleIds as jest.MockedFunction<
+  typeof hooks.useMissingModuleIds
 >
 const mockGetAttachedModules = getAttachedModules as jest.MockedFunction<
   typeof getAttachedModules
@@ -109,9 +109,6 @@ describe('ModuleSetup', () => {
       robotName: MOCK_ROBOT_NAME,
       expandLabwareSetupStep: () => {},
     }
-    mockUseMissingModuleIds.mockReturnValue({
-      missingModuleIds: [''],
-    })
 
     when(mockInferModuleOrientationFromXCoordinate)
       .calledWith(expect.anything())
@@ -146,6 +143,8 @@ describe('ModuleSetup', () => {
 
   it('should render a deck WITHOUT modules', () => {
     when(mockUseModuleRenderInfoById).calledWith().mockReturnValue({})
+
+    mockUseMissingModuleIds.mockReturnValue([])
 
     render(props)
     expect(mockModuleViz).not.toHaveBeenCalled()
@@ -221,9 +220,7 @@ describe('ModuleSetup', () => {
       )
       .mockReturnValue(<div>mock module info {mockTCModule.model} </div>)
 
-    mockUseMissingModuleIds.mockReturnValue({
-      missingModuleIds: ['foo'],
-    })
+    mockUseMissingModuleIds.mockReturnValue(['foo'])
 
     const { getByText, getByRole } = render(props)
     getByText('mock module viz magneticModuleType')
@@ -252,6 +249,8 @@ describe('ModuleSetup', () => {
           nestedLabwareDef: null,
         },
       })
+
+    mockUseMissingModuleIds.mockReturnValue([])
 
     when(mockGetAttachedModules)
       .calledWith(undefined as any, MOCK_ROBOT_NAME)
@@ -318,6 +317,6 @@ describe('ModuleSetup', () => {
     getByText('mock module viz thermocyclerModuleType')
     getByText('mock module info magneticModuleV2')
     const button = getByRole('button', { name: 'Proceed to Labware Setup' })
-    expect(button).not.toHaveAttribute('disabled=""')
+    expect(button).not.toBeDisabled()
   })
 })

@@ -7,19 +7,15 @@ import type { State } from '../../../redux/types'
 import type { AttachedModule } from '../../../redux/modules/types'
 import { useModuleRenderInfoById } from '../hooks'
 
-interface MissingModules {
-  missingModuleIds: string[]
-}
-export function useMissingModuleIds(): MissingModules {
+export function useMissingModuleIds(): string[] {
   const robot = useSelector((state: State) => getConnectedRobot(state))
   const moduleRenderInfoById = useModuleRenderInfoById()
-  let robotName = ''
-  if (robot != null) {
-    robotName = robot.name
-  }
   const attachedModules = useSelector((state: State) =>
-    getAttachedModules(state, robotName)
+    getAttachedModules(state, robot === null ? null : robot.name)
   )
+  if (robot === null) {
+    return []
+  }
 
   interface ModuleMatchResults {
     missingModuleIds: string[]
@@ -51,5 +47,5 @@ export function useMissingModuleIds(): MissingModules {
     },
     { missingModuleIds: [], remainingAttachedModules: attachedModules }
   )
-  return { missingModuleIds }
+  return missingModuleIds
 }

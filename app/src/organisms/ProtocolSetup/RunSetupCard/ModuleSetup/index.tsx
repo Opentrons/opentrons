@@ -57,8 +57,6 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
   const dispatch = useDispatch<Dispatch>()
   const [targetProps, tooltipProps] = useHoverTooltip()
   const moduleRenderInfoById = useModuleRenderInfoById()
-  const proceedToLabwareDisabledReason =
-    'Plug in and power up the required modules to continue'
   const moduleModels = map(
     moduleRenderInfoById,
     ({ moduleDef }) => moduleDef.model
@@ -72,8 +70,11 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
   ] = React.useState<boolean>(false)
   const { t } = useTranslation('protocol_setup')
   const hasADuplicateModule = new Set(moduleModels).size !== moduleModels.length
-  const { missingModuleIds } = useMissingModuleIds()
-  const proceedToLabwareDisabled = missingModuleIds.length > 0
+  const missingModuleIds = useMissingModuleIds()
+  const proceedToLabwareDisabledReason =
+    missingModuleIds.length > 0
+      ? 'Plug in and power up the required modules to continue'
+      : null
   const modulesByPort = attachedModules.reduce<{
     [port: string]: AttachedModule[]
   }>((portMap, module) => {
@@ -185,7 +186,7 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
       <Flex justifyContent={JUSTIFY_CENTER} margin={SPACING_4}>
         <PrimaryBtn
           title={t('proceed_to_labware_setup_step')}
-          disabled={proceedToLabwareDisabled}
+          disabled={proceedToLabwareDisabledReason != null}
           onClick={expandLabwareSetupStep}
           backgroundColor={C_BLUE}
           id={'ModuleSetup_proceedToLabwareSetup'}
@@ -193,7 +194,7 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
         >
           {t('proceed_to_labware_setup_step')}
         </PrimaryBtn>
-        {proceedToLabwareDisabled && (
+        {proceedToLabwareDisabledReason != null && (
           <Tooltip {...tooltipProps}>{proceedToLabwareDisabledReason}</Tooltip>
         )}
       </Flex>
