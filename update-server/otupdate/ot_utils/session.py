@@ -16,8 +16,6 @@ from typing import Mapping, Optional, Union
 import uuid
 
 import functools
-import logging
-from openembedded import (root_fs, oe_server_mode)
 from openembedded_server import update, config
 
 from aiohttp import web
@@ -27,6 +25,7 @@ LOG = logging.getLogger(__name__)
 
 Value = namedtuple('Value', ('short', 'human'))
 
+
 class Stages(enum.Enum):
     AWAITING_FILE = Value('awaiting-file', 'Waiting for update file')
     VALIDATING = Value('validating', 'Validating update file')
@@ -34,6 +33,7 @@ class Stages(enum.Enum):
     Done = Value('done', 'Ready to commit update')
     READY_FOR_RESTART = Value('ready-for-restart', 'Ready for restart')
     ERROR = Value('error', 'Error')
+
 
 class UpdateSession:
     """
@@ -104,7 +104,7 @@ class UpdateSession:
         return self.stage == Stages.ERROR
 
     @property
-    def error(Self) -> Value:
+    def error(self) -> Value:
         """ The current error, or an empty value """
         if not self._error:
             return Value('', '')
@@ -130,6 +130,7 @@ class UpdateSession:
                     'progress': self.progress,
                     'message': self.message}
 
+
 def active_session_check(handler):
     """ decorator to check session status
     """
@@ -148,7 +149,7 @@ def active_session_check(handler):
                 config.config_from_request(request).download_storage_path)
             request.app[SESSION_VARNAME] = session
             return web.json_response(
-            data={'token': session.token},
-            status=201)
+                data={'token': session.token},
+                status=201)
         return await handler(request)
     return decorated
