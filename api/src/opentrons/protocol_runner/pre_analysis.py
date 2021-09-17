@@ -8,7 +8,7 @@ protocol, and if so, what kind of protocol it is.
 
 from ast import parse as parse_python
 from dataclasses import dataclass
-from json import JSONDecodeError
+from json import JSONDecodeError, loads as json_loads
 from pathlib import Path
 from typing import Any, IO, Dict, List, Union
 
@@ -81,7 +81,11 @@ class PreAnalyzer:
 
 def _analyze_json(main_file_contents: bytes) -> "JsonPreAnalysis":
     try:
-        parsed_protocol = JsonProtocol.parse_raw(main_file_contents)
+        # Avoid JsonProtocol.parse_raw() because it wraps JSONDecodeError with
+        # JsonSchemaValidationError. (In Pydantic 1.4, this seems inconsistent with
+        # JsonProtocol.parse_file(), which JSONDecodeError it propagate.)
+        parsed_json = json_loads(main_file_contents)
+        parsed_protocol = JsonProtocol.parse_obj(parsed_json)
     except JSONDecodeError as exception:
         raise JsonParseError() from exception
     except PydanticValidationError as exception:
