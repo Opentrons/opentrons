@@ -1,7 +1,7 @@
 import typing
 from uuid import uuid4
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 IdentifierType = typing.NewType("IdentifierType", str)
 
@@ -15,8 +15,11 @@ class EmptyModel(BaseModel):
     pass
 
 
-OffsetVector = typing.Tuple[float, float, float]
+# NOTE: this would be more accurately typed as
+# a typing.Tuple[float, float, float], but tuple is
+# not able to be expressed in OpenAPI Spec
+OffsetVector = typing.List[float]
 
 
 class JogPosition(BaseModel):
-    vector: OffsetVector
+    vector: OffsetVector = Field(..., min_items=3, max_items=3)

@@ -1,4 +1,4 @@
-from typing import Optional, List, Tuple
+from typing import Optional, List
 from typing_extensions import Literal
 from functools import partial
 from pydantic import BaseModel, Field
@@ -6,10 +6,17 @@ from pydantic import BaseModel, Field
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from ..helper_classes import RequiredLabware, AttachedPipette
 
-OffsetVector = Tuple[float, float, float]
+# NOTE: this would be more accurately typed as
+# a typing.Tuple[float, float, float], but tuple is
+# not able to be expressed in OpenAPI Spec
+OffsetVector = List[float]
 
 OffsetVectorField = partial(
-    Field, ..., description="An offset vector in deck " "coordinates (x, y, z)"
+    Field,
+    ...,
+    description="An offset vector in deck coordinates (x, y, z)",
+    min_items=3,
+    max_items=3,
 )
 
 

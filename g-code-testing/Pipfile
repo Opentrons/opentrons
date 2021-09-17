@@ -10,8 +10,10 @@ robot-server = {editable = true, path = "./../robot-server"}
 opentrons-shared-data = {editable = true, path = "../shared-data/python"}
 g-code-testing = {editable = true, path = "."}
 anyio = "==3.3.0"
-pydantic = "==1.4"
-
+pydantic = "==1.8.2"
+# opentrons dependency on linux, spec'd here to force lockfile inclusion
+# https://github.com/pypa/pipenv/issues/4408#issuecomment-668324177
+systemd-python = {version="==234", sys_platform="== 'linux'"}
 
 [dev-packages]
 boto3 = "==1.18.41"

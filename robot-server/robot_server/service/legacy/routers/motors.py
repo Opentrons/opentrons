@@ -23,7 +23,7 @@ router = APIRouter()
 )
 async def get_engaged_motors(
     hardware: ThreadManager = Depends(get_hardware),
-) -> model.EngagedMotors:  # type: ignore
+) -> model.EngagedMotors:
     try:
         engaged_axes = hardware.engaged_axes
         axes_dict = {

@@ -21,6 +21,7 @@ from .types import (
     PipetteName,
     WellLocation,
     WellOrigin,
+    WellOffset,
 )
 
 __all__ = [
@@ -48,4 +49,5 @@ __all__ = [
     "PipetteName",
     "WellLocation",
     "WellOrigin",
+    "WellOffset",
 ]

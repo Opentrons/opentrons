@@ -34,8 +34,7 @@ from robot_server.sessions.router.commands_router import (
 @pytest.fixture
 def get_session(decoy: Decoy) -> Callable[..., Awaitable[ResponseModel[Session]]]:
     """Get a mock version of the get_session route handler."""
-    # TODO(mc, 2021-08-09): remove FastAPI from these tests
-    return decoy.mock(func=real_get_session)  # type: ignore[no-any-return]
+    return decoy.mock(func=real_get_session)
 
 
 @pytest.fixture(autouse=True)

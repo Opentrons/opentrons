@@ -9,7 +9,7 @@ python_version = "3.7"
 [packages]
 opentrons = {editable = true, path = "../api"}
 opentrons-shared-data = {editable = true, path = "../shared-data/python"}
-pydantic = "==1.4"
+pydantic = "==1.8.2"
 pyzmq = "==19.*,>=19.0.2"
 typing-extensions = "==3.10.0.0"
 

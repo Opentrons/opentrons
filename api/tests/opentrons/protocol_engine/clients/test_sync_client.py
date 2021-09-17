@@ -15,7 +15,12 @@ from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import DeckSlotName, MountType
 from opentrons.protocol_engine import DeckSlotLocation, PipetteName, commands
 from opentrons.protocol_engine.clients import SyncClient, AbstractSyncTransport
-from opentrons.protocol_engine.types import CalibrationOffset, WellOrigin, WellLocation
+from opentrons.protocol_engine.types import (
+    CalibrationOffset,
+    WellOrigin,
+    WellOffset,
+    WellLocation,
+)
 
 
 @pytest.fixture
@@ -145,7 +150,10 @@ def test_aspirate(
             pipetteId="123",
             labwareId="456",
             wellName="A2",
-            wellLocation=WellLocation(origin=WellOrigin.BOTTOM, offset=(0, 0, 1)),
+            wellLocation=WellLocation(
+                origin=WellOrigin.BOTTOM,
+                offset=WellOffset(x=0, y=0, z=1),
+            ),
             volume=123.45,
         )
     )
@@ -160,7 +168,10 @@ def test_aspirate(
         pipette_id="123",
         labware_id="456",
         well_name="A2",
-        well_location=WellLocation(origin=WellOrigin.BOTTOM, offset=(0, 0, 1)),
+        well_location=WellLocation(
+            origin=WellOrigin.BOTTOM,
+            offset=WellOffset(x=0, y=0, z=1),
+        ),
         volume=123.45,
     )
 
@@ -178,7 +189,10 @@ def test_dispense(
             pipetteId="123",
             labwareId="456",
             wellName="A2",
-            wellLocation=WellLocation(origin=WellOrigin.BOTTOM, offset=(0, 0, 1)),
+            wellLocation=WellLocation(
+                origin=WellOrigin.BOTTOM,
+                offset=WellOffset(x=0, y=0, z=1),
+            ),
             volume=10,
         )
     )
@@ -191,7 +205,9 @@ def test_dispense(
         pipette_id="123",
         labware_id="456",
         well_name="A2",
-        well_location=WellLocation(origin=WellOrigin.BOTTOM, offset=(0, 0, 1)),
+        well_location=WellLocation(
+            origin=WellOrigin.BOTTOM, offset=WellOffset(x=0, y=0, z=1)
+        ),
         volume=10,
     )
 
