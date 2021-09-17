@@ -111,4 +111,9 @@ describe('RobotCalibration', () => {
     fireEvent.click(getByRole('button', { name: 'Proceed to Module Setup' }))
     expect(mockExpandStep).toHaveBeenCalled()
   })
+  it('does not the expandStep function on click if button is disabled', () => {
+    const { getByRole } = render({ calibrationStatus: { complete: false } })
+    fireEvent.click(getByRole('button', { name: 'Proceed to Module Setup' }))
+    expect(mockExpandStep).not.toHaveBeenCalled()
+  })
 })
