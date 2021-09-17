@@ -16,7 +16,7 @@ from aiohttp import web, BodyPartReader
 
 from .constants import RESTART_LOCK_NAME
 from . import config, file_actions
-from .update_session import UpdateSession, Stages
+from .update_session import Stages
 
 from ot_utils import session
 
@@ -25,7 +25,7 @@ SESSION_VARNAME = APP_VARIABLE_PREFIX + 'session'
 LOG = logging.getLogger(__name__)
 
 
-def session_from_request(request: web.Request) -> Optional[UpdateSession]:
+def session_from_request(request: web.Request) -> Optional[session.UpdateSession]:
     return request.app.get(SESSION_VARNAME, None)
 
 
@@ -46,8 +46,8 @@ def require_session(handler):
 
 
 @session.active_session_check
-async def begin(request: web.Request, response: web.Response) -> web.Response:
-    return response
+async def begin(request: web.Request) -> web.Response:
+    pass
 
 
 async def cancel(request: web.Request) -> web.Response:
@@ -58,7 +58,7 @@ async def cancel(request: web.Request) -> web.Response:
 
 
 @require_session
-async def status(request: web.Request, session: UpdateSession) -> web.Response:
+async def status(request: web.Request, session: session.UpdateSession) -> web.Response:
     return web.json_response(
         data=session.state,
         status=200)
@@ -72,7 +72,7 @@ async def _save_file(part: BodyPartReader, path: str):
             write.write(decoded)
 
 
-def _begin_write(session: UpdateSession,
+def _begin_write(session: session.UpdateSession,
                  loop: asyncio.AbstractEventLoop,
                  rootfs_file_path: str):
     """ Start the write process. """
@@ -94,7 +94,7 @@ def _begin_write(session: UpdateSession,
 
 
 def _begin_validation(
-        session: UpdateSession,
+        session: session.UpdateSession,
         config: config.Config,
         loop: asyncio.AbstractEventLoop,
         downloaded_update_path: str)\
@@ -126,7 +126,7 @@ def _begin_validation(
 
 @require_session
 async def file_upload(
-        request: web.Request, session: UpdateSession) -> web.Response:
+        request: web.Request, session: session.UpdateSession) -> web.Response:
     """ Serves /updates/:session/file
 
     Requires multipart (encoding doesn't matter) with a file field in the
@@ -158,7 +158,7 @@ async def file_upload(
 
 @require_session
 async def commit(
-        request: web.Request, session: UpdateSession) -> web.Response:
+        request: web.Request, session: session.UpdateSession) -> web.Response:
     """ Serves /update/:session/commit """
     if session.stage != Stages.DONE:
         return web.json_response(

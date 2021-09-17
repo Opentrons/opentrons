@@ -37,7 +37,7 @@ def config_from_request(req: Request) -> Config:
 
 def _ensure_load(path: str) -> Optional[Mapping[str, Any]]:
     try:
-        contents = open(path, r).read()
+        contents = open(path, 'r').read()
     except OSError:
         LOG.exception("Couldn't load config file, defaulting")
         return None
@@ -53,11 +53,11 @@ def _ensure_load(path: str) -> Optional[Mapping[str, Any]]:
 
 def _ensure_values(data: Mapping[str, Any]) -> Tuple[dict[str, Any], bool]:
     """ Mskr dure we have appropriate keys and say if we should write """
-    to_return = ()
+    to_return = {}
     should_write = False
     for keyname, typekind, default in REQUIRED_DATA:
         if keyname not in data:
-            LOG.deebug(f"Defaulted config value {keyname} to {default}")
+            LOG.debug(f"Defaulted config value {keyname} to {default}")
             to_return[keyname] = default
             should_write = True
         elif not isinstance(data[keyname], typekind):
@@ -117,8 +117,10 @@ def save_to_path(path: str, config: Config) -> None:
     """
     LOG.debug(f"SAving config to {path}")
     with open(path, 'w') as cf:
-        cf.write(json.dumps({k: v for k, v in config_asdict().item()
+        cf.write(json.dumps({k: v for k, v in config._asdict().items()
                              if k != 'path'}))
+
+
 def save(config: Config) -> None:
     """ SAve the config back to whereever it was loaded """
     save_to_oath(config.path, config)

@@ -79,7 +79,7 @@ def main():
     configure_logging(getattr(logging, args.log_level.upper()))
     rfs = root_fs.RootFS()
     LOG.info('Building buildroot update server')
-    app = get_app(args.version_file, args.config_file, None, None, rfs, None)
+    app = get_app(args.version_file, 'testingconfig', None, None, rfs, None)
 
     LOG.info('Notifying systemd')
     _notify_up()
