@@ -4,10 +4,10 @@ from datetime import datetime
 from fastapi import UploadFile
 from logging import getLogger
 from pathlib import Path
-from typing import Dict, List, Sequence
+from typing import Dict, List, Sequence, Union
 
-# from opentrons.protocol_api import MAX_SUPPORTED_VERSION
-from opentrons.protocol_runner import ProtocolFile, ProtocolFileType, EngineExecution
+from opentrons.protocol_runner import ProtocolFile, ProtocolFileType
+from opentrons.protocol_runner.pre_analysis import JsonPreAnalysis, PythonPreAnalysis
 
 log = getLogger(__name__)
 
@@ -18,6 +18,7 @@ class ProtocolResource(ProtocolFile):
 
     protocol_id: str
     created_at: datetime
+    pre_analysis: Union[JsonPreAnalysis, PythonPreAnalysis]
 
 
 class ProtocolNotFoundError(KeyError):
@@ -45,6 +46,9 @@ class ProtocolStore:
 
         Arguments:
             directory: Directory in which to place created files.
+
+            pre_analyzer: Called to extract basic info from protocols when they are
+            `create()`ed.
         """
         self._directory = directory
         self._protocols_by_id: Dict[str, ProtocolResource] = {}
@@ -54,12 +58,17 @@ class ProtocolStore:
         protocol_id: str,
         created_at: datetime,
         files: Sequence[UploadFile],
+        pre_analysis: Union[JsonPreAnalysis, PythonPreAnalysis],
     ) -> ProtocolResource:
-        """Add a protocol to the store."""
+        """Add a protocol to the store.
+
+        Raises:
+            ProtocolFileInvalidError
+        """
         protocol_dir = self._get_protocol_dir(protocol_id)
         # TODO(mc, 2021-06-02): check for protocol collision
         protocol_dir.mkdir(parents=True)
-        saved_files = []
+        saved_files: List[Path] = []
 
         for index, upload_file in enumerate(files):
             if upload_file.filename == "":
@@ -77,8 +86,8 @@ class ProtocolStore:
 
         entry = ProtocolResource(
             protocol_id=protocol_id,
-            protocol_type=self._get_protocol_type(saved_files),
-            execution_method=EngineExecution(),
+            protocol_type=self._get_protocol_type(pre_analysis),
+            pre_analysis=pre_analysis,
             created_at=created_at,
             files=saved_files,
         )
@@ -120,15 +129,11 @@ class ProtocolStore:
     def _get_protocol_dir(self, protocol_id: str) -> Path:
         return self._directory / protocol_id
 
-    # TODO(mc, 2021-06-01): add multi-file support and ditch all of this
-    # logic in favor of whatever protocol analyzer we come up with
     @staticmethod
-    def _get_protocol_type(files: List[Path]) -> ProtocolFileType:
-        file_path = files[0]
-
-        if file_path.suffix == ".json":
+    def _get_protocol_type(
+        pre_analysis: Union[JsonPreAnalysis, PythonPreAnalysis]
+    ) -> ProtocolFileType:
+        if isinstance(pre_analysis, JsonPreAnalysis):
             return ProtocolFileType.JSON
-        elif file_path.suffix == ".py":
-            return ProtocolFileType.PYTHON
         else:
-            raise NotImplementedError("Protocol type not yet supported")
+            return ProtocolFileType.PYTHON

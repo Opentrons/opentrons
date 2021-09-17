@@ -2,11 +2,19 @@
 import pytest
 from decoy import Decoy
 
+from opentrons.protocol_runner.pre_analysis import PreAnalyzer
+
 from robot_server.service.task_runner import TaskRunner
 from robot_server.protocols.protocol_store import ProtocolStore
 from robot_server.protocols.analysis_store import AnalysisStore
 from robot_server.protocols.response_builder import ResponseBuilder
 from robot_server.protocols.protocol_analyzer import ProtocolAnalyzer
+
+
+@pytest.fixture
+def pre_analyzer(decoy: Decoy) -> PreAnalyzer:
+    """Get a mocked out PreAnalyzer."""
+    return decoy.mock(cls=PreAnalyzer)
 
 
 @pytest.fixture

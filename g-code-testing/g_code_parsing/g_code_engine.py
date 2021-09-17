@@ -2,7 +2,7 @@ import os
 import sys
 import threading
 import asyncio
-from typing import Generator
+from typing import Generator, Callable
 from collections import namedtuple
 
 from opentrons.hardware_control.emulation.settings import Settings
@@ -27,8 +27,6 @@ from opentrons.protocols.context.protocol_api.protocol_context import (
     ProtocolContextImplementation,
 )
 from g_code_parsing.utils import get_configuration_dir
-from g_code_parsing.g_code_test_data import HTTPTestData, ProtocolTestData
-
 
 Protocol = namedtuple("Protocol", ["text", "filename", "filelike"])
 
@@ -105,14 +103,14 @@ class GCodeEngine:
         return Protocol(text=text, filename=file_path, filelike=file)
 
     @contextmanager
-    def run_protocol(self, test_data: ProtocolTestData) -> Generator:
+    def run_protocol(self, path: str) -> Generator:
         """
         Runs passed protocol file and collects all G-Code I/O from it.
         Will cleanup emulation after execution
-        :param test_data: Path to file
+        :param path: Path to file
         :return: GCodeProgram with all the parsed data
         """
-        file_path = os.path.join(get_configuration_dir(), test_data.path)
+        file_path = os.path.join(get_configuration_dir(), path)
         server_manager = ServerManager(self._config)
         self._start_emulation_app(server_manager)
         protocol = self._get_protocol(file_path)
@@ -129,15 +127,15 @@ class GCodeEngine:
         server_manager.stop()
 
     @contextmanager
-    def run_http(self, test_data: HTTPTestData):
+    def run_http(self, executable: Callable):
         """
         Runs http request and returns all G-Code I/O from it
-        :param test_data: Function connected to HTTP Request to execute
+        :param executable: Function connected to HTTP Request to execute
         :return:
         """
         server_manager = ServerManager(self._config)
         self._start_emulation_app(server_manager)
         with GCodeWatcher() as watcher:
-            asyncio.run(test_data.executable(hardware=self._emulate_hardware()))
+            asyncio.run(executable(hardware=self._emulate_hardware()))
         yield GCodeProgram.from_g_code_watcher(watcher)
         server_manager.stop()

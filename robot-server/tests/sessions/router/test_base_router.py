@@ -8,7 +8,9 @@ from httpx import AsyncClient
 
 from opentrons.types import DeckSlotName, MountType
 from opentrons.protocol_engine import commands as pe_commands, types as pe_types
-from opentrons.protocol_runner import ProtocolFileType, EngineExecution
+from opentrons.protocol_runner import ProtocolFileType
+
+from opentrons.protocol_runner.pre_analysis import JsonPreAnalysis
 
 from robot_server.service.task_runner import TaskRunner
 from robot_server.protocols import (
@@ -140,7 +142,7 @@ async def test_create_protocol_session(
     protocol_resource = ProtocolResource(
         protocol_id="protocol-id",
         protocol_type=ProtocolFileType.JSON,
-        execution_method=EngineExecution(),
+        pre_analysis=JsonPreAnalysis(schema_version=123, metadata={}),
         created_at=datetime.now(),
         files=[],
     )

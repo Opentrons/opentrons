@@ -1,7 +1,7 @@
 """Protocol response model factory."""
 from typing import List
 from .protocol_store import ProtocolResource
-from .protocol_models import Protocol
+from .protocol_models import Protocol, Metadata
 from .analysis_models import ProtocolAnalysis
 
 
@@ -24,7 +24,8 @@ class ResponseBuilder:
         """
         return Protocol(
             id=resource.protocol_id,
-            protocolType=resource.protocol_type,
             createdAt=resource.created_at,
+            protocolType=resource.protocol_type,
+            metadata=Metadata.parse_obj(resource.pre_analysis.metadata),
             analyses=analyses,
         )

@@ -131,6 +131,7 @@ class TempDeck(mod_abc.AbstractModule):
         """
         await self.wait_for_is_running()
         await self._driver.set_temperature(celsius=celsius)
+        await self.wait_next_poll()
 
         async def _wait():
             # Wait until we reach the target temperature.
@@ -162,6 +163,7 @@ class TempDeck(mod_abc.AbstractModule):
             return
 
         await self.wait_for_is_running()
+        await self.wait_next_poll()
 
         async def _await_temperature():
             if self.status == TemperatureStatus.HEATING:

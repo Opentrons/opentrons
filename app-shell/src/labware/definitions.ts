@@ -1,5 +1,6 @@
 import path from 'path'
 import fs from 'fs-extra'
+
 import { shell } from 'electron'
 
 import type { Dirent } from 'fs'
@@ -75,7 +76,5 @@ export function addLabwareFile(file: string, dir: string): Promise<void> {
 }
 
 export function removeLabwareFile(file: string): Promise<void> {
-  const result = shell.moveItemToTrash(file)
-
-  return result ? Promise.resolve() : fs.unlink(file)
+  return shell.trashItem(file).catch(() => fs.unlink(file))
 }
