@@ -35,6 +35,7 @@ export interface PipetteOffsetCalibrationInstrument {
 
 export interface PipetteOffsetCalibrationSessionParams {
   mount: string
+  // this will be false for pipette offset cal
   shouldRecalibrateTipLength: boolean
   hasCalibrationBlock: boolean
   tipRackDefinition: LabwareDefinition2 | null

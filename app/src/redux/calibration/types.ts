@@ -69,5 +69,9 @@ export type CalibrationState = Readonly<
 
 export interface ProtocolCalibrationStatus {
   complete: boolean
-  reason?: string
+  reason?:
+    | 'calibrate_deck_failure_reason'
+    | 'calibrate_tiprack_failure_reason'
+    | 'calibrate_pipette_failure_reason'
+    | 'attach_pipette_failure_reason'
 }

@@ -12,12 +12,21 @@ describe('CollapsibleStep', () => {
     title = 'stub title',
     description = 'stub description',
     label = 'stub label',
+    rightAlignedNode = null,
     toggleExpanded = toggleExpandedMock,
     children = <button>stub children</button>,
   }: Partial<React.ComponentProps<typeof CollapsibleStep>> = {}) => {
     return renderWithProviders(
       <CollapsibleStep
-        {...{ expanded, title, description, label, toggleExpanded, children }}
+        {...{
+          expanded,
+          title,
+          description,
+          label,
+          toggleExpanded,
+          children,
+          rightAlignedNode,
+        }}
       />,
       { i18nInstance: i18n }
     )
