@@ -14,14 +14,14 @@ from robot_server.service.shared_models import calibration as cal_model
 Offset = typing.Sequence[float]
 
 # NOTE: this would be more accurately typed as
-# a 4x4 motraix using typing.Tuple, but tuple is
+# a 4x4 matrix using typing.Tuple, but Tuple is
 # not able to be expressed in OpenAPI Spec
 AffineMatrix = typing.Sequence[
     typing.Sequence[float],
 ]
 
 # NOTE: this would be more accurately typed as
-# a 3x3 motraix using typing.Tuple, but tuple is
+# a 3x3 matrix using typing.Tuple, but Tuple is
 # not able to be expressed in OpenAPI Spec
 AttitudeMatrix = typing.Sequence[
     typing.Sequence[float],
