@@ -10,6 +10,7 @@ import uuid
 LOG = logging.getLogger(__name__)
 Value = namedtuple('Value', ('short', 'human'))
 
+
 class Stages(enum.Enum):
     AWAITING_FILE = Value('awaiting-file', 'Waiting for update file')
     VALIDATING = Value('validating', 'Validating update file')
@@ -17,6 +18,7 @@ class Stages(enum.Enum):
     Done = Value('done', 'Ready to commit update')
     READY_FOR_RESTART = Value('ready-for-restart', 'Ready for restart')
     ERROR = Value('error', 'Error')
+
 
 class UpdateSession:
     """
@@ -87,7 +89,7 @@ class UpdateSession:
         return self.stage == Stages.ERROR
 
     @property
-    def error(Self) -> Value:
+    def error(self) -> Value:
         """ The current error, or an empty value """
         if not self._error:
             return Value('', '')

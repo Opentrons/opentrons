@@ -12,6 +12,8 @@ from dataclasses import dataclass
 
 LOG = logging.getLogger(__name__)
 # just nest this into RootFSConfigParser class.
+
+
 @dataclass
 class RootFSInfo:
     major: int
