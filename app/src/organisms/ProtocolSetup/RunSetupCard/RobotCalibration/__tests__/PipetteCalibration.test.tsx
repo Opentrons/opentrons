@@ -41,21 +41,6 @@ describe('PipetteCalibration', () => {
     ).toBeTruthy()
     expect(getByText('Last calibrated: April 09, 2021 20:00')).toBeTruthy()
   })
-  // you should not use link outside a router
-  //   it('renders the attach button if pipette not attached', () => {
-  //     const { getByText, getByRole } = render({
-  //       pipetteTipRackData: {
-  //         pipetteDisplayName: 'my pipette',
-  //         tipRacks: [],
-  //         exactPipetteMatch: 'incompatible',
-  //         pipetteCalDate: null,
-  //       },
-  //     })
-  //     expect(getByRole('button', { name: 'Attach Pipette' })).toBeTruthy()
-  //     expect(
-  //       getByText('Attach pipette to see calibration information')
-  //     ).toBeTruthy()
-  //   })
 
   it('renders the calibrate now button if pipette attached but not calibrated', () => {
     const { getByText, getByRole } = render({
