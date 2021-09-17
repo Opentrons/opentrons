@@ -23,7 +23,7 @@ class OtApplication:
         try:
             with open(self.config_path, encoding="utf-8") as config_file:
                 self.config = json.load(config_file)
-        except Exception as exception:  # pylint: disable=W0703
+        except Exception as exception:
             logger.exception(exception)
         self.start_modtime = os.path.getmtime(self.config_path)
         logger.info(f"config.json for the application\n{self.config}")
@@ -42,6 +42,6 @@ class OtApplication:
                 # make it look like the format teh app uses
                 data = json.dumps(self.config, indent=4).replace("    ", "\t")
                 config_file.write(data)
-        except Exception as exception:  # pylint: disable=W0703
+        except Exception as exception:
             logger.exception(exception)
         self.read_config()

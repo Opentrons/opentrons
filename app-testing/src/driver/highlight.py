@@ -1,6 +1,9 @@
-"""Functions to apply a border with javascript around an
-element in the App (Electron/Browser) while a test is running.
-Useful for troubleshooting and demonstrations."""
+"""Functions to apply a border with javascript.
+
+This happens in the DOM on the element in the App (Electron/Browser)
+while a test is running.
+Useful for troubleshooting and demonstrations.
+"""
 import functools
 import os
 import time
@@ -13,7 +16,7 @@ def apply_border(
     element: WebElement, effect_time_sec: int, color: str, border_size_px: int
 ) -> None:
     """Highlights (blinks) a Selenium Webdriver element."""
-    driver: WebDriver = element._parent  # pylint: disable=W0212
+    driver: WebDriver = element._parent
 
     def apply_style(argument: str) -> None:
         """Execute the javascript to apply the style."""

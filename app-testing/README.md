@@ -59,7 +59,7 @@ Slices of the tests will be selected as candidates for automation and then perfo
 use xdist
 `pipenv run pytest -n3`
 
-run black, mypy, pylint, and flake8
+run black, mypy, and flake8
 `make check`
 
 ## Tools

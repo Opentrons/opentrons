@@ -1,7 +1,3 @@
-.PHONY: pylint
-pylint:
-	pipenv run python -m pylint conftest.py src/ tests/
-
 .PHONY: black
 black:
 	pipenv run python -m black conftest.py src/ tests/
@@ -18,7 +14,6 @@ mypy:
 check:
 	$(MAKE) black
 	$(MAKE) mypy
-	$(MAKE) pylint
 	$(MAKE) flake8
 
 .PHONY: test

@@ -6,7 +6,7 @@ import time
 
 if platform.system() == "Darwin":
     # seems to have to be here on 3.7.10 ?
-    import AppKit  # pylint: disable=W0611 # noqa: F401
+    import AppKit  # noqa: F401
 if platform.system() in ["Darwin", "Windows"]:
     # Have not got working on Linux yet.
     import pyautogui

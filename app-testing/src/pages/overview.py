@@ -38,7 +38,7 @@ class Overview:
             return WebDriverWait(self.driver, 2).until(
                 EC.element_to_be_clickable((Overview.continue_button_locator))
             )
-        except Exception:  # pylint: disable=W0703
+        except Exception:
             return None
 
     def click_continue_if_present(self) -> None:
