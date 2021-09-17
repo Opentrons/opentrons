@@ -2,12 +2,10 @@
 import pytest
 from datetime import datetime
 from decoy import Decoy, matchers
-from starlette.datastructures import UploadFile
+from fastapi import UploadFile
 
-from opentrons.protocol_runner import ProtocolFileType
 from opentrons.protocol_runner.pre_analysis import (
     PreAnalyzer,
-    InputFile as PreAnalysisInputFile,
     NotPreAnalyzableError,
     JsonPreAnalysis,
     PythonPreAnalysis,
@@ -15,7 +13,7 @@ from opentrons.protocol_runner.pre_analysis import (
 
 from robot_server.errors import ApiError
 from robot_server.service.task_runner import TaskRunner
-from robot_server.protocols.protocol_models import Metadata, Protocol
+from robot_server.protocols.protocol_models import Metadata, Protocol, ProtocolType
 from robot_server.protocols.analysis_store import AnalysisStore
 from robot_server.protocols.protocol_analyzer import ProtocolAnalyzer
 from robot_server.protocols.response_builder import ResponseBuilder
@@ -65,17 +63,12 @@ async def test_get_protocols(
     resource_1 = ProtocolResource(
         protocol_id="abc",
         created_at=created_at_1,
-        protocol_type=ProtocolFileType.PYTHON,
-        pre_analysis=PythonPreAnalysis(
-            metadata={},
-            api_level="1234.5678",
-        ),
+        pre_analysis=PythonPreAnalysis(metadata={}, api_level="1234.5678"),
         files=[],
     )
     resource_2 = ProtocolResource(
         protocol_id="123",
         created_at=created_at_2,
-        protocol_type=ProtocolFileType.JSON,
         pre_analysis=JsonPreAnalysis(schema_version=123, metadata={}),
         files=[],
     )
@@ -86,14 +79,14 @@ async def test_get_protocols(
     protocol_1 = Protocol(
         id="abc",
         createdAt=created_at_1,
-        protocolType=ProtocolFileType.PYTHON,
+        protocolType=ProtocolType.PYTHON,
         metadata=Metadata(),
         analyses=[analysis_1],
     )
     protocol_2 = Protocol(
         id="123",
         createdAt=created_at_2,
-        protocolType=ProtocolFileType.JSON,
+        protocolType=ProtocolType.JSON,
         metadata=Metadata(),
         analyses=[analysis_2],
     )
@@ -126,11 +119,7 @@ async def test_get_protocol_by_id(
     """It should return a single protocol file."""
     resource = ProtocolResource(
         protocol_id="protocol-id",
-        protocol_type=ProtocolFileType.PYTHON,
-        pre_analysis=PythonPreAnalysis(
-            metadata={},
-            api_level="1234.5678",
-        ),
+        pre_analysis=PythonPreAnalysis(metadata={}, api_level="1234.5678"),
         created_at=datetime(year=2021, month=1, day=1),
         files=[],
     )
@@ -140,7 +129,7 @@ async def test_get_protocol_by_id(
     protocol = Protocol(
         id="protocol-id",
         createdAt=datetime(year=2021, month=1, day=1),
-        protocolType=ProtocolFileType.PYTHON,
+        protocolType=ProtocolType.PYTHON,
         metadata=Metadata(),
         analyses=[analysis],
     )
@@ -196,11 +185,11 @@ async def test_create_protocol(
     current_time: datetime,
 ) -> None:
     """It should store an uploaded protocol file."""
+    protocol_file = UploadFile(filename="foo.json")
     metadata_as_dict = {"this_is_fake_metadata": True}
     pre_analysis = JsonPreAnalysis(schema_version=123, metadata=metadata_as_dict)
     protocol_resource = ProtocolResource(
         protocol_id="protocol-id",
-        protocol_type=ProtocolFileType.JSON,
         pre_analysis=pre_analysis,
         created_at=current_time,
         files=[],
@@ -209,20 +198,18 @@ async def test_create_protocol(
     protocol = Protocol(
         id="protocol-id",
         createdAt=current_time,
-        protocolType=ProtocolFileType.JSON,
+        protocolType=ProtocolType.JSON,
         metadata=Metadata.parse_obj(metadata_as_dict),
         analyses=[analysis],
     )
 
-    decoy.when(
-        pre_analyzer.analyze([matchers.IsA(PreAnalysisInputFile, {"name": "foo.json"})])
-    ).then_return(pre_analysis)
+    decoy.when(pre_analyzer.analyze([protocol_file])).then_return(pre_analysis)
 
     decoy.when(
         await protocol_store.create(
             protocol_id="protocol-id",
             created_at=current_time,
-            files=[matchers.IsA(UploadFile, {"filename": "foo.json"})],
+            files=[protocol_file],
             pre_analysis=pre_analysis,
         )
     ).then_return(protocol_resource)
@@ -235,10 +222,8 @@ async def test_create_protocol(
         response_builder.build(resource=protocol_resource, analyses=[analysis])
     ).then_return(protocol)
 
-    files = [UploadFile(filename="foo.json")]
-
     result = await create_protocol(
-        files=files,
+        files=[protocol_file],
         response_builder=response_builder,
         protocol_store=protocol_store,
         analysis_store=analysis_store,

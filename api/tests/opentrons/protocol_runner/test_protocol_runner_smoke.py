@@ -13,7 +13,6 @@ from datetime import datetime
 from decoy import matchers
 
 from opentrons.types import MountType
-from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocol_api_experimental import DeckSlotName
 
 from opentrons.protocol_engine import (
@@ -24,24 +23,22 @@ from opentrons.protocol_engine import (
     commands,
 )
 from opentrons.protocol_runner import (
-    ProtocolFile,
-    ProtocolFileType,
-    EngineExecution,
-    LegacyExecution,
+    ProtocolSource,
+    JsonPreAnalysis,
+    PythonPreAnalysis,
     create_simulating_runner,
 )
 
 
 async def test_runner_with_python(python_protocol_file: Path) -> None:
     """It should run a Python protocol on the ProtocolRunner."""
-    protocol_file = ProtocolFile(
-        protocol_type=ProtocolFileType.PYTHON,
-        execution_method=EngineExecution(),
+    protocol_source = ProtocolSource(
         files=[python_protocol_file],
+        pre_analysis=PythonPreAnalysis(metadata={}, api_level="3.0"),
     )
 
     subject = await create_simulating_runner()
-    result = await subject.run(protocol_file)
+    result = await subject.run(protocol_source)
     commands_result = result.commands
     pipettes_result = result.pipettes
     labware_result = result.labware
@@ -84,14 +81,13 @@ async def test_runner_with_python(python_protocol_file: Path) -> None:
 
 async def test_runner_with_json(json_protocol_file: Path) -> None:
     """It should run a JSON protocol on the ProtocolRunner."""
-    protocol_file = ProtocolFile(
-        protocol_type=ProtocolFileType.JSON,
-        execution_method=EngineExecution(),
+    protocol_source = ProtocolSource(
         files=[json_protocol_file],
+        pre_analysis=JsonPreAnalysis(metadata={}, schema_version=6),
     )
 
     subject = await create_simulating_runner()
-    result = await subject.run(protocol_file)
+    result = await subject.run(protocol_source)
     commands_result = result.commands
     pipettes_result = result.pipettes
     labware_result = result.labware
@@ -131,14 +127,13 @@ async def test_runner_with_json(json_protocol_file: Path) -> None:
 
 async def test_runner_with_legacy_python(legacy_python_protocol_file: Path) -> None:
     """It should run a Python protocol on the ProtocolRunner."""
-    protocol_file = ProtocolFile(
-        protocol_type=ProtocolFileType.PYTHON,
-        execution_method=LegacyExecution(api_version=MAX_SUPPORTED_VERSION),
+    protocol_source = ProtocolSource(
         files=[legacy_python_protocol_file],
+        pre_analysis=PythonPreAnalysis(metadata={}, api_level="2.11"),
     )
 
     subject = await create_simulating_runner()
-    result = await subject.run(protocol_file)
+    result = await subject.run(protocol_source)
 
     # TODO(mc, 2021-09-13): uncomment (and edit as necessary) below
     # once command / equipment translation layer is in place
@@ -188,14 +183,13 @@ async def test_runner_with_legacy_python(legacy_python_protocol_file: Path) -> N
 
 async def test_runner_with_legacy_json(legacy_json_protocol_file: Path) -> None:
     """It should run a Python protocol on the ProtocolRunner."""
-    protocol_file = ProtocolFile(
-        protocol_type=ProtocolFileType.JSON,
-        execution_method=LegacyExecution(api_version=MAX_SUPPORTED_VERSION),
+    protocol_source = ProtocolSource(
         files=[legacy_json_protocol_file],
+        pre_analysis=JsonPreAnalysis(metadata={}, schema_version=5),
     )
 
     subject = await create_simulating_runner()
-    result = await subject.run(protocol_file)
+    result = await subject.run(protocol_source)
 
     # TODO(mc, 2021-09-13): uncomment (and edit as necessary) below
     # once command / equipment translation layer is in place

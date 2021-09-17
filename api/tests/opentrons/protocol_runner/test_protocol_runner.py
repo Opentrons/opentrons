@@ -4,17 +4,14 @@ from decoy import Decoy
 from typing import List
 
 from opentrons.hardware_control import API as HardwareAPI
-from opentrons.protocols.api_support.types import APIVersion
+
+# from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.models import JsonProtocol
 from opentrons.protocol_api_experimental import ProtocolContext
 from opentrons.protocol_engine import ProtocolEngine, commands as pe_commands
 from opentrons.protocol_runner import ProtocolRunner
-from opentrons.protocol_runner.protocol_file import (
-    ProtocolFile,
-    ProtocolFileType,
-    LegacyExecution,
-    EngineExecution,
-)
+from opentrons.protocol_runner.protocol_source import ProtocolSource
+from opentrons.protocol_runner.pre_analysis import JsonPreAnalysis, PythonPreAnalysis
 from opentrons.protocol_runner.task_queue import TaskQueue, TaskQueuePhase
 from opentrons.protocol_runner.json_file_reader import JsonFileReader
 from opentrons.protocol_runner.json_command_translator import JsonCommandTranslator
@@ -28,8 +25,8 @@ from opentrons.protocol_runner.legacy_wrappers import (
     LegacyFileReader,
     LegacyContextCreator,
     LegacyExecutor,
-    LegacyPythonProtocol,
-    LegacyProtocolContext,
+    # LegacyPythonProtocol,
+    # LegacyProtocolContext,
 )
 
 
@@ -215,10 +212,9 @@ def test_load_json(
     subject: ProtocolRunner,
 ) -> None:
     """It should load a JSON protocol file."""
-    json_protocol_file = ProtocolFile(
-        protocol_type=ProtocolFileType.JSON,
-        execution_method=EngineExecution(),
+    json_protocol_source = ProtocolSource(
         files=[],
+        pre_analysis=JsonPreAnalysis(metadata={}, schema_version=6),
     )
 
     json_protocol = JsonProtocol.construct()  # type: ignore[call-arg]
@@ -228,10 +224,10 @@ def test_load_json(
         pe_commands.PauseRequest(data=pe_commands.PauseData(message="goodbye")),
     ]
 
-    decoy.when(json_file_reader.read(json_protocol_file)).then_return(json_protocol)
+    decoy.when(json_file_reader.read(json_protocol_source)).then_return(json_protocol)
     decoy.when(json_command_translator.translate(json_protocol)).then_return(commands)
 
-    subject.load(json_protocol_file)
+    subject.load(json_protocol_source)
 
     decoy.verify(
         protocol_engine.add_command(
@@ -257,23 +253,22 @@ def test_load_python(
     subject: ProtocolRunner,
 ) -> None:
     """It should load a Python protocol file."""
-    python_protocol_file = ProtocolFile(
-        protocol_type=ProtocolFileType.PYTHON,
-        execution_method=EngineExecution(),
+    python_protocol_source = ProtocolSource(
         files=[],
+        pre_analysis=PythonPreAnalysis(metadata={}, api_level="3.0"),
     )
 
     python_protocol = decoy.mock(cls=PythonProtocol)
     protocol_context = decoy.mock(cls=ProtocolContext)
 
-    decoy.when(python_file_reader.read(python_protocol_file)).then_return(
+    decoy.when(python_file_reader.read(python_protocol_source)).then_return(
         python_protocol
     )
     decoy.when(python_context_creator.create(protocol_engine)).then_return(
         protocol_context
     )
 
-    subject.load(python_protocol_file)
+    subject.load(python_protocol_source)
 
     decoy.verify(
         task_queue.add(
@@ -286,50 +281,49 @@ def test_load_python(
     )
 
 
-def test_load_legacy(
-    decoy: Decoy,
-    legacy_file_reader: LegacyFileReader,
-    legacy_context_creator: LegacyContextCreator,
-    legacy_executor: LegacyExecutor,
-    task_queue: TaskQueue,
-    subject: ProtocolRunner,
-) -> None:
-    """It should load a legacy context-based protocol."""
-    legacy_protocol_source = ProtocolFile(
-        protocol_type=ProtocolFileType.PYTHON,
-        execution_method=LegacyExecution(api_version=APIVersion(2, 10)),
-        files=[],
-    )
+# def test_load_legacy(
+#     decoy: Decoy,
+#     legacy_file_reader: LegacyFileReader,
+#     legacy_context_creator: LegacyContextCreator,
+#     legacy_executor: LegacyExecutor,
+#     task_queue: TaskQueue,
+#     subject: ProtocolRunner,
+# ) -> None:
+#     """It should load a legacy context-based protocol."""
+#     legacy_protocol_source = ProtocolFile(
+#         protocol_type=ProtocolFileType.PYTHON,
+#         files=[],
+#     )
 
-    legacy_protocol = LegacyPythonProtocol(
-        text="",
-        contents="",
-        filename="protocol.py",
-        api_level=APIVersion(2, 10),
-        metadata={"foo": "bar"},
-        bundled_labware=None,
-        bundled_data=None,
-        bundled_python=None,
-        extra_labware=None,
-    )
+#     legacy_protocol = LegacyPythonProtocol(
+#         text="",
+#         contents="",
+#         filename="protocol.py",
+#         api_level=APIVersion(2, 10),
+#         metadata={"foo": "bar"},
+#         bundled_labware=None,
+#         bundled_data=None,
+#         bundled_python=None,
+#         extra_labware=None,
+#     )
 
-    legacy_context = decoy.mock(cls=LegacyProtocolContext)
+#     legacy_context = decoy.mock(cls=LegacyProtocolContext)
 
-    decoy.when(legacy_file_reader.read(legacy_protocol_source)).then_return(
-        legacy_protocol
-    )
-    decoy.when(legacy_context_creator.create(APIVersion(2, 10))).then_return(
-        legacy_context
-    )
+#     decoy.when(legacy_file_reader.read(legacy_protocol_source)).then_return(
+#         legacy_protocol
+#     )
+#     decoy.when(legacy_context_creator.create(APIVersion(2, 10))).then_return(
+#         legacy_context
+#     )
 
-    subject.load(legacy_protocol_source)
+#     subject.load(legacy_protocol_source)
 
-    decoy.verify(
-        task_queue.add(
-            phase=TaskQueuePhase.RUN,
-            func=legacy_executor.execute,
-            protocol=legacy_protocol,
-            context=legacy_context,
-        ),
-        times=1,
-    )
+#     decoy.verify(
+#         task_queue.add(
+#             phase=TaskQueuePhase.RUN,
+#             func=legacy_executor.execute,
+#             protocol=legacy_protocol,
+#             context=legacy_context,
+#         ),
+#         times=1,
+#     )

@@ -1,10 +1,10 @@
-# noqa: D100
-
+"""Tests for the opentrons.protocol_runner.pre_analysis module."""
 from contextlib import contextmanager
+from dataclasses import dataclass
 from json import dumps as json_dumps
 from pathlib import Path
 from textwrap import dedent
-from typing import Generator
+from typing import IO, Iterator
 from typing_extensions import Literal
 
 import pytest
@@ -46,14 +46,18 @@ def _make_minimal_json_protocol(
     )
 
 
+@dataclass(frozen=True)
+class _InputFileImpl(InputFile):
+    filename: str
+    file: IO[bytes]
+
+
 @contextmanager
-def _input_file(
-    directory: Path, name: str, contents: str
-) -> Generator[InputFile, None, None]:
-    with open(directory / name, "w+b") as file:
+def _input_file(directory: Path, filename: str, contents: str) -> Iterator[InputFile]:
+    with open(directory / filename, "w+b") as file:
         file.write(contents.encode("utf-8"))
         file.seek(0)
-        yield InputFile(name, file)
+        yield _InputFileImpl(filename=filename, file=file)
 
 
 def test_json_pre_analysis(tmp_path: Path) -> None:

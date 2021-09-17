@@ -4,13 +4,12 @@ Pre-analysis is the first step to reading a protocol. Given an opaque set of fil
 pre-analysis extracts basic information, like whether the files appear to represent a
 protocol, and if so, what kind of protocol it is.
 """
-
-
 from ast import parse as parse_python
 from dataclasses import dataclass
 from json import JSONDecodeError, loads as json_loads
 from pathlib import Path
-from typing import Any, IO, Dict, List, Union
+from typing import Any, IO, Dict, Sequence, Union
+from typing_extensions import Protocol
 
 from pydantic import ValidationError as PydanticValidationError
 
@@ -18,23 +17,50 @@ from opentrons.protocols.parse import extract_metadata as extract_python_metadat
 from opentrons.protocols.models import JsonProtocol
 
 
-@dataclass(frozen=True)
-class InputFile:
-    """An individual file to be pre-analyzed as part of a protocol."""
+class InputFile(Protocol):
+    """An individual file to be pre-analyzed as part of a protocol.
 
-    name: str
-    """The filename, including extension, without any path separators."""
-
-    file_like: IO[bytes]
-    """A file-like object for the `PreAnalyzer` to read the contents.
-
-    If you want to reuse this object (read it again) after pre-analysis,
-    it's your responsibility to call ``.seek(0)`` on it to reset it.
-
-    This currently needs to be IO[bytes] instead of the more intuitive BinaryIO type
-    because mypy can't see that a TemporaryFile is a BinaryIO.
-    https://github.com/python/typeshed/issues/1780
+    Properties:
+        filename: The basename, including extension, of the file.
+        file: A [file](https://docs.python.org/3/glossary.html#term-file-object)
+            providing the contents of the protocol to be read. If you want
+            to read this file multiple times, you should call `seek(0)`
+            after passing it to the PreAnalyzer.
     """
+
+    filename: str
+    file: IO[bytes]
+
+
+Metadata = Dict[str, Any]
+"""A protocol's metadata (non-essential info, like author and title).
+
+Robot software should not change how it handles a protocol depending on anything in
+here.
+
+This must be a simple JSON-like dict, serializable to JSON via ``json.dumps()``.
+``Dict[str, Any]`` is an overly-permissive approximation,
+needed because mypy doesn't support recursive types.
+"""
+
+
+@dataclass(frozen=True)
+class PythonPreAnalysis:
+    """A pre-analysis of a Python protocol."""
+
+    metadata: Metadata
+    api_level: str
+
+
+@dataclass(frozen=True)
+class JsonPreAnalysis:
+    """A pre-analysis of a JSON protocol."""
+
+    metadata: Metadata
+    schema_version: int
+
+
+PreAnalysis = Union[PythonPreAnalysis, JsonPreAnalysis]
 
 
 # todo(mm, 2021-09-13): Currently wrapped in a class so dependency-injection and mocking
@@ -44,9 +70,7 @@ class PreAnalyzer:
     """A protocol pre-analyzer."""
 
     @staticmethod
-    def analyze(
-        protocol_files: List[InputFile],
-    ) -> Union["PythonPreAnalysis", "JsonPreAnalysis"]:
+    def analyze(protocol_files: Sequence[InputFile]) -> PreAnalysis:
         """Pre-analyze a set of files that's thought to define a protocol.
 
         Returns:
@@ -66,20 +90,20 @@ class PreAnalyzer:
             raise NotImplementedError("Multi-file protocols not yet supported.")
 
         main_file = protocol_files[0]
-        suffix = Path(main_file.name).suffix
+        suffix = Path(main_file.filename).suffix
 
         # May raise IOError.
-        main_file_contents = main_file.file_like.read()
+        main_file_contents = main_file.file.read()
 
         if suffix == ".json":
             return _analyze_json(main_file_contents)
         elif suffix == ".py":
-            return _analyze_python(main_file_contents, main_file.name)
+            return _analyze_python(main_file_contents, main_file.filename)
         else:
             raise FileTypeError(f'Unrecognized file extension "{suffix}"')
 
 
-def _analyze_json(main_file_contents: bytes) -> "JsonPreAnalysis":
+def _analyze_json(main_file_contents: bytes) -> JsonPreAnalysis:
     try:
         # Avoid JsonProtocol.parse_raw() because it wraps JSONDecodeError with
         # JsonSchemaValidationError. (In Pydantic 1.4, this seems inconsistent with
@@ -99,7 +123,8 @@ def _analyze_json(main_file_contents: bytes) -> "JsonPreAnalysis":
 
 # todo(mm, 2021-09-13): Deduplicate with opentrons.protocols.parse.
 def _analyze_python(
-    main_file_contents: bytes, main_file_name: str
+    main_file_contents: bytes,
+    main_file_name: str,
 ) -> "PythonPreAnalysis":
     try:
         # todo(mm, 2021-09-13): Investigate whether it's really appropriate to leave
@@ -134,34 +159,6 @@ def _analyze_python(
         )
 
     return PythonPreAnalysis(metadata=metadata, api_level=api_level)
-
-
-Metadata = Dict[str, Any]
-"""A protocol's metadata (non-essential info, like author and title).
-
-Robot software should not change how it handles a protocol depending on anything in
-here.
-
-This must be a simple JSON-like dict, serializable to JSON via ``json.dumps()``.
-``Dict[str, Any]`` is an overly-permissive approximation,
-needed because mypy doesn't support recursive types.
-"""
-
-
-@dataclass(frozen=True)
-class PythonPreAnalysis:
-    """A pre-analysis of a Python protocol."""
-
-    metadata: Metadata
-    api_level: str
-
-
-@dataclass(frozen=True)
-class JsonPreAnalysis:
-    """A pre-analysis of a JSON protocol."""
-
-    metadata: Metadata
-    schema_version: int
 
 
 class NotPreAnalyzableError(Exception):

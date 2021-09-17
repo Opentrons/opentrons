@@ -17,7 +17,7 @@ from opentrons.protocols.types import (
     PythonProtocol as LegacyPythonProtocol,
 )
 
-from .protocol_file import ProtocolFile as ProtocolSource
+from .protocol_source import ProtocolSource
 
 
 class LegacyFileReader:
@@ -26,7 +26,8 @@ class LegacyFileReader:
     @staticmethod
     def read(protocol_source: ProtocolSource) -> LegacyProtocol:
         """Read a PAPIv2 protocol into a datastructure."""
-        # TODO(mc, 2021-08-25): validate files list length before access
+        # TODO(mc, 2021-09-17): access the "main file" in a more
+        # explicit way than the first entry in the files list
         protocol_file_path = protocol_source.files[0]
         protocol_contents = protocol_file_path.read_text()
 
