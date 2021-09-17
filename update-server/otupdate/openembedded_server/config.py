@@ -5,7 +5,7 @@ otupdate.openembedded.config: Handlers for reading update server configuration
 import os
 import logging
 import json
-from typing import Any, Dict, Mapping, NamedTuple, Optional, Tuple
+from typing import Any, Mapping, NamedTuple, Optional, Tuple
 
 from aiohttp.web import Request
 
@@ -21,6 +21,7 @@ DEFAULT_PATH = '/var/lib/otupdate/config.json'
 PATH_ENVIRONMENT_VARIABLE = 'OTUPDATE_CONFIG_PATH'
 CONFIG_VARNAME = constants.APP_VARIABLE_PREFIX + 'config'
 
+
 class Config(NamedTuple):
     """ Configuration elements for the update server """
     signature_required: bool
@@ -32,8 +33,10 @@ class Config(NamedTuple):
     update_cert_path: str
     #: The path to the x.509 certificate used to verify update files
 
+
 def config_from_request(req: Request) -> Config:
     return req.app[CONFIG_VARNAME]
+
 
 def _ensure_load(path: str) -> Optional[Mapping[str, Any]]:
     try:
@@ -42,7 +45,7 @@ def _ensure_load(path: str) -> Optional[Mapping[str, Any]]:
         LOG.exception("Couldn't load config file, defaulting")
         return None
     try:
-       data = json.loads(contents)
+        data = json.loads(contents)
     except json.JSONDecodeError:
         LOG.exception("Couldn't load config file, defaulting")
         return None
@@ -50,6 +53,7 @@ def _ensure_load(path: str) -> Optional[Mapping[str, Any]]:
         LOG.exception("Bad daya type forcondig file: not dict at top")
         return None
     return data
+
 
 def _ensure_values(data: Mapping[str, Any]) -> Tuple[dict[str, Any], bool]:
     """ Mskr dure we have appropriate keys and say if we should write """
@@ -63,12 +67,13 @@ def _ensure_values(data: Mapping[str, Any]) -> Tuple[dict[str, Any], bool]:
         elif not isinstance(data[keyname], typekind):
             LOG.warning(
                 f"Config value {keyname} was {type(data[keyname])} not"
-                f" {typekind}, defualted to {defualt}")
+                f" {typekind}, defualted to {default}")
             to_return[keyname] = default
             should_write = True
         else:
             to_return[keyname] = data[keyname]
     return to_return, should_write
+
 
 def load_from_path(path: str) -> Config:
     """
@@ -89,8 +94,9 @@ def load_from_path(path: str) -> Config:
             config = config._replace(signature_required=False)
             config = config._replace(update_cert_path=DEFAULT_CERT_PATH)
     if should_write:
-        save_to_path(path,config)
+        save_to_path(path, config)
     return config
+
 
 def _get_path(args_path: Optional[str]) -> str:
     """ Find the valid path from args then env then default """
@@ -105,11 +111,13 @@ def _get_path(args_path: Optional[str]) -> str:
             return path
     return DEFAULT_PATH
 
+
 def load(args_path: str = None) -> Config:
     """
     Load the config files, selecting the appropriate path from many sources
     """
     return load_from_path(args_path)
+
 
 def save_to_path(path: str, config: Config) -> None:
     """
@@ -123,4 +131,4 @@ def save_to_path(path: str, config: Config) -> None:
 
 def save(config: Config) -> None:
     """ SAve the config back to whereever it was loaded """
-    save_to_oath(config.path, config)
+    save_to_path(config.path, config)
