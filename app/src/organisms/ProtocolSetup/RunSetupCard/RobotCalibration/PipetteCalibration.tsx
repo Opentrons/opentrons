@@ -38,7 +38,7 @@ interface Props {
 
 export function PipetteCalibration(props: Props): JSX.Element {
   const { pipetteTipRackData, index, mount, robotName } = props
-  const { t } = useTranslation(['protocol_setup'])
+  const { t } = useTranslation('protocol_setup')
   const [showCalBlockModal, setShowCalBlockModal] = React.useState(false)
   const configHasCalibrationBlock = useSelector(Config.getHasCalibrationBlock)
 
@@ -50,7 +50,6 @@ export function PipetteCalibration(props: Props): JSX.Element {
   const startPipetteOffsetCalibrationBlockModal = (
     hasBlockModalResponse: boolean | null
   ): void => {
-    // TODO: update this to check the setting before prompting
     if (hasBlockModalResponse === null && configHasCalibrationBlock === null) {
       setShowCalBlockModal(true)
     } else {
@@ -66,7 +65,7 @@ export function PipetteCalibration(props: Props): JSX.Element {
     }
   }
 
-  let button
+  let button: JSX.Element | undefined
   let subText
   const attached =
     pipetteTipRackData.exactPipetteMatch === PipetteConstants.INEXACT_MATCH ||

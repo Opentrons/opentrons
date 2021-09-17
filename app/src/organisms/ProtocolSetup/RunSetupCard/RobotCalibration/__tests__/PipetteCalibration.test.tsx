@@ -32,14 +32,13 @@ describe('PipetteCalibration', () => {
     jest.resetAllMocks()
   })
 
-  it('renders the pipette name and last calibrated date', () => {
-    const { getByText } = render()
+  it('renders the pipette name', () => {
+    const { getByRole } = render()
     expect(
-      getByText(
-        `LEFT MOUNT: ${mockProtocolPipetteTipRackCalInfo.pipetteDisplayName}`
-      )
+      getByRole('heading', {
+        name: `LEFT MOUNT: ${mockProtocolPipetteTipRackCalInfo.pipetteDisplayName}`,
+      })
     ).toBeTruthy()
-    expect(getByText('Last calibrated: April 09, 2021 20:00')).toBeTruthy()
   })
 
   it('renders the calibrate now button if pipette attached but not calibrated', () => {

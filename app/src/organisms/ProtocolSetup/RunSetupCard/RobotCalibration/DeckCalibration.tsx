@@ -33,13 +33,16 @@ import { CalibrationItem } from './CalibrationItem'
 import type { State } from '../../../../redux/types'
 import type { DeckCalibrationData } from '../../../../redux/calibration/types'
 
+const robotCalHelpArticle =
+  'https://support.opentrons.com/en/articles/3499692-how-positional-calibration-works-on-the-ot-2'
+
 interface Props {
   robotName: string
 }
 
 export function DeckCalibration(props: Props): JSX.Element | null {
   const { robotName } = props
-  const { t } = useTranslation(['protocol_setup'])
+  const { t } = useTranslation(['protocol_setup', 'shared'])
   const [helpModalIsOpen, setHelpModalIsOpen] = React.useState(false)
 
   const deckCalData: DeckCalibrationData | null = useSelector(
@@ -65,10 +68,11 @@ export function DeckCalibration(props: Props): JSX.Element | null {
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
       >
-        <Text css={FONT_HEADER_THIN} paddingBottom={SPACING_2}>
+        <Text as={'h2'} css={FONT_HEADER_THIN} paddingBottom={SPACING_2}>
           {t('deck_calibration_title')}
         </Text>
         <Link
+          role={'link'}
           onClick={() => setHelpModalIsOpen(true)}
           color={C_BLUE}
           fontSize={FONT_SIZE_BODY_1}
@@ -99,7 +103,7 @@ export function DeckCalibration(props: Props): JSX.Element | null {
                     a_help_article: (
                       <Link
                         color={C_BLUE}
-                        href="https://support.opentrons.com/en/articles/3499692-how-positional-calibration-works-on-the-ot-2"
+                        href={robotCalHelpArticle}
                         target="_blank"
                         rel="noopener noreferrer"
                       />
@@ -114,6 +118,7 @@ export function DeckCalibration(props: Props): JSX.Element | null {
                 fontWeight={FONT_WEIGHT_SEMIBOLD}
                 fontSize={FONT_SIZE_BODY_1}
                 marginTop={SPACING_3}
+                role={'heading'}
               >
                 {t('deck_calibration_title')}
               </Text>
@@ -124,6 +129,7 @@ export function DeckCalibration(props: Props): JSX.Element | null {
                 fontWeight={FONT_WEIGHT_SEMIBOLD}
                 fontSize={FONT_SIZE_BODY_1}
                 marginTop={SPACING_3}
+                role={'heading'}
               >
                 {t('tip_length_cal_title')}
               </Text>
@@ -134,6 +140,7 @@ export function DeckCalibration(props: Props): JSX.Element | null {
                 fontWeight={FONT_WEIGHT_SEMIBOLD}
                 fontSize={FONT_SIZE_BODY_1}
                 marginTop={SPACING_3}
+                role={'heading'}
               >
                 {t('pipette_offset_cal')}
               </Text>

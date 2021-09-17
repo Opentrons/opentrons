@@ -20,7 +20,7 @@ describe('CalibrationItem', () => {
 
   it('renders all nodes with prop contents', () => {
     const { getByRole, getByText } = render({ subText: 'stub subtext' })
-    expect(getByText('stub title')).toBeTruthy()
+    expect(getByRole('heading', { name: 'stub title' })).toBeTruthy()
     expect(getByText('stub subtext')).toBeTruthy()
     expect(getByRole('button', { name: 'stub button' })).toBeTruthy()
   })

@@ -30,24 +30,22 @@ describe('DeckCalibration', () => {
     jest.resetAllMocks()
   })
   it('renders all nodes with prop contents', () => {
-    const { getByText } = render()
-    expect(getByText('Deck Calibration')).toBeTruthy()
-    expect(getByText('Robot Calibration Help')).toBeTruthy()
-    expect(getByText('Last calibrated: September 15, 2021 00:00')).toBeTruthy()
+    const { getByRole } = render()
+    expect(getByRole('heading', { name: 'Deck Calibration' })).toBeTruthy()
+    expect(getByRole('link', { name: 'Robot Calibration Help' })).toBeTruthy()
   })
   it('opens robot cal help modal on click', () => {
-    const { getByText } = render()
-    fireEvent.click(getByText('Robot Calibration Help'))
+    const { getByRole } = render()
+    fireEvent.click(getByRole('link', { name: 'Robot Calibration Help' }))
     expect(
-      getByText(
-        `This measures the Z distance between the bottom of the tip and the pipette's nozzle. Calibrate tip length for each new tip type you use on a pipette. If you redo the tip length calibration for the tip you used to calibrate a pipette, you will also be prompted to recalibrate that pipette.`
-      )
+      getByRole('heading', { name: 'Tip Length Calibration' })
     ).toBeTruthy()
+    expect(getByRole('button', { name: 'close' })).toBeTruthy()
   })
   it('closes robot cal help modal on click', () => {
-    const { getByText, getByRole } = render()
-    fireEvent.click(getByText('Robot Calibration Help'))
+    const { getByRole } = render()
+    fireEvent.click(getByRole('link', { name: 'Robot Calibration Help' }))
     fireEvent.click(getByRole('button', { name: 'close' }))
-    expect(getByText('Deck Calibration')).toBeTruthy()
+    expect(getByRole('link', { name: 'Robot Calibration Help' })).toBeTruthy()
   })
 })

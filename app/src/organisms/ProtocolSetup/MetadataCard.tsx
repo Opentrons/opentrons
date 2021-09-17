@@ -1,8 +1,5 @@
 import * as React from 'react'
 import { format } from 'date-fns'
-
-import { LabeledValue } from '../../atoms/structure'
-
 import {
   Card,
   Flex,
@@ -10,6 +7,7 @@ import {
   SPACING_3,
   C_WHITE,
 } from '@opentrons/components'
+import { LabeledValue } from '../../atoms/structure'
 
 import { useProtocolMetadata } from './hooks'
 import { useTranslation } from 'react-i18next'
