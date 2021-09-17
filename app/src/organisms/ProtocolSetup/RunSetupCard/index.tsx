@@ -23,8 +23,6 @@ import { getConnectedRobot } from '../../../redux/discovery/selectors'
 export function RunSetupCard(): JSX.Element | null {
   const { t } = useTranslation('protocol_setup')
   const protocolData = useSelector((state: State) => getProtocolData(state))
-  const moduleRenderCoords = useModuleRenderInfoById()
-  const labwareRenderCoords = useLabwareRenderInfoById()
   const robot = useSelector((state: State) => getConnectedRobot(state))
 
   const ROBOT_CALIBRATION_STEP_KEY = 'robot_calibration_step' as const
