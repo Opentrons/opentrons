@@ -116,7 +116,7 @@ exports[`Splash renders correctly with custom props 1`] = `
 >
   <svg
     aria-hidden="true"
-    className="sc-AxmLO c0"
+    className="sc-fzozJi c0"
     fill="currentColor"
     version="1.1"
     viewBox="0 0 24 24"
@@ -144,7 +144,7 @@ exports[`Splash renders correctly with no props 1`] = `
 >
   <svg
     aria-hidden="true"
-    className="sc-AxmLO c0"
+    className="sc-fzozJi c0"
     fill="currentColor"
     version="1.1"
     viewBox="0 0 50 50"
@@ -178,7 +178,7 @@ exports[`TitleBar renders TitleBar with back button correctly 1`] = `
   >
     <svg
       aria-hidden="true"
-      className="sc-AxmLO c0 icon"
+      className="sc-fzozJi c0 icon"
       fill="currentColor"
       version="1.1"
       viewBox="0 0 24 24"
