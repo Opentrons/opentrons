@@ -43,6 +43,14 @@
           "celsius": 3
         }
       }
+    ],
+    "magdeck": [
+      {
+        "function_name": "engage",
+        "kwargs": {
+          "height": 4
+        }
+      }
     ]
   }
 }

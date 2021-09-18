@@ -2708,10 +2708,6 @@
     "0b4319b0-75c7-11ea-b42f-4b64e50f43e5:temperatureModuleType": {
       "slot": "3",
       "model": "temperatureModuleV2"
-    },
-    "0b4319b0-75c7-11ea-b42f-4b64e50f43e5u:temperatureModuleType": {
-      "slot": "4",
-      "model": "temperatureModuleV2"
     }
   },
   "commands": [
