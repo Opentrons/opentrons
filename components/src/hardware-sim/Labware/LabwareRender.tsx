@@ -38,7 +38,6 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
 
   return (
     <g
-      /* eslint-disable-next-line @typescript-eslint/restrict-template-expressions */
       transform={`translate(${cornerOffsetFromSlot.x}, ${cornerOffsetFromSlot.y})`}
       ref={gRef}
     >

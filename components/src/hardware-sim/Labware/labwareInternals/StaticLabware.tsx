@@ -4,7 +4,7 @@ import * as React from 'react'
 import flatMap from 'lodash/flatMap'
 import cx from 'classnames'
 
-import { LabwareOutline } from '../../../legacy-hardware-sim/LabwareOutline'
+import { LabwareOutline } from './LabwareOutline'
 import { Well } from './Well'
 import styles from './StaticLabware.css'
 
