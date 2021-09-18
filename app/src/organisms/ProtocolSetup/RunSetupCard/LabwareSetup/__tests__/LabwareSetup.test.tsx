@@ -22,7 +22,6 @@ import { LabwareSetupModal } from '../LabwareSetupModal'
 import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
 import { ExtraAttentionWarning } from '../ExtraAttentionWarning'
 import { getModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
-import { getProtocolPipetteTipRackCalInfo } from '../../../../../redux/pipettes/selectors'
 import { useModuleRenderInfoById, useLabwareRenderInfoById } from '../../../hooks'
 
 jest.mock('../../../../../redux/modules')
@@ -32,7 +31,6 @@ jest.mock('../LabwareInfoOverlay')
 jest.mock('../ExtraAttentionWarning')
 jest.mock('../../../hooks')
 jest.mock('../utils/getModuleTypesThatRequireExtraAttention')
-jest.mock('../../../hooks')
 jest.mock('@opentrons/components', () => {
   const actualComponents = jest.requireActual('@opentrons/components')
   return {
@@ -73,10 +71,6 @@ const mockExtraAttentionWarning = ExtraAttentionWarning as jest.MockedFunction<
 const mockUseLabwareRenderInfoById = useLabwareRenderInfoById as jest.MockedFunction<typeof useLabwareRenderInfoById>
 const mockUseModuleRenderInfoById = useModuleRenderInfoById as jest.MockedFunction<typeof useModuleRenderInfoById>
 
-
-const mockGetProtocolPipetteTipRackCalInfo = getProtocolPipetteTipRackCalInfo as jest.MockedFunction<
-  typeof getProtocolPipetteTipRackCalInfo
->
 
 const deckSlotsById = standardDeckDef.locations.orderedSlots.reduce(
   (acc, deckSlot) => ({ ...acc, [deckSlot.id]: deckSlot }),
@@ -175,23 +169,6 @@ describe('LabwareSetup', () => {
           })}
         </svg>
       ))
-
-    when(mockGetProtocolPipetteTipRackCalInfo)
-      .calledWith(undefined as any, MOCK_ROBOT_NAME)
-      .mockReturnValue({
-        left: {
-          exactPipetteMatch: 'compatible',
-          pipetteCalDate: 'abcde',
-          pipetteDisplayName: 'Left Pipette',
-          tipRacks: [
-            {
-              displayName: 'Mock TipRack Definition',
-              lastModifiedDate: null,
-            },
-          ],
-        },
-        right: null,
-      })
   })
 
   afterEach(() => {
@@ -308,7 +285,7 @@ describe('LabwareSetup', () => {
       name: 'Labware Position Check',
     })
     getByText(
-      'This workflow guides you through checking the position of each labware on the deck. Any adjustments you make will be saved as offset data for this protocol.'
+      'Labware Position Check is an optional workflow that guides you through checking the position of each labware on the deck. During this check, you can make an offset adjustment to the overall position of the labware.'
     )
   })
   it('should render the extra attention warning when there are modules/labware that need extra attention', () => {
