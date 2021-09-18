@@ -5,7 +5,7 @@ import {
   SPACING_1,
   JUSTIFY_CENTER,
   ALIGN_CENTER,
-} from '@opentrons/components'
+} from '../../'
 
 export interface ModuleTagProps {
   x: number

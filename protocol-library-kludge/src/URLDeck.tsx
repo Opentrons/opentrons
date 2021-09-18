@@ -3,10 +3,10 @@ import styles from './URLDeck.css'
 
 import {
   RobotWorkSpace,
-  Labware as LegacyLabwareRender,
+  LegacyLabware,
   LabwareNameOverlay,
   LabwareRender,
-  Module,
+  ModuleItem,
   RobotCoordsForeignDiv,
 } from '@opentrons/components'
 import { getLatestLabwareDef, getLegacyLabwareDef } from './getLabware'
@@ -102,7 +102,7 @@ export class URLDeck extends React.Component<{}> {
                   <g
                     transform={`translate(${slot.position[0]}, ${slot.position[1]})`}
                   >
-                    <Module model={moduleModel} mode={'default'} slot={slot} />
+                    <ModuleItem model={moduleModel} mode={'default'} slot={slot} />
                   </g>
                 )}
                 {labware && (
@@ -112,8 +112,8 @@ export class URLDeck extends React.Component<{}> {
                     {labwareDefV2 ? (
                       <LabwareRender definition={labwareDefV2} />
                     ) : (
-                      <LegacyLabwareRender
-                        /* @ts-expect-error(mc, 2021-03-18): LegacyLabwareRender does not take x and y props */
+                      <LegacyLabware
+                        /* @ts-expect-error(mc, 2021-03-18): LegacyLabware does not take x and y props */
                         x={0}
                         y={0}
                         definition={labwareDefV1}

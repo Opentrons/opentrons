@@ -4,7 +4,7 @@ import { styleProps, isntStyleProp } from './style-props'
 
 import type { StyleProps, PrimitiveComponent } from './types'
 
-export interface SvgProps extends StyleProps {
+export interface ForeignObjectProps extends StyleProps {
   /** attach a width attribute to the <svg> element */
   svgWidth?: string | number
   /** attach a height attribute to the <svg> element */
@@ -28,7 +28,7 @@ const SVG_PROPS = ['x', 'y', 'svgWidth', 'svgHeight', '_cssWidth', '_cssHeight']
  *
  * @component
  */
-export const ForeignObject: PrimitiveComponent<'foreignObject', SvgProps> = styled.foreignObject
+export const ForeignObject: PrimitiveComponent<'foreignObject', ForeignObjectProps> = styled.foreignObject
   .withConfig({
     shouldForwardProp: p => {
       return (
@@ -43,7 +43,7 @@ export const ForeignObject: PrimitiveComponent<'foreignObject', SvgProps> = styl
     },
   })
   .attrs(
-    (props: SvgProps): React.ComponentProps<PrimitiveComponent<'svg'>> => ({
+    (props: ForeignObjectProps): React.ComponentProps<PrimitiveComponent<'svg'>> => ({
       // map the explicit svgWidth/Height props to width/height attrs
       width: props.svgWidth,
       height: props.svgHeight,
@@ -52,7 +52,7 @@ export const ForeignObject: PrimitiveComponent<'foreignObject', SvgProps> = styl
       _cssHeight: props.height,
     })
   )`
-  ${(props: Partial<SvgProps>) => {
+  ${(props: Partial<ForeignObjectProps>) => {
     const { width, height, ...otherProps } = props
 
     // replace width and height attrs with internal style props

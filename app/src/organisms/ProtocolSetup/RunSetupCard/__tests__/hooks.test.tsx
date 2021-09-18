@@ -10,6 +10,7 @@ import { renderHook } from '@testing-library/react-hooks'
 import { useMissingModuleIds } from '../hooks'
 import type { Store } from 'redux'
 import type { State } from '../../../../redux/types'
+import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
 
 jest.mock('../../../../redux/protocol')
 jest.mock('../../hooks')

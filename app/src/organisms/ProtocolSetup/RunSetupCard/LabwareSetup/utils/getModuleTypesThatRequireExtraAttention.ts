@@ -1,8 +1,4 @@
-import {
-  getModuleType,
-  ModuleModel,
-  ModuleRealType,
-} from '@opentrons/shared-data'
+import { getModuleType, ModuleModel, ModuleType } from '@opentrons/shared-data'
 
 const MODULE_TYPES_THAT_REQUIRE_EXTRA_ATTENTION = [
   'magneticModuleType',
@@ -12,7 +8,7 @@ const MODULE_TYPES_THAT_REQUIRE_EXTRA_ATTENTION = [
 export type ModuleTypesThatRequiresExtraAttention = typeof MODULE_TYPES_THAT_REQUIRE_EXTRA_ATTENTION[number]
 
 const doesModuleRequireExtraAttention = (
-  moduleType: ModuleRealType
+  moduleType: ModuleType
 ): moduleType is ModuleTypesThatRequiresExtraAttention =>
   MODULE_TYPES_THAT_REQUIRE_EXTRA_ATTENTION.includes(
     moduleType as ModuleTypesThatRequiresExtraAttention

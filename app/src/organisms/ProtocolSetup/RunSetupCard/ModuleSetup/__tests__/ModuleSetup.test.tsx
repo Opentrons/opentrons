@@ -18,8 +18,7 @@ import {
   ModuleType,
 } from '@opentrons/shared-data'
 import { getAttachedModules } from '../../../../../redux/modules'
-import * as hooks from '../../hooks'
-import { useModuleRenderInfoById } from '../../../hooks'
+import { useMissingModuleIds } from '../../hooks'
 import {
   mockThermocycler as mockThermocyclerFixture,
   mockMagneticModule as mockMagneticModuleFixture,
@@ -46,24 +45,14 @@ jest.mock('@opentrons/shared-data', () => {
     inferModuleOrientationFromXCoordinate: jest.fn(),
   }
 })
-const mockUseMissingModuleIds = hooks.useMissingModuleIds as jest.MockedFunction<
-  typeof hooks.useMissingModuleIds
->
-const mockGetAttachedModules = getAttachedModules as jest.MockedFunction<
-  typeof getAttachedModules
->
+const mockUseMissingModuleIds = useMissingModuleIds as jest.MockedFunction<typeof useMissingModuleIds>
+const mockGetAttachedModules = getAttachedModules as jest.MockedFunction<typeof getAttachedModules>
 const mockModuleInfo = ModuleInfo as jest.MockedFunction<typeof ModuleInfo>
-
 const mockModuleViz = ModuleViz as jest.MockedFunction<typeof ModuleViz>
-
 const mockInferModuleOrientationFromXCoordinate = inferModuleOrientationFromXCoordinate as jest.MockedFunction<
   typeof inferModuleOrientationFromXCoordinate
 >
-
-const mockRobotWorkSpace = RobotWorkSpace as jest.MockedFunction<
-  typeof RobotWorkSpace
->
-
+const mockRobotWorkSpace = RobotWorkSpace as jest.MockedFunction<typeof RobotWorkSpace>
 const mockUseModuleRenderInfoById = useModuleRenderInfoById as jest.MockedFunction<typeof useModuleRenderInfoById>
 
 const deckSlotsById = standardDeckDef.locations.orderedSlots.reduce(

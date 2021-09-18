@@ -45,7 +45,7 @@ export const PSEUDO_DECK_SLOTS: Record<DeckSlot, DeckDefSlot> = {
       yDimension: STD_SLOT_Y_DIM * 2 + STD_SLOT_DIVIDER_WIDTH,
       zDimension: 0,
     },
-    compatibleModules: [THERMOCYCLER],
+    compatibleModules: [THERMOCYCLER_MODULE_TYPE],
   },
 }
 export const START_TERMINAL_TITLE = 'STARTING DECK STATE'

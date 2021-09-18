@@ -11,7 +11,7 @@ import {
 import {
   RobotCoordsForeignDiv,
   LabwareRender,
-  Labware as LabwareComponent,
+  LegacyLabware,
   Icon,
   humanizeLabwareType,
 } from '@opentrons/components'
@@ -51,7 +51,7 @@ export function LabwareItem(props: LabwareItemProps): JSX.Element {
     height = definition.dimensions.yDimension
     title = getLabwareDisplayName(definition)
   } else {
-    item = <LabwareComponent definition={getLegacyLabwareDef(type)} />
+    item = <LegacyLabware definition={getLegacyLabwareDef(type)} />
     width = SLOT_RENDER_WIDTH
     height = SLOT_RENDER_HEIGHT
     title = humanizeLabwareType(type)

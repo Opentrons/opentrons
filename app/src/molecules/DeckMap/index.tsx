@@ -5,7 +5,7 @@ import some from 'lodash/some'
 import map from 'lodash/map'
 import mapValues from 'lodash/mapValues'
 
-import { RobotWorkSpace, Module as ModuleItem } from '@opentrons/components'
+import { RobotWorkSpace, ModuleItem } from '@opentrons/components'
 import { getDeckDefinitions } from '@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions'
 
 import { selectors as robotSelectors } from '../../redux/robot'

@@ -1,6 +1,6 @@
 import React from 'react'
 import '@testing-library/jest-dom'
-import { ModuleModel, ModuleRealType } from '@opentrons/shared-data'
+import { ModuleModel, ModuleType } from '@opentrons/shared-data'
 import { ModuleInfo } from '../ModuleInfo'
 import { renderWithProviders } from '@opentrons/components/__utils__'
 import { i18n } from '../../../../../i18n'
@@ -15,7 +15,7 @@ const mockTCModule = {
   labwareOffset: { x: 3, y: 3, z: 3 },
   moduleId: 'TCModuleId',
   model: 'thermocyclerModuleV1' as ModuleModel,
-  type: 'thermocyclerModuleType' as ModuleRealType,
+  type: 'thermocyclerModuleType' as ModuleType,
 }
 
 describe('ModuleInfo', () => {
