@@ -47,7 +47,6 @@ const DECK_LAYER_BLOCKLIST = [
   'screwHoles',
 ]
 const POLL_MODULE_INTERVAL_MS = 5000
-// const DECK_VIEW_BOX = `-64 -10 ${530} ${456}`
 const DECK_VIEW_BOX = '-80 -40 550 510'
 
 interface ModuleSetupProps {
