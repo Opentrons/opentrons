@@ -18,6 +18,8 @@ import {
   ModuleType,
 } from '@opentrons/shared-data'
 import { getAttachedModules } from '../../../../../redux/modules'
+import * as hooks from '../../hooks'
+import { useModuleRenderInfoById } from '../../../hooks'
 import {
   mockThermocycler as mockThermocyclerFixture,
   mockMagneticModule as mockMagneticModuleFixture,
@@ -26,7 +28,9 @@ import { useModuleRenderInfoById, useLabwareRenderInfoById } from '../../../hook
 
 jest.mock('../../../../../redux/modules')
 jest.mock('../ModuleInfo')
+jest.mock('../../hooks')
 jest.mock('../../../hooks')
+jest.mock('../MultipleModulesModal')
 jest.mock('@opentrons/components', () => {
   const actualComponents = jest.requireActual('@opentrons/components')
   return {
@@ -42,6 +46,9 @@ jest.mock('@opentrons/shared-data', () => {
     inferModuleOrientationFromXCoordinate: jest.fn(),
   }
 })
+const mockUseMissingModuleIds = hooks.useMissingModuleIds as jest.MockedFunction<
+  typeof hooks.useMissingModuleIds
+>
 const mockGetAttachedModules = getAttachedModules as jest.MockedFunction<
   typeof getAttachedModules
 >
@@ -154,6 +161,10 @@ describe('ModuleSetup', () => {
   })
 
   it('should render a deck WITHOUT modules', () => {
+    when(mockUseModuleRenderInfoById).calledWith().mockReturnValue({})
+
+    mockUseMissingModuleIds.mockReturnValue([])
+
     render(props)
     expect(mockModuleViz).not.toHaveBeenCalled()
     expect(mockModuleInfo).not.toHaveBeenCalled()
@@ -226,6 +237,8 @@ describe('ModuleSetup', () => {
       )
       .mockReturnValue(<div>mock module info {mockTCModule.model} </div>)
 
+    mockUseMissingModuleIds.mockReturnValue(['foo'])
+
     const { getByText, getByRole } = render(props)
     getByText('mock module viz magneticModuleType')
     getByText('mock module viz thermocyclerModuleType')
@@ -235,6 +248,7 @@ describe('ModuleSetup', () => {
   })
 
   it('should render a deck WITH modules with CTA enabled', () => {
+    mockUseMissingModuleIds.mockReturnValue([])
 
     when(mockUseModuleRenderInfoById).calledWith().mockReturnValue({
       [mockMagneticModule.moduleId]: {
@@ -317,6 +331,6 @@ describe('ModuleSetup', () => {
     getByText('mock module viz thermocyclerModuleType')
     getByText('mock module info magneticModuleV2')
     const button = getByRole('button', { name: 'Proceed to Labware Setup' })
-    expect(button).not.toHaveAttribute('disabled')
+    expect(button).not.toBeDisabled()
   })
 })

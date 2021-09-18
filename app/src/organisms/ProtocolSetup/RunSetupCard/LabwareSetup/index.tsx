@@ -1,6 +1,5 @@
 import * as React from 'react'
 import map from 'lodash/map'
-import { NavLink } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
   Btn,
@@ -8,17 +7,13 @@ import {
   LabwareRender,
   Link,
   Module,
-  PrimaryBtn,
   RobotWorkSpace,
   SecondaryBtn,
   Text,
-  Tooltip,
-  useHoverTooltip,
   ALIGN_FLEX_END,
   DIRECTION_COLUMN,
   FONT_SIZE_BODY_1,
   JUSTIFY_CENTER,
-  SPACING_4,
   SPACING_3,
   C_BLUE,
   C_DARK_GRAY,
@@ -46,13 +41,12 @@ const DECK_LAYER_BLOCKLIST = [
   'screwHoles',
 ]
 
-const DECK_MAP_VIEWBOX = '-80 -40 550 510'
+const DECK_MAP_VIEWBOX = '-80 -40 550 500'
 
 export const LabwareSetup = (): JSX.Element | null => {
   const moduleRenderInfoById = useModuleRenderInfoById()
   const labwareRenderInfoById = useLabwareRenderInfoById()
   const { t } = useTranslation('protocol_setup')
-  const [targetProps, tooltipProps] = useHoverTooltip()
   const [
     showLabwareHelpModal,
     setShowLabwareHelpModal,
@@ -62,10 +56,6 @@ export const LabwareSetup = (): JSX.Element | null => {
   const moduleTypesThatRequireExtraAttention = getModuleTypesThatRequireExtraAttention(
     moduleModels
   )
-  const proceedToRunDisabled = false
-  const proceedToRunDisabledReason = 'replace with actual tooltip text'
-  const LinkComponent = proceedToRunDisabled ? 'button' : NavLink
-  const linkProps = proceedToRunDisabled ? {} : { to: '/run' }
   return (
     <React.Fragment>
       {showLabwareHelpModal && (
@@ -137,33 +127,21 @@ export const LabwareSetup = (): JSX.Element | null => {
             )
           }}
         </RobotWorkSpace>
-        <Text color={C_DARK_GRAY} margin={SPACING_4}>
+        <Text as={'h4'} marginLeft={SPACING_3}>
+          Labware Position Check
+        </Text>
+        <Text color={C_DARK_GRAY} margin={SPACING_3}>
           {t('labware_position_check_text')}
         </Text>
         <Flex justifyContent={JUSTIFY_CENTER}>
           <SecondaryBtn
             title={t('check_labware_positions')}
-            marginRight={SPACING_3}
             onClick={() => console.log('check labware positions!')}
             color={C_BLUE}
             id={'LabwareSetup_checkLabwarePositionsButton'}
           >
             {t('check_labware_positions')}
           </SecondaryBtn>
-          <PrimaryBtn
-            title={t('proceed_to_run')}
-            disabled={proceedToRunDisabled}
-            as={LinkComponent}
-            backgroundColor={C_BLUE}
-            id={'LabwareSetup_proceedToRunButton'}
-            {...linkProps}
-            {...targetProps}
-          >
-            {t('proceed_to_run')}
-          </PrimaryBtn>
-          {proceedToRunDisabled && (
-            <Tooltip {...tooltipProps}>{proceedToRunDisabledReason}</Tooltip>
-          )}
         </Flex>
       </Flex>
     </React.Fragment>

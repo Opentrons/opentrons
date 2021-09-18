@@ -8,7 +8,6 @@ import {
   getProtocolDescription,
   getProtocolData,
 } from '../../redux/protocol'
-
 import { getModuleRenderInfo } from './utils/getModuleRenderInfo'
 import { getLabwareRenderInfo } from './utils/getLabwareRenderInfo'
 

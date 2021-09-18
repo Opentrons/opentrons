@@ -27,6 +27,7 @@ import {
   inferModuleOrientationFromXCoordinate,
 } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
+import { useMissingModuleIds } from '../hooks'
 import { fetchModules, getAttachedModules } from '../../../../redux/modules'
 import { ModuleInfo } from './ModuleInfo'
 import { MultipleModulesModal } from './MultipleModulesModal'
@@ -64,6 +65,7 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
     showMultipleModulesModal,
     setShowMultipleModulesModal,
   ] = React.useState<boolean>(false)
+  const missingModuleIds = useMissingModuleIds()
   useInterval(
     () => dispatch(fetchModules(robotName)),
     robotName === null ? POLL_MODULE_INTERVAL_MS : null,
@@ -76,27 +78,6 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
   const moduleModels = map(moduleRenderInfoById, ({ moduleDef}) => moduleDef.model)
 
   const hasADuplicateModule = new Set(moduleModels).size !== moduleModels.length
-
-  type ModuleMatchResults = {missingModuleIds: string[], remainingAttachedModules: AttachedModule[]}
-  const { missingModuleIds } = reduce<typeof moduleRenderInfoById, ModuleMatchResults>(
-    moduleRenderInfoById,
-    (acc, {moduleDef}, id) => {
-      const {model} = moduleDef
-      const moduleTypeMatchIndex = acc.remainingAttachedModules.findIndex((attachedModule) => (
-        getModuleType(model) === getModuleType(attachedModule.model)
-      ))
-      return moduleTypeMatchIndex !== -1
-        ? {
-            ...acc,
-            remainingAttachedModules: acc.remainingAttachedModules.filter((_m, i) => i !== moduleTypeMatchIndex)
-          }
-        : {
-          ...acc,
-          missingModuleIds: [...acc.missingModuleIds, id]
-        }
-    },
-    {missingModuleIds: [], remainingAttachedModules: attachedModules}
-  )
 
   const proceedToLabwareDisabledReason = missingModuleIds.length > 0
    ? t('plug_in_required_module', {count: missingModuleIds.length })
