@@ -22,7 +22,8 @@ import type {
   ModuleDefinition,
 } from './types'
 
-// TODO: generate typescript types directly from JSON schema
+// TODO(bc, 2021-09-18): generate typescript types directly from JSON schema
+// having to maintain TS types side by side with the schema is a liability
 export const getModuleDef2 = (moduleModel: ModuleModel): ModuleDefinition => {
   switch (moduleModel) {
     case MAGNETIC_MODULE_V1:
