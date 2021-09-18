@@ -35,7 +35,7 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element => {
       fontSize={FONT_SIZE_TINY}
       color={C_WHITE}
     >
-      <Text margin={SPACING_1} >{displayName}</Text>
+      <Text margin={SPACING_1}>{displayName}</Text>
       <Text
         marginX={SPACING_1}
         fontWeight={FONT_WEIGHT_SEMIBOLD}
