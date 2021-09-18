@@ -7,6 +7,7 @@ import type { State } from '../../../redux/types'
 import type { AttachedModule } from '../../../redux/modules/types'
 import { useModuleRenderInfoById } from '../hooks'
 
+// get moduleId's from protocol that do not have a module of the requested model attached to the robot
 export function useMissingModuleIds(): string[] {
   const robot = useSelector((state: State) => getConnectedRobot(state))
   const moduleRenderInfoById = useModuleRenderInfoById()
