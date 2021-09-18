@@ -63,7 +63,7 @@ export interface RichOption {
   disabled?: boolean
   imgSrc?: string
 }
-export type RichOptions = RichOption[]
+export type RichOptions = readonly RichOption[]
 
 export type LabwareType =
   | 'wellPlate'
@@ -331,22 +331,19 @@ export const aluminumBlockAutofills = {
   },
 } as const
 
-export const labwareTypeAutofills: Record<
-  LabwareType,
-  Partial<LabwareFields>
-> = {
+export const labwareTypeAutofills = {
   tipRack: {
-    homogeneousWells: 'true' as const,
-    wellShape: 'circular' as const,
+    homogeneousWells: 'true',
+    wellShape: 'circular',
     wellBottomShape: null,
   },
   tubeRack: {},
   wellPlate: {},
   reservoir: {},
   aluminumBlock: {},
-}
+} as const
 
-export const aluminumBlockChildTypeOptions: Options = [
+export const aluminumBlockChildTypeOptions = [
   {
     name: 'Tubes',
     value: 'tubes',
@@ -359,7 +356,7 @@ export const aluminumBlockChildTypeOptions: Options = [
     name: 'PCR Plate',
     value: 'pcrPlate',
   },
-]
+] as const
 
 export const getInitialStatus = (): FormStatus => ({
   defaultedDef: null,

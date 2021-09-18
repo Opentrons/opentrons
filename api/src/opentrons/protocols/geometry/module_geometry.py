@@ -13,6 +13,7 @@ from typing import Mapping, Optional, Union, TYPE_CHECKING
 
 import numpy as np  # type: ignore
 import jsonschema  # type: ignore
+from opentrons import types
 from opentrons.protocols.context.protocol_api.labware import LabwareImplementation
 
 from opentrons_shared_data import module
@@ -305,6 +306,24 @@ class ThermocyclerGeometry(ModuleGeometry):
             self._labware = labware
         return self._labware
 
+    def flag_unsafe_move(
+        self,
+        to_loc: types.Location,
+        from_loc: types.Location,
+        lid_position: Optional[str],
+    ):
+        to_lw, to_well = to_loc.labware.get_parent_labware_and_well()
+        from_lw, from_well = from_loc.labware.get_parent_labware_and_well()
+        if (
+            self.labware is not None
+            and (self.labware == to_lw or self.labware == from_lw)
+            and lid_position != "open"
+        ):
+            raise RuntimeError(
+                "Cannot move to labware loaded in Thermocycler"
+                " when lid is not fully open."
+            )
+
 
 def _load_from_v1(
     definition: "ModuleDefinitionV1", parent: Location, api_level: APIVersion
@@ -449,8 +468,8 @@ def load_module_from_definition(
                                  defaults to :py:attr:`.MAX_SUPPORTED_VERSION`.
     """
     api_level = api_level or MAX_SUPPORTED_VERSION
-    # def not yet discriminated, mypy complains sadly
-    schema = definition.get("$otSharedSchema")  # type: ignore
+    # def not yet discriminated, mypy returns `object` type
+    schema = definition.get("$otSharedSchema")
     if not schema:
         # v1 definitions don't have schema versions
         # but unfortunately we can't tell mypy that because it can only

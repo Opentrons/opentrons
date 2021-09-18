@@ -5,7 +5,17 @@ from collections import UserDict
 import functools
 import logging
 from dataclasses import dataclass, field, astuple
-from typing import Any, Callable, Dict, Optional, TYPE_CHECKING, Union, List
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Dict,
+    List,
+    Optional,
+    TypeVar,
+    Union,
+    cast,
+)
 
 from opentrons import types as top_types
 from opentrons.protocols.api_support.types import APIVersion
@@ -370,12 +380,15 @@ def clamp_value(
     return input_value
 
 
-def requires_version(major: int, minor: int) -> Callable[[Callable], Callable]:
+FuncT = TypeVar("FuncT", bound=Callable[..., Any])
+
+
+def requires_version(major: int, minor: int) -> Callable[[FuncT], FuncT]:
     """Decorator. Apply to Protocol API methods or attributes to indicate
     the first version in which the method or attribute was present.
     """
 
-    def _set_version(decorated_obj: Callable) -> Callable:
+    def _set_version(decorated_obj: FuncT) -> FuncT:
         added_version = APIVersion(major, minor)
         setattr(decorated_obj, "__opentrons_version_added", added_version)
         if hasattr(decorated_obj, "__doc__"):
@@ -388,7 +401,7 @@ def requires_version(major: int, minor: int) -> Callable[[Callable], Callable]:
             decorated_obj.__doc__ = docstr
 
         @functools.wraps(decorated_obj)
-        def _check_version_wrapper(*args, **kwargs):
+        def _check_version_wrapper(*args: Any, **kwargs: Any) -> Any:
             slf = args[0]
             added_in = decorated_obj.__opentrons_version_added  # type: ignore
             current_version = slf._api_version
@@ -406,7 +419,7 @@ def requires_version(major: int, minor: int) -> Callable[[Callable], Callable]:
                 )
             return decorated_obj(*args, **kwargs)
 
-        return _check_version_wrapper
+        return cast(FuncT, _check_version_wrapper)
 
     return _set_version
 

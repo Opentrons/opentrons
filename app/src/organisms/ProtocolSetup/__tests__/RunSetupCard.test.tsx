@@ -24,9 +24,10 @@ import {
 import { mockCalibrationStatus } from '../../../redux/calibration/__fixtures__'
 import * as calibrationSelectors from '../../../redux/calibration/selectors'
 import * as protocolSelectors from '../../../redux/protocol/selectors'
-import { getLabwareRenderCoords } from '../utils/getLabwareRenderCoords'
-import { ModuleSetup } from '../RunSetupCard/ModuleSetup'
+import { getModuleRenderInfo } from '../utils/getModuleRenderInfo'
+import { getLabwareRenderInfo } from '../utils/getLabwareRenderInfo'
 import { RunSetupCard } from '../RunSetupCard'
+import { ModuleSetup } from '../RunSetupCard/ModuleSetup'
 import { LabwareSetup } from '../RunSetupCard/LabwareSetup'
 import { RobotCalibration } from '../RunSetupCard/RobotCalibration'
 import { ProceedToRunCta } from '../RunSetupCard/ProceedToRunCta'
@@ -45,8 +46,8 @@ jest.mock('../RunSetupCard/LabwareSetup')
 jest.mock('../RunSetupCard/ModuleSetup')
 jest.mock('../RunSetupCard/RobotCalibration')
 jest.mock('../utils/getModuleRenderInfo')
-jest.mock('../utils/getLabwareRenderCoords')
 jest.mock('../RunSetupCard/ProceedToRunCta')
+jest.mock('../utils/getLabwareRenderInfo')
 
 const mockAttachedPipettes: AttachedPipettesByMount = {
   left: mockAttachedPipette,
@@ -61,21 +62,10 @@ const mockProtocolPipetteTipRackCalData: ProtocolPipetteTipRackCalDataByMount = 
 const mockGetProtocolData = protocolSelectors.getProtocolData as jest.MockedFunction<
   typeof protocolSelectors.getProtocolData
 >
-const mockLabwareSetup = LabwareSetup as jest.MockedFunction<
-  typeof LabwareSetup
->
-
-const mockProceedToRun = ProceedToRunCta as jest.MockedFunction<
-  typeof ProceedToRunCta
->
-
+const mockLabwareSetup = LabwareSetup as jest.MockedFunction<typeof LabwareSetup>
 const mockModuleSetup = ModuleSetup as jest.MockedFunction<typeof ModuleSetup>
-const mockRobotCalibration = RobotCalibration as jest.MockedFunction<
-  typeof RobotCalibration
->
-const mockGetLabwareRenderCoords = getLabwareRenderCoords as jest.MockedFunction<
-  typeof getLabwareRenderCoords
->
+const mockRobotCalibration = RobotCalibration as jest.MockedFunction<typeof RobotCalibration>
+const mockProceedToRun = ProceedToRunCta as jest.MockedFunction<typeof ProceedToRunCta>
 const mockGetConnectedRobot = discoverySelectors.getConnectedRobot as jest.MockedFunction<
   typeof discoverySelectors.getConnectedRobot
 >
@@ -91,9 +81,6 @@ const mockGetDeckCalData = calibrationSelectors.getDeckCalibrationData as jest.M
   typeof calibrationSelectors.getDeckCalibrationData
 >
 
-const mockLabwareRenderCoords = {
-  mockLabwareId: { x: 0, y: 0, z: 0, labwareDef: {} as any },
-}
 describe('RunSetupCard', () => {
   let render: () => ReturnType<typeof renderWithProviders>
 
@@ -108,17 +95,9 @@ describe('RunSetupCard', () => {
     )
     mockGetProtocolData.mockReturnValue(noModulesProtocol as any)
 
-    when(mockGetLabwareRenderCoords)
-      .calledWith(noModulesProtocol as any, standardDeckDef as any)
-      .mockReturnValue(mockLabwareRenderCoords)
-
     when(mockLabwareSetup)
       .mockReturnValue(<div></div>) // this (default) empty div will be returned when LabwareSetup isn't called with expected props
-      .calledWith(
-        componentPropsMatcher({
-          labwareRenderCoords: mockLabwareRenderCoords,
-        })
-      )
+      .calledWith()
       .mockReturnValue(<div>Mock Labware Setup</div>)
     when(mockModuleSetup)
       .mockReturnValue(<div></div>) // this (default) empty div will be returned when ModuleSetup isn't called with expected props
@@ -179,9 +158,6 @@ describe('RunSetupCard', () => {
   it('renders module setup and allows the user to proceed to labware setup', () => {
     mockGetProtocolData.mockReturnValue(withModulesProtocol as any)
 
-    when(mockGetLabwareRenderCoords)
-      .calledWith(withModulesProtocol as any, standardDeckDef as any)
-      .mockReturnValue(mockLabwareRenderCoords)
     const { getByRole, getByText } = render()
     const moduleSetupHeading = getByRole('heading', { name: 'Module Setup' })
     fireEvent.click(moduleSetupHeading)

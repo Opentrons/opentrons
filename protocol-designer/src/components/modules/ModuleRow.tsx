@@ -18,21 +18,21 @@ import { ModuleDiagram } from './ModuleDiagram'
 import { isModuleWithCollisionIssue } from './utils'
 import styles from './styles.css'
 
-import { ModuleRealType } from '@opentrons/shared-data'
+import { ModuleType } from '@opentrons/shared-data'
 
 interface Props {
   moduleOnDeck?: ModuleOnDeck
   showCollisionWarnings?: boolean
-  type: ModuleRealType
+  type: ModuleType
   openEditModuleModal: (
-    moduleType: ModuleRealType,
+    moduleType: ModuleType,
     moduleId?: string
   ) => unknown
 }
 
 export function ModuleRow(props: Props): JSX.Element {
   const { moduleOnDeck, openEditModuleModal, showCollisionWarnings } = props
-  const type: ModuleRealType = moduleOnDeck?.type || props.type
+  const type: ModuleType = moduleOnDeck?.type || props.type
 
   const model = moduleOnDeck?.model
   const slot = moduleOnDeck?.slot
@@ -86,7 +86,7 @@ export function ModuleRow(props: Props): JSX.Element {
   )
 
   const setCurrentModule = (
-    moduleType: ModuleRealType,
+    moduleType: ModuleType,
     moduleId?: string
   ) => () => openEditModuleModal(moduleType, moduleId)
 

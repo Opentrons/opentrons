@@ -15,7 +15,7 @@ import { CollapsibleStep } from './CollapsibleStep'
 import { ProceedToRunCta } from './ProceedToRunCta'
 import { LabwareSetup } from './LabwareSetup'
 import { ModuleSetup } from './ModuleSetup'
-import { getLabwareRenderCoords } from '../utils/getLabwareRenderCoords'
+import { useModuleRenderInfoById, useLabwareRenderInfoById } from '../hooks'
 import { RobotCalibration } from './RobotCalibration'
 import type { JsonProtocolFile } from '@opentrons/shared-data'
 import type { State } from '../../../redux/types'
@@ -24,10 +24,6 @@ import { getConnectedRobot } from '../../../redux/discovery/selectors'
 export function RunSetupCard(): JSX.Element | null {
   const { t } = useTranslation('protocol_setup')
   const protocolData = useSelector((state: State) => getProtocolData(state))
-  const labwareRenderCoords = getLabwareRenderCoords(
-    protocolData,
-    standardDeckDef as any
-  )
   const robot = useSelector((state: State) => getConnectedRobot(state))
 
   const ROBOT_CALIBRATION_STEP_KEY = 'robot_calibration_step' as const
@@ -83,7 +79,7 @@ export function RunSetupCard(): JSX.Element | null {
       }),
     },
     [LABWARE_SETUP_KEY]: {
-      stepInternals: <LabwareSetup labwareRenderCoords={labwareRenderCoords} />,
+      stepInternals: <LabwareSetup />,
       description: t(`${LABWARE_SETUP_KEY}_description`),
     },
   }

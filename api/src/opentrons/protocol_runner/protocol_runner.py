@@ -1,7 +1,13 @@
 """Protocol run control and management."""
-from typing import Optional, Sequence
+from dataclasses import dataclass
+from typing import List, Optional
 
-from opentrons.protocol_engine import ProtocolEngine, Command as ProtocolCommand
+from opentrons.protocol_engine import (
+    ProtocolEngine,
+    Command,
+    LoadedLabware,
+    LoadedPipette,
+)
 
 from .protocol_file import ProtocolFile, ProtocolFileType
 from .task_queue import TaskQueue, TaskQueuePhase
@@ -10,6 +16,15 @@ from .json_command_translator import JsonCommandTranslator
 from .python_file_reader import PythonFileReader
 from .python_context_creator import PythonContextCreator
 from .python_executor import PythonExecutor
+
+
+@dataclass(frozen=True)
+class ProtocolRunData:
+    """Data from a protocol run."""
+
+    commands: List[Command]
+    labware: List[LoadedLabware]
+    pipettes: List[LoadedPipette]
 
 
 class ProtocolRunner:
@@ -44,11 +59,6 @@ class ProtocolRunner:
         self._python_file_reader = python_file_reader or PythonFileReader()
         self._python_context_creator = python_context_creator or PythonContextCreator()
         self._python_executor = python_executor or PythonExecutor()
-
-    @property
-    def engine(self) -> ProtocolEngine:
-        """Get the runner's underlying ProtocolEngine."""
-        return self._protocol_engine
 
     def load(self, protocol_file: ProtocolFile) -> None:
         """Load a ProtocolFile into managed ProtocolEngine.
@@ -92,12 +102,17 @@ class ProtocolRunner:
         """
         return await self._task_queue.join()
 
-    async def run(self, protocol_file: ProtocolFile) -> Sequence[ProtocolCommand]:
+    async def run(self, protocol_file: ProtocolFile) -> ProtocolRunData:
         """Run a given protocol to completion."""
         self.load(protocol_file)
         self.play()
         await self.join()
-        return self._protocol_engine.state_view.commands.get_all()
+
+        commands = self._protocol_engine.state_view.commands.get_all()
+        labware = self._protocol_engine.state_view.labware.get_all()
+        pipettes = self._protocol_engine.state_view.pipettes.get_all()
+
+        return ProtocolRunData(commands=commands, labware=labware, pipettes=pipettes)
 
     def _load_json(self, protocol_file: ProtocolFile) -> None:
         protocol = self._json_file_reader.read(protocol_file)

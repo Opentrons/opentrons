@@ -143,6 +143,10 @@ def validate_can_dispense(location: types.Location) -> None:
         raise RuntimeError("Cannot dispense to a tiprack")
 
 
+# TODO(mc, 2021-09-08): this `as_labware` looks wrong. I get the feeling
+# this is coincidentally working because `both `Well` and `Labware` have
+# a `parent` property. Also, it doesn't seem to handle the wide range of
+# things a `types.Location` can be (i.e. module, labware, well, etc.)
 def _is_tiprack(location: types.Location) -> bool:
     labware = location.labware.as_labware()
-    return labware.parent and labware.parent.is_tiprack
+    return labware.parent and labware.parent.is_tiprack  # type: ignore[return-value, union-attr]  # noqa: E501

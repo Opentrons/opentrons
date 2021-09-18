@@ -1,10 +1,13 @@
 import logging
-from typing import Dict, Awaitable, Callable, Any, Set, List, Optional, TYPE_CHECKING
+from typing import Dict, Awaitable, Callable, Any, Set, List, Optional
+
 from opentrons.types import Mount, Point, Location
 from opentrons.config import feature_flags as ff
 from opentrons.hardware_control import ThreadManager, CriticalPoint, Pipette
 from opentrons.protocol_api import labware
 from opentrons.protocols.geometry.deck import Deck
+
+from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 from robot_server.robot.calibration import util
 from robot_server.service.errors import RobotServerError
@@ -21,10 +24,6 @@ from ..constants import (
 )
 from .constants import TipCalibrationState as State, TIP_RACK_SLOT
 from .state_machine import TipCalibrationStateMachine
-
-if TYPE_CHECKING:
-    from opentrons_shared_data.labware import LabwareDefinition
-
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -46,7 +45,7 @@ class TipCalibrationUserFlow:
         hardware: ThreadManager,
         mount: Mount,
         has_calibration_block: bool,
-        tip_rack: "LabwareDefinition",
+        tip_rack: LabwareDefinition,
     ):
         self._hardware = hardware
         self._mount = mount
@@ -119,7 +118,7 @@ class TipCalibrationUserFlow:
         self._tip_origin_pt = None
 
     @property
-    def supported_commands(self) -> List:
+    def supported_commands(self) -> List[str]:
         return self._supported_commands.supported()
 
     @property
@@ -134,7 +133,7 @@ class TipCalibrationUserFlow:
             tipLength=self._hw_pipette.config.tip_length,
             mount=str(self._mount),
             serial=self._hw_pipette.pipette_id,
-            defaultTipracks=self._default_tipracks,  # type: ignore[arg-type]
+            defaultTipracks=self._default_tipracks,
         )
 
     def get_required_labware(self) -> List[RequiredLabware]:
@@ -164,7 +163,10 @@ class TipCalibrationUserFlow:
             f"from {self._current_state} to {next_state}"
         )
 
-    async def load_labware(self, tiprackDefinition: Optional[dict] = None):
+    async def load_labware(
+        self,
+        tiprackDefinition: Optional[LabwareDefinition] = None,
+    ):
         pass
 
     async def move_to_tip_rack(self):
@@ -190,7 +192,7 @@ class TipCalibrationUserFlow:
     def _get_default_tip_length(self) -> float:
         tiprack: labware.Labware = self._deck[TIP_RACK_SLOT]  # type: ignore
         full_length = tiprack.tip_length
-        overlap_dict: Dict = self._hw_pipette.config.tip_overlap
+        overlap_dict: Dict[str, float] = self._hw_pipette.config.tip_overlap
         overlap = overlap_dict.get(tiprack.uri, 0)
         return full_length - overlap
 
@@ -202,19 +204,23 @@ class TipCalibrationUserFlow:
             else None
         )
 
-    async def get_current_point(self, critical_point: CriticalPoint = None) -> Point:
+    async def get_current_point(
+        self,
+        critical_point: Optional[CriticalPoint] = None,
+    ) -> Point:
         return await self._hardware.gantry_position(self._mount, critical_point)
 
     async def jog(self, vector):
         await self._hardware.move_rel(mount=self._mount, delta=Point(*vector))
 
     async def move_to_reference_point(self):
+        cal_block_target_well: Optional[labware.Well] = None
+
         if self._has_calibration_block:
             cb_setup = CAL_BLOCK_SETUP_BY_MOUNT[self._mount]
             calblock: labware.Labware = self._deck[cb_setup.slot]  # type: ignore
             cal_block_target_well = calblock.wells_by_name()[cb_setup.well]
-        else:
-            cal_block_target_well = None
+
         ref_loc = util.get_reference_location(
             deck=self._deck, cal_block_target_well=cal_block_target_well
         )
@@ -232,7 +238,7 @@ class TipCalibrationUserFlow:
             await self.return_tip()
         await self._hardware.home()
 
-    def _get_tip_rack_lw(self, tip_rack_def: "LabwareDefinition") -> labware.Labware:
+    def _get_tip_rack_lw(self, tip_rack_def: LabwareDefinition) -> labware.Labware:
         try:
             return labware.load_from_definition(
                 tip_rack_def, self._deck.position_for(TIP_RACK_SLOT)

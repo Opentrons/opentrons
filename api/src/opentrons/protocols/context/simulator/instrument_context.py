@@ -1,12 +1,17 @@
 import typing
 
-from opentrons import types, APIVersion
+from opentrons import types
 from opentrons.hardware_control import NoTipAttachedError, TipAttachedError
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.hardware_control.types import HardwareAction
+from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocols.api_support.util import FlowRates, PlungerSpeeds, Clearances
+from opentrons.protocols.context.paired_instrument import AbstractPairedInstrument
+from opentrons.protocols.context.simulator.paired_instrument import (
+    PairedInstrumentSimulation,
+)
 from opentrons.protocols.geometry import planning
 from opentrons.protocols.context.instrument import AbstractInstrument
 from opentrons.protocols.context.protocol import AbstractProtocol
@@ -206,3 +211,12 @@ class InstrumentContextSimulation(AbstractInstrument):
         """Raise TipAttachedError if tip."""
         if self.has_tip():
             raise TipAttachedError(f"Cannot {action} with a tip attached")
+
+    def pair_with(
+        self, other_instrument: AbstractInstrument
+    ) -> AbstractPairedInstrument:
+        return PairedInstrumentSimulation(
+            primary_instrument=self,
+            secondary_instrument=other_instrument,
+            ctx=self._protocol_interface,
+        )

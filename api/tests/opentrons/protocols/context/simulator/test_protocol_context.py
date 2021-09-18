@@ -4,36 +4,7 @@ from opentrons.protocols.context.protocol import AbstractProtocol
 from pytest_lazyfixture import lazy_fixture
 
 from opentrons.protocols.context.labware import AbstractLabware
-from opentrons.protocols.context.protocol_api.labware import LabwareImplementation
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
-from opentrons import types, ThreadManager
-from opentrons.protocols.context.protocol_api.protocol_context import (
-    ProtocolContextImplementation,
-)
-from opentrons.protocols.context.simulator.protocol_context import (
-    ProtocolContextSimulation,
-)
-
-
-@pytest.fixture
-def protocol_context(hardware: ThreadManager) -> ProtocolContextImplementation:
-    """Protocol context implementation fixture."""
-    return ProtocolContextImplementation(hardware=hardware)
-
-
-@pytest.fixture
-def simulating_protocol_context(hardware: ThreadManager) -> ProtocolContextSimulation:
-    """Protocol context simulation fixture."""
-    return ProtocolContextSimulation(hardware=hardware)
-
-
-@pytest.fixture
-def labware(minimal_labware_def: LabwareDefinition) -> AbstractLabware:
-    """Labware fixture."""
-    return LabwareImplementation(
-        definition=minimal_labware_def,
-        parent=types.Location(types.Point(0, 0, 0), "1"),
-    )
+from opentrons import types
 
 
 @pytest.fixture(

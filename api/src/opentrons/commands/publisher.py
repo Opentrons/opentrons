@@ -1,6 +1,6 @@
 import functools
 import inspect
-from typing import Any, Callable, cast, Dict, Tuple, Mapping, Generic, TypeVar
+from typing import Any, Callable, Dict, Generic, Mapping, Optional, Tuple, TypeVar, cast
 from opentrons.broker import Broker
 from . import types as command_types
 
@@ -28,7 +28,7 @@ getfullargspec_cache = InspectMemoizer(inspect.getfullargspec)
 
 
 class CommandPublisher:
-    def __init__(self, broker: Broker) -> None:
+    def __init__(self, broker: Optional[Broker]) -> None:
         self._broker = broker or Broker()
 
     @property
@@ -109,14 +109,17 @@ def publish_paired(
     publish_command(message={**payload, "$": when})
 
 
-def _publish_dec(
-    before: bool, after: bool, command: CmdFunction, meta: Any = None
-):  # noqa: ANN202
-    def _decorator(f: Callable):  # noqa: ANN202
+FuncT = TypeVar("FuncT", bound=Callable[..., Any])
+
+
+def publish(command: CmdFunction, meta: Any = None) -> Callable[[FuncT], FuncT]:
+    """Publish events both before and after the decorated function has run."""
+
+    def _decorator(f: FuncT) -> FuncT:
         @functools.wraps(
             f, updated=functools.WRAPPER_UPDATES + ("__globals__",)  # type: ignore[operator]  # noqa: E501
         )
-        def _decorated(*args, **kwargs):  # noqa: ANN202,ANN003,ANN002
+        def _decorated(*args: Any, **kwargs: Any) -> Any:
             try:
                 broker = cast(Broker, args[0].broker)
             except AttributeError:
@@ -124,35 +127,15 @@ def _publish_dec(
                     "Only methods of CommandPublisher \
                     classes should be decorated."
                 )
-            if before:
-                do_publish(broker, command, f, "before", None, meta, *args, **kwargs)
+
+            do_publish(broker, command, f, "before", None, meta, *args, **kwargs)
             res = f(*args, **kwargs)
-            if after:
-                do_publish(broker, command, f, "after", res, meta, *args, **kwargs)
+            do_publish(broker, command, f, "after", res, meta, *args, **kwargs)
             return res
 
-        return _decorated
+        return cast(FuncT, _decorated)
 
     return _decorator
-
-
-class publish:
-    """Class that allows namespaced decorators with valid mypy types
-
-    These were previously defined by adding them as attributes to the
-    publish function, which is not currently supported by mypy:
-    https://github.com/python/mypy/issues/2087
-
-    Making a simple class with these as attributes does the same thing
-    but in a way that mypy can actually verify.
-
-    Only commands inheriting from class CommandPublisher should contain
-    decorators.
-    """
-
-    before = functools.partial(_publish_dec, before=True, after=False)
-    after = functools.partial(_publish_dec, before=False, after=True)
-    both = functools.partial(_publish_dec, before=True, after=True)
 
 
 def _get_args(f: Callable, args: Tuple, kwargs: Mapping[str, Any]) -> Dict[str, Any]:

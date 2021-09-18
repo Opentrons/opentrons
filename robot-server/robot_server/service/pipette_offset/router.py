@@ -1,5 +1,6 @@
 from starlette import status
 from fastapi import APIRouter
+from typing import Optional
 
 from opentrons import types as ot_types
 from opentrons.calibration_storage import (
@@ -43,7 +44,7 @@ def _format_calibration(
     response_model=pip_models.MultipleCalibrationsResponse,
 )
 async def get_all_pipette_offset_calibrations(
-    pipette_id: str = None, mount: pip_models.MountType = None
+    pipette_id: Optional[str] = None, mount: Optional[pip_models.MountType] = None
 ) -> pip_models.MultipleCalibrationsResponse:
     all_calibrations = get_cal.get_all_pipette_offset_calibrations()
 

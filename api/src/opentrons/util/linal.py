@@ -1,7 +1,7 @@
 import logging
-import numpy as np  # type: ignore
-from numpy import insert, dot  # type: ignore
-from numpy.linalg import inv  # type: ignore
+import numpy as np  # type: ignore[import]
+from numpy import insert, dot
+from numpy.linalg import inv  # type: ignore[import]
 from typing import List, Tuple, Union
 
 from opentrons.calibration_storage.types import AttitudeMatrix

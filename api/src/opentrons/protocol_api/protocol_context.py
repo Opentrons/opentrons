@@ -1,3 +1,4 @@
+from __future__ import annotations
 import asyncio
 import contextlib
 import logging
@@ -15,8 +16,8 @@ from typing import (
 from collections import OrderedDict
 
 from opentrons.hardware_control import SynchronousAdapter, ThreadManager
+from opentrons.hardware_control.modules.types import ModuleType
 from opentrons import types
-from opentrons.hardware_control import API
 from opentrons.commands import protocol_commands as cmds, types as cmd_types
 from opentrons.commands.publisher import CommandPublisher, publish
 from opentrons.protocols.api_support.types import APIVersion
@@ -30,7 +31,7 @@ from opentrons.protocols.types import Protocol
 from .labware import Labware
 from opentrons.protocols.context.labware import AbstractLabware
 from opentrons.protocols.context.protocol import AbstractProtocol
-from opentrons.protocols.geometry.module_geometry import ModuleGeometry, ModuleType
+from opentrons.protocols.geometry.module_geometry import ModuleGeometry
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from .instrument_context import InstrumentContext
@@ -49,7 +50,7 @@ from opentrons.protocols.api_support.util import (
 if TYPE_CHECKING:
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
-MODULE_LOG = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 ModuleTypes = Union[
     "TemperatureModuleContext", "MagneticModuleContext", "ThermocyclerContext"
@@ -106,7 +107,6 @@ class ProtocolContext(CommandPublisher):
         }
         self._modules: List[ModuleContext] = []
 
-        self._log = MODULE_LOG.getChild(self.__class__.__name__)
         self._commands: List[str] = []
         self._unsubscribe_commands: Optional[Callable[[], None]] = None
         self.clear_commands()
@@ -114,7 +114,7 @@ class ProtocolContext(CommandPublisher):
     @classmethod
     def build_using(
         cls, implementation: AbstractProtocol, protocol: Protocol, *args, **kwargs
-    ):
+    ) -> ProtocolContext:
         """Build an API instance for the specified parsed protocol
 
         This is used internally to provision the context with bundle
@@ -140,7 +140,7 @@ class ProtocolContext(CommandPublisher):
     def _hw_manager(self):
         # TODO (lc 01-05-2021) remove this once we have a more
         # user facing hardware control http api.
-        self._log.warning(
+        logger.warning(
             "This function will be deprecated in later versions."
             "Please use with caution."
         )
@@ -294,7 +294,7 @@ class ProtocolContext(CommandPublisher):
                     instrument_context._implementation = instrument_impl
 
     @requires_version(2, 0)
-    def connect(self, hardware: API):
+    def connect(self, hardware: Union[ThreadManager, SynchronousAdapter]):
         """Connect to a running hardware API.
 
         This can be either a simulator or a full hardware controller.
@@ -393,9 +393,7 @@ class ProtocolContext(CommandPublisher):
         .. deprecated:: 2.0
             Use :py:meth:`load_labware` instead.
         """
-        MODULE_LOG.warning(
-            "load_labware_by_name is deprecated. Use load_labware instead."
-        )
+        logger.warning("load_labware_by_name is deprecated. Use load_labware instead.")
         return self.load_labware(load_name, location, label, namespace, version)
 
     @property  # type: ignore
@@ -561,7 +559,7 @@ class ProtocolContext(CommandPublisher):
                 "mount should be either an instance of opentrons.types.Mount"
                 " or a string, but is {}.".format(mount)
             )
-        self._log.info(
+        logger.info(
             "Trying to load {} on {} mount".format(
                 instrument_name, checked_mount.name.lower()
             )
@@ -577,7 +575,6 @@ class ProtocolContext(CommandPublisher):
             implementation=impl,
             at_version=self.api_version,
             tip_racks=tip_racks,
-            log_parent=self._log,
         )
         self._instruments[checked_mount] = new_instr
         return new_instr
@@ -606,7 +603,7 @@ class ProtocolContext(CommandPublisher):
             if instr
         }
 
-    @publish.both(command=cmds.pause)
+    @publish(command=cmds.pause)
     @requires_version(2, 0)
     def pause(self, msg=None) -> None:
         """Pause execution of the protocol until it's resumed.
@@ -622,7 +619,7 @@ class ProtocolContext(CommandPublisher):
         """
         self._implementation.pause(msg=msg)
 
-    @publish.both(command=cmds.resume)
+    @publish(command=cmds.resume)
     @requires_version(2, 0)
     def resume(self) -> None:
         """Resume the protocol after :py:meth:`pause`.
@@ -635,7 +632,7 @@ class ProtocolContext(CommandPublisher):
         """
         self._implementation.resume()
 
-    @publish.both(command=cmds.comment)
+    @publish(command=cmds.comment)
     @requires_version(2, 0)
     def comment(self, msg) -> None:
         """
@@ -648,7 +645,7 @@ class ProtocolContext(CommandPublisher):
         """
         self._implementation.comment(msg=msg)
 
-    @publish.both(command=cmds.delay)
+    @publish(command=cmds.delay)
     @requires_version(2, 0)
     def delay(self, seconds=0, minutes=0, msg=None):
         """Delay protocol execution for a specific amount of time.
@@ -664,7 +661,7 @@ class ProtocolContext(CommandPublisher):
     @requires_version(2, 0)
     def home(self):
         """Homes the robot."""
-        self._log.debug("home")
+        logger.debug("home")
         self._implementation.home()
 
     @property

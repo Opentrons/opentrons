@@ -4,6 +4,7 @@ import os
 import pytest
 
 from opentrons.config import CONFIG, robot_configs
+from opentrons.config.types import CurrentDict
 from opentrons.hardware_control.types import BoardRevision
 
 legacy_dummy_settings = {
@@ -127,7 +128,7 @@ def test_load_legacy_gantry_cal():
 
 def test_load_currents():
     legacy = {"X": 2.0, "Y": 0.5, "Z": 0.2, "A": 0.1, "B": 0.5, "C": 0.7}
-    default = {
+    default: CurrentDict = {
         "default": {"X": 0.1, "Y": 0.3, "Z": 0.1, "A": 0.2, "B": 0.1, "C": 0.2},
         "B": {"X": 0.2, "Y": 0.1, "Z": 0.5, "A": 0.6, "B": 0.7, "C": 0.8},
         "2.1": {"X": 1, "Y": 2, "Z": 3, "A": 4, "B": 5, "C": 7},

@@ -4,7 +4,7 @@ import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
-  ModuleRealType,
+  ModuleType,
   MAGNETIC_MODULE_V1,
   MAGNETIC_MODULE_V2,
   TEMPERATURE_MODULE_V1,
@@ -14,12 +14,12 @@ import {
 } from '@opentrons/shared-data'
 
 interface Props {
-  type: ModuleRealType
+  type: ModuleType
   model: ModuleModel
 }
 
 type ModuleImg = {
-  [type in ModuleRealType]: {
+  [type in ModuleType]: {
     [model in ModuleModel]?: string
   }
 }

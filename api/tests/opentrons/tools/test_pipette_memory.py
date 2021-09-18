@@ -96,7 +96,7 @@ pipette_barcode_to_model = {
 }
 
 
-def test_parse_model_from_barcode():
+def test_parse_model_from_barcode() -> None:
     for barcode, model in pipette_barcode_to_model.items():
         assert write_pipette_memory._parse_model_from_barcode(barcode) == model
 

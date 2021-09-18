@@ -2,9 +2,9 @@
 from fastapi import APIRouter, Depends, status
 
 from opentrons import __version__, config, protocol_api
-from opentrons.hardware_control import ThreadManager
+from opentrons.hardware_control import API as HardwareAPI
 
-from robot_server.service.dependencies import get_hardware
+from robot_server.hardware import get_hardware
 from robot_server.service.legacy.models import V1BasicResponse
 from .models import Health, HealthLinks
 
@@ -27,7 +27,7 @@ health_router = APIRouter()
         }
     },
 )
-async def get_health(hardware: ThreadManager = Depends(get_hardware)) -> Health:
+async def get_health(hardware: HardwareAPI = Depends(get_hardware)) -> Health:
     """Get information about the health of the robot server.
 
     Use the health endpoint to check that the robot server is running

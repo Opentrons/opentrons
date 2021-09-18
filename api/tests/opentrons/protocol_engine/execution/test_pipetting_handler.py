@@ -8,8 +8,13 @@ from opentrons.types import Mount
 from opentrons.hardware_control.api import API as HardwareAPI
 from opentrons.hardware_control.dev_types import PipetteDict
 
-from opentrons.protocol_engine import DeckLocation, WellLocation, WellOrigin
-from opentrons.protocol_engine.state import StateStore, TipGeometry, HardwarePipette
+from opentrons.protocol_engine import WellLocation, WellOrigin
+from opentrons.protocol_engine.state import (
+    StateStore,
+    TipGeometry,
+    HardwarePipette,
+    CurrentWell,
+)
 from opentrons.protocol_engine.execution.movement import MovementHandler
 from opentrons.protocol_engine.execution.pipetting import PipettingHandler
 
@@ -234,7 +239,7 @@ async def test_handle_aspirate_request_without_prep(
             labware_id="labware-id",
             well_name="C6",
             well_location=well_location,
-            current_location=None,
+            current_well=None,
         ),
         await hardware_api.aspirate(
             mount=Mount.LEFT,
@@ -296,8 +301,10 @@ async def test_handle_aspirate_request_with_prep(
             labware_id="labware-id",
             well_name="C6",
             well_location=well_location,
-            current_location=DeckLocation(
-                pipette_id="pipette-id", labware_id="labware-id", well_name="C6"
+            current_well=CurrentWell(
+                pipette_id="pipette-id",
+                labware_id="labware-id",
+                well_name="C6",
             ),
         ),
         await hardware_api.aspirate(mount=Mount.LEFT, volume=25),

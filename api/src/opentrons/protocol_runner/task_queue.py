@@ -29,7 +29,7 @@ class TaskQueue:
         """Initialize the TaskQueue."""
         self._run_entry: Optional[TaskQueueEntry] = None
         self._cleanup_entry: Optional[TaskQueueEntry] = None
-        self._run_task: Optional[asyncio.Task] = None
+        self._run_task: Optional["asyncio.Task[None]"] = None
         self._run_started_event: asyncio.Event = asyncio.Event()
 
     def add(

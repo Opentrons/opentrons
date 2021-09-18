@@ -12,6 +12,7 @@ const standardDeckDef = _standardDeckDef as any
 
 describe('getModuleRenderInfo', () => {
   it('should gather module coordinates', () => {
+    // mag mod is in deck slot 1 which has [x,y] coordinate [0,0,0]
     const SLOT_1_COORDS = [0, 0, 0]
     // temp mod is in deck slot 3 which has [x,y] coordinate [265,0,0]
     const SLOT_3_COORDS = [265, 0, 0]
@@ -30,13 +31,13 @@ describe('getModuleRenderInfo', () => {
     const TC_LW_ID =
       'b0103540-3412-11eb-ad93-ed232a2337cf:opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1'
 
-    const expectedCoords = {
+
+    const expectedInfo = {
       [MAG_MOD_ID]: {
         x: SLOT_1_COORDS[0],
         y: SLOT_1_COORDS[1],
         z: SLOT_1_COORDS[2],
         moduleDef: getModuleDef2('magneticModuleV2'),
-        //  @ts-expect-error
         nestedLabwareDef: _protocolWithMagTempTC.labwareDefinitions[
           _protocolWithMagTempTC.labware[MAG_LW_ID].definitionId
         ] as LabwareDefinition2,
@@ -46,7 +47,6 @@ describe('getModuleRenderInfo', () => {
         y: SLOT_3_COORDS[1],
         z: SLOT_3_COORDS[2],
         moduleDef: getModuleDef2('temperatureModuleV2'),
-        //  @ts-expect-error
         nestedLabwareDef: _protocolWithMagTempTC.labwareDefinitions[
           _protocolWithMagTempTC.labware[TEMP_LW_ID].definitionId
         ] as LabwareDefinition2,
@@ -56,7 +56,6 @@ describe('getModuleRenderInfo', () => {
         y: SLOT_7_COORDS[1],
         z: SLOT_7_COORDS[2],
         moduleDef: getModuleDef2('thermocyclerModuleV1'),
-        //  @ts-expect-error
         nestedLabwareDef: _protocolWithMagTempTC.labwareDefinitions[
           _protocolWithMagTempTC.labware[TC_LW_ID].definitionId
         ] as LabwareDefinition2,
@@ -64,7 +63,7 @@ describe('getModuleRenderInfo', () => {
     }
 
     expect(getModuleRenderInfo(protocolWithMagTempTC, standardDeckDef)).toEqual(
-      expectedCoords
+      expectedInfo
     )
   })
 })

@@ -9,9 +9,11 @@ import {
   getProtocolData,
 } from '../../redux/protocol'
 import { getModuleRenderInfo } from './utils/getModuleRenderInfo'
-import type { ModuleRenderInfoById } from './utils/getModuleRenderInfo'
-import type { State } from '../../redux/types'
+import { getLabwareRenderInfo } from './utils/getLabwareRenderInfo'
 
+import type { ModuleRenderInfoById } from './utils/getModuleRenderInfo'
+import type { LabwareRenderInfoById } from './utils/getLabwareRenderInfo'
+import type { State } from '../../redux/types'
 interface ProtocolMetadata {
   author: string | null
   lastUpdated: number | null
@@ -34,4 +36,9 @@ export function useProtocolMetadata(): ProtocolMetadata {
 export function useModuleRenderInfoById(): ModuleRenderInfoById {
   const protocolData = useSelector((state: State) => getProtocolData(state))
   return getModuleRenderInfo(protocolData, standardDeckDef as any)
+}
+
+export function useLabwareRenderInfoById(): LabwareRenderInfoById {
+  const protocolData = useSelector((state: State) => getProtocolData(state))
+  return getLabwareRenderInfo(protocolData, standardDeckDef as any)
 }

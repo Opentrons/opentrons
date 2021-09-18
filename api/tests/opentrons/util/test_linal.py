@@ -1,19 +1,23 @@
 from math import pi, sin, cos
 from opentrons.util.linal import solve, add_z, apply_transform, solve_attitude
-from numpy.linalg import inv
-import numpy as np
+from numpy.linalg import inv  # type: ignore[import]
+import numpy as np  # type: ignore[import]
 
 
 def test_solve():
     theta = pi / 3.0  # 60 deg
     scale = 2.0
 
-    expected = [[cos(0), sin(0)], [cos(pi / 2), sin(pi / 2)], [cos(pi), sin(pi)]]
+    expected = [
+        (cos(0), sin(0)),
+        (cos(pi / 2), sin(pi / 2)),
+        (cos(pi), sin(pi)),
+    ]
 
     actual = [
-        [cos(theta) * scale + 0.5, sin(theta) * scale + 0.25],
-        [cos(theta + pi / 2) * scale + 0.5, sin(theta + pi / 2) * scale + 0.25],
-        [cos(theta + pi) * scale + 0.5, sin(theta + pi) * scale + 0.25],
+        (cos(theta) * scale + 0.5, sin(theta) * scale + 0.25),
+        (cos(theta + pi / 2) * scale + 0.5, sin(theta + pi / 2) * scale + 0.25),
+        (cos(theta + pi) * scale + 0.5, sin(theta + pi) * scale + 0.25),
     ]
 
     X = solve(expected, actual)

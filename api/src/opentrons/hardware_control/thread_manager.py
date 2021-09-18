@@ -1,13 +1,13 @@
-""" Manager for the :py:class:`.hardware_control.API` thread.
-"""
+"""Manager for the :py:class:`.hardware_control.API` thread."""
 import threading
 import logging
 import asyncio
 import functools
 import weakref
-from typing import Generic, TypeVar, Any, Optional
+from typing import Any, Awaitable, Callable, Generic, Optional, TypeVar
 from .adapters import SynchronousAdapter
 from .modules.mod_abc import AbstractModule
+from .api import API as HardwareAPI
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -95,15 +95,20 @@ class ThreadManager:
     >>> api_single_thread.sync.home() # call as blocking sync
     """
 
-    def __init__(self, builder, *args, **kwargs):
+    def __init__(
+        self,
+        builder: Callable[..., Awaitable[HardwareAPI]],
+        *args: Any,
+        **kwargs: Any,
+    ) -> None:
         """Build the ThreadManager.
 
         :param builder: The API function to use
         """
 
-        self._loop = None
-        self.managed_obj = None
-        self.bridged_obj = None
+        self._loop: Optional[asyncio.AbstractEventLoop] = None
+        self.managed_obj: Optional[HardwareAPI] = None
+        self.bridged_obj: Optional[CallBridger[Any]] = None
         self._sync_managed_obj: Optional[SynchronousAdapter] = None
         is_running = threading.Event()
         self._is_running = is_running

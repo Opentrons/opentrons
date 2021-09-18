@@ -57,11 +57,11 @@ class ExecutionManager:
 
     async def wait_for_is_running(self):
         async with self._condition:
-            if self._state is ExecutionState.PAUSED:
+            if self._state == ExecutionState.PAUSED:
                 await self._condition.wait()
-                if self._state is ExecutionState.CANCELLED:
+                if self._state == ExecutionState.CANCELLED:
                     raise ExecutionCancelledError
-            elif self._state is ExecutionState.CANCELLED:
+            elif self._state == ExecutionState.CANCELLED:
                 raise ExecutionCancelledError
             else:
                 pass

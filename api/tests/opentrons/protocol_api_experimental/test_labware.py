@@ -66,7 +66,7 @@ def test_labware_deck_slot_parent(
 ) -> None:
     """It should return a deck slot name if labware is loaded on the deck."""
     decoy.when(
-        engine_client.state.labware.get_labware_location(labware_id="labware-id")
+        engine_client.state.labware.get_location(labware_id="labware-id")
     ).then_return(DeckSlotLocation(slot=DeckSlotName.SLOT_5))
 
     assert subject.parent == "5"
@@ -124,7 +124,7 @@ def test_labware_parameters(
 ) -> None:
     """It should return the labware definition's parameters."""
     decoy.when(
-        engine_client.state.labware.get_labware_definition(labware_id="labware-id")
+        engine_client.state.labware.get_definition(labware_id="labware-id")
     ).then_return(labware_definition)
     assert subject.parameters == labware_definition.parameters
 
@@ -137,7 +137,7 @@ def test_labware_magdeck_engage_height_not_compatible(
 ) -> None:
     """It should return None for magdeck engage height if not in definition."""
     decoy.when(
-        engine_client.state.labware.get_labware_definition(labware_id="labware-id")
+        engine_client.state.labware.get_definition(labware_id="labware-id")
     ).then_return(labware_definition)
 
     assert subject.magdeck_engage_height is None
@@ -152,7 +152,7 @@ def test_labware_magdeck_engage_height(
     """It should return magdeck engage height from definition."""
     labware_definition.parameters.magneticModuleEngageHeight = 101.0
     decoy.when(
-        engine_client.state.labware.get_labware_definition(labware_id="labware-id")
+        engine_client.state.labware.get_definition(labware_id="labware-id")
     ).then_return(labware_definition)
 
     assert subject.magdeck_engage_height == 101.0
@@ -166,7 +166,7 @@ def test_labware_is_not_tiprack(
 ) -> None:
     """It should return False if not tiprack."""
     decoy.when(
-        engine_client.state.labware.get_labware_definition(labware_id="labware-id")
+        engine_client.state.labware.get_definition(labware_id="labware-id")
     ).then_return(labware_definition)
     assert subject.is_tiprack is False
 
@@ -180,7 +180,7 @@ def test_labware_tip_length(
     """It should return tip length if present in the definition."""
     labware_definition.parameters.tipLength = 42.0
     decoy.when(
-        engine_client.state.labware.get_labware_definition(labware_id="labware-id")
+        engine_client.state.labware.get_definition(labware_id="labware-id")
     ).then_return(labware_definition)
     assert subject.tip_length == 42.0
 
@@ -193,7 +193,7 @@ def test_labware_no_tip_length(
 ) -> None:
     """It should raise a LabwareIsNotTiprackError if tip length is not present."""
     decoy.when(
-        engine_client.state.labware.get_labware_definition(labware_id="labware-id")
+        engine_client.state.labware.get_definition(labware_id="labware-id")
     ).then_return(labware_definition)
     with pytest.raises(errors.LabwareIsNotTipRackError):
         subject.tip_length

@@ -5,26 +5,25 @@ from typing import cast, Dict, Optional
 from opentrons.types import MountType, Mount as HwMount
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocol_engine import errors
-from opentrons.protocol_engine.types import DeckLocation, PipetteName
-
+from opentrons.protocol_engine.types import PipetteName, LoadedPipette
 from opentrons.protocol_engine.state.pipettes import (
     PipetteState,
     PipetteView,
-    PipetteData,
+    CurrentWell,
     HardwarePipette,
 )
 
 
 def get_pipette_view(
-    pipettes_by_id: Optional[Dict[str, PipetteData]] = None,
-    aspirated_volume_by_id: Dict[str, float] = None,
-    current_location: Optional[DeckLocation] = None,
+    pipettes_by_id: Optional[Dict[str, LoadedPipette]] = None,
+    aspirated_volume_by_id: Optional[Dict[str, float]] = None,
+    current_well: Optional[CurrentWell] = None,
 ) -> PipetteView:
     """Get a pipette view test subject with the specified state."""
     state = PipetteState(
         pipettes_by_id=pipettes_by_id or {},
         aspirated_volume_by_id=aspirated_volume_by_id or {},
-        current_location=current_location,
+        current_well=current_well,
     )
 
     return PipetteView(state=state)
@@ -35,28 +34,29 @@ def test_initial_pipette_data_by_id() -> None:
     subject = get_pipette_view()
 
     with pytest.raises(errors.PipetteDoesNotExistError):
-        subject.get_pipette_data_by_id("asdfghjkl")
+        subject.get("asdfghjkl")
 
 
 def test_initial_pipette_data_by_mount() -> None:
     """It should return None if mount isn't present."""
     subject = get_pipette_view()
 
-    assert subject.get_pipette_data_by_mount(MountType.LEFT) is None
-    assert subject.get_pipette_data_by_mount(MountType.RIGHT) is None
+    assert subject.get_by_mount(MountType.LEFT) is None
+    assert subject.get_by_mount(MountType.RIGHT) is None
 
 
 def test_get_pipette_data() -> None:
     """It should get pipette data by ID and mount from the state."""
-    pipette_data = PipetteData(
-        pipette_name=PipetteName.P300_SINGLE,
+    pipette_data = LoadedPipette(
+        id="pipette-id",
+        pipetteName=PipetteName.P300_SINGLE,
         mount=MountType.LEFT,
     )
 
     subject = get_pipette_view(pipettes_by_id={"pipette-id": pipette_data})
 
-    result_by_id = subject.get_pipette_data_by_id("pipette-id")
-    result_by_mount = subject.get_pipette_data_by_mount(MountType.LEFT)
+    result_by_id = subject.get("pipette-id")
+    result_by_mount = subject.get_by_mount(MountType.LEFT)
 
     assert result_by_id == pipette_data
     assert result_by_mount == pipette_data
@@ -72,13 +72,15 @@ def test_get_hardware_pipette() -> None:
 
     subject = get_pipette_view(
         pipettes_by_id={
-            "left-id": PipetteData(
+            "left-id": LoadedPipette(
+                id="left-id",
                 mount=MountType.LEFT,
-                pipette_name=PipetteName.P300_SINGLE,
+                pipetteName=PipetteName.P300_SINGLE,
             ),
-            "right-id": PipetteData(
+            "right-id": LoadedPipette(
+                id="right-id",
                 mount=MountType.RIGHT,
-                pipette_name=PipetteName.P300_MULTI,
+                pipetteName=PipetteName.P300_MULTI,
             ),
         }
     )
@@ -111,9 +113,10 @@ def test_get_hardware_pipette_raises_with_name_mismatch() -> None:
 
     subject = get_pipette_view(
         pipettes_by_id={
-            "pipette-id": PipetteData(
+            "pipette-id": LoadedPipette(
+                id="pipette-id",
                 mount=MountType.LEFT,
-                pipette_name=PipetteName.P300_SINGLE,
+                pipetteName=PipetteName.P300_SINGLE,
             ),
         }
     )
@@ -146,9 +149,10 @@ def test_pipette_is_ready_to_aspirate_if_has_volume() -> None:
 
     subject = get_pipette_view(
         pipettes_by_id={
-            "pipette-id": PipetteData(
+            "pipette-id": LoadedPipette(
+                id="pipette-id",
                 mount=MountType.LEFT,
-                pipette_name=PipetteName.P300_SINGLE,
+                pipetteName=PipetteName.P300_SINGLE,
             ),
         },
         aspirated_volume_by_id={"pipette-id": 42},
@@ -167,9 +171,10 @@ def test_pipette_is_ready_to_aspirate_if_no_volume_and_hc_says_ready() -> None:
 
     subject = get_pipette_view(
         pipettes_by_id={
-            "pipette-id": PipetteData(
+            "pipette-id": LoadedPipette(
+                id="pipette-id",
                 mount=MountType.LEFT,
-                pipette_name=PipetteName.P300_SINGLE,
+                pipetteName=PipetteName.P300_SINGLE,
             ),
         },
         aspirated_volume_by_id={"pipette-id": 0},
@@ -189,9 +194,10 @@ def test_pipette_not_ready_to_aspirate() -> None:
 
     subject = get_pipette_view(
         pipettes_by_id={
-            "pipette-id": PipetteData(
+            "pipette-id": LoadedPipette(
+                id="pipette-id",
                 mount=MountType.LEFT,
-                pipette_name=PipetteName.P300_SINGLE,
+                pipetteName=PipetteName.P300_SINGLE,
             ),
         },
         aspirated_volume_by_id={"pipette-id": 0},

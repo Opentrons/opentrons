@@ -8,7 +8,7 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { SPAN7_8_10_11_SLOT, TC_SPAN_SLOTS } from '../../constants'
-import type { DeckSlotId, ModuleRealType } from '@opentrons/shared-data'
+import type { DeckSlotId, ModuleType } from '@opentrons/shared-data'
 import {
   NormalizedPipette,
   NormalizedPipetteById,
@@ -156,7 +156,7 @@ export const getHasGen1MultiChannelPipette = (
 }
 export const getIsModuleOnDeck = (
   modules: InitialDeckSetup['modules'],
-  moduleType: ModuleRealType
+  moduleType: ModuleType
 ): boolean => {
   const moduleIds = Object.keys(modules)
   return moduleIds.some(moduleId => modules[moduleId]?.type === moduleType)

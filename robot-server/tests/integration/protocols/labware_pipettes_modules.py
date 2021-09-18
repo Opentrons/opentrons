@@ -1,3 +1,5 @@
+from opentrons.protocol_api import ProtocolContext
+
 metadata = {
     "protocolName": "Extraction",
     "author": "Opentrons <protocols@opentrons.com>",
@@ -5,7 +7,7 @@ metadata = {
 }
 
 
-def run(ctx):
+def run(ctx: ProtocolContext) -> None:
     magdeck = ctx.load_module("magnetic module gen2", "6")
     magdeck.load_labware("nest_96_wellplate_2ml_deep", "deepwell plate")
     tempdeck = ctx.load_module("Temperature Module Gen2", "1")

@@ -10,7 +10,7 @@ import {
   RobotCoordsForeignDiv,
 } from '@opentrons/components'
 import { getLatestLabwareDef, getLegacyLabwareDef } from './getLabware'
-import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
+import { getDeckDefinitions } from '@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions'
 import type { ModuleModel, DeckSlotId } from '@opentrons/shared-data'
 
 // URI-encoded JSON expected as URL param "data" (eg `?data=...`)

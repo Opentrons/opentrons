@@ -7,9 +7,9 @@ from fastapi.testclient import TestClient
 from httpx import AsyncClient
 
 from tests.helpers import verify_response
-from robot_server.sessions.session_view import SessionView, BasicSessionCreateData
+from robot_server.sessions.session_models import BasicSessionCreateData
+from robot_server.sessions.session_view import SessionView
 from robot_server.sessions.engine_store import EngineStore, EngineMissingError
-
 from robot_server.sessions.session_store import (
     SessionStore,
     SessionNotFoundError,

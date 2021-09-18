@@ -100,7 +100,7 @@ def test_move_to_well_without_optional_params():
         _move_to_well(instruments, mock.sentinel.loaded_labware, params)
 
     assert pipette_mock.mock_calls == [
-        mock.call.move_to(well.bottom(), force_direct=None, minimum_z_height=None)
+        mock.call.move_to(well.bottom(), force_direct=False, minimum_z_height=None)
     ]
 
     assert mock_get_well.mock_calls == [mock.call(mock.sentinel.loaded_labware, params)]

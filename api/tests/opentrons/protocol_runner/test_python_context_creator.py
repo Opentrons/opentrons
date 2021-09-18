@@ -50,7 +50,7 @@ async def test_wires_protocol_context_to_engine(
         ),
     )
 
-    labware_location = protocol_engine.state_view.labware.get_labware_location(
+    labware_location = protocol_engine.state_view.labware.get_location(
         labware_id=result.labware_id
     )
 

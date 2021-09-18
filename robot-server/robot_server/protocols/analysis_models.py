@@ -5,12 +5,7 @@ from pydantic import BaseModel, Field
 from typing import List, Union
 from typing_extensions import Literal
 
-from opentrons.types import MountType
-from opentrons.protocol_engine import (
-    Command as EngineCommand,
-    PipetteName,
-    LabwareLocation,
-)
+from opentrons.protocol_engine import Command, LoadedLabware, LoadedPipette
 
 
 class AnalysisStatus(str, Enum):
@@ -52,23 +47,6 @@ class PendingAnalysis(AnalysisSummary):
     status: Literal[AnalysisStatus.PENDING] = AnalysisStatus.PENDING
 
 
-class AnalysisPipette(BaseModel):
-    """A pipette that the protocol is expected to use, based on the analysis."""
-
-    id: str
-    pipetteName: PipetteName
-    mount: MountType
-
-
-class AnalysisLabware(BaseModel):
-    """A labware that the protocol is expected to use, based on the analysis."""
-
-    id: str
-    loadName: str
-    definitionUri: str
-    location: LabwareLocation
-
-
 class CompletedAnalysis(AnalysisSummary):
     """A completed protocol run analysis.
 
@@ -95,15 +73,15 @@ class CompletedAnalysis(AnalysisSummary):
         ...,
         description="Whether the protocol is expected to run successfully",
     )
-    pipettes: List[AnalysisPipette] = Field(
+    pipettes: List[LoadedPipette] = Field(
         ...,
         description="Pipettes used by the protocol",
     )
-    labware: List[AnalysisLabware] = Field(
+    labware: List[LoadedLabware] = Field(
         ...,
         description="Labware used by the protocol",
     )
-    commands: List[EngineCommand] = Field(
+    commands: List[Command] = Field(
         ...,
         description="The protocol commands the run is expected to produce",
     )

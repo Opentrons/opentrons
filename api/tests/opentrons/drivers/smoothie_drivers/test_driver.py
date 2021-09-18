@@ -13,6 +13,7 @@ from opentrons.drivers.smoothie_drivers.constants import (
 from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
 
 from opentrons.drivers.smoothie_drivers import driver_3_0, constants
+from opentrons.drivers.smoothie_drivers.errors import SmoothieError
 
 
 @pytest.fixture
@@ -35,7 +36,7 @@ def smoothie(mock_connection: AsyncMock, sim_gpio) -> driver_3_0.SmoothieDriver:
     d = driver_3_0.SmoothieDriver(
         connection=mock_connection, config=robot_configs.load(), gpio_chardev=sim_gpio
     )
-    yield d
+    return d
 
 
 def position(x, y, z, a, b, c):
@@ -193,7 +194,7 @@ async def test_clear_limit_switch(
     mock_connection.send_command.side_effect = write_mock
 
     # This will cause a limit-switch error and not back off
-    with pytest.raises(driver_3_0.SmoothieError):
+    with pytest.raises(SmoothieError):
         await smoothie.move({"C": 100})
 
     assert [c.strip() for c in cmd_list] == [
@@ -269,7 +270,7 @@ async def test_home_flagged_axes(
     expected: str,
 ) -> None:
     """It should only home un-homed axes."""
-    smoothie.home = AsyncMock()
+    smoothie.home = AsyncMock()  # type: ignore[assignment]
     await smoothie.update_homed_flags(home_flags)
 
     await smoothie.home_flagged_axes(axes_string=axis_string)
@@ -289,7 +290,7 @@ async def test_home_flagged_axes_no_call(
     smoothie: driver_3_0.SmoothieDriver, home_flags: Dict[str, bool], axis_string: str
 ) -> None:
     """It should not home homed axes."""
-    smoothie.home = AsyncMock()
+    smoothie.home = AsyncMock()  # type: ignore[assignment]
     await smoothie.update_homed_flags(home_flags)
 
     await smoothie.home_flagged_axes(axes_string=axis_string)

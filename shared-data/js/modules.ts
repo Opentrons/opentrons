@@ -1,8 +1,8 @@
-import magneticModuleV1 from '../module/definitions/2/magneticModuleV1.json'
-import magneticModuleV2 from '../module/definitions/2/magneticModuleV2.json'
-import temperatureModuleV1 from '../module/definitions/2/temperatureModuleV1.json'
-import temperatureModuleV2 from '../module/definitions/2/temperatureModuleV2.json'
-import thermocyclerModuleV1 from '../module/definitions/2/thermocyclerModuleV1.json'
+import magneticModuleV1 from '../module/definitions/3/magneticModuleV1.json'
+import magneticModuleV2 from '../module/definitions/3/magneticModuleV2.json'
+import temperatureModuleV1 from '../module/definitions/3/temperatureModuleV1.json'
+import temperatureModuleV2 from '../module/definitions/3/temperatureModuleV2.json'
+import thermocyclerModuleV1 from '../module/definitions/3/thermocyclerModuleV1.json'
 
 import {
   MAGDECK,
@@ -15,63 +15,39 @@ import {
   THERMOCYCLER_MODULE_V1,
 } from './constants'
 
-import type { ModuleModel, ModuleRealType, ModuleType } from './types'
+import type {
+  ModuleModel,
+  ModuleModelWithLegacy,
+  ModuleType,
+  ModuleDefinition,
+} from './types'
 
-// The module objects in v2 Module Definitions representing a single module model
-interface Coordinates {
-  x: number
-  y: number
-  z?: number
-}
-
-type AffineTransform = [number, number, number]
-
-export interface ModuleDef2 {
-  moduleType: ModuleRealType
-  model: ModuleModel
-  labwareOffset: Coordinates
-  dimensions: {
-    bareOverallHeight: number
-    overLabwareHeight: number
-    lidHeight?: number
-  }
-  calibrationPoint: Coordinates
-  displayName: string
-  quirks: string[]
-  slotTransforms: {
-    [deckDef: string]: {
-      [slot: string]: {
-        [transformName: string]: AffineTransform
-      }
-    }
-  }
-  compatibleWith: ModuleModel[]
-}
-
-// TODO IMMEDIATELY: Phase out code that uses legacy models
-export const getModuleDef2 = (moduleModel: ModuleModel): ModuleDef2 => {
+// TODO: generate typescript types directly from JSON schema
+export const getModuleDef2 = (moduleModel: ModuleModel): ModuleDefinition => {
   switch (moduleModel) {
     case MAGNETIC_MODULE_V1:
-      return magneticModuleV1 as ModuleDef2
+      return magneticModuleV1 as ModuleDefinition
 
     case MAGNETIC_MODULE_V2:
-      return (magneticModuleV2 as unknown) as ModuleDef2
+      return (magneticModuleV2 as unknown) as ModuleDefinition
 
     case TEMPERATURE_MODULE_V1:
-      return temperatureModuleV1 as ModuleDef2
+      return temperatureModuleV1 as ModuleDefinition
 
     case TEMPERATURE_MODULE_V2:
-      return (temperatureModuleV2 as unknown) as ModuleDef2
+      return (temperatureModuleV2 as unknown) as ModuleDefinition
 
     case THERMOCYCLER_MODULE_V1:
-      return thermocyclerModuleV1 as ModuleDef2
+      return thermocyclerModuleV1 as ModuleDefinition
 
     default:
       throw new Error(`Invalid module model ${moduleModel as string}`)
   }
 }
 
-export function normalizeModuleModel(legacyModule: ModuleType): ModuleModel {
+export function normalizeModuleModel(
+  legacyModule: ModuleModelWithLegacy
+): ModuleModel {
   switch (legacyModule) {
     case TEMPDECK:
       return TEMPERATURE_MODULE_V1
@@ -87,7 +63,7 @@ export function normalizeModuleModel(legacyModule: ModuleType): ModuleModel {
   }
 }
 
-export function getModuleType(moduleModel: ModuleModel): ModuleRealType {
+export function getModuleType(moduleModel: ModuleModel): ModuleType {
   return getModuleDef2(moduleModel).moduleType
 }
 

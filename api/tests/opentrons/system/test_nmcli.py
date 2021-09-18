@@ -180,13 +180,13 @@ GENERAL.STATE:100 (connected)"""
         "type": "ethernet",
     }
 
-    async def mock_call(cmd):
+    async def dummy_error_mock_call(cmd):
         if "connectivity" in cmd:
             return "full", ""
         else:
             return "", "this is a dummy error"
 
-    monkeypatch.setattr(nmcli, "_call", mock_call)
+    monkeypatch.setattr(nmcli, "_call", dummy_error_mock_call)
     assert await nmcli.is_connected() == "full"
     with pytest.raises(ValueError, match="this is a dummy error"):
         await nmcli.iface_info(nmcli.NETWORK_IFACES.WIFI)

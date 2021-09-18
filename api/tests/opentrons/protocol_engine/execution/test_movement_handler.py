@@ -7,8 +7,8 @@ from opentrons.hardware_control.api import API as HardwareAPI
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons.motion_planning import Waypoint
 
-from opentrons.protocol_engine import DeckLocation, WellLocation, WellOrigin
-from opentrons.protocol_engine.state import StateStore, PipetteLocationData
+from opentrons.protocol_engine import WellLocation, WellOrigin
+from opentrons.protocol_engine.state import StateStore, PipetteLocationData, CurrentWell
 from opentrons.protocol_engine.execution.movement import MovementHandler
 
 
@@ -42,7 +42,7 @@ async def test_move_to_well(
     decoy.when(
         state_store.motion.get_pipette_location(
             pipette_id="pipette-id",
-            current_location=None,
+            current_well=None,
         )
     ).then_return(
         PipetteLocationData(
@@ -71,7 +71,7 @@ async def test_move_to_well(
             labware_id="labware-id",
             well_name="B2",
             well_location=well_location,
-            current_location=None,
+            current_well=None,
         )
     ).then_return(
         [Waypoint(Point(1, 2, 3), CriticalPoint.XY_CENTER), Waypoint(Point(4, 5, 6))]
@@ -105,14 +105,16 @@ async def test_move_to_well_from_starting_location(
     """It should be able to move to a well from a start location."""
     well_location = WellLocation(origin=WellOrigin.BOTTOM, offset=(0, 0, 1))
 
-    current_location = DeckLocation(
-        pipette_id="pipette-id", labware_id="labware-id", well_name="B2"
+    current_well = CurrentWell(
+        pipette_id="pipette-id",
+        labware_id="labware-id",
+        well_name="B2",
     )
 
     decoy.when(
         state_store.motion.get_pipette_location(
             pipette_id="pipette-id",
-            current_location=current_location,
+            current_well=current_well,
         )
     ).then_return(
         PipetteLocationData(
@@ -134,7 +136,7 @@ async def test_move_to_well_from_starting_location(
 
     decoy.when(
         state_store.motion.get_movement_waypoints(
-            current_location=current_location,
+            current_well=current_well,
             origin=Point(1, 2, 5),
             origin_cp=CriticalPoint.XY_CENTER,
             max_travel_z=42.0,
@@ -150,7 +152,7 @@ async def test_move_to_well_from_starting_location(
         labware_id="labware-id",
         well_name="B2",
         well_location=well_location,
-        current_location=current_location,
+        current_well=current_well,
     )
 
     decoy.verify(

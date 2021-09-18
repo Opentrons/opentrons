@@ -16,6 +16,7 @@ import {
   DISPLAY_FLEX,
   DIRECTION_COLUMN,
   JUSTIFY_FLEX_END,
+  FONT_SIZE_TINY,
 } from '@opentrons/components'
 interface LabwareInfoProps {
   displayName: string
@@ -31,10 +32,10 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element => {
       flexDirection={'column'}
       backgroundColor={OVERLAY_BLACK_90}
       borderRadius={`0 0 0.4rem 0.4rem`}
-      fontSize={'0.5rem'}
+      fontSize={FONT_SIZE_TINY}
       color={C_WHITE}
     >
-      <Text margin={SPACING_1}>{displayName}</Text>
+      <Text margin={SPACING_1} >{displayName}</Text>
       <Text
         marginX={SPACING_1}
         fontWeight={FONT_WEIGHT_SEMIBOLD}
@@ -91,19 +92,19 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element => {
 }
 
 interface LabwareInfoOverlayProps {
-  x: number
-  y: number
   definition: LabwareDefinition2
 }
 export const LabwareInfoOverlay = (
   props: LabwareInfoOverlayProps
 ): JSX.Element => {
-  const { x, y, definition } = props
+  const { definition } = props
   const width = definition.dimensions.xDimension
   const height = definition.dimensions.yDimension
   return (
     <RobotCoordsForeignDiv
-      {...{ x, y, width, height }}
+      x={0}
+      y={0}
+      {...{width, height }}
       innerDivProps={{
         display: DISPLAY_FLEX,
         flexDirection: DIRECTION_COLUMN,

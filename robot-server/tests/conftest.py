@@ -61,12 +61,12 @@ def current_time() -> datetime:
 
 
 @pytest.fixture
-def hardware():
+def hardware() -> MagicMock:
     return MagicMock(spec=API)
 
 
 @pytest.fixture
-def override_hardware(hardware):
+def override_hardware(hardware: MagicMock):
     async def get_hardware_override() -> HardwareAPILike:
         """Override for get_hardware dependency"""
         return hardware

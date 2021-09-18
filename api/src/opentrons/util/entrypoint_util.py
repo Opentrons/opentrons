@@ -4,7 +4,7 @@
 import logging
 from json import JSONDecodeError
 import pathlib
-from typing import Dict, List, TYPE_CHECKING
+from typing import Dict, Sequence, Union, TYPE_CHECKING
 
 from jsonschema import ValidationError  # type: ignore
 
@@ -16,7 +16,9 @@ if TYPE_CHECKING:
 log = logging.getLogger(__name__)
 
 
-def labware_from_paths(paths: List[str]) -> Dict[str, "LabwareDefinition"]:
+def labware_from_paths(
+    paths: Sequence[Union[str, pathlib.Path]]
+) -> Dict[str, "LabwareDefinition"]:
     labware_defs: Dict[str, "LabwareDefinition"] = {}
 
     for strpath in paths:
@@ -44,7 +46,7 @@ def labware_from_paths(paths: List[str]) -> Dict[str, "LabwareDefinition"]:
     return labware_defs
 
 
-def datafiles_from_paths(paths: List[str]) -> Dict[str, bytes]:
+def datafiles_from_paths(paths: Sequence[Union[str, pathlib.Path]]) -> Dict[str, bytes]:
     datafiles: Dict[str, bytes] = {}
     for strpath in paths:
         log.info(f"data files: checking path {strpath}")

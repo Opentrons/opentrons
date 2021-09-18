@@ -9,9 +9,9 @@ from opentrons.protocols.context.protocol_api.protocol_context import (
 )
 
 try:
-    import aionotify
+    import aionotify  # type: ignore[import]
 except (OSError, ModuleNotFoundError):
-    aionotify = None  # type: ignore
+    aionotify = None
 import asyncio
 import os
 import io
@@ -32,6 +32,7 @@ from opentrons.hardware_control import API, ThreadManager, ThreadedAsyncLock
 from opentrons.protocol_api import ProtocolContext
 from opentrons.types import Mount, Location, Point
 
+from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 Session = namedtuple("Session", ["server", "socket", "token", "call"])
 
@@ -185,15 +186,18 @@ async def hardware(request, loop, virtual_smoothie_env):
 @pytest.fixture
 def main_router(loop, virtual_smoothie_env, hardware):
     router = MainRouter(hardware=hardware, loop=loop, lock=ThreadedAsyncLock())
-    router.wait_until = partial(
+    # TODO(mc, 2021-09-12): What is this mocking? `MainRouter` does not
+    # have a `wait_until` method
+    router.wait_until = partial(  # type: ignore[attr-defined]
         wait_until, notifications=router.notifications, loop=loop
     )
     yield router
 
 
 async def wait_until(matcher, notifications, timeout=1, loop=None):
-    result = []
-    for coro in iter(notifications.__anext__, None):
+    # TODO(mc, 2021-09-03): see TODO above about `wait_until`
+    result = []  # type: ignore[var-annotated]
+    for coro in iter(notifications.__anext__, None):  # type: ignore[var-annotated]
         done, pending = await asyncio.wait([coro], timeout=timeout)
 
         if pending:
@@ -217,6 +221,9 @@ def data_dir() -> str:
     return os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
 
+Model = namedtuple("Model", ["robot", "instrument", "container"])
+
+
 def build_v2_model(h, lw_name, loop):
     ctx = ProtocolContext(
         implementation=ProtocolContextImplementation(hardware=h), loop=loop
@@ -228,7 +235,8 @@ def build_v2_model(h, lw_name, loop):
     instrument = models.Instrument(pip, [], ctx)
     plate = ctx.load_labware(lw_name or "corning_96_wellplate_360ul_flat", 1)
     container = models.Container(plate, [], context=ctx)
-    return namedtuple("model", "robot instrument container")(
+
+    return Model(
         robot=h,
         instrument=instrument,
         container=container,
@@ -414,7 +422,7 @@ def get_bundle_fixture():
         if fixture_name == "simple_bundle":
             with open(fixture_dir / "protocol.py", "r") as f:
                 result["contents"] = f.read()
-            with open(fixture_dir / "data.txt", "rb") as f:
+            with open(fixture_dir / "data.txt", "rb") as f:  # type: ignore[assignment]
                 result["bundled_data"] = {"data.txt": f.read()}
             with open(fixture_dir / "custom_labware.json", "r") as f:
                 custom_labware = json.load(f)
@@ -492,7 +500,7 @@ def get_bundle_fixture():
 
 
 @pytest.fixture
-def minimal_labware_def() -> dict:
+def minimal_labware_def() -> LabwareDefinition:
     return {
         "metadata": {
             "displayName": "minimal labware",
@@ -537,7 +545,7 @@ def minimal_labware_def() -> dict:
 
 
 @pytest.fixture
-def minimal_labware_def2() -> dict:
+def minimal_labware_def2() -> LabwareDefinition:
     return {
         "metadata": {
             "displayName": "other test labware",

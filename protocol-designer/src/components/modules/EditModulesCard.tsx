@@ -4,7 +4,7 @@ import { Card } from '@opentrons/components'
 import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
-  ModuleRealType,
+  ModuleType,
 } from '@opentrons/shared-data'
 import {
   selectors as stepFormSelectors,
@@ -21,7 +21,7 @@ import styles from './styles.css'
 export interface Props {
   modules: ModulesForEditModulesCard
   openEditModuleModal: (
-    moduleType: ModuleRealType,
+    moduleType: ModuleType,
     moduleId?: string
   ) => unknown
 }
