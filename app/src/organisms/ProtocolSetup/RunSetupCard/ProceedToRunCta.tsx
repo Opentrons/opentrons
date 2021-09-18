@@ -47,21 +47,19 @@ export const ProceedToRunCta = (
     missingModuleIds.length > 0 && pipettesCalibrated === false
 
   let proceedToRunDisabledReason = null
-  if (calibrationIncomplete) {
+  if (moduleAndCalibrationIncomplete) {
     proceedToRunDisabledReason = t(
-      'proceed_to_run_disabled_calibration_not_complete_tooltip'
-    )
-  } else if (moduleAndCalibrationIncomplete) {
-    proceedToRunDisabledReason = t(
-      'proceed_to_run_disabled_modules_and_calibration_not_complete_tooltip',
+      'proceed_to_run_disabled_modules_and_calibration_not_complete',
       { count: missingModuleIds.length }
+    )
+  } else if (calibrationIncomplete) {
+    proceedToRunDisabledReason = t(
+      'proceed_to_run_disabled_calibration_not_complete'
     )
   } else if (moduleSetupIncomplete) {
     proceedToRunDisabledReason = t(
-      'proceed_to_run_disabled_modules_not_connected_tooltip',
-      {
-        count: missingModuleIds.length,
-      }
+      'proceed_to_run_disabled_modules_not_connected',
+      { count: missingModuleIds.length }
     )
   }
 

@@ -27,6 +27,12 @@ const mockGetAttachedModules = getAttachedModules as jest.MockedFunction<
   typeof getAttachedModules
 >
 
+const mockMagneticModuleDef = {
+  labwareOffset: { x: 5, y: 5, z: 5 },
+  moduleId: 'someMagneticModule',
+  model: 'magneticModuleV2' as ModuleModel,
+  type: 'magneticModuleType' as ModuleType,
+}
 const MOCK_MODULE_MISSING_ID = ['temperatureModuleV1']
 
 describe('useMissingModuleIds', () => {
@@ -49,18 +55,30 @@ describe('useMissingModuleIds', () => {
     jest.restoreAllMocks()
   })
 
-  it('should return no missing Module Ids', () => {
+  it('should return no missing Module Ids if all modules present', () => {
     const wrapper: React.FunctionComponent<{}> = ({ children }) => (
       <Provider store={store}>{children}</Provider>
     )
     const { result } = renderHook(useMissingModuleIds, { wrapper })
     const missingModuleIds = result.current
     expect(missingModuleIds).toStrictEqual([])
-    expect(typeof useMissingModuleIds).toBe('function')
   })
-  it('should return 1 missing Module Ids', () => {
-    const missingModuleIds = MOCK_MODULE_MISSING_ID
-    expect(missingModuleIds).toStrictEqual(['temperatureModuleV1'])
-    expect(typeof useMissingModuleIds).toBe('function')
+  it('should return 1 missing moduleId if requested model not attached', () => {
+    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+      <Provider store={store}>{children}</Provider>
+    )
+    const moduleId = 'fakeMagModuleId'
+    when(mockUseModuleRenderInfoById).calledWith().mockReturnValue({
+      [moduleId]: {
+        x: 0,
+        y: 0,
+        z: 0,
+        moduleDef: mockMagneticModuleDef as any,
+        nestedLabwareDef: null
+      }
+    })
+
+    const { result } = renderHook(useMissingModuleIds, { wrapper })
+    expect(result.current).toStrictEqual([moduleId])
   })
 })

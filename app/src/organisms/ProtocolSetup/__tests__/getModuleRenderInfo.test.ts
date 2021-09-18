@@ -31,7 +31,6 @@ describe('getModuleRenderInfo', () => {
     const TC_LW_ID =
       'b0103540-3412-11eb-ad93-ed232a2337cf:opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1'
 
-
     const expectedInfo = {
       [MAG_MOD_ID]: {
         x: SLOT_1_COORDS[0],

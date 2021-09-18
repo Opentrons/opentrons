@@ -60,21 +60,21 @@ describe('ProceedToRunCta', () => {
     )
   })
 
-  it('should enabled with no tooltip if there are no missing Ids', () => {
+  it('should br enabled with no tooltip if there are no missing Ids', () => {
     mockUseMissingModuleIds.mockReturnValue([])
     const { getByRole } = render(props)
     expect(typeof ProceedToRunCta).toBe('function')
     const button = getByRole('button', { name: 'Proceed to Run' })
     expect(button).not.toHaveAttribute('disabled')
   })
-  it('should be enabled with modules not connected tooltip and a missing Id', () => {
+  it('should be disabled with modules not connected tooltip when there are missing moduleIdd', () => {
     mockUseMissingModuleIds.mockReturnValue(['temperatureModuleV1'])
     const { getByRole } = render(props)
     expect(typeof ProceedToRunCta).toBe('function')
     const button = getByRole('button', { name: 'Proceed to Run' })
     expect(button).toHaveAttribute('disabled')
   })
-  it('should be enabled with modules not connected and calibration not complete tooltip', () => {
+  it('should be disabled with modules not connected and calibration not completed tooltip if missing cal and moduleIds', () => {
     mockUseMissingModuleIds.mockReturnValue(['temperatureModuleV1'])
     mockGetProtocolPipetteTiprackData.mockReturnValue({
       left: MOCK_PIPETTE_NOT_CALIBRATED,
@@ -85,7 +85,7 @@ describe('ProceedToRunCta', () => {
     const button = getByRole('button', { name: 'Proceed to Run' })
     expect(button).toHaveAttribute('disabled')
   })
-  it('should be enabled with calibration not complete tooltip', () => {
+  it('should be disabled with calibration not complete tooltip', () => {
     mockGetProtocolPipetteTiprackData.mockReturnValue({
       left: MOCK_PIPETTE_NOT_CALIBRATED,
       right: null,

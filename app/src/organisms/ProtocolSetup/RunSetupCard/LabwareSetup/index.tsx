@@ -7,7 +7,6 @@ import {
   LabwareRender,
   Link,
   Module,
-  PrimaryBtn,
   RobotWorkSpace,
   SecondaryBtn,
   Text,
@@ -15,7 +14,6 @@ import {
   DIRECTION_COLUMN,
   FONT_SIZE_BODY_1,
   JUSTIFY_CENTER,
-  SPACING_4,
   SPACING_3,
   C_BLUE,
   C_DARK_GRAY,
@@ -49,7 +47,6 @@ export const LabwareSetup = (): JSX.Element | null => {
   const moduleRenderInfoById = useModuleRenderInfoById()
   const labwareRenderInfoById = useLabwareRenderInfoById()
   const { t } = useTranslation('protocol_setup')
-  const [targetProps, tooltipProps] = useHoverTooltip()
   const [
     showLabwareHelpModal,
     setShowLabwareHelpModal,
@@ -59,10 +56,6 @@ export const LabwareSetup = (): JSX.Element | null => {
   const moduleTypesThatRequireExtraAttention = getModuleTypesThatRequireExtraAttention(
     moduleModels
   )
-  const proceedToRunDisabled = false
-  const proceedToRunDisabledReason = 'replace with actual tooltip text'
-  const LinkComponent = proceedToRunDisabled ? 'button' : NavLink
-  const linkProps = proceedToRunDisabled ? {} : { to: '/run' }
   return (
     <React.Fragment>
       {showLabwareHelpModal && (
