@@ -30,6 +30,7 @@ import { RunSetupCard } from '../RunSetupCard'
 import { ModuleSetup } from '../RunSetupCard/ModuleSetup'
 import { LabwareSetup } from '../RunSetupCard/LabwareSetup'
 import { RobotCalibration } from '../RunSetupCard/RobotCalibration'
+import { ProceedToRunCta } from '../RunSetupCard/ProceedToRunCta'
 
 import type {
   AttachedPipettesByMount,
@@ -45,6 +46,7 @@ jest.mock('../RunSetupCard/LabwareSetup')
 jest.mock('../RunSetupCard/ModuleSetup')
 jest.mock('../RunSetupCard/RobotCalibration')
 jest.mock('../utils/getModuleRenderInfo')
+jest.mock('../RunSetupCard/ProceedToRunCta')
 jest.mock('../utils/getLabwareRenderInfo')
 
 const mockAttachedPipettes: AttachedPipettesByMount = {
@@ -63,6 +65,7 @@ const mockGetProtocolData = protocolSelectors.getProtocolData as jest.MockedFunc
 const mockLabwareSetup = LabwareSetup as jest.MockedFunction<typeof LabwareSetup>
 const mockModuleSetup = ModuleSetup as jest.MockedFunction<typeof ModuleSetup>
 const mockRobotCalibration = RobotCalibration as jest.MockedFunction<typeof RobotCalibration>
+const mockProceedToRun = ProceedToRunCta as jest.MockedFunction<typeof ProceedToRunCta>
 const mockGetConnectedRobot = discoverySelectors.getConnectedRobot as jest.MockedFunction<
   typeof discoverySelectors.getConnectedRobot
 >
@@ -118,6 +121,14 @@ describe('RunSetupCard', () => {
     render = () => {
       return renderWithProviders(<RunSetupCard />, { i18nInstance: i18n })
     }
+    when(mockProceedToRun)
+      .mockReturnValue(<div></div>)
+      .calledWith(
+        componentPropsMatcher({
+          robotName: mockConnectedRobot.name,
+        })
+      )
+      .mockReturnValue(<div>Mock Proceed To Run</div>)
   })
 
   afterEach(() => {
@@ -146,6 +157,7 @@ describe('RunSetupCard', () => {
 
   it('renders module setup and allows the user to proceed to labware setup', () => {
     mockGetProtocolData.mockReturnValue(withModulesProtocol as any)
+
     const { getByRole, getByText } = render()
     const moduleSetupHeading = getByRole('heading', { name: 'Module Setup' })
     fireEvent.click(moduleSetupHeading)
@@ -215,5 +227,18 @@ describe('RunSetupCard', () => {
         'Plug in and power up the required module via the OT-2 USB Port. Place the module as shown in the deck map.'
       )
     ).toBeTruthy()
+  })
+  it('renders robot calibration by default, skips module setup, renders labware setup heading, and allows the user to proceed to run', () => {
+    const { getByRole, getByText } = render()
+    getByRole('heading', {
+      name: 'Robot Calibration',
+    })
+    getByText('Mock Robot Calibration')
+    getByRole('heading', {
+      name: 'Labware Setup',
+    })
+    const proceedToRun = getByText('Mock Proceed To Run')
+    fireEvent.click(proceedToRun)
+    getByText('Mock Proceed To Run')
   })
 })

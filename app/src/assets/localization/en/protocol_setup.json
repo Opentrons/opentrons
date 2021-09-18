@@ -47,5 +47,10 @@
   "no_usb_port_yet": "No USB Port Yet",
   "usb_port_connected": "USB Port {{port}}",
   "hub_port_connected": "USB Port {{port}} via hub",
-  "usb_connected_no_port_info": "USB Port Connected"
+  "usb_connected_no_port_info": "USB Port Connected",
+  "proceed_to_run_disabled_modules_not_connected": "Make sure the module is connected before proceeding to run",
+  "proceed_to_run_disabled_modules_not_connected_plural": "Make sure all modules are connected before proceeding to run",
+  "proceed_to_run_disabled_calibration_not_complete": "Make sure robot calibration is complete before proceeding to run",
+  "proceed_to_run_disabled_modules_and_calibration_not_complete": "Make sure robot calibration is complete and the module is connected before proceeding to run",
+  "proceed_to_run_disabled_modules_and_calibration_not_complete_plural": "Make sure robot calibration is complete and all modules are connected before proceeding to run"
 }

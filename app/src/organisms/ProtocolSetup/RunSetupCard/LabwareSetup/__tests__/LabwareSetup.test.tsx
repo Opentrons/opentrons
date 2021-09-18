@@ -22,11 +22,15 @@ import { LabwareSetupModal } from '../LabwareSetupModal'
 import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
 import { ExtraAttentionWarning } from '../ExtraAttentionWarning'
 import { getModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
+import { getProtocolPipetteTipRackCalInfo } from '../../../../../redux/pipettes/selectors'
 import { useModuleRenderInfoById, useLabwareRenderInfoById } from '../../../hooks'
 
+jest.mock('../../../../../redux/modules')
+jest.mock('../../../../../redux/pipettes/selectors')
 jest.mock('../LabwareSetupModal')
 jest.mock('../LabwareInfoOverlay')
 jest.mock('../ExtraAttentionWarning')
+jest.mock('../../../hooks')
 jest.mock('../utils/getModuleTypesThatRequireExtraAttention')
 jest.mock('../../../hooks')
 jest.mock('@opentrons/components', () => {
@@ -45,7 +49,6 @@ jest.mock('@opentrons/shared-data', () => {
     inferModuleOrientationFromXCoordinate: jest.fn(),
   }
 })
-
 const mockLabwareInfoOverlay = LabwareInfoOverlay as jest.MockedFunction<
   typeof LabwareInfoOverlay
 >
@@ -55,6 +58,7 @@ const mockModule = Module as jest.MockedFunction<typeof Module>
 const mockInferModuleOrientationFromXCoordinate = inferModuleOrientationFromXCoordinate as jest.MockedFunction<
   typeof inferModuleOrientationFromXCoordinate
 >
+
 const mockRobotWorkSpace = RobotWorkSpace as jest.MockedFunction<typeof RobotWorkSpace>
 const mockLabwareRender = LabwareRender as jest.MockedFunction<typeof LabwareRender>
 const mockLabwareSetupModal = LabwareSetupModal as jest.MockedFunction<
@@ -69,6 +73,10 @@ const mockExtraAttentionWarning = ExtraAttentionWarning as jest.MockedFunction<
 const mockUseLabwareRenderInfoById = useLabwareRenderInfoById as jest.MockedFunction<typeof useLabwareRenderInfoById>
 const mockUseModuleRenderInfoById = useModuleRenderInfoById as jest.MockedFunction<typeof useModuleRenderInfoById>
 
+
+const mockGetProtocolPipetteTipRackCalInfo = getProtocolPipetteTipRackCalInfo as jest.MockedFunction<
+  typeof getProtocolPipetteTipRackCalInfo
+>
 
 const deckSlotsById = standardDeckDef.locations.orderedSlots.reduce(
   (acc, deckSlot) => ({ ...acc, [deckSlot.id]: deckSlot }),
@@ -91,6 +99,7 @@ const MOCK_300_UL_TIPRACK_ID = '300_ul_tiprack_id'
 const MOCK_MAGNETIC_MODULE_COORDS = [10, 20, 0]
 const MOCK_TC_COORDS = [20, 30, 0]
 const MOCK_300_UL_TIPRACK_COORDS = [30, 40, 0]
+const MOCK_ROBOT_NAME = 'ot-dev'
 
 const mockMagneticModule = {
   labwareOffset: { x: 5, y: 5, z: 5 },
@@ -166,6 +175,23 @@ describe('LabwareSetup', () => {
           })}
         </svg>
       ))
+
+    when(mockGetProtocolPipetteTipRackCalInfo)
+      .calledWith(undefined as any, MOCK_ROBOT_NAME)
+      .mockReturnValue({
+        left: {
+          exactPipetteMatch: 'compatible',
+          pipetteCalDate: 'abcde',
+          pipetteDisplayName: 'Left Pipette',
+          tipRacks: [
+            {
+              displayName: 'Mock TipRack Definition',
+              lastModifiedDate: null,
+            },
+          ],
+        },
+        right: null,
+      })
   })
 
   afterEach(() => {
@@ -216,9 +242,12 @@ describe('LabwareSetup', () => {
 
     const { getByText } = render()
     expect(mockModule).not.toHaveBeenCalled()
+    expect(mockLabwareRender).toHaveBeenCalled()
+    expect(mockLabwareInfoOverlay).toHaveBeenCalled()
     getByText('mock labware render of 300ul Tiprack FIXTURE')
     getByText('mock labware info overlay of 300ul Tiprack FIXTURE')
   })
+
   it('should render a deck WITH labware and WITH modules', () => {
     when(mockUseLabwareRenderInfoById).calledWith().mockReturnValue({
       [MOCK_300_UL_TIPRACK_ID]: {
@@ -273,10 +302,13 @@ describe('LabwareSetup', () => {
     getByText('mock labware info overlay of 300ul Tiprack FIXTURE')
   })
   it('should render the labware position check text', () => {
-    const { getByText } = render()
+    const { getByText, getByRole } = render()
 
+    getByRole('heading', {
+      name: 'Labware Position Check',
+    })
     getByText(
-      'Labware Position Check is an optional workflow that guides you through checking the position of each labware on the deck. During this check, you can make an offset adjustment to the overall position of the labware.'
+      'This workflow guides you through checking the position of each labware on the deck. Any adjustments you make will be saved as offset data for this protocol.'
     )
   })
   it('should render the extra attention warning when there are modules/labware that need extra attention', () => {

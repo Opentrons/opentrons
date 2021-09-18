@@ -12,6 +12,7 @@ import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_stand
 import { getProtocolData } from '../../../redux/protocol'
 import { Divider } from '../../../atoms/structure'
 import { CollapsibleStep } from './CollapsibleStep'
+import { ProceedToRunCta } from './ProceedToRunCta'
 import { LabwareSetup } from './LabwareSetup'
 import { ModuleSetup } from './ModuleSetup'
 import { useModuleRenderInfoById, useLabwareRenderInfoById } from '../hooks'
@@ -105,6 +106,8 @@ export function RunSetupCard(): JSX.Element | null {
           </CollapsibleStep>
         </React.Fragment>
       ))}
+      <Divider marginY={SPACING_3} />
+      <ProceedToRunCta robotName={robot.name} />
     </Card>
   )
 }

@@ -8,9 +8,8 @@ import {
   getModuleDef2,
 } from '@opentrons/shared-data'
 import { getProtocolData } from '../../../redux/protocol'
-import { protocol } from 'electron'
 
-export type ModuleRenderInfoById = {
+export interface ModuleRenderInfoById {
   [moduledId: string]: {
     x: number
     y: number

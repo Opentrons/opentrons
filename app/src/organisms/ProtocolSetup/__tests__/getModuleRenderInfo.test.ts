@@ -6,7 +6,6 @@ import {
   JsonProtocolFile,
   LabwareDefinition2,
 } from '@opentrons/shared-data'
-import { Labware } from '../../../redux/robot'
 
 const protocolWithMagTempTC = _protocolWithMagTempTC as JsonProtocolFile
 const standardDeckDef = _standardDeckDef as any
