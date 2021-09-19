@@ -2,8 +2,6 @@ import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import map from 'lodash/map'
-import reduce from 'lodash/reduce'
-import isEmpty from 'lodash/isEmpty'
 import {
   Flex,
   Btn,
@@ -35,7 +33,6 @@ import {useModuleRenderInfoById} from '../../hooks'
 import styles from '../../styles.css'
 
 import type { State, Dispatch } from '../../../../redux/types'
-import type { AttachedModule } from '../../../../redux/modules/types'
 
 const DECK_LAYER_BLOCKLIST = [
   'calibrationMarkings',
@@ -119,8 +116,10 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
               {map(moduleRenderInfoById, ({ x, y, moduleDef}) => {
                 const {model} = moduleDef
                 const attachedModuleMatch = attachedModules.find(
-                  attachedModule => getModuleType(model) === getModuleType(attachedModule.model)
+                  attachedModule => model === attachedModule.model
                 )
+                console.log({attachedModuleMatch})
+                console.log({model, isAttached: attachedModuleMatch != null, port: attachedModuleMatch?.usbPort.port, hub: attachedModuleMatch?.usbPort.hub})
                 return (
                   <React.Fragment
                     key={`LabwareSetup_Module_${model}_${x}${y}`}
