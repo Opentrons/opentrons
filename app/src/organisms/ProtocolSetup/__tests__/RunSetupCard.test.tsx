@@ -4,6 +4,7 @@ import '@testing-library/jest-dom'
 import { fireEvent } from '@testing-library/react'
 import {
   componentPropsMatcher,
+  partialComponentPropsMatcher,
   renderWithProviders,
 } from '@opentrons/components/__utils__'
 import noModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/simpleV4.json'
@@ -103,14 +104,12 @@ describe('RunSetupCard', () => {
     mockGetProtocolCalibrationComplete.mockReturnValue({ complete: true })
     mockGetProtocolData.mockReturnValue(noModulesProtocol as any)
 
-    when(mockLabwareSetup)
-      .mockReturnValue(<div></div>) // this (default) empty div will be returned when LabwareSetup isn't called with expected props
-      .calledWith()
-      .mockReturnValue(<div>Mock Labware Setup</div>)
+    mockLabwareSetup.mockReturnValue(<div>Mock Labware Setup</div>)
+
     when(mockModuleSetup)
       .mockReturnValue(<div></div>) // this (default) empty div will be returned when ModuleSetup isn't called with expected props
       .calledWith(
-        componentPropsMatcher({
+        partialComponentPropsMatcher({
           expandLabwareSetupStep: expect.anything(),
           robotName: mockConnectedRobot.name,
         })
@@ -121,7 +120,7 @@ describe('RunSetupCard', () => {
     when(mockRobotCalibration)
       .mockReturnValue(<div></div>) // this (default) empty div will be returned when RobotCalibration isn't called with expected props
       .calledWith(
-        componentPropsMatcher({
+        partialComponentPropsMatcher({
           robot: mockConnectedRobot,
         })
       )
