@@ -102,7 +102,6 @@ const MOCK_300_UL_TIPRACK_ID = '300_ul_tiprack_id'
 const MOCK_MAGNETIC_MODULE_COORDS = [10, 20, 0]
 const MOCK_TC_COORDS = [20, 30, 0]
 const MOCK_300_UL_TIPRACK_COORDS = [30, 40, 0]
-const MOCK_ROBOT_NAME = 'ot-dev'
 
 const mockMagneticModule = {
   labwareOffset: { x: 5, y: 5, z: 5 },

@@ -14,17 +14,13 @@ import {
   FONT_SIZE_CAPTION,
   COLOR_ERROR,
   COLOR_SUCCESS,
-  C_NEAR_WHITE,
   ALIGN_CENTER,
   JUSTIFY_CENTER,
   FONT_WEIGHT_SEMIBOLD,
   C_DARK_GRAY,
 } from '@opentrons/components'
 import {
-  getModuleType,
   ModuleModel,
-  getModuleVizDims,
-  STD_SLOT_X_DIM as SLOT_X,
   getModuleDisplayName,
   getModuleDef2,
 } from '@opentrons/shared-data'

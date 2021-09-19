@@ -20,10 +20,7 @@ import {
   Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
-import {
-  getModuleType,
-  inferModuleOrientationFromXCoordinate,
-} from '@opentrons/shared-data'
+import { inferModuleOrientationFromXCoordinate } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 import { useMissingModuleIds } from '../hooks'
 import { fetchModules, getAttachedModules } from '../../../../redux/modules'

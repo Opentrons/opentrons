@@ -305,7 +305,7 @@ export type AffineTransformMatrix = [
   [number, number, number]
 ]
 
-export type SlotTransforms = {
+export interface SlotTransforms {
   [deckOtId: string]: {
     [slotId: string]: {
       [transformKey in keyof ModuleDefinition]?: AffineTransformMatrix

@@ -17,7 +17,7 @@ export default {
 
 const Template: Story<ThermocyclerVizProps> = args => {
   return (
-    <RobotWorkSpace deckDef={getDeckDefinitions()['ot2_standard']}>
+    <RobotWorkSpace deckDef={getDeckDefinitions().ot2_standard}>
       {({ deckSlotsById }: RobotWorkSpaceRenderProps) => {
         const slot = deckSlotsById['7']
         const [x, y] = slot.position

@@ -9,19 +9,11 @@ const standardDeckDef = _standardDeckDef as any
 describe('getLabwareRenderInfo', () => {
   it('should gather labware coordinates with module offsets', () => {
     // these are just taken from the ot-2 deck def for readability
-    const SLOT_1_COORDS = [0, 0, 0]
     const SLOT_2_COORDS = [132.5, 0.0, 0.0]
-    const SLOT_3_COORDS = [265.0, 0.0, 0.0]
     const SLOT_4_COORDS = [0.0, 90.5, 0.0]
     const SLOT_5_COORDS = [132.5, 90.5, 0.0]
     const SLOT_6_COORDS = [265.0, 90.5, 0.0]
-    const SLOT_7_COORDS = [0.0, 181.0, 0.0]
     const SLOT_9_COORDS = [265.0, 181.0, 0.0]
-
-    // labware offsets come from module defs, they are just here for readability
-    const MAG_MOD_LABWARE_OFFSET = [-1.175, -0.125, 82.25]
-    const TEMP_MOD_LABWARE_OFFSET = [-1.45, -0.15, 80.09]
-    const TC_LABWARE_OFFSET = [0, 82.56, 97.8]
 
     // module ids come from the fixture protocol, they are just here for readability
     const OPENTRONS_96_TIPRACK_1000UL_TIPRACK_ID =
@@ -31,12 +23,6 @@ describe('getLabwareRenderInfo', () => {
     const CORNING_24_WELLPLATE_1_ID = '53d3b350-a9c0-11eb-bce6-9f1d5b9c1a1b'
     const CORNING_24_WELLPLATE_2_ID =
       '60e8b050-3412-11eb-ad93-ed232a2337cf:opentrons/corning_24_wellplate_3.4ml_flat/1'
-    const NEST_96_WELLPLATE_100UL_1_ID =
-      'aac5d680-3412-11eb-ad93-ed232a2337cf:opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1'
-    const OPENTRONS_96_ALUMINUM_BLOCK_ID =
-      'ada13110-3412-11eb-ad93-ed232a2337cf:opentrons/opentrons_96_aluminumblock_generic_pcr_strip_200ul/1'
-    const NEST_96_WELLPLATE_100UL_2_ID =
-      'b0103540-3412-11eb-ad93-ed232a2337cf:opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1'
     const OPENTRONS_96_TIPRACK_20UL_TIPRACK_ID =
       'faa13a50-a9bf-11eb-bce6-9f1d5b9c1a1b:opentrons/opentrons_96_tiprack_20ul/1'
     const expected = {

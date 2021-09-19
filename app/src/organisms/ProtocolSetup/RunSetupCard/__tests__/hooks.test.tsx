@@ -34,7 +34,6 @@ const mockMagneticModuleDef = {
   model: 'magneticModuleV2' as ModuleModel,
   type: 'magneticModuleType' as ModuleType,
 }
-const MOCK_MODULE_MISSING_ID = ['temperatureModuleV1']
 
 describe('useMissingModuleIds', () => {
   const store: Store<State> = createStore(jest.fn(), {})

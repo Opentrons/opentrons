@@ -16,7 +16,7 @@ export default {
 
 const Template: Story<{ slot: string; standaloneSVG: boolean }> = args => {
   return (
-    <RobotWorkSpace deckDef={getDeckDefinitions()['ot2_standard']}>
+    <RobotWorkSpace deckDef={getDeckDefinitions().ot2_standard}>
       {({ deckSlotsById }: RobotWorkSpaceRenderProps) => {
         const slot = deckSlotsById[args.slot]
         return (

@@ -10,7 +10,6 @@ const render = (props: React.ComponentProps<typeof ModuleInfo>) => {
     i18nInstance: i18n,
   })
 }
-const STUBBED_ORIENTATION_VALUE = 'left'
 const mockTCModule = {
   labwareOffset: { x: 3, y: 3, z: 3 },
   moduleId: 'TCModuleId',

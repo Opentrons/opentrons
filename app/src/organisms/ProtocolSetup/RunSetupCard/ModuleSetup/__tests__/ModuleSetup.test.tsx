@@ -23,10 +23,7 @@ import {
   mockThermocycler as mockThermocyclerFixture,
   mockMagneticModule as mockMagneticModuleFixture,
 } from '../../../../../redux/modules/__fixtures__/index'
-import {
-  useModuleRenderInfoById,
-  useLabwareRenderInfoById,
-} from '../../../hooks'
+import { useModuleRenderInfoById } from '../../../hooks'
 
 jest.mock('../../../../../redux/modules')
 jest.mock('../ModuleInfo')

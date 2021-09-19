@@ -2,8 +2,6 @@
 // component; once legacy Module viz is removed, we should rename it Module
 
 import * as React from 'react'
-import parseHtml from 'html-react-parser'
-import { stringify } from 'svgson'
 
 import { THERMOCYCLER_MODULE_V1, getModuleDef2 } from '@opentrons/shared-data'
 

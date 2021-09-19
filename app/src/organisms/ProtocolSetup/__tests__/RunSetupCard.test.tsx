@@ -8,7 +8,6 @@ import {
 } from '@opentrons/components/__utils__'
 import noModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/simpleV4.json'
 import withModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/testModulesProtocol.json'
-import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 
 import { i18n } from '../../../i18n'
 import {
@@ -24,8 +23,6 @@ import {
 import { mockCalibrationStatus } from '../../../redux/calibration/__fixtures__'
 import * as calibrationSelectors from '../../../redux/calibration/selectors'
 import * as protocolSelectors from '../../../redux/protocol/selectors'
-import { getModuleRenderInfo } from '../utils/getModuleRenderInfo'
-import { getLabwareRenderInfo } from '../utils/getLabwareRenderInfo'
 import { RunSetupCard } from '../RunSetupCard'
 import { ModuleSetup } from '../RunSetupCard/ModuleSetup'
 import { LabwareSetup } from '../RunSetupCard/LabwareSetup'

@@ -1,10 +1,5 @@
-import {
-  DeckDefinition,
-  getModuleDef2,
-  LabwareDefinition2,
-  SPAN7_8_10_11_SLOT,
-} from '@opentrons/shared-data'
-import { find, reduce } from 'lodash'
+import { DeckDefinition, LabwareDefinition2 } from '@opentrons/shared-data'
+import reduce from 'lodash/reduce'
 import { getProtocolData } from '../../../redux/protocol'
 
 const getSlotPosition = (

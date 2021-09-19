@@ -1,6 +1,5 @@
 import * as React from 'react'
 import {
-  getModuleDef2,
   getModuleType,
   ModuleDefinition,
   THERMOCYCLER_MODULE_TYPE,
@@ -10,11 +9,9 @@ import {
   C_MED_LIGHT_GRAY,
   SPACING_1,
   JUSTIFY_CENTER,
-  ALIGN_START,
   DISPLAY_FLEX,
   FONT_WEIGHT_SEMIBOLD,
   DIRECTION_COLUMN,
-  ALIGN_STRETCH,
   ALIGN_CENTER,
 } from '../../styles'
 import { RobotCoordsForeignObject } from '../Deck'
@@ -104,7 +101,7 @@ export const Module = (props: Props): JSX.Element => {
   // transform to be applied to children which render within the labware interfacing surface of the module
   const childrenTransform = `translate(${clampedLabwareOffsetX}, ${clampedLabwareOffsetY})`
 
-  const renderStatusInfo = () => {
+  const renderStatusInfo = (): JSX.Element | null => {
     if (statusInfo == null) return null
     const statusWidth = (labwareInterfaceXDimension ?? xDimension) / 2
     return (
