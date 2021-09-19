@@ -12,7 +12,7 @@ import { THERMOCYCLER_MODULE_V1, getModuleDef2 } from '@opentrons/shared-data'
 const lidMotorStates = ['open', 'closed', 'unknown']
 
 export default {
-  title: 'Library/Molecules/Simulation/Modules/Thermocycler'
+  title: 'Library/Molecules/Simulation/Modules/Thermocycler',
 } as Meta
 
 const Template: Story<ThermocyclerVizProps> = args => {
@@ -22,7 +22,12 @@ const Template: Story<ThermocyclerVizProps> = args => {
         const slot = deckSlotsById['7']
         const [x, y] = slot.position
         return (
-          <Module x={x} y={y} def={getModuleDef2(THERMOCYCLER_MODULE_V1)} innerProps={{lidMotorState: args.lidMotorState}} />
+          <Module
+            x={x}
+            y={y}
+            def={getModuleDef2(THERMOCYCLER_MODULE_V1)}
+            innerProps={{ lidMotorState: args.lidMotorState }}
+          />
         )
       }}
     </RobotWorkSpace>
@@ -33,7 +38,7 @@ Thermocycler.argTypes = {
   lidMotorState: {
     control: {
       type: 'select',
-      options: lidMotorStates
+      options: lidMotorStates,
     },
     defaultValue: lidMotorStates[0],
   },

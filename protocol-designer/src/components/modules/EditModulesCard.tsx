@@ -20,10 +20,7 @@ import styles from './styles.css'
 
 export interface Props {
   modules: ModulesForEditModulesCard
-  openEditModuleModal: (
-    moduleType: ModuleType,
-    moduleId?: string
-  ) => unknown
+  openEditModuleModal: (moduleType: ModuleType, moduleId?: string) => unknown
 }
 
 export function EditModulesCard(props: Props): JSX.Element {

@@ -102,7 +102,11 @@ export class URLDeck extends React.Component<{}> {
                   <g
                     transform={`translate(${slot.position[0]}, ${slot.position[1]})`}
                   >
-                    <ModuleItem model={moduleModel} mode={'default'} slot={slot} />
+                    <ModuleItem
+                      model={moduleModel}
+                      mode={'default'}
+                      slot={slot}
+                    />
                   </g>
                 )}
                 {labware && (

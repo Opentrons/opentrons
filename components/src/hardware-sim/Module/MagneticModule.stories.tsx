@@ -11,10 +11,10 @@ import { MAGNETIC_MODULE_V2, getModuleDef2 } from '@opentrons/shared-data'
 const slots = ['1', '3', '4', '6', '7', '9', '10']
 
 export default {
-  title: 'Library/Molecules/Simulation/Modules/Magnetic Module'
+  title: 'Library/Molecules/Simulation/Modules/Magnetic Module',
 } as Meta
 
-const Template: Story<{slot: string}> = args => {
+const Template: Story<{ slot: string }> = args => {
   return (
     <RobotWorkSpace deckDef={getDeckDefinitions()['ot2_standard']}>
       {({ deckSlotsById }: RobotWorkSpaceRenderProps) => {
@@ -24,11 +24,8 @@ const Template: Story<{slot: string}> = args => {
             x={slot.position[0]}
             y={slot.position[1]}
             def={getModuleDef2(MAGNETIC_MODULE_V2)}
-            orientation={
-              ['3','6','9'].includes(args.slot)
-                ? 'right'
-                : 'left'
-            } />
+            orientation={['3', '6', '9'].includes(args.slot) ? 'right' : 'left'}
+          />
         )
       }}
     </RobotWorkSpace>
@@ -39,7 +36,7 @@ MagneticModule.argTypes = {
   slot: {
     control: {
       type: 'select',
-      options: slots
+      options: slots,
     },
     defaultValue: slots[slots.length - 1],
   },

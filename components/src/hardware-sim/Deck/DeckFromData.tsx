@@ -5,7 +5,11 @@ import snakeCase from 'lodash/snakeCase'
 
 import styles from './Deck.css'
 
-import type { DeckDefinition, DeckLayer, DeckLayerFeature } from '@opentrons/shared-data'
+import type {
+  DeckDefinition,
+  DeckLayer,
+  DeckLayerFeature,
+} from '@opentrons/shared-data'
 
 export interface DeckFromDataProps {
   def: DeckDefinition

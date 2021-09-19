@@ -61,9 +61,7 @@ export function ModuleFields(props: ModuleFieldsProps): JSX.Element {
   } = props
   // @ts-expect-error(sa, 2021-6-21): Object.keys not smart enough to take the keys of FormModulesByType
   const modules: ModuleType[] = Object.keys(values)
-  const handleOnDeckChange = (type: ModuleType) => (
-    e: React.ChangeEvent
-  ) => {
+  const handleOnDeckChange = (type: ModuleType) => (e: React.ChangeEvent) => {
     const targetToClear = `modulesByType.${type}.model`
 
     onFieldChange(e)

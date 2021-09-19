@@ -90,7 +90,12 @@
     "labwareOffset": { "$ref": "#/definitions/coordinates" },
     "dimensions": {
       "type": "object",
-      "required": ["bareOverallHeight", "overLabwareHeight", "xDimension", "yDimension"],
+      "required": [
+        "bareOverallHeight",
+        "overLabwareHeight",
+        "xDimension",
+        "yDimension"
+      ],
       "properties": {
         "bareOverallHeight": { "type": "number" },
         "overLabwareHeight": { "type": "number" },

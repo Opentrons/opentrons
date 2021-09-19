@@ -23,7 +23,10 @@ import {
   mockThermocycler as mockThermocyclerFixture,
   mockMagneticModule as mockMagneticModuleFixture,
 } from '../../../../../redux/modules/__fixtures__/index'
-import { useModuleRenderInfoById, useLabwareRenderInfoById } from '../../../hooks'
+import {
+  useModuleRenderInfoById,
+  useLabwareRenderInfoById,
+} from '../../../hooks'
 
 jest.mock('../../../../../redux/modules')
 jest.mock('../ModuleInfo')
@@ -44,14 +47,22 @@ jest.mock('@opentrons/shared-data', () => {
     inferModuleOrientationFromXCoordinate: jest.fn(),
   }
 })
-const mockUseMissingModuleIds = useMissingModuleIds as jest.MockedFunction<typeof useMissingModuleIds>
-const mockGetAttachedModules = getAttachedModules as jest.MockedFunction<typeof getAttachedModules>
+const mockUseMissingModuleIds = useMissingModuleIds as jest.MockedFunction<
+  typeof useMissingModuleIds
+>
+const mockGetAttachedModules = getAttachedModules as jest.MockedFunction<
+  typeof getAttachedModules
+>
 const mockModuleInfo = ModuleInfo as jest.MockedFunction<typeof ModuleInfo>
 const mockInferModuleOrientationFromXCoordinate = inferModuleOrientationFromXCoordinate as jest.MockedFunction<
   typeof inferModuleOrientationFromXCoordinate
 >
-const mockRobotWorkSpace = RobotWorkSpace as jest.MockedFunction<typeof RobotWorkSpace>
-const mockUseModuleRenderInfoById = useModuleRenderInfoById as jest.MockedFunction<typeof useModuleRenderInfoById>
+const mockRobotWorkSpace = RobotWorkSpace as jest.MockedFunction<
+  typeof RobotWorkSpace
+>
+const mockUseModuleRenderInfoById = useModuleRenderInfoById as jest.MockedFunction<
+  typeof useModuleRenderInfoById
+>
 
 const deckSlotsById = standardDeckDef.locations.orderedSlots.reduce(
   (acc, deckSlot) => ({ ...acc, [deckSlot.id]: deckSlot }),
@@ -88,7 +99,7 @@ const mockMagneticModule = {
     labwareInterfaceXDimension: 80,
     labwareInterfaceYDimension: 120,
   },
-  twoDimensionalRendering: {children: []}
+  twoDimensionalRendering: { children: [] },
 }
 
 const mockTCModule = {
@@ -105,7 +116,7 @@ const mockTCModule = {
     labwareInterfaceXDimension: 80,
     labwareInterfaceYDimension: 120,
   },
-  twoDimensionalRendering: {children: []}
+  twoDimensionalRendering: { children: [] },
 }
 
 describe('ModuleSetup', () => {
@@ -156,22 +167,24 @@ describe('ModuleSetup', () => {
     expect(mockModuleInfo).not.toHaveBeenCalled()
   })
   it('should render a deck WITH modules with CTA disabled if the protocol requests modules and they are not all attached to the robot', () => {
-    when(mockUseModuleRenderInfoById).calledWith().mockReturnValue({
-      [mockMagneticModule.moduleId]: {
-        x: MOCK_MAGNETIC_MODULE_COORDS[0],
-        y: MOCK_MAGNETIC_MODULE_COORDS[1],
-        z: MOCK_MAGNETIC_MODULE_COORDS[2],
-        moduleDef: mockMagneticModule as any,
-        nestedLabwareDef: null
-      },
-      [mockTCModule.moduleId]: {
-        x: MOCK_TC_COORDS[0],
-        y: MOCK_TC_COORDS[1],
-        z: MOCK_TC_COORDS[2],
-        moduleDef: mockTCModule,
-        nestedLabwareDef: null
-      },
-    })
+    when(mockUseModuleRenderInfoById)
+      .calledWith()
+      .mockReturnValue({
+        [mockMagneticModule.moduleId]: {
+          x: MOCK_MAGNETIC_MODULE_COORDS[0],
+          y: MOCK_MAGNETIC_MODULE_COORDS[1],
+          z: MOCK_MAGNETIC_MODULE_COORDS[2],
+          moduleDef: mockMagneticModule as any,
+          nestedLabwareDef: null,
+        },
+        [mockTCModule.moduleId]: {
+          x: MOCK_TC_COORDS[0],
+          y: MOCK_TC_COORDS[1],
+          z: MOCK_TC_COORDS[2],
+          moduleDef: mockTCModule,
+          nestedLabwareDef: null,
+        },
+      })
 
     when(mockModuleInfo)
       .calledWith(
@@ -206,22 +219,24 @@ describe('ModuleSetup', () => {
   it('should render a deck WITH modules with CTA enabled if all protocol requested modules have a matching attached module', () => {
     mockUseMissingModuleIds.mockReturnValue([])
 
-    when(mockUseModuleRenderInfoById).calledWith().mockReturnValue({
-      [mockMagneticModule.moduleId]: {
-        x: MOCK_MAGNETIC_MODULE_COORDS[0],
-        y: MOCK_MAGNETIC_MODULE_COORDS[1],
-        z: MOCK_MAGNETIC_MODULE_COORDS[2],
-        moduleDef: mockMagneticModule as any,
-        nestedLabwareDef: null
-      },
-      [mockTCModule.moduleId]: {
-        x: MOCK_TC_COORDS[0],
-        y: MOCK_TC_COORDS[1],
-        z: MOCK_TC_COORDS[2],
-        moduleDef: mockTCModule,
-        nestedLabwareDef: null
-      },
-    })
+    when(mockUseModuleRenderInfoById)
+      .calledWith()
+      .mockReturnValue({
+        [mockMagneticModule.moduleId]: {
+          x: MOCK_MAGNETIC_MODULE_COORDS[0],
+          y: MOCK_MAGNETIC_MODULE_COORDS[1],
+          z: MOCK_MAGNETIC_MODULE_COORDS[2],
+          moduleDef: mockMagneticModule as any,
+          nestedLabwareDef: null,
+        },
+        [mockTCModule.moduleId]: {
+          x: MOCK_TC_COORDS[0],
+          y: MOCK_TC_COORDS[1],
+          z: MOCK_TC_COORDS[2],
+          moduleDef: mockTCModule,
+          nestedLabwareDef: null,
+        },
+      })
     when(mockGetAttachedModules)
       .calledWith(undefined as any, MOCK_ROBOT_NAME)
       .mockReturnValue([

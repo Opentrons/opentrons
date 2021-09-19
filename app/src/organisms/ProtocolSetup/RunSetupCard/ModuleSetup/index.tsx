@@ -29,7 +29,7 @@ import { useMissingModuleIds } from '../hooks'
 import { fetchModules, getAttachedModules } from '../../../../redux/modules'
 import { ModuleInfo } from './ModuleInfo'
 import { MultipleModulesModal } from './MultipleModulesModal'
-import {useModuleRenderInfoById} from '../../hooks'
+import { useModuleRenderInfoById } from '../../hooks'
 import styles from '../../styles.css'
 
 import type { State, Dispatch } from '../../../../redux/types'
@@ -71,13 +71,17 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
     getAttachedModules(state, robotName)
   )
 
-  const moduleModels = map(moduleRenderInfoById, ({ moduleDef}) => moduleDef.model)
+  const moduleModels = map(
+    moduleRenderInfoById,
+    ({ moduleDef }) => moduleDef.model
+  )
 
   const hasADuplicateModule = new Set(moduleModels).size !== moduleModels.length
 
-  const proceedToLabwareDisabledReason = missingModuleIds.length > 0
-   ? t('plug_in_required_module', {count: missingModuleIds.length })
-   : null
+  const proceedToLabwareDisabledReason =
+    missingModuleIds.length > 0
+      ? t('plug_in_required_module', { count: missingModuleIds.length })
+      : null
 
   return (
     <React.Fragment>
@@ -113,17 +117,20 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
         >
           {() => (
             <>
-              {map(moduleRenderInfoById, ({ x, y, moduleDef}) => {
-                const {model} = moduleDef
+              {map(moduleRenderInfoById, ({ x, y, moduleDef }) => {
+                const { model } = moduleDef
                 const attachedModuleMatch = attachedModules.find(
                   attachedModule => model === attachedModule.model
                 )
-                console.log({attachedModuleMatch})
-                console.log({model, isAttached: attachedModuleMatch != null, port: attachedModuleMatch?.usbPort.port, hub: attachedModuleMatch?.usbPort.hub})
+                console.log({ attachedModuleMatch })
+                console.log({
+                  model,
+                  isAttached: attachedModuleMatch != null,
+                  port: attachedModuleMatch?.usbPort.port,
+                  hub: attachedModuleMatch?.usbPort.hub,
+                })
                 return (
-                  <React.Fragment
-                    key={`LabwareSetup_Module_${model}_${x}${y}`}
-                  >
+                  <React.Fragment key={`LabwareSetup_Module_${model}_${x}${y}`}>
                     <Module
                       x={x}
                       y={y}

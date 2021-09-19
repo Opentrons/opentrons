@@ -62,10 +62,16 @@ const mockProtocolPipetteTipRackCalData: ProtocolPipetteTipRackCalDataByMount = 
 const mockGetProtocolData = protocolSelectors.getProtocolData as jest.MockedFunction<
   typeof protocolSelectors.getProtocolData
 >
-const mockLabwareSetup = LabwareSetup as jest.MockedFunction<typeof LabwareSetup>
+const mockLabwareSetup = LabwareSetup as jest.MockedFunction<
+  typeof LabwareSetup
+>
 const mockModuleSetup = ModuleSetup as jest.MockedFunction<typeof ModuleSetup>
-const mockRobotCalibration = RobotCalibration as jest.MockedFunction<typeof RobotCalibration>
-const mockProceedToRun = ProceedToRunCta as jest.MockedFunction<typeof ProceedToRunCta>
+const mockRobotCalibration = RobotCalibration as jest.MockedFunction<
+  typeof RobotCalibration
+>
+const mockProceedToRun = ProceedToRunCta as jest.MockedFunction<
+  typeof ProceedToRunCta
+>
 const mockGetConnectedRobot = discoverySelectors.getConnectedRobot as jest.MockedFunction<
   typeof discoverySelectors.getConnectedRobot
 >

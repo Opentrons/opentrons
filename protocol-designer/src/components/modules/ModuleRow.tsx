@@ -24,10 +24,7 @@ interface Props {
   moduleOnDeck?: ModuleOnDeck
   showCollisionWarnings?: boolean
   type: ModuleType
-  openEditModuleModal: (
-    moduleType: ModuleType,
-    moduleId?: string
-  ) => unknown
+  openEditModuleModal: (moduleType: ModuleType, moduleId?: string) => unknown
 }
 
 export function ModuleRow(props: Props): JSX.Element {
@@ -85,10 +82,8 @@ export function ModuleRow(props: Props): JSX.Element {
     <div className={styles.collision_tolltip}>{collisionTooltipText}</div>
   )
 
-  const setCurrentModule = (
-    moduleType: ModuleType,
-    moduleId?: string
-  ) => () => openEditModuleModal(moduleType, moduleId)
+  const setCurrentModule = (moduleType: ModuleType, moduleId?: string) => () =>
+    openEditModuleModal(moduleType, moduleId)
 
   const addRemoveText = moduleOnDeck ? 'remove' : 'add'
 

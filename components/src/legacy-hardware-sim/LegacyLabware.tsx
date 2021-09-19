@@ -15,7 +15,7 @@ import { SELECTABLE_WELL_CLASS } from '../constants'
 import labwareStyles from './Labware.css'
 import wellStyles from './Well.css'
 
-import { LabwareOutline, RobotCoordsForeignDiv} from '../hardware-sim'
+import { LabwareOutline, RobotCoordsForeignDiv } from '../hardware-sim'
 
 export interface LabwareProps {
   /** labware type, to get legacy definition from shared-data */
@@ -101,7 +101,6 @@ export function FallbackLabware(): JSX.Element {
   )
 }
 
-
 export interface TipProps {
   wellDef: WellDefinition
   tipVolume: number | null | undefined
@@ -145,7 +144,11 @@ export function Tip(props: TipProps): JSX.Element {
   return (
     <g>
       {/* Fill contents */}
-      <circle {...circleProps} r={outerRadius} className={wellStyles.tip_fill} />
+      <circle
+        {...circleProps}
+        r={outerRadius}
+        className={wellStyles.tip_fill}
+      />
       {/* Outer circle */}
       <circle
         {...circleProps}
@@ -153,7 +156,11 @@ export function Tip(props: TipProps): JSX.Element {
         className={outerCircleClassName}
       />
       {/* Inner circle */}
-      <circle {...circleProps} r={innerRadius} className={wellStyles.tip_border} />
+      <circle
+        {...circleProps}
+        r={innerRadius}
+        className={wellStyles.tip_border}
+      />
     </g>
   )
 }
@@ -231,7 +238,11 @@ export class Well extends React.Component<WellProps> {
       return (
         <g>
           {/* Fill contents */}
-          <rect {...rectProps} className={wellStyles.well_fill} color={fillColor} />
+          <rect
+            {...rectProps}
+            className={wellStyles.well_fill}
+            color={fillColor}
+          />
           {/* Border + overlay */}
           <rect
             {...selectionProps}

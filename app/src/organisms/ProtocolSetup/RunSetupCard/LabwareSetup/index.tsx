@@ -52,7 +52,10 @@ export const LabwareSetup = (): JSX.Element | null => {
     setShowLabwareHelpModal,
   ] = React.useState<boolean>(false)
 
-  const moduleModels = map(moduleRenderInfoById, ({ moduleDef }) => moduleDef.model)
+  const moduleModels = map(
+    moduleRenderInfoById,
+    ({ moduleDef }) => moduleDef.model
+  )
   const moduleTypesThatRequireExtraAttention = getModuleTypesThatRequireExtraAttention(
     moduleModels
   )
@@ -94,23 +97,32 @@ export const LabwareSetup = (): JSX.Element | null => {
           {() => {
             return (
               <React.Fragment>
-                {map(moduleRenderInfoById, ({ x, y, moduleDef, nestedLabwareDef}) => (
-                  <Module
-                    key={`LabwareSetup_Module_${moduleDef.model}_${x}${y}`}
-                    x={x}
-                    y={y}
-                    orientation={inferModuleOrientationFromXCoordinate(x)}
-                    def={moduleDef}
-                    innerProps={moduleDef.model === THERMOCYCLER_MODULE_V1 ? {lidMotorState: 'open'} : {}}
-                  >
-                    {nestedLabwareDef != null
-                      ?  <React.Fragment key={`LabwareSetup_Labware_${nestedLabwareDef.metadata.displayName}_${x}${y}`}>
+                {map(
+                  moduleRenderInfoById,
+                  ({ x, y, moduleDef, nestedLabwareDef }) => (
+                    <Module
+                      key={`LabwareSetup_Module_${moduleDef.model}_${x}${y}`}
+                      x={x}
+                      y={y}
+                      orientation={inferModuleOrientationFromXCoordinate(x)}
+                      def={moduleDef}
+                      innerProps={
+                        moduleDef.model === THERMOCYCLER_MODULE_V1
+                          ? { lidMotorState: 'open' }
+                          : {}
+                      }
+                    >
+                      {nestedLabwareDef != null ? (
+                        <React.Fragment
+                          key={`LabwareSetup_Labware_${nestedLabwareDef.metadata.displayName}_${x}${y}`}
+                        >
                           <LabwareRender definition={nestedLabwareDef} />
                           <LabwareInfoOverlay definition={nestedLabwareDef} />
                         </React.Fragment>
-                      : null}
-                  </Module>
-                ))}
+                      ) : null}
+                    </Module>
+                  )
+                )}
                 {map(labwareRenderInfoById, ({ x, y, labwareDef }) => {
                   return (
                     <React.Fragment

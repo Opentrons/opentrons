@@ -28,7 +28,10 @@ const SVG_PROPS = ['x', 'y', 'svgWidth', 'svgHeight', '_cssWidth', '_cssHeight']
  *
  * @component
  */
-export const ForeignObject: PrimitiveComponent<'foreignObject', ForeignObjectProps> = styled.foreignObject
+export const ForeignObject: PrimitiveComponent<
+  'foreignObject',
+  ForeignObjectProps
+> = styled.foreignObject
   .withConfig({
     shouldForwardProp: p => {
       return (
@@ -43,7 +46,9 @@ export const ForeignObject: PrimitiveComponent<'foreignObject', ForeignObjectPro
     },
   })
   .attrs(
-    (props: ForeignObjectProps): React.ComponentProps<PrimitiveComponent<'svg'>> => ({
+    (
+      props: ForeignObjectProps
+    ): React.ComponentProps<PrimitiveComponent<'svg'>> => ({
       // map the explicit svgWidth/Height props to width/height attrs
       width: props.svgWidth,
       height: props.svgHeight,

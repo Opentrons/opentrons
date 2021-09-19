@@ -1,5 +1,14 @@
 import * as React from 'react'
-import { LabwareDefinition2, MAGNETIC_MODULE_V1, MAGNETIC_MODULE_V2, ModuleModel, TEMPERATURE_MODULE_V1, TEMPERATURE_MODULE_V2, THERMOCYCLER_MODULE_V1, getModuleDef2 } from '@opentrons/shared-data'
+import {
+  LabwareDefinition2,
+  MAGNETIC_MODULE_V1,
+  MAGNETIC_MODULE_V2,
+  ModuleModel,
+  TEMPERATURE_MODULE_V1,
+  TEMPERATURE_MODULE_V2,
+  THERMOCYCLER_MODULE_V1,
+  getModuleDef2,
+} from '@opentrons/shared-data'
 import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 import { RobotWorkSpace } from '../Deck/RobotWorkSpace'
 import { getDeckDefinitions } from '../Deck/getDeckDefinitions'
@@ -21,28 +30,33 @@ const moduleModels: ModuleModel[] = [
 ]
 
 export default {
-  title: 'Library/Molecules/Simulation/Modules/Module'
+  title: 'Library/Molecules/Simulation/Modules/Module',
 } as Meta
 
 const Template: Story<{
- slot: string,
- model: ModuleModel,
- orientation: 'left' | 'right',
- hasLabware: boolean
+  slot: string
+  model: ModuleModel
+  orientation: 'left' | 'right'
+  hasLabware: boolean
 }> = args => {
   return (
     <RobotWorkSpace deckDef={getDeckDefinitions().ot2_standard}>
       {({ deckSlotsById }: RobotWorkSpaceRenderProps) => {
         const slot = deckSlotsById[args.slot]
         return (
-            <ModuleComponent
-              def={getModuleDef2(args.model)}
-              x={slot.position[0]}
-              y={slot.position[1]}
-              innerProps={{lidMotorState: 'open'}}
-              orientation={args.orientation}>
-              {args.hasLabware ? <LabwareRender definition={fixture_96_plate as LabwareDefinition2}/> : null}
-            </ModuleComponent>
+          <ModuleComponent
+            def={getModuleDef2(args.model)}
+            x={slot.position[0]}
+            y={slot.position[1]}
+            innerProps={{ lidMotorState: 'open' }}
+            orientation={args.orientation}
+          >
+            {args.hasLabware ? (
+              <LabwareRender
+                definition={fixture_96_plate as LabwareDefinition2}
+              />
+            ) : null}
+          </ModuleComponent>
         )
       }}
     </RobotWorkSpace>
@@ -53,21 +67,21 @@ Module.argTypes = {
   slot: {
     control: {
       type: 'select',
-      options: slots
+      options: slots,
     },
     defaultValue: slots[slots.length - 1],
   },
   model: {
     control: {
       type: 'select',
-      options: moduleModels
+      options: moduleModels,
     },
     defaultValue: moduleModels[0],
   },
   orientation: {
     control: {
       type: 'select',
-      options: ['left' , 'right'],
+      options: ['left', 'right'],
     },
     defaultValue: 'left',
   },

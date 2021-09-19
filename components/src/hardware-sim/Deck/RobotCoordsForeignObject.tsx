@@ -12,20 +12,30 @@ export interface RobotCoordsForeignObjectProps {
   flexProps?: React.ComponentProps<typeof Flex>
 }
 
-
 export const RobotCoordsForeignObject = (
   props: RobotCoordsForeignObjectProps
 ): JSX.Element => {
-  const { children, x, y, height, width, foreignObjectProps = {}, flexProps = {} } = props
+  const {
+    children,
+    x,
+    y,
+    height,
+    width,
+    foreignObjectProps = {},
+    flexProps = {},
+  } = props
 
   return (
-    <ForeignObject
-      {...{ x, y, height, width}}
-    >
-      <Flex height='100%' width='100%' css={css`transform: scale(1, -1);`} {...foreignObjectProps}>
-        <Flex  {...flexProps}>
-          {children}
-        </Flex>
+    <ForeignObject {...{ x, y, height, width }}>
+      <Flex
+        height="100%"
+        width="100%"
+        css={css`
+          transform: scale(1, -1);
+        `}
+        {...foreignObjectProps}
+      >
+        <Flex {...flexProps}>{children}</Flex>
       </Flex>
     </ForeignObject>
   )

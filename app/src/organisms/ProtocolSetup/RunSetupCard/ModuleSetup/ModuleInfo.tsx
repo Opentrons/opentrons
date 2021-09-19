@@ -39,16 +39,21 @@ export interface ModuleInfoProps {
 export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
   const { moduleModel, usbPort, hubPort, isAttached } = props
   const moduleDef = getModuleDef2(moduleModel)
-  const {xDimension, yDimension, labwareInterfaceYDimension, labwareInterfaceXDimension} = moduleDef.dimensions
+  const {
+    xDimension,
+    yDimension,
+    labwareInterfaceYDimension,
+    labwareInterfaceXDimension,
+  } = moduleDef.dimensions
   const { t } = useTranslation('protocol_setup')
 
   let connectionStatus = t('no_usb_port_yet')
   if (usbPort === null && hubPort === null && isAttached) {
     connectionStatus = t('usb_connected_no_port_info')
   } else if (hubPort === null && usbPort !== null && isAttached) {
-    connectionStatus = t('usb_port_connected', {port: usbPort})
+    connectionStatus = t('usb_port_connected', { port: usbPort })
   } else if (hubPort !== null && isAttached) {
-    connectionStatus = t('hub_port_connected', {port: hubPort})
+    connectionStatus = t('hub_port_connected', { port: hubPort })
   }
 
   return (
@@ -57,7 +62,7 @@ export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
       y={0}
       height={labwareInterfaceYDimension ?? yDimension}
       width={labwareInterfaceXDimension ?? xDimension}
-      flexProps={{padding: SPACING_3}}
+      flexProps={{ padding: SPACING_3 }}
     >
       <Flex flexDirection={DIRECTION_COLUMN} justifyContent={JUSTIFY_CENTER}>
         <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
@@ -72,8 +77,18 @@ export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
             {!isAttached ? t('module_not_connected') : t('module_connected')}
           </Text>
         </Flex>
-        <Text fontWeight={FONT_WEIGHT_SEMIBOLD} color={C_DARK_GRAY} fontSize={FONT_SIZE_BODY_1}>{getModuleDisplayName(moduleModel)}</Text>
-        <Text color={C_DARK_GRAY} fontSize="0.5rem" fontStyle={FONT_STYLE_ITALIC}>
+        <Text
+          fontWeight={FONT_WEIGHT_SEMIBOLD}
+          color={C_DARK_GRAY}
+          fontSize={FONT_SIZE_BODY_1}
+        >
+          {getModuleDisplayName(moduleModel)}
+        </Text>
+        <Text
+          color={C_DARK_GRAY}
+          fontSize="0.5rem"
+          fontStyle={FONT_STYLE_ITALIC}
+        >
           {connectionStatus}
         </Text>
       </Flex>

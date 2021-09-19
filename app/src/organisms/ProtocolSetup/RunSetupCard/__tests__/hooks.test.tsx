@@ -69,15 +69,17 @@ describe('useMissingModuleIds', () => {
       <Provider store={store}>{children}</Provider>
     )
     const moduleId = 'fakeMagModuleId'
-    when(mockUseModuleRenderInfoById).calledWith().mockReturnValue({
-      [moduleId]: {
-        x: 0,
-        y: 0,
-        z: 0,
-        moduleDef: mockMagneticModuleDef as any,
-        nestedLabwareDef: null
-      }
-    })
+    when(mockUseModuleRenderInfoById)
+      .calledWith()
+      .mockReturnValue({
+        [moduleId]: {
+          x: 0,
+          y: 0,
+          z: 0,
+          moduleDef: mockMagneticModuleDef as any,
+          nestedLabwareDef: null,
+        },
+      })
 
     const { result } = renderHook(useMissingModuleIds, { wrapper })
     expect(result.current).toStrictEqual([moduleId])

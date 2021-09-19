@@ -104,7 +104,7 @@ export const LabwareInfoOverlay = (
     <RobotCoordsForeignDiv
       x={0}
       y={0}
-      {...{width, height }}
+      {...{ width, height }}
       innerDivProps={{
         display: DISPLAY_FLEX,
         flexDirection: DIRECTION_COLUMN,

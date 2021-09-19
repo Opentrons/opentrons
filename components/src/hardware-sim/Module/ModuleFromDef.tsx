@@ -11,26 +11,30 @@ export interface ModuleFromDataProps {
 }
 
 export function ModuleFromDef(props: ModuleFromDataProps): JSX.Element {
-  const { def, layerBlocklist = [], standaloneSVG = false} = props
+  const { def, layerBlocklist = [], standaloneSVG = false } = props
 
   const layerGroupNodes = def.twoDimensionalRendering.children.filter(
     g => !layerBlocklist.includes(g.attributes?.id)
   )
-  const groupNodeWrapper= {
+  const groupNodeWrapper = {
     name: 'g',
     type: 'element',
     value: '',
-    attributes: {id: 'moduleVisualization'},
-    children: layerGroupNodes
+    attributes: { id: 'moduleVisualization' },
+    children: layerGroupNodes,
   }
   const filteredSVGWrapper = {
     ...def.twoDimensionalRendering,
-    children: layerGroupNodes
+    children: layerGroupNodes,
   }
 
   return (
     <g>
-      {parseHtml(stringify(standaloneSVG ? filteredSVGWrapper: groupNodeWrapper, {selfClose: false}))}
+      {parseHtml(
+        stringify(standaloneSVG ? filteredSVGWrapper : groupNodeWrapper, {
+          selfClose: false,
+        })
+      )}
     </g>
   )
 }

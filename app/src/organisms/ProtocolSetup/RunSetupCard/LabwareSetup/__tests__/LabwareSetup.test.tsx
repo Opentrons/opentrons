@@ -22,7 +22,10 @@ import { LabwareSetupModal } from '../LabwareSetupModal'
 import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
 import { ExtraAttentionWarning } from '../ExtraAttentionWarning'
 import { getModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
-import { useModuleRenderInfoById, useLabwareRenderInfoById } from '../../../hooks'
+import {
+  useModuleRenderInfoById,
+  useLabwareRenderInfoById,
+} from '../../../hooks'
 
 jest.mock('../../../../../redux/modules')
 jest.mock('../../../../../redux/pipettes/selectors')
@@ -51,14 +54,17 @@ const mockLabwareInfoOverlay = LabwareInfoOverlay as jest.MockedFunction<
   typeof LabwareInfoOverlay
 >
 
-
 const mockModule = Module as jest.MockedFunction<typeof Module>
 const mockInferModuleOrientationFromXCoordinate = inferModuleOrientationFromXCoordinate as jest.MockedFunction<
   typeof inferModuleOrientationFromXCoordinate
 >
 
-const mockRobotWorkSpace = RobotWorkSpace as jest.MockedFunction<typeof RobotWorkSpace>
-const mockLabwareRender = LabwareRender as jest.MockedFunction<typeof LabwareRender>
+const mockRobotWorkSpace = RobotWorkSpace as jest.MockedFunction<
+  typeof RobotWorkSpace
+>
+const mockLabwareRender = LabwareRender as jest.MockedFunction<
+  typeof LabwareRender
+>
 const mockLabwareSetupModal = LabwareSetupModal as jest.MockedFunction<
   typeof LabwareSetupModal
 >
@@ -68,9 +74,12 @@ const mockGetModuleTypesThatRequireExtraAttention = getModuleTypesThatRequireExt
 const mockExtraAttentionWarning = ExtraAttentionWarning as jest.MockedFunction<
   typeof ExtraAttentionWarning
 >
-const mockUseLabwareRenderInfoById = useLabwareRenderInfoById as jest.MockedFunction<typeof useLabwareRenderInfoById>
-const mockUseModuleRenderInfoById = useModuleRenderInfoById as jest.MockedFunction<typeof useModuleRenderInfoById>
-
+const mockUseLabwareRenderInfoById = useLabwareRenderInfoById as jest.MockedFunction<
+  typeof useLabwareRenderInfoById
+>
+const mockUseModuleRenderInfoById = useModuleRenderInfoById as jest.MockedFunction<
+  typeof useModuleRenderInfoById
+>
 
 const deckSlotsById = standardDeckDef.locations.orderedSlots.reduce(
   (acc, deckSlot) => ({ ...acc, [deckSlot.id]: deckSlot }),
@@ -144,7 +153,7 @@ describe('LabwareSetup', () => {
 
     when(mockLabwareInfoOverlay)
       .mockReturnValue(<div></div>) // this (default) empty div will be returned when LabwareInfoOverlay isn't called with expected props
-      .calledWith(componentPropsMatcher({definition: fixture_tiprack_300_ul}))
+      .calledWith(componentPropsMatcher({ definition: fixture_tiprack_300_ul }))
       .mockReturnValue(
         <div>
           mock labware info overlay of{' '}
@@ -206,14 +215,16 @@ describe('LabwareSetup', () => {
     expect(mockLabwareInfoOverlay).not.toHaveBeenCalled()
   })
   it('should render a deck WITH labware and WITHOUT modules', () => {
-    when(mockUseLabwareRenderInfoById).calledWith().mockReturnValue({
-      '300_ul_tiprack_id': {
-        labwareDef: fixture_tiprack_300_ul as LabwareDefinition2,
-        x: MOCK_300_UL_TIPRACK_COORDS[0],
-        y: MOCK_300_UL_TIPRACK_COORDS[1],
-        z: MOCK_300_UL_TIPRACK_COORDS[2],
-      },
-    })
+    when(mockUseLabwareRenderInfoById)
+      .calledWith()
+      .mockReturnValue({
+        '300_ul_tiprack_id': {
+          labwareDef: fixture_tiprack_300_ul as LabwareDefinition2,
+          x: MOCK_300_UL_TIPRACK_COORDS[0],
+          y: MOCK_300_UL_TIPRACK_COORDS[1],
+          z: MOCK_300_UL_TIPRACK_COORDS[2],
+        },
+      })
 
     when(mockUseModuleRenderInfoById).calledWith().mockReturnValue({})
 
@@ -226,31 +237,35 @@ describe('LabwareSetup', () => {
   })
 
   it('should render a deck WITH labware and WITH modules', () => {
-    when(mockUseLabwareRenderInfoById).calledWith().mockReturnValue({
-      [MOCK_300_UL_TIPRACK_ID]: {
-        labwareDef: fixture_tiprack_300_ul as LabwareDefinition2,
-        x: MOCK_300_UL_TIPRACK_COORDS[0],
-        y: MOCK_300_UL_TIPRACK_COORDS[1],
-        z: MOCK_300_UL_TIPRACK_COORDS[2],
-      },
-    })
+    when(mockUseLabwareRenderInfoById)
+      .calledWith()
+      .mockReturnValue({
+        [MOCK_300_UL_TIPRACK_ID]: {
+          labwareDef: fixture_tiprack_300_ul as LabwareDefinition2,
+          x: MOCK_300_UL_TIPRACK_COORDS[0],
+          y: MOCK_300_UL_TIPRACK_COORDS[1],
+          z: MOCK_300_UL_TIPRACK_COORDS[2],
+        },
+      })
 
-    when(mockUseModuleRenderInfoById).calledWith().mockReturnValue({
-      [mockMagneticModule.moduleId]: {
-        x: MOCK_MAGNETIC_MODULE_COORDS[0],
-        y: MOCK_MAGNETIC_MODULE_COORDS[1],
-        z: MOCK_MAGNETIC_MODULE_COORDS[2],
-        moduleDef: mockMagneticModule as any,
-        nestedLabwareDef: null
-      },
-      [mockTCModule.moduleId]: {
-        x: MOCK_TC_COORDS[0],
-        y: MOCK_TC_COORDS[1],
-        z: MOCK_TC_COORDS[2],
-        moduleDef: mockTCModule,
-        nestedLabwareDef: null
-      },
-    })
+    when(mockUseModuleRenderInfoById)
+      .calledWith()
+      .mockReturnValue({
+        [mockMagneticModule.moduleId]: {
+          x: MOCK_MAGNETIC_MODULE_COORDS[0],
+          y: MOCK_MAGNETIC_MODULE_COORDS[1],
+          z: MOCK_MAGNETIC_MODULE_COORDS[2],
+          moduleDef: mockMagneticModule as any,
+          nestedLabwareDef: null,
+        },
+        [mockTCModule.moduleId]: {
+          x: MOCK_TC_COORDS[0],
+          y: MOCK_TC_COORDS[1],
+          z: MOCK_TC_COORDS[2],
+          moduleDef: mockTCModule,
+          nestedLabwareDef: null,
+        },
+      })
 
     when(mockModule)
       .calledWith(
