@@ -119,13 +119,6 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
                 const attachedModuleMatch = attachedModules.find(
                   attachedModule => model === attachedModule.model
                 )
-                console.log({ attachedModuleMatch })
-                console.log({
-                  model,
-                  isAttached: attachedModuleMatch != null,
-                  port: attachedModuleMatch?.usbPort.port,
-                  hub: attachedModuleMatch?.usbPort.hub,
-                })
                 return (
                   <React.Fragment key={`LabwareSetup_Module_${model}_${x}${y}`}>
                     <Module

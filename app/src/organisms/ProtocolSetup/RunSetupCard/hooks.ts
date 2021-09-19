@@ -1,6 +1,5 @@
 import { useSelector } from 'react-redux'
 import reduce from 'lodash/reduce'
-import { getModuleType } from '@opentrons/shared-data'
 import { getAttachedModules } from '../../../redux/modules'
 import { getConnectedRobot } from '../../../redux/discovery/selectors'
 import type { State } from '../../../redux/types'
@@ -31,8 +30,7 @@ export function useMissingModuleIds(): string[] {
     (acc, { moduleDef }, id) => {
       const { model } = moduleDef
       const moduleTypeMatchIndex = acc.remainingAttachedModules.findIndex(
-        attachedModule =>
-          getModuleType(model) === getModuleType(attachedModule.model)
+        attachedModule => model === attachedModule.model
       )
       return moduleTypeMatchIndex !== -1
         ? {
