@@ -24,7 +24,7 @@ def client(app: FastAPI) -> TestClient:
     return TestClient(app)
 
 
-def test_check_version_headers(app: FastAPI, client: TestClient) -> None:
+def test_check_version_header(app: FastAPI, client: TestClient) -> None:
     """It should put Opentrons-Version header in request state."""
 
     @app.get("/foobar")
@@ -39,7 +39,7 @@ def test_check_version_headers(app: FastAPI, client: TestClient) -> None:
     assert result.status_code == 200
 
 
-def test_set_version_headers_on_route(app: FastAPI, client: TestClient) -> None:
+def test_check_version_header_on_route(app: FastAPI, client: TestClient) -> None:
     """It should set version state with a route dependency."""
     router = APIRouter(dependencies=[Depends(check_version_header)])
 
@@ -54,7 +54,7 @@ def test_set_version_headers_on_route(app: FastAPI, client: TestClient) -> None:
     assert result.status_code == 200
 
 
-def test_uses_latest_available_version(app: FastAPI, client: TestClient) -> None:
+def test_check_version_header_fallback(app: FastAPI, client: TestClient) -> None:
     """It should set state according to the latest available version.
 
     A client may request a later version than is available, and the server
