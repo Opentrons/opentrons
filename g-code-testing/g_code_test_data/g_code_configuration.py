@@ -1,9 +1,7 @@
-from typing import Callable
+from typing import Callable, List, Type
 
 import pytest
-from pytest import mark
-
-
+from _pytest.mark.structures import Mark
 from g_code_parsing.g_code_engine import GCodeEngine
 from g_code_parsing.g_code_program.supported_text_modes import SupportedTextModes
 from opentrons.hardware_control.emulation.settings import Settings, SmoothieSettings
@@ -19,13 +17,17 @@ class SharedFunctionsMixin:
     Functions that GCodeConfirmConfig classes share
     """
 
+    marks: List[Mark] = [pytest.mark.g_code_confirm]
+
+    def get_configuration_path(self):
+        return f'{self.driver}/{self.name}'
+
     def get_master_file_path(self):
         """
         Get that path of the file in S3
         :return: str
         """
-        modded_name = self.name.replace('_', '-')
-        return f'{self.driver}/{modded_name}.txt'
+        return f'{self.get_configuration_path()}.txt'
 
     def get_master_file(self):
         """
@@ -59,7 +61,10 @@ class SharedFunctionsMixin:
         else:
             print(f'{file_name} Not Uploaded')
 
-    def generate_pytest_param(self, user_marks=[]):
+    def add_mark(self, user_mark: Mark):
+        self.marks.append(user_mark)
+
+    def generate_pytest_param(self):
         """
         Turn the configuration into a pytest parameter.
         Doing this to give the test a user readable name and to
@@ -70,12 +75,10 @@ class SharedFunctionsMixin:
         :param user_marks: A list of
         :return:
         """
-        marks = [pytest.mark.g_code_confirm]
-        marks.extend(user_marks)
         return pytest.param(
             self,
             id=f'test_{self.name}',
-            marks=marks,
+            marks=self.marks,
         )
 
 

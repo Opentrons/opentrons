@@ -98,11 +98,11 @@ ROBOT_MOVE_RIGHT_PIPETTE = HTTPGCodeConfirmConfig(
 
 
 ROBOT_CONFIGURATIONS = [
-    ROBOT_HOME_ROBOT.generate_pytest_param(),
-    ROBOT_HOME_LEFT_PIPETTE.generate_pytest_param(),
-    ROBOT_HOME_RIGHT_PIPETTE.generate_pytest_param(),
-    ROBOT_MOVE_LEFT_MOUNT.generate_pytest_param(),
-    ROBOT_MOVE_LEFT_PIPETTE.generate_pytest_param(),
-    ROBOT_MOVE_RIGHT_MOUNT.generate_pytest_param(),
-    ROBOT_MOVE_RIGHT_PIPETTE.generate_pytest_param(),
+    ROBOT_HOME_ROBOT,
+    ROBOT_HOME_LEFT_PIPETTE,
+    ROBOT_HOME_RIGHT_PIPETTE,
+    ROBOT_MOVE_LEFT_MOUNT,
+    ROBOT_MOVE_LEFT_PIPETTE,
+    ROBOT_MOVE_RIGHT_MOUNT,
+    ROBOT_MOVE_RIGHT_PIPETTE,
 ]

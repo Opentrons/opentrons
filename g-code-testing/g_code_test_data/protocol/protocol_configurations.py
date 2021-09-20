@@ -62,10 +62,17 @@ SWIFT_TURBO = ProtocolGCodeConfirmConfig(
     settings=SWIFT_SMOOTHIE_SETTINGS
 )
 
-PROTOCOL_CONFIGURATIONS = [
-    BASIC_SMOOTHIE.generate_pytest_param(),
-    TWO_SINGLE_CHANNEL.generate_pytest_param(),
-    TWO_MODULES.generate_pytest_param(user_marks=[pytest.mark.slow]),
-    SWIFT_SMOKE.generate_pytest_param(user_marks=[pytest.mark.slow]),
-    SWIFT_TURBO.generate_pytest_param(user_marks=[pytest.mark.slow]),
+[
+    configuration.add_mark(user_mark=pytest.mark.slow)
+    for configuration
+    in [TWO_MODULES, SWIFT_SMOKE, SWIFT_TURBO]
 ]
+
+PROTOCOL_CONFIGURATIONS = [
+    BASIC_SMOOTHIE,
+    TWO_SINGLE_CHANNEL,
+    TWO_MODULES,
+    SWIFT_SMOKE,
+    SWIFT_TURBO,
+]
+

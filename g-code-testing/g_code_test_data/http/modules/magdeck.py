@@ -36,7 +36,7 @@ MAGDECK_ENGAGE = HTTPGCodeConfirmConfig(
 )
 
 MAGDECK_CONFIGURATIONS = [
-    MAGDECK_CALIBRATE.generate_pytest_param(),
-    MAGDECK_DEACTIVATE.generate_pytest_param(),
-    MAGDECK_ENGAGE.generate_pytest_param(),
+    MAGDECK_CALIBRATE,
+    MAGDECK_DEACTIVATE,
+    MAGDECK_ENGAGE,
 ]
