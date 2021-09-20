@@ -6,7 +6,12 @@ import type { State } from '../../../redux/types'
 import type { AttachedModule } from '../../../redux/modules/types'
 import { useModuleRenderInfoById } from '../hooks'
 
-// get moduleId's from protocol that do not have a module of the requested model attached to the robot
+interface ModuleMatchResults {
+  missingModuleIds: string[]
+  remainingAttachedModules: AttachedModule[]
+}
+
+// get requested protocol moduleId's that do map to a robot attached modulemodule of the requested model
 export function useMissingModuleIds(): string[] {
   const robot = useSelector((state: State) => getConnectedRobot(state))
   const moduleRenderInfoById = useModuleRenderInfoById()
@@ -17,11 +22,6 @@ export function useMissingModuleIds(): string[] {
     return []
   }
 
-  interface ModuleMatchResults {
-    missingModuleIds: string[]
-    remainingAttachedModules: AttachedModule[]
-  }
-
   const { missingModuleIds } = reduce<
     typeof moduleRenderInfoById,
     ModuleMatchResults
@@ -29,18 +29,22 @@ export function useMissingModuleIds(): string[] {
     moduleRenderInfoById,
     (acc, { moduleDef }, id) => {
       const { model } = moduleDef
+      // for this required module, find a remaining (unmatched) attached module of the requested model
       const moduleTypeMatchIndex = acc.remainingAttachedModules.findIndex(
         attachedModule => model === attachedModule.model
       )
       return moduleTypeMatchIndex !== -1
         ? {
             ...acc,
+            // remove matched module from remaining modules list
             remainingAttachedModules: acc.remainingAttachedModules.filter(
-              (_m, i) => i !== moduleTypeMatchIndex
+              (_remainingAttachedModule, index) =>
+                index !== moduleTypeMatchIndex
             ),
           }
         : {
             ...acc,
+            // append unmatchable module to list of requested modules that are missing a physical match
             missingModuleIds: [...acc.missingModuleIds, id],
           }
     },

@@ -1,4 +1,5 @@
 import * as React from 'react'
+import every from 'lodash/every'
 import { useSelector } from 'react-redux'
 import { NavLink } from 'react-router-dom'
 import { useMissingModuleIds } from './hooks'
@@ -29,38 +30,38 @@ export const ProceedToRunCta = (
   const protocolPipetteTipRackData = useSelector((state: State) => {
     return Pipettes.getProtocolPipetteTipRackCalInfo(state, robotName)
   })
-  const pipettesMountInfo = PipetteConstants.PIPETTE_MOUNTS.reduce(
-    mount => mount
+  const isEverythingCalibrated = every(
+    protocolPipetteTipRackData,
+    pipCalData => {
+      if (pipCalData != null) {
+        return (
+          pipCalData.pipetteCalDate != null &&
+          pipCalData.tipRacks.every(
+            tipRackCal => tipRackCal.lastModifiedDate != null
+          )
+        )
+      } else {
+        // if no pipette requested on mount
+        return true
+      }
+    }
   )
-  const pipetteCalibrationInfo = protocolPipetteTipRackData[pipettesMountInfo]
-  if (pipetteCalibrationInfo == null) {
-    return null
-  }
-  const pipettesCalibrated =
-    pipetteCalibrationInfo.pipetteCalDate !== undefined &&
-    pipetteCalibrationInfo.pipetteCalDate !== null
   const calibrationIncomplete =
-    missingModuleIds.length === 0 && pipettesCalibrated === false
+    missingModuleIds.length === 0 && !isEverythingCalibrated
   const moduleSetupIncomplete =
-    missingModuleIds.length > 0 && pipettesCalibrated === true
+    missingModuleIds.length > 0 && isEverythingCalibrated
   const moduleAndCalibrationIncomplete =
-    missingModuleIds.length > 0 && pipettesCalibrated === false
+    missingModuleIds.length > 0 && !isEverythingCalibrated
 
   let proceedToRunDisabledReason = null
   if (moduleAndCalibrationIncomplete) {
     proceedToRunDisabledReason = t(
-      'proceed_to_run_disabled_modules_and_calibration_not_complete',
-      { count: missingModuleIds.length }
+      'run_disabled_modules_and_calibration_not_complete'
     )
   } else if (calibrationIncomplete) {
-    proceedToRunDisabledReason = t(
-      'proceed_to_run_disabled_calibration_not_complete'
-    )
+    proceedToRunDisabledReason = t('run_disabled_calibration_not_complete')
   } else if (moduleSetupIncomplete) {
-    proceedToRunDisabledReason = t(
-      'proceed_to_run_disabled_modules_not_connected',
-      { count: missingModuleIds.length }
-    )
+    proceedToRunDisabledReason = t('run_disabled_modules_not_connected')
   }
 
   const LinkComponent = proceedToRunDisabledReason != null ? 'button' : NavLink

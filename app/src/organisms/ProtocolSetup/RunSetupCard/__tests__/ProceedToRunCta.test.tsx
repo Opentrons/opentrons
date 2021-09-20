@@ -1,6 +1,7 @@
 import * as React from 'react'
 import '@testing-library/jest-dom'
-import { fireEvent, waitFor, act } from '@testing-library/react'
+import { fireEvent } from '@testing-library/react'
+import { Tooltip } from '@opentrons/components'
 import { StaticRouter } from 'react-router-dom'
 import { renderWithProviders } from '@opentrons/components/__utils__'
 import { i18n } from '../../../../i18n'
@@ -13,6 +14,13 @@ import type { ProtocolPipetteTipRackCalDataByMount } from '../../../../redux/pip
 jest.mock('../hooks')
 jest.mock('../../../../redux/pipettes/__fixtures__')
 jest.mock('../../../../redux/pipettes')
+jest.mock('@opentrons/components', () => {
+  const actualComponents = jest.requireActual('@opentrons/components')
+  return {
+    ...actualComponents,
+    Tooltip: jest.fn(({ children }) => <div>{children}</div>),
+  }
+})
 
 const mockUseMissingModuleIds = hooks.useMissingModuleIds as jest.MockedFunction<
   typeof hooks.useMissingModuleIds
@@ -30,11 +38,11 @@ const mockProtocolPipetteTipRackCalData: ProtocolPipetteTipRackCalDataByMount = 
 const MOCK_PIPETTE_NOT_CALIBRATED = {
   pipetteDisplayName: 'My Pipette',
   exactPipetteMatch: 'match',
-  pipetteCalDate: '',
+  pipetteCalDate: null,
   tipRacks: [
     {
       displayName: 'My TipRack',
-      lastModifiedDate: '2021-04-10',
+      lastModifiedDate: null,
     },
   ],
 }
@@ -62,21 +70,17 @@ describe('ProceedToRunCta', () => {
 
   it('should be enabled with no tooltip if there are no missing Ids', () => {
     mockUseMissingModuleIds.mockReturnValue([])
-    const { getByRole, getByText } = render(props)
+    const { getByRole } = render(props)
     const button = getByRole('button', { name: 'Proceed to Run' })
     expect(button).not.toBeDisabled()
   })
 
-  it('should be disabled with modules not connected tooltip when there are missing moduleIds', async () => {
+  it('should be disabled with modules not connected tooltip when there are missing moduleIds', () => {
     mockUseMissingModuleIds.mockReturnValue(['temperatureModuleV1'])
     const { getByRole, getByText } = render(props)
     const button = getByRole('button', { name: 'Proceed to Run' })
     expect(button).toBeDisabled()
-    act(() => {
-      fireEvent.mouseOver(button)
-      fireEvent.mouseEnter(button)
-    })
-    await getByText('Make sure the module is connected before proceeding to run')
+    getByText('Make sure all modules are connected before proceeding to run')
   })
   it('should be disabled with modules not connected and calibration not completed tooltip if missing cal and moduleIds', async () => {
     mockUseMissingModuleIds.mockReturnValue(['temperatureModuleV1'])
@@ -87,12 +91,12 @@ describe('ProceedToRunCta', () => {
     const { getByRole, getByText } = render(props)
     const button = getByRole('button', { name: 'Proceed to Run' })
     expect(button).toBeDisabled()
-    fireEvent.mouseOver(button)
-    expect(
-      await getByText('Make sure robot calibration is complete and the module is connected before proceeding to run')
-    ).toBeInTheDocument()
+    getByText(
+      'Make sure robot calibration is complete and all modules are connected before proceeding to run'
+    )
   })
   it('should be disabled with calibration not complete tooltip', async () => {
+    mockUseMissingModuleIds.mockReturnValue([])
     mockGetProtocolPipetteTiprackData.mockReturnValue({
       left: MOCK_PIPETTE_NOT_CALIBRATED,
       right: null,
@@ -100,9 +104,8 @@ describe('ProceedToRunCta', () => {
     const { getByRole, getByText } = render(props)
     const button = getByRole('button', { name: 'Proceed to Run' })
     expect(button).toBeDisabled()
-    fireEvent.mouseOver(button)
-    expect(
-      await getByText('Make sure robot calibration is complete before proceeding to run')
-    ).toBeInTheDocument()
+    getByText(
+      'Make sure robot calibration is complete before proceeding to run'
+    )
   })
 })
