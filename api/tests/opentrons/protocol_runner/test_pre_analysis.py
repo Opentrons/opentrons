@@ -1,4 +1,5 @@
 """Tests for the opentrons.protocol_runner.pre_analysis module."""
+import pytest
 from contextlib import contextmanager
 from dataclasses import dataclass
 from json import dumps as json_dumps
@@ -7,8 +8,7 @@ from textwrap import dedent
 from typing import IO, Iterator
 from typing_extensions import Literal
 
-import pytest
-
+from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.models.json_protocol import (
     Metadata as JsonProtocolMetadata,
     Model as JsonProtocol,
@@ -119,13 +119,16 @@ def test_python_pre_analysis(tmp_path: Path) -> None:
         # its own attribute. But it's simpler to assert that apiLevel is here anyway.
         "apiLevel": "123.456",
     }
-    expected_api_level = "123.456"
+    expected_api_version = APIVersion(123, 456)
 
     with _input_file(
         tmp_path, "My Python Protocol.py", input_protocol_text
     ) as protocol_file:
         result = PreAnalyzer().analyze([protocol_file])
-        assert result == PythonPreAnalysis(expected_metadata, expected_api_level)
+        assert result == PythonPreAnalysis(
+            metadata=expected_metadata,
+            api_version=expected_api_version,
+        )
 
 
 # Apparently a bug in opentrons.protocols.parse.extract_metadata.
@@ -147,13 +150,16 @@ def test_python_non_string_metadata(tmp_path: Path) -> None:
         "apiLevel": "123.456",
         "anInt": 7890,
     }
-    expected_api_level = "123.456"
+    expected_api_version = APIVersion(123, 456)
 
     with _input_file(
         tmp_path, "My Python Protocol.py", input_protocol_text
     ) as protocol_file:
         result = PreAnalyzer().analyze([protocol_file])
-        assert result == PythonPreAnalysis(expected_metadata, expected_api_level)
+        assert result == PythonPreAnalysis(
+            metadata=expected_metadata,
+            api_version=expected_api_version,
+        )
 
 
 def test_error_if_python_file_has_syntax_error(tmp_path: Path) -> None:

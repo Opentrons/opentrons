@@ -6,6 +6,8 @@ from pathlib import Path
 from fastapi import UploadFile
 from typing import Iterator, List
 
+from opentrons.protocols.api_support.types import APIVersion
+
 from opentrons.protocol_runner.pre_analysis import (
     JsonPreAnalysis,
     PythonPreAnalysis,
@@ -95,7 +97,8 @@ async def test_create_and_get_python_protocol(
     """It should save a single protocol to disk."""
     created_at = datetime.now()
     pre_analysis = PythonPreAnalysis(
-        api_level="9001.0", metadata={"this_is_fake_metadata": True}
+        api_version=APIVersion(9001, 0),
+        metadata={"this_is_fake_metadata": True},
     )
 
     creation_result = await subject.create(

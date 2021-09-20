@@ -4,6 +4,8 @@ from datetime import datetime
 from decoy import Decoy, matchers
 from fastapi import UploadFile
 
+from opentrons.protocols.api_support.types import APIVersion
+
 from opentrons.protocol_runner.pre_analysis import (
     PreAnalyzer,
     NotPreAnalyzableError,
@@ -63,7 +65,7 @@ async def test_get_protocols(
     resource_1 = ProtocolResource(
         protocol_id="abc",
         created_at=created_at_1,
-        pre_analysis=PythonPreAnalysis(metadata={}, api_level="1234.5678"),
+        pre_analysis=PythonPreAnalysis(metadata={}, api_version=APIVersion(1234, 5678)),
         files=[],
     )
     resource_2 = ProtocolResource(
@@ -119,7 +121,7 @@ async def test_get_protocol_by_id(
     """It should return a single protocol file."""
     resource = ProtocolResource(
         protocol_id="protocol-id",
-        pre_analysis=PythonPreAnalysis(metadata={}, api_level="1234.5678"),
+        pre_analysis=PythonPreAnalysis(metadata={}, api_version=APIVersion(1234, 5678)),
         created_at=datetime(year=2021, month=1, day=1),
         files=[],
     )

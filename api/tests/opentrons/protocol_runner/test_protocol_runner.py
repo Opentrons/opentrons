@@ -1,11 +1,12 @@
 """Tests for the ProtocolRunner class."""
 import pytest
 from decoy import Decoy
-from typing import List
+from typing import List, cast
 
+from opentrons_shared_data.protocol.dev_types import JsonProtocol as JsonProtocolDict
 from opentrons.hardware_control import API as HardwareAPI
 
-# from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.models import JsonProtocol
 from opentrons.protocol_api_experimental import ProtocolContext
 from opentrons.protocol_engine import ProtocolEngine, commands as pe_commands
@@ -25,8 +26,9 @@ from opentrons.protocol_runner.legacy_wrappers import (
     LegacyFileReader,
     LegacyContextCreator,
     LegacyExecutor,
-    # LegacyPythonProtocol,
-    # LegacyProtocolContext,
+    LegacyPythonProtocol,
+    LegacyJsonProtocol,
+    LegacyProtocolContext,
 )
 
 
@@ -255,7 +257,7 @@ def test_load_python(
     """It should load a Python protocol file."""
     python_protocol_source = ProtocolSource(
         files=[],
-        pre_analysis=PythonPreAnalysis(metadata={}, api_level="3.0"),
+        pre_analysis=PythonPreAnalysis(metadata={}, api_version=APIVersion(3, 0)),
     )
 
     python_protocol = decoy.mock(cls=PythonProtocol)
@@ -281,49 +283,94 @@ def test_load_python(
     )
 
 
-# def test_load_legacy(
-#     decoy: Decoy,
-#     legacy_file_reader: LegacyFileReader,
-#     legacy_context_creator: LegacyContextCreator,
-#     legacy_executor: LegacyExecutor,
-#     task_queue: TaskQueue,
-#     subject: ProtocolRunner,
-# ) -> None:
-#     """It should load a legacy context-based protocol."""
-#     legacy_protocol_source = ProtocolFile(
-#         protocol_type=ProtocolFileType.PYTHON,
-#         files=[],
-#     )
+def test_load_legacy_python(
+    decoy: Decoy,
+    legacy_file_reader: LegacyFileReader,
+    legacy_context_creator: LegacyContextCreator,
+    legacy_executor: LegacyExecutor,
+    task_queue: TaskQueue,
+    subject: ProtocolRunner,
+) -> None:
+    """It should load a legacy context-based Python protocol."""
+    legacy_protocol_source = ProtocolSource(
+        files=[],
+        pre_analysis=PythonPreAnalysis(metadata={}, api_version=APIVersion(2, 11)),
+    )
 
-#     legacy_protocol = LegacyPythonProtocol(
-#         text="",
-#         contents="",
-#         filename="protocol.py",
-#         api_level=APIVersion(2, 10),
-#         metadata={"foo": "bar"},
-#         bundled_labware=None,
-#         bundled_data=None,
-#         bundled_python=None,
-#         extra_labware=None,
-#     )
+    legacy_protocol = LegacyPythonProtocol(
+        text="",
+        contents="",
+        filename="protocol.py",
+        api_level=APIVersion(2, 11),
+        metadata={"foo": "bar"},
+        bundled_labware=None,
+        bundled_data=None,
+        bundled_python=None,
+        extra_labware=None,
+    )
 
-#     legacy_context = decoy.mock(cls=LegacyProtocolContext)
+    legacy_context = decoy.mock(cls=LegacyProtocolContext)
 
-#     decoy.when(legacy_file_reader.read(legacy_protocol_source)).then_return(
-#         legacy_protocol
-#     )
-#     decoy.when(legacy_context_creator.create(APIVersion(2, 10))).then_return(
-#         legacy_context
-#     )
+    decoy.when(legacy_file_reader.read(legacy_protocol_source)).then_return(
+        legacy_protocol
+    )
+    decoy.when(legacy_context_creator.create(APIVersion(2, 11))).then_return(
+        legacy_context
+    )
 
-#     subject.load(legacy_protocol_source)
+    subject.load(legacy_protocol_source)
 
-#     decoy.verify(
-#         task_queue.add(
-#             phase=TaskQueuePhase.RUN,
-#             func=legacy_executor.execute,
-#             protocol=legacy_protocol,
-#             context=legacy_context,
-#         ),
-#         times=1,
-#     )
+    decoy.verify(
+        task_queue.add(
+            phase=TaskQueuePhase.RUN,
+            func=legacy_executor.execute,
+            protocol=legacy_protocol,
+            context=legacy_context,
+        ),
+        times=1,
+    )
+
+
+def test_load_legacy_json(
+    decoy: Decoy,
+    legacy_file_reader: LegacyFileReader,
+    legacy_context_creator: LegacyContextCreator,
+    legacy_executor: LegacyExecutor,
+    task_queue: TaskQueue,
+    subject: ProtocolRunner,
+) -> None:
+    """It should load a legacy context-based Python protocol."""
+    legacy_protocol_source = ProtocolSource(
+        files=[],
+        pre_analysis=JsonPreAnalysis(metadata={}, schema_version=5),
+    )
+
+    legacy_protocol = LegacyJsonProtocol(
+        text="{}",
+        contents=cast(JsonProtocolDict, {}),
+        filename="protocol.json",
+        api_level=APIVersion(2, 11),
+        schema_version=5,
+        metadata={"foo": "bar"},
+    )
+
+    legacy_context = decoy.mock(cls=LegacyProtocolContext)
+
+    decoy.when(legacy_file_reader.read(legacy_protocol_source)).then_return(
+        legacy_protocol
+    )
+    decoy.when(legacy_context_creator.create(APIVersion(2, 11))).then_return(
+        legacy_context
+    )
+
+    subject.load(legacy_protocol_source)
+
+    decoy.verify(
+        task_queue.add(
+            phase=TaskQueuePhase.RUN,
+            func=legacy_executor.execute,
+            protocol=legacy_protocol,
+            context=legacy_context,
+        ),
+        times=1,
+    )

@@ -13,6 +13,7 @@ from datetime import datetime
 from decoy import matchers
 
 from opentrons.types import MountType
+from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_api_experimental import DeckSlotName
 
 from opentrons.protocol_engine import (
@@ -34,7 +35,7 @@ async def test_runner_with_python(python_protocol_file: Path) -> None:
     """It should run a Python protocol on the ProtocolRunner."""
     protocol_source = ProtocolSource(
         files=[python_protocol_file],
-        pre_analysis=PythonPreAnalysis(metadata={}, api_level="3.0"),
+        pre_analysis=PythonPreAnalysis(metadata={}, api_version=APIVersion(3, 0)),
     )
 
     subject = await create_simulating_runner()
@@ -129,7 +130,7 @@ async def test_runner_with_legacy_python(legacy_python_protocol_file: Path) -> N
     """It should run a Python protocol on the ProtocolRunner."""
     protocol_source = ProtocolSource(
         files=[legacy_python_protocol_file],
-        pre_analysis=PythonPreAnalysis(metadata={}, api_level="2.11"),
+        pre_analysis=PythonPreAnalysis(metadata={}, api_version=APIVersion(2, 11)),
     )
 
     subject = await create_simulating_runner()

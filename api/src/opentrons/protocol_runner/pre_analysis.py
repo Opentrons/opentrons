@@ -13,6 +13,7 @@ from typing_extensions import Protocol
 
 from pydantic import ValidationError as PydanticValidationError
 
+from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.parse import extract_metadata as extract_python_metadata
 from opentrons.protocols.models import JsonProtocol
 
@@ -49,7 +50,7 @@ class PythonPreAnalysis:
     """A pre-analysis of a Python protocol."""
 
     metadata: Metadata
-    api_level: str
+    api_version: APIVersion
 
 
 @dataclass(frozen=True)
@@ -122,7 +123,7 @@ def _analyze_json(main_file_contents: bytes) -> JsonPreAnalysis:
 
 
 # todo(mm, 2021-09-13): Deduplicate with opentrons.protocols.parse.
-def _analyze_python(
+def _analyze_python(  # noqa: C901
     main_file_contents: bytes,
     main_file_name: str,
 ) -> "PythonPreAnalysis":
@@ -158,7 +159,14 @@ def _analyze_python(
             f' "{type(api_level)}".'
         )
 
-    return PythonPreAnalysis(metadata=metadata, api_level=api_level)
+    try:
+        api_version = APIVersion.from_string(api_level)
+    except ValueError as exception:
+        raise PythonMetadataError(
+            f"apiLevel '{api_level}' is not of the format X.Y"
+        ) from exception
+
+    return PythonPreAnalysis(metadata=metadata, api_version=api_version)
 
 
 class NotPreAnalyzableError(Exception):

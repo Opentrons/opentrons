@@ -80,16 +80,22 @@ class ProtocolRunner:
         to control the run of a file-based protocol.
         """
         pre_analysis = protocol_source.pre_analysis
-        # execution_method = protocol_file.execution_method
-
-        # if isinstance(execution_method, LegacyExecution):
-        #     self._load_legacy(protocol_file, api_version=execution_method.api_version)
 
         if isinstance(pre_analysis, JsonPreAnalysis):
-            self._load_json(protocol_source)
+            schema_version = pre_analysis.schema_version
+
+            if schema_version >= 6:
+                self._load_json(protocol_source)
+            else:
+                self._load_legacy(protocol_source)
 
         elif isinstance(pre_analysis, PythonPreAnalysis):
-            self._load_python(protocol_source)
+            api_version = pre_analysis.api_version
+
+            if api_version >= APIVersion(3, 0):
+                self._load_python(protocol_source)
+            else:
+                self._load_legacy(protocol_source)
 
     def play(self) -> None:
         """Start or resume the run."""
@@ -150,15 +156,12 @@ class ProtocolRunner:
     def _load_legacy(
         self,
         protocol_source: ProtocolSource,
-        api_version: APIVersion,
     ) -> None:
         protocol = self._legacy_file_reader.read(protocol_source)
-        context = self._legacy_context_creator.create(api_version)
+        context = self._legacy_context_creator.create(protocol.api_level)
         self._task_queue.add(
             phase=TaskQueuePhase.RUN,
             func=self._legacy_executor.execute,
             protocol=protocol,
             context=context,
         )
-
-        # self._context = context
