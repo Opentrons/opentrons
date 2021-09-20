@@ -55,10 +55,10 @@ async def check_version_header(
         ),
     ),
 ) -> None:
-    """Get the Opentrons-Version headers and set them in state and response headers.
+    """Get the request's version header and prepare state and response.
 
-    This function hooks into FastAPI via `fastapi.depends`, and should be used
-    as a router or application level dependency.
+    This function should be used inside a `fastapi.Depends` as a router
+    or application dependency.
     """
     if opentrons_version == LATEST_API_VERSION_HEADER_VALUE:
         api_version = API_VERSION
@@ -80,13 +80,11 @@ async def check_version_header(
     response.headers[MIN_API_VERSION_HEADER] = f"{MIN_API_VERSION}"
 
 
-async def set_version_response_headers(request: Request, response: Response) -> None:
+async def set_version_response_headers(response: Response) -> None:
     """Set Opentrons-Version headers on the response, without checking the request.
 
-    This function hooks into FastAPI via `fastapi.depends`, and should be used
-    as a router or application level dependency.
+    This function should be used inside a `fastapi.Depends` as a router
+    or application dependency.
     """
-    api_version = getattr(request.state, "api_version", API_VERSION)
-
-    response.headers[API_VERSION_HEADER] = f"{api_version}"
+    response.headers[API_VERSION_HEADER] = f"{API_VERSION}"
     response.headers[MIN_API_VERSION_HEADER] = f"{MIN_API_VERSION}"
