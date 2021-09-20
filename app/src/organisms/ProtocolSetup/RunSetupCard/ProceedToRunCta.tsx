@@ -13,7 +13,6 @@ import {
   C_BLUE,
 } from '@opentrons/components'
 import * as Pipettes from '../../../redux/pipettes'
-import * as PipetteConstants from '../../../redux/pipettes/constants'
 import type { State } from '../../../redux/types'
 
 interface ProceedToRunProps {
