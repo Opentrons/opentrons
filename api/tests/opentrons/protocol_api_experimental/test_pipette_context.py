@@ -3,7 +3,7 @@ import pytest
 from decoy import Decoy
 
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
-from opentrons.protocol_engine.types import WellOrigin, WellLocation
+from opentrons.protocol_engine.types import WellOrigin, WellOffset, WellLocation
 from opentrons.protocol_api_experimental import PipetteContext, Labware, Well
 
 
@@ -99,7 +99,10 @@ def test_aspirate(
             pipette_id=pipette_id,
             labware_id=labware_id,
             well_name=well.well_name,
-            well_location=WellLocation(origin=WellOrigin.BOTTOM, offset=(0, 0, 1)),
+            well_location=WellLocation(
+                origin=WellOrigin.BOTTOM,
+                offset=WellOffset(x=0, y=0, z=1),
+            ),
             volume=12345.6789,
         )
     )
@@ -140,7 +143,10 @@ def test_dispense(
             pipette_id=pipette_id,
             labware_id=labware_id,
             well_name=well.well_name,
-            well_location=WellLocation(origin=WellOrigin.BOTTOM, offset=(0, 0, 1)),
+            well_location=WellLocation(
+                origin=WellOrigin.BOTTOM,
+                offset=WellOffset(x=0, y=0, z=1),
+            ),
             volume=10,
         )
     )

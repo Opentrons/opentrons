@@ -18,21 +18,18 @@ import { ModuleDiagram } from './ModuleDiagram'
 import { isModuleWithCollisionIssue } from './utils'
 import styles from './styles.css'
 
-import { ModuleRealType } from '@opentrons/shared-data'
+import { ModuleType } from '@opentrons/shared-data'
 
 interface Props {
   moduleOnDeck?: ModuleOnDeck
   showCollisionWarnings?: boolean
-  type: ModuleRealType
-  openEditModuleModal: (
-    moduleType: ModuleRealType,
-    moduleId?: string
-  ) => unknown
+  type: ModuleType
+  openEditModuleModal: (moduleType: ModuleType, moduleId?: string) => unknown
 }
 
 export function ModuleRow(props: Props): JSX.Element {
   const { moduleOnDeck, openEditModuleModal, showCollisionWarnings } = props
-  const type: ModuleRealType = moduleOnDeck?.type || props.type
+  const type: ModuleType = moduleOnDeck?.type || props.type
 
   const model = moduleOnDeck?.model
   const slot = moduleOnDeck?.slot
@@ -85,10 +82,8 @@ export function ModuleRow(props: Props): JSX.Element {
     <div className={styles.collision_tolltip}>{collisionTooltipText}</div>
   )
 
-  const setCurrentModule = (
-    moduleType: ModuleRealType,
-    moduleId?: string
-  ) => () => openEditModuleModal(moduleType, moduleId)
+  const setCurrentModule = (moduleType: ModuleType, moduleId?: string) => () =>
+    openEditModuleModal(moduleType, moduleId)
 
   const addRemoveText = moduleOnDeck ? 'remove' : 'add'
 

@@ -3,7 +3,6 @@ import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
-  THERMOCYCLER,
   MAGNETIC_MODULE_V1,
   MAGNETIC_MODULE_V2,
   TEMPERATURE_MODULE_V1,
@@ -11,7 +10,7 @@ import {
   THERMOCYCLER_MODULE_V1,
   LabwareDefinition2,
   DeckSlot as DeckDefSlot,
-  ModuleRealType,
+  ModuleType,
   ModuleModel,
 } from '@opentrons/shared-data'
 import { i18n } from './localization'
@@ -45,7 +44,7 @@ export const PSEUDO_DECK_SLOTS: Record<DeckSlot, DeckDefSlot> = {
       yDimension: STD_SLOT_Y_DIM * 2 + STD_SLOT_DIVIDER_WIDTH,
       zDimension: 0,
     },
-    compatibleModules: [THERMOCYCLER],
+    compatibleModules: [THERMOCYCLER_MODULE_TYPE],
   },
 }
 export const START_TERMINAL_TITLE = 'STARTING DECK STATE'
@@ -75,7 +74,7 @@ export const MAX_TC_LID_TEMP = 110
 export const MIN_TC_DURATION_SECONDS = 0
 export const MAX_TC_DURATION_SECONDS = 60
 export const MODELS_FOR_MODULE_TYPE: Record<
-  ModuleRealType,
+  ModuleType,
   Array<{
     name: string
     value: string
@@ -112,10 +111,7 @@ export const MODELS_FOR_MODULE_TYPE: Record<
     },
   ],
 }
-export const DEFAULT_MODEL_FOR_MODULE_TYPE: Record<
-  ModuleRealType,
-  ModuleModel
-> = {
+export const DEFAULT_MODEL_FOR_MODULE_TYPE: Record<ModuleType, ModuleModel> = {
   [MAGNETIC_MODULE_TYPE]: MAGNETIC_MODULE_V1,
   [TEMPERATURE_MODULE_TYPE]: TEMPERATURE_MODULE_V1,
   [THERMOCYCLER_MODULE_TYPE]: THERMOCYCLER_MODULE_V1,

@@ -28,7 +28,7 @@ exports[`buttons Button with iconName renders correctly 1`] = `
 >
   <svg
     aria-hidden="true"
-    className="sc-AxmLO c0 icon"
+    className="sc-fzozJi c0 icon"
     fill="currentColor"
     version="1.1"
     viewBox="0 0 24 24"
@@ -71,7 +71,7 @@ exports[`buttons FlatButton with iconName renders correctly 1`] = `
 >
   <svg
     aria-hidden="true"
-    className="sc-AxmLO c0 icon"
+    className="sc-fzozJi c0 icon"
     fill="currentColor"
     version="1.1"
     viewBox="0 0 24 24"
@@ -103,7 +103,7 @@ exports[`buttons IconButton renders correctly 1`] = `
 >
   <svg
     aria-hidden="true"
-    className="sc-AxmLO c0 spin"
+    className="sc-fzozJi c0 spin"
     fill="currentColor"
     version="1.1"
     viewBox="0 0 24 24"
@@ -156,7 +156,7 @@ exports[`buttons OutlineButton with iconName renders correctly 1`] = `
 >
   <svg
     aria-hidden="true"
-    className="sc-AxmLO c0 icon"
+    className="sc-fzozJi c0 icon"
     fill="currentColor"
     version="1.1"
     viewBox="0 0 24 24"
@@ -199,7 +199,7 @@ exports[`buttons PrimaryButton with iconName renders correctly 1`] = `
 >
   <svg
     aria-hidden="true"
-    className="sc-AxmLO c0 icon"
+    className="sc-fzozJi c0 icon"
     fill="currentColor"
     version="1.1"
     viewBox="0 0 24 24"

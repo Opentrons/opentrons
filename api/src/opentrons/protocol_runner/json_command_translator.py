@@ -9,6 +9,7 @@ from opentrons.protocol_engine import (
     PipetteName,
     WellLocation,
     WellOrigin,
+    WellOffset,
 )
 
 
@@ -120,7 +121,7 @@ class JsonCommandTranslator:
                 volume=command.params.volume,
                 wellLocation=WellLocation(
                     origin=WellOrigin.BOTTOM,
-                    offset=(0, 0, command.params.offsetFromBottomMm),
+                    offset=WellOffset(x=0, y=0, z=command.params.offsetFromBottomMm),
                 ),
             )
         )
@@ -137,7 +138,7 @@ class JsonCommandTranslator:
                 volume=command.params.volume,
                 wellLocation=WellLocation(
                     origin=WellOrigin.BOTTOM,
-                    offset=(0, 0, command.params.offsetFromBottomMm),
+                    offset=WellOffset(x=0, y=0, z=command.params.offsetFromBottomMm),
                 ),
             )
         )

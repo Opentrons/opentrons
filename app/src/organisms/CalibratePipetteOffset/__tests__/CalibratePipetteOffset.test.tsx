@@ -3,7 +3,7 @@ import { Provider } from 'react-redux'
 import { HTMLAttributes, mount } from 'enzyme'
 import { act } from 'react-dom/test-utils'
 
-import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
+import { getDeckDefinitions } from '@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions'
 
 import * as Sessions from '../../../redux/sessions'
 import { mockPipetteOffsetCalibrationSessionAttributes } from '../../../redux/sessions/__fixtures__'
@@ -25,7 +25,7 @@ import type { ReactWrapper } from 'enzyme'
 import type { Dispatch } from 'redux'
 import { DispatchRequestsType } from '../../../redux/robot-api'
 
-jest.mock('@opentrons/components/src/deck/getDeckDefinitions')
+jest.mock('@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions')
 jest.mock('../../../redux/sessions/selectors')
 jest.mock('../../../redux/robot-api/selectors')
 

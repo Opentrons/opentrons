@@ -1,6 +1,6 @@
 import React from 'react'
 import '@testing-library/jest-dom'
-import { ModuleModel, ModuleRealType } from '@opentrons/shared-data'
+import { ModuleModel, ModuleType } from '@opentrons/shared-data'
 import { ModuleInfo } from '../ModuleInfo'
 import { renderWithProviders } from '@opentrons/components/__utils__'
 import { i18n } from '../../../../../i18n'
@@ -10,21 +10,17 @@ const render = (props: React.ComponentProps<typeof ModuleInfo>) => {
     i18nInstance: i18n,
   })
 }
-const STUBBED_ORIENTATION_VALUE = 'left'
 const mockTCModule = {
   labwareOffset: { x: 3, y: 3, z: 3 },
   moduleId: 'TCModuleId',
   model: 'thermocyclerModuleV1' as ModuleModel,
-  type: 'thermocyclerModuleType' as ModuleRealType,
+  type: 'thermocyclerModuleType' as ModuleType,
 }
 
 describe('ModuleInfo', () => {
   let props: React.ComponentProps<typeof ModuleInfo>
   beforeEach(() => {
     props = {
-      x: mockTCModule.labwareOffset.x,
-      y: mockTCModule.labwareOffset.y,
-      orientation: STUBBED_ORIENTATION_VALUE,
       moduleModel: mockTCModule.model,
       isAttached: false,
       usbPort: null,
@@ -34,11 +30,11 @@ describe('ModuleInfo', () => {
 
   it('should show module not connected', () => {
     const { getByText } = render(props)
-    expect(getByText('Not Connected')).toBeTruthy()
+    expect(getByText('Not connected')).toBeTruthy()
   })
 
   it('should show module connected and hub number', () => {
-    props = { ...props, usbPort: '1', hubPort: '1', isAttached: true }
+    props = { ...props, usbPort: 1, hubPort: 1, isAttached: true }
     const { getByText } = render(props)
     expect(getByText('Connected')).toBeTruthy()
     expect(getByText('USB Port 1 via hub')).toBeTruthy()
@@ -52,7 +48,7 @@ describe('ModuleInfo', () => {
   })
 
   it('should show module connected and USB number', () => {
-    props = { ...props, usbPort: '1', hubPort: null, isAttached: true }
+    props = { ...props, usbPort: 1, hubPort: null, isAttached: true }
     const { getByText } = render(props)
     expect(getByText('Connected')).toBeTruthy()
     expect(getByText('USB Port 1')).toBeTruthy()

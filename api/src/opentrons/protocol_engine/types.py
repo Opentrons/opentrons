@@ -1,8 +1,8 @@
 """Public protocol engine value types and models."""
 from enum import Enum
 from dataclasses import dataclass
-from pydantic import BaseModel
-from typing import Union, Tuple
+from pydantic import BaseModel, Field
+from typing import Union
 
 from opentrons.types import MountType, DeckSlotName
 
@@ -37,11 +37,19 @@ class WellOrigin(str, Enum):
     BOTTOM = "bottom"
 
 
+class WellOffset(BaseModel):
+    """An offset vector in (x, y, z)."""
+
+    x: float = 0
+    y: float = 0
+    z: float = 0
+
+
 class WellLocation(BaseModel):
     """A relative location in reference to a well's location."""
 
     origin: WellOrigin = WellOrigin.TOP
-    offset: Tuple[float, float, float] = (0, 0, 0)
+    offset: WellOffset = Field(default_factory=WellOffset)
 
 
 @dataclass(frozen=True)

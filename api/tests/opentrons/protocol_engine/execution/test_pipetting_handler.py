@@ -8,7 +8,7 @@ from opentrons.types import Mount
 from opentrons.hardware_control.api import API as HardwareAPI
 from opentrons.hardware_control.dev_types import PipetteDict
 
-from opentrons.protocol_engine import WellLocation, WellOrigin
+from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset
 from opentrons.protocol_engine.state import (
     StateStore,
     TipGeometry,
@@ -174,7 +174,7 @@ async def test_handle_drop_up_tip_request(
             labware_id="labware-id",
             pipette_config=mock_hw_pipettes.right_config,
         )
-    ).then_return(WellLocation(offset=(0, 0, 10)))
+    ).then_return(WellLocation(offset=WellOffset(x=0, y=0, z=10)))
 
     await handler.drop_tip(
         pipette_id="pipette-id",
@@ -187,7 +187,7 @@ async def test_handle_drop_up_tip_request(
             pipette_id="pipette-id",
             labware_id="labware-id",
             well_name="A1",
-            well_location=WellLocation(offset=(0, 0, 10)),
+            well_location=WellLocation(offset=WellOffset(x=0, y=0, z=10)),
         ),
         await hardware_api.drop_tip(mount=Mount.RIGHT, home_after=True),
     )
@@ -202,7 +202,10 @@ async def test_handle_aspirate_request_without_prep(
     handler: PipettingHandler,
 ) -> None:
     """It should aspirate from a well if pipette is ready to aspirate."""
-    well_location = WellLocation(origin=WellOrigin.BOTTOM, offset=(0, 0, 1))
+    well_location = WellLocation(
+        origin=WellOrigin.BOTTOM,
+        offset=WellOffset(x=0, y=0, z=1),
+    )
 
     decoy.when(
         state_store.pipettes.get_hardware_pipette(
@@ -257,7 +260,10 @@ async def test_handle_aspirate_request_with_prep(
     handler: PipettingHandler,
 ) -> None:
     """It should aspirate from a well if pipette isn't ready to aspirate."""
-    well_location = WellLocation(origin=WellOrigin.BOTTOM, offset=(0, 0, 1))
+    well_location = WellLocation(
+        origin=WellOrigin.BOTTOM,
+        offset=WellOffset(x=0, y=0, z=1),
+    )
 
     decoy.when(
         state_store.pipettes.get_hardware_pipette(
@@ -320,7 +326,10 @@ async def test_handle_dispense_request(
     handler: PipettingHandler,
 ) -> None:
     """It should be able to dispense to a well."""
-    well_location = WellLocation(origin=WellOrigin.BOTTOM, offset=(0, 0, 1))
+    well_location = WellLocation(
+        origin=WellOrigin.BOTTOM,
+        offset=WellOffset(x=0, y=0, z=1),
+    )
 
     decoy.when(
         state_store.pipettes.get_hardware_pipette(

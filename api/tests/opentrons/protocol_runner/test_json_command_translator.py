@@ -12,6 +12,7 @@ from opentrons.protocol_engine import (
     PipetteName,
     WellLocation,
     WellOrigin,
+    WellOffset,
 )
 
 
@@ -193,7 +194,7 @@ def test_aspirate(subject: JsonCommandTranslator) -> None:
                 wellName="A1",
                 wellLocation=WellLocation(
                     origin=WellOrigin.BOTTOM,
-                    offset=(0, 0, 7.89),
+                    offset=WellOffset(x=0, y=0, z=7.89),
                 ),
             )
         )
@@ -225,7 +226,7 @@ def test_dispense(subject: JsonCommandTranslator) -> None:
                 wellName="A1",
                 wellLocation=WellLocation(
                     origin=WellOrigin.BOTTOM,
-                    offset=(0, 0, 7.89),
+                    offset=WellOffset(x=0, y=0, z=7.89),
                 ),
             )
         )

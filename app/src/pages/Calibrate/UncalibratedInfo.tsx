@@ -52,6 +52,7 @@ interface UncalibratedInfoProps {
   hasCalibrated: boolean
   handleStart: () => unknown
   showSpinner: boolean
+  robotCalStep?: boolean
 }
 
 export function UncalibratedInfo(props: UncalibratedInfoProps): JSX.Element {

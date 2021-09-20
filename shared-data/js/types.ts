@@ -15,6 +15,7 @@ import {
   LEFT,
   RIGHT,
 } from './constants'
+import type { INode } from 'svgson'
 
 // TODO Ian 2019-06-04 split this out into eg ../labware/flowTypes/labwareV1.js
 export interface WellDefinition {
@@ -81,11 +82,12 @@ export interface LabwareDimensions {
   zDimension: number
 }
 
-export interface LabwareOffset {
+export interface Coordinates {
   x: number
   y: number
   z: number
 }
+export type LabwareOffset = Coordinates
 
 // 1. Valid pipette type for a container (i.e. is there multi channel access?)
 // 2. Is the container a tiprack?
@@ -159,15 +161,11 @@ export interface LabwareDefinition2 {
   groups: LabwareWellGroup[]
 }
 
-// Module Type corresponds to `moduleType` key in a module definition. Is NOT model.
-// TODO: IL 2020-02-20 ModuleType is DEPRECATED. Replace all instances with ModuleRealType
-// (then finally rename ModuleRealType -> ModuleType)
-export type ModuleType = typeof MAGDECK | typeof TEMPDECK | typeof THERMOCYCLER
-
-export type ModuleRealType =
+export type ModuleType =
   | typeof MAGNETIC_MODULE_TYPE
   | typeof TEMPERATURE_MODULE_TYPE
   | typeof THERMOCYCLER_MODULE_TYPE
+
 // ModuleModel corresponds to top-level keys in shared-data/module/definitions/2
 export type MagneticModuleModel =
   | typeof MAGNETIC_MODULE_V1
@@ -266,7 +264,13 @@ export interface DeckDefinition {
 export interface ModuleDimensions {
   bareOverallHeight: number
   overLabwareHeight: number
-  lidHeight: number
+  xDimension: number
+  yDimension: number
+  footprintXDimension?: number
+  footprintYDimension?: number
+  labwareInterfaceXDimension?: number
+  labwareInterfaceYDimension?: number
+  lidHeight?: number
 }
 
 export interface ModuleCalibrationPoint {
@@ -275,13 +279,38 @@ export interface ModuleCalibrationPoint {
   z?: number
 }
 
+export interface ModuleLayer {
+  name: string
+  pathDValues: string[]
+}
+
+// module definition that adheres to the v3 module json schema
 export interface ModuleDefinition {
-  labwareOffset: LabwareOffset
+  moduleType: ModuleType
+  model: ModuleModel
+  labwareOffset: Coordinates
   dimensions: ModuleDimensions
+  cornerOffsetFromSlot: Coordinates
   calibrationPoint: ModuleCalibrationPoint
   displayName: string
-  loadName: string
   quirks: string[]
+  slotTransforms: SlotTransforms
+  compatibleWith: ModuleModel[]
+  twoDimensionalRendering: INode
+}
+
+export type AffineTransformMatrix = [
+  [number, number, number],
+  [number, number, number],
+  [number, number, number]
+]
+
+export interface SlotTransforms {
+  [deckOtId: string]: {
+    [slotId: string]: {
+      [transformKey in keyof ModuleDefinition]?: AffineTransformMatrix
+    }
+  }
 }
 
 export type ModuleOrientation = 'left' | 'right'

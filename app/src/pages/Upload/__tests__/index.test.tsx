@@ -6,10 +6,12 @@ import { i18n } from '../../../i18n'
 
 import * as Fixtures from '../../../redux/discovery/__fixtures__'
 import * as ConfigSelectors from '../../../redux/config/selectors'
+import * as calibrationSelectors from '../../../redux/calibration/selectors'
 import * as RobotSelectors from '../../../redux/robot/selectors'
 import * as ProtocolSelectors from '../../../redux/protocol/selectors'
 import * as DiscoSelectors from '../../../redux/discovery/selectors'
 import * as CustomLWSelectors from '../../../redux/custom-labware/selectors'
+import { mockCalibrationStatus } from '../../../redux/calibration/__fixtures__'
 
 import { Upload } from '../'
 
@@ -20,6 +22,7 @@ jest.mock('../../../redux/robot/selectors')
 jest.mock('../../../redux/protocol/selectors')
 jest.mock('../../../redux/discovery/selectors')
 jest.mock('../../../redux/custom-labware/selectors')
+jest.mock('../../../redux/calibration/selectors')
 
 const getFeatureFlags = ConfigSelectors.getFeatureFlags as jest.MockedFunction<
   typeof ConfigSelectors.getFeatureFlags
@@ -44,6 +47,10 @@ const getCustomLabware = CustomLWSelectors.getCustomLabware as jest.MockedFuncti
 >
 const getConnectedRobot = DiscoSelectors.getConnectedRobot as jest.MockedFunction<
   typeof DiscoSelectors.getConnectedRobot
+>
+
+const getCalibrationStatus = calibrationSelectors.getCalibrationStatus as jest.MockedFunction<
+  typeof calibrationSelectors.getCalibrationStatus
 >
 
 describe('Upload page', () => {
@@ -77,6 +84,7 @@ describe('Upload page', () => {
     getProtocolFilename.mockReturnValue(null)
     getCustomLabware.mockReturnValue([])
     getConnectedRobot.mockReturnValue(Fixtures.mockConnectedRobot)
+    getCalibrationStatus.mockReturnValue(mockCalibrationStatus)
   })
 
   afterEach(() => {
