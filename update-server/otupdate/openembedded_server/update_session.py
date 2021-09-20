@@ -15,7 +15,7 @@ class Stages(enum.Enum):
     AWAITING_FILE = Value('awaiting-file', 'Waiting for update file')
     VALIDATING = Value('validating', 'Validating update file')
     WRITING = Value('writing', 'Writing update to system')
-    Done = Value('done', 'Ready to commit update')
+    DONE = Value('done', 'Ready to commit update')
     READY_FOR_RESTART = Value('ready-for-restart', 'Ready for restart')
     ERROR = Value('error', 'Error')
 
@@ -27,7 +27,7 @@ class UpdateSession:
     def __init__(self, storage_path: str) -> None:
         self._token = base64.urlsafe_b64encode(uuid.uuid4().bytes)\
                             .decode().strip('=')
-        self._state = Stages.AWAITING_FILE
+        self._stage = Stages.AWAITING_FILE
         self._progress = 0.0
         self._message = ''
         self._error: Optional[Value] = None
@@ -69,7 +69,7 @@ class UpdateSession:
         return self._storage_path
 
     @property
-    def rootfs_file(self) -> str:
+    def rootfs_file(self) -> Optional[str]:
         return self._rootfs_file
 
     @property

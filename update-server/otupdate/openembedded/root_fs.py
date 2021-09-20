@@ -20,6 +20,20 @@ class RootFSInfo:
     minor: int
     disk: str
 
+    def init(self):
+        self.major = None
+        self.minor = None
+        self.disk = ''
+
+    def __str__(self):
+        try:
+            if (None is not self.major and None is not self.minor):
+                return (str)(str(self.disk)+str(self.major)+str(self.minor))
+            else:
+                raise TypeError
+        except TypeError:
+            LOG.exception('disk not found')
+
 
 """ A simple class for OT3 RootFS manipulation
  ** Get current partition RootFS is mounted on
@@ -157,9 +171,9 @@ class RootFS:
 
     """ debug fuctions """
     def print_rootFS_partition(self, arg: argparse.Namespace) -> str:
-        tmp = self.get_partition()
-        tmp = ('Current RootFS Partition '+tmp.disk+'\n')
-        return tmp
+        tmp = str(self.get_partition().disk)
+        tmp = ('Current RootFS Partition ' + tmp + '\n')
+        return str(tmp)
 
     def print_rootFS_config(self, arg: argparse.Namespace) -> str:
         tmp = (('ROOTFS_TEST_TITLE '+arg.tt+'\n') +

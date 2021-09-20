@@ -136,7 +136,7 @@ async def file_upload(
         return web.json_response(
             data={'error': 'file-already-uploaded',
                   'message': 'A file has already been sent for this update'},
-            staus=409)
+            status=409)
     reader = await request.multipart()
     async for part in reader:
         if part.name != 'ot3-system.zip':

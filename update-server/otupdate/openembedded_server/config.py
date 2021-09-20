@@ -5,7 +5,7 @@ otupdate.openembedded.config: Handlers for reading update server configuration
 import os
 import logging
 import json
-from typing import Any, Mapping, NamedTuple, Optional, Tuple
+from typing import Any, Dict, Mapping, NamedTuple, Optional, Tuple
 
 from aiohttp.web import Request
 
@@ -55,7 +55,7 @@ def _ensure_load(path: str) -> Optional[Mapping[str, Any]]:
     return data
 
 
-def _ensure_values(data: Mapping[str, Any]) -> Tuple[dict[str, Any], bool]:
+def _ensure_values(data: Mapping[str, Any]) -> Tuple[Dict[str, Any], bool]:
     """ Mskr dure we have appropriate keys and say if we should write """
     to_return = {}
     should_write = False
@@ -98,7 +98,7 @@ def load_from_path(path: str) -> Config:
     return config
 
 
-def _get_path(args_path: Optional[str]) -> str:
+def _get_path(args_path: str) -> str:
     """ Find the valid path from args then env then default """
     env_path = os.getenv(PATH_ENVIRONMENT_VARIABLE)
     for path, source in ((args_path, 'arg'),
@@ -112,7 +112,7 @@ def _get_path(args_path: Optional[str]) -> str:
     return DEFAULT_PATH
 
 
-def load(args_path: str = None) -> Config:
+def load(args_path: str) -> Config:
     """
     Load the config files, selecting the appropriate path from many sources
     """

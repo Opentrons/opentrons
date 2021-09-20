@@ -3,7 +3,10 @@ import asyncio
 import logging
 from aiohttp import web
 
-# from . import constants, name_management
+# from . import constants
+
+# , name_management
+
 from . import config, update
 # from . import config, control, update, ssh_key_management
 from openembedded import root_fs
@@ -25,7 +28,7 @@ def get_app(system_version_file: str = None,
             config_file_override: str = None,
             name_override: str = None,
             boot_id_override: str = None,
-            rfs: root_fs.RootFS = None,
+            rfs: root_fs.RootFS = root_fs.RootFS(),
             loop: asyncio.AbstractEventLoop = None) -> web.Application:
     """ Build and return the aiohttp.web.Application that runs the server
 

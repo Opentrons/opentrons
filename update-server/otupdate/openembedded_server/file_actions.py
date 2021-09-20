@@ -266,7 +266,7 @@ def validate_update(filepath: str,
     assert rootfs
     rootfs_hash = hash_file(rootfs,
                             hash_callback,
-                            file_start=sizes[ROOTFS_NAME])
+                            file_size=sizes[ROOTFS_NAME])
     hashfile = files.get(ROOTFS_HASH_NAME)
     assert hashfile
     packaged_hash = open(hashfile, 'rb').read().strip()

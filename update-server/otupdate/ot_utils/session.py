@@ -42,7 +42,7 @@ class UpdateSession:
     def __init__(self, storage_path: str) -> None:
         self._token = base64.urlsafe_b64encode(uuid.uuid4().bytes)\
                             .decode().strip('=')
-        self._state = Stages.AWAITING_FILE
+        self._stage = Stages.AWAITING_FILE
         self._progress = 0.0
         self._message = ''
         self._error: Optional[Value] = None
@@ -84,7 +84,7 @@ class UpdateSession:
         return self._storage_path
 
     @property
-    def rootfs_file(self) -> str:
+    def rootfs_file(self) -> Optional[str]:
         return self._rootfs_file
 
     @property
