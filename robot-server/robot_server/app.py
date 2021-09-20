@@ -1,11 +1,8 @@
 """Main FastAPI application."""
 import asyncio
 import logging
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from starlette.responses import Response
-from starlette.requests import Request
-from starlette.middleware.base import RequestResponseEndpoint
 
 from opentrons import __version__
 
@@ -15,7 +12,7 @@ from .hardware import initialize_hardware, cleanup_hardware
 from .service import initialize_logging
 from .service.dependencies import get_protocol_manager
 from .service.legacy.rpc import cleanup_rpc_server
-from . import constants
+from .versioning import set_version_headers
 
 log = logging.getLogger(__name__)
 
@@ -30,14 +27,9 @@ app = FastAPI(
         "`patternProperties` behavior."
     ),
     version=__version__,
+    exception_handlers=exception_handlers,
+    dependencies=[Depends(set_version_headers)],
 )
-
-# exception handlers
-# TODO(mc, 2021-05-10): after upgrade to FastAPI > 0.61.2, we can pass these
-# to FastAPI's `exception_handlers` arg instead. Current version has bug, see:
-# https://github.com/tiangolo/fastapi/pull/1924
-for exc_cls, handler in exception_handlers.items():
-    app.add_exception_handler(exc_cls, handler)
 
 # cors
 app.add_middleware(
@@ -75,21 +67,3 @@ async def on_shutdown() -> None:
 
     for e in shutdown_errors:
         log.warning("Error during shutdown", exc_info=e)
-
-
-@app.middleware("http")
-async def api_version_response_header(
-    request: Request,
-    call_next: RequestResponseEndpoint,
-) -> Response:
-    """Attach Opentrons-Version headers to responses."""
-    # Attach the version the request state. Optional dependency
-    #  check_version_header will override this value if check passes.
-    request.state.api_version = constants.API_VERSION
-
-    response: Response = await call_next(request)
-
-    # Put the api version in the response header
-    response.headers[constants.API_VERSION_HEADER] = str(request.state.api_version)
-    response.headers[constants.MIN_API_VERSION_HEADER] = str(constants.MIN_API_VERSION)
-    return response
