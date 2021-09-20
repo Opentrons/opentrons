@@ -14,7 +14,7 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
   THERMOCYCLER_MODULE_V1,
-  ModuleRealType,
+  ModuleType,
   ModuleModel,
 } from '@opentrons/shared-data'
 import { i18n } from '../../../localization'
@@ -47,7 +47,7 @@ import { ModuleOnDeck } from '../../../step-forms/types'
 import { ModelModuleInfo } from '../../EditModules'
 
 export interface EditModulesModalProps {
-  moduleType: ModuleRealType
+  moduleType: ModuleType
   moduleOnDeck: ModuleOnDeck | null
   onCloseClick: () => unknown
   editModuleModel: (model: ModuleModel) => unknown

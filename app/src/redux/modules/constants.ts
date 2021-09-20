@@ -1,13 +1,8 @@
-import {
-  ModuleRealType,
-  THERMOCYCLER_MODULE_TYPE,
-} from '@opentrons/shared-data'
+import { ModuleType, THERMOCYCLER_MODULE_TYPE } from '@opentrons/shared-data'
 
 // common constants
 
-export const PREPARABLE_MODULE_TYPES: ModuleRealType[] = [
-  THERMOCYCLER_MODULE_TYPE,
-]
+export const PREPARABLE_MODULE_TYPES: ModuleType[] = [THERMOCYCLER_MODULE_TYPE]
 
 export {
   MAGNETIC_MODULE_TYPE,

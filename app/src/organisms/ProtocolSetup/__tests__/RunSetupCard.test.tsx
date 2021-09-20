@@ -4,11 +4,11 @@ import '@testing-library/jest-dom'
 import { fireEvent } from '@testing-library/react'
 import {
   componentPropsMatcher,
+  partialComponentPropsMatcher,
   renderWithProviders,
 } from '@opentrons/components/__utils__'
 import noModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/simpleV4.json'
 import withModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/testModulesProtocol.json'
-import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 
 import { i18n } from '../../../i18n'
 import {
@@ -24,12 +24,11 @@ import {
 import { mockCalibrationStatus } from '../../../redux/calibration/__fixtures__'
 import * as calibrationSelectors from '../../../redux/calibration/selectors'
 import * as protocolSelectors from '../../../redux/protocol/selectors'
-import { getModuleRenderCoords } from '../utils/getModuleRenderCoords'
-import { getLabwareRenderCoords } from '../utils/getLabwareRenderCoords'
-import { ModuleSetup } from '../RunSetupCard/ModuleSetup'
 import { RunSetupCard } from '../RunSetupCard'
+import { ModuleSetup } from '../RunSetupCard/ModuleSetup'
 import { LabwareSetup } from '../RunSetupCard/LabwareSetup'
 import { RobotCalibration } from '../RunSetupCard/RobotCalibration'
+import { ProceedToRunCta } from '../RunSetupCard/ProceedToRunCta'
 
 import type {
   AttachedPipettesByMount,
@@ -44,8 +43,9 @@ jest.mock('../../../redux/calibration/selectors')
 jest.mock('../RunSetupCard/LabwareSetup')
 jest.mock('../RunSetupCard/ModuleSetup')
 jest.mock('../RunSetupCard/RobotCalibration')
-jest.mock('../utils/getModuleRenderCoords')
-jest.mock('../utils/getLabwareRenderCoords')
+jest.mock('../utils/getModuleRenderInfo')
+jest.mock('../RunSetupCard/ProceedToRunCta')
+jest.mock('../utils/getLabwareRenderInfo')
 
 const mockAttachedPipettes: AttachedPipettesByMount = {
   left: mockAttachedPipette,
@@ -67,11 +67,8 @@ const mockModuleSetup = ModuleSetup as jest.MockedFunction<typeof ModuleSetup>
 const mockRobotCalibration = RobotCalibration as jest.MockedFunction<
   typeof RobotCalibration
 >
-const mockGetModuleRenderCoords = getModuleRenderCoords as jest.MockedFunction<
-  typeof getModuleRenderCoords
->
-const mockGetLabwareRenderCoords = getLabwareRenderCoords as jest.MockedFunction<
-  typeof getLabwareRenderCoords
+const mockProceedToRun = ProceedToRunCta as jest.MockedFunction<
+  typeof ProceedToRunCta
 >
 const mockGetConnectedRobot = discoverySelectors.getConnectedRobot as jest.MockedFunction<
   typeof discoverySelectors.getConnectedRobot
@@ -92,12 +89,6 @@ const mockGetProtocolCalibrationComplete = calibrationSelectors.getProtocolCalib
   typeof calibrationSelectors.getProtocolCalibrationComplete
 >
 
-const mockModuleRenderCoords = {
-  mockModuleId: { x: 0, y: 0, z: 0, moduleModel: 'mockModule' as any },
-}
-const mockLabwareRenderCoords = {
-  mockLabwareId: { x: 0, y: 0, z: 0, labwareDef: {} as any },
-}
 describe('RunSetupCard', () => {
   let render: () => ReturnType<typeof renderWithProviders>
 
@@ -112,27 +103,13 @@ describe('RunSetupCard', () => {
     )
     mockGetProtocolCalibrationComplete.mockReturnValue({ complete: true })
     mockGetProtocolData.mockReturnValue(noModulesProtocol as any)
-    when(mockGetModuleRenderCoords)
-      .calledWith(noModulesProtocol as any, standardDeckDef as any)
-      .mockReturnValue(mockModuleRenderCoords)
-    when(mockGetLabwareRenderCoords)
-      .calledWith(noModulesProtocol as any, standardDeckDef as any)
-      .mockReturnValue(mockLabwareRenderCoords)
 
-    when(mockLabwareSetup)
-      .mockReturnValue(<div></div>) // this (default) empty div will be returned when LabwareSetup isn't called with expected props
-      .calledWith(
-        componentPropsMatcher({
-          moduleRenderCoords: mockModuleRenderCoords,
-          labwareRenderCoords: mockLabwareRenderCoords,
-        })
-      )
-      .mockReturnValue(<div>Mock Labware Setup</div>)
+    mockLabwareSetup.mockReturnValue(<div>Mock Labware Setup</div>)
+
     when(mockModuleSetup)
       .mockReturnValue(<div></div>) // this (default) empty div will be returned when ModuleSetup isn't called with expected props
       .calledWith(
-        componentPropsMatcher({
-          moduleRenderCoords: mockModuleRenderCoords,
+        partialComponentPropsMatcher({
           expandLabwareSetupStep: expect.anything(),
           robotName: mockConnectedRobot.name,
         })
@@ -143,7 +120,7 @@ describe('RunSetupCard', () => {
     when(mockRobotCalibration)
       .mockReturnValue(<div></div>) // this (default) empty div will be returned when RobotCalibration isn't called with expected props
       .calledWith(
-        componentPropsMatcher({
+        partialComponentPropsMatcher({
           robot: mockConnectedRobot,
         })
       )
@@ -151,6 +128,14 @@ describe('RunSetupCard', () => {
     render = () => {
       return renderWithProviders(<RunSetupCard />, { i18nInstance: i18n })
     }
+    when(mockProceedToRun)
+      .mockReturnValue(<div></div>)
+      .calledWith(
+        componentPropsMatcher({
+          robotName: mockConnectedRobot.name,
+        })
+      )
+      .mockReturnValue(<div>Mock Proceed To Run</div>)
   })
 
   afterEach(() => {
@@ -186,12 +171,7 @@ describe('RunSetupCard', () => {
 
   it('renders module setup and allows the user to proceed to labware setup', () => {
     mockGetProtocolData.mockReturnValue(withModulesProtocol as any)
-    when(mockGetModuleRenderCoords)
-      .calledWith(withModulesProtocol as any, standardDeckDef as any)
-      .mockReturnValue(mockModuleRenderCoords)
-    when(mockGetLabwareRenderCoords)
-      .calledWith(withModulesProtocol as any, standardDeckDef as any)
-      .mockReturnValue(mockLabwareRenderCoords)
+
     const { getByRole, getByText } = render()
     const moduleSetupHeading = getByRole('heading', { name: 'Module Setup' })
     fireEvent.click(moduleSetupHeading)
@@ -261,5 +241,18 @@ describe('RunSetupCard', () => {
         'Plug in and power up the required module via the OT-2 USB Port. Place the module as shown in the deck map.'
       )
     ).toBeTruthy()
+  })
+  it('renders robot calibration by default, skips module setup, renders labware setup heading, and allows the user to proceed to run', () => {
+    const { getByRole, getByText } = render()
+    getByRole('heading', {
+      name: 'Robot Calibration',
+    })
+    getByText('Mock Robot Calibration')
+    getByRole('heading', {
+      name: 'Labware Setup',
+    })
+    const proceedToRun = getByText('Mock Proceed To Run')
+    fireEvent.click(proceedToRun)
+    getByText('Mock Proceed To Run')
   })
 })
