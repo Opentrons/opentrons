@@ -1,7 +1,7 @@
 """Main FastAPI application."""
 import asyncio
 import logging
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from opentrons import __version__
@@ -12,7 +12,6 @@ from .hardware import initialize_hardware, cleanup_hardware
 from .service import initialize_logging
 from .service.dependencies import get_protocol_manager
 from .service.legacy.rpc import cleanup_rpc_server
-from .versioning import set_version_headers
 
 log = logging.getLogger(__name__)
 
@@ -28,7 +27,6 @@ app = FastAPI(
     ),
     version=__version__,
     exception_handlers=exception_handlers,
-    dependencies=[Depends(set_version_headers)],
 )
 
 # cors

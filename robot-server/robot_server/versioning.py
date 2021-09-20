@@ -1,5 +1,5 @@
 """HTTP API versioning logic, utilities, and dependencies."""
-from fastapi import Depends, Header, Request, Response, status
+from fastapi import Header, Request, Response, status
 from typing import Union
 from typing_extensions import Literal, Final
 
@@ -43,7 +43,7 @@ class OutdatedApiVersionResponse(ErrorDetails):
     title: str = "Requested HTTP API version no longer supported"
 
 
-async def set_version_headers(
+async def check_version_header(
     request: Request,
     response: Response,
     opentrons_version: Union[int, Literal["*"]] = Header(
@@ -55,39 +55,15 @@ async def set_version_headers(
         ),
     ),
 ) -> None:
-    """Set Opentrons-Version headers on the request and response.
+    """Get the Opentrons-Version headers and set them in state and response headers.
 
-    This function hooks into FastAPI via `fastapi.depends`, and can be
-    used as a router-level dependency.
-
-    Arguments:
-        opentrons_version: The value of an incoming `Opentrons-Version` header.
-        request: The request object, used to set request state.
-        response: A mutable future response, used to set outgoing headers
+    This function hooks into FastAPI via `fastapi.depends`, and should be used
+    as a router or application level dependency.
     """
     if opentrons_version == LATEST_API_VERSION_HEADER_VALUE:
         api_version = API_VERSION
     else:
         api_version = min(API_VERSION, int(opentrons_version))
-
-    request.state.api_version = api_version
-    response.headers[API_VERSION_HEADER] = f"{api_version}"
-    response.headers[MIN_API_VERSION_HEADER] = f"{MIN_API_VERSION}"
-
-
-async def verify_version(
-    request: Request,
-    _: None = Depends(set_version_headers),
-) -> None:
-    """Check the requested API version, and raise an error if invalid.
-
-    This function hooks into FastAPI via `fastapi.depends`, and can be
-    used as a router-level dependency.
-
-    Arguments:
-        request: The request object, used to get request state.
-    """
-    api_version = request.state.api_version
 
     if api_version < MIN_API_VERSION:
         error_detail = (
@@ -98,3 +74,19 @@ async def verify_version(
         raise OutdatedApiVersionResponse(detail=error_detail).as_error(
             status.HTTP_400_BAD_REQUEST
         )
+
+    request.state.api_version = api_version
+    response.headers[API_VERSION_HEADER] = f"{api_version}"
+    response.headers[MIN_API_VERSION_HEADER] = f"{MIN_API_VERSION}"
+
+
+async def set_version_response_headers(request: Request, response: Response) -> None:
+    """Set Opentrons-Version headers on the response, without checking the request.
+
+    This function hooks into FastAPI via `fastapi.depends`, and should be used
+    as a router or application level dependency.
+    """
+    api_version = getattr(request.state, "api_version", API_VERSION)
+
+    response.headers[API_VERSION_HEADER] = f"{api_version}"
+    response.headers[MIN_API_VERSION_HEADER] = f"{MIN_API_VERSION}"

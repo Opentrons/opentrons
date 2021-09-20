@@ -9,7 +9,7 @@ from .health import health_router
 from .protocols import protocols_router
 from .sessions import sessions_router
 from .system import system_router
-from .versioning import verify_version
+from .versioning import check_version_header
 from .service.legacy.routers import legacy_routes
 from .service.session.router import router as deprecated_session_router
 from .service.pipette_offset.router import router as pip_os_router
@@ -34,7 +34,7 @@ router.include_router(
 router.include_router(
     router=health_router,
     tags=["Health", V1_TAG],
-    dependencies=[Depends(verify_version)],
+    dependencies=[Depends(check_version_header)],
     responses={
         status.HTTP_422_UNPROCESSABLE_ENTITY: {
             "model": LegacyErrorResponse,
@@ -47,55 +47,55 @@ if enable_protocol_engine():
     router.include_router(
         router=sessions_router,
         tags=["Session Management"],
-        dependencies=[Depends(verify_version)],
+        dependencies=[Depends(check_version_header)],
     )
 
     router.include_router(
         router=protocols_router,
         tags=["Protocol Management"],
-        dependencies=[Depends(verify_version)],
+        dependencies=[Depends(check_version_header)],
     )
 
 else:
     router.include_router(
         router=deprecated_session_router,
         tags=["Session Management"],
-        dependencies=[Depends(verify_version)],
+        dependencies=[Depends(check_version_header)],
     )
 
     router.include_router(
         router=deprecated_protocol_router,
         tags=["Protocol Management"],
-        dependencies=[Depends(verify_version)],
+        dependencies=[Depends(check_version_header)],
     )
 
 
 router.include_router(
     router=labware_router,
     tags=["Labware Calibration Management"],
-    dependencies=[Depends(verify_version)],
+    dependencies=[Depends(check_version_header)],
 )
 
 router.include_router(
     router=pip_os_router,
     tags=["Pipette Offset Calibration Management"],
-    dependencies=[Depends(verify_version)],
+    dependencies=[Depends(check_version_header)],
 )
 
 router.include_router(
     router=tl_router,
     tags=["Tip Length Calibration Management"],
-    dependencies=[Depends(verify_version)],
+    dependencies=[Depends(check_version_header)],
 )
 
 router.include_router(
     router=notifications_router,
     tags=["Notification Server Management"],
-    dependencies=[Depends(verify_version)],
+    dependencies=[Depends(check_version_header)],
 )
 
 router.include_router(
     router=system_router,
     tags=["System Control"],
-    dependencies=[Depends(verify_version)],
+    dependencies=[Depends(check_version_header)],
 )

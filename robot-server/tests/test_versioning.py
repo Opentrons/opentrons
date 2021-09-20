@@ -9,7 +9,7 @@ from fastapi.testclient import TestClient
 from typing import Dict
 
 from robot_server.errors import exception_handlers
-from robot_server.versioning import API_VERSION, set_version_headers
+from robot_server.versioning import API_VERSION, check_version_header
 
 
 @pytest.fixture
@@ -24,13 +24,13 @@ def client(app: FastAPI) -> TestClient:
     return TestClient(app)
 
 
-def test_set_version_headers(app: FastAPI, client: TestClient) -> None:
+def test_check_version_headers(app: FastAPI, client: TestClient) -> None:
     """It should put Opentrons-Version header in request state."""
 
     @app.get("/foobar")
     def _get_foobar(
         request: Request,
-        _: None = Depends(set_version_headers),
+        _: None = Depends(check_version_header),
     ) -> Dict[str, str]:
         assert request.state.api_version == 2
         return {"hello": "world"}
@@ -41,7 +41,7 @@ def test_set_version_headers(app: FastAPI, client: TestClient) -> None:
 
 def test_set_version_headers_on_route(app: FastAPI, client: TestClient) -> None:
     """It should set version state with a route dependency."""
-    router = APIRouter(dependencies=[Depends(set_version_headers)])
+    router = APIRouter(dependencies=[Depends(check_version_header)])
 
     @router.get("/foobar")
     def _get_foobar(request: Request) -> Dict[str, str]:
@@ -64,7 +64,7 @@ def test_uses_latest_available_version(app: FastAPI, client: TestClient) -> None
     @app.get("/foobar")
     def _get_foobar(
         request: Request,
-        _: None = Depends(set_version_headers),
+        _: None = Depends(check_version_header),
     ) -> Dict[str, str]:
         assert request.state.api_version == API_VERSION
         return {"hello": "world"}

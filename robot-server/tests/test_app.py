@@ -1,7 +1,7 @@
 """Tests for FastAPI application object of the robot server."""
 import pytest
 from mock import MagicMock, patch
-from http import HTTPStatus
+from fastapi import status
 from fastapi.testclient import TestClient
 from typing import Iterator
 
@@ -21,7 +21,6 @@ def mock_log_control() -> Iterator[MagicMock]:
     argvalues=[
         "/logs/serial.log",
         "/logs/api.log",
-        "/logs/some-random-journald-thing",
         "/",
     ],
 )
@@ -33,5 +32,6 @@ def test_api_versioning_non_versions_endpoints(
     """It should not enforce versioning requirements on some endpoints."""
     del api_client.headers["Opentrons-Version"]
     resp = api_client.get(path)
+    print(resp.headers)
+    assert resp.status_code != status.HTTP_422_UNPROCESSABLE_ENTITY
     assert resp.headers.get(API_VERSION_HEADER) == str(API_VERSION)
-    assert resp.status_code != HTTPStatus.BAD_REQUEST
