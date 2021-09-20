@@ -11,6 +11,7 @@ import { useMissingModuleIds } from '../hooks'
 import type { Store } from 'redux'
 import type { State } from '../../../../redux/types'
 import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
+import { componentPropsMatcher } from '@opentrons/components/__utils__'
 
 jest.mock('../../../../redux/protocol')
 jest.mock('../../hooks')
@@ -41,7 +42,9 @@ describe('useMissingModuleIds', () => {
   beforeEach(() => {
     store.dispatch = jest.fn()
 
-    mockGetConnectedRobot.mockReturnValue(mockConnectedRobot)
+    when(mockGetConnectedRobot)
+      .calledWith(undefined as any)
+      .mockReturnValue(mockConnectedRobot)
 
     when(mockGetAttachedModules)
       .calledWith(undefined as any, mockConnectedRobot.name)
