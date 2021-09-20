@@ -17,8 +17,6 @@ class SharedFunctionsMixin:
     Functions that GCodeConfirmConfig classes share
     """
 
-    marks: List[Mark] = [pytest.mark.g_code_confirm]
-
     def get_configuration_path(self):
         return f'{self.driver}/{self.name}'
 
@@ -87,6 +85,10 @@ class ProtocolGCodeConfirmConfig(BaseModel, SharedFunctionsMixin):
     path: str
     settings: Settings
     driver = 'protocol'
+    marks: List[Mark] = [pytest.mark.g_code_confirm]
+
+    class Config:
+        arbitrary_types_allowed = True
 
     def execute(self):
         with GCodeEngine(self.settings).run_protocol(path=self.path) as program:
@@ -98,6 +100,10 @@ class HTTPGCodeConfirmConfig(BaseModel, SharedFunctionsMixin):
     executable: Callable
     settings: Settings
     driver = 'http'
+    marks: List[Mark] = [pytest.mark.g_code_confirm]
+
+    class Config:
+        arbitrary_types_allowed = True
 
     def execute(self):
         with GCodeEngine(self.settings).run_http(self.executable) as program:
