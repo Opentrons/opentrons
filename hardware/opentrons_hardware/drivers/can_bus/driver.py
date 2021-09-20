@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import asyncio
 import platform
-from typing import Optional
+from typing import Optional, Union
 
 from can import Notifier, Bus, AsyncBufferedReader, Message
 
@@ -57,6 +57,23 @@ class CanDriver:
         return CanDriver(
             bus=Bus(channel=channel, bitrate=bitrate, interface=interface),
             loop=asyncio.get_event_loop(),
+        )
+
+    @classmethod
+    async def connect_to_emulator(cls, vcan_interface: str) -> CanDriver:
+        """
+        Build a CanDriver that is connected to an emulator
+
+        Args:
+            vcan_interface: The name of the vcan interface to use
+        """
+        return CanDriver(
+            bus=Bus(
+                channel=vcan_interface,
+                bustype='socketcan',
+                fd=True
+            ),
+            loop=asyncio.get_event_loop()
         )
 
     def shutdown(self) -> None:
