@@ -35,10 +35,8 @@ def _format_calibrations(
         # TODO: Integrate datetime methods
         # to ensure that last_modified is the expected
         # value.
-        # TODO(mc, 2020-09-17): lw_offset types do not match the types
-        # expected by OffsetData
         offset = lw_models.OffsetData(
-            value=lw_offset.value,  # type: ignore[arg-type]
+            value=lw_offset.value,
             lastModified=lw_offset.last_modified,  # type: ignore[arg-type]
         )
 

@@ -19,9 +19,9 @@ import {
   inferModuleOrientationFromSlot,
   GEN_ONE_MULTI_PIPETTES,
   DeckSlot as DeckDefSlot,
-  ModuleRealType,
+  ModuleType,
 } from '@opentrons/shared-data'
-import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
+import { getDeckDefinitions } from '@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions'
 import { PSEUDO_DECK_SLOTS } from '../../constants'
 import { i18n } from '../../localization'
 import {
@@ -132,9 +132,9 @@ export const getSwapBlocked = (args: SwapBlockedArgs): boolean => {
     return false
   }
 
-  const sourceModuleType: ModuleRealType | null =
+  const sourceModuleType: ModuleType | null =
     modulesById[draggedLabware.slot]?.type || null
-  const destModuleType: ModuleRealType | null =
+  const destModuleType: ModuleType | null =
     modulesById[hoveredLabware.slot]?.type || null
 
   const draggedLabwareIsCustom = getLabwareIsCustom(

@@ -1,4 +1,5 @@
 import noop from 'lodash/noop'
+import { mockTipRackDefinition } from '../../custom-labware/__fixtures__'
 
 import * as PipetteSelectors from '../../pipettes/selectors'
 import * as Fixtures from '../__fixtures__'
@@ -111,7 +112,7 @@ describe('getProtocolCalibrationComplete without bad deck calibration', () => {
       Selectors.getProtocolCalibrationComplete(state, 'robotName')
     ).toMatchObject({
       complete: false,
-      reason: 'calibrate deck',
+      reason: 'calibrate_deck_failure_reason',
     })
   })
 })
@@ -130,13 +131,14 @@ describe('getProtocolCalibrationComplete with deck calibration', () => {
               {
                 displayName: 'Mock TipRack Definition',
                 lastModifiedDate: null,
+                tipRackDef: mockTipRackDefinition,
               },
             ],
           },
           right: null,
         })
       },
-      expected: { complete: false, reason: 'attach pipette' },
+      expected: { complete: false, reason: 'attach_pipette_failure_reason' },
     },
     {
       name:
@@ -152,13 +154,14 @@ describe('getProtocolCalibrationComplete with deck calibration', () => {
               {
                 displayName: 'Mock TipRack Definition',
                 lastModifiedDate: null,
+                tipRackDef: mockTipRackDefinition,
               },
             ],
           },
           right: null,
         })
       },
-      expected: { complete: false, reason: 'calibrate pipette' },
+      expected: { complete: false, reason: 'calibrate_pipette_failure_reason' },
     },
     {
       name:
@@ -174,13 +177,14 @@ describe('getProtocolCalibrationComplete with deck calibration', () => {
               {
                 displayName: 'Mock TipRack Definition',
                 lastModifiedDate: null,
+                tipRackDef: mockTipRackDefinition,
               },
             ],
           },
           right: null,
         })
       },
-      expected: { complete: false, reason: 'calibrate tiprack' },
+      expected: { complete: false, reason: 'calibrate_tiprack_failure_reason' },
     },
     {
       name:
@@ -196,6 +200,7 @@ describe('getProtocolCalibrationComplete with deck calibration', () => {
               {
                 displayName: 'Mock TipRack Definition',
                 lastModifiedDate: '2020-08-30T10:02',
+                tipRackDef: mockTipRackDefinition,
               },
             ],
           },

@@ -1,11 +1,11 @@
 import { uuid } from '../../utils'
-import { ModuleModel, ModuleRealType } from '@opentrons/shared-data'
+import { ModuleModel, ModuleType } from '@opentrons/shared-data'
 import { DeckSlot } from '../../types'
 export interface CreateModuleAction {
   type: 'CREATE_MODULE'
   payload: {
     slot: DeckSlot
-    type: ModuleRealType
+    type: ModuleType
     model: ModuleModel
     // model should match name of module definition,
     id: string

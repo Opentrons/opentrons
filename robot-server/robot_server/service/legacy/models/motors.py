@@ -1,7 +1,7 @@
 from enum import Enum
 
 import typing
-from pydantic import BaseModel, Field, validator, create_model
+from pydantic import BaseModel, Field, validator
 
 from opentrons.hardware_control import types
 
@@ -25,15 +25,15 @@ class EngagedMotor(BaseModel):
 
 
 # Dynamically create the Engaged motors. It has one EngagedMotor per MotorName
-EngagedMotors = create_model(
-    "EngagedMotors",
-    __config__=None,
-    __base__=None,
-    __module__=None,
-    __validators__=None,
-    **{motor.value: (EngagedMotor, ...) for motor in MotorName}
-)
-EngagedMotors.__doc__ = "Which motors are engaged"
+class EngagedMotors(BaseModel):
+    """Which motors are engaged."""
+
+    x: EngagedMotor
+    y: EngagedMotor
+    z: EngagedMotor
+    a: EngagedMotor
+    b: EngagedMotor
+    c: EngagedMotor
 
 
 class Axes(BaseModel):

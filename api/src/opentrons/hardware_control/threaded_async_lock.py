@@ -23,7 +23,7 @@ class ThreadedAsyncLock:
     ``async with`` or a synchronous context manager using ``with``.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._thread_lock = threading.Lock()
 
     def lock(self) -> "_Internal":

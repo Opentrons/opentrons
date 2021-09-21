@@ -47,13 +47,15 @@ setup:
 	$(pipenv) sync $(pipenv_opts)
 	$(pipenv) run pip freeze
 
-
 .PHONY: teardown
 teardown:
 	$(pipenv) --rm
 
-dist/opentrons_hardware-%-py2.py3-none-any.whl: setup.py $(ot_sources)
+.PHONY: clean
+clean:
 	$(clean_cmd)
+
+dist/opentrons_hardware-%-py2.py3-none-any.whl: setup.py $(ot_sources)
 	$(python) setup.py $(wheel_opts) bdist_wheel
 	$(SHX) rm -rf build
 	$(SHX) ls dist

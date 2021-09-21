@@ -16,6 +16,7 @@ from opentrons.protocol_engine.types import (
     LoadedLabware,
     WellLocation,
     WellOrigin,
+    WellOffset,
 )
 from opentrons.protocol_engine.state.labware import LabwareView
 from opentrons.protocol_engine.state.geometry import GeometryView
@@ -276,7 +277,10 @@ def test_get_well_position_with_top_offset(
     result = subject.get_well_position(
         labware_id="labware-id",
         well_name="B2",
-        well_location=WellLocation(origin=WellOrigin.TOP, offset=(1, 2, 3)),
+        well_location=WellLocation(
+            origin=WellOrigin.TOP,
+            offset=WellOffset(x=1, y=2, z=3),
+        ),
     )
 
     assert result == Point(
@@ -319,7 +323,10 @@ def test_get_well_position_with_bottom_offset(
     result = subject.get_well_position(
         labware_id="labware-id",
         well_name="B2",
-        well_location=WellLocation(origin=WellOrigin.BOTTOM, offset=(3, 2, 1)),
+        well_location=WellLocation(
+            origin=WellOrigin.BOTTOM,
+            offset=WellOffset(x=3, y=2, z=1),
+        ),
     )
 
     assert result == Point(
@@ -439,7 +446,7 @@ def test_get_tip_drop_location(
 
     assert location == WellLocation(
         origin=WellOrigin.TOP,
-        offset=(0, 0, -0.7 * 50),
+        offset=WellOffset(x=0, y=0, z=-0.7 * 50),
     )
 
 
@@ -460,4 +467,7 @@ def test_get_tip_drop_location_with_trash(
         pipette_config=pipette_config,
     )
 
-    assert location == WellLocation(origin=WellOrigin.TOP, offset=(0, 0, 0))
+    assert location == WellLocation(
+        origin=WellOrigin.TOP,
+        offset=WellOffset(x=0, y=0, z=0),
+    )

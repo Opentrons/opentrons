@@ -23,7 +23,7 @@ exports[`Notification Icon NotificationIcon renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -35,7 +35,7 @@ exports[`Notification Icon NotificationIcon renders correctly 1`] = `
   />
   <svg
     aria-hidden="true"
-    className="sc-AxmLO c1"
+    className="sc-fzozJi c1"
     fill="currentColor"
     height={8}
     version="1.1"
@@ -64,7 +64,7 @@ exports[`icons alert renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -88,7 +88,7 @@ exports[`icons alert-circle renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -112,7 +112,7 @@ exports[`icons arrow-left renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -136,7 +136,7 @@ exports[`icons arrow-right renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -160,7 +160,7 @@ exports[`icons book-open-page-variant renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -184,7 +184,7 @@ exports[`icons check renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -208,7 +208,7 @@ exports[`icons check-circle renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -232,7 +232,7 @@ exports[`icons check-decagram renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -256,7 +256,7 @@ exports[`icons checkbox-blank-circle-outline renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -280,7 +280,7 @@ exports[`icons checkbox-blank-outline renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -304,7 +304,7 @@ exports[`icons checkbox-marked renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -328,7 +328,7 @@ exports[`icons checkbox-multiple-marked-outline renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -352,7 +352,7 @@ exports[`icons chevron-down renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -376,7 +376,7 @@ exports[`icons chevron-left renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -400,7 +400,7 @@ exports[`icons chevron-right renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -424,7 +424,7 @@ exports[`icons chevron-up renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -448,7 +448,7 @@ exports[`icons circle renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -472,7 +472,7 @@ exports[`icons close renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -496,7 +496,7 @@ exports[`icons close-circle renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -520,7 +520,7 @@ exports[`icons content-copy renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -544,7 +544,7 @@ exports[`icons cursor-move renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -568,7 +568,7 @@ exports[`icons delete renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -592,7 +592,7 @@ exports[`icons dots-horizontal renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -616,7 +616,7 @@ exports[`icons download renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -640,7 +640,7 @@ exports[`icons flask-outline renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -664,7 +664,7 @@ exports[`icons folder-open renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -688,7 +688,7 @@ exports[`icons help-circle renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -712,7 +712,7 @@ exports[`icons information renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -736,7 +736,7 @@ exports[`icons lock renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -760,7 +760,7 @@ exports[`icons menu renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -784,7 +784,7 @@ exports[`icons menu-down renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -808,7 +808,7 @@ exports[`icons minus renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -832,7 +832,7 @@ exports[`icons minus-box renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -856,7 +856,7 @@ exports[`icons open-in-new renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -880,7 +880,7 @@ exports[`icons ot-arrow-down renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -904,7 +904,7 @@ exports[`icons ot-arrow-left renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -928,7 +928,7 @@ exports[`icons ot-arrow-right renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -952,7 +952,7 @@ exports[`icons ot-arrow-up renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -976,7 +976,7 @@ exports[`icons ot-calibrate renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -1000,7 +1000,7 @@ exports[`icons ot-click-and-drag renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 48 48"
@@ -1024,7 +1024,7 @@ exports[`icons ot-connect renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -1048,7 +1048,7 @@ exports[`icons ot-consolidate renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -1072,7 +1072,7 @@ exports[`icons ot-copy-text renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 18 20"
@@ -1096,7 +1096,7 @@ exports[`icons ot-design renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 42 35"
@@ -1120,7 +1120,7 @@ exports[`icons ot-distribute renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -1144,7 +1144,7 @@ exports[`icons ot-file renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -1168,7 +1168,7 @@ exports[`icons ot-flat-bottom renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -1192,7 +1192,7 @@ exports[`icons ot-logo renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 50 50"
@@ -1216,7 +1216,7 @@ exports[`icons ot-magnet renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -1240,7 +1240,7 @@ exports[`icons ot-mix renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -1264,7 +1264,7 @@ exports[`icons ot-run renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -1288,7 +1288,7 @@ exports[`icons ot-spinner renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 512 512"
@@ -1312,7 +1312,7 @@ exports[`icons ot-temperature renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -1336,7 +1336,7 @@ exports[`icons ot-thermocycler renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -1360,7 +1360,7 @@ exports[`icons ot-toggle-field-off renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 27 27"
@@ -1384,7 +1384,7 @@ exports[`icons ot-toggle-field-on renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 27 27"
@@ -1408,7 +1408,7 @@ exports[`icons ot-toggle-switch-off renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -1432,7 +1432,7 @@ exports[`icons ot-toggle-switch-on renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -1456,7 +1456,7 @@ exports[`icons ot-transfer renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -1480,7 +1480,7 @@ exports[`icons ot-u-bottom renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -1504,7 +1504,7 @@ exports[`icons ot-v-bottom renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -1528,7 +1528,7 @@ exports[`icons ot-water-outline renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -1552,7 +1552,7 @@ exports[`icons ot-wifi-0 renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -1576,7 +1576,7 @@ exports[`icons ot-wifi-1 renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -1600,7 +1600,7 @@ exports[`icons ot-wifi-2 renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -1624,7 +1624,7 @@ exports[`icons ot-wifi-3 renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -1648,7 +1648,7 @@ exports[`icons pause renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -1672,7 +1672,7 @@ exports[`icons pause-circle renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -1696,7 +1696,7 @@ exports[`icons pen renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -1720,7 +1720,7 @@ exports[`icons pencil renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -1744,7 +1744,7 @@ exports[`icons plus renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -1768,7 +1768,7 @@ exports[`icons radiobox-blank renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -1792,7 +1792,7 @@ exports[`icons radiobox-marked renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -1816,7 +1816,7 @@ exports[`icons refresh renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 200 200"
@@ -1840,7 +1840,7 @@ exports[`icons settings renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -1864,7 +1864,7 @@ exports[`icons swap-horizontal renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -1888,7 +1888,7 @@ exports[`icons unfold-less-horizontal renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -1912,7 +1912,7 @@ exports[`icons unfold-more-horizontal renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -1936,7 +1936,7 @@ exports[`icons upload renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -1960,7 +1960,7 @@ exports[`icons usb renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -1984,7 +1984,7 @@ exports[`icons water renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"
@@ -2008,7 +2008,7 @@ exports[`icons wifi renders correctly 1`] = `
 
 <svg
   aria-hidden="true"
-  className="sc-AxmLO c0 foo"
+  className="sc-fzozJi c0 foo"
   fill="currentColor"
   version="1.1"
   viewBox="0 0 24 24"

@@ -12,6 +12,7 @@ from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.types import (
     WellLocation,
     WellOrigin,
+    WellOffset,
     PipetteName,
     LoadedPipette,
 )
@@ -250,7 +251,9 @@ class WaypointSpec:
         WaypointSpec(
             name="General arc with a well offset",
             all_labware_z=20,
-            well_location=WellLocation(origin=WellOrigin.TOP, offset=(0, 0, 1)),
+            well_location=WellLocation(
+                origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=1)
+            ),
             expected_move_type=MoveType.GENERAL_ARC,
         ),
         # TODO(mc, 2021-01-08): add test for override current location

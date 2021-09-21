@@ -6,7 +6,7 @@ import {
 } from '@opentrons/shared-data'
 import type {
   LabwareDefinition2,
-  ModuleRealType,
+  ModuleType,
   ModuleModel,
   PipetteNameSpecs,
   PipetteName,
@@ -78,7 +78,7 @@ export interface LabwareEntities {
 
 export interface ModuleEntity {
   id: string
-  type: ModuleRealType
+  type: ModuleType
   model: ModuleModel
 }
 

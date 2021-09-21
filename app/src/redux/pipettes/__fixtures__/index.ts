@@ -5,6 +5,7 @@ import type {
   RobotApiResponse,
   RobotApiResponseMeta,
 } from '../../robot-api/types'
+import { mockTipRackDefinition } from '../../custom-labware/__fixtures__'
 
 export const mockRobot = { name: 'robot', ip: '127.0.0.1', port: 31950 }
 
@@ -133,6 +134,7 @@ export const mockProtocolPipetteTipRackCalInfo: ProtocolPipetteTipRackCalData = 
     {
       displayName: 'My TipRack',
       lastModifiedDate: '2021-04-10',
+      tipRackDef: mockTipRackDefinition,
     },
   ],
 }

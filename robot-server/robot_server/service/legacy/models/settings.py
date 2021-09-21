@@ -173,10 +173,7 @@ class BasePipetteSettingFields(BaseModel):
 PipetteSettingsFields = create_model(
     "PipetteSettingsFields",
     __base__=BasePipetteSettingFields,
-    __config__=None,
-    __module__=None,
-    __validators__=None,
-    **{
+    **{  # type: ignore[arg-type]
         conf: (PipetteSettingsField, None)
         for conf in MUTABLE_CONFIGS
         if conf != "quirks"

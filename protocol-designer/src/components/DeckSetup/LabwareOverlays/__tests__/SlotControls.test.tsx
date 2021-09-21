@@ -27,7 +27,7 @@ describe('SlotControlsComponent', () => {
         zDimension: 40,
       },
       displayName: 'slot 1',
-      compatibleModules: ['magdeck'],
+      compatibleModules: [MAGNETIC_MODULE_TYPE],
     }
 
     const labwareOnDeck = {

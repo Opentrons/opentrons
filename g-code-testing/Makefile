@@ -42,7 +42,7 @@ test-g-code-fast:
 
 .PHONY: test-g-code-2-modules
 test-g-code-2-modules:
-	$(pytest) -m 'slow' -k 'test_two_modules_protocol' $(tests) $(test_opts)
+	$(pytest) -m 'slow' -k 'test_2_modules' $(tests) $(test_opts)
 
 .PHONY: test-g-code-swift-smoke
 test-g-code-swift-smoke:

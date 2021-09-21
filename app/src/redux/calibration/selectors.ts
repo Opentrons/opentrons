@@ -41,7 +41,7 @@ export const getProtocolCalibrationComplete: (
     if (deckCalStatus !== 'OK') {
       return {
         complete: false,
-        reason: 'calibrate deck',
+        reason: 'calibrate_deck_failure_reason',
       }
     }
     let calibrationStatus: ProtocolCalibrationStatus = {
@@ -53,7 +53,7 @@ export const getProtocolCalibrationComplete: (
         if (tiprack.lastModifiedDate == null) {
           calibrationStatus = {
             complete: false,
-            reason: 'calibrate tiprack',
+            reason: 'calibrate_tiprack_failure_reason',
           }
         }
       })
@@ -62,7 +62,7 @@ export const getProtocolCalibrationComplete: (
       if (pipette !== null && pipette.pipetteCalDate == null) {
         calibrationStatus = {
           complete: false,
-          reason: 'calibrate pipette',
+          reason: 'calibrate_pipette_failure_reason',
         }
       }
     })
@@ -73,7 +73,7 @@ export const getProtocolCalibrationComplete: (
       if (pipette !== null && !pipetteIsMatch) {
         calibrationStatus = {
           complete: false,
-          reason: 'attach pipette',
+          reason: 'attach_pipette_failure_reason',
         }
       }
     })

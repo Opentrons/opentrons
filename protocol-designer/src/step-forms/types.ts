@@ -1,6 +1,6 @@
 import { Mount } from '@opentrons/components'
 import {
-  ModuleRealType,
+  ModuleType,
   ModuleModel,
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
@@ -61,7 +61,7 @@ export interface ModuleTemporalProperties {
 }
 export type ModuleOnDeck = ModuleEntity & ModuleTemporalProperties
 export type ModulesForEditModulesCard = Partial<
-  Record<ModuleRealType, ModuleOnDeck | null | undefined>
+  Record<ModuleType, ModuleOnDeck | null | undefined>
 >
 // =========== LABWARE ========
 export type NormalizedLabwareById = Record<

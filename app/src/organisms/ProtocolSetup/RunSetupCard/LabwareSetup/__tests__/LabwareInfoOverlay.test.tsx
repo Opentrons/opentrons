@@ -36,8 +36,6 @@ describe('LabwareInfoOverlay', () => {
   let props: React.ComponentProps<typeof LabwareInfoOverlay>
   beforeEach(() => {
     props = {
-      x: 0,
-      y: 0,
       definition: fixture_tiprack_300_ul as LabwareDefinition2,
     }
     when(mockGetLabwareDisplayName)
@@ -54,7 +52,7 @@ describe('LabwareInfoOverlay', () => {
   })
   it('should render the offset data label', () => {
     const { getByText } = render(props)
-    getByText('Offset')
+    getByText('Offset Data')
   })
   // eslint-disable-next-line jest/no-disabled-tests
   it.skip('should renders labware offset data', () => {

@@ -34,5 +34,6 @@ class ProtocolFile:
     """
 
     # TODO(mc, 2021-08-27): `protocol_type` is a little redundant as a field name
+    # TODO(mm, 2021-09-03): `protocol_type` is redundant now that we have pre_analysis
     protocol_type: ProtocolFileType
     files: List[Path]

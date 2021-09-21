@@ -1,12 +1,19 @@
 """App exception handlers."""
 from logging import getLogger
 from fastapi import Request, Response, status
+from fastapi.routing import APIRoute
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from traceback import format_exception, format_exception_only
 from typing import Any, Callable, Coroutine, Dict, Optional, Sequence, Type, Union
 
+from robot_server.versioning import (
+    API_VERSION,
+    MIN_API_VERSION,
+    API_VERSION_HEADER,
+    MIN_API_VERSION_HEADER,
+)
 from robot_server.constants import V1_TAG
 from .global_errors import UnexpectedError, BadRequest, InvalidRequest
 
@@ -25,9 +32,11 @@ log = getLogger(__name__)
 def _route_is_legacy(request: Request) -> bool:
     """Check if router handling the request is a legacy v1 endpoint."""
     router = request.scope.get("router")
+    endpoint = request.scope.get("endpoint")
+
     if router:
         for route in router.routes:
-            if route.endpoint == request.scope.get("endpoint"):
+            if isinstance(route, APIRoute) and route.endpoint == endpoint:
                 return V1_TAG in route.tags
 
     return False
@@ -39,8 +48,8 @@ def _format_validation_source(
     """Format a validation location from FastAPI into an ErrorSource."""
     try:
         if parts[0] == "body":
-            # ["body", "model", "field"] > { "pointer": "/field" }
-            return ErrorSource(pointer=f"/{'/'.join(str(p) for p in parts[2::])}")
+            # ["body", "field"] > { "pointer": "/field" }
+            return ErrorSource(pointer=f"/{'/'.join(str(p) for p in parts[1::])}")
         elif parts[0] == "query":
             # ["query", "param"] > { parameter: "param" }
             return ErrorSource(parameter=str(parts[1]))
@@ -64,6 +73,10 @@ async def handle_api_error(request: Request, error: ApiError) -> JSONResponse:
     return JSONResponse(
         status_code=error.status_code,
         content=error.content,
+        headers={
+            MIN_API_VERSION_HEADER: f"{MIN_API_VERSION}",
+            API_VERSION_HEADER: f"{API_VERSION}",
+        },
     )
 
 

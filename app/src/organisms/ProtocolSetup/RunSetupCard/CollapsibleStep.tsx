@@ -22,6 +22,7 @@ interface CollapsibleStepProps {
   label: string
   toggleExpanded: () => void
   children: React.ReactNode
+  rightAlignedNode: React.ReactNode
 }
 
 export function CollapsibleStep({
@@ -31,6 +32,7 @@ export function CollapsibleStep({
   label,
   toggleExpanded,
   children,
+  rightAlignedNode,
 }: CollapsibleStepProps): JSX.Element {
   return (
     <Flex flexDirection={DIRECTION_COLUMN} paddingX={SPACING_3}>
@@ -51,6 +53,7 @@ export function CollapsibleStep({
             {description}
           </Text>
         </Flex>
+        {rightAlignedNode != null ? rightAlignedNode : null}
         <Icon size={SIZE_1} name={expanded ? 'minus' : 'plus'} />
       </Flex>
       {expanded ? children : null}

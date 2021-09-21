@@ -77,6 +77,9 @@ class Metadata(BaseModel):
     Optional metadata about the protocol
     """
 
+    class Config:
+        extra = Extra.allow
+
     protocolName: Optional[str] = Field(
         None, description="A short, human-readable name for the protocol"
     )
