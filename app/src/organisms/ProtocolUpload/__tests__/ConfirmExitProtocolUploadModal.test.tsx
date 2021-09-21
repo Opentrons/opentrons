@@ -3,7 +3,9 @@ import { renderWithProviders } from '@opentrons/components/__utils__'
 import { i18n } from '../../../i18n'
 import { ConfirmExitProtocolUploadModal } from '../ConfirmExitProtocolUploadModal'
 
-const render = (props: React.ComponentProps<typeof ConfirmExitProtocolUploadModal>) => {
+const render = (
+  props: React.ComponentProps<typeof ConfirmExitProtocolUploadModal>
+) => {
   return renderWithProviders(<ConfirmExitProtocolUploadModal {...props} />, {
     i18nInstance: i18n,
   })
@@ -21,9 +23,7 @@ describe('ConfirmExitProtocolUploadModal', () => {
   })
   it('should render the correct body', () => {
     const { getByText } = render(props)
-    getByText(
-      'Are you sure you want to close this protocol?'
-    )
+    getByText('Are you sure you want to close this protocol?')
   })
   it('should render both buttons', () => {
     const { getByRole } = render(props)
