@@ -31,9 +31,11 @@ collect all G-Code output.
 ### HTTP Tests
 
 **Description:** The tests execute the underlying function from calling an HTTP endpoint and collect all the G-Code
-output. Some of the HTTP endpoints have been skipped.
+output. Some HTTP endpoints have been skipped.
 
 **[Control Tests:](https://github.com/Opentrons/opentrons/blob/edge/robot-server/robot_server/service/legacy/routers/control.py)**
+
+These tests cover the movement of the gantry and pipettes
 
 - Implemented Tests
   - http_move_left_pipette - Test moving the left pipette with the `robot/move` HTTP endpoint
@@ -47,6 +49,61 @@ output. Some of the HTTP endpoints have been skipped.
   - `identify` endpoint - Only goes to the Raspberry Pi, does not generate any G-Code
   - `robot/positions` endpoint - Tests by issuing move commands which is already covered
   - `robot/lights` endpoint - Only goes to the Raspberry Pi, does not generate any G-Code
+
+**Module Tests:** <-- Insert link here
+
+These tests cover the functionality of all modules
+
+- Magdeck
+  - Implemented Tests
+    - http_magdeck_calibrate - Test the `calibrate` command with the `/modules/{serial}` HTTP endpoint. This command
+      performs the automatic calibration of the magdeck.
+    - http_magdeck_engage - Test `engage` command with the `/modules/{serial}` HTTP endpoint. This command lifts the
+      magnets.
+    - http_magdeck_deactivate - Test `deactivate` command with the `/modules/{serial}` HTTP endpoint. This command
+      returns the magnets to home.
+  - Skipped Tests
+    - Getters for all the properties on the magdeck because they do not generate any G-Code
+    - `bootloader` method - Because it is way too complicated to try to run this
+    - `/modules/{serial}/update` endpoint - Have to inject a `bundled_fw` arg into the function and the return isn't
+      worth it
+- Tempdeck
+  - Implemented Tests
+    - http_tempdeck_start_set_temp - Test `start_set_temperature` command with the `/modules/{serial}` HTTP endpoint.
+      This command sets the temperature and exits. It does not wait for the temp deck to come to temperature.
+    - http_tempdeck_set_temp - Test `set_temperature` command with the `/modules/{serial}` HTTP endpoint. This command
+      sets the temperature and waits for the tempdeck to come up to temperature.
+    - http_tempdeck_deactivate - Test `deactivate` command with the `/modules/{serial}` HTTP endpoint. This command
+      returns stops any heating or cooling and turns off the fan
+  - Skipped Tests
+    - Getters for all the properties on the tempdeck because they do not generate any G-Code
+    - `bootloader` method - Because it is way too complicated to try to run this
+    - `/modules/{serial}/update` endpoint - Have to inject a `bundled_fw` arg into the function and the return isn't
+      worth it
+    - `wait_next_poll` method - It is covered by `http_tempdeck_set_temp`
+    - `await_temperature` method - It does not return any unique G-Code
+- Thermocycler
+  - Implemented Tests
+    - `http_thermocycler_deactivate_lid` - Test `deactivate_lid` command with the `/modules/{serial}` HTTP endpoint.
+      This command turns off the heating pad on the thermocycler lid.
+    - `http_thermocycler_deactivate_block` - Test `deactivate_block` command with the `/modules/{serial}` HTTP endpoint.
+      This command turns off the heating pad on the thermocycler block.
+    - `http_thermocycler_deactivate` - Test `deactivate` command with the `/modules/{serial}` HTTP endpoint.
+      This command turns off the heating pad on the thermocycler block and lid.
+    - `http_thermocycler_open` - Test `open` command with the `/modules/{serial}` HTTP endpoint. This command opens
+      the thermocycler lid.
+    - `http_thermocycler_close` - Test `close` command with the `/modules/{serial}` HTTP endpoint. This command closes
+      the thermocycler lid.
+    - `http_thermocycler_set_temp` - Test `set_temperature` command with the `/modules/{serial}` HTTP endpoint.
+      This command sets the temperature of the thermocycler.
+    - `http_thermocycler_cycle_temps` - Test `cycle_temperatures` command with the `/modules/{serial}` HTTP endpoint.
+      This command cycles through multiple temperatures on the thermocycler.
+    - `http_thermocycler_set_lid_temp` - Test `set_lid_temperature` command with the `/modules/{serial}` HTTP endpoint.
+      This command sets the lid temperature of the thermocycler.
+  - Skipped Tests
+    - Getters for all the properties on the thermocycler because they do not generate any G-Code
+    - `bootloader` method - Because it is way too complicated to try to run this
+    - `hold_time_probably_set` method - Because it doesn't generate any G-Code
 
 ## Setup
 
