@@ -14,14 +14,13 @@ from typing import Optional
 
 from aiohttp import web, BodyPartReader
 
-from .constants import RESTART_LOCK_NAME
+from .constants import APP_VARIABLE_PREFIX, RESTART_LOCK_NAME
 from . import config, file_actions
 
 from ot_utils import session
 
 from ot_utils.session import Stages
 
-APP_VARIABLE_PREFIX = 'OT3_SESSION'
 SESSION_VARNAME = APP_VARIABLE_PREFIX + 'session'
 LOG = logging.getLogger(__name__)
 
@@ -36,6 +35,7 @@ def require_session(handler):
     async def decorated(request: web.Request) -> web.Response:
         request_session_token = request.match_info['session']
         session = session_from_request(request)
+        print (request_session_token)
         if not session or request_session_token != session.token:
             LOG.warning(f"request has an invalid session {request_session_token}")
             return web.json_response(
@@ -45,10 +45,29 @@ def require_session(handler):
         return await handler(request, session)
     return decorated
 
-
+"""
 @session.active_session_check
 async def begin(request: web.Request) -> web.Response:
     pass
+"""
+async def begin(request: web.Request) -> web.Response:
+    """ Begin a session
+    """
+    if None is not session_from_request(request):
+        LOG.warning("begin: requested with active session")
+        return web.json_response(
+            data={'message':
+                  'An update session is already active on this robot',
+                  'error': 'session-already-active'},
+            status=409)
+
+    session_val = session.UpdateSession(
+        config.config_from_request(request).download_storage_path)
+    request.app[SESSION_VARNAME] = session_val
+    return web.json_response(
+        data={'token': session_val.token},
+        status=201)
+
 
 
 async def cancel(request: web.Request) -> web.Response:
