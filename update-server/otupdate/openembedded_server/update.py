@@ -35,7 +35,6 @@ def require_session(handler):
     async def decorated(request: web.Request) -> web.Response:
         request_session_token = request.match_info['session']
         session = session_from_request(request)
-        print (request_session_token)
         if not session or request_session_token != session.token:
             LOG.warning(f"request has an invalid session {request_session_token}")
             return web.json_response(
@@ -45,11 +44,14 @@ def require_session(handler):
         return await handler(request, session)
     return decorated
 
+
 """
 @session.active_session_check
 async def begin(request: web.Request) -> web.Response:
     pass
 """
+
+
 async def begin(request: web.Request) -> web.Response:
     """ Begin a session
     """
@@ -67,7 +69,6 @@ async def begin(request: web.Request) -> web.Response:
     return web.json_response(
         data={'token': session_val.token},
         status=201)
-
 
 
 async def cancel(request: web.Request) -> web.Response:
