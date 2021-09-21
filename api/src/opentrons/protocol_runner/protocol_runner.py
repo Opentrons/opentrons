@@ -3,7 +3,6 @@ from dataclasses import dataclass
 from typing import List, Optional
 
 from opentrons.hardware_control import API as HardwareAPI
-from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_engine import (
     ProtocolEngine,
     Command,
@@ -19,7 +18,13 @@ from .json_command_translator import JsonCommandTranslator
 from .python_file_reader import PythonFileReader
 from .python_context_creator import PythonContextCreator
 from .python_executor import PythonExecutor
-from .legacy_wrappers import LegacyFileReader, LegacyContextCreator, LegacyExecutor
+from .legacy_wrappers import (
+    LEGACY_PYTHON_API_VERSION_CUTOFF,
+    LEGACY_JSON_SCHEMA_VERSION_CUTOFF,
+    LegacyFileReader,
+    LegacyContextCreator,
+    LegacyExecutor,
+)
 
 
 @dataclass(frozen=True)
@@ -71,7 +76,9 @@ class ProtocolRunner:
         self._legacy_context_creator = legacy_context_creator or LegacyContextCreator(
             hardware_api=hardware_api
         )
-        self._legacy_executor = legacy_executor or LegacyExecutor()
+        self._legacy_executor = legacy_executor or LegacyExecutor(
+            hardware_api=hardware_api
+        )
 
     def load(self, protocol_source: ProtocolSource) -> None:
         """Load a ProtocolSource into managed ProtocolEngine.
@@ -84,7 +91,7 @@ class ProtocolRunner:
         if isinstance(pre_analysis, JsonPreAnalysis):
             schema_version = pre_analysis.schema_version
 
-            if schema_version >= 6:
+            if schema_version >= LEGACY_JSON_SCHEMA_VERSION_CUTOFF:
                 self._load_json(protocol_source)
             else:
                 self._load_legacy(protocol_source)
@@ -92,7 +99,7 @@ class ProtocolRunner:
         elif isinstance(pre_analysis, PythonPreAnalysis):
             api_version = pre_analysis.api_version
 
-            if api_version >= APIVersion(3, 0):
+            if api_version >= LEGACY_PYTHON_API_VERSION_CUTOFF:
                 self._load_python(protocol_source)
             else:
                 self._load_legacy(protocol_source)

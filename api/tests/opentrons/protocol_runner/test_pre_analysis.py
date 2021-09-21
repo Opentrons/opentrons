@@ -215,6 +215,12 @@ def test_error_if_python_file_has_syntax_error(tmp_path: Path) -> None:
             metadata = {"apiLevel": 123.456}
             """
         ),
+        dedent(
+            """
+            # apiLevel provided, but not as a well formatted string.
+            metadata = {"apiLevel": "123*456"}
+            """
+        ),
     ],
 )
 def test_error_if_bad_python_metadata(

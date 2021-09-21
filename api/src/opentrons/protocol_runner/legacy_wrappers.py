@@ -3,6 +3,7 @@ import asyncio
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 
+from opentrons.config import feature_flags
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.context.protocol_api.protocol_context import (
@@ -18,6 +19,12 @@ from opentrons.protocols.types import (
 )
 
 from .protocol_source import ProtocolSource
+
+
+LEGACY_PYTHON_API_VERSION_CUTOFF = APIVersion(3, 0)
+
+# TODO(mc, 2021-09-21): remove this condition, cut off before 6 always
+LEGACY_JSON_SCHEMA_VERSION_CUTOFF = 5 if feature_flags.enable_protocol_engine() else 6
 
 
 class LegacyFileReader:
@@ -61,10 +68,20 @@ class LegacyContextCreator:
 class LegacyExecutor:
     """Interface to execute Protocol API v2 protocols in a child thread."""
 
-    @staticmethod
-    async def execute(protocol: LegacyProtocol, context: LegacyProtocolContext) -> None:
+    def __init__(self, hardware_api: HardwareAPI) -> None:
+        self._hardware_api = hardware_api
+
+    async def execute(
+        self,
+        protocol: LegacyProtocol,
+        context: LegacyProtocolContext,
+    ) -> None:
         """Execute a PAPIv2 protocol with a given ProtocolContext in a child thread."""
         loop = asyncio.get_running_loop()
+
+        # NOTE: this initial home is to match the previous behavior of the
+        # RPC session, which called `ctx.home` before calling `run_protocol`
+        await self._hardware_api.home()
 
         with ThreadPoolExecutor(max_workers=1) as executor:
             await loop.run_in_executor(
