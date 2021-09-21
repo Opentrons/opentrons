@@ -250,13 +250,13 @@ def extract_metadata(parsed: ast.Module) -> Metadata:
             for key, value in evaluated_literal.items():
                 if not isinstance(key, str):
                     raise ValueError(
-                        f'metadata keys must be strings, but "{key}"'
-                        f" has type {type(key)}"
+                        f'metadata keys must be strings, but key "{key}"'
+                        f' has type "{type(key).__name__}".'
                     )
                 if not isinstance(value, str):
                     raise ValueError(
-                        f"metadata values must be strings, but {value}"
-                        f" has type {type(value)}"
+                        f'metadata values must be strings, but value "{value}"'
+                        f' has type "{type(value).__name__}".'
                     )
 
             metadata = evaluated_literal
