@@ -4,11 +4,7 @@ from fastapi import APIRouter, Depends, File, UploadFile, status
 from typing import List
 from typing_extensions import Literal
 
-from opentrons.protocol_runner.pre_analysis import (
-    PreAnalyzer,
-    InputFile as PreAnalysisInputFile,
-    NotPreAnalyzableError,
-)
+from opentrons.protocol_runner.pre_analysis import PreAnalyzer, NotPreAnalyzableError
 
 from robot_server.errors import ErrorDetails, ErrorResponse
 from robot_server.service.task_runner import TaskRunner
@@ -103,12 +99,8 @@ async def create_protocol(
     # We should change this so the pre-analyzer, or something before the
     # pre-analyzer, saves all uploaded files to the filesystem. Then, all downstream
     # units can receive a pathlib.Path pointing to the protocol's enclosing directory.
-    pre_analysis_input = [
-        PreAnalysisInputFile(name=f.filename, file_like=f.file) for f in files
-    ]
-
     try:
-        pre_analysis = pre_analyzer.analyze(pre_analysis_input)
+        pre_analysis = pre_analyzer.analyze(files)
     except NotPreAnalyzableError as e:
         # todo(mm, 2021-09-14):
         # Not every NotPreAnalyzableError will have been constructed with a message,

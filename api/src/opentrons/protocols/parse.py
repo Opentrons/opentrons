@@ -174,7 +174,7 @@ def parse(
     if filename and filename.endswith(".zip"):
         if not isinstance(protocol_file, bytes):
             raise RuntimeError(
-                "Please update your Run App version to " "support uploading a .zip file"
+                "Please update your Run App version to support uploading a .zip file"
             )
 
         with ZipFile(BytesIO(protocol_file)) as bundle:

@@ -6,22 +6,18 @@ from logging import getLogger
 from pathlib import Path
 from typing import Dict, List, Sequence, Union
 
-from opentrons.protocol_runner import ProtocolFile, ProtocolFileType
-from opentrons.protocol_runner.pre_analysis import (
-    JsonPreAnalysis,
-    PythonPreAnalysis,
-)
+from opentrons.protocol_runner import ProtocolSource
+from opentrons.protocol_runner.pre_analysis import JsonPreAnalysis, PythonPreAnalysis
 
 log = getLogger(__name__)
 
 
 @dataclass(frozen=True)
-class ProtocolResource(ProtocolFile):
+class ProtocolResource(ProtocolSource):
     """An entry in the protocol store, used to construct response models."""
 
     protocol_id: str
     created_at: datetime
-    pre_analysis: Union[JsonPreAnalysis, PythonPreAnalysis]
 
 
 class ProtocolNotFoundError(KeyError):
@@ -89,7 +85,6 @@ class ProtocolStore:
 
         entry = ProtocolResource(
             protocol_id=protocol_id,
-            protocol_type=self._get_protocol_type(pre_analysis),
             pre_analysis=pre_analysis,
             created_at=created_at,
             files=saved_files,
@@ -131,12 +126,3 @@ class ProtocolStore:
 
     def _get_protocol_dir(self, protocol_id: str) -> Path:
         return self._directory / protocol_id
-
-    @staticmethod
-    def _get_protocol_type(
-        pre_analysis: Union[JsonPreAnalysis, PythonPreAnalysis]
-    ) -> ProtocolFileType:
-        if isinstance(pre_analysis, JsonPreAnalysis):
-            return ProtocolFileType.JSON
-        else:
-            return ProtocolFileType.PYTHON
