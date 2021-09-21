@@ -113,11 +113,7 @@ def _analyze_python(
 
     try:
         metadata = extract_python_metadata(module_ast)
-    except Exception as exception:
-        # todo(mm, 2021-09-13):
-        # Characterize how extract_python_metadata() is allowed to fail,
-        # make it raise a good exception type to indicate that failure,
-        # and catch that exception type here.
+    except ValueError as exception:
         raise PythonMetadataError() from exception
 
     try:
