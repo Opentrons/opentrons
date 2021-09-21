@@ -237,7 +237,6 @@ def extract_metadata(parsed: ast.Module) -> Metadata:
             # expressions that aren't statically or "safely" evaluable, like
             # `{"o": object()}` or `{"s": "abc"[0]}`.
             except ValueError as exception:
-                # todo(mm, 2021-09-21): Raise a custom exception type.
                 raise ValueError(
                     "Could not read the contents of the metadata dict."
                     " Make sure it doesn't contain any complex expressions, such as"
@@ -249,7 +248,6 @@ def extract_metadata(parsed: ast.Module) -> Metadata:
             assert isinstance(evaluated_literal, dict)
 
             for key, value in evaluated_literal.items():
-                # todo(mm, 2021-09-21): Raise a custom exception type.
                 if not isinstance(key, str):
                     raise ValueError(
                         f'metadata keys must be strings, but "{key}"'
