@@ -1,7 +1,12 @@
 import * as React from 'react'
+import { when } from 'jest-when'
+
 import '@testing-library/jest-dom'
 import { fireEvent } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components/__utils__'
+import {
+  renderWithProviders,
+  componentPropsMatcher,
+} from '@opentrons/components/__utils__'
 import withModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/testModulesProtocol.json'
 
 import { i18n } from '../../../i18n'
@@ -10,7 +15,7 @@ import * as calibrationSelectors from '../../../redux/calibration/selectors'
 import * as discoverySelectors from '../../../redux/discovery/selectors'
 import * as protocolSelectors from '../../../redux/protocol/selectors'
 import * as protocolUtils from '../../../redux/protocol/utils'
-import { closeProtocol } from '../../../redux/protocol/actions'
+import { ConfirmExitProtocolUploadModal } from '../ConfirmExitProtocolUploadModal'
 import { mockCalibrationStatus } from '../../../redux/calibration/__fixtures__'
 import { ProtocolUpload } from '..'
 
@@ -18,6 +23,7 @@ jest.mock('../../../redux/protocol/selectors')
 jest.mock('../../../redux/protocol/utils')
 jest.mock('../../../redux/discovery/selectors')
 jest.mock('../../../redux/calibration/selectors')
+jest.mock('../ConfirmExitProtocolUploadModal')
 
 const getProtocolFile = protocolSelectors.getProtocolFile as jest.MockedFunction<
   typeof protocolSelectors.getProtocolFile
@@ -31,9 +37,11 @@ const ingestProtocolFile = protocolUtils.ingestProtocolFile as jest.MockedFuncti
 const getConnectedRobot = discoverySelectors.getConnectedRobot as jest.MockedFunction<
   typeof discoverySelectors.getConnectedRobot
 >
-
 const getCalibrationStatus = calibrationSelectors.getCalibrationStatus as jest.MockedFunction<
   typeof calibrationSelectors.getCalibrationStatus
+>
+const mockConfirmExitProtocolUploadModal = ConfirmExitProtocolUploadModal as jest.MockedFunction<
+  typeof ConfirmExitProtocolUploadModal
 >
 
 describe('ProtocolUpload', () => {
@@ -45,6 +53,16 @@ describe('ProtocolUpload', () => {
     getProtocolName.mockReturnValue(null)
     getCalibrationStatus.mockReturnValue(mockCalibrationStatus)
     ingestProtocolFile.mockImplementation((_f, _s, _e) => {})
+    when(mockConfirmExitProtocolUploadModal)
+      .calledWith(
+        componentPropsMatcher({
+          exit: expect.anything(),
+          back: expect.anything(),
+        })
+      )
+      .mockImplementation(({ exit }) => (
+        <div onClick={exit}>mock confirm exit protocol upload modal</div>
+      ))
     render = () => {
       return renderWithProviders(<ProtocolUpload />, { i18nInstance: i18n })
     }
@@ -68,14 +86,15 @@ describe('ProtocolUpload', () => {
     expect(queryByRole('button', { name: 'Choose File...' })).toBeNull()
     expect(getByText('Organization/Author')).toBeTruthy()
   })
-  it('handles closing protocol', () => {
+
+  it('opens up the confirm close protocol modal when clicked', () => {
     getProtocolFile.mockReturnValue(withModulesProtocol as any)
     getProtocolName.mockReturnValue('some file name')
-    const { store, getByRole } = render()
-
+    const { getByRole, getByText } = render()
     fireEvent.click(getByRole('button', { name: 'close' }))
-    expect(store.dispatch).toHaveBeenCalledWith(closeProtocol())
+    getByText('mock confirm exit protocol upload modal')
   })
+
   it('calls ingest protocol if handleUpload', () => {
     const { getByTestId } = render()
 
