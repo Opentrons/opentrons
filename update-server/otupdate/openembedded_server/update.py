@@ -16,9 +16,10 @@ from aiohttp import web, BodyPartReader
 
 from .constants import RESTART_LOCK_NAME
 from . import config, file_actions
-from .update_session import Stages
 
 from ot_utils import session
+
+from ot_utils.session import Stages
 
 APP_VARIABLE_PREFIX = 'OT3_SESSION'
 SESSION_VARNAME = APP_VARIABLE_PREFIX + 'session'
