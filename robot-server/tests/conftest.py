@@ -20,7 +20,12 @@ from typing_extensions import NoReturn
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 from opentrons import config
-from opentrons.hardware_control import API, HardwareAPILike, ThreadedAsyncLock
+from opentrons.hardware_control import (
+    API,
+    HardwareAPILike,
+    ThreadedAsyncLock,
+    ThreadManager,
+)
 from opentrons.protocols.context.protocol_api.labware import LabwareImplementation
 from opentrons.calibration_storage import delete, modify, helpers
 from opentrons.protocol_api import labware
@@ -28,8 +33,8 @@ from opentrons.types import Point, Mount
 from opentrons.protocols.geometry.deck import Deck
 
 from robot_server.app import app
-from robot_server.constants import API_VERSION_HEADER, API_VERSION_LATEST
-from robot_server.service.dependencies import get_hardware
+from robot_server.hardware import get_hardware
+from robot_server.versioning import API_VERSION_HEADER, LATEST_API_VERSION_HEADER_VALUE
 from robot_server.service.protocol.manager import ProtocolManager
 from robot_server.service.session.manager import SessionManager
 
@@ -79,7 +84,7 @@ def override_hardware(hardware: MagicMock) -> None:
 @pytest.fixture
 def api_client(override_hardware: None) -> TestClient:
     client = TestClient(app)
-    client.headers.update({API_VERSION_HEADER: API_VERSION_LATEST})
+    client.headers.update({API_VERSION_HEADER: LATEST_API_VERSION_HEADER_VALUE})
     return client
 
 
@@ -88,19 +93,19 @@ def api_client_no_errors(override_hardware: None) -> TestClient:
     """An API client that won't raise server exceptions.
     Use only to test 500 pages; never use this for other tests."""
     client = TestClient(app, raise_server_exceptions=False)
-    client.headers.update({API_VERSION_HEADER: API_VERSION_LATEST})
+    client.headers.update({API_VERSION_HEADER: LATEST_API_VERSION_HEADER_VALUE})
     return client
 
 
 @pytest.fixture(scope="session")
-def request_session():
+def request_session() -> requests.Session:
     session = requests.Session()
-    session.headers.update({API_VERSION_HEADER: API_VERSION_LATEST})
+    session.headers.update({API_VERSION_HEADER: LATEST_API_VERSION_HEADER_VALUE})
     return session
 
 
 @pytest.fixture(scope="session")
-def server_temp_directory():
+def server_temp_directory() -> Iterator[str]:
     new_dir = tempfile.mkdtemp()
     os.environ["OT_API_CONFIG_DIR"] = new_dir
     config.reload()
@@ -112,7 +117,9 @@ def server_temp_directory():
 
 
 @pytest.fixture(scope="session")
-def run_server(request_session, server_temp_directory):
+def run_server(
+    request_session: requests.Session, server_temp_directory: str
+) -> Iterator["subprocess.Popen[Any]"]:
     """Run the robot server in a background process."""
     # In order to collect coverage we run using `coverage`.
     # `-a` is to append to existing `.coverage` file.
@@ -161,7 +168,7 @@ def run_server(request_session, server_temp_directory):
 
 
 @pytest.fixture
-def attach_pipettes(server_temp_directory):
+def attach_pipettes(server_temp_directory: str) -> Iterator[None]:
     import json
 
     pipette = {"dropTipShake": True, "model": "p300_multi_v1"}
@@ -176,7 +183,7 @@ def attach_pipettes(server_temp_directory):
 
 
 @pytest.fixture
-def set_up_index_file_temporary_directory(server_temp_directory):
+def set_up_index_file_temporary_directory(server_temp_directory: str) -> None:
     delete.clear_calibrations()
     deck = Deck()
     labware_list = [
@@ -194,7 +201,7 @@ def set_up_index_file_temporary_directory(server_temp_directory):
 
 
 @pytest.fixture
-def set_up_pipette_offset_temp_directory(server_temp_directory):
+def set_up_pipette_offset_temp_directory(server_temp_directory: str) -> None:
     attached_pip_list = ["123", "321"]
     mount_list = [Mount.LEFT, Mount.RIGHT]
     definition = labware.get_labware_definition("opentrons_96_filtertiprack_200ul")
@@ -210,7 +217,7 @@ def set_up_pipette_offset_temp_directory(server_temp_directory):
 
 
 @pytest.fixture
-def set_up_tip_length_temp_directory(server_temp_directory):
+def set_up_tip_length_temp_directory(server_temp_directory: str) -> None:
     attached_pip_list = ["123", "321"]
     tip_length_list = [30.5, 31.5]
     definition = labware.get_labware_definition("opentrons_96_filtertiprack_200ul")
@@ -223,13 +230,13 @@ def set_up_tip_length_temp_directory(server_temp_directory):
 
 
 @pytest.fixture
-def set_up_deck_calibration_temp_directory(server_temp_directory):
+def set_up_deck_calibration_temp_directory(server_temp_directory: str) -> None:
     attitude = [[1.0008, 0.0052, 0.0], [-0.0, 0.992, 0.0], [0.0, 0.0, 1.0]]
     modify.save_robot_deck_attitude(attitude, "pip_1", "fakehash")
 
 
 @pytest.fixture
-def session_manager(hardware) -> SessionManager:
+def session_manager(hardware: ThreadManager) -> SessionManager:
     return SessionManager(
         hardware=hardware,
         motion_lock=ThreadedAsyncLock(),
@@ -238,7 +245,9 @@ def session_manager(hardware) -> SessionManager:
 
 
 @pytest.fixture
-def set_enable_http_protocol_sessions(request_session) -> Iterator[None]:
+def set_enable_http_protocol_sessions(
+    request_session: requests.Session,
+) -> Iterator[None]:
     """For integration tests that need to set then clear the
     enableHttpProtocolSessions feature flag"""
     url = "http://localhost:31950/settings"

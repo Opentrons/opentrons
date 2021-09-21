@@ -42,7 +42,7 @@ class CalibrationPosition:
 
 
 class Deck(UserDict):
-    def __init__(self, load_name=STANDARD_DECK):
+    def __init__(self, load_name: str = STANDARD_DECK) -> None:
         super().__init__()
         row_offset = 90.5
         col_offset = 132.5

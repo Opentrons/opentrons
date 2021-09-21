@@ -21,7 +21,7 @@ CONFIG = Settings(
 )
 
 PROTOCOL_PATH = os.path.join(
-    get_configuration_dir(), "protocols", "smoothie_protocol.py"
+    get_configuration_dir(), "protocol", "protocols", "smoothie_protocol.py"
 )
 
 
