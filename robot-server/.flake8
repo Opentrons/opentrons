@@ -33,6 +33,4 @@ per-file-ignores =
     tests/robot/*:ANN,D
     tests/service/*:ANN,D
     tests/conftest.py:ANN,D
-    tests/test_app.py:ANN,D
-    tests/test_hardware_wrapper.py:ANN,D
     tests/test_util.py:ANN,D

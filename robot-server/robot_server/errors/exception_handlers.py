@@ -8,6 +8,12 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from traceback import format_exception, format_exception_only
 from typing import Any, Callable, Coroutine, Dict, Optional, Sequence, Type, Union
 
+from robot_server.versioning import (
+    API_VERSION,
+    MIN_API_VERSION,
+    API_VERSION_HEADER,
+    MIN_API_VERSION_HEADER,
+)
 from robot_server.constants import V1_TAG
 from .global_errors import UnexpectedError, BadRequest, InvalidRequest
 
@@ -67,6 +73,10 @@ async def handle_api_error(request: Request, error: ApiError) -> JSONResponse:
     return JSONResponse(
         status_code=error.status_code,
         content=error.content,
+        headers={
+            MIN_API_VERSION_HEADER: f"{MIN_API_VERSION}",
+            API_VERSION_HEADER: f"{API_VERSION}",
+        },
     )
 
 

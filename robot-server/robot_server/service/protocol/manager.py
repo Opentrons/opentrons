@@ -14,7 +14,7 @@ log = logging.getLogger(__name__)
 class ProtocolManager:
     MAX_COUNT = get_settings().protocol_manager_max_protocols
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._protocols: typing.Dict[str, UploadedProtocol] = {}
 
     def create(
