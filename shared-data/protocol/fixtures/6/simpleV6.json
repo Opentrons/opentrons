@@ -47,7 +47,8 @@
   },
   "liquid": {
     "waterId": {
-      "displayName": "Liquid Water"
+      "displayName": "Water",
+      "description": "Liquid H2O"
     }
   },
   "labwareDefinitions": {
@@ -1238,56 +1239,64 @@
   },
   "commands": [
     {
-      "command": "load_pipette",
+      "commandType": "loadPipette",
+      "id": "0abc123",
       "params": {
         "entityId": "pipetteId",
         "locationId": "leftMount"
       }
     },
     {
-      "command": "load_module",
+      "commandType": "loadModule",
+      "id": "1abc123",
       "params": {
         "entityId": "magneticModuleId",
         "locationId": "3"
       }
     },
     {
-      "command": "load_module",
+      "commandType": "loadModule",
+      "id": "2abc123",
       "params": {
         "entityId": "temperatureModuleId",
         "locationId": "1"
       }
     },
     {
-      "command": "load_labware",
+      "commandType": "loadLabware",
+      "id": "3abc123",
       "params": {
         "entityId": "sourcePlateId",
         "locationId": "temperatureModuleId"
       }
     },
     {
-      "command": "load_labware",
+      "commandType": "loadLabware",
+      "id": "4abc123",
       "params": {
         "entityId": "destPlateId",
         "locationId": "magneticModuleId"
       }
     },
     {
-      "command": "load_labware",
+      "commandType": "loadLabware",
+      "id": "5abc123",
       "params": {
         "entityId": "tipRackId",
         "locationId": "magneticModuleId"
       }
     },
     {
-      "command": "load_labware",
+      "commandType": "loadLabware",
+      "id": "6abc123",
       "params": {
         "entityId": "trashId",
         "locationId": "12"
       }
     },
     {
-      "command": "load_liquid",
+      "commandType": "loadLiquid",
+      "id": "7abc123",
       "params": {
         "liquidId": "waterId",
         "labwareId": "sourcePlateId",
@@ -1298,7 +1307,8 @@
       }
     },
     {
-      "command": "pickUpTip",
+      "commandType": "pickUpTip",
+      "id": "8abc123",
       "params": {
         "pipette": "pipetteId",
         "labware": "tipRackId",
@@ -1306,54 +1316,60 @@
       }
     },
     {
-      "command": "aspirate",
+      "commandType": "aspirate",
+      "id": "9abc123",
       "params": {
         "pipette": "pipetteId",
         "labware": "sourcePlateId",
         "well": "A1",
         "volume": 5,
         "flowRate": 3,
-        "offsetFromBottomMm": 2
+        "offset": {"x": 0, "y": 0, "z": 2}
       }
     },
     {
-      "command": "delay",
+      "commandType": "delay",
+      "id": "10abc123",
       "params": {
         "wait": 42
       }
     },
     {
-      "command": "dispense",
+      "commandType": "dispense",
+      "id": "11abc123",
       "params": {
         "pipette": "pipetteId",
         "labware": "destPlateId",
         "well": "B1",
         "volume": 4.5,
         "flowRate": 2.5,
-        "offsetFromBottomMm": 1
+        "offset": {"x": 0, "y": 0, "z": 1}
       }
     },
     {
-      "command": "touchTip",
+      "commandType": "touchTip",
+      "id": "12abc123",
       "params": {
         "pipette": "pipetteId",
         "labware": "destPlateId",
         "well": "B1",
-        "offsetFromBottomMm": 11
+        "offset": {"x": 0, "y": 0, "z": 11}
       }
     },
     {
-      "command": "blowout",
+      "commandType": "blowout",
+      "id": "13abc123",
       "params": {
         "pipette": "pipetteId",
         "labware": "destPlateId",
         "well": "B1",
         "flowRate": 2,
-        "offsetFromBottomMm": 12
+        "offset": {"x": 0, "y": 0, "z": 12}
       }
     },
     {
-      "command": "moveToSlot",
+      "commandType": "moveToSlot",
+      "id": "14abc123",
       "params": {
         "pipette": "pipetteId",
         "slot": "5",
@@ -1365,7 +1381,8 @@
       }
     },
     {
-      "command": "moveToWell",
+      "commandType": "moveToWell",
+      "id": "15abc123",
       "params": {
         "pipette": "pipetteId",
         "labware": "destPlateId",
@@ -1373,7 +1390,8 @@
       }
     },
     {
-      "command": "moveToWell",
+      "commandType": "moveToWell",
+      "id": "16abc123",
       "params": {
         "pipette": "pipetteId",
         "labware": "destPlateId",
@@ -1384,7 +1402,8 @@
       }
     },
     {
-      "command": "dropTip",
+      "commandType": "dropTip",
+      "id": "17abc123",
       "params": {
         "pipette": "pipetteId",
         "labware": "trashId",

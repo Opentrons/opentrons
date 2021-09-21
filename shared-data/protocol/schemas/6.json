@@ -45,6 +45,24 @@
       }
     },
 
+    "offset": {
+      "description": "Optional offset from default location, in mm",
+      "type": "object",
+      "required": ["offset"],
+      "properties": {
+        "offset": {
+          "description": "x, y, and z component of offset vector in mm",
+          "type": "object",
+          "required": ["x", "y", "z"],
+          "properties": {
+            "x": { "type": "number" },
+            "y": { "type": "number" },
+            "z": { "type": "number" }
+          }
+        }
+      }
+    },
+
     "pipetteAccessParams": {
       "required": ["pipette", "labware", "well"],
       "properties": {
@@ -278,8 +296,7 @@
           {
             "description": "Aspirate Liquid / Dispense Liquid / Aspirate Air Gap / Dispense Air Aap",
             "type": "object",
-            "required": ["id", "commandType", "params"],
-            "additionalProperties": false,
+            "required": ["id", "commandType", "params", "offset"],
             "properties": {
               "id": {"type": "string"},
               "commandType": {
@@ -290,7 +307,10 @@
                   { "$ref": "#/definitions/flowRate" },
                   { "$ref": "#/definitions/pipetteAccessParams" },
                   { "$ref": "#/definitions/volumeParams" },
-                  { "$ref": "#/definitions/offsetFromBottomMm" }
+                  {
+                    "$ref": "#/definitions/offset",
+                    "description": "Offset from bottom center of location, in mm"
+                  }
                 ]
               }
             }
@@ -299,8 +319,7 @@
           {
             "description": "Blowout",
             "type": "object",
-            "required": ["id", "commandType", "params"],
-            "additionalProperties": false,
+            "required": ["id", "commandType", "params", "offset"],
             "properties": {
               "id": {"type": "string"},
               "commandType": {
@@ -310,7 +329,10 @@
                 "allOf": [
                   { "$ref": "#/definitions/flowRate" },
                   { "$ref": "#/definitions/pipetteAccessParams" },
-                  { "$ref": "#/definitions/offsetFromBottomMm" }
+                  {
+                    "$ref": "#/definitions/offset",
+                    "description": "Offset from bottom center of location, in mm"
+                   }
                 ]
               }
             }
@@ -319,8 +341,7 @@
           {
             "description": "Touch Tip",
             "type": "object",
-            "required": ["id", "commandType", "params"],
-            "additionalProperties": false,
+            "required": ["id", "commandType", "params", "offset"],
             "properties": {
               "id": {"type": "string"},
               "commandType": {
@@ -329,7 +350,10 @@
               "params": {
                 "allOf": [
                   { "$ref": "#/definitions/pipetteAccessParams" },
-                  { "$ref": "#/definitions/offsetFromBottomMm" }
+                  {
+                    "$ref": "#/definitions/offset",
+                    "description": "Offset from bottom center of location, in mm"
+                  }
                 ]
               }
             }
@@ -354,8 +378,7 @@
           {
             "description": "Move To Slot. NOTE: this is an EXPERIMENTAL command, its behavior is subject to change in future releases.",
             "type": "object",
-            "required": ["id", "commandType", "params"],
-            "additionalProperties": false,
+            "required": ["id", "commandType", "params", "offset"],
             "properties": {
               "id": {"type": "string"},
               "commandType": { "enum": ["moveToSlot"] },
@@ -367,14 +390,8 @@
                   "pipette": { "type": "string" },
                   "slot": { "$ref": "#/definitions/locationId" },
                   "offset": {
-                    "description": "Optional offset from slot bottom left corner, in mm",
-                    "type": "object",
-                    "required": ["x", "y", "z"],
-                    "properties": {
-                      "x": { "type": "number" },
-                      "y": { "type": "number" },
-                      "z": { "type": "number" }
-                    }
+                    "$ref": "#/definitions/offset",
+                    "description": "Optional offset from slot bottom left corner, in mm"
                   },
                   "minimumZHeight": {
                     "description": "Optional minimal Z margin in mm. If this is larger than the API's default safe Z margin, it will make the arc higher. If it's smaller, it will have no effect. Specifying this for movements that would not arc (moving within the same well in the same labware) will cause an arc movement instead.",
@@ -703,8 +720,7 @@
           {
             "description": "Move To Well: Move the pipette's critical point to the specified well in a labware, with an optional offset. The pipette's critical point is a reference point on the pipette. The critical point can be one of the following: (1) Single-channel pipette with no tip: end of nozzle. (2) Multi-channel pipette with no tip: end of backmost nozzle. (3) Single-channel pipette with a tip: end of tip. (4) Multi-channel pipette with tip: end of tip on backmost nozzle.",
             "type": "object",
-            "required": ["id", "commandType", "params"],
-            "additionalProperties": false,
+            "required": ["id", "commandType", "params", "offset"],
             "properties": {
               "id": {"type": "string"},
               "commandType": { "enum": ["moveToWell"] },
@@ -717,14 +733,8 @@
                   "labware": { "type": "string" },
                   "well": { "type": "string" },
                   "offset": {
-                    "description": "Optional offset from well bottom center, in mm",
-                    "type": "object",
-                    "required": ["x", "y", "z"],
-                    "properties": {
-                      "x": { "type": "number" },
-                      "y": { "type": "number" },
-                      "z": { "type": "number" }
-                    }
+                    "$ref": "#/definitions/offset",
+                    "description": "Optional offset from well bottom center, in mm"
                   },
                   "minimumZHeight": {
                     "description": "Optional minimal Z margin in mm. If this is larger than the API's default safe Z margin, it will make the arc higher. If it's smaller, it will have no effect. Specifying this for movements that would not arc (moving within the same well in the same labware) will cause an arc movement instead.",
