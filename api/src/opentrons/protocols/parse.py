@@ -209,20 +209,58 @@ def parse(
 
 
 def extract_metadata(parsed: ast.Module) -> Metadata:
+    """Return the contents of a Python protocol's ``metadata`` block.
+
+    Returns:
+        The contents of module's ``metadata`` block, if succeeded.
+
+        ``{}``, if the module never assigns a dict to a variable named  ``metadata``.
+
+    Raises:
+        ``ValueError``, if `parsed` does assign a dict to a variable named ``metadata``,
+        but either:
+
+        * That dict is not statically parsable
+        * That dict contains unsupported types
+    """
     metadata: Metadata = {}
     assigns = [obj for obj in parsed.body if isinstance(obj, ast.Assign)]
     for obj in assigns:
-        # XXX This seems brittle and could probably do with
-        # - enough love that we can remove the type: ignores
-        # - some thought about exactly what types are allowed in metadata
         if (
             isinstance(obj.targets[0], ast.Name)
             and obj.targets[0].id == "metadata"
             and isinstance(obj.value, ast.Dict)
         ):
-            keys = [k.s for k in obj.value.keys]  # type: ignore
-            values = [v.s for v in obj.value.values]  # type: ignore
-            metadata = dict(zip(keys, values))
+            try:
+                evaluated_literal = ast.literal_eval(obj.value)
+            # Undocumented, but ast.literal_eval() seems to raise ValueError for
+            # expressions that aren't statically or "safely" evaluable, like
+            # `{"o": object()}` or `{"s": "abc"[0]}`.
+            except ValueError as exception:
+                raise ValueError(
+                    "Could not read the contents of the metadata dict."
+                    " Make sure it doesn't contain any complex expressions, such as"
+                    " function calls or array indexings."
+                ) from exception
+
+            # ast.literal_eval() is typed as returning Any, but we're pretty sure it
+            # should return a dict in this case because we passed it an ast.Dict.
+            assert isinstance(evaluated_literal, dict)
+
+            for key, value in evaluated_literal.items():
+                if not isinstance(key, str):
+                    raise ValueError(
+                        f'metadata keys must be strings, but key "{key}"'
+                        f' has type "{type(key).__name__}".'
+                    )
+                if not isinstance(value, str):
+                    raise ValueError(
+                        f'metadata values must be strings, but value "{value}"'
+                        f' has type "{type(value).__name__}".'
+                    )
+
+            metadata = evaluated_literal
+
     return metadata
 
 
