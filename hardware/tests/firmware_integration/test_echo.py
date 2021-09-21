@@ -8,7 +8,7 @@ from opentrons_hardware.drivers.can_bus import CanDriver, ArbitrationId, CanMess
 async def driver(
         loop: asyncio.BaseEventLoop
 ) -> AsyncGenerator[CanDriver, None]:
-    driver = await CanDriver.connect_to_emulator('vcan0')
+    driver = await CanDriver.connect_to_emulator()
     yield driver
     driver.shutdown()
 

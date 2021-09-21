@@ -3,9 +3,9 @@ from __future__ import annotations
 
 import asyncio
 import platform
-from typing import Optional, Union
+from typing import Optional
 
-from can import Notifier, Bus, AsyncBufferedReader, Message
+from can import Notifier, Bus, AsyncBufferedReader, Message, util
 
 from .arbitration_id import ArbitrationId
 from .message import CanMessage
@@ -26,6 +26,9 @@ if platform.system() == "Darwin":
 
 class CanDriver:
     """The can driver."""
+
+    DEFAULT_VCAN_NETWORK = 'vcan0'
+    VCAN_NETWORK_ENV_VAR = 'CAN_CHANNEL'
 
     def __init__(self, bus: Bus, loop: asyncio.AbstractEventLoop) -> None:
         """Constructor.
@@ -60,19 +63,19 @@ class CanDriver:
         )
 
     @classmethod
-    async def connect_to_emulator(cls, vcan_interface: str) -> CanDriver:
+    async def connect_to_emulator(cls) -> CanDriver:
         """
         Build a CanDriver that is connected to an emulator
 
         Args:
             vcan_interface: The name of the vcan interface to use
         """
+        can_channel: str = util.load_environment_config().get('channel')
+        if can_channel is None:
+            can_channel = cls.DEFAULT_VCAN_NETWORK
+
         return CanDriver(
-            bus=Bus(
-                channel=vcan_interface,
-                bustype='socketcan',
-                fd=True
-            ),
+            bus=Bus(channel=can_channel, bustype='socketcan', fd=True),
             loop=asyncio.get_event_loop()
         )
 
