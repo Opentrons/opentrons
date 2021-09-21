@@ -7,7 +7,7 @@ from aiohttp import web
 
 # , name_management
 
-from . import config, constants, control, name_management, ssh_key_management, update
+from . import config, constants, control, ssh_key_management, update
 # from . import config, control, update, ssh_key_management
 from openembedded import root_fs
 
@@ -59,12 +59,12 @@ def get_app(system_version_file: str = None,
         web.post('/server/update/{session}/file', update.file_upload),
         web.post('/server/update/{session}/commit', update.commit),
         web.post('/server/restart', control.restart),
-        web.get('server/ssh_keys', ssh_key_management.list_keys),
+        web.get('/server/ssh_keys', ssh_key_management.list_keys),
         web.post('/server/ssh_keys', ssh_key_management.add),
         web.delete('/server/ssh_keys', ssh_key_management.clear),
         web.delete('/server/ssh_keys/{key_md5}', ssh_key_management.remove),
-        web.post('/server/name', name_management.set_name_endpoint),
-        web.get('/server/name', name_management.get_name_endpoint),
+        # web.post('/server/name', name_management.set_name_endpoint),
+        # web.get('/server/name', name_management.get_name_endpoint),
         web.post('/server/oe/restore', rfs.factory_restore),
         web.post('/server/oe/swap', rfs.swap_partition),
         web.get('/server/oe/partition', rfs.get_partition_api),
