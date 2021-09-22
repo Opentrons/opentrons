@@ -2,7 +2,7 @@
 
 openembedded server mode
 Allows us to start oe update server in different modes.
-For instance,  debug mode. This mode runs the debug functions
+For instance debug mode runs the debug functions
 and prints out current config values.
 Debug mode:
 Gives us something to debug the api points, and whatever else additions
