@@ -3,12 +3,9 @@ import asyncio
 import logging
 from aiohttp import web
 
-# from . import constants
-
 # , name_management
 
 from . import config, constants, control, ssh_key_management, update
-# from . import config, control, update, ssh_key_management
 from openembedded import root_fs
 
 LOG = logging.getLogger(__name__)

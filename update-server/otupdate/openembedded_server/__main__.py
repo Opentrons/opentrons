@@ -14,7 +14,6 @@ try:
     # systemd journal is available, we can use its handler
     import systemd.journal
     import systemd.daemon
-# whats this _handler_for and _notify_up being defined here for, (function definition)
 
     def _handler_for(topic_name: str,
                      log_level: int):
@@ -45,8 +44,6 @@ except ImportError:
 
     def _notify_up():
         LOG.info("systemd couldn't be imported (host? test?), not notifying")
-
-# look into logging module to figure out this crap
 
 
 def configure_logging(level: int):
