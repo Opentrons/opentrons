@@ -32,7 +32,7 @@ from opentrons.protocol_api import labware
 from opentrons.types import Point, Mount
 from opentrons.protocols.geometry.deck import Deck
 
-from robot_server.app import app
+from robot_server import app
 from robot_server.hardware import get_hardware
 from robot_server.versioning import API_VERSION_HEADER, LATEST_API_VERSION_HEADER_VALUE
 from robot_server.service.protocol.manager import ProtocolManager
