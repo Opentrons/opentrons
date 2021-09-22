@@ -137,7 +137,7 @@ def active_session_check(handler):
     @functools.wraps(handler)
     async def decorated(request: web.Request) -> web.Response:
         # checks if session exists!
-        if None is not update.session_from_request(request):
+        if update.session_from_request(request) is not None:
             LOG.warning("check_session: active session exists!")
             return web.json_response(
                 data={'message':

@@ -44,9 +44,6 @@ def get_app(system_version_file: str = None,
 
     config_obj = config.load(config_file_override)
 
-    async def hello(request):
-        print('hello')
-        return web.Response(text="hello")
     app = web.Application(middlewares=[log_error_middleware])
     app[config.CONFIG_VARNAME] = config_obj
     app[constants.RESTART_LOCK_NAME] = asyncio.Lock()
@@ -68,6 +65,5 @@ def get_app(system_version_file: str = None,
         web.post('/server/oe/restore', rfs.factory_restore),
         web.post('/server/oe/swap', rfs.swap_partition),
         web.get('/server/oe/partition', rfs.get_partition_api),
-        web.get('/server/oe/hello', hello),
     ])
     return app

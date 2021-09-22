@@ -47,6 +47,11 @@ def require_session(handler):
 
 @session.active_session_check
 async def begin(request: web.Request) -> web.Response:
+    """ future add begin functionality on
+    top of active_session_check decorator from
+    ot_utils.session can be added here. For
+    now just adding a pass.
+    """
     pass
 
 
