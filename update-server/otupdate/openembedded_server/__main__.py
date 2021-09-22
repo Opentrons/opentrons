@@ -65,7 +65,8 @@ def configure_logging(level: int):
             'level': level
         }
     }
-    LOG.debug(config)
+    # LOG.debug(config)
+    logging.config.dictConfig(config)
 
 
 def main():
