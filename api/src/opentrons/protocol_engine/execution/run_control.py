@@ -10,7 +10,9 @@ class RunControlHandler:
     _state_store: StateStore
 
     def __init__(
-        self, state_store: StateStore, action_dispatcher: ActionDispatcher
+        self,
+        state_store: StateStore,
+        action_dispatcher: ActionDispatcher,
     ) -> None:
         """Initialize a RunControlHandler instance."""
         self._state_store = state_store
