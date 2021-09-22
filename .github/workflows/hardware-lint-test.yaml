@@ -59,7 +59,7 @@ jobs:
           python-version: '3.7'
 
       - name: Setup Hardware Project
-      - uses: './.github/actions/python/setup'
+        uses: './.github/actions/python/setup'
         with:
           project: 'hardware'
 
@@ -68,7 +68,9 @@ jobs:
 
       - name: Test
         run: make -C hardware test
-      - uses: 'codecov/codecov-action@v2'
+
+      - name: Code Coverage
+        uses: 'codecov/codecov-action@v2'
         with:
           files: ./hardware/coverage.xml
           flags: hardware 
