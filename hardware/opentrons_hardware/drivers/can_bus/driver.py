@@ -75,7 +75,7 @@ class CanDriver:
         can_interface: str = util.load_environment_config().get(
             "interface", cls.DEFAULT_CAN_INTERFACE
         )
-        can_bitrate: str = util.load_environment_config().get(
+        can_bitrate: int = util.load_environment_config().get(
             "bitrate", cls.DEFAULT_CAN_BITRATE
         )
 
