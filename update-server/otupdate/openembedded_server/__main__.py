@@ -82,7 +82,7 @@ def configure_logging(level: int):
 
 def main():
 
-    configure_logging(getattr(logging, 'INFO'))
+    configure_logging(20)
     LOG.info('check logger for OE server')
 
     # configure_logging(getattr(logging, args.log_level.upper()))
