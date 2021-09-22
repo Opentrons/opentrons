@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import map from 'lodash/map'
 import {
   LabwareRender,
-  ModuleViz,
+  Module,
   RobotWorkSpace,
   ModalPage,
   PrimaryBtn,
@@ -22,19 +22,18 @@ import {
   LINE_HEIGHT_COPY,
 } from '@opentrons/components'
 import {
-  getModuleType,
+  THERMOCYCLER_MODULE_V1,
   inferModuleOrientationFromXCoordinate,
   getPipetteNameSpecs,
 } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 import { Portal } from '../../../App/portal'
 import { getProtocolData } from '../../../redux/protocol'
-import { getModuleRenderCoords } from '../utils/getModuleRenderCoords'
-import { getLabwareRenderCoords } from '../utils/getLabwareRenderCoords'
+import { useModuleRenderInfoById, useLabwareRenderInfoById } from '../hooks'
 import { getPrimaryPipetteId } from './utils/getPrimaryPipetteId'
 import { getLabwarePositionCheckSteps } from './getLabwarePositionCheckSteps'
+import { useIntroInfo } from './hooks'
 
-import { ModuleTag } from '../ModuleTag'
 import styles from '../styles.css'
 
 const DECK_LAYER_BLOCKLIST = [
@@ -61,43 +60,20 @@ export const LabwarePositionCheck = (
     currentLabwareCheckStep,
     setCurrentLabwareCheckStep,
   ] = React.useState<Number | null>(null)
+  const moduleRenderInfoById = useModuleRenderInfoById()
+  const labwareRenderInfoById = useLabwareRenderInfoById()
   // placeholder for next steps
   console.log(currentLabwareCheckStep)
 
-  const protocolData = useSelector((state: State) => getProtocolData(state))
-  const moduleRenderCoords = getModuleRenderCoords(
-    protocolData,
-    standardDeckDef as any
-  )
-  const labwareRenderCoords = getLabwareRenderCoords(
-    protocolData,
-    standardDeckDef as any
-  )
-
-  // get the primary pipette info
-  const pipettes = protocolData.pipettes
-  const primaryPipetteId = getPrimaryPipetteId(pipettes)
-  const primaryPipetteSpecs = getPipetteNameSpecs(
-    pipettes[primaryPipetteId].name
-  )
-  // find how many channels pipette for check has for dynmic text
-  const channels = primaryPipetteSpecs.channels
-  const numTipsText = channels === 1 ? '1 tip' : `${channels} tips`
-
-  // find which tiprack primary pipette will use for check
-  const steps = getLabwarePositionCheckSteps(protocolData)
-  const pickUpTipStep = steps.find(
-    step => step.commands[0].command === 'pickUpTip'
-  )
-  const pickUpTipLabwareId = pickUpTipStep.labwareId
-  const pickUpTipLabware = protocolData.labware[pickUpTipLabwareId]
-  // find name and slot number for tiprack used for check
-  const name = pickUpTipLabware.displayName
-  const slot = pickUpTipLabware.slot
-
-  // find the slot for the first labware that will be checked for button
-  const firstTiprackToCheckId = steps[0].labwareId
-  const firstLabwareSlot = protocolData.labware[firstTiprackToCheckId].slot
+  const introInfo = useIntroInfo()
+  if (introInfo == null) return null
+  const {
+    primaryTipRackSlot,
+    primaryTipRackName,
+    numberOfTips,
+    firstStepLabwareSlot,
+    sections,
+  } = introInfo
 
   return (
     <Portal level="top">
@@ -127,9 +103,10 @@ export const LabwarePositionCheck = (
             lineHeight={LINE_HEIGHT_COPY}
           >
             {t('position_check_description', {
-              number_of_tips: numTipsText,
-              labware_name: name,
-              labware_slot: slot,
+              count: numberOfTips,
+              number_of_tips: numberOfTips,
+              labware_name: primaryTipRackName,
+              labware_slot: primaryTipRackSlot,
             })}
           </Text>
           <Flex
@@ -140,8 +117,8 @@ export const LabwarePositionCheck = (
               {/* This is a placeholder for next PR */}
               <Text>TODO</Text>
               <ul style={{ fontSize: '.5rem' }}>
-                {steps.map((step, index) => (
-                  <li key={index}>{step.section}</li>
+                {sections.map((section, index) => (
+                  <li key={index}>{section}</li>
                 ))}
               </ul>
             </Box>
@@ -156,30 +133,30 @@ export const LabwarePositionCheck = (
                 {() => {
                   return (
                     <React.Fragment>
-                      {map(moduleRenderCoords, ({ x, y, moduleModel }) => {
-                        const orientation = inferModuleOrientationFromXCoordinate(
-                          x
-                        )
-                        return (
-                          <React.Fragment
-                            key={`LabwareSetup_Module_${moduleModel}_${x}${y}`}
-                          >
-                            <ModuleViz
-                              x={x}
-                              y={y}
-                              orientation={orientation}
-                              moduleType={getModuleType(moduleModel)}
-                            />
-                            <ModuleTag
-                              x={x}
-                              y={y}
-                              moduleModel={moduleModel}
-                              orientation={orientation}
-                            />
-                          </React.Fragment>
-                        )
-                      })}
-                      {map(labwareRenderCoords, ({ x, y, labwareDef }) => {
+                      {map(moduleRenderInfoById, ({ x, y, moduleDef, nestedLabwareDef }) => (
+                        <Module
+                        key={`LabwareSetup_Module_${moduleDef.model}_${x}${y}`}
+                        x={x}
+                        y={y}
+                        orientation={inferModuleOrientationFromXCoordinate(x)}
+                        def={moduleDef}
+                        innerProps={
+                          moduleDef.model === THERMOCYCLER_MODULE_V1
+                            ? { lidMotorState: 'open' }
+                            : {}
+                        }
+                        >
+                          {nestedLabwareDef != null ? (
+                            <React.Fragment
+                              key={`LabwareSetup_Labware_${nestedLabwareDef.metadata.displayName}_${x}${y}`}
+                            >
+                              <LabwareRender definition={nestedLabwareDef} />
+                            </React.Fragment>
+                          ) : null}
+                        </Module>
+                      ))}
+
+                      {map(labwareRenderInfoById, ({ x, y, labwareDef }) => {
                         return (
                           <React.Fragment
                             key={`LabwareSetup_Labware_${labwareDef.metadata.displayName}_${x}${y}`}
