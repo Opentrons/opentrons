@@ -4,11 +4,11 @@ from opentrons.hardware_control import API as HardwareAPI
 
 from .resources import ModelUtils
 from .commands import Command, CommandRequest, CommandMapper
-from .execution import QueueWorker
+from .execution import QueueWorker, create_queue_worker
+from .state import StateStore, StateView
 
-from .state import (
-    StateStore,
-    StateView,
+from .actions import (
+    ActionDispatcher,
     PlayAction,
     PauseAction,
     StopAction,
@@ -34,7 +34,8 @@ class ProtocolEngine:
         self,
         hardware_api: HardwareAPI,
         state_store: StateStore,
-        queue_worker: QueueWorker,
+        action_dispatcher: Optional[ActionDispatcher] = None,
+        queue_worker: Optional[QueueWorker] = None,
         command_mapper: Optional[CommandMapper] = None,
         model_utils: Optional[ModelUtils] = None,
     ) -> None:
@@ -45,14 +46,25 @@ class ProtocolEngine:
         """
         self._hardware_api = hardware_api
         self._state_store = state_store
-        self._queue_worker = queue_worker
+        self._action_dispatcher = action_dispatcher or ActionDispatcher(
+            sink=self._state_store
+        )
         self._command_mapper = command_mapper or CommandMapper()
         self._model_utils = model_utils or ModelUtils()
+        self._queue_worker = queue_worker or create_queue_worker(
+            hardware_api=self._hardware_api,
+            state_store=self._state_store,
+            action_dispatcher=self._action_dispatcher,
+        )
 
     @property
     def state_view(self) -> StateView:
         """Get an interface to retrieve calculated state values."""
         return self._state_store
+
+    # def add_plugin(self, plugin: AbstractPlugin) -> None:
+    #     """Add a plugin to the engine to customize behavior."""
+    #     raise NotImplementedError("add_plugin not yet implemented")
 
     def play(self) -> None:
         """Start or resume executing commands in the queue."""
@@ -60,14 +72,14 @@ class ProtocolEngine:
         # homed if necessary
         action = PlayAction()
         self._state_store.commands.validate_action_allowed(action)
-        self._state_store.handle_action(action)
+        self._action_dispatcher.dispatch(action)
         self._queue_worker.start()
 
     def pause(self) -> None:
         """Pause executing commands in the queue."""
         action = PauseAction()
         self._state_store.commands.validate_action_allowed(action)
-        self._state_store.handle_action(action)
+        self._action_dispatcher.dispatch(action)
 
     def add_command(self, request: CommandRequest) -> Command:
         """Add a command to the `ProtocolEngine`'s queue.
@@ -84,7 +96,7 @@ class ProtocolEngine:
             command_id=self._model_utils.generate_id(),
             created_at=self._model_utils.get_timestamp(),
         )
-        self._state_store.handle_action(UpdateCommandAction(command=command))
+        self._action_dispatcher.dispatch(UpdateCommandAction(command=command))
 
         return command
 
@@ -116,7 +128,7 @@ class ProtocolEngine:
         You should call `stop` after calling `halt` for cleanup and to allow
         the engine to settle and recover.
         """
-        self._state_store.handle_action(StopAction())
+        self._action_dispatcher.dispatch(StopAction())
         self._queue_worker.cancel()
         await self._hardware_api.halt()
 
@@ -140,7 +152,7 @@ class ProtocolEngine:
                 condition=self._state_store.commands.get_all_complete
             )
 
-        self._state_store.handle_action(StopAction())
+        self._action_dispatcher.dispatch(StopAction())
 
         try:
             await self._queue_worker.join()

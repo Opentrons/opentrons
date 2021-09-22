@@ -1,7 +1,7 @@
 """State store actions.
 
-Actions can be passed to the StateStore, where they will trigger
-state changes.
+Actions can be passed to the ActionDispatcher, where they will trigger
+reactions in objects that subscribe to the pipeline, like the StateStore.
 """
 
 from dataclasses import dataclass

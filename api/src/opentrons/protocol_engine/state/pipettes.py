@@ -18,7 +18,7 @@ from ..commands import (
     PickUpTipResult,
     DropTipResult,
 )
-from .actions import Action, UpdateCommandAction
+from ..actions import Action, UpdateCommandAction
 from .abstract_store import HasState, HandlesActions
 
 

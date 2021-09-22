@@ -6,7 +6,7 @@ from typing import List, NamedTuple, Optional, Sequence, Tuple, Type, Union
 
 from opentrons.protocol_engine import EngineStatus, commands as cmd, errors
 from opentrons.protocol_engine.state.commands import CommandState, CommandView
-from opentrons.protocol_engine.state.actions import PlayAction, PauseAction
+from opentrons.protocol_engine.actions import PlayAction, PauseAction
 
 from .command_fixtures import (
     create_pending_command,
