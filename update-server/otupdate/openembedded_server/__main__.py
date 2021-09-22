@@ -82,7 +82,9 @@ def configure_logging(level: int):
 
 def main():
 
-    configure_logging(getattr(logging, 'ERROR'))
+    LOG.info('check logger for OE server')
+
+    configure_logging(getattr(logging, 'info'))
     # configure_logging(getattr(logging, args.log_level.upper()))
     oesi = oe_server_mode.OEServerMode()
     options = oesi.parse_args(sys.argv[1:])
