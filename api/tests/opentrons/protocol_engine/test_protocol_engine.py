@@ -11,6 +11,7 @@ from opentrons.protocol_engine.commands import CommandMapper
 from opentrons.protocol_engine.execution import QueueWorker
 from opentrons.protocol_engine.resources import ModelUtils
 from opentrons.protocol_engine.state import StateStore
+from opentrons.protocol_engine.plugins import AbstractPlugin
 
 from opentrons.protocol_engine.actions import (
     ActionDispatcher,
@@ -284,4 +285,21 @@ async def test_halt(
         action_dispatcher.dispatch(StopAction()),
         queue_worker.cancel(),
         await hardware_api.halt(),
+    )
+
+
+def test_add_plugin(
+    decoy: Decoy,
+    state_store: StateStore,
+    action_dispatcher: ActionDispatcher,
+    subject: ProtocolEngine,
+) -> None:
+    """It should configure and add a plugin to the ActionDispatcher pipeline."""
+    plugin = decoy.mock(cls=AbstractPlugin)
+
+    subject.add_plugin(plugin)
+
+    decoy.verify(
+        plugin._configure(state=state_store, action_dispatcher=action_dispatcher),
+        action_dispatcher.add_handler(plugin),
     )

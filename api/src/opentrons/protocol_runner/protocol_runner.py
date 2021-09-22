@@ -18,6 +18,7 @@ from .json_command_translator import JsonCommandTranslator
 from .python_file_reader import PythonFileReader
 from .python_context_creator import PythonContextCreator
 from .python_executor import PythonExecutor
+from .legacy_context_plugin import LegacyContextPlugin
 from .legacy_wrappers import (
     LEGACY_PYTHON_API_VERSION_CUTOFF,
     LEGACY_JSON_SCHEMA_VERSION_CUTOFF,
@@ -64,6 +65,7 @@ class ProtocolRunner:
     ) -> None:
         """Initialize the ProtocolRunner with its dependencies."""
         self._protocol_engine = protocol_engine
+        self._hardware_api = hardware_api
         self._task_queue = task_queue or TaskQueue()
         self._json_file_reader = json_file_reader or JsonFileReader()
         self._json_command_translator = (
@@ -166,6 +168,14 @@ class ProtocolRunner:
     ) -> None:
         protocol = self._legacy_file_reader.read(protocol_source)
         context = self._legacy_context_creator.create(protocol.api_level)
+
+        self._protocol_engine.add_plugin(
+            LegacyContextPlugin(
+                hardware_api=self._hardware_api,
+                protocol_context=context,
+            )
+        )
+
         self._task_queue.add(
             phase=TaskQueuePhase.RUN,
             func=self._legacy_executor.execute,
