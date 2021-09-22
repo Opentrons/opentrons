@@ -16,11 +16,11 @@ from typing import Mapping, Optional, Union
 import uuid
 
 import functools
-from openembedded_server import update, config
+from openembedded_server import constants, update, config
 
 from aiohttp import web
 
-SESSION_VARNAME = 'OT3' + 'session'
+SESSION_VARNAME = constants.APP_VARIABLE_PREFIX + 'session'
 LOG = logging.getLogger(__name__)
 
 Value = namedtuple('Value', ('short', 'human'))
@@ -137,7 +137,7 @@ def active_session_check(handler):
     @functools.wraps(handler)
     async def decorated(request: web.Request) -> web.Response:
         # checks if session exists!
-        if update.session_from_request(request) is not None:
+        if None is not update.session_from_request(request):
             LOG.warning("check_session: active session exists!")
             return web.json_response(
                 data={'message':

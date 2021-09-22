@@ -45,16 +45,14 @@ def require_session(handler):
     return decorated
 
 
-"""
 @session.active_session_check
 async def begin(request: web.Request) -> web.Response:
     pass
+
+
 """
-
-
 async def begin(request: web.Request) -> web.Response:
-    """ Begin a session
-    """
+     # Begin a session
     if None is not session_from_request(request):
         LOG.warning("begin: requested with active session")
         return web.json_response(
@@ -69,6 +67,7 @@ async def begin(request: web.Request) -> web.Response:
     return web.json_response(
         data={'token': session_val.token},
         status=201)
+"""
 
 
 async def cancel(request: web.Request) -> web.Response:
