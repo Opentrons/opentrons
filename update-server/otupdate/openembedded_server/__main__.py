@@ -71,10 +71,11 @@ def configure_logging(level: int):
 
 def main():
 
+    configure_logging(getattr(logging, 1))
+    # configure_logging(getattr(logging, args.log_level.upper()))
     oesi = oe_server_mode.OEServerMode()
     options = oesi.parse_args(sys.argv[1:])
     args = options
-    configure_logging(getattr(logging, args.log_level.upper()))
     rfs = root_fs.RootFS()
     LOG.info('Building buildroot update server')
     app = get_app(args.version_file, 'testingconfig', None, None, rfs, None)
