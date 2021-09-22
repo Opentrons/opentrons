@@ -62,10 +62,6 @@ class ProtocolEngine:
         """Get an interface to retrieve calculated state values."""
         return self._state_store
 
-    # def add_plugin(self, plugin: AbstractPlugin) -> None:
-    #     """Add a plugin to the engine to customize behavior."""
-    #     raise NotImplementedError("add_plugin not yet implemented")
-
     def play(self) -> None:
         """Start or resume executing commands in the queue."""
         # TODO(mc, 2021-08-05): if starting, ensure plungers motors are
