@@ -1,5 +1,5 @@
 {
-  "$id": "opentronsProtocolSchemaV5",
+  "$id": "opentronsProtocolSchemaV6",
   "$schema": "http://json-schema.org/draft-07/schema#",
 
   "definitions": {
@@ -46,20 +46,12 @@
     },
 
     "offset": {
-      "description": "Optional offset from default location, in mm",
-      "type": "object",
-      "required": ["offset"],
+      "description": "x, y, and z component of offset vector in mm",
+      "required": ["x", "y", "z"],
       "properties": {
-        "offset": {
-          "description": "x, y, and z component of offset vector in mm",
-          "type": "object",
-          "required": ["x", "y", "z"],
-          "properties": {
-            "x": { "type": "number" },
-            "y": { "type": "number" },
-            "z": { "type": "number" }
-          }
-        }
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "z": { "type": "number" }
       }
     },
 
@@ -241,7 +233,7 @@
               "type": "string"
             },
             "displayName": {
-              "description": "An optional human-readable nickname for this labware. Eg \"Buffer Trough\"",
+              "description": "An optional human-readable nickname for this labware instance within this protocol. Eg \"Buffer Trough\"",
               "type": "string"
             }
           }
@@ -296,7 +288,7 @@
           {
             "description": "Aspirate Liquid / Dispense Liquid / Aspirate Air Gap / Dispense Air Aap",
             "type": "object",
-            "required": ["id", "commandType", "params", "offset"],
+            "required": ["id", "commandType", "params"],
             "properties": {
               "id": {"type": "string"},
               "commandType": {
@@ -308,8 +300,10 @@
                   { "$ref": "#/definitions/pipetteAccessParams" },
                   { "$ref": "#/definitions/volumeParams" },
                   {
-                    "$ref": "#/definitions/offset",
-                    "description": "Offset from bottom center of location, in mm"
+                    "offset": {
+                      "$ref": "#/definitions/offset",
+                      "description": "Offset from bottom center of location, in mm"
+                    }
                   }
                 ]
               }
@@ -319,7 +313,7 @@
           {
             "description": "Blowout",
             "type": "object",
-            "required": ["id", "commandType", "params", "offset"],
+            "required": ["id", "commandType", "params"],
             "properties": {
               "id": {"type": "string"},
               "commandType": {
@@ -330,9 +324,11 @@
                   { "$ref": "#/definitions/flowRate" },
                   { "$ref": "#/definitions/pipetteAccessParams" },
                   {
-                    "$ref": "#/definitions/offset",
-                    "description": "Offset from bottom center of location, in mm"
-                   }
+                    "offset": {
+                      "$ref": "#/definitions/offset",
+                      "description": "Offset from bottom center of location, in mm"
+                    }
+                  }
                 ]
               }
             }
@@ -341,7 +337,7 @@
           {
             "description": "Touch Tip",
             "type": "object",
-            "required": ["id", "commandType", "params", "offset"],
+            "required": ["id", "commandType", "params"],
             "properties": {
               "id": {"type": "string"},
               "commandType": {
@@ -351,8 +347,10 @@
                 "allOf": [
                   { "$ref": "#/definitions/pipetteAccessParams" },
                   {
-                    "$ref": "#/definitions/offset",
-                    "description": "Offset from bottom center of location, in mm"
+                    "offset": {
+                      "$ref": "#/definitions/offset",
+                      "description": "Offset from bottom center of location, in mm"
+                    }
                   }
                 ]
               }
@@ -378,7 +376,7 @@
           {
             "description": "Move To Slot. NOTE: this is an EXPERIMENTAL command, its behavior is subject to change in future releases.",
             "type": "object",
-            "required": ["id", "commandType", "params", "offset"],
+            "required": ["id", "commandType", "params"],
             "properties": {
               "id": {"type": "string"},
               "commandType": { "enum": ["moveToSlot"] },
@@ -720,7 +718,7 @@
           {
             "description": "Move To Well: Move the pipette's critical point to the specified well in a labware, with an optional offset. The pipette's critical point is a reference point on the pipette. The critical point can be one of the following: (1) Single-channel pipette with no tip: end of nozzle. (2) Multi-channel pipette with no tip: end of backmost nozzle. (3) Single-channel pipette with a tip: end of tip. (4) Multi-channel pipette with tip: end of tip on backmost nozzle.",
             "type": "object",
-            "required": ["id", "commandType", "params", "offset"],
+            "required": ["id", "commandType", "params"],
             "properties": {
               "id": {"type": "string"},
               "commandType": { "enum": ["moveToWell"] },
