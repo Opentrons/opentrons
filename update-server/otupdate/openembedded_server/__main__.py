@@ -60,18 +60,29 @@ def configure_logging(level: int):
         'handlers': {
             'journald': _handler_for('opentrons-update', level)
         },
-        'root': {
-            'handlers': ['journald'],
-            'level': level
+        'loggers': {
+            'otupdate': {
+                'handlers': ['journald'],
+                'level': level,
+                'propagate': False
+            },
+            '__main__': {
+                'handlers': ['journald'],
+                'level': level,
+                'propagate': False,
+            },
+            'root': {
+                'handlers': ['journald'],
+                'level': level
+            }
         }
-    }
-    # LOG.debug(config)
+        }
     logging.config.dictConfig(config)
 
 
 def main():
 
-    configure_logging(getattr(logging, 1))
+    configure_logging(getattr(logging, 'ERROR'))
     # configure_logging(getattr(logging, args.log_level.upper()))
     oesi = oe_server_mode.OEServerMode()
     options = oesi.parse_args(sys.argv[1:])
