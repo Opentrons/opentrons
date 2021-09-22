@@ -3,7 +3,7 @@ from collections import OrderedDict
 
 from opentrons.protocol_engine.state.commands import CommandState, CommandStore
 
-from opentrons.protocol_engine.state.actions import (
+from opentrons.protocol_engine.actions import (
     UpdateCommandAction,
     PlayAction,
     PauseAction,

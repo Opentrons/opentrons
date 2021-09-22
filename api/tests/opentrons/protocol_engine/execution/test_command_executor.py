@@ -7,7 +7,9 @@ from typing import Optional, Type, cast
 
 from opentrons.protocol_engine.errors import ProtocolEngineError
 from opentrons.protocol_engine.resources import ModelUtils
-from opentrons.protocol_engine.state import StateStore, UpdateCommandAction
+from opentrons.protocol_engine.state import StateStore
+from opentrons.protocol_engine.actions import ActionDispatcher, UpdateCommandAction
+
 from opentrons.protocol_engine.commands import (
     AbstractCommandImpl,
     BaseCommand,
@@ -29,6 +31,12 @@ from opentrons.protocol_engine.execution import (
 def state_store(decoy: Decoy) -> StateStore:
     """Get a mocked out StateStore."""
     return decoy.mock(cls=StateStore)
+
+
+@pytest.fixture
+def action_dispatcher(decoy: Decoy) -> ActionDispatcher:
+    """Get a mocked out ActionDispatcher."""
+    return decoy.mock(cls=ActionDispatcher)
 
 
 @pytest.fixture
@@ -70,6 +78,7 @@ def command_mapper(decoy: Decoy) -> CommandMapper:
 @pytest.fixture
 def subject(
     state_store: StateStore,
+    action_dispatcher: ActionDispatcher,
     equipment: EquipmentHandler,
     movement: MovementHandler,
     pipetting: PipettingHandler,
@@ -80,6 +89,7 @@ def subject(
     """Get a CommandExecutor test subject with its dependencies mocked out."""
     return CommandExecutor(
         state_store=state_store,
+        action_dispatcher=action_dispatcher,
         equipment=equipment,
         movement=movement,
         pipetting=pipetting,
@@ -105,6 +115,7 @@ class _TestCommandImpl(AbstractCommandImpl[_TestCommandData, _TestCommandResult]
 async def test_execute(
     decoy: Decoy,
     state_store: StateStore,
+    action_dispatcher: ActionDispatcher,
     equipment: EquipmentHandler,
     movement: MovementHandler,
     pipetting: PipettingHandler,
@@ -206,14 +217,15 @@ async def test_execute(
     await subject.execute("command-id")
 
     decoy.verify(
-        state_store.handle_action(UpdateCommandAction(command=running_command)),
-        state_store.handle_action(UpdateCommandAction(command=completed_command)),
+        action_dispatcher.dispatch(UpdateCommandAction(command=running_command)),
+        action_dispatcher.dispatch(UpdateCommandAction(command=completed_command)),
     )
 
 
 async def test_execute_raises_protocol_engine_error(
     decoy: Decoy,
     state_store: StateStore,
+    action_dispatcher: ActionDispatcher,
     equipment: EquipmentHandler,
     movement: MovementHandler,
     pipetting: PipettingHandler,
@@ -315,6 +327,6 @@ async def test_execute_raises_protocol_engine_error(
     await subject.execute("command-id")
 
     decoy.verify(
-        state_store.handle_action(UpdateCommandAction(command=running_command)),
-        state_store.handle_action(UpdateCommandAction(command=failed_command)),
+        action_dispatcher.dispatch(UpdateCommandAction(command=running_command)),
+        action_dispatcher.dispatch(UpdateCommandAction(command=failed_command)),
     )

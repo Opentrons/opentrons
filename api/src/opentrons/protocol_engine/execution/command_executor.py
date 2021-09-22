@@ -2,9 +2,10 @@
 from logging import getLogger
 from typing import Optional
 
-from ..state import StateStore, UpdateCommandAction
+from ..state import StateStore
 from ..resources import ModelUtils
 from ..commands import CommandStatus, CommandMapper
+from ..actions import ActionDispatcher, UpdateCommandAction
 from .equipment import EquipmentHandler
 from .movement import MovementHandler
 from .pipetting import PipettingHandler
@@ -23,6 +24,7 @@ class CommandExecutor:
     def __init__(
         self,
         state_store: StateStore,
+        action_dispatcher: ActionDispatcher,
         equipment: EquipmentHandler,
         movement: MovementHandler,
         pipetting: PipettingHandler,
@@ -32,6 +34,7 @@ class CommandExecutor:
     ) -> None:
         """Initialize the CommandExecutor with access to its dependencies."""
         self._state_store = state_store
+        self._action_dispatcher = action_dispatcher
         self._equipment = equipment
         self._movement = movement
         self._pipetting = pipetting
@@ -61,7 +64,7 @@ class CommandExecutor:
             startedAt=started_at,
         )
 
-        self._state_store.handle_action(UpdateCommandAction(command=running_command))
+        self._action_dispatcher.dispatch(UpdateCommandAction(command=running_command))
 
         result = None
         error = None
@@ -89,4 +92,4 @@ class CommandExecutor:
             completedAt=completed_at,
         )
 
-        self._state_store.handle_action(UpdateCommandAction(command=completed_command))
+        self._action_dispatcher.dispatch(UpdateCommandAction(command=completed_command))
