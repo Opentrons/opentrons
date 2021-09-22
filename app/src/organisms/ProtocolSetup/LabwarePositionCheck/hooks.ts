@@ -20,7 +20,7 @@ export function useSteps(): LabwarePositionCheckStep[] {
 export function useSections(): string[] {
   const steps = useSteps()
   return steps.reduce<string[]>(
-    (acc, step) => (step.section in acc ? acc : [...acc, step.section]),
+    (acc, step) => (acc.includes(step.section) ? acc : [...acc, step.section]),
     []
   )
 }
@@ -51,6 +51,8 @@ interface IntroInfo {
 }
 export function useIntroInfo(): IntroInfo | null {
   const protocolData = useSelector((state: State) => getProtocolData(state))
+  const steps = useSteps()
+  const sections = useSections()
   if (
     protocolData == null ||
     !('pipettes' in protocolData) ||
@@ -59,11 +61,7 @@ export function useIntroInfo(): IntroInfo | null {
     return null // this state should never be reached
 
   // find which tiprack primary pipette will use for check
-  const steps = getLabwarePositionCheckSteps(protocolData)
-  const sections = steps.reduce<string[]>(
-    (acc, step) => (step.section in acc ? acc : [...acc, step.section]),
-    []
-  )
+
   const pickUpTipStep = steps.find(
     step => step.commands[0].command === 'pickUpTip'
   )

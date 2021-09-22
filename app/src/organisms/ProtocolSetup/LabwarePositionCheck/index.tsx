@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import map from 'lodash/map'
 import {
@@ -24,14 +23,10 @@ import {
 import {
   THERMOCYCLER_MODULE_V1,
   inferModuleOrientationFromXCoordinate,
-  getPipetteNameSpecs,
 } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 import { Portal } from '../../../App/portal'
-import { getProtocolData } from '../../../redux/protocol'
 import { useModuleRenderInfoById, useLabwareRenderInfoById } from '../hooks'
-import { getPrimaryPipetteId } from './utils/getPrimaryPipetteId'
-import { getLabwarePositionCheckSteps } from './getLabwarePositionCheckSteps'
 import { useIntroInfo } from './hooks'
 
 import styles from '../styles.css'
@@ -115,10 +110,9 @@ export const LabwarePositionCheck = (
           >
             <Box width="210px" marginLeft="4rem">
               {/* This is a placeholder for next PR */}
-              <Text>TODO</Text>
               <ul style={{ fontSize: '.5rem' }}>
                 {sections.map((section, index) => (
-                  <li key={index}>{section}</li>
+                  <li key={index}>{t(`${section.toLowerCase()}_section`)}</li>
                 ))}
               </ul>
             </Box>
@@ -133,28 +127,33 @@ export const LabwarePositionCheck = (
                 {() => {
                   return (
                     <React.Fragment>
-                      {map(moduleRenderInfoById, ({ x, y, moduleDef, nestedLabwareDef }) => (
-                        <Module
-                        key={`LabwareSetup_Module_${moduleDef.model}_${x}${y}`}
-                        x={x}
-                        y={y}
-                        orientation={inferModuleOrientationFromXCoordinate(x)}
-                        def={moduleDef}
-                        innerProps={
-                          moduleDef.model === THERMOCYCLER_MODULE_V1
-                            ? { lidMotorState: 'open' }
-                            : {}
-                        }
-                        >
-                          {nestedLabwareDef != null ? (
-                            <React.Fragment
-                              key={`LabwareSetup_Labware_${nestedLabwareDef.metadata.displayName}_${x}${y}`}
-                            >
-                              <LabwareRender definition={nestedLabwareDef} />
-                            </React.Fragment>
-                          ) : null}
-                        </Module>
-                      ))}
+                      {map(
+                        moduleRenderInfoById,
+                        ({ x, y, moduleDef, nestedLabwareDef }) => (
+                          <Module
+                            key={`LabwareSetup_Module_${moduleDef.model}_${x}${y}`}
+                            x={x}
+                            y={y}
+                            orientation={inferModuleOrientationFromXCoordinate(
+                              x
+                            )}
+                            def={moduleDef}
+                            innerProps={
+                              moduleDef.model === THERMOCYCLER_MODULE_V1
+                                ? { lidMotorState: 'open' }
+                                : {}
+                            }
+                          >
+                            {nestedLabwareDef != null ? (
+                              <React.Fragment
+                                key={`LabwareSetup_Labware_${nestedLabwareDef.metadata.displayName}_${x}${y}`}
+                              >
+                                <LabwareRender definition={nestedLabwareDef} />
+                              </React.Fragment>
+                            ) : null}
+                          </Module>
+                        )
+                      )}
 
                       {map(labwareRenderInfoById, ({ x, y, labwareDef }) => {
                         return (
@@ -180,7 +179,7 @@ export const LabwarePositionCheck = (
               onClick={() => setCurrentLabwareCheckStep(0)}
             >
               {t('start_position_check', {
-                initial_labware_slot: firstLabwareSlot,
+                initial_labware_slot: firstStepLabwareSlot,
               })}
             </PrimaryBtn>
           </Flex>
