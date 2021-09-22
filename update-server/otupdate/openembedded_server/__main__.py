@@ -70,12 +70,12 @@ def configure_logging(level: int):
                 'handlers': ['journald'],
                 'level': level,
                 'propagate': False,
-            },
-            'root': {
-                'handlers': ['journald'],
-                'level': level
             }
-        }
+        },
+        'root': {
+            'handlers': ['journald'],
+            'level': level
+            }
         }
     logging.config.dictConfig(config)
 

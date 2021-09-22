@@ -73,13 +73,13 @@ def configure_logging(level: int):
                 'level': level,
                 'propagate': False,
             }
-           },
-           'root': {
-               'handlers': ['journald'],
-               'level': level
+        },
+        'root': {
+            'handlers': ['journald'],
+            'level': level
            }
         }
-        logging.config.dictConfig(config)
+    logging.config.dictConfig(config)
 
 
 def main():
