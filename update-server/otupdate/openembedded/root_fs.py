@@ -1,11 +1,7 @@
 import argparse
-import os
-import re
 import sys
 import json
 import logging
-import shlex
-import stat
 import subprocess
 from aiohttp import web
 from dataclasses import dataclass
@@ -117,64 +113,6 @@ class RootFS:
     async def get_partition_api(self, request: web.Request) -> web.Response:
         return web.Response(text="hello, world")
 
-    def get_partition_api_(self) -> web.Response:
-        dev = os.stat('/')[stat.ST_DEV]
-        major = os.major(dev)
-        minor = os.minor(dev)
-        out = subprocess.Popen(shlex.split("mount"),
-                               stdout=subprocess.PIPE).communicate()
-        m = re.search(r'(/[^\s]+)s', str(out))
-        if m is not None:
-            mp = m.group(1)
-            ri = RootFSInfo(major, minor, mp)
-            return web.json_response(
-                    data={'major': f'major {ri.major}',
-                          'minor': ri.minor},
-                    status=200)
-        else:
-            raise AssertionError("Unexpected value of partition")
-
-    def get_partition(self) -> RootFSInfo:
-        dev = os.stat('/')[stat.ST_DEV]
-        major = os.major(dev)
-        minor = os.minor(dev)
-        out = subprocess.Popen(shlex.split("mount"),
-                               stdout=subprocess.PIPE).communicate()
-        m = re.search(r'(/[^\s]+)s', str(out))
-        if m is not None:
-            mp = m.group(1)
-            ri = RootFSInfo(major, minor, mp)
-            return ri
-        else:
-            raise AssertionError("Unexpected value of partition")
-
-    def swap_partition(self, arg: argparse.Namespace) -> None:
-        """swap partitions get current partition
-           and swap it with the other available partition"""
-        current_partition = self.get_partition()
-        if current_partition is not None:
-            if current_partition.disk == self._root_FS_config.ROOTFS_PART1:
-                self.set_partition(arg, self._root_FS_config.ROOTFS_PART2)
-            else:
-                self.set_partition(arg, self._root_FS_config.ROOTFS_PART1)
-
-    def factory_restore(self, arg: argparse.Namespace) -> None:
-        """" bmap to factory reset here"""
-        bmap = (self._root_FS_config.SD_CARD_MOUNT_POINT +
-                self._root_FS_config.BMAP_FILE)
-        bmap_img = (self._root_FS_config.SD_CARD_MOUNT_POINT +
-                    self._root_FS_config.BMAP_IMAGE)
-        subprocess.run(["bmaptool", "copy", "--bmap", bmap ,
-                        "--no-sig-verify", "--no-verify",
-                        bmap_img,
-                        self._root_FS_config.DISK])
-
-    """ debug fuctions """
-    def print_rootFS_partition(self, arg: argparse.Namespace) -> str:
-        tmp = str(self.get_partition().disk)
-        tmp = ('Current RootFS Partition ' + tmp + '\n')
-        return str(tmp)
-
     def print_rootFS_config(self, arg: argparse.Namespace) -> str:
         tmp = (('ROOTFS_TEST_TITLE '+arg.tt+'\n') +
                ('ROOTFS_PART1 '+self._root_FS_config.ROOTFS_PART1+'\n') +
@@ -189,5 +127,5 @@ class RootFS:
         return tmp
 
     def debug(self, arg: argparse.Namespace) -> None:
-        print(self.print_rootFS_partition(arg))
+        # print(self.print_rootFS_partition(arg))
         print(self.print_rootFS_config(arg))

@@ -59,8 +59,5 @@ def get_app(system_version_file: str = None,
         web.delete('/server/ssh_keys/{key_md5}', ssh_key_management.remove),
         # web.post('/server/name', name_management.set_name_endpoint),
         # web.get('/server/name', name_management.get_name_endpoint),
-        web.post('/server/oe/restore', rfs.factory_restore),
-        web.post('/server/oe/swap', rfs.swap_partition),
-        web.get('/server/oe/partition', rfs.get_partition_api),
     ])
     return app
