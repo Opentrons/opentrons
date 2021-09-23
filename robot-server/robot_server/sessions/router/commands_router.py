@@ -42,7 +42,7 @@ class CommandNotFound(ErrorDetails):
         status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[SessionNotFound]},
     },
 )
-async def post_session_commands(
+async def post_session_command(
     command_request: pe_commands.CommandRequest,
     engine_store: EngineStore = Depends(get_engine_store),
     session: ResponseModel[Session] = Depends(get_session),
