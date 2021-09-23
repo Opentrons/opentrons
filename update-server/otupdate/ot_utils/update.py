@@ -16,14 +16,14 @@ from aiohttp import web, BodyPartReader
 from .constants import APP_VARIABLE_PREFIX, RESTART_LOCK_NAME
 from . import config, file_actions
 
-from ..ot_utils import session as session_class
+from otupdate.ot_utils.session import UpdateSession
 
 
 SESSION_VARNAME = APP_VARIABLE_PREFIX + 'session'
 LOG = logging.getLogger(__name__)
 
 
-def session_from_request(request: web.Request) -> Optional[session_class.UpdateSession]:
+def session_from_request(request: web.Request) -> Optional[UpdateSession]:
     return request.app.get(SESSION_VARNAME, None)
 
 
@@ -43,7 +43,7 @@ def require_session(handler):
     return decorated
 
 
-@session_class.active_session_check
+@session.active_session_check
 async def begin(request: web.Request) -> web.Response:
     """ future add begin functionality on
     top of active_session_check decorator from
@@ -117,7 +117,7 @@ def _begin_write(session: session_class.UpdateSession,
 
 
 def _begin_validation(
-        session: session_class.UpdateSession,
+        session: session.UpdateSession,
         config: config.Config,
         loop: asyncio.AbstractEventLoop,
         downloaded_update_path: str)\
@@ -149,7 +149,7 @@ def _begin_validation(
 
 @require_session
 async def file_upload(
-        request: web.Request, session: session_class.UpdateSession) -> web.Response:
+        request: web.Request, session: session.UpdateSession) -> web.Response:
     """ Serves /updates/:session/file
 
     Requires multipart (encoding doesn't matter) with a file field in the
@@ -181,7 +181,7 @@ async def file_upload(
 
 @require_session
 async def commit(
-        request: web.Request, session: session_class.UpdateSession) -> web.Response:
+        request: web.Request, session: session.UpdateSession) -> web.Response:
     """ Serves /update/:session/commit """
     if session.stage != session_calss.Stages.DONE:
         return web.json_response(

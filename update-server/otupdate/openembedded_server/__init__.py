@@ -6,7 +6,7 @@ from aiohttp import web
 # , name_management
 
 from . import config, constants, control, ssh_key_management, update
-from openembedded import root_fs
+from otupdate.openembedded import root_fs
 
 LOG = logging.getLogger(__name__)
 

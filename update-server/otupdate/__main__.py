@@ -1,3 +1,3 @@
-from .openembedded_server.__main__ import main
+from otupdate.openembedded_server.__main__ import main
 
 main()

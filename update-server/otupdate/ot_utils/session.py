@@ -16,7 +16,7 @@ from typing import Mapping, Optional, Union
 import uuid
 
 import functools
-from openembedded_server import constants, update, config
+from otupdate.ot_utils import constants, config
 
 from aiohttp import web
 
