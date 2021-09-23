@@ -19,7 +19,7 @@ class LegacyContextPlugin(AbstractPlugin):
 
     1. Play/pause the protocol run using the HardwareAPI, as was done before
        the ProtocolEngine existed.
-    2. Subscribe the message broker commands and insert them into ProtocolEngine
+    2. Subscribe to the message broker commands and insert them into ProtocolEngine
        state, for progress tracking rather than execution.
     """
 
