@@ -10,40 +10,14 @@ import logging.config
 # from openembedded import (root_fs, oe_server_mode)
 LOG = logging.getLogger(__name__)
 
-try:
-    # systemd journal is available, we can use its handler
-    import systemd.journal
-    import systemd.daemon
 
-    def _handler_for(topic_name: str,
-                     log_level: int):
-        return {'class': 'logging.StreamHandler',
-                'formatter': 'basic',
-                'level': log_level,
-                'SYSLOG_IDENTIFIER': topic_name}
-
-    # By using sd_notify
-    # (https://www.freedesktop.org/software/systemd/man/sd_notify.html)
-    # and type=notify in the unit file, we can prevent systemd from starting
-    # dependent services until we actually say we're ready. By calling this
-    # after we change the hostname, we make anything with an After= on us
-    # be guaranteed to see the correct hostname
-    def _notify_up():
-        systemd.daemon.notify("READY=1")
-
-except ImportError:
-    # systemd journal isn't available, probably running tests
-
-    def _handler_for(topic_name: str,
-                     log_level: int):
-        return {
-            'class': 'logging.StreamHandler',
-            'formatter': 'basic',
-            'level': log_level,
-        }
-
-    def _notify_up():
-        LOG.info("systemd couldn't be imported (host? test?), not notifying")
+def _handler_for(topic_name: str,
+                 log_level: int):
+    return {
+        'class': 'logging.StreamHandler',
+        'formatter': 'basic',
+        'level': log_level,
+    }
 
 
 def configure_logging(level: int):
@@ -97,9 +71,6 @@ def main():
     # rfs = root_fs.RootFS()
     LOG.info('Building buildroot update server')
     # app = get_app(args.version_file, 'testingconfig', None, None, rfs, None)
-
-    LOG.info('Notifying systemd')
-    _notify_up()
 
     # LOG.info(
     #    f'Starting openembedded update server on http://{args.host}:{args.port}')
