@@ -2,13 +2,7 @@
 import pytest
 
 from datetime import datetime
-from decoy import Decoy, matchers
-from fastapi import FastAPI
-from fastapi.testclient import TestClient
-from httpx import AsyncClient
-from typing import Callable, Awaitable
-
-from tests.helpers import verify_response
+from decoy import Decoy
 
 from opentrons.protocol_engine import (
     CommandStatus,
@@ -17,6 +11,7 @@ from opentrons.protocol_engine import (
     errors as pe_errors,
 )
 
+from robot_server.errors import ApiError
 from robot_server.service.json_api import ResponseModel
 from robot_server.sessions.session_models import (
     Session,
@@ -24,34 +19,13 @@ from robot_server.sessions.session_models import (
     SessionCommandSummary,
 )
 from robot_server.sessions.engine_store import EngineStore
-from robot_server.sessions.router.base_router import get_session as real_get_session
 from robot_server.sessions.router.commands_router import (
-    commands_router,
-    CommandNotFound,
+    get_session_command,
+    get_session_commands,
 )
 
 
-@pytest.fixture
-def get_session(decoy: Decoy) -> Callable[..., Awaitable[ResponseModel[Session]]]:
-    """Get a mock version of the get_session route handler."""
-    return decoy.mock(func=real_get_session)
-
-
-@pytest.fixture(autouse=True)
-def setup_app(
-    get_session: Callable[..., Awaitable[ResponseModel[Session]]],
-    app: FastAPI,
-) -> None:
-    """Setup the FastAPI app with commands routes and dependencies."""
-    app.dependency_overrides[real_get_session] = get_session
-    app.include_router(commands_router)
-
-
-async def test_get_session_commands(
-    decoy: Decoy,
-    get_session: Callable[..., Awaitable[ResponseModel[Session]]],
-    async_client: AsyncClient,
-) -> None:
+async def test_get_session_commands(decoy: Decoy) -> None:
     """It should return a list of all commands in a session."""
     command_summary = SessionCommandSummary(
         id="command-id",
@@ -59,34 +33,26 @@ async def test_get_session_commands(
         status=CommandStatus.RUNNING,
     )
 
-    session_response = BasicSession(
-        id="session-id",
-        createdAt=datetime(year=2021, month=1, day=1),
-        status=EngineStatus.RUNNING,
-        actions=[],
-        commands=[command_summary],
-        pipettes=[],
-        labware=[],
+    session_response = ResponseModel[Session](
+        data=BasicSession(
+            id="session-id",
+            createdAt=datetime(year=2021, month=1, day=1),
+            status=EngineStatus.RUNNING,
+            actions=[],
+            commands=[command_summary],
+            pipettes=[],
+            labware=[],
+        )
     )
 
-    decoy.when(
-        await get_session(
-            sessionId="session-id",
-            session_view=matchers.Anything(),
-            session_store=matchers.Anything(),
-            engine_store=matchers.Anything(),
-        ),
-    ).then_return(ResponseModel(data=session_response))
+    response = await get_session_commands(session=session_response)
 
-    response = await async_client.get("/sessions/session-id/commands")
-
-    verify_response(response, expected_status=200, expected_data=[command_summary])
+    assert response.data == [command_summary]
 
 
-def test_get_session_command_by_id(
+async def test_get_session_command_by_id(
     decoy: Decoy,
     engine_store: EngineStore,
-    client: TestClient,
 ) -> None:
     """It should return full details about a command by ID."""
     command = pe_commands.MoveToWell(
@@ -100,15 +66,16 @@ def test_get_session_command_by_id(
         command
     )
 
-    response = client.get("/sessions/session-id/commands/command-id")
+    response = await get_session_command(
+        commandId="command-id", engine_store=engine_store
+    )
 
-    verify_response(response, expected_status=200, expected_data=command)
+    assert response.data == command
 
 
-def test_get_session_command_missing_command(
+async def test_get_session_command_missing_command(
     decoy: Decoy,
     engine_store: EngineStore,
-    client: TestClient,
 ) -> None:
     """It should 404 if you attempt to get a non-existent command."""
     key_error = pe_errors.CommandDoesNotExistError("oh no")
@@ -117,10 +84,7 @@ def test_get_session_command_missing_command(
         key_error
     )
 
-    response = client.get("/sessions/session-id/commands/command-id")
-
-    verify_response(
-        response,
-        expected_status=404,
-        expected_errors=CommandNotFound(detail=str(key_error)),
-    )
+    with pytest.raises(ApiError) as exc_info:
+        await get_session_command(commandId="command-id", engine_store=engine_store)
+    assert exc_info.value.status_code == 404
+    assert exc_info.value.content["errors"][0]["detail"] == "oh no"
