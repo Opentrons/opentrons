@@ -77,8 +77,8 @@ def configure_logging(level: int):
         'root': {
             'handlers': ['journald'],
             'level': level
-           }
         }
+    }
     logging.config.dictConfig(config)
 
 

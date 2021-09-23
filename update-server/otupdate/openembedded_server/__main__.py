@@ -17,8 +17,8 @@ try:
 
     def _handler_for(topic_name: str,
                      log_level: int):
-        return {'class': 'systemd.journal.JournalHandler',
-                'formatter': 'message_only',
+        return {'class': 'logging.StreamHandler',
+                'formatter': 'basic',
                 'level': log_level,
                 'SYSLOG_IDENTIFIER': topic_name}
 
@@ -64,7 +64,7 @@ def configure_logging(level: int):
             'openembedded_server': {
                 'handlers': ['journald'],
                 'level': level,
-                'propogate': False
+                'propagate': False
             },
             'otupdate': {
                 'handlers': ['journald'],
