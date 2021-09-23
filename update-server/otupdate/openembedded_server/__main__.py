@@ -3,11 +3,11 @@ Entrypoint for the openembedded update server
 """
 import logging
 import logging.config
-import sys
+# import sys
 
-from . import get_app
-from aiohttp import web
-from openembedded import (root_fs, oe_server_mode)
+# from . import get_app
+# from aiohttp import web
+# from openembedded import (root_fs, oe_server_mode)
 LOG = logging.getLogger(__name__)
 
 try:
@@ -86,20 +86,20 @@ def main():
     LOG.info('check logger for OE server')
 
     # configure_logging(getattr(logging, args.log_level.upper()))
-    oesi = oe_server_mode.OEServerMode()
-    options = oesi.parse_args(sys.argv[1:])
-    args = options
-    rfs = root_fs.RootFS()
+    # oesi = oe_server_mode.OEServerMode()
+    # options = oesi.parse_args(sys.argv[1:])
+    # args = options
+    # rfs = root_fs.RootFS()
     LOG.info('Building buildroot update server')
-    app = get_app(args.version_file, 'testingconfig', None, None, rfs, None)
+    # app = get_app(args.version_file, 'testingconfig', None, None, rfs, None)
 
     LOG.info('Notifying systemd')
     _notify_up()
 
-    LOG.info(
-        f'Starting openembedded update server on http://{args.host}:{args.port}')
-    options.func(options)
-    web.run_app(app, host=args.host, port=args.port)
+    # LOG.info(
+    #    f'Starting openembedded update server on http://{args.host}:{args.port}')
+    # options.func(options)
+    # web.run_app(app, host=args.host, port=args.port)
 
 
 if __name__ == '__main__':
