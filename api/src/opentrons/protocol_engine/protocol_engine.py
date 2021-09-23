@@ -6,7 +6,7 @@ from .resources import ModelUtils
 from .commands import Command, CommandRequest, CommandMapper
 from .execution import QueueWorker, create_queue_worker
 from .state import StateStore, StateView
-
+from .plugins import AbstractPlugin
 from .actions import (
     ActionDispatcher,
     PlayAction,
@@ -61,6 +61,14 @@ class ProtocolEngine:
     def state_view(self) -> StateView:
         """Get an interface to retrieve calculated state values."""
         return self._state_store
+
+    def add_plugin(self, plugin: AbstractPlugin) -> None:
+        """Add a plugin to the engine to customize behavior."""
+        plugin._configure(
+            state=self._state_store,
+            action_dispatcher=self._action_dispatcher,
+        )
+        self._action_dispatcher.add_handler(plugin)
 
     def play(self) -> None:
         """Start or resume executing commands in the queue."""

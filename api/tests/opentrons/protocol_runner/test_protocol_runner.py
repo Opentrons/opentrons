@@ -1,6 +1,6 @@
 """Tests for the ProtocolRunner class."""
 import pytest
-from decoy import Decoy
+from decoy import Decoy, matchers
 from typing import List, cast
 
 from opentrons_shared_data.protocol.dev_types import JsonProtocol as JsonProtocolDict
@@ -22,6 +22,7 @@ from opentrons.protocol_runner.python_file_reader import (
 )
 from opentrons.protocol_runner.python_context_creator import PythonContextCreator
 from opentrons.protocol_runner.python_executor import PythonExecutor
+from opentrons.protocol_runner.legacy_context_plugin import LegacyContextPlugin
 from opentrons.protocol_runner.legacy_wrappers import (
     LegacyFileReader,
     LegacyContextCreator,
@@ -289,6 +290,7 @@ def test_load_legacy_python(
     legacy_context_creator: LegacyContextCreator,
     legacy_executor: LegacyExecutor,
     task_queue: TaskQueue,
+    protocol_engine: ProtocolEngine,
     subject: ProtocolRunner,
 ) -> None:
     """It should load a legacy context-based Python protocol."""
@@ -321,13 +323,13 @@ def test_load_legacy_python(
     subject.load(legacy_protocol_source)
 
     decoy.verify(
+        protocol_engine.add_plugin(matchers.IsA(LegacyContextPlugin)),
         task_queue.add(
             phase=TaskQueuePhase.RUN,
             func=legacy_executor.execute,
             protocol=legacy_protocol,
             context=legacy_context,
         ),
-        times=1,
     )
 
 
@@ -337,6 +339,7 @@ def test_load_legacy_json(
     legacy_context_creator: LegacyContextCreator,
     legacy_executor: LegacyExecutor,
     task_queue: TaskQueue,
+    protocol_engine: ProtocolEngine,
     subject: ProtocolRunner,
 ) -> None:
     """It should load a legacy context-based Python protocol."""
@@ -366,11 +369,11 @@ def test_load_legacy_json(
     subject.load(legacy_protocol_source)
 
     decoy.verify(
+        protocol_engine.add_plugin(matchers.IsA(LegacyContextPlugin)),
         task_queue.add(
             phase=TaskQueuePhase.RUN,
             func=legacy_executor.execute,
             protocol=legacy_protocol,
             context=legacy_context,
         ),
-        times=1,
     )

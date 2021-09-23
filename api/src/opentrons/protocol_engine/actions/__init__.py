@@ -1,4 +1,4 @@
-"""ProtocolEngine action and plugin interfaces.
+"""ProtocolEngine action interfaces.
 
 Actions are the driver of state changes in the ProtocolEngine.
 """

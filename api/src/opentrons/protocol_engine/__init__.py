@@ -10,6 +10,8 @@ from .protocol_engine import ProtocolEngine
 from .errors import ProtocolEngineError
 from .commands import Command, CommandRequest, CommandStatus, CommandType
 from .state import State, StateView
+from .plugins import AbstractPlugin
+
 from .types import (
     CalibrationOffset,
     DeckSlotLocation,
@@ -50,4 +52,6 @@ __all__ = [
     "WellLocation",
     "WellOrigin",
     "WellOffset",
+    # plugins
+    "AbstractPlugin",
 ]
