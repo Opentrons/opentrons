@@ -32,7 +32,8 @@ def test_configure(
     """The engine should be able to configure the plugin."""
     action = PlayAction()
 
-    subject = _MyPlugin()._configure(
+    subject = _MyPlugin()
+    subject._configure(
         state=state_view,
         action_dispatcher=action_dispatcher,
     )

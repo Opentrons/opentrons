@@ -42,10 +42,12 @@ def subject(
     action_dispatcher: pe_actions.ActionDispatcher,
 ) -> LegacyContextPlugin:
     """Get a configured LegacyContextPlugin with its dependencies mocked out."""
-    return LegacyContextPlugin(
+    plugin = LegacyContextPlugin(
         hardware_api=hardware_api,
         protocol_context=legacy_context,
-    )._configure(state=state_view, action_dispatcher=action_dispatcher)
+    )
+    plugin._configure(state=state_view, action_dispatcher=action_dispatcher)
+    return plugin
 
 
 def test_play_action(
