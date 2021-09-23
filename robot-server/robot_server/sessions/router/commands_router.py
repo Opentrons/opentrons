@@ -28,7 +28,7 @@ class CommandNotFound(ErrorDetails):
 # todo(mm, 2021-09-23): Should this return a summary, instead of a full command?
 @commands_router.post(
     path="/sessions/{sessionId}/commands",
-    summary="Add protocol commands to the session",
+    summary="Enqueue a protocol command",
     description=(
         "Add a single protocol command to the session. "
         "The command is placed at the back of the queue."
