@@ -24,6 +24,34 @@ class CommandNotFound(ErrorDetails):
     title: str = "Session Command Not Found"
 
 
+# todo(mm, 2021-09-23): Should this accept a list of commands, instead of just one?
+# todo(mm, 2021-09-23): Should this return a summary, instead of a full command?
+@commands_router.post(
+    path="/sessions/{sessionId}/commands",
+    summary="Add protocol commands to the session",
+    description=(
+        "Add a single protocol command to the session. "
+        "The command is placed at the back of the queue."
+        "\n\n"
+        "A summary of the added command is returned. "
+        "See `GET /sessions/{sessionId}/commands/{commandId}` to get its details."
+    ),
+    status_code=status.HTTP_200_OK,
+    response_model=ResponseModel[pe_commands.Command],
+    responses={
+        status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[SessionNotFound]},
+    },
+)
+async def post_session_commands(
+    command_request: pe_commands.CommandRequest,
+    engine_store: EngineStore = Depends(get_engine_store),
+    session: ResponseModel[Session] = Depends(get_session),
+) -> ResponseModel[pe_commands.Command]:
+    """Fix before merge: Docstring."""
+    command = engine_store.engine.add_command(command_request)
+    return ResponseModel[pe_commands.Command](data=command)
+
+
 @commands_router.get(
     path="/sessions/{sessionId}/commands",
     summary="Get a list of all protocol commands in the session",
