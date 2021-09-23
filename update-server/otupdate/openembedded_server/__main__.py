@@ -61,6 +61,11 @@ def configure_logging(level: int):
             'journald': _handler_for('opentrons-update', level)
         },
         'loggers': {
+            'openembedded_server': {
+                'handlers': ['journald'],
+                'level': level,
+                'propogate': False
+            },
             'otupdate': {
                 'handlers': ['journald'],
                 'level': level,
@@ -75,8 +80,8 @@ def configure_logging(level: int):
         'root': {
             'handlers': ['journald'],
             'level': level
-            }
         }
+    }
     logging.config.dictConfig(config)
 
 
