@@ -14,9 +14,10 @@ from opentrons_hardware.drivers.can_bus import (
 
 
 class block:
+    """C block generator."""
+
     def __init__(self, output: io.StringIO, start: str, terminate: str) -> None:
-        """
-        Construct a code block context manager.
+        """Construct a code block context manager.
 
         Args:
             output: the buffer in which to write
