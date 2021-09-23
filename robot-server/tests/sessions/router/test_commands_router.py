@@ -20,12 +20,37 @@ from robot_server.sessions.session_models import (
 )
 from robot_server.sessions.engine_store import EngineStore
 from robot_server.sessions.router.commands_router import (
+    post_session_command,
     get_session_command,
     get_session_commands,
 )
 
 
-async def test_get_session_commands(decoy: Decoy) -> None:
+async def test_post_session_command(decoy: Decoy, engine_store: EngineStore) -> None:
+    """It should add the requested command to the Protocol Engine and return it."""
+    command_request = pe_commands.PauseRequest(
+        data=pe_commands.PauseData(message="Hello")
+    )
+    output_command = pe_commands.Pause(
+        id="abc123",
+        createdAt=datetime(year=2021, month=1, day=1),
+        status=CommandStatus.QUEUED,
+        data=pe_commands.PauseData(message="Hello"),
+        result=None,
+    )
+
+    decoy.when(engine_store.engine.add_command(command_request)).then_return(
+        output_command
+    )
+
+    response = await post_session_command(
+        command_request=command_request, engine_store=engine_store
+    )
+
+    assert response.data == output_command
+
+
+async def test_get_session_commands() -> None:
     """It should return a list of all commands in a session."""
     command_summary = SessionCommandSummary(
         id="command-id",
