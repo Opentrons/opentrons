@@ -52,7 +52,6 @@ async def wait_responses(can_driver: CanDriver) -> None:
 
 async def run(interface: str, bitrate: int, channel: Optional[str] = None) -> None:
     """Entry point for script."""
-    ...
     driver = await CanDriver.build(
         bitrate=bitrate, interface=interface, channel=channel
     )
@@ -66,13 +65,14 @@ async def run(interface: str, bitrate: int, channel: Optional[str] = None) -> No
         driver.shutdown()
 
 
-if __name__ == "__main__":
+def main() -> None:
+    """Entry point."""
     parser = argparse.ArgumentParser(description="Identify peripherals on the can bus.")
     parser.add_argument(
         "--interface",
         type=str,
         required=True,
-        help="the interface to use (ie: virtual, pcan, socketcan",
+        help="the interface to use (ie: virtual, pcan, socketcan)",
     )
     parser.add_argument(
         "--bitrate", type=int, default=250000, required=False, help="the bitrate"
@@ -84,3 +84,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     asyncio.run(run(args.interface, args.bitrate, args.channel))
+
+
+if __name__ == "__main__":
+    main()
