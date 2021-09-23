@@ -65,7 +65,8 @@ async def run(interface: str, bitrate: int, channel: Optional[str] = None) -> No
         driver.shutdown()
 
 
-if __name__ == "__main__":
+def main() -> None:
+    """Entry point."""
     parser = argparse.ArgumentParser(description="Identify peripherals on the can bus.")
     parser.add_argument(
         "--interface",
@@ -83,3 +84,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     asyncio.run(run(args.interface, args.bitrate, args.channel))
+
+
+if __name__ == "__main__":
+    main()

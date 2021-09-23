@@ -76,4 +76,10 @@ if __name__ == "__main__":
         classifiers=CLASSIFIERS,
         install_requires=INSTALL_REQUIRES,
         include_package_data=True,
+        entry_points={
+            "console_scripts": [
+                "opentrons_generate_header = opentrons_hardware.scripts.generate_header:main",
+                "opentrons_canbus_identify = opentrons_hardware.scripts.identify:main",
+            ]
+        },
     )
