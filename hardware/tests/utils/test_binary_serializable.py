@@ -5,6 +5,19 @@ from dataclasses import dataclass
 from opentrons_hardware import utils
 
 
+def test_fields_must_be_binary_fields() -> None:
+    """It should raise an error when a field is not BinaryFieldBase type."""
+
+    @dataclass
+    class Failing(utils.BinarySerializable):
+        """Test class type."""
+
+        a: int
+
+    with pytest.raises(utils.InvalidFieldException):
+        Failing(a=123).serialize()
+
+
 @dataclass
 class TestClass(utils.BinarySerializable):
     """Test class type."""
@@ -31,12 +44,12 @@ def subject() -> TestClass:
 
 
 def test_serialize_length(subject: TestClass) -> None:
-    """Test that serialized data length is correct."""
+    """It should serialize with correct data length."""
     assert len(subject.serialize()) == 14
 
 
 def test_deserialize() -> None:
-    """Test that we deserialize data correctly."""
+    """It should deserialize data correctly."""
     data = b"\x01\x02\x00\x03\x00\x04\x00\x00\x00\x05\x00\x00\x00\x06"
     assert TestClass.build(data) == TestClass(
         ub=utils.UInt8Field(1),
@@ -49,7 +62,7 @@ def test_deserialize() -> None:
 
 
 def test_serdes(subject: TestClass) -> None:
-    """Test that deserializing a serialized instance works."""
+    """It should serialize a deserialized instance correctly."""
     new = TestClass.build(subject.serialize())
     assert new == subject
 
@@ -63,7 +76,7 @@ class LittleEndianTestClass(utils.LittleEndianBinarySerializable):
 
 
 def test_deserialize_little_endian() -> None:
-    """Test that we deserialize data correctly."""
+    """It should deserialize little endian data correctly."""
     data = b"\x00\x00\x00\x05\x00\x00\x00\x06"
     assert LittleEndianTestClass.build(data) == LittleEndianTestClass(
         ul=utils.UInt32Field(0x05000000), l=utils.Int32Field(0x06000000)
@@ -71,7 +84,7 @@ def test_deserialize_little_endian() -> None:
 
 
 def test_serialize_little_endian() -> None:
-    """Test that we serialize data correctly."""
+    """It should serialize little endian data correctly."""
     data = b"\x00\x00\x00\x05\x00\x00\x00\x06"
     assert (
         LittleEndianTestClass(

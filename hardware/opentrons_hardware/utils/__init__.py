@@ -9,6 +9,8 @@ from .binary_serializable import (
     UInt8Field,
     UInt16Field,
     UInt32Field,
+    BinarySerializableException,
+    InvalidFieldException,
 )
 
 __all__ = [
@@ -20,4 +22,6 @@ __all__ = [
     "UInt8Field",
     "UInt16Field",
     "UInt32Field",
+    "BinarySerializableException",
+    "InvalidFieldException",
 ]

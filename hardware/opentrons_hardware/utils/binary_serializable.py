@@ -10,6 +10,18 @@ from typing_extensions import Final
 format_string_attribute: Final = "__struct_format_string__"
 
 
+class BinarySerializableException(BaseException):
+    """Exception."""
+
+    pass
+
+
+class InvalidFieldException(BinarySerializableException):
+    """Field is wrong type."""
+
+    pass
+
+
 T = TypeVar("T")
 
 
@@ -97,8 +109,9 @@ class BinarySerializable:
         Returns:
             Byte buffer
         """
+        string = self._get_format_string()
         vals = [x.value for x in astuple(self)]
-        return struct.pack(self._get_format_string(), *vals)
+        return struct.pack(string, *vals)
 
     @classmethod
     def build(cls, data: bytes) -> BinarySerializable:
@@ -125,9 +138,15 @@ class BinarySerializable:
         format_string: str = getattr(cls, format_string_attribute, None)
         if format_string is None:
             dataclass_fields = fields(cls)
-            format_string = (
-                f"{cls.ENDIAN}{''.join(v.type.FORMAT for v in dataclass_fields)}"
-            )
+            try:
+                format_string = (
+                    f"{cls.ENDIAN}{''.join(v.type.FORMAT for v in dataclass_fields)}"
+                )
+            except AttributeError:
+                raise InvalidFieldException(
+                    f"All fields must be of type {BinaryFieldBase.__class__}"
+                )
+
             # Cache it on the cls.
             setattr(cls, format_string_attribute, format_string)
         return format_string
