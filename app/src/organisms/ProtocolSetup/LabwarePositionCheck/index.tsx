@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import map from 'lodash/map'
+
 import {
   LabwareRender,
   Module,
@@ -14,10 +15,11 @@ import {
   FONT_WEIGHT_SEMIBOLD,
   JUSTIFY_SPACE_BETWEEN,
   JUSTIFY_CENTER,
+  ALIGN_CENTER,
   C_BLUE,
   SPACING_3,
+  SPACING_4,
   FONT_SIZE_BODY_2,
-  ALIGN_CENTER,
   LINE_HEIGHT_COPY,
 } from '@opentrons/components'
 import {
@@ -27,6 +29,7 @@ import {
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 import { Portal } from '../../../App/portal'
 import { useModuleRenderInfoById, useLabwareRenderInfoById } from '../hooks'
+import { PositionCheckNav } from './PositionCheckNav'
 import { useIntroInfo } from './hooks'
 
 import styles from '../styles.css'
@@ -54,17 +57,19 @@ export const LabwarePositionCheck = (
   const [
     currentLabwareCheckStep,
     setCurrentLabwareCheckStep,
-  ] = React.useState<Number | null>(null)
-  const moduleRenderInfoById = useModuleRenderInfoById()
-  const labwareRenderInfoById = useLabwareRenderInfoById()
+  ] = React.useState<String | null>(null)
   // placeholder for next steps
   console.log(currentLabwareCheckStep)
-
+  const moduleRenderInfoById = useModuleRenderInfoById()
+  const labwareRenderInfoById = useLabwareRenderInfoById()
   const introInfo = useIntroInfo()
+
   if (introInfo == null) return null
   const {
     primaryTipRackSlot,
     primaryTipRackName,
+    primaryPipetteMount,
+    secondaryPipetteMount,
     numberOfTips,
     firstStepLabwareSlot,
     sections,
@@ -108,14 +113,12 @@ export const LabwarePositionCheck = (
             justifyContent={JUSTIFY_SPACE_BETWEEN}
             alignItems={ALIGN_CENTER}
           >
-            <Box width="210px" marginLeft="4rem">
-              {/* This is a placeholder for next PR */}
-              <ul style={{ fontSize: '.5rem' }}>
-                {sections.map((section, index) => (
-                  <li key={index}>{t(`${section.toLowerCase()}_section`)}</li>
-                ))}
-              </ul>
-            </Box>
+            <PositionCheckNav
+              sections={sections}
+              primaryPipetteMount={primaryPipetteMount}
+              secondaryPipetteMount={secondaryPipetteMount}
+            />
+
             <Box width="65%" padding={SPACING_3}>
               <RobotWorkSpace
                 deckDef={standardDeckDef as any}
@@ -131,7 +134,7 @@ export const LabwarePositionCheck = (
                         moduleRenderInfoById,
                         ({ x, y, moduleDef, nestedLabwareDef }) => (
                           <Module
-                            key={`LabwareSetup_Module_${moduleDef.model}_${x}${y}`}
+                            key={`LabwarePositionCheck_Module_${moduleDef.model}_${x}${y}`}
                             x={x}
                             y={y}
                             orientation={inferModuleOrientationFromXCoordinate(
@@ -146,7 +149,7 @@ export const LabwarePositionCheck = (
                           >
                             {nestedLabwareDef != null ? (
                               <React.Fragment
-                                key={`LabwareSetup_Labware_${nestedLabwareDef.metadata.displayName}_${x}${y}`}
+                                key={`LabwarePositionCheck_Labware_${nestedLabwareDef.metadata.displayName}_${x}${y}`}
                               >
                                 <LabwareRender definition={nestedLabwareDef} />
                               </React.Fragment>
@@ -158,7 +161,7 @@ export const LabwarePositionCheck = (
                       {map(labwareRenderInfoById, ({ x, y, labwareDef }) => {
                         return (
                           <React.Fragment
-                            key={`LabwareSetup_Labware_${labwareDef.metadata.displayName}_${x}${y}`}
+                            key={`LabwarePositionCheck_Labware_${labwareDef.metadata.displayName}_${x}${y}`}
                           >
                             <g transform={`translate(${x},${y})`}>
                               <LabwareRender definition={labwareDef} />
@@ -172,9 +175,15 @@ export const LabwarePositionCheck = (
               </RobotWorkSpace>
             </Box>
           </Flex>
-          <Flex justifyContent={JUSTIFY_CENTER} marginTop="-3rem">
+          <Flex
+            justifyContent={JUSTIFY_CENTER}
+            marginTop="-4rem"
+            marginBottom={SPACING_4}
+          >
             <PrimaryBtn
-              title="proceed to check"
+              title={t('start_position_check', {
+                initial_labware_slot: firstStepLabwareSlot,
+              })}
               backgroundColor={C_BLUE}
               onClick={() => setCurrentLabwareCheckStep(0)}
             >

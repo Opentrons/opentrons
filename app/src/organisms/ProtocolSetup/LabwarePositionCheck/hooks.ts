@@ -72,6 +72,9 @@ export function useIntroInfo(): IntroInfo | null {
     labware: pickUpTipLabwareId,
   } = (pickUpTipStep.commands[0] as PickUpTipCommand).params
   const primaryPipetteName = protocolData.pipettes[primaryPipetteId].name
+  const primaryPipetteMount = protocolData.pipettes[primaryPipetteId].mount
+  const secondaryPipetteMount =
+    protocolData.pipettes[primaryPipetteId].mount === 'right' ? 'left' : 'right'
   const primaryPipetteSpecs =
     primaryPipetteName != null
       ? getPipetteNameSpecs(primaryPipetteName as PipetteName)
@@ -100,6 +103,8 @@ export function useIntroInfo(): IntroInfo | null {
   return {
     primaryTipRackSlot,
     primaryTipRackName,
+    primaryPipetteMount,
+    secondaryPipetteMount,
     numberOfTips,
     firstStepLabwareSlot,
     sections,
