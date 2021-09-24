@@ -66,8 +66,8 @@ wheel: $(wheel_file)
 test:
 	$(pytest) -m 'not requires_emulator' $(tests) $(test_opts)
 
-.PHONY: test_with_emulator
-test_with_emulator:
+.PHONY: test-with-emulator
+test-with-emulator:
 	$(pytest) -m 'requires_emulator' $(tests) $(test_opts)
 
 .PHONY: lint

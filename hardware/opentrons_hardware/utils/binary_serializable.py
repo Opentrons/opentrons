@@ -95,10 +95,10 @@ class Int8Field(BinaryFieldBase[int]):
 
 @dataclass
 class BinarySerializable:
-    """Base class of a dataclass that can be serialized/desiarilized into bytes.
+    """Base class of a dataclass that can be serialized/deserialized into bytes.
 
     Each field must have the FieldMetaData metadata value defining the format string
-    used by `struct` package to pack/unback the field.
+    used by `struct` package to pack/unpack the field.
 
     Data will be packed big endian.
     """
