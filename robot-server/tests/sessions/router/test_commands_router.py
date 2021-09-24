@@ -12,7 +12,7 @@ from opentrons.protocol_engine import (
 )
 
 from robot_server.errors import ApiError
-from robot_server.service.json_api import ResponseModel
+from robot_server.service.json_api import RequestModel, ResponseModel
 from robot_server.sessions.session_models import (
     Session,
     BasicSession,
@@ -44,7 +44,7 @@ async def test_post_session_command(decoy: Decoy, engine_store: EngineStore) -> 
     )
 
     response = await post_session_command(
-        command_request=command_request, engine_store=engine_store
+        request_body=RequestModel(data=command_request), engine_store=engine_store
     )
 
     assert response.data == output_command

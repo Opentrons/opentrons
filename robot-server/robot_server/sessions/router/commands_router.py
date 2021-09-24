@@ -6,7 +6,11 @@ from typing_extensions import Literal
 from opentrons.protocol_engine import commands as pe_commands, errors as pe_errors
 
 from robot_server.errors import ErrorDetails, ErrorResponse
-from robot_server.service.json_api import ResponseModel, MultiResponseModel
+from robot_server.service.json_api import (
+    RequestModel,
+    ResponseModel,
+    MultiResponseModel,
+)
 
 from ..session_models import Session, SessionCommandSummary
 from ..schema_models import SessionCommandResponse
@@ -39,22 +43,22 @@ class CommandNotFound(ErrorDetails):
     },
 )
 async def post_session_command(
-    command_request: pe_commands.CommandRequest,
+    request_body: RequestModel[pe_commands.CommandRequest],
     engine_store: EngineStore = Depends(get_engine_store),
     session: ResponseModel[Session] = Depends(get_session),
 ) -> ResponseModel[pe_commands.Command]:
     """Enqueue a protocol command.
 
     Arguments:
-        command_request: The request for the command that the client wants to
-            enqueue.
+        request_body: The request containing the command that the client wants
+            to enqueue.
         engine_store: Used to retrieve the `ProtocolEngine` on which the new
             command will be enqueued.
         session: Session response model, provided by the route handler for
             `GET /session/{sessionId}`. Present to ensure 404 if session
             not found.
     """
-    command = engine_store.engine.add_command(command_request)
+    command = engine_store.engine.add_command(request_body.data)
     return ResponseModel[pe_commands.Command](data=command)
 
 
