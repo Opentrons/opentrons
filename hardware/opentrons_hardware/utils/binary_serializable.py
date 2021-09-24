@@ -1,30 +1,84 @@
+"""BinarySerializable dataclass."""
+
 from __future__ import annotations
 import struct
-from dataclasses import dataclass, fields, field, astuple
-from functools import partial
-from typing_extensions import TypedDict, Final
+from dataclasses import dataclass, fields, astuple
+from typing import TypeVar, Generic
+
+from typing_extensions import Final
 
 format_string_attribute: Final = "__struct_format_string__"
 
 
-class FieldMetaData(TypedDict):
-    format: str
+T = TypeVar("T")
 
 
-ulong = FieldMetaData(format="L")
-long = FieldMetaData(format="l")
-ushort = FieldMetaData(format="H")
-short = FieldMetaData(format="h")
-ubyte = FieldMetaData(format="B")
-byte = FieldMetaData(format="b")
+class BinaryFieldBase(Generic[T]):
+    """Binary serializable field."""
+
+    FORMAT = ""
+    """The struct format string for this field."""
+
+    def __init__(self, t: T) -> None:
+        """Constructor."""
+        self._t = t
+
+    @classmethod
+    def build(cls, t: T) -> BinaryFieldBase[T]:
+        """Factory method.
+
+        Args:
+            t: The value.
+
+        Returns:
+            New instance.
+        """
+        return cls(t)
+
+    @property
+    def value(self) -> T:
+        """The value."""
+        return self._t
+
+    def __eq__(self, other: object) -> bool:
+        """Comparison."""
+        return isinstance(other, BinaryFieldBase) and other.value == self.value
 
 
-ulong_field = partial(field, metadata=ulong)
-long_field = partial(field, metadata=long)
-ushort_field = partial(field, metadata=ushort)
-short_field = partial(field, metadata=short)
-ubyte_field = partial(field, metadata=ubyte)
-byte_field = partial(field, metadata=byte)
+class UInt32Field(BinaryFieldBase[int]):
+    """Unsigned 32 bit integer field."""
+
+    FORMAT = "L"
+
+
+class Int32Field(BinaryFieldBase[int]):
+    """Signed 32 bit integer field."""
+
+    FORMAT = "l"
+
+
+class UInt16Field(BinaryFieldBase[int]):
+    """Unsigned 16 bit integer field."""
+
+    FORMAT = "H"
+
+
+class Int16Field(BinaryFieldBase[int]):
+    """Signed 16 bit integer field."""
+
+    FORMAT = "h"
+
+
+class UInt8Field(BinaryFieldBase[int]):
+    """Unsigned 8 bit integer field."""
+
+    FORMAT = "B"
+
+
+class Int8Field(BinaryFieldBase[int]):
+    """Signed 8 bit integer field."""
+
+    FORMAT = "b"
 
 
 @dataclass
@@ -32,25 +86,23 @@ class BinarySerializable:
     """Base class of a dataclass that can be serialized/desiarilized into bytes.
 
     Each field must have the FieldMetaData metadata value defining the format string
-    used by `struct` package to pack/unpack the field.
+    used by `struct` package to pack/unback the field.
 
     Data will be packed big endian.
     """
 
     def serialize(self) -> bytes:
-        """
-        Serialize into a byte buffer.
+        """Serialize into a byte buffer.
 
         Returns:
             Byte buffer
         """
-        vals = [x for x in astuple(self)]
+        vals = [x.value for x in astuple(self)]
         return struct.pack(self._get_format_string(), *vals)
 
     @classmethod
     def build(cls, data: bytes) -> BinarySerializable:
-        """
-        Create a BinarySerializable from a byte buffer.
+        """Create a BinarySerializable from a byte buffer.
 
         Args:
             data: Byte buffer
@@ -59,13 +111,13 @@ class BinarySerializable:
             cls
         """
         b = struct.unpack(cls._get_format_string(), data)
-        args = {v.name: b[i] for i, v in enumerate(fields(cls))}
-        return cls(**args)
+        args = {v.name: v.type.build(b[i]) for i, v in enumerate(fields(cls))}
+        # Mypy is not liking constructing the derived types.
+        return cls(**args)  # type: ignore
 
     @classmethod
     def _get_format_string(cls) -> str:
-        """
-        Get the `struct` format string for this class.
+        """Get the `struct` format string for this class.
 
         Returns:
             a string
@@ -74,7 +126,7 @@ class BinarySerializable:
         if format_string is None:
             dataclass_fields = fields(cls)
             format_string = (
-                f"{cls.ENDIAN}{''.join(v.metadata['format'] for v in dataclass_fields)}"
+                f"{cls.ENDIAN}{''.join(v.type.FORMAT for v in dataclass_fields)}"
             )
             # Cache it on the cls.
             setattr(cls, format_string_attribute, format_string)
@@ -92,6 +144,6 @@ class LittleEndianMixIn:
 
 
 class LittleEndianBinarySerializable(LittleEndianMixIn, BinarySerializable):
-    """Little endian binary serializable"""
+    """Little endian binary serializable."""
 
     ...
