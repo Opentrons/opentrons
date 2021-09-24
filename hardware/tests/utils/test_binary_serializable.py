@@ -57,6 +57,7 @@ def test_serdes(subject: TestClass) -> None:
 @dataclass
 class LittleEndianTestClass(utils.LittleEndianBinarySerializable):
     """Little endian test class."""
+
     ul: utils.UInt32Field
     l: utils.Int32Field
 
