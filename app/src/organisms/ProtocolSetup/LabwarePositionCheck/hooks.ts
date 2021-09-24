@@ -5,7 +5,11 @@ import { getPipetteNameSpecs } from '@opentrons/shared-data'
 
 import type { PipetteName } from '@opentrons/shared-data'
 import type { State } from '../../../redux/types'
-import type { PickUpTipCommand, LabwarePositionCheckStep } from './types'
+import type {
+  PickUpTipCommand,
+  LabwarePositionCheckStep,
+  Section,
+} from './types'
 
 interface LabwareIdsBySection {
   [section: string]: string[]
@@ -17,9 +21,9 @@ export function useSteps(): LabwarePositionCheckStep[] {
   return getLabwarePositionCheckSteps(protocolData)
 }
 
-export function useSections(): string[] {
+export function useSections(): Section[] {
   const steps = useSteps()
-  return steps.reduce<string[]>(
+  return steps.reduce<Section[]>(
     (acc, step) => (acc.includes(step.section) ? acc : [...acc, step.section]),
     []
   )
@@ -45,9 +49,11 @@ export function useLabwareIdsBySection(): LabwareIdsBySection {
 interface IntroInfo {
   primaryTipRackSlot: string
   primaryTipRackName: string
+  primaryPipetteMount: string
+  secondaryPipetteMount: string
   numberOfTips: number
   firstStepLabwareSlot: string
-  sections: string[]
+  sections: Section[]
 }
 export function useIntroInfo(): IntroInfo | null {
   const protocolData = useSelector((state: State) => getProtocolData(state))

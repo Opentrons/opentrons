@@ -57,7 +57,7 @@ export const LabwarePositionCheck = (
   const [
     currentLabwareCheckStep,
     setCurrentLabwareCheckStep,
-  ] = React.useState<String | null>(null)
+  ] = React.useState<Number | null>(null)
   // placeholder for next steps
   console.log(currentLabwareCheckStep)
   const moduleRenderInfoById = useModuleRenderInfoById()
@@ -78,7 +78,6 @@ export const LabwarePositionCheck = (
   return (
     <Portal level="top">
       <ModalPage
-        className={styles.modal}
         contentsClassName={styles.modal_contents}
         titleBar={{
           title: t('labware_position_check'),
