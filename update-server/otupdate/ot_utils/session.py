@@ -30,7 +30,7 @@ class Stages(enum.Enum):
     AWAITING_FILE = Value('awaiting-file', 'Waiting for update file')
     VALIDATING = Value('validating', 'Validating update file')
     WRITING = Value('writing', 'Writing update to system')
-    Done = Value('done', 'Ready to commit update')
+    DONE = Value('done', 'Ready to commit update')
     READY_FOR_RESTART = Value('ready-for-restart', 'Ready for restart')
     ERROR = Value('error', 'Error')
 
@@ -131,13 +131,17 @@ class UpdateSession:
                     'message': self.message}
 
 
+def session_from_request(request: web.Request) -> Optional[UpdateSession]:
+    return request.app.get(SESSION_VARNAME, None)
+
+
 def active_session_check(handler):
     """ decorator to check session status
     """
     @functools.wraps(handler)
     async def decorated(request: web.Request) -> web.Response:
         # checks if session exists!
-        if update.session_from_request(request) is not None:
+        if session_from_request(request) is not None:
             LOG.warning("check_session: active session exists!")
             return web.json_response(
                 data={'message':

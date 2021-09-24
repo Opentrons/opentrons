@@ -197,7 +197,7 @@ async def commit(
         except (OSError, CalledProcessError):
             LOG.exception('Failed to update machine-id')
         file_actions.commit_update()
-        session.set_flag(Stages.READY_FOR_RESTART)
+        session.set_stage(Stages.READY_FOR_RESTART)
 
     return web.json_response(
         data=session.state,
