@@ -5,8 +5,8 @@ from aiohttp import web
 
 # , name_management
 
-from . import config, constants, control, ssh_key_management, update
-from otupdate.openembedded import root_fs
+from . import config, constants, control, ssh_key_management
+from otupdate.openembedded_server import update
 
 LOG = logging.getLogger(__name__)
 
@@ -25,7 +25,6 @@ def get_app(system_version_file: str = None,
             config_file_override: str = None,
             name_override: str = None,
             boot_id_override: str = None,
-            rfs: root_fs.RootFS = root_fs.RootFS(),
             loop: asyncio.AbstractEventLoop = None) -> web.Application:
     """ Build and return the aiohttp.web.Application that runs the server
 
