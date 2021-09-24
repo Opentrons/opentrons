@@ -49,6 +49,12 @@ from .pause import (
     PauseCommandType,
 )
 
+from .custom import (
+    Custom,
+    CustomResult,
+    CustomCommandType,
+)
+
 Command = Union[
     AddLabwareDefinition,
     Aspirate,
@@ -59,6 +65,7 @@ Command = Union[
     MoveToWell,
     PickUpTip,
     Pause,
+    Custom,
 ]
 
 CommandType = Union[
@@ -71,6 +78,7 @@ CommandType = Union[
     MoveToWellCommandType,
     PickUpTipCommandType,
     PauseCommandType,
+    CustomCommandType,
 ]
 
 CommandRequest = Union[
@@ -95,4 +103,5 @@ CommandResult = Union[
     MoveToWellResult,
     PickUpTipResult,
     PauseResult,
+    CustomResult,
 ]

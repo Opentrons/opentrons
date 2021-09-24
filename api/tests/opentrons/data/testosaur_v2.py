@@ -17,4 +17,4 @@ def run(ctx):
     right.pick_up_tip()
     right.aspirate(10, lw.wells()[0].bottom())
     right.dispense(10, lw.wells()[1].bottom())
-    right.drop_tip(tr.wells()[-1].top())
+    right.return_tip()

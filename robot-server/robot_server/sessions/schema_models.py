@@ -40,4 +40,6 @@ SessionCommandResponse = Union[
     ResponseModel[pe_commands.LoadPipette],
     ResponseModel[pe_commands.MoveToWell],
     ResponseModel[pe_commands.PickUpTip],
+    ResponseModel[pe_commands.Pause],
+    ResponseModel[pe_commands.Custom],
 ]
