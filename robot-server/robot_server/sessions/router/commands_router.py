@@ -46,7 +46,7 @@ async def post_session_command(
     """Enqueue a protocol command.
 
     Arguments:
-        commandRequest: The request for the command that the client wants to
+        command_request: The request for the command that the client wants to
             enqueue.
         engine_store: Used to retrieve the `ProtocolEngine` on which the new
             command will be enqueued.
