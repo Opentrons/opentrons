@@ -69,6 +69,9 @@ jobs:
       - name: Test
         run: make -C hardware test
 
+      - name: Test with emulator
+        run: make -C hardware test-with-emulator
+
       - name: Code Coverage
         uses: 'codecov/codecov-action@v2'
         with:
