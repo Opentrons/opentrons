@@ -81,7 +81,8 @@ async def cancel(request: web.Request) -> web.Response:
 
 
 @require_session
-async def status(request: web.Request, session: session_class.UpdateSession) -> web.Response:
+async def status(request: web.Request,
+                 session: session_class.UpdateSession) -> web.Response:
     return web.json_response(
         data=session.state,
         status=200)
@@ -183,7 +184,7 @@ async def file_upload(
 async def commit(
         request: web.Request, session: session_class.UpdateSession) -> web.Response:
     """ Serves /update/:session/commit """
-    if session.stage != session_calss.Stages.DONE:
+    if session.stage != session_class.Stages.DONE:
         return web.json_response(
             data={'error': 'not-ready',
                   'message': f'System is not ready to commit the update '

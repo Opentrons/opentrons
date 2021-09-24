@@ -14,9 +14,10 @@ from typing import Optional
 from aiohttp import web, BodyPartReader
 
 from .constants import APP_VARIABLE_PREFIX, RESTART_LOCK_NAME
-from . import config, file_actions
+from . import config, file_actions, session
 
 from otupdate.ot_utils.session import UpdateSession
+from otupdate.ot_utils.session import Stages
 
 
 SESSION_VARNAME = APP_VARIABLE_PREFIX + 'session'
@@ -81,7 +82,7 @@ async def cancel(request: web.Request) -> web.Response:
 
 
 @require_session
-async def status(request: web.Request, session: session_class.UpdateSession) -> web.Response:
+async def status(request: web.Request, session: UpdateSession) -> web.Response:
     return web.json_response(
         data=session.state,
         status=200)
@@ -95,12 +96,12 @@ async def _save_file(part: BodyPartReader, path: str):
             write.write(decoded)
 
 
-def _begin_write(session: session_class.UpdateSession,
+def _begin_write(session: UpdateSession,
                  loop: asyncio.AbstractEventLoop,
                  rootfs_file_path: str):
     """ Start the write process. """
     session.set_progress(0)
-    session.set_stage(session_class.Stages.WRITING)
+    session.set_stage(Stages.WRITING)
     write_future = asyncio.ensure_future(loop.run_in_executor(
         None, file_actions.write_update, rootfs_file_path,
         session.set_progress))
@@ -111,7 +112,7 @@ def _begin_write(session: session_class.UpdateSession,
             session.set_error(getattr(exc, 'short', str(type(exc))),
                               str(exc))
         else:
-            session.set_stage(session_class.Stages.DONE)
+            session.set_stage(Stages.DONE)
 
     write_future.add_done_callback(write_done)
 
@@ -123,7 +124,7 @@ def _begin_validation(
         downloaded_update_path: str)\
         -> asyncio.futures.Future:
     """ Start the validation process. """
-    session.set_stage(session_class.Stages.VALIDATING)
+    session.set_stage(Stages.VALIDATING)
     cert_path = config.update_cert_path\
         if config.signature_required else None
 
@@ -155,7 +156,7 @@ async def file_upload(
     Requires multipart (encoding doesn't matter) with a file field in the
     body called 'ot3-system.zip'.
     """
-    if session.stage != session_class.Stages.AWAITING_FILE:
+    if session.stage != Stages.AWAITING_FILE:
         return web.json_response(
             data={'error': 'file-already-uploaded',
                   'message': 'A file has already been sent for this update'},
@@ -183,7 +184,7 @@ async def file_upload(
 async def commit(
         request: web.Request, session: session.UpdateSession) -> web.Response:
     """ Serves /update/:session/commit """
-    if session.stage != session_calss.Stages.DONE:
+    if session.stage != Stages.DONE:
         return web.json_response(
             data={'error': 'not-ready',
                   'message': f'System is not ready to commit the update '
@@ -196,7 +197,7 @@ async def commit(
         except (OSError, CalledProcessError):
             LOG.exception('Failed to update machine-id')
         file_actions.commit_update()
-        session.set_flag(session_class.Stages.READY_FOR_RESTART)
+        session.set_flag(Stages.READY_FOR_RESTART)
 
     return web.json_response(
         data=session.state,
