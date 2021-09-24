@@ -6,7 +6,11 @@ from typing_extensions import Literal
 from opentrons.protocol_engine import commands as pe_commands, errors as pe_errors
 
 from robot_server.errors import ErrorDetails, ErrorResponse
-from robot_server.service.json_api import ResponseModel, MultiResponseModel
+from robot_server.service.json_api import (
+    RequestModel,
+    ResponseModel,
+    MultiResponseModel,
+)
 
 from ..session_models import Session, SessionCommandSummary
 from ..schema_models import SessionCommandResponse
@@ -22,6 +26,40 @@ class CommandNotFound(ErrorDetails):
 
     id: Literal["CommandNotFound"] = "CommandNotFound"
     title: str = "Session Command Not Found"
+
+
+# todo(mm, 2021-09-23): Should this accept a list of commands, instead of just one?
+@commands_router.post(
+    path="/sessions/{sessionId}/commands",
+    summary="Enqueue a protocol command",
+    description=(
+        "Add a single protocol command to the session. "
+        "The command is placed at the back of the queue."
+    ),
+    status_code=status.HTTP_200_OK,
+    response_model=ResponseModel[pe_commands.Command],
+    responses={
+        status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[SessionNotFound]},
+    },
+)
+async def post_session_command(
+    request_body: RequestModel[pe_commands.CommandRequest],
+    engine_store: EngineStore = Depends(get_engine_store),
+    session: ResponseModel[Session] = Depends(get_session),
+) -> ResponseModel[pe_commands.Command]:
+    """Enqueue a protocol command.
+
+    Arguments:
+        request_body: The request containing the command that the client wants
+            to enqueue.
+        engine_store: Used to retrieve the `ProtocolEngine` on which the new
+            command will be enqueued.
+        session: Session response model, provided by the route handler for
+            `GET /session/{sessionId}`. Present to ensure 404 if session
+            not found.
+    """
+    command = engine_store.engine.add_command(request_body.data)
+    return ResponseModel[pe_commands.Command](data=command)
 
 
 @commands_router.get(
