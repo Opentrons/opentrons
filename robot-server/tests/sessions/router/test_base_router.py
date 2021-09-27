@@ -445,6 +445,10 @@ def test_delete_session_by_id(
     client: TestClient,
 ) -> None:
     """It should be able to remove a session by ID."""
+    decoy.when(engine_store.engine.state_view.commands.get_is_stopped()).then_return(
+        True
+    )
+
     response = client.delete("/sessions/unique-id")
 
     decoy.verify(
@@ -459,11 +463,15 @@ def test_delete_session_by_id(
 def test_delete_session_with_bad_id(
     decoy: Decoy,
     session_store: SessionStore,
+    engine_store: EngineStore,
     client: TestClient,
 ) -> None:
     """It should 404 if the session ID does not exist."""
     key_error = SessionNotFoundError(session_id="session-id")
 
+    decoy.when(engine_store.engine.state_view.commands.get_is_stopped()).then_return(
+        True
+    )
     decoy.when(session_store.remove(session_id="session-id")).then_raise(key_error)
 
     response = client.delete("/sessions/session-id")
@@ -482,8 +490,8 @@ def test_delete_running_session(
     client: TestClient,
 ) -> None:
     """It should 409 if the session is not finished."""
-    decoy.when(engine_store.engine.state_view.commands.get_is_running()).then_return(
-        True
+    decoy.when(engine_store.engine.state_view.commands.get_is_stopped()).then_return(
+        False
     )
 
     response = client.delete("/sessions/session-id")
@@ -502,7 +510,7 @@ def test_delete_running_session_no_engine(
     client: TestClient,
 ) -> None:
     """It should no-op if no engine is present."""
-    decoy.when(engine_store.engine.state_view.commands.get_is_running()).then_raise(
+    decoy.when(engine_store.engine.state_view.commands.get_is_stopped()).then_raise(
         EngineMissingError()
     )
 

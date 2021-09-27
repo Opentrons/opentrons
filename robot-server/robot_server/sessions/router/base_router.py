@@ -232,7 +232,7 @@ async def remove_session_by_id(
         engine_store: ProtocolEngine storage and control.
     """
     try:
-        if engine_store.engine.state_view.commands.get_is_running():
+        if not engine_store.engine.state_view.commands.get_is_stopped():
             raise SessionRunning().as_error(status.HTTP_409_CONFLICT)
     except EngineMissingError:
         pass
