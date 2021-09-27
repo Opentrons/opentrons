@@ -10,9 +10,7 @@ export function Run(): JSX.Element {
 
   return isNewProtocolRunPage
     ? (
-      <Page titleBarProps={{ title: <SessionHeader /> }}>
-        <RunDetails />
-      </Page>
+      <RunDetails />
     ) : (
       <Page titleBarProps={{ title: <SessionHeader /> }}>
         <RunLog />

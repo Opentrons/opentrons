@@ -1,3 +1,14 @@
 {
-  "protocol_title": "Protocol - {{protocol_name}}"
+  "pause_run": "Pause Run",
+  "protocol_title": "Protocol - {{protocol_name}}",
+  "reset_run": "Reset Run",
+  "resume_run": "Resume Run",
+  "run_protocol": "Run Protocol",
+  "run_status": "Status: {{status}}",
+  "start_run": "Start Run",
+  "status_canceled": "Canceled",
+  "status_finished": "Finished",
+  "status_loaded": "Not started",
+  "status_paused": "Paused",
+  "status_running": "Running"
 }

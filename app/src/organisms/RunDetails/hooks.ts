@@ -1,4 +1,3 @@
-import path from 'path'
 import { useSelector } from 'react-redux'
 import { getProtocolData, getProtocolName } from '../../redux/protocol'
 
