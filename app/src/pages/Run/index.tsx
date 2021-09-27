@@ -1,13 +1,21 @@
-// run task component
 import * as React from 'react'
 import { Page } from '../../atoms/Page'
 import { SessionHeader } from '../../organisms/SessionHeader'
+import { RunDetails } from '../../organisms/RunDetails'
+import { useFeatureFlag } from '../../redux/config'
 import { RunLog } from './RunLog'
 
 export function Run(): JSX.Element {
-  return (
-    <Page titleBarProps={{ title: <SessionHeader /> }}>
-      <RunLog />
-    </Page>
-  )
+  const isNewProtocolRunPage = useFeatureFlag('preProtocolFlowWithoutRPC')
+
+  return isNewProtocolRunPage
+    ? (
+      <Page titleBarProps={{ title: <SessionHeader /> }}>
+        <RunDetails />
+      </Page>
+    ) : (
+      <Page titleBarProps={{ title: <SessionHeader /> }}>
+        <RunLog />
+      </Page>
+    )
 }
