@@ -55,7 +55,7 @@ const mapDispatchToProps: MapDispatchToProps<DP, {}> = dispatch => ({
   onResetClick: () => dispatch(robotActions.refreshSession()),
 })
 
-function RunPanelComponent(props: Props): JSX.Element {
+export function RunPanelComponent(props: Props): JSX.Element {
   const { t } = useTranslation('run_details')
   const isNewProtocolRunPanel = useFeatureFlag('preProtocolFlowWithoutRPC')
 
