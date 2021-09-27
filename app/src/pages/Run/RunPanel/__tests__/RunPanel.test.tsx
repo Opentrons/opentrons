@@ -33,28 +33,24 @@ describe('RunSetupCard', () => {
 
   beforeEach(() => {
     when(mockRunTimer)
-      .mockReturnValue(<div></div>) // this (default) empty div will be returned when ModuleSetup isn't called with expected props
       .calledWith(partialComponentPropsMatcher({}))
       .mockImplementation(() => (
         <div>Mock Run Timer</div>
       ))
 
     when(mockRunControls)
-      .mockReturnValue(<div></div>) // this (default) empty div will be returned when ModuleSetup isn't called with expected props
       .calledWith(partialComponentPropsMatcher({}))
       .mockImplementation(() => (
         <div>Mock Run Controls</div>
       ))
 
     when(mockModuleLiveStatusCards)
-      .mockReturnValue(<div></div>) // this (default) empty div will be returned when ModuleSetup isn't called with expected props
       .calledWith(partialComponentPropsMatcher({}))
       .mockImplementation(() => (
         <div>Mock Module Live Status Cards</div>
       ))
 
     when(mockRunTimeControl)
-      .mockReturnValue(<div></div>) // this (default) empty div will be returned when ModuleSetup isn't called with expected props
       .calledWith(partialComponentPropsMatcher({}))
       .mockImplementation(() => (
         <div>Mock Run Time Control</div>
