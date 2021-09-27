@@ -24,6 +24,10 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 In 4.6.0 and previous releases, the OT-2 will only use TLS 1.0 for WPA2 Enterprise association. Some RADIUS servers have disabled this version of TLS; it must be enabled to connect the OT-2 to a RADIUS-secured network.
 
+Since version 4.5.0, if a thermocycler encounters an error, the robot will be unable to recognize the error state. If your thermocycler starts blinking its yellow LED, you should cancel your protocol. See issue [8393][] for more details.
+
+[8393]: https://github.com/Opentrons/opentrons/issues/8393
+
 ---
 
 ## OT-2 Software Changes in 4.5.0
