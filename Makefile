@@ -108,21 +108,11 @@ deploy-py:
 	$(MAKE) -C $(API_DIR) deploy
 	$(MAKE) -C $(SHARED_DATA_DIR) deploy-py
 
-.PHONY: push-api-balena
-push-api-balena: export host = $(usb_host)
-push-api-balena:
-	$(if $(host),@echo "Pushing to $(host)",$(error host variable required))
-	$(MAKE) -C $(API_DIR) push-balena
-	$(MAKE) -C $(API_DIR) restart
-
 .PHONY: push-api
 push-api: export host = $(usb_host)
 push-api:
 	$(if $(host),@echo "Pushing to $(host)",$(error host variable required))
 	$(MAKE) -C $(API_DIR) push
-
-.PHONY: push-api-buildroot
-push-api-buildroot: push-api
 
 .PHONY: push-update-server
 push-update-server: export host = $(usb_host)
