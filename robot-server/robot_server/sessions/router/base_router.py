@@ -51,7 +51,7 @@ class SessionAlreadyActive(ErrorDetails):
 class SessionRunning(ErrorDetails):
     """An error if one tries to delete a session that is running."""
 
-    id: Literal["SessionRunning"] = "SessionStillRunning"
+    id: Literal["SessionRunning"] = "SessionRunning"
     title: str = "Session Running"
     detail: str = (
         "Session is currently running. Allow the session to finish or"
