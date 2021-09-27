@@ -30,5 +30,9 @@
   "required_cal_data_title": "Calibration Data",
   "simulation_in_progress": "Simulation in Progress",
   "update_robot_for_custom_labware": "You have custom labware definitions saved to your app, but this robot needs to be updated before you can use these definitions with Python protocols",
-  "upload_and_simulate": "Upload and Simulate Protocol"
+  "upload_and_simulate": "Upload and Simulate Protocol",
+  "exit_modal_heading": "Confirm Close Protocol",
+  "exit_modal_go_back": "No, go back",
+  "exit_modal_exit": "Yes, close now",
+  "exit_modal_body": "Are you sure you want to close this protocol?"
 }

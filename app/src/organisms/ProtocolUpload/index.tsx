@@ -1,5 +1,11 @@
 import * as React from 'react'
-import { AlertItem, Text, Box, C_NEAR_WHITE } from '@opentrons/components'
+import {
+  AlertItem,
+  Text,
+  Box,
+  C_NEAR_WHITE,
+  useConditionalConfirm,
+} from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { Page } from '../../atoms/Page'
@@ -8,6 +14,8 @@ import { ProtocolSetup } from '../ProtocolSetup'
 import { getProtocolName, getProtocolFile } from '../../redux/protocol'
 import { loadProtocol, closeProtocol } from '../../redux/protocol/actions'
 import { ingestProtocolFile } from '../../redux/protocol/utils'
+
+import { ConfirmExitProtocolUploadModal } from './ConfirmExitProtocolUploadModal'
 
 import { useLogger } from '../../logger'
 import type { ErrorObject } from 'ajv'
@@ -51,12 +59,18 @@ export function ProtocolUpload(): JSX.Element {
     dispatch(closeProtocol())
   }
 
+  const {
+    showConfirmation: showConfirmExit,
+    confirm: confirmExit,
+    cancel: cancelExit,
+  } = useConditionalConfirm(handleCloseProtocol, true)
+
   const titleBarProps =
     protocolFile !== null
       ? {
           title: t('protocol_title', { protocol_name: protocolName }),
           back: {
-            onClick: handleCloseProtocol,
+            onClick: confirmExit,
             title: t('shared:close'),
             children: t('shared:close'),
             iconName: 'close' as const,
@@ -67,31 +81,36 @@ export function ProtocolUpload(): JSX.Element {
         }
 
   return (
-    <Page titleBarProps={titleBarProps}>
-      {uploadError != null && (
-        <AlertItem
-          type="warning"
-          onCloseClick={clearError}
-          title={t('protocol_upload_failed')}
-        >
-          {t(VALIDATION_ERROR_T_MAP[uploadError[0]])}
-          {uploadError[1] != null &&
-            uploadError[1].map((errorObject, i) => (
-              <Text key={i}>{JSON.stringify(errorObject)}</Text>
-            ))}
-        </AlertItem>
+    <>
+      {showConfirmExit && (
+        <ConfirmExitProtocolUploadModal exit={confirmExit} back={cancelExit} />
       )}
-      <Box
-        height="calc(100vh - 3rem)"
-        width="100%"
-        backgroundColor={C_NEAR_WHITE}
-      >
-        {protocolFile !== null ? (
-          <ProtocolSetup />
-        ) : (
-          <UploadInput onUpload={handleUpload} />
+      <Page titleBarProps={titleBarProps}>
+        {uploadError != null && (
+          <AlertItem
+            type="warning"
+            onCloseClick={clearError}
+            title={t('protocol_upload_failed')}
+          >
+            {t(VALIDATION_ERROR_T_MAP[uploadError[0]])}
+            {uploadError[1] != null &&
+              uploadError[1].map((errorObject, i) => (
+                <Text key={i}>{JSON.stringify(errorObject)}</Text>
+              ))}
+          </AlertItem>
         )}
-      </Box>
-    </Page>
+        <Box
+          height="calc(100vh - 3rem)"
+          width="100%"
+          backgroundColor={C_NEAR_WHITE}
+        >
+          {protocolFile !== null ? (
+            <ProtocolSetup />
+          ) : (
+            <UploadInput onUpload={handleUpload} />
+          )}
+        </Box>
+      </Page>
+    </>
   )
 }
