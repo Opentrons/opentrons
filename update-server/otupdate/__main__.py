@@ -12,10 +12,13 @@ def parse_args():
     oe.set_defaults(func=oe_main)
     args = parser.parse_args()
     if args.build_system == 'oe':
-        sys.argv = [sys.argv[0]]
+        """ git rid of oe from command line args,
+        preserve order of other server args
+        """
+        sys.argv[1:] = sys.argv[2:]
         oe_main()
     else:
-        sys.argv = [sys.argv[0]]
+        sys.argv[1:] = sys.argv[2:]
         br_main()
 
 
