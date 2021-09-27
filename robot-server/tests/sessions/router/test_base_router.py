@@ -29,7 +29,11 @@ from robot_server.sessions.session_models import (
     ProtocolSessionCreateParams,
 )
 
-from robot_server.sessions.engine_store import EngineStore, EngineConflictError
+from robot_server.sessions.engine_store import (
+    EngineStore,
+    EngineConflictError,
+    EngineMissingError,
+)
 
 from robot_server.sessions.session_store import (
     SessionStore,
@@ -41,6 +45,7 @@ from robot_server.sessions.router.base_router import (
     base_router,
     SessionNotFound,
     SessionAlreadyActive,
+    SessionRunning,
 )
 
 from tests.helpers import verify_response
@@ -468,3 +473,39 @@ def test_delete_session_with_bad_id(
         expected_status=404,
         expected_errors=SessionNotFound(detail=str(key_error)),
     )
+
+
+def test_delete_running_session(
+    decoy: Decoy,
+    engine_store: EngineStore,
+    session_store: SessionStore,
+    client: TestClient,
+) -> None:
+    """It should 409 if the session is not finished."""
+    decoy.when(engine_store.engine.state_view.commands.get_is_running()).then_return(
+        True
+    )
+
+    response = client.delete("/sessions/session-id")
+
+    verify_response(
+        response,
+        expected_status=409,
+        expected_errors=SessionRunning(),
+    )
+
+
+def test_delete_running_session_no_engine(
+    decoy: Decoy,
+    engine_store: EngineStore,
+    session_store: SessionStore,
+    client: TestClient,
+) -> None:
+    """It should no-op if no engine is present."""
+    decoy.when(engine_store.engine.state_view.commands.get_is_running()).then_raise(
+        EngineMissingError()
+    )
+
+    response = client.delete("/sessions/session-id")
+
+    assert response.status_code == 200

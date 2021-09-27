@@ -142,11 +142,6 @@ async def test_play_starts_run(
 
     decoy.verify(
         protocol_engine.play(),
-        task_queue.add(
-            phase=TaskQueuePhase.CLEANUP,
-            func=protocol_engine.stop,
-            wait_until_complete=True,
-        ),
         task_queue.start(),
     )
 
@@ -212,6 +207,7 @@ def test_load_json(
     json_file_reader: JsonFileReader,
     json_command_translator: JsonCommandTranslator,
     protocol_engine: ProtocolEngine,
+    task_queue: TaskQueue,
     subject: ProtocolRunner,
 ) -> None:
     """It should load a JSON protocol file."""
@@ -242,6 +238,11 @@ def test_load_json(
             request=pe_commands.PauseRequest(
                 data=pe_commands.PauseData(message="goodbye")
             )
+        ),
+        task_queue.add(
+            phase=TaskQueuePhase.CLEANUP,
+            func=protocol_engine.stop,
+            wait_until_complete=True,
         ),
     )
 
@@ -280,7 +281,11 @@ def test_load_python(
             protocol=python_protocol,
             context=protocol_context,
         ),
-        times=1,
+        task_queue.add(
+            phase=TaskQueuePhase.CLEANUP,
+            func=protocol_engine.stop,
+            wait_until_complete=True,
+        ),
     )
 
 
@@ -330,6 +335,11 @@ def test_load_legacy_python(
             protocol=legacy_protocol,
             context=legacy_context,
         ),
+        task_queue.add(
+            phase=TaskQueuePhase.CLEANUP,
+            func=protocol_engine.stop,
+            wait_until_complete=True,
+        ),
     )
 
 
@@ -375,5 +385,10 @@ def test_load_legacy_json(
             func=legacy_executor.execute,
             protocol=legacy_protocol,
             context=legacy_context,
+        ),
+        task_queue.add(
+            phase=TaskQueuePhase.CLEANUP,
+            func=protocol_engine.stop,
+            wait_until_complete=True,
         ),
     )

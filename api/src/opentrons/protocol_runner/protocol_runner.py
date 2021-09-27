@@ -106,16 +106,19 @@ class ProtocolRunner:
             else:
                 self._load_legacy(protocol_source)
 
+        # ensure the engine is stopped gracefully once the
+        # protocol file stops issuing commands
+        self._task_queue.add(
+            phase=TaskQueuePhase.CLEANUP,
+            func=self._protocol_engine.stop,
+            wait_until_complete=True,
+        )
+
     def play(self) -> None:
         """Start or resume the run."""
         self._protocol_engine.play()
 
         if not self._task_queue.is_started():
-            self._task_queue.add(
-                phase=TaskQueuePhase.CLEANUP,
-                func=self._protocol_engine.stop,
-                wait_until_complete=True,
-            )
             self._task_queue.start()
 
     def pause(self) -> None:

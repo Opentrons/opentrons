@@ -27,7 +27,7 @@ from ..session_store import SessionStore, SessionNotFoundError
 from ..session_view import SessionView
 from ..session_models import Session, ProtocolSessionCreateData
 from ..schema_models import CreateSessionRequest, SessionResponse
-from ..engine_store import EngineStore, EngineConflictError
+from ..engine_store import EngineStore, EngineConflictError, EngineMissingError
 from ..dependencies import get_session_store, get_engine_store
 
 base_router = APIRouter()
@@ -46,6 +46,17 @@ class SessionAlreadyActive(ErrorDetails):
 
     id: Literal["SessionAlreadyActive"] = "SessionAlreadyActive"
     title: str = "Session Already Active"
+
+
+class SessionRunning(ErrorDetails):
+    """An error if one tries to delete a session that is running."""
+
+    id: Literal["SessionRunning"] = "SessionStillRunning"
+    title: str = "Session Running"
+    detail: str = (
+        "Session is currently running. Allow the session to finish or"
+        " stop it with a `stop` action before attempting to delete it."
+    )
 
 
 @base_router.post(
@@ -220,6 +231,12 @@ async def remove_session_by_id(
         session_store: Session storage interface.
         engine_store: ProtocolEngine storage and control.
     """
+    try:
+        if engine_store.engine.state_view.commands.get_is_running():
+            raise SessionRunning().as_error(status.HTTP_409_CONFLICT)
+    except EngineMissingError:
+        pass
+
     try:
         engine_store.clear()
         session_store.remove(session_id=sessionId)
