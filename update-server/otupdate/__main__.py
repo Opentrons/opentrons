@@ -18,7 +18,7 @@ def parse_args():
         sys.argv[1:] = sys.argv[2:]
         oe_main()
     else:
-        sys.argv[1:] = sys.argv[2:]
+        # assuming python -m otupdate used  
         br_main()
 
 
