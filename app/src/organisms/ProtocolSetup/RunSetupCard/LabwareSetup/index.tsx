@@ -18,6 +18,7 @@ import {
   C_BLUE,
   C_DARK_GRAY,
   C_NEAR_WHITE,
+  PipetteRender,
 } from '@opentrons/components'
 import {
   inferModuleOrientationFromXCoordinate,
@@ -140,7 +141,10 @@ export const LabwareSetup = (): JSX.Element | null => {
                     >
                       <g transform={`translate(${x},${y})`}>
                         <LabwareRender definition={labwareDef} />
-                        <LabwareInfoOverlay definition={labwareDef} />
+                        <PipetteRender
+                          pipetteName={'p10_single'}
+                          labwareDef={labwareDef}
+                        />
                       </g>
                     </React.Fragment>
                   )

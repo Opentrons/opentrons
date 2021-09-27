@@ -224,15 +224,15 @@
               "$ref": "#/definitions/positiveNumber"
             },
             "x": {
-              "description": "x location of center-bottom of well in reference to left-front-bottom of labware",
+              "description": "x location of center of the well in reference to left-front-bottom of labware",
               "$ref": "#/definitions/positiveNumber"
             },
             "y": {
-              "description": "y location of center-bottom of well in reference to left-front-bottom of labware",
+              "description": "y location of the well in reference to left-front-bottom of labware",
               "$ref": "#/definitions/positiveNumber"
             },
             "z": {
-              "description": "z location of center-bottom of well in reference to left-front-bottom of labware",
+              "description": "z location of the well in reference to left-front-bottom of labware",
               "$ref": "#/definitions/positiveNumber"
             },
             "totalLiquidVolume": {
