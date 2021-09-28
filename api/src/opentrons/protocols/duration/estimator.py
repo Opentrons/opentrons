@@ -89,7 +89,8 @@ class DurationEstimator:
         payload = message["payload"]
 
         # We cannot handle paired pipette messages
-        if "instruments" in payload or "locations" in payload:
+        # locations also applies to transfer commands
+        if "instruments" in payload:
             logger.warning(
                 f"Paired pipettes are not supported by the duration estimator. "
                 f"Command '{payload['text']}' cannot be estimated properly."
@@ -164,6 +165,15 @@ class DurationEstimator:
             duration = self.on_thermocycler_deactivate_lid(payload=payload)
         elif message_name == types.THERMOCYCLER_OPEN:
             duration = self.on_thermocycler_lid_open(payload=payload)
+        elif message_name == types.TRANSFER:
+            # Already accounted for in other steps
+            pass
+        elif message_name == types.DISTRIBUTE:
+            pass
+        elif message_name == types.CONSOLIDATE:
+            pass
+        elif message_name == types.COMMENT:
+            pass
         else:
             logger.warning(
                 f"Command type '{message_name}' is not yet supported by the "
@@ -291,7 +301,6 @@ class DurationEstimator:
         # So we are defaulting to 0.5 seconds
         duration = 0.5
         logger.info(f"blowing_out_for {duration} seconds, in slot {curr_slot}")
-
         return duration
 
     def on_touch_tip(self, payload) -> float:
@@ -304,7 +313,6 @@ class DurationEstimator:
         # depth = plate['A1'].diameter
         duration = 0.5
         logger.info(f"touch_tip for {duration} seconds")
-
         return duration
 
     def on_delay(self, payload) -> float:
@@ -394,7 +402,6 @@ class DurationEstimator:
         duration = 24
         thermoaction = "closing"
         logger.info(f"thermocation =  {thermoaction}")
-
         return duration
 
     def on_thermocycler_lid_open(self, payload) -> float:
@@ -402,7 +409,6 @@ class DurationEstimator:
         duration = 24
         thermoaction = "opening"
         logger.info(f"thermocation =  {thermoaction}")
-
         return duration
 
     def on_thermocycler_deactivate_lid(self, payload) -> float:
@@ -410,7 +416,6 @@ class DurationEstimator:
         duration = 23
         thermoaction = "Deactivating"
         logger.info(f"thermocation =  {thermoaction}")
-
         return duration
 
     def on_tempdeck_set_temp(self, payload) -> float:

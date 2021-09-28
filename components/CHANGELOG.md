@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.6.0](https://github.com/Opentrons/opentrons/compare/v4.5.0...v4.6.0) (2021-09-27)
+
+
+### Bug Fixes
+
+* **components, protocol-designer:** fix TitledList alignment ([#8186](https://github.com/Opentrons/opentrons/issues/8186)) ([557e583](https://github.com/Opentrons/opentrons/commit/557e58301fb9391ae68334561ff0a478ce5d4c37)), closes [#8008](https://github.com/Opentrons/opentrons/issues/8008) [#7543](https://github.com/Opentrons/opentrons/issues/7543)
+
+
+### Features
+
+* **app:** add id attributes for e2e testing ([#8262](https://github.com/Opentrons/opentrons/issues/8262)) ([9d4274c](https://github.com/Opentrons/opentrons/commit/9d4274c565a43ddaeb748752ea17afa8c90a6fe0))
+* **app:** add labware setup step to protocol setup flow ([#8172](https://github.com/Opentrons/opentrons/issues/8172)) ([e33deb7](https://github.com/Opentrons/opentrons/commit/e33deb7ca641900196dbc6c8edff0bea7e14343e)), closes [#7665](https://github.com/Opentrons/opentrons/issues/7665)
+
+
+
+
+
 # [4.5.0](https://github.com/Opentrons/opentrons/compare/v4.4.0...v4.5.0) (2021-08-03)
 
 

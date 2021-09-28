@@ -67,7 +67,7 @@ jobs:
         run: make -C hardware lint
 
       - name: Test
-        run: make -C hardware test
+        run: make -C hardware test-with-emulator
 
       - name: Code Coverage
         uses: 'codecov/codecov-action@v2'

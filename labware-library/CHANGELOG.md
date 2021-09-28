@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.6.0](https://github.com/Opentrons/opentrons/compare/v4.5.0...v4.6.0) (2021-09-27)
+
+
+### Bug Fixes
+
+* **labware-creator:** fix bad syntax in tip rack protocol ([#8171](https://github.com/Opentrons/opentrons/issues/8171)) ([9468633](https://github.com/Opentrons/opentrons/commit/9468633a2eb5c3ee8388f4f83427635b5f32199b))
+* **labware-creator:** fix readonly option type error ([#8306](https://github.com/Opentrons/opentrons/issues/8306)) ([463fb70](https://github.com/Opentrons/opentrons/commit/463fb70a65f3fbb0968b7056c5323dd19ea11238)), closes [#7972](https://github.com/Opentrons/opentrons/issues/7972)
+
+
+
+
+
 # [4.5.0](https://github.com/Opentrons/opentrons/compare/v4.4.0...v4.5.0) (2021-08-03)
 
 
