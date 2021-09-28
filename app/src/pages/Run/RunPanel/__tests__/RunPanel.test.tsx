@@ -21,14 +21,10 @@ jest.mock('../ModuleLiveStatusCards')
 jest.mock('../../../../redux/config')
 jest.mock('../../../../organisms/RunTimeControl')
 
-const mockRunTimer = RunTimer as jest.MockedFunction<typeof RunTimer>
+const mockRunTimer = RunTimer as jest.Mock
 const mockRunControls = RunControls as jest.MockedFunction<typeof RunControls>
-const mockModuleLiveStatusCards = ModuleLiveStatusCards as jest.MockedFunction<
-  typeof ModuleLiveStatusCards
->
-const mockRunTimeControl = RunTimeControl as jest.MockedFunction<
-  typeof RunTimeControl
->
+const mockModuleLiveStatusCards = ModuleLiveStatusCards as jest.Mock
+const mockRunTimeControl = RunTimeControl as jest.Mock
 const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
   typeof useFeatureFlag
 >
@@ -40,15 +36,12 @@ describe('RunSetupCard', () => {
     when(mockRunTimer)
       .calledWith(partialComponentPropsMatcher({}))
       .mockImplementation(() => <div>Mock Run Timer</div>)
-
     when(mockRunControls)
       .calledWith(partialComponentPropsMatcher({}))
       .mockImplementation(() => <div>Mock Run Controls</div>)
-
     when(mockModuleLiveStatusCards)
       .calledWith(partialComponentPropsMatcher({}))
       .mockImplementation(() => <div>Mock Module Live Status Cards</div>)
-
     when(mockRunTimeControl)
       .calledWith(partialComponentPropsMatcher({}))
       .mockImplementation(() => <div>Mock Run Time Control</div>)

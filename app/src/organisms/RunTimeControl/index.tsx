@@ -8,7 +8,7 @@ import {
   SPACING_1,
   Text,
 } from '@opentrons/components'
-import { useRunControls, useRunDisabledReason, useRunStatus } from './hooks'
+import { useRunControls, useRunStatus } from './hooks'
 
 export function RunTimeControl(): JSX.Element {
   const { t } = useTranslation('run_details')
@@ -16,7 +16,7 @@ export function RunTimeControl(): JSX.Element {
   const { play, pause, reset } = useRunControls()
 
   let callToActionText = ''
-  let action = () => {}
+  let action = (): void => {}
   if (runStatus === 'loaded') {
     callToActionText = t('start_run')
     action = play

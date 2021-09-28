@@ -17,8 +17,8 @@ export function RunDetails(): JSX.Element | null {
     <Page titleBarProps={titleBarProps}>
       <Flex flexDirection={DIRECTION_COLUMN}>
         {'commands' in protocolData
-          ? protocolData.commands.map(command => (
-              <Flex>
+          ? protocolData.commands.map((command, index) => (
+              <Flex key={index}>
                 <Text>{command.command}</Text>
               </Flex>
             ))

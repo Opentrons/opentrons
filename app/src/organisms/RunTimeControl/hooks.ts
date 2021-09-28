@@ -5,13 +5,13 @@ interface RunControls {
 }
 
 export function useRunControls(): RunControls {
-  const play = () => {
+  const play = (): void => {
     console.log('TODO: wire up to protocol play endpoint')
   }
-  const pause = () => {
+  const pause = (): void => {
     console.log('TODO: wire up to protocol pause endpoint')
   }
-  const reset = () => {
+  const reset = (): void => {
     console.log('TODO: wire up to protocol reset endpoint')
   }
   return { play, pause, reset }
