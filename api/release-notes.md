@@ -22,7 +22,7 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ## 4.6.1
 
-The 4.6.1 hotfix release contains a small configuration change to to fix an issue with installing the `opentrons` PyPI package on computers running Python 3.8 and later. It does not affect the software running on your OT-2.
+The 4.6.1 hotfix release contains a small configuration change to fix an issue with installing the `opentrons` PyPI package on computers running Python 3.8 and later. It does not affect the software running on your OT-2.
 
 ## Known Issues
 
