@@ -33,7 +33,7 @@ describe('Run Page', () => {
   beforeEach(() => {
     when(mockRunDetails)
       .calledWith(componentPropsMatcher({}))
-      .mockReturnValue(<div>Mock Run Details</div>) // this (default) empty div will be returned when LabwareInfoOverlay isn't called with expected props
+      .mockReturnValue(<div>Mock Run Details</div>)
 
     render = () => {
       return renderWithProviders(
