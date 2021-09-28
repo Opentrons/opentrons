@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.6.0](https://github.com/Opentrons/opentrons/compare/v4.5.0...v4.6.0) (2021-09-27)
+
+
+### Bug Fixes
+
+* **api:** ensure decorators do not erase ProtocolContext types ([#8323](https://github.com/Opentrons/opentrons/issues/8323)) ([2a8a370](https://github.com/Opentrons/opentrons/commit/2a8a37025e8894230cdeb0376a7bf832b4e9f12f))
+* **robot-server:** use the current critical point when moving pipettes ([#8331](https://github.com/Opentrons/opentrons/issues/8331)) ([09efb81](https://github.com/Opentrons/opentrons/commit/09efb818822cbfa5169377884240c6e494024226))
+
+
+
+
+
 # [4.5.0](https://github.com/Opentrons/opentrons/compare/v4.4.0...v4.5.0) (2021-08-03)
 
 **Note:** Version bump only for package @opentrons/robot-server
