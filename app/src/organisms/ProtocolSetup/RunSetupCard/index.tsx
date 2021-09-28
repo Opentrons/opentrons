@@ -50,7 +50,7 @@ export function RunSetupCard(): JSX.Element | null {
   })
 
   const [expandedStepKey, setExpandedStepKey] = React.useState<StepKey | null>(
-    ROBOT_CALIBRATION_STEP_KEY
+    null
   )
   if (
     protocolData == null ||

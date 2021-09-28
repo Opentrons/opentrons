@@ -145,7 +145,7 @@ export function DeckCalibration(props: Props): JSX.Element | null {
                 {t('pipette_offset_cal')}
               </Text>
               <Text fontSize={FONT_SIZE_BODY_1} marginTop={SPACING_3}>
-                {t('pipette_offset_cal_description')}
+                <Trans t={t} i18nKey="pipette_offset_cal_description" />
               </Text>
               <Box textAlign={ALIGN_CENTER} marginTop={SPACING_4}>
                 <PrimaryBtn
