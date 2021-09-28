@@ -2,7 +2,7 @@
   "extends": "../tsconfig-base.json",
   "references": [
     {
-      "path": "./tsconfig-utils.json"
+      "path": "./__utils__"
     },
     {
       "path": "../shared-data"
