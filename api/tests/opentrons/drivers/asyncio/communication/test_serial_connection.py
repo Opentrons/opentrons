@@ -32,6 +32,8 @@ def subject(mock_serial_port: AsyncMock, ack: str) -> SerialConnection:
         name="name",
         port="port",
         retry_wait_time_seconds=0,
+        error_keyword="error",
+        alarm_keyword="alarm",
     )
 
 

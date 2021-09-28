@@ -23,6 +23,8 @@ class SerialConnection:
         name: Optional[str] = None,
         retry_wait_time_seconds: float = 0.1,
         loop: Optional[asyncio.AbstractEventLoop] = None,
+        error_keyword: Optional[str] = None,
+        alarm_keyword: Optional[str] = None,
     ) -> SerialConnection:
         """
         Create a connection.
@@ -35,6 +37,12 @@ class SerialConnection:
             name: the connection name
             retry_wait_time_seconds: how long to wait between retries.
             loop: optional event loop.
+            error_keyword: optional string that will cause an
+                           ErrorResponse exception when detected
+                           (default: error)
+            alarm_keyword: optional string that will cause an
+                           AlarmResponse exception when detected
+                           (default: alarm)
 
         Returns: SerialConnection
         """
@@ -48,6 +56,8 @@ class SerialConnection:
             name=name,
             ack=ack,
             retry_wait_time_seconds=retry_wait_time_seconds,
+            error_keyword=error_keyword or "error",
+            alarm_keyword=alarm_keyword or "alarm",
         )
 
     def __init__(
@@ -57,6 +67,8 @@ class SerialConnection:
         name: str,
         ack: str,
         retry_wait_time_seconds: float,
+        error_keyword: str,
+        alarm_keyword: str,
     ) -> None:
         """
         Constructor
@@ -67,6 +79,10 @@ class SerialConnection:
             ack: the command response ack
             name: the connection name
             retry_wait_time_seconds: how long to wait between retries.
+            error_keyword: string that will cause an ErrorResponse
+                           exception when detected
+            alarm_keyword: string that will cause an AlarmResponse
+                           exception when detected
         """
         self._serial = serial
         self._port = port
@@ -74,6 +90,8 @@ class SerialConnection:
         self._ack = ack.encode()
         self._retry_wait_time_seconds = retry_wait_time_seconds
         self._send_data_lock = asyncio.Lock()
+        self._error_keyword = error_keyword.lower()
+        self._alarm_keyword = alarm_keyword.lower()
 
     async def send_command(
         self, command: CommandBuilder, retries: int = 0, timeout: Optional[float] = None
@@ -183,10 +201,10 @@ class SerialConnection:
         Raises: SerialException
         """
         lower = response.lower()
-        if "error" in lower:
+        if self._error_keyword in lower:
             raise ErrorResponse(port=self._port, response=response)
 
-        if "alarm" in lower:
+        if self._alarm_keyword in lower:
             raise AlarmResponse(port=self._port, response=response)
 
     async def on_retry(self) -> None:
