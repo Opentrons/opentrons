@@ -130,6 +130,7 @@ export function RobotCalibration(props: Props): JSX.Element {
           onClick={() => expandStep(nextStep)}
           backgroundColor={C_BLUE}
           {...targetProps}
+          id={'RobotCalStep_proceedButton'}
         >
           {t(nextStepButtonKey)}
         </PrimaryBtn>

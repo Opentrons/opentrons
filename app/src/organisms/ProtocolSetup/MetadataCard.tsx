@@ -25,16 +25,19 @@ export function MetadataCard(): JSX.Element {
           flex={3}
           label={t('organization_and_author')}
           value={author || '-'}
+          id={'MetadataCard_protocolOrganizationAuthor'}
         />
         <LabeledValue
           flex={3}
           label={t('last_updated')}
           value={lastUpdated ? format(lastUpdated, DATE_FORMAT) : '-'}
+          id={'MetadataCard_protocolLastUpdated'}
         />
         <LabeledValue
           flex={2}
           label={t('creation_method')}
           value={method || '-'}
+          id={'MetadataCard_protocolCreationMethod'}
         />
       </Flex>
       <Flex marginTop={SPACING_2}>
@@ -42,8 +45,14 @@ export function MetadataCard(): JSX.Element {
           flex={6}
           label={t('description')}
           value={description || '-'}
+          id={'MetadataCard_protocolDescription'}
         />
-        <LabeledValue flex={2} label={t('estimated_run_time')} value={'-'} />
+        <LabeledValue
+          flex={2}
+          label={t('estimated_run_time')}
+          value={'-'}
+          id={'MetadataCard_protocolEstRunTime'}
+        />
       </Flex>
     </Card>
   )

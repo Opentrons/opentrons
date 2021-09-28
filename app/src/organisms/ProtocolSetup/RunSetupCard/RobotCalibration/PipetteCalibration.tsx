@@ -89,6 +89,7 @@ export function PipetteCalibration(props: Props): JSX.Element {
           href={inexactPipetteSupportArticle}
           color={C_BLUE}
           marginRight={SPACING_3}
+          id={'PipetteCalibration_pipetteMismatchHelpLink'}
         >
           {t('pipette_compat_help')}
         </Link>
@@ -109,7 +110,12 @@ export function PipetteCalibration(props: Props): JSX.Element {
         >
           {t('pipette_missing')}
         </Text>
-        <PrimaryBtn as={RRDLink} to={pipettesPageUrl} backgroundColor={C_BLUE}>
+        <PrimaryBtn
+          as={RRDLink}
+          to={pipettesPageUrl}
+          backgroundColor={C_BLUE}
+          id={'PipetteCalibration_attachPipetteButton'}
+        >
           {t('attach_pipette_cta')}
         </PrimaryBtn>
       </Flex>
@@ -122,6 +128,7 @@ export function PipetteCalibration(props: Props): JSX.Element {
           <PrimaryBtn
             backgroundColor={C_BLUE}
             onClick={() => startPipetteOffsetCalibrationBlockModal(null)}
+            id={'PipetteCalibration_calibratePipetteButton'}
           >
             {t('calibrate_now_cta')}
           </PrimaryBtn>
