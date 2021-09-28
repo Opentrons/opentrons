@@ -103,6 +103,9 @@ class BinarySerializable:
     Data will be packed big endian.
     """
 
+    ENDIAN = ">"
+    """The big endian format string"""
+
     def serialize(self) -> bytes:
         """Serialize into a byte buffer.
 
@@ -150,9 +153,6 @@ class BinarySerializable:
             # Cache it on the cls.
             setattr(cls, format_string_attribute, format_string)
         return format_string
-
-    ENDIAN = ">"
-    """The big endian format string"""
 
 
 class LittleEndianMixIn:

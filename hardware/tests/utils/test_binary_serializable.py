@@ -34,17 +34,20 @@ class TestClass(utils.BinarySerializable):
 def subject() -> TestClass:
     """The test subject."""
     return TestClass(
+        # 1 bytes each
         ub=utils.UInt8Field(8),
         b=utils.Int8Field(-8),
+        # 2 bytes each
         us=utils.UInt16Field(16),
         s=utils.Int16Field(-16),
+        # 4 bytes each
         ul=utils.UInt32Field(32),
         l=utils.Int32Field(-32),
     )
 
 
 def test_serialize_length(subject: TestClass) -> None:
-    """It should serialize with correct data length."""
+    """It should serialize with correct data length in bytes."""
     assert len(subject.serialize()) == 14
 
 
@@ -63,6 +66,7 @@ def test_deserialize() -> None:
 
 def test_serdes(subject: TestClass) -> None:
     """It should serialize a deserialized instance correctly."""
+    # Deserialize a serialized instance. They should be the same.
     new = TestClass.build(subject.serialize())
     assert new == subject
 
@@ -75,20 +79,24 @@ class LittleEndianTestClass(utils.LittleEndianBinarySerializable):
     l: utils.Int32Field
 
 
-def test_deserialize_little_endian() -> None:
+@pytest.fixture
+def little_endian_data() -> bytes:
+    """Little endian data fixture."""
+    return b"\x00\x00\x00\x05\x00\x00\x00\x06"
+
+
+def test_deserialize_little_endian(little_endian_data: bytes) -> None:
     """It should deserialize little endian data correctly."""
-    data = b"\x00\x00\x00\x05\x00\x00\x00\x06"
-    assert LittleEndianTestClass.build(data) == LittleEndianTestClass(
+    assert LittleEndianTestClass.build(little_endian_data) == LittleEndianTestClass(
         ul=utils.UInt32Field(0x05000000), l=utils.Int32Field(0x06000000)
     )
 
 
-def test_serialize_little_endian() -> None:
+def test_serialize_little_endian(little_endian_data: bytes) -> None:
     """It should serialize little endian data correctly."""
-    data = b"\x00\x00\x00\x05\x00\x00\x00\x06"
     assert (
         LittleEndianTestClass(
             ul=utils.UInt32Field(0x05000000), l=utils.Int32Field(0x06000000)
         ).serialize()
-        == data
+        == little_endian_data
     )
