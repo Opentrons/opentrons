@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.6.1](https://github.com/Opentrons/opentrons/compare/v4.6.0...v4.6.1) (2021-09-28)
+
+
+### Bug Fixes
+
+* **api:** loosen numpy spec in setup.py ([#8418](https://github.com/Opentrons/opentrons/issues/8418)) ([105cf3a](https://github.com/Opentrons/opentrons/commit/105cf3ab8bd404da07e457b145f6339358390a37))
+
+
+
+
+
 # [4.6.0](https://github.com/Opentrons/opentrons/compare/v4.5.0...v4.6.0) (2021-09-27)
 
 
