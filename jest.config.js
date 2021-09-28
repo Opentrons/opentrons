@@ -4,6 +4,7 @@ module.exports = {
   setupFilesAfterEnv: [
     '<rootDir>/scripts/setup-enzyme.js',
     '<rootDir>/scripts/setup-global-mocks.js',
+    '<rootDir>/scripts/setup-global-imports.js',
   ],
   globals: {
     __webpack_public_path__: '/',
