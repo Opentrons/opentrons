@@ -8,12 +8,11 @@ import { RunLog } from './RunLog'
 export function Run(): JSX.Element {
   const isNewProtocolRunPage = useFeatureFlag('preProtocolFlowWithoutRPC')
 
-  return isNewProtocolRunPage
-    ? (
-      <RunDetails />
-    ) : (
-      <Page titleBarProps={{ title: <SessionHeader /> }}>
-        <RunLog />
-      </Page>
-    )
+  return isNewProtocolRunPage ? (
+    <RunDetails />
+  ) : (
+    <Page titleBarProps={{ title: <SessionHeader /> }}>
+      <RunLog />
+    </Page>
+  )
 }

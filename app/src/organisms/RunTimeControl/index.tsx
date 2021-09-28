@@ -13,7 +13,7 @@ import { useRunControls, useRunDisabledReason, useRunStatus } from './hooks'
 export function RunTimeControl(): JSX.Element {
   const { t } = useTranslation('run_details')
   const runStatus = useRunStatus()
-  const {play, pause, reset} = useRunControls()
+  const { play, pause, reset } = useRunControls()
 
   let callToActionText = ''
   let action = () => {}
@@ -35,16 +35,12 @@ export function RunTimeControl(): JSX.Element {
   }
 
   return (
-      <Flex flexDirection={DIRECTION_COLUMN} margin={SPACING_1}>
-        <Text>{t('run_status', {status: t(`status_${runStatus}`)})}</Text>
-          {
-            runStatus !== 'loaded'
-              ?  (<Text>TODO: INSERT RUN TIMER HERE</Text>)
-              : null
-          }
-        <PrimaryBtn onClick={action} alignSelf={ALIGN_STRETCH}>
-          {callToActionText}
-        </PrimaryBtn>
-      </Flex>
+    <Flex flexDirection={DIRECTION_COLUMN} margin={SPACING_1}>
+      <Text>{t('run_status', { status: t(`status_${runStatus}`) })}</Text>
+      {runStatus !== 'loaded' ? <Text>TODO: INSERT RUN TIMER HERE</Text> : null}
+      <PrimaryBtn onClick={action} alignSelf={ALIGN_STRETCH}>
+        {callToActionText}
+      </PrimaryBtn>
+    </Flex>
   )
 }

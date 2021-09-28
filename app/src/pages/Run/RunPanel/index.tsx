@@ -59,32 +59,31 @@ export function RunPanelComponent(props: Props): JSX.Element {
   const { t } = useTranslation('run_details')
   const isNewProtocolRunPanel = useFeatureFlag('preProtocolFlowWithoutRPC')
 
-  return isNewProtocolRunPanel
-    ? (
-      <SidePanel title={t('run_protocol')}>
-        <RunTimeControl />
-        <ModuleLiveStatusCards />
-      </SidePanel>
-    ) : (
-      <SidePanel title="Execute Run">
-        <SidePanelGroup>
-          <RunTimer />
-          <RunControls
-            disabled={props.disabled}
-            modulesReady={props.modulesReady}
-            isReadyToRun={props.isReadyToRun}
-            isPaused={props.isPaused}
-            isRunning={props.isRunning}
-            isBlocked={props.isBlocked}
-            onRunClick={props.onRunClick}
-            onPauseClick={props.onPauseClick}
-            onResumeClick={props.onResumeClick}
-            onResetClick={props.onResetClick}
-          />
-        </SidePanelGroup>
-        <ModuleLiveStatusCards />
-      </SidePanel>
-    )
+  return isNewProtocolRunPanel ? (
+    <SidePanel title={t('run_protocol')}>
+      <RunTimeControl />
+      <ModuleLiveStatusCards />
+    </SidePanel>
+  ) : (
+    <SidePanel title="Execute Run">
+      <SidePanelGroup>
+        <RunTimer />
+        <RunControls
+          disabled={props.disabled}
+          modulesReady={props.modulesReady}
+          isReadyToRun={props.isReadyToRun}
+          isPaused={props.isPaused}
+          isRunning={props.isRunning}
+          isBlocked={props.isBlocked}
+          onRunClick={props.onRunClick}
+          onPauseClick={props.onPauseClick}
+          onResumeClick={props.onResumeClick}
+          onResetClick={props.onResetClick}
+        />
+      </SidePanelGroup>
+      <ModuleLiveStatusCards />
+    </SidePanel>
+  )
 }
 
 export const RunPanel = connect(
