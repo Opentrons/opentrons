@@ -4,7 +4,6 @@ import {
   Text,
   Flex,
   Icon,
-  SIZE_2,
   FONT_SIZE_BODY_1,
   FONT_SIZE_BODY_2,
   FONT_STYLE_ITALIC,
@@ -15,7 +14,6 @@ import {
   SPACING_2,
   ALIGN_CENTER,
   DIRECTION_ROW,
-  BORDER_SOLID_MEDIUM,
   Box,
   JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
