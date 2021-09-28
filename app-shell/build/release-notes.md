@@ -6,9 +6,9 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
-# Opentrons App Changes in 4.6.x
+# Opentrons App Changes in 4.6.1
 
-The 4.6.x release is primarily focused on bug fixes on the robot software side and behind the scenes changes in the app for future work. You shouldn't notice any big changes with this upgrade.
+The 4.6.1 release is primarily focused on bug fixes on the robot software side and behind the scenes changes in the app for future work. You shouldn't notice any big changes with this upgrade.
 
 ## New Features
 
@@ -18,7 +18,7 @@ None in the Opentrons App.
 
 None in the Opentrons App.
 
-## 4.6.1
+## 4.6.0 to 4.6.1
 
 The 4.6.1 hotfix release contains a small configuration change to fix an issue with installing the `opentrons` PyPI package on computers running Python 3.8 and later. It does not affect the software running in the Opentrons App.
 

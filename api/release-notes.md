@@ -6,7 +6,7 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
-# OT-2 Software Changes in 4.6.x
+# OT-2 Software Changes in 4.6.1
 
 ## New Features
 
@@ -20,7 +20,7 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 - Fixed a few issues with the faster protocol analysis method added in the 4.5.0 release.
 - Fixed type annotations of the `ProtocolContext` classes.
 
-## 4.6.1
+## 4.6.0 to 4.6.1
 
 The 4.6.1 hotfix release contains a small configuration change to fix an issue with installing the `opentrons` PyPI package on computers running Python 3.8 and later. It does not affect the software running on your OT-2.
 
