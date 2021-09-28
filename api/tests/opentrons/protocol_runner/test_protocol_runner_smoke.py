@@ -29,6 +29,7 @@ from opentrons.protocol_runner import (
     PythonPreAnalysis,
     create_simulating_runner,
 )
+from opentrons.protocol_runner.legacy_command_mapper import LegacyCommandData
 
 
 async def test_runner_with_python(python_protocol_file: Path) -> None:
@@ -136,50 +137,43 @@ async def test_runner_with_legacy_python(legacy_python_protocol_file: Path) -> N
     subject = await create_simulating_runner()
     result = await subject.run(protocol_source)
 
-    # TODO(mc, 2021-09-13): uncomment (and edit as necessary) below
-    # once command / equipment translation layer is in place
+    commands_result = result.commands
+    pipettes_result = result.pipettes
+    labware_result = result.labware
 
-    print(result)
-    # print(subject._context.commands())
+    pipette_id_captor = matchers.Captor()
+    labware_id_captor = matchers.Captor()
 
-    # commands_result = result.commands
-    # pipettes_result = result.pipettes
-    # labware_result = result.labware
+    expected_pipette = LoadedPipette.construct(
+        id=pipette_id_captor,
+        pipetteName=PipetteName.P300_SINGLE,
+        mount=MountType.LEFT,
+    )
 
-    # pipette_id_captor = matchers.Captor()
-    # labware_id_captor = matchers.Captor()
+    expected_labware = LoadedLabware.construct(
+        id=labware_id_captor,
+        location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
+        loadName="opentrons_96_tiprack_300ul",
+        definitionUri="opentrons/opentrons_96_tiprack_300ul/1",
+    )
 
-    # expected_pipette = LoadedPipette.construct(
-    #     id=pipette_id_captor,
-    #     pipetteName=PipetteName.P300_SINGLE,
-    #     mount=MountType.LEFT,
-    # )
+    assert expected_pipette in pipettes_result
+    assert expected_labware in labware_result
 
-    # expected_labware = LoadedLabware.construct(
-    #     id=labware_id_captor,
-    #     location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
-    #     loadName="opentrons_96_tiprack_300ul",
-    #     definitionUri="opentrons/opentrons_96_tiprack_300ul/1",
-    # )
+    expected_command = commands.Custom.construct(
+        id=matchers.IsA(str),
+        status=commands.CommandStatus.SUCCEEDED,
+        createdAt=matchers.IsA(datetime),
+        startedAt=matchers.IsA(datetime),
+        completedAt=matchers.IsA(datetime),
+        data=LegacyCommandData(
+            legacyCommandType="command.PICK_UP_TIP",
+            legacyCommandText="Picking up tip from A1 of Opentrons 96 Tip Rack 300 µL on 1",  # noqa: E501
+        ),
+        result=None,
+    )
 
-    # assert expected_pipette in pipettes_result
-    # assert expected_labware in labware_result
-
-    # expected_command = commands.PickUpTip.construct(
-    #     id=matchers.IsA(str),
-    #     status=commands.CommandStatus.SUCCEEDED,
-    #     createdAt=matchers.IsA(datetime),
-    #     startedAt=matchers.IsA(datetime),
-    #     completedAt=matchers.IsA(datetime),
-    #     data=commands.PickUpTipData(
-    #         pipetteId=pipette_id_captor.value,
-    #         labwareId=labware_id_captor.value,
-    #         wellName="A1",
-    #     ),
-    #     result=commands.PickUpTipResult(),
-    # )
-
-    # assert expected_command in commands_result
+    assert expected_command in commands_result
 
 
 async def test_runner_with_legacy_json(legacy_json_protocol_file: Path) -> None:
@@ -192,47 +186,40 @@ async def test_runner_with_legacy_json(legacy_json_protocol_file: Path) -> None:
     subject = await create_simulating_runner()
     result = await subject.run(protocol_source)
 
-    # TODO(mc, 2021-09-13): uncomment (and edit as necessary) below
-    # once command / equipment translation layer is in place
+    commands_result = result.commands
+    pipettes_result = result.pipettes
+    labware_result = result.labware
 
-    print(result)
-    # print(subject._context.commands())
+    pipette_id_captor = matchers.Captor()
+    labware_id_captor = matchers.Captor()
 
-    # commands_result = result.commands
-    # pipettes_result = result.pipettes
-    # labware_result = result.labware
+    expected_pipette = LoadedPipette.construct(
+        id=pipette_id_captor,
+        pipetteName=PipetteName.P300_SINGLE,
+        mount=MountType.LEFT,
+    )
 
-    # pipette_id_captor = matchers.Captor()
-    # labware_id_captor = matchers.Captor()
+    expected_labware = LoadedLabware.construct(
+        id=labware_id_captor,
+        location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
+        loadName="opentrons_96_tiprack_300ul",
+        definitionUri="opentrons/opentrons_96_tiprack_300ul/1",
+    )
 
-    # expected_pipette = LoadedPipette.construct(
-    #     id=pipette_id_captor,
-    #     pipetteName=PipetteName.P300_SINGLE,
-    #     mount=MountType.LEFT,
-    # )
+    assert expected_pipette in pipettes_result
+    assert expected_labware in labware_result
 
-    # expected_labware = LoadedLabware.construct(
-    #     id=labware_id_captor,
-    #     location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
-    #     loadName="opentrons_96_tiprack_300ul",
-    #     definitionUri="opentrons/opentrons_96_tiprack_300ul/1",
-    # )
+    expected_command = commands.Custom.construct(
+        id=matchers.IsA(str),
+        status=commands.CommandStatus.SUCCEEDED,
+        createdAt=matchers.IsA(datetime),
+        startedAt=matchers.IsA(datetime),
+        completedAt=matchers.IsA(datetime),
+        data=LegacyCommandData(
+            legacyCommandType="command.PICK_UP_TIP",
+            legacyCommandText="Picking up tip from A1 of Opentrons 96 Tip Rack 300 µL on 1",  # noqa: E501
+        ),
+        result=None,
+    )
 
-    # assert expected_pipette in pipettes_result
-    # assert expected_labware in labware_result
-
-    # expected_command = commands.PickUpTip.construct(
-    #     id=matchers.IsA(str),
-    #     status=commands.CommandStatus.SUCCEEDED,
-    #     createdAt=matchers.IsA(datetime),
-    #     startedAt=matchers.IsA(datetime),
-    #     completedAt=matchers.IsA(datetime),
-    #     data=commands.PickUpTipData(
-    #         pipetteId=pipette_id_captor.value,
-    #         labwareId=labware_id_captor.value,
-    #         wellName="A1",
-    #     ),
-    #     result=commands.PickUpTipResult(),
-    # )
-
-    # assert expected_command in commands_result
+    assert expected_command in commands_result

@@ -46,6 +46,9 @@ class LegacyCommandMapper:
         results: List[pe_commands.Command] = []
 
         if stage == "before":
+            # TODO(mc, 2021-09-28): equipment mapping behavior seems
+            # best tested e2e, but current smoke tests won't remain sufficient
+            # for very long. Figure out a better testing strategy
             results += self._load_new_labware(loaded_labware)
             results += self._load_new_pipettes(loaded_pipettes)
 
