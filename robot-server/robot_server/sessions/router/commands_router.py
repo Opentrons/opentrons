@@ -13,7 +13,6 @@ from robot_server.service.json_api import (
 )
 
 from ..session_models import Session, SessionCommandSummary
-from ..schema_models import SessionCommandResponse
 from ..engine_store import EngineStore
 from ..dependencies import get_engine_store
 from .base_router import SessionNotFound, get_session
@@ -97,9 +96,7 @@ async def get_session_commands(
         "execution information."
     ),
     status_code=status.HTTP_200_OK,
-    # TODO(mc, 2021-06-23): mypy >= 0.780 broke Unions as `response_model`
-    # see https://github.com/tiangolo/fastapi/issues/2279
-    response_model=SessionCommandResponse,  # type: ignore[arg-type]
+    response_model=ResponseModel[pe_commands.Command],
     responses={
         status.HTTP_404_NOT_FOUND: {
             "model": Union[

@@ -30,16 +30,3 @@ SessionResponse = Union[
     ResponseModel[BasicSession],
     ResponseModel[ProtocolSession],
 ]
-
-SessionCommandResponse = Union[
-    ResponseModel[pe_commands.AddLabwareDefinition],
-    ResponseModel[pe_commands.Aspirate],
-    ResponseModel[pe_commands.Dispense],
-    ResponseModel[pe_commands.DropTip],
-    ResponseModel[pe_commands.LoadLabware],
-    ResponseModel[pe_commands.LoadPipette],
-    ResponseModel[pe_commands.MoveToWell],
-    ResponseModel[pe_commands.PickUpTip],
-    ResponseModel[pe_commands.Pause],
-    ResponseModel[pe_commands.Custom],
-]
