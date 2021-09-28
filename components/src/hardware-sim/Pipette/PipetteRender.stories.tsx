@@ -1,16 +1,15 @@
 import * as React from 'react'
-
-import { PipetteRender } from './'
-import { LabwareRender } from '../Labware'
-import pipetteNameSpecFixtures from '../../../../shared-data/pipette/fixtures/name/pipetteNameSpecFixtures.json'
+import pipetteNameSpecFixtures from '@opentrons/shared-data/pipette/fixtures/name/pipetteNameSpecFixtures.json'
 import _uncasted_opentrons300UlTiprack from '@opentrons/shared-data/labware/definitions/2/opentrons_96_tiprack_300ul/1.json'
 import _uncasted_nest12Reservoir15ml from '@opentrons/shared-data/labware/definitions/2/nest_12_reservoir_15ml/1.json'
 import _uncasted_axygenReservoir90ml from '@opentrons/shared-data/labware/definitions/2/axygen_1_reservoir_90ml/1.json'
 import _uncasted_opentrons6TuberackNest50mlConical from '@opentrons/shared-data/labware/definitions/2/opentrons_6_tuberack_nest_50ml_conical/1.json'
+import { LabwareRender } from '../Labware'
+import { RobotWorkSpace } from '../Deck'
+import { PipetteRender } from './'
 
 import type { Story, Meta } from '@storybook/react'
 import type { LabwareDefinition2, PipetteName } from '@opentrons/shared-data'
-import { RobotWorkSpace } from '../Deck'
 
 const DECK_MAP_VIEWBOX = '0 -140 230 230'
 

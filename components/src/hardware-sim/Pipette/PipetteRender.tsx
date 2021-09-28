@@ -8,11 +8,13 @@ import {
 import { C_MED_GRAY } from '../../styles'
 import { RobotCoordsForeignDiv } from '../Deck/RobotCoordsForeignDiv'
 import {
-  MULTI_CHANNEL_PIPETTE_WIDTH,
-  SINGLE_CHANNEL_PIPETTE_WIDTH,
-  SINGLE_CHANNEL_PIPETTE_HEIGHT,
-  MULTI_CHANNEL_PIPETTE_HEIGHT,
-} from './constants'
+    MULTI_CHANNEL_PIPETTE_WIDTH,
+    SINGLE_CHANNEL_PIPETTE_WIDTH,
+    SINGLE_CHANNEL_PIPETTE_HEIGHT,
+    MULTI_CHANNEL_PIPETTE_HEIGHT,
+    MULTI_CHANNEL_CENTER_Y_NOZZLE,
+    MULTI_CHANNEL_Y_OFFSET
+} from './constants';
 import { EmanatingNozzle } from './EmanatingNozzle'
 import { EightEmanatingNozzles } from './EightEmanatingNozzles'
 import styles from './styles.css'
@@ -29,9 +31,9 @@ export const PipetteRender = (props: PipetteRenderProps): JSX.Element => {
     channels === 1
       ? SINGLE_CHANNEL_PIPETTE_WIDTH / 2
       : MULTI_CHANNEL_PIPETTE_WIDTH / 2
-  const cy = channels === 1 ? SINGLE_CHANNEL_PIPETTE_HEIGHT / 2 : 14
+  const cy = channels === 1 ? SINGLE_CHANNEL_PIPETTE_HEIGHT / 2 : MULTI_CHANNEL_CENTER_Y_NOZZLE
   const x = labwareDef.wells.A1.x - cx
-  const y = channels === 1 ? labwareDef.wells.A1.y - cy : -2
+  const y = channels === 1 ? labwareDef.wells.A1.y - cy : MULTI_CHANNEL_Y_OFFSET
 
   return (
     <RobotCoordsForeignDiv
