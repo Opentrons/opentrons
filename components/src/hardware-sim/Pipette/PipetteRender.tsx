@@ -5,7 +5,7 @@ import {
   LabwareDefinition2,
   PipetteName,
 } from '@opentrons/shared-data'
-import { C_MED_GRAY } from '../../styles'
+import { C_MED_DARK_GRAY, C_MED_GRAY } from '../../styles'
 import { RobotCoordsForeignDiv } from '../Deck/RobotCoordsForeignDiv'
 import {
   MULTI_CHANNEL_PIPETTE_WIDTH,
@@ -54,11 +54,16 @@ export const PipetteRender = (props: PipetteRenderProps): JSX.Element => {
       y={y}
       className={classNames(styles.overflow)}
       innerDivProps={{
-        borderRadius: '6px',
-        backgroundColor: `${C_MED_GRAY}80`,
-        width: '100%',
-        height: '100%',
-        overflow: 'visible',
+        style: {
+          width: '100%',
+          height: '100%',
+          overflow: 'visible',
+          boxSizing: 'border-box',
+          borderRadius: '4px',
+          margin: 0,
+          boxShadow: `inset 0 0 0 1px ${C_MED_DARK_GRAY}`,
+          backgroundColor: `${C_MED_GRAY}80`,
+        },
       }}
     >
       <svg overflow="visible">
