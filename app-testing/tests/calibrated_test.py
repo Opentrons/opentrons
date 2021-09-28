@@ -2,10 +2,8 @@
 import logging
 import os
 from pathlib import Path
-import platform
 import time
 from typing import Dict
-import pytest
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
@@ -22,7 +20,6 @@ from src.driver.drag_drop import drag_and_drop_file
 logger = logging.getLogger(__name__)
 
 
-@pytest.mark.skipif(platform.system() == "Linux", reason="Not developed yet.")
 def test_calibrate(
     chrome_options: Options,
     test_protocols: Dict[str, Path],
