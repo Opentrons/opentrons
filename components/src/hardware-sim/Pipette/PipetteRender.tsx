@@ -5,87 +5,21 @@ import {
   LabwareDefinition2,
   PipetteName,
 } from '@opentrons/shared-data'
-import { C_MED_GRAY, C_SELECTED_DARK } from '../../styles'
+import { C_MED_GRAY } from '../../styles'
 import { RobotCoordsForeignDiv } from '../Deck/RobotCoordsForeignDiv'
+import {
+  MULTI_CHANNEL_PIPETTE_WIDTH,
+  SINGLE_CHANNEL_PIPETTE_WIDTH,
+  SINGLE_CHANNEL_PIPETTE_HEIGHT,
+  MULTI_CHANNEL_PIPETTE_HEIGHT,
+} from './constants'
+import { EmanatingNozzle } from './EmanatingNozzle'
+import { EightEmanatingNozzles } from './EightEmanatingNozzles'
 import styles from './styles.css'
-
-const SINGLE_CHANNEL_PIPETTE_WIDTH = 18
-const SINGLE_CHANNEL_PIPETTE_HEIGHT = 30
-
-const MULTI_CHANNEL_PIPETTE_WIDTH = 18
-const MULTI_CHANNEL_PIPETTE_HEIGHT = 90
 
 interface PipetteRenderProps {
   labwareDef: LabwareDefinition2
   pipetteName: PipetteName
-}
-
-const Circles = (props: { cx: number; cy: number }): JSX.Element => {
-  const { cx, cy } = props
-  return (
-    <React.Fragment>
-      <circle
-        cx={cx}
-        cy={cy}
-        r={1.5}
-        stroke={C_SELECTED_DARK}
-        fill={C_SELECTED_DARK}
-      ></circle>
-      <circle
-        cx={cx}
-        cy={cy}
-        r={3}
-        stroke={C_SELECTED_DARK}
-        strokeWidth={'2px'}
-        fill={'transparent'}
-      >
-        <animate
-          attributeName="r"
-          from={3}
-          to={
-            Math.max(
-              SINGLE_CHANNEL_PIPETTE_WIDTH,
-              SINGLE_CHANNEL_PIPETTE_HEIGHT
-            ) / 2
-          }
-          begin={0}
-          dur={3}
-          calcMode="linear"
-          repeatCount="indefinite"
-        />
-        <animate
-          attributeName="opacity"
-          from={1}
-          to={0}
-          begin={0}
-          dur={3}
-          calcMode="linear"
-          repeatCount="indefinite"
-        />
-      </circle>
-    </React.Fragment>
-  )
-}
-
-const MultiChannelCircles = (props: {
-  cx: number
-  cy: number
-}): JSX.Element => {
-  const { cx, cy } = props
-  const MULTI_CHANNEL_NOZZLE_SPACING = 9
-  return (
-    <React.Fragment>
-      {[...Array(8)].map((_, i: number) => {
-        return (
-          <Circles
-            cx={cx}
-            cy={cy + i * MULTI_CHANNEL_NOZZLE_SPACING}
-            key={`Circle_${i}`}
-          />
-        )
-      })}
-    </React.Fragment>
-  )
 }
 
 export const PipetteRender = (props: PipetteRenderProps): JSX.Element => {
@@ -119,13 +53,14 @@ export const PipetteRender = (props: PipetteRenderProps): JSX.Element => {
         backgroundColor: `${C_MED_GRAY}80`,
         width: '100%',
         height: '100%',
+        overflow: 'visible',
       }}
     >
       <svg overflow="visible">
         {channels === 1 ? (
-          <Circles cx={cx} cy={cy} />
+          <EmanatingNozzle cx={cx} cy={cy} />
         ) : (
-          <MultiChannelCircles cx={cx} cy={cy} />
+          <EightEmanatingNozzles cx={cx} initialCy={cy} />
         )}
       </svg>
     </RobotCoordsForeignDiv>

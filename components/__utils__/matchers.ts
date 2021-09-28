@@ -11,3 +11,5 @@ export const partialComponentPropsMatcher = (argsToMatch: unknown) =>
   when.allArgs((args, equals) =>
     equals(args[0], expect.objectContaining(argsToMatch))
   )
+
+export const anyProps = partialComponentPropsMatcher({})
