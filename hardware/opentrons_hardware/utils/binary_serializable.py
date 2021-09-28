@@ -56,6 +56,10 @@ class BinaryFieldBase(Generic[T]):
         """Comparison."""
         return isinstance(other, BinaryFieldBase) and other.value == self.value
 
+    def __repr__(self) -> str:
+        """Representation string."""
+        return f"{self.__class__.__name__}(value={repr(self.value)})"
+
 
 class UInt32Field(BinaryFieldBase[int]):
     """Unsigned 32 bit integer field."""
@@ -147,7 +151,7 @@ class BinarySerializable:
                 )
             except AttributeError:
                 raise InvalidFieldException(
-                    f"All fields must be of type {BinaryFieldBase.__class__}"
+                    f"All fields must be of type {BinaryFieldBase}"
                 )
 
             # Cache it on the cls.
