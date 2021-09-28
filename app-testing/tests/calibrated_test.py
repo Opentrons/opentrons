@@ -3,6 +3,7 @@ import logging
 import os
 from pathlib import Path
 import time
+from pytest import FixtureRequest
 from typing import Dict
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -21,8 +22,7 @@ logger = logging.getLogger(__name__)
 
 
 def test_calibrate(
-    chrome_options: Options,
-    test_protocols: Dict[str, Path],
+    chrome_options: Options, test_protocols: Dict[str, Path], request: FixtureRequest
 ) -> None:
     """Upload a protocol."""
     robot = OtRobot()
@@ -53,6 +53,9 @@ def test_calibrate(
         if exit_button:
             exit_button.click()
             calibrate.exit_confirm_button().click()
+        driver.save_screenshot(
+            f"results/{request.node.originalname}.{int(time.time())}.png"
+        )
         robot_page.start_calibration()
         calibrate.calibrate_deck()
         assert robot_page.wait_for_deck_to_show_calibrated()
@@ -67,3 +70,6 @@ def test_calibrate(
         overview.click_continue_if_present()
         # This element location will fail if the file is not loaded.
         overview.get_filename_header(test_protocols["python1"].name)
+        driver.save_screenshot(
+            f"results/{request.node.originalname}.{int(time.time())}.png"
+        )
