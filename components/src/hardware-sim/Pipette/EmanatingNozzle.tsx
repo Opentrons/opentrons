@@ -10,7 +10,6 @@ export const EmanatingNozzle = (props: {
   cy: number
 }): JSX.Element => {
   const { cx, cy } = props
-  console.log('should not be in here')
   return (
     <React.Fragment>
       <circle
