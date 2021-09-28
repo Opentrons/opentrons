@@ -613,6 +613,7 @@ class API(HardwareAPILike):
         self._log.warning("Pause with message: {}".format(message))
         for cb in self._callbacks:
             cb(message)
+        self._log.info("****** Done going through callbacks ******")
         self.pause(PauseType.PAUSE)
 
     def resume(self, pause_type: PauseType):
