@@ -60,7 +60,6 @@ export const PipetteRender = (props: PipetteRenderProps): JSX.Element => {
           overflow: 'visible',
           boxSizing: 'border-box',
           borderRadius: '4px',
-          margin: 0,
           boxShadow: `inset 0 0 0 1px ${C_MED_DARK_GRAY}`,
           backgroundColor: `${C_MED_GRAY}80`,
         },
