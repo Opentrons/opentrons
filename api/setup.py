@@ -58,7 +58,11 @@ INSTALL_REQUIRES = [
     "aionotify==0.2.0",
     "anyio==3.3.0",
     "jsonschema==3.0.2",
-    "numpy==1.15.1",
+    # TODO(mc, 2021-09-28): this spec does not match the Pipfile, and is
+    # intentionally loose to avoid installation problems for end-users.
+    # This discrepency should be resolved:
+    # https://github.com/Opentrons/opentrons/issues/8416
+    "numpy>=1.15.1,<2",
     "pydantic==1.4",
     "pyserial==3.5",
     "systemd-python==234; sys_platform=='linux'",
