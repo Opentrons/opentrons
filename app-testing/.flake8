@@ -19,3 +19,6 @@ extend-ignore =
 docstring-convention = google
 
 noqa-require-code = true
+
+per-file-ignores =
+    src/driver/drag_drop.py:E501

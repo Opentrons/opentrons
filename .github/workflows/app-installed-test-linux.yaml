@@ -34,9 +34,6 @@ jobs:
           chromedriver --version
       - name: Run docker robot
         run: docker-compose up -d
-      - name: Install pyautogui dependencies.
-        run: |
-          sudo apt-get install -y python3-tk python3-dev scrot xauth
       - name: Install python dependencies.
         working-directory: ./app-testing
         run: |

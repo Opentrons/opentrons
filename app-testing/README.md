@@ -7,9 +7,7 @@ Slices of the tests will be selected as candidates for automation and then perfo
 ## Notes
 
 - This folder is not plugged into the global Make ecosystem of the Opentrons mono repository. This is intentional, the tools in this folder are independent and will likely be used by only a few and are in no way a dependency of any other part of this repository.
-- Because this is not a released module it is easier to use the `pipenv update` feature and only lock dependencies when required. Periodically put in a PR after running `pipenv update`
-- Currently [Github Action on Windows](../.github/workflows/app-installed-test-windows.yaml) does not work. When I install the app silently I can't find where the .exe is placed. I am also not sure that the spin up of the robot emulation is running on the Windows VM.
-- Tests may be run against mac and linux in github runner. Linux is by far the fastest and can use docker-compose to run the robot emulator.
+- Tests may be run against the linux github runner. Linux is by far the fastest and can use docker-compose to run the robot emulator.
 
 ## Steps
 
@@ -45,8 +43,8 @@ Slices of the tests will be selected as candidates for automation and then perfo
 - Once there is a mass of tests to see the patterns to abstract:
   - Abstract env variables and config file setup into data structures and functions instead of inline?
   - Extend or change the reporting output?
-- Caching in mac and linux github action runners?
-- Fix windows github action runner?
+- Mac and Windows github action runners?
+- Caching in github action runners?
 - Add the option/capability to 'build and install' instead of 'download and install' on runners.
 - Define steps for a VM/docker locally for linux runs?
 - Define steps for a VM locally for windows runs?

@@ -26,4 +26,4 @@ setup:
 
 .PHONY: teardown
 teardown:
-	pipenv -rm
+	pipenv --rm

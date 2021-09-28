@@ -17,6 +17,11 @@ class ProtocolFile:
         "//label[contains(normalize-space(@class), 'upload-panel__upload_button')]",
     )
 
+    drag_and_drop: Tuple[str, str] = (
+        By.XPATH,
+        "(//input[contains(normalize-space(@class), 'upload-panel__file_input')])[2]",
+    )
+
     def __init__(self, driver: WebDriver) -> None:
         """Initialize with driver."""
         self.driver: WebDriver = driver
@@ -28,3 +33,11 @@ class ProtocolFile:
             EC.visibility_of_element_located(ProtocolFile.open)
         )
         return button
+
+    @highlight
+    def get_drag_and_drop(self) -> WebElement:
+        """Retrieve the Webelement input for drag and drop."""
+        input: WebElement = WebDriverWait(self.driver, 5).until(
+            EC.visibility_of_element_located(ProtocolFile.drag_and_drop)
+        )
+        return input

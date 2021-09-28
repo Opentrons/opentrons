@@ -17,8 +17,6 @@ importlib-metadata = "~=4.8.1"
 requests = "~=2.26.0"
 python-dotenv = "~=0.19.0"
 pytest-xdist = "~=2.3.0"
-pyautogui = "~=0.9.53"
-pyobjc = {version = "*", markers="sys_platform == 'darwin'"}
 python-xlib = "~=0.31"
 mypy = "~=0.910"
 types-requests = "~=2.25.6"

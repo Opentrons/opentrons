@@ -17,7 +17,7 @@ from src.pages.deck_calibrate import DeckCalibration
 from src.resources.ot_robot import OtRobot
 from src.resources.ot_application import OtApplication
 from src.pages.overview import Overview
-from src.resources.system_file_dialog import input_file_source
+from src.driver.drag_drop import drag_and_drop_file
 
 logger = logging.getLogger(__name__)
 
@@ -62,11 +62,11 @@ def test_calibrate(
         left_menu = LeftMenu(driver)
         left_menu.click_protocol_upload_button()
         protocol_file = ProtocolFile(driver)
-        protocol_file.get_open_button().click()
-        time.sleep(1)
         logger.info(f"uploading protocol: {test_protocols['python1'].resolve()}")
-        input_file_source(test_protocols["python1"])
-        time.sleep(1)
+        input = protocol_file.get_drag_and_drop()
+        drag_and_drop_file(input, test_protocols["python1"])
+        time.sleep(2)
         overview = Overview(driver)
         overview.click_continue_if_present()
+        # This element location will fail if the file is not loaded.
         overview.get_filename_header(test_protocols["python1"].name)
