@@ -10,9 +10,11 @@ from opentrons.protocol_engine.types import PipetteName
 from opentrons.protocol_engine.commands import CommandMapper
 from opentrons.protocol_engine.execution import QueueWorker
 from opentrons.protocol_engine.resources import ModelUtils
+from opentrons.protocol_engine.state import StateStore
+from opentrons.protocol_engine.plugins import AbstractPlugin
 
-from opentrons.protocol_engine.state import (
-    StateStore,
+from opentrons.protocol_engine.actions import (
+    ActionDispatcher,
     PlayAction,
     PauseAction,
     StopAction,
@@ -24,6 +26,12 @@ from opentrons.protocol_engine.state import (
 def state_store(decoy: Decoy) -> StateStore:
     """Get a mock StateStore."""
     return decoy.mock(cls=StateStore)
+
+
+@pytest.fixture
+def action_dispatcher(decoy: Decoy) -> ActionDispatcher:
+    """Get a mock ActionDispatcher."""
+    return decoy.mock(cls=ActionDispatcher)
 
 
 @pytest.fixture
@@ -53,6 +61,7 @@ def hardware_api(decoy: Decoy) -> HardwareAPI:
 @pytest.fixture
 def subject(
     state_store: StateStore,
+    action_dispatcher: ActionDispatcher,
     command_mapper: CommandMapper,
     model_utils: ModelUtils,
     queue_worker: QueueWorker,
@@ -62,6 +71,7 @@ def subject(
     return ProtocolEngine(
         hardware_api=hardware_api,
         state_store=state_store,
+        action_dispatcher=action_dispatcher,
         queue_worker=queue_worker,
         command_mapper=command_mapper,
         model_utils=model_utils,
@@ -70,7 +80,7 @@ def subject(
 
 def test_add_command(
     decoy: Decoy,
-    state_store: StateStore,
+    action_dispatcher: ActionDispatcher,
     command_mapper: CommandMapper,
     model_utils: ModelUtils,
     queue_worker: QueueWorker,
@@ -107,13 +117,14 @@ def test_add_command(
 
     assert result == queued_command
     decoy.verify(
-        state_store.handle_action(UpdateCommandAction(command=queued_command)),
+        action_dispatcher.dispatch(UpdateCommandAction(command=queued_command)),
     )
 
 
 async def test_execute_command(
     decoy: Decoy,
     state_store: StateStore,
+    action_dispatcher: ActionDispatcher,
     command_mapper: CommandMapper,
     model_utils: ModelUtils,
     queue_worker: QueueWorker,
@@ -166,7 +177,7 @@ async def test_execute_command(
     assert result == executed_command
 
     decoy.verify(
-        state_store.handle_action(UpdateCommandAction(command=queued_command)),
+        action_dispatcher.dispatch(UpdateCommandAction(command=queued_command)),
         await state_store.wait_for(
             condition=state_store.commands.get_is_complete,
             command_id="command-id",
@@ -177,6 +188,7 @@ async def test_execute_command(
 def test_play(
     decoy: Decoy,
     state_store: StateStore,
+    action_dispatcher: ActionDispatcher,
     subject: ProtocolEngine,
 ) -> None:
     """It should be able to start executing queued commands."""
@@ -184,13 +196,14 @@ def test_play(
 
     decoy.verify(
         state_store.commands.validate_action_allowed(PlayAction()),
-        state_store.handle_action(PlayAction()),
+        action_dispatcher.dispatch(PlayAction()),
     )
 
 
 def test_pause(
     decoy: Decoy,
     state_store: StateStore,
+    action_dispatcher: ActionDispatcher,
     subject: ProtocolEngine,
 ) -> None:
     """It should be able to pause executing queued commands."""
@@ -198,13 +211,13 @@ def test_pause(
 
     decoy.verify(
         state_store.commands.validate_action_allowed(PauseAction()),
-        state_store.handle_action(PauseAction()),
+        action_dispatcher.dispatch(PauseAction()),
     )
 
 
 async def test_stop(
     decoy: Decoy,
-    state_store: StateStore,
+    action_dispatcher: ActionDispatcher,
     queue_worker: QueueWorker,
     hardware_api: HardwareAPI,
     subject: ProtocolEngine,
@@ -213,7 +226,7 @@ async def test_stop(
     await subject.stop()
 
     decoy.verify(
-        state_store.handle_action(StopAction()),
+        action_dispatcher.dispatch(StopAction()),
         await queue_worker.join(),
         await hardware_api.stop(home_after=False),
     )
@@ -221,7 +234,6 @@ async def test_stop(
 
 async def test_stop_stops_hardware_if_queue_worker_join_fails(
     decoy: Decoy,
-    state_store: StateStore,
     queue_worker: QueueWorker,
     hardware_api: HardwareAPI,
     subject: ProtocolEngine,
@@ -243,6 +255,7 @@ async def test_stop_stops_hardware_if_queue_worker_join_fails(
 async def test_stop_after_wait(
     decoy: Decoy,
     state_store: StateStore,
+    action_dispatcher: ActionDispatcher,
     queue_worker: QueueWorker,
     hardware_api: HardwareAPI,
     subject: ProtocolEngine,
@@ -252,7 +265,7 @@ async def test_stop_after_wait(
 
     decoy.verify(
         await state_store.wait_for(condition=state_store.commands.get_all_complete),
-        state_store.handle_action(StopAction()),
+        action_dispatcher.dispatch(StopAction()),
         await queue_worker.join(),
         await hardware_api.stop(home_after=False),
     )
@@ -260,7 +273,7 @@ async def test_stop_after_wait(
 
 async def test_halt(
     decoy: Decoy,
-    state_store: StateStore,
+    action_dispatcher: ActionDispatcher,
     queue_worker: QueueWorker,
     hardware_api: HardwareAPI,
     subject: ProtocolEngine,
@@ -269,7 +282,24 @@ async def test_halt(
     await subject.halt()
 
     decoy.verify(
-        state_store.handle_action(StopAction()),
+        action_dispatcher.dispatch(StopAction()),
         queue_worker.cancel(),
         await hardware_api.halt(),
+    )
+
+
+def test_add_plugin(
+    decoy: Decoy,
+    state_store: StateStore,
+    action_dispatcher: ActionDispatcher,
+    subject: ProtocolEngine,
+) -> None:
+    """It should configure and add a plugin to the ActionDispatcher pipeline."""
+    plugin = decoy.mock(cls=AbstractPlugin)
+
+    subject.add_plugin(plugin)
+
+    decoy.verify(
+        plugin._configure(state=state_store, action_dispatcher=action_dispatcher),
+        action_dispatcher.add_handler(plugin),
     )

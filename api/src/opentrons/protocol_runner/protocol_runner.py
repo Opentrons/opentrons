@@ -2,6 +2,7 @@
 from dataclasses import dataclass
 from typing import List, Optional
 
+from opentrons.hardware_control import API as HardwareAPI
 from opentrons.protocol_engine import (
     ProtocolEngine,
     Command,
@@ -9,13 +10,22 @@ from opentrons.protocol_engine import (
     LoadedPipette,
 )
 
-from .protocol_file import ProtocolFile, ProtocolFileType
+from .protocol_source import ProtocolSource
+from .pre_analysis import JsonPreAnalysis, PythonPreAnalysis
 from .task_queue import TaskQueue, TaskQueuePhase
 from .json_file_reader import JsonFileReader
 from .json_command_translator import JsonCommandTranslator
 from .python_file_reader import PythonFileReader
 from .python_context_creator import PythonContextCreator
 from .python_executor import PythonExecutor
+from .legacy_context_plugin import LegacyContextPlugin
+from .legacy_wrappers import (
+    LEGACY_PYTHON_API_VERSION_CUTOFF,
+    LEGACY_JSON_SCHEMA_VERSION_CUTOFF,
+    LegacyFileReader,
+    LegacyContextCreator,
+    LegacyExecutor,
+)
 
 
 @dataclass(frozen=True)
@@ -42,15 +52,20 @@ class ProtocolRunner:
     def __init__(
         self,
         protocol_engine: ProtocolEngine,
+        hardware_api: HardwareAPI,
         task_queue: Optional[TaskQueue] = None,
         json_file_reader: Optional[JsonFileReader] = None,
         json_command_translator: Optional[JsonCommandTranslator] = None,
         python_file_reader: Optional[PythonFileReader] = None,
         python_context_creator: Optional[PythonContextCreator] = None,
         python_executor: Optional[PythonExecutor] = None,
+        legacy_file_reader: Optional[LegacyFileReader] = None,
+        legacy_context_creator: Optional[LegacyContextCreator] = None,
+        legacy_executor: Optional[LegacyExecutor] = None,
     ) -> None:
         """Initialize the ProtocolRunner with its dependencies."""
         self._protocol_engine = protocol_engine
+        self._hardware_api = hardware_api
         self._task_queue = task_queue or TaskQueue()
         self._json_file_reader = json_file_reader or JsonFileReader()
         self._json_command_translator = (
@@ -59,20 +74,37 @@ class ProtocolRunner:
         self._python_file_reader = python_file_reader or PythonFileReader()
         self._python_context_creator = python_context_creator or PythonContextCreator()
         self._python_executor = python_executor or PythonExecutor()
+        self._legacy_file_reader = legacy_file_reader or LegacyFileReader()
+        self._legacy_context_creator = legacy_context_creator or LegacyContextCreator(
+            hardware_api=hardware_api
+        )
+        self._legacy_executor = legacy_executor or LegacyExecutor(
+            hardware_api=hardware_api
+        )
 
-    def load(self, protocol_file: ProtocolFile) -> None:
-        """Load a ProtocolFile into managed ProtocolEngine.
+    def load(self, protocol_source: ProtocolSource) -> None:
+        """Load a ProtocolSource into managed ProtocolEngine.
 
         Calling this method is only necessary if the runner will be used
         to control the run of a file-based protocol.
         """
-        protocol_type = protocol_file.protocol_type
+        pre_analysis = protocol_source.pre_analysis
 
-        if protocol_type == ProtocolFileType.JSON:
-            self._load_json(protocol_file)
+        if isinstance(pre_analysis, JsonPreAnalysis):
+            schema_version = pre_analysis.schema_version
 
-        elif protocol_type == ProtocolFileType.PYTHON:
-            self._load_python(protocol_file)
+            if schema_version >= LEGACY_JSON_SCHEMA_VERSION_CUTOFF:
+                self._load_json(protocol_source)
+            else:
+                self._load_legacy(protocol_source)
+
+        elif isinstance(pre_analysis, PythonPreAnalysis):
+            api_version = pre_analysis.api_version
+
+            if api_version >= LEGACY_PYTHON_API_VERSION_CUTOFF:
+                self._load_python(protocol_source)
+            else:
+                self._load_legacy(protocol_source)
 
     def play(self) -> None:
         """Start or resume the run."""
@@ -102,9 +134,9 @@ class ProtocolRunner:
         """
         return await self._task_queue.join()
 
-    async def run(self, protocol_file: ProtocolFile) -> ProtocolRunData:
+    async def run(self, protocol_source: ProtocolSource) -> ProtocolRunData:
         """Run a given protocol to completion."""
-        self.load(protocol_file)
+        self.load(protocol_source)
         self.play()
         await self.join()
 
@@ -114,18 +146,39 @@ class ProtocolRunner:
 
         return ProtocolRunData(commands=commands, labware=labware, pipettes=pipettes)
 
-    def _load_json(self, protocol_file: ProtocolFile) -> None:
-        protocol = self._json_file_reader.read(protocol_file)
+    def _load_json(self, protocol_source: ProtocolSource) -> None:
+        protocol = self._json_file_reader.read(protocol_source)
         commands = self._json_command_translator.translate(protocol)
         for request in commands:
             self._protocol_engine.add_command(request=request)
 
-    def _load_python(self, protocol_file: ProtocolFile) -> None:
-        protocol = self._python_file_reader.read(protocol_file)
+    def _load_python(self, protocol_source: ProtocolSource) -> None:
+        protocol = self._python_file_reader.read(protocol_source)
         context = self._python_context_creator.create(self._protocol_engine)
         self._task_queue.add(
             phase=TaskQueuePhase.RUN,
             func=self._python_executor.execute,
+            protocol=protocol,
+            context=context,
+        )
+
+    def _load_legacy(
+        self,
+        protocol_source: ProtocolSource,
+    ) -> None:
+        protocol = self._legacy_file_reader.read(protocol_source)
+        context = self._legacy_context_creator.create(protocol.api_level)
+
+        self._protocol_engine.add_plugin(
+            LegacyContextPlugin(
+                hardware_api=self._hardware_api,
+                protocol_context=context,
+            )
+        )
+
+        self._task_queue.add(
+            phase=TaskQueuePhase.RUN,
+            func=self._legacy_executor.execute,
             protocol=protocol,
             context=context,
         )

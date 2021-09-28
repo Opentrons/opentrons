@@ -80,7 +80,7 @@ class EngineStore:
         # set after the check but before the engine has finished getting created,
         # at the expense of having to potentially throw away an engine instance
         engine = await create_protocol_engine(hardware_api=self._hardware_api)
-        runner = ProtocolRunner(protocol_engine=engine)
+        runner = ProtocolRunner(protocol_engine=engine, hardware_api=self._hardware_api)
 
         if self._runner_engine_pair is not None:
             raise EngineConflictError("Cannot load multiple sessions simultaneously.")

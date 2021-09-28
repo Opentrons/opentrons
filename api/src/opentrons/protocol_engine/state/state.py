@@ -8,7 +8,7 @@ from typing import Any, Callable, List, Optional, Sequence, TypeVar
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV2
 
 from ..resources import DeckFixedLabware
-from .actions import Action
+from ..actions import Action, ActionHandler
 from .abstract_store import HasState, HandlesActions
 from .change_notifier import ChangeNotifier
 from .commands import CommandState, CommandStore, CommandView
@@ -66,7 +66,7 @@ class StateView(HasState[State]):
         return self._motion
 
 
-class StateStore(StateView, HandlesActions):
+class StateStore(StateView, ActionHandler):
     """ProtocolEngine state store.
 
     A StateStore manages several substores, which will modify themselves in

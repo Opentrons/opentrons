@@ -18,7 +18,7 @@ from .. import errors
 from ..resources import DeckFixedLabware
 from ..commands import Command, LoadLabwareResult, AddLabwareDefinitionResult
 from ..types import CalibrationOffset, LabwareLocation, LoadedLabware, Dimensions
-from .actions import Action, UpdateCommandAction
+from ..actions import Action, UpdateCommandAction
 from .abstract_store import HasState, HandlesActions
 
 

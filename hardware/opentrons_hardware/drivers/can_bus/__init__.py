@@ -4,12 +4,9 @@ from .driver import CanDriver
 from .message import CanMessage
 from .arbitration_id import (
     ArbitrationId,
-    NodeId,
-    FunctionCode,
-    MessageId,
     ArbitrationIdParts,
 )
-
+from .constants import NodeId, FunctionCode, MessageId
 
 __all__ = [
     "CanMessage",

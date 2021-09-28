@@ -2,7 +2,7 @@
 from abc import ABC, abstractmethod
 from typing import Generic, TypeVar
 
-from .actions import Action
+from ..actions import Action
 
 StateT = TypeVar("StateT")
 

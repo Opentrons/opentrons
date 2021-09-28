@@ -1,12 +1,19 @@
 """Protocol file models."""
 from __future__ import annotations
+from enum import Enum
 from datetime import datetime
 from pydantic import BaseModel, Extra, Field
 from typing import Sequence
 
-from opentrons.protocol_runner import ProtocolFileType
 from robot_server.service.json_api import ResourceModel
 from .analysis_models import ProtocolAnalysis
+
+
+class ProtocolType(str, Enum):
+    """Type of protocol, JSON or Python."""
+
+    JSON = "json"
+    PYTHON = "python"
 
 
 class Metadata(BaseModel):
@@ -50,7 +57,7 @@ class Protocol(ResourceModel):
         ),
     )
 
-    protocolType: ProtocolFileType = Field(
+    protocolType: ProtocolType = Field(
         ...,
         description="The type of protocol file (JSON or Python).",
     )

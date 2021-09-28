@@ -6,7 +6,8 @@ from pathlib import Path
 from fastapi import UploadFile
 from typing import Iterator, List
 
-from opentrons.protocol_runner import ProtocolFileType
+from opentrons.protocols.api_support.types import APIVersion
+
 from opentrons.protocol_runner.pre_analysis import (
     JsonPreAnalysis,
     PythonPreAnalysis,
@@ -77,7 +78,6 @@ async def test_create_and_get_json_protocol(
 
     assert creation_result == ProtocolResource(
         protocol_id="protocol-id",
-        protocol_type=ProtocolFileType.JSON,
         pre_analysis=pre_analysis,
         created_at=created_at,
         files=matchers.Anything(),
@@ -97,7 +97,8 @@ async def test_create_and_get_python_protocol(
     """It should save a single protocol to disk."""
     created_at = datetime.now()
     pre_analysis = PythonPreAnalysis(
-        api_level="9001.0", metadata={"this_is_fake_metadata": True}
+        api_version=APIVersion(9001, 0),
+        metadata={"this_is_fake_metadata": True},
     )
 
     creation_result = await subject.create(
@@ -109,7 +110,6 @@ async def test_create_and_get_python_protocol(
 
     assert creation_result == ProtocolResource(
         protocol_id="protocol-id",
-        protocol_type=ProtocolFileType.PYTHON,
         pre_analysis=pre_analysis,
         created_at=created_at,
         files=matchers.Anything(),
@@ -161,7 +161,8 @@ async def test_get_all_protocols(
         created_at=created_at_1,
         files=upload_files,
         pre_analysis=JsonPreAnalysis(
-            schema_version=123, metadata={"protocol1Metadata": "hello"}
+            schema_version=123,
+            metadata={"protocol1Metadata": "hello"},
         ),
     )
 
@@ -175,7 +176,8 @@ async def test_get_all_protocols(
         created_at=created_at_2,
         files=upload_files,
         pre_analysis=JsonPreAnalysis(
-            schema_version=123, metadata={"protocol2Metadata": "hello"}
+            schema_version=123,
+            metadata={"protocol2Metadata": "hello"},
         ),
     )
 
@@ -184,20 +186,20 @@ async def test_get_all_protocols(
     assert result == [
         ProtocolResource(
             protocol_id="protocol-id-1",
-            protocol_type=ProtocolFileType.JSON,
             created_at=created_at_1,
             files=matchers.Anything(),
             pre_analysis=JsonPreAnalysis(
-                schema_version=123, metadata={"protocol1Metadata": "hello"}
+                schema_version=123,
+                metadata={"protocol1Metadata": "hello"},
             ),
         ),
         ProtocolResource(
             protocol_id="protocol-id-2",
-            protocol_type=ProtocolFileType.JSON,
             created_at=created_at_2,
             files=matchers.Anything(),
             pre_analysis=JsonPreAnalysis(
-                schema_version=123, metadata={"protocol2Metadata": "hello"}
+                schema_version=123,
+                metadata={"protocol2Metadata": "hello"},
             ),
         ),
     ]

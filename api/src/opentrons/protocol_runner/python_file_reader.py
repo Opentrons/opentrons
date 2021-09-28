@@ -3,7 +3,7 @@ import importlib.util
 from types import ModuleType
 
 from opentrons.protocol_api_experimental import ProtocolContext
-from .protocol_file import ProtocolFile
+from .protocol_source import ProtocolSource
 
 
 class PythonProtocol:
@@ -25,13 +25,14 @@ class PythonFileReader:
     """
 
     @staticmethod
-    def read(protocol_file: ProtocolFile) -> PythonProtocol:
+    def read(protocol_source: ProtocolSource) -> PythonProtocol:
         """Read a Python protocol as a `import`ed Python module."""
         # TODO(mc, 2021-06-30): better module name logic
-        # TODO(mc, 2021-08-25): validate files list length before access
+        # TODO(mc, 2021-09-17): access the "main file" in a more
+        # explicit way than the first entry in the files list
         spec = importlib.util.spec_from_file_location(
             name="protocol",
-            location=protocol_file.files[0],
+            location=protocol_source.files[0],
         )
 
         # TODO(mc, 2021-09-12): figure out why this would happen and raise

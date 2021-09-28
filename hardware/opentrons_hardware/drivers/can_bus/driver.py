@@ -5,7 +5,7 @@ import asyncio
 import platform
 from typing import Optional
 
-from can import Notifier, Bus, AsyncBufferedReader, Message
+from can import Notifier, Bus, AsyncBufferedReader, Message, util
 
 from .arbitration_id import ArbitrationId
 from .message import CanMessage
@@ -27,6 +27,10 @@ if platform.system() == "Darwin":
 class CanDriver:
     """The can driver."""
 
+    DEFAULT_CAN_NETWORK = "vcan0"
+    DEFAULT_CAN_INTERFACE = "socketcan"
+    DEFAULT_CAN_BITRATE = 0
+
     def __init__(self, bus: Bus, loop: asyncio.AbstractEventLoop) -> None:
         """Constructor.
 
@@ -41,7 +45,10 @@ class CanDriver:
 
     @classmethod
     async def build(
-        cls, bitrate: int, interface: str, channel: Optional[str] = None
+        cls,
+        interface: str,
+        channel: Optional[str] = None,
+        bitrate: Optional[int] = None,
     ) -> CanDriver:
         """Build a CanDriver.
 
@@ -55,9 +62,24 @@ class CanDriver:
             A CanDriver instance.
         """
         return CanDriver(
-            bus=Bus(channel=channel, bitrate=bitrate, interface=interface),
+            bus=Bus(channel=channel, bitrate=bitrate, interface=interface, fd=True),
             loop=asyncio.get_event_loop(),
         )
+
+    @classmethod
+    async def from_env(cls) -> CanDriver:
+        """Build a CanDriver from env variables."""
+        can_channel: str = util.load_environment_config().get(
+            "channel", cls.DEFAULT_CAN_NETWORK
+        )
+        can_interface: str = util.load_environment_config().get(
+            "interface", cls.DEFAULT_CAN_INTERFACE
+        )
+        can_bitrate: int = util.load_environment_config().get(
+            "bitrate", cls.DEFAULT_CAN_BITRATE
+        )
+
+        return await CanDriver.build(can_interface, can_channel, can_bitrate)
 
     def shutdown(self) -> None:
         """Stop the driver."""

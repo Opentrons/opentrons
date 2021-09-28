@@ -3,7 +3,7 @@
 This server provides the main control interface for an Opentrons robot.
 """
 
-from .app import app
+from .app_setup import app
 
 __all__ = [
     "app",

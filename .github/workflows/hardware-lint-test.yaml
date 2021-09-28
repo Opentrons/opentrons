@@ -30,24 +30,47 @@ jobs:
   lint-test:
     name: 'hardware package linting and tests'
     timeout-minutes: 20
-    runs-on: 'ubuntu-18.04'
+    runs-on: 'ubuntu-20.04'
     steps:
-      - uses: 'actions/checkout@v2'
-      - uses: 'actions/setup-node@v1'
+      - name: Setup SocketCan
+        run: |
+          sudo apt-get update
+          sudo apt-get install linux-modules-extra-$(uname -r)
+          sudo modprobe vcan
+
+      - name: Checkout firmware repo
+        uses: actions/checkout@v2
+
+        # Don't specify ot3-firmware-commit-id input var to get it to pull main from ot3-firmware
+      - name: Run OT-3 Emulator
+        uses: Opentrons/ot3-emulator@v1.1
+
+      - name: Checkout opentrons repo
+        uses: 'actions/checkout@v2'
+
+      - name: Setup Node
+        uses: 'actions/setup-node@v1'
         with:
           node-version: '12'
-      - uses: 'actions/setup-python@v2'
+
+      - name: Setup Python
+        uses: 'actions/setup-python@v2'
         with:
           python-version: '3.7'
 
-      - uses: './.github/actions/python/setup'
+      - name: Setup Hardware Project
+        uses: './.github/actions/python/setup'
         with:
           project: 'hardware'
+
       - name: Lint
         run: make -C hardware lint
+
       - name: Test
         run: make -C hardware test
-      - uses: 'codecov/codecov-action@v2'
+
+      - name: Code Coverage
+        uses: 'codecov/codecov-action@v2'
         with:
           files: ./hardware/coverage.xml
           flags: hardware 
