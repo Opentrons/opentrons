@@ -80,7 +80,7 @@ export const LabwarePositionCheck = (
       <ModalPage
         contentsClassName={styles.modal_contents}
         titleBar={{
-          title: t('labware_position_check'),
+          title: t('labware_position_check_title'),
           back: {
             onClick: props.onCloseClick,
             title: t('shared:exit'),

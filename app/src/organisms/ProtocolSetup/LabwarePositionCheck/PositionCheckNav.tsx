@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import capitalize from 'lodash/capitalize'
 
 import {
   Flex,
@@ -25,7 +26,7 @@ interface Props {
 
 export function PositionCheckNav(props: Props): JSX.Element {
   const { sections, primaryPipetteMount, secondaryPipetteMount } = props
-  const { t } = useTranslation(['protocol_setup', 'shared'])
+  const { t } = useTranslation('protocol_setup')
   return (
     <Box
       fontSize={FONT_SIZE_CAPTION}
@@ -52,14 +53,8 @@ export function PositionCheckNav(props: Props): JSX.Element {
           </Box>
           <Box maxWidth="85%">
             {t(`${section.toLowerCase()}_section`, {
-              primary_mount: `${
-                primaryPipetteMount.charAt(0).toUpperCase() +
-                primaryPipetteMount.slice(1)
-              }`,
-              secondary_mount: `${
-                secondaryPipetteMount.charAt(0).toUpperCase() +
-                secondaryPipetteMount.slice(1)
-              }`,
+              primary_mount: capitalize(primaryPipetteMount),
+              secondary_mount: capitalize(secondaryPipetteMount),
             })}
           </Box>
         </Flex>
