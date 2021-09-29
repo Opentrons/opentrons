@@ -110,3 +110,11 @@ class TemperatureStatus(str, Enum):
     HEATING = "heating"
     IDLE = "idle"
     ERROR = "error"
+
+
+class SpeedStatus(str, Enum):
+    HOLDING = "holding at target"
+    ACCELERATING = "speeding up"
+    DECELERATING = "slowing down"
+    IDLE = "idle"
+    ERROR = "error"

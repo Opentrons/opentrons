@@ -47,7 +47,7 @@ class SimulatingDriver(AbstractHeaterShakerDriver):
         return self._rpm
 
     async def home(self) -> None:
-        self._rpm.target = 0
+        self._rpm.target = None
         self._rpm.current = 0
         self._homing_status = True
 
