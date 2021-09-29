@@ -716,6 +716,124 @@
           },
 
           {
+            "description": "Heater Shaker Module Set Target Temperature: Module will begin moving to the target temperature. This command is non-blocking, it does not delay protocol execution while approaching the target temperature.",
+            "type": "object",
+            "required": ["id", "commandType", "params"],
+            "additionalProperties": false,
+            "properties": {
+              "id": {"type": "string"},
+              "commandType": { "enum": ["heaterShakerModule/setTargetTemperature"] },
+              "params": {
+                "required": ["module", "temperature"],
+                "additionalProperties": false,
+                "properties": {
+                  "module": { "type": "string" },
+                  "temperature": { "type": "number", "description": "target temperature to heat to in °C" }
+                }
+              }
+            }
+          },
+
+          {
+            "description": "Heater Shaker Module Set Target Shake Speed: Module will begin accelerating to the target shake speed. This command is non-blocking, it does not delay protocol execution while approaching the target shake speed.",
+            "type": "object",
+            "required": ["id", "commandType", "params"],
+            "additionalProperties": false,
+            "properties": {
+              "id": {"type": "string"},
+              "commandType": { "enum": ["heaterShakerModule/setTargetShakeSpeed"] },
+              "params": {
+                "required": ["module", "rpm"],
+                "additionalProperties": false,
+                "properties": {
+                  "module": { "type": "string" },
+                  "rpm": { "type": "number", "description": "target orbital rotations per minute" }
+                }
+              }
+            }
+          },
+
+          {
+            "description": "Heater Shaker Module Await Temperature: Delay protocol execution until the specified target temperature is reached.",
+            "type": "object",
+            "required": ["id", "commandType", "params"],
+            "additionalProperties": false,
+            "properties": {
+              "id": {"type": "string"},
+              "commandType": { "enum": ["heaterShakerModule/awaitTemperature"] },
+              "params": {
+                "required": ["module", "temperature"],
+                "additionalProperties": false,
+                "properties": {
+                  "module": { "type": "string" },
+                  "temperature": { "type": "number", "description": "temperature in °C to await" }
+                }
+              }
+            }
+          },
+
+          {
+            "description": "Heater Shaker Module Await Speed: Delay protocol execution until the specified target shake speed is reached.",
+            "type": "object",
+            "required": ["id", "commandType", "params"],
+            "additionalProperties": false,
+            "properties": {
+              "id": {"type": "string"},
+              "commandType": { "enum": ["heaterShakerModule/awaitShakeSpeed"] },
+              "params": {
+                "required": ["module", "rpm"],
+                "additionalProperties": false,
+                "properties": {
+                  "module": { "type": "string" },
+                  "rpm": { "type": "number", "description": "target rotations per minute to await" }
+                }
+              }
+            }
+          },
+
+          {
+            "description": "Heater Shaker Module Deactivate Heater: Module will stop actively heating and drift to ambient temperature.",
+            "type": "object",
+            "required": ["id", "commandType", "params"],
+            "additionalProperties": false,
+            "properties": {
+              "id": {"type": "string"},
+              "commandType": { "enum": ["heaterShakerModule/deactivateHeater"] },
+              "params": {
+                "$ref": "#/definitions/moduleOnlyParams"
+              }
+            }
+          },
+
+          {
+            "description": "Heater Shaker Module Deactivate Shaker: Module will deaccelerate until holding still",
+            "type": "object",
+            "required": ["id", "commandType", "params"],
+            "additionalProperties": false,
+            "properties": {
+              "id": {"type": "string"},
+              "commandType": { "enum": ["heaterShakerModule/deactivateShaker"] },
+              "params": {
+                "$ref": "#/definitions/moduleOnlyParams"
+              }
+            }
+          },
+
+          {
+            "description": "Heater Shaker Module Deactivate Shaker: Module will deaccelerate until holding still",
+            "type": "object",
+            "required": ["id", "commandType", "params"],
+            "additionalProperties": false,
+            "properties": {
+              "id": {"type": "string"},
+              "commandType": { "enum": ["heaterShakerModule/deactivateShaker"] },
+              "params": {
+                "$ref": "#/definitions/moduleOnlyParams"
+              }
+            }
+          },
+
+          {
             "description": "Move To Well: Move the pipette's critical point to the specified well in a labware, with an optional offset. The pipette's critical point is a reference point on the pipette. The critical point can be one of the following: (1) Single-channel pipette with no tip: end of nozzle. (2) Multi-channel pipette with no tip: end of backmost nozzle. (3) Single-channel pipette with a tip: end of tip. (4) Multi-channel pipette with tip: end of tip on backmost nozzle.",
             "type": "object",
             "required": ["id", "commandType", "params"],
