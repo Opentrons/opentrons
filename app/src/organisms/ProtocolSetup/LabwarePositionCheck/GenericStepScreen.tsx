@@ -1,3 +1,9 @@
 import * as React from 'react'
+import { LabwarePositionCheckStep } from './types'
 
-export const GenericStepScreen = (): JSX.Element | null => <div></div>
+interface GenericStepScreenProps {
+  selectedStep: LabwarePositionCheckStep
+}
+export const GenericStepScreen = (
+  props: GenericStepScreenProps
+): JSX.Element | null => <div></div>
