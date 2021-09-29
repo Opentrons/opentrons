@@ -3,6 +3,7 @@ import { LabwarePositionCheckStep } from './types'
 
 interface GenericStepScreenProps {
   selectedStep: LabwarePositionCheckStep
+  setCurrentLabwareCheckStep: (stepNumber: number) => void
 }
 export const GenericStepScreen = (
   props: GenericStepScreenProps

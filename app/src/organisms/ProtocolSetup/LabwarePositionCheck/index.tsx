@@ -2,10 +2,11 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { ModalPage } from '@opentrons/components'
 import { Portal } from '../../../App/portal'
-
-import styles from '../styles.css'
+import { useSteps } from './hooks'
 import { IntroScreen } from './IntroScreen'
 import { GenericStepScreen } from './GenericStepScreen'
+
+import styles from '../styles.css'
 
 interface LabwarePositionCheckModalProps {
   onCloseClick: () => unknown
@@ -15,10 +16,10 @@ export const LabwarePositionCheck = (
   props: LabwarePositionCheckModalProps
 ): JSX.Element | null => {
   const { t } = useTranslation(['labware_position_check', 'shared'])
-  const [
-    currentLabwareCheckStep,
-    setCurrentLabwareCheckStep,
-  ] = React.useState<Number | null>(null)
+  const steps = useSteps()
+  const [currentLabwareCheckStep, setCurrentLabwareCheckStep] = React.useState<
+    number | null
+  >(null)
   // placeholder for next steps
   console.log(currentLabwareCheckStep)
 
@@ -36,7 +37,10 @@ export const LabwarePositionCheck = (
         }}
       >
         {currentLabwareCheckStep !== null ? (
-          <GenericStepScreen selectedStep={{} as any} /> // replace this with actual selected step
+          <GenericStepScreen
+            setCurrentLabwareCheckStep={setCurrentLabwareCheckStep}
+            selectedStep={steps[currentLabwareCheckStep]}
+          />
         ) : (
           <IntroScreen
             setCurrentLabwareCheckStep={setCurrentLabwareCheckStep}
