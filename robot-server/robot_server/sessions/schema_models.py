@@ -9,7 +9,6 @@ of `ResponseModel`s rather than `ResponseModel`s of `Union`s.
 """
 from typing import Union
 
-from opentrons.protocol_engine import commands as pe_commands
 from robot_server.service.json_api import RequestModel, ResponseModel
 
 
