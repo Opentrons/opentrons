@@ -1,4 +1,7 @@
-export type TimingCommand = { commandType: 'delay'; params: DelayParams }
+export interface TimingCommand {
+  commandType: 'delay'
+  params: DelayParams
+}
 
 interface DelayParams {
   wait: number | true

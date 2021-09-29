@@ -1,11 +1,8 @@
 import last from 'lodash/last'
 import { getNextRobotStateAndWarningsSingleCommand } from '../getNextRobotStateAndWarnings'
 import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
-import type {
-  InvariantContext,
-  RobotState,
-  CommandsAndRobotState,
-} from '../types'
+import type { InvariantContext, CommandsAndRobotState } from '../types'
+import { makeInitialRobotState } from './misc'
 
 export const createTimelineFromCommands = (
   commands: Command[],
@@ -13,10 +10,12 @@ export const createTimelineFromCommands = (
 ): CommandsAndRobotState[] =>
   commands.reduce<CommandsAndRobotState[]>(
     (acc, command: Command) => {
+      const prevRobotStateAndCommands = last(acc)
+      if (prevRobotStateAndCommands == null) return acc // should never be reached
       const updates = getNextRobotStateAndWarningsSingleCommand(
         command,
         invariantContext,
-        last(acc).robotState
+        prevRobotStateAndCommands.robotState
       )
       return [
         ...acc,
@@ -28,13 +27,12 @@ export const createTimelineFromCommands = (
     },
     [
       {
-        robotState: {
-          pipettes: {},
-          labware: {},
-          modules: {},
-          tipState: { tipracks: {}, pipettes: {} },
-          liquidState: { pipettes: {}, labware: {} },
-        },
+        robotState: makeInitialRobotState({
+          invariantContext,
+          labwareLocations: {},
+          moduleLocations: {},
+          pipetteLocations: {},
+        }),
         commands: [],
       },
     ]

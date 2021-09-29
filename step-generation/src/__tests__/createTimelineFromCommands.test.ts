@@ -1,21 +1,13 @@
 import { createTimelineFromCommands } from '../utils/createTimelineFromCommands'
+import { makeInitialRobotState } from '../utils/misc'
 import {
   makeContext,
-  getInitialRobotStateStandard,
   DEFAULT_PIPETTE,
   SOURCE_LABWARE,
   TROUGH_LABWARE,
 } from '../fixtures'
 
-import { Command, InvariantContext, RobotState } from '../types'
-
-const getRobotInitialState = (): any => {
-  // This particular state shouldn't matter for delay
-  return {}
-}
-
-// neither should InvariantContext
-const invariantContext: any = {}
+import { Command, InvariantContext } from '../types'
 
 const commands: Command[] = [
   {
@@ -112,43 +104,16 @@ const commands: Command[] = [
       well: 'A1',
     },
   },
-  {
-    command: 'updateRobotState',
-    params: {
-      labware: {
-        tiprack1Id: { slot: '5' },
-        [SOURCE_LABWARE]: { slot: '6' },
-        [TROUGH_LABWARE]: { slot: 'magneticModuleId' },
-      },
-      modules: { temperatureModuleId: { slot: null } },
-      tipState: {
-        tipracks: { tiprack1Id: { A1: true, A2: false } },
-        pipettes: { pipetteId: true },
-      },
-    },
-  },
 ]
 
 describe('createTimelineFromCommnds', () => {
   let invariantContext: InvariantContext
-  let robotState: RobotState
-  let flowRatesAndOffsets: { flowRate: number; offsetFromBottomMm: number }
 
   beforeEach(() => {
     invariantContext = makeContext()
-    robotState = getInitialRobotStateStandard(invariantContext)
-    flowRatesAndOffsets = {
-      flowRate: 1.23,
-      offsetFromBottomMm: 4.32,
-    }
   })
   it('...', () => {
-    const result = createTimelineFromCommands(
-      commands,
-      invariantContext,
-      robotState
-    )
-    console.log(result)
+    const result = createTimelineFromCommands(commands, invariantContext)
     expect(result).toBeTruthy()
   })
 })
