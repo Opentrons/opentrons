@@ -1411,5 +1411,19 @@
         "well": "A1"
       }
     }
+  ],
+  "commandAnnotations": [
+    {
+      "commandIds": [
+        "1abc123",
+        "2abc123",
+        "3abc123",
+        "4abc123",
+        "5abc123",
+        "6abc123",
+        "7abc123"
+      ],
+      "annotationType": "initialSetup"
+    }
   ]
 }

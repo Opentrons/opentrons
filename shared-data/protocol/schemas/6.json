@@ -944,7 +944,7 @@
           },
 
           {
-            "description": "Load Liquid: Note this command is only meant to make the Opentrons system aware of a liquid's location. It does not instruct any specific hardware to carry out the physical action of moving the liquid to the location.",
+            "description": "Load Liquid: This command is only meant to make the Opentrons system aware of a liquid's location. It does not instruct any specific hardware to carry out the physical action of moving the liquid to the location.",
             "type": "object",
             "required": ["id", "commandType", "params"],
             "additionalProperties": false,
@@ -976,14 +976,53 @@
                 }
               }
             }
+          },
+
+          {
+            "description": "Custom: This command is meant to allow non-canonical commands to be included in the commands list.",
+            "type": "object",
+            "required": ["id", "commandType", "params"],
+            "additionalProperties": false,
+            "properties": {
+              "id": {"type": "string"},
+              "commandType": {
+                "enum": ["custom"]
+              },
+              "params": {
+                "type": "object",
+                "description": "all of the parameters required to identify and execute this command"
+              }
+            }
           }
+
         ]
       }
     },
 
     "commandAnnotations": {
-      "description": "An optional object of annotations associated with commands. Its usage has not yet been defined, so its shape is not enforced by this schema.",
-      "type": "object"
+      "type": "array",
+      "items": {
+        "description": "An optional object of annotations associated with commands.",
+        "type": "object",
+        "required": ["commandIds", "annotationType"],
+        "properties": {
+          "commandIds": {
+            "description": "An array of command ids that correspond to the targeted grouping of this annotation",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "annotationType": {
+            "description": "The type of annotation (e.g. 'transfer', 'initialSetup')",
+            "type": "string"
+          },
+          "params": {
+            "description": "The parameters used to create this grouping of atomic commands",
+            "type": "object"
+          }
+        }
+      }
     }
   }
 }
