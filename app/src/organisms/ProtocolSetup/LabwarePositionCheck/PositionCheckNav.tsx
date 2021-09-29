@@ -26,7 +26,7 @@ interface Props {
 
 export function PositionCheckNav(props: Props): JSX.Element {
   const { sections, primaryPipetteMount, secondaryPipetteMount } = props
-  const { t } = useTranslation('protocol_setup')
+  const { t } = useTranslation('labware_position_check')
   return (
     <Box
       fontSize={FONT_SIZE_CAPTION}

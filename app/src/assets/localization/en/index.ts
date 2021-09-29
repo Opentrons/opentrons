@@ -1,4 +1,5 @@
 import shared from './shared.json'
+import labware_position_check from './labware_position_check.json'
 import protocol_calibration from './protocol_calibration.json'
 import protocol_info from './protocol_info.json'
 import protocol_setup from './protocol_setup.json'
@@ -12,6 +13,7 @@ import top_navigation from './top_navigation.json'
 
 export const en = {
   shared,
+  labware_position_check,
   protocol_calibration,
   protocol_info,
   protocol_setup,
