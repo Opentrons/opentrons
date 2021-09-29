@@ -1,10 +1,6 @@
 import asyncio
-import logging
 from typing import Set
 from .types import ExecutionState, ExecutionCancelledError
-
-
-log = logging.getLogger(__name__)
 
 
 class ExecutionManager:
@@ -61,7 +57,6 @@ class ExecutionManager:
 
     async def wait_for_is_running(self):
         async with self._condition:
-            log.info(f"******** self._state is: {self._state} ********")
             if self._state == ExecutionState.PAUSED:
                 await self._condition.wait()
                 if self._state == ExecutionState.CANCELLED:

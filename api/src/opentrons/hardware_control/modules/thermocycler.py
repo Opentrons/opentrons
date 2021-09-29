@@ -311,7 +311,7 @@ class Thermocycler(mod_abc.AbstractModule):
             return
 
         while self._listener.lid_status != TemperatureStatus.HOLDING:
-            await self._listener.wait_next_poll()
+            await self.wait_next_poll()
 
     async def _wait_for_temp(self) -> None:
         """
@@ -348,7 +348,10 @@ class Thermocycler(mod_abc.AbstractModule):
 
     async def wait_next_poll(self) -> None:
         """Wait for the next poll to complete."""
-        await self._listener.wait_next_poll()
+        try:
+            await self._listener.wait_next_poll()
+        except Exception as e:
+            raise ThermocyclerError(str(e))
 
     @property
     def lid_target(self) -> Optional[float]:
@@ -571,3 +574,4 @@ class ThermocyclerListener(WaitableListener[PolledData]):
         """On error."""
         if self._callback:
             self._callback(str(exc))
+        return super().on_error(exc)

@@ -110,6 +110,7 @@ class SmoothieDriver:
             name="smoothie",
             timeout=DEFAULT_EXECUTE_TIMEOUT,
             ack=SMOOTHIE_ACK,
+            reset_buffer_before_write=True,
         )
         gpio_chardev = gpio_chardev or SimulatingGPIOCharDev("simulated")
 
@@ -424,6 +425,7 @@ class SmoothieDriver:
                 name="smoothie",
                 timeout=DEFAULT_EXECUTE_TIMEOUT,
                 ack=SMOOTHIE_ACK,
+                reset_buffer_before_write=True,
             )
             self.simulating = False
         except SerialException:

@@ -312,3 +312,4 @@ class TempdeckListener(WaitableListener[Temperature]):
         """On error."""
         if self._callback:
             self._callback(str(exc))
+        super().on_error(exc)
