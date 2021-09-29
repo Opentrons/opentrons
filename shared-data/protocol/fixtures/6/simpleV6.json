@@ -1243,56 +1243,56 @@
       "commandType": "loadPipette",
       "id": "0abc123",
       "params": {
-        "entityId": "pipetteId",
-        "locationId": "leftMount"
+        "pipette": "pipetteId",
+        "mount": "leftMount"
       }
     },
     {
       "commandType": "loadModule",
       "id": "1abc123",
       "params": {
-        "entityId": "magneticModuleId",
-        "locationId": "3"
+        "module": "magneticModuleId",
+        "location": "3"
       }
     },
     {
       "commandType": "loadModule",
       "id": "2abc123",
       "params": {
-        "entityId": "temperatureModuleId",
-        "locationId": "1"
+        "module": "temperatureModuleId",
+        "location": "1"
       }
     },
     {
       "commandType": "loadLabware",
       "id": "3abc123",
       "params": {
-        "entityId": "sourcePlateId",
-        "locationId": "temperatureModuleId"
+        "labware": "sourcePlateId",
+        "location": "temperatureModuleId"
       }
     },
     {
       "commandType": "loadLabware",
       "id": "4abc123",
       "params": {
-        "entityId": "destPlateId",
-        "locationId": "magneticModuleId"
+        "labware": "destPlateId",
+        "location": "magneticModuleId"
       }
     },
     {
       "commandType": "loadLabware",
       "id": "5abc123",
       "params": {
-        "entityId": "tipRackId",
-        "locationId": "magneticModuleId"
+        "labware": "tipRackId",
+        "location": "magneticModuleId"
       }
     },
     {
       "commandType": "loadLabware",
       "id": "6abc123",
       "params": {
-        "entityId": "trashId",
-        "locationId": "12"
+        "labware": "trashId",
+        "location": "12"
       }
     },
     {

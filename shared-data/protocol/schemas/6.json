@@ -86,11 +86,6 @@
           "minimum": 0
         }
       }
-    },
-
-    "locationId": {
-      "description": "identifier of a unique location (e.g. 'slot1', 'leftMount', 'thermocyclerLocation')",
-      "type": "string"
     }
   },
 
@@ -390,7 +385,7 @@
                 "additionalProperties": false,
                 "properties": {
                   "pipette": { "type": "string" },
-                  "slot": { "$ref": "#/definitions/locationId" },
+                  "slot": { "type": "string" },
                   "offset": {
                     "$ref": "#/definitions/offset",
                     "description": "Optional offset from slot bottom left corner, in mm"
@@ -871,25 +866,77 @@
           },
 
           {
-            "description": "Load Pipette / Load Labware / Load Module: These commands are only meant to make the Opentrons system aware of an entity's location. They do not instruct any specific hardware to carry out the physical action of moving the entity to the location.",
+            "description": "Load Pipette: This command is only meant to make the Opentrons system aware of a pipette's location. It does not instruct any specific hardware to carry out the physical action of moving the pipette to the location.",
             "type": "object",
             "required": ["id", "commandType", "params"],
             "additionalProperties": false,
             "properties": {
               "id": {"type": "string"},
               "commandType": {
-                "enum": ["loadPipette", "loadLabware", "loadModule"]
+                "enum": ["loadPipette"]
               },
               "params": {
-                "required": ["entityId", "locationId"],
+                "required": ["pipette", "mount"],
                 "properties": {
-                  "entityId": {
+                  "pipette": {
                     "type": "string",
-                    "description": "Unique identifier of instance of entity to load (e.g. pipette id, module id, labware id)"
+                    "description": "Unique identifier of pipette to load"
                   },
-                  "locationId": {
+                  "mount": {
+                    "type": ["string", "null"],
+                    "description": "Unique identifier of physical destination location to load pipette into (e.g. 'left' || null)"
+                  }
+                }
+              }
+            }
+          },
+
+          {
+            "description": "Load Labware: This command is only meant to make the Opentrons system aware of a labware instance's location. It does not instruct any specific hardware to carry out the physical action of moving the labware instance to the location.",
+            "type": "object",
+            "required": ["id", "commandType", "params"],
+            "additionalProperties": false,
+            "properties": {
+              "id": {"type": "string"},
+              "commandType": {
+                "enum": ["loadLabware"]
+              },
+              "params": {
+                "required": ["labware", "location"],
+                "properties": {
+                  "labware": {
                     "type": "string",
-                    "description": "Unique identifier of physical destination location to load entity into (e.g. pipette mount, slot id, module id)"
+                    "description": "Unique identifier of labware to load"
+                  },
+                  "location": {
+                    "type": ["string", "null"],
+                    "description": "Unique identifier of physical destination location to load labware into (e.g. '1' || null)"
+                  }
+                }
+              }
+            }
+          },
+
+          {
+            "description": "Load Module: This command is only meant to make the Opentrons system aware of a module instance's location. It does not instruct any specific hardware to carry out the physical action of moving the module instance to the location.",
+            "type": "object",
+            "required": ["id", "commandType", "params"],
+            "additionalProperties": false,
+            "properties": {
+              "id": {"type": "string"},
+              "commandType": {
+                "enum": ["loadModule"]
+              },
+              "params": {
+                "required": ["module", "location"],
+                "properties": {
+                  "module": {
+                    "type": "string",
+                    "description": "Unique identifier of module to load"
+                  },
+                  "location": {
+                    "type": ["string", "null"],
+                    "description": "Unique identifier of physical destination location to load module into (e.g. '1' || null)"
                   }
                 }
               }
