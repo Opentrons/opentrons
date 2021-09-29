@@ -26,5 +26,6 @@ export const Link: PrimitiveComponent<'a', LinkProps> = styled.a
     }
   )`
   text-decoration: none;
+  cursor: pointer;
   ${styleProps}
 `

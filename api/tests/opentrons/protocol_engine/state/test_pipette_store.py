@@ -4,7 +4,7 @@ import pytest
 from opentrons.types import MountType
 from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine.types import PipetteName, LoadedPipette
-from opentrons.protocol_engine.state.actions import UpdateCommandAction
+from opentrons.protocol_engine.actions import UpdateCommandAction
 from opentrons.protocol_engine.state.pipettes import (
     PipetteStore,
     PipetteState,

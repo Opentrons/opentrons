@@ -753,7 +753,7 @@ class CheckCalibrationUserFlow:
 
             info = ComparisonStatus(
                 differenceVector=(jogged_pt - ref_pt),
-                thresholdVector=threshold_vector,
+                thresholdVector=list(threshold_vector),
                 exceedsThreshold=exceeds,
             )
             intermediate_map = self._update_compare_status_by_state(rank, info, status)

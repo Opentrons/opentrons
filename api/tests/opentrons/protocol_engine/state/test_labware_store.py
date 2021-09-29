@@ -12,7 +12,7 @@ from opentrons.protocol_engine.types import (
     DeckSlotLocation,
     LoadedLabware,
 )
-from opentrons.protocol_engine.state.actions import UpdateCommandAction
+from opentrons.protocol_engine.actions import UpdateCommandAction
 from opentrons.protocol_engine.state.labware import LabwareStore, LabwareState
 
 from .command_fixtures import create_load_labware_command, create_add_definition_command

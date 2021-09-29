@@ -63,7 +63,7 @@ INSTALL_REQUIRES = [
     # This discrepency should be resolved:
     # https://github.com/Opentrons/opentrons/issues/8416
     "numpy>=1.15.1,<2",
-    "pydantic==1.4",
+    "pydantic==1.8.2",
     "pyserial==3.5",
     "systemd-python==234; sys_platform=='linux'",
     "typing-extensions==3.10.0.0",

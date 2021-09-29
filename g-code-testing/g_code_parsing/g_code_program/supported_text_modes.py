@@ -2,7 +2,7 @@ import re
 
 from g_code_parsing.g_code import GCode
 from g_code_parsing.errors import InvalidTextModeError
-from typing import Callable
+from typing import Callable, List
 from enum import Enum
 
 MULTIPLE_SPACE_REGEX = re.compile(" +")
@@ -24,11 +24,11 @@ class TextMode:
         self._builder = builder
 
     @property
-    def name(self):
+    def name(self) -> str:
         return self._name
 
     @property
-    def builder(self):
+    def builder(self) -> Callable:
         return self._builder
 
 
@@ -127,11 +127,11 @@ class SupportedTextModes(Enum):
     G_CODE = "G-Code"
 
     @classmethod
-    def get_valid_modes(cls):
+    def get_valid_modes(cls) -> List[str]:
         return [cls.CONCISE.value, cls.DEFAULT.value, cls.G_CODE.value]
 
     @classmethod
-    def get_text_mode(cls, key: str):
+    def get_text_mode(cls, key: str) -> TextMode:
         # Defining this inside of the function so that it does not show up
         # when using the __members__ attribute
         _internal_mapping = {
@@ -146,5 +146,5 @@ class SupportedTextModes(Enum):
         return _internal_mapping[key]
 
     @classmethod
-    def get_text_mode_by_enum_value(cls, enum_value):
+    def get_text_mode_by_enum_value(cls, enum_value) -> TextMode:
         return cls.get_text_mode(enum_value.value)

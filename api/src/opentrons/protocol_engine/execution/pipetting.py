@@ -131,7 +131,7 @@ class PipettingHandler:
                 pipette_id=pipette_id,
                 labware_id=labware_id,
                 well_name=well_name,
-                well_location=WellLocation(origin=WellOrigin.TOP, offset=(0, 0, 0)),
+                well_location=WellLocation(origin=WellOrigin.TOP),
             )
 
             await self._hardware_api.prepare_for_aspirate(mount=hw_pipette.mount)

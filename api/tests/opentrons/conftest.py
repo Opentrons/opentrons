@@ -259,16 +259,16 @@ def model(request, hardware, loop):
 
 
 @pytest.fixture
-def smoothie(monkeypatch):
+async def smoothie(monkeypatch):
     from opentrons.drivers.smoothie_drivers import SmoothieDriver
     from opentrons.config import robot_configs
 
     monkeypatch.setenv("ENABLE_VIRTUAL_SMOOTHIE", "true")
     driver = SmoothieDriver(robot_configs.load(), SimulatingGPIOCharDev("simulated"))
-    driver.connect()
+    await driver.connect()
     yield driver
     try:
-        driver.disconnect()
+        await driver.disconnect()
     except AttributeError:
         # if the test disconnected
         pass

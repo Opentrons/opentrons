@@ -4,11 +4,11 @@ from collections import OrderedDict
 from dataclasses import dataclass, replace
 from typing import List, Optional, Union
 
+from ..actions import Action, UpdateCommandAction, PlayAction, PauseAction, StopAction
 from ..commands import Command, CommandStatus
 from ..errors import CommandDoesNotExistError, ProtocolEngineStoppedError
 from ..types import EngineStatus
 from .abstract_store import HasState, HandlesActions
-from .actions import Action, UpdateCommandAction, PlayAction, PauseAction, StopAction
 
 
 @dataclass(frozen=True)
@@ -149,6 +149,13 @@ class CommandView(HasState[CommandState]):
         A command may still be executing while the engine is stopping.
         """
         return self._state.stop_requested
+
+    def get_is_stopped(self) -> bool:
+        """Get whether an engine stop has completed."""
+        return self._state.stop_requested and not any(
+            c.status == CommandStatus.RUNNING
+            for c in self._state.commands_by_id.values()
+        )
 
     def validate_action_allowed(self, action: Union[PlayAction, PauseAction]) -> None:
         """Validate if a PlayAction or PauseAction is allowed, raising if not.

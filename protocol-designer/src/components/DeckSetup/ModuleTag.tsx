@@ -7,7 +7,7 @@ import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
-  ModuleRealType,
+  ModuleType,
   ModuleOrientation,
 } from '@opentrons/shared-data'
 import {
@@ -128,7 +128,7 @@ const ModuleTagComponent = (props: ModuleTagProps): JSX.Element | null => {
     | ModuleTemporalProperties['moduleState']
     | null
     | undefined = timelineFrame?.robotState.modules[props.id]?.moduleState
-  const moduleType: ModuleRealType | null | undefined = moduleEntity?.type
+  const moduleType: ModuleType | null | undefined = moduleEntity?.type
 
   const hoveredLabwares = useSelector(uiSelectors.getHoveredStepLabware)
   const initialDeck = useSelector(stepFormSelectors.getInitialDeckSetup)

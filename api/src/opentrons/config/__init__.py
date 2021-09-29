@@ -533,7 +533,7 @@ def write_config(config_data: Dict[str, Path], path: Path = None):
         )
 
 
-def reload():
+def reload() -> None:
     global CONFIG
     CONFIG.clear()
     CONFIG.update(load_and_migrate())
@@ -553,9 +553,9 @@ CONFIG = load_and_migrate()
 #: are config element names
 
 
-def get_tip_length_cal_path():
+def get_tip_length_cal_path() -> Path:
     return get_opentrons_path("tip_length_calibration_dir")
 
 
-def get_custom_tiprack_def_path():
+def get_custom_tiprack_def_path() -> Path:
     return get_opentrons_path("custom_tiprack_dir")

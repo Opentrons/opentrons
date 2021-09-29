@@ -1,8 +1,18 @@
 """Protocol response model factory."""
 from typing import List
+
+from opentrons.protocol_runner import PreAnalysis, JsonPreAnalysis
+
 from .protocol_store import ProtocolResource
-from .protocol_models import Protocol
+from .protocol_models import Protocol, ProtocolType, Metadata
 from .analysis_models import ProtocolAnalysis
+
+
+def _pre_analysis_to_protocol_type(pre_analysis: PreAnalysis) -> ProtocolType:
+    if isinstance(pre_analysis, JsonPreAnalysis):
+        return ProtocolType.JSON
+    else:
+        return ProtocolType.PYTHON
 
 
 class ResponseBuilder:
@@ -24,7 +34,8 @@ class ResponseBuilder:
         """
         return Protocol(
             id=resource.protocol_id,
-            protocolType=resource.protocol_type,
             createdAt=resource.created_at,
+            protocolType=_pre_analysis_to_protocol_type(resource.pre_analysis),
+            metadata=Metadata.parse_obj(resource.pre_analysis.metadata),
             analyses=analyses,
         )

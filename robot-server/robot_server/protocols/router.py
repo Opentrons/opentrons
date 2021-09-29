@@ -4,6 +4,8 @@ from fastapi import APIRouter, Depends, File, UploadFile, status
 from typing import List
 from typing_extensions import Literal
 
+from opentrons.protocol_runner.pre_analysis import PreAnalyzer, NotPreAnalyzableError
+
 from robot_server.errors import ErrorDetails, ErrorResponse
 from robot_server.service.task_runner import TaskRunner
 from robot_server.service.dependencies import get_unique_id, get_current_time
@@ -13,7 +15,11 @@ from robot_server.service.json_api import (
     EmptyResponseModel,
 )
 
-from .dependencies import get_protocol_store, get_analysis_store, get_protocol_analyzer
+from .dependencies import (
+    get_protocol_store,
+    get_analysis_store,
+    get_protocol_analyzer,
+)
 from .protocol_models import Protocol
 from .protocol_analyzer import ProtocolAnalyzer
 from .response_builder import ResponseBuilder
@@ -57,6 +63,7 @@ async def create_protocol(
     response_builder: ResponseBuilder = Depends(ResponseBuilder),
     protocol_store: ProtocolStore = Depends(get_protocol_store),
     analysis_store: AnalysisStore = Depends(get_analysis_store),
+    pre_analyzer: PreAnalyzer = Depends(PreAnalyzer),
     protocol_analyzer: ProtocolAnalyzer = Depends(get_protocol_analyzer),
     task_runner: TaskRunner = Depends(TaskRunner),
     protocol_id: str = Depends(get_unique_id, use_cache=False),
@@ -70,20 +77,51 @@ async def create_protocol(
         response_builder: Interface to construct response models.
         protocol_store: In-memory database of protocol resources.
         analysis_store: In-memory database of protocol analyses.
+        pre_analyzer: Protocol pre-analysis interface.
         protocol_analyzer: Protocol analysis interface.
         task_runner: Background task runner.
         protocol_id: Unique identifier to attach to the protocol resource.
         analysis_id: Unique identifier to attach to the analysis resource.
         created_at: Timestamp to attach to the new resource.
     """
-    if len(files) > 1:
-        raise NotImplementedError("Multi-file protocols not yet supported.")
+    # todo(mm, 2021-09-16):
+    #
+    # Different units have different competing ideas about how to represent a protocol's
+    # files, which is unnecessarily complex.
+    #
+    # Python offers no standard *in-memory* file abstraction that suits all our needs:
+    #
+    # * Protocol files have contents
+    # * Protocol files have names
+    # * Protocol files can be arranged in a hierarchy
+    #
+    # For simplicity, then, we should not bother trying to keep things in-memory.
+    # We should change this so the pre-analyzer, or something before the
+    # pre-analyzer, saves all uploaded files to the filesystem. Then, all downstream
+    # units can receive a pathlib.Path pointing to the protocol's enclosing directory.
+    try:
+        pre_analysis = pre_analyzer.analyze(files)
+    except NotPreAnalyzableError as e:
+        # todo(mm, 2021-09-14):
+        # Not every NotPreAnalyzableError will have been constructed with a message,
+        # and str(e) will not include the exception type,
+        # so this detail string might be uselessly empty.
+        #
+        # todo(mm, 2021-09-14): Should this be HTTP 422?
+        raise ProtocolFileInvalid(detail=str(e)).as_error(status.HTTP_400_BAD_REQUEST)
+
+    # Pre-analysis may have read files.
+    # Reset them so that if protocol_store.create() reads them again,
+    # it will correctly start from the beginning.
+    for file in files:
+        await file.seek(0)
 
     try:
         protocol_resource = await protocol_store.create(
             protocol_id=protocol_id,
             created_at=created_at,
             files=files,
+            pre_analysis=pre_analysis,
         )
     except ProtocolFileInvalidError as e:
         raise ProtocolFileInvalid(detail=str(e)).as_error(status.HTTP_400_BAD_REQUEST)
@@ -98,6 +136,8 @@ async def create_protocol(
         analysis_id=analysis_id,
     )
     data = response_builder.build(resource=protocol_resource, analyses=analyses)
+
+    # todo(mm, 2021-09-14): Do we need to close the UploadFiles in our `files` arg?
 
     return ResponseModel(data=data)
 

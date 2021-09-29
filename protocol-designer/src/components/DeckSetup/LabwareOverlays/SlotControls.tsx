@@ -26,7 +26,7 @@ import { BaseState, DeckSlot, ThunkDispatch } from '../../../types'
 import { LabwareOnDeck } from '../../../step-forms'
 import {
   DeckSlot as DeckSlotDefinition,
-  ModuleRealType,
+  ModuleType,
 } from '@opentrons/shared-data'
 import styles from './LabwareOverlays.css'
 
@@ -39,7 +39,7 @@ interface DNDP {
 
 interface OP {
   slot: DeckSlotDefinition & { id: DeckSlot } // NOTE: Ian 2019-10-22 make slot `id` more restrictive when used in PD
-  moduleType: ModuleRealType | null
+  moduleType: ModuleType | null
   selectedTerminalItemId?: TerminalItemId | null
   handleDragHover?: () => unknown
 }

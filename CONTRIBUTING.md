@@ -154,10 +154,11 @@ Your computer will need the following tools installed to be able to develop with
   pyenv install 3.7.10
   ```
 
-- Node v12 - [nvm][] is optional, but recommended
+- Node v14 - [nvm][] is optional, but recommended
 
   ```shell
-  nvm install 12
+  nvm install 14
+  nvm use 14
   ```
 
 - [yarn][yarn-install] - JavaScript package manager
@@ -366,7 +367,7 @@ from github. You can do this via:
 make push host=${some_other_ip_address}
 ```
 
-To put the robot server on a test robot, if it's on buildroot do:
+To put the robot server on a test robot, do:
 
 ```shell
 # push the current contents of the api directory to robot for testing
@@ -374,16 +375,6 @@ To put the robot server on a test robot, if it's on buildroot do:
 make push-api
 # takes optional host variable for other robots
 make push-api host=${some_other_ip_address}
-```
-
-and if it's still on balena do:
-
-```shell
-# push the current contents of the api directory to robot for testing
-# defaults to currently connected ethernet robot
-make -C api push-balena
-# takes optional host variable for other robots
-make -C api push-balena host=${some_other_ip_address}
 ```
 
 To SSH into the robot, do

@@ -1,0 +1,431 @@
+{
+  "$otSharedSchema": "module/schemas/2",
+  "moduleType": "magneticModuleType",
+  "model": "magneticModuleV1",
+  "labwareOffset": {
+    "x": 0.125,
+    "y": -0.125,
+    "z": 82.25
+  },
+  "dimensions": {
+    "bareOverallHeight": 110.152,
+    "overLabwareHeight": 4.052,
+    "xDimension": 137,
+    "yDimension": 91,
+    "footprintXDimension": 128,
+    "footprintYDimension": 86,
+    "labwareInterfaceXDimension": 128,
+    "labwareInterfaceYDimension": 86
+  },
+  "cornerOffsetFromSlot": {
+    "x": -7,
+    "y": -1.8,
+    "z": 0
+  },
+  "calibrationPoint": {
+    "x": 124.875,
+    "y": 2.75
+  },
+  "displayName": "Magnetic Module GEN1",
+  "quirks": [],
+  "slotTransforms": {},
+  "compatibleWith": [],
+  "twoDimensionalRendering": {
+    "name": "svg",
+    "type": "element",
+    "value": "",
+    "attributes": {
+      "version": "1.1",
+      "id": "magneticModule",
+      "xmlns": "http://www.w3.org/2000/svg",
+      "xmlns:xlink": "http://www.w3.org/1999/xlink",
+      "x": "0px",
+      "y": "0px",
+      "viewBox": "0 0 135.9 90",
+      "style": "enable-background:new 0 0 135.9 90;",
+      "xml:space": "preserve"
+    },
+    "children": [
+      {
+        "name": "g",
+        "type": "element",
+        "value": "",
+        "attributes": {
+          "id": "darkFill"
+        },
+        "children": [
+          {
+            "name": "path",
+            "type": "element",
+            "value": "",
+            "attributes": {
+              "style": "fill: #E6E6E6;",
+              "d": "M126.4,74.2c-0.8,0-1.4,0.6-1.4,1.4v6.2c0,1.4-1.2,2.6-2.6,2.6H83.6v4.9H0.7V0.7h82.9v4.4h38.8\n\t\tc1.4,0,2.6,1.2,2.6,2.6v6.2c0,0.8,0.6,1.4,1.4,1.4h8.8v58.9H126.4z M24.4,13.5h-1.9v9.8h1.9V13.5z M24.4,31.1h-1.9V41h1.9V31.1z\n\t\t\tM24.4,49h-1.9v9.8h1.9V49z M24.4,66.8h-1.9v9.8h1.9V66.8z M42.2,13.5h-1.9v9.8h1.9V13.5z M42.2,31.1h-1.9V41h1.9V31.1z M42.2,49\n\t\th-1.9v9.8h1.9V49z M42.2,66.8h-1.9v9.8h1.9V66.8z M59.9,13.5h-1.9v9.8h1.9V13.5z M59.9,31.1h-1.9V41h1.9V31.1z M59.9,49h-1.9v9.8\n\t\th1.9V49z M59.9,66.8h-1.9v9.8h1.9V66.8z M77.7,13.5h-1.9v9.8h1.9V13.5z M77.7,31.1h-1.9V41h1.9V31.1z M77.7,49h-1.9v9.8h1.9V49z\n\t\t\tM77.7,66.8h-1.9v9.8h1.9V66.8z M95.5,13.5h-1.9v9.8h1.9V13.5z M95.5,31.1h-1.9V41h1.9V31.1z M95.5,49h-1.9v9.8h1.9V49z\n\t\t\tM95.5,66.8h-1.9v9.8h1.9V66.8z M113.3,13.5h-1.9v9.8h1.9V13.5z M113.3,31.1h-1.9V41h1.9V31.1z M113.3,49h-1.9v9.8h1.9V49z\n\t\t\tM113.3,66.8h-1.9v9.8h1.9V66.8z"
+            },
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": "g",
+        "type": "element",
+        "value": "",
+        "attributes": {
+          "id": "magnetPlate"
+        },
+        "children": [
+          {
+            "name": "path",
+            "type": "element",
+            "value": "",
+            "attributes": {
+              "d": "M118,81.7c2.2,0,4-1.8,4-4V11.9c0-2.2-1.8-4-4-4H18.1c-2.2,0-4,1.8-4,4v65.8c0,2.2,1.8,4,4,4L118,81.7 M118,82.4H18.1\n\t\tc-2.6,0-4.7-2.1-4.7-4.7V11.9c0-2.6,2.1-4.7,4.7-4.7H118c2.6,0,4.7,2.1,4.7,4.7v65.8C122.7,80.3,120.6,82.4,118,82.4L118,82.4z"
+            },
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": "g",
+        "type": "element",
+        "value": "",
+        "attributes": {
+          "id": "bracketThumbScrew"
+        },
+        "children": [
+          {
+            "name": "path",
+            "type": "element",
+            "value": "",
+            "attributes": {
+              "d": "M1.1,41.1h-5.8v7.8h5.8V41.1z M-4,41.8h4.4v6.3H-4V41.8z M-4,36.7h-4.1v16.6H-4V36.7z M-7.4,37.4h2.6v15.2h-2.6V37.4z"
+            },
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": "g",
+        "type": "element",
+        "value": "",
+        "attributes": {
+          "id": "powerButton"
+        },
+        "children": [
+          {
+            "name": "path",
+            "type": "element",
+            "value": "",
+            "attributes": {
+              "d": "M0,18.6v-8.1h-3.6v8.1H0 M0.7,19.3h-5V9.8h5V19.3L0.7,19.3z"
+            },
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": "g",
+        "type": "element",
+        "value": "",
+        "attributes": {
+          "id": "magnets"
+        },
+        "children": [
+          {
+            "name": "path",
+            "type": "element",
+            "value": "",
+            "attributes": {
+              "d": "M24.4,76.6v-9.8h-1.9v9.8H24.4 M25.1,77.4h-0.7h-1.9h-0.7v-0.7v-9.8v-0.7h0.7h1.9h0.7v0.7v9.8V77.4L25.1,77.4z"
+            },
+            "children": []
+          },
+          {
+            "name": "path",
+            "type": "element",
+            "value": "",
+            "attributes": {
+              "d": "M24.4,23.3v-9.8h-1.9v9.8H24.4 M25.1,24h-0.7h-1.9h-0.7v-0.7v-9.8v-0.7h0.7h1.9h0.7v0.7v9.8V24L25.1,24z"
+            },
+            "children": []
+          },
+          {
+            "name": "path",
+            "type": "element",
+            "value": "",
+            "attributes": {
+              "d": "M24.4,41v-9.8h-1.9V41H24.4 M25.1,41.7h-0.7h-1.9h-0.7V41v-9.8v-0.7h0.7h1.9h0.7v0.7V41V41.7L25.1,41.7z"
+            },
+            "children": []
+          },
+          {
+            "name": "path",
+            "type": "element",
+            "value": "",
+            "attributes": {
+              "d": "M24.4,58.8V49h-1.9v9.8H24.4 M25.1,59.5h-0.7h-1.9h-0.7v-0.7V49v-0.7h0.7h1.9h0.7V49v9.8V59.5L25.1,59.5z"
+            },
+            "children": []
+          },
+          {
+            "name": "path",
+            "type": "element",
+            "value": "",
+            "attributes": {
+              "d": "M42.2,76.6v-9.8h-1.9v9.8H42.2 M42.9,77.4h-0.7h-1.9h-0.7v-0.7v-9.8v-0.7h0.7h1.9h0.7v0.7v9.8V77.4L42.9,77.4z"
+            },
+            "children": []
+          },
+          {
+            "name": "path",
+            "type": "element",
+            "value": "",
+            "attributes": {
+              "d": "M42.2,23.3v-9.8h-1.9v9.8H42.2 M42.9,24h-0.7h-1.9h-0.7v-0.7v-9.8v-0.7h0.7h1.9h0.7v0.7v9.8V24L42.9,24z"
+            },
+            "children": []
+          },
+          {
+            "name": "path",
+            "type": "element",
+            "value": "",
+            "attributes": {
+              "d": "M42.2,41v-9.8h-1.9V41H42.2 M42.9,41.7h-0.7h-1.9h-0.7V41v-9.8v-0.7h0.7h1.9h0.7v0.7V41V41.7L42.9,41.7z"
+            },
+            "children": []
+          },
+          {
+            "name": "path",
+            "type": "element",
+            "value": "",
+            "attributes": {
+              "d": "M42.2,58.8V49h-1.9v9.8H42.2 M42.9,59.5h-0.7h-1.9h-0.7v-0.7V49v-0.7h0.7h1.9h0.7V49v9.8V59.5L42.9,59.5z"
+            },
+            "children": []
+          },
+          {
+            "name": "path",
+            "type": "element",
+            "value": "",
+            "attributes": {
+              "d": "M59.9,76.6v-9.8h-1.9v9.8H59.9 M60.7,77.4h-0.7h-1.9h-0.7v-0.7v-9.8v-0.7h0.7h1.9h0.7v0.7v9.8V77.4L60.7,77.4z"
+            },
+            "children": []
+          },
+          {
+            "name": "path",
+            "type": "element",
+            "value": "",
+            "attributes": {
+              "d": "M59.9,23.3v-9.8h-1.9v9.8H59.9 M60.7,24h-0.7h-1.9h-0.7v-0.7v-9.8v-0.7h0.7h1.9h0.7v0.7v9.8V24L60.7,24z"
+            },
+            "children": []
+          },
+          {
+            "name": "path",
+            "type": "element",
+            "value": "",
+            "attributes": {
+              "d": "M59.9,41v-9.8h-1.9V41H59.9 M60.7,41.7h-0.7h-1.9h-0.7V41v-9.8v-0.7h0.7h1.9h0.7v0.7V41V41.7L60.7,41.7z"
+            },
+            "children": []
+          },
+          {
+            "name": "path",
+            "type": "element",
+            "value": "",
+            "attributes": {
+              "d": "M59.9,58.8V49h-1.9v9.8H59.9 M60.7,59.5h-0.7h-1.9h-0.7v-0.7V49v-0.7h0.7h1.9h0.7V49v9.8V59.5L60.7,59.5z"
+            },
+            "children": []
+          },
+          {
+            "name": "path",
+            "type": "element",
+            "value": "",
+            "attributes": {
+              "d": "M77.7,76.6v-9.8h-1.9v9.8H77.7 M78.4,77.4h-0.7h-1.9h-0.7v-0.7v-9.8v-0.7h0.7h1.9h0.7v0.7v9.8V77.4L78.4,77.4z"
+            },
+            "children": []
+          },
+          {
+            "name": "path",
+            "type": "element",
+            "value": "",
+            "attributes": {
+              "d": "M77.7,23.3v-9.8h-1.9v9.8H77.7 M78.4,24h-0.7h-1.9h-0.7v-0.7v-9.8v-0.7h0.7h1.9h0.7v0.7v9.8V24L78.4,24z"
+            },
+            "children": []
+          },
+          {
+            "name": "path",
+            "type": "element",
+            "value": "",
+            "attributes": {
+              "d": "M77.7,41v-9.8h-1.9V41H77.7 M78.4,41.7h-0.7h-1.9h-0.7V41v-9.8v-0.7h0.7h1.9h0.7v0.7V41V41.7L78.4,41.7z"
+            },
+            "children": []
+          },
+          {
+            "name": "path",
+            "type": "element",
+            "value": "",
+            "attributes": {
+              "d": "M77.7,58.8V49h-1.9v9.8H77.7 M78.4,59.5h-0.7h-1.9h-0.7v-0.7V49v-0.7h0.7h1.9h0.7V49v9.8V59.5L78.4,59.5z"
+            },
+            "children": []
+          },
+          {
+            "name": "path",
+            "type": "element",
+            "value": "",
+            "attributes": {
+              "d": "M95.5,76.6v-9.8h-1.9v9.8H95.5 M96.2,77.4h-0.7h-1.9h-0.7v-0.7v-9.8v-0.7h0.7h1.9h0.7v0.7v9.8V77.4L96.2,77.4z"
+            },
+            "children": []
+          },
+          {
+            "name": "path",
+            "type": "element",
+            "value": "",
+            "attributes": {
+              "d": "M95.5,23.3v-9.8h-1.9v9.8H95.5 M96.2,24h-0.7h-1.9h-0.7v-0.7v-9.8v-0.7h0.7h1.9h0.7v0.7v9.8V24L96.2,24z"
+            },
+            "children": []
+          },
+          {
+            "name": "path",
+            "type": "element",
+            "value": "",
+            "attributes": {
+              "d": "M95.5,41v-9.8h-1.9V41H95.5 M96.2,41.7h-0.7h-1.9h-0.7V41v-9.8v-0.7h0.7h1.9h0.7v0.7V41V41.7L96.2,41.7z"
+            },
+            "children": []
+          },
+          {
+            "name": "path",
+            "type": "element",
+            "value": "",
+            "attributes": {
+              "d": "M95.5,58.8V49h-1.9v9.8H95.5 M96.2,59.5h-0.7h-1.9h-0.7v-0.7V49v-0.7h0.7h1.9h0.7V49v9.8V59.5L96.2,59.5z"
+            },
+            "children": []
+          },
+          {
+            "name": "path",
+            "type": "element",
+            "value": "",
+            "attributes": {
+              "d": "M113.3,76.6v-9.8h-1.9v9.8H113.3 M114,77.4h-0.7h-1.9h-0.7v-0.7v-9.8v-0.7h0.7h1.9h0.7v0.7v9.8V77.4L114,77.4z"
+            },
+            "children": []
+          },
+          {
+            "name": "path",
+            "type": "element",
+            "value": "",
+            "attributes": {
+              "d": "M113.3,23.3v-9.8h-1.9v9.8H113.3 M114,24h-0.7h-1.9h-0.7v-0.7v-9.8v-0.7h0.7h1.9h0.7v0.7v9.8V24L114,24z"
+            },
+            "children": []
+          },
+          {
+            "name": "path",
+            "type": "element",
+            "value": "",
+            "attributes": {
+              "d": "M113.3,41v-9.8h-1.9V41H113.3 M114,41.7h-0.7h-1.9h-0.7V41v-9.8v-0.7h0.7h1.9h0.7v0.7V41V41.7L114,41.7z"
+            },
+            "children": []
+          },
+          {
+            "name": "path",
+            "type": "element",
+            "value": "",
+            "attributes": {
+              "d": "M113.3,58.8V49h-1.9v9.8H113.3 M114,59.5h-0.7h-1.9h-0.7v-0.7V49v-0.7h0.7h1.9h0.7V49v9.8V59.5L114,59.5z"
+            },
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": "g",
+        "type": "element",
+        "value": "",
+        "attributes": {
+          "id": "innerWall"
+        },
+        "children": [
+          {
+            "name": "path",
+            "type": "element",
+            "value": "",
+            "attributes": {
+              "d": "M135.2,73.8h-8.8c-1,0-1.7,0.8-1.7,1.7v6.2c0,1.2-1,2.2-2.2,2.2H83.6v0.7h38.8c1.6,0,3-1.3,3-3v-6.2c0-0.6,0.5-1,1-1h8.8\n\t\tV73.8z M122.4,4.7H83.6v0.7h38.8c1.2,0,2.2,1,2.2,2.2v6.2c0,1,0.8,1.7,1.7,1.7h8.8v-0.7h-8.8c-0.6,0-1-0.5-1-1V7.7\n\t\tC125.4,6.1,124.1,4.7,122.4,4.7z"
+            },
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": "g",
+        "type": "element",
+        "value": "",
+        "attributes": {
+          "id": "labwareBracket"
+        },
+        "children": [
+          {
+            "name": "path",
+            "type": "element",
+            "value": "",
+            "attributes": {
+              "d": "M84.3,0H0v90h84.4v-9H17.4c-3.4,0-6.1-2.7-6.1-6.1V14.7c0-3.4,2.7-6.1,6.1-6.1h66.9L84.3,0L84.3,0z M1.4,1.4h81.5v5.7\n\t\tH17.4c-4.1,0-7.5,3.4-7.5,7.5v60.2c0,4.1,3.4,7.5,7.5,7.5h65.5v6.1H1.4V1.4z"
+            },
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": "g",
+        "type": "element",
+        "value": "",
+        "attributes": {
+          "id": "magnetPlateOverlayFill"
+        },
+        "children": [
+          {
+            "name": "path",
+            "type": "element",
+            "value": "",
+            "attributes": {
+              "style": "fill: #FAFAFAF4;",
+              "d": "M118,81.7c2.2,0,4-1.8,4-4V11.9c0-2.2-1.8-4-4-4H18.1c-2.2,0-4,1.8-4,4v65.8c0,2.2,1.8,4,4,4L118,81.7z"
+            },
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": "g",
+        "type": "element",
+        "value": "",
+        "attributes": {
+          "id": "outline"
+        },
+        "children": [
+          {
+            "name": "path",
+            "type": "element",
+            "value": "",
+            "attributes": {
+              "d": "M135.9,0H0l0,90h135.9V0z M1.4,1.4h133.1v87.1H1.4V1.4z"
+            },
+            "children": []
+          }
+        ]
+      }
+    ]
+  }
+}

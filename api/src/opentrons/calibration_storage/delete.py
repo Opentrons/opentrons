@@ -10,7 +10,7 @@ from opentrons import config
 from opentrons.types import Mount
 
 
-def clear_calibrations():
+def clear_calibrations() -> None:
     """
     Delete all calibration files for labware. This includes deleting tip-length
     data for tipracks.

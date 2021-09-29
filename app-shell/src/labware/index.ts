@@ -159,7 +159,7 @@ export function registerLabware(
 
       case CustomLabware.OPEN_CUSTOM_LABWARE_DIRECTORY: {
         const dir = getFullConfig().labware.directory
-        shell.openItem(dir)
+        shell.openPath(dir)
         break
       }
     }

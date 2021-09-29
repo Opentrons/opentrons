@@ -15,8 +15,9 @@ PROTOCOL_DESIGNER_DIR := protocol-designer
 SHARED_DATA_DIR := shared-data
 UPDATE_SERVER_DIR := update-server
 ROBOT_SERVER_DIR := robot-server
+HARDWARE_DIR := hardware
 
-PYTHON_DIRS := $(API_DIR) $(UPDATE_SERVER_DIR) $(NOTIFY_SERVER_DIR) $(ROBOT_SERVER_DIR) $(SHARED_DATA_DIR)/python $(G_CODE_TESTING_DIR)
+PYTHON_DIRS := $(API_DIR) $(UPDATE_SERVER_DIR) $(NOTIFY_SERVER_DIR) $(ROBOT_SERVER_DIR) $(SHARED_DATA_DIR)/python $(G_CODE_TESTING_DIR) $(HARDWARE_DIR)
 
 # This may be set as an environment variable (and is by CI tasks that upload
 # to test pypi) to add a .dev extension to the python package versions. If
@@ -107,21 +108,11 @@ deploy-py:
 	$(MAKE) -C $(API_DIR) deploy
 	$(MAKE) -C $(SHARED_DATA_DIR) deploy-py
 
-.PHONY: push-api-balena
-push-api-balena: export host = $(usb_host)
-push-api-balena:
-	$(if $(host),@echo "Pushing to $(host)",$(error host variable required))
-	$(MAKE) -C $(API_DIR) push-balena
-	$(MAKE) -C $(API_DIR) restart
-
 .PHONY: push-api
 push-api: export host = $(usb_host)
 push-api:
 	$(if $(host),@echo "Pushing to $(host)",$(error host variable required))
 	$(MAKE) -C $(API_DIR) push
-
-.PHONY: push-api-buildroot
-push-api-buildroot: push-api
 
 .PHONY: push-update-server
 push-update-server: export host = $(usb_host)
@@ -133,6 +124,9 @@ push-update-server:
 push: export host=$(usb_host)
 push:
 	$(if $(host),@echo "Pushing to $(host)",$(error host variable required))
+	# TODO (amit, 2021-09-28): re-enable when opentrons-hardware is worth deploying.
+	# $(MAKE) -C $(HARDWARE_DIR) push-no-restart
+	# sleep 1
 	$(MAKE) -C $(API_DIR) push-no-restart
 	sleep 1
 	$(MAKE) -C $(SHARED_DATA_DIR) push-no-restart
@@ -165,6 +159,7 @@ test-e2e:
 
 .PHONY: test-py-windows
 test-py-windows:
+	$(MAKE) -C $(HARDWARE_DIR) test
 	$(MAKE) -C $(API_DIR) test
 	$(MAKE) -C $(SHARED_DATA_DIR) test-py
 
@@ -213,6 +208,7 @@ format: format-js format-py
 
 .PHONY: format-py
 format-py:
+	$(MAKE) -C $(HARDWARE_DIR) format
 	$(MAKE) -C $(API_DIR) format
 	$(MAKE) -C $(ROBOT_SERVER_DIR) format
 	$(MAKE) -C $(G_CODE_TESTING_DIR) format

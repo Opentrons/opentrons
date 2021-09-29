@@ -10,7 +10,11 @@ if TYPE_CHECKING:
     )
     from .api_support.types import APIVersion
 
-Metadata = Dict[str, Union[str, int]]
+
+# This metadata type reflects existing behavior,
+# but there's no reason we couldn't change this to allow types other than strings.
+# Issue for fleshing out metadata spec: github.com/Opentrons/opentrons/issues/8334
+Metadata = Dict[str, str]
 
 
 @dataclass(frozen=True)

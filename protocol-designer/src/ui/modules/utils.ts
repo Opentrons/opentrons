@@ -3,7 +3,7 @@ import { i18n } from '../../localization'
 import {
   MAGNETIC_MODULE_V1,
   getLabwareDefaultEngageHeight,
-  ModuleRealType,
+  ModuleType,
 } from '@opentrons/shared-data'
 import { Options } from '@opentrons/components'
 import {
@@ -13,7 +13,7 @@ import {
 } from '../../step-forms/types'
 export function getModuleOnDeckByType(
   initialDeckSetup: InitialDeckSetup,
-  type: ModuleRealType
+  type: ModuleType
 ): ModuleOnDeck | null | undefined {
   return values(initialDeckSetup.modules).find(
     (moduleOnDeck: ModuleOnDeck) => moduleOnDeck.type === type
@@ -39,7 +39,7 @@ export function getModuleUnderLabware(
 export function getModuleLabwareOptions(
   initialDeckSetup: InitialDeckSetup,
   nicknamesById: Record<string, string>,
-  type: ModuleRealType
+  type: ModuleType
 ): Options {
   const moduleOnDeck = getModuleOnDeckByType(initialDeckSetup, type)
   const labware =
@@ -69,7 +69,7 @@ export function getModuleLabwareOptions(
 }
 export function getModuleHasLabware(
   initialDeckSetup: InitialDeckSetup,
-  type: ModuleRealType
+  type: ModuleType
 ): boolean {
   const moduleOnDeck = getModuleOnDeckByType(initialDeckSetup, type)
   const labware =

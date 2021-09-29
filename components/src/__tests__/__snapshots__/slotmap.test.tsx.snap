@@ -67,7 +67,7 @@ exports[`SlotMap renders correctly with collision warning 1`] = `
     />
     <svg
       aria-hidden="true"
-      className="sc-AxmLO c0 collision_icon"
+      className="sc-fzozJi c0 collision_icon"
       fill="currentColor"
       height={20}
       version="1.1"
@@ -304,7 +304,7 @@ exports[`SlotMap renders correctly with error and collision warning 1`] = `
     />
     <svg
       aria-hidden="true"
-      className="sc-AxmLO c0 collision_icon"
+      className="sc-fzozJi c0 collision_icon"
       fill="currentColor"
       height={20}
       version="1.1"

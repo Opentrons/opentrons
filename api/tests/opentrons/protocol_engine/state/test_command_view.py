@@ -6,7 +6,7 @@ from typing import List, NamedTuple, Optional, Sequence, Tuple, Type, Union
 
 from opentrons.protocol_engine import EngineStatus, commands as cmd, errors
 from opentrons.protocol_engine.state.commands import CommandState, CommandView
-from opentrons.protocol_engine.state.actions import PlayAction, PauseAction
+from opentrons.protocol_engine.actions import PlayAction, PauseAction
 
 from .command_fixtures import (
     create_pending_command,
@@ -233,6 +233,36 @@ def test_get_stop_requested() -> None:
 
     subject = get_command_view(stop_requested=False)
     assert subject.get_stop_requested() is False
+
+
+def test_get_is_stopped() -> None:
+    """It should return true if stop requested and no command running."""
+    completed_command = create_completed_command(command_id="command-id-1")
+    running_command = create_running_command(command_id="command-id-2")
+    pending_command = create_pending_command(command_id="command-id-3")
+    failed_command = create_failed_command(command_id="command-id-4")
+
+    subject = get_command_view(
+        stop_requested=False,
+        commands_by_id=(),
+    )
+    assert subject.get_is_stopped() is False
+
+    subject = get_command_view(
+        stop_requested=True,
+        commands_by_id=[("command-id-2", running_command)],
+    )
+    assert subject.get_is_stopped() is False
+
+    subject = get_command_view(
+        stop_requested=True,
+        commands_by_id=[
+            ("command-id-1", completed_command),
+            ("command-id-3", pending_command),
+            ("command-id-4", failed_command),
+        ],
+    )
+    assert subject.get_is_stopped() is True
 
 
 class ActionAllowedSpec(NamedTuple):

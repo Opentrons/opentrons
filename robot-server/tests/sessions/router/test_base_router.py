@@ -8,12 +8,12 @@ from httpx import AsyncClient
 
 from opentrons.types import DeckSlotName, MountType
 from opentrons.protocol_engine import commands as pe_commands, types as pe_types
+from opentrons.protocol_runner import JsonPreAnalysis
 
 from robot_server.service.task_runner import TaskRunner
 from robot_server.protocols import (
     ProtocolStore,
     ProtocolResource,
-    ProtocolFileType,
     ProtocolNotFoundError,
     ProtocolNotFound,
 )
@@ -29,7 +29,11 @@ from robot_server.sessions.session_models import (
     ProtocolSessionCreateParams,
 )
 
-from robot_server.sessions.engine_store import EngineStore, EngineConflictError
+from robot_server.sessions.engine_store import (
+    EngineStore,
+    EngineConflictError,
+    EngineMissingError,
+)
 
 from robot_server.sessions.session_store import (
     SessionStore,
@@ -41,6 +45,7 @@ from robot_server.sessions.router.base_router import (
     base_router,
     SessionNotFound,
     SessionAlreadyActive,
+    SessionRunning,
 )
 
 from tests.helpers import verify_response
@@ -139,7 +144,7 @@ async def test_create_protocol_session(
     )
     protocol_resource = ProtocolResource(
         protocol_id="protocol-id",
-        protocol_type=ProtocolFileType.JSON,
+        pre_analysis=JsonPreAnalysis(schema_version=123, metadata={}),
         created_at=datetime.now(),
         files=[],
     )
@@ -440,6 +445,10 @@ def test_delete_session_by_id(
     client: TestClient,
 ) -> None:
     """It should be able to remove a session by ID."""
+    decoy.when(engine_store.engine.state_view.commands.get_is_stopped()).then_return(
+        True
+    )
+
     response = client.delete("/sessions/unique-id")
 
     decoy.verify(
@@ -454,11 +463,15 @@ def test_delete_session_by_id(
 def test_delete_session_with_bad_id(
     decoy: Decoy,
     session_store: SessionStore,
+    engine_store: EngineStore,
     client: TestClient,
 ) -> None:
     """It should 404 if the session ID does not exist."""
     key_error = SessionNotFoundError(session_id="session-id")
 
+    decoy.when(engine_store.engine.state_view.commands.get_is_stopped()).then_return(
+        True
+    )
     decoy.when(session_store.remove(session_id="session-id")).then_raise(key_error)
 
     response = client.delete("/sessions/session-id")
@@ -468,3 +481,39 @@ def test_delete_session_with_bad_id(
         expected_status=404,
         expected_errors=SessionNotFound(detail=str(key_error)),
     )
+
+
+def test_delete_running_session(
+    decoy: Decoy,
+    engine_store: EngineStore,
+    session_store: SessionStore,
+    client: TestClient,
+) -> None:
+    """It should 409 if the session is not finished."""
+    decoy.when(engine_store.engine.state_view.commands.get_is_stopped()).then_return(
+        False
+    )
+
+    response = client.delete("/sessions/session-id")
+
+    verify_response(
+        response,
+        expected_status=409,
+        expected_errors=SessionRunning(),
+    )
+
+
+def test_delete_running_session_no_engine(
+    decoy: Decoy,
+    engine_store: EngineStore,
+    session_store: SessionStore,
+    client: TestClient,
+) -> None:
+    """It should no-op if no engine is present."""
+    decoy.when(engine_store.engine.state_view.commands.get_is_stopped()).then_raise(
+        EngineMissingError()
+    )
+
+    response = client.delete("/sessions/session-id")
+
+    assert response.status_code == 200

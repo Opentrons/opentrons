@@ -7,7 +7,7 @@ from opentrons.hardware_control.api import API as HardwareAPI
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons.motion_planning import Waypoint
 
-from opentrons.protocol_engine import WellLocation, WellOrigin
+from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset
 from opentrons.protocol_engine.state import StateStore, PipetteLocationData, CurrentWell
 from opentrons.protocol_engine.execution.movement import MovementHandler
 
@@ -37,7 +37,10 @@ async def test_move_to_well(
     handler: MovementHandler,
 ) -> None:
     """Move requests should call hardware controller with movement data."""
-    well_location = WellLocation(origin=WellOrigin.BOTTOM, offset=(0, 0, 1))
+    well_location = WellLocation(
+        origin=WellOrigin.BOTTOM,
+        offset=WellOffset(x=0, y=0, z=1),
+    )
 
     decoy.when(
         state_store.motion.get_pipette_location(
@@ -91,7 +94,9 @@ async def test_move_to_well(
             critical_point=CriticalPoint.XY_CENTER,
         ),
         await hardware_api.move_to(
-            mount=Mount.LEFT, abs_position=Point(4, 5, 6), critical_point=None
+            mount=Mount.LEFT,
+            abs_position=Point(4, 5, 6),
+            critical_point=None,
         ),
     )
 
@@ -103,7 +108,10 @@ async def test_move_to_well_from_starting_location(
     handler: MovementHandler,
 ) -> None:
     """It should be able to move to a well from a start location."""
-    well_location = WellLocation(origin=WellOrigin.BOTTOM, offset=(0, 0, 1))
+    well_location = WellLocation(
+        origin=WellOrigin.BOTTOM,
+        offset=WellOffset(x=0, y=0, z=1),
+    )
 
     current_well = CurrentWell(
         pipette_id="pipette-id",
