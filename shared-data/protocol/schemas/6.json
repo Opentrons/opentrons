@@ -360,7 +360,6 @@
             "description": "Pick Up Tip / Drop Tip",
             "type": "object",
             "required": ["id", "commandType", "params"],
-            "additionalProperties": false,
             "properties": {
               "id": {"type": "string"},
               "commandType": {
@@ -382,7 +381,6 @@
               "params": {
                 "type": "object",
                 "required": ["pipette", "slot"],
-                "additionalProperties": false,
                 "properties": {
                   "pipette": { "type": "string" },
                   "slot": { "type": "string" },
@@ -408,7 +406,6 @@
             "description": "Delay Protocol Execution",
             "type": "object",
             "required": ["id", "commandType", "params"],
-            "additionalProperties": false,
             "properties": {
               "id": {"type": "string"},
               "commandType": {
@@ -416,7 +413,6 @@
               },
               "params": {
                 "type": "object",
-                "additionalProperties": false,
                 "required": ["wait"],
                 "properties": {
                   "wait": {
@@ -435,7 +431,6 @@
             "description": "Magnetic Module Engage: Engage magnet to specified height.",
             "type": "object",
             "required": ["id", "commandType", "params"],
-            "additionalProperties": false,
             "properties": {
               "id": {"type": "string"},
               "commandType": {
@@ -443,7 +438,6 @@
               },
               "params": {
                 "required": ["module", "engageHeight"],
-                "additionalProperties": false,
                 "properties": {
                   "engageHeight": {
                     "description": "Height in mm(*) from bottom plane of labware (above if positive, below if negative). *NOTE: for magneticModuleV1 (aka GEN1), these are not true mm but an arbitrary unit equal to 0.5mm. So `engageHeight: 2` means 1mm above the labware plane if the command is for a GEN1 magnetic module, but would mean 2mm above the labware plane for GEN2 module",
@@ -461,7 +455,6 @@
             "description": "Magnetic Module Disengage: Retract magnet to disengaged (home) position",
             "type": "object",
             "required": ["id", "commandType", "params"],
-            "additionalProperties": false,
             "properties": {
               "id": {"type": "string"},
               "commandType": {
@@ -477,13 +470,11 @@
             "description": "Temperature Module Set Target Temperature: Module will begin moving to the target temperature. This command is non-blocking, it does not delay protocol execution while approaching the target temperature.",
             "type": "object",
             "required": ["id", "commandType", "params"],
-            "additionalProperties": false,
             "properties": {
               "id": {"type": "string"},
               "commandType": { "enum": ["temperatureModule/setTargetTemperature"] },
               "params": {
                 "required": ["module", "temperature"],
-                "additionalProperties": false,
                 "properties": {
                   "module": { "type": "string" },
                   "temperature": { "type": "number" }
@@ -496,13 +487,11 @@
             "description": "Temperature Module Await Temperature: Delay protocol execution until the specified temperature is reached.",
             "type": "object",
             "required": ["id", "commandType", "params"],
-            "additionalProperties": false,
             "properties": {
               "id": {"type": "string"},
               "commandType": { "enum": ["temperatureModule/awaitTemperature"] },
               "params": {
                 "required": ["module", "temperature"],
-                "additionalProperties": false,
                 "properties": {
                   "module": { "type": "string" },
                   "temperature": { "type": "number" }
@@ -515,7 +504,6 @@
             "description": "Temperature Module Deactivate: Module will stop actively controlling its temperature and drift to ambient temperature.",
             "type": "object",
             "required": ["id", "commandType", "params"],
-            "additionalProperties": false,
             "properties": {
               "id": {"type": "string"},
               "commandType": { "enum": ["temperatureModule/deactivate"] },
@@ -529,13 +517,11 @@
             "description": "Thermocycler Set Target Block Temperature: Well block will begin moving to the target temperature. This command is non-blocking, it does not delay protocol execution while approaching the target temperature.",
             "type": "object",
             "required": ["id", "commandType", "params"],
-            "additionalProperties": false,
             "properties": {
               "id": {"type": "string"},
               "commandType": { "enum": ["thermocycler/setTargetBlockTemperature"] },
               "params": {
                 "required": ["module", "temperature"],
-                "additionalProperties": false,
                 "properties": {
                   "module": { "type": "string" },
                   "temperature": { "type": "number" },
@@ -551,13 +537,11 @@
             "description": "Thermocycler Set Target Lid Temperature: Lid will begin moving to the target temperature. This command is non-blocking, it does not delay protocol execution while approaching the target temperature.",
             "type": "object",
             "required": ["id", "commandType", "params"],
-            "additionalProperties": false,
             "properties": {
               "id": {"type": "string"},
               "commandType": { "enum": ["thermocycler/setTargetLidTemperature"] },
               "params": {
                 "required": ["module", "temperature"],
-                "additionalProperties": false,
                 "properties": {
                   "module": { "type": "string" },
                   "temperature": { "type": "number" }
@@ -570,13 +554,11 @@
             "description": "Thermocycler Await Block Temperature: Delay protocol execution until the specified well block target temperature is reached.",
             "type": "object",
             "required": ["id", "commandType", "params"],
-            "additionalProperties": false,
             "properties": {
               "id": {"type": "string"},
               "commandType": { "enum": ["thermocycler/awaitBlockTemperature"] },
               "params": {
                 "required": ["module", "temperature"],
-                "additionalProperties": false,
                 "properties": {
                   "module": { "type": "string" },
                   "temperature": { "type": "number" }
@@ -589,13 +571,11 @@
             "description": "Thermocycler Await Lid Temperature: Delay protocol execution until the specified lid target temperature is reached.",
             "type": "object",
             "required": ["id", "commandType", "params"],
-            "additionalProperties": false,
             "properties": {
               "id": {"type": "string"},
               "commandType": { "enum": ["thermocycler/awaitLidTemperature"] },
               "params": {
                 "required": ["module", "temperature"],
-                "additionalProperties": false,
                 "properties": {
                   "module": { "type": "string" },
                   "temperature": { "type": "number" }
@@ -608,7 +588,6 @@
             "description": "Thermocycler Deactivate Block: Module will stop actively controlling its well block temperature.",
             "type": "object",
             "required": ["id", "commandType", "params"],
-            "additionalProperties": false,
             "properties": {
               "id": {"type": "string"},
               "commandType": { "enum": ["thermocycler/deactivateBlock"] },
@@ -622,7 +601,6 @@
             "description": "Thermocycler Deactivate Lid: Module will stop actively controlling its lid temperature.",
             "type": "object",
             "required": ["id", "commandType", "params"],
-            "additionalProperties": false,
             "properties": {
               "id": {"type": "string"},
               "commandType": { "enum": ["thermocycler/deactivateLid"] },
@@ -636,7 +614,6 @@
             "description": "Thermocycler Open Lid: Open lid of the module. This command will delay protocol execution until the lid is fully open.",
             "type": "object",
             "required": ["id", "commandType", "params"],
-            "additionalProperties": false,
             "properties": {
               "id": {"type": "string"},
               "commandType": { "enum": ["thermocycler/openLid"] },
@@ -650,7 +627,6 @@
             "description": "Thermocycler Close Lid: Close the lid of the module. This command will delay protocol execution until the lid is fully closed.",
             "type": "object",
             "required": ["id", "commandType", "params"],
-            "additionalProperties": false,
             "properties": {
               "id": {"type": "string"},
               "commandType": { "enum": ["thermocycler/closeLid"] },
@@ -664,14 +640,12 @@
             "description": "Thermocycler Run Profile: Begin running the specified profile steps on the Thermocycler. This command is non-blocking, it does not delay protocol execution outside of thermocycler steps. No more thermocycler commands should be given until a 'thermocycler/awaitProfileComplete' command is executed.",
             "type": "object",
             "required": ["id", "commandType", "params"],
-            "additionalProperties": false,
             "properties": {
               "id": {"type": "string"},
               "commandType": { "enum": ["thermocycler/runProfile"] },
               "params": {
                 "type": "object",
                 "required": ["module", "profile", "volume"],
-                "additionalProperties": false,
                 "properties": {
                   "module": { "type": "string" },
                   "profile": {
@@ -679,7 +653,6 @@
                     "items": {
                       "type": "object",
                       "required": ["temperature", "holdTime"],
-                      "additionalProperties": false,
                       "properties": {
                         "temperature": {
                           "description": "Target temperature of profile step",
@@ -704,7 +677,6 @@
             "description": "Thermocycler Await Profile Complete: Delay protocol execution until profile execution is complete.",
             "type": "object",
             "required": ["id", "commandType", "params"],
-            "additionalProperties": false,
             "properties": {
               "id": {"type": "string"},
               "commandType": { "enum": ["thermocycler/awaitProfileComplete"] },
@@ -718,13 +690,11 @@
             "description": "Heater Shaker Module Set Target Temperature: Module will begin moving to the target temperature. This command is non-blocking, it does not delay protocol execution while approaching the target temperature.",
             "type": "object",
             "required": ["id", "commandType", "params"],
-            "additionalProperties": false,
             "properties": {
               "id": {"type": "string"},
               "commandType": { "enum": ["heaterShakerModule/setTargetTemperature"] },
               "params": {
                 "required": ["module", "temperature"],
-                "additionalProperties": false,
                 "properties": {
                   "module": { "type": "string" },
                   "temperature": { "type": "number", "description": "target temperature to heat to in °C" }
@@ -737,13 +707,11 @@
             "description": "Heater Shaker Module Set Target Shake Speed: Module will begin accelerating to the target shake speed. This command is non-blocking, it does not delay protocol execution while approaching the target shake speed.",
             "type": "object",
             "required": ["id", "commandType", "params"],
-            "additionalProperties": false,
             "properties": {
               "id": {"type": "string"},
               "commandType": { "enum": ["heaterShakerModule/setTargetShakeSpeed"] },
               "params": {
                 "required": ["module", "rpm"],
-                "additionalProperties": false,
                 "properties": {
                   "module": { "type": "string" },
                   "rpm": { "type": "number", "description": "target orbital rotations per minute" }
@@ -756,13 +724,11 @@
             "description": "Heater Shaker Module Await Temperature: Delay protocol execution until the specified target temperature is reached.",
             "type": "object",
             "required": ["id", "commandType", "params"],
-            "additionalProperties": false,
             "properties": {
               "id": {"type": "string"},
               "commandType": { "enum": ["heaterShakerModule/awaitTemperature"] },
               "params": {
                 "required": ["module", "temperature"],
-                "additionalProperties": false,
                 "properties": {
                   "module": { "type": "string" },
                   "temperature": { "type": "number", "description": "temperature in °C to await" }
@@ -775,13 +741,11 @@
             "description": "Heater Shaker Module Await Speed: Delay protocol execution until the specified target shake speed is reached.",
             "type": "object",
             "required": ["id", "commandType", "params"],
-            "additionalProperties": false,
             "properties": {
               "id": {"type": "string"},
               "commandType": { "enum": ["heaterShakerModule/awaitShakeSpeed"] },
               "params": {
                 "required": ["module", "rpm"],
-                "additionalProperties": false,
                 "properties": {
                   "module": { "type": "string" },
                   "rpm": { "type": "number", "description": "target rotations per minute to await" }
@@ -794,7 +758,6 @@
             "description": "Heater Shaker Module Deactivate Heater: Module will stop actively heating and drift to ambient temperature.",
             "type": "object",
             "required": ["id", "commandType", "params"],
-            "additionalProperties": false,
             "properties": {
               "id": {"type": "string"},
               "commandType": { "enum": ["heaterShakerModule/deactivateHeater"] },
@@ -808,7 +771,6 @@
             "description": "Heater Shaker Module Deactivate Shaker: Module will deaccelerate until holding still",
             "type": "object",
             "required": ["id", "commandType", "params"],
-            "additionalProperties": false,
             "properties": {
               "id": {"type": "string"},
               "commandType": { "enum": ["heaterShakerModule/deactivateShaker"] },
@@ -822,7 +784,6 @@
             "description": "Heater Shaker Module Deactivate Shaker: Module will deaccelerate until holding still",
             "type": "object",
             "required": ["id", "commandType", "params"],
-            "additionalProperties": false,
             "properties": {
               "id": {"type": "string"},
               "commandType": { "enum": ["heaterShakerModule/deactivateShaker"] },
@@ -842,7 +803,6 @@
               "params": {
                 "type": "object",
                 "required": ["pipette", "labware", "well"],
-                "additionalProperties": false,
                 "properties": {
                   "pipette": { "type": "string" },
                   "labware": { "type": "string" },
@@ -869,7 +829,6 @@
             "description": "Load Pipette: This command is only meant to make the Opentrons system aware of a pipette's location. It does not instruct any specific hardware to carry out the physical action of moving the pipette to the location.",
             "type": "object",
             "required": ["id", "commandType", "params"],
-            "additionalProperties": false,
             "properties": {
               "id": {"type": "string"},
               "commandType": {
@@ -895,7 +854,6 @@
             "description": "Load Labware: This command is only meant to make the Opentrons system aware of a labware instance's location. It does not instruct any specific hardware to carry out the physical action of moving the labware instance to the location.",
             "type": "object",
             "required": ["id", "commandType", "params"],
-            "additionalProperties": false,
             "properties": {
               "id": {"type": "string"},
               "commandType": {
@@ -921,7 +879,6 @@
             "description": "Load Module: This command is only meant to make the Opentrons system aware of a module instance's location. It does not instruct any specific hardware to carry out the physical action of moving the module instance to the location.",
             "type": "object",
             "required": ["id", "commandType", "params"],
-            "additionalProperties": false,
             "properties": {
               "id": {"type": "string"},
               "commandType": {
@@ -947,7 +904,6 @@
             "description": "Load Liquid: This command is only meant to make the Opentrons system aware of a liquid's location. It does not instruct any specific hardware to carry out the physical action of moving the liquid to the location.",
             "type": "object",
             "required": ["id", "commandType", "params"],
-            "additionalProperties": false,
             "properties": {
               "id": {"type": "string"},
               "commandType": {
@@ -982,7 +938,6 @@
             "description": "Custom: This command is meant to allow non-canonical commands to be included in the commands list.",
             "type": "object",
             "required": ["id", "commandType", "params"],
-            "additionalProperties": false,
             "properties": {
               "id": {"type": "string"},
               "commandType": {
