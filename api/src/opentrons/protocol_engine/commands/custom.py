@@ -5,7 +5,7 @@ It can be used by ProtocolEngine plugins to represent external
 commands in state that a vanilla ProtocolEngine would not
 know about.
 
-This data model serves as a wrapper to ensure custom, arbitray
+This data model serves as a wrapper to ensure custom, arbitrary
 data still adheres to the shapes that ProtocolEngine expects.
 If you are implementing a custom command, you should probably
 put your own disambiguation identifier in the payload.
