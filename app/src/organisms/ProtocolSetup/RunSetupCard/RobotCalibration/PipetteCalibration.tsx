@@ -8,12 +8,13 @@ import {
   Link,
   PrimaryBtn,
   SPACING_3,
-  SPACING_4,
   ALIGN_CENTER,
   DIRECTION_ROW,
   FONT_SIZE_BODY_1,
   FONT_STYLE_ITALIC,
   C_BLUE,
+  DIRECTION_COLUMN,
+  ALIGN_FLEX_END,
 } from '@opentrons/components'
 import { Portal } from '../../../../App/portal'
 import { AskForCalibrationBlockModal } from '../../../../organisms/CalibrateTipLength/AskForCalibrationBlockModal'
@@ -71,30 +72,32 @@ export function PipetteCalibration(props: Props): JSX.Element {
     pipetteTipRackData.exactPipetteMatch === PipetteConstants.INEXACT_MATCH ||
     pipetteTipRackData.exactPipetteMatch === PipetteConstants.MATCH
 
+  let pipetteMismatchInfo
+  if (pipetteTipRackData.exactPipetteMatch === PipetteConstants.INEXACT_MATCH) {
+    pipetteMismatchInfo = (
+      <Flex flexDirection={DIRECTION_COLUMN} alignItems={ALIGN_FLEX_END}>
+        <Text
+          fontSize={FONT_SIZE_BODY_1}
+          fontStyle={FONT_STYLE_ITALIC}
+          marginRight={SPACING_3}
+        >
+          {t('pipette_mismatch')}
+        </Text>
+        <Link
+          external
+          fontSize={FONT_SIZE_BODY_1}
+          href={inexactPipetteSupportArticle}
+          color={C_BLUE}
+          marginRight={SPACING_3}
+        >
+          {t('pipette_compat_help')}
+        </Link>
+      </Flex>
+    )
+  }
+
   if (pipetteTipRackData.pipetteCalDate != null && attached) {
-    if (
-      pipetteTipRackData.exactPipetteMatch === PipetteConstants.INEXACT_MATCH
-    ) {
-      button = (
-        <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
-          <Text
-            fontSize={FONT_SIZE_BODY_1}
-            fontStyle={FONT_STYLE_ITALIC}
-            marginRight={SPACING_4}
-          >
-            {t('pipette_mismatch')}
-          </Text>
-          <Link
-            external
-            fontSize={FONT_SIZE_BODY_1}
-            href={inexactPipetteSupportArticle}
-            marginRight={SPACING_3}
-          >
-            {t('pipette_compat_help')}
-          </Link>
-        </Flex>
-      )
-    }
+    button = pipetteMismatchInfo
   } else if (!attached) {
     subText = t('attach_pipette_calibration')
     button = (
@@ -102,7 +105,7 @@ export function PipetteCalibration(props: Props): JSX.Element {
         <Text
           fontSize={FONT_SIZE_BODY_1}
           fontStyle={FONT_STYLE_ITALIC}
-          marginRight={SPACING_4}
+          marginRight={SPACING_3}
         >
           {t('pipette_missing')}
         </Text>
@@ -114,12 +117,15 @@ export function PipetteCalibration(props: Props): JSX.Element {
   } else {
     button = (
       <>
-        <PrimaryBtn
-          backgroundColor={C_BLUE}
-          onClick={() => startPipetteOffsetCalibrationBlockModal(null)}
-        >
-          {t('calibrate_now_cta')}
-        </PrimaryBtn>
+        <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
+          {pipetteMismatchInfo}
+          <PrimaryBtn
+            backgroundColor={C_BLUE}
+            onClick={() => startPipetteOffsetCalibrationBlockModal(null)}
+          >
+            {t('calibrate_now_cta')}
+          </PrimaryBtn>
+        </Flex>
         {PipetteOffsetCalibrationWizard}
         {showCalBlockModal && (
           <Portal level="top">

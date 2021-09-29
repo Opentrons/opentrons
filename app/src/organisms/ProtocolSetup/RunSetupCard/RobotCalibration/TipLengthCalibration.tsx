@@ -191,7 +191,7 @@ export function TipLengthCalibration({
     <>
       {hasCalibrated ? (
         <Link
-          onClick={() => handleStart()}
+          onClick={() => confirm(true)}
           textDecoration={TEXT_DECORATION_UNDERLINE}
           css={FONT_BODY_2_DARK}
         >

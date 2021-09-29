@@ -63,8 +63,8 @@ describe('PipetteCalibration', () => {
       },
     })
     expect(
-      getByRole('link', { name: 'Pipette Compatibility Help' })
+      getByRole('link', { name: 'Learn more about pipette mismatches' })
     ).toBeTruthy()
-    expect(getByText('Pipette mismatch')).toBeTruthy()
+    expect(getByText('Pipette generation mismatch')).toBeTruthy()
   })
 })

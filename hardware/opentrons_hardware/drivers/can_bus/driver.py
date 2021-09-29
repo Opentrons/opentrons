@@ -11,8 +11,10 @@ from .arbitration_id import ArbitrationId
 from .message import CanMessage
 
 if platform.system() == "Darwin":
-    # Super bad monkey patch to deal with MAC issue:
-    # https://github.com/hardbyte/python-can/issues/1117
+    # TODO (amit, 2021-09-29): remove hacks to support `pcan` when we don't
+    #  need it anymore.
+    #  Super bad monkey patch to deal with MAC issue:
+    #  https://github.com/hardbyte/python-can/issues/1117
     from can.interfaces.pcan import basic
 
     basic.TPCANMsgMac = basic.TPCANMsg
@@ -61,23 +63,26 @@ class CanDriver:
         Returns:
             A CanDriver instance.
         """
+        # TODO (amit, 2021-09-29): remove hacks to support `pcan` when we don't
+        #  need it anymore.
+        #  pcan will not initialize when `fd` is True. looks like it's
+        #  this issue https://forum.peak-system.com/viewtopic.php?t=5646
+        #  Luckily we can still send `fd` messages using `pcan`.
+        fd = True if interface != "pcan" else False
         return CanDriver(
-            bus=Bus(channel=channel, bitrate=bitrate, interface=interface, fd=True),
+            bus=Bus(channel=channel, bitrate=bitrate, interface=interface, fd=fd),
             loop=asyncio.get_event_loop(),
         )
 
     @classmethod
     async def from_env(cls) -> CanDriver:
         """Build a CanDriver from env variables."""
-        can_channel: str = util.load_environment_config().get(
-            "channel", cls.DEFAULT_CAN_NETWORK
-        )
-        can_interface: str = util.load_environment_config().get(
+        environment_config = util.load_environment_config()
+        can_channel: str = environment_config.get("channel", cls.DEFAULT_CAN_NETWORK)
+        can_interface: str = environment_config.get(
             "interface", cls.DEFAULT_CAN_INTERFACE
         )
-        can_bitrate: int = util.load_environment_config().get(
-            "bitrate", cls.DEFAULT_CAN_BITRATE
-        )
+        can_bitrate: int = environment_config.get("bitrate", cls.DEFAULT_CAN_BITRATE)
 
         return await CanDriver.build(can_interface, can_channel, can_bitrate)
 

@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 
 import {
   actions as robotActions,
@@ -11,6 +12,8 @@ import { SidePanel, SidePanelGroup } from '@opentrons/components'
 import { RunTimer } from './RunTimer'
 import { RunControls } from './RunControls'
 import { ModuleLiveStatusCards } from './ModuleLiveStatusCards'
+import { useFeatureFlag } from '../../../redux/config'
+import { RunTimeControl } from '../../../organisms/RunTimeControl'
 
 import type { MapDispatchToProps } from 'react-redux'
 import type { State } from '../../../redux/types'
@@ -52,8 +55,16 @@ const mapDispatchToProps: MapDispatchToProps<DP, {}> = dispatch => ({
   onResetClick: () => dispatch(robotActions.refreshSession()),
 })
 
-function RunPanelComponent(props: Props): JSX.Element {
-  return (
+export function RunPanelComponent(props: Props): JSX.Element {
+  const { t } = useTranslation('run_details')
+  const isNewProtocolRunPanel = useFeatureFlag('preProtocolFlowWithoutRPC')
+
+  return isNewProtocolRunPanel ? (
+    <SidePanel title={t('run_protocol')}>
+      <RunTimeControl />
+      <ModuleLiveStatusCards />
+    </SidePanel>
+  ) : (
     <SidePanel title="Execute Run">
       <SidePanelGroup>
         <RunTimer />
