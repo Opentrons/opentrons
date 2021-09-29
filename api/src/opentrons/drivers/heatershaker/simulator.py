@@ -19,7 +19,7 @@ class SimulatingDriver(AbstractHeaterShakerDriver):
     async def disconnect(self) -> None:
         pass
 
-    async def is_connect(self) -> bool:
+    async def is_connected(self) -> bool:
         return True
 
     async def open_plate_lock(self) -> None:
