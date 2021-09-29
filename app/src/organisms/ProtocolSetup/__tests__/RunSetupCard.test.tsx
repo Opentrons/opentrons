@@ -143,14 +143,11 @@ describe('RunSetupCard', () => {
   })
 
   describe('when no modules are in the protocol', () => {
-    it('renders robot calibration by default', () => {
-      const { getByRole, getByText } = render()
+    it('renders robot calibration heading', () => {
+      const { getByRole } = render()
       getByRole('heading', {
         name: 'Robot Calibration',
       })
-      getByText(
-        'Review required pipettes and tip length calibrations for this protocol.'
-      )
     })
     it('renders calibration needed when robot cal not complete', () => {
       mockGetProtocolCalibrationComplete.mockReturnValue({ complete: false })
@@ -242,12 +239,11 @@ describe('RunSetupCard', () => {
       )
     ).toBeTruthy()
   })
-  it('renders robot calibration by default, skips module setup, renders labware setup heading, and allows the user to proceed to run', () => {
+  it('renders robot calibration heading, skips module setup, renders labware setup heading, and allows the user to proceed to run', () => {
     const { getByRole, getByText } = render()
     getByRole('heading', {
       name: 'Robot Calibration',
     })
-    getByText('Mock Robot Calibration')
     getByRole('heading', {
       name: 'Labware Setup',
     })

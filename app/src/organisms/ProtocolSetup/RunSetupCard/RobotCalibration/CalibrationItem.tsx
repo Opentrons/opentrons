@@ -4,17 +4,16 @@ import {
   Text,
   Flex,
   Icon,
-  SIZE_2,
   FONT_SIZE_BODY_1,
   FONT_SIZE_BODY_2,
   FONT_STYLE_ITALIC,
   C_NEAR_WHITE,
   C_WHITE,
+  COLOR_WARNING,
   COLOR_SUCCESS,
   SPACING_2,
   ALIGN_CENTER,
   DIRECTION_ROW,
-  BORDER_SOLID_MEDIUM,
   Box,
   JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
@@ -48,23 +47,12 @@ export function CalibrationItem(props: Props): JSX.Element | null {
         justifyContent={JUSTIFY_SPACE_BETWEEN}
       >
         <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
-          {calibratedDate != null ? (
-            <Icon
-              name={'check-circle'}
-              size={'1.5rem'}
-              color={COLOR_SUCCESS}
-              marginRight={SPACING_2}
-            />
-          ) : (
-            <Icon
-              name={'circle'}
-              size={'1.5rem'}
-              color={C_WHITE}
-              border={BORDER_SOLID_MEDIUM}
-              borderRadius={SIZE_2}
-              marginRight={SPACING_2}
-            />
-          )}
+          <Icon
+            size={'1.5rem'}
+            color={calibratedDate != null ? COLOR_SUCCESS : COLOR_WARNING}
+            marginRight={SPACING_2}
+            name={calibratedDate != null ? 'check-circle' : 'alert-circle'}
+          />
           <span>
             {title !== undefined && (
               <Text role={'heading'} fontSize={FONT_SIZE_BODY_2}>
