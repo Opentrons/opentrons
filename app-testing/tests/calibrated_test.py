@@ -54,7 +54,7 @@ def test_calibrate(
             exit_button.click()
             calibrate.exit_confirm_button().click()
         driver.save_screenshot(
-            f"results/{request.node.originalname}.{int(time.time())}.png"
+            f"results/{request.node.originalname}.before_start_calibration.png"
         )
         robot_page.start_calibration()
         calibrate.calibrate_deck()
@@ -71,5 +71,5 @@ def test_calibrate(
         # This element location will fail if the file is not loaded.
         overview.get_filename_header(test_protocols["python1"].name)
         driver.save_screenshot(
-            f"results/{request.node.originalname}.{int(time.time())}.png"
+            f"results/{request.node.originalname}.after_file_upload.png"
         )
