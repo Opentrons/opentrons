@@ -111,9 +111,11 @@ export const getLabwareIdsInOrder = (
       const isTiprack = getIsTiprack(labwareDef)
       if (!isTiprack && labwareId !== FIXED_TRASH_ID) {
         let slot = currentLabware.slot
-        const isOnTopOfModule = Object.keys(modules).some(
-          moduleId => moduleId === currentLabware.slot
-        )
+        const isOnTopOfModule =
+          modules != null &&
+          Object.keys(modules).some(
+            moduleId => moduleId === currentLabware.slot
+          )
         if (isOnTopOfModule) {
           slot = modules[slot].slot
         }

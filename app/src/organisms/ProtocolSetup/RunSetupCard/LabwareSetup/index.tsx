@@ -24,6 +24,7 @@ import {
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
+import { LabwarePositionCheck } from '../../LabwarePositionCheck'
 import { LabwareInfoOverlay } from './LabwareInfoOverlay'
 import { LabwareSetupModal } from './LabwareSetupModal'
 import { getModuleTypesThatRequireExtraAttention } from './utils/getModuleTypesThatRequireExtraAttention'
@@ -59,11 +60,20 @@ export const LabwareSetup = (): JSX.Element | null => {
   const moduleTypesThatRequireExtraAttention = getModuleTypesThatRequireExtraAttention(
     moduleModels
   )
+  const [
+    showLabwarePositionCheckModal,
+    setShowLabwarePositionCheckModal,
+  ] = React.useState<boolean>(false)
   return (
     <React.Fragment>
       {showLabwareHelpModal && (
         <LabwareSetupModal
           onCloseClick={() => setShowLabwareHelpModal(false)}
+        />
+      )}
+      {showLabwarePositionCheckModal && (
+        <LabwarePositionCheck
+          onCloseClick={() => setShowLabwarePositionCheckModal(false)}
         />
       )}
       <Flex
@@ -148,7 +158,8 @@ export const LabwareSetup = (): JSX.Element | null => {
         <Flex justifyContent={JUSTIFY_CENTER}>
           <SecondaryBtn
             title={t('check_labware_positions')}
-            onClick={() => console.log('check labware positions!')}
+            marginRight={SPACING_3}
+            onClick={() => setShowLabwarePositionCheckModal(true)}
             color={C_BLUE}
             id={'LabwareSetup_checkLabwarePositionsButton'}
           >

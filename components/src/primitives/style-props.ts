@@ -45,6 +45,7 @@ const BORDER_PROPS = [
   'borderRadius',
   'borderWidth',
   'borderColor',
+  'boxShadow',
 ] as const
 
 const FLEXBOX_PROPS = [
