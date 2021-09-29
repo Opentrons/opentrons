@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { LabwarePositionCheckStepDetail } from './LabwarePositionCheckStepDetail'
 import { LabwarePositionCheckStep } from './types'
 
 interface GenericStepScreenProps {
@@ -7,4 +8,10 @@ interface GenericStepScreenProps {
 }
 export const GenericStepScreen = (
   props: GenericStepScreenProps
-): JSX.Element | null => <div></div>
+): JSX.Element | null => {
+  return (
+    <LabwarePositionCheckStepDetail>
+
+    </LabwarePositionCheckStepDetail>
+  )
+}
