@@ -289,9 +289,14 @@
             "type": "object",
             "required": ["id", "commandType", "params"],
             "properties": {
-              "id": {"type": "string"},
+              "id": { "type": "string" },
               "commandType": {
-                "enum": ["aspirate", "dispense", "aspirateAirGap", "dispenseAirGap"]
+                "enum": [
+                  "aspirate",
+                  "dispense",
+                  "aspirateAirGap",
+                  "dispenseAirGap"
+                ]
               },
               "params": {
                 "allOf": [
@@ -314,7 +319,7 @@
             "type": "object",
             "required": ["id", "commandType", "params"],
             "properties": {
-              "id": {"type": "string"},
+              "id": { "type": "string" },
               "commandType": {
                 "enum": ["blowout"]
               },
@@ -338,7 +343,7 @@
             "type": "object",
             "required": ["id", "commandType", "params"],
             "properties": {
-              "id": {"type": "string"},
+              "id": { "type": "string" },
               "commandType": {
                 "enum": ["touchTip"]
               },
@@ -361,7 +366,7 @@
             "type": "object",
             "required": ["id", "commandType", "params"],
             "properties": {
-              "id": {"type": "string"},
+              "id": { "type": "string" },
               "commandType": {
                 "enum": ["pickUpTip", "dropTip"]
               },
@@ -376,7 +381,7 @@
             "type": "object",
             "required": ["id", "commandType", "params"],
             "properties": {
-              "id": {"type": "string"},
+              "id": { "type": "string" },
               "commandType": { "enum": ["moveToSlot"] },
               "params": {
                 "type": "object",
@@ -407,7 +412,7 @@
             "type": "object",
             "required": ["id", "commandType", "params"],
             "properties": {
-              "id": {"type": "string"},
+              "id": { "type": "string" },
               "commandType": {
                 "enum": ["delay"]
               },
@@ -432,7 +437,7 @@
             "type": "object",
             "required": ["id", "commandType", "params"],
             "properties": {
-              "id": {"type": "string"},
+              "id": { "type": "string" },
               "commandType": {
                 "enum": ["magneticModule/engageMagnet"]
               },
@@ -456,7 +461,7 @@
             "type": "object",
             "required": ["id", "commandType", "params"],
             "properties": {
-              "id": {"type": "string"},
+              "id": { "type": "string" },
               "commandType": {
                 "enum": ["magneticModule/disengageMagnet"]
               },
@@ -471,8 +476,10 @@
             "type": "object",
             "required": ["id", "commandType", "params"],
             "properties": {
-              "id": {"type": "string"},
-              "commandType": { "enum": ["temperatureModule/setTargetTemperature"] },
+              "id": { "type": "string" },
+              "commandType": {
+                "enum": ["temperatureModule/setTargetTemperature"]
+              },
               "params": {
                 "required": ["module", "temperature"],
                 "properties": {
@@ -488,7 +495,7 @@
             "type": "object",
             "required": ["id", "commandType", "params"],
             "properties": {
-              "id": {"type": "string"},
+              "id": { "type": "string" },
               "commandType": { "enum": ["temperatureModule/awaitTemperature"] },
               "params": {
                 "required": ["module", "temperature"],
@@ -505,7 +512,7 @@
             "type": "object",
             "required": ["id", "commandType", "params"],
             "properties": {
-              "id": {"type": "string"},
+              "id": { "type": "string" },
               "commandType": { "enum": ["temperatureModule/deactivate"] },
               "params": {
                 "$ref": "#/definitions/moduleOnlyParams"
@@ -518,8 +525,10 @@
             "type": "object",
             "required": ["id", "commandType", "params"],
             "properties": {
-              "id": {"type": "string"},
-              "commandType": { "enum": ["thermocycler/setTargetBlockTemperature"] },
+              "id": { "type": "string" },
+              "commandType": {
+                "enum": ["thermocycler/setTargetBlockTemperature"]
+              },
               "params": {
                 "required": ["module", "temperature"],
                 "properties": {
@@ -538,8 +547,10 @@
             "type": "object",
             "required": ["id", "commandType", "params"],
             "properties": {
-              "id": {"type": "string"},
-              "commandType": { "enum": ["thermocycler/setTargetLidTemperature"] },
+              "id": { "type": "string" },
+              "commandType": {
+                "enum": ["thermocycler/setTargetLidTemperature"]
+              },
               "params": {
                 "required": ["module", "temperature"],
                 "properties": {
@@ -555,7 +566,7 @@
             "type": "object",
             "required": ["id", "commandType", "params"],
             "properties": {
-              "id": {"type": "string"},
+              "id": { "type": "string" },
               "commandType": { "enum": ["thermocycler/awaitBlockTemperature"] },
               "params": {
                 "required": ["module", "temperature"],
@@ -572,7 +583,7 @@
             "type": "object",
             "required": ["id", "commandType", "params"],
             "properties": {
-              "id": {"type": "string"},
+              "id": { "type": "string" },
               "commandType": { "enum": ["thermocycler/awaitLidTemperature"] },
               "params": {
                 "required": ["module", "temperature"],
@@ -589,7 +600,7 @@
             "type": "object",
             "required": ["id", "commandType", "params"],
             "properties": {
-              "id": {"type": "string"},
+              "id": { "type": "string" },
               "commandType": { "enum": ["thermocycler/deactivateBlock"] },
               "params": {
                 "$ref": "#/definitions/moduleOnlyParams"
@@ -602,7 +613,7 @@
             "type": "object",
             "required": ["id", "commandType", "params"],
             "properties": {
-              "id": {"type": "string"},
+              "id": { "type": "string" },
               "commandType": { "enum": ["thermocycler/deactivateLid"] },
               "params": {
                 "$ref": "#/definitions/moduleOnlyParams"
@@ -615,7 +626,7 @@
             "type": "object",
             "required": ["id", "commandType", "params"],
             "properties": {
-              "id": {"type": "string"},
+              "id": { "type": "string" },
               "commandType": { "enum": ["thermocycler/openLid"] },
               "params": {
                 "$ref": "#/definitions/moduleOnlyParams"
@@ -628,7 +639,7 @@
             "type": "object",
             "required": ["id", "commandType", "params"],
             "properties": {
-              "id": {"type": "string"},
+              "id": { "type": "string" },
               "commandType": { "enum": ["thermocycler/closeLid"] },
               "params": {
                 "$ref": "#/definitions/moduleOnlyParams"
@@ -641,7 +652,7 @@
             "type": "object",
             "required": ["id", "commandType", "params"],
             "properties": {
-              "id": {"type": "string"},
+              "id": { "type": "string" },
               "commandType": { "enum": ["thermocycler/runProfile"] },
               "params": {
                 "type": "object",
@@ -678,7 +689,7 @@
             "type": "object",
             "required": ["id", "commandType", "params"],
             "properties": {
-              "id": {"type": "string"},
+              "id": { "type": "string" },
               "commandType": { "enum": ["thermocycler/awaitProfileComplete"] },
               "params": {
                 "$ref": "#/definitions/moduleOnlyParams"
@@ -691,13 +702,18 @@
             "type": "object",
             "required": ["id", "commandType", "params"],
             "properties": {
-              "id": {"type": "string"},
-              "commandType": { "enum": ["heaterShakerModule/setTargetTemperature"] },
+              "id": { "type": "string" },
+              "commandType": {
+                "enum": ["heaterShakerModule/setTargetTemperature"]
+              },
               "params": {
                 "required": ["module", "temperature"],
                 "properties": {
                   "module": { "type": "string" },
-                  "temperature": { "type": "number", "description": "target temperature to heat to in °C" }
+                  "temperature": {
+                    "type": "number",
+                    "description": "target temperature to heat to in °C"
+                  }
                 }
               }
             }
@@ -708,13 +724,18 @@
             "type": "object",
             "required": ["id", "commandType", "params"],
             "properties": {
-              "id": {"type": "string"},
-              "commandType": { "enum": ["heaterShakerModule/setTargetShakeSpeed"] },
+              "id": { "type": "string" },
+              "commandType": {
+                "enum": ["heaterShakerModule/setTargetShakeSpeed"]
+              },
               "params": {
                 "required": ["module", "rpm"],
                 "properties": {
                   "module": { "type": "string" },
-                  "rpm": { "type": "number", "description": "target orbital rotations per minute" }
+                  "rpm": {
+                    "type": "number",
+                    "description": "target orbital rotations per minute"
+                  }
                 }
               }
             }
@@ -725,13 +746,18 @@
             "type": "object",
             "required": ["id", "commandType", "params"],
             "properties": {
-              "id": {"type": "string"},
-              "commandType": { "enum": ["heaterShakerModule/awaitTemperature"] },
+              "id": { "type": "string" },
+              "commandType": {
+                "enum": ["heaterShakerModule/awaitTemperature"]
+              },
               "params": {
                 "required": ["module", "temperature"],
                 "properties": {
                   "module": { "type": "string" },
-                  "temperature": { "type": "number", "description": "temperature in °C to await" }
+                  "temperature": {
+                    "type": "number",
+                    "description": "temperature in °C to await"
+                  }
                 }
               }
             }
@@ -742,13 +768,16 @@
             "type": "object",
             "required": ["id", "commandType", "params"],
             "properties": {
-              "id": {"type": "string"},
+              "id": { "type": "string" },
               "commandType": { "enum": ["heaterShakerModule/awaitShakeSpeed"] },
               "params": {
                 "required": ["module", "rpm"],
                 "properties": {
                   "module": { "type": "string" },
-                  "rpm": { "type": "number", "description": "target rotations per minute to await" }
+                  "rpm": {
+                    "type": "number",
+                    "description": "target rotations per minute to await"
+                  }
                 }
               }
             }
@@ -759,8 +788,10 @@
             "type": "object",
             "required": ["id", "commandType", "params"],
             "properties": {
-              "id": {"type": "string"},
-              "commandType": { "enum": ["heaterShakerModule/deactivateHeater"] },
+              "id": { "type": "string" },
+              "commandType": {
+                "enum": ["heaterShakerModule/deactivateHeater"]
+              },
               "params": {
                 "$ref": "#/definitions/moduleOnlyParams"
               }
@@ -772,8 +803,10 @@
             "type": "object",
             "required": ["id", "commandType", "params"],
             "properties": {
-              "id": {"type": "string"},
-              "commandType": { "enum": ["heaterShakerModule/deactivateShaker"] },
+              "id": { "type": "string" },
+              "commandType": {
+                "enum": ["heaterShakerModule/deactivateShaker"]
+              },
               "params": {
                 "$ref": "#/definitions/moduleOnlyParams"
               }
@@ -785,8 +818,10 @@
             "type": "object",
             "required": ["id", "commandType", "params"],
             "properties": {
-              "id": {"type": "string"},
-              "commandType": { "enum": ["heaterShakerModule/deactivateShaker"] },
+              "id": { "type": "string" },
+              "commandType": {
+                "enum": ["heaterShakerModule/deactivateShaker"]
+              },
               "params": {
                 "$ref": "#/definitions/moduleOnlyParams"
               }
@@ -798,7 +833,7 @@
             "type": "object",
             "required": ["id", "commandType", "params"],
             "properties": {
-              "id": {"type": "string"},
+              "id": { "type": "string" },
               "commandType": { "enum": ["moveToWell"] },
               "params": {
                 "type": "object",
@@ -830,7 +865,7 @@
             "type": "object",
             "required": ["id", "commandType", "params"],
             "properties": {
-              "id": {"type": "string"},
+              "id": { "type": "string" },
               "commandType": {
                 "enum": ["loadPipette"]
               },
@@ -855,7 +890,7 @@
             "type": "object",
             "required": ["id", "commandType", "params"],
             "properties": {
-              "id": {"type": "string"},
+              "id": { "type": "string" },
               "commandType": {
                 "enum": ["loadLabware"]
               },
@@ -880,7 +915,7 @@
             "type": "object",
             "required": ["id", "commandType", "params"],
             "properties": {
-              "id": {"type": "string"},
+              "id": { "type": "string" },
               "commandType": {
                 "enum": ["loadModule"]
               },
@@ -905,7 +940,7 @@
             "type": "object",
             "required": ["id", "commandType", "params"],
             "properties": {
-              "id": {"type": "string"},
+              "id": { "type": "string" },
               "commandType": {
                 "enum": ["loadLiquid"]
               },
@@ -939,7 +974,7 @@
             "type": "object",
             "required": ["id", "commandType", "params"],
             "properties": {
-              "id": {"type": "string"},
+              "id": { "type": "string" },
               "commandType": {
                 "enum": ["custom"]
               },
@@ -949,7 +984,6 @@
               }
             }
           }
-
         ]
       }
     },

@@ -35,6 +35,30 @@ export type ModuleCommand =
       commandType: 'thermocycler/awaitProfileComplete'
       params: ModuleOnlyParams
     }
+  | {
+      commandType: 'heaterShaker/setTargetTemperature'
+      params: TemperatureParams
+    }
+  | {
+      commandType: 'heaterShaker/awaitTemperature'
+      params: TemperatureParams
+    }
+  | {
+      commandType: 'heaterShaker/setTargetShakeSpeed'
+      params: ShakeSpeedParams
+    }
+  | {
+      commandType: 'heaterShaker/awaitShakeSpeed'
+      params: ShakeSpeedParams
+    }
+  | {
+      commandType: 'heaterShaker/deactivateHeater'
+      params: ModuleOnlyParams
+    }
+  | {
+      commandType: 'heaterShaker/deactivateShaker'
+      params: ModuleOnlyParams
+    }
 
 export interface EngageMagnetParams {
   module: string
@@ -44,6 +68,10 @@ export interface EngageMagnetParams {
 export interface TemperatureParams {
   module: string
   temperature: number
+}
+export interface ShakeSpeedParams {
+  module: string
+  rpm: number
 }
 
 export interface AtomicProfileStep {

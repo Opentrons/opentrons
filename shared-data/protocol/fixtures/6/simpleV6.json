@@ -1325,7 +1325,7 @@
         "well": "A1",
         "volume": 5,
         "flowRate": 3,
-        "offset": {"x": 0, "y": 0, "z": 2}
+        "offset": { "x": 0, "y": 0, "z": 2 }
       }
     },
     {
@@ -1344,7 +1344,7 @@
         "well": "B1",
         "volume": 4.5,
         "flowRate": 2.5,
-        "offset": {"x": 0, "y": 0, "z": 1}
+        "offset": { "x": 0, "y": 0, "z": 1 }
       }
     },
     {
@@ -1354,7 +1354,7 @@
         "pipette": "pipetteId",
         "labware": "destPlateId",
         "well": "B1",
-        "offset": {"x": 0, "y": 0, "z": 11}
+        "offset": { "x": 0, "y": 0, "z": 11 }
       }
     },
     {
@@ -1365,7 +1365,7 @@
         "labware": "destPlateId",
         "well": "B1",
         "flowRate": 2,
-        "offset": {"x": 0, "y": 0, "z": 12}
+        "offset": { "x": 0, "y": 0, "z": 12 }
       }
     },
     {

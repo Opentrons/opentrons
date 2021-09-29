@@ -30,5 +30,9 @@ interface VolumeParams {
 }
 
 interface OffsetParams {
-  offsetFromBottomMm: number
+  offset: {
+    x: number
+    y: number
+    z: number
+  }
 }
