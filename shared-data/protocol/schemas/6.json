@@ -23,11 +23,12 @@
     },
 
     "moduleOnlyParams": {
-      "required": ["module"],
+      "required": ["moduleId"],
       "additionalProperties": false,
       "properties": {
-        "module": {
-          "type": "string"
+        "moduleId": {
+          "type": "string",
+          "description": "Unique identifier of module to target. Must be a key from the top level 'modules' object",
         }
       }
     },
@@ -192,7 +193,7 @@
     },
 
     "pipettes": {
-      "description": "The pipettes used in this protocol, keyed by an arbitrary unique ID",
+      "description": "The pipettes used in this protocol, keyed by a unique identifier (pipetteId)",
       "additionalProperties": false,
       "patternProperties": {
         ".+": {
@@ -210,7 +211,7 @@
     },
 
     "labwareDefinitions": {
-      "description": "All labware definitions used by labware in this protocol, keyed by UUID",
+      "description": "All labware definitions used by labware in this protocol, keyed by a unique identifier (definitionId)",
       "patternProperties": {
         ".+": {
           "$ref": "opentronsLabwareSchemaV2"
@@ -219,7 +220,7 @@
     },
 
     "labware": {
-      "description": "All instances of labware used in this protocol, and references to their definitions",
+      "description": "All instances of labware used in this protocol, and references to their definitionslabwareId, keyed by a unique identifier (labwareId)",
       "patternProperties": {
         ".+": {
           "description": "Fields describing a single labware",
@@ -241,10 +242,10 @@
     },
 
     "liquid": {
-      "description": "All instances of liquid used in this protocol",
+      "description": "All instances of liquid used in this protocol, keyed by a unique identifier (liquidId)",
       "patternProperties": {
         ".+": {
-          "description": "Fields describing a single liquid, keyed by a unique identifier",
+          "description": "Fields describing a single liquid",
           "type": "object",
           "required": ["displayName", "description"],
           "properties": {
@@ -262,7 +263,7 @@
     },
 
     "modules": {
-      "description": "All modules used in this protocol",
+      "description": "All modules used in this protocol keyed by a unique identifier (moduleId)",
       "patternProperties": {
         ".+": {
           "description": "Fields describing a single module on the deck",
@@ -442,13 +443,14 @@
                 "enum": ["magneticModule/engageMagnet"]
               },
               "params": {
-                "required": ["module", "engageHeight"],
+                "required": ["moduleId", "engageHeight"],
                 "properties": {
                   "engageHeight": {
                     "description": "Height in mm(*) from bottom plane of labware (above if positive, below if negative). *NOTE: for magneticModuleV1 (aka GEN1), these are not true mm but an arbitrary unit equal to 0.5mm. So `engageHeight: 2` means 1mm above the labware plane if the command is for a GEN1 magnetic module, but would mean 2mm above the labware plane for GEN2 module",
                     "type": "number"
                   },
-                  "module": {
+                  "moduleId": {
+                    "description": "Unique identifier of Magnetic Module to target. Must be a key from the top level 'modules' object. Must be a key from the top level 'modules' object",
                     "type": "string"
                   }
                 }
@@ -481,9 +483,12 @@
                 "enum": ["temperatureModule/setTargetTemperature"]
               },
               "params": {
-                "required": ["module", "temperature"],
+                "required": ["moduleId", "temperature"],
                 "properties": {
-                  "module": { "type": "string" },
+                  "moduleId": {
+                    "type": "string",
+                    "description": "Unique identifier of Temperature Module to target. Must be a key from the top level 'modules' object"
+                   },
                   "temperature": { "type": "number" }
                 }
               }
@@ -498,9 +503,12 @@
               "id": { "type": "string" },
               "commandType": { "enum": ["temperatureModule/awaitTemperature"] },
               "params": {
-                "required": ["module", "temperature"],
+                "required": ["moduleId", "temperature"],
                 "properties": {
-                  "module": { "type": "string" },
+                  "moduleId": {
+                    "type": "string",
+                    "description": "Unique identifier of Temperature Module to target. Must be a key from the top level 'modules' object"
+                  },
                   "temperature": { "type": "number" }
                 }
               }
@@ -530,9 +538,12 @@
                 "enum": ["thermocycler/setTargetBlockTemperature"]
               },
               "params": {
-                "required": ["module", "temperature"],
+                "required": ["moduleId", "temperature"],
                 "properties": {
-                  "module": { "type": "string" },
+                  "moduleId": {
+                    "type": "string",
+                    "description": "Unique identifier of Thermocycler Module to target. Must be a key from the top level 'modules' object"
+                  },
                   "temperature": { "type": "number" },
                   "volume": {
                     "type": "number"
@@ -552,9 +563,12 @@
                 "enum": ["thermocycler/setTargetLidTemperature"]
               },
               "params": {
-                "required": ["module", "temperature"],
+                "required": ["moduleId", "temperature"],
                 "properties": {
-                  "module": { "type": "string" },
+                  "moduleId": {
+                    "type": "string",
+                    "description": "Unique identifier of Thermocycler Module to target. Must be a key from the top level 'modules' object"
+                  },
                   "temperature": { "type": "number" }
                 }
               }
@@ -569,9 +583,12 @@
               "id": { "type": "string" },
               "commandType": { "enum": ["thermocycler/awaitBlockTemperature"] },
               "params": {
-                "required": ["module", "temperature"],
+                "required": ["moduleId", "temperature"],
                 "properties": {
-                  "module": { "type": "string" },
+                  "moduleId": {
+                    "type": "string",
+                    "description": "Unique identifier of Thermocycler Module to target. Must be a key from the top level 'modules' object"
+                  },
                   "temperature": { "type": "number" }
                 }
               }
@@ -586,9 +603,12 @@
               "id": { "type": "string" },
               "commandType": { "enum": ["thermocycler/awaitLidTemperature"] },
               "params": {
-                "required": ["module", "temperature"],
+                "required": ["moduleId", "temperature"],
                 "properties": {
-                  "module": { "type": "string" },
+                  "moduleId": {
+                    "type": "string",
+                    "description": "Unique identifier of Thermocycler Module to target. Must be a key from the top level 'modules' object"
+                  },
                   "temperature": { "type": "number" }
                 }
               }
@@ -656,9 +676,12 @@
               "commandType": { "enum": ["thermocycler/runProfile"] },
               "params": {
                 "type": "object",
-                "required": ["module", "profile", "volume"],
+                "required": ["moduleId", "profile", "volume"],
                 "properties": {
-                  "module": { "type": "string" },
+                  "moduleId": {
+                    "type": "string",
+                    "description": "Unique identifier of Thermocycler Module to target. Must be a key from the top level 'modules' object"
+                  },
                   "profile": {
                     "type": "array",
                     "items": {
@@ -707,9 +730,12 @@
                 "enum": ["heaterShakerModule/setTargetTemperature"]
               },
               "params": {
-                "required": ["module", "temperature"],
+                "required": ["moduleId", "temperature"],
                 "properties": {
-                  "module": { "type": "string" },
+                  "moduleId": {
+                    "type": "string",
+                    "description": "Unique identifier of Heater Shaker Module to target. Must be a key from the top level 'modules' object"
+                  },
                   "temperature": {
                     "type": "number",
                     "description": "target temperature to heat to in °C"
@@ -729,9 +755,12 @@
                 "enum": ["heaterShakerModule/setTargetShakeSpeed"]
               },
               "params": {
-                "required": ["module", "rpm"],
+                "required": ["moduleId", "rpm"],
                 "properties": {
-                  "module": { "type": "string" },
+                  "moduleId": {
+                    "type": "string",
+                    "description": "Unique identifier of Heater Shaker Module to target. Must be a key from the top level 'modules' object"
+                  },
                   "rpm": {
                     "type": "number",
                     "description": "target orbital rotations per minute"
@@ -751,9 +780,12 @@
                 "enum": ["heaterShakerModule/awaitTemperature"]
               },
               "params": {
-                "required": ["module", "temperature"],
+                "required": ["moduleId", "temperature"],
                 "properties": {
-                  "module": { "type": "string" },
+                  "moduleId": {
+                    "type": "string",
+                    "description": "Unique identifier of Heater Shaker Module to target. Must be a key from the top level 'modules' object"
+                  },
                   "temperature": {
                     "type": "number",
                     "description": "temperature in °C to await"
@@ -771,9 +803,12 @@
               "id": { "type": "string" },
               "commandType": { "enum": ["heaterShakerModule/awaitShakeSpeed"] },
               "params": {
-                "required": ["module", "rpm"],
+                "required": ["moduleId", "rpm"],
                 "properties": {
-                  "module": { "type": "string" },
+                  "moduleId": {
+                    "type": "string",
+                    "description": "Unique identifier of Heater Shaker Module to target. Must be a key from the top level 'modules' object"
+                  },
                   "rpm": {
                     "type": "number",
                     "description": "target rotations per minute to await"
@@ -791,21 +826,6 @@
               "id": { "type": "string" },
               "commandType": {
                 "enum": ["heaterShakerModule/deactivateHeater"]
-              },
-              "params": {
-                "$ref": "#/definitions/moduleOnlyParams"
-              }
-            }
-          },
-
-          {
-            "description": "Heater Shaker Module Deactivate Shaker: Module will deaccelerate until holding still",
-            "type": "object",
-            "required": ["id", "commandType", "params"],
-            "properties": {
-              "id": { "type": "string" },
-              "commandType": {
-                "enum": ["heaterShakerModule/deactivateShaker"]
               },
               "params": {
                 "$ref": "#/definitions/moduleOnlyParams"
@@ -920,9 +940,9 @@
                 "enum": ["loadModule"]
               },
               "params": {
-                "required": ["module", "location"],
+                "required": ["moduleId", "location"],
                 "properties": {
-                  "module": {
+                  "moduleId": {
                     "type": "string",
                     "description": "Unique identifier of module to load"
                   },
@@ -949,17 +969,17 @@
                 "properties": {
                   "liquidId": {
                     "type": "string",
-                    "description": "Unique identifier of instance of entity to load (e.g. pipette id, module id, labware id)"
+                    "description": "Unique identifier of instance of liquid to load. Must be a key from the top level 'liquids' object"
                   },
                   "labwareId": {
                     "type": "string",
-                    "description": "Unique identifier of physical destination location to load liquid into (e.g. pipette mount, slot id, module id)"
+                    "description": "Unique identifier of labware to load liquid into. Must be a key from the top level 'labware' object"
                   },
                   "volumeByWell": {
                     "type": "object",
                     "patternProperties": {
                       ".+": {
-                        "description": "Volume in µL keyed by well from the specified labware",
+                        "description": "Volume in µL keyed by wellName from the specified labware",
                         "type": "number"
                       }
                     }

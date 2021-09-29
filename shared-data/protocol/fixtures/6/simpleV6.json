@@ -1251,7 +1251,7 @@
       "commandType": "loadModule",
       "id": "1abc123",
       "params": {
-        "module": "magneticModuleId",
+        "moduleId": "magneticModuleId",
         "location": "3"
       }
     },
@@ -1259,7 +1259,7 @@
       "commandType": "loadModule",
       "id": "2abc123",
       "params": {
-        "module": "temperatureModuleId",
+        "moduleId": "temperatureModuleId",
         "location": "1"
       }
     },
@@ -1267,7 +1267,7 @@
       "commandType": "loadLabware",
       "id": "3abc123",
       "params": {
-        "labware": "sourcePlateId",
+        "labwareId": "sourcePlateId",
         "location": "temperatureModuleId"
       }
     },
@@ -1275,7 +1275,7 @@
       "commandType": "loadLabware",
       "id": "4abc123",
       "params": {
-        "labware": "destPlateId",
+        "labwareId": "destPlateId",
         "location": "magneticModuleId"
       }
     },
@@ -1283,7 +1283,7 @@
       "commandType": "loadLabware",
       "id": "5abc123",
       "params": {
-        "labware": "tipRackId",
+        "labwareId": "tipRackId",
         "location": "magneticModuleId"
       }
     },
@@ -1291,7 +1291,7 @@
       "commandType": "loadLabware",
       "id": "6abc123",
       "params": {
-        "labware": "trashId",
+        "labwareId": "trashId",
         "location": "12"
       }
     },
@@ -1312,7 +1312,7 @@
       "id": "8abc123",
       "params": {
         "pipetteId": "pipetteId",
-        "labware": "tipRackId",
+        "labwareId": "tipRackId",
         "well": "B1"
       }
     },
@@ -1321,7 +1321,7 @@
       "id": "9abc123",
       "params": {
         "pipetteId": "pipetteId",
-        "labware": "sourcePlateId",
+        "labwareId": "sourcePlateId",
         "well": "A1",
         "volume": 5,
         "flowRate": 3,
@@ -1340,7 +1340,7 @@
       "id": "11abc123",
       "params": {
         "pipetteId": "pipetteId",
-        "labware": "destPlateId",
+        "labwareId": "destPlateId",
         "well": "B1",
         "volume": 4.5,
         "flowRate": 2.5,
@@ -1352,7 +1352,7 @@
       "id": "12abc123",
       "params": {
         "pipetteId": "pipetteId",
-        "labware": "destPlateId",
+        "labwareId": "destPlateId",
         "well": "B1",
         "offset": { "x": 0, "y": 0, "z": 11 }
       }
@@ -1362,7 +1362,7 @@
       "id": "13abc123",
       "params": {
         "pipetteId": "pipetteId",
-        "labware": "destPlateId",
+        "labwareId": "destPlateId",
         "well": "B1",
         "flowRate": 2,
         "offset": { "x": 0, "y": 0, "z": 12 }
@@ -1386,7 +1386,7 @@
       "id": "15abc123",
       "params": {
         "pipetteId": "pipetteId",
-        "labware": "destPlateId",
+        "labwareId": "destPlateId",
         "well": "B2"
       }
     },
@@ -1395,7 +1395,7 @@
       "id": "16abc123",
       "params": {
         "pipetteId": "pipetteId",
-        "labware": "destPlateId",
+        "labwareId": "destPlateId",
         "well": "B2",
         "offset": { "x": 2, "y": 3, "z": 10 },
         "minimumZHeight": 35,
@@ -1407,7 +1407,7 @@
       "id": "17abc123",
       "params": {
         "pipetteId": "pipetteId",
-        "labware": "trashId",
+        "labwareId": "trashId",
         "well": "A1"
       }
     }
