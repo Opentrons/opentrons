@@ -56,9 +56,9 @@
     },
 
     "pipetteAccessParams": {
-      "required": ["pipette", "labware", "well"],
+      "required": ["pipetteId", "labware", "well"],
       "properties": {
-        "pipette": {
+        "pipetteId": {
           "type": "string"
         },
         "labware": {
@@ -385,9 +385,9 @@
               "commandType": { "enum": ["moveToSlot"] },
               "params": {
                 "type": "object",
-                "required": ["pipette", "slot"],
+                "required": ["pipetteId", "slot"],
                 "properties": {
-                  "pipette": { "type": "string" },
+                  "pipetteId": { "type": "string" },
                   "slot": { "type": "string" },
                   "offset": {
                     "$ref": "#/definitions/offset",
@@ -837,9 +837,9 @@
               "commandType": { "enum": ["moveToWell"] },
               "params": {
                 "type": "object",
-                "required": ["pipette", "labware", "well"],
+                "required": ["pipetteId", "labware", "well"],
                 "properties": {
-                  "pipette": { "type": "string" },
+                  "pipetteId": { "type": "string" },
                   "labware": { "type": "string" },
                   "well": { "type": "string" },
                   "offset": {
@@ -870,9 +870,9 @@
                 "enum": ["loadPipette"]
               },
               "params": {
-                "required": ["pipette", "mount"],
+                "required": ["pipetteId", "mount"],
                 "properties": {
-                  "pipette": {
+                  "pipetteId": {
                     "type": "string",
                     "description": "Unique identifier of pipette to load"
                   },
