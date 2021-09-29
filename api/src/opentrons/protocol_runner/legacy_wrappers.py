@@ -9,12 +9,14 @@ from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.context.protocol_api.protocol_context import (
     ProtocolContextImplementation as LegacyContextImplementation,
 )
+
 from opentrons.protocol_api import (
     ProtocolContext as LegacyProtocolContext,
     InstrumentContext as LegacyPipetteContext,
-    ModuleContext as LegacyModuleContext,
-    Labware as LegacyLabware,
 )
+from opentrons.protocol_api.labware import Labware as LegacyLabware
+from opentrons.protocol_api.contexts import ModuleContext as LegacyModuleContext
+
 
 from opentrons.protocols.parse import parse
 from opentrons.protocols.execution.execute import run_protocol

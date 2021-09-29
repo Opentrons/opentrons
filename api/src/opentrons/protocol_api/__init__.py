@@ -8,7 +8,7 @@ from opentrons.protocols.api_support.definitions import (
     MAX_SUPPORTED_VERSION,
     MIN_SUPPORTED_VERSION,
 )
-from .labware import Labware, Well
+from . import labware
 from .contexts import (
     ProtocolContext,
     InstrumentContext,
@@ -16,7 +16,6 @@ from .contexts import (
     TemperatureModuleContext,
     MagneticModuleContext,
     ThermocyclerContext,
-    ModuleContext,
 )
 
 __all__ = [
@@ -27,8 +26,6 @@ __all__ = [
     "TemperatureModuleContext",
     "MagneticModuleContext",
     "ThermocyclerContext",
-    "ModuleContext",
     "PairedInstrumentContext",
-    "Labware",
-    "Well",
+    "labware",
 ]
