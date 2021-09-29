@@ -1,6 +1,6 @@
 from __future__ import annotations
 import asyncio
-from contextlib import contextmanager, ExitStack
+from contextlib import contextmanager, AsyncExitStack
 import logging
 from typing import Any, Dict, List, Optional, Tuple, TYPE_CHECKING, Union, Sequence
 from typing_extensions import Final
@@ -129,9 +129,9 @@ class Controller:
         speed: float = None,
         axis_max_speeds: Dict[str, float] = None,
     ):
-        with ExitStack() as cmstack:
+        async with AsyncExitStack() as cmstack:
             if axis_max_speeds:
-                cmstack.enter_context(
+                await cmstack.enter_async_context(
                     self._smoothie_driver.restore_axis_max_speed(axis_max_speeds)
                 )
             await self._smoothie_driver.move(
