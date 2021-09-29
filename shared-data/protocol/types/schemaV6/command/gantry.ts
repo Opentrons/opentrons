@@ -3,7 +3,7 @@ export type GantryCommand =
   | { commandType: 'moveToWell'; params: MoveToWellParams }
 
 interface MoveToSlotParams {
-  pipette: string
+  pipetteId: string
   slot: string
   offset?: {
     x: number
@@ -15,8 +15,8 @@ interface MoveToSlotParams {
 }
 
 interface MoveToWellParams {
-  pipette: string
-  labware: string
+  pipetteId: string
+  labwareId: string
   well: string
   offset?: {
     x: number

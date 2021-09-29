@@ -20,8 +20,8 @@ interface FlowRateParams {
 }
 
 interface PipetteAccessParams {
-  pipette: string
-  labware: string
+  pipetteId: string
+  labwareId: string
   well: string
 }
 

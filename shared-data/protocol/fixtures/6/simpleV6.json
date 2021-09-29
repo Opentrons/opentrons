@@ -1243,7 +1243,7 @@
       "commandType": "loadPipette",
       "id": "0abc123",
       "params": {
-        "pipette": "pipetteId",
+        "pipetteId": "pipetteId",
         "mount": "leftMount"
       }
     },
@@ -1311,7 +1311,7 @@
       "commandType": "pickUpTip",
       "id": "8abc123",
       "params": {
-        "pipette": "pipetteId",
+        "pipetteId": "pipetteId",
         "labware": "tipRackId",
         "well": "B1"
       }
@@ -1320,7 +1320,7 @@
       "commandType": "aspirate",
       "id": "9abc123",
       "params": {
-        "pipette": "pipetteId",
+        "pipetteId": "pipetteId",
         "labware": "sourcePlateId",
         "well": "A1",
         "volume": 5,
@@ -1339,7 +1339,7 @@
       "commandType": "dispense",
       "id": "11abc123",
       "params": {
-        "pipette": "pipetteId",
+        "pipetteId": "pipetteId",
         "labware": "destPlateId",
         "well": "B1",
         "volume": 4.5,
@@ -1351,7 +1351,7 @@
       "commandType": "touchTip",
       "id": "12abc123",
       "params": {
-        "pipette": "pipetteId",
+        "pipetteId": "pipetteId",
         "labware": "destPlateId",
         "well": "B1",
         "offset": { "x": 0, "y": 0, "z": 11 }
@@ -1361,7 +1361,7 @@
       "commandType": "blowout",
       "id": "13abc123",
       "params": {
-        "pipette": "pipetteId",
+        "pipetteId": "pipetteId",
         "labware": "destPlateId",
         "well": "B1",
         "flowRate": 2,
@@ -1372,7 +1372,7 @@
       "commandType": "moveToSlot",
       "id": "14abc123",
       "params": {
-        "pipette": "pipetteId",
+        "pipetteId": "pipetteId",
         "slot": "5",
         "offset": {
           "x": 1,
@@ -1385,7 +1385,7 @@
       "commandType": "moveToWell",
       "id": "15abc123",
       "params": {
-        "pipette": "pipetteId",
+        "pipetteId": "pipetteId",
         "labware": "destPlateId",
         "well": "B2"
       }
@@ -1394,7 +1394,7 @@
       "commandType": "moveToWell",
       "id": "16abc123",
       "params": {
-        "pipette": "pipetteId",
+        "pipetteId": "pipetteId",
         "labware": "destPlateId",
         "well": "B2",
         "offset": { "x": 2, "y": 3, "z": 10 },
@@ -1406,7 +1406,7 @@
       "commandType": "dropTip",
       "id": "17abc123",
       "params": {
-        "pipette": "pipetteId",
+        "pipetteId": "pipetteId",
         "labware": "trashId",
         "well": "A1"
       }

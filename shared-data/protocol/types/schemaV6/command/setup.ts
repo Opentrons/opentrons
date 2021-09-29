@@ -5,11 +5,11 @@ export type SetupCommand =
   | { commandType: 'loadLiquid'; params: LoadLiquidParams }
 
 interface LoadPipetteParams {
-  pipette: string
+  pipetteId: string
   mount: string | null
 }
 interface LoadLabwareParams {
-  labware: string
+  labwareId: string
   location: string | null
 }
 interface LoadModuleParams {

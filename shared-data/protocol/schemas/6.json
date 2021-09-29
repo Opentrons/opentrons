@@ -56,12 +56,12 @@
     },
 
     "pipetteAccessParams": {
-      "required": ["pipetteId", "labware", "well"],
+      "required": ["pipetteId", "labwareId", "well"],
       "properties": {
         "pipetteId": {
           "type": "string"
         },
-        "labware": {
+        "labwareId": {
           "type": "string"
         },
         "well": {
@@ -837,10 +837,10 @@
               "commandType": { "enum": ["moveToWell"] },
               "params": {
                 "type": "object",
-                "required": ["pipetteId", "labware", "well"],
+                "required": ["pipetteId", "labwareId", "well"],
                 "properties": {
                   "pipetteId": { "type": "string" },
-                  "labware": { "type": "string" },
+                  "labwareId": { "type": "string" },
                   "well": { "type": "string" },
                   "offset": {
                     "$ref": "#/definitions/offset",
@@ -895,9 +895,9 @@
                 "enum": ["loadLabware"]
               },
               "params": {
-                "required": ["labware", "location"],
+                "required": ["labwareId", "location"],
                 "properties": {
-                  "labware": {
+                  "labwareId": {
                     "type": "string",
                     "description": "Unique identifier of labware to load"
                   },
