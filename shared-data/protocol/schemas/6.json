@@ -182,12 +182,16 @@
     },
 
     "robot": {
-      "required": ["model"],
+      "required": ["model", "deckId"],
       "properties": {
         "model": {
-          "description": "Model of the robot this protocol is written for (currently only OT-2 Standard is supported)",
+          "description": "Model of the robot this protocol is written for",
           "type": "string",
-          "enum": ["OT-2 Standard"]
+          "enum": ["OT-2 Standard", "OT-3 Standard"]
+        },
+        "deckId": {
+          "description": "Identifier of physical deck this protocol is written for. This should match a top-level key in shared-data/deck/definitions/2.json",
+          "type": "string"
         }
       }
     },

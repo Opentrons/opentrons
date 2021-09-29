@@ -12,7 +12,8 @@
     "tags": ["unitTest"]
   },
   "robot": {
-    "model": "OT-2 Standard"
+    "model": "OT-2 Standard",
+    "deckId": "ot2_standard"
   },
   "pipettes": {
     "pipetteId": {
