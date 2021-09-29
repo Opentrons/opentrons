@@ -1,1 +1,1 @@
-"""Tools for extending the WebDiver."""
+"""WebDiver."""
