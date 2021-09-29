@@ -36,7 +36,7 @@ export const LabwarePositionCheck = (
         }}
       >
         {currentLabwareCheckStep !== null ? (
-          <GenericStepScreen />
+          <GenericStepScreen selectedStep={{} as any} /> // replace this with actual selected step
         ) : (
           <IntroScreen
             setCurrentLabwareCheckStep={setCurrentLabwareCheckStep}
