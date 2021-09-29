@@ -7,6 +7,7 @@ import robot_calibration from './robot_calibration.json'
 import robot_connection from './robot_connection.json'
 import robot_controls from './robot_controls.json'
 import robot_info from './robot_info.json'
+import run_details from './run_details.json'
 import top_navigation from './top_navigation.json'
 
 export const en = {
@@ -19,5 +20,6 @@ export const en = {
   robot_connection,
   robot_controls,
   robot_info,
+  run_details,
   top_navigation,
 }
