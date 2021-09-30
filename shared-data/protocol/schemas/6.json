@@ -558,7 +558,7 @@
                   "moduleId": {
                     "type": "string",
                     "description": "Unique identifier of Temperature Module to target. Must be a key from the top level 'modules' object"
-                   },
+                  },
                   "temperature": { "type": "number" }
                 }
               }
