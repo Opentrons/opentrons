@@ -28,7 +28,7 @@
       "properties": {
         "moduleId": {
           "type": "string",
-          "description": "Unique identifier of module to target. Must be a key from the top level 'modules' object",
+          "description": "Unique identifier of module to target. Must be a key from the top level 'modules' object"
         }
       }
     },

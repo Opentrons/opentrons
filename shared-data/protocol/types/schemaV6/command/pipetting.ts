@@ -11,9 +11,9 @@ export type PipettingCommand =
 type AspDispAirgapParams = FlowRateParams &
   PipetteAccessParams &
   VolumeParams &
-  OffsetParams
-type BlowoutParams = FlowRateParams & PipetteAccessParams & OffsetParams
-type TouchTipParams = PipetteAccessParams & OffsetParams
+  WellLocationParam
+type BlowoutParams = FlowRateParams & PipetteAccessParams & WellLocationParam
+type TouchTipParams = PipetteAccessParams & WellLocationParam
 
 interface FlowRateParams {
   flowRate: number
@@ -29,10 +29,13 @@ interface VolumeParams {
   volume: number
 }
 
-interface OffsetParams {
-  offset: {
-    x: number
-    y: number
-    z: number
+interface WellLocationParam {
+  wellLocation: {
+    origin: string // e.g. 'top' || 'bottom'
+    offset: {
+      x: number
+      y: number
+      z: number
+    }
   }
 }

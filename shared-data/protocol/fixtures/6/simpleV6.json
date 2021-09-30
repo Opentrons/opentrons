@@ -1418,7 +1418,7 @@
         "wellName": "B2",
         "wellLocation": {
           "origin": "bottom",
-          "offset": { "x": 2, "y": 3, "z": 10 },
+          "offset": { "x": 2, "y": 3, "z": 10 }
         },
         "minimumZHeight": 35,
         "forceDirect": true
