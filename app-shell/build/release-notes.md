@@ -20,7 +20,6 @@ None in the Opentrons App.
 
 ## 4.6.1 to 4.6.2
 
-
 The 4.6.2 hotfix release contains a small bug fix for an issue where the OT-2's max speed settings within a protocol will be ignored. It does not affect the software running in the Opentrons App.
 
 ## 4.6.0 to 4.6.1

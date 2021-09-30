@@ -20,7 +20,6 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 - Fixed a few issues with the faster protocol analysis method added in the 4.5.0 release.
 - Fixed type annotations of the `ProtocolContext` classes.
 
-
 ## 4.6.1 to 4.6.2
 
 The 4.6.2 hotfix release contains a small bug fix for an issue where the OT-2's max speed settings within a protocol will be ignored.
