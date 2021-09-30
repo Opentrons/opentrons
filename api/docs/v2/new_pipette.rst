@@ -201,40 +201,40 @@ For instance, in this protocol you can see the effects of specifying tipracks:
 .. code-block:: python
     :substitutions:
 
-   from opentrons import protocol_api
+    from opentrons import protocol_api
 
-   metadata = {'apiLevel': '|apiLevel|'}
+    metadata = {'apiLevel': '|apiLevel|'}
 
-   def run(protocol: protocol_api.ProtocolContext):
-       tiprack_left = protocol.load_labware('opentrons_96_tiprack_300ul', '1')
-       tiprack_right = protocol.load_labware('opentrons_96_tiprack_300ul', '2')
-       left_pipette = protocol.load_instrument('p300_single', 'left')
-       right_pipette = protocol.load_instrument(
-           'p300_multi', 'right', tip_racks=[tiprack_right])
+    def run(protocol: protocol_api.ProtocolContext):
+        tiprack_left = protocol.load_labware('opentrons_96_tiprack_300ul', '1')
+        tiprack_right = protocol.load_labware('opentrons_96_tiprack_300ul', '2')
+        left_pipette = protocol.load_instrument('p300_single', 'left')
+        right_pipette = protocol.load_instrument(
+            'p300_multi', 'right', tip_racks=[tiprack_right])
 
-       # You must specify the tip location for the left pipette, which was
-       # loaded without specifying tip_racks
-       left_pipette.pick_up_tip(tiprack['A1'])
-       left_pipette.drop_tip()
+        # You must specify the tip location for the left pipette, which was
+        # loaded without specifying tip_racks
+        left_pipette.pick_up_tip(tiprack['A1'])
+        left_pipette.drop_tip()
 
-       # And you have to do it every time you call pick_up_tip, doing all
-       # your own tip tracking
-       left_pipette.pick_up_tip(tiprack['A2'])
-       left_pipette.drop_tip()
-       left_pipette.pick_up_tip(tiprack['A3'])
-       left_pipette.drop_tip()
+        # And you have to do it every time you call pick_up_tip, doing all
+        # your own tip tracking
+        left_pipette.pick_up_tip(tiprack['A2'])
+        left_pipette.drop_tip()
+        left_pipette.pick_up_tip(tiprack['A3'])
+        left_pipette.drop_tip()
 
-       # Since you specified tip_racks when loading the right pipette, it will
-       # automatically pick up from A1 of its associated tiprack
-       right_pipette.pick_up_tip()
-       right_pipette.drop_tip()
+        # Since you specified tip_racks when loading the right pipette, it will
+        # automatically pick up from A1 of its associated tiprack
+        right_pipette.pick_up_tip()
+        right_pipette.drop_tip()
 
-       # And further calls to pick_up_tip will automatically progress through
-       # the tips in the rack
-       right_pipette.pick_up_tip()
-       right_pipette.drop_tip()
-       right_pipette.pick_up_tip()
-       right_pipette.drop_tip()
+        # And further calls to pick_up_tip will automatically progress through
+        # the tips in the rack
+        right_pipette.pick_up_tip()
+        right_pipette.drop_tip()
+        right_pipette.pick_up_tip()
+        right_pipette.drop_tip()
        
 
 This is further discussed in :ref:`v2-atomic-commands`
