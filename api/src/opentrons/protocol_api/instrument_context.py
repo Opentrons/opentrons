@@ -1057,7 +1057,7 @@ class InstrumentContext(CommandPublisher):
         # TODO: ..trash or the original well.
         # TODO: What should happen if the user passes a non-first-row well
         # TODO: ..as src/dest *while using multichannel pipette?
-        r"""
+        """
         Transfer will move a volume of liquid from a source location(s)
         to a dest location(s). It is a higher-level command, incorporating
         other :py:class:`InstrumentContext` commands, like :py:meth:`aspirate`
@@ -1075,7 +1075,7 @@ class InstrumentContext(CommandPublisher):
                        will be aspirated.
         :param dest: A single well or a list of wells where liquid
                      will be dispensed to.
-        :param \**kwargs: See below
+        :param \\**kwargs: See below
 
         :Keyword Arguments:
 
@@ -1106,15 +1106,16 @@ class InstrumentContext(CommandPublisher):
                 - 'destination well': blowout excess liquid into destination
                    well
                 - 'trash': blowout excess liquid into the trash
-                If no `blowout_location` specified, no `disposal_volume`
+
+                If no ``blowout_location`` specified, no ``disposal_volume``
                 specified, and the pipette contains liquid,
-                a :py:meth:`blow_out` will occur into the source well
+                a :py:meth:`blow_out` will occur into the source well.
 
-                If no `blowout_location` specified and either
-                `disposal_volume` is specified or the pipette is empty,
-                a :py:meth:`blow_out` will occur into the trash
+                If no ``blowout_location`` specified and either
+                ``disposal_volume`` is specified or the pipette is empty,
+                a :py:meth:`blow_out` will occur into the trash.
 
-                If `blow_out` is set to `False`, this parameter will be ignored
+                If `blow_out` is set to ``False``, this parameter will be ignored.
 
             * *mix_before* (``tuple``) --
               The tuple, if specified, gives the amount of volume to
