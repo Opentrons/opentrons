@@ -90,6 +90,14 @@ from .pause import (
 )
 
 
+from .custom import (
+    Custom,
+    CustomData,
+    CustomResult,
+    CustomCommandType,
+)
+
+
 __all__ = [
     # command model factory
     "CommandMapper",
@@ -157,4 +165,9 @@ __all__ = [
     "PauseRequest",
     "PauseResult",
     "PauseCommandType",
+    # custom command models
+    "Custom",
+    "CustomData",
+    "CustomResult",
+    "CustomCommandType",
 ]

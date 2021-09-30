@@ -9,7 +9,6 @@ of `ResponseModel`s rather than `ResponseModel`s of `Union`s.
 """
 from typing import Union
 
-from opentrons.protocol_engine import commands as pe_commands
 from robot_server.service.json_api import RequestModel, ResponseModel
 
 
@@ -29,15 +28,4 @@ CreateSessionRequest = Union[
 SessionResponse = Union[
     ResponseModel[BasicSession],
     ResponseModel[ProtocolSession],
-]
-
-SessionCommandResponse = Union[
-    ResponseModel[pe_commands.AddLabwareDefinition],
-    ResponseModel[pe_commands.Aspirate],
-    ResponseModel[pe_commands.Dispense],
-    ResponseModel[pe_commands.DropTip],
-    ResponseModel[pe_commands.LoadLabware],
-    ResponseModel[pe_commands.LoadPipette],
-    ResponseModel[pe_commands.MoveToWell],
-    ResponseModel[pe_commands.PickUpTip],
 ]
