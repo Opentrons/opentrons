@@ -33,19 +33,6 @@
       }
     },
 
-    "mmOffset": {
-      "description": "Millimeters for pipette location offsets",
-      "type": "number"
-    },
-
-    "offsetFromBottomMm": {
-      "description": "Offset from bottom of well in millimeters",
-      "required": ["offsetFromBottomMm"],
-      "properties": {
-        "offsetFromBottomMm": { "$ref": "#/definitions/mmOffset" }
-      }
-    },
-
     "offset": {
       "description": "x, y, and z component of offset vector in mm",
       "required": ["x", "y", "z"],
@@ -132,6 +119,20 @@
           "description": "The null location corresponds to any location not tracked by the system (off-deck)"
         }
       ]
+    },
+
+    "wellLocation": {
+      "required": ["origin", "offset"],
+      "properties": {
+        "origin": {
+          "type": "string",
+          "description": "reference location with respect to a well from which to apply an offset if given (e.g. 'bottom' || 'top')"
+        },
+        "offset": {
+          "$ref": "#/definitions/offset",
+          "description": "X, Y, Z offset from the specified origin with respect to well"
+        }
+      }
     }
   },
 
@@ -350,10 +351,7 @@
                   { "$ref": "#/definitions/pipetteAccessParams" },
                   { "$ref": "#/definitions/volumeParams" },
                   {
-                    "offset": {
-                      "$ref": "#/definitions/offset",
-                      "description": "Offset from bottom center of location, in mm"
-                    }
+                    "wellLocation": { "$ref": "#/definitions/wellLocation" }
                   }
                 ]
               }
@@ -374,10 +372,7 @@
                   { "$ref": "#/definitions/flowRate" },
                   { "$ref": "#/definitions/pipetteAccessParams" },
                   {
-                    "offset": {
-                      "$ref": "#/definitions/offset",
-                      "description": "Offset from bottom center of location, in mm"
-                    }
+                    "wellLocation": { "$ref": "#/definitions/wellLocation" }
                   }
                 ]
               }
@@ -397,10 +392,7 @@
                 "allOf": [
                   { "$ref": "#/definitions/pipetteAccessParams" },
                   {
-                    "offset": {
-                      "$ref": "#/definitions/offset",
-                      "description": "Offset from bottom center of location, in mm"
-                    }
+                    "wellLocation": { "$ref": "#/definitions/wellLocation" }
                   }
                 ]
               }
@@ -940,10 +932,7 @@
                   "pipetteId": { "type": "string" },
                   "labwareId": { "type": "string" },
                   "wellName": { "type": "string" },
-                  "offset": {
-                    "$ref": "#/definitions/offset",
-                    "description": "Optional offset from well bottom center, in mm"
-                  },
+                  "wellLocation": { "$ref": "#/definitions/wellLocation" },
                   "minimumZHeight": {
                     "description": "Optional minimal Z margin in mm. If this is larger than the API's default safe Z margin, it will make the arc higher. If it's smaller, it will have no effect. Specifying this for movements that would not arc (moving within the same well in the same labware) will cause an arc movement instead.",
                     "type": "number",

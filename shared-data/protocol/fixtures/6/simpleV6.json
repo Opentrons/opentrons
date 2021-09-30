@@ -1333,7 +1333,10 @@
         "wellName": "A1",
         "volume": 5,
         "flowRate": 3,
-        "offset": { "x": 0, "y": 0, "z": 2 }
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "x": 0, "y": 0, "z": 2 }
+        }
       }
     },
     {
@@ -1352,7 +1355,10 @@
         "wellName": "B1",
         "volume": 4.5,
         "flowRate": 2.5,
-        "offset": { "x": 0, "y": 0, "z": 1 }
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "x": 0, "y": 0, "z": 1 }
+        }
       }
     },
     {
@@ -1362,7 +1368,10 @@
         "pipetteId": "pipetteId",
         "labwareId": "destPlateId",
         "wellName": "B1",
-        "offset": { "x": 0, "y": 0, "z": 11 }
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "x": 0, "y": 0, "z": 11 }
+        }
       }
     },
     {
@@ -1373,7 +1382,10 @@
         "labwareId": "destPlateId",
         "wellName": "B1",
         "flowRate": 2,
-        "offset": { "x": 0, "y": 0, "z": 12 }
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "x": 0, "y": 0, "z": 12 }
+        }
       }
     },
     {
@@ -1382,10 +1394,9 @@
       "params": {
         "pipetteId": "pipetteId",
         "slotId": "5",
-        "offset": {
-          "x": 1,
-          "y": 2,
-          "z": 3
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "x": 1, "y": 2, "z": 3 }
         }
       }
     },
@@ -1405,7 +1416,10 @@
         "pipetteId": "pipetteId",
         "labwareId": "destPlateId",
         "wellName": "B2",
-        "offset": { "x": 2, "y": 3, "z": 10 },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "x": 2, "y": 3, "z": 10 },
+        },
         "minimumZHeight": 35,
         "forceDirect": true
       }
