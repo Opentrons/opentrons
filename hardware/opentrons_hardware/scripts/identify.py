@@ -12,6 +12,8 @@ from opentrons_hardware.drivers.can_bus import (
     ArbitrationId,
     ArbitrationIdParts,
 )
+from opentrons_hardware.drivers.can_bus.messages.payloads import \
+    DeviceInfoResponseBody
 
 
 async def request(can_driver: CanDriver) -> None:
@@ -45,9 +47,10 @@ async def wait_responses(can_driver: CanDriver) -> None:
     """
     async for message in can_driver:
         if message.arbitration_id.parts.message_id == MessageId.device_info_response:
-            node = NodeId(message.data[0])
+            body = DeviceInfoResponseBody.build(message.data)
+            node = NodeId(body.node_id.value)
             print(f"Received response from Node: {node.name}({node.value:x})")
-            print(f"\tArbitration id: {message.arbitration_id}")
+            print(f"\tArbitration id: {message.arbitration_id}. Body: {body}")
 
 
 async def run(interface: str, bitrate: int, channel: Optional[str] = None) -> None:
