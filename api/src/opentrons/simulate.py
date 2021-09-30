@@ -319,8 +319,8 @@ def simulate(
     :type log_level: 'debug', 'info', 'warning', or 'error'
     :returns: A tuple of a run log for user output, and possibly the required
               data to write to a bundle to bundle this protocol. The bundle is
-              only emitted if bundling is allowed (see
-              :py:meth:`allow_bundling`)  and this is an unbundled Protocol API
+              only emitted if bundling is allowed
+              and this is an unbundled Protocol API
               v2 python protocol. In other cases it is None.
     """
     stack_logger = logging.getLogger("opentrons")
