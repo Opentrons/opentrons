@@ -171,7 +171,7 @@ class Well:
         Specifies an arbitrary point in deck coordinates based
         on percentages of the radius in each axis. For example, to specify the
         back-right corner of a well at 1/4 of the well depth from the bottom,
-        the call would be `from_center_cartesian(1, 1, -0.5)`.
+        the call would be ``from_center_cartesian(1, 1, -0.5)``.
 
         No checks are performed to ensure that the resulting position will be
         inside of the well.
@@ -183,8 +183,8 @@ class Well:
         :param z: a float in the range [-1.0, 1.0] for a percentage of half of
             the height above/below the center
 
-        :return: a Point representing the specified location in absolute deck
-        coordinates
+        :return: a :py:class:`opentrons.types.Point` representing the specified
+                 location in absolute deck coordinates
         """
         return self._geometry.from_center_cartesian(x, y, z)
 
@@ -785,9 +785,9 @@ def select_tiprack_from_list_paired_pipettes(
     tipracks until it finds a well that is not empty.
 
     :return: A Tuple of the tiprack and well to move to. In this
-    instance the starting well is specific to the primary pipette.
+             instance the starting well is specific to the primary pipette.
     :raises TipSelectionError: if the starting tip specified
-    does not exist in the filtered tipracks.
+                               does not exist in the filtered tipracks.
     """
     try:
         first, rest = split_tipracks(tip_racks)
