@@ -142,19 +142,3 @@ def test_command_stack() -> None:
             legacyCommandText="hello",
         ),
     )
-
-
-# def test_maps_labware() -> None:
-#     """If the labware list changes, load labware commands should be issued."""
-#     legacy_command: PauseMessage = {
-#         "$": "before",
-#         "meta": {},
-#         "name": "command.PAUSE",
-#         "payload": {"userMessage": "hello world", "text": "hello world"},
-#     }
-
-#     subject = LegacyCommandMapper()
-#     results = subject.map(
-#         command=legacy_command
-#         loaded_labware={1, }
-#     )
