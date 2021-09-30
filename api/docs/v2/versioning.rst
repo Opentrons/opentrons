@@ -124,9 +124,11 @@ Changes in API Versions
 Version 2.1
 +++++++++++
 
-- You can now specify a label when loading labware into a module with the ``label`` parameter of
-  :py:meth:`.ModuleContext.load_labware` just like you can when loading labware
-  into your protocol with :py:meth:`.ProtocolContext.load_labware`.
+- When loading labware onto a module, you can now specify a label with the ``label`` parameter of
+  :py:meth:`.MagneticModuleContext.load_labware`,
+  :py:meth:`.TemperatureModuleContext.load_labware`,
+  :py:meth:`.ThermocyclerContext.load_labware`,
+  just like you can when loading labware onto the deck with :py:meth:`.ProtocolContext.load_labware`.
 
 
 Version 2.2
@@ -148,7 +150,7 @@ Version 2.3
   possible collisions
 - During a :ref:`mix`, the pipette will no longer move up to clear the liquid in
   between every dispense and following aspirate
-- You can now access the temperature module's status via the ``status`` property of ```ModuleContext.TemperatureModuleContext```
+- You can now access the temperature module's status via :py:obj:`.TemperatureModuleContext.status`.
 
 
 Version 2.4

@@ -406,7 +406,7 @@ class ProtocolContext(CommandPublisher):
         .. note::
 
             If a module is present on the deck but no labware has been loaded
-            into it with :py:meth:`.ModuleContext.load_labware`, there will
+            into it with ``module.load_labware()``, there will
             be no entry for that slot in this value. That means you should not
             use ``loaded_labwares`` to determine if a slot is available or not,
             only to get a list of labwares. If you want a data structure of all
@@ -461,8 +461,11 @@ class ProtocolContext(CommandPublisher):
                               the non-full plate configuration, you must
                               pass in the key word value `semi`
         :type location: str or int or None
-        :returns ModuleContext: The loaded and initialized
-                                :py:class:`ModuleContext`.
+        :returns: The loaded and initialized module---a
+                  :py:class:`TemperatureModuleContext`,
+                  :py:class:`ThermocyclerContext`, or
+                  :py:class:`MagneticModuleContext`,
+                  depending on what you requested with ``module_name``.
         """
         if self._api_version < APIVersion(2, 4) and configuration:
             raise APIVersionError(
