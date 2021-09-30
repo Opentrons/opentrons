@@ -1256,7 +1256,7 @@ class InstrumentContext(CommandPublisher):
         :param location: The location to move to.
         :type location: :py:class:`.types.Location`
         :param force_direct: If set to true, move directly to destination
-                        without arc motion.
+                             without arc motion.
         :param minimum_z_height: When specified, this Z margin is able to raise
                                  (but never lower) the mid-arc height.
         :param speed: The speed at which to move. By default,
@@ -1265,7 +1265,7 @@ class InstrumentContext(CommandPublisher):
                       individual axis speeds, you can use
                       :py:attr:`.ProtocolContext.max_speeds`.
         :param publish: Whether a call to this function should publish to the
-        runlog or not.
+                        runlog or not.
         """
         from_loc = self._ctx.location_cache
         if not from_loc:
