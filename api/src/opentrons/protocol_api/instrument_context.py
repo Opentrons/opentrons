@@ -1530,25 +1530,23 @@ class InstrumentContext(CommandPublisher):
 
         :param instrument: The secondary instrument you wish to use
 
-        :raises UnsupportedInstrumentPairingError: If you try to pair
-        pipettes that are not currently supported together.
-        :returns: PairedInstrumentContext: This is the object you
-        will call commands on.
+        :raises UnsupportedInstrumentPairingError: If you try to pair pipettes that are
+                                                   not currently supported together.
 
-        This function returns a :py:class:`PairedInstrumentContext`.
-        The building block commands are the same as an individual pipette's
-        building block commands found at :ref:`v2-atomic-commands`,
-        and when you want to move pipettes simultaneously you need to use the
-        :py:class:`PairedInstrumentContext`.
-
+        :returns: A ``PairedInstrumentContext``. This is the object you will call
+                  commands on. The building block commands are the same as an individual
+                  pipette's building block commands found at :ref:`v2-atomic-commands`,
+                  and when you want to move pipettes simultaneously you need to use the
+                  ``PairedInstrumentContext``.
 
         Limitations:
+
         1. This function utilizes a "primary" and "secondary" pipette to make
-        positional decisions. The consequence of doing this is that all X & Y
-        positions are based on the primary pipette only.
+           positional decisions. The consequence of doing this is that all X & Y
+           positions are based on the primary pipette only.
         2. At this time, only pipettes of the same type are supported for
-        pipette pairing. This means that you cannot utilize a P1000 Single
-        channel and a P300 Single channel at the same time.
+           pipette pairing. This means that you cannot utilize a P1000 Single
+           channel and a P300 Single channel at the same time.
 
         .. code-block :: python
             :substitutions:
