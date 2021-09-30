@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.6.2-alpha.0](https://github.com/Opentrons/opentrons/compare/v4.6.1...v4.6.2-alpha.0) (2021-09-30)
+
+**Note:** Version bump only for package @opentrons/webpack-config
+
+
+
+
+
 ## [4.6.1](https://github.com/Opentrons/opentrons/compare/v4.6.0...v4.6.1) (2021-09-28)
 
 **Note:** Version bump only for package @opentrons/webpack-config
