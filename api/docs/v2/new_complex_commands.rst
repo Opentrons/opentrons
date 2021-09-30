@@ -828,7 +828,7 @@ For example, to blow out in the destination well you can do the following:
 
 .. note::
 
-You *must* specify ``blow_out=True`` in order to utilize the new argument ``blowout_location``
+    You *must* specify ``blow_out=True`` in order to utilize the new argument ``blowout_location``
 
 
 
