@@ -57,7 +57,7 @@
     },
 
     "pipetteAccessParams": {
-      "required": ["pipetteId", "labwareId", "well"],
+      "required": ["pipetteId", "labwareId", "wellName"],
       "properties": {
         "pipetteId": {
           "type": "string"
@@ -65,7 +65,7 @@
         "labwareId": {
           "type": "string"
         },
-        "well": {
+        "wellName": {
           "type": "string"
         }
       }
@@ -857,11 +857,11 @@
               "commandType": { "enum": ["moveToWell"] },
               "params": {
                 "type": "object",
-                "required": ["pipetteId", "labwareId", "well"],
+                "required": ["pipetteId", "labwareId", "wellName"],
                 "properties": {
                   "pipetteId": { "type": "string" },
                   "labwareId": { "type": "string" },
-                  "well": { "type": "string" },
+                  "wellName": { "type": "string" },
                   "offset": {
                     "$ref": "#/definitions/offset",
                     "description": "Optional offset from well bottom center, in mm"

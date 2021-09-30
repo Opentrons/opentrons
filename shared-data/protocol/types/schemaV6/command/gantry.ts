@@ -17,7 +17,7 @@ interface MoveToSlotParams {
 interface MoveToWellParams {
   pipetteId: string
   labwareId: string
-  well: string
+  wellName: string
   offset?: {
     x: number
     y: number

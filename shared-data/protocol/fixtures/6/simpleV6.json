@@ -1313,7 +1313,7 @@
       "params": {
         "pipetteId": "pipetteId",
         "labwareId": "tipRackId",
-        "well": "B1"
+        "wellName": "B1"
       }
     },
     {
@@ -1322,7 +1322,7 @@
       "params": {
         "pipetteId": "pipetteId",
         "labwareId": "sourcePlateId",
-        "well": "A1",
+        "wellName": "A1",
         "volume": 5,
         "flowRate": 3,
         "offset": { "x": 0, "y": 0, "z": 2 }
@@ -1341,7 +1341,7 @@
       "params": {
         "pipetteId": "pipetteId",
         "labwareId": "destPlateId",
-        "well": "B1",
+        "wellName": "B1",
         "volume": 4.5,
         "flowRate": 2.5,
         "offset": { "x": 0, "y": 0, "z": 1 }
@@ -1353,7 +1353,7 @@
       "params": {
         "pipetteId": "pipetteId",
         "labwareId": "destPlateId",
-        "well": "B1",
+        "wellName": "B1",
         "offset": { "x": 0, "y": 0, "z": 11 }
       }
     },
@@ -1363,7 +1363,7 @@
       "params": {
         "pipetteId": "pipetteId",
         "labwareId": "destPlateId",
-        "well": "B1",
+        "wellName": "B1",
         "flowRate": 2,
         "offset": { "x": 0, "y": 0, "z": 12 }
       }
@@ -1387,7 +1387,7 @@
       "params": {
         "pipetteId": "pipetteId",
         "labwareId": "destPlateId",
-        "well": "B2"
+        "wellName": "B2"
       }
     },
     {
@@ -1396,7 +1396,7 @@
       "params": {
         "pipetteId": "pipetteId",
         "labwareId": "destPlateId",
-        "well": "B2",
+        "wellName": "B2",
         "offset": { "x": 2, "y": 3, "z": 10 },
         "minimumZHeight": 35,
         "forceDirect": true
@@ -1408,7 +1408,7 @@
       "params": {
         "pipetteId": "pipetteId",
         "labwareId": "trashId",
-        "well": "A1"
+        "wellName": "A1"
       }
     }
   ],

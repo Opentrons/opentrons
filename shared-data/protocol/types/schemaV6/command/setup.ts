@@ -13,11 +13,11 @@ interface LoadLabwareParams {
   location: string | null
 }
 interface LoadModuleParams {
-  module: string
+  moduleId: string
   location: string | null
 }
 interface LoadLiquidParams {
   liquidId: string
   labwareId: string
-  volumeByWell: { [wellId: string]: number }
+  volumeByWell: { [wellName: string]: number }
 }

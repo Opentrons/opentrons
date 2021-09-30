@@ -61,16 +61,16 @@ export type ModuleCommand =
     }
 
 export interface EngageMagnetParams {
-  module: string
+  moduleId: string
   engageHeight: number
 }
 
 export interface TemperatureParams {
-  module: string
+  moduleId: string
   temperature: number
 }
 export interface ShakeSpeedParams {
-  module: string
+  moduleId: string
   rpm: number
 }
 
@@ -80,17 +80,17 @@ export interface AtomicProfileStep {
 }
 
 export interface TCProfileParams {
-  module: string
+  moduleId: string
   profile: AtomicProfileStep[]
   volume: number
 }
 
 export interface ModuleOnlyParams {
-  module: string
+  moduleId: string
 }
 
 export interface ThermocyclerSetTargetBlockTemperatureParams {
-  module: string
+  moduleId: string
   temperature: number
   volume?: number
 }
