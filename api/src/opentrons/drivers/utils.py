@@ -51,7 +51,19 @@ def parse_string_value_from_substring(substring: str) -> str:
 def parse_temperature_response(
     temperature_string: str, rounding_val: int, zero_target_is_unset: bool = False
 ) -> Temperature:
-    """Example input: "T:none C:25"""
+    """Parse a standard temperature response from a module
+
+    temperature_string: The string from the module after decoding
+    rounding_val: A value to round to
+    zero_target_is_unset: Whether or not to treat a 0 target temperature
+    as indicating that the module is regulating around the target temperature
+    0C (which the tempdeck and thermocycler are capable of) or that the module
+    does not currently have a target temperature set and is not regulating
+    (as the heater/shaker does - it has a resistive heater rather than a
+    thermoelectric cooler, and therefore cannot regulate on a temperature below
+    ambient).
+
+    Example input: "T:none C:25"""
     data = parse_key_values(temperature_string)
     try:
         target = parse_optional_number(data["T"], rounding_val)
