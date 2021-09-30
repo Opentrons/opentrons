@@ -167,7 +167,7 @@ class HeaterShaker(mod_abc.AbstractModule):
         return {
             "temperatureStatus": self.temperature_status,
             "speedStatus": self.speed_status,
-            'status': self.status,
+            "status": self.status,
             "data": {
                 "currentTemp": self.temperature,
                 "targetTemp": self.target_temperature,
@@ -202,7 +202,7 @@ class HeaterShaker(mod_abc.AbstractModule):
 
     @property
     def status(self) -> str:
-        return f'temperature {self.temperature_status}, speed {self.speed_status}'
+        return f"temperature {self.temperature_status}, speed {self.speed_status}"
 
     @property
     def is_simulated(self) -> bool:
@@ -346,11 +346,14 @@ class HeaterShaker(mod_abc.AbstractModule):
         await t
 
     async def await_speed_and_temperature(self, temperature: float, speed: int) -> None:
-        """ Wait for previously-started speed and temperature commands to complete.#!/usr/bin/env python
+        """Wait for previously-started speed and temperature commands to complete.
 
-        To set speed, use start_set_speed. To set temperature, use start_set_temperature.
+        To set speed, use start_set_speed. To set temperature,
+        use start_set_temperature.
         """
-        await asyncio.gather(self.await_speed(speed), self.await_temperature(temperature))
+        await asyncio.gather(
+            self.await_speed(speed), self.await_temperature(temperature)
+        )
 
     async def _wait_for_plate_lock(self, status: HeaterShakerPlateLockStatus):
         current_status = await self._driver.get_plate_lock_status()
@@ -374,7 +377,8 @@ class HeaterShaker(mod_abc.AbstractModule):
         await self._wait_for_plate_lock(HeaterShakerPlateLockStatus.IDLE_CLOSED)
 
     async def prep_for_update(self) -> str:
-        return 'no'
+        return "no"
+
 
 @dataclass
 class PollResult:
