@@ -522,7 +522,10 @@ a few methods that allow you to do that.
 Basic Status
 ------------
 
-The :py:obj:`.ThermocyclerContext.status` property is one of the strings ``‘holding at target’``, ``‘cooling’``, ``‘heating’``, or ``‘idle’``.
+..
+    TODO(mm, 2021-09-30): We should be able to cross-reference to ThermocyclerContext.status, but it appears to not actually exist?
+
+The ``ThermocyclerContext.status`` property is one of the strings ``‘holding at target’``, ``‘cooling’``, ``‘heating’``, or ``‘idle’``.
 
 .. code-block:: python
 
