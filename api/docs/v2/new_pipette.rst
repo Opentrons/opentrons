@@ -39,6 +39,7 @@ Pipettes are specified in a protocol using the method :py:meth:`.ProtocolContext
     When you load a pipette in a protocol, you inform the OT-2 that you want the specified pipette to be present. Even if you do not use the pipette anywhere else in your protocol, the Opentrons App and the OT-2 will not let your protocol proceed until all pipettes loaded with ``load_instrument`` are attached to the OT-2.
 
 .. _new-multichannel-pipettes:
+
 Multi-Channel Pipettes
 ======================
 
