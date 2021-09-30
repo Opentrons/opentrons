@@ -25,7 +25,7 @@ async def test_controller_must_home(hardware_api):
     home.assert_called_once()
 
 
-async def test_home_specific_sim(hardware_api, monkeypatch, is_robot):
+async def test_home_specific_sim(hardware_api):
     await hardware_api.home()
     await hardware_api.move_to(types.Mount.RIGHT, types.Point(0, 10, 20))
     # Avoid the autoretract when moving two difference instruments
@@ -56,7 +56,7 @@ async def test_retract(hardware_api):
     }
 
 
-async def test_move(hardware_api, is_robot):
+async def test_move(hardware_api):
     abs_position = types.Point(30, 20, 10)
     mount = types.Mount.RIGHT
     target_position1 = {
@@ -197,7 +197,7 @@ async def test_critical_point_applied(hardware_api, monkeypatch, is_robot):
     assert await hardware_api.current_position(types.Mount.RIGHT) == target
 
 
-async def test_new_critical_point_applied(hardware_api, monkeypatch, is_robot):
+async def test_new_critical_point_applied(hardware_api):
     await hardware_api.home()
     hardware_api._backend._attached_instruments = {
         types.Mount.LEFT: {"model": None, "id": None},
