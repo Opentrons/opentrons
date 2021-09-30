@@ -12,5 +12,15 @@
   "labware_step_detail_labware_plural": "The tips should be centered above column 1 in ({labware_name}} and level with the top of the labware.",
   "labware_setp_detail_tiprack": "The pipette nozzle should be centered above A1 in {{tiprack_name}} and level with the top of the tip.",
   "labware_setp_detail_tiprack_plural": "The pipette nozzles should be centered above column 1 in {{tiprack_name}} and level with the top of the tips.",
-  "labware_step_detail_link": "See how to tell if the pipette is centered"
+  "labware_step_detail_link": "See how to tell if the pipette is centered",
+  "labware_step_detail_modal_heading": "How to tell if the pipette is centered and level",
+  "labware_step_detail_modal_nozzle": "To ensure that the nozzle is centered, check from a second side of your OT-2.",
+  "labware_step_detail_modal_nozzle_or_tip": "To ensure the nozzle or tip is level with the top of the labware, position yourself at eye-level and/or slide a sheet of paper between the nozzle and tip.",
+  "labware_step_detail_modal_nozzle_image_1_text": "Viewed from front, it appears centered...",
+  "labware_step_detail_modal_nozzle_image_2_text": "...but viewed from side, it requires adjustment",
+  "labware_step_detail_modal_nozzle_image_2_nozzletext": "Nozzle is not centered",
+  "labware_step_detail_modal_nozzle_or_tip_image_1_text": "Viewed from standing height, it appears level...",
+  "labware_step_detail_modal_nozzle_or_tip_image_2_text": "... but viewed from eye-level, it requires adjustment",
+  "labware_step_detail_modal_nozzle_or_tip_image_2_nozzletext": "Nozzle is not level",
+  "labware_step_detail_modal_nozzle_or_tip_image_3_text": "If you’re having trouble, slide 1 sheet of printer paper between the nozzle and the tip. A single piece of paper should barely pass between them."
 }

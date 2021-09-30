@@ -10,8 +10,6 @@ export const GenericStepScreen = (
   props: GenericStepScreenProps
 ): JSX.Element | null => {
   return (
-    <LabwarePositionCheckStepDetail>
-
-    </LabwarePositionCheckStepDetail>
+    <LabwarePositionCheckStepDetail/>
   )
 }
