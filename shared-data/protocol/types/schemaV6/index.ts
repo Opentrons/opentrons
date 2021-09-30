@@ -43,5 +43,9 @@ export interface ProtocolFile<DesignerApplicationData> {
     }
   }
   commands: V6Command[]
-  commandAnnotations?: Record<string, any> // NOTE: intentionally underspecified b/c we haven't decided on this yet
+  commandAnnotations?: {
+    commandIds: string[]
+    annotationType: string
+    params?: { [key: string]: any }
+  }
 }

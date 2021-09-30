@@ -82,11 +82,56 @@
       "required": ["flowRate"],
       "properties": {
         "flowRate": {
-          "description": "Flow rate in uL/sec. Must be greater than 0",
+          "description": "flow rate in ul/sec. must be greater than 0",
           "type": "number",
           "minimum": 0
         }
       }
+    },
+
+    "deckLocation": {
+      "oneOf": [
+        {
+          "required": ["slotId"],
+          "properties": {
+            "slotId": {
+              "description": "Unique string identifier that corresponds to a slot in the referenced deck definition's locations",
+              "type": "string"
+            }
+          }
+        },
+        {
+          "required": ["moduleId"],
+          "properties": {
+            "moduleId": {
+              "description": "Unique identifier of destination module. Must be a key from the top level 'modules' object.",
+              "type": "string"
+            }
+          }
+        },
+        {
+          "required": ["labwareId"],
+          "properties": {
+            "labwareId": {
+              "description": "Unique identifier of destination labware. Must be a key from the top level 'labware' object.",
+              "type": "string"
+            }
+          }
+        },
+        {
+          "required": ["coordinates"],
+          "properties": {
+            "coordinates": {
+              "$ref": "#/definitions/offset",
+              "description": "X, Y, Z coordinates from the deck's origin point. (left-front-bottom of working space)"
+            }
+          }
+        },
+        {
+          "type": "null",
+          "description": "The null location corresponds to any location not tracked by the system (off-deck)"
+        }
+      ]
     }
   },
 
@@ -386,13 +431,46 @@
               "commandType": { "enum": ["moveToSlot"] },
               "params": {
                 "type": "object",
-                "required": ["pipetteId", "slot"],
+                "required": ["pipetteId", "slotId"],
                 "properties": {
                   "pipetteId": { "type": "string" },
-                  "slot": { "type": "string" },
+                  "slotId": {
+                    "type": "string",
+                    "description": "Unique string identifier that corresponds to a slot in the referenced deck definition's locations"
+                  },
                   "offset": {
                     "$ref": "#/definitions/offset",
                     "description": "Optional offset from slot bottom left corner, in mm"
+                  },
+                  "minimumZHeight": {
+                    "description": "Optional minimal Z margin in mm. If this is larger than the API's default safe Z margin, it will make the arc higher. If it's smaller, it will have no effect. Specifying this for movements that would not arc (moving within the same well in the same labware) will cause an arc movement instead.",
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "forceDirect": {
+                    "description": "Default is false. If true, moving from one labware/well to another will not arc to the default safe z, but instead will move directly to the specified location. This will also force the 'minimumZHeight' param to be ignored. A 'direct' movement is in X/Y/Z simultaneously",
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          },
+
+          {
+            "description": "Move To Coordinates",
+            "type": "object",
+            "required": ["id", "commandType", "params"],
+            "properties": {
+              "id": { "type": "string" },
+              "commandType": { "enum": ["moveToCoordinates"] },
+              "params": {
+                "type": "object",
+                "required": ["pipetteId", "coordinates"],
+                "properties": {
+                  "pipetteId": { "type": "string" },
+                  "coordinates": {
+                    "$ref": "#/definitions/offset",
+                    "description": "X, Y and Z coordinates in mm from deck's origin location (left-front-bottom corner of work space)"
                   },
                   "minimumZHeight": {
                     "description": "Optional minimal Z margin in mm. If this is larger than the API's default safe Z margin, it will make the arc higher. If it's smaller, it will have no effect. Specifying this for movements that would not arc (moving within the same well in the same labware) will cause an arc movement instead.",
@@ -450,7 +528,7 @@
                     "type": "number"
                   },
                   "moduleId": {
-                    "description": "Unique identifier of Magnetic Module to target. Must be a key from the top level 'modules' object. Must be a key from the top level 'modules' object",
+                    "description": "Unique identifier of Magnetic Module to target. Must be a key from the top level 'modules' object.",
                     "type": "string"
                   }
                 }
@@ -922,8 +1000,8 @@
                     "description": "Unique identifier of labware to load"
                   },
                   "location": {
-                    "type": ["string", "null"],
-                    "description": "Unique identifier of physical destination location to load labware into (e.g. '1' || null)"
+                    "$ref": "#/definitions/deckLocation",
+                    "description": "Physical destination location to load labware into (e.g. '1' || null)"
                   }
                 }
               }
@@ -947,8 +1025,8 @@
                     "description": "Unique identifier of module to load"
                   },
                   "location": {
-                    "type": ["string", "null"],
-                    "description": "Unique identifier of physical destination location to load module into (e.g. '1' || null)"
+                    "$ref": "#/definitions/deckLocation",
+                    "description": "Physical destination location to load module into (e.g. '1' || null)"
                   }
                 }
               }

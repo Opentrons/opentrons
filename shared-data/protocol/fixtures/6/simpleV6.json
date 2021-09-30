@@ -1252,7 +1252,7 @@
       "id": "1abc123",
       "params": {
         "moduleId": "magneticModuleId",
-        "location": "3"
+        "location": {"slotId":"3"}
       }
     },
     {
@@ -1260,7 +1260,7 @@
       "id": "2abc123",
       "params": {
         "moduleId": "temperatureModuleId",
-        "location": "1"
+        "location": {"slotId":"1"}
       }
     },
     {
@@ -1268,7 +1268,9 @@
       "id": "3abc123",
       "params": {
         "labwareId": "sourcePlateId",
-        "location": "temperatureModuleId"
+        "location": {
+          "moduleId": "temperatureModuleId"
+        }
       }
     },
     {
@@ -1276,7 +1278,9 @@
       "id": "4abc123",
       "params": {
         "labwareId": "destPlateId",
-        "location": "magneticModuleId"
+        "location": {
+          "moduleId": "magneticModuleId"
+        }
       }
     },
     {
@@ -1284,7 +1288,9 @@
       "id": "5abc123",
       "params": {
         "labwareId": "tipRackId",
-        "location": "magneticModuleId"
+        "location": {
+          "moduleId": "magneticModuleId"
+        }
       }
     },
     {
@@ -1292,7 +1298,9 @@
       "id": "6abc123",
       "params": {
         "labwareId": "trashId",
-        "location": "12"
+        "location": {
+          "slotId": "12"
+        }
       }
     },
     {
@@ -1373,7 +1381,7 @@
       "id": "14abc123",
       "params": {
         "pipetteId": "pipetteId",
-        "slot": "5",
+        "slotId": "5",
         "offset": {
           "x": 1,
           "y": 2,
@@ -1409,6 +1417,16 @@
         "pipetteId": "pipetteId",
         "labwareId": "trashId",
         "wellName": "A1"
+      }
+    },
+    {
+      "commandType": "moveToCoordinates",
+      "id": "16abc123",
+      "params": {
+        "pipetteId": "pipetteId",
+        "coordinates": { "x": 0, "y": 0, "z": 0 },
+        "minimumZHeight": 35,
+        "forceDirect": true
       }
     }
   ],
