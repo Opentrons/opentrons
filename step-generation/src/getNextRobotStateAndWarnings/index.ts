@@ -6,10 +6,6 @@ import { forDispense } from './forDispense'
 import { forBlowout } from './forBlowout'
 import { forDropTip } from './forDropTip'
 import { forPickUpTip } from './forPickUpTip'
-import { forLoadLabware } from './forLoadLabware'
-import { forLoadPipette } from './forLoadPipette'
-import { forLoadModule } from './forLoadModule'
-import { forLoadLiquid } from './forLoadLiquid'
 import { forEngageMagnet, forDisengageMagnet } from './magnetUpdates'
 import {
   forThermocyclerAwaitBlockTemperature,
@@ -80,9 +76,7 @@ function _getNextRobotStateAndWarningsSingleCommand(
     case 'delay':
     case 'airGap':
     case 'dispenseAirGap':
-    case 'moveToSlot':
     case 'moveToWell':
-    case 'updateRobotState':
       // these commands don't have any effects on the state
       break
 
@@ -184,22 +178,6 @@ function _getNextRobotStateAndWarningsSingleCommand(
         invariantContext,
         robotStateAndWarnings
       )
-      break
-
-    case 'loadLabware':
-      forLoadLabware(command.params, invariantContext, robotStateAndWarnings)
-      break
-
-    case 'loadModule':
-      forLoadModule(command.params, invariantContext, robotStateAndWarnings)
-      break
-
-    case 'loadPipette':
-      forLoadPipette(command.params, invariantContext, robotStateAndWarnings)
-      break
-
-    case 'loadLiquid':
-      forLoadLiquid(command.params, invariantContext, robotStateAndWarnings)
       break
 
     default:
