@@ -13,7 +13,7 @@ import contextlib
 import logging
 from os import environ
 from time import time
-from typing import Any, Dict, Optional, Union, List, Tuple, cast
+from typing import Any, Dict, Optional, Union, List, Tuple
 
 from math import isclose
 
@@ -175,9 +175,7 @@ class SmoothieDriver:
         self.engaged_axes = {ax: True for ax in AXES}
 
         # motor speed settings
-        self._max_speed_settings = cast(
-            Dict[str, float], config.default_max_speed.copy()
-        )
+        self._max_speed_settings = config.default_max_speed.copy()
         self._saved_max_speed_settings = self._max_speed_settings.copy()
         self._combined_speed = float(DEFAULT_AXES_SPEED)
         self._saved_axes_speed = float(self._combined_speed)
@@ -527,13 +525,13 @@ class SmoothieDriver:
     def steps_per_mm(self) -> Dict[str, float]:
         return self._steps_per_mm
 
-    @contextlib.asynccontextmanager
-    async def restore_speed(self, value: Union[float, str]):
-        await self.set_speed(value, update=False)
+    @contextlib.contextmanager
+    def restore_speed(self, value: Union[float, str]):
+        self.set_speed(value, update=False)
         try:
             yield
         finally:
-            await self.set_speed(self._combined_speed)
+            self.set_speed(self._combined_speed)
 
     @staticmethod
     def _build_speed_command(speed: float) -> CommandBuilder:
@@ -557,13 +555,13 @@ class SmoothieDriver:
     async def pop_speed(self) -> None:
         await self.set_speed(self._saved_axes_speed)
 
-    @contextlib.asynccontextmanager
-    async def restore_axis_max_speed(self, new_max_speeds: Dict[str, float]):
-        await self.set_axis_max_speed(new_max_speeds, update=False)
+    @contextlib.contextmanager
+    def restore_axis_max_speed(self, new_max_speeds: Dict[str, float]):
+        self.set_axis_max_speed(new_max_speeds, update=False)
         try:
             yield
         finally:
-            await self.set_axis_max_speed(self._max_speed_settings)
+            self.set_axis_max_speed(self._max_speed_settings)  # type: ignore
 
     async def set_axis_max_speed(
         self, settings: Dict[str, float], update: bool = True
@@ -578,7 +576,7 @@ class SmoothieDriver:
             bool, True to save the settings for future use
         """
         if update:
-            self._max_speed_settings.update(settings)
+            self._max_speed_settings.update(settings)  # type: ignore
 
         command = _command_builder().add_gcode(gcode=GCODE.SET_MAX_SPEED)
         for axis, value in sorted(settings.items()):
@@ -591,7 +589,7 @@ class SmoothieDriver:
         self._saved_max_speed_settings = self._max_speed_settings.copy()
 
     async def pop_axis_max_speed(self) -> None:
-        await self.set_axis_max_speed(self._saved_max_speed_settings)
+        await self.set_axis_max_speed(self._saved_max_speed_settings)  # type: ignore
 
     async def set_acceleration(self, settings: Dict[str, float]) -> None:
         """
