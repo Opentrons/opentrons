@@ -570,7 +570,7 @@ class InstrumentContext(CommandPublisher):
         .. note::
 
             This is behavior change from legacy API (which accepts any
-            :py:class:`.Placeable` as the ``location`` parameter)
+            ``Placeable`` as the ``location`` parameter)
 
         """
         if not self._implementation.has_tip():
