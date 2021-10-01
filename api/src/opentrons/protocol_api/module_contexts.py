@@ -567,7 +567,7 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
         block_max_volume: Optional[float] = None,
     ):
         """Execute a Thermocycler Profile defined as a cycle of
-        :py:attr:`steps` to repeat for a given number of :py:attr:`repetitions`
+        ``steps`` to repeat for a given number of ``repetitions``.
 
         :param steps: List of unique steps that make up a single cycle.
                       Each list item should be a dictionary that maps to
