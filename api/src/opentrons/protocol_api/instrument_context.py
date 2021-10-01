@@ -388,7 +388,7 @@ class InstrumentContext(CommandPublisher):
                      `rate` * :py:attr:`flow_rate.aspirate <flow_rate>`,
                      and when dispensing, it will be
                      `rate` * :py:attr:`flow_rate.dispense <flow_rate>`.
-        :raises NoTipAttachedError: If no tip is attached to the pipette.
+        :raises: ``NoTipAttachedError`` -- if no tip is attached to the pipette.
         :returns: This instance
 
         .. note::
@@ -559,7 +559,7 @@ class InstrumentContext(CommandPublisher):
         :param speed: The speed for touch tip motion, in mm/s.
                       Default: 60.0 mm/s, Max: 80.0 mm/s, Min: 20.0 mm/s
         :type speed: float
-        :raises NoTipAttachedError: if no tip is attached to the pipette
+        :raises: ``NoTipAttachedError`` -- if no tip is attached to the pipette
         :raises RuntimeError: If no location is specified and location cache is
                               None. This should happen if `touch_tip` is called
                               without first calling a method that takes a
@@ -634,7 +634,7 @@ class InstrumentContext(CommandPublisher):
                        to air-gap aspirate. (Default: 5mm above current Well)
         :type height: float
 
-        :raises NoTipAttachedError: If no tip is attached to the pipette
+        :raises: ``NoTipAttachedError`` -- if no tip is attached to the pipette
 
         :raises RuntimeError: If location cache is None.
                               This should happen if `touch_tip` is called
