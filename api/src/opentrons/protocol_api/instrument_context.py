@@ -149,8 +149,8 @@ class InstrumentContext(CommandPublisher):
         :type volume: int or float
         :param location: Where to aspirate from. If `location` is a
                          :py:class:`.Well`, the robot will aspirate from
-                         :py:obj:`well_bottom_clearance.aspirate` mm
-                         above the bottom of the well. If `location` is a
+                         :py:obj:`well_bottom_clearance.aspirate <well_bottom_clearance>`
+                         mm above the bottom of the well. If `location` is a
                          :py:class:`.Location` (i.e. the result of
                          :py:meth:`.Well.top` or :py:meth:`.Well.bottom`), the
                          robot will aspirate from the exact specified location.
@@ -171,7 +171,7 @@ class InstrumentContext(CommandPublisher):
             a location, specify it as a keyword argument:
             ``instr.aspirate(location=wellplate['A1'])``
 
-        """
+        """  # noqa: E501
         logger.debug(
             "aspirate {} from {} at {}".format(
                 volume, location if location else "current position", rate
@@ -277,8 +277,8 @@ class InstrumentContext(CommandPublisher):
 
         :param location: Where to dispense into. If `location` is a
                          :py:class:`.Well`, the robot will dispense into
-                         :py:obj:`well_bottom_clearance.dispense` mm
-                         above the bottom of the well. If `location` is a
+                         :py:obj:`well_bottom_clearance.dispense <well_bottom_clearance>`
+                         mm above the bottom of the well. If `location` is a
                          :py:class:`.Location` (i.e. the result of
                          :py:meth:`.Well.top` or :py:meth:`.Well.bottom`), the
                          robot will dispense into the exact specified location.
@@ -300,7 +300,7 @@ class InstrumentContext(CommandPublisher):
             a location, specify it as a keyword argument:
             ``instr.dispense(location=wellplate['A1'])``
 
-        """
+        """  # noqa: E501
         logger.debug(
             "dispense {} from {} at {}".format(
                 volume, location if location else "current position", rate
