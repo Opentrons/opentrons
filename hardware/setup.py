@@ -79,7 +79,6 @@ if __name__ == "__main__":
         entry_points={
             "console_scripts": [
                 "opentrons_generate_header = opentrons_hardware.scripts.generate_header:main",  # noqa: E501
-                "opentrons_canbus_identify = opentrons_hardware.scripts.identify:main",
                 "opentrons_can_comm = opentrons_hardware.scripts.can_comm:main",
             ]
         },
