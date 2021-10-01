@@ -355,9 +355,9 @@ def main() -> int:
     """Handler for command line invocation to run a protocol.
 
     :param argv: The arguments the program was invoked with; this is usually
-                 :py:attr:`sys.argv` but if you want to override that you can.
+                 :py:obj:`sys.argv` but if you want to override that you can.
     :returns int: A success or failure value suitable for use as a shell
-                  return code passed to :py:meth:`sys.exit` (0 means success,
+                  return code passed to :py:obj:`sys.exit` (0 means success,
                   anything else is a kind of failure).
     """
     parser = argparse.ArgumentParser(
