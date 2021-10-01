@@ -1057,7 +1057,7 @@ class InstrumentContext(CommandPublisher):
         # TODO: ..trash or the original well.
         # TODO: What should happen if the user passes a non-first-row well
         # TODO: ..as src/dest *while using multichannel pipette?
-        r"""
+        """
         Transfer will move a volume of liquid from a source location(s)
         to a dest location(s). It is a higher-level command, incorporating
         other :py:class:`InstrumentContext` commands, like :py:meth:`aspirate`
@@ -1075,7 +1075,7 @@ class InstrumentContext(CommandPublisher):
                        will be aspirated.
         :param dest: A single well or a list of wells where liquid
                      will be dispensed to.
-        :param \**kwargs: See below
+        :param \\**kwargs: See below
 
         :Keyword Arguments:
 
@@ -1106,15 +1106,16 @@ class InstrumentContext(CommandPublisher):
                 - 'destination well': blowout excess liquid into destination
                    well
                 - 'trash': blowout excess liquid into the trash
-                If no `blowout_location` specified, no `disposal_volume`
+
+                If no ``blowout_location`` specified, no ``disposal_volume``
                 specified, and the pipette contains liquid,
-                a :py:meth:`blow_out` will occur into the source well
+                a :py:meth:`blow_out` will occur into the source well.
 
-                If no `blowout_location` specified and either
-                `disposal_volume` is specified or the pipette is empty,
-                a :py:meth:`blow_out` will occur into the trash
+                If no ``blowout_location`` specified and either
+                ``disposal_volume`` is specified or the pipette is empty,
+                a :py:meth:`blow_out` will occur into the trash.
 
-                If `blow_out` is set to `False`, this parameter will be ignored
+                If ``blow_out`` is set to ``False``, this parameter will be ignored.
 
             * *mix_before* (``tuple``) --
               The tuple, if specified, gives the amount of volume to
@@ -1255,7 +1256,7 @@ class InstrumentContext(CommandPublisher):
         :param location: The location to move to.
         :type location: :py:class:`.types.Location`
         :param force_direct: If set to true, move directly to destination
-                        without arc motion.
+                             without arc motion.
         :param minimum_z_height: When specified, this Z margin is able to raise
                                  (but never lower) the mid-arc height.
         :param speed: The speed at which to move. By default,
@@ -1264,7 +1265,7 @@ class InstrumentContext(CommandPublisher):
                       individual axis speeds, you can use
                       :py:attr:`.ProtocolContext.max_speeds`.
         :param publish: Whether a call to this function should publish to the
-        runlog or not.
+                        runlog or not.
         """
         from_loc = self._ctx.location_cache
         if not from_loc:
@@ -1530,25 +1531,23 @@ class InstrumentContext(CommandPublisher):
 
         :param instrument: The secondary instrument you wish to use
 
-        :raises UnsupportedInstrumentPairingError: If you try to pair
-        pipettes that are not currently supported together.
-        :returns: PairedInstrumentContext: This is the object you
-        will call commands on.
+        :raises UnsupportedInstrumentPairingError: If you try to pair pipettes that are
+                                                   not currently supported together.
 
-        This function returns a :py:class:`PairedInstrumentContext`.
-        The building block commands are the same as an individual pipette's
-        building block commands found at :ref:`v2-atomic-commands`,
-        and when you want to move pipettes simultaneously you need to use the
-        :py:class:`PairedInstrumentContext`.
-
+        :returns: A ``PairedInstrumentContext``. This is the object you will call
+                  commands on. The building block commands are the same as an individual
+                  pipette's building block commands found at :ref:`v2-atomic-commands`,
+                  and when you want to move pipettes simultaneously you need to use the
+                  ``PairedInstrumentContext``.
 
         Limitations:
+
         1. This function utilizes a "primary" and "secondary" pipette to make
-        positional decisions. The consequence of doing this is that all X & Y
-        positions are based on the primary pipette only.
+           positional decisions. The consequence of doing this is that all X & Y
+           positions are based on the primary pipette only.
         2. At this time, only pipettes of the same type are supported for
-        pipette pairing. This means that you cannot utilize a P1000 Single
-        channel and a P300 Single channel at the same time.
+           pipette pairing. This means that you cannot utilize a P1000 Single
+           channel and a P300 Single channel at the same time.
 
         .. code-block :: python
             :substitutions:

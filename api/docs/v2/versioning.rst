@@ -124,9 +124,11 @@ Changes in API Versions
 Version 2.1
 +++++++++++
 
-- You can now specify a label when loading labware into a module with the ``label`` parameter of
-  :py:meth:`.ModuleContext.load_labware` just like you can when loading labware
-  into your protocol with :py:meth:`.ProtocolContext.load_labware`.
+- When loading labware onto a module, you can now specify a label with the ``label`` parameter of
+  :py:meth:`.MagneticModuleContext.load_labware`,
+  :py:meth:`.TemperatureModuleContext.load_labware`,
+  :py:meth:`.ThermocyclerContext.load_labware`,
+  just like you can when loading labware onto the deck with :py:meth:`.ProtocolContext.load_labware`.
 
 
 Version 2.2
@@ -148,25 +150,27 @@ Version 2.3
   possible collisions
 - During a :ref:`mix`, the pipette will no longer move up to clear the liquid in
   between every dispense and following aspirate
-- You can now access the temperature module's status via the ``status`` property of ```ModuleContext.TemperatureModuleContext```
+- You can now access the temperature module's status via :py:obj:`.TemperatureModuleContext.status`.
 
 
 Version 2.4
 +++++++++++
 
 - The following improvements were made to the `touch_tip` command:
-    - The speed for `touch_tip` can now be lowered down to 1 mm/s
-    - `touch_tip` no longer moves diagonally from the X direction -> Y direction
-    - Takes into account geometry of the deck and modules
+
+  - The speed for ``touch_tip`` can now be lowered down to 1 mm/s
+  - ``touch_tip`` no longer moves diagonally from the X direction -> Y direction
+  - Takes into account geometry of the deck and modules
 
 
 Version 2.5
 +++++++++++
 
 - New :ref:`new-utility-commands` were added:
-    - :py:meth:`.ProtocolContext.set_rail_lights`: turns robot rail lights on or off
-    - :py:obj:`.ProtocolContext.rail_lights_on`: describes whether or not the rail lights are on
-    - :py:obj:`.ProtocolContext.door_closed`: describes whether the robot door is closed
+
+  - :py:meth:`.ProtocolContext.set_rail_lights`: turns robot rail lights on or off
+  - :py:obj:`.ProtocolContext.rail_lights_on`: describes whether or not the rail lights are on
+  - :py:obj:`.ProtocolContext.door_closed`: describes whether the robot door is closed
 
 
 Version 2.6
@@ -174,8 +178,10 @@ Version 2.6
 
 - GEN2 Single pipettes now default to flow rates equivalent to 10 mm/s plunger
   speeds
-    - Protocols that manually configure pipette flow rates will be unaffected
-    - For a comparison between API Versions, see :ref:`defaults`
+
+  - Protocols that manually configure pipette flow rates will be unaffected
+
+  - For a comparison between API Versions, see :ref:`defaults`
 
 
 Version 2.7
@@ -186,7 +192,7 @@ Version 2.7
 
   .. note::
 
-  This feature is still under development.
+      This feature is still under development.
 
 - Calling :py:meth:`.InstrumentContext.has_tip` will return whether a particular instrument
   has a tip attached or not.
@@ -194,10 +200,15 @@ Version 2.7
 
 Version 2.8
 +++++++++++
+
 - You can now pass in a list of volumes to distribute and consolidate. See :ref:`distribute-consolidate-volume-list` for more information.
-    - Passing in a zero volume to any :ref:`v2-complex-commands` will result in no actions taken for aspirate or dispense
+
+  - Passing in a zero volume to any :ref:`v2-complex-commands` will result in no actions taken for aspirate or dispense
+
 - :py:meth:`.Well.from_center_cartesian` can be used to find a point within a well using normalized distance from the center in each axis.
-    - **Note** that you will need to create a location object to use this function in a protocol. See :ref:`protocol-api-labware` for more information.
+
+  - **Note** that you will need to create a location object to use this function in a protocol. See :ref:`protocol-api-labware` for more information.
+
 - You can now pass in a blowout location to transfer, distribute, and consolidate 
   with the ``blowout_location`` parameter. See :py:meth:`.InstrumentContext.transfer` for more detail!
 

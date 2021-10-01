@@ -288,8 +288,8 @@ def simulate(
         - ``logs``: Any log messages that occurred during execution of this
                     command, as a logging.LogRecord
 
-    :param file-like protocol_file: The protocol file to simulate.
-    :param str file_name: The name of the file
+    :param protocol_file: The protocol file to simulate.
+    :param file_name: The name of the file
     :param custom_labware_paths: A list of directories to search for custom
                                  labware, or None. Ignored if the apiv2 feature
                                  flag is not set. Loads valid labware from
@@ -313,14 +313,13 @@ def simulate(
                            occur during protocol simulation are best associated
                            with the actions in the protocol that cause them.
                            Default: ``False``
-    :type propagate_logs: bool
-    :param log_level: The level of logs to capture in the runlog. Default:
-                      ``'warning'``
-    :type log_level: 'debug', 'info', 'warning', or 'error'
+    :param log_level: The level of logs to capture in the runlog:
+                      ``"debug"``, ``"info"``, ``"warning"``, or ``"error"``.
+                      Defaults to ``'warning'``.
     :returns: A tuple of a run log for user output, and possibly the required
               data to write to a bundle to bundle this protocol. The bundle is
-              only emitted if bundling is allowed (see
-              :py:meth:`allow_bundling`)  and this is an unbundled Protocol API
+              only emitted if bundling is allowed
+              and this is an unbundled Protocol API
               v2 python protocol. In other cases it is None.
     """
     stack_logger = logging.getLogger("opentrons")

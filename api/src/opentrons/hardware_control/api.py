@@ -913,7 +913,7 @@ class API(HardwareAPILike):
 
         :param mount: The mount to move
         :param abs_position: The target absolute position in
-                             :ref:`protocol-api-deck-coords` to move the
+                             deck coordinates to move the
                              critical point to
         :param speed: An overall head speed to use during the move
         :param critical_point: The critical point to move. In most situations

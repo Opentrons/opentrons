@@ -114,12 +114,12 @@ Protocols are structured around a function called ``run(protocol)``, defined in 
 .. code-block:: python
     :substitutions:
 
-   from opentrons import protocol_api
+    from opentrons import protocol_api
 
-   metadata = {'apiLevel': '|apiLevel|'}
+    metadata = {'apiLevel': '|apiLevel|'}
 
-   def run(protocol: protocol_api.ProtocolContext):
-       pass
+    def run(protocol: protocol_api.ProtocolContext):
+        pass
 
 This function must be named exactly ``run`` and must take exactly one mandatory argument (its name doesn’t matter, but we recommend ``protocol`` since this argument represents the protocol that the robot will execute).
 
