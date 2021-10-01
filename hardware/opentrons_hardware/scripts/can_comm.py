@@ -72,6 +72,10 @@ def prompt_payload(payload_type: Type[BinarySerializable]) -> BinarySerializable
     payload_fields = dataclasses.fields(payload_type)
     i = {}
     for f in payload_fields:
+        # TODO (amit 2021-10-01): Conversion to int is not good here long term.
+        #  Should be handled by type coercion in utils.BinarySerializable.
+        #  All values are ints now, but may be bytes in the future (ie serial
+        #  numbers, fw upgrade blobs).
         i[f.name] = f.type.build(int(input(f"enter {f.name}:")))
     return payload_type(**i)
 
