@@ -167,7 +167,7 @@ def get_protocol_api(
                             and is best not used.
     :param bundled_data: If specified, a mapping from filenames to contents
                          for data to be available in the protocol from
-                         :py:attr:`.ProtocolContext.bundled_data`.
+                         :py:obj:`.ProtocolContext.bundled_data`.
     :param extra_labware: If specified, a mapping from labware names to
                           labware definitions for labware to consider in the
                           protocol in addition to those stored on the robot.
@@ -301,7 +301,7 @@ def simulate(
                               directories. Specified files and the
                               non-recursive contents of specified directories
                               are presented by the protocol context in
-                              :py:attr:`.ProtocolContext.bundled_data`.
+                              :py:obj:`.ProtocolContext.bundled_data`.
     :param hardware_simulator_file_path: A path to a JSON file defining a
                                          hardware simulator.
     :param duration_estimator: For internal use only.
