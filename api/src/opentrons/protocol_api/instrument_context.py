@@ -1451,10 +1451,7 @@ class InstrumentContext(CommandPublisher):
     @property  # type: ignore
     @requires_version(2, 7)
     def has_tip(self) -> bool:
-        """
-        :returns: Whether this instrument has a tip attached or not.
-        :type: bool
-        """
+        """Return whether this instrument has a tip attached or not."""
         return self._implementation.has_tip()
 
     @property
