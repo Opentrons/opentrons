@@ -1526,8 +1526,8 @@ class InstrumentContext(CommandPublisher):
 
         :param instrument: The secondary instrument you wish to use
 
-        :raises UnsupportedInstrumentPairingError: If you try to pair pipettes that are
-                                                   not currently supported together.
+        :raises: ``UnsupportedInstrumentPairingError`` -- if you try to pair pipettes
+                 that are not currently supported together.
 
         :returns: A ``PairedInstrumentContext``. This is the object you will call
                   commands on. The building block commands are the same as an individual
