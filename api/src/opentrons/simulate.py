@@ -315,7 +315,7 @@ def simulate(
                            Default: ``False``
     :param log_level: The level of logs to capture in the runlog:
                       ``"debug"``, ``"info"``, ``"warning"``, or ``"error"``.
-                      Defaults to ``'warning'``.
+                      Defaults to ``"warning"``.
     :returns: A tuple of a run log for user output, and possibly the required
               data to write to a bundle to bundle this protocol. The bundle is
               only emitted if bundling is allowed
