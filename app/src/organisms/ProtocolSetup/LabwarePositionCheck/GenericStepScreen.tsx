@@ -9,7 +9,5 @@ interface GenericStepScreenProps {
 export const GenericStepScreen = (
   props: GenericStepScreenProps
 ): JSX.Element | null => {
-  return (
-    <LabwarePositionCheckStepDetail selectedStep={props.selectedStep}/>
-  )
+  return <LabwarePositionCheckStepDetail selectedStep={props.selectedStep} />
 }

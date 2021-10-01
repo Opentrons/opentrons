@@ -25,16 +25,12 @@ export const LabwarePositionCheckStepDetail = (
   const { labwareId } = props.selectedStep
   const { t } = useTranslation('labware_position_check')
   const introInfo = useIntroInfo()
-  console.log(introInfo)
   const { protocolData } = useProtocolDetails()
-  console.log(protocolData)
   const [
     showLabwarePositionCheckStepDetailModal,
     setLabwarePositionCheckStepDetailModal,
   ] = React.useState<boolean>(false)
-  //if (protocolData == null) return null
-  console.log('labware id is ', labwareId)
-
+  if (protocolData == null) return null
   const labwareDefId = protocolData.labware[labwareId].definitionId
 
   const displayName =
