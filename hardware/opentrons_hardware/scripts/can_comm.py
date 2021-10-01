@@ -5,7 +5,7 @@ import logging
 import argparse
 from enum import Enum
 from logging.config import dictConfig
-from typing import Type, Sequence, Optional, Callable
+from typing import Type, Sequence, Optional, Callable, cast
 
 from opentrons_hardware.drivers.can_bus import (
     CanDriver,
@@ -13,12 +13,12 @@ from opentrons_hardware.drivers.can_bus import (
     NodeId,
     CanMessage,
     ArbitrationId,
-    ArbitrationIdParts, FunctionCode,
+    ArbitrationIdParts,
+    FunctionCode,
 )
 from opentrons_hardware.drivers.can_bus.messages.messages import get_definition
 from opentrons_hardware.scripts.can_args import add_can_args
-from opentrons_hardware.utils import BinarySerializable, \
-    BinarySerializableException
+from opentrons_hardware.utils import BinarySerializable, BinarySerializableException
 
 log = logging.getLogger(__name__)
 
@@ -28,6 +28,8 @@ OutputFunc = Callable[[str], None]
 
 
 class InvalidInput(Exception):
+    """Invalid input exception."""
+
     pass
 
 
@@ -54,10 +56,13 @@ def create_choices(enum_type: Type[Enum]) -> Sequence[str]:
         a collection of strings describing the choices in enum.
 
     """
-    return [f"{i}: {v.name}" for (i, v) in enumerate(enum_type)]
+    # mypy wants type annotation for v.
+    return [f"{i}: {v.name}" for (i, v) in enumerate(enum_type)]  # type: ignore
 
 
-def prompt_enum(enum_type: Type[Enum], get_user_input: GetInputFunc, output_func: OutputFunc) -> Type[Enum]:
+def prompt_enum(
+    enum_type: Type[Enum], get_user_input: GetInputFunc, output_func: OutputFunc
+) -> Type[Enum]:
     """Prompt to choose a member of the enum.
 
     Args:
@@ -103,12 +108,12 @@ def prompt_payload(
             i[f.name] = f.type.build(int(get_user_input(f"enter {f.name}:")))
         except ValueError as e:
             raise InvalidInput(str(e))
-    return payload_type(**i)
+    # Mypy is not liking constructing the derived types.
+    return payload_type(**i)  # type: ignore
 
 
 def prompt_message(get_user_input: GetInputFunc, output_func: OutputFunc) -> CanMessage:
-    """
-    Prompt user to create a message.
+    """Prompt user to create a message.
 
     Args:
         get_user_input: Function to get user input.
@@ -120,7 +125,9 @@ def prompt_message(get_user_input: GetInputFunc, output_func: OutputFunc) -> Can
     node_id = prompt_enum(NodeId, get_user_input, output_func)
     # TODO (amit, 2021-10-01): Get function code when the time comes.
     function_code = FunctionCode.network_management
-    message_def = get_definition(message_id)
+    message_def = get_definition(cast(MessageId, message_id))
+    if message_def is None:
+        raise InvalidInput(f"No message definition found for {message_id}")
     payload = prompt_payload(message_def.payload_type, get_user_input)
     try:
         data = payload.serialize()

@@ -1,7 +1,7 @@
 """Script to identify peripherals on the can bus."""
 import argparse
 import asyncio
-from typing import Optional
+from typing import Optional, cast
 
 from opentrons_hardware.drivers.can_bus import (
     CanDriver,
@@ -47,7 +47,9 @@ async def wait_responses(can_driver: CanDriver) -> None:
     """
     async for message in can_driver:
         if message.arbitration_id.parts.message_id == MessageId.device_info_response:
-            body = DeviceInfoResponseBody.build(message.data)
+            body = cast(
+                DeviceInfoResponseBody, DeviceInfoResponseBody.build(message.data)
+            )
             node = NodeId(body.node_id.value)
             print(f"Received response from Node: {node.name}({node.value:x})")
             print(f"\tArbitration id: {message.arbitration_id}. Body: {body}")

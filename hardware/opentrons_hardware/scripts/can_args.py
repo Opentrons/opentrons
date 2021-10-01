@@ -1,3 +1,4 @@
+"""ArgumentParser setup for a can device."""
 from argparse import ArgumentParser
 
 
