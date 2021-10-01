@@ -169,15 +169,15 @@ async def run(interface: str, bitrate: int, channel: Optional[str] = None) -> No
     )
 
     loop = asyncio.get_event_loop()
-    lt = loop.create_task(listen_task(driver))
-    ui = loop.create_task(ui_task(driver))
-
+    fut = asyncio.gather(
+        loop.create_task(listen_task(driver)), loop.create_task(ui_task(driver))
+    )
     try:
-        await lt
-        await ui
+        await fut
     except KeyboardInterrupt:
-        lt.cancel()
-        ui.cancel()
+        fut.cancel()
+    except asyncio.CancelledError:
+        pass
     finally:
         driver.shutdown()
 
