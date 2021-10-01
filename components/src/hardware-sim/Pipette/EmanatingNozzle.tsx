@@ -13,7 +13,7 @@ export const EmanatingNozzle = (props: {
         data-testid="origin_circle"
         cx={cx}
         cy={cy}
-        r={.5}
+        r={0.5}
         stroke={C_SELECTED_DARK}
         fill={C_SELECTED_DARK}
       ></circle>
@@ -21,7 +21,7 @@ export const EmanatingNozzle = (props: {
         data-testid="emanating_circle"
         cx={cx}
         cy={cy}
-        r={.5}
+        r={0.5}
         stroke={C_SELECTED_DARK}
         strokeWidth={'2px'}
         fill={C_TRANSPARENT}
@@ -29,7 +29,7 @@ export const EmanatingNozzle = (props: {
         <animate
           data-testid="animation_radius"
           attributeName="r"
-          from={.5}
+          from={0.5}
           to={SINGLE_CHANNEL_PIPETTE_HEIGHT / 2}
           begin={0}
           dur={1.5}
