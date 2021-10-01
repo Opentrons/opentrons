@@ -690,8 +690,8 @@ def verify_definition(
     If the definition is invalid, an exception is raised; otherwise parse the
     json and return the valid definition.
 
-    :raises json.JsonDecodeError: If the definition is not valid json
-    :raises jsonschema.ValidationError: If the definition is not valid.
+    :raises json.JSONDecodeError: If the definition is not valid json
+    :raises: ``jsonschema.ValidationError`` -- if the definition is not valid.
     :returns: The parsed definition
     """
     return labware_module.verify_definition(contents=contents)
