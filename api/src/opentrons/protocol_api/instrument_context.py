@@ -989,7 +989,6 @@ class InstrumentContext(CommandPublisher):
 
         :param volume: The amount of volume to distribute to each destination
                        well.
-        :type volume: float or sequence of floats
         :param source: A single well from where liquid will be aspirated.
         :param dest: List of Wells where liquid will be dispensed to.
         :param kwargs: See :py:meth:`transfer`. Some arguments are changed.
@@ -1022,7 +1021,6 @@ class InstrumentContext(CommandPublisher):
 
         :param volume: The amount of volume to consolidate from each source
                        well.
-        :type volume: float or sequence of floats
         :param source: List of wells from where liquid will be aspirated.
         :param dest: The single well into which liquid will be dispensed.
         :param kwargs: See :py:meth:`transfer`. Some arguments are changed.
