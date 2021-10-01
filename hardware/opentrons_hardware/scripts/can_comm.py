@@ -155,7 +155,10 @@ async def ui_task(can_driver: CanDriver) -> None:
     """
     while True:
         try:
-            can_message = prompt_message(input, print)
+            # Run sync prompt message in threadpool executor.
+            can_message = await asyncio.get_event_loop().run_in_executor(
+                None, prompt_message, input, print
+            )
             await can_driver.send(can_message)
         except InvalidInput as e:
             print(str(e))
