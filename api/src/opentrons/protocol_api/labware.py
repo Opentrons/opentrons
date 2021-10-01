@@ -220,7 +220,7 @@ class Labware(DeckItem):
     reservoir, tip rack, etc. It defines the physical geometry of the labware,
     and provides methods for accessing wells within the labware.
 
-    It is commonly created by calling :py:meth:`ProtocolContext.load_labware`.
+    It is commonly created by calling ``ProtocolContext.load_labware()``.
 
     To access a labware's wells, you can use its well accessor methods:
     :py:meth:`wells_by_name`, :py:meth:`wells`, :py:meth:`columns`,
@@ -775,7 +775,7 @@ def select_tiprack_from_list_paired_pipettes(
     starting_point: Optional[Well] = None,
 ) -> Tuple[Labware, Well]:
     """
-    Helper function utilized in :py:attr:`PairedInstrumentContext`
+    Helper function utilized in ``PairedInstrumentContext``
     to determine which pipette tiprack to pick up from.
 
     If a starting point is specified, this method with check

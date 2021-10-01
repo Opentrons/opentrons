@@ -42,7 +42,8 @@ def get_protocol_api(
     extra_labware: Dict[str, "LabwareDefinition"] = None,
 ) -> protocol_api.ProtocolContext:
     """
-    Build and return a :py:class:`ProtocolContext` connected to the robot.
+    Build and return a ``protocol_api.ProtocolContext``
+    connected to the robot.
 
     This can be used to run protocols from interactive Python sessions
     such as Jupyter or an interpreter on the command line:
@@ -73,7 +74,7 @@ def get_protocol_api(
                             and is best not used.
     :param bundled_data: If specified, a mapping from filenames to contents
                          for data to be available in the protocol from
-                         :py:attr:`.ProtocolContext.bundled_data`.
+                         ``protocol_api.ProtocolContext.bundled_data``.
     :param extra_labware: If specified, a mapping from labware names to
                           labware definitions for labware to consider in the
                           protocol in addition to those stored on the robot.
@@ -81,7 +82,7 @@ def get_protocol_api(
                           on a robot, it will look in the 'labware'
                           subdirectory of the Jupyter data directory for
                           custom labware.
-    :returns opentrons.protocol_api.ProtocolContext: The protocol context.
+    :return: The protocol context.
     """
     global _THREAD_MANAGED_HW
     if not _THREAD_MANAGED_HW:
@@ -252,7 +253,7 @@ def execute(
                               directories. Specified files and the
                               non-recursive contents of specified directories
                               are presented by the protocol context in
-                              :py:attr:`.ProtocolContext.bundled_data`.
+                              ``ProtocolContext.bundled_data``.
 
     The format of the runlog entries is as follows:
 

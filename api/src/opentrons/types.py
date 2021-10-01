@@ -74,8 +74,7 @@ class Location:
 
     It should rarely be constructed directly by the user; rather, it is the
     return type of most :py:class:`.Well` accessors like :py:meth:`.Well.top`
-    and is passed directly into a method like
-    :py:meth:`InstrumentContext.aspirate`.
+    and is passed directly into a method like ``InstrumentContext.aspirate()``.
 
     .. warning::
        The ``.labware`` attribute of this class is used by the protocol
