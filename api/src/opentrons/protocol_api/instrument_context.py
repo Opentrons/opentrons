@@ -1261,7 +1261,7 @@ class InstrumentContext(CommandPublisher):
                       :py:attr:`InstrumentContext.default_speed`. This controls
                       the straight linear speed of the motion; to limit
                       individual axis speeds, you can use
-                      :py:attr:`.ProtocolContext.max_speeds`.
+                      :py:obj:`.ProtocolContext.max_speeds`.
         :param publish: Whether a call to this function should publish to the
                         runlog or not.
         """
