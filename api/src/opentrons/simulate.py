@@ -283,7 +283,7 @@ def simulate(
                      it would be 3.
         - ``payload``: The command, its arguments, and how to format its text.
                        For more specific details see
-                       :py:mod:`opentrons.commands`. To format a message from
+                       ``opentrons.commands``. To format a message from
                        a payload do ``payload['text'].format(**payload)``.
         - ``logs``: Any log messages that occurred during execution of this
                     command, as a logging.LogRecord
