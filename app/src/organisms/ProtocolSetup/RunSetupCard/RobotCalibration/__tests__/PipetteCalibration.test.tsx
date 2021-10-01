@@ -1,6 +1,6 @@
 import * as React from 'react'
 import '@testing-library/jest-dom'
-import { renderWithProviders } from '@opentrons/components/__utils__'
+import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../i18n'
 import { mockProtocolPipetteTipRackCalInfo } from '../../../../../redux/pipettes/__fixtures__'
 import { PipetteCalibration } from '../PipetteCalibration'

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import '@testing-library/jest-dom'
 import { fireEvent } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components/__utils__'
+import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
 import { UploadInput } from '../UploadInput'

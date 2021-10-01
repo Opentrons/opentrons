@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Link as InternalLink } from 'react-router-dom'
-import { mountWithStore } from '@opentrons/components/__utils__'
+import { mountWithStore } from '@opentrons/components'
 
 import { BaseModal, Flex, Icon } from '@opentrons/components'
 import * as Shell from '../../../redux/shell'

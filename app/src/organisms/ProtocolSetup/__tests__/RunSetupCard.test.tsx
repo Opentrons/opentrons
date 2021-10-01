@@ -6,7 +6,7 @@ import {
   componentPropsMatcher,
   partialComponentPropsMatcher,
   renderWithProviders,
-} from '@opentrons/components/__utils__'
+} from '@opentrons/components'
 import noModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/simpleV4.json'
 import withModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/testModulesProtocol.json'
 

@@ -15,7 +15,7 @@ import {
   renderWithProviders,
   componentPropsMatcher,
   partialComponentPropsMatcher,
-} from '@opentrons/components/__utils__'
+} from '@opentrons/components'
 import { i18n } from '../../../../../i18n'
 import { LabwareSetup } from '..'
 import { LabwareSetupModal } from '../LabwareSetupModal'

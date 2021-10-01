@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { mountWithProviders } from '@opentrons/components/__utils__'
+import { mountWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../../i18n'
 import wellPlate96Def from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'

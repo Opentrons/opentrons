@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { mountWithProviders } from '@opentrons/components/__utils__'
+import { mountWithProviders } from '@opentrons/components'
 import { saveAs } from 'file-saver'
 
 import { i18n } from '../../../../i18n'

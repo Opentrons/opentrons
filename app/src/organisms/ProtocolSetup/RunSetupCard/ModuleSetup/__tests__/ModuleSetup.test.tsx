@@ -8,7 +8,7 @@ import {
   renderWithProviders,
   partialComponentPropsMatcher,
   componentPropsMatcher,
-} from '@opentrons/components/__utils__'
+} from '@opentrons/components'
 import { i18n } from '../../../../../i18n'
 import { ModuleSetup } from '..'
 import { ModuleInfo } from '../ModuleInfo'

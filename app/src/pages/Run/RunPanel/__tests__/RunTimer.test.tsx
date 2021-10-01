@@ -3,7 +3,7 @@ import { when } from 'jest-when'
 
 import { RunTimer } from '../RunTimer'
 import { formatSeconds, formatTime } from '../utils'
-import { mountWithStore } from '@opentrons/components/__utils__'
+import { mountWithStore } from '@opentrons/components'
 import * as selectors from '../../../../redux/robot/selectors'
 import { State } from '../../../../redux/types'
 

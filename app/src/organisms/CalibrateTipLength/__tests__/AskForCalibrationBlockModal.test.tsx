@@ -1,12 +1,12 @@
 import * as React from 'react'
-import { mountWithStore } from '@opentrons/components/__utils__'
+import { mountWithStore } from '@opentrons/components'
 import { act } from 'react-dom/test-utils'
 
 import { AskForCalibrationBlockModal } from '../AskForCalibrationBlockModal'
 import { CheckboxField } from '@opentrons/components'
 import { setUseTrashSurfaceForTipCal } from '../../../redux/calibration'
 
-import type { WrapperWithStore } from '@opentrons/components/__utils__'
+import type { WrapperWithStore } from '@opentrons/components'
 
 type RenderReturnType = WrapperWithStore<
   React.ComponentProps<typeof AskForCalibrationBlockModal>

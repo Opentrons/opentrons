@@ -2,7 +2,7 @@ import * as React from 'react'
 import {
   mountWithStore,
   WrapperWithStore,
-} from '@opentrons/components/__utils__'
+} from '@opentrons/components'
 
 import { ConfirmPipette } from '../ConfirmPipette'
 import { CheckPipettesButton } from '../CheckPipettesButton'

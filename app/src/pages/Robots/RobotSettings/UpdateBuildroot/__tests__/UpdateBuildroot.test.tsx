@@ -3,7 +3,7 @@ import * as React from 'react'
 import {
   mountWithStore,
   WrapperWithStore,
-} from '@opentrons/components/__utils__'
+} from '@opentrons/components'
 import { mockConnectableRobot as mockRobot } from '../../../../../redux/discovery/__fixtures__'
 import * as Buildroot from '../../../../../redux/buildroot'
 import { UpdateBuildroot } from '..'

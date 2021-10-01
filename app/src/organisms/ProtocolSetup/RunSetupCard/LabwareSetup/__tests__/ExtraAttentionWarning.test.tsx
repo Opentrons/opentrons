@@ -4,7 +4,7 @@ import { fireEvent, screen } from '@testing-library/react'
 import {
   partialComponentPropsMatcher,
   renderWithProviders,
-} from '@opentrons/components/__utils__'
+} from '@opentrons/components'
 import { i18n } from '../../../../../i18n'
 import { ExtraAttentionWarning } from '../ExtraAttentionWarning'
 import { SecureLabwareModal } from '../SecureLabwareModal'

@@ -28,3 +28,6 @@ export * from './styles'
 
 // Pure Types
 export * from './robot-types'
+
+// testing utilities
+export * from './testing/utils'

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { render } from '@testing-library/react'
 import { when } from 'jest-when'
-import { anyProps } from '../../../../__utils__/matchers'
+import { anyProps } from '../../../testing/utils'
 import { EightEmanatingNozzles } from '../EightEmanatingNozzles'
 import { EmanatingNozzle } from '../EmanatingNozzle'
 
@@ -14,7 +14,7 @@ const mockEmanatingNozzle = EmanatingNozzle as jest.MockedFunction<
 describe('EightEmanatingNozzles', () => {
   beforeEach(() => {
     when(mockEmanatingNozzle)
-      .calledWith(anyProps)
+      .calledWith(anyProps())
       .mockReturnValue(<div>mock emanating nozzle</div>)
   })
   it('should render eight emanating nozzles', () => {

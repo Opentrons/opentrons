@@ -2,10 +2,7 @@ import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { render } from '@testing-library/react'
 import _uncasted_fixtureTiprack300Ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
-import {
-  anyProps,
-  partialComponentPropsMatcher,
-} from '../../../../__utils__/matchers'
+import { anyProps, partialComponentPropsMatcher } from '../../../testing/utils'
 import { RobotCoordsForeignDiv } from '../../Deck/RobotCoordsForeignDiv'
 import { PipetteRender } from '../PipetteRender'
 import { EmanatingNozzle } from '../EmanatingNozzle'
@@ -63,7 +60,7 @@ describe('PipetteRender', () => {
         ))
 
       when(mockEmanatingNozzle)
-        .calledWith(anyProps)
+        .calledWith(anyProps())
         .mockReturnValue(<div>mock emanating nozzle</div>)
     })
 
@@ -107,7 +104,7 @@ describe('PipetteRender', () => {
         ))
 
       when(mockEightEmanatingNozzles)
-        .calledWith(anyProps)
+        .calledWith(anyProp(s)
         .mockReturnValue(<div>mock eight emanating nozzles</div>)
     })
     it('should render a rectangle with the correct dimensions', () => {

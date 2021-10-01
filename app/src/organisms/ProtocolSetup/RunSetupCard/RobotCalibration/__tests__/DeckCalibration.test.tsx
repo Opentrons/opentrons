@@ -1,7 +1,7 @@
 import * as React from 'react'
 import '@testing-library/jest-dom'
 import { fireEvent } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components/__utils__'
+import { renderWithProviders } from '@opentrons/components'
 import { mockDeckCalData } from '../../../../../redux/calibration/__fixtures__'
 import * as calibrationSelectors from '../../../../../redux/calibration/selectors'
 

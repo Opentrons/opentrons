@@ -5,7 +5,7 @@ import {
   LabwareDefinition2,
 } from '@opentrons/shared-data'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
-import { renderWithProviders } from '@opentrons/components/__utils__'
+import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../i18n'
 import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
 

@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import { mountWithStore } from '@opentrons/components/__utils__'
+import { mountWithStore } from '@opentrons/components'
 import { AlertModal, OutlineButton } from '@opentrons/components'
 import { mockReachableRobot } from '../../../../../redux/discovery/__fixtures__'
 import { UPGRADE, DOWNGRADE, REINSTALL } from '../../../../../redux/buildroot'

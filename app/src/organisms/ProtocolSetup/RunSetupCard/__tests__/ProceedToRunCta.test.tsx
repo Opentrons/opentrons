@@ -1,7 +1,7 @@
 import * as React from 'react'
 import '@testing-library/jest-dom'
 import { StaticRouter } from 'react-router-dom'
-import { renderWithProviders } from '@opentrons/components/__utils__'
+import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import * as hooks from '../hooks'
 import { ProceedToRunCta } from '../ProceedToRunCta'

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { mountWithStore } from '@opentrons/components/__utils__'
+import { mountWithStore } from '@opentrons/components'
 
 import * as CustomLabware from '../../../../redux/custom-labware'
 import * as CustomLabwareFixtures from '../../../../redux/custom-labware/__fixtures__'
@@ -8,7 +8,7 @@ import { ManagePath } from '../ManagePath'
 import { AddLabware } from '../AddLabware'
 import { AddLabwareFailureModal } from '../AddLabwareFailureModal'
 
-import type { WrapperWithStore } from '@opentrons/components/__utils__'
+import type { WrapperWithStore } from '@opentrons/components'
 import type { State, Action } from '../../../../redux/types'
 
 jest.mock('../../../../redux/custom-labware/selectors')
