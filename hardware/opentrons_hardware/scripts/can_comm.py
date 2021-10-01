@@ -5,15 +5,30 @@ import logging
 import argparse
 from enum import Enum
 from logging.config import dictConfig
-from typing import Type, Sequence, Optional
+from typing import Type, Sequence, Optional, Callable
 
-from opentrons_hardware.drivers.can_bus import CanDriver, MessageId, NodeId, \
-    CanMessage, ArbitrationId, ArbitrationIdParts
+from opentrons_hardware.drivers.can_bus import (
+    CanDriver,
+    MessageId,
+    NodeId,
+    CanMessage,
+    ArbitrationId,
+    ArbitrationIdParts, FunctionCode,
+)
 from opentrons_hardware.drivers.can_bus.messages.messages import get_definition
 from opentrons_hardware.scripts.can_args import add_can_args
-from opentrons_hardware.utils import BinarySerializable
+from opentrons_hardware.utils import BinarySerializable, \
+    BinarySerializableException
 
 log = logging.getLogger(__name__)
+
+
+GetInputFunc = Callable[[str], str]
+OutputFunc = Callable[[str], None]
+
+
+class InvalidInput(Exception):
+    pass
 
 
 async def listen_task(can_driver: CanDriver) -> None:
@@ -42,27 +57,35 @@ def create_choices(enum_type: Type[Enum]) -> Sequence[str]:
     return [f"{i}: {v.name}" for (i, v) in enumerate(enum_type)]
 
 
-def prompt_enum(enum_type: Type[Enum]) -> Type[Enum]:
+def prompt_enum(enum_type: Type[Enum], get_user_input: GetInputFunc, output_func: OutputFunc) -> Type[Enum]:
     """Prompt to choose a member of the enum.
 
     Args:
+        output_func: Function to output text to user.
+        get_user_input: Function to get user input.
         enum_type: an enum type
 
     Returns:
         The choice.
 
     """
-    print(f"choose {enum_type}:")
+    output_func(f"choose {enum_type}:")
     for row in create_choices(enum_type):
-        print(f"\t{row}")
+        output_func(f"\t{row}")
 
-    return list(enum_type)[int(input("enter choice:"))]
+    try:
+        return list(enum_type)[int(get_user_input("enter choice:"))]
+    except (ValueError, IndexError) as e:
+        raise InvalidInput(str(e))
 
 
-def prompt_payload(payload_type: Type[BinarySerializable]) -> BinarySerializable:
+def prompt_payload(
+    payload_type: Type[BinarySerializable], get_user_input: GetInputFunc
+) -> BinarySerializable:
     """Prompt to get payload.
 
     Args:
+        get_user_input: Function to get user input.
         payload_type: Serializable payload type.
 
     Returns:
@@ -76,8 +99,43 @@ def prompt_payload(payload_type: Type[BinarySerializable]) -> BinarySerializable
         #  Should be handled by type coercion in utils.BinarySerializable.
         #  All values are ints now, but may be bytes in the future (ie serial
         #  numbers, fw upgrade blobs).
-        i[f.name] = f.type.build(int(input(f"enter {f.name}:")))
+        try:
+            i[f.name] = f.type.build(int(get_user_input(f"enter {f.name}:")))
+        except ValueError as e:
+            raise InvalidInput(str(e))
     return payload_type(**i)
+
+
+def prompt_message(get_user_input: GetInputFunc, output_func: OutputFunc) -> CanMessage:
+    """
+    Prompt user to create a message.
+
+    Args:
+        get_user_input: Function to get user input.
+        output_func: Function to output text to user.
+
+    Returns: a CanMessage
+    """
+    message_id = prompt_enum(MessageId, get_user_input, output_func)
+    node_id = prompt_enum(NodeId, get_user_input, output_func)
+    # TODO (amit, 2021-10-01): Get function code when the time comes.
+    function_code = FunctionCode.network_management
+    message_def = get_definition(message_id)
+    payload = prompt_payload(message_def.payload_type, get_user_input)
+    try:
+        data = payload.serialize()
+    except BinarySerializableException as e:
+        raise InvalidInput(str(e))
+    can_message = CanMessage(
+        arbitration_id=ArbitrationId(
+            parts=ArbitrationIdParts(
+                message_id=message_id, node_id=node_id, function_code=function_code
+            )
+        ),
+        data=data,
+    )
+    log.info(f"Sending --> {can_message}")
+    return can_message
 
 
 async def ui_task(can_driver: CanDriver) -> None:
@@ -89,21 +147,11 @@ async def ui_task(can_driver: CanDriver) -> None:
     Returns: None.
     """
     while True:
-        message_id = prompt_enum(MessageId)
-        node_id = prompt_enum(NodeId)
-        # TODO (amit, 2021-10-01): Get function code when the time comes.
-        message_def = get_definition(message_id)
-
-        payload = prompt_payload(message_def.payload_type)
-
-        can_message = CanMessage(
-            arbitration_id=ArbitrationId(parts=ArbitrationIdParts(message_id=message_id, node_id=node_id, function_code=0)),
-            data=payload.serialize(),
-        )
-
-        log.info(f"Sending --> {can_message}")
-
-        await can_driver.send(can_message)
+        try:
+            can_message = prompt_message(input, print)
+            await can_driver.send(can_message)
+        except InvalidInput as e:
+            print(str(e))
 
 
 async def run(interface: str, bitrate: int, channel: Optional[str] = None) -> None:
@@ -128,32 +176,28 @@ async def run(interface: str, bitrate: int, channel: Optional[str] = None) -> No
 
 
 LOG_CONFIG = {
-        "version": 1,
-        "disable_existing_loggers": False,
-        "formatters": {
-            "basic": {
-                "format": (
-                    "%(asctime)s %(name)s %(levelname)s %(message)s"
-                )
-            }
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "basic": {"format": ("%(asctime)s %(name)s %(levelname)s %(message)s")}
+    },
+    "handlers": {
+        "file_handler": {
+            "class": "logging.handlers.RotatingFileHandler",
+            "formatter": "basic",
+            "filename": "can_comm.log",
+            "maxBytes": 5000000,
+            "level": logging.INFO,
+            "backupCount": 3,
         },
-        "handlers": {
-            "file_handler": {
-                "class": "logging.handlers.RotatingFileHandler",
-                "formatter": "basic",
-                "filename": "can_comm.log",
-                "maxBytes": 5000000,
-                "level": logging.INFO,
-                "backupCount": 3,
-            },
+    },
+    "loggers": {
+        "": {
+            "handlers": ["file_handler"],
+            "level": logging.INFO,
         },
-        "loggers": {
-            "": {
-                "handlers": ["file_handler"],
-                "level": logging.INFO,
-            },
-        },
-    }
+    },
+}
 
 
 def main() -> None:

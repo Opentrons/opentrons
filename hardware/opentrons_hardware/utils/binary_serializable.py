@@ -22,6 +22,12 @@ class InvalidFieldException(BinarySerializableException):
     pass
 
 
+class SerializationException(BinarySerializableException):
+    """Serialization error."""
+
+    pass
+
+
 T = TypeVar("T")
 
 
@@ -118,7 +124,10 @@ class BinarySerializable:
         """
         string = self._get_format_string()
         vals = [x.value for x in astuple(self)]
-        return struct.pack(string, *vals)
+        try:
+            return struct.pack(string, *vals)
+        except struct.error as e:
+            raise SerializationException(str(e))
 
     @classmethod
     def build(cls, data: bytes) -> BinarySerializable:
