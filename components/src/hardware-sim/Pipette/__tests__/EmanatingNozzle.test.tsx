@@ -14,7 +14,7 @@ describe('EmanatingNozzle', () => {
     const originCircle = getByTestId('origin_circle')
     expect(originCircle).toHaveAttribute('cx', '5')
     expect(originCircle).toHaveAttribute('cy', '10')
-    expect(originCircle).toHaveAttribute('r', '1.5')
+    expect(originCircle).toHaveAttribute('r', '0.5')
     expect(originCircle).toHaveAttribute('stroke', C_SELECTED_DARK)
     expect(originCircle).toHaveAttribute('fill', C_SELECTED_DARK)
   })
@@ -27,7 +27,7 @@ describe('EmanatingNozzle', () => {
     const emanatingCircle = getByTestId('emanating_circle')
     expect(emanatingCircle).toHaveAttribute('cx', '5')
     expect(emanatingCircle).toHaveAttribute('cy', '10')
-    expect(emanatingCircle).toHaveAttribute('r', '3')
+    expect(emanatingCircle).toHaveAttribute('r', '0.5')
     expect(emanatingCircle).toHaveAttribute('stroke', C_SELECTED_DARK)
     expect(emanatingCircle).toHaveAttribute('fill', C_TRANSPARENT)
   })
@@ -40,13 +40,13 @@ describe('EmanatingNozzle', () => {
     const animations = getByTestId('emanating_circle').children
     const radiusAnimation = animations[0]
     expect(radiusAnimation).toHaveAttribute('attributeName', 'r')
-    expect(radiusAnimation).toHaveAttribute('from', '3')
+    expect(radiusAnimation).toHaveAttribute('from', '0.5')
     expect(radiusAnimation).toHaveAttribute(
       'to',
       (SINGLE_CHANNEL_PIPETTE_HEIGHT / 2).toString()
     )
     expect(radiusAnimation).toHaveAttribute('begin', '0')
-    expect(radiusAnimation).toHaveAttribute('dur', '3')
+    expect(radiusAnimation).toHaveAttribute('dur', '1.5')
     expect(radiusAnimation).toHaveAttribute('calcMode', 'linear')
     expect(radiusAnimation).toHaveAttribute('repeatCount', 'indefinite')
   })
@@ -62,7 +62,7 @@ describe('EmanatingNozzle', () => {
     expect(opacityAnimation).toHaveAttribute('from', '1')
     expect(opacityAnimation).toHaveAttribute('to', '0')
     expect(opacityAnimation).toHaveAttribute('begin', '0')
-    expect(opacityAnimation).toHaveAttribute('dur', '3')
+    expect(opacityAnimation).toHaveAttribute('dur', '1.5')
     expect(opacityAnimation).toHaveAttribute('calcMode', 'linear')
     expect(opacityAnimation).toHaveAttribute('repeatCount', 'indefinite')
   })
