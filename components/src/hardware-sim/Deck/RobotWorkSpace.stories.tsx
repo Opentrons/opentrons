@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { RobotWorkSpace } from './RobotWorkSpace'
 import { RobotCoordsForeignDiv, Module } from '@opentrons/components'
+import { getModuleDef2 } from '@opentrons/shared-data'
 import { getDeckDefinitions } from './getDeckDefinitions'
 
 import type { Story, Meta } from '@storybook/react'
@@ -65,11 +66,12 @@ Deck.args = {
             placeholder="example input"
           />
         </RobotCoordsForeignDiv>
-        <g
-          transform={`translate(${moduleSlot.position[0]}, ${moduleSlot.position[1]})`}
-        >
-          <Module slot={moduleSlot} model="temperatureModuleV1" />
-        </g>
+
+        <Module
+          def={getModuleDef2('temperatureModuleV1')}
+          x={moduleSlot.position[0]}
+          y={moduleSlot.position[1]}
+        />
       </>
     )
   },
