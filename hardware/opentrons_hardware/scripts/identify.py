@@ -12,8 +12,8 @@ from opentrons_hardware.drivers.can_bus import (
     ArbitrationId,
     ArbitrationIdParts,
 )
-from opentrons_hardware.drivers.can_bus.messages.payloads import \
-    DeviceInfoResponseBody
+from opentrons_hardware.drivers.can_bus.messages.payloads import DeviceInfoResponseBody
+from opentrons_hardware.scripts.can_args import add_can_args
 
 
 async def request(can_driver: CanDriver) -> None:
@@ -71,18 +71,7 @@ async def run(interface: str, bitrate: int, channel: Optional[str] = None) -> No
 def main() -> None:
     """Entry point."""
     parser = argparse.ArgumentParser(description="Identify peripherals on the can bus.")
-    parser.add_argument(
-        "--interface",
-        type=str,
-        required=True,
-        help="the interface to use (ie: virtual, pcan, socketcan)",
-    )
-    parser.add_argument(
-        "--bitrate", type=int, default=250000, required=False, help="the bitrate"
-    )
-    parser.add_argument(
-        "--channel", type=str, default=None, required=False, help="optional channel"
-    )
+    add_can_args(parser)
 
     args = parser.parse_args()
 

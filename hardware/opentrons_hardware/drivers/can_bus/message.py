@@ -10,4 +10,4 @@ class CanMessage:
     """A can message."""
 
     arbitration_id: ArbitrationId
-    data: bytearray
+    data: bytes

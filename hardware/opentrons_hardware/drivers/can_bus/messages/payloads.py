@@ -28,6 +28,13 @@ class GetStatusResponse(utils.BinarySerializable):
 
 
 @dataclass
+class MoveRequest(utils.BinarySerializable):
+    """Move request."""
+
+    steps: utils.UInt32Field
+
+
+@dataclass
 class GetSpeedResponse(utils.BinarySerializable):
     """Get speed response."""
 
