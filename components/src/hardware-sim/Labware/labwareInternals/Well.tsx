@@ -2,6 +2,7 @@ import assert from 'assert'
 import * as React from 'react'
 import cx from 'classnames'
 import styles from './Well.css'
+import { C_MED_GRAY, C_WHITE, C_BLUE } from '../../../styles/colors'
 
 import type { LabwareWell } from '@opentrons/shared-data'
 import type { CSSProperties } from 'styled-components'
@@ -12,6 +13,8 @@ export interface WellProps {
   className?: string | null | undefined
   /** fill inline style */
   fill?: CSSProperties['fill']
+  /** stroke inline style */
+  stroke?: CSSProperties['stroke']
   /** Well Name (eg 'A1') */
   wellName: string
   /** well object from labware definition */
@@ -24,7 +27,14 @@ export interface WellProps {
 }
 
 function WellComponent(props: WellProps): JSX.Element | null {
-  const { well, wellName, fill, onMouseEnterWell, onMouseLeaveWell } = props
+  const {
+    well,
+    wellName,
+    fill,
+    stroke,
+    onMouseEnterWell,
+    onMouseLeaveWell,
+  } = props
   assert(well, `expected 'well' prop for well "${wellName}"`)
   if (!well) return null
   const { x, y } = well
@@ -34,7 +44,7 @@ function WellComponent(props: WellProps): JSX.Element | null {
 
   const _mouseInteractionProps = {
     className,
-    style: { fill },
+    style: { fill, stroke },
     'data-wellname': wellName,
     onMouseEnter: onMouseEnterWell
       ? ((event =>
@@ -47,7 +57,11 @@ function WellComponent(props: WellProps): JSX.Element | null {
   }
   const _noMouseProps = {
     className: baseClassName,
-    style: { fill, pointerEvents: 'none' as CSSProperties['pointerEvents'] },
+    style: {
+      fill,
+      stroke,
+      pointerEvents: 'none' as CSSProperties['pointerEvents'],
+    },
   }
   // exclude all mouse interactivity props if no event handler props provided
   const commonProps =

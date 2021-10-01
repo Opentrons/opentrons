@@ -9,16 +9,25 @@ import styles from './LabwareRender.css'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
+  HighlightedWellLabels,
   WellMouseEvent,
   WellFill,
   WellGroup,
 } from './labwareInternals/types'
 
+export const WELL_LABEL_OPTIONS = {
+  SHOW_LABEL_INSIDE: 'SHOW_LABEL_INSIDE',
+  SHOW_LABEL_OUTSIDE: 'SHOW_LABEL_OUTSIDE',
+} as const
+
+export type WellLabelOption = keyof typeof WELL_LABEL_OPTIONS
+
 export interface LabwareRenderProps {
   definition: LabwareDefinition2
-  showLabels?: boolean
+  wellLabelOption?: WellLabelOption
+  highlightedWells?: WellGroup
   missingTips?: WellGroup | null | undefined
-  highlightedWells?: WellGroup | null | undefined
+  highlightedWellLabels?: HighlightedWellLabels
   selectedWells?: WellGroup | null | undefined
   /** CSS color to fill specified wells */
   wellFill?: WellFill
@@ -74,7 +83,13 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
           wells={props.missingTips}
         />
       )}
-      {props.showLabels && <WellLabels definition={props.definition} />}
+      {props.wellLabelOption && (
+        <WellLabels
+          definition={props.definition}
+          wellLabelOption={props.wellLabelOption}
+          highlightedWellLabels={props.highlightedWellLabels}
+        />
+      )}
     </g>
   )
 }

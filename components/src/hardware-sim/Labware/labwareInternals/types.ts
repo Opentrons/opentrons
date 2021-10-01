@@ -10,3 +10,8 @@ export type WellFill = Record<string, string>
 
 // Use this like a Set!
 export type WellGroup = Record<string, null>
+
+export interface HighlightedWellLabels {
+  wells: WellGroup
+  highlightColor?: string
+}

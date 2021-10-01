@@ -40,18 +40,7 @@ function StaticLabwareComponent(props: StaticLabwareProps): JSX.Element {
   return (
     <g>
       <g className={styles.labware_detail_group}>
-        <LabwareOutline definition={props.definition} />
-        <rect
-          x={1}
-          y={1}
-          strokeWidth={1}
-          width={props.definition.dimensions.xDimension - 2}
-          height={props.definition.dimensions.yDimension - 2}
-          rx={6}
-          className={cx(styles.labware_outline, {
-            [styles.tiprack_outline]: isTiprack,
-          })}
-        />
+        <LabwareOutline definition={props.definition} stroke={'blue'}/>
       </g>
       <g>
         {flatMap(

@@ -9,3 +9,7 @@
 .letter_column {
   dominant-baseline: middle;
 }
+
+.label_highlight {
+  fill: var(--c-blue);
+}
