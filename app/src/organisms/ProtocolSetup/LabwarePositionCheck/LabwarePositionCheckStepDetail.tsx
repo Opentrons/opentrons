@@ -1,3 +1,4 @@
+import * as React from 'react'
 import {
   Box,
   Btn,
@@ -7,48 +8,39 @@ import {
   Link,
   SPACING_1,
   SPACING_2,
-  SPACING_5,
   SPACING_7,
 } from '@opentrons/components'
-import map from 'lodash/map'
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { useIntroInfo, useLabwareIdsBySection } from './hooks'
+import { Trans, useTranslation } from 'react-i18next'
+import { useIntroInfo } from './hooks'
 import { LabwarePositionCheckStepDetailModal } from './LabwarePositionCheckStepDetailModal'
-import { useLabwareRenderInfoById } from '../hooks'
+import { LabwarePositionCheckStep } from './types'
+import { useProtocolDetails } from '../../RunDetails/hooks'
 
-export const LabwarePositionCheckStepDetail = (): JSX.Element | null => {
+interface LabwarePositionCheckStepDetailProps {
+  selectedStep: LabwarePositionCheckStep
+}
+export const LabwarePositionCheckStepDetail = (
+  props: LabwarePositionCheckStepDetailProps
+): JSX.Element | null => {
+  const { labwareId } = props.selectedStep
   const { t } = useTranslation('labware_position_check')
   const introInfo = useIntroInfo()
-  const labwareIds = useLabwareIdsBySection()
-  const labwareRenderInfoById = useLabwareRenderInfoById()
+  console.log(introInfo)
+  const { protocolData } = useProtocolDetails()
+  console.log(protocolData)
   const [
     showLabwarePositionCheckStepDetailModal,
     setLabwarePositionCheckStepDetailModal,
   ] = React.useState<boolean>(false)
-  const {
-    PRIMARY_PIPETTE_TIPRACKS,
-    CHECK_REMAINING_LABWARE_WITH_PRIMARY_PIPETTE,
-  } = labwareIds
+  //if (protocolData == null) return null
+  console.log('labware id is ', labwareId)
+
+  const labwareDefId = protocolData.labware[labwareId].definitionId
+
+  const displayName =
+    protocolData.labwareDefinitions[labwareDefId].metadata.displayName
   if (introInfo == null) return null
-  const { numberOfTips, primaryTipRackName } = introInfo
-  //   console.log(numberOfTips)
-  //   console.log(labwareIds)
-  //   console.log(PRIMARY_PIPETTE_TIPRACKS)
-  //   console.log(CHECK_REMAINING_LABWARE_WITH_PRIMARY_PIPETTE)
-  //   console.log(primaryTipRackName)
-  //   const firstTiprack = primaryTipRackName.split()
-  //   const labwaresAndTipracks = PRIMARY_PIPETTE_TIPRACKS.concat(
-  //     CHECK_REMAINING_LABWARE_WITH_PRIMARY_PIPETTE
-  //   )
-  //   const allLabwaresAndTipracks = firstTiprack.concat(labwaresAndTipracks)
-  //   console.log(allLabwaresAndTipracks)
-  const labwareDefs = map(
-    labwareRenderInfoById,
-    ({ labwareDef }) => labwareDef.metadata.displayName
-  )
-  console.log(labwareDefs, 'labwre info')
- // const labwareDefinition = map(labwareDefs, {{labwareDef} => labwareDef)
+  const { numberOfTips } = introInfo
 
   return (
     <React.Fragment>
@@ -68,7 +60,19 @@ export const LabwarePositionCheckStepDetail = (): JSX.Element | null => {
         borderRadius="4px"
         backgroundColor={C_NEAR_WHITE}
       >
-        {t('labware_step_detail_labware', { count: numberOfTips })}
+        <Trans
+          t={t}
+          i18nKey={
+            displayName.includes('Tip Rack')
+              ? 'labware_step_detail_tiprack'
+              : 'labware_step_detail_labware'
+          }
+          count={numberOfTips}
+          values={{ labware_name: displayName, tiprack_name: displayName }}
+          components={{
+            bold: <strong />,
+          }}
+        />
         <Btn
           as={Link}
           fontSize={FONT_SIZE_CAPTION}

@@ -30,7 +30,7 @@ describe('LabwarePositionCheckStepDetailModal', () => {
     ).toBeTruthy()
   })
   it('should render the correct body and image texts', () => {
-    const { getByRole, getByText } = render(props)
+    const { getByText } = render(props)
     getByText(
       'To ensure that the nozzle is centered, check from a second side of your OT-2.'
     )
@@ -43,8 +43,9 @@ describe('LabwarePositionCheckStepDetailModal', () => {
     getByText('Viewed from standing height, it appears level...')
     getByText('... but viewed from eye-level, it requires adjustment')
     getByText('Nozzle is not level')
-    getByText('If you’re having trouble, slide 1 sheet of printer paper between the nozzle and the tip. A single piece of paper should barely pass between them.')
-
+    getByText(
+      'If you’re having trouble, slide 1 sheet of printer paper between the nozzle and the tip. A single piece of paper should barely pass between them.'
+    )
   })
   it('should call onCloseClick when the close button is pressed', () => {
     const { getByRole } = render(props)
