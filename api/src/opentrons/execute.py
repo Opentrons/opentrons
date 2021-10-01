@@ -226,10 +226,10 @@ def execute(
     or :py:meth:`.Robot.discover_modules`, or
     :py:meth:`.Robot.cache_instrument_models`.
 
-    :param file-like protocol_file: The protocol file to execute
-    :param str protocol_name: The name of the protocol file. This is required
-                              internally, but it may not be a thing we can get
-                              from the protocol_file argument.
+    :param protocol_file: The protocol file to execute
+    :param protocol_name: The name of the protocol file. This is required
+                          internally, but it may not be a thing we can get
+                          from the protocol_file argument.
     :param propagate_logs: Whether this function should allow logs from the
                            Opentrons stack to propagate up to the root handler.
                            This can be useful if you're integrating this
@@ -237,10 +237,9 @@ def execute(
                            occur during protocol simulation are best associated
                            with the actions in the protocol that cause them.
                            Default: ``False``
-    :type propagate_logs: bool
-    :param log_level: The level of logs to emit on the command line.. Default:
-                      'warning'
-    :type log_level: 'debug', 'info', 'warning', or 'error'
+    :param log_level: The level of logs to emit on the command line:
+                      ``"debug"``, ``"info"``, ``"warning"``, or ``"error"``.
+                      Defaults to ``"warning"``.
     :param emit_runlog: A callback for printing the runlog. If specified, this
                         will be called whenever a command adds an entry to the
                         runlog, which can be used for display and progress
