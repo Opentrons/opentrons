@@ -74,12 +74,12 @@ def prompt_enum(
         The choice.
 
     """
-    output_func(f"choose {enum_type}:")
+    output_func(f"choose {enum_type.__name__}:")
     for row in create_choices(enum_type):
         output_func(f"\t{row}")
 
     try:
-        return list(enum_type)[int(get_user_input("enter choice:"))]
+        return list(enum_type)[int(get_user_input("enter choice: "))]
     except (ValueError, IndexError) as e:
         raise InvalidInput(str(e))
 
@@ -105,7 +105,7 @@ def prompt_payload(
         #  All values are ints now, but may be bytes in the future (ie serial
         #  numbers, fw upgrade blobs).
         try:
-            i[f.name] = f.type.build(int(get_user_input(f"enter {f.name}:")))
+            i[f.name] = f.type.build(int(get_user_input(f"enter {f.name}: ")))
         except ValueError as e:
             raise InvalidInput(str(e))
     # Mypy is not liking constructing the derived types.
