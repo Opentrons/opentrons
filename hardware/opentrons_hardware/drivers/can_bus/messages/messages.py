@@ -1,4 +1,5 @@
 """Message types."""
+from functools import lru_cache
 from typing import Union, Optional
 
 from typing_extensions import get_args
@@ -24,6 +25,7 @@ MessageDefinition = Union[
 ]
 
 
+@lru_cache(maxsize=None)
 def get_definition(message_id: MessageId) -> Optional[MessageDefinition]:
     """Get the message type for a message id.
 
@@ -33,6 +35,7 @@ def get_definition(message_id: MessageId) -> Optional[MessageDefinition]:
     Returns: The message definition for a type
 
     """
+    # Dumb linear search, but the result is memoized.
     for i in get_args(MessageDefinition):
         if i.message_id == message_id:
             # get args returns Tuple[Any...]
