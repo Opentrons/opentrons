@@ -71,7 +71,7 @@ class CommandScraper:
 
     The :py:attr:`commands` property contains the list of commands
     and log messages integrated together. Each element of the list is
-    a dict following the pattern in the docs of :py:meth:`simulate`.
+    a dict following the pattern in the docs of :py:obj:`simulate`.
     """
 
     def __init__(
@@ -103,7 +103,7 @@ class CommandScraper:
 
     @property
     def commands(self) -> List[Mapping[str, Mapping[str, Any]]]:
-        """The list of commands. See :py:meth:`simulate`"""
+        """The list of commands. See :py:obj:`simulate`"""
         return self._commands
 
     def __del__(self):
@@ -379,10 +379,10 @@ def simulate(
 
 def format_runlog(runlog: List[Mapping[str, Any]]) -> str:
     """
-    Format a run log (return value of :py:meth:`simulate``) into a
+    Format a run log (return value of :py:obj:`simulate`) into a
     human-readable string
 
-    :param runlog: The output of a call to :py:func:`simulate`
+    :param runlog: The output of a call to :py:obj:`simulate`
     """
     to_ret = []
     for command in runlog:
