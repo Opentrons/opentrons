@@ -132,7 +132,7 @@ class ProtocolContext(CommandPublisher):
         The supported API version was specified when the protocol context
         was initialized. It may be lower than the highest version supported
         by the robot software. For the highest version supported by the
-        robot software, see :py:attr:`.protocol_api.MAX_SUPPORTED_VERSION`.
+        robot software, see ``protocol_api.MAX_SUPPORTED_VERSION``.
         """
         return self._api_version
 

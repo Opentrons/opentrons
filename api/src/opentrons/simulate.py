@@ -155,9 +155,9 @@ def get_protocol_api(
     available.
 
     :param version: The API version to use. This must be lower than
-                    :py:attr:`opentrons.protocol_api.MAX_SUPPORTED_VERSION`.
+                    ``opentrons.protocol_api.MAX_SUPPORTED_VERSION``.
                     It may be specified either as a string (``'2.0'``) or
-                    as a :py:class:`.protocols.types.APIVersion`
+                    as a ``protocols.types.APIVersion``
                     (``APIVersion(2, 0)``).
     :param bundled_labware: If specified, a mapping from labware names to
                             labware definitions for labware to consider in the

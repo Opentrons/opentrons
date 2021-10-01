@@ -862,10 +862,10 @@ def load_from_definition(
                    (often the front-left corner of a slot on the deck).
     :param str label: An optional label that will override the labware's
                       display name from its definition
-    :param APIVersion api_level: the API version to set for the loaded labware
-                                 instance. The :py:class:`.Labware` will
-                                 conform to this level. If not specified,
-                                 defaults to :py:attr:`.MAX_SUPPORTED_VERSION`.
+    :param api_level: the API version to set for the loaded labware
+                      instance. The :py:class:`.Labware` will
+                      conform to this level. If not specified,
+                      defaults to ``MAX_SUPPORTED_VERSION``.
     """
     return Labware(
         implementation=labware_module.load_from_definition(
@@ -911,10 +911,10 @@ def load(
     :param extra_defs: If specified, a mapping of labware names to labware
         definitions. If no bundle is passed, these definitions will also be
         searched.
-    :param APIVersion api_level: the API version to set for the loaded labware
-                                 instance. The :py:class:`.Labware` will
-                                 conform to this level. If not specified,
-                                 defaults to :py:attr:`.MAX_SUPPORTED_VERSION`.
+    :param api_level: the API version to set for the loaded labware
+                      instance. The :py:class:`.Labware` will
+                      conform to this level. If not specified,
+                      defaults to ``MAX_SUPPORTED_VERSION``.
     """
 
     return Labware(
