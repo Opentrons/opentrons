@@ -1115,7 +1115,7 @@ class InstrumentContext(CommandPublisher):
                 ``disposal_volume`` is specified or the pipette is empty,
                 a :py:meth:`blow_out` will occur into the trash.
 
-                If `blow_out` is set to ``False``, this parameter will be ignored.
+                If ``blow_out`` is set to ``False``, this parameter will be ignored.
 
             * *mix_before* (``tuple``) --
               The tuple, if specified, gives the amount of volume to
