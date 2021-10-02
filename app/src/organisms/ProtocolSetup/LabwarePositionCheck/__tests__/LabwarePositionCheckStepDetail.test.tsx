@@ -139,15 +139,16 @@ describe('LabwarePositionCheckStepDetail', () => {
     ).toBeNull()
   })
   it('renders the 1 tip with tiprack text: labware_step_detail_tiprack', () => {
-    render(props)
-
+    const { getByText } = render(props)
+    getByText('See how to tell if the pipette is centered')
     nestedTextMatcher(
       'The pipette nozzle should be centered above A1 in Opentrons 96 Filter Tip Rack 200 µl and level with the top of the tip.'
     )
   })
   it('renders the 1 tip with labware text: labware_step_detail_labware', () => {
     props = { selectedStep: mockLabwarePositionCheckStepLabware }
-    render(props)
+    const { getByText } = render(props)
+    getByText('See how to tell if the pipette is centered')
     nestedTextMatcher(
       'The tip should be centered above A1 in NEST 96 Well Plate 100 µL PCR Full Skirt and level with the top of the labware.'
     )
@@ -167,7 +168,8 @@ describe('LabwarePositionCheckStepDetail', () => {
       firstStepLabwareSlot: '2',
       sections: MOCK_SECTIONS,
     })
-    render(props)
+    const { getByText } = render(props)
+    getByText('See how to tell if the pipette is centered')
 
     nestedTextMatcher(
       'The pipette nozzle should be centered above column 1 in Opentrons 96 Filter Tip Rack 200 µL and level with the top of the tip.'
@@ -189,7 +191,8 @@ describe('LabwarePositionCheckStepDetail', () => {
       firstStepLabwareSlot: '2',
       sections: MOCK_SECTIONS,
     })
-    render(props)
+    const { getByText } = render(props)
+    getByText('See how to tell if the pipette is centered')
 
     nestedTextMatcher(
       'The tips should be centered above column 1 in NEST 96 Well Plate 100 µL PCR Full Skirt and level with the top of the labware.'
