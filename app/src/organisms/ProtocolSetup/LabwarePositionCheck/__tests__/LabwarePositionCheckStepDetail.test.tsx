@@ -198,4 +198,18 @@ describe('LabwarePositionCheckStepDetail', () => {
       'The tips should be centered above column 1 in NEST 96 Well Plate 100 µL PCR Full Skirt and level with the top of the labware.'
     )
   })
+  it('returns null if protocolData is null', () => {
+    when(mockUseProtocolDetails)
+      .calledWith()
+      .mockReturnValue({
+        protocolData: null,
+      } as any)
+    const { container } = render(props)
+    expect(container.firstChild).toBeNull()
+  })
+  it('returns null if introInfo is null', () => {
+    when(mockUseIntroInfo).calledWith().mockReturnValue(null)
+    const { container } = render(props)
+    expect(container.firstChild).toBeNull()
+  })
 })
