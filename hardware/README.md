@@ -19,16 +19,19 @@ The `opentrons-hardware` package includes some utility scripts.
 This will generate a C++ header file defining constants shared between firmware and the `opentrons-hardware` package.
 
 #### Usage
+
 ```
 opentrons_generate_header --target TARGET
 ```
+
 Example: `opentrons_generate_header --target some_file.h`
 
-### CAN  Communication
+### CAN Communication
 
 This is a tool for sending messages to firmware over CAN bus
 
 #### Usage
+
 ```
 opentrons_can_comm --interface INTERFACE [--bitrate BITRATE]
                    [--channel CHANNEL]
