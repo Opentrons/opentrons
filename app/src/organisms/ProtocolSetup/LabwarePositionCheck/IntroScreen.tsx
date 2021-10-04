@@ -16,6 +16,7 @@ import {
   JUSTIFY_CENTER,
   ALIGN_CENTER,
   C_BLUE,
+  SPACING_2,
   SPACING_3,
   SPACING_4,
   FONT_SIZE_BODY_2,
@@ -54,11 +55,8 @@ export const IntroScreen = (props: {
 
   if (introInfo == null) return null
   const {
-    primaryTipRackSlot,
-    primaryTipRackName,
     primaryPipetteMount,
     secondaryPipetteMount,
-    numberOfTips,
     firstStepLabwareSlot,
     sections,
   } = introInfo
@@ -72,13 +70,16 @@ export const IntroScreen = (props: {
       >
         {t('labware_position_check_overview')}
       </Text>
+      <Text
+        as={'p'}
+        fontSize={FONT_SIZE_BODY_2}
+        lineHeight={LINE_HEIGHT_COPY}
+        marginBottom={SPACING_2}
+      >
+        {t('position_check_description_1')}
+      </Text>
       <Text as={'p'} fontSize={FONT_SIZE_BODY_2} lineHeight={LINE_HEIGHT_COPY}>
-        {t('position_check_description', {
-          count: numberOfTips,
-          number_of_tips: numberOfTips,
-          labware_name: primaryTipRackName,
-          labware_slot: primaryTipRackSlot,
-        })}
+        {t('position_check_description_2')}
       </Text>
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_CENTER}>
         <PositionCheckNav
@@ -87,7 +88,7 @@ export const IntroScreen = (props: {
           secondaryPipetteMount={secondaryPipetteMount}
         />
 
-        <Box width="65%" padding={SPACING_3}>
+        <Box width="60%" padding={SPACING_3}>
           <RobotWorkSpace
             deckDef={standardDeckDef as any}
             viewBox={DECK_MAP_VIEWBOX}
