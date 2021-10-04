@@ -1,6 +1,6 @@
 import * as React from 'react'
 import '@testing-library/jest-dom'
-import { renderWithProviders } from '@opentrons/components/__utils__'
+import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
 import { MetadataCard } from '../MetadataCard'
@@ -14,7 +14,7 @@ const useProtocolMetadata = hooks.useProtocolMetadata as jest.MockedFunction<
 
 describe('MetadataCard', () => {
   const render = () => {
-    return renderWithProviders(<MetadataCard />, { i18nInstance: i18n })
+    return renderWithProviders(<MetadataCard />, { i18nInstance: i18n })[0]
   }
 
   beforeEach(() => {

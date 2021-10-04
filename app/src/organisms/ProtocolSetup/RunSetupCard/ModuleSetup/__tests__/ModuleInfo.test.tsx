@@ -2,13 +2,13 @@ import React from 'react'
 import '@testing-library/jest-dom'
 import { ModuleModel, ModuleType } from '@opentrons/shared-data'
 import { ModuleInfo } from '../ModuleInfo'
-import { renderWithProviders } from '@opentrons/components/__utils__'
+import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../i18n'
 
 const render = (props: React.ComponentProps<typeof ModuleInfo>) => {
   return renderWithProviders(<ModuleInfo {...props} />, {
     i18nInstance: i18n,
-  })
+  })[0]
 }
 const mockTCModule = {
   labwareOffset: { x: 3, y: 3, z: 3 },

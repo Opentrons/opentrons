@@ -1,6 +1,6 @@
 import * as React from 'react'
 import '@testing-library/jest-dom'
-import { renderWithProviders } from '@opentrons/components/__utils__'
+import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
 import { CollapsibleStep } from '../RunSetupCard/CollapsibleStep'
@@ -29,7 +29,7 @@ describe('CollapsibleStep', () => {
         }}
       />,
       { i18nInstance: i18n }
-    )
+    )[0]
   }
   let toggleExpandedMock: jest.MockedFunction<() => void>
 

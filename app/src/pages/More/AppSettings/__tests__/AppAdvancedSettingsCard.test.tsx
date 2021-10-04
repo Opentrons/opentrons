@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { mountWithStore } from '@opentrons/components/__utils__'
+import { mountWithStore } from '@opentrons/components'
 import * as Config from '../../../../redux/config'
 import { AppAdvancedSettingsCard } from '../AppAdvancedSettingsCard'
 

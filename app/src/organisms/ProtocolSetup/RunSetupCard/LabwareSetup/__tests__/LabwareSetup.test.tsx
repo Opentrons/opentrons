@@ -1,7 +1,14 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { StaticRouter } from 'react-router-dom'
-import { LabwareRender, RobotWorkSpace, Module } from '@opentrons/components'
+import {
+  renderWithProviders,
+  componentPropsMatcher,
+  partialComponentPropsMatcher,
+  LabwareRender,
+  RobotWorkSpace,
+  Module,
+} from '@opentrons/components'
 import {
   inferModuleOrientationFromXCoordinate,
   LabwareDefinition2,
@@ -11,11 +18,6 @@ import {
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 import { fireEvent, screen } from '@testing-library/react'
-import {
-  renderWithProviders,
-  componentPropsMatcher,
-  partialComponentPropsMatcher,
-} from '@opentrons/components/__utils__'
 import { i18n } from '../../../../../i18n'
 import { LabwareSetup } from '..'
 import { LabwareSetupModal } from '../LabwareSetupModal'
@@ -94,7 +96,7 @@ const render = () => {
     {
       i18nInstance: i18n,
     }
-  )
+  )[0]
 }
 
 const STUBBED_ORIENTATION_VALUE = 'left'

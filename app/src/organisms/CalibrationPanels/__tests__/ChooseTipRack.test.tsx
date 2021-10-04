@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { mountWithStore } from '@opentrons/components/__utils__'
+import { mountWithStore } from '@opentrons/components'
 
 import { mockAttachedPipette } from '../../../redux/pipettes/__fixtures__'
 import { mockDeckCalTipRack } from '../../../redux/sessions/__fixtures__'
@@ -17,7 +17,7 @@ import { getAttachedPipettes } from '../../../redux/pipettes'
 import { ChooseTipRack } from '../ChooseTipRack'
 import type { AttachedPipettesByMount } from '../../../redux/pipettes/types'
 import type { ReactWrapper } from 'enzyme'
-import type { WrapperWithStore } from '@opentrons/components/__utils__'
+import type { WrapperWithStore } from '@opentrons/components'
 
 jest.mock('../../../redux/pipettes/selectors')
 jest.mock('../../../redux/calibration/')

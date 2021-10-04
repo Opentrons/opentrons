@@ -1,7 +1,7 @@
 import * as React from 'react'
 import '@testing-library/jest-dom'
 import { fireEvent } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components/__utils__'
+import { renderWithProviders } from '@opentrons/components'
 import { mockDeckCalData } from '../../../../../redux/calibration/__fixtures__'
 import * as calibrationSelectors from '../../../../../redux/calibration/selectors'
 
@@ -13,17 +13,15 @@ jest.mock('../../../../../redux/calibration/selectors')
 const mockGetDeckCalData = calibrationSelectors.getDeckCalibrationData as jest.MockedFunction<
   typeof calibrationSelectors.getDeckCalibrationData
 >
+const render = () => {
+  return renderWithProviders(<DeckCalibration robotName="robot name" />, {
+    i18nInstance: i18n,
+  })[0]
+}
 
 describe('DeckCalibration', () => {
-  let render: () => ReturnType<typeof renderWithProviders>
-
   beforeEach(() => {
     mockGetDeckCalData.mockReturnValue(mockDeckCalData)
-    render = () => {
-      return renderWithProviders(<DeckCalibration robotName="robot name" />, {
-        i18nInstance: i18n,
-      })
-    }
   })
 
   afterEach(() => {

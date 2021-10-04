@@ -1,6 +1,6 @@
 import * as React from 'react'
 import uniqueId from 'lodash/uniqueId'
-import { mountWithStore } from '@opentrons/components/__utils__'
+import { mountWithStore } from '@opentrons/components'
 import { act } from 'react-dom/test-utils'
 
 import * as RobotApi from '../../../redux/robot-api'

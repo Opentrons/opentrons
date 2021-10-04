@@ -1,23 +1,23 @@
 import * as React from 'react'
 import '@testing-library/jest-dom'
 import { fireEvent } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components/__utils__'
+import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
 import { UploadInput } from '../UploadInput'
 
+const render = (props: React.ComponentProps<typeof UploadInput>) => {
+  return renderWithProviders(<UploadInput onUpload={props.onUpload} />, {
+    i18nInstance: i18n,
+  })[0]
+}
+
 describe('UploadInput', () => {
-  let render: () => ReturnType<typeof renderWithProviders>
-  let handleUpload: jest.MockedFunction<
-    React.ComponentProps<typeof UploadInput>['onUpload']
-  >
+  let props = {} as React.ComponentProps<typeof UploadInput>
 
   beforeEach(() => {
-    handleUpload = jest.fn()
-    render = () => {
-      return renderWithProviders(<UploadInput onUpload={handleUpload} />, {
-        i18nInstance: i18n,
-      })
+    props = {
+      onUpload: jest.fn(),
     }
   })
 
@@ -26,7 +26,7 @@ describe('UploadInput', () => {
   })
 
   it('renders correct contents for empty state', () => {
-    const { getByRole } = render()
+    const { getByRole } = render(props)
 
     expect(getByRole('heading')).toHaveTextContent(
       /Open a protocol to get started/i
@@ -45,7 +45,7 @@ describe('UploadInput', () => {
   })
 
   it('opens file select on button click', () => {
-    const { getByRole, getByTestId } = render()
+    const { getByRole, getByTestId } = render(props)
     const button = getByRole('button', { name: 'Choose File...' })
     const input = getByTestId('file_input')
     input.click = jest.fn()
@@ -53,9 +53,9 @@ describe('UploadInput', () => {
     expect(input.click).toHaveBeenCalled()
   })
   it('calls create session on choose file', () => {
-    const { getByTestId } = render()
+    const { getByTestId } = render(props)
     const input = getByTestId('file_input')
     fireEvent.change(input, { target: { files: ['dummyFile'] } })
-    expect(handleUpload).toHaveBeenCalledWith('dummyFile')
+    expect(props.onUpload).toHaveBeenCalledWith('dummyFile')
   })
 })

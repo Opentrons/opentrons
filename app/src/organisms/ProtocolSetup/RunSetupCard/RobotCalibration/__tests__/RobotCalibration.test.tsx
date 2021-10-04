@@ -1,7 +1,7 @@
 import * as React from 'react'
 import '@testing-library/jest-dom'
 import { fireEvent } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components/__utils__'
+import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../i18n'
 import * as PipetteOffset from '../../../../../redux/calibration/pipette-offset'
 import * as TipLength from '../../../../../redux/calibration/tip-length'
@@ -67,7 +67,7 @@ describe('RobotCalibration', () => {
     jest.useRealTimers()
   })
   it('calls fetches data on mount and on a 10s interval', () => {
-    const { store } = render()
+    const store = render()[1]
 
     expect(store.dispatch).toHaveBeenNthCalledWith(
       1,
@@ -86,7 +86,7 @@ describe('RobotCalibration', () => {
   })
 
   it('renders all text titles and button', () => {
-    const { getByRole } = render()
+    const { getByRole } = render()[0]
     expect(getByRole('heading', { name: 'Required Pipettes' })).toBeTruthy()
     expect(
       getByRole('heading', { name: 'Required Tip Length Calibrations' })
@@ -101,18 +101,18 @@ describe('RobotCalibration', () => {
     ).toBeTruthy()
   })
   it('changes Proceed CTA copy based on next step', () => {
-    const { getByRole } = render({ nextStep: 'labware_setup_step' })
+    const { getByRole } = render({ nextStep: 'labware_setup_step' })[0]
     expect(
       getByRole('button', { name: 'Proceed to Labware Setup' })
     ).toBeTruthy()
   })
   it('calls the expandStep function on click', () => {
-    const { getByRole } = render()
+    const { getByRole } = render()[0]
     fireEvent.click(getByRole('button', { name: 'Proceed to Module Setup' }))
     expect(mockExpandStep).toHaveBeenCalled()
   })
   it('does not the expandStep function on click if button is disabled', () => {
-    const { getByRole } = render({ calibrationStatus: { complete: false } })
+    const { getByRole } = render({ calibrationStatus: { complete: false } })[0]
     fireEvent.click(getByRole('button', { name: 'Proceed to Module Setup' }))
     expect(mockExpandStep).not.toHaveBeenCalled()
   })

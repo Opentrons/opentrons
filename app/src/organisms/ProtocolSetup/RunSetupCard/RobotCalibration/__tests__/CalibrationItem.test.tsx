@@ -1,6 +1,6 @@
 import * as React from 'react'
 import '@testing-library/jest-dom'
-import { renderWithProviders } from '@opentrons/components/__utils__'
+import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../../../i18n'
 import { CalibrationItem } from '../CalibrationItem'
@@ -15,7 +15,7 @@ describe('CalibrationItem', () => {
     return renderWithProviders(
       <CalibrationItem {...{ subText, calibratedDate, title, button }} />,
       { i18nInstance: i18n }
-    )
+    )[0]
   }
 
   it('renders all nodes with prop contents', () => {

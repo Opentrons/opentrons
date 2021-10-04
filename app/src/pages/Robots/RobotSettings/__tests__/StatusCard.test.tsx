@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { mountWithProviders } from '@opentrons/components/__utils__'
+import { SecondaryBtn, Icon, mountWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 
 import * as Fixtures from '../../../../redux/discovery/__fixtures__'
@@ -7,7 +7,6 @@ import {
   actions as RobotActions,
   selectors as RobotSelectors,
 } from '../../../../redux/robot'
-import { SecondaryBtn, Icon } from '@opentrons/components'
 import { StatusCard } from '../StatusCard'
 
 import type { ViewableRobot } from '../../../../redux/discovery/types'

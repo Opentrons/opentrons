@@ -1,8 +1,5 @@
 import * as React from 'react'
-import {
-  mountWithProviders,
-  WrapperWithStore,
-} from '@opentrons/components/__utils__'
+import { mountWithProviders, WrapperWithStore } from '@opentrons/components'
 
 import { i18n } from '../../../../i18n'
 

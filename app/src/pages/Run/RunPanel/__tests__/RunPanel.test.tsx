@@ -4,7 +4,7 @@ import '@testing-library/jest-dom'
 import {
   partialComponentPropsMatcher,
   renderWithProviders,
-} from '@opentrons/components/__utils__'
+} from '@opentrons/components'
 
 import { i18n } from '../../../../i18n'
 
@@ -29,9 +29,25 @@ const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
   typeof useFeatureFlag
 >
 
-describe('RunSetupCard', () => {
-  let render: () => ReturnType<typeof renderWithProviders>
+const render = () => {
+  return renderWithProviders(
+    <RunPanelComponent
+      disabled={true}
+      modulesReady={true}
+      isReadyToRun={true}
+      isPaused={true}
+      isRunning={true}
+      isBlocked={true}
+      onRunClick={() => {}}
+      onPauseClick={() => {}}
+      onResumeClick={() => {}}
+      onResetClick={() => {}}
+    />,
+    { i18nInstance: i18n }
+  )[0]
+}
 
+describe('RunSetupCard', () => {
   beforeEach(() => {
     when(mockRunTimer)
       .calledWith(partialComponentPropsMatcher({}))
@@ -45,24 +61,6 @@ describe('RunSetupCard', () => {
     when(mockRunTimeControl)
       .calledWith(partialComponentPropsMatcher({}))
       .mockImplementation(() => <div>Mock Run Time Control</div>)
-
-    render = () => {
-      return renderWithProviders(
-        <RunPanelComponent
-          disabled={true}
-          modulesReady={true}
-          isReadyToRun={true}
-          isPaused={true}
-          isRunning={true}
-          isBlocked={true}
-          onRunClick={() => {}}
-          onPauseClick={() => {}}
-          onResumeClick={() => {}}
-          onResetClick={() => {}}
-        />,
-        { i18nInstance: i18n }
-      )
-    }
   })
 
   afterEach(() => {

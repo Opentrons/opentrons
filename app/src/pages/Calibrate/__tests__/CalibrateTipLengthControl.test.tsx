@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { mountWithStore } from '@opentrons/components/__utils__'
+import { mountWithStore } from '@opentrons/components'
 
 import wellPlate96Def from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 import tiprack300Def from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
@@ -16,7 +16,7 @@ import * as Analytics from '../../../redux/analytics/actions'
 import type { Labware } from '../../../redux/robot/types'
 import type { State } from '../../../redux/types'
 import type { DispatchApiRequestType } from '../../../redux/robot-api'
-import type { WrapperWithStore } from '@opentrons/components/__utils__'
+import type { WrapperWithStore } from '@opentrons/components'
 
 jest.mock('../../../redux/robot-api')
 jest.mock('../../../redux/robot/selectors')

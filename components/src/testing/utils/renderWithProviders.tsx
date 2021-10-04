@@ -3,7 +3,7 @@
 import * as React from 'react'
 import { I18nextProvider } from 'react-i18next'
 import { Provider } from 'react-redux'
-import { render } from '@testing-library/react'
+import { render, RenderResult } from '@testing-library/react'
 import { createStore } from 'redux'
 
 import type { Store } from 'redux'
@@ -17,7 +17,8 @@ export interface RenderWithProvidersOptions<State> extends RenderOptions {
 export function renderWithProviders<State>(
   Component: React.ReactElement,
   options?: RenderWithProvidersOptions<State>
-) {
+): [RenderResult, Store<State>] {
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   const { initialState = {} as State, i18nInstance = null } = options || {}
 
   const store: Store<State> = createStore(jest.fn(), initialState)
@@ -37,5 +38,5 @@ export function renderWithProviders<State>(
     }
   }
 
-  return { ...render(Component, { wrapper: ProviderWrapper }), store }
+  return [render(Component, { wrapper: ProviderWrapper }), store]
 }

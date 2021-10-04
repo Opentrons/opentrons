@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { StaticRouter, Route, Redirect } from 'react-router-dom'
 
-import { mountWithProviders } from '@opentrons/components/__utils__'
+import { SpinnerModalPage, mountWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import {
   mockConnectableRobot,
@@ -17,7 +17,6 @@ import {
   selectors as RobotSelectors,
 } from '../../../../redux/robot'
 
-import { SpinnerModalPage } from '@opentrons/components'
 import { Page } from '../../../../atoms/Page'
 import { ErrorModal } from '../../../../molecules/modals'
 import { ReachableRobotBanner } from '../ReachableRobotBanner'

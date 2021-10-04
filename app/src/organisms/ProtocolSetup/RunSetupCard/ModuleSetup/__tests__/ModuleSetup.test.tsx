@@ -2,13 +2,13 @@ import * as React from 'react'
 import '@testing-library/jest-dom'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { StaticRouter } from 'react-router-dom'
-import { RobotWorkSpace } from '@opentrons/components'
-import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 import {
   renderWithProviders,
   partialComponentPropsMatcher,
   componentPropsMatcher,
-} from '@opentrons/components/__utils__'
+  RobotWorkSpace,
+} from '@opentrons/components'
+import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 import { i18n } from '../../../../../i18n'
 import { ModuleSetup } from '..'
 import { ModuleInfo } from '../ModuleInfo'
@@ -74,7 +74,7 @@ const render = (props: React.ComponentProps<typeof ModuleSetup>) => {
     {
       i18nInstance: i18n,
     }
-  )
+  )[0]
 }
 
 const STUBBED_ORIENTATION_VALUE = 'left'
