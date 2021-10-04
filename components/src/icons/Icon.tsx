@@ -28,6 +28,7 @@ export interface IconProps extends SvgProps {
   style?: Record<string, string | number>
   /** optional children */
   children?: React.ReactNode
+  id?: string
 }
 
 const spinAnimation = keyframes`
@@ -52,7 +53,7 @@ const spinStyle = css`
  * ```
  */
 export function Icon(props: IconProps): JSX.Element | null {
-  const { name, children, className, spin, ...svgProps } = props
+  const { name, children, className, spin, id, ...svgProps } = props
 
   if (!(name in ICON_DATA_BY_NAME)) {
     console.error(`"${name}" is not a valid Icon name`)
@@ -69,6 +70,7 @@ export function Icon(props: IconProps): JSX.Element | null {
       className={cx(className, { spin })}
       css={spinStyle}
       {...svgProps}
+      id={id}
     >
       <path fillRule="evenodd" d={path} />
       {props.children}
