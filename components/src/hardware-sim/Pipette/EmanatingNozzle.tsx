@@ -29,20 +29,20 @@ export const EmanatingNozzle = (props: {
         <animate
           data-testid="animation_radius"
           attributeName="r"
-          from={0.5}
+          from={5}
           to={SINGLE_CHANNEL_PIPETTE_HEIGHT / 2}
           begin={0}
-          dur={1.5}
-          calcMode="linear"
+          dur={1.1}
+          calcMode="ease-out"
           repeatCount="indefinite"
         />
         <animate
           data-testid="animation_radius"
           attributeName="opacity"
-          from={1}
+          from={0.7}
           to={0}
           begin={0}
-          dur={1.5}
+          dur={1.1}
           calcMode="linear"
           repeatCount="indefinite"
         />
