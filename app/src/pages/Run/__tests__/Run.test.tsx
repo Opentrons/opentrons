@@ -5,7 +5,7 @@ import { StaticRouter } from 'react-router-dom'
 import {
   componentPropsMatcher,
   renderWithProviders,
-} from '@opentrons/components/__utils__'
+} from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
 
@@ -27,22 +27,20 @@ const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
   typeof useFeatureFlag
 >
 
-describe('Run Page', () => {
-  let render: () => ReturnType<typeof renderWithProviders>
+const render = () => {
+  return renderWithProviders(
+    <StaticRouter>
+      <Run />
+    </StaticRouter>,
+    { i18nInstance: i18n }
+  )[0]
+}
 
+describe('Run Page', () => {
   beforeEach(() => {
     when(mockRunDetails)
       .calledWith(componentPropsMatcher({}))
       .mockReturnValue(<div>Mock Run Details</div>)
-
-    render = () => {
-      return renderWithProviders(
-        <StaticRouter>
-          <Run />
-        </StaticRouter>,
-        { i18nInstance: i18n }
-      )
-    }
   })
 
   afterEach(() => {

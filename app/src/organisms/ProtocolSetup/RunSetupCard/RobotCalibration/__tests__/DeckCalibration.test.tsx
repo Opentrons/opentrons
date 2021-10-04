@@ -13,17 +13,15 @@ jest.mock('../../../../../redux/calibration/selectors')
 const mockGetDeckCalData = calibrationSelectors.getDeckCalibrationData as jest.MockedFunction<
   typeof calibrationSelectors.getDeckCalibrationData
 >
+const render = () => {
+  return renderWithProviders(<DeckCalibration robotName="robot name" />, {
+    i18nInstance: i18n,
+  })[0]
+}
 
 describe('DeckCalibration', () => {
-  let render: () => ReturnType<typeof renderWithProviders>
-
   beforeEach(() => {
     mockGetDeckCalData.mockReturnValue(mockDeckCalData)
-    render = () => {
-      return renderWithProviders(<DeckCalibration robotName="robot name" />, {
-        i18nInstance: i18n,
-      })
-    }
   })
 
   afterEach(() => {

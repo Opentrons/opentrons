@@ -25,7 +25,7 @@ describe('PipetteCalibration', () => {
         }}
       />,
       { i18nInstance: i18n }
-    )
+    )[0]
   }
 
   afterEach(() => {

@@ -14,7 +14,7 @@ const useProtocolMetadata = hooks.useProtocolMetadata as jest.MockedFunction<
 
 describe('MetadataCard', () => {
   const render = () => {
-    return renderWithProviders(<MetadataCard />, { i18nInstance: i18n })
+    return renderWithProviders(<MetadataCard />, { i18nInstance: i18n })[0]
   }
 
   beforeEach(() => {

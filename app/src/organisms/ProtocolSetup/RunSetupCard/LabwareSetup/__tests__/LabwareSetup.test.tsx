@@ -96,7 +96,7 @@ const render = () => {
     {
       i18nInstance: i18n,
     }
-  )
+  )[0]
 }
 
 const STUBBED_ORIENTATION_VALUE = 'left'

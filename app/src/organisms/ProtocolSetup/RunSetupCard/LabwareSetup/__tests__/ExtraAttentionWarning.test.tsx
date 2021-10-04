@@ -17,7 +17,7 @@ const mockSecureLabwareModal = SecureLabwareModal as jest.MockedFunction<
 const render = (props: React.ComponentProps<typeof ExtraAttentionWarning>) => {
   return renderWithProviders(<ExtraAttentionWarning {...props} />, {
     i18nInstance: i18n,
-  })
+  })[0]
 }
 
 describe('ExtraAttentionWarning', () => {

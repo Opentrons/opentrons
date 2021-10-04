@@ -25,7 +25,7 @@ const render = (props: React.ComponentProps<typeof LabwareInfoOverlay>) => {
     {
       i18nInstance: i18n,
     }
-  )
+  )[0]
 }
 
 const mockGetLabwareDisplayName = getLabwareDisplayName as jest.MockedFunction<
@@ -55,7 +55,7 @@ describe('LabwareInfoOverlay', () => {
     getByText('Offset Data')
   })
   // eslint-disable-next-line jest/no-disabled-tests
-  it.skip('should renders labware offset data', () => {
+  it.skip('should render labware offset data', () => {
     // implement when data is available
   })
 })

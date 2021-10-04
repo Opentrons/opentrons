@@ -53,7 +53,7 @@ const render = (props: React.ComponentProps<typeof ProceedToRunCta>) => {
     {
       i18nInstance: i18n,
     }
-  )
+  )[0]
 }
 describe('ProceedToRunCta', () => {
   let props: React.ComponentProps<typeof ProceedToRunCta>

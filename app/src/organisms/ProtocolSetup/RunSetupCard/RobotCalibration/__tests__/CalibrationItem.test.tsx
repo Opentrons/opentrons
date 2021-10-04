@@ -15,7 +15,7 @@ describe('CalibrationItem', () => {
     return renderWithProviders(
       <CalibrationItem {...{ subText, calibratedDate, title, button }} />,
       { i18nInstance: i18n }
-    )
+    )[0]
   }
 
   it('renders all nodes with prop contents', () => {

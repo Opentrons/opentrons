@@ -29,7 +29,7 @@ describe('CollapsibleStep', () => {
         }}
       />,
       { i18nInstance: i18n }
-    )
+    )[0]
   }
   let toggleExpandedMock: jest.MockedFunction<() => void>
 

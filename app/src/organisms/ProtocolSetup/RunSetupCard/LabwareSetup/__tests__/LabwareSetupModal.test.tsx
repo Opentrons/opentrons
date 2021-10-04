@@ -7,7 +7,7 @@ import { LabwareSetupModal } from '../LabwareSetupModal'
 const render = (props: React.ComponentProps<typeof LabwareSetupModal>) => {
   return renderWithProviders(<LabwareSetupModal {...props} />, {
     i18nInstance: i18n,
-  })
+  })[0]
 }
 
 describe('LabwareSetupModal', () => {

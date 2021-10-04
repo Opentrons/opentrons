@@ -89,9 +89,11 @@ const mockGetProtocolCalibrationComplete = calibrationSelectors.getProtocolCalib
   typeof calibrationSelectors.getProtocolCalibrationComplete
 >
 
-describe('RunSetupCard', () => {
-  let render: () => ReturnType<typeof renderWithProviders>
+const render = () => {
+  return renderWithProviders(<RunSetupCard />, { i18nInstance: i18n })[0]
+}
 
+describe('RunSetupCard', () => {
   beforeEach(() => {
     mockGetConnectedRobot.mockReturnValue(mockConnectedRobot)
     mockGetAttachedPipettes.mockReturnValue(mockAttachedPipettes)
@@ -125,9 +127,7 @@ describe('RunSetupCard', () => {
         })
       )
       .mockReturnValue(<div>Mock Robot Calibration</div>)
-    render = () => {
-      return renderWithProviders(<RunSetupCard />, { i18nInstance: i18n })
-    }
+
     when(mockProceedToRun)
       .mockReturnValue(<div></div>)
       .calledWith(

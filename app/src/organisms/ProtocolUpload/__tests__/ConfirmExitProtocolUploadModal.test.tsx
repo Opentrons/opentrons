@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components/__utils__'
+import { renderWithProviders } from '@opentrons/components'
 import { fireEvent } from '@testing-library/react'
 import { i18n } from '../../../i18n'
 import { ConfirmExitProtocolUploadModal } from '../ConfirmExitProtocolUploadModal'
@@ -9,7 +9,7 @@ const render = (
 ) => {
   return renderWithProviders(<ConfirmExitProtocolUploadModal {...props} />, {
     i18nInstance: i18n,
-  })
+  })[0]
 }
 
 describe('ConfirmExitProtocolUploadModal', () => {

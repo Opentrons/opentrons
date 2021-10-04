@@ -44,10 +44,11 @@ const getCalibrationStatus = calibrationSelectors.getCalibrationStatus as jest.M
 const mockConfirmExitProtocolUploadModal = ConfirmExitProtocolUploadModal as jest.MockedFunction<
   typeof ConfirmExitProtocolUploadModal
 >
+const render = () => {
+  return renderWithProviders(<ProtocolUpload />, { i18nInstance: i18n })
+}
 
 describe('ProtocolUpload', () => {
-  let render: () => ReturnType<typeof renderWithProviders>
-
   beforeEach(() => {
     getConnectedRobot.mockReturnValue(mockConnectedRobot)
     getProtocolFile.mockReturnValue(null)
@@ -64,10 +65,6 @@ describe('ProtocolUpload', () => {
       .mockImplementation(({ exit }) => (
         <div onClick={exit}>mock confirm exit protocol upload modal</div>
       ))
-
-    render = () => {
-      return renderWithProviders(<ProtocolUpload />, { i18nInstance: i18n })
-    }
   })
 
   afterEach(() => {
@@ -75,7 +72,7 @@ describe('ProtocolUpload', () => {
   })
 
   it('renders Protocol Upload Input for empty state', () => {
-    const { getByRole, queryByText } = render()
+    const { getByRole, queryByText } = render()[0]
 
     expect(getByRole('button', { name: 'Choose File...' })).toBeTruthy()
     expect(queryByText('Organization/Author')).toBeNull()
@@ -83,7 +80,7 @@ describe('ProtocolUpload', () => {
   it('renders Protocol Setup if file loaded', () => {
     getProtocolFile.mockReturnValue({ metadata: {} } as any)
     getProtocolName.mockReturnValue('some file name')
-    const { queryByRole, getByText } = render()
+    const { queryByRole, getByText } = render()[0]
 
     expect(queryByRole('button', { name: 'Choose File...' })).toBeNull()
     expect(getByText('Organization/Author')).toBeTruthy()
@@ -92,7 +89,7 @@ describe('ProtocolUpload', () => {
   it('opens up the confirm close protocol modal when clicked', () => {
     getProtocolFile.mockReturnValue(withModulesProtocol as any)
     getProtocolName.mockReturnValue('some file name')
-    const { getByRole, getByText } = render()
+    const { getByRole, getByText } = render()[0]
     fireEvent.click(getByRole('button', { name: 'close' }))
     getByText('mock confirm exit protocol upload modal')
   })
@@ -100,7 +97,7 @@ describe('ProtocolUpload', () => {
   it('closes the confirm close protocol modal when Yes, close now is clicked', () => {
     getProtocolFile.mockReturnValue(withModulesProtocol as any)
     getProtocolName.mockReturnValue('some file name')
-    const { store, getByRole, getByText } = render()
+    const [{ getByRole, getByText }, store] = render()
     fireEvent.click(getByRole('button', { name: 'close' }))
     const mockCloseModal = getByText('mock confirm exit protocol upload modal')
     fireEvent.click(mockCloseModal)
@@ -111,7 +108,7 @@ describe('ProtocolUpload', () => {
   })
 
   it('calls ingest protocol if handleUpload', () => {
-    const { getByTestId } = render()
+    const { getByTestId } = render()[0]
 
     const protocolFile = new File(
       [JSON.stringify(withModulesProtocol)],

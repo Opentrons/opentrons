@@ -7,7 +7,7 @@ import { MultipleModulesModal } from '../MultipleModulesModal'
 const render = (props: React.ComponentProps<typeof MultipleModulesModal>) => {
   return renderWithProviders(<MultipleModulesModal {...props} />, {
     i18nInstance: i18n,
-  })
+  })[0]
 }
 
 describe('MultipleModulesModal', () => {
