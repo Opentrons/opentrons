@@ -20,7 +20,7 @@ interface CollapsibleStepProps {
   title: string
   description: string
   label: string
-  id: string
+  id?: string
   toggleExpanded: () => void
   children: React.ReactNode
   rightAlignedNode: React.ReactNode
