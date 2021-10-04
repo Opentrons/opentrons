@@ -21,8 +21,7 @@ on:
       # and not for path matches.
       - '**'
     paths:
-      - 'api/src/opentrons/protocol_api/**'
-      - 'api/docs/**'
+      - 'api/**'
       - '.github/workflows/docs-build.yaml'
       - '.github/actions/python/**'
       - '.github/actions/webstack/deploy-to-sandbox/**'
