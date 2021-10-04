@@ -18,7 +18,8 @@ flake8 = "~=3.9.0"
 flake8-annotations = "~=2.6.2"
 flake8-docstrings = "~=1.6.0"
 flake8-noqa = "~=1.1.0"
-
+mock = "~=4.0.2"
+types-mock = "==4.0.1"
 
 [requires]
 python_version = "3.7"

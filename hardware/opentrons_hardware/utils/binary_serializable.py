@@ -22,6 +22,12 @@ class InvalidFieldException(BinarySerializableException):
     pass
 
 
+class SerializationException(BinarySerializableException):
+    """Serialization error."""
+
+    pass
+
+
 T = TypeVar("T")
 
 
@@ -55,6 +61,10 @@ class BinaryFieldBase(Generic[T]):
     def __eq__(self, other: object) -> bool:
         """Comparison."""
         return isinstance(other, BinaryFieldBase) and other.value == self.value
+
+    def __repr__(self) -> str:
+        """Representation string."""
+        return f"{self.__class__.__name__}(value={repr(self.value)})"
 
 
 class UInt32Field(BinaryFieldBase[int]):
@@ -114,7 +124,10 @@ class BinarySerializable:
         """
         string = self._get_format_string()
         vals = [x.value for x in astuple(self)]
-        return struct.pack(string, *vals)
+        try:
+            return struct.pack(string, *vals)
+        except struct.error as e:
+            raise SerializationException(str(e))
 
     @classmethod
     def build(cls, data: bytes) -> BinarySerializable:
@@ -147,7 +160,7 @@ class BinarySerializable:
                 )
             except AttributeError:
                 raise InvalidFieldException(
-                    f"All fields must be of type {BinaryFieldBase.__class__}"
+                    f"All fields must be of type {BinaryFieldBase}"
                 )
 
             # Cache it on the cls.

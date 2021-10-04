@@ -5,9 +5,9 @@ from dataclasses import dataclass
 from .arbitration_id import ArbitrationId
 
 
-@dataclass
+@dataclass(frozen=True)
 class CanMessage:
     """A can message."""
 
     arbitration_id: ArbitrationId
-    data: bytearray
+    data: bytes
