@@ -111,7 +111,12 @@ export function RunSetupCard(): JSX.Element | null {
       paddingY={SPACING_3}
       backgroundColor={C_WHITE}
     >
-      <Text as="h2" paddingX={SPACING_3} fontWeight={FONT_WEIGHT_SEMIBOLD}>
+      <Text
+        as="h2"
+        paddingX={SPACING_3}
+        fontWeight={FONT_WEIGHT_SEMIBOLD}
+        id={'RunSetupCard_setupForRun'}
+      >
         {t('setup_for_run')}
       </Text>
       {stepsKeysInOrder.map((stepKey, index) => (
@@ -121,6 +126,7 @@ export function RunSetupCard(): JSX.Element | null {
             expanded={stepKey === expandedStepKey}
             label={t('step', { index: index + 1 })}
             title={t(`${stepKey}_title`)}
+            id={`RunSetupCard_${stepKey}`}
             description={StepDetailMap[stepKey].description}
             toggleExpanded={() =>
               stepKey === expandedStepKey
@@ -145,8 +151,12 @@ export function RunSetupCard(): JSX.Element | null {
                         ? 'check-circle'
                         : 'alert-circle'
                     }
+                    id={'RunSetupCard_calibrationIcon'}
                   />
-                  <Text fontSize={FONT_SIZE_BODY_1}>
+                  <Text
+                    fontSize={FONT_SIZE_BODY_1}
+                    id={'RunSetupCard_calibrationText'}
+                  >
                     {calibrationStatus.complete
                       ? t('calibration_ready')
                       : t('calibration_needed')}

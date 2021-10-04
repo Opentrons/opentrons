@@ -68,7 +68,12 @@ export function DeckCalibration(props: Props): JSX.Element | null {
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
       >
-        <Text as={'h2'} css={FONT_HEADER_THIN} paddingBottom={SPACING_2}>
+        <Text
+          as={'h2'}
+          css={FONT_HEADER_THIN}
+          paddingBottom={SPACING_2}
+          id={'DeckCalibration_deckCalibrationTitle'}
+        >
           {t('deck_calibration_title')}
         </Text>
         <Link
@@ -76,6 +81,7 @@ export function DeckCalibration(props: Props): JSX.Element | null {
           onClick={() => setHelpModalIsOpen(true)}
           color={C_BLUE}
           fontSize={FONT_SIZE_BODY_1}
+          id={'DeckCalibration_robotCalibrationHelpLink'}
         >
           {t('robot_cal_help_title')}
         </Link>
@@ -91,7 +97,10 @@ export function DeckCalibration(props: Props): JSX.Element | null {
                 justifyContent={JUSTIFY_SPACE_BETWEEN}
               >
                 <Text css={FONT_HEADER_DARK}>{t('robot_cal_help_title')}</Text>
-                <Box onClick={() => setHelpModalIsOpen(false)}>
+                <Box
+                  onClick={() => setHelpModalIsOpen(false)}
+                  id={'RobotCalModal_xButton'}
+                >
                   <Icon name={'close'} size={SIZE_2} />
                 </Box>
               </Flex>
@@ -106,6 +115,7 @@ export function DeckCalibration(props: Props): JSX.Element | null {
                         href={robotCalHelpArticle}
                         target="_blank"
                         rel="noopener noreferrer"
+                        id={'RobotCalModal_helpArticleLink'}
                       />
                     ),
                   }}
@@ -153,6 +163,7 @@ export function DeckCalibration(props: Props): JSX.Element | null {
                   width={SIZE_4}
                   backgroundColor={C_BLUE}
                   name="close"
+                  id={'RobotCalModal_closeButton'}
                 >
                   {t('shared:close')}
                 </PrimaryBtn>

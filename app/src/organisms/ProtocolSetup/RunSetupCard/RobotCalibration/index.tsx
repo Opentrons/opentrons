@@ -61,7 +61,12 @@ export function RobotCalibration(props: Props): JSX.Element {
     <>
       <DeckCalibration robotName={robotName} />
       <Divider marginY={SPACING_3} />
-      <Text as="h2" paddingBottom={SPACING_2} css={FONT_HEADER_THIN}>
+      <Text
+        as="h2"
+        paddingBottom={SPACING_2}
+        css={FONT_HEADER_THIN}
+        id={`PipetteCalibration_requiredPipettesTitle`}
+      >
         {t('required_pipettes_title')}
       </Text>
       <div>
@@ -83,7 +88,11 @@ export function RobotCalibration(props: Props): JSX.Element {
         })}
       </div>
       <Divider marginY={SPACING_3} />
-      <Text as="h2" css={FONT_HEADER_THIN}>
+      <Text
+        as="h2"
+        css={FONT_HEADER_THIN}
+        id={'TipRackCalibration_requiredTipLengthTitle'}
+      >
         {t('required_tip_racks_title')}
       </Text>
       <div>
@@ -130,6 +139,7 @@ export function RobotCalibration(props: Props): JSX.Element {
           onClick={() => expandStep(nextStep)}
           backgroundColor={C_BLUE}
           {...targetProps}
+          id={'RobotCalStep_proceedButton'}
         >
           {t(nextStepButtonKey)}
         </PrimaryBtn>
