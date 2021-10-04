@@ -104,7 +104,7 @@ describe('PipetteRender', () => {
         ))
 
       when(mockEightEmanatingNozzles)
-        .calledWith(anyProp(s)
+        .calledWith(anyProps())
         .mockReturnValue(<div>mock eight emanating nozzles</div>)
     })
     it('should render a rectangle with the correct dimensions', () => {

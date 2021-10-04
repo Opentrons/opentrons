@@ -1,7 +1,5 @@
 import * as React from 'react'
-import { mountWithStore } from '@opentrons/components'
-
-import { BORDER_SOLID_LIGHT } from '@opentrons/components'
+import { mountWithStore, BORDER_SOLID_LIGHT } from '@opentrons/components'
 import * as Alerts from '../../../../redux/alerts'
 import * as Analytics from '../../../../redux/analytics'
 import { TitledControl } from '../../../../atoms/TitledControl'

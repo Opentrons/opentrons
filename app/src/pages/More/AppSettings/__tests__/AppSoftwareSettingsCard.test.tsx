@@ -1,8 +1,12 @@
 // tests for the AppSoftwareSettingsCard
 import * as React from 'react'
-
-import { mountWithStore } from '@opentrons/components'
-import { Card, LabeledValue, Link, SecondaryBtn } from '@opentrons/components'
+import {
+  mountWithStore,
+  Card,
+  LabeledValue,
+  Link,
+  SecondaryBtn,
+} from '@opentrons/components'
 import * as Shell from '../../../../redux/shell'
 import { Portal } from '../../../../App/portal'
 import { TitledControl } from '../../../../atoms/TitledControl'

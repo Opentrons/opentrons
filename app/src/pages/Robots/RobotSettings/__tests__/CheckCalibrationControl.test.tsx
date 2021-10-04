@@ -1,13 +1,14 @@
 import * as React from 'react'
 import {
+  Tooltip,
+  PrimaryBtn,
+  SecondaryBtn,
   mountWithProviders,
   WrapperWithStore,
 } from '@opentrons/components'
 
 import { i18n } from '../../../../i18n'
 import * as Sessions from '../../../../redux/sessions'
-
-import { Tooltip, PrimaryBtn, SecondaryBtn } from '@opentrons/components'
 import { TitledControl } from '../../../../atoms/TitledControl'
 import { CheckCalibrationControl } from '../CheckCalibrationControl'
 

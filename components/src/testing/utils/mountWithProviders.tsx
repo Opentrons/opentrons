@@ -22,6 +22,7 @@ export function mountWithProviders<Element, State, Action>(
   const {
     provideI18n = true,
     provideStore = true,
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     initialState = {} as State,
     i18nInstance = null,
   } = options || {}
@@ -64,7 +65,7 @@ export function mountWithProviders<Element, State, Action>(
     children: React.ReactNode
     store: Store<State>
     i18n: React.ComponentProps<typeof I18nextProvider>['i18n']
-  }) => (
+  }): JSX.Element => (
     <StateWrapper store={store}>
       <I18nWrapper i18n={i18n}>{children}</I18nWrapper>
     </StateWrapper>

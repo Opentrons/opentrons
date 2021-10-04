@@ -26,6 +26,7 @@ export function mountWithStore<Props, State = {}, Action = {}>(
   node: React.ReactElement<Props>,
   options?: MountWithStoreOptions<State>
 ): WrapperWithStore<Props, State, Action> {
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   const initialState = options?.initialState ?? ({} as State)
 
   const store: MockStore<State, Action> = {

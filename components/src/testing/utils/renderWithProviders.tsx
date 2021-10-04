@@ -17,7 +17,8 @@ export interface RenderWithProvidersOptions<State> extends RenderOptions {
 export function renderWithProviders<State>(
   Component: React.ReactElement,
   options?: RenderWithProvidersOptions<State>
-) {
+): React.ReactNode {
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   const { initialState = {} as State, i18nInstance = null } = options || {}
 
   const store: Store<State> = createStore(jest.fn(), initialState)
