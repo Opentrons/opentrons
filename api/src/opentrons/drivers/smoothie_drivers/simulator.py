@@ -5,13 +5,13 @@ from opentrons.drivers.smoothie_drivers.constants import (
 
 
 class SimulatingDriver:
-    def __init__(self):
+    def __init__(self) -> None:
         self._steps_per_mm = {}
 
-    def home(self, axis):
+    def home(self, axis) -> None:
         pass
 
-    def _smoothie_reset(self):
+    def _smoothie_reset(self) -> None:
         pass
 
     def read_pipette_id(self, mount):
