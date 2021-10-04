@@ -27,7 +27,7 @@ async def subject(
     loop: asyncio.BaseEventLoop, bus_channel: str
 ) -> AsyncGenerator[CanDriver, None]:
     """The can driver under test."""
-    driver = await CanDriver.build(channel=bus_channel, interface="virtual", bitrate=0)
+    driver = await CanDriver.build(channel=bus_channel, interface="virtual", bit_rate=0)
     yield driver
     driver.shutdown()
 

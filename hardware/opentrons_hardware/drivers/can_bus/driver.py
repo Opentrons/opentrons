@@ -33,14 +33,21 @@ class CanDriver:
     DEFAULT_CAN_INTERFACE = "socketcan"
     DEFAULT_CAN_BITRATE = 0
 
-    def __init__(self, bus: Bus, loop: asyncio.AbstractEventLoop) -> None:
+    def __init__(
+        self,
+        bus: Bus,
+        loop: asyncio.AbstractEventLoop,
+        use_fd: Optional[bool] = True,
+    ) -> None:
         """Constructor.
 
         Args:
             bus: The can bus to communicate with
             loop: Event loop
+            use_fd: Use can fd
         """
         self._bus = bus
+        self._use_fd = use_fd
         self._loop = loop
         self._reader = AsyncBufferedReader(loop=loop)
         self._notifier = Notifier(bus=self._bus, listeners=[self._reader], loop=loop)
@@ -50,15 +57,17 @@ class CanDriver:
         cls,
         interface: str,
         channel: Optional[str] = None,
-        bitrate: Optional[int] = None,
+        bit_rate: Optional[int] = None,
+        use_fd: Optional[bool] = True,
     ) -> CanDriver:
         """Build a CanDriver.
 
         Args:
-            bitrate: The bitrate to use.
+            bit_rate: The bit rate to use.
             interface: The interface for pycan to use.
                 see https://python-can.readthedocs.io/en/master/interfaces.html
             channel: Optional channel
+            use_fd: Optional use of flexible data rate
 
         Returns:
             A CanDriver instance.
@@ -68,9 +77,9 @@ class CanDriver:
         #  pcan will not initialize when `fd` is True. looks like it's
         #  this issue https://forum.peak-system.com/viewtopic.php?t=5646
         #  Luckily we can still send `fd` messages using `pcan`.
-        fd = True if interface != "pcan" else False
+        fd = use_fd if interface != "pcan" else False
         return CanDriver(
-            bus=Bus(channel=channel, bitrate=bitrate, interface=interface, fd=fd),
+            bus=Bus(channel=channel, bitrate=bit_rate, interface=interface, fd=fd),
             loop=asyncio.get_event_loop(),
         )
 
@@ -102,7 +111,7 @@ class CanDriver:
         m = Message(
             arbitration_id=message.arbitration_id.id,
             is_extended_id=True,
-            is_fd=True,
+            is_fd=self._use_fd,
             data=message.data,
         )
         await self._loop.run_in_executor(None, self._bus.send, m)

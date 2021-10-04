@@ -164,11 +164,16 @@ async def ui_task(can_driver: CanDriver) -> None:
             print(str(e))
 
 
-async def run(interface: str, bitrate: int, channel: Optional[str] = None) -> None:
+async def run(
+    interface: str,
+    bit_rate: int,
+    channel: Optional[str] = None,
+    use_fd: Optional[bool] = True,
+) -> None:
     """Entry point for script."""
-    log.info(f"Connecting to {interface} {bitrate} {channel}")
+    log.info(f"Connecting to {interface} {bit_rate} {channel}")
     driver = await CanDriver.build(
-        bitrate=bitrate, interface=interface, channel=channel
+        bit_rate=bit_rate, interface=interface, channel=channel, use_fd=use_fd
     )
 
     loop = asyncio.get_event_loop()
@@ -219,7 +224,7 @@ def main() -> None:
 
     args = parser.parse_args()
 
-    asyncio.run(run(args.interface, args.bitrate, args.channel))
+    asyncio.run(run(args.interface, args.bitrate, args.channel, not args.not_fd))
 
 
 if __name__ == "__main__":

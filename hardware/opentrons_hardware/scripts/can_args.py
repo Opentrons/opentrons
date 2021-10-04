@@ -22,4 +22,11 @@ def add_can_args(parser: ArgumentParser) -> ArgumentParser:
     parser.add_argument(
         "--channel", type=str, default=None, required=False, help="optional channel"
     )
+    parser.add_argument(
+        "--not-fd",
+        default=False,
+        required=False,
+        help="don't use can fd",
+        action="store_true",
+    )
     return parser
