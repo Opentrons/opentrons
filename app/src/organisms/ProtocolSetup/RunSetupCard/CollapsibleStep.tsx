@@ -20,6 +20,7 @@ interface CollapsibleStepProps {
   title: string
   description: string
   label: string
+  id: string
   toggleExpanded: () => void
   children: React.ReactNode
   rightAlignedNode: React.ReactNode
@@ -30,6 +31,7 @@ export function CollapsibleStep({
   title,
   description,
   label,
+  id,
   toggleExpanded,
   children,
   rightAlignedNode,
@@ -46,7 +48,7 @@ export function CollapsibleStep({
           >
             {label}
           </Text>
-          <Text as="h5" css={FONT_HEADER_DARK} marginTop={SPACING_2}>
+          <Text as="h5" css={FONT_HEADER_DARK} marginTop={SPACING_2} id={id}>
             {title}
           </Text>
           <Text as="p" css={FONT_BODY_1_DARK} marginTop={SPACING_2}>

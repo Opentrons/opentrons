@@ -25,10 +25,11 @@ interface Props {
   index?: number
   subText?: string
   title?: string
+  id?: string
 }
 
 export function CalibrationItem(props: Props): JSX.Element | null {
-  const { index, title, subText, calibratedDate, button } = props
+  const { index, title, subText, calibratedDate, button, id } = props
   const { t } = useTranslation('protocol_setup')
   const backgroundColor =
     index !== undefined && index % 2 === 0 ? C_NEAR_WHITE : C_WHITE
@@ -55,7 +56,7 @@ export function CalibrationItem(props: Props): JSX.Element | null {
           />
           <span>
             {title !== undefined && (
-              <Text role={'heading'} fontSize={FONT_SIZE_BODY_2}>
+              <Text role={'heading'} fontSize={FONT_SIZE_BODY_2} id={id}>
                 {title}
               </Text>
             )}

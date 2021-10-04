@@ -158,6 +158,7 @@ export function PipetteCalibration(props: Props): JSX.Element {
       title={`${t('mount_title', { mount: mount.toUpperCase() })} ${
         pipetteTipRackData.pipetteDisplayName
       }`}
+      id={`PipetteCalibration_${mount}MountTitle`}
     />
   )
 }
