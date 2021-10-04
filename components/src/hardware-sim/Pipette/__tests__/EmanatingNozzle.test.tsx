@@ -40,14 +40,14 @@ describe('EmanatingNozzle', () => {
     const animations = getByTestId('emanating_circle').children
     const radiusAnimation = animations[0]
     expect(radiusAnimation).toHaveAttribute('attributeName', 'r')
-    expect(radiusAnimation).toHaveAttribute('from', '0.5')
+    expect(radiusAnimation).toHaveAttribute('from', '5')
     expect(radiusAnimation).toHaveAttribute(
       'to',
       (SINGLE_CHANNEL_PIPETTE_HEIGHT / 2).toString()
     )
     expect(radiusAnimation).toHaveAttribute('begin', '0')
-    expect(radiusAnimation).toHaveAttribute('dur', '1.5')
-    expect(radiusAnimation).toHaveAttribute('calcMode', 'linear')
+    expect(radiusAnimation).toHaveAttribute('dur', '1.1')
+    expect(radiusAnimation).toHaveAttribute('calcMode', 'ease-out')
     expect(radiusAnimation).toHaveAttribute('repeatCount', 'indefinite')
   })
   it('should render a medium sized animating circle that fades out', () => {
@@ -59,10 +59,10 @@ describe('EmanatingNozzle', () => {
     const animations = getByTestId('emanating_circle').children
     const opacityAnimation = animations[1]
     expect(opacityAnimation).toHaveAttribute('attributeName', 'opacity')
-    expect(opacityAnimation).toHaveAttribute('from', '1')
+    expect(opacityAnimation).toHaveAttribute('from', '0.7')
     expect(opacityAnimation).toHaveAttribute('to', '0')
     expect(opacityAnimation).toHaveAttribute('begin', '0')
-    expect(opacityAnimation).toHaveAttribute('dur', '1.5')
+    expect(opacityAnimation).toHaveAttribute('dur', '1.1')
     expect(opacityAnimation).toHaveAttribute('calcMode', 'linear')
     expect(opacityAnimation).toHaveAttribute('repeatCount', 'indefinite')
   })
