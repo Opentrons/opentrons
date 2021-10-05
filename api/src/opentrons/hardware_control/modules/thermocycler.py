@@ -350,8 +350,8 @@ class Thermocycler(mod_abc.AbstractModule):
         """Wait for the next poll to complete."""
         try:
             await self._listener.wait_next_poll()
-        except Exception as e:
-            raise ThermocyclerError(str(e))
+        except Exception:
+            MODULE_LOG.exception("Error while waiting for poll.")
 
     @property
     def lid_target(self) -> Optional[float]:
