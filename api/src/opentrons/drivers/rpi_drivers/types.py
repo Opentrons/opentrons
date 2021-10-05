@@ -1,3 +1,4 @@
+from __future__ import annotations
 import enum
 from itertools import groupby
 from dataclasses import dataclass
@@ -168,10 +169,10 @@ class GPIOGroup:
     def __getattr__(self, item):
         return next(filter(lambda x: x.name is item, self.pins), None)
 
-    def by_type(self, pin_dir: PinDir):
+    def by_type(self, pin_dir: PinDir) -> GPIOGroup:
         return GPIOGroup(list(filter(lambda x: x.in_out is pin_dir, self.pins)))
 
-    def by_names(self, names: List[str]):
+    def by_names(self, names: List[str]) -> GPIOGroup:
         return GPIOGroup(list(filter(lambda x: x.name in names, self.pins)))
 
     def group_by_pins(self, board_rev: BoardRevision) -> List:
