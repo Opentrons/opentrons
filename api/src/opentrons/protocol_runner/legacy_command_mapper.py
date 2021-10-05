@@ -1,4 +1,5 @@
-"""Customize the ProtocolEngine to control and track state of legacy protocols."""
+"""Translate events from a legacy ``ProtocolContext`` into Protocol Engine commands."""
+
 from collections import defaultdict
 from typing import Any, Dict, List, Set
 
