@@ -29,7 +29,7 @@ class LegacyCommandMapper:
         self._loaded_labware_slots: Set[int] = set()
         self._loaded_module_slots: Set[int] = set()
 
-    def map(
+    def map_brokered_command(
         self,
         command: LegacyCommand,
         loaded_pipettes: Dict[str, LegacyPipetteContext],

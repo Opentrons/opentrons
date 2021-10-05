@@ -59,7 +59,7 @@ class LegacyContextPlugin(AbstractPlugin):
             self._unsubscribe_broker()
 
     def _dispatch_legacy_command(self, command: LegacyCommand) -> None:
-        pe_commands = self._legacy_command_mapper.map(
+        pe_commands = self._legacy_command_mapper.map_brokered_command(
             command=command,
             loaded_pipettes=self._protocol_context.loaded_instruments,
             loaded_modules=self._protocol_context.loaded_modules,

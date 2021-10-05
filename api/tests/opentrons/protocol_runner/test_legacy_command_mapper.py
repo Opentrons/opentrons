@@ -20,7 +20,7 @@ def test_map_before_command() -> None:
     }
 
     subject = LegacyCommandMapper()
-    (result,) = subject.map(legacy_command, {}, {}, {})
+    (result,) = subject.map_brokered_command(legacy_command, {}, {}, {})
 
     assert result == pe_commands.Custom.construct(
         id="command.PAUSE-0",
@@ -51,8 +51,8 @@ def test_map_after_command() -> None:
 
     subject = LegacyCommandMapper()
 
-    _ = subject.map(legacy_command_start, {}, {}, {})
-    (result,) = subject.map(legacy_command_end, {}, {}, {})
+    _ = subject.map_brokered_command(legacy_command_start, {}, {}, {})
+    (result,) = subject.map_brokered_command(legacy_command_end, {}, {}, {})
 
     assert result == pe_commands.Custom.construct(
         id="command.PAUSE-0",
@@ -95,10 +95,10 @@ def test_command_stack() -> None:
     }
 
     subject = LegacyCommandMapper()
-    (result_1,) = subject.map(legacy_command_1, {}, {}, {})
-    (result_2,) = subject.map(legacy_command_2, {}, {}, {})
-    (result_3,) = subject.map(legacy_command_3, {}, {}, {})
-    (result_4,) = subject.map(legacy_command_4, {}, {}, {})
+    (result_1,) = subject.map_brokered_command(legacy_command_1, {}, {}, {})
+    (result_2,) = subject.map_brokered_command(legacy_command_2, {}, {}, {})
+    (result_3,) = subject.map_brokered_command(legacy_command_3, {}, {}, {})
+    (result_4,) = subject.map_brokered_command(legacy_command_4, {}, {}, {})
 
     assert result_1 == pe_commands.Custom.construct(
         id="command.PAUSE-0",

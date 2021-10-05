@@ -158,7 +158,7 @@ def test_broker_messages(
     legacy_context.loaded_labwares = {5: labware}  # type: ignore[misc]
 
     decoy.when(
-        legacy_command_mapper.map(
+        legacy_command_mapper.map_brokered_command(
             command=legacy_command,
             loaded_pipettes={"left": pipette},
             loaded_modules={3: module},
