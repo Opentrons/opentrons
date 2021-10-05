@@ -6,6 +6,7 @@ import pytest
 from can import Bus, Message
 
 from opentrons_hardware.drivers.can_bus import CanDriver, ArbitrationId, CanMessage
+from opentrons_hardware.drivers.can_bus.errors import ErrorFrameCanError
 
 
 @pytest.fixture
@@ -89,3 +90,17 @@ async def test_receive_iter(subject: CanDriver, can_bus: Bus) -> None:
     assert received[0].arbitration_id.id == 0x1FFFFFFF
     assert received[1].data == bytearray([4, 3, 2, 1])
     assert received[1].arbitration_id.id == 0
+
+
+async def test_raise_error_frame_error(subject: CanDriver, can_bus: Bus) -> None:
+    """It should raise an error when an error frame is received."""
+    m = Message(
+        arbitration_id=0x1FFFFFFF,
+        is_extended_id=True,
+        is_error_frame=True,
+        is_fd=True,
+        data=bytearray([1, 2, 3, 4]),
+    )
+    can_bus.send(m)
+    with pytest.raises(ErrorFrameCanError):
+        await subject.read()
