@@ -526,7 +526,7 @@ class SmoothieDriver:
         pass
 
     @property
-    def steps_per_mm(self) -> Dict[str, float]:
+    def steps_per_mm(seupdate_steps_per_mmlf) -> Dict[str, float]:
         return self._steps_per_mm
 
     @contextlib.asynccontextmanager

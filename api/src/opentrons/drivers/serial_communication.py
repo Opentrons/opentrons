@@ -6,6 +6,8 @@ from serial.tools import list_ports  # type: ignore
 import contextlib
 import logging
 
+from serial.tools.list_ports_common import ListPortInfo
+
 log = logging.getLogger(__name__)
 
 RECOVERY_TIMEOUT = 10
@@ -26,7 +28,7 @@ def get_ports_by_name(device_name: str) -> List[serial.Serial]:
     return device_ports
 
 
-def get_port_by_VID(vid: str) -> Optional[str]:
+def get_port_by_VID(vid: str) -> Optional[ListPortInfo]:
     """Returns first serial device with a given VID"""
     for d in list_ports.comports():
         if d.vid == vid:
@@ -69,7 +71,7 @@ def _write_to_device_and_return(cmd: str, ack: str, device_connection: Serial, t
 
     encoded_write = cmd.encode()
     encoded_ack = ack.encode()
-    log.debug(f"{tag}: Write -> {encoded_write}")
+    log.debug(f"{tag}: Write -> {encoded_write!r}")
     device_connection.write(encoded_write)
     response = device_connection.read_until(encoded_ack)
     log.debug(f"{tag}: Read <- {response}")
