@@ -2,6 +2,7 @@
 
 from collections import defaultdict
 from typing import Any, Dict, List, Set
+import logging
 
 from opentrons.types import DeckSlotName, MountType
 from opentrons.util.helpers import utc_now
@@ -90,8 +91,19 @@ class LegacyCommandMapper:
 
         namespace, load_name, version = loaded_labware.uri.split("/")
 
-        # FIX BEFORE MERGE
-        slot = 1
+        labware_parent = loaded_labware.parent
+        if not isinstance(labware_parent, str):
+            # todo(mm, 2021-10-05): Implement this when Protocol Engine supports
+            # loading labware onto modules.
+            logging.warning(
+                f"Labware {repr(loaded_labware)} "
+                f"has parent {repr(labware_parent)}, "
+                f"which doesn't seem like a deck slot. "
+                f"Currently, only labware loaded onto a deck slot can be mapped to "
+                f"Protocol Engine commands, "
+                f"so this labware will not show up in the Protocol Engine state."
+            )
+            return []
 
         count = self._command_count["LOAD_LABWARE"]
 
@@ -103,7 +115,7 @@ class LegacyCommandMapper:
             completedAt=now,
             data=pe_commands.LoadLabwareData(
                 location=pe_types.DeckSlotLocation(
-                    slot=DeckSlotName.from_primitive(slot)
+                    slot=DeckSlotName.from_primitive(labware_parent)
                 ),
                 loadName=load_name,
                 namespace=namespace,
