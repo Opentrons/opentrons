@@ -9,6 +9,8 @@ from can import Notifier, Bus, AsyncBufferedReader, Message, util
 
 from .arbitration_id import ArbitrationId
 from .message import CanMessage
+from .errors import ErrorFrameCanError
+
 
 if platform.system() == "Darwin":
     # TODO (amit, 2021-09-29): remove hacks to support `pcan` when we don't
@@ -112,9 +114,15 @@ class CanDriver:
 
         Returns:
             A can message
+
+        Raises:
+            ErrorFrameCanError
         """
         ...
         m: Message = await self._reader.get_message()
+        if m.is_error_frame:
+            raise ErrorFrameCanError(message=repr(m))
+
         return CanMessage(
             arbitration_id=ArbitrationId(id=m.arbitration_id), data=m.data
         )
