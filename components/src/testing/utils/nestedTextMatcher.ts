@@ -1,7 +1,7 @@
 import type { Matcher } from '@testing-library/react'
 
 // Match things like <p>Some <strong>nested</strong> text</p>
-// Use with either string match: nestedTextMatcher("Some nested text"))
+// Use with string match: nestedTextMatcher("Some nested text")
 export const nestedTextMatcher = (textMatch: string | RegExp): Matcher => (
   content,
   node
