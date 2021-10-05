@@ -49,7 +49,6 @@ class LegacyCommandMapper:
             # TODO(mc, 2021-09-28): equipment mapping behavior seems
             # best tested e2e, but current smoke tests won't remain sufficient
             # for very long. Figure out a better testing strategy
-            results += self._load_new_labware(loaded_labware)
             results += self._load_new_pipettes(loaded_pipettes)
 
             count = self._command_count[command_type]
@@ -83,46 +82,49 @@ class LegacyCommandMapper:
 
         return results
 
-    def _load_new_labware(
-        self,
-        loaded_labware: Dict[int, LegacyLabware],
+    def map_labware_loaded(
+        self, loaded_labware: LegacyLabware
     ) -> List[pe_commands.Command]:
-        results: List[pe_commands.Command] = []
+        now = utc_now()
 
-        for slot, labware in loaded_labware.items():
-            if slot not in self._loaded_labware_slots:
-                self._loaded_labware_slots.add(slot)
+        namespace, load_name, version = loaded_labware.uri.split("/")
 
-                now = utc_now()
-                uri = labware.uri
-                namespace, load_name, version = uri.split("/")
+        # FIX BEFORE MERGE
+        slot = 1
 
-                results.append(
-                    pe_commands.LoadLabware(
-                        id=f"commands.LOAD_LABWARE-{slot}",
-                        status=pe_commands.CommandStatus.SUCCEEDED,
-                        createdAt=now,
-                        startedAt=now,
-                        completedAt=now,
-                        data=pe_commands.LoadLabwareData(
-                            location=pe_types.DeckSlotLocation(
-                                slot=DeckSlotName.from_primitive(slot)
-                            ),
-                            loadName=load_name,
-                            namespace=namespace,
-                            version=int(version),
-                        ),
-                        result=pe_commands.LoadLabwareResult(
-                            labwareId=f"labware-{slot}",
-                            definition=LabwareDefinition.parse_obj(
-                                labware._implementation.get_definition()
-                            ),
-                            calibration=pe_types.CalibrationOffset(x=0, y=0, z=0),
-                        ),
-                    )
-                )
+        count = self._command_count["LOAD_LABWARE"]
 
-        return results
+        load_labware_command = pe_commands.LoadLabware(
+            id=f"commands.LOAD_LABWARE-{count}",
+            status=pe_commands.CommandStatus.SUCCEEDED,
+            createdAt=now,
+            startedAt=now,
+            completedAt=now,
+            data=pe_commands.LoadLabwareData(
+                location=pe_types.DeckSlotLocation(
+                    slot=DeckSlotName.from_primitive(slot)
+                ),
+                loadName=load_name,
+                namespace=namespace,
+                version=int(version),
+            ),
+            result=pe_commands.LoadLabwareResult(
+                labwareId=f"labware-{count}",
+                definition=LabwareDefinition.parse_obj(
+                    loaded_labware._implementation.get_definition()
+                ),
+                calibration=pe_types.CalibrationOffset(x=0, y=0, z=0),
+            ),
+        )
+
+        self._command_count["LOAD_LABWARE"] = count + 1
+        return [load_labware_command]
+
+    def map_pipette_load(self) -> None:
+        raise NotImplementedError()
+
+    def map_module_load(self) -> None:
+        raise NotImplementedError()
 
     def _load_new_pipettes(
         self,

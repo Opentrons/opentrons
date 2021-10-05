@@ -7,7 +7,7 @@ from opentrons.hardware_control import API as HardwareAPI
 from opentrons.hardware_control.types import PauseType as HardwarePauseType
 from opentrons.protocol_engine import AbstractPlugin, actions as pe_actions
 
-from .legacy_wrappers import LegacyProtocolContext
+from .legacy_wrappers import LegacyLabware, LegacyProtocolContext
 from .legacy_command_mapper import LegacyCommandMapper
 
 
@@ -50,6 +50,14 @@ class LegacyContextPlugin(AbstractPlugin):
                     handler=self._dispatch_legacy_command,
                 )
 
+            if self._protocol_context.on_labware_loaded is None:
+                self._protocol_context.on_labware_loaded = self._dispatch_labware_loaded
+            else:
+                assert (
+                    self._protocol_context.on_labware_loaded
+                    == self._dispatch_labware_loaded
+                )
+
             self._hardware_api.resume(HardwarePauseType.PAUSE)
 
         elif isinstance(action, pe_actions.PauseAction):
@@ -64,6 +72,14 @@ class LegacyContextPlugin(AbstractPlugin):
             loaded_pipettes=self._protocol_context.loaded_instruments,
             loaded_modules=self._protocol_context.loaded_modules,
             loaded_labware=self._protocol_context.loaded_labwares,
+        )
+
+        for c in pe_commands:
+            self.dispatch(pe_actions.UpdateCommandAction(command=c))
+
+    def _dispatch_labware_loaded(self, loaded_labware: LegacyLabware) -> None:
+        pe_commands = self._legacy_command_mapper.map_labware_loaded(
+            loaded_labware=loaded_labware
         )
 
         for c in pe_commands:

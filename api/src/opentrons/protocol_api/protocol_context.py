@@ -74,6 +74,15 @@ class ProtocolContext(CommandPublisher):
 
     """
 
+    on_labware_loaded: Optional[Callable[[Labware], None]] = None
+    """For internal Opentrons use only.
+
+    For every successful labware load, this callback will be called with the
+    labware object.
+
+    :meta private:
+    """
+
     def __init__(
         self,
         implementation: AbstractProtocol,
@@ -338,7 +347,10 @@ class ProtocolContext(CommandPublisher):
         implementation = self._implementation.load_labware_from_definition(
             labware_def=labware_def, location=location, label=label
         )
-        return Labware(implementation=implementation)
+        result = Labware(implementation=implementation)
+        if self.on_labware_loaded:
+            self.on_labware_loaded(result)
+        return result
 
     @requires_version(2, 0)
     def load_labware(
@@ -378,7 +390,10 @@ class ProtocolContext(CommandPublisher):
             namespace=namespace,
             version=version,
         )
-        return Labware(implementation=implementation)
+        result = Labware(implementation=implementation)
+        if self.on_labware_loaded:
+            self.on_labware_loaded(result)
+        return result
 
     @requires_version(2, 0)
     def load_labware_by_name(
