@@ -13,7 +13,7 @@ import contextlib
 import logging
 from os import environ
 from time import time
-from typing import Any, Dict, Optional, Union, List, Tuple, cast
+from typing import Any, Dict, Optional, Union, List, Tuple, cast, AsyncGenerator
 
 from math import isclose
 
@@ -91,7 +91,7 @@ class SmoothieDriver:
         cls,
         port: str,
         config: RobotConfig,
-        gpio_chardev: GPIODriverLike = None,
+        gpio_chardev: Optional[GPIODriverLike] = None,
     ) -> SmoothieDriver:
         """
         Build a smoothie driver
@@ -203,11 +203,11 @@ class SmoothieDriver:
         self._axes_moved_at = AxisMoveTimestamp(AXES)
 
     @property
-    def gpio_chardev(self):
+    def gpio_chardev(self) -> GPIODriverLike:
         return self._gpio_chardev
 
     @gpio_chardev.setter
-    def gpio_chardev(self, gpio_chardev):
+    def gpio_chardev(self, gpio_chardev: GPIODriverLike) -> None:
         self._gpio_chardev = gpio_chardev
 
     @property
@@ -226,7 +226,7 @@ class SmoothieDriver:
             {axis: value for axis, value in target.items() if value is not None}
         )
 
-    async def update_position(self, default=None) -> None:
+    async def update_position(self, default: Optional[Dict[str, float]]=None) -> None:
         """Get the current position from the smoothie and cache it."""
         if default is None:
             default = self._position
@@ -236,7 +236,7 @@ class SmoothieDriver:
             updated_position.update(**default)
         else:
 
-            async def _recursive_update_position(retries):
+            async def _recursive_update_position(retries: int) -> Dict[str, float]:
                 try:
                     position_response = await self._send_command(
                         _command_builder().add_gcode(gcode=GCODE.CURRENT_POSITION)
@@ -311,7 +311,7 @@ class SmoothieDriver:
                 res = res.replace("_v13", "_v1.3")
         return res
 
-    async def write_pipette_id(self, mount: str, data_string: str):
+    async def write_pipette_id(self, mount: str, data_string: str) -> None:
         """
         Writes to an attached pipette's ID memory location
         The ID is unique to this pipette, and is a string of unknown length
@@ -383,7 +383,7 @@ class SmoothieDriver:
 
     # FIXME (JG 9/28/17): Should have a more thought out
     # way of simulating vs really running
-    async def connect(self, port: str = None) -> None:
+    async def connect(self, port: Optional[str] = None) -> None:
         if environ.get("ENABLE_VIRTUAL_SMOOTHIE", "").lower() == "true":
             self.simulating = True
             return
@@ -391,7 +391,7 @@ class SmoothieDriver:
         await self._connect_to_port(port)
         await self._setup()
 
-    async def disconnect(self):
+    async def disconnect(self) -> None:
         if self._connection and await self.is_connected():
             await self._connection.close()
         self._connection = None
@@ -413,7 +413,7 @@ class SmoothieDriver:
         # Let this raise an exception.
         return get_ports_by_name(device_name=smoothie_id)[0]
 
-    async def _connect_to_port(self, port: str = None):
+    async def _connect_to_port(self, port: Optional[str] = None) -> None:
         try:
             port = self.get_port() if port is None else port
 
@@ -487,7 +487,7 @@ class SmoothieDriver:
         )
         return parse_utils.parse_switch_values(res)
 
-    async def update_homed_flags(self, flags: Dict[str, bool] = None):
+    async def update_homed_flags(self, flags: Optional[Dict[str, bool]] = None) -> None:
         """
         Returns Smoothieware's current homing-status, which is a dictionary
         of boolean values for each axis (XYZABC). If an axis is False, then it
@@ -501,7 +501,7 @@ class SmoothieDriver:
             self.homed_flags.update({ax: False for ax in AXES})
         elif await self.is_connected():
 
-            async def _recursive_update_homed_flags(retries: int):
+            async def _recursive_update_homed_flags(retries: int)  -> None:
                 try:
                     res = await self._send_command(
                         _command_builder().add_gcode(gcode=GCODE.HOMING_STATUS)
@@ -530,7 +530,7 @@ class SmoothieDriver:
         return self._steps_per_mm
 
     @contextlib.asynccontextmanager
-    async def restore_speed(self, value: Union[float, str]):
+    async def restore_speed(self, value: Union[float, str]) -> AsyncGenerator[None]:
         await self.set_speed(value, update=False)
         try:
             yield
@@ -545,7 +545,7 @@ class SmoothieDriver:
             .add_int(prefix="F", value=int(float(speed) * SEC_PER_MIN))
         )
 
-    async def set_speed(self, value: Union[float, str], update: bool = True):
+    async def set_speed(self, value: Union[float, str], update: bool = True) -> None:
         """set total axes movement speed in mm/second"""
         if update:
             self._combined_speed = float(value)
@@ -560,7 +560,7 @@ class SmoothieDriver:
         await self.set_speed(self._saved_axes_speed)
 
     @contextlib.asynccontextmanager
-    async def restore_axis_max_speed(self, new_max_speeds: Dict[str, float]):
+    async def restore_axis_max_speed(self, new_max_speeds: Dict[str, float]) -> None:
         await self.set_axis_max_speed(new_max_speeds, update=False)
         try:
             yield
@@ -1677,15 +1677,15 @@ class SmoothieDriver:
             self.pop_active_current()
             await self.pop_axis_max_speed()
 
-    def pause(self):
+    def pause(self) -> None:
         if not self.simulating:
             self.run_flag.clear()
 
-    def resume(self):
+    def resume(self) -> None:
         if not self.simulating:
             self.run_flag.set()
 
-    async def delay(self, seconds: float):
+    async def delay(self, seconds: float) -> None:
         # per http://smoothieware.org/supported-g-codes:
         # In grbl mode P is float seconds to comply with gcode standards
         command = (
@@ -1727,34 +1727,34 @@ class SmoothieDriver:
         else:
             raise RuntimeError(f"Cant probe axis {axis}")
 
-    def turn_on_blue_button_light(self):
+    def turn_on_blue_button_light(self) -> None:
         self._gpio_chardev.set_button_light(blue=True)
 
-    def turn_on_green_button_light(self):
+    def turn_on_green_button_light(self) -> None:
         self._gpio_chardev.set_button_light(green=True)
 
-    def turn_on_red_button_light(self):
+    def turn_on_red_button_light(self) -> None:
         self._gpio_chardev.set_button_light(red=True)
 
-    def turn_off_button_light(self):
+    def turn_off_button_light(self) -> None:
         self._gpio_chardev.set_button_light(red=False, green=False, blue=False)
 
-    def turn_on_rail_lights(self):
+    def turn_on_rail_lights(self) -> None:
         self._gpio_chardev.set_rail_lights(True)
 
-    def turn_off_rail_lights(self):
+    def turn_off_rail_lights(self) -> None:
         self._gpio_chardev.set_rail_lights(False)
 
-    def get_rail_lights_on(self):
+    def get_rail_lights_on(self) -> bool:
         return self._gpio_chardev.get_rail_lights()
 
-    def read_button(self):
+    def read_button(self) -> bool:
         return self._gpio_chardev.read_button()
 
-    def read_window_switches(self):
+    def read_window_switches(self) -> bool:
         return self._gpio_chardev.read_window_switches()
 
-    def set_lights(self, button: bool = None, rails: bool = None):
+    def set_lights(self, button: Optional[bool] = None, rails: Optional[bool] = None) -> None:
         if button is not None:
             self._gpio_chardev.set_button_light(blue=button)
         if rails is not None:
@@ -1779,7 +1779,7 @@ class SmoothieDriver:
         await self._reset_from_error()
         await self._setup()
 
-    async def home_flagged_axes(self, axes_string: str):
+    async def home_flagged_axes(self, axes_string: str) -> None:
         """
         Given a list of axes to check, this method will home each axis if
         Smoothieware's internal flag sets it as needing to be homed
@@ -1791,7 +1791,7 @@ class SmoothieDriver:
             axes_string = "".join(axes_that_need_to_home)
             await self.home(axes_string)
 
-    async def _smoothie_reset(self):
+    async def _smoothie_reset(self) -> None:
         log.debug(f"Resetting Smoothie (simulating: {self.simulating})")
         if self.simulating:
             pass
@@ -1804,7 +1804,7 @@ class SmoothieDriver:
             await self._wait_for_ack()
             await self._reset_from_error()
 
-    async def _smoothie_programming_mode(self):
+    async def _smoothie_programming_mode(self) -> None:
         log.debug(f"Setting Smoothie to ISP mode (simulating: {self.simulating})")
         if self.simulating:
             pass
@@ -1817,7 +1817,7 @@ class SmoothieDriver:
             self._gpio_chardev.set_isp_pin(True)
             await asyncio.sleep(0.25)
 
-    async def hard_halt(self):
+    async def hard_halt(self) -> None:
         log.debug(f"Halting Smoothie (simulating: {self.simulating}")
         if self.simulating:
             pass
@@ -1832,7 +1832,7 @@ class SmoothieDriver:
     async def update_firmware(  # noqa: C901
         self,  # noqa: C901
         filename: str,
-        loop: asyncio.AbstractEventLoop = None,
+        loop: Optional[asyncio.AbstractEventLoop] = None,
         explicit_modeset: bool = True,
     ) -> str:
         """

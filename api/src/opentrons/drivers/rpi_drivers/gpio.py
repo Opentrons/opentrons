@@ -21,7 +21,7 @@ DTOVERLAY_PATH = "/proc/device-tree/soc/gpio@7e200000/gpio_rev_bit_pins"
 def _event_callback(
     update_door_state: Callable[[DoorState], None],
     get_door_state: Callable[..., DoorState],
-):
+)  -> None:
     try:
         update_door_state(get_door_state())
     except Exception:
@@ -47,7 +47,7 @@ class GPIOCharDev:
         return self._board_rev
 
     @board_rev.setter
-    def board_rev(self, boardrev: BoardRevision):
+    def board_rev(self, boardrev: BoardRevision) -> None:
         self._board_rev = boardrev
 
     def _request_line(self, pin: GPIOPin, request_type) -> gpiod.Line:
@@ -80,7 +80,7 @@ class GPIOCharDev:
             lines[rev.name] = self._request_line(rev, gpiod.LINE_REQ_DIR_IN)
         return lines
 
-    def _determine_board_revision(self):
+    def _determine_board_revision(self) -> BoardRevision:
         """Read revision bit pins and return the board revision"""
         try:
             rev_bits = self.read_revision_bits()
@@ -97,7 +97,7 @@ class GPIOCharDev:
             )
             return BoardRevision.UNKNOWN
 
-    def config_by_board_rev(self):
+    def config_by_board_rev(self)  -> None:
         MODULE_LOG.info("Configuring GPIOs by central routing roard revision")
         # get board revision based on rev bits
         self.board_rev = self._determine_board_revision()
@@ -247,7 +247,7 @@ class GPIOCharDev:
         self,
         loop: asyncio.AbstractEventLoop,
         update_door_state: Callable[[DoorState], None],
-    ):
+    ) -> None:
         current_door_value = self.read_window_switches()
         if current_door_value == 0:
             update_door_state(DoorState.OPEN)
@@ -265,11 +265,11 @@ class GPIOCharDev:
                 "switch properly"
             )
 
-    def release_line(self, pin: GPIOPin):
+    def release_line(self, pin: GPIOPin) -> None:
         self.lines[pin.name].release()
         self.lines.pop(pin.name)
 
-    def stop_door_switch_watcher(self, loop: asyncio.AbstractEventLoop):
+    def stop_door_switch_watcher(self, loop: asyncio.AbstractEventLoop)  -> None:
         try:
             door_fd = self.lines["window_door_sw"].event_get_fd()
             loop.remove_reader(door_fd)

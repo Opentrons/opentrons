@@ -2,7 +2,7 @@ from __future__ import annotations
 import enum
 from itertools import groupby
 from dataclasses import dataclass
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, Dict, Any
 from opentrons.hardware_control.types import BoardRevision
 from opentrons.algorithms.types import GenericNode
 
@@ -126,13 +126,13 @@ class USBPort(GenericNode[str]):
 
 class GPIOPin:
     @classmethod
-    def build(cls, name: str, in_out: PinDir, pin: int):
+    def build(cls, name: str, in_out: PinDir, pin: int) -> GPIOPin:
         # use this method if the pin number is the same
         # across all board revisions
         return cls(name, in_out, rev_og=pin, rev_a=pin, rev_b=pin, rev_c=pin)
 
     @classmethod
-    def build_with_rev(cls, name: str, in_out: PinDir, **kwargs):
+    def build_with_rev(cls, name: str, in_out: PinDir, **kwargs: Dict[Any, Any]) -> GPIOPin:
         return cls(name, in_out, **kwargs)
 
     def __init__(
@@ -151,7 +151,7 @@ class GPIOPin:
         self.rev_b = rev_b
         self.rev_c = rev_c
 
-    def by_board_rev(self, board_rev: BoardRevision):
+    def by_board_rev(self, board_rev: BoardRevision) -> Optional[int]:
         ref = {
             BoardRevision.OG: self.rev_og,
             BoardRevision.A: self.rev_a,
@@ -166,7 +166,7 @@ class GPIOGroup:
     def __init__(self, pins: List[GPIOPin]):
         self.pins = pins
 
-    def __getattr__(self, item):
+    def __getattr__(self, item: str) -> Optional[GPIOPin]:
         return next(filter(lambda x: x.name is item, self.pins), None)
 
     def by_type(self, pin_dir: PinDir) -> GPIOGroup:
@@ -175,7 +175,7 @@ class GPIOGroup:
     def by_names(self, names: List[str]) -> GPIOGroup:
         return GPIOGroup(list(filter(lambda x: x.name in names, self.pins)))
 
-    def group_by_pins(self, board_rev: BoardRevision) -> List:
+    def group_by_pins(self, board_rev: BoardRevision) -> List[GPIOPin]:
         c = groupby(self.pins, key=lambda x: x.by_board_rev(board_rev))
         l: list = []
         for k, v in c:
