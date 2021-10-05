@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { LabwarePositionCheckStepDetail } from './LabwarePositionCheckStepDetail'
-import { LabwarePositionCheckStep } from './types'
+import type { LabwarePositionCheckStep } from './types'
 
 interface GenericStepScreenProps {
   selectedStep: LabwarePositionCheckStep

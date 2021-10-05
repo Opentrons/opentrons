@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { Portal } from '../../../App/portal'
 import {
   Box,
   Btn,
@@ -26,12 +25,13 @@ import {
   Text,
   TEXT_TRANSFORM_UPPERCASE,
 } from '@opentrons/components'
-import styles from '../styles.css'
+import { Portal } from '../../../App/portal'
 import labwarePositionCheckModalImage1 from '../../../assets/images/labware_position_check_modal_nozzle_image_1.svg'
 import labwarePositionCheckModalImage2 from '../../../assets/images/labware_position_check_modal_nozzle_image2.svg'
 import labwarePositionCheckModalImage3 from '../../../assets/images/labware_position_check_modal_nozzle_or_tip_image1.svg'
 import labwarePositionCheckModalImage4 from '../../../assets/images/labware_position_check_modal_nozzle_or_tip_image2.svg'
 import labwarePositionCheckModalImage5 from '../../../assets/images/labware_position_check_modal_nozzle_or_tip_image3.svg'
+import styles from '../styles.css'
 
 interface LabwarePositionCheckStepDetailModalProps {
   onCloseClick: () => unknown
@@ -109,7 +109,7 @@ export const LabwarePositionCheckStepDetailModal = (
                 marginTop={'4.5rem'}
                 marginLeft={'8.5rem'}
               >
-                {t('labware_step_detail_modal_nozzle_image_2_nozzletext')}
+                {t('labware_step_detail_modal_nozzle_image_2_nozzle_text')}
               </Text>
             </Box>
           </div>
@@ -166,7 +166,7 @@ export const LabwarePositionCheckStepDetailModal = (
               marginTop={'1.7rem'}
               marginLeft={'6.7rem'}
             >
-              {t('labware_step_detail_modal_nozzle_or_tip_image_2_nozzletext')}
+              {t('labware_step_detail_modal_nozzle_or_tip_image_2_nozzle_text')}
             </Text>
           </div>
           <Flex flext-direction={DIRECTION_ROW} justifyContent={JUSTIFY_CENTER}>

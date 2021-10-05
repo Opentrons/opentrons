@@ -1,10 +1,10 @@
+import * as React from 'react'
+import { when } from 'jest-when'
 import {
   partialComponentPropsMatcher,
   renderWithProviders,
-} from '@opentrons/components/__utils__'
-import { when } from 'jest-when'
-import * as React from 'react'
-import { StaticRouter } from 'react-router'
+} from '@opentrons/components/src/testing/utils'
+import { i18n } from '../../../../i18n'
 import { GenericStepScreen } from '../GenericStepScreen'
 import { LabwarePositionCheckStepDetail } from '../LabwarePositionCheckStepDetail'
 
@@ -31,15 +31,14 @@ const mockLabwarePositionCheckStepTipRack = {
 } as any
 
 const render = (props: React.ComponentProps<typeof GenericStepScreen>) => {
-  return renderWithProviders(
-    <StaticRouter>
-      <GenericStepScreen {...props} />
-    </StaticRouter>
-  )
+  return renderWithProviders(<GenericStepScreen {...props} />, {
+    i18nInstance: i18n,
+  })[0]
 }
 
 describe('GenericStepScreen', () => {
   let props: React.ComponentProps<typeof GenericStepScreen>
+
   beforeEach(() => {
     props = {
       selectedStep: mockLabwarePositionCheckStepTipRack,
