@@ -20,6 +20,7 @@ on:
       - '*'
     tags:
       - 'components*'
+  workflow_dispatch:
 
 defaults:
   run:
