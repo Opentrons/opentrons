@@ -71,7 +71,7 @@ class CommandScraper:
 
     The :py:attr:`commands` property contains the list of commands
     and log messages integrated together. Each element of the list is
-    a dict following the pattern in the docs of :py:meth:`simulate`.
+    a dict following the pattern in the docs of :py:obj:`simulate`.
     """
 
     def __init__(
@@ -103,7 +103,7 @@ class CommandScraper:
 
     @property
     def commands(self) -> List[Mapping[str, Mapping[str, Any]]]:
-        """The list of commands. See :py:meth:`simulate`"""
+        """The list of commands. See :py:obj:`simulate`"""
         return self._commands
 
     def __del__(self):
@@ -137,8 +137,8 @@ def get_protocol_api(
     hardware_simulator: HardwareToManage = None,
 ) -> protocol_api.ProtocolContext:
     """
-    Build and return a :py:class:`ProtocolContext` connected to
-    Virtual Smoothie.
+    Build and return a ``protocol_api.ProtocolContext``
+    connected to Virtual Smoothie.
 
     This can be used to run protocols from interactive Python sessions
     such as Jupyter or an interpreter on the command line:
@@ -155,9 +155,9 @@ def get_protocol_api(
     available.
 
     :param version: The API version to use. This must be lower than
-                    :py:attr:`opentrons.protocol_api.MAX_SUPPORTED_VERSION`.
+                    ``opentrons.protocol_api.MAX_SUPPORTED_VERSION``.
                     It may be specified either as a string (``'2.0'``) or
-                    as a :py:class:`.protocols.types.APIVersion`
+                    as a ``protocols.types.APIVersion``
                     (``APIVersion(2, 0)``).
     :param bundled_labware: If specified, a mapping from labware names to
                             labware definitions for labware to consider in the
@@ -167,7 +167,7 @@ def get_protocol_api(
                             and is best not used.
     :param bundled_data: If specified, a mapping from filenames to contents
                          for data to be available in the protocol from
-                         :py:attr:`.ProtocolContext.bundled_data`.
+                         ``protocol_api.ProtocolContext.bundled_data``.
     :param extra_labware: If specified, a mapping from labware names to
                           labware definitions for labware to consider in the
                           protocol in addition to those stored on the robot.
@@ -176,7 +176,7 @@ def get_protocol_api(
                           subdirectory of the Jupyter data directory for
                           custom labware.
     :param hardware_simulator: If specified, a hardware simulator instance.
-    :returns opentrons.protocol_api.ProtocolContext: The protocol context.
+    :return: The protocol context.
     """
     if isinstance(version, str):
         checked_version = parse.version_from_string(version)
@@ -283,7 +283,7 @@ def simulate(
                      it would be 3.
         - ``payload``: The command, its arguments, and how to format its text.
                        For more specific details see
-                       :py:mod:`opentrons.commands`. To format a message from
+                       ``opentrons.commands``. To format a message from
                        a payload do ``payload['text'].format(**payload)``.
         - ``logs``: Any log messages that occurred during execution of this
                     command, as a logging.LogRecord
@@ -301,7 +301,7 @@ def simulate(
                               directories. Specified files and the
                               non-recursive contents of specified directories
                               are presented by the protocol context in
-                              :py:attr:`.ProtocolContext.bundled_data`.
+                              ``protocol_api.ProtocolContext.bundled_data``.
     :param hardware_simulator_file_path: A path to a JSON file defining a
                                          hardware simulator.
     :param duration_estimator: For internal use only.
@@ -315,7 +315,7 @@ def simulate(
                            Default: ``False``
     :param log_level: The level of logs to capture in the runlog:
                       ``"debug"``, ``"info"``, ``"warning"``, or ``"error"``.
-                      Defaults to ``'warning'``.
+                      Defaults to ``"warning"``.
     :returns: A tuple of a run log for user output, and possibly the required
               data to write to a bundle to bundle this protocol. The bundle is
               only emitted if bundling is allowed
@@ -379,10 +379,10 @@ def simulate(
 
 def format_runlog(runlog: List[Mapping[str, Any]]) -> str:
     """
-    Format a run log (return value of :py:meth:`simulate``) into a
+    Format a run log (return value of :py:obj:`simulate`) into a
     human-readable string
 
-    :param runlog: The output of a call to :py:func:`simulate`
+    :param runlog: The output of a call to :py:obj:`simulate`
     """
     to_ret = []
     for command in runlog:

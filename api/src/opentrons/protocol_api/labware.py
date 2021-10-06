@@ -220,7 +220,7 @@ class Labware(DeckItem):
     reservoir, tip rack, etc. It defines the physical geometry of the labware,
     and provides methods for accessing wells within the labware.
 
-    It is commonly created by calling :py:meth:`ProtocolContext.load_labware`.
+    It is commonly created by calling ``ProtocolContext.load_labware()``.
 
     To access a labware's wells, you can use its well accessor methods:
     :py:meth:`wells_by_name`, :py:meth:`wells`, :py:meth:`columns`,
@@ -690,8 +690,8 @@ def verify_definition(
     If the definition is invalid, an exception is raised; otherwise parse the
     json and return the valid definition.
 
-    :raises json.JsonDecodeError: If the definition is not valid json
-    :raises jsonschema.ValidationError: If the definition is not valid.
+    :raises json.JSONDecodeError: If the definition is not valid json
+    :raises: ``jsonschema.ValidationError`` -- if the definition is not valid.
     :returns: The parsed definition
     """
     return labware_module.verify_definition(contents=contents)
@@ -775,7 +775,7 @@ def select_tiprack_from_list_paired_pipettes(
     starting_point: Optional[Well] = None,
 ) -> Tuple[Labware, Well]:
     """
-    Helper function utilized in :py:attr:`PairedInstrumentContext`
+    Helper function utilized in ``PairedInstrumentContext``
     to determine which pipette tiprack to pick up from.
 
     If a starting point is specified, this method with check
@@ -862,10 +862,10 @@ def load_from_definition(
                    (often the front-left corner of a slot on the deck).
     :param str label: An optional label that will override the labware's
                       display name from its definition
-    :param APIVersion api_level: the API version to set for the loaded labware
-                                 instance. The :py:class:`.Labware` will
-                                 conform to this level. If not specified,
-                                 defaults to :py:attr:`.MAX_SUPPORTED_VERSION`.
+    :param api_level: the API version to set for the loaded labware
+                      instance. The :py:class:`.Labware` will
+                      conform to this level. If not specified,
+                      defaults to ``MAX_SUPPORTED_VERSION``.
     """
     return Labware(
         implementation=labware_module.load_from_definition(
@@ -911,10 +911,10 @@ def load(
     :param extra_defs: If specified, a mapping of labware names to labware
         definitions. If no bundle is passed, these definitions will also be
         searched.
-    :param APIVersion api_level: the API version to set for the loaded labware
-                                 instance. The :py:class:`.Labware` will
-                                 conform to this level. If not specified,
-                                 defaults to :py:attr:`.MAX_SUPPORTED_VERSION`.
+    :param api_level: the API version to set for the loaded labware
+                      instance. The :py:class:`.Labware` will
+                      conform to this level. If not specified,
+                      defaults to ``MAX_SUPPORTED_VERSION``.
     """
 
     return Labware(

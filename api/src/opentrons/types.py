@@ -74,27 +74,29 @@ class Location:
 
     It should rarely be constructed directly by the user; rather, it is the
     return type of most :py:class:`.Well` accessors like :py:meth:`.Well.top`
-    and is passed directly into a method like
-    :py:meth:`InstrumentContext.aspirate`.
+    and is passed directly into a method like ``InstrumentContext.aspirate()``.
 
     .. warning::
-       The :py:attr:`labware` attribute of this class is used by the protocol
+       The ``.labware`` attribute of this class is used by the protocol
        API internals to, among other things, determine safe heights to retract
        the instruments to when moving between locations. If constructing an
-       instance of this class manually, be sure to either specify `None` as the
+       instance of this class manually, be sure to either specify ``None`` as the
        labware (so the robot does its worst case retraction) or specify the
-       correct labware for the :py:attr:`point` attribute.
+       correct labware for the ``.point`` attribute.
 
 
     .. warning::
-       The `==` operation compares both the position and associated labware.
-       If you only need to compare locations, compare the :py:attr:`point`
+       The ``==`` operation compares both the position and associated labware.
+       If you only need to compare locations, compare the ``.point``
        of each item.
     """
 
     def __init__(self, point: Point, labware: LocationLabware):
         self._point = point
         self._labware = LabwareLike(labware)
+
+    # todo(mm, 2021-10-01): Figure out how to get .point and .labware to show up
+    # in the rendered docs, and then update the class docstring to use cross-references.
 
     @property
     def point(self) -> Point:

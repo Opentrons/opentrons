@@ -149,8 +149,8 @@ class InstrumentContext(CommandPublisher):
         :type volume: int or float
         :param location: Where to aspirate from. If `location` is a
                          :py:class:`.Well`, the robot will aspirate from
-                         :py:obj:`well_bottom_clearance.aspirate` mm
-                         above the bottom of the well. If `location` is a
+                         :py:obj:`well_bottom_clearance.aspirate <well_bottom_clearance>`
+                         mm above the bottom of the well. If `location` is a
                          :py:class:`.Location` (i.e. the result of
                          :py:meth:`.Well.top` or :py:meth:`.Well.bottom`), the
                          robot will aspirate from the exact specified location.
@@ -171,7 +171,7 @@ class InstrumentContext(CommandPublisher):
             a location, specify it as a keyword argument:
             ``instr.aspirate(location=wellplate['A1'])``
 
-        """
+        """  # noqa: E501
         logger.debug(
             "aspirate {} from {} at {}".format(
                 volume, location if location else "current position", rate
@@ -277,8 +277,8 @@ class InstrumentContext(CommandPublisher):
 
         :param location: Where to dispense into. If `location` is a
                          :py:class:`.Well`, the robot will dispense into
-                         :py:obj:`well_bottom_clearance.dispense` mm
-                         above the bottom of the well. If `location` is a
+                         :py:obj:`well_bottom_clearance.dispense <well_bottom_clearance>`
+                         mm above the bottom of the well. If `location` is a
                          :py:class:`.Location` (i.e. the result of
                          :py:meth:`.Well.top` or :py:meth:`.Well.bottom`), the
                          robot will dispense into the exact specified location.
@@ -300,7 +300,7 @@ class InstrumentContext(CommandPublisher):
             a location, specify it as a keyword argument:
             ``instr.dispense(location=wellplate['A1'])``
 
-        """
+        """  # noqa: E501
         logger.debug(
             "dispense {} from {} at {}".format(
                 volume, location if location else "current position", rate
@@ -388,7 +388,7 @@ class InstrumentContext(CommandPublisher):
                      `rate` * :py:attr:`flow_rate.aspirate <flow_rate>`,
                      and when dispensing, it will be
                      `rate` * :py:attr:`flow_rate.dispense <flow_rate>`.
-        :raises NoTipAttachedError: If no tip is attached to the pipette.
+        :raises: ``NoTipAttachedError`` -- if no tip is attached to the pipette.
         :returns: This instance
 
         .. note::
@@ -559,7 +559,7 @@ class InstrumentContext(CommandPublisher):
         :param speed: The speed for touch tip motion, in mm/s.
                       Default: 60.0 mm/s, Max: 80.0 mm/s, Min: 20.0 mm/s
         :type speed: float
-        :raises NoTipAttachedError: if no tip is attached to the pipette
+        :raises: ``NoTipAttachedError`` -- if no tip is attached to the pipette
         :raises RuntimeError: If no location is specified and location cache is
                               None. This should happen if `touch_tip` is called
                               without first calling a method that takes a
@@ -570,7 +570,7 @@ class InstrumentContext(CommandPublisher):
         .. note::
 
             This is behavior change from legacy API (which accepts any
-            :py:class:`.Placeable` as the ``location`` parameter)
+            ``Placeable`` as the ``location`` parameter)
 
         """
         if not self._implementation.has_tip():
@@ -634,7 +634,7 @@ class InstrumentContext(CommandPublisher):
                        to air-gap aspirate. (Default: 5mm above current Well)
         :type height: float
 
-        :raises NoTipAttachedError: If no tip is attached to the pipette
+        :raises: ``NoTipAttachedError`` -- if no tip is attached to the pipette
 
         :raises RuntimeError: If location cache is None.
                               This should happen if `touch_tip` is called
@@ -989,7 +989,6 @@ class InstrumentContext(CommandPublisher):
 
         :param volume: The amount of volume to distribute to each destination
                        well.
-        :type volume: float or sequence of floats
         :param source: A single well from where liquid will be aspirated.
         :param dest: List of Wells where liquid will be dispensed to.
         :param kwargs: See :py:meth:`transfer`. Some arguments are changed.
@@ -1022,7 +1021,6 @@ class InstrumentContext(CommandPublisher):
 
         :param volume: The amount of volume to consolidate from each source
                        well.
-        :type volume: float or sequence of floats
         :param source: List of wells from where liquid will be aspirated.
         :param dest: The single well into which liquid will be dispensed.
         :param kwargs: See :py:meth:`transfer`. Some arguments are changed.
@@ -1263,7 +1261,7 @@ class InstrumentContext(CommandPublisher):
                       :py:attr:`InstrumentContext.default_speed`. This controls
                       the straight linear speed of the motion; to limit
                       individual axis speeds, you can use
-                      :py:attr:`.ProtocolContext.max_speeds`.
+                      :py:obj:`.ProtocolContext.max_speeds`.
         :param publish: Whether a call to this function should publish to the
                         runlog or not.
         """
@@ -1453,10 +1451,7 @@ class InstrumentContext(CommandPublisher):
     @property  # type: ignore
     @requires_version(2, 7)
     def has_tip(self) -> bool:
-        """
-        :returns: Whether this instrument has a tip attached or not.
-        :type: bool
-        """
+        """Return whether this instrument has a tip attached or not."""
         return self._implementation.has_tip()
 
     @property
@@ -1531,8 +1526,8 @@ class InstrumentContext(CommandPublisher):
 
         :param instrument: The secondary instrument you wish to use
 
-        :raises UnsupportedInstrumentPairingError: If you try to pair pipettes that are
-                                                   not currently supported together.
+        :raises: ``UnsupportedInstrumentPairingError`` -- if you try to pair pipettes
+                 that are not currently supported together.
 
         :returns: A ``PairedInstrumentContext``. This is the object you will call
                   commands on. The building block commands are the same as an individual

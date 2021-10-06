@@ -9,7 +9,13 @@ SHX := npx shx
 firmware = $(wildcard smoothie/*.hex)
 
 # python and pipenv config
-sphinx_build := $(pipenv) run sphinx-build
+sphinx_build := $(pipenv) run sphinx-build -W --keep-going
+# todo(mm, 2021-10-04):
+# 1. Resolve all Sphinx warnings.
+# 2. Convert all recipes to use $(sphinx_build).
+# 3. Delete $(sphinx_build_allow_warnings).
+# github.com/Opentrons/opentrons/issues/6135
+sphinx_build_allow_warnings := $(pipenv) run sphinx-build
 
 
 # Find the version of the wheel from package.json using a helper script. We
@@ -96,10 +102,11 @@ format:
 
 docs/build/html/v%: docs/v%
 	$(sphinx_build) -b html -d docs/build/doctrees -n $< $@
-	$(SHX) cp docs/img/lightbulb.jpg $@/_images/ # sphinx wont automatically do this because it's only in a template
+# sphinx wont automatically do this because it's only in a template
+	$(SHX) cp docs/img/lightbulb.jpg $@/_images/
 
 docs/build/html/hardware: docs/hardware src/opentrons/hardware_control
-	$(sphinx_build) -b html -d docs/build/doctrees -n $< $@
+	$(sphinx_build_allow_warnings) -b html -d docs/build/doctrees -n $< $@
 	$(SHX) mkdir $@/_images/
 	$(SHX) cp docs/img/lightbulb.jpg $@/_images/
 
@@ -109,7 +116,7 @@ docs/build/pdf/OpentronsPythonAPIV%.pdf: docs/v%
 	$(SHX) ls $(@D)/*.pdf $(if $(CI),,|| $(SHX) echo "no pdf produced")
 
 docs/build/pdf/OT2HardwareControl.pdf: docs/hardware
-	$(sphinx_build) -b latex -d docs/build/doctrees $< $(@D)
+	$(sphinx_build_allow_warnings) -b latex -d docs/build/doctrees $< $(@D)
 	$(MAKE) -C $(@D) all-pdf $(if $(CI),>/dev/null,|| $(SHX) echo "latex build failed (pdflatex not installed)")
 
 docs/dist/v%: docs/build/html/v% docs/build/pdf/OpentronsPythonAPIV%.pdf

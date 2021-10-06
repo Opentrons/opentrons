@@ -67,7 +67,7 @@ class ProtocolContext(CommandPublisher):
     Unlike the old robot class, it is designed to be ephemeral. The lifetime
     of a particular instance should be about the same as the lifetime of a
     protocol. The only exception is the one stored in
-    :py:attr:`.legacy_api.api.robot`, which is provided only for back
+    ``.legacy_api.api.robot``, which is provided only for back
     compatibility and should be used less and less as time goes by.
 
     .. versionadded:: 2.0
@@ -132,7 +132,7 @@ class ProtocolContext(CommandPublisher):
         The supported API version was specified when the protocol context
         was initialized. It may be lower than the highest version supported
         by the robot software. For the highest version supported by the
-        robot software, see :py:attr:`.protocol_api.MAX_SUPPORTED_VERSION`.
+        robot software, see ``protocol_api.MAX_SUPPORTED_VERSION``.
         """
         return self._api_version
 
