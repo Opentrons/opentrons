@@ -241,6 +241,7 @@ class Thermocycler(mod_abc.AbstractModule):
         # Wait for target temperature to be set.
         retries = 0
         while self.target != temperature or not self.hold_time_probably_set(hold_time):
+            await self.wait_for_is_running()
             # Wait for the poller to update
             await self.wait_next_poll()
             retries += 1
@@ -289,6 +290,7 @@ class Thermocycler(mod_abc.AbstractModule):
         # Wait for target to be set
         retries = 0
         while self.lid_target != temperature:
+            await self.wait_for_is_running()
             # Wait for the poller to update
             await self.wait_next_poll()
             retries += 1
