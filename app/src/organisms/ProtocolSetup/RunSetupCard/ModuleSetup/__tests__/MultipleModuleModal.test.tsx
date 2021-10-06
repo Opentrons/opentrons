@@ -18,7 +18,9 @@ describe('MultipleModulesModal', () => {
 
   it('should render the correct header', () => {
     const { getByRole } = render(props)
-    expect(getByRole('heading', { name: 'Setting Up Modules of the Same Type' })).toBeTruthy()
+    expect(
+      getByRole('heading', { name: 'Setting Up Modules of the Same Type' })
+    ).toBeTruthy()
   })
   it('should render the correct body', () => {
     const { getByRole, getByText } = render(props)

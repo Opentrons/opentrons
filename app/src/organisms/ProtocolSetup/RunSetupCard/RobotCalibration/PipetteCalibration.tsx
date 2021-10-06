@@ -95,7 +95,7 @@ export function PipetteCalibration(props: Props): JSX.Element {
             id={'PipetteCalibration_pipetteMismatchHelpLink'}
           >
             {t('pipette_compat_help')}
-            <Icon name={'open-in-new'} marginLeft={SPACING_1} size="10px"/>
+            <Icon name={'open-in-new'} marginLeft={SPACING_1} size="10px" />
           </Link>
         </Flex>
       </Flex>

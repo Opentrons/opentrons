@@ -24,7 +24,7 @@ describe('SecureLabwareModal', () => {
       'Opentrons recommends ensuring your labware locks to the Magnetic Module by adjusting the black plate bracket on top of the module.'
     )
     getByText(
-      'Please note there are two sizes of plate brackets supplied with your module: standard and deep well. These brackets can be removed and swapped by unscrewing the module’s thumb screw (the silver knob on the front).'
+      'Please note there are two sizes of plate brackets supplied with your module: standard and deep well. These brackets can be removed and swapped by unscrewing the modules thumb screw (the silver knob on the front).'
     )
     getByText('Magnetic Module with 0.2 mL 96 well PCR Plate')
     getByText('Magnetic Module with 2 mL Deep Well Plate')

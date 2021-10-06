@@ -102,7 +102,6 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
             alignSelf={ALIGN_FLEX_END}
             onClick={() => setShowMultipleModulesModal(true)}
             data-test={'LabwareSetup_helpLink'}
-            marginRight={SPACING_3}
           >
             {t('multiple_modules_help_link_title')}
           </Btn>

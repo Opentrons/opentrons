@@ -81,7 +81,9 @@ describe('ExtraAttentionWarning', () => {
       screen.queryByText('mock secure labware modal magnetic module')
     ).toBeNull()
 
-    const modalLink = getByText('See how to secure labware to the Magnetic Module')
+    const modalLink = getByText(
+      'See how to secure labware to the Magnetic Module'
+    )
 
     fireEvent.click(modalLink)
     getByText('mock secure labware modal magnetic module')
@@ -105,7 +107,9 @@ describe('ExtraAttentionWarning', () => {
       screen.queryByText('mock secure labware modal thermocycler')
     ).toBeNull()
 
-    const modalLink = getByText('See how to secure labware to the Thermocyler Module')
+    const modalLink = getByText(
+      'See how to secure labware to the Thermocyler Module'
+    )
 
     fireEvent.click(modalLink)
     getByText('mock secure labware modal thermocycler')
