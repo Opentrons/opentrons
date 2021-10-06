@@ -40,6 +40,8 @@ def test_calibrate(
         logger.info(ot_application.config)
         # ignore updates
         ot_application.config["alerts"]["ignored"] = ["appUpdateAvailable"]
+        # use new protocol tab
+        ot_application.config["devInternal"] = {"preProtocolFlowWithoutRPC": True}
         ot_application.write_config()
         robots_list = RobotsList(driver)
         if not robots_list.is_robot_toggle_active(RobotsList.DEV):
@@ -62,14 +64,15 @@ def test_calibrate(
         left_menu = LeftMenu(driver)
         left_menu.click_protocol_upload_button()
         protocol_file = ProtocolFile(driver)
-        logger.info(f"uploading protocol: {test_protocols['python1'].resolve()}")
-        input = protocol_file.get_drag_and_drop()
-        drag_and_drop_file(input, test_protocols["python1"])
+        logger.info(f"uploading protocol: {test_protocols['json1'].resolve()}")
+        # close the PROTOCOL - OT-2 GUIDED WALK-THROUGH
+        # protocol_file.get_close_button().click()
+        # protocol_file.get_yes_close_now().click()
+        input = protocol_file.get_new_drag_and_drop()
+        drag_and_drop_file(input, test_protocols["json1"])
         time.sleep(2)
         overview = Overview(driver)
         overview.click_continue_if_present()
-        # This element location will fail if the file is not loaded.
-        overview.get_filename_header(test_protocols["python1"].name)
         driver.save_screenshot(
             f"results/{request.node.originalname}.after_file_upload.png"
         )

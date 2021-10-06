@@ -22,6 +22,18 @@ class ProtocolFile:
         "(//input[contains(normalize-space(@class), 'upload-panel__file_input')])[2]",
     )
 
+    close_button: Tuple[str, str] = (
+        By.XPATH,
+        "//button[contains(normalize-space(@class), 'buttons__button_flat_')]",
+    )
+
+    yes_close_now: Tuple[str, str] = (By.XPATH, '//button[text()="Yes, close now"]')
+
+    new_drag_and_drop: Tuple[str, str] = (
+        By.ID,
+        "file_input",
+    )
+
     def __init__(self, driver: WebDriver) -> None:
         """Initialize with driver."""
         self.driver: WebDriver = driver
@@ -41,3 +53,27 @@ class ProtocolFile:
             EC.visibility_of_element_located(ProtocolFile.drag_and_drop)
         )
         return input
+
+    @highlight
+    def get_new_drag_and_drop(self) -> WebElement:
+        """Retrieve the Webelement input for drag and drop."""
+        input: WebElement = WebDriverWait(self.driver, 5).until(
+            EC.visibility_of_element_located(ProtocolFile.new_drag_and_drop)
+        )
+        return input
+
+    @highlight
+    def get_close_button(self) -> WebElement:
+        """Retrieve the Webelement input for drag and drop."""
+        button: WebElement = WebDriverWait(self.driver, 5).until(
+            EC.visibility_of_element_located(ProtocolFile.close_button)
+        )
+        return button
+
+    @highlight
+    def get_yes_close_now(self) -> WebElement:
+        """Retrieve the Webelement input for drag and drop."""
+        button: WebElement = WebDriverWait(self.driver, 5).until(
+            EC.visibility_of_element_located(ProtocolFile.yes_close_now)
+        )
+        return button

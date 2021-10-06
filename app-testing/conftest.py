@@ -47,4 +47,8 @@ def test_protocols() -> Dict[str, Path]:
             Path(__file__).resolve().parent,
             "files/protocol/python1/test_drive.py",
         ),
+        "json1": Path(
+            Path(__file__).resolve().parent,
+            "files/protocol/json1/protocol.json",
+        ),
     }
