@@ -83,6 +83,12 @@ class ProtocolContext(CommandPublisher):
     :meta private:
     """
 
+    on_instrument_loaded: Optional[Callable[[InstrumentContext], None]] = None
+    """Like :py:obj:`on_labware_loaded`, but for pipettes.
+
+    :meta private:
+    """
+
     def __init__(
         self,
         implementation: AbstractProtocol,
@@ -348,7 +354,7 @@ class ProtocolContext(CommandPublisher):
             labware_def=labware_def, location=location, label=label
         )
         result = Labware(implementation=implementation)
-        if self.on_labware_loaded:
+        if self.on_labware_loaded is not None:
             self.on_labware_loaded(result)
         return result
 
@@ -391,7 +397,7 @@ class ProtocolContext(CommandPublisher):
             version=version,
         )
         result = Labware(implementation=implementation)
-        if self.on_labware_loaded:
+        if self.on_labware_loaded is not None:
             self.on_labware_loaded(result)
         return result
 
@@ -595,6 +601,10 @@ class ProtocolContext(CommandPublisher):
             tip_racks=tip_racks,
         )
         self._instruments[checked_mount] = new_instr
+
+        if self.on_instrument_loaded is not None:
+            self.on_instrument_loaded(new_instr)
+
         return new_instr
 
     @property  # type: ignore
