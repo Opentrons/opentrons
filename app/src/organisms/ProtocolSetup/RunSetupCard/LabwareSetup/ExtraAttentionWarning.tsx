@@ -56,6 +56,7 @@ const ModuleWarning = (props: {
           a: (
             <Btn
               as={'span'}
+              id={`ExtraAttentionWarning_${snakeCase(moduleName)}_link`}
               alignSelf={ALIGN_FLEX_END}
               onClick={props.onLinkClick}
               textDecoration={TEXT_DECORATION_UNDERLINE}
@@ -96,7 +97,11 @@ export const ExtraAttentionWarning = (
             <Box size={SIZE_2} paddingY={SPACING_1} paddingRight={SPACING_2}>
               <Icon name="alert-circle" color={COLOR_WARNING} />
             </Box>
-            <Text as="h4" marginY={SPACING_2}>
+            <Text
+              as="h4"
+              marginY={SPACING_2}
+              id={`ExtraAttentionWarning_title`}
+            >
               {t('extra_attention_warning_title')}
             </Text>
           </Flex>
