@@ -89,7 +89,6 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
       )}
       <Flex
         flex="1"
-        backgroundColor={C_NEAR_WHITE}
         borderRadius="6px"
         flexDirection={DIRECTION_COLUMN}
       >

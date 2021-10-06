@@ -78,20 +78,10 @@ export const LabwareSetup = (): JSX.Element | null => {
       )}
       <Flex
         flex="1"
-        backgroundColor={C_NEAR_WHITE}
         borderRadius="6px"
+        maxHeight="85vh"
         flexDirection={DIRECTION_COLUMN}
       >
-        <Btn
-          as={Link}
-          fontSize={FONT_SIZE_BODY_1}
-          color={C_BLUE}
-          alignSelf={ALIGN_FLEX_END}
-          onClick={() => setShowLabwareHelpModal(true)}
-          data-test={'LabwareSetup_helpLink'}
-        >
-          {t('labware_help_link_title')}
-        </Btn>
         {moduleTypesThatRequireExtraAttention.length > 0 && (
           <ExtraAttentionWarning
             moduleTypes={moduleTypesThatRequireExtraAttention}

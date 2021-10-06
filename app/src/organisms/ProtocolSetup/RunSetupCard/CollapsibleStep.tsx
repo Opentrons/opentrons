@@ -2,6 +2,7 @@ import * as React from 'react'
 import {
   Icon,
   Flex,
+  Box,
   Text,
   C_MED_GRAY,
   DIRECTION_COLUMN,
@@ -58,7 +59,13 @@ export function CollapsibleStep({
         {rightAlignedNode != null ? rightAlignedNode : null}
         <Icon size={SIZE_1} name={expanded ? 'minus' : 'plus'} />
       </Flex>
-      {expanded ? children : null}
+      <Box
+        maxHeight={expanded ? "100vh" : "0vh"}
+        transition={expanded ? "max-height 500ms ease-in" : "max-height 500ms ease-out"}
+        overflow="hidden"
+        >
+        {children}
+      </Box>
     </Flex>
   )
 }
