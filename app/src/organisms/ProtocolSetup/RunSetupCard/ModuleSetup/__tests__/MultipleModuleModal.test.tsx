@@ -37,7 +37,7 @@ describe('MultipleModulesModal', () => {
     const { getByRole } = render(props)
     expect(
       getByRole('link', {
-        name: 'Learn more about how to use multiples of a module',
+        name: 'Learn more about using more than one module of the same type',
       }).getAttribute('href')
     ).toBe(
       'https://support.opentrons.com/en/articles/5167312-using-modules-of-the-same-type-on-the-ot-2'

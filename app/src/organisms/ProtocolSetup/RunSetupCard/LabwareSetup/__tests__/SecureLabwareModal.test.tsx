@@ -19,7 +19,7 @@ describe('SecureLabwareModal', () => {
   })
   it('should render the correct modal for magnetic module type', () => {
     const { getByText, getByRole } = render(props)
-    getByText('Securing Labware to the Magnetic Module')
+    getByText('How To Secure Labware to the Magnetic Module')
     getByText(
       'Opentrons recommends ensuring your labware locks to the Magnetic Module by adjusting the black plate bracket on top of the module.'
     )
@@ -40,7 +40,7 @@ describe('SecureLabwareModal', () => {
   it('should render the correct modal for thermocycler module type', () => {
     props = { type: mockTypeTC, onCloseClick: jest.fn() }
     const { getByText, getByRole } = render(props)
-    getByText('Securing Labware to the Thermocycler')
+    getByText('How To Secure Labware to the Thermocycler')
     getByText(
       'Opentrons recommends ensuring your labware locks to the Thermocycler module by securing the Thermocycler Latch Mechanism. This latch secures the plate on the module to ensure level and accurate plate placement for optimal results.'
     )

@@ -118,7 +118,7 @@ export const DeckCalibrationModal = (
                 name={'circle'}
                 marginRight={SPACING_1}
                 marginTop={'0.35rem'}
-                size="5px"
+                size="4px"
               />
               {t('pipette_offset_cal_description_bullet_1')}
             </Flex>
@@ -127,7 +127,7 @@ export const DeckCalibrationModal = (
                 name={'circle'}
                 marginRight={SPACING_1}
                 marginTop={'0.35rem'}
-                size="5px"
+                size="4px"
               />
               {t('pipette_offset_cal_description_bullet_2')}
             </Flex>
