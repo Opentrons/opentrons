@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Trans, useTranslation } from 'react-i18next'
+import { useTranslation } from 'react-i18next'
 import {
   Flex,
   Link,
@@ -19,11 +19,11 @@ import {
   SIZE_2,
   SPACING_3,
   DIRECTION_COLUMN,
-  DIRECTION_ROW,
+  SPACING_1,
+  SPACING_4,
 } from '@opentrons/components'
 import { Portal } from '../../../../App/portal'
-import multipleModuleHelp from '../../../../assets/images/multiple_module_help_example.png'
-
+import multipleModuleHelp from '../../../../assets/images/MoaM_modal_Image.svg'
 import styles from '../../styles.css'
 
 const HOW_TO_MULTIPLE_MODULES_HREF =
@@ -48,30 +48,26 @@ export const MultipleModulesModal = (
             <Icon name={'close'} color={C_MED_DARK_GRAY}></Icon>
           </Btn>
         </Flex>
-        <Flex flexDirection={DIRECTION_ROW}>
+        <Flex flexDirection={DIRECTION_COLUMN} paddingLeft={SPACING_3}>
           <Flex flexDirection={DIRECTION_COLUMN}>
-            <Trans
-              t={t}
-              i18nKey="multiple_modules_explanation"
-              components={{
-                block: (
-                  <Text
-                    fontSize={FONT_SIZE_BODY_1}
-                    fontWeight={FONT_WEIGHT_REGULAR}
-                    marginBottom={SPACING_3}
-                  />
-                ),
-                a_how_to_multiple_modules: (
-                  <Link
-                    fontSize={FONT_SIZE_BODY_1}
-                    color={C_BLUE}
-                    href={HOW_TO_MULTIPLE_MODULES_HREF}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  />
-                ),
-              }}
-            />
+            <Text
+              fontSize={FONT_SIZE_BODY_1}
+              fontWeight={FONT_WEIGHT_REGULAR}
+              marginBottom={SPACING_3}
+            >
+              {t('multiple_modules_explanation')}
+            </Text>
+            <Link
+              fontSize={FONT_SIZE_BODY_1}
+              color={C_BLUE}
+              href={HOW_TO_MULTIPLE_MODULES_HREF}
+              target="_blank"
+              rel="noopener noreferrer"
+              marginBottom={SPACING_3}
+            >
+              {t('multiple_modules_link')}
+              <Icon name={'open-in-new'} marginLeft={SPACING_1} size="10px" />
+            </Link>
             <Text
               as={'h4'}
               fontWeight={FONT_WEIGHT_SEMIBOLD}
@@ -84,6 +80,7 @@ export const MultipleModulesModal = (
               fontSize={FONT_SIZE_BODY_1}
               fontWeight={FONT_WEIGHT_REGULAR}
               title={t('multiple_modules_example')}
+              marginBottom={SPACING_4}
             >
               {t('multiple_modules_example')}
             </Text>
@@ -95,6 +92,7 @@ export const MultipleModulesModal = (
             onClick={props.onCloseClick}
             width={SIZE_4}
             backgroundColor={C_BLUE}
+            marginTop={SPACING_3}
           >
             {t('shared:close')}
           </PrimaryBtn>

@@ -15,6 +15,8 @@ import {
   C_BLUE,
   DIRECTION_COLUMN,
   ALIGN_FLEX_END,
+  Icon,
+  SPACING_1,
 } from '@opentrons/components'
 import { Portal } from '../../../../App/portal'
 import { AskForCalibrationBlockModal } from '../../../../organisms/CalibrateTipLength/AskForCalibrationBlockModal'
@@ -83,16 +85,19 @@ export function PipetteCalibration(props: Props): JSX.Element {
         >
           {t('pipette_mismatch')}
         </Text>
-        <Link
-          external
-          fontSize={FONT_SIZE_BODY_1}
-          href={inexactPipetteSupportArticle}
-          color={C_BLUE}
-          marginRight={SPACING_3}
-          id={'PipetteCalibration_pipetteMismatchHelpLink'}
-        >
-          {t('pipette_compat_help')}
-        </Link>
+        <Flex flexDirection={DIRECTION_COLUMN}>
+          <Link
+            external
+            fontSize={FONT_SIZE_BODY_1}
+            href={inexactPipetteSupportArticle}
+            color={C_BLUE}
+            marginRight={SPACING_3}
+            id={'PipetteCalibration_pipetteMismatchHelpLink'}
+          >
+            {t('pipette_compat_help')}
+            <Icon name={'open-in-new'} marginLeft={SPACING_1} size="10px"/>
+          </Link>
+        </Flex>
       </Flex>
     )
   }
