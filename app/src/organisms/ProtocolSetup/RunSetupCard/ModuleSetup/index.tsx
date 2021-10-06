@@ -19,7 +19,6 @@ import {
   useInterval,
   Tooltip,
   useHoverTooltip,
-  SPACING_3,
 } from '@opentrons/components'
 import { inferModuleOrientationFromXCoordinate } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
