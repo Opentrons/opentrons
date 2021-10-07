@@ -1,12 +1,15 @@
 import * as React from 'react'
-import { connect } from 'react-redux'
+import { connect, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { Fragment, useRef, useEffect } from 'react'
+import useWebSocket, { ReadyState } from 'react-use-websocket'
 
 import {
   actions as robotActions,
   selectors as robotSelectors,
 } from '../../../redux/robot'
 import { getMissingModules } from '../../../redux/modules'
+import { getConnectedRobot } from '../../../redux/discovery'
 
 import { SidePanel, SidePanelGroup } from '@opentrons/components'
 import { RunTimer } from './RunTimer'
@@ -55,6 +58,45 @@ const mapDispatchToProps: MapDispatchToProps<DP, {}> = dispatch => ({
   onResetClick: () => dispatch(robotActions.refreshSession()),
 })
 
+function VolumeTable() {
+  const didUnmount = useRef(false)
+  const connectedRobot = useSelector(getConnectedRobot)
+  const { lastJsonMessage: volumes, readyState } = useWebSocket(
+    // `ws://${connectedRobot.ip}:13555/`,
+    `ws://192.168.1.181:13555/`,
+    {
+      shouldReconnect: () => didUnmount.current === false,
+      reconnectInterval: 3000,
+    }
+  )
+  useEffect(() => () => (didUnmount.current = true), [])
+
+  const connectionStatus = {
+    [ReadyState.CONNECTING]: 'Connecting',
+    [ReadyState.OPEN]: 'Open',
+    [ReadyState.CLOSING]: 'Closing',
+    [ReadyState.CLOSED]: 'Closed',
+    [ReadyState.UNINSTANTIATED]: 'Uninstantiated',
+  }[readyState]
+  if (!volumes) return connectionStatus
+
+  return (
+    <div style={{ padding: 16 }}>
+      <strong>Volumes:</strong>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)' }}>
+        {Object.keys(volumes)
+          .sort()
+          .map(key => (
+            <Fragment key={key}>
+              <span>{key}</span>
+              <span>{volumes[key].toFixed(2)} μL</span>
+            </Fragment>
+          ))}
+      </div>
+    </div>
+  )
+}
+
 export function RunPanelComponent(props: Props): JSX.Element {
   const { t } = useTranslation('run_details')
   const isNewProtocolRunPanel = useFeatureFlag('preProtocolFlowWithoutRPC')
@@ -82,6 +124,7 @@ export function RunPanelComponent(props: Props): JSX.Element {
         />
       </SidePanelGroup>
       <ModuleLiveStatusCards />
+      <VolumeTable />
     </SidePanel>
   )
 }

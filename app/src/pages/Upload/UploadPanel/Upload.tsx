@@ -1,7 +1,12 @@
 import * as React from 'react'
+import { Fragment, useRef, useEffect, useState, useCallback } from 'react'
 import { UploadInput } from './UploadInput'
 import { ConfirmUploadModal } from './ConfirmUploadModal'
 import { UploadMenu } from './UploadMenu'
+import { getConnectedRobot } from '../../../redux/discovery'
+import { connect, useSelector } from 'react-redux'
+import { PrimaryButton, Icon } from '@opentrons/components'
+import useWebSocket, { ReadyState } from 'react-use-websocket'
 
 export interface UploadProps {
   filename: string | null | undefined
@@ -11,6 +16,82 @@ export interface UploadProps {
 
 interface UploadState {
   uploadedFile: File | null | undefined
+}
+
+function VolumeForm() {
+  const didUnmount = useRef(false)
+  const connectedRobot = useSelector(getConnectedRobot)
+  console.log('test', connectedRobot)
+  const [volumes, setVolumes] = useState(null)
+  const { lastJsonMessage, readyState, sendJsonMessage } = useWebSocket(
+    // `ws://${connectedRobot.ip}:13555/`,
+    `ws://192.168.1.181:13555/`,
+    {
+      shouldReconnect: () => didUnmount.current === false,
+      reconnectInterval: 3000,
+    }
+  )
+
+  useEffect(() => () => (didUnmount.current = true), [])
+  useEffect(() => {
+    if (volumes === null && lastJsonMessage) {
+      setVolumes(
+        Object.fromEntries(
+          Object.entries(lastJsonMessage).map(([k, v]) => [k, v.toFixed(2)])
+        )
+      )
+    }
+  }, [lastJsonMessage, volumes])
+
+  const handleChange = useCallback(event => {
+    const { name, value } = event.target
+    setVolumes(volumes => ({ ...volumes, [name]: value }))
+  }, [])
+
+  const handleSubmit = useCallback(
+    event => {
+      event.preventDefault()
+      sendJsonMessage(
+        Object.fromEntries(
+          Object.entries(volumes).map(([k, v]) => [k, parseFloat(v)])
+        )
+      )
+    },
+    [sendJsonMessage, volumes]
+  )
+
+  const connectionStatus = {
+    [ReadyState.CONNECTING]: 'Connecting',
+    [ReadyState.OPEN]: 'Open',
+    [ReadyState.CLOSING]: 'Closing',
+    [ReadyState.CLOSED]: 'Closed',
+    [ReadyState.UNINSTANTIATED]: 'Uninstantiated',
+  }[readyState]
+  if (!volumes) return connectionStatus
+
+  return (
+    <form action="#" style={{ padding: 16 }} onSubmit={handleSubmit}>
+      <strong>Volumes:</strong>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(3, auto)',
+          margin: '10px 0',
+        }}
+      >
+        {Object.keys(volumes)
+          .sort()
+          .map(key => (
+            <Fragment key={key}>
+              <span>{key}</span>
+              <input name={key} value={volumes[key]} onChange={handleChange} />
+              <span>μL</span>
+            </Fragment>
+          ))}
+      </div>
+      <PrimaryButton type="submit">Save</PrimaryButton>
+    </form>
+  )
 }
 
 export class Upload extends React.Component<UploadProps, UploadState> {
@@ -75,13 +156,13 @@ export class Upload extends React.Component<UploadProps, UploadState> {
         {filename && <UploadMenu />}
         <UploadInput onUpload={this.onUpload} isButton />
         <UploadInput onUpload={this.onUpload} />
-
         {uploadedFile && (
           <ConfirmUploadModal
             confirm={this.confirmUpload}
             cancel={this.forgetUpload}
           />
         )}
+        <VolumeForm />
       </>
     )
   }
