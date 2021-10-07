@@ -80,7 +80,7 @@ lint: $(ot_py_sources)
 
 .PHONY: format
 format:
-	$(python) -m black opentrons_hardware tests setup.py
+	$(python) -m black notify_server tests setup.py
 
 .PHONY: dev
 dev: export OT_NOTIFY_SERVER_PRODUCTION := 0

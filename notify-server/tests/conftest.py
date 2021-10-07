@@ -12,5 +12,5 @@ def event() -> Event:
     return Event(
         createdOn=datetime(2000, 1, 1),
         publisher="pub",
-        data=UserData(data={"val1": 1, "val2": 2})
+        data=UserData(data={"val1": 1, "val2": 2}),
     )
