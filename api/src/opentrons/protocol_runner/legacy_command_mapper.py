@@ -38,7 +38,7 @@ class LegacyCommandMapper:
         loaded_modules: Dict[int, LegacyModuleContext[Any]],
         loaded_labware: Dict[int, LegacyLabware],
     ) -> List[pe_commands.Command]:
-        """Map a Broker command to a ProtocolEngine command."""
+        """Map a legacy Broker command to ProtocolEngine commands."""
         command_type = command["name"]
         command_text = command["payload"]["text"]
         stage = command["$"]
