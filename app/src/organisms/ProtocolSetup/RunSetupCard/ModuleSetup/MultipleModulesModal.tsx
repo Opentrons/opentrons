@@ -21,6 +21,7 @@ import {
   DIRECTION_COLUMN,
   SPACING_1,
   SPACING_4,
+  SPACING_2,
 } from '@opentrons/components'
 import { Portal } from '../../../../App/portal'
 import multipleModuleHelp from '../../../../assets/images/MoaM_modal_Image.svg'
@@ -53,7 +54,7 @@ export const MultipleModulesModal = (
             <Text
               fontSize={FONT_SIZE_BODY_1}
               fontWeight={FONT_WEIGHT_REGULAR}
-              marginBottom={SPACING_3}
+              marginBottom={SPACING_1}
             >
               {t('multiple_modules_explanation')}
             </Text>
@@ -71,7 +72,7 @@ export const MultipleModulesModal = (
             <Text
               as={'h4'}
               fontWeight={FONT_WEIGHT_SEMIBOLD}
-              marginBottom={SPACING_3}
+              marginBottom={SPACING_2}
             >
               {t('example')}
             </Text>

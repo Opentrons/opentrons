@@ -42,7 +42,7 @@ describe('DeckCalibrationModal', () => {
       'This measures a pipette’s X, Y and Z values in relation to the pipette mount and the deck. Pipette offset calibration relies on Deck calibration and Tip Length calibration. Perform Pipette Offset calibration the first time you attach it to a new mount.'
     )
     getByText('Redo Pipette Offset calibration after:')
-    getByText('Performing Deck Calibration')
+    getByText('Performing Deck calibration')
     getByText(
       'Redoing Tip Length calibration for the tip you used to calibration pipette'
     )
