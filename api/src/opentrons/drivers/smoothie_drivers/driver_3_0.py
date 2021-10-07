@@ -501,7 +501,7 @@ class SmoothieDriver:
             self.homed_flags.update({ax: False for ax in AXES})
         elif await self.is_connected():
 
-            async def _recursive_update_homed_flags(retries: int)  -> None:
+            async def _recursive_update_homed_flags(retries: int) -> None:
                 try:
                     res = await self._send_command(
                         _command_builder().add_gcode(gcode=GCODE.HOMING_STATUS)
@@ -526,7 +526,7 @@ class SmoothieDriver:
         pass
 
     @property
-    def steps_per_mm(seupdate_steps_per_mmlf) -> Dict[str, float]:
+    def steps_per_mm(self) -> Dict[str, float]:
         return self._steps_per_mm
 
     @contextlib.asynccontextmanager

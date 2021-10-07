@@ -3,7 +3,7 @@ from __future__ import annotations
 import asyncio
 import contextlib
 from concurrent.futures.thread import ThreadPoolExecutor
-from typing import Optional
+from typing import Optional, Generator
 
 from serial import Serial, serial_for_url  # type: ignore
 
@@ -150,7 +150,7 @@ class AsyncSerial:
         return self._serial.is_open
 
     @contextlib.contextmanager
-    def _timeout_override(self, timeout_property: str, timeout: Optional[float]):
+    def _timeout_override(self, timeout_property: str, timeout: Optional[float]) -> Generator[None, None, None]:
         """Context manager that will temporarily override the default timeout."""
         default_timeout = getattr(self._serial, timeout_property)
         override = timeout is not None and default_timeout != timeout

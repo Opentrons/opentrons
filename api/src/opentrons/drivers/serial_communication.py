@@ -6,7 +6,7 @@ from serial.tools import list_ports  # type: ignore
 import contextlib
 import logging
 
-from serial.tools.list_ports_common import ListPortInfo
+from serial.tools.list_ports_common import ListPortInfo # type: ignore
 
 log = logging.getLogger(__name__)
 
