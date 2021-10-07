@@ -1,4 +1,4 @@
-"""Customize the ProtocolEngine to monitor and conrol legacy (APIv2) protocols."""
+"""Customize the ProtocolEngine to monitor and control legacy (APIv2) protocols."""
 from __future__ import annotations
 from typing import Callable, Optional
 
