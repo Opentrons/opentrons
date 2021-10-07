@@ -1,6 +1,8 @@
 import { PipetteName } from '../../../js'
-import type { V6Command } from './command'
+import type { Command } from './command'
 import type { LabwareDefinition2, ModuleModel } from '../../../js/types'
+
+export * from './command'
 
 // NOTE: must be kept in sync with '../schemas/6.json'
 export interface ProtocolFile<DesignerApplicationData> {
@@ -42,7 +44,7 @@ export interface ProtocolFile<DesignerApplicationData> {
       model: ModuleModel
     }
   }
-  commands: V6Command[]
+  commands: Command[]
   commandAnnotations?: {
     commandIds: string[]
     annotationType: string

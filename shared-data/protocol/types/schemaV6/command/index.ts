@@ -8,7 +8,7 @@ interface CommonCommand {
   id: string
 }
 
-export type V6Command = CommonCommand &
+export type Command = CommonCommand &
   (
     | PipettingCommand // involves the pipettes plunger motor
     | GantryCommand // movement that only effects the x,y,z position of the gantry/pipette
