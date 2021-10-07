@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { LabwarePositionCheckStep } from './types'
+import { LabwarePositionCheckStepDetail } from './LabwarePositionCheckStepDetail'
+import type { LabwarePositionCheckStep } from './types'
 
 interface GenericStepScreenProps {
   selectedStep: LabwarePositionCheckStep
@@ -7,4 +8,6 @@ interface GenericStepScreenProps {
 }
 export const GenericStepScreen = (
   props: GenericStepScreenProps
-): JSX.Element | null => <div></div>
+): JSX.Element | null => {
+  return <LabwarePositionCheckStepDetail selectedStep={props.selectedStep} />
+}
