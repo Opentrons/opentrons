@@ -39,41 +39,40 @@ class LegacyContextPlugin(AbstractPlugin):
         self._hardware_api = hardware_api
         self._protocol_context = protocol_context
         self._legacy_command_mapper = legacy_command_mapper or LegacyCommandMapper()
+
+        self._subscriptions_are_set_up: bool = False
         self._unsubscribe_broker: Optional[Callable[[], None]] = None
 
     def handle_action(self, action: pe_actions.Action) -> None:
         """React to a ProtocolEngine action."""
         if isinstance(action, pe_actions.PlayAction):
-            if self._unsubscribe_broker is None:
-                self._unsubscribe_broker = self._protocol_context.broker.subscribe(
-                    topic="command",
-                    handler=self._dispatch_legacy_command,
-                )
-
-            if self._protocol_context.on_labware_loaded is None:
-                self._protocol_context.on_labware_loaded = self._dispatch_labware_loaded
-            else:
-                assert (
-                    self._protocol_context.on_labware_loaded
-                    == self._dispatch_labware_loaded
-                )
-            if self._protocol_context.on_instrument_loaded is None:
-                self._protocol_context.on_instrument_loaded = (
-                    self._dispatch_instrument_loaded
-                )
-            else:
-                assert (
-                    self._protocol_context.on_instrument_loaded
-                    == self._dispatch_instrument_loaded
-                )
-
+            if not self._subscriptions_are_set_up:
+                self._set_up_subscriptions()
             self._hardware_api.resume(HardwarePauseType.PAUSE)
 
         elif isinstance(action, pe_actions.PauseAction):
             self._hardware_api.pause(HardwarePauseType.PAUSE)
 
-        elif isinstance(action, pe_actions.StopAction) and self._unsubscribe_broker:
+        elif isinstance(action, pe_actions.StopAction):
+            self._tear_down_subscriptions()
+
+    def _set_up_subscriptions(self) -> None:
+        assert not self._subscriptions_are_set_up
+        self._unsubscribe_broker = self._protocol_context.broker.subscribe(
+            topic="command",
+            handler=self._dispatch_legacy_command,
+        )
+        self._protocol_context.on_labware_loaded = self._dispatch_labware_loaded
+        self._protocol_context.on_instrument_loaded = self._dispatch_instrument_loaded
+        self._subscriptions_are_set_up = True
+
+    def _tear_down_subscriptions(self) -> None:
+        if self._subscriptions_are_set_up:
+            assert self._unsubscribe_broker is not None
             self._unsubscribe_broker()
+            self._protocol_context.on_labware_loaded = None
+            self._protocol_context.on_instrument_loaded = None
+            self._subscriptions_are_set_up = False
 
     def _dispatch_legacy_command(self, command: LegacyCommand) -> None:
         pe_commands = self._legacy_command_mapper.map_brokered_command(
