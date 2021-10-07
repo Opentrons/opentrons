@@ -1,11 +1,11 @@
 import * as React from 'react'
 import cx from 'classnames'
+import { C_BLUE } from '../../../styles/colors'
 import { RobotCoordsText } from '../../Deck'
 import { WellLabelOption, WELL_LABEL_OPTIONS } from '../LabwareRender'
 import styles from './WellLabels.css'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { HighlightedWellLabels } from './types'
-
 
 // magic layout numbers to make the letters close to the edges of the labware
 const LETTER_COLUMN_X_INSIDE = 4
@@ -28,6 +28,7 @@ const Labels = (props: {
   highlightedWellLabels?: HighlightedWellLabels
 }): JSX.Element => {
   const { wellLabelOption, highlightedWellLabels } = props
+  const highlightColor = highlightedWellLabels?.color ?? C_BLUE
   const LETTER_COLUMN_X =
     wellLabelOption === WELL_LABEL_OPTIONS.SHOW_LABEL_INSIDE
       ? LETTER_COLUMN_X_INSIDE
@@ -54,11 +55,12 @@ const Labels = (props: {
             }
             className={cx(styles.label_text, {
               [styles.letter_column]: props.isLetterColumn,
-              [styles.label_highlight]:
-                highlightedWellLabels != null &&
-                Object.keys(highlightedWellLabels.wells)?.includes(wellName),
             })}
-            fill={highlightedWellLabels?.highlightColor}
+            fill={
+              highlightedWellLabels?.wells.includes(wellName)
+                ? highlightColor
+                : undefined
+            }
           >
             {(props.isLetterColumn ? /[A-Z]+/g : /\d+/g).exec(wellName)}
           </RobotCoordsText>

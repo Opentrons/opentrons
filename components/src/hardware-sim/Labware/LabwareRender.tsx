@@ -12,8 +12,10 @@ import type {
   HighlightedWellLabels,
   WellMouseEvent,
   WellFill,
+  WellStroke,
   WellGroup,
 } from './labwareInternals/types'
+import { StrokedWells } from './labwareInternals/StrokedWells'
 
 export const WELL_LABEL_OPTIONS = {
   SHOW_LABEL_INSIDE: 'SHOW_LABEL_INSIDE',
@@ -25,12 +27,14 @@ export type WellLabelOption = keyof typeof WELL_LABEL_OPTIONS
 export interface LabwareRenderProps {
   definition: LabwareDefinition2
   wellLabelOption?: WellLabelOption
-  highlightedWells?: WellGroup
+  highlightedWells?: WellGroup | null | undefined
   missingTips?: WellGroup | null | undefined
   highlightedWellLabels?: HighlightedWellLabels
   selectedWells?: WellGroup | null | undefined
   /** CSS color to fill specified wells */
   wellFill?: WellFill
+  /** CSS color to fill specified wells */
+  wellStroke?: WellStroke
   /** Optional callback, called with WellMouseEvent args onMouseEnter */
   onMouseEnterWell?: (e: WellMouseEvent) => unknown
   /** Optional callback, called with WellMouseEvent args onMouseLeave */
@@ -56,6 +60,12 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
         onMouseLeaveWell={props.onMouseLeaveWell}
         selectableWellClass={props.selectableWellClass}
       />
+      {props.wellStroke && (
+        <StrokedWells
+          definition={props.definition}
+          strokeByWell={props.wellStroke}
+        />
+      )}
       {props.wellFill && (
         <FilledWells
           definition={props.definition}

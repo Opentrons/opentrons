@@ -2,7 +2,6 @@ import assert from 'assert'
 import * as React from 'react'
 import cx from 'classnames'
 import styles from './Well.css'
-import { C_MED_GRAY, C_WHITE, C_BLUE } from '../../../styles/colors'
 
 import type { LabwareWell } from '@opentrons/shared-data'
 import type { CSSProperties } from 'styled-components'

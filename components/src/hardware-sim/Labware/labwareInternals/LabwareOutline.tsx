@@ -2,7 +2,6 @@ import * as React from 'react'
 import cx from 'classnames'
 import { SLOT_RENDER_WIDTH, SLOT_RENDER_HEIGHT } from '@opentrons/shared-data'
 import styles from './LabwareOutline.css'
-import { C_LIGHT_GRAY, C_MED_GRAY } from '../../../styles/colors'
 
 import type { CSSProperties } from 'styled-components'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'

@@ -31,7 +31,6 @@ import { getModuleTypesThatRequireExtraAttention } from './utils/getModuleTypesT
 import { ExtraAttentionWarning } from './ExtraAttentionWarning'
 import styles from '../../styles.css'
 import { useModuleRenderInfoById, useLabwareRenderInfoById } from '../../hooks'
-import { WELL_LABEL_OPTIONS } from '../../../../../../components/src/hardware-sim/Labware/LabwareRender'
 
 const DECK_LAYER_BLOCKLIST = [
   'calibrationMarkings',
@@ -140,13 +139,7 @@ export const LabwareSetup = (): JSX.Element | null => {
                       key={`LabwareSetup_Labware_${labwareDef.metadata.displayName}_${x}${y}`}
                     >
                       <g transform={`translate(${x},${y})`}>
-                        <LabwareRender
-                          definition={labwareDef}
-                          wellLabelOption={
-                            WELL_LABEL_OPTIONS.SHOW_LABEL_OUTSIDE
-                          }
-                          highlightedWellLabels={['A1']}
-                        />
+                        <LabwareRender definition={labwareDef} />
                         <LabwareInfoOverlay definition={labwareDef} />
                       </g>
                     </React.Fragment>

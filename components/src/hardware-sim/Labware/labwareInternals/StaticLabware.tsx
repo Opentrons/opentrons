@@ -2,7 +2,6 @@
 import assert from 'assert'
 import * as React from 'react'
 import flatMap from 'lodash/flatMap'
-import cx from 'classnames'
 
 import { LabwareOutline } from './LabwareOutline'
 import { Well } from './Well'
@@ -40,7 +39,7 @@ function StaticLabwareComponent(props: StaticLabwareProps): JSX.Element {
   return (
     <g>
       <g className={styles.labware_detail_group}>
-        <LabwareOutline definition={props.definition} stroke={'blue'}/>
+        <LabwareOutline definition={props.definition}/>
       </g>
       <g>
         {flatMap(

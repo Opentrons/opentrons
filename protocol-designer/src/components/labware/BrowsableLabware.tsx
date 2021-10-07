@@ -6,7 +6,7 @@ import { SingleLabware } from './SingleLabware'
 import { wellFillFromWellContents } from './utils'
 import { ContentsByWell } from '../../labware-ingred/types'
 import { WellIngredientNames } from '../../steplist/types'
-import { WellGroup } from '@opentrons/components'
+import { WellGroup, WELL_LABEL_OPTIONS } from '@opentrons/components'
 import { LabwareDefinition2 } from '@opentrons/shared-data'
 
 import { WellTooltip } from './WellTooltip'
@@ -33,7 +33,7 @@ export function BrowsableLabware(props: Props): JSX.Element | null {
       }) => (
         <SingleLabware
           definition={definition}
-          showLabels
+          wellLabelOption={WELL_LABEL_OPTIONS.SHOW_LABEL_INSIDE}
           wellFill={wellFillFromWellContents(wellContents)}
           highlightedWells={
             wellContents === null

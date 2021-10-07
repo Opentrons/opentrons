@@ -8,6 +8,7 @@ import {
   OutlineButton,
   LabeledValue,
   WellGroup,
+  WELL_LABEL_OPTIONS,
 } from '@opentrons/components'
 import {
   sortWells,
@@ -93,7 +94,7 @@ const WellSelectionModalComponent = (
       {labwareDef && (
         <SelectableLabware
           labwareProps={{
-            showLabels: true,
+            wellLabelOption: WELL_LABEL_OPTIONS.SHOW_LABEL_INSIDE,
             definition: labwareDef,
             highlightedWells,
             wellFill: wellFillFromWellContents(wellContents),
