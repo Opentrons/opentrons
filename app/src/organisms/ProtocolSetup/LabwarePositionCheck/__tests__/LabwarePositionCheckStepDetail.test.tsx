@@ -1,5 +1,4 @@
 import * as React from 'react'
-import '@testing-library/jest-dom'
 import { when } from 'jest-when'
 import {
   partialComponentPropsMatcher,

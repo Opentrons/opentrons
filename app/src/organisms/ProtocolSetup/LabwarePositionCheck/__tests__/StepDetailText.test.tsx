@@ -8,7 +8,7 @@ import { nestedTextMatcher } from '@opentrons/components/src/testing/utils/neste
 import {
   componentPropsMatcher,
   renderWithProviders,
-} from '@opentrons/components/src/testing/utils'
+} from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import { useProtocolDetails } from '../../../RunDetails/hooks'
 import { LabwarePositionCheckStepDetailModal } from '../LabwarePositionCheckStepDetailModal'
