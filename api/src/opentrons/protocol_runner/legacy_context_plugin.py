@@ -1,4 +1,4 @@
-"""Customize the ProtocolEngine to control and track state of legacy protocols."""
+"""Customize the ProtocolEngine to monitor and conrol legacy (APIv2) protocols."""
 from __future__ import annotations
 from typing import Callable, Optional
 
@@ -25,8 +25,9 @@ class LegacyContextPlugin(AbstractPlugin):
 
     1. Play/pause the protocol run using the HardwareAPI, as was done before
        the ProtocolEngine existed.
-    2. Subscribe to the message broker commands and insert them into
-       ProtocolEngine state for purely progress tracking purposes.
+    2. Subscribe to what is being done with the legacy ProtocolContext,
+       and insert matching commands into ProtocolEngine state for
+       purely progress-tracking purposes.
     """
 
     def __init__(
