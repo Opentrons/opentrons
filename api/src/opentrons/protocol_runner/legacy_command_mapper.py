@@ -48,11 +48,6 @@ class LegacyCommandMapper:
         results: List[pe_commands.Command] = []
 
         if stage == "before":
-            # TODO(mc, 2021-09-28): equipment mapping behavior seems
-            # best tested e2e, but current smoke tests won't remain sufficient
-            # for very long. Figure out a better testing strategy
-            results += self._load_new_pipettes(loaded_pipettes)
-
             count = self._command_count[command_type]
             command_id = f"{command_type}-{count}"
             engine_command = pe_commands.Custom(
@@ -87,6 +82,7 @@ class LegacyCommandMapper:
     def map_labware_loaded(
         self, loaded_labware: LegacyLabware
     ) -> List[pe_commands.Command]:
+        """Map a legacy labware load to Protocol Engine commands."""
         now = utc_now()
 
         namespace, load_name, version = loaded_labware.uri.split("/")
@@ -133,38 +129,30 @@ class LegacyCommandMapper:
         self._command_count["LOAD_LABWARE"] = count + 1
         return [load_labware_command]
 
-    def map_pipette_load(self) -> None:
-        raise NotImplementedError()
-
-    def map_module_load(self) -> None:
-        raise NotImplementedError()
-
-    def _load_new_pipettes(
-        self,
-        loaded_pipettes: Dict[str, LegacyPipetteContext],
+    def map_instrument_loaded(
+        self, loaded_instrument: LegacyPipetteContext
     ) -> List[pe_commands.Command]:
-        results: List[pe_commands.Command] = []
+        """Map a legacy instrument (pipette) load to Protocol Engine commands."""
+        now = utc_now()
 
-        for mount, pipette in loaded_pipettes.items():
-            if mount not in self._loaded_pipette_mounts:
-                self._loaded_pipette_mounts.add(mount)
-                now = utc_now()
+        count = self._command_count["LOAD_PIPETTE"]
+        name = loaded_instrument.name
+        mount = loaded_instrument.mount
 
-                results.append(
-                    pe_commands.LoadPipette(
-                        id=f"commands.LOAD_PIPETTE-{mount}",
-                        status=pe_commands.CommandStatus.SUCCEEDED,
-                        createdAt=now,
-                        startedAt=now,
-                        completedAt=now,
-                        data=pe_commands.LoadPipetteData(
-                            pipetteName=pe_types.PipetteName(pipette.name),
-                            mount=MountType(mount),
-                        ),
-                        result=pe_commands.LoadPipetteResult(
-                            pipetteId=f"pipette-{mount}",
-                        ),
-                    )
-                )
+        load_pipette_command = pe_commands.LoadPipette(
+            id=f"commands.LOAD_PIPETTE-{count}",
+            status=pe_commands.CommandStatus.SUCCEEDED,
+            createdAt=now,
+            startedAt=now,
+            completedAt=now,
+            data=pe_commands.LoadPipetteData(
+                pipetteName=pe_types.PipetteName(name),
+                mount=MountType(mount),
+            ),
+            result=pe_commands.LoadPipetteResult(
+                pipetteId=f"pipette-{count}",
+            ),
+        )
 
-        return results
+        self._command_count["LOAD_PIPETTE"] = count + 1
+        return [load_pipette_command]
