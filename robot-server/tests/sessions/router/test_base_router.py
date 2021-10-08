@@ -322,7 +322,7 @@ def test_get_session(
         commands=[
             SessionCommandSummary(
                 id=command.id,
-                commandType=command.commandType,
+                commandType=command.commandTypeType,
                 status=command.status,
             ),
         ],

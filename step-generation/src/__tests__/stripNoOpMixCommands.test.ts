@@ -1,5 +1,5 @@
 import { _stripNoOpMixCommands } from '../utils/stripNoOpCommands'
-import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
+import type { Command } from '@opentrons/shared-data/protocol/types/schemaV5Addendum'
 
 describe('_stripNoOpMixCommands', () => {
   it('should remove pairs of aspirate+dispense commands when they result in no liquid changes', () => {
