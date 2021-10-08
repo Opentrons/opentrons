@@ -29,6 +29,7 @@ from .util import use_or_initialize_loop, DeckTransformState, check_motion_bound
 from .pipette import Pipette, generate_hardware_configs, load_from_config_and_check_skip
 from .controller import Controller
 from .simulator import Simulator
+from .ot3controller import OT3Controller
 from .constants import (
     SHAKE_OFF_TIPS_SPEED,
     SHAKE_OFF_TIPS_DROP_DISTANCE,
@@ -83,7 +84,7 @@ class API(HardwareAPILike):
 
     def __init__(
         self,
-        backend: Union[Controller, Simulator],
+        backend: Union[Controller, Simulator, OT3Controller],
         loop: asyncio.AbstractEventLoop,
         config: RobotConfig,
     ) -> None:
@@ -257,6 +258,21 @@ class API(HardwareAPILike):
         backend.module_controls = module_controls
         await backend.watch()
         return api_instance
+
+    @classmethod
+    async def build_ot3_controller(
+        cls,
+        attached_instruments: Dict[top_types.Mount, Dict[str, Optional[str]]] = None,
+        attached_modules: List[str] = None,
+        config: RobotConfig = None,
+        loop: asyncio.AbstractEventLoop = None,
+        strict_attached_instruments: bool = True,
+    ) -> "API":
+        """Build an ot3 hardware controller."""
+        checked_loop = use_or_initialize_loop(loop)
+        checked_config = config or robot_configs.load()
+        backend = await OT3Controller.build(checked_config)
+        return cls(backend, loop=checked_loop, config=checked_config)
 
     def __repr__(self):
         return "<{} using backend {}>".format(type(self), type(self._backend))
