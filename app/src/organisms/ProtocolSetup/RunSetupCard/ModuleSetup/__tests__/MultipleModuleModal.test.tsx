@@ -18,15 +18,14 @@ describe('MultipleModulesModal', () => {
 
   it('should render the correct header', () => {
     const { getByRole } = render(props)
-    expect(getByRole('heading', { name: 'Multiple Modules Help' })).toBeTruthy()
+    expect(
+      getByRole('heading', { name: 'Setting Up Modules of the Same Type' })
+    ).toBeTruthy()
   })
   it('should render the correct body', () => {
     const { getByRole, getByText } = render(props)
     getByText(
-      'To use multiples of a module in one protocol, you need to plug in the module that’s in the lowest numbered deck slot in the lowest numbered USB port on the OT-2.'
-    )
-    getByText(
-      'Currently, you can use multiple Magnetic Modules or multiple Temperature Modules. You won’t be able to load multiple Thermocycler Modules.'
+      'To use more than one of the same module in a protocol, you first need to plug in the module that’s in the lowest numbered deck slot to the lowest numbered USB port on the OT-2. Continue in the same manner with additional modules.'
     )
     expect(getByRole('heading', { name: 'Example' })).toBeTruthy()
 
@@ -38,7 +37,7 @@ describe('MultipleModulesModal', () => {
     const { getByRole } = render(props)
     expect(
       getByRole('link', {
-        name: 'Learn more about how to use multiples of a module',
+        name: 'Learn more about using more than one module of the same type',
       }).getAttribute('href')
     ).toBe(
       'https://support.opentrons.com/en/articles/5167312-using-modules-of-the-same-type-on-the-ot-2'
