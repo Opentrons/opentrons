@@ -1,6 +1,6 @@
 import * as React from 'react'
 import cx from 'classnames'
-import { C_BLUE } from '../../../styles/colors'
+import { C_BLACK, C_BLUE } from '../../../styles/colors'
 import { RobotCoordsText } from '../../Deck'
 import { WellLabelOption, WELL_LABEL_OPTIONS } from '../LabwareRender'
 import styles from './WellLabels.css'
@@ -18,6 +18,7 @@ export interface WellLabelsProps {
   definition: LabwareDefinition2
   wellLabelOption: WellLabelOption
   highlightedWellLabels?: HighlightedWellLabels
+  wellLabelColor?: string
 }
 
 const Labels = (props: {
@@ -26,9 +27,11 @@ const Labels = (props: {
   wellLabelOption: WellLabelOption
   isLetterColumn?: boolean
   highlightedWellLabels?: HighlightedWellLabels
+  wellLabelColor?: string
 }): JSX.Element => {
-  const { wellLabelOption, highlightedWellLabels } = props
+  const { wellLabelOption, highlightedWellLabels, wellLabelColor } = props
   const highlightColor = highlightedWellLabels?.color ?? C_BLUE
+  const fillColor = wellLabelColor ?? C_BLACK
   const LETTER_COLUMN_X =
     wellLabelOption === WELL_LABEL_OPTIONS.SHOW_LABEL_INSIDE
       ? LETTER_COLUMN_X_INSIDE
@@ -59,7 +62,7 @@ const Labels = (props: {
             fill={
               highlightedWellLabels?.wells.includes(wellName)
                 ? highlightColor
-                : undefined
+                : fillColor
             }
           >
             {(props.isLetterColumn ? /[A-Z]+/g : /\d+/g).exec(wellName)}
@@ -71,7 +74,12 @@ const Labels = (props: {
 }
 
 function WellLabelsComponent(props: WellLabelsProps): JSX.Element {
-  const { definition, wellLabelOption, highlightedWellLabels } = props
+  const {
+    definition,
+    wellLabelOption,
+    highlightedWellLabels,
+    wellLabelColor,
+  } = props
   const letterColumn = definition.ordering[0]
   // TODO(bc, 2021-03-08): replace types here with real ones once shared data is in TS
   const numberRow = definition.ordering.map((wellCol: any[]) => wellCol[0])
@@ -83,6 +91,7 @@ function WellLabelsComponent(props: WellLabelsProps): JSX.Element {
         wells={letterColumn}
         wellLabelOption={wellLabelOption}
         highlightedWellLabels={highlightedWellLabels}
+        wellLabelColor={wellLabelColor}
         isLetterColumn
       />
       <Labels
@@ -90,6 +99,7 @@ function WellLabelsComponent(props: WellLabelsProps): JSX.Element {
         wells={numberRow}
         wellLabelOption={wellLabelOption}
         highlightedWellLabels={highlightedWellLabels}
+        wellLabelColor={wellLabelColor}
       />
     </g>
   )

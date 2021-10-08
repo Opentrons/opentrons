@@ -10,13 +10,14 @@ import {
   LabwareRender,
   PipetteRender,
   WellStroke,
+  WELL_LABEL_OPTIONS,
+  C_BLUE,
+  C_MED_GRAY,
 } from '@opentrons/components'
+import { getPipetteNameSpecs } from '@opentrons/shared-data'
 import { useProtocolDetails } from '../../RunDetails/hooks'
 import { StepDetailText } from './StepDetailText'
-import { LabwarePositionCheckStep } from './types'
-import { C_BLUE } from '../../../../../components/src/styles/colors'
-import { WELL_LABEL_OPTIONS } from '../../../../../components/src/hardware-sim/Labware/LabwareRender'
-import { getPipetteNameSpecs } from '@opentrons/shared-data'
+import type { LabwarePositionCheckStep } from './types'
 
 const DECK_MAP_VIEWBOX = '-10 -70 180 180'
 interface LabwarePositionCheckStepDetailProps {
@@ -86,6 +87,8 @@ export const LabwarePositionCheckStepDetail = (
               wellStroke={wellStroke}
               wellLabelOption={WELL_LABEL_OPTIONS.SHOW_LABEL_OUTSIDE}
               highlightedWellLabels={{ wells: wellsToHighlight }}
+              labwareStroke={C_MED_GRAY}
+              wellLabelColor={C_MED_GRAY}
             />
             <PipetteRender labwareDef={labwareDef} pipetteName={pipetteName} />
           </React.Fragment>

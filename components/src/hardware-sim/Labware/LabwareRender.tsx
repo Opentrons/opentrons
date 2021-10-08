@@ -5,6 +5,7 @@ import {
   FilledWells,
   StaticLabware,
 } from './labwareInternals'
+import { StrokedWells } from './labwareInternals/StrokedWells'
 import styles from './LabwareRender.css'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
@@ -15,7 +16,7 @@ import type {
   WellStroke,
   WellGroup,
 } from './labwareInternals/types'
-import { StrokedWells } from './labwareInternals/StrokedWells'
+import type { CSSProperties } from 'styled-components'
 
 export const WELL_LABEL_OPTIONS = {
   SHOW_LABEL_INSIDE: 'SHOW_LABEL_INSIDE',
@@ -25,16 +26,24 @@ export const WELL_LABEL_OPTIONS = {
 export type WellLabelOption = keyof typeof WELL_LABEL_OPTIONS
 
 export interface LabwareRenderProps {
+  /** Labware definition to render */
   definition: LabwareDefinition2
+  /** option to show well labels inside or outside of labware outline */
   wellLabelOption?: WellLabelOption
+  /** wells to highlight */
   highlightedWells?: WellGroup | null | undefined
   missingTips?: WellGroup | null | undefined
+  /** color to render well labels */
+  wellLabelColor?: string
+  /** option to highlight well labels with specified color */
   highlightedWellLabels?: HighlightedWellLabels
   selectedWells?: WellGroup | null | undefined
   /** CSS color to fill specified wells */
   wellFill?: WellFill
-  /** CSS color to fill specified wells */
+  /** CSS color to stroke specified wells */
   wellStroke?: WellStroke
+  /** CSS color to stroke the labware outline */
+  labwareStroke?: CSSProperties['stroke']
   /** Optional callback, called with WellMouseEvent args onMouseEnter */
   onMouseEnterWell?: (e: WellMouseEvent) => unknown
   /** Optional callback, called with WellMouseEvent args onMouseLeave */
@@ -97,6 +106,7 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
         <WellLabels
           definition={props.definition}
           wellLabelOption={props.wellLabelOption}
+          wellLabelColor={props.wellLabelColor}
           highlightedWellLabels={props.highlightedWellLabels}
         />
       )}
