@@ -1519,12 +1519,51 @@ class InstrumentContext(CommandPublisher):
 
     @requires_version(2, 7)
     def pair_with(self, instrument: InstrumentContext) -> PairedInstrumentContext:
-        """This function allows you to pair both of your pipettes and use
-        them simultaneously. The function implicitly decides a primary
-        and secondary pipette based on which instrument you call this
-        function on.
+        """Pair this pipette with another one so you can use both simultaneously.
 
-        :param instrument: The secondary instrument you wish to use
+        .. warning::
+
+            Pipette pairing was an experimental feature
+            intended for Opentrons' own internal use.
+
+            **We no longer support this method in any way.**
+            We can't help you if you use it and run into any problems.
+
+            We keep this documentation here
+            for the benefit of people working with old protocols.
+            New protocols shouldn't use this method.
+
+            In a future robot software update,
+            we might change pipette pairing in a way that isn't backwards-compatible,
+            or even remove it entirely.
+            We might do this without advance warning,
+            and without leaving a way for you to restore the old behavior
+            by lowering your protocol's :ref:`apiLevel <v2-versioning>`.
+
+        Limitations:
+
+        * Only :ref:`building block commands <v2-atomic-commands>` are supported,
+          not :ref:`complex commands <v2-complex-commands>`.
+        * Only pipettes of the same type are supported.
+          For example, you can't pair a P1000 Single-Channel with a P300 Single-Channel.
+        * All positioning is based on the *primary pipette* only.
+          (See below for the difference between the primary pipette
+          and the secondary pipette.)
+          The physical offset between the two pipettes is assumed to match
+          an idealized value.
+          The OT-2's pipette offset calibration is not taken into account.
+
+          If the physical offset does not exactly match the ideal,
+          then the secondary pipette will always be off-position.
+          The OT-2 hardware does not provide an easy way
+          of adjusting the physical offset to fix this.
+
+        The :py:obj:`InstrumentContext` on which you call this method
+        is designated the *primary pipette*,
+        and the :py:obj:`InstrumentContext` that you provide as an argument
+        is designated the *secondary pipette*.
+
+        :param instrument: The secondary pipette that you wish to use.
 
         :raises: ``UnsupportedInstrumentPairingError`` -- if you try to pair pipettes
                  that are not currently supported together.
@@ -1534,15 +1573,6 @@ class InstrumentContext(CommandPublisher):
                   pipette's building block commands found at :ref:`v2-atomic-commands`,
                   and when you want to move pipettes simultaneously you need to use the
                   ``PairedInstrumentContext``.
-
-        Limitations:
-
-        1. This function utilizes a "primary" and "secondary" pipette to make
-           positional decisions. The consequence of doing this is that all X & Y
-           positions are based on the primary pipette only.
-        2. At this time, only pipettes of the same type are supported for
-           pipette pairing. This means that you cannot utilize a P1000 Single
-           channel and a P300 Single channel at the same time.
 
         .. code-block :: python
             :substitutions:
@@ -1575,12 +1605,6 @@ class InstrumentContext(CommandPublisher):
                 left_paired_with_right = left_pipette.pair_with(right_pipette)
                 left_paired_with_right.pick_up_tip()
                 left_paired_with_right.drop_tip()
-
-        .. note::
-
-            Before using this method, you should seriously consider whether
-            this is the best fit for your use-case especially given the
-            limitations listed above.
         """
         if instrument.name != self.name:
             raise UnsupportedInstrumentPairingError(

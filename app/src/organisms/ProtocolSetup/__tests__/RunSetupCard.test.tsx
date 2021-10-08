@@ -195,15 +195,13 @@ describe('RunSetupCard', () => {
     expect(getByRole('heading', { name: 'STEP 2' })).toBeTruthy()
     expect(getByRole('heading', { name: 'Labware Setup' })).toBeTruthy()
     expect(
-      getByText(
-        'Position full tip racks and labware in the deck slots as shown in the deck map.'
-      )
+      getByText('Position full tipracks and labware as shown in the deck map.')
     ).toBeTruthy()
     expect(getByRole('heading', { name: 'STEP 3' })).toBeTruthy()
     expect(getByRole('heading', { name: 'Module Setup' })).toBeTruthy()
     expect(
       getByText(
-        'Plug in and power up the required modules via the OT-2 USB Ports. Place the modules as shown in the deck map.'
+        'Plug in and turn on the required modules via the OT-2 USB Ports. Place the modules as shown in the deck map.'
       )
     ).toBeTruthy()
   })
@@ -227,15 +225,13 @@ describe('RunSetupCard', () => {
     expect(getByRole('heading', { name: 'STEP 2' })).toBeTruthy()
     expect(getByRole('heading', { name: 'Labware Setup' })).toBeTruthy()
     expect(
-      getByText(
-        'Position full tip racks and labware in the deck slots as shown in the deck map.'
-      )
+      getByText('Position full tipracks and labware as shown in the deck map.')
     ).toBeTruthy()
     expect(getByRole('heading', { name: 'STEP 3' })).toBeTruthy()
     expect(getByRole('heading', { name: 'Module Setup' })).toBeTruthy()
     expect(
       getByText(
-        'Plug in and power up the required module via the OT-2 USB Port. Place the module as shown in the deck map.'
+        'Plug in and turn on the required module via the OT-2 USB Port. Place the module as shown in the deck map.'
       )
     ).toBeTruthy()
   })
