@@ -96,12 +96,12 @@ class LegacyContextPlugin(AbstractPlugin):
         )
         self._unsubscribe_from_labware_loaded_broker = (
             self._protocol_context.labware_loaded_broker.subscribe(
-                self._dispatch_labware_loaded
+                callback=self._dispatch_labware_loaded
             )
         )
         self._unsubscribe_from_instrument_loaded_broker = (
             self._protocol_context.instrument_loaded_broker.subscribe(
-                self._dispatch_instrument_loaded
+                callback=self._dispatch_instrument_loaded
             )
         )
         self._subscriptions_are_set_up = True

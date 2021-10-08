@@ -98,22 +98,32 @@ def test_broker_subscribe_unsubscribe(
     legacy_command_mapper: LegacyCommandMapper,
     subject: LegacyContextPlugin,
 ) -> None:
-    """It should subscribe to the broker on play and unsubscribe on stop."""
-    play = pe_actions.PlayAction()
-    stop = pe_actions.StopAction()
-    unsubscribe: Callable[[], None] = decoy.mock()
+    """It should subscribe to the brokers on play and unsubscribe on stop."""
+    main_unsubscribe: Callable[[], None] = decoy.mock()
+    labware_unsubscribe: Callable[[], None] = decoy.mock()
+    instrument_unsubscribe: Callable[[], None] = decoy.mock()
 
     decoy.when(
         legacy_context.broker.subscribe(
             topic="command",
             handler=matchers.Anything(),
         )
-    ).then_return(unsubscribe)
+    ).then_return(main_unsubscribe)
 
-    subject.handle_action(play)
-    subject.handle_action(stop)
+    decoy.when(
+        legacy_context.labware_loaded_broker.subscribe(callback=matchers.Anything())
+    ).then_return(labware_unsubscribe)
 
-    decoy.verify(unsubscribe())
+    decoy.when(
+        legacy_context.instrument_loaded_broker.subscribe(callback=matchers.Anything())
+    ).then_return(instrument_unsubscribe)
+
+    subject.handle_action(pe_actions.PlayAction())
+    subject.handle_action(pe_actions.StopAction())
+
+    decoy.verify(main_unsubscribe())
+    decoy.verify(labware_unsubscribe())
+    decoy.verify(instrument_unsubscribe())
 
 
 def test_broker_messages(
