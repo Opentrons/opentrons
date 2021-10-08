@@ -15,7 +15,7 @@ class MenuItems(Enum):
 
     APP = "app"
     CUSTOM_LABWARE = "custom-labware"
-    NETWORK_AND_SYSTEM = "network-and-system"
+    NETWORK = "network"
     RESOURCES = "resources"
 
 

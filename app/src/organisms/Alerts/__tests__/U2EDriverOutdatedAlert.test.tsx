@@ -51,13 +51,13 @@ describe('U2EDriverOutdatedAlert', () => {
     )
   })
 
-  it('should have a link to /network-and-system that dismisses the alert', () => {
+  it('should have a close button that dismisses the alert', () => {
     const wrapper = render()
-    const link = wrapper.find('Link[to="/more/network-and-system"]')
+    const link = wrapper.find('a[href="#"]')
 
     link.invoke('onClick')?.({} as React.MouseEvent)
 
-    expect(link.prop('children')).toContain('view adapter info')
+    expect(link.prop('children')).toContain('close')
     expect(dismissAlert).toHaveBeenCalledWith(false)
     expect(trackEvent).toHaveBeenCalledWith({
       name: 'u2eDriverAlertDismissed',
@@ -87,9 +87,7 @@ describe('U2EDriverOutdatedAlert', () => {
       checkbox.simulate('change')
     })
     wrapper.update()
-    wrapper.find('Link[to="/more/network-and-system"]').invoke('onClick')?.(
-      {} as React.MouseEvent
-    )
+    wrapper.find('a[href="#"]').invoke('onClick')?.({} as React.MouseEvent)
 
     expect(dismissAlert).toHaveBeenCalledWith(true)
     expect(trackEvent).toHaveBeenCalledWith({

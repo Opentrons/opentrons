@@ -1,18 +1,20 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { SidePanel, ListItem, Icon } from '@opentrons/components'
 
 import { MORE } from '../../../redux/nav'
 import styles from './styles.css'
 
-// TODO(mc, 2019-12-03): i18n
-const ITEMS = [
-  { label: 'App', url: '/more/app' },
-  { label: 'Custom Labware', url: '/more/custom-labware' },
-  { label: 'Network & System', url: '/more/network-and-system' },
-  { label: 'Resources', url: '/more/resources' },
-]
-
 export function MorePanel(): JSX.Element {
+  const { t } = useTranslation(['more_panel'])
+
+  const ITEMS = [
+    { label: t('app'), url: '/more/app' },
+    { label: t('custom_labware'), url: '/more/custom-labware' },
+    { label: t('network'), url: '/more/network' },
+    { label: t('resources'), url: '/more/resources' },
+  ]
+
   return (
     <SidePanel title={MORE}>
       <div className={styles.menu_panel}>

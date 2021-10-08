@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Link as InternalLink } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 
 import {
@@ -21,11 +21,8 @@ import type { AlertProps } from './types'
 
 // TODO(mc, 2020-05-07): i18n
 const DRIVER_OUT_OF_DATE = 'Realtek USB-to-Ethernet Driver Update Available'
-const VIEW_ADAPTER_INFO = 'view adapter info'
 const GET_UPDATE = 'get update'
 const DONT_REMIND_ME_AGAIN = "Don't remind me again"
-
-const ADAPTER_INFO_URL = '/more/network-and-system'
 
 const LinkButton = styled(Link)`
   width: auto;
@@ -43,6 +40,7 @@ export function U2EDriverOutdatedAlert(props: AlertProps): JSX.Element {
   const trackEvent = useTrackEvent()
   const [rememberDismiss, toggleRememberDismiss] = useToggle()
   const { dismissAlert } = props
+  const { t } = useTranslation(['shared'])
 
   return (
     <AlertModal
@@ -51,9 +49,8 @@ export function U2EDriverOutdatedAlert(props: AlertProps): JSX.Element {
       buttons={[
         {
           Component: LinkButton,
-          as: InternalLink,
-          to: ADAPTER_INFO_URL,
-          children: VIEW_ADAPTER_INFO,
+          href: '#',
+          children: t('close'),
           onClick: () => {
             dismissAlert(rememberDismiss)
             trackEvent({
