@@ -69,9 +69,7 @@ class CommandExecutor:
         result = None
         error = None
         try:
-            log.debug(
-                f"Executing {command.id}, {command.commandType}, {command.data}"
-            )
+            log.debug(f"Executing {command.id}, {command.commandType}, {command.data}")
             result = await command_impl.execute(command.data)  # type: ignore[arg-type]
             completed_status = CommandStatus.SUCCEEDED
         except Exception as e:
