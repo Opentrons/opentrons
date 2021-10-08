@@ -8,31 +8,31 @@ import {
   Link,
   SPACING_2,
   JUSTIFY_CENTER,
+  FONT_SIZE_BODY_2,
 } from '@opentrons/components'
 import { useProtocolDetails } from '../../RunDetails/hooks'
-import { useIntroInfo } from './hooks'
 import { LabwarePositionCheckStepDetailModal } from './LabwarePositionCheckStepDetailModal'
 import type { LabwarePositionCheckStep } from './types'
 
 interface StepDetailTextProps {
   selectedStep: LabwarePositionCheckStep
+  pipetteChannels?: 1 | 8
 }
 export const StepDetailText = (
   props: StepDetailTextProps
 ): JSX.Element | null => {
   const { labwareId } = props.selectedStep
+  const { pipetteChannels } = props
   const { t } = useTranslation('labware_position_check')
-  const introInfo = useIntroInfo()
   const { protocolData } = useProtocolDetails()
   const [
     showLabwarePositionCheckStepDetailModal,
     setLabwarePositionCheckStepDetailModal,
   ] = React.useState<boolean>(false)
-  if (protocolData == null || introInfo == null) return null
+  if (protocolData == null) return null
   const labwareDefId = protocolData.labware[labwareId].definitionId
   const displayName =
     protocolData.labwareDefinitions[labwareDefId].metadata.displayName
-  const { numberOfTips } = introInfo
 
   return (
     <React.Fragment>
@@ -41,7 +41,11 @@ export const StepDetailText = (
           onCloseClick={() => setLabwarePositionCheckStepDetailModal(false)}
         />
       )}
-      <Box padding={SPACING_2} justifyContent={JUSTIFY_CENTER}>
+      <Box
+        padding={SPACING_2}
+        justifyContent={JUSTIFY_CENTER}
+        fontSize={FONT_SIZE_BODY_2}
+      >
         <Trans
           t={t}
           i18nKey={
@@ -49,7 +53,7 @@ export const StepDetailText = (
               ? 'labware_step_detail_tiprack'
               : 'labware_step_detail_labware'
           }
-          count={numberOfTips}
+          count={pipetteChannels}
           values={{ labware_name: displayName, tiprack_name: displayName }}
           components={{
             bold: <strong />,

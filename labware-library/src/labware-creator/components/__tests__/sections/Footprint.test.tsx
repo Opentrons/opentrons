@@ -2,12 +2,12 @@ import React from 'react'
 import '@testing-library/jest-dom'
 import { FormikConfig } from 'formik'
 import { when, resetAllWhenMocks } from 'jest-when'
+import { nestedTextMatcher } from '@opentrons/components'
 import { render, screen } from '@testing-library/react'
 import { getDefaultFormState, LabwareFields } from '../../../fields'
 import { Footprint } from '../../sections/Footprint'
 import { wrapInFormik } from '../../utils/wrapInFormik'
 import { isEveryFieldHidden } from '../../../utils'
-import { nestedTextMatcher } from '../../__testUtils__/nestedTextMatcher'
 
 jest.mock('../../../utils')
 
@@ -46,7 +46,7 @@ describe('Footprint', () => {
     screen.getByRole('textbox', { name: /Width/i })
   })
 
-  it('should render correct copy when tipRack is selected', () => {
+  it.only('should render correct copy when tipRack is selected', () => {
     formikConfig.initialValues.labwareType = 'tipRack'
     render(wrapInFormik(<Footprint />, formikConfig))
 

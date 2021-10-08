@@ -3,11 +3,11 @@ import '@testing-library/jest-dom'
 import { FormikConfig } from 'formik'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { render, screen } from '@testing-library/react'
+import { nestedTextMatcher } from '@opentrons/components'
 import { getDefaultFormState, LabwareFields } from '../../../fields'
 import { isEveryFieldHidden } from '../../../utils'
 import { Height } from '../../sections/Height'
 import { wrapInFormik } from '../../utils/wrapInFormik'
-import { nestedTextMatcher } from '../../__testUtils__/nestedTextMatcher'
 
 jest.mock('../../../utils')
 

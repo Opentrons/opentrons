@@ -39,7 +39,7 @@ function StaticLabwareComponent(props: StaticLabwareProps): JSX.Element {
   return (
     <g>
       <g className={styles.labware_detail_group}>
-        <LabwareOutline definition={props.definition}/>
+        <LabwareOutline definition={props.definition} />
       </g>
       <g>
         {flatMap(
