@@ -1,7 +1,7 @@
 """Translate events from a legacy ``ProtocolContext`` into Protocol Engine commands."""
 
 from collections import defaultdict
-from typing import Any, Dict, List, Set
+from typing import Dict, List
 import logging
 
 from opentrons.types import DeckSlotName, MountType
@@ -10,7 +10,7 @@ from opentrons.commands.types import CommandMessage as LegacyCommand
 from opentrons.protocol_engine import commands as pe_commands, types as pe_types
 from opentrons.protocols.models.labware_definition import LabwareDefinition
 
-from .legacy_wrappers import LegacyPipetteContext, LegacyModuleContext, LegacyLabware
+from .legacy_wrappers import LegacyPipetteContext, LegacyLabware
 
 
 class LegacyCommandData(pe_commands.CustomData):
@@ -27,16 +27,10 @@ class LegacyCommandMapper:
         """Initialize the command mapper."""
         self._running_commands: Dict[str, List[pe_commands.Command]] = defaultdict(list)
         self._command_count: Dict[str, int] = defaultdict(lambda: 0)
-        self._loaded_pipette_mounts: Set[str] = set()
-        self._loaded_labware_slots: Set[int] = set()
-        self._loaded_module_slots: Set[int] = set()
 
     def map_brokered_command(
         self,
         command: LegacyCommand,
-        loaded_pipettes: Dict[str, LegacyPipetteContext],
-        loaded_modules: Dict[int, LegacyModuleContext[Any]],
-        loaded_labware: Dict[int, LegacyLabware],
     ) -> List[pe_commands.Command]:
         """Map a legacy Broker command to ProtocolEngine commands."""
         command_type = command["name"]

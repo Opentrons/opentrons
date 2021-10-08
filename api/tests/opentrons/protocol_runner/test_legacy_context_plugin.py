@@ -17,9 +17,6 @@ from opentrons.protocol_runner.legacy_command_mapper import LegacyCommandMapper
 from opentrons.protocol_runner.legacy_context_plugin import LegacyContextPlugin
 from opentrons.protocol_runner.legacy_wrappers import (
     LegacyProtocolContext,
-    LegacyPipetteContext,
-    LegacyModuleContext,
-    LegacyLabware,
 )
 
 
@@ -149,21 +146,8 @@ def test_broker_messages(
         data=pe_commands.CustomData(message="hello world"),  # type: ignore[call-arg]
     )
 
-    pipette = decoy.mock(cls=LegacyPipetteContext)
-    module = decoy.mock(cls=LegacyModuleContext)
-    labware = decoy.mock(cls=LegacyLabware)
-
-    legacy_context.loaded_instruments = {"left": pipette}  # type: ignore[misc]
-    legacy_context.loaded_modules = {3: module}  # type: ignore[misc]
-    legacy_context.loaded_labwares = {5: labware}  # type: ignore[misc]
-
     decoy.when(
-        legacy_command_mapper.map_brokered_command(
-            command=legacy_command,
-            loaded_pipettes={"left": pipette},
-            loaded_modules={3: module},
-            loaded_labware={5: labware},
-        )
+        legacy_command_mapper.map_brokered_command(command=legacy_command)
     ).then_return([engine_command])
 
     handler(legacy_command)

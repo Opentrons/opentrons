@@ -96,12 +96,7 @@ class LegacyContextPlugin(AbstractPlugin):
             self._subscriptions_are_set_up = False
 
     def _dispatch_legacy_command(self, command: LegacyCommand) -> None:
-        pe_commands = self._legacy_command_mapper.map_brokered_command(
-            command=command,
-            loaded_pipettes=self._protocol_context.loaded_instruments,
-            loaded_modules=self._protocol_context.loaded_modules,
-            loaded_labware=self._protocol_context.loaded_labwares,
-        )
+        pe_commands = self._legacy_command_mapper.map_brokered_command(command=command)
 
         for c in pe_commands:
             self.dispatch(pe_actions.UpdateCommandAction(command=c))
