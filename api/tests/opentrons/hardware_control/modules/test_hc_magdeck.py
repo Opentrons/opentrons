@@ -21,7 +21,6 @@ async def test_sim_initialization(loop, usb_port):
         usb_port=usb_port,
         which="magdeck",
         simulating=True,
-        interrupt_callback=lambda x: None,
         loop=loop,
         execution_manager=ExecutionManager(loop=loop),
     )
@@ -34,7 +33,6 @@ async def test_sim_data(loop, usb_port):
         usb_port=usb_port,
         which="magdeck",
         simulating=True,
-        interrupt_callback=lambda x: None,
         loop=loop,
         execution_manager=ExecutionManager(loop=loop),
     )
@@ -53,7 +51,6 @@ async def test_sim_state_update(loop, usb_port):
         usb_port=usb_port,
         which="magdeck",
         simulating=True,
-        interrupt_callback=lambda x: None,
         loop=loop,
         execution_manager=ExecutionManager(loop=loop),
     )
@@ -71,7 +68,6 @@ async def test_revision_model_parsing(loop, usb_port):
         "magdeck",
         True,
         usb_port,
-        lambda x: None,
         loop=loop,
         execution_manager=ExecutionManager(loop=loop),
     )

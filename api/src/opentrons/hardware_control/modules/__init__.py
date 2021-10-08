@@ -6,7 +6,6 @@ from .update import update_firmware
 from .utils import MODULE_HW_BY_NAME, build
 from .types import (
     ThermocyclerStep,
-    InterruptCallback,
     UploadFunction,
     BundledFirmware,
     UpdateError,
@@ -22,7 +21,6 @@ __all__ = [
     "TempDeck",
     "MagDeck",
     "Thermocycler",
-    "InterruptCallback",
     "UploadFunction",
     "BundledFirmware",
     "UpdateError",

@@ -34,7 +34,6 @@ class TempDeck(mod_abc.AbstractModule):
         port: str,
         usb_port: USBPort,
         execution_manager: ExecutionManager,
-        interrupt_callback: types.InterruptCallback = None,
         simulating: bool = False,
         loop: asyncio.AbstractEventLoop = None,
         sim_model: str = None,
@@ -47,7 +46,6 @@ class TempDeck(mod_abc.AbstractModule):
             port: The port to connect to
             usb_port: USB Port
             execution_manager: Execution manager.
-            interrupt_callback: Optional interrupt callback
             simulating: whether to build a simulating driver
             loop: Loop
             sim_model: The model name used by simulator
@@ -121,7 +119,7 @@ class TempDeck(mod_abc.AbstractModule):
         """Wait for the next poll to complete."""
         try:
             await self._listener.wait_next_poll()
-        except Exception:
+        except asyncio.CancelledError:
             log.exception("Error while waiting for poll.")
 
     async def set_temperature(self, celsius: float) -> None:
@@ -295,11 +293,9 @@ class TempdeckListener(WaitableListener[Temperature]):
     def __init__(
         self,
         loop: Optional[asyncio.AbstractEventLoop] = None,
-        interrupt_callback: types.InterruptCallback = None,
     ) -> None:
         """Constructor."""
         super().__init__(loop=loop)
-        self._callback = interrupt_callback
         self._polled_data = Temperature(current=25, target=None)
 
     @property
@@ -313,6 +309,4 @@ class TempdeckListener(WaitableListener[Temperature]):
 
     def on_error(self, exc: Exception) -> None:
         """On error."""
-        if self._callback:
-            self._callback(str(exc))
         super().on_error(exc)

@@ -1,6 +1,6 @@
 import asyncio
 import logging
-from typing import Optional, List, Dict, Mapping
+from typing import Optional, List, Dict, Mapping, Callable
 from dataclasses import dataclass
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.types import ThermocyclerLidStatus, Temperature, PlateTemperature
@@ -41,7 +41,6 @@ class Thermocycler(mod_abc.AbstractModule):
         port: str,
         usb_port: USBPort,
         execution_manager: ExecutionManager,
-        interrupt_callback: types.InterruptCallback = None,
         simulating: bool = False,
         loop: asyncio.AbstractEventLoop = None,
         sim_model: str = None,
@@ -54,7 +53,6 @@ class Thermocycler(mod_abc.AbstractModule):
             port: The port to connect to
             usb_port: USB Port
             execution_manager: Execution manager.
-            interrupt_callback: Optional interrupt callback
             simulating: whether to build a simulating driver
             loop: Loop
             sim_model: The model name used by simulator
@@ -79,7 +77,6 @@ class Thermocycler(mod_abc.AbstractModule):
             usb_port=usb_port,
             driver=driver,
             device_info=await driver.get_device_info(),
-            interrupt_callback=interrupt_callback,
             loop=loop,
             execution_manager=execution_manager,
             polling_interval_sec=polling_frequency,
@@ -93,7 +90,6 @@ class Thermocycler(mod_abc.AbstractModule):
         execution_manager: ExecutionManager,
         driver: AbstractThermocyclerDriver,
         device_info: Dict[str, str],
-        interrupt_callback: types.InterruptCallback = None,
         loop: asyncio.AbstractEventLoop = None,
         polling_interval_sec: float = POLLING_FREQUENCY_SEC,
     ) -> None:
@@ -106,7 +102,6 @@ class Thermocycler(mod_abc.AbstractModule):
             execution_manager: The hardware execution manager.
             driver: The thermocycler driver.
             device_info: The thermocycler device info.
-            interrupt_callback: Optional interrupt callback.
             loop: Optional loop.
             polling_interval_sec: How often to poll thermocycler for status
         """
@@ -116,7 +111,7 @@ class Thermocycler(mod_abc.AbstractModule):
         self._driver = driver
         self._device_info = device_info
         self._listener = ThermocyclerListener(
-            loop=loop, interrupt_callback=interrupt_callback
+            loop=loop, interrupt_callback=self._enter_error_state
         )
         self._poller = Poller(
             interval_seconds=polling_interval_sec,
@@ -125,12 +120,12 @@ class Thermocycler(mod_abc.AbstractModule):
             loop=loop,
         )
         self._hold_time_fuzzy_seconds = polling_interval_sec * 5
-        self._interrupt_cb = interrupt_callback
 
         self._total_cycle_count: Optional[int] = None
         self._current_cycle_index: Optional[int] = None
         self._total_step_count: Optional[int] = None
         self._current_step_index: Optional[int] = None
+        self._in_error_state: bool = False
 
     async def cleanup(self) -> None:
         """Stop the poller task."""
@@ -352,8 +347,8 @@ class Thermocycler(mod_abc.AbstractModule):
         """Wait for the next poll to complete."""
         try:
             await self._listener.wait_next_poll()
-        except Exception:
-            MODULE_LOG.exception("Error while waiting for poll.")
+        except asyncio.CancelledError:
+            raise ThermocyclerError("Error while waiting for poll.")
 
     @property
     def lid_target(self) -> Optional[float]:
@@ -410,7 +405,7 @@ class Thermocycler(mod_abc.AbstractModule):
 
     @property
     def status(self) -> str:
-        return self._listener.plate_status
+        return self._listener.plate_status if not self._in_error_state else TemperatureStatus.ERROR
 
     @property
     def device_info(self) -> Mapping[str, str]:
@@ -511,6 +506,24 @@ class Thermocycler(mod_abc.AbstractModule):
                 await self._execute_cycle_step(step, volume)
                 await self._wait_for_hold()
 
+    def _enter_error_state(self, cause: Exception) -> None:
+        """Enter into an error state.
+
+        The Thermocycler will not be accessible in this state.
+
+        Args:
+            cause: The cause of the exception.
+
+        Returns:
+            None
+        """
+        self._in_error_state = True
+        MODULE_LOG.error(
+            f"Thermocycler has encountered an unrecoverable error: {str(cause)}"
+        )
+        self._poller.stop()
+        asyncio.run_coroutine_threadsafe(self._driver.disconnect(), self._loop)
+
 
 @dataclass
 class PolledData:
@@ -543,8 +556,8 @@ class ThermocyclerListener(WaitableListener[PolledData]):
 
     def __init__(
         self,
+        interrupt_callback: Callable[[Exception], None],
         loop: Optional[asyncio.AbstractEventLoop] = None,
-        interrupt_callback: types.InterruptCallback = None,
     ) -> None:
         """Constructor."""
         super().__init__(loop=loop)
@@ -575,5 +588,5 @@ class ThermocyclerListener(WaitableListener[PolledData]):
     def on_error(self, exc: Exception) -> None:
         """On error."""
         if self._callback:
-            self._callback(str(exc))
+            self._callback(exc)
         return super().on_error(exc)

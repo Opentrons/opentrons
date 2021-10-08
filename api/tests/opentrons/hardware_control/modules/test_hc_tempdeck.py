@@ -22,7 +22,6 @@ async def test_sim_initialization(loop, usb_port):
         usb_port=usb_port,
         which="tempdeck",
         simulating=True,
-        interrupt_callback=lambda x: None,
         loop=loop,
         execution_manager=ExecutionManager(loop=loop),
     )
