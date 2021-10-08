@@ -1523,9 +1523,10 @@ class InstrumentContext(CommandPublisher):
 
         .. warning::
 
-            Pipette pairing was an experimental feature that didn't pan out.
+            Pipette pairing was an experimental feature
+            intended for Opentrons' own internal use.
 
-            **We don't currently support this method in any way.**
+            **We no longer support this method in any way.**
             We can't help you if you use it and run into any problems.
 
             We keep this documentation here
