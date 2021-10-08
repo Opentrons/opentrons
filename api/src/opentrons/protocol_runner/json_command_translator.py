@@ -52,13 +52,13 @@ class JsonCommandTranslator:
         command: models.json_protocol.AllCommands,
     ) -> pe_commands.CommandRequest:
         try:
-            h = self._COMMAND_TO_NAME[command.commandType]
+            h = self._COMMAND_TO_NAME[command.command]
             return cast(pe_commands.CommandRequest, getattr(self, h)(command))
         except KeyError:
-            raise CommandTranslatorError(f"'{command.commandType}' is not recognized.")
+            raise CommandTranslatorError(f"'{command.command}' is not recognized.")
         except AttributeError:
             raise CommandTranslatorError(
-                f"Cannot find handler for '{command.commandType}'."
+                f"Cannot find handler for '{command.command}'."
             )
 
     def _translate_add_labware_definition(

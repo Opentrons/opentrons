@@ -119,9 +119,9 @@ async def post_serial_command(
             status.HTTP_404_NOT_FOUND
         )
 
-    if hasattr(matching_mod, command.commandType_type):
+    if hasattr(matching_mod, command.command_type):
         clean_args = command.args or []
-        method = getattr(matching_mod, command.commandType_type)
+        method = getattr(matching_mod, command.command_type)
         try:
             if asyncio.iscoroutinefunction(method):
                 val = await method(*clean_args)
@@ -137,7 +137,7 @@ async def post_serial_command(
             return SerialCommandResponse(message="Success", returnValue=val)
     else:
         raise LegacyErrorResponse(
-            message=f"Module does not have command: {command.commandType_type}"
+            message=f"Module does not have command: {command.command_type}"
         ).as_error(status.HTTP_400_BAD_REQUEST)
 
 
