@@ -24,7 +24,6 @@ def magdeck():
             usb_port=usb_port,
             which="magdeck",
             simulating=True,
-            interrupt_callback=lambda x: None,
             execution_manager=ExecutionManager(loop=asyncio.get_event_loop()),
             loop=asyncio.get_event_loop(),
         )
@@ -49,7 +48,6 @@ def tempdeck():
             usb_port=usb_port,
             which="tempdeck",
             simulating=True,
-            interrupt_callback=lambda x: None,
             execution_manager=ExecutionManager(loop=asyncio.get_event_loop()),
             loop=asyncio.get_event_loop(),
         )
@@ -75,7 +73,6 @@ def thermocycler():
             usb_port=usb_port,
             which="thermocycler",
             simulating=True,
-            interrupt_callback=lambda x: None,
             execution_manager=ExecutionManager(loop=asyncio.get_event_loop()),
             loop=asyncio.get_event_loop(),
         )
