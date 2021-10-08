@@ -22,7 +22,6 @@ import {
   ALIGN_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   SPACING_1,
-  FONT_WEIGHT_REGULAR,
 } from '@opentrons/components'
 import RobotCalHelpImage from '../../../../assets/images/robot_calibration_help.png'
 import { Portal } from '../../../../App/portal'
@@ -104,13 +103,7 @@ export const DeckCalibrationModal = (
               t={t}
               i18nKey="pipette_offset_cal_description"
               components={{
-                block: (
-                  <Text
-                    fontSize={FONT_SIZE_BODY_1}
-                    fontWeight={FONT_WEIGHT_REGULAR}
-                    marginBottom={SPACING_3}
-                  />
-                ),
+                block: <Text marginBottom={SPACING_3} />,
               }}
             />
             <Flex flexDirection={DIRECTION_ROW} marginLeft={SPACING_3}>
