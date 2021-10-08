@@ -78,7 +78,6 @@ export const LabwareSetup = (): JSX.Element | null => {
       )}
       <Flex
         flex="1"
-        borderRadius="6px"
         maxHeight="85vh"
         flexDirection={DIRECTION_COLUMN}
       >

@@ -10,30 +10,30 @@ import {
 import noModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/simpleV4.json'
 import withModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/testModulesProtocol.json'
 
-import { i18n } from '../../../i18n'
+import { i18n } from '../../../../i18n'
 import {
   mockAttachedPipette,
   mockProtocolPipetteTipRackCalInfo,
-} from '../../../redux/pipettes/__fixtures__'
-import { mockConnectedRobot } from '../../../redux/discovery/__fixtures__'
-import * as discoverySelectors from '../../../redux/discovery/selectors'
+} from '../../../../redux/pipettes/__fixtures__'
+import { mockConnectedRobot } from '../../../../redux/discovery/__fixtures__'
+import * as discoverySelectors from '../../../../redux/discovery/selectors'
 import {
   getAttachedPipettes,
   getProtocolPipetteTipRackCalInfo,
-} from '../../../redux/pipettes'
-import { mockCalibrationStatus } from '../../../redux/calibration/__fixtures__'
-import * as calibrationSelectors from '../../../redux/calibration/selectors'
-import * as protocolSelectors from '../../../redux/protocol/selectors'
-import { RunSetupCard } from '../RunSetupCard'
-import { ModuleSetup } from '../RunSetupCard/ModuleSetup'
-import { LabwareSetup } from '../RunSetupCard/LabwareSetup'
-import { RobotCalibration } from '../RunSetupCard/RobotCalibration'
-import { ProceedToRunCta } from '../RunSetupCard/ProceedToRunCta'
+} from '../../../../redux/pipettes'
+import { mockCalibrationStatus } from '../../../../redux/calibration/__fixtures__'
+import * as calibrationSelectors from '../../../../redux/calibration/selectors'
+import * as protocolSelectors from '../../../../redux/protocol/selectors'
+import { RunSetupCard } from '..'
+import { ModuleSetup } from '../ModuleSetup'
+import { LabwareSetup } from '../LabwareSetup'
+import { RobotCalibration } from '../RobotCalibration'
+import { ProceedToRunCta } from '../ProceedToRunCta'
 
 import type {
   AttachedPipettesByMount,
   ProtocolPipetteTipRackCalDataByMount,
-} from '../../../redux/pipettes/types'
+} from '../../../../redux/pipettes/types'
 import { pick } from 'lodash'
 
 jest.mock('../../../redux/protocol/selectors')
@@ -225,21 +225,21 @@ describe('RunSetupCard', () => {
       )
     ).toBeTruthy()
     expect(getByRole('heading', { name: 'STEP 2' })).toBeTruthy()
-    expect(getByRole('heading', { name: 'Labware Setup' })).toBeTruthy()
-    expect(
-      getByText(
-        'Position full tip racks and labware in the deck slots as shown in the deck map.'
-      )
-    ).toBeTruthy()
-    expect(getByRole('heading', { name: 'STEP 3' })).toBeTruthy()
     expect(getByRole('heading', { name: 'Module Setup' })).toBeTruthy()
     expect(
       getByText(
         'Plug in and power up the required module via the OT-2 USB Port. Place the module as shown in the deck map.'
       )
     ).toBeTruthy()
+    expect(getByRole('heading', { name: 'STEP 3' })).toBeTruthy()
+    expect(getByRole('heading', { name: 'Labware Setup' })).toBeTruthy()
+    expect(
+      getByText(
+        'Position full tip racks and labware in the deck slots as shown in the deck map.'
+      )
+    ).toBeTruthy()
   })
-  it('renders robot calibration heading, skips module setup, renders labware setup heading, and allows the user to proceed to run', () => {
+  it('if no modules renders robot calibration heading, skips module setup, renders labware setup heading, and allows the user to proceed to run', () => {
     const { getByRole, getByText } = render()
     getByRole('heading', {
       name: 'Robot Calibration',
