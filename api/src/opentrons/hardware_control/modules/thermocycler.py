@@ -405,7 +405,11 @@ class Thermocycler(mod_abc.AbstractModule):
 
     @property
     def status(self) -> str:
-        return self._listener.plate_status if not self._in_error_state else TemperatureStatus.ERROR
+        return (
+            self._listener.plate_status
+            if not self._in_error_state
+            else TemperatureStatus.ERROR
+        )
 
     @property
     def device_info(self) -> Mapping[str, str]:
