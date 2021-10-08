@@ -48,7 +48,7 @@ class Axis(enum.Enum):
         """The axes which are tied to the gantry and require the deck
         calibration transform
         """
-        return (cls.X, cls.Y, cls.Z, cls.A)
+        return cls.X, cls.Y, cls.Z, cls.A
 
     @classmethod
     def of_plunger(cls, mount: top_types.Mount):
@@ -137,7 +137,7 @@ class BoardRevision(enum.Enum):
     C = enum.auto()
 
     @classmethod
-    def by_bits(cls, rev_bits: Tuple[bool, bool]):
+    def by_bits(cls, rev_bits: Tuple[bool, bool]) -> "BoardRevision":
         br = {
             (True, True): cls.OG,
             (False, True): cls.A,

@@ -3,7 +3,7 @@ import os
 import shutil
 
 
-def _ensure_programmer_executable():
+def _ensure_programmer_executable() -> None:
     """Find the lpc21isp executable and ensure it is executable"""
     # Find the lpc21isp executable, explicitly allowing the case where it
     # is not executable (since that’s exactly what we’re trying to fix)

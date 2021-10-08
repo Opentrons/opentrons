@@ -98,7 +98,7 @@ class USBPort(GenericNode[str]):
 
     @staticmethod
     def map_to_revision(
-        board_revision: BoardRevision, port_info: List
+        board_revision: BoardRevision, port_info: Tuple[Optional[int], int]
     ) -> Tuple[Optional[int], int]:
         hub, port = port_info
         if board_revision == BoardRevision.OG:
@@ -132,7 +132,7 @@ class GPIOPin:
         return cls(name, in_out, rev_og=pin, rev_a=pin, rev_b=pin, rev_c=pin)
 
     @classmethod
-    def build_with_rev(cls, name: str, in_out: PinDir, **kwargs: Dict[Any, Any]) -> GPIOPin:
+    def build_with_rev(cls, name: str, in_out: PinDir, **kwargs: Optional[int]) -> GPIOPin:
         return cls(name, in_out, **kwargs)
 
     def __init__(
@@ -166,8 +166,10 @@ class GPIOGroup:
     def __init__(self, pins: List[GPIOPin]):
         self.pins = pins
 
-    def __getattr__(self, item: str) -> Optional[GPIOPin]:
-        return next(filter(lambda x: x.name is item, self.pins), None)
+    def __getattr__(self, item: str) -> GPIOPin:
+        res = next(filter(lambda x: x.name is item, self.pins), None)
+        assert res, f"Failed to find GPIOPin named: {item}"
+        return res
 
     def by_type(self, pin_dir: PinDir) -> GPIOGroup:
         return GPIOGroup(list(filter(lambda x: x.in_out is pin_dir, self.pins)))
@@ -175,9 +177,9 @@ class GPIOGroup:
     def by_names(self, names: List[str]) -> GPIOGroup:
         return GPIOGroup(list(filter(lambda x: x.name in names, self.pins)))
 
-    def group_by_pins(self, board_rev: BoardRevision) -> List[GPIOPin]:
+    def group_by_pins(self, board_rev: BoardRevision) -> List[List[GPIOPin]]:
         c = groupby(self.pins, key=lambda x: x.by_board_rev(board_rev))
-        l: list = []
+        l: List[List[GPIOPin]] = []
         for k, v in c:
             l.append(list(v))
         return l

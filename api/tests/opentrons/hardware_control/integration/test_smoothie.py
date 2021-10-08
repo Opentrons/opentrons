@@ -344,6 +344,48 @@ async def test_fast_home(subject: SmoothieDriver, spy: MagicMock):
     ]
 
 
+async def test_fast_home_two_axes_plus_two_invalid_axes(
+        subject: SmoothieDriver, spy: MagicMock
+):
+    await subject.fast_home(axis="XYJK", safety_margin=12)
+
+    command_log = [x.kwargs["data"].strip() for x in spy.call_args_list]
+    assert command_log == [
+        'M907 A0.1 B0.05 C0.05 X1.25 Y1.25 Z0.1 G4 P0.005 G0 X406.0 Y341.0',
+        'M400',
+        'M203.1 Y50',
+        'M400',
+        'M907 A0.1 B0.05 C0.05 X1.25 Y0.8 Z0.1 G4 P0.005 G91 G0 Y-28 G0 Y10 G90',
+        'M400',
+        'M203.1 X80',
+        'M400',
+        'M907 A0.1 B0.05 C0.05 X1.25 Y0.3 Z0.1 G4 P0.005 G28.2 X',
+        'M400',
+        'M203.1 A125 B40 C40 X600 Y400 Z125',
+        'M400',
+        'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4 P0.005',
+        'M400',
+        'M203.1 Y80',
+        'M400',
+        'M907 A0.1 B0.05 C0.05 X0.3 Y1.25 Z0.1 G4 P0.005 G28.2 Y',
+        'M400',
+        'M203.1 Y8',
+        'M400',
+        'G91 G0 Y-3 G90',
+        'M400',
+        'G28.2 Y',
+        'M400',
+        'G91 G0 Y-3 G90',
+        'M400',
+        'M203.1 A125 B40 C40 X600 Y400 Z125',
+        'M400',
+        'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4 P0.005',
+        'M400',
+        'M114.2',
+        'M400'
+    ]
+
+
 async def test_update_homing_flags(subject: SmoothieDriver, spy: MagicMock):
     await subject.update_homed_flags()
     command_log = [x.kwargs["data"].strip() for x in spy.call_args_list]

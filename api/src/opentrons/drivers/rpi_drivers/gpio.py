@@ -50,13 +50,13 @@ class GPIOCharDev:
     def board_rev(self, boardrev: BoardRevision) -> None:
         self._board_rev = boardrev
 
-    def _request_line(self, pin: GPIOPin, request_type) -> gpiod.Line:
+    def _request_line(self, pin: GPIOPin, request_type: int) -> gpiod.Line:
         name = pin.name
         offset = pin.by_board_rev(self.board_rev)
 
         line = self.chip.get_line(offset)
 
-        def _retry_request_line(retries: int = 0):
+        def _retry_request_line(retries: int = 0):  # type: ignore
             try:
                 line.request(consumer=name, type=request_type, default_vals=[0])
             except OSError as e:
@@ -117,7 +117,7 @@ class GPIOCharDev:
             for pin in pins:
                 self._lines[pin.name] = line
 
-    async def setup(self):
+    async def setup(self) -> None:
         MODULE_LOG.info("Setting up GPIOs")
         self.set_audio_enable(True)
         # smoothieware programming pins, must be in a known state (HIGH)
@@ -128,7 +128,7 @@ class GPIOCharDev:
         self.set_reset_pin(True)
         await asyncio.sleep(0.25)
 
-    def setup_v1(self):
+    def setup_v1(self) -> None:
         # TODO: AA 07-08-2020 remove when legacy API is deprecated
         MODULE_LOG.info("Setting up GPIOs for APIv1")
         self.set_audio_enable(True)
@@ -140,15 +140,15 @@ class GPIOCharDev:
         self.set_reset_pin(True)
         time.sleep(0.25)
 
-    def set_high(self, output_pin: GPIOPin):
+    def set_high(self, output_pin: GPIOPin) -> None:
         self.lines[output_pin.name].set_value(1)
 
-    def set_low(self, output_pin: GPIOPin):
+    def set_low(self, output_pin: GPIOPin) -> None:
         self.lines[output_pin.name].set_value(0)
 
     def set_button_light(
         self, red: bool = False, green: bool = False, blue: bool = False
-    ):
+    ) -> None:
         color_pins = {
             gpio_group.red_button: red,
             gpio_group.green_button: green,
@@ -160,39 +160,39 @@ class GPIOCharDev:
             else:
                 self.set_low(pin)
 
-    def set_rail_lights(self, on: bool = True):
+    def set_rail_lights(self, on: bool = True) -> None:
         if on:
             self.set_high(gpio_group.frame_leds)
         else:
             self.set_low(gpio_group.frame_leds)
 
-    def set_reset_pin(self, on: bool = True):
+    def set_reset_pin(self, on: bool = True) -> None:
         if on:
             self.set_high(gpio_group.reset)
         else:
             self.set_low(gpio_group.reset)
 
-    def set_isp_pin(self, on: bool = True):
+    def set_isp_pin(self, on: bool = True) -> None:
         if on:
             self.set_high(gpio_group.isp)
         else:
             self.set_low(gpio_group.isp)
 
-    def set_halt_pin(self, on: bool = True):
+    def set_halt_pin(self, on: bool = True) -> None:
         if on:
             self.set_high(gpio_group.halt)
         else:
             self.set_low(gpio_group.halt)
 
-    def set_audio_enable(self, on: bool = True):
+    def set_audio_enable(self, on: bool = True) -> None:
         if on:
             self.set_high(gpio_group.audio_enable)
         else:
             self.set_low(gpio_group.audio_enable)
 
-    def _read(self, input_pin: GPIOPin):
+    def _read(self, input_pin: GPIOPin) -> int:
         try:
-            return self.lines[input_pin.name].get_value()
+            return self.lines[input_pin.name].get_value()  # type: ignore
         except KeyError:
             raise RuntimeError(
                 f"GPIO {input_pin.name} is not registered and cannot" "be read"
@@ -269,7 +269,7 @@ class GPIOCharDev:
         self.lines[pin.name].release()
         self.lines.pop(pin.name)
 
-    def stop_door_switch_watcher(self, loop: asyncio.AbstractEventLoop)  -> None:
+    def stop_door_switch_watcher(self, loop: asyncio.AbstractEventLoop) -> None:
         try:
             door_fd = self.lines["window_door_sw"].event_get_fd()
             loop.remove_reader(door_fd)

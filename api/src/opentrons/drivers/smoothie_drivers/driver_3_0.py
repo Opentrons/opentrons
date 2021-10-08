@@ -530,7 +530,7 @@ class SmoothieDriver:
         return self._steps_per_mm
 
     @contextlib.asynccontextmanager
-    async def restore_speed(self, value: Union[float, str]) -> AsyncGenerator[None]:
+    async def restore_speed(self, value: Union[float, str]) -> AsyncGenerator[None, None]:
         await self.set_speed(value, update=False)
         try:
             yield
@@ -560,7 +560,7 @@ class SmoothieDriver:
         await self.set_speed(self._saved_axes_speed)
 
     @contextlib.asynccontextmanager
-    async def restore_axis_max_speed(self, new_max_speeds: Dict[str, float]) -> None:
+    async def restore_axis_max_speed(self, new_max_speeds: Dict[str, float]) -> AsyncGenerator[None, None]:
         await self.set_axis_max_speed(new_max_speeds, update=False)
         try:
             yield
@@ -1095,7 +1095,7 @@ class SmoothieDriver:
             command.add_float(prefix=axis, value=value, precision=None)
         return command
 
-    async def update_steps_per_mm(self, data: Union[Dict[str, float], str]):
+    async def update_steps_per_mm(self, data: Union[Dict[str, float], str]) -> None:
         # Using M92, update steps per mm for a given axis
         if self.simulating:
             if isinstance(data, dict):
@@ -1150,7 +1150,7 @@ class SmoothieDriver:
             pass
         return None
 
-    async def _write_to_pipette(self, gcode: str, mount: str, data_string: str):
+    async def _write_to_pipette(self, gcode: str, mount: str, data_string: str) -> None:
         """
         Write to an attached pipette's internal memory. The gcode used
         determines which portion of memory is written to.
@@ -1195,7 +1195,7 @@ class SmoothieDriver:
         self,
         target: Dict[str, float],
         home_flagged_axes: bool = False,
-        speed: float = None,
+        speed: Optional[float] = None,
     ) -> None:
         """
         Move to the `target` Smoothieware coordinate, along any of the size
@@ -1376,7 +1376,7 @@ class SmoothieDriver:
         if home_flagged_axes:
             await self.home_flagged_axes("".join(list(target.keys())))
 
-        async def _do_split():
+        async def _do_split() -> None:
             try:
                 for sc in (c for c in (split_prefix, split_command) if c):
                     await self._send_command(sc)
@@ -1519,7 +1519,7 @@ class SmoothieDriver:
         ).add_gcode(gcode=GCODE.DWELL).add_float(prefix="P", value=0.01, precision=None)
         return prefix, postfix
 
-    async def _do_relative_splits_during_home_for(self, axes: str):
+    async def _do_relative_splits_during_home_for(self, axes: str) -> None:
         """Handle split moves for unsticking axes before home.
 
         This is particularly ugly bit of code that flips the motor controller
@@ -1598,15 +1598,16 @@ class SmoothieDriver:
                 .add_builder(builder=self._build_speed_command(self._combined_speed))
             )
 
-    async def fast_home(self, axis, safety_margin):
+    async def fast_home(self, axis: str, safety_margin: float) -> Dict[str, float]:
         """home after a controlled motor stall
 
         Given a known distance we have just stalled along an axis, move
         that distance away from the homing switch. Then finish with home.
         """
         # move some mm distance away from the target axes endstop switch(es)
+        axis_values = ((ax, self.homed_position.get(ax)) for ax in axis.upper())
         destination = {
-            ax: self.homed_position.get(ax) - abs(safety_margin) for ax in axis.upper()
+            ax: val - abs(safety_margin) for (ax, val) in axis_values if val is not None
         }
 
         # there is a chance the axis will hit it's home switch too soon
@@ -1621,8 +1622,8 @@ class SmoothieDriver:
         return await self.home(axis=axis, disabled=disabled)
 
     async def unstick_axes(
-        self, axes: str, distance: float = None, speed: float = None
-    ):
+        self, axes: str, distance: Optional[float] = None, speed: Optional[float] = None
+    ) -> None:
         """
         The plunger axes on OT2 can build up static friction over time and
         when it's cold. To get over this, the robot can move that plunger at
@@ -1766,7 +1767,7 @@ class SmoothieDriver:
             "rails": self._gpio_chardev.get_rail_lights(),
         }
 
-    async def kill(self):
+    async def kill(self) -> None:
         """
         In order to terminate Smoothie motion immediately (including
         interrupting a command in progress, we set the reset pin low and then

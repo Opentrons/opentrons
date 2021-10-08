@@ -1,6 +1,6 @@
 import asyncio
 import logging
-from typing import Callable, Dict, Tuple
+from typing import Callable, Dict, Tuple, List, Optional
 
 from opentrons.hardware_control.types import BoardRevision, DoorState
 from .types import gpio_group, GPIOPin
@@ -30,14 +30,14 @@ class SimulatingGPIOCharDev:
     def board_rev(self, boardrev: BoardRevision) -> None:
         self._board_rev = boardrev
 
-    def _initialize(self) -> Dict[str, int]:
+    def _initialize(self) -> Dict[str, Optional[int]]:
         lines = {}
         for pin in gpio_group.pins:
             lines[pin.name] = pin.by_board_rev(self.board_rev)
         self._initialize_values(list(lines.keys()))
         return lines
 
-    def _initialize_values(self, names) -> None:
+    def _initialize_values(self, names: List[str]) -> None:
         self._values: Dict[str, int] = {}
         for name in names:
             self._values[name] = 1
