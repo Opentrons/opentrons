@@ -61,8 +61,19 @@ class LegacyContextPlugin(AbstractPlugin):
         self._protocol_context = protocol_context
         self._legacy_command_mapper = legacy_command_mapper or LegacyCommandMapper()
 
+        # todo(mm, 2021-10-08):
+        # To simplify this class's structurally allowed state space,
+        # wrap these up in a single optional dataclass.
+        # Currently blocked by a mypy bug, fixed in github.com/python/mypy/pull/10548
+        # but fix unreleased as of mypy 0.910.
         self._subscriptions_are_set_up: bool = False
-        self._unsubscribe_broker: Optional[Callable[[], None]] = None
+        self._unsubscribe_from_main_broker: Optional[Callable[[], None]] = None
+        self._unsubscribe_from_labware_loaded_broker: Optional[
+            Callable[[], None]
+        ] = None
+        self._unsubscribe_from_instrument_loaded_broker: Optional[
+            Callable[[], None]
+        ] = None
 
     def handle_action(self, action: pe_actions.Action) -> None:
         """React to a ProtocolEngine action."""
@@ -79,20 +90,30 @@ class LegacyContextPlugin(AbstractPlugin):
 
     def _set_up_subscriptions(self) -> None:
         assert not self._subscriptions_are_set_up
-        self._unsubscribe_broker = self._protocol_context.broker.subscribe(
+        self._unsubscribe_from_main_broker = self._protocol_context.broker.subscribe(
             topic="command",
             handler=self._dispatch_legacy_command,
         )
-        self._protocol_context.on_labware_loaded = self._dispatch_labware_loaded
-        self._protocol_context.on_instrument_loaded = self._dispatch_instrument_loaded
+        self._unsubscribe_from_labware_loaded_broker = (
+            self._protocol_context.labware_loaded_broker.subscribe(
+                self._dispatch_labware_loaded
+            )
+        )
+        self._unsubscribe_from_instrument_loaded_broker = (
+            self._protocol_context.instrument_loaded_broker.subscribe(
+                self._dispatch_instrument_loaded
+            )
+        )
         self._subscriptions_are_set_up = True
 
     def _tear_down_subscriptions(self) -> None:
         if self._subscriptions_are_set_up:
-            assert self._unsubscribe_broker is not None
-            self._unsubscribe_broker()
-            self._protocol_context.on_labware_loaded = None
-            self._protocol_context.on_instrument_loaded = None
+            assert self._unsubscribe_from_main_broker is not None
+            assert self._unsubscribe_from_labware_loaded_broker is not None
+            assert self._unsubscribe_from_instrument_loaded_broker is not None
+            self._unsubscribe_from_main_broker()
+            self._unsubscribe_from_labware_loaded_broker()
+            self._unsubscribe_from_instrument_loaded_broker()
             self._subscriptions_are_set_up = False
 
     def _dispatch_legacy_command(self, command: LegacyCommand) -> None:

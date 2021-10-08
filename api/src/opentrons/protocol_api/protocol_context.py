@@ -3,12 +3,15 @@ import asyncio
 import contextlib
 import logging
 from typing import (
+    Callable,
     Dict,
+    Generic,
     Iterator,
     List,
-    Callable,
     Optional,
+    Set,
     Tuple,
+    TypeVar,
     Union,
     TYPE_CHECKING,
     cast,
@@ -74,21 +77,6 @@ class ProtocolContext(CommandPublisher):
 
     """
 
-    on_labware_loaded: Optional[Callable[[Labware], None]] = None
-    """For internal Opentrons use only.
-
-    For every successful labware load, this callback will be called with the
-    labware object.
-
-    :meta private:
-    """
-
-    on_instrument_loaded: Optional[Callable[[InstrumentContext], None]] = None
-    """Like :py:obj:`on_labware_loaded`, but for pipettes.
-
-    :meta private:
-    """
-
     def __init__(
         self,
         implementation: AbstractProtocol,
@@ -125,6 +113,33 @@ class ProtocolContext(CommandPublisher):
         self._commands: List[str] = []
         self._unsubscribe_commands: Optional[Callable[[], None]] = None
         self.clear_commands()
+
+        self._labware_loaded_broker = EquipmentBroker[Labware]()
+        self._instrument_loaded_broker = EquipmentBroker[InstrumentContext]()
+
+    @property
+    def labware_loaded_broker(self) -> EquipmentBroker[Labware]:
+        """For internal Opentrons use only.
+
+        :meta private:
+
+        For every successful labware load,
+        subscribers to this broker will be called with the labware object.
+
+        Only :py:obj:`ProtocolContext` is allowed to publish to this broker.
+        Calling code may only subscribe or unsubscribe.
+        """
+        return self._labware_loaded_broker
+
+    @property
+    def instrument_loaded_broker(self) -> EquipmentBroker[InstrumentContext]:
+        """For internal Opentrons use only.
+
+        Like :py:obj:`on_labware_loaded`, but for pipettes.
+
+        :meta private:
+        """
+        return self._instrument_loaded_broker
 
     @classmethod
     def build_using(
@@ -354,8 +369,7 @@ class ProtocolContext(CommandPublisher):
             labware_def=labware_def, location=location, label=label
         )
         result = Labware(implementation=implementation)
-        if self.on_labware_loaded is not None:
-            self.on_labware_loaded(result)
+        self.labware_loaded_broker.publish(result)
         return result
 
     @requires_version(2, 0)
@@ -397,8 +411,7 @@ class ProtocolContext(CommandPublisher):
             version=version,
         )
         result = Labware(implementation=implementation)
-        if self.on_labware_loaded is not None:
-            self.on_labware_loaded(result)
+        self.labware_loaded_broker.publish(result)
         return result
 
     @requires_version(2, 0)
@@ -602,8 +615,7 @@ class ProtocolContext(CommandPublisher):
         )
         self._instruments[checked_mount] = new_instr
 
-        if self.on_instrument_loaded is not None:
-            self.on_instrument_loaded(new_instr)
+        self.instrument_loaded_broker.publish(new_instr)
 
         return new_instr
 
@@ -760,3 +772,62 @@ class ProtocolContext(CommandPublisher):
     def door_closed(self) -> bool:
         """Returns True if the robot door is closed"""
         return self._implementation.door_closed()
+
+
+_MessageT = TypeVar("_MessageT")
+
+
+_CallbackT = Callable[[_MessageT], None]
+
+
+class EquipmentBroker(Generic[_MessageT]):
+    """For Opentrons internal use only.
+
+    :meta private:
+
+    This is a simple pub/sub message broker,
+    meant for monitoring when equipment-loading events
+    (pipette, labware, and module loads)
+    happen on an APIv2 `ProtocolContext`.
+
+    This duplicates much of `opentrons.broker.Broker`,
+    which covers most other APIv2 events, like aspirates and moves,
+    but doesn't cover equipment loads.
+
+    To cover equipment loads, we felt more comfortable
+    duplicating `opentrons.broker.Broker`'s responsibilities here
+    than attempting to extend it without breaking anything.
+    """
+
+    def __init__(self) -> None:
+        self._callbacks: Set[_CallbackT] = set()
+
+    def subscribe(self, callback: _CallbackT) -> Callable[[], None]:
+        """Register ``callback`` to be called by a subsequent `publish`.
+
+        You must not subscribe the same callback again
+        unless you first unsubscribe it.
+
+        Returns:
+            A function that you can call to unsubscribe ``callback``.
+            It must not be called more than once.
+        """
+
+        def unsubscribe() -> None:
+            self._callbacks.remove(callback)
+
+        self._callbacks.add(callback)
+        return unsubscribe
+
+    def publish(self, message: _MessageT) -> None:
+        """Call every subscribed callback, with ``message`` as the argument.
+
+        The order in which the callbacks are called is undefined.
+
+        If any callback raises an exception, it's propagated,
+        and any remaining callbacks will be left uncalled.
+        """
+        # Callback order is undefined because
+        # Python sets don't preserve insertion order.
+        for callback in self._callbacks:
+            callback(message)
