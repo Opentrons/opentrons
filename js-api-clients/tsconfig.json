@@ -1,0 +1,14 @@
+{
+  "files": [],
+  "references": [
+    {
+      "path": "./example-app"
+    },
+    {
+      "path": "./packages/api-client"
+    },
+    {
+      "path": "./packages/react-api-client"
+    }
+  ]
+}

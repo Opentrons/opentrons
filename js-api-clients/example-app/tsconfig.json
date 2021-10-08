@@ -1,0 +1,10 @@
+{
+  "extends": "../tsconfig-base.json",
+  "references": [{ "path": "../packages/react-api-client" }],
+  "compilerOptions": {
+    "composite": true,
+    "rootDir": "src",
+    "outDir": "lib"
+  },
+  "include": ["src"]
+}
