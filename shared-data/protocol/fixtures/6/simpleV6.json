@@ -46,7 +46,7 @@
       "definitionId": "example/plate/1"
     }
   },
-  "liquid": {
+  "liquids": {
     "waterId": {
       "displayName": "Water",
       "description": "Liquid H2O"

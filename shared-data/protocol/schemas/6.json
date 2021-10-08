@@ -287,7 +287,7 @@
       }
     },
 
-    "liquid": {
+    "liquids": {
       "description": "All instances of liquid used in this protocol, keyed by a unique identifier (liquidId)",
       "patternProperties": {
         ".+": {

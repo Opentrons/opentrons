@@ -44,6 +44,12 @@ export interface ProtocolFile<DesignerApplicationData> {
       model: ModuleModel
     }
   }
+  liquids: {
+    [liquidId: string]: {
+      displayName: string
+      description: string
+    }
+  }
   commands: Command[]
   commandAnnotations?: {
     commandIds: string[]
