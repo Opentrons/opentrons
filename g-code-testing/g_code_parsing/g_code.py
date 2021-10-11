@@ -7,6 +7,7 @@ from opentrons.drivers.smoothie_drivers.driver_3_0 import GCODE as SMOOTHIE_G_CO
 from opentrons.drivers.mag_deck.driver import GCODE as MAGDECK_G_CODE
 from opentrons.drivers.temp_deck.driver import GCODE as TEMPDECK_G_CODE
 from opentrons.drivers.thermocycler.driver import GCODE as THERMOCYCLER_G_CODE
+from opentrons.drivers.heatershaker.driver import GCODE as HEATER_SHAKER_G_CODE
 from g_code_parsing.utils import reverse_enum
 from opentrons.hardware_control.emulation.parser import Parser
 from g_code_parsing.g_code_functionality_defs.g_code_functionality_def_base import (  # noqa: E501
@@ -17,6 +18,7 @@ from g_code_parsing.g_code_functionality_defs import (
     magdeck,
     tempdeck,
     thermocycler,
+    heater_shaker,
 )
 
 
@@ -94,6 +96,18 @@ class GCode:
         THERMOCYCLER_G_CODE.EDIT_PID_PARAMS.name: thermocycler.EditPIDParamsGCodeFunctionalityDef,  # noqa: E501
     }
 
+    HEATER_SHAKER_G_CODE_EXPLANATION_MAPPING = {
+        HEATER_SHAKER_G_CODE.SET_RPM.name: heater_shaker.SetRPMGCodeFunctionalityDef,
+        HEATER_SHAKER_G_CODE.GET_RPM.name: heater_shaker.GetRPMGCodeFunctionalityDef,
+        HEATER_SHAKER_G_CODE.SET_TEMPERATURE.name: heater_shaker.SetTempGCodeFunctionalityDef,  # noqa: E501
+        HEATER_SHAKER_G_CODE.GET_TEMPERATURE.name: heater_shaker.GetTempGCodeFunctionalityDef,  # noqa: E501
+        HEATER_SHAKER_G_CODE.HOME.name: heater_shaker.HomeGCodeFunctionalityDef,
+        HEATER_SHAKER_G_CODE.GET_VERSION.name: heater_shaker.GetVersionGCodeFunctionalityDef,  # noqa: E501
+        HEATER_SHAKER_G_CODE.OPEN_PLATE_LOCK.name: heater_shaker.OpenPlateLockGCodeFunctionalityDef,  # noqa: E501
+        HEATER_SHAKER_G_CODE.CLOSE_PLATE_LOCK.name: heater_shaker.ClosePlateLockGCodeFunctionalityDef,  # noqa: E501
+        HEATER_SHAKER_G_CODE.GET_PLATE_LOCK_STATE.name: heater_shaker.GetPlateLockStateGCodeFunctionalityDef,  # noqa: E501
+    }
+
     # Smoothie G-Code Parsing Characters
     SET_SPEED_CHARACTER = "F"
     MOVE_CHARACTERS = ["X", "Y", "Z", "A", "B", "C"]
@@ -112,11 +126,15 @@ class GCode:
     THERMOCYCLER_IDENT = "thermocycler"
     THERMOCYCLER_G_CODE_LOOKUP = reverse_enum(THERMOCYCLER_G_CODE)
 
+    HEATER_SHAKER_IDENT = "heatershaker"
+    HEATER_SHAKER_G_CODE_LOOKUP = reverse_enum(HEATER_SHAKER_G_CODE)
+
     DEVICE_GCODE_LOOKUP = {
         SMOOTHIE_IDENT: SMOOTHIE_G_CODE_LOOKUP,
         MAGDECK_IDENT: MAGDECK_G_CODE_LOOKUP,
         TEMPDECK_IDENT: TEMPDECK_G_CODE_LOOKUP,
         THERMOCYCLER_IDENT: THERMOCYCLER_G_CODE_LOOKUP,
+        HEATER_SHAKER_IDENT: HEATER_SHAKER_G_CODE_LOOKUP,
     }
 
     SPECIAL_HANDLING_REQUIRED_G_CODES = [
@@ -129,6 +147,7 @@ class GCode:
         MAGDECK_IDENT: MAGDECK_G_CODE_EXPLANATION_MAPPING,
         TEMPDECK_IDENT: TEMPDECK_G_CODE_EXPLANATION_MAPPING,
         THERMOCYCLER_IDENT: THERMOCYCLER_G_CODE_EXPLANATION_MAPPING,
+        HEATER_SHAKER_IDENT: HEATER_SHAKER_G_CODE_EXPLANATION_MAPPING,
     }
 
     # These are a list of codes that are called using polling.

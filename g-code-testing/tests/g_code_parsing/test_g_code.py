@@ -273,12 +273,61 @@ def thermocycler_g_codes() -> List[GCode]:
     return [code[0] for code in g_code_list]
 
 
+def heater_shaker_g_codes() -> List[GCode]:
+    raw_codes = [
+        # Test 75 - Set RPM
+        ["M3 S2000", "M3 OK"],
+        # Test 76 - Get RPM
+        ["M123", "M123 C:1998 T:2000 OK"],
+        # Test 77 - Set Temperature
+        ["M104 S63.1", "M104 OK"],
+        # Test 78 - Get Temperature
+        ["M105", "M105 C:63.12 T:63.10 OK"],
+        # Test 79 - Home
+        ["G28", "G28 OK"],
+        # Test 80 - Get Version
+        [
+            "M115",
+            "M115 FW:v0.1.0-12-gba8ae71-ba8ae71 HW:Opentrons Heater-Shaker "
+            "SerialNo:EMPTYSN OK",
+        ],
+        # Test 81 - Open Plate Lock
+        ["M242", "M242 OK"],
+        # Test 82 - Close Plate Lock
+        ["M243", "M243 OK"],
+        # Test 83 - Get Plate Lock State (Opening)
+        ["M241", "M241 STATE:OPENING OK"],
+        # Test 84 - Get Plate Lock State (Closing)
+        ["M241", "M241 STATE:CLOSING OK"],
+        # Test 85 - Get Plate Lock State (Unknown)
+        ["M241", "M241 STATE:IDLE_UNKNOWN OK"],
+        # Test 86 - Get Plate Lock State (Open)
+        ["M241", "M241 STATE:IDLE_OPEN OK"],
+        # Test 87 - Get Plate Lock State (Closed)
+        ["M241", "M241 STATE:IDLE_CLOSED OK"],
+    ]
+    g_code_list = [
+        GCode.from_raw_code(code, "heatershaker", response)
+        for code, response in raw_codes
+    ]
+
+    for g_code in g_code_list:
+        if len(g_code) > 1:
+            g_codes = ", ".join([code.g_code for code in g_code])
+            raise Exception(
+                "Hey, you forgot to put a comma between the G-Codes for " f"{g_codes}"
+            )
+
+    return [code[0] for code in g_code_list]
+
+
 def all_g_codes() -> List[GCode]:
     g_codes = []
     g_codes.extend(smoothie_g_codes())
     g_codes.extend(magdeck_g_codes())
     g_codes.extend(tempdeck_g_codes())
     g_codes.extend(thermocycler_g_codes())
+    g_codes.extend(heater_shaker_g_codes())
 
     return g_codes
 
@@ -364,6 +413,20 @@ def expected_function_name_values() -> List[str]:
         "DEACTIVATE_ALL",  # Test 72
         "EDIT_PID_PARAMS",  # Test 73
         "EDIT_PID_PARAMS",  # Test 74
+        # Heater Shaker
+        "SET_RPM",  # Test 75 - Set RPM
+        "GET_RPM",  # Test 76 - Get RPM
+        "SET_TEMPERATURE",  # Test 77 - Set Temperature
+        "GET_TEMPERATURE",  # Test 78 - Get Temperature
+        "HOME",  # Test 79 - Home
+        "GET_VERSION",  # Test 80 - Get Version
+        "OPEN_PLATE_LOCK",  # Test 81 - Open Plate Lock
+        "CLOSE_PLATE_LOCK",  # Test 82 - Close Plate Lock
+        "GET_PLATE_LOCK_STATE",  # Test 83 - Get Plate Lock State (Opening)
+        "GET_PLATE_LOCK_STATE",  # Test 84 - Get Plate Lock State (Closing)
+        "GET_PLATE_LOCK_STATE",  # Test 85 - Get Plate Lock State (Unknown)
+        "GET_PLATE_LOCK_STATE",  # Test 86 - Get Plate Lock State (Open)
+        "GET_PLATE_LOCK_STATE",  # Test 87 - Get Plate Lock State (Closed)
     ]
 
 
@@ -534,6 +597,33 @@ def expected_arg_values() -> List[Dict[str, Union[int, float, str, None]]]:
         {"P": 0.2, "I": 0.3, "D": 0.4},
         # Test 74
         {"P": 0.2, "I": 0.3, "D": 0.4},
+        # Heater Shaker
+        # Test 75 - Set RPM
+        {"S": 2000.0},
+        # Test 76 - Get RPM
+        {},
+        # Test 77 - Set Temperature
+        {"S": 63.1},
+        # Test 78 - Get Temperature
+        {},
+        # Test 79 - Home
+        {},
+        # Test 80 - Get Version
+        {},
+        # Test 81 - Open Plate Lock
+        {},
+        # Test 82 - Close Plate Lock
+        {},
+        # Test 83 - Get Plate Lock State (Opening)
+        {},
+        # Test 84 - Get Plate Lock State (Closing)
+        {},
+        # Test 85 - Get Plate Lock State (Unknown)
+        {},
+        # Test 86 - Get Plate Lock State (Open)
+        {},
+        # Test 87 - Get Plate Lock State (Closed)
+        {},
     ]
 
 
@@ -1249,6 +1339,115 @@ def explanations() -> List[Explanation]:
             "\n\tKp: 0.2"
             "\n\tKi: 0.3"
             "\n\tKd: 0.4",
+        ),
+        # Test 75
+        Explanation(
+            code="M3",
+            command_name="SET_RPM",
+            response="",
+            provided_args={"S": 2000.0},
+            command_explanation="Setting heater-shaker RPM to 2000.0",
+        ),
+        # Test 76
+        Explanation(
+            code="M123",
+            command_name="GET_RPM",
+            response="Set RPM is 2000. Current RPM is 1998",
+            provided_args={},
+            command_explanation="Getting heater-shaker RPM",
+        ),
+        # Test 77
+        Explanation(
+            code="M104",
+            command_name="SET_TEMPERATURE",
+            response="",
+            provided_args={"S": 63.1},
+            command_explanation="Setting heater-shaker temp to 63.1C",
+        ),
+        # Test 78
+        Explanation(
+            code="M105",
+            command_name="GET_TEMPERATURE",
+            response="Set temp is 63.10C. Current temp is 63.12C",
+            provided_args={},
+            command_explanation="Getting heater-shaker temperature",
+        ),
+        # Test 79
+        Explanation(
+            code="G28",
+            command_name="HOME",
+            response="",
+            provided_args={},
+            command_explanation="Homing the heater-shaker",
+        ),
+        # Test 80
+        Explanation(
+            code="M115",
+            command_name="GET_VERSION",
+            response=(
+                "Heater-Shaker info:"
+                "\n\tSerial Number: EMPTYSN"
+                "\n\tModel: Opentrons Heater-Shaker"
+                "\n\tFirmware Version: v0.1.0-12-gba8ae71-ba8ae71"
+            ),
+            provided_args={},
+            command_explanation="Getting heater-shaker version information",
+        ),
+        # Test 81
+        Explanation(
+            code="M242",
+            command_name="OPEN_PLATE_LOCK",
+            response="",
+            provided_args={},
+            command_explanation="Opening heater-shaker plate lock",
+        ),
+        # Test 82
+        Explanation(
+            code="M243",
+            command_name="CLOSE_PLATE_LOCK",
+            response="",
+            provided_args={},
+            command_explanation="Closing heater-shaker plate lock",
+        ),
+        # Test 83
+        Explanation(
+            code="M241",
+            command_name="GET_PLATE_LOCK_STATE",
+            response="Plate Lock State: OPENING",
+            provided_args={},
+            command_explanation="Getting heater-shaker plate lock state",
+        ),
+        # Test 84
+        Explanation(
+            code="M241",
+            command_name="GET_PLATE_LOCK_STATE",
+            response="Plate Lock State: CLOSING",
+            provided_args={},
+            command_explanation="Getting heater-shaker plate lock state",
+        ),
+        # Test 85
+        Explanation(
+            code="M241",
+            command_name="GET_PLATE_LOCK_STATE",
+            response="Plate Lock State: IDLE_UNKNOWN",
+            provided_args={},
+            command_explanation="Getting heater-shaker plate lock state",
+        ),
+        # Test 86
+        Explanation(
+            code="M241",
+            command_name="GET_PLATE_LOCK_STATE",
+            response="Plate Lock State: IDLE_OPEN",
+            provided_args={},
+            command_explanation="Getting heater-shaker plate lock state",
+        ),
+        # Test 87
+        Explanation(
+            code="M241",
+            command_name="GET_PLATE_LOCK_STATE",
+            response="Plate Lock State: IDLE_CLOSED",
+            provided_args={},
+            command_explanation="Getting heater-shaker plate lock state",
         ),
     ]
 
