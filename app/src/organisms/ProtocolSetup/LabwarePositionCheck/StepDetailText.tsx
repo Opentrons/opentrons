@@ -4,7 +4,6 @@ import {
   Box,
   Btn,
   C_BLUE,
-  FONT_SIZE_CAPTION,
   Link,
   SPACING_2,
   JUSTIFY_CENTER,
@@ -61,7 +60,6 @@ export const StepDetailText = (
         />
         <Btn
           as={Link}
-          fontSize={FONT_SIZE_CAPTION}
           color={C_BLUE}
           marginLeft="0.1rem"
           onClick={() => setLabwarePositionCheckStepDetailModal(true)}
