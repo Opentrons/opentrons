@@ -1288,9 +1288,7 @@
       "id": "5abc123",
       "params": {
         "labwareId": "tipRackId",
-        "location": {
-          "moduleId": "magneticModuleId"
-        }
+        "location": { "slotId": "8" }
       }
     },
     {

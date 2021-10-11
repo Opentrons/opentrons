@@ -1313,6 +1313,7 @@
         }
       }
     },
+
     {
       "commandType": "pickUpTip",
       "id": "8abc123",
@@ -1360,85 +1361,41 @@
       }
     },
     {
-      "commandType": "touchTip",
+      "commandType": "temperatureModule/setTargetTemperature",
       "id": "12abc123",
       "params": {
-        "pipetteId": "pipetteId",
-        "labwareId": "destPlateId",
-        "wellName": "B1",
-        "wellLocation": {
-          "origin": "bottom",
-          "offset": { "x": 0, "y": 0, "z": 11 }
-        }
+        "moduleId": "temperatureModuleId",
+        "temperature": 80
       }
     },
     {
-      "commandType": "blowout",
+      "commandType": "temperatureModule/awaitTemperature",
       "id": "13abc123",
       "params": {
-        "pipetteId": "pipetteId",
-        "labwareId": "destPlateId",
-        "wellName": "B1",
-        "flowRate": 2,
-        "wellLocation": {
-          "origin": "bottom",
-          "offset": { "x": 0, "y": 0, "z": 12 }
-        }
+        "moduleId": "temperatureModuleId",
+        "temperature": 80
       }
     },
     {
-      "commandType": "moveToSlot",
+      "commandType": "temperatureModule/deactivate",
       "id": "14abc123",
       "params": {
-        "pipetteId": "pipetteId",
-        "slotId": "5",
-        "wellLocation": {
-          "origin": "bottom",
-          "offset": { "x": 1, "y": 2, "z": 3 }
-        }
+        "moduleId": "temperatureModuleId"
       }
     },
     {
-      "commandType": "moveToWell",
+      "commandType": "magneticModule/engageMagnet",
       "id": "15abc123",
       "params": {
-        "pipetteId": "pipetteId",
-        "labwareId": "destPlateId",
-        "wellName": "B2"
+        "moduleId": "magneticModuleId",
+        "engageHeight": 10
       }
     },
     {
-      "commandType": "moveToWell",
+      "commandType": "magneticModule/disengageMagnet",
       "id": "16abc123",
       "params": {
-        "pipetteId": "pipetteId",
-        "labwareId": "destPlateId",
-        "wellName": "B2",
-        "wellLocation": {
-          "origin": "bottom",
-          "offset": { "x": 2, "y": 3, "z": 10 }
-        },
-        "minimumZHeight": 35,
-        "forceDirect": true
-      }
-    },
-    {
-      "commandType": "dropTip",
-      "id": "17abc123",
-      "params": {
-        "pipetteId": "pipetteId",
-        "labwareId": "trashId",
-        "wellName": "A1"
-      }
-    },
-    {
-      "commandType": "moveToCoordinates",
-      "id": "16abc123",
-      "params": {
-        "pipetteId": "pipetteId",
-        "coordinates": { "x": 0, "y": 0, "z": 0 },
-        "minimumZHeight": 35,
-        "forceDirect": true
+        "moduleId": "temperatureModuleId"
       }
     }
   ],
