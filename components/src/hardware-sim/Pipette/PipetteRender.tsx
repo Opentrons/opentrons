@@ -69,7 +69,7 @@ export const PipetteRender = (props: PipetteRenderProps): JSX.Element => {
         {channels === 1 ? (
           <EmanatingNozzle cx={cx} cy={cy} />
         ) : (
-          <EightEmanatingNozzles cx={cx - 0.3} initialCy={cy} />
+          <EightEmanatingNozzles cx={cx} initialCy={cy} />
         )}
       </svg>
     </RobotCoordsForeignDiv>
