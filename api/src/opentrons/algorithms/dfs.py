@@ -4,7 +4,7 @@ Search a generic graph down to its leaf
 nodes first before back-tracking up the tree.
 """
 
-from typing import List, Set, Generic
+from typing import List, Set, Generic, Sequence
 
 from .graph import Graph
 from .types import VertexName, GenericNode
@@ -17,7 +17,7 @@ class DFS(Generic[VertexName]):
     perform a depth first search on the graph.
     """
 
-    def __init__(self, graph: List[GenericNode[VertexName]]) -> None:
+    def __init__(self, graph: Sequence[GenericNode[VertexName]]) -> None:
         """DFS Initializer.
 
         :param graph: A list of nodes you wish to add to
