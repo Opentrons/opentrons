@@ -1,6 +1,7 @@
 from __future__ import annotations
 import asyncio
 import contextlib
+from dataclasses import dataclass
 import logging
 from typing import (
     Callable,
@@ -114,17 +115,17 @@ class ProtocolContext(CommandPublisher):
         self._unsubscribe_commands: Optional[Callable[[], None]] = None
         self.clear_commands()
 
-        self._labware_loaded_broker = EquipmentBroker[Labware]()
+        self._labware_loaded_broker = EquipmentBroker[LabwareLoadInfo]()
         self._instrument_loaded_broker = EquipmentBroker[InstrumentContext]()
 
     @property
-    def labware_loaded_broker(self) -> EquipmentBroker[Labware]:
+    def labware_loaded_broker(self) -> EquipmentBroker[LabwareLoadInfo]:
         """For internal Opentrons use only.
 
         :meta private:
 
-        For every successful labware load,
-        subscribers to this broker will be called with the labware object.
+        Subscribers to this broker will be notified with information about every
+        successful labware load.
 
         Only :py:obj:`ProtocolContext` is allowed to publish to this broker.
         Calling code may only subscribe or unsubscribe.
@@ -135,9 +136,9 @@ class ProtocolContext(CommandPublisher):
     def instrument_loaded_broker(self) -> EquipmentBroker[InstrumentContext]:
         """For internal Opentrons use only.
 
-        Like :py:obj:`on_labware_loaded`, but for pipettes.
-
         :meta private:
+
+        Like `labware_loaded_broker`, but for pipettes.
         """
         return self._instrument_loaded_broker
 
@@ -369,7 +370,18 @@ class ProtocolContext(CommandPublisher):
             labware_def=labware_def, location=location, label=label
         )
         result = Labware(implementation=implementation)
-        self.labware_loaded_broker.publish(result)
+
+        result_namespace, result_load_name, result_version = result.uri.split("/")
+        self.labware_loaded_broker.publish(
+            LabwareLoadInfo(
+                labware_definition=result._implementation.get_definition(),
+                labware_namespace=result_namespace,
+                labware_load_name=result_load_name,
+                labware_version=int(result_version),
+                deck_slot=types.DeckSlotName.from_primitive(location),
+            )
+        )
+
         return result
 
     @requires_version(2, 0)
@@ -411,7 +423,18 @@ class ProtocolContext(CommandPublisher):
             version=version,
         )
         result = Labware(implementation=implementation)
-        self.labware_loaded_broker.publish(result)
+
+        result_namespace, result_load_name, result_version = result.uri.split("/")
+        self.labware_loaded_broker.publish(
+            LabwareLoadInfo(
+                labware_definition=result._implementation.get_definition(),
+                labware_namespace=result_namespace,
+                labware_load_name=result_load_name,
+                labware_version=int(result_version),
+                deck_slot=types.DeckSlotName.from_primitive(location),
+            )
+        )
+
         return result
 
     @requires_version(2, 0)
@@ -774,9 +797,29 @@ class ProtocolContext(CommandPublisher):
         return self._implementation.door_closed()
 
 
+# todo(mm, 2021-10-11): For the HTTP API to report when labware is loaded on a module,
+# this class either needs to optionally have a module attribute instead of DeckSlotName,
+# or it needs to be split into LabwareLoadedOnDeckInfo and LabwareLoadedOnModuleInfo.
+@dataclass(frozen=True)
+class LabwareLoadInfo:
+    """For Opentrons internal use only.
+
+    :meta private:
+
+    Information about a successful labware load.
+
+    This is a separate class from the main user-facing `Labware` class
+    because this is easier to construct in unit tests.
+    """
+
+    labware_definition: "LabwareDefinition"
+    labware_namespace: str
+    labware_load_name: str
+    labware_version: int
+    deck_slot: types.DeckSlotName
+
+
 _MessageT = TypeVar("_MessageT")
-
-
 
 
 class EquipmentBroker(Generic[_MessageT]):

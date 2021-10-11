@@ -2,15 +2,14 @@
 
 from collections import defaultdict
 from typing import Dict, List
-import logging
 
-from opentrons.types import DeckSlotName, MountType
+from opentrons.types import MountType
 from opentrons.util.helpers import utc_now
 from opentrons.commands.types import CommandMessage as LegacyCommand
 from opentrons.protocol_engine import commands as pe_commands, types as pe_types
 from opentrons.protocols.models.labware_definition import LabwareDefinition
 
-from .legacy_wrappers import LegacyPipetteContext, LegacyLabware
+from .legacy_wrappers import LegacyPipetteContext, LegacyLabwareLoadInfo
 
 
 class LegacyCommandData(pe_commands.CustomData):
@@ -74,26 +73,11 @@ class LegacyCommandMapper:
         return results
 
     def map_labware_loaded(
-        self, loaded_labware: LegacyLabware
+        self,
+        labware_load_info: LegacyLabwareLoadInfo,
     ) -> List[pe_commands.Command]:
         """Map a legacy labware load to Protocol Engine commands."""
         now = utc_now()
-
-        namespace, load_name, version = loaded_labware.uri.split("/")
-
-        labware_parent = loaded_labware.parent
-        if not isinstance(labware_parent, str):
-            # todo(mm, 2021-10-05): Implement this when Protocol Engine supports
-            # loading labware onto modules.
-            logging.warning(
-                f"Labware {repr(loaded_labware)} "
-                f"has parent {repr(labware_parent)}, "
-                f"which doesn't seem like a deck slot. "
-                f"Currently, only labware loaded onto a deck slot can be mapped to "
-                f"Protocol Engine commands, "
-                f"so this labware will not show up in the Protocol Engine state."
-            )
-            return []
 
         count = self._command_count["LOAD_LABWARE"]
 
@@ -104,17 +88,15 @@ class LegacyCommandMapper:
             startedAt=now,
             completedAt=now,
             data=pe_commands.LoadLabwareData(
-                location=pe_types.DeckSlotLocation(
-                    slot=DeckSlotName.from_primitive(labware_parent)
-                ),
-                loadName=load_name,
-                namespace=namespace,
-                version=int(version),
+                location=pe_types.DeckSlotLocation(slot=labware_load_info.deck_slot),
+                loadName=labware_load_info.labware_load_name,
+                namespace=labware_load_info.labware_namespace,
+                version=labware_load_info.labware_version,
             ),
             result=pe_commands.LoadLabwareResult(
                 labwareId=f"labware-{count}",
                 definition=LabwareDefinition.parse_obj(
-                    loaded_labware._implementation.get_definition()
+                    labware_load_info.labware_definition
                 ),
                 calibration=pe_types.CalibrationOffset(x=0, y=0, z=0),
             ),
