@@ -14,7 +14,7 @@ export function useEnsureBasicSession(): SessionData | null {
     if (existingBasicSessions == null && !isLoading && !isError) {
       createSession()
     }
-  }, [existingBasicSessions, isLoading])
+  }, [existingBasicSessions, isLoading, createSession, isError])
 
   return existingBasicSessions?.data[0] ?? null
 }
