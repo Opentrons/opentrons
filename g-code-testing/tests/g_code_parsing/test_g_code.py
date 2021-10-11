@@ -276,35 +276,35 @@ def thermocycler_g_codes() -> List[GCode]:
 def heater_shaker_g_codes() -> List[GCode]:
     raw_codes = [
         # Test 75 - Set RPM
-        ['M3 S2000', 'M3 OK'],
+        ["M3 S2000", "M3 OK"],
         # Test 76 - Get RPM
-        ['M123', 'M123 C:1998 T:2000 OK'],
+        ["M123", "M123 C:1998 T:2000 OK"],
         # Test 77 - Set Temperature
-        ['M104 S63.1', 'M104 OK'],
+        ["M104 S63.1", "M104 OK"],
         # Test 78 - Get Temperature
-        ['M105', 'M105 C:63.12 T:63.10 OK'],
+        ["M105", "M105 C:63.12 T:63.10 OK"],
         # Test 79 - Home
-        ['G28', 'G28 OK'],
+        ["G28", "G28 OK"],
         # Test 80 - Get Version
         [
-            'M115',
-            'M115 FW:v0.1.0-12-gba8ae71-ba8ae71 HW:Opentrons Heater-Shaker '
-            'SerialNo:EMPTYSN OK'
+            "M115",
+            "M115 FW:v0.1.0-12-gba8ae71-ba8ae71 HW:Opentrons Heater-Shaker "
+            "SerialNo:EMPTYSN OK",
         ],
         # Test 81 - Open Plate Lock
-        ['M242', 'M242 OK'],
+        ["M242", "M242 OK"],
         # Test 82 - Close Plate Lock
-        ['M243', 'M243 OK'],
+        ["M243", "M243 OK"],
         # Test 83 - Get Plate Lock State (Opening)
-        ['M241', 'M241 STATE:OPENING OK'],
+        ["M241", "M241 STATE:OPENING OK"],
         # Test 84 - Get Plate Lock State (Closing)
-        ['M241', 'M241 STATE:CLOSING OK'],
+        ["M241", "M241 STATE:CLOSING OK"],
         # Test 85 - Get Plate Lock State (Unknown)
-        ['M241', 'M241 STATE:IDLE_UNKNOWN OK'],
+        ["M241", "M241 STATE:IDLE_UNKNOWN OK"],
         # Test 86 - Get Plate Lock State (Open)
-        ['M241', 'M241 STATE:IDLE_OPEN OK'],
+        ["M241", "M241 STATE:IDLE_OPEN OK"],
         # Test 87 - Get Plate Lock State (Closed)
-        ['M241', 'M241 STATE:IDLE_CLOSED OK'],
+        ["M241", "M241 STATE:IDLE_CLOSED OK"],
     ]
     g_code_list = [
         GCode.from_raw_code(code, "heatershaker", response)

@@ -20,8 +20,5 @@ class GetTempGCodeFunctionalityDef(GCodeFunctionalityDefBase):
         if match is not None:
             current_temp = match.groupdict()["current_temp"].strip()
             set_temp = match.groupdict()["set_temp"].strip()
-            message = (
-                f"Set temp is {set_temp}C. "
-                f"Current temp is {current_temp}C"
-            )
+            message = f"Set temp is {set_temp}C. " f"Current temp is {current_temp}C"
         return message

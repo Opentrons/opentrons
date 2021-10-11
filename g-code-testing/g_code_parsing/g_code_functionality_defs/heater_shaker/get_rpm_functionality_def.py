@@ -19,8 +19,5 @@ class GetRPMGCodeFunctionalityDef(GCodeFunctionalityDefBase):
         if match is not None:
             current_rpm = match.groupdict()["current_rpm"].strip()
             set_rpm = match.groupdict()["set_rpm"].strip()
-            message = (
-                f"Set RPM is {set_rpm}. "
-                f"Current RPM is {current_rpm}"
-            )
+            message = f"Set RPM is {set_rpm}. " f"Current RPM is {current_rpm}"
         return message

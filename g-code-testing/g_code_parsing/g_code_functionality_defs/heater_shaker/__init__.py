@@ -1,6 +1,6 @@
 from .close_plate_lock_functionality_def import ClosePlateLockGCodeFunctionalityDef
 from .get_plate_lock_state_functionality_def import (
-    GetPlateLockStateGCodeFunctionalityDef
+    GetPlateLockStateGCodeFunctionalityDef,
 )
 from .get_rpm_functionality_def import GetRPMGCodeFunctionalityDef
 from .get_temperature_functionality_def import GetTempGCodeFunctionalityDef
@@ -11,13 +11,13 @@ from .set_rpm_functionality_def import SetRPMGCodeFunctionalityDef
 from .set_temperature_functionality_def import SetTempGCodeFunctionalityDef
 
 __all__ = [
-    'ClosePlateLockGCodeFunctionalityDef',
-    'GetPlateLockStateGCodeFunctionalityDef',
-    'GetRPMGCodeFunctionalityDef',
-    'GetTempGCodeFunctionalityDef',
-    'GetVersionGCodeFunctionalityDef',
-    'HomeGCodeFunctionalityDef',
-    'OpenPlateLockGCodeFunctionalityDef',
-    'SetRPMGCodeFunctionalityDef',
-    'SetTempGCodeFunctionalityDef',
+    "ClosePlateLockGCodeFunctionalityDef",
+    "GetPlateLockStateGCodeFunctionalityDef",
+    "GetRPMGCodeFunctionalityDef",
+    "GetTempGCodeFunctionalityDef",
+    "GetVersionGCodeFunctionalityDef",
+    "HomeGCodeFunctionalityDef",
+    "OpenPlateLockGCodeFunctionalityDef",
+    "SetRPMGCodeFunctionalityDef",
+    "SetTempGCodeFunctionalityDef",
 ]

@@ -5,6 +5,7 @@ from opentrons.drivers.smoothie_drivers.driver_3_0 import GCODE as SMOOTHIE_G_CO
 from opentrons.drivers.mag_deck.driver import GCODE as MAGDECK_G_CODE
 from opentrons.drivers.temp_deck.driver import GCODE as TEMPDECK_G_CODE
 from opentrons.drivers.thermocycler.driver import GCODE as THERMOCYCLER_G_CODE
+from opentrons.drivers.heatershaker.driver import GCODE as HEATER_SHAKER_G_CODE
 
 
 WRITE_REGEX = re.compile(r"(.*?) \| (.*?) \|(.*?)$")
@@ -16,6 +17,7 @@ def reverse_enum(
         Type[MAGDECK_G_CODE],
         Type[TEMPDECK_G_CODE],
         Type[THERMOCYCLER_G_CODE],
+        Type[HEATER_SHAKER_G_CODE],
     ]
 ) -> Dict:
     """
