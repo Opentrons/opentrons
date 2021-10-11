@@ -30,6 +30,9 @@
     },
     {
       "path": "./protocol-library-kludge"
+    },
+    {
+      "path": "./js-api-clients"
     }
   ]
 }
