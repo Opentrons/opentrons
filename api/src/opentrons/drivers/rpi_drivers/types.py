@@ -17,7 +17,7 @@ REV_A_USB_HUB = 3
 
 
 @dataclass(frozen=True)
-class USBPort(GenericNode):
+class USBPort(GenericNode[str]):
     port_number: Optional[int] = None
     device_path: str = ""
     hub: Optional[int] = None
@@ -30,8 +30,12 @@ class USBPort(GenericNode):
         An example port path:
         `1-1.3/1-1.3:1.0/tty/ttyACM1/dev`
 
-        :param port_path: Full path of a usb device
-        :returns: Tuple of the port number, hub and name
+        Args:
+            port_path: Full path of a usb device
+            board_revision: Board revision
+
+        Returns:
+            Tuple of the port number, hub and name
         """
         full_name, device_path = port_path.split(":")
         port_nodes = cls.get_unique_nodes(full_name)

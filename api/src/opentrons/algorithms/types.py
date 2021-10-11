@@ -32,6 +32,3 @@ class GenericNode(Generic[VertexName]):
         the list here.
         """
         return hash((self.name, *self.sub_names))
-
-
-VertexLike = TypeVar("VertexLike", bound=GenericNode)

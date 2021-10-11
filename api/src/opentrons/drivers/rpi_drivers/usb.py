@@ -8,7 +8,7 @@ more readable format.
 import subprocess
 import re
 import os
-from typing import List, Set
+from typing import List, Set, Sequence
 
 from opentrons.algorithms.dfs import DFS
 from opentrons.hardware_control.modules.types import ModuleAtPort
@@ -30,8 +30,8 @@ USB_PORT_INFO = re.compile(PORT_PATTERN + DEVICE_PATH)
 class USBBus(USBDriverInterface):
     def __init__(self, board_revision: BoardRevision):
         self._board_revision = board_revision
-        self._usb_dev: List[USBPort] = self.read_usb_bus()
-        self._dfs: DFS = DFS(self._usb_dev)
+        self._usb_dev: Sequence[USBPort] = self.read_usb_bus()
+        self._dfs: DFS[str] = DFS[str](self._usb_dev)
         self._sorted = self._dfs.dfs()
 
     @staticmethod
@@ -88,7 +88,7 @@ class USBBus(USBDriverInterface):
         self._usb_dev = ports
 
     @property
-    def sorted_ports(self) -> Set:
+    def sorted_ports(self) -> Set[str]:
         """
         USBBus property: sorted_ports.
 
@@ -97,7 +97,7 @@ class USBBus(USBDriverInterface):
         return self._sorted
 
     @sorted_ports.setter
-    def sorted_ports(self, sorted: Set) -> None:
+    def sorted_ports(self, sorted: Set[str]) -> None:
         """
         USBBus setter: sorted_ports.
 

@@ -7,12 +7,12 @@ from pathlib import Path
 import pytest
 import json
 import os
-from typing import Any, Callable, List, Set, Tuple, Union
+from typing import Any, Callable, List, Set, Tuple, Union, Dict
 
 from opentrons.algorithms import dfs, types
 
 
-def convert_to_vertex(graph_dict: dict, cast_type: Callable) -> List[types.GenericNode]:
+def convert_to_vertex(graph_dict: Dict[str, List[Union[int, str]]], cast_type: Callable[[Union[int, str]], Union[int, str]]) -> List[types.GenericNode[Union[int, str]]]:
     """Convert to Vertex.
 
     Helper function to convert a json file to a list of
@@ -26,7 +26,7 @@ def convert_to_vertex(graph_dict: dict, cast_type: Callable) -> List[types.Gener
 
 
 def load_graph() -> Tuple[
-    Tuple[List[types.GenericNode], str], Tuple[List[types.GenericNode], str]
+    Tuple[List[types.GenericNode[str]], str], Tuple[List[types.GenericNode[int]], str]
 ]:
     """Load Graphs.
 
@@ -41,7 +41,7 @@ def load_graph() -> Tuple[
 
 
 @pytest.fixture(scope="session", params=load_graph())
-def dfs_graph(request: Any) -> Tuple[dfs.DFS, str]:
+def dfs_graph(request: Any) -> Tuple[dfs.DFS[Union[str, int]], str]:
     """Build DFS class.
 
     Fixture that sets up a dfs class for either an
@@ -52,7 +52,7 @@ def dfs_graph(request: Any) -> Tuple[dfs.DFS, str]:
     return dfs.DFS(graph), _type
 
 
-def test_vertices(dfs_graph: Tuple[dfs.DFS, str]) -> None:
+def test_vertices(dfs_graph: Tuple[dfs.DFS[Union[str, int]], str]) -> None:
     """Test vertices.
 
     Test adding and removing the vertices of a graph.

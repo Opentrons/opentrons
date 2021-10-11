@@ -6,17 +6,17 @@ from __future__ import annotations
 
 from typing import List, Dict, Callable, Sequence, Generic
 
-from .types import VertexLike, VertexName
+from .types import GenericNode, VertexName
 
 
-class Vertex(Generic[VertexName, VertexLike]):
+class Vertex(Generic[VertexName]):
     """Vertex class.
 
     A class to hold information about each vertex
     of a graph.
     """
 
-    def __init__(self, vertex: VertexLike, neighbors: List[VertexName]) -> None:
+    def __init__(self, vertex: GenericNode[VertexName], neighbors: List[VertexName]) -> None:
         """Vertex class initializer.
 
         :param vertex: A node dataclass
@@ -35,7 +35,7 @@ class Vertex(Generic[VertexName, VertexLike]):
         return self._vertex.name
 
     @property
-    def vertex(self) -> VertexLike:
+    def vertex(self) -> GenericNode[VertexName]:
         """Vertex class property: vertex.
 
         :returns: The node dataclass
@@ -68,7 +68,7 @@ class Vertex(Generic[VertexName, VertexLike]):
             self._neighbors.remove(vertex_name)
 
 
-def default_sort(vertex: Vertex) -> VertexName:
+def default_sort(vertex: Vertex[VertexName]) -> VertexName:
     """Sort function default for a graph.
 
     By default, a graph's nodes will be searched
@@ -78,7 +78,7 @@ def default_sort(vertex: Vertex) -> VertexName:
     return vertex.name
 
 
-class Graph(Generic[VertexName, VertexLike]):
+class Graph(Generic[VertexName]):
     """Graph class.
 
     A class to handle functions moving through the
@@ -92,9 +92,9 @@ class Graph(Generic[VertexName, VertexLike]):
     # https://github.com/python/typing/issues/760
     def __init__(
         self,
-        sorted_graph: List[Vertex],
-        lookup_table: Dict[VertexName, Vertex],
-        sort_by: Callable[[Vertex], str],
+        sorted_graph: List[Vertex[VertexName]],
+        lookup_table: Dict[VertexName, Vertex[VertexName]],
+        sort_by: Callable[[Vertex[VertexName]], VertexName],
     ) -> None:
         """Graph class initializer.
 
@@ -110,7 +110,7 @@ class Graph(Generic[VertexName, VertexLike]):
         self._lookup_table = lookup_table
 
     @classmethod
-    def build(cls, graph: List[VertexLike], sort_by: Callable = default_sort) -> Graph:
+    def build(cls, graph: List[GenericNode[VertexName]], sort_by: Callable[[Vertex[VertexName]], VertexName] = default_sort) -> Graph[VertexName]:
         """Graph class builder.
 
         :param graph: A list of nodes to add to the graph.
@@ -128,7 +128,7 @@ class Graph(Generic[VertexName, VertexLike]):
         return cls(sorted_graph, lookup_table, sort_by)
 
     @property
-    def graph(self) -> Sequence[Vertex]:
+    def graph(self) -> Sequence[Vertex[VertexName]]:
         """Graph class property: graph.
 
         :returns: A list of sorted vertex objects
@@ -136,7 +136,7 @@ class Graph(Generic[VertexName, VertexLike]):
         return self._sorted_graph
 
     @staticmethod
-    def build_vertex(vertex: VertexLike) -> Vertex:
+    def build_vertex(vertex: GenericNode[VertexName]) -> Vertex[VertexName]:
         """Build a vertex.
 
         Use this to sort the neighbors and then build
@@ -147,7 +147,7 @@ class Graph(Generic[VertexName, VertexLike]):
         vertex.sub_names.sort()
         return Vertex(vertex, vertex.sub_names)
 
-    def add_vertex(self, vertex: VertexLike) -> None:
+    def add_vertex(self, vertex: GenericNode[VertexName]) -> None:
         """Add a vertex.
 
         :param vertex: A node dataclass
@@ -158,7 +158,7 @@ class Graph(Generic[VertexName, VertexLike]):
             self._sorted_graph.append(new_vertex)
         self._sorted_graph.sort(key=self._sort_by)
 
-    def remove_vertex(self, vertex: VertexLike) -> None:
+    def remove_vertex(self, vertex: GenericNode[VertexName]) -> None:
         """Remove a vertex.
 
         :param vertex: A node dataclass
@@ -168,7 +168,7 @@ class Graph(Generic[VertexName, VertexLike]):
             del self._lookup_table[vertex.name]
             self._sorted_graph.remove(vertex_to_remove)
 
-    def get_vertex(self, vertex_name: VertexName) -> Vertex:
+    def get_vertex(self, vertex_name: VertexName) -> Vertex[VertexName]:
         """Get a vertex.
 
         :param vertex_name: The name of the vertex
