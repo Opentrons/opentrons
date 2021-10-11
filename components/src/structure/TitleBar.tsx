@@ -13,6 +13,7 @@ export interface TitleBarProps {
   title: React.ReactNode
   subtitle?: React.ReactNode
   back?: ButtonProps
+  rightNode?: React.ReactNode
   className?: string
 
   // TODO(mc, 2018-04-13): deprecate these props
@@ -31,7 +32,7 @@ export function TitleBar(props: TitleBarProps): JSX.Element {
     backButtonLabel,
     id,
   } = props
-  let { back } = props
+  let { back, rightNode } = props
 
   const separator = subtitle && <span className={styles.separator}>|</span>
 
@@ -66,6 +67,7 @@ export function TitleBar(props: TitleBarProps): JSX.Element {
       <h1 className={cx(styles.title, { [styles.right]: back })}>{title}</h1>
       {separator}
       {subheading}
+      {rightNode}
     </header>
   )
 }
