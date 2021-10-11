@@ -29,9 +29,10 @@ interface Props {
 export function PositionCheckNav(props: Props): JSX.Element {
   const { sections, primaryPipetteMount, secondaryPipetteMount } = props
   const { t } = useTranslation('labware_position_check')
-  const [sectionIndex, setSectionIndex] = React.useState<number>(0) 
-  const rotateSectionIndex = () => setSectionIndex((sectionIndex+1) % sections.length) 
-  useInterval(rotateSectionIndex, INTERVAL_MS, true)
+  const [sectionIndex, setSectionIndex] = React.useState<number>(0)
+  const rotateSectionIndex = (): void =>
+    setSectionIndex((sectionIndex + 1) % sections.length)
+  useInterval(rotateSectionIndex, INTERVAL_MS)
   const currentSection = sections[sectionIndex]
 
   return (
@@ -61,11 +62,7 @@ export function PositionCheckNav(props: Props): JSX.Element {
             {index + 1}
           </Box>
           <Box maxWidth="85%">
-            <Text
-              color={
-                section === currentSection ? '#00c3e6' : C_DARK_GRAY
-              }
-            >
+            <Text color={section === currentSection ? '#00c3e6' : C_DARK_GRAY}>
               {t(`${section.toLowerCase()}_section`, {
                 primary_mount: capitalize(primaryPipetteMount),
                 secondary_mount: capitalize(secondaryPipetteMount),
