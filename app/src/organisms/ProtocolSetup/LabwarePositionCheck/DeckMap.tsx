@@ -1,7 +1,11 @@
 import * as React from 'react'
 import map from 'lodash/map'
-
-import { LabwareRender, Module, RobotWorkSpace } from '@opentrons/components'
+import {
+  LabwareRender,
+  Module,
+  RobotWorkSpace,
+  C_SELECTED_DARK,
+} from '@opentrons/components'
 import {
   THERMOCYCLER_MODULE_V1,
   inferModuleOrientationFromXCoordinate,
@@ -22,7 +26,12 @@ const DECK_LAYER_BLOCKLIST = [
   'screwHoles',
 ]
 
-export const DeckMap = (): JSX.Element => {
+interface DeckMapProps {
+  labwareIdsToHighlight?: string[]
+}
+
+export const DeckMap = (props: DeckMapProps): JSX.Element => {
+  const { labwareIdsToHighlight } = props
   const moduleRenderInfoById = useModuleRenderInfoById()
   const labwareRenderInfoById = useLabwareRenderInfoById()
   return (
@@ -38,7 +47,7 @@ export const DeckMap = (): JSX.Element => {
           <React.Fragment>
             {map(
               moduleRenderInfoById,
-              ({ x, y, moduleDef, nestedLabwareDef }) => (
+              ({ x, y, moduleDef, nestedLabwareDef, nestedLabwareId }) => (
                 <Module
                   key={`LabwarePositionCheck_Module_${moduleDef.model}_${x}${y}`}
                   x={x}
@@ -56,19 +65,41 @@ export const DeckMap = (): JSX.Element => {
                       key={`LabwarePositionCheck_Labware_${nestedLabwareDef.metadata.displayName}_${x}${y}`}
                     >
                       <LabwareRender definition={nestedLabwareDef} />
+                      {nestedLabwareId != null &&
+                        labwareIdsToHighlight?.includes(nestedLabwareId) ===
+                          true && (
+                          <rect
+                            width={nestedLabwareDef.dimensions.xDimension - 2}
+                            height={nestedLabwareDef.dimensions.yDimension - 2}
+                            fill={'none'}
+                            stroke={C_SELECTED_DARK}
+                            strokeWidth={'3px'}
+                            data-testid={`DeckMap_module_${nestedLabwareId}_highlight`}
+                          />
+                        )}
                     </React.Fragment>
                   ) : null}
                 </Module>
               )
             )}
 
-            {map(labwareRenderInfoById, ({ x, y, labwareDef }) => {
+            {map(labwareRenderInfoById, ({ x, y, labwareDef }, labwareId) => {
               return (
                 <React.Fragment
                   key={`LabwarePositionCheck_Labware_${labwareDef.metadata.displayName}_${x}${y}`}
                 >
                   <g transform={`translate(${x},${y})`}>
                     <LabwareRender definition={labwareDef} />
+                    {labwareIdsToHighlight?.includes(labwareId) === true && (
+                      <rect
+                        width={labwareDef.dimensions.xDimension - 2}
+                        height={labwareDef.dimensions.yDimension - 2}
+                        fill={'none'}
+                        stroke={C_SELECTED_DARK}
+                        strokeWidth={'3px'}
+                        data-testid={`DeckMap_${labwareId}_highlight`}
+                      />
+                    )}
                   </g>
                 </React.Fragment>
               )

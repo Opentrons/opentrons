@@ -14,26 +14,24 @@ import {
   C_DARK_GRAY,
   TEXT_ALIGN_CENTER,
   FONT_SIZE_CAPTION,
-  useInterval,
   Text,
 } from '@opentrons/components'
 import type { Section } from './types'
-
-const INTERVAL_MS = 3000
 interface Props {
   sections: Section[]
+  currentSection: Section
   primaryPipetteMount: string
   secondaryPipetteMount: string
 }
 
 export function PositionCheckNav(props: Props): JSX.Element {
-  const { sections, primaryPipetteMount, secondaryPipetteMount } = props
+  const {
+    currentSection,
+    sections,
+    primaryPipetteMount,
+    secondaryPipetteMount,
+  } = props
   const { t } = useTranslation('labware_position_check')
-  const [sectionIndex, setSectionIndex] = React.useState<number>(0)
-  const rotateSectionIndex = (): void =>
-    setSectionIndex((sectionIndex + 1) % sections.length)
-  useInterval(rotateSectionIndex, INTERVAL_MS)
-  const currentSection = sections[sectionIndex]
 
   return (
     <Box

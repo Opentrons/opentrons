@@ -5,6 +5,7 @@ import {
   Text,
   Flex,
   Box,
+  useInterval,
   TEXT_TRANSFORM_UPPERCASE,
   FONT_WEIGHT_SEMIBOLD,
   JUSTIFY_SPACE_BETWEEN,
@@ -18,13 +19,21 @@ import {
 } from '@opentrons/components'
 import { PositionCheckNav } from './PositionCheckNav'
 import { DeckMap } from './DeckMap'
-import { useIntroInfo } from './hooks'
+import { useIntroInfo, useLabwareIdsBySection } from './hooks'
+
+const INTERVAL_MS = 3000
 
 export const IntroScreen = (props: {
   setCurrentLabwareCheckStep: (stepNumber: number) => void
 }): JSX.Element | null => {
   const introInfo = useIntroInfo()
+  const labwareIdsBySection = useLabwareIdsBySection()
   const { t } = useTranslation(['labware_position_check', 'shared'])
+
+  const [sectionIndex, setSectionIndex] = React.useState<number>(0)
+  const rotateSectionIndex = (): void =>
+    setSectionIndex((sectionIndex + 1) % sections.length)
+  useInterval(rotateSectionIndex, INTERVAL_MS)
 
   if (introInfo == null) return null
   const {
@@ -33,6 +42,9 @@ export const IntroScreen = (props: {
     firstStepLabwareSlot,
     sections,
   } = introInfo
+
+  const currentSection = sections[sectionIndex]
+  const labwareIdsToHighlight = labwareIdsBySection[currentSection]
 
   return (
     <Box margin={SPACING_3}>
@@ -53,11 +65,12 @@ export const IntroScreen = (props: {
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_CENTER}>
         <PositionCheckNav
           sections={sections}
+          currentSection={currentSection}
           primaryPipetteMount={primaryPipetteMount}
           secondaryPipetteMount={secondaryPipetteMount}
         />
         <Box width="60%" padding={SPACING_3}>
-          <DeckMap />
+          <DeckMap labwareIdsToHighlight={labwareIdsToHighlight} />
         </Box>
       </Flex>
       <Flex justifyContent={JUSTIFY_CENTER} marginBottom={SPACING_4}>
