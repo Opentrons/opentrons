@@ -17,7 +17,6 @@ import {
   useInterval,
   Text,
 } from '@opentrons/components'
-import { useLabwareIdsBySection } from './hooks'
 import type { Section } from './types'
 
 const INTERVAL_MS = 3000
@@ -30,9 +29,10 @@ interface Props {
 export function PositionCheckNav(props: Props): JSX.Element {
   const { sections, primaryPipetteMount, secondaryPipetteMount } = props
   const { t } = useTranslation('labware_position_check')
-  const labwareIdsBySection = useLabwareIdsBySection()
-  useInterval(() => sectionsByLabwareId[0], INTERVAL_MS, true)
-  const sectionsByLabwareId = Object.keys(labwareIdsBySection)
+  const [sectionIndex, setSectionIndex] = React.useState<number>(0) 
+  const rotateSectionIndex = () => setSectionIndex((sectionIndex+1) % sections.length) 
+  useInterval(rotateSectionIndex, INTERVAL_MS, true)
+  const currentSection = sections[sectionIndex]
 
   return (
     <Box
@@ -51,7 +51,7 @@ export function PositionCheckNav(props: Props): JSX.Element {
             height={SIZE_1}
             lineHeight={SIZE_1}
             backgroundColor={
-              section === sectionsByLabwareId[0] ? '#00c3e6' : C_DARK_GRAY
+              section === currentSection ? '#00c3e6' : C_DARK_GRAY
             }
             color={C_WHITE}
             borderRadius="50%"
@@ -63,7 +63,7 @@ export function PositionCheckNav(props: Props): JSX.Element {
           <Box maxWidth="85%">
             <Text
               color={
-                section === sectionsByLabwareId[0] ? '#00c3e6' : C_DARK_GRAY
+                section === currentSection ? '#00c3e6' : C_DARK_GRAY
               }
             >
               {t(`${section.toLowerCase()}_section`, {
