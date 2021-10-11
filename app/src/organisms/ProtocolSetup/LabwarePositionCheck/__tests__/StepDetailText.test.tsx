@@ -3,8 +3,8 @@ import { resetAllWhenMocks, when } from 'jest-when'
 import { fireEvent, screen } from '@testing-library/react'
 import withSinglechannelProtocol from '@opentrons/shared-data/protocol/fixtures/4/testModulesProtocol.json'
 import withMultiChannelProtocol from '@opentrons/shared-data/protocol/fixtures/4/pipetteMultiChannelProtocolV4.json'
-import { nestedTextMatcher } from '@opentrons/components'
 import {
+  nestedTextMatcher,
   componentPropsMatcher,
   renderWithProviders,
 } from '@opentrons/components'

@@ -49,6 +49,11 @@ const Labels = (props: {
         return (
           <RobotCoordsText
             key={wellName}
+            data-testid={
+              wellLabelOption === WELL_LABEL_OPTIONS.SHOW_LABEL_INSIDE
+                ? 'WellsLabels_show_inside'
+                : 'WellsLabels_show_outside'
+            }
             x={props.isLetterColumn ? LETTER_COLUMN_X : well.x}
             y={
               props.isLetterColumn
@@ -73,7 +78,7 @@ const Labels = (props: {
   )
 }
 
-function WellLabelsComponent(props: WellLabelsProps): JSX.Element {
+export function WellLabelsComponent(props: WellLabelsProps): JSX.Element {
   const {
     definition,
     wellLabelOption,

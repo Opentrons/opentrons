@@ -3,9 +3,9 @@ import {
   WellLabels,
   StyledWells,
   FilledWells,
+  StrokedWells,
   StaticLabware,
 } from './labwareInternals'
-import { StrokedWells } from './labwareInternals/StrokedWells'
 import styles from './LabwareRender.css'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'

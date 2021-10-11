@@ -25,7 +25,7 @@ export interface WellProps {
   onMouseLeaveWell?: (e: WellMouseEvent) => unknown
 }
 
-function WellComponent(props: WellProps): JSX.Element | null {
+export function WellComponent(props: WellProps): JSX.Element | null {
   const {
     well,
     wellName,

@@ -3,19 +3,19 @@ import { when, resetAllWhenMocks } from 'jest-when'
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
 import {
   RobotWorkSpace,
+  componentPropsMatcher,
   partialComponentPropsMatcher,
   renderWithProviders,
   LabwareRender,
   PipetteRender,
   anyProps,
+  C_BLUE,
+  WELL_LABEL_OPTIONS,
 } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import { useProtocolDetails } from '../../../RunDetails/hooks'
 import { LabwarePositionCheckStepDetail } from '../LabwarePositionCheckStepDetail'
 import { StepDetailText } from '../StepDetailText'
-import { componentPropsMatcher } from '../../../../../../components/lib/matchers'
-import { C_BLUE } from '../../../../../../components/src/styles/colors'
-import { WELL_LABEL_OPTIONS } from '../../../../../../components/src/hardware-sim/Labware/LabwareRender'
 
 jest.mock('@opentrons/components', () => {
   const actualComponents = jest.requireActual('@opentrons/components')
@@ -177,7 +177,7 @@ describe('LabwarePositionCheckStepDetail', () => {
           <div>mock labware render not being called with the right props</div>
         )
         .calledWith(
-          componentPropsMatcher({
+          partialComponentPropsMatcher({
             definition: LABWARE_DEF,
             wellStroke: { A1: C_BLUE, A2: C_BLUE },
             wellLabelOption: WELL_LABEL_OPTIONS.SHOW_LABEL_OUTSIDE,
@@ -205,7 +205,7 @@ describe('LabwarePositionCheckStepDetail', () => {
           <div>mock labware render not being called with the right props</div>
         )
         .calledWith(
-          componentPropsMatcher({
+          partialComponentPropsMatcher({
             definition: LABWARE_DEF,
             wellStroke: { A1: C_BLUE },
             wellLabelOption: WELL_LABEL_OPTIONS.SHOW_LABEL_OUTSIDE,

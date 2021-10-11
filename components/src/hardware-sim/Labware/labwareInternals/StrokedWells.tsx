@@ -9,7 +9,7 @@ export interface StrokedWellProps {
   strokeByWell: Record<string, CSSProperties['stroke']>
 }
 
-function StrokedWellsComponent(props: StrokedWellProps): JSX.Element {
+export function StrokedWellsComponent(props: StrokedWellProps): JSX.Element {
   const { definition, strokeByWell } = props
   return (
     <>
