@@ -72,10 +72,8 @@ class LegacyContextPlugin(AbstractPlugin):
         # but fix unreleased as of mypy 0.910.
         self._subscriptions_are_set_up: bool = False
         self._unsubscribe_from_main_broker: Optional[Callable[[], None]] = None
-        self._unsubscribe_from_labware_loaded_broker: Optional[
-            Callable[[], None]
-        ] = None
-        self._unsubscribe_from_instrument_loaded_broker: Optional[
+        self._unsubscribe_from_labware_load_broker: Optional[Callable[[], None]] = None
+        self._unsubscribe_from_instrument_load_broker: Optional[
             Callable[[], None]
         ] = None
 
@@ -98,13 +96,13 @@ class LegacyContextPlugin(AbstractPlugin):
             topic="command",
             handler=self._dispatch_legacy_command,
         )
-        self._unsubscribe_from_labware_loaded_broker = (
-            self._protocol_context.labware_loaded_broker.subscribe(
+        self._unsubscribe_from_labware_load_broker = (
+            self._protocol_context.labware_load_broker.subscribe(
                 callback=self._dispatch_labware_loaded
             )
         )
-        self._unsubscribe_from_instrument_loaded_broker = (
-            self._protocol_context.instrument_loaded_broker.subscribe(
+        self._unsubscribe_from_instrument_load_broker = (
+            self._protocol_context.instrument_load_broker.subscribe(
                 callback=self._dispatch_instrument_loaded
             )
         )
@@ -113,11 +111,11 @@ class LegacyContextPlugin(AbstractPlugin):
     def _tear_down_subscriptions(self) -> None:
         if self._subscriptions_are_set_up:
             assert self._unsubscribe_from_main_broker is not None
-            assert self._unsubscribe_from_labware_loaded_broker is not None
-            assert self._unsubscribe_from_instrument_loaded_broker is not None
+            assert self._unsubscribe_from_labware_load_broker is not None
+            assert self._unsubscribe_from_instrument_load_broker is not None
             self._unsubscribe_from_main_broker()
-            self._unsubscribe_from_labware_loaded_broker()
-            self._unsubscribe_from_instrument_loaded_broker()
+            self._unsubscribe_from_labware_load_broker()
+            self._unsubscribe_from_instrument_load_broker()
             self._subscriptions_are_set_up = False
 
     def _dispatch_legacy_command(self, command: LegacyCommand) -> None:
@@ -129,7 +127,7 @@ class LegacyContextPlugin(AbstractPlugin):
     def _dispatch_labware_loaded(
         self, labware_load_info: LegacyLabwareLoadInfo
     ) -> None:
-        pe_commands = self._legacy_command_mapper.map_labware_loaded(
+        pe_commands = self._legacy_command_mapper.map_labware_load(
             labware_load_info=labware_load_info
         )
 
@@ -139,7 +137,7 @@ class LegacyContextPlugin(AbstractPlugin):
     def _dispatch_instrument_loaded(
         self, instrument_load_info: LegacyInstrumentLoadInfo
     ) -> None:
-        pe_commands = self._legacy_command_mapper.map_instrument_loaded(
+        pe_commands = self._legacy_command_mapper.map_instrument_load(
             instrument_load_info=instrument_load_info
         )
 

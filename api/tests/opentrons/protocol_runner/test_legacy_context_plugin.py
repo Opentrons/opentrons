@@ -111,11 +111,11 @@ def test_broker_subscribe_unsubscribe(
     ).then_return(main_unsubscribe)
 
     decoy.when(
-        legacy_context.labware_loaded_broker.subscribe(callback=matchers.Anything())
+        legacy_context.labware_load_broker.subscribe(callback=matchers.Anything())
     ).then_return(labware_unsubscribe)
 
     decoy.when(
-        legacy_context.instrument_loaded_broker.subscribe(callback=matchers.Anything())
+        legacy_context.instrument_load_broker.subscribe(callback=matchers.Anything())
     ).then_return(instrument_unsubscribe)
 
     subject.handle_action(pe_actions.PlayAction())

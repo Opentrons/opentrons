@@ -75,7 +75,7 @@ class LegacyCommandMapper:
 
         return results
 
-    def map_labware_loaded(
+    def map_labware_load(
         self,
         labware_load_info: LegacyLabwareLoadInfo,
     ) -> List[pe_commands.Command]:
@@ -108,7 +108,7 @@ class LegacyCommandMapper:
         self._command_count["LOAD_LABWARE"] = count + 1
         return [load_labware_command]
 
-    def map_instrument_loaded(
+    def map_instrument_load(
         self, instrument_load_info: LegacyInstrumentLoadInfo
     ) -> List[pe_commands.Command]:
         """Map a legacy instrument (pipette) load to Protocol Engine commands."""

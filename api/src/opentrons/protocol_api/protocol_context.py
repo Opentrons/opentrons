@@ -115,11 +115,11 @@ class ProtocolContext(CommandPublisher):
         self._unsubscribe_commands: Optional[Callable[[], None]] = None
         self.clear_commands()
 
-        self._labware_loaded_broker = EquipmentBroker[LabwareLoadInfo]()
-        self._instrument_loaded_broker = EquipmentBroker[InstrumentLoadInfo]()
+        self._labware_load_broker = EquipmentBroker[LabwareLoadInfo]()
+        self._instrument_load_broker = EquipmentBroker[InstrumentLoadInfo]()
 
     @property
-    def labware_loaded_broker(self) -> EquipmentBroker[LabwareLoadInfo]:
+    def labware_load_broker(self) -> EquipmentBroker[LabwareLoadInfo]:
         """For internal Opentrons use only.
 
         :meta private:
@@ -130,17 +130,17 @@ class ProtocolContext(CommandPublisher):
         Only :py:obj:`ProtocolContext` is allowed to publish to this broker.
         Calling code may only subscribe or unsubscribe.
         """
-        return self._labware_loaded_broker
+        return self._labware_load_broker
 
     @property
-    def instrument_loaded_broker(self) -> EquipmentBroker[InstrumentLoadInfo]:
+    def instrument_load_broker(self) -> EquipmentBroker[InstrumentLoadInfo]:
         """For internal Opentrons use only.
 
         :meta private:
 
-        Like `labware_loaded_broker`, but for pipettes.
+        Like `labware_load_broker`, but for pipettes.
         """
-        return self._instrument_loaded_broker
+        return self._instrument_load_broker
 
     @classmethod
     def build_using(
@@ -372,7 +372,7 @@ class ProtocolContext(CommandPublisher):
         result = Labware(implementation=implementation)
 
         result_namespace, result_load_name, result_version = result.uri.split("/")
-        self.labware_loaded_broker.publish(
+        self.labware_load_broker.publish(
             LabwareLoadInfo(
                 labware_definition=result._implementation.get_definition(),
                 labware_namespace=result_namespace,
@@ -425,7 +425,7 @@ class ProtocolContext(CommandPublisher):
         result = Labware(implementation=implementation)
 
         result_namespace, result_load_name, result_version = result.uri.split("/")
-        self.labware_loaded_broker.publish(
+        self.labware_load_broker.publish(
             LabwareLoadInfo(
                 labware_definition=result._implementation.get_definition(),
                 labware_namespace=result_namespace,
@@ -638,7 +638,7 @@ class ProtocolContext(CommandPublisher):
         )
         self._instruments[checked_mount] = new_instr
 
-        self.instrument_loaded_broker.publish(
+        self.instrument_load_broker.publish(
             InstrumentLoadInfo(
                 instrument_load_name=instrument_name,
                 mount=checked_mount,
