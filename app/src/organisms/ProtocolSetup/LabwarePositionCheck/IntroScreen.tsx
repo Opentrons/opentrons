@@ -42,7 +42,7 @@ const DECK_LAYER_BLOCKLIST = [
   'screwHoles',
 ]
 
-const DECK_MAP_VIEWBOX = '-80 -100 550 560'
+const DECK_MAP_VIEWBOX = '-80 -100 570 540'
 
 export const IntroScreen = (props: {
   setCurrentLabwareCheckStep: (stepNumber: number) => void
@@ -82,7 +82,7 @@ export const IntroScreen = (props: {
           primaryPipetteMount={primaryPipetteMount}
           secondaryPipetteMount={secondaryPipetteMount}
         />
-        <Box width="60%" padding={SPACING_3}>
+        <Box width="60%" paddingTop={SPACING_3}>
           <RobotWorkSpace
             deckDef={standardDeckDef as any}
             viewBox={DECK_MAP_VIEWBOX}
@@ -136,11 +136,7 @@ export const IntroScreen = (props: {
           </RobotWorkSpace>
         </Box>
       </Flex>
-      <Flex
-        justifyContent={JUSTIFY_CENTER}
-        marginTop="-4rem"
-        marginBottom={SPACING_4}
-      >
+      <Flex justifyContent={JUSTIFY_CENTER} marginBottom={SPACING_4}>
         <PrimaryBtn
           title={t('start_position_check', {
             initial_labware_slot: firstStepLabwareSlot,
