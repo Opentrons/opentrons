@@ -7,6 +7,7 @@ import { FlatButton } from '../buttons'
 import styles from './structure.css'
 
 import type { ButtonProps } from '../buttons'
+import { Flex, JUSTIFY_FLEX_END, SPACING_AUTO } from '@opentrons/components'
 
 export interface TitleBarProps {
   id?: string
@@ -67,7 +68,9 @@ export function TitleBar(props: TitleBarProps): JSX.Element {
       <h1 className={cx(styles.title, { [styles.right]: back })}>{title}</h1>
       {separator}
       {subheading}
-      {rightNode}
+      <Flex justifyContent={JUSTIFY_FLEX_END} marginLeft={SPACING_AUTO}>
+        {rightNode}
+      </Flex>
     </header>
   )
 }
