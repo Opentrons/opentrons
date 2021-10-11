@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 import map from 'lodash/map'
 
 import {
@@ -20,7 +20,6 @@ import {
   SPACING_3,
   SPACING_4,
   FONT_SIZE_BODY_2,
-  LINE_HEIGHT_COPY,
 } from '@opentrons/components'
 import {
   THERMOCYCLER_MODULE_V1,
@@ -70,24 +69,19 @@ export const IntroScreen = (props: {
       >
         {t('labware_position_check_overview')}
       </Text>
-      <Text
-        as={'p'}
-        fontSize={FONT_SIZE_BODY_2}
-        lineHeight={LINE_HEIGHT_COPY}
-        marginBottom={SPACING_2}
-      >
-        {t('position_check_description_1')}
-      </Text>
-      <Text as={'p'} fontSize={FONT_SIZE_BODY_2} lineHeight={LINE_HEIGHT_COPY}>
-        {t('position_check_description_2')}
-      </Text>
+      <Trans
+        t={t}
+        i18nKey="position_check_description"
+        components={{
+          block: <Text fontSize={FONT_SIZE_BODY_2} marginBottom={SPACING_2} />,
+        }}
+      ></Trans>
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_CENTER}>
         <PositionCheckNav
           sections={sections}
           primaryPipetteMount={primaryPipetteMount}
           secondaryPipetteMount={secondaryPipetteMount}
         />
-
         <Box width="60%" padding={SPACING_3}>
           <RobotWorkSpace
             deckDef={standardDeckDef as any}
