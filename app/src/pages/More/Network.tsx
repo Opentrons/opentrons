@@ -15,7 +15,7 @@ const CARD_GRID_STYLE = css`
 `
 
 export const Network = (): JSX.Element => {
-  const { t } = useTranslation(['more_network'])
+  const { t } = useTranslation('more_network')
 
   return (
     <Page titleBarProps={{ title: t('network_title') }}>

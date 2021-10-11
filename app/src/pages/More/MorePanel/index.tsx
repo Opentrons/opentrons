@@ -6,7 +6,7 @@ import { MORE } from '../../../redux/nav'
 import styles from './styles.css'
 
 export function MorePanel(): JSX.Element {
-  const { t } = useTranslation(['more_panel'])
+  const { t } = useTranslation('more_panel')
 
   const ITEMS = [
     { label: t('app'), url: '/more/app' },

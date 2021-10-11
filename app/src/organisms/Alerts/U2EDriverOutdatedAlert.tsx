@@ -40,7 +40,7 @@ export function U2EDriverOutdatedAlert(props: AlertProps): JSX.Element {
   const trackEvent = useTrackEvent()
   const [rememberDismiss, toggleRememberDismiss] = useToggle()
   const { dismissAlert } = props
-  const { t } = useTranslation(['shared'])
+  const { t } = useTranslation('shared')
 
   return (
     <AlertModal
