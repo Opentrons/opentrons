@@ -46,7 +46,7 @@ describe('Footprint', () => {
     screen.getByRole('textbox', { name: /Width/i })
   })
 
-  it.only('should render correct copy when tipRack is selected', () => {
+  it('should render correct copy when tipRack is selected', () => {
     formikConfig.initialValues.labwareType = 'tipRack'
     render(wrapInFormik(<Footprint />, formikConfig))
 
