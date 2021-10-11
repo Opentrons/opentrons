@@ -8,8 +8,8 @@ from opentrons.hardware_control.types import PauseType as HardwarePauseType
 from opentrons.protocol_engine import AbstractPlugin, actions as pe_actions
 
 from .legacy_wrappers import (
+    LegacyInstrumentLoadInfo,
     LegacyLabwareLoadInfo,
-    LegacyPipetteContext,
     LegacyProtocolContext,
 )
 from .legacy_command_mapper import LegacyCommandMapper
@@ -137,10 +137,10 @@ class LegacyContextPlugin(AbstractPlugin):
             self.dispatch(pe_actions.UpdateCommandAction(command=c))
 
     def _dispatch_instrument_loaded(
-        self, loaded_instrument: LegacyPipetteContext
+        self, instrument_load_info: LegacyInstrumentLoadInfo
     ) -> None:
         pe_commands = self._legacy_command_mapper.map_instrument_loaded(
-            loaded_instrument=loaded_instrument
+            instrument_load_info=instrument_load_info
         )
 
         for c in pe_commands:

@@ -116,7 +116,7 @@ class ProtocolContext(CommandPublisher):
         self.clear_commands()
 
         self._labware_loaded_broker = EquipmentBroker[LabwareLoadInfo]()
-        self._instrument_loaded_broker = EquipmentBroker[InstrumentContext]()
+        self._instrument_loaded_broker = EquipmentBroker[InstrumentLoadInfo]()
 
     @property
     def labware_loaded_broker(self) -> EquipmentBroker[LabwareLoadInfo]:
@@ -133,7 +133,7 @@ class ProtocolContext(CommandPublisher):
         return self._labware_loaded_broker
 
     @property
-    def instrument_loaded_broker(self) -> EquipmentBroker[InstrumentContext]:
+    def instrument_loaded_broker(self) -> EquipmentBroker[InstrumentLoadInfo]:
         """For internal Opentrons use only.
 
         :meta private:
@@ -638,7 +638,12 @@ class ProtocolContext(CommandPublisher):
         )
         self._instruments[checked_mount] = new_instr
 
-        self.instrument_loaded_broker.publish(new_instr)
+        self.instrument_loaded_broker.publish(
+            InstrumentLoadInfo(
+                instrument_load_name=instrument_name,
+                mount=checked_mount,
+            )
+        )
 
         return new_instr
 
@@ -817,6 +822,19 @@ class LabwareLoadInfo:
     labware_load_name: str
     labware_version: int
     deck_slot: types.DeckSlotName
+
+
+@dataclass(frozen=True)
+class InstrumentLoadInfo:
+    """For Opentrons internal use only.
+
+    :meta private:
+
+    Like `LabwareLoadInfo`, but for instruments (pipettes).
+    """
+
+    instrument_load_name: str
+    mount: types.Mount
 
 
 _MessageT = TypeVar("_MessageT")

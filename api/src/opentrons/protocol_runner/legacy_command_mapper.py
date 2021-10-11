@@ -9,7 +9,10 @@ from opentrons.commands.types import CommandMessage as LegacyCommand
 from opentrons.protocol_engine import commands as pe_commands, types as pe_types
 from opentrons.protocols.models.labware_definition import LabwareDefinition
 
-from .legacy_wrappers import LegacyPipetteContext, LegacyLabwareLoadInfo
+from .legacy_wrappers import (
+    LegacyInstrumentLoadInfo,
+    LegacyLabwareLoadInfo,
+)
 
 
 class LegacyCommandData(pe_commands.CustomData):
@@ -106,14 +109,12 @@ class LegacyCommandMapper:
         return [load_labware_command]
 
     def map_instrument_loaded(
-        self, loaded_instrument: LegacyPipetteContext
+        self, instrument_load_info: LegacyInstrumentLoadInfo
     ) -> List[pe_commands.Command]:
         """Map a legacy instrument (pipette) load to Protocol Engine commands."""
         now = utc_now()
 
         count = self._command_count["LOAD_PIPETTE"]
-        name = loaded_instrument.name
-        mount = loaded_instrument.mount
 
         load_pipette_command = pe_commands.LoadPipette(
             id=f"commands.LOAD_PIPETTE-{count}",
@@ -122,8 +123,10 @@ class LegacyCommandMapper:
             startedAt=now,
             completedAt=now,
             data=pe_commands.LoadPipetteData(
-                pipetteName=pe_types.PipetteName(name),
-                mount=MountType(mount),
+                pipetteName=pe_types.PipetteName(
+                    instrument_load_info.instrument_load_name
+                ),
+                mount=MountType(instrument_load_info.mount),
             ),
             result=pe_commands.LoadPipetteResult(
                 pipetteId=f"pipette-{count}",

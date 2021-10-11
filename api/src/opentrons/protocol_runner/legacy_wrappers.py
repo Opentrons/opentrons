@@ -15,6 +15,7 @@ from opentrons.protocol_api import (
     InstrumentContext as LegacyPipetteContext,
 )
 from opentrons.protocol_api.protocol_context import (
+    InstrumentLoadInfo as LegacyInstrumentLoadInfo,
     LabwareLoadInfo as LegacyLabwareLoadInfo,
 )
 from opentrons.protocol_api.contexts import ModuleContext as LegacyModuleContext
@@ -105,6 +106,7 @@ __all__ = [
     "LegacyProtocolContext",
     "LegacyPipetteContext",
     "LegacyModuleContext",
+    "LegacyInstrumentLoadInfo",
     "LegacyLabwareLoadInfo",
     "LegacyProtocol",
     "LegacyJsonProtocol",
