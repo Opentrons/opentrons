@@ -187,6 +187,7 @@ describe('ModuleSetup', () => {
           z: MOCK_MAGNETIC_MODULE_COORDS[2],
           moduleDef: mockMagneticModule as any,
           nestedLabwareDef: null,
+          nestedLabwareId: null,
         },
         [mockMagneticModule.moduleId]: {
           x: MOCK_MAGNETIC_MODULE_COORDS[0],
@@ -194,6 +195,7 @@ describe('ModuleSetup', () => {
           z: MOCK_MAGNETIC_MODULE_COORDS[2],
           moduleDef: mockMagneticModule as any,
           nestedLabwareDef: null,
+          nestedLabwareId: null,
         },
       })
 

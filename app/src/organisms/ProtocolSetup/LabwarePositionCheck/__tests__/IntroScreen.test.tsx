@@ -11,7 +11,7 @@ import { LabwareDefinition2 } from '@opentrons/shared-data'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import { useModuleRenderInfoById, useLabwareRenderInfoById } from '../../hooks'
 import { PositionCheckNav } from '../PositionCheckNav'
-import { useIntroInfo } from '../hooks'
+import { useIntroInfo, useLabwareIdsBySection } from '../hooks'
 import { IntroScreen } from '../IntroScreen'
 import type { Section } from '../types'
 import { fireEvent } from '@testing-library/dom'
@@ -32,6 +32,9 @@ const mockUseModuleRenderInfoById = useModuleRenderInfoById as jest.MockedFuncti
 >
 const mockUseLabwareRenderInfoById = useLabwareRenderInfoById as jest.MockedFunction<
   typeof useLabwareRenderInfoById
+>
+const mockUseLabwareIdsBySection = useLabwareIdsBySection as jest.MockedFunction<
+  typeof useLabwareIdsBySection
 >
 const mockUseIntroInfo = useIntroInfo as jest.MockedFunction<
   typeof useIntroInfo
@@ -89,6 +92,7 @@ describe('IntroScreen', () => {
           z: MOCK_300_UL_TIPRACK_COORDS[2],
         },
       })
+    when(mockUseLabwareIdsBySection).calledWith().mockReturnValue({})
     when(mockUseModuleRenderInfoById).calledWith().mockReturnValue({})
 
     when(mockUseIntroInfo).calledWith().mockReturnValue({
