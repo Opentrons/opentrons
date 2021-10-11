@@ -5,6 +5,7 @@ import reactRefresh from '@vitejs/plugin-react-refresh'
 
 import { ALIAS_ENTRIES } from '../rollup.config'
 
+// eslint-disable-next-line import/no-default-export
 export default defineConfig({
   root: __dirname,
   plugins: [reactRefresh()],

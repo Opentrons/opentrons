@@ -80,11 +80,12 @@ const configs = [
   { packageName: 'api-client' },
   { packageName: 'api-client', browser: true },
   { packageName: 'react-api-client', browser: true },
-].map((options) => ({
+].map(options => ({
   ...input(options),
   ...output(options),
   ...plugins(options),
   external: ['react'],
 }))
 
+// eslint-disable-next-line import/no-default-export
 export default configs
