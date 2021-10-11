@@ -55,10 +55,6 @@ export type ModuleCommand =
       commandType: 'heaterShaker/deactivateHeater'
       params: ModuleOnlyParams
     }
-  | {
-      commandType: 'heaterShaker/deactivateShaker'
-      params: ModuleOnlyParams
-    }
 
 export interface EngageMagnetParams {
   moduleId: string
