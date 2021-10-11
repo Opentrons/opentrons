@@ -65,7 +65,7 @@ describe('useSessionsByTypeQuery hook', () => {
     const basicSessions = {
       ...SESSIONS_RESPONSE,
       data: SESSIONS_RESPONSE.data.filter(
-        (session) => session.sessionType === 'basic'
+        session => session.sessionType === 'basic'
       ),
     }
 

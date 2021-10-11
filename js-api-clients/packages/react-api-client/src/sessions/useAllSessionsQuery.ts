@@ -6,7 +6,7 @@ export function useAllSessionsQuery(): UseQueryResult<Sessions> {
   const host = useHost()
   const query = useQuery(
     ['session', host],
-    () => getSessions(host as HostConfig).then((response) => response.data),
+    () => getSessions(host as HostConfig).then(response => response.data),
     { enabled: host !== null }
   )
 

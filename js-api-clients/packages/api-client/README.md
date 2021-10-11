@@ -21,7 +21,7 @@ const host: HostConfig = { hostname: 'OT2CEP9999999A99.local' }
 
 getHealth(host)
   .then((response: Response<Health>) => console.log(response.data))
-  .catch((error) => console.error(error))
+  .catch(error => console.error(error))
 ```
 
 ## Details

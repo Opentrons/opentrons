@@ -12,7 +12,7 @@ export function TextInput(props: TextInputProps): JSX.Element {
 
   return (
     <form
-      onSubmit={(event) => {
+      onSubmit={event => {
         onChange(value)
         event.preventDefault()
       }}
@@ -21,7 +21,7 @@ export function TextInput(props: TextInputProps): JSX.Element {
         type="text"
         placeholder={placeholder}
         value={value}
-        onChange={(event) => setValue(event.target.value)}
+        onChange={event => setValue(event.target.value)}
       />
       <button type="submit">{children}</button>
     </form>

@@ -17,7 +17,7 @@ export function useSessionsByTypeQuery(args: {
     () =>
       getSessions(host as HostConfig, {
         session_type: sessionType,
-      }).then((response) => response.data),
+      }).then(response => response.data),
     { enabled: host !== null, refetchInterval: 5000 }
   )
 

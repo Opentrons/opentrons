@@ -6,7 +6,7 @@ export function useHealthQuery(): UseQueryResult<Health> {
   const host = useHost()
   const query = useQuery(
     ['health', host],
-    () => getHealth(host as HostConfig).then((response) => response.data),
+    () => getHealth(host as HostConfig).then(response => response.data),
     { enabled: host !== null }
   )
 

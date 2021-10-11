@@ -18,7 +18,7 @@ export function useCreateSessionMutation(
   const host = useHost()
   const mutation = useMutation<Session, unknown>(['session', host], () =>
     createSession(host as HostConfig, createSessionData).then(
-      (response) => response.data
+      response => response.data
     )
   )
   return {
