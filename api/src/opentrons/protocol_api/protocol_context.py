@@ -777,7 +777,6 @@ class ProtocolContext(CommandPublisher):
 _MessageT = TypeVar("_MessageT")
 
 
-_CallbackT = Callable[[_MessageT], None]
 
 
 class EquipmentBroker(Generic[_MessageT]):
@@ -800,9 +799,9 @@ class EquipmentBroker(Generic[_MessageT]):
     """
 
     def __init__(self) -> None:
-        self._callbacks: Set[_CallbackT] = set()
+        self._callbacks: Set[Callable[[_MessageT], None]] = set()
 
-    def subscribe(self, callback: _CallbackT) -> Callable[[], None]:
+    def subscribe(self, callback: Callable[[_MessageT], None]) -> Callable[[], None]:
         """Register ``callback`` to be called by a subsequent `publish`.
 
         You must not subscribe the same callback again
