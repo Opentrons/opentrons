@@ -2,7 +2,9 @@ from typing import Optional, Dict, Union
 
 from opentrons.drivers.smoothie_drivers.constants import (
     HOMED_POSITION,
-    Y_BOUND_OVERRIDE, DISABLE_AXES, AXES,
+    Y_BOUND_OVERRIDE,
+    DISABLE_AXES,
+    AXES,
 )
 from opentrons.drivers.types import MoveSplits
 
@@ -38,7 +40,9 @@ class SimulatingDriver:
     def turn_on_red_button_light(self) -> None:
         pass
 
-    async def update_pipette_config(self,  axis: str, data: Dict[str, float]) -> Dict[str, Dict[str, float]]:
+    async def update_pipette_config(
+        self, axis: str, data: Dict[str, float]
+    ) -> Dict[str, Dict[str, float]]:
         """
         Updates the following configs for a given pipette mount based on
         the detected pipette type:
@@ -58,7 +62,7 @@ class SimulatingDriver:
         pass
 
     @property
-    def steps_per_mm(self)-> Dict[str, float]:
+    def steps_per_mm(self) -> Dict[str, float]:
         return self._steps_per_mm
 
     # @steps_per_mm.setter
@@ -66,7 +70,7 @@ class SimulatingDriver:
     #     # Keep track of any updates to the steps per mm per axis
     #     self._steps_per_mm[axis] = mm
 
-    async def update_steps_per_mm(self, data: Union[Dict[str, float], str]) ->None:
+    async def update_steps_per_mm(self, data: Union[Dict[str, float], str]) -> None:
         pass
 
     def configure_splits_for(self, config: MoveSplits) -> None:

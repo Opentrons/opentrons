@@ -21,7 +21,7 @@ DTOVERLAY_PATH = "/proc/device-tree/soc/gpio@7e200000/gpio_rev_bit_pins"
 def _event_callback(
     update_door_state: Callable[[DoorState], None],
     get_door_state: Callable[..., DoorState],
-)  -> None:
+) -> None:
     try:
         update_door_state(get_door_state())
     except Exception:
@@ -97,7 +97,7 @@ class GPIOCharDev:
             )
             return BoardRevision.UNKNOWN
 
-    def config_by_board_rev(self)  -> None:
+    def config_by_board_rev(self) -> None:
         MODULE_LOG.info("Configuring GPIOs by central routing roard revision")
         # get board revision based on rev bits
         self.board_rev = self._determine_board_revision()

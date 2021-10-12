@@ -41,7 +41,13 @@ class USBPort(GenericNode[str]):
         full_name, device_path = port_path.split(":")
         port_nodes = cls.get_unique_nodes(full_name)
         hub, port, name = cls.find_hub(port_nodes)
-        hub, port = cls.map_to_revision(board_revision, (hub, port,))
+        hub, port = cls.map_to_revision(
+            board_revision,
+            (
+                hub,
+                port,
+            ),
+        )
         return cls(
             name=name, port_number=port, sub_names=[], device_path=device_path, hub=hub
         )
@@ -132,7 +138,9 @@ class GPIOPin:
         return cls(name, in_out, rev_og=pin, rev_a=pin, rev_b=pin, rev_c=pin)
 
     @classmethod
-    def build_with_rev(cls, name: str, in_out: PinDir, **kwargs: Optional[int]) -> GPIOPin:
+    def build_with_rev(
+        cls, name: str, in_out: PinDir, **kwargs: Optional[int]
+    ) -> GPIOPin:
         return cls(name, in_out, **kwargs)
 
     def __init__(

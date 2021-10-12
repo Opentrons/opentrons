@@ -6,7 +6,7 @@ from serial.tools import list_ports  # type: ignore
 import contextlib
 import logging
 
-from serial.tools.list_ports_common import ListPortInfo # type: ignore
+from serial.tools.list_ports_common import ListPortInfo  # type: ignore
 
 log = logging.getLogger(__name__)
 
@@ -37,7 +37,9 @@ def get_port_by_VID(vid: str) -> Optional[ListPortInfo]:
 
 
 @contextlib.contextmanager
-def serial_with_temp_timeout(serial_connection: Serial, timeout: float) -> Generator[Serial, None, None]:
+def serial_with_temp_timeout(
+    serial_connection: Serial, timeout: float
+) -> Generator[Serial, None, None]:
     """Implements a temporary timeout for a serial connection"""
     saved_timeout = serial_connection.timeout
     if timeout is not None:
@@ -60,7 +62,9 @@ def clear_buffer(serial_connection: Serial) -> None:
     serial_connection.reset_input_buffer()
 
 
-def _write_to_device_and_return(cmd: str, ack: str, device_connection: Serial, tag: Optional[str] = None) -> str:
+def _write_to_device_and_return(
+    cmd: str, ack: str, device_connection: Serial, tag: Optional[str] = None
+) -> str:
     """Writes to a serial device.
     - Formats command
     - Wait for ack return
@@ -96,7 +100,9 @@ def _connect(port_name: str, baudrate: int) -> Serial:
     return ser
 
 
-def _attempt_command_recovery(command: str, ack: str, serial_conn: Serial, tag: Optional[str]=None) -> str:
+def _attempt_command_recovery(
+    command: str, ack: str, serial_conn: Serial, tag: Optional[str] = None
+) -> str:
     """Recovery after following a failed write_and_return() attempt"""
     if not tag:
         tag = serial_conn.port
@@ -112,7 +118,11 @@ def _attempt_command_recovery(command: str, ack: str, serial_conn: Serial, tag: 
 
 
 def write_and_return(
-    command: str, ack: str, serial_connection: Serial, timeout: int=DEFAULT_WRITE_TIMEOUT, tag: Optional[str]=None
+    command: str,
+    ack: str,
+    serial_connection: Serial,
+    timeout: int = DEFAULT_WRITE_TIMEOUT,
+    tag: Optional[str] = None,
 ) -> str:
     """Write a command and return the response"""
     clear_buffer(serial_connection)
@@ -121,7 +131,9 @@ def write_and_return(
     return response
 
 
-def connect(device_name: str, port: Optional[str]=None, baudrate: int =115200) -> Serial:
+def connect(
+    device_name: str, port: Optional[str] = None, baudrate: int = 115200
+) -> Serial:
     """
     Creates a serial connection.
 

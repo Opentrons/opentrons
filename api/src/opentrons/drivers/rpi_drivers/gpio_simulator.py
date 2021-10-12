@@ -59,7 +59,7 @@ class SimulatingGPIOCharDev:
     ) -> None:
         pass
 
-    def set_rail_lights(self, on: bool = True)  -> None:
+    def set_rail_lights(self, on: bool = True) -> None:
         pass
 
     def set_reset_pin(self, on: bool = True) -> None:

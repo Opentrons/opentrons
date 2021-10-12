@@ -44,7 +44,7 @@ class GPIODriverLike(Protocol):
     ) -> None:
         ...
 
-    def set_rail_lights(self, on: bool = True)  -> None:
+    def set_rail_lights(self, on: bool = True) -> None:
         ...
 
     def set_reset_pin(self, on: bool = True) -> None:
@@ -84,7 +84,7 @@ class GPIODriverLike(Protocol):
         self,
         loop: asyncio.AbstractEventLoop,
         update_door_state: Callable[[DoorState], None],
-    )  -> None:
+    ) -> None:
         ...
 
     def release_line(self, pin: GPIOPin) -> None:

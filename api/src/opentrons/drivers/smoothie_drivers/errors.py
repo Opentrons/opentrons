@@ -2,7 +2,9 @@ from typing import Optional
 
 
 class SmoothieError(Exception):
-    def __init__(self, ret_code: Optional[str] = None, command: Optional[str] = None) -> None:
+    def __init__(
+        self, ret_code: Optional[str] = None, command: Optional[str] = None
+    ) -> None:
         self.ret_code = ret_code or ""
         self.command = command
         super().__init__()
@@ -15,7 +17,9 @@ class SmoothieError(Exception):
 
 
 class SmoothieAlarm(Exception):
-    def __init__(self, ret_code: Optional[str] = None, command: Optional[str] = None) -> None:
+    def __init__(
+        self, ret_code: Optional[str] = None, command: Optional[str] = None
+    ) -> None:
         self.ret_code = ret_code
         self.command = command
         super().__init__()
@@ -28,7 +32,9 @@ class SmoothieAlarm(Exception):
 
 
 class TipProbeError(SmoothieAlarm):
-    def __init__(self, ret_code: Optional[str] = None, command: Optional[str] = None) -> None:
+    def __init__(
+        self, ret_code: Optional[str] = None, command: Optional[str] = None
+    ) -> None:
         self.ret_code = ret_code
         self.command = command
         super().__init__(ret_code, command)

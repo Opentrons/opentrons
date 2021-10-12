@@ -150,7 +150,9 @@ class AsyncSerial:
         return self._serial.is_open
 
     @contextlib.contextmanager
-    def _timeout_override(self, timeout_property: str, timeout: Optional[float]) -> Generator[None, None, None]:
+    def _timeout_override(
+        self, timeout_property: str, timeout: Optional[float]
+    ) -> Generator[None, None, None]:
         """Context manager that will temporarily override the default timeout."""
         default_timeout = getattr(self._serial, timeout_property)
         override = timeout is not None and default_timeout != timeout

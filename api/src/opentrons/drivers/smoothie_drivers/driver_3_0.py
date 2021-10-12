@@ -226,7 +226,7 @@ class SmoothieDriver:
             {axis: value for axis, value in target.items() if value is not None}
         )
 
-    async def update_position(self, default: Optional[Dict[str, float]]=None) -> None:
+    async def update_position(self, default: Optional[Dict[str, float]] = None) -> None:
         """Get the current position from the smoothie and cache it."""
         if default is None:
             default = self._position
@@ -530,7 +530,9 @@ class SmoothieDriver:
         return self._steps_per_mm
 
     @contextlib.asynccontextmanager
-    async def restore_speed(self, value: Union[float, str]) -> AsyncGenerator[None, None]:
+    async def restore_speed(
+        self, value: Union[float, str]
+    ) -> AsyncGenerator[None, None]:
         await self.set_speed(value, update=False)
         try:
             yield
@@ -560,7 +562,9 @@ class SmoothieDriver:
         await self.set_speed(self._saved_axes_speed)
 
     @contextlib.asynccontextmanager
-    async def restore_axis_max_speed(self, new_max_speeds: Dict[str, float]) -> AsyncGenerator[None, None]:
+    async def restore_axis_max_speed(
+        self, new_max_speeds: Dict[str, float]
+    ) -> AsyncGenerator[None, None]:
         await self.set_axis_max_speed(new_max_speeds, update=False)
         try:
             yield
@@ -1755,7 +1759,9 @@ class SmoothieDriver:
     def read_window_switches(self) -> bool:
         return self._gpio_chardev.read_window_switches()
 
-    def set_lights(self, button: Optional[bool] = None, rails: Optional[bool] = None) -> None:
+    def set_lights(
+        self, button: Optional[bool] = None, rails: Optional[bool] = None
+    ) -> None:
         if button is not None:
             self._gpio_chardev.set_button_light(blue=button)
         if rails is not None:
