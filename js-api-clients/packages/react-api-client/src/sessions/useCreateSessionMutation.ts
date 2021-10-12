@@ -7,8 +7,11 @@ import {
 import { UseMutationResult, useMutation, UseMutateFunction } from 'react-query'
 import { useHost } from '../api'
 
-export interface UseCreateSessionMutationResult
-  extends UseMutationResult<Session, unknown, void> {
+export type UseCreateSessionMutationResult = UseMutationResult<
+  Session,
+  unknown,
+  void
+> & {
   createSession: UseMutateFunction<Session, unknown, void>
 }
 
