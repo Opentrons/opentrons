@@ -51,7 +51,7 @@ def test_vertices(subject: dfs.DFS[types.VertexName], additional_vertex: types.G
     assert additional_vertex.name in graph._lookup_table.keys()
     assert vertex_obj in graph._sorted_graph
     graph.remove_vertex(additional_vertex)
-    assert additional_vertex not in graph._lookup_table.keys()
+    assert additional_vertex.name not in graph._lookup_table.keys()
     assert vertex_obj not in graph._sorted_graph
 
 

@@ -8,7 +8,7 @@ more readable format.
 import subprocess
 import re
 import os
-from typing import List, Set, Sequence
+from typing import List, Set, Sequence, cast
 
 from opentrons.algorithms.dfs import DFS
 from opentrons.hardware_control.modules.types import ModuleAtPort
@@ -30,7 +30,7 @@ USB_PORT_INFO = re.compile(PORT_PATTERN + DEVICE_PATH)
 class USBBus(USBDriverInterface):
     def __init__(self, board_revision: BoardRevision):
         self._board_revision = board_revision
-        self._usb_dev: Sequence[USBPort] = self.read_usb_bus()
+        self._usb_dev = self.read_usb_bus()
         self._dfs: DFS[str] = DFS[str](self._usb_dev)
         self._sorted = self._dfs.dfs()
 
@@ -135,7 +135,7 @@ class USBBus(USBDriverInterface):
         """
         for s in self.sorted_ports:
             vertex = self._dfs.graph.get_vertex(s)
-            port = vertex.vertex
+            port = cast(USBPort, vertex.vertex)
             if port.device_path.find(device_path):
                 return port
         return USBPort(

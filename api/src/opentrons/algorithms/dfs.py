@@ -17,13 +17,13 @@ class DFS(Generic[VertexName]):
     perform a depth first search on the graph.
     """
 
-    def __init__(self, graph: Sequence[GenericNode[VertexName]]) -> None:
+    def __init__(self, graph: List[GenericNode[VertexName]]) -> None:
         """DFS Initializer.
 
         :param graph: A list of nodes you wish to add to
         the graph.
         """
-        self._graph = Graph.build(graph)
+        self._graph = Graph[VertexName].build(graph)
 
     @property
     def graph(self) -> Graph[VertexName]:
@@ -42,7 +42,7 @@ class DFS(Generic[VertexName]):
         """
         visited_vertices: Set[VertexName] = set()
         for node in self.graph.graph:
-            if node not in visited_vertices:
+            if node.name not in visited_vertices:
                 visited_vertices.add(node.name)
             for neighbor in node.neighbors:
                 if neighbor not in visited_vertices:
