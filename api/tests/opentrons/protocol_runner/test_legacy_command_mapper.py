@@ -6,6 +6,7 @@ from opentrons.commands.types import PauseMessage
 from opentrons.protocol_engine import (
     CalibrationOffset,
     DeckSlotLocation,
+    PipetteName,
     commands as pe_commands,
 )
 from opentrons.protocol_runner.legacy_command_mapper import (
@@ -13,10 +14,11 @@ from opentrons.protocol_runner.legacy_command_mapper import (
     LegacyCommandData,
 )
 from opentrons.protocol_runner.legacy_wrappers import (
+    LegacyInstrumentLoadInfo,
     LegacyLabwareLoadInfo,
 )
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
-from opentrons.types import DeckSlotName
+from opentrons.types import DeckSlotName, Mount, MountType
 
 
 def test_map_before_command() -> None:
@@ -184,4 +186,26 @@ def test_map_labware_load(minimal_labware_def: LabwareDefinition) -> None:
     )
 
     output = LegacyCommandMapper().map_labware_load(input)
+    assert output[0] == expected_output
+
+
+def test_map_instrument_load() -> None:
+    """It should correctly map an instrument load."""
+    input = LegacyInstrumentLoadInfo(
+        instrument_load_name="p1000_single_gen2",
+        mount=Mount.LEFT,
+    )
+    expected_output = pe_commands.LoadPipette.construct(
+        id=matchers.IsA(str),
+        status=pe_commands.CommandStatus.SUCCEEDED,
+        createdAt=matchers.IsA(datetime),
+        startedAt=matchers.IsA(datetime),
+        completedAt=matchers.IsA(datetime),
+        data=pe_commands.LoadPipetteData.construct(
+            pipetteName=PipetteName.P1000_SINGLE_GEN2, mount=MountType.LEFT
+        ),
+        result=pe_commands.LoadPipetteResult.construct(pipetteId=matchers.IsA(str)),
+    )
+
+    output = LegacyCommandMapper().map_instrument_load(input)
     assert output[0] == expected_output
