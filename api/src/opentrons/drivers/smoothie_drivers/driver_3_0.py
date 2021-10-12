@@ -1474,7 +1474,8 @@ class SmoothieDriver:
 
         # Only update axes that have been selected for homing
         homed_axes = "".join(home_sequence)
-        homed = {ax: self.homed_position.get(ax) for ax in homed_axes}
+        axis_position = ((ax, self.homed_position.get(ax)) for ax in homed_axes)
+        homed = {k: v for (k, v) in axis_position if v is not None}
         await self.update_position(default=homed)
 
         for ax in homed_axes:
