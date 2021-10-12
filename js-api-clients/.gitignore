@@ -1,0 +1,4 @@
+# type caches
+example-app/lib/
+packages/api-client/lib
+packages/react-api-client/lib
