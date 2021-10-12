@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { ModalPage } from '@opentrons/components'
 import { Portal } from '../../../App/portal'
-import { useIntroInfo, useSteps } from './hooks'
+import { useSteps } from './hooks'
 import { IntroScreen } from './IntroScreen'
 import { GenericStepScreen } from './GenericStepScreen'
 
@@ -17,13 +17,9 @@ export const LabwarePositionCheck = (
 ): JSX.Element | null => {
   const { t } = useTranslation(['labware_position_check', 'shared'])
   const steps = useSteps()
-  const introInfo = useIntroInfo()
   const [currentLabwareCheckStep, setCurrentLabwareCheckStep] = React.useState<
     number | null
   >(null)
-  const [sectionIndex] = React.useState<number>(0)
-  if (introInfo == null) return null
-  const { sections } = introInfo
 
   return (
     <Portal level="top">
@@ -42,8 +38,6 @@ export const LabwarePositionCheck = (
           <GenericStepScreen
             setCurrentLabwareCheckStep={setCurrentLabwareCheckStep}
             selectedStep={steps[currentLabwareCheckStep]}
-            sections={sections}
-            activeSection={sections[sectionIndex]}
           />
         ) : (
           <IntroScreen
