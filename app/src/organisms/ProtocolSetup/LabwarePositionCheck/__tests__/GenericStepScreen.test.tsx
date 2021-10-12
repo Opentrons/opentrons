@@ -29,7 +29,7 @@ const PICKUP_TIP_LABWARE_ID = 'PICKUP_TIP_LABWARE_ID'
 const PRIMARY_PIPETTE_ID = 'PRIMARY_PIPETTE_ID'
 const MOCK_SECTION = ['PRIMARY_PIPETTE_TIPRACKS' as Section]
 
-const MOCK_LABWARE_POSITION_CHECK_STEP_TIP_RACK = {
+const MOCK_LABWARE_POSITION_CHECK_STEP_TIPRACK = {
   labwareId:
     '1d57fc10-67ad-11ea-9f8b-3b50068bd62d:opentrons/opentrons_96_filtertiprack_200ul/1',
   section: '',
@@ -55,13 +55,13 @@ describe('GenericStepScreen', () => {
 
   beforeEach(() => {
     props = {
-      selectedStep: MOCK_LABWARE_POSITION_CHECK_STEP_TIP_RACK,
+      selectedStep: MOCK_LABWARE_POSITION_CHECK_STEP_TIPRACK,
       setCurrentLabwareCheckStep: () => {},
     }
     when(mockLabwarePositionCheckStepDetail)
       .calledWith(
         partialComponentPropsMatcher({
-          selectedStep: MOCK_LABWARE_POSITION_CHECK_STEP_TIP_RACK,
+          selectedStep: MOCK_LABWARE_POSITION_CHECK_STEP_TIPRACK,
         })
       )
       .mockReturnValue(<div>Mock Labware Position Check Step Detail</div>)
