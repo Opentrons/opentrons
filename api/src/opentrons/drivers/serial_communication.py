@@ -19,7 +19,7 @@ class SerialNoResponse(Exception):
     pass
 
 
-def get_ports_by_name(device_name: str) -> List[serial.Serial]:
+def get_ports_by_name(device_name: str) -> List[str]:
     """Returns all serial devices with a given name"""
     filtered_devices = filter(
         lambda device: device_name in device[1], list_ports.comports()
@@ -123,10 +123,15 @@ def write_and_return(
 
 def connect(device_name: str, port: Optional[str]=None, baudrate: int =115200) -> Serial:
     """
-    Creates a serial connection
-    :param device_name: defaults to 'Smoothieboard'
-    :param baudrate: integer frequency for serial communication
-    :return: serial.Serial connection
+    Creates a serial connection.
+
+    Args:
+        device_name: defaults to 'Smoothieboard'
+        port: the optional port
+        baudrate: integer frequency for serial communication
+
+    Returns:
+        serial.Serial connection
     """
     if not port:
         port = get_ports_by_name(device_name=device_name)[0]

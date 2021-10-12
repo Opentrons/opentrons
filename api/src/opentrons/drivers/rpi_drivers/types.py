@@ -40,8 +40,8 @@ class USBPort(GenericNode[str]):
         """
         full_name, device_path = port_path.split(":")
         port_nodes = cls.get_unique_nodes(full_name)
-        *port_info, name = cls.find_hub(port_nodes)
-        hub, port = cls.map_to_revision(board_revision, port_info)
+        hub, port, name = cls.find_hub(port_nodes)
+        hub, port = cls.map_to_revision(board_revision, (hub, port,))
         return cls(
             name=name, port_number=port, sub_names=[], device_path=device_path, hub=hub
         )
