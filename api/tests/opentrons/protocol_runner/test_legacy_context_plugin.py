@@ -156,9 +156,9 @@ def test_broker_messages(
         data=pe_commands.CustomData(message="hello world"),  # type: ignore[call-arg]
     )
 
-    decoy.when(
-        legacy_command_mapper.map_brokered_command(command=legacy_command)
-    ).then_return([engine_command])
+    decoy.when(legacy_command_mapper.map_command(command=legacy_command)).then_return(
+        [engine_command]
+    )
 
     handler(legacy_command)
 

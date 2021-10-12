@@ -30,7 +30,7 @@ class LegacyCommandMapper:
         self._running_commands: Dict[str, List[pe_commands.Command]] = defaultdict(list)
         self._command_count: Dict[str, int] = defaultdict(lambda: 0)
 
-    def map_brokered_command(
+    def map_command(
         self,
         command: LegacyCommand,
     ) -> List[pe_commands.Command]:
