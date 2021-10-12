@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import capitalize from 'lodash/capitalize'
-
 import {
   Flex,
   Box,
@@ -50,25 +49,27 @@ export function PositionCheckNav(props: Props): JSX.Element {
       backgroundColor={C_NEAR_WHITE}
     >
       {sections.map((section, index) => {
-        const sectionColor =
+        const sectionTextOrBackgroundColor =
           completedSections != null && !completedSections.includes(section)
             ? C_DISABLED
             : C_DARK_GRAY
         const isCompleted =
           completedSections != null && completedSections.includes(section)
+        let iconBackgroundColor = C_DISABLED
+        if (section === currentSection) {
+          iconBackgroundColor = '#00c3e6'
+        } else if (isCompleted === true) {
+          iconBackgroundColor = 'transparent'
+        } else {
+          iconBackgroundColor = sectionTextOrBackgroundColor
+        }
         return (
           <Flex key={index} padding={SPACING_2} alignItems={ALIGN_CENTER}>
             <Box
               width={SIZE_1}
               height={SIZE_1}
               lineHeight={SIZE_1}
-              backgroundColor={
-                section === currentSection
-                  ? '#00c3e6'
-                  : isCompleted
-                  ? 'transparent'
-                  : sectionColor
-              }
+              backgroundColor={iconBackgroundColor}
               color={C_WHITE}
               borderRadius="50%"
               marginRight={SPACING_2}
@@ -76,9 +77,10 @@ export function PositionCheckNav(props: Props): JSX.Element {
             >
               {isCompleted ? (
                 <Icon
-                  opacity="1"
                   name="check-circle"
-                  width="1rem"
+                  width={SIZE_1}
+                  height={SIZE_1}
+                  lineHeight={SIZE_1}
                   marginRight={SPACING_2}
                   color={COLOR_SUCCESS}
                 />
@@ -88,7 +90,11 @@ export function PositionCheckNav(props: Props): JSX.Element {
             </Box>
             <Box maxWidth="85%">
               <Text
-                color={section === currentSection ? '#00c3e6' : sectionColor}
+                color={
+                  section === currentSection
+                    ? '#00c3e6'
+                    : sectionTextOrBackgroundColor
+                }
               >
                 {t(`${section.toLowerCase()}_section`, {
                   primary_mount: capitalize(primaryPipetteMount),
