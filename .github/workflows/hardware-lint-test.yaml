@@ -42,7 +42,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Run OT-3 Emulator
-        uses: Opentrons/opentrons-emulation@v1.1
+        uses: Opentrons/opentrons-emulation@v1.2
         with:
           ot3-firmware-commit-id: latest
           modules-commit-id: latest
