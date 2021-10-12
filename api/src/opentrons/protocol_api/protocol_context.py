@@ -818,6 +818,8 @@ class LabwareLoadInfo:
     """
 
     labware_definition: "LabwareDefinition"
+    # todo(mm, 2021-10-11): Namespace, load name, and version can be derived from the
+    # definition. Should they be removed from here?
     labware_namespace: str
     labware_load_name: str
     labware_version: int
