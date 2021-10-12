@@ -157,7 +157,7 @@ def test_broker_messages(
     )
 
     decoy.when(legacy_command_mapper.map_command(command=legacy_command)).then_return(
-        [engine_command]
+        engine_command
     )
 
     handler(legacy_command)

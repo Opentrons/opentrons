@@ -119,27 +119,21 @@ class LegacyContextPlugin(AbstractPlugin):
             self._subscriptions_are_set_up = False
 
     def _dispatch_legacy_command(self, command: LegacyCommand) -> None:
-        pe_commands = self._legacy_command_mapper.map_command(command=command)
-
-        for c in pe_commands:
-            self.dispatch(pe_actions.UpdateCommandAction(command=c))
+        pe_command = self._legacy_command_mapper.map_command(command=command)
+        self.dispatch(pe_actions.UpdateCommandAction(command=pe_command))
 
     def _dispatch_labware_loaded(
         self, labware_load_info: LegacyLabwareLoadInfo
     ) -> None:
-        pe_commands = self._legacy_command_mapper.map_labware_load(
+        pe_command = self._legacy_command_mapper.map_labware_load(
             labware_load_info=labware_load_info
         )
-
-        for c in pe_commands:
-            self.dispatch(pe_actions.UpdateCommandAction(command=c))
+        self.dispatch(pe_actions.UpdateCommandAction(command=pe_command))
 
     def _dispatch_instrument_loaded(
         self, instrument_load_info: LegacyInstrumentLoadInfo
     ) -> None:
-        pe_commands = self._legacy_command_mapper.map_instrument_load(
+        pe_command = self._legacy_command_mapper.map_instrument_load(
             instrument_load_info=instrument_load_info
         )
-
-        for c in pe_commands:
-            self.dispatch(pe_actions.UpdateCommandAction(command=c))
+        self.dispatch(pe_actions.UpdateCommandAction(command=pe_command))

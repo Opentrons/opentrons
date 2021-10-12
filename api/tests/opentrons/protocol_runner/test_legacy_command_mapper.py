@@ -31,7 +31,7 @@ def test_map_before_command() -> None:
     }
 
     subject = LegacyCommandMapper()
-    (result,) = subject.map_command(legacy_command)
+    result = subject.map_command(legacy_command)
 
     assert result == pe_commands.Custom.construct(
         id="command.PAUSE-0",
@@ -63,7 +63,7 @@ def test_map_after_command() -> None:
     subject = LegacyCommandMapper()
 
     _ = subject.map_command(legacy_command_start)
-    (result,) = subject.map_command(legacy_command_end)
+    result = subject.map_command(legacy_command_end)
 
     assert result == pe_commands.Custom.construct(
         id="command.PAUSE-0",
@@ -106,10 +106,10 @@ def test_command_stack() -> None:
     }
 
     subject = LegacyCommandMapper()
-    (result_1,) = subject.map_command(legacy_command_1)
-    (result_2,) = subject.map_command(legacy_command_2)
-    (result_3,) = subject.map_command(legacy_command_3)
-    (result_4,) = subject.map_command(legacy_command_4)
+    result_1 = subject.map_command(legacy_command_1)
+    result_2 = subject.map_command(legacy_command_2)
+    result_3 = subject.map_command(legacy_command_3)
+    result_4 = subject.map_command(legacy_command_4)
 
     assert result_1 == pe_commands.Custom.construct(
         id="command.PAUSE-0",
@@ -187,7 +187,7 @@ def test_map_labware_load(minimal_labware_def: LabwareDefinition) -> None:
     )
 
     output = LegacyCommandMapper().map_labware_load(input)
-    assert output[0] == expected_output
+    assert output == expected_output
 
 
 def test_map_instrument_load() -> None:
@@ -209,4 +209,4 @@ def test_map_instrument_load() -> None:
     )
 
     output = LegacyCommandMapper().map_instrument_load(input)
-    assert output[0] == expected_output
+    assert output == expected_output

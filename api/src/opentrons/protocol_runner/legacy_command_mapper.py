@@ -36,8 +36,8 @@ class LegacyCommandMapper:
     def map_command(
         self,
         command: LegacyCommand,
-    ) -> List[pe_commands.Command]:
-        """Map a legacy Broker command to ProtocolEngine commands.
+    ) -> pe_commands.Command:
+        """Map a legacy Broker command to a ProtocolEngine command.
 
         A "before" message from the Broker
         is mapped to a ``RUNNING`` ProtocolEngine command.
@@ -54,7 +54,6 @@ class LegacyCommandMapper:
 
         command_id = f"{command_type}-0"
         now = utc_now()
-        results: List[pe_commands.Command] = []
 
         if stage == "before":
             count = self._command_count[command_type]
@@ -73,7 +72,7 @@ class LegacyCommandMapper:
             self._command_count[command_type] = count + 1
             self._running_commands[command_type].append(engine_command)
 
-            results.append(engine_command)
+            return engine_command
 
         else:
             running_command = self._running_commands[command_type].pop()
@@ -84,15 +83,13 @@ class LegacyCommandMapper:
                 }
             )
 
-            results.append(completed_command)
-
-        return results
+            return completed_command
 
     def map_labware_load(
         self,
         labware_load_info: LegacyLabwareLoadInfo,
-    ) -> List[pe_commands.Command]:
-        """Map a legacy labware load to ProtocolEngine commands."""
+    ) -> pe_commands.Command:
+        """Map a legacy labware load to a ProtocolEngine command."""
         now = utc_now()
 
         count = self._command_count["LOAD_LABWARE"]
@@ -119,12 +116,12 @@ class LegacyCommandMapper:
         )
 
         self._command_count["LOAD_LABWARE"] = count + 1
-        return [load_labware_command]
+        return load_labware_command
 
     def map_instrument_load(
         self, instrument_load_info: LegacyInstrumentLoadInfo
-    ) -> List[pe_commands.Command]:
-        """Map a legacy instrument (pipette) load to ProtocolEngine commands."""
+    ) -> pe_commands.Command:
+        """Map a legacy instrument (pipette) load to a ProtocolEngine command."""
         now = utc_now()
 
         count = self._command_count["LOAD_PIPETTE"]
@@ -147,4 +144,4 @@ class LegacyCommandMapper:
         )
 
         self._command_count["LOAD_PIPETTE"] = count + 1
-        return [load_pipette_command]
+        return load_pipette_command
