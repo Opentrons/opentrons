@@ -139,7 +139,7 @@ class LegacyCommandMapper:
                 pipetteName=pe_types.PipetteName(
                     instrument_load_info.instrument_load_name
                 ),
-                mount=MountType(instrument_load_info.mount),
+                mount=MountType(str(instrument_load_info.mount).lower()),
             ),
             result=pe_commands.LoadPipetteResult(
                 pipetteId=f"pipette-{count}",
