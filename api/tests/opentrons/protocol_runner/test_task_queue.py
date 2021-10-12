@@ -1,94 +1,77 @@
 """Tests for TaskQueue."""
-import pytest
 import asyncio
-from typing import Any
-from opentrons.protocol_runner.task_queue import TaskQueue, TaskQueuePhase
+from decoy import Decoy
+from opentrons.protocol_runner.task_queue import TaskQueue
 
 
-async def test_is_started() -> None:
-    """It should report if the task queue has been started."""
-    subject = TaskQueue()
-
-    assert subject.is_started() is False
-    subject.start()
-    assert subject.is_started() is True
-
-
-async def test_add_run_task() -> None:
+async def test_add_run_func(decoy: Decoy) -> None:
     """It should be able to add a task for the "run" phase."""
-    run_result = False
-
-    async def run_task() -> None:
-        nonlocal run_result
-        run_result = True
+    run_func = decoy.mock(is_async=True)
 
     subject = TaskQueue()
-    subject.add(phase=TaskQueuePhase.RUN, func=run_task)
+    subject.add_run_func(func=run_func)
     subject.start()
     await subject.join()
 
-    assert run_result is True
+    decoy.verify(await run_func())
 
 
-async def test_add_cleanup_task() -> None:
+async def test_add_cleanup_func(decoy: Decoy) -> None:
     """It should be able to add a task for the "cleanup" phase."""
-    cleanup_result = False
-
-    async def cleanup_task() -> None:
-        nonlocal cleanup_result
-        cleanup_result = True
+    cleanup_func = decoy.mock(is_async=True)
 
     subject = TaskQueue()
-    subject.add(phase=TaskQueuePhase.CLEANUP, func=cleanup_task)
+    subject.add_cleanup_func(func=cleanup_func)
     subject.start()
     await subject.join()
 
-    assert cleanup_result is True
+    decoy.verify(await cleanup_func(error=None))
 
 
-async def test_passes_args() -> None:
-    """It should be able to add a task for the "cleanup" phase."""
-    run_args = None
-    cleanup_args = None
-
-    async def run_task(*args: Any, **kwargs: Any) -> None:
-        nonlocal run_args
-        run_args = (args, kwargs)
-
-    async def cleanup_task(*args: Any, **kwargs: Any) -> None:
-        nonlocal cleanup_args
-        cleanup_args = (args, kwargs)
+async def test_passes_args(decoy: Decoy) -> None:
+    """It should pass kwargs to the run phase function."""
+    run_func = decoy.mock(is_async=True)
 
     subject = TaskQueue()
-    subject.add(TaskQueuePhase.RUN, run_task, 1, 2, hello="world")
-    subject.add(TaskQueuePhase.CLEANUP, cleanup_task, "a", "b", fizz="buzz")
+    subject.add_run_func(func=run_func, hello="world")
     subject.start()
     await subject.join()
 
-    assert run_args == ((1, 2), {"hello": "world"})
-    assert cleanup_args == (("a", "b"), {"fizz": "buzz"})
+    decoy.verify(await run_func(hello="world"))
 
 
-async def test_cleanup_always_runs() -> None:
-    """It should be able to add a task for the "cleanup" phase."""
-    cleanup_result = False
-
-    async def run_task() -> None:
-        raise RuntimeError("oh no")
-
-    async def cleanup_task() -> None:
-        nonlocal cleanup_result
-        cleanup_result = True
+async def test_cleanup_runs_second(decoy: Decoy) -> None:
+    """It should run the "run" and "cleanup" funcs in order."""
+    run_func = decoy.mock(is_async=True)
+    cleanup_func = decoy.mock(is_async=True)
 
     subject = TaskQueue()
-    subject.add(TaskQueuePhase.RUN, func=run_task)
-    subject.add(TaskQueuePhase.CLEANUP, func=cleanup_task)
+    subject.add_run_func(func=run_func)
+    subject.add_cleanup_func(func=cleanup_func)
     subject.start()
+    await subject.join()
 
-    with pytest.raises(RuntimeError, match="oh no"):
-        await subject.join()
+    decoy.verify(
+        await run_func(),
+        await cleanup_func(error=None),
+    )
 
-    assert cleanup_result is True
+
+async def test_cleanup_gets_run_error(decoy: Decoy) -> None:
+    """It should run the "run" and "cleanup" funcs in order."""
+    run_func = decoy.mock(is_async=True)
+    cleanup_func = decoy.mock(is_async=True)
+    error = RuntimeError("Oh no!")
+
+    decoy.when(await run_func()).then_raise(error)
+
+    subject = TaskQueue()
+    subject.add_run_func(func=run_func)
+    subject.add_cleanup_func(func=cleanup_func)
+    subject.start()
+    await subject.join()
+
+    decoy.verify(await cleanup_func(error=error))
 
 
 async def test_join_waits_for_start() -> None:
@@ -101,3 +84,19 @@ async def test_join_waits_for_start() -> None:
 
     subject.start()
     await join_task
+
+
+async def test_start_runs_stuff_once(decoy: Decoy) -> None:
+    """Calling `start` should no-op if already started."""
+    run_func = decoy.mock(is_async=True)
+    cleanup_func = decoy.mock(is_async=True)
+
+    subject = TaskQueue()
+    subject.add_run_func(func=run_func)
+    subject.add_cleanup_func(func=cleanup_func)
+    subject.start()
+    subject.start()
+    await subject.join()
+
+    decoy.verify(await run_func(), times=1)
+    decoy.verify(await cleanup_func(error=None), times=1)

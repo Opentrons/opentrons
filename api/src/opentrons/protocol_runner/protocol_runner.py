@@ -12,7 +12,7 @@ from opentrons.protocol_engine import (
 
 from .protocol_source import ProtocolSource
 from .pre_analysis import JsonPreAnalysis, PythonPreAnalysis
-from .task_queue import TaskQueue, TaskQueuePhase
+from .task_queue import TaskQueue
 from .json_file_reader import JsonFileReader
 from .json_command_translator import JsonCommandTranslator
 from .python_file_reader import PythonFileReader
@@ -108,18 +108,14 @@ class ProtocolRunner:
 
         # ensure the engine is stopped gracefully once the
         # protocol file stops issuing commands
-        self._task_queue.add(
-            phase=TaskQueuePhase.CLEANUP,
+        self._task_queue.add_cleanup_func(
             func=self._protocol_engine.stop,
-            wait_until_complete=True,
         )
 
     def play(self) -> None:
         """Start or resume the run."""
         self._protocol_engine.play()
-
-        if not self._task_queue.is_started():
-            self._task_queue.start()
+        self._task_queue.start()
 
     def pause(self) -> None:
         """Pause the run."""
@@ -155,11 +151,14 @@ class ProtocolRunner:
         for request in commands:
             self._protocol_engine.add_command(request=request)
 
+        self._task_queue.add_run_func(
+            func=self._protocol_engine.wait_until_complete,
+        )
+
     def _load_python(self, protocol_source: ProtocolSource) -> None:
         protocol = self._python_file_reader.read(protocol_source)
         context = self._python_context_creator.create(self._protocol_engine)
-        self._task_queue.add(
-            phase=TaskQueuePhase.RUN,
+        self._task_queue.add_run_func(
             func=self._python_executor.execute,
             protocol=protocol,
             context=context,
@@ -179,8 +178,7 @@ class ProtocolRunner:
             )
         )
 
-        self._task_queue.add(
-            phase=TaskQueuePhase.RUN,
+        self._task_queue.add_run_func(
             func=self._legacy_executor.execute,
             protocol=protocol,
             context=context,

@@ -13,7 +13,7 @@ from opentrons.protocol_engine import ProtocolEngine, commands as pe_commands
 from opentrons.protocol_runner import ProtocolRunner
 from opentrons.protocol_runner.protocol_source import ProtocolSource
 from opentrons.protocol_runner.pre_analysis import JsonPreAnalysis, PythonPreAnalysis
-from opentrons.protocol_runner.task_queue import TaskQueue, TaskQueuePhase
+from opentrons.protocol_runner.task_queue import TaskQueue
 from opentrons.protocol_runner.json_file_reader import JsonFileReader
 from opentrons.protocol_runner.json_command_translator import JsonCommandTranslator
 from opentrons.protocol_runner.python_file_reader import (
@@ -136,37 +136,12 @@ async def test_play_starts_run(
     subject: ProtocolRunner,
 ) -> None:
     """It should start a protocol run with play."""
-    decoy.when(task_queue.is_started()).then_return(False)
-
     subject.play()
 
     decoy.verify(
         protocol_engine.play(),
         task_queue.start(),
     )
-
-
-async def test_play_resumes_run(
-    decoy: Decoy,
-    protocol_engine: ProtocolEngine,
-    task_queue: TaskQueue,
-    subject: ProtocolRunner,
-) -> None:
-    """It should resume an already started protocol run with play."""
-    decoy.when(task_queue.is_started()).then_return(True)
-
-    subject.play()
-
-    decoy.verify(protocol_engine.play(), times=1)
-    decoy.verify(
-        task_queue.add(
-            phase=TaskQueuePhase.CLEANUP,
-            func=protocol_engine.stop,
-            wait_until_complete=True,
-        ),
-        times=0,
-    )
-    decoy.verify(task_queue.start(), times=0)
 
 
 async def test_pause(
@@ -239,11 +214,8 @@ def test_load_json(
                 data=pe_commands.PauseData(message="goodbye")
             )
         ),
-        task_queue.add(
-            phase=TaskQueuePhase.CLEANUP,
-            func=protocol_engine.stop,
-            wait_until_complete=True,
-        ),
+        task_queue.add_run_func(func=protocol_engine.wait_until_complete),
+        task_queue.add_cleanup_func(func=protocol_engine.stop),
     )
 
 
@@ -275,17 +247,12 @@ def test_load_python(
     subject.load(python_protocol_source)
 
     decoy.verify(
-        task_queue.add(
-            phase=TaskQueuePhase.RUN,
+        task_queue.add_run_func(
             func=python_executor.execute,
             protocol=python_protocol,
             context=protocol_context,
         ),
-        task_queue.add(
-            phase=TaskQueuePhase.CLEANUP,
-            func=protocol_engine.stop,
-            wait_until_complete=True,
-        ),
+        task_queue.add_cleanup_func(func=protocol_engine.stop),
     )
 
 
@@ -329,17 +296,12 @@ def test_load_legacy_python(
 
     decoy.verify(
         protocol_engine.add_plugin(matchers.IsA(LegacyContextPlugin)),
-        task_queue.add(
-            phase=TaskQueuePhase.RUN,
+        task_queue.add_run_func(
             func=legacy_executor.execute,
             protocol=legacy_protocol,
             context=legacy_context,
         ),
-        task_queue.add(
-            phase=TaskQueuePhase.CLEANUP,
-            func=protocol_engine.stop,
-            wait_until_complete=True,
-        ),
+        task_queue.add_cleanup_func(func=protocol_engine.stop),
     )
 
 
@@ -380,15 +342,10 @@ def test_load_legacy_json(
 
     decoy.verify(
         protocol_engine.add_plugin(matchers.IsA(LegacyContextPlugin)),
-        task_queue.add(
-            phase=TaskQueuePhase.RUN,
+        task_queue.add_run_func(
             func=legacy_executor.execute,
             protocol=legacy_protocol,
             context=legacy_context,
         ),
-        task_queue.add(
-            phase=TaskQueuePhase.CLEANUP,
-            func=protocol_engine.stop,
-            wait_until_complete=True,
-        ),
+        task_queue.add_cleanup_func(func=protocol_engine.stop),
     )
