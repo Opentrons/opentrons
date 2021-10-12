@@ -14,19 +14,25 @@ import {
   C_DARK_GRAY,
   TEXT_ALIGN_CENTER,
   FONT_SIZE_CAPTION,
+  Text,
 } from '@opentrons/components'
-
 import type { Section } from './types'
-
 interface Props {
   sections: Section[]
+  currentSection: Section
   primaryPipetteMount: string
   secondaryPipetteMount: string
 }
 
 export function PositionCheckNav(props: Props): JSX.Element {
-  const { sections, primaryPipetteMount, secondaryPipetteMount } = props
+  const {
+    currentSection,
+    sections,
+    primaryPipetteMount,
+    secondaryPipetteMount,
+  } = props
   const { t } = useTranslation('labware_position_check')
+
   return (
     <Box
       fontSize={FONT_SIZE_CAPTION}
@@ -43,7 +49,9 @@ export function PositionCheckNav(props: Props): JSX.Element {
             width={SIZE_1}
             height={SIZE_1}
             lineHeight={SIZE_1}
-            backgroundColor={C_DARK_GRAY}
+            backgroundColor={
+              section === currentSection ? '#00c3e6' : C_DARK_GRAY
+            }
             color={C_WHITE}
             borderRadius="50%"
             marginRight={SPACING_2}
@@ -52,10 +60,12 @@ export function PositionCheckNav(props: Props): JSX.Element {
             {index + 1}
           </Box>
           <Box maxWidth="85%">
-            {t(`${section.toLowerCase()}_section`, {
-              primary_mount: capitalize(primaryPipetteMount),
-              secondary_mount: capitalize(secondaryPipetteMount),
-            })}
+            <Text color={section === currentSection ? '#00c3e6' : C_DARK_GRAY}>
+              {t(`${section.toLowerCase()}_section`, {
+                primary_mount: capitalize(primaryPipetteMount),
+                secondary_mount: capitalize(secondaryPipetteMount),
+              })}
+            </Text>
           </Box>
         </Flex>
       ))}
