@@ -21,7 +21,7 @@ import { PositionCheckNav } from './PositionCheckNav'
 import { DeckMap } from './DeckMap'
 import { useIntroInfo, useLabwareIdsBySection } from './hooks'
 
-const INTERVAL_MS = 3000
+export const INTERVAL_MS = 3000
 
 export const IntroScreen = (props: {
   setCurrentLabwareCheckStep: (stepNumber: number) => void

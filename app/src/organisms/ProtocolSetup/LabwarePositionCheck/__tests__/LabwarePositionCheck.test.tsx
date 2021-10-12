@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { resetAllWhenMocks, when } from 'jest-when'
-import { renderWithProviders } from '@opentrons/components/src/testing/utils'
+import { renderWithProviders } from '@opentrons/components'
 import { fireEvent } from '@testing-library/dom'
 import { i18n } from '../../../../i18n'
 import { LabwarePositionCheck } from '../index'

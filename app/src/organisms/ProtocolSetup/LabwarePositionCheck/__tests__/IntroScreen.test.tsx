@@ -1,10 +1,11 @@
 import * as React from 'react'
-import { when } from 'jest-when'
+import { when, resetAllWhenMocks } from 'jest-when'
 import {
+  RobotWorkSpace,
+  useInterval,
   partialComponentPropsMatcher,
   renderWithProviders,
-} from '@opentrons/components/src/testing/utils'
-import { RobotWorkSpace } from '@opentrons/components'
+} from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 import { LabwareDefinition2 } from '@opentrons/shared-data'
@@ -12,7 +13,7 @@ import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fi
 import { useModuleRenderInfoById, useLabwareRenderInfoById } from '../../hooks'
 import { PositionCheckNav } from '../PositionCheckNav'
 import { useIntroInfo, useLabwareIdsBySection } from '../hooks'
-import { IntroScreen } from '../IntroScreen'
+import { IntroScreen, INTERVAL_MS } from '../IntroScreen'
 import type { Section } from '../types'
 import { fireEvent } from '@testing-library/dom'
 
@@ -24,6 +25,7 @@ jest.mock('@opentrons/components', () => {
   return {
     ...actualComponents,
     RobotWorkSpace: jest.fn(() => <div>mock RobotWorkSpace</div>),
+    useInterval: jest.fn(),
   }
 })
 
@@ -39,6 +41,7 @@ const mockUseLabwareIdsBySection = useLabwareIdsBySection as jest.MockedFunction
 const mockUseIntroInfo = useIntroInfo as jest.MockedFunction<
   typeof useIntroInfo
 >
+const mockUseInterval = useInterval as jest.MockedFunction<typeof useInterval>
 const mockPositionCheckNav = PositionCheckNav as jest.MockedFunction<
   typeof PositionCheckNav
 >
@@ -106,6 +109,10 @@ describe('IntroScreen', () => {
     })
     mockPositionCheckNav.mockReturnValue(<div>Mock Position Check Nav</div>)
   })
+  afterEach(() => {
+    resetAllWhenMocks()
+    jest.resetAllMocks()
+  })
 
   it('renders correct heading and position_check_description', () => {
     const { getByRole, getByText } = render(props)
@@ -128,5 +135,9 @@ describe('IntroScreen', () => {
     })
     fireEvent.click(genericStepScreenButton)
     expect(props.setCurrentLabwareCheckStep).toHaveBeenCalled()
+  })
+  it('should should rotate through the active section', () => {
+    render(props)
+    expect(mockUseInterval.mock.calls[0][1]).toBe(INTERVAL_MS)
   })
 })

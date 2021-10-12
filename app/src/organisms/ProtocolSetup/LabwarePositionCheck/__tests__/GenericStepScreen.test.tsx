@@ -3,7 +3,7 @@ import { when } from 'jest-when'
 import {
   partialComponentPropsMatcher,
   renderWithProviders,
-} from '@opentrons/components/src/testing/utils'
+} from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import { GenericStepScreen } from '../GenericStepScreen'
 import { LabwarePositionCheckStepDetail } from '../LabwarePositionCheckStepDetail'
