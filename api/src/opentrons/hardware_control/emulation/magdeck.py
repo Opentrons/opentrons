@@ -20,6 +20,9 @@ VERSION = "2.0.0"
 class MagDeckEmulator(AbstractEmulator):
     """Magdeck emulator"""
 
+    height: float = 0
+    position: float = 0
+
     def __init__(self, parser: Parser) -> None:
         self.reset()
         self._parser = parser
@@ -30,7 +33,7 @@ class MagDeckEmulator(AbstractEmulator):
         joined = " ".join(r for r in results if r)
         return None if not joined else joined
 
-    def reset(self):
+    def reset(self) -> None:
         self.height: float = 0
         self.position: float = 0
 
