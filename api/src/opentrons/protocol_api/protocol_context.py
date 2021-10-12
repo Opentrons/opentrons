@@ -6,22 +6,20 @@ import logging
 from typing import (
     Callable,
     Dict,
-    Generic,
     Iterator,
     List,
     Optional,
-    Set,
     Tuple,
-    TypeVar,
     Union,
     TYPE_CHECKING,
     cast,
 )
 from collections import OrderedDict
 
+from opentrons import types
+from opentrons.equipment_broker import EquipmentBroker
 from opentrons.hardware_control import SynchronousAdapter, ThreadManager
 from opentrons.hardware_control.modules.types import ModuleType
-from opentrons import types
 from opentrons.commands import protocol_commands as cmds, types as cmd_types
 from opentrons.commands.publisher import CommandPublisher, publish
 from opentrons.protocols.api_support.types import APIVersion
@@ -837,59 +835,3 @@ class InstrumentLoadInfo:
 
     instrument_load_name: str
     mount: types.Mount
-
-
-_MessageT = TypeVar("_MessageT")
-
-
-class EquipmentBroker(Generic[_MessageT]):
-    """For Opentrons internal use only.
-
-    :meta private:
-
-    This is a simple pub/sub message broker,
-    meant for monitoring when equipment-loading events
-    (pipette, labware, and module loads)
-    happen on an APIv2 `ProtocolContext`.
-
-    This duplicates much of `opentrons.broker.Broker`,
-    which covers most other APIv2 events, like aspirates and moves,
-    but doesn't cover equipment loads.
-
-    To cover equipment loads, we felt more comfortable
-    duplicating `opentrons.broker.Broker`'s responsibilities here
-    than attempting to extend it without breaking anything.
-    """
-
-    def __init__(self) -> None:
-        self._callbacks: Set[Callable[[_MessageT], None]] = set()
-
-    def subscribe(self, callback: Callable[[_MessageT], None]) -> Callable[[], None]:
-        """Register ``callback`` to be called by a subsequent `publish`.
-
-        You must not subscribe the same callback again
-        unless you first unsubscribe it.
-
-        Returns:
-            A function that you can call to unsubscribe ``callback``.
-            It must not be called more than once.
-        """
-
-        def unsubscribe() -> None:
-            self._callbacks.remove(callback)
-
-        self._callbacks.add(callback)
-        return unsubscribe
-
-    def publish(self, message: _MessageT) -> None:
-        """Call every subscribed callback, with ``message`` as the argument.
-
-        The order in which the callbacks are called is undefined.
-
-        If any callback raises an exception, it's propagated,
-        and any remaining callbacks will be left uncalled.
-        """
-        # Callback order is undefined because
-        # Python sets don't preserve insertion order.
-        for callback in self._callbacks:
-            callback(message)
