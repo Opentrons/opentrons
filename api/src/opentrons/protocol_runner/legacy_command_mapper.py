@@ -23,7 +23,10 @@ class LegacyCommandData(pe_commands.CustomData):
 
 
 class LegacyCommandMapper:
-    """Map broker commands to protocol engine commands."""
+    """Map broker commands to protocol engine commands.
+
+    Each protocol should use its own instance of this class.
+    """
 
     def __init__(self) -> None:
         """Initialize the command mapper."""
@@ -34,7 +37,17 @@ class LegacyCommandMapper:
         self,
         command: LegacyCommand,
     ) -> List[pe_commands.Command]:
-        """Map a legacy Broker command to ProtocolEngine commands."""
+        """Map a legacy Broker command to ProtocolEngine commands.
+
+        A "before" message from the Broker
+        is mapped to a ``RUNNING`` ProtocolEngine command.
+
+        An "after" message from the Broker
+        is mapped to a ``SUCCEEDED`` ProtocolEngine command.
+        It has the same ID as the original ``RUNNING`` command,
+        so when you send it to the ProtocolEngine, it will update the original
+        command's status in-place.
+        """
         command_type = command["name"]
         command_text = command["payload"]["text"]
         stage = command["$"]
@@ -79,7 +92,7 @@ class LegacyCommandMapper:
         self,
         labware_load_info: LegacyLabwareLoadInfo,
     ) -> List[pe_commands.Command]:
-        """Map a legacy labware load to Protocol Engine commands."""
+        """Map a legacy labware load to ProtocolEngine commands."""
         now = utc_now()
 
         count = self._command_count["LOAD_LABWARE"]
@@ -111,7 +124,7 @@ class LegacyCommandMapper:
     def map_instrument_load(
         self, instrument_load_info: LegacyInstrumentLoadInfo
     ) -> List[pe_commands.Command]:
-        """Map a legacy instrument (pipette) load to Protocol Engine commands."""
+        """Map a legacy instrument (pipette) load to ProtocolEngine commands."""
         now = utc_now()
 
         count = self._command_count["LOAD_PIPETTE"]
