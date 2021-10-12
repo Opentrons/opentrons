@@ -179,7 +179,8 @@ def test_map_labware_load(minimal_labware_def: LabwareDefinition) -> None:
         ),
         result=pe_commands.LoadLabwareResult.construct(
             labwareId=matchers.IsA(str),
-            # Trusting that the labware definition gets passed through corectly.
+            # Trusting that the exact fields within in the labware definition
+            # get passed through corectly.
             definition=matchers.Anything(),
             calibration=CalibrationOffset(x=0, y=0, z=0),
         ),
