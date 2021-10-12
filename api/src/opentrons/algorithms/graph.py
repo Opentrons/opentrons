@@ -16,7 +16,9 @@ class Vertex(Generic[VertexName]):
     of a graph.
     """
 
-    def __init__(self, vertex: GenericNode[VertexName], neighbors: List[VertexName]) -> None:
+    def __init__(
+        self, vertex: GenericNode[VertexName], neighbors: List[VertexName]
+    ) -> None:
         """Vertex class initializer.
 
         :param vertex: A node dataclass
@@ -110,7 +112,11 @@ class Graph(Generic[VertexName]):
         self._lookup_table = lookup_table
 
     @classmethod
-    def build(cls, graph: List[GenericNode[VertexName]], sort_by: Callable[[Vertex[VertexName]], VertexName] = default_sort) -> Graph[VertexName]:
+    def build(
+        cls,
+        graph: List[GenericNode[VertexName]],
+        sort_by: Callable[[Vertex[VertexName]], VertexName] = default_sort,
+    ) -> Graph[VertexName]:
         """Graph class builder.
 
         :param graph: A list of nodes to add to the graph.

@@ -33,11 +33,20 @@ def str_named_graph() -> dfs.DFS[str]:
 @pytest.mark.parametrize(
     argnames=["subject", "additional_vertex"],
     argvalues=[
-        [lazy_fixture("int_named_graph"), types.GenericNode(name=12, sub_names=[1, 9, 5])],
-        [lazy_fixture("str_named_graph"), types.GenericNode(name="K", sub_names=["H", "J", "A"])],
-    ]
+        [
+            lazy_fixture("int_named_graph"),
+            types.GenericNode(name=12, sub_names=[1, 9, 5]),
+        ],
+        [
+            lazy_fixture("str_named_graph"),
+            types.GenericNode(name="K", sub_names=["H", "J", "A"]),
+        ],
+    ],
 )
-def test_vertices(subject: dfs.DFS[types.VertexName], additional_vertex: types.GenericNode[types.VertexName]) -> None:
+def test_vertices(
+    subject: dfs.DFS[types.VertexName],
+    additional_vertex: types.GenericNode[types.VertexName],
+) -> None:
     """Test vertices.
 
     Test adding and removing the vertices of a graph.

@@ -8,9 +8,10 @@ more readable format.
 import subprocess
 import re
 import os
-from typing import List, Set, Sequence, cast
+from typing import List, Set, cast
 
 from opentrons.algorithms.dfs import DFS
+from opentrons.algorithms.types import GenericNode
 from opentrons.hardware_control.modules.types import ModuleAtPort
 from opentrons.hardware_control.types import BoardRevision
 
@@ -31,7 +32,7 @@ class USBBus(USBDriverInterface):
     def __init__(self, board_revision: BoardRevision):
         self._board_revision = board_revision
         self._usb_dev = self.read_usb_bus()
-        self._dfs: DFS[str] = DFS[str](self._usb_dev)
+        self._dfs: DFS[str] = DFS[str](cast(List[GenericNode[str]], self._usb_dev))
         self._sorted = self._dfs.dfs()
 
     @staticmethod

@@ -4,7 +4,7 @@ Search a generic graph down to its leaf
 nodes first before back-tracking up the tree.
 """
 
-from typing import List, Set, Generic, Sequence
+from typing import List, Set, Generic
 
 from .graph import Graph
 from .types import VertexName, GenericNode
