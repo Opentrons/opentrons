@@ -8,8 +8,8 @@ import {
 } from '@opentrons/components'
 import { LabwarePositionCheckStepDetail } from './LabwarePositionCheckStepDetail'
 import { SectionList } from './SectionList'
-import type { LabwarePositionCheckStep } from './types'
 import { useIntroInfo } from './hooks'
+import type { LabwarePositionCheckStep } from './types'
 
 interface GenericStepScreenProps {
   selectedStep: LabwarePositionCheckStep

@@ -25,7 +25,7 @@ const mockUseIntroInfo = useIntroInfo as jest.MockedFunction<
 
 const PICKUP_TIP_LABWARE_ID = 'PICKUP_TIP_LABWARE_ID'
 const PRIMARY_PIPETTE_ID = 'PRIMARY_PIPETTE_ID'
-const MOCK_SECTION = ['PRIMARY_PIPETTE_TIPRACKS' as Section]
+const MOCK_SECTIONS = ['PRIMARY_PIPETTE_TIPRACKS' as Section]
 
 const MOCK_LABWARE_POSITION_CHECK_STEP_TIPRACK = {
   labwareId:
@@ -72,7 +72,7 @@ describe('GenericStepScreen', () => {
       secondaryPipetteMount: '',
       numberOfTips: 1,
       firstStepLabwareSlot: '2',
-      sections: MOCK_SECTION,
+      sections: MOCK_SECTIONS,
     })
   })
   it('renders LabwarePositionCheckStepDetail component', () => {
@@ -81,7 +81,7 @@ describe('GenericStepScreen', () => {
   })
   it('renders GenericStepScreenNav component', () => {
     const { getByText } = render(props)
-    expect(getByText('Mock SectionList')).toBeTruthy()
+    getByText('Mock SectionList')
   })
   it('renders null if useIntroInfo is null', () => {
     mockUseIntroInfo.mockReturnValue(null)

@@ -18,6 +18,7 @@ import {
   Icon,
   SPACING_3,
   COLOR_SUCCESS,
+  C_SELECTED_DARK,
 } from '@opentrons/components'
 import type { Section } from './types'
 interface Props {
@@ -49,19 +50,19 @@ export function SectionList(props: Props): JSX.Element {
       backgroundColor={C_NEAR_WHITE}
     >
       {sections.map((section, index) => {
-        const sectionTextOrBackgroundColor =
+        const sectionTextColor =
           completedSections != null && !completedSections.includes(section)
             ? C_DISABLED
             : C_DARK_GRAY
         const isCompleted =
           completedSections != null && completedSections.includes(section)
-        let iconBackgroundColor = C_DISABLED
+        let backgroundColor = C_DISABLED
         if (section === currentSection) {
-          iconBackgroundColor = '#00c3e6'
+          backgroundColor = C_SELECTED_DARK
         } else if (isCompleted === true) {
-          iconBackgroundColor = 'transparent'
+          backgroundColor = 'transparent'
         } else {
-          iconBackgroundColor = sectionTextOrBackgroundColor
+          backgroundColor = sectionTextColor
         }
         return (
           <Flex key={index} padding={SPACING_2} alignItems={ALIGN_CENTER}>
@@ -69,7 +70,7 @@ export function SectionList(props: Props): JSX.Element {
               width={SIZE_1}
               height={SIZE_1}
               lineHeight={SIZE_1}
-              backgroundColor={iconBackgroundColor}
+              backgroundColor={backgroundColor}
               color={C_WHITE}
               borderRadius="50%"
               marginRight={SPACING_2}
@@ -92,8 +93,8 @@ export function SectionList(props: Props): JSX.Element {
               <Text
                 color={
                   section === currentSection
-                    ? '#00c3e6'
-                    : sectionTextOrBackgroundColor
+                    ? C_SELECTED_DARK
+                    : sectionTextColor
                 }
               >
                 {t(`${section.toLowerCase()}_section`, {
