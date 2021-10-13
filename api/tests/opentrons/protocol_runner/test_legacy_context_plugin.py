@@ -230,7 +230,9 @@ def test_instrument_load_broker_messages(
 
     handler_captor = matchers.Captor()
 
-    decoy.verify(legacy_context.instrument_load_broker.subscribe(callback=handler_captor))
+    decoy.verify(
+        legacy_context.instrument_load_broker.subscribe(callback=handler_captor)
+    )
 
     handler: Callable[[LegacyInstrumentLoadInfo], None] = handler_captor.value
 
