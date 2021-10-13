@@ -15,9 +15,9 @@ interface GenericStepScreenProps {
   selectedStep: LabwarePositionCheckStep
   setCurrentLabwareCheckStep: (stepNumber: number) => void
 }
-export function GenericStepScreen(
+export const GenericStepScreen = (
   props: GenericStepScreenProps
-): JSX.Element | null {
+): JSX.Element | null => {
   const introInfo = useIntroInfo()
   const [sectionIndex] = React.useState<number>(0)
   if (introInfo == null) return null
