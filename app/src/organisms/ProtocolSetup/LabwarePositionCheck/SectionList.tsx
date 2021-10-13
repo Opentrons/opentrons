@@ -28,7 +28,7 @@ interface Props {
   completedSections?: Section[]
 }
 
-export function PositionCheckNav(props: Props): JSX.Element {
+export function SectionList(props: Props): JSX.Element {
   const {
     currentSection,
     sections,

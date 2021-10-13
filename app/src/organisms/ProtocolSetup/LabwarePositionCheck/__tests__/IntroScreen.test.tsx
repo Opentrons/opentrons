@@ -11,14 +11,14 @@ import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_stand
 import { LabwareDefinition2 } from '@opentrons/shared-data'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import { useModuleRenderInfoById, useLabwareRenderInfoById } from '../../hooks'
-import { PositionCheckNav } from '../PositionCheckNav'
+import { SectionList } from '../SectionList'
 import { useIntroInfo, useLabwareIdsBySection } from '../hooks'
 import { IntroScreen, INTERVAL_MS } from '../IntroScreen'
 import type { Section } from '../types'
 import { fireEvent } from '@testing-library/dom'
 
 jest.mock('../hooks')
-jest.mock('../PositionCheckNav')
+jest.mock('../Sectionlist')
 jest.mock('../../hooks')
 jest.mock('@opentrons/components', () => {
   const actualComponents = jest.requireActual('@opentrons/components')
@@ -42,9 +42,7 @@ const mockUseIntroInfo = useIntroInfo as jest.MockedFunction<
   typeof useIntroInfo
 >
 const mockUseInterval = useInterval as jest.MockedFunction<typeof useInterval>
-const mockPositionCheckNav = PositionCheckNav as jest.MockedFunction<
-  typeof PositionCheckNav
->
+const mockSectionList = SectionList as jest.MockedFunction<typeof SectionList>
 const mockRobotWorkSpace = RobotWorkSpace as jest.MockedFunction<
   typeof RobotWorkSpace
 >
@@ -107,7 +105,7 @@ describe('IntroScreen', () => {
       firstStepLabwareSlot: '2',
       sections: MOCK_SECTIONS,
     })
-    mockPositionCheckNav.mockReturnValue(<div>Mock Position Check Nav</div>)
+    mockSectionList.mockReturnValue(<div>Mock Section List</div>)
   })
   afterEach(() => {
     resetAllWhenMocks()
@@ -125,7 +123,7 @@ describe('IntroScreen', () => {
     getByText(
       'When you check a labware, the OT-2’s pipette nozzle or attached tip will stop at the center of the A1 well. If the pipette nozzle or tip is not centered, you can reveal the OT-2’s jog controls to make an adjustment. This Labware Offset will be applied to the entire labware. Offset data is measured to the nearest 1/10th mm and can be made in the X, Y and/or Z directions.'
     )
-    getByText('Mock Position Check Nav')
+    getByText('Mock Section List')
   })
   it('should call setCurrentLabwareCheckStep when the CTA button is pressed', () => {
     const { getByRole } = render(props)

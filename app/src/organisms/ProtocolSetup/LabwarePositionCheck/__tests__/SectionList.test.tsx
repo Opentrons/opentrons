@@ -1,7 +1,7 @@
 import { renderWithProviders } from '@opentrons/components'
 import * as React from 'react'
 import { i18n } from '../../../../i18n'
-import { PositionCheckNav } from '../PositionCheckNav'
+import { SectionList } from '../SectionList'
 import { Section } from '../types'
 
 const MOCK_SECTIONS_1_PIPETTE_2_STEPS = [
@@ -20,14 +20,14 @@ const MOCK_SECTIONS_2_PIPETTES_4_STEPS = [
   'RETURN_TIP',
 ] as Section[]
 
-const render = (props: React.ComponentProps<typeof PositionCheckNav>) => {
-  return renderWithProviders(<PositionCheckNav {...props} />, {
+const render = (props: React.ComponentProps<typeof SectionList>) => {
+  return renderWithProviders(<SectionList {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
 
-describe('PositionCheckNav', () => {
-  let props: React.ComponentProps<typeof PositionCheckNav>
+describe('SectionList', () => {
+  let props: React.ComponentProps<typeof SectionList>
 
   beforeEach(() => {
     props = {

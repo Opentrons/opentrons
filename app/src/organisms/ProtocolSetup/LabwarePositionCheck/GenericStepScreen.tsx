@@ -7,7 +7,7 @@ import {
   SPACING_3,
 } from '@opentrons/components'
 import { LabwarePositionCheckStepDetail } from './LabwarePositionCheckStepDetail'
-import { PositionCheckNav } from './PositionCheckNav'
+import { SectionList } from './SectionList'
 import type { LabwarePositionCheckStep } from './types'
 import { useIntroInfo } from './hooks'
 
@@ -25,7 +25,7 @@ export const GenericStepScreen = (
   return (
     <Box margin={SPACING_3}>
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_CENTER}>
-        <PositionCheckNav
+        <SectionList
           primaryPipetteMount={primaryPipetteMount}
           secondaryPipetteMount={secondaryPipetteMount}
           sections={sections}

@@ -7,20 +7,18 @@ import {
 import { i18n } from '../../../../i18n'
 import { GenericStepScreen } from '../GenericStepScreen'
 import { LabwarePositionCheckStepDetail } from '../LabwarePositionCheckStepDetail'
-import { PositionCheckNav } from '../PositionCheckNav'
+import { SectionList } from '../SectionList'
 import { useIntroInfo } from '../hooks'
 import { Section } from '../types'
 
 jest.mock('../LabwarePositionCheckStepDetail')
-jest.mock('../PositionCheckNav')
+jest.mock('../SectionList')
 jest.mock('../hooks')
 
 const mockLabwarePositionCheckStepDetail = LabwarePositionCheckStepDetail as jest.MockedFunction<
   typeof LabwarePositionCheckStepDetail
 >
-const mockPositionCheckNav = PositionCheckNav as jest.MockedFunction<
-  typeof PositionCheckNav
->
+const mockSectionList = SectionList as jest.MockedFunction<typeof SectionList>
 const mockUseIntroInfo = useIntroInfo as jest.MockedFunction<
   typeof useIntroInfo
 >
@@ -66,7 +64,7 @@ describe('GenericStepScreen', () => {
       )
       .mockReturnValue(<div>Mock Labware Position Check Step Detail</div>)
 
-    mockPositionCheckNav.mockReturnValue(<div>Mock Position Check Nav</div>)
+    mockSectionList.mockReturnValue(<div>Mock SectionList </div>)
     when(mockUseIntroInfo).calledWith().mockReturnValue({
       primaryTipRackSlot: '1',
       primaryTipRackName: 'Opentrons 96 Filter Tip Rack 200 µL',
@@ -83,7 +81,7 @@ describe('GenericStepScreen', () => {
   })
   it('renders GenericStepScreenNav component', () => {
     const { getByText } = render(props)
-    expect(getByText('Mock Position Check Nav')).toBeTruthy()
+    expect(getByText('Mock SectionList')).toBeTruthy()
   })
   it('renders null if useIntroInfo is null', () => {
     mockUseIntroInfo.mockReturnValue(null)
