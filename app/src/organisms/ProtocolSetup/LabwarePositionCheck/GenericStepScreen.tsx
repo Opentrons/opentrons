@@ -1,5 +1,11 @@
 import * as React from 'react'
-import { ALIGN_START, Flex } from '@opentrons/components'
+import {
+  ALIGN_CENTER,
+  Box,
+  Flex,
+  JUSTIFY_SPACE_BETWEEN,
+  SPACING_3,
+} from '@opentrons/components'
 import { LabwarePositionCheckStepDetail } from './LabwarePositionCheckStepDetail'
 import { PositionCheckNav } from './PositionCheckNav'
 import type { LabwarePositionCheckStep } from './types'
@@ -17,8 +23,8 @@ export function GenericStepScreen(
   if (introInfo == null) return null
   const { sections, primaryPipetteMount, secondaryPipetteMount } = introInfo
   return (
-    <React.Fragment>
-      <Flex alignItems={ALIGN_START}>
+    <Box margin={SPACING_3}>
+      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_CENTER}>
         <PositionCheckNav
           primaryPipetteMount={primaryPipetteMount}
           secondaryPipetteMount={secondaryPipetteMount}
@@ -26,10 +32,10 @@ export function GenericStepScreen(
           currentSection={sections[sectionIndex]}
           completedSections={[sections[sectionIndex - 1]]}
         />
-        <Flex>
+        <Box width="60%" padding={SPACING_3}>
           <LabwarePositionCheckStepDetail selectedStep={props.selectedStep} />
-        </Flex>
+        </Box>
       </Flex>
-    </React.Fragment>
+    </Box>
   )
 }
