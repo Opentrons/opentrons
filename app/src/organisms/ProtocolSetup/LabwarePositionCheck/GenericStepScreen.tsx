@@ -16,7 +16,6 @@ export function GenericStepScreen(
   const [sectionIndex] = React.useState<number>(0)
   if (introInfo == null) return null
   const { sections, primaryPipetteMount, secondaryPipetteMount } = introInfo
-
   return (
     <React.Fragment>
       <Flex alignItems={ALIGN_START}>
@@ -25,6 +24,7 @@ export function GenericStepScreen(
           secondaryPipetteMount={secondaryPipetteMount}
           sections={sections}
           currentSection={sections[sectionIndex]}
+          completedSections={[sections[sectionIndex - 1]]}
         />
         <Flex>
           <LabwarePositionCheckStepDetail selectedStep={props.selectedStep} />

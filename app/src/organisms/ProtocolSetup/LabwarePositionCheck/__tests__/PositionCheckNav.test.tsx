@@ -40,9 +40,9 @@ describe('PositionCheckNav', () => {
   it('renders a 2 step Nav with 1 pipette', () => {
     const { getByText } = render(props)
     expect(getByText('1')).toHaveStyle('backgroundColor: #00c3e6')
-    expect(getByText('Check tipracks with Left Pipette')).toBeTruthy()
+    getByText('Check tipracks with Left Pipette')
     expect(getByText('2')).toHaveStyle('backgroundColor: C_DISABLED')
-    expect(getByText('Return tip')).toBeTruthy()
+    getByText('Return tip')
   })
   it('renders a 3 step Nav with 2 pipettes', () => {
     props = {
@@ -53,11 +53,11 @@ describe('PositionCheckNav', () => {
     }
     const { getByText } = render(props)
     expect(getByText('1')).toHaveStyle('backgroundColor: #00c3e6')
-    expect(getByText('Check tipracks with Left Pipette')).toBeTruthy()
+    getByText('Check tipracks with Left Pipette')
     expect(getByText('2')).toHaveStyle('backgroundColor: C_DISABLED')
-    expect(getByText('Check tipracks with Right Pipette')).toBeTruthy()
+    getByText('Check tipracks with Right Pipette')
     expect(getByText('3')).toHaveStyle('backgroundColor: C_DISABLED')
-    expect(getByText('Return tip')).toBeTruthy()
+    getByText('Return tip')
   })
   it('renders a 4 step Nav with 2 pipettes', () => {
     props = {
@@ -68,13 +68,13 @@ describe('PositionCheckNav', () => {
     }
     const { getByText } = render(props)
     expect(getByText('1')).toHaveStyle('backgroundColor: #00c3e6')
-    expect(getByText('Check tipracks with Left Pipette')).toBeTruthy()
+    getByText('Check tipracks with Left Pipette')
     expect(getByText('2')).toHaveStyle('backgroundColor: C_DISABLED')
-    expect(getByText('Check tipracks with Right Pipette')).toBeTruthy()
+    getByText('Check tipracks with Right Pipette')
     expect(getByText('3')).toHaveStyle('backgroundColor: C_DISABLED')
-    expect(getByText('Check remaining labware with Left Pipette')).toBeTruthy()
+    getByText('Check remaining labware with Left Pipette')
     expect(getByText('4')).toHaveStyle('backgroundColor: C_DISABLED')
-    expect(getByText('Return tip')).toBeTruthy()
+    getByText('Return tip')
   })
   it('renders a 3 step Nav with 2 pipettes and on the second step', () => {
     props = {
@@ -85,10 +85,10 @@ describe('PositionCheckNav', () => {
       completedSections: ['PRIMARY_PIPETTE_TIPRACKS'],
     }
     const { getByText } = render(props)
-    expect(getByText('Check tipracks with Left Pipette')).toBeTruthy()
+    getByText('Check tipracks with Left Pipette')
     expect(getByText('2')).toHaveStyle('backgroundColor: #00c3e6')
-    expect(getByText('Check tipracks with Right Pipette')).toBeTruthy()
+    getByText('Check tipracks with Right Pipette')
     expect(getByText('3')).toHaveStyle('backgroundColor: C_DISABLED')
-    expect(getByText('Return tip')).toBeTruthy()
+    getByText('Return tip')
   })
 })
