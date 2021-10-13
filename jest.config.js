@@ -11,6 +11,8 @@ module.exports = {
   },
   moduleNameMapper: {
     '\\.(css)$': 'identity-obj-proxy',
+    '^@opentrons/api-client$': `@opentrons/api-client/src/index.ts`,
+    '^@opentrons/react-api-client$': `@opentrons/api-client/src/index.ts`,
   },
   transform: {
     '^.+\\.(js|ts|tsx)$': 'babel-jest',

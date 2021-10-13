@@ -55,6 +55,14 @@ module.exports = {
       plugins: [['react-hot-loader/babel', false]],
       presets: [['@babel/preset-env', { targets: { node: '8' } }]],
     },
+    {
+      test: ['js-api-clients/**/*'],
+      presets: [
+        ['@babel/env', { useBuiltIns: 'usage', corejs: '3.10' }],
+        '@babel/preset-react',
+        '@babel/preset-typescript',
+      ],
+    },
     // apps that should be polyfilled
     // these projects require `core-js` in their package.json `dependencies`
     {
