@@ -1,14 +1,18 @@
-"""Customize the ProtocolEngine to control and track state of legacy protocols."""
-from collections import defaultdict
-from typing import Any, Dict, List, Set
+"""Translate events from a legacy ``ProtocolContext`` into Protocol Engine commands."""
 
-from opentrons.types import DeckSlotName, MountType
+from collections import defaultdict
+from typing import Dict, List
+
+from opentrons.types import MountType
 from opentrons.util.helpers import utc_now
 from opentrons.commands.types import CommandMessage as LegacyCommand
 from opentrons.protocol_engine import commands as pe_commands, types as pe_types
 from opentrons.protocols.models.labware_definition import LabwareDefinition
 
-from .legacy_wrappers import LegacyPipetteContext, LegacyModuleContext, LegacyLabware
+from .legacy_wrappers import (
+    LegacyInstrumentLoadInfo,
+    LegacyLabwareLoadInfo,
+)
 
 
 class LegacyCommandData(pe_commands.CustomData):
@@ -19,39 +23,39 @@ class LegacyCommandData(pe_commands.CustomData):
 
 
 class LegacyCommandMapper:
-    """Map broker commands to protocol engine commands."""
+    """Map broker commands to protocol engine commands.
+
+    Each protocol should use its own instance of this class.
+    """
 
     def __init__(self) -> None:
         """Initialize the command mapper."""
         self._running_commands: Dict[str, List[pe_commands.Command]] = defaultdict(list)
         self._command_count: Dict[str, int] = defaultdict(lambda: 0)
-        self._loaded_pipette_mounts: Set[str] = set()
-        self._loaded_labware_slots: Set[int] = set()
-        self._loaded_module_slots: Set[int] = set()
 
-    def map(
+    def map_command(
         self,
         command: LegacyCommand,
-        loaded_pipettes: Dict[str, LegacyPipetteContext],
-        loaded_modules: Dict[int, LegacyModuleContext[Any]],
-        loaded_labware: Dict[int, LegacyLabware],
-    ) -> List[pe_commands.Command]:
-        """Map a Broker command to a ProtocolEngine command."""
+    ) -> pe_commands.Command:
+        """Map a legacy Broker command to a ProtocolEngine command.
+
+        A "before" message from the Broker
+        is mapped to a ``RUNNING`` ProtocolEngine command.
+
+        An "after" message from the Broker
+        is mapped to a ``SUCCEEDED`` ProtocolEngine command.
+        It has the same ID as the original ``RUNNING`` command,
+        so when you send it to the ProtocolEngine, it will update the original
+        command's status in-place.
+        """
         command_type = command["name"]
         command_text = command["payload"]["text"]
         stage = command["$"]
 
         command_id = f"{command_type}-0"
         now = utc_now()
-        results: List[pe_commands.Command] = []
 
         if stage == "before":
-            # TODO(mc, 2021-09-28): equipment mapping behavior seems
-            # best tested e2e, but current smoke tests won't remain sufficient
-            # for very long. Figure out a better testing strategy
-            results += self._load_new_labware(loaded_labware)
-            results += self._load_new_pipettes(loaded_pipettes)
-
             count = self._command_count[command_type]
             command_id = f"{command_type}-{count}"
             engine_command = pe_commands.Custom(
@@ -68,7 +72,7 @@ class LegacyCommandMapper:
             self._command_count[command_type] = count + 1
             self._running_commands[command_type].append(engine_command)
 
-            results.append(engine_command)
+            return engine_command
 
         else:
             running_command = self._running_commands[command_type].pop()
@@ -79,77 +83,65 @@ class LegacyCommandMapper:
                 }
             )
 
-            results.append(completed_command)
+            return completed_command
 
-        return results
-
-    def _load_new_labware(
+    def map_labware_load(
         self,
-        loaded_labware: Dict[int, LegacyLabware],
-    ) -> List[pe_commands.Command]:
-        results: List[pe_commands.Command] = []
+        labware_load_info: LegacyLabwareLoadInfo,
+    ) -> pe_commands.Command:
+        """Map a legacy labware load to a ProtocolEngine command."""
+        now = utc_now()
 
-        for slot, labware in loaded_labware.items():
-            if slot not in self._loaded_labware_slots:
-                self._loaded_labware_slots.add(slot)
+        count = self._command_count["LOAD_LABWARE"]
 
-                now = utc_now()
-                uri = labware.uri
-                namespace, load_name, version = uri.split("/")
+        load_labware_command = pe_commands.LoadLabware(
+            id=f"commands.LOAD_LABWARE-{count}",
+            status=pe_commands.CommandStatus.SUCCEEDED,
+            createdAt=now,
+            startedAt=now,
+            completedAt=now,
+            data=pe_commands.LoadLabwareData(
+                location=pe_types.DeckSlotLocation(slot=labware_load_info.deck_slot),
+                loadName=labware_load_info.labware_load_name,
+                namespace=labware_load_info.labware_namespace,
+                version=labware_load_info.labware_version,
+            ),
+            result=pe_commands.LoadLabwareResult(
+                labwareId=f"labware-{count}",
+                definition=LabwareDefinition.parse_obj(
+                    labware_load_info.labware_definition
+                ),
+                calibration=pe_types.CalibrationOffset(x=0, y=0, z=0),
+            ),
+        )
 
-                results.append(
-                    pe_commands.LoadLabware(
-                        id=f"commands.LOAD_LABWARE-{slot}",
-                        status=pe_commands.CommandStatus.SUCCEEDED,
-                        createdAt=now,
-                        startedAt=now,
-                        completedAt=now,
-                        data=pe_commands.LoadLabwareData(
-                            location=pe_types.DeckSlotLocation(
-                                slot=DeckSlotName.from_primitive(slot)
-                            ),
-                            loadName=load_name,
-                            namespace=namespace,
-                            version=int(version),
-                        ),
-                        result=pe_commands.LoadLabwareResult(
-                            labwareId=f"labware-{slot}",
-                            definition=LabwareDefinition.parse_obj(
-                                labware._implementation.get_definition()
-                            ),
-                            calibration=pe_types.CalibrationOffset(x=0, y=0, z=0),
-                        ),
-                    )
-                )
+        self._command_count["LOAD_LABWARE"] = count + 1
+        return load_labware_command
 
-        return results
+    def map_instrument_load(
+        self, instrument_load_info: LegacyInstrumentLoadInfo
+    ) -> pe_commands.Command:
+        """Map a legacy instrument (pipette) load to a ProtocolEngine command."""
+        now = utc_now()
 
-    def _load_new_pipettes(
-        self,
-        loaded_pipettes: Dict[str, LegacyPipetteContext],
-    ) -> List[pe_commands.Command]:
-        results: List[pe_commands.Command] = []
+        count = self._command_count["LOAD_PIPETTE"]
 
-        for mount, pipette in loaded_pipettes.items():
-            if mount not in self._loaded_pipette_mounts:
-                self._loaded_pipette_mounts.add(mount)
-                now = utc_now()
+        load_pipette_command = pe_commands.LoadPipette(
+            id=f"commands.LOAD_PIPETTE-{count}",
+            status=pe_commands.CommandStatus.SUCCEEDED,
+            createdAt=now,
+            startedAt=now,
+            completedAt=now,
+            data=pe_commands.LoadPipetteData(
+                pipetteName=pe_types.PipetteName(
+                    instrument_load_info.instrument_load_name
+                ),
+                mount=MountType(str(instrument_load_info.mount).lower()),
+            ),
+            result=pe_commands.LoadPipetteResult(
+                pipetteId=f"pipette-{count}",
+            ),
+        )
 
-                results.append(
-                    pe_commands.LoadPipette(
-                        id=f"commands.LOAD_PIPETTE-{mount}",
-                        status=pe_commands.CommandStatus.SUCCEEDED,
-                        createdAt=now,
-                        startedAt=now,
-                        completedAt=now,
-                        data=pe_commands.LoadPipetteData(
-                            pipetteName=pe_types.PipetteName(pipette.name),
-                            mount=MountType(mount),
-                        ),
-                        result=pe_commands.LoadPipetteResult(
-                            pipetteId=f"pipette-{mount}",
-                        ),
-                    )
-                )
-
-        return results
+        self._command_count["LOAD_PIPETTE"] = count + 1
+        return load_pipette_command

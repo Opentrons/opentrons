@@ -258,6 +258,7 @@ describe('LabwareSetup', () => {
           z: MOCK_MAGNETIC_MODULE_COORDS[2],
           moduleDef: mockMagneticModule as any,
           nestedLabwareDef: null,
+          nestedLabwareId: null,
         },
         [mockTCModule.moduleId]: {
           x: MOCK_TC_COORDS[0],
@@ -265,6 +266,7 @@ describe('LabwareSetup', () => {
           z: MOCK_TC_COORDS[2],
           moduleDef: mockTCModule,
           nestedLabwareDef: null,
+          nestedLabwareId: null,
         },
       })
 
