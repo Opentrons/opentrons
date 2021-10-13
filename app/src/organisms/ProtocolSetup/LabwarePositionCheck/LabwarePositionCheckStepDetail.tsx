@@ -13,13 +13,19 @@ import {
   WELL_LABEL_OPTIONS,
   C_BLUE,
   C_MED_GRAY,
+  DIRECTION_ROW,
+  ALIGN_CENTER,
+  Box,
+  JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
 import { useProtocolDetails } from '../../RunDetails/hooks'
 import { StepDetailText } from './StepDetailText'
+import levelWithTip from '../../../assets/images/lpc_level_with_tip.svg'
+import levelWithLabware from '../../../assets/images/lpc_level_with_labware.svg'
 import type { LabwarePositionCheckStep } from './types'
 
-const DECK_MAP_VIEWBOX = '-10 -70 180 180'
+const DECK_MAP_VIEWBOX = '-30 -80 180 190'
 interface LabwarePositionCheckStepDetailProps {
   selectedStep: LabwarePositionCheckStep
 }
@@ -42,7 +48,6 @@ export const LabwarePositionCheckStepDetail = (
     )
     return null
   }
-
   const pipetteId = command.params.pipette
   const pipetteName = protocolData.pipettes[pipetteId].name
   let wellsToHighlight: string[] = []
@@ -78,22 +83,37 @@ export const LabwarePositionCheckStepDetail = (
         selectedStep={props.selectedStep}
         pipetteChannels={pipetteChannels}
       />
-
-      <RobotWorkSpace viewBox={DECK_MAP_VIEWBOX}>
-        {() => (
-          <React.Fragment>
-            <LabwareRender
-              definition={labwareDef}
-              wellStroke={wellStroke}
-              wellLabelOption={WELL_LABEL_OPTIONS.SHOW_LABEL_OUTSIDE}
-              highlightedWellLabels={{ wells: wellsToHighlight }}
-              labwareStroke={C_MED_GRAY}
-              wellLabelColor={C_MED_GRAY}
-            />
-            <PipetteRender labwareDef={labwareDef} pipetteName={pipetteName} />
-          </React.Fragment>
-        )}
-      </RobotWorkSpace>
+      <Flex
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
+        flexDirection={DIRECTION_ROW}
+        alignItems={ALIGN_CENTER}
+      >
+        <RobotWorkSpace viewBox={DECK_MAP_VIEWBOX}>
+          {() => (
+            <React.Fragment>
+              <LabwareRender
+                definition={labwareDef}
+                wellStroke={wellStroke}
+                wellLabelOption={WELL_LABEL_OPTIONS.SHOW_LABEL_OUTSIDE}
+                highlightedWellLabels={{ wells: wellsToHighlight }}
+                labwareStroke={C_MED_GRAY}
+                wellLabelColor={C_MED_GRAY}
+              />
+              <PipetteRender
+                labwareDef={labwareDef}
+                pipetteName={pipetteName}
+              />
+            </React.Fragment>
+          )}
+        </RobotWorkSpace>
+        <Box width="40%" padding={SPACING_2} marginBottom={'7rem'}>
+          {labwareDefId.includes('tiprack') ? (
+            <img src={levelWithTip} />
+          ) : (
+            <img src={levelWithLabware} />
+          )}
+        </Box>
+      </Flex>
     </Flex>
   )
 }

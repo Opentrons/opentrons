@@ -167,7 +167,7 @@ describe('LabwarePositionCheckStepDetail', () => {
     getByText('mock pipette render')
   })
   describe('when pipette is multi channel', () => {
-    it('renders labware with with stroke, and highlighted labels outside', () => {
+    it('renders labware with stroke, and highlighted labels outside', () => {
       when(mockGetPipetteNameSpecs)
         .calledWith(PRIMARY_PIPETTE_NAME as any)
         .mockReturnValue({ channels: 8 } as any)
@@ -195,7 +195,7 @@ describe('LabwarePositionCheckStepDetail', () => {
     })
   })
   describe('when pipette is single channel', () => {
-    it('renders labware with with stroke, and highlighted labels outside', () => {
+    it('renders labware with stroke, and highlighted labels outside', () => {
       when(mockGetPipetteNameSpecs)
         .calledWith(PRIMARY_PIPETTE_NAME as any)
         .mockReturnValue({ channels: 1 } as any)
