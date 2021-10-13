@@ -1,6 +1,5 @@
 import pytest
 from mock import AsyncMock
-from opentrons.drivers.mag_deck import AbstractMagDeckDriver
 from opentrons.drivers.temp_deck import AbstractTempDeckDriver
 from opentrons.hardware_control import modules, ExecutionManager
 
