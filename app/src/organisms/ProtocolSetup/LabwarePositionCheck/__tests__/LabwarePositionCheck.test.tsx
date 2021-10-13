@@ -16,7 +16,6 @@ jest.mock('../hooks')
 const mockGenericStepScreen = GenericStepScreen as jest.MockedFunction<
   typeof GenericStepScreen
 >
-
 const mockIntroScreen = IntroScreen as jest.MockedFunction<typeof IntroScreen>
 const mockUseSteps = useSteps as jest.MockedFunction<typeof useSteps>
 
@@ -54,14 +53,12 @@ describe('LabwarePositionCheck', () => {
         } as LabwarePositionCheckStep,
       ])
     mockIntroScreen.mockReturnValue(<div>Mock Intro Screen Component </div>)
-
     mockGenericStepScreen.mockReturnValue(null)
   })
   afterEach(() => {
     resetAllWhenMocks()
     jest.resetAllMocks()
   })
-
   it('renders LabwarePositionCheck header and button and no components', () => {
     const { getByRole } = render(props)
     getByRole('heading', {
