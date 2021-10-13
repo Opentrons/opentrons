@@ -56,7 +56,7 @@ module.exports = {
       presets: [['@babel/preset-env', { targets: { node: '8' } }]],
     },
     {
-      test: ['js-api-clients/**/*'],
+      test: ['react-api-client/**/*', 'js-api-client/**/*'],
       presets: [
         ['@babel/env', { useBuiltIns: 'usage', corejs: '3.10' }],
         '@babel/preset-react',

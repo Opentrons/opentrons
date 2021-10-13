@@ -11,8 +11,8 @@ module.exports = {
   },
   moduleNameMapper: {
     '\\.(css)$': 'identity-obj-proxy',
-    '^@opentrons/api-client$': `@opentrons/api-client/src/index.ts`,
-    '^@opentrons/react-api-client$': `@opentrons/api-client/src/index.ts`,
+    '^@opentrons/js-api-client$': `@opentrons/js-api-client/src/index.ts`,
+    '^@opentrons/react-api-client$': `@opentrons/react-api-client/src/index.ts`,
   },
   transform: {
     '^.+\\.(js|ts|tsx)$': 'babel-jest',
@@ -20,10 +20,10 @@ module.exports = {
       '@opentrons/components/src/__mocks__/file.js',
   },
   modulePathIgnorePatterns: [
-    '/shared-data/python/.*',
-    '/api/.*',
-    '/robot-server/.*',
-    '/update-server/.*',
+    '<rootDir>/shared-data/python/.*',
+    '<rootDir>/api/.*',
+    '<rootDir>/robot-server/.*',
+    '<rootDir>/update-server/.*',
   ],
   transformIgnorePatterns: ['/node_modules/(?!@opentrons/)'],
   collectCoverageFrom: [

@@ -32,7 +32,10 @@
       "path": "./protocol-library-kludge"
     },
     {
-      "path": "./js-api-clients"
+      "path": "./js-api-client"
+    },
+    {
+      "path": "./react-api-client"
     }
   ]
 }

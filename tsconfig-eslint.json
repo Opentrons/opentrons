@@ -26,8 +26,7 @@
     "protocol-designer/typings",
     "protocol-library-kludge/src",
     "protocol-library-kludge/typings",
-    "js-api-clients/example-app/src",
-    "js-api-clients/packages/api-client/src",
-    "js-api-clients/packages/react-api-client/src"
+    "js-api-client/src",
+    "react-api-client/src"
   ]
 }
