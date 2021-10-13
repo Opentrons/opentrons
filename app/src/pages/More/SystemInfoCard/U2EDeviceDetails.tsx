@@ -7,7 +7,6 @@ import {
   Text,
   FONT_STYLE_ITALIC,
   SPACING_1,
-  SPACING_2,
   SPACING_6,
 } from '@opentrons/components'
 
@@ -33,7 +32,7 @@ const DetailItem = ({
   // TODO(bh, 2021-10-12): may need to type react-i18next https://react.i18next.com/latest/typescript
   value?: string | number | object | null
 }): JSX.Element => (
-  <Flex as="li" marginBottom={SPACING_2}>
+  <Flex as="li">
     <DetailText>{label}:</DetailText>
     <DetailText>{value}</DetailText>
   </Flex>
@@ -54,12 +53,12 @@ export const U2EDeviceDetails = ({
   return (
     <>
       {device === null ? (
-        <Text fontStyle={FONT_STYLE_ITALIC} marginTop={SPACING_2}>
+        <Text as="li" fontStyle={FONT_STYLE_ITALIC}>
           {t('no_adapter_found')}
         </Text>
       ) : (
         <>
-          {driverOutdated && <U2EDriverWarning marginBottom={SPACING_2} />}
+          {driverOutdated && <U2EDriverWarning />}
           {DEVICE_STATS.filter(({ property }) => property in device).map(
             ({ label, property }) => (
               <DetailItem
