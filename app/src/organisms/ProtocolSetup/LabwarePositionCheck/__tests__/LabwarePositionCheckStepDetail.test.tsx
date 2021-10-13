@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
+import { screen } from '@testing-library/react'
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
 import {
   RobotWorkSpace,
@@ -59,6 +60,7 @@ const PICKUP_TIP_LABWARE_ID = 'PICKUP_TIP_LABWARE_ID'
 const PRIMARY_PIPETTE_ID = 'PRIMARY_PIPETTE_ID'
 const PRIMARY_PIPETTE_NAME = 'PRIMARY_PIPETTE_NAME'
 const LABWARE_DEF_ID = 'LABWARE_DEF_ID'
+const TIPRACK_DEF_ID = 'tiprack_DEF_ID'
 const LABWARE_DEF = {
   ordering: [['A1', 'A2']],
 }
@@ -153,6 +155,36 @@ describe('LabwarePositionCheckStepDetail', () => {
   it('renders StepDetailText component', () => {
     const { getByText } = render(props)
     getByText('Mock Step Detail Text')
+  })
+  it('renders the level with labware image', () => {
+    render(props)
+    screen.getByAltText('level with labware')
+  })
+  it('renders the level with tip image', () => {
+    when(mockUseProtocolDetails)
+      .calledWith()
+      .mockReturnValue({
+        protocolData: {
+          labware: {
+            [mockLabwarePositionCheckStepTipRack.labwareId]: {
+              slot: '1',
+              displayName: 'someDislpayName',
+              definitionId: TIPRACK_DEF_ID,
+            },
+          },
+          labwareDefinitions: {
+            [TIPRACK_DEF_ID]: LABWARE_DEF,
+          },
+          pipettes: {
+            [PRIMARY_PIPETTE_ID]: {
+              name: PRIMARY_PIPETTE_NAME,
+              mount: 'left',
+            },
+          },
+        },
+      } as any)
+    render(props)
+    screen.getByAltText('level with tip')
   })
   it('renders a pipette', () => {
     when(mockPipetteRender)

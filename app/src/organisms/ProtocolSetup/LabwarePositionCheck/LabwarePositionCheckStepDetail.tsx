@@ -17,6 +17,8 @@ import {
   ALIGN_CENTER,
   Box,
   JUSTIFY_SPACE_BETWEEN,
+  DIRECTION_COLUMN,
+  SPACING_6,
 } from '@opentrons/components'
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
 import { useProtocolDetails } from '../../RunDetails/hooks'
@@ -25,7 +27,7 @@ import levelWithTip from '../../../assets/images/lpc_level_with_tip.svg'
 import levelWithLabware from '../../../assets/images/lpc_level_with_labware.svg'
 import type { LabwarePositionCheckStep } from './types'
 
-const DECK_MAP_VIEWBOX = '-30 -80 180 190'
+const DECK_MAP_VIEWBOX = '-30 -90 180 190'
 interface LabwarePositionCheckStepDetailProps {
   selectedStep: LabwarePositionCheckStep
 }
@@ -70,14 +72,12 @@ export const LabwarePositionCheckStepDetail = (
     <Flex
       fontSize={FONT_SIZE_CAPTION}
       padding={SPACING_2}
-      width="60%"
       justifyContent={JUSTIFY_CENTER}
       marginTop={SPACING_4}
-      marginLeft="30%"
       boxShadow="1px 1px 1px rgba(0, 0, 0, 0.25)"
       borderRadius="4px"
       backgroundColor={C_NEAR_WHITE}
-      flexDirection={'column'}
+      flexDirection={DIRECTION_COLUMN}
     >
       <StepDetailText
         selectedStep={props.selectedStep}
@@ -106,11 +106,11 @@ export const LabwarePositionCheckStepDetail = (
             </React.Fragment>
           )}
         </RobotWorkSpace>
-        <Box width="40%" padding={SPACING_2} marginBottom={'7rem'}>
+        <Box width="40%" padding={SPACING_2} marginBottom={SPACING_6}>
           {labwareDefId.includes('tiprack') ? (
-            <img src={levelWithTip} />
+            <img src={levelWithTip} alt="level with tip" />
           ) : (
-            <img src={levelWithLabware} />
+            <img src={levelWithLabware} alt="level with labware" />
           )}
         </Box>
       </Flex>
