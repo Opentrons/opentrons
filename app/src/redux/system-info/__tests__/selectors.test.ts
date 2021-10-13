@@ -70,93 +70,6 @@ describe('robot controls selectors', () => {
     })
   })
 
-  describe('getU2EInterfacesMap', () => {
-    it('should return empty dict by default', () => {
-      const state: State = {
-        systemInfo: { usbDevices: [], networkInterfaces: [] },
-      } as any
-
-      expect(Selectors.getU2EInterfacesMap(state)).toEqual({})
-    })
-
-    it('should return empty iface array if adapter found but no interface with same MAC', () => {
-      const state: State = {
-        systemInfo: {
-          usbDevices: [Fixtures.mockRealtekDevice],
-          networkInterfaces: [Fixtures.mockNetworkInterface],
-        },
-      } as any
-
-      expect(Selectors.getU2EInterfacesMap(state)).toEqual({
-        [Fixtures.mockRealtekDevice.serialNumber]: [],
-      })
-    })
-
-    it('should return interface with matching MAC', () => {
-      const mac = ['01', '23', '45', '67', '89', 'AB']
-      const adapter = {
-        ...Fixtures.mockRealtekDevice,
-        serialNumber: mac.join(''),
-      }
-      const iface = {
-        ...Fixtures.mockNetworkInterface,
-        mac: mac.join(':').toLowerCase(),
-      }
-
-      const state: State = {
-        systemInfo: { usbDevices: [adapter], networkInterfaces: [iface] },
-      } as any
-
-      expect(Selectors.getU2EInterfacesMap(state)).toEqual({
-        [adapter.serialNumber]: [iface],
-      })
-    })
-
-    it('should handle multiple devices and interface with matching MAC', () => {
-      const mac1 = ['01', '23', '45', '67', '89', 'AB']
-      const mac2 = ['FE', 'DC', 'BA', '98', '76', '54']
-
-      const adapter1 = {
-        ...Fixtures.mockRealtekDevice,
-        serialNumber: mac1.join(''),
-      }
-      const adapter2 = {
-        ...Fixtures.mockRealtekDevice,
-        serialNumber: mac2.join(''),
-      }
-
-      const iface1v4 = {
-        ...Fixtures.mockNetworkInterface,
-        mac: mac1.join(':').toLowerCase(),
-      }
-      const iface1v6 = {
-        ...Fixtures.mockNetworkInterfaceV6,
-        mac: mac1.join(':'),
-      }
-      const iface2v4 = {
-        ...Fixtures.mockNetworkInterface,
-        mac: mac2.join(':').toLowerCase(),
-      }
-
-      const state: State = {
-        systemInfo: {
-          usbDevices: [adapter1, adapter2],
-          networkInterfaces: [
-            Fixtures.mockNetworkInterface,
-            iface1v4,
-            iface1v6,
-            iface2v4,
-          ],
-        },
-      } as any
-
-      expect(Selectors.getU2EInterfacesMap(state)).toEqual({
-        [adapter1.serialNumber]: [iface1v4, iface1v6],
-        [adapter2.serialNumber]: [iface2v4],
-      })
-    })
-  })
-
   describe('getU2EDeviceAnalyticsProps', () => {
     it('should return null if no Realtek device', () => {
       const state: State = {
@@ -183,7 +96,6 @@ describe('robot controls selectors', () => {
         'U2E Serial Number': Fixtures.mockRealtekDevice.serialNumber,
         'U2E Device Name': Fixtures.mockRealtekDevice.deviceName,
         'U2E Manufacturer': Fixtures.mockRealtekDevice.manufacturer,
-        'U2E IPv4 Address': null,
       })
     })
 
@@ -198,33 +110,6 @@ describe('robot controls selectors', () => {
       expect(Selectors.getU2EDeviceAnalyticsProps(state)).toMatchObject({
         'U2E Windows Driver Version':
           Fixtures.mockWindowsRealtekDevice.windowsDriverVersion,
-      })
-    })
-
-    it('should include IPv4 address if available', () => {
-      const mac = ['01', '23', '45', '67', '89', 'AB']
-      const adapter = {
-        ...Fixtures.mockRealtekDevice,
-        serialNumber: mac.join(''),
-      }
-      const ifaceV4 = {
-        ...Fixtures.mockNetworkInterface,
-        mac: mac.join(':').toLowerCase(),
-      }
-      const ifaceV6 = {
-        ...Fixtures.mockNetworkInterfaceV6,
-        mac: mac.join(':').toLowerCase(),
-      }
-
-      const state: State = {
-        systemInfo: {
-          usbDevices: [adapter],
-          networkInterfaces: [ifaceV6, ifaceV4],
-        },
-      } as any
-
-      expect(Selectors.getU2EDeviceAnalyticsProps(state)).toMatchObject({
-        'U2E IPv4 Address': ifaceV4.address,
       })
     })
   })

@@ -1,46 +1,41 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
 import {
   Box,
   Text,
   FONT_SIZE_BODY_1,
-  FONT_WEIGHT_SEMIBOLD,
+  FONT_SIZE_BODY_2,
   SPACING_2,
   SPACING_3,
 } from '@opentrons/components'
 
 import * as SystemInfo from '../../../redux/system-info'
-import { U2EDriverWarning } from './U2EDriverWarning'
 import { U2EDeviceDetails } from './U2EDeviceDetails'
 
 import type { State } from '../../../redux/types'
 
-const U2E_ADAPTER_INFORMATION = 'USB-to-Ethernet Adapter Information'
-
 export const U2EAdapterInfo = (): JSX.Element => {
   const device = useSelector(SystemInfo.getU2EAdapterDevice)
-  const ifacesMap = useSelector(SystemInfo.getU2EInterfacesMap)
   const driverOutdated = useSelector((state: State) => {
     const status = SystemInfo.getU2EWindowsDriverStatus(state)
     return status === SystemInfo.OUTDATED
   })
+  const { t } = useTranslation('more_network_and_system')
 
   return (
-    <Box fontSize={FONT_SIZE_BODY_1} padding={SPACING_3}>
-      <Text
-        as="h3"
-        fontSize={FONT_SIZE_BODY_1}
-        fontWeight={FONT_WEIGHT_SEMIBOLD}
-        marginBottom={SPACING_2}
-      >
-        {U2E_ADAPTER_INFORMATION}
+    <Box
+      as="ul"
+      style={{ listStyleType: 'none' }}
+      marginBottom={SPACING_2}
+      fontSize={FONT_SIZE_BODY_1}
+      padding={SPACING_3}
+    >
+      <Text as="li" fontSize={FONT_SIZE_BODY_2} marginBottom={SPACING_2}>
+        {t('u2e_adapter_information')}
       </Text>
-      {driverOutdated && <U2EDriverWarning marginBottom={SPACING_3} />}
-      <U2EDeviceDetails
-        device={device}
-        ifaces={device ? ifacesMap[device.serialNumber] ?? [] : []}
-      />
+      <U2EDeviceDetails device={device} driverOutdated={driverOutdated} />
     </Box>
   )
 }
