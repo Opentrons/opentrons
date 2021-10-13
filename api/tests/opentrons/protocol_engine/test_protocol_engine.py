@@ -232,7 +232,7 @@ async def test_stop(
     )
 
 
-async def test_stop_with_Error(
+async def test_stop_with_error(
     decoy: Decoy,
     action_dispatcher: ActionDispatcher,
     queue_worker: QueueWorker,
