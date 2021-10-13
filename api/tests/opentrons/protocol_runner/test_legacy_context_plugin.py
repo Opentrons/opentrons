@@ -17,6 +17,14 @@ from opentrons.protocol_runner.legacy_command_mapper import LegacyCommandMapper
 from opentrons.protocol_runner.legacy_context_plugin import LegacyContextPlugin
 from opentrons.protocol_runner.legacy_wrappers import (
     LegacyProtocolContext,
+    LegacyLabwareLoadInfo,
+    LegacyInstrumentLoadInfo,
+)
+
+from opentrons.types import DeckSlotName, Mount
+
+from opentrons_shared_data.labware.dev_types import (
+    LabwareDefinition as LabwareDefinitionDict,
 )
 
 
@@ -132,36 +140,101 @@ def test_broker_messages(
     legacy_command_mapper: LegacyCommandMapper,
     action_dispatcher: pe_actions.ActionDispatcher,
     subject: LegacyContextPlugin,
+    minimal_labware_def: LabwareDefinitionDict,
 ) -> None:
     """It should map broker messages to ProtocolEngine commands."""
     subject.handle_action(pe_actions.PlayAction())
 
-    handler_captor = matchers.Captor()
+    main_handler_captor = matchers.Captor()
+    load_labware_handler_captor = matchers.Captor()
+    load_instrument_handler_captor = matchers.Captor()
+
     decoy.verify(
-        legacy_context.broker.subscribe(topic="command", handler=handler_captor)
+        legacy_context.broker.subscribe(topic="command", handler=main_handler_captor)
+    )
+    decoy.verify(
+        legacy_context.labware_load_broker.subscribe(
+            callback=load_labware_handler_captor
+        )
+    )
+    decoy.verify(
+        legacy_context.instrument_load_broker.subscribe(
+            callback=load_instrument_handler_captor
+        )
     )
 
-    handler: Callable[[LegacyCommand], None] = handler_captor.value
+    main_handler: Callable[[LegacyCommand], None] = main_handler_captor.value
+    load_labware_handler: Callable[
+        [LegacyLabwareLoadInfo], None
+    ] = load_labware_handler_captor.value
+    load_instrument_handler: Callable[
+        [LegacyInstrumentLoadInfo], None
+    ] = load_instrument_handler_captor.value
 
-    legacy_command: PauseMessage = {
+    input_main_broker_command: PauseMessage = {
         "$": "before",
         "meta": {},
         "name": "command.PAUSE",
         "payload": {"userMessage": "hello world", "text": "hello world"},
     }
-    engine_command = pe_commands.Custom(
-        id="command-id",
+    input_load_labware_info = LegacyLabwareLoadInfo(
+        labware_definition=minimal_labware_def,
+        labware_namespace="some_namespace",
+        labware_load_name="some_load_name",
+        labware_version=123,
+        deck_slot=DeckSlotName.SLOT_1,
+    )
+    input_load_instrument_info = LegacyInstrumentLoadInfo(
+        instrument_load_name="some_load_name", mount=Mount.LEFT
+    )
+
+    dummy_main_command = pe_commands.Custom(
+        id="command-id-1",
+        status=pe_commands.CommandStatus.RUNNING,
+        createdAt=datetime(year=2021, month=1, day=1),
+        data=pe_commands.CustomData(message="hello world"),  # type: ignore[call-arg]
+    )
+    dummy_labware_command = pe_commands.Custom(
+        id="command-id-2",
+        status=pe_commands.CommandStatus.RUNNING,
+        createdAt=datetime(year=2021, month=1, day=1),
+        data=pe_commands.CustomData(message="hello world"),  # type: ignore[call-arg]
+    )
+    dummy_instrument_command = pe_commands.Custom(
+        id="command-id-3",
         status=pe_commands.CommandStatus.RUNNING,
         createdAt=datetime(year=2021, month=1, day=1),
         data=pe_commands.CustomData(message="hello world"),  # type: ignore[call-arg]
     )
 
-    decoy.when(legacy_command_mapper.map_command(command=legacy_command)).then_return(
-        engine_command
-    )
+    decoy.when(
+        legacy_command_mapper.map_command(command=input_main_broker_command)
+    ).then_return(dummy_main_command)
+    decoy.when(
+        legacy_command_mapper.map_labware_load(
+            labware_load_info=input_load_labware_info
+        )
+    ).then_return(dummy_labware_command)
+    decoy.when(
+        legacy_command_mapper.map_instrument_load(
+            instrument_load_info=input_load_instrument_info
+        )
+    ).then_return(dummy_instrument_command)
 
-    handler(legacy_command)
+    main_handler(input_main_broker_command)
+    load_labware_handler(input_load_labware_info)
+    load_instrument_handler(input_load_instrument_info)
 
     decoy.verify(
-        action_dispatcher.dispatch(pe_actions.UpdateCommandAction(engine_command))
+        action_dispatcher.dispatch(pe_actions.UpdateCommandAction(dummy_main_command))
+    )
+    decoy.verify(
+        action_dispatcher.dispatch(
+            pe_actions.UpdateCommandAction(dummy_labware_command)
+        )
+    )
+    decoy.verify(
+        action_dispatcher.dispatch(
+            pe_actions.UpdateCommandAction(dummy_instrument_command)
+        )
     )
