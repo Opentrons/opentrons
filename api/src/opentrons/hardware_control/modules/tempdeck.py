@@ -117,10 +117,7 @@ class TempDeck(mod_abc.AbstractModule):
 
     async def wait_next_poll(self) -> None:
         """Wait for the next poll to complete."""
-        try:
-            await self._listener.wait_next_poll()
-        except asyncio.CancelledError:
-            log.exception("Error while waiting for poll.")
+        await self._listener.wait_next_poll()
 
     async def set_temperature(self, celsius: float) -> None:
         """
