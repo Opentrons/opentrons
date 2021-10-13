@@ -47,6 +47,15 @@ export const getTwoPipettePositionCheckSteps = (args: {
     labwareDefinitions
   )
 
+  const orderedTiprackIdsThatOnlySecondaryPipetteUses = orderedTiprackIdsThatSecondaryPipetteUses.filter(
+    tiprackId => !orderedTiprackIdsThatPrimaryPipetteUses.includes(tiprackId)
+  )
+
+  const remainingTiprackIdsThatPrimaryPipetteUses = orderedTiprackIdsThatPrimaryPipetteUses.filter(
+    tiprackId =>
+      !orderedTiprackIdsThatOnlySecondaryPipetteUses.includes(tiprackId)
+  )
+
   const orderedLabwareIds = getLabwareIdsInOrder(
     labware,
     labwareDefinitions,
@@ -54,20 +63,20 @@ export const getTwoPipettePositionCheckSteps = (args: {
   )
 
   const moveSecondaryPipetteToTiprackSteps = getMoveToTiprackSteps(
-    orderedTiprackIdsThatSecondaryPipetteUses,
+    orderedTiprackIdsThatOnlySecondaryPipetteUses,
     secondaryPipetteId,
     SECTIONS.SECONDARY_PIPETTE_TIPRACKS
   )
 
   const movePrimaryPipetteToTiprackSteps = getMoveToTiprackSteps(
-    orderedTiprackIdsThatPrimaryPipetteUses,
+    remainingTiprackIdsThatPrimaryPipetteUses,
     primaryPipetteId,
     SECTIONS.PRIMARY_PIPETTE_TIPRACKS
   )
 
   const lastTiprackId =
-    orderedTiprackIdsThatPrimaryPipetteUses[
-      orderedTiprackIdsThatPrimaryPipetteUses.length - 1
+    remainingTiprackIdsThatPrimaryPipetteUses[
+      remainingTiprackIdsThatPrimaryPipetteUses.length - 1
     ]
 
   const pickupTipFromLastTiprackStep = getPickupTipStep(
