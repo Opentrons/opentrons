@@ -18,7 +18,7 @@ import type { Section } from '../types'
 import { fireEvent } from '@testing-library/dom'
 
 jest.mock('../hooks')
-jest.mock('../Sectionlist')
+jest.mock('../SectionList')
 jest.mock('../../hooks')
 jest.mock('@opentrons/components', () => {
   const actualComponents = jest.requireActual('@opentrons/components')
