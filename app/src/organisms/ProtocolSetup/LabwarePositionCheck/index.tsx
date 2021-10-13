@@ -20,8 +20,6 @@ export const LabwarePositionCheck = (
   const [currentLabwareCheckStep, setCurrentLabwareCheckStep] = React.useState<
     number | null
   >(null)
-  // placeholder for next steps
-  console.log(currentLabwareCheckStep)
 
   return (
     <Portal level="top">
