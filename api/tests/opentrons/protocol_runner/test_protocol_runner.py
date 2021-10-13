@@ -214,8 +214,8 @@ def test_load_json(
                 data=pe_commands.PauseData(message="goodbye")
             )
         ),
-        task_queue.add_run_func(func=protocol_engine.wait_until_complete),
-        task_queue.add_cleanup_func(func=protocol_engine.stop),
+        task_queue.set_run_func(func=protocol_engine.wait_until_complete),
+        task_queue.set_cleanup_func(func=protocol_engine.stop),
     )
 
 
@@ -247,12 +247,12 @@ def test_load_python(
     subject.load(python_protocol_source)
 
     decoy.verify(
-        task_queue.add_run_func(
+        task_queue.set_run_func(
             func=python_executor.execute,
             protocol=python_protocol,
             context=protocol_context,
         ),
-        task_queue.add_cleanup_func(func=protocol_engine.stop),
+        task_queue.set_cleanup_func(func=protocol_engine.stop),
     )
 
 
@@ -296,12 +296,12 @@ def test_load_legacy_python(
 
     decoy.verify(
         protocol_engine.add_plugin(matchers.IsA(LegacyContextPlugin)),
-        task_queue.add_run_func(
+        task_queue.set_run_func(
             func=legacy_executor.execute,
             protocol=legacy_protocol,
             context=legacy_context,
         ),
-        task_queue.add_cleanup_func(func=protocol_engine.stop),
+        task_queue.set_cleanup_func(func=protocol_engine.stop),
     )
 
 
@@ -342,10 +342,10 @@ def test_load_legacy_json(
 
     decoy.verify(
         protocol_engine.add_plugin(matchers.IsA(LegacyContextPlugin)),
-        task_queue.add_run_func(
+        task_queue.set_run_func(
             func=legacy_executor.execute,
             protocol=legacy_protocol,
             context=legacy_context,
         ),
-        task_queue.add_cleanup_func(func=protocol_engine.stop),
+        task_queue.set_cleanup_func(func=protocol_engine.stop),
     )

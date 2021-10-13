@@ -33,7 +33,7 @@ class TaskQueue:
         self._run_task: Optional["asyncio.Task[None]"] = None
         self._run_started_event: asyncio.Event = asyncio.Event()
 
-    def add_run_func(
+    def set_run_func(
         self,
         func: Callable[..., Awaitable[Any]],
         **kwargs: Any,
@@ -44,7 +44,7 @@ class TaskQueue:
         """
         self._run_func = partial(func, **kwargs)
 
-    def add_cleanup_func(self, func: CleanupFunc) -> None:
+    def set_cleanup_func(self, func: CleanupFunc) -> None:
         """Add the run cleanup task to the queue.
 
         The "cleanup" task will run after the "run" task, and will be passed
@@ -54,9 +54,10 @@ class TaskQueue:
 
     def start(self) -> None:
         """Start running tasks in the queue."""
+        self._run_started_event.set()
+
         if self._run_task is None:
             self._run_task = asyncio.create_task(self._run())
-            self._run_started_event.set()
 
     async def join(self) -> None:
         """Wait for the background run task to complete, propagating errors."""

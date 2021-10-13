@@ -108,7 +108,7 @@ class ProtocolRunner:
 
         # ensure the engine is stopped gracefully once the
         # protocol file stops issuing commands
-        self._task_queue.add_cleanup_func(
+        self._task_queue.set_cleanup_func(
             func=self._protocol_engine.stop,
         )
 
@@ -151,14 +151,14 @@ class ProtocolRunner:
         for request in commands:
             self._protocol_engine.add_command(request=request)
 
-        self._task_queue.add_run_func(
+        self._task_queue.set_run_func(
             func=self._protocol_engine.wait_until_complete,
         )
 
     def _load_python(self, protocol_source: ProtocolSource) -> None:
         protocol = self._python_file_reader.read(protocol_source)
         context = self._python_context_creator.create(self._protocol_engine)
-        self._task_queue.add_run_func(
+        self._task_queue.set_run_func(
             func=self._python_executor.execute,
             protocol=protocol,
             context=context,
@@ -178,7 +178,7 @@ class ProtocolRunner:
             )
         )
 
-        self._task_queue.add_run_func(
+        self._task_queue.set_run_func(
             func=self._legacy_executor.execute,
             protocol=protocol,
             context=context,

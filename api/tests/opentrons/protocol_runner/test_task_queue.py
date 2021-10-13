@@ -4,24 +4,24 @@ from decoy import Decoy
 from opentrons.protocol_runner.task_queue import TaskQueue
 
 
-async def test_add_run_func(decoy: Decoy) -> None:
+async def test_set_run_func(decoy: Decoy) -> None:
     """It should be able to add a task for the "run" phase."""
     run_func = decoy.mock(is_async=True)
 
     subject = TaskQueue()
-    subject.add_run_func(func=run_func)
+    subject.set_run_func(func=run_func)
     subject.start()
     await subject.join()
 
     decoy.verify(await run_func())
 
 
-async def test_add_cleanup_func(decoy: Decoy) -> None:
+async def test_set_cleanup_func(decoy: Decoy) -> None:
     """It should be able to add a task for the "cleanup" phase."""
     cleanup_func = decoy.mock(is_async=True)
 
     subject = TaskQueue()
-    subject.add_cleanup_func(func=cleanup_func)
+    subject.set_cleanup_func(func=cleanup_func)
     subject.start()
     await subject.join()
 
@@ -33,7 +33,7 @@ async def test_passes_args(decoy: Decoy) -> None:
     run_func = decoy.mock(is_async=True)
 
     subject = TaskQueue()
-    subject.add_run_func(func=run_func, hello="world")
+    subject.set_run_func(func=run_func, hello="world")
     subject.start()
     await subject.join()
 
@@ -46,8 +46,8 @@ async def test_cleanup_runs_second(decoy: Decoy) -> None:
     cleanup_func = decoy.mock(is_async=True)
 
     subject = TaskQueue()
-    subject.add_run_func(func=run_func)
-    subject.add_cleanup_func(func=cleanup_func)
+    subject.set_run_func(func=run_func)
+    subject.set_cleanup_func(func=cleanup_func)
     subject.start()
     await subject.join()
 
@@ -66,8 +66,8 @@ async def test_cleanup_gets_run_error(decoy: Decoy) -> None:
     decoy.when(await run_func()).then_raise(error)
 
     subject = TaskQueue()
-    subject.add_run_func(func=run_func)
-    subject.add_cleanup_func(func=cleanup_func)
+    subject.set_run_func(func=run_func)
+    subject.set_cleanup_func(func=cleanup_func)
     subject.start()
     await subject.join()
 
@@ -92,8 +92,8 @@ async def test_start_runs_stuff_once(decoy: Decoy) -> None:
     cleanup_func = decoy.mock(is_async=True)
 
     subject = TaskQueue()
-    subject.add_run_func(func=run_func)
-    subject.add_cleanup_func(func=cleanup_func)
+    subject.set_run_func(func=run_func)
+    subject.set_cleanup_func(func=cleanup_func)
     subject.start()
     subject.start()
     await subject.join()
