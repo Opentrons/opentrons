@@ -12,7 +12,7 @@ all: clean build
 
 .PHONY: clean
 clean:
-	tsc --build --clean && yarn shx rm -rf \"dist\"
+	yarn shx rm -rf dist
 
 .PHONY: build
 build:
