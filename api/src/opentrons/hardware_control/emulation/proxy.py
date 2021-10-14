@@ -1,183 +1,228 @@
+from __future__ import annotations
 import asyncio
 import logging
-from typing import Tuple, List
+import socket
+import uuid
+from abc import ABC, abstractmethod
+from dataclasses import dataclass
+from typing import List
 
-from opentrons.hardware_control.emulation.settings import ProxySettings, Settings
+from opentrons.hardware_control.emulation.settings import ProxySettings
 
 log = logging.getLogger(__name__)
 
 
+@dataclass(frozen=True)
+class Connection:
+    """A connection."""
+
+    identifier: str
+    reader: asyncio.StreamReader
+    writer: asyncio.StreamWriter
+
+
+class ProxyListener(ABC):
+    @abstractmethod
+    def on_server_connected(
+        self, server_type: str, client_uri: str, identifier: str
+    ) -> None:
+        """Called when a new server connects."""
+        ...
+
+    @abstractmethod
+    def on_server_disconnected(self, identifier: str) -> None:
+        """Called when a server disconnects."""
+        ...
+
+
 class Proxy:
-    def __init__(self, name: str) -> None:
-        """Constructor."""
+    """A class that has servers (emulators) connect on one port and clients
+    (drivers) on another. A server connection will be added to a collection. A
+    client connection will check for a server connection and if available will
+    have its write stream attached to the servers read stream and vice versa."""
+
+    def __init__(
+        self, name: str, listener: ProxyListener, settings: ProxySettings
+    ) -> None:
+        """Constructor.
+
+        Args:
+            name: Proxy name.
+            listener: Connection even listener.
+            settings:  The proxy settings.
+        """
         self._name = name
-        self._cons: List[Tuple[asyncio.StreamReader, asyncio.StreamWriter]] = []
+        self._settings = settings
+        self._event_listener = listener
+        self._cons: List[Connection] = []
 
-    async def run(self, settings: ProxySettings) -> None:
-        """
+    @property
+    def name(self) -> str:
+        """Return the name of the proxy."""
+        return self._name
 
-        Args:
-            settings:
-
-        Returns:
-
-        """
+    async def run(self) -> None:
+        """Run the server."""
         await asyncio.gather(
-            self._run_emulator__server(settings), self._run_driver_server(settings)
+            self._listen_server_connections(),
+            self._listen_client_connections(),
         )
 
-    async def _run_emulator__server(self, settings: ProxySettings) -> None:
-        """
-
-        Args:
-            settings:
-
-        Returns:
-
-        """
+    async def _listen_server_connections(self) -> None:
+        """Run the server listener."""
         log.info(
-            f"starting {self._name} emulator server at "
-            f"{settings.host}:{settings.emulator_port}"
+            f"starting {self._name} server connection server at "
+            f"{self._settings.host}:{self._settings.emulator_port}"
         )
         server = await asyncio.start_server(
-            self.em_conn, settings.host, settings.emulator_port
+            self._handle_server_connection,
+            self._settings.host,
+            self._settings.emulator_port,
         )
         await server.serve_forever()
 
-    async def _run_driver_server(self, settings: ProxySettings) -> None:
-        """
-
-        Args:
-            settings:
-
-        Returns:
-
-        """
+    async def _listen_client_connections(self) -> None:
+        """Run the client listener."""
         log.info(
-            f"starting {self._name} driver server at "
-            f"{settings.host}:{settings.driver_port}"
+            f"starting {self._name} client connection server at "
+            f"{self._settings.host}:{self._settings.driver_port}"
         )
         server = await asyncio.start_server(
-            self.driver_conn, settings.host, settings.driver_port
+            self._handle_client_connection,
+            self._settings.host,
+            self._settings.driver_port,
         )
         await server.serve_forever()
 
-    async def em_conn(
+    async def _handle_server_connection(
         self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter
     ) -> None:
-        """
+        """Handle a server connection.
+
+        A new connection will be added to the our connection collection.
 
         Args:
-            reader:
-            writer:
+            reader: Reader
+            writer: Writer
 
         Returns:
-
+            None
         """
         log.info(f"{self._name} emulator connected.")
-        self._cons.append(
-            (
-                reader,
-                writer,
-            )
+        connection = Connection(
+            identifier=str(uuid.uuid1()), reader=reader, writer=writer
+        )
+        self._cons.append(connection)
+        self._event_listener.on_server_connected(
+            server_type=self._name,
+            client_uri=f"{socket.gethostname()}:{self._settings.driver_port}",
+            identifier=connection.identifier,
         )
 
-    async def driver_conn(
+    async def _handle_client_connection(
         self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter
     ) -> None:
-        """
+        """Handle a client connection.
+
+        Attempt to match the client steam with an available server stream.
 
         Args:
-            reader:
-            writer:
+            reader: Reader
+            writer: Writer
 
         Returns:
-
+            None
         """
-        log.info(f"{self._name} driver connected.")
-
-        # Pop an emulator connection.
-        r, w = self._cons.pop()
-
-        async def _read_from_driver(
-            driver_in: asyncio.StreamReader, em_out: asyncio.StreamWriter
-        ) -> None:
-            while True:
-                d = await driver_in.read(1)
-                if not d:
-                    log.info(f"{self._name} driver disconnected.")
-                    break
-                em_out.write(d)
-
-        async def _read_from_em(
-            em_in: asyncio.StreamReader, driver_out: asyncio.StreamWriter
-        ) -> None:
-            while True:
-                d = await em_in.read(1)
-                if not d:
-                    log.info(f"{self._name} emulator disconnected.")
-                    break
-                driver_out.write(d)
-
-        t1 = asyncio.get_event_loop().create_task(_read_from_driver(reader, w))
-        t2 = asyncio.get_event_loop().create_task(_read_from_em(r, writer))
-        await t1
-        t2.cancel()
         try:
-            await t2
-        except asyncio.CancelledError:
-            pass
+            while True:
+                # Pop an emulator connection.
+                connection = self._cons.pop(0)
+                if not connection.reader.at_eof():
+                    break
+                else:
+                    log.info(f"{self._name} server connection terminated")
+                    self._event_listener.on_server_disconnected(connection.identifier)
+        except IndexError:
+            log.info(f"{self._name} no emulator connected.")
+            writer.close()
+            return
+
+        log.info(
+            f"{self._name} "
+            f"client at {writer.transport.get_extra_info('socket')}"
+            f" connected to {connection.writer.transport.get_extra_info('socket')}."
+        )
+
+        await self._handle_proxy(
+            driver=Connection(
+                reader=reader, writer=writer, identifier=connection.identifier
+            ),
+            server=connection,
+        )
 
         # Return the emulator connection to the pool.
-        self._cons.append((r, w))
+        if not connection.reader.at_eof():
+            log.info(f"{self._name} returning connection to pool")
+            self._cons.append(connection)
+        else:
+            log.info(f"{self._name} server connection terminated")
+            self._event_listener.on_server_disconnected(connection.identifier)
 
-        log.info("done")
+    async def _handle_proxy(self, driver: Connection, server: Connection) -> None:
+        """Connect the driver to the emulator.
 
+        Args:
+            driver: Driver connection
+            server: Emulator connection
 
-async def em_server(proxy: Proxy) -> None:
-    """
+        Returns:
+            None
+        """
+        loop = asyncio.get_event_loop()
+        read_from_client_task = loop.create_task(
+            self._data_router(driver, server, False)
+        )
+        read_from_server_task = loop.create_task(
+            self._data_router(server, driver, True)
+        )
+        await read_from_client_task
+        read_from_server_task.cancel()
+        try:
+            await read_from_server_task
+        except asyncio.CancelledError:
+            log.exception("Server task cancelled")
+            pass
 
-    Args:
-        proxy:
+    @staticmethod
+    async def _data_router(
+        in_connection: Connection,
+        out_connection: Connection,
+        close_other_on_disconnect: bool,
+    ) -> None:
+        """Route date from in to out.
 
-    Returns:
+        Args:
+            in_connection: connection to read from.
+            out_connection: connection to write to
+            close_other_on_disconnect: whether the other connection should
+                be closed if the in_connection is closed.
+                A driver disconnect should close connection with emulator, while
+                an emulator disconnect should close the attached driver.
 
-    """
-    server = await asyncio.start_server(proxy.em_conn, "localhost", 1234)
-    await server.serve_forever()
-
-
-async def driver_server(proxy: Proxy) -> None:
-    """
-
-    Args:
-        proxy:
-
-    Returns:
-
-    """
-    server = await asyncio.start_server(proxy.driver_conn, "localhost", 1235)
-    await server.serve_forever()
-
-
-async def run() -> None:
-    """
-
-    Returns:
-
-    """
-    settings = Settings()
-
-    await asyncio.gather(
-        Proxy("smoothie_proxy").run(settings.smoothie_proxy),
-        Proxy("magdeck_proxy").run(settings.magdeck_proxy),
-        Proxy("temperature_proxy").run(settings.temperature_proxy),
-        Proxy("thermocycler_proxy").run(settings.thermocycler_proxy),
-        Proxy("heatershaker_proxy").run(settings.heatershaker_proxy),
-    )
-    pass
-
-
-if __name__ == "__main__":
-    logging.basicConfig(format="%(asctime)s:%(message)s", level=logging.DEBUG)
-    asyncio.run(run())
+        Returns:
+            None
+        """
+        while True:
+            try:
+                d = await in_connection.reader.read(1)
+                if not d:
+                    log.info(
+                        f"{in_connection.writer.transport.get_extra_info('socket')} disconnected."
+                    )
+                    break
+                out_connection.writer.write(d)
+            except ConnectionError:
+                log.exception(f"connection error in data router")
+                break
+        if close_other_on_disconnect:
+            out_connection.writer.close()

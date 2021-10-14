@@ -13,6 +13,8 @@ class SmoothieSettings(BaseModel):
     right: PipetteSettings = PipetteSettings(
         model="p20_single_v2.0", id="P20SV202020070101"
     )
+    host: str = "0.0.0.0"
+    port: int = 9996
 
 
 class ProxySettings(BaseSettings):
@@ -23,6 +25,13 @@ class ProxySettings(BaseSettings):
     driver_port: int
 
 
+class ModuleServerSettings(BaseModel):
+    """Settings for the module server"""
+
+    host: str = "0.0.0.0"
+    port: int = 8888
+
+
 class Settings(BaseSettings):
     smoothie: SmoothieSettings = SmoothieSettings()
 
@@ -31,7 +40,6 @@ class Settings(BaseSettings):
     heatershaker_proxy: ProxySettings = ProxySettings(
         emulator_port=9000, driver_port=9995
     )
-    smoothie_proxy: ProxySettings = ProxySettings(emulator_port=9001, driver_port=9996)
     thermocycler_proxy: ProxySettings = ProxySettings(
         emulator_port=9002, driver_port=9997
     )
@@ -42,3 +50,5 @@ class Settings(BaseSettings):
 
     class Config:
         env_prefix = "OT_EMULATOR_"
+
+    module_server: ModuleServerSettings = ModuleServerSettings()
