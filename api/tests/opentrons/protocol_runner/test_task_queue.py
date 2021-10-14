@@ -58,7 +58,7 @@ async def test_cleanup_runs_second(decoy: Decoy) -> None:
 
 
 async def test_cleanup_gets_run_error(decoy: Decoy) -> None:
-    """It should run the "run" and "cleanup" funcs in order."""
+    """It should verify "cleanup" func gets error raised in "run" func."
     run_func = decoy.mock(is_async=True)
     cleanup_func = decoy.mock(is_async=True)
     error = RuntimeError("Oh no!")
