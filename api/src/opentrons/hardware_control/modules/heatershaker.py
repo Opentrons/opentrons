@@ -28,6 +28,7 @@ class HeaterShaker(mod_abc.AbstractModule):
         simulating: bool = False,
         loop: asyncio.AbstractEventLoop = None,
         sim_model: str = None,
+        polling_period: float = None,
         **kwargs,
     ):
         """
@@ -41,9 +42,8 @@ class HeaterShaker(mod_abc.AbstractModule):
             simulating: whether to build a simulating driver
             loop: Loop
             sim_model: The model name used by simulator
-            **kwargs: Module specific values.
-                can be 'polling_period' to specify the polling period in
-                seconds
+            polling_period: the polling period in seconds
+            kwargs: unused, passthrough to superclass
 
         Returns:
             HeaterShaker instance
@@ -60,7 +60,7 @@ class HeaterShaker(mod_abc.AbstractModule):
             driver=driver,
             device_info=await driver.get_device_info(),
             loop=loop,
-            polling_period=kwargs.get("polling_period"),
+            polling_period=polling_period,
         )
         return mod
 
