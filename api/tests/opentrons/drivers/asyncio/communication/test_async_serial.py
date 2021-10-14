@@ -34,7 +34,12 @@ async def subject(
     loop: asyncio.AbstractEventLoop, mock_serial: MagicMock
 ) -> AsyncSerial:
     """The test subject."""
-    return AsyncSerial(serial=mock_serial, executor=ThreadPoolExecutor(), loop=loop)
+    return AsyncSerial(
+        serial=mock_serial,
+        executor=ThreadPoolExecutor(),
+        loop=loop,
+        reset_buffer_before_write=False,
+    )
 
 
 @pytest.mark.parametrize(

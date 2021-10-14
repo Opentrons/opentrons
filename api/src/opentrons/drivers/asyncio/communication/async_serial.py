@@ -19,6 +19,7 @@ class AsyncSerial:
         timeout: Optional[float] = None,
         write_timeout: Optional[float] = None,
         loop: Optional[asyncio.AbstractEventLoop] = None,
+        reset_buffer_before_write: bool = False,
     ) -> AsyncSerial:
         """
         Create an AsyncSerial instance.
@@ -29,6 +30,8 @@ class AsyncSerial:
             timeout: optional timeout in seconds
             write_timeout: optional write timeout in seconds
             loop: optional event loop. if None get_running_loop will be used
+            reset_buffer_before_write: reset the serial input buffer before
+             writing to it
         """
         loop = loop or asyncio.get_running_loop()
         executor = ThreadPoolExecutor(max_workers=1)
@@ -41,13 +44,19 @@ class AsyncSerial:
                 write_timeout=write_timeout,
             ),
         )
-        return cls(serial=serial, executor=executor, loop=loop)
+        return cls(
+            serial=serial,
+            executor=executor,
+            loop=loop,
+            reset_buffer_before_write=reset_buffer_before_write,
+        )
 
     def __init__(
         self,
         serial: Serial,
         executor: ThreadPoolExecutor,
         loop: asyncio.AbstractEventLoop,
+        reset_buffer_before_write: bool,
     ) -> None:
         """
         Constructor
@@ -60,6 +69,7 @@ class AsyncSerial:
         self._serial = serial
         self._executor = executor
         self._loop = loop
+        self._reset_buffer_before_write = reset_buffer_before_write
 
     async def read_until(self, match: bytes, timeout: Optional[float] = None) -> bytes:
         """
@@ -107,7 +117,8 @@ class AsyncSerial:
             None
         """
         with self._timeout_override("write_timeout", timeout):
-            self._serial.reset_input_buffer()
+            if self._reset_buffer_before_write:
+                self._serial.reset_input_buffer()
             self._serial.write(data=data)
 
     async def open(self) -> None:
