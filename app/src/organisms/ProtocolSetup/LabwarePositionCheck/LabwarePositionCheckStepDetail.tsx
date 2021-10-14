@@ -137,7 +137,7 @@ export const LabwarePositionCheckStepDetail = (
             <JogControls
               color={C_BLUE}
               jog={jog}
-              stepSizes={[0.1, 1]}
+              stepSizes={[0.1, 1, 10]}
               planes={[HORIZONTAL_PLANE, VERTICAL_PLANE]}
               width="100%"
             />
