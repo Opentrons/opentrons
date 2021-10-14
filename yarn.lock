@@ -4063,13 +4063,6 @@
   dependencies:
     "@types/react" "*"
 
-"@types/react-query@^1.2.9":
-  version "1.2.9"
-  resolved "https://registry.yarnpkg.com/@types/react-query/-/react-query-1.2.9.tgz#61df5a0594ea4b90234f9c0fdd8f12a06e331fed"
-  integrity sha512-xfVcv5zjC6fGf6axPyKxdXNm9RKK9OFzSIyZeCR3r9h4zDuqSpHc8ilTBtfQ1zU/uCx+tAsB+W6vzdCBMu1jtg==
-  dependencies:
-    react-query "*"
-
 "@types/react-redux@^7.1.16":
   version "7.1.16"
   resolved "https://registry.yarnpkg.com/@types/react-redux/-/react-redux-7.1.16.tgz#0fbd04c2500c12105494c83d4a3e45c084e3cb21"
@@ -17801,10 +17794,10 @@ react-property@1.0.1:
   resolved "https://registry.yarnpkg.com/react-property/-/react-property-1.0.1.tgz#4ae4211557d0a0ae050a71aa8ad288c074bea4e6"
   integrity sha512-1tKOwxFn3dXVomH6pM9IkLkq2Y8oh+fh/lYW3MJ/B03URswUTqttgckOlbxY2XHF3vPG6uanSc4dVsLW/wk3wQ==
 
-react-query@*:
-  version "3.26.0"
-  resolved "https://registry.yarnpkg.com/react-query/-/react-query-3.26.0.tgz#7083a8622afdf946ee6d8f3a6d94591b980c1aa0"
-  integrity sha512-wFPnL9Y+9xf6gJHAQ8ue+vBurciJ4cfQL4dhsI0x3YyRaEXlyklUQpJzbR63CfFULVekP3iWoyFxhaNVS9RFDw==
+react-query@3.12.0:
+  version "3.12.0"
+  resolved "https://registry.yarnpkg.com/react-query/-/react-query-3.12.0.tgz#a2082a167f3e394e84dfd3cec0f8c7503abf33dc"
+  integrity sha512-WJYECeZ6xT2oxIlgqXUjLNLWRvJbeelXscVnAFfyUFgO21OYEYHMWPG61V9W57EUUqrXioQsNPsU9XyddfEvXQ==
   dependencies:
     "@babel/runtime" "^7.5.5"
     broadcast-channel "^3.4.1"

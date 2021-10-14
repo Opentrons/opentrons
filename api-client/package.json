@@ -13,6 +13,7 @@
     "./dist/api-client.mjs": "./dist/api-client.browser.mjs"
   },
   "dependencies": {
-    "axios": "^0.21.1"
+    "axios": "^0.21.1",
+    "react-query": "3.12.0"
   }
 }
