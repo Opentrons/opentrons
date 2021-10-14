@@ -1,5 +1,3 @@
-from typing_extensions import Literal
-
 from pydantic import BaseSettings, BaseModel
 
 
@@ -19,6 +17,7 @@ class SmoothieSettings(BaseModel):
 
 class ProxySettings(BaseSettings):
     """Settings for a proxy."""
+
     host: str = "0.0.0.0"
     emulator_port: int
     driver_port: int
@@ -29,11 +28,17 @@ class Settings(BaseSettings):
 
     host: str = "0.0.0.0"
 
-    heatershaker_proxy: ProxySettings  = ProxySettings(emulator_port=9000, driver_port=9995)
+    heatershaker_proxy: ProxySettings = ProxySettings(
+        emulator_port=9000, driver_port=9995
+    )
     smoothie_proxy: ProxySettings = ProxySettings(emulator_port=9001, driver_port=9996)
-    thermocycler_proxy: ProxySettings = ProxySettings(emulator_port=9002, driver_port=9997)
-    temperature_proxy: ProxySettings = ProxySettings(emulator_port=9003, driver_port=9998)
-    magdeck_proxy: ProxySettings  = ProxySettings(emulator_port=9004, driver_port=9999)
+    thermocycler_proxy: ProxySettings = ProxySettings(
+        emulator_port=9002, driver_port=9997
+    )
+    temperature_proxy: ProxySettings = ProxySettings(
+        emulator_port=9003, driver_port=9998
+    )
+    magdeck_proxy: ProxySettings = ProxySettings(emulator_port=9004, driver_port=9999)
 
     class Config:
         env_prefix = "OT_EMULATOR_"
