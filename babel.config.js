@@ -32,6 +32,8 @@ module.exports = {
           '^@opentrons/components$': `@opentrons/components/src/index.ts`,
           '^@opentrons/shared-data$': `@opentrons/shared-data/js/index.ts`,
           '^@opentrons/step-generation$': `@opentrons/step-generation/src/index.ts`,
+          '^@opentrons/js-api-client$': `@opentrons/js-api-client/src/index.ts`,
+          '^@opentrons/react-api-client$': `@opentrons/react-api-client/src/index.ts`,
         },
       },
     ],
@@ -55,18 +57,16 @@ module.exports = {
       plugins: [['react-hot-loader/babel', false]],
       presets: [['@babel/preset-env', { targets: { node: '8' } }]],
     },
-    {
-      test: ['react-api-client/**/*', 'js-api-client/**/*'],
-      presets: [
-        ['@babel/env', { useBuiltIns: 'usage', corejs: '3.10' }],
-        '@babel/preset-react',
-        '@babel/preset-typescript',
-      ],
-    },
     // apps that should be polyfilled
     // these projects require `core-js` in their package.json `dependencies`
     {
-      test: ['app/**/*', 'labware-library/**/*', 'protocol-designer/**/*'],
+      test: [
+        'app/**/*',
+        'labware-library/**/*',
+        'protocol-designer/**/*',
+        'react-api-client/**/*',
+        'js-api-client/**/*',
+      ],
       presets: [['@babel/preset-env', { useBuiltIns: 'usage', corejs: 3 }]],
     },
   ],

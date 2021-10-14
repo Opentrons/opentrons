@@ -1,6 +1,6 @@
 {
   "extends": "../../../tsconfig-base.json",
-  "references": [{ "path": "../api-client" }],
+  "references": [{ "path": "../js-api-client" }],
   "compilerOptions": {
     "composite": true,
     "rootDir": "src",
