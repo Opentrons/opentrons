@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { renderHook } from '@testing-library/react-hooks'
+import { act, renderHook } from '@testing-library/react-hooks'
 import {
   createSession,
   CreateSessionData,
@@ -71,15 +71,18 @@ describe('useCreateSessionMutation hook', () => {
       .calledWith(HOST_CONFIG, createSessionData)
       .mockResolvedValue({ data: SESSION_RESPONSE } as Response<Session>)
 
-    const { result, waitFor } = renderHook(
+    const { result } = renderHook(
       () => useCreateSessionMutation(createSessionData),
       {
         wrapper,
       }
     )
-    result.current.createSession()
-    await waitFor(() => {
-      expect(result.current.data).toEqual(SESSION_RESPONSE)
+    act(() => result.current.createSession())
+    // TODO: remove this hack and replace with waitFor after we update to React v16.14
+    await new Promise(resolve => {
+      setImmediate(resolve)
     })
+
+    expect(result.current.data).toEqual(SESSION_RESPONSE)
   })
 })

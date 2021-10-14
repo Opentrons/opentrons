@@ -58,8 +58,11 @@ describe('useHealth hook', () => {
       .calledWith(HOST_CONFIG)
       .mockResolvedValue({ data: HEALTH_RESPONSE } as Response<Health>)
 
-    const { result, waitFor } = renderHook(useHealth, { wrapper })
-    await waitFor(() => result.current != null)
+    const { result } = renderHook(useHealth, { wrapper })
+    // TODO: remove this hack and replace with waitFor after we update to React v16.14
+    await new Promise(resolve => {
+      setImmediate(resolve)
+    })
 
     expect(result.current).toEqual(HEALTH_RESPONSE)
   })
