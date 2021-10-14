@@ -4,7 +4,7 @@ USB Simulating Driver.
 A class to convert info from the usb bus into a
 more readable format.
 """
-from typing import List, Set, Union
+from typing import List, Set
 
 from opentrons.hardware_control.modules.types import ModuleAtPort
 from opentrons.hardware_control.types import BoardRevision

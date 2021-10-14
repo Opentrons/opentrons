@@ -2,7 +2,7 @@ from __future__ import annotations
 import enum
 from itertools import groupby
 from dataclasses import dataclass
-from typing import List, Optional, Tuple, Dict, Any
+from typing import List, Optional, Tuple
 from opentrons.hardware_control.types import BoardRevision
 from opentrons.algorithms.types import GenericNode
 

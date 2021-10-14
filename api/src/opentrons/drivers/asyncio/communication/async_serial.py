@@ -33,16 +33,29 @@ class AsyncSerial:
             reset_buffer_before_write: reset the serial input buffer before
              writing to it
         """
+
+        def _create_serial(
+            url: str,
+            baudrate: Optional[int],
+            rto: Optional[float],
+            wto: Optional[float],
+        ) -> Serial:
+            return serial_for_url(
+                url=url,
+                baudrate=baudrate,
+                timeout=rto,
+                write_timeout=wto,
+            )
+
         loop = loop or asyncio.get_running_loop()
         executor = ThreadPoolExecutor(max_workers=1)
         serial = await loop.run_in_executor(
-            executor=executor,
-            func=lambda: serial_for_url(
-                url=port,
-                baudrate=baud_rate,
-                timeout=timeout,
-                write_timeout=write_timeout,
-            ),
+            executor,
+            _create_serial,
+            port,
+            baud_rate,
+            timeout,
+            write_timeout,
         )
         return cls(
             serial=serial,
@@ -85,7 +98,7 @@ class AsyncSerial:
         """
         with self._timeout_override("timeout", timeout):
             return await self._loop.run_in_executor(
-                executor=self._executor, func=lambda: self._serial.read_until(match)
+                self._executor, self._serial.read_until, match
             )
 
     async def write(self, data: bytes, timeout: Optional[float] = None) -> None:
@@ -147,7 +160,7 @@ class AsyncSerial:
 
         Returns: boolean
         """
-        return self._serial.is_open
+        return self._serial.is_open is True
 
     @contextlib.contextmanager
     def _timeout_override(
