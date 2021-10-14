@@ -3,7 +3,7 @@ import {
   HostConfig,
   Sessions,
   SessionType,
-} from '@opentrons/js-api-client'
+} from '@opentrons/api-client'
 import { UseQueryResult, useQuery } from 'react-query'
 import { useHost } from '../api'
 

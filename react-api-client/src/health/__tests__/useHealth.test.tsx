@@ -4,13 +4,13 @@ import { when } from 'jest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { renderHook } from '@testing-library/react-hooks'
 
-import { getHealth as mockGetHealth } from '@opentrons/js-api-client'
+import { getHealth as mockGetHealth } from '@opentrons/api-client'
 import { useHost as mockUseHost } from '../../api'
 import { useHealth } from '..'
 
-import type { HostConfig, Response, Health } from '@opentrons/js-api-client'
+import type { HostConfig, Response, Health } from '@opentrons/api-client'
 
-jest.mock('@opentrons/js-api-client')
+jest.mock('@opentrons/api-client')
 jest.mock('../../api/useHost')
 
 const getHealth = mockGetHealth as jest.MockedFunction<typeof mockGetHealth>

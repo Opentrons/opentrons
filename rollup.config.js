@@ -8,7 +8,7 @@ import resolve from '@rollup/plugin-node-resolve'
 import { terser } from 'rollup-plugin-terser'
 
 export const ALIAS_ENTRIES = {
-  '@opentrons/js-api-client': join(__dirname, './js-api-client/src/index.ts'),
+  '@opentrons/api-client': join(__dirname, './api-client/src/index.ts'),
   '@opentrons/react-api-client': join(
     __dirname,
     './react-api-client/src/index.ts'
@@ -72,8 +72,8 @@ const plugins = ({ browser }) => ({
 })
 
 const configs = [
-  { packageName: 'js-api-client' },
-  { packageName: 'js-api-client', browser: true },
+  { packageName: 'api-client' },
+  { packageName: 'api-client', browser: true },
   { packageName: 'react-api-client', browser: true },
 ].map(options => ({
   ...input(options),

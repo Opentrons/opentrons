@@ -2,13 +2,13 @@ import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { renderHook } from '@testing-library/react-hooks'
-import { getSession } from '@opentrons/js-api-client'
+import { getSession } from '@opentrons/api-client'
 import { useHost } from '../../api'
 import { useSessionQuery } from '..'
 
-import type { HostConfig, Response, Session } from '@opentrons/js-api-client'
+import type { HostConfig, Response, Session } from '@opentrons/api-client'
 
-jest.mock('@opentrons/js-api-client')
+jest.mock('@opentrons/api-client')
 jest.mock('../../api/useHost')
 
 const mockGetSession = getSession as jest.MockedFunction<typeof getSession>

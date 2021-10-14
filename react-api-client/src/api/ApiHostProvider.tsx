@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { HostConfig } from '@opentrons/js-api-client'
+import { HostConfig } from '@opentrons/api-client'
 
 export const ApiHostContext = React.createContext<HostConfig | null>(null)
 

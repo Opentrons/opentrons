@@ -3,7 +3,7 @@ import {
   Session,
   createSession,
   CreateSessionData,
-} from '@opentrons/js-api-client'
+} from '@opentrons/api-client'
 import { UseMutationResult, useMutation, UseMutateFunction } from 'react-query'
 import { useHost } from '../api'
 

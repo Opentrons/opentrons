@@ -1,4 +1,4 @@
-import { HostConfig, Health, getHealth } from '@opentrons/js-api-client'
+import { HostConfig, Health, getHealth } from '@opentrons/api-client'
 import { UseQueryResult, useQuery } from 'react-query'
 import { useHost } from '../api'
 

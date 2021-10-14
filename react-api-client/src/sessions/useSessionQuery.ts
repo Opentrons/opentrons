@@ -1,4 +1,4 @@
-import { HostConfig, Session, getSession } from '@opentrons/js-api-client'
+import { HostConfig, Session, getSession } from '@opentrons/api-client'
 import { UseQueryResult, useQuery } from 'react-query'
 import { useHost } from '../api'
 

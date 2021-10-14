@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { SessionData, SESSION_TYPE_BASIC } from '@opentrons/js-api-client'
+import { SessionData, SESSION_TYPE_BASIC } from '@opentrons/api-client'
 import { useSessionsByTypeQuery, useCreateSessionMutation } from '.'
 
 export function useEnsureBasicSession(): SessionData | null {

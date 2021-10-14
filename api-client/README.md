@@ -9,18 +9,13 @@ Opentrons robot HTTP API client for Node.js and browsers. Compatible with [Opent
 ### Installation
 
 ```shell
-npm install @opentrons/js-api-client
+npm install @opentrons/api-client
 ```
 
 ### Usage
 
 ```typescript
-import {
-  HostConfig,
-  Response,
-  Health,
-  getHealth,
-} from '@opentrons/js-api-client'
+import { HostConfig, Response, Health, getHealth } from '@opentrons/api-client'
 
 const host: HostConfig = { hostname: 'OT2CEP9999999A99.local' }
 
@@ -31,6 +26,6 @@ getHealth(host)
 
 ## Details
 
-The `@opentrons/js-api-client` module is built using [axios][].
+The `@opentrons/api-client` module is built using [axios][].
 
 [axios]: https://github.com/axios/axios

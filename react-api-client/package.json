@@ -11,6 +11,6 @@
     "react": "^16.8.0 || ^17.0.0"
   },
   "dependencies": {
-    "@opentrons/js-api-client": "^0.0.0"
+    "@opentrons/api-client": "^0.0.0"
   }
 }

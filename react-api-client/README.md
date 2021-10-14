@@ -94,7 +94,7 @@ export function RobotName(): JSX.Element | null {
 
 ## Details
 
-The `@opentrons/react-api-client` module is built on top of the `@opentrons/js-api-client` module, which uses [axios][], and the [react-query][] module.
+The `@opentrons/react-api-client` module is built on top of the `@opentrons/api-client` module, which uses [axios][], and the [react-query][] module.
 
 [axios]: https://github.com/axios/axios
 

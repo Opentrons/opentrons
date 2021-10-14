@@ -6,13 +6,13 @@ import {
   createSession,
   CreateSessionData,
   SESSION_TYPE_BASIC,
-} from '@opentrons/js-api-client'
+} from '@opentrons/api-client'
 import { useHost } from '../../api'
 import { useCreateSessionMutation } from '..'
 
-import type { HostConfig, Response, Session } from '@opentrons/js-api-client'
+import type { HostConfig, Response, Session } from '@opentrons/api-client'
 
-jest.mock('@opentrons/js-api-client')
+jest.mock('@opentrons/api-client')
 jest.mock('../../api/useHost')
 
 const mockCreateSession = createSession as jest.MockedFunction<

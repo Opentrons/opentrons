@@ -133,5 +133,5 @@ shared-data/python/pyproject.toml
 storybook-static/
 
 # api client type caches
-js-api-client/lib
+api-client/lib
 react-api-client/lib
