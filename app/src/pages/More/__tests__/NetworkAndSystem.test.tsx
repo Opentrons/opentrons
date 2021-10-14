@@ -1,5 +1,6 @@
 import React from 'react'
 import { shallow } from 'enzyme'
+import { when, resetAllWhenMocks } from 'jest-when'
 import { mountWithProviders } from '@opentrons/components'
 
 import { Page } from '../../../atoms/Page'
@@ -23,16 +24,6 @@ const getU2EWindowsDriverStatus = SystemInfo.getU2EWindowsDriverStatus as jest.M
   typeof SystemInfo.getU2EWindowsDriverStatus
 >
 
-function stubSelector<R>(
-  mock: jest.MockedFunction<(s: State) => R>,
-  rVal: R
-): void {
-  mock.mockImplementation(state => {
-    expect(state).toBe(MOCK_STATE)
-    return rVal
-  })
-}
-
 describe('/more/network-and-system page component', () => {
   const render = () => {
     return mountWithProviders<
@@ -46,12 +37,15 @@ describe('/more/network-and-system page component', () => {
   }
 
   beforeEach(() => {
-    stubSelector(getU2EAdapterDevice, null)
-    stubSelector(getU2EWindowsDriverStatus, SystemInfo.NOT_APPLICABLE)
+    when(getU2EAdapterDevice).calledWith(MOCK_STATE).mockReturnValue(null)
+
+    when(getU2EWindowsDriverStatus)
+      .calledWith(MOCK_STATE)
+      .mockReturnValue(SystemInfo.NOT_APPLICABLE)
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
+    resetAllWhenMocks()
   })
 
   it('should render a Page with the correct title', () => {

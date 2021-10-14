@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { when, resetAllWhenMocks } from 'jest-when'
 import { mountWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../../i18n'
@@ -22,16 +23,6 @@ const getU2EWindowsDriverStatus = SystemInfo.getU2EWindowsDriverStatus as jest.M
   typeof SystemInfo.getU2EWindowsDriverStatus
 >
 
-function stubSelector<R>(
-  mock: jest.MockedFunction<(s: State) => R>,
-  rVal: R
-): void {
-  mock.mockImplementation(state => {
-    expect(state).toBe(MOCK_STATE)
-    return rVal
-  })
-}
-
 describe('U2EAdapterInfo', () => {
   const render = () => {
     return mountWithProviders<
@@ -45,12 +36,15 @@ describe('U2EAdapterInfo', () => {
   }
 
   beforeEach(() => {
-    stubSelector(getU2EAdapterDevice, null)
-    stubSelector(getU2EWindowsDriverStatus, SystemInfo.NOT_APPLICABLE)
+    when(getU2EAdapterDevice).calledWith(MOCK_STATE).mockReturnValue(null)
+
+    when(getU2EWindowsDriverStatus)
+      .calledWith(MOCK_STATE)
+      .mockReturnValue(SystemInfo.NOT_APPLICABLE)
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
+    resetAllWhenMocks()
   })
 
   it('should render a title', () => {
@@ -71,7 +65,7 @@ describe('U2EAdapterInfo', () => {
   it('should display device information if present', () => {
     const device = Fixtures.mockRealtekDevice
 
-    stubSelector(getU2EAdapterDevice, device)
+    when(getU2EAdapterDevice).calledWith(MOCK_STATE).mockReturnValue(device)
 
     const { wrapper } = render()
     const children = wrapper.children().html()
@@ -84,7 +78,7 @@ describe('U2EAdapterInfo', () => {
   it('should display Windows driver version if available', () => {
     const device = Fixtures.mockWindowsRealtekDevice
 
-    stubSelector(getU2EAdapterDevice, device)
+    when(getU2EAdapterDevice).calledWith(MOCK_STATE).mockReturnValue(device)
 
     const { wrapper } = render()
     const children = wrapper.children().html()
@@ -99,7 +93,7 @@ describe('U2EAdapterInfo', () => {
       windowsDriverVersion: null,
     }
 
-    stubSelector(getU2EAdapterDevice, device)
+    when(getU2EAdapterDevice).calledWith(MOCK_STATE).mockReturnValue(device)
 
     const { wrapper } = render()
     const children = wrapper.children().html()
@@ -111,8 +105,11 @@ describe('U2EAdapterInfo', () => {
   it('should NOT show a U2EDriverWarning if driver status is UP_TO_DATE', () => {
     const device = Fixtures.mockWindowsRealtekDevice
 
-    stubSelector(getU2EAdapterDevice, device)
-    stubSelector(getU2EWindowsDriverStatus, SystemInfo.UP_TO_DATE)
+    when(getU2EAdapterDevice).calledWith(MOCK_STATE).mockReturnValue(device)
+
+    when(getU2EWindowsDriverStatus)
+      .calledWith(MOCK_STATE)
+      .mockReturnValue(SystemInfo.UP_TO_DATE)
 
     const { wrapper } = render()
 
@@ -122,8 +119,11 @@ describe('U2EAdapterInfo', () => {
   it('should show a U2EDriverWarning if driver status is OUTDATED', () => {
     const device = Fixtures.mockWindowsRealtekDevice
 
-    stubSelector(getU2EAdapterDevice, device)
-    stubSelector(getU2EWindowsDriverStatus, SystemInfo.OUTDATED)
+    when(getU2EAdapterDevice).calledWith(MOCK_STATE).mockReturnValue(device)
+
+    when(getU2EWindowsDriverStatus)
+      .calledWith(MOCK_STATE)
+      .mockReturnValue(SystemInfo.OUTDATED)
 
     const { wrapper } = render()
 
