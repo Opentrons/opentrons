@@ -6,8 +6,8 @@ import {
   Flex,
   Text,
   FONT_STYLE_ITALIC,
+  SIZE_4,
   SPACING_1,
-  SPACING_6,
 } from '@opentrons/components'
 
 import { U2EDriverWarning } from './U2EDriverWarning'
@@ -20,7 +20,7 @@ export interface U2EDeviceDetailsProps {
 }
 
 const DetailText = styled.span`
-  min-width: ${SPACING_6};
+  min-width: ${SIZE_4};
   margin-right: ${SPACING_1};
 `
 
