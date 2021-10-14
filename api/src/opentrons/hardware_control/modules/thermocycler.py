@@ -520,7 +520,10 @@ class Thermocycler(mod_abc.AbstractModule):
         """
         self._in_error_state = True
         MODULE_LOG.error(
-            f"Thermocycler has encountered an unrecoverable error: {str(cause)}"
+            f"Thermocycler has encountered an unrecoverable error: {str(cause)}. "
+            f"Please refer to support article at "
+            f"https://support.opentrons.com/en/articles/3469797-thermocycler-module"
+            f" for troubleshooting."
         )
         self._poller.stop()
         asyncio.run_coroutine_threadsafe(self._driver.disconnect(), self._loop)
