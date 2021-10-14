@@ -1,31 +1,22 @@
 import asyncio
+import logging
 
 from opentrons.hardware_control.emulation.abstract_emulator import AbstractEmulator
 from opentrons.hardware_control.emulation.connection_handler import ConnectionHandler
-from opentrons.hardware_control.emulation.magdeck import MagDeckEmulator
-from opentrons.hardware_control.emulation.parser import Parser
-from opentrons.hardware_control.emulation.settings import Settings
+
+log = logging.getLogger(__name__)
 
 
-async def run_emulator(host: str, port: int, emulator: AbstractEmulator) -> None:
-    """
-
-    Args:
-        host:
-        port:
-        emulator:
-
-    Returns:
-
-    """
+async def run_emulator_client(host: str, port: int, emulator: AbstractEmulator) -> None:
+    """Run an emulator as a client."""
+    log.info(f"Connecting to {emulator.__class__.__name__} at {host}:{port}")
     r, w = await asyncio.open_connection(host, port)
     connection = ConnectionHandler(emulator)
     await connection(r, w)
 
 
-if __name__ == "__main__":
-    settings = Settings()
-
-    e = MagDeckEmulator(Parser())
-
-    asyncio.run(run_emulator("localhost", settings.magdeck_proxy.emulator_port, e))
+async def run_emulator_server(host: str, port: int, emulator: AbstractEmulator) -> None:
+    """Run an emulator as a server."""
+    log.info(f"Starting {emulator.__class__.__name__} at {host}:{port}")
+    server = await asyncio.start_server(ConnectionHandler(emulator), host, port)
+    await server.serve_forever()

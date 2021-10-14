@@ -1,7 +1,7 @@
 import pytest
 import threading
 import asyncio
-from opentrons.hardware_control.emulation.app import ServerManager
+from opentrons.hardware_control.emulation.app import Application
 from opentrons.hardware_control.emulation.settings import (
     Settings,
     SmoothieSettings,
@@ -22,7 +22,7 @@ def emulation_app():
     """Run the emulators"""
 
     def runit():
-        asyncio.run(ServerManager().run())
+        asyncio.run(Application().run())
 
     # TODO 20210219
     #  The emulators must be run in a separate thread because our serial
