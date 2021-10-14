@@ -104,6 +104,12 @@ async def test_await_both(simulating_module):
 
 async def test_plate_lock(simulating_module):
     await simulating_module.open_plate_lock()
-    assert await simulating_module._driver.get_plate_lock_status() == HeaterShakerPlateLockStatus.IDLE_OPEN
+    assert (
+        await simulating_module._driver.get_plate_lock_status()
+        == HeaterShakerPlateLockStatus.IDLE_OPEN
+    )
     await simulating_module.close_plate_lock()
-    assert await simulating_module._driver.get_plate_lock_status() == HeaterShakerPlateLockStatus.IDLE_CLOSED
+    assert (
+        await simulating_module._driver.get_plate_lock_status()
+        == HeaterShakerPlateLockStatus.IDLE_CLOSED
+    )
