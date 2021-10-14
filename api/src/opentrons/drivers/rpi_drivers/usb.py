@@ -8,9 +8,10 @@ more readable format.
 import subprocess
 import re
 import os
-from typing import List, Set
+from typing import List, Set, cast
 
 from opentrons.algorithms.dfs import DFS
+from opentrons.algorithms.types import GenericNode
 from opentrons.hardware_control.modules.types import ModuleAtPort
 from opentrons.hardware_control.types import BoardRevision
 
@@ -30,8 +31,8 @@ USB_PORT_INFO = re.compile(PORT_PATTERN + DEVICE_PATH)
 class USBBus(USBDriverInterface):
     def __init__(self, board_revision: BoardRevision):
         self._board_revision = board_revision
-        self._usb_dev: List[USBPort] = self.read_usb_bus()
-        self._dfs: DFS = DFS(self._usb_dev)
+        self._usb_dev = self.read_usb_bus()
+        self._dfs: DFS[str] = DFS[str](cast(List[GenericNode[str]], self._usb_dev))
         self._sorted = self._dfs.dfs()
 
     @staticmethod
@@ -88,7 +89,7 @@ class USBBus(USBDriverInterface):
         self._usb_dev = ports
 
     @property
-    def sorted_ports(self) -> Set:
+    def sorted_ports(self) -> Set[str]:
         """
         USBBus property: sorted_ports.
 
@@ -97,7 +98,7 @@ class USBBus(USBDriverInterface):
         return self._sorted
 
     @sorted_ports.setter
-    def sorted_ports(self, sorted: Set) -> None:
+    def sorted_ports(self, sorted: Set[str]) -> None:
         """
         USBBus setter: sorted_ports.
 
@@ -135,7 +136,7 @@ class USBBus(USBDriverInterface):
         """
         for s in self.sorted_ports:
             vertex = self._dfs.graph.get_vertex(s)
-            port = vertex.vertex
+            port = cast(USBPort, vertex.vertex)
             if port.device_path.find(device_path):
                 return port
         return USBPort(

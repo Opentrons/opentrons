@@ -3,9 +3,10 @@ from __future__ import annotations
 import asyncio
 import contextlib
 from concurrent.futures.thread import ThreadPoolExecutor
-from typing import Optional
+from functools import partial
+from typing import Optional, Generator
 
-from serial import Serial, serial_for_url  # type: ignore
+from serial import Serial, serial_for_url  # type: ignore[import]
 
 
 class AsyncSerial:
@@ -19,6 +20,7 @@ class AsyncSerial:
         timeout: Optional[float] = None,
         write_timeout: Optional[float] = None,
         loop: Optional[asyncio.AbstractEventLoop] = None,
+        reset_buffer_before_write: bool = False,
     ) -> AsyncSerial:
         """
         Create an AsyncSerial instance.
@@ -29,25 +31,34 @@ class AsyncSerial:
             timeout: optional timeout in seconds
             write_timeout: optional write timeout in seconds
             loop: optional event loop. if None get_running_loop will be used
+            reset_buffer_before_write: reset the serial input buffer before
+             writing to it
         """
         loop = loop or asyncio.get_running_loop()
         executor = ThreadPoolExecutor(max_workers=1)
         serial = await loop.run_in_executor(
             executor=executor,
-            func=lambda: serial_for_url(
+            func=partial(
+                serial_for_url,
                 url=port,
                 baudrate=baud_rate,
                 timeout=timeout,
                 write_timeout=write_timeout,
             ),
         )
-        return cls(serial=serial, executor=executor, loop=loop)
+        return cls(
+            serial=serial,
+            executor=executor,
+            loop=loop,
+            reset_buffer_before_write=reset_buffer_before_write,
+        )
 
     def __init__(
         self,
         serial: Serial,
         executor: ThreadPoolExecutor,
         loop: asyncio.AbstractEventLoop,
+        reset_buffer_before_write: bool,
     ) -> None:
         """
         Constructor
@@ -60,6 +71,7 @@ class AsyncSerial:
         self._serial = serial
         self._executor = executor
         self._loop = loop
+        self._reset_buffer_before_write = reset_buffer_before_write
 
     async def read_until(self, match: bytes, timeout: Optional[float] = None) -> bytes:
         """
@@ -75,7 +87,8 @@ class AsyncSerial:
         """
         with self._timeout_override("timeout", timeout):
             return await self._loop.run_in_executor(
-                executor=self._executor, func=lambda: self._serial.read_until(match)
+                executor=self._executor,
+                func=partial(self._serial.read_until, expected=match),
             )
 
     async def write(self, data: bytes, timeout: Optional[float] = None) -> None:
@@ -107,7 +120,8 @@ class AsyncSerial:
             None
         """
         with self._timeout_override("write_timeout", timeout):
-            self._serial.reset_input_buffer()
+            if self._reset_buffer_before_write:
+                self._serial.reset_input_buffer()
             self._serial.write(data=data)
 
     async def open(self) -> None:
@@ -136,10 +150,12 @@ class AsyncSerial:
 
         Returns: boolean
         """
-        return self._serial.is_open
+        return self._serial.is_open is True
 
     @contextlib.contextmanager
-    def _timeout_override(self, timeout_property: str, timeout: Optional[float]):
+    def _timeout_override(
+        self, timeout_property: str, timeout: Optional[float]
+    ) -> Generator[None, None, None]:
         """Context manager that will temporarily override the default timeout."""
         default_timeout = getattr(self._serial, timeout_property)
         override = timeout is not None and default_timeout != timeout

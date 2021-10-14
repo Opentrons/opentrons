@@ -57,7 +57,6 @@ class AttachedModulesControl:
             usb_port=usb_port,
             which=model,
             simulating=self.api.is_simulator,
-            interrupt_callback=self.api.pause_with_message,
             loop=loop,
             execution_manager=self.api._execution_manager,
             sim_model=sim_model,

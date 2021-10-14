@@ -1,0 +1,11 @@
+{
+  "description": "Description",
+  "driver_version": "Driver Version",
+  "launch_realtek_adapter_drivers_site": "Launch Realtek Adapter Drivers Site",
+  "manufacturer": "Manufacturer",
+  "network_and_system_title": "Network & System",
+  "no_adapter_found": "No OT-2 USB-to-Ethernet adapter found",
+  "u2e_adapter_description": "Some OT-2's have an internal USB-to-Ethernet adapter. If your OT-2 uses this adapter, it will be added to your computer's device list when you make a wired connection. If you have a Realtek adapter, it is essential that the driver is up to date.",
+  "u2e_adapter_information": "USB-to-Ethernet Adapter Information",
+  "u2e_driver_update_alert": "Update available for Realtek USB-to-Ethernet adapter driver"
+}

@@ -6,7 +6,7 @@ from opentrons.drivers.types import Temperature, RPM, HeaterShakerPlateLockStatu
 class SimulatingDriver(AbstractHeaterShakerDriver):
     DEFAULT_TEMP = 23
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._plate_lock_state = HeaterShakerPlateLockStatus.IDLE_UNKNOWN
         self._current_temperature = self.DEFAULT_TEMP
         self._temperature = Temperature(current=self.DEFAULT_TEMP, target=None)

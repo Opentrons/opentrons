@@ -26,8 +26,6 @@ if TYPE_CHECKING:
 
 ThermocyclerStep = Dict[str, float]
 
-InterruptCallback = Callable[[str], None]
-
 UploadFunction = Callable[[str, str, Dict[str, Any]], Awaitable[Tuple[bool, str]]]
 
 LiveData = Mapping[str, Union[str, Mapping[str, Union[float, str, None]]]]

@@ -113,7 +113,6 @@ async def test_module_update_integration(monkeypatch, loop):
         usb_port=usb_port,
         which="tempdeck",
         simulating=True,
-        interrupt_callback=lambda x: None,
         loop=loop,
         execution_manager=ExecutionManager(loop=loop),
         sim_model="temperatureModuleV2",
@@ -144,7 +143,6 @@ async def test_module_update_integration(monkeypatch, loop):
         usb_port=usb_port,
         which="magdeck",
         simulating=True,
-        interrupt_callback=lambda x: None,
         loop=loop,
         execution_manager=ExecutionManager(loop=loop),
     )
@@ -161,7 +159,6 @@ async def test_module_update_integration(monkeypatch, loop):
         usb_port=usb_port,
         which="thermocycler",
         simulating=True,
-        interrupt_callback=lambda x: None,
         loop=loop,
         execution_manager=ExecutionManager(loop=loop),
     )

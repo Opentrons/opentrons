@@ -4,7 +4,7 @@ USB Simulating Driver.
 A class to convert info from the usb bus into a
 more readable format.
 """
-from typing import List, Set, Union
+from typing import List, Set
 
 from opentrons.hardware_control.modules.types import ModuleAtPort
 from opentrons.hardware_control.types import BoardRevision
@@ -16,7 +16,7 @@ from .types import USBPort
 class USBBusSimulator(USBDriverInterface):
     def __init__(self, board_revision: BoardRevision):
         self._usb_dev: List[USBPort] = self.read_usb_bus()
-        self._sorted: Set[Union[int, str]] = set()
+        self._sorted: Set[str] = set()
         self._board_revision = board_revision
 
     @staticmethod
@@ -59,7 +59,7 @@ class USBBusSimulator(USBDriverInterface):
         self._usb_dev = ports
 
     @property
-    def sorted_ports(self) -> Set:
+    def sorted_ports(self) -> Set[str]:
         """
         USBBus property: sorted_ports.
 
@@ -68,7 +68,7 @@ class USBBusSimulator(USBDriverInterface):
         return self._sorted
 
     @sorted_ports.setter
-    def sorted_ports(self, sorted: Set) -> None:
+    def sorted_ports(self, sorted: Set[str]) -> None:
         """
         USBBus setter: sorted_ports.
 

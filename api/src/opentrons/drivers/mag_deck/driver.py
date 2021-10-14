@@ -71,6 +71,7 @@ class MagDeckDriver(AbstractMagDeckDriver):
             timeout=DEFAULT_MAG_DECK_TIMEOUT,
             ack=MAG_DECK_ACK,
             loop=loop,
+            reset_buffer_before_write=False,
         )
         return cls(connection=connection)
 

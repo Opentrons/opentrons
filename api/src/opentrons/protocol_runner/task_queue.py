@@ -1,22 +1,23 @@
 """Asynchronous task queue to accomplish a protocol run."""
 import asyncio
-from enum import Enum
-from typing import Any, Awaitable, Callable, Dict, NamedTuple, Optional, Tuple
+import logging
+from functools import partial
+from typing import Any, Awaitable, Callable, Optional
+from typing_extensions import Protocol as Callback
 
 
-class TaskQueuePhase(str, Enum):
-    """Phase in which to run a given task."""
-
-    RUN = "run"
-    CLEANUP = "cleanup"
+log = logging.getLogger(__name__)
 
 
-class TaskQueueEntry(NamedTuple):
-    """An entry in the task queue."""
+class CleanupFunc(Callback):
+    """Expected cleanup function signature."""
 
-    func: Callable[..., Awaitable[Any]]
-    args: Tuple[Any, ...]
-    kwargs: Dict[str, Any]
+    def __call__(self, error: Optional[Exception]) -> Any:
+        """Cleanup, optionally taking an error thrown.
+
+        Return value will not be used.
+        """
+        ...
 
 
 class TaskQueue:
@@ -27,40 +28,36 @@ class TaskQueue:
 
     def __init__(self) -> None:
         """Initialize the TaskQueue."""
-        self._run_entry: Optional[TaskQueueEntry] = None
-        self._cleanup_entry: Optional[TaskQueueEntry] = None
+        self._run_func: Optional[Callable[[], Any]] = None
+        self._cleanup_func: Optional[CleanupFunc] = None
         self._run_task: Optional["asyncio.Task[None]"] = None
         self._run_started_event: asyncio.Event = asyncio.Event()
 
-    def add(
+    def set_run_func(
         self,
-        phase: TaskQueuePhase,
         func: Callable[..., Awaitable[Any]],
-        *args: Any,
         **kwargs: Any,
     ) -> None:
-        """Add a task to the queue.
+        """Add the protocol run task to the queue.
 
-        Two phases are available: TaskQueuePhase.RUN and TaskQueuePhase.CLEANUP.
-        Each phase may contain no tasks or one task. The RUN task will be run first,
-        if present, and the CLEANUP task will run second. The CLEANUP task will run
-        regardless of the success or failure of the RUN task.
+        The "run" task will be run first, before the "cleanup" task.
         """
-        entry = TaskQueueEntry(func=func, args=args, kwargs=kwargs)
+        self._run_func = partial(func, **kwargs)
 
-        if phase == TaskQueuePhase.RUN:
-            self._run_entry = entry
-        else:
-            self._cleanup_entry = entry
+    def set_cleanup_func(self, func: CleanupFunc) -> None:
+        """Add the run cleanup task to the queue.
 
-    def is_started(self) -> bool:
-        """Get whether the task queue has started running."""
-        return self._run_task is not None
+        The "cleanup" task will run after the "run" task, and will be passed
+        any exceptions raised by the "run" task.
+        """
+        self._cleanup_func = func
 
     def start(self) -> None:
         """Start running tasks in the queue."""
-        self._run_task = asyncio.create_task(self._run())
         self._run_started_event.set()
+
+        if self._run_task is None:
+            self._run_task = asyncio.create_task(self._run())
 
     async def join(self) -> None:
         """Wait for the background run task to complete, propagating errors."""
@@ -70,15 +67,19 @@ class TaskQueue:
             await self._run_task
 
     async def _run(self) -> None:
-        run_entry = self._run_entry
-        cleanup_entry = self._cleanup_entry
+        error = None
 
         try:
-            await self._run_task_entry(run_entry)
+            if self._run_func is not None:
+                await self._run_func()
+        except Exception as e:
+            error = e
         finally:
-            await self._run_task_entry(cleanup_entry)
-
-    @staticmethod
-    async def _run_task_entry(entry: Optional[TaskQueueEntry]) -> None:
-        if entry:
-            await entry.func(*entry.args, **entry.kwargs)
+            if self._cleanup_func is not None:
+                await self._cleanup_func(error=error)
+            elif error:
+                log.warning(
+                    "Exception raised during protocol run was not handled",
+                    exc_info=error,
+                )
+                raise error

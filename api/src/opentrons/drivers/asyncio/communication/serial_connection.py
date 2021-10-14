@@ -25,6 +25,7 @@ class SerialConnection:
         loop: Optional[asyncio.AbstractEventLoop] = None,
         error_keyword: Optional[str] = None,
         alarm_keyword: Optional[str] = None,
+        reset_buffer_before_write: bool = False,
     ) -> SerialConnection:
         """
         Create a connection.
@@ -43,11 +44,17 @@ class SerialConnection:
             alarm_keyword: optional string that will cause an
                            AlarmResponse exception when detected
                            (default: alarm)
+            reset_buffer_before_write: whether to reset the read buffer before
+              every write
 
         Returns: SerialConnection
         """
         serial = await AsyncSerial.create(
-            port=port, baud_rate=baud_rate, timeout=timeout, loop=loop
+            port=port,
+            baud_rate=baud_rate,
+            timeout=timeout,
+            loop=loop,
+            reset_buffer_before_write=reset_buffer_before_write,
         )
         name = name or port
         return cls(
