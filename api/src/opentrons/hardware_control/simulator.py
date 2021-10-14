@@ -353,13 +353,13 @@ class Simulator:
         mount_axis = Axis.by_mount(mount)
         plunger_axis = Axis.of_plunger(mount)
 
-        self._smoothie_driver.update_steps_per_mm(
+        await self._smoothie_driver.update_steps_per_mm(
             {plunger_axis.name: config["steps_per_mm"]}
         )
-        self._smoothie_driver.update_pipette_config(
+        await self._smoothie_driver.update_pipette_config(
             mount_axis.name, {"home": config["home_pos"]}
         )
-        self._smoothie_driver.update_pipette_config(
+        await self._smoothie_driver.update_pipette_config(
             plunger_axis.name, {"max_travel": config["max_travel"]}
         )
         self._smoothie_driver.set_dwelling_current(
