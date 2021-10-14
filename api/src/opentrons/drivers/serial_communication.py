@@ -1,12 +1,12 @@
-from typing import List, Optional, Generator
+from typing import List, Optional, Iterator
 
-import serial  # type: ignore
+import serial  # type: ignore[import]
 from serial import Serial
-from serial.tools import list_ports  # type: ignore
+from serial.tools import list_ports  # type: ignore[import]
 import contextlib
 import logging
 
-from serial.tools.list_ports_common import ListPortInfo  # type: ignore
+from serial.tools.list_ports_common import ListPortInfo  # type: ignore[import]
 
 log = logging.getLogger(__name__)
 
@@ -39,7 +39,7 @@ def get_port_by_VID(vid: str) -> Optional[ListPortInfo]:
 @contextlib.contextmanager
 def serial_with_temp_timeout(
     serial_connection: Serial, timeout: float
-) -> Generator[Serial, None, None]:
+) -> Iterator[Serial]:
     """Implements a temporary timeout for a serial connection"""
     saved_timeout = serial_connection.timeout
     if timeout is not None:

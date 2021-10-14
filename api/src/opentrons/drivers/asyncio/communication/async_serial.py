@@ -3,9 +3,10 @@ from __future__ import annotations
 import asyncio
 import contextlib
 from concurrent.futures.thread import ThreadPoolExecutor
+from functools import partial
 from typing import Optional, Generator
 
-from serial import Serial, serial_for_url  # type: ignore
+from serial import Serial, serial_for_url  # type: ignore[import]
 
 
 class AsyncSerial:
@@ -33,29 +34,17 @@ class AsyncSerial:
             reset_buffer_before_write: reset the serial input buffer before
              writing to it
         """
-
-        def _create_serial(
-            url: str,
-            baudrate: Optional[int],
-            rto: Optional[float],
-            wto: Optional[float],
-        ) -> Serial:
-            return serial_for_url(
-                url=url,
-                baudrate=baudrate,
-                timeout=rto,
-                write_timeout=wto,
-            )
-
         loop = loop or asyncio.get_running_loop()
         executor = ThreadPoolExecutor(max_workers=1)
         serial = await loop.run_in_executor(
-            executor,
-            _create_serial,
-            port,
-            baud_rate,
-            timeout,
-            write_timeout,
+            executor=executor,
+            func=partial(
+                serial_for_url,
+                url=port,
+                baudrate=baud_rate,
+                timeout=timeout,
+                write_timeout=write_timeout,
+            ),
         )
         return cls(
             serial=serial,
@@ -98,7 +87,8 @@ class AsyncSerial:
         """
         with self._timeout_override("timeout", timeout):
             return await self._loop.run_in_executor(
-                self._executor, self._serial.read_until, match
+                executor=self._executor,
+                func=partial(self._serial.read_until, expected=match),
             )
 
     async def write(self, data: bytes, timeout: Optional[float] = None) -> None:

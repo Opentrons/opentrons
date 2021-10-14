@@ -31,11 +31,11 @@ class SimulatingGPIOCharDev:
         self._board_rev = boardrev
 
     def _initialize(self) -> Dict[str, int]:
-        name_pin_num = (
-            (pin.name, pin.by_board_rev(self.board_rev)) for pin in gpio_group.pins
-        )
-        # Dict comprehension eliminating None values.
-        lines = {k: v for (k, v) in name_pin_num if v is not None}
+        lines: Dict[str, int] = {}
+        for pin in gpio_group.pins:
+            line = pin.by_board_rev(self.board_rev)
+            if line is not None:
+                lines[pin.name] = line
         self._initialize_values(list(lines.keys()))
         return lines
 

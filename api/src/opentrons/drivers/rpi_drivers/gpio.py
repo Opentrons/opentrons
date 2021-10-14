@@ -7,7 +7,7 @@ from opentrons.hardware_control.types import BoardRevision, DoorState
 from . import RevisionPinsError
 from .types import gpio_group, PinDir, GPIOPin
 
-import gpiod  # type: ignore
+import gpiod  # type: ignore[import]
 
 """
 Raspberry Pi GPIO control module
@@ -56,7 +56,7 @@ class GPIOCharDev:
 
         line = self.chip.get_line(offset)
 
-        def _retry_request_line(retries: int = 0):  # type: ignore
+        def _retry_request_line(retries: int = 0) -> gpiod.Line:
             try:
                 line.request(consumer=name, type=request_type, default_vals=[0])
             except OSError as e:
@@ -190,9 +190,9 @@ class GPIOCharDev:
         else:
             self.set_low(gpio_group.audio_enable)
 
-    def _read(self, input_pin: GPIOPin) -> int:
+    def _read(self, input_pin: GPIOPin) -> gpiod.Line:
         try:
-            return self.lines[input_pin.name].get_value()  # type: ignore
+            return self.lines[input_pin.name].get_value()
         except KeyError:
             raise RuntimeError(
                 f"GPIO {input_pin.name} is not registered and cannot" "be read"

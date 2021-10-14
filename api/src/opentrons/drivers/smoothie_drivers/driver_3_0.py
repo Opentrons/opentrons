@@ -13,7 +13,7 @@ import contextlib
 import logging
 from os import environ
 from time import time
-from typing import Any, Dict, Optional, Union, List, Tuple, cast, AsyncGenerator
+from typing import Any, Dict, Optional, Union, List, Tuple, cast, AsyncIterator
 
 from math import isclose
 
@@ -530,9 +530,7 @@ class SmoothieDriver:
         return self._steps_per_mm
 
     @contextlib.asynccontextmanager
-    async def restore_speed(
-        self, value: Union[float, str]
-    ) -> AsyncGenerator[None, None]:
+    async def restore_speed(self, value: Union[float, str]) -> AsyncIterator[None]:
         await self.set_speed(value, update=False)
         try:
             yield
@@ -564,7 +562,7 @@ class SmoothieDriver:
     @contextlib.asynccontextmanager
     async def restore_axis_max_speed(
         self, new_max_speeds: Dict[str, float]
-    ) -> AsyncGenerator[None, None]:
+    ) -> AsyncIterator[None]:
         await self.set_axis_max_speed(new_max_speeds, update=False)
         try:
             yield
@@ -1550,7 +1548,7 @@ class SmoothieDriver:
                 since_moved.get(ax) is None
                 or (
                     self._move_split_config.get(ax)
-                    and since_moved[ax]  # type: ignore
+                    and since_moved[ax]  # type: ignore[operator]
                     > self._move_split_config[ax].after_time
                 )
             )
@@ -1656,7 +1654,7 @@ class SmoothieDriver:
         self.push_active_current()
         self.set_active_current(
             {
-                ax: self._config.high_current["default"][ax]  # type: ignore
+                ax: self._config.high_current["default"][ax]  # type: ignore[misc]
                 for ax in axes
             }
         )
