@@ -1,3 +1,5 @@
+from typing import List
+
 import serial  # type: ignore
 from serial.tools import list_ports  # type: ignore
 import contextlib
@@ -14,7 +16,7 @@ class SerialNoResponse(Exception):
     pass
 
 
-def get_ports_by_name(device_name):
+def get_ports_by_name(device_name: str) -> List[serial.Serial]:
     """Returns all serial devices with a given name"""
     filtered_devices = filter(
         lambda device: device_name in device[1], list_ports.comports()
