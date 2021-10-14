@@ -7,9 +7,9 @@ from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.hardware_control.execution_manager import ExecutionManager
 from opentrons.hardware_control.poller import Reader, WaitableListener, Poller
 from opentrons.hardware_control.modules import mod_abc, types, update
-from opentrons.drivers.heatershaker.driver import HeaterShakerDriver
-from opentrons.drivers.heatershaker.abstract import AbstractHeaterShakerDriver
-from opentrons.drivers.heatershaker.simulator import SimulatingDriver
+from opentrons.drivers.heater_shaker.driver import HeaterShakerDriver
+from opentrons.drivers.heater_shaker.abstract import AbstractHeaterShakerDriver
+from opentrons.drivers.heater_shaker.simulator import SimulatingDriver
 from opentrons.drivers.types import Temperature, RPM, HeaterShakerPlateLockStatus
 
 log = logging.getLogger(__name__)
@@ -94,6 +94,7 @@ class HeaterShaker(mod_abc.AbstractModule):
 
     @classmethod
     def name(cls) -> str:
+        """Used for picking up serial port symlinks"""
         return "heatershaker"
 
     @staticmethod

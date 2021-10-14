@@ -7,7 +7,7 @@ from typing import Optional, Dict
 from opentrons.drivers import utils
 from opentrons.drivers.command_builder import CommandBuilder
 from opentrons.drivers.asyncio.communication import SerialConnection
-from opentrons.drivers.heatershaker.abstract import AbstractHeaterShakerDriver
+from opentrons.drivers.heater_shaker.abstract import AbstractHeaterShakerDriver
 from opentrons.drivers.types import Temperature, RPM, HeaterShakerPlateLockStatus
 
 
