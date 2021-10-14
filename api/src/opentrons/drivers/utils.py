@@ -99,8 +99,8 @@ def parse_plate_lock_status_response(status_string: str) -> HeaterShakerPlateLoc
     """Example format: STATUS:IDLE_OPEN"""
     status_vals = parse_key_values(status_string)
     try:
-        return getattr(HeaterShakerPlateLockStatus, status_vals["STATUS"])
-    except (KeyError, AttributeError):
+        return HeaterShakerPlateLockStatus[status_vals["STATUS"]]
+    except KeyError:
         raise ParseError(
             error_message="Unexpected argument to parse_plate_lock_status_response",
             parse_source=status_string,
