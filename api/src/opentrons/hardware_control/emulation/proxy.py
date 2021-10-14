@@ -35,11 +35,16 @@ class Proxy:
         Returns:
 
         """
-        log.info(f"starting {self._name} emulator server at {settings.host}:{settings.emulator_port}")
-        server = await asyncio.start_server(self.em_conn, settings.host, settings.emulator_port)
+        log.info(
+            f"starting {self._name} emulator server at "
+            f"{settings.host}:{settings.emulator_port}"
+        )
+        server = await asyncio.start_server(
+            self.em_conn, settings.host, settings.emulator_port
+        )
         await server.serve_forever()
 
-    async def _run_driver_server(self, settings:  ProxySettings) -> None:
+    async def _run_driver_server(self, settings: ProxySettings) -> None:
         """
 
         Args:
@@ -48,12 +53,17 @@ class Proxy:
         Returns:
 
         """
-        log.info(f"starting {self._name} driver server at {settings.host}:{settings.driver_port}")
-        server = await asyncio.start_server(self.driver_conn, settings.host, settings.driver_port)
+        log.info(
+            f"starting {self._name} driver server at "
+            f"{settings.host}:{settings.driver_port}"
+        )
+        server = await asyncio.start_server(
+            self.driver_conn, settings.host, settings.driver_port
+        )
         await server.serve_forever()
 
     async def em_conn(
-            self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter
+        self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter
     ) -> None:
         """
 
@@ -65,10 +75,15 @@ class Proxy:
 
         """
         log.info(f"{self._name} emulator connected.")
-        self._cons.append((reader, writer,))
+        self._cons.append(
+            (
+                reader,
+                writer,
+            )
+        )
 
     async def driver_conn(
-            self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter
+        self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter
     ) -> None:
         """
 
@@ -84,7 +99,9 @@ class Proxy:
         # Pop an emulator connection.
         r, w = self._cons.pop()
 
-        async def _read_from_driver(driver_in: asyncio.StreamReader, em_out: asyncio.StreamWriter) -> None:
+        async def _read_from_driver(
+            driver_in: asyncio.StreamReader, em_out: asyncio.StreamWriter
+        ) -> None:
             while True:
                 d = await driver_in.read(1)
                 if not d:
@@ -92,7 +109,9 @@ class Proxy:
                     break
                 em_out.write(d)
 
-        async def _read_from_em(em_in: asyncio.StreamReader, driver_out: asyncio.StreamWriter) -> None:
+        async def _read_from_em(
+            em_in: asyncio.StreamReader, driver_out: asyncio.StreamWriter
+        ) -> None:
             while True:
                 d = await em_in.read(1)
                 if not d:
