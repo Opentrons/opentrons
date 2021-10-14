@@ -15,7 +15,12 @@ npm install @opentrons/js-api-client
 ### Usage
 
 ```typescript
-import { HostConfig, Response, Health, getHealth } from '@opentrons/js-api-client'
+import {
+  HostConfig,
+  Response,
+  Health,
+  getHealth,
+} from '@opentrons/js-api-client'
 
 const host: HostConfig = { hostname: 'OT2CEP9999999A99.local' }
 
