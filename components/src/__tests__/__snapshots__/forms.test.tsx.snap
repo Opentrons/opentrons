@@ -307,6 +307,19 @@ exports[`RadioGroup renders correctly inline 1`] = `
   transform-origin: center;
 }
 
+.c1 {
+  color: #006fff;
+  width: 100%;
+}
+
+.c1.spin {
+  -webkit-animation: GLFYz 0.8s steps(8) infinite;
+  animation: GLFYz 0.8s steps(8) infinite;
+  -webkit-transform-origin: center;
+  -ms-transform-origin: center;
+  transform-origin: center;
+}
+
 <div
   className=""
 >
@@ -351,7 +364,7 @@ exports[`RadioGroup renders correctly inline 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="sc-fzozJi c0"
+        className="sc-fzozJi c1"
         fill="currentColor"
         version="1.1"
         viewBox="0 0 24 24"
@@ -425,6 +438,19 @@ exports[`RadioGroup renders correctly with checked value 1`] = `
   transform-origin: center;
 }
 
+.c1 {
+  color: #006fff;
+  width: 100%;
+}
+
+.c1.spin {
+  -webkit-animation: GLFYz 0.8s steps(8) infinite;
+  animation: GLFYz 0.8s steps(8) infinite;
+  -webkit-transform-origin: center;
+  -ms-transform-origin: center;
+  transform-origin: center;
+}
+
 <div
   className=""
 >
@@ -469,7 +495,7 @@ exports[`RadioGroup renders correctly with checked value 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="sc-fzozJi c0"
+        className="sc-fzozJi c1"
         fill="currentColor"
         version="1.1"
         viewBox="0 0 24 24"
