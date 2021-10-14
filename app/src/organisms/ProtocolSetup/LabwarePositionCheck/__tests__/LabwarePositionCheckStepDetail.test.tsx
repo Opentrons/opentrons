@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { screen } from '@testing-library/react'
-import { getPipetteNameSpecs } from '@opentrons/shared-data'
+import { getIsTiprack, getPipetteNameSpecs } from '@opentrons/shared-data'
 import {
   RobotWorkSpace,
   componentPropsMatcher,
@@ -32,6 +32,7 @@ jest.mock('@opentrons/shared-data', () => {
   return {
     ...actualSharedData,
     getPipetteNameSpecs: jest.fn(),
+    getIsTiprack: jest.fn(),
   }
 })
 jest.mock('../../../RunDetails/hooks')
@@ -46,6 +47,10 @@ const mockUseProtocolDetails = useProtocolDetails as jest.MockedFunction<
 const mockGetPipetteNameSpecs = getPipetteNameSpecs as jest.MockedFunction<
   typeof getPipetteNameSpecs
 >
+const mockGetIsTiprack = getIsTiprack as jest.MockedFunction<
+  typeof getIsTiprack
+>
+
 const mockRobotWorkSpace = RobotWorkSpace as jest.MockedFunction<
   typeof RobotWorkSpace
 >
@@ -127,6 +132,8 @@ describe('LabwarePositionCheckStepDetail', () => {
       .calledWith(PRIMARY_PIPETTE_NAME as any)
       .mockReturnValue({ channels: 1 } as any)
 
+    mockGetIsTiprack.mockReturnValue(false)
+
     when(mockRobotWorkSpace)
       .mockReturnValue(
         <div>mockRobotWorkSpace not being called with the correct props</div>
@@ -161,6 +168,8 @@ describe('LabwarePositionCheckStepDetail', () => {
     screen.getByAltText('level with labware')
   })
   it('renders the level with tip image', () => {
+    mockGetIsTiprack.mockReturnValue(true)
+
     when(mockUseProtocolDetails)
       .calledWith()
       .mockReturnValue({

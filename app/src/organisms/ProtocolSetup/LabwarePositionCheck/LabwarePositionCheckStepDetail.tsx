@@ -20,7 +20,7 @@ import {
   DIRECTION_COLUMN,
   SPACING_6,
 } from '@opentrons/components'
-import { getPipetteNameSpecs } from '@opentrons/shared-data'
+import { getIsTiprack, getPipetteNameSpecs } from '@opentrons/shared-data'
 import { useProtocolDetails } from '../../RunDetails/hooks'
 import { StepDetailText } from './StepDetailText'
 import levelWithTip from '../../../assets/images/lpc_level_with_tip.svg'
@@ -107,7 +107,7 @@ export const LabwarePositionCheckStepDetail = (
           )}
         </RobotWorkSpace>
         <Box width="40%" padding={SPACING_2} marginBottom={SPACING_6}>
-          {labwareDefId.includes('tiprack') ? (
+          {getIsTiprack(labwareDef) ? (
             <img src={levelWithTip} alt="level with tip" />
           ) : (
             <img src={levelWithLabware} alt="level with labware" />
