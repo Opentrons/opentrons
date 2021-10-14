@@ -14,10 +14,10 @@ import {
   WELL_LABEL_OPTIONS,
 } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
+import { JogControls } from '../../../../molecules/JogControls'
 import { useProtocolDetails } from '../../../RunDetails/hooks'
 import { LabwarePositionCheckStepDetail } from '../LabwarePositionCheckStepDetail'
 import { StepDetailText } from '../StepDetailText'
-import { JogControls } from '../../../../molecules/JogControls'
 
 jest.mock('@opentrons/components', () => {
   const actualComponents = jest.requireActual('@opentrons/components')
