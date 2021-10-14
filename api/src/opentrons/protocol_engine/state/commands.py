@@ -51,6 +51,9 @@ class CommandStore(HasState[CommandState], HandlesActions):
             self._state = replace(self._state, is_running=False)
 
         elif isinstance(action, StopAction):
+            # TODO(mc, 2021-10-12): handle `StopAction(error=Something)`
+            # - add errors to command state
+            # - allow StopAction to mark an in-progress command as failed
             self._state = replace(self._state, is_running=False, stop_requested=True)
 
 

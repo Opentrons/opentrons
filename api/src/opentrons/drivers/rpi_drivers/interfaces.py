@@ -29,11 +29,11 @@ class USBDriverInterface(Protocol):
         ...
 
     @property
-    def sorted_ports(self) -> Set:
+    def sorted_ports(self) -> Set[str]:
         ...
 
     @sorted_ports.setter
-    def sorted_ports(self, sorted: Set) -> None:
+    def sorted_ports(self, sorted: Set[str]) -> None:
         ...
 
     def read_usb_bus(self) -> List[USBPort]:

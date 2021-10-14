@@ -17,7 +17,7 @@ import {
   SPACING_4,
   FONT_SIZE_BODY_2,
 } from '@opentrons/components'
-import { PositionCheckNav } from './PositionCheckNav'
+import { SectionList } from './SectionList'
 import { DeckMap } from './DeckMap'
 import { useIntroInfo, useLabwareIdsBySection } from './hooks'
 
@@ -63,7 +63,7 @@ export const IntroScreen = (props: {
         }}
       ></Trans>
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_CENTER}>
-        <PositionCheckNav
+        <SectionList
           sections={sections}
           currentSection={currentSection}
           primaryPipetteMount={primaryPipetteMount}

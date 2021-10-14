@@ -142,7 +142,7 @@ class ThreadManager:
         if not object.__getattribute__(self, "managed_obj"):
             raise ThreadManagerException("Failed to create Managed Object")
 
-    async def managed_thread_ready_async(self):
+    async def managed_thread_ready_async(self) -> None:
         is_running = object.__getattribute__(self, "_is_running")
         while not is_running.is_set():
             await asyncio.sleep(0.1)

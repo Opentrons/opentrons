@@ -30,7 +30,6 @@ class MagDeck(mod_abc.AbstractModule):
         port: str,
         usb_port: USBPort,
         execution_manager: ExecutionManager,
-        interrupt_callback: types.InterruptCallback = None,
         simulating=False,
         loop: asyncio.AbstractEventLoop = None,
         sim_model: str = None,

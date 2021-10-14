@@ -54,7 +54,12 @@ from opentrons.hardware_control import (
     ThreadedAsyncLock,
 )
 from opentrons.hardware_control.types import Axis
-from opentrons.hardware_control.types import HardwareEventType, HardwareEvent, PauseType
+from opentrons.hardware_control.types import (
+    HardwareEvent,
+    PauseType,
+    DoorStateNotification,
+    ErrorMessageNotification,
+)
 from .models import Container, Instrument, Module
 from .dev_types import State, StateInfo, Message, LastCommand, Error, CommandShortId
 
@@ -496,6 +501,7 @@ class Session(RobotBusy):
                     self._hardware.home(axes=Axis.gantry_axes())
                     self._drop_tip_after_cancel(saved_tip_length)
                 self._hardware.stop(home_after=True)
+
             except asyncio.CancelledError:
                 pass
         self.set_state("stopped")
@@ -567,11 +573,16 @@ class Session(RobotBusy):
             self._event_watcher = None
 
     def _handle_hardware_event(self, hw_event: HardwareEvent) -> None:
-        if hw_event.event == HardwareEventType.DOOR_SWITCH_CHANGE:
+        if isinstance(hw_event, DoorStateNotification):
             self.door_state = str(hw_event.new_state)
             self.blocked = hw_event.blocking
             if self.blocked and self.state == "running":
                 self.pause("Robot door is open")
+            else:
+                self._on_state_changed()
+        elif isinstance(hw_event, ErrorMessageNotification):
+            if self.state == "running":
+                self.pause(hw_event.message)
             else:
                 self._on_state_changed()
 

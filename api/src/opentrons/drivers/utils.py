@@ -4,7 +4,12 @@ import time
 from typing import Dict, Optional, Mapping, Iterable, Sequence
 import re
 
-from opentrons.drivers.types import Temperature, PlateTemperature
+from opentrons.drivers.types import (
+    Temperature,
+    PlateTemperature,
+    RPM,
+    HeaterShakerPlateLockStatus,
+)
 
 log = logging.getLogger(__name__)
 
@@ -12,6 +17,7 @@ log = logging.getLogger(__name__)
 # to/from Temp-Deck
 TEMPDECK_GCODE_ROUNDING_PRECISION = 0
 TC_GCODE_ROUNDING_PRECISION = 2
+HS_GCODE_ROUNDING_PRECISION = 2
 
 
 KEY_VALUE_REGEX = re.compile(r"((?P<key>\S+):(?P<value>\S+))")
@@ -43,19 +49,61 @@ def parse_string_value_from_substring(substring: str) -> str:
 
 
 def parse_temperature_response(
-    temperature_string: str, rounding_val: int
+    temperature_string: str, rounding_val: int, zero_target_is_unset: bool = False
 ) -> Temperature:
-    """Example input: "T:none C:25"""
+    """Parse a standard temperature response from a module
+
+    temperature_string: The string from the module after decoding
+    rounding_val: A value to round to
+    zero_target_is_unset: Whether or not to treat a 0 target temperature
+    as indicating that the module is regulating around the target temperature
+    0C (which the tempdeck and thermocycler are capable of) or that the module
+    does not currently have a target temperature set and is not regulating
+    (as the heater/shaker does - it has a resistive heater rather than a
+    thermoelectric cooler, and therefore cannot regulate on a temperature below
+    ambient).
+
+    Example input: "T:none C:25"""
     data = parse_key_values(temperature_string)
     try:
-        return Temperature(
-            current=parse_number(data["C"], rounding_val),
-            target=parse_optional_number(data["T"], rounding_val),
-        )
+        target = parse_optional_number(data["T"], rounding_val)
+        if zero_target_is_unset and target == 0.0:
+            target = None
+        return Temperature(current=parse_number(data["C"], rounding_val), target=target)
     except KeyError:
         raise ParseError(
             error_message="Unexpected argument to parse_temperature_response",
             parse_source=temperature_string,
+        )
+
+
+def parse_rpm_response(rpm_string: str) -> RPM:
+    """Example input: T:1233 C:212"""
+    data = parse_key_values(rpm_string)
+    try:
+        target: Optional[int] = int(parse_number(data["T"], 0))
+        if target == 0:
+            target = None
+        return RPM(
+            current=int(parse_number(data["C"], 0)),
+            target=target,
+        )
+    except KeyError:
+        raise ParseError(
+            error_message="Unexpected argument to parse_rpm_response",
+            parse_source=rpm_string,
+        )
+
+
+def parse_plate_lock_status_response(status_string: str) -> HeaterShakerPlateLockStatus:
+    """Example format: STATUS:IDLE_OPEN"""
+    status_vals = parse_key_values(status_string)
+    try:
+        return getattr(HeaterShakerPlateLockStatus, status_vals["STATUS"])
+    except (KeyError, AttributeError):
+        raise ParseError(
+            error_message="Unexpected argument to parse_plate_lock_status_response",
+            parse_source=status_string,
         )
 
 
@@ -74,6 +122,22 @@ def parse_plate_temperature_response(
         raise ParseError(
             error_message="Unexpected argument to parse_plate_temperature_response",
             parse_source=temperature_string,
+        )
+
+
+def parse_hs_device_information(device_info_string: str) -> Dict[str, str]:
+    """Parse the device information block from a heater/shaker, which
+    has a slightly different set of keys for its entries
+    Example: "HW:A FW:21.2.1 SerialNo:TCA020B"
+    """
+    res = parse_key_values(device_info_string)
+    keymap = {"HW": "model", "FW": "version", "SerialNo": "serial"}
+    try:
+        return {keymap[key]: res[key] for key in keymap.keys()}
+    except KeyError as e:
+        raise ParseError(
+            error_message=f"Missing key '{str(e)} in parse_hs_device_information",
+            parse_source=device_info_string,
         )
 
 

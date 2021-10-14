@@ -1,4 +1,6 @@
 import pytest
+from mock import AsyncMock
+from opentrons.drivers.temp_deck import AbstractTempDeckDriver
 from opentrons.hardware_control import modules, ExecutionManager
 
 
@@ -22,7 +24,6 @@ async def test_sim_initialization(loop, usb_port):
         usb_port=usb_port,
         which="tempdeck",
         simulating=True,
-        interrupt_callback=lambda x: None,
         loop=loop,
         execution_manager=ExecutionManager(loop=loop),
     )
@@ -91,3 +92,20 @@ async def test_revision_model_parsing(loop, usb_port):
     assert mag.model() == "temperatureModuleV1"
     mag._device_info["model"] = "temp_deck_v1.1"
     assert mag.model() == "temperatureModuleV1"
+
+
+async def test_poll_error(loop, usb_port) -> None:
+    mock_driver = AsyncMock(spec=AbstractTempDeckDriver)
+    mock_driver.get_temperature.side_effect = ValueError("hello!")
+
+    magdeck = modules.TempDeck(
+        port="",
+        usb_port=usb_port,
+        execution_manager=AsyncMock(spec=ExecutionManager),
+        driver=mock_driver,
+        device_info={},
+        loop=loop,
+        polling_frequency=1,
+    )
+    with pytest.raises(ValueError, match="hello!"):
+        await magdeck.wait_next_poll()
