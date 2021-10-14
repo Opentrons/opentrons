@@ -6,11 +6,13 @@ on:
   pull_request:
     paths:
       - 'react-api-client/**'
+      - 'api-client/**'
       - 'package.json'
       - '.github/workflows/react-api-client-test.yaml'
   push:
     paths:
       - 'react-api-client/**'
+      - 'api-client/**'
       - 'package.json'
       - '.github/workflows/react-api-client-test.yaml'
     branches:
@@ -52,7 +54,7 @@ jobs:
           make setup-js
       - name: 'run react-api-client unit tests'
         run: |
-          yarn jest --coverage=true --ci=true --collectCoverageFrom="react-api-client/packages/**/*.(js|ts|tsx)" react-api-client/packages
+          yarn jest --coverage=true --ci=true --collectCoverageFrom="react-api-client/src/**/*.(js|ts|tsx)" react-api-client/src
       - name: 'Upload coverage report'
         uses: codecov/codecov-action@v2
         with:
