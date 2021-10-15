@@ -5,6 +5,13 @@ import {
   Module,
   RobotWorkSpace,
   C_SELECTED_DARK,
+  Flex,
+  Icon,
+  SIZE_1,
+  SPACING_2,
+  COLOR_SUCCESS,
+  Box,
+  C_WHITE,
 } from '@opentrons/components'
 import {
   THERMOCYCLER_MODULE_V1,
@@ -12,8 +19,8 @@ import {
 } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 import { useModuleRenderInfoById, useLabwareRenderInfoById } from '../hooks'
-
 import styles from '../styles.css'
+import { useIntroInfo } from './hooks'
 
 const DECK_MAP_VIEWBOX = '-80 -100 550 560'
 const DECK_LAYER_BLOCKLIST = [
@@ -28,12 +35,18 @@ const DECK_LAYER_BLOCKLIST = [
 
 interface DeckMapProps {
   labwareIdsToHighlight?: string[]
+  completedSections?: string[]
 }
 
-export const DeckMap = (props: DeckMapProps): JSX.Element => {
-  const { labwareIdsToHighlight } = props
+export const DeckMap = (props: DeckMapProps): JSX.Element | null => {
+  const { labwareIdsToHighlight, completedSections } = props
+  const introInfo = useIntroInfo()
   const moduleRenderInfoById = useModuleRenderInfoById()
   const labwareRenderInfoById = useLabwareRenderInfoById()
+  if (introInfo == null) return null
+  const { sections } = introInfo
+  if (sections == null) return null
+
   return (
     <RobotWorkSpace
       deckDef={standardDeckDef as any}
@@ -100,10 +113,42 @@ export const DeckMap = (props: DeckMapProps): JSX.Element => {
                         data-testid={`DeckMap_${labwareId}_highlight`}
                       />
                     )}
+                    </g>
+                    <g transform={`translate(${x},${y})`}>
+                    {completedSections?.includes(labwareId) === true && (
+                      <Icon
+                        name="check-circle"
+                        color={COLOR_SUCCESS}
+                        height='0.1rem'
+                        width='0.1rem'
+                      />
+                    )}
                   </g>
                 </React.Fragment>
               )
             })}
+            {/* / {sections.map((section, index) => {
+              const isCompleted =
+                completedSections != null && completedSections.includes(section)
+              console.log(isCompleted)
+              return (
+                <React.Fragment>
+                  <g transform={` scale(0.1 0.1) `}>
+                    {isCompleted ? (
+                      <Icon
+                        name="check-circle"
+                        color={COLOR_SUCCESS}
+                        // width={SIZE_1}
+                        // height={SIZE_1}
+                        // lineHeight={SIZE_1}
+                      />
+                    ) : (
+                      index + 1
+                    )}
+                  </g>
+                </React.Fragment>
+              )
+            })} */}
           </React.Fragment>
         )
       }}
