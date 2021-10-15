@@ -7,7 +7,7 @@ from typing import Callable, Union, cast
 from typing_extensions import Literal
 
 from opentrons import initialize as initialize_api
-from opentrons.config import feature_flags
+from opentrons.config import feature_flags, IS_ROBOT, ARCHITECTURE, SystemArchitecture
 from opentrons.util.helpers import utc_now
 from opentrons.hardware_control import API as HardwareAPI, ThreadManager
 from opentrons.hardware_control.simulator_setup import load_simulator
@@ -129,6 +129,15 @@ async def _initialize_hardware_api(app_state: AppState) -> None:
 
     _initialize_event_watchers(app_state, hardware_api)
     _hw_api.set_on(app_state, hardware_api)
+
+    if IS_ROBOT and ARCHITECTURE != SystemArchitecture.HOST:
+        try:
+            import systemd.daemon  # type: ignore
+
+            systemd.daemon.notify("READY=1")
+        except ImportError:
+            pass
+
     log.info("Opentrons hardware API initialized")
 
 

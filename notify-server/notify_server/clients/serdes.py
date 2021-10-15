@@ -33,7 +33,11 @@ def to_frames(topic: str, event: Event) -> List[bytes]:
         raise FrameEncodingError() from e
 
     return [
-        bytes(v, 'utf-8') for v in (topic, event_json,)
+        bytes(v, "utf-8")
+        for v in (
+            topic,
+            event_json,
+        )
     ]
 
 
@@ -55,8 +59,7 @@ def from_frames(frames: List[bytes]) -> TopicEvent:
     """
     try:
         return TopicEvent(
-            topic=frames[0].decode('utf-8'),
-            event=Event.parse_raw((frames[1]))
+            topic=frames[0].decode("utf-8"), event=Event.parse_raw((frames[1]))
         )
     except (ValueError, IndexError, AttributeError) as e:
         raise MalformedFrames() from e

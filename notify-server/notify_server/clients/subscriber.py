@@ -10,9 +10,7 @@ from notify_server.network.connection import create_subscriber, Connection
 log = logging.getLogger(__name__)
 
 
-def create(
-        host_address: str,
-        topics: typing.Sequence[str]) -> Subscriber:
+def create(host_address: str, topics: typing.Sequence[str]) -> Subscriber:
     """
     Create a subscriber.
 
@@ -26,8 +24,7 @@ def create(
 class Subscriber:
     """Async Subscriber class."""
 
-    def __init__(self,
-                 connection: Connection) -> None:
+    def __init__(self, connection: Connection) -> None:
         """Construct."""
         self._connection = connection
 
@@ -40,7 +37,7 @@ class Subscriber:
         s = await self._connection.recv_multipart()
         return from_frames(s)
 
-    def __aiter__(self) -> 'Subscriber':
+    def __aiter__(self) -> "Subscriber":
         """Create an async iterator."""
         return self
 

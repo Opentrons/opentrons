@@ -4,15 +4,13 @@ import logging
 import asyncio
 from asyncio import Queue
 
-from notify_server.network.connection import create_publisher, create_pull, \
-    Connection
+from notify_server.network.connection import create_publisher, create_pull, Connection
 from notify_server.settings import Settings
 
 log = logging.getLogger(__name__)
 
 
-async def _publisher_server_task(connection: Connection,
-                                 queue: Queue) -> None:
+async def _publisher_server_task(connection: Connection, queue: Queue) -> None:
     """
     Run a task that reads multipart messages: topic, data.
 
@@ -34,8 +32,7 @@ async def _publisher_server_task(connection: Connection,
         connection.close()
 
 
-async def _subscriber_server_task(connection: Connection,
-                                  queue: Queue) -> None:
+async def _subscriber_server_task(connection: Connection, queue: Queue) -> None:
     """
     Run a task that publishes messages to subscribers.
 
@@ -60,14 +57,12 @@ async def run(settings: Settings) -> None:
 
     subtask = asyncio.create_task(
         _subscriber_server_task(
-            create_publisher(settings.subscriber_address.connection_string()),
-            queue
+            create_publisher(settings.subscriber_address.connection_string()), queue
         )
     )
     pubtask = asyncio.create_task(
         _publisher_server_task(
-            create_pull(settings.publisher_address.connection_string()),
-            queue
+            create_pull(settings.publisher_address.connection_string()), queue
         )
     )
     await asyncio.gather(subtask, pubtask)
