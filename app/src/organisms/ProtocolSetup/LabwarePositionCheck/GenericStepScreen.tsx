@@ -27,11 +27,12 @@ export const GenericStepScreen = (
 ): JSX.Element | null => {
   const introInfo = useIntroInfo()
   const labwareIdsBySection = useLabwareIdsBySection()
-  //const [sectionIndex] = React.useState<number>(0)
-  const sectionIndex = 3
+  const [sectionIndex] = React.useState<number>(0)
+  //const sectionIndex = 1
   if (introInfo == null) return null
   const { sections, primaryPipetteMount, secondaryPipetteMount } = introInfo
   const labwareIdsToHighlight = labwareIdsBySection[sections[sectionIndex]]
+
   return (
     <Box margin={SPACING_3}>
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_CENTER}>
@@ -48,7 +49,7 @@ export const GenericStepScreen = (
           <Flex justifyContent={JUSTIFY_CENTER}>
             <DeckMap
               labwareIdsToHighlight={labwareIdsToHighlight}
-              completedSections={labwareIdsBySection[sections[sectionIndex -1]]}
+              completedLabwareIdSections ={labwareIdsBySection[sections[sectionIndex -1]]}
             />
           </Flex>
         </Flex>
