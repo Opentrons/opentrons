@@ -22,7 +22,6 @@ async def simulating_module(usb_port, loop):
         usb_port=usb_port,
         which="heatershaker",
         simulating=True,
-        interrupt_callback=lambda x: None,
         loop=loop,
         execution_manager=ExecutionManager(loop=loop),
     )

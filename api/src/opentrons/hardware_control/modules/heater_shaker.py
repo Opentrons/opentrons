@@ -1,7 +1,7 @@
 import asyncio
 import logging
 from dataclasses import dataclass
-from typing import Optional, Mapping
+from typing import Optional, Mapping, Callable
 from typing_extensions import Final
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.hardware_control.execution_manager import ExecutionManager
@@ -24,11 +24,9 @@ class HeaterShaker(mod_abc.AbstractModule):
         port: str,
         usb_port: USBPort,
         execution_manager: ExecutionManager,
-        interrupt_callback: types.InterruptCallback = None,
         simulating: bool = False,
         loop: asyncio.AbstractEventLoop = None,
         sim_model: str = None,
-        polling_period: float = None,
         **kwargs,
     ):
         """
@@ -38,12 +36,12 @@ class HeaterShaker(mod_abc.AbstractModule):
             port: The port to connect to
             usb_port: USB Port
             execution_manager: Execution manager.
-            interrupt_callback: Optional interrupt callback
             simulating: whether to build a simulating driver
             loop: Loop
             sim_model: The model name used by simulator
             polling_period: the polling period in seconds
-            kwargs: unused, passthrough to superclass
+            kwargs: further kwargs are in starargs because of inheritance rules.
+            possible values include polling_period: float, a time in seconds to poll
 
         Returns:
             HeaterShaker instance
@@ -60,7 +58,7 @@ class HeaterShaker(mod_abc.AbstractModule):
             driver=driver,
             device_info=await driver.get_device_info(),
             loop=loop,
-            polling_period=polling_period,
+            polling_period=kwargs.get("polling_period"),
         )
         return mod
 
@@ -409,7 +407,7 @@ class HeaterShakerListener(WaitableListener[PollResult]):
     def __init__(
         self,
         loop: Optional[asyncio.AbstractEventLoop] = None,
-        interrupt_callback: types.InterruptCallback = None,
+        interrupt_callback: Callable[[Exception], None] = None,
     ) -> None:
         """Constructor."""
         super().__init__(loop=loop)
@@ -431,4 +429,4 @@ class HeaterShakerListener(WaitableListener[PollResult]):
     def on_error(self, exc: Exception) -> None:
         """On error."""
         if self._callback:
-            self._callback(str(exc))
+            self._callback(exc)
