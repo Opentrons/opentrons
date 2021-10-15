@@ -7,9 +7,9 @@ class NodeId(int, Enum):
 
     broadcast = 0x00
     host = 0x10
-    pipette = 0x20,
-    gantry_x = 0x30,
-    gantry_y = 0x40,
+    pipette = 0x20
+    gantry_x = 0x30
+    gantry_y = 0x40
 
 
 class FunctionCode(int, Enum):
