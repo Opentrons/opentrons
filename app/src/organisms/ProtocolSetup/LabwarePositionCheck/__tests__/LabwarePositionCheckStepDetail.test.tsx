@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
-import { getPipetteNameSpecs } from '@opentrons/shared-data'
+import { screen } from '@testing-library/react'
+import { getIsTiprack, getPipetteNameSpecs } from '@opentrons/shared-data'
 import {
   RobotWorkSpace,
   componentPropsMatcher,
@@ -31,6 +32,7 @@ jest.mock('@opentrons/shared-data', () => {
   return {
     ...actualSharedData,
     getPipetteNameSpecs: jest.fn(),
+    getIsTiprack: jest.fn(),
   }
 })
 jest.mock('../../../RunDetails/hooks')
@@ -45,6 +47,10 @@ const mockUseProtocolDetails = useProtocolDetails as jest.MockedFunction<
 const mockGetPipetteNameSpecs = getPipetteNameSpecs as jest.MockedFunction<
   typeof getPipetteNameSpecs
 >
+const mockGetIsTiprack = getIsTiprack as jest.MockedFunction<
+  typeof getIsTiprack
+>
+
 const mockRobotWorkSpace = RobotWorkSpace as jest.MockedFunction<
   typeof RobotWorkSpace
 >
@@ -59,6 +65,7 @@ const PICKUP_TIP_LABWARE_ID = 'PICKUP_TIP_LABWARE_ID'
 const PRIMARY_PIPETTE_ID = 'PRIMARY_PIPETTE_ID'
 const PRIMARY_PIPETTE_NAME = 'PRIMARY_PIPETTE_NAME'
 const LABWARE_DEF_ID = 'LABWARE_DEF_ID'
+const TIPRACK_DEF_ID = 'tiprack_DEF_ID'
 const LABWARE_DEF = {
   ordering: [['A1', 'A2']],
 }
@@ -125,6 +132,8 @@ describe('LabwarePositionCheckStepDetail', () => {
       .calledWith(PRIMARY_PIPETTE_NAME as any)
       .mockReturnValue({ channels: 1 } as any)
 
+    mockGetIsTiprack.mockReturnValue(false)
+
     when(mockRobotWorkSpace)
       .mockReturnValue(
         <div>mockRobotWorkSpace not being called with the correct props</div>
@@ -154,6 +163,38 @@ describe('LabwarePositionCheckStepDetail', () => {
     const { getByText } = render(props)
     getByText('Mock Step Detail Text')
   })
+  it('renders the level with labware image', () => {
+    render(props)
+    screen.getByAltText('level with labware')
+  })
+  it('renders the level with tip image', () => {
+    mockGetIsTiprack.mockReturnValue(true)
+
+    when(mockUseProtocolDetails)
+      .calledWith()
+      .mockReturnValue({
+        protocolData: {
+          labware: {
+            [mockLabwarePositionCheckStepTipRack.labwareId]: {
+              slot: '1',
+              displayName: 'someDislpayName',
+              definitionId: TIPRACK_DEF_ID,
+            },
+          },
+          labwareDefinitions: {
+            [TIPRACK_DEF_ID]: LABWARE_DEF,
+          },
+          pipettes: {
+            [PRIMARY_PIPETTE_ID]: {
+              name: PRIMARY_PIPETTE_NAME,
+              mount: 'left',
+            },
+          },
+        },
+      } as any)
+    render(props)
+    screen.getByAltText('level with tip')
+  })
   it('renders a pipette', () => {
     when(mockPipetteRender)
       .calledWith(
@@ -167,7 +208,7 @@ describe('LabwarePositionCheckStepDetail', () => {
     getByText('mock pipette render')
   })
   describe('when pipette is multi channel', () => {
-    it('renders labware with with stroke, and highlighted labels outside', () => {
+    it('renders labware with stroke, and highlighted labels outside', () => {
       when(mockGetPipetteNameSpecs)
         .calledWith(PRIMARY_PIPETTE_NAME as any)
         .mockReturnValue({ channels: 8 } as any)
@@ -195,7 +236,7 @@ describe('LabwarePositionCheckStepDetail', () => {
     })
   })
   describe('when pipette is single channel', () => {
-    it('renders labware with with stroke, and highlighted labels outside', () => {
+    it('renders labware with stroke, and highlighted labels outside', () => {
       when(mockGetPipetteNameSpecs)
         .calledWith(PRIMARY_PIPETTE_NAME as any)
         .mockReturnValue({ channels: 1 } as any)

@@ -71,6 +71,7 @@ class ThermocyclerDriver(AbstractThermocyclerDriver):
             timeout=DEFAULT_TC_TIMEOUT,
             ack=TC_ACK,
             loop=loop,
+            reset_buffer_before_write=False,
         )
         return cls(connection=connection)
 

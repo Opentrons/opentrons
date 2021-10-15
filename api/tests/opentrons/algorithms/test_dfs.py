@@ -7,52 +7,46 @@ from pathlib import Path
 import pytest
 import json
 import os
-from typing import Any, Callable, List, Set, Tuple, Union
 
 from opentrons.algorithms import dfs, types
+from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
 
 
-def convert_to_vertex(graph_dict: dict, cast_type: Callable) -> List[types.GenericNode]:
-    """Convert to Vertex.
-
-    Helper function to convert a json file to a list of
-    generic nodes to help build the graph.
-    """
-    graph = []
-    for key, value in graph_dict.items():
-        vertex = types.GenericNode(name=cast_type(key), sub_names=value)
-        graph.append(vertex)
-    return graph
+@pytest.fixture
+def int_named_graph() -> dfs.DFS[int]:
+    """Integer named graph."""
+    path = Path(os.path.abspath(os.path.dirname(__file__)))
+    with (path / "fixture_numerical_graph.json").open() as f:
+        numbers = json.load(f)
+        return dfs.DFS([types.GenericNode[int](int(k), v) for k, v in numbers.items()])
 
 
-def load_graph() -> Tuple[
-    Tuple[List[types.GenericNode], str], Tuple[List[types.GenericNode], str]
-]:
-    """Load Graphs.
-
-    Helper function to load the test json graph files.
-    """
+@pytest.fixture
+def str_named_graph() -> dfs.DFS[str]:
+    """String named graph."""
     path = Path(os.path.abspath(os.path.dirname(__file__)))
     with (path / "fixture_alphabetical_graph.json").open() as f:
-        alphabet = convert_to_vertex(json.load(f), str)
-    with (path / "fixture_numerical_graph.json").open() as f:
-        numbers = convert_to_vertex(json.load(f), int)
-    return (alphabet, "string"), (numbers, "integer")
+        strings = json.load(f)
+        return dfs.DFS([types.GenericNode[str](k, v) for k, v in strings.items()])
 
 
-@pytest.fixture(scope="session", params=load_graph())
-def dfs_graph(request: Any) -> Tuple[dfs.DFS, str]:
-    """Build DFS class.
-
-    Fixture that sets up a dfs class for either an
-    alphabetical or numerical graph.
-    """
-    graph = request.param[0]
-    _type = request.param[1]
-    return dfs.DFS(graph), _type
-
-
-def test_vertices(dfs_graph: Tuple[dfs.DFS, str]) -> None:
+@pytest.mark.parametrize(
+    argnames=["subject", "additional_vertex"],
+    argvalues=[
+        [
+            lazy_fixture("int_named_graph"),
+            types.GenericNode(name=12, sub_names=[1, 9, 5]),
+        ],
+        [
+            lazy_fixture("str_named_graph"),
+            types.GenericNode(name="K", sub_names=["H", "J", "A"]),
+        ],
+    ],
+)
+def test_vertices(
+    subject: dfs.DFS[types.VertexName],
+    additional_vertex: types.GenericNode[types.VertexName],
+) -> None:
     """Test vertices.
 
     Test adding and removing the vertices of a graph.
@@ -60,40 +54,27 @@ def test_vertices(dfs_graph: Tuple[dfs.DFS, str]) -> None:
     Here we should check for the new vertice in the lookup
     table of the graph as well as the sorted graph attribute.
     """
-    _dfs, _type = dfs_graph
-    graph = _dfs.graph
-    additional_vertex: Union[types.GenericNode[str], types.GenericNode[int]]
-    if _type == "string":
-        additional_vertex = types.GenericNode(name="K", sub_names=["H", "J", "A"])
-    else:
-        additional_vertex = types.GenericNode(name=12, sub_names=[1, 9, 5])
+    graph = subject.graph
     graph.add_vertex(additional_vertex)
     vertex_obj = graph.get_vertex(additional_vertex.name)
     assert additional_vertex.name in graph._lookup_table.keys()
     assert vertex_obj in graph._sorted_graph
     graph.remove_vertex(additional_vertex)
-    assert additional_vertex not in graph._lookup_table.keys()
+    assert additional_vertex.name not in graph._lookup_table.keys()
     assert vertex_obj not in graph._sorted_graph
 
 
-def test_neighbors(dfs_graph: Tuple[dfs.DFS, str]) -> None:
+def test_neighbors_int(str_named_graph: dfs.DFS[str]) -> None:
     """Test neighbors.
 
     Test adding neighbors to a vertex.
     Neighbors act as keys for a given vertex.
     """
-    _dfs, _type = dfs_graph
-    graph = _dfs.graph
-    if _type == "string":
-        key: Union[str, int] = "A"
-        neighbor: Union[str, int] = "J"
-        og_neighbors: Union[List[str], List[int]] = ["B", "E"]
-        sorted_neighbors: Union[List[str], List[int]] = ["B", "E", "J"]
-    else:
-        key = 1
-        neighbor = 4
-        og_neighbors = [2, 5]
-        sorted_neighbors = [2, 4, 5]
+    graph = str_named_graph.graph
+    key = "A"
+    neighbor = "J"
+    og_neighbors = ["B", "E"]
+    sorted_neighbors = ["B", "E", "J"]
     vertex = graph.get_vertex(key)
     assert vertex.neighbors == og_neighbors
     vertex.add_neighbor(neighbor)
@@ -102,17 +83,42 @@ def test_neighbors(dfs_graph: Tuple[dfs.DFS, str]) -> None:
     assert vertex.neighbors == og_neighbors
 
 
-def test_depth_first_search(dfs_graph: Tuple[dfs.DFS, str]) -> None:
+def test_neighbors_str(int_named_graph: dfs.DFS[int]) -> None:
+    """Test neighbors.
+
+    Test adding neighbors to a vertex.
+    Neighbors act as keys for a given vertex.
+    """
+    graph = int_named_graph.graph
+    key = 1
+    neighbor = 4
+    og_neighbors = [2, 5]
+    sorted_neighbors = [2, 4, 5]
+    vertex = graph.get_vertex(key)
+    assert vertex.neighbors == og_neighbors
+    vertex.add_neighbor(neighbor)
+    assert vertex.neighbors == sorted_neighbors
+    vertex.remove_neighbor(neighbor)
+    assert vertex.neighbors == og_neighbors
+
+
+def test_depth_first_search_str(str_named_graph: dfs.DFS[str]) -> None:
     """Test the depth first search algorithm.
 
     The method should dig down into the bottom leaf node
     before backtracking up to find unvisited nodes.
     """
-    _dfs, _type = dfs_graph
-    visited_vertices = _dfs.dfs()
-    sort: Union[Set[str], Set[int]]
-    if _type == "string":
-        sort = {"A", "B", "F", "G", "C", "J", "I", "H", "D", "E"}
-    else:
-        sort = {1, 2, 6, 7, 3, 10, 9, 8, 4, 5}
+    visited_vertices = str_named_graph.dfs()
+    sort = {"A", "B", "F", "G", "C", "J", "I", "H", "D", "E"}
+    assert sort == visited_vertices
+
+
+def test_depth_first_search_int(int_named_graph: dfs.DFS[int]) -> None:
+    """Test the depth first search algorithm.
+
+    The method should dig down into the bottom leaf node
+    before backtracking up to find unvisited nodes.
+    """
+    visited_vertices = int_named_graph.dfs()
+    sort = {1, 2, 6, 7, 3, 10, 9, 8, 4, 5}
     assert sort == visited_vertices

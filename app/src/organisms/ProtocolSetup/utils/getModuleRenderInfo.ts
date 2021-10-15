@@ -1,4 +1,4 @@
-import find from 'lodash/find'
+import findKey from 'lodash/findKey'
 import reduce from 'lodash/reduce'
 import {
   DeckDefinition,
@@ -16,6 +16,7 @@ export interface ModuleRenderInfoById {
     z: number
     moduleDef: ModuleDefinition
     nestedLabwareDef: LabwareDefinition2 | null
+    nestedLabwareId: string | null
   }
 }
 
@@ -28,10 +29,12 @@ export const getModuleRenderInfo = (
       protocolData.modules,
       (acc, module, moduleId) => {
         const moduleDef = getModuleDef2(module.model)
-        const nestedLabware = find(
+        const nestedLabwareId = findKey(
           protocolData.labware,
           lw => lw.slot === moduleId
         )
+        const nestedLabware =
+          nestedLabwareId != null ? protocolData.labware[nestedLabwareId] : null
         const nestedLabwareDef =
           nestedLabware != null
             ? protocolData.labwareDefinitions[nestedLabware.definitionId]
@@ -56,13 +59,14 @@ export const getModuleRenderInfo = (
               z: 0,
               moduleDef,
               nestedLabwareDef,
+              nestedLabwareId,
             },
           }
         }
         const [x, y, z] = slotPosition
         return {
           ...acc,
-          [moduleId]: { x, y, z, moduleDef, nestedLabwareDef },
+          [moduleId]: { x, y, z, moduleDef, nestedLabwareDef, nestedLabwareId },
         }
       },
       {}

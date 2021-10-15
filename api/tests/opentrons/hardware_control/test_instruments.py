@@ -1,5 +1,5 @@
 import asyncio
-from unittest import mock
+import mock
 
 try:
     import aionotify
@@ -145,8 +145,8 @@ async def test_cache_instruments_sim(loop, dummy_instruments):
     sim = await hc.API.build_hardware_simulator(loop=loop)
     # With nothing specified at init or expected, we should have nothing
     # afterwards and nothing should have been reconfigured
-    sim._backend._smoothie_driver.update_steps_per_mm = mock.Mock(fake_func1)
-    sim._backend._smoothie_driver.update_pipette_config = mock.Mock(fake_func2)
+    sim._backend._smoothie_driver.update_steps_per_mm = mock.AsyncMock(fake_func1)
+    sim._backend._smoothie_driver.update_pipette_config = mock.AsyncMock(fake_func2)
     sim._backend._smoothie_driver.set_dwelling_current = mock.Mock(fake_func1)
 
     await sim.cache_instruments()

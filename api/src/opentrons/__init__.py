@@ -45,7 +45,7 @@ LEGACY_MODULES = ["robot", "reset", "instruments", "containers", "labware", "mod
 __all__ = ["version", "HERE", "config"]
 
 
-def __getattr__(attrname):
+def __getattr__(attrname: str) -> None:
     """
     Prevent import of legacy modules from global to officially
     deprecate Python API Version 1.0.
@@ -55,7 +55,7 @@ def __getattr__(attrname):
     raise AttributeError(attrname)
 
 
-def __dir__():
+def __dir__() -> List[str]:
     return sorted(__all__ + LEGACY_MODULES)
 
 
@@ -162,7 +162,7 @@ async def initialize() -> API:
     else:
         hardware = await _create_hardware_api()
 
-    async def _blink():
+    async def _blink() -> None:
         while True:
             await hardware.set_lights(button=True)
             await asyncio.sleep(0.5)

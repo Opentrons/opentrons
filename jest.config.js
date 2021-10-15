@@ -18,10 +18,10 @@ module.exports = {
       '@opentrons/components/src/__mocks__/file.js',
   },
   modulePathIgnorePatterns: [
-    '/shared-data/python/.*',
-    '/api/.*',
-    '/robot-server/.*',
-    '/update-server/.*',
+    '<rootDir>/shared-data/python/.*',
+    '<rootDir>/api/.*',
+    '<rootDir>/robot-server/.*',
+    '<rootDir>/update-server/.*',
   ],
   transformIgnorePatterns: ['/node_modules/(?!@opentrons/)'],
   collectCoverageFrom: [
