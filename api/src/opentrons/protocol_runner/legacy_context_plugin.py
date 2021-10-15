@@ -120,7 +120,7 @@ class LegacyContextPlugin(AbstractPlugin):
 
     def _dispatch_legacy_command(self, command: LegacyCommand) -> None:
         pe_command = self._legacy_command_mapper.map_command(command=command)
-        self.dispatch(pe_actions.UpdateCommandAction(command=pe_command))
+        self.dispatch(pe_actions.CommandUpdatedAction(command=pe_command))
 
     def _dispatch_labware_loaded(
         self, labware_load_info: LegacyLabwareLoadInfo
@@ -128,7 +128,7 @@ class LegacyContextPlugin(AbstractPlugin):
         pe_command = self._legacy_command_mapper.map_labware_load(
             labware_load_info=labware_load_info
         )
-        self.dispatch(pe_actions.UpdateCommandAction(command=pe_command))
+        self.dispatch(pe_actions.CommandUpdatedAction(command=pe_command))
 
     def _dispatch_instrument_loaded(
         self, instrument_load_info: LegacyInstrumentLoadInfo
@@ -136,4 +136,4 @@ class LegacyContextPlugin(AbstractPlugin):
         pe_command = self._legacy_command_mapper.map_instrument_load(
             instrument_load_info=instrument_load_info
         )
-        self.dispatch(pe_actions.UpdateCommandAction(command=pe_command))
+        self.dispatch(pe_actions.CommandUpdatedAction(command=pe_command))

@@ -171,7 +171,7 @@ def test_main_broker_messages(
     handler(legacy_command)
 
     decoy.verify(
-        action_dispatcher.dispatch(pe_actions.UpdateCommandAction(engine_command))
+        action_dispatcher.dispatch(pe_actions.CommandUpdatedAction(engine_command))
     )
 
 
@@ -214,7 +214,7 @@ def test_labware_load_broker_messages(
     handler(labware_load_info)
 
     decoy.verify(
-        action_dispatcher.dispatch(pe_actions.UpdateCommandAction(engine_command))
+        action_dispatcher.dispatch(pe_actions.CommandUpdatedAction(engine_command))
     )
 
 
@@ -256,5 +256,5 @@ def test_instrument_load_broker_messages(
     handler(instrument_load_info)
 
     decoy.verify(
-        action_dispatcher.dispatch(pe_actions.UpdateCommandAction(engine_command))
+        action_dispatcher.dispatch(pe_actions.CommandUpdatedAction(engine_command))
     )

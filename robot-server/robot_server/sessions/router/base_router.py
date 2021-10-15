@@ -11,6 +11,7 @@ from robot_server.errors import ErrorDetails, ErrorResponse
 from robot_server.service.dependencies import get_current_time, get_unique_id
 from robot_server.service.task_runner import TaskRunner
 from robot_server.service.json_api import (
+    RequestModel,
     ResponseModel,
     EmptyResponseModel,
     MultiResponseModel,
@@ -25,10 +26,10 @@ from robot_server.protocols import (
 
 from ..session_store import SessionStore, SessionNotFoundError
 from ..session_view import SessionView
-from ..session_models import Session, ProtocolSessionCreateData
-from ..schema_models import CreateSessionRequest, SessionResponse
+from ..session_models import Session, SessionCreateData, ProtocolSessionCreateData
 from ..engine_store import EngineStore, EngineConflictError, EngineMissingError
 from ..dependencies import get_session_store, get_engine_store
+
 
 base_router = APIRouter()
 
@@ -64,16 +65,14 @@ class SessionRunning(ErrorDetails):
     summary="Create a session",
     description="Create a new session to track robot interaction.",
     status_code=status.HTTP_201_CREATED,
-    # TODO(mc, 2021-06-23): mypy >= 0.780 broke Unions as `response_model`
-    # see https://github.com/tiangolo/fastapi/issues/2279
-    response_model=SessionResponse,  # type: ignore[arg-type]
+    response_model=ResponseModel[Session],
     responses={
         status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[ProtocolNotFound]},
         status.HTTP_409_CONFLICT: {"model": ErrorResponse[SessionAlreadyActive]},
     },
 )
 async def create_session(
-    request_body: Optional[CreateSessionRequest] = None,
+    request_body: Optional[RequestModel[SessionCreateData]] = None,
     session_view: SessionView = Depends(SessionView),
     session_store: SessionStore = Depends(get_session_store),
     engine_store: EngineStore = Depends(get_engine_store),
@@ -129,6 +128,7 @@ async def create_session(
         commands=engine_store.engine.state_view.commands.get_all(),
         pipettes=engine_store.engine.state_view.pipettes.get_all(),
         labware=engine_store.engine.state_view.labware.get_all(),
+        errors=engine_store.engine.state_view.errors.get_all(),
         engine_status=engine_store.engine.state_view.commands.get_status(),
     )
 
@@ -163,6 +163,7 @@ async def get_sessions(
             commands=engine_store.engine.state_view.commands.get_all(),
             pipettes=engine_store.engine.state_view.pipettes.get_all(),
             labware=engine_store.engine.state_view.labware.get_all(),
+            errors=engine_store.engine.state_view.errors.get_all(),
             engine_status=engine_store.engine.state_view.commands.get_status(),
         )
 
@@ -176,9 +177,7 @@ async def get_sessions(
     summary="Get a session",
     description="Get a specific session by its unique identifier.",
     status_code=status.HTTP_200_OK,
-    # TODO(mc, 2021-06-23): mypy >= 0.780 broke Unions as `response_model`
-    # see https://github.com/tiangolo/fastapi/issues/2279
-    response_model=SessionResponse,  # type: ignore[arg-type]
+    response_model=ResponseModel[Session],
     responses={status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[SessionNotFound]}},
 )
 async def get_session(
@@ -205,6 +204,7 @@ async def get_session(
         commands=engine_store.engine.state_view.commands.get_all(),
         pipettes=engine_store.engine.state_view.pipettes.get_all(),
         labware=engine_store.engine.state_view.labware.get_all(),
+        errors=engine_store.engine.state_view.errors.get_all(),
         engine_status=engine_store.engine.state_view.commands.get_status(),
     )
 

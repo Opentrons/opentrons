@@ -67,7 +67,7 @@ class BaseCommand(GenericModel, Generic[CommandDataT, CommandResultT]):
     # TODO(mc, 2021-06-08): model ProtocolEngine errors
     error: Optional[str] = Field(
         None,
-        description="Command execution failure, if failed",
+        description="Identifier of command execution failure, if failed",
     )
     startedAt: Optional[datetime] = Field(
         None,

@@ -18,7 +18,8 @@ from opentrons.protocol_engine.actions import (
     PlayAction,
     PauseAction,
     StopAction,
-    UpdateCommandAction,
+    StopErrorDetails,
+    CommandUpdatedAction,
 )
 
 
@@ -117,7 +118,7 @@ def test_add_command(
 
     assert result == queued_command
     decoy.verify(
-        action_dispatcher.dispatch(UpdateCommandAction(command=queued_command)),
+        action_dispatcher.dispatch(CommandUpdatedAction(command=queued_command)),
     )
 
 
@@ -177,7 +178,7 @@ async def test_execute_command(
     assert result == executed_command
 
     decoy.verify(
-        action_dispatcher.dispatch(UpdateCommandAction(command=queued_command)),
+        action_dispatcher.dispatch(CommandUpdatedAction(command=queued_command)),
         await state_store.wait_for(
             condition=state_store.commands.get_is_complete,
             command_id="command-id",
@@ -237,15 +238,28 @@ async def test_stop_with_error(
     action_dispatcher: ActionDispatcher,
     queue_worker: QueueWorker,
     hardware_api: HardwareAPI,
+    model_utils: ModelUtils,
     subject: ProtocolEngine,
 ) -> None:
     """It should be able to stop the engine."""
     error = RuntimeError("oh no")
+    completed_at = datetime(year=2021, month=1, day=1)
+
+    decoy.when(model_utils.get_timestamp()).then_return(completed_at)
+    decoy.when(model_utils.generate_id()).then_return("error-id")
 
     await subject.stop(error=error)
 
     decoy.verify(
-        action_dispatcher.dispatch(StopAction(error=error)),
+        action_dispatcher.dispatch(
+            StopAction(
+                error_details=StopErrorDetails(
+                    error=error,
+                    error_id="error-id",
+                    created_at=completed_at,
+                )
+            )
+        ),
         await queue_worker.join(),
         await hardware_api.stop(home_after=False),
     )

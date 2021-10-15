@@ -5,7 +5,16 @@ Actions are the driver of state changes in the ProtocolEngine.
 
 from .action_dispatcher import ActionDispatcher
 from .action_handler import ActionHandler
-from .actions import Action, PlayAction, PauseAction, StopAction, UpdateCommandAction
+
+from .actions import (
+    Action,
+    PlayAction,
+    PauseAction,
+    StopAction,
+    StopErrorDetails,
+    CommandUpdatedAction,
+    CommandFailedAction,
+)
 
 __all__ = [
     # action pipeline interface
@@ -17,5 +26,7 @@ __all__ = [
     "PlayAction",
     "PauseAction",
     "StopAction",
-    "UpdateCommandAction",
+    "StopErrorDetails",
+    "CommandUpdatedAction",
+    "CommandFailedAction",
 ]

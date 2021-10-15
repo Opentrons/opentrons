@@ -11,6 +11,7 @@ from opentrons.protocol_engine import (
     EngineStatus as SessionStatus,
     LoadedPipette,
     LoadedLabware,
+    ErrorOccurance,
 )
 from robot_server.service.json_api import ResourceModel
 from .action_models import SessionAction
@@ -63,6 +64,10 @@ class AbstractSession(ResourceModel):
     commands: List[SessionCommandSummary] = Field(
         ...,
         description="Protocol commands queued, running, or executed for the session.",
+    )
+    errors: List[ErrorOccurance] = Field(
+        ...,
+        description="Any errors that have occured during the run.",
     )
     pipettes: List[LoadedPipette] = Field(
         ...,

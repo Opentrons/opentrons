@@ -18,7 +18,7 @@ from .. import errors
 from ..resources import DeckFixedLabware
 from ..commands import Command, LoadLabwareResult, AddLabwareDefinitionResult
 from ..types import CalibrationOffset, LabwareLocation, LoadedLabware, Dimensions
-from ..actions import Action, UpdateCommandAction
+from ..actions import Action, CommandUpdatedAction
 from .abstract_store import HasState, HandlesActions
 
 
@@ -78,7 +78,7 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
 
     def handle_action(self, action: Action) -> None:
         """Modify state in reaction to an action."""
-        if isinstance(action, UpdateCommandAction):
+        if isinstance(action, CommandUpdatedAction):
             self._handle_command(action.command)
 
     def _handle_command(self, command: Command) -> None:

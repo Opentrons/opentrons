@@ -10,6 +10,7 @@ from opentrons.protocol_engine import (
     PipetteName,
     LoadedPipette,
     LoadedLabware,
+    ErrorOccurance,
     commands as pe_commands,
 )
 
@@ -113,6 +114,7 @@ current_time = datetime.now()
                 status=EngineStatus.READY_TO_RUN,
                 actions=[],
                 commands=[],
+                errors=[],
                 pipettes=[],
                 labware=[],
             ),
@@ -135,6 +137,7 @@ current_time = datetime.now()
                 commands=[],
                 pipettes=[],
                 labware=[],
+                errors=[],
             ),
         ),
     ),
@@ -150,6 +153,7 @@ def test_to_response(
         commands=[],
         pipettes=[],
         labware=[],
+        errors=[],
         engine_status=EngineStatus.READY_TO_RUN,
     )
     assert result == expected_response
@@ -185,6 +189,7 @@ def test_to_response_maps_commands() -> None:
     result = subject.as_response(
         session=session_resource,
         commands=[command_1, command_2],
+        errors=[],
         pipettes=[],
         labware=[],
         engine_status=EngineStatus.RUNNING,
@@ -207,6 +212,7 @@ def test_to_response_maps_commands() -> None:
                 status=CommandStatus.QUEUED,
             ),
         ],
+        errors=[],
         pipettes=[],
         labware=[],
     )
@@ -238,6 +244,7 @@ def test_to_response_adds_equipment() -> None:
     result = subject.as_response(
         session=session_resource,
         commands=[],
+        errors=[],
         pipettes=[pipette],
         labware=[labware],
         engine_status=EngineStatus.RUNNING,
@@ -249,8 +256,47 @@ def test_to_response_adds_equipment() -> None:
         status=EngineStatus.RUNNING,
         actions=[],
         commands=[],
+        errors=[],
         pipettes=[pipette],
         labware=[labware],
+    )
+
+
+def test_to_response_adds_errors() -> None:
+    """It should add ProtocolEngine errors to Session response model."""
+    session_resource = SessionResource(
+        session_id="session-id",
+        create_data=BasicSessionCreateData(),
+        created_at=datetime(year=2021, month=1, day=1),
+        actions=[],
+    )
+
+    error = ErrorOccurance(
+        id="error-id",
+        errorType="UnexpectedError",
+        createdAt=datetime(year=2022, month=2, day=2),
+        detail="An unexpected error occurred",
+    )
+
+    subject = SessionView()
+    result = subject.as_response(
+        session=session_resource,
+        commands=[],
+        errors=[error],
+        pipettes=[],
+        labware=[],
+        engine_status=EngineStatus.RUNNING,
+    )
+
+    assert result == BasicSession(
+        id="session-id",
+        createdAt=datetime(year=2021, month=1, day=1),
+        status=EngineStatus.RUNNING,
+        actions=[],
+        commands=[],
+        errors=[error],
+        pipettes=[],
+        labware=[],
     )
 
 

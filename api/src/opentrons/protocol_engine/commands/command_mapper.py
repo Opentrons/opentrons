@@ -1,6 +1,5 @@
 """Map command request and model types to other values."""
 from datetime import datetime
-from typing import Any
 
 from .command import CommandStatus
 from .command_unions import Command, CommandRequest
@@ -26,12 +25,3 @@ class CommandMapper:
             status=CommandStatus.QUEUED,
             data=request.data,  # type: ignore[arg-type]
         )
-
-    @staticmethod
-    def update_command(command: Command, **update: Any) -> Command:
-        """Map a Command to a new Command instance with updated field values.
-
-        This is a thin wrapper around `BaseModel.copy`, but it ensures that
-        all updates to commands happen immutably.
-        """
-        return command.copy(update=update)

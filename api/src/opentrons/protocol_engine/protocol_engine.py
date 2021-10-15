@@ -12,7 +12,8 @@ from .actions import (
     PlayAction,
     PauseAction,
     StopAction,
-    UpdateCommandAction,
+    StopErrorDetails,
+    CommandUpdatedAction,
 )
 
 
@@ -100,7 +101,7 @@ class ProtocolEngine:
             command_id=self._model_utils.generate_id(),
             created_at=self._model_utils.get_timestamp(),
         )
-        self._action_dispatcher.dispatch(UpdateCommandAction(command=command))
+        self._action_dispatcher.dispatch(CommandUpdatedAction(command=command))
 
         return command
 
@@ -159,7 +160,17 @@ class ProtocolEngine:
         Arguments:
             error: An error that caused the stop, if applicable.
         """
-        self._action_dispatcher.dispatch(StopAction(error=error))
+        error_details = (
+            None
+            if error is None
+            else StopErrorDetails(
+                error=error,
+                error_id=self._model_utils.generate_id(),
+                created_at=self._model_utils.get_timestamp(),
+            )
+        )
+
+        self._action_dispatcher.dispatch(StopAction(error_details=error_details))
 
         try:
             await self._queue_worker.join()

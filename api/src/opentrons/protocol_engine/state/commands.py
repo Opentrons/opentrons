@@ -4,10 +4,18 @@ from collections import OrderedDict
 from dataclasses import dataclass, replace
 from typing import List, Optional, Union
 
-from ..actions import Action, UpdateCommandAction, PlayAction, PauseAction, StopAction
 from ..commands import Command, CommandStatus
 from ..errors import CommandDoesNotExistError, ProtocolEngineStoppedError
 from ..types import EngineStatus
+from ..actions import (
+    Action,
+    CommandUpdatedAction,
+    CommandFailedAction,
+    PlayAction,
+    PauseAction,
+    StopAction,
+)
+
 from .abstract_store import HasState, HandlesActions
 
 
@@ -34,14 +42,26 @@ class CommandStore(HasState[CommandState], HandlesActions):
             commands_by_id=OrderedDict(),
         )
 
-    def handle_action(self, action: Action) -> None:
+    def handle_action(self, action: Action) -> None:  # noqa: C901
         """Modify state in reaction to an action."""
-        if isinstance(action, UpdateCommandAction):
-            command = action.command
-            commands_by_id = self._state.commands_by_id.copy()
-            commands_by_id.update({command.id: command})
+        if isinstance(action, CommandUpdatedAction):
+            self._state = _update_command(self._state, action.command)
 
-            self._state = replace(self._state, commands_by_id=commands_by_id)
+        elif isinstance(action, CommandFailedAction):
+            command_id = action.command_id
+            completed_at = action.completed_at
+            error_id = action.error_id
+            prev_command = self._state.commands_by_id.get(command_id)
+
+            if prev_command is not None:
+                next_command = prev_command.copy(
+                    update={
+                        "status": CommandStatus.FAILED,
+                        "completedAt": completed_at,
+                        "error": error_id,
+                    }
+                )
+                self._state = _update_command(self._state, next_command)
 
         elif isinstance(action, PlayAction):
             if not self._state.stop_requested:
@@ -51,10 +71,25 @@ class CommandStore(HasState[CommandState], HandlesActions):
             self._state = replace(self._state, is_running=False)
 
         elif isinstance(action, StopAction):
-            # TODO(mc, 2021-10-12): handle `StopAction(error=Something)`
-            # - add errors to command state
-            # - allow StopAction to mark an in-progress command as failed
-            self._state = replace(self._state, is_running=False, stop_requested=True)
+            commands_by_id = self._state.commands_by_id.copy()
+
+            if action.error_details is not None:
+                error_id = action.error_details.error_id
+                completed_at = action.error_details.created_at
+
+                for command_id, command in commands_by_id.items():
+                    if command.status == CommandStatus.RUNNING:
+                        updated_command = command.copy(
+                            update={"error": error_id, "completedAt": completed_at}
+                        )
+                        commands_by_id[command_id] = updated_command
+
+            self._state = replace(
+                self._state,
+                is_running=False,
+                stop_requested=True,
+                commands_by_id=commands_by_id,
+            )
 
 
 class CommandView(HasState[CommandState]):
@@ -202,3 +237,11 @@ class CommandView(HasState[CommandState]):
 
         else:
             return EngineStatus.RUNNING
+
+
+def _update_command(state: CommandState, command: Command) -> CommandState:
+    """Immutably update a Command in the CommandState."""
+    commands_by_id = state.commands_by_id.copy()
+    commands_by_id.update({command.id: command})
+
+    return replace(state, commands_by_id=commands_by_id)

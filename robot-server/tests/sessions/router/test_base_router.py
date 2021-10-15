@@ -7,7 +7,11 @@ from fastapi.testclient import TestClient
 from httpx import AsyncClient
 
 from opentrons.types import DeckSlotName, MountType
-from opentrons.protocol_engine import commands as pe_commands, types as pe_types
+from opentrons.protocol_engine import (
+    commands as pe_commands,
+    types as pe_types,
+    errors as pe_errors,
+)
 from opentrons.protocol_runner import JsonPreAnalysis
 
 from robot_server.service.task_runner import TaskRunner
@@ -80,6 +84,7 @@ async def test_create_session(
         status=pe_types.EngineStatus.READY_TO_RUN,
         actions=[],
         commands=[],
+        errors=[],
         pipettes=[],
         labware=[],
     )
@@ -87,6 +92,7 @@ async def test_create_session(
     decoy.when(engine_store.engine.state_view.commands.get_all()).then_return([])
     decoy.when(engine_store.engine.state_view.pipettes.get_all()).then_return([])
     decoy.when(engine_store.engine.state_view.labware.get_all()).then_return([])
+    decoy.when(engine_store.engine.state_view.errors.get_all()).then_return([])
     decoy.when(engine_store.engine.state_view.commands.get_status()).then_return(
         pe_types.EngineStatus.READY_TO_RUN
     )
@@ -105,6 +111,7 @@ async def test_create_session(
             commands=[],
             pipettes=[],
             labware=[],
+            errors=[],
             engine_status=pe_types.EngineStatus.READY_TO_RUN,
         ),
     ).then_return(expected_response)
@@ -157,6 +164,7 @@ async def test_create_protocol_session(
         commands=[],
         pipettes=[],
         labware=[],
+        errors=[],
     )
 
     decoy.when(protocol_store.get(protocol_id="protocol-id")).then_return(
@@ -176,6 +184,7 @@ async def test_create_protocol_session(
     decoy.when(engine_store.engine.state_view.commands.get_all()).then_return([])
     decoy.when(engine_store.engine.state_view.pipettes.get_all()).then_return([])
     decoy.when(engine_store.engine.state_view.labware.get_all()).then_return([])
+    decoy.when(engine_store.engine.state_view.errors.get_all()).then_return([])
     decoy.when(engine_store.engine.state_view.commands.get_status()).then_return(
         pe_types.EngineStatus.READY_TO_RUN
     )
@@ -186,6 +195,7 @@ async def test_create_protocol_session(
             commands=[],
             pipettes=[],
             labware=[],
+            errors=[],
             engine_status=pe_types.EngineStatus.READY_TO_RUN,
         ),
     ).then_return(expected_response)
@@ -314,6 +324,13 @@ def test_get_session(
         mount=MountType.LEFT,
     )
 
+    error = pe_errors.ErrorOccurance(
+        id="error-id",
+        errorType="UnexpectedError",
+        createdAt=datetime(year=2022, month=2, day=2),
+        detail="An unexpected error occurred",
+    )
+
     expected_response = BasicSession(
         id="session-id",
         createdAt=created_at,
@@ -328,11 +345,13 @@ def test_get_session(
         ],
         pipettes=[pipette],
         labware=[labware],
+        errors=[error],
     )
 
     decoy.when(session_store.get(session_id="session-id")).then_return(session)
 
     decoy.when(engine_store.engine.state_view.commands.get_all()).then_return([command])
+    decoy.when(engine_store.engine.state_view.errors.get_all()).then_return([error])
     decoy.when(engine_store.engine.state_view.pipettes.get_all()).then_return([pipette])
     decoy.when(engine_store.engine.state_view.labware.get_all()).then_return([labware])
     decoy.when(engine_store.engine.state_view.commands.get_status()).then_return(
@@ -345,6 +364,7 @@ def test_get_session(
             commands=[command],
             pipettes=[pipette],
             labware=[labware],
+            errors=[error],
             engine_status=pe_types.EngineStatus.READY_TO_RUN,
         ),
     ).then_return(expected_response)
@@ -410,6 +430,7 @@ def test_get_sessions_not_empty(
         status=pe_types.EngineStatus.SUCCEEDED,
         actions=[],
         commands=[],
+        errors=[],
         pipettes=[],
         labware=[],
     )
@@ -419,6 +440,7 @@ def test_get_sessions_not_empty(
     decoy.when(engine_store.engine.state_view.commands.get_all()).then_return([])
     decoy.when(engine_store.engine.state_view.pipettes.get_all()).then_return([])
     decoy.when(engine_store.engine.state_view.labware.get_all()).then_return([])
+    decoy.when(engine_store.engine.state_view.errors.get_all()).then_return([])
     decoy.when(engine_store.engine.state_view.commands.get_status()).then_return(
         pe_types.EngineStatus.SUCCEEDED
     )
@@ -429,6 +451,7 @@ def test_get_sessions_not_empty(
             commands=[],
             pipettes=[],
             labware=[],
+            errors=[],
             engine_status=pe_types.EngineStatus.SUCCEEDED,
         ),
     ).then_return(response_1)

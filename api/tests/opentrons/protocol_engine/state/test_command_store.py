@@ -1,28 +1,32 @@
 """Tests for the command lifecycle state."""
 from collections import OrderedDict
+from datetime import datetime
 
 from opentrons.protocol_engine.state.commands import CommandState, CommandStore
 
 from opentrons.protocol_engine.actions import (
-    UpdateCommandAction,
+    CommandUpdatedAction,
+    CommandFailedAction,
     PlayAction,
     PauseAction,
     StopAction,
+    StopErrorDetails,
 )
 
 from .command_fixtures import (
     create_pending_command,
     create_running_command,
     create_completed_command,
+    create_failed_command,
 )
 
 
-def test_command_store_handles_command() -> None:
+def test_command_store_handles_command_updated() -> None:
     """It should add a command to the store."""
     command = create_pending_command(command_id="command-id")
 
     subject = CommandStore()
-    subject.handle_action(UpdateCommandAction(command=command))
+    subject.handle_action(CommandUpdatedAction(command=command))
 
     assert subject.state == CommandState(
         is_running=False,
@@ -39,8 +43,8 @@ def test_command_store_preserves_handle_order() -> None:
     command_c = create_completed_command(command_id="command-id-1")
 
     subject = CommandStore()
-    subject.handle_action(UpdateCommandAction(command=command_a))
-    subject.handle_action(UpdateCommandAction(command=command_b))
+    subject.handle_action(CommandUpdatedAction(command=command_a))
+    subject.handle_action(CommandUpdatedAction(command=command_b))
 
     assert subject.state == CommandState(
         is_running=False,
@@ -53,7 +57,7 @@ def test_command_store_preserves_handle_order() -> None:
         ),
     )
 
-    subject.handle_action(UpdateCommandAction(command=command_c))
+    subject.handle_action(CommandUpdatedAction(command=command_c))
     assert subject.state == CommandState(
         is_running=False,
         stop_requested=False,
@@ -64,6 +68,42 @@ def test_command_store_preserves_handle_order() -> None:
             ]
         ),
     )
+
+
+def test_command_store_handles_command_failure_updates() -> None:
+    """It should handle a command execution failure."""
+    command = create_running_command(command_id="command-id")
+    action = CommandFailedAction(
+        command_id="command-id",
+        error_id="error-id",
+        error=RuntimeError("oh no"),
+        completed_at=datetime(year=2022, month=2, day=2),
+    )
+
+    subject = CommandStore()
+    subject.handle_action(CommandUpdatedAction(command=command))
+    subject.handle_action(action)
+
+    assert subject.state.commands_by_id[command.id] == create_failed_command(
+        command_id="command-id",
+        completed_at=datetime(year=2022, month=2, day=2),
+        error="error-id",
+    )
+
+
+def test_command_store_handles_command_failure_update_no_command() -> None:
+    """It should handle be resliant to invalid CommandFailure actions."""
+    action = CommandFailedAction(
+        command_id="command-id",
+        error_id="error-id",
+        error=RuntimeError("oh no"),
+        completed_at=datetime(year=2022, month=2, day=2),
+    )
+
+    subject = CommandStore()
+    subject.handle_action(action)
+
+    assert subject.state.commands_by_id.get("command-id") is None
 
 
 def test_command_store_handles_play_action() -> None:
@@ -101,6 +141,47 @@ def test_command_store_handles_stop_action() -> None:
         is_running=False,
         stop_requested=True,
         commands_by_id=OrderedDict(),
+    )
+
+
+def test_command_store_handles_stop_with_error() -> None:
+    """It should stop and mark running command as failed on stop with error."""
+    completed_command = create_completed_command(command_id="command-id-1")
+    running_command = create_running_command(command_id="command-id-2")
+    queued_command = create_pending_command(command_id="command-id-3")
+
+    subject = CommandStore()
+    subject.handle_action(CommandUpdatedAction(command=completed_command))
+    subject.handle_action(CommandUpdatedAction(command=running_command))
+    subject.handle_action(CommandUpdatedAction(command=queued_command))
+
+    completed_at = datetime(year=2021, month=1, day=1)
+
+    subject.handle_action(
+        StopAction(
+            error_details=StopErrorDetails(
+                error=RuntimeError("oh no"),
+                error_id="error-id",
+                created_at=completed_at,
+            )
+        )
+    )
+
+    assert subject.state == CommandState(
+        is_running=False,
+        stop_requested=True,
+        commands_by_id=OrderedDict(
+            [
+                ("command-id-1", completed_command),
+                (
+                    "command-id-2",
+                    running_command.copy(
+                        update={"error": "error-id", "completedAt": completed_at}
+                    ),
+                ),
+                ("command-id-3", queued_command),
+            ]
+        ),
     )
 
 

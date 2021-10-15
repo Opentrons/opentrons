@@ -12,6 +12,7 @@ from ..actions import Action, ActionHandler
 from .abstract_store import HasState, HandlesActions
 from .change_notifier import ChangeNotifier
 from .commands import CommandState, CommandStore, CommandView
+from .errors import ErrorState, ErrorStore, ErrorView
 from .labware import LabwareState, LabwareStore, LabwareView
 from .pipettes import PipetteState, PipetteStore, PipetteView
 from .geometry import GeometryView
@@ -26,6 +27,7 @@ class State:
     """Underlying engine state."""
 
     commands: CommandState
+    errors: ErrorState
     labware: LabwareState
     pipettes: PipetteState
 
@@ -35,6 +37,7 @@ class StateView(HasState[State]):
 
     _state: State
     _commands: CommandView
+    _errors: ErrorView
     _labware: LabwareView
     _pipettes: PipetteView
     _geometry: GeometryView
@@ -44,6 +47,11 @@ class StateView(HasState[State]):
     def commands(self) -> CommandView:
         """Get state view selectors for commands state."""
         return self._commands
+
+    @property
+    def errors(self) -> ErrorView:
+        """Get state view selectors for errors state."""
+        return self._errors
 
     @property
     def labware(self) -> LabwareView:
@@ -90,6 +98,7 @@ class StateStore(StateView, ActionHandler):
             change_notifier: Internal state change notifier.
         """
         self._command_store = CommandStore()
+        self._error_store = ErrorStore()
         self._pipette_store = PipetteStore()
         self._labware_store = LabwareStore(
             deck_fixed_labware=deck_fixed_labware,
@@ -100,6 +109,7 @@ class StateStore(StateView, ActionHandler):
             self._command_store,
             self._pipette_store,
             self._labware_store,
+            self._error_store,
         ]
 
         self._change_notifier = change_notifier or ChangeNotifier()
@@ -153,6 +163,7 @@ class StateStore(StateView, ActionHandler):
         """Get a new instance of the state value object."""
         return State(
             commands=self._command_store.state,
+            errors=self._error_store.state,
             labware=self._labware_store.state,
             pipettes=self._pipette_store.state,
         )
@@ -164,6 +175,7 @@ class StateStore(StateView, ActionHandler):
         # Base states
         self._state = state
         self._commands = CommandView(state.commands)
+        self._errors = ErrorView(state.errors)
         self._labware = LabwareView(state.labware)
         self._pipettes = PipetteView(state.pipettes)
 
@@ -181,6 +193,7 @@ class StateStore(StateView, ActionHandler):
 
         self._state = state
         self._commands._state = state.commands
+        self._errors._state = state.errors
         self._labware._state = state.labware
         self._pipettes._state = state.pipettes
 

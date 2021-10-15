@@ -12,7 +12,7 @@ from opentrons.protocol_engine.types import (
     DeckSlotLocation,
     LoadedLabware,
 )
-from opentrons.protocol_engine.actions import UpdateCommandAction
+from opentrons.protocol_engine.actions import CommandUpdatedAction
 from opentrons.protocol_engine.state.labware import LabwareStore, LabwareState
 
 from .command_fixtures import create_load_labware_command, create_add_definition_command
@@ -88,7 +88,7 @@ def test_handles_load_labware(
         location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
     )
 
-    subject.handle_action(UpdateCommandAction(command=command))
+    subject.handle_action(CommandUpdatedAction(command=command))
 
     assert subject.state.labware_by_id["test-labware-id"] == expected_labware_data
 
@@ -111,6 +111,6 @@ def test_handles_add_labware_defintion(
         version=well_plate_def.version,
     )
 
-    subject.handle_action(UpdateCommandAction(command=command))
+    subject.handle_action(CommandUpdatedAction(command=command))
 
     assert subject.state.definitions_by_uri[expected_uri] == well_plate_def

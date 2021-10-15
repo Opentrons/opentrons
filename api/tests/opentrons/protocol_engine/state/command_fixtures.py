@@ -36,6 +36,7 @@ def create_running_command(
     command_id: str = "command-id",
     command_type: str = "command-type",
     data: Optional[BaseModel] = None,
+    started_at: Optional[datetime] = None,
 ) -> cmd.Command:
     """Given command data, build a running command model."""
     return cast(
@@ -43,6 +44,7 @@ def create_running_command(
         cmd.BaseCommand(
             id=command_id,
             createdAt=datetime(year=2021, month=1, day=1),
+            startedAt=started_at,
             commandType=command_type,
             status=cmd.CommandStatus.RUNNING,
             data=data or BaseModel(),
@@ -54,6 +56,8 @@ def create_failed_command(
     command_id: str = "command-id",
     command_type: str = "command-type",
     data: Optional[BaseModel] = None,
+    completed_at: Optional[datetime] = None,
+    error: Optional[str] = None,
 ) -> cmd.Command:
     """Given command data, build a failed command model."""
     return cast(
@@ -61,9 +65,11 @@ def create_failed_command(
         cmd.BaseCommand(
             id=command_id,
             createdAt=datetime(year=2021, month=1, day=1),
+            completedAt=completed_at,
             commandType=command_type,
             status=cmd.CommandStatus.FAILED,
             data=data or BaseModel(),
+            error=error,
         ),
     )
 
@@ -73,6 +79,7 @@ def create_completed_command(
     command_type: str = "command-type",
     data: Optional[BaseModel] = None,
     result: Optional[BaseModel] = None,
+    completed_at: Optional[datetime] = None,
 ) -> cmd.Command:
     """Given command data and result, build a completed command model."""
     return cast(
@@ -80,6 +87,7 @@ def create_completed_command(
         cmd.BaseCommand(
             id=command_id,
             createdAt=datetime(year=2021, month=1, day=1),
+            completedAt=completed_at,
             commandType=command_type,
             status=cmd.CommandStatus.SUCCEEDED,
             data=data or BaseModel(),

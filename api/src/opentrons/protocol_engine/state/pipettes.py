@@ -18,7 +18,7 @@ from ..commands import (
     PickUpTipResult,
     DropTipResult,
 )
-from ..actions import Action, UpdateCommandAction
+from ..actions import Action, CommandUpdatedAction
 from .abstract_store import HasState, HandlesActions
 
 
@@ -63,7 +63,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
 
     def handle_action(self, action: Action) -> None:
         """Modify state in reaction to an action."""
-        if isinstance(action, UpdateCommandAction):
+        if isinstance(action, CommandUpdatedAction):
             self._handle_command(action.command)
 
     def _handle_command(self, command: Command) -> None:

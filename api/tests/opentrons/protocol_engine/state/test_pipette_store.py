@@ -4,7 +4,7 @@ import pytest
 from opentrons.types import MountType
 from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine.types import PipetteName, LoadedPipette
-from opentrons.protocol_engine.actions import UpdateCommandAction
+from opentrons.protocol_engine.actions import CommandUpdatedAction
 from opentrons.protocol_engine.state.pipettes import (
     PipetteStore,
     PipetteState,
@@ -46,7 +46,7 @@ def test_handles_load_pipette(subject: PipetteStore) -> None:
         mount=MountType.LEFT,
     )
 
-    subject.handle_action(UpdateCommandAction(command=command))
+    subject.handle_action(CommandUpdatedAction(command=command))
 
     result = subject.state
 
@@ -70,12 +70,12 @@ def test_pipette_volume_adds_aspirate(subject: PipetteStore) -> None:
         volume=42,
     )
 
-    subject.handle_action(UpdateCommandAction(command=load_command))
-    subject.handle_action(UpdateCommandAction(command=aspirate_command))
+    subject.handle_action(CommandUpdatedAction(command=load_command))
+    subject.handle_action(CommandUpdatedAction(command=aspirate_command))
 
     assert subject.state.aspirated_volume_by_id["pipette-id"] == 42
 
-    subject.handle_action(UpdateCommandAction(command=aspirate_command))
+    subject.handle_action(CommandUpdatedAction(command=aspirate_command))
 
     assert subject.state.aspirated_volume_by_id["pipette-id"] == 84
 
@@ -96,17 +96,17 @@ def test_pipette_volume_subtracts_dispense(subject: PipetteStore) -> None:
         volume=21,
     )
 
-    subject.handle_action(UpdateCommandAction(command=load_command))
-    subject.handle_action(UpdateCommandAction(command=aspirate_command))
-    subject.handle_action(UpdateCommandAction(command=dispense_command))
+    subject.handle_action(CommandUpdatedAction(command=load_command))
+    subject.handle_action(CommandUpdatedAction(command=aspirate_command))
+    subject.handle_action(CommandUpdatedAction(command=dispense_command))
 
     assert subject.state.aspirated_volume_by_id["pipette-id"] == 21
 
-    subject.handle_action(UpdateCommandAction(command=dispense_command))
+    subject.handle_action(CommandUpdatedAction(command=dispense_command))
 
     assert subject.state.aspirated_volume_by_id["pipette-id"] == 0
 
-    subject.handle_action(UpdateCommandAction(command=dispense_command))
+    subject.handle_action(CommandUpdatedAction(command=dispense_command))
 
     assert subject.state.aspirated_volume_by_id["pipette-id"] == 0
 
@@ -190,7 +190,7 @@ def test_movement_commands_update_current_well(
         mount=MountType.LEFT,
     )
 
-    subject.handle_action(UpdateCommandAction(command=load_pipette_command))
-    subject.handle_action(UpdateCommandAction(command=command))
+    subject.handle_action(CommandUpdatedAction(command=load_pipette_command))
+    subject.handle_action(CommandUpdatedAction(command=command))
 
     assert subject.state.current_well == expected_location

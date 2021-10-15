@@ -65,6 +65,7 @@ async def test_get_session_commands() -> None:
             status=EngineStatus.RUNNING,
             actions=[],
             commands=[command_summary],
+            errors=[],
             pipettes=[],
             labware=[],
         )
