@@ -92,7 +92,7 @@ def test_command_store_handles_command_failure_updates() -> None:
 
 
 def test_command_store_handles_command_failure_update_no_command() -> None:
-    """It should handle be resliant to invalid CommandFailure actions."""
+    """It should survive invalid CommandFailure actions."""
     action = CommandFailedAction(
         command_id="command-id",
         error_id="error-id",

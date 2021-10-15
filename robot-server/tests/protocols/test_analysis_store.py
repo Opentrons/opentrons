@@ -4,7 +4,11 @@ from datetime import datetime
 from typing import List, NamedTuple, Sequence
 
 from opentrons.types import MountType, DeckSlotName
-from opentrons.protocol_engine import commands as pe_commands, types as pe_types
+from opentrons.protocol_engine import (
+    ErrorOccurance,
+    commands as pe_commands,
+    types as pe_types,
+)
 
 from robot_server.protocols.analysis_store import AnalysisStore
 from robot_server.protocols.analysis_models import (
@@ -33,7 +37,12 @@ def test_add_pending() -> None:
 def test_add_errored_analysis() -> None:
     """It should be able to add a failed analysis to the store."""
     subject = AnalysisStore()
-    error = RuntimeError("oh no!")
+    error = ErrorOccurance(
+        id="error-id",
+        createdAt=datetime(year=2021, month=1, day=1),
+        errorType="RuntimeError",
+        detail="oh no",
+    )
 
     result = subject.add_pending(protocol_id="protocol-id", analysis_id="analysis-id")
     subject.update(
@@ -50,7 +59,7 @@ def test_add_errored_analysis() -> None:
         CompletedAnalysis(
             id="analysis-id",
             result=AnalysisResult.ERROR,
-            errors=["oh no!"],
+            errors=[error],
             labware=[],
             pipettes=[],
             commands=[],

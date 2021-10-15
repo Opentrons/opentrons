@@ -145,6 +145,30 @@ async def test_execute(
         ),
     )
 
+    running_command = cast(
+        Command,
+        _TestCommand(
+            id="command-id",
+            createdAt=datetime(year=2021, month=1, day=1),
+            startedAt=datetime(year=2022, month=2, day=2),
+            status=CommandStatus.RUNNING,
+            data=command_data,
+        ),
+    )
+
+    completed_command = cast(
+        Command,
+        _TestCommand(
+            id="command-id",
+            createdAt=datetime(year=2021, month=1, day=1),
+            startedAt=datetime(year=2022, month=2, day=2),
+            completedAt=datetime(year=2023, month=3, day=3),
+            status=CommandStatus.SUCCEEDED,
+            data=command_data,
+            result=command_result,
+        ),
+    )
+
     decoy.when(state_store.commands.get(command_id="command-id")).then_return(
         queued_command
     )
@@ -171,35 +195,9 @@ async def test_execute(
 
     decoy.verify(
         action_dispatcher.dispatch(
-            CommandUpdatedAction(
-                command=cast(
-                    Command,
-                    _TestCommand(
-                        id="command-id",
-                        createdAt=datetime(year=2021, month=1, day=1),
-                        startedAt=datetime(year=2022, month=2, day=2),
-                        status=CommandStatus.RUNNING,
-                        data=command_data,
-                    ),
-                )
-            ),
+            CommandUpdatedAction(command=running_command),
         ),
-        action_dispatcher.dispatch(
-            CommandUpdatedAction(
-                command=cast(
-                    Command,
-                    _TestCommand(
-                        id="command-id",
-                        createdAt=datetime(year=2021, month=1, day=1),
-                        startedAt=datetime(year=2022, month=2, day=2),
-                        completedAt=datetime(year=2023, month=3, day=3),
-                        status=CommandStatus.SUCCEEDED,
-                        data=command_data,
-                        result=command_result,
-                    ),
-                )
-            )
-        ),
+        action_dispatcher.dispatch(CommandUpdatedAction(command=completed_command)),
     )
 
 
@@ -240,6 +238,17 @@ async def test_execute_raises_protocol_engine_error(
         ),
     )
 
+    running_command = cast(
+        Command,
+        _TestCommand(
+            id="command-id",
+            createdAt=datetime(year=2021, month=1, day=1),
+            startedAt=datetime(year=2022, month=2, day=2),
+            status=CommandStatus.RUNNING,
+            data=command_data,
+        ),
+    )
+
     decoy.when(state_store.commands.get(command_id="command-id")).then_return(
         queued_command
     )
@@ -266,20 +275,7 @@ async def test_execute_raises_protocol_engine_error(
     await subject.execute("command-id")
 
     decoy.verify(
-        action_dispatcher.dispatch(
-            CommandUpdatedAction(
-                command=cast(
-                    Command,
-                    _TestCommand(
-                        id="command-id",
-                        createdAt=datetime(year=2021, month=1, day=1),
-                        startedAt=datetime(year=2022, month=2, day=2),
-                        status=CommandStatus.RUNNING,
-                        data=command_data,
-                    ),
-                )
-            )
-        ),
+        action_dispatcher.dispatch(CommandUpdatedAction(command=running_command)),
         action_dispatcher.dispatch(
             CommandFailedAction(
                 command_id="command-id",

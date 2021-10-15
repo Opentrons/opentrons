@@ -75,6 +75,7 @@ async def test_analyze(
             commands=[analysis_command],
             labware=[analysis_labware],
             pipettes=[analysis_pipette],
+            errors=[],
         )
     )
 
@@ -90,39 +91,5 @@ async def test_analyze(
             labware=[analysis_labware],
             pipettes=[analysis_pipette],
             errors=[],
-        ),
-    )
-
-
-async def test_analyze_error(
-    decoy: Decoy,
-    protocol_runner: ProtocolRunner,
-    analysis_store: AnalysisStore,
-    subject: ProtocolAnalyzer,
-) -> None:
-    """It should handle errors raised by the runner."""
-    protocol_resource = ProtocolResource(
-        protocol_id="protocol-id",
-        pre_analysis=JsonPreAnalysis(schema_version=123, metadata={}),
-        created_at=datetime(year=2021, month=1, day=1),
-        files=[],
-    )
-
-    error = RuntimeError("oh no")
-
-    decoy.when(await protocol_runner.run(protocol_resource)).then_raise(error)
-
-    await subject.analyze(
-        protocol_resource=protocol_resource,
-        analysis_id="analysis-id",
-    )
-
-    decoy.verify(
-        analysis_store.update(
-            analysis_id="analysis-id",
-            commands=[],
-            labware=[],
-            pipettes=[],
-            errors=[error],
         ),
     )

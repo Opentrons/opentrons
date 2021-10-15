@@ -26,7 +26,8 @@ class StopAction:
     """Stop processing commands in the engine, marking the engine status as done.
 
     Arguments:
-        error: Details about an external error that caused the stop.
+        error_details: Details about an external error that caused the stop,
+            if applicable.
     """
 
     error_details: Optional[StopErrorDetails] = None
@@ -34,7 +35,7 @@ class StopAction:
 
 @dataclass(frozen=True)
 class StopErrorDetails:
-    """Stop processing commands in the engine due to an external error.
+    """Details about an error that caused a StopAction to be issued.
 
     Arguments:
         error: The exception that caused the failure.

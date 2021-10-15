@@ -88,6 +88,28 @@ def python_protocol_file(tmp_path: Path) -> Path:
 
 
 @pytest.fixture
+def python_protocol_file_with_error(tmp_path: Path) -> Path:
+    """Get an on-disk, minimal Python protocol fixture that will raise."""
+    file_path = tmp_path / "protocol-name.py"
+
+    file_path.write_text(
+        textwrap.dedent(
+            """
+            # my protocol
+            metadata = {
+                "apiLevel": "3.0",
+            }
+            def run(ctx):
+                raise RuntimeError("oh no")
+            """
+        ),
+        encoding="utf-8",
+    )
+
+    return file_path
+
+
+@pytest.fixture
 def legacy_python_protocol_file(tmp_path: Path) -> Path:
     """Get an on-disk, minimal Python protocol fixture."""
     file_path = tmp_path / "protocol-name.py"
@@ -111,6 +133,28 @@ def legacy_python_protocol_file(tmp_path: Path) -> Path:
                 pipette.pick_up_tip(
                     location=tip_rack.wells_by_name()["A1"],
                 )
+            """
+        ),
+        encoding="utf-8",
+    )
+
+    return file_path
+
+
+@pytest.fixture
+def legacy_python_protocol_file_with_error(tmp_path: Path) -> Path:
+    """Get an on-disk, minimal Python protocol fixture that will raise."""
+    file_path = tmp_path / "protocol-name.py"
+
+    file_path.write_text(
+        textwrap.dedent(
+            """
+            # my protocol
+            metadata = {
+                "apiLevel": "2.11",
+            }
+            def run(ctx):
+                raise RuntimeError("oh no")
             """
         ),
         encoding="utf-8",

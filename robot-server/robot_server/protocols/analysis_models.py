@@ -5,7 +5,12 @@ from pydantic import BaseModel, Field
 from typing import List, Union
 from typing_extensions import Literal
 
-from opentrons.protocol_engine import Command, LoadedLabware, LoadedPipette
+from opentrons.protocol_engine import (
+    Command,
+    LoadedLabware,
+    LoadedPipette,
+    ErrorOccurance,
+)
 
 
 class AnalysisStatus(str, Enum):
@@ -85,12 +90,9 @@ class CompletedAnalysis(AnalysisSummary):
         ...,
         description="The protocol commands the run is expected to produce",
     )
-    # TODO(mc, 2021-09-01): replace string with error details object. Details
-    # object should try to distinguish between engine errors, Python execution
-    # errors, and unexpected errors due to Opentrons-sourced bugs
-    errors: List[str] = Field(
+    errors: List[ErrorOccurance] = Field(
         ...,
-        description="Any problems that prevented a conclusive analysis",
+        description="Any errors that occurred during analysis or command simulation",
     )
 
 

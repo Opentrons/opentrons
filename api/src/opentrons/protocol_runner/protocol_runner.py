@@ -8,6 +8,7 @@ from opentrons.protocol_engine import (
     Command,
     LoadedLabware,
     LoadedPipette,
+    ErrorOccurance,
 )
 
 from .protocol_source import ProtocolSource
@@ -35,6 +36,7 @@ class ProtocolRunData:
     commands: List[Command]
     labware: List[LoadedLabware]
     pipettes: List[LoadedPipette]
+    errors: List[ErrorOccurance]
 
 
 class ProtocolRunner:
@@ -142,8 +144,14 @@ class ProtocolRunner:
         commands = self._protocol_engine.state_view.commands.get_all()
         labware = self._protocol_engine.state_view.labware.get_all()
         pipettes = self._protocol_engine.state_view.pipettes.get_all()
+        errors = self._protocol_engine.state_view.errors.get_all()
 
-        return ProtocolRunData(commands=commands, labware=labware, pipettes=pipettes)
+        return ProtocolRunData(
+            commands=commands,
+            labware=labware,
+            pipettes=pipettes,
+            errors=errors,
+        )
 
     def _load_json(self, protocol_source: ProtocolSource) -> None:
         protocol = self._json_file_reader.read(protocol_source)

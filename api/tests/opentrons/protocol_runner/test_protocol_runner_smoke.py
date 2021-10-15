@@ -21,6 +21,7 @@ from opentrons.protocol_engine import (
     LoadedLabware,
     LoadedPipette,
     PipetteName,
+    ErrorOccurance,
     commands,
 )
 from opentrons.protocol_runner import (
@@ -223,3 +224,45 @@ async def test_runner_with_legacy_json(legacy_json_protocol_file: Path) -> None:
     )
 
     assert expected_command in commands_result
+
+
+async def test_runner_with_python_raiser(python_protocol_file_with_error: Path) -> None:
+    """It should report errors from a Python protocol on the ProtocolRunner."""
+    protocol_source = ProtocolSource(
+        files=[python_protocol_file_with_error],
+        pre_analysis=PythonPreAnalysis(metadata={}, api_version=APIVersion(3, 0)),
+    )
+
+    subject = await create_simulating_runner()
+    result = await subject.run(protocol_source)
+
+    assert result.errors == [
+        ErrorOccurance.construct(
+            id=matchers.IsA(str),
+            createdAt=matchers.IsA(datetime),
+            errorType="RuntimeError",
+            detail="oh no",
+        )
+    ]
+
+
+async def test_runner_with_legacy_python_raiser(
+    legacy_python_protocol_file_with_error: Path,
+) -> None:
+    """It should report errors from a Python protocol on the ProtocolRunner."""
+    protocol_source = ProtocolSource(
+        files=[legacy_python_protocol_file_with_error],
+        pre_analysis=PythonPreAnalysis(metadata={}, api_version=APIVersion(2, 11)),
+    )
+
+    subject = await create_simulating_runner()
+    result = await subject.run(protocol_source)
+
+    assert result.errors == [
+        ErrorOccurance.construct(
+            id=matchers.IsA(str),
+            createdAt=matchers.IsA(datetime),
+            errorType="ExceptionInProtocolError",
+            detail="RuntimeError [line 7]: oh no",
+        )
+    ]

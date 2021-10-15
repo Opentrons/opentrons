@@ -1,5 +1,7 @@
 """Protocol engine commands sub-state."""
 from __future__ import annotations
+
+import logging
 from collections import OrderedDict
 from dataclasses import dataclass, replace
 from typing import List, Optional, Union
@@ -17,6 +19,9 @@ from ..actions import (
 )
 
 from .abstract_store import HasState, HandlesActions
+
+
+log = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -62,6 +67,10 @@ class CommandStore(HasState[CommandState], HandlesActions):
                     }
                 )
                 self._state = _update_command(self._state, next_command)
+            else:
+                log.warning(
+                    f"CommandFailedAction issued for missing command: {command_id}"
+                )
 
         elif isinstance(action, PlayAction):
             if not self._state.stop_requested:

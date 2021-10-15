@@ -6,6 +6,7 @@ from opentrons.protocol_engine import (
     CommandStatus,
     LoadedPipette,
     LoadedLabware,
+    ErrorOccurance,
 )
 
 from .analysis_models import (
@@ -40,16 +41,13 @@ class AnalysisStore:
         commands: Sequence[Command],
         labware: Sequence[LoadedLabware],
         pipettes: Sequence[LoadedPipette],
-        errors: Sequence[Exception],
+        errors: Sequence[ErrorOccurance],
     ) -> None:
         """Update analysis results in the store."""
-        # TODO(mc, 2021-08-25): return error details objects, not strings
-        error_messages = [str(e) for e in errors]
-
-        if len(error_messages) > 0:
-            result = AnalysisResult.ERROR
-        elif any(c.status == CommandStatus.FAILED for c in commands):
+        if any(c.status == CommandStatus.FAILED for c in commands):
             result = AnalysisResult.NOT_OK
+        elif len(errors) > 0:
+            result = AnalysisResult.ERROR
         else:
             result = AnalysisResult.OK
 
@@ -59,7 +57,7 @@ class AnalysisStore:
             commands=list(commands),
             labware=list(labware),
             pipettes=list(pipettes),
-            errors=error_messages,
+            errors=list(errors),
         )
 
     def get_by_protocol(self, protocol_id: str) -> List[ProtocolAnalysis]:
