@@ -1,22 +1,19 @@
 import * as React from 'react'
 import {
   ALIGN_CENTER,
-  ALIGN_END,
   Box,
   DIRECTION_COLUMN,
-  DIRECTION_ROW,
   Flex,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  SPACING_1,
   SPACING_3,
   SPACING_4,
 } from '@opentrons/components'
 import { LabwarePositionCheckStepDetail } from './LabwarePositionCheckStepDetail'
 import { SectionList } from './SectionList'
 import { useIntroInfo, useLabwareIdsBySection } from './hooks'
-import type { LabwarePositionCheckStep } from './types'
 import { DeckMap } from './DeckMap'
+import type { LabwarePositionCheckStep } from './types'
 
 interface GenericStepScreenProps {
   selectedStep: LabwarePositionCheckStep
@@ -27,8 +24,8 @@ export const GenericStepScreen = (
 ): JSX.Element | null => {
   const introInfo = useIntroInfo()
   const labwareIdsBySection = useLabwareIdsBySection()
-  const [sectionIndex] = React.useState<number>(0)
-  //const sectionIndex = 1
+  //const [sectionIndex] = React.useState<number>(0)
+  const sectionIndex = 2
   if (introInfo == null) return null
   const { sections, primaryPipetteMount, secondaryPipetteMount } = introInfo
   const labwareIdsToHighlight = labwareIdsBySection[sections[sectionIndex]]

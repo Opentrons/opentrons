@@ -5,12 +5,8 @@ import {
   Module,
   RobotWorkSpace,
   C_SELECTED_DARK,
-  Flex,
   Icon,
-  SIZE_1,
-  SPACING_2,
   COLOR_SUCCESS,
-  Box,
   C_WHITE,
 } from '@opentrons/components'
 import {
@@ -34,7 +30,7 @@ const DECK_LAYER_BLOCKLIST = [
 
 interface DeckMapProps {
   labwareIdsToHighlight?: string[]
-  completedLabwareIdSections ?: string[]
+  completedLabwareIdSections?: string[]
 }
 
 export const DeckMap = (props: DeckMapProps): JSX.Element | null => {
@@ -72,18 +68,42 @@ export const DeckMap = (props: DeckMapProps): JSX.Element | null => {
                     <React.Fragment
                       key={`LabwarePositionCheck_Labware_${nestedLabwareDef.metadata.displayName}_${x}${y}`}
                     >
-                      <LabwareRender definition={nestedLabwareDef} />
+                      <g>
+                        <LabwareRender definition={nestedLabwareDef} />
+                        {nestedLabwareId != null &&
+                          labwareIdsToHighlight?.includes(nestedLabwareId) ===
+                            true && (
+                            <rect
+                              width={nestedLabwareDef.dimensions.xDimension - 2}
+                              height={
+                                nestedLabwareDef.dimensions.yDimension - 2
+                              }
+                              fill={'none'}
+                              stroke={C_SELECTED_DARK}
+                              strokeWidth={'3px'}
+                              data-testid={`DeckMap_module_${nestedLabwareId}_highlight`}
+                            />
+                          )}{' '}
+                      </g>
                       {nestedLabwareId != null &&
-                        labwareIdsToHighlight?.includes(nestedLabwareId) ===
-                          true && (
-                          <rect
-                            width={nestedLabwareDef.dimensions.xDimension - 2}
-                            height={nestedLabwareDef.dimensions.yDimension - 2}
-                            fill={'none'}
-                            stroke={C_SELECTED_DARK}
-                            strokeWidth={'3px'}
-                            data-testid={`DeckMap_module_${nestedLabwareId}_highlight`}
-                          />
+                        completedLabwareIdSections?.includes(
+                          nestedLabwareId
+                        ) === true && (
+                          <g
+                            transform={`translate(${x + 35},${
+                              y + 15
+                            }) scale(0.1, 0.1)`}
+                          >
+                            <circle
+                              cx="0"
+                              cy="0"
+                              r={260}
+                              fill={C_WHITE}
+                              transform={`translate(270,265)`}
+                              data-testid={`DeckMap_module_${nestedLabwareId}_checkmark`}
+                            />
+                            <Icon name="check-circle" color={COLOR_SUCCESS} />
+                          </g>
                         )}
                     </React.Fragment>
                   ) : null}
@@ -109,17 +129,23 @@ export const DeckMap = (props: DeckMapProps): JSX.Element | null => {
                       />
                     )}
                   </g>
-                  <g transform={` scale(0.1) translate(${x},${y}) `}>
-                    {completedLabwareIdSections ?.includes(labwareId) === true && (
-                      <Icon
-                        name="check-circle"
-                        color={COLOR_SUCCESS}
-                        width={SIZE_1}
-                        height={SIZE_1}
-                        lineHeight={SIZE_1}
+                  {completedLabwareIdSections?.includes(labwareId) === true && (
+                    <g
+                      transform={`
+                      translate(${x + 35},${y + 15}) scale(0.1, 0.1) rotate(-180 180 180)
+                      `}
+                    >
+                      <circle
+                        cx="0"
+                        cy="0"
+                        r={260}
+                        fill={C_WHITE}
+                        transform={`translate(270,265)`}
+                        data-testid={`DeckMap_${labwareId}_checkmark`}
                       />
-                    )}
-                  </g>
+                      <Icon name="check-circle" color={COLOR_SUCCESS} />
+                    </g>
+                  )}
                 </React.Fragment>
               )
             })}

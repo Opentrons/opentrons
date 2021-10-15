@@ -152,4 +152,24 @@ describe('LPC DeckMap', () => {
     getByTestId(`DeckMap_${LABWARE_ID_TO_HIGHLIGHT}_highlight`)
     getByTestId(`DeckMap_module_${ANOTHER_LABWARE_ID_TO_HIGHLIGHT}_highlight`)
   })
+  it('should render a deckmap with a blank circle and checkbox over completed non module sections', () => {
+    const { getByTestId } = render(
+      <DeckMap
+        labwareIdsToHighlight={[ANOTHER_LABWARE_ID_TO_HIGHLIGHT]}
+        completedLabwareIdSections={[LABWARE_ID_TO_HIGHLIGHT]}
+      />
+    )
+    getByTestId(`DeckMap_${LABWARE_ID_TO_HIGHLIGHT}_checkmark`)
+    getByTestId(`DeckMap_module_${ANOTHER_LABWARE_ID_TO_HIGHLIGHT}_highlight`)
+  })
+  it('should render a deckmap with a blank circle and checkbox over completed module section', () => {
+    const { getByTestId } = render(
+      <DeckMap
+        labwareIdsToHighlight={[LABWARE_ID_TO_HIGHLIGHT]}
+        completedLabwareIdSections={[ANOTHER_LABWARE_ID_TO_HIGHLIGHT]}
+      />
+    )
+    getByTestId(`DeckMap_${LABWARE_ID_TO_HIGHLIGHT}_highlight`)
+    getByTestId(`DeckMap_module_${ANOTHER_LABWARE_ID_TO_HIGHLIGHT}_checkmark`)
+  })
 })
