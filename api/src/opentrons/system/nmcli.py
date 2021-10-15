@@ -297,8 +297,9 @@ class CONNECTION_TYPES(enum.Enum):
 
 class NETWORK_IFACES(enum.Enum):
     """Network interface names that we manage here."""
-
-    WIFI = "wlan0"
+    WIFI = {
+        config.SystemArchitecture.BUILDROOT: 'wlan0',
+        config.SystemArchitecture.YOCTO: 'mlan0'}.get(config.ARCHITECTURE, 'wlan0')
     ETH_LL = "eth0"
 
 
@@ -451,12 +452,7 @@ def _add_eap_args(eap_args: Dict[str, str]) -> List[str]:
             if ta["type"] == "file":
                 # Keyfiles must be prepended with file:// so nm-cli
                 # knows that we’re not giving it DER-encoded blobs
-                if config.ARCHITECTURE == config.SystemArchitecture.BALENA:
-                    _make_host_symlink_if_necessary()
-                    path = _rewrite_key_path_to_host_path(eap_args[ta["name"]])
-                else:
-                    path = eap_args[ta["name"]]
-                val = "file://" + path
+                val = "file://" + eap_args[ta["name"]]
             else:
                 val = eap_args[ta["name"]]
             args += ["802-1x." + ta["nmName"], val]
@@ -483,7 +479,7 @@ def _build_con_add_cmd(
         "autoconnect",
         "yes",
         "ifname",
-        "wlan0",
+        NETWORK_IFACES.WIFI.value,
         "type",
         "wifi",
         "con-name",

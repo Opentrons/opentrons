@@ -45,19 +45,27 @@ log = logging.getLogger(__file__)
 IS_WIN = sys.platform.startswith("win")
 IS_OSX = sys.platform == "darwin"
 IS_LINUX = sys.platform.startswith("linux")
-IS_ROBOT = bool(IS_LINUX and os.environ.get("RUNNING_ON_PI"))
+IS_ROBOT = bool(IS_LINUX and (os.environ.get("RUNNING_ON_PI") or os.environ.get("RUNNING_ON_VERDIN")))
 #: This is the correct thing to check to see if we’re running on a robot
 IS_VIRTUAL = bool(os.environ.get("ENABLE_VIRTUAL_SMOOTHIE"))
 
 
 class SystemArchitecture(Enum):
     HOST = auto()
-    BALENA = auto()
     BUILDROOT = auto()
+    YOCTO = auto()
 
+ROBOT_FIRMWARE_DIR: Optional[Path] = None
+#: The path to firmware files for modules
 
 ARCHITECTURE: SystemArchitecture = SystemArchitecture.HOST
 #: The system architecture running
+
+JUPYTER_NOTEBOOK_ROOT_DIR: Optional[Path] = None
+#: The path to the root dir for Jupyter
+
+JUPYTER_NOTEBOOK_LABWARE_DIR: Optional[Path] = None
+#: The path to labware installs for jupyter
 
 OT_SYSTEM_VERSION = "0.0.0"
 #: The semver string of the system
@@ -66,7 +74,8 @@ OT_SYSTEM_VERSION = "0.0.0"
 if IS_ROBOT:
     if "OT_SYSTEM_VERSION" in os.environ:
         OT_SYSTEM_VERSION = os.environ["OT_SYSTEM_VERSION"]
-        ARCHITECTURE = SystemArchitecture.BALENA
+        ARCHITECTURE = SystemArchitecture.YOCTO
+        ROBOT_FIRMWARE_DIR: Optional[Path] = Path("/lib/firmware/")
     else:
         try:
             with open("/etc/VERSION.json") as vj:
@@ -75,21 +84,15 @@ if IS_ROBOT:
             ARCHITECTURE = SystemArchitecture.BUILDROOT
         except Exception:
             log.exception("Could not find version file in /etc/VERSION.json")
+        ROBOT_FIRMWARE_DIR: Optional[Path] = Path("/usr/lib/firmware/")
     JUPYTER_NOTEBOOK_ROOT_DIR: Optional[Path] = Path("/var/lib/jupyter/notebooks/")
     JUPYTER_NOTEBOOK_LABWARE_DIR: Optional[Path] = (
         JUPYTER_NOTEBOOK_ROOT_DIR / "labware"  # type: ignore[operator]
     )
-    ROBOT_FIRMWARE_DIR: Optional[Path] = Path("/usr/lib/firmware/")
-else:
-    JUPYTER_NOTEBOOK_ROOT_DIR = None
-    JUPYTER_NOTEBOOK_LABWARE_DIR = None
-    ROBOT_FIRMWARE_DIR = None
 
 
 def name() -> str:
-    if IS_ROBOT and ARCHITECTURE == SystemArchitecture.BALENA:
-        return "opentrons-{}".format(os.environ.get("RESIN_DEVICE_NAME_AT_INIT", "dev"))
-    if IS_ROBOT and ARCHITECTURE == SystemArchitecture.BUILDROOT:
+    if IS_ROBOT and ARCHITECTURE in (SystemArchitecture.BUILDROOT, SystemArchitecture.YOCTO):
         try:
             return (
                 subprocess.check_output(["hostnamectl", "--pretty", "status"])
@@ -290,7 +293,7 @@ def load_and_migrate() -> Dict[str, Path]:
     a default config and makes sure all directories required exist (though
     the files in them may not).
     """
-    if IS_ROBOT:
+    if IS_ROBOT and ARCHITECTURE != SystemArchitecture.YOCTO:
         _migrate_robot()
     base = infer_config_base_dir()
     base.mkdir(parents=True, exist_ok=True)

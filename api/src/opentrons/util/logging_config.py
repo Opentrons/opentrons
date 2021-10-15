@@ -107,7 +107,7 @@ def _host_config(level_value: int) -> Dict[str, Any]:
 
 def _config(arch: SystemArchitecture, level_value: int) -> Dict[str, Any]:
     return {
-        SystemArchitecture.BALENA: _balena_config,
+        SystemArchitecture.YOCTO: _buildroot_config,
         SystemArchitecture.BUILDROOT: _buildroot_config,
         SystemArchitecture.HOST: _host_config,
     }[arch](level_value)
