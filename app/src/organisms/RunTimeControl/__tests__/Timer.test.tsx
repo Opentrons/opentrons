@@ -12,7 +12,11 @@ describe('Timer', () => {
   it('renders a start time', () => {
     const [{ getByText }] = render()
 
-    expect(getByText('Start Time: 4:25:23 PM GMT-04:00')).toBeTruthy()
+    expect(
+      getByText(
+        /^Start Time: (\d{1,2}):(\d{2}):(\d{2}) (A|P)M GMT(\+|-)(\d{2}):(\d{2})$/
+      )
+    ).toBeTruthy()
   })
 
   it('renders a run time', () => {
