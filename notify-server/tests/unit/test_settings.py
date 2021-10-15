@@ -30,42 +30,42 @@ def scheme() -> str:
 
 
 @pytest.fixture
-def server_address_override(request: FixtureRequest,
-                            envvar_patch: MagicMock,
-                            port: int,
-                            scheme: str) -> None:
+def server_address_override(
+    request: FixtureRequest, envvar_patch: MagicMock, port: int, scheme: str
+) -> None:
     """Fixture that overrides a server address environment variable."""
     marker = request.node.get_closest_marker("env_var")
     obj = {"scheme": scheme, "port": port}
     envvar_patch[marker.args[0]] = json.dumps(obj)
 
 
-@pytest.mark.env_var('OT_NOTIFY_SERVER_publisher_address')
-def test_override_publisher_address(server_address_override: None,
-                                    port: int,
-                                    scheme: str) -> None:
+@pytest.mark.env_var("OT_NOTIFY_SERVER_publisher_address")
+def test_override_publisher_address(
+    server_address_override: None, port: int, scheme: str
+) -> None:
     """Test environment var override."""
     s = Settings()
     assert s.publisher_address.port == port
     assert s.publisher_address.scheme == scheme
 
 
-@pytest.mark.env_var('OT_NOTIFY_SERVER_subscriber_address')
-def test_override_subscriber_address(server_address_override: None,
-                                     port: int,
-                                     scheme: str) -> None:
+@pytest.mark.env_var("OT_NOTIFY_SERVER_subscriber_address")
+def test_override_subscriber_address(
+    server_address_override: None, port: int, scheme: str
+) -> None:
     """Test environment var override."""
     s = Settings()
     assert s.subscriber_address.port == port
     assert s.subscriber_address.scheme == scheme
 
 
-@pytest.mark.parametrize(argnames=["address", "expected"],
-                         argvalues=[
-                             [ServerBindAddress(scheme="tcp", port=1234),
-                              "tcp://*:1234"],
-                             [ServerBindAddress(scheme="ipc", path="/afile"),
-                              "ipc:///afile"]])
+@pytest.mark.parametrize(
+    argnames=["address", "expected"],
+    argvalues=[
+        [ServerBindAddress(scheme="tcp", port=1234), "tcp://*:1234"],
+        [ServerBindAddress(scheme="ipc", path="/afile"), "ipc:///afile"],
+    ],
+)
 def test_connection_string(address: ServerBindAddress, expected: str) -> None:
     """Test creation of zmq host address from settings."""
     assert address.connection_string() == expected

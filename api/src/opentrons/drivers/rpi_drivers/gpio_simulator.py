@@ -1,6 +1,6 @@
 import asyncio
 import logging
-from typing import Callable, Dict, Tuple
+from typing import Callable, Dict, Tuple, List
 
 from opentrons.hardware_control.types import BoardRevision, DoorState
 from .types import gpio_group, GPIOPin
@@ -27,48 +27,50 @@ class SimulatingGPIOCharDev:
         return self._board_rev
 
     @board_rev.setter
-    def board_rev(self, boardrev: BoardRevision):
+    def board_rev(self, boardrev: BoardRevision) -> None:
         self._board_rev = boardrev
 
     def _initialize(self) -> Dict[str, int]:
-        lines = {}
+        lines: Dict[str, int] = {}
         for pin in gpio_group.pins:
-            lines[pin.name] = pin.by_board_rev(self.board_rev)
+            line = pin.by_board_rev(self.board_rev)
+            if line is not None:
+                lines[pin.name] = line
         self._initialize_values(list(lines.keys()))
         return lines
 
-    def _initialize_values(self, names):
+    def _initialize_values(self, names: List[str]) -> None:
         self._values: Dict[str, int] = {}
         for name in names:
             self._values[name] = 1
 
-    async def setup(self):
+    async def setup(self) -> None:
         pass
 
-    def config_by_board_rev(self):
+    def config_by_board_rev(self) -> None:
         self.board_rev = BoardRevision.by_bits(self.read_revision_bits())
 
-    def set_high(self, output_pin: GPIOPin):
+    def set_high(self, output_pin: GPIOPin) -> None:
         self._values[output_pin.name] = 1
 
-    def set_low(self, output_pin: GPIOPin):
+    def set_low(self, output_pin: GPIOPin) -> None:
         self._values[output_pin.name] = 0
 
     def set_button_light(
         self, red: bool = False, green: bool = False, blue: bool = False
-    ):
+    ) -> None:
         pass
 
-    def set_rail_lights(self, on: bool = True):
+    def set_rail_lights(self, on: bool = True) -> None:
         pass
 
-    def set_reset_pin(self, on: bool = True):
+    def set_reset_pin(self, on: bool = True) -> None:
         pass
 
-    def set_isp_pin(self, on: bool = True):
+    def set_isp_pin(self, on: bool = True) -> None:
         pass
 
-    def set_halt_pin(self, on: bool = True):
+    def set_halt_pin(self, on: bool = True) -> None:
         pass
 
     def _read(self, input_pin: GPIOPin) -> int:
@@ -98,7 +100,7 @@ class SimulatingGPIOCharDev:
         return bool(self._read(gpio_group.door_sw_filt))
 
     def read_revision_bits(self) -> Tuple[bool, bool]:
-        return (bool(self._read(gpio_group.rev_0)), bool(self._read(gpio_group.rev_1)))
+        return bool(self._read(gpio_group.rev_0)), bool(self._read(gpio_group.rev_1))
 
     def get_door_state(self) -> DoorState:
         val = self.read_window_switches()
@@ -111,15 +113,15 @@ class SimulatingGPIOCharDev:
         self,
         loop: asyncio.AbstractEventLoop,
         update_door_state: Callable[[DoorState], None],
-    ):
+    ) -> None:
         current_door_value = self.read_window_switches()
         if current_door_value == 0:
             update_door_state(DoorState.OPEN)
         else:
             update_door_state(DoorState.CLOSED)
 
-    def release_line(self, pin: GPIOPin):
+    def release_line(self, pin: GPIOPin) -> None:
         self.lines.pop(pin.name)
 
-    def stop_door_switch_watcher(self, loop: asyncio.AbstractEventLoop):
+    def stop_door_switch_watcher(self, loop: asyncio.AbstractEventLoop) -> None:
         pass

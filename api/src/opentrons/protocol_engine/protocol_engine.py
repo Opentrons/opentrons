@@ -136,7 +136,16 @@ class ProtocolEngine:
         self._queue_worker.cancel()
         await self._hardware_api.halt()
 
-    async def stop(self, wait_until_complete: bool = False) -> None:
+    async def wait_until_complete(self) -> None:
+        """Wait until there are no more commands to execute.
+
+        This will happen if all commands are executed or if one command fails.
+        """
+        await self._state_store.wait_for(
+            condition=self._state_store.commands.get_all_complete
+        )
+
+    async def stop(self, error: Optional[Exception] = None) -> None:
         """Gracefully stop the ProtocolEngine, waiting for it to become idle.
 
         The engine will finish executing its current command (if any),
@@ -148,15 +157,9 @@ class ProtocolEngine:
         will be raised here.
 
         Arguments:
-            wait_until_complete: Wait until _all_ commands have completed
-                before stopping the engine.
+            error: An error that caused the stop, if applicable.
         """
-        if wait_until_complete:
-            await self._state_store.wait_for(
-                condition=self._state_store.commands.get_all_complete
-            )
-
-        self._action_dispatcher.dispatch(StopAction())
+        self._action_dispatcher.dispatch(StopAction(error=error))
 
         try:
             await self._queue_worker.join()

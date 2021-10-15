@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Dict
 
 from opentrons.drivers.thermocycler.abstract import AbstractThermocyclerDriver
 from opentrons.drivers.types import Temperature, PlateTemperature, ThermocyclerLidStatus
@@ -7,7 +7,7 @@ from opentrons.drivers.types import Temperature, PlateTemperature, ThermocyclerL
 class SimulatingDriver(AbstractThermocyclerDriver):
     DEFAULT_TEMP = 23
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._ramp_rate: Optional[float] = None
         self._lid_status = ThermocyclerLidStatus.OPEN
         self._lid_temperature = Temperature(current=self.DEFAULT_TEMP, target=None)
@@ -57,26 +57,26 @@ class SimulatingDriver(AbstractThermocyclerDriver):
         self._lid_temperature.target = temp
         self._lid_temperature.current = temp
 
-    async def deactivate_lid(self):
+    async def deactivate_lid(self) -> None:
         self._lid_temperature.target = None
         self._lid_temperature.current = self.DEFAULT_TEMP
 
-    async def deactivate_block(self):
+    async def deactivate_block(self) -> None:
         self._plate_temperature.target = None
         self._plate_temperature.current = self.DEFAULT_TEMP
         self._plate_temperature.hold = None
         self._ramp_rate = None
 
-    async def deactivate_all(self):
+    async def deactivate_all(self) -> None:
         await self.deactivate_lid()
         await self.deactivate_block()
 
-    async def get_device_info(self):
+    async def get_device_info(self) -> Dict[str, str]:
         return {
             "serial": "dummySerialTC",
             "model": "dummyModelTC",
             "version": "dummyVersionTC",
         }
 
-    async def enter_programming_mode(self):
+    async def enter_programming_mode(self) -> None:
         pass

@@ -1,8 +1,9 @@
-from typing import AsyncGenerator
+from typing import AsyncIterator
 
 from mock import patch
 
 import pytest
+from notify_server.clients.serdes import TopicEvent
 from starlette.testclient import TestClient
 from starlette.websockets import WebSocketDisconnect
 
@@ -24,7 +25,9 @@ def test_subscribe_no_topic(api_client: TestClient):
 
 
 def test_integration(
-    api_client: TestClient, mock_subscriber: AsyncGenerator, topic_event
+    api_client: TestClient,
+    mock_subscriber: AsyncIterator[TopicEvent],
+    topic_event: TopicEvent,
 ) -> None:
     """Test receiving a single event."""
     with patch.object(handle_subscriber, "create", return_value=mock_subscriber):

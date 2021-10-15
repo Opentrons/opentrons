@@ -8,7 +8,9 @@ class NodeId(int, Enum):
     broadcast = 0x00
     host = 0x10
     pipette = 0x20
-    gantry = 0x40
+    gantry_x = 0x30
+    gantry_y = 0x40
+    head = 0x50
 
 
 class FunctionCode(int, Enum):
@@ -37,6 +39,9 @@ class MessageId(int, Enum):
 
     get_status_request = 0x01
     get_status_response = 0x05
+
+    enable_motor_request = 0x06
+    disable_motor_request = 0x07
 
     move_request = 0x10
 
