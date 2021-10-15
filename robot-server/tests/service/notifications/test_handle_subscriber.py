@@ -1,7 +1,8 @@
-from typing import AsyncGenerator
+from typing import AsyncIterator
 
 import pytest
 from mock import MagicMock, patch, DEFAULT
+from notify_server.clients.serdes import TopicEvent
 from starlette.websockets import WebSocket
 from robot_server.service.notifications import handle_subscriber
 from robot_server.settings import get_settings
@@ -29,7 +30,9 @@ async def test_create_subscriber(mock_socket: MagicMock) -> None:
 
 
 async def test_route_events(
-    mock_socket: MagicMock, mock_subscriber: AsyncGenerator, topic_event
+    mock_socket: MagicMock,
+    mock_subscriber: AsyncIterator[TopicEvent],
+    topic_event: TopicEvent,
 ) -> None:
     """Test that an event is read from subscriber and sent to websocket."""
     with patch.object(handle_subscriber, "send") as mock_send:
@@ -37,7 +40,7 @@ async def test_route_events(
         mock_send.assert_called_once_with(mock_socket, topic_event)
 
 
-async def test_send_entry(topic_event, mock_socket: MagicMock) -> None:
+async def test_send_entry(topic_event: TopicEvent, mock_socket: MagicMock) -> None:
     """Test that entry is sent as json."""
     await handle_subscriber.send(mock_socket, topic_event)
     mock_socket.send_text.assert_called_once_with(topic_event.json())
