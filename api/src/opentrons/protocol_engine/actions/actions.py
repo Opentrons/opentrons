@@ -39,7 +39,7 @@ class StopErrorDetails:
 
     Arguments:
         error: The exception that caused the failure.
-        error_id: A unique identifier to assign to the error occurance.
+        error_id: A unique identifier to assign to the error occurrence.
         created_at: A timestamp of when the error occurred.
     """
 

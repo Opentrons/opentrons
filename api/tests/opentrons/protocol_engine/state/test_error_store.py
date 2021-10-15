@@ -1,7 +1,7 @@
 """Tests for the command lifecycle state."""
 from datetime import datetime
 
-from opentrons.protocol_engine.errors import ErrorOccurance
+from opentrons.protocol_engine.errors import ErrorOccurrence
 from opentrons.protocol_engine.actions import (
     CommandFailedAction,
     StopAction,
@@ -26,7 +26,7 @@ def test_error_store_handles_command_failed() -> None:
 
     assert subject.state == ErrorState(
         errors_by_id={
-            "error-id": ErrorOccurance(
+            "error-id": ErrorOccurrence(
                 id="error-id",
                 errorType="RuntimeError",
                 createdAt=datetime(year=2021, month=1, day=1),
@@ -52,7 +52,7 @@ def test_error_store_handles_stop_with_error() -> None:
 
     assert subject.state == ErrorState(
         errors_by_id={
-            "error-id": ErrorOccurance(
+            "error-id": ErrorOccurrence(
                 id="error-id",
                 errorType="RuntimeError",
                 createdAt=datetime(year=2021, month=1, day=1),

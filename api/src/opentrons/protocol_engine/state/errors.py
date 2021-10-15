@@ -5,15 +5,15 @@ from datetime import datetime
 from typing import List, Mapping
 
 from ..actions import Action, CommandFailedAction, StopAction
-from ..errors import ErrorOccurance
+from ..errors import ErrorOccurrence
 from .abstract_store import HasState, HandlesActions
 
 
 @dataclass(frozen=True)
 class ErrorState:
-    """State of all protocol engine error occurances."""
+    """State of all protocol engine error occurrences."""
 
-    errors_by_id: Mapping[str, ErrorOccurance]
+    errors_by_id: Mapping[str, ErrorOccurrence]
 
 
 class ErrorStore(HasState[ErrorState], HandlesActions):
@@ -27,25 +27,25 @@ class ErrorStore(HasState[ErrorState], HandlesActions):
 
     def handle_action(self, action: Action) -> None:
         """Modify state in reaction to an action."""
-        error_occurance = None
+        error_occurrence = None
 
         if isinstance(action, CommandFailedAction):
-            error_occurance = _create_error_occurance(
+            error_occurrence = _create_error_occurrence(
                 error=action.error,
                 error_id=action.error_id,
                 created_at=action.completed_at,
             )
 
         elif isinstance(action, StopAction) and action.error_details is not None:
-            error_occurance = _create_error_occurance(
+            error_occurrence = _create_error_occurrence(
                 error=action.error_details.error,
                 error_id=action.error_details.error_id,
                 created_at=action.error_details.created_at,
             )
 
-        if error_occurance is not None:
+        if error_occurrence is not None:
             errors_by_id = dict(self._state.errors_by_id)
-            errors_by_id[error_occurance.id] = error_occurance
+            errors_by_id[error_occurrence.id] = error_occurrence
             self._state = replace(self._state, errors_by_id=errors_by_id)
 
 
@@ -58,17 +58,17 @@ class ErrorView(HasState[ErrorState]):
         """Initialize the view of command state with its underlying data."""
         self._state = state
 
-    def get_all(self) -> List[ErrorOccurance]:
-        """Get a list of all error occurances in state."""
+    def get_all(self) -> List[ErrorOccurrence]:
+        """Get a list of all error occurrences in state."""
         return list(self._state.errors_by_id.values())
 
 
-def _create_error_occurance(
+def _create_error_occurrence(
     error: Exception,
     error_id: str,
     created_at: datetime,
-) -> ErrorOccurance:
-    return ErrorOccurance(
+) -> ErrorOccurrence:
+    return ErrorOccurrence(
         id=error_id,
         errorType=type(error).__qualname__,
         createdAt=created_at,

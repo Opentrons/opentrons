@@ -6,7 +6,7 @@ from opentrons.protocol_engine import (
     CommandStatus,
     LoadedPipette,
     LoadedLabware,
-    ErrorOccurance,
+    ErrorOccurrence,
 )
 
 from .analysis_models import (
@@ -41,7 +41,7 @@ class AnalysisStore:
         commands: Sequence[Command],
         labware: Sequence[LoadedLabware],
         pipettes: Sequence[LoadedPipette],
-        errors: Sequence[ErrorOccurance],
+        errors: Sequence[ErrorOccurrence],
     ) -> None:
         """Update analysis results in the store."""
         if any(c.status == CommandStatus.FAILED for c in commands):

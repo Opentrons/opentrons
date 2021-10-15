@@ -8,7 +8,7 @@ from opentrons.protocol_engine import (
     Command,
     LoadedLabware,
     LoadedPipette,
-    ErrorOccurance,
+    ErrorOccurrence,
 )
 
 from .protocol_source import ProtocolSource
@@ -36,7 +36,7 @@ class ProtocolRunData:
     commands: List[Command]
     labware: List[LoadedLabware]
     pipettes: List[LoadedPipette]
-    errors: List[ErrorOccurance]
+    errors: List[ErrorOccurrence]
 
 
 class ProtocolRunner:

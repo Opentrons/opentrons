@@ -1,20 +1,20 @@
-"""Models representing an error occurances."""
+"""Models representing an error occurrences."""
 from datetime import datetime
 from pydantic import BaseModel, Extra, Field
 
 
-class ErrorOccurance(BaseModel):
-    """An occurance of an error in the ProtocolEngine."""
+class ErrorOccurrence(BaseModel):
+    """An occurrence of an error in the ProtocolEngine."""
 
     id: str = Field(
         ...,
-        description="A unique identifier for this specific error occurance.",
+        description="A unique identifier for this specific error occurrence.",
     )
     errorType: str = Field(..., description="The type of error that occurred")
     createdAt: datetime = Field(..., description="When the error occured")
     detail: str = Field(
         ...,
-        description="A human-readable description of this error occurance",
+        description="A human-readable description of this error occurrence",
     )
 
     # TODO(mc, 2021-10-13): replace with concrete subclasses for each

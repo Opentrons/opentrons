@@ -1,6 +1,6 @@
 """Protocol engine errors module."""
 
-from .error_occurance import ErrorOccurance
+from .error_occurrence import ErrorOccurrence
 
 from .exceptions import (
     ProtocolEngineError,
@@ -21,7 +21,7 @@ from .exceptions import (
 
 __all__ = [
     # public models
-    "ErrorOccurance",
+    "ErrorOccurrence",
     # exceptions
     "ProtocolEngineError",
     "UnexpectedProtocolError",

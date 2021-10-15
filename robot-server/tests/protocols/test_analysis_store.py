@@ -5,7 +5,7 @@ from typing import List, NamedTuple, Sequence
 
 from opentrons.types import MountType, DeckSlotName
 from opentrons.protocol_engine import (
-    ErrorOccurance,
+    ErrorOccurrence,
     commands as pe_commands,
     types as pe_types,
 )
@@ -37,7 +37,7 @@ def test_add_pending() -> None:
 def test_add_errored_analysis() -> None:
     """It should be able to add a failed analysis to the store."""
     subject = AnalysisStore()
-    error = ErrorOccurance(
+    error = ErrorOccurrence(
         id="error-id",
         createdAt=datetime(year=2021, month=1, day=1),
         errorType="RuntimeError",

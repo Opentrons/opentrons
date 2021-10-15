@@ -1,20 +1,20 @@
 """Labware state store tests."""
 from datetime import datetime
 
-from opentrons.protocol_engine.errors import ErrorOccurance
+from opentrons.protocol_engine.errors import ErrorOccurrence
 from opentrons.protocol_engine.state.errors import ErrorState, ErrorView
 
 
 def test_get_all() -> None:
     """It should get all the commands from the state."""
-    error_1 = ErrorOccurance(
+    error_1 = ErrorOccurrence(
         id="error-id-1",
         errorType="ErrorType",
         createdAt=datetime(year=2021, month=1, day=1),
         detail="Oh no",
     )
 
-    error_2 = ErrorOccurance(
+    error_2 = ErrorOccurrence(
         id="error-id-2",
         errorType="AnotherErrorType",
         createdAt=datetime(year=2022, month=2, day=2),

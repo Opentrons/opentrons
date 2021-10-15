@@ -10,7 +10,7 @@ from opentrons.protocol_engine import (
     PipetteName,
     LoadedPipette,
     LoadedLabware,
-    ErrorOccurance,
+    ErrorOccurrence,
     commands as pe_commands,
 )
 
@@ -271,7 +271,7 @@ def test_to_response_adds_errors() -> None:
         actions=[],
     )
 
-    error = ErrorOccurance(
+    error = ErrorOccurrence(
         id="error-id",
         errorType="UnexpectedError",
         createdAt=datetime(year=2022, month=2, day=2),

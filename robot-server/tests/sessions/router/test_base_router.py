@@ -324,7 +324,7 @@ def test_get_session(
         mount=MountType.LEFT,
     )
 
-    error = pe_errors.ErrorOccurance(
+    error = pe_errors.ErrorOccurrence(
         id="error-id",
         errorType="UnexpectedError",
         createdAt=datetime(year=2022, month=2, day=2),

@@ -7,7 +7,7 @@ protocol state and side-effects like robot movements.
 
 from .create_protocol_engine import create_protocol_engine
 from .protocol_engine import ProtocolEngine
-from .errors import ProtocolEngineError, ErrorOccurance
+from .errors import ProtocolEngineError, ErrorOccurrence
 from .commands import Command, CommandRequest, CommandStatus, CommandType
 from .state import State, StateView
 from .plugins import AbstractPlugin
@@ -32,7 +32,7 @@ __all__ = [
     "ProtocolEngine",
     # error types
     "ProtocolEngineError",
-    "ErrorOccurance",
+    "ErrorOccurrence",
     # top level command unions and values
     "Command",
     "CommandRequest",

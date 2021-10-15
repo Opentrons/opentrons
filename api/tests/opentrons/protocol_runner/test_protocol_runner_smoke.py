@@ -21,7 +21,7 @@ from opentrons.protocol_engine import (
     LoadedLabware,
     LoadedPipette,
     PipetteName,
-    ErrorOccurance,
+    ErrorOccurrence,
     commands,
 )
 from opentrons.protocol_runner import (
@@ -237,7 +237,7 @@ async def test_runner_with_python_raiser(python_protocol_file_with_error: Path) 
     result = await subject.run(protocol_source)
 
     assert result.errors == [
-        ErrorOccurance.construct(
+        ErrorOccurrence.construct(
             id=matchers.IsA(str),
             createdAt=matchers.IsA(datetime),
             errorType="RuntimeError",
@@ -259,7 +259,7 @@ async def test_runner_with_legacy_python_raiser(
     result = await subject.run(protocol_source)
 
     assert result.errors == [
-        ErrorOccurance.construct(
+        ErrorOccurrence.construct(
             id=matchers.IsA(str),
             createdAt=matchers.IsA(datetime),
             errorType="ExceptionInProtocolError",

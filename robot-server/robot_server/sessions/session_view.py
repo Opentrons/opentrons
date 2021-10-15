@@ -5,7 +5,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from opentrons.protocol_engine import (
     Command as ProtocolEngineCommand,
-    ErrorOccurance,
+    ErrorOccurrence,
     EngineStatus,
     LoadedLabware,
     LoadedPipette,
@@ -94,7 +94,7 @@ class SessionView:
         commands: List[ProtocolEngineCommand],
         pipettes: List[LoadedPipette],
         labware: List[LoadedLabware],
-        errors: List[ErrorOccurance],
+        errors: List[ErrorOccurrence],
         engine_status: EngineStatus,
     ) -> Session:
         """Transform a session resource into its public response model.

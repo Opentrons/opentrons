@@ -226,7 +226,7 @@ class CommandView(HasState[CommandState]):
             action_desc = "play" if isinstance(action, PlayAction) else "pause"
             raise ProtocolEngineStoppedError(f"Cannot {action_desc} a stopped engine.")
 
-    # TODO(mc, 2021-10-15): with the introduction of the ErrorOccurances,
+    # TODO(mc, 2021-10-15): with the introduction of the ErrorOccurrences,
     # this status logic is no longer sufficient. Move to a StatusView
     # that depends on both and can differentiate between the different stops.
     # We also need to account for the fact that failed commands may not be fatal

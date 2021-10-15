@@ -51,7 +51,7 @@ class ErrorSource(BaseModel):
 
 
 class ErrorDetails(BaseErrorResponse):
-    """An error response with error type and occurance details.
+    """An error response with error type and occurrence details.
 
     Extend this class to create specific error responses, and use it in your
     route handlers.
@@ -90,7 +90,7 @@ class ErrorDetails(BaseErrorResponse):
     detail: str = Field(
         ...,
         description=(
-            "A human-readable message describing this specific occurance "
+            "A human-readable message describing this specific occurrence "
             "of the error."
         ),
     )
@@ -102,7 +102,7 @@ class ErrorDetails(BaseErrorResponse):
         None,
         description=(
             "An object containing non-standard information about this "
-            "occurance of the error"
+            "occurrence of the error"
         ),
     )
 

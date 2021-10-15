@@ -9,7 +9,7 @@ from opentrons.protocol_engine import (
     Command,
     LoadedLabware,
     LoadedPipette,
-    ErrorOccurance,
+    ErrorOccurrence,
 )
 
 
@@ -90,7 +90,7 @@ class CompletedAnalysis(AnalysisSummary):
         ...,
         description="The protocol commands the run is expected to produce",
     )
-    errors: List[ErrorOccurance] = Field(
+    errors: List[ErrorOccurrence] = Field(
         ...,
         description="Any errors that occurred during analysis or command simulation",
     )
