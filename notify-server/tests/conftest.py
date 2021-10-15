@@ -3,7 +3,7 @@ from datetime import datetime
 import pytest
 
 from notify_server.models.event import Event
-from notify_server.models.sample_events import SampleTwo
+from notify_server.models.payload_type import UserData
 
 
 @pytest.fixture
@@ -12,5 +12,5 @@ def event() -> Event:
     return Event(
         createdOn=datetime(2000, 1, 1),
         publisher="pub",
-        data=SampleTwo(val1=1, val2="2")
+        data=UserData(data={"val1": 1, "val2": 2}),
     )
