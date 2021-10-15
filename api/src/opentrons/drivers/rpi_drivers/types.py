@@ -1,3 +1,4 @@
+from __future__ import annotations
 import enum
 from itertools import groupby
 from dataclasses import dataclass
@@ -39,8 +40,14 @@ class USBPort(GenericNode[str]):
         """
         full_name, device_path = port_path.split(":")
         port_nodes = cls.get_unique_nodes(full_name)
-        *port_info, name = cls.find_hub(port_nodes)
-        hub, port = cls.map_to_revision(board_revision, port_info)
+        hub, port, name = cls.find_hub(port_nodes)
+        hub, port = cls.map_to_revision(
+            board_revision,
+            (
+                hub,
+                port,
+            ),
+        )
         return cls(
             name=name, port_number=port, sub_names=[], device_path=device_path, hub=hub
         )
@@ -97,7 +104,7 @@ class USBPort(GenericNode[str]):
 
     @staticmethod
     def map_to_revision(
-        board_revision: BoardRevision, port_info: List
+        board_revision: BoardRevision, port_info: Tuple[Optional[int], int]
     ) -> Tuple[Optional[int], int]:
         hub, port = port_info
         if board_revision == BoardRevision.OG:
@@ -125,13 +132,15 @@ class USBPort(GenericNode[str]):
 
 class GPIOPin:
     @classmethod
-    def build(cls, name: str, in_out: PinDir, pin: int):
+    def build(cls, name: str, in_out: PinDir, pin: int) -> GPIOPin:
         # use this method if the pin number is the same
         # across all board revisions
         return cls(name, in_out, rev_og=pin, rev_a=pin, rev_b=pin, rev_c=pin)
 
     @classmethod
-    def build_with_rev(cls, name: str, in_out: PinDir, **kwargs):
+    def build_with_rev(
+        cls, name: str, in_out: PinDir, **kwargs: Optional[int]
+    ) -> GPIOPin:
         return cls(name, in_out, **kwargs)
 
     def __init__(
@@ -150,7 +159,7 @@ class GPIOPin:
         self.rev_b = rev_b
         self.rev_c = rev_c
 
-    def by_board_rev(self, board_rev: BoardRevision):
+    def by_board_rev(self, board_rev: BoardRevision) -> Optional[int]:
         ref = {
             BoardRevision.OG: self.rev_og,
             BoardRevision.A: self.rev_a,
@@ -165,18 +174,20 @@ class GPIOGroup:
     def __init__(self, pins: List[GPIOPin]):
         self.pins = pins
 
-    def __getattr__(self, item):
-        return next(filter(lambda x: x.name is item, self.pins), None)
+    def __getattr__(self, item: str) -> GPIOPin:
+        res = next(filter(lambda x: x.name is item, self.pins), None)
+        assert res, f"Failed to find GPIOPin named: {item}"
+        return res
 
-    def by_type(self, pin_dir: PinDir):
+    def by_type(self, pin_dir: PinDir) -> GPIOGroup:
         return GPIOGroup(list(filter(lambda x: x.in_out is pin_dir, self.pins)))
 
-    def by_names(self, names: List[str]):
+    def by_names(self, names: List[str]) -> GPIOGroup:
         return GPIOGroup(list(filter(lambda x: x.name in names, self.pins)))
 
-    def group_by_pins(self, board_rev: BoardRevision) -> List:
+    def group_by_pins(self, board_rev: BoardRevision) -> List[List[GPIOPin]]:
         c = groupby(self.pins, key=lambda x: x.by_board_rev(board_rev))
-        l: list = []
+        l: List[List[GPIOPin]] = []
         for k, v in c:
             l.append(list(v))
         return l

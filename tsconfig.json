@@ -30,6 +30,12 @@
     },
     {
       "path": "./protocol-library-kludge"
+    },
+    {
+      "path": "./api-client"
+    },
+    {
+      "path": "./react-api-client"
     }
   ]
 }

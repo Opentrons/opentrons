@@ -1,7 +1,6 @@
 import json
 import os
 import sys
-from functools import partial
 from pathlib import Path
 import logging
 import asyncio
@@ -60,14 +59,6 @@ def __dir__() -> List[str]:
 
 
 log = logging.getLogger(__name__)
-
-try:
-    import systemd.daemon  # type: ignore
-
-    systemdd_notify = partial(systemd.daemon.notify, "READY=1")
-except ImportError:
-    log.info("Systemd couldn't be imported, not notifying")
-    systemdd_notify = partial(lambda: None)
 
 
 SMOOTHIE_HEX_RE = re.compile("smoothie-(.*).hex")
@@ -152,7 +143,6 @@ async def initialize() -> API:
 
     log.info(f"API server version: {__version__}")
     log.info(f"Robot Name: {name()}")
-    systemdd_notify()
 
     use_thread_manager = ff.enable_protocol_engine() is False
 

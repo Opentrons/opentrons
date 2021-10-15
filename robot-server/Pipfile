@@ -43,3 +43,8 @@ pydantic = "==1.8.2"
 typing-extensions = "==3.10.0.0"
 uvicorn = "==0.14.0"
 wsproto = "==1.0.0"
+systemd-python = {version="==234", sys_platform="== 'linux'"}
+idna = "==3.2"
+click = "==8.0.1"
+numpy = "==1.15.1"
+zipp = "==3.5.0"

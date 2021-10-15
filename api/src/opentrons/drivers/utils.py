@@ -99,8 +99,8 @@ def parse_plate_lock_status_response(status_string: str) -> HeaterShakerPlateLoc
     """Example format: STATUS:IDLE_OPEN"""
     status_vals = parse_key_values(status_string)
     try:
-        return getattr(HeaterShakerPlateLockStatus, status_vals["STATUS"])
-    except (KeyError, AttributeError):
+        return HeaterShakerPlateLockStatus[status_vals["STATUS"]]
+    except KeyError:
         raise ParseError(
             error_message="Unexpected argument to parse_plate_lock_status_response",
             parse_source=status_string,
@@ -171,7 +171,7 @@ def parse_key_values(value: str) -> Dict[str, str]:
     return res
 
 
-def parse_optional_number(value: str, rounding_val) -> Optional[float]:
+def parse_optional_number(value: str, rounding_val: int) -> Optional[float]:
     """Convert number to float. 'none' will be converted to None"""
     return None if value == "none" else parse_number(value, rounding_val)
 
@@ -192,7 +192,7 @@ class AxisMoveTimestamp:
     def __init__(self, axis_iter: Sequence[str]):
         self._moved_at: Dict[str, Optional[float]] = {ax: None for ax in axis_iter}
 
-    def mark_moved(self, axis_iter: Sequence[str]):
+    def mark_moved(self, axis_iter: Sequence[str]) -> None:
         """Indicate that a set of axes just moved"""
         now = time.monotonic()
         self._moved_at.update({ax: now for ax in axis_iter})
@@ -202,7 +202,7 @@ class AxisMoveTimestamp:
         now = time.monotonic()
         return {ax: now - val if val else None for ax, val, in self._moved_at.items()}
 
-    def reset_moved(self, axis_iter: Iterable[str]):
+    def reset_moved(self, axis_iter: Iterable[str]) -> None:
         """Reset the clocks for a set of axes"""
         self._moved_at.update({ax: None for ax in axis_iter})
 

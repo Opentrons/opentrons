@@ -19,5 +19,5 @@ async def run() -> None:
     await server.run(settings)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     asyncio.run(run())

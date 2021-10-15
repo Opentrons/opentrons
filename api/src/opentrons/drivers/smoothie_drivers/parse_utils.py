@@ -119,7 +119,7 @@ def parse_switch_values(raw_switch_values: str) -> Dict[str, bool]:
     return res
 
 
-def parse_homing_status_values(raw_homing_status_values):
+def parse_homing_status_values(raw_homing_status_values: str) -> Dict[str, bool]:
     """
     Parse the Smoothieware response to a G28.6 command (homing-status)
     A "1" means it has been homed, and "0" means it has not been homed

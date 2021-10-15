@@ -75,7 +75,12 @@ test:
 .PHONY: lint
 lint: $(ot_py_sources)
 	$(python) -m mypy $(SRC_PATH) $(tests)
+	$(python) -m black --check notify_server tests setup.py
 	$(python) -m flake8 $(SRC_PATH) $(tests)
+
+.PHONY: format
+format:
+	$(python) -m black notify_server tests setup.py
 
 .PHONY: dev
 dev: export OT_NOTIFY_SERVER_PRODUCTION := 0

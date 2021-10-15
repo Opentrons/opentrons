@@ -3,9 +3,10 @@ from __future__ import annotations
 import asyncio
 import contextlib
 from concurrent.futures.thread import ThreadPoolExecutor
-from typing import Optional
+from functools import partial
+from typing import Optional, Generator
 
-from serial import Serial, serial_for_url  # type: ignore
+from serial import Serial, serial_for_url  # type: ignore[import]
 
 
 class AsyncSerial:
@@ -37,7 +38,8 @@ class AsyncSerial:
         executor = ThreadPoolExecutor(max_workers=1)
         serial = await loop.run_in_executor(
             executor=executor,
-            func=lambda: serial_for_url(
+            func=partial(
+                serial_for_url,
                 url=port,
                 baudrate=baud_rate,
                 timeout=timeout,
@@ -85,7 +87,8 @@ class AsyncSerial:
         """
         with self._timeout_override("timeout", timeout):
             return await self._loop.run_in_executor(
-                executor=self._executor, func=lambda: self._serial.read_until(match)
+                executor=self._executor,
+                func=partial(self._serial.read_until, expected=match),
             )
 
     async def write(self, data: bytes, timeout: Optional[float] = None) -> None:
@@ -147,10 +150,12 @@ class AsyncSerial:
 
         Returns: boolean
         """
-        return self._serial.is_open
+        return self._serial.is_open is True
 
     @contextlib.contextmanager
-    def _timeout_override(self, timeout_property: str, timeout: Optional[float]):
+    def _timeout_override(
+        self, timeout_property: str, timeout: Optional[float]
+    ) -> Generator[None, None, None]:
         """Context manager that will temporarily override the default timeout."""
         default_timeout = getattr(self._serial, timeout_property)
         override = timeout is not None and default_timeout != timeout
