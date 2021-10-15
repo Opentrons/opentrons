@@ -46,6 +46,18 @@ class GetStatusRequest:  # noqa: D101
 
 
 @dataclass
+class EnableMotorRequest:  # noqa: D101
+    message_id: Literal[MessageId.enable_motor_request] = MessageId.get_status_request
+    payload_type: Type[BinarySerializable] = payloads.EmptyMessage
+
+
+@dataclass
+class DisableMotorRequest:  # noqa: D101
+    message_id: Literal[MessageId.disable_motor_request] = MessageId.get_status_request
+    payload_type: Type[BinarySerializable] = payloads.EmptyMessage
+
+
+@dataclass
 class GetStatusResponse:  # noqa: D101
     message_id: Literal[MessageId.get_status_response] = MessageId.get_status_response
     payload_type: Type[BinarySerializable] = payloads.EmptyMessage
