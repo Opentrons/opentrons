@@ -20,7 +20,6 @@ import {
   DIRECTION_COLUMN,
   SPACING_6,
   FONT_SIZE_BODY_2,
-  Btn,
   Link,
 } from '@opentrons/components'
 import { getIsTiprack, getPipetteNameSpecs } from '@opentrons/shared-data'
@@ -135,7 +134,6 @@ export const LabwarePositionCheckStepDetail = (
         {showJogControls ? (
           <Flex marginTop={'-10rem'} zIndex={5} justifyContent={JUSTIFY_CENTER}>
             <JogControls
-              color={C_BLUE}
               jog={jog}
               stepSizes={[0.1, 1, 10]}
               planes={[HORIZONTAL_PLANE, VERTICAL_PLANE]}
@@ -145,15 +143,15 @@ export const LabwarePositionCheckStepDetail = (
         ) : (
           <Box fontSize={FONT_SIZE_BODY_2} padding={SPACING_2}>
             <Flex justifyContent={JUSTIFY_CENTER} marginTop={'-8rem'}>
-              <Btn
-                as={Link}
+              <Link
+                role={'link'}
                 fontSize={FONT_SIZE_BODY_2}
                 color={C_BLUE}
                 onClick={() => setShowJogControls(true)}
                 zIndex={2}
               >
                 {t('reveal_jog_controls')}
-              </Btn>
+              </Link>
             </Flex>
           </Box>
         )}

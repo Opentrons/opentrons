@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
-import { fireEvent, screen } from '@testing-library/react'
+import '@testing-library/jest-dom'
+import { fireEvent, getByTestId, screen } from '@testing-library/react'
 import { getIsTiprack, getPipetteNameSpecs } from '@opentrons/shared-data'
 import {
   RobotWorkSpace,
@@ -171,6 +172,11 @@ describe('LabwarePositionCheckStepDetail', () => {
     render(props)
     screen.getByAltText('level with labware')
   })
+  it('renders null if protocol data is null', () => {
+    mockUseProtocolDetails.mockReturnValue({ protocolData: null } as any)
+    const { container } = render(props)
+    expect(container.firstChild).toBeNull()
+  })
   it('renders the level with tip image', () => {
     mockGetIsTiprack.mockReturnValue(true)
 
@@ -269,16 +275,18 @@ describe('LabwarePositionCheckStepDetail', () => {
   })
   describe('jog controls', () => {
     it('renders correct text when jog controls are hidden', () => {
-      const { getByText } = render(props)
+      const { getByText, getByRole } = render(props)
       getByText('Need to make an adjustment?')
-      getByText('Reveal jog controls')
+      expect(getByRole('link', { name: 'Reveal jog controls' })).toBeTruthy()
       expect(screen.queryByText('Mock Jog Controls')).toBeNull()
     })
     it('renders correct text when jog controls are revealed', () => {
       mockJogControls.mockReturnValue(<div>Mock Jog Controls</div>)
-      const { getByText } = render(props)
+      const { getByText, getByRole } = render(props)
       getByText('Need to make an adjustment?')
-      const revealJogControls = getByText('Reveal jog controls')
+      const revealJogControls = getByRole('link', {
+        name: 'Reveal jog controls',
+      })
       fireEvent.click(revealJogControls)
       expect(screen.queryByText('Mock Jog Controls')).not.toBeNull()
     })
