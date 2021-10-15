@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import '@testing-library/jest-dom'
-import { fireEvent, getByTestId, screen } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import { getIsTiprack, getPipetteNameSpecs } from '@opentrons/shared-data'
 import {
   RobotWorkSpace,
