@@ -75,6 +75,13 @@ class LegacyCommandMapper:
             return engine_command
 
         else:
+            # TODO(mc, 2021-10-15): we can still have an "infinite command running"
+            # problem here if:
+            # 1. The protocol enters a `try/except` block
+            # 2. A PC method triggers a `before` message
+            # 3. The method raises, and is caught by the `except`
+            # 4. The protocol continues, triggering more commands
+            # https://github.com/Opentrons/opentrons/issues/8490
             running_command = self._running_commands[command_type].pop()
             completed_command = running_command.copy(
                 update={

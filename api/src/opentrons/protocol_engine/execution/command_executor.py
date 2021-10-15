@@ -4,9 +4,8 @@ from typing import Optional
 
 from ..state import StateStore
 from ..resources import ModelUtils
-from ..actions import ActionDispatcher, CommandUpdatedAction, CommandFailedAction
 from ..commands import CommandStatus
-
+from ..actions import ActionDispatcher, CommandUpdatedAction, CommandFailedAction
 from .equipment import EquipmentHandler
 from .movement import MovementHandler
 from .pipetting import PipettingHandler

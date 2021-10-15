@@ -4,6 +4,7 @@ from datetime import datetime
 
 from opentrons.protocol_engine.state.commands import CommandState, CommandStore
 
+from opentrons.protocol_engine.commands import CommandStatus
 from opentrons.protocol_engine.actions import (
     CommandUpdatedAction,
     CommandFailedAction,
@@ -176,7 +177,11 @@ def test_command_store_handles_stop_with_error() -> None:
                 (
                     "command-id-2",
                     running_command.copy(
-                        update={"error": "error-id", "completedAt": completed_at}
+                        update={
+                            "error": "error-id",
+                            "status": CommandStatus.FAILED,
+                            "completedAt": completed_at,
+                        }
                     ),
                 ),
                 ("command-id-3", queued_command),

@@ -82,6 +82,12 @@ class CommandStore(HasState[CommandState], HandlesActions):
         elif isinstance(action, StopAction):
             commands_by_id = self._state.commands_by_id.copy()
 
+            # if we are stopping due to an error, pre-emptively mark any
+            # running command as "failed"
+            # TODO(mc, 2021-10-15): this is primarily to support mapping PAPIv2
+            # command messages, which have no error signal, to engine commands.
+            # It may be a better solution to add a command error signal to PAPIv2,
+            # in which case this command marking logic may be unnecessary.
             if action.error_details is not None:
                 error_id = action.error_details.error_id
                 completed_at = action.error_details.created_at
@@ -89,7 +95,11 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 for command_id, command in commands_by_id.items():
                     if command.status == CommandStatus.RUNNING:
                         updated_command = command.copy(
-                            update={"error": error_id, "completedAt": completed_at}
+                            update={
+                                "error": error_id,
+                                "completedAt": completed_at,
+                                "status": CommandStatus.FAILED,
+                            }
                         )
                         commands_by_id[command_id] = updated_command
 
@@ -216,6 +226,11 @@ class CommandView(HasState[CommandState]):
             action_desc = "play" if isinstance(action, PlayAction) else "pause"
             raise ProtocolEngineStoppedError(f"Cannot {action_desc} a stopped engine.")
 
+    # TODO(mc, 2021-10-15): with the introduction of the ErrorOccurances,
+    # this status logic is no longer sufficient. Move to a StatusView
+    # that depends on both and can differentiate between the different stops.
+    # We also need to account for the fact that failed commands may not be fatal
+    # in Python and live protocols.
     def get_status(self) -> EngineStatus:
         """Get the current execution status of the engine."""
         all_commands = self._state.commands_by_id.values()
