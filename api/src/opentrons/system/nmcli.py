@@ -297,9 +297,11 @@ class CONNECTION_TYPES(enum.Enum):
 
 class NETWORK_IFACES(enum.Enum):
     """Network interface names that we manage here."""
+
     WIFI = {
-        config.SystemArchitecture.BUILDROOT: 'wlan0',
-        config.SystemArchitecture.YOCTO: 'mlan0'}.get(config.ARCHITECTURE, 'wlan0')
+        config.SystemArchitecture.BUILDROOT: "wlan0",
+        config.SystemArchitecture.YOCTO: "mlan0",
+    }.get(config.ARCHITECTURE, "wlan0")
     ETH_LL = "eth0"
 
 

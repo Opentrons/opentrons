@@ -45,7 +45,10 @@ log = logging.getLogger(__file__)
 IS_WIN = sys.platform.startswith("win")
 IS_OSX = sys.platform == "darwin"
 IS_LINUX = sys.platform.startswith("linux")
-IS_ROBOT = bool(IS_LINUX and (os.environ.get("RUNNING_ON_PI") or os.environ.get("RUNNING_ON_VERDIN")))
+IS_ROBOT = bool(
+    IS_LINUX
+    and (os.environ.get("RUNNING_ON_PI") or os.environ.get("RUNNING_ON_VERDIN"))
+)
 #: This is the correct thing to check to see if we’re running on a robot
 IS_VIRTUAL = bool(os.environ.get("ENABLE_VIRTUAL_SMOOTHIE"))
 
@@ -54,6 +57,7 @@ class SystemArchitecture(Enum):
     HOST = auto()
     BUILDROOT = auto()
     YOCTO = auto()
+
 
 ROBOT_FIRMWARE_DIR: Optional[Path] = None
 #: The path to firmware files for modules
@@ -75,7 +79,7 @@ if IS_ROBOT:
     if "OT_SYSTEM_VERSION" in os.environ:
         OT_SYSTEM_VERSION = os.environ["OT_SYSTEM_VERSION"]
         ARCHITECTURE = SystemArchitecture.YOCTO
-        ROBOT_FIRMWARE_DIR: Optional[Path] = Path("/lib/firmware/")
+        ROBOT_FIRMWARE_DIR = Path("/lib/firmware/")
     else:
         try:
             with open("/etc/VERSION.json") as vj:
@@ -84,15 +88,16 @@ if IS_ROBOT:
             ARCHITECTURE = SystemArchitecture.BUILDROOT
         except Exception:
             log.exception("Could not find version file in /etc/VERSION.json")
-        ROBOT_FIRMWARE_DIR: Optional[Path] = Path("/usr/lib/firmware/")
-    JUPYTER_NOTEBOOK_ROOT_DIR: Optional[Path] = Path("/var/lib/jupyter/notebooks/")
-    JUPYTER_NOTEBOOK_LABWARE_DIR: Optional[Path] = (
-        JUPYTER_NOTEBOOK_ROOT_DIR / "labware"  # type: ignore[operator]
-    )
+        ROBOT_FIRMWARE_DIR = Path("/usr/lib/firmware/")
+    JUPYTER_NOTEBOOK_ROOT_DIR = Path("/var/lib/jupyter/notebooks/")
+    JUPYTER_NOTEBOOK_LABWARE_DIR = JUPYTER_NOTEBOOK_ROOT_DIR / "labware"
 
 
 def name() -> str:
-    if IS_ROBOT and ARCHITECTURE in (SystemArchitecture.BUILDROOT, SystemArchitecture.YOCTO):
+    if IS_ROBOT and ARCHITECTURE in (
+        SystemArchitecture.BUILDROOT,
+        SystemArchitecture.YOCTO,
+    ):
         try:
             return (
                 subprocess.check_output(["hostnamectl", "--pretty", "status"])
