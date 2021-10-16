@@ -90,9 +90,15 @@ export const DeckMap = (props: DeckMapProps): JSX.Element | null => {
                           nestedLabwareId
                         ) === true && (
                           <g
-                            transform={`translate(${x + 35},${
-                              y + 15
-                            }) scale(0.1, 0.1)`}
+                            transform={
+                              moduleDef.model !== THERMOCYCLER_MODULE_V1
+                                ? `translate(${x + 35},${
+                                    y + 70
+                                  }) scale(0.1, -0.1)`
+                                : `translate(${x + 35},${
+                                    y - 110
+                                  }) scale(0.1, -0.1)`
+                            }
                           >
                             <circle
                               cx="0"
@@ -132,7 +138,7 @@ export const DeckMap = (props: DeckMapProps): JSX.Element | null => {
                   {completedLabwareIdSections?.includes(labwareId) === true && (
                     <g
                       transform={`
-                      translate(${x + 35},${y + 15}) scale(0.1, 0.1) rotate(-180 180 180)
+                      translate(${x + 35},${y + 70}) scale(0.1, -0.1) 
                       `}
                     >
                       <circle

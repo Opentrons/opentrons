@@ -7,7 +7,7 @@ import {
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   SPACING_3,
-  SPACING_4,
+  SPACING_5,
 } from '@opentrons/components'
 import { LabwarePositionCheckStepDetail } from './LabwarePositionCheckStepDetail'
 import { SectionList } from './SectionList'
@@ -24,8 +24,7 @@ export const GenericStepScreen = (
 ): JSX.Element | null => {
   const introInfo = useIntroInfo()
   const labwareIdsBySection = useLabwareIdsBySection()
-  //const [sectionIndex] = React.useState<number>(0)
-  const sectionIndex = 2
+  const [sectionIndex] = React.useState<number>(0)
   if (introInfo == null) return null
   const { sections, primaryPipetteMount, secondaryPipetteMount } = introInfo
   const labwareIdsToHighlight = labwareIdsBySection[sections[sectionIndex]]
@@ -34,7 +33,7 @@ export const GenericStepScreen = (
     <Box margin={SPACING_3}>
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_CENTER}>
         <Flex flexDirection={DIRECTION_COLUMN}>
-          <Flex marginRight={SPACING_4}>
+          <Flex marginRight={SPACING_5}>
             <SectionList
               primaryPipetteMount={primaryPipetteMount}
               secondaryPipetteMount={secondaryPipetteMount}
@@ -46,7 +45,9 @@ export const GenericStepScreen = (
           <Flex justifyContent={JUSTIFY_CENTER}>
             <DeckMap
               labwareIdsToHighlight={labwareIdsToHighlight}
-              completedLabwareIdSections ={labwareIdsBySection[sections[sectionIndex -1]]}
+              completedLabwareIdSections={
+                labwareIdsBySection[sections[sectionIndex - 1]]
+              }
             />
           </Flex>
         </Flex>
