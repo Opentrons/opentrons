@@ -106,9 +106,13 @@ export const DeckMap = (props: DeckMapProps): JSX.Element | null => {
                               r={260}
                               fill={C_WHITE}
                               transform={`translate(270,265)`}
+                              data-testid={`DeckMap_module_${nestedLabwareId}_whiteBackground`}
+                            />
+                            <Icon
+                              name="check-circle"
+                              color={COLOR_SUCCESS}
                               data-testid={`DeckMap_module_${nestedLabwareId}_checkmark`}
                             />
-                            <Icon name="check-circle" color={COLOR_SUCCESS} />
                           </g>
                         )}
                     </React.Fragment>
@@ -147,9 +151,13 @@ export const DeckMap = (props: DeckMapProps): JSX.Element | null => {
                         r={260}
                         fill={C_WHITE}
                         transform={`translate(270,265)`}
+                        data-testid={`DeckMap_${labwareId}_whiteBackground`}
+                      />
+                      <Icon
+                        name="check-circle"
+                        color={COLOR_SUCCESS}
                         data-testid={`DeckMap_${labwareId}_checkmark`}
                       />
-                      <Icon name="check-circle" color={COLOR_SUCCESS} />
                     </g>
                   )}
                 </React.Fragment>

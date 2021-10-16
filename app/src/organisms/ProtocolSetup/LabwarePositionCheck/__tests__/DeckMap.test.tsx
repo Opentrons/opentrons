@@ -160,6 +160,7 @@ describe('LPC DeckMap', () => {
       />
     )
     getByTestId(`DeckMap_${LABWARE_ID_TO_HIGHLIGHT}_checkmark`)
+    getByTestId(`DeckMap_${LABWARE_ID_TO_HIGHLIGHT}_whiteBackground`)
     getByTestId(`DeckMap_module_${ANOTHER_LABWARE_ID_TO_HIGHLIGHT}_highlight`)
   })
   it('should render a deckmap with a blank circle and checkbox over completed module section', () => {
@@ -171,5 +172,8 @@ describe('LPC DeckMap', () => {
     )
     getByTestId(`DeckMap_${LABWARE_ID_TO_HIGHLIGHT}_highlight`)
     getByTestId(`DeckMap_module_${ANOTHER_LABWARE_ID_TO_HIGHLIGHT}_checkmark`)
+    getByTestId(
+      `DeckMap_module_${ANOTHER_LABWARE_ID_TO_HIGHLIGHT}_whiteBackground`
+    )
   })
 })
