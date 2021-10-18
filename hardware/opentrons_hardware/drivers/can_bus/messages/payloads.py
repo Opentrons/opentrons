@@ -67,16 +67,20 @@ class AddToMoveGroupRequest(MoveGroupRequest):
     """Base of add to move group request to a message group."""
 
     seq_id: utils.UInt8Field
-    duration: utils.UInt32Field
+    # TODO (al, 2021-10-2021): this should be 32 bits
+    duration: utils.UInt16Field
 
 
 @dataclass
 class AddLinearMoveRequest(AddToMoveGroupRequest):
     """Add a linear move request to a message group."""
 
-    acceleration: utils.Int32Field
-    velocity: utils.Int32Field
-    position: utils.UInt32Field
+    # TODO (al, 2021-10-2021): this should be 32 bits
+    acceleration: utils.Int16Field
+    # TODO (al, 2021-10-2021): this should be 32 bits
+    velocity: utils.Int16Field
+    # TODO (al, 2021-10-2021): this should be present and 32 bits
+    # position: utils.UInt32Field
 
 
 @dataclass

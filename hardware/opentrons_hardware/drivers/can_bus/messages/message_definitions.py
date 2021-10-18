@@ -115,7 +115,7 @@ class AddLinearMoveRequest:  # noqa: D101
 
 @dataclass
 class GetMoveGroupRequest:  # noqa: D101
-    messageId: Literal[
+    message_id: Literal[
         MessageId.get_move_group_request
     ] = MessageId.get_move_group_request
     payload_type: Type[BinarySerializable] = payloads.MoveGroupRequest
@@ -123,7 +123,7 @@ class GetMoveGroupRequest:  # noqa: D101
 
 @dataclass
 class GetMoveGroupResponse:  # noqa: D101
-    messageId: Literal[
+    message_id: Literal[
         MessageId.get_move_group_response
     ] = MessageId.get_move_group_response
     payload_type: Type[BinarySerializable] = payloads.GetMoveGroupResponse
