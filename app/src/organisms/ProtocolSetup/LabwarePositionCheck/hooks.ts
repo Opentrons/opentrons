@@ -1,8 +1,12 @@
+import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { getLabwarePositionCheckSteps } from './getLabwarePositionCheckSteps'
 import { getProtocolData } from '../../../redux/protocol'
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
+import { createCommand, HostConfig } from '@opentrons/api-client'
+import { useHost, useEnsureBasicSession } from '@opentrons/react-api-client'
 
+import type { Command } from '@opentrons/shared-data/protocol/types/schemaV5'
 import type { PipetteName } from '@opentrons/shared-data'
 import type { State } from '../../../redux/types'
 import type {
@@ -117,5 +121,45 @@ export function useIntroInfo(): IntroInfo | null {
     numberOfTips,
     firstStepLabwareSlot,
     sections,
+  }
+}
+
+interface LabwarePositionCheckUtils {
+  currentStepIndex: number
+  isLoading: boolean
+  proceed: () => unknown
+  jog: () => unknown
+}
+
+export function useLabwarePositionCheck(
+  proceedToSummary: () => unknown
+): LabwarePositionCheckUtils {
+  const [currentCommandIndex, setCurrentCommandIndex] = React.useState<number>(
+    0
+  )
+  const host = useHost()
+  const basicSession = useEnsureBasicSession()
+  const [isLoading, setIsLoading] = React.useState<boolean>(false)
+  const commands = useSteps().reduce<Command[]>((steps, currentStep) => {
+    return [...steps, ...currentStep.commands]
+  }, [])
+
+  const currentCommand = commands[currentCommandIndex]
+  const proceed = async (): Promise<void> => {
+    // @ts-expect-error delete this when schema v6 types are out
+    if (currentCommand.command === 'savePosition') {
+      const data = {
+        // @ts-expect-error TODO: pipetteId should always exist on an LPC command, create a subtype so we can remove this
+        pipetteId: currentCommand.params.pipetteId,
+      }
+      await createCommand(host as HostConfig, basicSession?.id, data)
+    }
+  }
+
+  return {
+    currentCommandIndex,
+    isLoading,
+    proceed,
+    jog: () => console.log('jogginig'),
   }
 }

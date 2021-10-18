@@ -2,6 +2,7 @@ export { getSession } from './getSession'
 export { deleteSession } from './deleteSession'
 export { createSession } from './createSession'
 export { getSessions } from './getSessions'
-
+export { createCommand } from './commands/createCommand'
+export { getCommand } from './commands/getCommand'
 export * from './types'
 export type { CreateSessionData } from './createSession'
