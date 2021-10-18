@@ -80,7 +80,7 @@ class AddLinearMoveRequest(AddToMoveGroupRequest):
 
 
 @dataclass
-class GetMoveGroupResponse(utils.BinarySerializable):
+class GetMoveGroupResponse(MoveGroupRequest):
     """Response to request to get a move group."""
 
     num_moves: utils.UInt8Field
@@ -97,7 +97,7 @@ class ExecuteMoveGroupRequest(MoveGroupRequest):
 
 
 @dataclass
-class MoveGroupComplete(MoveGroupRequest):
+class MoveGroupCompleted(MoveGroupRequest):
     """Notification of a completed move group."""
 
     node_id: utils.UInt8Field
