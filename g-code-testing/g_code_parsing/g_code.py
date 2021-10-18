@@ -7,7 +7,7 @@ from opentrons.drivers.smoothie_drivers.driver_3_0 import GCODE as SMOOTHIE_G_CO
 from opentrons.drivers.mag_deck.driver import GCODE as MAGDECK_G_CODE
 from opentrons.drivers.temp_deck.driver import GCODE as TEMPDECK_G_CODE
 from opentrons.drivers.thermocycler.driver import GCODE as THERMOCYCLER_G_CODE
-from opentrons.drivers.heatershaker.driver import GCODE as HEATER_SHAKER_G_CODE
+from opentrons.drivers.heater_shaker.driver import GCODE as HEATER_SHAKER_G_CODE
 from g_code_parsing.utils import reverse_enum
 from opentrons.hardware_control.emulation.parser import Parser
 from g_code_parsing.g_code_functionality_defs.g_code_functionality_def_base import (  # noqa: E501
