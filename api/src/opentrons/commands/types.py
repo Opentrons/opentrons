@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from typing_extensions import Literal, Final, TypedDict
-from typing import Optional, List, Sequence, TYPE_CHECKING, Union, Any
+from typing import Optional, List, Sequence, TYPE_CHECKING, Union
 from opentrons.hardware_control.modules import ThermocyclerStep
 
 if TYPE_CHECKING:
@@ -572,14 +572,14 @@ MessageSequenceId = Union[Literal["before"], Literal["after"]]
 
 CommandMessageSequence = TypedDict("CommandMessageSequence", {"$": MessageSequenceId})
 
-CommandMessageOptional = TypedDict(
-    "CommandMessageOptional",
-    {"meta": Any, "error": Exception},
+CommandMessageError = TypedDict(
+    "CommandMessageError",
+    {"error": Exception},
     total=False,
 )
 
 
-class CommandMessageFields(CommandMessageOptional, CommandMessageSequence):
+class CommandMessageFields(CommandMessageError, CommandMessageSequence):
     pass
 
 

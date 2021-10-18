@@ -49,7 +49,7 @@ def do_publish(
     f: Callable,
     when: command_types.MessageSequenceId,
     res: Any,
-    meta: Any,
+    error: Optional[Exception],
     *args: Any,
     **kwargs: Any
 ) -> None:
@@ -83,8 +83,8 @@ def do_publish(
         {key: call_args[key] for key in (set(getfullargspec.args) & call_args.keys())}
     )
 
-    if meta:
-        command_args["meta"] = meta
+    if error:
+        command_args["error"] = error
 
     payload = cmd(**command_args)
 
@@ -112,7 +112,7 @@ def publish_paired(
 FuncT = TypeVar("FuncT", bound=Callable[..., Any])
 
 
-def publish(command: CmdFunction, meta: Any = None) -> Callable[[FuncT], FuncT]:
+def publish(command: CmdFunction) -> Callable[[FuncT], FuncT]:
     """Publish events both before and after the decorated function has run."""
 
     def _decorator(f: FuncT) -> FuncT:
@@ -128,9 +128,9 @@ def publish(command: CmdFunction, meta: Any = None) -> Callable[[FuncT], FuncT]:
                     classes should be decorated."
                 )
 
-            do_publish(broker, command, f, "before", None, meta, *args, **kwargs)
+            do_publish(broker, command, f, "before", None, None, *args, **kwargs)
             res = f(*args, **kwargs)
-            do_publish(broker, command, f, "after", res, meta, *args, **kwargs)
+            do_publish(broker, command, f, "after", res, None, *args, **kwargs)
             return res
 
         return cast(FuncT, _decorated)

@@ -25,7 +25,6 @@ def test_map_before_command() -> None:
     """It should map a "before" message to a running command."""
     legacy_command: PauseMessage = {
         "$": "before",
-        "meta": {},
         "name": "command.PAUSE",
         "payload": {"userMessage": "hello world", "text": "hello world"},
     }
@@ -49,13 +48,11 @@ def test_map_after_command() -> None:
     """It should map an "after" message to a completed command."""
     legacy_command_start: PauseMessage = {
         "$": "before",
-        "meta": {},
         "name": "command.PAUSE",
         "payload": {"userMessage": "hello world", "text": "hello world"},
     }
     legacy_command_end: PauseMessage = {
         "$": "after",
-        "meta": {},
         "name": "command.PAUSE",
         "payload": {"userMessage": "hello world", "text": "hello world"},
     }
@@ -82,25 +79,21 @@ def test_command_stack() -> None:
     """It should maintain a command stack to map IDs."""
     legacy_command_1: PauseMessage = {
         "$": "before",
-        "meta": {},
         "name": "command.PAUSE",
         "payload": {"userMessage": "hello", "text": "hello"},
     }
     legacy_command_2: PauseMessage = {
         "$": "before",
-        "meta": {},
         "name": "command.PAUSE",
         "payload": {"userMessage": "goodbye", "text": "goodbye"},
     }
     legacy_command_3: PauseMessage = {
         "$": "after",
-        "meta": {},
         "name": "command.PAUSE",
         "payload": {"userMessage": "hello world", "text": "goodbye"},
     }
     legacy_command_4: PauseMessage = {
         "$": "after",
-        "meta": {},
         "name": "command.PAUSE",
         "payload": {"userMessage": "hello world", "text": "hello"},
     }
