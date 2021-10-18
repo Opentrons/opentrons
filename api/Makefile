@@ -23,6 +23,9 @@ sphinx_build_allow_warnings := $(pipenv) run sphinx-build
 # used to create the wheel.
 wheel_file = dist/$(call python_get_wheelname,api,opentrons,$(BUILD_NUMBER))
 
+# Find the version of the sdist file from package.json using a helper script.
+sdist_file = dist/$(call python_get_sdistname,api,opentrons)
+
 # These variables are for simulating python protocols
 sim_log_level ?= info
 simfile ?=
@@ -78,13 +81,21 @@ clean: docs-clean
 teardown:
 	$(pipenv) --rm
 
-dist/opentrons-%-py2.py3-none-any.whl: setup.py $(ot_sources)
+$(wheel_file): setup.py $(ot_sources)
 	$(clean_cmd)
 	$(python) setup.py $(wheel_opts) bdist_wheel
 	$(SHX) rm -rf build
 	$(SHX) ls dist
 
 wheel: $(wheel_file)
+
+$(sdist_file): setup.py $(ot_sources)
+	$(clean_cmd)
+	$(python) setup.py sdist
+	$(SHX) rm -rf build
+	$(SHX) ls dist
+
+sdist: $(sdist_file)
 
 .PHONY: test
 test:
@@ -158,6 +169,15 @@ push-no-restart: wheel
 .PHONY: push
 push: push-no-restart
 	$(call restart-service,$(host),$(br_ssh_key),$(ssh_opts),"jupyter-notebook opentrons-robot-server")
+
+.PHONY: push-no-restart-ot3
+push-no-restart-ot3: $(sdist_file)
+	echo $(sdist_file)
+	$(call push-python-sdist,$(host),,$(ssh_opts),$(sdist_file),/opt/opentrons-robot-server,opentrons,src)
+
+.PHONY: push-ot3
+push-ot3: push-no-restart-ot3
+	$(call restart-server,$(host),,$(ssh_opts),"opentrons-robot-server")
 
 .PHONY: simulate
 simulate:
