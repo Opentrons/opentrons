@@ -43,8 +43,8 @@ class SDistWithData(sdist.sdist):
         self.announce("adding data files to base dir {}"
                       .format(base_dir))
         for data_file in get_shared_data_files():
-            sdist_dest = os.path.join(base_dir, DEST_BASE_PATH)
-            self.mkpath(os.path.join(sdist_dest, 'opentrons_shared_data',
+            sdist_dest = os.path.join(base_dir, 'opentrons_shared_data', DEST_BASE_PATH)
+            self.mkpath(os.path.join(sdist_dest,
                                      os.path.dirname(data_file)))
             self.copy_file(os.path.join(DATA_ROOT, data_file),
                            os.path.join(sdist_dest, data_file))
