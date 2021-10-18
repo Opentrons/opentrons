@@ -571,10 +571,15 @@ MessageSequenceId = Union[Literal["before"], Literal["after"]]
 
 
 CommandMessageSequence = TypedDict("CommandMessageSequence", {"$": MessageSequenceId})
-CommandMessageMeta = TypedDict("CommandMessageMeta", {"meta": Any}, total=False)
+
+CommandMessageOptional = TypedDict(
+    "CommandMessageOptional",
+    {"meta": Any, "error": Exception},
+    total=False,
+)
 
 
-class CommandMessageFields(CommandMessageMeta, CommandMessageSequence):
+class CommandMessageFields(CommandMessageOptional, CommandMessageSequence):
     pass
 
 
