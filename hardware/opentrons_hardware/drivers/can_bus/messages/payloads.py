@@ -57,13 +57,15 @@ class ReadFromEEPromResponse(utils.BinarySerializable):
 
 @dataclass
 class MoveGroupRequest(utils.BinarySerializable):
-    """"""
+    """A payload with a group id."""
+
     group_id: utils.UInt8Field
 
 
 @dataclass
 class AddToMoveGroupRequest(MoveGroupRequest):
     """Base of add to move group request to a message group."""
+
     seq_id: utils.UInt8Field
     duration: utils.UInt32Field
 
@@ -71,6 +73,7 @@ class AddToMoveGroupRequest(MoveGroupRequest):
 @dataclass
 class AddLinearMoveRequest(AddToMoveGroupRequest):
     """Add a linear move request to a message group."""
+
     acceleration: utils.Int32Field
     velocity: utils.Int32Field
     position: utils.UInt32Field
@@ -78,19 +81,23 @@ class AddLinearMoveRequest(AddToMoveGroupRequest):
 
 @dataclass
 class GetMoveGroupResponse(utils.BinarySerializable):
-    """"""
+    """Response to request to get a move group."""
+
     num_moves: utils.UInt8Field
     total_duration: utils.UInt32Field
+    node_id: utils.UInt8Field
 
 
 @dataclass
 class ExecuteMoveGroupRequest(MoveGroupRequest):
-    """"""
+    """Start executing a move group."""
+
     start_trigger: utils.UInt8Field
     cancel_trigger: utils.UInt8Field
 
 
 @dataclass
 class MoveGroupComplete(MoveGroupRequest):
-    """"""
+    """Notification of a completed move group."""
+
     node_id: utils.UInt8Field
