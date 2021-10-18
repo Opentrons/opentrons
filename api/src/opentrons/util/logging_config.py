@@ -6,7 +6,7 @@ from typing import Any, Dict
 from opentrons.config import CONFIG, ARCHITECTURE, SystemArchitecture
 
 
-def _balena_config(level_value: int) -> Dict[str, Any]:
+def _host_config(level_value: int) -> Dict[str, Any]:
     serial_log_filename = CONFIG["serial_log_file"]
     api_log_filename = CONFIG["api_log_file"]
     return {
@@ -98,11 +98,6 @@ def _buildroot_config(level_value: int) -> Dict[str, Any]:
             "__main__": {"handlers": ["api"], "level": level_value},
         },
     }
-
-
-def _host_config(level_value: int) -> Dict[str, Any]:
-    """Host logging, for now the same as balena logging"""
-    return _balena_config(level_value)
 
 
 def _config(arch: SystemArchitecture, level_value: int) -> Dict[str, Any]:
