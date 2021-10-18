@@ -24,6 +24,12 @@ MessageDefinition = Union[
     defs.WriteToEEPromRequest,
     defs.ReadFromEEPromRequest,
     defs.ReadFromEEPromResponse,
+    defs.AddLinearMoveRequest,
+    defs.GetMoveGroupRequest,
+    defs.GetMoveGroupResponse,
+    defs.ExecuteMoveGroupRequest,
+    defs.ClearMoveGroupRequest,
+    defs.MoveGroupCompleted
 ]
 
 

@@ -105,3 +105,41 @@ class ReadFromEEPromRequest:  # noqa: D101
 class ReadFromEEPromResponse:  # noqa: D101
     message_id: Literal[MessageId.read_eeprom_response] = MessageId.read_eeprom_response
     payload_type: Type[BinarySerializable] = payloads.ReadFromEEPromResponse
+
+
+@dataclass
+class AddLinearMoveRequest:
+    message_id: Literal[MessageId.add_move_request] = MessageId.add_move_request
+    payload_type: Type[BinarySerializable] = payloads.AddLinearMoveRequest
+
+
+@dataclass
+class GetMoveGroupRequest:
+    messageId: Literal[MessageId.get_move_group_request] = MessageId.get_move_group_request
+    payload_type: Type[BinarySerializable] = payloads.MoveGroupRequest
+
+
+@dataclass
+class GetMoveGroupResponse:
+    messageId: Literal[MessageId.get_move_group_response] = MessageId.get_move_group_response
+    payload_type: Type[BinarySerializable] = payloads.GetMoveGroupResponse
+
+
+@dataclass
+class ExecuteMoveGroupRequest:
+    message_id: Literal[MessageId.execute_move_group_request] = MessageId.execute_move_group_request
+    payload_type: Type[BinarySerializable] = payloads.MoveGroupRequest
+
+
+@dataclass
+class ClearMoveGroupRequest:
+    message_id: Literal[
+        MessageId.clear_move_group_request] = MessageId.clear_move_group_request
+    payload_type: Type[BinarySerializable] = payloads.MoveGroupRequest
+
+
+@dataclass
+class MoveGroupCompleted:
+    message_id: Literal[
+        MessageId.move_group_completed] = MessageId.move_group_completed
+    payload_type: Type[BinarySerializable] = payloads.MoveGroupComplete
