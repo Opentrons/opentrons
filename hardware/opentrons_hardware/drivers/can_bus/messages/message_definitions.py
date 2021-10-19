@@ -78,18 +78,6 @@ class SetupRequest:  # noqa: D101
 
 
 @dataclass
-class GetSpeedRequest:  # noqa: D101
-    message_id: Literal[MessageId.get_speed_request] = MessageId.get_speed_request
-    payload_type: Type[BinarySerializable] = payloads.EmptyMessage
-
-
-@dataclass
-class GetSpeedResponse:  # noqa: D101
-    message_id: Literal[MessageId.get_speed_response] = MessageId.get_speed_response
-    payload_type: Type[BinarySerializable] = payloads.GetSpeedResponse
-
-
-@dataclass
 class WriteToEEPromRequest:  # noqa: D101
     message_id: Literal[MessageId.write_eeprom] = MessageId.write_eeprom
     payload_type: Type[BinarySerializable] = payloads.WriteToEEPromRequest
@@ -149,3 +137,45 @@ class ClearMoveGroupRequest:  # noqa: D101
 class MoveGroupCompleted:  # noqa: D101
     message_id: Literal[MessageId.move_group_completed] = MessageId.move_group_completed
     payload_type: Type[BinarySerializable] = payloads.MoveGroupCompleted
+
+
+@dataclass
+class SetSpeedRequest:  # noqa: D101
+    message_id: Literal[MessageId.set_speed_request] = MessageId.set_speed_request
+    payload_type: Type[BinarySerializable] = payloads.SetSpeedRequest
+
+
+@dataclass
+class GetSpeedRequest:  # noqa: D101
+    message_id: Literal[MessageId.get_speed_request] = MessageId.get_speed_request
+    payload_type: Type[BinarySerializable] = payloads.EmptyMessage
+
+
+@dataclass
+class GetSpeedResponse:  # noqa: D101
+    message_id: Literal[MessageId.get_speed_response] = MessageId.get_speed_response
+    payload_type: Type[BinarySerializable] = payloads.GetSpeedResponse
+
+
+@dataclass
+class SetAccelerationRequest:  # noqa: D101
+    message_id: Literal[
+        MessageId.set_acceleration_request
+    ] = MessageId.set_acceleration_request
+    payload_type: Type[BinarySerializable] = payloads.SetAccelerationRequest
+
+
+@dataclass
+class GetAccelerationRequest:  # noqa: D101
+    message_id: Literal[
+        MessageId.get_acceleration_request
+    ] = MessageId.get_acceleration_request
+    payload_type: Type[BinarySerializable] = payloads.EmptyMessage
+
+
+@dataclass
+class GetAccelerationResponse:  # noqa: D101
+    message_id: Literal[
+        MessageId.get_acceleration_response
+    ] = MessageId.get_acceleration_response
+    payload_type: Type[BinarySerializable] = payloads.GetAccelerationResponse

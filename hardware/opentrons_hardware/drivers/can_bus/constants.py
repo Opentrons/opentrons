@@ -48,9 +48,13 @@ class MessageId(int, Enum):
     setup_request = 0x02
 
     set_speed_request = 0x03
-
     get_speed_request = 0x04
     get_speed_response = 0x11
+
+    set_acceleration_request = 0x20
+    get_acceleration_request = 0x21
+    get_acceleration_response = 0x022
+
     write_eeprom = 0x2001
     read_eeprom_request = 0x2002
     read_eeprom_response = 0x2003

@@ -30,6 +30,10 @@ MessageDefinition = Union[
     defs.ExecuteMoveGroupRequest,
     defs.ClearMoveGroupRequest,
     defs.MoveGroupCompleted,
+    defs.SetSpeedRequest,
+    defs.SetAccelerationRequest,
+    defs.GetAccelerationRequest,
+    defs.GetAccelerationResponse,
 ]
 
 

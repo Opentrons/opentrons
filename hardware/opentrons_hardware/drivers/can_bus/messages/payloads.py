@@ -35,13 +35,6 @@ class MoveRequest(utils.BinarySerializable):
 
 
 @dataclass
-class GetSpeedResponse(utils.BinarySerializable):
-    """Get speed response."""
-
-    mm_sec: utils.UInt32Field
-
-
-@dataclass
 class WriteToEEPromRequest(utils.BinarySerializable):
     """Write to eeprom request."""
 
@@ -104,4 +97,34 @@ class ExecuteMoveGroupRequest(MoveGroupRequest):
 class MoveGroupCompleted(MoveGroupRequest):
     """Notification of a completed move group."""
 
+    node_id: utils.UInt8Field
+
+
+@dataclass
+class SetSpeedRequest(utils.BinarySerializable):
+    """Set motor speed."""
+
+    speed: utils.Int32Field
+
+
+@dataclass
+class GetSpeedResponse(utils.BinarySerializable):
+    """Get speed request."""
+
+    speed: utils.Int32Field
+    node_id: utils.UInt8Field
+
+
+@dataclass
+class SetAccelerationRequest(utils.BinarySerializable):
+    """Set motor acceleration."""
+
+    acceleration: utils.Int32Field
+
+
+@dataclass
+class GetAccelerationResponse(utils.BinarySerializable):
+    """Get motor current acceleration response."""
+
+    acceleration: utils.Int32Field
     node_id: utils.UInt8Field
