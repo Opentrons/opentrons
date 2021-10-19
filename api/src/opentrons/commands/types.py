@@ -570,17 +570,10 @@ CommandPayload = Union[
 MessageSequenceId = Union[Literal["before"], Literal["after"]]
 
 
-CommandMessageSequence = TypedDict("CommandMessageSequence", {"$": MessageSequenceId})
-
-CommandMessageError = TypedDict(
-    "CommandMessageError",
-    {"error": Exception},
-    total=False,
+CommandMessageFields = TypedDict(
+    "CommandMessageFields",
+    {"$": MessageSequenceId, "error": Optional[Exception]},
 )
-
-
-class CommandMessageFields(CommandMessageError, CommandMessageSequence):
-    pass
 
 
 class MoveToMessage(CommandMessageFields, MoveToCommand):

@@ -83,12 +83,9 @@ def do_publish(
         {key: call_args[key] for key in (set(getfullargspec.args) & call_args.keys())}
     )
 
-    if error:
-        command_args["error"] = error
-
     payload = cmd(**command_args)
 
-    publish_command(message={**payload, "$": when})
+    publish_command(message={**payload, "$": when, "error": error})
 
 
 def publish_paired(
@@ -129,8 +126,17 @@ def publish(command: CmdFunction) -> Callable[[FuncT], FuncT]:
                 )
 
             do_publish(broker, command, f, "before", None, None, *args, **kwargs)
-            res = f(*args, **kwargs)
-            do_publish(broker, command, f, "after", res, None, *args, **kwargs)
+            res = None
+            error = None
+
+            try:
+                res = f(*args, **kwargs)
+            except Exception as e:
+                error = e
+                raise e
+            finally:
+                do_publish(broker, command, f, "after", res, error, *args, **kwargs)
+
             return res
 
         return cast(FuncT, _decorated)
