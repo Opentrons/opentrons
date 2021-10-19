@@ -6,7 +6,7 @@ import type { Session } from '..'
 
 export interface CreateCommandData {
   commandType: string
-  data: Record<string, unknown>
+  data: Record<string, any>
 }
 
 export function createCommand(

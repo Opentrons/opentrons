@@ -1,4 +1,4 @@
-import { POST, request } from '../../request'
+import { GET, request } from '../../request'
 
 import type { ResponsePromise } from '../../request'
 import type { HostConfig } from '../../types'
@@ -10,7 +10,7 @@ export function getCommand(
   commandId: string
 ): ResponsePromise<Session> {
   return request<Session>(
-    POST,
+    GET,
     `/sessions/${sessionId}/commands/${commandId}`,
     null,
     config
