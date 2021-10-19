@@ -15,14 +15,21 @@ import {
 } from '@opentrons/components'
 import { Page } from '../../atoms/Page'
 import { useProtocolDetails } from './hooks'
+import { ConfirmCancelModal } from '../../pages/Run/RunLog'
 
 export function RunDetails(): JSX.Element | null {
   const { t } = useTranslation('run_details')
   const { displayName, protocolData } = useProtocolDetails()
   if (protocolData == null) return null
+  const [isConfirmCancelOpen, setConfirmCancelOpen] = React.useState(false)
+
+  const handleCancelClick: React.MouseEventHandler = () => {
+    setConfirmCancelOpen(true)
+  }
+
   const cancelRunButton = (
     <PrimaryBtn
-      onClick={() => console.log('Cancel Run')}
+      onClick={handleCancelClick}
       backgroundColor={C_WHITE}
       color={C_BLUE}
       borderWidth={BORDER_WIDTH_DEFAULT}
@@ -43,6 +50,9 @@ export function RunDetails(): JSX.Element | null {
 
   return (
     <Page titleBarProps={titleBarProps}>
+      {isConfirmCancelOpen ? (
+        <ConfirmCancelModal onClose={() => setConfirmCancelOpen(false)} />
+      ) : null}
       <Flex flexDirection={DIRECTION_COLUMN}>
         {'commands' in protocolData
           ? protocolData.commands.map((command, index) => (
