@@ -58,13 +58,28 @@ class LegacyFileReader:
 class LegacyContextCreator:
     """Interface to contruct Protocol API v2 contexts."""
 
-    def __init__(self, hardware_api: HardwareAPI) -> None:
+    def __init__(
+        self,
+        hardware_api: HardwareAPI,
+        use_simulating_implementation: bool,
+    ) -> None:
+        """Prepare the LegacyContextCreator.
+
+        Args:
+            hardware_api: The interface to the hardware API that the created
+                Protocol API v2 contexts will use.
+            use_simulating_implementation: Whether the created Protocol API v2 contexts
+                should use a simulating implementation. See
+                `opentrons.protocols.context.simulator`.
+        """
         self._hardware_api = hardware_api
+        self._use_simulating_implementation = use_simulating_implementation
 
     def create(
         self,
         api_version: APIVersion,
     ) -> LegacyProtocolContext:
+        """Create a Protocol API v2 context."""
         context_impl = LegacyContextImplementation(
             api_version=api_version,
             hardware=self._hardware_api,
