@@ -29,7 +29,7 @@ import {
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 import { LabwarePositionCheck } from '../../LabwarePositionCheck'
 import { LabwareInfoOverlay } from './LabwareInfoOverlay'
-import { LabwareSetupModal } from './LabwareSetupModal'
+import { LabwareOffsetModal } from './LabwareOffsetModal'
 import { getModuleTypesThatRequireExtraAttention } from './utils/getModuleTypesThatRequireExtraAttention'
 import { ExtraAttentionWarning } from './ExtraAttentionWarning'
 import styles from '../../styles.css'
@@ -70,7 +70,7 @@ export const LabwareSetup = (): JSX.Element | null => {
   return (
     <React.Fragment>
       {showLabwareHelpModal && (
-        <LabwareSetupModal
+        <LabwareOffsetModal
           onCloseClick={() => setShowLabwareHelpModal(false)}
         />
       )}
