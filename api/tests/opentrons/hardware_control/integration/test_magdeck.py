@@ -1,16 +1,17 @@
 import asyncio
+from typing import Iterator
 
 import pytest
 from mock import AsyncMock
 from opentrons.drivers.rpi_drivers.types import USBPort
-from opentrons.hardware_control.emulation.app import MAGDECK_PORT
+from opentrons.hardware_control.emulation.settings import Settings
 from opentrons.hardware_control.modules import MagDeck
 
 
 @pytest.fixture
-async def magdeck(loop: asyncio.BaseEventLoop, emulation_app) -> MagDeck:
+async def magdeck(loop: asyncio.BaseEventLoop, emulation_app: Iterator[None], emulator_settings: Settings) -> MagDeck:
     module = await MagDeck.build(
-        port=f"socket://127.0.0.1:{MAGDECK_PORT}",
+        port=f"socket://127.0.0.1:{emulator_settings.magdeck_proxy.driver_port}",
         execution_manager=AsyncMock(),
         usb_port=USBPort(name="", port_number=1, sub_names=[], device_path="", hub=1),
         loop=loop,
