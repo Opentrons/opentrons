@@ -1,7 +1,7 @@
-import { HostConfig, Protocol, createProtocol } from '@opentrons/api-client'
-import type { JsonProtocolFile, ProtocolFileV3 } from '@opentrons/shared-data'
 import { UseMutationResult, useMutation, UseMutateFunction } from 'react-query'
+import { createProtocol } from '@opentrons/api-client'
 import { useHost } from '../api'
+import type { HostConfig, Protocol } from '@opentrons/api-client'
 
 export type UseCreateProtocolMutationResult = UseMutationResult<
   Protocol,
@@ -12,11 +12,11 @@ export type UseCreateProtocolMutationResult = UseMutationResult<
 }
 
 export function useCreateProtocolMutation(
-  protocolFile: JsonProtocolFile | ProtocolFileV3
+  protocolFiles: File[]
 ): UseCreateProtocolMutationResult {
   const host = useHost()
   const mutation = useMutation<Protocol, unknown>(['protocols', host], () =>
-    createProtocol(host as HostConfig, protocolFile).then(
+    createProtocol(host as HostConfig, protocolFiles).then(
       response => response.data
     )
   )
