@@ -51,6 +51,7 @@ export function StepSizeControl(props: StepSizeControlProps): JSX.Element {
             value: `${stepSize}`,
           }))}
           onChange={handleStepSelect}
+          className={styles.radio_button}
         />
       </HandleKeypress>
     </ControlContainer>
