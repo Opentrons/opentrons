@@ -20,8 +20,8 @@ import { ConfirmCancelModal } from '../../pages/Run/RunLog'
 export function RunDetails(): JSX.Element | null {
   const { t } = useTranslation('run_details')
   const { displayName, protocolData } = useProtocolDetails()
-  if (protocolData == null) return null
   const [isConfirmCancelOpen, setConfirmCancelOpen] = React.useState(false)
+  if (protocolData == null) return null
 
   const handleCancelClick: React.MouseEventHandler = () => {
     setConfirmCancelOpen(true)
