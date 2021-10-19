@@ -7,7 +7,6 @@ import { FlatButton } from '../buttons'
 import styles from './structure.css'
 
 import type { ButtonProps } from '../buttons'
-import { Flex, JUSTIFY_FLEX_END, SPACING_AUTO } from '@opentrons/components'
 
 export interface TitleBarProps {
   id?: string
@@ -39,6 +38,10 @@ export function TitleBar(props: TitleBarProps): JSX.Element {
 
   const subheading = subtitle && <h2 className={styles.subtitle}>{subtitle}</h2>
 
+  const rightNodeContainer = rightNode && (
+    <div className={styles.right_node}>{rightNode}</div>
+  )
+
   // TODO(mc, 2018-04-13): deprecate these props
   if (!back && onBackClick) {
     back = {
@@ -68,9 +71,7 @@ export function TitleBar(props: TitleBarProps): JSX.Element {
       <h1 className={cx(styles.title, { [styles.right]: back })}>{title}</h1>
       {separator}
       {subheading}
-      <Flex justifyContent={JUSTIFY_FLEX_END} marginLeft={SPACING_AUTO}>
-        {rightNode}
-      </Flex>
+      {rightNodeContainer}
     </header>
   )
 }
