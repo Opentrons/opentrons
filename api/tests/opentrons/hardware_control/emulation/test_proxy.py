@@ -2,6 +2,7 @@ import asyncio
 from typing import AsyncIterator
 
 import pytest
+from mock import MagicMock
 
 from opentrons.hardware_control.emulation.proxy import Proxy, ProxySettings
 
@@ -17,8 +18,9 @@ async def subject(
     loop: asyncio.AbstractEventLoop, setting: ProxySettings
 ) -> AsyncIterator[Proxy]:
     """Test subject."""
-    p = Proxy("proxy")
-    task = loop.create_task(p.run(setting))
+    mock_listener = MagicMock()
+    p = Proxy("proxy", mock_listener, setting)
+    task = loop.create_task(p.run())
     yield p
     task.cancel()
     try:
