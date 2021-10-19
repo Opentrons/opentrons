@@ -1,4 +1,4 @@
-"""Defintion of CAN messages."""
+"""Definition of CAN messages."""
 from dataclasses import dataclass
 from typing import Type
 

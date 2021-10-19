@@ -46,16 +46,14 @@ async def listen_task(can_driver: CanDriver) -> None:
         message_definition = get_definition(
             MessageId(message.arbitration_id.parts.message_id)
         )
-        try:
-            if message_definition:
-                log.info(
-                    f"Received <-- \n\traw: {message}, "
-                    f"\n\tparsed: {message_definition.payload_type.build(message.data)}"
-                )
-            else:
-                log.info(f"Received <-- \traw: {message}")
-        except Exception as e:
-            log.error(f"Exception raised {str(e)}: {message}")
+        if message_definition:
+            try:
+                build = message_definition.payload_type.build(message.data)
+                log.info(f"Received <-- \n\traw: {message}, " f"\n\tparsed: {build}")
+            except BinarySerializableException:
+                log.warning(f"Failed to build from {message}")
+        else:
+            log.info(f"Received <-- \traw: {message}")
 
 
 def create_choices(enum_type: Type[Enum]) -> Sequence[str]:
@@ -69,7 +67,7 @@ def create_choices(enum_type: Type[Enum]) -> Sequence[str]:
 
     """
     # mypy wants type annotation for v.
-    return [f"{i}: {v.name}" for (i, v) in enumerate(enum_type)]  # type: ignore
+    return [f"{i}: {v.name}" for (i, v) in enumerate(enum_type)]  # type: ignore[var-annotated]  # noqa: E501
 
 
 def prompt_enum(
@@ -121,7 +119,7 @@ def prompt_payload(
         except ValueError as e:
             raise InvalidInput(str(e))
     # Mypy is not liking constructing the derived types.
-    return payload_type(**i)  # type: ignore
+    return payload_type(**i)  # type: ignore[call-arg]
 
 
 def prompt_message(get_user_input: GetInputFunc, output_func: OutputFunc) -> CanMessage:
@@ -201,7 +199,7 @@ LOG_CONFIG = {
     "version": 1,
     "disable_existing_loggers": False,
     "formatters": {
-        "basic": {"format": ("%(asctime)s %(name)s %(levelname)s %(message)s")}
+        "basic": {"format": "%(asctime)s %(name)s %(levelname)s %(message)s"}
     },
     "handlers": {
         "file_handler": {
