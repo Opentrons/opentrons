@@ -479,6 +479,52 @@
           },
 
           {
+            "description": "Move Relative",
+            "type": "object",
+            "required": ["id", "commandType", "params"],
+            "properties": {
+              "id": { "type": "string" },
+              "commandType": { "enum": ["moveRelative"] },
+              "params": {
+                "type": "object",
+                "required": ["pipetteId", "axis", "distance"],
+                "properties": {
+                  "pipetteId": { "type": "string" },
+                  "axis": {
+                    "description": "Axis to move the gantry",
+                    "enum": ["x", "y", "z"]
+                  },
+                  "distance": {
+                    "description": "Distance in mm to move the gantry (negative numbers are allowed)",
+                    "type": "number"
+                  }
+                }
+              }
+            }
+          },
+
+          {
+            "description": "Save Position",
+            "type": "object",
+            "required": ["id", "commandType", "params"],
+            "properties": {
+              "id": { "type": "string" },
+              "commandType": { "enum": ["savePosition"] },
+              "params": {
+                "type": "object",
+                "required": ["pipetteId"],
+                "properties": {
+                  "pipetteId": { "type": "string" },
+                  "positionId": {
+                    "description": "Optional position ID, auto-assigned if left blank",
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+
+          {
             "description": "Delay Protocol Execution",
             "type": "object",
             "required": ["id", "commandType", "params"],

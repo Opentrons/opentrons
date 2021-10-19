@@ -1440,6 +1440,48 @@
         "minimumZHeight": 35,
         "forceDirect": true
       }
+    },
+    {
+      "commandType": "moveRelative",
+      "id": "18abc123",
+      "params": {
+        "pipetteId": "pipetteId",
+        "axis": "x",
+        "distance": 1
+      }
+    },
+    {
+      "commandType": "moveRelative",
+      "id": "19abc123",
+      "params": {
+        "pipetteId": "pipetteId",
+        "axis": "y",
+        "distance": 0.1
+      }
+    },
+    {
+      "commandType": "savePosition",
+      "id": "21abc123",
+      "params": {
+        "pipetteId": "pipetteId"
+      }
+    },
+    {
+      "commandType": "moveRelative",
+      "id": "20abc123",
+      "params": {
+        "pipetteId": "pipetteId",
+        "axis": "z",
+        "distance": 10
+      }
+    },
+    {
+      "commandType": "savePosition",
+      "id": "21abc123",
+      "params": {
+        "pipetteId": "pipetteId",
+        "positionId": "positionId"
+      }
     }
   ],
   "commandAnnotations": [
