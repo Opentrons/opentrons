@@ -54,7 +54,9 @@ describe('LabwareOffsetModal', () => {
       getByRole('link', {
         name: 'Learn more about Robot Calibration',
       }).getAttribute('href')
-    ).toBe('#') // replace when we have an actual link
+    ).toBe(
+      'https://support.opentrons.com/en/articles/3499692-how-positional-calibration-works-on-the-ot-2'
+    )
   })
   it('should render a link to the learn more page', () => {
     const { getByRole } = render(props)

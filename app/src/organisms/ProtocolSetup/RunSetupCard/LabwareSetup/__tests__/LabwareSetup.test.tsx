@@ -19,19 +19,21 @@ import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fi
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 import { fireEvent, screen } from '@testing-library/react'
 import { i18n } from '../../../../../i18n'
+import { LabwarePositionCheck } from '../../../LabwarePositionCheck'
+import {
+  useModuleRenderInfoById,
+  useLabwareRenderInfoById,
+} from '../../../hooks'
 import { LabwareSetup } from '..'
 import { LabwareOffsetModal } from '../LabwareOffsetModal'
 import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
 import { ExtraAttentionWarning } from '../ExtraAttentionWarning'
 import { getModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
-import {
-  useModuleRenderInfoById,
-  useLabwareRenderInfoById,
-} from '../../../hooks'
 
 jest.mock('../../../../../redux/modules')
 jest.mock('../../../../../redux/pipettes/selectors')
 jest.mock('../LabwareOffsetModal')
+jest.mock('../../../LabwarePositionCheck')
 jest.mock('../LabwareInfoOverlay')
 jest.mock('../ExtraAttentionWarning')
 jest.mock('../../../hooks')
@@ -81,6 +83,9 @@ const mockUseLabwareRenderInfoById = useLabwareRenderInfoById as jest.MockedFunc
 >
 const mockUseModuleRenderInfoById = useModuleRenderInfoById as jest.MockedFunction<
   typeof useModuleRenderInfoById
+>
+const mockLabwarePostionCheck = LabwarePositionCheck as jest.MockedFunction<
+  typeof LabwarePositionCheck
 >
 
 const deckSlotsById = standardDeckDef.locations.orderedSlots.reduce(
@@ -179,6 +184,10 @@ describe('LabwareSetup', () => {
           })}
         </svg>
       ))
+
+    mockLabwarePostionCheck.mockReturnValue(
+      <div>mock Labware Position Check</div>
+    )
   })
 
   afterEach(() => {
@@ -296,16 +305,21 @@ describe('LabwareSetup', () => {
     getByText('mock labware render of 300ul Tiprack FIXTURE')
     getByText('mock labware info overlay of 300ul Tiprack FIXTURE')
   })
-  it('should render the Labware Position Check and Labware Offset Data text and button', () => {
-    const { getByText, getByRole } = render()
+  it('should render the Labware Position Check and Labware Offset Data text', () => {
+    const { getByText } = render()
 
     getByText('Labware Position Check and Labware Offset Data')
     getByText(
       'Labware Position Check is an optional workflow that helps you verify the position of each labware on the deck. During this check, you can create Labware Offsets that adjust how the robot moves to each labware in the X, Y and Z directions.'
     )
-    getByRole('button', {
+  })
+  it('should render button and click it', () => {
+    const { getByRole, getByText } = render()
+    const button = getByRole('button', {
       name: 'run labware position check',
     })
+    fireEvent.click(button)
+    getByText('mock Labware Position Check')
   })
   it('should render the extra attention warning when there are modules/labware that need extra attention', () => {
     when(mockGetModuleTypesThatRequireExtraAttention)

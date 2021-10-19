@@ -28,12 +28,12 @@ import {
 } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 import { LabwarePositionCheck } from '../../LabwarePositionCheck'
+import styles from '../../styles.css'
+import { useModuleRenderInfoById, useLabwareRenderInfoById } from '../../hooks'
 import { LabwareInfoOverlay } from './LabwareInfoOverlay'
 import { LabwareOffsetModal } from './LabwareOffsetModal'
 import { getModuleTypesThatRequireExtraAttention } from './utils/getModuleTypesThatRequireExtraAttention'
 import { ExtraAttentionWarning } from './ExtraAttentionWarning'
-import styles from '../../styles.css'
-import { useModuleRenderInfoById, useLabwareRenderInfoById } from '../../hooks'
 
 const DECK_LAYER_BLOCKLIST = [
   'calibrationMarkings',
