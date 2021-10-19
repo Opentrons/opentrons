@@ -107,7 +107,7 @@ class PreAnalyzer:
 def _analyze_json(main_file_contents: bytes) -> JsonPreAnalysis:
     try:
         # Avoid JsonProtocol.parse_raw() because it wraps JSONDecodeError with
-        # JsonSchemaValidationError, but we want to preserve the distinction.
+        # PydanticValidationError, but we want to preserve the distinction.
         parsed_json = json_loads(main_file_contents)
     except JSONDecodeError as exception:
         raise JsonParseError() from exception
