@@ -2,6 +2,7 @@ export type GantryCommand =
   | { commandType: 'moveToSlot'; params: MoveToSlotParams }
   | { commandType: 'moveToWell'; params: MoveToWellParams }
   | { commandType: 'moveToCoordinates'; params: MoveToCoordinatesParams }
+  | { commandType: 'moveRelative'; params: MoveRelativeParams }
 
 interface MoveToSlotParams {
   pipetteId: string
@@ -37,4 +38,10 @@ interface MoveToCoordinatesParams {
   }
   minimumZHeight?: number
   forceDirect?: boolean
+}
+
+interface MoveRelativeParams {
+  pipetteId: string
+  axis: 'x' | 'y' | 'z'
+  distance: number
 }
