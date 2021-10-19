@@ -277,7 +277,7 @@ describe('LabwarePositionCheckStepDetail', () => {
     it('renders correct text when jog controls are hidden', () => {
       const { getByText, getByRole } = render(props)
       getByText('Need to make an adjustment?')
-      expect(getByRole('link', { name: 'Reveal jog controls' })).toBeTruthy()
+      getByRole('link', { name: 'Reveal jog controls' })
       expect(screen.queryByText('Mock Jog Controls')).toBeNull()
     })
     it('renders correct text when jog controls are revealed', () => {
@@ -288,7 +288,7 @@ describe('LabwarePositionCheckStepDetail', () => {
         name: 'Reveal jog controls',
       })
       fireEvent.click(revealJogControls)
-      expect(screen.queryByText('Mock Jog Controls')).not.toBeNull()
+      getByText('Mock Jog Controls')
     })
   })
 })

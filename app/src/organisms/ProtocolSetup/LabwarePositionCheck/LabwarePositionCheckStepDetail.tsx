@@ -14,13 +14,13 @@ import {
   C_BLUE,
   C_MED_GRAY,
   DIRECTION_ROW,
-  ALIGN_CENTER,
   Box,
   JUSTIFY_SPACE_BETWEEN,
   DIRECTION_COLUMN,
-  SPACING_6,
   FONT_SIZE_BODY_2,
   Link,
+  ALIGN_START,
+  SPACING_3,
 } from '@opentrons/components'
 import { getIsTiprack, getPipetteNameSpecs } from '@opentrons/shared-data'
 import {
@@ -35,7 +35,7 @@ import levelWithLabware from '../../../assets/images/lpc_level_with_labware.svg'
 import { Axis, Sign, StepSize } from '../../../molecules/JogControls/types'
 import type { LabwarePositionCheckStep } from './types'
 
-const DECK_MAP_VIEWBOX = '-30 -90 180 190'
+const DECK_MAP_VIEWBOX = '-30 -20 170 115'
 interface LabwarePositionCheckStepDetailProps {
   selectedStep: LabwarePositionCheckStep
 }
@@ -89,7 +89,7 @@ export const LabwarePositionCheckStepDetail = (
         borderRadius="4px"
         backgroundColor={C_NEAR_WHITE}
         flexDirection={DIRECTION_COLUMN}
-        width="100%"
+        width="106%"
       >
         <StepDetailText
           selectedStep={props.selectedStep}
@@ -98,7 +98,7 @@ export const LabwarePositionCheckStepDetail = (
         <Flex
           justifyContent={JUSTIFY_SPACE_BETWEEN}
           flexDirection={DIRECTION_ROW}
-          alignItems={ALIGN_CENTER}
+          alignItems={ALIGN_START}
         >
           <RobotWorkSpace viewBox={DECK_MAP_VIEWBOX}>
             {() => (
@@ -118,7 +118,7 @@ export const LabwarePositionCheckStepDetail = (
               </React.Fragment>
             )}
           </RobotWorkSpace>
-          <Box width="40%" padding={SPACING_2} marginBottom={SPACING_6}>
+          <Box width="40%" padding={SPACING_2} marginTop={SPACING_3}>
             {getIsTiprack(labwareDef) ? (
               <img src={levelWithTip} alt="level with tip" />
             ) : (
@@ -126,35 +126,30 @@ export const LabwarePositionCheckStepDetail = (
             )}
           </Box>
         </Flex>
-        <Box fontSize={FONT_SIZE_BODY_2} padding={SPACING_2}>
-          <Flex justifyContent={JUSTIFY_CENTER} marginTop={'-10rem'}>
+        <Box fontSize={FONT_SIZE_BODY_2}>
+          <Flex justifyContent={JUSTIFY_CENTER}>
             {t('jog_controls_adjustment')}
           </Flex>
-        </Box>
-        {showJogControls ? (
-          <Flex marginTop={'-10rem'} zIndex={5} justifyContent={JUSTIFY_CENTER}>
+          {showJogControls ? (
             <JogControls
               jog={jog}
               stepSizes={[0.1, 1, 10]}
               planes={[HORIZONTAL_PLANE, VERTICAL_PLANE]}
               width="100%"
             />
-          </Flex>
-        ) : (
-          <Box fontSize={FONT_SIZE_BODY_2} padding={SPACING_2}>
-            <Flex justifyContent={JUSTIFY_CENTER} marginTop={'-8rem'}>
+          ) : (
+            <Flex justifyContent={JUSTIFY_CENTER} marginTop={SPACING_2}>
               <Link
                 role={'link'}
                 fontSize={FONT_SIZE_BODY_2}
                 color={C_BLUE}
                 onClick={() => setShowJogControls(true)}
-                zIndex={2}
               >
                 {t('reveal_jog_controls')}
               </Link>
             </Flex>
-          </Box>
-        )}
+          )}
+        </Box>
       </Flex>
     </React.Fragment>
   )

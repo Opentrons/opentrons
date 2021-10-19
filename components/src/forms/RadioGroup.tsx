@@ -1,7 +1,6 @@
 import * as React from 'react'
 import cx from 'classnames'
 import { Icon } from '../icons'
-import { C_BLUE } from '../styles'
 import styles from './forms.css'
 
 export interface RadioOption {
@@ -48,11 +47,14 @@ export function RadioGroup(props: RadioGroupProps): JSX.Element {
       {props.options?.map(radio => (
         <label key={radio.value} className={itemClassName}>
           <div className={styles.checkbox_icon}>
-            {radio.value === props.value ? (
-              <Icon name={'radiobox-marked'} color={C_BLUE} width="100%" />
-            ) : (
-              <Icon name={'radiobox-blank'} width="100%" />
-            )}
+            <Icon
+              name={
+                radio.value === props.value
+                  ? 'radiobox-marked'
+                  : 'radiobox-blank'
+              }
+              width="100%"
+            />
           </div>
 
           <input

@@ -7,7 +7,11 @@ import {
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   SPACING_3,
+<<<<<<< HEAD
   SPACING_5,
+=======
+  SPACING_4,
+>>>>>>> 53ab5c9f9 (address pr comments)
 } from '@opentrons/components'
 import { LabwarePositionCheckStepDetail } from './LabwarePositionCheckStepDetail'
 import { SectionList } from './SectionList'
