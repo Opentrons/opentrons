@@ -7,7 +7,10 @@ from opentrons.config import feature_flags
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.context.protocol_api.protocol_context import (
-    ProtocolContextImplementation as LegacyContextImplementation,
+    ProtocolContextImplementation as LegacyProtocolContextImplementation,
+)
+from opentrons.protocols.context.simulator.protocol_context import (
+    ProtocolContextSimulation as LegacyProtocolContextSimulation,
 )
 from opentrons.protocol_api import (
     ProtocolContext as LegacyProtocolContext,
@@ -80,15 +83,21 @@ class LegacyContextCreator:
         api_version: APIVersion,
     ) -> LegacyProtocolContext:
         """Create a Protocol API v2 context."""
-        context_impl = LegacyContextImplementation(
-            api_version=api_version,
-            hardware=self._hardware_api,
-        )
-
-        return LegacyProtocolContext(
-            api_version=api_version,
-            implementation=context_impl,
-        )
+        if self._use_simulating_implementation:
+            return LegacyProtocolContext(
+                api_version=api_version,
+                implementation=LegacyProtocolContextSimulation(
+                    api_version=api_version, hardware=self._hardware_api
+                ),
+            )
+        else:
+            return LegacyProtocolContext(
+                api_version=api_version,
+                implementation=LegacyProtocolContextImplementation(
+                    api_version=api_version,
+                    hardware=self._hardware_api,
+                ),
+            )
 
 
 class LegacyExecutor:
