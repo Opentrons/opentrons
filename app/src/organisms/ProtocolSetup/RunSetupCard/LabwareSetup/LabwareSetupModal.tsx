@@ -45,7 +45,7 @@ export const LabwareSetupModal = (
         <Box marginX={SPACING_3}>
           <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
             <Text as={'h3'} marginBottom={SPACING_3}>
-              {t('labware_help_modal_title')}
+              {t('how_offset_data_works_title')}
             </Text>
             <Btn size={SIZE_2} onClick={props.onCloseClick}>
               <Icon name={'close'} color={C_MED_DARK_GRAY}></Icon>
