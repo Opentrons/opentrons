@@ -9,6 +9,7 @@ import {
   Icon,
   HandleKeypress,
   ALIGN_CENTER,
+  C_BLUE,
 } from '@opentrons/components'
 import { ControlContainer } from './ControlContainer'
 
@@ -145,7 +146,7 @@ export function DirectionControl(props: DirectionControlProps): JSX.Element {
                 onClick={() => props.jog(axis, sign, props.stepSize)}
                 {...{ gridRow, gridColumn }}
               >
-                <Icon name={iconName} />
+                <Icon name={iconName} backgroundColor={C_BLUE} />
               </PrimaryBtn>
             )
           )}

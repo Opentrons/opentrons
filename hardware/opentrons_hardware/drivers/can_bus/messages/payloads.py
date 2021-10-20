@@ -53,3 +53,55 @@ class ReadFromEEPromResponse(utils.BinarySerializable):
     """Read from ee prom response."""
 
     serial_number: utils.UInt8Field
+
+
+@dataclass
+class MoveGroupRequest(utils.BinarySerializable):
+    """A payload with a group id."""
+
+    group_id: utils.UInt8Field
+
+
+@dataclass
+class AddToMoveGroupRequest(MoveGroupRequest):
+    """Base of add to move group request to a message group."""
+
+    seq_id: utils.UInt8Field
+    # TODO (al, 2021-10-2021): this should be 32 bits
+    duration: utils.UInt16Field
+
+
+@dataclass
+class AddLinearMoveRequest(AddToMoveGroupRequest):
+    """Add a linear move request to a message group."""
+
+    # TODO (al, 2021-10-2021): this should be 32 bits
+    acceleration: utils.Int16Field
+    # TODO (al, 2021-10-2021): this should be 32 bits
+    velocity: utils.Int16Field
+    # TODO (al, 2021-10-2021): this should be present and 32 bits
+    # position: utils.UInt32Field
+
+
+@dataclass
+class GetMoveGroupResponse(MoveGroupRequest):
+    """Response to request to get a move group."""
+
+    num_moves: utils.UInt8Field
+    total_duration: utils.UInt32Field
+    node_id: utils.UInt8Field
+
+
+@dataclass
+class ExecuteMoveGroupRequest(MoveGroupRequest):
+    """Start executing a move group."""
+
+    start_trigger: utils.UInt8Field
+    cancel_trigger: utils.UInt8Field
+
+
+@dataclass
+class MoveGroupCompleted(MoveGroupRequest):
+    """Notification of a completed move group."""
+
+    node_id: utils.UInt8Field

@@ -5,6 +5,9 @@ import {
   Module,
   RobotWorkSpace,
   C_SELECTED_DARK,
+  Icon,
+  COLOR_SUCCESS,
+  C_WHITE,
 } from '@opentrons/components'
 import {
   THERMOCYCLER_MODULE_V1,
@@ -12,7 +15,6 @@ import {
 } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 import { useModuleRenderInfoById, useLabwareRenderInfoById } from '../hooks'
-
 import styles from '../styles.css'
 
 const DECK_MAP_VIEWBOX = '-80 -100 550 560'
@@ -28,12 +30,14 @@ const DECK_LAYER_BLOCKLIST = [
 
 interface DeckMapProps {
   labwareIdsToHighlight?: string[]
+  completedLabwareIdSections?: string[]
 }
 
-export const DeckMap = (props: DeckMapProps): JSX.Element => {
-  const { labwareIdsToHighlight } = props
+export const DeckMap = (props: DeckMapProps): JSX.Element | null => {
+  const { labwareIdsToHighlight, completedLabwareIdSections } = props
   const moduleRenderInfoById = useModuleRenderInfoById()
   const labwareRenderInfoById = useLabwareRenderInfoById()
+
   return (
     <RobotWorkSpace
       deckDef={standardDeckDef as any}
@@ -64,18 +68,52 @@ export const DeckMap = (props: DeckMapProps): JSX.Element => {
                     <React.Fragment
                       key={`LabwarePositionCheck_Labware_${nestedLabwareDef.metadata.displayName}_${x}${y}`}
                     >
-                      <LabwareRender definition={nestedLabwareDef} />
+                      <g>
+                        <LabwareRender definition={nestedLabwareDef} />
+                        {nestedLabwareId != null &&
+                          labwareIdsToHighlight?.includes(nestedLabwareId) ===
+                            true && (
+                            <rect
+                              width={nestedLabwareDef.dimensions.xDimension - 2}
+                              height={
+                                nestedLabwareDef.dimensions.yDimension - 2
+                              }
+                              fill={'none'}
+                              stroke={C_SELECTED_DARK}
+                              strokeWidth={'3px'}
+                              data-testid={`DeckMap_module_${nestedLabwareId}_highlight`}
+                            />
+                          )}{' '}
+                      </g>
                       {nestedLabwareId != null &&
-                        labwareIdsToHighlight?.includes(nestedLabwareId) ===
-                          true && (
-                          <rect
-                            width={nestedLabwareDef.dimensions.xDimension - 2}
-                            height={nestedLabwareDef.dimensions.yDimension - 2}
-                            fill={'none'}
-                            stroke={C_SELECTED_DARK}
-                            strokeWidth={'3px'}
-                            data-testid={`DeckMap_module_${nestedLabwareId}_highlight`}
-                          />
+                        completedLabwareIdSections?.includes(
+                          nestedLabwareId
+                        ) === true && (
+                          <g
+                            transform={
+                              moduleDef.model !== THERMOCYCLER_MODULE_V1
+                                ? `translate(${x + 35},${
+                                    y + 70
+                                  }) scale(0.1, -0.1)`
+                                : `translate(${x + 35},${
+                                    y - 110
+                                  }) scale(0.1, -0.1)`
+                            }
+                          >
+                            <circle
+                              cx="0"
+                              cy="0"
+                              r={260}
+                              fill={C_WHITE}
+                              transform={`translate(270,265)`}
+                              data-testid={`DeckMap_module_${nestedLabwareId}_whiteBackground`}
+                            />
+                            <Icon
+                              name="check-circle"
+                              color={COLOR_SUCCESS}
+                              data-testid={`DeckMap_module_${nestedLabwareId}_checkmark`}
+                            />
+                          </g>
                         )}
                     </React.Fragment>
                   ) : null}
@@ -101,6 +139,27 @@ export const DeckMap = (props: DeckMapProps): JSX.Element => {
                       />
                     )}
                   </g>
+                  {completedLabwareIdSections?.includes(labwareId) === true && (
+                    <g
+                      transform={`
+                      translate(${x + 35},${y + 70}) scale(0.1, -0.1) 
+                      `}
+                    >
+                      <circle
+                        cx="0"
+                        cy="0"
+                        r={260}
+                        fill={C_WHITE}
+                        transform={`translate(270,265)`}
+                        data-testid={`DeckMap_${labwareId}_whiteBackground`}
+                      />
+                      <Icon
+                        name="check-circle"
+                        color={COLOR_SUCCESS}
+                        data-testid={`DeckMap_${labwareId}_checkmark`}
+                      />
+                    </g>
+                  )}
                 </React.Fragment>
               )
             })}

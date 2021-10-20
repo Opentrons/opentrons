@@ -8,11 +8,13 @@ import { i18n } from '../../../../i18n'
 import { GenericStepScreen } from '../GenericStepScreen'
 import { LabwarePositionCheckStepDetail } from '../LabwarePositionCheckStepDetail'
 import { SectionList } from '../SectionList'
-import { useIntroInfo } from '../hooks'
+import { DeckMap } from '../DeckMap'
+import { useIntroInfo, useLabwareIdsBySection } from '../hooks'
 import { Section } from '../types'
 
 jest.mock('../LabwarePositionCheckStepDetail')
 jest.mock('../SectionList')
+jest.mock('../DeckMap')
 jest.mock('../hooks')
 
 const mockLabwarePositionCheckStepDetail = LabwarePositionCheckStepDetail as jest.MockedFunction<
@@ -22,6 +24,10 @@ const mockSectionList = SectionList as jest.MockedFunction<typeof SectionList>
 const mockUseIntroInfo = useIntroInfo as jest.MockedFunction<
   typeof useIntroInfo
 >
+const mockUseLabwareIdsBySection = useLabwareIdsBySection as jest.MockedFunction<
+  typeof useLabwareIdsBySection
+>
+const mockDeckmap = DeckMap as jest.MockedFunction<typeof DeckMap>
 
 const PICKUP_TIP_LABWARE_ID = 'PICKUP_TIP_LABWARE_ID'
 const PRIMARY_PIPETTE_ID = 'PRIMARY_PIPETTE_ID'
@@ -65,6 +71,9 @@ describe('GenericStepScreen', () => {
       .mockReturnValue(<div>Mock Labware Position Check Step Detail</div>)
 
     mockSectionList.mockReturnValue(<div>Mock SectionList </div>)
+    mockDeckmap.mockReturnValue(<div>Mock DeckMap </div>)
+    mockUseLabwareIdsBySection.mockReturnValue({})
+
     when(mockUseIntroInfo).calledWith().mockReturnValue({
       primaryTipRackSlot: '1',
       primaryTipRackName: 'Opentrons 96 Filter Tip Rack 200 µL',
@@ -79,9 +88,10 @@ describe('GenericStepScreen', () => {
     const { getByText } = render(props)
     expect(getByText('Mock Labware Position Check Step Detail')).toBeTruthy()
   })
-  it('renders GenericStepScreenNav component', () => {
+  it('renders GenericStepScreenNav component and deckmap', () => {
     const { getByText } = render(props)
     getByText('Mock SectionList')
+    getByText('Mock DeckMap')
   })
   it('renders null if useIntroInfo is null', () => {
     mockUseIntroInfo.mockReturnValue(null)
