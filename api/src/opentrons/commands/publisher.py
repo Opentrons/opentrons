@@ -113,7 +113,7 @@ def publish_context(broker: Broker, command: CommandPayload) -> Iterator[None]:
         yield
     except Exception as e:
         error = e
-        raise e
+        raise
     finally:
         if error is None or capture_errors is True:
             _do_publish(broker=broker, command=command, when="after", error=error)
