@@ -1,0 +1,38 @@
+language: python
+python:
+  - "2.6"
+  - "2.7"
+  - "3.3"
+  - "3.4"
+  - "3.5"
+  - "3.6"
+  - "3.7-dev" # 3.7 development branch
+  - "nightly" # currently points to 3.6-dev
+# pypy 2.x currently disabled, until testing fixed.
+#  - "pypy"
+#  - "pypy3"
+# command to install dependencies
+install:
+  - pip install codecov
+  - pip install .
+# command to run tests
+script: python setup.py nosetests --with-coverage --cover-xml
+after_success:
+  - codecov
+# Don't bug people yet
+notifications:
+  email: false
+
+# Perform testing also using optional compressors
+sudo: required
+dist: trusty
+before_install:
+  - sudo apt-get -qq update
+  - sudo apt-get install -y pbzip2 pigz lzop liblz4-tool
+# addons:
+#   apt:
+#     packages:
+#     - pbzip2
+#     - pigz
+#     - lzop
+#     - liblz4-tool

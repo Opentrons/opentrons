@@ -1,0 +1,215 @@
+bmap-tools (3.6) unstable; urgency=low
+
+  * Improve ZFS compatibility.
+  * Added the 'zstd' compression type support.
+  * Add '--psplash-pipe' option for interacting with psplash.
+
+ -- Artem Bityutskiy <artem.bityutskiy@linux.intel.com> Tue, 02 Feb 2021 14:08:41 +0200
+
+bmap-tools (3.5) unstable; urgency=low
+
+  * Fixed copying of compressed files from URLs
+  * Python 3.x support fixes and improvements.
+
+ -- Artem Bityutskiy <artem.bityutskiy@linux.intel.com> Thu, 23 Aug 2018 10:34:31 +0300
+
+bmap-tools (3.4) unstable; urgency=low
+
+  * New homepage: https://github.com/01org/bmap-tools
+  * Python 3.x support.
+  * bmaptool can now be shipped as standalone application.
+  * Added support for ZIP archives.
+  * Added support for LZ4 archives.
+  * Fixed bugs related to specific filesystems.
+
+ -- Alexander Kanevskiy <kad@linux.intel.com>  Thu, 31 Aug 2017 15:40:12 +0300
+
+bmap-tools (3.2) unstable; urgency=low
+
+  * Add support for LZO and archives ('.lzo' and '.tar.lzo').
+  * Add support for multi-stream bzip2 archives (creted with "pbzip2").
+  * Support tmpfs by using the SEEK_HOLE method instead of FIEMAP.
+  * Use external tools like 'gzip' and 'bzip2' for decompressing, instead of
+    using internal python libraries.
+
+ -- Artem Bityutskiy <artem.bityutskiy@linux.intel.com>  Wed, 19 Feb 2014 16:50:12 +0200
+
+bmap-tools (3.2~rc2) unstable; urgency=low
+
+  * Bump the version number to 3.2~rc2.
+
+ -- Artem Bityutskiy <artem.bityutskiy@linux.intel.com>  Fri, 31 Jan 2014 12:54:42 +0200
+
+bmap-tools (3.1) unstable; urgency=low
+
+  * Change bmap format version from 1.4 to 2.0, because there are incompatible
+    changes in 1.4 comparing to 1.3, so the right version number is 2.0
+  * Add backward and forward bmap format compatibility unit-tests
+
+ -- Artem Bityutskiy <artem.bityutskiy@linux.intel.com>  Thu, 07 Nov 2013 17:26:57 +0200
+
+bmap-tools (3.0) unstable; urgency=low
+
+  * Switch from using SHA1 for checksumming to SHA256.
+  * Start supporting OpenPGP signatures. Both detached and clearsign signatures
+    are supported.
+  * Always sync the image file before creating the bmap for it, to work-around
+    kernel bugs in early FIEMAP implementations.
+
+ -- Artem Bityutskiy <artem.bityutskiy@linux.intel.com>  Wed, 02 Oct 2013 09:30:22 +0300
+
+bmap-tools (2.6) unstable; urgency=low
+
+  * Add support for on-the-fly decompression of '.xz' and '.tar.xz' files.
+
+ -- Artem Bityutskiy <artem.bityutskiy@linux.intel.com>  Tue, 13 Aug 2013 14:53:49 +0300
+
+bmap-tools (2.5) unstable; urgency=low
+
+  * Do not fail when lacking permisssions for accessing block device's sysfs
+    files.
+  * Improve debian packaging.
+
+ -- Artem Bityutskiy <artem.bityutskiy@linux.intel.com>  Mon, 05 Aug 2013 10:05:09 +0300
+
+bmap-tools (2.4) unstable; urgency=low
+
+  * Add support for ssh:// URLs.
+
+ -- Artem Bityutskiy <artem.bityutskiy@linux.intel.com>  Wed, 05 Jun 2013 18:15:41 +0300
+
+bmap-tools (2.3) unstable; urgency=low
+
+  * Add bmap file SHA1 verification, make tests work on btrfs.
+
+ -- Artem Bityutskiy <artem.bityutskiy@linux.intel.com>  Mon, 06 May 2013 10:58:32 +0300
+
+bmap-tools (2.2) unstable; urgency=low
+
+  * Support username and password in URLs.
+
+ -- Artem Bityutskiy <artem.bityutskiy@linux.intel.com>  Mon, 11 Mar 2013 14:40:17 +0200
+
+bmap-tools (2.1) unstable; urgency=low
+
+  * Fix out of memory issues when copying .bz2 files.
+
+ -- Artem Bityutskiy <artem.bityutskiy@linux.intel.com>  Mon, 18 Feb 2013 16:38:32 +0200
+
+bmap-tools (2.0) unstable; urgency=low
+
+  * Fix the an issue with running out of memory in TransRead.py.
+
+ -- Artem Bityutskiy <artem.bityutskiy@linux.intel.com>  Thu, 17 Jan 2013 11:33:15 +0200
+
+bmap-tools (2.0~rc5) unstable; urgency=low
+
+  * When block device optimzations fail - raise an exception except of muting
+    the error, because we really want to know about these failures and possibly
+    fix them.
+
+ -- Artem Bityutskiy <artem.bityutskiy@linux.intel.com>  Tue, 15 Jan 2013 14:51:27 +0200
+
+bmap-tools (2.0~rc4) unstable; urgency=low
+
+  * Fix bmap autodiscovery.
+
+ -- Artem Bityutskiy <artem.bityutskiy@linux.intel.com>  Thu, 10 Jan 2013 13:58:07 +0200
+
+bmap-tools (2.0~rc3) unstable; urgency=low
+
+  * Fix uncaught urllib2 exception bug introduced in rc1.
+
+ -- Artem Bityutskiy <artem.bityutskiy@linux.intel.com>  Mon, 07 Jan 2013 10:19:49 +0200
+
+bmap-tools (2.0~rc2) unstable; urgency=low
+
+  * Fix writing to block devices, which was broken in rc1.
+  * Make the informational messages a bit nicer.
+
+ -- Artem Bityutskiy <artem.bityutskiy@linux.intel.com>  Fri, 04 Jan 2013 09:52:41 +0200
+
+bmap-tools (2.0~rc1) unstable; urgency=low
+
+  * Allow copying without bmap only if --nobmap was specified.
+  * Auto-discover the bmap file.
+  * Support reading from URLs.
+  * Implement progress bar.
+  * Highlight error and warning messages with red and yellow labels.
+
+ -- Artem Bityutskiy <artem.bityutskiy@linux.intel.com>  Thu, 20 Dec 2012 10:47:00 +0200
+
+bmap-tools (1.0) unstable; urgency=low
+
+  * Release version 1.0 of the tools - almost identical to 1.0~rc7 except of few
+    minor differences like spelling fixes.
+
+ -- Artem Bityutskiy <artem.bityutskiy@linux.intel.com>  Mon, 03 Dec 2012 10:00:33 +0200
+
+bmap-tools (1.0~rc7) unstable; urgency=low
+
+  * Add a Fiemap.py module which implements python API to the linux FIEMAP ioct.
+  * Use the FIEMAP ioctl properly and optimally.
+  * Add unit-tests, current test coverage is 66%.
+  * A lot of core rerafactoring.
+  * Several bug fixes in 'BmapCopy' (e.g., .tar.gz format support was broken).
+  * Add README and RELEASE_NOTES files.
+
+ -- Artem Bityutskiy <artem.bityutskiy@linux.intel.com>  Thu, 29 Nov 2012 12:29:39 +0200
+
+bmap-tools (0.6) unstable; urgency=low
+
+  * Improve the base API test to cover the case when there is no bmap.
+  * Fix a bug when copying without bmap.
+
+ -- Artem Bityutskiy <artem.bityutskiy@linux.intel.com>  Wed, 21 Nov 2012 16:43:49 +0200
+
+bmap-tools (0.5) unstable; urgency=low
+
+  * Fix handling of bmap files which contain ranges with only one block.
+  * Restore the block device settings which we change on exit.
+  * Change block device settings correctly for partitions.
+  * Rework API modules to accept file-like objects, not only paths.
+  * Fix and silence pylint warnings.
+  * Implement the base API test-case.
+
+ -- Artem Bityutskiy <artem.bityutskiy@linux.intel.com>  Tue, 20 Nov 2012 15:40:30 +0200
+
+bmap-tools (0.4) unstable; urgency=low
+
+  * Improved compressed images flashing speed by exploiting multiple threads:
+    now we read/decompress the image in one thread and write it in a different
+    thread.
+
+ -- Artem Bityutskiy <artem.bityutskiy@linux.intel.com>  Wed, 14 Nov 2012 12:35:06 +0200
+
+bmap-tools (0.3) unstable; urgency=low
+
+  * Fix flashing speed calculations
+  * Fix the Ctrl-C freeze issue - now we synchronize the block device
+    periodically so if a Ctrl-C interruption happens, we terminate withen few
+    seconds.
+
+ -- Artem Bityutskiy <artem.bityutskiy@linux.intel.com>  Tue, 13 Nov 2012 10:56:11 +0200
+
+bmap-tools (0.2) unstable; urgency=low
+
+  * Release 0.2 - mostly internal code re-structuring and renamings,
+    not much functional changes.
+  * The 'bmap-flasher' and 'bmap-creator' tools do not exist anymore. Now
+    we have 'bmaptool' which supports 'copy' and 'create' sub-commands instead.
+  * The BmapFlasher module was also re-named to BmapCopy.
+
+ -- Artem Bityutskiy <artem.bityutskiy@linux.intel.com>  Fri, 09 Nov 2012 12:20:37 +0200
+
+bmap-tools (0.1.1) unstable; urgency=low
+
+  * Release 0.1.1 - a lot of fixes and speed improvements.
+
+ -- Artem Bityutskiy <artem.bityutskiy@linux.intel.com>  Wed, 07 Nov 2012 11:36:29 +0200
+
+bmap-tools (0.1.0) unstable; urgency=low
+
+  * Initial release.
+
+ -- Ed Bartosh <eduard.bartosh@intel.com>  Sun, 27 Oct 2012 22:31:28 +0300

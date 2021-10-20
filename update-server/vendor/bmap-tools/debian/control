@@ -1,0 +1,32 @@
+Source: bmap-tools
+Maintainer: Artem Bityutskiy <artem.bityutskiy@linux.intel.com>
+Section: utils
+Priority: optional
+Build-Depends: debhelper (>= 9),
+               python-all (>= 2.7),
+               python-setuptools,
+Standards-Version: 3.8.4
+XS-Python-Version: >= 2.7
+
+Package: bmap-tools
+Architecture: all
+Depends: python (>=2.7),
+	 python-gpgme,
+         ${misc:Depends},
+         ${python:Depends},
+	 bzip2,
+	 pbzip2,
+	 gzip,
+	 pigz,
+	 lzop,
+	 liblz4-tool,
+	 xz-utils,
+	 tar,
+	 unzip,
+	 zstd
+Description: Tools to generate block map (AKA bmap) and flash images using
+ bmap. Bmaptool is a generic tool for creating the block map (bmap) for a file,
+ and copying files using the block map. The idea is that large file containing
+ unused blocks, like raw system image files, can be copied or flashed a lot
+ faster with bmaptool than with traditional tools like "dd" or "cp". See
+ source.tizen.org/documentation/reference/bmaptool for more information.

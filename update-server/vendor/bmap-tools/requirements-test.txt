@@ -1,0 +1,4 @@
+six
+nose
+backports.tempfile
+mock
