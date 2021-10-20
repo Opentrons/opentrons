@@ -2,6 +2,7 @@
 
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.protocol_engine import create_protocol_engine
+from opentrons.protocol_engine.state import EngineConfigs
 from .protocol_runner import ProtocolRunner
 
 
@@ -35,7 +36,10 @@ async def create_simulating_runner() -> ProtocolRunner:
 
     # TODO(mc, 2021-08-25): this engine will not simulate pauses
     # https://github.com/Opentrons/opentrons/issues/8265
-    protocol_engine = await create_protocol_engine(hardware_api=simulating_hardware_api)
+    protocol_engine = await create_protocol_engine(
+        hardware_api=simulating_hardware_api,
+        configs=EngineConfigs(ignore_pause=True),
+    )
 
     return ProtocolRunner(
         protocol_engine=protocol_engine,

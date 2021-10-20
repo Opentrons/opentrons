@@ -16,6 +16,7 @@ from .labware import LabwareState, LabwareStore, LabwareView
 from .pipettes import PipetteState, PipetteStore, PipetteView
 from .geometry import GeometryView
 from .motion import MotionView
+from .configs import EngineConfigs
 
 
 ReturnT = TypeVar("ReturnT")
@@ -39,6 +40,7 @@ class StateView(HasState[State]):
     _pipettes: PipetteView
     _geometry: GeometryView
     _motion: MotionView
+    _configs: EngineConfigs
 
     @property
     def commands(self) -> CommandView:
@@ -65,6 +67,11 @@ class StateView(HasState[State]):
         """Get state view selectors for derived motion state."""
         return self._motion
 
+    # TODO (spp, 2021-10-19): make this a property once EngineConfigsView is added.
+    def get_configs(self) -> EngineConfigs:
+        """Get Protocol Engine configurations."""
+        return self._configs
+
 
 class StateStore(StateView, ActionHandler):
     """ProtocolEngine state store.
@@ -78,6 +85,7 @@ class StateStore(StateView, ActionHandler):
         self,
         deck_definition: DeckDefinitionV2,
         deck_fixed_labware: Sequence[DeckFixedLabware],
+        configs: EngineConfigs = EngineConfigs(),
         change_notifier: Optional[ChangeNotifier] = None,
     ) -> None:
         """Initialize a StateStore and its substores.
@@ -101,7 +109,7 @@ class StateStore(StateView, ActionHandler):
             self._pipette_store,
             self._labware_store,
         ]
-
+        self._configs = configs
         self._change_notifier = change_notifier or ChangeNotifier()
         self._initialize_state()
 
