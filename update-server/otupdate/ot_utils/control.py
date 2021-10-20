@@ -1,5 +1,5 @@
 """
-otupdate.openembedded_server.control: non-update-specific endpoints for otupdate
+otupdate.openembedded.control: non-update-specific endpoints for otupdate
 
 This has endpoints like /restart that aren't specific to update tasks.
 """

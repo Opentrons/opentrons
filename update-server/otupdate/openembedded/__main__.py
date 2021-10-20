@@ -4,7 +4,7 @@ Entrypoint for the openembedded update server
 import argparse
 import logging
 import logging.config
-from otupdate.openembedded_server import get_app
+from otupdate.openembedded import get_app
 from aiohttp import web
 LOG = logging.getLogger(__name__)
 

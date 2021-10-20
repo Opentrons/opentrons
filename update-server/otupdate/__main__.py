@@ -1,6 +1,6 @@
 import argparse
 import sys
-from otupdate.openembedded_server.__main__ import main as oe_main
+from otupdate.openembedded.__main__ import main as oe_main
 from otupdate.buildroot.__main__ import main as br_main
 
 
