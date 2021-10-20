@@ -23,7 +23,7 @@ import {
 import type { Section } from './types'
 interface Props {
   sections: Section[]
-  currentSection: Section
+  currentSection?: Section
   primaryPipetteMount: string
   secondaryPipetteMount: string
   completedSections?: Section[]
