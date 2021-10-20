@@ -185,12 +185,6 @@ export const ConnectedStepItem = (props: Props): JSX.Element => {
       ? batchEditFormHasUnsavedChanges
       : currentFormIsPresaved || singleEditFormHasUnsavedChanges
   )
-  // (SA 2020/12/23): This will not be needed once we update to React 17
-  // since event pooling will be eliminated
-  const confirmWithPersistedEvent = (event: React.MouseEvent): void => {
-    event.persist()
-    confirm(event)
-  }
 
   const stepItemProps: StepItemProps = {
     description: step.stepDetails,
@@ -209,7 +203,7 @@ export const ConnectedStepItem = (props: Props): JSX.Element => {
     hovered: hoveredStep === stepId && !hoveredSubstep,
 
     highlightStep,
-    handleClick: confirmWithPersistedEvent,
+    handleClick: confirm,
     toggleStepCollapsed,
     unhighlightStep,
     isMultiSelectMode,
@@ -240,7 +234,7 @@ export const ConnectedStepItem = (props: Props): JSX.Element => {
       {showConfirmation && (
         <ConfirmDeleteModal
           modalType={getModalType()}
-          onContinueClick={confirmWithPersistedEvent}
+          onContinueClick={confirm}
           onCancelClick={cancel}
         />
       )}

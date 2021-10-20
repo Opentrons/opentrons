@@ -12,7 +12,7 @@ Opentrons robot HTTP API client for [React][] apps
 npm install @opentrons/react-api-client react
 ```
 
-This module must be installed alongside React v16.8 or higher.
+This module must be installed alongside React v17.0.1 or higher.
 
 ### Usage
 
