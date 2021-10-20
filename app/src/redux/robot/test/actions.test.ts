@@ -20,6 +20,16 @@ describe('robot actions', () => {
       meta: { robotCommand: true },
     }
 
+    expect(actions.legacyConnect('ot')).toEqual(expected)
+  })
+
+  it('CONNECT action', () => {
+    const expected = {
+      type: 'robot:CONNECT',
+      payload: { name: 'ot' },
+      meta: { robotCommand: true },
+    }
+
     expect(actions.connect('ot')).toEqual(expected)
   })
 
