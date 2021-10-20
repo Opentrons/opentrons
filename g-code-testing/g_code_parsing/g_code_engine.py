@@ -2,6 +2,8 @@ import os
 import sys
 import threading
 import asyncio
+import time
+from multiprocessing import Process
 from typing import Generator, Callable
 from collections import namedtuple
 
@@ -74,12 +76,12 @@ class GCodeEngine:
         )
 
     @staticmethod
-    def _start_emulation_app(application: Application, emulator_settings: Settings) -> None:
+    def _start_emulation_app(application: Application, emulator_settings: Settings) -> Process:
         """Start emulated OT-2"""
         async def _run_emulation_environment() -> None:
             await asyncio.gather(
                 # Start application
-                Application(settings=emulator_settings).run(),
+                application.run(),
                 # Add magdeck emulator
                 run_emulator_client(
                     host="localhost",
@@ -103,9 +105,10 @@ class GCodeEngine:
         def runit():
             asyncio.run(_run_emulation_environment())
 
-        t = threading.Thread(target=runit)
+        t = Process(target=runit)
         t.daemon = True
         t.start()
+        return t
 
     @staticmethod
     def _emulate_hardware(settings: Settings) -> ThreadManager:
@@ -136,7 +139,7 @@ class GCodeEngine:
         """
         file_path = os.path.join(get_configuration_dir(), path)
         emulator_app = Application(self._config)
-        self._start_emulation_app(application=emulator_app, emulator_settings=self._config)
+        app_process = self._start_emulation_app(application=emulator_app, emulator_settings=self._config)
         protocol = self._get_protocol(file_path)
         context = ProtocolContext(
             implementation=ProtocolContextImplementation(
@@ -148,7 +151,8 @@ class GCodeEngine:
         with GCodeWatcher(emulator_settings=self._config) as watcher:
             execute.run_protocol(parsed_protocol, context=context)
         yield GCodeProgram.from_g_code_watcher(watcher)
-        # emulator_app.stop()
+        app_process.terminate()
+        app_process.join()
 
     @contextmanager
     def run_http(self, executable: Callable):
@@ -158,8 +162,9 @@ class GCodeEngine:
         :return:
         """
         emulator_app = Application(self._config)
-        self._start_emulation_app(application=emulator_app, emulator_settings=self._config)
+        app_process = self._start_emulation_app(application=emulator_app, emulator_settings=self._config)
         with GCodeWatcher(emulator_settings=self._config) as watcher:
             asyncio.run(executable(hardware=self._emulate_hardware(settings=self._config)))
         yield GCodeProgram.from_g_code_watcher(watcher)
-        # emulator_app.stop()
+        app_process.terminate()
+        app_process.join()
