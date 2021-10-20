@@ -297,7 +297,7 @@ class API(HardwareAPILike):
         """
         The lru cache decorator is currently not supported by the
         ThreadManager. To work around this, we need to wrap the
-        actualy function around a dummy outer function.
+        actually function around a dummy outer function.
 
         Once decorators are more fully supported, we can remove this.
         """

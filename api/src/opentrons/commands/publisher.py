@@ -1,7 +1,21 @@
 import functools
 import inspect
-from typing import Any, Callable, Dict, Generic, Mapping, Optional, Tuple, TypeVar, cast
+from contextlib import contextmanager
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Generic,
+    Iterator,
+    Mapping,
+    Optional,
+    Tuple,
+    TypeVar,
+    cast,
+)
+
 from opentrons.broker import Broker
+from opentrons.config import feature_flags
 from . import types as command_types
 
 
@@ -43,67 +57,27 @@ class CommandPublisher:
 CmdFunction = Callable[..., command_types.Command]
 
 
-def do_publish(
+def _do_publish(
     broker: Broker,
-    cmd: CmdFunction,
-    f: Callable,
+    command: command_types.Command,
     when: command_types.MessageSequenceId,
-    res: Any,
     error: Optional[Exception],
-    *args: Any,
-    **kwargs: Any
 ) -> None:
-    """Implement the publish so it can be called outside the decorator"""
-    publish_command = functools.partial(broker.publish, topic=command_types.COMMAND)
-    call_args = _get_args(f, args, kwargs)
+    """Publish a command to the broker from the decorator or ContextManager."""
+    name = command["name"]
+    payload = command["payload"]
+    message: command_types.CommandMessage = {  # type: ignore[assignment,misc]
+        "$": when,
+        "name": name,
+        "payload": payload,
+        "error": error,
+    }
+
     if when == "before":
-        broker.logger.info(
-            "{}: {}".format(
-                f.__qualname__, {k: v for k, v in call_args.items() if str(k) != "self"}
-            )
-        )
-    getfullargspec = getfullargspec_cache.get(cmd)
-    command_args = dict(
-        zip(reversed(getfullargspec.args), reversed(getfullargspec.defaults or []))
-    )
+        payload_str = ", ".join(f"{k}: {v}" for k, v in payload.items() if k != "text")
+        broker.logger.info(f"{name}: {payload_str}")
 
-    # TODO (artyom, 20170927): we are doing this to be able to use
-    # the decorator in Instrument class methods, in which case
-    # self is effectively an instrument.
-    # To narrow the scope of this hack, we are checking if the
-    # command is expecting instrument first.
-    if "instrument" in getfullargspec.args:
-        # We are also checking if call arguments have 'self' and
-        # don't have instruments specified, in which case
-        # instruments should take precedence.
-        if "instrument" not in call_args and "self" in call_args:
-            call_args["instrument"] = call_args["self"]
-
-    command_args.update(
-        {key: call_args[key] for key in (set(getfullargspec.args) & call_args.keys())}
-    )
-
-    payload = cmd(**command_args)
-
-    publish_command(message={**payload, "$": when, "error": error})
-
-
-def publish_paired(
-    broker: Broker,
-    cmd: CmdFunction,
-    when: command_types.MessageSequenceId,
-    res: Any,
-    *args: Any,
-    pub_type: str = "Paired Pipettes"
-) -> None:
-    """Implement a second publisher outside of the decorator that
-    relies on the method providing all of the arguments required
-    rather than binding defaults to the signature"""
-    publish_command = functools.partial(broker.publish, topic=command_types.COMMAND)
-
-    payload = cmd(*args, pub_type)
-
-    publish_command(message={**payload, "$": when})
+    broker.publish(topic=command_types.COMMAND, message=message)
 
 
 FuncT = TypeVar("FuncT", bound=Callable[..., Any])
@@ -111,37 +85,70 @@ FuncT = TypeVar("FuncT", bound=Callable[..., Any])
 
 def publish(command: CmdFunction) -> Callable[[FuncT], FuncT]:
     """Publish events both before and after the decorated function has run."""
+    getfullargspec = getfullargspec_cache.get(command)
 
     def _decorator(f: FuncT) -> FuncT:
         @functools.wraps(
             f, updated=functools.WRAPPER_UPDATES + ("__globals__",)  # type: ignore[operator]  # noqa: E501
         )
         def _decorated(*args: Any, **kwargs: Any) -> Any:
-            try:
-                broker = cast(Broker, args[0].broker)
-            except AttributeError:
-                raise RuntimeError(
-                    "Only methods of CommandPublisher \
-                    classes should be decorated."
+            broker = getattr(args[0], "broker", None)
+
+            assert isinstance(
+                broker, Broker
+            ), "Only methods of CommandPublisher classes should be decorated."
+
+            call_args = _get_args(f, args, kwargs)
+            command_args = dict(
+                zip(
+                    reversed(getfullargspec.args),
+                    reversed(getfullargspec.defaults or []),
                 )
+            )
 
-            do_publish(broker, command, f, "before", None, None, *args, **kwargs)
-            res = None
-            error = None
+            # TODO (artyom, 20170927): we are doing this to be able to use
+            # the decorator in Instrument class methods, in which case
+            # self is effectively an instrument.
+            # To narrow the scope of this hack, we are checking if the
+            # command is expecting instrument first.
+            if "instrument" in getfullargspec.args:
+                # We are also checking if call arguments have 'self' and
+                # don't have instruments specified, in which case
+                # instruments should take precedence.
+                if "instrument" not in call_args and "self" in call_args:
+                    call_args["instrument"] = call_args["self"]
 
-            try:
-                res = f(*args, **kwargs)
-            except Exception as e:
-                error = e
-                raise e
-            finally:
-                do_publish(broker, command, f, "after", res, error, *args, **kwargs)
+            command_args.update(
+                {
+                    key: call_args[key]
+                    for key in (set(getfullargspec.args) & call_args.keys())
+                }
+            )
+            command_message = command(**command_args)
 
-            return res
+            with publish_context(broker=broker, command=command_message):
+                return f(*args, **kwargs)
 
         return cast(FuncT, _decorated)
 
     return _decorator
+
+
+@contextmanager
+def publish_context(broker: Broker, command: command_types.Command) -> Iterator[None]:
+    capture_errors = feature_flags.enable_protocol_engine()
+    error = None
+
+    try:
+        _do_publish(broker=broker, command=command, when="before", error=None)
+        yield
+    except Exception as e:
+        # TODO(mc, 2021-10-19): put this capture behind the PE feature flag
+        error = e
+        raise e
+    finally:
+        if error is None or capture_errors is True:
+            _do_publish(broker=broker, command=command, when="after", error=error)
 
 
 def _get_args(f: Callable, args: Tuple, kwargs: Mapping[str, Any]) -> Dict[str, Any]:

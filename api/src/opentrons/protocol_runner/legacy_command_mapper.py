@@ -47,6 +47,7 @@ class LegacyCommandMapper:
         """
         command_type = command["name"]
         command_text = command["payload"]["text"]
+        command_error = command["error"]
         stage = command["$"]
 
         command_id = f"{command_type}-0"
@@ -73,10 +74,16 @@ class LegacyCommandMapper:
 
         else:
             running_command = self._running_commands[command_type].pop()
+            completed_status = (
+                pe_commands.CommandStatus.SUCCEEDED
+                if command_error is None
+                else pe_commands.CommandStatus.FAILED
+            )
             completed_command = running_command.copy(
                 update={
-                    "status": pe_commands.CommandStatus.SUCCEEDED,
+                    "status": completed_status,
                     "completedAt": now,
+                    "error": str(command_error) if command_error is not None else None,
                 }
             )
 
