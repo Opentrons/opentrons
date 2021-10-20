@@ -49,16 +49,20 @@ export const LabwareOffsetModal = (
               <Icon name={'close'} color={C_MED_DARK_GRAY}></Icon>
             </Btn>
           </Flex>
-          <Text
-            as={'h4'}
-            fontWeight={FONT_WEIGHT_SEMIBOLD}
-            marginBottom={SPACING_2}
-          >
-            {t('position_offset_overiew')}
-          </Text>
-          <Text fontSize={FONT_SIZE_BODY_1} fontWeight={FONT_WEIGHT_REGULAR}>
-            {t('robot_cal_info')}
-          </Text>
+          <Trans
+            t={t}
+            i18nKey={`position_offset_overiew_and_description`}
+            components={{
+              h4: (
+                <Text
+                  as={'h4'}
+                  fontWeight={FONT_WEIGHT_SEMIBOLD}
+                  marginBottom={SPACING_2}
+                />
+              ),
+              block: <Text fontSize={FONT_SIZE_BODY_1} />,
+            }}
+          />
           <Link
             fontSize={FONT_SIZE_BODY_1}
             color={C_BLUE}
@@ -66,7 +70,7 @@ export const LabwareOffsetModal = (
             id={'LabwareOffsetModal_helpArticleLink1'}
             rel="noopener noreferrer"
           >
-            {t('learn_more_about_robot_cal')}
+            {t('learn_more_about_robot_cal_offset_modal_link')}
             <Icon name={'open-in-new'} marginLeft={SPACING_1} size="10px" />
           </Link>
           <Text
@@ -83,19 +87,19 @@ export const LabwareOffsetModal = (
             id={'LabwareOffsetModal_helpArticleLink2'}
             rel="noopener noreferrer"
           >
-            {t('learn_more_about_offset_data')}
+            {t('learn_more_about_offset_data_link')}
             <Icon name={'open-in-new'} marginLeft={SPACING_1} size="10px" />
           </Link>
           <Trans
             t={t}
             i18nKey={`creating_labware_offset_data`}
             components={{
-              h3: (
+              h4: (
                 <Text
-                  as={'h3'}
+                  as={'h4'}
                   marginTop={SPACING_3}
                   fontWeight={FONT_WEIGHT_SEMIBOLD}
-                  marginBottom={SPACING_1}
+                  marginBottom={SPACING_2}
                 />
               ),
               block: (
@@ -107,12 +111,12 @@ export const LabwareOffsetModal = (
             t={t}
             i18nKey={`rerunning_a_protocol`}
             components={{
-              h3: (
+              h4: (
                 <Text
-                  as={'h3'}
+                  as={'h4'}
                   marginTop={SPACING_3}
                   fontWeight={FONT_WEIGHT_SEMIBOLD}
-                  marginBottom={SPACING_1}
+                  marginBottom={SPACING_2}
                 />
               ),
               block: (
