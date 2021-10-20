@@ -106,17 +106,16 @@ def publish_context(broker: Broker, command: CommandPayload) -> Iterator[None]:
     message (if the ProtocolEngine is enabled) and re-raised.
     """
     capture_errors = feature_flags.enable_protocol_engine()
-    error = None
 
-    _do_publish(broker=broker, command=command, when="before", error=None)
+    _do_publish(broker=broker, command=command, when="before")
     try:
         yield
-    except Exception as e:
-        error = e
-        raise
-    finally:
-        if error is None or capture_errors is True:
+    except Exception as error:
+        if capture_errors:
             _do_publish(broker=broker, command=command, when="after", error=error)
+        raise
+    else:
+        _do_publish(broker=broker, command=command, when="after")
 
 
 @functools.lru_cache(maxsize=None)
@@ -129,7 +128,7 @@ def _do_publish(
     broker: Broker,
     command: CommandPayload,
     when: MessageSequenceId,
-    error: Optional[Exception],
+    error: Optional[Exception] = None,
 ) -> None:
     """Publish a command to the broker from the decorator or ContextManager."""
     name = command["name"]
