@@ -2,12 +2,13 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { ModalPage } from '@opentrons/components'
 import { Portal } from '../../../App/portal'
-import { useSteps } from './hooks'
+import { useSteps, useLabwarePositionCheck } from './hooks'
 import { IntroScreen } from './IntroScreen'
 import { GenericStepScreen } from './GenericStepScreen'
 import { SummaryScreen } from './SummaryScreen'
 
 import styles from '../styles.css'
+
 
 interface LabwarePositionCheckModalProps {
   onCloseClick: () => unknown
@@ -23,6 +24,10 @@ export const LabwarePositionCheck = (
   const [currentLabwareCheckStep, setCurrentLabwareCheckStep] = React.useState<
     number | null
   >(null)
+  const { proceed, ctaText } = useLabwarePositionCheck(
+    () => null,
+    () => null
+  )
 
   return (
     <Portal level="top">
@@ -43,6 +48,8 @@ export const LabwarePositionCheck = (
           <GenericStepScreen
             setCurrentLabwareCheckStep={setCurrentLabwareCheckStep}
             selectedStep={steps[currentLabwareCheckStep]}
+            ctaText={ctaText}
+            proceed={proceed}
           />
         ) : (
           <IntroScreen

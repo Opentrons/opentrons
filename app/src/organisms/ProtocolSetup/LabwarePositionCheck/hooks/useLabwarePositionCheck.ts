@@ -17,13 +17,41 @@ import type {
   Sign,
   StepSize,
 } from '../../../../molecules/JogControls/types'
-import { createCommand } from '../../../../../../api-client/src/sessions'
+import { useProtocolDetails } from '../../../RunDetails/hooks'
 
 interface LabwarePositionCheckUtils {
   currentCommandIndex: number
   isLoading: boolean
+  isComplete: boolean
   proceed: () => void
   jog: Jog
+  ctaText: string
+}
+
+const useLpcCtaText = (command: Command): string => {
+  const { protocolData } = useProtocolDetails()
+  switch (command.command) {
+    case 'moveToWell': {
+      const labwareId = command.params.labware
+      const slot = protocolData?.labware[labwareId].slot
+      return `Confirm position, move to slot ${slot}`
+    }
+    case 'thermocycler/openLid': {
+      const moduleId = command.params.module
+      const slot = protocolData?.modules[moduleId].slot
+      return `Confirm position, move to slot ${slot}`
+    }
+    case 'pickUpTip': {
+      return `Confirm position, pick up tip`
+    }
+    case 'dropTip': {
+      const labwareId = command.params.labware
+      const slot = protocolData?.labware[labwareId].slot
+      return `Confirm position, return tip to slot ${slot}`
+    }
+    default:
+      return ''
+  }
 }
 
 const commandIsComplete = (status: SessionCommandSummary['status']): boolean =>
@@ -39,7 +67,7 @@ const createCommandData = (
 export function useLabwarePositionCheck(
   proceedToSummary: () => unknown,
   addSavePositionCommandId: (commandId: string) => void
-): LabwarePositionCheckUtils | null {
+): LabwarePositionCheckUtils {
   const [currentCommandIndex, setCurrentCommandIndex] = React.useState<number>(
     0
   )
@@ -52,12 +80,22 @@ export function useLabwarePositionCheck(
   const LPCCommands = useSteps().reduce<Command[]>((steps, currentStep) => {
     return [...steps, ...currentStep.commands]
   }, [])
-  const currentRunCommands = useAllCommandsQuery(basicSession?.id).data?.data
-  if (basicSession == null) return null
+  const currentCommand = LPCCommands[currentCommandIndex]
+  const ctaText = useLpcCtaText(currentCommand)
+  const robotCommands = useAllCommandsQuery(basicSession?.id).data?.data
+  if (basicSession == null)
+    return {
+      isLoading: false,
+      currentCommandIndex: currentCommandIndex,
+      proceed: () => null,
+      jog: () => null,
+      ctaText,
+      isComplete: false,
+    }
   if (
     pendingCommandId != null &&
     Boolean(
-      currentRunCommands?.find(
+      robotCommands?.find(
         command =>
           command.id === pendingCommandId && commandIsComplete(command.status)
       )
@@ -67,13 +105,15 @@ export function useLabwarePositionCheck(
     setPendingCommandId(null)
   }
 
-  const currentCommand = LPCCommands[currentCommandIndex]
-
   const proceed = (): void => {
+    console.log('proceeding!')
     setIsLoading(true)
-    const data = createCommandData(currentCommand)
 
-    createCommand(host as HostConfig, basicSession.id, data)
+    createCommand(
+      host as HostConfig,
+      basicSession.id,
+      createCommandData(currentCommand)
+    )
       .then(response => {
         const commandId = response.data.data.id
         // @ts-expect-error delete this when schema v6 types are out
@@ -84,12 +124,15 @@ export function useLabwarePositionCheck(
         // execute the next moveToWell command if opening TC lid
         if (currentCommand.command === 'thermocycler/openLid') {
           const nextCommand = LPCCommands[currentCommandIndex + 1]
-          const nextData = createCommandData(nextCommand)
-          createCommand(host as HostConfig, basicSession.id, nextData)
+          createCommand(
+            host as HostConfig,
+            basicSession.id,
+            createCommandData(nextCommand)
+          )
             .then(response => {
               const commandId = response.data.data.id
               setPendingCommandId(commandId)
-              // incremement currentCommandIndex by 2 since we're executing 2 commands
+              // incremement currentCommandIndex by 2 since we've executed 2 commands
               setCurrentCommandIndex(currentCommandIndex + 2)
             })
             .catch(e => {
@@ -128,5 +171,7 @@ export function useLabwarePositionCheck(
     isLoading,
     proceed,
     jog,
+    ctaText,
+    isComplete: false,
   }
 }

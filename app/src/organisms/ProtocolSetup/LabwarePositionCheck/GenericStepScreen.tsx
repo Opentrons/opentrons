@@ -2,10 +2,13 @@ import * as React from 'react'
 import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
+  C_BLUE,
   Flex,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
+  PrimaryBtn,
   SPACING_3,
+  SPACING_5,
   SPACING_4,
 } from '@opentrons/components'
 import { LabwarePositionCheckStepDetail } from './LabwarePositionCheckStepDetail'
@@ -17,6 +20,8 @@ import type { LabwarePositionCheckStep } from './types'
 interface GenericStepScreenProps {
   selectedStep: LabwarePositionCheckStep
   setCurrentLabwareCheckStep: (stepNumber: number) => void
+  ctaText: string
+  proceed: () => void
 }
 export const GenericStepScreen = (
   props: GenericStepScreenProps

@@ -22,6 +22,7 @@ import {
   Box,
   FONT_WEIGHT_SEMIBOLD,
 } from '@opentrons/components'
+import { ApiClientProvider } from '@opentrons/react-api-client'
 import {
   inferModuleOrientationFromXCoordinate,
   THERMOCYCLER_MODULE_V1,
@@ -75,9 +76,11 @@ export const LabwareSetup = (): JSX.Element | null => {
         />
       )}
       {showLabwarePositionCheckModal && (
-        <LabwarePositionCheck
-          onCloseClick={() => setShowLabwarePositionCheckModal(false)}
-        />
+        <ApiClientProvider>
+          <LabwarePositionCheck
+            onCloseClick={() => setShowLabwarePositionCheckModal(false)}
+          />
+        </ApiClientProvider>
       )}
       <Flex
         flex="1"

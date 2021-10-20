@@ -120,3 +120,5 @@ export function useIntroInfo(): IntroInfo | null {
     sections,
   }
 }
+
+export { useLabwarePositionCheck } from './useLabwarePositionCheck'
