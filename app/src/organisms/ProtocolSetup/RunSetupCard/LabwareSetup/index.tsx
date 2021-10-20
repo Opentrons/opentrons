@@ -1,6 +1,7 @@
 import * as React from 'react'
 import map from 'lodash/map'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 import {
   Btn,
   Flex,
@@ -22,12 +23,13 @@ import {
   Box,
   FONT_WEIGHT_SEMIBOLD,
 } from '@opentrons/components'
-import { ApiClientProvider } from '@opentrons/react-api-client'
+import { ApiClientProvider, ApiHostProvider } from '@opentrons/react-api-client'
 import {
   inferModuleOrientationFromXCoordinate,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
+import { getConnectedRobot } from '../../../../redux/discovery'
 import { LabwarePositionCheck } from '../../LabwarePositionCheck'
 import styles from '../../styles.css'
 import { useModuleRenderInfoById, useLabwareRenderInfoById } from '../../hooks'
@@ -35,6 +37,7 @@ import { LabwareInfoOverlay } from './LabwareInfoOverlay'
 import { LabwareOffsetModal } from './LabwareOffsetModal'
 import { getModuleTypesThatRequireExtraAttention } from './utils/getModuleTypesThatRequireExtraAttention'
 import { ExtraAttentionWarning } from './ExtraAttentionWarning'
+
 
 const DECK_LAYER_BLOCKLIST = [
   'calibrationMarkings',
@@ -51,6 +54,8 @@ const DECK_MAP_VIEWBOX = '-80 -40 550 500'
 export const LabwareSetup = (): JSX.Element | null => {
   const moduleRenderInfoById = useModuleRenderInfoById()
   const labwareRenderInfoById = useLabwareRenderInfoById()
+  const connectedRobotIp = useSelector(getConnectedRobot)?.ip ?? ''
+  console.log('connectedRobotIp: ', connectedRobotIp)
   const { t } = useTranslation('protocol_setup')
   const [
     showLabwareHelpModal,
@@ -77,9 +82,11 @@ export const LabwareSetup = (): JSX.Element | null => {
       )}
       {showLabwarePositionCheckModal && (
         <ApiClientProvider>
-          <LabwarePositionCheck
-            onCloseClick={() => setShowLabwarePositionCheckModal(false)}
-          />
+          <ApiHostProvider hostname={connectedRobotIp}>
+            <LabwarePositionCheck
+              onCloseClick={() => setShowLabwarePositionCheckModal(false)}
+            />
+          </ApiHostProvider>
         </ApiClientProvider>
       )}
       <Flex
