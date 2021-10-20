@@ -16,7 +16,7 @@ from typing import Mapping, Optional, Union
 import uuid
 
 import functools
-from otupdate.ot_utils import constants, config
+from . import constants, config
 
 from aiohttp import web
 
