@@ -35,8 +35,6 @@ FuncT = TypeVar("FuncT", bound=Callable[..., Any])
 
 def publish(command: CommandMessageCreator) -> Callable[[FuncT], FuncT]:
     """Publish messages before and after the decorated function has run."""
-    message_creator_sig = _inspect_signature(command)
-    message_creator_params = set(message_creator_sig.parameters.keys())
 
     def _decorator(func: FuncT) -> FuncT:
         @functools.wraps(
@@ -56,8 +54,11 @@ def publish(command: CommandMessageCreator) -> Callable[[FuncT], FuncT]:
             bound_func_args.apply_defaults()
             func_args = bound_func_args.arguments
 
+            # map func argument values to message creator arguments
+            message_creator_sig = _inspect_signature(command)
+            message_creator_arg_names = set(message_creator_sig.parameters.keys())
             message_creator_args = {
-                p: func_args[p] for p in message_creator_params if p in func_args
+                n: func_args[n] for n in message_creator_arg_names if n in func_args
             }
 
             # TODO (artyom, 20170927): we are doing this to be able to use
@@ -65,12 +66,15 @@ def publish(command: CommandMessageCreator) -> Callable[[FuncT], FuncT]:
             # self is effectively an instrument.
             # To narrow the scope of this hack, we are checking if the
             # command is expecting instrument first.
-            if "instrument" in message_creator_params:
-                # We are also checking if call arguments have 'self' and
-                # don't have instruments specified, in which case
-                # instruments should take precedence.
-                if "instrument" not in message_creator_args and "self" in func_args:
-                    message_creator_args["instrument"] = func_args["self"]
+            # We are also checking if call arguments have 'self' and
+            # don't have instruments specified, in which case
+            # instruments should take precedence.
+            if (
+                "instrument" in message_creator_arg_names
+                and "instrument" not in message_creator_args
+                and "self" in func_args
+            ):
+                message_creator_args["instrument"] = func_args["self"]
 
             command_message = command(**message_creator_args)
 
@@ -92,7 +96,6 @@ def publish_context(broker: Broker, command: command_types.Command) -> Iterator[
     try:
         yield
     except Exception as e:
-        # TODO(mc, 2021-10-19): put this capture behind the PE feature flag
         error = e
         raise e
     finally:
