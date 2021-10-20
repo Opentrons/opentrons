@@ -1,13 +1,14 @@
 import {
+  Box,
   C_DISABLED,
   C_NEAR_WHITE,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
+  FONT_BODY_1_DARK,
   FONT_SIZE_CAPTION,
   FONT_WEIGHT_SEMIBOLD,
   JUSTIFY_CENTER,
-  JUSTIFY_SPACE_BETWEEN,
   SPACING_3,
   SPACING_4,
   Text,
@@ -24,38 +25,39 @@ const getOffsetDataInfo = (): Array<{
   {
     deckSlot: 'Slot 1',
     labware: 'Opentrons 96 100mL Tiprack in Temperature Module GEN2',
-    offsetData: { x: 1, y: 2, z: 3 },
+    offsetData: { x: 1.1, y: 2.1, z: 3.1 },
   },
   {
     deckSlot: 'Slot 3',
     labware: 'Opentrons 96 Tip Rack 20µL',
-    offsetData: { x: 0, y: 2, z: 1 },
+    offsetData: { x: 0.0, y: -1.2, z: 1.1 },
   },
   {
     deckSlot: 'Slot 5',
     labware: 'Opentrons Mixed Tube Rack',
-    offsetData: { x: 5, y: 2, z: 3 },
+    offsetData: { x: 5.1, y: 2.2, z: 3.1 },
   },
   {
     deckSlot: 'Slot 6',
     labware: 'Opentrons Mixed Tube Rack',
-    offsetData: { x: 0, y: 0, z: 0 },
+    offsetData: { x: 0.0, y: 0.0, z: 0.0 },
   },
   {
     deckSlot: 'Slot 7',
     labware: 'Opentrons Mixed Tube Rack',
-    offsetData: { x: 0, y: 0, z: 0 },
+    offsetData: { x: 0.0, y: 0.0, z: 0.0 },
   },
 ]
 
 export const LabwareOffsetsSummary = (): JSX.Element | null => {
   const { t } = useTranslation('labware_position_check')
+  const offsetData = getOffsetDataInfo().map(({ offsetData }) => offsetData)
+
   return (
     <React.Fragment>
       <Flex
         padding={SPACING_4}
         justifyContent={JUSTIFY_CENTER}
-        marginTop={SPACING_4}
         boxShadow="1px 1px 1px rgba(0, 0, 0, 0.25)"
         borderRadius="4px"
         backgroundColor={C_NEAR_WHITE}
@@ -69,31 +71,91 @@ export const LabwareOffsetsSummary = (): JSX.Element | null => {
         >
           {t('labware_offsets_summary_title')}
         </Text>
-        <Flex flexDirection={DIRECTION_ROW} justifyContent={JUSTIFY_SPACE_BETWEEN}>
-          <Text
-            textTransform={TEXT_TRANSFORM_UPPERCASE}
-            marginBottom={SPACING_3}
-            color={C_DISABLED}
-            fontSize={FONT_SIZE_CAPTION}
+        <Flex flexDirection={DIRECTION_ROW} justifyContent={JUSTIFY_CENTER}>
+          <Box
+            width="20%"
+            flexDirection={DIRECTION_COLUMN}
+            justifyContent={JUSTIFY_CENTER}
           >
-            {t('labware_offsets_summary_deckslot')}
-          </Text>
-          <Text
-            textTransform={TEXT_TRANSFORM_UPPERCASE}
-            marginBottom={SPACING_3}
-            color={C_DISABLED}
-            fontSize={FONT_SIZE_CAPTION}
+            <Text
+              textTransform={TEXT_TRANSFORM_UPPERCASE}
+              marginBottom={SPACING_3}
+              color={C_DISABLED}
+              fontSize={FONT_SIZE_CAPTION}
+            >
+              {t('labware_offsets_summary_deckslot')}
+            </Text>
+            {getOffsetDataInfo().map(({ deckSlot }) => {
+              return (
+                <Text marginBottom={SPACING_3} css={FONT_BODY_1_DARK}>
+                  {deckSlot}
+                </Text>
+              )
+            })}
+          </Box>
+          <Box
+            width="50%"
+            flexDirection={DIRECTION_COLUMN}
+            justifyContent={JUSTIFY_CENTER}
           >
-            {t('labware_offsets_summary_labware')}
-          </Text>
-          <Text
-            textTransform={TEXT_TRANSFORM_UPPERCASE}
-            marginBottom={SPACING_3}
-            color={C_DISABLED}
-            fontSize={FONT_SIZE_CAPTION}
+            <Text
+              textTransform={TEXT_TRANSFORM_UPPERCASE}
+              marginBottom={SPACING_3}
+              color={C_DISABLED}
+              fontSize={FONT_SIZE_CAPTION}
+            >
+              {t('labware_offsets_summary_labware')}
+            </Text>
+            {getOffsetDataInfo().map(({ labware }) => {
+              return (
+                <Text marginBottom={SPACING_3} css={FONT_BODY_1_DARK}>
+                  {labware}
+                </Text>
+              )
+            })}
+          </Box>
+          <Box
+            width="30%"
+            flexDirection={DIRECTION_COLUMN}
+            justifyContent={JUSTIFY_CENTER}
           >
-            {t('labware_offsets_summary_offset')}
-          </Text>
+            <Text
+              textTransform={TEXT_TRANSFORM_UPPERCASE}
+              marginBottom={SPACING_3}
+              color={C_DISABLED}
+              fontSize={FONT_SIZE_CAPTION}
+            >
+              {t('labware_offsets_summary_offset')}
+            </Text>
+            {offsetData.map(({ x, y, z }) => {
+              return x == 0 && y == 0 && z == 0 ? (
+                <Text marginBottom={SPACING_3} css={FONT_BODY_1_DARK}>
+                  {t('no_labware_offsets')}
+                </Text>
+              ) : (
+                <Box marginBottom={SPACING_3} css={FONT_BODY_1_DARK}>
+                  <Text as={'span'} marginRight={'0.15rem'}>
+                    <strong>X</strong>
+                  </Text>
+                  <Text as={'span'} marginRight={'0.4rem'}>
+                    {x}
+                  </Text>
+                  <Text as={'span'} marginRight={'0.15rem'}>
+                    <strong>Y</strong>
+                  </Text>
+                  <Text as={'span'} marginRight={'0.4rem'}>
+                    {y}
+                  </Text>
+                  <Text as={'span'} marginRight={'0.15rem'}>
+                    <strong>Z</strong>
+                  </Text>
+                  <Text as={'span'} marginRight={'0.4rem'}>
+                    {z}
+                  </Text>
+                </Box>
+              )
+            })}
+          </Box>
         </Flex>
       </Flex>
     </React.Fragment>

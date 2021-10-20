@@ -38,7 +38,7 @@ export const LabwarePositionCheck = (
         }}
       >
         {isComplete ? (
-          <SummaryScreen onCloseClick={props.onCloseClick} />
+          <SummaryScreen/>
         ) : currentLabwareCheckStep !== null ? (
           <GenericStepScreen
             setCurrentLabwareCheckStep={setCurrentLabwareCheckStep}

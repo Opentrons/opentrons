@@ -29,5 +29,7 @@
   "labware_offsets_summary_deckslot": "Deck Slot",
   "labware_offsets_summary_labware": "Labware",
   "labware_offsets_summary_offset": "Labware Offset Data",
-  "close_and_apply_offset_data": "Close and apply labware offset data"
+  "close_and_apply_offset_data": "Close and apply labware offset data",
+  "offset_values": "<bold>X</bold> {{x_offset}} <bold>Y</bold> {{y_offset}} <bold>Z</bold> {{z_offset}}",
+  "no_labware_offsets": "No Labware Offsets"
 }
