@@ -2,12 +2,8 @@ from __future__ import annotations
 from typing import List, Optional
 from opentrons.drivers.asyncio.communication import SerialConnection
 from dataclasses import dataclass
-from opentrons.hardware_control.emulation.app import (
-    TEMPDECK_PORT,
-    THERMOCYCLER_PORT,
-    SMOOTHIE_PORT,
-    MAGDECK_PORT,
-)
+
+from opentrons.hardware_control.emulation.settings import Settings
 
 
 @dataclass
@@ -23,16 +19,15 @@ class GCodeWatcher:
     extracts the parameters passed and stores them
     """
 
-    DEVICE_LOOKUP_BY_PORT = {
-        SMOOTHIE_PORT: "smoothie",
-        TEMPDECK_PORT: "tempdeck",
-        THERMOCYCLER_PORT: "thermocycler",
-        MAGDECK_PORT: "magdeck",
-    }
-
-    def __init__(self) -> None:
+    def __init__(self, emulator_settings: Settings) -> None:
         self._command_list: List[WatcherData] = []
         self._original_send_data = SerialConnection.send_data
+        self._device_lookup_by_port = {
+            emulator_settings.smoothie.port: "smoothie",
+            emulator_settings.temperature_proxy.driver_port: "tempdeck",
+            emulator_settings.thermocycler_proxy.driver_port: "thermocycler",
+            emulator_settings.magdeck_proxy.driver_port: "magdeck",
+        }
 
     def __enter__(self) -> GCodeWatcher:
         """Patch the send command function"""
@@ -73,15 +68,14 @@ class GCodeWatcher:
         # mypy error "Cannot assign to a method" is ignored
         SerialConnection.send_data = self._original_send_data  # type: ignore
 
-    @classmethod
-    def _parse_device(cls, serial_connection: SerialConnection):
+    def _parse_device(self, serial_connection: SerialConnection):
         """
         Based on port specified in connection URL, parse out what the name
         of the device is
         """
         serial_port = serial_connection.port
         device_port = serial_port[serial_port.rfind(":") + 1 :]
-        return cls.DEVICE_LOOKUP_BY_PORT[int(device_port)]
+        return self._device_lookup_by_port[int(device_port)]
 
     def get_command_list(self) -> List[WatcherData]:
         return self._command_list
