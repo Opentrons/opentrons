@@ -33,7 +33,7 @@ def emulator_settings() -> Settings:
 def emulation_app(emulator_settings: Settings) -> Iterator[None]:
     """Run the emulators"""
 
-    async def _() -> None:
+    async def _run_emulation_environment() -> None:
         await asyncio.gather(
             # Start application
             Application(settings=emulator_settings).run(),
@@ -58,7 +58,7 @@ def emulation_app(emulator_settings: Settings) -> Iterator[None]:
         )
 
     def runit() -> None:
-        asyncio.run(_())
+        asyncio.run(_run_emulation_environment())
 
     # TODO 20210219
     #  The emulators must be run in a separate thread because our serial
