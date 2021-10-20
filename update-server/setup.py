@@ -70,5 +70,6 @@ if __name__ == "__main__":
         classifiers=CLASSIFIERS,
         install_requires=INSTALL_REQUIRES,
         tests_require=['pytest'],
+        extras_require={'openembedded': 'bmap-tools==3.6'},
         include_package_data=True
     )

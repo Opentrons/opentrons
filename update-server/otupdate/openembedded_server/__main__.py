@@ -4,7 +4,7 @@ Entrypoint for the openembedded update server
 import argparse
 import logging
 import logging.config
-from otupdate.openembedded_server import get_app
+from . import get_app
 from aiohttp import web
 LOG = logging.getLogger(__name__)
 
@@ -20,26 +20,23 @@ def _handler_for(topic_name: str,
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Opentrons update server for buildroot systems')
+        description='Opentrons update server for openembedded systems')
     parser.add_argument('-p', '--port', dest='port', type=int,
                         help='Port to listen on. Passed to aiohttp')
     parser.add_argument('--host', dest='host', type=str, default='127.0.0.1',
                         help='Host to listen on. Passed to aiohttp')
-    parser.add_argument('--version-file', dest='version_file',
-                        type=str, default='BR_BUILTIN_VERSION_FILE',
-                        help='Version file path if not default')
     parser.add_argument('--log-level', dest='log_level',
                         choices=['debug', 'info', 'warning', 'error'],
                         help='Log level', default='info')
     parser.add_argument('--config-file', dest='config_file',
                         type=str, default=None,
                         help='Config file path. If not specified, falls back '
+                        f'to {config.PATH_ENVIRONMENT_VARIABLE} env var and '
+                        f'then default path {config.DEFAULT_PATH}')
                         )
     args = parser.parse_args()
 
-    LOG.info('check logger for OE server')
-
-    LOG.info('Building buildroot update server')
+    LOG.info('Building openembedded update server')
     app = get_app(args.version_file, 'testingconfig', None, None, None)
 
     LOG.info(

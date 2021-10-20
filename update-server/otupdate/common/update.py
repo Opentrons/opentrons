@@ -16,8 +16,8 @@ from aiohttp import web, BodyPartReader
 from .constants import APP_VARIABLE_PREFIX, RESTART_LOCK_NAME
 from . import config, file_actions, session
 
-from otupdate.ot_utils.session import UpdateSession
-from otupdate.ot_utils.session import Stages
+from .session import UpdateSession
+from .session import Stages
 
 
 SESSION_VARNAME = APP_VARIABLE_PREFIX + 'session'
@@ -48,7 +48,7 @@ def require_session(handler):
 async def begin(request: web.Request) -> web.Response:
     """ future add begin functionality on
     top of active_session_check decorator from
-    ot_utils.session can be added here. For
+    .session can be added here. For
     now just adding a pass.
     """
     pass
