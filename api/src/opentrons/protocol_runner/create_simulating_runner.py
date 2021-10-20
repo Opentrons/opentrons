@@ -34,13 +34,10 @@ async def create_simulating_runner() -> ProtocolRunner:
     # TODO(mc, 2021-08-25): move initial home to protocol engine
     await simulating_hardware_api.home()
 
-    # TODO(mc, 2021-08-25): this engine will not simulate pauses
-    # https://github.com/Opentrons/opentrons/issues/8265
     protocol_engine = await create_protocol_engine(
         hardware_api=simulating_hardware_api,
         configs=EngineConfigs(ignore_pause=True),
     )
-
     return ProtocolRunner(
         protocol_engine=protocol_engine,
         hardware_api=simulating_hardware_api,
