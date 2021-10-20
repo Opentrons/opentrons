@@ -114,7 +114,6 @@ def test_publish_decorator_with_error(
     enable_protocol_engine: None,
 ) -> None:
     """It should capture an exception and place it in the "after" message."""
-    _act = decoy.mock()
 
     def _get_command_payload(foo: str, bar: int) -> Dict[str, Any]:
         return {"name": "some_command", "payload": {"foo": foo, "bar": bar}}
@@ -122,9 +121,7 @@ def test_publish_decorator_with_error(
     class _Subject(CommandPublisher):
         @publish(command=_get_command_payload)  # type: ignore[arg-type]
         def act(self, foo: str, bar: int) -> None:
-            _act()
-
-    decoy.when(_act()).then_raise(RuntimeError("oh no"))
+            raise RuntimeError("oh no")
 
     subject = _Subject(broker=broker)
 
@@ -160,7 +157,6 @@ def test_publish_decorator_with_error_no_engine(
     enable_protocol_engine: None,
 ) -> None:
     """It should not capture errors if engine FF is off."""
-    _act = decoy.mock()
 
     def _get_command_payload(foo: str, bar: int) -> Dict[str, Any]:
         return {"name": "some_command", "payload": {"foo": foo, "bar": bar}}
@@ -168,9 +164,7 @@ def test_publish_decorator_with_error_no_engine(
     class _Subject(CommandPublisher):
         @publish(command=_get_command_payload)  # type: ignore[arg-type]
         def act(self, foo: str, bar: int) -> None:
-            _act()
-
-    decoy.when(_act()).then_raise(RuntimeError("oh no"))
+            raise RuntimeError("oh no")
 
     subject = _Subject(broker=broker)
 
