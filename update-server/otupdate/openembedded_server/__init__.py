@@ -5,7 +5,7 @@ from aiohttp import web
 
 # , name_management
 
-from otupdate.ot_utils import config, constants, control, ssh_key_management, update
+from otupdate.common import config, constants, control, ssh_key_management, update
 
 LOG = logging.getLogger(__name__)
 
