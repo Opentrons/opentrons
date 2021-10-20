@@ -46,7 +46,7 @@ def test_map_before_command() -> None:
 
 
 def test_map_after_command() -> None:
-    """It should map an "after" message to a completed command."""
+    """It should map an "after" message to a succeeded command."""
     legacy_command_start: PauseMessage = {
         "$": "before",
         "name": "command.PAUSE",
@@ -79,7 +79,7 @@ def test_map_after_command() -> None:
 
 
 def test_map_after_with_error_command() -> None:
-    """It should map an "after" message to a completed command."""
+    """It should map an "after" message to a failed command."""
     legacy_command_start: PauseMessage = {
         "$": "before",
         "name": "command.PAUSE",
