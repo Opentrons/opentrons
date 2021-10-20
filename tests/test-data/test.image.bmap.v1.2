@@ -1,0 +1,90 @@
+<?xml version="1.0" ?>
+<!-- This file contains the block map for an image file, which is basically
+     a list of useful (mapped) block numbers in the image file. In other words,
+     it lists only those blocks which contain data (boot sector, partition
+     table, file-system metadata, files, directories, extents, etc). These
+     blocks have to be copied to the target device. The other blocks do not
+     contain any useful data and do not have to be copied to the target
+     device.
+
+     The block map an optimization which allows to copy or flash the image to
+     the image quicker than copying of flashing the entire image. This is
+     because with bmap less data is copied: <MappedBlocksCount> blocks instead
+     of <BlocksCount> blocks.
+
+     Besides the machine-readable data, this file contains useful commentaries
+     which contain human-readable information like image size, percentage of
+     mapped data, etc.
+
+     The 'version' attribute is the block map file format version in the
+     'major.minor' format. The version major number is increased whenever an
+     incompatible block map format change is made. The minor number changes
+     in case of minor backward-compatible changes. -->
+
+<bmap version="1.2">
+    <!-- Image size in bytes (802.5 KiB) -->
+    <ImageSize> 821752 </ImageSize>
+
+    <!-- Size of a block in bytes -->
+    <BlockSize> 4096 </BlockSize>
+
+    <!-- Count of blocks in the image file -->
+    <BlocksCount> 201 </BlocksCount>
+
+    <!-- The block map which consists of elements which may either be a
+         range of blocks or a single block. The 'sha1' attribute (if present)
+         is the SHA1 checksum of this blocks range. -->
+    <BlockMap>
+        <Range sha1="94789636db14cdb8929133e7b8d3a158837e2e5a"> 0-1 </Range>
+        <Range sha1="4ad09a593ed833ece30d808477cb2f43fe7e96fe"> 3-5 </Range>
+        <Range sha1="35bea6bfaa394f4cf030dc0060befed0ab04c55c"> 9-10 </Range>
+        <Range sha1="21338baaedb0976efbb075736820f6bd6ae43b97"> 12 </Range>
+        <Range sha1="80086eaaf78f8eb52c80ea3a559be9958b4dee82"> 15-18 </Range>
+        <Range sha1="3e7c00626f9db9451fe0b55fa2a8cf2a81d9830a"> 20 </Range>
+        <Range sha1="458e9562df17d15ab3aa055ae681eec8f2d4c0fd"> 22 </Range>
+        <Range sha1="624066e4cb2838443ab2b1178bd4179d9d62acb8"> 24 </Range>
+        <Range sha1="7aa2876168020797c7060e241436c82889d66da9"> 30-32 </Range>
+        <Range sha1="5ae8333f60e55f8891e21c90e89ea603be421ca3"> 34-35 </Range>
+        <Range sha1="d5af843e9f9a1154ae610a30c71698089a298215"> 40 </Range>
+        <Range sha1="a98956e9a1801e612a1c07a0aa0f0c57be86c671"> 42-43 </Range>
+        <Range sha1="a121482d334a2bd9a42c444f99fe365ddf83a758"> 45 </Range>
+        <Range sha1="f619721549e15de1d6d5f7be85f9942140ae0d16"> 47 </Range>
+        <Range sha1="196df31f78d0e3cb623d4496e6237c4e9683cd81"> 49-50 </Range>
+        <Range sha1="f4cba9e7822dfb5206874e2a952681c53c513a71"> 52-53 </Range>
+        <Range sha1="7794743dc660f6ef29577b01af7146f6ad682a89"> 55-56 </Range>
+        <Range sha1="557fac47c5ae2476c04054b73680e531eeba116e"> 60-63 </Range>
+        <Range sha1="dba433052c7009aa4cbfdf81dabc17b285b8d087"> 65-67 </Range>
+        <Range sha1="55ab7ef8c797e942ea110aadcd22b55b19734ad3"> 70 </Range>
+        <Range sha1="2797a838edf16114b587d349da5b6c999290b02f"> 72 </Range>
+        <Range sha1="594cc8b274a0a92f2489765ca35545e1118d2375"> 78-80 </Range>
+        <Range sha1="e5f421fc2bdcdddd1f1f7081355091d5ec116930"> 82-83 </Range>
+        <Range sha1="c152f2a6e5eb08eae7122eabe8de71abb67fa810"> 85 </Range>
+        <Range sha1="67de1912c30546a2a0debca8ae41a0605a6eaa1a"> 88 </Range>
+        <Range sha1="b87c912352c16d33f056be47e26ece50375e560e"> 90-91 </Range>
+        <Range sha1="2976768755f1b5dd3a6386f8ade4887022024660"> 96 </Range>
+        <Range sha1="045ae769f1de3d99b35362b7e309609b6ff39886"> 98-105 </Range>
+        <Range sha1="dc6ba49fd6639a416c515575cd3c1a18bbbd77d7"> 111 </Range>
+        <Range sha1="b489f230fa3d578aeeb64d15d3ceba9c3f7fac18"> 114-116 </Range>
+        <Range sha1="29645cb904ec22f017fd24a8d5a188329cca1bdf"> 119-133 </Range>
+        <Range sha1="b25d6cd7311fd4b132e085b4649ca6af663f290b"> 135 </Range>
+        <Range sha1="8cba06dbce2c88a2d8370ab28c696e5871a3e80f"> 137 </Range>
+        <Range sha1="c5143c106c7cdb1324e55b862d8f3a7c7773fbd2"> 140 </Range>
+        <Range sha1="386e2a53aff173f7c8432a33ba9f115cb0f3f2dd"> 142-144 </Range>
+        <Range sha1="9536bce6180a813bf09b555bef8cc385c2250155"> 146-147 </Range>
+        <Range sha1="0b615f57ce2368bc58a03adab323d1fc40182ada"> 150-151 </Range>
+        <Range sha1="fa2982eb55d8302d534719e2099405e3cf10ab20"> 155 </Range>
+        <Range sha1="2867488d3abd8f16805c19e0ec639aebff9ff5b2"> 157 </Range>
+        <Range sha1="98cbb098a082e8c9c42945c38f057cc911b2e892"> 159-160 </Range>
+        <Range sha1="2627075946035748c9e341adc915edfdb1a97bc8"> 163-174 </Range>
+        <Range sha1="1a34d6fc1e86e38d5e5c4e3fb50e7f9b2e07870d"> 177 </Range>
+        <Range sha1="e170e81e69f8301d331382378823b5b2a577b670"> 181-186 </Range>
+        <Range sha1="1d463c99d29fb207fc7fd36bb297218294b851af"> 188-189 </Range>
+        <Range sha1="39652579027a70352fb8ee9ba94fe5bff486de6e"> 191 </Range>
+        <Range sha1="bee29c4d8f84c068a1be05a22aaf20c2e1f5fb92"> 193 </Range>
+        <Range sha1="959bba0c61e2e25d87af92e882d2d7d851376e72"> 195 </Range>
+        <Range sha1="dbca3770aa48e9e05629f8890d1b2330be709b8a"> 198-199 </Range>
+    </BlockMap>
+
+    <!-- Count of mapped blocks (468.0 KiB or 58.2% mapped) -->
+    <MappedBlocksCount> 117 </MappedBlocksCount>
+</bmap>

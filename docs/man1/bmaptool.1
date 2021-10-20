@@ -1,0 +1,325 @@
+.TH BMAPTOOL "1" "February 2014" "bmap-tools 3.2" "User Commands"
+
+.SH NAME
+
+.PP
+bmaptool - create block map (bmap) for a file or copy a file using bmap
+
+.SH SYNOPSIS
+
+.PP
+.B bmaptool
+[\-\-help] [\-\-version] [\-\-quiet] [\-\-debug] <command> [<options>] <args>
+
+.SH DESCRIPTION
+
+.PP
+\fIBmaptool\fR is a generic tool for creating the block map (bmap) for a file and
+copying files using the block map. The idea is that large files, like raw
+system image files, can be copied or flashed a lot faster with \fIbmaptool\fR than
+with traditional tools, like "dd" or "cp".
+
+.PP
+\fIBmaptool\fR supports 2 commands:
+.RS 2
+1. \fBcopy\fR - copy a file to another file using bmap or flash an image to a block device
+.RE
+.RS 2
+2. \fBcreate\fR - create a bmap for a file
+.RE
+
+.PP
+Please, find full documentation for the project online.
+
+.\" ===========================================================================
+.\" Global options
+.\" ===========================================================================
+.SH OPTIONS
+
+.PP
+\-\-version
+.RS 2
+Print \fIbmaptool\fR version and exit.
+.RE
+
+.PP
+\-h, \-\-help
+.RS 2
+Print short help text and exit.
+.RE
+
+.PP
+\-q, \-\-quiet
+.RS 2
+Be quiet, do not print extra information.
+.RE
+
+.PP
+\-d, \-\-debug
+.RS 2
+Print debugging messages.
+.RE
+
+.\" ===========================================================================
+.\" Commands descriptions
+.\" ===========================================================================
+.SH COMMANDS
+
+.\"
+.\" The "copy" command description
+.\"
+.SS \fBcopy\fR [options] IMAGE DEST
+
+.RS 2
+Copy file IMAGE to the destination regular file or block device DEST
+using bmap. IMAGE may either be a local path or an URL. DEST may either
+be a regular file or a block device (only local).
+
+.PP
+Unless the bmap file is explicitly specified with the "--bmap" option, \fIbmaptool\fR
+automatically discovers it by looking for a file with the same basename as IMAGE
+but with the ".bmap" extension. The bmap file is only looked for in
+IMAGE's directory (or base URL, in case IMAGE was specified as an URL). If the
+bmap file is not found, \fIbmaptool\fR fails. To copy without bmap, use
+the "--nobmap" option.
+
+.PP
+Both IMAGE and the bmap file may be specified as an URL (http://, ftp://,
+https://, file://, ssh://). In order to make \fIbmaptool\fR use a proxy server,
+please, specify the proxy using the standard "$http_proxy", "$https_proxy",
+"$ftp_proxy" or "$no_proxy" environment variables.
+
+.PP
+If the server requires authentication, user name and password may be specified
+in the URL, for example "https://user:password@my.server.org/image.raw.bz2", or
+"ssh://user:password@host:path/to/image.raw".
+
+.PP
+IMAGE may be compressed, in which case \fIbmaptool\fR decompresses it on-the-fly.
+The compression type is detected by the file extension and the following
+extensions are supported:
+
+.RS 4
+1. ".gz", ".gzip", ".tar.gz" and ".tgz" for files and tar archives compressed with "\fIgzip\fR" program
+.RE
+.RS 4
+2. ".bz2", "tar.bz2", ".tbz2", ".tbz", and ".tb2" for files and tar archives compressed with "\fIbzip2\fR" program
+.RE
+.RS 4
+3. ".xz", ".tar.xz", ".txz" for files and tar archives compressed with "\fIxz\fR" program
+.RE
+.RS 4
+4. ".lzo", "tar.lzo", ".tzo" for files and tar archives compressed with "\fIlzo\fR" program
+.RE
+.RS 4
+5. ".lz4", "tar.lz4", ".tlz4" for files and tar archives compressed with "\fIlz4\fR" program
+.RE
+.RS 4
+6. ".zst", "tar.zst", ".tzst" for files and tar archives compressed with "\fIzstd\fR" program
+.RE
+
+.PP
+IMAGE files with other extensions are assumed to be uncompressed. Note,
+\fIbmaptool\fR uses "\fIpbzip2\fR" and "\fIpigz\fR" programs for decompressing
+bzip2 and gzip archives faster, unless they are not available, in which case if
+falls-back to using "\fIbzip2\fR" and "\fIgzip\fR".
+
+.PP
+If DEST is a block device node (e.g., "/dev/sdg"), \fIbmaptool\fR opens it in
+exclusive mode. This means that it will fail if any other process has IMAGE
+block device node opened. This also means that no other processes will be able
+to open IMAGE until \fIbmaptool\fR finishes the copying. Please, see semantics
+of the "O_EXCL" flag of the "open()" syscall.
+
+.PP
+The bmap file typically contains SHA-256 checksum for itself as well as SHA-256
+checksum for all the mapped data regions, which makes it possible to guarantee
+data integrity. \fIbmaptool\fR verifies the checksums and exits with an error
+in case of a mismatch. Checksum verification can be disabled using the
+"--no-verify" option. \fIbmaptool\fR does not verify that unampped areas
+contain only zeroes, because these areas are anyway dropped and are not used for
+anything.
+
+.PP
+The bmap file may be signed with OpenPGP (gpg). The signature may be either
+detached (a separate file) or "built into" the bmap file (so called "clearsign"
+signature).
+
+.PP
+The detached signature can be specified with the "--bmap-sig" option, otherwise
+\fIbmaptool\fR tries to automatically discover it by looking for a file with
+the same basename as the bmap file but with the ".asc" or ".sig" extension.
+This is very similar to the bmap file auto-discovery. So if a ".asc" or ".sig"
+file exists, \fIbmaptool\fR will verify the signature.
+
+.PP
+The clearsign signature is part of the bmap file and \fIbmaptool\fR
+automatically detected and verifies it.
+
+.PP
+If the signature is bad, \fIbmaptool\fR exits with an error. Bmap file
+signature verification can be disabled using the "--no-sig-verify" option.
+.RE
+
+.\"
+.\" The "copy" command's options
+.\"
+.RS 2
+\fBOPTIONS\fR
+.RS 2
+\-h, \-\-help
+.RS 2
+Print short help text about the "copy" command and exit.
+.RE
+
+.PP
+\-\-bmap BMAP
+.RS 2
+Use bmap file "BMAP" for copying. If this option is not specified, \fIbmaptool\fR
+tries to automatically discover the bmap file.
+.RE
+
+.PP
+\-\-bmap-sig SIG
+.RS 2
+Use a detached OpenPGP signature file "SIG" for verifying the bmap file
+integrity and publisher. If this option is not specified, \fIbmaptool\fR
+tries to automatically discover the signature file.
+.RE
+
+.PP
+\-\-nobmap
+.RS 2
+Disable automatic bmap file discovery and force flashing entire IMAGE without bmap.
+.RE
+
+.PP
+\-\-no-sig-verify
+.RS 2
+Do not verify the OpenPGP bmap file signature (not recommended).
+.RE
+.RE
+
+.PP
+\-\-no-verify
+.RS 2
+Do not verify data checksums when copying (not recommended). The checksums are
+stored in the bmap file, and normally \fIbmaptool\fR verifies that the data in
+IMAGE matches the checksums.
+.RE
+
+.PP
+\-\-no-sig-verify
+.RS 2
+Write progress to a psplash pipe.
+.RE
+.RE
+
+.\"
+.\" The "copy" command's examples
+.\"
+.RS 2
+\fBEXAMPLES\fR
+.RS 2
+\fIbmaptool\fR copy image.raw.bz2 /dev/sdg
+.RS 2
+Copy bz2-compressed local file "image.raw.bz2" to block device "/dev/sdg". The
+image file is uncompressed on-the-fly. The bmap file is discovered
+automatically. The OpenPGP signature is detected/discovered automatically
+too.
+.RE
+.RE
+
+.RS 2
+\fIbmaptool\fR copy http://my-server.com/files/image.raw.bz2 $HOME/tmp/file
+.RS 2
+Copy bz2-compressed remote "image.raw.bz2" to regular file "$HOME/tmp/file".
+The image file is uncompressed on-the-fly. The bmap file is discovered
+automatically. The OpenPGP signature is detected/discovered automatically
+too.
+.RE
+.RE
+
+.RS 2
+\fIbmaptool\fR copy --bmap image.bmap --bmap-sig image.bmap.asc image.raw /dev/sdg
+.RS 2
+Copy non-compressed local file "image.raw" to block device "/dev/sdg" using bmap file
+"image.bmap". Verify the bmap file signature using a detached OpenPGP signature
+from "imag.bmap.asc".
+.RE
+.RE
+
+.\"
+.\" The "create" command description
+.\"
+.SS \fBcreate\fR [options] IMAGE
+
+.PP
+Generate bmap for a regular file IMAGE. Internally, this command uses the
+Linux "FIEMAP" ioctl to find out which IMAGE blocks are mapped. However, if
+"FIEMAP" is not supported, the "SEEK_HOLE" feature of the "lseek" system call
+is used instead. By default, the resulting bmap file is printed to stdout,
+unless the "--output" option is used.
+
+.PP
+The IMAGE file is always synchronized before the block map is generated. And it
+is important to make sure that the IMAGE file is not modified when the bmap
+file is being generated, and after the bmap file has been generated. Otherwise
+the bmap file becomes invalid and checksum verification will fail.
+
+.PP
+The image file can further be signed using OpenPGP.
+
+.\"
+.\" The "create" command's options
+.\"
+.RS 2
+\fBOPTIONS\fR
+.RS 2
+\-h, \-\-help
+.RS 2
+Print short help text about the "create" command and exit.
+.RE
+
+.PP
+\-o, \-\-output OUTPUT
+.RS 2
+Save the generated bmap in the OUTPUT file (by default the bmap is printed to
+stdout).
+.RE
+
+.PP
+\-\-no-checksum
+.RS 2
+Generate a bmap file without SHA1 checksums (not recommended).
+.RE
+.RE
+.RE
+
+.\"
+.\" The "create" command's examples
+.\"
+.RS 2
+\fBEXAMPLES\fR
+.RS 2
+\fIbmaptool\fR create image.raw
+.RS 2
+Generate bmap for the "image.raw" file and print it to stdout.
+.RE
+.RE
+
+.RS 2
+\fIbmaptool\fR create -o image.bmap image.raw
+.RS 2
+Generate bmap for the "image.raw" file and save it in "image.bmap".
+.RE
+.RE
+
+.SH AUTHOR
+
+Artem Bityutskiy <artem.bityutskiy@linux.intel.com>.
+
+.SH REPORTING BUGS
+
+Please, report bugs to Artem Bityutskiy <artem.bityutskiy@linux.intel.com> or
+to the bmap-tools mailing list <bmap-tools@lists.infradead.org>.

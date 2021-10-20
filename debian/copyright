@@ -1,0 +1,28 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-name: bmap-tools
+Upstream-Contact: Artem Bityutskiy <artem.bityutskiy@linux.intel.com>
+Source: https://github.com/01org/bmap-tools
+  .
+  The initial package was put together by Ed Bartosh <eduard.bartosh@intel.com>
+  on Sun Oct 27 22:32:19 EEST 2012.
+
+Files: *
+Copyright: © 2012-2013 Intel, Inc.
+License: GPL-2
+
+Files: debian/*
+Copyright: © 2012-2013 Intel, Inc.
+License: GPL-2
+
+License: GPL-2
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License, version 2,
+  as published by the Free Software Foundation.
+  .
+  This program is distributed in the hope that it will be useful, but
+  WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  General Public License for more details.
+Comment:
+  On Debian systems, the full text of the GPL v2 can be found
+  in /usr/share/common-licenses/GPL-2.
