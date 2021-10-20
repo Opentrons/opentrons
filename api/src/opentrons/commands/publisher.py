@@ -139,8 +139,8 @@ def publish_context(broker: Broker, command: command_types.Command) -> Iterator[
     capture_errors = feature_flags.enable_protocol_engine()
     error = None
 
+    _do_publish(broker=broker, command=command, when="before", error=None)
     try:
-        _do_publish(broker=broker, command=command, when="before", error=None)
         yield
     except Exception as e:
         # TODO(mc, 2021-10-19): put this capture behind the PE feature flag
