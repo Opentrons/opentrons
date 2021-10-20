@@ -2,6 +2,7 @@ from .mod_abc import AbstractModule
 from .tempdeck import TempDeck
 from .magdeck import MagDeck
 from .thermocycler import Thermocycler
+from .heater_shaker import HeaterShaker
 from .update import update_firmware
 from .utils import MODULE_HW_BY_NAME, build
 from .types import (
@@ -25,4 +26,5 @@ __all__ = [
     "BundledFirmware",
     "UpdateError",
     "ModuleAtPort",
+    "HeaterShaker",
 ]

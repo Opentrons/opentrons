@@ -15,6 +15,7 @@ port ?= 34000
 tests ?= tests
 test_opts ?=
 wheel_file = $(call python_get_wheelname,update-server,otupdate)
+sdist_file = $(call python_get_sdistname,update-server,otupdate)
 # Host key location for buildroot robot
 br_ssh_key ?= $(default_ssh_key)
 # Other SSH args for buildroot robots
@@ -60,6 +61,12 @@ wheel: clean
 	$(SHX) rm -rf build
 	$(SHX) ls dist
 
+.PHONY: sdist
+sdist: clean
+	$(python) setup.py sdist
+	$(SHX) rm -rf build
+	$(SHX) ls dist
+
 .PHONY: bootstrap
 bootstrap: wheel
 	curl -X POST \
@@ -76,3 +83,10 @@ push: wheel
 	$(call push-python-package,$(host),$(br_ssh_key),$(br_ssh_opts),dist/$(wheel_file))
 	$(call push-systemd-unit,$(host),$(br_ssh_key),$(br_ssh_opts),./opentrons-update-server.service)
 	$(call restart-service,$(host),$(br_ssh_key),$(br_ssh_opts),opentrons-update-server)
+
+
+.PHONY: push-ot3
+push-ot3: sdist
+	$(call push-python-sdist,$(host),,$(br_ssh_opts),dist/$(sdist_file),/opt/opentrons-update-server,otupdate)
+	# todo (seth): enable when this service actually exists
+	#$(call restart-service,$(host),,$(br_ssh_opts),opentrons-update-server)
