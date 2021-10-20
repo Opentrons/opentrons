@@ -95,6 +95,7 @@ class StateStore(StateView, ActionHandler):
                 labware state.
             deck_fixed_labware: Labware definitions from the deck
                 definition to preload into labware state.
+            configs: Configurations for the engine.
             change_notifier: Internal state change notifier.
         """
         self._command_store = CommandStore()
