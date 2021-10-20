@@ -13,10 +13,13 @@ from opentrons.drivers.smoothie_drivers import SmoothieDriver
 
 
 @pytest.fixture
-async def subject(emulation_app: Iterator[None], emulator_settings: Settings) -> SmoothieDriver:
+async def subject(
+    emulation_app: Iterator[None], emulator_settings: Settings
+) -> SmoothieDriver:
     """Smoothie driver connected to emulator."""
     d = await SmoothieDriver.build(
-        port=f"socket://127.0.0.1:{emulator_settings.smoothie.port}", config=build_config({})
+        port=f"socket://127.0.0.1:{emulator_settings.smoothie.port}",
+        config=build_config({}),
     )
     yield d
     await d.disconnect()

@@ -14,8 +14,7 @@ from opentrons.hardware_control.emulation.settings import (
     PipetteSettings,
 )
 from opentrons.hardware_control.emulation.tempdeck import TempDeckEmulator
-from opentrons.hardware_control.emulation.thermocycler import \
-    ThermocyclerEmulator
+from opentrons.hardware_control.emulation.thermocycler import ThermocyclerEmulator
 
 
 @pytest.fixture(scope="session")

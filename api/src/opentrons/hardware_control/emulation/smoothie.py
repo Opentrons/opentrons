@@ -6,7 +6,6 @@ Opentrons smoothie driver.
 import logging
 import re
 from typing import Optional, Dict
-from typing_extensions import Literal
 
 from opentrons import _find_smoothie_file
 from opentrons.drivers import utils
@@ -29,8 +28,8 @@ class SmoothieEmulator(AbstractEmulator):
     _pos: Dict[str, float]
     _home_status: Dict[str, bool]
     _speed: float
-    _pipette_model: Dict[Literal["L", "R"], str]
-    _pipette_id: Dict[Literal["L", "R"], str]
+    _pipette_model: Dict[str, str]
+    _pipette_id: Dict[str, str]
 
     def __init__(self, parser: Parser, settings: SmoothieSettings) -> None:
         """Constructor.
