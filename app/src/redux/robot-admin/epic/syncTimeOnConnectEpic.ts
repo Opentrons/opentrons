@@ -8,12 +8,12 @@ import * as Constants from '../constants'
 
 import type { Action, Epic } from '../../types'
 import type { RobotApiRequestOptions } from '../../robot-api/types'
-import type { ConnectAction } from '../../robot/actions'
+import type { ConnectAction, LegacyConnectAction } from '../../robot/actions'
 
 const SYNC_THRESHOLD_SEC = 60
 
 const mapActionToFetchRequest = (
-  action: ConnectAction
+  action: LegacyConnectAction
 ): RobotApiRequestOptions => {
   return { method: GET, path: Constants.SYSTEM_TIME_PATH }
 }
@@ -32,7 +32,7 @@ const createUpdateRequest = (date: Date): RobotApiRequestOptions => {
 
 export const syncTimeOnConnectEpic: Epic = (action$, state$) => {
   return action$.pipe(
-    ofType<Action, ConnectAction>('robot:CONNECT'),
+    ofType<Action, LegacyConnectAction | ConnectAction>('robot:LEGACY_CONNECT', 'robot:CONNECT'),
     withRobotHost(state$, action => action.payload.name),
     // TODO(mc, 2020-09-08): only fetch if health.links.systemTime exists,
     // see TODO in robot-server/robot_server/service/legacy/models/health.py

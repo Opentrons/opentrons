@@ -3,13 +3,20 @@ import type { Error } from '../types'
 import type { ProtocolData } from '../protocol/types'
 import type { Mount, Slot, Axis, Direction, SessionUpdate } from './types'
 
-export interface ConnectAction {
-  type: 'robot:CONNECT'
+export interface LegacyConnectAction {
+  type: 'robot:LEGACY_CONNECT'
   payload: {
     name: string
   }
   meta: {
     robotCommand: true
+  }
+}
+
+export interface ConnectAction {
+  type: 'robot:CONNECT'
+  payload: {
+    name: string
   }
 }
 
@@ -277,6 +284,7 @@ export const actionTypes = {
 
 // TODO(mc, 2018-01-23): NEW ACTION TYPES GO HERE
 export type Action =
+  | LegacyConnectAction
   | ConnectAction
   | ConnectResponseAction
   | DisconnectAction
@@ -313,9 +321,9 @@ export type Action =
   | CancelResponseAction
 
 export const actions = {
-  connect(name: string): ConnectAction {
+  connect(name: string): LegacyConnectAction {
     return {
-      type: 'robot:CONNECT',
+      type: 'robot:LEGACY_CONNECT',
       payload: { name },
       meta: { robotCommand: true },
     }
