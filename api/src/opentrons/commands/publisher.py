@@ -5,7 +5,12 @@ from typing import Any, Callable, Iterator, Optional, TypeVar, cast
 
 from opentrons.broker import Broker
 from opentrons.config import feature_flags
-from . import types as command_types
+from .types import (
+    COMMAND as COMMAND_TOPIC,
+    Command as CommandPayload,
+    CommandMessage,
+    MessageSequenceId,
+)
 
 
 class CommandPublisher:
@@ -26,35 +31,42 @@ class CommandPublisher:
         self._broker = broker
 
 
-CommandMessageCreator = Callable[..., command_types.Command]
+CommandPayloadCreator = Callable[..., CommandPayload]
 """A function that creates a Command dictionary message."""
 
 FuncT = TypeVar("FuncT", bound=Callable[..., Any])
 """A function wrapped by the @publish decorator."""
 
 
-def publish(command: CommandMessageCreator) -> Callable[[FuncT], FuncT]:
+def publish(command: CommandPayloadCreator) -> Callable[[FuncT], FuncT]:
     """Publish messages before and after the decorated function has run."""
 
     def _decorator(func: FuncT) -> FuncT:
-        @functools.wraps(
-            func,
-            updated=list(functools.WRAPPER_UPDATES) + ["__globals__"],
-        )
+        @functools.wraps(func)
         def _decorated(*args: Any, **kwargs: Any) -> Any:
+            """Use the args passed to wrapped `func` to build the message payload.
+
+            1. Inspect signature of `func` and bind arguments to signature to map
+               argument names to called (and/or default) values.
+            2. Inspect signature of `command` and map values from `func` call to
+               argument names expected by `command`.
+            3. Map `self` argument of `func` to the `instrument` argument of `command`,
+               where applicable.
+            4. Construct the command payload and publish it using `publish_context`
+            5. Return the value of calling `func` with `*args` and `**kwargs`
+            """
+
             broker = getattr(args[0], "broker", None)
 
             assert isinstance(
                 broker, Broker
             ), "Only methods of CommandPublisher classes should be decorated."
 
-            # get the values of func arguments, including defaults
             func_sig = _inspect_signature(func)
             bound_func_args = func_sig.bind(*args, **kwargs)
             bound_func_args.apply_defaults()
             func_args = bound_func_args.arguments
 
-            # map func argument values to message creator arguments
             message_creator_sig = _inspect_signature(command)
             message_creator_arg_names = set(message_creator_sig.parameters.keys())
             message_creator_args = {
@@ -87,8 +99,12 @@ def publish(command: CommandMessageCreator) -> Callable[[FuncT], FuncT]:
 
 
 @contextmanager
-def publish_context(broker: Broker, command: command_types.Command) -> Iterator[None]:
-    """Publish messages before and after the `with` block has run."""
+def publish_context(broker: Broker, command: CommandPayload) -> Iterator[None]:
+    """Publish messages before and after the `with` block has run.
+
+    If an `error` is raised in the `with` block, it will be published in the "after"
+    message (if the ProtocolEngine is enabled) and re-raised.
+    """
     capture_errors = feature_flags.enable_protocol_engine()
     error = None
 
@@ -111,14 +127,14 @@ def _inspect_signature(func: Callable[..., Any]) -> inspect.Signature:
 
 def _do_publish(
     broker: Broker,
-    command: command_types.Command,
-    when: command_types.MessageSequenceId,
+    command: CommandPayload,
+    when: MessageSequenceId,
     error: Optional[Exception],
 ) -> None:
     """Publish a command to the broker from the decorator or ContextManager."""
     name = command["name"]
     payload = command["payload"]
-    message: command_types.CommandMessage = {  # type: ignore[assignment,misc]
+    message: CommandMessage = {  # type: ignore[assignment, misc]
         "$": when,
         "name": name,
         "payload": payload,
@@ -129,4 +145,4 @@ def _do_publish(
         payload_str = ", ".join(f"{k}: {v}" for k, v in payload.items() if k != "text")
         broker.logger.info(f"{name}: {payload_str}")
 
-    broker.publish(topic=command_types.COMMAND, message=message)
+    broker.publish(topic=COMMAND_TOPIC, message=message)

@@ -6,7 +6,7 @@ from decoy import Decoy, matchers
 from typing import Any, Dict, AsyncIterator, cast
 from opentrons.config import advanced_settings
 from opentrons.broker import Broker
-from opentrons.commands.types import Command
+from opentrons.commands.types import Command as CommandDict
 from opentrons.commands.publisher import CommandPublisher, publish, publish_context
 
 
@@ -36,11 +36,14 @@ def test_publish_decorator(decoy: Decoy, broker: Broker) -> None:
     """It should publish "before" and "after" messages for decorated methods."""
     _act = decoy.mock()
 
-    def _get_command_payload(foo: str, bar: int) -> Dict[str, Any]:
-        return {"name": "some_command", "payload": {"foo": foo, "bar": bar}}
+    def _get_command_payload(foo: str, bar: int) -> CommandDict:
+        return cast(
+            CommandDict,
+            {"name": "some_command", "payload": {"foo": foo, "bar": bar}},
+        )
 
     class _Subject(CommandPublisher):
-        @publish(command=_get_command_payload)  # type: ignore[arg-type]
+        @publish(command=_get_command_payload)
         def act(self, foo: str, bar: int) -> None:
             _act()
 
@@ -74,11 +77,14 @@ def test_publish_decorator_with_arg_defaults(decoy: Decoy, broker: Broker) -> No
     """It should pass method argument defaults to the command creator."""
     _act = decoy.mock()
 
-    def _get_command_payload(foo: str, bar: int) -> Dict[str, Any]:
-        return {"name": "some_command", "payload": {"foo": foo, "bar": bar}}
+    def _get_command_payload(foo: str, bar: int) -> CommandDict:
+        return cast(
+            CommandDict,
+            {"name": "some_command", "payload": {"foo": foo, "bar": bar}},
+        )
 
     class _Subject(CommandPublisher):
-        @publish(command=_get_command_payload)  # type: ignore[arg-type]
+        @publish(command=_get_command_payload)
         def act(self, foo: str, bar: int = 42) -> None:
             _act()
 
@@ -225,7 +231,7 @@ def test_publish_context(decoy: Decoy, broker: Broker) -> None:
     _act = decoy.mock()
 
     command = cast(
-        Command,
+        CommandDict,
         {"name": "some_command", "payload": {"foo": "hello", "bar": 42}},
     )
 
@@ -264,7 +270,7 @@ def test_publish_context_with_error(
     enable_protocol_engine: None,
 ) -> None:
     command = cast(
-        Command,
+        CommandDict,
         {"name": "some_command", "payload": {"foo": "hello", "bar": 42}},
     )
 
@@ -305,7 +311,7 @@ def test_publish_context_with_error_no_engine(
 ) -> None:
     """It should not capture errors if the engine FF is off."""
     command = cast(
-        Command,
+        CommandDict,
         {"name": "some_command", "payload": {"foo": "hello", "bar": 42}},
     )
 
