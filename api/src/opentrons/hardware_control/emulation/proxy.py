@@ -217,12 +217,13 @@ class Proxy:
                 d = await in_connection.reader.read(1)
                 if not d:
                     log.info(
-                        f"{in_connection.writer.transport.get_extra_info('socket')} disconnected."
+                        f"{in_connection.writer.transport.get_extra_info('socket')} "
+                        f"disconnected."
                     )
                     break
                 out_connection.writer.write(d)
             except ConnectionError:
-                log.exception(f"connection error in data router")
+                log.exception("connection error in data router")
                 break
         if close_other_on_disconnect:
             out_connection.writer.close()

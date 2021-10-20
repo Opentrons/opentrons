@@ -10,7 +10,11 @@ from opentrons.types import Mount
 
 
 @pytest.fixture
-async def subject(loop: asyncio.BaseEventLoop, emulation_app: Iterator[None], emulator_settings: Settings) -> Controller:
+async def subject(
+    loop: asyncio.BaseEventLoop,
+    emulation_app: Iterator[None],
+    emulator_settings: Settings,
+) -> Controller:
     conf = build_config({})
     port = f"socket://127.0.0.1:{emulator_settings.smoothie.port}"
     hc = await Controller.build(config=conf)

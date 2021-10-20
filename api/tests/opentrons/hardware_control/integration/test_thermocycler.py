@@ -8,7 +8,11 @@ from opentrons.hardware_control.modules import Thermocycler
 
 
 @pytest.fixture
-async def thermocycler(loop: asyncio.BaseEventLoop, emulation_app: Iterator[None], emulator_settings: Settings) -> Thermocycler:
+async def thermocycler(
+    loop: asyncio.BaseEventLoop,
+    emulation_app: Iterator[None],
+    emulator_settings: Settings,
+) -> Thermocycler:
     """Thermocycler fixture."""
     execution_manager = ExecutionManager(loop)
     module = await Thermocycler.build(
