@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { when, resetAllWhenMocks } from 'jest-when'
 import { StaticRouter } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
@@ -8,12 +9,14 @@ import {
   actions as RobotActions,
   selectors as RobotSelectors,
 } from '../../../../redux/robot'
+import { useFeatureFlag } from '../../../../redux/config'
 import * as Buildroot from '../../../../redux/buildroot'
 import { RobotItem } from '../RobotItem'
 import { RobotListItem } from '../RobotListItem'
 
 jest.mock('../../../../redux/buildroot/selectors')
 jest.mock('../../../../redux/robot/selectors')
+jest.mock('../../../../redux/config')
 
 const getBuildrootUpdateAvailable = Buildroot.getBuildrootUpdateAvailable as jest.MockedFunction<
   typeof Buildroot.getBuildrootUpdateAvailable
@@ -21,6 +24,10 @@ const getBuildrootUpdateAvailable = Buildroot.getBuildrootUpdateAvailable as jes
 
 const getConnectRequest = RobotSelectors.getConnectRequest as jest.MockedFunction<
   typeof RobotSelectors.getConnectRequest
+>
+
+const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
+  typeof useFeatureFlag
 >
 
 describe('ConnectPanel RobotItem', () => {
@@ -66,6 +73,7 @@ describe('ConnectPanel RobotItem', () => {
 
   afterEach(() => {
     jest.resetAllMocks()
+    resetAllWhenMocks()
   })
 
   it('renders a RobotListItem with the robot', () => {
@@ -143,7 +151,27 @@ describe('ConnectPanel RobotItem', () => {
     expect(item.prop('isLocal')).toBe(false)
   })
 
-  it('dispatches connect on toggleConnect if disconnected', () => {
+  it('dispatches legacy connect on toggleConnect if disconnected and usePreProtocolWithoutRPC ff is NOT set', () => {
+    when(mockUseFeatureFlag)
+      .calledWith('preProtocolFlowWithoutRPC')
+      .mockReturnValue(false)
+
+    const robot = Fixtures.mockConnectableRobot
+    const wrapper = render(robot)
+    const item = wrapper.find(RobotListItem)
+
+    item.invoke('onToggleConnect')?.()
+
+    expect(store.dispatch).toHaveBeenCalledWith(
+      RobotActions.legacyConnect(robot.name)
+    )
+  })
+
+  it('dispatches connect on toggleConnect if disconnected and usePreProtocolWithoutRPC ff is set', () => {
+    when(mockUseFeatureFlag)
+      .calledWith('preProtocolFlowWithoutRPC')
+      .mockReturnValue(true)
+
     const robot = Fixtures.mockConnectableRobot
     const wrapper = render(robot)
     const item = wrapper.find(RobotListItem)

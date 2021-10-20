@@ -18,6 +18,9 @@ export interface ConnectAction {
   payload: {
     name: string
   }
+  meta: {
+    robotCommand: true
+  }
 }
 
 export interface ConnectResponseAction {
@@ -321,9 +324,18 @@ export type Action =
   | CancelResponseAction
 
 export const actions = {
-  connect(name: string): LegacyConnectAction {
+  // legacyConnect will construct an RPC client and update state
+  legacyConnect(name: string): LegacyConnectAction {
     return {
       type: 'robot:LEGACY_CONNECT',
+      payload: { name },
+      meta: { robotCommand: true },
+    }
+  },
+  // connect will NOT construct an RPC client
+  connect(name: string): ConnectAction {
+    return {
+      type: 'robot:CONNECT',
       payload: { name },
       meta: { robotCommand: true },
     }

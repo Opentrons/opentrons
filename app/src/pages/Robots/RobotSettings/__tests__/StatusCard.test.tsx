@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { when, resetAllWhenMocks } from 'jest-when'
 import { SecondaryBtn, Icon, mountWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 
@@ -7,11 +8,13 @@ import {
   actions as RobotActions,
   selectors as RobotSelectors,
 } from '../../../../redux/robot'
+import { useFeatureFlag } from '../../../../redux/config'
 import { StatusCard } from '../StatusCard'
 
 import type { ViewableRobot } from '../../../../redux/discovery/types'
 
 jest.mock('../../../../redux/robot/selectors')
+jest.mock('../../../../redux/config')
 
 const getSessionStatus = RobotSelectors.getSessionStatus as jest.MockedFunction<
   typeof RobotSelectors.getSessionStatus
@@ -19,6 +22,10 @@ const getSessionStatus = RobotSelectors.getSessionStatus as jest.MockedFunction<
 
 const getConnectRequest = RobotSelectors.getConnectRequest as jest.MockedFunction<
   typeof RobotSelectors.getConnectRequest
+>
+
+const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
+  typeof useFeatureFlag
 >
 
 describe('RobotSettings StatusCard', () => {
@@ -41,6 +48,7 @@ describe('RobotSettings StatusCard', () => {
 
   afterEach(() => {
     jest.resetAllMocks()
+    resetAllWhenMocks()
   })
 
   it('should have a connect button', () => {
@@ -50,7 +58,25 @@ describe('RobotSettings StatusCard', () => {
     expect(button.html()).toContain('connect')
   })
 
-  it('dispatch connect on connect button click if disconnected', () => {
+  it('dispatch connect on connect button click if disconnected and usePreProtocolWithoutRPC ff is NOT set', () => {
+    when(mockUseFeatureFlag)
+      .calledWith('preProtocolFlowWithoutRPC')
+      .mockReturnValue(false)
+
+    const { wrapper, store } = render()
+    const button = wrapper.find(SecondaryBtn)
+
+    button.invoke('onClick')?.({} as React.MouseEvent)
+    expect(store.dispatch).toHaveBeenCalledWith(
+      RobotActions.legacyConnect(Fixtures.mockConnectableRobot.name)
+    )
+  })
+
+  it('dispatch connect on connect button click if disconnected and usePreProtocolWithoutRPC ff is set', () => {
+    when(mockUseFeatureFlag)
+      .calledWith('preProtocolFlowWithoutRPC')
+      .mockReturnValue(true)
+
     const { wrapper, store } = render()
     const button = wrapper.find(SecondaryBtn)
 

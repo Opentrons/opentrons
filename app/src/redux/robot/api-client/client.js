@@ -94,6 +94,7 @@ export function client(dispatch) {
 
   // legacyConnect sets up the RPC client
   function legacyConnect(state, action) {
+    console.log('legacy connect being called!')
     if (selectors.getConnectRequest(state).inProgress) return
     if (rpcClient) disconnect()
 
