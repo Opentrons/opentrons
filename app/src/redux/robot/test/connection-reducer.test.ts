@@ -54,7 +54,7 @@ describe('robot reducer - connection', () => {
       },
     } as any
     const action: Action = {
-      type: 'robot:CONNECT',
+      type: 'robot:LEGACY_CONNECT',
       payload: { name: 'ot' },
       meta: {} as any,
     }
@@ -100,7 +100,7 @@ describe('robot reducer - connection', () => {
       },
     } as any
     const action: Action = {
-      type: 'robot:CONNECT',
+      type: 'robot:LEGACY_CONNECT',
       payload: { name: 'someone-else' },
       meta: {} as any,
     }
