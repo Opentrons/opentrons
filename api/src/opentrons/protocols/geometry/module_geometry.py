@@ -11,7 +11,7 @@ import logging
 import re
 from typing import Mapping, Optional, Union, TYPE_CHECKING
 
-import numpy as np  # type: ignore
+import numpy as np
 import jsonschema  # type: ignore
 from opentrons import types
 from opentrons.protocols.context.protocol_api.labware import LabwareImplementation
