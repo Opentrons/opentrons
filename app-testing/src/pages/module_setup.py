@@ -82,4 +82,4 @@ class ModuleSetup:
         self.get_proceed_to_labware_setup().click()
 
     def click_proceed_to_module_setup(self) -> None:
-        self.get_proceed_to_module_setup.click()
+        self.get_proceed_to_module_setup().click()
