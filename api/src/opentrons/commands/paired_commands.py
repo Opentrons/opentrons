@@ -15,7 +15,7 @@ Apiv2Locations = Sequence[Union["Location", "Well"]]
 Apiv2Instruments = Sequence["InstrumentContext"]
 
 
-def combine_locations(location: Sequence) -> str:
+def combine_locations(location: Apiv2Locations) -> str:
     if len(location) > 1:
         loc1 = stringify_location(location[0])
         loc2 = stringify_location(location[1])

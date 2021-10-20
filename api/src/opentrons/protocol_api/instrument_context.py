@@ -409,7 +409,7 @@ class InstrumentContext(CommandPublisher):
 
     @requires_version(2, 0)
     def blow_out(
-        self, location: Union[types.Location, Well] = None
+        self, location: Optional[Union[types.Location, Well]] = None
     ) -> InstrumentContext:
         """
         Blow liquid out of the tip.
@@ -464,7 +464,7 @@ class InstrumentContext(CommandPublisher):
             broker=self.broker,
             command=cmds.blow_out(
                 instrument=self,
-                location=location or self._ctx.location_cache,
+                location=location or self._ctx.location_cache,  # type: ignore[arg-type]
             ),
         ):
             self._implementation.blow_out()
