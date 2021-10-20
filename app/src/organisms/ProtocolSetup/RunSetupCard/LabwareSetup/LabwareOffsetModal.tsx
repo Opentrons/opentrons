@@ -56,11 +56,7 @@ export const LabwareOffsetModal = (
           >
             {t('position_offset_overiew')}
           </Text>
-          <Text
-            fontSize={FONT_SIZE_BODY_1}
-            fontWeight={FONT_WEIGHT_REGULAR}
-            marginBottom={SPACING_2}
-          >
+          <Text fontSize={FONT_SIZE_BODY_1} fontWeight={FONT_WEIGHT_REGULAR}>
             {t('robot_cal_info')}
           </Text>
           <Link
@@ -77,7 +73,6 @@ export const LabwareOffsetModal = (
             marginTop={SPACING_2}
             fontSize={FONT_SIZE_BODY_1}
             fontWeight={FONT_WEIGHT_REGULAR}
-            marginBottom={SPACING_1}
           >
             {t('labware_offset_data_info')}
           </Text>
@@ -91,40 +86,40 @@ export const LabwareOffsetModal = (
             {t('learn_more_about_offset_data')}
             <Icon name={'open-in-new'} marginLeft={SPACING_1} size="10px" />
           </Link>
-          <Text
-            marginTop={SPACING_3}
-            as={'h4'}
-            fontWeight={FONT_WEIGHT_SEMIBOLD}
-            marginBottom={SPACING_1}
-          >
-            {t('creating_labware_offset_data')}
-          </Text>
-          <Text
-            marginTop={SPACING_2}
-            fontSize={FONT_SIZE_BODY_1}
-            fontWeight={FONT_WEIGHT_REGULAR}
-            marginBottom={SPACING_2}
-          >
-            {t('creating_labware_off_data_explanation')}
-          </Text>
-          <Text
-            marginTop={SPACING_3}
-            as={'h4'}
-            fontWeight={FONT_WEIGHT_SEMIBOLD}
-            marginBottom={SPACING_2}
-          >
-            {t('rerunning_a_protocol')}
-          </Text>
           <Trans
             t={t}
-            i18nKey={`rerunning_a_protocol_explanation`}
+            i18nKey={`creating_labware_offset_data`}
             components={{
+              h3: (
+                <Text
+                  as={'h3'}
+                  marginTop={SPACING_3}
+                  fontWeight={FONT_WEIGHT_SEMIBOLD}
+                  marginBottom={SPACING_1}
+                />
+              ),
               block: (
                 <Text fontSize={FONT_SIZE_BODY_1} marginBottom={SPACING_3} />
               ),
             }}
           />
-
+          <Trans
+            t={t}
+            i18nKey={`rerunning_a_protocol`}
+            components={{
+              h3: (
+                <Text
+                  as={'h3'}
+                  marginTop={SPACING_3}
+                  fontWeight={FONT_WEIGHT_SEMIBOLD}
+                  marginBottom={SPACING_1}
+                />
+              ),
+              block: (
+                <Text fontSize={FONT_SIZE_BODY_1} marginBottom={SPACING_3} />
+              ),
+            }}
+          />
           <Flex justifyContent={JUSTIFY_CENTER} marginBottom={SPACING_3}>
             <PrimaryBtn
               onClick={props.onCloseClick}
