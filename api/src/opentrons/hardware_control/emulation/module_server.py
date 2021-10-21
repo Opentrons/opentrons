@@ -73,7 +73,7 @@ class ModuleStatusServer(ProxyListener):
             log.exception("Failed to find identifier")
 
     async def run(self) -> None:
-        """"""
+        """Run the server."""
         server = await asyncio.start_server(
             self._handle_connection, host=self._settings.host, port=self._settings.port
         )
