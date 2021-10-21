@@ -30,7 +30,7 @@ MessageDefinition = Union[
     defs.ExecuteMoveGroupRequest,
     defs.ClearMoveGroupRequest,
     defs.MoveGroupCompleted,
-    defs.MoveCompleted
+    defs.MoveCompleted,
 ]
 
 
