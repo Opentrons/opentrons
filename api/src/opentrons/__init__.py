@@ -159,6 +159,9 @@ async def initialize() -> API:
             await hardware.set_lights(button=False)
             await asyncio.sleep(0.5)
 
+    # While the hardware was initializing in _create_hardware_api(), it blinked the
+    # front button light. But that blinking stops when the completed hardware object
+    # is returned. Do our own blinking here to keep it going while we home the robot.
     blink_task = asyncio.create_task(_blink())
 
     if not ff.disable_home_on_boot():
