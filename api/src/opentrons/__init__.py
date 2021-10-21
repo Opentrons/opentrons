@@ -174,4 +174,7 @@ async def initialize() -> API:
         return hardware
     finally:
         blink_task.cancel()
-        await blink_task
+        try:
+            await blink_task
+        except asyncio.CancelledError:
+            pass
