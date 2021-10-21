@@ -157,7 +157,7 @@ class DurationEstimator:
         elif message_name == types.THERMOCYCLER_OPEN:
             duration = self.on_thermocycler_lid_open(payload=payload)
         elif message_name == types.TRANSFER:
-            # Already accounted for in other steps
+            # If there is a pass it is already accounted for
             pass
         elif message_name == types.DISTRIBUTE:
             pass
@@ -165,12 +165,42 @@ class DurationEstimator:
             pass
         elif message_name == types.COMMENT:
             pass
+        elif message_name == types.AIR_GAP:
+            #calls Types.Asirate so it is covevered
+            pass
+        elif message_name == command_types.MOVE_TO:
+            duration = self.on_move_to(payload=payload)
         else:
             logger.warning(
                 f"Command type '{message_name}' is not yet supported by the "
                 f"duration estimator."
             )
         return duration
+
+        ## New Function
+        def on_move_to(self, payload) -> float:
+            # General aspiration code
+            instrument = payload["instrument"]
+            # now lets handle the aspiration z-axis code.
+            location = payload["location"]
+            slot = self.get_slot(location)
+            # TODO (Matt and Alex, 2021-10-21): Please handle z axis better. For now we are just going to have an x axis one
+            gantry_speed = instrument.default_speed
+            z_total_time = self.z_time(
+                location.labware.parent.parent.is_module, gantry_speed
+            )
+            location = payload["location"]
+            prev_slot = self._last_deckslot
+            curr_slot = self.get_slot(location)
+            deck_travel_time = self.calc_deck_movement_time(
+                self._deck, curr_slot, prev_slot, gantry_speed
+            )
+
+            logger.info(
+                f"{instrument.name} move to slot"
+                f"{curr_slot} the duration is {duration}"
+            )
+            return duration
 
     def on_pick_up_tip(self, payload) -> float:
         """Handle a pick up tip event"""
@@ -215,6 +245,7 @@ class DurationEstimator:
         # let's only log the message after the pick up tip is done.
         logger.info(f"{instrument.name}, drop tip duration is {duration}")
         return duration
+
 
     def on_aspirate(self, payload) -> float:
         # General aspiration code
