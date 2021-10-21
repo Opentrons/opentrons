@@ -1,6 +1,6 @@
 // jog controls component
 import * as React from 'react'
-
+import cx from 'classnames'
 import { RadioGroup, HandleKeypress } from '@opentrons/components'
 import { ControlContainer } from './ControlContainer'
 import styles from './styles.css'
@@ -14,9 +14,14 @@ interface StepSizeControlProps {
   stepSizes: StepSize[]
   currentStepSize: StepSize
   setCurrentStepSize: (stepSize: StepSize) => void
+  isLPC?: boolean
 }
 export function StepSizeControl(props: StepSizeControlProps): JSX.Element {
   const { stepSizes, currentStepSize, setCurrentStepSize } = props
+
+  const lpcRadiobuttonColor = cx({
+    [styles.radio_button]: props.isLPC
+  })
 
   const increaseStepSize: () => void = () => {
     const i = stepSizes.indexOf(currentStepSize)
@@ -51,7 +56,7 @@ export function StepSizeControl(props: StepSizeControlProps): JSX.Element {
             value: `${stepSize}`,
           }))}
           onChange={handleStepSelect}
-          className={styles.radio_button}
+          className={lpcRadiobuttonColor}
         />
       </HandleKeypress>
     </ControlContainer>

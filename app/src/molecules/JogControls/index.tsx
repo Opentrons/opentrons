@@ -25,12 +25,15 @@ export interface JogControlsProps extends StyleProps {
   planes?: Plane[]
   stepSizes?: StepSize[]
   auxiliaryControl?: React.ReactNode | null
+  buttonColor?: string
+  isLPC?: boolean
 }
 
 export { HORIZONTAL_PLANE, VERTICAL_PLANE }
 
 export function JogControls(props: JogControlsProps): JSX.Element {
   const {
+    isLPC,
     stepSizes = DEFAULT_STEP_SIZES,
     planes = [HORIZONTAL_PLANE, VERTICAL_PLANE],
     jog,
@@ -50,7 +53,8 @@ export function JogControls(props: JogControlsProps): JSX.Element {
       {...styleProps}
     >
       <StepSizeControl
-        {...{ currentStepSize, setCurrentStepSize, stepSizes }}
+        {...{ currentStepSize, setCurrentStepSize, stepSizes, isLPC
+      }}
       />
       {planes.map(plane => (
         <DirectionControl
@@ -58,6 +62,7 @@ export function JogControls(props: JogControlsProps): JSX.Element {
           plane={plane}
           jog={jog}
           stepSize={currentStepSize}
+          buttonColor={props.buttonColor}
         />
       ))}
       {auxiliaryControl}

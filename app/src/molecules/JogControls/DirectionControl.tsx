@@ -112,6 +112,7 @@ interface DirectionControlProps {
   plane: Plane
   jog: Jog
   stepSize: number
+  buttonColor?: string
 }
 
 export function DirectionControl(props: DirectionControlProps): JSX.Element {
@@ -146,7 +147,7 @@ export function DirectionControl(props: DirectionControlProps): JSX.Element {
                 onClick={() => props.jog(axis, sign, props.stepSize)}
                 {...{ gridRow, gridColumn }}
               >
-                <Icon name={iconName} backgroundColor={C_BLUE} />
+                <Icon name={iconName} backgroundColor={props.buttonColor} />
               </PrimaryBtn>
             )
           )}
