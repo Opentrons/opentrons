@@ -53,8 +53,7 @@ export function JogControls(props: JogControlsProps): JSX.Element {
       {...styleProps}
     >
       <StepSizeControl
-        {...{ currentStepSize, setCurrentStepSize, stepSizes, isLPC
-      }}
+        {...{ currentStepSize, setCurrentStepSize, stepSizes, isLPC }}
       />
       {planes.map(plane => (
         <DirectionControl

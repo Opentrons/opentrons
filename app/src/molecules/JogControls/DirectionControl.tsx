@@ -9,7 +9,6 @@ import {
   Icon,
   HandleKeypress,
   ALIGN_CENTER,
-  C_BLUE,
 } from '@opentrons/components'
 import { ControlContainer } from './ControlContainer'
 

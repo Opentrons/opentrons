@@ -34,7 +34,6 @@ import levelWithTip from '../../../assets/images/lpc_level_with_tip.svg'
 import levelWithLabware from '../../../assets/images/lpc_level_with_labware.svg'
 import { Axis, Sign, StepSize } from '../../../molecules/JogControls/types'
 import type { LabwarePositionCheckStep } from './types'
-import { truncate } from 'lodash'
 
 const DECK_MAP_VIEWBOX = '-30 -20 170 115'
 interface LabwarePositionCheckStepDetailProps {

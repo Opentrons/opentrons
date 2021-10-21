@@ -20,7 +20,7 @@ export function StepSizeControl(props: StepSizeControlProps): JSX.Element {
   const { stepSizes, currentStepSize, setCurrentStepSize } = props
 
   const lpcRadiobuttonColor = cx({
-    [styles.radio_button]: props.isLPC
+    [styles.radio_button]: props.isLPC,
   })
 
   const increaseStepSize: () => void = () => {
