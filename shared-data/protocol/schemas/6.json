@@ -1003,15 +1003,6 @@
                             "type": "string"
                           }
                         }
-                      },
-                      {
-                        "required": ["coordinates"],
-                        "properties": {
-                          "coordinates": {
-                            "$ref": "#/definitions/offset",
-                            "description": "X, Y, Z coordinates from the deck's origin point. (left-front-bottom of working space)"
-                          }
-                        }
                       }
                     ]
                   }
@@ -1045,15 +1036,6 @@
                           "slotName": {
                             "description": "Unique string identifier that corresponds to a slot in the referenced deck definition's locations",
                             "type": "string"
-                          }
-                        }
-                      },
-                      {
-                        "required": ["coordinates"],
-                        "properties": {
-                          "coordinates": {
-                            "$ref": "#/definitions/offset",
-                            "description": "X, Y, Z coordinates from the deck's origin point. (left-front-bottom of working space)"
                           }
                         }
                       }
