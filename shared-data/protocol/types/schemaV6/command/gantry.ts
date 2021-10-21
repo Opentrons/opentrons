@@ -1,8 +1,13 @@
 export type GantryCommand =
-  | { commandType: 'moveToSlot'; params: MoveToSlotParams }
-  | { commandType: 'moveToWell'; params: MoveToWellParams }
-  | { commandType: 'moveToCoordinates'; params: MoveToCoordinatesParams }
-  | { commandType: 'moveRelative'; params: MoveRelativeParams }
+  | { commandType: 'moveToSlot'; params: MoveToSlotParams; result?: {} }
+  | { commandType: 'moveToWell'; params: MoveToWellParams; result?: {} }
+  | {
+      commandType: 'moveToCoordinates'
+      params: MoveToCoordinatesParams
+      result?: {}
+    }
+  | { commandType: 'moveRelative'; params: MoveRelativeParams; result?: {} }
+  | { commandType: 'savePosition'; params: SavePositionParams; result?: {} }
 
 interface MoveToSlotParams {
   pipetteId: string
@@ -44,4 +49,9 @@ interface MoveRelativeParams {
   pipetteId: string
   axis: 'x' | 'y' | 'z'
   distance: number
+}
+
+interface SavePositionParams {
+  pipetteId: string // pipette to use in measurement
+  positionId?: string // position ID, auto-assigned if left blank
 }

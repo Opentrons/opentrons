@@ -1,12 +1,44 @@
 export type PipettingCommand =
-  | { commandType: 'aspirate'; params: AspDispAirgapParams }
-  | { commandType: 'dispense'; params: AspDispAirgapParams }
-  | { commandType: 'aspirateAirGap'; params: AspDispAirgapParams }
-  | { commandType: 'dispenseAirGap'; params: AspDispAirgapParams }
-  | { commandType: 'blowout'; params: BlowoutParams }
-  | { commandType: 'touchTip'; params: TouchTipParams }
-  | { commandType: 'pickUpTip'; params: PipetteAccessParams }
-  | { commandType: 'dropTip'; params: PipetteAccessParams }
+  | {
+      commandType: 'aspirate'
+      params: AspDispAirgapParams
+      result?: BasicLiquidHandlingResult
+    }
+  | {
+      commandType: 'dispense'
+      params: AspDispAirgapParams
+      result?: BasicLiquidHandlingResult
+    }
+  | {
+      commandType: 'aspirateAirGap'
+      params: AspDispAirgapParams
+      result?: BasicLiquidHandlingResult
+    }
+  | {
+      commandType: 'dispenseAirGap'
+      params: AspDispAirgapParams
+      result?: BasicLiquidHandlingResult
+    }
+  | {
+      commandType: 'blowout'
+      params: BlowoutParams
+      result?: BasicLiquidHandlingResult
+    }
+  | {
+      commandType: 'touchTip'
+      params: TouchTipParams
+      result?: BasicLiquidHandlingResult
+    }
+  | {
+      commandType: 'pickUpTip'
+      params: PipetteAccessParams
+      result?: {}
+    }
+  | {
+      commandType: 'dropTip'
+      params: PipetteAccessParams
+      result?: {}
+    }
 
 type AspDispAirgapParams = FlowRateParams &
   PipetteAccessParams &
@@ -16,7 +48,7 @@ type BlowoutParams = FlowRateParams & PipetteAccessParams & WellLocationParam
 type TouchTipParams = PipetteAccessParams & WellLocationParam
 
 interface FlowRateParams {
-  flowRate: number
+  flowRate: number // µL/s
 }
 
 interface PipetteAccessParams {
@@ -26,16 +58,21 @@ interface PipetteAccessParams {
 }
 
 interface VolumeParams {
-  volume: number
+  volume: number // µL
 }
 
 interface WellLocationParam {
   wellLocation: {
     origin: string // e.g. 'top' || 'bottom'
     offset: {
+      // mm
       x: number
       y: number
       z: number
     }
   }
+}
+
+interface BasicLiquidHandlingResult {
+  volume: number // Amount of liquid in uL handled in the operation
 }
