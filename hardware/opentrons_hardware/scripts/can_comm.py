@@ -55,7 +55,7 @@ async def listen_task(can_driver: CanDriver) -> None:
             else:
                 log.info(f"Received <-- \traw: {message}")
         except Exception as e:
-            log.error(f"Exception raised (e): {message}")
+            log.error(f"Exception raised {str(e)}: {message}")
 
 
 def create_choices(enum_type: Type[Enum]) -> Sequence[str]:
