@@ -61,3 +61,4 @@ class MessageId(int, Enum):
     execute_move_group_request = 0x18
     clear_move_group_request = 0x19
     move_group_completed = 0x1A
+    move_completed = 0x13

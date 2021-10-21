@@ -105,3 +105,11 @@ class MoveGroupCompleted(MoveGroupRequest):
     """Notification of a completed move group."""
 
     node_id: utils.UInt8Field
+
+
+@dataclass
+class MoveCompleted(MoveGroupRequest):
+    """Notification of a completed move group."""
+    seq_id: utils.UInt8Field
+    ack_id: utils.UInt8Field
+    node_id: utils.UInt8Field
