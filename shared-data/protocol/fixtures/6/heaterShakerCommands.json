@@ -1252,7 +1252,7 @@
       "id": "1abc123",
       "params": {
         "moduleId": "magneticModuleId",
-        "location": { "slotId": "3" }
+        "location": { "slotName": "3" }
       }
     },
     {
@@ -1260,7 +1260,7 @@
       "id": "2abc123",
       "params": {
         "moduleId": "heaterShakerId",
-        "location": { "slotId": "1" }
+        "location": { "slotName": "1" }
       }
     },
     {
@@ -1288,7 +1288,7 @@
       "id": "5abc123",
       "params": {
         "labwareId": "tipRackId",
-        "location": { "slotId": "8" }
+        "location": { "slotName": "8" }
       }
     },
     {
@@ -1297,7 +1297,7 @@
       "params": {
         "labwareId": "trashId",
         "location": {
-          "slotId": "12"
+          "slotName": "12"
         }
       }
     },
