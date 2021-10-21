@@ -2,8 +2,10 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from typing_extensions import Literal
-from typing import Dict, List, Set
+
+from opentrons.hardware_control.emulation.app import ModuleType
+from typing_extensions import Literal, Final
+from typing import Dict, List, Set, Sequence, Optional
 from pydantic import BaseModel
 
 from opentrons.hardware_control.emulation.proxy import ProxyListener
@@ -11,6 +13,8 @@ from opentrons.hardware_control.emulation.settings import ModuleServerSettings
 
 
 log = logging.getLogger(__name__)
+
+MessageDelimiter: Final = b"\n"
 
 
 class ModuleStatusServer(ProxyListener):
@@ -68,7 +72,7 @@ class ModuleStatusServer(ProxyListener):
                     .json()
                     .encode()
                 )
-                c.write(b"\n")
+                c.write(MessageDelimiter)
         except KeyError:
             log.exception("Failed to find identifier")
 
@@ -88,7 +92,7 @@ class ModuleStatusServer(ProxyListener):
         m = Message(status="dump", connections=list(self._connections.values()))
 
         writer.write(m.json().encode())
-        writer.write(b"\n")
+        writer.write(MessageDelimiter)
 
         self._clients.add(writer)
 
@@ -96,6 +100,8 @@ class ModuleStatusServer(ProxyListener):
             if b"" == await reader.read():
                 self._clients.remove(writer)
                 break
+
+        log.info("Client disconnected from module server.")
 
 
 class Connection(BaseModel):
@@ -111,3 +117,96 @@ class Message(BaseModel):
 
     status: Literal["connected", "disconnected", "dump"]
     connections: List[Connection]
+
+
+class ModuleServerClient:
+    """A module server client."""
+
+    def __init__(
+        self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter
+    ) -> None:
+        """Constructor."""
+        self._reader = reader
+        self._writer = writer
+
+    @classmethod
+    async def connect(
+        cls,
+        host: str,
+        port: int,
+        retries: int = 3,
+        interval_seconds: float = 0.1,
+    ) -> ModuleServerClient:
+        """Connect to the module server.
+
+        Args:
+            host: module server host.
+            port: module server port.
+            retries: number of retries
+            interval_seconds: time between retries.
+
+        Returns:
+            None
+        Raises:
+            IOError on retry expiry.
+        """
+        r: Optional[asyncio.StreamReader] = None
+        w: Optional[asyncio.StreamWriter] = None
+        for i in range(retries):
+            try:
+                r, w = await asyncio.open_connection(host=host, port=port)
+            except OSError:
+                await asyncio.sleep(interval_seconds)
+
+        if r is not None and w is not None:
+            return ModuleServerClient(reader=r, writer=w)
+        else:
+            raise IOError(
+                f"Failed to connect to module_server at after {retries} retries."
+            )
+
+    async def read(self) -> Message:
+        """Read a message from the module server."""
+        b = await self._reader.readuntil(MessageDelimiter)
+        m: Message = Message.parse_raw(b)
+        return m
+
+
+async def wait_emulators(
+    client: ModuleServerClient,
+    modules: Sequence[ModuleType],
+    timeout: float,
+) -> None:
+    """Wait for module emulators to connect.
+
+    Args:
+        client: module server client.
+        modules: collection of of module types to wait for.
+        timeout: how long to wait for emulators to connect (in seconds)
+
+    Returns:
+        None
+    Raises:
+        asyncio.TimeoutError on timeout.
+    """
+
+    async def _wait_modules(cl: ModuleServerClient, module_set: Set[str]) -> None:
+        """Read messages from module server waiting for modules in module_set to
+        be connected."""
+        while module_set:
+            m: Message = await cl.read()
+            if m.status == "dump" or m.status == "connected":
+                for c in m.connections:
+                    if c.module_type in module_set:
+                        module_set.remove(c.module_type)
+            elif m.status == "disconnected":
+                for c in m.connections:
+                    if c.module_type in module_set:
+                        module_set.add(c.module_type)
+
+            log.debug(f"after message: {m}, awaiting module set is: {module_set}")
+
+    await asyncio.wait_for(
+        _wait_modules(cl=client, module_set=set(n.value for n in modules)),
+        timeout=timeout,
+    )

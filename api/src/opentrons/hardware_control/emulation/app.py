@@ -14,6 +14,7 @@ logger = logging.getLogger(__name__)
 
 class ModuleType(str, Enum):
     """Module type enumeration."""
+
     Magnetic = "magnetic"
     Temperature = "temperature"
     Thermocycler = "thermocycler"
@@ -38,13 +39,19 @@ class Application:
             ModuleType.Magnetic, self._status_server, self._settings.magdeck_proxy
         )
         self._temperature = Proxy(
-            ModuleType.Temperature, self._status_server, self._settings.temperature_proxy
+            ModuleType.Temperature,
+            self._status_server,
+            self._settings.temperature_proxy,
         )
         self._thermocycler = Proxy(
-            ModuleType.Thermocycler, self._status_server, self._settings.thermocycler_proxy
+            ModuleType.Thermocycler,
+            self._status_server,
+            self._settings.thermocycler_proxy,
         )
         self._heatershaker = Proxy(
-            ModuleType.Heatershaker, self._status_server, self._settings.heatershaker_proxy
+            ModuleType.Heatershaker,
+            self._status_server,
+            self._settings.heatershaker_proxy,
         )
 
     async def run(self) -> None:

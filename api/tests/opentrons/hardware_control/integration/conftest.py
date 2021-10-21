@@ -67,6 +67,4 @@ def emulation_app(emulator_settings: Settings) -> Iterator[None]:
     t = threading.Thread(target=runit)
     t.daemon = True
     t.start()
-    # Give it a bit to get going.
-    sleep(0.5)
     yield
