@@ -153,9 +153,9 @@ def test_main_broker_messages(
 
     legacy_command: PauseMessage = {
         "$": "before",
-        "meta": {},
         "name": "command.PAUSE",
         "payload": {"userMessage": "hello world", "text": "hello world"},
+        "error": None,
     }
     engine_command = pe_commands.Custom(
         id="command-id",

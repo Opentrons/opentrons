@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 import logging
+from contextlib import nullcontext
 from typing import List, Optional, Sequence, TYPE_CHECKING, Union
 from opentrons.broker import Broker
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons import types, hardware_control as hc
 from opentrons.commands import commands as cmds
-from opentrons.commands.publisher import CommandPublisher, do_publish, publish
+from opentrons.commands.publisher import CommandPublisher, publish, publish_context
 from opentrons.hardware_control.types import PipettePair
 from opentrons.protocols.advanced_control.mix import mix_from_kwargs
 from opentrons.protocols.api_support.instrument import (
@@ -227,31 +228,17 @@ class InstrumentContext(CommandPublisher):
 
         c_vol = self._implementation.get_available_volume() if not volume else volume
 
-        do_publish(
-            self.broker,
-            cmds.aspirate,
-            self.aspirate,
-            "before",
-            None,
-            None,
-            self,
-            c_vol,
-            dest,
-            rate,
-        )
-        self._implementation.aspirate(volume=c_vol, rate=rate)
-        do_publish(
-            self.broker,
-            cmds.aspirate,
-            self.aspirate,
-            "after",
-            self,
-            None,
-            self,
-            c_vol,
-            dest,
-            rate,
-        )
+        with publish_context(
+            broker=self.broker,
+            command=cmds.aspirate(
+                instrument=self,
+                volume=c_vol,
+                location=dest,
+                rate=rate,
+            ),
+        ):
+            self._implementation.aspirate(volume=c_vol, rate=rate)
+
         return self
 
     @requires_version(2, 0)
@@ -335,31 +322,17 @@ class InstrumentContext(CommandPublisher):
 
         c_vol = self.current_volume if not volume else volume
 
-        do_publish(
-            self.broker,
-            cmds.dispense,
-            self.dispense,
-            "before",
-            None,
-            None,
-            self,
-            c_vol,
-            loc,
-            rate,
-        )
-        self._implementation.dispense(volume=c_vol, rate=rate)
-        do_publish(
-            self.broker,
-            cmds.dispense,
-            self.dispense,
-            "after",
-            self,
-            None,
-            self,
-            c_vol,
-            loc,
-            rate,
-        )
+        with publish_context(
+            broker=self.broker,
+            command=cmds.dispense(
+                instrument=self,
+                volume=c_vol,
+                location=loc,
+                rate=rate,
+            ),
+        ):
+            self._implementation.dispense(volume=c_vol, rate=rate)
+
         return self
 
     @requires_version(2, 0)
@@ -416,41 +389,27 @@ class InstrumentContext(CommandPublisher):
 
         c_vol = self._implementation.get_available_volume() if not volume else volume
 
-        do_publish(
-            self.broker,
-            cmds.mix,
-            self.mix,
-            "before",
-            None,
-            None,
-            self,
-            repetitions,
-            c_vol,
-            location,
-        )
-        self.aspirate(volume, location, rate)
-        while repetitions - 1 > 0:
+        with publish_context(
+            broker=self.broker,
+            command=cmds.mix(
+                instrument=self,
+                repetitions=repetitions,
+                volume=c_vol,
+                location=location,
+            ),
+        ):
+            self.aspirate(volume, location, rate)
+            while repetitions - 1 > 0:
+                self.dispense(volume, rate=rate)
+                self.aspirate(volume, rate=rate)
+                repetitions -= 1
             self.dispense(volume, rate=rate)
-            self.aspirate(volume, rate=rate)
-            repetitions -= 1
-        self.dispense(volume, rate=rate)
-        do_publish(
-            self.broker,
-            cmds.mix,
-            self.mix,
-            "after",
-            None,
-            None,
-            self,
-            repetitions,
-            c_vol,
-            location,
-        )
+
         return self
 
     @requires_version(2, 0)
     def blow_out(
-        self, location: Union[types.Location, Well] = None
+        self, location: Optional[Union[types.Location, Well]] = None
     ) -> InstrumentContext:
         """
         Blow liquid out of the tip.
@@ -501,27 +460,15 @@ class InstrumentContext(CommandPublisher):
                 "knows where it is."
             )
 
-        do_publish(
-            self.broker,
-            cmds.blow_out,
-            self.blow_out,
-            "before",
-            None,
-            None,
-            self,
-            location or self._ctx.location_cache,
-        )
-        self._implementation.blow_out()
-        do_publish(
-            self.broker,
-            cmds.blow_out,
-            self.blow_out,
-            "after",
-            None,
-            None,
-            self,
-            location or self._ctx.location_cache,
-        )
+        with publish_context(
+            broker=self.broker,
+            command=cmds.blow_out(
+                instrument=self,
+                location=location or self._ctx.location_cache,  # type: ignore[arg-type]
+            ),
+        ):
+            self._implementation.blow_out()
+
         return self
 
     def _determine_speed(self, speed: float):
@@ -769,36 +716,19 @@ class InstrumentContext(CommandPublisher):
 
         assert tiprack.is_tiprack, "{} is not a tiprack".format(str(tiprack))
         validate_tiprack(self.name, tiprack, logger)
-        do_publish(
-            self.broker,
-            cmds.pick_up_tip,
-            self.pick_up_tip,
-            "before",
-            None,
-            None,
-            self,
-            location=target,
-        )
 
-        self.move_to(target.top(), publish=False)
-
-        self._implementation.pick_up_tip(
-            well=target._impl,
-            tip_length=self._tip_length_for(tiprack),
-            presses=presses,
-            increment=increment,
-        )
-        # Note that the hardware API pick_up_tip action includes homing z after
-        do_publish(
-            self.broker,
-            cmds.pick_up_tip,
-            self.pick_up_tip,
-            "after",
-            self,
-            None,
-            self,
-            location=target,
-        )
+        with publish_context(
+            broker=self.broker,
+            command=cmds.pick_up_tip(instrument=self, location=target),
+        ):
+            self.move_to(target.top(), publish=False)
+            self._implementation.pick_up_tip(
+                well=target._impl,
+                tip_length=self._tip_length_for(tiprack),
+                presses=presses,
+                increment=increment,
+            )
+            # Note that the hardware API pick_up_tip action includes homing z after
 
         tiprack.use_tips(target, self.channels)
         self._last_tip_picked_up_from = target
@@ -906,29 +836,13 @@ class InstrumentContext(CommandPublisher):
                 "tiprack.wells()[0].top()) or a Well (e.g. tiprack.wells()[0]."
                 " However, it is a {}".format(location)
             )
-        do_publish(
-            self.broker,
-            cmds.drop_tip,
-            self.drop_tip,
-            "before",
-            None,
-            None,
-            self,
-            location=target,
-        )
-        self.move_to(target, publish=False)
 
-        self._implementation.drop_tip(home_after=home_after)
-        do_publish(
-            self.broker,
-            cmds.drop_tip,
-            self.drop_tip,
-            "after",
-            self,
-            None,
-            self,
-            location=target,
-        )
+        with publish_context(
+            broker=self.broker,
+            command=cmds.drop_tip(instrument=self, location=target),
+        ):
+            self.move_to(target, publish=False)
+            self._implementation.drop_tip(home_after=home_after)
 
         if (
             self.api_version < APIVersion(2, 2)
@@ -956,13 +870,11 @@ class InstrumentContext(CommandPublisher):
         :returns: This instance.
         """
 
-        def home_dummy(mount):
-            pass
-
         mount_name = self._implementation.get_mount().name.lower()
-        do_publish(self.broker, cmds.home, home_dummy, "before", None, None, mount_name)
-        self._implementation.home()
-        do_publish(self.broker, cmds.home, home_dummy, "after", self, None, mount_name)
+
+        with publish_context(broker=self.broker, command=cmds.home(mount_name)):
+            self._implementation.home()
+
         return self
 
     @requires_version(2, 0)
@@ -1273,34 +1185,25 @@ class InstrumentContext(CommandPublisher):
             if isinstance(mod, ThermocyclerContext):
                 mod.flag_unsafe_move(to_loc=location, from_loc=from_loc)
 
+        publish_ctx = nullcontext()
+
         if publish:
-            do_publish(
-                self.broker,
-                cmds.move_to,
-                self.move_to,
-                "before",
-                None,
-                None,
-                self,
-                location or self._ctx.location_cache,
+            publish_ctx = publish_context(
+                broker=self.broker,
+                command=cmds.move_to(
+                    instrument=self,
+                    location=location or self._ctx.location_cache,  # type: ignore[arg-type]  # noqa: E501
+                ),
             )
-        self._implementation.move_to(
-            location=location,
-            force_direct=force_direct,
-            minimum_z_height=minimum_z_height,
-            speed=speed,
-        )
-        if publish:
-            do_publish(
-                self.broker,
-                cmds.move_to,
-                self.move_to,
-                "after",
-                None,
-                None,
-                self,
-                location or self._ctx.location_cache,
+
+        with publish_ctx:
+            self._implementation.move_to(
+                location=location,
+                force_direct=force_direct,
+                minimum_z_height=minimum_z_height,
+                speed=speed,
             )
+
         return self
 
     @property  # type: ignore
@@ -1347,7 +1250,7 @@ class InstrumentContext(CommandPublisher):
         .. note::
           This property is equivalent to :py:attr:`speed`; the only
           difference is the units in which this property is specified.
-          specifiying this property uses the units of the volumetric flow rate
+          specifying this property uses the units of the volumetric flow rate
           of liquid into or out of the tip, while :py:attr:`speed` uses the
           units of the linear speed of the plunger inside the pipette.
           Because :py:attr:`speed` and :py:attr:`flow_rate` modify the

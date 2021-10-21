@@ -302,7 +302,7 @@ class Session(RobotBusy):
         #: The current state
         self.stateInfo: "StateInfo" = {}
         #: A message associated with the current state
-        self.commands: List[command_types.CommandMessage] = []
+        self.commands: List[Dict[str, Any]] = []
         self.command_log: Dict[int, int] = {}
         self.errors: List[Error] = []
 

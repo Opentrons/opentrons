@@ -25,9 +25,9 @@ def test_map_before_command() -> None:
     """It should map a "before" message to a running command."""
     legacy_command: PauseMessage = {
         "$": "before",
-        "meta": {},
         "name": "command.PAUSE",
         "payload": {"userMessage": "hello world", "text": "hello world"},
+        "error": None,
     }
 
     subject = LegacyCommandMapper()
@@ -46,18 +46,18 @@ def test_map_before_command() -> None:
 
 
 def test_map_after_command() -> None:
-    """It should map an "after" message to a completed command."""
+    """It should map an "after" message to a succeeded command."""
     legacy_command_start: PauseMessage = {
         "$": "before",
-        "meta": {},
         "name": "command.PAUSE",
         "payload": {"userMessage": "hello world", "text": "hello world"},
+        "error": None,
     }
     legacy_command_end: PauseMessage = {
         "$": "after",
-        "meta": {},
         "name": "command.PAUSE",
         "payload": {"userMessage": "hello world", "text": "hello world"},
+        "error": None,
     }
 
     subject = LegacyCommandMapper()
@@ -78,31 +78,65 @@ def test_map_after_command() -> None:
     )
 
 
+def test_map_after_with_error_command() -> None:
+    """It should map an "after" message to a failed command."""
+    legacy_command_start: PauseMessage = {
+        "$": "before",
+        "name": "command.PAUSE",
+        "error": None,
+        "payload": {"userMessage": "hello world", "text": "hello world"},
+    }
+    legacy_command_end: PauseMessage = {
+        "$": "after",
+        "name": "command.PAUSE",
+        "error": RuntimeError("oh no"),
+        "payload": {"userMessage": "hello world", "text": "hello world"},
+    }
+
+    subject = LegacyCommandMapper()
+
+    _ = subject.map_command(legacy_command_start)
+    result = subject.map_command(legacy_command_end)
+
+    assert result == pe_commands.Custom.construct(
+        id="command.PAUSE-0",
+        status=pe_commands.CommandStatus.FAILED,
+        createdAt=matchers.IsA(datetime),
+        startedAt=matchers.IsA(datetime),
+        completedAt=matchers.IsA(datetime),
+        data=LegacyCommandData(
+            legacyCommandType="command.PAUSE",
+            legacyCommandText="hello world",
+        ),
+        error="oh no",
+    )
+
+
 def test_command_stack() -> None:
     """It should maintain a command stack to map IDs."""
     legacy_command_1: PauseMessage = {
         "$": "before",
-        "meta": {},
         "name": "command.PAUSE",
         "payload": {"userMessage": "hello", "text": "hello"},
+        "error": None,
     }
     legacy_command_2: PauseMessage = {
         "$": "before",
-        "meta": {},
         "name": "command.PAUSE",
         "payload": {"userMessage": "goodbye", "text": "goodbye"},
+        "error": None,
     }
     legacy_command_3: PauseMessage = {
         "$": "after",
-        "meta": {},
         "name": "command.PAUSE",
         "payload": {"userMessage": "hello world", "text": "goodbye"},
+        "error": None,
     }
     legacy_command_4: PauseMessage = {
         "$": "after",
-        "meta": {},
         "name": "command.PAUSE",
         "payload": {"userMessage": "hello world", "text": "hello"},
+        "error": None,
     }
 
     subject = LegacyCommandMapper()
