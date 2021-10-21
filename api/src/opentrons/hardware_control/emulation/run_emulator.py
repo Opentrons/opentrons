@@ -8,7 +8,13 @@ from opentrons.hardware_control.emulation.connection_handler import ConnectionHa
 log = logging.getLogger(__name__)
 
 
-async def run_emulator_client(host: str, port: int, emulator: AbstractEmulator, retries: int = 3, interval_seconds:float=0.1) -> None:
+async def run_emulator_client(
+    host: str,
+    port: int,
+    emulator: AbstractEmulator,
+    retries: int = 3,
+    interval_seconds: float = 0.1,
+) -> None:
     """Run an emulator as a client.
 
     Args:
@@ -30,11 +36,15 @@ async def run_emulator_client(host: str, port: int, emulator: AbstractEmulator, 
             r, w = await asyncio.open_connection(host, port)
             break
         except IOError:
-            log.error(f"{emulator.__class__.__name__} failed to connect on try {i + 1}. Retrying in {interval_seconds} seconds.")
+            log.error(
+                f"{emulator.__class__.__name__} failed to connect on try {i + 1}. Retrying in {interval_seconds} seconds."
+            )
             await asyncio.sleep(interval_seconds)
 
     if r is None or w is None:
-        raise IOError(f"Failed to connect to {emulator.__class__.__name__} at {host}:{port} after {retries} retries.")
+        raise IOError(
+            f"Failed to connect to {emulator.__class__.__name__} at {host}:{port} after {retries} retries."
+        )
 
     connection = ConnectionHandler(emulator)
     await connection(r, w)
