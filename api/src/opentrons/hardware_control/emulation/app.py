@@ -1,5 +1,6 @@
 import asyncio
 import logging
+from enum import Enum
 
 from opentrons.hardware_control.emulation.module_server import ModuleStatusServer
 from opentrons.hardware_control.emulation.parser import Parser
@@ -9,6 +10,14 @@ from opentrons.hardware_control.emulation.settings import Settings
 from opentrons.hardware_control.emulation.smoothie import SmoothieEmulator
 
 logger = logging.getLogger(__name__)
+
+
+class ModuleType(str, Enum):
+    """Module type enumeration."""
+    Magnetic = "magnetic"
+    Temperature = "temperature"
+    Thermocycler = "thermocycler"
+    Heatershaker = "heatershaker"
 
 
 class Application:
@@ -26,16 +35,16 @@ class Application:
             parser=Parser(), settings=settings.smoothie
         )
         self._magdeck = Proxy(
-            "magdeck", self._status_server, self._settings.magdeck_proxy
+            ModuleType.Magnetic, self._status_server, self._settings.magdeck_proxy
         )
         self._temperature = Proxy(
-            "temperature", self._status_server, self._settings.temperature_proxy
+            ModuleType.Temperature, self._status_server, self._settings.temperature_proxy
         )
         self._thermocycler = Proxy(
-            "thermocycler", self._status_server, self._settings.thermocycler_proxy
+            ModuleType.Thermocycler, self._status_server, self._settings.thermocycler_proxy
         )
         self._heatershaker = Proxy(
-            "heatershaker", self._status_server, self._settings.heatershaker_proxy
+            ModuleType.Heatershaker, self._status_server, self._settings.heatershaker_proxy
         )
 
     async def run(self) -> None:
