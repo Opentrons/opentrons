@@ -87,9 +87,9 @@ export const LabwareOffsetsSummary = (): JSX.Element | null => {
             </Text>
             {getOffsetDataInfo().map(({ deckSlot }) => {
               return (
-                <Flex key={deckSlot} height="30%" css={FONT_BODY_1_DARK}>
+                <Box key={deckSlot} height="30%" css={FONT_BODY_1_DARK}>
                   {deckSlot}
-                </Flex>
+                </Box>
               )
             })}
           </Box>
@@ -106,9 +106,9 @@ export const LabwareOffsetsSummary = (): JSX.Element | null => {
             >
               {t('labware_offsets_summary_labware')}
             </Text>
-            {getOffsetDataInfo().map(({ labware }) => {
+            {getOffsetDataInfo().map(({ labware }, index) => {
               return (
-                <Flex key={labware} height="30%" css={FONT_BODY_1_DARK}>
+                <Flex key={index} height={'30%'} css={FONT_BODY_1_DARK}>
                   {labware}
                 </Flex>
               )
@@ -129,11 +129,11 @@ export const LabwareOffsetsSummary = (): JSX.Element | null => {
             </Text>
             {offsetData.map(({ x, y, z }) => {
               return x === 0 && y === 0 && z === 0 ? (
-                <Flex height="30%" css={FONT_BODY_1_DARK}>
+                <Flex height={'30%'} css={FONT_BODY_1_DARK}>
                   {t('no_labware_offsets')}
                 </Flex>
               ) : (
-                <Flex height="30%" css={FONT_BODY_1_DARK}>
+                <Flex height={'30%'} css={FONT_BODY_1_DARK}>
                   <Text as={'span'} marginRight={'0.15rem'}>
                     <strong>X</strong>
                   </Text>

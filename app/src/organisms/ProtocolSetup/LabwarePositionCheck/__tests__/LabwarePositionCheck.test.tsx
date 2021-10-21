@@ -7,16 +7,22 @@ import { LabwarePositionCheck } from '../index'
 import { GenericStepScreen } from '../GenericStepScreen'
 import { IntroScreen } from '../IntroScreen'
 import { useSteps } from '../hooks'
+import { SummaryScreen } from '../SummaryScreen'
 import { LabwarePositionCheckStep } from '../types'
 
 jest.mock('../GenericStepScreen')
 jest.mock('../IntroScreen')
+jest.mock('../SummaryScreen')
 jest.mock('../hooks')
 
 const mockGenericStepScreen = GenericStepScreen as jest.MockedFunction<
   typeof GenericStepScreen
 >
 const mockIntroScreen = IntroScreen as jest.MockedFunction<typeof IntroScreen>
+const mockSummaryScreen = SummaryScreen as jest.MockedFunction<
+  typeof SummaryScreen
+>
+
 const mockUseSteps = useSteps as jest.MockedFunction<typeof useSteps>
 
 const PICKUP_TIP_LABWARE_ID = 'PICKUP_TIP_LABWARE_ID'
@@ -52,7 +58,8 @@ describe('LabwarePositionCheck', () => {
           section: 'PRIMARY_PIPETTE_TIPRACKS',
         } as LabwarePositionCheckStep,
       ])
-    mockIntroScreen.mockReturnValue(<div>Mock Intro Screen Component </div>)
+    mockIntroScreen.mockReturnValue(null)
+    mockSummaryScreen.mockReturnValue(<div>Mock Summary Screen Component </div>)
     mockGenericStepScreen.mockReturnValue(null)
   })
   afterEach(() => {
@@ -78,8 +85,15 @@ describe('LabwarePositionCheck', () => {
     expect(props.onCloseClick).toHaveBeenCalled()
   })
 
-  it('renders LabwarePositionCheck with IntroScreen component', () => {
+  it('renders LabwarePositionCheck with Summary Screen component', () => {
     const { getByText } = render(props)
-    getByText('Mock Intro Screen Component')
+    getByText('Mock Summary Screen Component')
   })
+
+  // TODO: fix this when LabwarePositionCheck/index is final and the isComplete boolean is final
+  // it('renders LabwarePositionCheck with IntroScreen component', () => {
+  //   mockIntroScreen.mockReturnValue(<div>Mock IntroScreen Component</div>)
+  //   const { getByText } = render(props)
+  //   getByText('Mock IntroScreen Component')
+  // })
 })

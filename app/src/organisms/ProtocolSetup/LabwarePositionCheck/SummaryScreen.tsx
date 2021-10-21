@@ -1,3 +1,4 @@
+import * as React from 'react'
 import {
   ALIGN_START,
   Box,
@@ -13,12 +14,11 @@ import {
   Text,
   TEXT_TRANSFORM_UPPERCASE,
 } from '@opentrons/components'
-import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { DeckMap } from './DeckMap'
 import { SectionList } from './SectionList'
 import { LabwareOffsetsSummary } from './LabwareOffsetsSummary'
 import { useIntroInfo, useLabwareIdsBySection } from './hooks'
-import { useTranslation } from 'react-i18next'
 
 export const SummaryScreen = (): JSX.Element | null => {
   const { t } = useTranslation('labware_position_check')
@@ -26,6 +26,17 @@ export const SummaryScreen = (): JSX.Element | null => {
   const labwareIdsBySection = useLabwareIdsBySection()
   if (introInfo == null) return null
   const { sections, primaryPipetteMount, secondaryPipetteMount } = introInfo
+  const primaryPipetteTiprackIds = labwareIdsBySection[sections[0]]
+  const secondaryPipetteLabwareIds = labwareIdsBySection[sections[1]]
+  const remainingLabwareIds = labwareIdsBySection[sections[2]]
+  const returnTipId = labwareIdsBySection[sections[3]]
+  //  @ts-expect-error, even if primaryPipettetiprackIds is undefined, we still want to concat all the arrays
+  const combinedSectionsLabwareIds = primaryPipetteTiprackIds.concat(
+    // @ts-expect-error, even if array is undefined, we still want to concat
+    remainingLabwareIds,
+    secondaryPipetteLabwareIds,
+    returnTipId
+  )
 
   return (
     <Box margin={SPACING_3}>
@@ -44,23 +55,13 @@ export const SummaryScreen = (): JSX.Element | null => {
             primaryPipetteMount={primaryPipetteMount}
             secondaryPipetteMount={secondaryPipetteMount}
             sections={sections}
-            completedSections={[
-              sections[0],
-              sections[1],
-              sections[2],
-              sections[3],
-            ]}
+            completedSections={sections}
           />
           <Flex justifyContent={JUSTIFY_CENTER}>
-            <DeckMap
-              completedLabwareIdSections={
-                (labwareIdsBySection[sections[0]],
-                labwareIdsBySection[sections[1]],labwareIdsBySection[sections[2]])
-              }
-            />
+            <DeckMap completedLabwareIdSections={combinedSectionsLabwareIds} />
           </Flex>
         </Box>
-        <Box width="80%" marginRight={SPACING_4}>
+        <Box width="80%" height="100%" marginRight={SPACING_4}>
           <LabwareOffsetsSummary />
         </Box>
       </Flex>
