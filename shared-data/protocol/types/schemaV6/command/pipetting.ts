@@ -63,7 +63,7 @@ interface VolumeParams {
 
 interface WellLocationParam {
   wellLocation: {
-    origin: string // e.g. 'top' || 'bottom'
+    origin: 'top' | 'bottom'
     offset: {
       // mm
       x: number

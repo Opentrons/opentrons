@@ -378,10 +378,10 @@
               "commandType": { "enum": ["moveToSlot"] },
               "params": {
                 "type": "object",
-                "required": ["pipetteId", "slotId"],
+                "required": ["pipetteId", "slotName"],
                 "properties": {
                   "pipetteId": { "type": "string" },
-                  "slotId": {
+                  "slotName": {
                     "type": "string",
                     "description": "Unique string identifier that corresponds to a slot in the referenced deck definition's locations"
                   },
@@ -975,12 +975,12 @@
                     "description": "Unique identifier of labware to load"
                   },
                   "location": {
-                    "description": "Physical destination location to load labware into (e.g. '1' || null)",
+                    "description": "Physical destination location to load labware into (e.g. '1' || 'someModuleId')",
                     "oneOf": [
                       {
-                        "required": ["slotId"],
+                        "required": ["slotName"],
                         "properties": {
-                          "slotId": {
+                          "slotName": {
                             "description": "Unique string identifier that corresponds to a slot in the referenced deck definition's locations",
                             "type": "string"
                           }
@@ -1037,12 +1037,12 @@
                     "description": "Unique identifier of module to load"
                   },
                   "location": {
-                    "description": "Physical destination location to load module into (e.g. '1' || null)",
+                    "description": "Physical destination location to load module into (e.g. '1')",
                     "oneOf": [
                       {
-                        "required": ["slotId"],
+                        "required": ["slotName"],
                         "properties": {
-                          "slotId": {
+                          "slotName": {
                             "description": "Unique string identifier that corresponds to a slot in the referenced deck definition's locations",
                             "type": "string"
                           }

@@ -11,7 +11,7 @@ export type GantryCommand =
 
 interface MoveToSlotParams {
   pipetteId: string
-  slotId: string
+  slotName: string
   offset?: {
     x: number
     y: number
@@ -25,10 +25,13 @@ interface MoveToWellParams {
   pipetteId: string
   labwareId: string
   wellName: string
-  offset?: {
-    x: number
-    y: number
-    z: number
+  wellLocation: {
+    origin: 'top' | 'bottom'
+    offset?: {
+      x: number
+      y: number
+      z: number
+    }
   }
   minimumZHeight?: number
   forceDirect?: boolean

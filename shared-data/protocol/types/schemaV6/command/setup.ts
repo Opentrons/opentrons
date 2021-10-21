@@ -23,12 +23,12 @@ export type SetupCommand =
     }
 
 type LabwareLocation =
-  | { slotId: string }
+  | { slotName: string }
   | { moduleId: string }
   | { coordinates: { x: number; y: number; z: number } }
 
 type ModuleLocation =
-  | { slotId: string }
+  | { slotName: string }
   | { coordinates: { x: number; y: number; z: number } }
 interface LoadPipetteParams {
   pipetteId: string
