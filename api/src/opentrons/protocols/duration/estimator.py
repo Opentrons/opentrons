@@ -180,7 +180,12 @@ class DurationEstimator:
 
 
     def on_move_to(self, payload) -> float:
-        # General aspiration code
+        # What does this do:
+        # It takes the instrument, location, previous, and current deck slot.
+        # it then takes the amount of time it would to move from deck slot to deck slot in the x and y
+        # So far we don't have a sophisticated way of tracking the z axis movements. 
+        
+        # Set up 
 
         instrument = payload["instrument"]
         # now lets handle the aspiration z-axis code.
@@ -188,26 +193,18 @@ class DurationEstimator:
         prev_slot = self._last_deckslot
         curr_slot = self.get_slot(location)
         gantry_speed = instrument.default_speed
+        
+        # calculate time for movement in the x and y
         deck_travel_time = self.calc_deck_movement_time(
             self._deck, curr_slot, prev_slot, gantry_speed
         )
-
-
-
-        slot = self.get_slot(location)
-        # TODO (Matt and Alex, 2021-10-21): We only handle x/y between slots. We can probably do better
+        # TODO (Matt and Alex and Amit, 2021-10-21): We only handle x/y between slots. We can probably do better
         gantry_speed = instrument.default_speed
 
         z_total_time = self.z_time(
             location.labware.parent.parent.is_module, gantry_speed
         )
 
-        location = payload["location"]
-        prev_slot = self._last_deckslot
-        curr_slot = self.get_slot(location)
-        deck_travel_time = self.calc_deck_movement_time(
-            self._deck, curr_slot, prev_slot, gantry_speed
-        )
         duration = deck_travel_time+ z_total_time
 
         logger.info(
