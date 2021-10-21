@@ -6,7 +6,7 @@ import {
   Flex,
   FONT_WEIGHT_SEMIBOLD,
   JUSTIFY_CENTER,
-  JUSTIFY_SPACE_BETWEEN,
+  JUSTIFY_START,
   PrimaryBtn,
   SPACING_3,
   SPACING_4,
@@ -26,7 +26,6 @@ export const SummaryScreen = (): JSX.Element | null => {
   const labwareIdsBySection = useLabwareIdsBySection()
   if (introInfo == null) return null
   const { sections, primaryPipetteMount, secondaryPipetteMount } = introInfo
-  const allSections = sections.length
 
   return (
     <Box margin={SPACING_3}>
@@ -35,29 +34,33 @@ export const SummaryScreen = (): JSX.Element | null => {
         textTransform={TEXT_TRANSFORM_UPPERCASE}
         fontWeight={FONT_WEIGHT_SEMIBOLD}
         marginBottom={SPACING_3}
+        marginLeft={SPACING_3}
       >
         {t('lpc_complete_summary_screen_heading')}
       </Text>
-      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_START}>
+      <Flex justifyContent={JUSTIFY_START} alignItems={ALIGN_START}>
         <Box width="55%" flexDirection={DIRECTION_COLUMN}>
           <SectionList
             primaryPipetteMount={primaryPipetteMount}
             secondaryPipetteMount={secondaryPipetteMount}
             sections={sections}
             completedSections={[
-              sections[allSections - 1],
-              sections[allSections - 2],
-              sections[allSections - 3],
-              sections[allSections - 4],
+              sections[0],
+              sections[1],
+              sections[2],
+              sections[3],
             ]}
           />
           <Flex justifyContent={JUSTIFY_CENTER}>
             <DeckMap
-              completedLabwareIdSections={labwareIdsBySection[sections[0]]}
+              completedLabwareIdSections={
+                (labwareIdsBySection[sections[0]],
+                labwareIdsBySection[sections[1]],labwareIdsBySection[sections[2]])
+              }
             />
           </Flex>
         </Box>
-        <Box width="70%" marginRight={SPACING_4}>
+        <Box width="80%" marginRight={SPACING_4}>
           <LabwareOffsetsSummary />
         </Box>
       </Flex>

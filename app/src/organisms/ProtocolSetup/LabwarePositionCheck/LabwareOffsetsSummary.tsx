@@ -55,14 +55,14 @@ export const LabwareOffsetsSummary = (): JSX.Element | null => {
 
   return (
     <React.Fragment>
-      <Flex
+      <Box
         padding={SPACING_4}
-        justifyContent={JUSTIFY_CENTER}
         boxShadow="1px 1px 1px rgba(0, 0, 0, 0.25)"
         borderRadius="4px"
         backgroundColor={C_NEAR_WHITE}
         flexDirection={DIRECTION_COLUMN}
         width="106%"
+        height="20rem"
       >
         <Text
           as={'h5'}
@@ -87,9 +87,9 @@ export const LabwareOffsetsSummary = (): JSX.Element | null => {
             </Text>
             {getOffsetDataInfo().map(({ deckSlot }) => {
               return (
-                <Text marginBottom={SPACING_3} css={FONT_BODY_1_DARK}>
+                <Flex key={deckSlot} height="30%" css={FONT_BODY_1_DARK}>
                   {deckSlot}
-                </Text>
+                </Flex>
               )
             })}
           </Box>
@@ -108,9 +108,9 @@ export const LabwareOffsetsSummary = (): JSX.Element | null => {
             </Text>
             {getOffsetDataInfo().map(({ labware }) => {
               return (
-                <Text marginBottom={SPACING_3} css={FONT_BODY_1_DARK}>
+                <Flex key={labware} height="30%" css={FONT_BODY_1_DARK}>
                   {labware}
-                </Text>
+                </Flex>
               )
             })}
           </Box>
@@ -128,12 +128,12 @@ export const LabwareOffsetsSummary = (): JSX.Element | null => {
               {t('labware_offsets_summary_offset')}
             </Text>
             {offsetData.map(({ x, y, z }) => {
-              return x == 0 && y == 0 && z == 0 ? (
-                <Text marginBottom={SPACING_3} css={FONT_BODY_1_DARK}>
+              return x === 0 && y === 0 && z === 0 ? (
+                <Flex height="30%" css={FONT_BODY_1_DARK}>
                   {t('no_labware_offsets')}
-                </Text>
+                </Flex>
               ) : (
-                <Box marginBottom={SPACING_3} css={FONT_BODY_1_DARK}>
+                <Flex height="30%" css={FONT_BODY_1_DARK}>
                   <Text as={'span'} marginRight={'0.15rem'}>
                     <strong>X</strong>
                   </Text>
@@ -152,12 +152,12 @@ export const LabwareOffsetsSummary = (): JSX.Element | null => {
                   <Text as={'span'} marginRight={'0.4rem'}>
                     {z}
                   </Text>
-                </Box>
+                </Flex>
               )
             })}
           </Box>
         </Flex>
-      </Flex>
+      </Box>
     </React.Fragment>
   )
 }
