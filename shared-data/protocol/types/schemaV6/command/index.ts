@@ -3,7 +3,6 @@ import type { GantryCommand } from './gantry'
 import type { ModuleCommand } from './module'
 import type { SetupCommand } from './setup'
 import type { TimingCommand } from './timing'
-import type { SavePositionCommand } from './position'
 
 // NOTE: these key/value pairs will only be present on commands at analysis/run time
 // they pertain only to the actual execution status of a command on hardware, as opposed to
@@ -28,6 +27,5 @@ export type Command = CommonCommandInfo &
     | ModuleCommand // directed at a hardware module
     | SetupCommand // only effecting robot's equipment setup (pipettes, labware, modules, liquid), no hardware side-effects
     | TimingCommand // effecting the timing of command execution
-    | SavePositionCommand // save a coordinate vector to be later queried
     | { commandType: 'custom'; params: { [key: string]: any } } // allows for experimentation between schema versions with no expectation of system support
   )

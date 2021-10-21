@@ -22,10 +22,14 @@ export type SetupCommand =
       result?: LoadLiquidResult
     }
 
-type DeckLocation =
+type LabwareLocation =
+  | { slotId: string }
+  | { moduleId: string }
+  | { coordinates: { x: number; y: number; z: number } }
+
+type ModuleLocation =
   | { slotId: string }
   | { coordinates: { x: number; y: number; z: number } }
-  | null
 interface LoadPipetteParams {
   pipetteId: string
   mount: string | null
@@ -36,7 +40,7 @@ interface LoadPipetteResult {
 }
 interface LoadLabwareParams {
   labwareId: string
-  location: DeckLocation
+  location: LabwareLocation
 }
 
 interface LoadLabwareResult {
@@ -46,7 +50,7 @@ interface LoadLabwareResult {
 }
 interface LoadModuleParams {
   moduleId: string
-  location: DeckLocation
+  location: ModuleLocation
 }
 interface LoadModuleResult {
   moduleId: string

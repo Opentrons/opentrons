@@ -76,51 +76,6 @@
       }
     },
 
-    "deckLocation": {
-      "oneOf": [
-        {
-          "required": ["slotId"],
-          "properties": {
-            "slotId": {
-              "description": "Unique string identifier that corresponds to a slot in the referenced deck definition's locations",
-              "type": "string"
-            }
-          }
-        },
-        {
-          "required": ["moduleId"],
-          "properties": {
-            "moduleId": {
-              "description": "Unique identifier of destination module. Must be a key from the top level 'modules' object.",
-              "type": "string"
-            }
-          }
-        },
-        {
-          "required": ["labwareId"],
-          "properties": {
-            "labwareId": {
-              "description": "Unique identifier of destination labware. Must be a key from the top level 'labware' object.",
-              "type": "string"
-            }
-          }
-        },
-        {
-          "required": ["coordinates"],
-          "properties": {
-            "coordinates": {
-              "$ref": "#/definitions/offset",
-              "description": "X, Y, Z coordinates from the deck's origin point. (left-front-bottom of working space)"
-            }
-          }
-        },
-        {
-          "type": "null",
-          "description": "The null location corresponds to any location not tracked by the system (off-deck)"
-        }
-      ]
-    },
-
     "wellLocation": {
       "required": ["origin", "offset"],
       "properties": {
@@ -995,8 +950,8 @@
                     "description": "Unique identifier of pipette to load"
                   },
                   "mount": {
-                    "type": ["string", "null"],
-                    "description": "Unique identifier of physical destination location to load pipette into (e.g. 'left' || null)"
+                    "type": "string",
+                    "description": "Unique identifier of physical destination location to load pipette into (e.g. 'left')"
                   }
                 }
               }
@@ -1020,8 +975,45 @@
                     "description": "Unique identifier of labware to load"
                   },
                   "location": {
-                    "$ref": "#/definitions/deckLocation",
-                    "description": "Physical destination location to load labware into (e.g. '1' || null)"
+                    "description": "Physical destination location to load labware into (e.g. '1' || null)",
+                    "oneOf": [
+                      {
+                        "required": ["slotId"],
+                        "properties": {
+                          "slotId": {
+                            "description": "Unique string identifier that corresponds to a slot in the referenced deck definition's locations",
+                            "type": "string"
+                          }
+                        }
+                      },
+                      {
+                        "required": ["moduleId"],
+                        "properties": {
+                          "moduleId": {
+                            "description": "Unique identifier of destination module. Must be a key from the top level 'modules' object.",
+                            "type": "string"
+                          }
+                        }
+                      },
+                      {
+                        "required": ["labwareId"],
+                        "properties": {
+                          "labwareId": {
+                            "description": "Unique identifier of destination labware. Must be a key from the top level 'labware' object.",
+                            "type": "string"
+                          }
+                        }
+                      },
+                      {
+                        "required": ["coordinates"],
+                        "properties": {
+                          "coordinates": {
+                            "$ref": "#/definitions/offset",
+                            "description": "X, Y, Z coordinates from the deck's origin point. (left-front-bottom of working space)"
+                          }
+                        }
+                      }
+                    ]
                   }
                 }
               }
@@ -1045,8 +1037,27 @@
                     "description": "Unique identifier of module to load"
                   },
                   "location": {
-                    "$ref": "#/definitions/deckLocation",
-                    "description": "Physical destination location to load module into (e.g. '1' || null)"
+                    "description": "Physical destination location to load module into (e.g. '1' || null)",
+                    "oneOf": [
+                      {
+                        "required": ["slotId"],
+                        "properties": {
+                          "slotId": {
+                            "description": "Unique string identifier that corresponds to a slot in the referenced deck definition's locations",
+                            "type": "string"
+                          }
+                        }
+                      },
+                      {
+                        "required": ["coordinates"],
+                        "properties": {
+                          "coordinates": {
+                            "$ref": "#/definitions/offset",
+                            "description": "X, Y, Z coordinates from the deck's origin point. (left-front-bottom of working space)"
+                          }
+                        }
+                      }
+                    ]
                   }
                 }
               }

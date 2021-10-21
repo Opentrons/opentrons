@@ -11,7 +11,7 @@ export type GantryCommand =
 
 interface MoveToSlotParams {
   pipetteId: string
-  slot: string
+  slotId: string
   offset?: {
     x: number
     y: number
