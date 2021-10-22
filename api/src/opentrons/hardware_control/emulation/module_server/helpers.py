@@ -1,11 +1,43 @@
 import asyncio
-from typing import Sequence, Set
+from typing import Sequence, Set, Callable, List, Coroutine, Awaitable
 
 from opentrons.hardware_control.emulation.module_server.client import \
     ModuleServerClient
 from opentrons.hardware_control.emulation.module_server.models import Message
 from opentrons.hardware_control.emulation.module_server.server import log
 from opentrons.hardware_control.emulation.types import ModuleType
+from opentrons.hardware_control.modules import ModuleAtPort
+
+NotifyMethod = Callable[[List[ModuleAtPort], List[ModuleAtPort]], Awaitable[None]]
+"""Signature of method to be notified of new and removed modules."""
+
+
+class ModuleListener:
+    """Provide a callback for listening for new and removed module connections."""
+
+    def __init__(self, client: ModuleServerClient, notify_method: NotifyMethod) -> None:
+        """Constructor.
+
+        Args:
+            client: A module server client
+            notify_method: callback method.
+
+        Returns:
+            None
+        """
+        self._client = client
+        self._notify_method = notify_method
+
+    async def run(self) -> None:
+        """"""
+        while True:
+            m = await self._client.read()
+            await self.message_to_notify(message=m, notify_method=self._notify_method)
+
+    @staticmethod
+    async def message_to_notify(message: Message, notify_method: NotifyMethod) -> None:
+        await notify_method([], [])
+
 
 
 async def wait_emulators(
