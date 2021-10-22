@@ -28,7 +28,7 @@ import styles from '../../styles.css'
 const ROBOT_CAL_HELP_ARTICLE =
   'https://support.opentrons.com/en/articles/3499692-how-positional-calibration-works-on-the-ot-2'
 
-const OFFSET_DATA_HELP_ARTICLE = '#' //  REPLACE WITH ACTUAL LINK
+const OFFSET_DATA_HELP_ARTICLE = '#' //  TODO IMMEDIATELY: REPLACE WITH ACTUAL LINK
 interface LabwareOffsetModalProps {
   onCloseClick: () => unknown
 }
