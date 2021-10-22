@@ -11,9 +11,6 @@ const slotTwo = 'foreignObject[x="132.5"][y="0"]'
 const slotThree = 'foreignObject[x="265"][y="0"]'
 
 describe('Custom Tip Racks', () => {
-  beforeEach(() => {
-    cy.viewport('macbook-15')
-  })
   before(() => {
     cy.visit('/')
     cy.closeAnnouncementModal()
