@@ -223,6 +223,10 @@ class API(HardwareAPILike):
             return api_instance
         finally:
             blink_task.cancel()
+            try:
+                await blink_task
+            except asyncio.CancelledError:
+                pass
 
     @classmethod
     async def build_hardware_simulator(
