@@ -1,24 +1,17 @@
-from typing import Any, List
+from typing import Any, Dict, Iterator, List, Tuple
+from opentrons.api.dev_types import CommandShortId
 
 
-def session_listify(location: Any) -> List:
-    if isinstance(location, list):
-        try:
-            return session_listify(location[0])
-        except IndexError:
-            return [location]
-    else:
-        return [location]
-
-
-def from_list(commands):
+def from_list(commands: List[CommandShortId]) -> List[Dict[str, Any]]:
     """
     Given a list of tuples of form (depth, text)
     that represents a DFS traversal of a command tree,
     returns a dictionary representing command tree.
     """
 
-    def subtrees(commands, level):
+    def subtrees(
+        commands: List[CommandShortId], level: int
+    ) -> Iterator[Tuple[CommandShortId, List[CommandShortId]]]:
         if not commands:
             return
 
@@ -34,7 +27,7 @@ def from_list(commands):
                 acc.clear()
         yield (parent, acc)
 
-    def walk(commands, level=0):
+    def walk(commands: List[CommandShortId], level: int = 0) -> List[Dict[str, Any]]:
         return [
             {
                 "description": key["description"],

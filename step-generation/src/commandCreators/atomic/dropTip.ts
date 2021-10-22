@@ -1,5 +1,5 @@
 import { FIXED_TRASH_ID } from '../../constants'
-import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
+import type { Command } from '@opentrons/shared-data/protocol/types/schemaV5Addendum'
 import type { CommandCreator } from '../../types'
 interface DropTipArgs {
   pipette: string

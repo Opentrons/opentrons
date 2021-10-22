@@ -223,6 +223,10 @@ class API(HardwareAPILike):
             return api_instance
         finally:
             blink_task.cancel()
+            try:
+                await blink_task
+            except asyncio.CancelledError:
+                pass
 
     @classmethod
     async def build_hardware_simulator(
@@ -297,7 +301,7 @@ class API(HardwareAPILike):
         """
         The lru cache decorator is currently not supported by the
         ThreadManager. To work around this, we need to wrap the
-        actualy function around a dummy outer function.
+        actual function around a dummy outer function.
 
         Once decorators are more fully supported, we can remove this.
         """
