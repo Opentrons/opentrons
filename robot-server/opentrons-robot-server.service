@@ -7,13 +7,6 @@ After=nginx.service
 
 After=opentrons-status-leds.service
 
-# Both this service and opentrons-gpio-setup.service
-# acquire the GPIO line to control the OT-2's front button light.
-# Stop opentrons-gpio-setup.service before starting this service,
-# so they don't conflict and cause a "device already in use" error.
-Conflicts=opentrons-gpio-setup.service
-After=opentrrons-gpio-setup.service
-
 
 [Service]
 

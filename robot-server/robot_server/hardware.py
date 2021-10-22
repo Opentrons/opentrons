@@ -1,6 +1,7 @@
 """Hardware API wrapper module for initialization and management."""
 import asyncio
 import logging
+import subprocess
 from pathlib import Path
 from fastapi import Depends, status
 from typing import Callable, Union, cast
@@ -114,6 +115,19 @@ async def _initialize_hardware_api(app_state: AppState) -> None:
     simulator_config = app_settings.simulator_configuration_file_path
     use_thread_manager = feature_flags.enable_protocol_engine() is False
 
+    systemd_available = IS_ROBOT and ARCHITECTURE != SystemArchitecture.HOST
+
+    if systemd_available:
+        # During boot, opentrons-gpio-setup.service will be blinking the
+        # front button light. Kill it here and wait for it to exit so it releases
+        # that GPIO line. Otherwise, our hardware initialization would get a
+        # "device already in use" error.
+        subprocess.run(
+            ["systemctl", "stop", "opentrons-gpio-setup"],
+            check=True,
+        )
+        log.info("Stopped opentrons-gpio-setup.")
+
     if simulator_config:
         simulator_config_path = Path(simulator_config)
         log.info(f"Loading simulator from {simulator_config_path}")
@@ -130,7 +144,7 @@ async def _initialize_hardware_api(app_state: AppState) -> None:
     _initialize_event_watchers(app_state, hardware_api)
     _hw_api.set_on(app_state, hardware_api)
 
-    if IS_ROBOT and ARCHITECTURE != SystemArchitecture.HOST:
+    if systemd_available:
         try:
             import systemd.daemon  # type: ignore
 
