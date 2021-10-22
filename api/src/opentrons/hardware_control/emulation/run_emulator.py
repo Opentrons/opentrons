@@ -58,7 +58,7 @@ async def run_emulator_server(host: str, port: int, emulator: AbstractEmulator) 
     Args:
         host: Host to listen on.
         port: Port to listen on.
-        emulator: Emaulator instance.
+        emulator: Emulator instance.
 
     Returns:
         None
