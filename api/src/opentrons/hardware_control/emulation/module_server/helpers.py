@@ -1,8 +1,7 @@
 import asyncio
-from typing import Sequence, Set, Callable, List, Coroutine, Awaitable
+from typing import Sequence, Set, Callable, List, Awaitable
 
-from opentrons.hardware_control.emulation.module_server.client import \
-    ModuleServerClient
+from opentrons.hardware_control.emulation.module_server.client import ModuleServerClient
 from opentrons.hardware_control.emulation.module_server.models import Message
 from opentrons.hardware_control.emulation.module_server.server import log
 from opentrons.hardware_control.emulation.types import ModuleType
@@ -37,7 +36,6 @@ class ModuleListener:
     @staticmethod
     async def message_to_notify(message: Message, notify_method: NotifyMethod) -> None:
         await notify_method([], [])
-
 
 
 async def wait_emulators(

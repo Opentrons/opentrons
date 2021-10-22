@@ -2,8 +2,10 @@ import asyncio
 import logging
 from typing import Dict, Set
 
-from opentrons.hardware_control.emulation.module_server.models import Connection, \
-    Message
+from opentrons.hardware_control.emulation.module_server.models import (
+    Connection,
+    Message,
+)
 from opentrons.hardware_control.emulation.proxy import ProxyListener
 from opentrons.hardware_control.emulation.settings import ModuleServerSettings
 from typing_extensions import Final

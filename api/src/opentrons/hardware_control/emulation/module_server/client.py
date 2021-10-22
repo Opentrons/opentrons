@@ -3,8 +3,7 @@ import asyncio
 from typing import Optional
 
 from opentrons.hardware_control.emulation.module_server.models import Message
-from opentrons.hardware_control.emulation.module_server.server import \
-    MessageDelimiter
+from opentrons.hardware_control.emulation.module_server.server import MessageDelimiter
 
 
 class ModuleServerClient:
