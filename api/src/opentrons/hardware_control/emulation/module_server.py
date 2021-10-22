@@ -171,6 +171,10 @@ class ModuleServerClient:
         m: Message = Message.parse_raw(b)
         return m
 
+    def close(self) -> None:
+        """Close the client."""
+        self._writer.close()
+
 
 async def wait_emulators(
     client: ModuleServerClient,
