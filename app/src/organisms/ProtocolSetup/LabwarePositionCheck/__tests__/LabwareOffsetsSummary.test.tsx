@@ -13,7 +13,7 @@ describe('LabwareOffsetsSummary', () => {
   it('renders correct header and summary categories', () => {
     const { getByRole, getByText } = render()
     getByRole('heading', { name: 'Labware Offsets to be applied to this run' })
-    getByText('Deck Slot')
+    getByText('Location')
     getByText('Labware')
     getByText('Labware Offset Data')
   })
