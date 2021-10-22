@@ -6,21 +6,24 @@ import { SectionList } from '../SectionList'
 import { DeckMap } from '../DeckMap'
 import { SummaryScreen } from '../SummaryScreen'
 import { LabwareOffsetsSummary } from '../LabwareOffsetsSummary'
-import { useIntroInfo, useLabwareIdsBySection } from '../hooks'
+import { useIntroInfo } from '../hooks'
+import { useProtocolDetails } from '../../../RunDetails/hooks'
 import { Section } from '../types'
 
 jest.mock('../SectionList')
 jest.mock('../hooks')
 jest.mock('../DeckMap')
+jest.mock('../../../RunDetails/hooks')
 jest.mock('../LabwareOffsetsSummary')
 
 const mockSectionList = SectionList as jest.MockedFunction<typeof SectionList>
 const mockUseIntroInfo = useIntroInfo as jest.MockedFunction<
   typeof useIntroInfo
 >
-const mockUseLabwareIdsBySection = useLabwareIdsBySection as jest.MockedFunction<
-  typeof useLabwareIdsBySection
+const mockUseProtocolDetails = useProtocolDetails as jest.MockedFunction<
+  typeof useProtocolDetails
 >
+
 const mockDeckmap = DeckMap as jest.MockedFunction<typeof DeckMap>
 
 const mockLabwareOffsetsSummary = LabwareOffsetsSummary as jest.MockedFunction<
@@ -28,6 +31,12 @@ const mockLabwareOffsetsSummary = LabwareOffsetsSummary as jest.MockedFunction<
 >
 
 const MOCK_SECTIONS = ['PRIMARY_PIPETTE_TIPRACKS' as Section]
+const LABWARE_DEF_ID = 'LABWARE_DEF_ID'
+const PRIMARY_PIPETTE_ID = 'PRIMARY_PIPETTE_ID'
+const PRIMARY_PIPETTE_NAME = 'PRIMARY_PIPETTE_NAME'
+const LABWARE_DEF = {
+  ordering: [['A1', 'A2']],
+}
 
 const render = () => {
   return renderWithProviders(<SummaryScreen />, {
@@ -42,7 +51,6 @@ describe('SummaryScreen', () => {
     mockLabwareOffsetsSummary.mockReturnValue(
       <div>Mock Labware Offsets Summary </div>
     )
-    mockUseLabwareIdsBySection.mockReturnValue({})
 
     when(mockUseIntroInfo).calledWith().mockReturnValue({
       primaryTipRackSlot: '1',
@@ -53,6 +61,29 @@ describe('SummaryScreen', () => {
       firstStepLabwareSlot: '2',
       sections: MOCK_SECTIONS,
     })
+
+    when(mockUseProtocolDetails)
+      .calledWith()
+      .mockReturnValue({
+        protocolData: {
+          labware: {
+            '1d57fc10-67ad-11ea-9f8b-3b50068bd62d:opentrons/opentrons_96_filtertiprack_200ul/1': {
+              slot: '1',
+              displayName: 'someDislpayName',
+              definitionId: LABWARE_DEF_ID,
+            },
+          },
+          labwareDefinitions: {
+            [LABWARE_DEF_ID]: LABWARE_DEF,
+          },
+          pipettes: {
+            [PRIMARY_PIPETTE_ID]: {
+              name: PRIMARY_PIPETTE_NAME,
+              mount: 'left',
+            },
+          },
+        },
+      } as any)
   })
   it('renders Summary Screen with all components and header', () => {
     const { getByText } = render()

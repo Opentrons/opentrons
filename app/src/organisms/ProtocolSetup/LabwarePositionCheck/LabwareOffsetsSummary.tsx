@@ -18,32 +18,32 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 const getOffsetDataInfo = (): Array<{
-  deckSlot: string
+  location: string
   labware: string
   offsetData: { x: number; y: number; z: number }
 }> => [
   {
-    deckSlot: 'Slot 1',
-    labware: 'Opentrons 96 100mL Tiprack in Temperature Module GEN2',
+    location: 'Temperature Module GEN 2 in Deck Slot 1',
+    labware: 'Opentrons 96 100mL Tiprack',
     offsetData: { x: 1.1, y: 2.1, z: 3.1 },
   },
   {
-    deckSlot: 'Slot 3',
+    location: 'Deck Slot 3',
     labware: 'Opentrons 96 Tip Rack 20µL',
     offsetData: { x: 0.0, y: -1.2, z: 1.1 },
   },
   {
-    deckSlot: 'Slot 5',
+    location: 'Deck Slot 5',
     labware: 'Opentrons Mixed Tube Rack',
     offsetData: { x: 5.1, y: 2.2, z: 3.1 },
   },
   {
-    deckSlot: 'Slot 6',
+    location: 'Deck Slot 6',
     labware: 'Opentrons Mixed Tube Rack',
     offsetData: { x: 0.0, y: 0.0, z: 0.0 },
   },
   {
-    deckSlot: 'Slot 7',
+    location: 'Thermocycler',
     labware: 'Opentrons Mixed Tube Rack',
     offsetData: { x: 0.0, y: 0.0, z: 0.0 },
   },
@@ -55,7 +55,7 @@ export const LabwareOffsetsSummary = (): JSX.Element | null => {
 
   return (
     <React.Fragment>
-      <Box
+      <Flex
         padding={SPACING_4}
         boxShadow="1px 1px 1px rgba(0, 0, 0, 0.25)"
         borderRadius="4px"
@@ -73,7 +73,7 @@ export const LabwareOffsetsSummary = (): JSX.Element | null => {
         </Text>
         <Flex flexDirection={DIRECTION_ROW} justifyContent={JUSTIFY_CENTER}>
           <Box
-            width="20%"
+            width="30%"
             flexDirection={DIRECTION_COLUMN}
             justifyContent={JUSTIFY_CENTER}
           >
@@ -83,18 +83,18 @@ export const LabwareOffsetsSummary = (): JSX.Element | null => {
               color={C_DISABLED}
               fontSize={FONT_SIZE_CAPTION}
             >
-              {t('labware_offsets_summary_deckslot')}
+              {t('labware_offsets_summary_location')}
             </Text>
-            {getOffsetDataInfo().map(({ deckSlot }) => {
+            {getOffsetDataInfo().map(({ location }) => {
               return (
-                <Box key={deckSlot} height="30%" css={FONT_BODY_1_DARK}>
-                  {deckSlot}
+                <Box key={location} height="30%" css={FONT_BODY_1_DARK}>
+                  {location}
                 </Box>
               )
             })}
           </Box>
           <Box
-            width="50%"
+            width="40%"
             flexDirection={DIRECTION_COLUMN}
             justifyContent={JUSTIFY_CENTER}
           >
@@ -157,7 +157,7 @@ export const LabwareOffsetsSummary = (): JSX.Element | null => {
             })}
           </Box>
         </Flex>
-      </Box>
+      </Flex>
     </React.Fragment>
   )
 }
