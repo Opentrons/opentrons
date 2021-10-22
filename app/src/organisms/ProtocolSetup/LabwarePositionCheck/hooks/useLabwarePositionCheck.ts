@@ -9,6 +9,7 @@ import {
   useEnsureBasicSession,
   useAllCommandsQuery,
 } from '@opentrons/react-api-client'
+import { useProtocolDetails } from '../../../RunDetails/hooks'
 import { useSteps } from '.'
 import type { Command } from '@opentrons/shared-data/protocol/types/schemaV5'
 import type {
@@ -17,7 +18,6 @@ import type {
   Sign,
   StepSize,
 } from '../../../../molecules/JogControls/types'
-import { useProtocolDetails } from '../../../RunDetails/hooks'
 
 interface LabwarePositionCheckUtils {
   currentCommandIndex: number
@@ -26,6 +26,7 @@ interface LabwarePositionCheckUtils {
   proceed: () => void
   jog: Jog
   ctaText: string
+  error: Error | null
 }
 
 const useLpcCtaText = (command: Command): string => {
@@ -65,7 +66,6 @@ const createCommandData = (
 })
 
 export function useLabwarePositionCheck(
-  proceedToSummary: () => unknown,
   addSavePositionCommandId: (commandId: string) => void
 ): LabwarePositionCheckUtils {
   const [currentCommandIndex, setCurrentCommandIndex] = React.useState<number>(
@@ -75,6 +75,7 @@ export function useLabwarePositionCheck(
     null
   )
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
+  const [error, setError] = React.useState<Error | null>(null)
   const host = useHost()
   const basicSession = useEnsureBasicSession()
   const LPCCommands = useSteps().reduce<Command[]>((steps, currentStep) => {
@@ -83,6 +84,7 @@ export function useLabwarePositionCheck(
   const currentCommand = LPCCommands[currentCommandIndex]
   const ctaText = useLpcCtaText(currentCommand)
   const robotCommands = useAllCommandsQuery(basicSession?.id).data?.data
+  const isComplete = currentCommandIndex === LPCCommands.length - 1
   if (basicSession == null)
     return {
       isLoading: false,
@@ -90,7 +92,8 @@ export function useLabwarePositionCheck(
       proceed: () => null,
       jog: () => null,
       ctaText,
-      isComplete: false,
+      error,
+      isComplete,
     }
   if (
     pendingCommandId != null &&
@@ -106,7 +109,6 @@ export function useLabwarePositionCheck(
   }
 
   const proceed = (): void => {
-    console.log('proceeding!')
     setIsLoading(true)
 
     createCommand(
@@ -128,25 +130,21 @@ export function useLabwarePositionCheck(
             host as HostConfig,
             basicSession.id,
             createCommandData(nextCommand)
-          )
-            .then(response => {
-              const commandId = response.data.data.id
-              setPendingCommandId(commandId)
-              // incremement currentCommandIndex by 2 since we've executed 2 commands
-              setCurrentCommandIndex(currentCommandIndex + 2)
-            })
-            .catch(e => {
-              console.error(`error issuing command to robot: ${e}`)
-              setIsLoading(false)
-            })
-        } else {
-          setPendingCommandId(commandId)
-          setCurrentCommandIndex(currentCommandIndex + 1)
+          ).then(response => {
+            const commandId = response.data.data.id
+            setPendingCommandId(commandId)
+            // incremement currentCommandIndex by 2 since we've executed 2 commands
+            setCurrentCommandIndex(currentCommandIndex + 2)
+          })
         }
+        setPendingCommandId(commandId)
+        console.log('incrementing command index')
+        setCurrentCommandIndex(currentCommandIndex + 1)
       })
-      .catch(e => {
-        console.error(`error issuing command to robot: ${e}`)
+      .catch((e: Error) => {
+        console.error(`error issuing command to robot: ${e.message}`)
         setIsLoading(false)
+        setError(e)
       })
   }
 
@@ -161,8 +159,11 @@ export function useLabwarePositionCheck(
       },
     }
 
-    createCommand(host as HostConfig, basicSession.id, data).catch(e =>
-      console.error(`error issuing jog command: ${e}`)
+    createCommand(host as HostConfig, basicSession.id, data).catch(
+      (e: Error) => {
+        setError(e)
+        console.error(`error issuing jog command: ${e.message}`)
+      }
     )
   }
 
@@ -172,6 +173,7 @@ export function useLabwarePositionCheck(
     proceed,
     jog,
     ctaText,
-    isComplete: false,
+    isComplete,
+    error,
   }
 }

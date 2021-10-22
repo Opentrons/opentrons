@@ -4,14 +4,16 @@ import { useHost } from '../api'
 
 export function useAllCommandsQuery(
   sessionId?: string
-): UseQueryResult<Commands> {
+): UseQueryResult<Commands, Error> {
   const host = useHost()
-  const query = useQuery(
-    ['session', host],
+  const query = useQuery<Commands, Error>(
+    ['session', sessionId, 'commands', host],
     () =>
-      getCommands(host as HostConfig, sessionId as string).then(
-        response => response.data
-      ),
+      getCommands(host as HostConfig, sessionId as string)
+        .then(response => response.data)
+        .catch((e: Error) => {
+          throw e
+        }),
     { enabled: host !== null && sessionId != null }
   )
 

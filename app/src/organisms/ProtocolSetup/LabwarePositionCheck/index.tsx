@@ -9,7 +9,6 @@ import { SummaryScreen } from './SummaryScreen'
 
 import styles from '../styles.css'
 
-
 interface LabwarePositionCheckModalProps {
   onCloseClick: () => unknown
 }
@@ -24,8 +23,7 @@ export const LabwarePositionCheck = (
   const [currentLabwareCheckStep, setCurrentLabwareCheckStep] = React.useState<
     number | null
   >(null)
-  const { proceed, ctaText } = useLabwarePositionCheck(
-    () => null,
+  const { proceed, ctaText, isLoading } = useLabwarePositionCheck(
     () => null
   )
 
@@ -53,7 +51,7 @@ export const LabwarePositionCheck = (
           />
         ) : (
           <IntroScreen
-            setCurrentLabwareCheckStep={setCurrentLabwareCheckStep}
+            proceed={proceed}
           />
         )}
       </ModalPage>
