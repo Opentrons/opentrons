@@ -70,9 +70,12 @@ class LegacyContextCreator:
 
         Args:
             hardware_api: The interface to the hardware API that the created
-                Protocol API v2 contexts will use.
+                Protocol API v2 contexts will use. Regardless of
+                ``use_simulating_implementation``, this can either be a real hardware
+                API to actually control the robot, or a simulating hardware API.
             use_simulating_implementation: Whether the created Protocol API v2 contexts
-                should use a simulating implementation. See
+                should use a simulating implementation, avoiding some calls to
+                `hardware_api` for performance. See
                 `opentrons.protocols.context.simulator`.
         """
         self._hardware_api = hardware_api
