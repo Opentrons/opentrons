@@ -33,7 +33,7 @@ async def create_simulating_runner() -> ProtocolRunner:
     simulating_hardware_api = await HardwareAPI.build_hardware_simulator()
     use_simulating_implementation = not feature_flags.disable_fast_protocol_upload()
 
-    legacy_context_creator = LegacyContextCreator(
+    simulating_legacy_context_creator = LegacyContextCreator(
         hardware_api=simulating_hardware_api,
         use_simulating_implementation=use_simulating_implementation,
     )
@@ -48,5 +48,5 @@ async def create_simulating_runner() -> ProtocolRunner:
     return ProtocolRunner(
         protocol_engine=protocol_engine,
         hardware_api=simulating_hardware_api,
-        legacy_context_creator=legacy_context_creator,
+        legacy_context_creator=simulating_legacy_context_creator,
     )
