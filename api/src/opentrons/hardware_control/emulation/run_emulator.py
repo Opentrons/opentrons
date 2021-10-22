@@ -37,13 +37,15 @@ async def run_emulator_client(
             break
         except IOError:
             log.error(
-                f"{emulator.__class__.__name__} failed to connect on try {i + 1}. Retrying in {interval_seconds} seconds."
+                f"{emulator.__class__.__name__} failed to connect on "
+                f"try {i + 1}. Retrying in {interval_seconds} seconds."
             )
             await asyncio.sleep(interval_seconds)
 
     if r is None or w is None:
         raise IOError(
-            f"Failed to connect to {emulator.__class__.__name__} at {host}:{port} after {retries} retries."
+            f"Failed to connect to {emulator.__class__.__name__} at "
+            f"{host}:{port} after {retries} retries."
         )
 
     connection = ConnectionHandler(emulator)

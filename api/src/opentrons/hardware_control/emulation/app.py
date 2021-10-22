@@ -1,6 +1,5 @@
 import asyncio
 import logging
-from enum import Enum
 
 from opentrons.hardware_control.emulation.module_server import ModuleStatusServer
 from opentrons.hardware_control.emulation.parser import Parser
@@ -8,17 +7,9 @@ from opentrons.hardware_control.emulation.proxy import Proxy
 from opentrons.hardware_control.emulation.run_emulator import run_emulator_server
 from opentrons.hardware_control.emulation.settings import Settings
 from opentrons.hardware_control.emulation.smoothie import SmoothieEmulator
+from opentrons.hardware_control.emulation.types import ModuleType
 
 logger = logging.getLogger(__name__)
-
-
-class ModuleType(str, Enum):
-    """Module type enumeration."""
-
-    Magnetic = "magnetic"
-    Temperature = "temperature"
-    Thermocycler = "thermocycler"
-    Heatershaker = "heatershaker"
 
 
 class Application:
