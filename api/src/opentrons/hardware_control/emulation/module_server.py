@@ -3,7 +3,7 @@ from __future__ import annotations
 import asyncio
 import logging
 
-from opentrons.hardware_control.emulation.app import ModuleType
+from opentrons.hardware_control.emulation.types import ModuleType
 from typing_extensions import Literal, Final
 from typing import Dict, List, Set, Sequence, Optional
 from pydantic import BaseModel
