@@ -19,19 +19,21 @@ import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fi
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 import { fireEvent, screen } from '@testing-library/react'
 import { i18n } from '../../../../../i18n'
-import { LabwareSetup } from '..'
-import { LabwareSetupModal } from '../LabwareSetupModal'
-import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
-import { ExtraAttentionWarning } from '../ExtraAttentionWarning'
-import { getModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
+import { LabwarePositionCheck } from '../../../LabwarePositionCheck'
 import {
   useModuleRenderInfoById,
   useLabwareRenderInfoById,
 } from '../../../hooks'
+import { LabwareSetup } from '..'
+import { LabwareOffsetModal } from '../LabwareOffsetModal'
+import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
+import { ExtraAttentionWarning } from '../ExtraAttentionWarning'
+import { getModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
 
 jest.mock('../../../../../redux/modules')
 jest.mock('../../../../../redux/pipettes/selectors')
-jest.mock('../LabwareSetupModal')
+jest.mock('../LabwareOffsetModal')
+jest.mock('../../../LabwarePositionCheck')
 jest.mock('../LabwareInfoOverlay')
 jest.mock('../ExtraAttentionWarning')
 jest.mock('../../../hooks')
@@ -67,8 +69,8 @@ const mockRobotWorkSpace = RobotWorkSpace as jest.MockedFunction<
 const mockLabwareRender = LabwareRender as jest.MockedFunction<
   typeof LabwareRender
 >
-const mockLabwareSetupModal = LabwareSetupModal as jest.MockedFunction<
-  typeof LabwareSetupModal
+const mockLabwareOffsetModal = LabwareOffsetModal as jest.MockedFunction<
+  typeof LabwareOffsetModal
 >
 const mockGetModuleTypesThatRequireExtraAttention = getModuleTypesThatRequireExtraAttention as jest.MockedFunction<
   typeof getModuleTypesThatRequireExtraAttention
@@ -81,6 +83,9 @@ const mockUseLabwareRenderInfoById = useLabwareRenderInfoById as jest.MockedFunc
 >
 const mockUseModuleRenderInfoById = useModuleRenderInfoById as jest.MockedFunction<
   typeof useModuleRenderInfoById
+>
+const mockLabwarePostionCheck = LabwarePositionCheck as jest.MockedFunction<
+  typeof LabwarePositionCheck
 >
 
 const deckSlotsById = standardDeckDef.locations.orderedSlots.reduce(
@@ -129,14 +134,14 @@ describe('LabwareSetup', () => {
       .calledWith(expect.anything())
       .mockReturnValue([])
 
-    when(mockLabwareSetupModal)
+    when(mockLabwareOffsetModal)
       .calledWith(
         componentPropsMatcher({
           onCloseClick: expect.anything(),
         })
       )
       .mockImplementation(({ onCloseClick }) => (
-        <div onClick={onCloseClick}>mock labware setup modal</div>
+        <div onClick={onCloseClick}>mock LabwareOffsetModal </div>
       ))
 
     when(mockLabwareRender)
@@ -179,6 +184,10 @@ describe('LabwareSetup', () => {
           })}
         </svg>
       ))
+
+    mockLabwarePostionCheck.mockReturnValue(
+      <div>mock Labware Position Check</div>
+    )
   })
 
   afterEach(() => {
@@ -186,23 +195,23 @@ describe('LabwareSetup', () => {
     jest.restoreAllMocks()
   })
 
-  describe('labware help link', () => {
-    it('opens up the labware help modal when clicked', () => {
+  describe('See How Labware Offsets Work link', () => {
+    it('opens up the See How Labware Offsets Work modal when clicked', () => {
       const { getByText } = render()
 
-      expect(screen.queryByText('mock labware setup modal')).toBeNull()
-      const helpLink = getByText('Labware Help')
+      expect(screen.queryByText('mock LabwareOffsetModal')).toBeNull()
+      const helpLink = getByText('See How Labware Offsets Work')
       fireEvent.click(helpLink)
-      getByText('mock labware setup modal')
+      getByText('mock LabwareOffsetModal')
     })
-    it('closes the labware help modal when closed', () => {
+    it('closes the See How Labware Offsets Work when closed', () => {
       const { getByText } = render()
 
-      const helpLink = getByText('Labware Help')
+      const helpLink = getByText('See How Labware Offsets Work')
       fireEvent.click(helpLink)
-      const mockModal = getByText('mock labware setup modal')
+      const mockModal = getByText('mock LabwareOffsetModal')
       fireEvent.click(mockModal)
-      expect(screen.queryByText('mock labware setup modal')).toBeNull()
+      expect(screen.queryByText('mock LabwareOffsetModal')).toBeNull()
     })
   })
 
@@ -296,15 +305,21 @@ describe('LabwareSetup', () => {
     getByText('mock labware render of 300ul Tiprack FIXTURE')
     getByText('mock labware info overlay of 300ul Tiprack FIXTURE')
   })
-  it('should render the labware position check text', () => {
-    const { getByText, getByRole } = render()
+  it('should render the Labware Position Check and Labware Offset Data text', () => {
+    const { getByText } = render()
 
-    getByRole('heading', {
-      name: 'Labware Position Check',
-    })
+    getByText('Labware Position Check and Labware Offset Data')
     getByText(
-      'Labware Position Check is an optional workflow that guides you through checking the position of each labware on the deck. During this check, you can make an offset adjustment to the overall position of the labware.'
+      'Labware Position Check is an optional workflow that helps you verify the position of each labware on the deck. During this check, you can create Labware Offsets that adjust how the robot moves to each labware in the X, Y and Z directions.'
     )
+  })
+  it('should render button and click it', () => {
+    const { getByRole, getByText } = render()
+    const button = getByRole('button', {
+      name: 'run labware position check',
+    })
+    fireEvent.click(button)
+    getByText('mock Labware Position Check')
   })
   it('should render the extra attention warning when there are modules/labware that need extra attention', () => {
     when(mockGetModuleTypesThatRequireExtraAttention)
