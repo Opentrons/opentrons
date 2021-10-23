@@ -8,8 +8,9 @@ from glob import glob
 
 from opentrons.config import IS_ROBOT, IS_LINUX
 from opentrons.drivers.rpi_drivers import types, usb, usb_simulator
-from opentrons.hardware_control.emulation.module_server.helpers import \
-    listen_module_connection
+from opentrons.hardware_control.emulation.module_server.helpers import (
+    listen_module_connection,
+)
 from opentrons.hardware_control.modules import ModuleAtPort
 
 from .types import AionotifyEvent, BoardRevision
@@ -43,7 +44,9 @@ class AttachedModulesControl:
         mc_instance = cls(api_instance, board_revision)
         if not api_instance.is_simulator:
             await mc_instance.register_modules(mc_instance.scan())
-            api_instance.loop.create_task(listen_module_connection(mc_instance.register_modules))
+            api_instance.loop.create_task(
+                listen_module_connection(mc_instance.register_modules)
+            )
 
         return mc_instance
 

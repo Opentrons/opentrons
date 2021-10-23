@@ -17,7 +17,11 @@ async def listen_module_connection(callback: NotifyMethod) -> None:
     """Listen for module emulator connections."""
     settings = Settings()
     try:
-        client = await ModuleServerClient.connect(host=settings.module_server.host, port=settings.module_server.port, interval_seconds=1.0)
+        client = await ModuleServerClient.connect(
+            host=settings.module_server.host,
+            port=settings.module_server.port,
+            interval_seconds=1.0,
+        )
         listener = ModuleListener(client=client, notify_method=callback)
         await listener.run()
     except IOError:
