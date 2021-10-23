@@ -1,6 +1,7 @@
 import asyncio
 from typing import Sequence, Set, Callable, List, Awaitable
 
+from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.hardware_control.emulation.module_server.client import ModuleServerClient
 from opentrons.hardware_control.emulation.module_server.models import Message
 from opentrons.hardware_control.emulation.module_server.server import log
@@ -28,14 +29,34 @@ class ModuleListener:
         self._notify_method = notify_method
 
     async def run(self) -> None:
-        """"""
+        """Run the listener."""
         while True:
             m = await self._client.read()
             await self.message_to_notify(message=m, notify_method=self._notify_method)
 
     @staticmethod
     async def message_to_notify(message: Message, notify_method: NotifyMethod) -> None:
-        await notify_method([], [])
+        """Call callback with results of message.
+
+        Args:
+            message: Message object from module server
+            notify_method: callback method
+
+        Returns:
+            None
+        """
+        connections = [
+            ModuleAtPort(
+                port=c.url,
+                name=c.module_type,
+                usb_port=USBPort(name=c.identifier, sub_names=[]),
+            )
+            for c in message.connections
+        ]
+        if message.status == "connected" or message.status == "dump":
+            await notify_method(connections, [])
+        elif message.status == "disconnected":
+            await notify_method([], connections)
 
 
 async def wait_emulators(
