@@ -12,7 +12,10 @@ from opentrons.protocols.execution import execute
 from contextlib import contextmanager
 from opentrons.protocol_api import ProtocolContext
 from opentrons.config.robot_configs import build_config
-from opentrons.hardware_control.emulation import module_server
+from opentrons.hardware_control.emulation.module_server.helpers import (
+    wait_emulators,
+    ModuleServerClient,
+)
 from opentrons.hardware_control.emulation.scripts import run_app
 from opentrons.hardware_control import API, ThreadManager
 from g_code_parsing.g_code_program.g_code_program import (
@@ -45,7 +48,6 @@ class GCodeEngine:
 
     def __init__(self, emulator_settings: Settings) -> None:
         self._config = emulator_settings
-        self._set_env_vars(emulator_settings)
 
     @staticmethod
     def _get_loop() -> asyncio.AbstractEventLoop:
@@ -58,22 +60,9 @@ class GCodeEngine:
         return asyncio.get_event_loop()
 
     @staticmethod
-    def _set_env_vars(settings: Settings) -> None:
-        """Set URLs of where to find modules and config for smoothie"""
-        os.environ["OT_MAGNETIC_EMULATOR_URI"] = (
-            GCodeEngine.URI_TEMPLATE % settings.magdeck_proxy.driver_port
-        )
-        os.environ["OT_THERMOCYCLER_EMULATOR_URI"] = (
-            GCodeEngine.URI_TEMPLATE % settings.thermocycler_proxy.driver_port
-        )
-        os.environ["OT_TEMPERATURE_EMULATOR_URI"] = (
-            GCodeEngine.URI_TEMPLATE % settings.temperature_proxy.driver_port
-        )
-
-    @staticmethod
     def _start_emulation_app(emulator_settings: Settings) -> Process:
         """Start emulated OT-2"""
-        modules = [ModuleType.Magnetic, ModuleType.Temperature, ModuleType.Thermocycler]
+        modules = [ModuleType.Thermocycler, ModuleType.Magnetic, ModuleType.Temperature]
 
         def runit():
             asyncio.run(
@@ -85,10 +74,10 @@ class GCodeEngine:
         proc.start()
 
         async def _wait_ready() -> None:
-            c = await module_server.ModuleServerClient.connect(
+            c = await ModuleServerClient.connect(
                 host="localhost", port=emulator_settings.module_server.port
             )
-            await module_server.wait_emulators(client=c, modules=modules, timeout=5)
+            await wait_emulators(client=c, modules=modules, timeout=5)
             c.close()
 
         proc2 = Process(target=lambda: asyncio.run(_wait_ready()))
