@@ -5,11 +5,23 @@ from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.hardware_control.emulation.module_server.client import ModuleServerClient
 from opentrons.hardware_control.emulation.module_server.models import Message
 from opentrons.hardware_control.emulation.module_server.server import log
+from opentrons.hardware_control.emulation.settings import Settings
 from opentrons.hardware_control.emulation.types import ModuleType
 from opentrons.hardware_control.modules import ModuleAtPort
 
 NotifyMethod = Callable[[List[ModuleAtPort], List[ModuleAtPort]], Awaitable[None]]
 """Signature of method to be notified of new and removed modules."""
+
+
+async def listen_module_connection(callback: NotifyMethod) -> None:
+    """Listen for module emulator connections."""
+    settings = Settings()
+    try:
+        client = await ModuleServerClient.connect(host=settings.module_server.host, port=settings.module_server.port, interval_seconds=1.0)
+        listener = ModuleListener(client=client, notify_method=callback)
+        await listener.run()
+    except IOError:
+        log.exception("Failed to connect to module server.")
 
 
 class ModuleListener:

@@ -115,7 +115,7 @@ class Proxy:
         self._cons.append(connection)
         self._event_listener.on_server_connected(
             server_type=self._name,
-            client_uri=f"{socket.gethostname()}:{self._settings.driver_port}",
+            client_uri=f"socket://{socket.gethostname()}:{self._settings.driver_port}",
             identifier=connection.identifier,
         )
 

@@ -4,7 +4,7 @@ from enum import Enum
 class ModuleType(str, Enum):
     """Module type enumeration."""
 
-    Magnetic = "magnetic"
-    Temperature = "temperature"
+    Magnetic = "magdeck"
+    Temperature = "tempdeck"
     Thermocycler = "thermocycler"
     Heatershaker = "heatershaker"
