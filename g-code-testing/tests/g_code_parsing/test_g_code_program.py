@@ -1,4 +1,4 @@
-from typing import Generator, Iterator
+from typing import Iterator
 
 import pytest
 from opentrons.hardware_control.emulation.settings import Settings
