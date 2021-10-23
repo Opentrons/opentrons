@@ -1,20 +1,11 @@
 import os
 import sys
-import threading
 import asyncio
-import time
 from multiprocessing import Process
 from typing import Generator, Callable
 from collections import namedtuple
 
-from opentrons.hardware_control.emulation.magdeck import MagDeckEmulator
-from opentrons.hardware_control.emulation.parser import Parser
-from opentrons.hardware_control.emulation.run_emulator import \
-    run_emulator_client
 from opentrons.hardware_control.emulation.settings import Settings
-from opentrons.hardware_control.emulation.tempdeck import TempDeckEmulator
-from opentrons.hardware_control.emulation.thermocycler import \
-    ThermocyclerEmulator
 from opentrons.hardware_control.emulation.types import ModuleType
 from opentrons.protocols.parse import parse
 from opentrons.protocols.execution import execute
@@ -69,7 +60,9 @@ class GCodeEngine:
     @staticmethod
     def _set_env_vars(settings: Settings) -> None:
         """Set URLs of where to find modules and config for smoothie"""
-        os.environ["OT_MAGNETIC_EMULATOR_URI"] = GCodeEngine.URI_TEMPLATE % settings.magdeck_proxy.driver_port
+        os.environ["OT_MAGNETIC_EMULATOR_URI"] = (
+            GCodeEngine.URI_TEMPLATE % settings.magdeck_proxy.driver_port
+        )
         os.environ["OT_THERMOCYCLER_EMULATOR_URI"] = (
             GCodeEngine.URI_TEMPLATE % settings.thermocycler_proxy.driver_port
         )
@@ -83,14 +76,18 @@ class GCodeEngine:
         modules = [ModuleType.Magnetic, ModuleType.Temperature, ModuleType.Thermocycler]
 
         def runit():
-            asyncio.run(run_app.run(emulator_settings, modules=[m.value for m in modules]))
+            asyncio.run(
+                run_app.run(emulator_settings, modules=[m.value for m in modules])
+            )
 
         proc = Process(target=runit)
         proc.daemon = True
         proc.start()
 
         async def _wait_ready() -> None:
-            c = await module_server.ModuleServerClient.connect(host="localhost", port=emulator_settings.module_server.port)
+            c = await module_server.ModuleServerClient.connect(
+                host="localhost", port=emulator_settings.module_server.port
+            )
             await module_server.wait_emulators(client=c, modules=modules, timeout=5)
             c.close()
 
@@ -152,7 +149,9 @@ class GCodeEngine:
         """
         app_process = self._start_emulation_app(emulator_settings=self._config)
         with GCodeWatcher(emulator_settings=self._config) as watcher:
-            asyncio.run(executable(hardware=self._emulate_hardware(settings=self._config)))
+            asyncio.run(
+                executable(hardware=self._emulate_hardware(settings=self._config))
+            )
         yield GCodeProgram.from_g_code_watcher(watcher)
         app_process.terminate()
         app_process.join()
