@@ -23,7 +23,7 @@ const getOffsetDataInfo = (): Array<{
   offsetData: { x: number; y: number; z: number }
 }> => [
   {
-    location: 'Temperature Module GEN 2 in Deck Slot 1',
+    location: 'Temperature Module',
     labware: 'Opentrons 96 100mL Tiprack',
     offsetData: { x: 1.1, y: 2.1, z: 3.1 },
   },
@@ -62,7 +62,6 @@ export const LabwareOffsetsSummary = (): JSX.Element | null => {
         backgroundColor={C_NEAR_WHITE}
         flexDirection={DIRECTION_COLUMN}
         width="106%"
-        height="20rem"
       >
         <Text
           as={'h5'}
@@ -87,7 +86,11 @@ export const LabwareOffsetsSummary = (): JSX.Element | null => {
             </Text>
             {getOffsetDataInfo().map(({ location }) => {
               return (
-                <Box key={location} height="30%" css={FONT_BODY_1_DARK}>
+                <Box
+                  key={location}
+                  marginBottom={SPACING_3}
+                  css={FONT_BODY_1_DARK}
+                >
                   {location}
                 </Box>
               )
@@ -108,7 +111,11 @@ export const LabwareOffsetsSummary = (): JSX.Element | null => {
             </Text>
             {getOffsetDataInfo().map(({ labware }, index) => {
               return (
-                <Flex key={index} height={'30%'} css={FONT_BODY_1_DARK}>
+                <Flex
+                  key={index}
+                  marginBottom={SPACING_3}
+                  css={FONT_BODY_1_DARK}
+                >
                   {labware}
                 </Flex>
               )
@@ -129,11 +136,11 @@ export const LabwareOffsetsSummary = (): JSX.Element | null => {
             </Text>
             {offsetData.map(({ x, y, z }) => {
               return x === 0 && y === 0 && z === 0 ? (
-                <Flex height={'30%'} css={FONT_BODY_1_DARK}>
+                <Flex marginBottom={SPACING_3} css={FONT_BODY_1_DARK}>
                   {t('no_labware_offsets')}
                 </Flex>
               ) : (
-                <Flex height={'30%'} css={FONT_BODY_1_DARK}>
+                <Flex marginBottom={SPACING_3} css={FONT_BODY_1_DARK}>
                   <Text as={'span'} marginRight={'0.15rem'}>
                     <strong>X</strong>
                   </Text>
