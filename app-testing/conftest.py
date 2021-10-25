@@ -47,14 +47,6 @@ def test_protocols() -> Dict[str, Path]:
             Path(__file__).resolve().parent,
             "files/protocol/python1/test_drive.py",
         ),
-    }
-
-
-@pytest.fixture(scope="session")
-def test_json_protocols() -> Dict[str, Path]:
-    """Provide a fixture with a dictionary of test protocol files."""
-    # build this manually for now
-    return {
         "protocoluploadjson": Path(
             Path(__file__).resolve().parent,
             "files/protocol/python1/upload_protocol.json",

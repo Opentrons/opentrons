@@ -1,19 +1,18 @@
 """Model for the screen of robot calibration."""
-from enum import Enum
 import logging
-from typing import Optional
-import time
+from typing import Optional, Tuple
 from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.action_chains import ActionChains
 
 from src.driver.highlight import highlight
 
 logger = logging.getLogger(__name__)
+
+""" Class for Setup For Run Page."""
 
 
 class RobotCalibration:
@@ -21,43 +20,49 @@ class RobotCalibration:
         """Initialize with driver."""
         self.driver: WebDriver = driver
 
-    setup_for_run_text_locator: tuple = (By.ID, "RunSetupCard_setupForRun")
+    setup_for_run_text_locator: Tuple[str, str] = (
+        By.ID,
+        "RunSetupCard_setupForRun",
+    )
 
-    robot_calibration_text_locator: tuple = (
+    robot_calibration_text_locator: Tuple[str, str] = (
         By.ID,
         "RunSetupCard_robot_calibration_step",
     )
 
-    deck_calibration_text_locator: tuple = (
+    deck_calibration_text_locator: Tuple[str, str] = (
         By.ID,
         "DeckCalibration_deckCalibrationTitle",
     )
 
-    required_pipettes_text_locator: tuple = (
+    required_pipettes_text_locator: Tuple[str, str] = (
         By.ID,
         "PipetteCalibration_requiredPipettesTitle",
     )
 
-    required_tip_lengh_calibration_text_locator: tuple = (
+    required_tip_lengh_calibration_text_locator: Tuple[str, str] = (
         By.ID,
         "TipRackCalibration_requiredTipLengthTitle",
     )
-    calibration_helper_icon_text_locator: tuple = (
+    calibration_helper_icon_text_locator: Tuple[str, str] = (
         By.ID,
         "RunSetupCard_calibrationText",
     )
 
-    robot_calibration_help_link_locator: tuple = (
+    robot_calibration_help_link_locator: Tuple[str, str] = (
         By.ID,
         "DeckCalibration_robotCalibrationHelpLink",
     )
-    robot_calibration_help_model_text: tuple = (
+    robot_calibration_help_model_text: Tuple[str, str] = (
         By.XPATH,
         "//p[text()='Robot Calibration Help']",
     )
-    close_robotcalibration_button: tuple = (By.ID, "RobotCalModal_closeButton")
+    close_robotcalibration_button: Tuple[str, str] = (
+        By.ID,
+        "RobotCalModal_closeButton",
+    )
 
-    proceed_to_module_setup_cta: tuple = (By.ID, "RobotCalStep_proceedButton")
+    proceed_to_module_setup_cta: Tuple[str, str] = (By.ID, "RobotCalStep_proceedButton")
 
     @highlight
     def get_setup_for_run(self) -> WebElement:

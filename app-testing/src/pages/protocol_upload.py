@@ -1,47 +1,49 @@
 """Model for the screens of protocol upload."""
-from enum import Enum
 import logging
-from typing import Optional
-import time
+from typing import Optional, Tuple
 from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.action_chains import ActionChains
 
 from src.driver.highlight import highlight
 
 logger = logging.getLogger(__name__)
 
+"""Class for Protocol Upload landing page."""
+
 
 class ProtocolUpload:
 
-    browse_our_protocol_library_button_locator: tuple = (
+    browse_our_protocol_library_button_locator: Tuple[str, str] = (
         By.ID,
         "UploadInput_protocolLibraryButton",
     )
 
-    launch_protocol_designer_button_locator: tuple = (
+    launch_protocol_designer_button_locator: Tuple[str, str] = (
         By.ID,
         "UploadInput_protocolDesignerButton",
     )
 
-    get_app: tuple = (By.XPATH, f'//a[contains(@href,"#/more/app")]')
+    get_app: Tuple[str, str] = (By.XPATH, f'//a[contains(@href,"#/more/app")]')
 
-    click_robot: tuple = (By.XPATH, f'//a[contains(@href,"#/robots")]')
+    click_robot: Tuple[str, str] = (By.XPATH, f'//a[contains(@href,"#/robots")]')
 
-    file_upload_button_locator: tuple = (By.XPATH, "//button[text()='Choose File...']")
+    file_upload_button_locator: Tuple[str, str] = (
+        By.XPATH,
+        "//button[text()='Choose File...']",
+    )
 
-    enable_developer_tool_toggle: tuple = (
+    enable_developer_tool_toggle: Tuple[str, str] = (
         By.XPATH,
         "//p[text()='Enable Developer Tools']/following-sibling::button",
     )
 
-    protocol: tuple = (By.XPATH, '//a[contains(@href,"#/protocol")]')
+    protocol: Tuple[str, str] = (By.XPATH, '//a[contains(@href,"#/protocol")]')
 
-    enable_pre_protocol_flow_without_rpc_toggle: tuple = (
+    enable_pre_protocol_flow_without_rpc_toggle: Tuple[str, str] = (
         By.XPATH,
         "//p[text()='__DEV__ Pre Protocol Flow Without RPC']/following-sibling::button",
     )

@@ -2,9 +2,7 @@
 import logging
 import os
 from pathlib import Path
-import platform
 import time
-import pytest
 from typing import Dict
 from selenium import webdriver
 from pytest import FixtureRequest
@@ -12,11 +10,11 @@ from selenium.webdriver.chrome.options import Options
 
 from src.menus.left_menu import LeftMenu
 from src.pages.protocol_upload import ProtocolUpload
-from src.pages.deck_calibrate import DeckCalibration
 from src.resources.ot_application import OtApplication
-from src.pages.overview import Overview
+from src.resources.ot_robot import OtRobot
 from src.pages.robot_page import RobotPage
 from src.pages.robot_calibration import RobotCalibration
+from src.pages.deck_calibrate import DeckCalibration
 from src.pages.module_setup import ModuleSetup
 from src.pages.labware_setup import LabwareSetup
 from src.menus.robots_list import RobotsList
@@ -25,12 +23,18 @@ from src.driver.drag_drop import drag_and_drop_file
 
 logger = logging.getLogger(__name__)
 
+"""Happy path for PUR - protocol upload revamp."""
+
 
 def test_protocol_upload(
     chrome_options: Options,
-    test_json_protocols: Dict[str, Path],
+    test_protocols: Dict[str, Path],
     request: FixtureRequest,
 ) -> None:
+    """Upload a protocol."""
+    robot = OtRobot()
+    # expecting docker emulated robot
+    assert robot.is_alive(), "is a robot available?"
     os.environ["OT_APP_DISCOVERY__CANDIDATES"] = "localhost"
     os.environ["OT_APP_ANALYTICS__SEEN_OPT_IN"] = "true"
     with webdriver.Chrome(options=chrome_options) as driver:
@@ -75,10 +79,10 @@ def test_protocol_upload(
         left_menu.click_protocol_upload_button()
         protocol_file = ProtocolFile(driver)
         logger.info(
-            f"uploading protocol: {test_json_protocols['protocoluploadjson'].resolve()}"
+            f"uploading protocol: {test_protocols['protocoluploadjson'].resolve()}"
         )
         input = protocol_file.get_drag_json_protocol()
-        drag_and_drop_file(input, test_json_protocols["protocoluploadjson"])
+        drag_and_drop_file(input, test_protocols["protocoluploadjson"])
         robot_calibrate = RobotCalibration(driver)
         assert robot_calibrate.get_setup_for_run().text == "Setup for Run"
         assert robot_calibrate.get_robot_calibration().text == "Robot Calibration"

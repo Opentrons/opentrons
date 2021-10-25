@@ -21,7 +21,7 @@ class ProtocolFile:
         By.XPATH,
         "(//input[contains(normalize-space(@class), 'upload-panel__file_input')])[2]",
     )
-    file_drag_locator: tuple = (By.ID, "file_input")
+    file_drag_locator: Tuple[str, str] = (By.ID, "file_input")
 
     def __init__(self, driver: WebDriver) -> None:
         """Initialize with driver."""
