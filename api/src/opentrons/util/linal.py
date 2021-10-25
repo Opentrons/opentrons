@@ -1,7 +1,7 @@
 import logging
-import numpy as np  # type: ignore[import]
+import numpy as np
 from numpy import insert, dot
-from numpy.linalg import inv  # type: ignore[import]
+from numpy.linalg import inv
 from typing import List, Tuple, Union
 
 from opentrons.calibration_storage.types import AttitudeMatrix
@@ -30,7 +30,7 @@ def solve_attitude(expected: SolvePoints, actual: SolvePoints) -> AttitudeMatrix
     mask_transform = np.array(
         [[True, True, False], [True, True, False], [False, False, False]]
     )
-    masked_array = np.ma.masked_array(t, ~mask_transform)
+    masked_array = np.ma.masked_array(t, ~mask_transform)  # type: ignore
 
     no_z_component = np.zeros((3, 3))
     np.put(no_z_component, [8, 8], 1)
