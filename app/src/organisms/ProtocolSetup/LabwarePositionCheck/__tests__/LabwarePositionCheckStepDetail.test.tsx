@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
-import { screen } from '@testing-library/react'
+import '@testing-library/jest-dom'
+import { fireEvent, screen } from '@testing-library/react'
 import { getIsTiprack, getPipetteNameSpecs } from '@opentrons/shared-data'
 import {
   RobotWorkSpace,
@@ -14,6 +15,7 @@ import {
   WELL_LABEL_OPTIONS,
 } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
+import { JogControls } from '../../../../molecules/JogControls'
 import { useProtocolDetails } from '../../../RunDetails/hooks'
 import { LabwarePositionCheckStepDetail } from '../LabwarePositionCheckStepDetail'
 import { StepDetailText } from '../StepDetailText'
@@ -37,6 +39,7 @@ jest.mock('@opentrons/shared-data', () => {
 })
 jest.mock('../../../RunDetails/hooks')
 jest.mock('../StepDetailText')
+jest.mock('../../../../molecules/JogControls')
 
 const mockStepDetailText = StepDetailText as jest.MockedFunction<
   typeof StepDetailText
@@ -60,7 +63,7 @@ const mockLabwareRender = LabwareRender as jest.MockedFunction<
 const mockPipetteRender = PipetteRender as jest.MockedFunction<
   typeof PipetteRender
 >
-
+const mockJogControls = JogControls as jest.MockedFunction<typeof JogControls>
 const PICKUP_TIP_LABWARE_ID = 'PICKUP_TIP_LABWARE_ID'
 const PRIMARY_PIPETTE_ID = 'PRIMARY_PIPETTE_ID'
 const PRIMARY_PIPETTE_NAME = 'PRIMARY_PIPETTE_NAME'
@@ -134,6 +137,8 @@ describe('LabwarePositionCheckStepDetail', () => {
 
     mockGetIsTiprack.mockReturnValue(false)
 
+    mockJogControls.mockReturnValue(<div></div>)
+
     when(mockRobotWorkSpace)
       .mockReturnValue(
         <div>mockRobotWorkSpace not being called with the correct props</div>
@@ -166,6 +171,11 @@ describe('LabwarePositionCheckStepDetail', () => {
   it('renders the level with labware image', () => {
     render(props)
     screen.getByAltText('level with labware')
+  })
+  it('renders null if protocol data is null', () => {
+    mockUseProtocolDetails.mockReturnValue({ protocolData: null } as any)
+    const { container } = render(props)
+    expect(container.firstChild).toBeNull()
   })
   it('renders the level with tip image', () => {
     mockGetIsTiprack.mockReturnValue(true)
@@ -261,6 +271,24 @@ describe('LabwarePositionCheckStepDetail', () => {
 
       const { getByText } = render(props)
       getByText('mock labware with stroke and highlighted well labels outside')
+    })
+  })
+  describe('jog controls', () => {
+    it('renders correct text when jog controls are hidden', () => {
+      const { getByText, getByRole } = render(props)
+      getByText('Need to make an adjustment?')
+      getByRole('link', { name: 'Reveal jog controls' })
+      expect(screen.queryByText('Mock Jog Controls')).toBeNull()
+    })
+    it('renders correct text when jog controls are revealed', () => {
+      mockJogControls.mockReturnValue(<div>Mock Jog Controls</div>)
+      const { getByText, getByRole } = render(props)
+      getByText('Need to make an adjustment?')
+      const revealJogControls = getByRole('link', {
+        name: 'Reveal jog controls',
+      })
+      fireEvent.click(revealJogControls)
+      getByText('Mock Jog Controls')
     })
   })
 })

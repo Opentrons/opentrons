@@ -145,11 +145,13 @@ def transform_volumes(volumes: Union[float, int]) -> float:
 
 
 @overload
-def transform_volumes(volumes: List[Union[float]]) -> List[float]:
+def transform_volumes(volumes: List[float]) -> List[float]:
     ...
 
 
-def transform_volumes(volumes):
+def transform_volumes(
+    volumes: Union[float, int, List[float]]
+) -> Union[float, List[float]]:
     if not isinstance(volumes, list):
         return float(volumes)
     else:
@@ -178,7 +180,7 @@ def mix(
 
 
 def blow_out(
-    instrument: InstrumentContext, location: Union[Well, Location, None]
+    instrument: InstrumentContext, location: Union[Well, Location]
 ) -> command_types.BlowOutCommand:
     location_text = stringify_location(location)
     text = "Blowing out"

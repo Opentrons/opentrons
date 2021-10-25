@@ -71,17 +71,15 @@ describe('useCreateSessionMutation hook', () => {
       .calledWith(HOST_CONFIG, createSessionData)
       .mockResolvedValue({ data: SESSION_RESPONSE } as Response<Session>)
 
-    const { result } = renderHook(
+    const { result, waitFor } = renderHook(
       () => useCreateSessionMutation(createSessionData),
       {
         wrapper,
       }
     )
     act(() => result.current.createSession())
-    // TODO: remove this hack and replace with waitFor after we update to React v16.14
-    await new Promise(resolve => {
-      setImmediate(resolve)
-    })
+
+    await waitFor(() => result.current.data != null)
 
     expect(result.current.data).toEqual(SESSION_RESPONSE)
   })

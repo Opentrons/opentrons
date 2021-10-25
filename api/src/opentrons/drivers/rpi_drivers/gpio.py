@@ -68,6 +68,11 @@ class GPIOCharDev:
             return line
 
         if name == "blue_button":
+            # todo(mm, 2021-10-22): See if we can remove these retries.
+            # They may have been to paper over a former race condition where, during
+            # boot, the robot server would start initializing hardware before the
+            # standalone light-blinking process ot-blinkenlights was guaranteed to
+            # have relinquished its handle on the blue button GPIO line.
             return _retry_request_line(3)
         else:
             return _retry_request_line()

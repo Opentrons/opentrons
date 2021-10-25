@@ -1,3 +1,7 @@
 .increment_item {
   margin: 0.625rem 0.375rem;
 }
+
+.radio_button svg {
+  color: var(--c-blue);
+}

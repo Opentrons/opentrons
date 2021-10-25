@@ -33,7 +33,6 @@ per-file-ignores =
     src/opentrons/calibration_storage/*:ANN,D
     src/opentrons/cli/*:ANN,D
     src/opentrons/commands/*:D
-    src/opentrons/commands/util.py:ANN,D
     src/opentrons/config/*:ANN,D
     src/opentrons/data_storage/*:ANN,D
     src/opentrons/deck_calibration/*:ANN,D

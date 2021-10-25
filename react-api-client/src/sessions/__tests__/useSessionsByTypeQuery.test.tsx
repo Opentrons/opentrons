@@ -74,14 +74,12 @@ describe('useSessionsByTypeQuery hook', () => {
       .calledWith(HOST_CONFIG, { session_type: 'basic' })
       .mockResolvedValue({ data: basicSessions } as Response<Sessions>)
 
-    const { result } = renderHook(
+    const { result, waitFor } = renderHook(
       () => useSessionsByTypeQuery({ sessionType: 'basic' }),
       { wrapper }
     )
-    // TODO: remove this hack and replace with waitFor after we update to React v16.14
-    await new Promise(resolve => {
-      setImmediate(resolve)
-    })
+
+    await waitFor(() => result.current.data != null)
 
     expect(result.current.data).toEqual(basicSessions)
   })

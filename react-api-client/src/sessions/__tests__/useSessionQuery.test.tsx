@@ -63,13 +63,11 @@ describe('useSessionQuery hook', () => {
       .calledWith(HOST_CONFIG, SESSION_ID)
       .mockResolvedValue({ data: SESSION_RESPONSE } as Response<Session>)
 
-    const { result } = renderHook(() => useSessionQuery(SESSION_ID), {
+    const { result, waitFor } = renderHook(() => useSessionQuery(SESSION_ID), {
       wrapper,
     })
-    // TODO: remove this hack and replace with waitFor after we update to React v16.14
-    await new Promise(resolve => {
-      setImmediate(resolve)
-    })
+
+    await waitFor(() => result.current.data != null)
 
     expect(result.current.data).toEqual(SESSION_RESPONSE)
   })

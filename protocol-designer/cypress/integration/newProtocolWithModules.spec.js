@@ -18,9 +18,6 @@ const tempDeckBlockWithExtraSpace = 'Temp Deck Block '
 const magenticDeckWellWithExtraSpace = 'Mag Deck Well '
 
 describe('Protocols with Modules', () => {
-  beforeEach(() => {
-    cy.viewport('macbook-15')
-  })
   before(() => {
     cy.visit('/')
     cy.closeAnnouncementModal()

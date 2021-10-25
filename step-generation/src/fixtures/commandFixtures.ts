@@ -7,7 +7,7 @@ import type {
   TouchTipParams,
 } from '@opentrons/shared-data/protocol/types/schemaV3'
 import { FIXED_TRASH_ID } from '../constants'
-import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
+import type { Command } from '@opentrons/shared-data/protocol/types/schemaV5Addendum'
 import type { CommandsAndWarnings, CommandCreatorErrorResponse } from '../types'
 
 /** Used to wrap command creators in tests, effectively casting their results
