@@ -14,6 +14,7 @@ interface StepSizeControlProps {
   stepSizes: StepSize[]
   currentStepSize: StepSize
   setCurrentStepSize: (stepSize: StepSize) => void
+  //  TODO: remove this prop after all primary buttons are changed to blue in the next gen app work
   isLPC?: boolean
 }
 export function StepSizeControl(props: StepSizeControlProps): JSX.Element {

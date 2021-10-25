@@ -136,7 +136,7 @@ export const LabwarePositionCheckStepDetail = (
               stepSizes={[0.1, 1, 10]}
               planes={[HORIZONTAL_PLANE, VERTICAL_PLANE]}
               width="100%"
-              buttonColor={C_BLUE}
+              directionControlButtonColor={C_BLUE}
               isLPC={true}
             />
           ) : (

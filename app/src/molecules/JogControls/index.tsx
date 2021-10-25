@@ -25,7 +25,8 @@ export interface JogControlsProps extends StyleProps {
   planes?: Plane[]
   stepSizes?: StepSize[]
   auxiliaryControl?: React.ReactNode | null
-  buttonColor?: string
+  directionControlButtonColor?: string
+  //  TODO: remove this prop after all primary buttons are changed to blue in the next gen app work
   isLPC?: boolean
 }
 
@@ -61,7 +62,7 @@ export function JogControls(props: JogControlsProps): JSX.Element {
           plane={plane}
           jog={jog}
           stepSize={currentStepSize}
-          buttonColor={props.buttonColor}
+          buttonColor={props.directionControlButtonColor}
         />
       ))}
       {auxiliaryControl}
