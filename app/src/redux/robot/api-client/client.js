@@ -45,6 +45,8 @@ export function client(dispatch) {
     switch (type) {
       case 'robot:CONNECT':
         return connect(state, action)
+      case 'robot:LEGACY_CONNECT':
+        return legacyConnect(state, action)
       case 'robot:DISCONNECT':
         return disconnect(state, action)
       case 'protocol:UPLOAD':
@@ -90,7 +92,8 @@ export function client(dispatch) {
     }
   }
 
-  function connect(state, action) {
+  // legacyConnect sets up the RPC client
+  function legacyConnect(state, action) {
     if (selectors.getConnectRequest(state).inProgress) return
     if (rpcClient) disconnect()
 
@@ -134,6 +137,21 @@ export function client(dispatch) {
         )
       })
       .catch(e => dispatch(actions.connectResponse(e)))
+  }
+  // connect's main purpose is to promote a discovered robot to a connected robot (client only)
+  function connect(state, action) {
+    if (selectors.getConnectRequest(state).inProgress) return
+
+    const name = action.payload.name
+    const target = find(getConnectableRobots(state), { name })
+
+    if (!target) {
+      return dispatch(
+        actions.connectResponse(new Error(`Robot "${name}" not found`))
+      )
+    }
+
+    dispatch(actions.connectResponse(null))
   }
 
   function disconnect() {

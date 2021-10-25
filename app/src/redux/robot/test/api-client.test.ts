@@ -117,7 +117,7 @@ describe('api client', () => {
   } as any
 
   const sendConnect = (): Promise<unknown> =>
-    sendToClient(STATE, actions.connect(ROBOT_NAME))
+    sendToClient(STATE, actions.legacyConnect(ROBOT_NAME))
 
   const sendDisconnect = (): Promise<unknown> =>
     sendToClient(STATE, actions.disconnect())
@@ -231,7 +231,7 @@ describe('api client', () => {
         },
       } as any
 
-      return sendToClient(state, actions.connect(ROBOT_NAME)).then(() => {
+      return sendToClient(state, actions.legacyConnect(ROBOT_NAME)).then(() => {
         expect(RpcClient).toHaveBeenCalledTimes(0)
       })
     })

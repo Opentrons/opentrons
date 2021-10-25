@@ -19,6 +19,7 @@ import {
 } from '@opentrons/components'
 import { CONNECTABLE } from '../../../redux/discovery'
 import { LabeledValue } from '../../../atoms/structure'
+import { useFeatureFlag } from '../../../redux/config'
 
 import type { Dispatch } from '../../../redux/types'
 import type { ViewableRobot } from '../../../redux/discovery/types'
@@ -47,11 +48,17 @@ export function StatusCard(props: Props): JSX.Element {
     status = sessionStatus
   }
 
+  const isUploadWithoutRPC = useFeatureFlag('preProtocolFlowWithoutRPC')
+
+  const connect = isUploadWithoutRPC
+    ? robotActions.connect
+    : robotActions.legacyConnect
+
   const handleClick: React.MouseEventHandler = () => {
     if (connected) {
       dispatch(robotActions.disconnect())
     } else {
-      dispatch(robotActions.connect(robot.name))
+      dispatch(connect(robot.name))
     }
   }
 
