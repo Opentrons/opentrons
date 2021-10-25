@@ -19,7 +19,7 @@ describe('robot reducer - connection', () => {
     })
   })
 
-  it('handles CONNECT action', () => {
+  it('handles LEGACY_CONNECT action', () => {
     const state: RobotState = {
       connection: {
         connectedTo: null,
@@ -42,7 +42,30 @@ describe('robot reducer - connection', () => {
     })
   })
 
-  it('handles CONNECT action if connect already in flight', () => {
+  it('handles CONNECT action', () => {
+    const state: RobotState = {
+      connection: {
+        connectedTo: null,
+        connectRequest: {
+          inProgress: false,
+          error: new Error('AH'),
+          name: '',
+        },
+      },
+    } as any
+    const action: Action = {
+      type: 'robot:CONNECT',
+      payload: { name: 'ot' },
+      meta: {} as any,
+    }
+
+    expect(getState(reducer(state, action))).toEqual({
+      connectedTo: null,
+      connectRequest: { inProgress: true, error: null, name: 'ot' },
+    })
+  })
+
+  it('handles LEGACY_CONNECT action if connect already in flight', () => {
     const state: RobotState = {
       connection: {
         connectedTo: null,
@@ -55,6 +78,29 @@ describe('robot reducer - connection', () => {
     } as any
     const action: Action = {
       type: 'robot:LEGACY_CONNECT',
+      payload: { name: 'someone-else' },
+      meta: {} as any,
+    }
+
+    expect(getState(reducer(state, action))).toEqual({
+      connectedTo: null,
+      connectRequest: { inProgress: true, error: null, name: 'ot' },
+    })
+  })
+
+  it('handles CONNECT action if connect already in flight', () => {
+    const state: RobotState = {
+      connection: {
+        connectedTo: null,
+        connectRequest: {
+          inProgress: true,
+          error: null,
+          name: 'ot',
+        },
+      },
+    } as any
+    const action: Action = {
+      type: 'robot:CONNECT',
       payload: { name: 'someone-else' },
       meta: {} as any,
     }

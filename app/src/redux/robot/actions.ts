@@ -285,7 +285,6 @@ export const actionTypes = {
   CANCEL_RESPONSE: 'robot:CANCEL_RESPONSE',
 } as const
 
-// TODO(mc, 2018-01-23): NEW ACTION TYPES GO HERE
 export type Action =
   | LegacyConnectAction
   | ConnectAction
