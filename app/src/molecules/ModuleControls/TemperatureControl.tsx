@@ -19,6 +19,7 @@ import {
 import { Portal } from '../../App/portal'
 import { THERMOCYCLER_MODULE_TYPE } from '../../redux/modules'
 import { getModuleDisplayName } from '@opentrons/shared-data'
+import { useFeatureFlag } from '../../redux/config'
 
 import type {
   ThermocyclerModule,
@@ -44,6 +45,7 @@ export const TemperatureControl = ({
   sendModuleCommand,
   disabledReason,
 }: Props): JSX.Element => {
+  const isNewProtocolRunPanel = useFeatureFlag('preProtocolFlowWithoutRPC')
   const [tempValue, setTempValue] = React.useState<string | null>(null)
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false)
   const [targetProps, tooltipProps] = useHoverTooltip()
@@ -107,7 +109,9 @@ export const TemperatureControl = ({
                 onClick: handleCancel,
               },
               {
-                children: 'Set temp',
+                children: isNewProtocolRunPanel
+                  ? 'Set temperature'
+                  : 'Set temp',
                 disabled: tempValue == null,
                 onClick: handleSubmitTemp,
               },
@@ -135,17 +139,32 @@ export const TemperatureControl = ({
           </AlertModal>
         </Portal>
       )}
-      <SecondaryBtn
-        paddingX={SPACING_2}
-        width={'11rem'}
-        onClick={handleClick}
-        disabled={disabledReason != null}
-        {...targetProps}
-      >
-        {hasTarget === true
-          ? `Deactivate${modulePartName}`
-          : `Set${modulePartName} Temp`}
-      </SecondaryBtn>
+      {isNewProtocolRunPanel ? (
+        <SecondaryBtn
+          paddingX={SPACING_2}
+          width={'11rem'}
+          onClick={handleClick}
+          disabled={disabledReason != null}
+          {...targetProps}
+          fontSize={'0.790rem'}
+        >
+          {hasTarget === true
+            ? `Deactivate${modulePartName}`
+            : `Set${modulePartName} Temp`}
+        </SecondaryBtn>
+      ) : (
+        <SecondaryBtn
+          paddingX={SPACING_2}
+          width={'11rem'}
+          onClick={handleClick}
+          disabled={disabledReason != null}
+          {...targetProps}
+        >
+          {hasTarget === true
+            ? `Deactivate${modulePartName}`
+            : `Set${modulePartName} Temp`}
+        </SecondaryBtn>
+      )}
       {disabledReason && <Tooltip {...tooltipProps}>{disabledReason}</Tooltip>}
     </Flex>
   )

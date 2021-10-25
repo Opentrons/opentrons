@@ -1,10 +1,22 @@
 import * as React from 'react'
-import { screen, render } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import { when } from 'jest-when'
 import { StatusCard } from '../StatusCard'
+import { renderWithProviders } from '@opentrons/components'
+import { useFeatureFlag } from '../../../../../redux/config'
+
+jest.mock('../../../../../redux/config')
+
+const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
+  typeof useFeatureFlag
+>
 
 describe('StatusCard headers', () => {
   it('should render StatusCard Header', () => {
-    render(
+    when(mockUseFeatureFlag)
+      .calledWith('preProtocolFlowWithoutRPC')
+      .mockReturnValue(false)
+    renderWithProviders(
       <StatusCard
         header={'1'}
         title={'Magnetic Module GEN 2'}
@@ -16,7 +28,10 @@ describe('StatusCard headers', () => {
   })
 
   it('should NOT render StatusCard header', () => {
-    render(
+    when(mockUseFeatureFlag)
+      .calledWith('preProtocolFlowWithoutRPC')
+      .mockReturnValue(false)
+    renderWithProviders(
       <StatusCard
         title={'Thermocycler Module'}
         isCardExpanded={false}
