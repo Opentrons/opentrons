@@ -43,36 +43,41 @@ class ModuleListener:
         """
         self._client = client
         self._notify_method = notify_method
+        self._hub_index = 1
 
     async def run(self) -> None:
         """Run the listener."""
         while True:
             m = await self._client.read()
-            await self.message_to_notify(message=m, notify_method=self._notify_method)
+            await self.handle_message(message=m)
 
-    @staticmethod
-    async def message_to_notify(message: Message, notify_method: NotifyMethod) -> None:
+    async def handle_message(self, message: Message) -> None:
         """Call callback with results of message.
 
         Args:
             message: Message object from module server
-            notify_method: callback method
 
         Returns:
             None
         """
+        def _next_index() -> int:
+            index = self._hub_index
+            self._hub_index += 1
+            return index
+
         connections = [
             ModuleAtPort(
                 port=c.url,
                 name=c.module_type,
-                usb_port=USBPort(name=c.identifier, sub_names=[]),
+                usb_port=USBPort(name=c.identifier, sub_names=[], hub=_next_index()),
             )
             for c in message.connections
         ]
         if message.status == "connected" or message.status == "dump":
-            await notify_method(connections, [])
+            await self._notify_method(connections, [])
         elif message.status == "disconnected":
-            await notify_method([], connections)
+            await self._notify_method([], connections)
+
 
 
 async def wait_emulators(

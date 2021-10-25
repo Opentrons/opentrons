@@ -33,7 +33,7 @@ class AttachedModulesControl:
         self._api = api
         self._usb = (
             usb.USBBus(board_revision)
-            if not api.is_simulator
+            if not api.is_simulator and IS_ROBOT
             else usb_simulator.USBBusSimulator(board_revision)
         )
 

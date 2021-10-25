@@ -42,6 +42,7 @@ class ModuleServerClient:
         for i in range(retries):
             try:
                 r, w = await asyncio.open_connection(host=host, port=port)
+                break
             except OSError:
                 await asyncio.sleep(interval_seconds)
 

@@ -3,7 +3,8 @@ from typing import List
 import pytest
 from mock import AsyncMock
 from opentrons.drivers.rpi_drivers.types import USBPort
-from opentrons.hardware_control.emulation.module_server import helpers
+from opentrons.hardware_control.emulation.module_server import helpers, \
+    ModuleServerClient
 from opentrons.hardware_control.emulation.module_server import models
 from opentrons.hardware_control.modules import ModuleAtPort
 
@@ -12,6 +13,18 @@ from opentrons.hardware_control.modules import ModuleAtPort
 def mock_callback() -> AsyncMock:
     """Callback mock."""
     return AsyncMock(spec=helpers.NotifyMethod)
+
+
+@pytest.fixture
+def mock_client() -> AsyncMock:
+    """Mock client."""
+    return AsyncMock(spec=ModuleServerClient)
+
+
+@pytest.fixture
+def subject(mock_callback: AsyncMock, mock_client: AsyncMock) -> helpers.ModuleListener:
+    """Test subject."""
+    return helpers.ModuleListener(client=mock_client, notify_method=mock_callback)
 
 
 @pytest.fixture
@@ -32,112 +45,118 @@ def modules_at_port() -> List[ModuleAtPort]:
         ModuleAtPort(
             port=f"url{i}",
             name=f"module_type{i}",
-            usb_port=USBPort(name=f"identifier{i}", sub_names=[]),
+            usb_port=USBPort(name=f"identifier{i}", sub_names=[], hub=i),
         )
         for i in range(5)
     ]
 
 
-async def test_message_to_notify_connected_empty(mock_callback: AsyncMock) -> None:
+async def test_handle_message_connected_empty(subject: helpers.ModuleListener, mock_callback: AsyncMock) -> None:
     """It should call the call back with the correct modules to add."""
     message = models.Message(status="connected", connections=[])
-    await helpers.ModuleListener.message_to_notify(
-        message=message, notify_method=mock_callback
+    await subject.handle_message(
+        message=message
     )
     mock_callback.assert_called_once_with([], [])
 
 
-async def test_message_to_notify_connected_one(
+async def test_handle_message_connected_one(
+    subject: helpers.ModuleListener,
     mock_callback: AsyncMock,
     connections: List[models.Connection],
     modules_at_port: List[ModuleAtPort],
 ) -> None:
     """It should call the call back with the correct modules to add."""
     message = models.Message(status="connected", connections=connections[:1])
-    await helpers.ModuleListener.message_to_notify(
-        message=message, notify_method=mock_callback
+    await subject.handle_message(
+        message=message
     )
     mock_callback.assert_called_once_with(modules_at_port[:1], [])
 
 
-async def test_message_to_notify_connected_many(
+async def test_handle_message_connected_many(
+    subject: helpers.ModuleListener,
     mock_callback: AsyncMock,
     connections: List[models.Connection],
     modules_at_port: List[ModuleAtPort],
 ) -> None:
     """It should call the call back with the correct modules to add."""
     message = models.Message(status="connected", connections=connections)
-    await helpers.ModuleListener.message_to_notify(
-        message=message, notify_method=mock_callback
+    await subject.handle_message(
+        message=message
     )
     mock_callback.assert_called_once_with(modules_at_port, [])
 
 
-async def test_message_to_notify_disconnected_empty(mock_callback: AsyncMock) -> None:
+async def test_handle_message_disconnected_empty(subject: helpers.ModuleListener, mock_callback: AsyncMock) -> None:
     """It should call the call back with the correct modules to remove."""
     message = models.Message(status="disconnected", connections=[])
-    await helpers.ModuleListener.message_to_notify(
-        message=message, notify_method=mock_callback
+    await subject.handle_message(
+        message=message
     )
     mock_callback.assert_called_once_with([], [])
 
 
-async def test_message_to_notify_disconnected_one(
+async def test_handle_message_disconnected_one(
+    subject: helpers.ModuleListener,
     mock_callback: AsyncMock,
     connections: List[models.Connection],
     modules_at_port: List[ModuleAtPort],
 ) -> None:
     """It should call the call back with the correct modules to remove."""
     message = models.Message(status="disconnected", connections=connections[:1])
-    await helpers.ModuleListener.message_to_notify(
-        message=message, notify_method=mock_callback
+    await subject.handle_message(
+        message=message
     )
     mock_callback.assert_called_once_with([], modules_at_port[:1])
 
 
-async def test_message_to_notify_disconnected_many(
+async def test_handle_message_disconnected_many(
+    subject: helpers.ModuleListener,
     mock_callback: AsyncMock,
     connections: List[models.Connection],
     modules_at_port: List[ModuleAtPort],
 ) -> None:
     """It should call the call back with the correct modules to remove."""
     message = models.Message(status="disconnected", connections=connections)
-    await helpers.ModuleListener.message_to_notify(
-        message=message, notify_method=mock_callback
+    await subject.handle_message(
+        message=message
     )
     mock_callback.assert_called_once_with([], modules_at_port)
 
 
-async def test_message_to_notify_dump_empty(mock_callback: AsyncMock) -> None:
+async def test_handle_message_dump_empty(subject: helpers.ModuleListener, mock_callback: AsyncMock) -> None:
     """It should call the call back with the correct modules to load."""
     message = models.Message(status="dump", connections=[])
-    await helpers.ModuleListener.message_to_notify(
-        message=message, notify_method=mock_callback
+    await subject.handle_message(
+        message=message
     )
     mock_callback.assert_called_once_with([], [])
 
 
-async def test_message_to_notify_dump_one(
+async def test_handle_message_dump_one(
+    subject: helpers.ModuleListener,
     mock_callback: AsyncMock,
     connections: List[models.Connection],
     modules_at_port: List[ModuleAtPort],
 ) -> None:
     """It should call the call back with the correct modules to load."""
     message = models.Message(status="dump", connections=connections[:1])
-    await helpers.ModuleListener.message_to_notify(
-        message=message, notify_method=mock_callback
+    await subject.handle_message(
+        message=message
     )
     mock_callback.assert_called_once_with(modules_at_port[:1], [])
 
 
-async def test_message_to_notify_dump_many(
+async def test_handle_message_dump_many(
+    subject: helpers.ModuleListener,
     mock_callback: AsyncMock,
     connections: List[models.Connection],
     modules_at_port: List[ModuleAtPort],
 ) -> None:
     """It should call the call back with the correct modules to load."""
     message = models.Message(status="dump", connections=connections)
-    await helpers.ModuleListener.message_to_notify(
-        message=message, notify_method=mock_callback
+    await subject.handle_message(
+        message=message
     )
     mock_callback.assert_called_once_with(modules_at_port, [])

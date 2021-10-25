@@ -29,7 +29,7 @@ class ModuleServerSettings(BaseModel):
     """Settings for the module server"""
 
     host: str = "0.0.0.0"
-    port: int = 8888
+    port: int = 8989
 
 
 class Settings(BaseSettings):

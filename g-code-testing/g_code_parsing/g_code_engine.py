@@ -62,14 +62,14 @@ class GCodeEngine:
     @staticmethod
     def _start_emulation_app(emulator_settings: Settings) -> Process:
         """Start emulated OT-2"""
-        modules = [ModuleType.Thermocycler, ModuleType.Magnetic, ModuleType.Temperature]
+        modules = [ModuleType.Magnetic, ModuleType.Temperature, ModuleType.Thermocycler]
 
-        def runit():
+        def _run_app():
             asyncio.run(
                 run_app.run(emulator_settings, modules=[m.value for m in modules])
             )
 
-        proc = Process(target=runit)
+        proc = Process(target=_run_app)
         proc.daemon = True
         proc.start()
 
@@ -80,9 +80,13 @@ class GCodeEngine:
             await wait_emulators(client=c, modules=modules, timeout=5)
             c.close()
 
-        proc2 = Process(target=lambda: asyncio.run(_wait_ready()))
-        proc2.start()
-        proc2.join()
+        def _run_wait_ready():
+            asyncio.run(_wait_ready())
+
+        ready_proc = Process(target=_run_wait_ready)
+        ready_proc.daemon = True
+        ready_proc.start()
+        ready_proc.join()
 
         return proc
 
