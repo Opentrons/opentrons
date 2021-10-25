@@ -130,12 +130,18 @@ export function useLabwarePositionCheck(
             host as HostConfig,
             basicSession.id,
             createCommandData(nextCommand)
-          ).then(response => {
-            const commandId = response.data.data.id
-            setPendingCommandId(commandId)
-            // incremement currentCommandIndex by 2 since we've executed 2 commands
-            setCurrentCommandIndex(currentCommandIndex + 2)
-          })
+          )
+            .then(response => {
+              const commandId = response.data.data.id
+              setPendingCommandId(commandId)
+              // incremement currentCommandIndex by 2 since we've executed 2 commands
+              setCurrentCommandIndex(currentCommandIndex + 2)
+            })
+            .catch((e: Error) => {
+              console.error(`error issuing command to robot: ${e.message}`)
+              setIsLoading(false)
+              setError(e)
+            })
         }
         setPendingCommandId(commandId)
         console.log('incrementing command index')
@@ -154,7 +160,7 @@ export function useLabwarePositionCheck(
       data: {
         // @ts-expect-error TODO IMMEDIATELY: add pipette id to top level command object
         pipetteId: currentCommand.params.pipetteId,
-        distance: step,
+        distance: step * dir,
         axis,
       },
     }
