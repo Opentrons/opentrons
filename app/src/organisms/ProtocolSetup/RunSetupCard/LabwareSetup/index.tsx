@@ -55,7 +55,6 @@ export const LabwareSetup = (): JSX.Element | null => {
   const moduleRenderInfoById = useModuleRenderInfoById()
   const labwareRenderInfoById = useLabwareRenderInfoById()
   const connectedRobotIp = useSelector(getConnectedRobot)?.ip ?? ''
-  console.log('connectedRobotIp: ', connectedRobotIp)
   const { t } = useTranslation('protocol_setup')
   const [
     showLabwareHelpModal,

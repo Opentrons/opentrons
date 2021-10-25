@@ -33,5 +33,6 @@
   "confirm_position_and_move": "Confirm position, move to Slot {{next_slot}}",
   "confirm_position_and_pick_up_tip": "Confirm position, pickup tip",
   "confirm_position_and_return_tip": "Confirm position, return tip to Slot {{next_slot}}",
-  "close_and_apply_offset_data": "Close and apply labware offset data"
+  "close_and_apply_offset_data": "Close and apply labware offset data",
+  "error_modal_header": "Something went wrong"
 }
