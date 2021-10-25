@@ -3,12 +3,14 @@ export const RUN_TYPE_PROTOCOL: 'protocol' = 'protocol'
 
 export type RunType = typeof RUN_TYPE_BASIC | typeof RUN_TYPE_PROTOCOL
 
+// TODO(bc, 2021-10-25): flesh out the real BasicRun model once api settles
 interface BasicRun {
   id: string
   runType: typeof RUN_TYPE_BASIC
   createParams: Record<string, unknown>
 }
 
+// TODO(bc, 2021-10-25): flesh out the real ProtocolRun model once api settles
 interface ProtocolRun {
   id: string
   runType: typeof RUN_TYPE_PROTOCOL
