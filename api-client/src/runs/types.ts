@@ -1,17 +1,17 @@
 export const RUN_TYPE_BASIC: 'basic' = 'basic'
 export const RUN_TYPE_PROTOCOL: 'protocol' = 'protocol'
 
-export type RunType = typeof RUN_TYPE_BASIC | typeof RUN_TYPE_BASIC
+export type RunType = typeof RUN_TYPE_BASIC | typeof RUN_TYPE_PROTOCOL
 
 interface BasicRun {
   id: string
-  sessionType: typeof RUN_TYPE_BASIC
+  runType: typeof RUN_TYPE_BASIC
   createParams: Record<string, unknown>
 }
 
 interface ProtocolRun {
   id: string
-  sessionType: typeof RUN_TYPE_PROTOCOL
+  runType: typeof RUN_TYPE_PROTOCOL
   createParams: Record<string, unknown>
 }
 

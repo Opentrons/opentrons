@@ -17,8 +17,8 @@ const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 const SESSIONS_RESPONSE = {
   data: [
-    { sessionType: 'basic', id: '1' },
-    { sessionType: 'basic', id: '2' },
+    { sessionType: 'deckCalibration', id: '1' },
+    { sessionType: 'tipLengthCalibration', id: '2' },
   ],
 } as Sessions
 
