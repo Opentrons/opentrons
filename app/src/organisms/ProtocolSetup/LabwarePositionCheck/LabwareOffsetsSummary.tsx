@@ -1,3 +1,4 @@
+import * as React from 'react'
 import {
   Box,
   C_DISABLED,
@@ -14,7 +15,6 @@ import {
   Text,
   TEXT_TRANSFORM_UPPERCASE,
 } from '@opentrons/components'
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 const getOffsetDataInfo = (): Array<{

@@ -2,12 +2,12 @@ import * as React from 'react'
 import { when } from 'jest-when'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
+import { useProtocolDetails } from '../../../RunDetails/hooks'
 import { SectionList } from '../SectionList'
 import { DeckMap } from '../DeckMap'
 import { SummaryScreen } from '../SummaryScreen'
 import { LabwareOffsetsSummary } from '../LabwareOffsetsSummary'
 import { useIntroInfo } from '../hooks'
-import { useProtocolDetails } from '../../../RunDetails/hooks'
 import { Section } from '../types'
 
 jest.mock('../SectionList')

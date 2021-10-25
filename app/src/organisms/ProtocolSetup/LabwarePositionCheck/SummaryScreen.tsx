@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   ALIGN_START,
   Box,
@@ -14,12 +15,11 @@ import {
   Text,
   TEXT_TRANSFORM_UPPERCASE,
 } from '@opentrons/components'
-import { useTranslation } from 'react-i18next'
+import { useProtocolDetails } from '../../RunDetails/hooks'
 import { DeckMap } from './DeckMap'
 import { SectionList } from './SectionList'
 import { LabwareOffsetsSummary } from './LabwareOffsetsSummary'
 import { useIntroInfo } from './hooks'
-import { useProtocolDetails } from '../../RunDetails/hooks'
 
 export const SummaryScreen = (): JSX.Element | null => {
   const { t } = useTranslation('labware_position_check')
