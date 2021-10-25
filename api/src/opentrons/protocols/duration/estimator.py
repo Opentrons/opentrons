@@ -165,6 +165,10 @@ class DurationEstimator:
             duration = self.on_thermocycler_deactivate_lid(payload=payload)
         elif message_name == types.THERMOCYCLER_OPEN:
             duration = self.on_thermocycler_lid_open(payload=payload)
+        elif message_name == types.MAGDECK_ENGAGE:
+            duration = self.on_magdeck_engage(payload=payload)
+        elif message_name == types.MAGDECK_DISENGAGE:
+            duration = self.on_magdeck_disengage(payload=payload)
         elif message_name == types.MOVE_TO:
             duration = self.on_move_to(payload=payload)
         elif message_name == types.TRANSFER:
@@ -197,6 +201,7 @@ class DurationEstimator:
         # Set up 
 
         instrument = payload["instrument"]
+        instrument[]
         # now lets handle the aspiration z-axis code.
         location = payload["location"]
         prev_slot = self._last_deckslot
@@ -265,7 +270,6 @@ class DurationEstimator:
         # let's only log the message after the pick up tip is done.
         logger.info(f"{instrument.name}, drop tip duration is {duration}")
         return duration
-
 
     def on_aspirate(self, payload) -> float:
         # General aspiration code
@@ -364,7 +368,19 @@ class DurationEstimator:
         duration = seconds_delay + minutes_delay * 60
         # Note will need to multiply minutes by 60
         logger.info(f"delay for {seconds_delay} seconds and {minutes_delay} minutes")
+        return duration
 
+    def on_magdeck_engage(self, payload) -> float:
+        # Approximating ~1 second
+        duration = 1
+        logger.info("Magnetic Module Engaging")
+        return duration
+
+    def on_magdeck_disengage(self, payload) -> float:
+        # Approximating ~1 second
+        duration = 1
+        thermoaction = "closing"
+        logger.info("Magnetic Module Disengaging")
         return duration
 
     def on_thermocycler_block_temp(self, payload) -> float:
