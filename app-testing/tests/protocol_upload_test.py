@@ -18,6 +18,7 @@ from src.pages.deck_calibrate import DeckCalibration
 from src.pages.module_setup import ModuleSetup
 from src.pages.labware_setup import LabwareSetup
 from src.menus.robots_list import RobotsList
+from src.pages.moam_pur import MoamPur
 from src.menus.protocol_file import ProtocolFile
 from src.driver.drag_drop import drag_and_drop_file
 
@@ -128,4 +129,63 @@ def test_protocol_upload(
         assert labware_setup.get_thermocycler_module_modal_text().is_displayed()
         labware_setup.click_close_button()
         labware_setup.click_proceed_to_run_button()
-        time.sleep(2)
+
+
+def test_moam_pur(
+    chrome_options: Options,
+    test_protocols: Dict[str, Path],
+    request: FixtureRequest,
+) -> None:
+    """Upload a protocol."""
+    robot = OtRobot()
+    # expecting docker emulated robot
+    assert robot.is_alive(), "is a robot available?"
+    os.environ["OT_APP_DISCOVERY__CANDIDATES"] = "localhost"
+    os.environ["OT_APP_ANALYTICS__SEEN_OPT_IN"] = "true"
+    with webdriver.Chrome(options=chrome_options) as driver:
+        logger.debug(f"driver capabilities {driver.capabilities}")
+        ot_application = OtApplication(
+            Path(f"{driver.capabilities['chrome']['userDataDir']}/config.json")
+        )
+        # ignore updates
+        ot_application.config["alerts"]["ignored"] = ["appUpdateAvailable"]
+        ot_application.write_config()
+        robots_list = RobotsList(driver)
+        if not robots_list.is_robot_toggle_active(RobotsList.DEV):
+            robots_list.get_robot_toggle(RobotsList.DEV).click()
+        left_menu = LeftMenu(driver)
+        left_menu.click_more_button()
+        protocol_upload = ProtocolUpload(driver)
+        protocol_upload.click_app_left_panel()
+        protocol_upload.click_enable_developer_toggle()
+        protocol_upload.click_enable_pur_feature()
+        protocol_upload.goto_robots_page()
+        # Instantiate the page object for the RobotsList.
+        robots_list = RobotsList(driver)
+        # toggle the DEV robot
+        if not robots_list.is_robot_toggle_active(RobotsList.DEV):
+            robots_list.get_robot_toggle(RobotsList.DEV).click()
+        # calibrate
+        robot_page = RobotPage(driver)
+        left_menu = LeftMenu(driver)
+        left_menu.click_protocol_upload_button()
+        protocol_file = ProtocolFile(driver)
+        logger.info(f"uploading protocol: {test_protocols['moamjson'].resolve()}")
+        input = protocol_file.get_drag_json_protocol()
+        drag_and_drop_file(input, test_protocols["moamjson"])
+        robot_calibrate = RobotCalibration(driver)
+        robot_calibrate.click_robot_calibration()
+        moam_pur = MoamPur(driver)
+        assert (
+            moam_pur.get_organization_author_text().text == "Organization/Author\nAA BB"
+        )
+        assert moam_pur.get_description_text().text == "Description\nModule - PUR"
+        # Verify that the Pipette missing text is available
+        assert moam_pur.get_attach_pipette_button().is_displayed()
+        module_setup = ModuleSetup(driver)
+        module_setup.click_module_setup_text()
+        assert moam_pur.get_moam_link().is_displayed()
+        moam_pur.click_moam_link()
+        assert moam_pur.get_moam_modal_text().is_displayed()
+        labware_setup = LabwareSetup(driver)
+        labware_setup.click_close_button()

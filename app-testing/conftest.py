@@ -51,4 +51,8 @@ def test_protocols() -> Dict[str, Path]:
             Path(__file__).resolve().parent,
             "files/protocol/python1/upload_protocol.json",
         ),
+        "moamjson": Path(
+            Path(__file__).resolve().parent,
+            "files/protocol/python1/moam_pur.json",
+        ),
     }

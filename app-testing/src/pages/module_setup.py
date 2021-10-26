@@ -94,3 +94,6 @@ class ModuleSetup:
 
     def click_proceed_to_module_setup(self) -> None:
         self.get_proceed_to_module_setup().click()
+
+    def click_module_setup_text(self) -> None:
+        self.get_module_setup_text_locator().click()
