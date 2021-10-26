@@ -2,8 +2,8 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   ALIGN_START,
-  Box,
   C_BLUE,
+  DIRECTION_COLUMN,
   Flex,
   FONT_WEIGHT_SEMIBOLD,
   JUSTIFY_CENTER,
@@ -30,7 +30,7 @@ export const SummaryScreen = (): JSX.Element | null => {
   const { sections, primaryPipetteMount, secondaryPipetteMount } = introInfo
 
   return (
-    <Box margin={SPACING_3}>
+    <Flex margin={SPACING_3} flexDirection={DIRECTION_COLUMN}>
       <Text
         as={'h3'}
         textTransform={TEXT_TRANSFORM_UPPERCASE}
@@ -40,25 +40,20 @@ export const SummaryScreen = (): JSX.Element | null => {
       >
         {t('lpc_complete_summary_screen_heading')}
       </Text>
-      <Flex
-        justifyContent={JUSTIFY_START}
-        alignItems={ALIGN_START}
-        marginLeft="-2.5rem" // TODO remove negative margin when fixing SectionList marginLeft
-      >
-        <Box width="50%">
+      <Flex justifyContent={JUSTIFY_START} alignItems={ALIGN_START}>
+        <Flex flex={'1 1 40%'} flexDirection={DIRECTION_COLUMN}>
           <SectionList
             primaryPipetteMount={primaryPipetteMount}
             secondaryPipetteMount={secondaryPipetteMount}
             sections={sections}
             completedSections={sections}
           />
-          <Flex justifyContent={JUSTIFY_CENTER}>
-            <DeckMap completedLabwareIdSections={labwareIds} />
-          </Flex>
-        </Box>
-        <Box width="80%" height="100%" marginRight={SPACING_4}>
+
+          <DeckMap completedLabwareIdSections={labwareIds} />
+        </Flex>
+        <Flex flex={'1 1 80%'} marginRight={SPACING_4}>
           <LabwareOffsetsSummary />
-        </Box>
+        </Flex>
       </Flex>
       <Flex justifyContent={JUSTIFY_CENTER} marginBottom={SPACING_4}>
         <PrimaryBtn
@@ -68,6 +63,6 @@ export const SummaryScreen = (): JSX.Element | null => {
           {t('close_and_apply_offset_data')}
         </PrimaryBtn>
       </Flex>
-    </Box>
+    </Flex>
   )
 }

@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  Box,
   C_DISABLED,
   C_NEAR_WHITE,
   DIRECTION_COLUMN,
@@ -71,7 +70,11 @@ export const LabwareOffsetsSummary = (): JSX.Element | null => {
           {t('labware_offsets_summary_title')}
         </Text>
         <Flex flexDirection={DIRECTION_ROW} justifyContent={JUSTIFY_CENTER}>
-          <Box width="30%" justifyContent={JUSTIFY_CENTER}>
+          <Flex
+            flex={'1 1 30%'}
+            flexDirection={DIRECTION_COLUMN}
+            justifyContent={JUSTIFY_CENTER}
+          >
             <Text
               textTransform={TEXT_TRANSFORM_UPPERCASE}
               marginBottom={SPACING_3}
@@ -82,17 +85,21 @@ export const LabwareOffsetsSummary = (): JSX.Element | null => {
             </Text>
             {getOffsetDataInfo().map(({ location }) => {
               return (
-                <Box
+                <Flex
                   key={location}
                   marginBottom={SPACING_3}
                   css={FONT_BODY_1_DARK}
                 >
                   {location}
-                </Box>
+                </Flex>
               )
             })}
-          </Box>
-          <Box width="40%" justifyContent={JUSTIFY_CENTER}>
+          </Flex>
+          <Flex
+            flex={'1 1 40%'}
+            flexDirection={DIRECTION_COLUMN}
+            justifyContent={JUSTIFY_CENTER}
+          >
             <Text
               textTransform={TEXT_TRANSFORM_UPPERCASE}
               marginBottom={SPACING_3}
@@ -112,8 +119,12 @@ export const LabwareOffsetsSummary = (): JSX.Element | null => {
                 </Flex>
               )
             })}
-          </Box>
-          <Box width="30%" justifyContent={JUSTIFY_CENTER}>
+          </Flex>
+          <Flex
+            flex={'1 1 30%'}
+            flexDirection={DIRECTION_COLUMN}
+            justifyContent={JUSTIFY_CENTER}
+          >
             <Text
               textTransform={TEXT_TRANSFORM_UPPERCASE}
               marginBottom={SPACING_3}
@@ -154,7 +165,7 @@ export const LabwareOffsetsSummary = (): JSX.Element | null => {
                 </Flex>
               )
             })}
-          </Box>
+          </Flex>
         </Flex>
       </Flex>
     </React.Fragment>

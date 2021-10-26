@@ -16,6 +16,7 @@ import {
   SPACING_3,
   SPACING_4,
   FONT_SIZE_BODY_2,
+  SPACING_6,
 } from '@opentrons/components'
 import { SectionList } from './SectionList'
 import { DeckMap } from './DeckMap'
@@ -63,12 +64,14 @@ export const IntroScreen = (props: {
         }}
       ></Trans>
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_CENTER}>
-        <SectionList
-          sections={sections}
-          currentSection={currentSection}
-          primaryPipetteMount={primaryPipetteMount}
-          secondaryPipetteMount={secondaryPipetteMount}
-        />
+        <Flex marginLeft={SPACING_6}>
+          <SectionList
+            sections={sections}
+            currentSection={currentSection}
+            primaryPipetteMount={primaryPipetteMount}
+            secondaryPipetteMount={secondaryPipetteMount}
+          />
+        </Flex>
         <Box width="60%" padding={SPACING_3}>
           <DeckMap labwareIdsToHighlight={labwareIdsToHighlight} />
         </Box>
