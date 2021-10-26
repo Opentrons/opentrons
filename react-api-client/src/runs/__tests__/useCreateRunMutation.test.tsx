@@ -3,39 +3,38 @@ import { when, resetAllWhenMocks } from 'jest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { act, renderHook } from '@testing-library/react-hooks'
 import {
-  createSession,
-  CreateSessionData,
-  SESSION_TYPE_DECK_CALIBRATION,
+  createRun,
+  CreateRunData,
+  RUN_TYPE_BASIC,
+  RUN_TYPE_PROTOCOL,
 } from '@opentrons/api-client'
 import { useHost } from '../../api'
-import { useCreateSessionMutation } from '..'
+import { useCreateRunMutation } from '..'
 
-import type { HostConfig, Response, Session } from '@opentrons/api-client'
+import type { HostConfig, Response, Run } from '@opentrons/api-client'
 
 jest.mock('@opentrons/api-client')
 jest.mock('../../api/useHost')
 
-const mockCreateSession = createSession as jest.MockedFunction<
-  typeof createSession
->
+const mockCreateRun = createRun as jest.MockedFunction<typeof createRun>
 const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
 
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
-const SESSION_ID = '1'
-const SESSION_RESPONSE = {
-  data: { sessionType: SESSION_TYPE_DECK_CALIBRATION, id: SESSION_ID },
-} as Session
+const RUN_ID = '1'
+const RUN_RESPONSE = {
+  data: { runType: RUN_TYPE_PROTOCOL, id: RUN_ID },
+} as Run
 
-describe('useCreateSessionMutation hook', () => {
+describe('useCreateRunMutation hook', () => {
   let wrapper: React.FunctionComponent<{}>
-  let createSessionData = {} as CreateSessionData
+  let createRunData = {} as CreateRunData
 
   beforeEach(() => {
     const queryClient = new QueryClient()
     const clientProvider: React.FunctionComponent<{}> = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
-    createSessionData = { sessionType: SESSION_TYPE_DECK_CALIBRATION }
+    createRunData = { runType: RUN_TYPE_BASIC }
 
     wrapper = clientProvider
   })
@@ -43,21 +42,21 @@ describe('useCreateSessionMutation hook', () => {
     resetAllWhenMocks()
   })
 
-  it('should return no data when calling createSession if the request fails', async () => {
+  it('should return no data when calling createRun if the request fails', async () => {
     when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
-    when(mockCreateSession)
-      .calledWith(HOST_CONFIG, createSessionData)
+    when(mockCreateRun)
+      .calledWith(HOST_CONFIG, createRunData)
       .mockRejectedValue('oh no')
 
     const { result, waitFor } = renderHook(
-      () => useCreateSessionMutation(createSessionData),
+      () => useCreateRunMutation(createRunData),
       {
         wrapper,
       }
     )
 
     expect(result.current.data).toBeUndefined()
-    result.current.createSession()
+    result.current.createRun()
     await waitFor(() => {
       console.log(result.current.status)
       return result.current.status !== 'loading'
@@ -65,22 +64,22 @@ describe('useCreateSessionMutation hook', () => {
     expect(result.current.data).toBeUndefined()
   })
 
-  it('should create a session when calling the createSession callback', async () => {
+  it('should create a run when calling the createRun callback', async () => {
     when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
-    when(mockCreateSession)
-      .calledWith(HOST_CONFIG, createSessionData)
-      .mockResolvedValue({ data: SESSION_RESPONSE } as Response<Session>)
+    when(mockCreateRun)
+      .calledWith(HOST_CONFIG, createRunData)
+      .mockResolvedValue({ data: RUN_RESPONSE } as Response<Run>)
 
     const { result, waitFor } = renderHook(
-      () => useCreateSessionMutation(createSessionData),
+      () => useCreateRunMutation(createRunData),
       {
         wrapper,
       }
     )
-    act(() => result.current.createSession())
+    act(() => result.current.createRun())
 
     await waitFor(() => result.current.data != null)
 
-    expect(result.current.data).toEqual(SESSION_RESPONSE)
+    expect(result.current.data).toEqual(RUN_RESPONSE)
   })
 })

@@ -2,25 +2,25 @@ import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { renderHook } from '@testing-library/react-hooks'
-import { getSession } from '@opentrons/api-client'
+import { getRun, RUN_TYPE_BASIC } from '@opentrons/api-client'
 import { useHost } from '../../api'
-import { useSessionQuery } from '..'
+import { useRunQuery } from '..'
 
-import type { HostConfig, Response, Session } from '@opentrons/api-client'
+import type { HostConfig, Response, Run } from '@opentrons/api-client'
 
 jest.mock('@opentrons/api-client')
 jest.mock('../../api/useHost')
 
-const mockGetSession = getSession as jest.MockedFunction<typeof getSession>
+const mockGetRun = getRun as jest.MockedFunction<typeof getRun>
 const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
 
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
-const SESSION_ID = '1'
-const SESSION_RESPONSE = {
-  data: { sessionType: 'deckCalibration', id: SESSION_ID },
-} as Session
+const RUN_ID = '1'
+const RUN_RESPONSE = {
+  data: { runType: RUN_TYPE_BASIC, id: RUN_ID },
+} as Run
 
-describe('useSessionQuery hook', () => {
+describe('useRunQuery hook', () => {
   let wrapper: React.FunctionComponent<{}>
 
   beforeEach(() => {
@@ -38,37 +38,35 @@ describe('useSessionQuery hook', () => {
   it('should return no data if no host', () => {
     when(mockUseHost).calledWith().mockReturnValue(null)
 
-    const { result } = renderHook(() => useSessionQuery(SESSION_ID), {
+    const { result } = renderHook(() => useRunQuery(RUN_ID), {
       wrapper,
     })
 
     expect(result.current.data).toBeUndefined()
   })
 
-  it('should return no data if the get sessions request fails', () => {
+  it('should return no data if the get runs request fails', () => {
     when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
-    when(mockGetSession)
-      .calledWith(HOST_CONFIG, SESSION_ID)
-      .mockRejectedValue('oh no')
+    when(mockGetRun).calledWith(HOST_CONFIG, RUN_ID).mockRejectedValue('oh no')
 
-    const { result } = renderHook(() => useSessionQuery(SESSION_ID), {
+    const { result } = renderHook(() => useRunQuery(RUN_ID), {
       wrapper,
     })
     expect(result.current.data).toBeUndefined()
   })
 
-  it('should return a session', async () => {
+  it('should return a run', async () => {
     when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
-    when(mockGetSession)
-      .calledWith(HOST_CONFIG, SESSION_ID)
-      .mockResolvedValue({ data: SESSION_RESPONSE } as Response<Session>)
+    when(mockGetRun)
+      .calledWith(HOST_CONFIG, RUN_ID)
+      .mockResolvedValue({ data: RUN_RESPONSE } as Response<Run>)
 
-    const { result, waitFor } = renderHook(() => useSessionQuery(SESSION_ID), {
+    const { result, waitFor } = renderHook(() => useRunQuery(RUN_ID), {
       wrapper,
     })
 
     await waitFor(() => result.current.data != null)
 
-    expect(result.current.data).toEqual(SESSION_RESPONSE)
+    expect(result.current.data).toEqual(RUN_RESPONSE)
   })
 })
