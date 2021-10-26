@@ -20,9 +20,9 @@ from robot_server.sessions.run_models import (
 )
 from robot_server.sessions.engine_store import EngineStore
 from robot_server.sessions.router.commands_router import (
-    post_session_command,
-    get_session_command,
-    get_session_commands,
+    post_run_command,
+    get_run_command,
+    get_run_commands,
 )
 
 
@@ -43,9 +43,8 @@ async def test_post_session_command(decoy: Decoy, engine_store: EngineStore) -> 
         output_command
     )
 
-    response = await post_session_command(
-        request_body=RequestModel(data=command_request), engine_store=engine_store
-    )
+    response = await post_run_command(request_body=RequestModel(data=command_request),
+                                      engine_store=engine_store)
 
     assert response.data == output_command
 
@@ -70,7 +69,7 @@ async def test_get_session_commands() -> None:
         )
     )
 
-    response = await get_session_commands(session=session_response)
+    response = await get_run_commands(session=session_response)
 
     assert response.data == [command_summary]
 
@@ -91,9 +90,7 @@ async def test_get_session_command_by_id(
         command
     )
 
-    response = await get_session_command(
-        commandId="command-id", engine_store=engine_store
-    )
+    response = await get_run_command(commandId="command-id", engine_store=engine_store)
 
     assert response.data == command
 
@@ -110,6 +107,6 @@ async def test_get_session_command_missing_command(
     )
 
     with pytest.raises(ApiError) as exc_info:
-        await get_session_command(commandId="command-id", engine_store=engine_store)
+        await get_run_command(commandId="command-id", engine_store=engine_store)
     assert exc_info.value.status_code == 404
     assert exc_info.value.content["errors"][0]["detail"] == "oh no"

@@ -29,7 +29,7 @@ class CommandNotFound(ErrorDetails):
 
 # todo(mm, 2021-09-23): Should this accept a list of commands, instead of just one?
 @commands_router.post(
-    path="/sessions/{sessionId}/commands",
+    path="/runs/{runId}/commands",
     summary="Enqueue a protocol command",
     description=(
         "Add a single protocol command to the session. "
@@ -41,7 +41,7 @@ class CommandNotFound(ErrorDetails):
         status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[RunNotFound]},
     },
 )
-async def post_session_command(
+async def post_run_command(
     request_body: RequestModel[pe_commands.CommandRequest],
     engine_store: EngineStore = Depends(get_engine_store),
     session: ResponseModel[Run] = Depends(get_run),
@@ -62,7 +62,7 @@ async def post_session_command(
 
 
 @commands_router.get(
-    path="/sessions/{sessionId}/commands",
+    path="/runs/{runId}/commands",
     summary="Get a list of all protocol commands in the session",
     description=(
         "Get a list of all commands in the session and their statuses. "
@@ -76,7 +76,7 @@ async def post_session_command(
         status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[RunNotFound]},
     },
 )
-async def get_session_commands(
+async def get_run_commands(
     session: ResponseModel[Run] = Depends(get_run),
 ) -> MultiResponseModel[RunCommandSummary]:
     """Get a summary of all commands in a session.
@@ -89,7 +89,7 @@ async def get_session_commands(
 
 
 @commands_router.get(
-    path="/sessions/{sessionId}/commands/{commandId}",
+    path="/runs/{runId}/commands/{commandId}",
     summary="Get full details about a specific command in the session",
     description=(
         "Get a command along with any associated payload, result, and "
@@ -106,7 +106,7 @@ async def get_session_commands(
         },
     },
 )
-async def get_session_command(
+async def get_run_command(
     commandId: str,
     engine_store: EngineStore = Depends(get_engine_store),
     session: ResponseModel[Run] = Depends(get_run),

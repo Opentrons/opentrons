@@ -219,7 +219,7 @@ async def get_run(
     response_model=EmptyResponseModel,
     responses={status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[RunNotFound]}},
 )
-async def remove_session_by_id(
+async def remove_run_by_id(
     runId: str,
     session_store: RunStore = Depends(get_run_store),
     engine_store: EngineStore = Depends(get_engine_store),
