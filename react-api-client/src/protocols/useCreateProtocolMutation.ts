@@ -1,4 +1,9 @@
-import { UseMutationResult, useMutation, UseMutateFunction } from 'react-query'
+import {
+  UseMutationResult,
+  useMutation,
+  UseMutateFunction,
+  useQueryClient,
+} from 'react-query'
 import { createProtocol } from '@opentrons/api-client'
 import { useHost } from '../api'
 import type { HostConfig, Protocol } from '@opentrons/api-client'
@@ -15,10 +20,14 @@ export function useCreateProtocolMutation(
   protocolFiles: File[]
 ): UseCreateProtocolMutationResult {
   const host = useHost()
-  const mutation = useMutation<Protocol, unknown>(['protocols', host], () =>
-    createProtocol(host as HostConfig, protocolFiles).then(
-      response => response.data
-    )
+  const queryClient = useQueryClient()
+
+  const mutation = useMutation<Protocol, unknown>([host, 'protocols'], () =>
+    createProtocol(host as HostConfig, protocolFiles).then(response => {
+      const protocolId = response.data.data.id
+      queryClient.setQueryData([host, 'protocols', protocolId], response.data)
+      return response.data
+    })
   )
   return {
     ...mutation,

@@ -20,17 +20,17 @@ const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 const PROTOCOLS_RESPONSE = {
   data: [
     {
-      protocolType: 'json',
-      createdAt: 'now',
       id: '1',
-      metaData: {},
+      createdAt: 'now',
+      protocolType: 'json',
+      metadata: {},
       analyses: {},
     },
     {
-      protocolType: 'python',
-      createdAt: 'now',
       id: '2',
-      metaData: {},
+      createdAt: 'now',
+      protocolType: 'python',
+      metadata: {},
       analyses: {},
     },
   ],
@@ -73,11 +73,9 @@ describe('useAllProtocolsQuery hook', () => {
       .calledWith(HOST_CONFIG)
       .mockResolvedValue({ data: PROTOCOLS_RESPONSE } as Response<Protocols>)
 
-    const { result } = renderHook(useAllProtocolsQuery, { wrapper })
-    // TODO: remove this hack and replace with waitFor after we update to React v16.14
-    await new Promise(resolve => {
-      setImmediate(resolve)
-    })
+    const { result, waitFor } = renderHook(useAllProtocolsQuery, { wrapper })
+
+    await waitFor(() => result.current.data != null)
 
     expect(result.current.data).toEqual(PROTOCOLS_RESPONSE)
   })

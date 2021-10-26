@@ -5,12 +5,12 @@ import type { Protocol } from './types'
 
 export function createProtocol(
   config: HostConfig,
-  protocolFiles: File[]
+  files: File[]
 ): ResponsePromise<Protocol> {
-  return request<Protocol, { protocolFiles: File[] }>(
+  return request<Protocol, { files: File[] }>(
     POST,
     '/protocols',
-    { protocolFiles },
+    { files },
     config
   )
 }

@@ -1,5 +1,5 @@
-import type { PipetteName } from '@opentrons/shared-data'
-import type { ResourceLinks } from '../types'
+import type { PipetteName, Command } from '@opentrons/shared-data'
+import type { ResourceLinks, ErrorDetails } from '../types'
 
 export interface LoadedPipette {
   id: string
@@ -11,7 +11,7 @@ export interface LoadedLabware {
   id: string
   loadName: string
   definitionUri: string
-  deckSlotLocation: {
+  location: {
     slot: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
   }
 }
@@ -19,11 +19,11 @@ export interface LoadedLabware {
 export interface ProtocolMetadata {
   protocolName?: string
   author?: string
-  description?: string | null | undefined
+  description?: string | null
   created?: number
-  lastModified?: number | null | undefined
-  category?: string | null | undefined
-  subcategory?: string | null | undefined
+  lastModified?: number | null
+  category?: string | null
+  subcategory?: string | null
   tags?: string[]
   [key: string]: unknown
 }
@@ -39,8 +39,7 @@ export interface CompletedProtocolAnalysis {
   result: 'ok' | 'not-ok' | 'error'
   pipettes: LoadedPipette[]
   labware: LoadedLabware[]
-  // TODO: replace with v6 Command type after that PR clears
-  commands: {}
+  commands: Command[]
   errors: string[]
 }
 
@@ -67,33 +66,12 @@ export interface EmptyResponse {
   data: null
 }
 
-export interface ErrorDetails {
-  id?: 'ProtocolNotFound' | 'ProtocolFileInvalid'
-  title?: string
-  detail: string
-  source?: {
-    pointer: string
-    parameter: string
-    header: string
-  }
+export interface ProtocolFileInvalid extends ErrorDetails {
+  id: 'ProtocolFileInvalid'
   meta: ProtocolMetadata
 }
 
-export interface ValidationError {
-  loc: string[]
-  msg: string
-  type: string
-}
-
-export interface ProtocolFileInvalid {
-  id: string
-}
-
-export interface ErrorResponse {
-  links?: ResourceLinks
-  errors: ErrorDetails[]
-}
-
-export interface ValidationErrorResponse {
-  detail: ValidationError[]
+export interface ProtocolNotFound extends ErrorDetails {
+  id: 'ProtocolNotFound'
+  meta: ProtocolMetadata
 }

@@ -6,7 +6,7 @@ import type { HostConfig, Protocol } from '@opentrons/api-client'
 export function useProtocolQuery(protocolId: string): UseQueryResult<Protocol> {
   const host = useHost()
   const query = useQuery(
-    ['protocols', host],
+    [host, 'protocols', protocolId],
     () =>
       getProtocol(host as HostConfig, protocolId).then(
         response => response.data
