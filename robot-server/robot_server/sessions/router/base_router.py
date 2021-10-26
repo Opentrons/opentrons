@@ -23,65 +23,65 @@ from robot_server.protocols import (
     get_protocol_store,
 )
 
-from ..session_store import SessionStore, SessionNotFoundError
-from ..session_view import SessionView
-from ..session_models import Session, ProtocolSessionCreateData
-from ..schema_models import CreateSessionRequest, SessionResponse
+from ..run_store import RunStore, RunNotFoundError
+from ..run_view import RunView
+from ..run_models import Run, ProtocolRunCreateData
+from ..schema_models import CreateRunRequest, RunResponse
 from ..engine_store import EngineStore, EngineConflictError, EngineMissingError
-from ..dependencies import get_session_store, get_engine_store
+from ..dependencies import get_run_store, get_engine_store
 
 base_router = APIRouter()
 
 
-class SessionNotFound(ErrorDetails):
+class RunNotFound(ErrorDetails):
     """An error if a given session is not found."""
 
-    id: Literal["SessionNotFound"] = "SessionNotFound"
+    id: Literal["RunNotFound"] = "RunNotFound"
     title: str = "Session Not Found"
 
 
 # TODO(mc, 2021-05-28): evaluate multi-session logic
-class SessionAlreadyActive(ErrorDetails):
+class RunAlreadyActive(ErrorDetails):
     """An error if one tries to create a new session while one is already active."""
 
-    id: Literal["SessionAlreadyActive"] = "SessionAlreadyActive"
+    id: Literal["RunAlreadyActive"] = "RunAlreadyActive"
     title: str = "Session Already Active"
 
 
-class SessionRunning(ErrorDetails):
+class RunNotIdle(ErrorDetails):
     """An error if one tries to delete a session that is running."""
 
-    id: Literal["SessionRunning"] = "SessionRunning"
-    title: str = "Session Running"
+    id: Literal["RunNotIdle"] = "RunNotIdle"
+    title: str = "Run is not idle."
     detail: str = (
-        "Session is currently running. Allow the session to finish or"
+        "Run is currently active. Allow the run to finish or"
         " stop it with a `stop` action before attempting to delete it."
     )
 
 
 @base_router.post(
-    path="/sessions",
-    summary="Create a session",
-    description="Create a new session to track robot interaction.",
+    path="/runs",
+    summary="Create a run",
+    description="Create a new run to track robot interaction.",
     status_code=status.HTTP_201_CREATED,
     # TODO(mc, 2021-06-23): mypy >= 0.780 broke Unions as `response_model`
     # see https://github.com/tiangolo/fastapi/issues/2279
-    response_model=SessionResponse,  # type: ignore[arg-type]
+    response_model=RunResponse,  # type: ignore[arg-type]
     responses={
         status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[ProtocolNotFound]},
-        status.HTTP_409_CONFLICT: {"model": ErrorResponse[SessionAlreadyActive]},
+        status.HTTP_409_CONFLICT: {"model": ErrorResponse[RunAlreadyActive]},
     },
 )
-async def create_session(
-    request_body: Optional[CreateSessionRequest] = None,
-    session_view: SessionView = Depends(SessionView),
-    session_store: SessionStore = Depends(get_session_store),
+async def create_run(
+    request_body: Optional[CreateRunRequest] = None,
+    session_view: RunView = Depends(RunView),
+    session_store: RunStore = Depends(get_run_store),
     engine_store: EngineStore = Depends(get_engine_store),
     protocol_store: ProtocolStore = Depends(get_protocol_store),
     session_id: str = Depends(get_unique_id),
     created_at: datetime = Depends(get_current_time),
     task_runner: TaskRunner = Depends(TaskRunner),
-) -> ResponseModel[Session]:
+) -> ResponseModel[Run]:
     """Create a new session.
 
     Arguments:
@@ -102,7 +102,7 @@ async def create_session(
     )
     protocol_id = None
 
-    if isinstance(create_data, ProtocolSessionCreateData):
+    if isinstance(create_data, ProtocolRunCreateData):
         protocol_id = create_data.createParams.protocolId
 
     try:
@@ -120,7 +120,7 @@ async def create_session(
         raise ProtocolNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
 
     except EngineConflictError as e:
-        raise SessionAlreadyActive(detail=str(e)).as_error(status.HTTP_409_CONFLICT)
+        raise RunAlreadyActive(detail=str(e)).as_error(status.HTTP_409_CONFLICT)
 
     session_store.upsert(session=session)
 
@@ -136,18 +136,18 @@ async def create_session(
 
 
 @base_router.get(
-    path="/sessions",
-    summary="Get all sessions",
-    description="Get a list of all active and inactive sessions.",
+    path="/runs",
+    summary="Get all runs",
+    description="Get a list of all active and inactive runs.",
     status_code=status.HTTP_200_OK,
-    response_model=MultiResponseModel[Session],
+    response_model=MultiResponseModel[Run],
 )
-async def get_sessions(
-    session_view: SessionView = Depends(SessionView),
-    session_store: SessionStore = Depends(get_session_store),
+async def get_runs(
+    session_view: RunView = Depends(RunView),
+    session_store: RunStore = Depends(get_run_store),
     engine_store: EngineStore = Depends(get_engine_store),
-) -> MultiResponseModel[Session]:
-    """Get all sessions.
+) -> MultiResponseModel[Run]:
+    """Get all runs.
 
     Args:
         session_view: Session model construction interface.
@@ -172,33 +172,33 @@ async def get_sessions(
 
 
 @base_router.get(
-    path="/sessions/{sessionId}",
-    summary="Get a session",
-    description="Get a specific session by its unique identifier.",
+    path="/runs/{runId}",
+    summary="Get a run",
+    description="Get a specific run by its unique identifier.",
     status_code=status.HTTP_200_OK,
     # TODO(mc, 2021-06-23): mypy >= 0.780 broke Unions as `response_model`
     # see https://github.com/tiangolo/fastapi/issues/2279
-    response_model=SessionResponse,  # type: ignore[arg-type]
-    responses={status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[SessionNotFound]}},
+    response_model=RunResponse,  # type: ignore[arg-type]
+    responses={status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[RunNotFound]}},
 )
-async def get_session(
-    sessionId: str,
-    session_view: SessionView = Depends(SessionView),
-    session_store: SessionStore = Depends(get_session_store),
+async def get_run(
+    runId: str,
+    session_view: RunView = Depends(RunView),
+    session_store: RunStore = Depends(get_run_store),
     engine_store: EngineStore = Depends(get_engine_store),
-) -> ResponseModel[Session]:
-    """Get a session by its ID.
+) -> ResponseModel[Run]:
+    """Get a run by its ID.
 
     Args:
-        sessionId: Session ID pulled from URL.
+        runId: Run ID pulled from URL.
         session_view: Session model construction interface.
         session_store: Session storage interface.
         engine_store: ProtocolEngine storage and control.
     """
     try:
-        session = session_store.get(session_id=sessionId)
-    except SessionNotFoundError as e:
-        raise SessionNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
+        session = session_store.get(session_id=runId)
+    except RunNotFoundError as e:
+        raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
 
     data = session_view.as_response(
         session=session,
@@ -212,35 +212,35 @@ async def get_session(
 
 
 @base_router.delete(
-    path="/sessions/{sessionId}",
+    path="/runs/{runId}",
     summary="Delete a session",
     description="Delete a specific session by its unique identifier.",
     status_code=status.HTTP_200_OK,
     response_model=EmptyResponseModel,
-    responses={status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[SessionNotFound]}},
+    responses={status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[RunNotFound]}},
 )
 async def remove_session_by_id(
-    sessionId: str,
-    session_store: SessionStore = Depends(get_session_store),
+    runId: str,
+    session_store: RunStore = Depends(get_run_store),
     engine_store: EngineStore = Depends(get_engine_store),
 ) -> EmptyResponseModel:
     """Delete a session by its ID.
 
     Arguments:
-        sessionId: Session ID pulled from URL.
+        runId: Session ID pulled from URL.
         session_store: Session storage interface.
         engine_store: ProtocolEngine storage and control.
     """
     try:
         if not engine_store.engine.state_view.commands.get_is_stopped():
-            raise SessionRunning().as_error(status.HTTP_409_CONFLICT)
+            raise RunNotIdle().as_error(status.HTTP_409_CONFLICT)
     except EngineMissingError:
         pass
 
     try:
         engine_store.clear()
-        session_store.remove(session_id=sessionId)
-    except SessionNotFoundError as e:
-        raise SessionNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
+        session_store.remove(session_id=runId)
+    except RunNotFoundError as e:
+        raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
 
     return EmptyResponseModel()

@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field
 from robot_server.service.json_api import ResourceModel
 
 
-class SessionActionType(str, Enum):
+class RunActionType(str, Enum):
     """Types of session control actions."""
 
     PLAY = "play"
@@ -14,16 +14,16 @@ class SessionActionType(str, Enum):
     STOP = "stop"
 
 
-class SessionActionCreateData(BaseModel):
+class RunActionCreateData(BaseModel):
     """Request model for new control action creation."""
 
-    actionType: SessionActionType
+    actionType: RunActionType
 
 
-class SessionAction(ResourceModel):
+class RunAction(ResourceModel):
     """Session control action model.
 
-    A SessionAction resource represents a client-provided command to
+    A RunAction resource represents a client-provided command to
     the session in order to control the execution of the session itself.
 
     This is different than a protocol command, which represents an individual
@@ -32,7 +32,7 @@ class SessionAction(ResourceModel):
 
     id: str = Field(..., description="A unique identifier to reference the command.")
     createdAt: datetime = Field(..., description="When the command was created.")
-    actionType: SessionActionType = Field(
+    actionType: RunActionType = Field(
         ...,
         description="Specific type of action, which determines behavior.",
     )

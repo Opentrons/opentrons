@@ -12,20 +12,20 @@ from typing import Union
 from robot_server.service.json_api import RequestModel, ResponseModel
 
 
-from .session_models import (
-    BasicSessionCreateData,
-    ProtocolSessionCreateData,
-    BasicSession,
-    ProtocolSession,
+from .run_models import (
+    BasicRunCreateData,
+    ProtocolRunCreateData,
+    BasicRun,
+    ProtocolRun,
 )
 
 
-CreateSessionRequest = Union[
-    RequestModel[BasicSessionCreateData],
-    RequestModel[ProtocolSessionCreateData],
+CreateRunRequest = Union[
+    RequestModel[BasicRunCreateData],
+    RequestModel[ProtocolRunCreateData],
 ]
 
-SessionResponse = Union[
-    ResponseModel[BasicSession],
-    ResponseModel[ProtocolSession],
+RunResponse = Union[
+    ResponseModel[BasicRun],
+    ResponseModel[ProtocolRun],
 ]

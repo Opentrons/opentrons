@@ -12,10 +12,10 @@ from robot_server.service.json_api import (
     MultiResponseModel,
 )
 
-from ..session_models import Session, SessionCommandSummary
+from ..run_models import Run, RunCommandSummary
 from ..engine_store import EngineStore
 from ..dependencies import get_engine_store
-from .base_router import SessionNotFound, get_session
+from .base_router import RunNotFound, get_run
 
 commands_router = APIRouter()
 
@@ -38,13 +38,13 @@ class CommandNotFound(ErrorDetails):
     status_code=status.HTTP_200_OK,
     response_model=ResponseModel[pe_commands.Command],
     responses={
-        status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[SessionNotFound]},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[RunNotFound]},
     },
 )
 async def post_session_command(
     request_body: RequestModel[pe_commands.CommandRequest],
     engine_store: EngineStore = Depends(get_engine_store),
-    session: ResponseModel[Session] = Depends(get_session),
+    session: ResponseModel[Run] = Depends(get_run),
 ) -> ResponseModel[pe_commands.Command]:
     """Enqueue a protocol command.
 
@@ -71,14 +71,14 @@ async def post_session_command(
         "information available for a given command."
     ),
     status_code=status.HTTP_200_OK,
-    response_model=MultiResponseModel[SessionCommandSummary],
+    response_model=MultiResponseModel[RunCommandSummary],
     responses={
-        status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[SessionNotFound]},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[RunNotFound]},
     },
 )
 async def get_session_commands(
-    session: ResponseModel[Session] = Depends(get_session),
-) -> MultiResponseModel[SessionCommandSummary]:
+    session: ResponseModel[Run] = Depends(get_run),
+) -> MultiResponseModel[RunCommandSummary]:
     """Get a summary of all commands in a session.
 
     Arguments:
@@ -100,7 +100,7 @@ async def get_session_commands(
     responses={
         status.HTTP_404_NOT_FOUND: {
             "model": Union[
-                ErrorResponse[SessionNotFound],
+                ErrorResponse[RunNotFound],
                 ErrorResponse[CommandNotFound],
             ]
         },
@@ -109,7 +109,7 @@ async def get_session_commands(
 async def get_session_command(
     commandId: str,
     engine_store: EngineStore = Depends(get_engine_store),
-    session: ResponseModel[Session] = Depends(get_session),
+    session: ResponseModel[Run] = Depends(get_run),
 ) -> ResponseModel[pe_commands.Command]:
     """Get a specific command from a session.
 

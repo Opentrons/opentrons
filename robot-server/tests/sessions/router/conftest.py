@@ -12,10 +12,10 @@ from robot_server.errors import exception_handlers
 from robot_server.service.dependencies import get_current_time, get_unique_id
 from robot_server.service.task_runner import TaskRunner
 from robot_server.protocols import ProtocolStore, get_protocol_store
-from robot_server.sessions.session_view import SessionView
-from robot_server.sessions.session_store import SessionStore
+from robot_server.sessions.run_view import RunView
+from robot_server.sessions.run_store import RunStore
 from robot_server.sessions.engine_store import EngineStore
-from robot_server.sessions.dependencies import get_session_store, get_engine_store
+from robot_server.sessions.dependencies import get_run_store, get_engine_store
 
 
 @pytest.fixture
@@ -31,15 +31,15 @@ def protocol_store(decoy: Decoy) -> ProtocolStore:
 
 
 @pytest.fixture
-def session_store(decoy: Decoy) -> SessionStore:
-    """Get a mock SessionStore interface."""
-    return decoy.mock(cls=SessionStore)
+def session_store(decoy: Decoy) -> RunStore:
+    """Get a mock RunStore interface."""
+    return decoy.mock(cls=RunStore)
 
 
 @pytest.fixture
-def session_view(decoy: Decoy) -> SessionView:
-    """Get a mock SessionView interface."""
-    return decoy.mock(cls=SessionView)
+def session_view(decoy: Decoy) -> RunView:
+    """Get a mock RunView interface."""
+    return decoy.mock(cls=RunView)
 
 
 @pytest.fixture
@@ -51,8 +51,8 @@ def engine_store(decoy: Decoy) -> EngineStore:
 @pytest.fixture
 def app(
     task_runner: TaskRunner,
-    session_store: SessionStore,
-    session_view: SessionView,
+    session_store: RunStore,
+    session_view: RunView,
     engine_store: EngineStore,
     protocol_store: ProtocolStore,
     unique_id: str,
@@ -61,8 +61,8 @@ def app(
     """Get a FastAPI app with mocked-out dependencies."""
     app = FastAPI(exception_handlers=exception_handlers)
     app.dependency_overrides[TaskRunner] = lambda: task_runner
-    app.dependency_overrides[SessionView] = lambda: session_view
-    app.dependency_overrides[get_session_store] = lambda: session_store
+    app.dependency_overrides[RunView] = lambda: session_view
+    app.dependency_overrides[get_run_store] = lambda: session_store
     app.dependency_overrides[get_engine_store] = lambda: engine_store
     app.dependency_overrides[get_protocol_store] = lambda: protocol_store
     app.dependency_overrides[get_unique_id] = lambda: unique_id

@@ -3,12 +3,12 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Dict, List
 
-from .session_models import SessionCreateData
-from .action_models import SessionAction
+from .run_models import RunCreateData
+from .action_models import RunAction
 
 
 @dataclass(frozen=True)
-class SessionResource:
+class RunResource:
     """An entry in the session store, used to construct response models.
 
     This represents all session state that cannot be derived from another
@@ -16,28 +16,28 @@ class SessionResource:
     """
 
     session_id: str
-    create_data: SessionCreateData
+    create_data: RunCreateData
     created_at: datetime
-    actions: List[SessionAction]
+    actions: List[RunAction]
 
 
-class SessionNotFoundError(ValueError):
-    """Error raised when a given session ID is not found in the store."""
+class RunNotFoundError(ValueError):
+    """Error raised when a given Run ID is not found in the store."""
 
     def __init__(self, session_id: str) -> None:
         """Initialize the error message from the missing ID."""
-        super().__init__(f"Session {session_id} was not found.")
+        super().__init__(f"Run {session_id} was not found.")
 
 
-class SessionStore:
-    """Methods for storing and retrieving session resources."""
+class RunStore:
+    """Methods for storing and retrieving run resources."""
 
     def __init__(self) -> None:
-        """Initialize a SessionStore and its in-memory storage."""
-        self._sessions_by_id: Dict[str, SessionResource] = {}
+        """Initialize a RunStore and its in-memory storage."""
+        self._sessions_by_id: Dict[str, RunResource] = {}
 
-    def upsert(self, session: SessionResource) -> SessionResource:
-        """Insert or update a session resource in the store.
+    def upsert(self, session: RunResource) -> RunResource:
+        """Insert or update a run resource in the store.
 
         Arguments:
             session: Session resource to store. Reads `session.id` to
@@ -50,7 +50,7 @@ class SessionStore:
 
         return session
 
-    def get(self, session_id: str) -> SessionResource:
+    def get(self, session_id: str) -> RunResource:
         """Get a specific session entry by its identifier.
 
         Arguments:
@@ -62,9 +62,9 @@ class SessionStore:
         try:
             return self._sessions_by_id[session_id]
         except KeyError as e:
-            raise SessionNotFoundError(session_id) from e
+            raise RunNotFoundError(session_id) from e
 
-    def get_all(self) -> List[SessionResource]:
+    def get_all(self) -> List[RunResource]:
         """Get all known session resources.
 
         Returns:
@@ -72,7 +72,7 @@ class SessionStore:
         """
         return list(self._sessions_by_id.values())
 
-    def remove(self, session_id: str) -> SessionResource:
+    def remove(self, session_id: str) -> RunResource:
         """Remove a session by its unique identifier.
 
         Arguments:
@@ -82,9 +82,9 @@ class SessionStore:
             The session entry that was deleted.
 
         Raises:
-            SessionNotFoundError: The specified session ID was not found.
+            RunNotFoundError: The specified session ID was not found.
         """
         try:
             return self._sessions_by_id.pop(session_id)
         except KeyError as e:
-            raise SessionNotFoundError(session_id) from e
+            raise RunNotFoundError(session_id) from e

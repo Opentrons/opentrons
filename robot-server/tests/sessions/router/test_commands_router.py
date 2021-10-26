@@ -13,10 +13,10 @@ from opentrons.protocol_engine import (
 
 from robot_server.errors import ApiError
 from robot_server.service.json_api import RequestModel, ResponseModel
-from robot_server.sessions.session_models import (
-    Session,
-    BasicSession,
-    SessionCommandSummary,
+from robot_server.sessions.run_models import (
+    Run,
+    BasicRun,
+    RunCommandSummary,
 )
 from robot_server.sessions.engine_store import EngineStore
 from robot_server.sessions.router.commands_router import (
@@ -52,14 +52,14 @@ async def test_post_session_command(decoy: Decoy, engine_store: EngineStore) -> 
 
 async def test_get_session_commands() -> None:
     """It should return a list of all commands in a session."""
-    command_summary = SessionCommandSummary(
+    command_summary = RunCommandSummary(
         id="command-id",
         commandType="moveToWell",
         status=CommandStatus.RUNNING,
     )
 
-    session_response = ResponseModel[Session](
-        data=BasicSession(
+    session_response = ResponseModel[Run](
+        data=BasicRun(
             id="session-id",
             createdAt=datetime(year=2021, month=1, day=1),
             status=EngineStatus.RUNNING,

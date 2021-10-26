@@ -9,8 +9,8 @@ Examples of "sessions" include:
 - A long running, "default" session to perform one-off actions, like toggling
   the frame lights on
 """
-from .router import sessions_router
+from .router import runs_router
 
 __all__ = [
-    "sessions_router",
+    "runs_router",
 ]

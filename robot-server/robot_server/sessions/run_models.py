@@ -13,20 +13,20 @@ from opentrons.protocol_engine import (
     LoadedLabware,
 )
 from robot_server.service.json_api import ResourceModel
-from .action_models import SessionAction
+from .action_models import RunAction
 
 
-class SessionType(str, Enum):
+class RunType(str, Enum):
     """All available session types."""
 
     BASIC = "basic"
     PROTOCOL = "protocol"
 
 
-class AbstractSessionCreateData(BaseModel):
+class AbstractRunCreateData(BaseModel):
     """Request data sent when creating a session."""
 
-    sessionType: SessionType = Field(
+    runType: RunType = Field(
         ...,
         description="The session type to create.",
     )
@@ -36,7 +36,7 @@ class AbstractSessionCreateData(BaseModel):
     )
 
 
-class SessionCommandSummary(ResourceModel):
+class RunCommandSummary(ResourceModel):
     """A stripped down model of a full Command for usage in a Session response."""
 
     id: str = Field(..., description="Unique command identifier.")
@@ -44,11 +44,11 @@ class SessionCommandSummary(ResourceModel):
     status: CommandStatus = Field(..., description="Execution status of the command.")
 
 
-class AbstractSession(ResourceModel):
+class AbstractRun(ResourceModel):
     """Base session resource model."""
 
     id: str = Field(..., description="Unique session identifier.")
-    sessionType: SessionType = Field(..., description="Specific session type.")
+    runType: RunType = Field(..., description="Specific session type.")
     createdAt: datetime = Field(..., description="When the session was created")
     status: SessionStatus = Field(..., description="Execution status of the session")
     # TODO(mc, 2021-05-25): how hard would it be to rename this field to `config`?
@@ -56,11 +56,11 @@ class AbstractSession(ResourceModel):
         None,
         description="Configuration parameters for the session.",
     )
-    actions: List[SessionAction] = Field(
+    actions: List[RunAction] = Field(
         ...,
         description="Client-initiated session control actions.",
     )
-    commands: List[SessionCommandSummary] = Field(
+    commands: List[RunCommandSummary] = Field(
         ...,
         description="Protocol commands queued, running, or executed for the session.",
     )
@@ -74,19 +74,19 @@ class AbstractSession(ResourceModel):
     )
 
 
-class BasicSessionCreateData(AbstractSessionCreateData):
+class BasicRunCreateData(AbstractRunCreateData):
     """Creation request data for a basic session."""
 
-    sessionType: Literal[SessionType.BASIC] = SessionType.BASIC
+    runType: Literal[RunType.BASIC] = RunType.BASIC
 
 
-class BasicSession(AbstractSession):
+class BasicRun(AbstractRun):
     """A session to execute commands without a previously loaded protocol file."""
 
-    sessionType: Literal[SessionType.BASIC] = SessionType.BASIC
+    runType: Literal[RunType.BASIC] = RunType.BASIC
 
 
-class ProtocolSessionCreateParams(BaseModel):
+class ProtocolRunCreateParams(BaseModel):
     """Creation parameters for a protocol session."""
 
     protocolId: str = Field(
@@ -95,26 +95,26 @@ class ProtocolSessionCreateParams(BaseModel):
     )
 
 
-class ProtocolSessionCreateData(AbstractSessionCreateData):
+class ProtocolRunCreateData(AbstractRunCreateData):
     """Creation request data for a protocol session."""
 
-    sessionType: Literal[SessionType.PROTOCOL] = SessionType.PROTOCOL
-    createParams: ProtocolSessionCreateParams
+    runType: Literal[RunType.PROTOCOL] = RunType.PROTOCOL
+    createParams: ProtocolRunCreateParams
 
 
-class ProtocolSession(AbstractSession):
+class ProtocolRun(AbstractRun):
     """A session to execute commands with a previously loaded protocol file."""
 
-    sessionType: Literal[SessionType.PROTOCOL] = SessionType.PROTOCOL
-    createParams: ProtocolSessionCreateParams
+    runType: Literal[RunType.PROTOCOL] = RunType.PROTOCOL
+    createParams: ProtocolRunCreateParams
 
 
-SessionCreateData = Union[
-    BasicSessionCreateData,
-    ProtocolSessionCreateData,
+RunCreateData = Union[
+    BasicRunCreateData,
+    ProtocolRunCreateData,
 ]
 
-Session = Union[
-    BasicSession,
-    ProtocolSession,
+Run = Union[
+    BasicRun,
+    ProtocolRun,
 ]

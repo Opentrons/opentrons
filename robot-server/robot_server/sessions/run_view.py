@@ -10,20 +10,20 @@ from opentrons.protocol_engine import (
     LoadedPipette,
 )
 
-from .session_store import SessionResource
-from .action_models import SessionAction, SessionActionCreateData
-from .session_models import (
-    Session,
-    SessionCreateData,
-    BasicSession,
-    BasicSessionCreateData,
-    ProtocolSession,
-    ProtocolSessionCreateData,
-    SessionCommandSummary,
+from .run_store import RunResource
+from .action_models import RunAction, RunActionCreateData
+from .run_models import (
+    Run,
+    RunCreateData,
+    BasicRun,
+    BasicRunCreateData,
+    ProtocolRun,
+    ProtocolRunCreateData,
+    RunCommandSummary,
 )
 
 
-class SessionView:
+class RunView:
     """Interface to build session model instances from data.
 
     Resources consumed and returned by this class will be treated as
@@ -34,8 +34,8 @@ class SessionView:
     def as_resource(
         session_id: str,
         created_at: datetime,
-        create_data: Optional[SessionCreateData],
-    ) -> SessionResource:
+        create_data: Optional[RunCreateData],
+    ) -> RunResource:
         """Create a new session resource instance from its create data.
 
         Arguments:
@@ -45,22 +45,22 @@ class SessionView:
 
         Returns:
             The session in its internal resource representation, for use in
-                the `SessionStore` and other classes.
+                the `RunStore` and other classes.
         """
-        return SessionResource(
+        return RunResource(
             session_id=session_id,
             created_at=created_at,
-            create_data=create_data or BasicSessionCreateData(),
+            create_data=create_data or BasicRunCreateData(),
             actions=[],
         )
 
     @staticmethod
     def with_action(
-        session: SessionResource,
+        session: RunResource,
         action_id: str,
-        action_data: SessionActionCreateData,
+        action_data: RunActionCreateData,
         created_at: datetime,
-    ) -> Tuple[SessionAction, SessionResource]:
+    ) -> Tuple[RunAction, RunResource]:
         """Create a new session control action resource instance.
 
         Arguments:
@@ -70,11 +70,11 @@ class SessionView:
             created_at: Resource creation timestamp.
 
         Returns:
-            A tuple of the created SessionAction resource and an
-            updated copy of the passed in SessionResource.
+            A tuple of the created RunAction resource and an
+            updated copy of the passed in RunResource.
 
         """
-        actions = SessionAction(
+        actions = RunAction(
             id=action_id,
             createdAt=created_at,
             actionType=action_data.actionType,
@@ -89,12 +89,12 @@ class SessionView:
 
     @staticmethod
     def as_response(
-        session: SessionResource,
+        session: RunResource,
         commands: List[ProtocolEngineCommand],
         pipettes: List[LoadedPipette],
         labware: List[LoadedLabware],
         engine_status: EngineStatus,
-    ) -> Session:
+    ) -> Run:
         """Transform a session resource into its public response model.
 
         Arguments:
@@ -105,7 +105,7 @@ class SessionView:
         """
         create_data = session.create_data
         command_summaries = [
-            SessionCommandSummary(id=c.id, commandType=c.commandType, status=c.status)
+            RunCommandSummary(id=c.id, commandType=c.commandType, status=c.status)
             for c in commands
         ]
 
@@ -119,11 +119,11 @@ class SessionView:
             "status": engine_status,
         }
 
-        if isinstance(create_data, BasicSessionCreateData):
-            return BasicSession(**response_fields)
+        if isinstance(create_data, BasicRunCreateData):
+            return BasicRun(**response_fields)
 
-        if isinstance(create_data, ProtocolSessionCreateData):
+        if isinstance(create_data, ProtocolRunCreateData):
             response_fields["createParams"] = create_data.createParams
-            return ProtocolSession(**response_fields)
+            return ProtocolRun(**response_fields)
 
         raise ValueError(f"Invalid session resource {session}")
