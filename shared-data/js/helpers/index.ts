@@ -84,7 +84,16 @@ export const toWellName = ({
 }: {
   rowNum: number
   colNum: number
-}): string => String.fromCharCode(rowNum + 65) + (colNum + 1)
+}): string => {
+  const numDupChar = rowNum % 26 == 0 ? Math.ceil(rowNum / 26)+1 : Math.ceil(rowNum / 26)
+  var rowNum = rowNum > 25 ? rowNum % 26 : rowNum
+  var modRowNum = rowNum % 25 < 25 && rowNum > 0 ? rowNum % 25 : rowNum
+  var modRowNum = rowNum % 25 == 0 ? 25 : rowNum
+  var modRowNum = rowNum == 0 ? 0 : rowNum
+  const rowChar = String.fromCharCode(modRowNum + 65)
+  const duppedRowChar = rowChar.repeat(numDupChar > 0 ? numDupChar : 1)
+  return `${duppedRowChar}${colNum+1}`
+}
 
 function _parseWell(well: string): [string, number] {
   const res = well.match(/([A-Z]+)(\d+)/)
