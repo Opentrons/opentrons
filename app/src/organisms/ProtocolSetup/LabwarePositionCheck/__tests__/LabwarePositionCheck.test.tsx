@@ -90,10 +90,6 @@ describe('LabwarePositionCheck', () => {
     getByText('Mock Summary Screen Component')
   })
 
-  // TODO: fix this when LabwarePositionCheck/index is final and the isComplete boolean is final
-  // it('renders LabwarePositionCheck with IntroScreen component', () => {
-  //   mockIntroScreen.mockReturnValue(<div>Mock IntroScreen Component</div>)
-  //   const { getByText } = render(props)
-  //   getByText('Mock IntroScreen Component')
-  // })
+  // TODO: IMMEDIATELY fix this when LabwarePositionCheck/index is final and the isComplete boolean is final
+  it.todo('renders LabwarePositionCheck with IntroScreen component')
 })

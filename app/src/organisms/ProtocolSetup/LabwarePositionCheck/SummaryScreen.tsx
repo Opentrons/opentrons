@@ -4,7 +4,6 @@ import {
   ALIGN_START,
   Box,
   C_BLUE,
-  DIRECTION_COLUMN,
   Flex,
   FONT_WEIGHT_SEMIBOLD,
   JUSTIFY_CENTER,
@@ -41,8 +40,12 @@ export const SummaryScreen = (): JSX.Element | null => {
       >
         {t('lpc_complete_summary_screen_heading')}
       </Text>
-      <Flex justifyContent={JUSTIFY_START} alignItems={ALIGN_START}>
-        <Box width="50%" flexDirection={DIRECTION_COLUMN}>
+      <Flex
+        justifyContent={JUSTIFY_START}
+        alignItems={ALIGN_START}
+        marginLeft="-2.5rem" // TODO remove negative margin when fixing SectionList marginLeft
+      >
+        <Box width="50%">
           <SectionList
             primaryPipetteMount={primaryPipetteMount}
             secondaryPipetteMount={secondaryPipetteMount}

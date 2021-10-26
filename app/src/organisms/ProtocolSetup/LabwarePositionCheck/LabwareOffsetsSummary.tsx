@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   Box,
   C_DISABLED,
@@ -15,7 +16,6 @@ import {
   Text,
   TEXT_TRANSFORM_UPPERCASE,
 } from '@opentrons/components'
-import { useTranslation } from 'react-i18next'
 
 const getOffsetDataInfo = (): Array<{
   location: string
@@ -71,11 +71,7 @@ export const LabwareOffsetsSummary = (): JSX.Element | null => {
           {t('labware_offsets_summary_title')}
         </Text>
         <Flex flexDirection={DIRECTION_ROW} justifyContent={JUSTIFY_CENTER}>
-          <Box
-            width="30%"
-            flexDirection={DIRECTION_COLUMN}
-            justifyContent={JUSTIFY_CENTER}
-          >
+          <Box width="30%" justifyContent={JUSTIFY_CENTER}>
             <Text
               textTransform={TEXT_TRANSFORM_UPPERCASE}
               marginBottom={SPACING_3}
@@ -96,11 +92,7 @@ export const LabwareOffsetsSummary = (): JSX.Element | null => {
               )
             })}
           </Box>
-          <Box
-            width="40%"
-            flexDirection={DIRECTION_COLUMN}
-            justifyContent={JUSTIFY_CENTER}
-          >
+          <Box width="40%" justifyContent={JUSTIFY_CENTER}>
             <Text
               textTransform={TEXT_TRANSFORM_UPPERCASE}
               marginBottom={SPACING_3}
@@ -121,11 +113,7 @@ export const LabwareOffsetsSummary = (): JSX.Element | null => {
               )
             })}
           </Box>
-          <Box
-            width="30%"
-            flexDirection={DIRECTION_COLUMN}
-            justifyContent={JUSTIFY_CENTER}
-          >
+          <Box width="30%" justifyContent={JUSTIFY_CENTER}>
             <Text
               textTransform={TEXT_TRANSFORM_UPPERCASE}
               marginBottom={SPACING_3}
@@ -134,9 +122,13 @@ export const LabwareOffsetsSummary = (): JSX.Element | null => {
             >
               {t('labware_offsets_summary_offset')}
             </Text>
-            {offsetData.map(({ x, y, z }) => {
+            {offsetData.map(({ x, y, z }, index) => {
               return x === 0 && y === 0 && z === 0 ? (
-                <Flex marginBottom={SPACING_3} css={FONT_BODY_1_DARK}>
+                <Flex
+                  key={index}
+                  marginBottom={SPACING_3}
+                  css={FONT_BODY_1_DARK}
+                >
                   {t('no_labware_offsets')}
                 </Flex>
               ) : (
@@ -144,19 +136,19 @@ export const LabwareOffsetsSummary = (): JSX.Element | null => {
                   <Text as={'span'} marginRight={'0.15rem'}>
                     <strong>X</strong>
                   </Text>
-                  <Text as={'span'} marginRight={'0.4rem'}>
+                  <Text key={x} as={'span'} marginRight={'0.4rem'}>
                     {x}
                   </Text>
                   <Text as={'span'} marginRight={'0.15rem'}>
                     <strong>Y</strong>
                   </Text>
-                  <Text as={'span'} marginRight={'0.4rem'}>
+                  <Text key={y} as={'span'} marginRight={'0.4rem'}>
                     {y}
                   </Text>
                   <Text as={'span'} marginRight={'0.15rem'}>
                     <strong>Z</strong>
                   </Text>
-                  <Text as={'span'} marginRight={'0.4rem'}>
+                  <Text key={z} as={'span'} marginRight={'0.4rem'}>
                     {z}
                   </Text>
                 </Flex>
