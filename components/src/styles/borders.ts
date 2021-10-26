@@ -4,6 +4,7 @@ import { C_LIGHT_GRAY, C_MED_GRAY } from './colors'
 export const BORDER_WIDTH_DEFAULT = '1px'
 
 export const BORDER_RADIUS_DEFAULT = '2px'
+export const BORDER_RADIUS_1 = '5px'
 
 export const BORDER_STYLE_NONE = 'none'
 export const BORDER_STYLE_SOLID = 'solid'

@@ -75,3 +75,15 @@ export const FONT_BODY_2_DARK: FlattenSimpleInterpolation = css`
   font-weight: ${FONT_WEIGHT_REGULAR};
   color: ${C_DARK_GRAY};
 `
+
+export const FONT_BODY_1_DARK_SEMIBOLD: FlattenSimpleInterpolation = css`
+  font-size: ${FONT_SIZE_BODY_1};
+  font-weight: ${FONT_WEIGHT_SEMIBOLD};
+  color: ${C_DARK_GRAY};
+`
+
+export const FONT_HUGE_DARK_SEMIBOLD: FlattenSimpleInterpolation = css`
+  font-size: ${FONT_SIZE_HUGE};
+  font-weight: ${FONT_WEIGHT_SEMIBOLD};
+  color: ${C_DARK_GRAY};
+`
