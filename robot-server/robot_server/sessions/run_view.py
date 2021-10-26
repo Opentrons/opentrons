@@ -32,14 +32,14 @@ class RunView:
 
     @staticmethod
     def as_resource(
-        session_id: str,
+        run_id: str,
         created_at: datetime,
         create_data: Optional[RunCreateData],
     ) -> RunResource:
         """Create a new session resource instance from its create data.
 
         Arguments:
-            session_id: Unique identifier.
+            run_id: Unique identifier.
             created_at: Resource creation timestamp.
             create_data: Data used to create the session.
 
@@ -48,7 +48,7 @@ class RunView:
                 the `RunStore` and other classes.
         """
         return RunResource(
-            session_id=session_id,
+            run_id=run_id,
             created_at=created_at,
             create_data=create_data or BasicRunCreateData(),
             actions=[],
@@ -56,7 +56,7 @@ class RunView:
 
     @staticmethod
     def with_action(
-        session: RunResource,
+        run: RunResource,
         action_id: str,
         action_data: RunActionCreateData,
         created_at: datetime,
@@ -64,7 +64,7 @@ class RunView:
         """Create a new session control action resource instance.
 
         Arguments:
-            session: The session resource to add the command to.
+            run: The session resource to add the command to.
             action_id: Unique ID to assign to the command resource.
             action_data: Data used to create the command resource.
             created_at: Resource creation timestamp.
@@ -80,16 +80,16 @@ class RunView:
             actionType=action_data.actionType,
         )
 
-        updated_session = replace(
-            session,
-            actions=session.actions + [actions],
+        updated_run = replace(
+            run,
+            actions=run.actions + [actions],
         )
 
-        return actions, updated_session
+        return actions, updated_run
 
     @staticmethod
     def as_response(
-        session: RunResource,
+        run: RunResource,
         commands: List[ProtocolEngineCommand],
         pipettes: List[LoadedPipette],
         labware: List[LoadedLabware],
@@ -98,21 +98,21 @@ class RunView:
         """Transform a session resource into its public response model.
 
         Arguments:
-            session: Internal resource representation of the session.
+            run: Internal resource representation of the session.
 
         Returns:
             Session response model representing the same resource.
         """
-        create_data = session.create_data
+        create_data = run.create_data
         command_summaries = [
             RunCommandSummary(id=c.id, commandType=c.commandType, status=c.status)
             for c in commands
         ]
 
         response_fields: Dict[str, Any] = {
-            "id": session.session_id,
-            "createdAt": session.created_at,
-            "actions": session.actions,
+            "id": run.run_id,
+            "createdAt": run.created_at,
+            "actions": run.actions,
             "commands": command_summaries,
             "pipettes": pipettes,
             "labware": labware,
@@ -126,4 +126,4 @@ class RunView:
             response_fields["createParams"] = create_data.createParams
             return ProtocolRun(**response_fields)
 
-        raise ValueError(f"Invalid session resource {session}")
+        raise ValueError(f"Invalid session resource {run}")

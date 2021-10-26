@@ -69,7 +69,7 @@ async def test_get_session_commands() -> None:
         )
     )
 
-    response = await get_run_commands(session=session_response)
+    response = await get_run_commands(run=session_response)
 
     assert response.data == [command_summary]
 

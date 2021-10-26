@@ -69,7 +69,7 @@ async def test_create_run(
 ) -> None:
     """It should be able to create a basic run."""
     session = RunResource(
-        session_id=unique_id,
+        run_id=unique_id,
         created_at=current_time,
         create_data=BasicRunCreateData(),
         actions=[],
@@ -92,21 +92,13 @@ async def test_create_run(
     )
 
     decoy.when(
-        session_view.as_resource(
-            create_data=BasicRunCreateData(),
-            session_id=unique_id,
-            created_at=current_time,
-        )
+        session_view.as_resource(run_id=unique_id, created_at=current_time,
+                                 create_data=BasicRunCreateData())
     ).then_return(session)
 
     decoy.when(
-        session_view.as_response(
-            session=session,
-            commands=[],
-            pipettes=[],
-            labware=[],
-            engine_status=pe_types.EngineStatus.READY_TO_RUN,
-        ),
+        session_view.as_response(run=session, commands=[], pipettes=[], labware=[],
+                                 engine_status=pe_types.EngineStatus.READY_TO_RUN),
     ).then_return(expected_response)
 
     response = await async_client.post(
@@ -119,7 +111,7 @@ async def test_create_run(
     decoy.verify(
         await engine_store.create(),
         task_runner.run(engine_store.runner.join),
-        session_store.upsert(session=session),
+        session_store.upsert(run=session),
     )
 
 
@@ -135,7 +127,7 @@ async def test_create_protocol_run(
 ) -> None:
     """It should be able to create a protocol run."""
     session = RunResource(
-        session_id=unique_id,
+        run_id=unique_id,
         created_at=current_time,
         create_data=ProtocolRunCreateData(
             createParams=ProtocolRunCreateParams(protocolId="protocol-id")
@@ -164,13 +156,11 @@ async def test_create_protocol_run(
     )
 
     decoy.when(
-        session_view.as_resource(
-            create_data=ProtocolRunCreateData(
-                createParams=ProtocolRunCreateParams(protocolId="protocol-id")
-            ),
-            session_id=unique_id,
-            created_at=current_time,
-        )
+        session_view.as_resource(run_id=unique_id, created_at=current_time,
+                                 create_data=ProtocolRunCreateData(
+                                     createParams=ProtocolRunCreateParams(
+                                         protocolId="protocol-id")
+                                 ))
     ).then_return(session)
 
     decoy.when(engine_store.engine.state_view.commands.get_all()).then_return([])
@@ -181,13 +171,8 @@ async def test_create_protocol_run(
     )
 
     decoy.when(
-        session_view.as_response(
-            session=session,
-            commands=[],
-            pipettes=[],
-            labware=[],
-            engine_status=pe_types.EngineStatus.READY_TO_RUN,
-        ),
+        session_view.as_response(run=session, commands=[], pipettes=[], labware=[],
+                                 engine_status=pe_types.EngineStatus.READY_TO_RUN),
     ).then_return(expected_response)
 
     response = await async_client.post(
@@ -205,7 +190,7 @@ async def test_create_protocol_run(
     decoy.verify(
         await engine_store.create(),
         engine_store.runner.load(protocol_resource),
-        session_store.upsert(session=session),
+        session_store.upsert(run=session),
     )
 
 
@@ -252,18 +237,15 @@ async def test_create_run_conflict(
 ) -> None:
     """It should respond with a conflict error if multiple engines are created."""
     session = RunResource(
-        session_id=unique_id,
+        run_id=unique_id,
         create_data=BasicRunCreateData(),
         created_at=current_time,
         actions=[],
     )
 
     decoy.when(
-        session_view.as_resource(
-            create_data=None,
-            session_id=unique_id,
-            created_at=current_time,
-        )
+        session_view.as_resource(run_id=unique_id, created_at=current_time,
+                                 create_data=None)
     ).then_return(session)
 
     decoy.when(await engine_store.create()).then_raise(EngineConflictError("oh no"))
@@ -288,7 +270,7 @@ def test_get_run(
     created_at = datetime.now()
     create_data = BasicRunCreateData()
     session = RunResource(
-        session_id="run-id",
+        run_id="run-id",
         create_data=create_data,
         created_at=created_at,
         actions=[],
@@ -330,7 +312,7 @@ def test_get_run(
         labware=[labware],
     )
 
-    decoy.when(session_store.get(session_id="run-id")).then_return(session)
+    decoy.when(session_store.get(run_id="run-id")).then_return(session)
 
     decoy.when(engine_store.engine.state_view.commands.get_all()).then_return([command])
     decoy.when(engine_store.engine.state_view.pipettes.get_all()).then_return([pipette])
@@ -340,13 +322,9 @@ def test_get_run(
     )
 
     decoy.when(
-        session_view.as_response(
-            session=session,
-            commands=[command],
-            pipettes=[pipette],
-            labware=[labware],
-            engine_status=pe_types.EngineStatus.READY_TO_RUN,
-        ),
+        session_view.as_response(run=session, commands=[command], pipettes=[pipette],
+                                 labware=[labware],
+                                 engine_status=pe_types.EngineStatus.READY_TO_RUN),
     ).then_return(expected_response)
 
     response = client.get("/runs/run-id")
@@ -360,9 +338,9 @@ def test_get_run_with_missing_id(
     client: TestClient,
 ) -> None:
     """It should 404 if the run ID does not exist."""
-    not_found_error = RunNotFoundError(session_id="run-id")
+    not_found_error = RunNotFoundError(run_id="run-id")
 
-    decoy.when(session_store.get(session_id="run-id")).then_raise(not_found_error)
+    decoy.when(session_store.get(run_id="run-id")).then_raise(not_found_error)
 
     response = client.get("/runs/run-id")
 
@@ -398,7 +376,7 @@ def test_get_runs_not_empty(
     created_at_1 = datetime.now()
 
     session_1 = RunResource(
-        session_id="unique-id-1",
+        run_id="unique-id-1",
         create_data=BasicRunCreateData(),
         created_at=created_at_1,
         actions=[],
@@ -424,13 +402,8 @@ def test_get_runs_not_empty(
     )
 
     decoy.when(
-        session_view.as_response(
-            session=session_1,
-            commands=[],
-            pipettes=[],
-            labware=[],
-            engine_status=pe_types.EngineStatus.SUCCEEDED,
-        ),
+        session_view.as_response(run=session_1, commands=[], pipettes=[], labware=[],
+                                 engine_status=pe_types.EngineStatus.SUCCEEDED),
     ).then_return(response_1)
 
     response = client.get("/runs")
@@ -453,7 +426,7 @@ def test_delete_run_by_id(
 
     decoy.verify(
         engine_store.clear(),
-        session_store.remove(session_id="unique-id"),
+        session_store.remove(run_id="unique-id"),
     )
 
     assert response.status_code == 200
@@ -467,12 +440,12 @@ def test_delete_run_with_bad_id(
     client: TestClient,
 ) -> None:
     """It should 404 if the run ID does not exist."""
-    key_error = RunNotFoundError(session_id="run-id")
+    key_error = RunNotFoundError(run_id="run-id")
 
     decoy.when(engine_store.engine.state_view.commands.get_is_stopped()).then_return(
         True
     )
-    decoy.when(session_store.remove(session_id="run-id")).then_raise(key_error)
+    decoy.when(session_store.remove(run_id="run-id")).then_raise(key_error)
 
     response = client.delete("/runs/run-id")
 

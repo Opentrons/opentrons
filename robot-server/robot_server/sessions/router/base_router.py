@@ -74,32 +74,29 @@ class RunNotIdle(ErrorDetails):
 )
 async def create_run(
     request_body: Optional[CreateRunRequest] = None,
-    session_view: RunView = Depends(RunView),
-    session_store: RunStore = Depends(get_run_store),
+    run_view: RunView = Depends(RunView),
+    run_store: RunStore = Depends(get_run_store),
     engine_store: EngineStore = Depends(get_engine_store),
     protocol_store: ProtocolStore = Depends(get_protocol_store),
-    session_id: str = Depends(get_unique_id),
+    run_id: str = Depends(get_unique_id),
     created_at: datetime = Depends(get_current_time),
     task_runner: TaskRunner = Depends(TaskRunner),
 ) -> ResponseModel[Run]:
-    """Create a new session.
+    """Create a new run.
 
     Arguments:
-        request_body: Optional request body with session creation data.
-        session_view: Session model construction interface.
-        session_store: Session storage interface.
+        request_body: Optional request body with run creation data.
+        run_view: Session model construction interface.
+        run_store: Session storage interface.
         engine_store: ProtocolEngine storage and control.
         protocol_store: Protocol resource storage.
-        session_id: Generated ID to assign to the session.
-        created_at: Timestamp to attach to created session.
+        run_id: Generated ID to assign to the run.
+        created_at: Timestamp to attach to created run.
         task_runner: Background task runner.
     """
     create_data = request_body.data if request_body is not None else None
-    session = session_view.as_resource(
-        session_id=session_id,
-        created_at=created_at,
-        create_data=create_data,
-    )
+    run = run_view.as_resource(run_id=run_id, created_at=created_at,
+                               create_data=create_data)
     protocol_id = None
 
     if isinstance(create_data, ProtocolRunCreateData):
@@ -113,7 +110,7 @@ async def create_run(
             engine_store.runner.load(protocol_resource)
 
         # TODO(mc, 2021-08-05): capture errors from `runner.join` and place
-        # them in the session resource
+        # them in the run resource
         task_runner.run(engine_store.runner.join)
 
     except ProtocolNotFoundError as e:
@@ -122,15 +119,13 @@ async def create_run(
     except EngineConflictError as e:
         raise RunAlreadyActive(detail=str(e)).as_error(status.HTTP_409_CONFLICT)
 
-    session_store.upsert(session=session)
+    run_store.upsert(run=run)
 
-    data = session_view.as_response(
-        session=session,
-        commands=engine_store.engine.state_view.commands.get_all(),
-        pipettes=engine_store.engine.state_view.pipettes.get_all(),
-        labware=engine_store.engine.state_view.labware.get_all(),
-        engine_status=engine_store.engine.state_view.commands.get_status(),
-    )
+    data = run_view.as_response(run=run,
+                                commands=engine_store.engine.state_view.commands.get_all(),
+                                pipettes=engine_store.engine.state_view.pipettes.get_all(),
+                                labware=engine_store.engine.state_view.labware.get_all(),
+                                engine_status=engine_store.engine.state_view.commands.get_status())
 
     return ResponseModel(data=data)
 
@@ -143,28 +138,26 @@ async def create_run(
     response_model=MultiResponseModel[Run],
 )
 async def get_runs(
-    session_view: RunView = Depends(RunView),
-    session_store: RunStore = Depends(get_run_store),
+    run_view: RunView = Depends(RunView),
+    run_store: RunStore = Depends(get_run_store),
     engine_store: EngineStore = Depends(get_engine_store),
 ) -> MultiResponseModel[Run]:
     """Get all runs.
 
     Args:
-        session_view: Session model construction interface.
-        session_store: Session storage interface.
+        run_view: Session model construction interface.
+        run_store: Session storage interface.
         engine_store: ProtocolEngine storage and control.
     """
     data = []
 
-    for session in session_store.get_all():
+    for run in run_store.get_all():
         # TODO(mc, 2021-06-23): add multi-engine support
-        session_data = session_view.as_response(
-            session=session,
-            commands=engine_store.engine.state_view.commands.get_all(),
-            pipettes=engine_store.engine.state_view.pipettes.get_all(),
-            labware=engine_store.engine.state_view.labware.get_all(),
-            engine_status=engine_store.engine.state_view.commands.get_status(),
-        )
+        session_data = run_view.as_response(run=run,
+                                            commands=engine_store.engine.state_view.commands.get_all(),
+                                            pipettes=engine_store.engine.state_view.pipettes.get_all(),
+                                            labware=engine_store.engine.state_view.labware.get_all(),
+                                            engine_status=engine_store.engine.state_view.commands.get_status())
 
         data.append(session_data)
 
@@ -183,30 +176,28 @@ async def get_runs(
 )
 async def get_run(
     runId: str,
-    session_view: RunView = Depends(RunView),
-    session_store: RunStore = Depends(get_run_store),
+    run_view: RunView = Depends(RunView),
+    run_store: RunStore = Depends(get_run_store),
     engine_store: EngineStore = Depends(get_engine_store),
 ) -> ResponseModel[Run]:
     """Get a run by its ID.
 
     Args:
         runId: Run ID pulled from URL.
-        session_view: Session model construction interface.
-        session_store: Session storage interface.
+        run_view: Session model construction interface.
+        run_store: Session storage interface.
         engine_store: ProtocolEngine storage and control.
     """
     try:
-        session = session_store.get(session_id=runId)
+        run = run_store.get(run_id=runId)
     except RunNotFoundError as e:
         raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
 
-    data = session_view.as_response(
-        session=session,
-        commands=engine_store.engine.state_view.commands.get_all(),
-        pipettes=engine_store.engine.state_view.pipettes.get_all(),
-        labware=engine_store.engine.state_view.labware.get_all(),
-        engine_status=engine_store.engine.state_view.commands.get_status(),
-    )
+    data = run_view.as_response(run=run,
+                                commands=engine_store.engine.state_view.commands.get_all(),
+                                pipettes=engine_store.engine.state_view.pipettes.get_all(),
+                                labware=engine_store.engine.state_view.labware.get_all(),
+                                engine_status=engine_store.engine.state_view.commands.get_status())
 
     return ResponseModel(data=data)
 
@@ -221,14 +212,14 @@ async def get_run(
 )
 async def remove_run_by_id(
     runId: str,
-    session_store: RunStore = Depends(get_run_store),
+    run_store: RunStore = Depends(get_run_store),
     engine_store: EngineStore = Depends(get_engine_store),
 ) -> EmptyResponseModel:
     """Delete a session by its ID.
 
     Arguments:
         runId: Session ID pulled from URL.
-        session_store: Session storage interface.
+        run_store: Session storage interface.
         engine_store: ProtocolEngine storage and control.
     """
     try:
@@ -239,7 +230,7 @@ async def remove_run_by_id(
 
     try:
         engine_store.clear()
-        session_store.remove(session_id=runId)
+        run_store.remove(run_id=runId)
     except RunNotFoundError as e:
         raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
 

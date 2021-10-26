@@ -15,7 +15,7 @@ class RunResource:
     location, such as a ProtocolEngine instance.
     """
 
-    session_id: str
+    run_id: str
     create_data: RunCreateData
     created_at: datetime
     actions: List[RunAction]
@@ -24,9 +24,9 @@ class RunResource:
 class RunNotFoundError(ValueError):
     """Error raised when a given Run ID is not found in the store."""
 
-    def __init__(self, session_id: str) -> None:
+    def __init__(self, run_id: str) -> None:
         """Initialize the error message from the missing ID."""
-        super().__init__(f"Run {session_id} was not found.")
+        super().__init__(f"Run {run_id} was not found.")
 
 
 class RunStore:
@@ -34,35 +34,35 @@ class RunStore:
 
     def __init__(self) -> None:
         """Initialize a RunStore and its in-memory storage."""
-        self._sessions_by_id: Dict[str, RunResource] = {}
+        self._runs_by_id: Dict[str, RunResource] = {}
 
-    def upsert(self, session: RunResource) -> RunResource:
+    def upsert(self, run: RunResource) -> RunResource:
         """Insert or update a run resource in the store.
 
         Arguments:
-            session: Session resource to store. Reads `session.id` to
+            run: Session resource to store. Reads `session.id` to
                 determine identity in storage.
 
         Returns:
             The resource that was added to the store.
         """
-        self._sessions_by_id[session.session_id] = session
+        self._runs_by_id[run.run_id] = run
 
-        return session
+        return run
 
-    def get(self, session_id: str) -> RunResource:
+    def get(self, run_id: str) -> RunResource:
         """Get a specific session entry by its identifier.
 
         Arguments:
-            session_id: Unique identifier of session entry to retrieve.
+            run_id: Unique identifier of session entry to retrieve.
 
         Returns:
             The retrieved session entry from the store.
         """
         try:
-            return self._sessions_by_id[session_id]
+            return self._runs_by_id[run_id]
         except KeyError as e:
-            raise RunNotFoundError(session_id) from e
+            raise RunNotFoundError(run_id) from e
 
     def get_all(self) -> List[RunResource]:
         """Get all known session resources.
@@ -70,13 +70,13 @@ class RunStore:
         Returns:
             All stored session entries.
         """
-        return list(self._sessions_by_id.values())
+        return list(self._runs_by_id.values())
 
-    def remove(self, session_id: str) -> RunResource:
+    def remove(self, run_id: str) -> RunResource:
         """Remove a session by its unique identifier.
 
         Arguments:
-            session_id: The session's unique identifier.
+            run_id: The session's unique identifier.
 
         Returns:
             The session entry that was deleted.
@@ -85,6 +85,6 @@ class RunStore:
             RunNotFoundError: The specified session ID was not found.
         """
         try:
-            return self._sessions_by_id.pop(session_id)
+            return self._runs_by_id.pop(run_id)
         except KeyError as e:
-            raise RunNotFoundError(session_id) from e
+            raise RunNotFoundError(run_id) from e

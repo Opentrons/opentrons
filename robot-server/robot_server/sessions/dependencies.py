@@ -16,13 +16,13 @@ _engine_store = AppStateValue[EngineStore]("engine_store")
 
 def get_run_store(app_state: AppState = Depends(get_app_state)) -> RunStore:
     """Get a singleton RunStore to keep track of created sessions."""
-    session_store = _run_store.get_from(app_state)
+    run_store = _run_store.get_from(app_state)
 
-    if session_store is None:
-        session_store = RunStore()
-        _run_store.set_on(app_state, session_store)
+    if run_store is None:
+        run_store = RunStore()
+        _run_store.set_on(app_state, run_store)
 
-    return session_store
+    return run_store
 
 
 def get_engine_store(

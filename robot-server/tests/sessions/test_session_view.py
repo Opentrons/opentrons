@@ -38,14 +38,11 @@ def test_create_session_resource_from_none() -> None:
     create_data = None
 
     subject = RunView()
-    result = subject.as_resource(
-        session_id="session-id",
-        create_data=create_data,
-        created_at=created_at,
-    )
+    result = subject.as_resource(run_id="session-id", created_at=created_at,
+                                 create_data=create_data)
 
     assert result == RunResource(
-        session_id="session-id",
+        run_id="session-id",
         create_data=BasicRunCreateData(),
         created_at=created_at,
         actions=[],
@@ -58,14 +55,11 @@ def test_create_session_resource() -> None:
     create_data = BasicRunCreateData()
 
     subject = RunView()
-    result = subject.as_resource(
-        session_id="session-id",
-        create_data=create_data,
-        created_at=created_at,
-    )
+    result = subject.as_resource(run_id="session-id", created_at=created_at,
+                                 create_data=create_data)
 
     assert result == RunResource(
-        session_id="session-id",
+        run_id="session-id",
         create_data=create_data,
         created_at=created_at,
         actions=[],
@@ -80,14 +74,11 @@ def test_create_protocol_session_resource() -> None:
     )
 
     subject = RunView()
-    result = subject.as_resource(
-        session_id="session-id",
-        create_data=create_data,
-        created_at=created_at,
-    )
+    result = subject.as_resource(run_id="session-id", created_at=created_at,
+                                 create_data=create_data)
 
     assert result == RunResource(
-        session_id="session-id",
+        run_id="session-id",
         create_data=create_data,
         created_at=created_at,
         actions=[],
@@ -102,7 +93,7 @@ current_time = datetime.now()
     (
         (
                 RunResource(
-                session_id="session-id",
+                run_id="session-id",
                 create_data=BasicRunCreateData(),
                 created_at=current_time,
                 actions=[],
@@ -119,7 +110,7 @@ current_time = datetime.now()
         ),
         (
                 RunResource(
-                session_id="session-id",
+                run_id="session-id",
                 create_data=ProtocolRunCreateData(
                     createParams=ProtocolRunCreateParams(protocolId="protocol-id")
                 ),
@@ -145,20 +136,15 @@ def test_to_response(
 ) -> None:
     """It should create the correct type of session."""
     subject = RunView()
-    result = subject.as_response(
-        session=session_resource,
-        commands=[],
-        pipettes=[],
-        labware=[],
-        engine_status=EngineStatus.READY_TO_RUN,
-    )
+    result = subject.as_response(run=session_resource, commands=[], pipettes=[],
+                                 labware=[], engine_status=EngineStatus.READY_TO_RUN)
     assert result == expected_response
 
 
 def test_to_response_maps_commands() -> None:
     """It should map ProtocolEngine commands to RunCommandSummary models."""
     session_resource = RunResource(
-        session_id="session-id",
+        run_id="session-id",
         create_data=BasicRunCreateData(),
         created_at=datetime(year=2021, month=1, day=1),
         actions=[],
@@ -182,13 +168,9 @@ def test_to_response_maps_commands() -> None:
     )
 
     subject = RunView()
-    result = subject.as_response(
-        session=session_resource,
-        commands=[command_1, command_2],
-        pipettes=[],
-        labware=[],
-        engine_status=EngineStatus.RUNNING,
-    )
+    result = subject.as_response(run=session_resource, commands=[command_1, command_2],
+                                 pipettes=[], labware=[],
+                                 engine_status=EngineStatus.RUNNING)
 
     assert result == BasicRun(
         id="session-id",
@@ -215,7 +197,7 @@ def test_to_response_maps_commands() -> None:
 def test_to_response_adds_equipment() -> None:
     """It should add ProtocolEngine equipment to Session response model."""
     session_resource = RunResource(
-        session_id="session-id",
+        run_id="session-id",
         create_data=BasicRunCreateData(),
         created_at=datetime(year=2021, month=1, day=1),
         actions=[],
@@ -235,13 +217,8 @@ def test_to_response_adds_equipment() -> None:
     )
 
     subject = RunView()
-    result = subject.as_response(
-        session=session_resource,
-        commands=[],
-        pipettes=[pipette],
-        labware=[labware],
-        engine_status=EngineStatus.RUNNING,
-    )
+    result = subject.as_response(run=session_resource, commands=[], pipettes=[pipette],
+                                 labware=[labware], engine_status=EngineStatus.RUNNING)
 
     assert result == BasicRun(
         id="session-id",
@@ -259,7 +236,7 @@ def test_create_action(current_time: datetime) -> None:
     session_created_at = datetime.now()
 
     session = RunResource(
-        session_id="session-id",
+        run_id="session-id",
         create_data=BasicRunCreateData(),
         created_at=session_created_at,
         actions=[],
@@ -270,12 +247,10 @@ def test_create_action(current_time: datetime) -> None:
     )
 
     subject = RunView()
-    action_result, session_result = subject.with_action(
-        session=session,
-        action_id="control-command-id",
-        action_data=command_data,
-        created_at=current_time,
-    )
+    action_result, session_result = subject.with_action(run=session,
+                                                        action_id="control-command-id",
+                                                        action_data=command_data,
+                                                        created_at=current_time)
 
     assert action_result == RunAction(
         id="control-command-id",
@@ -284,7 +259,7 @@ def test_create_action(current_time: datetime) -> None:
     )
 
     assert session_result == RunResource(
-        session_id="session-id",
+        run_id="session-id",
         create_data=BasicRunCreateData(),
         created_at=session_created_at,
         actions=[action_result],

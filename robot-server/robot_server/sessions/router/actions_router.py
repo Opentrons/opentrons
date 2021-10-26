@@ -40,8 +40,8 @@ class RunActionNotAllowed(ErrorDetails):
 async def create_run_action(
     runId: str,
     request_body: RequestModel[RunActionCreateData],
-    session_view: RunView = Depends(RunView),
-    session_store: RunStore = Depends(get_run_store),
+    run_view: RunView = Depends(RunView),
+    run_store: RunStore = Depends(get_run_store),
     engine_store: EngineStore = Depends(get_engine_store),
     action_id: str = Depends(get_unique_id),
     created_at: datetime = Depends(get_current_time),
@@ -51,21 +51,18 @@ async def create_run_action(
     Arguments:
         runId: Session ID pulled from the URL.
         request_body: Input payload from the request body.
-        session_view: Resource model builder.
-        session_store: Session storage interface.
+        run_view: Resource model builder.
+        run_store: Session storage interface.
         engine_store: Protocol engine and runner storage.
         action_id: Generated ID to assign to the control action.
         created_at: Timestamp to attach to the control action.
     """
     try:
-        prev_session = session_store.get(session_id=runId)
+        prev_run = run_store.get(run_id=runId)
 
-        action, next_session = session_view.with_action(
-            session=prev_session,
-            action_id=action_id,
-            action_data=request_body.data,
-            created_at=created_at,
-        )
+        action, next_run = run_view.with_action(run=prev_run, action_id=action_id,
+                                                action_data=request_body.data,
+                                                created_at=created_at)
 
         # TODO(mc, 2021-07-06): add a dependency to verify that a given
         # action is allowed
@@ -83,6 +80,6 @@ async def create_run_action(
             status.HTTP_400_BAD_REQUEST
         )
 
-    session_store.upsert(session=next_session)
+    run_store.upsert(run=next_run)
 
     return ResponseModel(data=action)

@@ -44,7 +44,7 @@ class CommandNotFound(ErrorDetails):
 async def post_run_command(
     request_body: RequestModel[pe_commands.CommandRequest],
     engine_store: EngineStore = Depends(get_engine_store),
-    session: ResponseModel[Run] = Depends(get_run),
+    run: ResponseModel[Run] = Depends(get_run),
 ) -> ResponseModel[pe_commands.Command]:
     """Enqueue a protocol command.
 
@@ -53,7 +53,7 @@ async def post_run_command(
             to enqueue.
         engine_store: Used to retrieve the `ProtocolEngine` on which the new
             command will be enqueued.
-        session: Session response model, provided by the route handler for
+        run: Session response model, provided by the route handler for
             `GET /session/{sessionId}`. Present to ensure 404 if session
             not found.
     """
@@ -77,15 +77,15 @@ async def post_run_command(
     },
 )
 async def get_run_commands(
-    session: ResponseModel[Run] = Depends(get_run),
+    run: ResponseModel[Run] = Depends(get_run),
 ) -> MultiResponseModel[RunCommandSummary]:
     """Get a summary of all commands in a session.
 
     Arguments:
-        session: Session response model, provided by the route handler for
+        run: Session response model, provided by the route handler for
             `GET /session/{sessionId}`
     """
-    return MultiResponseModel(data=session.data.commands)
+    return MultiResponseModel(data=run.data.commands)
 
 
 @commands_router.get(
@@ -109,14 +109,14 @@ async def get_run_commands(
 async def get_run_command(
     commandId: str,
     engine_store: EngineStore = Depends(get_engine_store),
-    session: ResponseModel[Run] = Depends(get_run),
+    run: ResponseModel[Run] = Depends(get_run),
 ) -> ResponseModel[pe_commands.Command]:
     """Get a specific command from a session.
 
     Arguments:
         commandId: Command identifier, pulled from route parameter.
         engine_store: Protocol engine and runner storage.
-        session: Session response model, provided by the route handler for
+        run: Session response model, provided by the route handler for
             `GET /session/{sessionId}`. Present to ensure 404 if session
             not found.
     """

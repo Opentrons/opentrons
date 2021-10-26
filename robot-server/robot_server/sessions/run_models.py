@@ -8,7 +8,7 @@ from typing_extensions import Literal
 from opentrons.protocol_engine import (
     CommandStatus,
     CommandType,
-    EngineStatus as SessionStatus,
+    EngineStatus as RunStatus,
     LoadedPipette,
     LoadedLabware,
 )
@@ -50,7 +50,7 @@ class AbstractRun(ResourceModel):
     id: str = Field(..., description="Unique session identifier.")
     runType: RunType = Field(..., description="Specific session type.")
     createdAt: datetime = Field(..., description="When the session was created")
-    status: SessionStatus = Field(..., description="Execution status of the session")
+    status: RunStatus = Field(..., description="Execution status of the session")
     # TODO(mc, 2021-05-25): how hard would it be to rename this field to `config`?
     createParams: Optional[BaseModel] = Field(
         None,
