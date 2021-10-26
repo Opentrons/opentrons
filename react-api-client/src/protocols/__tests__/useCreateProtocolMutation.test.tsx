@@ -6,12 +6,22 @@ import { createProtocol } from '@opentrons/api-client'
 import { useHost } from '../../api'
 import { useCreateProtocolMutation } from '..'
 import type { HostConfig, Response, Protocol } from '@opentrons/api-client'
-import testProtocol from '../../../../protocol-designer/fixtures/protocol/5/doItAllV5.json'
 
 jest.mock('@opentrons/api-client')
 jest.mock('../../api/useHost')
 
-const contents = JSON.stringify(testProtocol)
+const contents = JSON.stringify({
+  metadata: {
+    protocolName: 'Multi select banner test protocol',
+    author: '',
+    description: '',
+    created: 1606853851893,
+    lastModified: 1621690582736,
+    category: null,
+    subcategory: null,
+    tags: [],
+  },
+})
 const jsonFile = new File([contents], 'valid.json')
 
 const mockCreateProtocol = createProtocol as jest.MockedFunction<
