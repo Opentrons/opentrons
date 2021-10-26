@@ -2,7 +2,7 @@
   "extends": "../tsconfig-base.json",
   "references": [
     {
-      "path": "./api-client"
+      "path": "../api-client"
     },
     {
       "path": "../shared-data"
