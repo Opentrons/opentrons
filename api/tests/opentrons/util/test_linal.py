@@ -4,7 +4,7 @@ from numpy.linalg import inv
 import numpy as np
 
 
-def test_solve():
+def test_solve() -> None:
     theta = pi / 3.0  # 60 deg
     scale = 2.0
 
@@ -25,12 +25,12 @@ def test_solve():
     expected2 = np.array(
         [cos(theta + pi / 2) * scale + 0.5, sin(theta + pi / 2) * scale + 0.25, 1]
     )
-    result = np.dot(X, np.array([[0], [1], [1]])).transpose()  # type: ignore
+    result = np.dot(X, np.array([[0], [1], [1]])).transpose()  # type: ignore[no-untyped-call]
 
-    return np.isclose(expected2, result).all()
+    assert np.isclose(expected2, result).all()
 
 
-def test_add_z():
+def test_add_z() -> None:
     x = 5
     y = 10
     z = 20
@@ -43,7 +43,7 @@ def test_add_z():
     assert (result == expected).all()
 
 
-def test_apply_transform():
+def test_apply_transform() -> None:
     x = 1
     y = 2
     z = 3
@@ -61,5 +61,5 @@ def test_apply_transform():
 
     expected = (round(x - x_delta, 2), round(y - y_delta, 2), round(z))
 
-    result = apply_transform(inv(transform), (1, 2, 3))  # type: ignore
+    result = apply_transform(inv(transform), (1, 2, 3))  # type: ignore[no-untyped-call]
     assert np.isclose(result, expected, atol=0.1).all()
