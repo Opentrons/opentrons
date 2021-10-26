@@ -29,7 +29,12 @@ import 'cypress-file-upload'
 // General Custom Commands
 //
 Cypress.Commands.add('closeAnnouncementModal', () => {
-  cy.get('button').contains('Got It!').click()
+  // ComputingSpinner sometimes covers the announcement modal button and prevents the button click
+  // this will retry until the ComputingSpinner does not exist
+  cy.get('[data-test="ComputingSpinner"]', { timeout: 30000 }).should(
+    'not.exist'
+  )
+  cy.get('button').contains('Got It!').should('be.visible').click()
 })
 
 //

@@ -26,8 +26,6 @@ if TYPE_CHECKING:
 
 ThermocyclerStep = Dict[str, float]
 
-InterruptCallback = Callable[[str], None]
-
 UploadFunction = Callable[[str, str, Dict[str, Any]], Awaitable[Tuple[bool, str]]]
 
 LiveData = Mapping[str, Union[str, Mapping[str, Union[float, str, None]]]]
@@ -108,5 +106,13 @@ class TemperatureStatus(str, Enum):
     HOLDING = "holding at target"
     COOLING = "cooling"
     HEATING = "heating"
+    IDLE = "idle"
+    ERROR = "error"
+
+
+class SpeedStatus(str, Enum):
+    HOLDING = "holding at target"
+    ACCELERATING = "speeding up"
+    DECELERATING = "slowing down"
     IDLE = "idle"
     ERROR = "error"

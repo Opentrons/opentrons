@@ -3,6 +3,7 @@ import type { Action } from '../../types'
 
 import type {
   ConnectAction,
+  LegacyConnectAction,
   ConnectResponseAction,
   ClearConnectResponseAction,
   DisconnectAction,
@@ -37,6 +38,7 @@ export function connectionReducer(
   if (state == null) return INITIAL_STATE
 
   switch (action.type) {
+    case 'robot:LEGACY_CONNECT':
     case 'robot:CONNECT':
       return handleConnect(state, action)
 
@@ -61,7 +63,7 @@ export function connectionReducer(
 
 function handleConnect(
   state: ConnectionState,
-  action: ConnectAction
+  action: LegacyConnectAction | ConnectAction
 ): ConnectionState {
   const {
     payload: { name },

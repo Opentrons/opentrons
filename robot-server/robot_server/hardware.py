@@ -7,7 +7,7 @@ from typing import Callable, Union, cast
 from typing_extensions import Literal
 
 from opentrons import initialize as initialize_api
-from opentrons.config import feature_flags
+from opentrons.config import feature_flags, IS_ROBOT, ARCHITECTURE, SystemArchitecture
 from opentrons.util.helpers import utc_now
 from opentrons.hardware_control import API as HardwareAPI, ThreadManager
 from opentrons.hardware_control.simulator_setup import load_simulator
@@ -108,28 +108,73 @@ async def get_hardware(app_state: AppState = Depends(get_app_state)) -> Hardware
     return hardware_api
 
 
-async def _initialize_hardware_api(app_state: AppState) -> None:
+async def _initialize_hardware_api(app_state: AppState) -> None:  # noqa: C901
     """Initialize the HardwareAPI and attach it to global state."""
-    app_settings = get_settings()
-    simulator_config = app_settings.simulator_configuration_file_path
-    use_thread_manager = feature_flags.enable_protocol_engine() is False
+    try:
+        app_settings = get_settings()
+        simulator_config = app_settings.simulator_configuration_file_path
+        use_thread_manager = feature_flags.enable_protocol_engine() is False
 
-    if simulator_config:
-        simulator_config_path = Path(simulator_config)
-        log.info(f"Loading simulator from {simulator_config_path}")
+        systemd_available = IS_ROBOT and ARCHITECTURE != SystemArchitecture.HOST
 
-        if use_thread_manager:
-            thread_manager = ThreadManager(load_simulator, simulator_config_path)
-            hardware_api = cast(HardwareAPI, thread_manager)
+        if systemd_available:
+            # During boot, opentrons-gpio-setup.service will be blinking the
+            # front button light. Kill it here and wait for it to exit so it releases
+            # that GPIO line. Otherwise, our hardware initialization would get a
+            # "device already in use" error.
+            service_to_stop = "opentrons-gpio-setup"
+            command = ["systemctl", "stop", service_to_stop]
+            subprocess = await asyncio.create_subprocess_exec(
+                *command,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+            )
+            stdout, stderr = await subprocess.communicate()
+            if subprocess.returncode == 0:
+                log.info(f"Stopped {service_to_stop}.")
+            else:
+                raise RuntimeError(
+                    f"Error stopping {service_to_stop}.",
+                    {
+                        "returncode": subprocess.returncode,
+                        "stdout": stdout,
+                        "stderr": stderr,
+                    },
+                )
+
+        if simulator_config:
+            simulator_config_path = Path(simulator_config)
+            log.info(f"Loading simulator from {simulator_config_path}")
+
+            if use_thread_manager:
+                thread_manager = ThreadManager(load_simulator, simulator_config_path)
+                hardware_api = cast(HardwareAPI, thread_manager)
+            else:
+                hardware_api = await load_simulator(path=simulator_config_path)
+
         else:
-            hardware_api = await load_simulator(path=simulator_config_path)
+            hardware_api = await initialize_api()
 
-    else:
-        hardware_api = await initialize_api()
+        _initialize_event_watchers(app_state, hardware_api)
+        _hw_api.set_on(app_state, hardware_api)
 
-    _initialize_event_watchers(app_state, hardware_api)
-    _hw_api.set_on(app_state, hardware_api)
-    log.info("Opentrons hardware API initialized")
+        if systemd_available:
+            try:
+                import systemd.daemon  # type: ignore
+
+                systemd.daemon.notify("READY=1")
+            except ImportError:
+                pass
+
+        log.info("Opentrons hardware API initialized")
+
+    except Exception:
+        # todo(mm, 2021-10-22): Logging this exception should be the responsibility
+        # of calling code, but currently, nothing catches exceptions raised from
+        # this background initialization task. Once that's fixed, this log.error()
+        # should be removed,
+        log.exception("Exception during hardware background initialization.")
+        raise
 
 
 # TODO(mc, 2021-09-01): if we're ever going to actually use the notification

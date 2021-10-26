@@ -1,7 +1,6 @@
 describe('Desktop Navigation', () => {
   beforeEach(() => {
     cy.visit('/')
-    cy.viewport('macbook-15')
     cy.closeAnnouncementModal()
   })
 

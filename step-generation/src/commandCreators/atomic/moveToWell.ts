@@ -3,7 +3,7 @@ import {
   modulePipetteCollision,
   thermocyclerPipetteCollision,
 } from '../../utils'
-import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
+import type { Command } from '@opentrons/shared-data/protocol/types/schemaV5Addendum'
 import type { MoveToWellParams } from '@opentrons/shared-data/protocol/types/schemaV5'
 import type { CommandCreator, CommandCreatorError } from '../../types'
 

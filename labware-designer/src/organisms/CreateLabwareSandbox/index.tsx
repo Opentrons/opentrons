@@ -16,6 +16,7 @@ import {
   RadioGroup,
   SPACING_1,
   C_LIGHT_GRAY,
+  WELL_LABEL_OPTIONS,
 } from '@opentrons/components'
 import {
   createIrregularLabware,
@@ -184,7 +185,10 @@ export function CreateLabwareSandbox(): JSX.Element {
                       transform={`translate(${lwSlot.position[0]}, ${lwSlot.position[1]})`}
                       data-testid="lw_on_deck"
                     >
-                      <LabwareRender definition={labwareToRender} showLabels />
+                      <LabwareRender
+                        definition={labwareToRender}
+                        wellLabelOption={WELL_LABEL_OPTIONS.SHOW_LABEL_INSIDE}
+                      />
                     </g>
                   )
                 }}
@@ -196,7 +200,10 @@ export function CreateLabwareSandbox(): JSX.Element {
                 viewBox={`0 0 ${labwareToRender.dimensions.xDimension} ${labwareToRender.dimensions.yDimension}`}
                 style={{ transform: 'scale(1, -1)' }}
               >
-                <LabwareRender definition={labwareToRender} showLabels />
+                <LabwareRender
+                  definition={labwareToRender}
+                  wellLabelOption={WELL_LABEL_OPTIONS.SHOW_LABEL_INSIDE}
+                />
               </svg>
             )}
           </Flex>

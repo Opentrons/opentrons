@@ -32,6 +32,8 @@ module.exports = {
           '^@opentrons/components$': `@opentrons/components/src/index.ts`,
           '^@opentrons/shared-data$': `@opentrons/shared-data/js/index.ts`,
           '^@opentrons/step-generation$': `@opentrons/step-generation/src/index.ts`,
+          '^@opentrons/api-client$': `@opentrons/api-client/src/index.ts`,
+          '^@opentrons/react-api-client$': `@opentrons/react-api-client/src/index.ts`,
         },
       },
     ],
@@ -58,7 +60,13 @@ module.exports = {
     // apps that should be polyfilled
     // these projects require `core-js` in their package.json `dependencies`
     {
-      test: ['app/**/*', 'labware-library/**/*', 'protocol-designer/**/*'],
+      test: [
+        'app/**/*',
+        'labware-library/**/*',
+        'protocol-designer/**/*',
+        'react-api-client/**/*',
+        'api-client/**/*',
+      ],
       presets: [['@babel/preset-env', { useBuiltIns: 'usage', corejs: 3 }]],
     },
   ],

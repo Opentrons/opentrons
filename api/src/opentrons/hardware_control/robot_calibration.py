@@ -1,5 +1,5 @@
 import logging
-import numpy as np  # type: ignore
+import numpy as np
 from dataclasses import dataclass
 from typing import Optional, List
 
@@ -96,7 +96,7 @@ def migrate_affine_xy_to_attitude(
             [False, False, False, False],
         ]
     )
-    masked_array = np.ma.masked_array(gantry_cal, ~masked_transform)
+    masked_array = np.ma.masked_array(gantry_cal, ~masked_transform)  # type: ignore
     attitude_array = np.zeros((3, 3))
     np.put(attitude_array, [0, 1, 2], masked_array[0].compressed())
     np.put(attitude_array, [3, 4, 5], masked_array[1].compressed())

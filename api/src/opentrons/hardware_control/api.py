@@ -16,6 +16,7 @@ from typing import (
     cast,
     overload,
     Sequence,
+    Set,
 )
 
 from opentrons_shared_data.pipette import name_config
@@ -29,6 +30,7 @@ from .util import use_or_initialize_loop, DeckTransformState, check_motion_bound
 from .pipette import Pipette, generate_hardware_configs, load_from_config_and_check_skip
 from .controller import Controller
 from .simulator import Simulator
+from .ot3controller import OT3Controller
 from .constants import (
     SHAKE_OFF_TIPS_SPEED,
     SHAKE_OFF_TIPS_DROP_DISTANCE,
@@ -46,7 +48,8 @@ from .types import (
     NoTipAttachedError,
     DoorState,
     DoorStateNotification,
-    HardwareEvent,
+    ErrorMessageNotification,
+    HardwareEventHandler,
     PipettePair,
     TipAttachedError,
     HardwareAction,
@@ -83,7 +86,7 @@ class API(HardwareAPILike):
 
     def __init__(
         self,
-        backend: Union[Controller, Simulator],
+        backend: Union[Controller, Simulator, OT3Controller],
         loop: asyncio.AbstractEventLoop,
         config: RobotConfig,
     ) -> None:
@@ -99,7 +102,7 @@ class API(HardwareAPILike):
         self._loop = loop
 
         self._execution_manager = ExecutionManager(loop=loop)
-        self._callbacks: set = set()
+        self._callbacks: Set[HardwareEventHandler] = set()
         # {'X': 0.0, 'Y': 0.0, 'Z': 0.0, 'A': 0.0, 'B': 0.0, 'C': 0.0}
         self._current_position: Dict[Axis, float] = {}
 
@@ -220,6 +223,10 @@ class API(HardwareAPILike):
             return api_instance
         finally:
             blink_task.cancel()
+            try:
+                await blink_task
+            except asyncio.CancelledError:
+                pass
 
     @classmethod
     async def build_hardware_simulator(
@@ -258,6 +265,21 @@ class API(HardwareAPILike):
         await backend.watch()
         return api_instance
 
+    @classmethod
+    async def build_ot3_controller(
+        cls,
+        attached_instruments: Dict[top_types.Mount, Dict[str, Optional[str]]] = None,
+        attached_modules: List[str] = None,
+        config: RobotConfig = None,
+        loop: asyncio.AbstractEventLoop = None,
+        strict_attached_instruments: bool = True,
+    ) -> "API":
+        """Build an ot3 hardware controller."""
+        checked_loop = use_or_initialize_loop(loop)
+        checked_config = config or robot_configs.load()
+        backend = await OT3Controller.build(checked_config)
+        return cls(backend, loop=checked_loop, config=checked_config)
+
     def __repr__(self):
         return "<{} using backend {}>".format(type(self), type(self._backend))
 
@@ -279,7 +301,7 @@ class API(HardwareAPILike):
         """
         The lru cache decorator is currently not supported by the
         ThreadManager. To work around this, we need to wrap the
-        actualy function around a dummy outer function.
+        actual function around a dummy outer function.
 
         Once decorators are more fully supported, we can remove this.
         """
@@ -291,9 +313,7 @@ class API(HardwareAPILike):
             self._robot_calibration.deck_calibration
         )
 
-    def register_callback(
-        self, cb: Callable[[Union[str, HardwareEvent]], None]
-    ) -> Callable[[], None]:
+    def register_callback(self, cb: HardwareEventHandler) -> Callable[[], None]:
         """Allows the caller to register a callback, and returns a closure
         that can be used to unregister the provided callback
         """
@@ -593,10 +613,11 @@ class API(HardwareAPILike):
 
         asyncio.run_coroutine_threadsafe(_chained_calls(), self._loop)
 
-    def pause_with_message(self, message):
-        self._log.warning("Pause with message: {}".format(message))
+    def pause_with_message(self, message: str):
+        self._log.warning(f"Pause with message: {message}")
+        notification = ErrorMessageNotification(message=message)
         for cb in self._callbacks:
-            cb(message)
+            cb(notification)
         self.pause(PauseType.PAUSE)
 
     def resume(self, pause_type: PauseType):

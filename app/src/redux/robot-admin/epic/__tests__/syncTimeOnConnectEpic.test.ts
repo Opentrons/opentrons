@@ -13,7 +13,7 @@ import { syncTimeOnConnectEpic } from '../syncTimeOnConnectEpic'
 import type { Action } from '../../../types'
 
 const createConnectAction = (robotName: string): Action =>
-  RobotActions.connect(robotName) as any
+  RobotActions.legacyConnect(robotName) as any
 
 const createTimeSuccessResponse = (
   time: Date

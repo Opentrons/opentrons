@@ -41,9 +41,11 @@ jobs:
       - name: Checkout firmware repo
         uses: actions/checkout@v2
 
-        # Don't specify ot3-firmware-commit-id input var to get it to pull main from ot3-firmware
       - name: Run OT-3 Emulator
-        uses: Opentrons/ot3-emulator@v1.1
+        uses: Opentrons/opentrons-emulation@v1.2
+        with:
+          ot3-firmware-commit-id: latest
+          modules-commit-id: latest
 
       - name: Checkout opentrons repo
         uses: 'actions/checkout@v2'

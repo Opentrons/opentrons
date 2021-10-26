@@ -1,7 +1,6 @@
 import json
 import os
 import sys
-from functools import partial
 from pathlib import Path
 import logging
 import asyncio
@@ -45,7 +44,7 @@ LEGACY_MODULES = ["robot", "reset", "instruments", "containers", "labware", "mod
 __all__ = ["version", "HERE", "config"]
 
 
-def __getattr__(attrname):
+def __getattr__(attrname: str) -> None:
     """
     Prevent import of legacy modules from global to officially
     deprecate Python API Version 1.0.
@@ -55,19 +54,11 @@ def __getattr__(attrname):
     raise AttributeError(attrname)
 
 
-def __dir__():
+def __dir__() -> List[str]:
     return sorted(__all__ + LEGACY_MODULES)
 
 
 log = logging.getLogger(__name__)
-
-try:
-    import systemd.daemon  # type: ignore
-
-    systemdd_notify = partial(systemd.daemon.notify, "READY=1")
-except ImportError:
-    log.info("Systemd couldn't be imported, not notifying")
-    systemdd_notify = partial(lambda: None)
 
 
 SMOOTHIE_HEX_RE = re.compile("smoothie-(.*).hex")
@@ -152,7 +143,6 @@ async def initialize() -> API:
 
     log.info(f"API server version: {__version__}")
     log.info(f"Robot Name: {name()}")
-    systemdd_notify()
 
     use_thread_manager = ff.enable_protocol_engine() is False
 
@@ -162,21 +152,29 @@ async def initialize() -> API:
     else:
         hardware = await _create_hardware_api()
 
-    async def _blink():
+    async def _blink() -> None:
         while True:
             await hardware.set_lights(button=True)
             await asyncio.sleep(0.5)
             await hardware.set_lights(button=False)
             await asyncio.sleep(0.5)
 
+    # While the hardware was initializing in _create_hardware_api(), it blinked the
+    # front button light. But that blinking stops when the completed hardware object
+    # is returned. Do our own blinking here to keep it going while we home the robot.
     blink_task = asyncio.create_task(_blink())
 
-    if not ff.disable_home_on_boot():
-        log.info("Homing Z axes")
-        await hardware.home_z()
+    try:
+        if not ff.disable_home_on_boot():
+            log.info("Homing Z axes")
+            await hardware.home_z()
 
-    blink_task.cancel()
-    await asyncio.gather(blink_task, return_exceptions=True)
-    await hardware.set_lights(button=True)
+        await hardware.set_lights(button=True)
 
-    return hardware
+        return hardware
+    finally:
+        blink_task.cancel()
+        try:
+            await blink_task
+        except asyncio.CancelledError:
+            pass

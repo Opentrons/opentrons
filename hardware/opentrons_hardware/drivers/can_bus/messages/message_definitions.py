@@ -46,6 +46,20 @@ class GetStatusRequest:  # noqa: D101
 
 
 @dataclass
+class EnableMotorRequest:  # noqa: D101
+    message_id: Literal[MessageId.enable_motor_request] = MessageId.enable_motor_request
+    payload_type: Type[BinarySerializable] = payloads.EmptyMessage
+
+
+@dataclass
+class DisableMotorRequest:  # noqa: D101
+    message_id: Literal[
+        MessageId.disable_motor_request
+    ] = MessageId.disable_motor_request
+    payload_type: Type[BinarySerializable] = payloads.EmptyMessage
+
+
+@dataclass
 class GetStatusResponse:  # noqa: D101
     message_id: Literal[MessageId.get_status_response] = MessageId.get_status_response
     payload_type: Type[BinarySerializable] = payloads.EmptyMessage
@@ -91,3 +105,47 @@ class ReadFromEEPromRequest:  # noqa: D101
 class ReadFromEEPromResponse:  # noqa: D101
     message_id: Literal[MessageId.read_eeprom_response] = MessageId.read_eeprom_response
     payload_type: Type[BinarySerializable] = payloads.ReadFromEEPromResponse
+
+
+@dataclass
+class AddLinearMoveRequest:  # noqa: D101
+    message_id: Literal[MessageId.add_move_request] = MessageId.add_move_request
+    payload_type: Type[BinarySerializable] = payloads.AddLinearMoveRequest
+
+
+@dataclass
+class GetMoveGroupRequest:  # noqa: D101
+    message_id: Literal[
+        MessageId.get_move_group_request
+    ] = MessageId.get_move_group_request
+    payload_type: Type[BinarySerializable] = payloads.MoveGroupRequest
+
+
+@dataclass
+class GetMoveGroupResponse:  # noqa: D101
+    message_id: Literal[
+        MessageId.get_move_group_response
+    ] = MessageId.get_move_group_response
+    payload_type: Type[BinarySerializable] = payloads.GetMoveGroupResponse
+
+
+@dataclass
+class ExecuteMoveGroupRequest:  # noqa: D101
+    message_id: Literal[
+        MessageId.execute_move_group_request
+    ] = MessageId.execute_move_group_request
+    payload_type: Type[BinarySerializable] = payloads.MoveGroupRequest
+
+
+@dataclass
+class ClearMoveGroupRequest:  # noqa: D101
+    message_id: Literal[
+        MessageId.clear_move_group_request
+    ] = MessageId.clear_move_group_request
+    payload_type: Type[BinarySerializable] = payloads.MoveGroupRequest
+
+
+@dataclass
+class MoveGroupCompleted:  # noqa: D101
+    message_id: Literal[MessageId.move_group_completed] = MessageId.move_group_completed
+    payload_type: Type[BinarySerializable] = payloads.MoveGroupCompleted

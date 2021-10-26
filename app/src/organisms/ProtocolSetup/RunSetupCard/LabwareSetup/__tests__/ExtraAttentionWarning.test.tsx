@@ -30,7 +30,7 @@ describe('ExtraAttentionWarning', () => {
     const { getByRole } = render(props)
 
     getByRole('heading', {
-      name: 'Some labware and modules require extra attention',
+      name: 'Secure labware and modules before proceeding to run',
     })
   })
   it('should render the correct text for the mag mod', () => {
@@ -45,7 +45,7 @@ describe('ExtraAttentionWarning', () => {
     getByText(
       'Opentrons recommends securing labware with the module’s bracket.'
     )
-    getByText('Securing labware to the Magnetic Module')
+    getByText('See how to secure labware to the Magnetic Module')
   })
   it('should render the correct text for the TC', () => {
     props = {
@@ -57,7 +57,7 @@ describe('ExtraAttentionWarning', () => {
       name: 'Thermocycler',
     })
     getByText('Labware must be secured with the module’s latch.')
-    getByText('Securing labware to the Thermocycler')
+    getByText('See how to secure labware to the Thermocyler Module')
     getByText(
       'Thermocycler lid must be open when robot moves to the slots it occupies. Opentrons will automatically open the lid to move to these slots during Labware Position Check.'
     )
@@ -81,7 +81,9 @@ describe('ExtraAttentionWarning', () => {
       screen.queryByText('mock secure labware modal magnetic module')
     ).toBeNull()
 
-    const modalLink = getByText('Securing labware to the Magnetic Module')
+    const modalLink = getByText(
+      'See how to secure labware to the Magnetic Module'
+    )
 
     fireEvent.click(modalLink)
     getByText('mock secure labware modal magnetic module')
@@ -105,7 +107,9 @@ describe('ExtraAttentionWarning', () => {
       screen.queryByText('mock secure labware modal thermocycler')
     ).toBeNull()
 
-    const modalLink = getByText('Securing labware to the Thermocycler')
+    const modalLink = getByText(
+      'See how to secure labware to the Thermocyler Module'
+    )
 
     fireEvent.click(modalLink)
     getByText('mock secure labware modal thermocycler')

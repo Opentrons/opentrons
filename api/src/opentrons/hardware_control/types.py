@@ -3,12 +3,10 @@ import asyncio
 import enum
 import logging
 from dataclasses import dataclass
-from typing import cast, Tuple, Union, List, TYPE_CHECKING
+from typing import cast, Tuple, Union, List, Callable
 from typing_extensions import Literal
 from opentrons import types as top_types
 
-if TYPE_CHECKING:
-    from .dev_types import DoorStateNotificationType
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -50,7 +48,7 @@ class Axis(enum.Enum):
         """The axes which are tied to the gantry and require the deck
         calibration transform
         """
-        return (cls.X, cls.Y, cls.Z, cls.A)
+        return cls.X, cls.Y, cls.Z, cls.A
 
     @classmethod
     def of_plunger(cls, mount: top_types.Mount):
@@ -80,18 +78,29 @@ class DoorState(enum.Enum):
 
 class HardwareEventType(enum.Enum):
     DOOR_SWITCH_CHANGE = enum.auto()
+    ERROR_MESSAGE = enum.auto()
 
 
 @dataclass
 class DoorStateNotification:
-    event: "DoorStateNotificationType" = HardwareEventType.DOOR_SWITCH_CHANGE
+    event: Literal[
+        HardwareEventType.DOOR_SWITCH_CHANGE
+    ] = HardwareEventType.DOOR_SWITCH_CHANGE
     new_state: DoorState = DoorState.CLOSED
     blocking: bool = False
 
 
+@dataclass
+class ErrorMessageNotification:
+    message: str
+    event: Literal[HardwareEventType.ERROR_MESSAGE] = HardwareEventType.ERROR_MESSAGE
+
+
 # new event types get new dataclasses
 # when we add more event types we add them here
-HardwareEvent = Union[DoorStateNotification]
+HardwareEvent = Union[DoorStateNotification, ErrorMessageNotification]
+
+HardwareEventHandler = Callable[[HardwareEvent], None]
 
 
 class HardwareAPILike(abc.ABC):
@@ -128,7 +137,7 @@ class BoardRevision(enum.Enum):
     C = enum.auto()
 
     @classmethod
-    def by_bits(cls, rev_bits: Tuple[bool, bool]):
+    def by_bits(cls, rev_bits: Tuple[bool, bool]) -> "BoardRevision":
         br = {
             (True, True): cls.OG,
             (False, True): cls.A,
