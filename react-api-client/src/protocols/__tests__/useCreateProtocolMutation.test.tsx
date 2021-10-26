@@ -6,10 +6,13 @@ import { createProtocol } from '@opentrons/api-client'
 import { useHost } from '../../api'
 import { useCreateProtocolMutation } from '..'
 import type { HostConfig, Response, Protocol } from '@opentrons/api-client'
-import { testProtocol } from '../../../../protocol-designer/fixtures/protocol/5/doItAllV5.json'
+import testProtocol from '../../../../protocol-designer/fixtures/protocol/5/doItAllV5.json'
 
 jest.mock('@opentrons/api-client')
 jest.mock('../../api/useHost')
+
+const contents = JSON.stringify(testProtocol)
+const jsonFile = new File([contents], 'valid.json')
 
 const mockCreateProtocol = createProtocol as jest.MockedFunction<
   typeof createProtocol
@@ -29,7 +32,7 @@ const PROTOCOL_RESPONSE = {
 
 describe('useCreateProtocolMutation hook', () => {
   let wrapper: React.FunctionComponent<{}>
-  const createProtocolData = [testProtocol]
+  const createProtocolData = [jsonFile]
 
   beforeEach(() => {
     const queryClient = new QueryClient()
