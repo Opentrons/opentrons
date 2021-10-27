@@ -2,9 +2,9 @@
 import pytest
 from datetime import datetime
 
-from robot_server.sessions.run_models import BasicRunCreateData
+from robot_server.runs.run_models import BasicRunCreateData
 
-from robot_server.sessions.run_store import (
+from robot_server.runs.run_store import (
     RunStore,
     RunResource,
     RunNotFoundError,

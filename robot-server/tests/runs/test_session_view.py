@@ -13,9 +13,9 @@ from opentrons.protocol_engine import (
     commands as pe_commands,
 )
 
-from robot_server.sessions.run_store import RunResource
-from robot_server.sessions.run_view import RunView
-from robot_server.sessions.run_models import (
+from robot_server.runs.run_store import RunResource
+from robot_server.runs.run_view import RunView
+from robot_server.runs.run_models import (
     Run,
     BasicRun,
     BasicRunCreateData,
@@ -25,7 +25,7 @@ from robot_server.sessions.run_models import (
     RunCommandSummary,
 )
 
-from robot_server.sessions.action_models import (
+from robot_server.runs.action_models import (
     RunAction,
     RunActionCreateData,
     RunActionType,
@@ -38,8 +38,9 @@ def test_create_run_resource_from_none() -> None:
     create_data = None
 
     subject = RunView()
-    result = subject.as_resource(run_id="run-id", created_at=created_at,
-                                 create_data=create_data)
+    result = subject.as_resource(
+        run_id="run-id", created_at=created_at, create_data=create_data
+    )
 
     assert result == RunResource(
         run_id="run-id",
@@ -55,8 +56,9 @@ def test_create_run_resource() -> None:
     create_data = BasicRunCreateData()
 
     subject = RunView()
-    result = subject.as_resource(run_id="run-id", created_at=created_at,
-                                 create_data=create_data)
+    result = subject.as_resource(
+        run_id="run-id", created_at=created_at, create_data=create_data
+    )
 
     assert result == RunResource(
         run_id="run-id",
@@ -74,8 +76,9 @@ def test_create_protocol_run_resource() -> None:
     )
 
     subject = RunView()
-    result = subject.as_resource(run_id="run-id", created_at=created_at,
-                                 create_data=create_data)
+    result = subject.as_resource(
+        run_id="run-id", created_at=created_at, create_data=create_data
+    )
 
     assert result == RunResource(
         run_id="run-id",
@@ -92,13 +95,13 @@ current_time = datetime.now()
     ("run_resource", "expected_response"),
     (
         (
-                RunResource(
+            RunResource(
                 run_id="run-id",
                 create_data=BasicRunCreateData(),
                 created_at=current_time,
                 actions=[],
             ),
-                BasicRun(
+            BasicRun(
                 id="run-id",
                 createdAt=current_time,
                 status=EngineStatus.READY_TO_RUN,
@@ -109,7 +112,7 @@ current_time = datetime.now()
             ),
         ),
         (
-                RunResource(
+            RunResource(
                 run_id="run-id",
                 create_data=ProtocolRunCreateData(
                     createParams=ProtocolRunCreateParams(protocolId="protocol-id")
@@ -117,7 +120,7 @@ current_time = datetime.now()
                 created_at=current_time,
                 actions=[],
             ),
-                ProtocolRun(
+            ProtocolRun(
                 id="run-id",
                 createdAt=current_time,
                 status=EngineStatus.READY_TO_RUN,
@@ -136,8 +139,13 @@ def test_to_response(
 ) -> None:
     """It should create the correct type of run."""
     subject = RunView()
-    result = subject.as_response(run=run_resource, commands=[], pipettes=[],
-                                 labware=[], engine_status=EngineStatus.READY_TO_RUN)
+    result = subject.as_response(
+        run=run_resource,
+        commands=[],
+        pipettes=[],
+        labware=[],
+        engine_status=EngineStatus.READY_TO_RUN,
+    )
     assert result == expected_response
 
 
@@ -168,9 +176,13 @@ def test_to_response_maps_commands() -> None:
     )
 
     subject = RunView()
-    result = subject.as_response(run=run_resource, commands=[command_1, command_2],
-                                 pipettes=[], labware=[],
-                                 engine_status=EngineStatus.RUNNING)
+    result = subject.as_response(
+        run=run_resource,
+        commands=[command_1, command_2],
+        pipettes=[],
+        labware=[],
+        engine_status=EngineStatus.RUNNING,
+    )
 
     assert result == BasicRun(
         id="run-id",
@@ -217,8 +229,13 @@ def test_to_response_adds_equipment() -> None:
     )
 
     subject = RunView()
-    result = subject.as_response(run=run_resource, commands=[], pipettes=[pipette],
-                                 labware=[labware], engine_status=EngineStatus.RUNNING)
+    result = subject.as_response(
+        run=run_resource,
+        commands=[],
+        pipettes=[pipette],
+        labware=[labware],
+        engine_status=EngineStatus.RUNNING,
+    )
 
     assert result == BasicRun(
         id="run-id",
@@ -247,10 +264,12 @@ def test_create_action(current_time: datetime) -> None:
     )
 
     subject = RunView()
-    action_result, run_result = subject.with_action(run=run,
-                                                        action_id="control-command-id",
-                                                        action_data=command_data,
-                                                        created_at=current_time)
+    action_result, run_result = subject.with_action(
+        run=run,
+        action_id="control-command-id",
+        action_data=command_data,
+        created_at=current_time,
+    )
 
     assert action_result == RunAction(
         id="control-command-id",

@@ -95,8 +95,9 @@ async def create_run(
         task_runner: Background task runner.
     """
     create_data = request_body.data if request_body is not None else None
-    run = run_view.as_resource(run_id=run_id, created_at=created_at,
-                               create_data=create_data)
+    run = run_view.as_resource(
+        run_id=run_id, created_at=created_at, create_data=create_data
+    )
     protocol_id = None
 
     if isinstance(create_data, ProtocolRunCreateData):
@@ -121,11 +122,13 @@ async def create_run(
 
     run_store.upsert(run=run)
 
-    data = run_view.as_response(run=run,
-                                commands=engine_store.engine.state_view.commands.get_all(),
-                                pipettes=engine_store.engine.state_view.pipettes.get_all(),
-                                labware=engine_store.engine.state_view.labware.get_all(),
-                                engine_status=engine_store.engine.state_view.commands.get_status())
+    data = run_view.as_response(
+        run=run,
+        commands=engine_store.engine.state_view.commands.get_all(),
+        pipettes=engine_store.engine.state_view.pipettes.get_all(),
+        labware=engine_store.engine.state_view.labware.get_all(),
+        engine_status=engine_store.engine.state_view.commands.get_status(),
+    )
 
     return ResponseModel(data=data)
 
@@ -153,11 +156,13 @@ async def get_runs(
 
     for run in run_store.get_all():
         # TODO(mc, 2021-06-23): add multi-engine support
-        run_data = run_view.as_response(run=run,
-                                        commands=engine_store.engine.state_view.commands.get_all(),
-                                        pipettes=engine_store.engine.state_view.pipettes.get_all(),
-                                        labware=engine_store.engine.state_view.labware.get_all(),
-                                        engine_status=engine_store.engine.state_view.commands.get_status())
+        run_data = run_view.as_response(
+            run=run,
+            commands=engine_store.engine.state_view.commands.get_all(),
+            pipettes=engine_store.engine.state_view.pipettes.get_all(),
+            labware=engine_store.engine.state_view.labware.get_all(),
+            engine_status=engine_store.engine.state_view.commands.get_status(),
+        )
 
         data.append(run_data)
 
@@ -193,11 +198,13 @@ async def get_run(
     except RunNotFoundError as e:
         raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
 
-    data = run_view.as_response(run=run,
-                                commands=engine_store.engine.state_view.commands.get_all(),
-                                pipettes=engine_store.engine.state_view.pipettes.get_all(),
-                                labware=engine_store.engine.state_view.labware.get_all(),
-                                engine_status=engine_store.engine.state_view.commands.get_status())
+    data = run_view.as_response(
+        run=run,
+        commands=engine_store.engine.state_view.commands.get_all(),
+        pipettes=engine_store.engine.state_view.pipettes.get_all(),
+        labware=engine_store.engine.state_view.labware.get_all(),
+        engine_status=engine_store.engine.state_view.commands.get_status(),
+    )
 
     return ResponseModel(data=data)
 

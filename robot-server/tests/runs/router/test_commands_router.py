@@ -13,13 +13,13 @@ from opentrons.protocol_engine import (
 
 from robot_server.errors import ApiError
 from robot_server.service.json_api import RequestModel, ResponseModel
-from robot_server.sessions.run_models import (
+from robot_server.runs.run_models import (
     Run,
     BasicRun,
     RunCommandSummary,
 )
-from robot_server.sessions.engine_store import EngineStore
-from robot_server.sessions.router.commands_router import (
+from robot_server.runs.engine_store import EngineStore
+from robot_server.runs.router.commands_router import (
     post_run_command,
     get_run_command,
     get_run_commands,
@@ -43,8 +43,9 @@ async def test_post_run_command(decoy: Decoy, engine_store: EngineStore) -> None
         output_command
     )
 
-    response = await post_run_command(request_body=RequestModel(data=command_request),
-                                      engine_store=engine_store)
+    response = await post_run_command(
+        request_body=RequestModel(data=command_request), engine_store=engine_store
+    )
 
     assert response.data == output_command
 

@@ -18,9 +18,9 @@ from robot_server.protocols import (
     ProtocolNotFound,
 )
 
-from robot_server.sessions.run_view import RunView
+from robot_server.runs.run_view import RunView
 
-from robot_server.sessions.run_models import (
+from robot_server.runs.run_models import (
     RunCommandSummary,
     BasicRun,
     BasicRunCreateData,
@@ -29,19 +29,19 @@ from robot_server.sessions.run_models import (
     ProtocolRunCreateParams,
 )
 
-from robot_server.sessions.engine_store import (
+from robot_server.runs.engine_store import (
     EngineStore,
     EngineConflictError,
     EngineMissingError,
 )
 
-from robot_server.sessions.run_store import (
+from robot_server.runs.run_store import (
     RunStore,
     RunNotFoundError,
     RunResource,
 )
 
-from robot_server.sessions.router.base_router import (
+from robot_server.runs.router.base_router import (
     base_router,
     RunNotFound,
     RunAlreadyActive,
@@ -92,13 +92,19 @@ async def test_create_run(
     )
 
     decoy.when(
-        run_view.as_resource(run_id=unique_id, created_at=current_time,
-                             create_data=BasicRunCreateData())
+        run_view.as_resource(
+            run_id=unique_id, created_at=current_time, create_data=BasicRunCreateData()
+        )
     ).then_return(run)
 
     decoy.when(
-        run_view.as_response(run=run, commands=[], pipettes=[], labware=[],
-                             engine_status=pe_types.EngineStatus.READY_TO_RUN),
+        run_view.as_response(
+            run=run,
+            commands=[],
+            pipettes=[],
+            labware=[],
+            engine_status=pe_types.EngineStatus.READY_TO_RUN,
+        ),
     ).then_return(expected_response)
 
     response = await async_client.post(
@@ -156,11 +162,13 @@ async def test_create_protocol_run(
     )
 
     decoy.when(
-        run_view.as_resource(run_id=unique_id, created_at=current_time,
-                             create_data=ProtocolRunCreateData(
-                                     createParams=ProtocolRunCreateParams(
-                                         protocolId="protocol-id")
-                                 ))
+        run_view.as_resource(
+            run_id=unique_id,
+            created_at=current_time,
+            create_data=ProtocolRunCreateData(
+                createParams=ProtocolRunCreateParams(protocolId="protocol-id")
+            ),
+        )
     ).then_return(run)
 
     decoy.when(engine_store.engine.state_view.commands.get_all()).then_return([])
@@ -171,8 +179,13 @@ async def test_create_protocol_run(
     )
 
     decoy.when(
-        run_view.as_response(run=run, commands=[], pipettes=[], labware=[],
-                             engine_status=pe_types.EngineStatus.READY_TO_RUN),
+        run_view.as_response(
+            run=run,
+            commands=[],
+            pipettes=[],
+            labware=[],
+            engine_status=pe_types.EngineStatus.READY_TO_RUN,
+        ),
     ).then_return(expected_response)
 
     response = await async_client.post(
@@ -244,8 +257,9 @@ async def test_create_run_conflict(
     )
 
     decoy.when(
-        run_view.as_resource(run_id=unique_id, created_at=current_time,
-                             create_data=None)
+        run_view.as_resource(
+            run_id=unique_id, created_at=current_time, create_data=None
+        )
     ).then_return(run)
 
     decoy.when(await engine_store.create()).then_raise(EngineConflictError("oh no"))
@@ -322,9 +336,13 @@ def test_get_run(
     )
 
     decoy.when(
-        run_view.as_response(run=run, commands=[command], pipettes=[pipette],
-                             labware=[labware],
-                             engine_status=pe_types.EngineStatus.READY_TO_RUN),
+        run_view.as_response(
+            run=run,
+            commands=[command],
+            pipettes=[pipette],
+            labware=[labware],
+            engine_status=pe_types.EngineStatus.READY_TO_RUN,
+        ),
     ).then_return(expected_response)
 
     response = client.get("/runs/run-id")
@@ -402,8 +420,13 @@ def test_get_runs_not_empty(
     )
 
     decoy.when(
-        run_view.as_response(run=run_1, commands=[], pipettes=[], labware=[],
-                             engine_status=pe_types.EngineStatus.SUCCEEDED),
+        run_view.as_response(
+            run=run_1,
+            commands=[],
+            pipettes=[],
+            labware=[],
+            engine_status=pe_types.EngineStatus.SUCCEEDED,
+        ),
     ).then_return(response_1)
 
     response = client.get("/runs")

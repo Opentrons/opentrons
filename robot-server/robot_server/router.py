@@ -7,7 +7,7 @@ from .constants import V1_TAG
 from .errors import LegacyErrorResponse
 from .health import health_router
 from .protocols import protocols_router
-from .sessions import runs_router
+from .runs import runs_router
 from .system import system_router
 from .versioning import check_version_header
 from .service.legacy.routers import legacy_routes
@@ -46,7 +46,7 @@ router.include_router(
 if enable_protocol_engine():
     router.include_router(
         router=runs_router,
-        tags=["Session Management"],
+        tags=["Run Management"],
         dependencies=[Depends(check_version_header)],
     )
 

@@ -12,10 +12,10 @@ from robot_server.errors import exception_handlers
 from robot_server.service.dependencies import get_current_time, get_unique_id
 from robot_server.service.task_runner import TaskRunner
 from robot_server.protocols import ProtocolStore, get_protocol_store
-from robot_server.sessions.run_view import RunView
-from robot_server.sessions.run_store import RunStore
-from robot_server.sessions.engine_store import EngineStore
-from robot_server.sessions.dependencies import get_run_store, get_engine_store
+from robot_server.runs.run_view import RunView
+from robot_server.runs.run_store import RunStore
+from robot_server.runs.engine_store import EngineStore
+from robot_server.runs.dependencies import get_run_store, get_engine_store
 
 
 @pytest.fixture

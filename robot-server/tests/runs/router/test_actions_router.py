@@ -7,24 +7,24 @@ from fastapi.testclient import TestClient
 from httpx import AsyncClient
 
 from tests.helpers import verify_response
-from robot_server.sessions.run_models import BasicRunCreateData
-from robot_server.sessions.run_view import RunView
-from robot_server.sessions.engine_store import EngineStore, EngineMissingError
-from robot_server.sessions.run_store import (
+from robot_server.runs.run_models import BasicRunCreateData
+from robot_server.runs.run_view import RunView
+from robot_server.runs.engine_store import EngineStore, EngineMissingError
+from robot_server.runs.run_store import (
     RunStore,
     RunNotFoundError,
     RunResource,
 )
 
-from robot_server.sessions.action_models import (
+from robot_server.runs.action_models import (
     RunAction,
     RunActionType,
     RunActionCreateData,
 )
 
-from robot_server.sessions.router.base_router import RunNotFound
+from robot_server.runs.router.base_router import RunNotFound
 
-from robot_server.sessions.router.actions_router import (
+from robot_server.runs.router.actions_router import (
     actions_router,
     RunActionNotAllowed,
 )
@@ -73,10 +73,12 @@ def test_create_play_action(
     )
 
     decoy.when(
-        run_view.with_action(run=prev_run, action_id=unique_id,
-                             action_data=RunActionCreateData(
-                                     actionType=RunActionType.PLAY),
-                             created_at=current_time),
+        run_view.with_action(
+            run=prev_run,
+            action_id=unique_id,
+            action_data=RunActionCreateData(actionType=RunActionType.PLAY),
+            created_at=current_time,
+        ),
     ).then_return((action, next_run))
 
     response = client.post(
@@ -135,10 +137,12 @@ def test_create_run_action_without_runner(
     )
 
     decoy.when(
-        run_view.with_action(run=prev_run, action_id=unique_id,
-                             action_data=RunActionCreateData(
-                                     actionType=RunActionType.PLAY),
-                             created_at=current_time),
+        run_view.with_action(
+            run=prev_run,
+            action_id=unique_id,
+            action_data=RunActionCreateData(actionType=RunActionType.PLAY),
+            created_at=current_time,
+        ),
     ).then_return((actions, next_run))
 
     decoy.when(engine_store.runner.play()).then_raise(EngineMissingError("oh no"))
@@ -178,10 +182,12 @@ def test_create_pause_action(
     )
 
     decoy.when(
-        run_view.with_action(run=prev_run, action_id=unique_id,
-                             action_data=RunActionCreateData(
-                                     actionType=RunActionType.PAUSE),
-                             created_at=current_time),
+        run_view.with_action(
+            run=prev_run,
+            action_id=unique_id,
+            action_data=RunActionCreateData(actionType=RunActionType.PAUSE),
+            created_at=current_time,
+        ),
     ).then_return((action, next_run))
 
     response = client.post(
@@ -216,10 +222,12 @@ async def test_create_stop_action(
     )
 
     decoy.when(
-        run_view.with_action(run=prev_run, action_id=unique_id,
-                             action_data=RunActionCreateData(
-                                     actionType=RunActionType.STOP),
-                             created_at=current_time),
+        run_view.with_action(
+            run=prev_run,
+            action_id=unique_id,
+            action_data=RunActionCreateData(actionType=RunActionType.STOP),
+            created_at=current_time,
+        ),
     ).then_return((action, next_run))
 
     response = await async_client.post(

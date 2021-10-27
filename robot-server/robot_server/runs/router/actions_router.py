@@ -27,9 +27,7 @@ class RunActionNotAllowed(ErrorDetails):
 @actions_router.post(
     path="/runs/{runId}/actions",
     summary="Issue a control action to the run",
-    description=(
-        "Provide an action in order to control execution of the run."
-    ),
+    description=("Provide an action in order to control execution of the run."),
     status_code=status.HTTP_201_CREATED,
     response_model=ResponseModel[RunAction],
     responses={
@@ -60,9 +58,12 @@ async def create_run_action(
     try:
         prev_run = run_store.get(run_id=runId)
 
-        action, next_run = run_view.with_action(run=prev_run, action_id=action_id,
-                                                action_data=request_body.data,
-                                                created_at=created_at)
+        action, next_run = run_view.with_action(
+            run=prev_run,
+            action_id=action_id,
+            action_data=request_body.data,
+            created_at=created_at,
+        )
 
         # TODO(mc, 2021-07-06): add a dependency to verify that a given
         # action is allowed
@@ -76,9 +77,7 @@ async def create_run_action(
     except RunNotFoundError as e:
         raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
     except EngineMissingError as e:
-        raise RunActionNotAllowed(detail=str(e)).as_error(
-            status.HTTP_400_BAD_REQUEST
-        )
+        raise RunActionNotAllowed(detail=str(e)).as_error(status.HTTP_400_BAD_REQUEST)
 
     run_store.upsert(run=next_run)
 
