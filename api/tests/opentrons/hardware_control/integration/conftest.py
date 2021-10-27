@@ -1,8 +1,12 @@
+from multiprocessing import Process
 from typing import Iterator
 
 import pytest
 import threading
 import asyncio
+
+from opentrons.hardware_control.emulation.module_server import ModuleServerClient
+from opentrons.hardware_control.emulation.module_server.helpers import wait_emulators
 from opentrons.hardware_control.emulation.scripts import run_app
 from opentrons.hardware_control.emulation.types import ModuleType
 from opentrons.hardware_control.emulation.settings import (
@@ -27,24 +31,31 @@ def emulator_settings() -> Settings:
 @pytest.fixture(scope="session")
 def emulation_app(emulator_settings: Settings) -> Iterator[None]:
     """Run the emulators"""
+    modules = [ModuleType.Magnetic, ModuleType.Temperature, ModuleType.Thermocycler]
 
-    def runit() -> None:
-        asyncio.run(
-            run_app.run(
-                settings=emulator_settings,
-                modules=[
-                    ModuleType.Magnetic,
-                    ModuleType.Temperature,
-                    ModuleType.Thermocycler,
-                ],
-            )
+    def _run_app() -> None:
+        asyncio.run(run_app.run(emulator_settings, modules=[m.value for m in modules]))
+
+    proc = Process(target=_run_app)
+    proc.daemon = True
+    proc.start()
+
+    async def _wait_ready() -> None:
+        c = await ModuleServerClient.connect(
+            host="localhost", port=emulator_settings.module_server.port
         )
+        await wait_emulators(client=c, modules=modules, timeout=5)
+        c.close()
 
-    # TODO 20210219
-    #  The emulators must be run in a separate thread because our serial
-    #  drivers block the main thread. Remove this thread when that is no
-    #  longer true.
-    t = threading.Thread(target=runit)
-    t.daemon = True
-    t.start()
+    def _run_wait_ready() -> None:
+        asyncio.run(_wait_ready())
+
+    ready_proc = Process(target=_run_wait_ready)
+    ready_proc.daemon = True
+    ready_proc.start()
+    ready_proc.join()
+
     yield
+
+    proc.kill()
+    proc.join()

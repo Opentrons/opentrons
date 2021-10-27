@@ -60,6 +60,7 @@ class ModuleListener:
         Returns:
             None
         """
+
         def _next_index() -> int:
             index = self._hub_index
             self._hub_index += 1
@@ -77,7 +78,6 @@ class ModuleListener:
             await self._notify_method(connections, [])
         elif message.status == "disconnected":
             await self._notify_method([], connections)
-
 
 
 async def wait_emulators(

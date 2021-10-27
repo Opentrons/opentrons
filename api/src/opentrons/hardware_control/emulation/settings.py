@@ -1,3 +1,4 @@
+from opentrons.hardware_control.emulation.util import TEMPERATURE_ROOM
 from pydantic import BaseSettings, BaseModel
 
 
@@ -17,7 +18,31 @@ class SmoothieSettings(BaseModel):
     port: int = 9996
 
 
-class ProxySettings(BaseSettings):
+class BaseModuleSettings(BaseModel):
+    serial_number: str
+    model: str
+    version: str
+
+
+class TemperatureModelSettings(BaseModel):
+    degrees_per_tick: float = 2.0
+    starting: float = float(TEMPERATURE_ROOM)
+
+
+class MagDeckSettings(BaseModuleSettings):
+    pass
+
+
+class TempDeckSettings(BaseModuleSettings):
+    temperature: TemperatureModelSettings
+
+
+class ThermocyclerSettings(BaseModuleSettings):
+    lid_temperature: TemperatureModelSettings
+    plate_temperature: TemperatureModelSettings
+
+
+class ProxySettings(BaseModel):
     """Settings for a proxy."""
 
     host: str = "0.0.0.0"
@@ -34,6 +59,22 @@ class ModuleServerSettings(BaseModel):
 
 class Settings(BaseSettings):
     smoothie: SmoothieSettings = SmoothieSettings()
+    magdeck: MagDeckSettings = MagDeckSettings(
+        serial_number="magnetic_emulator", model="mag_deck_v20", version="2.0.0"
+    )
+    tempdeck: TempDeckSettings = TempDeckSettings(
+        serial_number="temperature_emulator",
+        model="temp_deck_v20",
+        version="v2.0.1",
+        temperature=TemperatureModelSettings(starting=0.0),
+    )
+    thermocycler: ThermocyclerSettings = ThermocyclerSettings(
+        serial_number="thermocycler_emulator",
+        model="v02",
+        version="v1.1.0",
+        lid_temperature=TemperatureModelSettings(),
+        plate_temperature=TemperatureModelSettings(),
+    )
 
     host: str = "0.0.0.0"
 

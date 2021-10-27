@@ -3,8 +3,10 @@ from typing import List
 import pytest
 from mock import AsyncMock
 from opentrons.drivers.rpi_drivers.types import USBPort
-from opentrons.hardware_control.emulation.module_server import helpers, \
-    ModuleServerClient
+from opentrons.hardware_control.emulation.module_server import (
+    helpers,
+    ModuleServerClient,
+)
 from opentrons.hardware_control.emulation.module_server import models
 from opentrons.hardware_control.modules import ModuleAtPort
 
@@ -45,18 +47,18 @@ def modules_at_port() -> List[ModuleAtPort]:
         ModuleAtPort(
             port=f"url{i}",
             name=f"module_type{i}",
-            usb_port=USBPort(name=f"identifier{i}", sub_names=[], hub=i),
+            usb_port=USBPort(name=f"identifier{i}", sub_names=[], hub=i + 1),
         )
         for i in range(5)
     ]
 
 
-async def test_handle_message_connected_empty(subject: helpers.ModuleListener, mock_callback: AsyncMock) -> None:
+async def test_handle_message_connected_empty(
+    subject: helpers.ModuleListener, mock_callback: AsyncMock
+) -> None:
     """It should call the call back with the correct modules to add."""
     message = models.Message(status="connected", connections=[])
-    await subject.handle_message(
-        message=message
-    )
+    await subject.handle_message(message=message)
     mock_callback.assert_called_once_with([], [])
 
 
@@ -68,9 +70,7 @@ async def test_handle_message_connected_one(
 ) -> None:
     """It should call the call back with the correct modules to add."""
     message = models.Message(status="connected", connections=connections[:1])
-    await subject.handle_message(
-        message=message
-    )
+    await subject.handle_message(message=message)
     mock_callback.assert_called_once_with(modules_at_port[:1], [])
 
 
@@ -82,18 +82,16 @@ async def test_handle_message_connected_many(
 ) -> None:
     """It should call the call back with the correct modules to add."""
     message = models.Message(status="connected", connections=connections)
-    await subject.handle_message(
-        message=message
-    )
+    await subject.handle_message(message=message)
     mock_callback.assert_called_once_with(modules_at_port, [])
 
 
-async def test_handle_message_disconnected_empty(subject: helpers.ModuleListener, mock_callback: AsyncMock) -> None:
+async def test_handle_message_disconnected_empty(
+    subject: helpers.ModuleListener, mock_callback: AsyncMock
+) -> None:
     """It should call the call back with the correct modules to remove."""
     message = models.Message(status="disconnected", connections=[])
-    await subject.handle_message(
-        message=message
-    )
+    await subject.handle_message(message=message)
     mock_callback.assert_called_once_with([], [])
 
 
@@ -105,9 +103,7 @@ async def test_handle_message_disconnected_one(
 ) -> None:
     """It should call the call back with the correct modules to remove."""
     message = models.Message(status="disconnected", connections=connections[:1])
-    await subject.handle_message(
-        message=message
-    )
+    await subject.handle_message(message=message)
     mock_callback.assert_called_once_with([], modules_at_port[:1])
 
 
@@ -119,18 +115,16 @@ async def test_handle_message_disconnected_many(
 ) -> None:
     """It should call the call back with the correct modules to remove."""
     message = models.Message(status="disconnected", connections=connections)
-    await subject.handle_message(
-        message=message
-    )
+    await subject.handle_message(message=message)
     mock_callback.assert_called_once_with([], modules_at_port)
 
 
-async def test_handle_message_dump_empty(subject: helpers.ModuleListener, mock_callback: AsyncMock) -> None:
+async def test_handle_message_dump_empty(
+    subject: helpers.ModuleListener, mock_callback: AsyncMock
+) -> None:
     """It should call the call back with the correct modules to load."""
     message = models.Message(status="dump", connections=[])
-    await subject.handle_message(
-        message=message
-    )
+    await subject.handle_message(message=message)
     mock_callback.assert_called_once_with([], [])
 
 
@@ -142,9 +136,7 @@ async def test_handle_message_dump_one(
 ) -> None:
     """It should call the call back with the correct modules to load."""
     message = models.Message(status="dump", connections=connections[:1])
-    await subject.handle_message(
-        message=message
-    )
+    await subject.handle_message(message=message)
     mock_callback.assert_called_once_with(modules_at_port[:1], [])
 
 
@@ -156,7 +148,5 @@ async def test_handle_message_dump_many(
 ) -> None:
     """It should call the call back with the correct modules to load."""
     message = models.Message(status="dump", connections=connections)
-    await subject.handle_message(
-        message=message
-    )
+    await subject.handle_message(message=message)
     mock_callback.assert_called_once_with(modules_at_port, [])
