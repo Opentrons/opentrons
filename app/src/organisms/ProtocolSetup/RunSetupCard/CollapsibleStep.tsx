@@ -45,6 +45,7 @@ export function CollapsibleStep({
             color={C_MED_GRAY}
             fontWeight={FONT_WEIGHT_SEMIBOLD}
             fontSize={FONT_SIZE_BODY_1}
+            id={`CollapsibleStep_${label}`}
           >
             {label}
           </Text>
