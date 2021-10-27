@@ -1,6 +1,13 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { AlertItem, AlertModal, Box, ModalPage, Text } from '@opentrons/components'
+import {
+  AlertItem,
+  AlertModal,
+  Box,
+  ModalPage,
+  SPACING_2,
+  Text,
+} from '@opentrons/components'
 import { Portal } from '../../../App/portal'
 import { useSteps, useLabwarePositionCheck } from './hooks'
 import { IntroScreen } from './IntroScreen'
@@ -23,13 +30,12 @@ export const LabwarePositionCheck = (
   const [currentLabwareCheckStep, setCurrentLabwareCheckStep] = React.useState<
     number | null
   >(null)
-  const { proceed, ctaText, isLoading, error } = useLabwarePositionCheck(
-    () => null
-  )
+  const labwarePositionCheckUtils = useLabwarePositionCheck(() => null)
 
-  return (
-    <Portal level="top">
-      {error != null && (
+  if ('error' in labwarePositionCheckUtils) {
+    const { error } = labwarePositionCheckUtils
+    return (
+      <Portal level="top">
         <AlertModal
           heading={t('error_modal_header')}
           iconName={null}
@@ -42,11 +48,18 @@ export const LabwarePositionCheck = (
           alertOverlay
         >
           <Box>
-            <Text>there was an error processing your request on the robot</Text>
-            <Text>Error: {error.message}</Text>
+            <Text>There was an error processing your request on the robot</Text>
+            <Text marginTop={SPACING_2}>Error: {error.message}</Text>
           </Box>
         </AlertModal>
-      )}
+      </Portal>
+    )
+  }
+
+  const { proceed, ctaText, isLoading } = labwarePositionCheckUtils
+
+  return (
+    <Portal level="top">
       <ModalPage
         contentsClassName={styles.modal_contents}
         titleBar={{

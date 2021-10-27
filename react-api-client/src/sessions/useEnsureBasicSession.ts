@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { SessionData, SESSION_TYPE_BASIC } from '@opentrons/api-client'
+import { SessionData, RUN_TYPE_BASIC } from '@opentrons/api-client'
 import { useSessionsByTypeQuery, useCreateSessionMutation } from '.'
 
 export function useEnsureBasicSession(): {
@@ -12,7 +12,7 @@ export function useEnsureBasicSession(): {
     isError: isGetSessionError,
     error: getSessionError,
   } = useSessionsByTypeQuery({
-    sessionType: SESSION_TYPE_BASIC,
+    sessionType: RUN_TYPE_BASIC,
   })
   const {
     createSession,
@@ -20,12 +20,12 @@ export function useEnsureBasicSession(): {
     isError: isCreateSessionError,
     error: createSessionError,
   } = useCreateSessionMutation({
-    sessionType: SESSION_TYPE_BASIC,
+    sessionType: RUN_TYPE_BASIC,
   })
 
   useEffect(() => {
     if (
-      existingBasicSessions == null &&
+      existingBasicSessions?.data[0] == null &&
       !isFetchingSession &&
       !isCreatingSession &&
       !isCreateSessionError

@@ -1,8 +1,8 @@
 import * as React from 'react'
 import {
-  createCommand,
   HostConfig,
   SessionCommandSummary,
+  createCommand
 } from '@opentrons/api-client'
 import {
   useHost,
@@ -19,15 +19,16 @@ import type {
   StepSize,
 } from '../../../../molecules/JogControls/types'
 
-interface LabwarePositionCheckUtils {
-  currentCommandIndex: number
-  isLoading: boolean
-  isComplete: boolean
-  proceed: () => void
-  jog: Jog
-  ctaText: string
-  error: Error | null
-}
+type LabwarePositionCheckUtils =
+  | {
+      currentCommandIndex: number
+      isLoading: boolean
+      isComplete: boolean
+      proceed: () => void
+      jog: Jog
+      ctaText: string
+    }
+  | { error: Error }
 
 const useLpcCtaText = (command: Command): string => {
   const { protocolData } = useProtocolDetails()
@@ -78,6 +79,9 @@ export function useLabwarePositionCheck(
   const [error, setError] = React.useState<Error | null>(null)
   const host = useHost()
   const basicSession = useEnsureBasicSession()
+  if (basicSession.error != null) {
+    setError(basicSession.error)
+  }
   const LPCCommands = useSteps().reduce<Command[]>((steps, currentStep) => {
     return [...steps, ...currentStep.commands]
   }, [])
@@ -85,16 +89,7 @@ export function useLabwarePositionCheck(
   const ctaText = useLpcCtaText(currentCommand)
   const robotCommands = useAllCommandsQuery(basicSession?.id).data?.data
   const isComplete = currentCommandIndex === LPCCommands.length - 1
-  if (basicSession == null)
-    return {
-      isLoading: false,
-      currentCommandIndex: currentCommandIndex,
-      proceed: () => null,
-      jog: () => null,
-      ctaText,
-      error,
-      isComplete,
-    }
+  if (error != null) return { error }
   if (
     pendingCommandId != null &&
     Boolean(
@@ -113,7 +108,7 @@ export function useLabwarePositionCheck(
 
     createCommand(
       host as HostConfig,
-      basicSession.id,
+      basicSession.data.id,
       createCommandData(currentCommand)
     )
       .then(response => {
@@ -180,6 +175,5 @@ export function useLabwarePositionCheck(
     jog,
     ctaText,
     isComplete,
-    error,
   }
 }
