@@ -25,7 +25,7 @@ def test_solve() -> None:
     expected2 = np.array(
         [cos(theta + pi / 2) * scale + 0.5, sin(theta + pi / 2) * scale + 0.25, 1]
     )
-    result = np.dot(X, np.array([[0], [1], [1]])).transpose()  # type: ignore[no-untyped-call]
+    result = np.dot(X, np.array([[0], [1], [1]])).transpose()  # type: ignore[no-untyped-call]  # noqa: E501
 
     assert np.isclose(expected2, result).all()
 
