@@ -37,14 +37,14 @@ For example to use a `p300_multi` on the right add:
     OT_EMULATOR_smoothie: '{"right": {"model": "p300_multi"}}'
 ```
 
-
 ### Adding more emulators
 
 #### Magdeck
 
-To add a second mag deck emulator make a copy of the existing `magdeck` section and change the key and `serial_number`. 
+To add a second mag deck emulator make a copy of the existing `magdeck` section and change the key and `serial_number`.
 
 For example this adds a `magdeck` with the serial number `magdeck2`:
+
 ```
  magdeck2:
     build: .
@@ -59,9 +59,10 @@ For example this adds a `magdeck` with the serial number `magdeck2`:
 
 #### Tempdeck
 
-To add a second temp deck emulator make a copy of the existing `tempdeck` section and change the key and `serial_number`. 
+To add a second temp deck emulator make a copy of the existing `tempdeck` section and change the key and `serial_number`.
 
 For example this adds a `tempdeck` with the serial number `tempdeck2`:
+
 ```
  tempdeck2:
     build: .
@@ -76,9 +77,10 @@ For example this adds a `tempdeck` with the serial number `tempdeck2`:
 
 #### Thermocycler
 
-To add a second thermocycler emulator make a copy of the existing `thermocycler` section and change the key and `serial_number`. 
+To add a second thermocycler emulator make a copy of the existing `thermocycler` section and change the key and `serial_number`.
 
 For example this adds a `thermocycler` with the serial number `thermocycler2`:
+
 ```
  thermocycler2:
     build: .
@@ -90,7 +92,6 @@ For example this adds a `thermocycler` with the serial number `thermocycler2`:
     environment:
       OT_EMULATOR_thermocycler: '{"serial_number": "thermocycler2", "model":"v02", "version":"v1.1.0", "lid_temperature": {"starting":23.0, "degrees_per_tick": 2.0},  "plate_temperature": {"starting":23.0, "degrees_per_tick": 2.0}}'
 ```
-
 
 ## Known Issues
 
