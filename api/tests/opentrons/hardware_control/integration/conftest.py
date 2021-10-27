@@ -1,5 +1,5 @@
-from multiprocessing import Process
 from typing import Iterator
+import threading
 
 import pytest
 import asyncio
@@ -35,10 +35,6 @@ def emulation_app(emulator_settings: Settings) -> Iterator[None]:
     def _run_app() -> None:
         asyncio.run(run_app.run(emulator_settings, modules=[m.value for m in modules]))
 
-    proc = Process(target=_run_app)
-    proc.daemon = True
-    proc.start()
-
     async def _wait_ready() -> None:
         c = await ModuleServerClient.connect(
             host="localhost", port=emulator_settings.module_server.port
@@ -49,12 +45,15 @@ def emulation_app(emulator_settings: Settings) -> Iterator[None]:
     def _run_wait_ready() -> None:
         asyncio.run(_wait_ready())
 
-    ready_proc = Process(target=_run_wait_ready)
+    # Start the emulator thread.
+    t = threading.Thread(target=_run_app)
+    t.daemon = True
+    t.start()
+
+    # Start the wait for emulator ready thread and wait for it to terminate.
+    ready_proc = threading.Thread(target=_run_wait_ready)
     ready_proc.daemon = True
     ready_proc.start()
     ready_proc.join()
 
     yield
-
-    proc.kill()
-    proc.join()
