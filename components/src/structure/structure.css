@@ -109,3 +109,9 @@
 .labeled_value_value {
   margin: 0;
 }
+
+.right_node {
+  display: flex;
+  justify-content: flex-end;
+  margin-left: auto;
+}
