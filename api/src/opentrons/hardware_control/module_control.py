@@ -1,7 +1,6 @@
 from __future__ import annotations
 import logging
 import asyncio
-import os
 import re
 from typing import List, Tuple, Optional
 from glob import glob
@@ -11,8 +10,6 @@ from opentrons.drivers.rpi_drivers import types, usb, usb_simulator
 from opentrons.hardware_control.emulation.module_server.helpers import (
     listen_module_connection,
 )
-from opentrons.hardware_control.modules import ModuleAtPort
-
 from .types import AionotifyEvent, BoardRevision
 from . import modules
 

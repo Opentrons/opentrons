@@ -2,7 +2,6 @@ from multiprocessing import Process
 from typing import Iterator
 
 import pytest
-import threading
 import asyncio
 
 from opentrons.hardware_control.emulation.module_server import ModuleServerClient
