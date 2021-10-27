@@ -163,9 +163,6 @@ class PairedInstrument(AbstractPairedInstrument):
 
         self._hw_manager.hardware.aspirate(self._pair_policy, volume, rate)
 
-    def air_gap(self, volume: float, rate: float) -> None:
-        self._hw_manager.hardware.aspirate(self._pair_policy, volume, rate)
-
     def dispense(self, volume: float, location: types.Location, rate: float) -> None:
         if location != self._ctx.get_last_location():
             self.move_to(location)
