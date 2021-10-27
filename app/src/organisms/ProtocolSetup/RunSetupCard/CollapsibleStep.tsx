@@ -49,10 +49,20 @@ export function CollapsibleStep({
           >
             {label}
           </Text>
-          <Text as="h5" css={FONT_HEADER_DARK} marginTop={SPACING_2} id={`CollapsibleStep_${title}`}>
+          <Text
+            as="h5"
+            css={FONT_HEADER_DARK}
+            marginTop={SPACING_2}
+            id={`CollapsibleStep_${title}`}
+          >
             {title}
           </Text>
-          <Text as="p" css={FONT_BODY_1_DARK} marginTop={SPACING_2} id={`CollapsibleStep_${description}`}>
+          <Text
+            as="p"
+            css={FONT_BODY_1_DARK}
+            marginTop={SPACING_2}
+            id={`CollapsibleStep_${description}`}
+          >
             {description}
           </Text>
         </Flex>
