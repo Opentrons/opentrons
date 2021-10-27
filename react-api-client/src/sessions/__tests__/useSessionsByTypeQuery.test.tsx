@@ -17,7 +17,7 @@ const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 const SESSIONS_RESPONSE = {
   data: [
-    { sessionType: 'basic', id: '1' },
+    { sessionType: 'tipLengthCalibration', id: '1' },
     { sessionType: 'deckCalibration', id: '2' },
   ],
 } as Sessions
@@ -41,7 +41,7 @@ describe('useSessionsByTypeQuery hook', () => {
     when(mockUseHost).calledWith().mockReturnValue(null)
 
     const { result } = renderHook(
-      () => useSessionsByTypeQuery({ sessionType: 'basic' }),
+      () => useSessionsByTypeQuery({ sessionType: 'tipLengthCalibration' }),
       { wrapper }
     )
 
@@ -51,38 +51,36 @@ describe('useSessionsByTypeQuery hook', () => {
   it('should return no data if the get sessions request fails', () => {
     when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
     when(mockGetSessions)
-      .calledWith(HOST_CONFIG, { session_type: 'basic' })
+      .calledWith(HOST_CONFIG, { session_type: 'tipLengthCalibration' })
       .mockRejectedValue('oh no')
 
     const { result } = renderHook(
-      () => useSessionsByTypeQuery({ sessionType: 'basic' }),
+      () => useSessionsByTypeQuery({ sessionType: 'tipLengthCalibration' }),
       { wrapper }
     )
     expect(result.current.data).toBeUndefined()
   })
 
   it('should return all sessions of the given type', async () => {
-    const basicSessions = {
+    const tipLengthCalSessions = {
       ...SESSIONS_RESPONSE,
       data: SESSIONS_RESPONSE.data.filter(
-        session => session.sessionType === 'basic'
+        session => session.sessionType === 'tipLengthCalibration'
       ),
     }
 
     when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
     when(mockGetSessions)
-      .calledWith(HOST_CONFIG, { session_type: 'basic' })
-      .mockResolvedValue({ data: basicSessions } as Response<Sessions>)
+      .calledWith(HOST_CONFIG, { session_type: 'tipLengthCalibration' })
+      .mockResolvedValue({ data: tipLengthCalSessions } as Response<Sessions>)
 
-    const { result } = renderHook(
-      () => useSessionsByTypeQuery({ sessionType: 'basic' }),
+    const { result, waitFor } = renderHook(
+      () => useSessionsByTypeQuery({ sessionType: 'tipLengthCalibration' }),
       { wrapper }
     )
-    // TODO: remove this hack and replace with waitFor after we update to React v16.14
-    await new Promise(resolve => {
-      setImmediate(resolve)
-    })
 
-    expect(result.current.data).toEqual(basicSessions)
+    await waitFor(() => result.current.data != null)
+
+    expect(result.current.data).toEqual(tipLengthCalSessions)
   })
 })

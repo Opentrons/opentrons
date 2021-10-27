@@ -136,6 +136,8 @@ export const LabwarePositionCheckStepDetail = (
               stepSizes={[0.1, 1, 10]}
               planes={[HORIZONTAL_PLANE, VERTICAL_PLANE]}
               width="100%"
+              directionControlButtonColor={C_BLUE}
+              isLPC={true}
             />
           ) : (
             <Flex justifyContent={JUSTIFY_CENTER} marginTop={SPACING_2}>

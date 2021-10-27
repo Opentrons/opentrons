@@ -1,14 +1,10 @@
 describe('Desktop Navigation', () => {
   before(() => {
     cy.visit('/')
-    cy.viewport('macbook-15')
+    cy.closeAnnouncementModal()
   })
 
   describe('the setup form', () => {
-    it('displays the announcement modal and clicks "GOT IT!" to close it', () => {
-      cy.closeAnnouncementModal()
-    })
-
     it('clicks the "CREATE NEW" button', () => {
       cy.get('button').contains('Create New').click()
     })

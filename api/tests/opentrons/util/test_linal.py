@@ -1,10 +1,10 @@
 from math import pi, sin, cos
 from opentrons.util.linal import solve, add_z, apply_transform, solve_attitude
-from numpy.linalg import inv  # type: ignore[import]
-import numpy as np  # type: ignore[import]
+from numpy.linalg import inv
+import numpy as np
 
 
-def test_solve():
+def test_solve() -> None:
     theta = pi / 3.0  # 60 deg
     scale = 2.0
 
@@ -22,15 +22,15 @@ def test_solve():
 
     X = solve(expected, actual)
 
-    expected = np.array(
+    expected2 = np.array(
         [cos(theta + pi / 2) * scale + 0.5, sin(theta + pi / 2) * scale + 0.25, 1]
     )
-    result = np.dot(X, np.array([[0], [1], [1]])).transpose()
+    result = np.dot(X, np.array([[0], [1], [1]])).transpose()  # type: ignore[no-untyped-call]  # noqa: E501
 
-    return np.isclose(expected, result).all()
+    assert np.isclose(expected2, result).all()
 
 
-def test_add_z():
+def test_add_z() -> None:
     x = 5
     y = 10
     z = 20
@@ -43,7 +43,7 @@ def test_add_z():
     assert (result == expected).all()
 
 
-def test_apply_transform():
+def test_apply_transform() -> None:
     x = 1
     y = 2
     z = 3
@@ -61,5 +61,5 @@ def test_apply_transform():
 
     expected = (round(x - x_delta, 2), round(y - y_delta, 2), round(z))
 
-    result = apply_transform(inv(transform), (1, 2, 3))
+    result = apply_transform(inv(transform), (1, 2, 3))  # type: ignore[no-untyped-call]
     assert np.isclose(result, expected, atol=0.1).all()

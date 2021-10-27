@@ -12,7 +12,7 @@ export interface RadioOption {
 
 export interface RadioGroupProps {
   /** blur handler */
-  onBlur?: React.FocusEventHandler
+  onBlur?: React.FocusEventHandler<HTMLInputElement>
   /** change handler */
   onChange: React.ChangeEventHandler
   /** value that is checked */

@@ -5,7 +5,7 @@ import { act, renderHook } from '@testing-library/react-hooks'
 import {
   createSession,
   CreateSessionData,
-  SESSION_TYPE_BASIC,
+  SESSION_TYPE_DECK_CALIBRATION,
 } from '@opentrons/api-client'
 import { useHost } from '../../api'
 import { useCreateSessionMutation } from '..'
@@ -23,7 +23,7 @@ const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 const SESSION_ID = '1'
 const SESSION_RESPONSE = {
-  data: { sessionType: SESSION_TYPE_BASIC, id: SESSION_ID },
+  data: { sessionType: SESSION_TYPE_DECK_CALIBRATION, id: SESSION_ID },
 } as Session
 
 describe('useCreateSessionMutation hook', () => {
@@ -35,7 +35,7 @@ describe('useCreateSessionMutation hook', () => {
     const clientProvider: React.FunctionComponent<{}> = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
-    createSessionData = { sessionType: SESSION_TYPE_BASIC }
+    createSessionData = { sessionType: SESSION_TYPE_DECK_CALIBRATION }
 
     wrapper = clientProvider
   })
@@ -71,17 +71,15 @@ describe('useCreateSessionMutation hook', () => {
       .calledWith(HOST_CONFIG, createSessionData)
       .mockResolvedValue({ data: SESSION_RESPONSE } as Response<Session>)
 
-    const { result } = renderHook(
+    const { result, waitFor } = renderHook(
       () => useCreateSessionMutation(createSessionData),
       {
         wrapper,
       }
     )
     act(() => result.current.createSession())
-    // TODO: remove this hack and replace with waitFor after we update to React v16.14
-    await new Promise(resolve => {
-      setImmediate(resolve)
-    })
+
+    await waitFor(() => result.current.data != null)
 
     expect(result.current.data).toEqual(SESSION_RESPONSE)
   })
