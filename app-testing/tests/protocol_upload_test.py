@@ -189,3 +189,51 @@ def test_moam_pur(
         assert moam_pur.get_moam_modal_text().is_displayed()
         labware_setup = LabwareSetup(driver)
         labware_setup.click_close_button()
+        moam_pur.click_protocol_close_button()
+        moam_pur.click_confirmation_close_button()
+
+
+def test_no_module(
+    chrome_options: Options,
+    test_protocols: Dict[str, Path],
+    request: FixtureRequest,
+) -> None:
+    """Upload a protocol."""
+    robot = OtRobot()
+    # expecting docker emulated robot
+    assert robot.is_alive(), "is a robot available?"
+    os.environ["OT_APP_DISCOVERY__CANDIDATES"] = "localhost"
+    os.environ["OT_APP_ANALYTICS__SEEN_OPT_IN"] = "true"
+    with webdriver.Chrome(options=chrome_options) as driver:
+        logger.debug(f"driver capabilities {driver.capabilities}")
+        ot_application = OtApplication(
+            Path(f"{driver.capabilities['chrome']['userDataDir']}/config.json")
+        )
+        # ignore updates
+        ot_application.config["alerts"]["ignored"] = ["appUpdateAvailable"]
+        ot_application.write_config()
+        robots_list = RobotsList(driver)
+        if not robots_list.is_robot_toggle_active(RobotsList.DEV):
+            robots_list.get_robot_toggle(RobotsList.DEV).click()
+        left_menu = LeftMenu(driver)
+        left_menu.click_more_button()
+        protocol_upload = ProtocolUpload(driver)
+        protocol_upload.click_app_left_panel()
+        protocol_upload.click_enable_developer_toggle()
+        protocol_upload.click_enable_pur_feature()
+        protocol_upload.goto_robots_page()
+        # Instantiate the page object for the RobotsList.
+        robots_list = RobotsList(driver)
+        # toggle the DEV robot
+        if not robots_list.is_robot_toggle_active(RobotsList.DEV):
+            robots_list.get_robot_toggle(RobotsList.DEV).click()
+        # calibrate
+        robot_page = RobotPage(driver)
+        left_menu = LeftMenu(driver)
+        left_menu.click_protocol_upload_button()
+        protocol_file = ProtocolFile(driver)
+        logger.info(f"uploading protocol: {test_protocols['nomodulejson'].resolve()}")
+        input = protocol_file.get_drag_json_protocol()
+        drag_and_drop_file(input, test_protocols["nomodulejson"])
+        robot_calibrate = RobotCalibration(driver)
+        robot_calibrate.click_robot_calibration()

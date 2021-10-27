@@ -1,4 +1,4 @@
-"""Model for the screen of Edge cases."""
+"""Model for the screen of Multiples of a Module."""
 import logging
 from typing import Tuple
 from selenium.webdriver.chrome.webdriver import WebDriver
@@ -42,7 +42,7 @@ class MoamPur:
     )
     close_protocol_text_locator: Tuple[str, str] = (
         By.XPATH,
-        "//button[text()='Yes, close now']",
+        "//button[text()='close']",
     )
     yes_close_now_text_locator: Tuple[str, str] = (
         By.XPATH,
@@ -79,5 +79,23 @@ class MoamPur:
             EC.element_to_be_clickable(MoamPur.moam_modal_text_locator)
         )
 
+    @highlight
+    def get_protocol_close_button(self) -> WebElement:
+        return WebDriverWait(self.driver, 2).until(
+            EC.element_to_be_clickable(MoamPur.close_protocol_text_locator)
+        )
+
+    @highlight
+    def get_confirmation_close_button(self) -> WebElement:
+        return WebDriverWait(self.driver, 2).until(
+            EC.element_to_be_clickable(MoamPur.yes_close_now_text_locator)
+        )
+
     def click_moam_link(self) -> None:
         self.get_moam_link().click()
+
+    def click_protocol_close_button(self) -> None:
+        self.get_protocol_close_button().click()
+
+    def click_confirmation_close_button(self) -> None:
+        self.get_confirmation_close_button().click()
