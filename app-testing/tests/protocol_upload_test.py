@@ -19,6 +19,7 @@ from src.pages.module_setup import ModuleSetup
 from src.pages.labware_setup import LabwareSetup
 from src.menus.robots_list import RobotsList
 from src.pages.moam_pur import MoamPur
+from src.pages.gen1_pipette_pur import Gen1PipettePur
 from src.menus.protocol_file import ProtocolFile
 from src.driver.drag_drop import drag_and_drop_file
 
@@ -193,7 +194,7 @@ def test_moam_pur(
         moam_pur.click_confirmation_close_button()
 
 
-def test_no_module(
+def test_gen1_pipette(
     chrome_options: Options,
     test_protocols: Dict[str, Path],
     request: FixtureRequest,
@@ -232,8 +233,8 @@ def test_no_module(
         left_menu = LeftMenu(driver)
         left_menu.click_protocol_upload_button()
         protocol_file = ProtocolFile(driver)
-        logger.info(f"uploading protocol: {test_protocols['nomodulejson'].resolve()}")
+        logger.info(f"uploading protocol: {test_protocols['gen1pipette'].resolve()}")
         input = protocol_file.get_drag_json_protocol()
-        drag_and_drop_file(input, test_protocols["nomodulejson"])
+        drag_and_drop_file(input, test_protocols["gen1pipette"])
         robot_calibrate = RobotCalibration(driver)
         robot_calibrate.click_robot_calibration()
