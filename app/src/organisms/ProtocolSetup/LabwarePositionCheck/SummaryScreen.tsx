@@ -41,7 +41,7 @@ export const SummaryScreen = (): JSX.Element | null => {
         {t('lpc_complete_summary_screen_heading')}
       </Text>
       <Flex justifyContent={JUSTIFY_START} alignItems={ALIGN_START}>
-        <Flex flex={'1 1 40%'} flexDirection={DIRECTION_COLUMN}>
+        <Flex flex={'auto'} flexDirection={DIRECTION_COLUMN}>
           <SectionList
             primaryPipetteMount={primaryPipetteMount}
             secondaryPipetteMount={secondaryPipetteMount}
@@ -51,7 +51,7 @@ export const SummaryScreen = (): JSX.Element | null => {
 
           <DeckMap completedLabwareIdSections={labwareIds} />
         </Flex>
-        <Flex flex={'1 1 80%'} marginRight={SPACING_4}>
+        <Flex flex={'auto'} marginRight={SPACING_4}>
           <LabwareOffsetsSummary />
         </Flex>
       </Flex>

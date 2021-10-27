@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  C_DISABLED,
+  C_MED_GRAY,
   C_NEAR_WHITE,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
@@ -12,8 +12,10 @@ import {
   JUSTIFY_CENTER,
   SPACING_3,
   SPACING_4,
+  SPACING_1,
   Text,
   TEXT_TRANSFORM_UPPERCASE,
+  SPACING_2,
 } from '@opentrons/components'
 
 const getOffsetDataInfo = (): Array<{
@@ -55,12 +57,12 @@ export const LabwareOffsetsSummary = (): JSX.Element | null => {
   return (
     <React.Fragment>
       <Flex
+        flex={'auto'}
         padding={SPACING_4}
         boxShadow="1px 1px 1px rgba(0, 0, 0, 0.25)"
         borderRadius="4px"
         backgroundColor={C_NEAR_WHITE}
         flexDirection={DIRECTION_COLUMN}
-        width="106%"
       >
         <Text
           as={'h5'}
@@ -69,16 +71,16 @@ export const LabwareOffsetsSummary = (): JSX.Element | null => {
         >
           {t('labware_offsets_summary_title')}
         </Text>
-        <Flex flexDirection={DIRECTION_ROW} justifyContent={JUSTIFY_CENTER}>
+        <Flex flexDirection={DIRECTION_ROW}>
           <Flex
-            flex={'1 1 30%'}
+            flex={'auto'}
             flexDirection={DIRECTION_COLUMN}
             justifyContent={JUSTIFY_CENTER}
           >
             <Text
               textTransform={TEXT_TRANSFORM_UPPERCASE}
               marginBottom={SPACING_3}
-              color={C_DISABLED}
+              color={C_MED_GRAY}
               fontSize={FONT_SIZE_CAPTION}
             >
               {t('labware_offsets_summary_location')}
@@ -96,14 +98,14 @@ export const LabwareOffsetsSummary = (): JSX.Element | null => {
             })}
           </Flex>
           <Flex
-            flex={'1 1 40%'}
+            flex={'auto'}
             flexDirection={DIRECTION_COLUMN}
             justifyContent={JUSTIFY_CENTER}
           >
             <Text
               textTransform={TEXT_TRANSFORM_UPPERCASE}
               marginBottom={SPACING_3}
-              color={C_DISABLED}
+              color={C_MED_GRAY}
               fontSize={FONT_SIZE_CAPTION}
             >
               {t('labware_offsets_summary_labware')}
@@ -121,14 +123,14 @@ export const LabwareOffsetsSummary = (): JSX.Element | null => {
             })}
           </Flex>
           <Flex
-            flex={'1 1 30%'}
+            flex={'auto'}
             flexDirection={DIRECTION_COLUMN}
             justifyContent={JUSTIFY_CENTER}
           >
             <Text
               textTransform={TEXT_TRANSFORM_UPPERCASE}
               marginBottom={SPACING_3}
-              color={C_DISABLED}
+              color={C_MED_GRAY}
               fontSize={FONT_SIZE_CAPTION}
             >
               {t('labware_offsets_summary_offset')}
@@ -144,22 +146,22 @@ export const LabwareOffsetsSummary = (): JSX.Element | null => {
                 </Flex>
               ) : (
                 <Flex marginBottom={SPACING_3} css={FONT_BODY_1_DARK}>
-                  <Text as={'span'} marginRight={'0.15rem'}>
+                  <Text as={'span'} marginRight={SPACING_1}>
                     <strong>X</strong>
                   </Text>
-                  <Text key={x} as={'span'} marginRight={'0.4rem'}>
+                  <Text key={x} as={'span'} marginRight={SPACING_2}>
                     {x}
                   </Text>
-                  <Text as={'span'} marginRight={'0.15rem'}>
+                  <Text as={'span'} marginRight={SPACING_1}>
                     <strong>Y</strong>
                   </Text>
-                  <Text key={y} as={'span'} marginRight={'0.4rem'}>
+                  <Text key={y} as={'span'} marginRight={SPACING_2}>
                     {y}
                   </Text>
-                  <Text as={'span'} marginRight={'0.15rem'}>
+                  <Text as={'span'} marginRight={SPACING_1}>
                     <strong>Z</strong>
                   </Text>
-                  <Text key={z} as={'span'} marginRight={'0.4rem'}>
+                  <Text key={z} as={'span'} marginRight={SPACING_2}>
                     {z}
                   </Text>
                 </Flex>
