@@ -8,7 +8,7 @@ from typing import Any, Callable, List, Optional, Sequence, TypeVar
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV2
 
 from ..resources import DeckFixedLabware
-from ..actions import Action, ActionHandler
+from ..actions import Action, ActionHandler, StopAction
 from .abstract_store import HasState, HandlesActions
 from .change_notifier import ChangeNotifier
 from .commands import CommandState, CommandStore, CommandView
@@ -18,6 +18,7 @@ from .geometry import GeometryView
 from .motion import MotionView
 from .configs import EngineConfigs
 
+import logging
 
 ReturnT = TypeVar("ReturnT")
 
@@ -121,10 +122,23 @@ class StateStore(StateView, ActionHandler):
             action: An action object representing a state change. Will be
                 passed to all substores so they can react accordingly.
         """
+        if isinstance(action, StopAction):
+            logging.warn("MAX:StateView: Handling StopAction.")
+
         for substore in self._substores:
             substore.handle_action(action)
 
         self._update_state_views()
+
+        if isinstance(action, StopAction):
+            logging.warn("MAX:StateView: Handled StopAction.")
+
+            logging.warn("The next queued is:")
+            try:
+                logging.warn(self.commands.get_next_queued())
+                pass
+            except BaseException as e:
+                logging.warn(f"Next queued raised exception: {repr(e)}")
 
     async def wait_for(
         self,

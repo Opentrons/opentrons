@@ -27,6 +27,8 @@ from .legacy_wrappers import (
     LegacyExecutor,
 )
 
+import logging
+
 
 @dataclass(frozen=True)
 class ProtocolRunData:
@@ -132,13 +134,17 @@ class ProtocolRunner:
         This method may be called before the run starts, in which case,
         it will wait for the run to start before waiting for completion.
         """
-        return await self._task_queue.join()
+        await self._task_queue.join()
 
     async def run(self, protocol_source: ProtocolSource) -> ProtocolRunData:
         """Run a given protocol to completion."""
+        logging.warn("MAX:ProtocolRunner:run() started")
         self.load(protocol_source)
+        logging.warn("MAX:ProtocolRunner:run() loaded")
         self.play()
+        logging.warn("MAX:ProtocolRunner:run() played")
         await self.join()
+        logging.warn("MAX:ProtocolRunner:run() joined")
 
         commands = self._protocol_engine.state_view.commands.get_all()
         labware = self._protocol_engine.state_view.labware.get_all()
@@ -169,6 +175,7 @@ class ProtocolRunner:
         self,
         protocol_source: ProtocolSource,
     ) -> None:
+        logging.warn("MAX: _load_legacy()")
         protocol = self._legacy_file_reader.read(protocol_source)
         context = self._legacy_context_creator.create(protocol.api_level)
 

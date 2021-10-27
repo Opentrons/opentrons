@@ -15,6 +15,8 @@ from .actions import (
     UpdateCommandAction,
 )
 
+import logging
+
 
 class ProtocolEngine:
     """Main ProtocolEngine class.
@@ -159,9 +161,15 @@ class ProtocolEngine:
         Arguments:
             error: An error that caused the stop, if applicable.
         """
+        logging.warn("MAX:protocol_engine.stop(): dispatching stop action")
         self._action_dispatcher.dispatch(StopAction(error=error))
 
         try:
+            logging.warn("MAX:protocol_engine.stop(): awaiting self._queue_worker()")
             await self._queue_worker.join()
         finally:
+            logging.warn(
+                "MAX:protocol_engine.stop():awaiting self._hardware_api.stop()"
+            )
             await self._hardware_api.stop(home_after=False)
+            logging.warn("MAX:protocol_engine.stop():done")

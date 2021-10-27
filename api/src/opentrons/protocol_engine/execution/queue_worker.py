@@ -35,6 +35,7 @@ class QueueWorker:
 
         This method will no-op if the worker is already running.
         """
+        log.warn("MAX:QueueWorker.start()")
         if self._worker_task is None:
             self._worker_task = asyncio.create_task(self._run_commands())
 
@@ -48,28 +49,37 @@ class QueueWorker:
         You should call `join` after calling `cancel` to clean up and
         propagate errors.
         """
+        log.warn("MAX:QueueWorker.cancel()")
         if self._worker_task:
             self._worker_task.cancel()
 
     async def join(self) -> None:
         """Wait for the worker to finish, propagating any errors."""
+        log.warn("MAX:QueueWorker.join()")
         worker_task = self._worker_task
 
         if worker_task:
             self._worker_task = None
 
             try:
+                log.warn("MAX:QueueWorker.join(): awaiting worker_task")
                 await worker_task
-            except (ProtocolEngineStoppedError, asyncio.CancelledError):
+            except (ProtocolEngineStoppedError, asyncio.CancelledError) as e:
+                log.warn(f"MAX:QueueWorker.join(): passing caught exception: {e}")
                 pass
             except Exception as e:
                 log.error("Unhandled exception in QueueWorker job", exc_info=e)
                 raise e
 
     async def _run_commands(self) -> None:
+        log.warn("MAX:QueueWorker._run_commands(): starting")
         while not self._state_store.commands.get_stop_requested():
+            log.warn("MAX:QueueWorker._run_commands(): awaiting next queued command")
+            # May raise ProtocolEngineStoppedError.
             command_id = await self._state_store.wait_for(
                 condition=self._state_store.commands.get_next_queued
             )
 
+            log.warn("MAX:QueueWorker._run_commands(): awaiting execute")
             await self._command_executor.execute(command_id=command_id)
+        log.warn("MAX:QueueWorker._run_commands(): finished")

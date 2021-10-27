@@ -61,8 +61,11 @@ class TaskQueue:
 
     async def join(self) -> None:
         """Wait for the background run task to complete, propagating errors."""
+
+        log.warn("MAX:TaskQueue: awaiting _run_started_event")
         await self._run_started_event.wait()
 
+        log.warn("MAX:TaskQueue: awaiting _run_task maybe")
         if self._run_task:
             await self._run_task
 
@@ -71,11 +74,14 @@ class TaskQueue:
 
         try:
             if self._run_func is not None:
+                log.warn("MAX:TaskQueue: awaiting _run_func()")
                 await self._run_func()
         except Exception as e:
             error = e
         finally:
+            log.warn("MAX:TaskQueue: in _run() finally-block")
             if self._cleanup_func is not None:
+                log.warn("MAX:TaskQueue: awaiting _cleanup_func()")
                 await self._cleanup_func(error=error)
             elif error:
                 log.warning(
@@ -83,3 +89,4 @@ class TaskQueue:
                     exc_info=error,
                 )
                 raise error
+            log.warn("MAX:TaskQueue: exiting _run() finally-block")
