@@ -1,4 +1,4 @@
-"""Tests for robot_server.sessions.session_store."""
+"""Tests for robot_server.runs.run_store."""
 import pytest
 from datetime import datetime
 
@@ -11,114 +11,114 @@ from robot_server.sessions.run_store import (
 )
 
 
-def test_add_session() -> None:
-    """It should be able to create a basic session from a None data argument."""
-    session = RunResource(
-        run_id="session-id",
+def test_add_run() -> None:
+    """It should be able to create a basic run from a None data argument."""
+    run = RunResource(
+        run_id="run-id",
         create_data=BasicRunCreateData(),
         created_at=datetime.now(),
         actions=[],
     )
 
     subject = RunStore()
-    result = subject.upsert(session)
+    result = subject.upsert(run)
 
-    assert result == session
+    assert result == run
 
 
-def test_update_session() -> None:
-    """It should be able to update a session in the store."""
-    session = RunResource(
-        run_id="identical-session-id",
+def test_update_run() -> None:
+    """It should be able to update a run in the store."""
+    run = RunResource(
+        run_id="identical-run-id",
         create_data=BasicRunCreateData(),
         created_at=datetime(year=2021, month=1, day=1, hour=1, minute=1, second=1),
         actions=[],
     )
-    updated_session = RunResource(
-        run_id="identical-session-id",
+    updated_run = RunResource(
+        run_id="identical-run-id",
         create_data=BasicRunCreateData(),
         created_at=datetime(year=2022, month=2, day=2, hour=2, minute=2, second=2),
         actions=[],
     )
 
     subject = RunStore()
-    subject.upsert(session)
+    subject.upsert(run)
 
-    result = subject.upsert(updated_session)
+    result = subject.upsert(updated_run)
 
-    assert result == updated_session
+    assert result == updated_run
 
 
-def test_get_session() -> None:
-    """It can get a previously stored session entry."""
-    session = RunResource(
-        run_id="session-id",
+def test_get_run() -> None:
+    """It can get a previously stored run entry."""
+    run = RunResource(
+        run_id="run-id",
         create_data=BasicRunCreateData(),
         created_at=datetime.now(),
         actions=[],
     )
 
     subject = RunStore()
-    subject.upsert(session)
+    subject.upsert(run)
 
-    result = subject.get(run_id="session-id")
+    result = subject.get(run_id="run-id")
 
-    assert result == session
+    assert result == run
 
 
-def test_get_session_missing() -> None:
-    """It raises if the session does not exist."""
+def test_get_run_missing() -> None:
+    """It raises if the run does not exist."""
     subject = RunStore()
 
-    with pytest.raises(RunNotFoundError, match="session-id"):
-        subject.get(run_id="session-id")
+    with pytest.raises(RunNotFoundError, match="run-id"):
+        subject.get(run_id="run-id")
 
 
-def test_get_all_sessions() -> None:
-    """It can get all created sessions."""
-    session_1 = RunResource(
-        run_id="session-id-1",
+def test_get_all_runs() -> None:
+    """It can get all created runs."""
+    run_1 = RunResource(
+        run_id="run-id-1",
         create_data=BasicRunCreateData(),
         created_at=datetime.now(),
         actions=[],
     )
-    session_2 = RunResource(
-        run_id="session-id-2",
+    run_2 = RunResource(
+        run_id="run-id-2",
         create_data=BasicRunCreateData(),
         created_at=datetime.now(),
         actions=[],
     )
 
     subject = RunStore()
-    subject.upsert(session_1)
-    subject.upsert(session_2)
+    subject.upsert(run_1)
+    subject.upsert(run_2)
 
     result = subject.get_all()
 
-    assert result == [session_1, session_2]
+    assert result == [run_1, run_2]
 
 
-def test_remove_session() -> None:
-    """It can get a previously stored session entry."""
-    session = RunResource(
-        run_id="session-id",
+def test_remove_run() -> None:
+    """It can get a previously stored run entry."""
+    run = RunResource(
+        run_id="run-id",
         create_data=BasicRunCreateData(),
         created_at=datetime.now(),
         actions=[],
     )
 
     subject = RunStore()
-    subject.upsert(session)
+    subject.upsert(run)
 
-    result = subject.remove(run_id="session-id")
+    result = subject.remove(run_id="run-id")
 
-    assert result == session
+    assert result == run
     assert subject.get_all() == []
 
 
-def test_remove_session_missing_id() -> None:
-    """It raises if the session does not exist."""
+def test_remove_run_missing_id() -> None:
+    """It raises if the run does not exist."""
     subject = RunStore()
 
-    with pytest.raises(RunNotFoundError, match="session-id"):
-        subject.remove(run_id="session-id")
+    with pytest.raises(RunNotFoundError, match="run-id"):
+        subject.remove(run_id="run-id")

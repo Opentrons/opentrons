@@ -1,4 +1,4 @@
-"""Session response model factory."""
+"""Run response model factory."""
 from dataclasses import replace
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Tuple
@@ -24,7 +24,7 @@ from .run_models import (
 
 
 class RunView:
-    """Interface to build session model instances from data.
+    """Interface to build run model instances from data.
 
     Resources consumed and returned by this class will be treated as
     immutable.
@@ -36,15 +36,15 @@ class RunView:
         created_at: datetime,
         create_data: Optional[RunCreateData],
     ) -> RunResource:
-        """Create a new session resource instance from its create data.
+        """Create a new run resource instance from its create data.
 
         Arguments:
             run_id: Unique identifier.
             created_at: Resource creation timestamp.
-            create_data: Data used to create the session.
+            create_data: Data used to create the run.
 
         Returns:
-            The session in its internal resource representation, for use in
+            The run in its internal resource representation, for use in
                 the `RunStore` and other classes.
         """
         return RunResource(
@@ -61,10 +61,10 @@ class RunView:
         action_data: RunActionCreateData,
         created_at: datetime,
     ) -> Tuple[RunAction, RunResource]:
-        """Create a new session control action resource instance.
+        """Create a new run control action resource instance.
 
         Arguments:
-            run: The session resource to add the command to.
+            run: The run resource to add the command to.
             action_id: Unique ID to assign to the command resource.
             action_data: Data used to create the command resource.
             created_at: Resource creation timestamp.
@@ -95,13 +95,13 @@ class RunView:
         labware: List[LoadedLabware],
         engine_status: EngineStatus,
     ) -> Run:
-        """Transform a session resource into its public response model.
+        """Transform a run resource into its public response model.
 
         Arguments:
-            run: Internal resource representation of the session.
+            run: Internal resource representation of the run.
 
         Returns:
-            Session response model representing the same resource.
+            Run response model representing the same resource.
         """
         create_data = run.create_data
         command_summaries = [
@@ -126,4 +126,4 @@ class RunView:
             response_fields["createParams"] = create_data.createParams
             return ProtocolRun(**response_fields)
 
-        raise ValueError(f"Invalid session resource {run}")
+        raise ValueError(f"Invalid run resource {run}")

@@ -1,6 +1,6 @@
 """HTTP request and response models.
 
-These models exist to ensure the /sessions API is mapped to a reasonable
+These models exist to ensure the /runs API is mapped to a reasonable
 OpenAPI Spec. Given the large number of classes and unions involved,
 the request and response models need to be ordered carefully.
 

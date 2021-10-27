@@ -1,4 +1,4 @@
-"""Router for /sessions commands endpoints."""
+"""Router for /runs commands endpoints."""
 from fastapi import APIRouter, Depends, status
 from typing import Union
 from typing_extensions import Literal
@@ -21,10 +21,10 @@ commands_router = APIRouter()
 
 
 class CommandNotFound(ErrorDetails):
-    """An error if a given session command is not found."""
+    """An error if a given run command is not found."""
 
     id: Literal["CommandNotFound"] = "CommandNotFound"
-    title: str = "Session Command Not Found"
+    title: str = "Run Command Not Found"
 
 
 # todo(mm, 2021-09-23): Should this accept a list of commands, instead of just one?
@@ -32,7 +32,7 @@ class CommandNotFound(ErrorDetails):
     path="/runs/{runId}/commands",
     summary="Enqueue a protocol command",
     description=(
-        "Add a single protocol command to the session. "
+        "Add a single protocol command to the run. "
         "The command is placed at the back of the queue."
     ),
     status_code=status.HTTP_200_OK,
@@ -53,8 +53,8 @@ async def post_run_command(
             to enqueue.
         engine_store: Used to retrieve the `ProtocolEngine` on which the new
             command will be enqueued.
-        run: Session response model, provided by the route handler for
-            `GET /session/{sessionId}`. Present to ensure 404 if session
+        run: Run response model, provided by the route handler for
+            `GET /runs/{runId}`. Present to ensure 404 if run
             not found.
     """
     command = engine_store.engine.add_command(request_body.data)
@@ -63,11 +63,11 @@ async def post_run_command(
 
 @commands_router.get(
     path="/runs/{runId}/commands",
-    summary="Get a list of all protocol commands in the session",
+    summary="Get a list of all protocol commands in the run",
     description=(
-        "Get a list of all commands in the session and their statuses. "
+        "Get a list of all commands in the run and their statuses. "
         "This endpoint returns command summaries. Use "
-        "`GET /sessions/{sessionId}/commands/{commandId}` to get all "
+        "`GET /runs/{runId}/commands/{commandId}` to get all "
         "information available for a given command."
     ),
     status_code=status.HTTP_200_OK,
@@ -79,18 +79,18 @@ async def post_run_command(
 async def get_run_commands(
     run: ResponseModel[Run] = Depends(get_run),
 ) -> MultiResponseModel[RunCommandSummary]:
-    """Get a summary of all commands in a session.
+    """Get a summary of all commands in a run.
 
     Arguments:
-        run: Session response model, provided by the route handler for
-            `GET /session/{sessionId}`
+        run: Run response model, provided by the route handler for
+            `GET /runs/{runId}`
     """
     return MultiResponseModel(data=run.data.commands)
 
 
 @commands_router.get(
     path="/runs/{runId}/commands/{commandId}",
-    summary="Get full details about a specific command in the session",
+    summary="Get full details about a specific command in the run",
     description=(
         "Get a command along with any associated payload, result, and "
         "execution information."
@@ -111,13 +111,13 @@ async def get_run_command(
     engine_store: EngineStore = Depends(get_engine_store),
     run: ResponseModel[Run] = Depends(get_run),
 ) -> ResponseModel[pe_commands.Command]:
-    """Get a specific command from a session.
+    """Get a specific command from a run.
 
     Arguments:
         commandId: Command identifier, pulled from route parameter.
         engine_store: Protocol engine and runner storage.
-        run: Session response model, provided by the route handler for
-            `GET /session/{sessionId}`. Present to ensure 404 if session
+        run: Run response model, provided by the route handler for
+            `GET /run/{runId}`. Present to ensure 404 if run
             not found.
     """
     try:

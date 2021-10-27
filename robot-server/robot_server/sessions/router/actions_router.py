@@ -1,4 +1,4 @@
-"""Router for /sessions actions endpoints."""
+"""Router for /runs actions endpoints."""
 from fastapi import APIRouter, Depends, status
 from datetime import datetime
 from typing_extensions import Literal
@@ -18,17 +18,17 @@ actions_router = APIRouter()
 
 
 class RunActionNotAllowed(ErrorDetails):
-    """An error if one tries to issue an unsupported session action."""
+    """An error if one tries to issue an unsupported run action."""
 
     id: Literal["RunActionNotAllowed"] = "RunActionNotAllowed"
-    title: str = "Session Action Not Allowed"
+    title: str = "Run Action Not Allowed"
 
 
 @actions_router.post(
     path="/runs/{runId}/actions",
-    summary="Issue a control action to the session",
+    summary="Issue a control action to the run",
     description=(
-        "Provide an action to the session in order to control execution of the run."
+        "Provide an action in order to control execution of the run."
     ),
     status_code=status.HTTP_201_CREATED,
     response_model=ResponseModel[RunAction],
@@ -46,13 +46,13 @@ async def create_run_action(
     action_id: str = Depends(get_unique_id),
     created_at: datetime = Depends(get_current_time),
 ) -> ResponseModel[RunAction]:
-    """Create a session control action.
+    """Create a run control action.
 
     Arguments:
-        runId: Session ID pulled from the URL.
+        runId: Run ID pulled from the URL.
         request_body: Input payload from the request body.
         run_view: Resource model builder.
-        run_store: Session storage interface.
+        run_store: Run storage interface.
         engine_store: Protocol engine and runner storage.
         action_id: Generated ID to assign to the control action.
         created_at: Timestamp to attach to the control action.

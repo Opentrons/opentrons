@@ -1,1 +1,1 @@
-"""Tests for the robot_server.sessions module."""
+"""Tests for the robot_server.runs module."""

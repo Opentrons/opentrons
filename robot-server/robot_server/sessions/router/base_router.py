@@ -1,6 +1,6 @@
-"""Base router for /sessions endpoints.
+"""Base router for /runs endpoints.
 
-Contains routes dealing primarily with `Session` models.
+Contains routes dealing primarily with `Run` models.
 """
 from fastapi import APIRouter, Depends, status
 from datetime import datetime
@@ -34,22 +34,22 @@ base_router = APIRouter()
 
 
 class RunNotFound(ErrorDetails):
-    """An error if a given session is not found."""
+    """An error if a given run is not found."""
 
     id: Literal["RunNotFound"] = "RunNotFound"
-    title: str = "Session Not Found"
+    title: str = "Run Not Found"
 
 
-# TODO(mc, 2021-05-28): evaluate multi-session logic
+# TODO(mc, 2021-05-28): evaluate multi-run logic
 class RunAlreadyActive(ErrorDetails):
-    """An error if one tries to create a new session while one is already active."""
+    """An error if one tries to create a new run while one is already active."""
 
     id: Literal["RunAlreadyActive"] = "RunAlreadyActive"
-    title: str = "Session Already Active"
+    title: str = "Run Already Active"
 
 
 class RunNotIdle(ErrorDetails):
-    """An error if one tries to delete a session that is running."""
+    """An error if one tries to delete a run that is not idle."""
 
     id: Literal["RunNotIdle"] = "RunNotIdle"
     title: str = "Run is not idle."
@@ -86,8 +86,8 @@ async def create_run(
 
     Arguments:
         request_body: Optional request body with run creation data.
-        run_view: Session model construction interface.
-        run_store: Session storage interface.
+        run_view: Run model construction interface.
+        run_store: Run storage interface.
         engine_store: ProtocolEngine storage and control.
         protocol_store: Protocol resource storage.
         run_id: Generated ID to assign to the run.
@@ -145,21 +145,21 @@ async def get_runs(
     """Get all runs.
 
     Args:
-        run_view: Session model construction interface.
-        run_store: Session storage interface.
+        run_view: Run model construction interface.
+        run_store: Run storage interface.
         engine_store: ProtocolEngine storage and control.
     """
     data = []
 
     for run in run_store.get_all():
         # TODO(mc, 2021-06-23): add multi-engine support
-        session_data = run_view.as_response(run=run,
-                                            commands=engine_store.engine.state_view.commands.get_all(),
-                                            pipettes=engine_store.engine.state_view.pipettes.get_all(),
-                                            labware=engine_store.engine.state_view.labware.get_all(),
-                                            engine_status=engine_store.engine.state_view.commands.get_status())
+        run_data = run_view.as_response(run=run,
+                                        commands=engine_store.engine.state_view.commands.get_all(),
+                                        pipettes=engine_store.engine.state_view.pipettes.get_all(),
+                                        labware=engine_store.engine.state_view.labware.get_all(),
+                                        engine_status=engine_store.engine.state_view.commands.get_status())
 
-        data.append(session_data)
+        data.append(run_data)
 
     return MultiResponseModel(data=data)
 
@@ -184,8 +184,8 @@ async def get_run(
 
     Args:
         runId: Run ID pulled from URL.
-        run_view: Session model construction interface.
-        run_store: Session storage interface.
+        run_view: Run model construction interface.
+        run_store: Run storage interface.
         engine_store: ProtocolEngine storage and control.
     """
     try:
@@ -204,8 +204,8 @@ async def get_run(
 
 @base_router.delete(
     path="/runs/{runId}",
-    summary="Delete a session",
-    description="Delete a specific session by its unique identifier.",
+    summary="Delete a run",
+    description="Delete a specific run by its unique identifier.",
     status_code=status.HTTP_200_OK,
     response_model=EmptyResponseModel,
     responses={status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[RunNotFound]}},
@@ -215,11 +215,11 @@ async def remove_run_by_id(
     run_store: RunStore = Depends(get_run_store),
     engine_store: EngineStore = Depends(get_engine_store),
 ) -> EmptyResponseModel:
-    """Delete a session by its ID.
+    """Delete a run by its ID.
 
     Arguments:
-        runId: Session ID pulled from URL.
-        run_store: Session storage interface.
+        runId: Run ID pulled from URL.
+        run_store: Run storage interface.
         engine_store: ProtocolEngine storage and control.
     """
     try:

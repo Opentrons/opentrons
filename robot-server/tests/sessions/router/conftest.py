@@ -1,4 +1,4 @@
-"""Common test fixtures for sessions route tests."""
+"""Common test fixtures for runs route tests."""
 import pytest
 import asyncio
 from datetime import datetime
@@ -31,13 +31,13 @@ def protocol_store(decoy: Decoy) -> ProtocolStore:
 
 
 @pytest.fixture
-def session_store(decoy: Decoy) -> RunStore:
+def run_store(decoy: Decoy) -> RunStore:
     """Get a mock RunStore interface."""
     return decoy.mock(cls=RunStore)
 
 
 @pytest.fixture
-def session_view(decoy: Decoy) -> RunView:
+def run_view(decoy: Decoy) -> RunView:
     """Get a mock RunView interface."""
     return decoy.mock(cls=RunView)
 
@@ -51,8 +51,8 @@ def engine_store(decoy: Decoy) -> EngineStore:
 @pytest.fixture
 def app(
     task_runner: TaskRunner,
-    session_store: RunStore,
-    session_view: RunView,
+    run_store: RunStore,
+    run_view: RunView,
     engine_store: EngineStore,
     protocol_store: ProtocolStore,
     unique_id: str,
@@ -61,8 +61,8 @@ def app(
     """Get a FastAPI app with mocked-out dependencies."""
     app = FastAPI(exception_handlers=exception_handlers)
     app.dependency_overrides[TaskRunner] = lambda: task_runner
-    app.dependency_overrides[RunView] = lambda: session_view
-    app.dependency_overrides[get_run_store] = lambda: session_store
+    app.dependency_overrides[RunView] = lambda: run_view
+    app.dependency_overrides[get_run_store] = lambda: run_store
     app.dependency_overrides[get_engine_store] = lambda: engine_store
     app.dependency_overrides[get_protocol_store] = lambda: protocol_store
     app.dependency_overrides[get_unique_id] = lambda: unique_id
@@ -73,7 +73,7 @@ def app(
 
 @pytest.fixture
 def client(app: FastAPI) -> TestClient:
-    """Get an TestClient for /sessions route testing."""
+    """Get an TestClient for /runs route testing."""
     return TestClient(app)
 
 
@@ -82,6 +82,6 @@ async def async_client(
     loop: asyncio.AbstractEventLoop,
     app: FastAPI,
 ) -> AsyncIterator[AsyncClient]:
-    """Get an asynchronous client for /sessions route testing."""
+    """Get an asynchronous client for /runs route testing."""
     async with AsyncClient(app=app, base_url="http://test") as client:
         yield client

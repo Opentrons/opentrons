@@ -1,4 +1,4 @@
-"""Tests for the session resource model builder."""
+"""Tests for the run resource model builder."""
 import pytest
 from datetime import datetime
 
@@ -32,53 +32,53 @@ from robot_server.sessions.action_models import (
 )
 
 
-def test_create_session_resource_from_none() -> None:
-    """It should create a basic session from create_data=None."""
+def test_create_run_resource_from_none() -> None:
+    """It should create a basic run from create_data=None."""
     created_at = datetime.now()
     create_data = None
 
     subject = RunView()
-    result = subject.as_resource(run_id="session-id", created_at=created_at,
+    result = subject.as_resource(run_id="run-id", created_at=created_at,
                                  create_data=create_data)
 
     assert result == RunResource(
-        run_id="session-id",
+        run_id="run-id",
         create_data=BasicRunCreateData(),
         created_at=created_at,
         actions=[],
     )
 
 
-def test_create_session_resource() -> None:
-    """It should create a session with create_data specified."""
+def test_create_run_resource() -> None:
+    """It should create a run with create_data specified."""
     created_at = datetime.now()
     create_data = BasicRunCreateData()
 
     subject = RunView()
-    result = subject.as_resource(run_id="session-id", created_at=created_at,
+    result = subject.as_resource(run_id="run-id", created_at=created_at,
                                  create_data=create_data)
 
     assert result == RunResource(
-        run_id="session-id",
+        run_id="run-id",
         create_data=create_data,
         created_at=created_at,
         actions=[],
     )
 
 
-def test_create_protocol_session_resource() -> None:
-    """It should create a protocol session resource view."""
+def test_create_protocol_run_resource() -> None:
+    """It should create a protocol run resource view."""
     created_at = datetime.now()
     create_data = ProtocolRunCreateData(
         createParams=ProtocolRunCreateParams(protocolId="protocol-id")
     )
 
     subject = RunView()
-    result = subject.as_resource(run_id="session-id", created_at=created_at,
+    result = subject.as_resource(run_id="run-id", created_at=created_at,
                                  create_data=create_data)
 
     assert result == RunResource(
-        run_id="session-id",
+        run_id="run-id",
         create_data=create_data,
         created_at=created_at,
         actions=[],
@@ -89,17 +89,17 @@ current_time = datetime.now()
 
 
 @pytest.mark.parametrize(
-    ("session_resource", "expected_response"),
+    ("run_resource", "expected_response"),
     (
         (
                 RunResource(
-                run_id="session-id",
+                run_id="run-id",
                 create_data=BasicRunCreateData(),
                 created_at=current_time,
                 actions=[],
             ),
                 BasicRun(
-                id="session-id",
+                id="run-id",
                 createdAt=current_time,
                 status=EngineStatus.READY_TO_RUN,
                 actions=[],
@@ -110,7 +110,7 @@ current_time = datetime.now()
         ),
         (
                 RunResource(
-                run_id="session-id",
+                run_id="run-id",
                 create_data=ProtocolRunCreateData(
                     createParams=ProtocolRunCreateParams(protocolId="protocol-id")
                 ),
@@ -118,7 +118,7 @@ current_time = datetime.now()
                 actions=[],
             ),
                 ProtocolRun(
-                id="session-id",
+                id="run-id",
                 createdAt=current_time,
                 status=EngineStatus.READY_TO_RUN,
                 createParams=ProtocolRunCreateParams(protocolId="protocol-id"),
@@ -131,20 +131,20 @@ current_time = datetime.now()
     ),
 )
 def test_to_response(
-    session_resource: RunResource,
+    run_resource: RunResource,
     expected_response: Run,
 ) -> None:
-    """It should create the correct type of session."""
+    """It should create the correct type of run."""
     subject = RunView()
-    result = subject.as_response(run=session_resource, commands=[], pipettes=[],
+    result = subject.as_response(run=run_resource, commands=[], pipettes=[],
                                  labware=[], engine_status=EngineStatus.READY_TO_RUN)
     assert result == expected_response
 
 
 def test_to_response_maps_commands() -> None:
     """It should map ProtocolEngine commands to RunCommandSummary models."""
-    session_resource = RunResource(
-        run_id="session-id",
+    run_resource = RunResource(
+        run_id="run-id",
         create_data=BasicRunCreateData(),
         created_at=datetime(year=2021, month=1, day=1),
         actions=[],
@@ -168,12 +168,12 @@ def test_to_response_maps_commands() -> None:
     )
 
     subject = RunView()
-    result = subject.as_response(run=session_resource, commands=[command_1, command_2],
+    result = subject.as_response(run=run_resource, commands=[command_1, command_2],
                                  pipettes=[], labware=[],
                                  engine_status=EngineStatus.RUNNING)
 
     assert result == BasicRun(
-        id="session-id",
+        id="run-id",
         createdAt=datetime(year=2021, month=1, day=1),
         status=EngineStatus.RUNNING,
         actions=[],
@@ -196,8 +196,8 @@ def test_to_response_maps_commands() -> None:
 
 def test_to_response_adds_equipment() -> None:
     """It should add ProtocolEngine equipment to Session response model."""
-    session_resource = RunResource(
-        run_id="session-id",
+    run_resource = RunResource(
+        run_id="run-id",
         create_data=BasicRunCreateData(),
         created_at=datetime(year=2021, month=1, day=1),
         actions=[],
@@ -217,11 +217,11 @@ def test_to_response_adds_equipment() -> None:
     )
 
     subject = RunView()
-    result = subject.as_response(run=session_resource, commands=[], pipettes=[pipette],
+    result = subject.as_response(run=run_resource, commands=[], pipettes=[pipette],
                                  labware=[labware], engine_status=EngineStatus.RUNNING)
 
     assert result == BasicRun(
-        id="session-id",
+        id="run-id",
         createdAt=datetime(year=2021, month=1, day=1),
         status=EngineStatus.RUNNING,
         actions=[],
@@ -232,13 +232,13 @@ def test_to_response_adds_equipment() -> None:
 
 
 def test_create_action(current_time: datetime) -> None:
-    """It should create a control action and add it to the session."""
-    session_created_at = datetime.now()
+    """It should create a control action and add it to the run."""
+    run_created_at = datetime.now()
 
-    session = RunResource(
-        run_id="session-id",
+    run = RunResource(
+        run_id="run-id",
         create_data=BasicRunCreateData(),
-        created_at=session_created_at,
+        created_at=run_created_at,
         actions=[],
     )
 
@@ -247,7 +247,7 @@ def test_create_action(current_time: datetime) -> None:
     )
 
     subject = RunView()
-    action_result, session_result = subject.with_action(run=session,
+    action_result, run_result = subject.with_action(run=run,
                                                         action_id="control-command-id",
                                                         action_data=command_data,
                                                         created_at=current_time)
@@ -258,9 +258,9 @@ def test_create_action(current_time: datetime) -> None:
         actionType=RunActionType.PLAY,
     )
 
-    assert session_result == RunResource(
-        run_id="session-id",
+    assert run_result == RunResource(
+        run_id="run-id",
         create_data=BasicRunCreateData(),
-        created_at=session_created_at,
+        created_at=run_created_at,
         actions=[action_result],
     )

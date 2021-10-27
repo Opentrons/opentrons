@@ -1,4 +1,4 @@
-"""Sessions in-memory store."""
+"""Runs' in-memory store."""
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Dict, List
@@ -9,9 +9,9 @@ from .action_models import RunAction
 
 @dataclass(frozen=True)
 class RunResource:
-    """An entry in the session store, used to construct response models.
+    """An entry in the run store, used to construct response models.
 
-    This represents all session state that cannot be derived from another
+    This represents all run state that cannot be derived from another
     location, such as a ProtocolEngine instance.
     """
 
@@ -40,7 +40,7 @@ class RunStore:
         """Insert or update a run resource in the store.
 
         Arguments:
-            run: Session resource to store. Reads `session.id` to
+            run: Run resource to store. Reads `run.id` to
                 determine identity in storage.
 
         Returns:
@@ -51,13 +51,13 @@ class RunStore:
         return run
 
     def get(self, run_id: str) -> RunResource:
-        """Get a specific session entry by its identifier.
+        """Get a specific run entry by its identifier.
 
         Arguments:
-            run_id: Unique identifier of session entry to retrieve.
+            run_id: Unique identifier of run entry to retrieve.
 
         Returns:
-            The retrieved session entry from the store.
+            The retrieved run entry from the store.
         """
         try:
             return self._runs_by_id[run_id]
@@ -65,24 +65,24 @@ class RunStore:
             raise RunNotFoundError(run_id) from e
 
     def get_all(self) -> List[RunResource]:
-        """Get all known session resources.
+        """Get all known run resources.
 
         Returns:
-            All stored session entries.
+            All stored run entries.
         """
         return list(self._runs_by_id.values())
 
     def remove(self, run_id: str) -> RunResource:
-        """Remove a session by its unique identifier.
+        """Remove a run by its unique identifier.
 
         Arguments:
-            run_id: The session's unique identifier.
+            run_id: The run's unique identifier.
 
         Returns:
-            The session entry that was deleted.
+            The run entry that was deleted.
 
         Raises:
-            RunNotFoundError: The specified session ID was not found.
+            RunNotFoundError: The specified run ID was not found.
         """
         try:
             return self._runs_by_id.pop(run_id)

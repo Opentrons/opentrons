@@ -1,4 +1,4 @@
-"""Tests for the /sessions/.../commands routes."""
+"""Tests for the /runs/.../commands routes."""
 import pytest
 
 from datetime import datetime
@@ -26,7 +26,7 @@ from robot_server.sessions.router.commands_router import (
 )
 
 
-async def test_post_session_command(decoy: Decoy, engine_store: EngineStore) -> None:
+async def test_post_run_command(decoy: Decoy, engine_store: EngineStore) -> None:
     """It should add the requested command to the Protocol Engine and return it."""
     command_request = pe_commands.PauseRequest(
         data=pe_commands.PauseData(message="Hello")
@@ -49,17 +49,17 @@ async def test_post_session_command(decoy: Decoy, engine_store: EngineStore) -> 
     assert response.data == output_command
 
 
-async def test_get_session_commands() -> None:
-    """It should return a list of all commands in a session."""
+async def test_get_run_commands() -> None:
+    """It should return a list of all commands in a run."""
     command_summary = RunCommandSummary(
         id="command-id",
         commandType="moveToWell",
         status=CommandStatus.RUNNING,
     )
 
-    session_response = ResponseModel[Run](
+    run_response = ResponseModel[Run](
         data=BasicRun(
-            id="session-id",
+            id="run-id",
             createdAt=datetime(year=2021, month=1, day=1),
             status=EngineStatus.RUNNING,
             actions=[],
@@ -69,12 +69,12 @@ async def test_get_session_commands() -> None:
         )
     )
 
-    response = await get_run_commands(run=session_response)
+    response = await get_run_commands(run=run_response)
 
     assert response.data == [command_summary]
 
 
-async def test_get_session_command_by_id(
+async def test_get_run_command_by_id(
     decoy: Decoy,
     engine_store: EngineStore,
 ) -> None:
@@ -95,7 +95,7 @@ async def test_get_session_command_by_id(
     assert response.data == command
 
 
-async def test_get_session_command_missing_command(
+async def test_get_run_command_missing_command(
     decoy: Decoy,
     engine_store: EngineStore,
 ) -> None:

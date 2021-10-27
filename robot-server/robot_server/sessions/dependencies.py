@@ -1,4 +1,4 @@
-"""Session router dependency-injection wire-up."""
+"""Run router dependency-injection wire-up."""
 from fastapi import Depends
 
 from opentrons.hardware_control import API as HardwareAPI
@@ -15,7 +15,7 @@ _engine_store = AppStateValue[EngineStore]("engine_store")
 
 
 def get_run_store(app_state: AppState = Depends(get_app_state)) -> RunStore:
-    """Get a singleton RunStore to keep track of created sessions."""
+    """Get a singleton RunStore to keep track of created runs."""
     run_store = _run_store.get_from(app_state)
 
     if run_store is None:
