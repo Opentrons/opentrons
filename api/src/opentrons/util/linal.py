@@ -25,17 +25,17 @@ def identity_deck_transform() -> np.ndarray:
 def solve_attitude(expected: SolvePoints, actual: SolvePoints) -> AttitudeMatrix:
     ex = np.array([list(point) for point in expected]).transpose()
     ac = np.array([list(point) for point in actual]).transpose()
-    t = np.dot(ac, inv(ex))
+    t = np.dot(ac, inv(ex))  # type: ignore[no-untyped-call]
 
     mask_transform = np.array(
         [[True, True, False], [True, True, False], [False, False, False]]
     )
-    masked_array = np.ma.masked_array(t, ~mask_transform)  # type: ignore
+    masked_array = np.ma.masked_array(t, ~mask_transform)  # type: ignore[var-annotated, no-untyped-call]  # noqa: E501
 
     no_z_component = np.zeros((3, 3))
     np.put(no_z_component, [8, 8], 1)
 
-    transform = masked_array.filled(0) + no_z_component
+    transform = masked_array.filled(0) + no_z_component  # type: ignore[no-untyped-call]
     return transform.round(4).tolist()
 
 
@@ -96,7 +96,7 @@ def solve(
     # [ y1 y2 y3 ]
     # [  1  1  1 ]
 
-    transform = np.dot(ac, inv(ex))
+    transform = np.dot(ac, inv(ex))  # type: ignore[no-untyped-call]
     # `dot` in numpy is a misnomer. When both arguments are square, N-
     # dimensional arrays, the return type is the result of performing matrix
     # multiplication, rather than the dot-product (so the return here will be
@@ -123,14 +123,14 @@ def add_z(xy: np.ndarray, z: float) -> np.ndarray:
             [ 0  0  0  1 ]
     """
     # First, insert a column of zeros as into the input matrix
-    interm = insert(xy, 2, [0, 0, 0], axis=1)
+    interm = insert(xy, 2, [0, 0, 0], axis=1)  # type: ignore[no-untyped-call]
     # Result:
     # [ 1  0  0  x ]
     # [ 0  1  0  y ]
     # [ 0  0  0  1 ]
 
     # Then, insert the z row to create a properly formed 3-D transform matrix:
-    xyz = insert(interm, 2, [0, 0, 1, z], axis=0)
+    xyz = insert(interm, 2, [0, 0, 1, z], axis=0)  # type: ignore[no-untyped-call]
     # Result:
     # [ 1  0  0  x ]
     # [ 0  1  0  y ]
@@ -167,4 +167,4 @@ def apply_reverse(
     t: Union[List[List[float]], np.ndarray], pos: AxisPosition
 ) -> Tuple[float, float, float]:
     """Like apply_transform but inverts the transform first"""
-    return apply_transform(inv(t), pos)
+    return apply_transform(inv(t), pos)  # type: ignore[no-untyped-call]
