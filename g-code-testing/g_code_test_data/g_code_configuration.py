@@ -84,7 +84,7 @@ class ProtocolGCodeConfirmConfig(BaseModel, SharedFunctionsMixin):
     name: constr(regex=r'^[a-z0-9_]*$')
     path: str
     settings: Settings
-    driver = 'protocol'
+    driver: str = 'protocol'
     marks: List[Mark] = [pytest.mark.g_code_confirm]
 
     class Config:
@@ -99,7 +99,7 @@ class HTTPGCodeConfirmConfig(BaseModel, SharedFunctionsMixin):
     name: constr(regex=r'^[a-z0-9_]*$')
     executable: Callable
     settings: Settings
-    driver = 'http'
+    driver: str = 'http'
     marks: List[Mark] = [pytest.mark.g_code_confirm]
 
     class Config:

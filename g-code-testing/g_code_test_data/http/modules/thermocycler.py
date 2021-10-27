@@ -3,7 +3,6 @@ from g_code_test_data.http.http_settings import HTTP_SETTINGS
 from g_code_test_data.g_code_configuration import HTTPGCodeConfirmConfig
 from robot_server.service.legacy.routers.modules import post_serial_command
 from robot_server.service.legacy.models.modules import SerialCommand
-from opentrons.hardware_control.emulation.thermocycler import SERIAL as SERIAL_NUM
 
 
 THERMOCYCLER_CLOSE = HTTPGCodeConfirmConfig(
@@ -11,7 +10,7 @@ THERMOCYCLER_CLOSE = HTTPGCodeConfirmConfig(
         executable=partial(
             post_serial_command,
             command=SerialCommand(command_type='close'),
-            serial=SERIAL_NUM,
+            serial=HTTP_SETTINGS.thermocycler.serial_number,
         ),
         settings=HTTP_SETTINGS,
     )
@@ -21,7 +20,7 @@ THERMOCYCLER_OPEN = HTTPGCodeConfirmConfig(
         executable=partial(
             post_serial_command,
             command=SerialCommand(command_type='open'),
-            serial=SERIAL_NUM,
+            serial=HTTP_SETTINGS.thermocycler.serial_number,
         ),
         settings=HTTP_SETTINGS,
     )
@@ -31,7 +30,7 @@ THERMOCYCLER_DEACTIVATE = HTTPGCodeConfirmConfig(
         executable=partial(
             post_serial_command,
             command=SerialCommand(command_type='deactivate'),
-            serial=SERIAL_NUM,
+            serial=HTTP_SETTINGS.thermocycler.serial_number,
         ),
         settings=HTTP_SETTINGS,
     )
@@ -41,7 +40,7 @@ THERMOCYCLER_DEACTIVATE_BLOCK = HTTPGCodeConfirmConfig(
         executable=partial(
             post_serial_command,
             command=SerialCommand(command_type='deactivate_block'),
-            serial=SERIAL_NUM,
+            serial=HTTP_SETTINGS.thermocycler.serial_number,
         ),
         settings=HTTP_SETTINGS,
     )
@@ -51,7 +50,7 @@ THERMOCYCLER_DEACTIVATE_LID = HTTPGCodeConfirmConfig(
         executable=partial(
             post_serial_command,
             command=SerialCommand(command_type='deactivate_lid'),
-            serial=SERIAL_NUM,
+            serial=HTTP_SETTINGS.thermocycler.serial_number,
         ),
         settings=HTTP_SETTINGS,
     )
@@ -66,7 +65,7 @@ THERMOCYCLER_CYCLE_TEMPERATURES = HTTPGCodeConfirmConfig(
                     , 1
                 ]
             ),
-            serial=SERIAL_NUM,
+            serial=HTTP_SETTINGS.thermocycler.serial_number,
         ),
         settings=HTTP_SETTINGS,
     )
@@ -76,7 +75,7 @@ THERMOCYCLER_SET_LID_TEMPERATURE = HTTPGCodeConfirmConfig(
         executable=partial(
             post_serial_command,
             command=SerialCommand(command_type='set_lid_temperature', args=[37.0]),
-            serial=SERIAL_NUM,
+            serial=HTTP_SETTINGS.thermocycler.serial_number,
         ),
         settings=HTTP_SETTINGS,
     )
@@ -86,7 +85,7 @@ THERMOCYCLER_SET_TEMPERATURE = HTTPGCodeConfirmConfig(
         executable=partial(
             post_serial_command,
             command=SerialCommand(command_type='set_temperature', args=[1.0]),
-            serial=SERIAL_NUM,
+            serial=HTTP_SETTINGS.thermocycler.serial_number,
         ),
         settings=HTTP_SETTINGS,
     )
