@@ -3,7 +3,11 @@ export const RUN_TYPE_PROTOCOL: 'protocol' = 'protocol'
 
 export type RunType = typeof RUN_TYPE_BASIC | typeof RUN_TYPE_PROTOCOL
 
+<<<<<<< HEAD
 export type RunStatus =
+=======
+type RunStatus =
+>>>>>>> wip
   | 'ready-to-run'
   | 'running'
   | 'pause-requested'

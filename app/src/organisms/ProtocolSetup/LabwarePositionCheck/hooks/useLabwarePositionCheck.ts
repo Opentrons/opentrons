@@ -2,11 +2,11 @@ import * as React from 'react'
 import {
   HostConfig,
   SessionCommandSummary,
-  createCommand
+  createCommand,
 } from '@opentrons/api-client'
 import {
   useHost,
-  useEnsureBasicSession,
+  useEnsureBasicRun,
   useAllCommandsQuery,
 } from '@opentrons/react-api-client'
 import { useProtocolDetails } from '../../../RunDetails/hooks'
@@ -78,16 +78,16 @@ export function useLabwarePositionCheck(
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
   const [error, setError] = React.useState<Error | null>(null)
   const host = useHost()
-  const basicSession = useEnsureBasicSession()
-  if (basicSession.error != null) {
-    setError(basicSession.error)
+  const basicRun = useEnsureBasicRun()
+  if (basicRun.error != null && error !== null) {
+    setError(basicRun.error)
   }
   const LPCCommands = useSteps().reduce<Command[]>((steps, currentStep) => {
     return [...steps, ...currentStep.commands]
   }, [])
   const currentCommand = LPCCommands[currentCommandIndex]
   const ctaText = useLpcCtaText(currentCommand)
-  const robotCommands = useAllCommandsQuery(basicSession?.id).data?.data
+  const robotCommands = useAllCommandsQuery(basicRun.data?.id).data?.data
   const isComplete = currentCommandIndex === LPCCommands.length - 1
   if (error != null) return { error }
   if (
@@ -108,7 +108,7 @@ export function useLabwarePositionCheck(
 
     createCommand(
       host as HostConfig,
-      basicSession.data.id,
+      basicRun.data?.id as string,
       createCommandData(currentCommand)
     )
       .then(response => {
@@ -123,7 +123,7 @@ export function useLabwarePositionCheck(
           const nextCommand = LPCCommands[currentCommandIndex + 1]
           createCommand(
             host as HostConfig,
-            basicSession.id,
+            basicRun.data?.id as string,
             createCommandData(nextCommand)
           )
             .then(response => {
@@ -160,7 +160,7 @@ export function useLabwarePositionCheck(
       },
     }
 
-    createCommand(host as HostConfig, basicSession.id, data).catch(
+    createCommand(host as HostConfig, basicRun.data?.id as string, data).catch(
       (e: Error) => {
         setError(e)
         console.error(`error issuing jog command: ${e.message}`)

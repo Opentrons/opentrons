@@ -6,7 +6,7 @@ import type { Runs, RunType } from './types'
 
 export function getRuns(
   config: HostConfig,
-  params?: { run_type: RunType }
+  params?: { session_type: RunType }
 ): ResponsePromise<Runs> {
-  return request<Runs>(GET, `/runs`, null, config, params)
+  return request<Runs>(GET, `/sessions`, null, config, params)
 }
