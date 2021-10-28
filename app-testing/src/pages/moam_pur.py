@@ -34,11 +34,11 @@ class MoamPur:
     )
     moam_link: Tuple[str, str] = (
         By.XPATH,
-        "//a[text()='Multiple Modules Help']",
+        "//a[text()='See How To Set Up Modules of the Same Type']",
     )
     moam_modal_text_locator: Tuple[str, str] = (
         By.XPATH,
-        "//h3[text()='Multiple Modules Help']",
+        "//h3[text()='Setting Up Modules of the Same Type']",
     )
     close_protocol_text_locator: Tuple[str, str] = (
         By.XPATH,

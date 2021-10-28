@@ -33,7 +33,7 @@ def test_protocol_upload(
     test_protocols: Dict[str, Path],
     request: FixtureRequest,
 ) -> None:
-    """Upload a protocol."""
+
     robot = OtRobot()
     # expecting docker emulated robot
     assert robot.is_alive(), "is a robot available?"
