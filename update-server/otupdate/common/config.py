@@ -1,5 +1,5 @@
 """
-otupdate.buildroot.config: Handlers for reading update server configuration
+otupdate.common.config: Handlers for reading update server configuration
 """
 
 import os

@@ -7,8 +7,9 @@ import zipfile
 
 import pytest
 
-from otupdate.buildroot import update, config, file_actions
-from otupdate.buildroot.update_session import UpdateSession, Stages
+from otupdate.buildroot import update, config, update_actions
+from otupdate.common import file_actions
+from otupdate.common.session import UpdateSession, Stages
 
 
 def session_endpoint(token, endpoint):
@@ -60,14 +61,16 @@ async def test_commit_fails_wrong_state(test_cli, update_session):
     assert resp.status == 409
 
 
-async def test_future_chain(otupdate_config, downloaded_update_file,
+async def test_updater_chain(otupdate_config, downloaded_update_file,
                             loop, testing_partition):
     conf = config.load_from_path(otupdate_config)
     session = UpdateSession(conf.download_storage_path)
+    handler = update_actions.OT2UpdateActions()
     fut = update._begin_validation(session,
                                    conf,
                                    loop,
-                                   downloaded_update_file)
+                                   downloaded_update_file,
+                                   handler)
     assert session.stage == Stages.VALIDATING
     last_progress = 0.0
     while session.stage == Stages.VALIDATING:
@@ -91,11 +94,13 @@ async def test_session_catches_validation_fail(otupdate_config,
                                                loop):
     conf = config.load_from_path(otupdate_config)
     session = UpdateSession(conf.download_storage_path)
+    handler = update_actions.OT2UpdateActions()
     fut = update._begin_validation(
         session,
         conf,
         loop,
-        downloaded_update_file)
+        downloaded_update_file,
+        handler)
     with pytest.raises(file_actions.FileMissing):
         await fut
     assert session.state['stage'] == 'error'

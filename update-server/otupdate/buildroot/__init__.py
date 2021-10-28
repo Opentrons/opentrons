@@ -5,9 +5,8 @@ import json
 from typing import Mapping
 from aiohttp import web
 
-from . import constants, name_management
-
-from . import config, control, update, ssh_key_management
+from otupdate.common import config, control, ssh_key_management, name_management, constants, update
+from . import update_actions
 
 
 BR_BUILTIN_VERSION_FILE = '/etc/VERSION.json'
@@ -73,6 +72,7 @@ def get_app(system_version_file: str = None,
     app[constants.RESTART_LOCK_NAME] = asyncio.Lock()
     app[constants.DEVICE_BOOT_ID_NAME] = boot_id
     app[constants.DEVICE_NAME_VARNAME] = name
+    update_actions.OT2UpdateActions.build_and_insert(app)
     app.router.add_routes([
         web.get('/server/update/health',
                 control.build_health_endpoint(version)),

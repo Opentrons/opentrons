@@ -1,9 +1,8 @@
 """
-otupdate.buildroot.update: endpoints for running software updates
-
-This has endpoints like update session management, validation, and execution
+openembedded update server
+- setup session
+- upload compressed raw image from host
 """
-
 import asyncio
 import functools
 import logging
@@ -12,12 +11,14 @@ from subprocess import CalledProcessError
 
 from typing import Optional
 
-
 from aiohttp import web, BodyPartReader
 
 from .constants import APP_VARIABLE_PREFIX, RESTART_LOCK_NAME
-from . import config, file_actions
-from .update_session import UpdateSession, Stages
+from . import config, file_actions, session
+
+from .session import UpdateSession
+from .session import Stages
+
 
 SESSION_VARNAME = APP_VARIABLE_PREFIX + 'session'
 LOG = logging.getLogger(__name__)
@@ -28,24 +29,34 @@ def session_from_request(request: web.Request) -> Optional[UpdateSession]:
 
 
 def require_session(handler):
-    """ Decorator to ensure a session is properly in the request """
+    # Decorator to check session exists in request
     @functools.wraps(handler)
     async def decorated(request: web.Request) -> web.Response:
         request_session_token = request.match_info['session']
         session = session_from_request(request)
         if not session or request_session_token != session.token:
-            LOG.warning(f"request for invalid session {request_session_token}")
+            LOG.warning(f"request has an invalid session {request_session_token}")
             return web.json_response(
-                data={'error': 'bad-token',
-                      'message': f'No such session {request_session_token}'},
-                status=404)
+                    data={'error': 'bad-token',
+                          'message': f'No such session {request_session_token}'},
+                    status=404)
         return await handler(request, session)
     return decorated
 
 
+@session.active_session_check
 async def begin(request: web.Request) -> web.Response:
-    """ Begin a session
+    """ future add begin functionality on
+    top of active_session_check decorator from
+    .session can be added here. For
+    now just adding a pass.
     """
+    pass
+
+
+"""
+async def begin(request: web.Request) -> web.Response:
+     # Begin a session
     if None is not session_from_request(request):
         LOG.warning("begin: requested with active session")
         return web.json_response(
@@ -54,19 +65,20 @@ async def begin(request: web.Request) -> web.Response:
                   'error': 'session-already-active'},
             status=409)
 
-    session = UpdateSession(
+    session_val = session.UpdateSession(
         config.config_from_request(request).download_storage_path)
-    request.app[SESSION_VARNAME] = session
+    request.app[SESSION_VARNAME] = session_val
     return web.json_response(
-        data={'token': session.token},
+        data={'token': session_val.token},
         status=201)
+"""
 
 
 async def cancel(request: web.Request) -> web.Response:
     request.app.pop(SESSION_VARNAME, None)
     return web.json_response(
-        data={'message': 'Session cancelled'},
-        status=200)
+            data={'message': 'Session cancelled'},
+            status=200)
 
 
 @require_session
@@ -106,7 +118,7 @@ def _begin_write(session: UpdateSession,
 
 
 def _begin_validation(
-        session: UpdateSession,
+        session: session.UpdateSession,
         config: config.Config,
         loop: asyncio.AbstractEventLoop,
         downloaded_update_path: str)\
@@ -128,7 +140,7 @@ def _begin_validation(
                               str(exc))
         else:
             rootfs_file = fut.result()
-            loop.call_soon_threadsafe(_begin_write,
+            loop.call_soon_threadsage(_begin_write,
                                       session,
                                       loop,
                                       rootfs_file)
@@ -138,11 +150,11 @@ def _begin_validation(
 
 @require_session
 async def file_upload(
-        request: web.Request, session: UpdateSession) -> web.Response:
-    """ Serves /update/:session/file
+        request: web.Request, session: session.UpdateSession) -> web.Response:
+    """ Serves /updates/:session/file
 
     Requires multipart (encoding doesn't matter) with a file field in the
-    body called 'ot2-system.zip'.
+    body called 'ot3-system.zip'.
     """
     if session.stage != Stages.AWAITING_FILE:
         return web.json_response(
@@ -151,9 +163,9 @@ async def file_upload(
             status=409)
     reader = await request.multipart()
     async for part in reader:
-        if part.name != 'ot2-system.zip':
+        if part.name != 'ot3-system.zip':
             LOG.warning(
-                f"Unknown field name {part.name} in file_upload, ignoring")
+                f"Unknown field name {part.name} in file uploaded. ignoring")
             await part.release()
         else:
             await _save_file(part, session.download_path)
@@ -162,7 +174,7 @@ async def file_upload(
         session,
         config.config_from_request(request),
         asyncio.get_event_loop(),
-        os.path.join(session.download_path, 'ot2-system.zip'))
+        os.path.join(session.download_path, 'ot3-system.zip'))
 
     return web.json_response(data=session.state,
                              status=201)
@@ -170,7 +182,7 @@ async def file_upload(
 
 @require_session
 async def commit(
-        request: web.Request, session: UpdateSession) -> web.Response:
+        request: web.Request, session: session.UpdateSession) -> web.Response:
     """ Serves /update/:session/commit """
     if session.stage != Stages.DONE:
         return web.json_response(

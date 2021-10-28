@@ -1,5 +1,5 @@
 """
-otupdate.buildroot.name_management: functions for managing machine names
+otupdate.common.name_management: functions for managing machine names
 
 The robot has two names associated with it:
 
@@ -145,7 +145,7 @@ async def setup_hostname() -> str:
     # /etc/hostname
     LOG.debug("Setting hostname")
     proc = await asyncio.create_subprocess_exec(
-        'hostname', '-F', '/etc/hostname',
+        'hostname', hostname,
         stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
     stdout, stderr = await proc.communicate()
     ret = proc.returncode

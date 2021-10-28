@@ -4,7 +4,7 @@ import os
 
 import pytest
 
-import otupdate.buildroot
+from otupdate.common import ssh_key_management
 
 
 @pytest.fixture
@@ -17,7 +17,7 @@ def dummy_authorized_keys(tmpdir, monkeypatch):
         with open(path, mode) as a:
             yield a
 
-    monkeypatch.setattr(otupdate.buildroot.ssh_key_management,
+    monkeypatch.setattr(ssh_key_management,
                         'authorized_keys', ak)
 
     return path
