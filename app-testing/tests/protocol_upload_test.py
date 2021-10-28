@@ -166,8 +166,6 @@ def test_moam_pur(
         # toggle the DEV robot
         if not robots_list.is_robot_toggle_active(RobotsList.DEV):
             robots_list.get_robot_toggle(RobotsList.DEV).click()
-        # calibrate
-        robot_page = RobotPage(driver)
         left_menu = LeftMenu(driver)
         left_menu.click_protocol_upload_button()
         protocol_file = ProtocolFile(driver)
@@ -228,8 +226,6 @@ def test_gen1_pipette(
         # toggle the DEV robot
         if not robots_list.is_robot_toggle_active(RobotsList.DEV):
             robots_list.get_robot_toggle(RobotsList.DEV).click()
-        # calibrate
-        robot_page = RobotPage(driver)
         left_menu = LeftMenu(driver)
         left_menu.click_protocol_upload_button()
         protocol_file = ProtocolFile(driver)

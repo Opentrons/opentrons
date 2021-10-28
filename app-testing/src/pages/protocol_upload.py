@@ -66,7 +66,7 @@ class ProtocolUpload:
             return None
 
     def click_app_left_panel(self) -> None:
-        """Linking to app link on the left panel"""
+        """Linking to app link on the left panel."""
         self.get_app_link().click()
 
     @highlight
@@ -78,7 +78,7 @@ class ProtocolUpload:
 
     @highlight
     def get_enable_developer_tool_toggle(self) -> WebElement:
-        """Locating the toggle button"""
+        """Locating the toggle button."""
         toggle: WebElement = WebDriverWait(self.driver, 2).until(
             EC.element_to_be_clickable(ProtocolUpload.enable_developer_tool_toggle)
         )
