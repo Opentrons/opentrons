@@ -5,7 +5,7 @@ by continuing to customize the parser.
 
 import argparse
 
-from . import config, constants
+from . import config
 
 
 def build_root_parser() -> argparse.ArgumentParser:

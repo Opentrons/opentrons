@@ -1,11 +1,10 @@
 """
 Entrypoint for the buildroot update server
 """
-import argparse
 import asyncio
 import logging
 
-from . import get_app, BR_BUILTIN_VERSION_FILE, config, constants
+from . import get_app, constants
 
 from otupdate.common import name_management, cli, systemd
 from aiohttp import web

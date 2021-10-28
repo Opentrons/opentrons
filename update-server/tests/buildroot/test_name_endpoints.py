@@ -1,6 +1,4 @@
 from otupdate.common import name_management
-import pytest
-from collections import Counter
 
 
 async def test_name_endpoint(test_cli, monkeypatch):

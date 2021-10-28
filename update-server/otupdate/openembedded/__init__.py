@@ -3,6 +3,7 @@ import asyncio
 import logging
 import json
 from aiohttp import web
+from typing import Optional, Mapping
 
 from otupdate.common import (
     config,
@@ -10,8 +11,9 @@ from otupdate.common import (
     control,
     ssh_key_management,
     name_management,
+    update,
 )
-from . import update, update_actions
+from . import update_actions
 
 LOG = logging.getLogger(__name__)
 

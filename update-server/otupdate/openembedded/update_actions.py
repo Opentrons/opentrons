@@ -12,15 +12,13 @@ import os
 import re
 import subprocess
 import tempfile
-from typing import Callable, NamedTuple, Optional
+from typing import Callable, Optional
 
 from otupdate.common.file_actions import (
     unzip_update,
     hash_file,
     verify_signature,
     HashMismatch,
-    FileMissing,
-    SignatureMismatch,
 )
 from otupdate.common.update_actions import UpdateActionsInterface, Partition
 
