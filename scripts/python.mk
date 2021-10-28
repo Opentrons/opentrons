@@ -45,6 +45,16 @@ define python_get_wheelname
 $(2)-$(call python_package_version,$(1),$(3),$(4))-py2.py3-none-any.whl
 endef
 
+# get the name of the sdist that setup.py will build
+# parameter 1: the name of the project (aka api, robot-server, etc)
+# parameter 2: the name of the python package (aka opentrons, robot_server, etc)
+# parameter 3: any extra version tags
+# parameter 4: override python_build_utils.py path (default: ../scripts/python_build_utils.py)
+
+define python_get_sdistname
+$(2)-$(call python_package_version,$(1),$(3),$(4)).tar.gz
+endef
+
 # upload a package to a repository
 # parameter 1: auth arguments for twine
 # parameter 2: repository url

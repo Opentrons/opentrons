@@ -1,6 +1,8 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
-import { getPipetteNameSpecs } from '@opentrons/shared-data'
+import '@testing-library/jest-dom'
+import { fireEvent, screen } from '@testing-library/react'
+import { getIsTiprack, getPipetteNameSpecs } from '@opentrons/shared-data'
 import {
   RobotWorkSpace,
   componentPropsMatcher,
@@ -13,6 +15,7 @@ import {
   WELL_LABEL_OPTIONS,
 } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
+import { JogControls } from '../../../../molecules/JogControls'
 import { useProtocolDetails } from '../../../RunDetails/hooks'
 import { LabwarePositionCheckStepDetail } from '../LabwarePositionCheckStepDetail'
 import { StepDetailText } from '../StepDetailText'
@@ -31,10 +34,12 @@ jest.mock('@opentrons/shared-data', () => {
   return {
     ...actualSharedData,
     getPipetteNameSpecs: jest.fn(),
+    getIsTiprack: jest.fn(),
   }
 })
 jest.mock('../../../RunDetails/hooks')
 jest.mock('../StepDetailText')
+jest.mock('../../../../molecules/JogControls')
 
 const mockStepDetailText = StepDetailText as jest.MockedFunction<
   typeof StepDetailText
@@ -45,6 +50,10 @@ const mockUseProtocolDetails = useProtocolDetails as jest.MockedFunction<
 const mockGetPipetteNameSpecs = getPipetteNameSpecs as jest.MockedFunction<
   typeof getPipetteNameSpecs
 >
+const mockGetIsTiprack = getIsTiprack as jest.MockedFunction<
+  typeof getIsTiprack
+>
+
 const mockRobotWorkSpace = RobotWorkSpace as jest.MockedFunction<
   typeof RobotWorkSpace
 >
@@ -54,11 +63,12 @@ const mockLabwareRender = LabwareRender as jest.MockedFunction<
 const mockPipetteRender = PipetteRender as jest.MockedFunction<
   typeof PipetteRender
 >
-
+const mockJogControls = JogControls as jest.MockedFunction<typeof JogControls>
 const PICKUP_TIP_LABWARE_ID = 'PICKUP_TIP_LABWARE_ID'
 const PRIMARY_PIPETTE_ID = 'PRIMARY_PIPETTE_ID'
 const PRIMARY_PIPETTE_NAME = 'PRIMARY_PIPETTE_NAME'
 const LABWARE_DEF_ID = 'LABWARE_DEF_ID'
+const TIPRACK_DEF_ID = 'tiprack_DEF_ID'
 const LABWARE_DEF = {
   ordering: [['A1', 'A2']],
 }
@@ -125,6 +135,10 @@ describe('LabwarePositionCheckStepDetail', () => {
       .calledWith(PRIMARY_PIPETTE_NAME as any)
       .mockReturnValue({ channels: 1 } as any)
 
+    mockGetIsTiprack.mockReturnValue(false)
+
+    mockJogControls.mockReturnValue(<div></div>)
+
     when(mockRobotWorkSpace)
       .mockReturnValue(
         <div>mockRobotWorkSpace not being called with the correct props</div>
@@ -154,6 +168,43 @@ describe('LabwarePositionCheckStepDetail', () => {
     const { getByText } = render(props)
     getByText('Mock Step Detail Text')
   })
+  it('renders the level with labware image', () => {
+    render(props)
+    screen.getByAltText('level with labware')
+  })
+  it('renders null if protocol data is null', () => {
+    mockUseProtocolDetails.mockReturnValue({ protocolData: null } as any)
+    const { container } = render(props)
+    expect(container.firstChild).toBeNull()
+  })
+  it('renders the level with tip image', () => {
+    mockGetIsTiprack.mockReturnValue(true)
+
+    when(mockUseProtocolDetails)
+      .calledWith()
+      .mockReturnValue({
+        protocolData: {
+          labware: {
+            [mockLabwarePositionCheckStepTipRack.labwareId]: {
+              slot: '1',
+              displayName: 'someDislpayName',
+              definitionId: TIPRACK_DEF_ID,
+            },
+          },
+          labwareDefinitions: {
+            [TIPRACK_DEF_ID]: LABWARE_DEF,
+          },
+          pipettes: {
+            [PRIMARY_PIPETTE_ID]: {
+              name: PRIMARY_PIPETTE_NAME,
+              mount: 'left',
+            },
+          },
+        },
+      } as any)
+    render(props)
+    screen.getByAltText('level with tip')
+  })
   it('renders a pipette', () => {
     when(mockPipetteRender)
       .calledWith(
@@ -167,7 +218,7 @@ describe('LabwarePositionCheckStepDetail', () => {
     getByText('mock pipette render')
   })
   describe('when pipette is multi channel', () => {
-    it('renders labware with with stroke, and highlighted labels outside', () => {
+    it('renders labware with stroke, and highlighted labels outside', () => {
       when(mockGetPipetteNameSpecs)
         .calledWith(PRIMARY_PIPETTE_NAME as any)
         .mockReturnValue({ channels: 8 } as any)
@@ -195,7 +246,7 @@ describe('LabwarePositionCheckStepDetail', () => {
     })
   })
   describe('when pipette is single channel', () => {
-    it('renders labware with with stroke, and highlighted labels outside', () => {
+    it('renders labware with stroke, and highlighted labels outside', () => {
       when(mockGetPipetteNameSpecs)
         .calledWith(PRIMARY_PIPETTE_NAME as any)
         .mockReturnValue({ channels: 1 } as any)
@@ -220,6 +271,24 @@ describe('LabwarePositionCheckStepDetail', () => {
 
       const { getByText } = render(props)
       getByText('mock labware with stroke and highlighted well labels outside')
+    })
+  })
+  describe('jog controls', () => {
+    it('renders correct text when jog controls are hidden', () => {
+      const { getByText, getByRole } = render(props)
+      getByText('Need to make an adjustment?')
+      getByRole('link', { name: 'Reveal jog controls' })
+      expect(screen.queryByText('Mock Jog Controls')).toBeNull()
+    })
+    it('renders correct text when jog controls are revealed', () => {
+      mockJogControls.mockReturnValue(<div>Mock Jog Controls</div>)
+      const { getByText, getByRole } = render(props)
+      getByText('Need to make an adjustment?')
+      const revealJogControls = getByRole('link', {
+        name: 'Reveal jog controls',
+      })
+      fireEvent.click(revealJogControls)
+      getByText('Mock Jog Controls')
     })
   })
 })

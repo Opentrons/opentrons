@@ -40,6 +40,7 @@ describe('getModuleRenderInfo', () => {
             _protocolWithMagTempTC.labware[MAG_LW_ID]
               .definitionId as keyof typeof _protocolWithMagTempTC.labwareDefinitions
           ],
+        nestedLabwareId: MAG_LW_ID,
       },
       [TEMP_MOD_ID]: {
         x: SLOT_3_COORDS[0],
@@ -51,6 +52,7 @@ describe('getModuleRenderInfo', () => {
             _protocolWithMagTempTC.labware[TEMP_LW_ID]
               .definitionId as keyof typeof _protocolWithMagTempTC.labwareDefinitions
           ],
+        nestedLabwareId: TEMP_LW_ID,
       },
       [TC_ID]: {
         x: SLOT_7_COORDS[0],
@@ -62,6 +64,7 @@ describe('getModuleRenderInfo', () => {
             _protocolWithMagTempTC.labware[TC_LW_ID]
               .definitionId as keyof typeof _protocolWithMagTempTC.labwareDefinitions
           ],
+        nestedLabwareId: TC_LW_ID,
       },
     }
 

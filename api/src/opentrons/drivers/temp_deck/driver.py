@@ -65,6 +65,7 @@ class TempDeckDriver(AbstractTempDeckDriver):
             timeout=DEFAULT_TEMP_DECK_TIMEOUT,
             ack=TEMP_DECK_ACK,
             loop=loop,
+            reset_buffer_before_write=False,
         )
         return cls(connection=connection)
 

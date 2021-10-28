@@ -20,8 +20,8 @@ class RunControlHandler:
 
     async def pause(self) -> None:
         """Issue a PauseAction to the store, pausing the run."""
-        self._action_dispatcher.dispatch(PauseAction())
-
-        await self._state_store.wait_for(
-            condition=self._state_store.commands.get_is_running
-        )
+        if not self._state_store.get_configs().ignore_pause:
+            self._action_dispatcher.dispatch(PauseAction())
+            await self._state_store.wait_for(
+                condition=self._state_store.commands.get_is_running
+            )

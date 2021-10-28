@@ -55,7 +55,7 @@ describe('RPC API client - session creation', () => {
       return _flush()
     }
 
-    return sendToClient(RobotActions.connect(mockRobot.name))
+    return sendToClient(RobotActions.legacyConnect(mockRobot.name))
   })
 
   afterEach(() => {

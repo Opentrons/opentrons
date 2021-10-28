@@ -16,7 +16,7 @@ from opentrons.drivers.rpi_drivers.types import USBPort
 async def test_get_modules_simulating():
     import opentrons.hardware_control as hardware_control
 
-    mods = ["tempdeck", "magdeck", "thermocycler"]
+    mods = ["tempdeck", "magdeck", "thermocycler", "heatershaker"]
     api = await hardware_control.API.build_hardware_simulator(attached_modules=mods)
     await asyncio.sleep(0.05)
     from_api = api.attached_modules
@@ -67,7 +67,14 @@ async def test_module_caching():
 async def test_filtering_modules():
     import opentrons.hardware_control as hardware_control
 
-    mods = ["tempdeck", "tempdeck", "magdeck", "magdeck", "thermocycler"]
+    mods = [
+        "tempdeck",
+        "tempdeck",
+        "magdeck",
+        "magdeck",
+        "thermocycler",
+        "heatershaker",
+    ]
     api = await hardware_control.API.build_hardware_simulator(attached_modules=mods)
     await asyncio.sleep(0.05)
 
@@ -106,7 +113,6 @@ async def test_module_update_integration(monkeypatch, loop):
         usb_port=usb_port,
         which="tempdeck",
         simulating=True,
-        interrupt_callback=lambda x: None,
         loop=loop,
         execution_manager=ExecutionManager(loop=loop),
         sim_model="temperatureModuleV2",
@@ -137,7 +143,6 @@ async def test_module_update_integration(monkeypatch, loop):
         usb_port=usb_port,
         which="magdeck",
         simulating=True,
-        interrupt_callback=lambda x: None,
         loop=loop,
         execution_manager=ExecutionManager(loop=loop),
     )
@@ -154,7 +159,6 @@ async def test_module_update_integration(monkeypatch, loop):
         usb_port=usb_port,
         which="thermocycler",
         simulating=True,
-        interrupt_callback=lambda x: None,
         loop=loop,
         execution_manager=ExecutionManager(loop=loop),
     )

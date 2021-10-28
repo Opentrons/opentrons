@@ -1,7 +1,7 @@
 from opentrons.commands.util import from_list
 
 
-def test_command_tree():
+def test_command_tree() -> None:
     commands = from_list(
         [
             {"level": 0, "description": "A", "id": 0},

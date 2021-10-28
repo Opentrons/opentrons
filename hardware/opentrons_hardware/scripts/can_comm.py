@@ -43,7 +43,19 @@ async def listen_task(can_driver: CanDriver) -> None:
 
     """
     async for message in can_driver:
-        log.info(f"Received <-- {message}")
+        message_definition = get_definition(
+            MessageId(message.arbitration_id.parts.message_id)
+        )
+        try:
+            if message_definition:
+                log.info(
+                    f"Received <-- \n\traw: {message}, "
+                    f"\n\tparsed: {message_definition.payload_type.build(message.data)}"
+                )
+            else:
+                log.info(f"Received <-- \traw: {message}")
+        except Exception as e:
+            log.error(f"Exception raised {str(e)}: {message}")
 
 
 def create_choices(enum_type: Type[Enum]) -> Sequence[str]:
@@ -141,7 +153,7 @@ def prompt_message(get_user_input: GetInputFunc, output_func: OutputFunc) -> Can
         ),
         data=data,
     )
-    log.info(f"Sending --> {can_message}")
+    log.info(f"Sending --> \n\traw: {can_message}")
     return can_message
 
 

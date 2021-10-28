@@ -29,9 +29,6 @@ const slotSeven = 'foreignObject[x="0"][y="181"]'
 const thermocyclerWellBlockWithExtraSpace = 'TC Well ' // Note: reason this is needed is because of a cypress race condition. see `https://stackoverflow.com/questions/66257661/how-to-resolve-missing-characters-bug-in-cypress-type-command`
 
 describe('Protocols with Modules', () => {
-  beforeEach(() => {
-    cy.viewport('macbook-15')
-  })
   before(() => {
     cy.visit('/')
     cy.closeAnnouncementModal()

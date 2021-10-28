@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import List, Optional
+from typing import List, Optional, Iterator
 
 
 class CommandBuilder:
@@ -90,13 +90,13 @@ class CommandBuilder:
     def __str__(self) -> str:
         return self.build()
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[str]:
         return iter(self._elements)
 
     def __bool__(self) -> bool:
         return len(self._elements) != 0
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: object) -> bool:
         if isinstance(other, CommandBuilder):
             return self.build() == other.build()
         return False

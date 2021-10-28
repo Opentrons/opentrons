@@ -5,10 +5,6 @@ import struct
 from dataclasses import dataclass, fields, astuple
 from typing import TypeVar, Generic
 
-from typing_extensions import Final
-
-format_string_attribute: Final = "__struct_format_string__"
-
 
 class BinarySerializableException(BaseException):
     """Exception."""
@@ -151,20 +147,14 @@ class BinarySerializable:
         Returns:
             a string
         """
-        format_string: str = getattr(cls, format_string_attribute, None)
-        if format_string is None:
-            dataclass_fields = fields(cls)
-            try:
-                format_string = (
-                    f"{cls.ENDIAN}{''.join(v.type.FORMAT for v in dataclass_fields)}"
-                )
-            except AttributeError:
-                raise InvalidFieldException(
-                    f"All fields must be of type {BinaryFieldBase}"
-                )
+        dataclass_fields = fields(cls)
+        try:
+            format_string = (
+                f"{cls.ENDIAN}{''.join(v.type.FORMAT for v in dataclass_fields)}"
+            )
+        except AttributeError:
+            raise InvalidFieldException(f"All fields must be of type {BinaryFieldBase}")
 
-            # Cache it on the cls.
-            setattr(cls, format_string_attribute, format_string)
         return format_string
 
 

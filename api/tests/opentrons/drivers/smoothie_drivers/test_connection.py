@@ -21,6 +21,8 @@ def subject(mock_serial_connection: AsyncMock) -> SmoothieConnection:
         ack="\r\n",
         name="",
         retry_wait_time_seconds=0,
+        error_keyword="error",
+        alarm_keyword="alarm",
     )
 
 

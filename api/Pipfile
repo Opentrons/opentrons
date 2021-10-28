@@ -7,7 +7,6 @@ name = "pypi"
 python_version = "3.7"
 
 [dev-packages]
-opentrons = {editable = true, path = "."}
 coverage = "==5.1"
 mypy = "0.910"
 numpydoc = "==0.9.1"
@@ -35,14 +34,5 @@ atomicwrites = {version="==1.4.0", sys_platform="== 'win32'"}
 colorama = {version="==0.4.4", sys_platform="== 'win32'"}
 types-mock = "==4.0.1"
 types-setuptools = "==57.0.2"
-
-[packages]
 opentrons-shared-data = {editable = true, path = "../shared-data/python"}
-aionotify = "==0.2.0"
-anyio = "==3.3.0"
-jsonschema = "==3.0.2"
-numpy = "==1.15.1"
-pydantic = "==1.8.2"
-pyserial = "==3.5"
-systemd-python = {version="==234", sys_platform="== 'linux'"}
-typing-extensions = "==3.10.0.0"
+opentrons = {editable = true, path = "."}

@@ -3,14 +3,18 @@ from opentrons.hardware_control.api import API as HardwareAPI
 
 from .protocol_engine import ProtocolEngine
 from .resources import DeckDataProvider
-from .state import StateStore
+from .state import StateStore, EngineConfigs
 
 
-async def create_protocol_engine(hardware_api: HardwareAPI) -> ProtocolEngine:
+async def create_protocol_engine(
+    hardware_api: HardwareAPI,
+    configs: EngineConfigs = EngineConfigs(),
+) -> ProtocolEngine:
     """Create a ProtocolEngine instance.
 
     Arguments:
         hardware_api: Hardware control API to pass down to dependencies.
+        configs: Protocol Engine configurations.
     """
     # TODO(mc, 2020-11-18): check short trash FF
     deck_data = DeckDataProvider()
@@ -22,6 +26,7 @@ async def create_protocol_engine(hardware_api: HardwareAPI) -> ProtocolEngine:
     state_store = StateStore(
         deck_definition=deck_definition,
         deck_fixed_labware=deck_fixed_labware,
+        configs=configs,
     )
 
     return ProtocolEngine(state_store=state_store, hardware_api=hardware_api)

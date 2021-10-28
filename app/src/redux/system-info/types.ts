@@ -34,10 +34,6 @@ export interface NetworkInterface {
   scopeid?: number
 }
 
-export interface U2EInterfaceMap {
-  [deviceSerialNumber: string]: NetworkInterface[]
-}
-
 export type DriverStatus =
   | typeof NOT_APPLICABLE
   | typeof UNKNOWN
@@ -50,7 +46,6 @@ export interface U2EAnalyticsProps {
   'U2E Serial Number': string
   'U2E Device Name': string
   'U2E Manufacturer': string
-  'U2E IPv4 Address': string | null
   'U2E Windows Driver Version'?: string | null
   [key: string]: string | number | null | undefined
 }

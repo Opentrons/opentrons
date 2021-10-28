@@ -1,0 +1,17 @@
+{
+  "extends": "../tsconfig-base.json",
+  "references": [
+    {
+      "path": "../api-client"
+    },
+    {
+      "path": "../shared-data"
+    }
+  ],
+  "compilerOptions": {
+    "composite": true,
+    "rootDir": "src",
+    "outDir": "lib"
+  },
+  "include": ["src"]
+}

@@ -10,10 +10,6 @@ export const UNKNOWN: 'UNKNOWN' = 'UNKNOWN'
 export const UP_TO_DATE: 'UP_TO_DATE' = 'UP_TO_DATE'
 export const OUTDATED: 'OUTDATED' = 'OUTDATED'
 
-// network interface families
-export const IFACE_FAMILY_IPV4 = 'IPv4'
-export const IFACE_FAMILY_IPV6 = 'IPv6'
-
 // action types
 
 export const INITIALIZED: 'systemInfo:INITIALIZED' = 'systemInfo:INITIALIZED'

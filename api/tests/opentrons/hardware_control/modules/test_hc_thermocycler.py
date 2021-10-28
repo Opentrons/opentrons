@@ -23,7 +23,6 @@ async def test_sim_initialization(loop, usb_port):
         usb_port=usb_port,
         which="thermocycler",
         simulating=True,
-        interrupt_callback=lambda x: None,
         loop=loop,
         execution_manager=ExecutionManager(loop=loop),
     )
@@ -37,7 +36,6 @@ async def test_lid(loop, usb_port):
         usb_port=usb_port,
         which="thermocycler",
         simulating=True,
-        interrupt_callback=lambda x: None,
         loop=loop,
         execution_manager=ExecutionManager(loop=loop),
     )
@@ -65,7 +63,6 @@ async def test_sim_state(loop, usb_port):
         usb_port=usb_port,
         which="thermocycler",
         simulating=True,
-        interrupt_callback=lambda x: None,
         loop=loop,
         execution_manager=ExecutionManager(loop=loop),
     )
@@ -88,7 +85,6 @@ async def test_sim_update(loop, usb_port):
         usb_port=usb_port,
         which="thermocycler",
         simulating=True,
-        interrupt_callback=lambda x: None,
         loop=loop,
         execution_manager=ExecutionManager(loop=loop),
     )
@@ -158,7 +154,6 @@ async def set_temperature_subject(
     hw_tc = modules.Thermocycler(
         port="/dev/ot_module_sim_thermocycler0",
         usb_port=usb_port,
-        interrupt_callback=lambda x: None,
         loop=loop,
         execution_manager=ExecutionManager(loop=loop),
         driver=simulator_set_plate_spy,

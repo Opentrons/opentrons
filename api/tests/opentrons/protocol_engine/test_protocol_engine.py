@@ -232,6 +232,25 @@ async def test_stop(
     )
 
 
+async def test_stop_with_error(
+    decoy: Decoy,
+    action_dispatcher: ActionDispatcher,
+    queue_worker: QueueWorker,
+    hardware_api: HardwareAPI,
+    subject: ProtocolEngine,
+) -> None:
+    """It should be able to stop the engine."""
+    error = RuntimeError("oh no")
+
+    await subject.stop(error=error)
+
+    decoy.verify(
+        action_dispatcher.dispatch(StopAction(error=error)),
+        await queue_worker.join(),
+        await hardware_api.stop(home_after=False),
+    )
+
+
 async def test_stop_stops_hardware_if_queue_worker_join_fails(
     decoy: Decoy,
     queue_worker: QueueWorker,
@@ -252,22 +271,16 @@ async def test_stop_stops_hardware_if_queue_worker_join_fails(
     )
 
 
-async def test_stop_after_wait(
+async def test_wait_until_complete(
     decoy: Decoy,
     state_store: StateStore,
-    action_dispatcher: ActionDispatcher,
-    queue_worker: QueueWorker,
-    hardware_api: HardwareAPI,
     subject: ProtocolEngine,
 ) -> None:
     """It should be able to stop the engine after waiting for commands to complete."""
-    await subject.stop(wait_until_complete=True)
+    await subject.wait_until_complete()
 
     decoy.verify(
-        await state_store.wait_for(condition=state_store.commands.get_all_complete),
-        action_dispatcher.dispatch(StopAction()),
-        await queue_worker.join(),
-        await hardware_api.stop(home_after=False),
+        await state_store.wait_for(condition=state_store.commands.get_all_complete)
     )
 
 

@@ -12,7 +12,6 @@ import os
 import sys
 from typing import Any, Callable, Dict, List, Optional, TextIO, Union, TYPE_CHECKING
 
-import opentrons
 from opentrons import protocol_api, __version__
 from opentrons.config import IS_ROBOT, JUPYTER_NOTEBOOK_LABWARE_DIR
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
@@ -22,7 +21,7 @@ from opentrons.protocols.context.protocol_api.protocol_context import (
 )
 from opentrons.commands import types as command_types
 from opentrons.protocols.parse import parse, version_from_string
-from opentrons.protocols.types import PythonProtocol
+from opentrons.protocols.types import ApiDeprecationError
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.hardware_control import API, ThreadManager
 from .util.entrypoint_util import labware_from_paths, datafiles_from_paths
@@ -289,16 +288,7 @@ def execute(
         contents, protocol_name, extra_labware=extra_labware, extra_data=extra_data
     )
     if getattr(protocol, "api_level", APIVersion(2, 0)) < APIVersion(2, 0):
-        opentrons.robot.connect()
-        opentrons.robot.cache_instrument_models()
-        opentrons.robot.discover_modules()
-        opentrons.robot.home()
-        if emit_runlog:
-            opentrons.robot.broker.subscribe(command_types.COMMAND, emit_runlog)
-        assert isinstance(
-            protocol, PythonProtocol
-        ), "Internal error: Only Python protocols may be executed in v1"
-        exec(protocol.contents, {})
+        raise ApiDeprecationError(getattr(protocol, "api_level"))
     else:
         bundled_data = getattr(protocol, "bundled_data", {})
         bundled_data.update(extra_data)

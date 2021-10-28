@@ -12,6 +12,7 @@ on:
       - 'shared-data/*/**'
       - '!shared-data/js/**'
       - 'robot-server/**'
+      - 'notify-server/**'
       - '.github/workflows/robot-server-test-lint.yaml'
       - '.github/actions/python/**'
     branches-ignore: # ignore any release-related thing (handled elsewhere)

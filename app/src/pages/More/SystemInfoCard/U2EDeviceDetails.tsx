@@ -1,56 +1,38 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 
 import {
-  Box,
   Flex,
   Text,
   FONT_STYLE_ITALIC,
+  SIZE_4,
   SPACING_1,
-  SPACING_2,
 } from '@opentrons/components'
 
-import { IFACE_FAMILY_IPV4 } from '../../../redux/system-info'
-import type {
-  UsbDevice,
-  NetworkInterface,
-} from '../../../redux/system-info/types'
+import { U2EDriverWarning } from './U2EDriverWarning'
 
-// TODO(mc, 2020-04-28): i18n
-const U2E_ADAPTER_DESCRIPTION =
-  "The OT-2 uses a USB-to-Ethernet adapter for its wired connection. When you plug the OT-2 into your computer, this adapter will be added to your computer's device list."
-const NO_ADAPTER_FOUND = 'No OT-2 USB-to-Ethernet adapter detected'
-const UNKNOWN = 'unknown'
-const NOT_ASSIGNED = 'Not assigned'
-const NETWORK_INTERFACE = 'Network Interface'
-const IPV4_ADDRESS = 'Local IPv4 Address'
-const IPV6_ADDRESS = 'Local IPv6 Address'
+import type { UsbDevice } from '../../../redux/system-info/types'
 
 export interface U2EDeviceDetailsProps {
   device: UsbDevice | null
-  ifaces: NetworkInterface[]
+  driverOutdated: boolean
 }
 
 const DetailText = styled.span`
-  min-width: 8rem;
+  min-width: ${SIZE_4};
   margin-right: ${SPACING_1};
 `
-
-const DEVICE_STATS: Array<{ label: string; property: keyof UsbDevice }> = [
-  { label: 'Description', property: 'deviceName' },
-  { label: 'Manufacturer', property: 'manufacturer' },
-  { label: 'Serial Number', property: 'serialNumber' },
-  { label: 'Driver Version', property: 'windowsDriverVersion' },
-]
 
 const DetailItem = ({
   label,
   value,
 }: {
   label: string
-  value: string | number
+  // TODO(bh, 2021-10-12): may need to type react-i18next https://react.i18next.com/latest/typescript
+  value?: string | number | object | null
 }): JSX.Element => (
-  <Flex as="li" marginBottom={SPACING_1}>
+  <Flex as="li">
     <DetailText>{label}:</DetailText>
     <DetailText>{value}</DetailText>
   </Flex>
@@ -58,40 +40,36 @@ const DetailItem = ({
 
 export const U2EDeviceDetails = ({
   device,
-  ifaces,
+  driverOutdated,
 }: U2EDeviceDetailsProps): JSX.Element => {
-  const nwIfaceName = ifaces.length > 0 ? ifaces[0].name : NOT_ASSIGNED
+  const { t } = useTranslation(['more_network_and_system', 'shared'])
+
+  const DEVICE_STATS: Array<{ label: string; property: keyof UsbDevice }> = [
+    { label: t('description'), property: 'deviceName' },
+    { label: t('manufacturer'), property: 'manufacturer' },
+    { label: t('driver_version'), property: 'windowsDriverVersion' },
+  ]
 
   return (
-    <div>
-      <Text>{U2E_ADAPTER_DESCRIPTION}</Text>
+    <>
       {device === null ? (
-        <Text fontStyle={FONT_STYLE_ITALIC} marginTop={SPACING_2}>
-          {NO_ADAPTER_FOUND}
+        <Text as="li" fontStyle={FONT_STYLE_ITALIC}>
+          {t('no_adapter_found')}
         </Text>
       ) : (
-        <Box as="ul" marginTop={SPACING_2}>
+        <>
+          {driverOutdated && <U2EDriverWarning />}
           {DEVICE_STATS.filter(({ property }) => property in device).map(
             ({ label, property }) => (
               <DetailItem
                 key={label}
                 label={label}
-                value={device[property] ?? UNKNOWN}
+                value={device[property] ?? t('shared:unknown')}
               />
             )
           )}
-          <DetailItem label={NETWORK_INTERFACE} value={nwIfaceName} />
-          {ifaces.map(iface => (
-            <DetailItem
-              key={iface.address}
-              label={
-                iface.family === IFACE_FAMILY_IPV4 ? IPV4_ADDRESS : IPV6_ADDRESS
-              }
-              value={iface.address}
-            />
-          ))}
-        </Box>
+        </>
       )}
-    </div>
+    </>
   )
 }

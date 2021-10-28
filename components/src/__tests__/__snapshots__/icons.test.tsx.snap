@@ -1733,6 +1733,30 @@ exports[`icons pencil renders correctly 1`] = `
 </svg>
 `;
 
+exports[`icons play renders correctly 1`] = `
+.c0.spin {
+  -webkit-animation: GLFYz 0.8s steps(8) infinite;
+  animation: GLFYz 0.8s steps(8) infinite;
+  -webkit-transform-origin: center;
+  -ms-transform-origin: center;
+  transform-origin: center;
+}
+
+<svg
+  aria-hidden="true"
+  className="sc-fzozJi c0 foo"
+  fill="currentColor"
+  version="1.1"
+  viewBox="0 0 24 24"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <path
+    d="M 5.25 2.25 L 18.75 12.125 L 5.25 21.75 Z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
 exports[`icons plus renders correctly 1`] = `
 .c0.spin {
   -webkit-animation: GLFYz 0.8s steps(8) infinite;

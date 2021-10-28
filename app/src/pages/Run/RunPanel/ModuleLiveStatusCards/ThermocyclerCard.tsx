@@ -127,7 +127,6 @@ export const ThermocyclerCard = ({
     currentStepIndex != null
   return (
     <StatusCard
-      header={slot}
       title={getModuleDisplayName(module.model)}
       isCardExpanded={isCardExpanded}
       toggleCard={toggleCard}

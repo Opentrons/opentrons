@@ -7,14 +7,14 @@ from pydantic import BaseSettings, BaseModel, Field
 class ServerBindAddress(BaseModel):
     """A bind address for server zmq socket."""
 
-    scheme: Literal['ipc', 'tcp']
+    scheme: Literal["ipc", "tcp"]
     host: str = "*"
     port: int = 5555
     path: str = "/tmp/notify-server"
 
     def connection_string(self) -> str:
         """Create the connection string."""
-        if self.scheme == 'ipc':
+        if self.scheme == "ipc":
             remainder = self.path
         else:
             remainder = f"{self.host}:{self.port}"
@@ -30,7 +30,7 @@ class Settings(BaseSettings):
     production: bool = Field(
         True,
         description="Whether this the application is running in a "
-                    "development environment"
+        "development environment",
     )
 
     class Config:
