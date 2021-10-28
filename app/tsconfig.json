@@ -12,7 +12,11 @@
     },
     {
       "path": "../shared-data"
+    },
+    {
+      "path": "../react-api-client"
     }
+    
   ],
   "compilerOptions": {
     "composite": true,

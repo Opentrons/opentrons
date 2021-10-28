@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { Switch, Route, Redirect } from 'react-router-dom'
 import { hot } from 'react-hot-loader/root'
+import { QueryClient, QueryClientProvider } from 'react-query'
 
 import {
   Flex,
@@ -29,6 +30,7 @@ import { Navbar } from './Navbar'
 import { PortalRoot as ModalPortalRoot, TopPortalRoot } from './portal'
 
 const stopEvent = (event: React.MouseEvent): void => event.preventDefault()
+const queryClient = new QueryClient()
 
 export const AppComponent = (): JSX.Element => (
   <>
@@ -41,37 +43,39 @@ export const AppComponent = (): JSX.Element => (
       onDragOver={stopEvent}
       onDrop={stopEvent}
     >
-      <Navbar />
-      <Switch>
-        <Route path="/robots/:name?" component={ConnectPanel} />
-        <Route path="/more" component={MorePanel} />
-        <Route path="/upload" component={UploadPanel} />
-        <Route path="/calibrate" component={CalibratePanel} />
-        <Route path="/run" component={RunPanel} />
-      </Switch>
-      <Box position={POSITION_RELATIVE} width="100%" height="100%">
+      <QueryClientProvider client={queryClient}>
+        <Navbar />
         <Switch>
-          <Route path="/robots/:name?">
-            <Robots />
-          </Route>
-          <Route path="/more">
-            <More />
-          </Route>
-          <Route path="/upload">
-            <Upload />
-          </Route>
-          <Route path="/calibrate">
-            <Calibrate />
-          </Route>
-          <Route path="/run">
-            <Run />
-          </Route>
-          <Redirect exact from="/" to="/robots" />
+          <Route path="/robots/:name?" component={ConnectPanel} />
+          <Route path="/more" component={MorePanel} />
+          <Route path="/upload" component={UploadPanel} />
+          <Route path="/calibrate" component={CalibratePanel} />
+          <Route path="/run" component={RunPanel} />
         </Switch>
-        <ModalPortalRoot />
-        <Alerts />
-      </Box>
-      <TopPortalRoot />
+        <Box position={POSITION_RELATIVE} width="100%" height="100%">
+          <Switch>
+            <Route path="/robots/:name?">
+              <Robots />
+            </Route>
+            <Route path="/more">
+              <More />
+            </Route>
+            <Route path="/upload">
+              <Upload />
+            </Route>
+            <Route path="/calibrate">
+              <Calibrate />
+            </Route>
+            <Route path="/run">
+              <Run />
+            </Route>
+            <Redirect exact from="/" to="/robots" />
+          </Switch>
+          <ModalPortalRoot />
+          <Alerts />
+        </Box>
+        <TopPortalRoot />
+      </QueryClientProvider>
     </Flex>
   </>
 )
