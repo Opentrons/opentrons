@@ -64,10 +64,10 @@ else:
     )
 
 router.include_router(
-        router=deprecated_session_router,
-        tags=["Session Management"],
-        dependencies=[Depends(check_version_header)],
-    )
+    router=deprecated_session_router,
+    tags=["Session Management"],
+    dependencies=[Depends(check_version_header)],
+)
 
 router.include_router(
     router=labware_router,
