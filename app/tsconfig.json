@@ -11,12 +11,11 @@
       "path": "../discovery-client"
     },
     {
-      "path": "../shared-data"
+      "path": "../react-api-client"
     },
     {
-      "path": "../react-api-client"
+      "path": "../shared-data"
     }
-    
   ],
   "compilerOptions": {
     "composite": true,
