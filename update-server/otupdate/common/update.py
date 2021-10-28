@@ -3,7 +3,6 @@ endpoints for running software updates
 
 This has endpoints like update session management, validation, and execution
 """
-import abc
 import asyncio
 import functools
 import logging

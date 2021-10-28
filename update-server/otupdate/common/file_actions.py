@@ -8,7 +8,7 @@ import hashlib
 import logging
 import os
 import subprocess
-from typing import Callable, Sequence, Mapping, Optional, Tuple
+from typing import Callable, Sequence, Mapping, Optional, Tuple, List, Dict
 import tempfile
 import zipfile
 

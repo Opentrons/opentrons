@@ -5,7 +5,7 @@ update actions
 
 import abc
 import contextlib
-from typing import NamedTuple, Optional, Callable
+from typing import NamedTuple, Optional, Callable, Iterator
 from aiohttp import web
 
 from .constants import APP_VARIABLE_PREFIX
@@ -56,7 +56,7 @@ class UpdateActionsInterface:
 
     @abc.abstractmethod
     @contextlib.contextmanager
-    def mount_update(self) -> None:
+    def mount_update(self) -> Iterator:
         """
         Mount the fs to overwrite with the update
         """
@@ -67,4 +67,9 @@ class UpdateActionsInterface:
         """
         Command the hardware to boot from the freshly-updated filesystem
         """
+        ...
+
+    @abc.abstractmethod
+    def write_machine_id(self, current_root: str, new_root: str) -> None:
+        """Copy the machine id over to the new partition"""
         ...
