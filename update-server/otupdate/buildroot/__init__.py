@@ -5,11 +5,18 @@ import json
 from typing import Mapping
 from aiohttp import web
 
-from otupdate.common import config, control, ssh_key_management, name_management, constants, update
+from otupdate.common import (
+    config,
+    control,
+    ssh_key_management,
+    name_management,
+    constants,
+    update,
+)
 from . import update_actions
 
 
-BR_BUILTIN_VERSION_FILE = '/etc/VERSION.json'
+BR_BUILTIN_VERSION_FILE = "/etc/VERSION.json"
 #: Location of the builtin system version
 
 LOG = logging.getLogger(__name__)
@@ -27,15 +34,17 @@ async def log_error_middleware(request, handler):
 
 def get_version(version_file: str) -> Mapping[str, str]:
     LOG.debug(f"Loading version file {version_file}")
-    return json.load(open(version_file, 'r'))
+    return json.load(open(version_file, "r"))
 
 
-def get_app(system_version_file: str = None,
-            config_file_override: str = None,
-            name_override: str = None,
-            boot_id_override: str = None,
-            loop: asyncio.AbstractEventLoop = None) -> web.Application:
-    """ Build and return the aiohttp.web.Application that runs the server
+def get_app(
+    system_version_file: str = None,
+    config_file_override: str = None,
+    name_override: str = None,
+    boot_id_override: str = None,
+    loop: asyncio.AbstractEventLoop = None,
+) -> web.Application:
+    """Build and return the aiohttp.web.Application that runs the server
 
     The params can be overloaded for testing.
     """
@@ -47,22 +56,26 @@ def get_app(system_version_file: str = None,
     boot_id = boot_id_override or control.get_boot_id()
     config_obj = config.load(config_file_override)
 
-    LOG.info("Setup: " + '\n\t'.join([
-        f'Device name: {name}',
-        'Buildroot version:         '
-        f'{version.get("buildroot_version", "unknown")}',
-        '\t(from git sha      '
-        f'{version.get("buildroot_sha", "unknown")}',
-        'API version:               '
-        f'{version.get("opentrons_api_version", "unknown")}',
-        '\t(from git sha      '
-        f'{version.get("opentrons_api_sha", "unknown")}',
-        'Update server version:     '
-        f'{version.get("update_server_version", "unknown")}',
-        '\t(from git sha      '
-        f'{version.get("update_server_sha", "unknown")}',
-        'Smoothie firmware version: TODO'
-    ]))
+    LOG.info(
+        "Setup: "
+        + "\n\t".join(
+            [
+                f"Device name: {name}",
+                "Buildroot version:         "
+                f'{version.get("buildroot_version", "unknown")}',
+                "\t(from git sha      " f'{version.get("buildroot_sha", "unknown")}',
+                "API version:               "
+                f'{version.get("opentrons_api_version", "unknown")}',
+                "\t(from git sha      "
+                f'{version.get("opentrons_api_sha", "unknown")}',
+                "Update server version:     "
+                f'{version.get("update_server_version", "unknown")}',
+                "\t(from git sha      "
+                f'{version.get("update_server_sha", "unknown")}',
+                "Smoothie firmware version: TODO",
+            ]
+        )
+    )
 
     if not loop:
         loop = asyncio.get_event_loop()
@@ -73,20 +86,21 @@ def get_app(system_version_file: str = None,
     app[constants.DEVICE_BOOT_ID_NAME] = boot_id
     app[constants.DEVICE_NAME_VARNAME] = name
     update_actions.OT2UpdateActions.build_and_insert(app)
-    app.router.add_routes([
-        web.get('/server/update/health',
-                control.build_health_endpoint(version)),
-        web.post('/server/update/begin', update.begin),
-        web.post('/server/update/cancel', update.cancel),
-        web.get('/server/update/{session}/status', update.status),
-        web.post('/server/update/{session}/file', update.file_upload),
-        web.post('/server/update/{session}/commit', update.commit),
-        web.post('/server/restart', control.restart),
-        web.get('/server/ssh_keys', ssh_key_management.list_keys),
-        web.post('/server/ssh_keys', ssh_key_management.add),
-        web.delete('/server/ssh_keys', ssh_key_management.clear),
-        web.delete('/server/ssh_keys/{key_md5}', ssh_key_management.remove),
-        web.post('/server/name', name_management.set_name_endpoint),
-        web.get('/server/name', name_management.get_name_endpoint),
-    ])
+    app.router.add_routes(
+        [
+            web.get("/server/update/health", control.build_health_endpoint(version)),
+            web.post("/server/update/begin", update.begin),
+            web.post("/server/update/cancel", update.cancel),
+            web.get("/server/update/{session}/status", update.status),
+            web.post("/server/update/{session}/file", update.file_upload),
+            web.post("/server/update/{session}/commit", update.commit),
+            web.post("/server/restart", control.restart),
+            web.get("/server/ssh_keys", ssh_key_management.list_keys),
+            web.post("/server/ssh_keys", ssh_key_management.add),
+            web.delete("/server/ssh_keys", ssh_key_management.clear),
+            web.delete("/server/ssh_keys/{key_md5}", ssh_key_management.remove),
+            web.post("/server/name", name_management.set_name_endpoint),
+            web.get("/server/name", name_management.get_name_endpoint),
+        ]
+    )
     return app

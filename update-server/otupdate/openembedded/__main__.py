@@ -7,8 +7,8 @@ import logging.config
 from . import get_app
 from otupdate.common import name_management, cli, systemd
 from aiohttp import web
-LOG = logging.getLogger(__name__)
 
+LOG = logging.getLogger(__name__)
 
 
 def main():
@@ -22,15 +22,14 @@ def main():
     hostname = loop.run_until_complete(name_management.setup_hostname())
     LOG.info(f"Set hostname to {hostname}")
 
-    LOG.info('Building openembedded update server')
+    LOG.info("Building openembedded update server")
     app = get_app(args.version_file, args.config_file)
 
     systemd.notify_up()
 
-    LOG.info(
-       f'Starting openembedded update server on http://{args.host}:{args.port}')
+    LOG.info(f"Starting openembedded update server on http://{args.host}:{args.port}")
     web.run_app(app, host=args.host, port=args.port)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
