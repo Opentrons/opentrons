@@ -12,14 +12,14 @@ export type UseCreateRunMutationResult = UseMutationResult<
   unknown,
   void
 > & {
-  createRun: UseMutateFunction<Run, unknown, void>
+  createRun: UseMutateFunction<Run>
 }
 
 export function useCreateRunMutation(
   createRunData: CreateRunData
 ): UseCreateRunMutationResult {
   const host = useHost()
-  const mutation = useMutation<Run, unknown>(['run', host], () =>
+  const mutation = useMutation<Run>([host, 'runs', 'create'], () =>
     createRun(host as HostConfig, createRunData).then(response => response.data)
   )
   return {

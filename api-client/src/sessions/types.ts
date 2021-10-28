@@ -1,3 +1,5 @@
+import type { ResourceLinks } from '../types'
+
 export const SESSION_TYPE_CALIBRATION_HEALTH_CHECK: 'calibrationCheck' =
   'calibrationCheck'
 export const SESSION_TYPE_TIP_LENGTH_CALIBRATION: 'tipLengthCalibration' =
@@ -42,13 +44,6 @@ export type SessionData =
   | TipLengthCalibrationSession
   | DeckCalibrationSession
   | PipetteOffsetCalibrationSession
-
-interface ResourceLink {
-  href: string
-  meta?: Partial<{ [key: string]: string | null | undefined }>
-}
-
-type ResourceLinks = Record<string, ResourceLink | string | null | undefined>
 
 export interface Session {
   data: SessionData

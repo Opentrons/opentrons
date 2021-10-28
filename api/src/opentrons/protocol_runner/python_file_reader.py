@@ -21,7 +21,7 @@ class PythonProtocol:
 class PythonFileReader:
     """A reader for Python protocol files.
 
-    Gets a Python protocol's metadata (TODO) and run method.
+    Gets a Python protocol's run method.
     """
 
     @staticmethod

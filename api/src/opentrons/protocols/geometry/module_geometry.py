@@ -12,7 +12,7 @@ import re
 from typing import Mapping, Optional, Union, TYPE_CHECKING
 
 import numpy as np
-import jsonschema  # type: ignore
+import jsonschema  # type: ignore[import]
 from opentrons import types
 from opentrons.protocols.context.protocol_api.labware import LabwareImplementation
 

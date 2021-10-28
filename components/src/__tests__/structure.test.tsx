@@ -55,6 +55,13 @@ describe('TitleBar', () => {
 
     expect(tree).toMatchSnapshot()
   })
+
+  it('renders TitleBar with rightNode and its ReactNode as a string', () => {
+    const rightNode = 'foo bar'
+    const tree = Renderer.create(<TitleBar title="foo" rightNode={rightNode} />)
+
+    expect(tree).toMatchSnapshot()
+  })
 })
 
 describe('PageTabs', () => {

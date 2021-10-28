@@ -149,3 +149,9 @@ class ClearMoveGroupRequest:  # noqa: D101
 class MoveGroupCompleted:  # noqa: D101
     message_id: Literal[MessageId.move_group_completed] = MessageId.move_group_completed
     payload_type: Type[BinarySerializable] = payloads.MoveGroupCompleted
+
+
+@dataclass
+class MoveCompleted:  # noqa: D101
+    message_id: Literal[MessageId.move_completed] = MessageId.move_completed
+    payload_type: Type[BinarySerializable] = payloads.MoveCompleted
