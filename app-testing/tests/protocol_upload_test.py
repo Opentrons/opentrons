@@ -96,12 +96,12 @@ def test_protocol_upload(
         )
         assert (
             robot_calibrate.get_robot_calibration_help_locator().text
-            == "Robot Calibration Help"
+            == "See How Robot Calibration Works"
         )
         robot_calibrate.click_robot_calibration_help_link()
         assert (
             robot_calibrate.get_robot_calibration_help_modal_text().text
-            == "Robot Calibration Help"
+            == "See How Robot Calibration Works"
         )
         assert robot_calibrate.get_robot_calibration_close_button().is_displayed()
         robot_calibrate.click_robot_calibration_close_button()
@@ -238,3 +238,13 @@ def test_gen1_pipette(
         drag_and_drop_file(input, test_protocols["gen1pipette"])
         robot_calibrate = RobotCalibration(driver)
         robot_calibrate.click_robot_calibration()
+        gen1_pipette = Gen1PipettePur(driver)
+        assert gen1_pipette.get_gen1_pipette_mismatch_text().is_displayed()
+        assert gen1_pipette.get_link_pipette_compatibility().is_displayed()
+        # Assert that Calibrate Now button is displayed in Tip length calibrations
+        assert gen1_pipette.get_tip_length_calibrate_now().is_displayed()
+        # Assert that no modules are available and step2 is labware setup
+        assert gen1_pipette.get_step2_text_locator().is_displayed()
+        gen1_pipette.click_on_step2()
+        labware_setup = LabwareSetup(driver)
+        assert labware_setup.get_labware_setup_text().is_displayed()

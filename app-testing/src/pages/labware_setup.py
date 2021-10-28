@@ -22,7 +22,7 @@ class LabwareSetup:
 
     labware_setup_text_locator: Tuple[str, str] = (
         By.ID,
-        "RunSetupCard_labware_setup_step",
+        "CollapsibleStep_Labware Setup",
     )
     securing_labware_to_magnetic_module_link: Tuple[str, str] = (
         By.ID,
@@ -34,11 +34,11 @@ class LabwareSetup:
     )
     magnetic_module_modal: Tuple[str, str] = (
         By.XPATH,
-        "//h3[text()='Securing Labware to the Magnetic Module']",
+        "//h3[text()='How To Secure Labware to the Magnetic Module']",
     )
     thermocycler_module_modal: Tuple[str, str] = (
         By.XPATH,
-        "//h3[text()='Securing Labware to the Thermocycler']",
+        "//h3[text()='How To Secure Labware to the Thermocycler']",
     )
     close_button: Tuple[str, str] = (
         By.XPATH,

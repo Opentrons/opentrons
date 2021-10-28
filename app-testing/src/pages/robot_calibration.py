@@ -27,7 +27,7 @@ class RobotCalibration:
 
     robot_calibration_text_locator: Tuple[str, str] = (
         By.ID,
-        "RunSetupCard_robot_calibration_step",
+        "CollapsibleStep_Robot Calibration",
     )
 
     deck_calibration_text_locator: Tuple[str, str] = (
@@ -55,7 +55,7 @@ class RobotCalibration:
     )
     robot_calibration_help_model_text: Tuple[str, str] = (
         By.XPATH,
-        "//p[text()='Robot Calibration Help']",
+        "//p[text()='See How Robot Calibration Works']",
     )
     close_robotcalibration_button: Tuple[str, str] = (
         By.ID,

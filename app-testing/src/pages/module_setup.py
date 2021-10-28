@@ -24,7 +24,7 @@ class ModuleSetup:
 
     module_setup_text_locator: Tuple[str, str] = (
         By.ID,
-        "RunSetupCard_module_setup_step",
+        "CollapsibleStep_Module Setup",
     )
 
     thermocycler_module: Tuple[str, str] = (
