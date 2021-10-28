@@ -207,6 +207,7 @@ format: format-js format-py
 format-py:
 	$(MAKE) -C $(API_DIR) format
 	$(MAKE) -C $(ROBOT_SERVER_DIR) format
+	$(MAKE) -C $(UPDATE_SERVER_DIR) format
 
 .PHONY: format-js
 format-js:

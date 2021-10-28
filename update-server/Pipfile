@@ -20,6 +20,7 @@ coverage = "==4.4.2"
 colorama = "*"
 mypy = "==0.910"
 typing-extensions = "*"
+black = "==21.7b0"
 
 [requires]
 python_version = "3.7"
