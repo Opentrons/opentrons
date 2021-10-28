@@ -1,38 +1,30 @@
 """
-otupdate.openembedded.file_actions: what files to expect and what to do with them
-
-This module has functions that actually accomplish the various tasks required
-for an update: unzipping update files, hashing rootfs, checking signatures,
-writing to root partitions
+common.file_actions - actions common to both buildroot and openembedded like
+handling hash and sig checking
 """
+
 import binascii
-import contextlib
-import enum
 import hashlib
 import logging
 import os
-import re
 import subprocess
+from typing import Callable, Sequence, Mapping, Optional, Tuple
 import tempfile
-from typing import (Callable, Dict, List, Mapping, NamedTuple,
-                    Optional, Sequence, Tuple)
 import zipfile
 
-ROOTFS_SIG_NAME = 'rootfs.ext3.hash.sig'
-ROOTFS_HASH_NAME = 'rootfs.ext4.hash'
-ROOTFS_NAME = 'rootfs.ext4'
-UPDATE_FILES = [ROOTFS_NAME, ROOTFS_SIG_NAME, ROOTFS_HASH_NAME]
 LOG = logging.getLogger(__name__)
 
 
-class Partition(NamedTuple):
-    number: int
-    path: str
+class FileMissing(ValueError):
+    def __init__(self, message):
+        self.message = message
+        self.short = 'File Missing'
 
+    def __repr__(self):
+        return f'<{self.__class__.__name__}: {self.message}>'
 
-class RootPartitions(enum.Enum):
-    TWO: Partition = Partition(2, '/dev/mmcblk0p2')
-    THREE: Partition = Partition(3, '/dev/mmcblk0p3')
+    def __str__(self):
+        return self.message
 
 
 class SignatureMismatch(ValueError):
@@ -53,19 +45,7 @@ class HashMismatch(ValueError):
         self.short = 'Hash Mismatch'
 
     def __repr__(self):
-        return f'<{self.__class__.name__}: {self.message}>'
-
-    def __str__(self):
-        return self.message
-
-
-class FileMissing(ValueError):
-    def __init__(self, message):
-        self.message = message
-        self.short = 'File Missing'
-
-    def __repr__(self):
-        return f'<{self.__class.__name__}: {self.message}>'
+        return f'<{self.__class__.__name__}: {self.message}>'
 
     def __str__(self):
         return self.message
@@ -89,31 +69,30 @@ def unzip_update(filepath: str,
     - a file called rootfs.ext4.hash.sig
 
     These will all be unzipped (discarding their leading directories) to
-    the same file as thr zipfile.
+    the same file as the zipfile.
 
-    This function is blocking and takes a while. It calls ``progress_callback```
+    This function is blocking and takes a while. It calls ``progress_callback``
     to indicate update progress with a number between 0 and 1 indicating
     overall archive unzip progress.
 
     :param filepath: The path zipfile to unzip. The contents will be in its
                      directory
-    :param progress_Callback: A callable taking a number betweem 0 and 1 that
+    :param progress_callback: A callable taking a number between 0 and 1 that
                               will be called periodically to check progress.
                               This is for user display; it may not reach 1.0
                               exactly.
     :param acceptable_files: A list of files to unzip if found. Others will be
                              ignored.
     :param mandatory_files: A list of files to raise an error about if they're
-                            not in the zip. Should probbaly be a subset of
-                            ```acceptable_files```.
-    :param chunk_size: If specified, the size of the chink to read and write.
+                            not in the zip. Should probably be a subset of
+                            ``acceptable_files``.
+    :param chunk_size: If specified, the size of the chunk to read and write.
                        If not specified, will default to 1024
     :return: Two dictionaries, the first mapping file names to paths and the
              second mapping file names to sizes
 
-    :raiases FileMissing: If a mandatory file is missing
+    :raises FileMissing: If a mandatory file is missing
     """
-
     assert chunk_size
     total_size = 0
     written_size = 0
@@ -152,7 +131,6 @@ def unzip_update(filepath: str,
                 file_paths[fi.filename] = uncomp_path
                 file_sizes[fi.filename] = fi.file_size
                 LOG.debug(f"Unzipped {fi.filename} to {uncomp_path}")
-
     LOG.info(
         f"Unzipped {filepath}, results: \n\t" + '\n\t'.join(
             [f'{k}: {file_paths[k]} ({file_sizes[k]}B)'
@@ -170,13 +148,13 @@ def hash_file(path: str,
 
     :param path: The file to hash
     :param progress_callback: The callback to call with progress between 0 and
-                              1. May nor ever be precicely 1.0.
+                              1. May not ever be precisely 1.0.
     :param chunk_size: If specified, the size of the chunks to hash in one call
                        If not specified, defaults to 1024
     :param file_size: If specified, the size of the file to hash (used for
                       progress callback generation). If not specified,
                       calculated internally.
-    :param algo: The algorith, to use. Can be anything used by
+    :param algo: The algorithm to use. Can be anything used by
                  :py:mod:`hashlib`
     :returns: The output has ascii hex
     """
@@ -191,6 +169,7 @@ def hash_file(path: str,
         while True:
             chunk = to_hash.read(chunk_size)
             hasher.update(chunk)
+            have_read += len(chunk)
             progress_callback(have_read/file_size)
             if len(chunk) != chunk_size:
                 break
@@ -205,12 +184,12 @@ def verify_signature(message_path: str,
 
     It is assumed that the public key for the signature is in the keyring
 
-    :param message_path: The path tp the message file to check
-    :param signfile_path: The apth to the signature to check
-    : returns True: If the signature verifies
+    :param message_path: The path to the message file to check
+    :param sigfile_path: The path to the signature to check
+    :param cert_path: The path to the certificate to check the signature with
+    :returns True: If the signature verifies
     :raises SignatureMismatch: If the signature does not verify
     """
-
     with tempfile.TemporaryDirectory() as pubkey_dir:
         pubkey_contents = subprocess.check_output(
             ['openssl', 'x509', '-in', cert_path,
@@ -224,194 +203,10 @@ def verify_signature(message_path: str,
                 stderr=subprocess.STDOUT)
         except subprocess.CalledProcessError as cpe:
             verification = cpe.output
+
     if verification.strip() == b'Verified OK':
         LOG.info(f"Verification passed from cert {cert_path}")
     else:
         LOG.error(
             f"Verification failed with cert {cert_path}: {verification!r}")
         raise SignatureMismatch('Signature check failed')
-
-
-def validate_update(filepath: str,
-                    progress_callback: Callable[[float], None],
-                    cert_path: Optional[str]):
-    """ Worker for validation. Call in an executor (so it can return things)
-    - Unzips filepath to its directory
-    - Hashes the rootfs inside
-    - If requested, checks the signature of th hash
-    :param filepath: The path to the update zip file
-    :param progress_Callback: The function to tcall with progress between 0
-                              and 1.0. May never reach precisely 1.0, best
-                              only for user information
-    :param cert_path: Path to an x.509 certificate to check the signature
-                      against. If ``None``, signature checking is disabled
-    :return str: Path to the rootfs file to update
-
-    Will also raise an exception if validiation fails
-    """
-
-    def zip_callback(progress):
-        progress_callback(progress/2.0)
-
-    required = [ROOTFS_NAME, ROOTFS_HASH_NAME]
-    if cert_path:
-        required.append(ROOTFS_SIG_NAME)
-    files, sizes = unzip_update(filepath, zip_callback,
-                                UPDATE_FILES,
-                                required)
-
-    def hash_callback(progress):
-        progress_callback(progress/2.0 + 0.5)
-    rootfs = files.get(ROOTFS_NAME)
-    assert rootfs
-    rootfs_hash = hash_file(rootfs,
-                            hash_callback,
-                            file_size=sizes[ROOTFS_NAME])
-    hashfile = files.get(ROOTFS_HASH_NAME)
-    assert hashfile
-    packaged_hash = open(hashfile, 'rb').read().strip()
-    if packaged_hash != rootfs_hash:
-        msg = f"Hash mismatch: calculated {rootfs_hash!r} != "\
-            f"packaged {packaged_hash!r}"
-        LOG.error(msg)
-        raise HashMismatch(msg)
-
-    if cert_path:
-        sigfile = files.get(ROOTFS_SIG_NAME)
-        assert sigfile
-        verify_signature(hashfile, sigfile, cert_path)
-
-    return rootfs
-
-
-def _find_unused_partition() -> RootPartitions:
-    """ Find the currently-used root partition to write to """
-    which = subprocess.check_output(['ot-unused-partition']).strip()
-    return {b'2': RootPartitions.TWO,
-            b'3': RootPartitions.THREE}[which]
-
-
-def write_file(infile: str,
-               outfile: str,
-               progress_callback: Callable[[float], None],
-               chunk_size: int = 1024,
-               file_size: int = None):
-    """ Write a file to another file with progress callbacks.
-
-    :param infile: The input filepath
-    :param outfile: The output filepath
-    :param progress_callback: The callback to call for progress
-    :param chunk_size: The size of file chunks to copy in between progress
-                      notofications
-    :param file_size: The total size of the update file (for generating
-                     progress percentage). If ``None``, generated with
-                     ``seel``/``tell``.
-    """
-    total_written = 0
-    with open(infile, 'rb') as img, open(outfile, 'wb') as part:
-        if None is file_size:
-            file_size = img.seek(0, 2)
-            img.seek(0)
-            LOG.info(f'write_file: file size calculated as ({file_size}B)'
-                     f' to {outfile} in {chunk_size}B chunks')
-            while True:
-                chunk = img.read(chunk_size)
-                part.write(chunk)
-                total_written += len(chunk)
-                progress_callback(total_written / file_size)
-                if len(chunk) != chunk_size:
-                    break
-
-
-def write_update(rootfs_filepath: str,
-                 progress_callback: Callable[[float], None],
-                 chunk_size: int = 1024,
-                 file_size: int = None) -> RootPartitions:
-    """
-    Write the new rootfs to the next root partition
-
-    -Figure out, from the syste, the correct root partition to write to
-    =Write the rootfs at ``rootfs_filepath`` there, with progress
-
-    :param rootfs_filepath: The path to a checked rootfs.ext4
-    :param progress_callback: A callbakc to call periodically with progress
-                              between 0 and 1.0. MAy never reach precisely
-                              1.0, best only for user information.
-    :param chunk_size: The size of file chunks to copy in petween progress
-                       notifications
-    :param file_size: The total size of the update file (for generating
-                      progress percentage). If ``None``, generated with
-                      ``seek``/``tell``.
-    :returns: the root partition that the root fs image was written to, e.g.
-    ``RootPartitions.TWO`` or ``RootPartition.THREE``.
-
-    """
-    unused = _find_unused_partition()
-    part_path = unused.value.path
-    write_file(rootfs_filepath, part_path, progress_callback,
-               chunk_size, file_size)
-    return unused
-
-
-def _mountpoint_root():
-    """ provides mountpoint location for :py:meth:`mount_update`.
-
-    exists only for rase of mocking
-    """
-    return '/mnt'
-
-
-@contextlib.contextmanager
-def mount_update():
-    """ mount the freshly-written partition r/w (to update machine-id).
-
-    Should be used as a context manager, and the yielded value is the path
-    to the mount. When the context manager exists, the partition will be
-    unmounted again and its mountpount removed.
-
-    :param mountpoint_in: The directory in which to create the mountpoint.
-    """
-    unused = _find_unused_partition()
-    part_path = unused.value.path
-    with tempfile.TemporaryDirectroy(dir=_mountpoint_root()) as mountpoint:
-        subprocess.check_output(['mount', part_path, mountpoint])
-        LOG.info(f"mounted {part_path} to {mountpoint}")
-        try:
-            yield mountpoint
-        finally:
-            subprocess.check_output(['umount', mountpoint])
-            LOG.info(f"Unmounted {part_path} from {mountpoint}")
-
-
-def write_machine_id(current_root: str, new_root: str):
-    """ Update the machine id in target rootfs """
-    mid = open(os.path.join(current_root, 'etc', 'machine-id')).read()
-    with open(os.path.join(new_root, 'etc', 'machine-id'), 'w') as new_mid:
-        new_mid.write(mid)
-    LOG.info(f'Wrote machine_id {mid.strip()} to {new_root}/etc/machine-id')
-
-
-def _switch_partition() -> RootPartitions:
-    """ Switch the active partition using the switch script """
-    res = subprocess.check_output(['ot-switch-partitions'])
-    for line in res.split(b'\n'):
-        matches = re.match(
-            b'Current boot partion: ([23]), setting to ([23])',
-            line)
-        if matches:
-            return {b'2': RootPartitions.TWO,
-                    b'3': RootPartitions.THREE}[matches.group(2)]
-    else:
-        raise RuntimeError(f'Bad output from ot-switch-partitions: {res!r}')
-
-
-def commit_update():
-    """ Switch the target boot partition. """
-    unused = _find_unused_partition()
-    new = _switch_partition()
-    if new != unused:
-        msg = f"Bad switch: switched to {new} when {unused} was unused"
-        LOG.error(msg)
-        raise RuntimeError(msg)
-    else:
-        LOG.info(f'commit_update: commited to bootking {new}')

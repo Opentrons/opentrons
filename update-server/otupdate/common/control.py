@@ -1,7 +1,7 @@
 """
-otupdate.openembedded_server.control: non-update-specific endpoints for otupdate
+otupdate.common.control: non-update-specific endpoints for otupdate
 
-This has endpoints like /restart that aren't specific to update tasks.
+This has endpoints like /restart that aren't specific to update tasks or machines.
 """
 import asyncio
 import logging

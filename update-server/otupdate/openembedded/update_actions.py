@@ -31,7 +31,7 @@ class RootPartitions(enum.Enum):
     THREE: Partition = Partition(3, '/dev/mmcblk0p3')
 
 
-class OT2UpdateActions(UpdateActionsInterface):
+class OT3UpdateActions(UpdateActionsInterface):
 
     def validate_update(self, filepath: str,
                         progress_callback: Callable[[float], None],
@@ -201,7 +201,7 @@ def _mountpoint_root():
 
     exists only for ease of mocking
     """
-    return '/mnt'
+    return '/media'
 
 
 def _switch_partition() -> RootPartitions:
@@ -216,5 +216,3 @@ def _switch_partition() -> RootPartitions:
                     b'3': RootPartitions.THREE}[matches.group(2)]
     else:
         raise RuntimeError(f'Bad output from ot-switch-partitions: {res!r}')
-
-

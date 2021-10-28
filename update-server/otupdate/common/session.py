@@ -1,9 +1,5 @@
 """
-utility subpackage for sessions.
-Can we used accross different Opentorns servers.
-sessions used to track stages, ensure multiple system
-upgrades dont start at the same time,
-token assignment, etc
+Update session object for tracking state across multiple calls
 """
 
 import base64
