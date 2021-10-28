@@ -1,4 +1,4 @@
-"""Tests for the /sessions router."""
+"""Tests for the /runs router."""
 import pytest
 from datetime import datetime
 from decoy import Decoy
@@ -7,32 +7,32 @@ from fastapi.testclient import TestClient
 from httpx import AsyncClient
 
 from tests.helpers import verify_response
-from robot_server.sessions.session_models import BasicSessionCreateData
-from robot_server.sessions.session_view import SessionView
-from robot_server.sessions.engine_store import EngineStore, EngineMissingError
-from robot_server.sessions.session_store import (
-    SessionStore,
-    SessionNotFoundError,
-    SessionResource,
+from robot_server.runs.run_models import BasicRunCreateData
+from robot_server.runs.run_view import RunView
+from robot_server.runs.engine_store import EngineStore, EngineMissingError
+from robot_server.runs.run_store import (
+    RunStore,
+    RunNotFoundError,
+    RunResource,
 )
 
-from robot_server.sessions.action_models import (
-    SessionAction,
-    SessionActionType,
-    SessionActionCreateData,
+from robot_server.runs.action_models import (
+    RunAction,
+    RunActionType,
+    RunActionCreateData,
 )
 
-from robot_server.sessions.router.base_router import SessionNotFound
+from robot_server.runs.router.base_router import RunNotFound
 
-from robot_server.sessions.router.actions_router import (
+from robot_server.runs.router.actions_router import (
     actions_router,
-    SessionActionNotAllowed,
+    RunActionNotAllowed,
 )
 
 
-prev_session = SessionResource(
-    session_id="session-id",
-    create_data=BasicSessionCreateData(),
+prev_run = RunResource(
+    run_id="run-id",
+    create_data=BasicRunCreateData(),
     created_at=datetime(year=2021, month=1, day=1),
     actions=[],
 )
@@ -45,44 +45,44 @@ def setup_app(app: FastAPI) -> None:
 
 
 @pytest.fixture(autouse=True)
-def setup_session_store(decoy: Decoy, session_store: SessionStore) -> None:
-    """Configure the mock SessionStore to return a SessionResource."""
-    decoy.when(session_store.get(session_id="session-id")).then_return(prev_session)
+def setup_run_store(decoy: Decoy, run_store: RunStore) -> None:
+    """Configure the mock RunStore to return a RunResource."""
+    decoy.when(run_store.get(run_id="run-id")).then_return(prev_run)
 
 
 def test_create_play_action(
     decoy: Decoy,
-    session_view: SessionView,
+    run_view: RunView,
     engine_store: EngineStore,
     unique_id: str,
     current_time: datetime,
     client: TestClient,
 ) -> None:
     """It should handle a play action."""
-    action = SessionAction(
-        actionType=SessionActionType.PLAY,
+    action = RunAction(
+        actionType=RunActionType.PLAY,
         createdAt=current_time,
         id=unique_id,
     )
 
-    next_session = SessionResource(
-        session_id="session-id",
-        create_data=BasicSessionCreateData(),
+    next_run = RunResource(
+        run_id="run-id",
+        create_data=BasicRunCreateData(),
         created_at=datetime(year=2021, month=1, day=1),
         actions=[action],
     )
 
     decoy.when(
-        session_view.with_action(
-            session=prev_session,
+        run_view.with_action(
+            run=prev_run,
             action_id=unique_id,
-            action_data=SessionActionCreateData(actionType=SessionActionType.PLAY),
+            action_data=RunActionCreateData(actionType=RunActionType.PLAY),
             created_at=current_time,
         ),
-    ).then_return((action, next_session))
+    ).then_return((action, next_run))
 
     response = client.post(
-        "/sessions/session-id/actions",
+        "/runs/run-id/actions",
         json={"data": {"actionType": "play"}},
     )
 
@@ -90,108 +90,108 @@ def test_create_play_action(
     decoy.verify(engine_store.runner.play())
 
 
-def test_create_session_action_with_missing_id(
+def test_create_run_action_with_missing_id(
     decoy: Decoy,
-    session_store: SessionStore,
+    run_store: RunStore,
     unique_id: str,
     current_time: datetime,
     client: TestClient,
 ) -> None:
-    """It should 404 if the session ID does not exist."""
-    not_found_error = SessionNotFoundError(session_id="session-id")
+    """It should 404 if the run ID does not exist."""
+    not_found_error = RunNotFoundError(run_id="run-id")
 
-    decoy.when(session_store.get(session_id="session-id")).then_raise(not_found_error)
+    decoy.when(run_store.get(run_id="run-id")).then_raise(not_found_error)
 
     response = client.post(
-        "/sessions/session-id/actions",
+        "/runs/run-id/actions",
         json={"data": {"actionType": "play"}},
     )
 
     verify_response(
         response,
         expected_status=404,
-        expected_errors=SessionNotFound(detail=str(not_found_error)),
+        expected_errors=RunNotFound(detail=str(not_found_error)),
     )
 
 
-def test_create_session_action_without_runner(
+def test_create_run_action_without_runner(
     decoy: Decoy,
-    session_view: SessionView,
+    run_view: RunView,
     engine_store: EngineStore,
     unique_id: str,
     current_time: datetime,
     client: TestClient,
 ) -> None:
     """It should 400 if the runner is not able to handle the action."""
-    actions = SessionAction(
-        actionType=SessionActionType.PLAY,
+    actions = RunAction(
+        actionType=RunActionType.PLAY,
         createdAt=current_time,
         id=unique_id,
     )
 
-    next_session = SessionResource(
-        session_id="unique-id",
-        create_data=BasicSessionCreateData(),
+    next_run = RunResource(
+        run_id="unique-id",
+        create_data=BasicRunCreateData(),
         created_at=datetime(year=2021, month=1, day=1),
         actions=[actions],
     )
 
     decoy.when(
-        session_view.with_action(
-            session=prev_session,
+        run_view.with_action(
+            run=prev_run,
             action_id=unique_id,
-            action_data=SessionActionCreateData(actionType=SessionActionType.PLAY),
+            action_data=RunActionCreateData(actionType=RunActionType.PLAY),
             created_at=current_time,
         ),
-    ).then_return((actions, next_session))
+    ).then_return((actions, next_run))
 
     decoy.when(engine_store.runner.play()).then_raise(EngineMissingError("oh no"))
 
     response = client.post(
-        "/sessions/session-id/actions",
+        "/runs/run-id/actions",
         json={"data": {"actionType": "play"}},
     )
 
     verify_response(
         response,
         expected_status=400,
-        expected_errors=SessionActionNotAllowed(detail="oh no"),
+        expected_errors=RunActionNotAllowed(detail="oh no"),
     )
 
 
 def test_create_pause_action(
     decoy: Decoy,
-    session_view: SessionView,
+    run_view: RunView,
     engine_store: EngineStore,
     unique_id: str,
     current_time: datetime,
     client: TestClient,
 ) -> None:
     """It should handle a pause action."""
-    action = SessionAction(
-        actionType=SessionActionType.PAUSE,
+    action = RunAction(
+        actionType=RunActionType.PAUSE,
         createdAt=current_time,
         id=unique_id,
     )
 
-    next_session = SessionResource(
-        session_id="unique-id",
-        create_data=BasicSessionCreateData(),
+    next_run = RunResource(
+        run_id="unique-id",
+        create_data=BasicRunCreateData(),
         created_at=datetime(year=2021, month=1, day=1),
         actions=[action],
     )
 
     decoy.when(
-        session_view.with_action(
-            session=prev_session,
+        run_view.with_action(
+            run=prev_run,
             action_id=unique_id,
-            action_data=SessionActionCreateData(actionType=SessionActionType.PAUSE),
+            action_data=RunActionCreateData(actionType=RunActionType.PAUSE),
             created_at=current_time,
         ),
-    ).then_return((action, next_session))
+    ).then_return((action, next_run))
 
     response = client.post(
-        "/sessions/session-id/actions",
+        "/runs/run-id/actions",
         json={"data": {"actionType": "pause"}},
     )
 
@@ -201,37 +201,37 @@ def test_create_pause_action(
 
 async def test_create_stop_action(
     decoy: Decoy,
-    session_view: SessionView,
+    run_view: RunView,
     engine_store: EngineStore,
     unique_id: str,
     current_time: datetime,
     async_client: AsyncClient,
 ) -> None:
     """It should handle a stop action."""
-    action = SessionAction(
-        actionType=SessionActionType.STOP,
+    action = RunAction(
+        actionType=RunActionType.STOP,
         createdAt=current_time,
         id=unique_id,
     )
 
-    next_session = SessionResource(
-        session_id="unique-id",
-        create_data=BasicSessionCreateData(),
+    next_run = RunResource(
+        run_id="unique-id",
+        create_data=BasicRunCreateData(),
         created_at=datetime(year=2021, month=1, day=1),
         actions=[action],
     )
 
     decoy.when(
-        session_view.with_action(
-            session=prev_session,
+        run_view.with_action(
+            run=prev_run,
             action_id=unique_id,
-            action_data=SessionActionCreateData(actionType=SessionActionType.STOP),
+            action_data=RunActionCreateData(actionType=RunActionType.STOP),
             created_at=current_time,
         ),
-    ).then_return((action, next_session))
+    ).then_return((action, next_run))
 
     response = await async_client.post(
-        "/sessions/session-id/actions",
+        "/runs/run-id/actions",
         json={"data": {"actionType": "stop"}},
     )
 

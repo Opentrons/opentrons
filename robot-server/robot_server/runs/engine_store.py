@@ -83,7 +83,7 @@ class EngineStore:
         runner = ProtocolRunner(protocol_engine=engine, hardware_api=self._hardware_api)
 
         if self._runner_engine_pair is not None:
-            raise EngineConflictError("Cannot load multiple sessions simultaneously.")
+            raise EngineConflictError("Cannot load multiple runs simultaneously.")
 
         self._runner_engine_pair = RunnerEnginePair(runner=runner, engine=engine)
 

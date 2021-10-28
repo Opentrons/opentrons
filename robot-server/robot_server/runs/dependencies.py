@@ -1,4 +1,4 @@
-"""Session router dependency-injection wire-up."""
+"""Run router dependency-injection wire-up."""
 from fastapi import Depends
 
 from opentrons.hardware_control import API as HardwareAPI
@@ -7,22 +7,22 @@ from robot_server.app_state import AppState, AppStateValue, get_app_state
 from robot_server.hardware import get_hardware
 
 from .engine_store import EngineStore
-from .session_store import SessionStore
+from .run_store import RunStore
 
 
-_session_store = AppStateValue[SessionStore]("session_store")
+_run_store = AppStateValue[RunStore]("run_store")
 _engine_store = AppStateValue[EngineStore]("engine_store")
 
 
-def get_session_store(app_state: AppState = Depends(get_app_state)) -> SessionStore:
-    """Get a singleton SessionStore to keep track of created sessions."""
-    session_store = _session_store.get_from(app_state)
+def get_run_store(app_state: AppState = Depends(get_app_state)) -> RunStore:
+    """Get a singleton RunStore to keep track of created runs."""
+    run_store = _run_store.get_from(app_state)
 
-    if session_store is None:
-        session_store = SessionStore()
-        _session_store.set_on(app_state, session_store)
+    if run_store is None:
+        run_store = RunStore()
+        _run_store.set_on(app_state, run_store)
 
-    return session_store
+    return run_store
 
 
 def get_engine_store(

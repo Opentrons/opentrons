@@ -1,6 +1,6 @@
 """HTTP request and response models.
 
-These models exist to ensure the /sessions API is mapped to a reasonable
+These models exist to ensure the /runs API is mapped to a reasonable
 OpenAPI Spec. Given the large number of classes and unions involved,
 the request and response models need to be ordered carefully.
 
@@ -12,20 +12,20 @@ from typing import Union
 from robot_server.service.json_api import RequestModel, ResponseModel
 
 
-from .session_models import (
-    BasicSessionCreateData,
-    ProtocolSessionCreateData,
-    BasicSession,
-    ProtocolSession,
+from .run_models import (
+    BasicRunCreateData,
+    ProtocolRunCreateData,
+    BasicRun,
+    ProtocolRun,
 )
 
 
-CreateSessionRequest = Union[
-    RequestModel[BasicSessionCreateData],
-    RequestModel[ProtocolSessionCreateData],
+CreateRunRequest = Union[
+    RequestModel[BasicRunCreateData],
+    RequestModel[ProtocolRunCreateData],
 ]
 
-SessionResponse = Union[
-    ResponseModel[BasicSession],
-    ResponseModel[ProtocolSession],
+RunResponse = Union[
+    ResponseModel[BasicRun],
+    ResponseModel[ProtocolRun],
 ]
