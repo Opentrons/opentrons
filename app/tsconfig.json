@@ -11,6 +11,9 @@
       "path": "../discovery-client"
     },
     {
+      "path": "../react-api-client"
+    },
+    {
       "path": "../shared-data"
     }
   ],

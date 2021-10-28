@@ -126,7 +126,6 @@ export function RunSetupCard(): JSX.Element | null {
             expanded={stepKey === expandedStepKey}
             label={t('step', { index: index + 1 })}
             title={t(`${stepKey}_title`)}
-            id={`RunSetupCard_${stepKey}`}
             description={StepDetailMap[stepKey].description}
             toggleExpanded={() =>
               stepKey === expandedStepKey

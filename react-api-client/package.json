@@ -11,6 +11,7 @@
     "react": "17.0.1"
   },
   "dependencies": {
+    "@opentrons/shared-data": "4.6.2",
     "@opentrons/api-client": "^0.0.0"
   }
 }
