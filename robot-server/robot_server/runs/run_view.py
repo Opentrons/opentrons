@@ -64,9 +64,9 @@ class RunView:
         """Create a new run control action resource instance.
 
         Arguments:
-            run: The run resource to add the command to.
-            action_id: Unique ID to assign to the command resource.
-            action_data: Data used to create the command resource.
+            run: The run resource to add the action to.
+            action_id: Unique ID to assign to the action resource.
+            action_data: Data used to create the action resource.
             created_at: Resource creation timestamp.
 
         Returns:
