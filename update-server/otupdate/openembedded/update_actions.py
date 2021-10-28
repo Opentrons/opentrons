@@ -15,28 +15,35 @@ import tempfile
 from typing import Callable, NamedTuple, Optional
 
 from otupdate.common.file_actions import (
-    unzip_update, hash_file, verify_signature, HashMismatch,
-    FileMissing,SignatureMismatch)
+    unzip_update,
+    hash_file,
+    verify_signature,
+    HashMismatch,
+    FileMissing,
+    SignatureMismatch,
+)
 from otupdate.common.update_actions import UpdateActionsInterface, Partition
 
-ROOTFS_SIG_NAME = 'rootfs.ext4.hash.sig'
-ROOTFS_HASH_NAME = 'rootfs.ext4.hash'
-ROOTFS_NAME = 'rootfs.ext4'
+ROOTFS_SIG_NAME = "rootfs.ext4.hash.sig"
+ROOTFS_HASH_NAME = "rootfs.ext4.hash"
+ROOTFS_NAME = "rootfs.ext4"
 UPDATE_FILES = [ROOTFS_NAME, ROOTFS_SIG_NAME, ROOTFS_HASH_NAME]
 LOG = logging.getLogger(__name__)
 
 
 class RootPartitions(enum.Enum):
-    TWO: Partition = Partition(2, '/dev/mmcblk0p2')
-    THREE: Partition = Partition(3, '/dev/mmcblk0p3')
+    TWO: Partition = Partition(2, "/dev/mmcblk0p2")
+    THREE: Partition = Partition(3, "/dev/mmcblk0p3")
 
 
 class OT3UpdateActions(UpdateActionsInterface):
-
-    def validate_update(self, filepath: str,
-                        progress_callback: Callable[[float], None],
-                        cert_path: Optional[str]):
-        """ Worker for validation. Call in an executor (so it can return things)
+    def validate_update(
+        self,
+        filepath: str,
+        progress_callback: Callable[[float], None],
+        cert_path: Optional[str],
+    ):
+        """Worker for validation. Call in an executor (so it can return things)
 
         - Unzips filepath to its directory
         - Hashes the rootfs inside
@@ -53,28 +60,27 @@ class OT3UpdateActions(UpdateActionsInterface):
         """
 
         def zip_callback(progress):
-            progress_callback(progress/2.0)
+            progress_callback(progress / 2.0)
 
         required = [ROOTFS_NAME, ROOTFS_HASH_NAME]
         if cert_path:
             required.append(ROOTFS_SIG_NAME)
-        files, sizes = unzip_update(filepath, zip_callback,
-                                    UPDATE_FILES,
-                                    required)
+        files, sizes = unzip_update(filepath, zip_callback, UPDATE_FILES, required)
 
         def hash_callback(progress):
-            progress_callback(progress/2.0 + 0.5)
+            progress_callback(progress / 2.0 + 0.5)
+
         rootfs = files.get(ROOTFS_NAME)
         assert rootfs
-        rootfs_hash = hash_file(rootfs,
-                                hash_callback,
-                                file_size=sizes[ROOTFS_NAME])
+        rootfs_hash = hash_file(rootfs, hash_callback, file_size=sizes[ROOTFS_NAME])
         hashfile = files.get(ROOTFS_HASH_NAME)
         assert hashfile
-        packaged_hash = open(hashfile, 'rb').read().strip()
+        packaged_hash = open(hashfile, "rb").read().strip()
         if packaged_hash != rootfs_hash:
-            msg = f"Hash mismatch: calculated {rootfs_hash!r} != "\
+            msg = (
+                f"Hash mismatch: calculated {rootfs_hash!r} != "
                 f"packaged {packaged_hash!r}"
+            )
             LOG.error(msg)
             raise HashMismatch(msg)
 
@@ -85,11 +91,13 @@ class OT3UpdateActions(UpdateActionsInterface):
 
         return rootfs
 
-    def write_update(self,
-                     rootfs_filepath: str,
-                     progress_callback: Callable[[float], None],
-                     chunk_size: int = 1024,
-                     file_size: int = None) -> Partition:
+    def write_update(
+        self,
+        rootfs_filepath: str,
+        progress_callback: Callable[[float], None],
+        chunk_size: int = 1024,
+        file_size: int = None,
+    ) -> Partition:
         """
         Write the new rootfs to the next root partition
 
@@ -110,13 +118,12 @@ class OT3UpdateActions(UpdateActionsInterface):
         """
         unused = _find_unused_partition()
         part_path = unused.value.path
-        write_file(rootfs_filepath, part_path, progress_callback,
-                   chunk_size, file_size)
+        write_file(rootfs_filepath, part_path, progress_callback, chunk_size, file_size)
         return unused.value
 
     @contextlib.contextmanager
     def mount_update(self):
-        """ Mount the freshly-written partition r/w (to update machine-id).
+        """Mount the freshly-written partition r/w (to update machine-id).
 
         Should be used as a context manager, and the yielded value is the path
         to the mount. When the context manager exits, the partition will be
@@ -127,17 +134,16 @@ class OT3UpdateActions(UpdateActionsInterface):
         unused = _find_unused_partition()
         part_path = unused.value.path
         with tempfile.TemporaryDirectory(dir=_mountpoint_root()) as mountpoint:
-            subprocess.check_output(['mount', part_path, mountpoint])
+            subprocess.check_output(["mount", part_path, mountpoint])
             LOG.info(f"mounted {part_path} to {mountpoint}")
             try:
                 yield mountpoint
             finally:
-                subprocess.check_output(['umount', mountpoint])
+                subprocess.check_output(["umount", mountpoint])
                 LOG.info(f"Unmounted {part_path} from {mountpoint}")
 
-
     def commit_update(self) -> None:
-        """ Switch the target boot partition. """
+        """Switch the target boot partition."""
         unused = _find_unused_partition()
         new = _switch_partition()
         if new != unused:
@@ -145,30 +151,30 @@ class OT3UpdateActions(UpdateActionsInterface):
             LOG.error(msg)
             raise RuntimeError(msg)
         else:
-            LOG.info(f'commit_update: committed to booting {new}')
+            LOG.info(f"commit_update: committed to booting {new}")
 
     def write_machine_id(self, current_root: str, new_root: str):
-        """ Update the machine id in target rootfs """
-        mid = open(os.path.join(current_root, 'etc', 'machine-id')).read()
-        with open(os.path.join(new_root, 'etc', 'machine-id'), 'w') as new_mid:
+        """Update the machine id in target rootfs"""
+        mid = open(os.path.join(current_root, "etc", "machine-id")).read()
+        with open(os.path.join(new_root, "etc", "machine-id"), "w") as new_mid:
             new_mid.write(mid)
-        LOG.info(f'Wrote machine_id {mid.strip()} to {new_root}/etc/machine-id')
-
+        LOG.info(f"Wrote machine_id {mid.strip()} to {new_root}/etc/machine-id")
 
 
 def _find_unused_partition() -> RootPartitions:
-    """ Find the currently-unused root partition to write to """
-    which = subprocess.check_output(['ot-unused-partition']).strip()
-    return {b'2': RootPartitions.TWO,
-            b'3': RootPartitions.THREE}[which]
+    """Find the currently-unused root partition to write to"""
+    which = subprocess.check_output(["ot-unused-partition"]).strip()
+    return {b"2": RootPartitions.TWO, b"3": RootPartitions.THREE}[which]
 
 
-def write_file(infile: str,
-               outfile: str,
-               progress_callback: Callable[[float], None],
-               chunk_size: int = 1024,
-               file_size: int = None):
-    """ Write a file to another file with progress callbacks.
+def write_file(
+    infile: str,
+    outfile: str,
+    progress_callback: Callable[[float], None],
+    chunk_size: int = 1024,
+    file_size: int = None,
+):
+    """Write a file to another file with progress callbacks.
 
     :param infile: The input filepath
     :param outfile: The output filepath
@@ -180,13 +186,15 @@ def write_file(infile: str,
                       ``seek``/``tell``.
     """
     total_written = 0
-    with open(infile, 'rb') as img, open(outfile, 'wb') as part:
+    with open(infile, "rb") as img, open(outfile, "wb") as part:
         if None is file_size:
             file_size = img.seek(0, 2)
             img.seek(0)
-            LOG.info(f'write_file: file size calculated as {file_size}B')
-        LOG.info(f'write_file: writing {infile} ({file_size}B)'
-                 f' to {outfile} in {chunk_size}B chunks')
+            LOG.info(f"write_file: file size calculated as {file_size}B")
+        LOG.info(
+            f"write_file: writing {infile} ({file_size}B)"
+            f" to {outfile} in {chunk_size}B chunks"
+        )
         while True:
             chunk = img.read(chunk_size)
             part.write(chunk)
@@ -197,22 +205,21 @@ def write_file(infile: str,
 
 
 def _mountpoint_root():
-    """ provides mountpoint location for :py:meth:`mount_update`.
+    """provides mountpoint location for :py:meth:`mount_update`.
 
     exists only for ease of mocking
     """
-    return '/media'
+    return "/media"
 
 
 def _switch_partition() -> RootPartitions:
-    """ Switch the active boot partition using the switch script """
-    res = subprocess.check_output(['ot-switch-partitions'])
-    for line in res.split(b'\n'):
-        matches = re.match(
-            b'Current boot partition: ([23]), setting to ([23])',
-            line)
+    """Switch the active boot partition using the switch script"""
+    res = subprocess.check_output(["ot-switch-partitions"])
+    for line in res.split(b"\n"):
+        matches = re.match(b"Current boot partition: ([23]), setting to ([23])", line)
         if matches:
-            return {b'2': RootPartitions.TWO,
-                    b'3': RootPartitions.THREE}[matches.group(2)]
+            return {b"2": RootPartitions.TWO, b"3": RootPartitions.THREE}[
+                matches.group(2)
+            ]
     else:
-        raise RuntimeError(f'Bad output from ot-switch-partitions: {res!r}')
+        raise RuntimeError(f"Bad output from ot-switch-partitions: {res!r}")

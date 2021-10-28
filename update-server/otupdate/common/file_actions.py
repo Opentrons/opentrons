@@ -18,10 +18,10 @@ LOG = logging.getLogger(__name__)
 class FileMissing(ValueError):
     def __init__(self, message):
         self.message = message
-        self.short = 'File Missing'
+        self.short = "File Missing"
 
     def __repr__(self):
-        return f'<{self.__class__.__name__}: {self.message}>'
+        return f"<{self.__class__.__name__}: {self.message}>"
 
     def __str__(self):
         return self.message
@@ -30,10 +30,10 @@ class FileMissing(ValueError):
 class SignatureMismatch(ValueError):
     def __init__(self, message):
         self.message = message
-        self.short = 'Signature Mismatch'
+        self.short = "Signature Mismatch"
 
     def __repr__(self, message):
-        return f'<{self.__class__.__name__}: {self.message}>'
+        return f"<{self.__class__.__name__}: {self.message}>"
 
     def __str__(self):
         return self.message
@@ -42,22 +42,23 @@ class SignatureMismatch(ValueError):
 class HashMismatch(ValueError):
     def __init__(self, message):
         self.message = message
-        self.short = 'Hash Mismatch'
+        self.short = "Hash Mismatch"
 
     def __repr__(self):
-        return f'<{self.__class__.__name__}: {self.message}>'
+        return f"<{self.__class__.__name__}: {self.message}>"
 
     def __str__(self):
         return self.message
 
 
-def unzip_update(filepath: str,
-                 progress_callback: Callable[[float], None],
-                 acceptable_files: Sequence[str],
-                 mandatory_files: Sequence[str],
-                 chunk_size: int = 1024) -> Tuple[Mapping[str, Optional[str]],
-                                                  Mapping[str, int]]:
-    """ Unzip an update file
+def unzip_update(
+    filepath: str,
+    progress_callback: Callable[[float], None],
+    acceptable_files: Sequence[str],
+    mandatory_files: Sequence[str],
+    chunk_size: int = 1024,
+) -> Tuple[Mapping[str, Optional[str]], Mapping[str, int]]:
+    """Unzip an update file
 
     The update file must contain
 
@@ -97,11 +98,10 @@ def unzip_update(filepath: str,
     total_size = 0
     written_size = 0
     to_unzip: List[zipfile.ZipInfo] = []
-    file_paths: Dict[str, Optional[str]] = {fn: None
-                                            for fn in acceptable_files}
+    file_paths: Dict[str, Optional[str]] = {fn: None for fn in acceptable_files}
     file_sizes: Dict[str, int] = {fn: 0 for fn in acceptable_files}
     LOG.info(f"Unzipping {filepath}")
-    with zipfile.ZipFile(filepath, 'r') as zf:
+    with zipfile.ZipFile(filepath, "r") as zf:
         files = zf.infolist()
         remaining_filenames = [fn for fn in acceptable_files]
         for fi in files:
@@ -115,34 +115,38 @@ def unzip_update(filepath: str,
 
         for name in remaining_filenames:
             if name in mandatory_files:
-                raise FileMissing(f'File {name} missing from zip')
+                raise FileMissing(f"File {name} missing from zip")
 
         for fi in to_unzip:
             uncomp_path = os.path.join(os.path.dirname(filepath), fi.filename)
-            with zf.open(fi) as zipped, open(uncomp_path, 'wb') as unzipped:
+            with zf.open(fi) as zipped, open(uncomp_path, "wb") as unzipped:
                 LOG.debug(f"Beginning unzip of {fi.filename} to {uncomp_path}")
                 while True:
                     chunk = zipped.read(chunk_size)
                     unzipped.write(chunk)
                     written_size += len(chunk)
-                    progress_callback(written_size/total_size)
+                    progress_callback(written_size / total_size)
                     if len(chunk) != chunk_size:
                         break
                 file_paths[fi.filename] = uncomp_path
                 file_sizes[fi.filename] = fi.file_size
                 LOG.debug(f"Unzipped {fi.filename} to {uncomp_path}")
     LOG.info(
-        f"Unzipped {filepath}, results: \n\t" + '\n\t'.join(
-            [f'{k}: {file_paths[k]} ({file_sizes[k]}B)'
-             for k in file_paths.keys()]))
+        f"Unzipped {filepath}, results: \n\t"
+        + "\n\t".join(
+            [f"{k}: {file_paths[k]} ({file_sizes[k]}B)" for k in file_paths.keys()]
+        )
+    )
     return file_paths, file_sizes
 
 
-def hash_file(path: str,
-              progress_callback: Callable[[float], None],
-              chunk_size: int = 1024,
-              file_size: int = None,
-              algo: str = 'sha256') -> bytes:
+def hash_file(
+    path: str,
+    progress_callback: Callable[[float], None],
+    chunk_size: int = 1024,
+    file_size: int = None,
+    algo: str = "sha256",
+) -> bytes:
     """
     Hash a file and return the hash, providing progress callbacks
 
@@ -162,7 +166,7 @@ def hash_file(path: str,
     have_read = 0
     if not chunk_size:
         chunk_size = 1024
-    with open(path, 'rb') as to_hash:
+    with open(path, "rb") as to_hash:
         if not file_size:
             file_size = to_hash.seek(0, 2)
             to_hash.seek(0)
@@ -170,15 +174,13 @@ def hash_file(path: str,
             chunk = to_hash.read(chunk_size)
             hasher.update(chunk)
             have_read += len(chunk)
-            progress_callback(have_read/file_size)
+            progress_callback(have_read / file_size)
             if len(chunk) != chunk_size:
                 break
     return binascii.hexlify(hasher.digest())
 
 
-def verify_signature(message_path: str,
-                     sigfile_path: str,
-                     cert_path: str) -> None:
+def verify_signature(message_path: str, sigfile_path: str, cert_path: str) -> None:
     """
     Verify the signature (assumed, of the hash file)
 
@@ -192,21 +194,29 @@ def verify_signature(message_path: str,
     """
     with tempfile.TemporaryDirectory() as pubkey_dir:
         pubkey_contents = subprocess.check_output(
-            ['openssl', 'x509', '-in', cert_path,
-             '-pubkey', '-noout'])
-        pubkey_file = os.path.join(pubkey_dir, 'pubkey')
-        open(pubkey_file, 'wb').write(pubkey_contents)
+            ["openssl", "x509", "-in", cert_path, "-pubkey", "-noout"]
+        )
+        pubkey_file = os.path.join(pubkey_dir, "pubkey")
+        open(pubkey_file, "wb").write(pubkey_contents)
         try:
             verification = subprocess.check_output(
-                ['openssl', 'dgst', '-sha256', '-verify', pubkey_file,
-                 '-signature', sigfile_path, message_path],
-                stderr=subprocess.STDOUT)
+                [
+                    "openssl",
+                    "dgst",
+                    "-sha256",
+                    "-verify",
+                    pubkey_file,
+                    "-signature",
+                    sigfile_path,
+                    message_path,
+                ],
+                stderr=subprocess.STDOUT,
+            )
         except subprocess.CalledProcessError as cpe:
             verification = cpe.output
 
-    if verification.strip() == b'Verified OK':
+    if verification.strip() == b"Verified OK":
         LOG.info(f"Verification passed from cert {cert_path}")
     else:
-        LOG.error(
-            f"Verification failed with cert {cert_path}: {verification!r}")
-        raise SignatureMismatch('Signature check failed')
+        LOG.error(f"Verification failed with cert {cert_path}: {verification!r}")
+        raise SignatureMismatch("Signature check failed")
