@@ -18,7 +18,7 @@ interface Props {
   toggleCard: () => unknown
 }
 
-const StatusCardIcons: Record<string, IconName> = {
+const iconNameByModuleType: Record<string, IconName> = {
   temperatureModuleType: 'ot-temperature',
   magneticModuleType: 'ot-magnet',
   thermocyclerModuleType: 'ot-thermocycler',
@@ -29,7 +29,7 @@ export function StatusCard(props: Props): JSX.Element {
 
   return isNewProtocolRunPanel ? (
     <CollapsibleItem
-      iconName={StatusCardIcons[props.moduleType]}
+      iconName={iconNameByModuleType[props.moduleType]}
       className={styles.status_card}
       onCollapseToggle={props.toggleCard}
       header={props.header && `Slot ${props.header}`}

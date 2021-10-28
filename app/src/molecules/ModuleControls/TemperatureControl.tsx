@@ -146,11 +146,11 @@ export const TemperatureControl = ({
           onClick={handleClick}
           disabled={disabledReason != null}
           {...targetProps}
-          fontSize={'0.790rem'}
+          fontSize={FONT_SIZE_BODY_1}
         >
           {hasTarget === true
             ? `Deactivate${modulePartName}`
-            : `Set${modulePartName} Temp`}
+            : `Set${modulePartName} Temperature`}
         </SecondaryBtn>
       ) : (
         <SecondaryBtn

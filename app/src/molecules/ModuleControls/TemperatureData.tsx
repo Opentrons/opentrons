@@ -28,7 +28,7 @@ interface TemperatureDataProps {
   title: string | null
   current: number | null
   target: number | null
-  status?: TemperatureStatus | ThermocyclerStatus | null
+  status?: TemperatureStatus | ThermocyclerStatus | null | undefined
 }
 
 export const TemperatureData = ({
@@ -38,6 +38,19 @@ export const TemperatureData = ({
   target,
 }: TemperatureDataProps): JSX.Element => {
   const isNewProtocolRunPanel = useFeatureFlag('preProtocolFlowWithoutRPC')
+  const getStatusColor = (): string => {
+    if (status === 'heating') {
+      return COLOR_ERROR
+    } else if (status === 'cooling') {
+      return C_BLUE
+    } else if (status === 'error') {
+      return COLOR_ERROR
+    } else if (status === 'idle') {
+      return C_LIGHT_GRAY
+    } else {
+      return COLOR_SUCCESS
+    }
+  }
   return (
     <Flex flexDirection={DIRECTION_COLUMN} fontSize={FONT_SIZE_BODY_1}>
       {title &&
@@ -65,18 +78,8 @@ export const TemperatureData = ({
             <Icon
               name="circle"
               width="10px"
-              marginRight="0.375rem"
-              color={
-                status.includes('heat')
-                  ? COLOR_ERROR
-                  : status.includes('error')
-                  ? COLOR_ERROR
-                  : status.includes('cool')
-                  ? C_BLUE
-                  : status.includes('idle')
-                  ? C_LIGHT_GRAY
-                  : COLOR_SUCCESS
-              }
+              marginRight={SPACING_1}
+              color={getStatusColor()}
             />
           ) : (
             <Icon

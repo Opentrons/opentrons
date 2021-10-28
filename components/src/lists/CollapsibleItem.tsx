@@ -55,12 +55,14 @@ export function CollapsibleItem(props: CollapsibleItemProps): JSX.Element {
     <div className={className}>
       <div className={titleBarClass}>
         {hasHeader && <p className={styles.header_text}>{header}</p>}
-        <div className={styles.icon_left_of_title_container}>
-          {props.iconName != null ? (
+        {props.iconName != null ? (
+          <div className={styles.icon_left_of_title_container}>
             <Icon className={styles.icon_left_of_title} name={props.iconName} />
-          ) : null}
+            <h3 className={styles.title}>{props.title}</h3>
+          </div>
+        ) : (
           <h3 className={styles.title}>{props.title}</h3>
-        </div>
+        )}
         {collapsible && (
           <div
             onClick={handleCollapseToggle}
