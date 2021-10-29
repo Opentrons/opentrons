@@ -23,8 +23,6 @@ export function useEnsureBasicRun(): {
     runType: RUN_TYPE_BASIC,
   })
 
-  console.log(existingBasicRuns)
-
   useEffect(() => {
     if (
       (existingBasicRuns == null || existingBasicRuns[0] == null) &&

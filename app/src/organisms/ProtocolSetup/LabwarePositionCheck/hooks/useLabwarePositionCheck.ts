@@ -163,7 +163,11 @@ export function useLabwarePositionCheck(
           host as HostConfig,
           basicRun.data?.id as string,
           createCommandData(prepCommand)
-        )
+        ).catch((e: Error) => {
+          console.error(`error issuing command to robot: ${e.message}`)
+          setIsLoading(false)
+          setError(e)
+        })
       })
       setPrepCommandsExecuted(true)
     }
