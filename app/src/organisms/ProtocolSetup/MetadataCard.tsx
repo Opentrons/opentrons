@@ -40,18 +40,12 @@ export function MetadataCard(): JSX.Element {
           id={'MetadataCard_protocolCreationMethod'}
         />
       </Flex>
-      <Flex marginTop={SPACING_2}>
+      <Flex marginTop={SPACING_2} flex={'auto'}>
         <LabeledValue
           flex={6}
           label={t('description')}
           value={description || '-'}
           id={'MetadataCard_protocolDescription'}
-        />
-        <LabeledValue
-          flex={2}
-          label={t('estimated_run_time')}
-          value={'-'}
-          id={'MetadataCard_protocolEstRunTime'}
         />
       </Flex>
     </Card>
