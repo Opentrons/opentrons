@@ -9,6 +9,7 @@ from opentrons.protocol_engine import (
     CommandStatus,
     CommandType,
     EngineStatus as RunStatus,
+    LabwareLocation,
     LoadedPipette,
     LoadedLabware,
 )
@@ -60,6 +61,31 @@ class AbstractRun(ResourceModel):
     labware: List[LoadedLabware] = Field(
         ...,
         description="Labware that has been loaded into the run.",
+    )
+
+
+class LabwareOffsetVector(BaseModel):
+    """An offset to apply to labware, in deck coordinates."""
+
+    x: float
+    y: float
+    z: float
+
+
+class LabwareOffset(BaseModel):
+    """An offset that the robot adds to a pipette's position when it moves to a labware.
+
+    During the run, if a labware is loaded whose definition URI and location
+    both match what's found here, the given offset will be added to all
+    pipette movements that use that labware as a reference point.
+    """
+
+    definitionUri: str = Field(..., description="The URI for the labware's definition.")
+    location: LabwareLocation = Field(
+        ..., description="Where the labware is located on the robot."
+    )
+    offset: LabwareOffsetVector = Field(
+        ..., description="The offset applied to matching labware."
     )
 
 
