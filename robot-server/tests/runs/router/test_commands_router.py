@@ -16,6 +16,7 @@ from robot_server.service.json_api import RequestModel, ResponseModel
 from robot_server.runs.run_models import (
     Run,
     BasicRun,
+    BasicRunCreateParams,
     RunCommandSummary,
 )
 from robot_server.runs.engine_store import EngineStore
@@ -61,6 +62,7 @@ async def test_get_run_commands() -> None:
     run_response = ResponseModel[Run](
         data=BasicRun(
             id="run-id",
+            createParams=BasicRunCreateParams(),
             createdAt=datetime(year=2021, month=1, day=1),
             status=EngineStatus.RUNNING,
             actions=[],
