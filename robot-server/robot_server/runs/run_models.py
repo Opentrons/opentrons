@@ -41,11 +41,6 @@ class AbstractRun(ResourceModel):
     runType: RunType = Field(..., description="Specific run type.")
     createdAt: datetime = Field(..., description="When the run was created")
     status: RunStatus = Field(..., description="Execution status of the run")
-    # TODO(mc, 2021-05-25): how hard would it be to rename this field to `config`?
-    createParams: Optional[BaseModel] = Field(
-        None,
-        description="Configuration parameters for the run.",
-    )
     actions: List[RunAction] = Field(
         ...,
         description="Client-initiated run control actions.",
@@ -102,6 +97,7 @@ class BasicRunCreateData(BaseModel):
         RunType.BASIC,
         description="The run type to create.",
     )
+    # TODO(mc, 2021-05-25): how hard would it be to rename this field to `config`?
     createParams: BasicRunCreateParams = Field(
         default_factory=BasicRunCreateParams,
         description="Parameters to set run behaviors at creation time.",
@@ -130,6 +126,7 @@ class ProtocolRunCreateData(BaseModel):
         RunType.PROTOCOL,
         description="The run type to create.",
     )
+    # TODO(mc, 2021-05-25): how hard would it be to rename this field to `config`?
     createParams: ProtocolRunCreateParams = Field(
         ...,
         description="Parameters to set run behaviors at creation time.",
