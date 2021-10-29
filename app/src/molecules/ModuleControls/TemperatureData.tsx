@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -38,6 +39,7 @@ export const TemperatureData = ({
   target,
 }: TemperatureDataProps): JSX.Element => {
   const isNewProtocolRunPanel = useFeatureFlag('preProtocolFlowWithoutRPC')
+  const { t } = useTranslation('run_details')
   const getStatusColor = (): string => {
     if (status === 'heating') {
       return COLOR_ERROR
@@ -100,12 +102,16 @@ export const TemperatureData = ({
           <Text textTransform={TEXT_TRANSFORM_CAPITALIZE}>{status}</Text>
         </Flex>
       )}
-      <Text marginBottom={SPACING_1}>{`Current: ${
-        current != null ? current + ' °C' : 'n/a'
-      }`}</Text>
-      <Text marginBottom={SPACING_3}>{`Target: ${
-        target != null ? target + ' °C' : 'n/a'
-      }`}</Text>
+      <Text marginBottom={SPACING_1}>
+        {current != null
+          ? t('current_temperature', { temperature: current })
+          : t('temperature_not_available', { temperature_type: 'Current' })}
+      </Text>
+      <Text marginBottom={SPACING_3}>
+        {target != null
+          ? t('target_temperature', { temperature: target })
+          : t('temperature_not_available', { temperature_type: 'Target' })}
+      </Text>
     </Flex>
   )
 }

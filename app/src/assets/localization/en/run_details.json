@@ -1,4 +1,6 @@
 {
+  "current_temperature": "Current: {{temperature}} °C",
+  "module_slot_number": "Slot {{slot_number}}",
   "pause_run": "Pause Run",
   "protocol_title": "Protocol - {{protocol_name}}",
   "reset_run": "Reset Run",
@@ -10,5 +12,7 @@
   "status_finished": "Finished",
   "status_loaded": "Not started",
   "status_paused": "Paused",
-  "status_running": "Running"
+  "status_running": "Running",
+  "target_temperature": "Target: {{temperature}} °C",
+  "temperature_not_available": "{{temperature_type}}: n/a"
 }

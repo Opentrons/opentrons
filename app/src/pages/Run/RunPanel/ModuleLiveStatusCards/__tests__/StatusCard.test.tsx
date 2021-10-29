@@ -4,6 +4,7 @@ import { when } from 'jest-when'
 import { StatusCard } from '../StatusCard'
 import { renderWithProviders } from '@opentrons/components'
 import { useFeatureFlag } from '../../../../../redux/config'
+import { i18n } from '../../../../../i18n'
 
 jest.mock('../../../../../redux/config')
 
@@ -22,7 +23,8 @@ describe('StatusCard headers', () => {
         title={'Magnetic Module GEN 2'}
         isCardExpanded={false}
         toggleCard={jest.fn()}
-      />
+      />,
+      { i18nInstance: i18n }
     )
     expect(screen.getByText(/Slot/)).toBeInTheDocument()
   })
