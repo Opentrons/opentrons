@@ -3,7 +3,6 @@ import asyncio
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 
-from opentrons.config import feature_flags
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.context.protocol_api.protocol_context import (
