@@ -54,6 +54,7 @@
     "rxjs": "^6.5.1",
     "semver": "5.5.0",
     "styled-components": "5.1.1",
-    "typeface-open-sans": "0.0.75"
+    "typeface-open-sans": "0.0.75",
+    "uuid": "8.3.2"
   }
 }

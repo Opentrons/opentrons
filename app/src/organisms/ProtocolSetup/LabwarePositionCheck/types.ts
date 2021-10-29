@@ -1,5 +1,5 @@
 import { SECTIONS } from './constants'
-import type { Command } from '@opentrons/shared-data/protocol/types/schemaV5'
+import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type { PipetteAccessParams } from '@opentrons/shared-data/protocol/types/schemaV3'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 

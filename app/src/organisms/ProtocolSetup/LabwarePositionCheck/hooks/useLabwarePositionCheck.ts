@@ -11,7 +11,12 @@ import {
 } from '@opentrons/react-api-client'
 import { useProtocolDetails } from '../../../RunDetails/hooks'
 import { useSteps } from '.'
-import type { Command } from '@opentrons/shared-data/protocol/types/schemaV5'
+import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
+import type {
+  LoadLabwareCommand,
+  LoadModuleCommand,
+  SetupCommand,
+} from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 import type {
   Axis,
   Jog,
@@ -32,23 +37,41 @@ type LabwarePositionCheckUtils =
 
 const useLpcCtaText = (command: Command): string => {
   const { protocolData } = useProtocolDetails()
-  switch (command.command) {
+  const commands = protocolData?.commands ?? []
+  switch (command.commandType) {
     case 'moveToWell': {
-      const labwareId = command.params.labware
-      const slot = protocolData?.labware[labwareId].slot
+      const labwareId = command.params.labwareId
+      const loadLabwareCommand = commands.find(
+        (command: Command) =>
+          command.commandType === 'loadLabware' &&
+          command.params.labwareId === labwareId
+      ) as LoadLabwareCommand
+      // @ts-expect-error we know slotName exists on params.location because the loadLabware command was loaded using the slotName, not moduleId
+      const slot = loadLabwareCommand.params.location.slotName
       return `Confirm position, move to slot ${slot}`
     }
     case 'thermocycler/openLid': {
-      const moduleId = command.params.module
-      const slot = protocolData?.modules[moduleId].slot
+      const moduleId = command.params.moduleId
+      const loadModuleCommand = commands.find(
+        (command: Command) =>
+          command.commandType === 'loadModule' &&
+          command.params.moduleId === moduleId
+      ) as LoadModuleCommand
+      const slot = loadModuleCommand.params.location.slotName
       return `Confirm position, move to slot ${slot}`
     }
     case 'pickUpTip': {
       return `Confirm position, pick up tip`
     }
     case 'dropTip': {
-      const labwareId = command.params.labware
-      const slot = protocolData?.labware[labwareId].slot
+      const labwareId = command.params.labwareId
+      const loadLabwareCommand = commands.find(
+        (command: Command) =>
+          command.commandType === 'loadLabware' &&
+          command.params.labwareId === labwareId
+      ) as LoadLabwareCommand
+      // @ts-expect-error we know slotName exists on params.location because the loadLabware command was loaded using the slotName, not moduleId
+      const slot = loadLabwareCommand.params.location.slotName
       return `Confirm position, return tip to slot ${slot}`
     }
     default:
@@ -62,9 +85,23 @@ const commandIsComplete = (status: SessionCommandSummary['status']): boolean =>
 const createCommandData = (
   command: Command
 ): { commandType: string; data: Record<string, any> } => ({
-  commandType: command.command,
+  commandType: command.commandType,
   data: command.params,
 })
+
+const isLoadCommand = (command: Command): boolean => {
+  const loadCommands: Array<SetupCommand['commandType']> = [
+    'loadLabware',
+    'loadLiquid',
+    'loadModule',
+    'loadPipette',
+  ]
+  // @ts-expect-error SetupCommand is more specific than Command, but the whole point of this util :)
+  return loadCommands.includes(command.commandType)
+}
+
+const isTCOpenCommand = (command: Command): boolean =>
+  command.commandType === 'thermocycler/openLid'
 
 export function useLabwarePositionCheck(
   addSavePositionCommandId: (commandId: string) => void
@@ -75,20 +112,33 @@ export function useLabwarePositionCheck(
   const [pendingCommandId, setPendingCommandId] = React.useState<string | null>(
     null
   )
+  const [
+    prepCommandsExecuted,
+    setPrepCommandsExecuted,
+  ] = React.useState<boolean>(false)
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
   const [error, setError] = React.useState<Error | null>(null)
+  const { protocolData } = useProtocolDetails()
   const host = useHost()
   const basicRun = useEnsureBasicRun()
   if (basicRun.error != null && error !== null) {
     setError(basicRun.error)
   }
-  const LPCCommands = useSteps().reduce<Command[]>((steps, currentStep) => {
-    return [...steps, ...currentStep.commands]
-  }, [])
-  const currentCommand = LPCCommands[currentCommandIndex]
+
+  const loadCommands = protocolData?.commands.filter(isLoadCommand) ?? []
+  const TCOpenCommands = protocolData?.commands.filter(isTCOpenCommand) ?? []
+  const prepCommands = [...loadCommands, ...TCOpenCommands]
+  const LPCMovementCommands = useSteps()
+    .reduce<Command[]>((steps, currentStep) => {
+      return [...steps, ...currentStep.commands]
+    }, [])
+    .filter(
+      (command: Command) => command.commandType !== 'thermocycler/openLid'
+    )
+  const currentCommand = LPCMovementCommands[currentCommandIndex]
   const ctaText = useLpcCtaText(currentCommand)
   const robotCommands = useAllCommandsQuery(basicRun.data?.id).data?.data
-  const isComplete = currentCommandIndex === LPCCommands.length - 1
+  const isComplete = currentCommandIndex === LPCMovementCommands.length - 1
   if (error != null) return { error }
   if (
     pendingCommandId != null &&
@@ -106,6 +156,18 @@ export function useLabwarePositionCheck(
   const proceed = (): void => {
     setIsLoading(true)
 
+    // execute all load commands first if they haven't been executed yet
+    if (!prepCommandsExecuted) {
+      prepCommands.forEach((prepCommand: Command) => {
+        createCommand(
+          host as HostConfig,
+          basicRun.data?.id as string,
+          createCommandData(prepCommand)
+        )
+      })
+      setPrepCommandsExecuted(true)
+    }
+
     createCommand(
       host as HostConfig,
       basicRun.data?.id as string,
@@ -113,14 +175,10 @@ export function useLabwarePositionCheck(
     )
       .then(response => {
         const commandId = response.data.data.id
-        // @ts-expect-error delete this when schema v6 types are out
-        if (currentCommand.command === 'savePosition') {
+        // execute the next movement command after issueing a savePosition command
+        if (currentCommand.commandType === 'savePosition') {
           addSavePositionCommandId(commandId)
-        }
-
-        // execute the next moveToWell command if opening TC lid
-        if (currentCommand.command === 'thermocycler/openLid') {
-          const nextCommand = LPCCommands[currentCommandIndex + 1]
+          const nextCommand = LPCMovementCommands[currentCommandIndex + 1]
           createCommand(
             host as HostConfig,
             basicRun.data?.id as string,
@@ -137,10 +195,10 @@ export function useLabwarePositionCheck(
               setIsLoading(false)
               setError(e)
             })
+        } else {
+          setPendingCommandId(commandId)
+          setCurrentCommandIndex(currentCommandIndex + 1)
         }
-        setPendingCommandId(commandId)
-        console.log('incrementing command index')
-        setCurrentCommandIndex(currentCommandIndex + 1)
       })
       .catch((e: Error) => {
         console.error(`error issuing command to robot: ${e.message}`)
