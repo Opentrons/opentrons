@@ -35,10 +35,18 @@ from opentrons.protocols.types import (
 from .protocol_source import ProtocolSource
 
 
+# The earliest Python Protocol API version ("apiLevel") where the protocol's simulation
+# and execution will be handled by Protocol Engine, rather than the legacy machinery.
+#
+# Note that even when simulation and execution are handled by the legacy machinery,
+# Protocol Engine still has some involvement for analyzing the simulation and
+# monitoring the execution.
 LEGACY_PYTHON_API_VERSION_CUTOFF = APIVersion(3, 0)
 
-# TODO(mc, 2021-09-21): remove this condition, cut off before 6 always
-LEGACY_JSON_SCHEMA_VERSION_CUTOFF = 5 if feature_flags.enable_protocol_engine() else 6
+
+# The earliest JSON protocol schema version where the protocol is executed directly by
+# Protocol Engine, rather than going through Python Protocol API v2.
+LEGACY_JSON_SCHEMA_VERSION_CUTOFF = 6
 
 
 class LegacyFileReader:
