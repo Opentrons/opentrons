@@ -44,5 +44,9 @@ describe('MetadataCard', () => {
     expect(getByText('Description').nextElementSibling).toHaveTextContent(
       /this describes the protocol/i
     )
+    // TODO: add estimated run time back in when ready
+    // expect(
+    //   getByText('Estimated Run Time').nextElementSibling
+    // ).toHaveTextContent(/-/i)
   })
 })
