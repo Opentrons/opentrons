@@ -1,9 +1,14 @@
 from __future__ import annotations
 import asyncio
+from asyncio import IncompleteReadError, LimitOverrunError
 from typing import Optional
 
 from opentrons.hardware_control.emulation.module_server.models import Message
 from opentrons.hardware_control.emulation.module_server.server import MessageDelimiter
+
+
+class ModuleServerClientError(Exception):
+    pass
 
 
 class ModuleServerClient:
@@ -55,9 +60,12 @@ class ModuleServerClient:
 
     async def read(self) -> Message:
         """Read a message from the module server."""
-        b = await self._reader.readuntil(MessageDelimiter)
-        m: Message = Message.parse_raw(b)
-        return m
+        try:
+            b = await self._reader.readuntil(MessageDelimiter)
+            m: Message = Message.parse_raw(b)
+            return m
+        except (IncompleteReadError, LimitOverrunError) as e:
+            raise ModuleServerClientError(str(e))
 
     def close(self) -> None:
         """Close the client."""

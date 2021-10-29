@@ -2,7 +2,10 @@ import asyncio
 from typing import Sequence, Set, Callable, List, Awaitable
 
 from opentrons.drivers.rpi_drivers.types import USBPort
-from opentrons.hardware_control.emulation.module_server.client import ModuleServerClient
+from opentrons.hardware_control.emulation.module_server.client import (
+    ModuleServerClient,
+    ModuleServerClientError,
+)
 from opentrons.hardware_control.emulation.module_server.models import Message
 from opentrons.hardware_control.emulation.module_server.server import log
 from opentrons.hardware_control.emulation.settings import Settings
@@ -48,8 +51,12 @@ class ModuleListener:
     async def run(self) -> None:
         """Run the listener."""
         while True:
-            m = await self._client.read()
-            await self.handle_message(message=m)
+            try:
+                m = await self._client.read()
+                await self.handle_message(message=m)
+            except ModuleServerClientError:
+                log.exception("Read error.")
+                break
 
     async def handle_message(self, message: Message) -> None:
         """Call callback with results of message.

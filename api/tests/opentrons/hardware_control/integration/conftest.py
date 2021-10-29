@@ -19,7 +19,6 @@ from opentrons.hardware_control.emulation.settings import (
 def emulator_settings() -> Settings:
     """Emulator settings"""
     return Settings(
-        host="0.0.0.0",
         smoothie=SmoothieSettings(
             left=PipetteSettings(model="p20_multi_v2.0", id="P3HMV202020041605"),
             right=PipetteSettings(model="p20_single_v2.0", id="P20SV202020070101"),
@@ -37,7 +36,9 @@ def emulation_app(emulator_settings: Settings) -> Iterator[None]:
 
     async def _wait_ready() -> None:
         c = await ModuleServerClient.connect(
-            host="localhost", port=emulator_settings.module_server.port
+            host="localhost",
+            port=emulator_settings.module_server.port,
+            interval_seconds=1,
         )
         await wait_emulators(client=c, modules=modules, timeout=5)
         c.close()

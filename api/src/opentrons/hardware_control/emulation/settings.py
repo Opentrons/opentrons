@@ -76,8 +76,6 @@ class Settings(BaseSettings):
         plate_temperature=TemperatureModelSettings(),
     )
 
-    host: str = "0.0.0.0"
-
     heatershaker_proxy: ProxySettings = ProxySettings(
         emulator_port=9000, driver_port=9995
     )
