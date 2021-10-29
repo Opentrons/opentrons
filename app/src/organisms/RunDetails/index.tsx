@@ -5,7 +5,7 @@ import {
   PrimaryBtn,
   Text,
   BORDER_WIDTH_DEFAULT,
-  C_BLUE,
+  C_ERROR_DARK,
   C_WHITE,
   DIRECTION_COLUMN,
   FONT_WEIGHT_SEMIBOLD,
@@ -16,11 +16,13 @@ import {
 } from '@opentrons/components'
 import { Page } from '../../atoms/Page'
 import { useProtocolDetails } from './hooks'
+import { useRunStatus } from '../RunTimeControl/hooks'
 import { ConfirmCancelModal } from '../../pages/Run/RunLog'
 
 export function RunDetails(): JSX.Element | null {
   const { t } = useTranslation('run_details')
   const { displayName, protocolData } = useProtocolDetails()
+  const runStatus = useRunStatus()
   const {
     showConfirmation: showConfirmExit,
     confirm: confirmExit,
@@ -32,7 +34,7 @@ export function RunDetails(): JSX.Element | null {
     <PrimaryBtn
       onClick={confirmExit}
       backgroundColor={C_WHITE}
-      color={C_BLUE}
+      color={C_ERROR_DARK}
       borderWidth={BORDER_WIDTH_DEFAULT}
       lineHeight={LINE_HEIGHT_SOLID}
       fontWeight={FONT_WEIGHT_SEMIBOLD}
@@ -44,10 +46,15 @@ export function RunDetails(): JSX.Element | null {
     </PrimaryBtn>
   )
 
-  const titleBarProps = {
-    title: t('protocol_title', { protocol_name: displayName }),
-    rightNode: cancelRunButton,
-  }
+  const titleBarProps =
+    runStatus === 'running'
+      ? {
+          title: t('protocol_title', { protocol_name: displayName }),
+          rightNode: cancelRunButton,
+        }
+      : {
+          title: t('protocol_title', { protocol_name: displayName }),
+        }
 
   return (
     <Page titleBarProps={titleBarProps}>

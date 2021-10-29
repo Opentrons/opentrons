@@ -21,6 +21,7 @@ export const COLOR_SUCCESS = '#60b120'
 export const C_DISABLED = '#9c9c9c'
 export const C_SELECTED_DARK = '#00c3e6'
 export const C_BG_SELECTED = '#f0f3ff'
+export const C_ERROR_DARK = '#ac0505'
 
 // overlays
 export const OVERLAY_WHITE_10 = 'rgba(255, 255, 255, 0.1)'

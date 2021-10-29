@@ -8,8 +8,8 @@ import { Portal } from '../../../App/portal'
 import type { Dispatch } from '../../../redux/types'
 
 const HEADING = 'Are you sure you want to cancel this run?'
-const CANCEL_TEXT = 'cancel run'
-const BACK_TEXT = 'go back'
+const CANCEL_TEXT = 'yes, cancel run'
+const BACK_TEXT = 'no, go back'
 
 export interface ConfirmCancelModalProps {
   onClose: () => unknown
