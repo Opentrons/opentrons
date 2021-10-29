@@ -15,7 +15,7 @@ from opentrons.protocol_api import ProtocolContext
 from opentrons.config.robot_configs import build_config
 from opentrons.hardware_control.emulation.module_server.helpers import (
     wait_emulators,
-    ModuleServerClient,
+    ModuleStatusClient,
 )
 from opentrons.hardware_control.emulation.scripts import run_app
 from opentrons.hardware_control import API, ThreadManager
@@ -76,7 +76,7 @@ class GCodeEngine:
 
         # Entry point for process that waits for emulation to be ready.
         async def _wait_ready() -> None:
-            c = await ModuleServerClient.connect(
+            c = await ModuleStatusClient.connect(
                 host="localhost", port=self._config.module_server.port
             )
             await wait_emulators(client=c, modules=modules, timeout=5)
