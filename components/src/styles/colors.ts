@@ -21,6 +21,7 @@ export const COLOR_SUCCESS = '#60b120'
 export const C_DISABLED = '#9c9c9c'
 export const C_SELECTED_DARK = '#00c3e6'
 export const C_BG_SELECTED = '#f0f3ff'
+export const C_ERROR_LIGHT = '#ffc0c0'
 
 // overlays
 export const OVERLAY_WHITE_10 = 'rgba(255, 255, 255, 0.1)'
@@ -41,3 +42,12 @@ export const OPACITY_DISABLED = 0.3
 
 // TODO(isk: 3/2/20): Rename to be more generic (e.g. not FONT)
 export const C_FONT_DISABLED = '#9c9c9c'
+
+//  run details current step border color
+export const C_MINT = '#00bfa8'
+
+//  run details completed step background color
+export const C_AQUAMARINE = '#eefff8'
+
+//  run details running step background color
+export const C_POWDER_BLUE = '#f1f8ff'
