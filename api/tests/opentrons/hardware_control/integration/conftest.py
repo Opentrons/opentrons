@@ -4,7 +4,7 @@ import threading
 import pytest
 import asyncio
 
-from opentrons.hardware_control.emulation.module_server import ModuleServerClient
+from opentrons.hardware_control.emulation.module_server import ModuleStatusClient
 from opentrons.hardware_control.emulation.module_server.helpers import wait_emulators
 from opentrons.hardware_control.emulation.scripts import run_app
 from opentrons.hardware_control.emulation.types import ModuleType
@@ -35,7 +35,7 @@ def emulation_app(emulator_settings: Settings) -> Iterator[None]:
         asyncio.run(run_app.run(emulator_settings, modules=[m.value for m in modules]))
 
     async def _wait_ready() -> None:
-        c = await ModuleServerClient.connect(
+        c = await ModuleStatusClient.connect(
             host="localhost",
             port=emulator_settings.module_server.port,
             interval_seconds=1,

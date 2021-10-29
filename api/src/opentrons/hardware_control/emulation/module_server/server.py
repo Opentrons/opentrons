@@ -1,9 +1,10 @@
+"""Server notifying of module connections."""
 import asyncio
 import logging
 from typing import Dict, Set
 
 from opentrons.hardware_control.emulation.module_server.models import (
-    Connection,
+    ModuleConnection,
     Message,
 )
 from opentrons.hardware_control.emulation.proxy import ProxyListener
@@ -16,7 +17,11 @@ MessageDelimiter: Final = b"\n"
 
 
 class ModuleStatusServer(ProxyListener):
-    """Server notifying of module connections."""
+    """The module status server is the emulator equivalent of inotify. A client
+    can know when an emulated module connects or disconnects.
+
+    Clients connect and read JSON messages (See models module).
+    """
 
     def __init__(self, settings: ModuleServerSettings) -> None:
         """Constructor
@@ -25,7 +30,7 @@ class ModuleStatusServer(ProxyListener):
             settings: app settings
         """
         self._settings = settings
-        self._connections: Dict[str, Connection] = {}
+        self._connections: Dict[str, ModuleConnection] = {}
         self._clients: Set[asyncio.StreamWriter] = set()
 
     def on_server_connected(
@@ -42,7 +47,7 @@ class ModuleStatusServer(ProxyListener):
 
         """
         log.info(f"On connected {server_type} {client_uri} {identifier}")
-        connection = Connection(
+        connection = ModuleConnection(
             module_type=server_type, url=client_uri, identifier=identifier
         )
         self._connections[identifier] = connection
@@ -87,6 +92,7 @@ class ModuleStatusServer(ProxyListener):
         """Handle a client connection to the server."""
         log.info("Client connected to module server.")
 
+        # A client connected. Send a dump of all connected modules.
         m = Message(status="dump", connections=list(self._connections.values()))
 
         writer.write(m.json().encode())

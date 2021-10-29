@@ -11,7 +11,7 @@ class ModuleServerClientError(Exception):
     pass
 
 
-class ModuleServerClient:
+class ModuleStatusClient:
     """A module server client."""
 
     def __init__(
@@ -28,7 +28,7 @@ class ModuleServerClient:
         port: int,
         retries: int = 3,
         interval_seconds: float = 0.1,
-    ) -> ModuleServerClient:
+    ) -> ModuleStatusClient:
         """Connect to the module server.
 
         Args:
@@ -52,7 +52,7 @@ class ModuleServerClient:
                 await asyncio.sleep(interval_seconds)
 
         if r is not None and w is not None:
-            return ModuleServerClient(reader=r, writer=w)
+            return ModuleStatusClient(reader=r, writer=w)
         else:
             raise IOError(
                 f"Failed to connect to module_server at after {retries} retries."

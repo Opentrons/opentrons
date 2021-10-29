@@ -1,3 +1,4 @@
+"""The Proxy class module."""
 from __future__ import annotations
 import asyncio
 import logging
@@ -14,7 +15,7 @@ log = logging.getLogger(__name__)
 
 @dataclass(frozen=True)
 class Connection:
-    """A connection."""
+    """Attributes of a client connected on the server port (module emulator)."""
 
     identifier: str
     reader: asyncio.StreamReader
@@ -22,6 +23,9 @@ class Connection:
 
 
 class ProxyListener(ABC):
+    """Interface defining an object needing to know when a server (module emulator)
+    connected/disconnected."""
+
     @abstractmethod
     def on_server_connected(
         self, server_type: str, client_uri: str, identifier: str

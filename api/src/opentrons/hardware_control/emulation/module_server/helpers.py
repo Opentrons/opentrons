@@ -1,9 +1,11 @@
+"""Utililty methods and classes for interacting with the Module Status Server."""
+
 import asyncio
 from typing import Sequence, Set, Callable, List, Awaitable
 
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.hardware_control.emulation.module_server.client import (
-    ModuleServerClient,
+    ModuleStatusClient,
     ModuleServerClientError,
 )
 from opentrons.hardware_control.emulation.module_server.models import Message
@@ -20,7 +22,7 @@ async def listen_module_connection(callback: NotifyMethod) -> None:
     """Listen for module emulator connections."""
     settings = Settings()
     try:
-        client = await ModuleServerClient.connect(
+        client = await ModuleStatusClient.connect(
             host=settings.module_server.host,
             port=settings.module_server.port,
             interval_seconds=1.0,
@@ -34,7 +36,7 @@ async def listen_module_connection(callback: NotifyMethod) -> None:
 class ModuleListener:
     """Provide a callback for listening for new and removed module connections."""
 
-    def __init__(self, client: ModuleServerClient, notify_method: NotifyMethod) -> None:
+    def __init__(self, client: ModuleStatusClient, notify_method: NotifyMethod) -> None:
         """Constructor.
 
         Args:
@@ -88,7 +90,7 @@ class ModuleListener:
 
 
 async def wait_emulators(
-    client: ModuleServerClient,
+    client: ModuleStatusClient,
     modules: Sequence[ModuleType],
     timeout: float,
 ) -> None:
@@ -105,7 +107,7 @@ async def wait_emulators(
         asyncio.TimeoutError on timeout.
     """
 
-    async def _wait_modules(cl: ModuleServerClient, module_set: Set[str]) -> None:
+    async def _wait_modules(cl: ModuleStatusClient, module_set: Set[str]) -> None:
         """Read messages from module server waiting for modules in module_set to
         be connected."""
         while module_set:

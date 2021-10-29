@@ -5,7 +5,7 @@ from mock import AsyncMock
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.hardware_control.emulation.module_server import (
     helpers,
-    ModuleServerClient,
+    ModuleStatusClient,
 )
 from opentrons.hardware_control.emulation.module_server import models
 from opentrons.hardware_control.modules import ModuleAtPort
@@ -20,7 +20,7 @@ def mock_callback() -> AsyncMock:
 @pytest.fixture
 def mock_client() -> AsyncMock:
     """Mock client."""
-    return AsyncMock(spec=ModuleServerClient)
+    return AsyncMock(spec=ModuleStatusClient)
 
 
 @pytest.fixture
@@ -30,10 +30,10 @@ def subject(mock_callback: AsyncMock, mock_client: AsyncMock) -> helpers.ModuleL
 
 
 @pytest.fixture
-def connections() -> List[models.Connection]:
+def connections() -> List[models.ModuleConnection]:
     """Connection models."""
     return [
-        models.Connection(
+        models.ModuleConnection(
             url=f"url{i}", module_type=f"module_type{i}", identifier=f"identifier{i}"
         )
         for i in range(5)
@@ -65,7 +65,7 @@ async def test_handle_message_connected_empty(
 async def test_handle_message_connected_one(
     subject: helpers.ModuleListener,
     mock_callback: AsyncMock,
-    connections: List[models.Connection],
+    connections: List[models.ModuleConnection],
     modules_at_port: List[ModuleAtPort],
 ) -> None:
     """It should call the call back with the correct modules to add."""
@@ -77,7 +77,7 @@ async def test_handle_message_connected_one(
 async def test_handle_message_connected_many(
     subject: helpers.ModuleListener,
     mock_callback: AsyncMock,
-    connections: List[models.Connection],
+    connections: List[models.ModuleConnection],
     modules_at_port: List[ModuleAtPort],
 ) -> None:
     """It should call the call back with the correct modules to add."""
@@ -98,7 +98,7 @@ async def test_handle_message_disconnected_empty(
 async def test_handle_message_disconnected_one(
     subject: helpers.ModuleListener,
     mock_callback: AsyncMock,
-    connections: List[models.Connection],
+    connections: List[models.ModuleConnection],
     modules_at_port: List[ModuleAtPort],
 ) -> None:
     """It should call the call back with the correct modules to remove."""
@@ -110,7 +110,7 @@ async def test_handle_message_disconnected_one(
 async def test_handle_message_disconnected_many(
     subject: helpers.ModuleListener,
     mock_callback: AsyncMock,
-    connections: List[models.Connection],
+    connections: List[models.ModuleConnection],
     modules_at_port: List[ModuleAtPort],
 ) -> None:
     """It should call the call back with the correct modules to remove."""
@@ -131,7 +131,7 @@ async def test_handle_message_dump_empty(
 async def test_handle_message_dump_one(
     subject: helpers.ModuleListener,
     mock_callback: AsyncMock,
-    connections: List[models.Connection],
+    connections: List[models.ModuleConnection],
     modules_at_port: List[ModuleAtPort],
 ) -> None:
     """It should call the call back with the correct modules to load."""
@@ -143,7 +143,7 @@ async def test_handle_message_dump_one(
 async def test_handle_message_dump_many(
     subject: helpers.ModuleListener,
     mock_callback: AsyncMock,
-    connections: List[models.Connection],
+    connections: List[models.ModuleConnection],
     modules_at_port: List[ModuleAtPort],
 ) -> None:
     """It should call the call back with the correct modules to load."""
