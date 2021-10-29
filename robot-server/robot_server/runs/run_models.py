@@ -35,6 +35,8 @@ class AbstractRun(ResourceModel):
     """Base run resource model."""
 
     id: str = Field(..., description="Unique run identifier.")
+    # TODO(mm, 2021-10-28): runType is redundant with createParams.runType.
+    # Deprecate one or the other.
     runType: RunType = Field(..., description="Specific run type.")
     createdAt: datetime = Field(..., description="When the run was created")
     status: RunStatus = Field(..., description="Execution status of the run")
