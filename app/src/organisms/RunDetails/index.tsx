@@ -13,10 +13,20 @@ import {
   SPACING_2,
   SPACING_3,
   useConditionalConfirm,
+  TEXT_TRANSFORM_UPPERCASE,
+  FONT_SIZE_CAPTION,
+  SPACING_1,
+  Icon,
+  JUSTIFY_SPACE_BETWEEN,
+  Btn,
+  DIRECTION_ROW,
+  SIZE_1,
+  C_MED_DARK_GRAY,
 } from '@opentrons/components'
 import { Page } from '../../atoms/Page'
-import { useProtocolDetails } from './hooks'
 import { ConfirmCancelModal } from '../../pages/Run/RunLog'
+import { useProtocolDetails } from './hooks'
+import { ProtocolSetupInfo } from './ProtocolSetupInfo'
 
 export function RunDetails(): JSX.Element | null {
   const { t } = useTranslation('run_details')
@@ -26,6 +36,10 @@ export function RunDetails(): JSX.Element | null {
     confirm: confirmExit,
     cancel: cancelExit,
   } = useConditionalConfirm(() => {}, true)
+  const [
+    showProtocolSetupInfo,
+    setShowProtocolSetupInfo,
+  ] = React.useState<boolean>(false)
   if (protocolData == null) return null
 
   const cancelRunButton = (
@@ -40,7 +54,7 @@ export function RunDetails(): JSX.Element | null {
       paddingRight={SPACING_2}
       paddingLeft={SPACING_2}
     >
-      Cancel Run
+      {t('cancel_run')}
     </PrimaryBtn>
   )
 
@@ -52,6 +66,39 @@ export function RunDetails(): JSX.Element | null {
   return (
     <Page titleBarProps={titleBarProps}>
       {showConfirmExit ? <ConfirmCancelModal onClose={cancelExit} /> : null}
+      <Flex
+        margin={SPACING_1}
+        backgroundColor={'#FAFAFA'} //  TODO: immediately use C_AQUAMARINE from colors.ts after rebasing!
+      >
+        {showProtocolSetupInfo ? (
+          <ProtocolSetupInfo
+            onCloseClick={() => setShowProtocolSetupInfo(false)}
+          />
+        ) : (
+          <Btn
+            width={'100%'}
+            role={'link'}
+            onClick={() => setShowProtocolSetupInfo(true)}
+            margin={SPACING_1}
+          >
+            <Flex
+              fontSize={FONT_SIZE_CAPTION}
+              flexDirection={DIRECTION_ROW}
+              justifyContent={JUSTIFY_SPACE_BETWEEN}
+              textTransform={TEXT_TRANSFORM_UPPERCASE}
+            >
+              <Flex>{t('protocol_setup')}</Flex>
+              <Flex>
+                <Icon
+                  name={'chevron-left'}
+                  width={SIZE_1}
+                  color={C_MED_DARK_GRAY}
+                />
+              </Flex>
+            </Flex>
+          </Btn>
+        )}
+      </Flex>
       <Flex flexDirection={DIRECTION_COLUMN}>
         {'commands' in protocolData
           ? protocolData.commands.map((command, index) => (

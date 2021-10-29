@@ -28,5 +28,11 @@
   "current_step_pause_timer": "Timer",
   "user_paused_protocol": "User paused protocol",
   "run_canceled": "Run canceled",
-  "step_failed": "Step failed"
+  "step_failed": "Step failed",
+  "protocol_setup": "Protocol Setup",
+  "cancel_run": "Cancel Run",
+  "load_pipette_protocol_setup": "Load {{pipette_name}} in {{mount_name}} Mount",
+  "load_modules_protocol_setup": "Load {{module}} in Slot {{slot_name}}",
+  "load_labware_info_protocol_setup": "Load {{labware_namespace}} {{labware_loadname}} {{labware_version}} in {{slot_number}}",
+  "labware_slot_protocol_setup": "in {{slot_number}}"
 }
