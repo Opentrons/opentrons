@@ -2,7 +2,7 @@
 from enum import Enum
 from datetime import datetime
 from pydantic import BaseModel, Field
-from typing import List, Optional, Union
+from typing import List, Union
 from typing_extensions import Literal
 
 from opentrons.protocol_engine import (
@@ -87,7 +87,7 @@ class LabwareOffset(BaseModel):
 class BasicRunCreateParams(BaseModel):
     """Creation parameters for a basic run."""
 
-    pass
+    labwareOffsets: List[LabwareOffset] = Field(default_factory=list)
 
 
 class BasicRunCreateData(BaseModel):
@@ -109,6 +109,8 @@ class BasicRun(AbstractRun):
 
     runType: Literal[RunType.BASIC] = RunType.BASIC
 
+    createParams: BasicRunCreateParams
+
 
 class ProtocolRunCreateParams(BaseModel):
     """Creation parameters for a protocol run."""
@@ -117,6 +119,8 @@ class ProtocolRunCreateParams(BaseModel):
         ...,
         description="Unique identifier of the protocol this run will execute.",
     )
+
+    labwareOffsets: List[LabwareOffset] = Field(default_factory=list)
 
 
 class ProtocolRunCreateData(BaseModel):
