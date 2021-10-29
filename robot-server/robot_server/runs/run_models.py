@@ -23,19 +23,6 @@ class RunType(str, Enum):
     PROTOCOL = "protocol"
 
 
-class AbstractRunCreateData(BaseModel):
-    """Request data sent when creating a run."""
-
-    runType: RunType = Field(
-        ...,
-        description="The run type to create.",
-    )
-    createParams: Optional[BaseModel] = Field(
-        None,
-        description="Parameters to set run behaviors at creation time.",
-    )
-
-
 class RunCommandSummary(ResourceModel):
     """A stripped down model of a full Command for usage in a Run response."""
 
@@ -74,10 +61,23 @@ class AbstractRun(ResourceModel):
     )
 
 
-class BasicRunCreateData(AbstractRunCreateData):
+class BasicRunCreateParams(BaseModel):
+    """Creation parameters for a basic run."""
+
+    pass
+
+
+class BasicRunCreateData(BaseModel):
     """Creation request data for a basic run."""
 
-    runType: Literal[RunType.BASIC] = RunType.BASIC
+    runType: Literal[RunType.BASIC] = Field(
+        RunType.BASIC,
+        description="The run type to create.",
+    )
+    createParams: BasicRunCreateParams = Field(
+        default_factory=BasicRunCreateParams,
+        description="Parameters to set run behaviors at creation time.",
+    )
 
 
 class BasicRun(AbstractRun):
@@ -95,11 +95,17 @@ class ProtocolRunCreateParams(BaseModel):
     )
 
 
-class ProtocolRunCreateData(AbstractRunCreateData):
+class ProtocolRunCreateData(BaseModel):
     """Creation request data for a protocol run."""
 
-    runType: Literal[RunType.PROTOCOL] = RunType.PROTOCOL
-    createParams: ProtocolRunCreateParams
+    runType: Literal[RunType.PROTOCOL] = Field(
+        RunType.PROTOCOL,
+        description="The run type to create.",
+    )
+    createParams: ProtocolRunCreateParams = Field(
+        ...,
+        description="Parameters to set run behaviors at creation time.",
+    )
 
 
 class ProtocolRun(AbstractRun):
