@@ -32,7 +32,7 @@ class RunCommandSummary(ResourceModel):
     status: CommandStatus = Field(..., description="Execution status of the command.")
 
 
-class AbstractRun(ResourceModel):
+class _AbstractRun(ResourceModel):
     """Base run resource model."""
 
     id: str = Field(..., description="Unique run identifier.")
@@ -102,7 +102,7 @@ class BasicRunCreateData(BaseModel):
     )
 
 
-class BasicRun(AbstractRun):
+class BasicRun(_AbstractRun):
     """A run to execute commands without a previously loaded protocol file."""
 
     runType: Literal[RunType.BASIC] = RunType.BASIC
@@ -135,7 +135,7 @@ class ProtocolRunCreateData(BaseModel):
     )
 
 
-class ProtocolRun(AbstractRun):
+class ProtocolRun(_AbstractRun):
     """A run to execute commands with a previously loaded protocol file."""
 
     runType: Literal[RunType.PROTOCOL] = RunType.PROTOCOL
