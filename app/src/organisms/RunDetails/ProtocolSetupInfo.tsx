@@ -1,29 +1,25 @@
 import * as React from 'react'
+import { Trans, useTranslation } from 'react-i18next'
 import {
   Btn,
   C_MED_DARK_GRAY,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  FONT_BODY_1_LIGHT,
   FONT_SIZE_BODY_1,
-  FONT_SIZE_BODY_2,
   FONT_SIZE_CAPTION,
-  FONT_WEIGHT_LIGHT,
-  FONT_WEIGHT_REGULAR,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  Mount,
   SIZE_1,
-  SIZE_2,
   SPACING_1,
-  SPACING_3,
   Text,
   TEXT_TRANSFORM_CAPITALIZE,
   TEXT_TRANSFORM_UPPERCASE,
 } from '@opentrons/components'
-import { useTranslation } from 'react-i18next'
+import { getModuleDisplayName } from '@opentrons/shared-data'
+
 import { useProtocolDetails } from './hooks'
+import { useModuleRenderInfoById } from '../ProtocolSetup/hooks'
 
 interface ProtocolSetupInfoProps {
   onCloseClick: () => unknown
@@ -60,47 +56,82 @@ export const ProtocolSetupInfo = (
         </Btn>
       </Flex>
       {pipetteInfo.map(({ mount, name }, index) => (
-        <Text key={index} marginTop={SPACING_1} marginBottom={SPACING_1}>
-          {t('load_pipette_protocol_setup', {
-            pipette_name: name,
-            mount_name: mount,
-          })}
-        </Text>
+        <Flex
+          flexDirection={DIRECTION_ROW}
+          marginTop={SPACING_1}
+          marginBottom={SPACING_1}
+        >
+          <Trans
+            t={t}
+            key={index}
+            i18nKey={'load_pipette_protocol_setup'}
+            values={{ pipette_name: name, mount_name: mount }}
+            components={{
+              span: (
+                <Text
+                  textTransform={TEXT_TRANSFORM_CAPITALIZE}
+                  marginLeft={SPACING_1}
+                  marginRight={SPACING_1}
+                />
+              ),
+            }}
+          />
+        </Flex>
       ))}
+
       {moduleInfo != null &&
         moduleInfo.map(({ slot, model }, index) => (
           <Text key={index} marginTop={SPACING_1} marginBottom={SPACING_1}>
             {t('load_modules_protocol_setup', {
-              module: model,
+              module: getModuleDisplayName(model),
               slot_name: slot,
             })}
           </Text>
         ))}
+
       {labwareInfo != null &&
         labwareInfo.map(({ namespace, metadata, version }, index) => {
           const displayName = metadata.displayName
-          //   labwareSlot != null &&
-          //     labwareSlot.map(({ slot }, index) => {
           return (
-            <Text key={index} marginTop={SPACING_1} marginBottom={SPACING_1}>
-              {t('load_labware_info_protocol_setup', {
-                labware_namespace: namespace,
-                labware_loadname: displayName,
-                labware_version: version,
-                // slot_number: slot,
-              })}
-            </Text>
+            <Flex
+              flexDirection={DIRECTION_ROW}
+              marginTop={SPACING_1}
+              marginBottom={SPACING_1}
+            >
+              <Trans
+                t={t}
+                key={index}
+                i18nKey={'load_labware_info_protocol_setup'}
+                values={{
+                  labware_namespace: namespace,
+                  labware_loadname: displayName,
+                  labware_version: version,
+                }}
+                components={{
+                  span: (
+                    <Text
+                      textTransform={TEXT_TRANSFORM_CAPITALIZE}
+                      marginLeft={SPACING_1}
+                      marginRight={SPACING_1}
+                    />
+                  ),
+                }}
+              />
+            </Flex>
           )
           // })
         })}
-      {/* {labwareSlot != null &&
-        labwareSlot.map(({ slot }, index) => (
-          <Text key={index}>
-            {t('labware_slot_protocol_setup', {
-              slot_number: slot,
-            })}
-          </Text>
-        ))} */}
+
+      {/* <Flex>
+        {labwareSlot != null &&
+          labwareSlot.map(({ slot }, index) => (
+            <Text key={index}>
+              {t('labware_slot_protocol_setup', {
+                slot_number: slot,
+              })}
+            </Text>
+          ))}
+      </Flex> */}
     </Flex>
   )
 }

@@ -31,8 +31,8 @@
   "step_failed": "Step failed",
   "protocol_setup": "Protocol Setup",
   "cancel_run": "Cancel Run",
-  "load_pipette_protocol_setup": "Load {{pipette_name}} in {{mount_name}} Mount",
+  "load_pipette_protocol_setup": "Load {{pipette_name}} in <span>{{mount_name}}</span> Mount",
   "load_modules_protocol_setup": "Load {{module}} in Slot {{slot_name}}",
-  "load_labware_info_protocol_setup": "Load {{labware_namespace}} {{labware_loadname}} {{labware_version}} in {{slot_number}}",
+  "load_labware_info_protocol_setup": "Load <span>{{labware_namespace}}</span> {{labware_loadname}} v{{labware_version}} in Slot {{slot_number}}",
   "labware_slot_protocol_setup": "in {{slot_number}}"
 }
