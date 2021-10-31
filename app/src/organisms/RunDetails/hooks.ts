@@ -6,13 +6,13 @@ import type { State } from '../../redux/types'
 
 interface ProtocolDetails {
   displayName: string | null
-  protocolData: ProtocolFile<{}> | null // TODO: IMMEDIATELY update to ProtocolFileV6 once schema is complete
+  protocolData: ProtocolFile<{}> | null
 }
 
 export function useProtocolDetails(): ProtocolDetails {
   const protocolData = useSelector((state: State) =>
     getProtocolData(state)
-  ) as ProtocolFile<{}>| null
+  ) as ProtocolFile<{}> | null
   const displayName = useSelector((state: State) => getProtocolName(state))
   return { displayName, protocolData }
 }
