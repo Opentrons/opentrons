@@ -1,104 +1,125 @@
 export type ModuleCommand =
-  | {
-      commandType: 'magneticModule/engageMagnet'
-      params: EngageMagnetParams
-      result?: {}
-    }
-  | {
-      commandType: 'magneticModule/disengageMagnet'
-      params: ModuleOnlyParams
-      result?: {}
-    }
-  | {
-      commandType: 'temperatureModule/setTargetTemperature'
-      params: TemperatureParams
-      result?: {}
-    }
-  | {
-      commandType: 'temperatureModule/deactivate'
-      params: ModuleOnlyParams
-      result?: {}
-    }
-  | {
-      commandType: 'temperatureModule/awaitTemperature'
-      params: TemperatureParams
-      result?: {}
-    }
-  | {
-      commandType: 'thermocycler/setTargetBlockTemperature'
-      params: ThermocyclerSetTargetBlockTemperatureParams
-      result?: {}
-    }
-  | {
-      commandType: 'thermocycler/setTargetLidTemperature'
-      params: TemperatureParams
-      result?: {}
-    }
-  | {
-      commandType: 'thermocycler/awaitBlockTemperature'
-      params: TemperatureParams
-      result?: {}
-    }
-  | {
-      commandType: 'thermocycler/awaitLidTemperature'
-      params: TemperatureParams
-      result?: {}
-    }
-  | {
-      commandType: 'thermocycler/openLid'
-      params: ModuleOnlyParams
-      result?: {}
-    }
-  | {
-      commandType: 'thermocycler/closeLid'
-      params: ModuleOnlyParams
-      result?: {}
-    }
-  | {
-      commandType: 'thermocycler/deactivateBlock'
-      params: ModuleOnlyParams
-      result?: {}
-    }
-  | {
-      commandType: 'thermocycler/deactivateLid'
-      params: ModuleOnlyParams
-      result?: {}
-    }
-  | {
-      commandType: 'thermocycler/runProfile'
-      params: TCProfileParams
-      result?: {}
-    }
-  | {
-      commandType: 'thermocycler/awaitProfileComplete'
-      params: ModuleOnlyParams
-      result?: {}
-    }
-  | {
-      commandType: 'heaterShaker/setTargetTemperature'
-      params: TemperatureParams
-      result?: {}
-    }
-  | {
-      commandType: 'heaterShaker/awaitTemperature'
-      params: TemperatureParams
-      result?: {}
-    }
-  | {
-      commandType: 'heaterShaker/setTargetShakeSpeed'
-      params: ShakeSpeedParams
-      result?: {}
-    }
-  | {
-      commandType: 'heaterShaker/awaitShakeSpeed'
-      params: ShakeSpeedParams
-      result?: {}
-    }
-  | {
-      commandType: 'heaterShaker/deactivateHeater'
-      params: ModuleOnlyParams
-      result?: {}
-    }
+  | MagneticModuleEngageMagnetCommand
+  | MagneticModuleDisengageMagnetCommand
+  | TemperatureModuleSetTargetTemperatureCommand
+  | TemperatureModuleDeactivateCommand
+  | TemperatureModuleAwaitTemperatureCommand
+  | TCSetTargetBlockTemperatureCommand
+  | TCSetTargetLidTemperatureCommand
+  | TCAwaitBlockTemperatureCommand
+  | TCAwaitLidTemperatureCommand
+  | TCOpenLidCommand
+  | TCCloseLidCommand
+  | TCDeactivateBlockCommand
+  | TCDeactivateLidCommand
+  | TCRunProfileCommand
+  | TCAwaitProfileCompleteCommand
+  | HeaterShakerSetTargetTemperatureCommand
+  | HeaterShakerAwaitTemperatureCommand
+  | HeaterShakerSetTargetShakeSpeedCommand
+  | HeaterShakerAwaitShakeSpeedCommand
+  | HeaterShakerDeactivateHeaterCommand
+
+export interface MagneticModuleEngageMagnetCommand {
+  commandType: 'magneticModule/engageMagnet'
+  params: EngageMagnetParams
+  result?: {}
+}
+export interface MagneticModuleDisengageMagnetCommand {
+  commandType: 'magneticModule/disengageMagnet'
+  params: ModuleOnlyParams
+  result?: {}
+}
+export interface TemperatureModuleSetTargetTemperatureCommand {
+  commandType: 'temperatureModule/setTargetTemperature'
+  params: TemperatureParams
+  result?: {}
+}
+export interface TemperatureModuleDeactivateCommand {
+  commandType: 'temperatureModule/deactivate'
+  params: ModuleOnlyParams
+  result?: {}
+}
+export interface TemperatureModuleAwaitTemperatureCommand {
+  commandType: 'temperatureModule/awaitTemperature'
+  params: TemperatureParams
+  result?: {}
+}
+export interface TCSetTargetBlockTemperatureCommand {
+  commandType: 'thermocycler/setTargetBlockTemperature'
+  params: ThermocyclerSetTargetBlockTemperatureParams
+  result?: {}
+}
+export interface TCSetTargetLidTemperatureCommand {
+  commandType: 'thermocycler/setTargetLidTemperature'
+  params: TemperatureParams
+  result?: {}
+}
+export interface TCAwaitBlockTemperatureCommand {
+  commandType: 'thermocycler/awaitBlockTemperature'
+  params: TemperatureParams
+  result?: {}
+}
+export interface TCAwaitLidTemperatureCommand {
+  commandType: 'thermocycler/awaitLidTemperature'
+  params: TemperatureParams
+  result?: {}
+}
+export interface TCOpenLidCommand {
+  commandType: 'thermocycler/openLid'
+  params: ModuleOnlyParams
+  result?: {}
+}
+export interface TCCloseLidCommand {
+  commandType: 'thermocycler/closeLid'
+  params: ModuleOnlyParams
+  result?: {}
+}
+export interface TCDeactivateBlockCommand {
+  commandType: 'thermocycler/deactivateBlock'
+  params: ModuleOnlyParams
+  result?: {}
+}
+export interface TCDeactivateLidCommand {
+  commandType: 'thermocycler/deactivateLid'
+  params: ModuleOnlyParams
+  result?: {}
+}
+export interface TCRunProfileCommand {
+  commandType: 'thermocycler/runProfile'
+  params: TCProfileParams
+  result?: {}
+}
+export interface TCAwaitProfileCompleteCommand {
+  commandType: 'thermocycler/awaitProfileComplete'
+  params: ModuleOnlyParams
+  result?: {}
+}
+export interface HeaterShakerSetTargetTemperatureCommand {
+  commandType: 'heaterShaker/setTargetTemperature'
+  params: TemperatureParams
+  result?: {}
+}
+export interface HeaterShakerAwaitTemperatureCommand {
+  commandType: 'heaterShaker/awaitTemperature'
+  params: TemperatureParams
+  result?: {}
+}
+export interface HeaterShakerSetTargetShakeSpeedCommand {
+  commandType: 'heaterShaker/setTargetShakeSpeed'
+  params: ShakeSpeedParams
+  result?: {}
+}
+export interface HeaterShakerAwaitShakeSpeedCommand {
+  commandType: 'heaterShaker/awaitShakeSpeed'
+  params: ShakeSpeedParams
+  result?: {}
+}
+export interface HeaterShakerDeactivateHeaterCommand {
+  commandType: 'heaterShaker/deactivateHeater'
+  params: ModuleOnlyParams
+  result?: {}
+}
 
 export interface EngageMagnetParams {
   moduleId: string

@@ -6,7 +6,7 @@ import type { Commands } from '..'
 
 export function getCommands(
   config: HostConfig,
-  sessionId: string
+  runId: string
 ): ResponsePromise<Commands> {
-  return request<Commands>(GET, `/sessions/${sessionId}/commands`, null, config)
+  return request<Commands>(GET, `/runs/${runId}/commands`, null, config)
 }

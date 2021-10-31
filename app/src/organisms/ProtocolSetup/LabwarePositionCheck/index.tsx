@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  AlertItem,
   AlertModal,
   Box,
   ModalPage,
@@ -30,7 +29,21 @@ export const LabwarePositionCheck = (
   const [currentLabwareCheckStep, setCurrentLabwareCheckStep] = React.useState<
     number | null
   >(null)
-  const labwarePositionCheckUtils = useLabwarePositionCheck(() => null)
+  const [savePositionCommandData, setSavePositionCommandData] = React.useState<{
+    [labwareId: string]: string[]
+  }>({})
+  
+  // at the end of LPC, each labwareId will have 2 associated save position command ids which will be used to calculate the labware offsets 
+  const addSavePositionCommandData = (
+    commandId: string,
+    labwareId: string
+  ): void => {
+    setSavePositionCommandData({
+      ...savePositionCommandData,
+      [labwareId]: [...savePositionCommandData[labwareId], commandId],
+    })
+  }
+  const labwarePositionCheckUtils = useLabwarePositionCheck(addSavePositionCommandData)
 
   if ('error' in labwarePositionCheckUtils) {
     const { error } = labwarePositionCheckUtils
@@ -56,7 +69,7 @@ export const LabwarePositionCheck = (
     )
   }
 
-  const { proceed, ctaText, isLoading } = labwarePositionCheckUtils
+  const { beginLPC, proceed, ctaText } = labwarePositionCheckUtils
 
   return (
     <Portal level="top">
@@ -81,7 +94,7 @@ export const LabwarePositionCheck = (
             proceed={proceed}
           />
         ) : (
-          <IntroScreen proceed={proceed} />
+          <IntroScreen beginLPC={beginLPC} />
         )}
       </ModalPage>
     </Portal>

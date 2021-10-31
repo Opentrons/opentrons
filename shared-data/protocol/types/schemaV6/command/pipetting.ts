@@ -1,44 +1,53 @@
 export type PipettingCommand =
-  | {
-      commandType: 'aspirate'
-      params: AspDispAirgapParams
-      result?: BasicLiquidHandlingResult
-    }
-  | {
-      commandType: 'dispense'
-      params: AspDispAirgapParams
-      result?: BasicLiquidHandlingResult
-    }
-  | {
-      commandType: 'aspirateAirGap'
-      params: AspDispAirgapParams
-      result?: BasicLiquidHandlingResult
-    }
-  | {
-      commandType: 'dispenseAirGap'
-      params: AspDispAirgapParams
-      result?: BasicLiquidHandlingResult
-    }
-  | {
-      commandType: 'blowout'
-      params: BlowoutParams
-      result?: BasicLiquidHandlingResult
-    }
-  | {
-      commandType: 'touchTip'
-      params: TouchTipParams
-      result?: BasicLiquidHandlingResult
-    }
-  | {
-      commandType: 'pickUpTip'
-      params: PipetteAccessParams
-      result?: {}
-    }
-  | {
-      commandType: 'dropTip'
-      params: PipetteAccessParams
-      result?: {}
-    }
+  | AspirateCommand
+  | DispenseCommand
+  | AspirateAirGapCommand
+  | DispenseAirGapCommand
+  | BlowoutCommand
+  | TouchTipCommand
+  | PickUpTipCommand
+  | DropTipCommand
+
+export interface AspirateCommand {
+  commandType: 'aspirate'
+  params: AspDispAirgapParams
+  result?: BasicLiquidHandlingResult
+}
+export interface DispenseCommand {
+  commandType: 'dispense'
+  params: AspDispAirgapParams
+  result?: BasicLiquidHandlingResult
+}
+export interface AspirateAirGapCommand {
+  commandType: 'aspirateAirGap'
+  params: AspDispAirgapParams
+  result?: BasicLiquidHandlingResult
+}
+export interface DispenseAirGapCommand {
+  commandType: 'dispenseAirGap'
+  params: AspDispAirgapParams
+  result?: BasicLiquidHandlingResult
+}
+export interface BlowoutCommand {
+  commandType: 'blowout'
+  params: BlowoutParams
+  result?: BasicLiquidHandlingResult
+}
+export interface TouchTipCommand {
+  commandType: 'touchTip'
+  params: TouchTipParams
+  result?: BasicLiquidHandlingResult
+}
+export interface PickUpTipCommand {
+  commandType: 'pickUpTip'
+  params: PipetteAccessParams
+  result?: {}
+}
+export interface DropTipCommand {
+  commandType: 'dropTip'
+  params: PipetteAccessParams
+  result?: {}
+}
 
 type AspDispAirgapParams = FlowRateParams &
   PipetteAccessParams &

@@ -14,7 +14,7 @@ export function useAllCommandsQuery(
         .catch((e: Error) => {
           throw e
         }),
-    { enabled: host !== null && sessionId != null }
+    { enabled: host !== null && sessionId != null, refetchInterval: 1000 }
   )
 
   return query

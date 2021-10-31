@@ -1,13 +1,34 @@
+export interface MoveToSlotCommand {
+  commandType: 'moveToSlot'
+  params: MoveToSlotParams
+  result?: {}
+}
+export interface MoveToWellCommand {
+  commandType: 'moveToWell'
+  params: MoveToWellParams
+  result?: {}
+}
+export interface MoveToCoordinatesCommand {
+  commandType: 'moveToCoordinates'
+  params: MoveToCoordinatesParams
+  result?: {}
+}
+export interface MoveRelativeCommand {
+  commandType: 'moveRelative'
+  params: MoveRelativeParams
+  result?: {}
+}
+export interface SavePositionCommand {
+  commandType: 'savePosition'
+  params: SavePositionParams
+  result?: {}
+}
 export type GantryCommand =
-  | { commandType: 'moveToSlot'; params: MoveToSlotParams; result?: {} }
-  | { commandType: 'moveToWell'; params: MoveToWellParams; result?: {} }
-  | {
-      commandType: 'moveToCoordinates'
-      params: MoveToCoordinatesParams
-      result?: {}
-    }
-  | { commandType: 'moveRelative'; params: MoveRelativeParams; result?: {} }
-  | { commandType: 'savePosition'; params: SavePositionParams; result?: {} }
+  | MoveToSlotCommand
+  | MoveToWellCommand
+  | MoveToCoordinatesCommand
+  | MoveRelativeCommand
+  | SavePositionCommand
 
 interface MoveToSlotParams {
   pipetteId: string

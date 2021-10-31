@@ -11,12 +11,12 @@ export interface CreateCommandData {
 
 export function createCommand(
   config: HostConfig,
-  sessionId: string,
+  runId: string,
   data: CreateCommandData
 ): ResponsePromise<Session> {
   return request<Session, { data: CreateCommandData }>(
     POST,
-    `/sessions/${sessionId}/commands`,
+    `/runs/${runId}/commands`,
     { data },
     config
   )
