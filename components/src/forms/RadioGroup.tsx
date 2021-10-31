@@ -3,7 +3,6 @@ import cx from 'classnames'
 import { Icon } from '../icons'
 
 import styles from './forms.css'
-import { C_BLUE } from '../styles'
 
 export interface RadioOption {
   name: string
