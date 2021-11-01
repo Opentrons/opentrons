@@ -1,4 +1,5 @@
 """Union types of concrete command definitions."""
+
 from typing import Union
 
 from .add_labware_definition import (
@@ -19,6 +20,13 @@ from .load_labware import (
     LoadLabwareRequest,
     LoadLabwareResult,
     LoadLabwareCommandType,
+)
+
+from .load_module import (
+    LoadModule,
+    LoadModuleRequest,
+    LoadModuleResult,
+    LoadModuleCommandType,
 )
 
 from .load_pipette import (
@@ -61,6 +69,7 @@ Command = Union[
     Dispense,
     DropTip,
     LoadLabware,
+    LoadModule,
     LoadPipette,
     MoveToWell,
     PickUpTip,
@@ -74,6 +83,7 @@ CommandType = Union[
     DispenseCommandType,
     DropTipCommandType,
     LoadLabwareCommandType,
+    LoadModuleCommandType,
     LoadPipetteCommandType,
     MoveToWellCommandType,
     PickUpTipCommandType,
@@ -87,6 +97,7 @@ CommandRequest = Union[
     DispenseRequest,
     DropTipRequest,
     LoadLabwareRequest,
+    LoadModuleRequest,
     LoadPipetteRequest,
     MoveToWellRequest,
     PickUpTipRequest,
@@ -99,6 +110,7 @@ CommandResult = Union[
     DispenseResult,
     DropTipResult,
     LoadLabwareResult,
+    LoadModuleResult,
     LoadPipetteResult,
     MoveToWellResult,
     PickUpTipResult,

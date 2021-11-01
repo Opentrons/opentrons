@@ -27,7 +27,7 @@ class DeckSlotLocation(BaseModel):
 
 
 LabwareLocation = Union[DeckSlotLocation]
-"""Union of all legal labware locations."""
+"""Union of all locations where it's legal to load a labware."""
 
 
 class WellOrigin(str, Enum):
