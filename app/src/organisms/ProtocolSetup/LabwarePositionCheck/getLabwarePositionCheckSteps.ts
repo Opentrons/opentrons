@@ -21,7 +21,7 @@ export const getLabwarePositionCheckSteps = (
     const modules: ProtocolFile<{}>['modules'] = protocolData.modules
     const labwareDefinitions = protocolData.labwareDefinitions
     const commands: Command[] = protocolData.commands
-    const primaryPipetteId = getPrimaryPipetteId(pipettesById)
+    const primaryPipetteId = getPrimaryPipetteId(pipettesById, commands)
     const pipetteWorkflow = getPipetteWorkflow({
       pipetteNames,
       primaryPipetteId,

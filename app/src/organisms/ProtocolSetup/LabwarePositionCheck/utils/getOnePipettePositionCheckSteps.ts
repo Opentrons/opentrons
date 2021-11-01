@@ -1,4 +1,4 @@
-import { JsonProtocolFile, LabwareDefinition2 } from '@opentrons/shared-data'
+import { ProtocolFile, LabwareDefinition2 } from '@opentrons/shared-data'
 import { SECTIONS } from '../constants'
 import { getLabwareIdsInOrder, getTiprackIdsInOrder } from './labware'
 import {
@@ -12,7 +12,7 @@ import type { LabwarePositionCheckStep } from '../types'
 
 export const getOnePipettePositionCheckSteps = (args: {
   primaryPipetteId: string
-  labware: JsonProtocolFile['labware']
+  labware: ProtocolFile<{}>['labware']
   labwareDefinitions: Record<string, LabwareDefinition2>
   modules: Record<string, FileModule>
 }): LabwarePositionCheckStep[] => {

@@ -38,7 +38,7 @@ interface ModuleLocation {
 }
 interface LoadPipetteParams {
   pipetteId: string
-  mount: string | null
+  mount: 'left' | 'right'
 }
 
 interface LoadPipetteResult {
