@@ -2,13 +2,14 @@
 from enum import Enum
 from datetime import datetime
 from pydantic import BaseModel, Field
-from typing import List, Optional, Union
+from typing import List, Union
 from typing_extensions import Literal
 
 from opentrons.protocol_engine import (
     CommandStatus,
     CommandType,
     EngineStatus as RunStatus,
+    LabwareLocation,
     LoadedPipette,
     LoadedLabware,
 )
@@ -23,19 +24,6 @@ class RunType(str, Enum):
     PROTOCOL = "protocol"
 
 
-class AbstractRunCreateData(BaseModel):
-    """Request data sent when creating a run."""
-
-    runType: RunType = Field(
-        ...,
-        description="The run type to create.",
-    )
-    createParams: Optional[BaseModel] = Field(
-        None,
-        description="Parameters to set run behaviors at creation time.",
-    )
-
-
 class RunCommandSummary(ResourceModel):
     """A stripped down model of a full Command for usage in a Run response."""
 
@@ -44,18 +32,13 @@ class RunCommandSummary(ResourceModel):
     status: CommandStatus = Field(..., description="Execution status of the command.")
 
 
-class AbstractRun(ResourceModel):
+class _AbstractRun(ResourceModel):
     """Base run resource model."""
 
     id: str = Field(..., description="Unique run identifier.")
     runType: RunType = Field(..., description="Specific run type.")
     createdAt: datetime = Field(..., description="When the run was created")
     status: RunStatus = Field(..., description="Execution status of the run")
-    # TODO(mc, 2021-05-25): how hard would it be to rename this field to `config`?
-    createParams: Optional[BaseModel] = Field(
-        None,
-        description="Configuration parameters for the run.",
-    )
     actions: List[RunAction] = Field(
         ...,
         description="Client-initiated run control actions.",
@@ -74,16 +57,57 @@ class AbstractRun(ResourceModel):
     )
 
 
-class BasicRunCreateData(AbstractRunCreateData):
+class LabwareOffsetVector(BaseModel):
+    """An offset to apply to labware, in deck coordinates."""
+
+    x: float
+    y: float
+    z: float
+
+
+class LabwareOffset(BaseModel):
+    """An offset that the robot adds to a pipette's position when it moves to a labware.
+
+    During the run, if a labware is loaded whose definition URI and location
+    both match what's found here, the given offset will be added to all
+    pipette movements that use that labware as a reference point.
+    """
+
+    definitionUri: str = Field(..., description="The URI for the labware's definition.")
+    location: LabwareLocation = Field(
+        ..., description="Where the labware is located on the robot."
+    )
+    offset: LabwareOffsetVector = Field(
+        ..., description="The offset applied to matching labware."
+    )
+
+
+class BasicRunCreateParams(BaseModel):
+    """Creation parameters for a basic run."""
+
+    labwareOffsets: List[LabwareOffset] = Field(default_factory=list)
+
+
+class BasicRunCreateData(BaseModel):
     """Creation request data for a basic run."""
 
-    runType: Literal[RunType.BASIC] = RunType.BASIC
+    runType: Literal[RunType.BASIC] = Field(
+        RunType.BASIC,
+        description="The run type to create.",
+    )
+    # TODO(mc, 2021-05-25): how hard would it be to rename this field to `config`?
+    createParams: BasicRunCreateParams = Field(
+        default_factory=BasicRunCreateParams,
+        description="Parameters to set run behaviors at creation time.",
+    )
 
 
-class BasicRun(AbstractRun):
+class BasicRun(_AbstractRun):
     """A run to execute commands without a previously loaded protocol file."""
 
     runType: Literal[RunType.BASIC] = RunType.BASIC
+
+    createParams: BasicRunCreateParams
 
 
 class ProtocolRunCreateParams(BaseModel):
@@ -94,15 +118,24 @@ class ProtocolRunCreateParams(BaseModel):
         description="Unique identifier of the protocol this run will execute.",
     )
 
+    labwareOffsets: List[LabwareOffset] = Field(default_factory=list)
 
-class ProtocolRunCreateData(AbstractRunCreateData):
+
+class ProtocolRunCreateData(BaseModel):
     """Creation request data for a protocol run."""
 
-    runType: Literal[RunType.PROTOCOL] = RunType.PROTOCOL
-    createParams: ProtocolRunCreateParams
+    runType: Literal[RunType.PROTOCOL] = Field(
+        RunType.PROTOCOL,
+        description="The run type to create.",
+    )
+    # TODO(mc, 2021-05-25): how hard would it be to rename this field to `config`?
+    createParams: ProtocolRunCreateParams = Field(
+        ...,
+        description="Parameters to set run behaviors at creation time.",
+    )
 
 
-class ProtocolRun(AbstractRun):
+class ProtocolRun(_AbstractRun):
     """A run to execute commands with a previously loaded protocol file."""
 
     runType: Literal[RunType.PROTOCOL] = RunType.PROTOCOL

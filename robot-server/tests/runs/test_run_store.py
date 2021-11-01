@@ -99,7 +99,7 @@ def test_get_all_runs() -> None:
 
 
 def test_remove_run() -> None:
-    """It can get a previously stored run entry."""
+    """It can remove and return a previously stored run entry."""
     run = RunResource(
         run_id="run-id",
         create_data=BasicRunCreateData(),
