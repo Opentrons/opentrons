@@ -34,6 +34,6 @@
   "load_pipette_protocol_setup": "Load {{pipette_name}} in <span>{{mount_name}}</span> Mount",
   "load_modules_protocol_setup": "Load {{module}} in Slot {{slot_name}}",
   "load_modules_protocol_setup_plural": "Load {{module}}",
-  "load_labware_info_protocol_setup": "Load {{labware_loadname}} v{{labware_version}} in Slot",
+  "load_labware_info_protocol_setup": "Load {{labware_loadname}} v{{labware_version}} in Slot {{slot_number}}",
   "labware_slot_protocol_setup": "in {{slot_number}}"
 }
