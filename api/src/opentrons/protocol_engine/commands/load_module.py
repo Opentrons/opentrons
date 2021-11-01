@@ -45,8 +45,10 @@ class LoadModuleData(BaseModel):
 
     moduleId: Optional[str] = Field(
         None,
-        description="An optional ID to assign to this module. If None, an ID "
-        "will be generated.",
+        description=(
+            "An optional ID to assign to this module."
+            " If None, an ID will be generated."
+        ),
     )
 
 
