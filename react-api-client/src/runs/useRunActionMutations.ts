@@ -42,18 +42,19 @@ export type UseCancelRunMutationResult = UseMutationResult<
 }
 
 interface UseRunActionMutations {
-  usePlayRunMutation: () => UsePlayRunMutationResult
-  usePauseRunMutation: () => UsePauseRunMutationResult
-  useCancelRunMutation: () => UseCancelRunMutationResult
+  usePlayRunMutation: (runId: string) => UsePlayRunMutationResult
+  usePauseRunMutation: (runId: string) => UsePauseRunMutationResult
+  useCancelRunMutation: (runId: string) => UseCancelRunMutationResult
 }
 
+// separate out these hooks, individual exports, useRunActionMutations is an organizational hook
 export function useRunActionMutations(): UseRunActionMutations {
-  const usePlayRunMutation = (): UsePlayRunMutationResult => {
+  const usePlayRunMutation = (runId: string): UsePlayRunMutationResult => {
     const host = useHost()
     const mutation = useMutation<RunAction>(
       ['run', RUN_ACTION_TYPE_PLAY, host],
       () =>
-        createRunAction(host as HostConfig, {
+        createRunAction(host as HostConfig, runId, {
           actionType: RUN_ACTION_TYPE_PLAY,
         }).then(response => response.data)
       // Promise.resolve(mockPlayRunAction)
@@ -64,12 +65,12 @@ export function useRunActionMutations(): UseRunActionMutations {
     }
   }
 
-  const usePauseRunMutation = (): UsePauseRunMutationResult => {
+  const usePauseRunMutation = (runId: string): UsePauseRunMutationResult => {
     const host = useHost()
     const mutation = useMutation<RunAction>(
       ['run', RUN_ACTION_TYPE_PAUSE, host],
       () =>
-        createRunAction(host as HostConfig, {
+        createRunAction(host as HostConfig, runId, {
           actionType: RUN_ACTION_TYPE_PAUSE,
         }).then(response => response.data)
       // Promise.resolve(mockPauseRunAction)
@@ -80,12 +81,12 @@ export function useRunActionMutations(): UseRunActionMutations {
     }
   }
 
-  const useCancelRunMutation = (): UseCancelRunMutationResult => {
+  const useCancelRunMutation = (runId: string): UseCancelRunMutationResult => {
     const host = useHost()
     const mutation = useMutation<RunAction>(
       ['run', RUN_ACTION_TYPE_STOP, host],
       () =>
-        createRunAction(host as HostConfig, {
+        createRunAction(host as HostConfig, runId, {
           actionType: RUN_ACTION_TYPE_STOP,
         }).then(response => response.data)
       // Promise.resolve(mockStopRunAction)

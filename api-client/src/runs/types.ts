@@ -3,49 +3,40 @@ export const RUN_TYPE_PROTOCOL: 'protocol' = 'protocol'
 
 export type RunType = typeof RUN_TYPE_BASIC | typeof RUN_TYPE_PROTOCOL
 
-export const EVENT_SOURCE_SESSION_COMMAND: 'sessionCommand' = 'sessionCommand'
-export const EVENT_SOURCE_PROTOCOL: 'protocol' = 'protocol'
-
-type EventSource =
-  | typeof EVENT_SOURCE_SESSION_COMMAND
-  | typeof EVENT_SOURCE_PROTOCOL
-
-interface Event {
-  source: EventSource
-  event: string
-  timestamp: string
-  commandId?: string
-  params?: Record<string, unknown>
-  result?: string
-}
-
-// TODO: IMMEDIATELY replace with real status enum type from server run status
 export type RunStatus =
-  | 'loaded'
+  | 'ready-to-run'
   | 'running'
+  | 'pause-requested'
   | 'paused'
-  | 'finished'
-  | 'canceled'
-  | undefined
+  | 'stop-requested'
+  | 'stopped'
+  | 'failed'
+  | 'succeeded'
 
 export interface BasicRun {
   id: string
-  createdAt: string
-  details: Record<string, unknown>
   runType: typeof RUN_TYPE_BASIC
+  createdAt: string
+  status: RunStatus
   createParams?: Record<string, unknown>
+  actions: RunAction[]
+  // TODO(bh, 10-29-2021): types for commands, pipettes, labware
+  commands: unknown[]
+  pipettes: unknown[]
+  labware: unknown[]
 }
 
 export interface ProtocolRun {
   id: string
-  createdAt: string
-  details: {
-    protocolId: string
-    currentState?: RunStatus
-    events: readonly Event[]
-  }
   runType: typeof RUN_TYPE_PROTOCOL
+  createdAt: string
+  status: RunStatus
   createParams: { protocolId: string }
+  actions: RunAction[]
+  // TODO(bh, 10-29-2021): types for commands, pipettes, labware
+  commands: unknown[]
+  pipettes: unknown[]
+  labware: unknown[]
 }
 
 export type RunData = BasicRun | ProtocolRun
