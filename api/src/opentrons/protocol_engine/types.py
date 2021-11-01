@@ -21,7 +21,7 @@ class EngineStatus(str, Enum):
 
 
 class DeckSlotLocation(BaseModel):
-    """Location for labware placed in a single slot."""
+    """The location of something placed in a single deck slot."""
 
     slot: DeckSlotName
 
