@@ -1,7 +1,7 @@
 """Run response model factory."""
 from dataclasses import replace
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Tuple
+from typing import List, Optional, Tuple
 
 from opentrons.protocol_engine import (
     Command as ProtocolEngineCommand,
@@ -109,21 +109,28 @@ class RunView:
             for c in commands
         ]
 
-        response_fields: Dict[str, Any] = {
-            "id": run.run_id,
-            "createdAt": run.created_at,
-            "actions": run.actions,
-            "commands": command_summaries,
-            "pipettes": pipettes,
-            "labware": labware,
-            "status": engine_status,
-        }
-
         if isinstance(create_data, BasicRunCreateData):
-            return BasicRun(**response_fields)
+            return BasicRun(
+                id=run.run_id,
+                createParams=create_data.createParams,
+                createdAt=run.created_at,
+                actions=run.actions,
+                commands=command_summaries,
+                pipettes=pipettes,
+                labware=labware,
+                status=engine_status,
+            )
 
         if isinstance(create_data, ProtocolRunCreateData):
-            response_fields["createParams"] = create_data.createParams
-            return ProtocolRun(**response_fields)
+            return ProtocolRun(
+                id=run.run_id,
+                createParams=create_data.createParams,
+                createdAt=run.created_at,
+                actions=run.actions,
+                commands=command_summaries,
+                pipettes=pipettes,
+                labware=labware,
+                status=engine_status,
+            )
 
         raise ValueError(f"Invalid run resource {run}")

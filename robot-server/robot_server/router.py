@@ -58,17 +58,16 @@ if enable_protocol_engine():
 
 else:
     router.include_router(
-        router=deprecated_session_router,
-        tags=["Session Management"],
-        dependencies=[Depends(check_version_header)],
-    )
-
-    router.include_router(
         router=deprecated_protocol_router,
         tags=["Protocol Management"],
         dependencies=[Depends(check_version_header)],
     )
 
+router.include_router(
+    router=deprecated_session_router,
+    tags=["Session Management"],
+    dependencies=[Depends(check_version_header)],
+)
 
 router.include_router(
     router=labware_router,

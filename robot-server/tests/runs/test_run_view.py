@@ -19,10 +19,13 @@ from robot_server.runs.run_models import (
     Run,
     BasicRun,
     BasicRunCreateData,
+    BasicRunCreateParams,
     ProtocolRun,
     ProtocolRunCreateData,
     ProtocolRunCreateParams,
     RunCommandSummary,
+    LabwareOffset,
+    LabwareOffsetVector,
 )
 
 from robot_server.runs.action_models import (
@@ -97,7 +100,17 @@ current_time = datetime.now()
         (
             RunResource(
                 run_id="run-id",
-                create_data=BasicRunCreateData(),
+                create_data=BasicRunCreateData(
+                    createParams=BasicRunCreateParams(
+                        labwareOffsets=[
+                            LabwareOffset(
+                                definitionUri="my-labware-definition-uri",
+                                location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
+                                offset=LabwareOffsetVector(x=1, y=2, z=3),
+                            )
+                        ]
+                    )
+                ),
                 created_at=current_time,
                 actions=[],
             ),
@@ -105,6 +118,15 @@ current_time = datetime.now()
                 id="run-id",
                 createdAt=current_time,
                 status=EngineStatus.READY_TO_RUN,
+                createParams=BasicRunCreateParams(
+                    labwareOffsets=[
+                        LabwareOffset(
+                            definitionUri="my-labware-definition-uri",
+                            location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
+                            offset=LabwareOffsetVector(x=1, y=2, z=3),
+                        )
+                    ]
+                ),
                 actions=[],
                 commands=[],
                 pipettes=[],
@@ -186,6 +208,7 @@ def test_to_response_maps_commands() -> None:
 
     assert result == BasicRun(
         id="run-id",
+        createParams=BasicRunCreateParams(),
         createdAt=datetime(year=2021, month=1, day=1),
         status=EngineStatus.RUNNING,
         actions=[],
@@ -239,6 +262,7 @@ def test_to_response_adds_equipment() -> None:
 
     assert result == BasicRun(
         id="run-id",
+        createParams=BasicRunCreateParams(),
         createdAt=datetime(year=2021, month=1, day=1),
         status=EngineStatus.RUNNING,
         actions=[],

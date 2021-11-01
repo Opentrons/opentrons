@@ -17,6 +17,7 @@ import {
 } from '..'
 
 import {
+  RUN_ID_1,
   mockPlayRunAction,
   mockPauseRunAction,
   mockStopRunAction,
@@ -36,9 +37,9 @@ const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 
 describe('useRunActionMutations hook', () => {
   let wrapper: React.FunctionComponent<{}>
-  let usePlayRunMutation: () => UsePlayRunMutationResult
-  let usePauseRunMutation: () => UsePauseRunMutationResult
-  let useCancelRunMutation: () => UseCancelRunMutationResult
+  let usePlayRunMutation: (runId: string) => UsePlayRunMutationResult
+  let usePauseRunMutation: (runId: string) => UsePauseRunMutationResult
+  let useCancelRunMutation: (runId: string) => UseCancelRunMutationResult
   const createPlayRunActionData = { actionType: RUN_ACTION_TYPE_PLAY }
   const createPauseRunActionData = { actionType: RUN_ACTION_TYPE_PAUSE }
   const createStopRunActionData = { actionType: RUN_ACTION_TYPE_STOP }
@@ -62,17 +63,16 @@ describe('useRunActionMutations hook', () => {
   it('should return no data when calling playRun if the request fails', async () => {
     when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
     when(mockCreateRunAction)
-      .calledWith(HOST_CONFIG, createPlayRunActionData)
+      .calledWith(HOST_CONFIG, RUN_ID_1, createPlayRunActionData)
       .mockRejectedValue('oh no')
 
-    const { result, waitFor } = renderHook(() => usePlayRunMutation(), {
+    const { result, waitFor } = renderHook(() => usePlayRunMutation(RUN_ID_1), {
       wrapper,
     })
 
     expect(result.current.data).toBeUndefined()
     result.current.playRun()
     await waitFor(() => {
-      console.log(result.current.status)
       return result.current.status !== 'loading'
     })
     expect(result.current.data).toBeUndefined()
@@ -81,17 +81,19 @@ describe('useRunActionMutations hook', () => {
   it('should return no data when calling pauseRun if the request fails', async () => {
     when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
     when(mockCreateRunAction)
-      .calledWith(HOST_CONFIG, createPauseRunActionData)
+      .calledWith(HOST_CONFIG, RUN_ID_1, createPauseRunActionData)
       .mockRejectedValue('uh oh')
 
-    const { result, waitFor } = renderHook(() => usePauseRunMutation(), {
-      wrapper,
-    })
+    const { result, waitFor } = renderHook(
+      () => usePauseRunMutation(RUN_ID_1),
+      {
+        wrapper,
+      }
+    )
 
     expect(result.current.data).toBeUndefined()
     result.current.pauseRun()
     await waitFor(() => {
-      console.log(result.current.status)
       return result.current.status !== 'loading'
     })
     expect(result.current.data).toBeUndefined()
@@ -100,17 +102,19 @@ describe('useRunActionMutations hook', () => {
   it('should return no data when calling cancelRun if the request fails', async () => {
     when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
     when(mockCreateRunAction)
-      .calledWith(HOST_CONFIG, createStopRunActionData)
+      .calledWith(HOST_CONFIG, RUN_ID_1, createStopRunActionData)
       .mockRejectedValue('oops')
 
-    const { result, waitFor } = renderHook(() => useCancelRunMutation(), {
-      wrapper,
-    })
+    const { result, waitFor } = renderHook(
+      () => useCancelRunMutation(RUN_ID_1),
+      {
+        wrapper,
+      }
+    )
 
     expect(result.current.data).toBeUndefined()
     result.current.cancelRun()
     await waitFor(() => {
-      console.log(result.current.status)
       return result.current.status !== 'loading'
     })
     expect(result.current.data).toBeUndefined()
@@ -119,10 +123,10 @@ describe('useRunActionMutations hook', () => {
   it('should create a play run action when calling the playRun callback', async () => {
     when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
     when(mockCreateRunAction)
-      .calledWith(HOST_CONFIG, createPlayRunActionData)
+      .calledWith(HOST_CONFIG, RUN_ID_1, createPlayRunActionData)
       .mockResolvedValue({ data: mockPlayRunAction } as Response<RunAction>)
 
-    const { result, waitFor } = renderHook(() => usePlayRunMutation(), {
+    const { result, waitFor } = renderHook(() => usePlayRunMutation(RUN_ID_1), {
       wrapper,
     })
     act(() => result.current.playRun())
@@ -135,12 +139,15 @@ describe('useRunActionMutations hook', () => {
   it('should create a pause run action when calling the pauseRun callback', async () => {
     when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
     when(mockCreateRunAction)
-      .calledWith(HOST_CONFIG, createPauseRunActionData)
+      .calledWith(HOST_CONFIG, RUN_ID_1, createPauseRunActionData)
       .mockResolvedValue({ data: mockPauseRunAction } as Response<RunAction>)
 
-    const { result, waitFor } = renderHook(() => usePauseRunMutation(), {
-      wrapper,
-    })
+    const { result, waitFor } = renderHook(
+      () => usePauseRunMutation(RUN_ID_1),
+      {
+        wrapper,
+      }
+    )
     act(() => result.current.pauseRun())
 
     await waitFor(() => result.current.data != null)
@@ -151,12 +158,15 @@ describe('useRunActionMutations hook', () => {
   it('should create a stop run action when calling the cancelRun callback', async () => {
     when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
     when(mockCreateRunAction)
-      .calledWith(HOST_CONFIG, createStopRunActionData)
+      .calledWith(HOST_CONFIG, RUN_ID_1, createStopRunActionData)
       .mockResolvedValue({ data: mockStopRunAction } as Response<RunAction>)
 
-    const { result, waitFor } = renderHook(() => useCancelRunMutation(), {
-      wrapper,
-    })
+    const { result, waitFor } = renderHook(
+      () => useCancelRunMutation(RUN_ID_1),
+      {
+        wrapper,
+      }
+    )
     act(() => result.current.cancelRun())
 
     await waitFor(() => result.current.data != null)
