@@ -14,5 +14,8 @@
   "dependencies": {
     "ajv": "6.10.2",
     "lodash": "4.17.15"
+  },
+  "devDependencies": {
+    "cypress": "^8.7.0"
   }
 }
