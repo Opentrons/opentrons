@@ -145,7 +145,11 @@ export const LabwareOffsetsSummary = (): JSX.Element | null => {
                   {t('no_labware_offsets')}
                 </Flex>
               ) : (
-                <Flex marginBottom={SPACING_3} css={FONT_BODY_1_DARK}>
+                <Flex
+                  key={index}
+                  marginBottom={SPACING_3}
+                  css={FONT_BODY_1_DARK}
+                >
                   <Text as={'span'} marginRight={SPACING_1}>
                     <strong>X</strong>
                   </Text>

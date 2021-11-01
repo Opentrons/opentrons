@@ -53,7 +53,7 @@ export const GenericStepScreen = (
           />
         </Flex>
       </Flex>
-      <Flex flex={'1 1 60%'} padding={SPACING_3}>
+      <Flex padding={SPACING_3}>
         <LabwarePositionCheckStepDetail selectedStep={props.selectedStep} />
       </Flex>
     </Flex>
