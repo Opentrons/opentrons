@@ -20,11 +20,13 @@ class LoadModuleData(BaseModel):
     model: str = Field(
         ...,
         example="magneticModuleV1",
-        description="""The model name of the module to load.
-
-        If a different version of this module is physically connected, the load will
-        succeed if it's deemed compatible with the version you requested.
-        """,
+        description=(
+            "The model name of the module to load."
+            "\n\n"
+            "If a different version of this module is physically connected,"
+            " the load will succeed"
+            " if it's deemed compatible with the version you requested."
+        )
     )
 
     # Note: Our assumption here that a module's position can be boiled down to a
@@ -33,11 +35,12 @@ class LoadModuleData(BaseModel):
     # API nor Protocol Designer attempt to support it, either.
     location: DeckSlotLocation = Field(
         ...,
-        description="""The location into which this module should be loaded.
-
-        For the Thermocycler Module, which occupies multiple deck slots,
-        this should be the front-most occupied slot (normally slot 7).
-        """,
+        description=(
+            "The location into which this module should be loaded."
+            "\n\n"
+            "For the Thermocycler Module, which occupies multiple deck slots,"
+            " this should be the front-most occupied slot (normally slot 7)."
+        )
     )
 
     moduleId: Optional[str] = Field(
