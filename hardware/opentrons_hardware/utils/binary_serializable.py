@@ -135,10 +135,13 @@ class BinarySerializable:
         Returns:
             cls
         """
-        b = struct.unpack(cls._get_format_string(), data)
-        args = {v.name: v.type.build(b[i]) for i, v in enumerate(fields(cls))}
-        # Mypy is not liking constructing the derived types.
-        return cls(**args)  # type: ignore
+        try:
+            b = struct.unpack(cls._get_format_string(), data)
+            args = {v.name: v.type.build(b[i]) for i, v in enumerate(fields(cls))}
+            # Mypy is not liking constructing the derived types.
+            return cls(**args)  # type: ignore[call-arg]
+        except struct.error as e:
+            raise InvalidFieldException(str(e))
 
     @classmethod
     def _get_format_string(cls) -> str:

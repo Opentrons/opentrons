@@ -24,6 +24,7 @@ from robot_server.runs.run_models import (
     RunCommandSummary,
     BasicRun,
     BasicRunCreateData,
+    BasicRunCreateParams,
     ProtocolRun,
     ProtocolRunCreateData,
     ProtocolRunCreateParams,
@@ -77,6 +78,7 @@ async def test_create_run(
     expected_response = BasicRun(
         id=unique_id,
         createdAt=current_time,
+        createParams=BasicRunCreateParams(),
         status=pe_types.EngineStatus.READY_TO_RUN,
         actions=[],
         commands=[],
@@ -312,6 +314,7 @@ def test_get_run(
 
     expected_response = BasicRun(
         id="run-id",
+        createParams=BasicRunCreateParams(),
         createdAt=created_at,
         status=pe_types.EngineStatus.READY_TO_RUN,
         actions=[],
@@ -402,6 +405,7 @@ def test_get_runs_not_empty(
 
     response_1 = BasicRun(
         id="unique-id-1",
+        createParams=BasicRunCreateParams(),
         createdAt=created_at_1,
         status=pe_types.EngineStatus.SUCCEEDED,
         actions=[],
