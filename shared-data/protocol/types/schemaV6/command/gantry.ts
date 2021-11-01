@@ -1,24 +1,25 @@
-export interface MoveToSlotCommand {
+import { CommonCommandInfo } from '.'
+export interface MoveToSlotCommand extends CommonCommandInfo {
   commandType: 'moveToSlot'
   params: MoveToSlotParams
   result?: {}
 }
-export interface MoveToWellCommand {
+export interface MoveToWellCommand extends CommonCommandInfo {
   commandType: 'moveToWell'
   params: MoveToWellParams
   result?: {}
 }
-export interface MoveToCoordinatesCommand {
+export interface MoveToCoordinatesCommand extends CommonCommandInfo {
   commandType: 'moveToCoordinates'
   params: MoveToCoordinatesParams
   result?: {}
 }
-export interface MoveRelativeCommand {
+export interface MoveRelativeCommand extends CommonCommandInfo {
   commandType: 'moveRelative'
   params: MoveRelativeParams
   result?: {}
 }
-export interface SavePositionCommand {
+export interface SavePositionCommand extends CommonCommandInfo {
   commandType: 'savePosition'
   params: SavePositionParams
   result?: {}

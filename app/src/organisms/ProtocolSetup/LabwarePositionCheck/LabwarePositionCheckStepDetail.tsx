@@ -52,13 +52,13 @@ export const LabwarePositionCheckStepDetail = (
   const labwareDef = protocolData.labwareDefinitions[labwareDefId]
   const command = selectedStep.commands[0]
   // there case should never happen, there will always be a pipette id in the LPC commands list
-  if (!('pipette' in command.params)) {
+  if (!('pipetteId' in command.params)) {
     console.error(
-      `expected there to be a pipette in LPC command ${command.command}, but there was none`
+      `expected there to be a pipette in LPC command ${command.commandType}, but there was none`
     )
     return null
   }
-  const pipetteId = command.params.pipette
+  const pipetteId = command.params.pipetteId
   const pipetteName = protocolData.pipettes[pipetteId].name
   let wellsToHighlight: string[] = []
   const pipetteChannels = getPipetteNameSpecs(pipetteName)?.channels

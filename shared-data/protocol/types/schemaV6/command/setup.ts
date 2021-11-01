@@ -1,21 +1,25 @@
-import { LabwareDefinition2, LabwareOffset } from '../../../../js'
+import {
+  CommonCommandInfo,
+  LabwareDefinition2,
+  LabwareOffset,
+} from '../../../../js'
 
-export interface LoadPipetteCommand {
+export interface LoadPipetteCommand extends CommonCommandInfo {
   commandType: 'loadPipette'
   params: LoadPipetteParams
   result?: LoadPipetteResult
 }
-export interface LoadLabwareCommand {
+export interface LoadLabwareCommand extends CommonCommandInfo {
   commandType: 'loadLabware'
   params: LoadLabwareParams
   result?: LoadLabwareResult
 }
-export interface LoadModuleCommand {
+export interface LoadModuleCommand extends CommonCommandInfo {
   commandType: 'loadModule'
   params: LoadModuleParams
   result?: LoadModuleResult
 }
-export interface LoadLiquidCommand {
+export interface LoadLiquidCommand extends CommonCommandInfo {
   commandType: 'loadLiquid'
   params: LoadLiquidParams
   result?: LoadLiquidResult
@@ -29,7 +33,9 @@ export type SetupCommand =
 
 type LabwareLocation = { slotName: string } | { moduleId: string }
 
-interface ModuleLocation { slotName: string }
+interface ModuleLocation {
+  slotName: string
+}
 interface LoadPipetteParams {
   pipetteId: string
   mount: string | null

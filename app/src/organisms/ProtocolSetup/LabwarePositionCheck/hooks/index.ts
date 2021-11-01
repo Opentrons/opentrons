@@ -6,11 +6,8 @@ import { getPipetteNameSpecs } from '@opentrons/shared-data'
 
 import type { PipetteName } from '@opentrons/shared-data'
 import type { State } from '../../../../redux/types'
-import type {
-  PickUpTipCommand,
-  LabwarePositionCheckStep,
-  Section,
-} from '../types'
+import type { LabwarePositionCheckStep, Section } from '../types'
+import { PickUpTipCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
 
 type LabwareIdsBySection = {
   [section in Section]?: string[]
@@ -73,13 +70,13 @@ export function useIntroInfo(): IntroInfo | null {
   // find which tiprack primary pipette will use for check
 
   const pickUpTipStep = steps.find(
-    step => step.commands[0].command === 'pickUpTip'
+    step => step.commands[0].commandType === 'pickUpTip'
   )
   if (pickUpTipStep == null) return null // this state should never be reached
 
   const {
-    pipette: primaryPipetteId,
-    labware: pickUpTipLabwareId,
+    pipetteId: primaryPipetteId,
+    labwareId: pickUpTipLabwareId,
   } = (pickUpTipStep.commands[0] as PickUpTipCommand).params
   const primaryPipetteName = protocolData.pipettes[primaryPipetteId].name
   const primaryPipetteMount = protocolData.pipettes[primaryPipetteId].mount

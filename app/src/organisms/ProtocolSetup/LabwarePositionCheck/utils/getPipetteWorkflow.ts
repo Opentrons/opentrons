@@ -5,7 +5,7 @@ import type {
   LabwareDefinition2,
   PipetteName,
 } from '@opentrons/shared-data'
-import type { Command } from '@opentrons/shared-data/protocol/types/schemaV5'
+import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
 
 export const getPipetteWorkflow = (args: {
   pipetteNames: PipetteName[]

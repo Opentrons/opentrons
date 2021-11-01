@@ -1,10 +1,10 @@
 import findKey from 'lodash/findKey'
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
-import type { FilePipette } from '@opentrons/shared-data/protocol/types/schemaV4'
+import type { ProtocolFile } from '@opentrons/shared-data/protocol'
 
-export const getPrimaryPipetteId = (pipettesById: {
-  [id: string]: FilePipette
-}): string => {
+export const getPrimaryPipetteId = (
+  pipettesById: ProtocolFile<{}>['pipettes']
+): string => {
   if (Object.keys(pipettesById).length === 1) {
     return Object.keys(pipettesById)[0]
   }

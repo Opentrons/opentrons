@@ -5,8 +5,13 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import type { FileModule } from '@opentrons/shared-data/protocol/types/schemaV4'
-import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
-import type { LabwarePositionCheckStep, Section } from '../types'
+import type {
+  LabwarePositionCheckCommand,
+  LabwarePositionCheckStep,
+  Section,
+} from '../types'
+import { TCOpenLidCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
+import { MoveToWellCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/gantry'
 
 const getIsLabwareOnTopOfTC = (
   modules: Record<string, FileModule>,
@@ -51,7 +56,7 @@ export const getMoveToLabwareSteps = (
   section: Section
 ): LabwarePositionCheckStep[] =>
   labwareIds.map(labwareId => {
-    const moveToWellCommand: Command = {
+    const moveToWellCommand: MoveToWellCommand = {
       commandType: 'moveToWell' as const,
       id: uuidv4(),
       params: {
@@ -68,10 +73,10 @@ export const getMoveToLabwareSteps = (
       labwareId
     )
 
-    let commands: Command[] = []
+    let commands: LabwarePositionCheckCommand[] = []
 
     if (isLabwareOnTopOfTC) {
-      const openTCLidCommand: Command = {
+      const openTCLidCommand: TCOpenLidCommand = {
         commandType: 'thermocycler/openLid',
         id: uuidv4(),
         params: {

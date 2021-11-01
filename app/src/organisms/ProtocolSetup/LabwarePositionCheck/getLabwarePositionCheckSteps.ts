@@ -3,26 +3,23 @@ import { getPrimaryPipetteId } from './utils/getPrimaryPipetteId'
 import { getPipetteWorkflow } from './utils/getPipetteWorkflow'
 import { getOnePipettePositionCheckSteps } from './utils/getOnePipettePositionCheckSteps'
 import { getTwoPipettePositionCheckSteps } from './utils/getTwoPipettePositionCheckSteps'
-import type { Command } from '@opentrons/shared-data/protocol/types/schemaV5'
-import type { FilePipette } from '@opentrons/shared-data/protocol/types/schemaV3'
+import type {
+  Command,
+  ProtocolFile,
+} from '@opentrons/shared-data/protocol/types/schemaV6'
 import type { FileModule } from '@opentrons/shared-data/protocol/types/schemaV4'
-import type { ProtocolData } from '../../../redux/protocol/types'
 import type { LabwarePositionCheckStep } from './types'
 
 export const getLabwarePositionCheckSteps = (
-  protocolData: ProtocolData
+  protocolData: ProtocolFile<{}>
 ): LabwarePositionCheckStep[] => {
   if (protocolData != null && 'pipettes' in protocolData) {
-    // @ts-expect-error v1 protocols do not have pipettes names (see the two different FilePipette types)
-    const pipettesById: Record<string, FilePipette> = protocolData.pipettes
-    const pipettes: FilePipette[] = values(pipettesById)
+    const pipettesById: ProtocolFile<{}>['pipettes'] = protocolData.pipettes
+    const pipettes = values(pipettesById)
     const pipetteNames = pipettes.map(({ name }) => name)
     const labware = protocolData.labware
-    // @ts-expect-error older protocols do not have modules
-    const modules: Record<string, FileModule> = protocolData.modules
-    // @ts-expect-error v1 protocols do not have labware defs
+    const modules: ProtocolFile<{}>['modules'] = protocolData.modules
     const labwareDefinitions = protocolData.labwareDefinitions
-    // @ts-expect-error v1 protocols do not have commands
     const commands: Command[] = protocolData.commands
     const primaryPipetteId = getPrimaryPipetteId(pipettesById)
     const pipetteWorkflow = getPipetteWorkflow({

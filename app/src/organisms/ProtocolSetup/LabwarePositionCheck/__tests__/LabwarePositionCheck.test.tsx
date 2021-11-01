@@ -46,10 +46,10 @@ describe('LabwarePositionCheck', () => {
         {
           commands: [
             {
-              command: 'pickUpTip',
+              commandType: 'pickUpTip',
               params: {
-                pipette: PRIMARY_PIPETTE_ID,
-                labware: PICKUP_TIP_LABWARE_ID,
+                pipetteId: PRIMARY_PIPETTE_ID,
+                labwareId: PICKUP_TIP_LABWARE_ID,
               },
             },
           ],

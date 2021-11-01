@@ -7,8 +7,9 @@ import {
   LabwareDefinition2,
 } from '@opentrons/shared-data'
 import type { FileModule } from '@opentrons/shared-data/protocol/types/schemaV4'
-import type { Command } from '@opentrons/shared-data/protocol/types/schemaV5'
-import type { LabwareToOrder, PickUpTipCommand } from '../types'
+import type { PickUpTipCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
+import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
+import type { LabwareToOrder } from '../types'
 
 export const tipRackOrderSort = (
   tiprack1: LabwareToOrder,
@@ -72,13 +73,13 @@ export const getAllTipracksIdsThatPipetteUsesInOrder = (
 ): string[] => {
   const pickUpTipCommandsWithPipette: PickUpTipCommand[] = commands
     .filter(
-      (command): command is PickUpTipCommand => command.command === 'pickUpTip'
+      (command): command is PickUpTipCommand => command.commandType === 'pickUpTip'
     )
-    .filter(command => command.params.pipette === pipetteId)
+    .filter(command => command.params.pipetteId === pipetteId)
 
   const tipracksVisited = pickUpTipCommandsWithPipette.reduce<string[]>(
     (visited, command) => {
-      const tiprack = command.params.labware
+      const tiprack = command.params.labwareId
       return visited.includes(tiprack) ? visited : [...visited, tiprack]
     },
     []

@@ -8,10 +8,11 @@ import { getOnePipettePositionCheckSteps } from '../utils/getOnePipettePositionC
 import { getTwoPipettePositionCheckSteps } from '../utils/getTwoPipettePositionCheckSteps'
 
 import type { FilePipette } from '@opentrons/shared-data/protocol/types/schemaV4'
-import type { ProtocolFileV5 } from '@opentrons/shared-data'
+import type { ProtocolFile } from '@opentrons/shared-data'
 
-const protocolWithOnePipette = _uncasted_protocolWithOnePipette as ProtocolFileV5<any>
-const protocolWithTwoPipettes = _uncasted_protocolWithTwoPipettes as ProtocolFileV5<any>
+// TODO: update these fixtures to be v6 protocols
+const protocolWithOnePipette = _uncasted_protocolWithOnePipette as unknown as ProtocolFile<any>
+const protocolWithTwoPipettes = _uncasted_protocolWithTwoPipettes as unknown as  ProtocolFile<any>
 
 jest.mock('../utils/getPrimaryPipetteId')
 jest.mock('../utils/getPipetteWorkflow')

@@ -1,3 +1,4 @@
+import { CommonCommandInfo } from '.'
 export type PipettingCommand =
   | AspirateCommand
   | DispenseCommand
@@ -8,42 +9,43 @@ export type PipettingCommand =
   | PickUpTipCommand
   | DropTipCommand
 
-export interface AspirateCommand {
+export interface AspirateCommand extends CommonCommandInfo {
   commandType: 'aspirate'
   params: AspDispAirgapParams
   result?: BasicLiquidHandlingResult
 }
-export interface DispenseCommand {
+export interface DispenseCommand extends CommonCommandInfo {
   commandType: 'dispense'
   params: AspDispAirgapParams
   result?: BasicLiquidHandlingResult
 }
-export interface AspirateAirGapCommand {
+export interface AspirateAirGapCommand extends CommonCommandInfo {
   commandType: 'aspirateAirGap'
   params: AspDispAirgapParams
   result?: BasicLiquidHandlingResult
 }
-export interface DispenseAirGapCommand {
+export interface DispenseAirGapCommand extends CommonCommandInfo {
   commandType: 'dispenseAirGap'
   params: AspDispAirgapParams
   result?: BasicLiquidHandlingResult
 }
-export interface BlowoutCommand {
+export interface BlowoutCommand extends CommonCommandInfo {
   commandType: 'blowout'
   params: BlowoutParams
   result?: BasicLiquidHandlingResult
 }
-export interface TouchTipCommand {
+export interface TouchTipCommand extends CommonCommandInfo {
   commandType: 'touchTip'
   params: TouchTipParams
   result?: BasicLiquidHandlingResult
 }
-export interface PickUpTipCommand {
+export interface PickUpTipCommand extends CommonCommandInfo {
+  id: string
   commandType: 'pickUpTip'
   params: PipetteAccessParams
   result?: {}
 }
-export interface DropTipCommand {
+export interface DropTipCommand extends CommonCommandInfo {
   commandType: 'dropTip'
   params: PipetteAccessParams
   result?: {}
