@@ -48,6 +48,6 @@ def get_definition(message_id: MessageId) -> Optional[MessageDefinition]:
     for i in get_args(MessageDefinition):
         if i.message_id == message_id:
             # get args returns Tuple[Any...]
-            return i  # type: ignore
+            return i  # type: ignore[no-any-return]
 
     return None
