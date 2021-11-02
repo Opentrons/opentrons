@@ -1,24 +1,26 @@
 import { v4 as uuidv4 } from 'uuid'
 import {
+  Command,
   getModuleType,
-  JsonProtocolFile,
+  ProtocolFile,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import type { FileModule } from '@opentrons/shared-data/protocol/types/schemaV4'
+import { getLabwareLocation } from '../../utils/getLabwareLocation'
 import type {
   LabwarePositionCheckCommand,
   LabwarePositionCheckStep,
   Section,
 } from '../types'
-import { TCOpenLidCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
-import { MoveToWellCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/gantry'
+import type { TCOpenLidCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
+import type { MoveToWellCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/gantry'
+
 
 const getIsLabwareOnTopOfTC = (
-  modules: Record<string, FileModule>,
-  labware: JsonProtocolFile['labware'],
-  labwareId: string
+  modules:  ProtocolFile<{}>['modules'],
+  labwareId: string,
+  commands: Command[]
 ): boolean => {
-  const labwareSlot = labware[labwareId].slot
+  const labwareSlot = getLabwareLocation(labwareId, commands)
   return (
     modules != null &&
     Object.keys(modules).some(moduleId => moduleId === labwareSlot) &&
@@ -49,11 +51,12 @@ export const getMoveToTiprackSteps = (
   })
 
 export const getMoveToLabwareSteps = (
-  labware: JsonProtocolFile['labware'],
-  modules: Record<string, FileModule>,
+  labware: ProtocolFile<{}>['labware'],
+  modules: ProtocolFile<{}>['modules'],
   labwareIds: string[],
   pipetteId: string,
-  section: Section
+  section: Section,
+  commands: Command[]
 ): LabwarePositionCheckStep[] =>
   labwareIds.map(labwareId => {
     const moveToWellCommand: MoveToWellCommand = {
@@ -69,29 +72,29 @@ export const getMoveToLabwareSteps = (
 
     const isLabwareOnTopOfTC = getIsLabwareOnTopOfTC(
       modules,
-      labware,
-      labwareId
+      labwareId,
+      commands
     )
 
-    let commands: LabwarePositionCheckCommand[] = []
+    let moveToLabwareCommands: LabwarePositionCheckCommand[] = []
 
     if (isLabwareOnTopOfTC) {
       const openTCLidCommand: TCOpenLidCommand = {
         commandType: 'thermocycler/openLid',
         id: uuidv4(),
         params: {
-          moduleId: labware[labwareId].slot,
+          moduleId: getLabwareLocation(labwareId, commands),
         },
       }
-      commands = [openTCLidCommand, moveToWellCommand]
+      moveToLabwareCommands = [openTCLidCommand, moveToWellCommand]
     } else {
-      commands = [moveToWellCommand]
+      moveToLabwareCommands = [moveToWellCommand]
     }
 
     return {
       section,
       labwareId,
-      commands,
+      commands: moveToLabwareCommands,
     }
   })
 

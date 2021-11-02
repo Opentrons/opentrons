@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { getLabwarePositionCheckSteps } from '../getLabwarePositionCheckSteps'
 import { getProtocolData } from '../../../../redux/protocol'
-import { getPipetteNameSpecs } from '@opentrons/shared-data'
+import { getPipetteNameSpecs, ProtocolFile } from '@opentrons/shared-data'
 
 import type { PipetteName } from '@opentrons/shared-data'
 import type { State } from '../../../../redux/types'
@@ -14,7 +14,8 @@ type LabwareIdsBySection = {
 }
 
 export function useSteps(): LabwarePositionCheckStep[] {
-  const protocolData = useSelector((state: State) => getProtocolData(state))
+  // @ts-expect-error casting to a v6 protocol, switch this to grab from react query once we make the switch
+  const protocolData: ProtocolFile<{}> = useSelector((state: State) => getProtocolData(state))
   if (protocolData == null) return [] // this state should never be reached
   return getLabwarePositionCheckSteps(protocolData)
 }

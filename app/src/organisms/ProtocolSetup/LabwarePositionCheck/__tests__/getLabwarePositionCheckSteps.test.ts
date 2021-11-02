@@ -7,7 +7,6 @@ import { getPipetteWorkflow } from '../utils/getPipetteWorkflow'
 import { getOnePipettePositionCheckSteps } from '../utils/getOnePipettePositionCheckSteps'
 import { getTwoPipettePositionCheckSteps } from '../utils/getTwoPipettePositionCheckSteps'
 
-import type { FilePipette } from '@opentrons/shared-data/protocol/types/schemaV4'
 import type { ProtocolFile } from '@opentrons/shared-data'
 
 // TODO: update these fixtures to be v6 protocols
@@ -37,9 +36,9 @@ describe('getLabwarePositionCheckSteps', () => {
     resetAllWhenMocks()
   })
   it('should generate commands with the one pipette workflow', () => {
-    const mockPipette: FilePipette = protocolWithOnePipette.pipettes.pipetteId
+    const mockPipette = protocolWithOnePipette.pipettes.pipetteId
     when(mockGetPrimaryPipetteId)
-      .calledWith(protocolWithOnePipette.pipettes)
+      .calledWith(protocolWithOnePipette.pipettes, [])
       .mockReturnValue('pipetteId')
 
     when(mockGetPipetteWorkflow)
@@ -64,13 +63,13 @@ describe('getLabwarePositionCheckSteps', () => {
   it('should generate commands with the two pipette workflow', () => {
     const leftPipetteId = '3dff4f90-3412-11eb-ad93-ed232a2337cf'
     const rightPipetteId = '4da579b0-a9bf-11eb-bce6-9f1d5b9c1a1b'
-    const leftPipette: FilePipette =
+    const leftPipette =
       protocolWithTwoPipettes.pipettes[leftPipetteId]
-    const rightPipette: FilePipette =
+    const rightPipette =
       protocolWithTwoPipettes.pipettes[rightPipetteId]
 
     when(mockGetPrimaryPipetteId)
-      .calledWith(protocolWithTwoPipettes.pipettes)
+      .calledWith(protocolWithTwoPipettes.pipettes, [])
       .mockReturnValue(leftPipetteId)
 
     when(mockGetPipetteWorkflow)

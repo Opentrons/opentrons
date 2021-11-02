@@ -9,7 +9,7 @@ describe('getPrimaryPipetteId', () => {
         name: 'p10_single',
       },
     }
-    expect(getPrimaryPipetteId({ ...mockPipette })).toBe('p10SingleId')
+    expect(getPrimaryPipetteId({...mockPipette}, [])).toBe('p10SingleId')
   })
   it('should throw an error if there are two pipettes with the same mount', () => {
     const p10Single: Record<string, FilePipette> = {
@@ -29,7 +29,7 @@ describe('getPrimaryPipetteId', () => {
       ...p10Single,
       ...p10Multi,
     }
-    expect(() => getPrimaryPipetteId(pipettes)).toThrow()
+    expect(() => getPrimaryPipetteId(pipettes, [])).toThrow()
   })
   it('should return the pipette with fewer channels', () => {
     const p10Single: Record<string, FilePipette> = {
@@ -49,7 +49,7 @@ describe('getPrimaryPipetteId', () => {
       ...p10Single,
       ...p10Multi,
     }
-    expect(getPrimaryPipetteId(pipettes)).toBe('p10SingleId')
+    expect(getPrimaryPipetteId(pipettes, [])).toBe('p10SingleId')
   })
   it('should return the smaller pipette', () => {
     const p10Single: Record<string, FilePipette> = {
@@ -69,7 +69,7 @@ describe('getPrimaryPipetteId', () => {
       ...p10Single,
       ...p50Multi,
     }
-    expect(getPrimaryPipetteId(pipettes)).toBe('p10SingleId')
+    expect(getPrimaryPipetteId(pipettes, [])).toBe('p10SingleId')
   })
   it('should return the newer model', () => {
     const p300Single: Record<string, FilePipette> = {
@@ -89,7 +89,7 @@ describe('getPrimaryPipetteId', () => {
       ...p300Single,
       ...p300SingleGen2,
     }
-    expect(getPrimaryPipetteId(pipettes)).toBe('p300SingleGen2Id')
+    expect(getPrimaryPipetteId(pipettes, [])).toBe('p300SingleGen2Id')
   })
 
   it('should return the left pipette when all else is the same', () => {
@@ -110,6 +110,6 @@ describe('getPrimaryPipetteId', () => {
       ...p300SingleLeft,
       ...p300SingleRight,
     }
-    expect(getPrimaryPipetteId(pipettes)).toBe('p300SingleLeftId')
+    expect(getPrimaryPipetteId(pipettes, [])).toBe('p300SingleLeftId')
   })
 })

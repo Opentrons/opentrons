@@ -7,7 +7,6 @@ import type {
   Command,
   ProtocolFile,
 } from '@opentrons/shared-data/protocol/types/schemaV6'
-import type { FileModule } from '@opentrons/shared-data/protocol/types/schemaV4'
 import type { LabwarePositionCheckStep } from './types'
 
 export const getLabwarePositionCheckSteps = (
@@ -36,6 +35,7 @@ export const getLabwarePositionCheckSteps = (
         labware,
         labwareDefinitions,
         modules,
+        commands
       })
     } else {
       const secondaryPipetteId = Object.keys(pipettesById).find(

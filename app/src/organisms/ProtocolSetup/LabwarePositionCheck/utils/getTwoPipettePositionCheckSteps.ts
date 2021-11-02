@@ -1,7 +1,4 @@
-import type {
-  JsonProtocolFile,
-  LabwareDefinition2,
-} from '@opentrons/shared-data'
+import type { ProtocolFile, LabwareDefinition2 } from '@opentrons/shared-data'
 import { SECTIONS } from '../constants'
 import {
   getLabwareIdsInOrder,
@@ -13,16 +10,15 @@ import {
   getMoveToLabwareSteps,
   getDropTipStep,
 } from './stepCreators'
-import type { FileModule } from '@opentrons/shared-data/protocol/types/schemaV4'
 import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type { LabwarePositionCheckStep } from '../types'
 
 export const getTwoPipettePositionCheckSteps = (args: {
   primaryPipetteId: string
   secondaryPipetteId: string
-  labware: JsonProtocolFile['labware']
+  labware: ProtocolFile<{}>['labware']
   labwareDefinitions: Record<string, LabwareDefinition2>
-  modules: Record<string, FileModule>
+  modules: ProtocolFile<{}>['modules']
   commands: Command[]
 }): LabwarePositionCheckStep[] => {
   const {
@@ -59,7 +55,8 @@ export const getTwoPipettePositionCheckSteps = (args: {
   const orderedLabwareIds = getLabwareIdsInOrder(
     labware,
     labwareDefinitions,
-    modules
+    modules,
+    commands
   )
 
   const moveSecondaryPipetteToTiprackSteps = getMoveToTiprackSteps(
@@ -90,7 +87,8 @@ export const getTwoPipettePositionCheckSteps = (args: {
     modules,
     orderedLabwareIds,
     primaryPipetteId,
-    SECTIONS.CHECK_REMAINING_LABWARE_WITH_PRIMARY_PIPETTE
+    SECTIONS.CHECK_REMAINING_LABWARE_WITH_PRIMARY_PIPETTE,
+    commands
   )
 
   const dropTipInLastTiprackStep = getDropTipStep(

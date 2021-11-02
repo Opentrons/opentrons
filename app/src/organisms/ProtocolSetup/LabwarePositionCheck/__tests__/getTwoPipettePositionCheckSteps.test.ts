@@ -2,12 +2,13 @@ import _uncastedProtocolMultipleTipracks from '@opentrons/shared-data/protocol/f
 import _uncastedProtocolWithTC from '@opentrons/shared-data/protocol/fixtures/5/multipleTipracksWithTC.json'
 import { getTwoPipettePositionCheckSteps } from '../utils/getTwoPipettePositionCheckSteps'
 import { SECTIONS } from '../constants'
-import type { ProtocolFileV5 } from '@opentrons/shared-data'
-import type { Command } from '@opentrons/shared-data/protocol/types/schemaV5'
+import type { ProtocolFile } from '@opentrons/shared-data'
+import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type { LabwarePositionCheckStep } from '../types'
 
-const protocolMultipleTipracks = _uncastedProtocolMultipleTipracks as ProtocolFileV5<any>
-const protocolWithTC = _uncastedProtocolWithTC as ProtocolFileV5<any>
+// TODO: update these fixtures to be v6 protocols
+const protocolMultipleTipracks = (_uncastedProtocolMultipleTipracks as unknown) as ProtocolFile<{}>
+const protocolWithTC = (_uncastedProtocolWithTC as unknown) as ProtocolFile<{}>
 
 describe('getTwoPipettePositionCheckSteps', () => {
   it('should move to all tipracks that the secondary pipette uses, move to all tipracks with that the primary pipette uses, pick up a tip at the final tiprack that the primary pipette uses, move to all remaining labware, and drop the tip back in the tiprack that the primary pipette uses', () => {
@@ -25,47 +26,61 @@ describe('getTwoPipettePositionCheckSteps', () => {
       '9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1'
 
     const moveToWellSeconaryPipetteSecondTiprack: Command = {
-      command: 'moveToWell',
+      id: '1',
+      commandType: 'moveToWell',
       params: {
-        pipette: secondaryPipetteId,
-        labware: tiprackInSlot2Id,
-        well: 'A1',
+        pipetteId: secondaryPipetteId,
+        labwareId: tiprackInSlot2Id,
+        wellName: 'A1',
+        wellLocation: {
+          origin: 'top',
+        },
       },
     }
 
     const moveToWellPrimaryPipetteFirstTiprack: Command = {
-      command: 'moveToWell',
+      id: '2',
+      commandType: 'moveToWell',
       params: {
-        pipette: primaryPipetteId,
-        labware: tiprackInSlot1Id,
-        well: 'A1',
+        pipetteId: primaryPipetteId,
+        labwareId: tiprackInSlot1Id,
+        wellName: 'A1',
+        wellLocation: {
+          origin: 'top',
+        },
       },
     }
 
     const pickupTipAtLastTiprackPrimaryPipetteUses: Command = {
-      command: 'pickUpTip',
+      id: '3',
+      commandType: 'pickUpTip',
       params: {
-        pipette: primaryPipetteId,
-        labware: tiprackInSlot1Id,
-        well: 'A1',
+        pipetteId: primaryPipetteId,
+        labwareId: tiprackInSlot1Id,
+        wellName: 'A1',
       },
     }
 
     const moveToWellFirstLabware: Command = {
-      command: 'moveToWell',
+      id: '4',
+      commandType: 'moveToWell',
       params: {
-        pipette: primaryPipetteId,
-        labware: resevoirId,
-        well: 'A1',
+        pipetteId: primaryPipetteId,
+        labwareId: resevoirId,
+        wellName: 'A1',
+        wellLocation: {
+          origin: 'top',
+        },
       },
     }
 
     const dropTipIntoLastTiprackPrimaryPipetteUses: Command = {
-      command: 'dropTip',
+      id: '5',
+      commandType: 'dropTip',
       params: {
-        pipette: primaryPipetteId,
-        labware: tiprackInSlot1Id,
-        well: 'A1',
+        pipetteId: primaryPipetteId,
+        labwareId: tiprackInSlot1Id,
+        wellName: 'A1',
       },
     }
 
@@ -126,63 +141,82 @@ describe('getTwoPipettePositionCheckSteps', () => {
       '1dc0c050-0122-11ec-88a3-f1745cf9b36c:opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1'
 
     const moveToWellSeconaryPipetteSecondTiprack: Command = {
-      command: 'moveToWell',
+      id: '1',
+      commandType: 'moveToWell',
       params: {
-        pipette: secondaryPipetteId,
-        labware: tiprackInSlot2Id,
-        well: 'A1',
+        pipetteId: secondaryPipetteId,
+        labwareId: tiprackInSlot2Id,
+        wellName: 'A1',
+        wellLocation: {
+          origin: 'top',
+        },
       },
     }
 
     const moveToWellPrimaryPipetteFirstTiprack: Command = {
-      command: 'moveToWell',
+      id: '2',
+      commandType: 'moveToWell',
       params: {
-        pipette: primaryPipetteId,
-        labware: tiprackInSlot1Id,
-        well: 'A1',
+        pipetteId: primaryPipetteId,
+        labwareId: tiprackInSlot1Id,
+        wellName: 'A1',
+        wellLocation: {
+          origin: 'top',
+        },
       },
     }
 
     const pickupTipAtLastTiprackPrimaryPipetteUses: Command = {
-      command: 'pickUpTip',
+      id: '3',
+      commandType: 'pickUpTip',
       params: {
-        pipette: primaryPipetteId,
-        labware: tiprackInSlot1Id,
-        well: 'A1',
+        pipetteId: primaryPipetteId,
+        labwareId: tiprackInSlot1Id,
+        wellName: 'A1',
       },
     }
 
     const moveToWellFirstLabware: Command = {
-      command: 'moveToWell',
+      id: '4',
+      commandType: 'moveToWell',
       params: {
-        pipette: primaryPipetteId,
-        labware: resevoirId,
-        well: 'A1',
+        pipetteId: primaryPipetteId,
+        labwareId: resevoirId,
+        wellName: 'A1',
+        wellLocation: {
+          origin: 'top',
+        },
       },
     }
 
     const openTCLidCommand: Command = {
-      command: 'thermocycler/openLid',
+      id: '5',
+      commandType: 'thermocycler/openLid',
       params: {
-        module: TCId,
+        moduleId: TCId,
       },
     }
 
     const moveToWellAfterOpeningTCLidCommand: Command = {
-      command: 'moveToWell',
+      id: '6',
+      commandType: 'moveToWell',
       params: {
-        pipette: primaryPipetteId,
-        labware: TCWellPlateId,
-        well: 'A1',
+        pipetteId: primaryPipetteId,
+        labwareId: TCWellPlateId,
+        wellName: 'A1',
+        wellLocation: {
+          origin: 'top',
+        },
       },
     }
 
     const dropTipIntoLastTiprackPrimaryPipetteUses: Command = {
-      command: 'dropTip',
+      id: '7',
+      commandType: 'dropTip',
       params: {
-        pipette: primaryPipetteId,
-        labware: tiprackInSlot1Id,
-        well: 'A1',
+        pipetteId: primaryPipetteId,
+        labwareId: tiprackInSlot1Id,
+        wellName: 'A1',
       },
     }
 
