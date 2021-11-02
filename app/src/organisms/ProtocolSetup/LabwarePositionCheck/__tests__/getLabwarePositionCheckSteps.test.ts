@@ -10,8 +10,8 @@ import { getTwoPipettePositionCheckSteps } from '../utils/getTwoPipettePositionC
 import type { ProtocolFile } from '@opentrons/shared-data'
 
 // TODO: update these fixtures to be v6 protocols
-const protocolWithOnePipette = _uncasted_protocolWithOnePipette as unknown as ProtocolFile<any>
-const protocolWithTwoPipettes = _uncasted_protocolWithTwoPipettes as unknown as  ProtocolFile<any>
+const protocolWithOnePipette = (_uncasted_protocolWithOnePipette as unknown) as ProtocolFile<any>
+const protocolWithTwoPipettes = (_uncasted_protocolWithTwoPipettes as unknown) as ProtocolFile<any>
 
 jest.mock('../utils/getPrimaryPipetteId')
 jest.mock('../utils/getPipetteWorkflow')
@@ -38,7 +38,10 @@ describe('getLabwarePositionCheckSteps', () => {
   it('should generate commands with the one pipette workflow', () => {
     const mockPipette = protocolWithOnePipette.pipettes.pipetteId
     when(mockGetPrimaryPipetteId)
-      .calledWith(protocolWithOnePipette.pipettes, [])
+      .calledWith(
+        protocolWithOnePipette.pipettes,
+        protocolWithOnePipette.commands
+      )
       .mockReturnValue('pipetteId')
 
     when(mockGetPipetteWorkflow)
@@ -58,18 +61,20 @@ describe('getLabwarePositionCheckSteps', () => {
       labware: protocolWithOnePipette.labware,
       labwareDefinitions: protocolWithOnePipette.labwareDefinitions,
       modules: protocolWithOnePipette.modules,
+      commands: protocolWithOnePipette.commands,
     })
   })
   it('should generate commands with the two pipette workflow', () => {
     const leftPipetteId = '3dff4f90-3412-11eb-ad93-ed232a2337cf'
     const rightPipetteId = '4da579b0-a9bf-11eb-bce6-9f1d5b9c1a1b'
-    const leftPipette =
-      protocolWithTwoPipettes.pipettes[leftPipetteId]
-    const rightPipette =
-      protocolWithTwoPipettes.pipettes[rightPipetteId]
+    const leftPipette = protocolWithTwoPipettes.pipettes[leftPipetteId]
+    const rightPipette = protocolWithTwoPipettes.pipettes[rightPipetteId]
 
     when(mockGetPrimaryPipetteId)
-      .calledWith(protocolWithTwoPipettes.pipettes, [])
+      .calledWith(
+        protocolWithTwoPipettes.pipettes,
+        protocolWithTwoPipettes.commands
+      )
       .mockReturnValue(leftPipetteId)
 
     when(mockGetPipetteWorkflow)
