@@ -71,7 +71,9 @@ class EquipmentHandler:
         Returns:
             A LoadedLabwareData object.
         """
-        labware_id = labware_id if labware_id else self._model_utils.generate_id()
+        labware_id = (
+            labware_id if labware_id is not None else self._model_utils.generate_id()
+        )
 
         try:
             # Try to use existing definition in state.
@@ -133,6 +135,8 @@ class EquipmentHandler:
         except RuntimeError as e:
             raise FailedToLoadPipetteError(str(e)) from e
 
-        pipette_id = pipette_id or self._model_utils.generate_id()
+        pipette_id = (
+            pipette_id if pipette_id is not None else self._model_utils.generate_id()
+        )
 
         return LoadedPipetteData(pipette_id=pipette_id)
