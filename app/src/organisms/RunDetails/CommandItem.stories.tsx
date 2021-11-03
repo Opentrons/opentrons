@@ -1,17 +1,17 @@
 import * as React from 'react'
-import { RunDetailsCommand } from './RunDetailsCommand'
+import { CommandItem } from './CommandItem'
 
 import type { Story, Meta } from '@storybook/react'
 import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6/command'
 
 export default {
-  title: 'App/Molecules/RunDetailsCommand',
-  component: RunDetailsCommand,
+  title: 'App/Molecules/CommandItem',
+  component: CommandItem,
 } as Meta
 
-const Template: Story<
-  React.ComponentProps<typeof RunDetailsCommand>
-> = args => <RunDetailsCommand {...args} />
+const Template: Story<React.ComponentProps<typeof CommandItem>> = args => (
+  <CommandItem {...args} />
+)
 
 const WELL_LOCATION = { origin: 'top', offset: { x: 0, y: 0, z: 0 } }
 

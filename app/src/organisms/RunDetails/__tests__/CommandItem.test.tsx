@@ -1,11 +1,11 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
-import { RunDetailsCommand } from '../RunDetailsCommand'
+import { CommandItem } from '../CommandItem'
 import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6/command'
 
-const render = (props: React.ComponentProps<typeof RunDetailsCommand>) => {
-  return renderWithProviders(<RunDetailsCommand {...props} />, {
+const render = (props: React.ComponentProps<typeof CommandItem>) => {
+  return renderWithProviders(<CommandItem {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
@@ -16,7 +16,7 @@ const WELLNAME = 'WELLNAME'
 const COMMAND_TYPE = 'touchTip'
 
 describe('Run  Details Command', () => {
-  let props: React.ComponentProps<typeof RunDetailsCommand>
+  let props: React.ComponentProps<typeof CommandItem>
 
   beforeEach(() => {
     props = {

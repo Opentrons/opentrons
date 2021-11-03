@@ -11,6 +11,9 @@ export const C_TRANSPARENT = 'transparent'
 
 // brand colors
 export const C_BLUE = '#006fff'
+export const C_MINT = '#00bfa8'
+export const C_AQUAMARINE = '#eefff8'
+export const C_POWDER_BLUE = '#f1f8ff'
 
 // colors by usage
 // TODO(mc, 2020-10-08): s/COLOR_/C_
@@ -42,12 +45,3 @@ export const OPACITY_DISABLED = 0.3
 
 // TODO(isk: 3/2/20): Rename to be more generic (e.g. not FONT)
 export const C_FONT_DISABLED = '#9c9c9c'
-
-//  run details current step border color
-export const C_MINT = '#00bfa8'
-
-//  run details completed step background color
-export const C_AQUAMARINE = '#eefff8'
-
-//  run details running step background color
-export const C_POWDER_BLUE = '#f1f8ff'
