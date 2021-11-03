@@ -16,51 +16,42 @@ import {
   TEXT_TRANSFORM_CAPITALIZE,
   TEXT_TRANSFORM_UPPERCASE,
 } from '@opentrons/components'
-import type { SetupCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
 
 interface ProtocolSetupInfoProps {
   onCloseClick: () => unknown
-  //SetupCommand: SetupCommand
+  SetupCommand: Command
 }
 
 export const ProtocolSetupInfo = (
   props: ProtocolSetupInfoProps
 ): JSX.Element | null => {
   const { SetupCommand } = props
-  const SetupCommand = {
-    commandType: 'loadModule',
-    params: {
-      moduleId: 'temperature_module_gen2',
-      location: { slotName: '9', coordinates: { x: 0, y: 0, z: 0 } },
-    },
-    result: { moduleId: 'thermocycler_gen1' },
-  }
   const { t } = useTranslation('run_details')
 
   let SetupCommandText
-  // if (SetupCommand.commandType === 'loadPipette') {
-  //   SetupCommandText = (
-  //     <Trans
-  //       t={t}
-  //       id={`RunDetails_PipetteSetup`}
-  //       i18nKey={'load_pipette_protocol_setup'}
-  //       values={{
-  //         pipette_name: SetupCommand.result?.pipetteId,
-  //         mount_name: SetupCommand.params.mount,
-  //       }}
-  //       components={{
-  //         span: (
-  //           <Text
-  //             textTransform={TEXT_TRANSFORM_CAPITALIZE}
-  //             marginLeft={SPACING_1}
-  //             marginRight={SPACING_1}
-  //           />
-  //         ),
-  //       }}
-  //     />
-  //   )
-  // } 
- if (SetupCommand.commandType === 'loadModule') {
+  if (SetupCommand.commandType === 'loadPipette') {
+    SetupCommandText = (
+      <Trans
+        t={t}
+        id={`RunDetails_PipetteSetup`}
+        i18nKey={'load_pipette_protocol_setup'}
+        values={{
+          pipette_name: SetupCommand.result?.pipetteId,
+          mount_name: SetupCommand.params.mount,
+        }}
+        components={{
+          span: (
+            <Text
+              textTransform={TEXT_TRANSFORM_CAPITALIZE}
+              marginLeft={SPACING_1}
+              marginRight={SPACING_1}
+            />
+          ),
+        }}
+      />
+    )
+  } else if (SetupCommand.commandType === 'loadModule') {
     const moduleSlotNumber = SetupCommand.result?.moduleId.includes(
       'thermocycler'
     )
@@ -78,33 +69,50 @@ export const ProtocolSetupInfo = (
         }}
       />
     )
-  } 
-  // else if (SetupCommand.commandType === 'loadLabware') {
-  //   SetupCommand.result?.definition.metadata.displayName.includes('trash')
-  //     ? (SetupCommandText = null)
-  //     : (SetupCommandText = (
-  //         <Trans
-  //           t={t}
-  //           id={`RunDetails_LabwareSetup`}
-  //           i18nKey={'load_labware_info_protocol_setup'}
-  //           values={{
-  //             labware_loadname:
-  //               SetupCommand.result?.definition.metadata.displayName,
-  //             labware_version: SetupCommand.result?.definition.version,
-  //             slot_number: Object.values(SetupCommand.params.location)[0],
-  //           }}
-  //         />
-  //       ))
-  // }
+  } else if (SetupCommand.commandType === 'loadLabware') {
+    const moduleUnderLabware = Object.values(SetupCommand.params.location)[1]
+    let moduleIncluded = 0
+    if (moduleUnderLabware == null) {
+      moduleIncluded = 0
+    } else if (
+      moduleUnderLabware !== null &&
+      //  @ts-ignore: moduleUnderLabware is possibly 'null'
+      moduleUnderLabware.includes('thermocycler')
+    ) {
+      moduleIncluded = 4
+    } else if (moduleUnderLabware != null) {
+      moduleIncluded = 1
+    }
+    SetupCommand.result?.definition.metadata.displayName.includes('trash')
+      ? (SetupCommandText = null)
+      : (SetupCommandText = (
+          <Trans
+            t={t}
+            id={`RunDetails_LabwareSetup`}
+            i18nKey={
+              moduleIncluded === 0
+                ? 'load_labware_info_protocol_setup_no_module'
+                : 'load_labware_info_protocol_setup'
+            }
+            count={moduleIncluded === 0 ? undefined : moduleIncluded}
+            values={{
+              labware_loadname:
+                SetupCommand.result?.definition.metadata.displayName,
+              labware_version: SetupCommand.result?.definition.version,
+              slot_number: Object.values(SetupCommand.params.location)[0],
+              module_name: Object.values(SetupCommand.params.location)[1],
+            }}
+          />
+        ))
+  }
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
       margin={SPACING_1}
       width={'100%'}
-      color={C_MED_DARK_GRAY}
       fontSize={FONT_SIZE_BODY_1}
     >
-      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
+      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} color={C_MED_DARK_GRAY}>
         <Text
           textTransform={TEXT_TRANSFORM_UPPERCASE}
           fontSize={FONT_SIZE_CAPTION}

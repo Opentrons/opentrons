@@ -16,6 +16,11 @@ import {
 } from '@opentrons/components'
 import { useProtocolDetails } from './hooks'
 import { ProtocolSetupInfo } from './ProtocolSetupInfo'
+import _Fixture_commands from './Fixture_commands.json'
+import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
+import { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
+
 
 export function RunDetailsCommands(): JSX.Element | null {
   const { t } = useTranslation('run_details')
@@ -25,16 +30,32 @@ export function RunDetailsCommands(): JSX.Element | null {
     setShowProtocolSetupInfo,
   ] = React.useState<boolean>(false)
   if (protocolData == null) return null
+//  const fixtureCommands = _Fixture_commands as Command //TODO: immediately
+
+const LABWARE_LOCATION = { slotName: '9' } || { moduleId: 'thermocycler' } || {
+  coordinates: { x: 0, y: 0, z: 0 },
+}
+
+const COMMAND = {
+commandType: 'loadLabware',
+params: {
+  labwareId: '96_wellplate',
+  location: LABWARE_LOCATION,
+},
+result: {
+  labwareId: '96_wellplate',
+  definition: fixture_96_plate as LabwareDefinition2,
+  offset: { x: 0, y: 0, z: 0 },
+},
+} as Command
 
   return (
     <React.Fragment>
-      <Flex
-        margin={SPACING_1}
-        backgroundColor={'#FAFAFA'} //  background color should change when this step is completed
-      >
+      <Flex margin={SPACING_1}>
         {showProtocolSetupInfo ? (
           <ProtocolSetupInfo
             onCloseClick={() => setShowProtocolSetupInfo(false)}
+            SetupCommand={COMMAND}
           />
         ) : (
           <Btn
