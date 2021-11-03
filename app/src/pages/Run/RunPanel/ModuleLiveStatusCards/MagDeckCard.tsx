@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Box, SPACING_3 } from '@opentrons/components'
-import { getModuleDisplayName } from '@opentrons/shared-data'
+import { getModuleDisplayName, getModuleType } from '@opentrons/shared-data'
 
 import { StatusCard } from './StatusCard'
 import { MagnetData, MagnetControl } from '../../../../molecules/ModuleControls'
@@ -33,6 +33,7 @@ export const MagDeckCard = ({
   slot,
 }: Props): JSX.Element => (
   <StatusCard
+    moduleType={getModuleType(module.model)}
     header={slot}
     title={getModuleDisplayName(module.model)}
     isCardExpanded={isCardExpanded}
