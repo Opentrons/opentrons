@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
 import { getLabwarePositionCheckSteps } from '../getLabwarePositionCheckSteps'
