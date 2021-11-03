@@ -21,7 +21,7 @@ from opentrons.calibration_storage.helpers import uri_from_details
 
 from .. import errors
 from ..resources import DeckFixedLabware
-from ..commands import Command, LoadLabwareResult, AddLabwareDefinitionResult
+from ..commands import Command, LoadLabware, AddLabwareDefinition
 from ..types import CalibrationOffset, LabwareLocation, LoadedLabware, Dimensions
 from ..actions import Action, UpdateCommandAction
 from .abstract_store import HasState, HandlesActions
@@ -91,11 +91,14 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
     def handle_action(self, action: Action) -> None:
         """Modify state in reaction to an action."""
         if isinstance(action, UpdateCommandAction):
-            self._handle_command(action.command)
+            command = action.command
+            if isinstance(command, LoadLabware):
+                self._handle_load_labware(command)
+            elif isinstance(command, AddLabwareDefinition):
+                self._handle_add_labware_definition(command)
 
-    def _handle_command(self, command: Command) -> None:
-        """Modify state in reaction to a command."""
-        if isinstance(command.result, LoadLabwareResult):
+    def _handle_load_labware(self, command: LoadLabware) -> None:
+        if command.result is not None:
             labware_id = command.result.labwareId
             definition_uri = uri_from_details(
                 namespace=command.result.definition.namespace,
@@ -122,7 +125,8 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
                 labware_definitions_by_uri=labware_definitions_by_uri,
             )
 
-        elif isinstance(command.result, AddLabwareDefinitionResult):
+    def _handle_add_labware_definition(self, command: AddLabwareDefinition) -> None:
+        if command.result is not None:
             definition_uri = uri_from_details(
                 namespace=command.result.namespace,
                 load_name=command.result.loadName,
