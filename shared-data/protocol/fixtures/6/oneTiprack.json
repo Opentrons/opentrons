@@ -1231,7 +1231,55 @@
   },
   "commands": [
     {
-      "id": 0,
+      "id": "0abc1",
+      "commandType": "loadPipette",
+      "params": {
+        "pipetteId": "pipetteId",
+        "mount": "left"
+      }
+    },
+    {
+      "id": "0abc2",
+      "commandType": "loadLabware",
+      "params": {
+        "labwareId": "trashId",
+        "location": {
+          "slotName": "12"
+        }
+      }
+    },
+    {
+      "id": "0abc3",
+      "commandType": "loadLabware",
+      "params": {
+        "labwareId": "tiprackId",
+        "location": {
+          "slotName": "1"
+        }
+      }
+    },
+    {
+      "id": "0abc4",
+      "commandType": "loadLabware",
+      "params": {
+        "labwareId": "sourcePlateId",
+        "location": {
+          "slotName": "2"
+        }
+      }
+    },
+    {
+      "id": "0abc4",
+      "commandType": "loadLabware",
+      "params": {
+        "labwareId": "destPlateId",
+        "location": {
+          "slotName": "3"
+        }
+      }
+    },
+    {
+      "id": "0",
       "commandType": "pickUpTip",
       "params": {
         "pipetteId": "pipetteId",
@@ -1240,7 +1288,7 @@
       }
     },
     {
-      "id": 1,
+      "id": "1",
       "commandType": "aspirate",
       "params": {
         "pipetteId": "pipetteId",
@@ -1255,14 +1303,14 @@
       }
     },
     {
-      "id": 2,
+      "id": "2",
       "commandType": "delay",
       "params": {
         "wait": 42
       }
     },
     {
-      "id": 3,
+      "id": "3",
       "commandType": "dispense",
       "params": {
         "pipetteId": "pipetteId",
@@ -1277,7 +1325,7 @@
       }
     },
     {
-      "id": 4,
+      "id": "4",
       "commandType": "touchTip",
       "params": {
         "pipetteId": "pipetteId",
@@ -1290,7 +1338,7 @@
       }
     },
     {
-      "id": 5,
+      "id": "5",
       "commandType": "blowout",
       "params": {
         "pipetteId": "pipetteId",
@@ -1304,7 +1352,7 @@
       }
     },
     {
-      "id": 6,
+      "id": "6",
       "commandType": "moveToSlot",
       "params": {
         "pipetteId": "pipetteId",
@@ -1317,7 +1365,7 @@
       }
     },
     {
-      "id": 7,
+      "id": "7",
       "commandType": "moveToWell",
       "params": {
         "pipetteId": "pipetteId",
@@ -1329,7 +1377,7 @@
       }
     },
     {
-      "id": 8,
+      "id": "8",
       "commandType": "moveToWell",
       "params": {
         "pipetteId": "pipetteId",
@@ -1348,7 +1396,7 @@
       }
     },
     {
-      "id": 9,
+      "id": "9",
       "commandType": "dropTip",
       "params": {
         "pipetteId": "pipetteId",

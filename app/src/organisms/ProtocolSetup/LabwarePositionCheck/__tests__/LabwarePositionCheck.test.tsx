@@ -6,8 +6,8 @@ import { i18n } from '../../../../i18n'
 import { LabwarePositionCheck } from '../index'
 import { GenericStepScreen } from '../GenericStepScreen'
 import { IntroScreen } from '../IntroScreen'
-import { useSteps } from '../hooks'
 import { SummaryScreen } from '../SummaryScreen'
+import { useSteps, useLabwarePositionCheck } from '../hooks'
 import { LabwarePositionCheckStep } from '../types'
 
 jest.mock('../GenericStepScreen')
@@ -24,6 +24,9 @@ const mockSummaryScreen = SummaryScreen as jest.MockedFunction<
 >
 
 const mockUseSteps = useSteps as jest.MockedFunction<typeof useSteps>
+const mockUseLabwarePositionCheck = useLabwarePositionCheck as jest.MockedFunction<
+  typeof useLabwarePositionCheck
+>
 
 const PICKUP_TIP_LABWARE_ID = 'PICKUP_TIP_LABWARE_ID'
 const PRIMARY_PIPETTE_ID = 'PRIMARY_PIPETTE_ID'
