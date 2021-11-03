@@ -1,4 +1,9 @@
-"""Basic labware data state and store."""
+"""Basic labware and module data state and store."""
+
+# todo(mm, 2021-11-03): Either rename this module and these classes to reflect that they
+# includes hardware modules as well as labware, or move hardware modules to their own
+# thing.
+
 from __future__ import annotations
 
 import re
@@ -27,9 +32,15 @@ class LabwareState:
     """State of all loaded labware resources."""
 
     labware_by_id: Dict[str, LoadedLabware]
-    calibrations_by_id: Dict[str, CalibrationOffset]
-    definitions_by_uri: Dict[str, LabwareDefinition]
+    modules_by_id: Dict[str, None]
+
+    # Offsets to apply to labware, indexed by that labware's ID.
+    # If the labware is loaded on a module, this is in addition to any
+    # offset inherent to that type of module.
+    labware_offsets_by_id: Dict[str, CalibrationOffset]
+
     deck_definition: DeckDefinitionV2
+    labware_definitions_by_uri: Dict[str, LabwareDefinition]
 
 
 class LabwareStore(HasState[LabwareState], HandlesActions):
@@ -43,7 +54,7 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
         deck_fixed_labware: Sequence[DeckFixedLabware],
     ) -> None:
         """Initialize a labware store and its state."""
-        definitions_by_uri: Dict[str, LabwareDefinition] = {
+        labware_definitions_by_uri: Dict[str, LabwareDefinition] = {
             uri_from_details(
                 load_name=fixed_labware.definition.parameters.loadName,
                 namespace=fixed_labware.definition.namespace,
@@ -64,16 +75,17 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
             )
             for fixed_labware in deck_fixed_labware
         }
-        calibrations_by_id = {
+        labware_offsets_by_id = {
             fixed_labware.labware_id: CalibrationOffset(x=0, y=0, z=0)
             for fixed_labware in deck_fixed_labware
         }
 
         self._state = LabwareState(
-            definitions_by_uri=definitions_by_uri,
-            calibrations_by_id=calibrations_by_id,
             labware_by_id=labware_by_id,
+            modules_by_id={},
+            labware_offsets_by_id=labware_offsets_by_id,
             deck_definition=deck_definition,
+            labware_definitions_by_uri=labware_definitions_by_uri,
         )
 
     def handle_action(self, action: Action) -> None:
@@ -91,11 +103,11 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
                 version=command.result.definition.version,
             )
             labware_by_id = self._state.labware_by_id.copy()
-            calibrations_by_id = self._state.calibrations_by_id.copy()
-            definitions_by_uri = self._state.definitions_by_uri.copy()
+            labware_offsets_by_id = self._state.labware_offsets_by_id.copy()
+            labware_definitions_by_uri = self._state.labware_definitions_by_uri.copy()
 
-            definitions_by_uri[definition_uri] = command.result.definition
-            calibrations_by_id[labware_id] = command.result.calibration
+            labware_definitions_by_uri[definition_uri] = command.result.definition
+            labware_offsets_by_id[labware_id] = command.result.calibration
             labware_by_id[labware_id] = LoadedLabware(
                 id=labware_id,
                 location=command.data.location,
@@ -106,8 +118,8 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
             self._state = replace(
                 self._state,
                 labware_by_id=labware_by_id,
-                calibrations_by_id=calibrations_by_id,
-                definitions_by_uri=definitions_by_uri,
+                labware_offsets_by_id=labware_offsets_by_id,
+                labware_definitions_by_uri=labware_definitions_by_uri,
             )
 
         elif isinstance(command.result, AddLabwareDefinitionResult):
@@ -116,9 +128,11 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
                 load_name=command.result.loadName,
                 version=command.result.version,
             )
-            definitions_by_uri = self._state.definitions_by_uri.copy()
-            definitions_by_uri[definition_uri] = command.data.definition
-            self._state = replace(self._state, definitions_by_uri=definitions_by_uri)
+            labware_definitions_by_uri = self._state.labware_definitions_by_uri.copy()
+            labware_definitions_by_uri[definition_uri] = command.data.definition
+            self._state = replace(
+                self._state, labware_definitions_by_uri=labware_definitions_by_uri
+            )
 
 
 class LabwareView(HasState[LabwareState]):
@@ -173,7 +187,7 @@ class LabwareView(HasState[LabwareState]):
     def get_definition_by_uri(self, uri: LabwareUri) -> LabwareDefinition:
         """Get the labware definition matching loadName namespace and version."""
         try:
-            return self._state.definitions_by_uri[uri]
+            return self._state.labware_definitions_by_uri[uri]
         except KeyError:
             raise errors.LabwareDefinitionDoesNotExistError(
                 f"Labware definition for matching {uri} not found."
@@ -277,6 +291,6 @@ class LabwareView(HasState[LabwareState]):
     def get_calibration_offset(self, labware_id: str) -> CalibrationOffset:
         """Get the labware's calibration offset."""
         try:
-            return self._state.calibrations_by_id[labware_id]
+            return self._state.labware_offsets_by_id[labware_id]
         except KeyError:
             raise errors.LabwareDoesNotExistError(f"Labware {labware_id} not found.")

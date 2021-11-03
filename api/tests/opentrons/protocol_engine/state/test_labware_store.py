@@ -58,8 +58,9 @@ def test_initial_state(
                 location=DeckSlotLocation(slot=DeckSlotName.FIXED_TRASH),
             )
         },
-        calibrations_by_id={"fixedTrash": CalibrationOffset(x=0, y=0, z=0)},
-        definitions_by_uri={expected_trash_uri: fixed_trash_def},
+        modules_by_id={},
+        labware_offsets_by_id={"fixedTrash": CalibrationOffset(x=0, y=0, z=0)},
+        labware_definitions_by_uri={expected_trash_uri: fixed_trash_def},
     )
 
 
@@ -92,9 +93,12 @@ def test_handles_load_labware(
 
     assert subject.state.labware_by_id["test-labware-id"] == expected_labware_data
 
-    assert subject.state.definitions_by_uri[expected_definition_uri] == well_plate_def
+    assert (
+        subject.state.labware_definitions_by_uri[expected_definition_uri]
+        == well_plate_def
+    )
 
-    assert subject.state.calibrations_by_id["test-labware-id"] == CalibrationOffset(
+    assert subject.state.labware_offsets_by_id["test-labware-id"] == CalibrationOffset(
         x=1, y=2, z=3
     )
 
@@ -113,4 +117,4 @@ def test_handles_add_labware_defintion(
 
     subject.handle_action(UpdateCommandAction(command=command))
 
-    assert subject.state.definitions_by_uri[expected_uri] == well_plate_def
+    assert subject.state.labware_definitions_by_uri[expected_uri] == well_plate_def
