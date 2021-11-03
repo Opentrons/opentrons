@@ -1,13 +1,15 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
+import { getPipetteNameSpecs } from '@opentrons/shared-data'
 import { getLabwarePositionCheckSteps } from '../getLabwarePositionCheckSteps'
 import { getProtocolData } from '../../../../redux/protocol'
-import { getPipetteNameSpecs, ProtocolFile } from '@opentrons/shared-data'
+import { getPipetteMount } from '../../utils/getPipetteMount'
+import { getLabwareLocation } from '../../utils/getLabwareLocation'
 
-import type { PipetteName } from '@opentrons/shared-data'
+import type { PipetteName, ProtocolFile } from '@opentrons/shared-data'
+import type { PickUpTipCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
 import type { State } from '../../../../redux/types'
 import type { LabwarePositionCheckStep, Section } from '../types'
-import { PickUpTipCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
 
 type LabwareIdsBySection = {
   [section in Section]?: string[]
@@ -85,9 +87,12 @@ export function useIntroInfo(): IntroInfo | null {
     labwareId: pickUpTipLabwareId,
   } = (pickUpTipStep.commands[0] as PickUpTipCommand).params
   const primaryPipetteName = protocolData.pipettes[primaryPipetteId].name
-  const primaryPipetteMount = protocolData.pipettes[primaryPipetteId].mount
+  const primaryPipetteMount = getPipetteMount(
+    primaryPipetteId,
+    protocolData.commands
+  )
   const secondaryPipetteMount =
-    protocolData.pipettes[primaryPipetteId].mount === 'right' ? 'left' : 'right'
+    primaryPipetteMount === 'right' ? 'left' : 'right'
   const primaryPipetteSpecs =
     primaryPipetteName != null
       ? getPipetteNameSpecs(primaryPipetteName as PipetteName)
@@ -96,14 +101,20 @@ export function useIntroInfo(): IntroInfo | null {
   // find name and slot number for tiprack used for check
   const primaryTipRackName =
     'displayName' in pickUpTipLabware ? pickUpTipLabware?.displayName : null
-  const primaryTipRackSlot = pickUpTipLabware.slot
+  const primaryTipRackSlot = getLabwareLocation(
+    pickUpTipLabwareId,
+    protocolData.commands
+  )
 
   // find how many channels pipette for check has for dynmic text
   const numberOfTips = primaryPipetteSpecs?.channels
 
   // find the slot for the first labware that will be checked for button
   const firstTiprackToCheckId = steps[0].labwareId
-  const firstStepLabwareSlot = protocolData.labware[firstTiprackToCheckId].slot
+  const firstStepLabwareSlot = getLabwareLocation(
+    firstTiprackToCheckId,
+    protocolData.commands
+  )
 
   if (
     primaryTipRackSlot == null ||

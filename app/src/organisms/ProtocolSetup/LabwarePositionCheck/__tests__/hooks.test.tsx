@@ -5,12 +5,18 @@ import { createStore, Store } from 'redux'
 import { renderHook } from '@testing-library/react-hooks'
 import { getPipetteNameSpecs, PipetteName } from '@opentrons/shared-data'
 import { getProtocolData } from '../../../../redux/protocol'
+import { getPipetteMount } from '../../utils/getPipetteMount'
 import * as hooks from '../hooks'
+import { getLabwareLocation } from '../../utils/getLabwareLocation'
 import { getLabwarePositionCheckSteps } from '../getLabwarePositionCheckSteps'
+import type { PickUpTipCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
+import type { LoadLabwareCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 
 jest.mock('@opentrons/shared-data')
 jest.mock('../getLabwarePositionCheckSteps')
 jest.mock('../../../../redux/protocol')
+jest.mock('../../utils/getPipetteMount')
+jest.mock('../../utils/getLabwareLocation')
 
 const PRIMARY_PIPETTE_ID = 'PRIMARY_PIPETTE_ID'
 const PRIMARY_PIPETTE_NAME = 'PRIMARY_PIPETTE_NAME' as PipetteName
@@ -25,32 +31,50 @@ const PICKUP_TIP_LABWARE_DISPLAY_NAME = 'PICKUP_TIP_LABWARE_DISPLAY_NAME'
 const mockGetProtocolData = getProtocolData as jest.MockedFunction<
   typeof getProtocolData
 >
-
 const mockGetPipetteNameSpecs = getPipetteNameSpecs as jest.MockedFunction<
   typeof getPipetteNameSpecs
 >
 const mockGetLabwarePositionCheckSteps = getLabwarePositionCheckSteps as jest.MockedFunction<
   typeof getLabwarePositionCheckSteps
 >
+const mockGetPipetteMount = getPipetteMount as jest.MockedFunction<
+  typeof getPipetteMount
+>
+const mockGetLabwareLocation = getLabwareLocation as jest.MockedFunction<
+  typeof getLabwareLocation
+>
 
 const store: Store<any> = createStore(jest.fn(), {})
 
 describe('useIntroInfo', () => {
   beforeEach(() => {
+    const protocolCommands = [
+      {
+        commandType: 'loadLabware',
+        id: '4abc123',
+        params: {
+          labwareId: PICKUP_TIP_LABWARE_ID,
+          location: {
+            slotName: PICKUP_TIP_LABWARE_SLOT,
+          },
+        },
+      } as LoadLabwareCommand,
+    ]
     mockGetLabwarePositionCheckSteps.mockReturnValue([
       {
         labwareId: PICKUP_TIP_LABWARE_ID,
-        section: '',
+        section: 'PRIMARY_PIPETTE_TIPRACKS',
+        // LPC commands that are generated, different than commands that come from protocol analysis
         commands: [
           {
-            command: 'pickUpTip',
+            commandType: 'pickUpTip',
             params: {
-              pipette: PRIMARY_PIPETTE_ID,
-              labware: PICKUP_TIP_LABWARE_ID,
+              pipetteId: PRIMARY_PIPETTE_ID,
+              labwareId: PICKUP_TIP_LABWARE_ID,
             },
-          },
+          } as PickUpTipCommand,
         ],
-      } as any,
+      },
     ])
     mockGetProtocolData.mockReturnValue({
       labware: {
@@ -69,11 +93,20 @@ describe('useIntroInfo', () => {
           mount: 'right',
         },
       },
+      commands: protocolCommands,
     } as any)
 
     when(mockGetPipetteNameSpecs)
       .calledWith(PRIMARY_PIPETTE_NAME)
       .mockReturnValue({ channels: PRIMARY_PIPETTE_NUM_CHANNELS } as any)
+
+    when(mockGetPipetteMount)
+      .calledWith(PRIMARY_PIPETTE_ID, protocolCommands)
+      .mockReturnValue('left')
+
+    when(mockGetLabwareLocation)
+      .calledWith(PICKUP_TIP_LABWARE_ID, protocolCommands)
+      .mockReturnValue(PICKUP_TIP_LABWARE_SLOT)
   })
   it('should gather all labware position check intro screen data', () => {
     const wrapper: React.FunctionComponent<{}> = ({ children }) => (
