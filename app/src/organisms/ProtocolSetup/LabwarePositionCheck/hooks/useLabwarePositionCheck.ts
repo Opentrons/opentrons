@@ -108,9 +108,9 @@ export function useLabwarePositionCheck(
   }
   const loadCommands = protocolData?.commands.filter(isLoadCommand) ?? []
   const TCOpenCommands = useCommands().filter(isTCOpenCommand) ?? []
-  // prepCommands will be run once when a user starts LPC
+  // prepCommands will be run when a user starts LPC
   const prepCommands = [...loadCommands, ...TCOpenCommands]
-  // LPCMovementCommands will during the guided LPC flow
+  // LPCMovementCommands will be run during the guided LPC flow
   const LPCMovementCommands: LabwarePositionCheckMovementCommand[] = useCommands().filter(
     (
       command: LabwarePositionCheckCommand
