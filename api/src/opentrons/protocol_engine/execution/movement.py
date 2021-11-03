@@ -81,10 +81,9 @@ class MovementHandler:
             )
 
     async def save_position(
-        self, pipette_id: str, position_id: str
+        self, pipette_id: str, position_id: Optional[str]
     ) -> SavedPositionData:
         """Get the pipette position and save to state."""
-
         pipette_location = self._state_store.motion.get_pipette_location(
             pipette_id=pipette_id,
         )

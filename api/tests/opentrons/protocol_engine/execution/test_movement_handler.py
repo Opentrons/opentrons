@@ -217,8 +217,9 @@ async def test_save_position(
     ).then_return(Point(1, 1, 1))
 
     result = await handler.save_position(pipette_id="pipette-id", position_id="123")
-    assert result == SavedPositionData(positionId="123",
-                                       position=DeckPoint(x=1, y=1, z=1))
+    assert result == SavedPositionData(
+        positionId="123", position=DeckPoint(x=1, y=1, z=1)
+    )
 
 
 @pytest.mark.parametrize(
@@ -235,9 +236,9 @@ async def test_save_position_different_cp(
     hardware_api: HardwareAPI,
     handler: MovementHandler,
     mock_hw_pipettes: MockPipettes,
-    unverified_cp,
-    tip_length,
-    verified_cp,
+    unverified_cp: CriticalPoint,
+    tip_length: float,
+    verified_cp: CriticalPoint,
 ) -> None:
     """Test that `save_position` selects correct critical point."""
     decoy.when(
