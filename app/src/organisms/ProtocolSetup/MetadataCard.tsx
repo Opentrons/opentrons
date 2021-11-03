@@ -40,7 +40,7 @@ export function MetadataCard(): JSX.Element {
           id={'MetadataCard_protocolCreationMethod'}
         />
       </Flex>
-      <Flex marginTop={SPACING_2} flex={'auto'}>
+      <Flex marginTop={SPACING_2}>
         <LabeledValue
           flex={6}
           label={t('description')}
