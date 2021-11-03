@@ -26,7 +26,19 @@ class DeckSlotLocation(BaseModel):
     slot: DeckSlotName
 
 
-LabwareLocation = Union[DeckSlotLocation]
+class ModuleLocation(BaseModel):
+    """The location of something placed atop a hardware module."""
+
+    moduleId: str = Field(
+        ...,
+        description=(
+            "The ID of a loaded module,"
+            " from the result of a prior `loadModule` command."
+        ),
+    )
+
+
+LabwareLocation = Union[DeckSlotLocation, ModuleLocation]
 """Union of all locations where it's legal to load a labware."""
 
 
