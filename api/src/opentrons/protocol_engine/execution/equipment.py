@@ -1,6 +1,7 @@
 """Equipment command side-effect logic."""
 from dataclasses import dataclass
 from typing import Tuple, Optional
+import logging
 
 from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.protocols.models import LabwareDefinition
@@ -15,7 +16,7 @@ from ..types import LabwareLocation, PipetteName
 
 @dataclass(frozen=True)
 class LoadedLabwareData:
-    """The result of a load labware procedure."""
+    """The result of a successful labware load."""
 
     labware_id: str
     definition: LabwareDefinition
@@ -23,8 +24,15 @@ class LoadedLabwareData:
 
 
 @dataclass(frozen=True)
+class LoadedModuleData:
+    """The result of a successful module load."""
+
+    module_id: str
+
+
+@dataclass(frozen=True)
 class LoadedPipetteData:
-    """The result of a load pipette procedure."""
+    """The result of a successful pipette load."""
 
     pipette_id: str
 
@@ -101,6 +109,32 @@ class EquipmentHandler:
             definition=definition,
             calibration=calibration,
         )
+
+    async def load_module(
+        self,
+        module_name: str,
+        module_id: Optional[str],
+    ) -> LoadedModuleData:
+        """Ensure the requested module (or something compatible) is connected."""
+
+        # todo(mm, 2021-11-01): Figure out how to support multiples of a module.
+        # For example, if a protocol requires two magnetic modules but only one is
+        # connected, attempting to load the second one should fail even though, in a
+        # sense, the "requested module" *is* "connected."
+
+        module_id = (
+            module_id if module_id is not None else self._model_utils.generate_id()
+        )
+
+        # todo(mm, 2021-11-01): Detect if the requested module isn't connected.
+
+        logging.warn(
+            f"Protocol Engine does not currently support controlling modules."
+            f" Assuming a {module_name} is connected"
+            f" for module ID {module_id}."
+        )
+
+        return LoadedModuleData(module_id=module_id)
 
     async def load_pipette(
         self,
