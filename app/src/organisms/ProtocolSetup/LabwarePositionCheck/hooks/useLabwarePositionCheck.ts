@@ -11,20 +11,18 @@ import {
   useAllCommandsQuery,
 } from '@opentrons/react-api-client'
 import { useProtocolDetails } from '../../../RunDetails/hooks'
-import { useSteps } from '.'
+import { getLabwareLocation } from '../../utils/getLabwareLocation'
+import { getModuleLocation } from '../../utils/getModuleLocation'
+import { useCommands } from '.'
 import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
-import type {
-  LoadLabwareCommand,
-  LoadModuleCommand,
-  SetupCommand,
-} from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+import type { SetupCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 import type {
   Axis,
   Jog,
   Sign,
   StepSize,
 } from '../../../../molecules/JogControls/types'
-import {
+import type {
   LabwarePositionCheckCommand,
   LabwarePositionCheckMovementCommand,
 } from '../types'
@@ -45,43 +43,20 @@ const useLpcCtaText = (command: LabwarePositionCheckCommand): string => {
   const { protocolData } = useProtocolDetails()
   const commands = protocolData?.commands ?? []
   switch (command.commandType) {
+    case 'dropTip':
     case 'moveToWell': {
       const labwareId = command.params.labwareId
-      const loadLabwareCommand = commands.find(
-        (command: Command) =>
-          command.commandType === 'loadLabware' &&
-          command.params.labwareId === labwareId
-      ) as LoadLabwareCommand
-      // @ts-expect-error we know slotName exists on params.location because the loadLabware command was loaded using the slotName, not moduleId
-      const slot = loadLabwareCommand.params.location.slotName
+      const slot = getLabwareLocation(labwareId, commands)
       return `Confirm position, move to slot ${slot}`
     }
     case 'thermocycler/openLid': {
       const moduleId = command.params.moduleId
-      const loadModuleCommand = commands.find(
-        (command: Command) =>
-          command.commandType === 'loadModule' &&
-          command.params.moduleId === moduleId
-      ) as LoadModuleCommand
-      const slot = loadModuleCommand.params.location.slotName
+      const slot = getModuleLocation(moduleId, commands)
       return `Confirm position, move to slot ${slot}`
     }
     case 'pickUpTip': {
       return `Confirm position, pick up tip`
     }
-    case 'dropTip': {
-      const labwareId = command.params.labwareId
-      const loadLabwareCommand = commands.find(
-        (command: Command) =>
-          command.commandType === 'loadLabware' &&
-          command.params.labwareId === labwareId
-      ) as LoadLabwareCommand
-      // @ts-expect-error we know slotName exists on params.location because the loadLabware command was loaded using the slotName, not moduleId
-      const slot = loadLabwareCommand.params.location.slotName
-      return `Confirm position, return tip to slot ${slot}`
-    }
-    default:
-      return ''
   }
 }
 
@@ -131,20 +106,17 @@ export function useLabwarePositionCheck(
   if (basicRun.error != null && error !== null) {
     setError(basicRun.error)
   }
-
   const loadCommands = protocolData?.commands.filter(isLoadCommand) ?? []
-  // TODO IMMEDIATELY: pull TC open lid commands from LPC commands
-  const TCOpenCommands = protocolData?.commands.filter(isTCOpenCommand) ?? []
+  const TCOpenCommands = useCommands().filter(isTCOpenCommand) ?? []
+  // prepCommands will be run once when a user starts LPC
   const prepCommands = [...loadCommands, ...TCOpenCommands]
-  // @ts-expect-error TS can't tell we're filtering out TC open lid commands, so we're just left with movement commands
-  const LPCMovementCommands: LabwarePositionCheckMovementCommand[] = useSteps()
-    .reduce<LabwarePositionCheckCommand[]>((steps, currentStep) => {
-      return [...steps, ...currentStep.commands]
-    }, [])
-    .filter(
-      (command: LabwarePositionCheckCommand) =>
-        command.commandType !== 'thermocycler/openLid'
-    )
+  // LPCMovementCommands will during the guided LPC flow
+  const LPCMovementCommands: LabwarePositionCheckMovementCommand[] = useCommands().filter(
+    (
+      command: LabwarePositionCheckCommand
+    ): command is LabwarePositionCheckMovementCommand =>
+      command.commandType !== 'thermocycler/openLid'
+  )
   const lastCommand = LPCMovementCommands[currentCommandIndex - 1]
   const currentCommand = LPCMovementCommands[currentCommandIndex]
   const ctaText = useLpcCtaText(currentCommand)
@@ -209,9 +181,11 @@ export function useLabwarePositionCheck(
       basicRun.data?.id as string,
       createCommandData(savePositionCommand)
     )
+      // add the saved command id so we can use it to query locations later
       .then(response => {
         const commandId = response.data.data.id
         addSavePositionCommandData(commandId, lastCommand.params.labwareId)
+        // execute the movement command
         return createCommand(
           host as HostConfig,
           basicRun.data?.id as string,
@@ -233,6 +207,7 @@ export function useLabwarePositionCheck(
 
   const beginLPC = (): void => {
     setIsLoading(true)
+    // execute prep commands
     prepCommands.forEach((prepCommand: Command) => {
       createCommand(
         host as HostConfig,

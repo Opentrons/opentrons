@@ -8,7 +8,11 @@ import { getLabwareLocation } from '../../utils/getLabwareLocation'
 import type { PipetteName, ProtocolFile } from '@opentrons/shared-data'
 import type { PickUpTipCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
 import type { State } from '../../../../redux/types'
-import type { LabwarePositionCheckStep, Section } from '../types'
+import type {
+  LabwarePositionCheckCommand,
+  LabwarePositionCheckStep,
+  Section,
+} from '../types'
 
 type LabwareIdsBySection = {
   [section in Section]?: string[]
@@ -21,6 +25,15 @@ export function useSteps(): LabwarePositionCheckStep[] {
   )
   if (protocolData == null) return [] // this state should never be reached
   return getLabwarePositionCheckSteps(protocolData)
+}
+
+export function useCommands(): LabwarePositionCheckCommand[] {
+  return useSteps().reduce<LabwarePositionCheckCommand[]>(
+    (steps, currentStep) => {
+      return [...steps, ...currentStep.commands]
+    },
+    []
+  )
 }
 
 export function useSections(): Section[] {
