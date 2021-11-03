@@ -454,7 +454,8 @@ class API(HardwareAPILike):
         for mount, name in checked_require.items():
             if name not in name_config():
                 raise RuntimeError(f"{name} is not a valid pipette name")
-        found = await self._backend.get_attached_instruments(checked_require)
+        async with self._motion_lock:
+            found = await self._backend.get_attached_instruments(checked_require)
 
         for mount, instrument_data in found.items():
             config = instrument_data.get("config")
