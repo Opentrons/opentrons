@@ -35,7 +35,7 @@ export const getLabwarePositionCheckSteps = (
         labware,
         labwareDefinitions,
         modules,
-        commands
+        commands,
       })
     } else {
       const secondaryPipetteId = Object.keys(pipettesById).find(

@@ -123,7 +123,9 @@ describe('getPrimaryPipetteId', () => {
       ...p10Single,
       ...p50Multi,
     }
-    expect(getPrimaryPipetteId(pipettes, loadPipetteCommands)).toBe('p10SingleId')
+    expect(getPrimaryPipetteId(pipettes, loadPipetteCommands)).toBe(
+      'p10SingleId'
+    )
   })
   it('should return the newer model', () => {
     const loadPipetteCommands: LoadPipetteCommand[] = [
@@ -160,7 +162,9 @@ describe('getPrimaryPipetteId', () => {
       ...p300Single,
       ...p300SingleGen2,
     }
-    expect(getPrimaryPipetteId(pipettes, loadPipetteCommands)).toBe('p300SingleGen2Id')
+    expect(getPrimaryPipetteId(pipettes, loadPipetteCommands)).toBe(
+      'p300SingleGen2Id'
+    )
   })
 
   it('should return the left pipette when all else is the same', () => {
@@ -182,7 +186,7 @@ describe('getPrimaryPipetteId', () => {
         },
       },
     ]
-    
+
     const p300SingleLeft: ProtocolFile<{}>['pipettes'] = {
       p300SingleLeftId: {
         name: 'p300_single',
@@ -198,6 +202,8 @@ describe('getPrimaryPipetteId', () => {
       ...p300SingleLeft,
       ...p300SingleRight,
     }
-    expect(getPrimaryPipetteId(pipettes, loadPipetteCommands)).toBe('p300SingleLeftId')
+    expect(getPrimaryPipetteId(pipettes, loadPipetteCommands)).toBe(
+      'p300SingleLeftId'
+    )
   })
 })

@@ -17,7 +17,7 @@ export const getOnePipettePositionCheckSteps = (args: {
   primaryPipetteId: string
   labware: ProtocolFile<{}>['labware']
   labwareDefinitions: Record<string, LabwareDefinition2>
-  modules: ProtocolFile<{}>['modules'],
+  modules: ProtocolFile<{}>['modules']
   commands: Command[]
 }): LabwarePositionCheckStep[] => {
   const {

@@ -32,8 +32,8 @@ export const LabwarePositionCheck = (
   const [savePositionCommandData, setSavePositionCommandData] = React.useState<{
     [labwareId: string]: string[]
   }>({})
-  
-  // at the end of LPC, each labwareId will have 2 associated save position command ids which will be used to calculate the labware offsets 
+
+  // at the end of LPC, each labwareId will have 2 associated save position command ids which will be used to calculate the labware offsets
   const addSavePositionCommandData = (
     commandId: string,
     labwareId: string
@@ -43,7 +43,9 @@ export const LabwarePositionCheck = (
       [labwareId]: [...savePositionCommandData[labwareId], commandId],
     })
   }
-  const labwarePositionCheckUtils = useLabwarePositionCheck(addSavePositionCommandData)
+  const labwarePositionCheckUtils = useLabwarePositionCheck(
+    addSavePositionCommandData
+  )
 
   if ('error' in labwarePositionCheckUtils) {
     const { error } = labwarePositionCheckUtils

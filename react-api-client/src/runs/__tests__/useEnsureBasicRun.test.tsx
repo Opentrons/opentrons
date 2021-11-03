@@ -181,7 +181,7 @@ describe('useEnsureBasicRun hook', () => {
         createRun: mockCreateRun as any,
         isLoading: false,
         isError: true,
-        error: 'some error creating the run'
+        error: 'some error creating the run',
       } as any)
 
     const { result } = renderHook(useEnsureBasicRun, {

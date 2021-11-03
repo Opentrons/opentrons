@@ -14,9 +14,8 @@ import type {
 import type { TCOpenLidCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 import type { MoveToWellCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/gantry'
 
-
 const getIsLabwareOnTopOfTC = (
-  modules:  ProtocolFile<{}>['modules'],
+  modules: ProtocolFile<{}>['modules'],
   labwareId: string,
   commands: Command[]
 ): boolean => {

@@ -21,7 +21,7 @@
     },
     {
       "path": "../react-api-client"
-    },
+    }
   ],
   "compilerOptions": {
     "composite": true,
