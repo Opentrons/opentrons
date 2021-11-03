@@ -3,9 +3,8 @@ from typing import Optional
 from dataclasses import dataclass
 from opentrons.hardware_control.api import API as HardwareAPI
 from opentrons.hardware_control.types import CriticalPoint
-from opentrons.types import MountType, Point
 
-from ..types import WellLocation
+from ..types import WellLocation, DeckPoint
 from ..state import StateStore, CurrentWell
 from ..resources import ModelUtils
 
@@ -15,7 +14,7 @@ class SavedPositionData:
     """The result of a save position procedure."""
 
     positionId: str
-    position: Point
+    position: DeckPoint
 
 
 class MovementHandler:
@@ -102,10 +101,15 @@ class MovementHandler:
             else:
                 pip_cp = CriticalPoint.NOZZLE
 
-        position = await self._hardware_api.gantry_position(
+        # TODO (spp, 2021-11-3): Handle MustHomeError case
+        point = await self._hardware_api.gantry_position(
             mount=hw_mount,
             critical_point=pip_cp,
         )
+
         position_id = position_id or self._model_utils.generate_id()
 
-        return SavedPositionData(positionId=position_id, position=position)
+        return SavedPositionData(
+            positionId=position_id,
+            position=DeckPoint(x=point.x, y=point.y, z=point.z),
+        )

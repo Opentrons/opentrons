@@ -5,25 +5,10 @@ from pydantic import BaseModel, Field
 from typing import Optional, Type
 from typing_extensions import Literal
 
-from opentrons.types import MountType, Point
-
+from ..types import DeckPoint
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandRequest
 
 SavePositionCommandType = Literal["savePosition"]
-
-"""
-{
-    commandType: "savePosition",
-    data: {
-        pipetteId: string,    // pipette to use in measurement
-        positionId: string | null | undefined,  // position ID, auto-assigned if left blank
-    },
-    result: {
-        positionId: string,
-        position: { x: number, y: number, z: number }
-    }
-}
-"""
 
 
 class SavePositionData(BaseModel):
@@ -45,7 +30,7 @@ class SavePositionResult(BaseModel):
     positionId: str = Field(
         ..., description="An ID to reference this position in subsequent requests."
     )
-    position: Point = Field(
+    position: DeckPoint = Field(
         ...,
         description="The (x,y,z) coordinates of the pipette's critical point "
         "in deck space.",

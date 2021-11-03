@@ -7,6 +7,7 @@ from opentrons.hardware_control.api import API as HardwareAPI
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons.motion_planning import Waypoint
 
+from opentrons.protocol_engine.types import DeckPoint
 from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset
 from opentrons.protocol_engine.state import (
     StateStore,
@@ -216,7 +217,8 @@ async def test_save_position(
     ).then_return(Point(1, 1, 1))
 
     result = await handler.save_position(pipette_id="pipette-id", position_id="123")
-    assert result == SavedPositionData(positionId="123", position=Point(1, 1, 1))
+    assert result == SavedPositionData(positionId="123",
+                                       position=DeckPoint(x=1, y=1, z=1))
 
 
 @pytest.mark.parametrize(
@@ -250,6 +252,7 @@ async def test_save_position_different_cp(
     )
 
     mock_hw_pipettes.left_config.update({"tip_length": tip_length})
+
     decoy.when(
         state_store.pipettes.get_hardware_pipette(
             pipette_id="pipette-id",
@@ -258,6 +261,13 @@ async def test_save_position_different_cp(
     ).then_return(
         HardwarePipette(mount=Mount.LEFT, config=mock_hw_pipettes.left_config)
     )
+    decoy.when(
+        await hardware_api.gantry_position(
+            mount=Mount.LEFT,
+            critical_point=verified_cp,
+        )
+    ).then_return(Point(1, 1, 1))
+
     await handler.save_position(pipette_id="pipette-id", position_id="123")
     decoy.verify(
         await hardware_api.gantry_position(

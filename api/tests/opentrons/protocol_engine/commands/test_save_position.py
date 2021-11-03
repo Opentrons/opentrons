@@ -1,7 +1,7 @@
 """Test save position command."""
 from decoy import Decoy
 
-from opentrons.types import MountType, Point
+from opentrons.protocol_engine.types import DeckPoint
 from opentrons.protocol_engine.execution import (
     EquipmentHandler,
     MovementHandler,
@@ -40,7 +40,11 @@ async def test_save_position_implementation(
             pipette_id="abc",
             position_id="123",
         )
-    ).then_return(SavedPositionData(positionId="123", position=Point(x=1, y=2, z=3)))
+    ).then_return(
+        SavedPositionData(positionId="123", position=DeckPoint(x=1, y=2, z=3))
+    )
 
     result = await subject.execute(data)
-    assert result == SavePositionResult(positionId="123", position=Point(x=1, y=2, z=3))
+    assert result == SavePositionResult(
+        positionId="123", position=DeckPoint(x=1, y=2, z=3)
+    )
