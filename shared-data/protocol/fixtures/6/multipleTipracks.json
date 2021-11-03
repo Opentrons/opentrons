@@ -1967,7 +1967,8 @@
   "modules": {},
   "commands": [
     {
-      "command": "pickUpTip",
+      "id": 0,
+      "commandType": "pickUpTip",
       "params": {
         "pipetteId": "50d23e00-0042-11ec-8258-f7ffdf5ad45a",
         "labwareId": "50d3ebb0-0042-11ec-8258-f7ffdf5ad45a:opentrons/opentrons_96_tiprack_300ul/1",
@@ -1975,29 +1976,38 @@
       }
     },
     {
-      "command": "aspirate",
+      "id": 1,
+      "commandType": "aspirate",
       "params": {
         "pipetteId": "50d23e00-0042-11ec-8258-f7ffdf5ad45a",
         "volume": 100,
         "labwareId": "9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1",
         "well": "A1",
         "offsetFromBottomMm": 1,
-        "flowRate": 46.43
+        "flowRate": 46.43,
+        "wellLocation": {
+          "origin": "top"
+        }
       }
     },
     {
-      "command": "dispense",
+      "id": 2,
+      "commandType": "dispense",
       "params": {
         "pipetteId": "50d23e00-0042-11ec-8258-f7ffdf5ad45a",
         "volume": 100,
         "labwareId": "9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1",
         "well": "A12",
         "offsetFromBottomMm": 0.5,
-        "flowRate": 46.43
+        "flowRate": 46.43,
+        "wellLocation": {
+          "origin": "top"
+        }
       }
     },
     {
-      "command": "dropTip",
+      "id": 3,
+      "commandType": "dropTip",
       "params": {
         "pipetteId": "50d23e00-0042-11ec-8258-f7ffdf5ad45a",
         "labwareId": "trashId",
@@ -2005,7 +2015,8 @@
       }
     },
     {
-      "command": "pickUpTip",
+      "id": 4,
+      "commandType": "pickUpTip",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
         "labwareId": "50d3ebb0-0042-11ec-8258-f7ffdf5ad45a:opentrons/opentrons_96_tiprack_300ul/1",
@@ -2013,29 +2024,38 @@
       }
     },
     {
-      "command": "aspirate",
+      "id": 5,
+      "commandType": "aspirate",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
         "volume": 100,
         "labwareId": "9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1",
         "well": "A3",
         "offsetFromBottomMm": 1,
-        "flowRate": 150
+        "flowRate": 150,
+        "wellLocation": {
+          "origin": "top"
+        }
       }
     },
     {
-      "command": "dispense",
+      "id": 6,
+      "commandType": "dispense",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
         "volume": 100,
         "labwareId": "9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1",
         "well": "A10",
         "offsetFromBottomMm": 0.5,
-        "flowRate": 300
+        "flowRate": 300,
+        "wellLocation": {
+          "origin": "top"
+        }
       }
     },
     {
-      "command": "dropTip",
+      "id": 7,
+      "commandType": "dropTip",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
         "labwareId": "trashId",
@@ -2043,7 +2063,8 @@
       }
     },
     {
-      "command": "pickUpTip",
+      "id": 8,
+      "commandType": "pickUpTip",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
         "labwareId": "50d3ebb0-0042-11ec-8258-f7ffdf5ad45a:opentrons/opentrons_96_tiprack_300ul/1",
@@ -2051,29 +2072,38 @@
       }
     },
     {
-      "command": "aspirate",
+      "id": 9,
+      "commandType": "aspirate",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
         "volume": 100,
         "labwareId": "9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1",
         "well": "A4",
         "offsetFromBottomMm": 1,
-        "flowRate": 150
+        "flowRate": 150,
+        "wellLocation": {
+          "origin": "top"
+        }
       }
     },
     {
-      "command": "dispense",
+      "id": 10,
+      "commandType": "dispense",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
         "volume": 100,
         "labwareId": "9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1",
         "well": "A8",
         "offsetFromBottomMm": 0.5,
-        "flowRate": 300
+        "flowRate": 300,
+        "wellLocation": {
+          "origin": "top"
+        }
       }
     },
     {
-      "command": "dropTip",
+      "id": 11,
+      "commandType": "dropTip",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
         "labwareId": "trashId",
@@ -2081,7 +2111,8 @@
       }
     },
     {
-      "command": "pickUpTip",
+      "id": 12,
+      "commandType": "pickUpTip",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
         "labwareId": "50d3ebb0-0042-11ec-8258-f7ffdf5ad45a:opentrons/opentrons_96_tiprack_300ul/1",
@@ -2089,29 +2120,38 @@
       }
     },
     {
-      "command": "aspirate",
+      "id": 13,
+      "commandType": "aspirate",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
         "volume": 100,
         "labwareId": "9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1",
         "well": "A4",
         "offsetFromBottomMm": 1,
-        "flowRate": 150
+        "flowRate": 150,
+        "wellLocation": {
+          "origin": "top"
+        }
       }
     },
     {
-      "command": "dispense",
+      "id": 14,
+      "commandType": "dispense",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
         "volume": 100,
         "labwareId": "9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1",
         "well": "A8",
         "offsetFromBottomMm": 0.5,
-        "flowRate": 300
+        "flowRate": 300,
+        "wellLocation": {
+          "origin": "top"
+        }
       }
     },
     {
-      "command": "dropTip",
+      "id": 15,
+      "commandType": "dropTip",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
         "labwareId": "trashId",
@@ -2119,7 +2159,8 @@
       }
     },
     {
-      "command": "pickUpTip",
+      "id": 16,
+      "commandType": "pickUpTip",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
         "labwareId": "50d3ebb0-0042-11ec-8258-f7ffdf5ad45a:opentrons/opentrons_96_tiprack_300ul/1",
@@ -2127,29 +2168,38 @@
       }
     },
     {
-      "command": "aspirate",
+      "id": 17,
+      "commandType": "aspirate",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
         "volume": 100,
         "labwareId": "9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1",
         "well": "A4",
         "offsetFromBottomMm": 1,
-        "flowRate": 150
+        "flowRate": 150,
+        "wellLocation": {
+          "origin": "top"
+        }
       }
     },
     {
-      "command": "dispense",
+      "id": 18,
+      "commandType": "dispense",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
         "volume": 100,
         "labwareId": "9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1",
         "well": "A8",
         "offsetFromBottomMm": 0.5,
-        "flowRate": 300
+        "flowRate": 300,
+        "wellLocation": {
+          "origin": "top"
+        }
       }
     },
     {
-      "command": "dropTip",
+      "id": 19,
+      "commandType": "dropTip",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
         "labwareId": "trashId",
@@ -2157,7 +2207,8 @@
       }
     },
     {
-      "command": "pickUpTip",
+      "id": 20,
+      "commandType": "pickUpTip",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
         "labwareId": "50d3ebb0-0042-11ec-8258-f7ffdf5ad45a:opentrons/opentrons_96_tiprack_300ul/1",
@@ -2165,29 +2216,38 @@
       }
     },
     {
-      "command": "aspirate",
+      "id": 21,
+      "commandType": "aspirate",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
         "volume": 100,
         "labwareId": "9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1",
         "well": "A4",
         "offsetFromBottomMm": 1,
-        "flowRate": 150
+        "flowRate": 150,
+        "wellLocation": {
+          "origin": "top"
+        }
       }
     },
     {
-      "command": "dispense",
+      "id": 22,
+      "commandType": "dispense",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
         "volume": 100,
         "labwareId": "9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1",
         "well": "A8",
         "offsetFromBottomMm": 0.5,
-        "flowRate": 300
+        "flowRate": 300,
+        "wellLocation": {
+          "origin": "top"
+        }
       }
     },
     {
-      "command": "dropTip",
+      "id": 23,
+      "commandType": "dropTip",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
         "labwareId": "trashId",
@@ -2195,7 +2255,8 @@
       }
     },
     {
-      "command": "pickUpTip",
+      "id": 24,
+      "commandType": "pickUpTip",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
         "labwareId": "50d3ebb0-0042-11ec-8258-f7ffdf5ad45a:opentrons/opentrons_96_tiprack_300ul/1",
@@ -2203,29 +2264,38 @@
       }
     },
     {
-      "command": "aspirate",
+      "id": 25,
+      "commandType": "aspirate",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
         "volume": 100,
         "labwareId": "9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1",
         "well": "A4",
         "offsetFromBottomMm": 1,
-        "flowRate": 150
+        "flowRate": 150,
+        "wellLocation": {
+          "origin": "top"
+        }
       }
     },
     {
-      "command": "dispense",
+      "id": 26,
+      "commandType": "dispense",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
         "volume": 100,
         "labwareId": "9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1",
         "well": "A8",
         "offsetFromBottomMm": 0.5,
-        "flowRate": 300
+        "flowRate": 300,
+        "wellLocation": {
+          "origin": "top"
+        }
       }
     },
     {
-      "command": "dropTip",
+      "id": 27,
+      "commandType": "dropTip",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
         "labwareId": "trashId",
@@ -2233,7 +2303,8 @@
       }
     },
     {
-      "command": "pickUpTip",
+      "id": 28,
+      "commandType": "pickUpTip",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
         "labwareId": "50d3ebb0-0042-11ec-8258-f7ffdf5ad45a:opentrons/opentrons_96_tiprack_300ul/1",
@@ -2241,29 +2312,38 @@
       }
     },
     {
-      "command": "aspirate",
+      "id": 29,
+      "commandType": "aspirate",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
         "volume": 100,
         "labwareId": "9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1",
         "well": "A4",
         "offsetFromBottomMm": 1,
-        "flowRate": 150
+        "flowRate": 150,
+        "wellLocation": {
+          "origin": "top"
+        }
       }
     },
     {
-      "command": "dispense",
+      "id": 30,
+      "commandType": "dispense",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
         "volume": 100,
         "labwareId": "9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1",
         "well": "A8",
         "offsetFromBottomMm": 0.5,
-        "flowRate": 300
+        "flowRate": 300,
+        "wellLocation": {
+          "origin": "top"
+        }
       }
     },
     {
-      "command": "dropTip",
+      "id": 31,
+      "commandType": "dropTip",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
         "labwareId": "trashId",
@@ -2271,7 +2351,8 @@
       }
     },
     {
-      "command": "pickUpTip",
+      "id": 32,
+      "commandType": "pickUpTip",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
         "labwareId": "50d3ebb0-0042-11ec-8258-f7ffdf5ad45a:opentrons/opentrons_96_tiprack_300ul/1",
@@ -2279,29 +2360,38 @@
       }
     },
     {
-      "command": "aspirate",
+      "id": 33,
+      "commandType": "aspirate",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
         "volume": 100,
         "labwareId": "9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1",
         "well": "A4",
         "offsetFromBottomMm": 1,
-        "flowRate": 150
+        "flowRate": 150,
+        "wellLocation": {
+          "origin": "top"
+        }
       }
     },
     {
-      "command": "dispense",
+      "id": 34,
+      "commandType": "dispense",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
         "volume": 100,
         "labwareId": "9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1",
         "well": "A8",
         "offsetFromBottomMm": 0.5,
-        "flowRate": 300
+        "flowRate": 300,
+        "wellLocation": {
+          "origin": "top"
+        }
       }
     },
     {
-      "command": "dropTip",
+      "id": 35,
+      "commandType": "dropTip",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
         "labwareId": "trashId",
@@ -2309,7 +2399,8 @@
       }
     },
     {
-      "command": "pickUpTip",
+      "id": 36,
+      "commandType": "pickUpTip",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
         "labwareId": "50d3ebb0-0042-11ec-8258-f7ffdf5ad45a:opentrons/opentrons_96_tiprack_300ul/1",
@@ -2317,29 +2408,38 @@
       }
     },
     {
-      "command": "aspirate",
+      "id": 37,
+      "commandType": "aspirate",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
         "volume": 100,
         "labwareId": "9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1",
         "well": "A4",
         "offsetFromBottomMm": 1,
-        "flowRate": 150
+        "flowRate": 150,
+        "wellLocation": {
+          "origin": "top"
+        }
       }
     },
     {
-      "command": "dispense",
+      "id": 38,
+      "commandType": "dispense",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
         "volume": 100,
         "labwareId": "9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1",
         "well": "A8",
         "offsetFromBottomMm": 0.5,
-        "flowRate": 300
+        "flowRate": 300,
+        "wellLocation": {
+          "origin": "top"
+        }
       }
     },
     {
-      "command": "dropTip",
+      "id": 39,
+      "commandType": "dropTip",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
         "labwareId": "trashId",
@@ -2347,7 +2447,8 @@
       }
     },
     {
-      "command": "pickUpTip",
+      "id": 40,
+      "commandType": "pickUpTip",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
         "labwareId": "50d3ebb0-0042-11ec-8258-f7ffdf5ad45a:opentrons/opentrons_96_tiprack_300ul/1",
@@ -2355,29 +2456,38 @@
       }
     },
     {
-      "command": "aspirate",
+      "id": 41,
+      "commandType": "aspirate",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
         "volume": 100,
         "labwareId": "9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1",
         "well": "A4",
         "offsetFromBottomMm": 1,
-        "flowRate": 150
+        "flowRate": 150,
+        "wellLocation": {
+          "origin": "top"
+        }
       }
     },
     {
-      "command": "dispense",
+      "id": 42,
+      "commandType": "dispense",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
         "volume": 100,
         "labwareId": "9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1",
         "well": "A8",
         "offsetFromBottomMm": 0.5,
-        "flowRate": 300
+        "flowRate": 300,
+        "wellLocation": {
+          "origin": "top"
+        }
       }
     },
     {
-      "command": "dropTip",
+      "id": 43,
+      "commandType": "dropTip",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
         "labwareId": "trashId",
@@ -2385,7 +2495,8 @@
       }
     },
     {
-      "command": "pickUpTip",
+      "id": 44,
+      "commandType": "pickUpTip",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
         "labwareId": "50d3ebb0-0042-11ec-8258-f7ffdf5ad45a:opentrons/opentrons_96_tiprack_300ul/1",
@@ -2393,29 +2504,38 @@
       }
     },
     {
-      "command": "aspirate",
+      "id": 45,
+      "commandType": "aspirate",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
         "volume": 100,
         "labwareId": "9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1",
         "well": "A4",
         "offsetFromBottomMm": 1,
-        "flowRate": 150
+        "flowRate": 150,
+        "wellLocation": {
+          "origin": "top"
+        }
       }
     },
     {
-      "command": "dispense",
+      "id": 46,
+      "commandType": "dispense",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
         "volume": 100,
         "labwareId": "9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1",
         "well": "A8",
         "offsetFromBottomMm": 0.5,
-        "flowRate": 300
+        "flowRate": 300,
+        "wellLocation": {
+          "origin": "top"
+        }
       }
     },
     {
-      "command": "dropTip",
+      "id": 47,
+      "commandType": "dropTip",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
         "labwareId": "trashId",
@@ -2423,7 +2543,8 @@
       }
     },
     {
-      "command": "pickUpTip",
+      "id": 48,
+      "commandType": "pickUpTip",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
         "labwareId": "e24818a0-0042-11ec-8258-f7ffdf5ad45a",
@@ -2431,39 +2552,62 @@
       }
     },
     {
-      "command": "aspirate",
+      "id": 49,
+      "commandType": "aspirate",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
         "volume": 100,
         "labwareId": "9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1",
         "well": "A4",
         "offsetFromBottomMm": 1,
-        "flowRate": 150
+        "flowRate": 150,
+        "wellLocation": {
+          "origin": "top"
+        }
       }
     },
     {
-      "command": "moveToWell",
+      "id": 50,
+      "commandType": "moveToWell",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
         "labwareId": "9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1",
         "well": "A4",
-        "offset": { "x": 0, "y": 0, "z": 4 }
+        "offset": {
+          "x": 0,
+          "y": 0,
+          "z": 4
+        },
+        "wellLocation": {
+          "origin": "top"
+        }
       }
     },
-    { "command": "delay", "params": { "wait": 1 } },
     {
-      "command": "dispense",
+      "id": 51,
+      "commandType": "delay",
+      "params": {
+        "wait": 1
+      }
+    },
+    {
+      "id": 52,
+      "commandType": "dispense",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
         "volume": 100,
         "labwareId": "9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1",
         "well": "A8",
         "offsetFromBottomMm": 0.5,
-        "flowRate": 300
+        "flowRate": 300,
+        "wellLocation": {
+          "origin": "top"
+        }
       }
     },
     {
-      "command": "dropTip",
+      "id": 53,
+      "commandType": "dropTip",
       "params": {
         "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
         "labwareId": "trashId",
