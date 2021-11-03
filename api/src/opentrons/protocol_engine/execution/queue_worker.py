@@ -75,10 +75,14 @@ class QueueWorker:
         log.warn("MAX:QueueWorker._run_commands(): starting")
         while not self._state_store.commands.get_stop_requested():
             log.warn("MAX:QueueWorker._run_commands(): awaiting next queued command")
-            # May raise ProtocolEngineStoppedError.
-            command_id = await self._state_store.wait_for(
-                condition=self._state_store.commands.get_next_queued
-            )
+            try:
+                # May raise ProtocolEngineStoppedError.
+                command_id = await self._state_store.wait_for(
+                    condition=self._state_store.commands.get_next_queued
+                )
+            except BaseException as e:
+                log.warn(f"MAX:QueueWorker._run_commands(): awaiting next queued command raised {e}")
+                raise
 
             log.warn("MAX:QueueWorker._run_commands(): awaiting execute")
             await self._command_executor.execute(command_id=command_id)
