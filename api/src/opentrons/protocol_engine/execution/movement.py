@@ -1,9 +1,21 @@
 """Movement command handling."""
 from typing import Optional
+from dataclasses import dataclass
 from opentrons.hardware_control.api import API as HardwareAPI
+from opentrons.hardware_control.types import CriticalPoint
+from opentrons.types import MountType, Point
 
 from ..types import WellLocation
 from ..state import StateStore, CurrentWell
+from ..resources import ModelUtils
+
+
+@dataclass(frozen=True)
+class SavedPositionData:
+    """The result of a save position procedure."""
+
+    positionId: str
+    position: Point
 
 
 class MovementHandler:
@@ -11,15 +23,18 @@ class MovementHandler:
 
     _state_store: StateStore
     _hardware_api: HardwareAPI
+    _model_utils: ModelUtils
 
     def __init__(
         self,
         state_store: StateStore,
         hardware_api: HardwareAPI,
+        model_utils: Optional[ModelUtils] = None,
     ) -> None:
         """Initialize a MovementHandler instance."""
         self._state_store = state_store
         self._hardware_api = hardware_api
+        self._model_utils = model_utils or ModelUtils()
 
     async def move_to_well(
         self,
@@ -65,3 +80,32 @@ class MovementHandler:
                 abs_position=wp.position,
                 critical_point=wp.critical_point,
             )
+
+    async def save_position(
+        self, pipette_id: str, position_id: str
+    ) -> SavedPositionData:
+        """Get the pipette position and save to state."""
+
+        pipette_location = self._state_store.motion.get_pipette_location(
+            pipette_id=pipette_id,
+        )
+
+        hw_mount = pipette_location.mount.to_hw_mount()
+        pip_cp = pipette_location.critical_point
+        if pip_cp is None:
+            hw_pipette = self._state_store.pipettes.get_hardware_pipette(
+                pipette_id=pipette_id,
+                attached_pipettes=self._hardware_api.attached_instruments,
+            )
+            if hw_pipette.config.get("tip_length"):
+                pip_cp = CriticalPoint.TIP
+            else:
+                pip_cp = CriticalPoint.NOZZLE
+
+        position = await self._hardware_api.gantry_position(
+            mount=hw_mount,
+            critical_point=pip_cp,
+        )
+        position_id = position_id or self._model_utils.generate_id()
+
+        return SavedPositionData(positionId=position_id, position=position)
