@@ -1,12 +1,120 @@
 [
   {
-    "id": "190fad08-c285-4ef6-81ac-5173e69ee0ea",
-    "createdAt": "2021-11-01T20:42:20.311270+00:00",
+    "id": "commands.LOAD_PIPETTE-0",
+    "createdAt": "2021-11-04T19:38:06.527183+00:00",
+    "commandType": "loadPipette",
+    "status": "succeeded",
+    "data": {
+      "pipetteName": "p300_single_gen2",
+      "mount": "right",
+      "pipetteId": null
+    },
+    "result": {
+      "pipetteId": "pipette-0"
+    },
+    "error": null,
+    "startedAt": "2021-11-04T19:38:06.527183+00:00",
+    "completedAt": "2021-11-04T19:38:06.527183+00:00"
+  },
+  {
+    "id": "commands.LOAD_LABWARE-0",
+    "createdAt": "2021-11-04T19:38:06.532796+00:00",
     "commandType": "loadLabware",
     "status": "succeeded",
     "data": {
       "location": {
-        "slot": 8
+        "slot": 12
+      },
+      "loadName": "opentrons_1_trash_1100ml_fixed",
+      "namespace": "opentrons",
+      "version": 1,
+      "labwareId": null
+    },
+    "result": {
+      "labwareId": "labware-0",
+      "definition": {
+        "schemaVersion": 2,
+        "version": 1,
+        "namespace": "opentrons",
+        "metadata": {
+          "displayName": "Opentrons Fixed Trash",
+          "displayCategory": "trash",
+          "displayVolumeUnits": "mL",
+          "tags": []
+        },
+        "brand": {
+          "brand": "Opentrons",
+          "brandId": null,
+          "links": null
+        },
+        "parameters": {
+          "format": "trash",
+          "quirks": [
+            "fixedTrash",
+            "centerMultichannelOnWells",
+            "touchTipDisabled"
+          ],
+          "isTiprack": false,
+          "tipLength": null,
+          "tipOverlap": null,
+          "loadName": "opentrons_1_trash_1100ml_fixed",
+          "isMagneticModuleCompatible": false,
+          "magneticModuleEngageHeight": null
+        },
+        "ordering": [["A1"]],
+        "cornerOffsetFromSlot": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "dimensions": {
+          "yDimension": 165.86,
+          "zDimension": 82.0,
+          "xDimension": 172.86
+        },
+        "wells": {
+          "A1": {
+            "depth": 0.0,
+            "x": 82.84,
+            "y": 80.0,
+            "z": 82.0,
+            "totalLiquidVolume": 1100000.0,
+            "xDimension": 107.11,
+            "yDimension": 165.67,
+            "diameter": null,
+            "shape": "rectangular"
+          }
+        },
+        "groups": [
+          {
+            "wells": ["A1"],
+            "metadata": {
+              "displayName": null,
+              "displayCategory": null,
+              "wellBottomShape": null
+            },
+            "brand": null
+          }
+        ]
+      },
+      "calibration": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      }
+    },
+    "error": null,
+    "startedAt": "2021-11-04T19:38:06.532796+00:00",
+    "completedAt": "2021-11-04T19:38:06.532796+00:00"
+  },
+  {
+    "id": "commands.LOAD_LABWARE-1",
+    "createdAt": "2021-11-04T19:38:06.539746+00:00",
+    "commandType": "loadLabware",
+    "status": "succeeded",
+    "data": {
+      "location": {
+        "slot": 1
       },
       "loadName": "opentrons_96_tiprack_300ul",
       "namespace": "opentrons",
@@ -14,7 +122,7 @@
       "labwareId": null
     },
     "result": {
-      "labwareId": "af664446-dbd2-453e-9d86-27b6068be2d1",
+      "labwareId": "labware-1",
       "definition": {
         "schemaVersion": 2,
         "version": 1,
@@ -1240,251 +1348,17 @@
       }
     },
     "error": null,
-    "startedAt": "2021-11-01T20:42:20.311561+00:00",
-    "completedAt": "2021-11-01T20:42:20.327590+00:00"
+    "startedAt": "2021-11-04T19:38:06.539746+00:00",
+    "completedAt": "2021-11-04T19:38:06.539746+00:00"
   },
   {
-    "id": "75d84ea2-15e9-4fbe-9fd4-231e78547744",
-    "createdAt": "2021-11-01T20:42:20.332498+00:00",
+    "id": "commands.LOAD_LABWARE-2",
+    "createdAt": "2021-11-04T19:38:06.543924+00:00",
     "commandType": "loadLabware",
     "status": "succeeded",
     "data": {
       "location": {
-        "slot": 1
-      },
-      "loadName": "nest_12_reservoir_15ml",
-      "namespace": "opentrons",
-      "version": 1,
-      "labwareId": null
-    },
-    "result": {
-      "labwareId": "0ce4cb97-e3dd-44f8-a9fd-34e1ca031b53",
-      "definition": {
-        "schemaVersion": 2,
-        "version": 1,
-        "namespace": "opentrons",
-        "metadata": {
-          "displayName": "NEST 12 Well Reservoir 15 mL",
-          "displayCategory": "reservoir",
-          "displayVolumeUnits": "mL",
-          "tags": []
-        },
-        "brand": {
-          "brand": "NEST",
-          "brandId": ["360102"],
-          "links": ["http://www.cell-nest.com/page94?_l=en&product_id=102"]
-        },
-        "parameters": {
-          "format": "trough",
-          "quirks": ["centerMultichannelOnWells", "touchTipDisabled"],
-          "isTiprack": false,
-          "tipLength": null,
-          "tipOverlap": null,
-          "loadName": "nest_12_reservoir_15ml",
-          "isMagneticModuleCompatible": false,
-          "magneticModuleEngageHeight": null
-        },
-        "ordering": [
-          ["A1"],
-          ["A2"],
-          ["A3"],
-          ["A4"],
-          ["A5"],
-          ["A6"],
-          ["A7"],
-          ["A8"],
-          ["A9"],
-          ["A10"],
-          ["A11"],
-          ["A12"]
-        ],
-        "cornerOffsetFromSlot": {
-          "x": 0.0,
-          "y": 0.0,
-          "z": 0.0
-        },
-        "dimensions": {
-          "yDimension": 85.48,
-          "zDimension": 31.4,
-          "xDimension": 127.76
-        },
-        "wells": {
-          "A1": {
-            "depth": 26.85,
-            "x": 14.38,
-            "y": 42.78,
-            "z": 4.55,
-            "totalLiquidVolume": 15000.0,
-            "xDimension": 8.2,
-            "yDimension": 71.2,
-            "diameter": null,
-            "shape": "rectangular"
-          },
-          "A2": {
-            "depth": 26.85,
-            "x": 23.38,
-            "y": 42.78,
-            "z": 4.55,
-            "totalLiquidVolume": 15000.0,
-            "xDimension": 8.2,
-            "yDimension": 71.2,
-            "diameter": null,
-            "shape": "rectangular"
-          },
-          "A3": {
-            "depth": 26.85,
-            "x": 32.38,
-            "y": 42.78,
-            "z": 4.55,
-            "totalLiquidVolume": 15000.0,
-            "xDimension": 8.2,
-            "yDimension": 71.2,
-            "diameter": null,
-            "shape": "rectangular"
-          },
-          "A4": {
-            "depth": 26.85,
-            "x": 41.38,
-            "y": 42.78,
-            "z": 4.55,
-            "totalLiquidVolume": 15000.0,
-            "xDimension": 8.2,
-            "yDimension": 71.2,
-            "diameter": null,
-            "shape": "rectangular"
-          },
-          "A5": {
-            "depth": 26.85,
-            "x": 50.38,
-            "y": 42.78,
-            "z": 4.55,
-            "totalLiquidVolume": 15000.0,
-            "xDimension": 8.2,
-            "yDimension": 71.2,
-            "diameter": null,
-            "shape": "rectangular"
-          },
-          "A6": {
-            "depth": 26.85,
-            "x": 59.38,
-            "y": 42.78,
-            "z": 4.55,
-            "totalLiquidVolume": 15000.0,
-            "xDimension": 8.2,
-            "yDimension": 71.2,
-            "diameter": null,
-            "shape": "rectangular"
-          },
-          "A7": {
-            "depth": 26.85,
-            "x": 68.38,
-            "y": 42.78,
-            "z": 4.55,
-            "totalLiquidVolume": 15000.0,
-            "xDimension": 8.2,
-            "yDimension": 71.2,
-            "diameter": null,
-            "shape": "rectangular"
-          },
-          "A8": {
-            "depth": 26.85,
-            "x": 77.38,
-            "y": 42.78,
-            "z": 4.55,
-            "totalLiquidVolume": 15000.0,
-            "xDimension": 8.2,
-            "yDimension": 71.2,
-            "diameter": null,
-            "shape": "rectangular"
-          },
-          "A9": {
-            "depth": 26.85,
-            "x": 86.38,
-            "y": 42.78,
-            "z": 4.55,
-            "totalLiquidVolume": 15000.0,
-            "xDimension": 8.2,
-            "yDimension": 71.2,
-            "diameter": null,
-            "shape": "rectangular"
-          },
-          "A10": {
-            "depth": 26.85,
-            "x": 95.38,
-            "y": 42.78,
-            "z": 4.55,
-            "totalLiquidVolume": 15000.0,
-            "xDimension": 8.2,
-            "yDimension": 71.2,
-            "diameter": null,
-            "shape": "rectangular"
-          },
-          "A11": {
-            "depth": 26.85,
-            "x": 104.38,
-            "y": 42.78,
-            "z": 4.55,
-            "totalLiquidVolume": 15000.0,
-            "xDimension": 8.2,
-            "yDimension": 71.2,
-            "diameter": null,
-            "shape": "rectangular"
-          },
-          "A12": {
-            "depth": 26.85,
-            "x": 113.38,
-            "y": 42.78,
-            "z": 4.55,
-            "totalLiquidVolume": 15000.0,
-            "xDimension": 8.2,
-            "yDimension": 71.2,
-            "diameter": null,
-            "shape": "rectangular"
-          }
-        },
-        "groups": [
-          {
-            "wells": [
-              "A1",
-              "A2",
-              "A3",
-              "A4",
-              "A5",
-              "A6",
-              "A7",
-              "A8",
-              "A9",
-              "A10",
-              "A11",
-              "A12"
-            ],
-            "metadata": {
-              "displayName": null,
-              "displayCategory": null,
-              "wellBottomShape": "v"
-            },
-            "brand": null
-          }
-        ]
-      },
-      "calibration": {
-        "x": 0.0,
-        "y": 0.0,
-        "z": 0.0
-      }
-    },
-    "error": null,
-    "startedAt": "2021-11-01T20:42:20.333213+00:00",
-    "completedAt": "2021-11-01T20:42:20.336484+00:00"
-  },
-  {
-    "id": "5a64fef5-cdfa-4e17-be45-299961d65ae7",
-    "createdAt": "2021-11-01T20:42:20.337819+00:00",
-    "commandType": "loadLabware",
-    "status": "succeeded",
-    "data": {
-      "location": {
-        "slot": 2
+        "slot": 5
       },
       "loadName": "corning_96_wellplate_360ul_flat",
       "namespace": "opentrons",
@@ -1492,7 +1366,7 @@
       "labwareId": null
     },
     "result": {
-      "labwareId": "169b832d-9b01-441c-ac45-df296b59c8a4",
+      "labwareId": "labware-2",
       "definition": {
         "schemaVersion": 2,
         "version": 1,
@@ -2748,352 +2622,367 @@
       }
     },
     "error": null,
-    "startedAt": "2021-11-01T20:42:20.338291+00:00",
-    "completedAt": "2021-11-01T20:42:20.347141+00:00"
+    "startedAt": "2021-11-04T19:38:06.543924+00:00",
+    "completedAt": "2021-11-04T19:38:06.543924+00:00"
   },
   {
-    "id": "f34f6874-949a-4fd2-97ad-70cd769ba05c",
-    "createdAt": "2021-11-01T20:42:20.348503+00:00",
-    "commandType": "loadPipette",
+    "id": "commands.LOAD_LABWARE-3",
+    "createdAt": "2021-11-04T19:38:06.548741+00:00",
+    "commandType": "loadLabware",
     "status": "succeeded",
     "data": {
-      "pipetteName": "p300_single",
-      "mount": "right",
-      "pipetteId": null
+      "location": {
+        "slot": 4
+      },
+      "loadName": "nest_12_reservoir_15ml",
+      "namespace": "opentrons",
+      "version": 1,
+      "labwareId": null
     },
     "result": {
-      "pipetteId": "334286f8-e06c-4dd5-92a9-2645dfca4841"
-    },
-    "error": null,
-    "startedAt": "2021-11-01T20:42:20.349033+00:00",
-    "completedAt": "2021-11-01T20:42:20.350259+00:00"
-  },
-  {
-    "id": "a832047d-caaf-4ea8-b5d5-56e2414fe18d",
-    "createdAt": "2021-11-01T20:42:20.359609+00:00",
-    "commandType": "pickUpTip",
-    "status": "succeeded",
-    "data": {
-      "pipetteId": "334286f8-e06c-4dd5-92a9-2645dfca4841",
-      "labwareId": "af664446-dbd2-453e-9d86-27b6068be2d1",
-      "wellName": "A1"
-    },
-    "result": {},
-    "error": null,
-    "startedAt": "2021-11-01T20:42:20.360323+00:00",
-    "completedAt": "2021-11-01T20:42:20.384501+00:00"
-  },
-  {
-    "id": "f70351e9-25bc-4dbb-9fdc-13c32a0e3c6b",
-    "createdAt": "2021-11-01T20:42:20.388142+00:00",
-    "commandType": "aspirate",
-    "status": "succeeded",
-    "data": {
-      "pipetteId": "334286f8-e06c-4dd5-92a9-2645dfca4841",
-      "labwareId": "0ce4cb97-e3dd-44f8-a9fd-34e1ca031b53",
-      "wellName": "A1",
-      "volume": 50.0,
-      "wellLocation": {
-        "origin": "bottom",
-        "offset": {
+      "labwareId": "labware-3",
+      "definition": {
+        "schemaVersion": 2,
+        "version": 1,
+        "namespace": "opentrons",
+        "metadata": {
+          "displayName": "NEST 12 Well Reservoir 15 mL",
+          "displayCategory": "reservoir",
+          "displayVolumeUnits": "mL",
+          "tags": []
+        },
+        "brand": {
+          "brand": "NEST",
+          "brandId": ["360102"],
+          "links": ["http://www.cell-nest.com/page94?_l=en&product_id=102"]
+        },
+        "parameters": {
+          "format": "trough",
+          "quirks": ["centerMultichannelOnWells", "touchTipDisabled"],
+          "isTiprack": false,
+          "tipLength": null,
+          "tipOverlap": null,
+          "loadName": "nest_12_reservoir_15ml",
+          "isMagneticModuleCompatible": false,
+          "magneticModuleEngageHeight": null
+        },
+        "ordering": [
+          ["A1"],
+          ["A2"],
+          ["A3"],
+          ["A4"],
+          ["A5"],
+          ["A6"],
+          ["A7"],
+          ["A8"],
+          ["A9"],
+          ["A10"],
+          ["A11"],
+          ["A12"]
+        ],
+        "cornerOffsetFromSlot": {
           "x": 0.0,
           "y": 0.0,
-          "z": 1.0
-        }
+          "z": 0.0
+        },
+        "dimensions": {
+          "yDimension": 85.48,
+          "zDimension": 31.4,
+          "xDimension": 127.76
+        },
+        "wells": {
+          "A1": {
+            "depth": 26.85,
+            "x": 14.38,
+            "y": 42.78,
+            "z": 4.55,
+            "totalLiquidVolume": 15000.0,
+            "xDimension": 8.2,
+            "yDimension": 71.2,
+            "diameter": null,
+            "shape": "rectangular"
+          },
+          "A2": {
+            "depth": 26.85,
+            "x": 23.38,
+            "y": 42.78,
+            "z": 4.55,
+            "totalLiquidVolume": 15000.0,
+            "xDimension": 8.2,
+            "yDimension": 71.2,
+            "diameter": null,
+            "shape": "rectangular"
+          },
+          "A3": {
+            "depth": 26.85,
+            "x": 32.38,
+            "y": 42.78,
+            "z": 4.55,
+            "totalLiquidVolume": 15000.0,
+            "xDimension": 8.2,
+            "yDimension": 71.2,
+            "diameter": null,
+            "shape": "rectangular"
+          },
+          "A4": {
+            "depth": 26.85,
+            "x": 41.38,
+            "y": 42.78,
+            "z": 4.55,
+            "totalLiquidVolume": 15000.0,
+            "xDimension": 8.2,
+            "yDimension": 71.2,
+            "diameter": null,
+            "shape": "rectangular"
+          },
+          "A5": {
+            "depth": 26.85,
+            "x": 50.38,
+            "y": 42.78,
+            "z": 4.55,
+            "totalLiquidVolume": 15000.0,
+            "xDimension": 8.2,
+            "yDimension": 71.2,
+            "diameter": null,
+            "shape": "rectangular"
+          },
+          "A6": {
+            "depth": 26.85,
+            "x": 59.38,
+            "y": 42.78,
+            "z": 4.55,
+            "totalLiquidVolume": 15000.0,
+            "xDimension": 8.2,
+            "yDimension": 71.2,
+            "diameter": null,
+            "shape": "rectangular"
+          },
+          "A7": {
+            "depth": 26.85,
+            "x": 68.38,
+            "y": 42.78,
+            "z": 4.55,
+            "totalLiquidVolume": 15000.0,
+            "xDimension": 8.2,
+            "yDimension": 71.2,
+            "diameter": null,
+            "shape": "rectangular"
+          },
+          "A8": {
+            "depth": 26.85,
+            "x": 77.38,
+            "y": 42.78,
+            "z": 4.55,
+            "totalLiquidVolume": 15000.0,
+            "xDimension": 8.2,
+            "yDimension": 71.2,
+            "diameter": null,
+            "shape": "rectangular"
+          },
+          "A9": {
+            "depth": 26.85,
+            "x": 86.38,
+            "y": 42.78,
+            "z": 4.55,
+            "totalLiquidVolume": 15000.0,
+            "xDimension": 8.2,
+            "yDimension": 71.2,
+            "diameter": null,
+            "shape": "rectangular"
+          },
+          "A10": {
+            "depth": 26.85,
+            "x": 95.38,
+            "y": 42.78,
+            "z": 4.55,
+            "totalLiquidVolume": 15000.0,
+            "xDimension": 8.2,
+            "yDimension": 71.2,
+            "diameter": null,
+            "shape": "rectangular"
+          },
+          "A11": {
+            "depth": 26.85,
+            "x": 104.38,
+            "y": 42.78,
+            "z": 4.55,
+            "totalLiquidVolume": 15000.0,
+            "xDimension": 8.2,
+            "yDimension": 71.2,
+            "diameter": null,
+            "shape": "rectangular"
+          },
+          "A12": {
+            "depth": 26.85,
+            "x": 113.38,
+            "y": 42.78,
+            "z": 4.55,
+            "totalLiquidVolume": 15000.0,
+            "xDimension": 8.2,
+            "yDimension": 71.2,
+            "diameter": null,
+            "shape": "rectangular"
+          }
+        },
+        "groups": [
+          {
+            "wells": [
+              "A1",
+              "A2",
+              "A3",
+              "A4",
+              "A5",
+              "A6",
+              "A7",
+              "A8",
+              "A9",
+              "A10",
+              "A11",
+              "A12"
+            ],
+            "metadata": {
+              "displayName": null,
+              "displayCategory": null,
+              "wellBottomShape": "v"
+            },
+            "brand": null
+          }
+        ]
+      },
+      "calibration": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
       }
     },
-    "result": {
-      "volume": 50.0
-    },
     "error": null,
-    "startedAt": "2021-11-01T20:42:20.389043+00:00",
-    "completedAt": "2021-11-01T20:42:20.391053+00:00"
+    "startedAt": "2021-11-04T19:38:06.548741+00:00",
+    "completedAt": "2021-11-04T19:38:06.548741+00:00"
   },
   {
-    "id": "76c469a9-c890-4611-8810-62daa7037629",
-    "createdAt": "2021-11-01T20:42:20.394778+00:00",
-    "commandType": "dispense",
+    "id": "command.PICK_UP_TIP-0",
+    "createdAt": "2021-11-04T19:38:06.574603+00:00",
+    "commandType": "custom",
     "status": "succeeded",
     "data": {
-      "pipetteId": "334286f8-e06c-4dd5-92a9-2645dfca4841",
-      "labwareId": "169b832d-9b01-441c-ac45-df296b59c8a4",
-      "wellName": "A1",
-      "volume": 50.0,
-      "wellLocation": {
-        "origin": "bottom",
-        "offset": {
-          "x": 0.0,
-          "y": 0.0,
-          "z": 1.0
-        }
-      }
+      "legacyCommandText": "Picking up tip from A1 of Opentrons 96 Tip Rack 300 µL on 1",
+      "legacyCommandType": "command.PICK_UP_TIP"
     },
-    "result": {
-      "volume": 50.0
-    },
+    "result": null,
     "error": null,
-    "startedAt": "2021-11-01T20:42:20.395421+00:00",
-    "completedAt": "2021-11-01T20:42:20.396813+00:00"
+    "startedAt": "2021-11-04T19:38:06.574603+00:00",
+    "completedAt": "2021-11-04T19:38:06.619685+00:00"
   },
   {
-    "id": "3193f741-2b6a-4207-aa04-d10e3ecd616d",
-    "createdAt": "2021-11-01T20:42:20.398685+00:00",
-    "commandType": "dropTip",
+    "id": "command.ASPIRATE-0",
+    "createdAt": "2021-11-04T19:38:06.649792+00:00",
+    "commandType": "custom",
     "status": "succeeded",
     "data": {
-      "pipetteId": "334286f8-e06c-4dd5-92a9-2645dfca4841",
-      "labwareId": "af664446-dbd2-453e-9d86-27b6068be2d1",
-      "wellName": "A1"
+      "legacyCommandText": "Aspirating 50.0 uL from A1 of NEST 12 Well Reservoir 15 mL on 4 at 46.43 uL/sec",
+      "legacyCommandType": "command.ASPIRATE"
     },
-    "result": {},
+    "result": null,
     "error": null,
-    "startedAt": "2021-11-01T20:42:20.399215+00:00",
-    "completedAt": "2021-11-01T20:42:20.423568+00:00"
+    "startedAt": "2021-11-04T19:38:06.649792+00:00",
+    "completedAt": "2021-11-04T19:38:06.650969+00:00"
   },
   {
-    "id": "a046b294-b4cb-4fc9-a073-e2daceffe9dd",
-    "createdAt": "2021-11-01T20:42:20.425428+00:00",
-    "commandType": "pickUpTip",
+    "id": "command.DISPENSE-0",
+    "createdAt": "2021-11-04T19:38:06.675323+00:00",
+    "commandType": "custom",
     "status": "succeeded",
     "data": {
-      "pipetteId": "334286f8-e06c-4dd5-92a9-2645dfca4841",
-      "labwareId": "af664446-dbd2-453e-9d86-27b6068be2d1",
-      "wellName": "B1"
+      "legacyCommandText": "Dispensing 50.0 uL into A1 of Destination on 5 at 46.43 uL/sec",
+      "legacyCommandType": "command.DISPENSE"
     },
-    "result": {},
+    "result": null,
     "error": null,
-    "startedAt": "2021-11-01T20:42:20.425819+00:00",
-    "completedAt": "2021-11-01T20:42:20.473769+00:00"
+    "startedAt": "2021-11-04T19:38:06.675323+00:00",
+    "completedAt": "2021-11-04T19:38:06.675854+00:00"
   },
   {
-    "id": "8cbbdb92-dc30-4afd-b492-bfdddd0750f5",
-    "createdAt": "2021-11-01T20:42:20.501662+00:00",
-    "commandType": "aspirate",
+    "id": "command.DROP_TIP-0",
+    "createdAt": "2021-11-04T19:38:06.691034+00:00",
+    "commandType": "custom",
     "status": "succeeded",
     "data": {
-      "pipetteId": "334286f8-e06c-4dd5-92a9-2645dfca4841",
-      "labwareId": "0ce4cb97-e3dd-44f8-a9fd-34e1ca031b53",
-      "wellName": "A1",
-      "volume": 50.0,
-      "wellLocation": {
-        "origin": "bottom",
-        "offset": {
-          "x": 0.0,
-          "y": 0.0,
-          "z": 1.0
-        }
-      }
+      "legacyCommandText": "Dropping tip into A1 of Trash on 12",
+      "legacyCommandType": "command.DROP_TIP"
     },
-    "result": {
-      "volume": 50.0
-    },
+    "result": null,
     "error": null,
-    "startedAt": "2021-11-01T20:42:20.502187+00:00",
-    "completedAt": "2021-11-01T20:42:20.504071+00:00"
+    "startedAt": "2021-11-04T19:38:06.691034+00:00",
+    "completedAt": "2021-11-04T19:38:06.697759+00:00"
   },
   {
-    "id": "102ac5d8-f7fd-4e1d-aa49-efb6653659e4",
-    "createdAt": "2021-11-01T20:42:20.509121+00:00",
-    "commandType": "dispense",
+    "id": "command.PAUSE-0",
+    "createdAt": "2021-11-04T19:38:06.706121+00:00",
+    "commandType": "custom",
     "status": "succeeded",
     "data": {
-      "pipetteId": "334286f8-e06c-4dd5-92a9-2645dfca4841",
-      "labwareId": "169b832d-9b01-441c-ac45-df296b59c8a4",
-      "wellName": "B1",
-      "volume": 50.0,
-      "wellLocation": {
-        "origin": "bottom",
-        "offset": {
-          "x": 0.0,
-          "y": 0.0,
-          "z": 1.0
-        }
-      }
+      "legacyCommandText": "Pausing robot operation: Take a break! Put your feet up!",
+      "legacyCommandType": "command.PAUSE"
     },
-    "result": {
-      "volume": 50.0
-    },
+    "result": null,
     "error": null,
-    "startedAt": "2021-11-01T20:42:20.510039+00:00",
-    "completedAt": "2021-11-01T20:42:20.511271+00:00"
+    "startedAt": "2021-11-04T19:38:06.706121+00:00",
+    "completedAt": "2021-11-04T19:38:06.706726+00:00"
   },
   {
-    "id": "9e9da565-58d6-4464-bc8a-6e49e21a805d",
-    "createdAt": "2021-11-01T20:42:20.534279+00:00",
-    "commandType": "dropTip",
+    "id": "command.PICK_UP_TIP-1",
+    "createdAt": "2021-11-04T19:38:06.715597+00:00",
+    "commandType": "custom",
     "status": "succeeded",
     "data": {
-      "pipetteId": "334286f8-e06c-4dd5-92a9-2645dfca4841",
-      "labwareId": "af664446-dbd2-453e-9d86-27b6068be2d1",
-      "wellName": "B1"
+      "legacyCommandText": "Picking up tip from B1 of Opentrons 96 Tip Rack 300 µL on 1",
+      "legacyCommandType": "command.PICK_UP_TIP"
     },
-    "result": {},
+    "result": null,
     "error": null,
-    "startedAt": "2021-11-01T20:42:20.534708+00:00",
-    "completedAt": "2021-11-01T20:42:20.571371+00:00"
+    "startedAt": "2021-11-04T19:38:06.715597+00:00",
+    "completedAt": "2021-11-04T19:38:06.730410+00:00"
   },
   {
-    "id": "89f321e6-5165-4594-b577-f4b184db03f3",
-    "createdAt": "2021-11-01T20:42:20.572447+00:00",
-    "commandType": "pickUpTip",
+    "id": "command.ASPIRATE-1",
+    "createdAt": "2021-11-04T19:38:06.743398+00:00",
+    "commandType": "custom",
     "status": "succeeded",
     "data": {
-      "pipetteId": "334286f8-e06c-4dd5-92a9-2645dfca4841",
-      "labwareId": "af664446-dbd2-453e-9d86-27b6068be2d1",
-      "wellName": "C1"
+      "legacyCommandText": "Aspirating 100.0 uL from A1 of NEST 12 Well Reservoir 15 mL on 4 at 46.43 uL/sec",
+      "legacyCommandType": "command.ASPIRATE"
     },
-    "result": {},
+    "result": null,
     "error": null,
-    "startedAt": "2021-11-01T20:42:20.572830+00:00",
-    "completedAt": "2021-11-01T20:42:20.580569+00:00"
+    "startedAt": "2021-11-04T19:38:06.743398+00:00",
+    "completedAt": "2021-11-04T19:38:06.744862+00:00"
   },
   {
-    "id": "0d5c0039-18b5-412b-b9e6-6df1d5244a8d",
-    "createdAt": "2021-11-01T20:42:20.591011+00:00",
-    "commandType": "aspirate",
+    "id": "command.DISPENSE-1",
+    "createdAt": "2021-11-04T19:38:06.753218+00:00",
+    "commandType": "custom",
     "status": "succeeded",
     "data": {
-      "pipetteId": "334286f8-e06c-4dd5-92a9-2645dfca4841",
-      "labwareId": "0ce4cb97-e3dd-44f8-a9fd-34e1ca031b53",
-      "wellName": "A1",
-      "volume": 50.0,
-      "wellLocation": {
-        "origin": "bottom",
-        "offset": {
-          "x": 0.0,
-          "y": 0.0,
-          "z": 1.0
-        }
-      }
+      "legacyCommandText": "Dispensing 100.0 uL into B1 of Destination on 5 at 46.43 uL/sec",
+      "legacyCommandType": "command.DISPENSE"
     },
-    "result": {
-      "volume": 50.0
-    },
+    "result": null,
     "error": null,
-    "startedAt": "2021-11-01T20:42:20.591440+00:00",
-    "completedAt": "2021-11-01T20:42:20.595151+00:00"
+    "startedAt": "2021-11-04T19:38:06.753218+00:00",
+    "completedAt": "2021-11-04T19:38:06.753829+00:00"
   },
   {
-    "id": "f5a84d79-fad9-486f-91dc-bae20bf9f4f2",
-    "createdAt": "2021-11-01T20:42:20.599418+00:00",
-    "commandType": "dispense",
+    "id": "command.DROP_TIP-1",
+    "createdAt": "2021-11-04T19:38:06.760183+00:00",
+    "commandType": "custom",
     "status": "succeeded",
     "data": {
-      "pipetteId": "334286f8-e06c-4dd5-92a9-2645dfca4841",
-      "labwareId": "169b832d-9b01-441c-ac45-df296b59c8a4",
-      "wellName": "C1",
-      "volume": 50.0,
-      "wellLocation": {
-        "origin": "bottom",
-        "offset": {
-          "x": 0.0,
-          "y": 0.0,
-          "z": 1.0
-        }
-      }
+      "legacyCommandText": "Dropping tip into A1 of Trash on 12",
+      "legacyCommandType": "command.DROP_TIP"
     },
-    "result": {
-      "volume": 50.0
-    },
+    "result": null,
     "error": null,
-    "startedAt": "2021-11-01T20:42:20.600388+00:00",
-    "completedAt": "2021-11-01T20:42:20.602954+00:00"
-  },
-  {
-    "id": "4fed2fc5-ac71-417b-a1f3-28dae3216be0",
-    "createdAt": "2021-11-01T20:42:20.604215+00:00",
-    "commandType": "dropTip",
-    "status": "succeeded",
-    "data": {
-      "pipetteId": "334286f8-e06c-4dd5-92a9-2645dfca4841",
-      "labwareId": "af664446-dbd2-453e-9d86-27b6068be2d1",
-      "wellName": "C1"
-    },
-    "result": {},
-    "error": null,
-    "startedAt": "2021-11-01T20:42:20.604400+00:00",
-    "completedAt": "2021-11-01T20:42:20.606561+00:00"
-  },
-  {
-    "id": "bb475434-4dfb-4f42-8114-9c111d731a39",
-    "createdAt": "2021-11-01T20:42:20.607101+00:00",
-    "commandType": "pickUpTip",
-    "status": "succeeded",
-    "data": {
-      "pipetteId": "334286f8-e06c-4dd5-92a9-2645dfca4841",
-      "labwareId": "af664446-dbd2-453e-9d86-27b6068be2d1",
-      "wellName": "D1"
-    },
-    "result": {},
-    "error": null,
-    "startedAt": "2021-11-01T20:42:20.607334+00:00",
-    "completedAt": "2021-11-01T20:42:20.615004+00:00"
-  },
-  {
-    "id": "04741814-1175-4687-b3d6-e8f184b41826",
-    "createdAt": "2021-11-01T20:42:20.617761+00:00",
-    "commandType": "aspirate",
-    "status": "succeeded",
-    "data": {
-      "pipetteId": "334286f8-e06c-4dd5-92a9-2645dfca4841",
-      "labwareId": "0ce4cb97-e3dd-44f8-a9fd-34e1ca031b53",
-      "wellName": "A1",
-      "volume": 50.0,
-      "wellLocation": {
-        "origin": "bottom",
-        "offset": {
-          "x": 0.0,
-          "y": 0.0,
-          "z": 1.0
-        }
-      }
-    },
-    "result": {
-      "volume": 50.0
-    },
-    "error": null,
-    "startedAt": "2021-11-01T20:42:20.624005+00:00",
-    "completedAt": "2021-11-01T20:42:20.627530+00:00"
-  },
-  {
-    "id": "6bece215-5eb2-4dc5-9899-80e8f836eba1",
-    "createdAt": "2021-11-01T20:42:20.630790+00:00",
-    "commandType": "dispense",
-    "status": "succeeded",
-    "data": {
-      "pipetteId": "334286f8-e06c-4dd5-92a9-2645dfca4841",
-      "labwareId": "169b832d-9b01-441c-ac45-df296b59c8a4",
-      "wellName": "D1",
-      "volume": 50.0,
-      "wellLocation": {
-        "origin": "bottom",
-        "offset": {
-          "x": 0.0,
-          "y": 0.0,
-          "z": 1.0
-        }
-      }
-    },
-    "result": {
-      "volume": 50.0
-    },
-    "error": null,
-    "startedAt": "2021-11-01T20:42:20.631112+00:00",
-    "completedAt": "2021-11-01T20:42:20.633247+00:00"
-  },
-  {
-    "id": "0e2329c9-d0f7-4029-928e-3e930feb2a7a",
-    "createdAt": "2021-11-01T20:42:20.634612+00:00",
-    "commandType": "dropTip",
-    "status": "succeeded",
-    "data": {
-      "pipetteId": "334286f8-e06c-4dd5-92a9-2645dfca4841",
-      "labwareId": "af664446-dbd2-453e-9d86-27b6068be2d1",
-      "wellName": "D1"
-    },
-    "result": {},
-    "error": null,
-    "startedAt": "2021-11-01T20:42:20.634909+00:00",
-    "completedAt": "2021-11-01T20:42:20.638337+00:00"
+    "startedAt": "2021-11-04T19:38:06.760183+00:00",
+    "completedAt": "2021-11-04T19:38:06.765172+00:00"
   }
 ]

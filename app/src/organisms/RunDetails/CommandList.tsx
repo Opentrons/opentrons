@@ -97,7 +97,7 @@ export function CommandList(): JSX.Element | null {
             COMMAND.commandType
           )}
         </Flex>
-        <Flex>{t('end_of_protocol')}</Flex>
+        <Flex padding={SPACING_1}>{t('end_of_protocol')}</Flex>
       </Flex>
     </React.Fragment>
   )
