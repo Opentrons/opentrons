@@ -9,6 +9,11 @@ import {
   RUN_TYPE_PROTOCOL,
 } from '@opentrons/api-client'
 import { useHost } from '../../api'
+import {
+  PROTOCOL_ID,
+  mockBasicRunResponse,
+  mockProtocolRunResponse,
+} from '../__fixtures__'
 import { useCreateRunMutation } from '..'
 
 import type { HostConfig, Response, Run } from '@opentrons/api-client'
@@ -20,10 +25,6 @@ const mockCreateRun = createRun as jest.MockedFunction<typeof createRun>
 const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
 
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
-const RUN_ID = '1'
-const RUN_RESPONSE = {
-  data: { runType: RUN_TYPE_PROTOCOL, id: RUN_ID },
-} as Run
 
 describe('useCreateRunMutation hook', () => {
   let wrapper: React.FunctionComponent<{}>
@@ -64,11 +65,11 @@ describe('useCreateRunMutation hook', () => {
     expect(result.current.data).toBeUndefined()
   })
 
-  it('should create a run when calling the createRun callback', async () => {
+  it('should create a basic run when calling the createRun callback with basic run args', async () => {
     when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
     when(mockCreateRun)
       .calledWith(HOST_CONFIG, createRunData)
-      .mockResolvedValue({ data: RUN_RESPONSE } as Response<Run>)
+      .mockResolvedValue({ data: mockBasicRunResponse } as Response<Run>)
 
     const { result, waitFor } = renderHook(
       () => useCreateRunMutation(createRunData),
@@ -80,6 +81,29 @@ describe('useCreateRunMutation hook', () => {
 
     await waitFor(() => result.current.data != null)
 
-    expect(result.current.data).toEqual(RUN_RESPONSE)
+    expect(result.current.data).toEqual(mockBasicRunResponse)
+  })
+
+  it('should create a protocol run when calling the createRun callback with protocol run args', async () => {
+    createRunData = {
+      runType: RUN_TYPE_PROTOCOL,
+      createParams: { protocolId: PROTOCOL_ID },
+    }
+    when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
+    when(mockCreateRun)
+      .calledWith(HOST_CONFIG, createRunData)
+      .mockResolvedValue({ data: mockProtocolRunResponse } as Response<Run>)
+
+    const { result, waitFor } = renderHook(
+      () => useCreateRunMutation(createRunData),
+      {
+        wrapper,
+      }
+    )
+    act(() => result.current.createRun())
+
+    await waitFor(() => result.current.data != null)
+
+    expect(result.current.data).toEqual(mockProtocolRunResponse)
   })
 })

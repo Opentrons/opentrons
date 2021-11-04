@@ -1,12 +1,15 @@
 import { HostConfig, Run, getRun } from '@opentrons/api-client'
 import { UseQueryResult, useQuery } from 'react-query'
 import { useHost } from '../api'
+// TODO(bh, 10-27-2021): temp mock returns til fully wired. uncomment query callback to mock
+// import { mockProtocolRunResponse } from './__fixtures__'
 
-export function useRunQuery(sessionId: string): UseQueryResult<Run> {
+export function useRunQuery(runId: string): UseQueryResult<Run> {
   const host = useHost()
   const query = useQuery(
-    ['session', host],
-    () => getRun(host as HostConfig, sessionId).then(response => response.data),
+    [host, 'runs', runId],
+    () => getRun(host as HostConfig, runId).then(response => response.data),
+    // () => Promise.resolve(mockProtocolRunResponse),
     { enabled: host !== null }
   )
 
