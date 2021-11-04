@@ -50,14 +50,14 @@ describe('useCreateRunMutation hook', () => {
       .mockRejectedValue('oh no')
 
     const { result, waitFor } = renderHook(
-      () => useCreateRunMutation(createRunData),
+      () => useCreateRunMutation(RUN_TYPE_BASIC),
       {
         wrapper,
       }
     )
 
     expect(result.current.data).toBeUndefined()
-    result.current.createRun()
+    result.current.createRun({})
     await waitFor(() => {
       console.log(result.current.status)
       return result.current.status !== 'loading'
@@ -95,12 +95,12 @@ describe('useCreateRunMutation hook', () => {
       .mockResolvedValue({ data: mockProtocolRunResponse } as Response<Run>)
 
     const { result, waitFor } = renderHook(
-      () => useCreateRunMutation(createRunData),
+      () => useCreateRunMutation(RUN_TYPE_BASIC),
       {
         wrapper,
       }
     )
-    act(() => result.current.createRun())
+    act(() => result.current.createRun({}))
 
     await waitFor(() => result.current.data != null)
 
