@@ -106,7 +106,9 @@ export function useLabwarePositionCheck(
   if (basicRun.error != null && error !== null) {
     setError(basicRun.error)
   }
+  // load commands come from the protocol resource
   const loadCommands = protocolData?.commands.filter(isLoadCommand) ?? []
+  // TC open lid commands come from the LPC command generator
   const TCOpenCommands = useCommands().filter(isTCOpenCommand) ?? []
   // prepCommands will be run when a user starts LPC
   const prepCommands = [...loadCommands, ...TCOpenCommands]
