@@ -16,12 +16,12 @@ export interface CreateLabwareOffsetData {
 
 export function createLabwareOffset(
   config: HostConfig,
-  sessionId: string,
+  runId: string,
   data: CreateLabwareOffsetData
 ): ResponsePromise<Session> {
   return request<Session, { data: CreateLabwareOffsetData }>(
     POST,
-    `/sessions/${sessionId}`,
+    `/runs/${runId}`,
     { data },
     config
   )

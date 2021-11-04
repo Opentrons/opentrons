@@ -6,12 +6,12 @@ import type { Session } from '..'
 
 export function getCommand(
   config: HostConfig,
-  sessionId: string,
+  runId: string,
   commandId: string
 ): ResponsePromise<Session> {
   return request<Session>(
     GET,
-    `/sessions/${sessionId}/commands/${commandId}`,
+    `/runs/${runId}/commands/${commandId}`,
     null,
     config
   )
