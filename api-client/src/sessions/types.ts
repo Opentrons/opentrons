@@ -54,19 +54,3 @@ export interface Sessions {
   data: SessionData[]
   links?: ResourceLinks
 }
-
-export interface RunCommandSummary {
-  id: string
-  commandType: string
-  status: 'queued' | 'running' | 'succeeded' | 'failed'
-}
-
-export interface Command {
-  data: RunCommandSummary
-  links?: ResourceLinks
-}
-
-export interface Commands {
-  data: RunCommandSummary[]
-  links?: ResourceLinks
-}

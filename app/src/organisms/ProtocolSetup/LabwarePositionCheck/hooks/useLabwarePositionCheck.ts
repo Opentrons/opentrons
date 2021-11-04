@@ -27,7 +27,7 @@ import type {
   LabwarePositionCheckMovementCommand,
 } from '../types'
 
-type LabwarePositionCheckUtils =
+export type LabwarePositionCheckUtils =
   | {
       currentCommandIndex: number
       isLoading: boolean

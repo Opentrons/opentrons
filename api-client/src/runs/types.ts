@@ -3,11 +3,7 @@ export const RUN_TYPE_PROTOCOL: 'protocol' = 'protocol'
 
 export type RunType = typeof RUN_TYPE_BASIC | typeof RUN_TYPE_PROTOCOL
 
-<<<<<<< HEAD
 export type RunStatus =
-=======
-type RunStatus =
->>>>>>> wip
   | 'ready-to-run'
   | 'running'
   | 'pause-requested'
@@ -79,4 +75,19 @@ export interface RunAction {
 
 export interface CreateRunActionData {
   actionType: RunActionType
+}
+export interface RunCommandSummary {
+  id: string
+  commandType: string
+  status: 'queued' | 'running' | 'succeeded' | 'failed'
+}
+
+export interface Command {
+  data: RunCommandSummary
+  links?: ResourceLinks
+}
+
+export interface Commands {
+  data: RunCommandSummary[]
+  links?: ResourceLinks
 }

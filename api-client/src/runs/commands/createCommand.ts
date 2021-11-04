@@ -2,7 +2,7 @@ import { POST, request } from '../../request'
 
 import type { ResponsePromise } from '../../request'
 import type { HostConfig } from '../../types'
-import type { Session } from '..'
+import type { Command } from '../types'
 
 export interface CreateCommandData {
   commandType: string
@@ -13,8 +13,8 @@ export function createCommand(
   config: HostConfig,
   runId: string,
   data: CreateCommandData
-): ResponsePromise<Session> {
-  return request<Session, { data: CreateCommandData }>(
+): ResponsePromise<Command> {
+  return request<Command, { data: CreateCommandData }>(
     POST,
     `/runs/${runId}/commands`,
     { data },
