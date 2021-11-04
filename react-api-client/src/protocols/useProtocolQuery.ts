@@ -10,11 +10,9 @@ export function useProtocolQuery(
   const query = useQuery(
     [host, 'protocols', protocolId],
     () =>
-      protocolId !== null
-        ? getProtocol(host as HostConfig, protocolId).then(
-            response => response.data
-          )
-        : null,
+      getProtocol(host as HostConfig, protocolId as string).then(
+        response => response.data
+      ),
     { enabled: host !== null && protocolId !== null }
   )
 
