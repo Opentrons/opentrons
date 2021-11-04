@@ -102,6 +102,12 @@
 
 .icon_left_of_title {
   margin-right: 0.5rem;
+  height: 1.2rem;
+}
+
+.icon_left_of_title_container {
+  display: flex;
+  justify-content: flex-start;
 }
 
 .title_bar_carat {
