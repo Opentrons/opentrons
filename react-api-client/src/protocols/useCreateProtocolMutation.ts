@@ -1,5 +1,6 @@
 import {
   UseMutationResult,
+  UseMutationOptions,
   useMutation,
   UseMutateFunction,
   useQueryClient,
@@ -16,7 +17,15 @@ export type UseCreateProtocolMutationResult = UseMutationResult<
   createProtocol: UseMutateFunction<Protocol, unknown, File[]>
 }
 
-export function useCreateProtocolMutation(): UseCreateProtocolMutationResult {
+export type UseCreateProtocolMutationOptions = UseMutationOptions<
+  Protocol,
+  unknown,
+  File[]
+>
+
+export function useCreateProtocolMutation(
+  options: UseCreateProtocolMutationOptions = {}
+): UseCreateProtocolMutationResult {
   const host = useHost()
   const queryClient = useQueryClient()
 
@@ -27,7 +36,8 @@ export function useCreateProtocolMutation(): UseCreateProtocolMutationResult {
         const protocolId = response.data.data.id
         queryClient.setQueryData([host, 'protocols', protocolId], response.data)
         return response.data
-      })
+      }),
+    options
   )
   return {
     ...mutation,
