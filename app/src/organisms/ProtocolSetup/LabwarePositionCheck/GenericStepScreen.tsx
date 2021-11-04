@@ -1,13 +1,12 @@
 import * as React from 'react'
 import {
   ALIGN_CENTER,
-  Box,
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   SPACING_3,
-  SPACING_5,
+  SPACING_4,
 } from '@opentrons/components'
 import { LabwarePositionCheckStepDetail } from './LabwarePositionCheckStepDetail'
 import { SectionList } from './SectionList'
@@ -30,31 +29,33 @@ export const GenericStepScreen = (
   const labwareIdsToHighlight = labwareIdsBySection[sections[sectionIndex]]
 
   return (
-    <Box margin={SPACING_3}>
-      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_CENTER}>
-        <Flex flexDirection={DIRECTION_COLUMN}>
-          <Flex marginRight={SPACING_5}>
-            <SectionList
-              primaryPipetteMount={primaryPipetteMount}
-              secondaryPipetteMount={secondaryPipetteMount}
-              sections={sections}
-              currentSection={sections[sectionIndex]}
-              completedSections={[sections[sectionIndex - 1]]}
-            />
-          </Flex>
-          <Flex justifyContent={JUSTIFY_CENTER}>
-            <DeckMap
-              labwareIdsToHighlight={labwareIdsToHighlight}
-              completedLabwareIdSections={
-                labwareIdsBySection[sections[sectionIndex - 1]]
-              }
-            />
-          </Flex>
+    <Flex
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
+      alignItems={ALIGN_CENTER}
+      margin={SPACING_3}
+    >
+      <Flex flexDirection={DIRECTION_COLUMN}>
+        <Flex marginLeft={SPACING_4}>
+          <SectionList
+            primaryPipetteMount={primaryPipetteMount}
+            secondaryPipetteMount={secondaryPipetteMount}
+            sections={sections}
+            currentSection={sections[sectionIndex]}
+            completedSections={[sections[sectionIndex - 1]]}
+          />
         </Flex>
-        <Box width="60%" padding={SPACING_3}>
-          <LabwarePositionCheckStepDetail selectedStep={props.selectedStep} />
-        </Box>
+        <Flex justifyContent={JUSTIFY_CENTER}>
+          <DeckMap
+            labwareIdsToHighlight={labwareIdsToHighlight}
+            completedLabwareIdSections={
+              labwareIdsBySection[sections[sectionIndex - 1]]
+            }
+          />
+        </Flex>
       </Flex>
-    </Box>
+      <Flex padding={SPACING_3}>
+        <LabwarePositionCheckStepDetail selectedStep={props.selectedStep} />
+      </Flex>
+    </Flex>
   )
 }
