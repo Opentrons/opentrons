@@ -7,6 +7,7 @@ import { useFeatureFlag } from '../../../../redux/config'
 interface Props {
   /** The type of module */
   moduleType?: string | any
+  moduleStatus?: string
   /** Slot number the module is in */
   header?: string
   /** Title for the card */
@@ -32,6 +33,7 @@ export function StatusCard(props: Props): JSX.Element {
   return isNewProtocolRunPanel ? (
     <CollapsibleItem
       iconName={iconNameByModuleType[props.moduleType]}
+      statusNode={props.moduleStatus}
       className={styles.status_card}
       onCollapseToggle={props.toggleCard}
       header={

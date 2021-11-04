@@ -100,6 +100,10 @@
   height: 1.5rem;
 }
 
+.title_bar_error {
+  background-color: var(--c-error-light);
+}
+
 .icon_left_of_title {
   margin-right: 0.5rem;
   height: 1.2rem;

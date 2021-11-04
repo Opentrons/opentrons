@@ -128,6 +128,7 @@ export const ThermocyclerCard = ({
   return (
     <StatusCard
       moduleType={getModuleType(module.model)}
+      moduleStatus={module.status}
       title={getModuleDisplayName(module.model)}
       isCardExpanded={isCardExpanded}
       toggleCard={toggleCard}

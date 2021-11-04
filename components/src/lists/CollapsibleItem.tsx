@@ -4,6 +4,7 @@ import cx from 'classnames'
 
 import styles from './lists.css'
 import { Icon } from '../icons'
+import { COLOR_ERROR } from '../styles/colors'
 
 import type { IconName } from '../icons'
 // TODO(bc, 2021-03-31): this is only used in on place
@@ -12,6 +13,7 @@ import type { IconName } from '../icons'
 export interface CollapsibleItemProps {
   /** optional icon for title */
   iconName?: IconName
+  statusNode?: React.ReactNode
   /** header */
   header?: string
   /** text of title */
@@ -50,13 +52,28 @@ export function CollapsibleItem(props: CollapsibleItemProps): JSX.Element {
   })
 
   const titleBarClass = cx(styles.title_bar, styles.clickable)
+  const titleBarErrorClass = cx(
+    styles.titled_list_title_bar,
+    styles.title_bar_error
+  )
 
   return (
     <div className={className}>
-      <div className={titleBarClass}>
+      <div
+        className={
+          props.statusNode === 'error' ? titleBarErrorClass : titleBarClass
+        }
+      >
         {hasHeader && <p className={styles.header_text}>{header}</p>}
         {props.iconName != null ? (
           <div className={styles.icon_left_of_title_container}>
+            {props.statusNode === 'error' ? (
+              <Icon
+                className={styles.icon_left_of_title}
+                color={COLOR_ERROR}
+                name="alert-circle"
+              />
+            ) : null}
             <Icon className={styles.icon_left_of_title} name={props.iconName} />
             <h3 className={styles.title}>{props.title}</h3>
           </div>
