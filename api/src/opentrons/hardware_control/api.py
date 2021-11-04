@@ -214,7 +214,9 @@ class API(HardwareAPILike):
 
             api_instance = cls(backend, loop=checked_loop, config=checked_config)
             await api_instance.cache_instruments()
-            module_controls = await AttachedModulesControl.build(api_instance)
+            module_controls = await AttachedModulesControl.build(
+                api_instance, board_revision=backend.board_revision
+            )
             backend.module_controls = module_controls
             checked_loop.create_task(backend.watch(loop=checked_loop))
             backend.start_gpio_door_watcher(
@@ -260,7 +262,9 @@ class API(HardwareAPILike):
         )
         api_instance = cls(backend, loop=checked_loop, config=checked_config)
         await api_instance.cache_instruments()
-        module_controls = await AttachedModulesControl.build(api_instance)
+        module_controls = await AttachedModulesControl.build(
+            api_instance, board_revision=backend.board_revision
+        )
         backend.module_controls = module_controls
         await backend.watch()
         return api_instance

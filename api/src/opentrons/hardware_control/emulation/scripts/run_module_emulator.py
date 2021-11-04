@@ -17,9 +17,11 @@ from opentrons.hardware_control.emulation.run_emulator import run_emulator_clien
 from opentrons.hardware_control.emulation.settings import Settings, ProxySettings
 
 emulator_builder: Final[Dict[str, Callable[[Settings], AbstractEmulator]]] = {
-    ModuleType.Magnetic.value: lambda s: MagDeckEmulator(Parser()),
-    ModuleType.Temperature.value: lambda s: TempDeckEmulator(Parser()),
-    ModuleType.Thermocycler.value: lambda s: ThermocyclerEmulator(Parser()),
+    ModuleType.Magnetic.value: lambda s: MagDeckEmulator(Parser(), s.magdeck),
+    ModuleType.Temperature.value: lambda s: TempDeckEmulator(Parser(), s.tempdeck),
+    ModuleType.Thermocycler.value: lambda s: ThermocyclerEmulator(
+        Parser(), s.thermocycler
+    ),
 }
 
 emulator_port: Final[Dict[str, Callable[[Settings], ProxySettings]]] = {
