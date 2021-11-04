@@ -6,6 +6,7 @@ import {
   C_NEAR_WHITE,
   useConditionalConfirm,
 } from '@opentrons/components'
+import { useCreateProtocolMutation, useProtocolQuery, useCreateRunMutation } from '@opentrons/react-api-client'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { Page } from '../../atoms/Page'
@@ -29,6 +30,17 @@ const VALIDATION_ERROR_T_MAP: { [errorKey: string]: string } = {
 export function ProtocolUpload(): JSX.Element {
   const { t } = useTranslation(['protocol_info', 'shared'])
   const dispatch = useDispatch<Dispatch>()
+  const [ protocolId, setProtocolId ] =  React.useState<string | null>(null)
+  const { createRun } = useCreateRunMutation('protocol')
+  const { createProtocol } = useCreateProtocolMutation({
+    onSuccess: data =>  {
+      setProtocolId(data.data.id)
+    }
+  })
+  const { data: protocolData } = useProtocolQuery(protocolId)
+
+
+
   const logger = useLogger(__filename)
   const [uploadError, setUploadError] = React.useState<
     [string, ErrorObject[] | null | undefined] | null
@@ -46,6 +58,7 @@ export function ProtocolUpload(): JSX.Element {
       file,
       data => {
         dispatch(loadProtocol(file, data))
+        createProtocol([file])
       },
       (errorKey, errorDetails) => {
         logger.warn(errorKey)
@@ -64,6 +77,8 @@ export function ProtocolUpload(): JSX.Element {
     confirm: confirmExit,
     cancel: cancelExit,
   } = useConditionalConfirm(handleCloseProtocol, true)
+
+  console.log('protocol id', protocolId)
 
   const titleBarProps =
     protocolFile !== null
