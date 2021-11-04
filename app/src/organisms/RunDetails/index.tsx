@@ -14,7 +14,7 @@ import {
 import { Page } from '../../atoms/Page'
 import { ConfirmCancelModal } from '../../pages/Run/RunLog'
 import { useProtocolDetails } from './hooks'
-import { RunDetailsCommands } from './RunDetailsCommands'
+import { CommandList } from './CommandList'
 
 export function RunDetails(): JSX.Element | null {
   const { t } = useTranslation('run_details')
@@ -50,7 +50,7 @@ export function RunDetails(): JSX.Element | null {
   return (
     <Page titleBarProps={titleBarProps}>
       {showConfirmExit ? <ConfirmCancelModal onClose={cancelExit} /> : null}
-      <RunDetailsCommands />
+      <CommandList />
     </Page>
   )
 }
