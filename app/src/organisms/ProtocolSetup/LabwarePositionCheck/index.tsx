@@ -5,12 +5,15 @@ import { Portal } from '../../../App/portal'
 import { useSteps } from './hooks'
 import { IntroScreen } from './IntroScreen'
 import { GenericStepScreen } from './GenericStepScreen'
+import { SummaryScreen } from './SummaryScreen'
 
 import styles from '../styles.css'
 
 interface LabwarePositionCheckModalProps {
   onCloseClick: () => unknown
 }
+
+const isComplete = true // TODO: replace this with isComplete boolean from useLabwarePositionCheck
 
 export const LabwarePositionCheck = (
   props: LabwarePositionCheckModalProps
@@ -34,7 +37,9 @@ export const LabwarePositionCheck = (
           },
         }}
       >
-        {currentLabwareCheckStep !== null ? (
+        {isComplete ? (
+          <SummaryScreen />
+        ) : currentLabwareCheckStep !== null ? (
           <GenericStepScreen
             setCurrentLabwareCheckStep={setCurrentLabwareCheckStep}
             selectedStep={steps[currentLabwareCheckStep]}

@@ -47,12 +47,12 @@ export function MetadataCard(): JSX.Element {
           value={description || '-'}
           id={'MetadataCard_protocolDescription'}
         />
-        <LabeledValue
+        {/* <LabeledValue TODO: add estimated run time back in when ready
           flex={2}
           label={t('estimated_run_time')}
           value={'-'}
           id={'MetadataCard_protocolEstRunTime'}
-        />
+        /> */}
       </Flex>
     </Card>
   )

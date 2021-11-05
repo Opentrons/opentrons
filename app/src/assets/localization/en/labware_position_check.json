@@ -23,5 +23,12 @@
   "labware_step_detail_modal_nozzle_or_tip_image_3_text": "If you’re having trouble, slide 1 sheet of printer paper between the nozzle and the tip. A single piece of paper should barely pass between them.",
   "start_position_check": "begin labware position check, move to Slot {{initial_labware_slot}}",
   "jog_controls_adjustment": "Need to make an adjustment?",
-  "reveal_jog_controls": "Reveal jog controls"
+  "reveal_jog_controls": "Reveal jog controls",
+  "lpc_complete_summary_screen_heading": "Labware Position Check Complete",
+  "labware_offsets_summary_title": "Labware Offsets to be applied to this run",
+  "labware_offsets_summary_location": "Location",
+  "labware_offsets_summary_labware": "Labware",
+  "labware_offsets_summary_offset": "Labware Offset Data",
+  "close_and_apply_offset_data": "Close and apply labware offset data",
+  "no_labware_offsets": "No Labware Offsets"
 }
