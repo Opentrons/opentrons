@@ -59,7 +59,7 @@ const SERVER_MESSAGE = (status: HealthStatus, ip: string): JSX.Element => (
       </li>
       <li>
         <p>
-          If power-cycling does not work, please update your {"robot's"}
+          If power-cycling does not work, please update your {"robot's"}{' '}
           software
           <br />
           (Note: your {"robot's"} update server is still responding and should
