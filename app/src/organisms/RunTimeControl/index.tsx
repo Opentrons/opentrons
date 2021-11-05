@@ -23,29 +23,30 @@ import {
 import { useRunControls, useRunStatus } from './hooks'
 import { Timer } from './Timer'
 
-export function RunTimeControl(): JSX.Element {
+export function RunTimeControl(): JSX.Element | null {
   const { t } = useTranslation('run_details')
   const runStatus = useRunStatus()
-  const { play, pause, reset } = useRunControls()
+
+  const { usePlay, usePause, useReset } = useRunControls()
 
   let callToAction: React.ReactNode = ''
   let action = (): void => {}
-  if (runStatus === 'loaded') {
+  if (runStatus === 'ready-to-run') {
     callToAction = (
       <>
         <Icon name="play" size={SIZE_1} marginRight={SPACING_2} />
         <Text fontSize={FONT_SIZE_DEFAULT}>{t('start_run')}</Text>
       </>
     )
-    action = play
-  } else if (runStatus === 'running') {
+    action = usePlay
+  } else if (runStatus === 'running' || runStatus === 'pause-requested') {
     callToAction = (
       <>
         <Icon name="pause" size={SIZE_1} marginRight={SPACING_2} />
         <Text fontSize={FONT_SIZE_DEFAULT}>{t('pause_run')}</Text>
       </>
     )
-    action = pause
+    action = usePause
   } else if (runStatus === 'paused') {
     callToAction = (
       <>
@@ -53,24 +54,28 @@ export function RunTimeControl(): JSX.Element {
         <Text fontSize={FONT_SIZE_DEFAULT}>{t('resume_run')}</Text>
       </>
     )
-    action = play
-  } else if (runStatus === 'finished') {
+    action = usePlay
+    // need status stop-requested
+  } else if (
+    runStatus === 'stopped' ||
+    runStatus === 'failed' ||
+    runStatus === 'succeeded'
+  ) {
     callToAction = <Text fontSize={FONT_SIZE_DEFAULT}>{t('run_again')}</Text>
-    action = reset
-  } else if (runStatus === 'canceled') {
-    callToAction = <Text fontSize={FONT_SIZE_DEFAULT}>{t('run_again')}</Text>
-    action = reset
+    action = useReset
   }
 
-  return (
+  return runStatus != null ? (
     <Flex flexDirection={DIRECTION_COLUMN} margin={SPACING_2}>
       <Text css={FONT_HEADER_DARK} marginBottom={SPACING_3}>
         {t('run_protocol')}
       </Text>
       <Text css={FONT_BODY_1_DARK_SEMIBOLD} marginBottom={SPACING_3}>
-        {t('run_status', { status: t(`status_${runStatus}`) })}
+        {runStatus != null
+          ? t('run_status', { status: t(`status_${runStatus}`) })
+          : ''}
       </Text>
-      {runStatus !== 'loaded' ? <Timer /> : null}
+      {runStatus !== 'ready-to-run' ? <Timer /> : null}
       <PrimaryBtn
         onClick={action}
         alignSelf={ALIGN_STRETCH}
@@ -85,5 +90,5 @@ export function RunTimeControl(): JSX.Element {
         {callToAction}
       </PrimaryBtn>
     </Flex>
-  )
+  ) : null
 }

@@ -1,4 +1,6 @@
 import * as React from 'react'
+import { UseMutateFunction } from 'react-query'
+import { Protocol, Run } from '@opentrons/api-client'
 import {
   useCreateProtocolMutation,
   useProtocolQuery,
@@ -11,7 +13,13 @@ import {
 
 const CONFLICTING_RECORD_STATUS_CODE = 409
 
-export function useCurrentProtocolRun() {
+interface UseCurrentProtocolRun {
+  createProtocolRun: UseMutateFunction<Protocol, unknown, File[]>
+  protocolRecord?: Protocol | null
+  runRecord?: Run | null
+}
+
+export function useCurrentProtocolRun(): UseCurrentProtocolRun {
   // TODO: IMMEDIATELY as soon as client data current run endpoint
   // exists on the robot, we should query/mutate that state rather than
   // storing this runId in react state

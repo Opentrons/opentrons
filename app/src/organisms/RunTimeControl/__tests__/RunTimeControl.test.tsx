@@ -27,11 +27,13 @@ describe('RunTimeControl', () => {
     when(mockUseRunControls)
       .calledWith()
       .mockReturnValue({
-        play: () => {},
-        pause: () => {},
-        reset: () => {},
+        usePlay: () => {},
+        usePause: () => {},
+        useReset: () => {},
       })
-    when(mockUseRunStatus).calledWith().mockReturnValue('loaded')
+    when(mockUseRunStatus)
+      .calledWith()
+      .mockReturnValue(['loaded', '2021-10-22T18:54:53.366581+00:00'])
     mockTimer.mockReturnValue(<div>Mock Timer</div>)
   })
 
@@ -55,7 +57,9 @@ describe('RunTimeControl', () => {
   })
 
   it('renders a run status and timer if running', () => {
-    when(mockUseRunStatus).calledWith().mockReturnValue('running')
+    when(mockUseRunStatus)
+      .calledWith()
+      .mockReturnValue(['running', '2021-10-22T18:54:53.366581+00:00'])
 
     const [{ getByRole, getByText }] = render()
 
@@ -65,7 +69,9 @@ describe('RunTimeControl', () => {
   })
 
   it('renders a run status and timer if paused', () => {
-    when(mockUseRunStatus).calledWith().mockReturnValue('paused')
+    when(mockUseRunStatus)
+      .calledWith()
+      .mockReturnValue(['paused', '2021-10-22T18:54:53.366581+00:00'])
 
     const [{ getByRole, getByText }] = render()
 
@@ -75,7 +81,9 @@ describe('RunTimeControl', () => {
   })
 
   it('renders a run status and timer if finished', () => {
-    when(mockUseRunStatus).calledWith().mockReturnValue('finished')
+    when(mockUseRunStatus)
+      .calledWith()
+      .mockReturnValue(['finished', '2021-10-22T18:54:53.366581+00:00'])
 
     const [{ getByRole, getByText }] = render()
 
@@ -85,7 +93,9 @@ describe('RunTimeControl', () => {
   })
 
   it('renders a run status and timer if canceled', () => {
-    when(mockUseRunStatus).calledWith().mockReturnValue('canceled')
+    when(mockUseRunStatus)
+      .calledWith()
+      .mockReturnValue(['canceled', '2021-10-22T18:54:53.366581+00:00'])
     const [{ getByRole, getByText }] = render()
 
     expect(getByText('Status: Canceled')).toBeTruthy()

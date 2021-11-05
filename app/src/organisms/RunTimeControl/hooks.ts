@@ -1,27 +1,45 @@
+import { RunAction, RunStatus } from '@opentrons/api-client'
+import { useRunQuery, useRunActionMutations } from '@opentrons/react-api-client'
+
+import { useCurrentProtocolRun } from '../ProtocolUpload/useCurrentProtocolRun'
+
 interface RunControls {
-  play: () => void
-  pause: () => void
-  reset: () => void
+  usePlay: () => void
+  usePause: () => void
+  useReset: () => void
 }
 
 export function useRunControls(): RunControls {
-  const play = (): void => {
-    console.log('TODO: wire up to protocol play endpoint')
+  const { runRecord } = useCurrentProtocolRun()
+  // hardcoded run created in postman
+  const { playRun, pauseRun } = useRunActionMutations(
+    '49247bbd-4bac-4178-887b-4f7a6fb916b3'
+  )
+  // const { playRun, pauseRun } = useRunActionMutations(
+  //   runRecord?.data.id as string
+  // )
+
+  const usePlay = (): void => {
+    playRun()
   }
-  const pause = (): void => {
-    console.log('TODO: wire up to protocol pause endpoint')
+  const usePause = (): void => {
+    pauseRun()
   }
-  const reset = (): void => {
+  const useReset = (): void => {
     console.log('TODO: wire up to protocol reset endpoint')
   }
-  return { play, pause, reset }
+  return { usePlay, usePause, useReset }
 }
 
-// TODO: IMMEDIATELY replace with real status enum type from server run status
-type RunStatus = 'loaded' | 'running' | 'paused' | 'finished' | 'canceled'
 export function useRunStatus(): RunStatus {
-  const runStatus = 'loaded'
-  return runStatus
+  const { runRecord } = useCurrentProtocolRun()
+
+  // const { data } = useRunQuery(runRecord?.data.id as string)
+  const { data } = useRunQuery('49247bbd-4bac-4178-887b-4f7a6fb916b3')
+
+  const currentState = data?.data.status as RunStatus
+
+  return currentState
 }
 
 export function useRunDisabledReason(): string | null {
@@ -30,4 +48,20 @@ export function useRunDisabledReason(): string | null {
    "required pipettes not detected", "isBlocked?"
   */
   return null
+}
+
+export function useRunStartTime(): string | undefined {
+  const { runRecord } = useCurrentProtocolRun()
+
+  // hardcoded run created in postman
+  const { data } = useRunQuery('49247bbd-4bac-4178-887b-4f7a6fb916b3')
+  // const { data } = useRunQuery(runRecord?.data.id as string)
+
+  const actions = data?.data.actions as RunAction[]
+
+  // find first play action
+  const firstPlay = actions?.[0]
+
+  const runStart = firstPlay?.createdAt
+  return runStart
 }

@@ -2,6 +2,7 @@
   "current_temperature": "Current: {{temperature}} °C",
   "module_slot_number": "Slot {{slot_number}}",
   "pause_run": "Pause Run",
+  "paused_for": "Paused For",
   "protocol_title": "Protocol - {{protocol_name}}",
   "resume_run": "Resume Run",
   "run_again": "Run Again",

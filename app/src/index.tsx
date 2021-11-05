@@ -5,8 +5,6 @@ import { Provider } from 'react-redux'
 
 import { ConnectedRouter } from 'connected-react-router'
 
-import { QueryClient, QueryClientProvider } from 'react-query'
-
 import { I18nextProvider } from 'react-i18next'
 
 import { i18n } from './i18n'
@@ -20,7 +18,6 @@ import { store } from './redux/store'
 import { App } from './App'
 
 const log = createLogger(__filename)
-const queryClient = new QueryClient()
 
 // kickoff app-shell initializations
 store.dispatch(uiInitialized())
@@ -30,11 +27,9 @@ log.info('Rendering app UI')
 ReactDom.render(
   <Provider store={store}>
     <ConnectedRouter history={history}>
-      <QueryClientProvider client={queryClient}>
-        <I18nextProvider i18n={i18n}>
-          <App />
-        </I18nextProvider>
-      </QueryClientProvider>
+      <I18nextProvider i18n={i18n}>
+        <App />
+      </I18nextProvider>
     </ConnectedRouter>
   </Provider>,
   document.getElementById('root')

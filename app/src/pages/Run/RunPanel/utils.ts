@@ -9,5 +9,5 @@ export function formatSeconds(value: number): string {
 }
 
 export function formatTime(time: number | null | undefined): string {
-  return time ? format(time, 'pp') : ''
+  return time != null ? format(time, 'pp') : ''
 }

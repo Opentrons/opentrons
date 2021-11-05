@@ -1,6 +1,8 @@
 import * as React from 'react'
 import { format } from 'date-fns'
 import { useTranslation } from 'react-i18next'
+
+import { RunStatus } from '@opentrons/api-client'
 import {
   useInterval,
   Text,
@@ -9,25 +11,48 @@ import {
   SPACING_3,
 } from '@opentrons/components'
 
-export function Timer(): JSX.Element {
+import { useRunStartTime, useRunStatus } from './hooks'
+import { formatInterval } from './utils'
+
+// flesh out TimerProps (to eliminate refetch)
+interface TimerProps {
+  startTime: string
+  runStatus: RunStatus
+  lastEventTime: string
+}
+
+export function Timer(): JSX.Element | null {
   const { t } = useTranslation('run_details')
 
-  // TODO(bh, 2021-10-14): replace now timer with real run time
-  const [now, setNow] = React.useState(Date.now())
-  useInterval(() => setNow(Date.now()), 500)
+  const startTime = useRunStartTime()
+  const [runStatus, lastEventTime] = useRunStatus()
 
-  // TODO(bh, 2021-10-14): replace hardcoded startTime with real start time
-  const startTime = 1634243123471
+  const initialNow = Date()
+  const [now, setNow] = React.useState(initialNow)
+  // interval causing refetch
+  useInterval(() => setNow(Date()), 500, true)
 
-  return (
+  const pausedAt = runStatus === 'paused' ? lastEventTime : null
+
+  return startTime != null ? (
     <>
       <Text css={FONT_BODY_1_DARK_SEMIBOLD} marginBottom={SPACING_3}>{`${t(
         'start_time'
-      )}: ${format(startTime, 'pppp')}`}</Text>
+      )}: ${format(new Date(startTime), 'pppp')}`}</Text>
+      {pausedAt != null ? (
+        <>
+          <Text css={FONT_BODY_1_DARK_SEMIBOLD}>{`${t('paused_for')}:`}</Text>
+          <Text css={FONT_HUGE_DARK_SEMIBOLD} marginBottom={SPACING_3}>
+            {formatInterval(pausedAt, now)}
+          </Text>
+        </>
+      ) : null}
       <Text css={FONT_BODY_1_DARK_SEMIBOLD}>{`${t('run_time')}:`}</Text>
       <Text css={FONT_HUGE_DARK_SEMIBOLD} marginBottom={SPACING_3}>
-        {format(now, 'hh:mm:ss')}
+        {pausedAt != null
+          ? formatInterval(startTime, pausedAt)
+          : formatInterval(startTime, now)}
       </Text>
     </>
-  )
+  ) : null
 }
