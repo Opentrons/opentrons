@@ -22,6 +22,7 @@ import { useLogger } from '../../logger'
 import type { ErrorObject } from 'ajv'
 import type { Dispatch, State } from '../../redux/types'
 import { useCurrentProtocolRun } from './useCurrentProtocolRun'
+import { useCloseProtocolRun } from './useCloseProtocolRun'
 
 const VALIDATION_ERROR_T_MAP: { [errorKey: string]: string } = {
   INVALID_FILE_TYPE: 'invalid_file_type',
@@ -31,7 +32,10 @@ const VALIDATION_ERROR_T_MAP: { [errorKey: string]: string } = {
 export function ProtocolUpload(): JSX.Element {
   const { t } = useTranslation(['protocol_info', 'shared'])
   const dispatch = useDispatch<Dispatch>()
-  const { createProtocolRun } = useCurrentProtocolRun()
+  const { createProtocolRun, runRecord, protocolRecord } = useCurrentProtocolRun()
+  const closeProtocolRun = useCloseProtocolRun()
+  console.log('run ', runRecord)
+  console.log('protocol ', protocolRecord)
 
   const logger = useLogger(__filename)
   const [uploadError, setUploadError] = React.useState<
@@ -62,6 +66,7 @@ export function ProtocolUpload(): JSX.Element {
 
   const handleCloseProtocol: React.MouseEventHandler = _event => {
     dispatch(closeProtocol())
+    closeProtocolRun()
   }
 
   const {
@@ -109,7 +114,7 @@ export function ProtocolUpload(): JSX.Element {
           width="100%"
           backgroundColor={C_NEAR_WHITE}
         >
-          {protocolFile !== null ? (
+          {runRecord != null && protocolRecord != null ? (
             <ProtocolSetup />
           ) : (
             <UploadInput onUpload={handleUpload} />

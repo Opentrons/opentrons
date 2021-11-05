@@ -6,6 +6,7 @@ import {
   useDeleteRunMutation,
   useRunQuery,
   useAllRunsQuery,
+  useStopRunMutation,
 } from '@opentrons/react-api-client'
 
 const CONFLICTING_RECORD_STATUS_CODE = 409
@@ -15,18 +16,47 @@ export function useCurrentProtocolRun() {
   // exists on the robot, we should query/mutate that state rather than
   // storing this runId in react state
   // const { data: currentRunId } = useCurrentRunIdQuery()
+  const [protocolId, setProtocolId] = React.useState<string | null>(null)
   const [runId, setRunId] = React.useState<string | null>(null)
   const { data: allRuns } = useAllRunsQuery()
+  const { data: runRecord } = useRunQuery(runId, {
+    onError: _data => {
+      console.log('ON ERROR')
+      setRunId(null)
+    },
+  })
+  const { data: protocolRecord } = useProtocolQuery(
+    (runRecord?.data?.createParams?.protocolId as string) ?? null
+  )
 
   // const { patchCurrentRunId } = usePatchCurrentRunId()
-  const { deleteRun } = useDeleteRunMutation()
+  const { stopRun } = useStopRunMutation({
+    onSuccess: _data => {
+      if (allRuns != null) {
+        deleteRun(allRuns.data[0].id)
+      }
+    },
+  })
+  const { deleteRun } = useDeleteRunMutation({
+    onSuccess: _data => {
+      if (protocolId != null) {
+        createRun({
+          runType: 'protocol',
+          createParams: {
+            protocolId: protocolId,
+          },
+        })
+      }
+    },
+  })
   const { createRun } = useCreateRunMutation({
     onError: error => {
+      console.log('run error', error, runId)
       if (
         error?.response?.status === CONFLICTING_RECORD_STATUS_CODE &&
         allRuns != null
       ) {
-        deleteRun(allRuns.data[0].id)
+        stopRun(allRuns.data[0].id)
       }
     },
     onSuccess: data => {
@@ -36,6 +66,7 @@ export function useCurrentProtocolRun() {
   })
   const { createProtocol: createProtocolRun } = useCreateProtocolMutation({
     onSuccess: data => {
+      setProtocolId(data.data.id)
       createRun({
         runType: 'protocol',
         createParams: {
@@ -45,11 +76,9 @@ export function useCurrentProtocolRun() {
     },
   })
 
-  const { data: runData } = useRunQuery(runId)
-  const { data: protocolData } = useProtocolQuery(
-    (runData?.data?.createParams?.protocolId as string) ?? null
-  )
-
-  console.table({ createProtocolRun, protocolData, runData })
-  return { createProtocolRun, protocolData, runData }
+  return {
+    createProtocolRun,
+    protocolRecord,
+    runRecord,
+  }
 }
