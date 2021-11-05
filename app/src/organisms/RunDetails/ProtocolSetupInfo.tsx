@@ -16,6 +16,12 @@ import {
   TEXT_TRANSFORM_CAPITALIZE,
   TEXT_TRANSFORM_UPPERCASE,
 } from '@opentrons/components'
+import { getModuleDisplayName, ProtocolFile } from '@opentrons/shared-data'
+import { getProtocolPipetteTipRackCalInfo } from '../../redux/pipettes'
+import { getConnectedRobot } from '../../redux/discovery'
+import { State } from '../../redux/types'
+import { useSelector } from 'react-redux'
+import { useProtocolDetails } from './hooks'
 import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
 
 interface ProtocolSetupInfoProps {
@@ -28,16 +34,31 @@ export const ProtocolSetupInfo = (
 ): JSX.Element | null => {
   const { SetupCommand } = props
   const { t } = useTranslation('run_details')
+  //  @ts-expect-error casting a v6 protocol, remove when wiring up to protocol resource
+  const protocolData: ProtocolFile<{}> | null = useProtocolDetails()
+    .protocolData
+  const robot = useSelector((state: State) => getConnectedRobot(state))
+  const robotName = robot?.name != null ? robot?.name : ''
+  const protocolPipetteData = useSelector((state: State) =>
+    getProtocolPipetteTipRackCalInfo(state, robotName)
+  )
+
+  if (protocolData == null) return null
 
   let SetupCommandText
   if (SetupCommand.commandType === 'loadPipette') {
+    //  @ts-expect-error mount is a string right now but mount needs to equal Mount[] - should be fixable when command type is updated
+    const pipetteData = protocolPipetteData[SetupCommand.params.mount]
+    if (pipetteData == null) {
+      return null
+    }
     SetupCommandText = (
       <Trans
         t={t}
         id={`RunDetails_PipetteSetup`}
         i18nKey={'load_pipette_protocol_setup'}
         values={{
-          pipette_name: SetupCommand.result?.pipetteId,
+          pipette_name: pipetteData.pipetteDisplayName,
           mount_name: SetupCommand.params.mount,
         }}
         components={{
@@ -52,11 +73,9 @@ export const ProtocolSetupInfo = (
       />
     )
   } else if (SetupCommand.commandType === 'loadModule') {
-    const moduleSlotNumber = SetupCommand.result?.moduleId.includes(
-      'thermocycler'
-    )
-      ? 4
-      : 1
+    const moduleId = SetupCommand.params.moduleId
+    const moduleModel = protocolData.modules[moduleId]
+    const moduleSlotNumber = moduleId.includes('thermocycler') ? 4 : 1
     SetupCommandText = (
       <Trans
         t={t}
@@ -64,47 +83,67 @@ export const ProtocolSetupInfo = (
         i18nKey={'load_modules_protocol_setup'}
         count={moduleSlotNumber}
         values={{
-          module: SetupCommand.result?.moduleId,
+          module: getModuleDisplayName(moduleModel.model),
           slot_name: Object.values(SetupCommand.params.location)[0],
         }}
       />
     )
   } else if (SetupCommand.commandType === 'loadLabware') {
-    const moduleUnderLabware = Object.values(SetupCommand.params.location)[1]
-    let moduleIncluded = 0
-    if (moduleUnderLabware == null) {
-      moduleIncluded = 0
-    } else if (
-      moduleUnderLabware !== null &&
-      //  @ts-ignore: moduleUnderLabware is possibly 'null'
-      moduleUnderLabware.includes('thermocycler')
-    ) {
-      moduleIncluded = 4
-    } else if (moduleUnderLabware != null) {
-      moduleIncluded = 1
+    let moduleName: string | null = null
+    let slotNumber = Object.values(SetupCommand.params.location)[0]
+    if ('moduleId' in SetupCommand.params.location) {
+      const moduleId = SetupCommand.params.location.moduleId
+      const moduleModel = protocolData.modules[moduleId]
+      const moduleSlotNumber = protocolData.commands.find(
+        command =>
+          command.commandType === 'loadModule' &&
+          command.params.moduleId === moduleId
+        //  @ts-expect-error narrow to load module command when command types get updated
+      )?.params.location.moduleId
+      slotNumber = moduleSlotNumber
+      moduleName = getModuleDisplayName(moduleModel.model)
     }
+    let moduleSlots = 0
+    if (moduleName === null) {
+      moduleSlots = 0
+    } else if (moduleName != null && moduleName.includes('Thermocycler')) {
+      moduleSlots = 4
+    } else if (moduleName != null) {
+      moduleSlots = 1
+    }
+
     SetupCommand.result?.definition.metadata.displayName.includes('trash')
       ? (SetupCommandText = null)
-      : (SetupCommandText = (
-          <Trans
-            t={t}
-            id={`RunDetails_LabwareSetup`}
-            i18nKey={
-              moduleIncluded === 0
-                ? 'load_labware_info_protocol_setup_no_module'
-                : 'load_labware_info_protocol_setup'
-            }
-            count={moduleIncluded === 0 ? undefined : moduleIncluded}
-            values={{
-              labware_loadname:
-                SetupCommand.result?.definition.metadata.displayName,
-              labware_version: SetupCommand.result?.definition.version,
-              slot_number: Object.values(SetupCommand.params.location)[0],
-              module_name: Object.values(SetupCommand.params.location)[1],
-            }}
-          />
-        ))
+      : (SetupCommandText =
+          moduleName === null ? (
+            <Trans
+              t={t}
+              id={`RunDetails_LabwareSetup_NoModules`}
+              i18nKey={'load_labware_info_protocol_setup_no_module'}
+              values={{
+                labware_loadname:
+                  SetupCommand.result?.definition.metadata.displayName,
+                labware_version: SetupCommand.result?.definition.version,
+                slot_number: slotNumber,
+              }}
+            />
+          ) : (
+            <Trans
+              t={t}
+              id={`RunDetails_LabwareSetup_WithModules`}
+              i18nKey={'load_labware_info_protocol_setup'}
+              count={moduleSlots}
+              values={{
+                labware_loadname:
+                  SetupCommand.result?.definition.metadata.displayName,
+                labware_version: SetupCommand.result?.definition.version,
+                slot_number: slotNumber,
+                module_name: moduleName,
+              }}
+            />
+          ))
   }
+
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}

@@ -2,7 +2,6 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   Flex,
-  Text,
   DIRECTION_COLUMN,
   TEXT_TRANSFORM_UPPERCASE,
   FONT_SIZE_CAPTION,
@@ -17,31 +16,31 @@ import {
 import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 import { useProtocolDetails } from './hooks'
 import { ProtocolSetupInfo } from './ProtocolSetupInfo'
-import _Fixture_commands from './Fixture_commands.json'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+//import _Fixture_commands from './Fixture_commands.json'
+import type { LabwareDefinition2, ProtocolFile } from '@opentrons/shared-data'
 import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
 
 export function CommandList(): JSX.Element | null {
   const { t } = useTranslation('run_details')
-  const { protocolData } = useProtocolDetails()
   const [
     showProtocolSetupInfo,
     setShowProtocolSetupInfo,
   ] = React.useState<boolean>(false)
+  //  @ts-expect-error casting a v6 protocol, remove when wiring up to protocol resource
+  const protocolData: ProtocolFile<{}> | null = useProtocolDetails()
+    .protocolData
   if (protocolData == null) return null
-  //  const fixtureCommands = _Fixture_commands as Command //TODO: immediately
-
-  const LABWARE_LOCATION = { slotName: '9' } || {
-      moduleId: 'thermocycler',
-    } || {
-      coordinates: { x: 0, y: 0, z: 0 },
-    }
+  //  const fixtureCommands = _Fixture_commands //TODO: immediately
 
   const COMMAND = {
     commandType: 'loadLabware',
     params: {
       labwareId: '96_wellplate',
-      location: LABWARE_LOCATION,
+      location: { slotName: '9' } || {
+          moduleId: 'Thermocycler',
+        } || {
+          coordinates: { x: 0, y: 0, z: 0 },
+        },
     },
     result: {
       labwareId: '96_wellplate',
@@ -87,7 +86,7 @@ export function CommandList(): JSX.Element | null {
       >
         <Flex>
           {COMMAND.commandType === 'delay' ? (
-            <Flex>
+            <Flex flexDirection={DIRECTION_ROW}>
               <Flex textTransform={TEXT_TRANSFORM_UPPERCASE}>
                 {t('comment')}
               </Flex>
