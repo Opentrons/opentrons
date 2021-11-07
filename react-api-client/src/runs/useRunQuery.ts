@@ -8,7 +8,7 @@ import type { UseQueryResult, UseQueryOptions } from 'react-query'
 
 export function useRunQuery(
   runId: string | null,
-  options: UseQueryOptions<Run | null>
+  options?: UseQueryOptions<Run | null>
 ): UseQueryResult<Run | null> {
   const host = useHost()
   const query = useQuery(

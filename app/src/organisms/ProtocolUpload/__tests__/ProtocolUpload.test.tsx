@@ -1,7 +1,6 @@
 import * as React from 'react'
-import { when } from 'jest-when'
-
-import '@testing-library/jest-dom'
+import { resetAllWhenMocks, when } from 'jest-when'
+import { QueryClient, QueryClientProvider } from 'react-query'
 import { fireEvent, screen } from '@testing-library/react'
 import {
   renderWithProviders,
@@ -17,13 +16,15 @@ import * as protocolSelectors from '../../../redux/protocol/selectors'
 import * as protocolUtils from '../../../redux/protocol/utils'
 import { ConfirmExitProtocolUploadModal } from '../ConfirmExitProtocolUploadModal'
 import { mockCalibrationStatus } from '../../../redux/calibration/__fixtures__'
-import { ProtocolUpload } from '..'
+import { useCurrentProtocolRun } from '../useCurrentProtocolRun'
 import { closeProtocol } from '../../../redux/protocol/actions'
+import { ProtocolUpload } from '..'
 
 jest.mock('../../../redux/protocol/selectors')
 jest.mock('../../../redux/protocol/utils')
 jest.mock('../../../redux/discovery/selectors')
 jest.mock('../../../redux/calibration/selectors')
+jest.mock('../useCurrentProtocolRun')
 jest.mock('../ConfirmExitProtocolUploadModal')
 
 const getProtocolFile = protocolSelectors.getProtocolFile as jest.MockedFunction<
@@ -44,8 +45,18 @@ const getCalibrationStatus = calibrationSelectors.getCalibrationStatus as jest.M
 const mockConfirmExitProtocolUploadModal = ConfirmExitProtocolUploadModal as jest.MockedFunction<
   typeof ConfirmExitProtocolUploadModal
 >
+const mockUseCurrentProtocolRun = useCurrentProtocolRun as jest.MockedFunction<
+  typeof useCurrentProtocolRun
+>
+const queryClient = new QueryClient()
+
 const render = () => {
-  return renderWithProviders(<ProtocolUpload />, { i18nInstance: i18n })
+  return renderWithProviders(
+    <QueryClientProvider client={queryClient}>
+      <ProtocolUpload />
+    </QueryClientProvider>,
+    { i18nInstance: i18n }
+  )
 }
 
 describe('ProtocolUpload', () => {
@@ -65,10 +76,18 @@ describe('ProtocolUpload', () => {
       .mockImplementation(({ exit }) => (
         <div onClick={exit}>mock confirm exit protocol upload modal</div>
       ))
+    when(mockUseCurrentProtocolRun)
+      .calledWith()
+      .mockReturnValue({
+        protocolRecord: null,
+        runRecord: null,
+        createProtocolRun: jest.fn(),
+      } as any)
   })
 
   afterEach(() => {
     jest.resetAllMocks()
+    resetAllWhenMocks()
   })
 
   it('renders Protocol Upload Input for empty state', () => {
@@ -78,8 +97,13 @@ describe('ProtocolUpload', () => {
     expect(queryByText('Organization/Author')).toBeNull()
   })
   it('renders Protocol Setup if file loaded', () => {
-    getProtocolFile.mockReturnValue({ metadata: {} } as any)
-    getProtocolName.mockReturnValue('some file name')
+    when(mockUseCurrentProtocolRun)
+      .calledWith()
+      .mockReturnValue({
+        protocolRecord: {},
+        runRecord: {},
+        createProtocolRun: jest.fn(),
+      } as any)
     const { queryByRole, getByText } = render()[0]
 
     expect(queryByRole('button', { name: 'Choose File...' })).toBeNull()

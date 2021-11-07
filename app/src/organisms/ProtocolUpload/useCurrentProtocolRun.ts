@@ -1,4 +1,6 @@
 import * as React from 'react'
+import { useQueryClient, UseMutateFunction } from 'react-query'
+import { useHost } from '../../../../react-api-client/src/api/useHost'
 import {
   useCreateProtocolMutation,
   useProtocolQuery,
@@ -8,20 +10,28 @@ import {
   useAllRunsQuery,
   useStopRunMutation,
 } from '@opentrons/react-api-client'
+import type { Protocol, Run } from '@opentrons/api-client'
 
 const CONFLICTING_RECORD_STATUS_CODE = 409
 
-export function useCurrentProtocolRun() {
+interface UseCurrentProtocolRun {
+  createProtocolRun: UseMutateFunction<Protocol, unknown, File[], unknown>
+  protocolRecord: Protocol | null | undefined
+  runRecord: Run | null | undefined
+}
+
+export function useCurrentProtocolRun(): UseCurrentProtocolRun {
   // TODO: IMMEDIATELY as soon as client data current run endpoint
   // exists on the robot, we should query/mutate that state rather than
   // storing this runId in react state
   // const { data: currentRunId } = useCurrentRunIdQuery()
+  const host = useHost()
+  const queryClient = useQueryClient()
   const [protocolId, setProtocolId] = React.useState<string | null>(null)
   const [runId, setRunId] = React.useState<string | null>(null)
   const { data: allRuns } = useAllRunsQuery()
   const { data: runRecord } = useRunQuery(runId, {
     onError: _data => {
-      console.log('ON ERROR')
       setRunId(null)
     },
   })
@@ -51,16 +61,25 @@ export function useCurrentProtocolRun() {
   })
   const { createRun } = useCreateRunMutation({
     onError: error => {
-      console.log('run error', error, runId)
       if (
         error?.response?.status === CONFLICTING_RECORD_STATUS_CODE &&
         allRuns != null
       ) {
         stopRun(allRuns.data[0].id)
+        queryClient
+          .invalidateQueries([host, 'runs'])
+          .catch((e: Error) =>
+            console.error(`error invalidating runs query: ${e.message}`)
+          )
       }
     },
     onSuccess: data => {
       // patchCurrentRunId(data.data.id)
+      queryClient
+        .invalidateQueries([host, 'runs'])
+        .catch((e: Error) =>
+          console.error(`error invalidating runs query: ${e.message}`)
+        )
       setRunId(data.data.id)
     },
   })

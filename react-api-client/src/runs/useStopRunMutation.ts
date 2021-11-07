@@ -30,7 +30,7 @@ export type UseStopRunMutationOptions = UseMutationOptions<
 >
 
 export const useStopRunMutation = (
-  options: UseStopRunMutationOptions
+  options?: UseStopRunMutationOptions
 ): UseStopRunMutationResult => {
   const host = useHost()
   const mutation = useMutation<RunAction, unknown, string>(
