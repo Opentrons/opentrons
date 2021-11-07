@@ -1,6 +1,7 @@
 import * as React from 'react'
-import { UseMutateFunction } from 'react-query'
+import { UseMutateFunction, useQueryClient } from 'react-query'
 import { Protocol, Run } from '@opentrons/api-client'
+import { useHost } from '../../../../react-api-client/src/api/useHost'
 import {
   useCreateProtocolMutation,
   useProtocolQuery,
@@ -24,6 +25,8 @@ export function useCurrentProtocolRun(): UseCurrentProtocolRun {
   // exists on the robot, we should query/mutate that state rather than
   // storing this runId in react state
   // const { data: currentRunId } = useCurrentRunIdQuery()
+  const host = useHost()
+  const queryClient = useQueryClient()
   const [protocolId, setProtocolId] = React.useState<string | null>(null)
   const [runId, setRunId] = React.useState<string | null>(null)
   const { data: allRuns } = useAllRunsQuery()
@@ -59,16 +62,25 @@ export function useCurrentProtocolRun(): UseCurrentProtocolRun {
   })
   const { createRun } = useCreateRunMutation({
     onError: error => {
-      console.log('run error', error, runId)
       if (
         error?.response?.status === CONFLICTING_RECORD_STATUS_CODE &&
         allRuns != null
       ) {
         stopRun(allRuns.data[0].id)
+        queryClient
+          .invalidateQueries([host, 'runs'])
+          .catch((e: Error) =>
+            console.error(`error invalidating runs query: ${e.message}`)
+          )
       }
     },
     onSuccess: data => {
       // patchCurrentRunId(data.data.id)
+      queryClient
+        .invalidateQueries([host, 'runs'])
+        .catch((e: Error) =>
+          console.error(`error invalidating runs query: ${e.message}`)
+        )
       setRunId(data.data.id)
     },
   })

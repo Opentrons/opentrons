@@ -11,7 +11,7 @@ export function useRunActionMutations(runId: string): UseRunActionMutations {
 
   const { pauseRun } = usePauseRunMutation(runId)
 
-  const { stopRun } = useStopRunMutation(runId)
+  const { stopRun } = useStopRunMutation()
 
-  return { playRun, pauseRun, stopRun }
+  return { playRun, pauseRun, stopRun: () => stopRun(runId) }
 }

@@ -6,12 +6,13 @@ import {
   C_NEAR_WHITE,
   useConditionalConfirm,
 } from '@opentrons/components'
-import { useCreateProtocolMutation, useProtocolQuery, useCreateRunMutation, useRunQuery } from '@opentrons/react-api-client'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { Page } from '../../atoms/Page'
 import { UploadInput } from './UploadInput'
 import { ProtocolSetup } from '../ProtocolSetup'
+import { useCurrentProtocolRun } from './useCurrentProtocolRun'
+import { useCloseProtocolRun } from './useCloseProtocolRun'
 import { getProtocolName, getProtocolFile } from '../../redux/protocol'
 import { loadProtocol, closeProtocol } from '../../redux/protocol/actions'
 import { ingestProtocolFile } from '../../redux/protocol/utils'
@@ -21,8 +22,6 @@ import { ConfirmExitProtocolUploadModal } from './ConfirmExitProtocolUploadModal
 import { useLogger } from '../../logger'
 import type { ErrorObject } from 'ajv'
 import type { Dispatch, State } from '../../redux/types'
-import { useCurrentProtocolRun } from './useCurrentProtocolRun'
-import { useCloseProtocolRun } from './useCloseProtocolRun'
 
 const VALIDATION_ERROR_T_MAP: { [errorKey: string]: string } = {
   INVALID_FILE_TYPE: 'invalid_file_type',
@@ -32,10 +31,12 @@ const VALIDATION_ERROR_T_MAP: { [errorKey: string]: string } = {
 export function ProtocolUpload(): JSX.Element {
   const { t } = useTranslation(['protocol_info', 'shared'])
   const dispatch = useDispatch<Dispatch>()
-  const { createProtocolRun, runRecord, protocolRecord } = useCurrentProtocolRun()
+  const {
+    createProtocolRun,
+    runRecord,
+    protocolRecord,
+  } = useCurrentProtocolRun()
   const closeProtocolRun = useCloseProtocolRun()
-  console.log('run ', runRecord)
-  console.log('protocol ', protocolRecord)
 
   const logger = useLogger(__filename)
   const [uploadError, setUploadError] = React.useState<

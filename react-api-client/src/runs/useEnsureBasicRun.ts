@@ -6,13 +6,13 @@ export function useEnsureBasicRun(): RunData | null {
   const { data: existingBasicRuns } = useRunsByTypeQuery({
     runType: RUN_TYPE_BASIC,
   })
-  const { createRun, isLoading, isError } = useCreateRunMutation({
-    runType: RUN_TYPE_BASIC,
-  })
+  const { createRun, isLoading, isError } = useCreateRunMutation()
 
   useEffect(() => {
     if (existingBasicRuns == null && !isLoading && !isError) {
-      createRun()
+      createRun({
+        runType: RUN_TYPE_BASIC,
+      })
     }
   }, [existingBasicRuns, isLoading, createRun, isError])
 
