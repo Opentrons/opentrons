@@ -3015,7 +3015,8 @@
       "id": "0abc1",
       "commandType": "loadPipette",
       "params": {
-        "pipetteId": "50d23e00-0042-11ec-8258-f7ffdf5ad45a"
+        "pipetteId": "50d23e00-0042-11ec-8258-f7ffdf5ad45a",
+        "mount": "right"
       },
       "result": {
         "pipetteId": "50d23e00-0042-11ec-8258-f7ffdf5ad45a"
