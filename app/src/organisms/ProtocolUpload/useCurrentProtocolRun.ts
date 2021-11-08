@@ -21,7 +21,7 @@ interface UseCurrentProtocolRun {
 }
 
 export function useCurrentProtocolRun(): UseCurrentProtocolRun {
-  // TODO: IMMEDIATELY as soon as client data current run endpoint
+  // TODO: IMMEDIATELY as soon as GET /runs links.current pointer path exists
   // exists on the robot, we should query/mutate that state rather than
   // storing this runId in react state
   // const { data: currentRunId } = useCurrentRunIdQuery()
