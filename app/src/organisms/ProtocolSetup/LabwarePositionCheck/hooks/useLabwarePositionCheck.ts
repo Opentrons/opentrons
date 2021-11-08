@@ -2,7 +2,7 @@ import * as React from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import {
   HostConfig,
-  createCommand,
+  createCommand, // TODO: create hook for this inside react-api-client
   RunCommandSummary,
 } from '@opentrons/api-client'
 import {
@@ -13,7 +13,7 @@ import {
 import { useProtocolDetails } from '../../../RunDetails/hooks'
 import { getLabwareLocation } from '../../utils/getLabwareLocation'
 import { getModuleLocation } from '../../utils/getModuleLocation'
-import { useCommands } from '.'
+import { useLPCCommands } from '.'
 import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type { SetupCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 import type {
@@ -102,6 +102,7 @@ export function useLabwarePositionCheck(
   const [error, setError] = React.useState<Error | null>(null)
   const { protocolData } = useProtocolDetails()
   const host = useHost()
+  // TODO IMMEDIATELY: no longer using basic run, get current protocol run from useCurrentProtocolRun
   const basicRun = useEnsureBasicRun()
   if (basicRun.error != null && error !== null) {
     setError(basicRun.error)
@@ -109,17 +110,16 @@ export function useLabwarePositionCheck(
   // load commands come from the protocol resource
   const loadCommands = protocolData?.commands.filter(isLoadCommand) ?? []
   // TC open lid commands come from the LPC command generator
-  const TCOpenCommands = useCommands().filter(isTCOpenCommand) ?? []
+  const TCOpenCommands = useLPCCommands().filter(isTCOpenCommand) ?? []
   // prepCommands will be run when a user starts LPC
   const prepCommands = [...loadCommands, ...TCOpenCommands]
   // LPCMovementCommands will be run during the guided LPC flow
-  const LPCMovementCommands: LabwarePositionCheckMovementCommand[] = useCommands().filter(
+  const LPCMovementCommands: LabwarePositionCheckMovementCommand[] = useLPCCommands().filter(
     (
       command: LabwarePositionCheckCommand
     ): command is LabwarePositionCheckMovementCommand =>
       command.commandType !== 'thermocycler/openLid'
   )
-  const lastCommand = LPCMovementCommands[currentCommandIndex - 1]
   const currentCommand = LPCMovementCommands[currentCommandIndex]
   const ctaText = useLpcCtaText(currentCommand)
   const robotCommands = useAllCommandsQuery(basicRun.data?.id).data?.data
@@ -171,12 +171,13 @@ export function useLabwarePositionCheck(
   }
 
   const proceed = (): void => {
+    const prevCommand = LPCMovementCommands[currentCommandIndex - 1]
     setIsLoading(true)
     // before executing the next movement command, save the current position
     const savePositionCommand: Command = {
       commandType: 'savePosition',
       id: uuidv4(),
-      params: { pipetteId: lastCommand.params.pipetteId },
+      params: { pipetteId: prevCommand.params.pipetteId },
     }
     createCommand(
       host as HostConfig,
@@ -186,7 +187,7 @@ export function useLabwarePositionCheck(
       // add the saved command id so we can use it to query locations later
       .then(response => {
         const commandId = response.data.data.id
-        addSavePositionCommandData(commandId, lastCommand.params.labwareId)
+        addSavePositionCommandData(commandId, prevCommand.params.labwareId)
         // execute the movement command
         return createCommand(
           host as HostConfig,

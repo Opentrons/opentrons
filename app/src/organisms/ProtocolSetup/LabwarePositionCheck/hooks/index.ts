@@ -1,4 +1,4 @@
-export { useCommands } from './useCommands'
+export { useLPCCommands } from './useLPCCommands'
 export { useIntroInfo } from './useIntroInfo'
 export { useLabwareIdsBySection } from './useLabwareIdsBySection'
 export { useSections } from './useSections'

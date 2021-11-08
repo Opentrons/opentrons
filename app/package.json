@@ -20,7 +20,6 @@
   "dependencies": {
     "@hot-loader/react-dom": "17.0.1",
     "@opentrons/components": "4.6.2",
-    "@opentrons/react-api-client": "^0.0.0",
     "@opentrons/shared-data": "4.6.2",
     "@opentrons/api-client": "0.0.0",
     "@opentrons/react-api-client": "0.0.0",
