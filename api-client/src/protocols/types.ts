@@ -61,11 +61,6 @@ export interface Protocols {
   data: ProtocolData[]
 }
 
-export interface EmptyResponse {
-  links?: ResourceLinks
-  data: null
-}
-
 export interface ProtocolFileInvalid extends ErrorDetails {
   id: 'ProtocolFileInvalid'
   meta: ProtocolMetadata
