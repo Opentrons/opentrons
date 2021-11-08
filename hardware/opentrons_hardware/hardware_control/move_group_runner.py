@@ -20,7 +20,7 @@ from opentrons_hardware.drivers.can_bus.messages.payloads import (
 )
 from opentrons_hardware.hardware_control.constants import interrupts_per_sec
 from opentrons_hardware.hardware_control.motion import MoveGroups
-from opentrons_hardware.utils import UInt8Field, UInt16Field, Int16Field
+from opentrons_hardware.utils import UInt8Field, UInt32Field, Int32Field
 
 
 log = logging.getLogger(__name__)
@@ -68,11 +68,11 @@ class MoveGroupRunner:
                             payload=AddLinearMoveRequestPayload(
                                 group_id=UInt8Field(group_i),
                                 seq_id=UInt8Field(seq_i),
-                                duration=UInt16Field(
+                                duration=UInt32Field(
                                     int(step.duration_sec * interrupts_per_sec)
                                 ),
-                                acceleration=Int16Field(0),
-                                velocity=Int16Field(
+                                acceleration=Int32Field(0),
+                                velocity=Int32Field(
                                     int(interrupts_per_sec * step.velocity_mm_sec)
                                 ),
                             )
