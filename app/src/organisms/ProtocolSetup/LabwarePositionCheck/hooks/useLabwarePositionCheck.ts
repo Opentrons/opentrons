@@ -13,7 +13,7 @@ import {
 import { useProtocolDetails } from '../../../RunDetails/hooks'
 import { getLabwareLocation } from '../../utils/getLabwareLocation'
 import { getModuleLocation } from '../../utils/getModuleLocation'
-import { useLPCCommands } from '.'
+import { useLPCCommands } from './useLPCCommands'
 import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type { SetupCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 import type {
