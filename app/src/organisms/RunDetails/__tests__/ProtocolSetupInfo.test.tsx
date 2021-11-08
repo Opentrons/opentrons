@@ -13,6 +13,7 @@ import { ProtocolSetupInfo } from '../ProtocolSetupInfo'
 import { useProtocolDetails } from '../hooks'
 import { ProtocolFile } from '@opentrons/shared-data'
 import type { Command, LabwareDefinition2 } from '@opentrons/shared-data'
+import { isNull } from 'lodash'
 
 jest.mock('../hooks')
 jest.mock('../../../redux/pipettes/types')
@@ -261,6 +262,5 @@ describe('ProtocolSetupInfo', () => {
     })
     const { getByText } = render(props)
     getByText('Protocol Setup')
-    expect(props.SetupCommand).toReturn
   })
 })

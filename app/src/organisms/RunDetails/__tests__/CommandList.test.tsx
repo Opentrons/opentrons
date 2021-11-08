@@ -44,10 +44,6 @@ describe('CommandList', () => {
     fireEvent.click(getByText('Protocol Setup'))
     getByText('End of protocol')
   })
-  it('renders first command', () => {
-    const { getByText } = render()
-    getByText('loadPipette')
-  })
   //  TODO: immediately once Shlok's PR is merged, use protocol fixture that has a delay command
   it.todo('renders comment when commandtype is delay')
 })

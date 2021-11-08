@@ -43,7 +43,7 @@ export const ProtocolSetupInfo = (
     getProtocolPipetteTipRackCalInfo(state, robotName)
   )
   if (protocolData == null) return null
-  if (SetupCommand == undefined) return null
+  if (SetupCommand === undefined) return null
 
   let SetupCommandText
   if (SetupCommand.commandType === 'loadPipette') {
