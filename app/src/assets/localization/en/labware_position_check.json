@@ -23,5 +23,6 @@
   "labware_step_detail_modal_nozzle_or_tip_image_3_text": "If you’re having trouble, slide 1 sheet of printer paper between the nozzle and the tip. A single piece of paper should barely pass between them.",
   "start_position_check": "begin labware position check, move to Slot {{initial_labware_slot}}",
   "jog_controls_adjustment": "Need to make an adjustment?",
-  "reveal_jog_controls": "Reveal jog controls"
+  "reveal_jog_controls": "Reveal jog controls",
+  "robot_in_motion": "Stand back, robot is in motion."
 }
