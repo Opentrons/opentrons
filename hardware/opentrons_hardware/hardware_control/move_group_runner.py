@@ -79,9 +79,14 @@ class MoveGroupRunner:
                         ),
                     )
 
-    async def _move(self, can_messenge: CanMessenger) -> None:
+    async def _move(self, can_messenger: CanMessenger) -> None:
         """Run all the move groups."""
-        pass
+        scheduler = MoveScheduler(self._move_groups)
+        try:
+            can_messenger.add_listener(scheduler)
+            await scheduler.run(can_messenger)
+        finally:
+            can_messenger.remove_listener(scheduler)
 
 
 class MoveScheduler(MessageListener):

@@ -1,6 +1,6 @@
 """Tests for the move scheduler."""
 import pytest
-from mock import AsyncMock, call
+from mock import AsyncMock, call, MagicMock
 
 from opentrons_hardware.drivers.can_bus import NodeId
 from opentrons_hardware.drivers.can_bus.can_messenger import MessageListener
@@ -271,6 +271,15 @@ async def test_multi_send_setup_commands(
             )
         ),
     )
+
+
+async def test_move() -> None:
+    """It should register to listen for messages."""
+    subject = MoveGroupRunner(move_groups=[])
+    mock_can_messenger = MagicMock()
+    await subject._move(mock_can_messenger)
+    mock_can_messenger.add_listener.assert_called_once()
+    mock_can_messenger.remove_listener.assert_called_once()
 
 
 class MockSendMoveCompleter:
