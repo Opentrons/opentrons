@@ -26,7 +26,7 @@ import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
 
 interface ProtocolSetupInfoProps {
   onCloseClick: () => unknown
-  SetupCommand: Command
+  SetupCommand?: Command
 }
 
 export const ProtocolSetupInfo = (
@@ -42,8 +42,8 @@ export const ProtocolSetupInfo = (
   const protocolPipetteData = useSelector((state: State) =>
     getProtocolPipetteTipRackCalInfo(state, robotName)
   )
-
   if (protocolData == null) return null
+  if (SetupCommand == undefined) return null
 
   let SetupCommandText
   if (SetupCommand.commandType === 'loadPipette') {
@@ -99,7 +99,7 @@ export const ProtocolSetupInfo = (
           command.commandType === 'loadModule' &&
           command.params.moduleId === moduleId
         //  @ts-expect-error narrow to load module command when command types get updated
-      )?.params.location.moduleId
+      )?.params.location.slotName
       slotNumber = moduleSlotNumber
       moduleName = getModuleDisplayName(moduleModel.model)
     }
@@ -112,7 +112,7 @@ export const ProtocolSetupInfo = (
       moduleSlots = 1
     }
 
-    SetupCommand.result?.definition.metadata.displayName.includes('trash')
+    SetupCommand.params.labwareId.includes('trash')
       ? (SetupCommandText = null)
       : (SetupCommandText =
           moduleName === null ? (

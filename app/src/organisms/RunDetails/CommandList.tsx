@@ -16,7 +16,7 @@ import {
 import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 import { useProtocolDetails } from './hooks'
 import { ProtocolSetupInfo } from './ProtocolSetupInfo'
-//import _Fixture_commands from './Fixture_commands.json'
+import _Fixture_commands from './Fixture_commands.json'
 import type { LabwareDefinition2, ProtocolFile } from '@opentrons/shared-data'
 import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
 
@@ -30,14 +30,13 @@ export function CommandList(): JSX.Element | null {
   const protocolData: ProtocolFile<{}> | null = useProtocolDetails()
     .protocolData
   if (protocolData == null) return null
-  //  const fixtureCommands = _Fixture_commands //TODO: immediately
 
   const COMMAND = {
     commandType: 'loadLabware',
     params: {
       labwareId: '96_wellplate',
       location: { slotName: '9' } || {
-          moduleId: 'Thermocycler',
+          moduleId: 'thermocycler',
         } || {
           coordinates: { x: 0, y: 0, z: 0 },
         },
@@ -53,10 +52,18 @@ export function CommandList(): JSX.Element | null {
     <React.Fragment>
       <Flex margin={SPACING_1}>
         {showProtocolSetupInfo ? (
-          <ProtocolSetupInfo
-            onCloseClick={() => setShowProtocolSetupInfo(false)}
-            SetupCommand={COMMAND}
-          />
+          protocolData.commands.map(command => {
+            ;<ProtocolSetupInfo
+              onCloseClick={() => setShowProtocolSetupInfo(false)}
+              SetupCommand={
+                command.commandType === 'loadLabware' ||
+                'loadPipette' ||
+                'loadModule'
+                  ? command
+                  : undefined
+              }
+            />
+          })
         ) : (
           <Btn
             width={'100%'}
@@ -85,16 +92,25 @@ export function CommandList(): JSX.Element | null {
         color={C_MED_DARK_GRAY}
       >
         <Flex>
-          {COMMAND.commandType === 'delay' ? (
-            <Flex flexDirection={DIRECTION_ROW}>
-              <Flex textTransform={TEXT_TRANSFORM_UPPERCASE}>
-                {t('comment')}
+          {protocolData.commands.map(command => {
+            command.commandType === 'delay' ? (
+              <Flex flexDirection={DIRECTION_ROW}>
+                <Flex
+                  textTransform={TEXT_TRANSFORM_UPPERCASE}
+                  padding={SPACING_1}
+                  key={command.id}
+                >
+                  {t('comment')}
+                </Flex>
+                <Flex flexDirection={DIRECTION_COLUMN}>
+                  <Flex>{command.commandType}</Flex>
+                  <Flex>{command.params.message}</Flex>
+                </Flex>
               </Flex>
-              <Flex>{COMMAND.commandType}</Flex>
-            </Flex>
-          ) : (
-            COMMAND.commandType
-          )}
+            ) : (
+              <Flex key={command.id}>{command.commandType}</Flex>
+            )
+          })}
         </Flex>
         <Flex padding={SPACING_1}>{t('end_of_protocol')}</Flex>
       </Flex>
