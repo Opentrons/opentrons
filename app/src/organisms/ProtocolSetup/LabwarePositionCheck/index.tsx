@@ -5,6 +5,7 @@ import { Portal } from '../../../App/portal'
 import { useSteps } from './hooks'
 import { IntroScreen } from './IntroScreen'
 import { GenericStepScreen } from './GenericStepScreen'
+import { SummaryScreen } from './SummaryScreen'
 import { RobotMotionLoadingModal } from './RobotMotionLoadingModal'
 
 import styles from '../styles.css'
@@ -12,6 +13,8 @@ import styles from '../styles.css'
 interface LabwarePositionCheckModalProps {
   onCloseClick: () => unknown
 }
+
+const isComplete = true // TODO: replace this with isComplete boolean from useLabwarePositionCheck
 
 export const LabwarePositionCheck = (
   props: LabwarePositionCheckModalProps
@@ -39,7 +42,9 @@ export const LabwarePositionCheck = (
         {isLoading ? (
           <RobotMotionLoadingModal title={'Moving to Slot 7'} />
         ) : null}
-        {currentLabwareCheckStep !== null ? (
+        {isComplete ? (
+          <SummaryScreen />
+        ) : currentLabwareCheckStep !== null ? (
           <GenericStepScreen
             setCurrentLabwareCheckStep={setCurrentLabwareCheckStep}
             selectedStep={steps[currentLabwareCheckStep]}

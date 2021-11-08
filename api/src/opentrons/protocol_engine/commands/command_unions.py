@@ -57,6 +57,13 @@ from .pause import (
     PauseCommandType,
 )
 
+from .save_position import (
+    SavePosition,
+    SavePositionRequest,
+    SavePositionResult,
+    SavePositionCommandType,
+)
+
 from .custom import (
     Custom,
     CustomResult,
@@ -74,6 +81,7 @@ Command = Union[
     MoveToWell,
     PickUpTip,
     Pause,
+    SavePosition,
     Custom,
 ]
 
@@ -88,6 +96,7 @@ CommandType = Union[
     MoveToWellCommandType,
     PickUpTipCommandType,
     PauseCommandType,
+    SavePositionCommandType,
     CustomCommandType,
 ]
 
@@ -102,6 +111,7 @@ CommandRequest = Union[
     MoveToWellRequest,
     PickUpTipRequest,
     PauseRequest,
+    SavePositionRequest,
 ]
 
 CommandResult = Union[
@@ -115,5 +125,6 @@ CommandResult = Union[
     MoveToWellResult,
     PickUpTipResult,
     PauseResult,
+    SavePositionResult,
     CustomResult,
 ]
