@@ -142,10 +142,37 @@ class ProtocolRun(_AbstractRun):
     createParams: ProtocolRunCreateParams
 
 
+class PatchLabwareOffsetsRequest(BaseModel):
+    """A request to change the run's labware offsets."""
+
+    labwareOffsets: List[LabwareOffset] = Field(
+        ...,
+        description=(
+            "Labware offsets to replace the existing list."
+            "\n\n"
+            "You may only `PATCH` this field"
+            ' while the run\'s `status` is `"ready-to-run"`.'
+        ),
+    )
+
+
 RunCreateData = Union[
     BasicRunCreateData,
     ProtocolRunCreateData,
 ]
+
+
+# todo(mm, 2021-11-08):
+# When runs have a `current: bool` field, and we allow patching it,
+# create a separate patch request model for just that field,
+# and add it to this union.
+#
+# We limit PATCHing to one field at a time to make our error handling a little more
+# foolproof: we don't have to handle the case where one field has valid new data but
+# the other has invalid new data. Clients currently have no pressing need to PATCH
+# multiple fields at once, anyway.
+RunPatchRequest = Union[PatchLabwareOffsetsRequest]
+
 
 Run = Union[
     BasicRun,

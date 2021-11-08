@@ -3,6 +3,7 @@
 Contains routes dealing primarily with `Run` models.
 """
 from fastapi import APIRouter, Depends, status
+from dataclasses import replace as dataclass_replace
 from datetime import datetime
 from typing import Optional
 from typing_extensions import Literal
@@ -25,7 +26,7 @@ from robot_server.protocols import (
 
 from ..run_store import RunStore, RunNotFoundError
 from ..run_view import RunView
-from ..run_models import Run, ProtocolRunCreateData
+from ..run_models import Run, ProtocolRunCreateData, PatchLabwareOffsetsRequest
 from ..schema_models import CreateRunRequest, RunResponse
 from ..engine_store import EngineStore, EngineConflictError, EngineMissingError
 from ..dependencies import get_run_store, get_engine_store
@@ -130,6 +131,56 @@ async def create_run(
         engine_status=engine_store.engine.state_view.commands.get_status(),
     )
 
+    return ResponseModel(data=data)
+
+
+@base_router.patch(
+    path="/runs/{runId}",
+    summary="Modify a run.",
+    description="Modify a run that was previously created via `POST /runs`.",
+    status_code=status.HTTP_200_OK,
+    # TODO(mc, 2021-06-23): mypy >= 0.780 broke Unions as `response_model`
+    # see https://github.com/tiangolo/fastapi/issues/2279
+    response_model=RunResponse,  # type: ignore[arg-type]
+)
+async def patch_run(
+    runId: str,
+    request_body: PatchLabwareOffsetsRequest,
+    run_view: RunView = Depends(RunView),
+    run_store: RunStore = Depends(get_run_store),
+    engine_store: EngineStore = Depends(get_engine_store),
+) -> ResponseModel[Run]:
+    """Modify a run.
+
+    Arguments:
+        runId: Which run to modify, supplied by the HTTP request.
+        request_body: Details about how to modify the run, supplied by the HTTP request.
+        run_view: Run model construction interface.
+        run_store: Run storage interface.
+        engine_store: ProtocolEngine storage and control.
+    """
+    try:
+        old_run = run_store.get(run_id=runId)
+    except RunNotFoundError as e:
+        raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
+
+    # Make a copy and then mutate it
+    # instead of providing an `update` dict to the `.copy()` method.
+    # This seems easier for mypy to typecheck statically.
+    new_run_create_data = old_run.create_data.copy(deep=True)
+    new_run_create_data.createParams.labwareOffsets = request_body.labwareOffsets
+
+    new_run = dataclass_replace(old_run, create_data=new_run_create_data)
+
+    result = run_store.upsert(run=new_run)  # Should only ever update, never insert.
+
+    data = run_view.as_response(
+        run=result,
+        commands=engine_store.engine.state_view.commands.get_all(),
+        pipettes=engine_store.engine.state_view.pipettes.get_all(),
+        labware=engine_store.engine.state_view.labware.get_all(),
+        engine_status=engine_store.engine.state_view.commands.get_status(),
+    )
     return ResponseModel(data=data)
 
 
