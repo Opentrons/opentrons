@@ -26,7 +26,7 @@ from opentrons_hardware.drivers.can_bus.messages import (
     message_definitions as md,
     MessageDefinition,
 )
-from opentrons_hardware.utils import UInt8Field, Int16Field, UInt16Field
+from opentrons_hardware.utils import UInt8Field, Int32Field, UInt32Field
 
 
 @pytest.fixture
@@ -129,14 +129,14 @@ async def test_single_send_setup_commands(
             payload=AddLinearMoveRequestPayload(
                 group_id=UInt8Field(0),
                 seq_id=UInt8Field(0),
-                velocity=Int16Field(
+                velocity=Int32Field(
                     int(
                         move_group_single[0][0][NodeId.head].velocity_mm_sec
                         * interrupts_per_sec
                     )
                 ),
-                acceleration=Int16Field(0),
-                duration=UInt16Field(
+                acceleration=Int32Field(0),
+                duration=UInt32Field(
                     int(
                         move_group_single[0][0][NodeId.head].duration_sec
                         * interrupts_per_sec
@@ -161,14 +161,14 @@ async def test_multi_send_setup_commands(
             payload=AddLinearMoveRequestPayload(
                 group_id=UInt8Field(0),
                 seq_id=UInt8Field(0),
-                velocity=Int16Field(
+                velocity=Int32Field(
                     int(
                         move_group_multiple[0][0][NodeId.head].velocity_mm_sec
                         * interrupts_per_sec
                     )
                 ),
-                acceleration=Int16Field(0),
-                duration=UInt16Field(
+                acceleration=Int32Field(0),
+                duration=UInt32Field(
                     int(
                         move_group_multiple[0][0][NodeId.head].duration_sec
                         * interrupts_per_sec
@@ -185,14 +185,14 @@ async def test_multi_send_setup_commands(
             payload=AddLinearMoveRequestPayload(
                 group_id=UInt8Field(1),
                 seq_id=UInt8Field(0),
-                velocity=Int16Field(
+                velocity=Int32Field(
                     int(
                         move_group_multiple[1][0][NodeId.gantry_x].velocity_mm_sec
                         * interrupts_per_sec
                     )
                 ),
-                acceleration=Int16Field(0),
-                duration=UInt16Field(
+                acceleration=Int32Field(0),
+                duration=UInt32Field(
                     int(
                         move_group_multiple[1][0][NodeId.gantry_x].duration_sec
                         * interrupts_per_sec
@@ -208,14 +208,14 @@ async def test_multi_send_setup_commands(
             payload=AddLinearMoveRequestPayload(
                 group_id=UInt8Field(1),
                 seq_id=UInt8Field(0),
-                velocity=Int16Field(
+                velocity=Int32Field(
                     int(
                         move_group_multiple[1][0][NodeId.gantry_y].velocity_mm_sec
                         * interrupts_per_sec
                     )
                 ),
-                acceleration=Int16Field(0),
-                duration=UInt16Field(
+                acceleration=Int32Field(0),
+                duration=UInt32Field(
                     int(
                         move_group_multiple[1][0][NodeId.gantry_y].duration_sec
                         * interrupts_per_sec
@@ -232,14 +232,14 @@ async def test_multi_send_setup_commands(
             payload=AddLinearMoveRequestPayload(
                 group_id=UInt8Field(2),
                 seq_id=UInt8Field(0),
-                velocity=Int16Field(
+                velocity=Int32Field(
                     int(
                         move_group_multiple[2][0][NodeId.pipette].velocity_mm_sec
                         * interrupts_per_sec
                     )
                 ),
-                acceleration=Int16Field(0),
-                duration=UInt16Field(
+                acceleration=Int32Field(0),
+                duration=UInt32Field(
                     int(
                         move_group_multiple[2][0][NodeId.pipette].duration_sec
                         * interrupts_per_sec
@@ -255,14 +255,14 @@ async def test_multi_send_setup_commands(
             payload=AddLinearMoveRequestPayload(
                 group_id=UInt8Field(2),
                 seq_id=UInt8Field(1),
-                velocity=Int16Field(
+                velocity=Int32Field(
                     int(
                         move_group_multiple[2][1][NodeId.pipette].velocity_mm_sec
                         * interrupts_per_sec
                     )
                 ),
-                acceleration=Int16Field(0),
-                duration=UInt16Field(
+                acceleration=Int32Field(0),
+                duration=UInt32Field(
                     int(
                         move_group_multiple[2][1][NodeId.pipette].duration_sec
                         * interrupts_per_sec
