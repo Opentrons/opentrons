@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useQueryClient, UseMutateFunction } from 'react-query'
-import { useHost } from '../../../../react-api-client/src/api/useHost'
 import {
+  useHost,
   useCreateProtocolMutation,
   useProtocolQuery,
   useCreateRunMutation,
