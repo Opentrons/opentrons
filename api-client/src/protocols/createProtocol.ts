@@ -9,7 +9,7 @@ export function createProtocol(
 ): ResponsePromise<Protocol> {
   const formData = new FormData()
   // NOTE(bc, 2021-11-03): We're only expecting one file for now, because currently the
-  // api can only handle one under the "files" key, replace this with mutli file capabilities
+  // api can only handle one under the "files" key, replace this with multi file capabilities
   // during custom labware support pass
   formData.append('files', files[0], files[0].name)
 
