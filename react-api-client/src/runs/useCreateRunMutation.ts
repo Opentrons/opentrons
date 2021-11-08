@@ -12,11 +12,11 @@ export type UseCreateRunMutationResult = UseMutationResult<Run, Error, void> & {
 }
 
 export function useCreateRunMutation(
-  createSessionData: CreateRunData
+  createRunData: CreateRunData
 ): UseCreateRunMutationResult {
   const host = useHost()
   const mutation = useMutation<Run, Error>(['run', host], () =>
-    createRun(host as HostConfig, createSessionData)
+    createRun(host as HostConfig, createRunData)
       .then(response => response.data)
       .catch((e: Error) => {
         throw e
