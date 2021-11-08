@@ -8,7 +8,7 @@ export const getLabwareLocation = (
   const labwareLocation = commands.find(
     (command: Command): command is LoadLabwareCommand =>
       command.commandType === 'loadLabware' &&
-      command.params.labwareId === labwareId
+      command.result?.labwareId === labwareId
   )?.params.location
 
   if (labwareLocation == null) {

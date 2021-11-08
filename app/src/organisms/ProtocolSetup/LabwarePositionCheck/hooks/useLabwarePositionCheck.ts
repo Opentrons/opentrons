@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { v4 as uuidv4 } from 'uuid'
 import {
   HostConfig,
@@ -41,21 +42,26 @@ export type LabwarePositionCheckUtils =
 
 const useLpcCtaText = (command: LabwarePositionCheckCommand): string => {
   const { protocolData } = useProtocolDetails()
+  const { t } = useTranslation('labware_position_check')
   const commands = protocolData?.commands ?? []
   switch (command.commandType) {
     case 'dropTip':
     case 'moveToWell': {
       const labwareId = command.params.labwareId
       const slot = getLabwareLocation(labwareId, commands)
-      return `Confirm position, move to slot ${slot}`
+      return t('confirm_position_and_move', {
+        next_slot: slot,
+      })
     }
     case 'thermocycler/openLid': {
       const moduleId = command.params.moduleId
       const slot = getModuleLocation(moduleId, commands)
-      return `Confirm position, move to slot ${slot}`
+      return t('confirm_position_and_move', {
+        next_slot: slot,
+      })
     }
     case 'pickUpTip': {
-      return `Confirm position, pick up tip`
+      return t('confirm_position_and_pick_up_tip')
     }
   }
 }

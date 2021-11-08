@@ -33,7 +33,11 @@ import { StepDetailText } from './StepDetailText'
 import levelWithTip from '../../../assets/images/lpc_level_with_tip.svg'
 import levelWithLabware from '../../../assets/images/lpc_level_with_labware.svg'
 import { Axis, Sign, StepSize } from '../../../molecules/JogControls/types'
-import type { LabwarePositionCheckStep } from './types'
+import type {
+  LabwarePositionCheckCommand,
+  LabwarePositionCheckMovementCommand,
+  LabwarePositionCheckStep,
+} from './types'
 
 const DECK_MAP_VIEWBOX = '-30 -20 170 115'
 interface LabwarePositionCheckStepDetailProps {
@@ -50,14 +54,15 @@ export const LabwarePositionCheckStepDetail = (
   if (protocolData == null) return null
   const labwareDefId = protocolData.labware[labwareId].definitionId
   const labwareDef = protocolData.labwareDefinitions[labwareDefId]
-  const command = selectedStep.commands[0]
-  // there case should never happen, there will always be a pipette id in the LPC commands list
-  if (!('pipetteId' in command.params)) {
-    console.error(
-      `expected there to be a pipette in LPC command ${command.commandType}, but there was none`
-    )
-    return null
-  }
+  // filter out the TC open lid command as it does not have an associated pipette id
+  const stepMovementCommands = selectedStep.commands.filter(
+    (
+      command: LabwarePositionCheckCommand
+    ): command is LabwarePositionCheckMovementCommand =>
+      command.commandType !== 'thermocycler/openLid'
+  )
+  const command = stepMovementCommands[0]
+
   const pipetteId = command.params.pipetteId
   const pipetteName = protocolData.pipettes[pipetteId].name
   let wellsToHighlight: string[] = []

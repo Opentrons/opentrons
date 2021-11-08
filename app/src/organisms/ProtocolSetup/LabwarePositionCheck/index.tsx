@@ -63,7 +63,7 @@ export const LabwarePositionCheck = (
           alertOverlay
         >
           <Box>
-            <Text>There was an error processing your request on the robot</Text>
+            <Text>{t('error_modal_text')}</Text>
             <Text marginTop={SPACING_2}>Error: {error.message}</Text>
           </Box>
         </AlertModal>

@@ -32,7 +32,6 @@ import { getModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypes
 
 jest.mock('../../../../../redux/modules')
 jest.mock('../../../../../redux/pipettes/selectors')
-jest.mock('../../../../../redux/discovery')
 jest.mock('../LabwareOffsetModal')
 jest.mock('../../../LabwarePositionCheck')
 jest.mock('../LabwareInfoOverlay')

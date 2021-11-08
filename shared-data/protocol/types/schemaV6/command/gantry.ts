@@ -1,4 +1,4 @@
-import { CommonCommandInfo } from '.'
+import type { CommonCommandInfo } from '.'
 export interface MoveToSlotCommand extends CommonCommandInfo {
   commandType: 'moveToSlot'
   params: MoveToSlotParams
