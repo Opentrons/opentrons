@@ -2,13 +2,24 @@ import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { CommandItemFailed } from '../CommandItemStyling'
+import { CommandText } from '../CommandText'
+import { CommandTimer } from '../CommandTimer'
 import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6/command'
+
+jest.mock('../CommandText')
+jest.mock('../CommandTimer')
+
+const mockCommandText = CommandText as jest.MockedFunction<typeof CommandText>
+const mockCommandTimer = CommandTimer as jest.MockedFunction<
+  typeof CommandTimer
+>
 
 const render = (props: React.ComponentProps<typeof CommandItemFailed>) => {
   return renderWithProviders(<CommandItemFailed {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
+
 const WELL_LOCATION = { origin: 'top', offset: { x: 0, y: 0, z: 0 } }
 const PIPETTE_ID = 'PIPETTE_ID'
 const LABWARE_ID = 'LABWARE_ID'
@@ -31,6 +42,8 @@ describe('CommandItemFailed', () => {
         result: { volume: 10 },
       } as Command,
     }
+    mockCommandText.mockReturnValue(<div>Mock Command Text</div>)
+    mockCommandTimer.mockReturnValue(<div>Mock Command Timer</div>)
   })
   it('renders the correct failed status', () => {
     const { getByText } = render(props)
@@ -38,8 +51,7 @@ describe('CommandItemFailed', () => {
       'backgroundColor: C_ERROR_LIGHT'
     )
     getByText('Step failed')
-    getByText('touchTip')
-    getByText('Start')
-    getByText('End')
+    getByText('Mock Command Text')
+    getByText('Mock Command Timer')
   })
 })

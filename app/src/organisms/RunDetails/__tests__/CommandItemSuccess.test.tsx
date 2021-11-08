@@ -2,7 +2,17 @@ import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { CommandItemSuccess } from '../CommandItemStyling'
+import { CommandText } from '../CommandText'
+import { CommandTimer } from '../CommandTimer'
 import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6/command'
+
+jest.mock('../CommandText')
+jest.mock('../CommandTimer')
+
+const mockCommandText = CommandText as jest.MockedFunction<typeof CommandText>
+const mockCommandTimer = CommandTimer as jest.MockedFunction<
+  typeof CommandTimer
+>
 
 const render = (props: React.ComponentProps<typeof CommandItemSuccess>) => {
   return renderWithProviders(<CommandItemSuccess {...props} />, {
@@ -31,11 +41,14 @@ describe('CommandItemSuccess', () => {
         result: { volume: 10 },
       } as Command,
     }
+    mockCommandText.mockReturnValue(<div>Mock Command Text</div>)
+    mockCommandTimer.mockReturnValue(<div>Mock Command Timer</div>)
   })
   it('renders the correct success status', () => {
     const { getByText } = render(props)
-    expect(getByText('Start')).toHaveStyle('backgroundColor: C_AQUAMARINE')
-    getByText('touchTip')
-    getByText('End')
+    expect(getByText('Mock Command Text')).toHaveStyle(
+      'backgroundColor: C_AQUAMARINE'
+    )
+    getByText('Mock Command Timer')
   })
 })
