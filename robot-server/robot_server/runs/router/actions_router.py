@@ -1,6 +1,7 @@
 """Router for /runs actions endpoints."""
 from fastapi import APIRouter, Depends, status
 from datetime import datetime
+from typing import Union
 from typing_extensions import Literal
 
 from robot_server.errors import ErrorDetails, ErrorResponse
@@ -12,7 +13,7 @@ from ..run_view import RunView
 from ..action_models import RunAction, RunActionType, RunActionCreateData
 from ..engine_store import EngineStore, EngineMissingError
 from ..dependencies import get_run_store, get_engine_store
-from .base_router import RunNotFound
+from .base_router import RunNotFound, RunStopped
 
 actions_router = APIRouter()
 
@@ -31,7 +32,9 @@ class RunActionNotAllowed(ErrorDetails):
     status_code=status.HTTP_201_CREATED,
     response_model=ResponseModel[RunAction],
     responses={
-        status.HTTP_400_BAD_REQUEST: {"model": ErrorResponse[RunActionNotAllowed]},
+        status.HTTP_400_BAD_REQUEST: {
+            "model": ErrorResponse[Union[RunActionNotAllowed, RunStopped]],
+        },
         status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[RunNotFound]},
     },
 )
@@ -57,6 +60,11 @@ async def create_run_action(
     """
     try:
         prev_run = run_store.get(run_id=runId)
+
+        if not prev_run.is_current:
+            raise RunStopped(detail=f"Run {runId} is not the current run").as_error(
+                status.HTTP_400_BAD_REQUEST
+            )
 
         action, next_run = run_view.with_action(
             run=prev_run,

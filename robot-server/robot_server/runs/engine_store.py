@@ -1,15 +1,9 @@
 """In-memory storage of ProtocolEngine instances."""
-from typing import Optional, NamedTuple
+from typing import Dict, NamedTuple, Optional
 
 from opentrons.hardware_control import API as HardwareAPI
-from opentrons.protocol_engine import ProtocolEngine, create_protocol_engine
+from opentrons.protocol_engine import ProtocolEngine, StateView, create_protocol_engine
 from opentrons.protocol_runner import ProtocolRunner
-
-
-class EngineConflictError(RuntimeError):
-    """An error raised if the runner already has an engine initialized."""
-
-    pass
 
 
 class EngineMissingError(RuntimeError):
@@ -18,7 +12,13 @@ class EngineMissingError(RuntimeError):
     If this error is raised, it's almost certainly due to a software bug.
     """
 
-    pass
+
+class EngineConflictError(RuntimeError):
+    """An error raised if an active engine is already initialized.
+
+    The store will not create a new engine unless the "current" runner/engine
+    pair is idle.
+    """
 
 
 class RunnerEnginePair(NamedTuple):
@@ -41,10 +41,11 @@ class EngineStore:
         """
         self._hardware_api = hardware_api
         self._runner_engine_pair: Optional[RunnerEnginePair] = None
+        self._engines_by_run_id: Dict[str, ProtocolEngine] = {}
 
     @property
     def engine(self) -> ProtocolEngine:
-        """Get the persisted ProtocolEngine.
+        """Get the "current" persisted ProtocolEngine.
 
         Raises:
             EngineMissingError: Engine has not yet been created and persisted.
@@ -56,7 +57,7 @@ class EngineStore:
 
     @property
     def runner(self) -> ProtocolRunner:
-        """Get the persisted ProtocolRunner.
+        """Get the "current" persisted ProtocolRunner.
 
         Raises:
             EngineMissingError: Runner has not yet been created and persisted.
@@ -66,28 +67,44 @@ class EngineStore:
 
         return self._runner_engine_pair.runner
 
-    async def create(self) -> RunnerEnginePair:
-        """Create and store a ProtocolRunner and ProtocolEngine.
+    async def create(self, run_id: str) -> StateView:
+        """Create and store a ProtocolRunner and ProtocolEngine for a given Run.
+
+        Args:
+            run_id: The run resource the engine is assigned to.
 
         Returns:
             The created and stored ProtocolRunner / ProtocolEngine pair.
 
         Raises:
-            EngineConflictError: a ProtocolEngine is already present.
+            EngineConflictError: The current runner/engine pair is not idle, so
+            a new set may not be created.
         """
-        # NOTE: this async. creation happens before the `self._engine`
-        # check intentionally to avoid a race condition where `self._engine` is
-        # set after the check but before the engine has finished getting created,
-        # at the expense of having to potentially throw away an engine instance
         engine = await create_protocol_engine(hardware_api=self._hardware_api)
         runner = ProtocolRunner(protocol_engine=engine, hardware_api=self._hardware_api)
 
         if self._runner_engine_pair is not None:
-            raise EngineConflictError("Cannot load multiple runs simultaneously.")
+            if not self.engine.state_view.commands.get_is_stopped():
+                raise EngineConflictError("Current engine is not stopped.")
 
         self._runner_engine_pair = RunnerEnginePair(runner=runner, engine=engine)
+        self._engines_by_run_id[run_id] = engine
 
-        return self._runner_engine_pair
+        return engine.state_view
+
+    def get_state(self, run_id: str) -> StateView:
+        """Get a run's ProtocolEngine state.
+
+        Args:
+            run_id: The run resource to retrieve engine state from.
+
+        Raises:
+            EngineMissingError: No engine found for the given run ID.
+        """
+        try:
+            return self._engines_by_run_id[run_id].state_view
+        except KeyError:
+            raise EngineMissingError(f"No engine state found for run {run_id}")
 
     def clear(self) -> None:
         """Remove the persisted ProtocolEngine, if present, no-op otherwise."""

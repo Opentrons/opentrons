@@ -39,6 +39,10 @@ class _AbstractRun(ResourceModel):
     runType: RunType = Field(..., description="Specific run type.")
     createdAt: datetime = Field(..., description="When the run was created")
     status: RunStatus = Field(..., description="Execution status of the run")
+    current: bool = Field(
+        ...,
+        description="Whether this Run is currently controlling the robot",
+    )
     actions: List[RunAction] = Field(
         ...,
         description="Client-initiated run control actions.",
