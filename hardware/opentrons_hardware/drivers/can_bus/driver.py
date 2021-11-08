@@ -131,7 +131,6 @@ class CanDriver:
         Raises:
             ErrorFrameCanError
         """
-        ...
         m: Message = await self._reader.get_message()
         if m.is_error_frame:
             raise ErrorFrameCanError(message=repr(m))
@@ -153,6 +152,5 @@ class CanDriver:
 
         Returns:
             CanMessage
-
         """
         return await self.read()
