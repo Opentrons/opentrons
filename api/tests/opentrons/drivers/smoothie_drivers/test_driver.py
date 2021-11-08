@@ -180,7 +180,7 @@ async def test_clear_limit_switch(
     """
     cmd_list = []
 
-    def write_mock(command, retries, timeout):
+    async def write_mock(command, retries, timeout):
         cmd_list.append(command.build())
         if constants.GCODE.MOVE in command:
             raise AlarmResponse(port="", response="ALARM: Hard limit +C")

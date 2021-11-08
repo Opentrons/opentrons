@@ -1,44 +1,55 @@
+import { CommonCommandInfo } from '.'
 export type PipettingCommand =
-  | {
-      commandType: 'aspirate'
-      params: AspDispAirgapParams
-      result?: BasicLiquidHandlingResult
-    }
-  | {
-      commandType: 'dispense'
-      params: AspDispAirgapParams
-      result?: BasicLiquidHandlingResult
-    }
-  | {
-      commandType: 'aspirateAirGap'
-      params: AspDispAirgapParams
-      result?: BasicLiquidHandlingResult
-    }
-  | {
-      commandType: 'dispenseAirGap'
-      params: AspDispAirgapParams
-      result?: BasicLiquidHandlingResult
-    }
-  | {
-      commandType: 'blowout'
-      params: BlowoutParams
-      result?: BasicLiquidHandlingResult
-    }
-  | {
-      commandType: 'touchTip'
-      params: TouchTipParams
-      result?: BasicLiquidHandlingResult
-    }
-  | {
-      commandType: 'pickUpTip'
-      params: PipetteAccessParams
-      result?: {}
-    }
-  | {
-      commandType: 'dropTip'
-      params: PipetteAccessParams
-      result?: {}
-    }
+  | AspirateCommand
+  | DispenseCommand
+  | AspirateAirGapCommand
+  | DispenseAirGapCommand
+  | BlowoutCommand
+  | TouchTipCommand
+  | PickUpTipCommand
+  | DropTipCommand
+
+export interface AspirateCommand extends CommonCommandInfo {
+  commandType: 'aspirate'
+  params: AspDispAirgapParams
+  result?: BasicLiquidHandlingResult
+}
+export interface DispenseCommand extends CommonCommandInfo {
+  commandType: 'dispense'
+  params: AspDispAirgapParams
+  result?: BasicLiquidHandlingResult
+}
+export interface AspirateAirGapCommand extends CommonCommandInfo {
+  commandType: 'aspirateAirGap'
+  params: AspDispAirgapParams
+  result?: BasicLiquidHandlingResult
+}
+export interface DispenseAirGapCommand extends CommonCommandInfo {
+  commandType: 'dispenseAirGap'
+  params: AspDispAirgapParams
+  result?: BasicLiquidHandlingResult
+}
+export interface BlowoutCommand extends CommonCommandInfo {
+  commandType: 'blowout'
+  params: BlowoutParams
+  result?: BasicLiquidHandlingResult
+}
+export interface TouchTipCommand extends CommonCommandInfo {
+  commandType: 'touchTip'
+  params: TouchTipParams
+  result?: BasicLiquidHandlingResult
+}
+export interface PickUpTipCommand extends CommonCommandInfo {
+  id: string
+  commandType: 'pickUpTip'
+  params: PipetteAccessParams
+  result?: {}
+}
+export interface DropTipCommand extends CommonCommandInfo {
+  commandType: 'dropTip'
+  params: PipetteAccessParams
+  result?: {}
+}
 
 type AspDispAirgapParams = FlowRateParams &
   PipetteAccessParams &

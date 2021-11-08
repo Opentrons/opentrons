@@ -1,26 +1,43 @@
 import { getPrimaryPipetteId } from '../utils/getPrimaryPipetteId'
-import type { FilePipette } from '@opentrons/shared-data/protocol/types/schemaV4'
+import { ProtocolFile } from '@opentrons/shared-data'
+import { LoadPipetteCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 
 describe('getPrimaryPipetteId', () => {
   it('should return the one and only pipette if there is only one pipette in the protocol', () => {
-    const mockPipette: Record<string, FilePipette> = {
+    const mockPipette: ProtocolFile<{}>['pipettes'] = {
       p10SingleId: {
-        mount: 'left',
         name: 'p10_single',
       },
     }
-    expect(getPrimaryPipetteId({ ...mockPipette })).toBe('p10SingleId')
+    expect(getPrimaryPipetteId({ ...mockPipette }, [])).toBe('p10SingleId')
   })
   it('should throw an error if there are two pipettes with the same mount', () => {
-    const p10Single: Record<string, FilePipette> = {
+    const loadPipetteCommands: LoadPipetteCommand[] = [
+      {
+        id: '1',
+        commandType: 'loadPipette',
+        params: {
+          pipetteId: 'p10SingleId',
+          mount: 'left',
+        },
+      },
+      {
+        id: '1',
+        commandType: 'loadPipette',
+        params: {
+          pipetteId: 'p10MultiId',
+          mount: 'left',
+        },
+      },
+    ]
+
+    const p10Single: ProtocolFile<{}>['pipettes'] = {
       p10SingleId: {
-        mount: 'left',
         name: 'p10_single',
       },
     }
-    const p10Multi: Record<string, FilePipette> = {
+    const p10Multi: ProtocolFile<{}>['pipettes'] = {
       p10MultiId: {
-        mount: 'left',
         name: 'p10_multi',
       },
     }
@@ -29,18 +46,36 @@ describe('getPrimaryPipetteId', () => {
       ...p10Single,
       ...p10Multi,
     }
-    expect(() => getPrimaryPipetteId(pipettes)).toThrow()
+    expect(() => getPrimaryPipetteId(pipettes, loadPipetteCommands)).toThrow(
+      'expected to find both left pipette and right pipette but could not'
+    )
   })
   it('should return the pipette with fewer channels', () => {
-    const p10Single: Record<string, FilePipette> = {
+    const loadPipetteCommands: LoadPipetteCommand[] = [
+      {
+        id: '1',
+        commandType: 'loadPipette',
+        params: {
+          pipetteId: 'p10SingleId',
+          mount: 'left',
+        },
+      },
+      {
+        id: '1',
+        commandType: 'loadPipette',
+        params: {
+          pipetteId: 'p10MultiId',
+          mount: 'right',
+        },
+      },
+    ]
+    const p10Single: ProtocolFile<{}>['pipettes'] = {
       p10SingleId: {
-        mount: 'left',
         name: 'p10_single',
       },
     }
-    const p10Multi: Record<string, FilePipette> = {
+    const p10Multi: ProtocolFile<{}>['pipettes'] = {
       p10MultiId: {
-        mount: 'right',
         name: 'p10_multi',
       },
     }
@@ -49,18 +84,37 @@ describe('getPrimaryPipetteId', () => {
       ...p10Single,
       ...p10Multi,
     }
-    expect(getPrimaryPipetteId(pipettes)).toBe('p10SingleId')
+    expect(getPrimaryPipetteId(pipettes, loadPipetteCommands)).toBe(
+      'p10SingleId'
+    )
   })
   it('should return the smaller pipette', () => {
-    const p10Single: Record<string, FilePipette> = {
+    const loadPipetteCommands: LoadPipetteCommand[] = [
+      {
+        id: '1',
+        commandType: 'loadPipette',
+        params: {
+          pipetteId: 'p10SingleId',
+          mount: 'left',
+        },
+      },
+      {
+        id: '1',
+        commandType: 'loadPipette',
+        params: {
+          pipetteId: 'p50MultiId',
+          mount: 'right',
+        },
+      },
+    ]
+
+    const p10Single: ProtocolFile<{}>['pipettes'] = {
       p10SingleId: {
-        mount: 'right',
         name: 'p10_single',
       },
     }
-    const p50Multi: Record<string, FilePipette> = {
+    const p50Multi: ProtocolFile<{}>['pipettes'] = {
       p50MultiId: {
-        mount: 'left',
         name: 'p50_single',
       },
     }
@@ -69,18 +123,37 @@ describe('getPrimaryPipetteId', () => {
       ...p10Single,
       ...p50Multi,
     }
-    expect(getPrimaryPipetteId(pipettes)).toBe('p10SingleId')
+    expect(getPrimaryPipetteId(pipettes, loadPipetteCommands)).toBe(
+      'p10SingleId'
+    )
   })
   it('should return the newer model', () => {
-    const p300Single: Record<string, FilePipette> = {
+    const loadPipetteCommands: LoadPipetteCommand[] = [
+      {
+        id: '1',
+        commandType: 'loadPipette',
+        params: {
+          pipetteId: 'p300SingleId',
+          mount: 'left',
+        },
+      },
+      {
+        id: '1',
+        commandType: 'loadPipette',
+        params: {
+          pipetteId: 'p300SingleGen2Id',
+          mount: 'right',
+        },
+      },
+    ]
+
+    const p300Single: ProtocolFile<{}>['pipettes'] = {
       p300SingleId: {
-        mount: 'right',
         name: 'p300_single',
       },
     }
-    const p300SingleGen2: Record<string, FilePipette> = {
+    const p300SingleGen2: ProtocolFile<{}>['pipettes'] = {
       p300SingleGen2Id: {
-        mount: 'left',
         name: 'p300_single_gen2',
       },
     }
@@ -89,19 +162,38 @@ describe('getPrimaryPipetteId', () => {
       ...p300Single,
       ...p300SingleGen2,
     }
-    expect(getPrimaryPipetteId(pipettes)).toBe('p300SingleGen2Id')
+    expect(getPrimaryPipetteId(pipettes, loadPipetteCommands)).toBe(
+      'p300SingleGen2Id'
+    )
   })
 
   it('should return the left pipette when all else is the same', () => {
-    const p300SingleLeft: Record<string, FilePipette> = {
+    const loadPipetteCommands: LoadPipetteCommand[] = [
+      {
+        id: '1',
+        commandType: 'loadPipette',
+        params: {
+          pipetteId: 'p300SingleLeftId',
+          mount: 'left',
+        },
+      },
+      {
+        id: '1',
+        commandType: 'loadPipette',
+        params: {
+          pipetteId: 'p300SingleRightId',
+          mount: 'right',
+        },
+      },
+    ]
+
+    const p300SingleLeft: ProtocolFile<{}>['pipettes'] = {
       p300SingleLeftId: {
-        mount: 'left',
         name: 'p300_single',
       },
     }
-    const p300SingleRight: Record<string, FilePipette> = {
+    const p300SingleRight: ProtocolFile<{}>['pipettes'] = {
       p300SingleRightId: {
-        mount: 'right',
         name: 'p300_single',
       },
     }
@@ -110,6 +202,8 @@ describe('getPrimaryPipetteId', () => {
       ...p300SingleLeft,
       ...p300SingleRight,
     }
-    expect(getPrimaryPipetteId(pipettes)).toBe('p300SingleLeftId')
+    expect(getPrimaryPipetteId(pipettes, loadPipetteCommands)).toBe(
+      'p300SingleLeftId'
+    )
   })
 })
