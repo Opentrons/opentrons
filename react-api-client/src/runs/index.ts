@@ -7,6 +7,7 @@ export { usePlayRunMutation } from './usePlayRunMutation'
 export { usePauseRunMutation } from './usePauseRunMutation'
 export { useStopRunMutation } from './useStopRunMutation'
 export { useRunActionMutations } from './useRunActionMutations'
+export { useAllCommandsQuery } from './useAllCommandsQuery'
 
 export type { UsePlayRunMutationResult } from './usePlayRunMutation'
 export type { UsePauseRunMutationResult } from './usePauseRunMutation'
