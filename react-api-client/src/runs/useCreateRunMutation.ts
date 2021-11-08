@@ -7,11 +7,7 @@ import {
 import { UseMutationResult, useMutation, UseMutateFunction } from 'react-query'
 import { useHost } from '../api'
 
-export type UseCreateRunMutationResult = UseMutationResult<
-  Run,
-  Error,
-  void
-> & {
+export type UseCreateRunMutationResult = UseMutationResult<Run, Error, void> & {
   createRun: UseMutateFunction<Run>
 }
 
