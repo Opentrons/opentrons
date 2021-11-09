@@ -15,7 +15,7 @@ const PIPETTE_ID = 'PIPETTE_ID'
 const LABWARE_ID = 'LABWARE_ID'
 const WELLNAME = 'WELLNAME'
 const COMMAND_TYPE = 'touchTip'
-const COMMAND_TEXT = 'COMMAND_TEXT'
+const COMMAND_TEXT = ('COMMAND_TEXT' as unknown) as JSX.Element
 
 describe('CommandText', () => {
   let props: React.ComponentProps<typeof CommandText>
