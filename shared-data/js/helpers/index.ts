@@ -7,6 +7,7 @@ import type { LabwareDefinition2 } from '../types'
 export { getWellNamePerMultiTip } from './getWellNamePerMultiTip'
 export { getWellTotalVolume } from './getWellTotalVolume'
 export { wellIsRect } from './wellIsRect'
+export { schemaV6Adapter } from './schemaV6Adapter'
 
 export * from './parseProtocolData'
 export * from './volume'
