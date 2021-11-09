@@ -4,7 +4,7 @@ import {
 } from '@opentrons/react-api-client'
 import { useCurrentRunId } from './useCurrentRunId'
 
-export function useCloseProtocolRun(): () => void {
+export function useCloseCurrentRun(): () => void {
   const currentRunId = useCurrentRunId()
   const { dismissCurrentRun } = useDismissCurrentRunMutation()
 

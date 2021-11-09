@@ -13,7 +13,7 @@ import type { HostConfig } from '@opentrons/api-client'
 jest.mock('@opentrons/api-client')
 jest.mock('../../api/useHost')
 
-const mockDismissCurrentRun= dismissCurrentRun as jest.MockedFunction<
+const mockDismissCurrentRun = dismissCurrentRun as jest.MockedFunction<
   typeof dismissCurrentRun
 >
 const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
@@ -38,7 +38,7 @@ describe('useDismissCurrentRunMutation hook', () => {
     when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
     when(mockDismissCurrentRun)
       .calledWith(HOST_CONFIG, RUN_ID_1)
-      .mockResolvedValue({data: 'something'} as any)
+      .mockResolvedValue({ data: 'something' } as any)
 
     const { result, waitFor } = renderHook(
       () => useDismissCurrentRunMutation(),

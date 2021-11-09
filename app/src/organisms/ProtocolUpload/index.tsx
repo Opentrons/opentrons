@@ -7,13 +7,12 @@ import {
   useConditionalConfirm,
 } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { Page } from '../../atoms/Page'
 import { UploadInput } from './UploadInput'
 import { ProtocolSetup } from '../ProtocolSetup'
 import { useCurrentProtocolRun } from './useCurrentProtocolRun'
-import { useCloseProtocolRun } from './useCloseProtocolRun'
-import { getProtocolName, getProtocolFile } from '../../redux/protocol'
+import { useCloseCurrentRun } from './useCloseCurrentRun'
 import { loadProtocol, closeProtocol } from '../../redux/protocol/actions'
 import { ingestProtocolFile } from '../../redux/protocol/utils'
 
@@ -37,7 +36,7 @@ export function ProtocolUpload(): JSX.Element {
     protocolRecord,
   } = useCurrentProtocolRun()
   const hasCurrentRun = runRecord != null && protocolRecord != null
-  const closeProtocolRun = useCloseProtocolRun()
+  const closeProtocolRun = useCloseCurrentRun()
 
   const logger = useLogger(__filename)
   const [uploadError, setUploadError] = React.useState<
@@ -75,20 +74,21 @@ export function ProtocolUpload(): JSX.Element {
     cancel: cancelExit,
   } = useConditionalConfirm(handleCloseProtocol, true)
 
-  const titleBarProps =
-    hasCurrentRun
-      ? {
-          title: t('protocol_title', { protocol_name: protocolRecord?.data?.metadata?.protocolName ?? ''}),
-          back: {
-            onClick: confirmExit,
-            title: t('shared:close'),
-            children: t('shared:close'),
-            iconName: 'close' as const,
-          },
-        }
-      : {
-          title: t('upload_and_simulate'),
-        }
+  const titleBarProps = hasCurrentRun
+    ? {
+        title: t('protocol_title', {
+          protocol_name: protocolRecord?.data?.metadata?.protocolName ?? '',
+        }),
+        back: {
+          onClick: confirmExit,
+          title: t('shared:close'),
+          children: t('shared:close'),
+          iconName: 'close' as const,
+        },
+      }
+    : {
+        title: t('upload_and_simulate'),
+      }
 
   return (
     <>
