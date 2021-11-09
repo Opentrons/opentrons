@@ -5,14 +5,11 @@ import { act, renderHook } from '@testing-library/react-hooks'
 import {
   createRun,
   CreateRunData,
-  RUN_TYPE_BASIC,
-  RUN_TYPE_PROTOCOL,
 } from '@opentrons/api-client'
 import { useHost } from '../../api'
 import {
   PROTOCOL_ID,
-  mockBasicRunResponse,
-  mockProtocolRunResponse,
+  mockRunResponse,
 } from '../__fixtures__'
 import { useCreateRunMutation } from '..'
 
@@ -35,7 +32,7 @@ describe('useCreateRunMutation hook', () => {
     const clientProvider: React.FunctionComponent<{}> = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
-    createRunData = { runType: RUN_TYPE_BASIC }
+    createRunData = {}
 
     wrapper = clientProvider
   })
@@ -54,7 +51,7 @@ describe('useCreateRunMutation hook', () => {
     })
 
     expect(result.current.data).toBeUndefined()
-    result.current.createRun({ runType: RUN_TYPE_BASIC })
+    result.current.createRun({})
     await waitFor(() => {
       console.log(result.current.status)
       return result.current.status !== 'loading'
@@ -62,11 +59,11 @@ describe('useCreateRunMutation hook', () => {
     expect(result.current.data).toBeUndefined()
   })
 
-  it('should create a basic run when calling the createRun callback with basic run args', async () => {
+  it('should create a run when calling the createRun callback with basic run args', async () => {
     when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
     when(mockCreateRun)
       .calledWith(HOST_CONFIG, createRunData)
-      .mockResolvedValue({ data: mockBasicRunResponse } as Response<Run>)
+      .mockResolvedValue({ data: mockRunResponse } as Response<Run>)
 
     const { result, waitFor } = renderHook(() => useCreateRunMutation(), {
       wrapper,
@@ -75,18 +72,15 @@ describe('useCreateRunMutation hook', () => {
 
     await waitFor(() => result.current.data != null)
 
-    expect(result.current.data).toEqual(mockBasicRunResponse)
+    expect(result.current.data).toEqual(mockRunResponse)
   })
 
   it('should create a protocol run when calling the createRun callback with protocol run args', async () => {
-    createRunData = {
-      runType: RUN_TYPE_PROTOCOL,
-      createParams: { protocolId: PROTOCOL_ID },
-    }
+    createRunData = { protocolId: PROTOCOL_ID }
     when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
     when(mockCreateRun)
       .calledWith(HOST_CONFIG, createRunData)
-      .mockResolvedValue({ data: mockProtocolRunResponse } as Response<Run>)
+      .mockResolvedValue({ data: mockRunResponse } as Response<Run>)
 
     const { result, waitFor } = renderHook(() => useCreateRunMutation(), {
       wrapper,
@@ -95,6 +89,6 @@ describe('useCreateRunMutation hook', () => {
 
     await waitFor(() => result.current.data != null)
 
-    expect(result.current.data).toEqual(mockProtocolRunResponse)
+    expect(result.current.data).toEqual(mockRunResponse)
   })
 })

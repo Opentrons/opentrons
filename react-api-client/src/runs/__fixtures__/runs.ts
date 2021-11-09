@@ -1,21 +1,17 @@
 import {
   RUN_ACTION_TYPE_PLAY,
   RUN_ACTION_TYPE_PAUSE,
-  RUN_TYPE_BASIC,
-  RUN_TYPE_PROTOCOL,
-  BasicRun,
-  ProtocolRun,
   Run,
   Runs,
+  RunData,
 } from '@opentrons/api-client'
 
 export const PROTOCOL_ID = '1'
 export const RUN_ID_1 = '1'
 export const RUN_ID_2 = '2'
 
-export const mockPausedRun: ProtocolRun = {
+export const mockPausedRun: RunData = {
   id: RUN_ID_1,
-  runType: RUN_TYPE_PROTOCOL,
   createdAt: '2021-10-07T18:44:49.366581+00:00',
   status: 'paused',
   createParams: { protocolId: PROTOCOL_ID },
@@ -36,9 +32,8 @@ export const mockPausedRun: ProtocolRun = {
   labware: [],
 }
 
-export const mockRunningRun: ProtocolRun = {
+export const mockRunningRun: RunData = {
   id: RUN_ID_2,
-  runType: RUN_TYPE_PROTOCOL,
   createdAt: '2021-10-07T18:44:49.366581+00:00',
   status: 'running',
   createParams: { protocolId: PROTOCOL_ID },
@@ -64,23 +59,8 @@ export const mockRunningRun: ProtocolRun = {
   labware: [],
 }
 
-const mockBasicRun: BasicRun = {
-  id: '1',
-  runType: RUN_TYPE_BASIC,
-  createdAt: '2021-10-07T18:44:49.366581+00:00',
-  status: 'ready-to-run',
-  actions: [],
-  commands: [],
-  pipettes: [],
-  labware: [],
-}
-
-export const mockProtocolRunResponse: Run = {
+export const mockRunResponse: Run = {
   data: mockRunningRun,
-}
-
-export const mockBasicRunResponse: Run = {
-  data: mockBasicRun,
 }
 
 export const mockRunsResponse: Runs = {

@@ -36,14 +36,13 @@ export function ProtocolUpload(): JSX.Element {
     runRecord,
     protocolRecord,
   } = useCurrentProtocolRun()
+  const hasCurrentRun = runRecord != null && protocolRecord != null
   const closeProtocolRun = useCloseProtocolRun()
 
   const logger = useLogger(__filename)
   const [uploadError, setUploadError] = React.useState<
     [string, ErrorObject[] | null | undefined] | null
   >(null)
-  const protocolFile = useSelector((state: State) => getProtocolFile(state))
-  const protocolName = useSelector((state: State) => getProtocolName(state))
 
   const clearError = (): void => {
     setUploadError(null)
@@ -77,9 +76,9 @@ export function ProtocolUpload(): JSX.Element {
   } = useConditionalConfirm(handleCloseProtocol, true)
 
   const titleBarProps =
-    protocolFile !== null
+    hasCurrentRun
       ? {
-          title: t('protocol_title', { protocol_name: protocolName }),
+          title: t('protocol_title', { protocol_name: protocolRecord?.data?.metadata?.protocolName ?? ''}),
           back: {
             onClick: confirmExit,
             title: t('shared:close'),

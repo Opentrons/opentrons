@@ -16,10 +16,7 @@ const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
 
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 const RUNS_RESPONSE = {
-  data: [
-    { runType: 'protocol', id: '1' },
-    { runType: 'basic', id: '2' },
-  ],
+  data: [ { id: '1' }, { id: '2' } ],
 } as Runs
 
 describe('useAllRunsQuery hook', () => {

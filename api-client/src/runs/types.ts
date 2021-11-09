@@ -12,12 +12,12 @@ export interface RunData {
   id: string
   createdAt: string
   status: RunStatus
-  createParams: { protocolId: string }
   actions: RunAction[]
   // TODO(bh, 10-29-2021): types for commands, pipettes, labware
   commands: unknown[]
   pipettes: unknown[]
   labware: unknown[]
+  protocolId?: string
 }
 
 interface ResourceLink {

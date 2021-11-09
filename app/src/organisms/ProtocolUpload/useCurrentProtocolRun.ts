@@ -23,7 +23,7 @@ export function useCurrentProtocolRun(): UseCurrentProtocolRun {
 
   const { data: runRecord } = useRunQuery(currentRunId)
   const { data: protocolRecord } = useProtocolQuery(
-    (runRecord?.data?.createParams?.protocolId as string) ?? null
+    (runRecord?.data?.protocolId as string) ?? null
   )
 
   const { createRun } = useCreateRunMutation({
@@ -37,12 +37,7 @@ export function useCurrentProtocolRun(): UseCurrentProtocolRun {
   })
   const { createProtocol: createProtocolRun } = useCreateProtocolMutation({
     onSuccess: data => {
-      createRun({
-        runType: 'protocol',
-        createParams: {
-          protocolId: data.data.id,
-        },
-      })
+      createRun({ protocolId: data.data.id })
     },
   })
 
