@@ -8,7 +8,7 @@ from opentrons.hardware_control.emulation.thermocycler import SERIAL as SERIAL_N
 
 THERMOCYCLER_CLOSE = HTTPGCodeConfirmConfig(
         name='thermocycler_close',
-        s3_path=f"{S3_BASE}/http/thermocycler_close.txt",
+        s3_path=f"{S3_BASE}/thermocycler_close.txt",
         executable=partial(
             post_serial_command,
             command=SerialCommand(command_type='close'),
