@@ -2,9 +2,12 @@ import asyncio
 from typing import AsyncIterator
 
 import pytest
-from mock import MagicMock
 
-from opentrons.hardware_control.emulation.proxy import Proxy, ProxySettings
+from opentrons.hardware_control.emulation.proxy import (
+    Proxy,
+    ProxySettings,
+    ProxyListener,
+)
 
 
 @pytest.fixture
@@ -13,13 +16,37 @@ def setting() -> ProxySettings:
     return ProxySettings(emulator_port=12345, driver_port=12346)
 
 
+class SimpleProxyListener(ProxyListener):
+    def __init__(self) -> None:
+        self._count = 0
+
+    def on_server_connected(
+        self, server_type: str, client_uri: str, identifier: str
+    ) -> None:
+        self._count += 1
+
+    def on_server_disconnected(self, identifier: str) -> None:
+        self._count -= 1
+
+    async def wait_count(self, count: int) -> None:
+        while count != self._count:
+            await asyncio.sleep(0.01)
+
+
+@pytest.fixture
+def proxy_listener() -> SimpleProxyListener:
+    """A proxy listener."""
+    return SimpleProxyListener()
+
+
 @pytest.fixture
 async def subject(
-    loop: asyncio.AbstractEventLoop, setting: ProxySettings
+    loop: asyncio.AbstractEventLoop,
+    setting: ProxySettings,
+    proxy_listener: SimpleProxyListener,
 ) -> AsyncIterator[Proxy]:
     """Test subject."""
-    mock_listener = MagicMock()
-    p = Proxy("proxy", mock_listener, setting)
+    p = Proxy("proxy", proxy_listener, setting)
     task = loop.create_task(p.run())
     yield p
     task.cancel()
@@ -29,22 +56,28 @@ async def subject(
         pass
 
 
-async def test_driver_route_message(subject: Proxy, setting: ProxySettings) -> None:
+async def test_driver_route_message(
+    subject: Proxy, setting: ProxySettings, proxy_listener: SimpleProxyListener
+) -> None:
     """It should route a message to an emulator."""
     emulator = await asyncio.open_connection(
         host="localhost", port=setting.emulator_port
     )
+    await proxy_listener.wait_count(1)
     driver = await asyncio.open_connection(host="localhost", port=setting.driver_port)
     driver[1].write(b"abc")
     r = await emulator[0].read(3)
     assert r == b"abc"
 
 
-async def test_emulator_route_message(subject: Proxy, setting: ProxySettings) -> None:
+async def test_emulator_route_message(
+    subject: Proxy, setting: ProxySettings, proxy_listener: SimpleProxyListener
+) -> None:
     """It should route a message to a driver."""
     emulator = await asyncio.open_connection(
         host="localhost", port=setting.emulator_port
     )
+    await proxy_listener.wait_count(1)
     driver = await asyncio.open_connection(host="localhost", port=setting.driver_port)
     emulator[1].write(b"abc")
     r = await driver[0].read(3)
@@ -52,7 +85,7 @@ async def test_emulator_route_message(subject: Proxy, setting: ProxySettings) ->
 
 
 async def test_driver_route_message_two_connections(
-    subject: Proxy, setting: ProxySettings
+    subject: Proxy, setting: ProxySettings, proxy_listener: SimpleProxyListener
 ) -> None:
     """It should route messages to correct emulator."""
     emulator1 = await asyncio.open_connection(
@@ -61,6 +94,7 @@ async def test_driver_route_message_two_connections(
     emulator2 = await asyncio.open_connection(
         host="localhost", port=setting.emulator_port
     )
+    await proxy_listener.wait_count(2)
     driver1 = await asyncio.open_connection(host="localhost", port=setting.driver_port)
     driver2 = await asyncio.open_connection(host="localhost", port=setting.driver_port)
     driver1[1].write(b"abc")
@@ -72,7 +106,7 @@ async def test_driver_route_message_two_connections(
 
 
 async def test_emulator_route_message_two_connections(
-    subject: Proxy, setting: ProxySettings
+    subject: Proxy, setting: ProxySettings, proxy_listener: SimpleProxyListener
 ) -> None:
     """It should route messages to correct driver."""
     emulator1 = await asyncio.open_connection(
@@ -81,6 +115,7 @@ async def test_emulator_route_message_two_connections(
     emulator2 = await asyncio.open_connection(
         host="localhost", port=setting.emulator_port
     )
+    await proxy_listener.wait_count(2)
     driver1 = await asyncio.open_connection(host="localhost", port=setting.driver_port)
     driver2 = await asyncio.open_connection(host="localhost", port=setting.driver_port)
     emulator1[1].write(b"abc")
@@ -98,12 +133,13 @@ async def test_driver_and_no_emulator(subject: Proxy, setting: ProxySettings) ->
 
 
 async def test_two_driver_and_one_emulator(
-    subject: Proxy, setting: ProxySettings
+    subject: Proxy, setting: ProxySettings, proxy_listener: SimpleProxyListener
 ) -> None:
     """It should fail to read if no emulator."""
     emulator = await asyncio.open_connection(
         host="localhost", port=setting.emulator_port
     )
+    await proxy_listener.wait_count(1)
     driver1 = await asyncio.open_connection(host="localhost", port=setting.driver_port)
     driver2 = await asyncio.open_connection(host="localhost", port=setting.driver_port)
     emulator[1].write(b"abc")
@@ -111,11 +147,14 @@ async def test_two_driver_and_one_emulator(
     assert b"" == await driver2[0].read(n=3)
 
 
-async def test_driver_reconnect(subject: Proxy, setting: ProxySettings) -> None:
+async def test_driver_reconnect(
+    subject: Proxy, setting: ProxySettings, proxy_listener: SimpleProxyListener
+) -> None:
     """It should allow a second driver to claim a formerly used emulator."""
     emulator = await asyncio.open_connection(
         host="localhost", port=setting.emulator_port
     )
+    await proxy_listener.wait_count(1)
     driver = await asyncio.open_connection(host="localhost", port=setting.driver_port)
     emulator[1].write(b"abc")
     assert b"abc" == await driver[0].read(n=3)
@@ -127,11 +166,14 @@ async def test_driver_reconnect(subject: Proxy, setting: ProxySettings) -> None:
     assert b"abc" == await driver[0].read(n=3)
 
 
-async def test_emulator_disconnects(subject: Proxy, setting: ProxySettings) -> None:
+async def test_emulator_disconnects(
+    subject: Proxy, setting: ProxySettings, proxy_listener: SimpleProxyListener
+) -> None:
     """It should disconnect driver when emulator disconnects."""
     emulator = await asyncio.open_connection(
         host="localhost", port=setting.emulator_port
     )
+    await proxy_listener.wait_count(1)
     driver = await asyncio.open_connection(host="localhost", port=setting.driver_port)
     emulator[1].close()
 
