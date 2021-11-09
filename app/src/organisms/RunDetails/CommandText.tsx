@@ -10,7 +10,7 @@ import {
 
 interface Props {
   command: Command
-  commandText: string
+  commandText?: JSX.Element
 }
 export function CommandText(props: Props): JSX.Element {
   return (

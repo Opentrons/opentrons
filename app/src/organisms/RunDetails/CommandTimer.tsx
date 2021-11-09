@@ -29,17 +29,17 @@ export function CommandTimer(props: TimerProps): JSX.Element {
     >
       <Flex flexDirection={DIRECTION_ROW}>
         <Flex marginRight={SPACING_1}>{t('start_step_time')}</Flex>
-        <Flex>{props.start} </Flex>
+        <Flex>{props.start}</Flex>
       </Flex>
       {props.runStatus === 'paused' ? (
         <Flex flexDirection={DIRECTION_ROW}>
           <Flex marginRight={SPACING_1}>{t('current_step_pause_timer')}</Flex>
-          <Flex>{props.timer} </Flex>
+          <Flex>{props.timer}</Flex>
         </Flex>
       ) : null}
       <Flex flexDirection={DIRECTION_ROW}>
         <Flex marginRight={SPACING_1}>{t('end_step_time')}</Flex>
-        <Flex marginLeft={SPACING_2}>{props.end} </Flex>
+        <Flex marginLeft={SPACING_2}>{props.end}</Flex>
       </Flex>
     </Flex>
   )

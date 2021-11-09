@@ -21,14 +21,14 @@ import { getConnectedRobot } from '../../redux/discovery'
 import { State } from '../../redux/types'
 import { useSelector } from 'react-redux'
 import { useProtocolDetails } from './hooks'
-import { CommandItem } from './CommandItem'
+import { CommandItem, Status } from './CommandItem'
 import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
 
 interface ProtocolSetupInfoProps {
   onCloseClick: () => unknown
   SetupCommand?: Command
   runStatus: string
-  type: string
+  type: Status
 }
 
 export const ProtocolSetupInfo = (
@@ -113,7 +113,7 @@ export const ProtocolSetupInfo = (
     }
 
     SetupCommand.params.labwareId.includes('trash')
-      ? (SetupCommandText = null)
+      ? (SetupCommandText = undefined)
       : (SetupCommandText =
           moduleName === null ? (
             <Trans

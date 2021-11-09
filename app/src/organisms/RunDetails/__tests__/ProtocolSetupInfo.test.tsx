@@ -10,7 +10,7 @@ import { mockConnectedRobot } from '../../../redux/discovery/__fixtures__'
 import { mockProtocolPipetteTipRackCalInfo } from '../../../redux/pipettes/__fixtures__'
 import { getProtocolPipetteTipRackCalInfo } from '../../../redux/pipettes'
 import { ProtocolSetupInfo } from '../ProtocolSetupInfo'
-import { CommandItem } from '../CommandItem'
+import { CommandItem, Status } from '../CommandItem'
 import { useProtocolDetails } from '../hooks'
 import type {
   Command,
@@ -22,7 +22,7 @@ jest.mock('../hooks')
 jest.mock('../../../redux/pipettes/types')
 jest.mock('../../../redux/discovery/selectors')
 jest.mock('../../../redux/pipettes')
-jest.mock('./CommandItem')
+jest.mock('../CommandItem')
 
 const mockUseProtocolDetails = useProtocolDetails as jest.MockedFunction<
   typeof useProtocolDetails
@@ -37,6 +37,8 @@ const mockCommandItem = CommandItem as jest.MockedFunction<typeof CommandItem>
 
 const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolFile<{}>
 
+const TEMP_ID = 'temperature_module_gen2'
+const TYPE = 'type' as Status
 const TC_ID = 'thermocycler'
 const LABWARE_LOCATION = { slotName: '3' }
 const MODULE_LOCATION = { slotName: '3' } || {
@@ -148,7 +150,7 @@ describe('ProtocolSetupInfo', () => {
       onCloseClick: jest.fn(),
       SetupCommand: COMMAND_TYPE_LOAD_LABWARE,
       runStatus: 'run status',
-      type: 'type',
+      type: TYPE,
     }
     when(mockUseProtocolDetails)
       .calledWith()
@@ -165,7 +167,7 @@ describe('ProtocolSetupInfo', () => {
             [LABWARE_DEF_ID]: LABWARE_DEF,
           },
           modules: {
-            ['temperature_module_gen2']: {
+            [TEMP_ID]: {
               slot: '3',
               model: 'temperatureModuleV2',
             },
@@ -190,6 +192,9 @@ describe('ProtocolSetupInfo', () => {
   })
 
   it('should render correct command when commandType is loadLabware', () => {
+    when(mockCommandItem).mockReturnValue(
+      <div>Load ANSI 96 Standard Microplate v1 in Slot 3</div>
+    )
     const { getByText } = render(props)
     getByText('Load ANSI 96 Standard Microplate v1 in Slot 3')
   })
@@ -199,12 +204,18 @@ describe('ProtocolSetupInfo', () => {
       onCloseClick: jest.fn(),
       SetupCommand: COMMAND_TYPE_LOAD_LABWARE_WITH_MODULE,
       runStatus: 'run status',
-      type: 'type',
+      type: TYPE,
     }
     when(mockUseProtocolDetails).calledWith().mockReturnValue({
       protocolData: simpleV6Protocol,
       displayName: 'mock display name',
     })
+    when(mockCommandItem).mockReturnValue(
+      <div>
+        Load ANSI 96 Standard Microplate v1 in Magnetic Module GEN2 in Slot 3
+      </div>
+    )
+
     const { getByText } = render(props)
     getByText(
       'Load ANSI 96 Standard Microplate v1 in Magnetic Module GEN2 in Slot 3'
@@ -215,8 +226,11 @@ describe('ProtocolSetupInfo', () => {
       onCloseClick: jest.fn(),
       SetupCommand: COMMAND_TYPE_LOAD_PIPETTE,
       runStatus: 'run status',
-      type: 'type',
+      type: TYPE,
     }
+    when(mockCommandItem).mockReturnValue(
+      <div>Load My Pipette in left Mount</div>
+    )
     const { getByText } = render(props)
     getByText(nestedTextMatcher('Load My Pipette in left Mount'))
   })
@@ -225,8 +239,11 @@ describe('ProtocolSetupInfo', () => {
       onCloseClick: jest.fn(),
       SetupCommand: COMMAND_TYPE_LOAD_MODULE,
       runStatus: 'run status',
-      type: 'type',
+      type: TYPE,
     }
+    when(mockCommandItem).mockReturnValue(
+      <div>Load Temperature Module GEN2 in Slot 3</div>
+    )
     const { getByText } = render(props)
     getByText('Load Temperature Module GEN2 in Slot 3')
   })
@@ -235,7 +252,7 @@ describe('ProtocolSetupInfo', () => {
       onCloseClick: jest.fn(),
       SetupCommand: COMMAND_TYPE_LOAD_MODULE_TC,
       runStatus: 'run status',
-      type: 'type',
+      type: TYPE,
     }
     when(mockUseProtocolDetails)
       .calledWith()
@@ -265,6 +282,7 @@ describe('ProtocolSetupInfo', () => {
           },
         },
       } as any)
+    when(mockCommandItem).mockReturnValue(<div>Load Thermocycler Module</div>)
     const { getByText } = render(props)
     getByText('Load Thermocycler Module')
   })
@@ -278,7 +296,7 @@ describe('ProtocolSetupInfo', () => {
       onCloseClick: jest.fn(),
       SetupCommand: undefined,
       runStatus: 'run status',
-      type: 'type',
+      type: TYPE,
     }
     const { container } = render(props)
     expect(container.firstChild).toBeNull()
@@ -288,7 +306,7 @@ describe('ProtocolSetupInfo', () => {
       onCloseClick: jest.fn(),
       SetupCommand: COMMAND_TYPE_TRASH,
       runStatus: 'run status',
-      type: 'type',
+      type: TYPE,
     }
     when(mockUseProtocolDetails).calledWith().mockReturnValue({
       protocolData: simpleV6Protocol,

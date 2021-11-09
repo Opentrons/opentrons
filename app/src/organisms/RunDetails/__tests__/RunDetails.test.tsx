@@ -1,39 +1,24 @@
 import * as React from 'react'
 import '@testing-library/jest-dom'
+import { fireEvent } from '@testing-library/dom'
 import { renderWithProviders } from '@opentrons/components'
 import { when } from 'jest-when'
 import { RunDetails } from '..'
 import { i18n } from '../../../i18n'
+import { CommandList } from '../CommandList'
 import { useProtocolDetails } from '../hooks'
+import _uncastedSimpleV6Protocol from '@opentrons/shared-data/protocol/fixtures/6/simpleV6.json'
+import type { ProtocolFile } from '@opentrons/shared-data'
 
 jest.mock('../hooks')
+jest.mock('../CommandList')
 
 const mockUseProtocolDetails = useProtocolDetails as jest.MockedFunction<
   typeof useProtocolDetails
 >
+const mockCommandList = CommandList as jest.MockedFunction<typeof CommandList>
 
-const PRIMARY_PIPETTE_ID = 'PRIMARY_PIPETTE_ID'
-const PRIMARY_PIPETTE_NAME = 'PRIMARY_PIPETTE_NAME'
-const PICKUP_TIP_LABWARE_ID = 'PICKUP_TIP_LABWARE_ID'
-const LABWARE_DEF_ID = 'LABWARE_DEF_ID'
-const LABWARE_DEF = {
-  ordering: [['A1', 'A2']],
-}
-
-const mockLabwarePositionCheckStepTipRack = {
-  labwareId:
-    '1d57fc10-67ad-11ea-9f8b-3b50068bd62d:opentrons/opentrons_96_filtertiprack_200ul/1',
-  section: '',
-  commands: [
-    {
-      command: 'pickUpTip',
-      params: {
-        pipette: PRIMARY_PIPETTE_ID,
-        labware: PICKUP_TIP_LABWARE_ID,
-      },
-    },
-  ],
-} as any
+const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolFile<{}>
 
 const render = () => {
   return renderWithProviders(<RunDetails />, {
@@ -43,38 +28,24 @@ const render = () => {
 
 describe('RunDetails', () => {
   beforeEach(() => {
-    when(mockUseProtocolDetails)
-      .calledWith()
-      .mockReturnValue({
-        protocolData: {
-          labware: {
-            [mockLabwarePositionCheckStepTipRack.labwareId]: {
-              slot: '1',
-              displayName: 'someDislpayName',
-              definitionId: LABWARE_DEF_ID,
-            },
-          },
-          labwareDefinitions: {
-            [LABWARE_DEF_ID]: LABWARE_DEF,
-          },
-          pipettes: {
-            [PRIMARY_PIPETTE_ID]: {
-              name: PRIMARY_PIPETTE_NAME,
-              mount: 'left',
-            },
-          },
-        },
-      } as any)
-  })
-
-  it('renders null if protocol data is null', () => {
-    mockUseProtocolDetails.mockReturnValue({ protocolData: null } as any)
-    const { container } = render()
-    expect(container.firstChild).toBeNull()
+    when(mockUseProtocolDetails).calledWith().mockReturnValue({
+      protocolData: simpleV6Protocol,
+      displayName: 'mock display name',
+    })
+    when(mockCommandList).mockReturnValue(<div>Mock Command List</div>)
   })
   it('renders protocol title', () => {
     const { getByText } = render()
-    getByText('Protocol -')
+    getByText('Protocol - mock display name')
   })
-  it.todo('renders run detail command component')
+  it('renders run detail command component', () => {
+    const { getAllByText } = render()
+    getAllByText('Mock Command List')
+  })
+  it('renders the cancel button and is clickable', () => {
+    const { getByRole } = render()
+    const button = getByRole('button', { name: 'Cancel Run' })
+    fireEvent.click(button)
+    expect(button).not.toBeNull()
+  })
 })

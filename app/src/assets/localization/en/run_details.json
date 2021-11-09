@@ -21,7 +21,6 @@
   "anticipated_step": "Anticipated steps",
   "start_step_time": "Start",
   "end_step_time": "End",
-  "end_of_protocol": "End of protocol",
   "comment_step": "Comment",
   "pause_protocol": "Pause protocol",
   "current_step_pause": "Current Step - Paused by User",

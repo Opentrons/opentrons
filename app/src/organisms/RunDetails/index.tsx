@@ -10,6 +10,7 @@ import {
   SPACING_2,
   SPACING_3,
   useConditionalConfirm,
+  Flex,
 } from '@opentrons/components'
 import { Page } from '../../atoms/Page'
 import { ConfirmCancelModal } from '../../pages/Run/RunLog'
@@ -52,11 +53,13 @@ export function RunDetails(): JSX.Element | null {
     <Page titleBarProps={titleBarProps}>
       {showConfirmExit ? <ConfirmCancelModal onClose={cancelExit} /> : null}
       {fixtureCommands.commands.map(command => (
-        <CommandList
-          anticipated={command.id}
-          inProgress={command.id[commandIdIndex]}
-          completed={command.id[commandIdIndex - 1]}
-        />
+        <Flex key={command.id}>
+          <CommandList
+            anticipated={command.id}
+            inProgress={command.id[commandIdIndex]}
+            completed={command.id[commandIdIndex - 1]}
+          />
+        </Flex>
       ))}
     </Page>
   )

@@ -33,9 +33,9 @@ export type Status = 'queued' | 'running' | 'succeeded' | 'failed'
 interface CommandItemsProps {
   runStatus?: string
   currentCommand: Command
-  commandText: string
+  commandText?: JSX.Element
 }
-export function CommandItemRunning(props: CommandItemsProps): JSX.Element {
+function CommandItemRunning(props: CommandItemsProps): JSX.Element {
   const { currentCommand, runStatus } = props
   const { t } = useTranslation('run_details')
   return (
@@ -78,7 +78,7 @@ export function CommandItemRunning(props: CommandItemsProps): JSX.Element {
   )
 }
 
-export function CommandItemQueued(props: CommandItemsProps): JSX.Element {
+function CommandItemQueued(props: CommandItemsProps): JSX.Element {
   const { currentCommand } = props
   return (
     <Flex>
@@ -88,7 +88,7 @@ export function CommandItemQueued(props: CommandItemsProps): JSX.Element {
   )
 }
 
-export function CommandItemSuccess(props: CommandItemsProps): JSX.Element {
+function CommandItemSuccess(props: CommandItemsProps): JSX.Element {
   const { currentCommand } = props
   return (
     <Flex flexDirection={DIRECTION_ROW}>
@@ -98,7 +98,7 @@ export function CommandItemSuccess(props: CommandItemsProps): JSX.Element {
   )
 }
 
-export function CommandItemFailed(props: CommandItemsProps): JSX.Element {
+function CommandItemFailed(props: CommandItemsProps): JSX.Element {
   const { currentCommand } = props
   const { t } = useTranslation('run_details')
   return (
@@ -119,20 +119,20 @@ export interface CommandItemProps {
   currentCommand: Command
   type: Status
   runStatus?: string
-  commandText: string
+  commandText?: JSX.Element
 }
 
 const WRAPPER_STYLE_BY_STATUS: Record<
   Status,
   { border: string; backgroundColor: string }
 > = {
-  queued: { border: '', backgroundColor: C_NEAR_WHITE },
+  queued: { border: 'no-border', backgroundColor: C_NEAR_WHITE },
   running: {
     border: `1px solid ${C_MINT}`,
     backgroundColor: C_POWDER_BLUE,
   },
   succeeded: {
-    border: '',
+    border: 'no-border',
     backgroundColor: C_AQUAMARINE,
   },
   failed: {

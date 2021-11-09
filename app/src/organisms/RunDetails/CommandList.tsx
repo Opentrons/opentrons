@@ -13,9 +13,10 @@ import {
   SIZE_1,
   C_MED_DARK_GRAY,
 } from '@opentrons/components'
+import { useRunStatus } from '../RunTimeControl/hooks'
 import { useProtocolDetails } from './hooks'
 import { ProtocolSetupInfo } from './ProtocolSetupInfo'
-import { useRunStatus } from '../RunTimeControl/hooks'
+import { Status } from './CommandItem'
 import fixtureCommands from '@opentrons/app/src/organisms/RunDetails/Fixture_commands.json'
 import type { ProtocolFile } from '@opentrons/shared-data'
 
@@ -36,37 +37,39 @@ export function CommandList(props: Props): JSX.Element | null {
   if (protocolData == null) return null
   const legacyCommands = fixtureCommands.commands
 
-  let commandType = ''
-  if (props.inProgress) {
-    commandType === 'running'
-  } else if (props.anticipated) {
-    commandType === 'queued'
-  } else if (props.completed) {
-    commandType === 'succeeded'
-  } else {
-    commandType === 'failed'
-  }
-
   return (
     <React.Fragment>
       <Flex margin={SPACING_1}>
         {showProtocolSetupInfo ? (
-          protocolData.commands.map(command => (
-            <Flex id={`RunDetails_ProtocolSetup_CommandList`} key={command.id}>
-              <ProtocolSetupInfo
-                onCloseClick={() => setShowProtocolSetupInfo(false)}
-                SetupCommand={
-                  command.commandType === 'loadLabware' ||
-                  'loadPipette' ||
-                  'loadModule'
-                    ? command
-                    : undefined
-                }
-                runStatus={runStatus}
-                type={commandType}
-              />
-            </Flex>
-          ))
+          protocolData.commands.map(command => {
+            let commandTypeStatus = 'queued' as Status
+            if (command.id === props.inProgress) commandTypeStatus = 'running'
+            else if (command.id === props.anticipated)
+              commandTypeStatus = 'queued'
+            else if (command.id === props.completed)
+              commandTypeStatus = 'succeeded'
+            else commandTypeStatus = 'failed'
+
+            return (
+              <Flex
+                id={`RunDetails_ProtocolSetup_CommandList`}
+                key={command.id}
+              >
+                <ProtocolSetupInfo
+                  onCloseClick={() => setShowProtocolSetupInfo(false)}
+                  SetupCommand={
+                    command.commandType === 'loadLabware' ||
+                    command.commandType === 'loadPipette' ||
+                    command.commandType === 'loadModule'
+                      ? command
+                      : undefined
+                  }
+                  runStatus={runStatus}
+                  type={commandTypeStatus}
+                />
+              </Flex>
+            )
+          })
         ) : (
           <Btn
             width={'100%'}
@@ -96,6 +99,15 @@ export function CommandList(props: Props): JSX.Element | null {
       >
         <Flex>
           {legacyCommands.map(command => {
+            let legacyCommandTypeStatus = 'queued' as Status
+            if (command.id === props.inProgress)
+              legacyCommandTypeStatus = 'running'
+            else if (command.id === props.anticipated)
+              legacyCommandTypeStatus = 'queued'
+            else if (command.id === props.completed)
+              legacyCommandTypeStatus = 'succeeded'
+            else legacyCommandTypeStatus = 'failed'
+
             let commandWholeText
             if (command.commandType === 'delay') {
               commandWholeText = (
@@ -123,23 +135,19 @@ export function CommandList(props: Props): JSX.Element | null {
 
             return (
               <Flex key={command.id} id={`RunDetails_CommandList`}>
-                {commandType === 'queued' ? (
+                {legacyCommandTypeStatus === 'queued' ? (
                   <Flex padding={SPACING_1} fontSize={FONT_SIZE_CAPTION}>
                     {t('anticipated')}
                   </Flex>
                 ) : null}
-                <CommandItem
-                  currentCommand={
-                    command.commandType !== 'loadLabware' &&
-                    'loadPipette' &&
-                    'loadModule'
-                      ? command
-                      : undefined
-                  }
+                <Flex padding={SPACING_1}>{commandWholeText}</Flex>
+                {/*   TODO: immediately CommandItem takes in v6 Commands this won't work until Command types are updated, stubbing in the legacyCommand commandWholeText for now */}
+                {/* <CommandItem
+                  currentCommand={command}
                   type={commandType}
                   runStatus={runStatus}
                   commandText={commandWholeText}
-                />
+                /> */}
               </Flex>
             )
           })}
