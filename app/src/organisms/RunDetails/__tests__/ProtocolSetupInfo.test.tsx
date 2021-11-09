@@ -13,7 +13,6 @@ import { ProtocolSetupInfo } from '../ProtocolSetupInfo'
 import { useProtocolDetails } from '../hooks'
 import { ProtocolFile } from '@opentrons/shared-data'
 import type { Command, LabwareDefinition2 } from '@opentrons/shared-data'
-import { isNull } from 'lodash'
 
 jest.mock('../hooks')
 jest.mock('../../../redux/pipettes/types')
@@ -188,7 +187,6 @@ describe('ProtocolSetupInfo', () => {
       SetupCommand: COMMAND_TYPE_LOAD_LABWARE_WITH_MODULE,
     }
     when(mockUseProtocolDetails).calledWith().mockReturnValue({
-      //  @ts-expect-error commandAnnotations doesn't exist on v5
       protocolData: simpleV6Protocol,
       displayName: 'mock display name',
     })
@@ -256,7 +254,6 @@ describe('ProtocolSetupInfo', () => {
   it('renders null if labware is a trash', () => {
     props = { onCloseClick: jest.fn(), SetupCommand: COMMAND_TYPE_TRASH }
     when(mockUseProtocolDetails).calledWith().mockReturnValue({
-      //  @ts-expect-error commandAnnotations doesn't exist on v5
       protocolData: simpleV6Protocol,
       displayName: 'mock display name',
     })

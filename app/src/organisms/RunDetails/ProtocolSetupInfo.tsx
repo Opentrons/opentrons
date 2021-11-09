@@ -27,14 +27,15 @@ import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
 interface ProtocolSetupInfoProps {
   onCloseClick: () => unknown
   SetupCommand?: Command
+  runStatus: string
+  type: string
 }
 
 export const ProtocolSetupInfo = (
   props: ProtocolSetupInfoProps
 ): JSX.Element | null => {
-  const { SetupCommand } = props
+  const { SetupCommand, runStatus, type } = props
   const { t } = useTranslation('run_details')
-  //  @ts-expect-error casting a v6 protocol, remove when wiring up to protocol resource
   const protocolData: ProtocolFile<{}> | null = useProtocolDetails()
     .protocolData
   const robot = useSelector((state: State) => getConnectedRobot(state))
@@ -47,7 +48,6 @@ export const ProtocolSetupInfo = (
 
   let SetupCommandText
   if (SetupCommand.commandType === 'loadPipette') {
-    //  @ts-expect-error mount is a string right now but mount needs to equal Mount[] - should be fixable when command type is updated
     const pipetteData = protocolPipetteData[SetupCommand.params.mount]
     if (pipetteData == null) {
       return null
@@ -163,7 +163,14 @@ export const ProtocolSetupInfo = (
           <Icon name="chevron-up" color={C_MED_DARK_GRAY}></Icon>
         </Btn>
       </Flex>
-      <Flex flexDirection={DIRECTION_ROW}>{SetupCommandText}</Flex>
+      <Flex>
+        <CommandItem
+          currentCommand={SetupCommand}
+          type={type}
+          runStatus={runStatus}
+          commandText={SetupCommandText}
+        />
+      </Flex>
     </Flex>
   )
 }

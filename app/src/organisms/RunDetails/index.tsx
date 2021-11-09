@@ -24,6 +24,7 @@ export function RunDetails(): JSX.Element | null {
     confirm: confirmExit,
     cancel: cancelExit,
   } = useConditionalConfirm(() => {}, true)
+  const [commandIdIndex] = React.useState<number>(0)
   if (protocolData == null) return null
 
   const cancelRunButton = (
@@ -50,7 +51,13 @@ export function RunDetails(): JSX.Element | null {
   return (
     <Page titleBarProps={titleBarProps}>
       {showConfirmExit ? <ConfirmCancelModal onClose={cancelExit} /> : null}
-      <CommandList />
+      {protocolData.commands.map(command => (
+        <CommandList
+          anticipated={command.id}
+          inProgress={command.id[commandIdIndex]}
+          completed={command.id[commandIdIndex - 1]}
+        />
+      ))}
     </Page>
   )
 }

@@ -15,42 +15,23 @@ import {
 } from '@opentrons/components'
 import { useProtocolDetails } from './hooks'
 import { ProtocolSetupInfo } from './ProtocolSetupInfo'
-import _Fixture_commands from './Fixture_commands.json'
-import { ProtocolFile } from '@opentrons/shared-data'
-import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
-
+import type { ProtocolFile } from '@opentrons/shared-data'
+import { useRunStatus } from '../RunTimeControl/hooks'
 interface Props {
-  anticipated: Command[]
-  inProgress: Command
-  completed: Command[]
+  anticipated?: string
+  inProgress: string
+  completed?: string
 }
-export function CommandList(): JSX.Element | null {
+export function CommandList(props: Props): JSX.Element | null {
   const { t } = useTranslation('run_details')
   const [
     showProtocolSetupInfo,
     setShowProtocolSetupInfo,
   ] = React.useState<boolean>(false)
-  //  @ts-expect-error casting a v6 protocol, remove when wiring up to protocol resource
   const protocolData: ProtocolFile<{}> | null = useProtocolDetails()
     .protocolData
+  const runStatus = useRunStatus()
   if (protocolData == null) return null
-
-  // const COMMAND = {
-  //   commandType: 'loadLabware',
-  //   params: {
-  //     labwareId: '96_wellplate',
-  //     location: { slotName: '9' } || {
-  //         moduleId: 'thermocycler',
-  //       } || {
-  //         coordinates: { x: 0, y: 0, z: 0 },
-  //       },
-  //   },
-  //   result: {
-  //     labwareId: '96_wellplate',
-  //     definition: fixture_96_plate as LabwareDefinition2,
-  //     offset: { x: 0, y: 0, z: 0 },
-  //   },
-  // } as Command
 
   return (
     <React.Fragment>
@@ -100,24 +81,63 @@ export function CommandList(): JSX.Element | null {
         <Flex>
           {'commands' in protocolData
             ? protocolData.commands.map(command => {
-                command.commandType === 'delay' ? (
-                  <Flex flexDirection={DIRECTION_ROW}>
-                    <Flex
-                      textTransform={TEXT_TRANSFORM_UPPERCASE}
-                      padding={SPACING_1}
-                      key={command.id}
-                      id={`RunDetails_CommandList`}
-                    >
-                      {t('comment')}
-                    </Flex>
-                    <Flex>{command.params.message}</Flex>
+                let commandType
+                if (props.inProgress) {
+                  commandType === 'running'
+                } else if (props.anticipated) {
+                  commandType === 'queued'
+                } else if (props.completed) {
+                  commandType === 'succeeded'
+                }
+                let commandText
+                if (command.commandType === 'delay'){
+                  commandText = <Flex flexDirection={DIRECTION_ROW}>
+                      <Flex
+                        textTransform={TEXT_TRANSFORM_UPPERCASE}
+                        padding={SPACING_1}
+                        key={command.id}
+                        id={`RunDetails_CommandList`}
+                      >
+                        {t('comment')}
+                      </Flex>
+                      <Flex>{command.params.message}</Flex>
+                    </Flex>}
+                    else if (
+                    command.commandType !== 'loadLabware' &&
+                    'loadPipette' &&
+                    'loadModule') {
+                      commandText = <Flex key={command.id}>{command.commandType}</Flex>
+                    }
+                  
+                return (
+                  <Flex key={command.id} id={`RunDetails_CommandList`}>
+                    <CommandItem
+                      currentCommand={command}
+                      type={commandType}
+                      runStatus={runStatus}
+                      commandText={commandText}
+                    />
                   </Flex>
-                ) : (
-                  command.commandType !== 'loadLabware' &&
-                  'loadPipette' &&
-                  'loadModule' && (
-                    <Flex key={command.id}>{command.commandType}</Flex>
-                  )
+                  // use the CommandText component that you make in your other pr to move this text into there
+                  // command.commandType === 'delay' ? (
+                  //   <Flex flexDirection={DIRECTION_ROW}>
+                  //     <Flex
+                  //       textTransform={TEXT_TRANSFORM_UPPERCASE}
+                  //       padding={SPACING_1}
+                  //       key={command.id}
+                  //       id={`RunDetails_CommandList`}
+                  //     >
+                  //       {t('comment')}
+                  //     </Flex>
+                  //     <Flex>{command.params.message}</Flex>
+                  //   </Flex>
+                  // ) : (
+                  //   command.commandType !== 'loadLabware' &&
+                  //   'loadPipette' &&
+                  //   'loadModule' && (
+                  //     <Flex key={command.id}>{command.commandType}</Flex>
+                  //   )
+                  // )
                 )
               })
             : null}
