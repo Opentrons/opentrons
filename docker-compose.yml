@@ -4,6 +4,12 @@ services:
     build: .
     command: python3 -m opentrons.hardware_control.emulation.app
     ports:
+      - '8888:8888'
+      - '9000:9000'
+      - '9002:9002'
+      - '9003:9003'
+      - '9004:9004'
+      - '9995:9995'
       - '9996:9996'
       - '9997:9997'
       - '9998:9998'
@@ -17,14 +23,33 @@ services:
     ports:
       - '31950:31950'
     environment:
-      - OT_API_CONFIG_DIR=/config
-      - OT_SMOOTHIE_EMULATOR_URI=socket://emulator:9996
-      - OT_THERMOCYCLER_EMULATOR_URI=socket://emulator:9997
-      - OT_TEMPERATURE_EMULATOR_URI=socket://emulator:9998
-      - OT_MAGNETIC_EMULATOR_URI=socket://emulator:9999
+      OT_API_CONFIG_DIR: /config
+      OT_SMOOTHIE_EMULATOR_URI: socket://emulator:9996
+      OT_EMULATOR_module_server: '{"host": "emulator"}'
     links:
       - 'emulator'
     depends_on:
       - 'emulator'
     volumes:
       - .opentrons_config:/config:rw
+  tempdeck:
+    build: .
+    command: python3 -m opentrons.hardware_control.emulation.scripts.run_module_emulator tempdeck emulator
+    links:
+      - 'emulator'
+    depends_on:
+      - 'emulator'
+  thermocycler:
+    build: .
+    command: python3 -m opentrons.hardware_control.emulation.scripts.run_module_emulator thermocycler emulator
+    links:
+      - 'emulator'
+    depends_on:
+      - 'emulator'
+  magdeck:
+    build: .
+    command: python3 -m opentrons.hardware_control.emulation.scripts.run_module_emulator magdeck emulator
+    links:
+      - 'emulator'
+    depends_on:
+      - 'emulator'
