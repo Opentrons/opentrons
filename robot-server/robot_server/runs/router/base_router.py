@@ -29,7 +29,7 @@ from robot_server.protocols import (
 from ..run_store import RunStore, RunNotFoundError
 from ..run_view import RunView
 from ..run_models import Run, RunCreateData, ProtocolRunCreateData, RunUpdate
-from ..engine_store import EngineStore, EngineConflictError, EngineMissingError
+from ..engine_store import EngineStore, EngineConflictError
 from ..dependencies import get_run_store, get_engine_store
 
 base_router = APIRouter()
@@ -56,7 +56,7 @@ class RunNotIdle(ErrorDetails):
     title: str = "Run is not idle."
     detail: str = (
         "Run is currently active. Allow the run to finish or"
-        " stop it with a `stop` action before attempting to delete it."
+        " stop it with a `stop` action before attempting to modify it."
     )
 
 
@@ -253,15 +253,11 @@ async def remove_run(
         engine_store: ProtocolEngine storage and control.
     """
     try:
-        engine_state = engine_store.get_state(runId)
-    except EngineMissingError:
-        pass
-    else:
-        if not engine_state.commands.get_is_stopped():
-            raise RunNotIdle().as_error(status.HTTP_409_CONFLICT)
+        engine_store.clear()
+    except EngineConflictError:
+        raise RunNotIdle().as_error(status.HTTP_409_CONFLICT)
 
     try:
-        engine_store.clear()
         run_store.remove(run_id=runId)
     except RunNotFoundError as e:
         raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
@@ -306,8 +302,13 @@ async def update_run(
         )
     elif update.current is False:
         run = run_view.with_update(run=run, update=update)
+
+        try:
+            engine_store.clear()
+        except EngineConflictError:
+            raise RunNotIdle().as_error(status.HTTP_409_CONFLICT)
+
         run_store.upsert(run)
-        engine_store.clear()
 
     engine_state = engine_store.get_state(run.run_id)
     data = run_view.as_response(

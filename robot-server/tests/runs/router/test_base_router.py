@@ -479,10 +479,6 @@ async def test_delete_run_by_id(
     engine_store: EngineStore,
 ) -> None:
     """It should be able to remove a run by ID."""
-    engine_state = decoy.mock(cls=StateView)
-    decoy.when(engine_store.get_state("run-id")).then_return(engine_state)
-    decoy.when(engine_state.commands.get_is_stopped()).then_return(True)
-
     result = await remove_run(
         runId="run-id",
         run_store=run_store,
@@ -505,7 +501,6 @@ async def test_delete_run_with_bad_id(
     """It should 404 if the run ID does not exist."""
     key_error = RunNotFoundError(run_id="run-id")
 
-    decoy.when(engine_store.get_state("run-id")).then_raise(EngineMissingError("oh no"))
     decoy.when(run_store.remove(run_id="run-id")).then_raise(key_error)
 
     with pytest.raises(ApiError) as exc_info:
@@ -525,9 +520,7 @@ async def test_delete_active_run(
     run_store: RunStore,
 ) -> None:
     """It should 409 if the run is not finished."""
-    engine_state = decoy.mock(cls=StateView)
-    decoy.when(engine_store.get_state("run-id")).then_return(engine_state)
-    decoy.when(engine_state.commands.get_is_stopped()).then_return(False)
+    decoy.when(engine_store.clear()).then_raise(EngineConflictError("oh no"))
 
     with pytest.raises(ApiError) as exc_info:
         await remove_run(
@@ -626,8 +619,8 @@ async def test_update_run_to_not_current(
 
     assert result == ResponseModel(data=expected_response, links=None)
     decoy.verify(
-        run_store.upsert(updated_resource),
         engine_store.clear(),
+        run_store.upsert(updated_resource),
     )
 
 
