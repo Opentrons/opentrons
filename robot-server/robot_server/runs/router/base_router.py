@@ -5,7 +5,7 @@ Contains routes dealing primarily with `Run` models.
 from fastapi import APIRouter, Depends, status
 from datetime import datetime
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional, Union
 from typing_extensions import Literal
 
 from robot_server.errors import ErrorDetails, ErrorResponse
@@ -272,7 +272,9 @@ async def remove_run(
     status_code=status.HTTP_200_OK,
     response_model=ResponseModel[Run, None],
     responses={
-        status.HTTP_409_CONFLICT: {"model": ErrorResponse[RunStopped]},
+        status.HTTP_409_CONFLICT: {
+            "model": ErrorResponse[Union[RunStopped, RunNotIdle]]
+        },
         status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[RunNotFound]},
     },
 )
