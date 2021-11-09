@@ -271,7 +271,10 @@ async def remove_run(
     description="Update a specific run, returing the updated resource.",
     status_code=status.HTTP_200_OK,
     response_model=ResponseModel[Run, None],
-    responses={status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[RunNotFound]}},
+    responses={
+        status.HTTP_409_CONFLICT: {"model": ErrorResponse[RunStopped]},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[RunNotFound]},
+    },
 )
 async def update_run(
     runId: str,
