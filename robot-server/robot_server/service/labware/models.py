@@ -114,6 +114,6 @@ class LabwareCalibration(ResponseDataModel):
         }
 
 
-MultipleCalibrationsResponse = MultiResponseModel[LabwareCalibration]
+MultipleCalibrationsResponse = MultiResponseModel[LabwareCalibration, None]
 
-SingleCalibrationResponse = ResponseModel[LabwareCalibration]
+SingleCalibrationResponse = ResponseModel[LabwareCalibration, None]

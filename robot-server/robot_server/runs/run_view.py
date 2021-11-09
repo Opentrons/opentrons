@@ -20,6 +20,7 @@ from .run_models import (
     ProtocolRun,
     ProtocolRunCreateData,
     RunCommandSummary,
+    RunUpdate,
 )
 
 
@@ -54,6 +55,20 @@ class RunView:
             actions=[],
             is_current=True,
         )
+
+    @staticmethod
+    def with_update(run: RunResource, update: RunUpdate) -> RunResource:
+        """Update a run resource with update request data.
+
+        Arguments:
+            run: Existing run resource.
+            update: Run update data.
+
+        Returns:
+            The updated run resource.
+        """
+        is_current = update.current if update.current is not None else run.is_current
+        return replace(run, is_current=is_current)
 
     @staticmethod
     def with_action(

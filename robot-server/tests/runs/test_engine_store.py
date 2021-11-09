@@ -62,6 +62,7 @@ def test_raise_if_engine_does_not_exist(subject: EngineStore) -> None:
 async def test_clear_engine(subject: EngineStore) -> None:
     """It should clear a stored engine entry."""
     await subject.create(run_id="run-id")
+    await subject.runner.stop()
     subject.clear()
 
     with pytest.raises(EngineMissingError):
@@ -74,3 +75,11 @@ async def test_clear_engine(subject: EngineStore) -> None:
 async def test_clear_engine_noop(subject: EngineStore) -> None:
     """It should noop if clear called and no stored engine entry."""
     subject.clear()
+
+
+async def test_clear_engine_not_stopped(subject: EngineStore) -> None:
+    """It should raise a conflict if the engine is not stopped."""
+    await subject.create(run_id="run-id")
+
+    with pytest.raises(EngineConflictError):
+        subject.clear()

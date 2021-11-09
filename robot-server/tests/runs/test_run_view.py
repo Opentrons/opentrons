@@ -26,6 +26,7 @@ from robot_server.runs.run_models import (
     RunCommandSummary,
     LabwareOffset,
     LabwareOffsetVector,
+    RunUpdate,
 )
 
 from robot_server.runs.action_models import (
@@ -318,4 +319,27 @@ def test_create_action(current_time: datetime) -> None:
         created_at=run_created_at,
         actions=[action_result],
         is_current=True,
+    )
+
+
+def test_with_update() -> None:
+    """It should update a run resource to not current."""
+    run = RunResource(
+        run_id="run-id",
+        create_data=BasicRunCreateData(),
+        created_at=datetime(year=2021, month=1, day=1),
+        actions=[],
+        is_current=True,
+    )
+    update = RunUpdate(current=False)
+
+    subject = RunView()
+    result = subject.with_update(run=run, update=update)
+
+    assert result == RunResource(
+        run_id="run-id",
+        create_data=BasicRunCreateData(),
+        created_at=datetime(year=2021, month=1, day=1),
+        actions=[],
+        is_current=False,
     )
