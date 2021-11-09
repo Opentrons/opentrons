@@ -136,7 +136,7 @@ async def create_run(
 
 @base_router.patch(
     path="/runs/{runId}",
-    summary="Modify a run.",
+    summary="Modify a run",
     description="Modify a run that was previously created via `POST /runs`.",
     status_code=status.HTTP_200_OK,
     # TODO(mc, 2021-06-23): mypy >= 0.780 broke Unions as `response_model`
