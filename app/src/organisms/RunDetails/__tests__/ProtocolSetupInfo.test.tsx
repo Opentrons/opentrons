@@ -10,14 +10,19 @@ import { mockConnectedRobot } from '../../../redux/discovery/__fixtures__'
 import { mockProtocolPipetteTipRackCalInfo } from '../../../redux/pipettes/__fixtures__'
 import { getProtocolPipetteTipRackCalInfo } from '../../../redux/pipettes'
 import { ProtocolSetupInfo } from '../ProtocolSetupInfo'
+import { CommandItem } from '../CommandItem'
 import { useProtocolDetails } from '../hooks'
-import { ProtocolFile } from '@opentrons/shared-data'
-import type { Command, LabwareDefinition2 } from '@opentrons/shared-data'
+import type {
+  Command,
+  LabwareDefinition2,
+  ProtocolFile,
+} from '@opentrons/shared-data'
 
 jest.mock('../hooks')
 jest.mock('../../../redux/pipettes/types')
 jest.mock('../../../redux/discovery/selectors')
 jest.mock('../../../redux/pipettes')
+jest.mock('./CommandItem')
 
 const mockUseProtocolDetails = useProtocolDetails as jest.MockedFunction<
   typeof useProtocolDetails
@@ -28,9 +33,11 @@ const mockGetProtocolPipetteTiprackData = getProtocolPipetteTipRackCalInfo as je
 const mockGetConnectedRobot = discoverySelectors.getConnectedRobot as jest.MockedFunction<
   typeof discoverySelectors.getConnectedRobot
 >
+const mockCommandItem = CommandItem as jest.MockedFunction<typeof CommandItem>
 
 const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolFile<{}>
 
+const TC_ID = 'thermocycler'
 const LABWARE_LOCATION = { slotName: '3' }
 const MODULE_LOCATION = { slotName: '3' } || {
   coordinates: { x: 0, y: 0, z: 0 },
@@ -83,11 +90,11 @@ const COMMAND_TYPE_LOAD_MODULE = {
 const COMMAND_TYPE_LOAD_MODULE_TC = {
   commandType: 'loadModule',
   params: {
-    moduleId: 'thermocycler',
+    moduleId: TC_ID,
     location: MODULE_LOCATION,
   },
   result: {
-    moduleId: 'thermocycler',
+    moduleId: TC_ID,
   },
 } as Command
 const COMMAND_TYPE_LOAD_PIPETTE = {
@@ -137,7 +144,12 @@ const render = (props: React.ComponentProps<typeof ProtocolSetupInfo>) => {
 describe('ProtocolSetupInfo', () => {
   let props: React.ComponentProps<typeof ProtocolSetupInfo>
   beforeEach(() => {
-    props = { onCloseClick: jest.fn(), SetupCommand: COMMAND_TYPE_LOAD_LABWARE }
+    props = {
+      onCloseClick: jest.fn(),
+      SetupCommand: COMMAND_TYPE_LOAD_LABWARE,
+      runStatus: 'run status',
+      type: 'type',
+    }
     when(mockUseProtocolDetails)
       .calledWith()
       .mockReturnValue({
@@ -169,6 +181,7 @@ describe('ProtocolSetupInfo', () => {
     mockGetProtocolPipetteTiprackData.mockReturnValue(
       mockProtocolPipetteTipRackCalData
     )
+    when(mockCommandItem).mockReturnValue(<div>Mock Command Item</div>)
     mockGetConnectedRobot.mockReturnValue(mockConnectedRobot)
   })
   it('should render correct Protocol Setup text', () => {
@@ -185,6 +198,8 @@ describe('ProtocolSetupInfo', () => {
     props = {
       onCloseClick: jest.fn(),
       SetupCommand: COMMAND_TYPE_LOAD_LABWARE_WITH_MODULE,
+      runStatus: 'run status',
+      type: 'type',
     }
     when(mockUseProtocolDetails).calledWith().mockReturnValue({
       protocolData: simpleV6Protocol,
@@ -196,12 +211,22 @@ describe('ProtocolSetupInfo', () => {
     )
   })
   it('should render correct command when commandType is loadPipette', () => {
-    props = { onCloseClick: jest.fn(), SetupCommand: COMMAND_TYPE_LOAD_PIPETTE }
+    props = {
+      onCloseClick: jest.fn(),
+      SetupCommand: COMMAND_TYPE_LOAD_PIPETTE,
+      runStatus: 'run status',
+      type: 'type',
+    }
     const { getByText } = render(props)
     getByText(nestedTextMatcher('Load My Pipette in left Mount'))
   })
   it('should render correct command when commandType is loadModule', () => {
-    props = { onCloseClick: jest.fn(), SetupCommand: COMMAND_TYPE_LOAD_MODULE }
+    props = {
+      onCloseClick: jest.fn(),
+      SetupCommand: COMMAND_TYPE_LOAD_MODULE,
+      runStatus: 'run status',
+      type: 'type',
+    }
     const { getByText } = render(props)
     getByText('Load Temperature Module GEN2 in Slot 3')
   })
@@ -209,6 +234,8 @@ describe('ProtocolSetupInfo', () => {
     props = {
       onCloseClick: jest.fn(),
       SetupCommand: COMMAND_TYPE_LOAD_MODULE_TC,
+      runStatus: 'run status',
+      type: 'type',
     }
     when(mockUseProtocolDetails)
       .calledWith()
@@ -225,7 +252,7 @@ describe('ProtocolSetupInfo', () => {
             [LABWARE_DEF_ID]: LABWARE_DEF,
           },
           modules: {
-            ['thermocycler']: {
+            [TC_ID]: {
               slot: '3',
               model: 'thermocyclerModuleV1',
             },
@@ -247,12 +274,22 @@ describe('ProtocolSetupInfo', () => {
     expect(container.firstChild).toBeNull()
   })
   it('renders null if SetupCommand is undefined', () => {
-    props = { onCloseClick: jest.fn(), SetupCommand: undefined }
+    props = {
+      onCloseClick: jest.fn(),
+      SetupCommand: undefined,
+      runStatus: 'run status',
+      type: 'type',
+    }
     const { container } = render(props)
     expect(container.firstChild).toBeNull()
   })
   it('renders null if labware is a trash', () => {
-    props = { onCloseClick: jest.fn(), SetupCommand: COMMAND_TYPE_TRASH }
+    props = {
+      onCloseClick: jest.fn(),
+      SetupCommand: COMMAND_TYPE_TRASH,
+      runStatus: 'run status',
+      type: 'type',
+    }
     when(mockUseProtocolDetails).calledWith().mockReturnValue({
       protocolData: simpleV6Protocol,
       displayName: 'mock display name',

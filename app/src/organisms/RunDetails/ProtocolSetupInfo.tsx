@@ -4,7 +4,6 @@ import {
   Btn,
   C_MED_DARK_GRAY,
   DIRECTION_COLUMN,
-  DIRECTION_ROW,
   Flex,
   FONT_SIZE_BODY_1,
   FONT_SIZE_CAPTION,
@@ -22,6 +21,7 @@ import { getConnectedRobot } from '../../redux/discovery'
 import { State } from '../../redux/types'
 import { useSelector } from 'react-redux'
 import { useProtocolDetails } from './hooks'
+import { CommandItem } from './CommandItem'
 import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
 
 interface ProtocolSetupInfoProps {

@@ -38,5 +38,6 @@
   "load_labware_info_protocol_setup": "Load {{labware_loadname}} v{{labware_version}} in {{module_name}} in Slot {{slot_number}}",
   "load_labware_info_protocol_setup_plural": "Load {{labware_loadname}} v{{labware_version}} in {{module_name}}",
   "end_of_protocol": "End of protocol",
-  "comment": "Comment"
+  "comment": "Comment",
+  "anticipated": "Anticipated steps"
 }

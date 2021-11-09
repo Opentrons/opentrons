@@ -15,8 +15,10 @@ import {
 } from '@opentrons/components'
 import { useProtocolDetails } from './hooks'
 import { ProtocolSetupInfo } from './ProtocolSetupInfo'
-import type { ProtocolFile } from '@opentrons/shared-data'
 import { useRunStatus } from '../RunTimeControl/hooks'
+import fixtureCommands from '@opentrons/app/src/organisms/RunDetails/Fixture_commands.json'
+import type { ProtocolFile } from '@opentrons/shared-data'
+
 interface Props {
   anticipated?: string
   inProgress: string
@@ -32,6 +34,18 @@ export function CommandList(props: Props): JSX.Element | null {
     .protocolData
   const runStatus = useRunStatus()
   if (protocolData == null) return null
+  const legacyCommands = fixtureCommands.commands
+
+  let commandType = ''
+  if (props.inProgress) {
+    commandType === 'running'
+  } else if (props.anticipated) {
+    commandType === 'queued'
+  } else if (props.completed) {
+    commandType === 'succeeded'
+  } else {
+    commandType === 'failed'
+  }
 
   return (
     <React.Fragment>
@@ -48,6 +62,8 @@ export function CommandList(props: Props): JSX.Element | null {
                     ? command
                     : undefined
                 }
+                runStatus={runStatus}
+                type={commandType}
               />
             </Flex>
           ))
@@ -79,68 +95,54 @@ export function CommandList(props: Props): JSX.Element | null {
         color={C_MED_DARK_GRAY}
       >
         <Flex>
-          {'commands' in protocolData
-            ? protocolData.commands.map(command => {
-                let commandType
-                if (props.inProgress) {
-                  commandType === 'running'
-                } else if (props.anticipated) {
-                  commandType === 'queued'
-                } else if (props.completed) {
-                  commandType === 'succeeded'
-                }
-                let commandText
-                if (command.commandType === 'delay'){
-                  commandText = <Flex flexDirection={DIRECTION_ROW}>
-                      <Flex
-                        textTransform={TEXT_TRANSFORM_UPPERCASE}
-                        padding={SPACING_1}
-                        key={command.id}
-                        id={`RunDetails_CommandList`}
-                      >
-                        {t('comment')}
-                      </Flex>
-                      <Flex>{command.params.message}</Flex>
-                    </Flex>}
-                    else if (
+          {legacyCommands.map(command => {
+            let commandWholeText
+            if (command.commandType === 'delay') {
+              commandWholeText = (
+                <Flex flexDirection={DIRECTION_ROW}>
+                  <Flex
+                    textTransform={TEXT_TRANSFORM_UPPERCASE}
+                    padding={SPACING_1}
+                    key={command.id}
+                    id={`RunDetails_CommandList`}
+                  >
+                    {t('comment')}
+                  </Flex>
+                  <Flex>{command.data.legacyCommandText}</Flex>
+                </Flex>
+              )
+            } else if (
+              command.commandType !== 'loadLabware' &&
+              'loadPipette' &&
+              'loadModule'
+            ) {
+              commandWholeText = (
+                <Flex key={command.id}>{command.data.legacyCommandText}</Flex>
+              )
+            }
+
+            return (
+              <Flex key={command.id} id={`RunDetails_CommandList`}>
+                {commandType === 'queued' ? (
+                  <Flex padding={SPACING_1} fontSize={FONT_SIZE_CAPTION}>
+                    {t('anticipated')}
+                  </Flex>
+                ) : null}
+                <CommandItem
+                  currentCommand={
                     command.commandType !== 'loadLabware' &&
                     'loadPipette' &&
-                    'loadModule') {
-                      commandText = <Flex key={command.id}>{command.commandType}</Flex>
-                    }
-                  
-                return (
-                  <Flex key={command.id} id={`RunDetails_CommandList`}>
-                    <CommandItem
-                      currentCommand={command}
-                      type={commandType}
-                      runStatus={runStatus}
-                      commandText={commandText}
-                    />
-                  </Flex>
-                  // use the CommandText component that you make in your other pr to move this text into there
-                  // command.commandType === 'delay' ? (
-                  //   <Flex flexDirection={DIRECTION_ROW}>
-                  //     <Flex
-                  //       textTransform={TEXT_TRANSFORM_UPPERCASE}
-                  //       padding={SPACING_1}
-                  //       key={command.id}
-                  //       id={`RunDetails_CommandList`}
-                  //     >
-                  //       {t('comment')}
-                  //     </Flex>
-                  //     <Flex>{command.params.message}</Flex>
-                  //   </Flex>
-                  // ) : (
-                  //   command.commandType !== 'loadLabware' &&
-                  //   'loadPipette' &&
-                  //   'loadModule' && (
-                  //     <Flex key={command.id}>{command.commandType}</Flex>
-                  //   )
-                  // )
-                )
-              })
-            : null}
+                    'loadModule'
+                      ? command
+                      : undefined
+                  }
+                  type={commandType}
+                  runStatus={runStatus}
+                  commandText={commandWholeText}
+                />
+              </Flex>
+            )
+          })}
         </Flex>
         <Flex padding={SPACING_1}>{t('end_of_protocol')}</Flex>
       </Flex>
