@@ -14,7 +14,7 @@ export const mockPausedRun: RunData = {
   id: RUN_ID_1,
   createdAt: '2021-10-07T18:44:49.366581+00:00',
   status: 'paused',
-  createParams: { protocolId: PROTOCOL_ID },
+  protocolId: PROTOCOL_ID,
   actions: [
     {
       id: '1',
@@ -36,7 +36,7 @@ export const mockRunningRun: RunData = {
   id: RUN_ID_2,
   createdAt: '2021-10-07T18:44:49.366581+00:00',
   status: 'running',
-  createParams: { protocolId: PROTOCOL_ID },
+  protocolId: PROTOCOL_ID,
   actions: [
     {
       id: '1',
