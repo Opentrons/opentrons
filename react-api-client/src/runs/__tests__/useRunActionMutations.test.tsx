@@ -37,13 +37,13 @@ describe('useRunActionMutations hook', () => {
     const mockStopRun = jest.fn()
 
     when(mockUsePlayRunMutation)
-      .calledWith(RUN_ID_1)
+      .calledWith()
       .mockReturnValue(({
         playRun: mockPlayRun,
       } as unknown) as UsePlayRunMutationResult)
 
     when(mockUsePauseRunMutation)
-      .calledWith(RUN_ID_1)
+      .calledWith()
       .mockReturnValue(({
         pauseRun: mockPauseRun,
       } as unknown) as UsePauseRunMutationResult)
@@ -58,8 +58,10 @@ describe('useRunActionMutations hook', () => {
 
     act(() => result.current.playRun())
     expect(mockPlayRun).toHaveBeenCalledTimes(1)
+    expect(mockPlayRun).toHaveBeenCalledWith(RUN_ID_1)
     act(() => result.current.pauseRun())
     expect(mockPauseRun).toHaveBeenCalledTimes(1)
+    expect(mockPauseRun).toHaveBeenCalledWith(RUN_ID_1)
     act(() => result.current.stopRun())
     expect(mockStopRun).toHaveBeenCalledTimes(1)
     expect(mockStopRun).toHaveBeenCalledWith(RUN_ID_1)

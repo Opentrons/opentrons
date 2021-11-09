@@ -12,16 +12,16 @@ import { useHost } from '../api'
 export type UsePlayRunMutationResult = UseMutationResult<
   RunAction,
   unknown,
-  void
+  string
 > & {
-  playRun: UseMutateFunction<RunAction>
+  playRun: UseMutateFunction<RunAction, unknown, string>
 }
 
-export const usePlayRunMutation = (runId: string): UsePlayRunMutationResult => {
+export const usePlayRunMutation = (): UsePlayRunMutationResult => {
   const host = useHost()
-  const mutation = useMutation<RunAction>(
+  const mutation = useMutation<RunAction, unknown, string>(
     [host, 'runs', RUN_ACTION_TYPE_PLAY],
-    () =>
+    (runId: string) =>
       createRunAction(host as HostConfig, runId, {
         actionType: RUN_ACTION_TYPE_PLAY,
       }).then(response => response.data)

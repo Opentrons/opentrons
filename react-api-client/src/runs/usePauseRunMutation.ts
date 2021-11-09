@@ -12,18 +12,16 @@ import { useHost } from '../api'
 export type UsePauseRunMutationResult = UseMutationResult<
   RunAction,
   unknown,
-  void
+  string
 > & {
-  pauseRun: UseMutateFunction<RunAction>
+  pauseRun: UseMutateFunction<RunAction, unknown, string>
 }
 
-export const usePauseRunMutation = (
-  runId: string
-): UsePauseRunMutationResult => {
+export const usePauseRunMutation = (): UsePauseRunMutationResult => {
   const host = useHost()
-  const mutation = useMutation<RunAction>(
+  const mutation = useMutation<RunAction, unknown, string>(
     [host, 'runs', RUN_ACTION_TYPE_PAUSE],
-    () =>
+    (runId: string) =>
       createRunAction(host as HostConfig, runId, {
         actionType: RUN_ACTION_TYPE_PAUSE,
       }).then(response => response.data)
