@@ -1,7 +1,7 @@
 """Run response model factory."""
 from dataclasses import replace
 from datetime import datetime
-from typing import List, Optional, Tuple
+from typing import List, Tuple
 
 from opentrons.protocol_engine import (
     Command as ProtocolEngineCommand,
@@ -12,16 +12,7 @@ from opentrons.protocol_engine import (
 
 from .run_store import RunResource
 from .action_models import RunAction, RunActionCreateData
-from .run_models import (
-    Run,
-    RunCreateData,
-    BasicRun,
-    BasicRunCreateData,
-    ProtocolRun,
-    ProtocolRunCreateData,
-    RunCommandSummary,
-    RunUpdate,
-)
+from .run_models import Run, RunUpdate, RunCommandSummary
 
 
 class RunView:
@@ -30,31 +21,6 @@ class RunView:
     Resources consumed and returned by this class will be treated as
     immutable.
     """
-
-    @staticmethod
-    def as_resource(
-        run_id: str,
-        created_at: datetime,
-        create_data: Optional[RunCreateData],
-    ) -> RunResource:
-        """Create a new run resource instance from its create data.
-
-        Arguments:
-            run_id: Unique identifier.
-            created_at: Resource creation timestamp.
-            create_data: Data used to create the run.
-
-        Returns:
-            The run in its internal resource representation, for use in
-                the `RunStore` and other classes.
-        """
-        return RunResource(
-            run_id=run_id,
-            created_at=created_at,
-            create_data=create_data or BasicRunCreateData(),
-            actions=[],
-            is_current=True,
-        )
 
     @staticmethod
     def with_update(run: RunResource, update: RunUpdate) -> RunResource:
@@ -123,36 +89,19 @@ class RunView:
         Returns:
             Run response model representing the same resource.
         """
-        create_data = run.create_data
         command_summaries = [
             RunCommandSummary(id=c.id, commandType=c.commandType, status=c.status)
             for c in commands
         ]
 
-        if isinstance(create_data, BasicRunCreateData):
-            return BasicRun(
-                id=run.run_id,
-                createParams=create_data.createParams,
-                createdAt=run.created_at,
-                current=run.is_current,
-                actions=run.actions,
-                commands=command_summaries,
-                pipettes=pipettes,
-                labware=labware,
-                status=engine_status,
-            )
-
-        if isinstance(create_data, ProtocolRunCreateData):
-            return ProtocolRun(
-                id=run.run_id,
-                createParams=create_data.createParams,
-                createdAt=run.created_at,
-                current=run.is_current,
-                actions=run.actions,
-                commands=command_summaries,
-                pipettes=pipettes,
-                labware=labware,
-                status=engine_status,
-            )
-
-        raise ValueError(f"Invalid run resource {run}")
+        return Run(
+            id=run.run_id,
+            protocolId=run.protocol_id,
+            createdAt=run.created_at,
+            current=run.is_current,
+            actions=run.actions,
+            commands=command_summaries,
+            pipettes=pipettes,
+            labware=labware,
+            status=engine_status,
+        )
