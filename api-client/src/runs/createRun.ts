@@ -4,7 +4,9 @@ import type { ResponsePromise } from '../request'
 import type { HostConfig } from '../types'
 import type { Run } from './types'
 
-export type CreateRunData = { protocolId?: string }
+export interface CreateRunData {
+  protocolId?: string
+}
 
 export function createRun(
   config: HostConfig,

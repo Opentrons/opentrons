@@ -20,7 +20,7 @@ import { ConfirmExitProtocolUploadModal } from './ConfirmExitProtocolUploadModal
 
 import { useLogger } from '../../logger'
 import type { ErrorObject } from 'ajv'
-import type { Dispatch, State } from '../../redux/types'
+import type { Dispatch } from '../../redux/types'
 
 const VALIDATION_ERROR_T_MAP: { [errorKey: string]: string } = {
   INVALID_FILE_TYPE: 'invalid_file_type',
